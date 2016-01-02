@@ -1,7 +1,6 @@
 using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +64,7 @@ namespace DevelopersWin.VoteReporter
 
 	public class VoteReport : ViewBase
 	{
-		public Collection<VoteGroupView> Groups { get; } = new Collection<VoteGroupView>();
+		public System.Collections.ObjectModel.Collection<VoteGroupView> Groups { get; } = new System.Collections.ObjectModel.Collection<VoteGroupView>();
 	}
 
 	public abstract class VoteViewBase : ViewBase
@@ -84,7 +83,7 @@ namespace DevelopersWin.VoteReporter
 
 	public class VoteGroupView : VoteViewBase
 	{
-		public Collection<VoteView> Votes { get; } = new Collection<VoteView>();
+		public System.Collections.ObjectModel.Collection<VoteView> Votes { get; } = new System.Collections.ObjectModel.Collection<VoteView>();
 	}
 
 	public class VoteView : VoteViewBase

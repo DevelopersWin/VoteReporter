@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Diagnostics;
 using DragonSpark.Setup.Commands;
-using DragonSpark.Windows;
 using DragonSpark.Windows.Diagnostics;
 using DragonSpark.Windows.Runtime;
 

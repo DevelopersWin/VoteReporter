@@ -63,16 +63,12 @@ namespace DevelopersWin.VoteReporter.Properties {
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         ///&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
-        ///    xmlns:msxsl=&quot;urn:schemas-microsoft-com:xslt&quot; exclude-result-prefixes=&quot;msxsl&quot;
+        ///	xmlns:i=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+        ///	xmlns:msxsl=&quot;urn:schemas-microsoft-com:xslt&quot; xmlns:local=&quot;clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter&quot; exclude-result-prefixes=&quot;msxsl i local&quot;
         ///&gt;
-        ///    &lt;xsl:output method=&quot;text&quot; indent=&quot;yes&quot;/&gt;
+        ///	&lt;xsl:output method=&quot;html&quot; indent=&quot;no&quot; /&gt;
         ///
-        ///    &lt;xsl:template match=&quot;@* | node()&quot;&gt;
-        ///        &lt;xsl:copy&gt;
-        ///            &lt;xsl:apply-templates select=&quot;@* | node()&quot;/&gt;
-        ///        &lt;/xsl:copy&gt;
-        ///    &lt;/xsl:template&gt;
-        ///&lt;/xsl:stylesheet&gt;.
+        ///	&lt;xsl:template match=&quot;local:VoteReport&quot;&gt;&lt;xsl:variable name=&quot;Date&quot; select=&quot;msxsl:format-date( @Created, &apos;dddd, MM [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Report {
             get {

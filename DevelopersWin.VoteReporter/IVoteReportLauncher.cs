@@ -1,5 +1,6 @@
 using DragonSpark.Windows;
 using System;
+using System.Diagnostics;
 
 namespace DevelopersWin.VoteReporter
 {
@@ -12,7 +13,7 @@ namespace DevelopersWin.VoteReporter
 	{
 		public void Launch( Uri location )
 		{
-			Process.Create( location.LocalPath );
+			Process.Start( location.LocalPath );
 		}
 	}
 }

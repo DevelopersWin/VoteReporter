@@ -1,18 +1,15 @@
 ﻿using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
-using DragonSpark.Setup;
 using System;
 using System.Linq;
-using DragonSpark.Activation;
 
 namespace DevelopersWin.VoteReporter.Configuration.Development
 {
-	public class Module : Module<Setup>
+	public class Module : MonitoredModule<Setup>
 	{
-		public Module( IActivator activator, IModuleMonitor moduleMonitor, SetupContext context ) : base( activator, moduleMonitor, context )
-		{
-		}
+		public Module( IModuleMonitor moduleMonitor, Setup command ) : base( moduleMonitor, command )
+		{}
 	}
 
 	class VoteCountLocator : IVoteCountLocator

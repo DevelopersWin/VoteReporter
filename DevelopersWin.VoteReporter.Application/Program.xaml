@@ -3,7 +3,6 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-	xmlns:application="clr-namespace:DragonSpark.Windows;assembly=DragonSpark.Windows"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	xmlns:localEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
@@ -13,13 +12,11 @@
 	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
 	xmlns:registration="clr-namespace:DragonSpark.Setup.Registration;assembly=DragonSpark"
 	xmlns:voteReporter="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
-	xmlns:modularity="clr-namespace:DragonSpark.Modularity;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
 	<voteReporter:SetupApplicationCommand />
 	<commands:SetupUnityCommand>
 		<commands:UnityInstance Instance="{markup:DirectoryInfo Reports}" />
-		<commands:UnityInstance RegistrationType="{x:Type modularity:IModuleCatalog}" Instance="{x:Static application:AssemblyModuleCatalog.Instance}" />
 	</commands:SetupUnityCommand>
 	<registration:RegisterFrameworkExceptionTypesCommand />
 	<setupWindows:SetupRegistrationByConventionCommand />

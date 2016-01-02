@@ -3,9 +3,9 @@ using System;
 using System.Globalization;
 using Xunit;
 
-namespace DevelopersWin.VoteReporter.Testing
+namespace DragonSpark.Windows.Testing.Io
 {
-	public class UnitTest1
+	public class FileSystemTests
 	{
 		[Fact]
 		public void TestMethod1()

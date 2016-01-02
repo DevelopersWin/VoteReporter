@@ -1,4 +1,6 @@
-﻿namespace DevelopersWin.VoteReporter.Application
+﻿using DragonSpark.Setup;
+
+namespace DevelopersWin.VoteReporter.Application
 {
 	public partial class Program
 	{
@@ -9,7 +11,7 @@
 
 		static void Main( string[] args )
 		{
-			new Program().Run( args );
+			new Program().Run( new SetupParameter<string[]>( args ) );
 		}
 	}
 }
