@@ -1,7 +1,7 @@
+using DragonSpark.Runtime;
+using DragonSpark.Windows.Io;
 using System;
 using System.IO;
-using System.Xaml;
-using DragonSpark.Windows.Io;
 
 namespace DevelopersWin.VoteReporter
 {
@@ -25,24 +25,10 @@ namespace DevelopersWin.VoteReporter
 		{
 			var extension = item is string ? "txt" : "xaml";
 			var path = Path.Combine( directory.FullName, fileName ?? $"{FileSystem.GetValidPath()}.{extension}" );
-			var content = item as string ?? serializer.Serialize( item );
+			var content = item as string ?? serializer.Save( item );
 			File.WriteAllText( path, content );
 
 			var result = new Uri( path );
-			return result;
-		}
-	}
-
-	public interface ISerializer
-	{
-		string Serialize( object item );
-	}
-
-	class Serializer : ISerializer
-	{
-		public string Serialize( object item )
-		{
-			var result = XamlServices.Save( item );
 			return result;
 		}
 	}

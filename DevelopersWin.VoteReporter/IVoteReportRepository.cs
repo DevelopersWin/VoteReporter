@@ -2,8 +2,6 @@ namespace DevelopersWin.VoteReporter
 {
 	public interface IVoteReportRepository
 	{
-		// VoteReport GetLatest();
-
 		void Save( VoteReport report );
 	}
 
@@ -15,12 +13,6 @@ namespace DevelopersWin.VoteReporter
 		{
 			this.storage = storage;
 		}
-
-		/*public VoteReport GetLatest()
-		{
-			var result = directory.GetFiles( "*.xaml" ).OrderByDescending( info => info.CreationTimeUtc ).FirstOrDefault().Transform( x => (VoteReport)XamlServices.Load( x.FullName ) );
-			return result;
-		}*/
 
 		public void Save( VoteReport report )
 		{
