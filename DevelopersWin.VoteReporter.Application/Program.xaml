@@ -1,9 +1,8 @@
-﻿<setup:Setup x:Class="DevelopersWin.VoteReporter.Application.Program"
+﻿<voteReporter:ApplicationSetup x:Class="DevelopersWin.VoteReporter.Application.Program"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	xmlns:localEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
 	xmlns:setupWindows="clr-namespace:DragonSpark.Windows.Setup;assembly=DragonSpark.Windows"
@@ -14,7 +13,6 @@
 	xmlns:voteReporter="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
 	mc:Ignorable="d"
 >
-	<voteReporter:SetupApplicationCommand />
 	<commands:SetupUnityCommand>
 		<commands:UnityInstance Instance="{markup:DirectoryInfo Reports}" />
 	</commands:SetupUnityCommand>
@@ -37,4 +35,4 @@
 		<markup:Locate Type="{markup:Enumerable {x:Type entity:IInstaller}}" />
 	</localEntity:InitializeDatabaseCommand>
 	<commands:RunProgramCommand />
-</setup:Setup>
+</voteReporter:ApplicationSetup>

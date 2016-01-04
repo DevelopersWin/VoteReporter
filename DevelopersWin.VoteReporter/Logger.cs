@@ -5,7 +5,7 @@ using DragonSpark.Windows.Runtime;
 
 namespace DevelopersWin.VoteReporter
 {
-	public class SetupApplicationCommand : SetupApplicationCommand<Logger, AssemblyProvider>
+	public class ApplicationSetup : ApplicationSetup<Logger, AssemblyProvider>
 	{ }
 
 	public class Logger : CompositeMessageLogger
