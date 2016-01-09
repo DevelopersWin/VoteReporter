@@ -1,14 +1,14 @@
+using DragonSpark.Setup.Registration;
+using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Entity;
 using System.Data.Entity;
-using DragonSpark.Setup;
-using DragonSpark.Setup.Registration;
 
 namespace DevelopersWin.VoteReporter.Entity
 {
 	[Register( typeof(DbContext) )]
 	public class VotingContext : EntityContext
 	{
-		public VotingContext()
+		public VotingContext( IAttributeProvider provider ) : base( provider )
 		{}
 
 		protected override void Dispose( bool disposing )
