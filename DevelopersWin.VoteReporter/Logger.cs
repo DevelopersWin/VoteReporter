@@ -5,9 +5,6 @@ using DragonSpark.Windows.Runtime;
 
 namespace DevelopersWin.VoteReporter
 {
-	public class SetupApplicationCommand : SetupApplicationCommandBase<Logger>
-	{}
-
 	public class SetupUnityCommand : SetupUnityCommand<AssemblyProvider>
 	{}
 

@@ -7,7 +7,7 @@ namespace DevelopersWin.VoteReporter.Application
 	{
 		static void Main( string[] args )
 		{
-			using ( var parameter = new SetupParameter<string[]>( args ) )
+			using ( var parameter = new ApplicationSetupParameter<Logger, string[]>( args ) )
 			{
 				new Program().Run( parameter );
 			}

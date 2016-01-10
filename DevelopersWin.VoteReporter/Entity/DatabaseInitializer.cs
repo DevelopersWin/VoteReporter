@@ -1,10 +1,9 @@
-using System.Data.Entity;
-using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
+using System.Data.Entity;
 
 namespace DevelopersWin.VoteReporter.Entity
 {
-	[Register( typeof(IDatabaseInitializer<VotingContext>) )]
+	[Register.As( typeof(IDatabaseInitializer<VotingContext>) )]
 	public class DatabaseInitializer : DragonSpark.Windows.Entity.MigrateDatabaseToLatestVersion<VotingContext, Configuration>
 	{}
 }

@@ -5,7 +5,7 @@ using System.Data.Entity;
 
 namespace DevelopersWin.VoteReporter.Entity
 {
-	[Register( typeof(DbContext) )]
+	[Register.As( typeof(DbContext) )]
 	public class VotingContext : EntityContext
 	{
 		public VotingContext( IAttributeProvider provider ) : base( provider )

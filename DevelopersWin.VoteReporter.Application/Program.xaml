@@ -14,7 +14,7 @@
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
-	<voteReporter:SetupApplicationCommand />
+	<commands:AssignLocationCommand />
 	<voteReporter:SetupUnityCommand>
 		<commands:UnityInstance Instance="{markup:DirectoryInfo Reports}" />
 	</voteReporter:SetupUnityCommand>
