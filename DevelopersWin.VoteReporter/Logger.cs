@@ -5,12 +5,14 @@ using DragonSpark.Windows.Runtime;
 
 namespace DevelopersWin.VoteReporter
 {
-	public class ApplicationSetup : ApplicationSetup<Logger, AssemblyProvider>
-	{ }
+	public class SetupApplicationCommand : SetupApplicationCommandBase<Logger>
+	{}
+
+	public class SetupUnityCommand : SetupUnityCommand<AssemblyProvider>
+	{}
 
 	public class Logger : CompositeMessageLogger
 	{
-		public Logger() : base( new TextMessageLogger(), new TraceMessageLogger() )
-		{}
+		public Logger() : base( new TextMessageLogger(), new TraceMessageLogger() ) {}
 	}
 }
