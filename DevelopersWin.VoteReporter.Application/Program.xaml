@@ -10,22 +10,18 @@
 	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
 	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
 	xmlns:registration="clr-namespace:DragonSpark.Setup.Registration;assembly=DragonSpark"
-	xmlns:voteReporter="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
-	<commands:AssignLocationCommand />
-	<voteReporter:SetupUnityCommand>
+	<commands:SetupUnityCommand>
 		<commands:UnityInstance Instance="{markup:DirectoryInfo Reports}" />
-	</voteReporter:SetupUnityCommand>
+	</commands:SetupUnityCommand>
 	<registration:RegisterFrameworkExceptionTypesCommand />
 	<setupWindows:SetupRegistrationByConventionCommand />
 
 	<commands:SetupObjectBuilderCommand />
 	<commands:ConfigureUnityCommand>
-		<commands:UnityInstance>
-			<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
-		</commands:UnityInstance>
+		<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
 	</commands:ConfigureUnityCommand>
 
 	<setupWindows:InitializeMarkupCommand />

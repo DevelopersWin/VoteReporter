@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Setup;
+using DragonSpark.Windows.Setup;
 
 namespace DevelopersWin.VoteReporter.Application
 {
@@ -7,7 +7,7 @@ namespace DevelopersWin.VoteReporter.Application
 	{
 		static void Main( string[] args )
 		{
-			using ( var parameter = new ApplicationSetupParameter<Logger, string[]>( args ) )
+			using ( var parameter = new ConsoleSetupParameter( ServiceLocator.Instance, args ) )
 			{
 				new Program().Run( parameter );
 			}
