@@ -6,10 +6,12 @@ using Microsoft.Practices.ServiceLocation;
 
 namespace DevelopersWin.VoteReporter
 {
-	public class ServiceLocator : ServiceLocatorFactory<AssemblyProvider, Logger>
+	public static class ServiceLocator
 	{
-		public static IServiceLocator Instance { get; } = new ServiceLocator().Create();
+		public static IServiceLocator Instance { get; } = new ServiceLocatorFactory().Create();
 	}
+
+	public class ServiceLocatorFactory : ServiceLocatorFactory<AssemblyProvider, Logger> {}
 
 	public class Logger : CompositeMessageLogger
 	{
