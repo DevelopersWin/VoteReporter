@@ -30,7 +30,7 @@ Dark O' Thirty:
 .@satyanadella @VisualStudio @windowsdev <xsl:value-of select="$TotalUbiquitous" /> votes for a ubiquitous #dotnet. Will you #empower $MSFT #developers?
 
 Disqus Comment:
-Please help spread the word by liking and/or re-tweeting our kind, weekly check-in to the Big Three there @ MSFT: 
+Please show your support by liking and/or re-tweeting our kind, weekly check-in to the Big Three there @ MSFT: 
 </xsl:template>
 
 	<xsl:template match="local:VoteGroupView">| **<xsl:value-of select="@Title" />** | **<xsl:value-of select="number(.//local:VoteCount/@Count)-number(.//local:VoteCount/@Delta)" />** | <span class="new">**<xsl:value-of select=".//local:VoteCount/@Delta" />**</span> | **<xsl:value-of select=".//local:VoteCount/@Count" />** |<xsl:text>&#10;</xsl:text><xsl:apply-templates select="local:VoteGroupView.Votes/local:VoteView" /></xsl:template>
