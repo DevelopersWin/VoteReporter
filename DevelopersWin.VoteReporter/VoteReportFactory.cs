@@ -43,7 +43,7 @@ namespace DevelopersWin.VoteReporter
 		{
 			var result = current.MapInto<VoteGroupView>();
 			var count = current.Votes.Sum( vote => vote.Records.SingleOrDefault( record => record.Recording == recording ).With( record => record.Count ) );
-			result.Counts = new VoteCount { Count = count, Delta = count - previous.With( view => view.Counts.Count ) }.BuildUp();
+			result.Counts = new VoteCount { Count = count, Delta = count - previous.With( view => view.Counts.Count ) };
 			result.Votes.AddRange( 
 				current.Votes
 					.OrderBy( vote => vote.Order )
@@ -57,7 +57,7 @@ namespace DevelopersWin.VoteReporter
 		{
 			var result = current.MapInto<VoteView>();
 			var count = current.Records.SingleOrDefault( record => record.Recording == recording ).With( record => record.Count );
-			result.Counts = new VoteCount { Count = count, Delta = count - previous.With( view => view.Counts.Count ) }.BuildUp();
+			result.Counts = new VoteCount { Count = count, Delta = count - previous.With( view => view.Counts.Count ) };
 			return result;
 		}
 	}

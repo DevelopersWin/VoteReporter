@@ -19,7 +19,6 @@
 	<registration:RegisterFrameworkExceptionTypesCommand />
 	<setupWindows:SetupRegistrationByConventionCommand />
 
-	<commands:SetupObjectBuilderCommand />
 	<commands:ConfigureUnityCommand>
 		<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
 	</commands:ConfigureUnityCommand>

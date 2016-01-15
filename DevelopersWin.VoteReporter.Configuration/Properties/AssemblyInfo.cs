@@ -2,6 +2,7 @@
 using DragonSpark.Setup;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using DragonSpark.ComponentModel;
 using DragonSpark.Setup.Registration;
 
 // General Information about an assembly is controlled through the following 
@@ -37,3 +38,5 @@ using DragonSpark.Setup.Registration;
 [assembly: AssemblyVersion( "1.0.0.0" )]
 [assembly: AssemblyFileVersion( "1.0.0.0" )]
 [assembly: Registration( Priority.High )]
+
+[assembly: DefaultValueAspectProvider]
