@@ -38,4 +38,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion( "1.0.0.0" )]
 [assembly: Registration( Priority.High )]
 
-[assembly: DefaultValueAspectProvider]
+[assembly: ApplyDefaultValues]

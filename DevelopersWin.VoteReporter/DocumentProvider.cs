@@ -1,13 +1,11 @@
-using System;
-using System.Net;
-using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using HtmlAgilityPack;
-using Microsoft.Practices.Unity;
+using System;
+using System.Net;
 
 namespace DevelopersWin.VoteReporter
 {
-	[LifetimeManager( typeof(ContainerControlledLifetimeManager) )]
+	[Persistent]
 	public class DocumentProvider
 	{
 		public HtmlDocument Load( string location )

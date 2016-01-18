@@ -39,4 +39,4 @@ using DragonSpark.Aspects;
 [assembly: AssemblyFileVersion( "1.0.0.0" )]
 [assembly: Registration( Priority.AboveNormal )]
 
-[assembly: DefaultValueAspectProvider]
+[assembly: ApplyDefaultValues]
