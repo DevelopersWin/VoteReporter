@@ -1,9 +1,9 @@
 using DevelopersWin.VoteReporter.Entity;
-using DragonSpark.Activation;
+using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Windows.Entity;
+using PostSharp.Patterns.Contracts;
 using System.Linq;
-using DragonSpark.Activation.FactoryModel;
 
 namespace DevelopersWin.VoteReporter
 {
@@ -13,7 +13,7 @@ namespace DevelopersWin.VoteReporter
 		readonly IVoteProvider provider;
 		readonly IVoteUpdater updater;
 
-		public RecordingFactory( VotingContext context, IVoteProvider provider, IVoteUpdater updater )
+		public RecordingFactory( [Required]VotingContext context, [Required]IVoteProvider provider, [Required]IVoteUpdater updater )
 		{
 			this.context = context;
 			this.provider = provider;
@@ -22,10 +22,10 @@ namespace DevelopersWin.VoteReporter
 
 		protected override Recording CreateItem()
 		{
-			var set = context.Create<Recording>();
-			var array = provider.Retrieve( set ).ToArray();
-			set.Records = array.Select( vote => vote.With( x => updater.Update( set, vote ) ).Records.OrderByDescending( record => record.Created ).First() ).ToList();
-			return set;
+			var result = context.Create<Recording>();
+			var votes = provider.Retrieve( result ).ToArray();
+			result.Records = votes.Select( vote => vote.With( x => updater.Update( result, vote ) ).Records.OrderByDescending( record => record.Created ).First() ).ToList();
+			return result;
 		}
 	}
 }

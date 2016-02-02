@@ -1,4 +1,4 @@
-﻿<setupWindows:ConsoleApplication x:Class="DevelopersWin.VoteReporter.Application.Program"
+﻿<setupWindows:ConsoleApplicationSetup x:Class="DevelopersWin.VoteReporter.Application.Program"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -22,7 +22,7 @@
 		<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
 	</commands:SetupUnityCommand>
 
-	<ds:InitializeMarkupCommand Context="{ds:Root}" />
+	<ds:InitializeMarkupCommand />
 	<commands:InitializeModulesCommand />
 	<entity:AssignDataDirectoryCommand />
 	<entity:InstallDatabaseCommand />
@@ -31,4 +31,4 @@
 		<markup:Locate Type="{markup:Enumerable {x:Type entity:IInstaller}}" />
 	</localEntity:InitializeDatabaseCommand>
 	<commands:RunProgramCommand />
-</setupWindows:ConsoleApplication>
+</setupWindows:ConsoleApplicationSetup>
