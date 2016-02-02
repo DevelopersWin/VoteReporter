@@ -4,7 +4,7 @@ using DragonSpark.ComponentModel;
 
 namespace DevelopersWin.VoteReporter.Entity
 {
-	[ContentProperty( "Votes" )]
+	[ContentProperty( nameof(Votes) )]
 	public class VoteGroup : VoteBase
 	{
 		[Collection]

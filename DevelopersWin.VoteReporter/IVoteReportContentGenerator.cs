@@ -2,6 +2,7 @@ using DevelopersWin.VoteReporter.Properties;
 using DragonSpark.Runtime;
 using DragonSpark.Windows.Runtime.Data;
 using PostSharp.Patterns.Contracts;
+using Transformer = System.Func<DragonSpark.Windows.Runtime.Data.DataTransformParameter, string>;
 
 namespace DevelopersWin.VoteReporter
 {
@@ -12,14 +13,13 @@ namespace DevelopersWin.VoteReporter
 
 	class VoteReportContentGenerator : IVoteReportContentGenerator
 	{
-		readonly IDataTransformer transformer;
+		readonly Transformer transformer;
 		readonly ISerializer serializer;
 		readonly DocumentFactory factory;
 
-		public VoteReportContentGenerator( IDataTransformer transformer, ISerializer serializer ) : this( transformer, serializer, DocumentFactory.Instance )
-		{}
+		public VoteReportContentGenerator( DataTransformer transformer, ISerializer serializer ) : this( transformer.Create, serializer, DocumentFactory.Instance ) {}
 
-		public VoteReportContentGenerator( [Required]IDataTransformer transformer, [Required]ISerializer serializer, [Required]DocumentFactory factory )
+		protected VoteReportContentGenerator( [Required]Transformer transformer, [Required]ISerializer serializer, [Required]DocumentFactory factory )
 		{
 			this.transformer = transformer;
 			this.serializer = serializer;
@@ -31,7 +31,7 @@ namespace DevelopersWin.VoteReporter
 			var stylesheet = factory.Create( Resources.Report );
 			var data = serializer.Save( report );
 			var source = factory.Create( data );
-			var result = transformer.ToString( stylesheet, source );
+			var result = transformer( new DataTransformParameter( stylesheet, source ) );
 			return result;
 		}
 	}

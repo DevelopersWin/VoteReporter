@@ -2,11 +2,10 @@
 using DragonSpark.Diagnostics;
 using DragonSpark.Windows.Diagnostics;
 using DragonSpark.Windows.Runtime;
-using Microsoft.Practices.ServiceLocation;
 
 namespace DevelopersWin.VoteReporter
 {
-	public static class ServiceLocator
+	/*public static class ServiceLocator
 	{
 		public static IServiceLocator Instance { get; } = ServiceLocatorFactory.Instance.Create();
 	}
@@ -16,6 +15,11 @@ namespace DevelopersWin.VoteReporter
 		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory();
 
 		ServiceLocatorFactory() : base( UnityContainerFactory<AssemblyProvider, Logger>.Instance.Create ) {}
+	}*/
+
+	public class AssignServiceLocation : AssignLocationCommand
+	{
+		public AssignServiceLocation() : base( UnityContainerFactory<AssemblyProvider, Logger>.Instance.Create() ) {}
 	}
 
 	public class Logger : CompositeMessageLogger
