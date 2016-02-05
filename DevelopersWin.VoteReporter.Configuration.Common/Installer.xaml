@@ -9,7 +9,7 @@
 	mc:Ignorable="d"
 	Id="59ED8E8C-3078-4737-8F8B-679C736A74A2"
 	ContextType="{x:Type voteReporter:VotingContext}"
-	Version="1.0.0.4"
+	Version="1.0.0.5"
 	>
 	<entity:EntityInstallationStep>
 		<voteReporter:VoteGroup Id="BC7C5B60-6187-453A-88F4-7B58CC2B4453" Title="Ubiquitous / Cross-Platform Client .NET" Order="{markup:Next}">
@@ -20,6 +20,8 @@
 				<voteReporter:Vote Id="6FF2260C-700E-4312-8F98-542E130CFB84" Title="Make Universal Windows Platform Open Source and Cross-Platform" Location="https://wpdev.uservoice.com/forums/110705-dev-platform/suggestions/7989744-make-universal-windows-platform-open-source-and-cr" Order="{markup:Next}" />
 				<voteReporter:Vote Id="077ec8cd-52a2-4a22-99da-bab432111f3d" Title="Windows App Studio: Add support for Android and IOS conversion" Location="https://wpdev.uservoice.com/forums/216486-windows-app-studio/suggestions/9550647-add-support-for-andriod-and-ios-conversion" Order="{markup:Next}" />
 				<voteReporter:Vote Id="D17F1A40-6857-4B1E-BFBF-CFDAC59D3141" Title="Expand/Enable Universal Windows Platform to Transpile to JavaScript (iOS/Droid Compatibility)" Location="https://wpdev.uservoice.com/forums/216486-windows-app-studio/suggestions/9550647-add-support-for-andriod-and-ios-conversion" Order="{markup:Next}" />
+				<voteReporter:Vote Id="3ca90c31-ffe7-486b-b910-958112acf874" Title="Negotiate with Other Major Browsers Manufacturers Over a Common IL" Location="https://wpdev.uservoice.com/forums/257854-microsoft-edge-developer/suggestions/11392869-negociate-with-other-major-browsers-maufacturers-o" Order="{markup:Next}" />
+				<voteReporter:Vote Id="d646a165-c8cc-460d-9167-7e30b30cddae" Title="Run Xaml / C# (like Silverlight) Applications Inside, without Plug-in [Closed / Carrying the Torch]" Location="https://wpdev.uservoice.com/forums/257854-microsoft-edge-developer/suggestions/8022150-run-xaml-c-like-silverlight-applications-ins" Order="{markup:Next}" />
 				<voteReporter:Vote Id="1c98f6e5-7a9e-47bd-a610-8a84646868d5" Title="Silverlight 6 [Closed / Carrying the Torch]" Location="http://visualstudio.uservoice.com/forums/121579-visual-studio/suggestions/3556619-silverlight-6" Order="{markup:Next}" />
 			</markup:Collection>
 		</voteReporter:VoteGroup>
