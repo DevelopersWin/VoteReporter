@@ -6,12 +6,12 @@ using System.Collections.ObjectModel;
 
 namespace DragonSpark.Diagnostics
 {
-	public class RecordingMessageLogger : ILogEventSink
+	public class RecordingLogEventSink : ILogEventSink
 	{
 		readonly IList<LogEvent> source = new Collection<LogEvent>();
 		readonly IReadOnlyCollection<LogEvent> events;
 
-		public RecordingMessageLogger()
+		public RecordingLogEventSink()
 		{
 			events = new ReadOnlyCollection<LogEvent>( source );
 		}
@@ -22,6 +22,6 @@ namespace DragonSpark.Diagnostics
 
 		public IEnumerable<LogEvent> Events => events;
 
-		public void Emit( LogEvent logEvent ) => source.Add( logEvent );
+		public virtual void Emit( LogEvent logEvent ) => source.Add( logEvent );
 	}
 }

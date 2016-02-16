@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override void OnInitializing( AutoData context ) => factory( context.Method ).Each( customization => customization.Customize( context.Fixture ) );
 	}
 
-	/*public class UnityContainerFactory<TAssemblyProvider> : UnityContainerFactory<TAssemblyProvider, RecordingMessageLogger> where TAssemblyProvider : IAssemblyProvider
+	/*public class UnityContainerFactory<TAssemblyProvider> : UnityContainerFactory<TAssemblyProvider, RecordingLogEventSink> where TAssemblyProvider : IAssemblyProvider
 	{
 		public new static UnityContainerFactory<TAssemblyProvider> Instance { get; } = new UnityContainerFactory<TAssemblyProvider>();
 

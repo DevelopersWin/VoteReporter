@@ -288,7 +288,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public static LogExceptionCommand Instance { get; } = new LogExceptionCommand();
 
-		public LogExceptionCommand() : this( MessageLogger.Instance ) { }
+		public LogExceptionCommand() : this( LoggingServices.Instance ) { }
 
 		public LogExceptionCommand( IMessageLogger logger ) : this( ExceptionMessageFactory.Instance, logger ) { }
 
@@ -299,7 +299,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public static LogFatalExceptionCommand Instance { get; } = new LogFatalExceptionCommand();
 
-		public LogFatalExceptionCommand() : this( MessageLogger.Instance ) { }
+		public LogFatalExceptionCommand() : this( LoggingServices.Instance ) { }
 
 		public LogFatalExceptionCommand( IMessageLogger logger ) : this( FatalExceptionMessageFactory.Instance, logger ) { }
 
@@ -310,7 +310,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public static LogWarningCommand Instance { get; } = new LogWarningCommand();
 
-		public LogWarningCommand() : this( MessageLogger.Instance ) { }
+		public LogWarningCommand() : this( LoggingServices.Instance ) { }
 
 		public LogWarningCommand( IMessageLogger logger ) : this( WarningMessageFactory.Instance, logger ) { }
 
@@ -321,7 +321,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public static LogInformationCommand Instance { get; } = new LogInformationCommand();
 
-		public LogInformationCommand() : this( MessageLogger.Instance ) {}
+		public LogInformationCommand() : this( LoggingServices.Instance ) {}
 
 		public LogInformationCommand( IMessageLogger logger ) : this( InformationMessageFactory.Instance, logger ) {}
 

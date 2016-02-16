@@ -205,7 +205,7 @@
     <Compile Include="Diagnostics\ExceptionFormatter.cs" />
     <Compile Include="Diagnostics\IMessageRecorder.cs" />
     <Compile Include="Diagnostics\Message.cs" />
-    <Compile Include="Diagnostics\MessageRecorder.cs" />
+    <Compile Include="Diagnostics\RecordingLogEventSink.cs" />
     <Compile Include="Diagnostics\TryContext.cs" />
     <Compile Include="Extensions\BuilderContextExtensions.cs" />
     <Compile Include="Extensions\ObjectMappingParameter.cs" />
@@ -271,7 +271,7 @@
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
     <Compile Include="Runtime\Values\IValue.cs" />
     <Compile Include="Runtime\ListDictionary.cs" />
-    <Compile Include="Diagnostics\MessageLogger.cs" />
+    <Compile Include="Diagnostics\RecordingSinkFactory.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
     <Compile Include="Modularity\AttributeDataProvider.cs" />
     <Compile Include="Modularity\CyclicDependencyFoundException.cs" />

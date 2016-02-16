@@ -1,3 +1,4 @@
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Windows.Modularity;
@@ -282,13 +283,14 @@ namespace DragonSpark.Windows.Testing.Modularity
 			Assert.Throws<ModuleTypeLoaderNotFoundException>( () => manager.Run() );
 		}
 
-		/*[Fact]
+		[Fact]
 		public void ShouldLogMessageOnModuleRetrievalError()
 		{
 			var loader = new MockModuleInitializer();
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
-			var logger = new MockMessageLogger();
+			var sink = new MockRecordingLogEventSink();
+			var logger = new RecordingSinkFactory( sink ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			ModuleManager manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -303,18 +305,19 @@ namespace DragonSpark.Windows.Testing.Modularity
 				// Ignore all errors to make sure logger is called even if errors thrown.
 			}
 
-			Assert.NotNull(logger.LastMessage);
-			Assert.Contains("ModuleThatNeedsRetrieval", logger.LastMessage);
-			Assert.Equal("Exception", logger.LastMessageCategory);
-		}*/
+			Assert.NotNull(sink.LastMessage);
+			Assert.Contains("ModuleThatNeedsRetrieval", sink.LastMessage);
+			Assert.Equal("Exception", sink.LastMessageCategory);
+		}
 
-		/*[Fact]
+		[Fact]
 		public void OnModuleRetrievalErrorDoesNotThrow()
 		{
 			var loader = new MockModuleInitializer();
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
-			var logger = new MockMessageLogger();
+			var sink = new MockRecordingLogEventSink();
+			var logger = new RecordingSinkFactory( sink ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManagerExtended(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -323,11 +326,11 @@ namespace DragonSpark.Windows.Testing.Modularity
 			Assert.Null( manager.Handled );
 			manager.Run();
 
-			Assert.NotNull( logger.LastMessage );
-			Assert.Contains( "ModuleThatNeedsRetrieval", logger.LastMessage );
-			Assert.Equal( "Exception", logger.LastMessageCategory );
+			Assert.NotNull( sink.LastMessage );
+			Assert.Contains( "ModuleThatNeedsRetrieval", sink.LastMessage );
+			Assert.Equal( "Exception", sink.LastMessageCategory );
 			Assert.NotNull( manager.Handled );
-		}*/
+		}
 
 		class ModuleManagerExtended : ModuleManager
 		{
@@ -350,13 +353,14 @@ namespace DragonSpark.Windows.Testing.Modularity
 			}
 		}
 
-		/*[Fact]
+		[Fact]
 		public void ShouldNotLogMessageOnModuleRetrievalErrorOnHandled()
 		{
 			var loader = new MockModuleInitializer();
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
-			var logger = new MockMessageLogger();
+			var sink = new MockRecordingLogEventSink();
+			var logger = new RecordingSinkFactory( sink ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			manager.LoadModuleCompleted += ( sender, args ) => args.IsErrorHandled = true;
@@ -365,10 +369,10 @@ namespace DragonSpark.Windows.Testing.Modularity
 
 			manager.Run();
 
-			Assert.Null( logger.LastMessage );
-			Assert.DoesNotContain( "ModuleThatNeedsRetrieval", logger.LastMessage );
-			Assert.NotEqual( "Exception", logger.LastMessageCategory );
-		}*/
+			Assert.Null( sink.LastMessage );
+			Assert.DoesNotContain( "ModuleThatNeedsRetrieval", sink.LastMessage );
+			Assert.NotEqual( "Exception", sink.LastMessageCategory );
+		}
 
 		[Fact]
 		public void ShouldWorkIfModuleLoadsAnotherOnDemandModuleWhenInitializing()
@@ -413,7 +417,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		public void DisposeDoesNotThrowWithNonDisposableTypeLoaders()
 		{
 			Mock<IModuleInitializer> mockInit = new Mock<IModuleInitializer>();
-			var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
+			CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new Mock<IModuleCatalog>();
 			ModuleManager manager = new ModuleManager(mockInit.Object, catalog.Object, new Mock<ILogger>().Object, new MockModuleTypeLoader());
 

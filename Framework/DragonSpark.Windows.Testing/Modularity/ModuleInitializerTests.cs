@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
@@ -7,6 +5,8 @@ using DragonSpark.Windows.Testing.TestObjects.Modules;
 using Microsoft.Practices.ServiceLocation;
 using Moq;
 using Serilog;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
@@ -61,11 +61,12 @@ namespace DragonSpark.Windows.Testing.Modularity
 			Assert.True(service.HandleModuleInitializeErrorCalled);
 		}
 
-		/*[Fact]
+		[Fact]
 		public void ShouldLogModuleInitializationError()
 		{
 			IServiceLocator containerFacade = new MockContainerAdapter();
-			var logger = new MockMessageLogger();
+			var sink = new MockRecordingLogEventSink();
+			var logger = new RecordingSinkFactory( sink ).Create();
 			var service = new ModuleInitializer(containerFacade, logger);
 			ExceptionThrowingModule.wasInitializedOnce = false;
 			var exceptionModule = CreateModuleInfo(typeof(ExceptionThrowingModule));
@@ -78,9 +79,9 @@ namespace DragonSpark.Windows.Testing.Modularity
 			{
 			}
 
-			Assert.NotNull(logger.LastMessage);
-			Assert.Contains("ExceptionThrowingModule", logger.LastMessage);
-		}*/
+			Assert.NotNull(sink.LastMessage);
+			Assert.Contains("ExceptionThrowingModule", sink.LastMessage);
+		}
 
 		[Fact]
 		public void ShouldThrowExceptionIfBogusType()

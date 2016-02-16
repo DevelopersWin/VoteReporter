@@ -48,7 +48,7 @@ namespace DragonSpark.Setup
 
 	/*public class SetupParameter : SetupParameter<object>
 	{
-		public SetupParameter() : this( MessageLogger.Instance, null ) {}
+		public SetupParameter() : this( LoggingServices.Instance, null ) {}
 
 		public SetupParameter( IMessageLogger logger, object arguments ) : base( logger, arguments ) {}
 	}*/

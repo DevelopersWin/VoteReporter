@@ -6,13 +6,13 @@ namespace DragonSpark.Diagnostics
 {
 	public class TryContext
 	{
-		readonly ILogger messageLogger;
+		readonly ILogger logger;
 
-		public TryContext() : this( MessageLogger.Create() ) {} // TODO: Logger Instance
+		public TryContext() : this( new RecordingSinkFactory().Create() ) {} // TODO: Logger Instance
 
-		public TryContext( [Required]ILogger messageLogger )
+		public TryContext( [Required]ILogger logger )
 		{
-			this.messageLogger = messageLogger;
+			this.logger = logger;
 		}
 
 		public Exception Try( Action action )
@@ -23,7 +23,7 @@ namespace DragonSpark.Diagnostics
 			}
 			catch ( Exception exception )
 			{
-				messageLogger.Debug( exception, "An exception has occurred while executing an application delegate." );
+				logger.Debug( exception, "An exception has occurred while executing an application delegate." );
 				return exception;
 			}
 			return null;

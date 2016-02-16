@@ -20,7 +20,7 @@ namespace DragonSpark.Setup.Commands
 			
 			context.Register( ModuleCatalog );
 
-			// context.MessageLogger.Information( Resources.ConfiguringModuleCatalog, Priority.Low );
+			// context.LoggingServices.Information( Resources.ConfiguringModuleCatalog, Priority.Low );
 		}
 	}*/
 

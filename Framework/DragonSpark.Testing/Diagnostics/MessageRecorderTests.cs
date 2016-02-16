@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Diagnostics
 	public class MessageRecorderTests
 	{
 		[Theory, AutoData]
-		public void Message( RecordingMessageLogger sut, string message, Priority priority )
+		public void Message( RecordingLogEventSink sut, string message, Priority priority )
 		{
 			var logger = new LoggerConfiguration().WriteTo.Sink( sut ).CreateLogger();
 
@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Diagnostics
 		}
 
 		[Theory, AutoData]
-		public void Fatal( RecordingMessageLogger sut, string message, FatalApplicationException error )
+		public void Fatal( RecordingLogEventSink sut, string message, FatalApplicationException error )
 		{
 			var logger = new LoggerConfiguration().WriteTo.Sink( sut ).CreateLogger();
 

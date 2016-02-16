@@ -31,7 +31,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class OutputCustomization : AutoDataCustomization
 	{
 		[Locate]
-		public RecordingMessageLogger Logger { [return: Required]get; set; }
+		public RecordingLogEventSink Logger { [return: Required]get; set; }
 
 		protected override void OnInitialized( AutoData context )
 		{

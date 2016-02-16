@@ -49,14 +49,14 @@ namespace DragonSpark.Activation.IoC
 		{
 			readonly ConditionMonitor monitor = new ConditionMonitor();
 
-			public MonitorLoggerCommand() : this( new RecordingMessageLogger() ) { }
+			public MonitorLoggerCommand() : this( new RecordingLogEventSink() ) { }
 
-			MonitorLoggerCommand( [Required]RecordingMessageLogger logger )
+			MonitorLoggerCommand( [Required]RecordingLogEventSink logger )
 			{
 				Logger = logger;
 			}
 
-			public RecordingMessageLogger Logger { get; }
+			public RecordingLogEventSink Logger { get; }
 
 			public override bool CanExecute( IMessageLogger parameter )
 			{

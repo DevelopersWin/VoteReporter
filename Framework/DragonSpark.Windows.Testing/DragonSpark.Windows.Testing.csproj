@@ -210,7 +210,7 @@
     <Compile Include="TestObjects\Modules\DummyClass.cs" />
     <Compile Include="TestObjects\Modules\MockConfigurationStore.cs" />
     <Compile Include="TestObjects\Modules\MockContainerAdapter.cs" />
-    <Compile Include="TestObjects\Modules\MockMessageLogger.cs" />
+    <Compile Include="TestObjects\Modules\MockRecordingLogEventSink.cs" />
     <Compile Include="TestObjects\Modules\MockModuleTypeLoader.cs" />
     <Compile Include="TestObjects\Modules\MyDummyClass.cs" />
     <Compile Include="TestObjects\Relayed.cs" />
