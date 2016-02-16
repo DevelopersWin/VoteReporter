@@ -53,12 +53,12 @@ namespace DragonSpark.Setup
 		public SetupParameter( IMessageLogger logger, object arguments ) : base( logger, arguments ) {}
 	}*/
 
-	public class MessageLoggerFactory<TLogger> : ActivateFactory<TLogger> where TLogger : class, IMessageLogger
+	/*public class MessageLoggerFactory<TLogger> : ActivateFactory<TLogger> where TLogger : class, IMessageLogger
 	{
 		public new static MessageLoggerFactory<TLogger> Instance { get; } = new MessageLoggerFactory<TLogger>();
 
 		protected override TLogger Activate( ActivateParameter parameter ) => base.Activate( parameter ).Information( Resources.LoggerCreatedSuccessfully );
-	}
+	}*/
 
 	/*public class SetupParameter<TArgument> : ISetupParameter<TArgument>
 	{

@@ -37,19 +37,18 @@ namespace DragonSpark.Testing.Objects.Setup
 		ServiceLocatorFactory() : base( UnityContainerFactory.Instance.Create ) {}
 	}*/
 
-	public class AssignServiceLocation : AssignLocationCommand
-	{
-		public AssignServiceLocation() : base( UnityContainerFactory.Instance.Create() ) {}
-	}
+	public class AssignServiceLocation : AssignLocationCommand<UnityContainerFactory> {}
 
 	[Discoverable]
-	public class UnityContainerFactory : UnityContainerFactory<AssemblyProvider, RecordingMessageLogger>
+	public class UnityContainerFactory : UnityContainerFactory<AssemblyProvider>
 	{
 		public class Register : RegisterFactoryAttribute
 		{
 			public Register() : base( typeof(UnityContainerFactory) ) {}
 		}
 
-		public new static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
+		public UnityContainerFactory() : base( MessageLogger.Create() ) {}
+
+		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 	}
 }

@@ -4,38 +4,39 @@ using DragonSpark.Properties;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
+using Serilog;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class TransientServiceRegistry : ServiceRegistry<TransientLifetimeManager>
 	{
-		public TransientServiceRegistry( IUnityContainer container, IMessageLogger logger, LifetimeManagerFactory<TransientLifetimeManager> factory ) : base( container, logger, factory ) {}
+		public TransientServiceRegistry( IUnityContainer container, ILogger logger, LifetimeManagerFactory<TransientLifetimeManager> factory ) : base( container, logger, factory ) {}
 	}
 
 	public class PersistentServiceRegistry : ServiceRegistry<ContainerControlledLifetimeManager>
 	{
-		public PersistentServiceRegistry( IUnityContainer container, IMessageLogger logger, LifetimeManagerFactory<ContainerControlledLifetimeManager> factory ) : base( container, logger, factory ) {}
+		public PersistentServiceRegistry( IUnityContainer container, ILogger logger, LifetimeManagerFactory<ContainerControlledLifetimeManager> factory ) : base( container, logger, factory ) {}
 	}
 
 	public class ServiceRegistry<TLifetime> : ServiceRegistry where TLifetime : LifetimeManager
 	{
-		public ServiceRegistry( IUnityContainer container, IMessageLogger logger, LifetimeManagerFactory<TLifetime> factory ) : base( container, logger, factory ) {}
+		public ServiceRegistry( IUnityContainer container, ILogger logger, LifetimeManagerFactory<TLifetime> factory ) : base( container, logger, factory ) {}
 	}
 
 	public class ServiceRegistry : IServiceRegistry
 	{
 		readonly IUnityContainer container;
-		readonly IMessageLogger logger;
+		readonly ILogger logger;
 		readonly Func<Type, LifetimeManager> lifetimeFactory;
 
 		[InjectionConstructor]
-		public ServiceRegistry( IUnityContainer container, IMessageLogger logger, [Required]LifetimeManagerFactory factory ) : this( container, logger, factory.Create ) { }
+		public ServiceRegistry( IUnityContainer container, ILogger logger, [Required]LifetimeManagerFactory factory ) : this( container, logger, factory.Create ) { }
 
 		public ServiceRegistry( IUnityContainer container, Type lifetimeFactoryType ) : this( container, container.Logger(), t => container.Resolve<LifetimeManager>( lifetimeFactoryType ) ) { }
 
 		public ServiceRegistry( IUnityContainer container, LifetimeManager lifetimeManager ) : this( container, container.Logger(), type => lifetimeManager ) { }
 
-		protected ServiceRegistry( [Required]IUnityContainer container, [Required]IMessageLogger logger, [Required]Func<Type, LifetimeManager> lifetimeFactory )
+		protected ServiceRegistry( [Required]IUnityContainer container, [Required]ILogger logger, [Required]Func<Type, LifetimeManager> lifetimeFactory )
 		{
 			this.container = container;
 			this.logger = logger;

@@ -2,7 +2,10 @@ using DragonSpark.Setup;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class ConsoleApplicationSetup : Setup<string[]> {}
+	public class ConsoleApplication : Application<string[]>
+	{
+		// public ConsoleApplication( ConfigureLocationCommand inner ) : base( inner ) {}
+	}
 
 	/*public class ConfigurationFactory : FactoryBase<Func<string, object>>
 	{

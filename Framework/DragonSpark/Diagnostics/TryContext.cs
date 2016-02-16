@@ -1,16 +1,16 @@
 using System;
 using PostSharp.Patterns.Contracts;
+using Serilog;
 
 namespace DragonSpark.Diagnostics
 {
 	public class TryContext
 	{
-		readonly IMessageLogger messageLogger;
+		readonly ILogger messageLogger;
 
-		public TryContext() : this( MessageLogger.Instance )
-		{}
+		public TryContext() : this( MessageLogger.Create() ) {} // TODO: Logger Instance
 
-		public TryContext( [Required]IMessageLogger messageLogger )
+		public TryContext( [Required]ILogger messageLogger )
 		{
 			this.messageLogger = messageLogger;
 		}
@@ -23,7 +23,7 @@ namespace DragonSpark.Diagnostics
 			}
 			catch ( Exception exception )
 			{
-				messageLogger.Exception( "An exception has occurred while executing an application delegate.", exception );
+				messageLogger.Debug( exception, "An exception has occurred while executing an application delegate." );
 				return exception;
 			}
 			return null;

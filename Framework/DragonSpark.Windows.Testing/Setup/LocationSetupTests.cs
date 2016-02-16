@@ -564,9 +564,8 @@ namespace DragonSpark.Windows.Testing.Setup
 
 		public ServiceLocatorFactory( [Required]IUnityContainer container ) : base( 
 			() => new ServiceLocator( container ), 
-			new CommandTransformer<ConfigureLocationCommand, IServiceLocator>( new ConfigureLocationCommand( container ) ).Create 
+			new CommandTransformer<ConfigureLocationCommand, IServiceLocator>( new ConfigureLocationCommand { Container = container } ).Create 
 		)
-		{
-		}
+		{}
 	}
 }

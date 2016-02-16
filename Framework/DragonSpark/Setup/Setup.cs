@@ -4,23 +4,18 @@ using DragonSpark.Runtime.Values;
 
 namespace DragonSpark.Setup
 {
-	/*public class RegisterItemsCommand : Command<IEnumerable<object>>
-	{
-		readonly RegisterAllClassesCommand<OnlyIfNotRegistered> register;
+	public abstract class Application<TArguments> : CompositeCommand<TArguments>
+	{}
 
-		public RegisterItemsCommand( [Required]RegisterAllClassesCommand<OnlyIfNotRegistered> register )
-		{
-			this.register = register;
-		}
+	public class SetupApplicationCommand<TSetup> : DeferredCommand<TSetup, object> where TSetup : ISetup {}
 
-		protected override void OnExecute( IEnumerable<object> parameter ) => parameter.Each( register.ExecuteWith );
-	}*/
+	// public class Setup : Setup<object> {}
 
-	public abstract class Setup<T> : CompositeCommand<T>, ISetup<T>
+	public abstract class Setup : CompositeCommand, ISetup
 	{
 		public Collection<object> Items { get; } = new Collection<object>();
 
-		protected override void OnExecute( T parameter )
+		protected override void OnExecute( object parameter )
 		{
 			using ( new AmbientContextCommand<ITaskMonitor>().ExecuteWith( new TaskMonitor() ) )
 			{

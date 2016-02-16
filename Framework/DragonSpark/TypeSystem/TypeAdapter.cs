@@ -2,9 +2,9 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace DragonSpark.TypeSystem
@@ -23,6 +23,29 @@ namespace DragonSpark.TypeSystem
 		{
 			this.info = info;
 		}
+
+		readonly static MethodInfo LambdaMethod = typeof(Expression).GetRuntimeMethods().First(x => x.Name == nameof(Expression.Lambda) && x.GetParameters()[1].ParameterType == typeof(ParameterExpression[]));
+// static readonly MethodInfo EqualsMethod = typeof (object).GetMethod("Equals", BindingFlags.Instance | BindingFlags.Public);
+
+		// Attribution: https://weblogs.asp.net/ricardoperes/detecting-default-values-of-value-types
+		/*bool IsDefaultUsingLinqAndDynamic()
+		{
+			var arguments = new Expression[] { Expression.Default( type ) };
+			var paramExpression = Expression.Parameter(type, "x");
+			var equalsMethod = type.GetRuntimeMethod( nameof(Equals), new [] { type } );
+			var call = Expression.Call(paramExpression, equalsMethod, arguments);
+			var lambdaArgType = typeof(Func<,>).MakeGenericType(type, typeof(bool));
+			var lambdaMethod = LambdaMethod.MakeGenericMethod(lambdaArgType);
+			var expression = lambdaMethod.Invoke(null, new object[] { call, new[] { paramExpression } }) as LambdaExpression;
+ 
+			//cache this, please
+			var func = expression.Compile();
+			dynamic arg = obj;
+			dynamic del = func;
+			var result = del( arg );
+			return result;
+		}*/
+
 
 		public object GetDefaultValue() => info.IsValueType && Nullable.GetUnderlyingType( type ) == null ? Activator.CreateInstance( type ) : null;
 

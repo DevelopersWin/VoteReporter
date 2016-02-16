@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Diagnostics;
 using Microsoft.Practices.Unity;
+using Serilog;
 using System;
 
 namespace DragonSpark.Extensions
@@ -10,7 +10,7 @@ namespace DragonSpark.Extensions
 	{
 		// public static IServiceRegistry Registry( this IUnityContainer @this ) => @this.Resolve<IServiceRegistry>();
 
-		public static IMessageLogger Logger( this IUnityContainer @this ) => @this.Resolve<IMessageLogger>();
+		public static ILogger Logger( this IUnityContainer @this ) => @this.Resolve<ILogger>();
 
 		public static T Resolve<T>( this IUnityContainer container, Type type ) => (T)container.Resolve( type );
 

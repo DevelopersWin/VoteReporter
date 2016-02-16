@@ -1,9 +1,8 @@
 ﻿using DragonSpark.Runtime;
-using System.Windows.Input;
 
 namespace DragonSpark.Setup
 {
-	public interface ISetup : ICommand {}
+	public interface ISetup : ICommand<object> {}
 
-	public interface ISetup<in T> : ISetup, ICommand<T> {}
+	//public interface ISetup<in T> : ISetup, ICommand<T> {}
 }

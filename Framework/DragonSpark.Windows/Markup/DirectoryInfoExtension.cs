@@ -6,28 +6,9 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Windows.Markup
 {
-	/*public class DirectoryInfoFactory : FactoryBase<string, DirectoryInfo>
-	{
-		readonly string baseDirectory;
-
-		public DirectoryInfoFactory( string baseDirectory )
-		{
-			this.baseDirectory = baseDirectory ?? ;
-		}
-
-		protected override DirectoryInfo CreateItem( Type resultType, string parameter )
-		{
-			// var directory = Directory.CreateDirectory( Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "Reports" ) );
-			
-		}
-	}*/
-
 	[MarkupExtensionReturnType( typeof(DirectoryInfo) )]
 	public class DirectoryInfoExtension : MarkupExtension
 	{
-		public DirectoryInfoExtension()
-		{}
-
 		public DirectoryInfoExtension( string path )
 	    {
 	        Path = path;

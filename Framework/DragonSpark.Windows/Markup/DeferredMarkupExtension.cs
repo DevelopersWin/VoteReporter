@@ -10,7 +10,7 @@ namespace DragonSpark.Windows.Markup
 {
 	public abstract class DeferredMarkupExtension : MarkupExtension
 	{
-		static readonly IMarkupTargetValueSetterBuilder[] DefaultBuilders = 
+		readonly static IMarkupTargetValueSetterBuilder[] DefaultBuilders = 
 		{
 			DependencyPropertyMarkupTargetValueSetterBuilder.Instance,
 			CollectionTargetSetterBuilder.Instance,
@@ -44,8 +44,8 @@ namespace DragonSpark.Windows.Markup
 					default:
 						return Builders.FirstOrDefault( builder => builder.Handles( service ) ).With( builder =>
 						{
-							var provider = Prepare( serviceProvider, service, builder );
 							var setter = builder.Create( service );
+							var provider = Prepare( serviceProvider, service, builder.GetPropertyType( service ) );
 							var value = BeginProvideValue( provider, setter );
 							return value;
 						} );
@@ -55,9 +55,9 @@ namespace DragonSpark.Windows.Markup
 			return null;
 		}
 
-		protected virtual IServiceProvider Prepare( IServiceProvider serviceProvider, IProvideValueTarget target, IMarkupTargetValueSetterBuilder builder )
+		protected virtual IServiceProvider Prepare( IServiceProvider serviceProvider, IProvideValueTarget target, Type propertyType )
 		{
-			var result = new DeferredContext( serviceProvider, target.TargetObject, target.TargetProperty, builder.GetPropertyType( target ) );
+			var result = new MarkupValueContext( serviceProvider, target.TargetObject, target.TargetProperty, propertyType );
 			return result;
 		}
 

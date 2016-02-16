@@ -1,8 +1,8 @@
-using System;
-using System.Reflection;
 using AutoMapper.Internal;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {

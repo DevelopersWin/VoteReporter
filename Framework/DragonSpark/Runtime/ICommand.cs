@@ -4,6 +4,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Windows.Input;
 using DragonSpark.Runtime.Specifications;
+using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Runtime
 {
@@ -55,20 +56,30 @@ namespace DragonSpark.Runtime
 			GC.SuppressFinalize( this );
 		}
 
-		void Dispose( bool disposing )
+		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
+
+		protected virtual void OnDispose() {}
+	}
+
+	public class DeferredCommand<TCommand, T> : Command<T> where TCommand : ICommand<T>
+	{
+		readonly Func<TCommand> factory;
+
+		public DeferredCommand() : this( Activator.Activate<TCommand> ) {}
+
+		public DeferredCommand( [Required]Func<TCommand> factory )
 		{
-			disposing.IsTrue( OnDispose );
+			this.factory = factory;
 		}
 
-		protected virtual void OnDispose()
-		{}
+		protected override void OnExecute( T parameter ) => factory().ExecuteWith( parameter );
 	}
 
 	public class DecoratedCommand<T> : Command<T>
 	{
-		readonly ICommand<T> inner;
+		readonly ICommand inner;
 
-		public DecoratedCommand( [Required]ICommand<T> inner )
+		public DecoratedCommand( [Required]ICommand inner )
 		{
 			this.inner = inner;
 		}

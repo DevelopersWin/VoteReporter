@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Serilog;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -97,7 +98,7 @@ namespace DragonSpark.Activation.IoC
 						var lifetimeManager = factory.Create( reference.Type );
 						lifetimeManager.With( manager =>
 						{
-							context.New<IMessageLogger>().Information( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
+							context.New<ILogger>().Information( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
 
 							context.PersistentPolicies.Set<ILifetimePolicy>( manager, reference );
 						} );

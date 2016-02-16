@@ -1,15 +1,17 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Runtime;
 
 namespace DragonSpark.Activation.FactoryModel
 {
 	public abstract class TransformerBase<T> : FactoryBase<T, T>, ITransformer<T>
-	{}
+	{
+		protected TransformerBase() : base( new FactoryParameterCoercer<T>() ) {}
+	}
 
 	public class CommandTransformer<TCommand, T> : TransformerBase<T> where TCommand : ICommand<T>
 	{
@@ -106,6 +108,18 @@ namespace DragonSpark.Activation.FactoryModel
 		}
 
 		protected override T CreateItem() => inner.FirstWhere( factory => factory() );
+	}
+
+	public class FixedFactory<T> : FactoryBase<T>
+	{
+		readonly T item;
+
+		public FixedFactory( [Required] T item )
+		{
+			this.item = item;
+		}
+
+		protected override T CreateItem() => item;
 	}
 
 	public class AggregateFactory<T> : FactoryBase<T>
