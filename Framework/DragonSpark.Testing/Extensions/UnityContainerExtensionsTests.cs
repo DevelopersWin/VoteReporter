@@ -15,8 +15,8 @@ namespace DragonSpark.Testing.Extensions
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
 			var logger = sut.Resolve<RecordingMessageLogger>();
-			var initial = logger.Messages.Count();
-			Assert.NotEmpty( logger.Messages );
+			var initial = logger.Events.Count();
+			Assert.NotEmpty( logger.Events );
 
 			Assert.False( sut.IsRegistered<ISingletonLocator>() );
 
@@ -25,21 +25,21 @@ namespace DragonSpark.Testing.Extensions
 
 			Assert.True( sut.IsRegistered<ISingletonLocator>() );
 
-			var count = logger.Messages.Count();
+			var count = logger.Events.Count();
 			Assert.True( count > initial );
 
 			/*var register = new RecordingMessageLogger();
 			sut.RegisterInstance<IMessageLogger>( register );
 
-			Assert.Empty( logger.Messages );
-			Assert.NotEmpty( register.Messages );
+			Assert.Empty( logger.Events );
+			Assert.NotEmpty( register.Events );
 
-			var after = register.Messages.Count();
+			var after = register.Events.Count();
 			Assert.Equal( count + 2, after );
 
 			Assert.Null( sut.TryResolve<IInterface>() );
-			Assert.Equal( after + 2, register.Messages.Count() );
-			Assert.Empty( logger.Messages );*/
+			Assert.Equal( after + 2, register.Events.Count() );
+			Assert.Empty( logger.Events );*/
 		}
 	}
 }

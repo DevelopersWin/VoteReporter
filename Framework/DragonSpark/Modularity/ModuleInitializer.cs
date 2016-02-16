@@ -4,6 +4,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Globalization;
 using System.Reflection;
+using Serilog;
 
 namespace DragonSpark.Modularity
 {
@@ -12,15 +13,15 @@ namespace DragonSpark.Modularity
 	/// </summary>
 	public class ModuleInitializer : IModuleInitializer
 	{
-		private readonly IServiceLocator serviceLocator;
-		private readonly IMessageLogger messageLoggerFacade;
+		readonly private IServiceLocator serviceLocator;
+		readonly private ILogger messageLoggerFacade;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ModuleInitializer"/>.
 		/// </summary>
 		/// <param name="serviceLocator">The container that will be used to resolve the modules by specifying its type.</param>
 		/// <param name="messageLoggerFacade">The logger to use.</param>
-		public ModuleInitializer(IServiceLocator serviceLocator, IMessageLogger messageLoggerFacade)
+		public ModuleInitializer(IServiceLocator serviceLocator, ILogger messageLoggerFacade)
 		{
 			if (serviceLocator == null)
 			{
@@ -71,7 +72,7 @@ namespace DragonSpark.Modularity
 		{
 			var result = exception is ModuleInitializeException ? exception : new ModuleInitializeException( moduleInfo.ModuleName, assemblyName, exception.Message, exception );
 
-			messageLoggerFacade.Exception(result.ToString(), result);
+			messageLoggerFacade.Error(result, result.ToString());
 
 			throw result;
 		}

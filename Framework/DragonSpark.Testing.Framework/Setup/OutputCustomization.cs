@@ -4,8 +4,8 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework.Setup.Location;
 using Ploeh.AutoFixture;
-using System.Linq;
 using PostSharp.Patterns.Contracts;
+using System.Linq;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework.Setup
@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			var declaringType = context.Method.DeclaringType;
 			if ( declaringType.GetConstructors().Where( info => info.IsPublic ).Any( info => info.GetParameters().Any( parameterInfo => parameterInfo.ParameterType == typeof(ITestOutputHelper) ) ) )
 			{
-				var item = Logger.Purge().OrderBy( line => line.Time ).Select( line => line.Text ).ToArray();
+				var item = Logger.Purge().OrderBy( line => line.Timestamp ).Select( line => line.RenderMessage() ).ToArray();
 				new OutputValue( declaringType ).Assign( item );	
 			}
 		}

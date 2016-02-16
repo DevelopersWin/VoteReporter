@@ -3,6 +3,7 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Modularity;
 using DragonSpark.Properties;
 using PostSharp.Patterns.Contracts;
+using Serilog;
 
 namespace DragonSpark.Setup.Commands
 {
@@ -12,7 +13,7 @@ namespace DragonSpark.Setup.Commands
 		public IModuleMonitor Monitor { [return: Required]get; set; }
 
 		[Locate, Required]
-		public IMessageLogger MessageLogger { [return: Required]get; set; }
+		public ILogger MessageLogger { [return: Required]get; set; }
 
 		[Locate, Required]
 		public IModuleManager Manager { [return: Required]get; set; }
@@ -22,13 +23,13 @@ namespace DragonSpark.Setup.Commands
 
 		protected override void OnExecute( object parameter )
 		{
-			MessageLogger.Information( Resources.InitializingModules, Priority.Low );
+			MessageLogger.Information( Resources.InitializingModules );
 			Manager.Run();
 
-			MessageLogger.Information( Resources.LoadingModules, Priority.Low );
+			MessageLogger.Information( Resources.LoadingModules );
 			Tasks.Monitor( Monitor.Load().ContinueWith( task =>
 			{
-				MessageLogger.Information( Resources.ModulesLoaded, Priority.Low );
+				MessageLogger.Information( Resources.ModulesLoaded );
 			} ) );
 		}
 	}

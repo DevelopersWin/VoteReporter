@@ -2,6 +2,8 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework.Setup;
+using Serilog;
+using Serilog.Events;
 using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
@@ -11,25 +13,28 @@ namespace DragonSpark.Testing.Diagnostics
 		[Theory, AutoData]
 		public void Message( RecordingMessageLogger sut, string message, Priority priority )
 		{
-			sut.Information( message, priority );
+			var logger = new LoggerConfiguration().WriteTo.Sink( sut ).CreateLogger();
 
-			var item = sut.Messages.Only();
+			logger.Information( message, priority );
+
+			var item = sut.Events.Only();
 			Assert.NotNull( item );
 
-			Assert.Equal( nameof(MessageLoggerExtensions.Information), item.Category );
-			Assert.Equal( priority, item.Priority );
+			Assert.Equal( LogEventLevel.Information, item.Level );
 		}
 
 		[Theory, AutoData]
 		public void Fatal( RecordingMessageLogger sut, string message, FatalApplicationException error )
 		{
-			sut.Fatal( message, error );
+			var logger = new LoggerConfiguration().WriteTo.Sink( sut ).CreateLogger();
 
-			var item = sut.Messages.Only();
+			logger.Fatal( error, message );
+
+			var item = sut.Events.Only();
 			Assert.NotNull( item );
 
-			Assert.Equal( nameof(Fatal), item.Category );
-			Assert.Contains( error.GetType().Name, item.Text );
+			Assert.Equal( LogEventLevel.Fatal, item.Level );
+			Assert.Contains( error.GetType().Name, item.RenderMessage() );
 		}
 	}
 }

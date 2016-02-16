@@ -8,7 +8,7 @@ using System.IO;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public class TextMessageLogger : MessageLoggerBase, IDisposable
+	/*public class TextMessageLogger : MessageLoggerBase, IDisposable
 	{
 		readonly TextWriter writer;
 
@@ -34,7 +34,7 @@ namespace DragonSpark.Windows.Diagnostics
 				writer.Dispose();
 			}
 		}
-	}
+	}*/
 
 	public class AddSeqSinkCommand : AddSinkCommand
 	{

@@ -2,7 +2,7 @@ using DragonSpark.Diagnostics;
 
 namespace DragonSpark.Windows.Testing.TestObjects.Modules
 {
-	class MockMessageLogger : MessageLoggerBase
+	/*class MockMessageLogger : MessageLoggerBase
 	{
 		public string LastMessage { get; private set; }
 		public string LastMessageCategory;
@@ -12,5 +12,5 @@ namespace DragonSpark.Windows.Testing.TestObjects.Modules
 			LastMessage = message.Text;
 			LastMessageCategory = message.Category;
 		}
-	}
+	}*/
 }

@@ -155,7 +155,6 @@
     <Compile Include="Entity\VersionConverter.cs" />
     <Compile Include="Io\FileSystem.cs" />
     <Compile Include="Diagnostics\TextMessageLogger.cs" />
-    <Compile Include="Diagnostics\TraceMessageLogger.cs" />
     <Compile Include="Markup\CollectionExtension.cs" />
     <Compile Include="Markup\CollectionSetter.cs" />
     <Compile Include="Markup\CollectionTargetSetterBuilder.cs" />

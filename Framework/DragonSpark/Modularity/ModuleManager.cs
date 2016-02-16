@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Serilog;
 
 namespace DragonSpark.Modularity
 {
@@ -13,11 +14,11 @@ namespace DragonSpark.Modularity
 	/// </summary>
 	public class ModuleManager : IModuleManager, IDisposable
 	{
-		private readonly IModuleInitializer moduleInitializer;
-		private readonly IMessageLogger messageLoggerFacade;
-		private readonly IModuleTypeLoader loader;
-		private IEnumerable<IModuleTypeLoader> typeLoaders;
-		private readonly HashSet<IModuleTypeLoader> subscribedToModuleTypeLoaders = new HashSet<IModuleTypeLoader>();
+		readonly IModuleInitializer moduleInitializer;
+		readonly ILogger messageLoggerFacade;
+		readonly IModuleTypeLoader loader;
+		IEnumerable<IModuleTypeLoader> typeLoaders;
+		readonly HashSet<IModuleTypeLoader> subscribedToModuleTypeLoaders = new HashSet<IModuleTypeLoader>();
 
 		/// <summary>
 		/// Initializes an instance of the <see cref="ModuleManager"/> class.
@@ -26,7 +27,7 @@ namespace DragonSpark.Modularity
 		/// <param name="moduleCatalog">Catalog that enumerates the modules to be loaded and initialized.</param>
 		/// <param name="messageLoggerFacade">Logger used during the load and initialization of modules.</param>
 		/// <param name="loader"></param>
-		public ModuleManager(IModuleInitializer moduleInitializer, IModuleCatalog moduleCatalog, IMessageLogger messageLoggerFacade, [Required]IModuleTypeLoader loader)
+		public ModuleManager(IModuleInitializer moduleInitializer, IModuleCatalog moduleCatalog, ILogger messageLoggerFacade, [Required]IModuleTypeLoader loader)
 		{
 			if (moduleInitializer == null)
 			{
@@ -225,7 +226,7 @@ namespace DragonSpark.Modularity
 		{
 			var moduleTypeLoadingException = exception as ModuleTypeLoadingException ?? new ModuleTypeLoadingException(moduleInfo.ModuleName, exception.Message, exception);
 
-			messageLoggerFacade.Exception(moduleTypeLoadingException.Message, moduleTypeLoadingException);
+			messageLoggerFacade.Error(moduleTypeLoadingException, moduleTypeLoadingException.Message);
 
 			throw moduleTypeLoadingException;
 		}

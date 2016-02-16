@@ -1,6 +1,5 @@
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
-using DragonSpark.Properties;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
@@ -10,18 +9,12 @@ using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Markup;
 
 namespace DragonSpark.Diagnostics
 {
-	public interface IMessageLogger
-	{
-		void Log( Message message );
-	}
-
 	[ContentProperty( nameof(Commands) )]
 	public class LoggerFactory : FactoryBase<ILogger>
 	{
@@ -264,7 +257,7 @@ namespace DragonSpark.Diagnostics
 		protected abstract void Configure( T configuration );
 	}
 
-	public static class MessageLoggerExtensions
+	/*public static class MessageLoggerExtensions
 	{
 		public static TLogger Information<TLogger>( this TLogger @this, string message, Priority priority = Priority.Normal ) where TLogger : IMessageLogger
 		{
@@ -460,5 +453,5 @@ namespace DragonSpark.Diagnostics
 			var result = new Message( parameter.Priority, current, category, formatted );
 			return result;
 		}
-	}
+	}*/
 }

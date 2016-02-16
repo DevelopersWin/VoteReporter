@@ -26,7 +26,7 @@ namespace DragonSpark.Extensions
 			catch ( ReflectionTypeLoadException e )
 			{
 				var messages = string.Join( System.Environment.NewLine, e.LoaderExceptions.Select( x => string.Concat( "- ", x.Message ) ) );
-				Log.Warning( string.Format( "Could not get types for assembly: {0}.  Messages: {1}{2}", target.GetName(), System.Environment.NewLine, messages ) );
+				Log.Warning( string.Format( "Could not get types for assembly: {0}.  Events: {1}{2}", target.GetName(), System.Environment.NewLine, messages ) );
 				return e.Types.NotNull().ToArray();
 			}
 		}

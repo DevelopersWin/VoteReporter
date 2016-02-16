@@ -1,24 +1,27 @@
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Extensions;
+using Serilog.Core;
+using Serilog.Events;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Diagnostics
 {
-	public class RecordingMessageLogger : MessageLoggerBase
+	public class RecordingMessageLogger : ILogEventSink
 	{
-		readonly IList<Message> source = new Collection<Message>();
-		readonly IReadOnlyCollection<Message> messages;
+		readonly IList<LogEvent> source = new Collection<LogEvent>();
+		readonly IReadOnlyCollection<LogEvent> events;
 
 		public RecordingMessageLogger()
 		{
-			messages = new ReadOnlyCollection<Message>( source );
+			events = new ReadOnlyCollection<LogEvent>( source );
 		}
 
-		public Message[] Purge() => source.Purge();
+		public LogEvent[] Purge() => source.Purge();
 		
-		protected override void OnLog( Message message ) => source.Add( message );
+		// protected override void OnLog( Message message ) => source.Add( message );
 
-		public IEnumerable<Message> Messages => messages;
+		public IEnumerable<LogEvent> Events => events;
+
+		public void Emit( LogEvent logEvent ) => source.Add( logEvent );
 	}
 }

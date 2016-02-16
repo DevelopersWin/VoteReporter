@@ -201,12 +201,10 @@
     <Compile Include="TypeSystem\AssemblyInformationFactory.cs" />
     <Compile Include="ComponentModel\SingletonAttribute.cs" />
     <Compile Include="ComponentModel\ValueAttribute.cs" />
-    <Compile Include="Diagnostics\CompositeMessageLogger.cs" />
     <Compile Include="Diagnostics\Diagnostics.cs" />
     <Compile Include="Diagnostics\ExceptionFormatter.cs" />
     <Compile Include="Diagnostics\IMessageRecorder.cs" />
     <Compile Include="Diagnostics\Message.cs" />
-    <Compile Include="Diagnostics\MessageLoggerBase.cs" />
     <Compile Include="Diagnostics\MessageRecorder.cs" />
     <Compile Include="Diagnostics\TryContext.cs" />
     <Compile Include="Extensions\BuilderContextExtensions.cs" />

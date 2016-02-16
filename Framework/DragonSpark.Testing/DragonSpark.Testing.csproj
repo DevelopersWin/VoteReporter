@@ -119,6 +119,14 @@
       <HintPath>..\..\packages\PostSharp.Patterns.Threading.4.2.18\lib\net45\PostSharp.Patterns.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xaml" />
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
@@ -166,10 +174,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
-    <Compile Include="Diagnostics\CompositeMessageLoggerTests.cs" />
-    <Compile Include="Diagnostics\EmptyMessageLogger.cs" />
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
-    <Compile Include="Diagnostics\MessageLoggerTests.cs" />
     <Compile Include="Diagnostics\MessageRecorderTests.cs" />
     <Compile Include="Extensions\AssemblyExtensionsTests.cs" />
     <Compile Include="Extensions\BooleanExtensionsTests.cs">
