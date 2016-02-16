@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
@@ -5,24 +6,20 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
+using Moq;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using DragonSpark.Activation;
-using Moq;
 using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
 {
 	[ContentProperty( nameof( Properties ) )]
-	public class AmbientExtension : MonitoredMarkupExtension
+	public class AmbientExtension : MarkupExtensionBase
 	{
 		readonly Type type;
 
@@ -31,12 +28,12 @@ namespace DragonSpark.Windows.Markup
 			this.type = type;
 		}
 
-		protected override object GetValue( IServiceProvider serviceProvider ) => Ambient.GetCurrent( type );
+		protected override object GetValue( MarkupValueContext serviceProvider ) => Ambient.GetCurrent( type );
 	}
 
-	public class RootExtension : MarkupExtension
+	public class RootExtension : MarkupExtensionBase
 	{
-		public override object ProvideValue( IServiceProvider serviceProvider ) => serviceProvider.Get<IRootObjectProvider>().RootObject;
+		protected override object GetValue( MarkupValueContext serviceProvider ) => serviceProvider.Get<IRootObjectProvider>().RootObject;
 	}
 
 	[ContentProperty( nameof(Instance) )]

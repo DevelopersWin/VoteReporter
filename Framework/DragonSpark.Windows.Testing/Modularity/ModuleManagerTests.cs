@@ -307,7 +307,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 
 			Assert.NotNull(sink.LastMessage);
 			Assert.Contains("ModuleThatNeedsRetrieval", sink.LastMessage);
-			Assert.Equal("Exception", sink.LastMessageCategory);
+			Assert.Equal("Error", sink.LastMessageCategory);
 		}
 
 		[Fact]
@@ -328,7 +328,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 
 			Assert.NotNull( sink.LastMessage );
 			Assert.Contains( "ModuleThatNeedsRetrieval", sink.LastMessage );
-			Assert.Equal( "Exception", sink.LastMessageCategory );
+			Assert.Equal( "Error", sink.LastMessageCategory );
 			Assert.NotNull( manager.Handled );
 		}
 

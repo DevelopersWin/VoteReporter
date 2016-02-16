@@ -34,7 +34,8 @@ namespace DragonSpark.Testing.Diagnostics
 			Assert.NotNull( item );
 
 			Assert.Equal( LogEventLevel.Fatal, item.Level );
-			Assert.Contains( error.GetType().Name, item.RenderMessage() );
+			Assert.Contains( message, item.RenderMessage() );
+			Assert.Equal( error, item.Exception );
 		}
 	}
 }
