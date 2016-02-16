@@ -153,7 +153,7 @@ namespace DragonSpark.Windows.Markup
 	}
 
 	[ContentProperty( nameof(Properties) )]
-	public class LocateExtension : MonitoredMarkupExtension
+	public class LocateExtension : MarkupExtensionBase
 	{
 		public LocateExtension()
 		{}
@@ -172,7 +172,7 @@ namespace DragonSpark.Windows.Markup
 		[Locate, Required]
 		IServiceLocator Locator { [return: NotNull]get; set; }
 
-		[BuildUp]
+		/*[BuildUp]
 		protected override object GetValue( IServiceProvider serviceProvider )
 		{
 			var result = Locator.GetInstance( Type, BuildName );
@@ -180,8 +180,18 @@ namespace DragonSpark.Windows.Markup
 			result.With( x => Properties.Each( y => x.GetType().GetProperty( y.PropertyName ).With( z => y.Apply( z, x ) ) ) );
 			result.As<ISupportInitialize>( x => x.EndInit() );
 			return result;
-		}
+		}*/
 
-		public Collection<PropertySetter> Properties { get; } = new Collection<PropertySetter>();
+		// public Collection<PropertySetter> Properties { get; } = new Collection<PropertySetter>();
+
+		[BuildUp]
+		protected override object GetValue( MarkupValueContext serviceProvider )
+		{
+			var result = Locator.GetInstance( Type, BuildName );
+			/*result.As<ISupportInitialize>( x => x.BeginInit() );
+			result.With( x => Properties.Each( y => x.GetType().GetProperty( y.PropertyName ).With( z => y.Apply( z, x ) ) ) );
+			result.As<ISupportInitialize>( x => x.EndInit() );*/
+			return result;
+		}
 	}
 }

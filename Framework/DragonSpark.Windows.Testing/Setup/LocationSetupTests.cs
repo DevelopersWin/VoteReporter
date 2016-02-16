@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -14,15 +15,13 @@ using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using Moq;
 using Ploeh.AutoFixture.Xunit2;
+using PostSharp.Patterns.Contracts;
 using PostSharp.Patterns.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation.FactoryModel;
-using PostSharp.Aspects;
-using PostSharp.Patterns.Contracts;
 using Xunit;
 using Xunit.Abstractions;
 using Activator = DragonSpark.Windows.Testing.TestObjects.Activator;
@@ -556,10 +555,6 @@ namespace DragonSpark.Windows.Testing.Setup
 	[Discoverable]
 	public class ServiceLocatorFactory : AggregateFactory<IServiceLocator>
 	{
-		// public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory();
-
-		// ServiceLocatorFactory() : base( UnityContainerFactory.Instance.Create, ConfigureLocationCommandFactory.Instance.Create ) {}
-
 		public ServiceLocatorFactory() : this( UnityContainerFactory.Instance.Create() ) {}
 
 		public ServiceLocatorFactory( [Required]IUnityContainer container ) : base( 

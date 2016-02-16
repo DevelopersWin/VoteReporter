@@ -5,7 +5,10 @@ using DragonSpark.Runtime.Values;
 namespace DragonSpark.Setup
 {
 	public abstract class Application<TArguments> : CompositeCommand<TArguments>
-	{}
+	{
+		protected Application( params ICommand<TArguments>[] commands ) : base( commands )
+		{}
+	}
 
 	public class SetupApplicationCommand<TSetup> : DeferredCommand<TSetup, object> where TSetup : ISetup {}
 

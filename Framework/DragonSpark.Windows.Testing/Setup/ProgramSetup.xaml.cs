@@ -4,8 +4,7 @@
 	{
 		public class AutoDataAttribute : DragonSpark.Testing.Framework.Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( DragonSpark.Testing.Objects.Setup.SetupFixtureFactory<ProgramSetup>.Instance.Create )
-			{ }
+			public AutoDataAttribute() : base( SetupFixtureFactory<ProgramSetup>.Instance.Create ) {}
 		}
 
 		public ProgramSetup()

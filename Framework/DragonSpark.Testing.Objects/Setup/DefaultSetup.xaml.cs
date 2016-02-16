@@ -1,8 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Activation.IoC;
-using DragonSpark.Diagnostics;
-using DragonSpark.Setup;
-using DragonSpark.Testing.Framework;
+﻿using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Setup;
 
 namespace DragonSpark.Testing.Objects.Setup
@@ -20,35 +16,9 @@ namespace DragonSpark.Testing.Objects.Setup
 		}
 	}
 
-	public class SetupFixtureFactory<T> : FixtureFactory<SetupCustomization<T>> where T : class, ISetup<AutoData> {}
+	public class Application<T> : AutoDataApplication<T> where T : ISetup {}
 
-	public class SetupCustomization<T> : Framework.Setup.SetupCustomization<T> where T : class, ISetup<AutoData> {}
+	public class SetupFixtureFactory<TSetup> : FixtureFactory<ApplicationSetupCustomization<TSetup>> where TSetup : class, ISetup {}
 
-	/*[Discoverable]
-	public class ServiceLocatorFactory : Activation.IoC.ServiceLocatorFactory
-	{
-		public class Register : RegisterFactoryAttribute
-		{
-			public Register() : base( typeof(ServiceLocatorFactory) ) {}
-		}
-
-		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory();
-
-		ServiceLocatorFactory() : base( UnityContainerFactory.Instance.Create ) {}
-	}*/
-
-	public class AssignServiceLocation : AssignLocationCommand<UnityContainerFactory> {}
-
-	[Discoverable]
-	public class UnityContainerFactory : UnityContainerFactory<AssemblyProvider>
-	{
-		public class Register : RegisterFactoryAttribute
-		{
-			public Register() : base( typeof(UnityContainerFactory) ) {}
-		}
-
-		public UnityContainerFactory() : base( MessageLogger.Create() ) {}
-
-		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-	}
+	public class ApplicationSetupCustomization<TSetup> : Framework.Setup.ApplicationSetupCustomization<Application<TSetup>, TSetup> where TSetup : class, ISetup {}
 }
