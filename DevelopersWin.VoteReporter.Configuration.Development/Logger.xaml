@@ -1,4 +1,4 @@
-﻿<diagnostics:LoggerFactory x:Class="DevelopersWin.VoteReporter.Application.Startup.Logger"
+﻿<diagnostics:LoggerFactory x:Class="DevelopersWin.VoteReporter.Configuration.Development.Logger"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,7 +8,7 @@
 	xmlns:enrichers="clr-namespace:Serilog.Enrichers;assembly=Serilog.FullNetFx"
 	mc:Ignorable="d" 
 	>
-	<diagnostics:MinimumLevelIsCommand Level="Debug" />
+	<diagnostics:MinimumLevelIsCommand Level="Information" />
 	<diagnosticsPlatform:AddConsoleSinkCommand />
 	<diagnosticsPlatform:AddTraceSinkCommand />
 	<diagnostics:EnrichCommand>

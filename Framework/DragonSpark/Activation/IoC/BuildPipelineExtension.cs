@@ -291,10 +291,10 @@ namespace DragonSpark.Activation.IoC
 			{
 				context.Existing = Factory.Create( context.BuildKey.Type );
 
-				context.Existing.With( o =>
+				context.Existing.With( instance =>
 				{
 					var registry = context.New<IServiceRegistry>();
-					registry.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o, context.BuildKey.Name ) );
+					registry.Register( new InstanceRegistrationParameter( context.BuildKey.Type, instance, context.BuildKey.Name ) );
 				} );
 
 				context.BuildComplete = context.Existing != null;

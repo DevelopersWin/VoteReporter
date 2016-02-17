@@ -32,30 +32,30 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	[ContentProperty( nameof(Logger) )]
-	public class UnityContainerFactory : FactoryBase<IUnityContainer>
+	public class AssignAssembliesCommand : Command<object>
 	{
-		/*readonly Assembly[] assemblies;
-		readonly ILogger logger;
-
-		public UnityContainerFactory( [Required]Assembly[] assemblies, [Required]ILogger logger )
-		{
-			this.assemblies = assemblies;
-			this.logger = logger;
-		}*/
-
 		[Required]
 		public Assembly[] Assemblies { [return: Required]get; set; }
 
+		protected override void OnExecute( object parameter ) => new AssemblyHost().Assign( Assemblies );
+	}
+
+	public class UnityContainerFactory : FactoryBase<IUnityContainer>
+	{
 		[Required]
-		public ILogger Logger { [return: Required]get; set; }
+		public Assembly[] Assemblies { get; set; }
+
+		[Required]
+		public ILogger Logger { get; set; }
 
 		protected override IUnityContainer CreateItem()
 		{
+			var assemblies = Assemblies ?? TypeSystem.Assemblies.GetCurrent();
+			var logger = Logger ?? Factory.Create<ILogger>();
 			var result = new UnityContainer()
-				.RegisterInstance( Assemblies )
+				.RegisterInstance( assemblies )
+				.RegisterInstance( logger )
 				.Extend<RegistrationMonitorExtension>()
-				.RegisterInstance( Logger )
 				.Extend<BuildPipelineExtension>();
 			return result;
 		}
@@ -95,11 +95,13 @@ namespace DragonSpark.Activation.IoC
 			public ILogger Logger { get; }
 		}
 
+		[Required]
 		public IUnityContainer Container { get; set; }
 
 		protected override void OnExecute( object parameter )
 		{
-			var context = new Context( Container );
+			var container = Container ?? Factory.Create<IUnityContainer>();
+			var context = new Context( container );
 			Configure( context );
 		}
 

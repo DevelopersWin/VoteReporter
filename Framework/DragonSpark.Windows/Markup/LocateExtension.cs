@@ -139,6 +139,18 @@ namespace DragonSpark.Windows.Markup
 			=> new MarkupValueContext( serviceProvider, target.TargetObject, target.TargetProperty, propertyType );
 	}
 
+	public class ValueExtension : MarkupExtensionBase
+	{
+		readonly IValue value;
+
+		public ValueExtension( [Required]IValue value )
+		{
+			this.value = value;
+		}
+
+		protected override object GetValue( MarkupValueContext serviceProvider ) => value.Item;
+	}
+
 	public class FactoryTypeExtension : MarkupExtensionBase
 	{
 		public FactoryTypeExtension( [Required]Type factoryType )

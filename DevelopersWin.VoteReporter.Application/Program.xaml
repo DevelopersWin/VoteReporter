@@ -9,10 +9,11 @@
 	xmlns:startup="clr-namespace:DevelopersWin.VoteReporter.Application.Startup"
 	mc:Ignorable="d" 
 >
-	<ioC:AssignLocationCommand>
-		<ds:Factory>
-			<ioC:UnityContainerFactory Assemblies="{ds:FactoryType {x:Type windowsRuntime:AssemblyProvider}}" Logger="{ds:FactoryType {x:Type startup:Logger}}" />
-		</ds:Factory>
-	</ioC:AssignLocationCommand>
+	<!--<ds:ConsoleApplication.Items>
+		<setup:SetupValue x:Name="Assemblies" Item="{ds:FactoryType {x:Type windowsRuntime:AssemblyProvider}}" />
+	</ds:ConsoleApplication.Items>-->
+
+	<ioC:AssignAssembliesCommand Assemblies="{ds:FactoryType {x:Type windowsRuntime:AssemblyProvider}}" />
+	<ioC:AssignLocationCommand />
 	<startup:SetupApplicationCommand />
 </ds:ConsoleApplication>

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Markup;
+using DragonSpark.Setup;
 
 namespace DragonSpark.Diagnostics
 {
@@ -61,7 +62,7 @@ namespace DragonSpark.Diagnostics
 		protected override void Configure( LoggerSinkConfiguration configuration ) => configuration.TextWriter( Writer, RestrictedToMinimumLevel, OutputTemplate, FormatProvider );
 	}
 
-	public abstract class AddSinkCommand : LoggerCommandBase<LoggerSinkConfiguration>
+	public abstract class AddSinkCommand : LoggerConfigurationCommandBase<LoggerSinkConfiguration>
 	{
 		protected AddSinkCommand() : this( LogEventLevel.Verbose ) {}
 
@@ -75,7 +76,7 @@ namespace DragonSpark.Diagnostics
 		public LogEventLevel RestrictedToMinimumLevel { get; set; }
 	}
 
-	public abstract class MinimumLevelCommandBase : LoggerCommandBase<LoggerMinimumLevelConfiguration>
+	public abstract class MinimumLevelCommandBase : LoggerConfigurationCommandBase<LoggerMinimumLevelConfiguration>
 	{
 		protected MinimumLevelCommandBase() : base( configuration => configuration.MinimumLevel ) {}
 	}
@@ -97,7 +98,7 @@ namespace DragonSpark.Diagnostics
 		protected override void Configure( LoggerMinimumLevelConfiguration configuration ) => configuration.ControlledBy( Controller );
 	}
 
-	public abstract class ReadFromCommandBase : LoggerCommandBase<LoggerSettingsConfiguration>
+	public abstract class ReadFromCommandBase : LoggerConfigurationCommandBase<LoggerSettingsConfiguration>
 	{
 		protected ReadFromCommandBase() : base( configuration => configuration.ReadFrom ) {}
 	}
@@ -130,7 +131,7 @@ namespace DragonSpark.Diagnostics
 		protected override void Configure( LoggerSettingsConfiguration configuration ) => configuration.KeyValuePairs( Dictionary );
 	}
 
-	public abstract class DestructureCommandBase : LoggerCommandBase<LoggerDestructuringConfiguration>
+	public abstract class DestructureCommandBase : LoggerConfigurationCommandBase<LoggerDestructuringConfiguration>
 	{
 		protected DestructureCommandBase() : base( configuration => configuration.Destructure ) {}
 	}
@@ -172,7 +173,7 @@ namespace DragonSpark.Diagnostics
 		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming<T>( Factory.Create );
 	}
 
-	public abstract class FilterCommandBase : LoggerCommandBase<LoggerFilterConfiguration>
+	public abstract class FilterCommandBase : LoggerConfigurationCommandBase<LoggerFilterConfiguration>
 	{
 		protected FilterCommandBase() : base( configuration => configuration.Filter ) {}
 	}
@@ -220,7 +221,7 @@ namespace DragonSpark.Diagnostics
 		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.WithProperty( PropertyName, Value, DestructureObjects );
 	}
 
-	public abstract class EnrichCommandBase : LoggerCommandBase<LoggerEnrichmentConfiguration>
+	public abstract class EnrichCommandBase : LoggerConfigurationCommandBase<LoggerEnrichmentConfiguration>
 	{
 		protected EnrichCommandBase() : base( configuration => configuration.Enrich ) {}
 	}
@@ -239,11 +240,11 @@ namespace DragonSpark.Diagnostics
 		protected override void Configure( LoggerMinimumLevelConfiguration configuration ) => configuration.Is( Level );
 	}
 
-	public abstract class LoggerCommandBase<T> : Command<LoggerConfiguration>
+	public abstract class LoggerConfigurationCommandBase<T> : SetupCommandBase<LoggerConfiguration>
 	{
 		readonly Func<LoggerConfiguration, T> transform;
 
-		protected LoggerCommandBase( Func<LoggerConfiguration, T> transform )
+		protected LoggerConfigurationCommandBase( Func<LoggerConfiguration, T> transform )
 		{
 			this.transform = transform;
 		}

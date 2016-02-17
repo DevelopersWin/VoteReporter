@@ -4,10 +4,7 @@ namespace DragonSpark.Runtime.Values
 	{
 		T reference;
 
-		public override void Assign( T item )
-		{
-			reference = item;
-		}
+		public override void Assign( T item ) => reference = item;
 
 		public override T Item => reference;
 	}

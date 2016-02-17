@@ -121,9 +121,6 @@
     <Compile Include="Program.xaml.cs">
       <DependentUpon>Program.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Startup\Logger.xaml.cs">
-      <DependentUpon>Logger.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
@@ -181,10 +178,6 @@
     <Page Include="Program.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Startup\Logger.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Startup\Setup.xaml">
       <SubType>Designer</SubType>
