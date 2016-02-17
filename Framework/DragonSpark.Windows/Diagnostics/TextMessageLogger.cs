@@ -4,41 +4,14 @@ using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 using System;
-using System.IO;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	/*public class TextMessageLogger : MessageLoggerBase, IDisposable
-	{
-		readonly TextWriter writer;
-
-		public TextMessageLogger() : this( Console.Out ) {}
-
-		public TextMessageLogger( [Required]TextWriter writer )
-		{
-			this.writer = writer;
-		}
-
-		protected override void OnLog( Message message ) => writer.WriteLine( message.Text );
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				writer.Dispose();
-			}
-		}
-	}*/
-
 	public class AddSeqSinkCommand : AddSinkCommand
 	{
-		public AddSeqSinkCommand( LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose, int batchPostingLimit = 1000, TimeSpan? period = null, string apiKey = null, string bufferBaseFilename = null, long? bufferFileSizeLimitBytes = null ) : base( restrictedToMinimumLevel )
+		public AddSeqSinkCommand() : this( LogEventLevel.Verbose, 1000, null, null, null, null ) {}
+
+		public AddSeqSinkCommand( LogEventLevel restrictedToMinimumLevel, int batchPostingLimit, TimeSpan? period, string apiKey, string bufferBaseFilename, long? bufferFileSizeLimitBytes ) : base( restrictedToMinimumLevel )
 		{
 			BatchPostingLimit = batchPostingLimit;
 			Period = period;
@@ -60,9 +33,42 @@ namespace DragonSpark.Windows.Diagnostics
 			=> configuration.Seq( Endpoint.ToString(), RestrictedToMinimumLevel, BatchPostingLimit, Period, ApiKey, BufferBaseFilename, BufferFileSizeLimitBytes );
 	}
 
+	public class AddConsoleSinkCommand : AddSinkCommand
+	{
+		public AddConsoleSinkCommand() : this( "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}", LogEventLevel.Verbose ) {}
+
+		public AddConsoleSinkCommand( [NotEmpty]string outputTemplate, LogEventLevel restrictedToMinimumLevel ) : base( restrictedToMinimumLevel )
+		{
+			OutputTemplate = outputTemplate;
+		}
+
+		[NotEmpty]
+		public string OutputTemplate { [return: NotEmpty]get; set; }
+
+		protected override void Configure( LoggerSinkConfiguration configuration )
+			=> configuration.ColoredConsole( RestrictedToMinimumLevel, OutputTemplate, FormatProvider );
+	}
+
+	public class AddTraceSinkCommand : AddSinkCommand
+	{
+		public AddTraceSinkCommand() : this( "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}", LogEventLevel.Verbose ) {}
+
+		public AddTraceSinkCommand( [NotEmpty]string outputTemplate, LogEventLevel restrictedToMinimumLevel ) : base( restrictedToMinimumLevel )
+		{
+			OutputTemplate = outputTemplate;
+		}
+
+		[NotEmpty]
+		public string OutputTemplate { [return: NotEmpty]get; set; }
+
+		protected override void Configure( LoggerSinkConfiguration configuration ) => configuration.Trace( RestrictedToMinimumLevel, OutputTemplate, FormatProvider );
+	}
+	
 	public class AddRollingFileSinkCommand : AddSinkCommand
 	{
-		public AddRollingFileSinkCommand( LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose, string outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}", long fileSizeLimitBytes = 1073741824, int retainedFileCountLimit = 31 ) : base( restrictedToMinimumLevel )
+		public AddRollingFileSinkCommand() : this( "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}", 1073741824, 31, LogEventLevel.Verbose ) {}
+
+		public AddRollingFileSinkCommand( [NotEmpty]string outputTemplate, long fileSizeLimitBytes, int retainedFileCountLimit, LogEventLevel restrictedToMinimumLevel ) : base( restrictedToMinimumLevel )
 		{
 			OutputTemplate = outputTemplate;
 			FileSizeLimitBytes = fileSizeLimitBytes;

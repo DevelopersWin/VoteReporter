@@ -117,7 +117,9 @@ namespace DragonSpark.Windows.Markup
 							return Builders.WithFirst( builder => builder.Handles( service ), builder =>
 							{
 								var context = Prepare( serviceProvider, service, builder.GetPropertyType( service ) );
-								var result = designMode ? designTimeFactory.Create( context ) : GetValue( context );
+								var value = designMode ? designTimeFactory.Create( context ) : GetValue( context );
+
+								var result = context.TargetProperty == null ? builder.Create( service ).SetValue( value ) : value;
 								return result;
 							} );
 					}

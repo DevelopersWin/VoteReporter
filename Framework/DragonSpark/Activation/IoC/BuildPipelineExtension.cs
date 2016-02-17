@@ -128,6 +128,8 @@ namespace DragonSpark.Activation.IoC
 				registry.Register<IServiceRegistry, ServiceRegistry>();
 				registry.Register<IActivator, Activator>();
 				registry.Register( Context );
+				registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
+				registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
 			} );
 
 			monitor.Purge().Each( Context.Policies.Clear<IBuildPlanPolicy> );
@@ -316,8 +318,6 @@ namespace DragonSpark.Activation.IoC
 			if ( new Checked( reference, this ).Item.Apply() )
 			{
 				var type = context.BuildKey.Type;
-				var name = type.Name;
-
 				context.New<ConventionCandidateLocator>().Create( context ).With( located =>
 				{
 					var mapped = new NamedTypeBuildKey( located, context.BuildKey.Name );

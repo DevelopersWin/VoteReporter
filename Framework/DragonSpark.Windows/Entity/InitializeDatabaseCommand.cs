@@ -34,11 +34,11 @@ namespace DragonSpark.Windows.Entity
 
 				var items = Installers.OrderBy( x => x.Version ).Where( x => x.ContextType == typeof(TContext) && context.Installations.Find( x.Id, x.Version.ToString() ) == null ).ToArray();
 
-				MessageLogger.Information( $"Performing entity installation on {items.Length} installers." );
+				MessageLogger.Information( "Performing entity installation on {Length} installers.", items.Length );
 
 				items.Each( x =>
 				{
-					MessageLogger.Information( $"Installing Entity Installer with ID of '{x.Id}' and version '{x.Version}'." );
+					MessageLogger.Information( "Installing Entity Installer with ID of '{Id}' and version '{Version}'.", x.Id, x.Version );
 
 					x.Steps.Each( y =>
 					{
@@ -48,7 +48,7 @@ namespace DragonSpark.Windows.Entity
 					context.Create<InstallationEntry>( y => x.MapInto( y ) );
 					context.Save();
 				} );
-				MessageLogger.Information( "Database Initialized.", Priority.Low );
+				MessageLogger.Information( "Database Initialized." );
 			}
 		}
 	}

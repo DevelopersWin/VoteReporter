@@ -11,7 +11,7 @@ namespace DragonSpark.Windows.Markup
 
 		readonly IServiceProvider inner;
 
-		public MarkupValueContext( [Required]IServiceProvider inner, [Required]object targetObject, [Required]object targetProperty, [Required]Type propertyType )
+		public MarkupValueContext( [Required]IServiceProvider inner, [Required]object targetObject, object targetProperty, [Required]Type propertyType )
 		{
 			this.inner = inner;
 			TargetObject = targetObject;

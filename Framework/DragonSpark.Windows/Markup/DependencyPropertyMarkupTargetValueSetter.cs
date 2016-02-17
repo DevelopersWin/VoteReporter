@@ -14,7 +14,7 @@ namespace DragonSpark.Windows.Markup
 			this.targetProperty = targetProperty;
 		}
 
-		protected override void Apply( object value )
+		protected override object Apply( object value )
 		{
 			// Marshal the call back to the UI thread
 			targetObject.Dispatcher.Invoke( DispatcherPriority.Normal, (DispatcherOperationCallback)( o =>
@@ -22,6 +22,7 @@ namespace DragonSpark.Windows.Markup
 				targetObject.SetValue( targetProperty, o );
 				return null;
 			} ), value );
+			return null;
 		}
 	}
 }

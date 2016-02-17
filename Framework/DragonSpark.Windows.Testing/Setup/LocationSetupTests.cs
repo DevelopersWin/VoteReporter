@@ -3,7 +3,6 @@ using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
@@ -17,12 +16,12 @@ using Moq;
 using Ploeh.AutoFixture.Xunit2;
 using PostSharp.Patterns.Contracts;
 using PostSharp.Patterns.Model;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Serilog;
 using Xunit;
 using Xunit.Abstractions;
 using Activator = DragonSpark.Windows.Testing.TestObjects.Activator;
@@ -331,78 +330,11 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void Information( [Located( false ), Frozen]ILogger messageLogger, string message )
-		{
-			messageLogger.Information( message );
-			messageLogger.Information( message, Priority.High );
-
-			// Mock.Get( messageLogger ).Verify( x => x.Log( It.Is<Message>( m => m.Category == InformationMessageFactory.Category && m.Text.Contains( message ) && m.Priority == Priority.Normal ) ) );
-			// Mock.Get( messageLogger ).Verify( x => x.Log( It.Is<Message>( m => m.Category == InformationMessageFactory.Category && m.Text.Contains( message ) && m.Priority == Priority.High ) ) );
-		}
-
-		[Theory, LocationSetup.AutoData]
-		public void Warning( [Located( false ), Frozen]ILogger messageLogger, string message )
-		{
-			messageLogger.Warning( message );
-			messageLogger.Warning( message, Priority.Low );
-
-			// Mock.Get( messageLogger ).Verify( x => x.Log( It.Is<Message>( m => m.Category == WarningMessageFactory.Category && m.Text.Contains( message ) && m.Priority == Priority.High ) ) );
-			// Mock.Get( messageLogger ).Verify( x => x.Log( It.Is<Message>( m => m.Category == WarningMessageFactory.Category && m.Text.Contains( message ) && m.Priority == Priority.Low ) ) );
-		}
-
-		[Theory, LocationSetup.AutoData]
-		[Map(typeof(IExceptionFormatter), typeof(ExceptionFormatter) )]
-		public void Error( [Located( false ), Frozen]ILogger messageLogger, IExceptionFormatter formatter, [Modest]InvalidOperationException error, string message )
-		{
-			// Assert.Same( logger, Log.Current );
-
-			messageLogger.Error( error, message );
-
-			// Mock.Get( messageLogger ).Verify( x => x.Log( It.Is<Message>( m => m.Category == ExceptionMessageFactory.Category && m.Text.Contains( message ) && m.Text.Contains( error.GetType().FullName ) && m.Priority == Priority.High ) ) );
-		}
-
-		[Theory, LocationSetup.AutoData]
-		public void DefaultError( [Located( false ), Frozen]ILogger messageLogger, [Modest]InvalidOperationException error, string message )
-		{
-			messageLogger.Error( error, message );
-
-			// var message = error.ToString();
-
-			// Mock.Get( messageLogger ).Verify( x => x.Log( It.Is<Message>( m => m.Category == ExceptionMessageFactory.Category && m.Text.Contains( message ) && m.Text.Contains( error.GetType().FullName ) && m.Priority == Priority.High ) ) );
-		}
-
-		[Theory, LocationSetup.AutoData]
-		[Map(typeof(IExceptionFormatter), typeof(ExceptionFormatter) )]
-		public void Fatal( [Located( false ), Frozen]ILogger messageLogger, IExceptionFormatter formatter, [Modest]FatalApplicationException error, string message )
-		{
-			// Assert.Same( logger, Log.Current );
-
-			messageLogger.Fatal( error, message );
-
-			// var message = formatter.FormatMessage( error, id );
-
-			// Mock.Get( messageLogger ).Verify( x => x.Log( It.Is<Message>( m => m.Category == FatalExceptionMessageFactory.Category && m.Text.Contains( message ) && m.Text.Contains( error.GetType().FullName ) && m.Priority == Priority.Highest ) ) );
-		}
-
-		[Theory, LocationSetup.AutoData]
 		[Map(typeof(IExceptionFormatter), typeof(ExceptionFormatter) )]
 		public void Try()
 		{
 			var exception = ExceptionSupport.Try( () => {} );
 			Assert.Null( exception );
-		}
-
-		[Theory, LocationSetup.AutoData]
-		[Map(typeof(IExceptionFormatter), typeof(ExceptionFormatter) )]
-		public void TryException( [Located( false ), Frozen, Registered]ILogger messageLogger, [Modest]InvalidOperationException error )
-		{
-			var exception = ExceptionSupport.Try( () => { throw error; } );
-			Assert.NotNull( exception );
-			Assert.Equal( error, exception );
-
-			// var message = formatter.FormatMessage( error );
-
-			// Mock.Get( messageLogger ).Verify( x => x.Log( It.Is<Message>( m => m.Category == ExceptionMessageFactory.Category && m.Text.Contains( "An exception has occurred while executing an application delegate." ) && m.Text.Contains( error.GetType().FullName ) && m.Priority == Priority.High ) ) );
 		}
 
 		[Theory, LocationSetup.AutoData]

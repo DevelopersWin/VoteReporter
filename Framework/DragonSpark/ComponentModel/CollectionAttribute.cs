@@ -1,7 +1,6 @@
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using System;
-using DragonSpark.Runtime;
 
 namespace DragonSpark.ComponentModel
 {
@@ -16,11 +15,13 @@ namespace DragonSpark.ComponentModel
 			return result;
 		} );
 
+		public class Collection<T> : System.Collections.ObjectModel.Collection<T> {}
+
 		class Transformer : TransformerBase<Type>
 		{
 			public static Transformer Instance { get; } = new Transformer();
 
-			protected override Type CreateItem( Type parameter ) => typeof(System.Collections.ObjectModel.Collection<>).MakeGenericType( parameter );
+			protected override Type CreateItem( Type parameter ) => typeof(Collection<>).MakeGenericType( parameter );
 		}
 	}
 }

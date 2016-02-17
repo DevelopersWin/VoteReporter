@@ -21,9 +21,10 @@ namespace DragonSpark.Windows.Markup
 			this.assign = assign;
 		}
 
-		protected override void Apply( object value )
+		protected override object Apply( object value )
 		{
 			assign( targetObject, targetProperty, value );
+			return null;
 		}
 	}
 }

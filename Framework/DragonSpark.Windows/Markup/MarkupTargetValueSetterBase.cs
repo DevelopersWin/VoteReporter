@@ -6,28 +6,25 @@ namespace DragonSpark.Windows.Markup
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 		
-		public void SetValue( object value )
+		public object SetValue( object value )
 		{
 			if ( monitor.IsApplied )
 			{
 				throw new ObjectDisposedException( GetType().FullName );
 			}
 
-			Apply( value );
+			return Apply( value );
 		}
 
-		protected abstract void Apply( object value );
+		protected abstract object Apply( object value );
 
 		protected bool IsDisposed => monitor.IsApplied;
 
-		public void Dispose()
+		public void Dispose() => monitor.Apply( () =>
 		{
-			monitor.Apply( () =>
-			{
-				Dispose( true );
-				GC.SuppressFinalize( this );
-			} );
-		}
+			Dispose( true );
+			GC.SuppressFinalize( this );
+		} );
 
 		protected virtual void Dispose( bool disposing )
 		{}

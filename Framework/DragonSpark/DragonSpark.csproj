@@ -330,7 +330,6 @@
     <Compile Include="Setup\Setup.cs" />
     <Compile Include="Setup\SetupCommandBase.cs" />
     <Compile Include="Setup\SetupParameter.cs" />
-    <Compile Include="Setup\Commands\SetupModuleCatalogCommand.cs" />
     <Compile Include="Setup\Commands\DelegatedCommand.cs" />
     <Compile Include="Setup\Registration\LifetimeManagerAttribute.cs" />
     <Compile Include="Setup\Registration\RegistrationAttribute.cs" />

@@ -6,7 +6,7 @@ namespace DragonSpark.Windows.Markup
 {
 	public interface IMarkupTargetValueSetter : IDisposable
 	{
-		void SetValue( object value );
+		object SetValue( object value );
 	}
 
 	public abstract class MarkupTargetValueSetterFactory<TTarget, TProperty> : FactoryBase<IProvideValueTarget, IMarkupTargetValueSetter>, IMarkupTargetValueSetterBuilder

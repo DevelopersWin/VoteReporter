@@ -1,5 +1,4 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
@@ -35,7 +34,7 @@ namespace DragonSpark.Activation.IoC
 			var result = Container.TryResolve( serviceType, key );
 			if ( result == null && !Container.IsRegistered( serviceType, key ) )
 			{
-				Container.Logger().Warning( string.Format( Resources.ServiceLocator_NotRegistered, serviceType, key ?? Resources.Activator_None ) );
+				Container.Logger().Debug( string.Format( Resources.ServiceLocator_NotRegistered, serviceType, key ?? Resources.Activator_None ) );
 			}
 			return result;
 		}

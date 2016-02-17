@@ -11,11 +11,11 @@ namespace DragonSpark.Testing.Diagnostics
 	public class MessageRecorderTests
 	{
 		[Theory, AutoData]
-		public void Message( RecordingLogEventSink sut, string message, Priority priority )
+		public void Message( RecordingLogEventSink sut, string message )
 		{
 			var logger = new LoggerConfiguration().WriteTo.Sink( sut ).CreateLogger();
 
-			logger.Information( message, priority );
+			logger.Information( message );
 
 			var item = sut.Events.Only();
 			Assert.NotNull( item );
