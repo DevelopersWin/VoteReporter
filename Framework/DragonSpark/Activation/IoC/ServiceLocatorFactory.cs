@@ -9,52 +9,24 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System.Reflection;
 using System.Windows.Markup;
+using DragonSpark.ComponentModel;
 using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation.IoC
 {
-	public abstract class UnityContainerFactory<TAssemblyProvider, TLogger> : UnityContainerFactory<TAssemblyProvider>
-		where TAssemblyProvider : IAssemblyProvider, new()
-		where TLogger : IFactory<ILogger>, new()
-	{
-		protected UnityContainerFactory() : base( new TLogger().Create() ) {}
-	}
-
-	public abstract class UnityContainerFactory<TAssemblyProvider> : UnityContainerFactory
-		where TAssemblyProvider : IAssemblyProvider, new()
-	{
-		protected UnityContainerFactory( ILogger logger ) : this( new TAssemblyProvider().Create(), logger ) {}
-
-		protected UnityContainerFactory( [Required]Assembly[] assemblies, [Required]ILogger logger )
-		{
-			Assemblies = assemblies;
-			Logger = logger;
-		}
-	}
-
-	public class AssignAssembliesCommand : Command<object>
-	{
-		[Required]
-		public Assembly[] Assemblies { [return: Required]get; set; }
-
-		protected override void OnExecute( object parameter ) => new AssemblyHost().Assign( Assemblies );
-	}
-
 	public class UnityContainerFactory : FactoryBase<IUnityContainer>
 	{
-		[Required]
+		[Required, Value( typeof(AssemblyHost) )]
 		public Assembly[] Assemblies { get; set; }
 
-		[Required]
+		[Required, Factory]
 		public ILogger Logger { get; set; }
 
 		protected override IUnityContainer CreateItem()
 		{
-			var assemblies = Assemblies ?? TypeSystem.Assemblies.GetCurrent();
-			var logger = Logger ?? Factory.Create<ILogger>();
 			var result = new UnityContainer()
-				.RegisterInstance( assemblies )
-				.RegisterInstance( logger )
+				.RegisterInstance( Assemblies )
+				.RegisterInstance( Logger )
 				.Extend<RegistrationMonitorExtension>()
 				.Extend<BuildPipelineExtension>();
 			return result;
@@ -95,15 +67,10 @@ namespace DragonSpark.Activation.IoC
 			public ILogger Logger { get; }
 		}
 
-		[Required]
+		[Required, Factory]
 		public IUnityContainer Container { get; set; }
 
-		protected override void OnExecute( object parameter )
-		{
-			var container = Container ?? Factory.Create<IUnityContainer>();
-			var context = new Context( container );
-			Configure( context );
-		}
+		protected override void OnExecute( object parameter ) => new Context( Container ).With( Configure );
 
 		protected virtual void Configure( Context context )
 		{

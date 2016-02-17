@@ -59,9 +59,9 @@ namespace DragonSpark.Testing.ComponentModel
 			Assert.IsType<ClassWithParameter>( target.Factory );
 
 			Assert.NotNull( target.Collection );
-			Assert.IsType<System.Collections.ObjectModel.Collection<object>>( target.Collection );
+			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<object>>( target.Collection );
 			Assert.NotNull( target.Classes );
-			Assert.IsType<System.Collections.ObjectModel.Collection<Class>>( target.Classes );
+			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<Class>>( target.Classes );
 
 			Assert.Equal( 6776, target.ValuedInt );
 

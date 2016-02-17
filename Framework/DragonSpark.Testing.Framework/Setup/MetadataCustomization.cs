@@ -26,13 +26,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override void OnInitializing( AutoData context ) => factory( context.Method ).Each( customization => customization.Customize( context.Fixture ) );
 	}
 
-	/*public class UnityContainerFactory<TAssemblyProvider> : UnityContainerFactory<TAssemblyProvider, RecordingLogEventSink> where TAssemblyProvider : IAssemblyProvider
-	{
-		public new static UnityContainerFactory<TAssemblyProvider> Instance { get; } = new UnityContainerFactory<TAssemblyProvider>();
-
-		protected override IUnityContainer CreateItem() => base.CreateItem().Extension<FixtureExtension>().Container;
-	}*/
-
 	public class AutoDataApplication<TSetup> : Application<AutoData> where TSetup : ISetup
 	{
 		public AutoDataApplication( params ICommand<AutoData>[] commands ) : base( commands.Concat( new SetupApplicationCommand<TSetup>().ToItem() ).ToArray() ) {}

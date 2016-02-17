@@ -20,5 +20,5 @@ namespace DragonSpark.Testing.Objects.Setup
 
 	public class SetupFixtureFactory<TSetup> : FixtureFactory<ApplicationSetupCustomization<TSetup>> where TSetup : class, ISetup {}
 
-	public class ApplicationSetupCustomization<TSetup> : Framework.Setup.ApplicationSetupCustomization<Application<TSetup>, TSetup> where TSetup : class, ISetup {}
+	public class ApplicationSetupCustomization<TSetup> : ApplicationSetupCustomization<Application<TSetup>, TSetup> where TSetup : class, ISetup {}
 }

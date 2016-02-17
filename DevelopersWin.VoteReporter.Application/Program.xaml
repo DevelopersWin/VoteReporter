@@ -8,12 +8,8 @@
 	xmlns:windowsRuntime="clr-namespace:DragonSpark.Windows.Runtime;assembly=DragonSpark.Windows"
 	xmlns:startup="clr-namespace:DevelopersWin.VoteReporter.Application.Startup"
 	mc:Ignorable="d" 
+	Assemblies="{ds:FactoryType {x:Type windowsRuntime:AssemblyProvider}}"
 >
-	<!--<ds:ConsoleApplication.Items>
-		<setup:SetupValue x:Name="Assemblies" Item="{ds:FactoryType {x:Type windowsRuntime:AssemblyProvider}}" />
-	</ds:ConsoleApplication.Items>-->
-
-	<ioC:AssignAssembliesCommand Assemblies="{ds:FactoryType {x:Type windowsRuntime:AssemblyProvider}}" />
 	<ioC:AssignLocationCommand />
 	<startup:SetupApplicationCommand />
 </ds:ConsoleApplication>

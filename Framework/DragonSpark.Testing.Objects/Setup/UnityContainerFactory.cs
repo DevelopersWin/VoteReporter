@@ -1,10 +1,12 @@
 ﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Testing.Framework;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
+using Serilog;
 using Serilog.Core;
+using System.Reflection;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -28,5 +30,17 @@ namespace DragonSpark.Testing.Objects.Setup
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
 		protected override IUnityContainer CreateItem() => base.CreateItem().RegisterInstance<ILogEventSink>( sink );
+	}
+
+	public abstract class UnityContainerFactory<TAssemblyProvider> : Activation.IoC.UnityContainerFactory
+		where TAssemblyProvider : IAssemblyProvider, new()
+	{
+		protected UnityContainerFactory( ILogger logger ) : this( new TAssemblyProvider().Create(), logger ) {}
+
+		protected UnityContainerFactory( [Required]Assembly[] assemblies, [Required]ILogger logger )
+		{
+			Assemblies = assemblies;
+			Logger = logger;
+		}
 	}
 }

@@ -1,20 +1,32 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.ComponentModel;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
+using DragonSpark.TypeSystem;
+using System.Reflection;
 
 namespace DragonSpark.Setup
 {
 	public abstract class Application<TArguments> : SetupContainer<TArguments>
 	{
 		protected Application( params ICommand<TArguments>[] commands ) : base( commands ) {}
+
+		[Value( typeof(AssemblyHost) )]
+		public Assembly[] Assemblies { get; set; }
+
+		protected override void OnExecute( TArguments parameter )
+		{
+			using ( new AssignValueCommand<Assembly[]>( new AssemblyHost() ).ExecuteWith( Assemblies ) )
+			{
+				using ( new AmbientContextCommand<ITaskMonitor>().ExecuteWith( new TaskMonitor() ) )
+				{
+					base.OnExecute( parameter );
+				}
+			}
+		}
 	}
 
 	public class SetupApplicationCommand<TSetup> : DeferredCommand<TSetup, object> where TSetup : ISetup {}
-
-	public class SetupValue : IValue<object>
-	{
-		public object Item { get; set; }
-	}
 
 	public abstract class SetupContainer<T> : CompositeCommand<T>
 	{
@@ -27,12 +39,9 @@ namespace DragonSpark.Setup
 	{
 		protected override void OnExecute( object parameter )
 		{
-			using ( new AmbientContextCommand<ITaskMonitor>().ExecuteWith( new TaskMonitor() ) )
+			using ( new AmbientContextCommand<ISetup>().ExecuteWith( this ) )
 			{
-				using ( new AmbientContextCommand<ISetup>().ExecuteWith( this ) )
-				{
-					base.OnExecute( parameter );
-				}
+				base.OnExecute( parameter );
 			}
 		}
 	}
