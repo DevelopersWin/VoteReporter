@@ -15,7 +15,6 @@ namespace DragonSpark.Windows.Markup
 		[Locate, Required]
 		public IIncrementer Incrementer { [return: Required]get; set; }
 		
-		[BuildUp]
 		public override object ProvideValue( IServiceProvider serviceProvider )
 		{
 			var context = DetermineContext( serviceProvider );

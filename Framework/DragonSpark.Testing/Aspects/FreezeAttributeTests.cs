@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Xunit2;
-using PostSharp.Patterns.Model;
 using System;
 using System.Reflection;
 using Xunit;
@@ -37,50 +36,6 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( 2, sut.Count );
 			sut.Other();
 			Assert.Equal( 2, sut.Count );
-		}
-
-		/*[Fact]
-		public void Deconstructor()
-		{
-			var count = 0;
-			new SubjectWithDeconstructor( () => count++ ).QueryInterface<IDisposable>().Dispose();
-			GC.Collect();
-			GC.WaitForPendingFinalizers();
-			Assert.Equal( 1, count );
-		}
-
-		[Disposable]
-		public class SubjectWithDeconstructor
-		{
-			readonly Action action;
-
-			public SubjectWithDeconstructor( Action action )
-			{
-				this.action = action;
-			}
-
-			~SubjectWithDeconstructor()
-			{
-				action();
-				// Dispose( false );
-			}
-
-			[Freeze]
-			protected virtual void Dispose( bool disposing ) => action();
-		}*/
-
-		[Fact]
-		public void DisposeModel()
-		{
-			Assert.Throws<ObjectDisposedException>( () => new Item().QueryInterface<IDisposable>().Dispose() );
-		}
-
-		[Disposable( ThrowObjectDisposedException = true )]
-		public class Item
-		{
-			public string PropertyName { get; set; }
-			
-			protected virtual void Dispose( bool disposing ) => PropertyName = null;
 		}
 
 		public class Disposable : IDisposable

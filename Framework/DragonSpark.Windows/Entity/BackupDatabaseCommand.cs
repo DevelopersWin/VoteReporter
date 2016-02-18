@@ -16,7 +16,6 @@ namespace DragonSpark.Windows.Entity
 		[Default( 6 )]
 		public int? MaximumBackups { get; set; }
 
-		[BuildUp]
 		protected override void OnExecute( object parameter )
 		{
 			Database.With( file =>

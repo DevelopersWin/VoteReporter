@@ -1,9 +1,6 @@
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Windows.Markup;
-using System.Xaml;
-using DragonSpark.Extensions;
-using DragonSpark.Setup;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -19,7 +16,7 @@ namespace DragonSpark.Windows.Markup
 		public override object ProvideValue( IServiceProvider serviceProvider ) => Activator.CreateInstance( type );
 	}
 
-	public abstract class MonitoredMarkupExtension : DeferredMarkupExtension
+	/*public abstract class MonitoredMarkupExtension : DeferredMarkupExtension
 	{
 		protected override object BeginProvideValue( IServiceProvider serviceProvider, IMarkupTargetValueSetter setter )
 		{
@@ -39,5 +36,5 @@ namespace DragonSpark.Windows.Markup
 		}
 
 		protected abstract object GetValue( IServiceProvider serviceProvider );
-	}
+	}*/
 }

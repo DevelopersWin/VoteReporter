@@ -9,7 +9,7 @@ using System.Windows.Markup;
 namespace DragonSpark.Windows.Markup
 {
 	[ContentProperty( nameof(Items) )]
-	public class CollectionExtension : MonitoredMarkupExtension
+	public class CollectionExtension : MarkupExtensionBase
 	{
 		public Collection Items { get; } = new Collection();
 
@@ -21,7 +21,7 @@ namespace DragonSpark.Windows.Markup
 			return result;
 		}
 
-		protected override object GetValue( IServiceProvider serviceProvider )
+		protected override object GetValue( MarkupValueContext serviceProvider )
 		{
 			var result = DetermineCollection( serviceProvider ).With( o =>
 			{

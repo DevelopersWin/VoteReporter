@@ -22,7 +22,6 @@ namespace DragonSpark.Windows.Entity
 		[Locate, Required]
 		public ILogger MessageLogger { [return: Required]get; set; }
 
-		[BuildUp]
 		protected override void OnExecute( object parameter )
 		{
 			Database.SetInitializer( Initializer );
