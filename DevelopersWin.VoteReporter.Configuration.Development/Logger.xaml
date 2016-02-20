@@ -7,8 +7,8 @@
 	xmlns:diagnosticsPlatform="clr-namespace:DragonSpark.Windows.Diagnostics;assembly=DragonSpark.Windows"
 	xmlns:enrichers="clr-namespace:Serilog.Enrichers;assembly=Serilog.FullNetFx"
 	mc:Ignorable="d" 
-	>
-	<diagnostics:MinimumLevelIsCommand Level="Information" />
+>
+	<diagnostics:MinimumLevelIsCommand />
 	<diagnosticsPlatform:AddConsoleSinkCommand />
 	<diagnosticsPlatform:AddTraceSinkCommand />
 	<diagnostics:EnrichCommand>

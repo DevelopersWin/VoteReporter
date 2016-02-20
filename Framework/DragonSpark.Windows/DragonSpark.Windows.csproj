@@ -44,6 +44,10 @@
       <HintPath>$(SolutionDir)packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CPI.DirectoryServices, Version=1.2.0.0, Culture=neutral, PublicKeyToken=9acea252523a2304, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DNParser.1.2.0.0\lib\net40-Client\CPI.DirectoryServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -122,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
+    <Compile Include="Security\KeyVaultApplicationFactory.cs" />
     <Compile Include="Setup\ConsoleApplication.cs" />
     <Compile Include="Setup\ConfigurationSectionFactory.cs" />
     <Compile Include="Runtime\Data\DataBuilder.cs" />
