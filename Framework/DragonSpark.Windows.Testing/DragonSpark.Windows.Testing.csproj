@@ -214,6 +214,11 @@
   <ItemGroup>
     <Compile Include="Io\FileSystemTests.cs" />
     <Compile Include="Modularity\DirectoryModuleInfoProviderTests.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Runtime\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Runtime\AssemblyProviderTests.cs" />
     <Compile Include="Runtime\DomainAssemblySourceTests.cs" />
@@ -244,6 +249,8 @@
     <Compile Include="Runtime\ExceptionFormatterTests.cs" />
     <Compile Include="Runtime\ThreadDataValueTests.cs" />
     <Compile Include="Security\KeyVaultApplicationFactoryTests.cs" />
+    <Compile Include="Security\CertificateFactoryTests.cs" />
+    <Compile Include="Security\SecretFactoryTests.cs" />
     <Compile Include="Setup\Application.cs" />
     <Compile Include="Setup\LocationSetup.cs">
       <DependentUpon>LocationSetup.xaml</DependentUpon>
@@ -270,6 +277,10 @@
     <Compile Include="TestObjects\Modules\MockModuleTypeLoader.cs" />
     <Compile Include="TestObjects\Modules\MyDummyClass.cs" />
     <Compile Include="TestObjects\Relayed.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="TestObjects\Modules\MockModuleThrowingException.cs" />
     <EmbeddedResource Include="TestObjects\Modules\MockModuleReferencingOtherModule.cs" />
     <EmbeddedResource Include="TestObjects\Modules\MockModuleReferencingAssembly.cs" />
@@ -292,6 +303,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Resources\Certificate.cer" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonSpark.Testing.Framework\DragonSpark.Testing.Framework.csproj">

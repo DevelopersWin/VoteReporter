@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using CPI.DirectoryServices;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
@@ -10,27 +11,29 @@ namespace DragonSpark.Windows.Security
 {
 	public class KeyVaultApplication
 	{
-		public KeyVaultApplication( [Required]Guid id, [Required]Uri location )
+		public KeyVaultApplication( [Required]X509Certificate2 certificate, [Required]Guid id, [Required]Uri location )
 		{
+			Certificate = certificate;
 			Id = id;
 			Location = location;
 		}
 
-		public Guid Id { get; set; }
-		public Uri Location { get; set; }
+		public X509Certificate2 Certificate { get; }
+		public Guid Id { get; }
+		public Uri Location { get; }
 	}
 
-	public class KeyVaultApplicationFactory : FactoryBase<string, KeyVaultApplication>
+	public class KeyVaultApplicationFactory : FactoryBase<X509Certificate2, KeyVaultApplication>
 	{
 		public static KeyVaultApplicationFactory Instance { get; } = new KeyVaultApplicationFactory();
 
-		protected override KeyVaultApplication CreateItem( string parameter )
+		protected override KeyVaultApplication CreateItem( X509Certificate2 parameter )
 		{
-			var name = new DN( parameter );
+			var name = new DN( parameter.IssuerName.Name );
 			var components = name.RDNs.SelectMany( rdn => rdn.Components ).ToArray();
 			var id = Get( components, "OU" );
 			var location = Get( components, "CN" );
-			var result = new KeyVaultApplication( new Guid( id ), new Uri( $"{Uri.UriSchemeHttps}://{location}" ) );
+			var result = new KeyVaultApplication( parameter, new Guid( id ), new Uri( $"{Uri.UriSchemeHttps}://{location}" ) );
 			return result;
 		}
 
