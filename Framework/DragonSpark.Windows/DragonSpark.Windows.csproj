@@ -44,6 +44,10 @@
       <HintPath>$(SolutionDir)packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="BouncyCastle.CryptoExt, Version=1.7.4114.6378, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\..\packages\BouncyCastle-Ext.1.7.0\lib\net20\BouncyCastle.CryptoExt.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="CPI.DirectoryServices, Version=1.2.0.0, Culture=neutral, PublicKeyToken=9acea252523a2304, processorArchitecture=MSIL">
       <HintPath>..\..\packages\DNParser.1.2.0.0\lib\net40-Client\CPI.DirectoryServices.dll</HintPath>
       <Private>True</Private>
@@ -168,6 +172,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xaml">
       <Aliases>global</Aliases>
     </Reference>

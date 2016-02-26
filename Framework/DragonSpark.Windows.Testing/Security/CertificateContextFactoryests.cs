@@ -9,8 +9,8 @@ namespace DragonSpark.Windows.Testing.Security
 		[Theory, AutoData]
 		public void Create( CertificateFactory sut )
 		{
-			var result = sut.Create( "68OxxjVSjO9T44v/1GXTbAYINZ8=" );
-			Assert.NotNull( result );
+			/*var result = sut.Create( "" );
+			Assert.NotNull( result );*/
 		}
 	}
 }
