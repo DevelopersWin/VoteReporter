@@ -1,10 +1,9 @@
-using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
-using System;
 using Serilog;
+using System;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -47,7 +46,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			var lifetimeManager = lifetimeFactory( parameter.MappedTo ) ?? new TransientLifetimeManager();
 			container.RegisterType( parameter.Type, parameter.MappedTo, parameter.Name, lifetimeManager );
-			logger.Information( string.Format( Resources.ServiceRegistry_Registering, parameter.Type, parameter.Name, lifetimeManager.GetType().FullName ) );
+			logger.Information( string.Format( Resources.ServiceRegistry_Registering, parameter.Type, parameter.MappedTo, lifetimeManager.GetType().FullName ) );
 		}
 
 		public void Register( InstanceRegistrationParameter parameter )
