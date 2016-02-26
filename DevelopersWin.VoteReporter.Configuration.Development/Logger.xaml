@@ -11,8 +11,8 @@
 	<diagnostics:MinimumLevelIsCommand />
 	<diagnosticsPlatform:AddConsoleSinkCommand />
 	<diagnosticsPlatform:AddTraceSinkCommand />
-	
-	
+
+	<diagnosticsPlatform:AddSeqSinkCommand Endpoint="http://localhost:5341" />
 	
 	<diagnostics:EnrichCommand>
 		<enrichers:ProcessIdEnricher />
