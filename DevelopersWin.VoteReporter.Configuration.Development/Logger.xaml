@@ -11,6 +11,9 @@
 	<diagnostics:MinimumLevelIsCommand />
 	<diagnosticsPlatform:AddConsoleSinkCommand />
 	<diagnosticsPlatform:AddTraceSinkCommand />
+	
+	
+	
 	<diagnostics:EnrichCommand>
 		<enrichers:ProcessIdEnricher />
 		<enrichers:ThreadIdEnricher />
