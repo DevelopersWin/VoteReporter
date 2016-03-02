@@ -7,6 +7,7 @@ using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Composition;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -96,18 +97,22 @@ namespace DragonSpark.Activation.FactoryModel
 
 	public class FrameworkFactoryTypeLocator : FactoryTypeLocatorBase<Type>
 	{
-		public static FrameworkFactoryTypeLocator Instance { get; } = new FrameworkFactoryTypeLocator();
+		public static FrameworkFactoryTypeLocator Instance { get; } = new FrameworkFactoryTypeLocator( Assemblies.GetCurrent );
 
-		public FrameworkFactoryTypeLocator() : base( Default<Type>.Self, t => Default<Type>.Items ) {}
+		public FrameworkFactoryTypeLocator( Assemblies.Get assemblies ) : base( assemblies, Default<Type>.Self, t => Default<Type>.Items ) {}
 	}
 
 	public abstract class FactoryTypeLocatorBase<T> : FactoryBase<T, Type>
 	{
+		readonly Assemblies.Get assemblies;
 		readonly Func<T, Type> type;
 		readonly Func<T, Type[]> locations;
 
-		protected FactoryTypeLocatorBase( [Required]Func<T, Type> type, [Required]Func<T, Type[]> locations )
+		protected FactoryTypeLocatorBase( [Required]Func<T, Type> type, [Required]Func<T, Type[]> locations ) : this( Assemblies.GetCurrent, type, locations ) {}
+
+		protected FactoryTypeLocatorBase( Assemblies.Get assemblies, [Required]Func<T, Type> type, [Required]Func<T, Type[]> locations )
 		{
+			this.assemblies = assemblies;
 			this.type = type;
 			this.locations = locations;
 		}
@@ -116,8 +121,8 @@ namespace DragonSpark.Activation.FactoryModel
 		protected override Type CreateItem( T parameter )
 		{
 			var mapped = type( parameter );
-			var assemblies = new Assemblies.Get[] { locations( parameter ).Append( mapped, GetType() ).Assemblies().Distinct().Fixed, Assemblies.GetCurrent };
-			var result = assemblies.FirstWhere( get => new DiscoverableFactoryTypeLocator( get() ).Create( mapped ) );
+			var candidates = new[] { locations( parameter ).Append( mapped, GetType() ).Assemblies().Distinct().Fixed, assemblies };
+			var result = candidates.FirstWhere( get => new DiscoverableFactoryTypeLocator( get() ).Create( mapped ) );
 			return result;
 		}
 	}
@@ -137,7 +142,7 @@ namespace DragonSpark.Activation.FactoryModel
 			var result =
 				assemblies.FirstWhere( assembly =>
 				{
-					var enumerable = assembly.DefinedTypes.AsTypes().Where( Factory.IsFactory ).Where( x => x.IsDefined<DiscoverableAttribute>( true ) );
+					var enumerable = assembly.DefinedTypes.AsTypes().Where( Factory.IsFactory ).Where( x => x.IsDefined<ExportAttribute>( true ) );
 					var buildable = enumerable.Where( CanBuildSpecification.Instance.IsSatisfiedBy ).ToArray();
 					return buildable.With( types =>
 						types.Where( info => info.Name == name ).Only()

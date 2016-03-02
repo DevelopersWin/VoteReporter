@@ -80,7 +80,7 @@ namespace DragonSpark.Runtime.Values
 		public Reference( object instance, T key ) : base( instance, ConnectedValueKeyFactory<T>.Instance.Create( new EqualityList( key ) ), () => key ) {}
 	}
 
-	class Checked : AssociatedValue<ConditionMonitor>
+	public class Checked : AssociatedValue<ConditionMonitor>
 	{
 		public Checked( object instance ) : this( instance, instance ) {}
 

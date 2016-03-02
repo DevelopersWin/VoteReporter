@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 
 namespace DevelopersWin.VoteReporter.Application
 {
@@ -12,7 +11,7 @@ namespace DevelopersWin.VoteReporter.Application
 
 		public Program()
 		{
-			var temp = ConfigurationManager.AppSettings["Testing"];
+			var temp = DevelopersWin.VoteReporter.Configuration.Development.Properties.Settings.Default.Setting;
 
 			InitializeComponent();
 		}
