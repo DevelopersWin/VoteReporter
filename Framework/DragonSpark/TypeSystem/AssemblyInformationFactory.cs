@@ -1,14 +1,13 @@
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Registration;
-using System;
+using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	[Discoverable]
+	[Export]
 	public class AssemblyInformationFactory : FactoryBase<Assembly, AssemblyInformation>
 	{
 		public static AssemblyInformationFactory Instance { get; } = new AssemblyInformationFactory();
@@ -23,8 +22,7 @@ namespace DragonSpark.TypeSystem
 			typeof(AssemblyCopyrightAttribute)
 		};
 
-		AssemblyInformationFactory() : base( new FactoryParameterCoercer<Assembly>() )
-		{}
+		AssemblyInformationFactory() : base( new FactoryParameterCoercer<Assembly>() ) {}
 
 		protected override AssemblyInformation CreateItem( Assembly parameter )
 		{

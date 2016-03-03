@@ -1,16 +1,16 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Core;
+using System.Composition;
 using System.Reflection;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
-	[Discoverable]
+	[Export]
 	public class UnityContainerFactory : UnityContainerFactory<AssemblyProvider>
 	{
 		readonly RecordingLogEventSink sink;

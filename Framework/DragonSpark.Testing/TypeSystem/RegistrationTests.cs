@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
+using System.Composition;
 using System.Reflection;
-using DragonSpark.Activation.FactoryModel;
 using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Same( sut, AssemblySource.Result );
 		}
 
-		[Discoverable]
+		[Export]
 		public class AssemblySource : AssemblySourceBase
 		{
 			readonly internal static Assembly[] Result = new Assembly[0];

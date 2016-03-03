@@ -1,11 +1,7 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace DragonSpark.Activation.FactoryModel
 {
-	[AttributeUsage( AttributeTargets.Class )]
-	public class DiscoverableAttribute : Attribute {}
-
 	public abstract class ActivationFactory<TParameter, TResult> : FactoryBase<TParameter, TResult> where TParameter : ActivationParameter where TResult : class
 	{
 		readonly Activator.Get activator;

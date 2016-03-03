@@ -1,6 +1,7 @@
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
 using System;
+using System.Composition;
 using System.IO;
 using System.Reflection;
 using DragonSpark.Activation.FactoryModel;
@@ -9,7 +10,7 @@ using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Windows.Runtime
 {
-	[Discoverable]
+	[Export]
 	public class ApplicationAssemblyLocator : FirstFactory<Assembly>, IApplicationAssemblyLocator
 	{
 		public ApplicationAssemblyLocator( DomainApplicationAssemblyLocator domain, TypeSystem.ApplicationAssemblyLocator system ) : base( domain, system ) {}

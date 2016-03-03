@@ -5,6 +5,7 @@ using DragonSpark.Windows.Runtime;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
 using Ploeh.AutoFixture.Xunit2;
 using System;
+using System.Composition;
 using System.Linq;
 using Xunit;
 
@@ -42,7 +43,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 			Assert.True( fifth.RethrowRecommended );
 		}
 
-		[Discoverable]
+		[Export]
 		public class ExceptionManagerFactory : FactoryBase<ExceptionManager>
 		{
 			internal const string ExceptionReplaced = "Exception Replaced", ExceptionWrapped = "Exception Wrapped";

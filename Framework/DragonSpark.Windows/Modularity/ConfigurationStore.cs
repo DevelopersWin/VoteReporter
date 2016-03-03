@@ -1,12 +1,11 @@
-using System;
-using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Setup.Registration;
 using DragonSpark.Windows.Setup;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Composition;
 
 namespace DragonSpark.Windows.Modularity
 {
-	[Discoverable]
+	[Export]
 	public class ModulesConfigurationSectionFactory : ConfigurationSectionFactory<ModulesConfigurationSection>
 	{
 		public static ModulesConfigurationSectionFactory Instance { get; } = new ModulesConfigurationSectionFactory();

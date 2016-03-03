@@ -19,6 +19,7 @@ using PostSharp.Patterns.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -485,7 +486,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{ }
 	}
 
-	[Discoverable]
+	[Export]
 	public class ServiceLocatorFactory : AggregateFactory<IServiceLocator>
 	{
 		public ServiceLocatorFactory() : this( UnityContainerFactory.Instance.Create() ) {}

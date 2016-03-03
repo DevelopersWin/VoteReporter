@@ -1,11 +1,12 @@
-using System;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Composition;
 
 namespace DragonSpark.Testing.Objects
 {
-	[Discoverable]
+	[Export]
 	public class FactoryOfYAC : FactoryBase<YetAnotherClass>
 	{
 		readonly Func<YetAnotherClass> inner;

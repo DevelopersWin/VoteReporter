@@ -1,11 +1,11 @@
-﻿using DragonSpark.Activation.FactoryModel;
+﻿using System.Composition;
 
 namespace DevelopersWin.VoteReporter.Configuration.Development
 {
 	/// <summary>
 	/// Interaction logic for Logger.xaml
 	/// </summary>
-	[Discoverable]
+	[Export]
 	public partial class Logger
 	{
 		public Logger()

@@ -1,16 +1,15 @@
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
-using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
 
 namespace DragonSpark.Setup.Registration
 {
-	[Discoverable]
+	[Export]
 	public class ConventionRegistrationProfileFactory : FactoryBase<ConventionRegistrationProfile>
 	{
 		readonly Assembly[] assemblies;
