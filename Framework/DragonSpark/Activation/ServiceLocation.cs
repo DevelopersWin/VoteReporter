@@ -1,4 +1,3 @@
-using System;
 using DragonSpark.Runtime.Values;
 using Microsoft.Practices.ServiceLocation;
 

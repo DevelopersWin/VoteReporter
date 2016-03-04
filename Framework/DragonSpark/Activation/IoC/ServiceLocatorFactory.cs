@@ -1,16 +1,16 @@
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
+using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System.Reflection;
 using System.Windows.Markup;
-using DragonSpark.ComponentModel;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -88,7 +88,6 @@ namespace DragonSpark.Activation.IoC
 		{
 			Container = container;
 		}
-
 	}
 
 	public class AssignLocationCommand : ConfigureLocationCommand

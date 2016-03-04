@@ -1,9 +1,7 @@
-﻿using System.Composition.Hosting;
-using System.Linq;
+﻿using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Runtime.Values;
+using System.Composition.Hosting;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using DragonSpark.Activation.FactoryModel;
 
 namespace DragonSpark.Composition
 {
@@ -14,8 +12,11 @@ namespace DragonSpark.Composition
 		protected override CompositionHost CreateItem( Assembly[] parameter ) => 
 			new ContainerConfiguration()
 				.WithAssemblies( parameter )
+				.WithProvider( new InstanceExportDescriptorProvider( parameter ) )
 				.WithProvider( new FactoryExportDescriptorProvider( parameter ) )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider( parameter ) )
 				.CreateContainer();
 	}
+
+	public class CompositionHostContext : ExecutionContextValue<CompositionHost> {}
 }

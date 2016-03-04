@@ -180,6 +180,7 @@
     <Compile Include="Composition\FactoryDelegateExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProviderBase.cs" />
+    <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="Runtime\Specifications\WrappedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsTypeSpecification.cs" />
     <Compile Include="Runtime\Values\AmbientContextCommand.cs" />
+    <Compile Include="Runtime\Values\CompositeWritableValue.cs" />
     <Compile Include="Runtime\Values\ConnectedValue.cs" />
     <Compile Include="Extensions\ActivateFactoryExtensions.cs" />
     <Compile Include="Activation\FactoryModel\ActivateParameter.cs" />
