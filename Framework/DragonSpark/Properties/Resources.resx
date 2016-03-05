@@ -174,7 +174,7 @@ Error was: {1}.</value>
     <value>Logger was created successfully.</value>
   </data>
   <data name="ServiceLocator_NotRegistered" xml:space="preserve">
-    <value>Specified type is not registered: "{0}" with build name "{1}".</value>
+    <value>Specified type is not registered: "{Type}" with build name "{Name}".</value>
   </data>
   <data name="DefaultTextLoggerPattern" xml:space="preserve">
     <value>[{0:u}] [{1}-{3}] -&gt; {2}.</value>

@@ -1,18 +1,17 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using Xunit;
 using Xunit.Abstractions;
 using ServiceLocation = DragonSpark.Activation.ServiceLocation;
-using UnityContainerFactory = DragonSpark.Testing.Objects.Setup.UnityContainerFactory;
 
 namespace DragonSpark.Testing.Activation
 {
 	public class DefaultServicesTests : Tests
 	{
-		public DefaultServicesTests( ITestOutputHelper output ) : base( output )
-		{}
+		public DefaultServicesTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Theory, AutoData]
 		public void IsAvailable()
@@ -23,7 +22,7 @@ namespace DragonSpark.Testing.Activation
 
 			Assert.False( sut.IsAvailable );
 
-			var serviceLocator = new ServiceLocator( UnityContainerFactory.Instance.Create() );
+			var serviceLocator = Composer.Compose<ServiceLocator>(); // new ServiceLocator( UnityContainerFactory.Instance.Create(), new RecordingSinkFactory().Create() );
 			Assert.NotNull( serviceLocator );
 			sut.Assign( serviceLocator );
 

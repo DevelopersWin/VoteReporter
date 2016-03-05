@@ -5,6 +5,8 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using PostSharp;
+using PostSharp.Extensibility;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -13,7 +15,20 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		public AutoDataAttribute() : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create ) {}
 
-		protected AutoDataAttribute( [Required]Func<IFixture> fixture ) : base( fixture() ) {}
+		protected AutoDataAttribute( [Required]Func<IFixture> fixture ) : base( Testes( fixture ) ) {}
+
+		static IFixture Testes( Func<IFixture> fixture )
+		{
+			try
+			{
+				return fixture();
+			}
+			catch ( Exception e )
+			{
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "0001", $"HELLO {e}", null, null, null ) );
+				throw;
+			}
+		}
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{

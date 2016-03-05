@@ -342,7 +342,6 @@
     <Compile Include="Activation\IoC\InjectionMemberFactory.cs" />
     <Compile Include="Runtime\IProgram.cs" />
     <Compile Include="Setup\Registration\IRegistrationTypeContext.cs" />
-    <Compile Include="Setup\ISetup.cs" />
     <Compile Include="Activation\IoC\ISingletonLocator.cs" />
     <Compile Include="Runtime\Program.cs" />
     <Compile Include="Setup\Registration\RegisterAttribute.cs" />

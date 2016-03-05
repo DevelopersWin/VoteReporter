@@ -1,46 +1,20 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Testing.Framework;
-using DragonSpark.TypeSystem;
-using Microsoft.Practices.Unity;
-using PostSharp.Patterns.Contracts;
-using Serilog;
-using Serilog.Core;
+﻿using DragonSpark.Testing.Framework;
 using System.Composition;
-using System.Reflection;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
 	[Export]
-	public class UnityContainerFactory : UnityContainerFactory<AssemblyProvider>
+	public class UnityContainerFactory : Activation.IoC.UnityContainerFactory
 	{
-		readonly RecordingLogEventSink sink;
+		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
 		public class Register : RegisterFactoryAttribute
 		{
 			public Register() : base( typeof(UnityContainerFactory) ) {}
 		}
-
-		public UnityContainerFactory() : this( new RecordingLogEventSink() ) {}
-
-		public UnityContainerFactory( [Required]RecordingLogEventSink sink ) : base( new RecordingSinkFactory( sink ).Create() )
-		{
-			this.sink = sink;
-		}
-
-		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-
-		protected override IUnityContainer CreateItem() => base.CreateItem().RegisterInstance<ILogEventSink>( sink );
 	}
 
-	public abstract class UnityContainerFactory<TAssemblyProvider> : Activation.IoC.UnityContainerFactory
-		where TAssemblyProvider : IAssemblyProvider, new()
-	{
-		protected UnityContainerFactory( ILogger logger ) : this( new TAssemblyProvider().Create(), logger ) {}
-
-		protected UnityContainerFactory( [Required]Assembly[] assemblies, [Required]ILogger logger )
-		{
-			Assemblies = assemblies;
-			Logger = logger;
-		}
-	}
+	[Export]
+	public class RecordingSinkFactory : Diagnostics.RecordingSinkFactory
+	{}
 }

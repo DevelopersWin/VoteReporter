@@ -1,11 +1,12 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
+using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Input;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -15,8 +16,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		readonly Func<MethodBase, ICustomization[]> factory;
 
-		public MetadataCustomization() : this( MetadataCustomizationFactory.Instance.Create )
-		{}
+		public MetadataCustomization() : this( MetadataCustomizationFactory.Instance.Create ) {}
 
 		public MetadataCustomization( Func<MethodBase, ICustomization[]> factory )
 		{
@@ -26,23 +26,31 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override void OnInitializing( AutoData context ) => factory( context.Method ).Each( customization => customization.Customize( context.Fixture ) );
 	}
 
-	public class AutoDataApplication<TSetup> : Application<AutoData> where TSetup : ISetup
+	public class Application : Application<AutoData>
 	{
-		public AutoDataApplication( params ICommand<AutoData>[] commands ) : base( commands.Concat( new SetupApplicationCommand<TSetup>().ToItem() ).ToArray() ) {}
+		public Application( params ICommand<AutoData>[] commands ) : base( commands ) {}
+
+		// public Application( params ICommand<AutoData>[] commands ) : base( commands.Concat( new SetupApplicationCommand<TSetup>().ToItem() ).ToArray() ) {}
 	}
 
-	public abstract class ApplicationSetupCustomization<TApplication, TSetup> : SetupCustomization 
-		where TApplication : AutoDataApplication<TSetup>
-		where TSetup : class, ISetup
+	/*public abstract class ApplicationSetupCustomization<TApplication> : SetupCustomization 
+		where TApplication : Application
 	{
 		protected ApplicationSetupCustomization() : base( ActivateFactory<TApplication>.Instance.Create ) {}
+	}*/
+
+	public class ApplicationCustomization<T> : ApplicationCustomization where T : ICommand
+	{
+		public ApplicationCustomization() : this( Default<ICommand>.Items ) {}
+
+		public ApplicationCustomization( params ICommand[] commands ) : base( () => new Application( commands.Concat( new [] { new ApplyExportedCommandsCommand<T>() } ).Cast<ICommand<object>>().ToArray() ) ) {}
 	}
 
-	public abstract class SetupCustomization : AutoDataCustomization
+	public class ApplicationCustomization : AutoDataCustomization
 	{
 		readonly Func<ICommand<AutoData>> setupFactory;
 	
-		protected SetupCustomization( Func<ICommand<AutoData>> setupFactory )
+		protected ApplicationCustomization( Func<ICommand<AutoData>> setupFactory )
 		{
 			this.setupFactory = setupFactory;
 		}

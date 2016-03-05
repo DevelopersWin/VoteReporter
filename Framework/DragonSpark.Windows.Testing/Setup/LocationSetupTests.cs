@@ -29,7 +29,6 @@ using Activator = DragonSpark.Windows.Testing.TestObjects.Activator;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 using Object = DragonSpark.Testing.Objects.Object;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
-using UnityContainerFactory = DragonSpark.Testing.Objects.Setup.UnityContainerFactory;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -489,12 +488,9 @@ namespace DragonSpark.Windows.Testing.Setup
 	[Export]
 	public class ServiceLocatorFactory : AggregateFactory<IServiceLocator>
 	{
-		public ServiceLocatorFactory() : this( UnityContainerFactory.Instance.Create() ) {}
-
-		public ServiceLocatorFactory( [Required]IUnityContainer container ) : base( 
-			() => new ServiceLocator( container ), 
-			new CommandTransformer<ConfigureLocationCommand, IServiceLocator>( new ConfigureLocationCommand { Container = container } ).Create 
-		)
-		{}
+		[ImportingConstructor]
+		public ServiceLocatorFactory( [Required]ConfigureServiceLocationContext context ) : base( () => context.Locator, 
+			new CommandTransformer<ConfigureLocationCommand, IServiceLocator>( new ConfigureLocationCommand( context ) ).Create 
+		){}
 	}
 }

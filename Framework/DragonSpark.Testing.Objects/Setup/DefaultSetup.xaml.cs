@@ -1,16 +1,14 @@
-﻿using DragonSpark.ComponentModel;
-using DragonSpark.Setup;
-using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.TypeSystem;
-using System.Reflection;
+﻿using DragonSpark.Testing.Framework.Setup;
+using System.Composition;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
+	[Export]
 	public partial class DefaultSetup
 	{
 		public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( SetupFixtureFactory<DefaultSetup>.Instance.Create ) {}
+			public AutoDataAttribute() : base( FixtureFactory<ApplicationCustomization<DefaultSetup>>.Instance.Create ) {}
 		}
 
 		public DefaultSetup()
@@ -18,18 +16,4 @@ namespace DragonSpark.Testing.Objects.Setup
 			InitializeComponent();
 		}
 	}
-
-	public class Application<T> : AutoDataApplication<T> where T : ISetup
-	{
-		[Value( typeof(AssemblyHost) )]
-		public override Assembly[] Assemblies
-		{
-			get { return base.Assemblies; }
-			set { base.Assemblies = value; }
-		}
-	}
-
-	public class SetupFixtureFactory<TSetup> : FixtureFactory<ApplicationSetupCustomization<TSetup>> where TSetup : class, ISetup {}
-
-	public class ApplicationSetupCustomization<TSetup> : ApplicationSetupCustomization<Application<TSetup>, TSetup> where TSetup : class, ISetup {}
 }

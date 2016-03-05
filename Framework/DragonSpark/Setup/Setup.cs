@@ -1,4 +1,5 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.ComponentModel;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
@@ -6,6 +7,7 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
+using System.Windows.Input;
 
 namespace DragonSpark.Setup
 {
@@ -13,7 +15,7 @@ namespace DragonSpark.Setup
 	{
 		public ApplicationHost() : this( new AssemblyHost(), new CompositionHost() ) {}
 
-		public ApplicationHost( [Required]AssemblyHost assemblyHost, [Required]CompositionHost compositionHost ) : base( assemblyHost, compositionHost ) {}
+		public ApplicationHost( params IWritableValue<Assembly[]>[] values ) : base( values ) {}
 	}
 
 	public class CompositionHost : FixedValue<Assembly[]>
@@ -38,15 +40,16 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public abstract class Application<TArguments> : SetupContainer<TArguments>
+	public abstract class Application<TArguments> : SetupContainerBase<TArguments>
 	{
 		protected Application( params ICommand<TArguments>[] commands ) : base( commands ) {}
 
-		public virtual Assembly[] Assemblies { get; set; }
+		public Assembly[] Assemblies { get; set; }
 
 		protected override void OnExecute( TArguments parameter )
 		{
-			using ( new AssignValueCommand<Assembly[]>( new ApplicationHost() ).ExecuteWith( Assemblies ) )
+			var assemblies = Assemblies ?? new AssemblyHost().Item;
+			using ( new AssignValueCommand<Assembly[]>( new ApplicationHost() ).ExecuteWith( assemblies ) )
 			{
 				using ( new AmbientContextCommand<ITaskMonitor>().ExecuteWith( new TaskMonitor() ) )
 				{
@@ -56,16 +59,34 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class SetupApplicationCommand<TSetup> : DeferredCommand<TSetup, object> where TSetup : ISetup {}
-
-	public abstract class SetupContainer<T> : CompositeCommand<T>
+	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand
 	{
-		protected SetupContainer( params ICommand<T>[] commands ) : base( commands ) {}
+		[Required, Value( typeof(CompositionHostContext) )]
+		public System.Composition.Hosting.CompositionHost Host { [return: Required]get; set; }
+
+		public string ContractName { get; set; }
+
+		protected override void OnExecute( object parameter ) => 
+			Host.GetExports<T>( ContractName ).Prioritize().Each( setup =>
+			{
+				setup.ExecuteWith( parameter );
+			} );
+	}
+
+	public class ApplySetup : ApplyExportedCommandsCommand<ISetup> {}
+
+	public interface ISetup : ICommand<object> {}
+
+	public class Setup : SetupContainerBase<object>, ISetup {}
+
+	public abstract class SetupContainerBase<T> : CompositeCommand<T>
+	{
+		protected SetupContainerBase( params ICommand<T>[] commands ) : base( commands ) {}
 
 		public Collection<object> Items { get; } = new Collection<object>();
 	}
 
-	public abstract class Setup : SetupContainer<object>, ISetup
+	/*public abstract class Setup : SetupContainerBase<object>, ISetup
 	{
 		protected override void OnExecute( object parameter )
 		{
@@ -74,5 +95,5 @@ namespace DragonSpark.Setup
 				base.OnExecute( parameter );
 			}
 		}
-	}
+	}*/
 }

@@ -6,10 +6,10 @@
 	xmlns:ioC="clr-namespace:DragonSpark.Activation.IoC;assembly=DragonSpark"
 	xmlns:ds="http://framework.dragonspark.us"
 	xmlns:windowsRuntime="clr-namespace:DragonSpark.Windows.Runtime;assembly=DragonSpark.Windows"
-	xmlns:startup="clr-namespace:DevelopersWin.VoteReporter.Application.Startup"
+	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" 
 	Assemblies="{ds:Factory {x:Static windowsRuntime:AssemblyProvider.Instance}}"
 >
 	<ioC:AssignLocationCommand />
-	<startup:SetupApplicationCommand />
+	<setup:ApplySetup />
 </ds:ConsoleApplication>

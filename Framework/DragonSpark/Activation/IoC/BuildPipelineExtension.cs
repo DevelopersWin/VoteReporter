@@ -1,5 +1,7 @@
 ﻿using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
+using DragonSpark.ComponentModel;
+using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
@@ -10,19 +12,38 @@ using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Composition.Hosting;
+using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using Serilog;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
 {
+	public class ExportDescriptorProvider : System.Composition.Hosting.Core.ExportDescriptorProvider
+	{
+		readonly IUnityContainer container;
+
+		public ExportDescriptorProvider( [Required]IUnityContainer container )
+		{
+			this.container = container;
+		}
+
+		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
+		{
+			CompositionDependency dependency;
+			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) && container.IsRegistered( contract.ContractType, contract.ContractName ) )
+			{
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => container.Resolve( contract.ContractType, contract.ContractName ), NoMetadata ) );
+			}
+		}
+	}
+
 	public class RegistrationMonitorExtension : UnityContainerExtension, IDisposable
 	{
-		// readonly MonitorLoggerCommand command = new MonitorLoggerCommand();
-
 		protected override void Initialize() => Context.RegisteringInstance += ContextOnRegisteringInstance;
 
 		void ContextOnRegisteringInstance( object sender, RegisterInstanceEventArgs args )
@@ -107,6 +128,9 @@ namespace DragonSpark.Activation.IoC
 			}
 		}
 
+		[Required, Value( typeof(CompositionHostContext) )]
+		public CompositionHost Host { [return: Required]get; set; }
+
 		protected override void Initialize()
 		{
 			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
@@ -130,6 +154,7 @@ namespace DragonSpark.Activation.IoC
 				registry.Register( Context );
 				registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
 				registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
+				registry.Register( Host );
 			} );
 
 			monitor.Purge().Each( Context.Policies.Clear<IBuildPlanPolicy> );
@@ -140,7 +165,9 @@ namespace DragonSpark.Activation.IoC
 			Context.BuildPlanStrategies.AddNew<DynamicMethodCallStrategy>( UnityBuildStage.Initialization );
 
 			Context.Strategies.AddNew<ConventionStrategy>( UnityBuildStage.PreCreation );
-			Context.Strategies.AddNew<FactoryStrategy>( UnityBuildStage.PreCreation );
+
+			Host.GetExport<IExportDescriptorProviderRegistry>().Register( new ExportDescriptorProvider( Container ) );
+			Context.Strategies.AddNew<ComposeStrategy>( UnityBuildStage.PreCreation );
 
 			var policy = Context.Policies.Get<IBuildPlanCreatorPolicy>( null );
 			var builder = new Builder<TryContext>( Context.Strategies, policy.CreatePlan );
@@ -281,23 +308,24 @@ namespace DragonSpark.Activation.IoC
 		public KeyReference( object instance, NamedTypeBuildKey key ) : base( instance, key ) { }
 	}
 
-	public class FactoryStrategy : BuilderStrategy
+	public class ComposeStrategy : BuilderStrategy
 	{
+		[Required, Value( typeof(CompositionHostContext) )]
+		public CompositionHost Host { [return: Required]get; set; }
+
 		public override void PreBuildUp( IBuilderContext context )
 		{
 			var reference = new KeyReference( this, context.BuildKey ).Item;
 			var hasBuildPlan = context.HasBuildPlan();
-			if ( reference.Name == null && !hasBuildPlan && new Checked( reference, this ).Item.Apply() )
+			object existing;
+			if ( reference.Name == null && !hasBuildPlan && new Checked( reference, this ).Item.Apply() && Host.TryGetExport( context.BuildKey.Type, context.BuildKey.Name, out existing ) )
 			{
-				context.Existing = Factory.Create( context.BuildKey.Type );
+				context.Existing = existing;
 
-				context.Existing.With( instance =>
-				{
-					var registry = context.New<IServiceRegistry>();
-					registry.Register( new InstanceRegistrationParameter( context.BuildKey.Type, instance, context.BuildKey.Name ) );
-				} );
+				var registry = context.New<IServiceRegistry>();
+				registry.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing, context.BuildKey.Name ) );
 
-				context.BuildComplete = context.Existing != null;
+				context.BuildComplete = true;
 			}
 		}
 	}

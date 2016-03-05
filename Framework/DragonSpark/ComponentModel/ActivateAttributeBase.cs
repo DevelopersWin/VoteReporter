@@ -1,11 +1,9 @@
+using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Extensions;
-using Microsoft.Practices.Unity;
+using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
-using DragonSpark.Activation;
-using Microsoft.Practices.ServiceLocation;
 
 namespace DragonSpark.ComponentModel
 {
@@ -82,7 +80,7 @@ namespace DragonSpark.ComponentModel
 		readonly Func<PropertyInfo, ActivateParameter> convert;
 		readonly Func<Tuple<ActivateParameter, DefaultValueParameter>, object> create;
 
-		public ActivatedValueProvider( Converter converter ) : this( converter, Creator.Instance ) {}
+		// public ActivatedValueProvider( Converter converter ) : this( converter, Creator.Instance ) {}
 
 		public ActivatedValueProvider( Converter converter, Creator creator ) : this( converter.Create, creator.Create ) {}
 

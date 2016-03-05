@@ -256,7 +256,7 @@ namespace DragonSpark.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specified type is not registered: &quot;{0}&quot; with build name &quot;{1}&quot;..
+        ///   Looks up a localized string similar to Specified type is not registered: &quot;{Type}&quot; with build name &quot;{Name}&quot;..
         /// </summary>
         public static string ServiceLocator_NotRegistered {
             get {

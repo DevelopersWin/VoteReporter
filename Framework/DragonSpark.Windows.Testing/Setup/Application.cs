@@ -1,18 +1,16 @@
 ﻿using DragonSpark.Activation.IoC;
-using DragonSpark.Setup;
-using DragonSpark.Testing.Framework.Setup;
-using UnityContainerFactory = DragonSpark.Testing.Objects.Setup.UnityContainerFactory;
+using System.Windows.Input;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	public class Application<T> : AutoDataApplication<T> where T : ISetup
+	public class ApplicationCustomization<T> : DragonSpark.Testing.Framework.Setup.ApplicationCustomization<T> where T : ICommand
 	{
-		public Application() : base( new AssignLocationCommand() ) {}
+		public ApplicationCustomization() : base( new AssignLocationCommand() ) {}
 	}
 
-	public class SetupFixtureFactory<TSetup> : FixtureFactory<ApplicationSetupCustomization<TSetup>> where TSetup : class, ISetup {}
+	// public class SetupFixtureFactory<TSetup> : FixtureFactory<ApplicationSetupCustomization<TSetup>> where TSetup : class, ISetup {}
 
-	public class ApplicationSetupCustomization<TSetup> : ApplicationSetupCustomization<Application<TSetup>, TSetup> where TSetup : class, ISetup {}
+	// public class ApplicationSetupCustomization<TSetup> : ApplicationSetupCustomization<Application<TSetup>, TSetup> where TSetup : class, ISetup {}
 
-	public class AssignLocationCommand : AssignLocationCommand<UnityContainerFactory> {}
+	// public class AssignLocationCommand : AssignLocationCommand<UnityContainerFactory> {}
 }

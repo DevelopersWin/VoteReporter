@@ -1,32 +1,23 @@
+using System.Composition;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
-using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
-using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using Serilog;
-using System.Reflection;
 using System.Windows.Markup;
+using DragonSpark.ComponentModel;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class UnityContainerFactory : FactoryBase<IUnityContainer>
 	{
-		[Required, Value( typeof(AssemblyHost) )]
-		public Assembly[] Assemblies { get; set; }
-
-		[Required, Factory]
-		public ILogger Logger { get; set; }
-
 		protected override IUnityContainer CreateItem()
 		{
 			var result = new UnityContainer()
-				.RegisterInstance( Assemblies )
-				.RegisterInstance( Logger )
 				.Extend<RegistrationMonitorExtension>()
 				.Extend<BuildPipelineExtension>();
 			return result;
@@ -39,63 +30,87 @@ namespace DragonSpark.Activation.IoC
 		protected override void Dispose( bool disposing ) => base.Dispose( disposing );
 	}
 
-	[ContentProperty( nameof(Container) )]
-	public class ConfigureLocationCommand : Command<object>
+	[Export]
+	public class ConfigureServiceLocationContext
 	{
-		public class Context
+		[ImportingConstructor]
+		public ConfigureServiceLocationContext( [Required]IUnityContainer container, [Required]ILogger logger ) : this( Services.Location, new ServiceLocator( container, logger ), container, logger ) {}
+
+		public ConfigureServiceLocationContext( [Required]IServiceLocation location, [Required]IServiceLocator locator, [Required]IUnityContainer container, [Required]ILogger logger )
 		{
-			public Context( [Required]IUnityContainer container ) : this( container, container.Resolve<ILogger>() ) {}
-
-			public Context( [Required]IUnityContainer container, [Required]ILogger logger ) : this( Services.Location, container, logger ) {}
-
-			public Context( [Required]IServiceLocation location, [Required]IUnityContainer container, [Required]ILogger logger ) : this( location, new ServiceLocator( container ), container, logger ) {}
-
-			public Context( [Required]IServiceLocation location, [Required]IServiceLocator locator, [Required]IUnityContainer container, [Required]ILogger logger )
-			{
-				Location = location;
-				Locator = locator;
-				Container = container;
-				Logger = logger;
-			}
-
-			public IUnityContainer Container { get; }
-
-			public IServiceLocation Location { get; }
-
-			public IServiceLocator Locator { get; }
-
-			public ILogger Logger { get; }
+			Location = location;
+			Locator = locator;
+			Container = container;
+			Logger = logger;
 		}
 
-		[Required, Factory]
+		public IUnityContainer Container { get; }
+
+		public IServiceLocation Location { get; }
+
+		public IServiceLocator Locator { get; }
+
+		public ILogger Logger { get; }
+	}
+
+	[ContentProperty( nameof(Context) )]
+	public class ConfigureLocationCommand : Command<object>
+	{
+		public ConfigureLocationCommand() {}
+
+		public ConfigureLocationCommand( [Required]ConfigureServiceLocationContext context )
+		{
+			Context = context;
+		}
+
+		// public ConfigureLocationCommand() : this( Composer.Compose<IUnityContainer>(), Composer.Compose<ILogger>() ) {}
+
+		// public ConfigureLocationCommand( [Required]IUnityContainer container, ILogger logger ) : this( new ServiceLocator( container, logger ), container, logger ) {}
+
+		/*public ConfigureLocationCommand( [Required]IServiceLocator locator, [Required]IUnityContainer container, [Required]ILogger logger )
+		{
+			Locator = locator;
+			Container = container;
+			Logger = logger;
+		}*/
+
+		[Required, Compose]
+		public ConfigureServiceLocationContext Context { [return: Required]get; set; }
+
+		/*[Required, ComponentModel.Singleton( typeof(Services), nameof(Services.Location) )]
+		public IServiceLocation Location { [return: Required] get; set; }
+
+		[Required]
 		public IUnityContainer Container { get; set; }
 
-		protected override void OnExecute( object parameter ) => new Context( Container ).With( Configure );
+		[Required]
+		public IServiceLocator Locator { get; set; }
 
-		protected virtual void Configure( Context context )
+		[Required]
+		public ILogger Logger { get; set; }*/
+
+		protected override void OnExecute( object parameter )
 		{
-			context.Logger.Information( Resources.ConfiguringServiceLocatorSingleton );
-			context.Container.RegisterInstance( context.Location );
-			context.Container.RegisterInstance( context.Locator, new FrozenDisposeContainerControlledLifetimeManager() );
+			Context.Logger.Information( Resources.ConfiguringServiceLocatorSingleton );
+			Context.Container.RegisterInstance( Context.Location );
+			Context.Container.RegisterInstance( Context.Locator, new FrozenDisposeContainerControlledLifetimeManager() );
 		}
 	}
 
-	public class AssignLocationCommand<T> : AssignLocationCommand where T : UnityContainerFactory, new()
+	/*public class AssignLocationCommand<T> : AssignLocationCommand where T : UnityContainerFactory, new()
 	{
 		public AssignLocationCommand() : this( new T().Create() ) {}
 
-		public AssignLocationCommand( IUnityContainer container )
-		{
-			Container = container;
-		}
-	}
+		public AssignLocationCommand( IUnityContainer container ) : base()
+		
+	}*/
 
 	public class AssignLocationCommand : ConfigureLocationCommand
 	{
-		protected override void Configure( Context context )
+		protected override void OnExecute( object parameter )
 		{
-			context.Location.Assign( context.Locator );
-			base.Configure( context );
+			Context.Location.Assign( Context.Locator );
+			base.OnExecute( parameter );
 		}
 	}
 }
