@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Objects.Setup
 	{
 		public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( FixtureFactory<ApplicationCustomization<DefaultSetup>>.Instance.Create ) {}
+			public AutoDataAttribute() : base( FixtureFactory<Customization<DefaultSetup>>.Instance.Create ) {}
 		}
 
 		public DefaultSetup()

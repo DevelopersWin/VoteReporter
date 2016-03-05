@@ -290,7 +290,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockRecordingLogEventSink();
-			var logger = new RecordingSinkFactory( sink ).Create();
+			var logger = new RecordingLoggerFactory( sink ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			ModuleManager manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -317,7 +317,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockRecordingLogEventSink();
-			var logger = new RecordingSinkFactory( sink ).Create();
+			var logger = new RecordingLoggerFactory( sink ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManagerExtended(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -360,7 +360,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockRecordingLogEventSink();
-			var logger = new RecordingSinkFactory( sink ).Create();
+			var logger = new RecordingLoggerFactory( sink ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			manager.LoadModuleCompleted += ( sender, args ) => args.IsErrorHandled = true;

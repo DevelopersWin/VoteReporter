@@ -44,12 +44,12 @@ namespace DragonSpark.Setup
 	{
 		protected Application( params ICommand<TArguments>[] commands ) : base( commands ) {}
 
-		public Assembly[] Assemblies { get; set; }
+		[Required]
+		public Assembly[] Assemblies { [return: Required]get; set; }
 
 		protected override void OnExecute( TArguments parameter )
 		{
-			var assemblies = Assemblies ?? new AssemblyHost().Item;
-			using ( new AssignValueCommand<Assembly[]>( new ApplicationHost() ).ExecuteWith( assemblies ) )
+			using ( new AssignValueCommand<Assembly[]>( new ApplicationHost() ).ExecuteWith( Assemblies ) )
 			{
 				using ( new AmbientContextCommand<ITaskMonitor>().ExecuteWith( new TaskMonitor() ) )
 				{

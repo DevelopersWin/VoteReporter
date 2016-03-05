@@ -10,6 +10,8 @@ namespace DragonSpark.Testing.Objects
 {
 	public class AssemblyProvider : AssemblySourceBase, IAssemblyProvider
 	{
+		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
+
 		readonly Assembly[] others;
 
 		public class Register : RegisterFactoryAttribute

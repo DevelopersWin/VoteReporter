@@ -273,7 +273,6 @@
     <Compile Include="Security\KeyVaultApplicationFactoryTests.cs" />
     <Compile Include="Security\CertificateContextFactoryests.cs" />
     <Compile Include="Security\SecretFactoryTests.cs" />
-    <Compile Include="Setup\Application.cs" />
     <Compile Include="Setup\LocationSetup.cs">
       <DependentUpon>LocationSetup.xaml</DependentUpon>
     </Compile>

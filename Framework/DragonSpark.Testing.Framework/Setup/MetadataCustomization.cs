@@ -7,6 +7,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Activation.FactoryModel;
+using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -28,7 +30,10 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class Application : Application<AutoData>
 	{
-		public Application( params ICommand<AutoData>[] commands ) : base( commands ) {}
+		public Application( [Required] Assembly[] assemblies, params ICommand<AutoData>[] commands ) : base( commands )
+		{
+			Assemblies = assemblies;
+		}
 
 		// public Application( params ICommand<AutoData>[] commands ) : base( commands.Concat( new SetupApplicationCommand<TSetup>().ToItem() ).ToArray() ) {}
 	}
@@ -39,11 +44,29 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected ApplicationSetupCustomization() : base( ActivateFactory<TApplication>.Instance.Create ) {}
 	}*/
 
-	public class ApplicationCustomization<T> : ApplicationCustomization where T : ICommand
+	/*public class ApplicationCustomization<T> : ApplicationCustomization where T : ICommand
 	{
 		public ApplicationCustomization() : this( Default<ICommand>.Items ) {}
 
 		public ApplicationCustomization( params ICommand[] commands ) : base( () => new Application( commands.Concat( new [] { new ApplyExportedCommandsCommand<T>() } ).Cast<ICommand<object>>().ToArray() ) ) {}
+	}*/
+
+	public abstract class ApplicationFactory<TSetup> : FactoryBase<Application> where TSetup : ICommand
+	{
+		readonly Assembly[] assemblies;
+		readonly ICommand<object>[] commands;
+
+		protected ApplicationFactory( Assembly[] assemblies, params ICommand<object>[] commands )
+		{
+			this.assemblies = assemblies;
+			this.commands = commands.Concat( new [] { new ApplyExportedCommandsCommand<TSetup>() } ).ToArray();
+		}
+
+		protected override Application CreateItem()
+		{
+			var result = new Application( assemblies, commands );
+			return result;
+		}
 	}
 
 	public class ApplicationCustomization : AutoDataCustomization

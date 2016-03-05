@@ -6,11 +6,11 @@ using Serilog.Core;
 
 namespace DragonSpark.Diagnostics
 {
-	public class RecordingSinkFactory : FactoryBase<ILogger>
+	public class RecordingLoggerFactory : FactoryBase<ILogger>
 	{
-		public RecordingSinkFactory() : this( new RecordingLogEventSink() ) {}
+		public RecordingLoggerFactory() : this( new RecordingLogEventSink() ) {}
 
-		public RecordingSinkFactory( [Required]ILogEventSink sink )
+		public RecordingLoggerFactory( [Required]ILogEventSink sink )
 		{
 			Sink = sink;
 		}

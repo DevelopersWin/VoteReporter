@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Activation
 
 			Assert.False( sut.IsAvailable );
 
-			var serviceLocator = Composer.Compose<ServiceLocator>(); // new ServiceLocator( UnityContainerFactory.Instance.Create(), new RecordingSinkFactory().Create() );
+			var serviceLocator = Composer.Compose<ServiceLocator>(); // new ServiceLocator( UnityContainerFactory.Instance.Create(), new RecordingLoggerFactory().Create() );
 			Assert.NotNull( serviceLocator );
 			sut.Assign( serviceLocator );
 

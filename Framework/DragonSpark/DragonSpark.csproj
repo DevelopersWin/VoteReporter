@@ -293,7 +293,7 @@
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
     <Compile Include="Runtime\Values\IValue.cs" />
     <Compile Include="Runtime\ListDictionary.cs" />
-    <Compile Include="Diagnostics\RecordingSinkFactory.cs" />
+    <Compile Include="Diagnostics\RecordingLoggerFactory.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
     <Compile Include="Modularity\AttributeDataProvider.cs" />
     <Compile Include="Modularity\CyclicDependencyFoundException.cs" />
