@@ -5,44 +5,31 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using PostSharp;
-using PostSharp.Extensibility;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
-		public AutoDataAttribute() : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create ) {}
+		readonly Func<Application> application;
 
-		protected AutoDataAttribute( [Required]Func<IFixture> fixture ) : base( Testes( fixture ) ) {}
+		public AutoDataAttribute() : this( () => new Application() ) {}
 
-		static IFixture Testes( Func<IFixture> fixture )
+		protected AutoDataAttribute( Func<Application> application ) : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create, application ) {}
+
+		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, () => new Application() ) {}
+
+		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required]Func<Application> application  ) : base( fixture() )
 		{
-			try
-			{
-				return fixture();
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "0001", $"HELLO {e}", null, null, null ) );
-				throw;
-			}
+			this.application = application;
 		}
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
-			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
-			{
-				using ( var autoData = new AutoData( Fixture, methodUnderTest ) )
-				{
-					using ( new AssignAutoDataCommand().ExecuteWith( autoData ) )
-					{
-						var result = base.GetData( methodUnderTest );
-						return result;
-					}
-				}
-			}
+			var autoData = new AutoData( Fixture, methodUnderTest, base.GetData );
+			application().ExecuteWith( autoData );
+			var result = autoData.Results;
+			return result;
 		}
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance>( info => new AspectInstance( info, new AssignExecutionContextAspect() ) ).ToItem();

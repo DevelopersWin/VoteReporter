@@ -163,7 +163,9 @@ namespace DragonSpark.Activation.IoC
 				registry.Register( Context );
 				registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
 				registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
-				registry.Register( Host );
+
+				new RegisterHierarchyCommand( registry ).ExecuteWith( new InstanceRegistrationParameter( Host ) );
+				// registry.Register( Host );
 			} );
 
 			monitor.Apply();

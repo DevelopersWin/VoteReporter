@@ -53,10 +53,12 @@ namespace DragonSpark.Setup
 			{
 				using ( new AmbientContextCommand<ITaskMonitor>().ExecuteWith( new TaskMonitor() ) )
 				{
-					base.OnExecute( parameter );
+					OnExecuteCore( parameter );
 				}
 			}
 		}
+
+		protected virtual void OnExecuteCore( TArguments parameter ) => base.OnExecute( parameter );
 	}
 
 	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand

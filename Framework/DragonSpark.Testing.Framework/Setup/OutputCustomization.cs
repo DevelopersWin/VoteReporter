@@ -1,3 +1,4 @@
+using System.Composition;
 using DragonSpark.ComponentModel;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -6,6 +7,10 @@ using DragonSpark.Testing.Framework.Setup.Location;
 using Ploeh.AutoFixture;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
+using DragonSpark.Setup;
+using DragonSpark.TypeSystem;
+using Microsoft.Practices.ServiceLocation;
+using Ploeh.AutoFixture.Kernel;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework.Setup
@@ -28,9 +33,41 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected virtual void OnInitialized( AutoData context ) {}
 	}
 
+	public class CompositionExtension : AutoDataCustomization
+	{
+		[Required, Compose]
+		public CompositionRelay Relay { [return: Required]get; set; }
+
+		protected override void OnInitializing( AutoData context )
+		{
+			base.OnInitializing( context );
+			context.Fixture.ResidueCollectors.Add( Relay );
+		}
+	}
+
+	[Export]
+	public class CompositionRelay : ISpecimenBuilder
+	{
+		readonly CompositionContext host;
+
+		[ImportingConstructor]
+		public CompositionRelay( [Required]CompositionContext host )
+		{
+			this.host = host;
+		}
+
+		public object Create( object request, ISpecimenContext context )
+		{
+			var type = Type.From( request );
+			object export;
+			var result = host.TryGetExport( type, out export ) ? export : new NoSpecimen();
+			return result;
+		}
+	}
+
 	public class OutputCustomization : AutoDataCustomization
 	{
-		[Locate]
+		[Compose]
 		public RecordingLogEventSink Logger { [return: Required]get; set; }
 
 		protected override void OnInitialized( AutoData context )

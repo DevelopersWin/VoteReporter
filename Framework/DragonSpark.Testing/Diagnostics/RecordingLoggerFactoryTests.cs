@@ -1,18 +1,25 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Testing.Objects.Setup;
 using Serilog;
-using System.Diagnostics;
+using System.Composition;
+using DragonSpark.Testing.Framework;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	public class RecordingLoggerFactoryTests
+	public class RecordingLoggerFactoryTests : Tests
 	{
+		public RecordingLoggerFactoryTests( ITestOutputHelper output ) : base( output ) {}
+
 		[Theory, DefaultSetup.AutoData]
-		public void BasicCompose()
+		public void BasicCompose( CompositionContext host )
 		{
-			var temp = Composer.Compose<ILogger>();
-			Debugger.Break();
-		} 
+			var sink = host.GetExport<RecordingLogEventSink>();
+
+			var first = host.GetExport<ILogger>();
+			var second = host.GetExport<ILogger>();
+			Assert.Same( first, second );
+		}
 	}
 }

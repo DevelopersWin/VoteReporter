@@ -1,23 +1,22 @@
-﻿using System.Composition;
-using DragonSpark.Activation.FactoryModel;
+﻿using DragonSpark.Activation.FactoryModel;
 using PostSharp.Patterns.Contracts;
 using Serilog;
-using Serilog.Core;
+using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
 	public class RecordingLoggerFactory : FactoryBase<ILogger>
 	{
+		readonly RecordingLogEventSink sink;
+
 		public RecordingLoggerFactory() : this( new RecordingLogEventSink() ) {}
 
-		public RecordingLoggerFactory( [Required]ILogEventSink sink )
+		[ImportingConstructor]
+		public RecordingLoggerFactory( [Required]RecordingLogEventSink sink )
 		{
-			Sink = sink;
+			this.sink = sink;
 		}
 
-		[Export]
-		public ILogEventSink Sink { get; }
-
-		protected override ILogger CreateItem() => new LoggerConfiguration().WriteTo.Sink( Sink ).CreateLogger();
+		protected override ILogger CreateItem() => new LoggerConfiguration().WriteTo.Sink( sink ).CreateLogger();
 	}
 }

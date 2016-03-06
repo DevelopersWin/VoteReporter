@@ -1,3 +1,4 @@
+using System;
 using DragonSpark.Activation.FactoryModel;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.AutoMoq;
@@ -11,15 +12,22 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class AutoDataMoqAttribute : AutoDataAttribute
 	{
-		public AutoDataMoqAttribute() : base( FixtureFactory<AutoMoqCustomization>.Instance.Create ) {}
+		public AutoDataMoqAttribute() : base( new Func<IFixture>( FixtureFactory<AutoMoqCustomization>.Instance.Create ) ) {}
 	}
 
 	/*public class SetupFixtureFactory<T> : FixtureFactory<T> where T : SetupCustomization, new() {}*/
 
-	public class FixtureFactory<TWith> : FactoryBase<IFixture> where TWith : ICustomization, new()
+	public class FixtureFactory<TWith> : FixtureFactory where TWith : ICustomization, new()
 	{
-		public static FixtureFactory<TWith> Instance { get; } = new FixtureFactory<TWith>();
+		public new static FixtureFactory<TWith> Instance { get; } = new FixtureFactory<TWith>();
 
-		protected override IFixture CreateItem() => new Fixture( DefaultEngineParts.Instance ).Customize( new TWith() );
+		protected override IFixture CreateItem() => base.CreateItem().Customize( new TWith() );
+	}
+
+	public class FixtureFactory : FactoryBase<IFixture>
+	{
+		public static FixtureFactory Instance { get; } = new FixtureFactory();
+
+		protected override IFixture CreateItem() => new Fixture( DefaultEngineParts.Instance );
 	}
 }

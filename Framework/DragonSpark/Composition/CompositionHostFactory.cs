@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using DragonSpark.Activation.FactoryModel;
+﻿using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
+using PostSharp.Patterns.Contracts;
+using System;
+using System.Collections.Generic;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Composition
 {
@@ -14,7 +14,11 @@ namespace DragonSpark.Composition
 	{
 		public static T Compose<T>() => (T)Compose( typeof(T) );
 
-		public static object Compose( [Required] Type type ) => new CompositionHostContext().Item.GetExport( type );
+		public static object Compose( [Required] Type type )
+		{
+			var compositionHost = new CompositionHostContext().Item;
+			return compositionHost.GetExport( type );
+		}
 
 		public static object ComposeMany( [Required] Type type ) => new CompositionHostContext().Item.GetExports( type );
 	}
@@ -47,9 +51,10 @@ namespace DragonSpark.Composition
 		{
 			var types = parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
 			var result = new ContainerConfiguration()
-				.WithAssemblies( parameter )
+				.WithParts( types )
 				.WithProvider( new RegisteredExportDescriptorProvider() )
 				.WithProvider( new InstanceExportDescriptorProvider( parameter ) )
+				.WithProvider( new InstanceExportDescriptorProvider( types ) )
 				.WithProvider( new InstanceExportDescriptorProvider( new FactoryTypeContainer( types ) ) )
 				.WithProvider( new InstanceExportDescriptorProvider( new FactoryWithParameterTypeContainer( types ) ) )
 				.WithProvider( new FactoryExportDescriptorProvider( parameter ) )

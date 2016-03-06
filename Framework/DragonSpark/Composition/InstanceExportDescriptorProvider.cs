@@ -26,6 +26,17 @@ namespace DragonSpark.Composition
 		}
 	}
 
+	/*public class HostExportDescriptorProvider : ExportDescriptorProvider
+	{
+		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
+		{
+			if ( contract.ContractType.Adapt().IsInstanceOfType( instance ) && contract.ContractName == name )
+			{
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => context., NoMetadata ) );
+			}
+		}
+	}*/
+
 	public interface IExportDescriptorProviderRegistry
 	{
 		void Register( ExportDescriptorProvider provider );

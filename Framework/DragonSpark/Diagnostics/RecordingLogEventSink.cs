@@ -3,9 +3,11 @@ using Serilog.Core;
 using Serilog.Events;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
+	[Export, Shared]
 	public class RecordingLogEventSink : ILogEventSink
 	{
 		readonly IList<LogEvent> source = new Collection<LogEvent>();

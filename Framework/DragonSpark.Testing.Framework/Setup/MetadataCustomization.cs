@@ -3,12 +3,11 @@ using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Activation.FactoryModel;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -28,30 +27,39 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override void OnInitializing( AutoData context ) => factory( context.Method ).Each( customization => customization.Customize( context.Fixture ) );
 	}
 
-	public class Application : Application<AutoData>
+	public class Application<T> : Application where T : ICommand
 	{
+		public Application( Assembly[] assemblies, params ICommand<AutoData>[] commands ) : base( assemblies, commands.Concat( new [] { new ApplyExportedCommandsCommand<T>() } ).ToArray() ) {}
+	}
+
+	public class Application : DragonSpark.Setup.Application<AutoData>
+	{
+		public Application( params ICommand<AutoData>[] commands ) : this( Default<Assembly>.Items, commands ) {}
+
 		public Application( [Required] Assembly[] assemblies, params ICommand<AutoData>[] commands ) : base( commands )
 		{
 			Assemblies = assemblies;
 		}
 
-		// public Application( params ICommand<AutoData>[] commands ) : base( commands.Concat( new SetupApplicationCommand<TSetup>().ToItem() ).ToArray() ) {}
+		protected override void OnExecute( AutoData parameter )
+		{
+			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( parameter.Method ) ) )
+			{
+				using ( new AssignAutoDataCommand().ExecuteWith( parameter ) )
+				{
+					base.OnExecute( parameter );
+				}
+			}
+		}
+
+		protected override void OnExecuteCore( AutoData parameter )
+		{
+			base.OnExecuteCore( parameter );
+			parameter.Apply();
+		}
 	}
 
-	/*public abstract class ApplicationSetupCustomization<TApplication> : SetupCustomization 
-		where TApplication : Application
-	{
-		protected ApplicationSetupCustomization() : base( ActivateFactory<TApplication>.Instance.Create ) {}
-	}*/
-
-	/*public class ApplicationCustomization<T> : ApplicationCustomization where T : ICommand
-	{
-		public ApplicationCustomization() : this( Default<ICommand>.Items ) {}
-
-		public ApplicationCustomization( params ICommand[] commands ) : base( () => new Application( commands.Concat( new [] { new ApplyExportedCommandsCommand<T>() } ).Cast<ICommand<object>>().ToArray() ) ) {}
-	}*/
-
-	public abstract class ApplicationFactory<TSetup> : FactoryBase<Application> where TSetup : ICommand
+	/*public abstract class ApplicationFactory<TSetup> : FactoryBase<Application> where TSetup : ICommand
 	{
 		readonly Assembly[] assemblies;
 		readonly ICommand<object>[] commands;
@@ -62,14 +70,10 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.commands = commands.Concat( new [] { new ApplyExportedCommandsCommand<TSetup>() } ).ToArray();
 		}
 
-		protected override Application CreateItem()
-		{
-			var result = new Application( assemblies, commands );
-			return result;
-		}
-	}
+		protected override Application CreateItem() => new Application( assemblies, commands );
+	}*/
 
-	public class ApplicationCustomization : AutoDataCustomization
+	/*public class ApplicationCustomization : AutoDataCustomization
 	{
 		readonly Func<ICommand<AutoData>> setupFactory;
 	
@@ -83,5 +87,5 @@ namespace DragonSpark.Testing.Framework.Setup
 			var setup = setupFactory();
 			setup.Run( context );
 		}
-	}
+	}*/
 }

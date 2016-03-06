@@ -1,13 +1,12 @@
-﻿using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Testing.Objects.Setup;
+﻿using DragonSpark.Testing.Objects.Setup;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
 	public partial class ProgramSetup
 	{
-		public class AutoDataAttribute : DragonSpark.Testing.Framework.Setup.AutoDataAttribute
+		public class AutoDataAttribute : DragonSpark.Testing.Objects.Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( FixtureFactory<Customization<ProgramSetup>>.Instance.Create ) {}
+			public AutoDataAttribute() : base( () => new ApplicationWithLocation<ProgramSetup>() ) {}
 		}
 
 		public ProgramSetup()

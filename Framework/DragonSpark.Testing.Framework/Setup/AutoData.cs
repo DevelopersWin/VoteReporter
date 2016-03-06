@@ -1,3 +1,4 @@
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using Ploeh.AutoFixture;
@@ -9,10 +10,15 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
+	public delegate IEnumerable<object[]> AutoDataFactory( MethodInfo method );
+
 	public class AutoData : IDisposable
 	{
-		public AutoData( [Required]IFixture fixture, [Required]MethodBase method )
+		readonly AutoDataFactory factory;
+
+		public AutoData( [Required]IFixture fixture, [Required]MethodInfo method, [Required] AutoDataFactory factory )
 		{
+			this.factory = factory;
 			Fixture = fixture;
 			Method = method;
 			Items = new List<IAutoDataCustomization>( new object[] { Fixture, Method }.SelectMany( o => new Items<IAutoDataCustomization>( o ).Item.Purge() ) );
@@ -24,8 +30,14 @@ namespace DragonSpark.Testing.Framework.Setup
 			return this;
 		}
 
+		[Freeze]
+		public IEnumerable<object[]> Apply() => Results = factory( Method );
+
+		public IEnumerable<object[]> Results { get; private set; }
+
 		public IFixture Fixture { get; }
-		public MethodBase Method { get; }
+
+		public MethodInfo Method { get; }
 
 		public IList<IAutoDataCustomization> Items { get; }
 

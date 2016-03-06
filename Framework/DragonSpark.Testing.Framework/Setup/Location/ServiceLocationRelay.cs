@@ -14,8 +14,8 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 		readonly IServiceLocator locator;
 		readonly IRequestSpecification specification;
 
-		public ServiceLocationRelay( IServiceLocator locator ) : this( locator, new CanLocateSpecification( locator ) )
-		{}
+		/*public ServiceLocationRelay( IServiceLocator locator ) : this( locator, new CanLocateSpecification( locator ) )
+		{}*/
 
 		public ServiceLocationRelay( IServiceLocator locator, IRequestSpecification specification )
 		{

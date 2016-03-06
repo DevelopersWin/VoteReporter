@@ -3,7 +3,6 @@ using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
-using DragonSpark.Setup.Registration;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -11,9 +10,9 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		readonly IResolutionSupport support;
-		readonly RegisterAllClassesCommand command;
+		readonly RegisterEntireHierarchyCommand command;
 
-		public Activator( [Required]IUnityContainer container, [Required]IResolutionSupport support, [Required]RegisterAllClassesCommand command )
+		public Activator( [Required]IUnityContainer container, [Required]IResolutionSupport support, [Required]RegisterEntireHierarchyCommand command )
 		{
 			this.container = container;
 			this.support = support;

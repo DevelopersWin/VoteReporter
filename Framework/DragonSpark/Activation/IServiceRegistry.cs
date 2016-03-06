@@ -6,6 +6,7 @@ using DragonSpark.Runtime.Specifications;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Activation
 {
@@ -20,6 +21,8 @@ namespace DragonSpark.Activation
 
 	public class Always : WrappedSpecification<Type>
 	{
+		public static Always Instance { get; } = new Always();
+
 		public Always() : base( AlwaysSpecification.Instance ) { }
 	}
 
@@ -30,7 +33,7 @@ namespace DragonSpark.Activation
 
 	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<Always>
 	{
-		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ImplementedFromConventionTypeLocator locator, Always specification ) : base( registry, locator, specification ) {}
+		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ImplementedFromConventionTypeLocator locator ) : base( registry, locator, Always.Instance ) {}
 	}
 
 	public class RegisterInstanceByConventionCommand<T> : RegisterInstanceCommand<T> where T : ISpecification<Type>
@@ -48,16 +51,36 @@ namespace DragonSpark.Activation
 		} );
 	}
 
-	public class RegisterAllClassesCommand : RegisterAllClassesCommand<Always>
+	public class RegisterEntireHierarchyCommand : RegisterEntireHierarchyCommand<Always>
 	{
-		public RegisterAllClassesCommand( IServiceRegistry registry, Always specification ) : base( registry, specification ) {}
+		public RegisterEntireHierarchyCommand( IServiceRegistry registry ) : base( registry, Always.Instance ) {}
 	}
 
-	public class RegisterAllClassesCommand<T> : RegisterInstanceCommand<T> where T : ISpecification<Type>
+	public class RegisterEntireHierarchyCommand<T> : RegisterHierarchyCommandBase<T> where T : ISpecification<Type>
 	{
-		public RegisterAllClassesCommand( IServiceRegistry registry, T specification ) : base( registry, specification ) {}
+		public RegisterEntireHierarchyCommand( IServiceRegistry registry, T specification ) : base( registry, specification, parameter => parameter.Instance.Adapt().GetEntireHierarchy() ) {}
+	}
 
-		protected override void OnExecute( InstanceRegistrationParameter parameter ) => parameter.Instance.Adapt().GetEntireHierarchy().Each( type =>
+	public class RegisterHierarchyCommand : RegisterHierarchyCommand<Always>
+	{
+		public RegisterHierarchyCommand( IServiceRegistry registry ) : base( registry, Always.Instance ) {}
+	}
+
+	public class RegisterHierarchyCommand<T> : RegisterHierarchyCommandBase<T> where T : ISpecification<Type>
+	{
+		public RegisterHierarchyCommand( IServiceRegistry registry, T specification ) : base( registry, specification, parameter => parameter.Instance.Adapt().GetHierarchy( false ) ) {}
+	}
+
+	public abstract class RegisterHierarchyCommandBase<T> : RegisterInstanceCommand<T> where T : ISpecification<Type>
+	{
+		readonly Func<InstanceRegistrationParameter, IEnumerable<Type>> typeResolver;
+
+		protected RegisterHierarchyCommandBase( IServiceRegistry registry, T specification, [Required]Func<InstanceRegistrationParameter,IEnumerable<Type>> typeResolver ) : base( registry, specification )
+		{
+			this.typeResolver = typeResolver;
+		}
+
+		protected override void OnExecute( InstanceRegistrationParameter parameter ) => typeResolver( parameter ).Each( type =>
 		{
 			base.OnExecute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
 		} );
