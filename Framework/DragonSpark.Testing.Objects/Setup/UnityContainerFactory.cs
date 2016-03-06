@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
-	[Export]
+	[Export, Shared]
 	public class UnityContainerFactory : Activation.IoC.UnityContainerFactory
 	{
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Objects.Setup
 		}
 	}
 
-	[Export]
+	[Export, Shared]
 	public class RecordingLoggerFactory : Diagnostics.RecordingLoggerFactory
 	{}
 

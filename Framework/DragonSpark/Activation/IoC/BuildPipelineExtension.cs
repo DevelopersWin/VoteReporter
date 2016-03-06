@@ -15,6 +15,7 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
@@ -107,6 +108,9 @@ namespace DragonSpark.Activation.IoC
 
 		class MetadataLifetimeStrategy : BuilderStrategy
 		{
+			[Required, Compose]
+			ILogger Logger { get; set; }
+
 			public override void PreBuildUp( IBuilderContext context )
 			{
 				var reference = new KeyReference( this, context.BuildKey ).Item;
@@ -119,7 +123,8 @@ namespace DragonSpark.Activation.IoC
 						var lifetimeManager = factory.Create( reference.Type );
 						lifetimeManager.With( manager =>
 						{
-							context.New<ILogger>().Information( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
+							var logger = Logger;
+							logger.Information( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
 
 							context.PersistentPolicies.Set<ILifetimePolicy>( manager, reference );
 						} );
@@ -133,19 +138,23 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
+			var monitor = new DeferredExecutionMonitor();
 			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
+			Host.GetExport<IExportDescriptorProviderRegistry>().Register( new ExportDescriptorProvider( Container ) );
 
 			Context.Strategies.Clear();
 			Context.Strategies.AddNew<BuildKeyMappingStrategy>( UnityBuildStage.TypeMapping );
 			Context.Strategies.AddNew<MetadataLifetimeStrategy>( UnityBuildStage.Lifetime );
 			Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
 			Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
+			Context.Strategies.AddNew<ConventionStrategy>( UnityBuildStage.PreCreation );
+			Context.Strategies.Add( new ComposeStrategy( monitor ), UnityBuildStage.PreCreation );
 			Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
 			Context.Strategies.AddNew<EnumerableResolutionStrategy>( UnityBuildStage.Creation );
 			Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
 
-			var monitor = new BuildKeyMonitorStrategy();
-			Context.BuildPlanStrategies.Add( monitor, UnityBuildStage.Setup );
+			var strategy = new BuildKeyMonitorStrategy();
+			Context.BuildPlanStrategies.Add( strategy, UnityBuildStage.Setup );
 
 			Context.New<PersistentServiceRegistry>().With( registry =>
 			{
@@ -157,17 +166,13 @@ namespace DragonSpark.Activation.IoC
 				registry.Register( Host );
 			} );
 
-			monitor.Purge().Each( Context.Policies.Clear<IBuildPlanPolicy> );
+			monitor.Apply();
+			strategy.Purge().Each( Context.Policies.ClearBuildPlan );
 
 			Context.BuildPlanStrategies.Clear();
 			Context.BuildPlanStrategies.AddNew<DynamicMethodConstructorStrategy>( UnityBuildStage.Creation );
 			Context.BuildPlanStrategies.AddNew<DynamicMethodPropertySetterStrategy>( UnityBuildStage.Initialization );
 			Context.BuildPlanStrategies.AddNew<DynamicMethodCallStrategy>( UnityBuildStage.Initialization );
-
-			Context.Strategies.AddNew<ConventionStrategy>( UnityBuildStage.PreCreation );
-
-			Host.GetExport<IExportDescriptorProviderRegistry>().Register( new ExportDescriptorProvider( Container ) );
-			Context.Strategies.AddNew<ComposeStrategy>( UnityBuildStage.PreCreation );
 
 			var policy = Context.Policies.Get<IBuildPlanCreatorPolicy>( null );
 			var builder = new Builder<TryContext>( Context.Strategies, policy.CreatePlan );
@@ -308,24 +313,57 @@ namespace DragonSpark.Activation.IoC
 		public KeyReference( object instance, NamedTypeBuildKey key ) : base( instance, key ) { }
 	}
 
+	public class DeferredExecutionMonitor
+	{
+		readonly ConditionMonitor monitor = new ConditionMonitor();
+
+		readonly ICollection<Action> delegates = new Collection<Action>();
+
+		public void Execute( [Required]Action action )
+		{
+			if ( monitor.IsApplied )
+			{
+				action();
+			}
+			else
+			{
+				delegates.Add( action );
+			}
+		}
+
+		public void Apply() => monitor.Apply( () => delegates.Purge().Each( action => action() ) );
+	}
+
 	public class ComposeStrategy : BuilderStrategy
 	{
+		readonly DeferredExecutionMonitor monitor;
+
+		public ComposeStrategy( [Required]DeferredExecutionMonitor monitor )
+		{
+			this.monitor = monitor;
+		}
+
 		[Required, Value( typeof(CompositionHostContext) )]
 		public CompositionHost Host { [return: Required]get; set; }
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var reference = new KeyReference( this, context.BuildKey ).Item;
 			var hasBuildPlan = context.HasBuildPlan();
 			object existing;
-			if ( reference.Name == null && !hasBuildPlan && new Checked( reference, this ).Item.Apply() && Host.TryGetExport( context.BuildKey.Type, context.BuildKey.Name, out existing ) )
+			var reference = new KeyReference( this, context.BuildKey ).Item;
+			if ( !hasBuildPlan && Host.TryGetExport( reference.Type, reference.Name, out existing ) )
 			{
-				context.Existing = existing;
+				context.Complete( existing );
 
-				var registry = context.New<IServiceRegistry>();
-				registry.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing, context.BuildKey.Name ) );
-
-				context.BuildComplete = true;
+				monitor.Execute( () =>
+				{
+					var checker = new Checked( reference, this );
+					if ( checker.Item.Apply() )
+					{
+						var registry = context.New<IServiceRegistry>();
+						registry.Register( new InstanceRegistrationParameter( reference.Type, existing, context.BuildKey.Name ) );
+					}
+				} );
 			}
 		}
 	}

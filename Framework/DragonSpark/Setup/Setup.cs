@@ -33,7 +33,7 @@ namespace DragonSpark.Setup
 
 		public override void Assign( Assembly[] item )
 		{
-			var host =  factory( item );
+			var host =  item.With( factory );
 			context.Assign( host );
 
 			base.Assign( item );

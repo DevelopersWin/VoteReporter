@@ -1,17 +1,15 @@
+using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using DragonSpark.Activation;
-using DragonSpark.Setup.Registration;
-using Microsoft.Practices.Unity;
-using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.TypeSystem
 {
@@ -54,9 +52,9 @@ namespace DragonSpark.TypeSystem
 	{
 		public static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory();
 
-		public MemberInfoProviderFactory() : this( new MemberInfoAttributeProviderFactory( new MemberInfoLocator() ) ) {}
+		public MemberInfoProviderFactory() : this( MemberInfoAttributeProviderFactory.Instance ) {}
 
-		public MemberInfoProviderFactory( MemberInfoAttributeProviderFactory inner ) : base( inner, false ) {}
+		MemberInfoProviderFactory( MemberInfoAttributeProviderFactory inner ) : base( inner, false ) {}
 	}
 
 	abstract class MemberInfoProviderFactoryBase : FactoryBase<object, IAttributeProvider>

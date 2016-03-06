@@ -48,6 +48,7 @@ namespace DragonSpark.Composition
 			var types = parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
 			var result = new ContainerConfiguration()
 				.WithAssemblies( parameter )
+				.WithProvider( new RegisteredExportDescriptorProvider() )
 				.WithProvider( new InstanceExportDescriptorProvider( parameter ) )
 				.WithProvider( new InstanceExportDescriptorProvider( new FactoryTypeContainer( types ) ) )
 				.WithProvider( new InstanceExportDescriptorProvider( new FactoryWithParameterTypeContainer( types ) ) )
