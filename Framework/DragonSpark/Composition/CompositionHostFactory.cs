@@ -14,11 +14,7 @@ namespace DragonSpark.Composition
 	{
 		public static T Compose<T>() => (T)Compose( typeof(T) );
 
-		public static object Compose( [Required] Type type )
-		{
-			var compositionHost = new CompositionHostContext().Item;
-			return compositionHost.GetExport( type );
-		}
+		public static object Compose( [Required] Type type ) => new CompositionHostContext().Item.GetExport( type );
 
 		public static object ComposeMany( [Required] Type type ) => new CompositionHostContext().Item.GetExports( type );
 	}

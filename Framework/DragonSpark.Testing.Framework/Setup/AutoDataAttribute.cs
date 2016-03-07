@@ -26,10 +26,11 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
-			var autoData = new AutoData( Fixture, methodUnderTest, base.GetData );
-			application().ExecuteWith( autoData );
-			var result = autoData.Results;
-			return result;
+			using ( application().ExecuteWith( new AutoData( Fixture, methodUnderTest ) ) )
+			{
+				var result = base.GetData( methodUnderTest );
+				return result;
+			}
 		}
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance>( info => new AspectInstance( info, new AssignExecutionContextAspect() ) ).ToItem();

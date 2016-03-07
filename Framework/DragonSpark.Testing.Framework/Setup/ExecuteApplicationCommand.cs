@@ -14,5 +14,10 @@ namespace DragonSpark.Testing.Framework.Setup
 			base.OnExecute( parameter );
 			parameter.Initialize();
 		}
+
+		protected override void OnDispose()
+		{
+			base.OnDispose();
+		}
 	}
 }

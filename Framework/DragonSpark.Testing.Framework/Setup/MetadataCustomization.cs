@@ -1,11 +1,12 @@
+using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
-using PostSharp.Patterns.Contracts;
+using Serilog;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Input;
 
@@ -29,63 +30,37 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class Application<T> : Application where T : ICommand
 	{
-		public Application( Assembly[] assemblies, params ICommand<AutoData>[] commands ) : base( assemblies, commands.Concat( new [] { new ApplyExportedCommandsCommand<T>() } ).ToArray() ) {}
+		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
+	}
+
+	public class ApplicationCommandFactory : ApplicationCommandFactory<AutoData>
+	{
+		public ApplicationCommandFactory( IEnumerable<ICommand> commands ) : base( commands ) {}
+
+		protected override IEnumerable<ICommand> DetermineContextCommands( ApplicationExecutionParameter<AutoData> parameter )
+		{
+			yield return new ProvisionedCommand( new AssignExecutionContextCommand(), MethodContext.Get( parameter.Arguments.Method ) );
+			foreach ( var item in base.DetermineContextCommands( parameter ) )
+			{
+				yield return item;
+			}
+			yield return new ProvisionedCommand( new AssignAutoDataCommand(), parameter.Arguments );
+		}
 	}
 
 	public class Application : DragonSpark.Setup.Application<AutoData>
 	{
-		public Application( params ICommand<AutoData>[] commands ) : this( Default<Assembly>.Items, commands ) {}
+		public Application( params ICommand[] commands ) : this( Default<Assembly>.Items, commands ) {}
 
-		public Application( [Required] Assembly[] assemblies, params ICommand<AutoData>[] commands ) : base( commands )
-		{
-			Assemblies = assemblies;
-		}
+		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, new ApplicationCommandFactory( commands ) ) {}
+
+		[Compose]
+		public ILogger Logger { get; set; }
 
 		protected override void OnExecute( AutoData parameter )
 		{
-			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( parameter.Method ) ) )
-			{
-				using ( new AssignAutoDataCommand().ExecuteWith( parameter ) )
-				{
-					base.OnExecute( parameter );
-				}
-			}
-		}
-
-		protected override void OnExecuteCore( AutoData parameter )
-		{
-			base.OnExecuteCore( parameter );
-			parameter.Apply();
+			Logger.Information( "Does this even work?" );
+			base.OnExecute( parameter );
 		}
 	}
-
-	/*public abstract class ApplicationFactory<TSetup> : FactoryBase<Application> where TSetup : ICommand
-	{
-		readonly Assembly[] assemblies;
-		readonly ICommand<object>[] commands;
-
-		protected ApplicationFactory( Assembly[] assemblies, params ICommand<object>[] commands )
-		{
-			this.assemblies = assemblies;
-			this.commands = commands.Concat( new [] { new ApplyExportedCommandsCommand<TSetup>() } ).ToArray();
-		}
-
-		protected override Application CreateItem() => new Application( assemblies, commands );
-	}*/
-
-	/*public class ApplicationCustomization : AutoDataCustomization
-	{
-		readonly Func<ICommand<AutoData>> setupFactory;
-	
-		protected ApplicationCustomization( Func<ICommand<AutoData>> setupFactory )
-		{
-			this.setupFactory = setupFactory;
-		}
-
-		protected override void OnInitializing( AutoData context )
-		{
-			var setup = setupFactory();
-			setup.Run( context );
-		}
-	}*/
 }

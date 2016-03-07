@@ -1,9 +1,10 @@
-﻿using DragonSpark.Runtime;
-using DragonSpark.Testing.Framework;
+﻿using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using System;
+using System.Collections.Generic;
 using System.Composition;
 using System.Windows.Input;
+using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -28,7 +29,9 @@ namespace DragonSpark.Testing.Objects.Setup
 
 	public class Application<T> : Framework.Setup.Application<T> where T : ICommand
 	{
-		public Application( params ICommand<AutoData>[] commands ) : base( AssemblyProvider.Instance.Create(), commands ) {}
+		public Application() : this( Default<ICommand>.Items ) {}
+
+		public Application( IEnumerable<ICommand> commands ) : base( AssemblyProvider.Instance.Create(), commands ) {}
 	}
 
 	/*public class LocationBasedApplicationCustomization<T> : ApplicationCustomization where T : ICommand

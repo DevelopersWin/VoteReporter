@@ -15,7 +15,9 @@ namespace DragonSpark.Testing.Diagnostics
 		[Theory, DefaultSetup.AutoData]
 		public void BasicCompose( CompositionContext host )
 		{
-			var sink = host.GetExport<RecordingLogEventSink>();
+			var sinkOne = host.GetExport<RecordingLogEventSink>();
+			var sinkTwo = host.GetExport<RecordingLogEventSink>();
+			Assert.Same( sinkOne, sinkTwo );
 
 			var first = host.GetExport<ILogger>();
 			var second = host.GetExport<ILogger>();

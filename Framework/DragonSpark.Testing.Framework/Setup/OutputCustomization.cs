@@ -1,16 +1,14 @@
-using System.Composition;
 using DragonSpark.ComponentModel;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework.Setup.Location;
-using Ploeh.AutoFixture;
-using PostSharp.Patterns.Contracts;
-using System.Linq;
-using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
-using Microsoft.Practices.ServiceLocation;
+using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
+using PostSharp.Patterns.Contracts;
+using System.Composition;
+using System.Linq;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework.Setup
@@ -33,7 +31,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected virtual void OnInitialized( AutoData context ) {}
 	}
 
-	public class CompositionExtension : AutoDataCustomization
+	public class CompositionCustomization : AutoDataCustomization
 	{
 		[Required, Compose]
 		public CompositionRelay Relay { [return: Required]get; set; }

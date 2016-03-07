@@ -8,7 +8,7 @@ using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Runtime
 {
-	public interface ICommand<in TParameter> : System.Windows.Input.ICommand
+	public interface ICommand<in TParameter> : ICommand
 	{
 		bool CanExecute( TParameter parameter );
 
@@ -30,18 +30,52 @@ namespace DragonSpark.Runtime
 			this.current = current;
 		}
 
-		protected override void OnExecute( T parameter )
-		{
-			value.Assign( parameter );
-		}
+		protected override void OnExecute( T parameter ) => value.Assign( parameter );
 
 		protected override void OnDispose()
 		{
-			value.Assign( current );
 			value.TryDispose();
+			value.Assign( current );
 			base.OnDispose();
 		}
 	}
+
+	public class ProvisionedCommand : DisposingCommand<object>
+	{
+		readonly ICommand command;
+		readonly object parameter;
+
+		public ProvisionedCommand( [Required]ICommand command, [Required]object parameter )
+		{
+			this.command = command;
+			this.parameter = parameter;
+		}
+
+		protected override void OnExecute( object p ) => command.ExecuteWith( parameter );
+
+		protected override void OnDispose()
+		{
+			base.OnDispose();
+			command.TryDispose();
+		}
+	}
+
+	/*public class DisposingCompositeCommand : DisposingCompositeCommand<object>
+	{
+		public DisposingCompositeCommand( params ICommand<object>[] commands ) : base( commands ) {}
+	}
+
+	public class DisposingCompositeCommand<TParameter> : DisposingCommand<TParameter>
+	{
+		readonly CompositeCommand<TParameter> body;
+
+		public DisposingCompositeCommand( [Required]params ICommand<TParameter>[] commands )
+		{
+			body = new CompositeCommand<TParameter>( commands );
+		}
+
+		protected override void OnExecute( TParameter parameter ) => body.ExecuteWith( parameter );
+	}*/
 
 	public abstract class DisposingCommand<TParameter> : Command<TParameter>, IDisposable
 	{
