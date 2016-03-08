@@ -1,12 +1,12 @@
-using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
-using Serilog;
+using PostSharp.Patterns.Collections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 
@@ -33,34 +33,39 @@ namespace DragonSpark.Testing.Framework.Setup
 		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
 	}
 
-	public class ApplicationCommandFactory : ApplicationCommandFactory<AutoData>
+	public interface IApplication : DragonSpark.Setup.IApplication, ICommand<AutoData>, IDisposable { }
+
+	// [Disposable( ThrowObjectDisposedException = true )]
+	public class Application : DragonSpark.Setup.Application<AutoData>, IApplication
+	{
+		// [Child]
+		readonly ICollection<IDisposable> disposables = new AdvisableCollection<IDisposable>();
+
+		public Application( params ICommand[] commands ) : this( Default<Assembly>.Items, commands ) {}
+
+		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, commands ) {}
+
+		protected override void ExecuteCore( ICommand[] commands, AutoData parameter )
+		{
+			disposables.AddRange( commands.Reverse().OfType<IDisposable>() );
+			base.ExecuteCore( commands, parameter );
+		}
+
+		public void Dispose() => disposables.Purge().Each( disposable => disposable.Dispose() );
+	}
+
+	/*public class ApplicationCommandFactory : ApplicationCommandFactory<AutoData>
 	{
 		public ApplicationCommandFactory( IEnumerable<ICommand> commands ) : base( commands ) {}
 
 		protected override IEnumerable<ICommand> DetermineContextCommands( ApplicationExecutionParameter<AutoData> parameter )
 		{
-			yield return new ProvisionedCommand( new AssignExecutionContextCommand(), MethodContext.Get( parameter.Arguments.Method ) );
+			// yield return new ProvisionedCommand(  );
 			foreach ( var item in base.DetermineContextCommands( parameter ) )
 			{
 				yield return item;
 			}
-			yield return new ProvisionedCommand( new AssignAutoDataCommand(), parameter.Arguments );
+			yield return new ProvisionedCommand(  );
 		}
-	}
-
-	public class Application : DragonSpark.Setup.Application<AutoData>
-	{
-		public Application( params ICommand[] commands ) : this( Default<Assembly>.Items, commands ) {}
-
-		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, new ApplicationCommandFactory( commands ) ) {}
-
-		[Compose]
-		public ILogger Logger { get; set; }
-
-		protected override void OnExecute( AutoData parameter )
-		{
-			Logger.Information( "Does this even work?" );
-			base.OnExecute( parameter );
-		}
-	}
+	}*/
 }

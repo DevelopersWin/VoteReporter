@@ -3,16 +3,15 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework.Setup;
 using PostSharp.Aspects;
-using System;
 using PostSharp.Patterns.Model;
+using System;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework
 {
 	public class OutputValue : AssociatedValue<Type, string[]>
 	{
-		public OutputValue( Type instance ) : base( instance )
-		{}
+		public OutputValue( Type instance ) : base( instance ) {}
 	}
 
 	public class InitializeOutputCommand : Command<Type>
@@ -39,7 +38,10 @@ namespace DragonSpark.Testing.Framework
 			var parameter = MethodContext.Get( args.Method );
 			using ( new AssignExecutionContextCommand().ExecuteWith( parameter ) )
 			{
-				args.Proceed();
+				using ( new AssociatedApplication( args.Method ) )
+				{
+					args.Proceed();
+				}
 			}
 		}
 	}

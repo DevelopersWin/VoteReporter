@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation.FactoryModel;
 using PostSharp.Patterns.Contracts;
 using Serilog;
-using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
@@ -11,7 +10,6 @@ namespace DragonSpark.Diagnostics
 
 		public RecordingLoggerFactory() : this( new RecordingLogEventSink() ) {}
 
-		[ImportingConstructor]
 		public RecordingLoggerFactory( [Required]RecordingLogEventSink sink )
 		{
 			this.sink = sink;

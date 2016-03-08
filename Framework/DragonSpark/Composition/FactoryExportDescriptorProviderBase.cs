@@ -1,11 +1,15 @@
+using System;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Runtime.Values;
+using DragonSpark.TypeSystem;
 using Handler = System.Func<System.Type, System.Func<object>, object>;
 using TransformContract = System.Func<System.Composition.Hosting.Core.CompositionContract, System.Composition.Hosting.Core.CompositionContract>;
+using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
@@ -29,37 +33,33 @@ namespace DragonSpark.Composition
 			return result;
 		}
 
-		static object FromContext( LifetimeContext context, string boundary, int key, CompositionOperation operation, CompositeActivator activator )
-		{
-			var scope = context.FindContextWithin( boundary );
-			var scoped = ReferenceEquals( scope, context );
-			var result = scoped ? scope.GetOrCreate( key, operation, activator ) : CompositionOperation.Run(scope, (c1, o1) => c1.GetOrCreate( key, o1, activator ) );
-			return result;
-		}
-
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
 			CompositionDependency dependency;
 			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
 			{
-				var resolvedContract = resolveContract( contract ).With( compositionContract => compositionContract.ContractType );
+				var resolvedContract = resolveContract( contract ).With( c => c.ContractType );
 				var factory = resolvedContract.With( locator.Create );
 				if ( factory != null && descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( factory ), true, out dependency ) )
 				{
 					var promise = dependency.Target;
 					var descriptor = promise.GetDescriptor();
-					var key = LifetimeContext.AllocateSharingId();
 					var boundary = GetSharingBoundary( dependency.Contract );
-					yield return new ExportDescriptorPromise( contract, promise.Origin, promise.IsShared, () => promise.Dependencies,
-						dependencies => ExportDescriptor.Create( ( context, operation ) =>
+					yield return new ExportDescriptorPromise( contract, promise.Origin, promise.IsShared, () => Default<CompositionDependency>.Items,
+						_ => ExportDescriptor.Create( ( context, operation ) =>
 						{
-							CompositeActivator activator = ( c, o ) => delegateHandler( resolvedContract, descriptor.Activator( c, o ).To<IFactory>().Create );
-							var item = promise.IsShared ? FromContext( context, boundary, key, operation, activator ) : activator( context, operation );
+							Func<object> activator = () => delegateHandler( resolvedContract, descriptor.Activator( context, operation ).To<IFactory>().Create );
+							var item = promise.IsShared ? new SharedValue( context.FindContextWithin( boundary ), resolvedContract, activator ).Item : activator();
 							return item;
 						}, descriptor.Metadata )
 					);
 				}
 			}
+		}
+
+		class SharedValue : AssociatedValue<LifetimeContext, object>
+		{
+			public SharedValue( LifetimeContext instance, Type key, Func<object> create = null ) : base( instance, key, create ) {}
 		}
 	}
 }

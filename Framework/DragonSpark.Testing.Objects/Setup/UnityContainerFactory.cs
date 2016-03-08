@@ -1,10 +1,11 @@
-﻿using DragonSpark.Testing.Framework;
+﻿using DragonSpark.Diagnostics;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Windows.Input;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -20,7 +21,11 @@ namespace DragonSpark.Testing.Objects.Setup
 	}
 
 	[Export, Shared]
-	public class RecordingLoggerFactory : Diagnostics.RecordingLoggerFactory {}
+	public class RecordingLoggerFactory : Diagnostics.RecordingLoggerFactory
+	{
+		[ImportingConstructor]
+		public RecordingLoggerFactory( RecordingLogEventSink sink ) : base( sink ) {}
+	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{

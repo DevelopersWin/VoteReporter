@@ -13,4 +13,15 @@ namespace DragonSpark.Runtime.Specifications
 
 		protected override bool Verify( T parameter ) => inner.IsSatisfiedBy( parameter );
 	}
+
+	public class OnlyOnceSpecification : SpecificationBase<object>
+	{
+		readonly ConditionMonitor monitor = new ConditionMonitor();
+
+		protected override bool Verify( object parameter )
+		{
+			var verify = monitor.Apply();
+			return verify;
+		}
+	}
 }

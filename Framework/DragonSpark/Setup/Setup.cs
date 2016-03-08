@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
@@ -12,10 +11,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using System.Windows.Markup;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Setup
 {
+	public class AssignApplication : AssignValueCommand<Assembly[]>
+	{
+		public AssignApplication() : this( new ApplicationContext() ) {}
+
+		public AssignApplication( IWritableValue<Assembly[]> value ) : base( value ) {}
+	}
+
 	public class ApplicationContext : CompositeWritableValue<Assembly[]>
 	{
 		public ApplicationContext() : this( new AssemblyHost(), new CompositionHost() ) {}
@@ -45,10 +51,10 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public interface IApplication<in T> : ICommand<T>, IApplication
+	/*public interface IApplication<in T> : ICommand<T>, IApplication
 	{
 		void Run();
-	}
+	}*/
 
 	public interface IApplication : ICommand
 	{
@@ -80,19 +86,18 @@ namespace DragonSpark.Setup
 
 		protected virtual IEnumerable<ICommand> DetermineContextCommands( ApplicationExecutionParameter<T> parameter )
 		{
-			yield return new ProvisionedCommand( new AssignValueCommand<Assembly[]>( new ApplicationContext() ), parameter.Application.Assemblies );
+			yield return new ProvisionedCommand( new AssignApplication(), parameter.Application.Assemblies );
 			yield return new ProvisionedCommand( new AmbientContextCommand<ITaskMonitor>(), new TaskMonitor() );
 		}
 	}
 
-	[ContentProperty( nameof(Body) )]
-	public abstract class Application<TParameter> : DisposingCommand<TParameter>, IApplication
+	public abstract class Application<TParameter> : CompositeCommand<TParameter, ISpecification<TParameter>>, IApplication
 	{
 		readonly IFactory<ApplicationExecutionParameter<TParameter>, ICommand[]> commandFactory;
 
-		readonly ICollection<IDisposable> disposables = new Collection<IDisposable>();
+		protected Application( [Required]Assembly[] assemblies, IEnumerable<ICommand> commands ) : this( assemblies, new ApplicationCommandFactory<TParameter>( commands ) ) {}
 
-		protected Application( [Required]Assembly[] assemblies, [Required]IFactory<ApplicationExecutionParameter<TParameter>, ICommand[]> commandFactory )
+		protected Application( [Required]Assembly[] assemblies, [Required]IFactory<ApplicationExecutionParameter<TParameter>, ICommand[]> commandFactory ) : base( new WrappedSpecification<TParameter>( new OnlyOnceSpecification() ) )
 		{
 			Assemblies = assemblies;
 			this.commandFactory = commandFactory;
@@ -101,21 +106,12 @@ namespace DragonSpark.Setup
 		[Required]
 		public Assembly[] Assemblies { [return: Required]get; set; }
 
-		public CommandCollection Body => new CompositeCommand().Commands;
-
-		[Freeze]
-		protected override void OnExecute( TParameter parameter )
+		protected override IEnumerable<ICommand> DetermineCommands( TParameter parameter )
 		{
-			disposables.Any().IsTrue( () => { throw new InvalidOperationException( "This application is currently and already executing." ); } );
-
 			var context = new ApplicationExecutionParameter<TParameter>( this, parameter );
-			var commands = commandFactory.Create( context ).Concat( Body ).ToArray();
-			disposables.AddRange( commands.OfType<IDisposable>() );
-
-			commands.Each( command => command.ExecuteWith<ICommand>( parameter ) );
+			var result = commandFactory.Create( context ).Concat( base.DetermineCommands( parameter ) ).ToArray();
+			return result;
 		}
-
-		protected override void OnDispose() => disposables.Purge().Reverse().Each( disposable => disposable.Dispose() );
 	}
 
 	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand
