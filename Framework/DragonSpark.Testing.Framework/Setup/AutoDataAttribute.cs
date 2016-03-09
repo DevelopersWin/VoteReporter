@@ -1,10 +1,8 @@
-using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

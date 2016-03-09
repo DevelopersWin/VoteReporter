@@ -4,6 +4,7 @@ using DragonSpark.ComponentModel;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
@@ -15,11 +16,13 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Input;
+using Serilog.Core;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -43,11 +46,159 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class RegistrationMonitorExtension : UnityContainerExtension, IDisposable
+	public abstract class MonitorExtensionBase : UnityContainerExtension, IDisposable
 	{
-		protected override void Initialize() => Context.RegisteringInstance += ContextOnRegisteringInstance;
+		protected override void Initialize() => Context.RegisteringInstance += OnRegisteringInstance;
 
-		void ContextOnRegisteringInstance( object sender, RegisterInstanceEventArgs args )
+		protected abstract void OnRegisteringInstance( object sender, RegisterInstanceEventArgs args );
+
+		public override void Remove()
+		{
+			base.Remove();
+
+			Context.RegisteringInstance -= OnRegisteringInstance;
+		}
+
+		public void Dispose() => Remove();
+	}
+
+	public class DefaultInjection : InjectionMember
+	{
+		readonly InjectionMember inner;
+
+		public DefaultInjection( [Required]InjectionMember inner )
+		{
+			this.inner = inner;
+		}
+
+		public class Applied : Checked
+		{
+			public Applied( IBuildPlanPolicy instance ) : base( instance, typeof(Applied) ) {}
+		}
+
+		public override void AddPolicies( Type serviceType, Type implementationType, string name, IPolicyList policies )
+		{
+			var key = new NamedTypeBuildKey( implementationType, name );
+			var before = policies.HasBuildPlan( key );
+			if ( !before )
+			{
+				inner.AddPolicies( serviceType, implementationType, name, policies );
+				policies.GetBuildPlan( key ).With( policy => new Applied( policy ).Item.Apply() );
+			}
+		}
+	}
+
+	public class RegisterDefaultCommand : Command<RegisterDefaultCommand.Parameter>
+	{
+		readonly IUnityContainer container;
+
+		public RegisterDefaultCommand( [Required]IUnityContainer container )
+		{
+			this.container = container;
+		}
+
+		public class Parameter<T> : Parameter
+		{
+			public Parameter( object instance ) : base( typeof(T), instance ) {}
+		}
+
+		public class Parameter
+		{
+			public Parameter( [Required]Type type, [Required]object instance )
+			{
+				Type = type;
+				Instance = instance;
+			}
+
+			public Type Type { get; }
+			public object Instance { get; }
+		}
+
+		protected override void OnExecute( Parameter parameter ) => 
+			new[] { parameter.Type, parameter.Instance.GetType() }.Distinct().WhereNot( container.IsRegistered ).Each( type =>
+			{
+				var factory = new InjectionFactory( c => parameter.Instance );
+				var member = new DefaultInjection( factory );
+				container.RegisterType( type, member );
+			} );
+	}
+
+	class MonitorLoggerRegistrationCommand : MonitorRegistrationCommandBase<ILogger>
+	{
+		readonly RecordingLogEventSink sink;
+
+		public MonitorLoggerRegistrationCommand( [Required]RecordingLogEventSink sink, ILogger instance ) : base( instance )
+		{
+			this.sink = sink;
+		}
+
+		protected override void OnExecute( ILogger parameter )
+		{
+			var messages = sink.Purge();
+			parameter.Information( $"A new logger of type '{parameter}' has been registered.  Purging existing logger with '{messages.Length}' messages and routing them through the new logger." );
+			messages.Each( parameter.Write );
+		}
+	}
+
+	class MonitorRecordingSinkRegistrationCommand : MonitorRegistrationCommandBase<RecordingLogEventSink>
+	{
+		public MonitorRecordingSinkRegistrationCommand( RecordingLogEventSink instance ) : base( instance ) {}
+
+		protected override void OnExecute( RecordingLogEventSink parameter ) => Instance.Events.Each( parameter.Emit );
+	}
+
+	abstract class MonitorRegistrationCommandBase<T> : Command<T, ISpecification<T>> where T : class
+	{
+		protected MonitorRegistrationCommandBase( [Required]T instance ) : base( new WrappedSpecification<T>( new AllSpecification( NullSpecification.NotNull, new OnlyOnceSpecification() ) ) )
+		{
+			Instance = instance;
+		}
+
+		protected T Instance { get; }
+
+		public override bool CanExecute( T parameter )
+		{
+			var result = parameter != Instance && base.CanExecute( parameter );
+			return result;
+		}
+	}
+
+	public class DefaultRegistrationsExtension : MonitorExtensionBase
+	{
+		readonly ICollection<ICommand> commands = new Collection<ICommand>();
+
+		protected override void Initialize()
+		{
+			base.Initialize();
+
+			var command = new RegisterDefaultCommand( Container );
+			
+			var sink = new RecordingLogEventSink();
+			var logger = new RecordingLoggerFactory( sink ).Create();
+
+			var parameters = new RegisterDefaultCommand.Parameter[]
+			{
+				new RegisterDefaultCommand.Parameter<ILogEventSink>( sink ),
+				new RegisterDefaultCommand.Parameter<ILogger>( logger )
+			};
+
+			parameters.Each( command.ExecuteWith );
+
+			commands.AddRange( new ICommand[] { new MonitorLoggerRegistrationCommand( sink, logger ), new MonitorRecordingSinkRegistrationCommand( sink ) } );
+		}
+
+		protected override void OnRegisteringInstance( object sender, RegisterInstanceEventArgs args ) => commands.ToArray().Select( command => command.ExecuteWith( args.Instance ) ).NotNull().Each( x => commands.Remove( x ) );
+
+		public override void Remove()
+		{
+			base.Remove();
+			commands.Clear();
+		}
+	}
+
+	public class InstanceTypeRegistrationMonitorExtension : MonitorExtensionBase
+	{
+		protected override void OnRegisteringInstance( object sender, RegisterInstanceEventArgs args )
 		{
 			var type = args.Instance.GetType();
 
@@ -57,42 +208,6 @@ namespace DragonSpark.Activation.IoC
 				registry.Register( new InstanceRegistrationParameter( type, args.Instance, args.Name ) );
 			}
 		}
-
-		void IDisposable.Dispose() => Remove();
-
-		public override void Remove()
-		{
-			base.Remove();
-
-			Context.RegisteringInstance -= ContextOnRegisteringInstance;
-		}
-
-		/*class MonitorLoggerCommand : Command<IMessageLogger>
-		{
-			readonly ConditionMonitor monitor = new ConditionMonitor();
-
-			public MonitorLoggerCommand() : this( new RecordingLogEventSink() ) { }
-
-			MonitorLoggerCommand( [Required]RecordingLogEventSink logger )
-			{
-				Logger = logger;
-			}
-
-			public RecordingLogEventSink Logger { get; }
-
-			public override bool CanExecute( IMessageLogger parameter )
-			{
-				var result = base.CanExecute( parameter ) && parameter != Logger && !monitor.IsApplied;
-				return result;
-			}
-
-			protected override void OnExecute( IMessageLogger parameter ) => monitor.Apply( () =>
-			{
-				var messages = Logger.Purge();
-				parameter.Information( $"A new logger of type '{parameter}' has been registered.  Purging existing logger with '{messages.Length}' messages and routing them through the new logger." );
-				messages.Each( parameter.Log );
-			} );
-		}*/
 	}
 
 	public class BuildPipelineExtension : UnityContainerExtension
@@ -108,7 +223,7 @@ namespace DragonSpark.Activation.IoC
 
 		class MetadataLifetimeStrategy : BuilderStrategy
 		{
-			[Required, Compose]
+			[Required, Locate]
 			ILogger Logger { get; set; }
 
 			public override void PreBuildUp( IBuilderContext context )
@@ -133,8 +248,16 @@ namespace DragonSpark.Activation.IoC
 			}
 		}
 
-		[Required, Value( typeof(CompositionHostContext) )]
+		[Required, Factory]
 		public CompositionHost Host { [return: Required]get; set; }
+
+		[Export]
+		class CompositionHostFactory : FirstFactory<CompositionHost>
+		{
+			public CompositionHostFactory() : this( new CompositionHostContext(), new AssemblyHost() ) {}
+
+			public CompositionHostFactory( [Required]CompositionHostContext context, [Required]AssemblyHost assemblies ) : base( () => context.Item, () => new Composition.CompositionHostFactory().Create( assemblies.Item ?? Default<Assembly>.Items ) ) {}
+		}
 
 		protected override void Initialize()
 		{
@@ -165,7 +288,6 @@ namespace DragonSpark.Activation.IoC
 				registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
 
 				new RegisterHierarchyCommand( registry ).ExecuteWith( new InstanceRegistrationParameter( Host ) );
-				// registry.Register( Host );
 			} );
 
 			monitor.Apply();
@@ -319,7 +441,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
-		readonly ICollection<Action> delegates = new Collection<Action>();
+		readonly ICollection<Action> delegates = new System.Collections.ObjectModel.Collection<Action>();
 
 		public void Execute( [Required]Action action )
 		{

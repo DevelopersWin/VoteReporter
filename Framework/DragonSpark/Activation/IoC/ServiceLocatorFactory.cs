@@ -18,7 +18,8 @@ namespace DragonSpark.Activation.IoC
 		protected override IUnityContainer CreateItem()
 		{
 			var result = new UnityContainer()
-				.Extend<RegistrationMonitorExtension>()
+				.Extend<DefaultRegistrationsExtension>()
+				.Extend<InstanceTypeRegistrationMonitorExtension>()
 				.Extend<BuildPipelineExtension>();
 			return result;
 		}

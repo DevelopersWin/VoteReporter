@@ -40,12 +40,12 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class ProvisionedCommand : DisposingCommand<object>
+	public class FixedCommand : DisposingCommand<object>
 	{
 		readonly ICommand command;
 		readonly object parameter;
 
-		public ProvisionedCommand( [Required]ICommand command, [Required]object parameter )
+		public FixedCommand( [Required]ICommand command, [Required]object parameter )
 		{
 			this.command = command;
 			this.parameter = parameter;

@@ -41,7 +41,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		// [Child]
 		readonly ICollection<IDisposable> disposables = new AdvisableCollection<IDisposable>();
 
-		public Application( params ICommand[] commands ) : this( Default<Assembly>.Items, commands ) {}
+		public Application( params ICommand[] commands ) : this( new AssemblyHost().Item, commands ) {}
 
 		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, commands ) {}
 
@@ -60,12 +60,12 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		protected override IEnumerable<ICommand> DetermineContextCommands( ApplicationExecutionParameter<AutoData> parameter )
 		{
-			// yield return new ProvisionedCommand(  );
+			// yield return new FixedCommand(  );
 			foreach ( var item in base.DetermineContextCommands( parameter ) )
 			{
 				yield return item;
 			}
-			yield return new ProvisionedCommand(  );
+			yield return new FixedCommand(  );
 		}
 	}*/
 }

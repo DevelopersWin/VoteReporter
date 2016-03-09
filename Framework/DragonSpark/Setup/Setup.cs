@@ -86,8 +86,8 @@ namespace DragonSpark.Setup
 
 		protected virtual IEnumerable<ICommand> DetermineContextCommands( ApplicationExecutionParameter<T> parameter )
 		{
-			yield return new ProvisionedCommand( new AssignApplication(), parameter.Application.Assemblies );
-			yield return new ProvisionedCommand( new AmbientContextCommand<ITaskMonitor>(), new TaskMonitor() );
+			yield return new FixedCommand( new AssignApplication(), parameter.Application.Assemblies );
+			yield return new FixedCommand( new AmbientContextCommand<ITaskMonitor>(), new TaskMonitor() );
 		}
 	}
 

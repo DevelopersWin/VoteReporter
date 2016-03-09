@@ -38,25 +38,4 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public Application( IEnumerable<ICommand> commands ) : base( AssemblyProvider.Instance.Create(), commands ) {}
 	}
-
-	/*public class LocationBasedApplicationCustomization<T> : ApplicationCustomization where T : ICommand
-	{
-		public static ApplicationFactory<T> Instance { get; } = new ApplicationFactory<T>( new AssignLocationCommand() );
-
-		public LocationBasedApplicationCustomization() : base( Instance.Create ) {}
-	}*/
-
-	/*public class ApplicationCustomization<T> : ApplicationCustomization where T : ICommand
-	{
-		public ApplicationCustomization() : base( ApplicationFactory<T>.Instance.Create ) {}
-	}
-
-	public class ApplicationFactory<T> : Framework.Setup.ApplicationFactory<T> where T : ICommand
-	{
-		public static ApplicationFactory<T> Instance { get; } = new ApplicationFactory<T>();
-
-		public ApplicationFactory( params ICommand<object>[] commands ) : this( AssemblyProvider.Instance.Create(), commands ) {}
-
-		protected ApplicationFactory( Assembly[] assemblies, params ICommand<object>[] commands ) : base( assemblies, commands ) {}
-	}*/
 }

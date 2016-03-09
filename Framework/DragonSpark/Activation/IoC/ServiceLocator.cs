@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace DragonSpark.Activation.IoC
 {
-	[Disposable( ThrowObjectDisposedException = true )]
+	[Disposable( ThrowObjectDisposedException = true ), Export]
 	public class ServiceLocator : ServiceLocatorImplBase
 	{
 		//public ServiceLocator() : this( new UnityContainer() ) {}
