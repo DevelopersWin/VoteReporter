@@ -1,7 +1,9 @@
-﻿using DragonSpark.Testing.Objects.Setup;
+﻿using System.Composition;
+using DragonSpark.Testing.Objects.Setup;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
+	[Export]
 	public partial class ProgramSetup
 	{
 		public class AutoDataAttribute : DragonSpark.Testing.Objects.Setup.AutoDataAttribute

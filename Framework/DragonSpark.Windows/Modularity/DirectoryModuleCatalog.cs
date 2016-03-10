@@ -1,7 +1,6 @@
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
-using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Generic;
@@ -26,10 +25,9 @@ namespace DragonSpark.Windows.Modularity
 	{
 		readonly IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory;
 
-		public DirectoryModuleCatalog() : this( AssemblyProvider.Instance, ModuleInfoBuilder.Instance, LoadRemoteModuleInfoFactory.Instance )
-		{}
+		public DirectoryModuleCatalog() : this( AssemblyProvider.Instance.Create(), ModuleInfoBuilder.Instance, LoadRemoteModuleInfoFactory.Instance ) {}
 
-		public DirectoryModuleCatalog( IAssemblyProvider provider, IModuleInfoBuilder builder, IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory ) : base( provider, builder )
+		public DirectoryModuleCatalog( Assembly[] assemblies, IModuleInfoBuilder builder, IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory ) : base( assemblies, builder )
 		{
 			this.factory = factory;
 			ModulePath = ".";

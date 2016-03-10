@@ -397,12 +397,12 @@ namespace DragonSpark.Activation.IoC
 
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
-		readonly Assembly[] assemblies;
+		readonly Func<Assembly[]> assemblies;
 		readonly CanBuildSpecification specification;
 
-		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies ) : this( assemblies, CanBuildSpecification.Instance ) {}
+		public BuildableTypeFromConventionLocator( [Required]Func<Assembly[]> assemblies ) : this( assemblies, CanBuildSpecification.Instance ) {}
 
-		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies, [Required]CanBuildSpecification specification )
+		public BuildableTypeFromConventionLocator( [Required]Func<Assembly[]> assemblies, [Required]CanBuildSpecification specification )
 		{
 			this.assemblies = assemblies;
 			this.specification = specification;
@@ -412,7 +412,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			var adapter = parameter.Adapt();
 			var name = parameter.Name.TrimStartOf( 'I' );
-			var result = assemblies.Append( parameter.Assembly() ).Distinct()
+			var result = assemblies().Append( parameter.Assembly() ).Distinct()
 				.SelectMany( assembly => assembly.DefinedTypes.AsTypes() )
 				.Where( adapter.IsAssignableFrom )
 				.Where( specification.IsSatisfiedBy )
@@ -536,7 +536,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			var reference = new KeyReference( this, context.BuildKey ).Item;
 			object existing = null;
-			var process = !context.HasBuildPlan() && new Checked( reference, this ).Item.Apply() && host.TryGetExport( context.BuildKey.Type, context.BuildKey.Name, out existing ) && !new DefaultRegistrationsExtension.Default( existing ).Item;
+			var process = !context.HasDefaultBuildPlan() && new Checked( reference, this ).Item.Apply() && host.TryGetExport( context.BuildKey.Type, context.BuildKey.Name, out existing ) && !new DefaultRegistrationsExtension.Default( existing ).Item;
 			process.IsTrue( () =>
 			{
 				registry.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing, context.BuildKey.Name ) );

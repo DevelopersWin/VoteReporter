@@ -10,11 +10,11 @@ namespace DragonSpark.Modularity
 {
 	public abstract class AssemblyModuleCatalog : ModuleCatalog
 	{
-		readonly IAssemblyProvider provider;
+		readonly Assembly[] assemblies;
 
-		protected AssemblyModuleCatalog( IAssemblyProvider provider, IModuleInfoBuilder builder )
+		protected AssemblyModuleCatalog( Assembly[] assemblies, IModuleInfoBuilder builder )
 		{
-			this.provider = provider;
+			this.assemblies = assemblies;
 			Builder = builder;
 		}
 
@@ -25,8 +25,6 @@ namespace DragonSpark.Modularity
 		/// </summary>
 		protected override void InnerLoad()
 		{
-			var assemblies = GetAssemblies();
-
 			var items = GetModuleInfos( assemblies );
 		   
 			Items.AddRange( items );
@@ -45,12 +43,6 @@ namespace DragonSpark.Modularity
 			var result = assemblies.Except( info.Assembly().ToItem() ).SelectMany( assembly => assembly.ExportedTypes.Where( CanLocate<IModule> ) )
 				.Select( Builder.CreateModuleInfo )
 				.ToArray();
-			return result;
-		}
-
-		protected virtual IEnumerable<Assembly> GetAssemblies()
-		{
-			var result = provider.Create();
 			return result;
 		}
 	}
