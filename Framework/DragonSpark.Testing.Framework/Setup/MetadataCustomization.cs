@@ -41,7 +41,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		// [Child]
 		readonly ICollection<IDisposable> disposables = new AdvisableCollection<IDisposable>();
 
-		public Application( params ICommand[] commands ) : this( new AssemblyHost().Item, commands ) {}
+		public Application( params ICommand[] commands ) : this( TypeSystem.Assemblies.GetCurrent(), commands ) {}
 
 		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, commands ) {}
 

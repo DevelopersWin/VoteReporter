@@ -124,13 +124,12 @@ namespace DragonSpark.Extensions
 
 		public static TItem AsValid<TItem>( this object @this, Action<TItem> with, string message )
 		{
-			var result = @this.As( with );
-			// if ( result.Is<TItem>() )
-			result.Null( () =>
+			if ( @this.Not<TItem>() )
 			{
 				throw new InvalidOperationException( message ?? $"'{@this.GetType().FullName}' is not of type {typeof(TItem).FullName}." );
-			} );
-			return result;
+			}
+			
+			return @this.As( with );
 		}
 
 		public static TResult As<TResult>( this object target ) => As( target, (Action<TResult>)null );

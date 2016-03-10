@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Activation.IoC
 {
 	public class ServiceLocatorTests
 	{
-		[Theory, AutoData]
+		[Theory, Framework.Setup.AutoData]
 		void Container( [Modest, Frozen] ServiceLocator sut )
 		{
 			sut.QueryInterface<IDisposable>().Dispose();

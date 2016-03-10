@@ -1,15 +1,19 @@
+using System.Collections.Generic;
 using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 
 namespace DragonSpark.TypeSystem
 {
 	public static class Assemblies
 	{
-		public static Assembly[] GetCurrent() => Services.Locate<Assembly[]>() ?? new AssemblyHost().Item ?? Default<Assembly>.Items;
+		public static Assembly[] Resolve( IEnumerable<Assembly> assemblies ) => assemblies.AnyOr( () => new AssemblyHost().Item ?? Default<Assembly>.Items ).Fixed();
+
+		public static Assembly[] GetCurrent() => Resolve( Services.Locate<Assembly[]>() );
 
 		public delegate Assembly[] Get();
 	}

@@ -197,7 +197,7 @@ namespace DragonSpark.Activation.IoC
 			this.register = register;
 			this.registry = registry;
 
-			var instance = assemblies.AnyOr( () => new AssemblyHost().Item ?? Default<Assembly>.Items ).Fixed();
+			var instance = Assemblies.Resolve( assemblies );
 			var loggingParameter = new RegisterDefaultCommand.Parameter<ILogger>( logger );
 			var sinkParameter = new RegisterDefaultCommand.Parameter<RecordingLogEventSink>( sink );
 			parameters = new RegisterDefaultCommand.Parameter[]
