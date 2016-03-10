@@ -32,8 +32,9 @@ namespace DragonSpark.Extensions
 
 		static UnityContainerExtension Create( IUnityContainer container, Type extensionType )
 		{
-			var activator = container.Resolve<IActivator>( () => SystemActivator.Instance );
-			var extension = activator.Activate<UnityContainerExtension>( extensionType );
+			// var activator = container.Resolve<IActivator>( () => SystemActivator.Instance );
+			// var extension = activator.Activate<UnityContainerExtension>( extensionType );
+			var extension = container.Resolve<UnityContainerExtension>( extensionType );
 			var result = extension.WithSelf( container.AddExtension );
 			return result;
 		}

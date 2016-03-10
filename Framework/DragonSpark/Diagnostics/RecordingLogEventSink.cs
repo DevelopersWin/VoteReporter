@@ -24,6 +24,6 @@ namespace DragonSpark.Diagnostics
 
 		public IEnumerable<LogEvent> Events => events;
 
-		public virtual void Emit( LogEvent logEvent ) => source.Add( logEvent );
+		public virtual void Emit( LogEvent logEvent ) => source.Contains( logEvent).IsFalse( () => source.Add( logEvent ) );
 	}
 }

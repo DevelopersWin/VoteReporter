@@ -14,8 +14,7 @@ namespace DragonSpark.TypeSystem
 
 		static string[] Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.NotNull().Append( typeof(ApplicationAssemblyTransformer).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToArray();
 
-		public ApplicationAssemblyTransformer( [Required]params Assembly[] coreAssemblies ) : this( Determine( coreAssemblies ) )
-		{}
+		public ApplicationAssemblyTransformer( [Required]params Assembly[] coreAssemblies ) : this( Determine( coreAssemblies ) ) {}
 
 		ApplicationAssemblyTransformer( string[] namespaces )
 		{

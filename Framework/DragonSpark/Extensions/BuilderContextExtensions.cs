@@ -2,6 +2,7 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Runtime.Values;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
+using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Extensions
@@ -10,7 +11,14 @@ namespace DragonSpark.Extensions
 	{
 		public static BuilderContext Context<T>( this ExtensionContext @this ) => new BuilderContext( @this.Strategies.MakeStrategyChain(), @this.Lifetime, @this.Policies, NamedTypeBuildKey.Make<T>(), null );
 
-		public static T New<T>( this ExtensionContext @this ) => (T)@this.Context<T>().With( context => context.Strategies.ExecuteBuildUp( context ) );
+		public static T New<T>( this ExtensionContext @this ) => @this.Context<T>().With( context => context.New<T>() );
+
+		/*public static T AddStrategy<T>( this ExtensionContext @this, UnityBuildStage stage ) where T : IBuilderStrategy
+		{
+			var result = @this.New<T>();
+			@this.Strategies.Add( result, stage );
+			return result;
+		}*/
 
 		public static bool HasBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ).With( policy => !new DefaultInjection.Applied( policy ).Item.IsApplied );
 

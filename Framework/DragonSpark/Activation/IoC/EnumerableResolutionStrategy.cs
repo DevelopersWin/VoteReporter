@@ -1,13 +1,13 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Diagnostics;
+using DragonSpark.Extensions;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.Utility;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Diagnostics;
-using PostSharp.Patterns.Contracts;
+using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -100,7 +100,7 @@ namespace DragonSpark.Activation.IoC
 					.Distinct()
 					.Select( context.New<T> )
 					.ToArray() 
-				) ?? new T[0];
+				) ?? Default<T>.Items;
 			return result;
 		}
 	}

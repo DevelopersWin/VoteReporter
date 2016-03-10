@@ -12,12 +12,18 @@ namespace DragonSpark.Composition
 {
 	public static class Composer
 	{
+		// public static CompositionHost Create( [Required] Assembly[] assemblies ) => new CompositionHostFactory().Create( assemblies );
+
+		public static CompositionHost Current => new CompositionHostContext().Item;
+
 		public static T Compose<T>() => (T)Compose( typeof(T) );
 
-		public static object Compose( [Required] Type type ) => new CompositionHostContext().Item.GetExport( type );
+		public static object Compose( [Required] Type type ) => Current.GetExport( type );
 
-		public static object ComposeMany( [Required] Type type ) => new CompositionHostContext().Item.GetExports( type );
+		public static object ComposeMany( [Required] Type type ) => Current.GetExports( type );
 	}
+
+	public class CompositionHostContext : ExecutionContextValue<CompositionHost> {}
 
 	public class FactoryTypeContainer : TypeContainer<IFactory>
 	{
@@ -43,6 +49,8 @@ namespace DragonSpark.Composition
 	{
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
 
+		CompositionHostFactory() {}
+
 		protected override CompositionHost CreateItem( Assembly[] parameter )
 		{
 			var types = parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
@@ -59,6 +67,4 @@ namespace DragonSpark.Composition
 			return result;
 		}
 	}
-
-	public class CompositionHostContext : ExecutionContextValue<CompositionHost> {}
 }

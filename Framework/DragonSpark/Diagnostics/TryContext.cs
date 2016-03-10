@@ -8,7 +8,7 @@ namespace DragonSpark.Diagnostics
 	{
 		readonly ILogger logger;
 
-		public TryContext() : this( new RecordingLoggerFactory().Create() ) {} // TODO: Logger Instance
+		// public TryContext() : this( new RecordingLoggerFactory().Create() ) {} // TODO: Logger Instance
 
 		public TryContext( [Required]ILogger logger )
 		{

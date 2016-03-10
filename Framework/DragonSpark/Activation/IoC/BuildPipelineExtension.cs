@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
-using DragonSpark.ComponentModel;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -16,13 +15,11 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using Serilog.Core;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -30,20 +27,27 @@ namespace DragonSpark.Activation.IoC
 	public class ExportDescriptorProvider : System.Composition.Hosting.Core.ExportDescriptorProvider
 	{
 		readonly IUnityContainer container;
+		readonly AccessMonitor<IEnumerable<ExportDescriptorPromise>> monitor = new AccessMonitor<IEnumerable<ExportDescriptorPromise>>( Default<ExportDescriptorPromise>.Items );
 
 		public ExportDescriptorProvider( [Required]IUnityContainer container )
 		{
+			// Current = current;
 			this.container = container;
 		}
 
-		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
+		// public IWritableValue<NamedTypeBuildKey> Current { get; }
+
+		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor ) //=> monitor.Access( () =>
 		{
 			CompositionDependency dependency;
-			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) && container.IsRegistered( contract.ContractType, contract.ContractName ) )
-			{
-				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => container.Resolve( contract.ContractType, contract.ContractName ), NoMetadata ) );
-			}
-		}
+			// var enabled = Current.Item == null || new NamedTypeBuildKey( contract.ContractType, contract.ContractName ) != Current.Item;
+			var existing = descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency );
+			var result = // enabled && 
+				!existing && container.IsRegistered( contract.ContractType, contract.ContractName )
+					? new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => container.Resolve( contract.ContractType, contract.ContractName ), NoMetadata ) ).ToItem()
+					: monitor.DefaultValue;
+			return result;
+		}// );
 	}
 
 	public abstract class MonitorExtensionBase : UnityContainerExtension, IDisposable
@@ -99,7 +103,11 @@ namespace DragonSpark.Activation.IoC
 
 		public class Parameter<T> : Parameter
 		{
-			public Parameter( object instance ) : base( typeof(T), instance ) {}
+			public Parameter( T instance ) : base( typeof(T), instance ) {}
+
+			public new T Instance() => (T)base.Instance;
+
+			public void Assign( T item ) => base.Instance = item;
 		}
 
 		public class Parameter
@@ -108,10 +116,11 @@ namespace DragonSpark.Activation.IoC
 			{
 				Type = type;
 				Instance = instance;
+				new DefaultRegistrationsExtension.Default( Instance ).Assign( true );
 			}
 
 			public Type Type { get; }
-			public object Instance { get; }
+			public object Instance { get; protected set; }
 		}
 
 		protected override void OnExecute( Parameter parameter ) => 
@@ -127,7 +136,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly RecordingLogEventSink sink;
 
-		public MonitorLoggerRegistrationCommand( [Required]RecordingLogEventSink sink, ILogger instance ) : base( instance )
+		public MonitorLoggerRegistrationCommand( [Required]RecordingLogEventSink sink, RegisterDefaultCommand.Parameter<ILogger> parameter ) : base( parameter )
 		{
 			this.sink = sink;
 		}
@@ -137,57 +146,93 @@ namespace DragonSpark.Activation.IoC
 			var messages = sink.Purge();
 			parameter.Information( $"A new logger of type '{parameter}' has been registered.  Purging existing logger with '{messages.Length}' messages and routing them through the new logger." );
 			messages.Each( parameter.Write );
+			base.OnExecute( parameter );
 		}
 	}
 
 	class MonitorRecordingSinkRegistrationCommand : MonitorRegistrationCommandBase<RecordingLogEventSink>
 	{
-		public MonitorRecordingSinkRegistrationCommand( RecordingLogEventSink instance ) : base( instance ) {}
+		public MonitorRecordingSinkRegistrationCommand( RegisterDefaultCommand.Parameter<RecordingLogEventSink> parameter ) : base( parameter ) {}
 
-		protected override void OnExecute( RecordingLogEventSink parameter ) => Instance.Events.Each( parameter.Emit );
+		protected override void OnExecute( RecordingLogEventSink parameter )
+		{
+			Parameter.Instance().Events.Each( parameter.Emit );
+			base.OnExecute( parameter );
+		}
 	}
 
 	abstract class MonitorRegistrationCommandBase<T> : Command<T, ISpecification<T>> where T : class
 	{
-		protected MonitorRegistrationCommandBase( [Required]T instance ) : base( new WrappedSpecification<T>( new AllSpecification( NullSpecification.NotNull, new OnlyOnceSpecification() ) ) )
+		protected MonitorRegistrationCommandBase( [Required] RegisterDefaultCommand.Parameter<T> parameter ) : base( new WrappedSpecification<T>( new AllSpecification( NullSpecification.NotNull, new OnlyOnceSpecification() ) ) )
 		{
-			Instance = instance;
+			Parameter = parameter;
 		}
 
-		protected T Instance { get; }
+		protected RegisterDefaultCommand.Parameter<T> Parameter { get; }
+
+		protected override void OnExecute( T parameter ) => Parameter.Assign( parameter );
 
 		public override bool CanExecute( T parameter )
 		{
-			var result = parameter != Instance && base.CanExecute( parameter );
+			var result = parameter != Parameter.Instance() && base.CanExecute( parameter );
 			return result;
 		}
 	}
 
 	public class DefaultRegistrationsExtension : MonitorExtensionBase
 	{
-		readonly ICollection<ICommand> commands = new Collection<ICommand>();
+		readonly RegisterDefaultCommand register;
+		readonly PersistentServiceRegistry registry;
+		readonly RegisterDefaultCommand.Parameter[] parameters;
+		readonly ICollection<ICommand> commands;
+
+		public DefaultRegistrationsExtension( [Required]IUnityContainer container, [Required]Assembly[] assemblies, [Required]RegisterDefaultCommand register, [Required]RecordingLogEventSink sink ) 
+			: this( container, assemblies, register, sink, new RecordingLoggerFactory( sink ).Create() ) {}
+
+		DefaultRegistrationsExtension( [Required] IUnityContainer container, [Required]Assembly[] assemblies, [Required] RegisterDefaultCommand register, [Required] RecordingLogEventSink sink, ILogger logger ) 
+			: this( assemblies, register, sink, logger, new PersistentServiceRegistry( container, logger, new LifetimeManagerFactory<ContainerControlledLifetimeManager>( container) ) ) {}
+
+		DefaultRegistrationsExtension( [Required]Assembly[] assemblies, [Required]RegisterDefaultCommand register, [Required]RecordingLogEventSink sink, [Required]ILogger logger, [Required]PersistentServiceRegistry registry )
+		{
+			this.register = register;
+			this.registry = registry;
+
+			var instance = assemblies.AnyOr( () => new AssemblyHost().Item ?? Default<Assembly>.Items ).Fixed();
+			var loggingParameter = new RegisterDefaultCommand.Parameter<ILogger>( logger );
+			var sinkParameter = new RegisterDefaultCommand.Parameter<RecordingLogEventSink>( sink );
+			parameters = new RegisterDefaultCommand.Parameter[]
+			{
+				new RegisterDefaultCommand.Parameter<Assembly[]>( instance ),
+				sinkParameter,
+				loggingParameter
+			};
+			commands = new Collection<ICommand>( new ICommand[] { new MonitorLoggerRegistrationCommand( sink, loggingParameter ), new MonitorRecordingSinkRegistrationCommand( sinkParameter ) } );
+		}
+
+		public class Default : AssociatedValue<object, bool>
+		{
+			public Default( object instance ) : base( instance ) {}
+		}
 
 		protected override void Initialize()
 		{
 			base.Initialize();
 
-			var command = new RegisterDefaultCommand( Container );
-			
-			var sink = new RecordingLogEventSink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			parameters.Each( register.ExecuteWith );
 
-			var parameters = new RegisterDefaultCommand.Parameter[]
-			{
-				new RegisterDefaultCommand.Parameter<ILogEventSink>( sink ),
-				new RegisterDefaultCommand.Parameter<ILogger>( logger )
-			};
-
-			parameters.Each( command.ExecuteWith );
-
-			commands.AddRange( new ICommand[] { new MonitorLoggerRegistrationCommand( sink, logger ), new MonitorRecordingSinkRegistrationCommand( sink ) } );
+			registry.Register<IServiceRegistry, ServiceRegistry>();
+			registry.Register<IActivator, Activator>();
+			registry.Register( Context );
+			registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
+			registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
 		}
 
-		protected override void OnRegisteringInstance( object sender, RegisterInstanceEventArgs args ) => commands.ToArray().Select( command => command.ExecuteWith( args.Instance ) ).NotNull().Each( x => commands.Remove( x ) );
+		class Activator : CompositeActivator
+		{
+			public Activator( [Required]IoC.Activator activator ) : base( activator, SystemActivator.Instance ) {}
+		}
+
+		protected override void OnRegisteringInstance( object sender, RegisterInstanceEventArgs args ) => commands.ToArray().Select( c => c.ExecuteWith( args.Instance ) ).NotNull().Each( commands.Remove );
 
 		public override void Remove()
 		{
@@ -212,19 +257,62 @@ namespace DragonSpark.Activation.IoC
 
 	public class BuildPipelineExtension : UnityContainerExtension
 	{
-		class BuildKeyMonitorStrategy : BuilderStrategy
+		readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
+		readonly ConventionStrategy conventionStrategy;
+
+		/*class BuildKeyMonitorStrategy : BuilderStrategy
 		{
 			readonly IList<NamedTypeBuildKey> keys = new List<NamedTypeBuildKey>();
 
 			public IEnumerable<NamedTypeBuildKey> Purge() => keys.Purge();
 
 			public override void PreBuildUp( IBuilderContext context ) => keys.Ensure( context.BuildKey );
+		}*/
+
+		public BuildPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy )
+		{
+			this.metadataLifetimeStrategy = metadataLifetimeStrategy;
+			this.conventionStrategy = conventionStrategy;
 		}
 
-		class MetadataLifetimeStrategy : BuilderStrategy
+		protected override void Initialize()
 		{
-			[Required, Locate]
-			ILogger Logger { get; set; }
+			/*var strategy = new BuildKeyMonitorStrategy();
+			Context.BuildPlanStrategies.Add( strategy, UnityBuildStage.Setup );			
+
+			strategy.Purge().Each( Context.Policies.ClearBuildPlan );
+
+			Context.BuildPlanStrategies.Clear();
+			Context.BuildPlanStrategies.AddNew<DynamicMethodConstructorStrategy>( UnityBuildStage.Creation );
+			Context.BuildPlanStrategies.AddNew<DynamicMethodPropertySetterStrategy>( UnityBuildStage.Initialization );
+			Context.BuildPlanStrategies.AddNew<DynamicMethodCallStrategy>( UnityBuildStage.Initialization );*/
+
+			Context.Strategies.Clear();
+			Context.Strategies.AddNew<BuildKeyMappingStrategy>( UnityBuildStage.TypeMapping );
+			Context.Strategies.Add( metadataLifetimeStrategy, UnityBuildStage.Lifetime );
+			Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
+			Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
+			Context.Strategies.Add( conventionStrategy, UnityBuildStage.PreCreation );
+			Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
+			Context.Strategies.AddNew<EnumerableResolutionStrategy>( UnityBuildStage.Creation );
+			Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
+
+			var policy = Context.Policies.Get<IBuildPlanCreatorPolicy>( null );
+			var builder = new Builder<TryContext>( Context.Strategies, policy.CreatePlan );
+			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( builder.Create, Policies, policy ) );
+			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
+		}
+
+		public class MetadataLifetimeStrategy : BuilderStrategy
+		{
+			readonly Func<ILogger> logger;
+			readonly LifetimeManagerFactory factory;
+
+			public MetadataLifetimeStrategy( [Required]Func<ILogger> logger, [Required]LifetimeManagerFactory factory )
+			{
+				this.logger = logger;
+				this.factory = factory;
+			}
 
 			public override void PreBuildUp( IBuilderContext context )
 			{
@@ -234,73 +322,16 @@ namespace DragonSpark.Activation.IoC
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
 					lifetimePolicy.Null( () =>
 					{
-						var factory = context.New<LifetimeManagerFactory>();
 						var lifetimeManager = factory.Create( reference.Type );
 						lifetimeManager.With( manager =>
 						{
-							var logger = Logger;
-							logger.Information( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
+							logger().Debug( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
 
 							context.PersistentPolicies.Set<ILifetimePolicy>( manager, reference );
 						} );
 					} );
 				}
 			}
-		}
-
-		[Required, Factory]
-		public CompositionHost Host { [return: Required]get; set; }
-
-		[Export]
-		class CompositionHostFactory : FirstFactory<CompositionHost>
-		{
-			public CompositionHostFactory() : this( new CompositionHostContext(), new AssemblyHost() ) {}
-
-			public CompositionHostFactory( [Required]CompositionHostContext context, [Required]AssemblyHost assemblies ) : base( () => context.Item, () => new Composition.CompositionHostFactory().Create( assemblies.Item ?? Default<Assembly>.Items ) ) {}
-		}
-
-		protected override void Initialize()
-		{
-			var monitor = new DeferredExecutionMonitor();
-			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
-			Host.GetExport<IExportDescriptorProviderRegistry>().Register( new ExportDescriptorProvider( Container ) );
-
-			Context.Strategies.Clear();
-			Context.Strategies.AddNew<BuildKeyMappingStrategy>( UnityBuildStage.TypeMapping );
-			Context.Strategies.AddNew<MetadataLifetimeStrategy>( UnityBuildStage.Lifetime );
-			Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
-			Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
-			Context.Strategies.AddNew<ConventionStrategy>( UnityBuildStage.PreCreation );
-			Context.Strategies.Add( new ComposeStrategy( monitor ), UnityBuildStage.PreCreation );
-			Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
-			Context.Strategies.AddNew<EnumerableResolutionStrategy>( UnityBuildStage.Creation );
-			Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
-
-			var strategy = new BuildKeyMonitorStrategy();
-			Context.BuildPlanStrategies.Add( strategy, UnityBuildStage.Setup );
-
-			Context.New<PersistentServiceRegistry>().With( registry =>
-			{
-				registry.Register<IServiceRegistry, ServiceRegistry>();
-				registry.Register<IActivator, Activator>();
-				registry.Register( Context );
-				registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
-				registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
-
-				new RegisterHierarchyCommand( registry ).ExecuteWith( new InstanceRegistrationParameter( Host ) );
-			} );
-
-			monitor.Apply();
-			strategy.Purge().Each( Context.Policies.ClearBuildPlan );
-
-			Context.BuildPlanStrategies.Clear();
-			Context.BuildPlanStrategies.AddNew<DynamicMethodConstructorStrategy>( UnityBuildStage.Creation );
-			Context.BuildPlanStrategies.AddNew<DynamicMethodPropertySetterStrategy>( UnityBuildStage.Initialization );
-			Context.BuildPlanStrategies.AddNew<DynamicMethodCallStrategy>( UnityBuildStage.Initialization );
-
-			var policy = Context.Policies.Get<IBuildPlanCreatorPolicy>( null );
-			var builder = new Builder<TryContext>( Context.Strategies, policy.CreatePlan );
-			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( builder.Create, Policies, policy ) );
 		}
 
 		public class Builder<T> : FactoryBase<IBuilderContext, T>
@@ -326,10 +357,41 @@ namespace DragonSpark.Activation.IoC
 		}
 
 		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
+	}
 
-		class Activator : CompositeActivator
+	public class CompositionExtension : UnityContainerExtension
+	{
+		readonly ComposeStrategy strategy;
+		readonly CompositionHost host;
+		readonly ExportDescriptorProvider provider;
+		readonly RegisterHierarchyCommand command;
+
+		public CompositionExtension( [Required]IServiceRegistry registry, [Required]Factory factory, ExportDescriptorProvider provider, PersistentServiceRegistry persistentServiceRegistry ) 
+			: this( registry, factory.Create(), provider, new RegisterHierarchyCommand( persistentServiceRegistry ) ) {}
+
+		CompositionExtension( IServiceRegistry registry, CompositionHost host, ExportDescriptorProvider provider, RegisterHierarchyCommand command )
+			: this( new ComposeStrategy( host, registry ), host, provider, command ) {}
+
+		CompositionExtension( [Required]ComposeStrategy strategy, [Required]CompositionHost host, [Required]ExportDescriptorProvider provider, [Required]RegisterHierarchyCommand command )
 		{
-			public Activator( [Required]IoC.Activator activator ) : base( activator, SystemActivator.Instance ) {}
+			this.strategy = strategy;
+			this.host = host;
+			this.provider = provider;
+			this.command = command;
+		}
+
+		protected override void Initialize()
+		{
+			command.ExecuteWith( new InstanceRegistrationParameter( host ) );
+
+			host.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
+
+			Context.Strategies.Add( strategy, UnityBuildStage.PreCreation );
+		}
+
+		public class Factory : FirstFactory<CompositionHost>
+		{
+			public Factory( [Required]IActivator activator, [Required]Assembly[] assemblies ) : base( activator.Activate<CompositionHost>, () => Composer.Current, () => CompositionHostFactory.Instance.Create( assemblies ) ) {}
 		}
 	}
 
@@ -350,11 +412,11 @@ namespace DragonSpark.Activation.IoC
 		{
 			var adapter = parameter.Adapt();
 			var name = parameter.Name.TrimStartOf( 'I' );
-			var result = assemblies.AnyOr( () => parameter.Assembly().ToItem() )
+			var result = assemblies.Append( parameter.Assembly() ).Distinct()
 				.SelectMany( assembly => assembly.DefinedTypes.AsTypes() )
 				.Where( adapter.IsAssignableFrom )
 				.Where( specification.IsSatisfiedBy )
-				.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
+				.FirstOrDefault( candidate => candidate != parameter && candidate.Name.StartsWith( name ) );
 			return result;
 		}
 	}
@@ -398,10 +460,11 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static CanBuildSpecification Instance { get; } = new CanBuildSpecification();
 
+		[Freeze]
 		protected override bool Verify( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();
-			var result = parameter != typeof(object) && !info.IsInterface && !info.IsAbstract && !typeof(Delegate).Adapt().IsAssignableFrom( parameter );
+			var result = parameter != typeof(object) && !info.IsInterface && !info.IsAbstract && !typeof(Delegate).Adapt().IsAssignableFrom( parameter ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
 			return result;
 		}
 	}
@@ -437,7 +500,7 @@ namespace DragonSpark.Activation.IoC
 		public KeyReference( object instance, NamedTypeBuildKey key ) : base( instance, key ) { }
 	}
 
-	public class DeferredExecutionMonitor
+	/*public class DeferredExecutionMonitor
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
@@ -456,50 +519,50 @@ namespace DragonSpark.Activation.IoC
 		}
 
 		public void Apply() => monitor.Apply( () => delegates.Purge().Each( action => action() ) );
-	}
+	}*/
 
 	public class ComposeStrategy : BuilderStrategy
 	{
-		readonly DeferredExecutionMonitor monitor;
+		readonly IServiceRegistry registry;
+		readonly CompositionHost host;
 
-		public ComposeStrategy( [Required]DeferredExecutionMonitor monitor )
+		public ComposeStrategy( [Required] CompositionHost host, [Required]IServiceRegistry registry )
 		{
-			this.monitor = monitor;
+			this.registry = registry;
+			this.host = host;
 		}
-
-		[Required, Value( typeof(CompositionHostContext) )]
-		public CompositionHost Host { [return: Required]get; set; }
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var hasBuildPlan = context.HasBuildPlan();
-			object existing;
 			var reference = new KeyReference( this, context.BuildKey ).Item;
-			if ( !hasBuildPlan && Host.TryGetExport( reference.Type, reference.Name, out existing ) )
+			object existing = null;
+			var process = !context.HasBuildPlan() && new Checked( reference, this ).Item.Apply() && host.TryGetExport( context.BuildKey.Type, context.BuildKey.Name, out existing ) && !new DefaultRegistrationsExtension.Default( existing ).Item;
+			process.IsTrue( () =>
 			{
-				context.Complete( existing );
+				registry.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing, context.BuildKey.Name ) );
 
-				monitor.Execute( () =>
-				{
-					var checker = new Checked( reference, this );
-					if ( checker.Item.Apply() )
-					{
-						var registry = context.New<IServiceRegistry>();
-						registry.Register( new InstanceRegistrationParameter( reference.Type, existing, context.BuildKey.Name ) );
-					}
-				} );
-			}
+				context.Complete( existing );
+			} );
 		}
 	}
 
 	public class ConventionStrategy : BuilderStrategy
 	{
-		[Persistent]
-		class ConventionCandidateLocator : SpecificationAwareFactory<IBuilderContext, Type>
+		readonly ConventionCandidateLocator locator;
+		readonly IServiceRegistry registry;
+
+		// [Persistent]
+		public class ConventionCandidateLocator : SpecificationAwareFactory<IBuilderContext, Type>
 		{
 			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : this( InvalidBuildFromContextSpecification.Instance, factory ) { }
 
 			ConventionCandidateLocator( [Required]InvalidBuildFromContextSpecification specification, [Required]BuildableTypeFromConventionLocator factory ) : base( specification, context => factory.Create( context.BuildKey.Type ) ) { }
+		}
+
+		public ConventionStrategy( [Required]ConventionCandidateLocator locator, [Required]IServiceRegistry registry )
+		{
+			this.locator = locator;
+			this.registry = registry;
 		}
 
 		public override void PreBuildUp( IBuilderContext context )
@@ -507,16 +570,13 @@ namespace DragonSpark.Activation.IoC
 			var reference = new KeyReference( this, context.BuildKey ).Item;
 			if ( new Checked( reference, this ).Item.Apply() )
 			{
-				var type = context.BuildKey.Type;
-				context.New<ConventionCandidateLocator>().Create( context ).With( located =>
+				var convention = locator.Create( context );
+				convention.With( located =>
 				{
-					var mapped = new NamedTypeBuildKey( located, context.BuildKey.Name );
-
-					var registry = context.New<IServiceRegistry>();
-
-					registry.Register( new MappingRegistrationParameter( type, mapped.Type, context.BuildKey.Name ) );
-
-					context.BuildKey = mapped;
+					var from = context.BuildKey.Type;
+					context.BuildKey = new NamedTypeBuildKey( located, context.BuildKey.Name );
+					
+					registry.Register( new MappingRegistrationParameter( from, context.BuildKey.Type, context.BuildKey.Name ) );
 				} );
 			}
 		}

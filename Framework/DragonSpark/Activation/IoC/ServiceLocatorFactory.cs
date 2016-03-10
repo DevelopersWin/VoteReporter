@@ -19,8 +19,10 @@ namespace DragonSpark.Activation.IoC
 		{
 			var result = new UnityContainer()
 				.Extend<DefaultRegistrationsExtension>()
+				.Extend<BuildPipelineExtension>()
 				.Extend<InstanceTypeRegistrationMonitorExtension>()
-				.Extend<BuildPipelineExtension>();
+				.Extend<CompositionExtension>()
+				;
 			return result;
 		}
 	}

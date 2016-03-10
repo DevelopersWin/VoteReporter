@@ -28,7 +28,7 @@ namespace DragonSpark.Extensions
 
 		public static void Null<TItem>( this TItem target, Action action ) => target.IsNull().IsTrue( action );
 
-		public static bool IsNull<T>( this T @this ) => Equals( @this, default(T) );
+		public static bool IsNull<T>( this T @this ) => Equals( @this, null );
 
 		public static IEnumerable<TItem> Enumerate<TItem>( this IEnumerator<TItem> target )
 		{
@@ -125,6 +125,7 @@ namespace DragonSpark.Extensions
 		public static TItem AsValid<TItem>( this object @this, Action<TItem> with, string message )
 		{
 			var result = @this.As( with );
+			// if ( result.Is<TItem>() )
 			result.Null( () =>
 			{
 				throw new InvalidOperationException( message ?? $"'{@this.GetType().FullName}' is not of type {typeof(TItem).FullName}." );
