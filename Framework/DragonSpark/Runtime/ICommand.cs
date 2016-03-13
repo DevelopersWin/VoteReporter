@@ -43,15 +43,17 @@ namespace DragonSpark.Runtime
 	public class FixedCommand : DisposingCommand<object>
 	{
 		readonly ICommand command;
-		readonly object parameter;
+		readonly Func<object> parameter;
 
-		public FixedCommand( [Required]ICommand command, [Required]object parameter )
+		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command, () => parameter ) {}
+
+		public FixedCommand( [Required]ICommand command, [Required]Func<object> parameter )
 		{
 			this.command = command;
 			this.parameter = parameter;
 		}
 
-		protected override void OnExecute( object p ) => command.ExecuteWith( parameter );
+		protected override void OnExecute( object p ) => command.ExecuteWith( parameter() );
 
 		protected override void OnDispose()
 		{

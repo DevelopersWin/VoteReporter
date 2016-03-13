@@ -8,9 +8,7 @@ namespace DragonSpark.Composition
 {
 	public class FactoryDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
-		public FactoryDelegateExportDescriptorProvider( Assembly[] assemblies ) : this( new DiscoverableFactoryTypeLocator( assemblies ) ) {}
-
-		FactoryDelegateExportDescriptorProvider( DiscoverableFactoryTypeLocator locator ) : base( locator, DetermineContract, ( type, func ) => func.Convert( type ) ) {}
+		public FactoryDelegateExportDescriptorProvider( DiscoverableFactoryTypeLocator locator ) : base( locator, DetermineContract, ( type, func ) => func.Convert( type ) ) {}
 
 		static CompositionContract DetermineContract( CompositionContract contract )
 		{

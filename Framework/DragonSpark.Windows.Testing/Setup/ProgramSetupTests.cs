@@ -5,6 +5,7 @@ using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System;
 using System.Diagnostics;
@@ -29,7 +30,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, ProgramSetup.AutoData]
-		public void Create( [Located, EnsureValues]ApplicationInformation sut )
+		public void Create( [Located, EnsureValues]ApplicationInformation sut, [Located]AssemblyInformation temp )
 		{
 			Assert.NotNull( sut.AssemblyInformation );
 			Assert.Equal( DateTimeOffset.Parse( "2/1/2016" ), sut.DeploymentDate.GetValueOrDefault() );

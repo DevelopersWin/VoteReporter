@@ -10,4 +10,18 @@ namespace DragonSpark.Testing.Objects.Composition
 	{
 		protected override IBasicService CreateItem() => new BasicService().WithSelf( service => new Checked( service ).Item.Apply() );
 	}
+
+	[Export]
+	public class Parameter
+	{
+		public string Message { get; set; }
+	}
+
+	[Export]
+	public class ParameterServiceFactory : FactoryBase<Parameter, IParameterService>
+	{
+		public ParameterServiceFactory() : base( FactoryParameterCoercer<Parameter>.Instance ) {}
+
+		protected override IParameterService CreateItem( Parameter parameter ) => new ParameterService( parameter );
+	}
 }

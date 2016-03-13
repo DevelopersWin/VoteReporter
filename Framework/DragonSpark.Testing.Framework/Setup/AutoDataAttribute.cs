@@ -6,6 +6,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using DragonSpark.Composition;
 
 namespace DragonSpark.Testing.Framework.Setup
 {

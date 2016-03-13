@@ -2,9 +2,11 @@ using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Setup.Registration;
 
 namespace DragonSpark.ComponentModel
 {
+	[Persistent]
 	public class MemberInfoLocator : TransformerBase<MemberInfo>, IMemberInfoLocator
 	{
 		public static MemberInfoLocator Instance { get; } = new MemberInfoLocator();

@@ -16,6 +16,8 @@ namespace DragonSpark.TypeSystem
 		public static Assembly[] GetCurrent() => Resolve( Services.Locate<Assembly[]>() );
 
 		public delegate Assembly[] Get();
+
+		public static System.Type[] GetTypes( this Get @this ) => @this().SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
 	}
 
 	public class AssemblyHost : ExecutionContextValue<Assembly[]> {}

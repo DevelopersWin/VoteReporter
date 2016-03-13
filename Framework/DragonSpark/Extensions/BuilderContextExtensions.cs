@@ -8,9 +8,9 @@ namespace DragonSpark.Extensions
 {
 	public static class BuilderContextExtensions
 	{
-		public static BuilderContext Context<T>( this ExtensionContext @this ) => new BuilderContext( @this.Strategies.MakeStrategyChain(), @this.Lifetime, @this.Policies, NamedTypeBuildKey.Make<T>(), null );
+		/*public static BuilderContext Context<T>( this ExtensionContext @this ) => new BuilderContext( @this.Strategies.MakeStrategyChain(), @this.Lifetime, @this.Policies, NamedTypeBuildKey.Make<T>(), null );
 
-		public static T New<T>( this ExtensionContext @this ) => @this.Context<T>().With( context => context.New<T>() );
+		public static T New<T>( this ExtensionContext @this ) => @this.Context<T>().With( context => context.New<T>() );*/
 
 		/*public static T AddStrategy<T>( this ExtensionContext @this, UnityBuildStage stage ) where T : IBuilderStrategy
 		{
@@ -19,7 +19,7 @@ namespace DragonSpark.Extensions
 			return result;
 		}*/
 
-		public static bool HasDefaultBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ).With( policy => !new DefaultInjection.Applied( policy ).Item.IsApplied );
+		public static bool HasRegisteredBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ).With( policy => !new DefaultInjection.Applied( policy ).Item.IsApplied );
 
 		public static bool HasBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ) != null;
 
@@ -42,7 +42,7 @@ namespace DragonSpark.Extensions
 		public static void Complete( this IBuilderContext @this, object result )
 		{
 			@this.Existing = result;
-			@this.BuildComplete = true;
+			@this.BuildComplete = result != null;
 		}
 
 		public static bool HasBuildPlan( this IPolicyList @this, NamedTypeBuildKey key ) => GetBuildPlan( @this, key ) != null;

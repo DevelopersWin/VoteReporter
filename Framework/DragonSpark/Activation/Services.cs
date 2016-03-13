@@ -21,6 +21,10 @@ namespace DragonSpark.Activation
 
 		public static IServiceLocation Location { get; private set; }
 
-		public static T Locate<T>() => Location.Locate<T>().OrDefault( Activator.Activate<T> );
+		public static T Locate<T>()
+		{
+			var locate = Location.Locate<T>();
+			return locate.OrDefault( Activator.Activate<T> );
+		}
 	}
 }

@@ -6,15 +6,20 @@ namespace DragonSpark.Diagnostics
 {
 	public class RecordingLoggerFactory : FactoryBase<ILogger>
 	{
-		readonly RecordingLogEventSink sink;
+		public RecordingLoggerFactory() : this( new RecordingLogEventSink(), new LoggingLevelSwitch() ) {}
 
-		public RecordingLoggerFactory() : this( new RecordingLogEventSink() ) {}
-
-		public RecordingLoggerFactory( [Required]RecordingLogEventSink sink )
+		public RecordingLoggerFactory( [Required]RecordingLogEventSink sink, [Required]Serilog.Core.LoggingLevelSwitch levelSwitch )
 		{
-			this.sink = sink;
+			Sink = sink;
+			LevelSwitch = levelSwitch;
 		}
 
-		protected override ILogger CreateItem() => new LoggerConfiguration().WriteTo.Sink( sink ).CreateLogger();
+		public RecordingLogEventSink Sink { get; }
+		public Serilog.Core.LoggingLevelSwitch LevelSwitch { get; }
+
+		protected override ILogger CreateItem() => new LoggerConfiguration()
+			.WriteTo.Sink( Sink )
+			.MinimumLevel.ControlledBy( LevelSwitch )
+			.CreateLogger();
 	}
 }

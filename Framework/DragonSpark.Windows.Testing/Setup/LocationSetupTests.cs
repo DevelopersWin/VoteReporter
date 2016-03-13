@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
@@ -356,6 +357,28 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( sut.Object, item );
 		}
 
+		/*[Fact]
+		public void Mocked()
+		{
+			/*var currentMethod = (MethodInfo)MethodBase.GetCurrentMethod();
+			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( currentMethod ) ) )
+			{
+				using ( var container = CompositionHostFactory.Instance.Create( AssemblyProvider.Instance.Create() ) )
+				{
+					new CompositionHostContext().Assign( container );
+					var temp = container.GetExport<ConfigureServiceLocationContext>();
+				}
+				/*var autoData = new AutoData( FixtureFactory.Instance.Create(), currentMethod );
+				var instance = new ApplicationWithLocation<UnitySetup>().ExecuteWith( autoData );
+				Assert.True( true );#2#
+			}#1#
+			using ( var container = CompositionHostFactory.Instance.Create( AssemblyProvider.Instance.Create() ) )
+			{
+				// new CompositionHostContext().Assign( container );
+				var temp = container.GetExport<ConfigureServiceLocationContext>();
+			}
+		}*/
+
 		[Theory, LocationSetup.AutoData]
 		public void GetAllInstances( IServiceLocator sut )
 		{
@@ -412,6 +435,31 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( fromContainer, fromProvider );
 
 			Assert.Equal( fromContainer, sut );
+		}
+
+		[Theory, LocationSetup.AutoData]
+		public void ConventionLocator( BuildableTypeFromConventionLocator locator )
+		{
+			var type = locator.Create( typeof(Assembly) );
+			Assert.Null( type );
+		}
+
+		[Theory, LocationSetup.AutoData]
+		public void CreateAssemblySimple( IUnityContainer container, IApplicationAssemblyLocator locator, [Located] Assembly sut )
+		{
+			Assert.True( container.IsRegistered<Assembly>() );
+		}
+
+		[Theory, LocationSetup.AutoData]
+		public void BasicComposition( Assembly[] assemblies, ExportDescriptorProvider provider )
+		{
+			using ( var container = CompositionHostFactory.Instance.Create( assemblies ) )
+			{
+				container.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
+
+				var test = container.GetExport<Assembly>();
+				Assert.NotNull( test );
+			}
 		}
 
 		[Theory, LocationSetup.AutoData]

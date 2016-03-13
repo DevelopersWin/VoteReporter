@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using PostSharp.Patterns.Model;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -35,37 +36,16 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public interface IApplication : DragonSpark.Setup.IApplication, ICommand<AutoData>, IDisposable { }
 
-	// [Disposable( ThrowObjectDisposedException = true )]
 	public class Application : DragonSpark.Setup.Application<AutoData>, IApplication
 	{
-		// [Child]
-		readonly ICollection<IDisposable> disposables = new AdvisableCollection<IDisposable>();
-
 		public Application( params ICommand[] commands ) : this( TypeSystem.Assemblies.GetCurrent(), commands ) {}
 
 		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, commands ) {}
 
-		protected override void ExecuteCore( ICommand[] commands, AutoData parameter )
+		public void Dispose()
 		{
-			disposables.AddRange( commands.Reverse().OfType<IDisposable>() );
-			base.ExecuteCore( commands, parameter );
+			Commands.OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
+			Commands.Clear();
 		}
-
-		public void Dispose() => disposables.Purge().Each( disposable => disposable.Dispose() );
 	}
-
-	/*public class ApplicationCommandFactory : ApplicationCommandFactory<AutoData>
-	{
-		public ApplicationCommandFactory( IEnumerable<ICommand> commands ) : base( commands ) {}
-
-		protected override IEnumerable<ICommand> DetermineContextCommands( ApplicationExecutionParameter<AutoData> parameter )
-		{
-			// yield return new FixedCommand(  );
-			foreach ( var item in base.DetermineContextCommands( parameter ) )
-			{
-				yield return item;
-			}
-			yield return new FixedCommand(  );
-		}
-	}*/
 }

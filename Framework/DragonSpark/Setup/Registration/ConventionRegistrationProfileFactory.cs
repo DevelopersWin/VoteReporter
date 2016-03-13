@@ -14,6 +14,7 @@ namespace DragonSpark.Setup.Registration
 	{
 		readonly Assembly[] assemblies;
 
+		[ImportingConstructor]
 		public ConventionRegistrationProfileFactory( [Required]Assembly[] assemblies )
 		{
 			this.assemblies = assemblies;

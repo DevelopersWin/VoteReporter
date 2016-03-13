@@ -7,10 +7,10 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
+	[Export]
 	public class AssemblyInformationFactory : FactoryBase<Assembly, AssemblyInformation>
 	{
-		[Export]
-		public static AssemblyInformationFactory Instance { get; } = new AssemblyInformationFactory();
+		// public static AssemblyInformationFactory Instance { get; } = new AssemblyInformationFactory();
 
 		readonly static System.Type[] Attributes =
 		{
@@ -22,7 +22,7 @@ namespace DragonSpark.TypeSystem
 			typeof(AssemblyCopyrightAttribute)
 		};
 
-		AssemblyInformationFactory() : base( new FactoryParameterCoercer<Assembly>() ) {}
+		public AssemblyInformationFactory() : base( new FactoryParameterCoercer<Assembly>() ) {}
 
 		protected override AssemblyInformation CreateItem( Assembly parameter )
 		{

@@ -3,15 +3,17 @@ using DragonSpark.ComponentModel;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
-using DragonSpark.TypeSystem;
+using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Runtime.Specifications;
+using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Setup
 {
@@ -28,6 +30,24 @@ namespace DragonSpark.Setup
 
 		public ApplicationContext( params IWritableValue<Assembly[]>[] values ) : base( values ) {}
 	}
+
+	/*public class ApplicationConfiguration
+	{
+		readonly Assembly[] assemblies;
+
+		public ApplicationConfiguration( Assembly[] assemblies )
+		{
+			this.assemblies = assemblies;
+		}
+	}
+
+	public class ApplicationFactory : FactoryBase<IApplication>
+	{
+		protected override IApplication CreateItem()
+		{
+			throw new NotImplementedException();
+		}
+	}*/
 
 	public class CompositionHost : FixedValue<Assembly[]>
 	{
@@ -51,67 +71,33 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	/*public interface IApplication<in T> : ICommand<T>, IApplication
-	{
-		void Run();
-	}*/
-
 	public interface IApplication : ICommand
 	{
+		/*CompositionHost Host { get; }
+
+		IServiceLocator Locator { get; }*/
+
 		Assembly[] Assemblies { get; }
-	}
-
-	public class ApplicationExecutionParameter<T>
-	{
-		public ApplicationExecutionParameter( [Required]IApplication application, T arguments )
-		{
-			Application = application;
-			Arguments = arguments;
-		}
-
-		public IApplication Application { get; }
-		public T Arguments { get; }
-	}
-
-	public class ApplicationCommandFactory<T> : FactoryBase<ApplicationExecutionParameter<T>, ICommand[]>
-	{
-		readonly ICommand[] commands;
-
-		public ApplicationCommandFactory( [Required]IEnumerable<ICommand> commands )
-		{
-			this.commands = commands.Fixed();
-		}
-
-		protected override ICommand[] CreateItem( ApplicationExecutionParameter<T> parameter ) => DetermineContextCommands( parameter ).Concat( commands ).ToArray();
-
-		protected virtual IEnumerable<ICommand> DetermineContextCommands( ApplicationExecutionParameter<T> parameter )
-		{
-			yield return new FixedCommand( new AssignApplication(), parameter.Application.Assemblies );
-			yield return new FixedCommand( new AmbientContextCommand<ITaskMonitor>(), new TaskMonitor() );
-		}
 	}
 
 	public abstract class Application<TParameter> : CompositeCommand<TParameter, ISpecification<TParameter>>, IApplication
 	{
-		readonly IFactory<ApplicationExecutionParameter<TParameter>, ICommand[]> commandFactory;
-
-		protected Application( [Required]Assembly[] assemblies, IEnumerable<ICommand> commands ) : this( assemblies, new ApplicationCommandFactory<TParameter>( commands ) ) {}
-
-		protected Application( [Required]Assembly[] assemblies, [Required]IFactory<ApplicationExecutionParameter<TParameter>, ICommand[]> commandFactory ) : base( new WrappedSpecification<TParameter>( new OnlyOnceSpecification() ) )
+		protected Application( [Required]Assembly[] assemblies, IEnumerable<ICommand> commands ) 
+			: base( new WrappedSpecification<TParameter>( new OnlyOnceSpecification() ), commands.ToArray() )
 		{
 			Assemblies = assemblies;
-			this.commandFactory = commandFactory;
+
+			var core = new ICommand[]
+			{
+				new FixedCommand( new AssignApplication(), () => Assemblies ),
+				new FixedCommand( new AmbientContextCommand<ITaskMonitor>(), () => new TaskMonitor() )
+			};
+
+			core.Each( Commands.Insert );
 		}
 
 		[Required]
 		public Assembly[] Assemblies { [return: Required]get; set; }
-
-		protected override IEnumerable<ICommand> DetermineCommands( TParameter parameter )
-		{
-			var context = new ApplicationExecutionParameter<TParameter>( this, parameter );
-			var result = commandFactory.Create( context ).Concat( base.DetermineCommands( parameter ) ).ToArray();
-			return result;
-		}
 	}
 
 	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand
@@ -132,23 +118,10 @@ namespace DragonSpark.Setup
 
 	public interface ISetup : ICommand<object> {}
 
-	public class Setup : SetupContainerBase<object>, ISetup {}
-
-	public abstract class SetupContainerBase<T> : CompositeCommand<T>
+	public class Setup : CompositeCommand, ISetup
 	{
-		protected SetupContainerBase( params ICommand<T>[] commands ) : base( commands ) {}
+		public Setup( params ICommand[] commands ) : base( commands ) {}
 
 		public Collection<object> Items { get; } = new Collection<object>();
 	}
-
-	/*public abstract class Setup : SetupContainerBase<object>, ISetup
-	{
-		protected override void OnExecute( object parameter )
-		{
-			using ( new AmbientContextCommand<ISetup>().ExecuteWith( this ) )
-			{
-				base.OnExecute( parameter );
-			}
-		}
-	}*/
 }

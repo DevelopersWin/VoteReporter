@@ -7,7 +7,9 @@ using Moq;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using Serilog.Core;
 using Xunit;
+using LoggingLevelSwitch = DragonSpark.Diagnostics.LoggingLevelSwitch;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
@@ -290,7 +292,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockRecordingLogEventSink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			var logger = new RecordingLoggerFactory( sink, new LoggingLevelSwitch() ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			ModuleManager manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -317,7 +319,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockRecordingLogEventSink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			var logger = new RecordingLoggerFactory( sink, new LoggingLevelSwitch() ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManagerExtended(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -360,7 +362,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockRecordingLogEventSink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			var logger = new RecordingLoggerFactory( sink, new LoggingLevelSwitch() ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			manager.LoadModuleCompleted += ( sender, args ) => args.IsErrorHandled = true;

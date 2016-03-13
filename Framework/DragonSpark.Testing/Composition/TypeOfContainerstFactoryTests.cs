@@ -9,7 +9,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Composition
 {
-	public class CompositionHostFactoryTests
+	public class TypeOfContainerstFactoryTests
 	{
 		[Theory, AutoData]
 		public void BasicComposition( Assembly[] assemblies, string text )
@@ -19,6 +19,17 @@ namespace DragonSpark.Testing.Composition
 				var test = container.GetExport<IBasicService>();
 				var message = test.HelloWorld( text );
 				Assert.Equal( $"Hello there! {text}", message );
+			}
+		}
+
+		[Theory, AutoData]
+		public void BasicCompositionWithParameter( Assembly[] assemblies, string text )
+		{
+			using ( var container = CompositionHostFactory.Instance.Create( assemblies ) )
+			{
+				var test = container.GetExport<IParameterService>();
+				var parameter = Assert.IsType<Parameter>( test.Parameter );
+				Assert.Equal( "Assigned by ParameterService", parameter.Message );
 			}
 		}
 

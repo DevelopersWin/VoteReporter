@@ -8,8 +8,10 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
+using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Composition;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.FactoryModel
@@ -21,11 +23,7 @@ namespace DragonSpark.Activation.FactoryModel
 			BasicTypes = new[] { typeof(IFactory), typeof(IFactoryWithParameter) }.Select( type => type.Adapt() ).ToArray();
 		
 		[Freeze]
-		public static bool IsFactory( [Required] Type type )
-		{
-			var isFactory = BasicTypes.Any( adapter => adapter.IsAssignableFrom( type ) );
-			return isFactory;
-		}
+		public static bool IsFactory( [Required] Type type ) => BasicTypes.Any( adapter => adapter.IsAssignableFrom( type ) );
 
 		public static T Create<T>() => (T)Create( typeof(T) );
 
@@ -38,22 +36,14 @@ namespace DragonSpark.Activation.FactoryModel
 			return result;
 		}
 
-		[Freeze]
-		public static Type GetParameterType( [Required]Type factoryType )
-		{
-			var result = Get( factoryType, types => types.First(), Types.Last() );
-			return result;
-		}
+		// [Freeze]
+		public static Type GetParameterType( [Required, OfFactoryType]Type factoryType ) => Get( factoryType, types => types.First(), Types.Last() );
 
 		[Freeze]
-		public static Type GetInterface( [Required] Type factoryType )
-		{
-			var result = factoryType.Adapt().GetAllInterfaces().FirstOrDefault( IsFactory );
-			return result;
-		}
+		public static Type GetInterface( [Required, OfFactoryType] Type factoryType ) => factoryType.Adapt().GetAllInterfaces().FirstOrDefault( IsFactory );
 
 		[Freeze]
-		public static Type GetResultType( [Required]Type factoryType ) => Get( factoryType, types => types.Last(), Types );
+		public static Type GetResultType( [Required, OfFactoryType]Type factoryType ) => Get( factoryType, types => types.Last(), Types );
 
 		static Type Get( Type factoryType, Func<Type[], Type> selector, params TypeAdapter[] typesToCheck )
 		{
@@ -68,11 +58,11 @@ namespace DragonSpark.Activation.FactoryModel
 
 	public class FactoryDelegateLocatorFactory : FirstFromParameterFactory<Type, Func<object>>
 	{
-		public static FactoryDelegateLocatorFactory Instance { get; } = new FactoryDelegateLocatorFactory();
+		public static FactoryDelegateLocatorFactory Instance { get; } = new FactoryDelegateLocatorFactory( FactoryDelegateFactory.Instance, FactoryWithActivatedParameterDelegateFactory.Instance );
 
-		public FactoryDelegateLocatorFactory() : base( 
-			new Factory<IFactoryWithParameter>( FactoryWithActivatedParameterDelegateFactory.Instance ),
-			new Factory<IFactory>( FactoryDelegateFactory.Instance )
+		public FactoryDelegateLocatorFactory( FactoryDelegateFactory factory, FactoryWithActivatedParameterDelegateFactory factoryWithParameter ) : base( 
+			new Factory<IFactory>( factory ),
+			new Factory<IFactoryWithParameter>( factoryWithParameter )
 		) {}
 
 		class Factory<T> : SpecificationAwareFactory<Type, Func<object>>
@@ -120,40 +110,35 @@ namespace DragonSpark.Activation.FactoryModel
 		[Freeze]
 		protected override Type CreateItem( T parameter )
 		{
-			var mapped = type( parameter );
-			var candidates = new[] { locations( parameter ).Append( mapped, GetType() ).Assemblies().Distinct().Fixed, assemblies };
-			var result = candidates.FirstWhere( get => new DiscoverableFactoryTypeLocator( get() ).Create( mapped ) );
+			var mapped = new CompositionContract( type( parameter ) );
+			var candidates = new[] { locations( parameter ).Append( mapped.ContractType, GetType() ).Assemblies().Distinct().Fixed, assemblies };
+			var result = candidates.Select( get => new DiscoverableFactoryTypeLocator( new FactoryTypeContainer( get.GetTypes() ) ) ).FirstWhere( get => get.Create( mapped ) );
 			return result;
 		}
 	}
 
-	public class DiscoverableFactoryTypeLocator : FactoryBase<Type, Type>
+	[Persistent]
+	public class DiscoverableFactoryTypeLocator : FactoryBase<CompositionContract, Type>
 	{
-		readonly Assembly[] assemblies;
+		readonly FactoryTypeContainer container;
 
-		public DiscoverableFactoryTypeLocator( [Required]Assembly[] assemblies )
+		public DiscoverableFactoryTypeLocator( [Required]FactoryTypeContainer container )
 		{
-			this.assemblies = assemblies;
+			this.container = container;
 		}
 
-		protected override Type CreateItem( Type parameter )
+		// [Freeze]
+		protected override Type CreateItem( CompositionContract parameter )
 		{
-			var name = $"{parameter.Name}Factory";
-			var result =
-				assemblies.FirstWhere( assembly =>
-				{
-					var enumerable = assembly.DefinedTypes.AsTypes().Where( Factory.IsFactory ).Where( x => x.IsDefined<ExportAttribute>( true ) );
-					var buildable = enumerable.Where( CanBuildSpecification.Instance.IsSatisfiedBy ).ToArray();
-					return buildable.With( types =>
-						types.Where( info => info.Name == name ).Only()
-						??
-						types.Select( type => new { type, resultType = Factory.GetResultType( type ) } ).NotNull( arg => arg.resultType ).ToArray().With( pairs =>
-						{
-							var assignable = CanBuildSpecification.Instance.IsSatisfiedBy( parameter ) ? pairs.Where( arg => parameter.Adapt().IsAssignableFrom( arg.resultType ) ) : Enumerable.Empty<dynamic>();
-							return pairs.Where( arg => arg.resultType == parameter ).Concat( assignable ).WithFirst( arg => arg.type );
-						} )
-					);
-				} );
+			var name = $"{parameter.ContractType.Name}Factory";
+			var candidates = container.Where( type => parameter.ContractName == type.Name && type.ResultType.Adapt().IsAssignableFrom( parameter.ContractType ) ).ToArray();
+			var item = 
+				candidates.Only( info => info.FactoryType.Name == name )
+				??
+				candidates.FirstOrDefault( arg => arg.ResultType == parameter.ContractType )
+				??
+				candidates.FirstOrDefault();
+			var result = item.With( profile => profile.FactoryType );
 			return result;
 		}
 	}

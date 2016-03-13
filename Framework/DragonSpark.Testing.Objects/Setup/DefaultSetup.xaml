@@ -5,7 +5,12 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:localSetup="clr-namespace:DragonSpark.Testing.Objects.Setup"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
+	xmlns:setup1="clr-namespace:DragonSpark.Testing.Framework.Setup;assembly=DragonSpark.Testing.Framework"
 	mc:Ignorable="d"
 >
-	<localSetup:DefaultCustomizeFixtureCommand />
+	<localSetup:DefaultCustomizeFixtureCommand>
+		<localSetup:DefaultCustomizeFixtureCommand.PreCustomizations>
+			<setup1:CompositionCustomization />
+		</localSetup:DefaultCustomizeFixtureCommand.PreCustomizations>
+	</localSetup:DefaultCustomizeFixtureCommand>
 </setup:Setup>

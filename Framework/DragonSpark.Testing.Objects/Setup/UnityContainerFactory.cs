@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Windows.Input;
+using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -20,11 +21,14 @@ namespace DragonSpark.Testing.Objects.Setup
 		}
 	}
 
+	/*[Export, Shared]
+	public class LoggingLevelSwitch : Serilog.Core.LoggingLevelSwitch { }*/
+
 	[Export, Shared]
 	public class RecordingLoggerFactory : Diagnostics.RecordingLoggerFactory
 	{
 		[ImportingConstructor]
-		public RecordingLoggerFactory( RecordingLogEventSink sink ) : base( sink ) {}
+		public RecordingLoggerFactory( RecordingLogEventSink sink, LoggingLevelSwitch levelSwitch ) : base( sink, levelSwitch ) {}
 	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute

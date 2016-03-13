@@ -9,6 +9,6 @@ namespace DragonSpark.Windows.Setup
 	{
 		public ConsoleApplication( params ICommand[] commands ) : this( Default<Assembly>.Items, commands ) {}
 
-		public ConsoleApplication( Assembly[] assemblies, params ICommand[] commands ) : base( assemblies, new ApplicationCommandFactory<string[]>( commands ) ) {}
+		public ConsoleApplication( Assembly[] assemblies, params ICommand[] commands ) : base( assemblies, commands ) {}
 	}
 }

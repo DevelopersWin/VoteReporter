@@ -7,7 +7,9 @@ using Moq;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using Serilog.Core;
 using Xunit;
+using LoggingLevelSwitch = DragonSpark.Diagnostics.LoggingLevelSwitch;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
@@ -66,7 +68,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		{
 			IServiceLocator containerFacade = new MockContainerAdapter();
 			var sink = new MockRecordingLogEventSink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			var logger = new RecordingLoggerFactory( sink, new LoggingLevelSwitch() ).Create();
 			var service = new ModuleInitializer(containerFacade, logger);
 			ExceptionThrowingModule.wasInitializedOnce = false;
 			var exceptionModule = CreateModuleInfo(typeof(ExceptionThrowingModule));

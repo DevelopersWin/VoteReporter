@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Objects
 	{
 		readonly Func<YetAnotherClass> inner;
 
-		public FactoryOfYAC() : this( ActivateFactory<YetAnotherClass>.Instance.Create ) {}
+		public FactoryOfYAC() : this( () => new YetAnotherClass() ) {}
 
 		FactoryOfYAC( [Required] Func<YetAnotherClass> inner )
 		{

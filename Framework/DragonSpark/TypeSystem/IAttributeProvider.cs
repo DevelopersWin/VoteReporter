@@ -54,7 +54,7 @@ namespace DragonSpark.TypeSystem
 
 		public MemberInfoProviderFactory() : this( MemberInfoAttributeProviderFactory.Instance ) {}
 
-		MemberInfoProviderFactory( MemberInfoAttributeProviderFactory inner ) : base( inner, false ) {}
+		public MemberInfoProviderFactory( MemberInfoAttributeProviderFactory inner ) : base( inner, false ) {}
 	}
 
 	abstract class MemberInfoProviderFactoryBase : FactoryBase<object, IAttributeProvider>

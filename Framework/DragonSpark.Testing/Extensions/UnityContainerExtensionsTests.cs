@@ -4,8 +4,10 @@ using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using Microsoft.Practices.Unity;
+using Serilog.Events;
 using System.Linq;
 using Xunit;
+using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 namespace DragonSpark.Testing.Extensions
 {
@@ -14,7 +16,11 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, Framework.Setup.AutoData]
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
+			var levelSwitch = sut.Resolve<LoggingLevelSwitch>();
+			levelSwitch.MinimumLevel = LogEventLevel.Debug;
+
 			var logger = sut.Resolve<RecordingLogEventSink>();
+			Assert.Same( logger, sut.Resolve<RecordingLogEventSink>() );
 			var initial = logger.Events.Count();
 			Assert.NotEmpty( logger.Events );
 

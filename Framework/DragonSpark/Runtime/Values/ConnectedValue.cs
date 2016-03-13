@@ -75,6 +75,13 @@ namespace DragonSpark.Runtime.Values
 		protected override string CreateItem( EqualityList parameter ) => $"{typeof(T)}-{parameter.GetHashCode()}";
 	}
 
+	public class ConnectedValueKeyFactory : FactoryBase<object, string>
+	{
+		public static ConnectedValueKeyFactory Instance { get; } = new ConnectedValueKeyFactory();
+
+		protected override string CreateItem( object parameter ) => $"{parameter.GetType()}-{parameter.GetHashCode()}";
+	}
+
 	public class Reference<T> : ConnectedValue<T>
 	{
 		public Reference( object instance, T key ) : base( instance, ConnectedValueKeyFactory<T>.Instance.Create( new EqualityList( key ) ), () => key ) {}
@@ -84,7 +91,7 @@ namespace DragonSpark.Runtime.Values
 	{
 		public Checked( object instance ) : this( instance, instance ) {}
 
-		public Checked( object instance, [Required]object reference ) : this( instance, reference.GetType() ) {}
+		public Checked( object instance, [Required]object reference ) : this( instance, ConnectedValueKeyFactory.Instance.Create( reference ) ) {}
 
 		public Checked( [Required]object instance, [Required]string key ) : base( instance, key, () => new ConditionMonitor() ) { }
 

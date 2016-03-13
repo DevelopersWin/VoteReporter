@@ -7,7 +7,6 @@
 	xmlns:autoMoq="clr-namespace:Ploeh.AutoFixture.AutoMoq;assembly=Ploeh.AutoFixture.AutoMoq"
 	mc:Ignorable="d" 
 >
-	<setup:CompositionCustomization />
 	<x:Static Member="setup:MetadataCustomization.Instance" />
 	<setup:OutputCustomization />
 	<autoMoq:AutoConfiguredMoqCustomization />

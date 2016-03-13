@@ -55,28 +55,26 @@ namespace DragonSpark.Activation.FactoryModel
 
 	public class SpecificationAwareFactory<T, U> : FactoryBase<T, U>
 	{
-		readonly ISpecification specification;
+		readonly ISpecification<T> specification;
 		readonly Func<T, U> inner;
 
-		public SpecificationAwareFactory( Func<T, U> inner ) : this( AlwaysSpecification.Instance, inner ) {}
+		public SpecificationAwareFactory( Func<T, U> inner ) : this( new WrappedSpecification<T>( AlwaysSpecification.Instance ), inner ) {}
 
-		public SpecificationAwareFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : this( (ISpecification)specification, inner ) {}
-
-		SpecificationAwareFactory( [Required]ISpecification specification, [Required]Func<T, U> inner ) : base( FactoryParameterCoercer<T>.Instance )
+		public SpecificationAwareFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : base( FactoryParameterCoercer<T>.Instance )
 		{
 			this.specification = specification;
 			this.inner = inner;
 		}
 
-		protected override U CreateItem( T parameter ) => specification.IsSatisfiedBy( parameter ) ? inner( (T)parameter ) : default(U);
+		protected override U CreateItem( T parameter ) => specification.IsSatisfiedBy( parameter ) ? inner( parameter ) : default(U);
 	}
 
-	public class FirstFromParameterFactory<T> : FirstFromParameterFactory<object, T>
+	/*public class FirstFromParameterFactory<T> : FirstFromParameterFactory<object, T>
 	{
 		public FirstFromParameterFactory( params IFactory<object, T>[] factories ) : base( factories ) {}
 
 		public FirstFromParameterFactory( params Func<object, T>[] inner ) : base( inner ) {}
-	}
+	}*/
 
 	public class FirstFromParameterFactory<T, U> : FactoryBase<T, U>
 	{
@@ -89,11 +87,7 @@ namespace DragonSpark.Activation.FactoryModel
 			this.inner = inner;
 		}
 
-		protected override U CreateItem( T parameter )
-		{
-			var result = inner.FirstWhere( factory => factory( parameter ) );
-			return result;
-		}
+		protected override U CreateItem( T parameter ) => inner.FirstWhere( factory => factory( parameter ) );
 	}
 
 	public class FirstFactory<T> : FactoryBase<T>

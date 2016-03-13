@@ -63,6 +63,8 @@ namespace DragonSpark.Runtime
 
 		public void Add( T item ) => items.Add( item );
 
+		public void Insert( T item ) => items.Insert( 0, item );
+
 		int IList.Add( object value )
 		{
 			var item = OnAdd( value );

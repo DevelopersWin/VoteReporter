@@ -1,19 +1,19 @@
-using DragonSpark.Setup.Registration;
+using DragonSpark.Activation.FactoryModel;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
 using System.IO;
 using System.Reflection;
-using DragonSpark.Activation.FactoryModel;
-using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Windows.Runtime
 {
-	[Export]
+	[Export, Shared]
 	public class ApplicationAssemblyLocator : FirstFactory<Assembly>, IApplicationAssemblyLocator
 	{
-		public ApplicationAssemblyLocator( DomainApplicationAssemblyLocator domain, TypeSystem.ApplicationAssemblyLocator system ) : base( domain, system ) {}
+		[ImportingConstructor]
+		public ApplicationAssemblyLocator( [Required]DomainApplicationAssemblyLocator domain, [Required]TypeSystem.ApplicationAssemblyLocator system ) : base( domain, system ) {}
 	}
 
 	public class DomainApplicationAssemblyLocator : FactoryBase<Assembly>

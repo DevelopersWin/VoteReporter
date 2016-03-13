@@ -85,15 +85,15 @@ namespace DragonSpark.Diagnostics
 	{
 		public MinimumLevelSwitchCommand() : this( LogEventLevel.Information ) {}
 
-		public MinimumLevelSwitchCommand( LogEventLevel level ) : this( new LoggingLevelSwitch( level ) ) {}
+		public MinimumLevelSwitchCommand( LogEventLevel level ) : this( new Serilog.Core.LoggingLevelSwitch( level ) ) {}
 
-		public MinimumLevelSwitchCommand( [Required]LoggingLevelSwitch controller )
+		public MinimumLevelSwitchCommand( [Required]Serilog.Core.LoggingLevelSwitch controller )
 		{
 			Controller = controller;
 		}
 
 		[Required]
-		public LoggingLevelSwitch Controller { [return: Required]get; set; }
+		public Serilog.Core.LoggingLevelSwitch Controller { [return: Required]get; set; }
 
 		protected override void Configure( LoggerMinimumLevelConfiguration configuration ) => configuration.ControlledBy( Controller );
 	}
