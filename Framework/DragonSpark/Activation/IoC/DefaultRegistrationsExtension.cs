@@ -214,13 +214,11 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		readonly Func<ILogger> logger;
-		readonly PersistentServiceRegistry registry;
 
-		public DefaultValueStrategy( [Required]IUnityContainer container, [Required]Func<ILogger> logger, [Required]PersistentServiceRegistry registry )
+		public DefaultValueStrategy( [Required]IUnityContainer container, [Required]Func<ILogger> logger )
 		{
 			this.container = container;
 			this.logger = logger;
-			this.registry = registry;
 		}
 
 		public override void PostBuildUp( IBuilderContext context ) => context.Existing.With( existing =>
@@ -235,7 +233,6 @@ namespace DragonSpark.Activation.IoC
 				logger().Debug( message );
 
 				context.Policies.ClearBuildPlan( reference );
-				// registry.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing, context.BuildKey.Name ) );
 			}
 		} );
 	}

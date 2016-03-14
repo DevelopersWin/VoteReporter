@@ -17,14 +17,9 @@ namespace DragonSpark.Activation.FactoryModel
 
 	public abstract class TransformerBase<T> : FactoryBase<T, T>, ITransformer<T>
 	{
-		readonly ISpecification<T> specification;
-
 		protected TransformerBase() : base( new FactoryParameterCoercer<T>() ) {}
 
-		protected TransformerBase( [Required]ISpecification<T> specification  ) : base( specification, new FactoryParameterCoercer<T>() )
-		{
-			this.specification = specification;
-		}
+		protected TransformerBase( [Required]ISpecification<T> specification  ) : base( specification, new FactoryParameterCoercer<T>() ) {}
 	}
 
 	public class CommandTransformer<TCommand, T> : TransformerBase<T> where TCommand : ICommand<T>

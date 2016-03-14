@@ -1,6 +1,7 @@
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.Collections.Generic;
+using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
@@ -9,37 +10,31 @@ using ExportDescriptorProvider = System.Composition.Hosting.Core.ExportDescripto
 
 namespace DragonSpark.Composition
 {
-	public class InstanceExportDescriptorProvider : ExportDescriptorProvider
+	public static class CompositionHostExtensions
 	{
-		readonly object instance;
-		readonly string name;
+		public static ContainerConfiguration WithInstance<T>( [Required] this ContainerConfiguration @this, T instance, string name = null ) => @this.WithProvider( new InstanceExportDescriptorProvider<T>( instance, name ) );
+	}
 
-		public InstanceExportDescriptorProvider( [Required]object instance, string name = null )
+	public class InstanceExportDescriptorProvider<T> : ExportDescriptorProvider
+	{
+		readonly T instance;
+		readonly CompositionContract[] contracts;
+
+		public InstanceExportDescriptorProvider( [Required]T instance, string name = null )
 		{
 			this.instance = instance;
-			this.name = name;
+			contracts = new [] { typeof(T), instance.GetType() }.Distinct().Select( type => new CompositionContract( type, name ) ).ToArray();
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
-			if ( contract.ContractType.Adapt().IsInstanceOfType( instance ) && contract.ContractName == name )
+			if ( contracts.Contains( contract ) )
 			{
 				new ExportProperties.Instance( instance ).Assign( true );
 				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => instance, NoMetadata ) );
 			}
 		}
 	}
-
-	/*public class HostExportDescriptorProvider : ExportDescriptorProvider
-	{
-		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
-		{
-			if ( contract.ContractType.Adapt().IsInstanceOfType( instance ) && contract.ContractName == name )
-			{
-				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => context., NoMetadata ) );
-			}
-		}
-	}*/
 
 	public interface IExportDescriptorProviderRegistry
 	{
@@ -60,8 +55,26 @@ namespace DragonSpark.Composition
 			var result = contract.ContractType == typeof(IExportDescriptorProviderRegistry) ?
 				new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => this, NoMetadata ) ).ToItem()
 				:
-				providers.SelectMany( provider => provider.GetExportDescriptors( contract, descriptorAccessor ) );
+				providers.SelectMany( provider => provider.GetExportDescriptors( contract, new Accessor( descriptorAccessor, providers.Except( provider.ToItem() ) ) ) );
 			return result;
+		}
+
+		class Accessor : DependencyAccessor
+		{
+			readonly DependencyAccessor accessor;
+			readonly IEnumerable<ExportDescriptorProvider> providers;
+
+			public Accessor( DependencyAccessor accessor, IEnumerable<ExportDescriptorProvider> providers )
+			{
+				this.accessor = accessor;
+				this.providers = providers;
+			}
+
+			protected override IEnumerable<ExportDescriptorPromise> GetPromises( CompositionContract exportKey )
+			{
+				var result = providers.SelectMany( provider => provider.GetExportDescriptors( exportKey, this ) ).Concat( accessor.ResolveDependencies( GetType().Name, exportKey, true ).Select( dependency => dependency.Target ) ).ToArray();
+				return result;
+			}
 		}
 
 		public void Register( ExportDescriptorProvider provider ) => providers.Add( provider );

@@ -118,7 +118,6 @@ namespace DragonSpark.Activation.IoC
 		{
 			var current = Ambient.GetCurrent<Operation>();
 			var result = current.With( operation => !operation.InProgress( contract.ContractType, contract.ContractName ), () => true ) ? activator.Activate<object>( contract.ContractType, contract.ContractName ) : null;
-			var stop = contract.ContractType == typeof(IUnityContainer);
 			return result;
 		}
 

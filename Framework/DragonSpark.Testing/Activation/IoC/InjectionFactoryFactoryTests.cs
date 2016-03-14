@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
@@ -7,8 +8,6 @@ using Microsoft.Practices.Unity;
 using Serilog;
 using System.Composition;
 using System.Linq;
-using DragonSpark.Testing.Objects.Setup;
-using Serilog.Core;
 using Xunit;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 using RecordingLoggerFactory = DragonSpark.Diagnostics.RecordingLoggerFactory;
@@ -108,6 +107,44 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.False( new RegisterDefaultCommand.Default( logger ).Item );
 
 			Assert.NotSame( @default, container.Resolve<ILogger>() );
+		}
+
+		[Fact]
+		public void DefaultPipelineWithCompositionReplacingDefault()
+		{
+			var container = new UnityContainer()
+				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>();
+			
+			
+			var @default = container.Resolve<ILogger>();
+			Assert.NotNull( @default );
+			Assert.True( new RegisterDefaultCommand.Default( @default ).Item );
+
+			container.Extend<CompositionExtension>();
+
+			var logger = new LoggerConfiguration().CreateLogger();
+			container.Resolve<IExportDescriptorProviderRegistry>().Register( new InstanceExportDescriptorProvider<ILogger>( logger ) );
+
+			var resolved = container.Resolve<ILogger>();
+			Assert.Same( logger, resolved );
+
+			/*Assert.NotNull( container );
+			var @default = container.Resolve<ILogger>();
+			Assert.NotNull( @default );
+			Assert.True( new RegisterDefaultCommand.Default( @default ).Item );
+			Assert.Same( @default, container.Resolve<ILogger>() );
+
+			var defaultSink = container.Resolve<RecordingLogEventSink>();
+			Assert.True( new RegisterDefaultCommand.Default( defaultSink ).Item );
+			Assert.NotEmpty( defaultSink.Events );
+
+			var before = defaultSink.Events.ToArray();
+			var logger = container.Resolve<ILogger>( nameof(SharedLoggerFactory) );
+			Assert.Equal( 2, defaultSink.Events.Except( before ).Count() );
+
+			Assert.False( new RegisterDefaultCommand.Default( logger ).Item );
+
+			Assert.NotSame( @default, container.Resolve<ILogger>() );*/
 		}
 
 		[Fact]

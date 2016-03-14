@@ -50,46 +50,30 @@ namespace DragonSpark.Composition
 		{}
 	}
 
-	/*public class FactoryTypeContainer : TypeOfContainer<IFactory>
-	{
-		public FactoryTypeContainer( IEnumerable<Type> types ) : base( types ) {}
-	}
-
-	public class FactoryWithParameterTypeContainer : TypeOfContainer<IFactoryWithParameter>
-	{
-		public FactoryWithParameterTypeContainer( IEnumerable<Type> types ) : base( types ) {}
-	}*/
-
-	/*public abstract class TypeOfContainer<T> : TypeContainer
-	{
-		protected TypeOfContainer( [Required]IEnumerable<Type> types ) : base( types.Where( typeof(T).Adapt().IsAssignableFrom ) ) {}
-	}*/
-
-	public abstract class TypeContainer : List<Type>
-	{
-		protected TypeContainer( [Required]IEnumerable<Type> types ) : base( types ) {}
-	}
-
 	public class CompositionHostFactory : FactoryBase<Assembly[], CompositionHost>
 	{
+		readonly Func<ContainerConfiguration> configuration;
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
 
-		CompositionHostFactory() {}
+		public CompositionHostFactory() : this( () => new ContainerConfiguration() ) {}
+
+		public CompositionHostFactory( Func<ContainerConfiguration> configuration )
+		{
+			this.configuration = configuration;
+		}
 
 		protected override CompositionHost CreateItem( Assembly[] parameter )
 		{
 			var types = parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
 			var container = new FactoryTypeContainer( types );
 			var locator = new DiscoverableFactoryTypeLocator( container );
-			var result = new ContainerConfiguration()
+			var result = configuration()
 				.WithParts( types )
 				.WithProvider( new RegisteredExportDescriptorProvider() )
-				.WithProvider( new InstanceExportDescriptorProvider( parameter ) )
-				.WithProvider( new InstanceExportDescriptorProvider( types ) )
-				.WithProvider( new InstanceExportDescriptorProvider( container ) )
-				.WithProvider( new InstanceExportDescriptorProvider( locator ) )
-				/*.WithProvider( new InstanceExportDescriptorProvider( new FactoryTypeContainer( types ) ) )
-				.WithProvider( new InstanceExportDescriptorProvider( new FactoryWithParameterTypeContainer( types ) ) )*/
+				.WithInstance( parameter )
+				.WithInstance( types )
+				.WithInstance( container )
+				.WithInstance( locator )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryExportDescriptorProvider( locator ) )

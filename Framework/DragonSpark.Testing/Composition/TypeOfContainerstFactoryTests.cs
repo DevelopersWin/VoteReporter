@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Composition;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects.Composition;
@@ -52,7 +51,6 @@ namespace DragonSpark.Testing.Composition
 				var p = Assert.IsType<Parameter>( test.Parameter );
 				Assert.Equal( "Assigned by ParameterService", p.Message );
 				Assert.NotSame( parameter, p );
-				// Assert.Equal( message, created.Parameter.To<Parameter>().Message );
 			}
 		}
 
@@ -101,7 +99,7 @@ namespace DragonSpark.Testing.Composition
 		public void VerifyInstanceExport( Assembly[] assemblies )
 		{
 			using ( var container = new ContainerConfiguration()
-				.WithProvider( new InstanceExportDescriptorProvider( assemblies ) )
+				.WithInstance( assemblies )
 				.CreateContainer() )
 			{
 				var composed = container.GetExport<Assembly[]>();
