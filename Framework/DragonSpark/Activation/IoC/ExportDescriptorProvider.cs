@@ -1,4 +1,3 @@
-using System;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
@@ -7,13 +6,13 @@ using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Setup.Registration;
 
 namespace DragonSpark.Activation.IoC
 {

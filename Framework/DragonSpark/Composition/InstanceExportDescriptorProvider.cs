@@ -1,11 +1,10 @@
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using System.Reflection;
-using DragonSpark.Activation.IoC;
 using ExportDescriptorProvider = System.Composition.Hosting.Core.ExportDescriptorProvider;
 
 namespace DragonSpark.Composition
@@ -13,6 +12,12 @@ namespace DragonSpark.Composition
 	public static class CompositionHostExtensions
 	{
 		public static ContainerConfiguration WithInstance<T>( [Required] this ContainerConfiguration @this, T instance, string name = null ) => @this.WithProvider( new InstanceExportDescriptorProvider<T>( instance, name ) );
+
+		public static object Checked( this LifetimeContext @this, object instance )
+		{
+			instance.As<IDisposable>( @this.AddBoundInstance );
+			return instance;
+		}
 	}
 
 	public class InstanceExportDescriptorProvider<T> : ExportDescriptorProvider
@@ -47,11 +52,6 @@ namespace DragonSpark.Composition
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
-			if ( CanBuildSpecification.Instance.IsSatisfiedBy( contract.ContractType ) )
-			{
-				contract.ContractType.GetTypeInfo().DeclaredConstructors.Each( info => info.GetParameters() );
-			}
-
 			var result = contract.ContractType == typeof(IExportDescriptorProviderRegistry) ?
 				new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => this, NoMetadata ) ).ToItem()
 				:

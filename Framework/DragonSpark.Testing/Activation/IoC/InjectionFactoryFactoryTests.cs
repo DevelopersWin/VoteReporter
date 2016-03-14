@@ -6,6 +6,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
 using Serilog;
+using System;
 using System.Composition;
 using System.Linq;
 using Xunit;
@@ -115,7 +116,6 @@ namespace DragonSpark.Testing.Activation.IoC
 			var container = new UnityContainer()
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>();
 			
-			
 			var @default = container.Resolve<ILogger>();
 			Assert.NotNull( @default );
 			Assert.True( new RegisterDefaultCommand.Default( @default ).Item );
@@ -127,24 +127,32 @@ namespace DragonSpark.Testing.Activation.IoC
 
 			var resolved = container.Resolve<ILogger>();
 			Assert.Same( logger, resolved );
+		}
 
-			/*Assert.NotNull( container );
-			var @default = container.Resolve<ILogger>();
-			Assert.NotNull( @default );
-			Assert.True( new RegisterDefaultCommand.Default( @default ).Item );
-			Assert.Same( @default, container.Resolve<ILogger>() );
+		[Fact]
+		public void DisposeCheck()
+		{
+			// var disposable = new Disposable();
+			var container = new UnityContainer()
+				.RegisterInstance( new[] { GetType().Assembly } )
+				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
+			var resolved = container.Resolve<Disposable>();
+			Assert.NotSame( resolved, container.Resolve<Disposable>() );
 
-			var defaultSink = container.Resolve<RecordingLogEventSink>();
-			Assert.True( new RegisterDefaultCommand.Default( defaultSink ).Item );
-			Assert.NotEmpty( defaultSink.Events );
+			Assert.False( resolved.Disposed );
+			container.Dispose();
+			Assert.True( resolved.Disposed );
+		}
 
-			var before = defaultSink.Events.ToArray();
-			var logger = container.Resolve<ILogger>( nameof(SharedLoggerFactory) );
-			Assert.Equal( 2, defaultSink.Events.Except( before ).Count() );
+		[Export]
+		class Disposable : IDisposable
+		{
+			public bool Disposed { get; private set; }
 
-			Assert.False( new RegisterDefaultCommand.Default( logger ).Item );
-
-			Assert.NotSame( @default, container.Resolve<ILogger>() );*/
+			public void Dispose()
+			{
+				Disposed = true;
+			}
 		}
 
 		[Fact]

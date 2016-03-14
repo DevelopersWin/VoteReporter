@@ -301,6 +301,11 @@ namespace DragonSpark.Activation.IoC
 					
 					registry.Register( new MappingRegistrationParameter( from, context.BuildKey.Type, context.BuildKey.Name ) );
 				} );
+
+				if ( CanBuildSpecification.Instance.IsSatisfiedBy( context.BuildKey.Type ) )
+				{
+					context.BuildKey.Type.GetTypeInfo().DeclaredConstructors.Each( info => info.GetParameters() );
+				}
 			}
 		}
 	}
