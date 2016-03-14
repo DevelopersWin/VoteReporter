@@ -138,7 +138,7 @@ namespace DragonSpark.Activation.IoC
 		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 	}
 
-	public class BuildableTypeFromConventionLocator : SpecificationAwareFactory<Type, Type>
+	public class BuildableTypeFromConventionLocator : DelegatedFactory<Type, Type>
 	{
 		public BuildableTypeFromConventionLocator( [Required]Func<Assembly[]> assemblies ) : this( assemblies, CanBuildSpecification.Instance ) {}
 
@@ -275,7 +275,7 @@ namespace DragonSpark.Activation.IoC
 		readonly IServiceRegistry registry;
 
 		// [Persistent]
-		public class ConventionCandidateLocator : SpecificationAwareFactory<IBuilderContext, Type>
+		public class ConventionCandidateLocator : DelegatedFactory<IBuilderContext, Type>
 		{
 			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : this( InvalidBuildFromContextSpecification.Instance, factory ) { }
 

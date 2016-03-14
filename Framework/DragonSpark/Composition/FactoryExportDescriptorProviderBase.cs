@@ -2,18 +2,14 @@ using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
-using System.Diagnostics;
 using System.Linq;
-using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Runtime.Specifications;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
-using Handler = System.Func<System.Type, System.Func<object>, object>;
-using TransformContract = System.Func<System.Composition.Hosting.Core.CompositionContract, System.Composition.Hosting.Core.CompositionContract>;
 using Type = System.Type;
 
 namespace DragonSpark.Composition
@@ -21,69 +17,16 @@ namespace DragonSpark.Composition
 	public abstract class FactoryExportDescriptorProviderBase : ExportDescriptorProvider
 	{
 		readonly DiscoverableFactoryTypeLocator locator;
-		readonly TransformContract resolveContract;
-		readonly Handler delegateHandler;
-		
-		protected FactoryExportDescriptorProviderBase( [Required]DiscoverableFactoryTypeLocator locator, [Required]TransformContract resolveContract, [Required]Handler delegateHandler )
+		readonly ITransformer<CompositionContract> resolver;
+		readonly ActivatorFactory factory;
+
+		protected FactoryExportDescriptorProviderBase( [Required]DiscoverableFactoryTypeLocator locator, [Required]ActivatorFactory factory ) : this( locator, SelfTransformer<CompositionContract>.Instance, factory ) {}
+
+		protected FactoryExportDescriptorProviderBase( [Required]DiscoverableFactoryTypeLocator locator, [Required]ITransformer<CompositionContract> resolver, [Required]ActivatorFactory factory )
 		{
 			this.locator = locator;
-			this.resolveContract = resolveContract;
-			this.delegateHandler = delegateHandler;
-		}
-
-		class Activator
-		{
-			readonly CompositionContract contract;
-			readonly DependencyAccessor accessor;
-			readonly IDictionary<Type, CompositeActivator> activators = new Dictionary<Type, CompositeActivator>();
-
-			public Activator( [Required]CompositionContract contract, [Required]DependencyAccessor accessor, params Type[] types )
-			{
-				this.contract = contract;
-				this.accessor = accessor;
-
-				types.Each( Register );
-			}
-
-			void Register( [Required]Type type )
-			{
-				CompositionDependency dependency;
-				if ( accessor.TryResolveOptionalDependency( $"Activator Request for '{GetType().FullName}'", contract.ChangeType( type ), true, out dependency ) )
-				{
-					activators.Add( type, dependency.Target.GetDescriptor().Activator );
-				}
-				else
-				{
-					Debugger.Break();
-				}
-			}
-
-			class Context
-			{
-				readonly LifetimeContext context;
-				readonly CompositionOperation operation;
-				readonly Func<Type, CompositeActivator> factory;
-
-				public Context( [Required]LifetimeContext context, [Required]CompositionOperation operation, [Required]Func<Type, CompositeActivator> factory )
-				{
-					this.context = context;
-					this.operation = operation;
-					this.factory = factory;
-				}
-
-				public T Activate<T>( [Required] Type type ) => factory( type ).With( activator => (T)activator( context, operation ) );
-			}
-
-			public Func<object> Create( [Required]LifetimeContext lifetime, [Required]CompositionOperation operation )
-			{
-				var context = new Context( lifetime, operation, type => activators.TryGet( type ) );
-
-				var factory = new FactoryDelegateLocatorFactory(
-								new FactoryDelegateFactory( context.Activate<IFactory> ),
-								new FactoryWithActivatedParameterDelegateFactory( new FactoryWithParameterDelegateFactory( context.Activate<IFactoryWithParameter> ).Create, context.Activate<object> ) );
-				var result = factory.Create( contract.ContractType );
-				return result;
-			}
+			this.resolver = resolver;
+			this.factory = factory;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
@@ -92,20 +35,19 @@ namespace DragonSpark.Composition
 			var exists = descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency );
 			if ( !exists )
 			{
-				var resolved = resolveContract( contract );
-				var with = resolved.With( locator.Create );
-				var success = with.With( type => descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( type ), true, out dependency ) );
+				var resultContract = resolver.Create( contract );
+				var success = resultContract.With( locator.Create ).With( type => descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( type ), true, out dependency ) );
 				if ( success )
 				{
 					var promise = dependency.Target;
 					var boundary = ContractSupport.GetSharingBoundary( dependency.Contract );
-					var activator = new Activator( dependency.Contract, descriptorAccessor, dependency.Contract.ContractType.Append( Factory.GetParameterType( dependency.Contract.ContractType ) ).NotNull().ToArray() );
-
+					var activator = factory.Create( new ActivatorFactory.Parameter( descriptorAccessor, resultContract, dependency.Contract ) );
+					
 					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, promise.IsShared, NoDependencies,
 						_ => ExportDescriptor.Create( ( context, operation ) =>
 						{
-							Func<object> create = () => delegateHandler( resolved.ContractType, activator.Create( context, operation ) ).With( o => new ExportProperties.Factory( o ).Assign( promise ) );
-							var item = promise.IsShared ? new SharedValue( context.FindContextWithin( boundary ), resolved.ContractType, create ).Item : create();
+							Func<object> create = () => activator( context, operation ).With( o => new ExportProperties.Factory( o ).Assign( promise ) );
+							var item = promise.IsShared ? new SharedValue( context.FindContextWithin( boundary ), resultContract, create ).Item : create();
 							return item;
 						}, NoMetadata ) );
 				}
@@ -114,13 +56,180 @@ namespace DragonSpark.Composition
 
 		class SharedValue : AssociatedValue<LifetimeContext, object>
 		{
-			public SharedValue( LifetimeContext instance, Type key, Func<object> create = null ) : base( instance, key, create ) {}
+			public SharedValue( LifetimeContext instance, CompositionContract key, Func<object> create = null ) : base( instance, key.ToString(), create ) {}
+		}
+	}
+
+	public class ActivatorFactory : FactoryBase<ActivatorFactory.Parameter, CompositeActivator>
+	{
+		public static ActivatorFactory Instance { get; } = new ActivatorFactory( ActivatorRegistryFactory.Instance, ActivatorResultFactory.Instance.Create );
+
+		readonly ActivatorRegistryFactory registryFactory;
+		readonly Func<Activator.Parameter, object> activatorFactory;
+
+		public ActivatorFactory( [Required]ActivatorRegistryFactory registryFactory, Func<Activator.Parameter, object> activatorFactory )
+		{
+			this.registryFactory = registryFactory;
+			this.activatorFactory = activatorFactory;
+		}
+
+		public class Parameter
+		{
+			public Parameter( DependencyAccessor accessor, CompositionContract resultContract, CompositionContract factoryContract )
+			{
+				Accessor = accessor;
+				ResultContract = resultContract;
+				FactoryContract = factoryContract;
+			}
+
+			public DependencyAccessor Accessor { get; }
+			public CompositionContract ResultContract { get; }
+			public CompositionContract FactoryContract { get; }
+		}
+
+		protected override CompositeActivator CreateItem( Parameter parameter )
+		{
+			var activators = registryFactory.Create( parameter );
+			var activator = new Activator( activatorFactory, activators, parameter.FactoryContract.ContractType );
+			var result = new CompositeActivator( activator.Create );
+			return result;
+		}
+
+		public class ActivatorRegistry : Dictionary<Type, CompositeActivator>
+		{
+			readonly DependencyAccessor accessor;
+			readonly CompositionContract contract;
+
+			public ActivatorRegistry( [Required]DependencyAccessor accessor, [Required]CompositionContract contract )
+			{
+				this.accessor = accessor;
+				this.contract = contract;
+			}
+
+			public void Register( [Required]Type type )
+			{
+				CompositionDependency dependency;
+				if ( accessor.TryResolveOptionalDependency( $"Activator Request for '{GetType().FullName}'", contract.ChangeType( type ), true, out dependency ) )
+				{
+					Add( type, dependency.Target.GetDescriptor().Activator );
+				}
+			}
+		}
+
+		public class ActivatorRegistryFactory : FactoryBase<Parameter, ActivatorRegistry>
+		{
+			public static ActivatorRegistryFactory Instance { get; } = new ActivatorRegistryFactory();
+
+			protected override ActivatorRegistry CreateItem( Parameter parameter )
+			{
+				var result = new ActivatorRegistry( parameter.Accessor, parameter.FactoryContract );
+				new[] { parameter.FactoryContract.ContractType, Factory.GetParameterType( parameter.FactoryContract.ContractType ) }.NotNull().Each( result.Register );
+				return result;
+			}
+		}
+	}
+
+	public class ActivatorDelegateFactory : FactoryBase<Activator.Parameter, Delegate>
+	{
+		public static ActivatorDelegateFactory Instance { get; } = new ActivatorDelegateFactory();
+
+		protected override Delegate CreateItem( Activator.Parameter parameter )
+		{
+			var factory = new FactoryDelegateLocatorFactory(
+								new FactoryDelegateFactory( parameter.Activate<IFactory> ),
+								new FactoryWithActivatedParameterDelegateFactory( new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create, parameter.Activate<object> ) );
+
+			var result = factory.Create( parameter.FactoryType ).Convert( Factory.GetResultType( parameter.FactoryType ) );
+			return result;
+		}
+	}
+
+	/*public class ActivatorWithParameterDelegateFactory : FactoryBase<Activator.Parameter, Delegate>
+	{
+		public static ActivatorWithParameterDelegateFactory Instance { get; } = new ActivatorWithParameterDelegateFactory();
+
+		protected override Delegate CreateItem( Activator.Parameter parameter )
+		{
+			/*var func = new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create( parameter.FactoryType );
+
+			var parameterType = Factory.GetParameterType( parameter.FactoryType );
+			// var result = new Func<object, object>( o => func( o ?? parameter.Activate<object>( parameterType ) ) );
+
+			var result = new FactoryWithActivatedParameterDelegateFactory( func,  )
+				.Create( parameter.FactoryType )
+				.Convert( Factory.GetResultType( parameter.FactoryType ) );
+			return result;#1#
+
+			new FactoryWithActivatedParameterDelegateFactory( new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create, parameter.Activate<object> ) )
+		}
+
+		// parameter.Activate<object> );
+	}*/
+
+	public class ActivatorResultFactory : FactoryBase<Activator.Parameter, object>
+	{
+		public static ActivatorResultFactory Instance { get; } = new ActivatorResultFactory();
+
+		readonly ActivatorDelegateFactory factory;
+
+		public ActivatorResultFactory() : this( ActivatorDelegateFactory.Instance ) {}
+
+		public ActivatorResultFactory( ActivatorDelegateFactory factory )
+		{
+			this.factory = factory;
+		}
+
+		protected override object CreateItem( Activator.Parameter parameter )
+		{
+			var @delegate = factory.Create( parameter );
+			var result = @delegate.DynamicInvoke();
+			return result;
+		}
+	}
+
+	public class Activator
+	{
+		readonly Func<Parameter, object> factory;
+		readonly IDictionary<Type, CompositeActivator> activators;
+		readonly Type factoryType;
+
+		public Activator( [Required]Func<Parameter, object> factory, [Required]IDictionary<Type, CompositeActivator> activators, Type factoryType )
+		{
+			this.factory = factory;
+			this.activators = activators;
+			this.factoryType = factoryType;
+		}
+
+		public class Parameter
+		{
+			readonly LifetimeContext context;
+			readonly CompositionOperation operation;
+			readonly Func<Type, CompositeActivator> factory;
+
+			public Parameter( [Required]LifetimeContext context, [Required]CompositionOperation operation, [Required]Func<Type, CompositeActivator> factory, [Required]Type factoryType )
+			{
+				this.context = context;
+				this.operation = operation;
+				this.factory = factory;
+				FactoryType = factoryType;
+			}
+
+			public T Activate<T>( [Required] Type type ) => factory( type ).With( activator => (T)activator( context, operation ) );
+
+			public Type FactoryType { get; }
+		}
+
+		public object Create( [Required]LifetimeContext lifetime, [Required]CompositionOperation operation )
+		{
+			var context = new Parameter( lifetime, operation, type => activators.TryGet( type ), factoryType );
+			var result = factory( context );
+			return result;
 		}
 	}
 
 	public static class ContractSupport
 	{
-		// [Freeze]
+		[Freeze]
 		public static string GetSharingBoundary( CompositionContract contract )
 		{
 			object sharingBoundaryMetadata;

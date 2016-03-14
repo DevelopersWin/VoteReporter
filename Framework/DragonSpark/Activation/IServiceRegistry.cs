@@ -19,11 +19,11 @@ namespace DragonSpark.Activation
 		void RegisterFactory( FactoryRegistrationParameter parameter );
 	}
 
-	public class Always : WrappedSpecification<Type>
+	public class AlwaysOfType : WrappedSpecification<Type>
 	{
-		public static Always Instance { get; } = new Always();
+		public static AlwaysOfType Instance { get; } = new AlwaysOfType();
 
-		public Always() : base( AlwaysSpecification.Instance ) { }
+		public AlwaysOfType() : base( AlwaysSpecification.Instance ) { }
 	}
 
 	public class OnlyIfNotRegistered : WrappedSpecification<Type>
@@ -31,9 +31,9 @@ namespace DragonSpark.Activation
 		public OnlyIfNotRegistered( IUnityContainer container ) : base( new InverseSpecification( new IsRegisteredSpecification( container ) ) ) { }
 	}
 
-	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<Always>
+	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<AlwaysOfType>
 	{
-		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ImplementedFromConventionTypeLocator locator ) : base( registry, locator, Always.Instance ) {}
+		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ImplementedFromConventionTypeLocator locator ) : base( registry, locator, AlwaysOfType.Instance ) {}
 	}
 
 	public class RegisterInstanceByConventionCommand<T> : RegisterInstanceCommand<T> where T : ISpecification<Type>
@@ -51,9 +51,9 @@ namespace DragonSpark.Activation
 		} );
 	}
 
-	public class RegisterEntireHierarchyCommand : RegisterEntireHierarchyCommand<Always>
+	public class RegisterEntireHierarchyCommand : RegisterEntireHierarchyCommand<AlwaysOfType>
 	{
-		public RegisterEntireHierarchyCommand( IServiceRegistry registry ) : base( registry, Always.Instance ) {}
+		public RegisterEntireHierarchyCommand( IServiceRegistry registry ) : base( registry, AlwaysOfType.Instance ) {}
 	}
 
 	public class RegisterEntireHierarchyCommand<T> : RegisterHierarchyCommandBase<T> where T : ISpecification<Type>
@@ -61,9 +61,9 @@ namespace DragonSpark.Activation
 		public RegisterEntireHierarchyCommand( IServiceRegistry registry, T specification ) : base( registry, specification, parameter => parameter.Instance.Adapt().GetEntireHierarchy() ) {}
 	}
 
-	public class RegisterHierarchyCommand : RegisterHierarchyCommand<Always>
+	public class RegisterHierarchyCommand : RegisterHierarchyCommand<AlwaysOfType>
 	{
-		public RegisterHierarchyCommand( IServiceRegistry registry ) : base( registry, Always.Instance ) {}
+		public RegisterHierarchyCommand( IServiceRegistry registry ) : base( registry, AlwaysOfType.Instance ) {}
 	}
 
 	public class RegisterHierarchyCommand<T> : RegisterHierarchyCommandBase<T> where T : ISpecification<Type>
@@ -102,9 +102,9 @@ namespace DragonSpark.Activation
 		protected override void OnExecute( T parameter ) => command( parameter );
 	}
 
-	public class RegisterCommand : RegisterCommand<Always>
+	public class RegisterCommand : RegisterCommand<AlwaysOfType>
 	{
-		public RegisterCommand( IServiceRegistry registry, Always specification ) : base( registry, specification ) {}
+		public RegisterCommand( IServiceRegistry registry, AlwaysOfType specification ) : base( registry, specification ) {}
 	}
 
 	public class RegisterCommand<T> : RegistrationCommandBase<MappingRegistrationParameter, T> where T : ISpecification<Type>
@@ -112,9 +112,9 @@ namespace DragonSpark.Activation
 		public RegisterCommand( [Required]IServiceRegistry registry, T specification ) : base( registry.Register, specification ) {}
 	}
 
-	public class RegisterInstanceCommand : RegisterInstanceCommand<Always>
+	public class RegisterInstanceCommand : RegisterInstanceCommand<AlwaysOfType>
 	{
-		public RegisterInstanceCommand( IServiceRegistry registry, Always specification ) : base( registry, specification ) {}
+		public RegisterInstanceCommand( IServiceRegistry registry, AlwaysOfType specification ) : base( registry, specification ) {}
 	}
 
 	public class RegisterInstanceCommand<T> : RegistrationCommandBase<InstanceRegistrationParameter, T> where T : ISpecification<Type>
@@ -122,9 +122,9 @@ namespace DragonSpark.Activation
 		public RegisterInstanceCommand( [Required]IServiceRegistry registry, T specification ) : base( registry.Register, specification ) { }
 	}
 
-	public class RegisterFactoryCommand : RegisterFactoryCommand<Always>
+	public class RegisterFactoryCommand : RegisterFactoryCommand<AlwaysOfType>
 	{
-		public RegisterFactoryCommand( IServiceRegistry registry, Always specification ) : base( registry, specification ) {}
+		public RegisterFactoryCommand( IServiceRegistry registry, AlwaysOfType specification ) : base( registry, specification ) {}
 	}
 
 	public class RegisterFactoryCommand<T> : RegistrationCommandBase<FactoryRegistrationParameter, T> where T : ISpecification<Type>

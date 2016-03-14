@@ -8,9 +8,23 @@ using System.Linq;
 
 namespace DragonSpark.Activation.FactoryModel
 {
+	public class SelfTransformer<T> : TransformerBase<T>
+	{
+		public static SelfTransformer<T> Instance { get; } = new SelfTransformer<T>();
+
+		protected override T CreateItem( T parameter ) => parameter;
+	}
+
 	public abstract class TransformerBase<T> : FactoryBase<T, T>, ITransformer<T>
 	{
+		readonly ISpecification<T> specification;
+
 		protected TransformerBase() : base( new FactoryParameterCoercer<T>() ) {}
+
+		protected TransformerBase( [Required]ISpecification<T> specification  ) : base( specification, new FactoryParameterCoercer<T>() )
+		{
+			this.specification = specification;
+		}
 	}
 
 	public class CommandTransformer<TCommand, T> : TransformerBase<T> where TCommand : ICommand<T>
@@ -31,19 +45,22 @@ namespace DragonSpark.Activation.FactoryModel
 
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
 	{
+		readonly ISpecification<TParameter> specification;
 		readonly IFactoryParameterCoercer<TParameter> coercer;
 
-		protected FactoryBase() : this( FixedFactoryParameterCoercer<TParameter>.Instance )
-		{}
+		protected FactoryBase() : this( FixedFactoryParameterCoercer<TParameter>.Instance ) {}
 
-		protected FactoryBase( [Required]IFactoryParameterCoercer<TParameter> coercer )
+		protected FactoryBase( [Required]IFactoryParameterCoercer<TParameter> coercer ) : this( new WrappedSpecification<TParameter>( AlwaysSpecification.Instance ), coercer ) {}
+
+		protected FactoryBase( [Required]ISpecification<TParameter> specification, [Required]IFactoryParameterCoercer<TParameter> coercer )
 		{
+			this.specification = specification;
 			this.coercer = coercer;
 		}
 
 		protected abstract TResult CreateItem( [Required]TParameter parameter );
 
-		public TResult Create( TParameter parameter ) => CreateItem( parameter );
+		public TResult Create( TParameter parameter ) => specification.IsSatisfiedBy( parameter ) ? CreateItem( parameter ) : default(TResult);
 
 		object IFactoryWithParameter.Create( object parameter )
 		{
@@ -53,20 +70,18 @@ namespace DragonSpark.Activation.FactoryModel
 		}
 	}
 
-	public class SpecificationAwareFactory<T, U> : FactoryBase<T, U>
+	public class DelegatedFactory<T, U> : FactoryBase<T, U>
 	{
-		readonly ISpecification<T> specification;
 		readonly Func<T, U> inner;
 
-		public SpecificationAwareFactory( Func<T, U> inner ) : this( new WrappedSpecification<T>( AlwaysSpecification.Instance ), inner ) {}
+		public DelegatedFactory( Func<T, U> inner ) : this( new WrappedSpecification<T>( AlwaysSpecification.Instance ), inner ) {}
 
-		public SpecificationAwareFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : base( FactoryParameterCoercer<T>.Instance )
+		public DelegatedFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : base( specification, FactoryParameterCoercer<T>.Instance )
 		{
-			this.specification = specification;
 			this.inner = inner;
 		}
 
-		protected override U CreateItem( T parameter ) => specification.IsSatisfiedBy( parameter ) ? inner( parameter ) : default(U);
+		protected override U CreateItem( T parameter ) => inner( parameter );
 	}
 
 	/*public class FirstFromParameterFactory<T> : FirstFromParameterFactory<object, T>

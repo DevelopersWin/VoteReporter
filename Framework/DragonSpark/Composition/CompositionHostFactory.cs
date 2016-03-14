@@ -82,6 +82,7 @@ namespace DragonSpark.Composition
 			var container = new FactoryTypeContainer( types );
 			var locator = new DiscoverableFactoryTypeLocator( container );
 			var result = new ContainerConfiguration()
+				.WithParts( types )
 				.WithProvider( new RegisteredExportDescriptorProvider() )
 				.WithProvider( new InstanceExportDescriptorProvider( parameter ) )
 				.WithProvider( new InstanceExportDescriptorProvider( types ) )
@@ -89,9 +90,8 @@ namespace DragonSpark.Composition
 				.WithProvider( new InstanceExportDescriptorProvider( locator ) )
 				/*.WithProvider( new InstanceExportDescriptorProvider( new FactoryTypeContainer( types ) ) )
 				.WithProvider( new InstanceExportDescriptorProvider( new FactoryWithParameterTypeContainer( types ) ) )*/
-				.WithProvider( new FactoryExportDescriptorProvider( locator ) )
-				.WithParts( types )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider( locator ) )
+				.WithProvider( new FactoryExportDescriptorProvider( locator ) )
 				.CreateContainer();
 			return result;
 		}

@@ -1,19 +1,38 @@
 using System;
 using System.Composition.Hosting.Core;
-using System.Reflection;
 using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Composition
 {
 	public class FactoryDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
-		public FactoryDelegateExportDescriptorProvider( DiscoverableFactoryTypeLocator locator ) : base( locator, DetermineContract, ( type, func ) => func.Convert( type ) ) {}
+		public FactoryDelegateExportDescriptorProvider( DiscoverableFactoryTypeLocator locator ) 
+			: base( locator, 
+				FactoryDelegateTransformer.Instance,
+				new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, ActivatorDelegateFactory.Instance.Create )
+			) {}
+	}
 
-		static CompositionContract DetermineContract( CompositionContract contract )
-		{
-			var adapter = contract.ContractType.Adapt();
-			return adapter.IsGenericOf<Func<object>>() ? contract.ChangeType( adapter.GetInnerType() ) : null;
-		}
+	/*public class FactoryWithParameterDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
+	{
+		public FactoryWithParameterDelegateExportDescriptorProvider( DiscoverableFactoryTypeLocator locator ) 
+			: base( locator, 
+				FactoryDelegateTransformer.InstanceWithParameter,
+				new ActivatorFactory( ActivatorFactory.ActivatorWithParameterRegistryFactory.Instance, ActivatorDelegateFactory.Instance.Create )
+			) {}
+	}*/
+
+	public class FactoryDelegateTransformer : TransformerBase<CompositionContract>
+	{
+		public static FactoryDelegateTransformer Instance { get; } = new FactoryDelegateTransformer( typeof(Func<>) );
+
+		public static FactoryDelegateTransformer InstanceWithParameter { get; } = new FactoryDelegateTransformer( typeof(Func<,>) );
+
+		public FactoryDelegateTransformer( [OfFactoryType]Type factoryDelegateType ) : base( new WrappedSpecification<CompositionContract>( new GenericTypeAssignableSpecification( factoryDelegateType ), contract => contract.ContractType ) ) {}
+
+		protected override CompositionContract CreateItem( CompositionContract parameter ) => Factory.GetResultType( parameter.ContractType ).With( parameter.ChangeType );
 	}
 }

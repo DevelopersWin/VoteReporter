@@ -1,17 +1,15 @@
 using AutoMapper.Internal;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Composition;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Composition;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.FactoryModel
@@ -19,6 +17,7 @@ namespace DragonSpark.Activation.FactoryModel
 	public static class Factory
 	{
 		readonly static TypeAdapter[]
+			CoreTypes = new[] { typeof(Func<>), typeof(Func<,>) }.Select( type => type.Adapt() ).ToArray(),
 			Types = new[] { typeof(IFactory<>), typeof(IFactory<,>) }.Select( type => type.Adapt() ).ToArray(),
 			BasicTypes = new[] { typeof(IFactory), typeof(IFactoryWithParameter) }.Select( type => type.Adapt() ).ToArray();
 		
@@ -36,14 +35,14 @@ namespace DragonSpark.Activation.FactoryModel
 			return result;
 		}
 
-		// [Freeze]
-		public static Type GetParameterType( [Required, OfFactoryType]Type factoryType ) => Get( factoryType, types => types.First(), Types.Last() );
+		[Freeze]
+		public static Type GetParameterType( [Required]Type factoryType ) => Get( factoryType, types => types.First(), Types.Last(), CoreTypes.Last() );
 
 		[Freeze]
-		public static Type GetInterface( [Required, OfFactoryType] Type factoryType ) => factoryType.Adapt().GetAllInterfaces().FirstOrDefault( IsFactory );
+		public static Type GetInterface( [Required] Type factoryType ) => factoryType.Adapt().GetAllInterfaces().FirstOrDefault( IsFactory );
 
 		[Freeze]
-		public static Type GetResultType( [Required, OfFactoryType]Type factoryType ) => Get( factoryType, types => types.Last(), Types );
+		public static Type GetResultType( [Required]Type factoryType ) => Get( factoryType, types => types.Last(), Types.Concat( CoreTypes ).ToArray() );
 
 		static Type Get( Type factoryType, Func<Type[], Type> selector, params TypeAdapter[] typesToCheck )
 		{
@@ -65,7 +64,7 @@ namespace DragonSpark.Activation.FactoryModel
 			new Factory<IFactoryWithParameter>( factoryWithParameter )
 		) {}
 
-		class Factory<T> : SpecificationAwareFactory<Type, Func<object>>
+		class Factory<T> : DelegatedFactory<Type, Func<object>>
 		{
 			public Factory( IFactory<Type, Func<object>> inner ) : base( TypeAssignableSpecification<T>.Instance, inner.Create ) {}
 		}
@@ -127,7 +126,7 @@ namespace DragonSpark.Activation.FactoryModel
 			this.container = container;
 		}
 
-		// [Freeze]
+		[Freeze]
 		protected override Type CreateItem( CompositionContract parameter )
 		{
 			var name = $"{parameter.ContractType.Name}Factory";
