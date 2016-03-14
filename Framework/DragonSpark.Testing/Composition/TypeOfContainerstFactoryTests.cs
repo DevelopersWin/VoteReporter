@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Composition;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects.Composition;
@@ -30,6 +31,28 @@ namespace DragonSpark.Testing.Composition
 				var test = container.GetExport<IParameterService>();
 				var parameter = Assert.IsType<Parameter>( test.Parameter );
 				Assert.Equal( "Assigned by ParameterService", parameter.Message );
+			}
+		}
+
+		[Theory, AutoData]
+		public void FactoryWithParameterDelegate( Assembly[] assemblies, string message )
+		{
+			using ( var container = CompositionHostFactory.Instance.Create( assemblies ) )
+			{
+				var factory = container.GetExport<Func<Parameter, IParameterService>>();
+				Assert.NotNull( factory );
+
+				var parameter = new Parameter();
+				var created = factory( parameter );
+				
+				Assert.Same( parameter, created.Parameter );
+				Assert.Equal( "Assigned by ParameterService", parameter.Message );
+
+				var test = container.GetExport<IParameterService>();
+				var p = Assert.IsType<Parameter>( test.Parameter );
+				Assert.Equal( "Assigned by ParameterService", p.Message );
+				Assert.NotSame( parameter, p );
+				// Assert.Equal( message, created.Parameter.To<Parameter>().Message );
 			}
 		}
 

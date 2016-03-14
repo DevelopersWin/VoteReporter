@@ -144,27 +144,17 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	/*public class ActivatorWithParameterDelegateFactory : FactoryBase<Activator.Parameter, Delegate>
+	public class ActivatorWithParameterDelegateFactory : FactoryBase<Activator.Parameter, Delegate>
 	{
 		public static ActivatorWithParameterDelegateFactory Instance { get; } = new ActivatorWithParameterDelegateFactory();
 
 		protected override Delegate CreateItem( Activator.Parameter parameter )
 		{
-			/*var func = new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create( parameter.FactoryType );
-
-			var parameterType = Factory.GetParameterType( parameter.FactoryType );
-			// var result = new Func<object, object>( o => func( o ?? parameter.Activate<object>( parameterType ) ) );
-
-			var result = new FactoryWithActivatedParameterDelegateFactory( func,  )
-				.Create( parameter.FactoryType )
-				.Convert( Factory.GetResultType( parameter.FactoryType ) );
-			return result;#1#
-
-			new FactoryWithActivatedParameterDelegateFactory( new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create, parameter.Activate<object> ) )
+			var @delegate = new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create( parameter.FactoryType );
+			var result = @delegate.Convert( Factory.GetParameterType( parameter.FactoryType ), Factory.GetResultType( parameter.FactoryType ) );
+			return result;
 		}
-
-		// parameter.Activate<object> );
-	}*/
+	}
 
 	public class ActivatorResultFactory : FactoryBase<Activator.Parameter, object>
 	{

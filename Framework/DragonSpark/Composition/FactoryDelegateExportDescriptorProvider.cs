@@ -16,14 +16,14 @@ namespace DragonSpark.Composition
 			) {}
 	}
 
-	/*public class FactoryWithParameterDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
+	public class FactoryWithParameterDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
 		public FactoryWithParameterDelegateExportDescriptorProvider( DiscoverableFactoryTypeLocator locator ) 
 			: base( locator, 
 				FactoryDelegateTransformer.InstanceWithParameter,
-				new ActivatorFactory( ActivatorFactory.ActivatorWithParameterRegistryFactory.Instance, ActivatorDelegateFactory.Instance.Create )
+				new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, ActivatorWithParameterDelegateFactory.Instance.Create )
 			) {}
-	}*/
+	}
 
 	public class FactoryDelegateTransformer : TransformerBase<CompositionContract>
 	{

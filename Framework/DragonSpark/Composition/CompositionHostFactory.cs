@@ -91,6 +91,7 @@ namespace DragonSpark.Composition
 				/*.WithProvider( new InstanceExportDescriptorProvider( new FactoryTypeContainer( types ) ) )
 				.WithProvider( new InstanceExportDescriptorProvider( new FactoryWithParameterTypeContainer( types ) ) )*/
 				.WithProvider( new FactoryDelegateExportDescriptorProvider( locator ) )
+				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryExportDescriptorProvider( locator ) )
 				.CreateContainer();
 			return result;

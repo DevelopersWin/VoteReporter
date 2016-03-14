@@ -1,7 +1,9 @@
 using DragonSpark.Runtime.Values;
 using System;
+using System.Linq;
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
+using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Activation.FactoryModel
 {
@@ -37,7 +39,9 @@ namespace DragonSpark.Activation.FactoryModel
 			{}
 		}
 
-		public static Delegate Convert( this Func<object> @this, Type type ) => (Delegate)typeof(FactoryExtensions).InvokeGeneric( nameof(Convert), type.ToItem(), @this );
+		public static Delegate Convert( [Required]this Func<object> @this, [Required]Type resultType ) => (Delegate)typeof(FactoryExtensions).InvokeGeneric( nameof(Convert), resultType.ToItem(), @this );
+
+		public static Delegate Convert( [Required]this Func<object, object> @this, [Required]Type parameterType, [Required]Type resultType ) => (Delegate)typeof(FactoryExtensions).InvokeGeneric( nameof(Convert), parameterType.Append( resultType ).ToArray(), @this );
 
 		public static Func<T> Convert<T>( this Func<object> @this ) => () => (T)@this();
 
