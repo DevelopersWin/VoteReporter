@@ -1,12 +1,11 @@
-using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using System.Reflection;
 using ExportDescriptorProvider = System.Composition.Hosting.Core.ExportDescriptorProvider;
 
 namespace DragonSpark.Composition
@@ -48,15 +47,27 @@ namespace DragonSpark.Composition
 		void Register( ExportDescriptorProvider provider );
 	}
 
+	// https://github.com/dotnet/corefx/issues/6857
+	public class TypeInitializingExportDescriptorProvider : ExportDescriptorProvider
+	{
+		public static TypeInitializingExportDescriptorProvider Instance { get; } = new TypeInitializingExportDescriptorProvider();
+
+		TypeInitializingExportDescriptorProvider() {}
+
+		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
+		{
+			InitializeTypeCommand.Instance.ExecuteWith( contract.ContractType );
+			yield break;
+		}
+	}
+
 	public class RegisteredExportDescriptorProvider : ExportDescriptorProvider, IExportDescriptorProviderRegistry
 	{
 		readonly ICollection<ExportDescriptorProvider> providers = new List<ExportDescriptorProvider>();
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
-			var type = contract.ContractType.Initialized();
-
-			var result = type == typeof(IExportDescriptorProviderRegistry) ?
+			var result = contract.ContractType == typeof(IExportDescriptorProviderRegistry) ?
 				new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => this, NoMetadata ) ).ToItem()
 				:
 				providers.SelectMany( provider => provider.GetExportDescriptors( contract, new Accessor( descriptorAccessor, providers.Except( provider.ToItem() ) ) ) );

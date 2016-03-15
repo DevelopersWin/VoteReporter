@@ -95,7 +95,7 @@ namespace DragonSpark.TypeSystem
 	{
 		protected AttributeProviderFactoryBase( MemberInfoProviderFactoryBase factory ) : base( IsAssemblyFactory.Instance.Create, factory.Create ) {}
 
-		class IsAssemblyFactory : DelegatedFactory<object, IAttributeProvider>
+		class IsAssemblyFactory : DecoratedFactory<object, IAttributeProvider>
 		{
 			public static IsAssemblyFactory Instance { get; } = new IsAssemblyFactory();
 

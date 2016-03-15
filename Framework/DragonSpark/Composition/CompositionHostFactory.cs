@@ -69,6 +69,7 @@ namespace DragonSpark.Composition
 			var locator = new DiscoverableFactoryTypeLocator( container );
 			var result = configuration()
 				.WithParts( types )
+				.WithProvider( TypeInitializingExportDescriptorProvider.Instance )
 				.WithProvider( new RegisteredExportDescriptorProvider() )
 				.WithInstance( parameter )
 				.WithInstance( types )

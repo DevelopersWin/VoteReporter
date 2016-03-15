@@ -65,13 +65,13 @@ namespace DragonSpark.Activation.FactoryModel
 		}
 	}
 
-	public class DelegatedFactory<T, U> : FactoryBase<T, U>
+	public class DecoratedFactory<T, U> : FactoryBase<T, U>
 	{
 		readonly Func<T, U> inner;
 
-		public DelegatedFactory( Func<T, U> inner ) : this( new WrappedSpecification<T>( AlwaysSpecification.Instance ), inner ) {}
+		public DecoratedFactory( Func<T, U> inner ) : this( new WrappedSpecification<T>( AlwaysSpecification.Instance ), inner ) {}
 
-		public DelegatedFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : base( specification, FactoryParameterCoercer<T>.Instance )
+		public DecoratedFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : base( specification, FactoryParameterCoercer<T>.Instance )
 		{
 			this.inner = inner;
 		}
