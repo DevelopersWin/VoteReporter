@@ -125,9 +125,11 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( T parameter ) => inner.Execute( parameter );
 	}
 
-	public abstract class Command<TParameter> : Command<TParameter, WrappedSpecification<TParameter>>
+	public abstract class Command<TParameter> : Command<TParameter, ISpecification<TParameter>>
 	{
-		protected Command() : base( Specification<TParameter>.Instance ) {}
+		protected Command() : this( Specification<TParameter>.Instance ) {}
+
+		protected Command( ISpecification<TParameter> specification ) : base( specification ) {}
 	}
 
 	public class Specification<TParameter> : WrappedSpecification<TParameter>

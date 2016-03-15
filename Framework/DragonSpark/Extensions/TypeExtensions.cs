@@ -19,8 +19,10 @@ namespace DragonSpark.Extensions
 			return ((PropertyInfo) memberInfo).PropertyType;
 		  if (memberInfo is FieldInfo)
 			return ((FieldInfo) memberInfo).FieldType;
-		  return (Type) null;
+		  return null;
 		}
+
+		public static Type Initialized( this Type @this ) => TypeInitializer.Instance.Create( @this );
 
 		public static Assembly[] Assemblies( [Required] this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).ToArray();
 
