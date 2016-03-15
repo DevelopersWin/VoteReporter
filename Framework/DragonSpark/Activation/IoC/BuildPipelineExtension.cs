@@ -56,12 +56,14 @@ namespace DragonSpark.Activation.IoC
 		readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
 		readonly ConventionStrategy conventionStrategy;
 		readonly DefaultValueStrategy defaultValueStrategy;
+		readonly EnumerableResolutionStrategy enumerableResolutionStrategy;
 
-		public BuildPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required] DefaultValueStrategy defaultValueStrategy )
+		public BuildPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required] DefaultValueStrategy defaultValueStrategy, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy )
 		{
 			this.metadataLifetimeStrategy = metadataLifetimeStrategy;
 			this.conventionStrategy = conventionStrategy;
 			this.defaultValueStrategy = defaultValueStrategy;
+			this.enumerableResolutionStrategy = enumerableResolutionStrategy;
 		}
 
 		protected override void Initialize()
@@ -74,7 +76,7 @@ namespace DragonSpark.Activation.IoC
 			Context.Strategies.Add( defaultValueStrategy, UnityBuildStage.Lifetime );
 			Context.Strategies.Add( conventionStrategy, UnityBuildStage.PreCreation );
 			Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
-			Context.Strategies.AddNew<EnumerableResolutionStrategy>( UnityBuildStage.Creation );
+			Context.Strategies.Add( enumerableResolutionStrategy, UnityBuildStage.Creation );
 			Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
 
 			var policy = Context.Policies.Get<IBuildPlanCreatorPolicy>( null );
@@ -172,16 +174,16 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class ImplementedFromConventionTypeLocator : FactoryBase<Type, Type> // TODO: Fix.
+	public class ImplementedFromConventionTypeLocator : FactoryBase<Type, Type>
 	{
 		public static ImplementedFromConventionTypeLocator Instance { get; } = new ImplementedFromConventionTypeLocator();
 
 		[Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
-			var assemblies = new[] { ApplicationServices.Current.Context.Assemblies, parameter.Append( GetType() ).Distinct().Assemblies() };
+			var locators = new[] { ApplicationServices.Current.Context.Assemblies, parameter.Append( GetType() ).Distinct().Assemblies() }.Select( assemblies => new ImplementedInterfaceFromConventionLocator( assemblies ) );
 
-			var result = assemblies.FirstWhere( get => new ImplementedInterfaceFromConventionLocator( get ).Create( parameter ) );
+			var result = locators.FirstWhere( locator => locator.Create( parameter ) );
 			return result;
 		}
 	}

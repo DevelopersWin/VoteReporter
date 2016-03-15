@@ -281,7 +281,6 @@
       <DependentUpon>ProgramSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Setup\ProgramSetupTests.cs" />
-    <Compile Include="Setup\Registration\RegisterAttributeTests.cs" />
     <Compile Include="Setup\SetupCommandTests.cs" />
     <Compile Include="Setup\LocationSetupTests.cs" />
     <Compile Include="Setup\TestExtension.cs" />
@@ -377,7 +376,9 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Setup\Registration\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

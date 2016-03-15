@@ -9,6 +9,7 @@ using System.Composition;
 using System.Reflection;
 using System.Windows.Input;
 using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Testing.Framework;
 using Microsoft.Practices.Unity;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
@@ -27,6 +28,11 @@ namespace DragonSpark.Testing.Objects.Setup
 
 	public class UnityContainerFactory : FactoryBase<IUnityContainer>
 	{
+		public class Register : RegisterFactoryAttribute
+		{
+			public Register() : base( typeof(UnityContainerFactory) ) {}
+		}
+
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
 		protected override IUnityContainer CreateItem()
@@ -55,9 +61,9 @@ namespace DragonSpark.Testing.Objects.Setup
 
 	public class ApplicationContextFactory : DragonSpark.Setup.ApplicationContextFactory
 	{
-		public static Framework.Setup.ApplicationContextFactory Instance { get; } = new Framework.Setup.ApplicationContextFactory();
+		public static ApplicationContextFactory Instance { get; } = new ApplicationContextFactory();
 
-		public ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
+		ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
 	}
 
 	public class Application<T> : Framework.Setup.Application<T> where T : ICommand

@@ -1,5 +1,4 @@
 using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Reflection;

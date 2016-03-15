@@ -39,6 +39,7 @@ namespace DragonSpark.Testing.Framework.Setup
 				{
 					var instance = application().ExecuteWith( autoData );
 					new AssociatedApplication( methodUnderTest ).Assign( instance );
+					autoData.Initialize();
 					var result = base.GetData( methodUnderTest );
 					return result;
 				}

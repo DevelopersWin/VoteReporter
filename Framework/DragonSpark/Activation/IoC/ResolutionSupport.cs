@@ -4,6 +4,7 @@ using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using System;
 using System.Collections.Generic;
+using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
 using DragonSpark.Activation.FactoryModel;
@@ -49,13 +50,13 @@ namespace DragonSpark.Activation.IoC
 		readonly static ISpecification<StrategyValidatorParameter>[] DefaultValidators = { ArrayStrategyValidator.Instance, EnumerableStrategyValidator.Instance };
 
 		readonly BuildableTypeFromConventionLocator locator;
-		readonly FrameworkFactoryTypeLocator factoryTypeLocator;
+		readonly Func<DiscoverableFactoryTypeLocator> factoryTypeLocator;
 		readonly IEnumerable<ISpecification<StrategyValidatorParameter>> validators;
 
-		public ResolutionSpecification( BuildableTypeFromConventionLocator locator, FrameworkFactoryTypeLocator factoryTypeLocator ) : this( locator, factoryTypeLocator, DefaultValidators )
+		public ResolutionSpecification( BuildableTypeFromConventionLocator locator, Func<DiscoverableFactoryTypeLocator> factoryTypeLocator ) : this( locator, factoryTypeLocator, DefaultValidators )
 		{}
 
-		ResolutionSpecification( BuildableTypeFromConventionLocator locator, FrameworkFactoryTypeLocator factoryTypeLocator, IEnumerable<ISpecification<StrategyValidatorParameter>> validators )
+		ResolutionSpecification( BuildableTypeFromConventionLocator locator, Func<DiscoverableFactoryTypeLocator> factoryTypeLocator, IEnumerable<ISpecification<StrategyValidatorParameter>> validators )
 		{
 			this.locator = locator;
 			this.factoryTypeLocator = factoryTypeLocator;
@@ -73,7 +74,7 @@ namespace DragonSpark.Activation.IoC
 			||
 			locator.Create( parameter.Key.Type ) != null
 			||
-			factoryTypeLocator.Create( parameter.Key.Type ) != null
+			factoryTypeLocator().Create( new CompositionContract( parameter.Key.Type ) ) != null
 			;
 
 		protected override bool Verify( ResolutionSpecificationParameter parameter ) => Check( parameter );

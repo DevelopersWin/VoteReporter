@@ -7,7 +7,6 @@ using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects.Setup;
 
 [assembly: AssemblyTitle( "DragonSpark.Testing" )]
@@ -28,7 +27,7 @@ using DragonSpark.Testing.Objects.Setup;
 [assembly: Application]
 
 // [assembly: ServiceLocatorFactory.Register]
-// [assembly: UnityContainerFactory.Register]
+[assembly: UnityContainerFactory.Register]
 [assembly: AssemblyProvider.Register] // Default assembly factory.
-// [assembly: Assemblies]
+									  // [assembly: Assemblies]
 [assembly: ApplyDefaultValues]

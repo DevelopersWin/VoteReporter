@@ -14,6 +14,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Setup;
 
 namespace DragonSpark.Testing.Framework
 {
@@ -49,7 +50,7 @@ namespace DragonSpark.Testing.Framework
 
 		public override ICustomization GetCustomization( ParameterInfo parameter )
 		{
-			var type = factoryType ?? ParameterInfoFactoryTypeLocator.Instance.Create( parameter );
+			var type = factoryType ?? new ParameterInfoFactoryTypeLocator( ApplicationServices.Current.Context.Get<DiscoverableFactoryTypeLocator>() ).Create( parameter );
 			var resultType = Factory.GetResultType( type );
 			var registration = new FactoryRegistration( type, parameter.ParameterType, resultType );
 			var result = new RegistrationCustomization( registration );

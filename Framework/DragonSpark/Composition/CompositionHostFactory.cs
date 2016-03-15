@@ -60,8 +60,9 @@ namespace DragonSpark.Composition
 
 	public class CompositionHostFactory : FactoryBase<Assembly[], CompositionHost>
 	{
-		readonly Func<ContainerConfiguration> configuration;
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
+
+		readonly Func<ContainerConfiguration> configuration;
 
 		public CompositionHostFactory() : this( () => new ContainerConfiguration() ) {}
 
@@ -73,7 +74,7 @@ namespace DragonSpark.Composition
 		protected override CompositionHost CreateItem( Assembly[] parameter )
 		{
 			var types = parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
-			var factoryTypes = types.Select( FactoryTypeFactory.Instance.Create ).ToArray();
+			var factoryTypes = types.Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
 			var locator = new DiscoverableFactoryTypeLocator( factoryTypes );
 			var result = configuration()
 				.WithParts( types )

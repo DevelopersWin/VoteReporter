@@ -72,7 +72,14 @@ namespace DragonSpark.Activation.IoC
 	{
 		delegate object Resolver( IBuilderContext context );
 
-		readonly static MethodInfo GenericResolveArrayMethod = typeof(EnumerableResolutionStrategy).GetTypeInfo().DeclaredMethods.First( m => m.Name == nameof(Resolve) && !m.IsPublic && m.IsStatic );
+		readonly static MethodInfo GenericResolveArrayMethod = typeof(EnumerableResolutionStrategy).GetTypeInfo().DeclaredMethods.First( m => m.Name == nameof(Resolve) && !m.IsPublic );
+
+		readonly IUnityContainer container;
+
+		public EnumerableResolutionStrategy( [Required]IUnityContainer container )
+		{
+			this.container = container;
+		}
 
 		public override void PreBuildUp( [Required]IBuilderContext context )
 		{
@@ -83,20 +90,21 @@ namespace DragonSpark.Activation.IoC
 				{
 					adapt.GetEnumerableType().With( type =>
 					{
-						var resolver = (Resolver)GenericResolveArrayMethod.MakeGenericMethod( type ).CreateDelegate( typeof(Resolver) );
+						var resolver = (Resolver)GenericResolveArrayMethod.MakeGenericMethod( type ).CreateDelegate( typeof(Resolver), this );
 
-						context.Existing = resolver( context );
-						context.BuildComplete = true;
+						var result = resolver( context );
+						context.Complete( result );
 					} );
 				}
 			}
 		}
 
-		static object Resolve<T>( IBuilderContext context )
+		object Resolve<T>( IBuilderContext context )
 		{
+			var defaultName = container.IsRegistered<T>() ? new string[] { null } : Default<string>.Items;
 			var result = context.Policies.Get<IRegisteredNamesPolicy>( null )
 				.With( policy => policy.GetRegisteredNames( typeof(T) )
-					.Concat( new string[] { null } ).Concat( typeof(T).GetTypeInfo().IsGenericType ? policy.GetRegisteredNames( typeof(T).GetGenericTypeDefinition() ) : Enumerable.Empty<string>() )
+					.Concat( defaultName ).Concat( typeof(T).GetTypeInfo().IsGenericType ? policy.GetRegisteredNames( typeof(T).GetGenericTypeDefinition() ) : Enumerable.Empty<string>() )
 					.Distinct()
 					.Select( context.New<T> )
 					.ToArray() 

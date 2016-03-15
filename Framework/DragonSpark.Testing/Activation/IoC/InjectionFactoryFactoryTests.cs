@@ -89,8 +89,10 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void DefaultPipelineWithComposition()
 		{
+			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
-				.RegisterInstance( new[] { GetType().Assembly } )
+				.RegisterInstance( assemblies )
+				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();
@@ -120,7 +122,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var @default = container.Resolve<ILogger>();
 			Assert.NotNull( @default );
 			Assert.True( new RegisterDefaultCommand.Default( @default ).Item );
-
+			container.RegisterInstance( CompositionHostFactory.Instance.Create( new Assembly[0] ) );
 			container.Extend<CompositionExtension>();
 
 			var logger = new LoggerConfiguration().CreateLogger();
@@ -134,8 +136,10 @@ namespace DragonSpark.Testing.Activation.IoC
 		public void DisposeCheck()
 		{
 			// var disposable = new Disposable();
+			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
-				.RegisterInstance( new[] { GetType().Assembly } )
+				.RegisterInstance( assemblies )
+				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			var resolved = container.Resolve<Disposable>();
 			Assert.NotSame( resolved, container.Resolve<Disposable>() );
@@ -159,8 +163,10 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void RegisteredPipelineWithSharedComposition()
 		{
+			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
-				.RegisterInstance( new[] { GetType().Assembly } )
+				.RegisterInstance( assemblies )
+				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();
@@ -193,8 +199,10 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void RegisteredPipelineWithComposition()
 		{
+			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
-				.RegisterInstance( new[] { GetType().Assembly } )
+				.RegisterInstance( assemblies )
+				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();
@@ -214,8 +222,10 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void MetataLifetime()
 		{
+			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
-				.RegisterInstance( new[] { GetType().Assembly } )
+				.RegisterInstance( assemblies )
+				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();

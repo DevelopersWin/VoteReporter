@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using System;
-using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Diagnostics
 {

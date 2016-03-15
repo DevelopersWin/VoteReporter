@@ -13,6 +13,7 @@ using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
@@ -101,10 +102,10 @@ namespace DragonSpark.Setup
 		{
 			var result = create()
 				.RegisterInstance( parameter.Assemblies )
+				.RegisterInstance( parameter.Host )
 				.Extend<DefaultRegistrationsExtension>()
 				.Extend<BuildPipelineExtension>()
 				.Extend<InstanceTypeRegistrationMonitorExtension>()
-				.RegisterInstance( parameter )
 				.Extend<CompositionExtension>()
 				;
 			return result;
@@ -257,15 +258,15 @@ namespace DragonSpark.Setup
 	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand
 	{
 		[Required, ApplicationService]
-		public CompositionHost Host { [return: Required]get; set; }
+		public CompositionContext Host { [return: Required]get; set; }
 
 		public string ContractName { get; set; }
 
-		protected override void OnExecute( object parameter ) => 
-			Host.GetExports<T>( ContractName ).Prioritize().Each( setup =>
-			{
-				setup.ExecuteWith( parameter );
-			} );
+		protected override void OnExecute( object parameter )
+		{
+			var enumerable = Host.GetExports<T>( ContractName );
+			enumerable.Prioritize().Each( setup => { setup.ExecuteWith( parameter ); } );
+		}
 	}
 
 	public class ApplySetup : ApplyExportedCommandsCommand<ISetup> {}

@@ -1,7 +1,7 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
@@ -12,7 +12,6 @@ using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -21,18 +20,9 @@ namespace DragonSpark.Activation.IoC
 		readonly ComposeStrategy strategy;
 		readonly CompositionHost host;
 		readonly ExportDescriptorProvider provider;
-		readonly RegisterHierarchyCommand command;
+		readonly RegisterHierarchyCommand<OnlyIfNotRegistered> command;
 
-		public CompositionExtension( [Required]Factory factory, [Required]IActivator activator, RegisterHierarchyCommand command, IServiceRegistry registry ) 
-			: this( factory.Create(), activator, command, registry ) {}
-
-		CompositionExtension( CompositionHost host, IActivator activator, RegisterHierarchyCommand command, IServiceRegistry registry )
-			: this( host, new CompositionManager( activator, host ), command, registry ) {}
-
-		CompositionExtension( CompositionHost host, CompositionManager manager, RegisterHierarchyCommand command, [Required]IServiceRegistry registry )
-			: this( new ComposeStrategy( manager, registry ), host, new ExportDescriptorProvider( manager ), command ) {}
-
-		CompositionExtension( [Required]ComposeStrategy strategy, [Required]CompositionHost host, [Required]ExportDescriptorProvider provider, [Required]RegisterHierarchyCommand command )
+		public CompositionExtension( [Required]ComposeStrategy strategy, [Required]CompositionHost host, [Required]ExportDescriptorProvider provider, [Required]RegisterHierarchyCommand<OnlyIfNotRegistered> command )
 		{
 			this.strategy = strategy;
 			this.host = host;
@@ -48,18 +38,13 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Add( strategy, UnityBuildStage.PreCreation );
 		}
-
-		public class Factory : FirstFactory<CompositionHost>
-		{
-			public Factory( [Required]IActivator activator, [Required]Assembly[] assemblies ) : base( activator.Activate<CompositionHost>, () => CompositionHostFactory.Instance.Create( assemblies ) ) {}
-		}
 	}
 
 	public class ExportDescriptorProvider : System.Composition.Hosting.Core.ExportDescriptorProvider
 	{
-		readonly CompositionManager activator;
+		readonly CompositionCoordinator activator;
 
-		public ExportDescriptorProvider( [Required]CompositionManager activator )
+		public ExportDescriptorProvider( [Required]CompositionCoordinator activator )
 		{
 			this.activator = activator;
 		}
@@ -75,27 +60,28 @@ namespace DragonSpark.Activation.IoC
 
 		 class Context
 		{
-			readonly CompositionManager manager;
+			readonly CompositionCoordinator coordinator;
 			readonly CompositionContract contract;
 
-			public Context( [Required]CompositionManager manager, [Required]CompositionContract contract )
+			public Context( [Required]CompositionCoordinator coordinator, [Required]CompositionContract contract )
 			{
-				this.manager = manager;
+				this.coordinator = coordinator;
 				this.contract = contract;
 			}
 
 			public ExportDescriptor Create( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( Activate, NoMetadata );
 
-			object Activate( LifetimeContext context, CompositionOperation operation ) => manager.Create( contract );
+			object Activate( LifetimeContext context, CompositionOperation operation ) => coordinator.Create( contract );
 		}
 	}
 
-	public class CompositionManager
+	[Persistent]
+	public class CompositionCoordinator
 	{
 		readonly IActivator activator;
 		readonly CompositionHost host;
 
-		public CompositionManager( [Required]IActivator activator, [Required]CompositionHost host )
+		public CompositionCoordinator( [Required]IActivator activator, [Required]CompositionHost host )
 		{
 			this.activator = activator;
 			this.host = host;
@@ -140,12 +126,12 @@ namespace DragonSpark.Activation.IoC
 
 	public class ComposeStrategy : BuilderStrategy
 	{
-		readonly CompositionManager manager;
+		readonly CompositionCoordinator coordinator;
 		readonly IServiceRegistry registry;
 
-		public ComposeStrategy( [Required] CompositionManager manager, [Required]IServiceRegistry registry )
+		public ComposeStrategy( [Required] CompositionCoordinator coordinator, [Required]IServiceRegistry registry )
 		{
-			this.manager = manager;
+			this.coordinator = coordinator;
 			this.registry = registry;
 		}
 
@@ -153,7 +139,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			if ( !context.HasRegisteredBuildPlan() )
 			{
-				var existing = manager.Create( context.BuildKey );
+				var existing = coordinator.Create( context.BuildKey );
 				existing.With( o =>
 				{
 					if ( new Checked( o, this ).Item.Apply() )

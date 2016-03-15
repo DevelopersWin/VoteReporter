@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation.IoC;
+using DragonSpark.Extensions;
 using Xunit;
 
 namespace DragonSpark.Testing.Activation.IoC
@@ -8,28 +9,28 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void SingletonFromItem()
 		{
-			var sut = new SingletonLocator();
+			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( typeof(SingletonItem).Assembly.ToItem() ) );
 			Assert.Same( SingletonItem.Instance, sut.Locate( typeof(SingletonItem) ) );
 		}
 
 		[Fact]
 		public void SingletonFromMetadata()
 		{
-			var sut = new SingletonLocator();
+			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( typeof(SingletonMetadata).Assembly.ToItem() ) );
 			Assert.Same( SingletonMetadata.Temp, sut.Locate( typeof(SingletonMetadata) ) );
 		}
 
 		[Fact]
 		public void SingletonFromOther()
 		{
-			var sut = new SingletonLocator( nameof(SingletonOther.Other) );
+			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( typeof(SingletonOther).Assembly.ToItem() ), nameof(SingletonOther.Other) );
 			Assert.Same( SingletonOther.Other, sut.Locate( typeof(SingletonOther) ) );
 		}
 
 		[Fact]
 		public void SingletonFromConvention()
 		{
-			var sut = new SingletonLocator();
+			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( typeof(ISingleton).Assembly.ToItem() ) );
 			Assert.Same( Singleton.Instance, sut.Locate( typeof(ISingleton) ) );
 		}
 

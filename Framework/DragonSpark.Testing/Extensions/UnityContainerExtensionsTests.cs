@@ -1,3 +1,4 @@
+using System.Composition;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -6,6 +7,7 @@ using DragonSpark.Testing.Objects;
 using Microsoft.Practices.Unity;
 using Serilog.Events;
 using System.Linq;
+using DragonSpark.Activation.FactoryModel;
 using Xunit;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
@@ -34,5 +36,8 @@ namespace DragonSpark.Testing.Extensions
 			var count = logger.Events.Count();
 			Assert.True( count > initial );
 		}
+
+		[Export]
+		class UnityContainerFactory : Objects.Setup.UnityContainerFactory {}
 	}
 }

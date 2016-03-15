@@ -12,12 +12,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override void OnExecute( AutoData parameter )
 		{
 			base.OnExecute( parameter );
-			parameter.Initialize();
-		}
-
-		protected override void OnDispose()
-		{
-			base.OnDispose();
 		}
 	}
 }
