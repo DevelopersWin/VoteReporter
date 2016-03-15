@@ -51,7 +51,7 @@ namespace DragonSpark.Activation.IoC
 
 		public class Factory : FirstFactory<CompositionHost>
 		{
-			public Factory( [Required]IActivator activator, [Required]Assembly[] assemblies ) : base( activator.Activate<CompositionHost>, () => Composer.Current, () => CompositionHostFactory.Instance.Create( assemblies ) ) {}
+			public Factory( [Required]IActivator activator, [Required]Assembly[] assemblies ) : base( activator.Activate<CompositionHost>, () => CompositionHostFactory.Instance.Create( assemblies ) ) {}
 		}
 	}
 

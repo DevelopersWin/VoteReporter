@@ -132,7 +132,7 @@ namespace DragonSpark.Runtime
 		protected Command( ISpecification<TParameter> specification ) : base( specification ) {}
 	}
 
-	public class Specification<TParameter> : WrappedSpecification<TParameter>
+	public class Specification<TParameter> : DecoratedSpecification<TParameter>
 	{
 		public static Specification<TParameter> Instance { get; } = new Specification<TParameter>();
 

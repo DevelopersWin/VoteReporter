@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Setup;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -140,16 +141,18 @@ namespace DragonSpark.Activation.IoC
 
 	public class BuildableTypeFromConventionLocator : DecoratedFactory<Type, Type>
 	{
-		public BuildableTypeFromConventionLocator( [Required]Func<Assembly[]> assemblies ) : this( assemblies, CanBuildSpecification.Instance ) {}
+		public BuildableTypeFromConventionLocator() : this( ApplicationServices.Current.Context.Assemblies ) {}
 
-		public BuildableTypeFromConventionLocator( [Required]Func<Assembly[]> assemblies, [Required]CanBuildSpecification specification ) : base( new WrappedSpecification<Type>( new InverseSpecification( specification ) ), new Context( assemblies, specification ).Create ) {}
+		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies ) : this( assemblies, CanBuildSpecification.Instance ) {}
+
+		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies, [Required]CanBuildSpecification specification ) : base( new DecoratedSpecification<Type>( new InverseSpecification( specification ) ), new Context( assemblies, specification ).Create ) {}
 
 		class Context : FactoryBase<Type, Type>
 		{
-			readonly Func<Assembly[]> assemblies;
+			readonly Assembly[] assemblies;
 			readonly CanBuildSpecification specification;
 
-			public Context( Func<Assembly[]> assemblies, CanBuildSpecification specification )
+			public Context( Assembly[] assemblies, CanBuildSpecification specification )
 			{
 				this.assemblies = assemblies;
 				this.specification = specification;
@@ -159,7 +162,7 @@ namespace DragonSpark.Activation.IoC
 			{
 				var adapter = parameter.Adapt();
 				var name = parameter.Name.TrimStartOf( 'I' );
-				var result = assemblies().Append( parameter.Assembly() ).Distinct()
+				var result = assemblies.Append( parameter.Assembly() ).Distinct()
 					.SelectMany( assembly => assembly.DefinedTypes.AsTypes() )
 					.Where( adapter.IsAssignableFrom )
 					.Where( specification.IsSatisfiedBy )
@@ -169,16 +172,16 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class ImplementedFromConventionTypeLocator : FactoryBase<Type, Type>
+	public class ImplementedFromConventionTypeLocator : FactoryBase<Type, Type> // TODO: Fix.
 	{
 		public static ImplementedFromConventionTypeLocator Instance { get; } = new ImplementedFromConventionTypeLocator();
 
 		[Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
-			var assemblies = new Assemblies.Get[] { Assemblies.GetCurrent, parameter.Append( GetType() ).Distinct().Assemblies };
+			var assemblies = new[] { ApplicationServices.Current.Context.Assemblies, parameter.Append( GetType() ).Distinct().Assemblies() };
 
-			var result = assemblies.FirstWhere( get => new ImplementedInterfaceFromConventionLocator( get() ).Create( parameter ) );
+			var result = assemblies.FirstWhere( get => new ImplementedInterfaceFromConventionLocator( get ).Create( parameter ) );
 			return result;
 		}
 	}
@@ -247,27 +250,6 @@ namespace DragonSpark.Activation.IoC
 	{
 		public KeyReference( object instance, NamedTypeBuildKey key ) : base( instance, key ) { }
 	}
-
-	/*public class DeferredExecutionMonitor
-	{
-		readonly ConditionMonitor monitor = new ConditionMonitor();
-
-		readonly ICollection<Action> delegates = new System.Collections.ObjectModel.Collection<Action>();
-
-		public void Execute( [Required]Action action )
-		{
-			if ( monitor.IsApplied )
-			{
-				action();
-			}
-			else
-			{
-				delegates.Add( action );
-			}
-		}
-
-		public void Apply() => monitor.Apply( () => delegates.Purge().Each( action => action() ) );
-	}*/
 
 	public class ConventionStrategy : BuilderStrategy
 	{

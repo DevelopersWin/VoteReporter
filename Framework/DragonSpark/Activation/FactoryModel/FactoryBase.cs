@@ -45,7 +45,9 @@ namespace DragonSpark.Activation.FactoryModel
 
 		protected FactoryBase() : this( FixedFactoryParameterCoercer<TParameter>.Instance ) {}
 
-		protected FactoryBase( [Required]IFactoryParameterCoercer<TParameter> coercer ) : this( new WrappedSpecification<TParameter>( AlwaysSpecification.Instance ), coercer ) {}
+		protected FactoryBase( [Required]IFactoryParameterCoercer<TParameter> coercer ) : this( new DecoratedSpecification<TParameter>( AlwaysSpecification.Instance ), coercer ) {}
+
+		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( specification, FixedFactoryParameterCoercer<TParameter>.Instance ) {}
 
 		protected FactoryBase( [Required]ISpecification<TParameter> specification, [Required]IFactoryParameterCoercer<TParameter> coercer )
 		{
@@ -69,7 +71,7 @@ namespace DragonSpark.Activation.FactoryModel
 	{
 		readonly Func<T, U> inner;
 
-		public DecoratedFactory( Func<T, U> inner ) : this( new WrappedSpecification<T>( AlwaysSpecification.Instance ), inner ) {}
+		public DecoratedFactory( Func<T, U> inner ) : this( new DecoratedSpecification<T>( AlwaysSpecification.Instance ), inner ) {}
 
 		public DecoratedFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : base( specification, FactoryParameterCoercer<T>.Instance )
 		{

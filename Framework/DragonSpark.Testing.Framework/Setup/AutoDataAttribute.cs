@@ -6,7 +6,6 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using DragonSpark.Composition;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -20,11 +19,11 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly Func<IApplication> application;
 
-		public AutoDataAttribute() : this( () => new Application() ) {}
+		public AutoDataAttribute() : this( () => new DefaultApplication() ) {}
 
 		protected AutoDataAttribute( Func<IApplication> application ) : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create, application ) {}
 
-		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, () => new Application() ) {}
+		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, () => new DefaultApplication() ) {}
 
 		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required]Func<IApplication> application  ) : base( fixture() )
 		{

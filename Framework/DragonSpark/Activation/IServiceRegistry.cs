@@ -19,14 +19,14 @@ namespace DragonSpark.Activation
 		void RegisterFactory( FactoryRegistrationParameter parameter );
 	}
 
-	public class AlwaysOfType : WrappedSpecification<Type>
+	public class AlwaysOfType : DecoratedSpecification<Type>
 	{
 		public static AlwaysOfType Instance { get; } = new AlwaysOfType();
 
 		public AlwaysOfType() : base( AlwaysSpecification.Instance ) { }
 	}
 
-	public class OnlyIfNotRegistered : WrappedSpecification<Type>
+	public class OnlyIfNotRegistered : DecoratedSpecification<Type>
 	{
 		public OnlyIfNotRegistered( IUnityContainer container ) : base( new InverseSpecification( new IsRegisteredSpecification( container ) ) ) { }
 	}

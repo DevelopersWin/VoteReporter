@@ -1,15 +1,13 @@
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
-using PostSharp.Patterns.Collections;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using PostSharp.Patterns.Model;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -29,23 +27,30 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override void OnInitializing( AutoData context ) => factory( context.Method ).Each( customization => customization.Customize( context.Fixture ) );
 	}
 
-	public class Application<T> : Application where T : ICommand
+	public abstract class Application<T> : Application where T : ICommand
 	{
-		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
+		protected Application( IApplicationContext context, IEnumerable<ICommand> commands ) : base( context, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
 	}
 
-	public interface IApplication : DragonSpark.Setup.IApplication, ICommand<AutoData>, IDisposable { }
+	public interface IApplication : DragonSpark.Setup.IApplication, ICommand<AutoData> { }
 
-	public class Application : DragonSpark.Setup.Application<AutoData>, IApplication
+	public class ApplicationContextFactory : DragonSpark.Setup.ApplicationContextFactory
 	{
-		public Application( params ICommand[] commands ) : this( TypeSystem.Assemblies.GetCurrent(), commands ) {}
+		public static ApplicationContextFactory Instance { get; } = new ApplicationContextFactory();
 
-		public Application( Assembly[] assemblies, IEnumerable<ICommand> commands ) : base( assemblies, commands ) {}
+		public ApplicationContextFactory() : base( () => Default<Assembly>.Items, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
+	}
 
-		public void Dispose()
+	public class DefaultApplication : Application
+	{
+		public DefaultApplication() : base( ApplicationContextFactory.Instance.Create(), Default<ICommand>.Items ) {}
+	}
+
+	public abstract class Application : DragonSpark.Setup.Application<AutoData>, IApplication
+	{
+		protected Application( IApplicationContext context, IEnumerable<ICommand> commands ) : base( context, commands )
 		{
-			Commands.OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
-			Commands.Clear();
+			DisposeAfterExecution = false;
 		}
 	}
 }

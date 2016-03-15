@@ -15,7 +15,6 @@ using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using Moq;
 using Ploeh.AutoFixture.Xunit2;
-using PostSharp.Patterns.Contracts;
 using PostSharp.Patterns.Model;
 using Serilog;
 using System;
@@ -357,28 +356,6 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( sut.Object, item );
 		}
 
-		/*[Fact]
-		public void Mocked()
-		{
-			/*var currentMethod = (MethodInfo)MethodBase.GetCurrentMethod();
-			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( currentMethod ) ) )
-			{
-				using ( var container = CompositionHostFactory.Instance.Create( AssemblyProvider.Instance.Create() ) )
-				{
-					new CompositionHostContext().Assign( container );
-					var temp = container.GetExport<ConfigureServiceLocationContext>();
-				}
-				/*var autoData = new AutoData( FixtureFactory.Instance.Create(), currentMethod );
-				var instance = new ApplicationWithLocation<UnitySetup>().ExecuteWith( autoData );
-				Assert.True( true );#2#
-			}#1#
-			using ( var container = CompositionHostFactory.Instance.Create( AssemblyProvider.Instance.Create() ) )
-			{
-				// new CompositionHostContext().Assign( container );
-				var temp = container.GetExport<ConfigureServiceLocationContext>();
-			}
-		}*/
-
 		[Theory, LocationSetup.AutoData]
 		public void GetAllInstances( IServiceLocator sut )
 		{
@@ -534,11 +511,30 @@ namespace DragonSpark.Windows.Testing.Setup
 	}
 
 	[Export]
-	public class ServiceLocatorFactory : AggregateFactory<IServiceLocator>
+	public class ServiceLocatorFactory : DragonSpark.Setup.ServiceLocatorFactory
 	{
+		/*class Configure : DragonSpark.Runtime.Command<IServiceLocator>
+		{
+			public static Configure Instance { get; } = new Configure( ConfigureLocationCommand.Instance );
+
+			readonly ConfigureLocationCommand configure;
+
+			Configure( ConfigureLocationCommand configure )
+			{
+				this.configure = configure;
+			}
+
+			protected override void OnExecute( IServiceLocator parameter )
+			{
+				var item = parameter.GetInstance<ConfigureLocationCommand.Parameter>();
+				configure.ExecuteWith( item );
+			}
+		}
+
 		[ImportingConstructor]
-		public ServiceLocatorFactory( [Required]ConfigureServiceLocationContext context ) : base( () => context.Locator, 
-			new CommandTransformer<ConfigureLocationCommand, IServiceLocator>( new ConfigureLocationCommand( context ) ).Create 
-		){}
+		public ServiceLocatorFactory( [Required]DragonSpark.Setup.ServiceLocatorFactory.Parameter parameter ) : base( 
+			() => DragonSpark.Setup.ServiceLocatorFactory.Instance.Create( parameter ), 
+			new CommandTransformer<Configure, IServiceLocator>( Configure.Instance ).Create 
+		){}*/
 	}
 }

@@ -7,9 +7,11 @@ using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Setup;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.FactoryModel
@@ -26,7 +28,7 @@ namespace DragonSpark.Activation.FactoryModel
 
 		public static T Create<T>() => (T)Create( typeof(T) );
 
-		public static object Create( Type type ) => FrameworkFactoryTypeLocator.Instance.Create( type ).With( From );
+		public static object Create( Type type ) => new FrameworkFactoryTypeLocator().Create( type ).With( From );
 
 		public static object From( [Required, OfFactoryType]Type factoryType )
 		{
@@ -74,32 +76,32 @@ namespace DragonSpark.Activation.FactoryModel
 	{
 		public static MemberInfoFactoryTypeLocator Instance { get; } = new MemberInfoFactoryTypeLocator();
 
-		public MemberInfoFactoryTypeLocator() : base( member => member.GetMemberType(), member => new[] { member.DeclaringType } ) {}
+		MemberInfoFactoryTypeLocator() : base( member => member.GetMemberType(), member => new[] { member.DeclaringType } ) {}
 	}
 
 	public class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
 	{
 		public static ParameterInfoFactoryTypeLocator Instance { get; } = new ParameterInfoFactoryTypeLocator();
 
-		public ParameterInfoFactoryTypeLocator() : base( parameter => parameter.ParameterType, parameter => new[] { parameter.Member.DeclaringType } ) {}
+		ParameterInfoFactoryTypeLocator() : base( parameter => parameter.ParameterType, parameter => new[] { parameter.Member.DeclaringType } ) {}
 	}
 
 	public class FrameworkFactoryTypeLocator : FactoryTypeLocatorBase<Type>
 	{
-		public static FrameworkFactoryTypeLocator Instance { get; } = new FrameworkFactoryTypeLocator( Assemblies.GetCurrent );
+		public FrameworkFactoryTypeLocator() : this( ApplicationServices.Current.Context.Assemblies ) {}
 
-		public FrameworkFactoryTypeLocator( Assemblies.Get assemblies ) : base( assemblies, Default<Type>.Self, t => Default<Type>.Items ) {}
+		public FrameworkFactoryTypeLocator( Assembly[] assemblies ) : base( assemblies, Default<Type>.Self, t => Default<Type>.Items ) {}
 	}
 
 	public abstract class FactoryTypeLocatorBase<T> : FactoryBase<T, Type>
 	{
-		readonly Assemblies.Get assemblies;
+		readonly Assembly[] assemblies;
 		readonly Func<T, Type> type;
 		readonly Func<T, Type[]> locations;
 
-		protected FactoryTypeLocatorBase( [Required]Func<T, Type> type, [Required]Func<T, Type[]> locations ) : this( Assemblies.GetCurrent, type, locations ) {}
+		protected FactoryTypeLocatorBase( [Required]Func<T, Type> type, [Required]Func<T, Type[]> locations ) : this( ApplicationServices.Current.Context.Assemblies, type, locations ) {}
 
-		protected FactoryTypeLocatorBase( Assemblies.Get assemblies, [Required]Func<T, Type> type, [Required]Func<T, Type[]> locations )
+		protected FactoryTypeLocatorBase( Assembly[] assemblies, [Required]Func<T, Type> type, [Required]Func<T, Type[]> locations )
 		{
 			this.assemblies = assemblies;
 			this.type = type;
@@ -109,35 +111,36 @@ namespace DragonSpark.Activation.FactoryModel
 		[Freeze]
 		protected override Type CreateItem( T parameter )
 		{
-			var mapped = new CompositionContract( type( parameter ) );
+			/*var mapped = new CompositionContract( type( parameter ) );
 			var candidates = new[] { locations( parameter ).Append( mapped.ContractType, GetType() ).Assemblies().Distinct().Fixed, assemblies };
-			var result = candidates.Select( get => new DiscoverableFactoryTypeLocator( new FactoryTypeContainer( get.GetTypes() ) ) ).FirstWhere( get => get.Create( mapped ) );
-			return result;
+			var result = candidates.Select( get => new DiscoverableFactoryTypeLocator( get.GetTypes().Select( FactoryTypeFactory.Instance.Create ) ) ).FirstWhere( get => get.Create( mapped ) );
+			return result;*/
+			return null; // TODO: Fix.
 		}
 	}
 
 	[Persistent]
 	public class DiscoverableFactoryTypeLocator : FactoryBase<CompositionContract, Type>
 	{
-		readonly FactoryTypeContainer container;
+		readonly IEnumerable<FactoryType> types;
 
-		public DiscoverableFactoryTypeLocator( [Required]FactoryTypeContainer container )
+		public DiscoverableFactoryTypeLocator( [Required]IEnumerable<FactoryType> types )
 		{
-			this.container = container;
+			this.types = types.Fixed();
 		}
 
 		[Freeze]
 		protected override Type CreateItem( CompositionContract parameter )
 		{
 			var name = $"{parameter.ContractType.Name}Factory";
-			var candidates = container.Where( type => parameter.ContractName == type.Name && type.ResultType.Adapt().IsAssignableFrom( parameter.ContractType ) ).ToArray();
+			var candidates = types.Where( type => parameter.ContractName == type.Name && type.ResultType.Adapt().IsAssignableFrom( parameter.ContractType ) ).ToArray();
 			var item = 
-				candidates.Only( info => info.FactoryType.Name == name )
+				candidates.Only( info => info.RuntimeType.Name == name )
 				??
 				candidates.FirstOrDefault( arg => arg.ResultType == parameter.ContractType )
 				??
 				candidates.FirstOrDefault();
-			var result = item.With( profile => profile.FactoryType );
+			var result = item.With( profile => profile.RuntimeType );
 			return result;
 		}
 	}

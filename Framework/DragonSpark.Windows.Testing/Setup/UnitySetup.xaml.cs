@@ -1,5 +1,4 @@
-﻿using DragonSpark.Testing.Objects.Setup;
-using System.Composition;
+﻿using System.Composition;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -8,7 +7,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public class AutoDataAttribute : DragonSpark.Testing.Objects.Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( () => new ApplicationWithLocation<UnitySetup>() ) {}
+			public AutoDataAttribute() : base( () => new Application<UnitySetup>() ) {}
 		}
 
 		public UnitySetup()

@@ -1,16 +1,20 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Testing.Framework;
+﻿using DragonSpark.Composition;
+using DragonSpark.Diagnostics;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Composition;
+using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Activation.FactoryModel;
+using Microsoft.Practices.Unity;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
-	[Export, Shared]
+	/*[Export, Shared]
 	public class UnityContainerFactory : Activation.IoC.UnityContainerFactory
 	{
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
@@ -18,6 +22,19 @@ namespace DragonSpark.Testing.Objects.Setup
 		public class Register : RegisterFactoryAttribute
 		{
 			public Register() : base( typeof(UnityContainerFactory) ) {}
+		}
+	}*/
+
+	public class UnityContainerFactory : FactoryBase<IUnityContainer>
+	{
+		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
+
+		protected override IUnityContainer CreateItem()
+		{
+			var assemblies = new Assembly[0];
+			var parameter = new ServiceLocatorFactory.Parameter( CompositionHostFactory.Instance.Create( assemblies ), assemblies );
+			var result = DragonSpark.Setup.UnityContainerFactory.Instance.Create( parameter );
+			return result;
 		}
 	}
 
@@ -36,10 +53,17 @@ namespace DragonSpark.Testing.Objects.Setup
 		protected AutoDataAttribute( Func<Application> application ) : base( FixtureFactory.Instance.Create, application ) {}
 	}
 
+	public class ApplicationContextFactory : DragonSpark.Setup.ApplicationContextFactory
+	{
+		public static Framework.Setup.ApplicationContextFactory Instance { get; } = new Framework.Setup.ApplicationContextFactory();
+
+		public ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
+	}
+
 	public class Application<T> : Framework.Setup.Application<T> where T : ICommand
 	{
 		public Application() : this( Default<ICommand>.Items ) {}
 
-		public Application( IEnumerable<ICommand> commands ) : base( AssemblyProvider.Instance.Create(), commands ) {}
+		public Application( IEnumerable<ICommand> commands ) : base( ApplicationContextFactory.Instance.Create(), commands ) {}
 	}
 }

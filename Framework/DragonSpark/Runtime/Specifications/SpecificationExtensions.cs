@@ -6,6 +6,6 @@ namespace DragonSpark.Runtime.Specifications
 
 		public static ISpecification And( this ISpecification @this, ISpecification other ) => new AllSpecification( @this, other );
 
-		public static ISpecification<T> Wrap<T>( this ISpecification @this ) => new WrappedSpecification<T>( @this );
+		public static ISpecification<T> Wrap<T>( this ISpecification @this ) => new DecoratedSpecification<T>( @this );
 	}
 }

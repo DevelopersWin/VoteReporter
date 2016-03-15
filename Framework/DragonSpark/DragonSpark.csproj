@@ -187,7 +187,7 @@
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
     <Compile Include="Runtime\ISerializer.cs" />
-    <Compile Include="Runtime\Specifications\WrappedSpecification.cs" />
+    <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsTypeSpecification.cs" />
     <Compile Include="Runtime\Values\AmbientContextCommand.cs" />
     <Compile Include="Runtime\Values\CompositeWritableValue.cs" />

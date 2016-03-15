@@ -3,14 +3,14 @@ using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class WrappedSpecification<T> : SpecificationBase<T>
+	public class DecoratedSpecification<T> : SpecificationBase<T>
 	{
 		readonly ISpecification inner;
 		readonly Func<T, object> transform;
 
-		public WrappedSpecification( [Required]ISpecification inner  ) : this( inner, t => t ) {}
+		public DecoratedSpecification( [Required]ISpecification inner  ) : this( inner, t => t ) {}
 
-		public WrappedSpecification( [Required]ISpecification inner, [Required]Func<T, object> transform )
+		public DecoratedSpecification( [Required]ISpecification inner, [Required]Func<T, object> transform )
 		{
 			this.inner = inner;
 			this.transform = transform;

@@ -39,12 +39,11 @@ namespace DragonSpark.Activation.IoC
 			this.register = register;
 			this.registry = registry;
 
-			var instance = Assemblies.Resolve( assemblies );
 			var loggingParameter = new RegisterDefaultCommand.Parameter<ILogger>( logger );
 			var sinkParameter = new RegisterDefaultCommand.Parameter<RecordingLogEventSink>( sink );
 			parameters = new RegisterDefaultCommand.Parameter[]
 			{
-				new RegisterDefaultCommand.Parameter<Assembly[]>( instance ),
+				new RegisterDefaultCommand.Parameter<Assembly[]>( assemblies ),
 				new RegisterDefaultCommand.Parameter<Serilog.Core.LoggingLevelSwitch>( levelSwitch ),
 				sinkParameter,
 				loggingParameter
@@ -62,7 +61,7 @@ namespace DragonSpark.Activation.IoC
 			registry.Register<IActivator, Activator>();
 			registry.Register( Context );
 			registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
-			registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
+			// registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
 		}
 
 		class Activator : CompositeActivator
@@ -168,7 +167,7 @@ namespace DragonSpark.Activation.IoC
 
 	abstract class MonitorRegistrationCommandBase<T> : Command<T, ISpecification<T>> where T : class
 	{
-		protected MonitorRegistrationCommandBase( [Required] RegisterDefaultCommand.Parameter<T> parameter ) : base( new WrappedSpecification<T>( new AllSpecification( NullSpecification.NotNull, new OnlyOnceSpecification() ) ) )
+		protected MonitorRegistrationCommandBase( [Required] RegisterDefaultCommand.Parameter<T> parameter ) : base( new DecoratedSpecification<T>( new AllSpecification( NullSpecification.NotNull, new OnlyOnceSpecification() ) ) )
 		{
 			Parameter = parameter;
 		}

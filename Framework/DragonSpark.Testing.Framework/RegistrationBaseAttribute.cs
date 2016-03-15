@@ -18,13 +18,13 @@ namespace DragonSpark.Testing.Framework
 		protected RegistrationBaseAttribute( Func<object, ICustomization> factory ) : base( x => x.AsTo( factory ) ) {}
 	}
 
-	[Priority( Priority.Low )]
+	/*[Priority( Priority.Low )]
 	public class AssembliesAttribute : RegistrationBaseAttribute
 	{
 		public AssembliesAttribute() : base( o => AssignAssemblyHostCustomization.Instance ) {}
-	}
+	}*/
 
-	public class AssignAssemblyHostCustomization : ICustomization
+	/*public class AssignAssemblyHostCustomization : ICustomization
 	{
 		public static AssignAssemblyHostCustomization Instance { get; } = new AssignAssemblyHostCustomization();
 
@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.Framework
 			var assemblies = fixture.Create<Assembly[]>();
 			new AssemblyHost().Assign( assemblies );
 		}
-	}
+	}*/
 
 	public class RegistrationCustomization : ICustomization
 	{

@@ -1,14 +1,12 @@
 using DragonSpark.Setup;
-using DragonSpark.TypeSystem;
-using System.Reflection;
 using System.Windows.Input;
 
 namespace DragonSpark.Windows.Setup
 {
 	public class ConsoleApplication : Application<string[]>
 	{
-		public ConsoleApplication( params ICommand[] commands ) : this( Default<Assembly>.Items, commands ) {}
+		public ConsoleApplication( IApplicationContext context, params ICommand[] commands ) : base( context, commands ) {}
 
-		public ConsoleApplication( Assembly[] assemblies, params ICommand[] commands ) : base( assemblies, commands ) {}
+		public ConsoleApplication( params ICommand[] commands ) : base( commands ) {}
 	}
 }

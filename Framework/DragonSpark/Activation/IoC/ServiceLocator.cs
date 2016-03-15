@@ -7,17 +7,18 @@ using PostSharp.Patterns.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Composition;
 using System.Linq;
 
 namespace DragonSpark.Activation.IoC
 {
-	[Disposable( ThrowObjectDisposedException = true ), Export]
+	[Disposable( ThrowObjectDisposedException = true )]
 	public class ServiceLocator : ServiceLocatorImplBase
 	{
 		//public ServiceLocator() : this( new UnityContainer() ) {}
 
-		[ImportingConstructor]
+		// [ImportingConstructor]
+		public ServiceLocator( [Required]IUnityContainer container ) : this( container, container.Resolve<ILogger>() ) {}
+
 		public ServiceLocator( [Required]IUnityContainer container, [Required]ILogger logger )
 		{
 			Container = container;

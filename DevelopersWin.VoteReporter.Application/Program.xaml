@@ -3,13 +3,12 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:ioC="clr-namespace:DragonSpark.Activation.IoC;assembly=DragonSpark"
 	xmlns:ds="http://framework.dragonspark.us"
-	xmlns:windowsRuntime="clr-namespace:DragonSpark.Windows.Runtime;assembly=DragonSpark.Windows"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
+	xmlns:startup="clr-namespace:DevelopersWin.VoteReporter.Application.Startup"
 	mc:Ignorable="d" 
-	Assemblies="{ds:Factory {x:Static windowsRuntime:AssemblyProvider.Instance}}"
+	Context="{ds:Factory {x:Static startup:ApplicationContextFactory.Instance}}"
 >
-	<ioC:AssignLocationCommand />
+	<!--<ioC:AssignLocationCommand />-->
 	<setup:ApplySetup />
 </ds:ConsoleApplication>
