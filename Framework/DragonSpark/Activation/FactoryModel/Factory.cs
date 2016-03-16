@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Setup;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.FactoryModel
@@ -28,7 +27,7 @@ namespace DragonSpark.Activation.FactoryModel
 
 		public static T Create<T>() => (T)Create( typeof(T) );
 
-		public static object Create( Type type ) => ApplicationServices.Current.Context.Get<DiscoverableFactoryTypeLocator>().Create( new CompositionContract( type ) ).With( From );
+		public static object Create( Type type ) => Services.Get<DiscoverableFactoryTypeLocator>().Create( new CompositionContract( type ) ).With( From );
 
 		public static object From( [Required, OfFactoryType]Type factoryType )
 		{

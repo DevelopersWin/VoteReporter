@@ -1,5 +1,9 @@
 using DragonSpark.Extensions;
+using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
+using PostSharp.Patterns.Contracts;
+using System;
+using ServiceLocator = Microsoft.Practices.ServiceLocation.ServiceLocator;
 
 namespace DragonSpark.Activation
 {
@@ -26,5 +30,11 @@ namespace DragonSpark.Activation
 			var locate = Location.Locate<T>();
 			return locate.OrDefault( Activator.Activate<T> );
 		}
+
+		static IApplication Current => new CurrentApplication().Item;
+
+		public static T Get<T>() => (T)Get( typeof(T) );
+		
+		public static object Get( [Required] Type type ) => Current.GetService( type );
 	}
 }

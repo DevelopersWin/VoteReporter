@@ -1,4 +1,5 @@
-﻿using DragonSpark.Activation.FactoryModel;
+﻿using DragonSpark.Activation;
+using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
@@ -18,7 +19,6 @@ using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 using Type = System.Type;
 
 namespace DragonSpark.Setup
@@ -54,33 +54,33 @@ namespace DragonSpark.Setup
 		}
 	}*/
 
-	public interface IApplicationContext : IServiceProvider
+	/*public interface IApplicationContext : IServiceProvider
 	{
 		Assembly[] Assemblies { get; }
-	}
+	}*/
 
-	public class ApplicationContextFactory : FactoryBase<IApplicationContext>
+	public class ApplicationServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
 		readonly Func<Assembly[]> assemblies;
 		readonly Func<Assembly[], CompositionHost> compositionHostFactory;
 		readonly Func<ServiceLocatorFactory.Parameter, IServiceLocator> serviceLocatorFactory;
 
-		public ApplicationContextFactory( [Required]IAssemblyProvider assemblyProvider, [Required]CompositionHostFactory compositionHostFactory, [Required]ServiceLocatorFactory serviceLocatorFactory ) : this( assemblyProvider.Create, compositionHostFactory.Create, serviceLocatorFactory.Create ) {}
+		public ApplicationServiceProviderFactory( [Required]IAssemblyProvider assemblyProvider, [Required]CompositionHostFactory compositionHostFactory, [Required]ServiceLocatorFactory serviceLocatorFactory ) : this( assemblyProvider.Create, compositionHostFactory.Create, serviceLocatorFactory.Create ) {}
 
-		public ApplicationContextFactory( [Required]Func<Assembly[]> assemblies, [Required]Func<Assembly[], CompositionHost> compositionHostFactory, [Required]Func<ServiceLocatorFactory.Parameter, IServiceLocator> serviceLocatorFactory )
+		public ApplicationServiceProviderFactory( [Required]Func<Assembly[]> assemblies, [Required]Func<Assembly[], CompositionHost> compositionHostFactory, [Required]Func<ServiceLocatorFactory.Parameter, IServiceLocator> serviceLocatorFactory )
 		{
 			this.assemblies = assemblies;
 			this.compositionHostFactory = compositionHostFactory;
 			this.serviceLocatorFactory = serviceLocatorFactory;
 		}
 
-		protected override IApplicationContext CreateItem()
+		protected override IServiceProvider CreateItem()
 		{
 			var instance = assemblies();
 			var host = compositionHostFactory( instance );
 			var parameter = new ServiceLocatorFactory.Parameter( host, instance );
 			var serviceLocator = serviceLocatorFactory( parameter );
-			var result = new ApplicationContext( instance, serviceLocator );
+			var result = new ApplicationServiceProvider( serviceLocator );
 			return result;
 		}
 	}
@@ -112,11 +112,11 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class MefServiceLocatorAdapter : ServiceLocatorImplBase
+	public class ServiceLocator : ServiceLocatorImplBase
 	{
 		readonly CompositionHost host;
 
-		public MefServiceLocatorAdapter(CompositionHost host)
+		public ServiceLocator( [Required]CompositionHost host )
 		{
 			this.host = host;
 		}
@@ -140,7 +140,14 @@ namespace DragonSpark.Setup
 	{
 		public static DefaultServiceLocatorFactory Instance { get; } = new DefaultServiceLocatorFactory();
 
-		protected override IServiceLocator CreateItem( ServiceLocatorFactory.Parameter parameter ) => new MefServiceLocatorAdapter( parameter.Host );
+		protected override IServiceLocator CreateItem( ServiceLocatorFactory.Parameter parameter )
+		{
+			var result = new ServiceLocator( parameter.Host );
+			var registry = parameter.Host.GetExport<IExportDescriptorProviderRegistry>();
+			registry.Register( new InstanceExportDescriptorProvider<IServiceLocator>( result ) );
+			registry.Register( new InstanceExportDescriptorProvider<IActivator>( SystemActivator.Instance ) );
+			return result;
+		}
 	}
 
 	public class ServiceLocatorFactory : FactoryBase<ServiceLocatorFactory.Parameter, IServiceLocator>
@@ -173,43 +180,36 @@ namespace DragonSpark.Setup
 		protected override IServiceLocator CreateItem( Parameter parameter )
 		{
 			var container = factory.Create( parameter );
-			var result = new ServiceLocator( container );
+			var result = new Activation.IoC.ServiceLocator( container );
 			var commandParameter = new ConfigureLocationCommand.Parameter( result, result.Container, result.Logger );
 			configure.ExecuteWith( commandParameter );
 			return result;
 		}
 	}
 
-	class ApplicationContext : IApplicationContext
+	class ApplicationServiceProvider : IServiceProvider
 	{
 		readonly IServiceLocator locator;
+		readonly IActivator activator;
 
-		public ApplicationContext( [Required]Assembly[] assemblies, [Required]IServiceLocator locator )
+		public ApplicationServiceProvider( [Required]IServiceLocator locator ) : this( locator, locator.GetInstance<IActivator>() ) {}
+
+		public ApplicationServiceProvider( [Required]IServiceLocator locator, [Required]IActivator activator )
 		{
 			this.locator = locator;
-			Assemblies = assemblies;
+			this.activator = activator;
 		}
 
-		public object GetService( Type serviceType ) => locator.GetInstance( serviceType );
-
-		public Assembly[] Assemblies { get; }
+		public object GetService( Type serviceType ) => locator.GetInstance( serviceType ) ?? activator.Activate( serviceType );
 	}
 
-	public interface IApplication : ICommand, IDisposable
-	{
-		IApplicationContext Context { get; }
-	}
-
-	public static class ApplicationServices
-	{
-		public static IApplication Current => new CurrentApplication().Item;
-	}
+	public interface IApplication : ICommand, IServiceProvider, IDisposable {}
 
 	public abstract class Application<TParameter> : CompositeCommand<TParameter, ISpecification<TParameter>>, IApplication
 	{
-		protected Application( [Required]IApplicationContext context, IEnumerable<ICommand> commands ) : this( commands )
+		protected Application( [Required]IServiceProvider provider, IEnumerable<ICommand> commands ) : this( commands )
 		{
-			Context = context;
+			Services = provider;
 		}
 
 		protected Application( IEnumerable<ICommand> commands ) : base( new DecoratedSpecification<TParameter>( new OnlyOnceSpecification() ), commands.ToArray() ) {}
@@ -233,7 +233,7 @@ namespace DragonSpark.Setup
 		}
 
 		[Required]
-		public IApplicationContext Context { [return: Required]get; set; }
+		public IServiceProvider Services { [return: Required]get; set; }
 
 		public void Dispose()
 		{
@@ -249,6 +249,8 @@ namespace DragonSpark.Setup
 			Commands.OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
 			Commands.Clear();
 		}
+
+		public object GetService( Type serviceType ) => Services.GetService( serviceType );
 	}
 
 	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand

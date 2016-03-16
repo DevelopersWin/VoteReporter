@@ -19,11 +19,11 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly Func<IApplication> application;
 
-		public AutoDataAttribute() : this( () => new DefaultApplication() ) {}
+		public AutoDataAttribute() : this( () => new Application() ) {}
 
 		protected AutoDataAttribute( Func<IApplication> application ) : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create, application ) {}
 
-		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, () => new DefaultApplication() ) {}
+		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, () => new Application() ) {}
 
 		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required]Func<IApplication> application  ) : base( fixture() )
 		{

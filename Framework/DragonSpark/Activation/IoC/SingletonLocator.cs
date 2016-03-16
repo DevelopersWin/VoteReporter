@@ -13,7 +13,7 @@ namespace DragonSpark.Activation.IoC
 		readonly BuildableTypeFromConventionLocator locator;
 		readonly string property;
 
-		public SingletonLocator( string property = "Instance" ) : this( new BuildableTypeFromConventionLocator(), property ) {}
+		//public SingletonLocator( string property = "Instance" ) : this( new BuildableTypeFromConventionLocator(), property ) {}
 
 		public SingletonLocator( [Required]BuildableTypeFromConventionLocator locator, string property = Instance )
 		{

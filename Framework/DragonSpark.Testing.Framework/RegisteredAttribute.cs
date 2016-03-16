@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework.Setup.Location;
 using Microsoft.Practices.ServiceLocation;
@@ -13,8 +14,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Values;
-using DragonSpark.Setup;
+using DragonSpark.Activation.IoC;
 
 namespace DragonSpark.Testing.Framework
 {
@@ -41,18 +41,24 @@ namespace DragonSpark.Testing.Framework
 
 	public class FactoryAttribute : CustomizeAttribute
 	{
+		readonly Func<ParameterInfoFactoryTypeLocator> factoryLocator;
+		readonly Func<ISingletonLocator> locator;
 		readonly Type factoryType;
 
-		public FactoryAttribute( Type factoryType = null )
+		public FactoryAttribute( Type factoryType = null ) : this( Services.Get<ParameterInfoFactoryTypeLocator>, Services.Get<ISingletonLocator>, factoryType ) {}
+
+		public FactoryAttribute( [Required]Func<ParameterInfoFactoryTypeLocator> factoryLocator, Func<ISingletonLocator> locator, Type factoryType = null )
 		{
+			this.factoryLocator = factoryLocator;
+			this.locator = locator;
 			this.factoryType = factoryType;
 		}
 
 		public override ICustomization GetCustomization( ParameterInfo parameter )
 		{
-			var type = factoryType ?? new ParameterInfoFactoryTypeLocator( ApplicationServices.Current.Context.Get<DiscoverableFactoryTypeLocator>() ).Create( parameter );
+			var type = factoryType ?? factoryLocator().Create( parameter );
 			var resultType = Factory.GetResultType( type );
-			var registration = new FactoryRegistration( type, parameter.ParameterType, resultType );
+			var registration = new FactoryRegistration( locator(), type, parameter.ParameterType, resultType );
 			var result = new RegistrationCustomization( registration );
 			return result;
 		}

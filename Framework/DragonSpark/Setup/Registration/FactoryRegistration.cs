@@ -12,20 +12,22 @@ namespace DragonSpark.Setup.Registration
 {
 	public class FactoryRegistration : IRegistration
 	{
+		readonly ISingletonLocator locator;
 		readonly RegisterFactoryParameter parameter;
 
-		public FactoryRegistration( [Required, OfFactoryType]Type factoryType ) : this( new RegisterFactoryParameter( factoryType ) ) {}
+		public FactoryRegistration( [Required]ISingletonLocator locator, [Required, OfFactoryType]Type factoryType ) : this( locator, new RegisterFactoryParameter( factoryType ) ) {}
 
-		public FactoryRegistration( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes ) : this( new RegisterFactoryParameter( factoryType, registrationTypes ) ) {}
+		public FactoryRegistration( [Required]ISingletonLocator locator, [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes ) : this( locator, new RegisterFactoryParameter( factoryType, registrationTypes ) ) {}
 
-		FactoryRegistration( [Required]RegisterFactoryParameter parameter )
+		FactoryRegistration( [Required]ISingletonLocator locator, [Required]RegisterFactoryParameter parameter )
 		{
+			this.locator = locator;
 			this.parameter = parameter;
 		}
 
 		public void Register( IServiceRegistry registry )
 		{
-			new ICommand<RegisterFactoryParameter>[] { new RegisterFactoryWithParameterCommand( registry ), new RegisterFactoryCommand( registry ) }
+			new ICommand<RegisterFactoryParameter>[] { new RegisterFactoryWithParameterCommand( registry, locator ), new RegisterFactoryCommand( registry, locator ) }
 				.FirstOrDefault( command => command.CanExecute( parameter ) )
 				.With( command => command.Run( parameter ) );
 		}
@@ -38,20 +40,6 @@ namespace DragonSpark.Setup.Registration
 		public static void Register<TService>( this IServiceRegistry @this, TService instance, string name = null ) => @this.Register( new InstanceRegistrationParameter( typeof(TService), instance, name ) );
 
 		public static void Register<TService>( this IServiceRegistry @this, Func<TService> factory, string name = null ) => @this.RegisterFactory( new FactoryRegistrationParameter( typeof(TService), () => factory(), name ) );
-
-		/*public static IServiceRegistry RegisterFactory( [Required] this IServiceRegistry @this, [Required]IFactory factory )
-		{
-			new RegisterFactoryCommand( @this, new FactoryDelegateFactory( factory ).Create )
-				.ExecuteWith( new RegisterFactoryParameter( factory.GetType() ) );
-			return @this;
-		}
-
-		public static IServiceRegistry RegisterFactory( [Required] this IServiceRegistry @this, [Required]IFactoryWithParameter factory )
-		{
-			new RegisterFactoryWithParameterCommand( @this, new FactoryWithActivatedParameterDelegateFactory( type => factory.Create ).Create )
-				.ExecuteWith( factory.GetType() );
-			return @this;
-		}*/
 	}
 
 	public class FactoryDelegateFactory : FactoryBase<Type, Func<object>>
@@ -147,9 +135,7 @@ namespace DragonSpark.Setup.Registration
 		readonly ISingletonLocator locator;
 		readonly Func<Type, Func<object>> create;
 
-		protected RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]Func<Type, Func<object>> create ) : this( registry, new SingletonLocator(), create ) {}
-
-		RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]ISingletonLocator locator, [Required]Func<Type, Func<object>> create )
+		protected RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]ISingletonLocator locator, [Required]Func<Type, Func<object>> create )
 		{
 			this.registry = registry;
 			this.locator = locator;
@@ -181,14 +167,14 @@ namespace DragonSpark.Setup.Registration
 
 	public class RegisterFactoryCommand : RegisterFactoryCommandBase<IFactory>
 	{
-		public RegisterFactoryCommand( IServiceRegistry registry ) : base( registry, FactoryDelegateFactory.Instance.Create ) {}
+		public RegisterFactoryCommand( IServiceRegistry registry, ISingletonLocator locator ) : base( registry, locator, FactoryDelegateFactory.Instance.Create ) {}
 
 		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<>).MakeGenericType( itemType );
 	}
 
 	public class RegisterFactoryWithParameterCommand : RegisterFactoryCommandBase<IFactoryWithParameter>
 	{
-		public RegisterFactoryWithParameterCommand( IServiceRegistry registry ) : base( registry, FactoryWithActivatedParameterDelegateFactory.Instance.Create ) {}
+		public RegisterFactoryWithParameterCommand( IServiceRegistry registry, ISingletonLocator locator ) : base( registry, locator, FactoryWithActivatedParameterDelegateFactory.Instance.Create ) {}
 
 		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<,>).MakeGenericType( Factory.GetParameterType( parameter ), itemType );
 

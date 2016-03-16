@@ -1,11 +1,8 @@
+using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Composition;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
-using System.Composition.Hosting;
-using DragonSpark.Extensions;
-using DragonSpark.Setup;
 
 namespace DragonSpark.ComponentModel
 {
@@ -13,7 +10,7 @@ namespace DragonSpark.ComponentModel
 	{
 		static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
-		static object Compose( Type arg ) => new CurrentApplication().Item.Context.GetService( arg );
+		static object Compose( Type arg ) => Services.Get( arg );
 
 		public ApplicationServiceAttribute( Type composedType = null ) : base( new ActivatedValueProvider.Converter( composedType, null ), Creator ) {}
 	}
@@ -22,7 +19,7 @@ namespace DragonSpark.ComponentModel
 	{
 		static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
-		static object Compose( Type arg ) => new CurrentApplication().Item.Context.Get<CompositionContext>().GetExport( arg );
+		static object Compose( Type arg ) => Services.Get<CompositionContext>().GetExport( arg );
 
 		public ComposeAttribute( Type composedType = null ) : base( new ActivatedValueProvider.Converter( composedType, null ), Creator ) {}
 	}
@@ -31,7 +28,7 @@ namespace DragonSpark.ComponentModel
 	{
 		static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
-		static object Compose( Type arg ) => new CurrentApplication().Item.Context.Get<CompositionContext>().GetExports( arg );
+		static object Compose( Type arg ) => Services.Get<CompositionContext>().GetExports( arg );
 
 		public ComposeManyAttribute( Type composedType = null ) : base( new ActivatedValueProvider.Converter( composedType, null ), Creator ) {}
 	}
@@ -40,7 +37,9 @@ namespace DragonSpark.ComponentModel
 	{
 		static DelegatedCreator Creator { get; } = new DelegatedCreator( Factory.From );
 
-		public FactoryAttribute( Type factoryType = null, string name = null ) : base( new ActivatedValueProvider.Converter( p => factoryType ?? new MemberInfoFactoryTypeLocator( ApplicationServices.Current.Context.Get<DiscoverableFactoryTypeLocator>() ).Create( p ), name ), Creator ) {}
+		public FactoryAttribute( Type factoryType = null, string name = null ) : this( Services.Get<MemberInfoFactoryTypeLocator>, factoryType, name ) {
+		}
+		public FactoryAttribute( Func<MemberInfoFactoryTypeLocator> locator, Type factoryType = null, string name = null ) : base( new ActivatedValueProvider.Converter( p => factoryType ?? locator().Create( p ), name ), Creator ) {}
 	}
 
 	public class DelegatedCreator : ActivatedValueProvider.Creator

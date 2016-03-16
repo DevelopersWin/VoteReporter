@@ -9,10 +9,10 @@ namespace DevelopersWin.VoteReporter.Application.Startup
 	/*[Export]
 	public class UnityContainerFactory : DragonSpark.Activation.IoC.UnityContainerFactory {}*/
 
-	public class ApplicationContextFactory : DragonSpark.Setup.ApplicationContextFactory
+	public class ApplicationServiceProviderFactory : DragonSpark.Setup.ApplicationServiceProviderFactory
 	{
-		public static ApplicationContextFactory Instance { get; } = new ApplicationContextFactory();
+		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
 
-		public ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+		public ApplicationServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
 	}
 }

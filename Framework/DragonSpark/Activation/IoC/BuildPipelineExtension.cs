@@ -2,11 +2,9 @@
 using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
-using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
@@ -16,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Setup;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -143,8 +140,6 @@ namespace DragonSpark.Activation.IoC
 
 	public class BuildableTypeFromConventionLocator : DecoratedFactory<Type, Type>
 	{
-		public BuildableTypeFromConventionLocator() : this( ApplicationServices.Current.Context.Assemblies ) {}
-
 		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies ) : this( assemblies, CanBuildSpecification.Instance ) {}
 
 		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies, [Required]CanBuildSpecification specification ) : base( new DecoratedSpecification<Type>( new InverseSpecification( specification ) ), new Context( assemblies, specification ).Create ) {}
@@ -176,12 +171,17 @@ namespace DragonSpark.Activation.IoC
 
 	public class ImplementedFromConventionTypeLocator : FactoryBase<Type, Type>
 	{
-		public static ImplementedFromConventionTypeLocator Instance { get; } = new ImplementedFromConventionTypeLocator();
+		readonly Assembly[] assemblies;
+
+		public ImplementedFromConventionTypeLocator( [Required] Assembly[] assemblies )
+		{
+			this.assemblies = assemblies;
+		}
 
 		[Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
-			var locators = new[] { ApplicationServices.Current.Context.Assemblies, parameter.Append( GetType() ).Distinct().Assemblies() }.Select( assemblies => new ImplementedInterfaceFromConventionLocator( assemblies ) );
+			var locators = new[] { assemblies, parameter.Append( GetType() ).Distinct().Assemblies() }.Select( candidate => new ImplementedInterfaceFromConventionLocator( candidate ) );
 
 			var result = locators.FirstWhere( locator => locator.Create( parameter ) );
 			return result;

@@ -27,28 +27,28 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override void OnInitializing( AutoData context ) => factory( context.Method ).Each( customization => customization.Customize( context.Fixture ) );
 	}
 
-	public abstract class Application<T> : Application where T : ICommand
+	public abstract class Application<T> : ApplicationBase where T : ICommand
 	{
-		protected Application( IApplicationContext context, IEnumerable<ICommand> commands ) : base( context, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
+		protected Application( IServiceProvider context, IEnumerable<ICommand> commands ) : base( context, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
 	}
 
 	public interface IApplication : DragonSpark.Setup.IApplication, ICommand<AutoData> { }
 
-	public class ApplicationContextFactory : DragonSpark.Setup.ApplicationContextFactory
+	public class ApplicationServiceProviderFactory : DragonSpark.Setup.ApplicationServiceProviderFactory
 	{
-		public static ApplicationContextFactory Instance { get; } = new ApplicationContextFactory();
+		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
 
-		public ApplicationContextFactory() : base( () => Default<Assembly>.Items, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
+		public ApplicationServiceProviderFactory() : base( () => Default<Assembly>.Items, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
 	}
 
-	public class DefaultApplication : Application
+	public class Application : ApplicationBase
 	{
-		public DefaultApplication() : base( ApplicationContextFactory.Instance.Create(), Default<ICommand>.Items ) {}
+		public Application() : base( ApplicationServiceProviderFactory.Instance.Create(), Default<ICommand>.Items ) {}
 	}
 
-	public abstract class Application : DragonSpark.Setup.Application<AutoData>, IApplication
+	public abstract class ApplicationBase : DragonSpark.Setup.Application<AutoData>, IApplication
 	{
-		protected Application( IApplicationContext context, IEnumerable<ICommand> commands ) : base( context, commands )
+		protected ApplicationBase( IServiceProvider context, IEnumerable<ICommand> commands ) : base( context, commands )
 		{
 			DisposeAfterExecution = false;
 		}

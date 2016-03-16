@@ -1,16 +1,16 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Setup;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
+using Microsoft.Practices.Unity;
 using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Testing.Framework;
-using Microsoft.Practices.Unity;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 namespace DragonSpark.Testing.Objects.Setup
@@ -56,20 +56,20 @@ namespace DragonSpark.Testing.Objects.Setup
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		protected AutoDataAttribute( Func<Application> application ) : base( FixtureFactory.Instance.Create, application ) {}
+		protected AutoDataAttribute( Func<ApplicationBase> application ) : base( FixtureFactory.Instance.Create, application ) {}
 	}
 
-	public class ApplicationContextFactory : DragonSpark.Setup.ApplicationContextFactory
+	public class ApplicationServiceProviderFactory : DragonSpark.Setup.ApplicationServiceProviderFactory
 	{
-		public static ApplicationContextFactory Instance { get; } = new ApplicationContextFactory();
+		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
 
-		ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
+		ApplicationServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
 	}
 
 	public class Application<T> : Framework.Setup.Application<T> where T : ICommand
 	{
 		public Application() : this( Default<ICommand>.Items ) {}
 
-		public Application( IEnumerable<ICommand> commands ) : base( ApplicationContextFactory.Instance.Create(), commands ) {}
+		public Application( IEnumerable<ICommand> commands ) : base( ApplicationServiceProviderFactory.Instance.Create(), commands ) {}
 	}
 }

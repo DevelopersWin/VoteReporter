@@ -1,4 +1,6 @@
 using DragonSpark.Activation;
+using DragonSpark.Activation.IoC;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
@@ -7,7 +9,6 @@ using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Reflection;
 using Type = System.Type;
 
 namespace DragonSpark.Testing.Framework
@@ -17,23 +18,6 @@ namespace DragonSpark.Testing.Framework
 	{
 		protected RegistrationBaseAttribute( Func<object, ICustomization> factory ) : base( x => x.AsTo( factory ) ) {}
 	}
-
-	/*[Priority( Priority.Low )]
-	public class AssembliesAttribute : RegistrationBaseAttribute
-	{
-		public AssembliesAttribute() : base( o => AssignAssemblyHostCustomization.Instance ) {}
-	}*/
-
-	/*public class AssignAssemblyHostCustomization : ICustomization
-	{
-		public static AssignAssemblyHostCustomization Instance { get; } = new AssignAssemblyHostCustomization();
-
-		public void Customize( IFixture fixture )
-		{
-			var assemblies = fixture.Create<Assembly[]>();
-			new AssemblyHost().Assign( assemblies );
-		}
-	}*/
 
 	public class RegistrationCustomization : ICustomization
 	{
@@ -54,6 +38,8 @@ namespace DragonSpark.Testing.Framework
 
 	public class RegisterFactoryAttribute : RegistrationBaseAttribute
 	{
-		public RegisterFactoryAttribute( Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( factoryType ) ) ) {}
+		public RegisterFactoryAttribute( Type factoryType ) : this( Services.Get<ISingletonLocator>, factoryType ) {
+		}
+		public RegisterFactoryAttribute( [Required]Func<ISingletonLocator> locator, [OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( locator(), factoryType ) ) ) {}
 	}
 }
