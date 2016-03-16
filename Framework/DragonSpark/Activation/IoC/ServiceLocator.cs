@@ -61,7 +61,7 @@ namespace DragonSpark.Activation.IoC
 
 		public ServiceLocatorFactory( ConfigureLocationCommand configure ) : this( configure, UnityContainerFactory.Instance ) {}
 
-		public ServiceLocatorFactory( ConfigureLocationCommand configure, UnityContainerFactory factory ) : base( FactoryParameterCoercer<ServiceProviderParameter>.Instance )
+		public ServiceLocatorFactory( ConfigureLocationCommand configure, UnityContainerFactory factory )
 		{
 			this.configure = configure;
 			this.factory = factory;

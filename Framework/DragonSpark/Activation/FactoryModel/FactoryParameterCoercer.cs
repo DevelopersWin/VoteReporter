@@ -6,8 +6,9 @@ namespace DragonSpark.Activation.FactoryModel
 {
 	public class FixedFactoryParameterCoercer<TParameter> : IFactoryParameterCoercer<TParameter>
 	{
+		public static FixedFactoryParameterCoercer<TParameter> Null { get; } = new FixedFactoryParameterCoercer<TParameter>();
+
 		readonly TParameter item;
-		public static FixedFactoryParameterCoercer<TParameter> Instance { get; } = new FixedFactoryParameterCoercer<TParameter>();
 
 		public FixedFactoryParameterCoercer() : this( default(TParameter) )
 		{}
@@ -24,11 +25,13 @@ namespace DragonSpark.Activation.FactoryModel
 	{
 		public static FactoryParameterCoercer<TParameter> Instance { get; } = new FactoryParameterCoercer<TParameter>();
 
+		protected FactoryParameterCoercer() {}
+
 		public TParameter Coerce( object context ) => context is TParameter ? (TParameter)context : PerformCoercion( context );
 
-		protected virtual TParameter PerformCoercion( object context ) => context.With( Construct/*, activator.Activate<TParameter>*/ );
+		protected virtual TParameter PerformCoercion( object context ) => context.With( Construct );
 
-		protected TParameter Construct( object parameter )
+		static TParameter Construct( object parameter )
 		{
 			var constructor = typeof(TParameter).Adapt().FindConstructor( parameter.GetType() );
 			var result = (TParameter)constructor.With( info =>

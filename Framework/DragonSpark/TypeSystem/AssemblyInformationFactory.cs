@@ -20,8 +20,6 @@ namespace DragonSpark.TypeSystem
 			typeof(AssemblyCopyrightAttribute)
 		};
 
-		public AssemblyInformationFactory() : base( FactoryParameterCoercer<Assembly>.Instance ) {}
-
 		protected override AssemblyInformation CreateItem( Assembly parameter )
 		{
 			var result = new AssemblyInformation { Version = parameter.GetName().Version };

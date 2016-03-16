@@ -102,7 +102,7 @@ namespace DragonSpark.Setup.Registration
 	{
 		public static FuncFactory<T, U> Instance { get; } = new FuncFactory<T, U>();
 
-		public FuncFactory() : base( new FactoryParameterCoercer<Func<object, object>>() ) { }
+		FuncFactory() {}
 
 		protected override Func<T, U> CreateItem( Func<object, object> parameter ) => t => (U)parameter( t );
 	}
@@ -111,7 +111,7 @@ namespace DragonSpark.Setup.Registration
 	{
 		public static FuncFactory<T> Instance { get; } = new FuncFactory<T>();
 
-		public FuncFactory() : base( new FactoryParameterCoercer<Func<object>>() ) {}
+		FuncFactory() {}
 
 		protected override Func<T> CreateItem( Func<object> parameter ) => () => (T)parameter();
 	}

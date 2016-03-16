@@ -17,9 +17,9 @@ namespace DragonSpark.Activation.FactoryModel
 
 	public abstract class TransformerBase<T> : FactoryBase<T, T>, ITransformer<T>
 	{
-		protected TransformerBase() : base( new FactoryParameterCoercer<T>() ) {}
+		protected TransformerBase() {}
 
-		protected TransformerBase( [Required]ISpecification<T> specification  ) : base( specification, new FactoryParameterCoercer<T>() ) {}
+		protected TransformerBase( [Required]ISpecification<T> specification  ) : base( specification ) {}
 	}
 
 	public class CommandTransformer<TCommand, T> : TransformerBase<T> where TCommand : ICommand<T>
@@ -38,16 +38,23 @@ namespace DragonSpark.Activation.FactoryModel
 		}
 	}
 
+	public static class FactoryDefaults<T>
+	{
+		public static ISpecification<T> Always { get; } = new DecoratedSpecification<T>( AlwaysSpecification.Instance );
+
+		public static IFactoryParameterCoercer<T> Coercer { get; } = FactoryParameterCoercer<T>.Instance;
+	}
+
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
 	{
 		readonly ISpecification<TParameter> specification;
 		readonly IFactoryParameterCoercer<TParameter> coercer;
 
-		protected FactoryBase() : this( FixedFactoryParameterCoercer<TParameter>.Instance ) {}
+		protected FactoryBase() : this( FactoryDefaults<TParameter>.Coercer ) {}
 
-		protected FactoryBase( [Required]IFactoryParameterCoercer<TParameter> coercer ) : this( new DecoratedSpecification<TParameter>( AlwaysSpecification.Instance ), coercer ) {}
+		protected FactoryBase( [Required]IFactoryParameterCoercer<TParameter> coercer ) : this( FactoryDefaults<TParameter>.Always, coercer ) {}
 
-		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( specification, FixedFactoryParameterCoercer<TParameter>.Instance ) {}
+		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( specification, FactoryDefaults<TParameter>.Coercer ) {}
 
 		protected FactoryBase( [Required]ISpecification<TParameter> specification, [Required]IFactoryParameterCoercer<TParameter> coercer )
 		{
@@ -71,9 +78,9 @@ namespace DragonSpark.Activation.FactoryModel
 	{
 		readonly Func<T, U> inner;
 
-		public DecoratedFactory( Func<T, U> inner ) : this( new DecoratedSpecification<T>( AlwaysSpecification.Instance ), inner ) {}
+		public DecoratedFactory( Func<T, U> inner ) : this( FactoryDefaults<T>.Always, inner ) {}
 
-		public DecoratedFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : base( specification, FactoryParameterCoercer<T>.Instance )
+		public DecoratedFactory( [Required]ISpecification<T> specification, [Required]Func<T, U> inner ) : base( specification )
 		{
 			this.inner = inner;
 		}
@@ -94,7 +101,7 @@ namespace DragonSpark.Activation.FactoryModel
 
 		public FirstFromParameterFactory( params IFactory<T, U>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
-		public FirstFromParameterFactory( [Required]params Func<T, U>[] inner ) : base( FactoryParameterCoercer<T>.Instance )
+		public FirstFromParameterFactory( [Required]params Func<T, U>[] inner )
 		{
 			this.inner = inner;
 		}
