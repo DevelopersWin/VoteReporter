@@ -5,11 +5,11 @@ using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class ExecuteAutoDataApplicationCommand : DisposingCommand<AutoData>
+	public class ExecuteApplicationCommand : DisposingCommand<AutoData>
 	{
 		readonly IApplication application;
 
-		public ExecuteAutoDataApplicationCommand( [Required]IApplication application )
+		public ExecuteApplicationCommand( [Required]IApplication application )
 		{
 			this.application = application;
 		}
