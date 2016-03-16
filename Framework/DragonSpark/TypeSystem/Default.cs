@@ -22,15 +22,6 @@ namespace DragonSpark.TypeSystem
 		public static T[] Items => DefaultFactory<T[]>.Instance.Create();
 	}
 
-	/*public class TypeInitializer : CommandTransformer<InitializeTypeCommand, System.Type>
-	{
-		public static TypeInitializer Instance { get; } = new TypeInitializer();
-
-		public TypeInitializer() : this( InitializeTypeCommand.Instance ) {}
-
-		public TypeInitializer( InitializeTypeCommand command ) : base( command ) {}
-	}*/
-
 	[Synchronized] // http://stackoverflow.com/questions/35976558/is-constructorinfo-getparameters-thread-safe/35976798
 	public class InitializeTypeCommand : Command<System.Type>
 	{

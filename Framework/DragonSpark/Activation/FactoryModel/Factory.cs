@@ -8,6 +8,7 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
@@ -71,17 +72,21 @@ namespace DragonSpark.Activation.FactoryModel
 		}
 	}
 
+	[Export]
 	public class MemberInfoFactoryTypeLocator : FactoryTypeLocatorBase<MemberInfo>
 	{
 		// public static MemberInfoFactoryTypeLocator Instance { get; } = new MemberInfoFactoryTypeLocator();
 
+		[ImportingConstructor]
 		public MemberInfoFactoryTypeLocator( DiscoverableFactoryTypeLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
 	}
 
+	[Export]
 	public class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
 	{
 		// public static ParameterInfoFactoryTypeLocator Instance { get; } = new ParameterInfoFactoryTypeLocator();
 
+		[ImportingConstructor]
 		public ParameterInfoFactoryTypeLocator( DiscoverableFactoryTypeLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
 	}
 

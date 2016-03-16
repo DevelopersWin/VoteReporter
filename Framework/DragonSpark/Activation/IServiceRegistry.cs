@@ -169,7 +169,7 @@ namespace DragonSpark.Activation
 
 	public class FactoryRegistrationParameter : RegistrationParameter
 	{
-		public FactoryRegistrationParameter( Type type, [System.ComponentModel.DataAnnotations.Required]Func<object> factory, string name = null ) : base( type, name )
+		public FactoryRegistrationParameter( Type type, [Required]Func<object> factory, string name = null ) : base( type, name )
 		{
 			Factory = factory;
 		}

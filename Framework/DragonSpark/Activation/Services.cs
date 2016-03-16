@@ -31,10 +31,30 @@ namespace DragonSpark.Activation
 			return locate.OrDefault( Activator.Activate<T> );
 		}
 
-		static IApplication Current => new CurrentApplication().Item;
+		class ServiceProvider : IServiceProvider
+		{
+			public static ServiceProvider Instance { get; } = new ServiceProvider();
+
+			readonly IActivator activator;
+
+			ServiceProvider() : this( SystemActivator.Instance ) {}
+
+			ServiceProvider( [Required]IActivator activator )
+			{
+				this.activator = activator;
+			}
+
+			public object GetService( Type serviceType ) => serviceType.Adapt().IsInstanceOfType( activator ) ? activator : activator.Activate( serviceType );
+		}
+
+		static IServiceProvider Current => (IServiceProvider)new CurrentApplication().Item ?? ServiceProvider.Instance;
 
 		public static T Get<T>() => (T)Get( typeof(T) );
 		
-		public static object Get( [Required] Type type ) => Current.GetService( type );
+		public static object Get( [Required] Type type )
+		{
+			var service = Current.GetService( type );
+			return service;
+		}
 	}
 }

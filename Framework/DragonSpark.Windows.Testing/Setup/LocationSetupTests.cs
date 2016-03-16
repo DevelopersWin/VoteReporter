@@ -511,12 +511,12 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		readonly Assembly[] assemblies;
 		readonly CompositionHostFactory factory;
-		readonly DragonSpark.Setup.ServiceLocatorFactory inner;
+		readonly Activation.IoC.ServiceLocatorFactory inner;
 
 		[ImportingConstructor]
-		public ServiceLocatorFactory( Assembly[] assemblies ) : this( assemblies, CompositionHostFactory.Instance, new DragonSpark.Setup.ServiceLocatorFactory( ConfigureLocationCommand.Instance ) ) {}
+		public ServiceLocatorFactory( Assembly[] assemblies ) : this( assemblies, CompositionHostFactory.Instance, new Activation.IoC.ServiceLocatorFactory( ConfigureLocationCommand.Instance ) ) {}
 
-		public ServiceLocatorFactory( Assembly[] assemblies, CompositionHostFactory factory, DragonSpark.Setup.ServiceLocatorFactory inner )
+		public ServiceLocatorFactory( Assembly[] assemblies, CompositionHostFactory factory, Activation.IoC.ServiceLocatorFactory inner )
 		{
 			this.assemblies = assemblies;
 			this.factory = factory;
@@ -526,7 +526,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		protected override IServiceLocator CreateItem()
 		{
 			var host = factory.Create( assemblies );
-			var parameter = new DragonSpark.Setup.ServiceLocatorFactory.Parameter( host, assemblies );
+			var parameter = new ServiceProviderParameter( host, assemblies );
 			var result = inner.Create( parameter );
 			return result;
 		}

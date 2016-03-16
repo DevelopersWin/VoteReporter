@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Setup.Registration;
+using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -50,15 +51,17 @@ namespace DragonSpark.Activation.IoC
 		readonly static ISpecification<StrategyValidatorParameter>[] DefaultValidators = { ArrayStrategyValidator.Instance, EnumerableStrategyValidator.Instance };
 
 		readonly BuildableTypeFromConventionLocator locator;
+		readonly ISingletonLocator singleton;
 		readonly Func<DiscoverableFactoryTypeLocator> factoryTypeLocator;
 		readonly IEnumerable<ISpecification<StrategyValidatorParameter>> validators;
 
-		public ResolutionSpecification( BuildableTypeFromConventionLocator locator, Func<DiscoverableFactoryTypeLocator> factoryTypeLocator ) : this( locator, factoryTypeLocator, DefaultValidators )
+		public ResolutionSpecification( [Required]BuildableTypeFromConventionLocator locator, [Required]ISingletonLocator singleton, [Required]Func<DiscoverableFactoryTypeLocator> factoryTypeLocator ) : this( locator, singleton, factoryTypeLocator, DefaultValidators )
 		{}
 
-		ResolutionSpecification( BuildableTypeFromConventionLocator locator, Func<DiscoverableFactoryTypeLocator> factoryTypeLocator, IEnumerable<ISpecification<StrategyValidatorParameter>> validators )
+		ResolutionSpecification( BuildableTypeFromConventionLocator locator, ISingletonLocator singleton, Func<DiscoverableFactoryTypeLocator> factoryTypeLocator, IEnumerable<ISpecification<StrategyValidatorParameter>> validators )
 		{
 			this.locator = locator;
+			this.singleton = singleton;
 			this.factoryTypeLocator = factoryTypeLocator;
 			this.validators = validators;
 		}
@@ -71,6 +74,8 @@ namespace DragonSpark.Activation.IoC
 			CheckInstance( parameter ) || CheckRegistered( parameter ) 
 			|| 
 			new StrategyValidatorParameter( parameter.Context.Strategies.MakeStrategyChain(), parameter.Key ).With( p => validators.Any( specification => specification.IsSatisfiedBy( p ) ) )
+			||
+			singleton.Locate( parameter.Key.Type ) != null
 			||
 			locator.Create( parameter.Key.Type ) != null
 			||

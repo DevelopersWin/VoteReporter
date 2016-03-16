@@ -1,5 +1,7 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Extensions;
 using DragonSpark.Properties;
+using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
@@ -7,16 +9,15 @@ using PostSharp.Patterns.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Composition.Hosting;
 using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
 	[Disposable( ThrowObjectDisposedException = true )]
 	public class ServiceLocator : ServiceLocatorImplBase
 	{
-		//public ServiceLocator() : this( new UnityContainer() ) {}
-
-		// [ImportingConstructor]
 		public ServiceLocator( [Required]IUnityContainer container ) : this( container, container.Resolve<ILogger>() ) {}
 
 		public ServiceLocator( [Required]IUnityContainer container, [Required]ILogger logger )
@@ -49,5 +50,30 @@ namespace DragonSpark.Activation.IoC
 		
 		[Reference]
 		public ILogger Logger { get; }
+	}
+
+	public class ServiceLocatorFactory : FactoryBase<ServiceProviderParameter, IServiceLocator>
+	{
+		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory( AssignLocationCommand.Instance );
+
+		readonly ConfigureLocationCommand configure;
+		readonly UnityContainerFactory factory;
+
+		public ServiceLocatorFactory( ConfigureLocationCommand configure ) : this( configure, UnityContainerFactory.Instance ) {}
+
+		public ServiceLocatorFactory( ConfigureLocationCommand configure, UnityContainerFactory factory ) : base( FactoryParameterCoercer<ServiceProviderParameter>.Instance )
+		{
+			this.configure = configure;
+			this.factory = factory;
+		}
+
+		protected override IServiceLocator CreateItem( ServiceProviderParameter parameter )
+		{
+			var container = factory.Create( parameter );
+			var result = new ServiceLocator( container );
+			var commandParameter = new ConfigureLocationCommand.Parameter( result, result.Container, result.Logger );
+			configure.ExecuteWith( commandParameter );
+			return result;
+		}
 	}
 }

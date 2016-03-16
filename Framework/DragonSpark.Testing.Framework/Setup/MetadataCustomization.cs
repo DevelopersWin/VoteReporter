@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Windows.Runtime;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -38,7 +39,14 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
 
-		public ApplicationServiceProviderFactory() : base( () => Default<Assembly>.Items, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
+		public ApplicationServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+	}
+
+	public class AssemblyProvider : AssemblyProviderBase
+	{
+		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
+
+		AssemblyProvider() : base( new[] { typeof(AssemblySourceBase) }, DomainApplicationAssemblyLocator.Instance.Create() ) {}
 	}
 
 	public class Application : ApplicationBase

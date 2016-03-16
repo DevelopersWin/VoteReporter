@@ -32,42 +32,15 @@ namespace DragonSpark.Setup
 
 	public class CurrentApplication : ExecutionContextValue<IApplication> {}
 
-	/*public class CompositionHost : FixedValue<Assembly[]>
-	{
-		readonly Func<Assembly[], System.Composition.Hosting.CompositionHost> factory;
-		readonly CompositionHostContext context;
-
-		public CompositionHost() : this( CompositionHostFactory.Instance.Create, new CompositionHostContext() ) {}
-
-		public CompositionHost( [Required]Func<Assembly[], System.Composition.Hosting.CompositionHost> factory, [Required]CompositionHostContext context )
-		{
-			this.factory = factory;
-			this.context = context;
-		}
-
-		public override void Assign( Assembly[] item )
-		{
-			var host =  item.With( factory );
-			context.Assign( host );
-
-			base.Assign( item );
-		}
-	}*/
-
-	/*public interface IApplicationContext : IServiceProvider
-	{
-		Assembly[] Assemblies { get; }
-	}*/
-
 	public class ApplicationServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
 		readonly Func<Assembly[]> assemblies;
 		readonly Func<Assembly[], CompositionHost> compositionHostFactory;
-		readonly Func<ServiceLocatorFactory.Parameter, IServiceLocator> serviceLocatorFactory;
+		readonly Func<ServiceProviderParameter, IServiceLocator> serviceLocatorFactory;
 
-		public ApplicationServiceProviderFactory( [Required]IAssemblyProvider assemblyProvider, [Required]CompositionHostFactory compositionHostFactory, [Required]ServiceLocatorFactory serviceLocatorFactory ) : this( assemblyProvider.Create, compositionHostFactory.Create, serviceLocatorFactory.Create ) {}
+		// public ApplicationServiceProviderFactory( [Required]IAssemblyProvider assemblyProvider, [Required]CompositionHostFactory compositionHostFactory, [Required]Activation.IoC.ServiceLocatorFactory serviceLocatorFactory ) : this( assemblyProvider.Create, compositionHostFactory.Create, serviceLocatorFactory.Create ) {}
 
-		public ApplicationServiceProviderFactory( [Required]Func<Assembly[]> assemblies, [Required]Func<Assembly[], CompositionHost> compositionHostFactory, [Required]Func<ServiceLocatorFactory.Parameter, IServiceLocator> serviceLocatorFactory )
+		public ApplicationServiceProviderFactory( [Required]Func<Assembly[]> assemblies, [Required]Func<Assembly[], CompositionHost> compositionHostFactory, [Required]Func<ServiceProviderParameter, IServiceLocator> serviceLocatorFactory )
 		{
 			this.assemblies = assemblies;
 			this.compositionHostFactory = compositionHostFactory;
@@ -78,14 +51,14 @@ namespace DragonSpark.Setup
 		{
 			var instance = assemblies();
 			var host = compositionHostFactory( instance );
-			var parameter = new ServiceLocatorFactory.Parameter( host, instance );
+			var parameter = new ServiceProviderParameter( host, instance );
 			var serviceLocator = serviceLocatorFactory( parameter );
 			var result = new ApplicationServiceProvider( serviceLocator );
 			return result;
 		}
 	}
 
-	public class UnityContainerFactory : FactoryBase<ServiceLocatorFactory.Parameter, IUnityContainer>
+	public class UnityContainerFactory : FactoryBase<ServiceProviderParameter, IUnityContainer>
 	{
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
@@ -98,7 +71,7 @@ namespace DragonSpark.Setup
 			this.create = create;
 		}
 
-		protected override IUnityContainer CreateItem( ServiceLocatorFactory.Parameter parameter )
+		protected override IUnityContainer CreateItem( ServiceProviderParameter parameter )
 		{
 			var result = create()
 				.RegisterInstance( parameter.Assemblies )
@@ -125,65 +98,66 @@ namespace DragonSpark.Setup
 
 		protected override object DoGetInstance(Type serviceType, string key)
 		{
-			object result;
-			if ( host.TryGetExport( serviceType, key, out result ) )
-			{
-				return result;
-			}
+			object item;
+			var result = host.TryGetExport( serviceType, key, out item ) ? item : null;
+			return result;
 
-			throw new ActivationException(
-				FormatActivationExceptionMessage(new CompositionFailedException("Export not found"), serviceType, key));
+			/*throw new ActivationException(
+				FormatActivationExceptionMessage(new CompositionFailedException("Export not found"), serviceType, key));*/
 		}
 	}
 
-	public class DefaultServiceLocatorFactory : FactoryBase<ServiceLocatorFactory.Parameter, IServiceLocator>
+	public class ServiceProviderParameter
 	{
-		public static DefaultServiceLocatorFactory Instance { get; } = new DefaultServiceLocatorFactory();
-
-		protected override IServiceLocator CreateItem( ServiceLocatorFactory.Parameter parameter )
+		public ServiceProviderParameter( [Required]CompositionHost host, Assembly[] assemblies )
 		{
-			var result = new ServiceLocator( parameter.Host );
+			Host = host;
+			Assemblies = assemblies;
+		}
+
+		public CompositionHost Host { get; }
+		public Assembly[] Assemblies { get; }
+	}
+
+	public class ServiceLocatorFactory : FactoryBase<ServiceProviderParameter, IServiceLocator>
+	{
+		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory();
+
+		protected override IServiceLocator CreateItem( ServiceProviderParameter parameter )
+		{
 			var registry = parameter.Host.GetExport<IExportDescriptorProviderRegistry>();
+			var activator = new CompositeActivator( new SingletonActivator( parameter.Host.TryGet<ISingletonLocator>() ), SystemActivator.Instance );
+			registry.Register( new InstanceExportDescriptorProvider<IActivator>( activator ) );
+			
+			var result = new ServiceLocator( parameter.Host );
 			registry.Register( new InstanceExportDescriptorProvider<IServiceLocator>( result ) );
-			registry.Register( new InstanceExportDescriptorProvider<IActivator>( SystemActivator.Instance ) );
 			return result;
 		}
-	}
 
-	public class ServiceLocatorFactory : FactoryBase<ServiceLocatorFactory.Parameter, IServiceLocator>
-	{
-		public class Parameter
+		class SingletonActivator : IActivator
 		{
-			public Parameter( [Required]CompositionHost host, Assembly[] assemblies )
+			readonly ISingletonLocator locator;
+
+			public SingletonActivator( [Required]ISingletonLocator locator )
 			{
-				Host = host;
-				Assemblies = assemblies;
+				this.locator = locator;
 			}
 
-			public CompositionHost Host { get; }
-			public Assembly[] Assemblies { get; }
-		}
+			public bool CanActivate( Type type, string name = null )
+			{
+				var canActivate = locator.Locate( type ) != null;
+				return canActivate;
+			}
 
-		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory( AssignLocationCommand.Instance );
+			public object Activate( Type type, string name = null )
+			{
+				var activate = locator.Locate( type );
+				return activate;
+			}
 
-		readonly ConfigureLocationCommand configure;
-		readonly UnityContainerFactory factory;
+			public bool CanConstruct( Type type, params object[] parameters ) => false;
 
-		public ServiceLocatorFactory( ConfigureLocationCommand configure ) : this( configure, UnityContainerFactory.Instance ) {}
-
-		public ServiceLocatorFactory( ConfigureLocationCommand configure, UnityContainerFactory factory ) : base( FactoryParameterCoercer<Parameter>.Instance )
-		{
-			this.configure = configure;
-			this.factory = factory;
-		}
-
-		protected override IServiceLocator CreateItem( Parameter parameter )
-		{
-			var container = factory.Create( parameter );
-			var result = new Activation.IoC.ServiceLocator( container );
-			var commandParameter = new ConfigureLocationCommand.Parameter( result, result.Container, result.Logger );
-			configure.ExecuteWith( commandParameter );
-			return result;
+			public object Construct( Type type, params object[] parameters ) => null;
 		}
 	}
 

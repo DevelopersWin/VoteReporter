@@ -12,6 +12,7 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -138,34 +139,30 @@ namespace DragonSpark.Activation.IoC
 		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 	}
 
-	public class BuildableTypeFromConventionLocator : DecoratedFactory<Type, Type>
+	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
+		readonly Assembly[] assemblies;
+		readonly CanBuildSpecification specification;
+
 		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies ) : this( assemblies, CanBuildSpecification.Instance ) {}
 
-		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies, [Required]CanBuildSpecification specification ) : base( new DecoratedSpecification<Type>( new InverseSpecification( specification ) ), new Context( assemblies, specification ).Create ) {}
-
-		class Context : FactoryBase<Type, Type>
+		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies, [Required]CanBuildSpecification specification ) : base( new DecoratedSpecification<Type>( new InverseSpecification( specification ) ) )
 		{
-			readonly Assembly[] assemblies;
-			readonly CanBuildSpecification specification;
+			this.assemblies = assemblies;
+			this.specification = specification;
+		}
 
-			public Context( Assembly[] assemblies, CanBuildSpecification specification )
-			{
-				this.assemblies = assemblies;
-				this.specification = specification;
-			}
-
-			protected override Type CreateItem( Type parameter )
-			{
-				var adapter = parameter.Adapt();
-				var name = parameter.Name.TrimStartOf( 'I' );
-				var result = assemblies.Append( parameter.Assembly() ).Distinct()
-					.SelectMany( assembly => assembly.DefinedTypes.AsTypes() )
-					.Where( adapter.IsAssignableFrom )
-					.Where( specification.IsSatisfiedBy )
-					.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
-				return result;
-			}
+		[Freeze]
+		protected override Type CreateItem( Type parameter )
+		{
+			var adapter = parameter.Adapt();
+			var name = parameter.Name.TrimStartOf( 'I' );
+			var result = assemblies.Append( parameter.Assembly() ).Distinct()
+				.SelectMany( assembly => assembly.DefinedTypes.AsTypes() )
+				.Where( adapter.IsAssignableFrom )
+				.Where( specification.IsSatisfiedBy )
+				.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
+			return result;
 		}
 	}
 
@@ -181,9 +178,8 @@ namespace DragonSpark.Activation.IoC
 		[Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
-			var locators = new[] { assemblies, parameter.Append( GetType() ).Distinct().Assemblies() }.Select( candidate => new ImplementedInterfaceFromConventionLocator( candidate ) );
-
-			var result = locators.FirstWhere( locator => locator.Create( parameter ) );
+			var items = assemblies.Concat( parameter.Append( GetType() ).Assemblies() ).Distinct().ToArray();
+			var result = new ImplementedInterfaceFromConventionLocator( items ).Create( parameter );
 			return result;
 		}
 	}

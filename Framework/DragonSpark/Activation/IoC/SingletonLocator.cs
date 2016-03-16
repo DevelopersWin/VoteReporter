@@ -1,11 +1,15 @@
+using System.Composition;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Setup.Registration;
+using Microsoft.Practices.Unity;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
 {
+	[Export( typeof(ISingletonLocator) ), Persistent]
 	public class SingletonLocator : ISingletonLocator
 	{
 		public const string Instance = "Instance";
@@ -13,9 +17,10 @@ namespace DragonSpark.Activation.IoC
 		readonly BuildableTypeFromConventionLocator locator;
 		readonly string property;
 
-		//public SingletonLocator( string property = "Instance" ) : this( new BuildableTypeFromConventionLocator(), property ) {}
+		[ImportingConstructor, InjectionConstructor]
+		public SingletonLocator( [Required]BuildableTypeFromConventionLocator locator ) : this( locator, Instance ) {}
 
-		public SingletonLocator( [Required]BuildableTypeFromConventionLocator locator, string property = Instance )
+		public SingletonLocator( [Required]BuildableTypeFromConventionLocator locator, [NotEmpty]string property )
 		{
 			this.locator = locator;
 			this.property = property;

@@ -3,15 +3,24 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Activation.IoC;
 using ExportDescriptorProvider = System.Composition.Hosting.Core.ExportDescriptorProvider;
 
 namespace DragonSpark.Composition
 {
 	public static class CompositionHostExtensions
 	{
+		public static T TryGet<T>( this CompositionContext @this, string name = null )
+		{
+			T existing;
+			var result = @this.TryGetExport( name, out existing ) ? existing : default(T);
+			return result;
+		}
+
 		public static ContainerConfiguration WithInstance<T>( [Required] this ContainerConfiguration @this, T instance, string name = null ) => @this.WithProvider( new InstanceExportDescriptorProvider<T>( instance, name ) );
 
 		public static object Checked( this LifetimeContext @this, object instance )
@@ -50,13 +59,19 @@ namespace DragonSpark.Composition
 	// https://github.com/dotnet/corefx/issues/6857
 	public class TypeInitializingExportDescriptorProvider : ExportDescriptorProvider
 	{
-		public static TypeInitializingExportDescriptorProvider Instance { get; } = new TypeInitializingExportDescriptorProvider();
+		readonly BuildableTypeFromConventionLocator locator;
 
-		TypeInitializingExportDescriptorProvider() {}
+		public TypeInitializingExportDescriptorProvider( BuildableTypeFromConventionLocator locator )
+		{
+			this.locator = locator;
+		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
-			InitializeTypeCommand.Instance.ExecuteWith( contract.ContractType );
+			new[] { contract.ContractType, locator.Create( contract.ContractType ) }
+				.Distinct()
+				.NotNull()
+				.Each( InitializeTypeCommand.Instance.ExecuteWith );
 			yield break;
 		}
 	}

@@ -12,6 +12,7 @@ using System.Composition;
 using System.Reflection;
 using System.Windows.Input;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
+using ServiceLocatorFactory = DragonSpark.Setup.ServiceLocatorFactory;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -38,7 +39,7 @@ namespace DragonSpark.Testing.Objects.Setup
 		protected override IUnityContainer CreateItem()
 		{
 			var assemblies = new Assembly[0];
-			var parameter = new ServiceLocatorFactory.Parameter( CompositionHostFactory.Instance.Create( assemblies ), assemblies );
+			var parameter = new ServiceProviderParameter( CompositionHostFactory.Instance.Create( assemblies ), assemblies );
 			var result = DragonSpark.Setup.UnityContainerFactory.Instance.Create( parameter );
 			return result;
 		}
@@ -63,7 +64,7 @@ namespace DragonSpark.Testing.Objects.Setup
 	{
 		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
 
-		ApplicationServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, DefaultServiceLocatorFactory.Instance.Create ) {}
+		ApplicationServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
 	}
 
 	public class Application<T> : Framework.Setup.Application<T> where T : ICommand

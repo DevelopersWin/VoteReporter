@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Runtime;
 using System.Linq;
 using Xunit;
+using AssemblyProvider = DragonSpark.Windows.Runtime.AssemblyProvider;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {

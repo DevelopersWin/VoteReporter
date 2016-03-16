@@ -1,13 +1,12 @@
-using System.Reflection;
 using DragonSpark.Activation;
 using DragonSpark.Composition;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Objects.Setup;
-using DragonSpark.TypeSystem;
 using Xunit;
 using Xunit.Abstractions;
+using AssemblyProvider = DragonSpark.Testing.Framework.Setup.AssemblyProvider;
 using ServiceLocation = DragonSpark.Activation.ServiceLocation;
+using ServiceLocatorFactory = DragonSpark.Setup.ServiceLocatorFactory;
 
 namespace DragonSpark.Testing.Activation
 {
@@ -23,8 +22,8 @@ namespace DragonSpark.Testing.Activation
 			Assert.Same( sut, ServiceLocation.Instance );
 
 			Assert.False( sut.IsAvailable );
-			var assemblies = Default<Assembly>.Items;
-			var serviceLocator = DefaultServiceLocatorFactory.Instance.Create( new ServiceLocatorFactory.Parameter( CompositionHostFactory.Instance.Create( assemblies ), assemblies ) ); // new ServiceLocator( UnityContainerFactory.Instance.Create(), new RecordingLoggerFactory().Create() );
+			var assemblies = AssemblyProvider.Instance.Create();
+			var serviceLocator = ServiceLocatorFactory.Instance.Create( new ServiceProviderParameter( CompositionHostFactory.Instance.Create( assemblies ), assemblies ) ); // new ServiceLocator( UnityContainerFactory.Instance.Create(), new RecordingLoggerFactory().Create() );
 			Assert.NotNull( serviceLocator );
 			sut.Assign( serviceLocator );
 

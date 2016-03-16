@@ -76,10 +76,12 @@ namespace DragonSpark.Composition
 			var types = parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
 			var factoryTypes = types.Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
 			var locator = new DiscoverableFactoryTypeLocator( factoryTypes );
+			var conventionLocator = new BuildableTypeFromConventionLocator( parameter );
 			var result = configuration()
+				.WithProvider( new TypeInitializingExportDescriptorProvider( conventionLocator ) )
 				.WithParts( types )
-				.WithProvider( TypeInitializingExportDescriptorProvider.Instance )
 				.WithProvider( new RegisteredExportDescriptorProvider() )
+				.WithInstance( conventionLocator )
 				.WithInstance( parameter )
 				.WithInstance( types )
 				.WithInstance( factoryTypes )

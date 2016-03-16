@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using System;
 
 namespace DragonSpark.Extensions
 {
