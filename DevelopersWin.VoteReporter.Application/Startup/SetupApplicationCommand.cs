@@ -13,6 +13,6 @@ namespace DevelopersWin.VoteReporter.Application.Startup
 	{
 		public static ApplicationContextFactory Instance { get; } = new ApplicationContextFactory();
 
-		public ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Assigned.Create ) {}
+		public ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
 	}
 }

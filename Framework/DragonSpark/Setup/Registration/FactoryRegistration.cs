@@ -101,7 +101,11 @@ namespace DragonSpark.Setup.Registration
 			this.createParameter = createParameter;
 		}
 
-		protected override Func<object> CreateItem( Type parameter ) => factory( parameter ).With( func => new Func<object>( () => func( createParameter( Factory.GetParameterType( parameter ) ) ) ) );
+		protected override Func<object> CreateItem( Type parameter ) => factory( parameter ).With( func => new Func<object>( () =>
+		{
+			var o = createParameter( Factory.GetParameterType( parameter ) );
+			return func( o );
+		} ) );
 	}
 
 	public class FuncFactory<T, U> : FactoryBase<Func<object, object>, Func<T, U>>

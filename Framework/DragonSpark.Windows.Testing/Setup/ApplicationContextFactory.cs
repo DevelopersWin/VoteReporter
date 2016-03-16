@@ -10,7 +10,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public static ApplicationContextFactory Instance { get; } = new ApplicationContextFactory();
 
-		public ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, DragonSpark.Setup.ServiceLocatorFactory.Assigned.Create ) {}
+		public ApplicationContextFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, DragonSpark.Setup.ServiceLocatorFactory.Instance.Create ) {}
 	}
 
 	public class Application<T> : DragonSpark.Testing.Framework.Setup.Application<T> where T : ICommand

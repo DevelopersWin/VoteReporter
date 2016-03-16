@@ -1,5 +1,4 @@
 ﻿using System.Composition;
-using DragonSpark.Testing.Objects.Setup;
 
 namespace DragonSpark.Windows.Testing.Setup
 {

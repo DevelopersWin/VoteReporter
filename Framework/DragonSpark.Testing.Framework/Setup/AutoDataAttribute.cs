@@ -35,11 +35,8 @@ namespace DragonSpark.Testing.Framework.Setup
 			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
 			{
 				var autoData = new AutoData( Fixture, methodUnderTest );
-				using ( new AssignAutoDataCommand().ExecuteWith( autoData ) )
+				using ( new ExecuteAutoDataApplicationCommand( application() ).ExecuteWith( autoData ) )
 				{
-					var instance = application().ExecuteWith( autoData );
-					new AssociatedApplication( methodUnderTest ).Assign( instance );
-					autoData.Initialize();
 					var result = base.GetData( methodUnderTest );
 					return result;
 				}

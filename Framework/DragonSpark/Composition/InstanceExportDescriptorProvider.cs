@@ -70,7 +70,7 @@ namespace DragonSpark.Composition
 			var result = contract.ContractType == typeof(IExportDescriptorProviderRegistry) ?
 				new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => this, NoMetadata ) ).ToItem()
 				:
-				providers.SelectMany( provider => provider.GetExportDescriptors( contract, new Accessor( descriptorAccessor, providers.Except( provider.ToItem() ) ) ) );
+				providers.SelectMany( provider => provider.GetExportDescriptors( contract, new Accessor( descriptorAccessor, providers.Except( provider.ToItem() ).ToArray() ) ) );
 			return result;
 		}
 

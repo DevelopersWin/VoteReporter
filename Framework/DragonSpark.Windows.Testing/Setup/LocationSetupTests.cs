@@ -207,8 +207,6 @@ namespace DragonSpark.Windows.Testing.Setup
 			var before = sut.GetInstance<IInterface>();
 			Assert.Null( before );
 
-			// logger.Verify( x => x.Debug( It.Is<Message>( m => m.Priority == Priority.High && m.Text.Contains( $@"Specified type is not registered: ""{typeof(IInterface).FullName}"" with build name ""<None>""." ) ) ) );
-
 			var registry = sut.GetInstance<IServiceRegistry>();
 			registry.Register<IInterface, Class>();
 
@@ -217,8 +215,6 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			var broken = sut.GetInstance<ClassWithBrokenConstructor>();
 			Assert.Null( broken );
-
-			// logger.Verify( x => x.Log( It.Is<Message>( m => m.Category == ExceptionMessageFactory.Category && m.Priority == Priority.High && m.Text.Contains( $@"Could not resolve type ""{typeof(ClassWithBrokenConstructor).Name}"" with build name ""<None>""." ) && m.Text.Contains( typeof(ResolutionFailedException).FullName ) ) ) );
 		}
 
 		[Theory, LocationSetup.AutoData]
@@ -511,30 +507,28 @@ namespace DragonSpark.Windows.Testing.Setup
 	}
 
 	[Export]
-	public class ServiceLocatorFactory : DragonSpark.Setup.ServiceLocatorFactory
+	public class ServiceLocatorFactory : FactoryBase<IServiceLocator>
 	{
-		/*class Configure : DragonSpark.Runtime.Command<IServiceLocator>
-		{
-			public static Configure Instance { get; } = new Configure( ConfigureLocationCommand.Instance );
-
-			readonly ConfigureLocationCommand configure;
-
-			Configure( ConfigureLocationCommand configure )
-			{
-				this.configure = configure;
-			}
-
-			protected override void OnExecute( IServiceLocator parameter )
-			{
-				var item = parameter.GetInstance<ConfigureLocationCommand.Parameter>();
-				configure.ExecuteWith( item );
-			}
-		}
+		readonly Assembly[] assemblies;
+		readonly CompositionHostFactory factory;
+		readonly DragonSpark.Setup.ServiceLocatorFactory inner;
 
 		[ImportingConstructor]
-		public ServiceLocatorFactory( [Required]DragonSpark.Setup.ServiceLocatorFactory.Parameter parameter ) : base( 
-			() => DragonSpark.Setup.ServiceLocatorFactory.Instance.Create( parameter ), 
-			new CommandTransformer<Configure, IServiceLocator>( Configure.Instance ).Create 
-		){}*/
+		public ServiceLocatorFactory( Assembly[] assemblies ) : this( assemblies, CompositionHostFactory.Instance, new DragonSpark.Setup.ServiceLocatorFactory( ConfigureLocationCommand.Instance ) ) {}
+
+		public ServiceLocatorFactory( Assembly[] assemblies, CompositionHostFactory factory, DragonSpark.Setup.ServiceLocatorFactory inner )
+		{
+			this.assemblies = assemblies;
+			this.factory = factory;
+			this.inner = inner;
+		}
+
+		protected override IServiceLocator CreateItem()
+		{
+			var host = factory.Create( assemblies );
+			var parameter = new DragonSpark.Setup.ServiceLocatorFactory.Parameter( host, assemblies );
+			var result = inner.Create( parameter );
+			return result;
+		}
 	}
 }

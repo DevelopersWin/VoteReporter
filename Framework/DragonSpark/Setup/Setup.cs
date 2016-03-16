@@ -157,18 +157,14 @@ namespace DragonSpark.Setup
 			public Assembly[] Assemblies { get; }
 		}
 
-		public static ServiceLocatorFactory Assigned { get; } = new ServiceLocatorFactory( AssignLocationCommand.Instance );
-
-		public static ServiceLocatorFactory Configured { get; } = new ServiceLocatorFactory();
+		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory( AssignLocationCommand.Instance );
 
 		readonly ConfigureLocationCommand configure;
 		readonly UnityContainerFactory factory;
 
-		public ServiceLocatorFactory() : this( ConfigureLocationCommand.Instance ) {}
-
 		public ServiceLocatorFactory( ConfigureLocationCommand configure ) : this( configure, UnityContainerFactory.Instance ) {}
 
-		public ServiceLocatorFactory( ConfigureLocationCommand configure, UnityContainerFactory factory )
+		public ServiceLocatorFactory( ConfigureLocationCommand configure, UnityContainerFactory factory ) : base( FactoryParameterCoercer<Parameter>.Instance )
 		{
 			this.configure = configure;
 			this.factory = factory;
@@ -262,11 +258,10 @@ namespace DragonSpark.Setup
 
 		public string ContractName { get; set; }
 
-		protected override void OnExecute( object parameter )
-		{
-			var enumerable = Host.GetExports<T>( ContractName );
-			enumerable.Prioritize().Each( setup => { setup.ExecuteWith( parameter ); } );
-		}
+		protected override void OnExecute( object parameter ) => 
+			Host.GetExports<T>( ContractName )
+				.Prioritize()
+				.Each( setup => setup.ExecuteWith( parameter ) );
 	}
 
 	public class ApplySetup : ApplyExportedCommandsCommand<ISetup> {}
