@@ -1,14 +1,15 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.ComponentModel;
-using DragonSpark.Runtime;
+using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Objects;
 using Microsoft.Practices.ServiceLocation;
-using Ploeh.AutoFixture.Xunit2;
 using System;
 using Xunit;
+using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
 namespace DragonSpark.Testing.ComponentModel
 {
+	[Freeze( typeof(IServiceLocator), typeof(ServiceLocator) )]
+	[Freeze( typeof(IActivator), typeof(Activator) )]
 	public class DefaultValueProviderTests
 	{
 		public class Activator : IActivator
@@ -29,7 +30,7 @@ namespace DragonSpark.Testing.ComponentModel
 			public object Construct( Type type, params object[] parameters ) => locator.GetInstance( type );
 		}
 
-		[Theory, AutoData]
+		[Theory, Objects.IoC.AutoData]
 		void Apply()
 		{
 			var current = DateTime.Now;

@@ -10,8 +10,6 @@ namespace DragonSpark.TypeSystem
 	[Export]
 	public class AssemblyInformationFactory : FactoryBase<Assembly, AssemblyInformation>
 	{
-		// public static AssemblyInformationFactory Instance { get; } = new AssemblyInformationFactory();
-
 		readonly static System.Type[] Attributes =
 		{
 			typeof(AssemblyTitleAttribute),
@@ -22,7 +20,7 @@ namespace DragonSpark.TypeSystem
 			typeof(AssemblyCopyrightAttribute)
 		};
 
-		public AssemblyInformationFactory() : base( new FactoryParameterCoercer<Assembly>() ) {}
+		public AssemblyInformationFactory() : base( FactoryParameterCoercer<Assembly>.Instance ) {}
 
 		protected override AssemblyInformation CreateItem( Assembly parameter )
 		{

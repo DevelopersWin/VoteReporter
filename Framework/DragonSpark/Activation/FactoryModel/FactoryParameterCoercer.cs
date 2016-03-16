@@ -1,7 +1,6 @@
 using DragonSpark.Extensions;
 using System;
 using System.Linq;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Activation.FactoryModel
 {
@@ -25,19 +24,9 @@ namespace DragonSpark.Activation.FactoryModel
 	{
 		public static FactoryParameterCoercer<TParameter> Instance { get; } = new FactoryParameterCoercer<TParameter>();
 
-		readonly Activator.Get activator;
-		
-		public FactoryParameterCoercer() : this( Activator.GetCurrent )
-		{}
-
-		public FactoryParameterCoercer( [Required]Activator.Get activator )
-		{
-			this.activator = activator;
-		}
-
 		public TParameter Coerce( object context ) => context is TParameter ? (TParameter)context : PerformCoercion( context );
 
-		protected virtual TParameter PerformCoercion( object context ) => context.With( Construct, activator().Activate<TParameter> );
+		protected virtual TParameter PerformCoercion( object context ) => context.With( Construct/*, activator.Activate<TParameter>*/ );
 
 		protected TParameter Construct( object parameter )
 		{

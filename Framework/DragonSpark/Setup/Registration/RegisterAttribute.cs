@@ -25,9 +25,9 @@ namespace DragonSpark.Setup.Registration
 
 		public class FactoryAttribute : RegistrationBaseAttribute
 		{
-			public FactoryAttribute() : this( Services.Get<ISingletonLocator> ) {
-			}
-			public FactoryAttribute( Func<ISingletonLocator> locator ) : base( t => new FactoryRegistration( locator(), t ) ) { }
+			public FactoryAttribute() : this( Services.Get<IActivator>, Services.Get<ISingletonLocator> ) {}
+
+			public FactoryAttribute( [Required]Func<IActivator> activator, [Required]Func<ISingletonLocator> locator ) : base( t => new FactoryRegistration( activator(), locator(), t ) ) { }
 		}
 	}
 }

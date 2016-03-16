@@ -1,31 +1,28 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Setup.Registration;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
-using DragonSpark.Setup.Registration;
-using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Windows.Entity
 {
 	[Persistent]
 	class ActivationSource : IActivationSource
 	{
-		readonly Activator.Get activator;
-		public static ActivationSource Instance { get; } = new ActivationSource();
+		readonly IActivator activator;
 
 		readonly Collection<Type> watching = new Collection<Type>();
 
-		public ActivationSource() : this( Activator.GetCurrent ) {}
-
-		public ActivationSource( Activator.Get activator )
+		public ActivationSource( [Required]IActivator activator )
 		{
 			this.activator = activator;
 		}
 
 		public void Apply( object item )
 		{
-			var current = activator();
+			var current = activator;
 			var type = item.GetType();
 			var canActivate = current.CanActivate( type );
 			if ( canActivate && !watching.Contains( type ) )

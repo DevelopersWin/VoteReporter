@@ -32,7 +32,8 @@ namespace DragonSpark.Activation.FactoryModel
 
 		public static object From( [Required, OfFactoryType]Type factoryType )
 		{
-			var @delegate = FactoryDelegateLocatorFactory.Instance.Create( factoryType );
+			var activator = Services.Get<IActivator>();
+			var @delegate = new FactoryDelegateLocatorFactory( new FactoryDelegateFactory( activator ), new FactoryWithActivatedParameterDelegateFactory( activator ) ).Create( factoryType );
 			var result = @delegate.With( d => d() );
 			return result;
 		}
@@ -59,7 +60,7 @@ namespace DragonSpark.Activation.FactoryModel
 
 	public class FactoryDelegateLocatorFactory : FirstFromParameterFactory<Type, Func<object>>
 	{
-		public static FactoryDelegateLocatorFactory Instance { get; } = new FactoryDelegateLocatorFactory( FactoryDelegateFactory.Instance, FactoryWithActivatedParameterDelegateFactory.Instance );
+		// public static FactoryDelegateLocatorFactory Instance { get; } = new FactoryDelegateLocatorFactory( FactoryDelegateFactory.Instance, FactoryWithActivatedParameterDelegateFactory.Instance );
 
 		public FactoryDelegateLocatorFactory( FactoryDelegateFactory factory, FactoryWithActivatedParameterDelegateFactory factoryWithParameter ) : base( 
 			new Factory<IFactory>( factory ),

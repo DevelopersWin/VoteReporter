@@ -4,14 +4,12 @@ namespace DragonSpark.Activation.FactoryModel
 {
 	public abstract class ActivationFactory<TParameter, TResult> : FactoryBase<TParameter, TResult> where TParameter : ActivationParameter where TResult : class
 	{
-		readonly Activator.Get activator;
-
-		protected ActivationFactory( [Required]Activator.Get activator, IFactoryParameterCoercer<TParameter> coercer ) : base( coercer )
+		protected ActivationFactory( [Required]IActivator activator, IFactoryParameterCoercer<TParameter> coercer ) : base( coercer )
 		{
-			this.activator = activator;
+			Activator = activator;
 		}
 
-		protected IActivator Activator => activator();
+		protected IActivator Activator { get; }
 
 		protected override TResult CreateItem( TParameter parameter ) => Activate( parameter );
 

@@ -131,7 +131,7 @@ namespace DragonSpark.ComponentModel
 
 			readonly Func<ActivateParameter, T> factory;
 
-			public Creator() : this( ActivateFactory<T>.Instance.Create ) { }
+			public Creator() : this( new ActivateFactory<T>( Services.Get<IActivator>() ).Create ) { }
 
 			public Creator( [Required]Func<ActivateParameter, T> factory )
 			{

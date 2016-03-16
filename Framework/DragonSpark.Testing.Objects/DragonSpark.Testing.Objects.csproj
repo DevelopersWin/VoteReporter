@@ -64,6 +64,7 @@
     <Compile Include="IInterface.cs" />
     <Compile Include="IItem.cs" />
     <Compile Include="IObject.cs" />
+    <Compile Include="IoC\Application.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="LowPriority.cs" />
     <Compile Include="NormalPriority.cs" />

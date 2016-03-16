@@ -35,7 +35,7 @@ namespace DragonSpark.TypeSystem
 		{
 			public Cached( object instance ) : base( instance, () =>
 			{
-				var activator = Services.Locate<T>();
+				var activator = Services.Get<T>();
 				var result = activator.Create( instance );
 				return result;
 			} ) {}

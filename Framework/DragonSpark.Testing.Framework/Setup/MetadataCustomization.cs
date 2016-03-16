@@ -51,11 +51,15 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class Application : ApplicationBase
 	{
-		public Application() : base( ApplicationServiceProviderFactory.Instance.Create(), Default<ICommand>.Items ) {}
+		public Application() : this( ApplicationServiceProviderFactory.Instance.Create() ) {}
+
+		public Application( IServiceProvider provider ) : base( provider ) {}
 	}
 
 	public abstract class ApplicationBase : DragonSpark.Setup.Application<AutoData>, IApplication
 	{
+		protected ApplicationBase( IServiceProvider context ) : this( context, Default<ICommand>.Items ) {}
+
 		protected ApplicationBase( IServiceProvider context, IEnumerable<ICommand> commands ) : base( context, commands )
 		{
 			DisposeAfterExecution = false;

@@ -1,9 +1,8 @@
 using AutoMapper;
+using DragonSpark.Activation;
 using System;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation;
-using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Extensions
 {
@@ -26,7 +25,7 @@ namespace DragonSpark.Extensions
 		public static TResult MapInto<TResult>( this object source, TResult existing = null, Action<IMappingExpression> configure = null ) where TResult : class 
 		{
 			var context = new ObjectMappingParameter<TResult>( source, existing, configure );
-			var factory = Activator.Activate<ObjectMappingFactory<TResult>>();
+			var factory = Services.Get<ObjectMappingFactory<TResult>>();
 			var result = factory.Create( context );
 			return result;
 		}

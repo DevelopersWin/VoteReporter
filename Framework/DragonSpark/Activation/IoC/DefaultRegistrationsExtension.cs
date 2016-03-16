@@ -60,7 +60,7 @@ namespace DragonSpark.Activation.IoC
 			registry.Register<IServiceRegistry, ServiceRegistry>();
 			registry.Register<IActivator, Activator>();
 			registry.Register( Context );
-			registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
+			// registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
 			// registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
 		}
 

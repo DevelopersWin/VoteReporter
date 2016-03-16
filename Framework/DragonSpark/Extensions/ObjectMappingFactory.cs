@@ -1,16 +1,17 @@
 using AutoMapper;
 using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
+using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Extensions
 {
 	public class ObjectMappingFactory<T> : FactoryBase<ObjectMappingParameter<T>, T> where T : class
 	{
-		readonly Activator.Get activator;
+		readonly IActivator activator;
 
-		public ObjectMappingFactory() : this( Activator.GetCurrent ) {}
+		// public ObjectMappingFactory() : this( Activator.GetCurrent ) {}
 
-		ObjectMappingFactory( Activator.Get activator )
+		public ObjectMappingFactory( [Required]IActivator activator )
 		{
 			this.activator = activator;
 		}
@@ -23,7 +24,7 @@ namespace DragonSpark.Extensions
 			var configuration = new MapperConfiguration( mapper =>
 			{
 				var map = mapper.CreateMap( sourceType, destinationType ).IgnoreUnassignable();
-				map.TypeMap.DestinationCtor = x => parameter.Existing ?? activator().Activate( x.DestinationType );
+				map.TypeMap.DestinationCtor = x => parameter.Existing ?? activator.Activate( x.DestinationType );
 				parameter.Configuration.With( x => x( map ) );
 			} );
 

@@ -1,20 +1,24 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
+using DragonSpark.Extensions;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
-using Ploeh.AutoFixture.Xunit2;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using DragonSpark.TypeSystem;
 using Xunit;
+using ApplicationServiceProviderFactory = DragonSpark.Setup.ApplicationServiceProviderFactory;
+using AssemblyProvider = DragonSpark.Testing.Framework.Setup.AssemblyProvider;
 
 namespace DragonSpark.Testing.Extensions
 {
 	public class ObjectExtensionsTests
 	{
-		[Theory, AutoData]
+		[Theory, Objects.IoC.AutoData]
 		void ProvidedValues( ClassWithProperties sut )
 		{
 			sut.PropertyOne = null;
@@ -39,7 +43,7 @@ namespace DragonSpark.Testing.Extensions
 
 		static MemberInfo Check( Expression<Func<ClassWithParameter, object>> expression ) => expression.GetMemberInfo();
 
-		[Theory, AutoData]
+		[Theory, Objects.IoC.AutoData]
 		void Ignored( ClassWithProperties sut )
 		{
 			var other = sut.MapInto<ClassWithDifferentProperties>();
@@ -49,7 +53,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.PropertyFour, other.PropertyFour );
 		}
 
-		[Theory, AutoData]
+		[Theory, Objects.IoC.AutoData]
 		void Clone( ClassWithProperties sut )
 		{
 			var cloned = sut.Clone();
@@ -60,7 +64,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.PropertyFour, cloned.PropertyFour );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void WithNull( int number )
 		{
 			var item = new int?( number );
@@ -71,7 +75,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( 1, count );
 		}
 
-		[Theory, AutoData]
+		[Theory, Objects.IoC.AutoData]
 		void Mapper( Objects.ClassWithProperties instance )
 		{
 			var mapped = instance.MapInto<ClassWithProperties>();
@@ -110,7 +114,7 @@ namespace DragonSpark.Testing.Extensions
 			public string PropertyFour { get; set; }
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void TryDispose( Disposable sut )
 		{
 			Assert.False( sut.Disposed );
@@ -128,14 +132,14 @@ namespace DragonSpark.Testing.Extensions
 			Assert.True( called );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void Enumerate( List<object> sut )
 		{
 			var items = sut.GetEnumerator().Enumerate().ToList();
 			Assert.True( items.Any() && items.All( x => sut.Contains( x ) && sut.ToList().IndexOf( x ) == items.IndexOf( x ) ) );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void GetAllPropertyValuesOf( ClassWithProperties sut )
 		{
 			var expected = new[] { sut.PropertyOne, sut.PropertyFour };
@@ -144,7 +148,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.True( expected.Length == values.Count() && expected.All( x => values.Contains( x ) ) );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void AsValid( Class sut )
 		{
 			var applied = false;
@@ -153,7 +157,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.IsType<Class>( valid );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void AsInvalid( string sut )
 		{
 			Assert.Throws<InvalidOperationException>( () => sut.AsValid<int>( i => Assert.True( false ) ) );
@@ -178,13 +182,13 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Null( Default<Generic<object>>.Item );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void With( ClassWithParameter sut, string message )
 		{
 			Assert.Equal( sut.Parameter, sut.With( x => x.Parameter, () => message ) );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void WithNullable( int supplied )
 		{
 			var item = new int?( supplied );
@@ -194,7 +198,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( supplied, value );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void WithSelf( int supplied, string message )
 		{
 			string item = null;
@@ -213,14 +217,14 @@ namespace DragonSpark.Testing.Extensions
 			Assert.NotNull( new Class().As<IInterface>() );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void AsTo( ClassWithParameter sut, string message )
 		{
 			var value = sut.AsTo<Class, object>( x => x, () => message );
 			Assert.Equal( value, message );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void ConvertTo( Class sample )
 		{
 			Assert.Equal( true, "true".ConvertTo<bool>() );

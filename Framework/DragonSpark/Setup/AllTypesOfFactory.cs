@@ -15,12 +15,11 @@ namespace DragonSpark.Setup
 	public class AllTypesOfFactory : FactoryBase<Type, Array>
 	{
 		readonly Assembly[] assemblies;
-		readonly Activator.Get activator;
+		readonly IActivator activator;
 
-		public AllTypesOfFactory( [Required]Assembly[] assemblies, [Required]Activator.Get activator )
+		public AllTypesOfFactory( [Required]Assembly[] assemblies, [Required]IActivator activator )
 		{
 			this.assemblies = assemblies;
-			this.activator = activator;
 			this.activator = activator;
 		}
 
@@ -29,7 +28,7 @@ namespace DragonSpark.Setup
 		protected override Array CreateItem( Type parameter )
 		{
 			var types = assemblies.SelectMany( assembly => assembly.ExportedTypes );
-			var result = activator().ActivateMany( parameter, types ).ToArray();
+			var result = activator.ActivateMany( parameter, types ).ToArray();
 			return result;
 		}
 	}
