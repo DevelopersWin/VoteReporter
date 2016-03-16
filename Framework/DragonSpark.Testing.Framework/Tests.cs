@@ -5,6 +5,7 @@ using DragonSpark.Testing.Framework.Setup;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using System;
+using DragonSpark.Activation;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework
@@ -35,10 +36,9 @@ namespace DragonSpark.Testing.Framework
 	{
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var parameter = MethodContext.Get( args.Method );
-			using ( new AssignExecutionContextCommand().ExecuteWith( parameter ) )
+			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( args.Method ) ) )
 			{
-				using ( new AssociatedApplication( args.Method ) )
+				using ( Services.Get<IApplication>() )
 				{
 					args.Proceed();
 				}

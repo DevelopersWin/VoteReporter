@@ -42,8 +42,7 @@ namespace DragonSpark.ComponentModel
 
 			readonly ServiceLocatorProvider locator;
 
-			Factory() : this( Services.GetLocator )
-			{}
+			Factory() : this( Services.Get<IServiceLocator> ) {}
 
 			Factory( [Required]ServiceLocatorProvider locator )
 			{

@@ -11,25 +11,8 @@ namespace DragonSpark.Activation
 	{
 		static Services()
 		{
-			Initialize( ServiceLocation.Instance );
+			ServiceLocator.SetLocatorProvider( Get<IServiceLocator> );
 		}
-
-		public static void Initialize( IServiceLocation location )
-		{
-			Location = location;
-
-			ServiceLocator.SetLocatorProvider( GetLocator );
-		}
-
-		public static IServiceLocator GetLocator() => Location.Item;
-
-		public static IServiceLocation Location { get; private set; }
-
-		/*public static T Locate<T>()
-		{
-			var locate = Location.Locate<T>();
-			return locate.OrDefault( Activator.Activate<T> );
-		}*/
 
 		class ServiceProvider : IServiceProvider
 		{
@@ -44,7 +27,7 @@ namespace DragonSpark.Activation
 				this.activator = activator;
 			}
 
-			public object GetService( Type serviceType ) => serviceType.Adapt().IsInstanceOfType( activator ) ? activator : activator.Activate( serviceType );
+			public object GetService( Type serviceType ) => serviceType.Adapt().IsInstanceOfType( activator ) ? activator : activator.Activate<object>( serviceType );
 		}
 
 		static IServiceProvider Current => (IServiceProvider)new CurrentApplication().Item ?? ServiceProvider.Instance;

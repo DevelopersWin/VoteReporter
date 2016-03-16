@@ -9,11 +9,6 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class AssociatedApplication : AssociatedValue<MethodBase, IApplication>
-	{
-		public AssociatedApplication( MethodBase instance ) : base( instance, () => null ) {}
-	}
-
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{

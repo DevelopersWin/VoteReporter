@@ -166,7 +166,6 @@
   <ItemGroup>
     <Compile Include="Activation\ActivatorTests.cs" />
     <Compile Include="Activation\CurrentActivatorTests.cs" />
-    <Compile Include="Activation\DefaultServicesTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryReflectionSupportTests.cs" />

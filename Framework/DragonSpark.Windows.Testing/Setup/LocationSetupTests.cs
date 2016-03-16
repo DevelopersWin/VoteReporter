@@ -100,90 +100,80 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void RegisterInstanceGeneric( [Located]ServiceLocation sut, [Located]IServiceRegistry registry, Class instance )
+		void RegisterInstanceGeneric( [Located]IServiceRegistry registry, Class instance )
 		{
-			Assert.IsType<ServiceLocation>( Services.Location );
-
-			Assert.Same( Services.Location, sut );
-
 			registry.Register<IInterface>( instance );
 
-			var located = sut.Locate<IInterface>();
+			var located = Services.Get<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void RegisterGeneric( ServiceLocation sut )
+		public void RegisterGeneric()
 		{
-			var registry = sut.Item.GetInstance<IServiceRegistry>();
+			var registry = Services.Get<IServiceRegistry>();
 			registry.Register<IInterface, Class>();
 
-			var located = sut.Locate<IInterface>();
+			var located = Services.Get<IInterface>();
 			Assert.IsType<Class>( located );
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void RegisterLocation( ServiceLocation sut )
+		public void RegisterLocation()
 		{
-			var registry = sut.Item.GetInstance<IServiceRegistry>();
+			var registry = Services.Get<IServiceRegistry>();
 			registry.Register<IInterface, Class>();
 
-			var located = sut.Locate<IInterface>();
+			var located = Services.Get<IInterface>();
 			Assert.IsType<Class>( located );
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void RegisterInstanceClass( ServiceLocation sut, Class instance )
+		void RegisterInstanceClass( Class instance )
 		{
-			var registry = sut.Item.GetInstance<IServiceRegistry>();
+			var registry = Services.Get<IServiceRegistry>();
 			registry.Register<IInterface>( instance );
 
-			var located = sut.Locate<IInterface>();
+			var located = Services.Get<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void RegisterFactoryClass( ServiceLocation sut, Class instance )
+		void RegisterFactoryClass( Class instance )
 		{
-			var registry = sut.Item.GetInstance<IServiceRegistry>();
+			var registry = Services.Get<IServiceRegistry>();
 			registry.Register<IInterface>( () => instance );
 
-			var located = sut.Locate<IInterface>();
+			var located = Services.Get<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void With( [Located]ServiceLocation sut, IServiceLocator locator, [Frozen, Registered]ClassWithParameter instance )
+		public void With( IServiceLocator locator, [Frozen, Registered]ClassWithParameter instance )
 		{
-			Assert.Same( Services.Location, sut );
-			Assert.Same( sut.Item, locator );
-			var item = sut.Item.GetInstance<ClassWithParameter>().With( x => x.Parameter );
+			var item = locator.GetInstance<ClassWithParameter>().With( x => x.Parameter );
 			Assert.Equal( instance.Parameter, item );
 
-			Assert.Null( sut.Item.GetInstance<IInterface>().With( x => x ) );
+			Assert.Null( locator.GetInstance<IInterface>().With( x => x ) );
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void WithDefault( [Located] ServiceLocation sut )
+		public void WithDefault()
 		{
-			var item = sut.Item.GetInstance<ClassWithParameter>().With( x => x.Parameter != null );
+			var item = Services.Get<ClassWithParameter>().With( x => x.Parameter != null );
 			Assert.True( item );
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void RegisterWithRegistry( [Located]ServiceLocation location, Mock<IServiceRegistry> sut )
+		public void RegisterWithRegistry( Mock<IServiceRegistry> sut )
 		{
-			Assert.Same( ServiceLocation.Instance, location );
-
-			location.Assign( DragonSpark.Activation.FactoryModel.Factory.Create<ServiceLocator>() );
-
-			var registry = location.Item.GetInstance<IServiceRegistry>();
+			var registry = Services.Get<IServiceRegistry>();
 			registry.Register( sut.Object );
 
-			var registered = location.Item.GetInstance<IServiceRegistry>();
+			var registered = Services.Get<IServiceRegistry>();
 			Assert.Same( sut.Object, registered );
 			registered.Register<IInterface, Class>();
 
@@ -201,7 +191,6 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		void GetInstance( [Factory, Frozen( Matching.ExactType )]ServiceLocator sut, [Frozen, Registered]Mock<ILogger> logger )
 		{
-			Assert.NotSame( Services.Location.Item, sut );
 			Assert.Same( sut.Get<ILogger>(), logger.Object );
 
 			var before = sut.GetInstance<IInterface>();
@@ -288,7 +277,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void Dispose( [Factory, Frozen, Assigned] ServiceLocator sut )
+		void Dispose( [Factory, Frozen] ServiceLocator sut )
 		{
 			var item = Services.Get<IInterface>( typeof(Class) );
 			Assert.NotNull( item );
@@ -297,15 +286,15 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			var registry = sut.GetInstance<IServiceRegistry>();
 			registry.Register( disposable );
-			registry.Register( new ServiceLocationMonitor( Services.Location, sut ) );
+			// registry.Register( new ServiceLocationMonitor( Services.Location, sut ) );
 
 			Assert.False( disposable.Disposed );
 
-			Assert.Same( Services.Location.Item, sut );
+			// Assert.Same( Services.Location.Item, sut );
 
 			sut.QueryInterface<IDisposable>().Dispose();
 
-			Assert.NotSame( Services.Location.Item, sut );
+			// Assert.NotSame( Services.Location.Item, sut );
 
 			Assert.True( disposable.Disposed );
 		}

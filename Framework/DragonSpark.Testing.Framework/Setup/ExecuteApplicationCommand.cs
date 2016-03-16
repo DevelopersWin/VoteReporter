@@ -1,30 +1,32 @@
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class ExecuteAutoDataApplicationCommand : AssignValueCommand<AutoData>
+	public class ExecuteAutoDataApplicationCommand : DisposingCommand<AutoData>
 	{
 		readonly IApplication application;
 
-		public ExecuteAutoDataApplicationCommand( IApplication application ) : this( application, new CurrentAutoDataContext() ) {}
-
-		public ExecuteAutoDataApplicationCommand( [Required]IApplication application, IWritableValue<AutoData> value ) : base( value )
+		public ExecuteAutoDataApplicationCommand( [Required]IApplication application )
 		{
 			this.application = application;
 		}
 
 		protected override void OnExecute( AutoData parameter )
 		{
-			base.OnExecute( parameter );
+			var registry = application.Get<IExportDescriptorProviderRegistry>();
+			registry.Register( new InstanceExportDescriptorProvider<AutoData>( parameter ) );
+			registry.Register( new InstanceExportDescriptorProvider<IApplication>( application ) );
 
-			new AssociatedApplication( parameter.Method ).Assign( application );
+			// new AssociatedApplication( parameter.Method ).Assign( application );
 
 			application.ExecuteWith( parameter );
 
 			parameter.Initialize();
 		}
+
+		protected override void OnDispose() => application.Get<AutoData>().Dispose();
 	}
 }

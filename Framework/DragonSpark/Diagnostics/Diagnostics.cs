@@ -6,7 +6,7 @@ namespace DragonSpark.Diagnostics
 {
 	public static class ExceptionSupport
 	{
-		public static Exception Try( Action action ) => Try( Services.Location.Locate<TryContext>, action );
+		public static Exception Try( Action action ) => Try( Services.Get<TryContext>, action );
 
 		public static Exception Try( this Func<TryContext> @this, Action action ) => @this().Try( action );
 

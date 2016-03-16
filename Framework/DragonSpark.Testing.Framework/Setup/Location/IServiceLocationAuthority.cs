@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 	public class FixtureExtension : UnityContainerExtension
 	{
-		[Value( typeof(CurrentAutoDataContext) )]
+		[ApplicationService]
 		public AutoData Setup { get; set; }
 
 		[Required, Locate]

@@ -5,6 +5,7 @@ using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -32,6 +33,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		public object Create( object request, [Required]ISpecimenContext context ) => request.AsTo<ParameterInfo, object>( info => ShouldDefault( info ) ? info.DefaultValue : inner.Create( request, context ), () => new NoSpecimen() );
 
 		static bool ShouldDefault( ParameterInfo info ) => 
-			info.IsOptional && !new CurrentAutoDataContext().Item.Method.GetParameters().Select( pi => pi.ParameterType ).Any( new TypeAdapter( info.ParameterType ).IsAssignableFrom );
+			info.IsOptional && !Services.Get<AutoData>().Method.GetParameters().Select( pi => pi.ParameterType ).Any( new TypeAdapter( info.ParameterType ).IsAssignableFrom );
 	}
 }

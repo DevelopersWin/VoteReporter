@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -17,7 +18,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		protected override void Customize( IFixture fixture )
 		{
-			var autoData = new CurrentAutoDataContext().Item.With( OnInitializing );
+			var autoData = Services.Get<AutoData>().With( OnInitializing );
 			var items = autoData?.Items ?? new Items<IAutoDataCustomization>( fixture ).Item;
 			items.Ensure( ( IAutoDataCustomization)this );
 		}

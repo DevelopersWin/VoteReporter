@@ -54,7 +54,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class ServiceLocatorFactory : FactoryBase<ServiceProviderParameter, IServiceLocator>
 	{
-		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory( AssignLocationCommand.Instance );
+		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory( ConfigureLocationCommand.Instance );
 
 		readonly ConfigureLocationCommand configure;
 		readonly UnityContainerFactory factory;
