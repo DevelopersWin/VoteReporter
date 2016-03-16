@@ -166,24 +166,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class ImplementedFromConventionTypeLocator : FactoryBase<Type, Type>
-	{
-		readonly Assembly[] assemblies;
-
-		public ImplementedFromConventionTypeLocator( [Required] Assembly[] assemblies )
-		{
-			this.assemblies = assemblies;
-		}
-
-		[Freeze]
-		protected override Type CreateItem( Type parameter )
-		{
-			var items = assemblies.Concat( parameter.Append( GetType() ).Assemblies() ).Distinct().ToArray();
-			var result = new ImplementedInterfaceFromConventionLocator( items ).Create( parameter );
-			return result;
-		}
-	}
-
+	[Persistent]
 	public class ImplementedInterfaceFromConventionLocator : FactoryBase<Type,Type>
 	{
 		readonly Assembly[] assemblies;
@@ -193,6 +176,7 @@ namespace DragonSpark.Activation.IoC
 			this.assemblies = assemblies;
 		}
 
+		[Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
 			var result =

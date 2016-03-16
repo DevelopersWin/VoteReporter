@@ -33,14 +33,14 @@ namespace DragonSpark.Activation
 
 	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<AlwaysOfType>
 	{
-		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ImplementedFromConventionTypeLocator locator ) : base( registry, locator, AlwaysOfType.Instance ) {}
+		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ImplementedInterfaceFromConventionLocator locator ) : base( registry, locator, AlwaysOfType.Instance ) {}
 	}
 
 	public class RegisterInstanceByConventionCommand<T> : RegisterInstanceCommand<T> where T : ISpecification<Type>
 	{
-		readonly ImplementedFromConventionTypeLocator locator;
+		readonly ImplementedInterfaceFromConventionLocator locator;
 
-		public RegisterInstanceByConventionCommand( IServiceRegistry registry, [Required]ImplementedFromConventionTypeLocator locator, T specification ) : base( registry, specification )
+		public RegisterInstanceByConventionCommand( IServiceRegistry registry, [Required]ImplementedInterfaceFromConventionLocator locator, T specification ) : base( registry, specification )
 		{
 			this.locator = locator;
 		}
