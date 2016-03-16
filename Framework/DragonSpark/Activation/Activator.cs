@@ -7,13 +7,7 @@ namespace DragonSpark.Activation
 {
 	public static class Activator
 	{
-		// public delegate IActivator Get();
-
 		public static IActivator GetCurrent() => Services.Get<IActivator>();
-
-		public static TResult Activate<TResult>() => Activate<TResult>( GetCurrent() );
-
-		public static TResult Activate<TResult>( this IActivator @this ) => @this.Activate<TResult>( typeof(TResult) );
 
 		public static TResult Activate<TResult>( this IActivator @this, Type type ) => @this.Activate<TResult>( type, null );
 

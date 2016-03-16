@@ -3,6 +3,7 @@ using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Windows.Input;
+using DragonSpark.Activation;
 using DragonSpark.Runtime.Specifications;
 using Activator = DragonSpark.Activation.Activator;
 
@@ -97,11 +98,11 @@ namespace DragonSpark.Runtime
 		protected virtual void OnDispose() {}
 	}
 
-	public class DeferredCommand<TCommand, T> : Command<T> where TCommand : ICommand<T>
+	/*public class DeferredCommand<TCommand, T> : Command<T> where TCommand : ICommand<T>
 	{
 		readonly Func<TCommand> factory;
 
-		public DeferredCommand() : this( Activator.Activate<TCommand> ) {}
+		public DeferredCommand() : this( Services.Get<TCommand> ) {}
 
 		public DeferredCommand( [Required]Func<TCommand> factory )
 		{
@@ -109,7 +110,7 @@ namespace DragonSpark.Runtime
 		}
 
 		protected override void OnExecute( T parameter ) => factory().ExecuteWith( parameter );
-	}
+	}*/
 
 	public class DecoratedCommand<T> : Command<T>
 	{

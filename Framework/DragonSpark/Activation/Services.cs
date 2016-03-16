@@ -49,12 +49,10 @@ namespace DragonSpark.Activation
 
 		static IServiceProvider Current => (IServiceProvider)new CurrentApplication().Item ?? ServiceProvider.Instance;
 
-		public static T Get<T>() => (T)Get( typeof(T) );
+		public static T Get<T>() => Get<T>( typeof(T) );
+
+		public static T Get<T>( [Required]Type type ) => (T)Get( type );
 		
-		public static object Get( [Required] Type type )
-		{
-			var service = Current.GetService( type );
-			return service;
-		}
+		public static object Get( [Required] Type type ) => Current.GetService( type );
 	}
 }

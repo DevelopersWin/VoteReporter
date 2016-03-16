@@ -70,7 +70,7 @@ namespace DragonSpark.Windows.Markup
 		static object CreateMock( Type targetType )
 		{
 			var type = typeof(Mock<>).MakeGenericType( targetType );
-			var result = Activator.GetCurrent().Activate<Mock>( type ).Object;
+			var result = Services.Get<Mock>( type ).Object;
 			return result;
 		}
 	}

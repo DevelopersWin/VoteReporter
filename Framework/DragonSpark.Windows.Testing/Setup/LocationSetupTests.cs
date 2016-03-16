@@ -63,7 +63,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void CreateInstance( [Registered]IActivator activator )
 		{
-			var expected = Activation.Activator.GetCurrent();
+			var expected = Services.Get<IActivator>();
 			Assert.Same( expected, activator );
 			Assert.NotSame( SystemActivator.Instance, activator );
 			Assert.IsType<Activator>( activator );
@@ -73,11 +73,11 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( "DefaultActivation", instance.Name );
 		}
 
-		[DragonSpark.Testing.Framework.Map( typeof( IActivator ), typeof( Activator ) )]
+		[Map( typeof( IActivator ), typeof( Activator ) )]
 		[Theory, LocationSetup.AutoData]
 		public void CreateNamedInstance( [Registered]IActivator activator, string name )
 		{
-			Assert.Same( DragonSpark.Activation.Activator.GetCurrent(), activator );
+			Assert.Same( Services.Get<IActivator>(), activator );
 			Assert.NotSame( SystemActivator.Instance, activator );
 
 			var instance = activator.Activate<IObject>( typeof(Object), name );
@@ -91,7 +91,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void CreateItem( [Registered]IActivator activator )
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
-			Assert.Same( DragonSpark.Activation.Activator.GetCurrent(), activator );
+			Assert.Same( Services.Get<IActivator>(), activator );
 			Assert.NotSame( SystemActivator.Instance, activator );
 			var instance = activator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
 			Assert.NotNull( instance );
@@ -290,7 +290,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		void Dispose( [Factory, Frozen, Assigned] ServiceLocator sut )
 		{
-			var item = DragonSpark.Activation.Activator.GetCurrent().Activate<IInterface>( typeof(Class) );
+			var item = Services.Get<IInterface>( typeof(Class) );
 			Assert.NotNull( item );
 
 			var disposable = new Disposable();
