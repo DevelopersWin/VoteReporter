@@ -20,8 +20,6 @@ namespace DragonSpark.Testing.Framework.Setup
 			registry.Register( new InstanceExportDescriptorProvider<AutoData>( parameter ) );
 			registry.Register( new InstanceExportDescriptorProvider<IApplication>( application ) );
 
-			// new AssociatedApplication( parameter.Method ).Assign( application );
-
 			application.ExecuteWith( parameter );
 
 			parameter.Initialize();
