@@ -17,6 +17,6 @@
 		</commands:SetupUnityCommand.Extensions>
 		<commands:UnityInstance RegistrationType="{x:Type setup:ISetup}" Instance="{ds:Root}" />
 	</commands:SetupUnityCommand>
-	<registration:DelegatedRegisterFromMetadataCommand />
+	<registration:RegisterFromMetadataCommand />
 	<setupObjects:DefaultCustomizeFixtureCommand />
 </setup:Setup>

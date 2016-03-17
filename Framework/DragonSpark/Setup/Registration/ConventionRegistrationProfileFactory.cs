@@ -5,33 +5,50 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Aspects;
 using Type = System.Type;
 
 namespace DragonSpark.Setup.Registration
 {
-	[Export]
-	public class ConventionRegistrationProfileFactory : FactoryBase<ConventionRegistrationProfile>
+	[Persistent]
+	public class IgnorableTypesLocator : FactoryBase<Type[]>
 	{
 		readonly Assembly[] assemblies;
 
-		[ImportingConstructor]
-		public ConventionRegistrationProfileFactory( [Required]Assembly[] assemblies )
+		public IgnorableTypesLocator( [Required]Assembly[] assemblies )
 		{
 			this.assemblies = assemblies;
 		}
 
+		[Freeze]
+		protected override Type[] CreateItem() => assemblies.SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToArray();
+	}
+
+	[Export]
+	public class ConventionRegistrationProfileFactory : FactoryBase<ConventionTypeContainer>
+	{
+		readonly IgnorableTypesLocator ignorable;
+		readonly TypeInfo[] types;
+
+		[ImportingConstructor]
+		public ConventionRegistrationProfileFactory( IgnorableTypesLocator ignorable, [Required]TypeInfo[] types )
+		{
+			this.ignorable = ignorable;
+			this.types = types;
+		}
+
 		protected virtual Type[] DetermineCandidateTypes()
 		{
-			var result = assemblies.SelectMany( assembly =>
-				{
-					var types = assembly.DefinedTypes.Where( info => !info.IsAbstract && ( !info.IsNested || info.IsNestedPublic ) )
+			var result = types
+						.Where( info => !info.IsAbstract && ( !info.IsNested || info.IsNestedPublic ) )
 						.AsTypes()
-						.Except( assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) );
-					return types;
-				} ).Prioritize().ToArray();
+						.Except( ignorable.Create() )
+						.Prioritize()
+						.ToArray();
 			return result;
 		}
 
-		protected override ConventionRegistrationProfile CreateItem() => new ConventionRegistrationProfile( DetermineCandidateTypes() );
+		[Freeze]
+		protected override ConventionTypeContainer CreateItem() => new ConventionTypeContainer( DetermineCandidateTypes() );
 	}
 }

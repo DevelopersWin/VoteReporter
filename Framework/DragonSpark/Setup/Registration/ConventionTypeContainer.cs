@@ -2,9 +2,9 @@ using System;
 
 namespace DragonSpark.Setup.Registration
 {
-	public class ConventionRegistrationProfile
+	public class ConventionTypeContainer
 	{
-		public ConventionRegistrationProfile( Type[] candidates )
+		public ConventionTypeContainer( Type[] candidates )
 		{
 			Candidates = candidates;
 		}

@@ -331,7 +331,7 @@
     <Compile Include="Setup\AllTypesOfFactory.cs" />
     <Compile Include="Runtime\CommandCollection.cs" />
     <Compile Include="Runtime\CompositeCommand.cs" />
-    <Compile Include="Setup\Registration\ConventionRegistrationProfile.cs" />
+    <Compile Include="Setup\Registration\ConventionTypeContainer.cs" />
     <Compile Include="Setup\Registration\ConventionRegistrationProfileFactory.cs" />
     <Compile Include="Setup\Registration\IRegistration.cs" />
     <Compile Include="Setup\Commands\InitializeModulesCommand.cs" />
@@ -357,7 +357,7 @@
     <Compile Include="Activation\IoC\SingletonAttribute.cs" />
     <Compile Include="Activation\IoC\SingletonLocator.cs" />
     <Compile Include="Setup\Commands\UnityCommand.cs" />
-    <Compile Include="Setup\Registration\RegisterFromMetadataCommand.cs" />
+    <Compile Include="Setup\Registration\MetadataRegistrationCommand.cs" />
     <Compile Include="Setup\Commands\UnityInstance.cs" />
     <Compile Include="Setup\Commands\UnityRegistrationCommand.cs" />
     <Compile Include="Setup\Commands\UnityType.cs" />
