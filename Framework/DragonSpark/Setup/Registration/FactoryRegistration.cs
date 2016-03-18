@@ -4,6 +4,7 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
@@ -50,6 +51,7 @@ namespace DragonSpark.Setup.Registration
 
 		// public static FactoryDelegateFactory Instance { get; } = new FactoryDelegateFactory();
 
+		[InjectionConstructor]
 		public FactoryDelegateFactory( [Required]IActivator activator ) : this( new ActivateFactory<IFactory>( activator ).CreateUsing ) {}
 
 		public FactoryDelegateFactory( [Required]Func<Type, IFactory> createFactory )
@@ -66,6 +68,7 @@ namespace DragonSpark.Setup.Registration
 
 		readonly Func<Type, IFactoryWithParameter> createFactory;
 
+		[InjectionConstructor]
 		public FactoryWithParameterDelegateFactory( IActivator activator ) : this( new ActivateFactory<IFactoryWithParameter>( activator ).CreateUsing ) {}
 
 		public FactoryWithParameterDelegateFactory( [Required]Func<Type, IFactoryWithParameter> createFactory )
@@ -83,6 +86,7 @@ namespace DragonSpark.Setup.Registration
 		readonly Func<Type, Func<object, object>> factory;
 		readonly Func<Type, object> createParameter;
 
+		[InjectionConstructor]
 		public FactoryWithActivatedParameterDelegateFactory( [Required]IActivator activator ) : this( new FactoryWithParameterDelegateFactory( activator ).Create, new ActivateFactory<object>( activator ).CreateUsing ) {}
 
 		public FactoryWithActivatedParameterDelegateFactory( [Required]Func<Type, Func<object, object>> factory, [Required]Func<Type, object> createParameter )

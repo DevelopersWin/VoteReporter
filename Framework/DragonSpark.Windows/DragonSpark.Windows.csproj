@@ -197,6 +197,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Markup\ConfigurationExtension.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
     <Compile Include="Security\CertificateFactory.cs" />
     <Compile Include="Security\KeyVaultApplicationFactory.cs" />
@@ -234,24 +235,24 @@
     <Compile Include="Io\FileSystem.cs" />
     <Compile Include="Diagnostics\TextMessageLogger.cs" />
     <Compile Include="Markup\CollectionExtension.cs" />
-    <Compile Include="Markup\CollectionSetter.cs" />
-    <Compile Include="Markup\CollectionTargetSetterBuilder.cs" />
-    <Compile Include="Markup\MarkupValueContext.cs" />
-    <Compile Include="Markup\DependencyPropertyMarkupTargetValueSetterBuilder.cs" />
+    <Compile Include="Markup\CollectionMarkupProperty.cs" />
+    <Compile Include="Markup\CollectionMarkupPropertyFactory.cs" />
+    <Compile Include="Markup\MarkupServiceProvider.cs" />
+    <Compile Include="Markup\DependencyPropertyMarkupPropertyFactory.cs" />
     <Compile Include="Markup\DirectoryInfoExtension.cs" />
     <Compile Include="Markup\EnumerableExtension.cs" />
-    <Compile Include="Markup\FieldInfoMarkupTargetValueSetterBuilder.cs" />
+    <Compile Include="Markup\FieldInfoMarkupPropertyFactory.cs" />
     <Compile Include="Markup\GenericTypeExtension.cs" />
     <Compile Include="Markup\IIncrementer.cs" />
     <Compile Include="Markup\ImageSourceOperations.cs" />
-    <Compile Include="Markup\IMarkupTargetValueSetterBuilder.cs" />
+    <Compile Include="Markup\IMarkupPropertyFactory.cs" />
     <Compile Include="Markup\Incrementer.cs" />
-    <Compile Include="Markup\MarkupTargetValueSetterBase.cs" />
-    <Compile Include="Markup\MarkupTargetValueSetterFactory.cs" />
+    <Compile Include="Markup\MarkupPropertyBase.cs" />
+    <Compile Include="Markup\MarkupPropertyFactory.cs" />
     <Compile Include="Markup\MonitoredMarkupExtension.cs" />
     <Compile Include="Markup\NameExtension.cs" />
     <Compile Include="Markup\NextExtension.cs" />
-    <Compile Include="Markup\PropertyInfoMarkupTargetValueSetterBuilder.cs" />
+    <Compile Include="Markup\PropertyInfoMarkupPropertyFactory.cs" />
     <Compile Include="Markup\ReferenceExtension.cs" />
     <Compile Include="Markup\StaticResourceExtension.cs" />
     <Compile Include="Modularity\DynamicModuleInfoGroup.cs" />
@@ -294,13 +295,12 @@
     <Compile Include="Setup\ExceptionPolicyDefinition.cs" />
     <Compile Include="Setup\ExceptionPolicyEntry.cs" />
     <Compile Include="Markup\AssemblyVersionExtension.cs" />
-    <Compile Include="Markup\ClrMemberMarkupTargetValueSetter.cs" />
-    <Compile Include="Markup\DeferredMarkupExtension.cs" />
-    <Compile Include="Markup\DependencyPropertyMarkupTargetValueSetter.cs" />
+    <Compile Include="Markup\ClrMemberMarkupProperty.cs" />
+    <Compile Include="Markup\DependencyPropertyMarkupProperty.cs" />
     <Compile Include="Markup\ImageSourceExtension.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Markup\IMarkupTargetValueSetter.cs" />
+    <Compile Include="Markup\IMarkupProperty.cs" />
     <Compile Include="Markup\LocateExtension.cs">
       <SubType>Code</SubType>
     </Compile>

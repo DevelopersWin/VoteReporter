@@ -3,8 +3,8 @@ using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using Microsoft.Practices.Unity;
 using Ploeh.AutoFixture;
-using System;
 using PostSharp.Patterns.Contracts;
+using System;
 
 namespace DragonSpark.Testing.Framework.Setup.Location
 {
@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 	public class FixtureExtension : UnityContainerExtension
 	{
-		[ApplicationService]
+		[Service]
 		public AutoData Setup { get; set; }
 
 		[Required, Locate]

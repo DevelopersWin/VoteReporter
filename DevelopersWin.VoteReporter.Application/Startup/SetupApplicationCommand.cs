@@ -4,10 +4,10 @@ using DragonSpark.Windows.Runtime;
 
 namespace DevelopersWin.VoteReporter.Application.Startup
 {
-	public class ApplicationServiceProviderFactory : DragonSpark.Setup.ApplicationServiceProviderFactory
+	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
 	{
-		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
+		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		public ApplicationServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+		public ServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
 	}
 }

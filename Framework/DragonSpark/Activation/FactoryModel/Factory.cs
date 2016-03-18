@@ -26,17 +26,9 @@ namespace DragonSpark.Activation.FactoryModel
 		[Freeze]
 		public static bool IsFactory( [Required] Type type ) => BasicTypes.Any( adapter => adapter.IsAssignableFrom( type ) );
 
-		public static T Create<T>() => (T)Create( typeof(T) );
+		/*public static T Create<T>() => (T)Create( typeof(T) );
 
-		public static object Create( Type type ) => Services.Get<DiscoverableFactoryTypeLocator>().Create( new CompositionContract( type ) ).With( From );
-
-		public static object From( [Required, OfFactoryType]Type factoryType )
-		{
-			var activator = Services.Get<IActivator>();
-			var @delegate = new FactoryDelegateLocatorFactory( new FactoryDelegateFactory( activator ), new FactoryWithActivatedParameterDelegateFactory( activator ) ).Create( factoryType );
-			var result = @delegate.With( d => d() );
-			return result;
-		}
+		public static object Create( Type type ) => Services.Get<DiscoverableFactoryTypeLocator>().Create( new CompositionContract( type ) ).With( From );*/
 
 		[Freeze]
 		public static Type GetParameterType( [Required]Type factoryType ) => Get( factoryType, types => types.First(), Types.Last(), CoreTypes.Last() );
@@ -54,6 +46,23 @@ namespace DragonSpark.Activation.FactoryModel
 				.Where( type => type.IsGenericType && typesToCheck.Any( extension => extension.IsAssignableFrom( type.GetGenericTypeDefinition() ) ) )
 				.Select( type => selector( type.GenericTypeArguments ) )
 				.FirstOrDefault();
+			return result;
+		}
+	}
+
+	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>
+	{
+		readonly FactoryDelegateLocatorFactory factory;
+
+		public InstanceFromFactoryTypeFactory( [Required]FactoryDelegateLocatorFactory factory )
+		{
+			this.factory = factory;
+		}
+
+		protected override object CreateItem( Type parameter )
+		{
+			var @delegate = factory.Create( parameter );
+			var result = @delegate.With( d => d() );
 			return result;
 		}
 	}

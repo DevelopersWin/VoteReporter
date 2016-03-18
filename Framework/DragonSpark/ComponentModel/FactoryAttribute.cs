@@ -6,13 +6,13 @@ using System.Composition;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class ApplicationServiceAttribute : ActivateAttributeBase
+	public sealed class ServiceAttribute : ActivateAttributeBase
 	{
 		static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
 		static object Compose( Type arg ) => Services.Get( arg );
 
-		public ApplicationServiceAttribute( Type composedType = null ) : base( new ActivatedValueProvider.Converter( composedType, null ), Creator ) {}
+		public ServiceAttribute( Type composedType = null ) : base( new ActivatedValueProvider.Converter( composedType, null ), Creator ) {}
 	}
 
 	public sealed class ComposeAttribute : ActivateAttributeBase
@@ -35,10 +35,12 @@ namespace DragonSpark.ComponentModel
 
 	public sealed class FactoryAttribute : ActivateAttributeBase
 	{
-		static DelegatedCreator Creator { get; } = new DelegatedCreator( Factory.From );
+		static DelegatedCreator Creator { get; } = new DelegatedCreator( Factory );
 
-		public FactoryAttribute( Type factoryType = null, string name = null ) : this( Services.Get<MemberInfoFactoryTypeLocator>, factoryType, name ) {
-		}
+		static object Factory( Type arg ) => Services.Get<InstanceFromFactoryTypeFactory>().Create( arg );
+
+		public FactoryAttribute( Type factoryType = null, string name = null ) : this( Services.Get<MemberInfoFactoryTypeLocator>, factoryType, name ) {}
+
 		public FactoryAttribute( Func<MemberInfoFactoryTypeLocator> locator, Type factoryType = null, string name = null ) : base( new ActivatedValueProvider.Converter( p => factoryType ?? locator().Create( p ), name ), Creator ) {}
 	}
 

@@ -21,7 +21,7 @@ namespace DragonSpark.Activation.IoC
 
 			var result = new InjectionFactory( ( unityContainer, type, buildName ) =>
 			{
-				var item = Factory.From( factoryType ) ?? previous.With( x => unityContainer.Resolve( x ) );
+				var item = unityContainer.Resolve<InstanceFromFactoryTypeFactory>().Create( factoryType ) ?? previous.With( x => unityContainer.Resolve( x ) );
 				return item;
 			} );
 			return result;

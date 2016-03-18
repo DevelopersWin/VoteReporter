@@ -12,7 +12,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
@@ -27,12 +26,12 @@ namespace DragonSpark.Windows.Markup
 			this.type = type;
 		}
 
-		protected override object GetValue( MarkupValueContext serviceProvider ) => Ambient.GetCurrent( type );
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Ambient.GetCurrent( type );
 	}
 
 	public class RootExtension : MarkupExtensionBase
 	{
-		protected override object GetValue( MarkupValueContext serviceProvider ) => serviceProvider.Get<IRootObjectProvider>().RootObject;
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => serviceProvider.Get<IRootObjectProvider>().RootObject;
 	}
 
 	[ContentProperty( nameof(Instance) )]
@@ -48,20 +47,19 @@ namespace DragonSpark.Windows.Markup
 		[Required]
 		public IFactory Instance { [return: Required]get; set; }
 
-		protected override object GetValue( MarkupValueContext serviceProvider ) => Instance.Create();
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Instance.Create();
 	}
 
-	public class DesignTimeValueProvider : FactoryBase<MarkupValueContext, object>
+	public class DesignTimeValueProvider : FactoryBase<Type, object>
 	{
 		public static DesignTimeValueProvider Instance { get; } = new DesignTimeValueProvider();
 
-		protected override object CreateItem( MarkupValueContext parameter )
+		protected override object CreateItem( Type parameter )
 		{
-			var type = parameter.PropertyType;
-			var enumerableType = type.Adapt().GetEnumerableType();
+			var enumerableType = parameter.Adapt().GetEnumerableType();
 			var items = enumerableType == null;
 			var name = items ? nameof(Default<object>.Item) : nameof(Default<object>.Items);
-			var targetType = enumerableType ?? type;
+			var targetType = enumerableType ?? parameter;
 			var property = typeof(Default<>).MakeGenericType( targetType ).GetProperty( name );
 			var result = property.GetValue( null ) ?? CreateMock( targetType );
 			return result;
@@ -75,27 +73,39 @@ namespace DragonSpark.Windows.Markup
 		}
 	}
 
+	public class MarkupValueSetterFactory : FirstFromParameterFactory<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
+	{
+		public static MarkupValueSetterFactory Instance { get; } = new MarkupValueSetterFactory();
+
+		MarkupValueSetterFactory() : base( 
+			DependencyPropertyMarkupPropertyFactory.Instance, 
+			CollectionMarkupPropertyFactory.Instance, 
+			PropertyInfoMarkupPropertyFactory.Instance, 
+			FieldInfoMarkupPropertyFactory.Instance ) {}
+	}
+
+	/*public class ServiceProviderTransformer : TransformerBase<IServiceProvider>
+	{
+		protected override IServiceProvider CreateItem( IServiceProvider parameter )
+		{
+			var target = parameter.Get<IProvideValueTarget>();
+			var result = new MarkupServiceProvider( parameter, target.TargetObject, target.TargetProperty, propertyType );
+			return result;
+		}
+	}*/
+
 	public abstract class MarkupExtensionBase : MarkupExtension
 	{
-		readonly IFactory<MarkupValueContext, object> designTimeFactory;
+		readonly IMarkupPropertyFactory factory;
+		readonly Func<Type, object> designTimeFactory;
 
-		readonly static IMarkupTargetValueSetterBuilder[] DefaultBuilders = 
+		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Instance, DesignTimeValueProvider.Instance.Create ) {}
+
+		protected MarkupExtensionBase( [Required]IMarkupPropertyFactory factory, [Required]Func<Type, object> designTimeFactory )
 		{
-			DependencyPropertyMarkupTargetValueSetterBuilder.Instance,
-			CollectionTargetSetterBuilder.Instance,
-			PropertyInfoMarkupTargetValueSetterBuilder.Instance,
-			FieldInfoMarkupTargetValueSetterBuilder.Instance
-		};
-
-		protected MarkupExtensionBase() : this( DefaultBuilders, DesignTimeValueProvider.Instance ) {}
-
-		protected MarkupExtensionBase( [Required]IMarkupTargetValueSetterBuilder[] builders, [Required]IFactory<MarkupValueContext, object> designTimeFactory )
-		{
+			this.factory = factory;
 			this.designTimeFactory = designTimeFactory;
-			Builders = builders;
 		}
-
-		protected IMarkupTargetValueSetterBuilder[] Builders { get; }
 
 		public override object ProvideValue( IServiceProvider serviceProvider )
 		{
@@ -113,12 +123,11 @@ namespace DragonSpark.Windows.Markup
 						case "System.Windows.SharedDp":
 							return this;
 						default:
-							return Builders.WithFirst( builder => builder.Handles( service ), builder =>
+							return factory.Create( serviceProvider ).With( property =>
 							{
-								var context = Prepare( serviceProvider, service, builder.GetPropertyType( service ) );
-								var value = designMode ? designTimeFactory.Create( context ) : GetValue( context );
+								var value = designMode ? designTimeFactory( property.Reference.PropertyType ) : GetValue( new MarkupServiceProvider( serviceProvider, service.TargetObject, property ) );
 
-								var result = context.TargetProperty == null ? builder.Create( service ).SetValue( value ) : value;
+								var result = service.TargetProperty == null ? property.SetValue( value ) : value;
 								return result;
 							} );
 					}
@@ -132,10 +141,7 @@ namespace DragonSpark.Windows.Markup
 			}
 		}
 
-		protected abstract object GetValue( MarkupValueContext serviceProvider );
-
-		protected virtual MarkupValueContext Prepare( IServiceProvider serviceProvider, IProvideValueTarget target, Type propertyType )
-			=> new MarkupValueContext( serviceProvider, target.TargetObject, target.TargetProperty, propertyType );
+		protected abstract object GetValue( MarkupServiceProvider serviceProvider );
 	}
 
 	public class ValueExtension : MarkupExtensionBase
@@ -147,7 +153,7 @@ namespace DragonSpark.Windows.Markup
 			this.value = value;
 		}
 
-		protected override object GetValue( MarkupValueContext serviceProvider ) => value.Item;
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => value.Item;
 	}
 
 	public class FactoryTypeExtension : MarkupExtensionBase
@@ -159,14 +165,16 @@ namespace DragonSpark.Windows.Markup
 
 		public Type FactoryType { get; set; }
 
-		protected override object GetValue( MarkupValueContext serviceProvider ) => Factory.From( FactoryType );
+		[Required, Service]
+		InstanceFromFactoryTypeFactory Factory { [return: Required]get; set; }
+
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Factory.Create( FactoryType );
 	}
 
 	[ContentProperty( nameof(Properties) )]
 	public class LocateExtension : MarkupExtensionBase
 	{
-		public LocateExtension()
-		{}
+		public LocateExtension() {}
 
 		public LocateExtension( Type type, string buildName = null )
 		{
@@ -184,7 +192,7 @@ namespace DragonSpark.Windows.Markup
 
 		// public Collection<PropertySetter> Properties { get; } = new Collection<PropertySetter>();
 
-		protected override object GetValue( MarkupValueContext serviceProvider )
+		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
 			var result = Locator.GetInstance( Type, BuildName );
 			/*result.As<ISupportInitialize>( x => x.BeginInit() );

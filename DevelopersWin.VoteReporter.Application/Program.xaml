@@ -7,7 +7,7 @@
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	xmlns:startup="clr-namespace:DevelopersWin.VoteReporter.Application.Startup"
 	mc:Ignorable="d" 
-	Services="{ds:Factory {x:Static startup:ApplicationServiceProviderFactory.Instance}}"
+	Services="{ds:Factory {x:Static startup:ServiceProviderFactory.Instance}}"
 >
 	<!--<ioC:AssignLocationCommand />-->
 	<setup:ApplySetup />

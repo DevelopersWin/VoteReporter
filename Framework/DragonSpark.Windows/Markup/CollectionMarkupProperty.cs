@@ -1,24 +1,28 @@
-using System;
 using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.TypeSystem;
+using PostSharp.Patterns.Contracts;
+using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
 {
-	public class CollectionSetter : MarkupTargetValueSetterBase
+	public class CollectionMarkupProperty : MarkupPropertyBase
 	{
 		readonly IList collection;
 		
-		public CollectionSetter( IList collection )
+		public CollectionMarkupProperty( [Required]IList collection, [Required]PropertyReference reference ) : base( reference )
 		{
 			this.collection = collection;
 		}
 
+		protected override object OnGetValue() => collection;
+
 		protected override object Apply( object value )
 		{
-			var index = collection.Cast<object>().FirstOrDefault( o => o == null ).With( o =>
+			var index = collection.Cast<object>().WithFirst( o => o == null, o =>
 			{
 				var i = collection.IndexOf( o );
 				collection.RemoveAt( i );

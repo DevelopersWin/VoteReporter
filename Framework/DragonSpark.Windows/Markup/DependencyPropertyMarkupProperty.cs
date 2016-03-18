@@ -3,16 +3,18 @@ using System.Windows.Threading;
 
 namespace DragonSpark.Windows.Markup
 {
-	public sealed class DependencyPropertyMarkupTargetValueSetter : MarkupTargetValueSetterBase
+	public sealed class DependencyPropertyMarkupProperty : MarkupPropertyBase
 	{
 		readonly DependencyObject targetObject;
 		readonly DependencyProperty targetProperty;
 
-		public DependencyPropertyMarkupTargetValueSetter( DependencyObject targetObject, DependencyProperty targetProperty )
+		public DependencyPropertyMarkupProperty( DependencyObject targetObject, DependencyProperty targetProperty ) : base( PropertyReference.New( targetProperty ) )
 		{
 			this.targetObject = targetObject;
 			this.targetProperty = targetProperty;
 		}
+
+		protected override object OnGetValue() => targetObject.GetValue( targetProperty );
 
 		protected override object Apply( object value )
 		{

@@ -1,9 +1,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using System;
 using System.Collections;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Markup;
 
 namespace DragonSpark.Windows.Markup
@@ -13,15 +11,14 @@ namespace DragonSpark.Windows.Markup
 	{
 		public Collection Items { get; } = new Collection();
 
-		protected virtual IList DetermineCollection( IServiceProvider serviceProvider )
+		protected virtual IList DetermineCollection( MarkupServiceProvider serviceProvider )
 		{
-			var service = serviceProvider.Get<IProvideValueTarget>();
-			var target = service.TargetObject;
-			var result = service.TargetProperty.AsTo<PropertyInfo, IList>( source => (IList)source.GetValue( target ) ) ?? target as IList;
+			var target = serviceProvider.TargetObject;
+			var result = serviceProvider.Property.GetValue() as IList ?? target as IList;
 			return result;
 		}
 
-		protected override object GetValue( MarkupValueContext serviceProvider )
+		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
 			var result = DetermineCollection( serviceProvider ).With( o =>
 			{

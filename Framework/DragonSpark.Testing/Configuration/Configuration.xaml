@@ -1,0 +1,13 @@
+﻿<configuration:ConfigurationRegistry x:Class="DragonSpark.Testing.Configuration.Configuration"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	mc:Ignorable="d" 
+>
+	<configuration:Registration Key="PrimaryKey" Value="Hello World!">
+		<system:String>Some Key</system:String>
+	</configuration:Registration>
+</configuration:ConfigurationRegistry>

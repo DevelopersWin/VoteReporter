@@ -11,7 +11,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Xunit;
-using ApplicationServiceProviderFactory = DragonSpark.Setup.ApplicationServiceProviderFactory;
 using AssemblyProvider = DragonSpark.Testing.Framework.Setup.AssemblyProvider;
 
 namespace DragonSpark.Testing.Extensions

@@ -1,11 +1,10 @@
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Windows.Markup;
 using System.Xaml;
-using DragonSpark.Aspects;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Windows.Markup
 {

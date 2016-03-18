@@ -6,14 +6,14 @@ namespace DragonSpark.Testing.Objects.IoC
 {
 	public class Application : ApplicationBase
 	{
-		public Application() : base( ApplicationServiceProviderFactory.Instance.Create() ) {}
+		public Application() : base( ServiceProviderFactory.Instance.Create() ) {}
 	}
 
-	public class ApplicationServiceProviderFactory : DragonSpark.Setup.ApplicationServiceProviderFactory
+	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
 	{
-		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
+		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		public ApplicationServiceProviderFactory() : base( Framework.Setup.AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+		public ServiceProviderFactory() : base( Framework.Setup.AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
 	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute

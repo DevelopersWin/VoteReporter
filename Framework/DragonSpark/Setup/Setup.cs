@@ -8,7 +8,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
-using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
@@ -32,15 +31,13 @@ namespace DragonSpark.Setup
 
 	public class CurrentApplication : ExecutionContextValue<IApplication> {}
 
-	public class ApplicationServiceProviderFactory : FactoryBase<IServiceProvider>
+	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
 		readonly Func<Assembly[]> assemblies;
 		readonly Func<Assembly[], CompositionHost> compositionHostFactory;
 		readonly Func<ServiceProviderParameter, IServiceLocator> serviceLocatorFactory;
 
-		// public ApplicationServiceProviderFactory( [Required]IAssemblyProvider assemblyProvider, [Required]CompositionHostFactory compositionHostFactory, [Required]Activation.IoC.ServiceLocatorFactory serviceLocatorFactory ) : this( assemblyProvider.Create, compositionHostFactory.Create, serviceLocatorFactory.Create ) {}
-
-		public ApplicationServiceProviderFactory( [Required]Func<Assembly[]> assemblies, [Required]Func<Assembly[], CompositionHost> compositionHostFactory, [Required]Func<ServiceProviderParameter, IServiceLocator> serviceLocatorFactory )
+		public ServiceProviderFactory( [Required]Func<Assembly[]> assemblies, [Required]Func<Assembly[], CompositionHost> compositionHostFactory, [Required]Func<ServiceProviderParameter, IServiceLocator> serviceLocatorFactory )
 		{
 			this.assemblies = assemblies;
 			this.compositionHostFactory = compositionHostFactory;
@@ -53,7 +50,7 @@ namespace DragonSpark.Setup
 			var host = compositionHostFactory( instance );
 			var parameter = new ServiceProviderParameter( host, instance );
 			var serviceLocator = serviceLocatorFactory( parameter );
-			var result = new ApplicationServiceProvider( serviceLocator );
+			var result = new ServiceProvider( serviceLocator );
 			return result;
 		}
 	}
@@ -101,9 +98,6 @@ namespace DragonSpark.Setup
 			object item;
 			var result = host.TryGetExport( serviceType, key, out item ) ? item : null;
 			return result;
-
-			/*throw new ActivationException(
-				FormatActivationExceptionMessage(new CompositionFailedException("Export not found"), serviceType, key));*/
 		}
 	}
 
@@ -143,17 +137,9 @@ namespace DragonSpark.Setup
 				this.locator = locator;
 			}
 
-			public bool CanActivate( Type type, string name = null )
-			{
-				var canActivate = locator.Locate( type ) != null;
-				return canActivate;
-			}
+			public bool CanActivate( Type type, string name = null ) => locator.Locate( type ) != null;
 
-			public object Activate( Type type, string name = null )
-			{
-				var activate = locator.Locate( type );
-				return activate;
-			}
+			public object Activate( Type type, string name = null ) => locator.Locate( type );
 
 			public bool CanConstruct( Type type, params object[] parameters ) => false;
 
@@ -161,14 +147,14 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	class ApplicationServiceProvider : IServiceProvider
+	class ServiceProvider : IServiceProvider
 	{
 		readonly IServiceLocator locator;
 		readonly IActivator activator;
 
-		public ApplicationServiceProvider( [Required]IServiceLocator locator ) : this( locator, locator.GetInstance<IActivator>() ) {}
+		public ServiceProvider( [Required]IServiceLocator locator ) : this( locator, locator.GetInstance<IActivator>() ) {}
 
-		public ApplicationServiceProvider( [Required]IServiceLocator locator, [Required]IActivator activator )
+		public ServiceProvider( [Required]IServiceLocator locator, [Required]IActivator activator )
 		{
 			this.locator = locator;
 			this.activator = activator;
@@ -229,7 +215,7 @@ namespace DragonSpark.Setup
 
 	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand
 	{
-		[Required, ApplicationService]
+		[Required, Service]
 		public CompositionContext Host { [return: Required]get; set; }
 
 		public string ContractName { get; set; }

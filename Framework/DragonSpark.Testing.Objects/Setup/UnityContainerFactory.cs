@@ -60,17 +60,17 @@ namespace DragonSpark.Testing.Objects.Setup
 		protected AutoDataAttribute( Func<ApplicationBase> application ) : base( FixtureFactory.Instance.Create, application ) {}
 	}
 
-	public class ApplicationServiceProviderFactory : DragonSpark.Setup.ApplicationServiceProviderFactory
+	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
 	{
-		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
+		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		ApplicationServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+		ServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
 	}
 
 	public class Application<T> : Framework.Setup.Application<T> where T : ICommand
 	{
 		public Application() : this( Default<ICommand>.Items ) {}
 
-		public Application( IEnumerable<ICommand> commands ) : base( ApplicationServiceProviderFactory.Instance.Create(), commands ) {}
+		public Application( IEnumerable<ICommand> commands ) : base( ServiceProviderFactory.Instance.Create(), commands ) {}
 	}
 }

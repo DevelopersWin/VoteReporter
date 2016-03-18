@@ -3,12 +3,12 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
+using DragonSpark.Windows.Runtime;
 using Ploeh.AutoFixture;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Windows.Runtime;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -35,11 +35,11 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public interface IApplication : DragonSpark.Setup.IApplication, ICommand<AutoData> { }
 
-	public class ApplicationServiceProviderFactory : DragonSpark.Setup.ApplicationServiceProviderFactory
+	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
 	{
-		public static ApplicationServiceProviderFactory Instance { get; } = new ApplicationServiceProviderFactory();
+		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		ApplicationServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+		ServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
 	}
 
 	public class AssemblyProvider : AssemblyProviderBase
@@ -51,7 +51,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class Application : ApplicationBase
 	{
-		public Application() : this( ApplicationServiceProviderFactory.Instance.Create() ) {}
+		public Application() : this( ServiceProviderFactory.Instance.Create() ) {}
 
 		public Application( IServiceProvider provider ) : base( provider ) {}
 	}
