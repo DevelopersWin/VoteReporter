@@ -4,7 +4,6 @@ using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using Microsoft.Practices.Unity;
-using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
@@ -13,7 +12,7 @@ namespace DragonSpark.Testing.Activation.IoC
 	public class RegistrationSupportTests
 	{
 		[Theory, Framework.Setup.AutoData]
-		public void Mapping( [Factory, Frozen( As = typeof(IUnityContainer) )]UnityContainer sut, TransientServiceRegistry registry )
+		public void Mapping( [Factory, Frozen]IUnityContainer sut, TransientServiceRegistry registry )
 		{
 			Assert.Null( sut.TryResolve<IInterface>() );
 			registry.Register<IInterface, Class>();
@@ -25,7 +24,7 @@ namespace DragonSpark.Testing.Activation.IoC
 		}
 
 		[Theory, Framework.Setup.AutoData]
-		public void Persisting( [Factory, Frozen( As = typeof(IUnityContainer) )]UnityContainer sut, PersistentServiceRegistry registry )
+		public void Persisting( [Factory, Frozen]IUnityContainer sut, PersistentServiceRegistry registry )
 		{
 			Assert.Null( sut.TryResolve<IInterface>() );
 			registry.Register<IInterface, Class>();
