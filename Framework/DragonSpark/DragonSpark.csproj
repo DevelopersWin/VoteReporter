@@ -112,20 +112,20 @@
       <HintPath>$(SolutionDir)\packages\NReco.LambdaParser.1.0.0.0\lib\portable-net40+sl50+win+WindowsPhoneApp81+wp80\NReco.LambdaParser.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PostSharp, Version=4.2.21.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\PostSharp.4.2.21\lib\portable-net4+sl5+netcore45+wpa81+wp8\PostSharp.dll</HintPath>
+    <Reference Include="PostSharp, Version=4.2.22.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\PostSharp.4.2.22\lib\portable-net4+sl5+netcore45+wpa81+wp8\PostSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PostSharp.Patterns.Common, Version=4.2.21.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\PostSharp.Patterns.Common.4.2.21\lib\portable-net45+netcore45+wpa81\PostSharp.Patterns.Common.dll</HintPath>
+    <Reference Include="PostSharp.Patterns.Common, Version=4.2.22.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\PostSharp.Patterns.Common.4.2.22\lib\portable-net45+netcore45+wpa81\PostSharp.Patterns.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PostSharp.Patterns.Model, Version=4.2.21.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\PostSharp.Patterns.Model.4.2.21\lib\portable-net45+netcore45+wpa81\PostSharp.Patterns.Model.dll</HintPath>
+    <Reference Include="PostSharp.Patterns.Model, Version=4.2.22.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\PostSharp.Patterns.Model.4.2.22\lib\portable-net45+netcore45+wpa81\PostSharp.Patterns.Model.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PostSharp.Patterns.Threading, Version=4.2.21.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\PostSharp.Patterns.Threading.4.2.21\lib\portable-net45+netcore45+wpa81\PostSharp.Patterns.Threading.dll</HintPath>
+    <Reference Include="PostSharp.Patterns.Threading, Version=4.2.22.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\PostSharp.Patterns.Threading.4.2.22\lib\portable-net45+netcore45+wpa81\PostSharp.Patterns.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
@@ -136,23 +136,23 @@
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETPortable\v4.5\System.Collections.Concurrent.dll</HintPath>
     </Reference>
     <Reference Include="System.Composition.AttributedModel, Version=1.0.30.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.AttributedModel.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.AttributedModel.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Composition.Convention, Version=1.0.30.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.Convention.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.Convention.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Composition.Hosting, Version=1.0.30.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.Hosting.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.Hosting.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Composition.Runtime, Version=1.0.30.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.Runtime.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Composition.TypedParts, Version=1.0.30.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.TypedParts.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.TypedParts.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -443,10 +443,10 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)packages\PostSharp.4.2.21\tools\PostSharp.targets" Condition="Exists('$(SolutionDir)packages\PostSharp.4.2.21\tools\PostSharp.targets')" />
+  <Import Project="$(SolutionDir)packages\PostSharp.4.2.22\tools\PostSharp.targets" Condition="Exists('$(SolutionDir)packages\PostSharp.4.2.22\tools\PostSharp.targets')" />
   <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
-    <Error Condition="!Exists('$(SolutionDir)packages\PostSharp.4.2.21\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
-    <Error Condition="Exists('$(SolutionDir)packages\PostSharp.4.2.21\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="!Exists('$(SolutionDir)packages\PostSharp.4.2.22\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="Exists('$(SolutionDir)packages\PostSharp.4.2.22\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	   Other similar extension points exist, see Microsoft.Common.targets.
