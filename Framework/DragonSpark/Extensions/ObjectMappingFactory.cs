@@ -7,6 +7,8 @@ namespace DragonSpark.Extensions
 {
 	public class ObjectMappingFactory<T> : FactoryBase<ObjectMappingParameter<T>, T> where T : class
 	{
+		public static ObjectMappingFactory<T> Default { get; } = new ObjectMappingFactory<T>( SystemActivator.Instance );
+
 		readonly IActivator activator;
 
 		// public ObjectMappingFactory() : this( Activator.GetCurrent ) {}

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using DragonSpark.Extensions;
+using PostSharp.Patterns.Contracts;
+using System;
 using System.Windows.Markup;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -21,22 +22,22 @@ namespace DragonSpark.Windows.Markup
 	}*/
 
 	[MarkupExtensionReturnType( typeof(Type) )]
-	public class GenericTypeExtension : MarkupExtension
+	public class GenericTypeExtension : MarkupExtensionBase
 	{
 		public GenericTypeExtension()
 		{}
 
-		public GenericTypeExtension( string typeName )
+		public GenericTypeExtension( [NotEmpty]string typeName )
 		{
 			// var items = typeName.Split( new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
 			TypeName = typeName;
 			// ProvidedTypes = items.Skip( 1 ).ToArray();
 		}
 
-		public string TypeName { get; set; }
+		[NotEmpty]
+		public string TypeName { [return: NotEmpty]get; set; }
 
-		// ProvideValue, which returns an object instance of the constructed generic type
-		public override object ProvideValue( System.IServiceProvider serviceProvider )
+		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
 			var result = serviceProvider.Get<IXamlTypeResolver>().Resolve( TypeName );
 			return result;

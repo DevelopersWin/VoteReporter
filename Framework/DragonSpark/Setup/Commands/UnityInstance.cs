@@ -9,6 +9,7 @@ namespace DragonSpark.Setup.Commands
 	[ContentProperty( nameof(Instance) )]
 	public class UnityInstance : UnityRegistrationCommand
 	{
+		[Required]
 		public object Instance { [return: Required]get; set; }
 
 		protected override void OnExecute( object parameter )

@@ -11,6 +11,8 @@ namespace DragonSpark.Windows.Entity
 	[Persistent]
 	class ActivationSource : IActivationSource
 	{
+		public static ActivationSource Default { get; } = new ActivationSource( SystemActivator.Instance );
+
 		readonly IActivator activator;
 
 		readonly Collection<Type> watching = new Collection<Type>();
