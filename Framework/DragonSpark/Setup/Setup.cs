@@ -210,7 +210,7 @@ namespace DragonSpark.Setup
 			Commands.Clear();
 		}
 
-		public object GetService( Type serviceType ) => Services.GetService( serviceType );
+		public virtual object GetService( Type serviceType ) => typeof(IApplication).Adapt().IsAssignableFrom( serviceType ) ? this : Services.GetService( serviceType );
 	}
 
 	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand

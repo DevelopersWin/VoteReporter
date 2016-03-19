@@ -57,7 +57,7 @@ namespace DragonSpark.Testing.Objects.Setup
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		protected AutoDataAttribute( Func<ApplicationBase> application ) : base( FixtureFactory.Instance.Create, application ) {}
+		protected AutoDataAttribute( Func<AutoData, ApplicationBase> application ) : base( FixtureFactory.Instance.Create, application ) {}
 	}
 
 	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
@@ -69,8 +69,8 @@ namespace DragonSpark.Testing.Objects.Setup
 
 	public class Application<T> : Framework.Setup.Application<T> where T : ICommand
 	{
-		public Application() : this( Default<ICommand>.Items ) {}
+		public Application( AutoData autoData ) : this( autoData, Default<ICommand>.Items ) {}
 
-		public Application( IEnumerable<ICommand> commands ) : base( ServiceProviderFactory.Instance.Create(), commands ) {}
+		public Application( AutoData autoData, IEnumerable<ICommand> commands ) : base( autoData, ServiceProviderFactory.Instance.Create(), commands ) {}
 	}
 }

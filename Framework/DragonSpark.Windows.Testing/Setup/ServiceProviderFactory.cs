@@ -1,8 +1,9 @@
 ﻿using DragonSpark.Composition;
-using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using System.Collections.Generic;
 using System.Windows.Input;
+using DragonSpark.Testing.Framework.Setup;
+using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -15,8 +16,8 @@ namespace DragonSpark.Windows.Testing.Setup
 
 	public class Application<T> : DragonSpark.Testing.Framework.Setup.Application<T> where T : ICommand
 	{
-		public Application() : this( Default<ICommand>.Items ) {}
+		public Application( AutoData autoData ) : this( autoData, Default<ICommand>.Items ) {}
 
-		public Application( IEnumerable<ICommand> commands ) : base( ServiceProviderFactory.Instance.Create(), commands ) {}
+		public Application( AutoData autoData, IEnumerable<ICommand> commands ) : base( autoData, ServiceProviderFactory.Instance.Create(), commands ) {}
 	}
 }

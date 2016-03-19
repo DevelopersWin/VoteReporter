@@ -94,6 +94,23 @@ namespace DragonSpark.Windows.Markup
 		}
 	}*/
 
+	public class EvalExtension : MarkupExtensionBase
+	{
+		readonly object item;
+		readonly string expression;
+		
+		public EvalExtension( [Required]object item, [NotEmpty]string expression )
+		{
+			this.item = item;
+			this.expression = expression;
+		}
+
+		[Required, Service]
+		IExpressionEvaluator Evaluator { [return: Required]get; set; }
+
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Evaluator.Evaluate( item, expression );
+	}
+
 	public abstract class MarkupExtensionBase : MarkupExtension
 	{
 		readonly IMarkupPropertyFactory factory;

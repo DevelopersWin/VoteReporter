@@ -1,4 +1,4 @@
-﻿namespace DragonSpark.Testing.Configuration
+﻿namespace DragonSpark.Windows.Testing.Configuration
 {
 	/// <summary>
 	/// Interaction logic for Configuration.xaml

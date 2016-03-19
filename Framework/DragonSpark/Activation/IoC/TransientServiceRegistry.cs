@@ -41,6 +41,8 @@ namespace DragonSpark.Activation.IoC
 			this.lifetimeFactory = lifetimeFactory;
 		}
 
+		public bool IsRegistered( Type type ) => container.IsRegistered( type );
+
 		public void Register( MappingRegistrationParameter parameter )
 		{
 			var lifetimeManager = lifetimeFactory( parameter.MappedTo ) ?? new TransientLifetimeManager();

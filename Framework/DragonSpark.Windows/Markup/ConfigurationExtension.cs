@@ -12,12 +12,16 @@ namespace DragonSpark.Windows.Markup
 	public class ConfigurationExtension : MarkupExtensionBase
 	{
 		readonly string key;
+		readonly Func<PropertyReference, string> factory = MemberInfoKeyFactory.Instance.Create;
 
 		public ConfigurationExtension() {}
 
-		public ConfigurationExtension( [NotEmpty]string key )
+		public ConfigurationExtension( [NotEmpty]string key ) : this( key, MemberInfoKeyFactory.Instance.Create ) {}
+
+		public ConfigurationExtension( [NotEmpty]string key, [Required]Func<PropertyReference, string> factory )
 		{
 			this.key = key;
+			this.factory = factory;
 		}
 
 		[Required, Service]
@@ -25,7 +29,15 @@ namespace DragonSpark.Windows.Markup
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
-			var name = key ?? MemberInfoKeyFactory.Instance.Create( serviceProvider.Property.Reference );
+			var name = key ?? factory( serviceProvider.Property.Reference );
+			var result = Registry.Get( name ) ?? FromTarget( serviceProvider );
+			return result;
+		}
+
+		object FromTarget( MarkupServiceProvider serviceProvider )
+		{
+			var adjusted = new PropertyReference( serviceProvider.TargetObject.GetType(), serviceProvider.Property.Reference.PropertyType, serviceProvider.Property.Reference.PropertyName );
+			var name = factory( adjusted );
 			var result = Registry.Get( name );
 			return result;
 		}

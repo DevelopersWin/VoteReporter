@@ -1,5 +1,4 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
@@ -12,15 +11,15 @@ namespace DragonSpark.Testing.Framework.Setup
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
-		readonly Func<IApplication> application;
+		readonly Func<AutoData, IApplication> application;
 
-		public AutoDataAttribute() : this( () => new Application() ) {}
+		public AutoDataAttribute() : this( autoData => new Application( autoData ) ) {}
 
-		protected AutoDataAttribute( Func<IApplication> application ) : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create, application ) {}
+		protected AutoDataAttribute( Func<AutoData, IApplication> application ) : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create, application ) {}
 
-		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, () => new Application() ) {}
+		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, autoData => new Application( autoData ) ) {}
 
-		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required]Func<IApplication> application  ) : base( fixture() )
+		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required]Func<AutoData, IApplication> application  ) : base( fixture() )
 		{
 			this.application = application;
 		}
@@ -30,7 +29,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
 			{
 				var autoData = new AutoData( Fixture, methodUnderTest );
-				using ( new ExecuteApplicationCommand( application() ).ExecuteWith( autoData ) )
+				using ( new ExecuteApplicationCommand( application( autoData ) ).ExecuteWith( autoData ) )
 				{
 					var result = base.GetData( methodUnderTest );
 					return result;

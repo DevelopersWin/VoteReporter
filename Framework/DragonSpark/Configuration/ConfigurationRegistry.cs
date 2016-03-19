@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.Collections.ObjectModel;
-using System.Composition;
-using System.Linq;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Configuration
 {
@@ -13,7 +9,7 @@ namespace DragonSpark.Configuration
 		object Get( string key );
 	}
 
-	[Export( typeof(IConfigurationRegistry) )]
+	// [Export( typeof(IConfigurationRegistry) )]
 	public class ConfigurationRegistry : KeyedCollection<string, Registration>, IConfigurationRegistry
 	{
 		public object Get( [Required]string key ) => this.WithFirst( registration => registration.Equals( key ), registration => registration.Value );

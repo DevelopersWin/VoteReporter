@@ -7,8 +7,10 @@ using DragonSpark.Windows.Runtime;
 using Ploeh.AutoFixture;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Windows.Input;
+using Type = System.Type;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -30,7 +32,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public abstract class Application<T> : ApplicationBase where T : ICommand
 	{
-		protected Application( IServiceProvider context, IEnumerable<ICommand> commands ) : base( context, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
+		protected Application( AutoData autoData, IServiceProvider context, IEnumerable<ICommand> commands ) : base( autoData, context, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
 	}
 
 	public interface IApplication : DragonSpark.Setup.IApplication, ICommand<AutoData> { }
@@ -51,18 +53,30 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class Application : ApplicationBase
 	{
-		public Application() : this( ServiceProviderFactory.Instance.Create() ) {}
+		public Application( AutoData autoData ) : this( autoData, ServiceProviderFactory.Instance.Create() ) {}
 
-		public Application( IServiceProvider provider ) : base( provider ) {}
+		public Application( AutoData autoData, IServiceProvider provider ) : base( autoData, provider ) {}
 	}
 
 	public abstract class ApplicationBase : DragonSpark.Setup.Application<AutoData>, IApplication
 	{
-		protected ApplicationBase( IServiceProvider context ) : this( context, Default<ICommand>.Items ) {}
+		readonly AutoData autoData;
 
-		protected ApplicationBase( IServiceProvider context, IEnumerable<ICommand> commands ) : base( context, commands )
+		protected ApplicationBase( AutoData autoData, IServiceProvider context ) : this( autoData, context, Default<ICommand>.Items ) {}
+
+		protected ApplicationBase( [Required]AutoData autoData, IServiceProvider context, IEnumerable<ICommand> commands ) : base( context, commands )
 		{
+			this.autoData = autoData;
 			DisposeAfterExecution = false;
+		}
+
+		public override object GetService( Type serviceType ) => base.GetService( serviceType ) ?? FromAutoData( serviceType );
+
+		object FromAutoData( Type serviceType )
+		{
+			var registered = new RegistrationCustomization.AssociatedRegistry( autoData.Fixture ).Item.IsRegistered( serviceType );
+			var result = registered ? autoData.Fixture.Create<object>( serviceType ) : null;
+			return result;
 		}
 	}
 }
