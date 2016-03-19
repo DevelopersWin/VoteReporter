@@ -9,6 +9,5 @@
 	mc:Ignorable="d" 
 	Services="{ds:Factory {x:Static startup:ServiceProviderFactory.Instance}}"
 >
-	<!--<ioC:AssignLocationCommand />-->
 	<setup:ApplySetup />
 </ds:ConsoleApplication>

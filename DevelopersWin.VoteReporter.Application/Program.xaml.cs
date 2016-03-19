@@ -11,8 +11,6 @@ namespace DevelopersWin.VoteReporter.Application
 
 		public Program()
 		{
-			var temp = DevelopersWin.VoteReporter.Configuration.Development.Properties.Settings.Default.Setting;
-
 			InitializeComponent();
 		}
 	}
