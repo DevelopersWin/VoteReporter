@@ -16,8 +16,8 @@ namespace DragonSpark.Windows.Testing.Setup
 
 	public class Application<T> : DragonSpark.Testing.Framework.Setup.Application<T> where T : ICommand
 	{
-		public Application( AutoData autoData ) : this( autoData, Default<ICommand>.Items ) {}
+		public Application() : this( Default<ICommand>.Items ) {}
 
-		public Application( AutoData autoData, IEnumerable<ICommand> commands ) : base( autoData, ServiceProviderFactory.Instance.Create(), commands ) {}
+		public Application( IEnumerable<ICommand> commands ) : base( ServiceProviderFactory.Instance.Create(), commands ) {}
 	}
 }

@@ -11,8 +11,11 @@ namespace DragonSpark.Windows.Testing.Configuration
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void FromConfiguration( Configuration sut )
 		{
-			var temp = sut.Get( "PrimaryKey" );
-			Assert.Equal( Settings.Default.HelloWorld, temp );
+			var primary = sut.Get( "PrimaryKey" );
+			Assert.Equal( Settings.Default.HelloWorld, primary );
+
+			var alias = sut.Get( "Some Key" );
+			Assert.Equal( Settings.Default.HelloWorld, alias );
 		}
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]

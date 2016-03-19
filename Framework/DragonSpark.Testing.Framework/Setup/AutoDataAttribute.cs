@@ -11,15 +11,15 @@ namespace DragonSpark.Testing.Framework.Setup
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
-		readonly Func<AutoData, IApplication> application;
+		readonly Func<IApplication> application;
 
-		public AutoDataAttribute() : this( autoData => new Application( autoData ) ) {}
+		public AutoDataAttribute() : this( () => new Application() ) {}
 
-		protected AutoDataAttribute( Func<AutoData, IApplication> application ) : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create, application ) {}
+		protected AutoDataAttribute( Func<IApplication> application ) : this( FixtureFactory<DefaultAutoDataCustomization>.Instance.Create, application ) {}
 
-		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, autoData => new Application( autoData ) ) {}
+		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, () => new Application() ) {}
 
-		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required]Func<AutoData, IApplication> application  ) : base( fixture() )
+		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required]Func<IApplication> application  ) : base( fixture() )
 		{
 			this.application = application;
 		}
@@ -29,7 +29,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
 			{
 				var autoData = new AutoData( Fixture, methodUnderTest );
-				using ( new ExecuteApplicationCommand( application( autoData ) ).ExecuteWith( autoData ) )
+				using ( new ExecuteApplicationCommand( application() ).ExecuteWith( autoData ) )
 				{
 					var result = base.GetData( methodUnderTest );
 					return result;

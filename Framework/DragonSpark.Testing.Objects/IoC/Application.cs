@@ -6,7 +6,7 @@ namespace DragonSpark.Testing.Objects.IoC
 {
 	public class Application : ApplicationBase
 	{
-		public Application( AutoData autoData ) : base( autoData, ServiceProviderFactory.Instance.Create() ) {}
+		public Application() : base( ServiceProviderFactory.Instance.Create() ) {}
 	}
 
 	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
@@ -18,6 +18,6 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		public AutoDataAttribute() : base( autoData => new Application( autoData ) ) {}
+		public AutoDataAttribute() : base( () => new Application() ) {}
 	}
 }
