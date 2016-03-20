@@ -9,7 +9,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Composition
 {
-	public class TypeOfContainerstFactoryTests
+	public class CompositionHostFactoryTests
 	{
 		[Theory, AutoData]
 		public void BasicComposition( Assembly[] assemblies, string text )

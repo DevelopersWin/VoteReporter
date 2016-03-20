@@ -35,9 +35,9 @@ namespace DragonSpark.Setup
 	{
 		readonly Func<Assembly[]> assemblies;
 		readonly Func<Assembly[], CompositionHost> compositionHostFactory;
-		readonly Func<ServiceProviderParameter, IServiceLocator> serviceLocatorFactory;
+		readonly Func<ServiceLocatorParameter, IServiceLocator> serviceLocatorFactory;
 
-		public ServiceProviderFactory( [Required]Func<Assembly[]> assemblies, [Required]Func<Assembly[], CompositionHost> compositionHostFactory, [Required]Func<ServiceProviderParameter, IServiceLocator> serviceLocatorFactory )
+		public ServiceProviderFactory( [Required]Func<Assembly[]> assemblies, [Required]Func<Assembly[], CompositionHost> compositionHostFactory, [Required]Func<ServiceLocatorParameter, IServiceLocator> serviceLocatorFactory )
 		{
 			this.assemblies = assemblies;
 			this.compositionHostFactory = compositionHostFactory;
@@ -48,14 +48,21 @@ namespace DragonSpark.Setup
 		{
 			var instance = assemblies();
 			var host = compositionHostFactory( instance );
-			var parameter = new ServiceProviderParameter( host, instance );
+			var parameter = new ServiceLocatorParameter( host, instance );
 			var serviceLocator = serviceLocatorFactory( parameter );
 			var result = new ServiceProvider( serviceLocator );
 			return result;
 		}
 	}
 
-	public class UnityContainerFactory : FactoryBase<ServiceProviderParameter, IUnityContainer>
+	public class ServiceProviderFactoryReplacement : AggregateFactory<IServiceProvider>
+	{
+		public ServiceProviderFactoryReplacement( Func<IServiceProvider> primary, params Func<IServiceProvider, IServiceProvider>[] transformers ) : base( primary, transformers )
+		{
+		}
+	}
+
+	public class UnityContainerFactory : FactoryBase<ServiceLocatorParameter, IUnityContainer>
 	{
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
@@ -68,11 +75,13 @@ namespace DragonSpark.Setup
 			this.create = create;
 		}
 
-		protected override IUnityContainer CreateItem( ServiceProviderParameter parameter )
+		protected override IUnityContainer CreateItem( ServiceLocatorParameter parameter )
 		{
 			var result = create()
 				.RegisterInstance( parameter.Assemblies )
+				.RegisterInstance( parameter.Types )
 				.RegisterInstance( parameter.Host )
+				.RegisterInstance( parameter.Host.TryGet<BuildableTypeFromConventionLocator>() )
 				.Extend<DefaultRegistrationsExtension>()
 				.Extend<BuildPipelineExtension>()
 				.Extend<InstanceTypeRegistrationMonitorExtension>()
@@ -101,23 +110,27 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class ServiceProviderParameter
+	public class ServiceLocatorParameter
 	{
-		public ServiceProviderParameter( [Required]CompositionHost host, Assembly[] assemblies )
+		public ServiceLocatorParameter( [Required]CompositionHost host, [Required]Assembly[] assemblies ) : this( host, assemblies, TypesFactory.Instance.Create( assemblies ) ) {}
+
+		public ServiceLocatorParameter( [Required]CompositionHost host, [Required]Assembly[] assemblies, [Required]Type[] types )
 		{
 			Host = host;
 			Assemblies = assemblies;
+			Types = types;
 		}
 
 		public CompositionHost Host { get; }
 		public Assembly[] Assemblies { get; }
+		public Type[] Types { get; }
 	}
 
-	public class ServiceLocatorFactory : FactoryBase<ServiceProviderParameter, IServiceLocator>
+	public class ServiceLocatorFactory : FactoryBase<ServiceLocatorParameter, IServiceLocator>
 	{
 		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory();
 
-		protected override IServiceLocator CreateItem( ServiceProviderParameter parameter )
+		protected override IServiceLocator CreateItem( ServiceLocatorParameter parameter )
 		{
 			var registry = parameter.Host.GetExport<IExportDescriptorProviderRegistry>();
 			var activator = new CompositeActivator( new SingletonActivator( parameter.Host.TryGet<ISingletonLocator>() ), SystemActivator.Instance );
@@ -149,18 +162,18 @@ namespace DragonSpark.Setup
 
 	class ServiceProvider : IServiceProvider
 	{
-		readonly IServiceLocator locator;
+		readonly IServiceProvider locator;
 		readonly IActivator activator;
 
-		public ServiceProvider( [Required]IServiceLocator locator ) : this( locator, locator.GetInstance<IActivator>() ) {}
+		public ServiceProvider( [Required]IServiceProvider provider ) : this( provider, provider.Get<IActivator>() ) {}
 
-		public ServiceProvider( [Required]IServiceLocator locator, [Required]IActivator activator )
+		public ServiceProvider( [Required]IServiceProvider locator, [Required]IActivator activator )
 		{
 			this.locator = locator;
 			this.activator = activator;
 		}
 
-		public object GetService( Type serviceType ) => locator.GetInstance( serviceType ) ?? activator.Activate( serviceType );
+		public object GetService( Type serviceType ) => locator.GetService( serviceType ) ?? activator.Activate<object>( serviceType );
 	}
 
 	public interface IApplication : ICommand, IServiceProvider, IDisposable {}

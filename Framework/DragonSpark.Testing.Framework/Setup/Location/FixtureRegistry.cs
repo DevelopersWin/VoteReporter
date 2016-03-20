@@ -6,6 +6,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Activation.FactoryModel;
 
 namespace DragonSpark.Testing.Framework.Setup.Location
 {
@@ -24,7 +25,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		public void Register( [Required]MappingRegistrationParameter parameter )
 		{
-			fixture.Customizations.Add( new TypeRelay( parameter.Type, parameter.MappedTo ) );
+			fixture.Customizations.Insert( 0, new TypeRelay( parameter.Type, parameter.MappedTo ) );
 			new[] { parameter.Type, parameter.MappedTo }.Distinct().Each( registered.Ensure );
 		}
 
@@ -40,7 +41,8 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		void RegisterFactory<T>( [Required]Func<object> factory )
 		{
-			fixture.Customize<T>( c => c.FromFactory( () => (T)factory() ).OmitAutoProperties() );
+			var convert = factory.Convert<T>();
+			fixture.Register( convert );
 			registered.Ensure( typeof(T) );
 		}
 	}

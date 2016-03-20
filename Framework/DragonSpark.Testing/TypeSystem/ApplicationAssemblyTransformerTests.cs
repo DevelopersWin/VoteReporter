@@ -1,8 +1,11 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Composition;
+using DragonSpark.Extensions;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using Moq;
+using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 using AutoDataAttribute = Ploeh.AutoFixture.Xunit2.AutoDataAttribute;
@@ -11,16 +14,41 @@ namespace DragonSpark.Testing.TypeSystem
 {
 	public class ApplicationAssemblyTransformerTests
 	{
-		[Theory, DefaultSetup.AutoData, AssemblyProvider.Register]
-		public void Basic( [Frozen]IAssemblyProvider provider, ApplicationAssemblyTransformer sut )
+		[Theory, DefaultSetup.AutoData]
+		public void Basic( Mock<IAssemblyProvider> provider, ApplicationAssemblyTransformer sut )
 		{
-			var mock = Mock.Get( provider );
-			mock.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.Assemblies() );
+			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.Assemblies() );
 
-			var assemblies = sut.Create( provider.Create() );
+			var assemblies = sut.Create( provider.Object.Create() );
 			
-			mock.Verify( assemblyProvider => assemblyProvider.Create() );
-			Assert.NotEqual( assemblies, provider.Create() );
-		} 
+			provider.Verify( assemblyProvider => assemblyProvider.Create() );
+			Assert.NotEqual( assemblies, provider.Object.Create() );
+		}
+
+		[Theory, Framework.Setup.AutoData]
+		public void DefaultProvider( IAssemblyProvider sut )
+		{
+			Assert.NotNull( sut );
+			Assert.Same( AssemblyProvider.Instance, sut );
+		}
+
+		[Theory, Framework.Setup.AutoData, DeclaredAssemblyProvider.Register]
+		public void DeclaredProvider( IAssemblyProvider sut )
+		{
+			Assert.NotNull( sut );
+			Assert.Same( DeclaredAssemblyProvider.Instance, sut );
+		}
+
+		class DeclaredAssemblyProvider : AssemblyProviderBase
+		{
+			public static DeclaredAssemblyProvider Instance { get; } = new DeclaredAssemblyProvider();
+
+			public class Register : RegisterFactoryAttribute
+			{
+				public Register() : base( typeof(DeclaredAssemblyProvider) ) {}
+			}
+
+			DeclaredAssemblyProvider() : base( typeof(DeclaredAssemblyProvider) ) {}
+		}
 	}
 }

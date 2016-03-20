@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Composition;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -44,6 +45,7 @@ namespace DragonSpark.Activation.IoC
 			parameters = new RegisterDefaultCommand.Parameter[]
 			{
 				new RegisterDefaultCommand.Parameter<Assembly[]>( assemblies ),
+				new RegisterDefaultCommand.Parameter<Type[]>( TypesFactory.Instance.Create( assemblies ) ),
 				new RegisterDefaultCommand.Parameter<Serilog.Core.LoggingLevelSwitch>( levelSwitch ),
 				sinkParameter,
 				loggingParameter
@@ -60,8 +62,6 @@ namespace DragonSpark.Activation.IoC
 			registry.Register<IServiceRegistry, ServiceRegistry>();
 			registry.Register<IActivator, Activator>();
 			registry.Register( Context );
-			// registry.Register( new Activation.Activator.Get( Activation.Activator.GetCurrent ) );
-			// registry.Register( new Assemblies.Get( Assemblies.GetCurrent ) );
 		}
 
 		class Activator : CompositeActivator

@@ -52,7 +52,7 @@ namespace DragonSpark.Activation.IoC
 		public ILogger Logger { get; }
 	}
 
-	public class ServiceLocatorFactory : FactoryBase<ServiceProviderParameter, IServiceLocator>
+	public class ServiceLocatorFactory : FactoryBase<ServiceLocatorParameter, IServiceLocator>
 	{
 		public static ServiceLocatorFactory Instance { get; } = new ServiceLocatorFactory( ConfigureLocationCommand.Instance );
 
@@ -67,7 +67,7 @@ namespace DragonSpark.Activation.IoC
 			this.factory = factory;
 		}
 
-		protected override IServiceLocator CreateItem( ServiceProviderParameter parameter )
+		protected override IServiceLocator CreateItem( ServiceLocatorParameter parameter )
 		{
 			var container = factory.Create( parameter );
 			var result = new ServiceLocator( container );

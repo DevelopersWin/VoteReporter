@@ -41,16 +41,14 @@ namespace DragonSpark.Testing.Framework
 
 	public class FactoryAttribute : CustomizeAttribute
 	{
-		readonly Func<IActivator> activator;
 		readonly Func<ParameterInfoFactoryTypeLocator> factoryLocator;
 		readonly Func<ISingletonLocator> locator;
 		readonly Type factoryType;
 
-		public FactoryAttribute( Type factoryType = null ) : this( Services.Get<IActivator>, Services.Get<ParameterInfoFactoryTypeLocator>, Services.Get<ISingletonLocator>, factoryType ) {}
+		public FactoryAttribute( Type factoryType = null ) : this( Services.Get<ParameterInfoFactoryTypeLocator>, Services.Get<ISingletonLocator>, factoryType ) {}
 
-		public FactoryAttribute( [Required]Func<IActivator> activator, [Required]Func<ParameterInfoFactoryTypeLocator> factoryLocator, Func<ISingletonLocator> locator, Type factoryType = null )
+		public FactoryAttribute( [Required]Func<ParameterInfoFactoryTypeLocator> factoryLocator, Func<ISingletonLocator> locator, Type factoryType = null )
 		{
-			this.activator = activator;
 			this.factoryLocator = factoryLocator;
 			this.locator = locator;
 			this.factoryType = factoryType;
@@ -60,7 +58,7 @@ namespace DragonSpark.Testing.Framework
 		{
 			var type = factoryType ?? factoryLocator().Create( parameter );
 			var resultType = Factory.GetResultType( type );
-			var registration = new FactoryRegistration( activator(), locator(), type, parameter.ParameterType, resultType );
+			var registration = new FactoryRegistration( locator(), type, parameter.ParameterType, resultType );
 			var result = new RegistrationCustomization( registration );
 			return result;
 		}

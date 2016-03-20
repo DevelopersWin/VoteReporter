@@ -26,7 +26,11 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.factory = factory;
 		}
 
-		protected override void OnInitializing( AutoData context ) => factory( context.Method ).Each( customization => customization.Customize( context.Fixture ) );
+		protected override void OnInitializing( AutoData context )
+		{
+			var customizations = factory( context.Method );
+			customizations.Each( customization => customization.Customize( context.Fixture ) );
+		}
 	}
 
 	public abstract class Application<T> : ApplicationBase where T : ICommand
@@ -66,14 +70,21 @@ namespace DragonSpark.Testing.Framework.Setup
 			DisposeAfterExecution = false;
 		}
 
-		public override object GetService( Type serviceType ) => base.GetService( serviceType ) ?? FromAutoData( serviceType );
-
-		object FromAutoData( Type serviceType )
+		protected override void OnExecute( AutoData parameter )
 		{
-			var autoData = Services.Get<AutoData>();
+			var registry = Services.Get<IExportDescriptorProviderRegistry>();
+			registry.Register( new InstanceExportDescriptorProvider<AutoData>( parameter ) );
+			
+			base.OnExecute( parameter );
+		}
+
+		public override object GetService( Type serviceType ) => FromAutoData( serviceType ) ?? base.GetService( serviceType );
+
+		object FromAutoData( Type serviceType ) => Services.Get<AutoData>().With( autoData =>
+		{
 			var registered = new RegistrationCustomization.AssociatedRegistry( autoData.Fixture ).Item.IsRegistered( serviceType );
 			var result = registered ? autoData.Fixture.Create<object>( serviceType ) : null;
 			return result;
-		}
+		} );
 	}
 }

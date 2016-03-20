@@ -18,9 +18,15 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		protected override void Customize( IFixture fixture )
 		{
-			var autoData = Services.Get<AutoData>().With( OnInitializing );
-			var items = autoData?.Items ?? new Items<IAutoDataCustomization>( fixture ).Item;
-			items.Ensure( ( IAutoDataCustomization)this );
+			var autoData = Services.Get<AutoData>();
+			if ( autoData != null )
+			{
+				OnInitializing( autoData );
+			}
+			else
+			{
+				new Items<IAutoDataCustomization>( fixture ).Item.Ensure( (IAutoDataCustomization)this );
+			}
 		}
 
 		void IAutoDataCustomization.Initializing( AutoData data ) => OnInitializing( data );

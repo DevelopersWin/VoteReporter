@@ -1,12 +1,10 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Setup.Registration;
-using DragonSpark.TypeSystem;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
-using PostSharp.Patterns.Contracts;
-using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 
 namespace DragonSpark.Setup

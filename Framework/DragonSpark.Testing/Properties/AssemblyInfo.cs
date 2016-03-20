@@ -26,8 +26,7 @@ using DragonSpark.Testing.Objects.Setup;
 [assembly: AssemblyFileVersion( "2016.2.1.1" )]
 [assembly: Application]
 
-// [assembly: ServiceLocatorFactory.Register]
 [assembly: UnityContainerFactory.Register]
-[assembly: AssemblyProvider.Register] // Default assembly factory.
-									  // [assembly: Assemblies]
+[assembly: AssemblyProvider.Register]
+[assembly: AssemblyProvider.Types]
 [assembly: ApplyDefaultValues]

@@ -1,15 +1,14 @@
+using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Setup.Registration;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -79,7 +78,7 @@ namespace DragonSpark.Activation.IoC
 			||
 			locator.Create( parameter.Key.Type ) != null
 			||
-			factoryTypeLocator().Create( new CompositionContract( parameter.Key.Type ) ) != null
+			factoryTypeLocator().Create( new TypeRequest( parameter.Key.Type ) ) != null
 			;
 
 		protected override bool Verify( ResolutionSpecificationParameter parameter ) => Check( parameter );

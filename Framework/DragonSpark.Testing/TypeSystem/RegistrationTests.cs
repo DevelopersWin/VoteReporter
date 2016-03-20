@@ -1,7 +1,9 @@
-﻿using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
+﻿using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation.IoC;
+using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
-using System.Composition;
+using Microsoft.Practices.Unity;
 using System.Reflection;
 using Xunit;
 
@@ -10,18 +12,28 @@ namespace DragonSpark.Testing.TypeSystem
 	public class RegistrationTests
 	{
 		[RegisterFactory( typeof(AssemblySource) )]
-		[Theory, AutoData]
+		[Theory, Framework.Setup.AutoData]
 		public void Testing( Assembly[] sut )
 		{
-			Assert.Same( sut, AssemblySource.Result );
+			Assert.Same( AssemblySource.Result, sut );
 		}
 
-		[Export]
-		public class AssemblySource : AssemblySourceBase
+		// [Export]
+		class AssemblySource : AssemblySourceBase
 		{
 			readonly internal static Assembly[] Result = new Assembly[0];
 
 			protected override Assembly[] CreateItem() => Result;
+		}
+
+		[Fact]
+		public void IsFactory()
+		{
+			var result = Factory.GetInterface( typeof(UnityContainerFactory) );
+			Assert.Equal( typeof(IFactory<IUnityContainer>), result );
+
+			var implemented = ImplementedInterfaceFromConventionLocator.Instance.Create( typeof(UnityContainerFactory) );
+			Assert.Null( implemented );
 		}
 	}
 }

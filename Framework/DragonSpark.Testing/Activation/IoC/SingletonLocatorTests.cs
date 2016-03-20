@@ -1,4 +1,6 @@
-﻿using DragonSpark.Activation.IoC;
+﻿using System.Linq;
+using System.Reflection;
+using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using Xunit;
 
@@ -9,28 +11,29 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void SingletonFromItem()
 		{
-			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( typeof(SingletonItem).Assembly.ToItem() ) );
+			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator() );
 			Assert.Same( SingletonItem.Instance, sut.Locate( typeof(SingletonItem) ) );
 		}
 
 		[Fact]
 		public void SingletonFromMetadata()
 		{
-			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( typeof(SingletonMetadata).Assembly.ToItem() ) );
+			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator() );
 			Assert.Same( SingletonMetadata.Temp, sut.Locate( typeof(SingletonMetadata) ) );
 		}
 
 		[Fact]
 		public void SingletonFromOther()
 		{
-			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( typeof(SingletonOther).Assembly.ToItem() ), nameof(SingletonOther.Other) );
+			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator(), nameof(SingletonOther.Other) );
 			Assert.Same( SingletonOther.Other, sut.Locate( typeof(SingletonOther) ) );
 		}
 
 		[Fact]
 		public void SingletonFromConvention()
 		{
-			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( typeof(ISingleton).Assembly.ToItem() ) );
+			var nestedTypes = GetType().GetTypeInfo().DeclaredNestedTypes.AsTypes().ToArray();
+			var sut = new SingletonLocator( new BuildableTypeFromConventionLocator( nestedTypes ) );
 			Assert.Same( Singleton.Instance, sut.Locate( typeof(ISingleton) ) );
 		}
 

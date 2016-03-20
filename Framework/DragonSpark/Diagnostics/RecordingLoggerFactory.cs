@@ -17,9 +17,13 @@ namespace DragonSpark.Diagnostics
 		public RecordingLogEventSink Sink { get; }
 		public Serilog.Core.LoggingLevelSwitch LevelSwitch { get; }
 
-		protected override ILogger CreateItem() => new LoggerConfiguration()
-			.WriteTo.Sink( Sink )
-			.MinimumLevel.ControlledBy( LevelSwitch )
-			.CreateLogger();
+		protected override ILogger CreateItem()
+		{
+			var logger = new LoggerConfiguration()
+				.WriteTo.Sink( Sink )
+				.MinimumLevel.ControlledBy( LevelSwitch )
+				.CreateLogger();
+			return logger;
+		}
 	}
 }

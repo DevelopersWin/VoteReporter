@@ -1,13 +1,12 @@
 using AutoMapper.Internal;
+using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using System;
-using System.Reflection;
-using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Threading;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {

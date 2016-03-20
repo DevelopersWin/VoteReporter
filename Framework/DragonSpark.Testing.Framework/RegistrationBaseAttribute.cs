@@ -38,8 +38,8 @@ namespace DragonSpark.Testing.Framework
 
 	public class RegisterFactoryAttribute : RegistrationBaseAttribute
 	{
-		public RegisterFactoryAttribute( Type factoryType ) : this( Services.Get<IActivator>, Services.Get<ISingletonLocator>, factoryType ) {}
+		public RegisterFactoryAttribute( Type factoryType ) : this( Services.Get<ISingletonLocator>, factoryType ) {}
 
-		public RegisterFactoryAttribute( [Required]Func<IActivator> activator, [Required]Func<ISingletonLocator> locator, [Required, OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( activator(), locator(), factoryType ) ) ) {}
+		public RegisterFactoryAttribute( [Required]Func<ISingletonLocator> locator, [Required, OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( locator(), factoryType ) ) ) {}
 	}
 }

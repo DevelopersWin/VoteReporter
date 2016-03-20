@@ -2,6 +2,8 @@ using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Reflection;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Setup.Registration
 {
@@ -14,20 +16,20 @@ namespace DragonSpark.Setup.Registration
 
 		public sealed class MappedAttribute : RegistrationBaseAttribute
 		{
-			public MappedAttribute() : this( Services.Get<ImplementedInterfaceFromConventionLocator>, null, null ) {}
+			public MappedAttribute() : this( ImplementedInterfaceFromConventionLocator.Instance, null, null ) {}
 
-			public MappedAttribute( Type @as ) : this( Services.Get<ImplementedInterfaceFromConventionLocator>, @as, null ) { }
+			public MappedAttribute( Type @as ) : this( ImplementedInterfaceFromConventionLocator.Instance, @as, null ) { }
 
-			public MappedAttribute( string name ) : this( Services.Get<ImplementedInterfaceFromConventionLocator>, null, name ) { }
+			public MappedAttribute( string name ) : this( ImplementedInterfaceFromConventionLocator.Instance, null, name ) { }
 
-			MappedAttribute( [Required]Func<ImplementedInterfaceFromConventionLocator> locator, Type @as, string name ) : base( t => new TypeRegistration( @as ?? locator().Create( t ) ?? t, t, name ) ) { }
+			MappedAttribute( [Required]ImplementedInterfaceFromConventionLocator locator, Type @as, string name ) : base( t => new TypeRegistration( @as ?? locator.Create( t ) ?? t.GetTypeInfo().ImplementedInterfaces.Only() ?? t, t, name ) ) { }
 		}
 
 		public class FactoryAttribute : RegistrationBaseAttribute
 		{
-			public FactoryAttribute() : this( Services.Get<IActivator>, Services.Get<ISingletonLocator> ) {}
+			public FactoryAttribute() : this( Services.Get<ISingletonLocator> ) {}
 
-			public FactoryAttribute( [Required]Func<IActivator> activator, [Required]Func<ISingletonLocator> locator ) : base( t => new FactoryRegistration( activator(), locator(), t ) ) { }
+			public FactoryAttribute( [Required]Func<ISingletonLocator> locator ) : base( t => new FactoryRegistration( locator(), t ) ) { }
 		}
 	}
 }

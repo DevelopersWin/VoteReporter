@@ -16,10 +16,6 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		protected override void OnExecute( AutoData parameter )
 		{
-			var registry = application.Get<IExportDescriptorProviderRegistry>();
-			registry.Register( new InstanceExportDescriptorProvider<AutoData>( parameter ) );
-			// registry.Register( new InstanceExportDescriptorProvider<DragonSpark.Setup.IApplication>( application ) );
-
 			application.ExecuteWith( parameter );
 
 			parameter.Initialize();

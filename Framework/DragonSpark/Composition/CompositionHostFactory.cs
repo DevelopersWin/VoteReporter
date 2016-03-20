@@ -3,14 +3,13 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Setup;
+using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
@@ -52,32 +51,41 @@ namespace DragonSpark.Composition
 			public new static Specification Instance { get; } = new Specification();
 
 			[Freeze]
-			protected override bool Verify( Type parameter ) => base.Verify( parameter ) && Factory.IsFactory( parameter ) && parameter.IsDefined<ExportAttribute>();
+			protected override bool Verify( Type parameter ) => base.Verify( parameter ) && Factory.IsFactory( parameter ) && parameter.Adapt().IsDefined<ExportAttribute>();
 		}
 
 		protected override FactoryType CreateItem( Type parameter ) => new FactoryType( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
+	}
+
+	public class TypesFactory : FactoryBase<Assembly[], Type[]>
+	{
+		public static TypesFactory Instance { get; } = new TypesFactory();
+
+		[Freeze]
+		protected override Type[] CreateItem( Assembly[] parameter ) => parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
 	}
 
 	public class CompositionHostFactory : FactoryBase<Assembly[], CompositionHost>
 	{
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
 
-		readonly Func<ContainerConfiguration> configuration;
+		readonly Func<ContainerConfiguration> factory;
 
 		public CompositionHostFactory() : this( () => new ContainerConfiguration() ) {}
 
-		public CompositionHostFactory( Func<ContainerConfiguration> configuration )
+		public CompositionHostFactory( [Required]Func<ContainerConfiguration> factory )
 		{
-			this.configuration = configuration;
+			this.factory = factory;
 		}
 
 		protected override CompositionHost CreateItem( Assembly[] parameter )
 		{
-			var types = parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
+			//var assemblies = parameter.Append( GetType().Assembly() ).Distinct().Fixed();
+			var types = TypesFactory.Instance.Create( parameter );
 			var factoryTypes = types.Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
 			var locator = new DiscoverableFactoryTypeLocator( factoryTypes );
-			var conventionLocator = new BuildableTypeFromConventionLocator( parameter );
-			var result = configuration()
+			var conventionLocator = new BuildableTypeFromConventionLocator( types );
+			var result = factory()
 				.WithProvider( new TypeInitializingExportDescriptorProvider( conventionLocator ) )
 				.WithParts( types )
 				.WithProvider( new RegisteredExportDescriptorProvider() )

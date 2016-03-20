@@ -39,7 +39,7 @@ namespace DragonSpark.Testing.Objects.Setup
 		protected override IUnityContainer CreateItem()
 		{
 			var assemblies = new Assembly[0];
-			var parameter = new ServiceProviderParameter( CompositionHostFactory.Instance.Create( assemblies ), assemblies );
+			var parameter = new ServiceLocatorParameter( CompositionHostFactory.Instance.Create( assemblies ), assemblies );
 			var result = DragonSpark.Setup.UnityContainerFactory.Instance.Create( parameter );
 			return result;
 		}

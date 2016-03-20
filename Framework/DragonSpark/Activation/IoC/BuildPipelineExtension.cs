@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Composition;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -139,16 +140,17 @@ namespace DragonSpark.Activation.IoC
 		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 	}
 
+	// [Persistent]
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
-		readonly Assembly[] assemblies;
+		readonly Type[] types;
 		readonly CanBuildSpecification specification;
 
-		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies ) : this( assemblies, CanBuildSpecification.Instance ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, CanBuildSpecification.Instance ) {}
 
-		public BuildableTypeFromConventionLocator( [Required]Assembly[] assemblies, [Required]CanBuildSpecification specification ) : base( new DecoratedSpecification<Type>( new InverseSpecification( specification ) ) )
+		public BuildableTypeFromConventionLocator( [Required]Type[] types, [Required]CanBuildSpecification specification ) : base( specification.Inverse<Type>() )
 		{
-			this.assemblies = assemblies;
+			this.types = types;
 			this.specification = specification;
 		}
 
@@ -157,8 +159,8 @@ namespace DragonSpark.Activation.IoC
 		{
 			var adapter = parameter.Adapt();
 			var name = parameter.Name.TrimStartOf( 'I' );
-			var result = assemblies.Append( parameter.Assembly() ).Distinct()
-				.SelectMany( assembly => assembly.DefinedTypes.AsTypes() )
+			var result = 
+				types.Union( TypesFactory.Instance.Create( parameter.Assembly().ToItem() ) )
 				.Where( adapter.IsAssignableFrom )
 				.Where( specification.IsSatisfiedBy )
 				.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
@@ -167,24 +169,25 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	public class ImplementedInterfaceFromConventionLocator : FactoryBase<Type,Type>
+	public class ImplementedInterfaceFromConventionLocator : FactoryBase<Type, Type>
 	{
-		readonly Assembly[] assemblies;
+		readonly Type[] ignore;
+		public static ImplementedInterfaceFromConventionLocator Instance { get; } = new ImplementedInterfaceFromConventionLocator( typeof(IFactory), typeof(IFactoryWithParameter) );
 
-		public ImplementedInterfaceFromConventionLocator( [Required]Assembly[] assemblies )
+		public ImplementedInterfaceFromConventionLocator( [Required]params Type[] ignore )
 		{
-			this.assemblies = assemblies;
+			this.ignore = ignore;
 		}
 
 		[Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
 			var result =
-				parameter.GetTypeInfo().ImplementedInterfaces.ToArray().With( interfaces => 
+				parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore ).ToArray().With( interfaces => 
 					interfaces.FirstOrDefault( i => parameter.Name.Contains( i.Name.TrimStartOf( 'I' ) ) )
-					??
-					interfaces.FirstOrDefault( t => assemblies.Contains( t.Assembly() ) )
-				) ?? parameter;
+					/*??
+					interfaces.FirstOrDefault( t => assemblies.Contains( t.Assembly() ) )*/
+				);
 			return result;
 		}
 	}

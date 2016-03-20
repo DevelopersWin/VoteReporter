@@ -9,7 +9,7 @@ using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
 {
-	[Export( typeof(ISingletonLocator) ), Persistent]
+	[Export( typeof(ISingletonLocator) ), Shared, Persistent]
 	public class SingletonLocator : ISingletonLocator
 	{
 		public const string Instance = "Instance";
@@ -28,7 +28,8 @@ namespace DragonSpark.Activation.IoC
 
 		public object Locate( Type type )
 		{
-			var mapped = locator.Create( type )?.GetTypeInfo() ?? type.GetTypeInfo();
+			var located = locator.Create( type ) ?? type;
+			var mapped = located.GetTypeInfo();
 			var declared = mapped.DeclaredProperties.FirstOrDefault( info => info.GetMethod.IsStatic && !info.GetMethod.ContainsGenericParameters && ( info.Name == property || info.Has<SingletonAttribute>() ) );
 			var result = declared.With( info => info.GetValue( null ) );
 			return result;

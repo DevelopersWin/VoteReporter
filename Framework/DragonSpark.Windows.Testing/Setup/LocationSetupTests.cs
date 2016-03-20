@@ -449,14 +449,14 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( assembly.GetName().Version, fromProvider.Version );
 		}
 
-		public interface IRegisteredWithName
-		{ }
-
 		[Theory, LocationSetup.AutoData]
 		void RegisterInterface( IAnotherInterface sut )
 		{
 			Assert.IsType<MultipleInterfaces>( sut );
 		}
+
+		public interface IRegisteredWithName
+		{ }
 
 		[Register.Mapped( typeof(IAnotherInterface) )]
 		public class MultipleInterfaces : IInterface, IAnotherInterface, IItem
@@ -515,7 +515,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		protected override IServiceLocator CreateItem()
 		{
 			var host = factory.Create( assemblies );
-			var parameter = new ServiceProviderParameter( host, assemblies );
+			var parameter = new ServiceLocatorParameter( host, assemblies );
 			var result = inner.Create( parameter );
 			return result;
 		}

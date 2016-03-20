@@ -29,5 +29,5 @@ namespace DragonSpark.Diagnostics
 
 	[Export( typeof(Serilog.Core.LoggingLevelSwitch) ), Shared]
 	public class LoggingLevelSwitch : Serilog.Core.LoggingLevelSwitch
-	{ }
+	{}
 }

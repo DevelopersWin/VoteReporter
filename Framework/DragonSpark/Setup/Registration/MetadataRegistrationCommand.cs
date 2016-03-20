@@ -21,12 +21,15 @@ namespace DragonSpark.Setup.Registration
 			this.registry = registry;
 		}
 
-		protected override void OnExecute( Type[] parameter ) => 
-			parameter
+		protected override void OnExecute( Type[] parameter )
+		{
+			var typeInfos = parameter
 				.AsTypeInfos()
 				.WhereDecorated<RegistrationBaseAttribute>()
-				.Select( item => item.Item2 )
+				.Select( item => item.Item2 ).Fixed();
+			typeInfos
 				.SelectMany( HostedValueLocator<IRegistration>.Instance.Create )
 				.Each( registration => registration.Register( registry ) );
+		}
 	}
 }
