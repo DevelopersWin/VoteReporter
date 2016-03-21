@@ -363,6 +363,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotSame( once, twice );
 		}
 
+		[AssemblyProvider.Register]
 		[Theory, LocationSetup.AutoData]
 		public void Factory( AllTypesOfFactory sut )
 		{
