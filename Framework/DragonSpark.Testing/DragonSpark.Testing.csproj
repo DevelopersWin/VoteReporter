@@ -199,7 +199,7 @@
     <Compile Include="Activation\IoC\InjectionFactoryFactoryTests.cs" />
     <Compile Include="Activation\IoC\LifetimeManagerFactoryTests.cs" />
     <Compile Include="Activation\IoC\RegistrationSupportTests.cs" />
-    <Compile Include="Activation\IoC\ServiceLocatorTests.cs" />
+    <Compile Include="Activation\IoC\DefaultUnityInstancesTests.cs" />
     <Compile Include="Activation\IoC\SingletonLocatorTests.cs" />
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
@@ -210,7 +210,7 @@
     </Compile>
     <Compile Include="Aspects\BuildUpTests.cs" />
     <Compile Include="ComponentModel\DefaultValueProviderTests.cs" />
-    <Compile Include="Composition\CompositionHostFactoryTests.cs" />
+    <Compile Include="Composition\ServiceLocatorFactoryTests.cs" />
     <Compile Include="Composition\ConventionBuilderTests.cs" />
     <Compile Include="ConditionMonitorTests.cs">
       <SubType>Code</SubType>

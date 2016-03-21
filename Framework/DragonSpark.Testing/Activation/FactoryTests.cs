@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Activation
 		[Theory, Framework.Setup.AutoData]
 		void CreateActivation( [Modest]ActivateFactory<Class> sut )
 		{
-			var creation = sut.CreateUsing( typeof(Class) );
+			var creation = sut.To<IFactoryWithParameter>().Create( typeof(Class) );
 			Assert.NotNull( creation );
 			Assert.IsType<Class>( creation );
 		}

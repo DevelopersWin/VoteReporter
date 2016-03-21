@@ -1,3 +1,4 @@
+using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -7,7 +8,8 @@ using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using DragonSpark.Activation.IoC;
+using DragonSpark.Diagnostics;
+using Serilog;
 using ExportDescriptorProvider = System.Composition.Hosting.Core.ExportDescriptorProvider;
 
 namespace DragonSpark.Composition
@@ -69,10 +71,34 @@ namespace DragonSpark.Composition
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
 			new[] { contract.ContractType, locator.Create( contract.ContractType ) }
-				.Distinct()
 				.NotNull()
+				.Distinct()
 				.Each( InitializeTypeCommand.Instance.ExecuteWith );
 			yield break;
+		}
+	}
+
+	public class DefaultLoggingExportDescriptorProvider : ExportDescriptorProvider
+	{
+		readonly Lazy<ILogger> logger;
+
+		public DefaultLoggingExportDescriptorProvider() : this( new RecordingLoggerFactory().Create ) {}
+
+		public DefaultLoggingExportDescriptorProvider( Func<ILogger> logger ) : this( new Lazy<ILogger>( logger ) ) {}
+
+		public DefaultLoggingExportDescriptorProvider( [Required] Lazy<ILogger> logger )
+		{
+			this.logger = logger;
+		}
+
+		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
+		{
+			CompositionDependency dependency;
+			var provide = typeof(ILogger).Adapt().IsAssignableFrom( contract.ContractType ) && !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency );
+			if ( provide )
+			{
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, _ => ExportDescriptor.Create( ( context, operation ) => logger.Value, NoMetadata ) );
+			}
 		}
 	}
 

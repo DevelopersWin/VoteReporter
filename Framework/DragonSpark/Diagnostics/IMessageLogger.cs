@@ -34,7 +34,7 @@ namespace DragonSpark.Diagnostics
 		{
 			var transformers = 
 				Commands
-					.Select( command => new CommandTransformer<Command<LoggerConfiguration>, LoggerConfiguration>( command ) )
+					.Select( command => new ConfiguringTransformer<LoggerConfiguration>( command.Run ) )
 					.Cast<ITransformer<LoggerConfiguration>>()
 					.ToArray();
 			var @fixed = new FixedFactory<LoggerConfiguration>( Configuration );

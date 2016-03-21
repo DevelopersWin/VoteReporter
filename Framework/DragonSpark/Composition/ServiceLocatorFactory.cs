@@ -2,9 +2,14 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup;
+using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
+using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
@@ -13,19 +18,6 @@ using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
-	/*public static class Composer
-	{
-		// public static CompositionHost Current => new CurrentApplication().Item.Context.Get<CompositionHost>();
-
-		// public static T Compose<T>() => (T)Compose( typeof(T) );
-
-		// public static object Compose( [Required] Type type ) => Current.GetExport( type );
-
-		public static object ComposeMany( [Required] Type type ) => Current.GetExports( type );
-	}
-
-	public class CompositionHostContext : ExecutionContextValue<CompositionHost> {}*/
-
 	public class FactoryType
 	{
 		public FactoryType( [Required]Type runtimeType, string name, [Required]Type resultType )
@@ -65,7 +57,84 @@ namespace DragonSpark.Composition
 		protected override Type[] CreateItem( Assembly[] parameter ) => parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
 	}
 
-	public class CompositionHostFactory : FactoryBase<Assembly[], CompositionHost>
+	public class ServiceProviderFactory : Setup.ServiceProviderFactory
+	{
+		public ServiceProviderFactory( [Required] Func<CompositionHost> source ) : base( new ServiceLocatorFactory( source ).Create, ConfigureProviderCommand.Instance.Run ) {}
+	}
+
+	public class ServiceLocatorFromPartsFactory : ServiceLocatorFactory
+	{
+		public ServiceLocatorFromPartsFactory( [Required]Assembly[] assemblies ) : this( assemblies.ToFactory() ) {}
+
+		public ServiceLocatorFromPartsFactory( Func<Assembly[]> assemblies ) : this( new CompositionHostFactory( assemblies ) ) {}
+
+		public ServiceLocatorFromPartsFactory( [Required]Type[] types ) : this( types.ToFactory() ) {}
+
+		public ServiceLocatorFromPartsFactory( Func<Type[]> types ) : this( new CompositionHostFactory( types ) ) {}
+
+		public ServiceLocatorFromPartsFactory( CompositionHostFactory factory ) : base( factory.Create ) {}
+	}
+
+	public class ServiceLocatorFactory : FactoryBase<IServiceProvider>
+	{
+		readonly Func<CompositionHost> source;
+
+		public ServiceLocatorFactory( [Required] Func<CompositionHost> source )
+		{
+			this.source = source;
+		}
+
+		protected override IServiceProvider CreateItem() => new ServiceLocator( source() );
+	}
+
+	public class ConfigureProviderCommand : ConfigureProviderCommandBase<ConfigureProviderCommand.Context>
+	{
+		public static ConfigureProviderCommand Instance { get; } = new ConfigureProviderCommand();
+
+		[Export]
+		public class Context
+		{
+			[ImportingConstructor]
+			public Context( [Required]IExportDescriptorProviderRegistry registry, [Required]ILogger logger )
+			{
+				Registry = registry;
+				Logger = logger;
+			}
+
+			public IExportDescriptorProviderRegistry Registry { get; }
+
+			public ILogger Logger { get; }
+		}
+		
+		protected override void Configure( ProviderContext context )
+		{
+			context.Context.Logger.Information( Resources.ConfiguringServiceLocatorSingleton );
+			context.Provider.As<IServiceLocator>( locator => context.Context.Registry.Register( new InstanceExportDescriptorProvider<IServiceLocator>( locator ) ) );
+		}
+	}
+
+	public class ServiceLocator : ServiceLocatorImplBase
+	{
+		readonly CompositionHost host;
+
+		public ServiceLocator( [Required]CompositionHost host )
+		{
+			this.host = host;
+		}
+
+		protected override IEnumerable<object> DoGetAllInstances(Type serviceType) => host.GetExports( serviceType, null );
+
+		protected override object DoGetInstance(Type serviceType, string key) => serviceType.Adapt().IsInstanceOfType( host ) ? host : Retrieve( serviceType, key );
+
+		object Retrieve( Type serviceType, string key )
+		{
+			object item;
+			var result = host.TryGetExport( serviceType, key, out item ) ? item : null;
+			return result;
+		}
+	}
+
+	/*public class CompositionHostFactory : FactoryBase<Assembly[], CompositionHost>
 	{
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
 
@@ -100,5 +169,5 @@ namespace DragonSpark.Composition
 				.CreateContainer();
 			return result;
 		}
-	}
+	}*/
 }

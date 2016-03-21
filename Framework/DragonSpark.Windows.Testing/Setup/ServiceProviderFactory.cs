@@ -1,17 +1,18 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.Activation.IoC;
 using DragonSpark.TypeSystem;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Testing.Framework.Setup;
 using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
+	public class ServiceProviderFactory : Activation.IoC.ServiceProviderFactory
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		public ServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, Activation.IoC.ServiceLocatorFactory.Instance.Create ) {}
+		ServiceProviderFactory() : base( new IntegratedUnityContainerFactory( new Func<Assembly[]>( AssemblyProvider.Instance.Create ) ).Create ) {}
 	}
 
 	public class Application<T> : DragonSpark.Testing.Framework.Setup.Application<T> where T : ICommand

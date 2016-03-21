@@ -1,33 +1,19 @@
-﻿using DragonSpark.Activation.FactoryModel;
+﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
-using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
-using Microsoft.Practices.Unity;
 using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Reflection;
 using System.Windows.Input;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
-using ServiceLocatorFactory = DragonSpark.Setup.ServiceLocatorFactory;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
-	/*[Export, Shared]
-	public class UnityContainerFactory : Activation.IoC.UnityContainerFactory
-	{
-		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-
-		public class Register : RegisterFactoryAttribute
-		{
-			public Register() : base( typeof(UnityContainerFactory) ) {}
-		}
-	}*/
-
-	public class UnityContainerFactory : FactoryBase<IUnityContainer>
+	public class UnityContainerFactory : IntegratedUnityContainerFactory
 	{
 		public class Register : RegisterFactoryAttribute
 		{
@@ -36,17 +22,8 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		protected override IUnityContainer CreateItem()
-		{
-			var assemblies = new Assembly[0];
-			var parameter = new ServiceLocatorParameter( CompositionHostFactory.Instance.Create( assemblies ), assemblies );
-			var result = DragonSpark.Setup.UnityContainerFactory.Instance.Create( parameter );
-			return result;
-		}
+		public UnityContainerFactory() : base( Default<Assembly>.Items ) {}
 	}
-
-	/*[Export, Shared]
-	public class LoggingLevelSwitch : Serilog.Core.LoggingLevelSwitch { }*/
 
 	[Export, Shared]
 	public class RecordingLoggerFactory : Diagnostics.RecordingLoggerFactory
@@ -60,11 +37,11 @@ namespace DragonSpark.Testing.Objects.Setup
 		protected AutoDataAttribute( Func<ApplicationBase> application ) : base( FixtureFactory.Instance.Create, application ) {}
 	}
 
-	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
+	public class ServiceProviderFactory : DragonSpark.Composition.ServiceProviderFactory
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		ServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+		ServiceProviderFactory() : base( new CompositionHostFactory( new Func<Assembly[]>( AssemblyProvider.Instance.Create ) ).Create ) {}
 	}
 
 	public class Application<T> : Framework.Setup.Application<T> where T : ICommand

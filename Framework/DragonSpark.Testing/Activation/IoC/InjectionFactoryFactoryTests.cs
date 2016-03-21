@@ -8,12 +8,14 @@ using Microsoft.Practices.Unity;
 using Serilog;
 using System;
 using System.Composition;
+using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Setup;
+using DragonSpark.TypeSystem;
 using Xunit;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 using RecordingLoggerFactory = DragonSpark.Diagnostics.RecordingLoggerFactory;
+using ServiceLocatorFactory = DragonSpark.Composition.ServiceLocatorFactory;
 
 namespace DragonSpark.Testing.Activation.IoC
 {
@@ -92,7 +94,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
 				.RegisterInstance( assemblies )
-				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
+				.RegisterInstance( new CompositionHostFactory( assemblies, Default<ITransformer<ContainerConfiguration>>.Items ).Create() )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();
@@ -122,7 +124,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var @default = container.Resolve<ILogger>();
 			Assert.NotNull( @default );
 			Assert.True( new RegisterDefaultCommand.Default( @default ).Item );
-			container.RegisterInstance( CompositionHostFactory.Instance.Create( new Assembly[0] ) );
+			container.RegisterInstance( new CompositionHostFactory( new Assembly[0], Default<ITransformer<ContainerConfiguration>>.Items ).Create() );
 			container.Extend<CompositionExtension>();
 
 			var logger = new LoggerConfiguration().CreateLogger();
@@ -139,7 +141,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
 				.RegisterInstance( assemblies )
-				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
+				.RegisterInstance( new CompositionHostFactory( assemblies ).Create() )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			var resolved = container.Resolve<Disposable>();
 			Assert.NotSame( resolved, container.Resolve<Disposable>() );
@@ -166,7 +168,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
 				.RegisterInstance( assemblies )
-				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
+				.RegisterInstance( new CompositionHostFactory( assemblies, Default<ITransformer<ContainerConfiguration>>.Items ).Create() )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();
@@ -202,7 +204,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
 				.RegisterInstance( assemblies )
-				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
+				.RegisterInstance( new CompositionHostFactory( assemblies ).Create() )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();
@@ -225,7 +227,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var assemblies = new[] { GetType().Assembly };
 			var container = new UnityContainer()
 				.RegisterInstance( assemblies )
-				.RegisterInstance( CompositionHostFactory.Instance.Create( assemblies ) )
+				.RegisterInstance( new CompositionHostFactory( assemblies ).Create() )
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();

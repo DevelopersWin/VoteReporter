@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -22,25 +21,42 @@ namespace DragonSpark.Activation.FactoryModel
 		protected TransformerBase( [Required]ISpecification<T> specification  ) : base( specification ) {}
 	}
 
-	public class CommandTransformer<TCommand, T> : TransformerBase<T> where TCommand : ICommand<T>
+	public class ConfiguringTransformer<T> : TransformerBase<T>
 	{
-		readonly TCommand command;
+		readonly Action<T> configure;
 
-		public CommandTransformer( [Required]TCommand command )
+		public ConfiguringTransformer( [Required]Action<T> configure )
 		{
-			this.command = command;
+			this.configure = configure;
 		}
 
 		protected override T CreateItem( T parameter )
 		{
-			command.ExecuteWith( parameter );
+			configure( parameter );
 			return parameter;
+		}
+	}
+
+	public class ConfiguringFactory<T> : DecoratedFactory<T>
+	{
+		readonly Action<T> configure;
+
+		public ConfiguringFactory( [Required]Func<T> inner, [Required]Action<T> configure ) : base( inner )
+		{
+			this.configure = configure;
+		}
+
+		protected override T CreateItem()
+		{
+			var result = base.CreateItem();
+			configure( result );
+			return result;
 		}
 	}
 
 	public static class FactoryDefaults<T>
 	{
-		public static ISpecification<T> Always { get; } = new DecoratedSpecification<T>( AlwaysSpecification.Instance );
+		public static ISpecification<T> Always { get; } = AlwaysSpecification.Instance.Wrap<T>();
 
 		public static IFactoryParameterCoercer<T> Coercer { get; } = FactoryParameterCoercer<T>.Instance;
 	}
@@ -88,12 +104,19 @@ namespace DragonSpark.Activation.FactoryModel
 		protected override U CreateItem( T parameter ) => inner( parameter );
 	}
 
-	/*public class FirstFromParameterFactory<T> : FirstFromParameterFactory<object, T>
+	public class DecoratedFactory<T> : FactoryBase<T>
 	{
-		public FirstFromParameterFactory( params IFactory<object, T>[] factories ) : base( factories ) {}
+		readonly Func<T> inner;
 
-		public FirstFromParameterFactory( params Func<object, T>[] inner ) : base( inner ) {}
-	}*/
+		public DecoratedFactory( Func<T> inner ) : this( AlwaysSpecification.Instance, inner ) {}
+
+		public DecoratedFactory( [Required]ISpecification specification, [Required]Func<T> inner ) : base( specification )
+		{
+			this.inner = inner;
+		}
+
+		protected override T CreateItem() => inner();
+	}
 
 	public class FirstFromParameterFactory<T, U> : FactoryBase<T, U>
 	{
@@ -154,9 +177,18 @@ namespace DragonSpark.Activation.FactoryModel
 
 	public abstract class FactoryBase<TResult> : IFactory<TResult>
 	{
+		readonly ISpecification specification;
+
+		protected FactoryBase() : this( AlwaysSpecification.Instance ) {}
+
+		protected FactoryBase( [Required]ISpecification specification )
+		{
+			this.specification = specification;
+		}
+
 		protected abstract TResult CreateItem();
 
-		public TResult Create() => CreateItem();
+		public virtual TResult Create() => specification.IsSatisfiedBy( this ) ? CreateItem() : default(TResult);
 
 		object IFactory.Create() => Create();
 	}

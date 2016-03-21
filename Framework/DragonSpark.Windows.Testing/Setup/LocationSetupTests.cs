@@ -415,7 +415,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void BasicComposition( Assembly[] assemblies, ExportDescriptorProvider provider )
 		{
-			using ( var container = CompositionHostFactory.Instance.Create( assemblies ) )
+			using ( var container = new CompositionHostFactory( assemblies ).Create() )
 			{
 				container.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
 
@@ -496,28 +496,9 @@ namespace DragonSpark.Windows.Testing.Setup
 	}
 
 	[Export]
-	public class ServiceLocatorFactory : FactoryBase<IServiceLocator>
+	public class ServiceLocatorFactory : Activation.IoC.ServiceLocatorFactory
 	{
-		readonly Assembly[] assemblies;
-		readonly CompositionHostFactory factory;
-		readonly Activation.IoC.ServiceLocatorFactory inner;
-
 		[ImportingConstructor]
-		public ServiceLocatorFactory( Assembly[] assemblies ) : this( assemblies, CompositionHostFactory.Instance, new Activation.IoC.ServiceLocatorFactory( ConfigureLocationCommand.Instance ) ) {}
-
-		public ServiceLocatorFactory( Assembly[] assemblies, CompositionHostFactory factory, Activation.IoC.ServiceLocatorFactory inner )
-		{
-			this.assemblies = assemblies;
-			this.factory = factory;
-			this.inner = inner;
-		}
-
-		protected override IServiceLocator CreateItem()
-		{
-			var host = factory.Create( assemblies );
-			var parameter = new ServiceLocatorParameter( host, assemblies );
-			var result = inner.Create( parameter );
-			return result;
-		}
+		public ServiceLocatorFactory( Assembly[] assemblies ) : base( new IntegratedUnityContainerFactory( assemblies ).Create ) {}
 	}
 }

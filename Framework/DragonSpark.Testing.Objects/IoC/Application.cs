@@ -1,6 +1,7 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Testing.Framework.Setup;
-using ServiceLocatorFactory = DragonSpark.Activation.IoC.ServiceLocatorFactory;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Testing.Objects.IoC
 {
@@ -9,11 +10,11 @@ namespace DragonSpark.Testing.Objects.IoC
 		public Application() : base( ServiceProviderFactory.Instance.Create() ) {}
 	}
 
-	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
+	public class ServiceProviderFactory : Activation.IoC.ServiceProviderFactory
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		public ServiceProviderFactory() : base( Framework.Setup.AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+		public ServiceProviderFactory() : base( new IntegratedUnityContainerFactory( new Func<Assembly[]>( Framework.Setup.AssemblyProvider.Instance.Create ) ).Create ) {}
 	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute

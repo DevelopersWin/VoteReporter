@@ -177,7 +177,8 @@
     <Compile Include="ComponentModel\DefaultValueProvider.cs" />
     <Compile Include="ComponentModel\HostedValueLocator.cs" />
     <Compile Include="ComponentModel\IDefaultValueProvider.cs" />
-    <Compile Include="Composition\CompositionHostFactory.cs" />
+    <Compile Include="Composition\ServiceLocatorFactory.cs" />
+    <Compile Include="Composition\TypesContainerConfigurationFactory.cs" />
     <Compile Include="Composition\FactoryDelegateExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProviderBase.cs" />
@@ -193,7 +194,6 @@
     <Compile Include="Runtime\Values\AmbientContextCommand.cs" />
     <Compile Include="Runtime\Values\CompositeWritableValue.cs" />
     <Compile Include="Runtime\Values\ConnectedValue.cs" />
-    <Compile Include="Extensions\ActivateFactoryExtensions.cs" />
     <Compile Include="Activation\FactoryModel\ActivateParameter.cs" />
     <Compile Include="Activation\FactoryModel\ActivationFactory.cs" />
     <Compile Include="Activation\FactoryModel\ActivationParameter.cs" />

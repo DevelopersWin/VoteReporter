@@ -7,6 +7,7 @@ using DragonSpark.Windows.Runtime;
 using Ploeh.AutoFixture;
 using System;
 using System.Collections.Generic;
+using System.Composition.Hosting;
 using System.Reflection;
 using System.Windows.Input;
 using Type = System.Type;
@@ -40,11 +41,11 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public interface IApplication : DragonSpark.Setup.IApplication, ICommand<AutoData> { }
 
-	public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
+	public class ServiceProviderFactory : Composition.ServiceProviderFactory
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		ServiceProviderFactory() : base( AssemblyProvider.Instance.Create, CompositionHostFactory.Instance.Create, ServiceLocatorFactory.Instance.Create ) {}
+		ServiceProviderFactory() : base( new CompositionHostFactory( new Func<Assembly[]>( AssemblyProvider.Instance.Create ) ).Create ) {}
 	}
 
 	public class AssemblyProvider : AssemblyProviderBase

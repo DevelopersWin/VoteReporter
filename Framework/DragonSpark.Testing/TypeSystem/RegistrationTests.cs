@@ -6,6 +6,7 @@ using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System.Reflection;
 using Xunit;
+using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
 
 namespace DragonSpark.Testing.TypeSystem
 {
