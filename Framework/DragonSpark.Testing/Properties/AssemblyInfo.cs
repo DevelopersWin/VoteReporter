@@ -3,11 +3,9 @@
 // associated with an assembly.
 
 using DragonSpark.Aspects;
-using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Testing.Objects.Setup;
 
 [assembly: AssemblyTitle( "DragonSpark.Testing" )]
 [assembly: AssemblyDescription( "" )]
@@ -26,5 +24,4 @@ using DragonSpark.Testing.Objects.Setup;
 [assembly: AssemblyFileVersion( "2016.2.1.1" )]
 [assembly: Application]
 
-[assembly: UnityContainerFactory.Register]
 [assembly: ApplyDefaultValues]

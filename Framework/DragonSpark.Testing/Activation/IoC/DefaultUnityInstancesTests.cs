@@ -1,4 +1,5 @@
-﻿using Ploeh.AutoFixture.Xunit2;
+﻿using DragonSpark.Testing.Objects.Setup;
+using Ploeh.AutoFixture.Xunit2;
 using PostSharp.Patterns.Model;
 using System;
 using Xunit;
@@ -6,6 +7,7 @@ using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
 namespace DragonSpark.Testing.Activation.IoC
 {
+	[UnityContainerFactory.Register]
 	public class DefaultUnityInstancesTests
 	{
 		[Theory, Framework.Setup.AutoData]
