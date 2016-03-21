@@ -5,12 +5,12 @@ using System.Composition;
 
 namespace DragonSpark.Windows.Modularity
 {
-	[Export]
+	[Export, Shared]
 	public class ModulesConfigurationSectionFactory : ConfigurationSectionFactory<ModulesConfigurationSection>
 	{
 		public static ModulesConfigurationSectionFactory Instance { get; } = new ModulesConfigurationSectionFactory();
 
-		public ModulesConfigurationSectionFactory() {}
+		ModulesConfigurationSectionFactory() {}
 
 		public ModulesConfigurationSectionFactory( Func<string, object> factory ) : base( factory ) {}
 	}

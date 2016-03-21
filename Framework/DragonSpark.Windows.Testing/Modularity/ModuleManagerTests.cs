@@ -5,11 +5,10 @@ using DragonSpark.Windows.Modularity;
 using DragonSpark.Windows.Testing.TestObjects.Modules;
 using Moq;
 using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
-using Serilog.Core;
 using Xunit;
-using LoggingLevelSwitch = DragonSpark.Diagnostics.LoggingLevelSwitch;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {

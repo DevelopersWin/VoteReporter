@@ -3,6 +3,7 @@ using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 using Serilog;
+using Serilog.Core;
 
 namespace DragonSpark.Diagnostics
 {
@@ -16,8 +17,8 @@ namespace DragonSpark.Diagnostics
 			LevelSwitch = levelSwitch;
 		}
 
-		public RecordingLogEventSink Sink { get; }
-		public Serilog.Core.LoggingLevelSwitch LevelSwitch { get; }
+		public virtual RecordingLogEventSink Sink { get; }
+		public virtual LoggingLevelSwitch LevelSwitch { get; }
 
 		protected override ILogger CreateItem()
 		{

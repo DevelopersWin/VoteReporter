@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
-	[Export]
+	[Export, Shared]
 	public class UnityConfigurationSectionFactory : ConfigurationSectionFactory<UnityConfigurationSection>
 	{
 		public static UnityConfigurationSectionFactory Instance { get; } = new UnityConfigurationSectionFactory();

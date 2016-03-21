@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using Serilog.Core;
 using Xunit;
-using LoggingLevelSwitch = DragonSpark.Diagnostics.LoggingLevelSwitch;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {

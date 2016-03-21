@@ -9,7 +9,6 @@ namespace DragonSpark.Configuration
 		object Get( string key );
 	}
 
-	// [Export( typeof(IConfigurationRegistry) )]
 	public class ConfigurationRegistry : KeyedCollection<string, Registration>, IConfigurationRegistry
 	{
 		public object Get( [Required]string key ) => this.WithFirst( registration => registration.Equals( key ), registration => registration.Value );

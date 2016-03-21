@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	[Export]
+	[Export, Shared]
 	public class AssemblyInformationFactory : FactoryBase<Assembly, AssemblyInformation>
 	{
 		readonly static System.Type[] Attributes =

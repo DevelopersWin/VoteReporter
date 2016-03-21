@@ -87,12 +87,12 @@ namespace DragonSpark.Composition
 		protected override IServiceProvider CreateItem() => new ServiceLocator( source() );
 	}
 
-	public class ConfigureProviderCommand : ConfigureProviderCommandBase<ConfigureProviderCommand.Context>
+	public sealed class ConfigureProviderCommand : ConfigureProviderCommandBase<ConfigureProviderCommand.Context>
 	{
 		public static ConfigureProviderCommand Instance { get; } = new ConfigureProviderCommand();
 
 		[Export]
-		public class Context
+		public sealed class Context
 		{
 			[ImportingConstructor]
 			public Context( [Required]IExportDescriptorProviderRegistry registry, [Required]ILogger logger )

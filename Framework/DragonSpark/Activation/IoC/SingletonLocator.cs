@@ -10,7 +10,7 @@ using Type = System.Type;
 namespace DragonSpark.Activation.IoC
 {
 	[Export( typeof(ISingletonLocator) ), Shared, Persistent]
-	public class SingletonLocator : ISingletonLocator
+	sealed class SingletonLocator : ISingletonLocator
 	{
 		public const string Instance = "Instance";
 

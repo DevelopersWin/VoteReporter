@@ -3,11 +3,10 @@ using Serilog.Core;
 using Serilog.Events;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
-	[Export, Shared]
+	// [Export, Shared]
 	public class RecordingLogEventSink : ILogEventSink
 	{
 		readonly IList<LogEvent> source = new Collection<LogEvent>();
@@ -26,8 +25,4 @@ namespace DragonSpark.Diagnostics
 
 		public virtual void Emit( LogEvent logEvent ) => source.Contains( logEvent).IsFalse( () => source.Add( logEvent ) );
 	}
-
-	[Export( typeof(Serilog.Core.LoggingLevelSwitch) ), Shared]
-	public class LoggingLevelSwitch : Serilog.Core.LoggingLevelSwitch
-	{}
 }

@@ -79,14 +79,14 @@ namespace DragonSpark.Activation.FactoryModel
 	}
 
 	[Export]
-	public class MemberInfoFactoryTypeLocator : FactoryTypeLocatorBase<MemberInfo>
+	public sealed class MemberInfoFactoryTypeLocator : FactoryTypeLocatorBase<MemberInfo>
 	{
 		[ImportingConstructor]
 		public MemberInfoFactoryTypeLocator( DiscoverableFactoryTypeLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
 	}
 
 	[Export]
-	public class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
+	public sealed class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
 	{
 		[ImportingConstructor]
 		public ParameterInfoFactoryTypeLocator( DiscoverableFactoryTypeLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
