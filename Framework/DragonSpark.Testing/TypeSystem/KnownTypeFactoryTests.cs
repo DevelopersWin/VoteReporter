@@ -2,9 +2,12 @@
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Xunit;
+using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 
 namespace DragonSpark.Testing.TypeSystem
 {
+	[AssemblyProvider.Register]
+	[AssemblyProvider.Types]
 	public class KnownTypeFactoryTests
 	{
 		[Theory, AutoData]

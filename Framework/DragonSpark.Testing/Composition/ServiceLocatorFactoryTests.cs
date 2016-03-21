@@ -6,9 +6,12 @@ using System;
 using System.Composition.Hosting;
 using System.Reflection;
 using Xunit;
+using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 
 namespace DragonSpark.Testing.Composition
 {
+	[AssemblyProvider.Register]
+	[AssemblyProvider.Types]
 	public class ServiceLocatorFactoryTests
 	{
 		[Theory, AutoData]

@@ -1,17 +1,16 @@
-﻿using DragonSpark.Composition;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using Moq;
-using Ploeh.AutoFixture;
-using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 using AutoDataAttribute = Ploeh.AutoFixture.Xunit2.AutoDataAttribute;
 
 namespace DragonSpark.Testing.TypeSystem
 {
+	[AssemblyProvider.Register]
+	[AssemblyProvider.Types]
 	public class ApplicationAssemblyTransformerTests
 	{
 		[Theory, DefaultSetup.AutoData]

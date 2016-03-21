@@ -27,6 +27,4 @@ using DragonSpark.Testing.Objects.Setup;
 [assembly: Application]
 
 [assembly: UnityContainerFactory.Register]
-[assembly: AssemblyProvider.Register]
-[assembly: AssemblyProvider.Types]
 [assembly: ApplyDefaultValues]
