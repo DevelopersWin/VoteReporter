@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System.Reflection;

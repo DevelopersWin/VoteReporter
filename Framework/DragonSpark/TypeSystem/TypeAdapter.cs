@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PostSharp.Aspects.Internals;
 
 namespace DragonSpark.TypeSystem
 {
@@ -46,7 +47,7 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}*/
 
-		public System.Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().ToArray();
+		public System.Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes.WhereNot( typeof(MethodBinding).Adapt().IsAssignableFrom ) ).AsTypes().ToArray();
 
 		public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
 

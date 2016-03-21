@@ -178,7 +178,7 @@
     <Compile Include="ComponentModel\HostedValueLocator.cs" />
     <Compile Include="ComponentModel\IDefaultValueProvider.cs" />
     <Compile Include="Composition\ServiceLocatorFactory.cs" />
-    <Compile Include="Composition\TypesContainerConfigurationFactory.cs" />
+    <Compile Include="Composition\PartsContainerConfigurationFactory.cs" />
     <Compile Include="Composition\FactoryDelegateExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProviderBase.cs" />

@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Reflection;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework.Setup;
@@ -9,9 +6,18 @@ using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using Ploeh.AutoFixture.Xunit2;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Parameters
 {
+	[AttributeUsage( AttributeTargets.Parameter )]
+	public class ServiceAttribute : CustomizeAttribute
+	{
+		public override ICustomization GetCustomization( ParameterInfo parameter ) => new ServiceRegistration( parameter.ParameterType );
+	}
+
 	[AttributeUsage( AttributeTargets.Parameter )]
 	public class LocatedAttribute : CustomizeAttribute
 	{

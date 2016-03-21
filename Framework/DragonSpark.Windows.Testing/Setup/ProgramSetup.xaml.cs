@@ -7,7 +7,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public class AutoDataAttribute : DragonSpark.Testing.Objects.Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( () => new Application<ProgramSetup>() ) {}
+			public AutoDataAttribute() : base( autoData => new Application<ProgramSetup>() ) {}
 		}
 
 		public ProgramSetup()

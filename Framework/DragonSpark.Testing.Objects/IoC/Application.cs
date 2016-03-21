@@ -19,6 +19,6 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		public AutoDataAttribute() : base( () => new Application() ) {}
+		public AutoDataAttribute() : base( autoData => new Application() ) {}
 	}
 }

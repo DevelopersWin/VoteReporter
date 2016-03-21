@@ -49,6 +49,14 @@ namespace DragonSpark.Composition
 		protected override FactoryType CreateItem( Type parameter ) => new FactoryType( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
 	}
 
+	public class AssembliesFactory : FactoryBase<Type[], Assembly[]>
+	{
+		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
+
+		[Freeze]
+		protected override Assembly[] CreateItem( Type[] parameter ) => parameter.Assemblies().Distinct().ToArray();
+	}
+
 	public class TypesFactory : FactoryBase<Assembly[], Type[]>
 	{
 		public static TypesFactory Instance { get; } = new TypesFactory();

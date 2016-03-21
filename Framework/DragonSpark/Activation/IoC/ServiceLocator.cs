@@ -58,22 +58,26 @@ namespace DragonSpark.Activation.IoC
 
 	public class DefaultUnityInstances : UnityConfigurator
 	{
-		readonly Func<Assembly[]> assemblies;
+		readonly Func<Assembly[]> assemblySource;
 		readonly Func<Type[]> types;
 		readonly Func<BuildableTypeFromConventionLocator> locator;
 
-		public DefaultUnityInstances( [Required] Func<Assembly[]> assemblies, [Required] Func<Type[]> types, [Required] Func<BuildableTypeFromConventionLocator> locator )
+		public DefaultUnityInstances( [Required] Func<Assembly[]> assemblySource, [Required] Func<Type[]> types, [Required] Func<BuildableTypeFromConventionLocator> locator )
 		{
-			this.assemblies = assemblies;
+			this.assemblySource = assemblySource;
 			this.types = types;
 			this.locator = locator;
 		}
 
-		protected override IUnityContainer CreateItem( IUnityContainer parameter ) => 
-			parameter
-				.RegisterInstance( assemblies() )
-				.RegisterInstance( types() )
+		protected override IUnityContainer CreateItem( IUnityContainer parameter )
+		{
+			var instance = types();
+			var assemblies = assemblySource();
+			return parameter
+				.RegisterInstance( assemblies )
+				.RegisterInstance( instance )
 				.RegisterInstance( locator() );
+		}
 	}
 
 	public class DefaultUnityExtensions : UnityConfigurator

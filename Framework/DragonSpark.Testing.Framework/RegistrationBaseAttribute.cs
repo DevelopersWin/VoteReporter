@@ -33,6 +33,10 @@ namespace DragonSpark.Testing.Framework
 		public class AssociatedRegistry : AssociatedValue<IFixture, IServiceRegistry>
 		{
 			public AssociatedRegistry( [Required]IFixture instance ) : base( instance, () => new FixtureRegistry( instance ) ) {}
+
+			public AssociatedRegistry( IFixture instance, Func<IServiceRegistry> create = null ) : base( instance, create )
+			{
+			}
 		}
 	}
 
@@ -41,5 +45,28 @@ namespace DragonSpark.Testing.Framework
 		public RegisterFactoryAttribute( Type factoryType ) : this( Services.Get<ISingletonLocator>, factoryType ) {}
 
 		public RegisterFactoryAttribute( [Required]Func<ISingletonLocator> locator, [Required, OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( locator(), factoryType ) ) ) {}
+	}
+
+	public class RegisterServiceAttribute : RegistrationBaseAttribute
+	{
+		public RegisterServiceAttribute( [Required] Type serviceType ) : base( t => new RegistrationCustomization( new ServiceRegistration( serviceType ) ) ) {}
+	}
+
+	public class ServiceRegistration : IRegistration, ICustomization
+	{
+		readonly Type serviceType;
+
+		public ServiceRegistration( [Required] Type serviceType )
+		{
+			this.serviceType = serviceType;
+		}
+
+		public void Register( IServiceRegistry registry ) => Services.Get( serviceType ).With( instance =>
+		{
+			var parameter = new InstanceRegistrationParameter( serviceType, instance );
+			registry.Register( parameter );
+		} );
+
+		public void Customize( IFixture fixture ) => Register( new FixtureRegistry( fixture ) );
 	}
 }

@@ -7,7 +7,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public class AutoDataAttribute : DragonSpark.Testing.Objects.Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( () => new Application<UnitySetup>() ) {}
+			public AutoDataAttribute() : base( autoData => new Application<UnitySetup>() ) {}
 		}
 
 		public UnitySetup()

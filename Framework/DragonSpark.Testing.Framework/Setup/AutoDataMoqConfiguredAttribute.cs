@@ -12,7 +12,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class AutoDataMoqAttribute : AutoDataAttribute
 	{
-		public AutoDataMoqAttribute() : base( new Func<IFixture>( FixtureFactory<AutoMoqCustomization>.Instance.Create ) ) {}
+		public AutoDataMoqAttribute() : base( FixtureFactory<AutoMoqCustomization>.Instance.Create ) {}
 	}
 
 	/*public class SetupFixtureFactory<T> : FixtureFactory<T> where T : SetupCustomization, new() {}*/

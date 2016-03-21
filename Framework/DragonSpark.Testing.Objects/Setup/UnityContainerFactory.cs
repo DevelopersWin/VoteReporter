@@ -44,7 +44,7 @@ namespace DragonSpark.Testing.Objects.Setup
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		protected AutoDataAttribute( Func<ApplicationBase> application ) : base( FixtureFactory.Instance.Create, application ) {}
+		protected AutoDataAttribute( Func<AutoData, ApplicationBase> source ) : base( FixtureFactory.Instance.Create, source ) {}
 	}
 
 	public class ServiceProviderFactory : DragonSpark.Composition.ServiceProviderFactory

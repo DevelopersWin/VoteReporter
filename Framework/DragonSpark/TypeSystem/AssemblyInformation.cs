@@ -1,9 +1,15 @@
 using System;
+using System.Diagnostics;
 
 namespace DragonSpark.TypeSystem
 {
 	public class AssemblyInformation
 	{
+		public AssemblyInformation()
+		{
+			Debugger.Break();
+		}
+
 		public string Title { get; set; }
 
 		public string Product { get; set; }

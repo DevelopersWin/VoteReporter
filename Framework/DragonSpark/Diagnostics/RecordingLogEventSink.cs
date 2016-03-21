@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 
 namespace DragonSpark.Diagnostics
 {
-	// [Export, Shared]
 	public class RecordingLogEventSink : ILogEventSink
 	{
 		readonly IList<LogEvent> source = new Collection<LogEvent>();
@@ -18,8 +17,6 @@ namespace DragonSpark.Diagnostics
 		}
 
 		public LogEvent[] Purge() => source.Purge();
-		
-		// protected override void OnLog( Message message ) => source.Add( message );
 
 		public IEnumerable<LogEvent> Events => events;
 

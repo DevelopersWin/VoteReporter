@@ -1,15 +1,19 @@
+using DragonSpark.Activation;
+using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using Ploeh.AutoFixture;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Composition.Hosting;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Runtime.Values;
 using Type = System.Type;
 
 namespace DragonSpark.Testing.Framework.Setup
@@ -46,6 +50,8 @@ namespace DragonSpark.Testing.Framework.Setup
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
 		ServiceProviderFactory() : base( new CompositionHostFactory( new Func<Assembly[]>( AssemblyProvider.Instance.Create ) ).Create ) {}
+
+		public ServiceProviderFactory( [Required] Type[] types ) : base( new CompositionHostFactory( types ).Create ) {}
 	}
 
 	public class AssemblyProvider : AssemblyProviderBase
@@ -79,13 +85,45 @@ namespace DragonSpark.Testing.Framework.Setup
 			base.OnExecute( parameter );
 		}
 
-		public override object GetService( Type serviceType ) => FromAutoData( serviceType ) ?? base.GetService( serviceType );
-
-		object FromAutoData( Type serviceType ) => Services.Get<AutoData>().With( autoData =>
+		public override object GetService( Type serviceType )
 		{
-			var registered = new RegistrationCustomization.AssociatedRegistry( autoData.Fixture ).Item.IsRegistered( serviceType );
-			var result = registered ? autoData.Fixture.Create<object>( serviceType ) : null;
+			var result = new[]
+			{
+				Services.Get<AutoData>().With( data => new AssociatedFactory( data.Fixture ).Item ),
+				base.GetService
+			}.NotNull().FirstWhere( func => func( serviceType ) );
 			return result;
-		} );
+		}
+
+		sealed class AssociatedFactory : AssociatedValue<IFixture, Func<Type, object>>
+		{
+			public AssociatedFactory( IFixture instance ) : base( instance, typeof(AssociatedFactory), () => new FixtureServiceFactory( instance ).Create ) {}
+		}
+
+		sealed class FixtureServiceFactory : FactoryBase<Type, object>
+		{
+			readonly IFixture fixture;
+
+			public FixtureServiceFactory( [Required]IFixture fixture ) : base( new Specification( fixture ) )
+			{
+				this.fixture = fixture;
+			}
+
+			protected override object CreateItem( Type parameter ) => fixture.Create<object>( parameter );
+		}
+
+		sealed class Specification : SpecificationBase<Type>
+		{
+			readonly IServiceRegistry registry;
+
+			public Specification( [Required] IFixture fixture ) : this( new RegistrationCustomization.AssociatedRegistry( fixture ).Item ) {}
+
+			Specification( [Required] IServiceRegistry registry )
+			{
+				this.registry = registry;
+			}
+
+			protected override bool Verify( Type parameter ) => registry.IsRegistered( parameter );
+		}
 	}
 }

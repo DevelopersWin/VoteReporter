@@ -1,49 +1,40 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Composition
 {
-	public class AssemblyBasedContainerConfigurationFactory : AggregateFactory<ContainerConfiguration>
-	{
-		public AssemblyBasedContainerConfigurationFactory( Func<Assembly[]> primary, params ITransformer<ContainerConfiguration>[] configurations ) : this( new Lazy<Assembly[]>( primary ), configurations ) {}
-
-		AssemblyBasedContainerConfigurationFactory( Lazy<Assembly[]> primary, params ITransformer<ContainerConfiguration>[] configurations )
-			: base( 
-				ContainerConfigurationFactory.Instance, 
-				configurations.Append(
-					new AssemblyContainerConfigurationFactory( () => primary.Value ),
-					new TypesContainerConfigurationFactory( () => TypesFactory.Instance.Create( primary.Value ) )
-					).ToArray()
-			)
-		{}
-	}
-
 	public class CompositionHostFactory : FactoryBase<CompositionHost>
 	{
 		readonly Func<ContainerConfiguration> configuration;
 
 		public CompositionHostFactory( [Required] Assembly[] assemblies ) : this( assemblies, DefaultLoggingConfigurator.Instance ) {}
 
-		public CompositionHostFactory( [Required] Assembly[] assemblies, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( assemblies.ToFactory(), configurations ) {}
+		public CompositionHostFactory( [Required] Assembly[] assemblies, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( assemblies.ToFactory(), () => TypesFactory.Instance.Create( assemblies ), configurations ) {}
 
 		public CompositionHostFactory( [Required] Func<Assembly[]> assemblies ) : this( assemblies, DefaultLoggingConfigurator.Instance ) {}
 
-		public CompositionHostFactory( [Required] Func<Assembly[]> assemblies, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( new Func<ContainerConfiguration>( new AssemblyBasedContainerConfigurationFactory( assemblies, configurations ).Create ) ) {}
+		public CompositionHostFactory( [Required] Func<Assembly[]> assemblies, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( new Lazy<Assembly[]>( assemblies ), configurations ) {}
+
+		CompositionHostFactory( [Required] Lazy<Assembly[]> assemblies, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( () => assemblies.Value, () => TypesFactory.Instance.Create( assemblies.Value), configurations ) {}
 
 		public CompositionHostFactory( [Required] Type[] types ) : this( types, DefaultLoggingConfigurator.Instance ) {}
 
-		public CompositionHostFactory( [Required] Type[] types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( types.ToFactory(), configurations ) {}
+		public CompositionHostFactory( [Required] Type[] types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( AssembliesFactory.Instance.Create( types ).ToFactory(), types.ToFactory(), configurations ) {}
 
 		public CompositionHostFactory( [Required] Func<Type[]> types ) : this( types, DefaultLoggingConfigurator.Instance ) {}
 
-		public CompositionHostFactory( [Required] Func<Type[]> types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( new Func<ContainerConfiguration>( new TypesBasedContainerConfigurationFactory( types, configurations ).Create ) ) {}
+		public CompositionHostFactory( [Required] Func<Type[]> types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( new System.Lazy<Type[]>( types ), configurations ) {}
+
+		CompositionHostFactory( [Required] Lazy<Type[]> types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( () => AssembliesFactory.Instance.Create( types.Value ), () => types.Value, configurations ) {}
+
+		public CompositionHostFactory( [Required] Func<Assembly[]> assemblies, [Required] Func<Type[]> types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) : this( new Func<ContainerConfiguration>( new ContainerConfigurationFactory( assemblies, types, configurations ).Create ) ) {}
 
 		CompositionHostFactory( [Required] Func<ContainerConfiguration> configuration )
 		{
@@ -53,19 +44,19 @@ namespace DragonSpark.Composition
 		protected override CompositionHost CreateItem() => configuration().CreateContainer();
 	}
 
-	public class TypesBasedContainerConfigurationFactory : AggregateFactory<ContainerConfiguration>
+	public class ContainerConfigurationFactory : AggregateFactory<ContainerConfiguration>
 	{
-		public TypesBasedContainerConfigurationFactory( Func<Type[]> types, params ITransformer<ContainerConfiguration>[] configurations )
+		public ContainerConfigurationFactory( [Required] Func<Assembly[]> assemblies, [Required] Func<Type[]> types, params ITransformer<ContainerConfiguration>[] configurations )
 			: base( 
-				ContainerConfigurationFactory.Instance, 
-				configurations.Append( new TypesContainerConfigurationFactory( types ) ).ToArray()
+				ContainerConfigurationCoreFactory.Instance, 
+				configurations.Append( new PartsContainerConfigurationFactory( assemblies, types ) ).ToArray()
 			)
 		{}
 	}
 
-	public class ContainerConfigurationFactory : FactoryBase<ContainerConfiguration>
+	public class ContainerConfigurationCoreFactory : FactoryBase<ContainerConfiguration>
 	{
-		public static ContainerConfigurationFactory Instance { get; } = new ContainerConfigurationFactory();
+		public static ContainerConfigurationCoreFactory Instance { get; } = new ContainerConfigurationCoreFactory();
 
 		protected override ContainerConfiguration CreateItem() => 
 			new ContainerConfiguration()
@@ -81,29 +72,20 @@ namespace DragonSpark.Composition
 		protected override ContainerConfiguration CreateItem( ContainerConfiguration parameter ) => parameter.WithProvider( new DefaultLoggingExportDescriptorProvider() );
 	}
 
-	public class AssemblyContainerConfigurationFactory : ContainerConfigurator
+	public class PartsContainerConfigurationFactory : ContainerConfigurator
 	{
 		readonly Func<Assembly[]> assemblySource;
-
-		public AssemblyContainerConfigurationFactory( [Required] Func<Assembly[]> assemblySource )
-		{
-			this.assemblySource = assemblySource;
-		}
-
-		protected override ContainerConfiguration CreateItem( ContainerConfiguration configuration ) => configuration.WithInstance( assemblySource() );
-	}
-
-	public class TypesContainerConfigurationFactory : ContainerConfigurator
-	{
 		readonly Func<Type[]> typesSource;
 
-		public TypesContainerConfigurationFactory( [Required]Func<Type[]> typesSource )
+		public PartsContainerConfigurationFactory( [Required] Func<Assembly[]> assemblySource, [Required]Func<Type[]> typesSource )
 		{
+			this.assemblySource = assemblySource;
 			this.typesSource = typesSource;
 		}
 
 		protected override ContainerConfiguration CreateItem( ContainerConfiguration configuration )
 		{
+			var assemblies = assemblySource();
 			var types = typesSource();
 			var factoryTypes = types.Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
 			var locator = new DiscoverableFactoryTypeLocator( factoryTypes );
@@ -111,7 +93,8 @@ namespace DragonSpark.Composition
 			var activator = new CompositeActivator( new SingletonActivator( new SingletonLocator( conventionLocator ) ), SystemActivator.Instance );
 
 			var result = configuration
-				.WithParts( types )
+				.WithParts( types.Union( new []{ typeof(ConfigureProviderCommand.Context) } ) )
+				.WithInstance( assemblies )
 				.WithInstance( types )
 				.WithInstance( conventionLocator )
 				.WithInstance( factoryTypes )
