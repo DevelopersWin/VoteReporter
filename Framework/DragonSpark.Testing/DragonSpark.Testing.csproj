@@ -263,7 +263,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Runtime\Values\AmbientContextCommandTests.cs" />
-    <Compile Include="TypeSystem\ApplicationAssemblyTransformerTests.cs" />
+    <Compile Include="TypeSystem\ApplicationAssemblyFilterTests.cs" />
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
     <Compile Include="TypeSystem\KnownTypeFactoryTests.cs" />
     <Compile Include="TypeSystem\RegistrationTests.cs" />

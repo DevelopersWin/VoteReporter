@@ -13,22 +13,18 @@ namespace DragonSpark.Setup.Registration
 {
 	public class FactoryRegistration : IRegistration
 	{
-		readonly ISingletonLocator locator;
 		readonly RegisterFactoryParameter parameter;
 
-		public FactoryRegistration( [Required]ISingletonLocator locator, [Required, OfFactoryType]Type factoryType ) : this( locator, new RegisterFactoryParameter( factoryType ) ) {}
+		public FactoryRegistration( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes ) : this( new RegisterFactoryParameter( factoryType, registrationTypes ) ) {}
 
-		public FactoryRegistration( [Required]ISingletonLocator locator, [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes ) : this( locator, new RegisterFactoryParameter( factoryType, registrationTypes ) ) {}
-
-		FactoryRegistration( [Required]ISingletonLocator locator, [Required]RegisterFactoryParameter parameter )
+		FactoryRegistration( [Required]RegisterFactoryParameter parameter )
 		{
-			this.locator = locator;
 			this.parameter = parameter;
 		}
 
 		public void Register( IServiceRegistry registry )
 		{
-			new ICommand<RegisterFactoryParameter>[] { new RegisterFactoryWithParameterCommand( registry, locator ), new RegisterFactoryCommand( registry, locator ) }
+			new ICommand<RegisterFactoryParameter>[] { new RegisterFactoryWithParameterCommand( registry ), new RegisterFactoryCommand( registry ) }
 				.FirstOrDefault( command => command.CanExecute( parameter ) )
 				.With( command => command.Run( parameter ) );
 		}
@@ -121,12 +117,10 @@ namespace DragonSpark.Setup.Registration
 
 	public class RegisterFactoryParameter
 	{
-		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType ) : this( factoryType, Factory.GetResultType( factoryType ) ) { }
-
 		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes )
 		{
 			FactoryType = factoryType;
-			RegisterTypes = registrationTypes.NotNull().Distinct().ToArray();
+			RegisterTypes = registrationTypes.NotNull().Append( Factory.GetResultType( factoryType ) ).Distinct().ToArray();
 		}
 		
 		public Type FactoryType { get; }
@@ -179,14 +173,14 @@ namespace DragonSpark.Setup.Registration
 
 	public class RegisterFactoryCommand : RegisterFactoryCommandBase<IFactory>
 	{
-		public RegisterFactoryCommand( IServiceRegistry registry, ISingletonLocator locator ) : base( registry, locator, FactoryDelegateFactory.Instance.Create ) {}
+		public RegisterFactoryCommand( IServiceRegistry registry ) : base( registry, SingletonLocator.Instance, FactoryDelegateFactory.Instance.Create ) {}
 
 		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<>).MakeGenericType( itemType );
 	}
 
 	public class RegisterFactoryWithParameterCommand : RegisterFactoryCommandBase<IFactoryWithParameter>
 	{
-		public RegisterFactoryWithParameterCommand( IServiceRegistry registry, ISingletonLocator locator ) : this( registry, locator, FactoryWithParameterDelegateFactory.Instance ) {}
+		public RegisterFactoryWithParameterCommand( IServiceRegistry registry ) : this( registry, SingletonLocator.Instance, FactoryWithParameterDelegateFactory.Instance ) {}
 
 		public RegisterFactoryWithParameterCommand( IServiceRegistry registry, ISingletonLocator locator, [Required]FactoryWithParameterDelegateFactory delegateFactory ) : base( registry, locator, FactoryWithActivatedParameterDelegateFactory.Instance.Create, delegateFactory.Create ) {}
 

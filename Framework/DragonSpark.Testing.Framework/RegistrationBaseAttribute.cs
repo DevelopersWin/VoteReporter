@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
@@ -34,17 +33,13 @@ namespace DragonSpark.Testing.Framework
 		{
 			public AssociatedRegistry( [Required]IFixture instance ) : base( instance, () => new FixtureRegistry( instance ) ) {}
 
-			public AssociatedRegistry( IFixture instance, Func<IServiceRegistry> create = null ) : base( instance, create )
-			{
-			}
+			/*public AssociatedRegistry( IFixture instance, Func<IServiceRegistry> create = null ) : base( instance, create ) {}*/
 		}
 	}
 
 	public class RegisterFactoryAttribute : RegistrationBaseAttribute
 	{
-		public RegisterFactoryAttribute( Type factoryType ) : this( Services.Get<ISingletonLocator>, factoryType ) {}
-
-		public RegisterFactoryAttribute( [Required]Func<ISingletonLocator> locator, [Required, OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( locator(), factoryType ) ) ) {}
+		public RegisterFactoryAttribute( [Required, OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( factoryType ) ) ) {}
 	}
 
 	public class RegisterServiceAttribute : RegistrationBaseAttribute

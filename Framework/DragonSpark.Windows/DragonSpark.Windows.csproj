@@ -285,7 +285,7 @@
     <Compile Include="Modularity\ModulesConfigurationSection.cs" />
     <Compile Include="Modularity\RemotingModuleInfoProvider.cs" />
     <Compile Include="Runtime\DisposableActionContext.cs" />
-    <Compile Include="Runtime\ApplicationAssemblyTransformer.cs" />
+    <Compile Include="Runtime\ApplicationAssemblyFilter.cs" />
     <Compile Include="Runtime\LogicalValue.cs" />
     <Compile Include="Runtime\ThreadDataValue.cs" />
     <Compile Include="Setup\FileConfigurationFactory.cs" />

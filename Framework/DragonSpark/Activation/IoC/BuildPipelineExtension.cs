@@ -1,10 +1,12 @@
 ﻿using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
+using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
@@ -12,10 +14,8 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Composition;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -140,30 +140,74 @@ namespace DragonSpark.Activation.IoC
 		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 	}
 
-	// [Persistent]
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
+		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator();
+
 		readonly Type[] types;
+		readonly Func<Type, Type[]> strategy;
 		readonly CanBuildSpecification specification;
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, CanBuildSpecification.Instance ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AdditionalTypeLocationStrategy.Instance.Create, CanBuildSpecification.Instance ) {}
 
-		public BuildableTypeFromConventionLocator( [Required]Type[] types, [Required]CanBuildSpecification specification ) : base( specification.Inverse<Type>() )
+		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, [Required]CanBuildSpecification specification ) : base( specification.Inverse<Type>() )
 		{
 			this.types = types;
+			this.strategy = strategy;
 			this.specification = specification;
 		}
+
+		/*public class Specification : SpecificationBase<Type>
+		{
+			readonly ISpecification<Type> inner;
+			readonly ISingletonLocator locator;
+
+			public Specification() : this( CanBuildSpecification.Instance.Inverse<Type>(), SingletonLocator.Instance )
+			{
+			}
+
+			public Specification( [Required] ISpecification<Type> inner, [Required] ISingletonLocator locator )
+			{
+				this.inner = inner;
+				this.locator = locator;
+			}
+
+			protected override bool Verify( Type parameter )
+			{
+				
+			}
+		}*/
 
 		[Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
 			var adapter = parameter.Adapt();
 			var name = parameter.Name.TrimStartOf( 'I' );
+			var others = strategy( parameter );
 			var result = 
-				types.Union( TypesFactory.Instance.Create( parameter.Assembly().ToItem() ) )
-				.Where( adapter.IsAssignableFrom )
+				types.Union( others )
 				.Where( specification.IsSatisfiedBy )
+				.Where( adapter.IsAssignableFrom )
 				.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
+			return result;
+		}
+	}
+
+	public class AdditionalTypeLocationStrategy : FactoryBase<Type, Type[]>
+	{
+		public static AdditionalTypeLocationStrategy Instance { get; } = new AdditionalTypeLocationStrategy( ApplicationAssemblySpecification.Instance );
+
+		readonly ApplicationAssemblySpecification specification;
+
+		public AdditionalTypeLocationStrategy( [Required] ApplicationAssemblySpecification specification )
+		{
+			this.specification = specification;
+		}
+
+		protected override Type[] CreateItem( Type parameter )
+		{
+			var assembly = parameter.Assembly();
+			var result = specification.IsSatisfiedBy( assembly ) ? TypesFactory.Instance.Create( assembly.ToItem() ) : Default<Type>.Items;
 			return result;
 		}
 	}

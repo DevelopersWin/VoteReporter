@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
+using System.Reflection;
 using Xunit;
 using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 
@@ -11,7 +12,7 @@ namespace DragonSpark.Testing.TypeSystem
 	public class KnownTypeFactoryTests
 	{
 		[Theory, AutoData]
-		public void Testing( KnownTypeFactory sut )
+		public void Testing( Assembly[] assemblies, KnownTypeFactory sut )
 		{
 			var parameter = typeof(Class);
 

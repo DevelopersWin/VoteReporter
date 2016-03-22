@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public class Application : ApplicationBase
 		{
-			public Application( Type primaryType, IEnumerable<Type> others ) : this( primaryType.Adapt().WithNested().Concat( TypesFactory.Instance.Create( new ApplicationAssemblyTransformer().Create( others.Assemblies() ) ) ) ) {}
+			public Application( Type primaryType, IEnumerable<Type> others ) : this( primaryType.Adapt().WithNested().Concat( TypesFactory.Instance.Create( new ApplicationAssemblyFilter().Create( others.Assemblies() ) ) ) ) {}
 
 			Application( IEnumerable<Type> enumerable ) : base( new ServiceProviderFactory( enumerable.Fixed() ).Create() ) {}
 		}

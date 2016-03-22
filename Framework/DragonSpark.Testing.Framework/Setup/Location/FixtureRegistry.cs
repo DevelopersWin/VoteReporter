@@ -37,10 +37,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 		void RegisterInstance<T>( [Required]T instance/*, bool applyRegistration*/ )
 		{
 			fixture.Inject( instance );
-			/*if ( applyRegistration )
-			{
-				registered.Ensure( typeof(T) );
-			}*/
+			registered.Ensure( typeof(T) );
 		}
 
 		public void RegisterFactory( [Required]FactoryRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterFactory), parameter.Type.ToItem(), parameter.Factory/*, new ApplyRegistration( parameter ).Item*/ );
@@ -49,10 +46,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 		{
 			var convert = factory.Convert<T>();
 			fixture.Register( convert );
-			/*if ( applyRegistration )
-			{
-				registered.Ensure( typeof(T) );
-			}*/
+			registered.Ensure( typeof(T) );
 		}
 
 		/*public class ApplyRegistration : AssociatedValue<RegistrationParameter, bool>

@@ -11,10 +11,10 @@ namespace DragonSpark.Testing.TypeSystem
 {
 	[AssemblyProvider.Register]
 	[AssemblyProvider.Types]
-	public class ApplicationAssemblyTransformerTests
+	public class ApplicationAssemblyFilterTests
 	{
 		[Theory, DefaultSetup.AutoData]
-		public void Basic( Mock<IAssemblyProvider> provider, ApplicationAssemblyTransformer sut )
+		public void Basic( Mock<IAssemblyProvider> provider, ApplicationAssemblyFilter sut )
 		{
 			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.Assemblies() );
 

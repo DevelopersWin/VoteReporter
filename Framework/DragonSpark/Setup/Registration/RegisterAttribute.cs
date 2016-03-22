@@ -1,9 +1,8 @@
-using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Setup.Registration
 {
@@ -27,9 +26,7 @@ namespace DragonSpark.Setup.Registration
 
 		public class FactoryAttribute : RegistrationBaseAttribute
 		{
-			public FactoryAttribute() : this( Services.Get<ISingletonLocator> ) {}
-
-			public FactoryAttribute( [Required]Func<ISingletonLocator> locator ) : base( t => new FactoryRegistration( locator(), t ) ) { }
+			public FactoryAttribute() : base( t => new FactoryRegistration( t ) ) { }
 		}
 	}
 }

@@ -262,7 +262,7 @@
     <Compile Include="TypeSystem\AssemblySourceBase.cs" />
     <Compile Include="Activation\FactoryModel\FactoryBase.cs" />
     <Compile Include="Runtime\Collection.cs" />
-    <Compile Include="TypeSystem\ApplicationAssemblyTransformer.cs">
+    <Compile Include="TypeSystem\ApplicationAssemblyFilter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Activation\FactoryModel\IFactory.cs">
