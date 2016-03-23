@@ -1,5 +1,4 @@
 ﻿using DragonSpark.TypeSystem;
-using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -15,12 +14,12 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Equal( typeof(int), item );
 		}
 
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		public void Qualify( int item )
 		{
 			var qualified = new TypeAdapter( typeof(Casted) ).Qualify( item );
 			Assert.Equal( item, Assert.IsType<Casted>( qualified ).Item );
-		}
+		}*/
 
 		[Fact]
 		public void IsInstanceOfType()
@@ -44,10 +43,10 @@ namespace DragonSpark.Testing.TypeSystem
 
 			public int Item { get; }
 
-			public static implicit operator Casted( int item )
+			/*public static implicit operator Casted( int item )
 			{
 				return new Casted( item );
-			}
+			}*/
 		}
 	}
 }

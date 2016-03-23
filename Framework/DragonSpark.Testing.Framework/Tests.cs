@@ -38,10 +38,11 @@ namespace DragonSpark.Testing.Framework
 		{
 			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( args.Method ) ) )
 			{
-				using ( Services.Get<IApplication>() )
+				args.Proceed();
+				/*using ( Services.Get<IApplication>() )
 				{
-					args.Proceed();
-				}
+					
+				}*/
 			}
 		}
 	}

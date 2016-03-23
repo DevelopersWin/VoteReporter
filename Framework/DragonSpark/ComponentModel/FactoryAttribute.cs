@@ -8,11 +8,9 @@ namespace DragonSpark.ComponentModel
 {
 	public sealed class ServiceAttribute : ActivateAttributeBase
 	{
-		static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
+		static DelegatedCreator Creator { get; } = new DelegatedCreator( Services.Get );
 
-		static object Compose( Type arg ) => Services.Get( arg );
-
-		public ServiceAttribute( Type composedType = null ) : base( new ActivatedValueProvider.Converter( composedType, null ), Creator ) {}
+		public ServiceAttribute( Type serviceType = null ) : base( new ActivatedValueProvider.Converter( serviceType, null ), Creator ) {}
 	}
 
 	public sealed class ComposeAttribute : ActivateAttributeBase

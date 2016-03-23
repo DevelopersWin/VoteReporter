@@ -310,6 +310,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		void RelayedAttribute()
 		{
+			var temp = Attributes.Get( typeof(Relayed) );
 			var attribute = typeof(Relayed).GetAttribute<Attribute>();
 			Assert.Equal( "This is a relayed class attribute.", attribute.PropertyName );
 		}

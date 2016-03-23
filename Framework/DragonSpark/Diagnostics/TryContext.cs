@@ -1,16 +1,16 @@
-using System;
+using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using Serilog;
+using System;
 
 namespace DragonSpark.Diagnostics
 {
+	[Persistent]
 	public class TryContext
 	{
-		readonly ILogger logger;
+		readonly Func<ILogger> logger;
 
-		// public TryContext() : this( new RecordingLoggerFactory().Create() ) {} // TODO: Logger Instance
-
-		public TryContext( [Required]ILogger logger )
+		public TryContext( [Required]Func<ILogger> logger )
 		{
 			this.logger = logger;
 		}
@@ -23,7 +23,7 @@ namespace DragonSpark.Diagnostics
 			}
 			catch ( Exception exception )
 			{
-				logger.Debug( exception, "An exception has occurred while executing an application delegate." );
+				logger().Debug( exception, "An exception has occurred while executing an application delegate." );
 				return exception;
 			}
 			return null;

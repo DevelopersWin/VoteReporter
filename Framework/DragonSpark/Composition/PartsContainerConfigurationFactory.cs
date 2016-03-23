@@ -4,6 +4,8 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Generic;
+using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
@@ -106,6 +108,15 @@ namespace DragonSpark.Composition
 				.WithProvider( new TypeInitializingExportDescriptorProvider( conventionLocator ) );
 			return result;
 		}
+
+		/*class AttributeProvider : AttributedModelProvider
+		{
+			public static AttributeProvider Instance { get; } = new AttributeProvider();
+
+			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, MemberInfo member ) => member.GetAttributes<Attribute>();
+
+			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, ParameterInfo parameter ) => parameter.GetAttributes<Attribute>();
+		}*/
 	}
 
 	class SingletonActivator : IActivator

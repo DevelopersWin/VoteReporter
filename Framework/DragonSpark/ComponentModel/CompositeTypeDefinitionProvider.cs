@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
@@ -16,10 +15,6 @@ namespace DragonSpark.ComponentModel
 		}
 
 		[Freeze]
-		public TypeInfo GetDefinition( TypeInfo info )
-		{
-			var result = providers.FirstWhere( x => x.GetDefinition( info ) ) ?? info;
-			return result;
-		}
+		public TypeInfo GetDefinition( TypeInfo info ) => providers.FirstWhere( x => x.GetDefinition( info ) ) ?? info;
 	}
 }

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Extensions
 {
-	public class TypeExtensionsTests
+	public class MemberTypeExtensionsTests
 	{
 		[Fact]
 		public void Adapt()

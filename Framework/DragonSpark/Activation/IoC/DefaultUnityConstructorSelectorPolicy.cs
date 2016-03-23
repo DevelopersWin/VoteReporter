@@ -1,9 +1,11 @@
-using System;
-using System.Linq;
-using System.Reflection;
+using DragonSpark.Runtime.Values;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
+using System;
+using System.Linq;
+using System.Reflection;
+using DragonSpark.Aspects;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -11,6 +13,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static DefaultUnityConstructorSelectorPolicy Instance { get; } = new DefaultUnityConstructorSelectorPolicy();
 
+		// [Freeze]
 		protected override IDependencyResolverPolicy CreateResolver( ParameterInfo parameter )
 		{
 			var isOptional = parameter.IsOptional && !parameter.IsDefined( typeof(OptionalDependencyAttribute) );
@@ -20,11 +23,11 @@ namespace DragonSpark.Activation.IoC
 					(IDependencyResolverPolicy)new LiteralValueDependencyResolverPolicy( parameter.DefaultValue ) 
 					: 
 					new OptionalDependencyResolverPolicy( parameter.ParameterType ) 
-				: CreateResolverOverride( parameter );
+				: Create( parameter );
 			return result;
 		}
 
-		static IDependencyResolverPolicy CreateResolverOverride( ParameterInfo parameter )
+		static IDependencyResolverPolicy Create( ParameterInfo parameter )
 		{
 			var attributes = parameter.GetCustomAttributes( false ) ?? Enumerable.Empty<Attribute>();
 			var list = attributes.OfType<DependencyResolutionAttribute>().ToList();

@@ -56,13 +56,15 @@ namespace DragonSpark.Activation.IoC
 		readonly ConventionStrategy conventionStrategy;
 		readonly DefaultValueStrategy defaultValueStrategy;
 		readonly EnumerableResolutionStrategy enumerableResolutionStrategy;
+		readonly TryContext tryContext;
 
-		public BuildPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required] DefaultValueStrategy defaultValueStrategy, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy )
+		public BuildPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required] DefaultValueStrategy defaultValueStrategy, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy, [Required] TryContext tryContext )
 		{
 			this.metadataLifetimeStrategy = metadataLifetimeStrategy;
 			this.conventionStrategy = conventionStrategy;
 			this.defaultValueStrategy = defaultValueStrategy;
 			this.enumerableResolutionStrategy = enumerableResolutionStrategy;
+			this.tryContext = tryContext;
 		}
 
 		protected override void Initialize()
@@ -78,10 +80,32 @@ namespace DragonSpark.Activation.IoC
 			Context.Strategies.Add( enumerableResolutionStrategy, UnityBuildStage.Creation );
 			Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
 
-			var policy = Context.Policies.Get<IBuildPlanCreatorPolicy>( null );
-			var builder = new Builder<TryContext>( Context.Strategies, policy.CreatePlan );
-			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( builder.Create, Policies, policy ) );
+			var policy = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) );
+			// var builder = new Builder<TryContext>( Context.Strategies, policy.CreatePlan );
+			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( c => tryContext, Policies, policy ) );
 			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
+		}
+
+		public class CachedCreatorPolicy : IBuildPlanCreatorPolicy
+		{
+			readonly IBuildPlanCreatorPolicy inner;
+
+			public CachedCreatorPolicy( [Required] IBuildPlanCreatorPolicy inner )
+			{
+				this.inner = inner;
+			}
+
+			class Plan : AssociatedValue<NamedTypeBuildKey, IBuildPlanPolicy>
+			{
+				public Plan( NamedTypeBuildKey instance, Func<IBuildPlanPolicy> create ) : base( instance, typeof(Plan), create ) {}
+			}
+
+			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
+			{
+				var reference = new KeyReference( this, context.BuildKey ).Item;
+				var result = new Plan( reference, () => inner.CreatePlan( context, buildKey ) ).Item;
+				return result;
+			}
 		}
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
@@ -115,7 +139,7 @@ namespace DragonSpark.Activation.IoC
 			}
 		}
 
-		public class Builder<T> : FactoryBase<IBuilderContext, T>
+		/*public class Builder<T> : FactoryBase<IBuilderContext, T>
 		{
 			readonly NamedTypeBuildKey key = NamedTypeBuildKey.Make<T>();
 			readonly IStagedStrategyChain strategies;
@@ -135,7 +159,7 @@ namespace DragonSpark.Activation.IoC
 				var result = context.Existing.To<T>();
 				return result;
 			}
-		}
+		}*/
 
 		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 	}

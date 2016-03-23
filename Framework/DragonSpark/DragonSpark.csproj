@@ -248,6 +248,7 @@
     <Compile Include="TypeSystem\HostingAttribute.cs" />
     <Compile Include="TypeSystem\IAttributeProvider.cs" />
     <Compile Include="TypeSystem\KnownTypeFactory.cs" />
+    <Compile Include="TypeSystem\MemberInfoAttributeProviderFactory.cs" />
     <Compile Include="TypeSystem\MemberInfoWithRelatedProviderFactory.cs" />
     <Compile Include="TypeSystem\TypeAdapter.cs" />
     <Compile Include="ComponentModel\CollectionAttribute.cs" />

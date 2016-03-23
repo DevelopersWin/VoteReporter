@@ -253,6 +253,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Setup\Registration\MetadataRegistrationCommandOtherTests.cs" />
+    <Compile Include="Setup\Registration\MetadataRegistrationCommandTests.cs" />
     <Compile Include="Runtime\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Runtime\AssemblyProviderTests.cs" />
     <Compile Include="Runtime\DomainAssemblySourceTests.cs" />
@@ -400,9 +402,7 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Setup\Registration\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

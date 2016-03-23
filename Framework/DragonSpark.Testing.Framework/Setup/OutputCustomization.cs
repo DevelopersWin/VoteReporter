@@ -1,10 +1,10 @@
+using System;
 using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework.Setup.Location;
-using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
@@ -14,11 +14,22 @@ using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using Xunit.Abstractions;
+using Type = DragonSpark.TypeSystem.Type;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
+	public class Testing : Attribute
+	{
+		[Service]
+		public AutoData AutoData { get; set; }
+	}
+
+	[Testing]
 	public abstract class AutoDataCustomization : CustomizationBase, IAutoDataCustomization
 	{
+		[Service]
+		public AutoData AutoData { get; set; }
+
 		protected override void OnCustomize( IFixture fixture )
 		{
 			var autoData = Services.Get<AutoData>();

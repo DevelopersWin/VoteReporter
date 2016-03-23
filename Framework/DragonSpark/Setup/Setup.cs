@@ -84,7 +84,7 @@ namespace DragonSpark.Setup
 			Services = provider;
 		}
 
-		protected Application( IEnumerable<ICommand> commands ) : base( new DecoratedSpecification<TParameter>( new OnlyOnceSpecification() ), commands.ToArray() ) {}
+		protected Application( IEnumerable<ICommand> commands ) : base( AlwaysSpecification.Instance.Wrap<TParameter>(), commands.ToArray() ) {}
 
 		[Default( true )]
 		public bool DisposeAfterExecution { get; set; }

@@ -65,16 +65,19 @@ namespace DragonSpark.Aspects
 				return result;
 			}
 		}*/
-		public override void RuntimeInitialize( MethodBase method ) => new Enabled( this ).Assign( true );
+
+		bool Enabled { get; set; }
+
+		public override void RuntimeInitialize( MethodBase method ) => Enabled = true;
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( new Enabled( this ).Item && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
+			if ( Enabled && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
-				var list = new EqualityList( args.Arguments.Append( args.Instance ?? args.Method.DeclaringType, args.Method ).Fixed() );
-				var key = ConnectedValueKeyFactory<Cached>.Instance.Create( list );
-				var check = args.Method.GetMemberType() != typeof(void) || new Checked( this, ConnectedValueKeyFactory<Checked>.Instance.Create( list ) ).Item.Apply();
-				args.ReturnValue = check ? new Cached( this, key, args.GetReturnValue ).Item : args.ReturnValue;
+				var code = args.Arguments.Concat( new object[] { args.Method.DeclaringType, args.Method } ).Aggregate( 0x2D2816FE, ( current, item ) => current * 31 + ( item?.GetHashCode() ?? 0 ) );
+				// var list = new EqualityList( args.Arguments.Append( args.Instance ??  ).Fixed() );
+				var check = ( args.Method as MethodInfo )?.ReturnType  != typeof(void) || new Checked( this, $"Checked{code}" ).Item.Apply();
+				args.ReturnValue = check ? new Cached( this, $"Cached{code}", args.GetReturnValue ).Item : args.ReturnValue;
 			}
 			else
 			{
@@ -82,13 +85,13 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		class Enabled : AssociatedValue<Freeze, bool>
+		/*class Enabled : AssociatedValue<Freeze, bool>
 		{
 			public Enabled( Freeze instance ) : base( instance ) {}
-		}
+		}*/
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
 
-		void IInstanceScopedAspect.RuntimeInitializeInstance() => new Enabled( this ).Assign( true );
+		void IInstanceScopedAspect.RuntimeInitializeInstance() => Enabled = true;
 	}
 }

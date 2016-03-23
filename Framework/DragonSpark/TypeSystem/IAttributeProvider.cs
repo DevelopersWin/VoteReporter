@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
-using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
@@ -13,21 +12,6 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	[Persistent]
-	public class MemberInfoAttributeProviderFactory : FactoryBase<Tuple<MemberInfo, bool>, IAttributeProvider>
-	{
-		public static MemberInfoAttributeProviderFactory Instance { get; } = new MemberInfoAttributeProviderFactory( MemberInfoLocator.Instance );
-
-		readonly IMemberInfoLocator locator;
-
-		public MemberInfoAttributeProviderFactory( [Required]IMemberInfoLocator locator )
-		{
-			this.locator = locator;
-		}
-
-		protected override IAttributeProvider CreateItem( Tuple<MemberInfo, bool> parameter ) => new MemberInfoAttributeProvider( locator.Create( parameter.Item1 ) ?? parameter.Item1, parameter.Item2 );
-	}
-
 	public static class Attributes
 	{
 		sealed class Cached<T> : AssociatedValue<IAttributeProvider> where T : AttributeProviderFactoryBase
@@ -68,6 +52,7 @@ namespace DragonSpark.TypeSystem
 			this.includeRelated = includeRelated;
 		}
 
+		[Freeze]
 		protected override IAttributeProvider CreateItem( object parameter )
 		{
 			var item = new Tuple<MemberInfo, bool>( parameter as MemberInfo ?? ( parameter as System.Type ?? parameter.GetType() ).GetTypeInfo(), includeRelated );
