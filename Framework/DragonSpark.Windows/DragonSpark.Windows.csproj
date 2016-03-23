@@ -200,6 +200,7 @@
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
     <Compile Include="Security\CertificateFactory.cs" />
     <Compile Include="Security\KeyVaultApplicationFactory.cs" />
+    <Compile Include="Security\KeyVaultClientFactory.cs" />
     <Compile Include="Setup\ConsoleApplication.cs" />
     <Compile Include="Setup\ConfigurationSectionFactory.cs" />
     <Compile Include="Runtime\Data\DataBuilder.cs" />

@@ -20,6 +20,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		[Locate, Required]
 		IServiceLocationAuthority Authority { [return: Required]get; set; }
 
-		protected override void Customize( IFixture fixture ) => Authority.Register( locationType, enabled );
+		protected override void OnCustomize( IFixture fixture ) => Authority.Register( locationType, enabled );
 	}
 }

@@ -1,17 +1,15 @@
 using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using Serilog.Events;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.TypeSystem;
-using Serilog;
 using Xunit;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 

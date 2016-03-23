@@ -6,9 +6,6 @@ namespace DragonSpark.Testing.Framework
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution()
-		{
-			Activation.Execution.Initialize( CurrentExecution.Instance );
-		}
+		public static void Execution() => Activation.Execution.Initialize( CurrentExecution.Instance );
 	}
 }

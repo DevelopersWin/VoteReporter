@@ -13,13 +13,12 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
+	[Persistent]
 	public class MemberInfoAttributeProviderFactory : FactoryBase<Tuple<MemberInfo, bool>, IAttributeProvider>
 	{
-		public static MemberInfoAttributeProviderFactory Instance { get; } = new MemberInfoAttributeProviderFactory();
+		public static MemberInfoAttributeProviderFactory Instance { get; } = new MemberInfoAttributeProviderFactory( MemberInfoLocator.Instance );
 
 		readonly IMemberInfoLocator locator;
-
-		public MemberInfoAttributeProviderFactory() : this( MemberInfoLocator.Instance ) {}
 
 		public MemberInfoAttributeProviderFactory( [Required]IMemberInfoLocator locator )
 		{
@@ -48,11 +47,12 @@ namespace DragonSpark.TypeSystem
 		public static IAttributeProvider GetWithRelated( [Required]object target ) => new Cached<ExpandedAttributeProviderFactory>( target ).Item;
 	}
 
+	[Persistent]
 	class MemberInfoProviderFactory : MemberInfoProviderFactoryBase
 	{
-		public static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory();
+		public static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory( MemberInfoAttributeProviderFactory.Instance );
 
-		public MemberInfoProviderFactory() : this( MemberInfoAttributeProviderFactory.Instance ) {}
+		// public MemberInfoProviderFactory() : this(  ) {}
 
 		public MemberInfoProviderFactory( MemberInfoAttributeProviderFactory inner ) : base( inner, false ) {}
 	}
@@ -76,6 +76,7 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
+	[Persistent]
 	class ExpandedAttributeProviderFactory : AttributeProviderFactoryBase
 	{
 		public ExpandedAttributeProviderFactory() : this( MemberInfoWithRelatedProviderFactory.Instance ) {}

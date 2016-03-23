@@ -42,11 +42,11 @@ namespace DragonSpark.Activation.IoC
 
 	public class ExportDescriptorProvider : System.Composition.Hosting.Core.ExportDescriptorProvider
 	{
-		readonly CompositionCoordinator activator;
+		readonly CompositionCoordinator coordinator;
 
-		public ExportDescriptorProvider( [Required]CompositionCoordinator activator )
+		public ExportDescriptorProvider( [Required]CompositionCoordinator coordinator )
 		{
-			this.activator = activator;
+			this.coordinator = coordinator;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
@@ -54,7 +54,7 @@ namespace DragonSpark.Activation.IoC
 			CompositionDependency dependency;
 			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
 			{
-				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Context( activator, contract ).Create );
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Context( coordinator, contract ).Create );
 			}
 		}
 
@@ -109,7 +109,7 @@ namespace DragonSpark.Activation.IoC
 		public object Create( NamedTypeBuildKey key )
 		{
 			var chain = new ThreadAmbientChain<Operation>();
-			if ( chain.Item.All( operation => !operation.InProgress( key.Type, key.Name ) ) )
+			if ( !chain.Item.Any( operation => operation.InProgress( key.Type, key.Name ) ) )
 			{
 				using ( new AmbientContextCommand<Operation>( chain ).ExecuteWith( new Operation( key ) )  )
 				{

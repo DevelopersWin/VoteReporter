@@ -1,11 +1,8 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
-using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.TypeSystem;
 using Xunit;
 using Type = System.Type;
 
@@ -22,7 +19,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.Count(), count );
 		}
 
-		[Theory, Framework.Setup.AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void NullIfEmpty( IEnumerable<object> sut )
 		{
 			Assert.NotNull( sut.NullIfEmpty() );

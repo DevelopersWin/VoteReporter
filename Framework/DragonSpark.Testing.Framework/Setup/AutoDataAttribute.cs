@@ -14,11 +14,11 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public class LocalAutoDataAttribute : AutoDataAttribute
 	{
-		public LocalAutoDataAttribute( bool includeFromParameters = true, params Type[] others ) : base( data => new Application( data.Method.DeclaringType, others.Concat( includeFromParameters ? data.Method.GetParameters().Select( info => info.ParameterType ) : Default<Type>.Items ) ) ) {}
+		public LocalAutoDataAttribute( bool includeFromParameters = true, params Type[] others ) : base( data => new Application( data.Method.DeclaringType, others.Concat( includeFromParameters ? data.Method.GetParameters().Select( info => info.ParameterType ) : Default<Type>.Items ).Fixed() ) ) {}
 
 		public class Application : ApplicationBase
 		{
-			public Application( Type primaryType, IEnumerable<Type> others ) : this( primaryType.Adapt().WithNested().Concat( TypesFactory.Instance.Create( new ApplicationAssemblyFilter().Create( others.Assemblies() ) ) ) ) {}
+			public Application( [Required] Type primaryType, [Required] params Type[] others ) : this( primaryType.Adapt().WithNested().Concat( TypesFactory.Instance.Create( ApplicationAssemblyFilter.Instance.Create( others.Assemblies() ) ) ) ) {}
 
 			Application( IEnumerable<Type> enumerable ) : base( new ServiceProviderFactory( enumerable.Fixed() ).Create() ) {}
 		}

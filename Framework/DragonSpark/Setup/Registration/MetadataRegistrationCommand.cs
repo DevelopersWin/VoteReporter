@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace DragonSpark.Setup.Registration
 {
-	public class RegisterFromMetadataCommand : DelegatedCommand<MetadataRegistrationCommand, Type[]> {}
+	public class RegisterFromMetadataCommand : ServicedCommand<MetadataRegistrationCommand, Type[]> {}
 
 	public class MetadataRegistrationCommand : Command<Type[]>
 	{

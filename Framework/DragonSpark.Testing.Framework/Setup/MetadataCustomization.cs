@@ -63,9 +63,9 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class Application : ApplicationBase
 	{
-		public Application() : this( ServiceProviderFactory.Instance.Create() ) {}
+		public Application() : base( ServiceProviderFactory.Instance.Create() ) {}
 
-		public Application( IServiceProvider provider ) : base( provider ) {}
+		// public Application( IServiceProvider provider ) : base( provider ) {}
 	}
 
 	public abstract class ApplicationBase : DragonSpark.Setup.Application<AutoData>, IApplication

@@ -30,6 +30,6 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public IList<IAutoDataCustomization> Items { get; }
 
-		public void Dispose() => Items.Purge().Each( customization => customization.Initialized( this ) );
+		public void Dispose() => Items.Purge().Reverse().Each( customization => customization.Initialized( this ) );
 	}
 }

@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Testing.Framework.Setup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace DragonSpark.Testing.Runtime
 {
 	public class ListDictionaryTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Cover( Guid key, string one, string two, ListDictionary<Guid, string> sut )
 		{
 			sut.Add( key, one );

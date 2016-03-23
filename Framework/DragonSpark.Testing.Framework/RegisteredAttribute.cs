@@ -91,7 +91,7 @@ namespace DragonSpark.Testing.Framework
 				this.registrationType = registrationType;
 			}
 
-			protected override void Customize( IFixture fixture )
+			protected override void OnCustomize( IFixture fixture )
 			{
 				new FreezingCustomization( registrationType ).Customize( fixture );
 

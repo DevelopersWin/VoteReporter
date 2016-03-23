@@ -10,6 +10,8 @@ namespace DragonSpark.TypeSystem
 {
 	public class ApplicationAssemblyFilter : TransformerBase<Assembly[]>
 	{
+		public static ApplicationAssemblyFilter Instance { get; } = new ApplicationAssemblyFilter();
+
 		readonly ISpecification<Assembly> specification;
 		
 		static string[] Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.NotNull().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToArray();

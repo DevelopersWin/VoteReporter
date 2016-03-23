@@ -4,8 +4,8 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 {
 	public abstract class CustomizationBase : ICustomization
 	{
-		void ICustomization.Customize( IFixture fixture ) => Customize( fixture );
+		public void Customize( IFixture fixture ) => OnCustomize( fixture );
 
-		protected abstract void Customize( IFixture fixture );
+		protected abstract void OnCustomize( IFixture fixture );
 	}
 }

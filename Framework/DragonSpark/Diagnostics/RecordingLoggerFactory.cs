@@ -1,5 +1,4 @@
-﻿using System;
-using DragonSpark.Activation.FactoryModel;
+﻿using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 using Serilog;
@@ -11,7 +10,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public RecordingLoggerFactory() : this( new RecordingLogEventSink(), new LoggingLevelSwitch() ) {}
 
-		public RecordingLoggerFactory( [Required]RecordingLogEventSink sink, [Required]Serilog.Core.LoggingLevelSwitch levelSwitch )
+		public RecordingLoggerFactory( [Required]RecordingLogEventSink sink, [Required]LoggingLevelSwitch levelSwitch )
 		{
 			Sink = sink;
 			LevelSwitch = levelSwitch;

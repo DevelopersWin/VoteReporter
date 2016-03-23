@@ -1,5 +1,4 @@
-﻿using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Runtime;
+﻿using DragonSpark.Windows.Runtime;
 using System;
 using System.Linq;
 using Xunit;
@@ -8,7 +7,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 {
 	public class DomainAssemblySourceTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void GetAssemblies( DomainAssemblySource sut )
 		{
 			var assemblies = sut.Create();

@@ -8,15 +8,18 @@ using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
+using Serilog;
+using System.Collections;
 using System.Composition;
+using System.Diagnostics;
 using System.Linq;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class AutoDataCustomization : CustomizationBase, IAutoDataCustomization
+	public abstract class AutoDataCustomization : CustomizationBase, IAutoDataCustomization
 	{
-		protected override void Customize( IFixture fixture )
+		protected override void OnCustomize( IFixture fixture )
 		{
 			var autoData = Services.Get<AutoData>();
 			if ( autoData != null )
@@ -70,19 +73,76 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
+	public class ListValue<T> : FixedValue<T>
+	{
+		readonly IList list;
+
+		public ListValue( [Required] IList list )
+		{
+			this.list = list;
+		}
+
+		public override void Assign( T item )
+		{
+			if ( item == null )
+			{
+				Remove( Item );
+			}
+			else if ( !list.Contains( item ) )
+			{
+				list.Add( item );
+			}
+			
+			base.Assign( item );
+		}
+
+		void Remove( T item )
+		{
+			if ( item != null && list.Contains( item ) )
+			{
+				list.Remove( item );
+			}
+		}
+
+		protected override void OnDispose() => Remove( Item );
+	}
+
+	public class TraceListenerListValue : ListValue<TraceListener>
+	{
+		public TraceListenerListValue() : base( Trace.Listeners ) {}
+
+		protected override void OnDispose()
+		{
+			Item.Dispose();
+			base.OnDispose();
+		}
+	}
+
 	public class OutputCustomization : AutoDataCustomization
 	{
-		[Compose]
-		public RecordingLogEventSink Logger { [return: Required]get; set; }
+		readonly TraceListenerListValue value = new TraceListenerListValue();
+
+		[Service]
+		public ILogger Logger { [return: Required]get; set; }
+
+		[Service]
+		public RecordingLogEventSink Sink { [return: Required]get; set; }
+
+		protected override void OnInitializing( AutoData context )
+		{
+			value.Assign( new SerilogTraceListener.SerilogTraceListener( Logger ) );
+			base.OnInitializing( context );
+		}
 
 		protected override void OnInitialized( AutoData context )
 		{
 			var declaringType = context.Method.DeclaringType;
 			if ( declaringType.GetConstructors().Where( info => info.IsPublic ).Any( info => info.GetParameters().Any( parameterInfo => parameterInfo.ParameterType == typeof(ITestOutputHelper) ) ) )
 			{
-				var item = Logger.Purge().OrderBy( line => line.Timestamp ).Select( line => line.RenderMessage() ).ToArray();
-				new OutputValue( declaringType ).Assign( item );	
+				var lines = PurgingEventFactory.Instance.Create( Sink );
+				new OutputValue( declaringType ).Assign( lines );	
 			}
+			value.Dispose();
 		}
 	}
 }

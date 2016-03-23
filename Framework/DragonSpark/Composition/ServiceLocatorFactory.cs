@@ -57,12 +57,32 @@ namespace DragonSpark.Composition
 		protected override Assembly[] CreateItem( Type[] parameter ) => parameter.Assemblies().Distinct().ToArray();
 	}
 
+	public static class AssemblyTypes
+	{
+		public static AssemblyTypesFactory All { get; } = new AssemblyTypesFactory( assembly => assembly.DefinedTypes.AsTypes() );
+
+		public static AssemblyTypesFactory Public { get; } = new AssemblyTypesFactory( assembly => assembly.ExportedTypes );
+	}
+
+	public class AssemblyTypesFactory : FactoryBase<Assembly, Type[]>
+	{
+		readonly Func<Assembly, IEnumerable<Type>> types;
+
+		public AssemblyTypesFactory( [Required] Func<Assembly, IEnumerable<Type>> types )
+		{
+			this.types = types;
+		}
+
+		[Freeze]
+		protected override Type[] CreateItem( Assembly parameter ) => types( parameter ).Fixed();
+	}
+
 	public class TypesFactory : FactoryBase<Assembly[], Type[]>
 	{
 		public static TypesFactory Instance { get; } = new TypesFactory();
 
 		[Freeze]
-		protected override Type[] CreateItem( Assembly[] parameter ) => parameter.SelectMany( assembly => assembly.DefinedTypes ).AsTypes().ToArray();
+		protected override Type[] CreateItem( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.Create ).ToArray();
 	}
 
 	public class ServiceProviderFactory : Setup.ServiceProviderFactory

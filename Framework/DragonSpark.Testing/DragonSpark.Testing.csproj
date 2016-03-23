@@ -119,6 +119,10 @@
       <HintPath>$(SolutionDir)packages\PostSharp.Patterns.Common.4.2.22\lib\net45\PostSharp.Patterns.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PostSharp.Patterns.Diagnostics, Version=4.2.22.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PostSharp.Patterns.Diagnostics.4.2.22\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PostSharp.Patterns.Model, Version=4.2.22.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\PostSharp.Patterns.Model.4.2.22\lib\net40\PostSharp.Patterns.Model.dll</HintPath>
       <Private>True</Private>
@@ -135,6 +139,10 @@
     </Reference>
     <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SerilogTraceListener, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SerilogTraceListener.1.0.7\lib\net45\SerilogTraceListener.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -263,6 +271,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Runtime\Values\AmbientContextCommandTests.cs" />
+    <Compile Include="Setup\Registration\MetadataRegistrationCommandOtherTests.cs" />
+    <Compile Include="Setup\Registration\MetadataRegistrationCommandTests.cs" />
     <Compile Include="TypeSystem\ApplicationAssemblyFilterTests.cs" />
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
     <Compile Include="TypeSystem\KnownTypeFactoryTests.cs" />

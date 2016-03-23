@@ -13,11 +13,11 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( "DragonSpark.Testing", result );
 		}
 
-		[Fact]
+		/*[Fact]
 		public void GetAssemblyName()
 		{
 			var result = GetType().Assembly.GetAssemblyName();
 			Assert.Equal( "DragonSpark.Testing", result );
-		}
+		}*/
 	}
 }

@@ -9,7 +9,7 @@ namespace DragonSpark.Windows.Testing.Security
 {
 	public class KeyVaultApplicationFactoryTests
 	{
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void Create( [NoAutoProperties]X509Certificate2 certificate, KeyVaultApplicationFactory sut )
 		{
 			certificate.Import( Resources.Certificate );

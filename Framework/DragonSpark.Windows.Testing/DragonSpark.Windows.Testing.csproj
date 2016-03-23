@@ -283,7 +283,7 @@
     <Compile Include="Runtime\ExceptionFormatterTests.cs" />
     <Compile Include="Runtime\ThreadDataValueTests.cs" />
     <Compile Include="Security\KeyVaultApplicationFactoryTests.cs" />
-    <Compile Include="Security\CertificateContextFactoryests.cs" />
+    <Compile Include="Security\CertificateFactoryTests.cs" />
     <Compile Include="Security\SecretFactoryTests.cs" />
     <Compile Include="Setup\ServiceProviderFactory.cs" />
     <Compile Include="Setup\LocationSetup.cs">

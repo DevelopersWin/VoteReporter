@@ -14,7 +14,6 @@ namespace DragonSpark.TypeSystem
 		[Freeze]
 		protected override T CreateItem()
 		{
-			// var name = typeof(T).AssemblyQualifiedName;
 			var adapter = typeof(T).Adapt();
 			var type = adapter.GetEnumerableType();
 			var value = type != null ? typeof(Enumerable).InvokeGeneric( nameof(Enumerable.Empty), type.ToItem() ) : adapter.GetDefaultValue();

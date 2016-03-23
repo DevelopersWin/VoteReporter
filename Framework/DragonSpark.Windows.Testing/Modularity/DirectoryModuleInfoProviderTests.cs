@@ -1,8 +1,5 @@
-﻿using DragonSpark.Testing.Framework.Setup;
+﻿using DragonSpark.Modularity;
 using DragonSpark.Windows.Modularity;
-using System;
-using System.Reflection;
-using DragonSpark.Modularity;
 using Xunit;
 using ModuleInfoBuilder = DragonSpark.Windows.Modularity.ModuleInfoBuilder;
 
@@ -10,7 +7,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 {
 	public class DirectoryModuleInfoProviderTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Cover()
 		{
 			using ( new DirectoryModuleInfoProvider( ModuleInfoBuilder.Instance, new[] { "Notexists.dll" }, "." ) )
@@ -20,7 +17,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			}
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void NotExist( RemoteModuleInfoProviderFactory sut )
 		{
 			using ( var provider = sut.Create( new LoadRemoteModuleInfoParameter( new[] { typeof( IModule ).Assembly.Location }, DirectoryModuleCatalogTests.InvalidModulesDirectory ) ) )

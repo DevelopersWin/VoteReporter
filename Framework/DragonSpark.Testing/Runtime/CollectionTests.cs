@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Runtime;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using Ploeh.AutoFixture.Xunit2;
 using System;
@@ -14,7 +13,7 @@ namespace DragonSpark.Testing.Runtime
 {
 	public class CollectionTests
 	{
-		[Theory, Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void Equality( System.Collections.ObjectModel.Collection<Tuple<object>> sut )
 		{
 			var item = new object();
@@ -43,7 +42,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.NotEqual( new EqualityList { item, 1 }, new EqualityList { item, 3 } );
 		}
 
-		[Theory, Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void Array( object[] items )
 		{
 			var first = new EqualityList( items.ToArray() );
@@ -52,7 +51,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.NotEqual( items.ToArray().GetHashCode(), items.ToArray().GetHashCode() );
 		}
 
-		[Theory, Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void EqualityDictionary( Dictionary<Tuple<object>, object> sut )
 		{
 			var item = new object();
@@ -65,13 +64,13 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Same( item, found );
 		}
 
-		[Theory, Framework.Setup.AutoData]
+		[Theory, AutoData]
 		void Add( Collection<Class> sut )
 		{
 			Assert.Equal( -1, sut.To<IList>().Add( new object() ) );
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		public void Cover( ModuleInfo one, ModuleInfo two, Collection<ModuleInfo> sut )
 		{
 			( (IList)sut ).Insert( 0, one );

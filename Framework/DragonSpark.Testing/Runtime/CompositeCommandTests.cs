@@ -1,13 +1,12 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Testing.Framework.Setup;
 using Xunit;
 
 namespace DragonSpark.Testing.Runtime
 {
 	public class CompositeCommandTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void Execute( Command command )
 		{
 			

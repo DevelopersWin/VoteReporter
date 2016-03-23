@@ -1,12 +1,11 @@
-﻿using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Runtime;
+﻿using DragonSpark.Windows.Runtime;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
 	public class TaskLocalValueTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Assign( int number, TaskLocalValue<int> sut )
 		{
 			sut.Assign( number );

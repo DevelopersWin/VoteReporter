@@ -1,6 +1,5 @@
 ﻿using Dynamitey;
 using System;
-using System.Linq;
 
 namespace DragonSpark.Extensions
 {

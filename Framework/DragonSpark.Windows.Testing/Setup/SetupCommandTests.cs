@@ -1,10 +1,8 @@
-﻿using System;
-using System.Windows.Input;
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Setup;
-using DragonSpark.Windows.Testing.TestObjects.Modules;
 using Ploeh.AutoFixture.Xunit2;
+using System;
+using System.Windows.Input;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup

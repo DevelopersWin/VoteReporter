@@ -1,12 +1,11 @@
 ﻿using DragonSpark.Modularity;
-using DragonSpark.Testing.Framework.Setup;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
 	public class ModuleTypeLoaderTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Cover( ModuleInfo info, ModuleTypeLoaderExtended sut )
 		{
 			Assert.True( sut.CanLoadModuleType(info) );

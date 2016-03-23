@@ -1,20 +1,15 @@
-﻿using System.Composition;
-using DragonSpark.Testing.Framework.Setup;
-using System.Composition.Convention;
-using System.Composition.Hosting;
-using System.Reflection;
-using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
-using DragonSpark.TypeSystem;
-using Microsoft.Practices.ServiceLocation;
-using Moq;
-using Ploeh.AutoFixture.Xunit2;
+using System.Composition;
+using System.Composition.Convention;
+using System.Composition.Hosting;
+using System.Reflection;
 using Xunit;
 using Type = System.Type;
 

@@ -3,6 +3,8 @@ using Serilog.Core;
 using Serilog.Events;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using DragonSpark.Activation.FactoryModel;
 
 namespace DragonSpark.Diagnostics
 {
@@ -20,6 +22,13 @@ namespace DragonSpark.Diagnostics
 
 		public IEnumerable<LogEvent> Events => events;
 
-		public virtual void Emit( LogEvent logEvent ) => source.Contains( logEvent).IsFalse( () => source.Add( logEvent ) );
+		public virtual void Emit( LogEvent logEvent ) => source.Contains( logEvent ).IsFalse( () => source.Add( logEvent ) );
+	}
+
+	public class PurgingEventFactory : FactoryBase<RecordingLogEventSink, string[]>
+	{
+		public static PurgingEventFactory Instance { get; } = new PurgingEventFactory();
+
+		protected override string[] CreateItem( RecordingLogEventSink parameter ) => parameter.Purge().OrderBy( line => line.Timestamp ).Select( line => line.RenderMessage() ).ToArray();
 	}
 }

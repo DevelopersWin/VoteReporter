@@ -1,12 +1,11 @@
 ﻿using DragonSpark.Modularity;
-using DragonSpark.Testing.Framework.Setup;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
 	public class ModuleInfoBuilderTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Create( ModuleInfoBuilder sut )
 		{
 			var module = sut.CreateModuleInfo( typeof(Module) );

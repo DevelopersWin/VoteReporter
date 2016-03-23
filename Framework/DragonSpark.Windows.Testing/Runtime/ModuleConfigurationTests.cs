@@ -1,5 +1,4 @@
-﻿using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Modularity;
+﻿using DragonSpark.Windows.Modularity;
 using DragonSpark.Windows.Testing.TestObjects;
 using Xunit;
 
@@ -7,7 +6,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 {
 	public class ModuleConfigurationTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Load( ModulesConfiguration sut )
 		{
 			var section = new ModulesConfigurationSectionFactory( sut.Create ).Create();

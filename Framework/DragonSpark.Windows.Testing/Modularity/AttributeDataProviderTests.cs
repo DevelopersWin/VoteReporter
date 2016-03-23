@@ -1,13 +1,12 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Modularity;
-using DragonSpark.Testing.Framework.Setup;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
 	public class AttributeDataProviderTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void GetAll( AttributeDataProvider sut )
 		{
 			var all = sut.GetAll<string>( typeof(ModuleAttribute), typeof(Module), nameof(ModuleAttribute.ModuleName) );

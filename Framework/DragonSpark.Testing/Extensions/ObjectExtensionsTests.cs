@@ -1,9 +1,7 @@
-﻿using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
-using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework.Setup;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
+using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,13 +9,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Xunit;
-using AssemblyProvider = DragonSpark.Testing.Framework.Setup.AssemblyProvider;
 
 namespace DragonSpark.Testing.Extensions
 {
 	public class ObjectExtensionsTests
 	{
-		[Theory, Objects.IoC.AutoData]
+		[Theory, AutoData]
 		void ProvidedValues( ClassWithProperties sut )
 		{
 			sut.PropertyOne = null;
@@ -42,7 +39,7 @@ namespace DragonSpark.Testing.Extensions
 
 		static MemberInfo Check( Expression<Func<ClassWithParameter, object>> expression ) => expression.GetMemberInfo();
 
-		[Theory, Objects.IoC.AutoData]
+		[Theory, AutoData]
 		void Ignored( ClassWithProperties sut )
 		{
 			var other = sut.MapInto<ClassWithDifferentProperties>();
@@ -52,7 +49,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.PropertyFour, other.PropertyFour );
 		}
 
-		[Theory, Objects.IoC.AutoData]
+		[Theory, AutoData]
 		void Clone( ClassWithProperties sut )
 		{
 			var cloned = sut.Clone();
@@ -63,7 +60,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.PropertyFour, cloned.PropertyFour );
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		public void WithNull( int number )
 		{
 			var item = new int?( number );
@@ -74,7 +71,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( 1, count );
 		}
 
-		[Theory, Objects.IoC.AutoData]
+		[Theory, AutoData]
 		void Mapper( Objects.ClassWithProperties instance )
 		{
 			var mapped = instance.MapInto<ClassWithProperties>();
