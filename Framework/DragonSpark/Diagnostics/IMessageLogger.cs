@@ -2,6 +2,7 @@ using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
@@ -12,37 +13,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Markup;
-using DragonSpark.Setup;
 
 namespace DragonSpark.Diagnostics
 {
 	[ContentProperty( nameof(Commands) )]
-	public class LoggerFactory : FactoryBase<ILogger>
+	public class ConfiguringLoggerConfigurationFactory : TransformerBase<LoggerConfiguration>
 	{
-		public LoggerFactory() : this( new LoggerConfiguration() ) {}
+		/*public ConfiguringLoggerConfigurationFactory() : this( new LoggerConfiguration() ) {}
 
-		public LoggerFactory( [Required]LoggerConfiguration configuration )
+		public ConfiguringLoggerConfigurationFactory( [Required]LoggerConfiguration configuration )
 		{
 			Configuration = configuration;
 		}
 
-		public LoggerConfiguration Configuration { get; set; }
+		public LoggerConfiguration Configuration { get; set; }*/
 
 		public Collection<Command<LoggerConfiguration>> Commands { get; } = new Collection<Command<LoggerConfiguration>>();
 
-		protected override ILogger CreateItem()
-		{
-			var transformers = 
-				Commands
-					.Select( command => new ConfiguringTransformer<LoggerConfiguration>( command.Run ) )
-					.Cast<ITransformer<LoggerConfiguration>>()
-					.ToArray();
-			var @fixed = new FixedFactory<LoggerConfiguration>( Configuration );
-			var factory = new AggregateFactory<LoggerConfiguration>( @fixed, transformers );
-
-			var result = factory.Create().CreateLogger();
-			return result;
-		}
+		protected override LoggerConfiguration CreateItem( LoggerConfiguration configuration ) => Commands.Aggregate( configuration, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Run ) );
 	}
 
 	public class AddTextWriterCommand : AddSinkCommand

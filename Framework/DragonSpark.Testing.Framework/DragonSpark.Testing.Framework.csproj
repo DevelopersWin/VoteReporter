@@ -190,6 +190,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Diagnostics\TracerFactory.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="Setup\ExecuteApplicationCommand.cs" />
     <Compile Include="Setup\Execution.cs" />

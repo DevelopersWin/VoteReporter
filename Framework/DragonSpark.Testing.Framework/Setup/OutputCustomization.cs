@@ -1,20 +1,17 @@
-using System;
 using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework.Setup.Location;
+using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
-using Serilog;
-using System.Collections;
+using System;
 using System.Composition;
-using System.Diagnostics;
 using System.Linq;
 using Xunit.Abstractions;
-using Type = DragonSpark.TypeSystem.Type;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -32,15 +29,20 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		protected override void OnCustomize( IFixture fixture )
 		{
-			var autoData = Services.Get<AutoData>();
+			var autoData = Services.Get<AutoData>().With( OnInitializing );
+			var items = autoData?.Items ?? new Items<IAutoDataCustomization>( fixture ).Item;
+			items.Ensure( ( IAutoDataCustomization)this );
+
+			/*var autoData = Services.Get<AutoData>();
 			if ( autoData != null )
 			{
 				OnInitializing( autoData );
 			}
 			else
 			{
-				new Items<IAutoDataCustomization>( fixture ).Item.Ensure( (IAutoDataCustomization)this );
-			}
+				var list = new Items<IAutoDataCustomization>( fixture ).Item;
+				list.Ensure( (IAutoDataCustomization)this );
+			}*/
 		}
 
 		void IAutoDataCustomization.Initializing( AutoData data ) => OnInitializing( data );
@@ -77,71 +79,26 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public object Create( object request, ISpecimenContext context )
 		{
-			var type = Type.From( request );
+			var type = TypeSupport.From( request );
 			object export;
 			var result = host.TryGetExport( type, out export ) ? export : new NoSpecimen();
 			return result;
 		}
 	}
 
-	public class ListValue<T> : FixedValue<T>
-	{
-		readonly IList list;
-
-		public ListValue( [Required] IList list )
-		{
-			this.list = list;
-		}
-
-		public override void Assign( T item )
-		{
-			if ( item == null )
-			{
-				Remove( Item );
-			}
-			else if ( !list.Contains( item ) )
-			{
-				list.Add( item );
-			}
-			
-			base.Assign( item );
-		}
-
-		void Remove( T item )
-		{
-			if ( item != null && list.Contains( item ) )
-			{
-				list.Remove( item );
-			}
-		}
-
-		protected override void OnDispose() => Remove( Item );
-	}
-
-	public class TraceListenerListValue : ListValue<TraceListener>
-	{
-		public TraceListenerListValue() : base( Trace.Listeners ) {}
-
-		protected override void OnDispose()
-		{
-			Item.Dispose();
-			base.OnDispose();
-		}
-	}
-
 	public class OutputCustomization : AutoDataCustomization
 	{
-		readonly TraceListenerListValue value = new TraceListenerListValue();
+		//readonly TraceListenerListValue value = new TraceListenerListValue();
 
-		[Service]
-		public ILogger Logger { [return: Required]get; set; }
+		/*[Service]
+		public ILogger Logger { [return: Required]get; set; }*/
 
 		[Service]
 		public RecordingLogEventSink Sink { [return: Required]get; set; }
 
 		protected override void OnInitializing( AutoData context )
 		{
-			value.Assign( new SerilogTraceListener.SerilogTraceListener( Logger ) );
+			// value.Assign( new SerilogTraceListener.SerilogTraceListener( Logger ) );
 			base.OnInitializing( context );
 		}
 
@@ -153,7 +110,7 @@ namespace DragonSpark.Testing.Framework.Setup
 				var lines = PurgingEventFactory.Instance.Create( Sink );
 				new OutputValue( declaringType ).Assign( lines );	
 			}
-			value.Dispose();
+			// value.Dispose();
 		}
 	}
 }

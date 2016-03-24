@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Testing.Setup;
+using Serilog;
 using Xunit;
 using Xunit.Abstractions;
 using Application = DragonSpark.Testing.Objects.IoC.Application;
@@ -43,7 +44,9 @@ namespace DragonSpark.Testing.Setup.Registration
 					var application = new Windows.Testing.Setup.Application<LocationSetup>();
 					using ( new ExecuteApplicationCommand( application ).ExecuteWith( autoData ) )
 					{
-						autoData.Initialize();
+						/*var logger1 = application.Get<ILogger>();
+						logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );*/
+						// autoData.Initialize();
 
 						/*var registerFromMetadataCommand = application.Get<RegisterFromMetadataCommand>();
 						registerFromMetadataCommand.ExecuteWith( new object() );*/

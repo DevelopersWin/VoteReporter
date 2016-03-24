@@ -5,7 +5,6 @@ using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Ploeh.AutoFixture.Kernel;
-using Type = DragonSpark.TypeSystem.Type;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -21,7 +20,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.activator = activator;
 		}
 
-		public bool IsSatisfiedBy( object request ) => Type.From( request ).With( CanLocate );
+		public bool IsSatisfiedBy( object request ) => TypeSupport.From( request ).With( CanLocate );
 
 		protected virtual bool CanLocate( System.Type type ) => activator.CanActivate( type );
 	}

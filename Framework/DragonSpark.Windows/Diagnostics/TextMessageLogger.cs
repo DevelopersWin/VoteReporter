@@ -7,6 +7,24 @@ using System;
 
 namespace DragonSpark.Windows.Diagnostics
 {
+	/*public class TracingContext : AssignValueCommand<TraceListener>
+	{
+		public TracingContext() : this( new TraceListenerListValue() ) {}
+
+		public TracingContext( [Required] IWritableValue<TraceListener> value ) : base( value ) {}
+	}
+
+	public class TraceListenerListValue : ListValue<TraceListener>
+	{
+		public TraceListenerListValue() : base( Trace.Listeners ) {}
+
+		protected override void OnDispose()
+		{
+			Item.Dispose();
+			base.OnDispose();
+		}
+	}*/
+
 	public class AddSeqSinkCommand : AddSinkCommand
 	{
 		public AddSeqSinkCommand() : this( LogEventLevel.Verbose, 1000, null, null, null, null ) {}

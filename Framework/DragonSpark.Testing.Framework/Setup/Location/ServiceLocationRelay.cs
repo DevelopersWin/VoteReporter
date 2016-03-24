@@ -1,6 +1,6 @@
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Ploeh.AutoFixture.Kernel;
-using Type = DragonSpark.TypeSystem.Type;
 
 namespace DragonSpark.Testing.Framework.Setup.Location
 {
@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		public object Create( object request, ISpecimenContext context )
 		{
-			var type = Type.From( request );
+			var type = TypeSupport.From( request );
 			var isSatisfiedBy = specification.IsSatisfiedBy( type );
 			var item = isSatisfiedBy ? locator.GetService( type ) : null;
 			var result = item ?? new NoSpecimen();

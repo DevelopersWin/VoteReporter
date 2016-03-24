@@ -6,7 +6,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	public class RecordingLoggerFactoryTests
+	public class LoggingConfigurationTransformer
 	{
 		[Theory, DefaultSetup.AutoData]
 		public void BasicCompose( CompositionContext host )

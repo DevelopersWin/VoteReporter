@@ -54,6 +54,23 @@ namespace DragonSpark.Activation.FactoryModel
 		}
 	}
 
+	public class ConfiguringFactory<T, TResult> : DecoratedFactory<T, TResult>
+	{
+		readonly Action<TResult> configure;
+
+		public ConfiguringFactory( [Required]Func<T, TResult> inner, [Required]Action<TResult> configure ) : base( inner )
+		{
+			this.configure = configure;
+		}
+
+		protected override TResult CreateItem( T parameter )
+		{
+			var result = base.CreateItem( parameter );
+			configure( result );
+			return result;
+		}
+	}
+
 	public static class FactoryDefaults<T>
 	{
 		public static ISpecification<T> Always { get; } = AlwaysSpecification.Instance.Wrap<T>();

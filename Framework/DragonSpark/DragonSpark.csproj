@@ -170,6 +170,7 @@
     <Compile Include="Aspects\Freeze.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />
     <Compile Include="Aspects\InterceptionArgsExtensions.cs" />
+    <Compile Include="Aspects\KeyFactory.cs" />
     <Compile Include="Aspects\OfTypeAttribute.cs" />
     <Compile Include="ComponentModel\BuildablePropertyCollectionFactory.cs" />
     <Compile Include="ComponentModel\DefaultPropertyValueFactory.cs" />
@@ -185,6 +186,7 @@
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
     <Compile Include="Configuration\CompositeConfigurationKey.cs" />
     <Compile Include="Configuration\ConfigurationRegistry.cs" />
+    <Compile Include="Diagnostics\IProfiler.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Setup;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -95,15 +96,14 @@ namespace DragonSpark.Activation.IoC
 				this.inner = inner;
 			}
 
-			class Plan : AssociatedValue<NamedTypeBuildKey, IBuildPlanPolicy>
+			class Plan : AssociatedValue<IBuildPlanPolicy>
 			{
-				public Plan( NamedTypeBuildKey instance, Func<IBuildPlanPolicy> create ) : base( instance, typeof(Plan), create ) {}
+				public Plan( Type key, Func<IBuildPlanPolicy> create ) : base( ThreadAmbientContext.GetCurrent(), $"{key}_{typeof(Plan)}", create ) {}
 			}
 
 			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
 			{
-				var reference = new KeyReference( this, context.BuildKey ).Item;
-				var result = new Plan( reference, () => inner.CreatePlan( context, buildKey ) ).Item;
+				var result = new Plan( context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Item;
 				return result;
 			}
 		}

@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -87,6 +88,40 @@ namespace DragonSpark.Runtime.Values
 		public Reference( object instance, T key ) : base( instance, ConnectedValueKeyFactory<T>.Instance.Create( new EqualityList( key ) ), () => key ) {}
 	}
 
+	public class ListValue<T> : FixedValue<T>
+	{
+		readonly IList list;
+
+		public ListValue( [Required] IList list )
+		{
+			this.list = list;
+		}
+
+		public override void Assign( T item )
+		{
+			if ( item == null )
+			{
+				Remove( Item );
+			}
+			else if ( !list.Contains( item ) )
+			{
+				list.Add( item );
+			}
+			
+			base.Assign( item );
+		}
+
+		void Remove( T item )
+		{
+			if ( item != null && list.Contains( item ) )
+			{
+				list.Remove( item );
+			}
+		}
+
+		protected override void OnDispose() => Remove( Item );
+	}
+
 	public class Checked : AssociatedValue<ConditionMonitor>
 	{
 		public Checked( object instance ) : this( instance, instance ) {}
@@ -102,7 +137,7 @@ namespace DragonSpark.Runtime.Values
 	{
 		public AssociatedValue( object instance, Func<T> create = null ) : this( instance, typeof(AssociatedValue<object, T>), create ) {}
 
-		protected AssociatedValue( object instance, string key, Func<T> create = null ) : base( instance, key, create ) {}
+		public AssociatedValue( object instance, string key, Func<T> create = null ) : base( instance, key, create ) {}
 
 		protected AssociatedValue( object instance, Type key, Func<T> create = null ) : base( instance, key, create ) {}
 	}

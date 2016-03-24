@@ -1,11 +1,11 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using PostSharp.Aspects.Internals;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using PostSharp.Aspects.Internals;
 
 namespace DragonSpark.TypeSystem
 {
@@ -67,15 +67,15 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}
 
-		public object Qualify( object instance ) => instance.With( o => Info.IsAssignableFrom( o.GetType().GetTypeInfo() ) ? o : GetCaster( o.GetType() ).With( caster => caster.Invoke( null, new[] { o } ) ) );
+		public object Qualify( object instance ) => instance.With( o => Info.IsAssignableFrom( o.GetType().GetTypeInfo() ) ? o : /*GetCaster( o.GetType() ).With( caster => caster.Invoke( null, new[] { o } ) ) )*/ null );
 
 		public bool IsAssignableFrom( TypeInfo other ) => IsAssignableFrom( other.AsType() );
 
-		public bool IsAssignableFrom( System.Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() ) || GetCaster( other ) != null;
+		public bool IsAssignableFrom( System.Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() ) /*|| GetCaster( other ) != null*/;
 
 		public bool IsInstanceOfType( object context ) => context.With( o => IsAssignableFrom( o.GetType() ) );
 
-		MethodInfo GetCaster( System.Type other ) => Info.DeclaredMethods.SingleOrDefault( method => method.Name == "op_Implicit" && method.GetParameters().First().ParameterType.GetTypeInfo().IsAssignableFrom( other.GetTypeInfo() ) );
+		// MethodInfo GetCaster( System.Type other ) => null; // Info.DeclaredMethods.SingleOrDefault( method => method.Name == "op_Implicit" && method.GetParameters().First().ParameterType.GetTypeInfo().IsAssignableFrom( other.GetTypeInfo() ) );
 
 		public Assembly Assembly => Info.Assembly;
 
