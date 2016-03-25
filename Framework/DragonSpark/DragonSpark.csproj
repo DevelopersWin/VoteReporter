@@ -229,7 +229,7 @@
     <Compile Include="Diagnostics\ExceptionFormatter.cs" />
     <Compile Include="Diagnostics\IMessageRecorder.cs" />
     <Compile Include="Diagnostics\Message.cs" />
-    <Compile Include="Diagnostics\RecordingLogEventSink.cs" />
+    <Compile Include="Diagnostics\LoggerHistorySink.cs" />
     <Compile Include="Diagnostics\TryContext.cs" />
     <Compile Include="Extensions\BuilderContextExtensions.cs" />
     <Compile Include="Extensions\ObjectMappingParameter.cs" />

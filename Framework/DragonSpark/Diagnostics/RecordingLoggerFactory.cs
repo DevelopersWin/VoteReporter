@@ -1,113 +1,96 @@
 ﻿using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
+using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
 	public class DiagnosticsFactory : FactoryBase<IDiagnostics>
 	{
 		readonly Func<ILogger> source;
-		readonly RecordingLogEventSink sink;
 		readonly LoggingLevelSwitch levelSwitch;
-		public DiagnosticsFactory() : this( new RecordingLogEventSink(), new LoggingLevelSwitch() ) {}
 
-		DiagnosticsFactory( [Required]RecordingLogEventSink sink, [Required]LoggingLevelSwitch levelSwitch ) : this( new RecordingLoggerFactory( sink, levelSwitch ).Create, sink, levelSwitch )  {}
+		/*public DiagnosticsFactory() : this( new RecordingLoggerFactory() ) {}
 
-		public DiagnosticsFactory( [Required] Func<ILogger> source, [Required]RecordingLogEventSink sink, [Required]LoggingLevelSwitch levelSwitch )
+		DiagnosticsFactory( RecordingLoggerFactory factory ) : this( factory.Create, factory.LevelSwitch ) { }*/
+
+		public DiagnosticsFactory( [Required] Func<ILogger> source, [Required]LoggingLevelSwitch levelSwitch )
 		{
 			this.source = source;
-			this.sink = sink;
 			this.levelSwitch = levelSwitch;
 		}
 
 		protected override IDiagnostics CreateItem()
 		{
 			var logger = source();
-			var result = new Diagnostics( logger, sink, levelSwitch );
+			var result = new Diagnostics( logger, levelSwitch );
 			return result;
 		}
 	}
 
-	/*public class ProfilerFactory : FactoryBase<IProfiler>
+	public interface ILoggerHistory : ILogEventSink
 	{
-		public ProfilerFactory() : this( new RecordingLoggerFactory() ) {}
+		IEnumerable<LogEvent> Events { get; }
 
-		ProfilerFactory( RecordingLoggerFactory factory ) : this( new DiagnosticsFactory( factory.Create, factory.Sink, factory.LevelSwitch ).Create, factory.Sink ) {}
+		void Clear();
+	}
 
-		public ProfilerFactory( [Required] Func<IDiagnostics> source, [Required] RecordingLogEventSink sink )
+	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommand<string>
+	{
+		[ImportingConstructor]
+		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, LogEventMessageFactory.Instance.Create ) {}
+	}
+
+	public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
+	{
+		public PurgeLoggerHistoryCommand( ILoggerHistory history ) : base( history, events => events.Fixed() ) {}
+	}
+
+	public abstract class PurgeLoggerHistoryCommand<T> : Command<Action<T>>
+	{
+		readonly ILoggerHistory history;
+		readonly Func<IEnumerable<LogEvent>, T[]> factory;
+
+		protected PurgeLoggerHistoryCommand( [Required] ILoggerHistory history, [Required] Func<IEnumerable<LogEvent>, T[]> factory )
 		{
-			Source = source;
-			Sink = sink;
+			this.history = history;
+			this.factory = factory;
 		}
 
-		protected Func<IDiagnostics> Source { get; }
-		protected RecordingLogEventSink Sink { get; }
+		protected override void OnExecute( Action<T> parameter )
+		{
+			var messages = factory( history.Events );
+			messages.Each( parameter );
+			history.Clear();
+		}
+	}
 
-		protected override IProfiler CreateItem() => new Profiler( Source(), Sink );
-	}*/
-
-	public interface IDiagnostics : IDisposable
+	public interface IDiagnostics
 	{
 		ILogger Logger { get; }
 
 		LoggingLevelSwitch Switch { get; }
-
-		IEnumerable<LogEvent> Events { get; }
-
-		void Purge( Action<string> writer );
 	}
-
-	public static class DiagnosticsExtensions
-	{
-		public static void Complete( [Required] this IDiagnostics @this, [Required] Action<string> writer )
-		{
-			@this.Purge( writer );
-			@this.Dispose();
-		}
-	}
-
-	/*public class AssignTracingContext<T> : AssignValueCommand<T>
-	{
-		readonly Action<string> output;
-
-		public AssignTracingContext( [Required] IDiagnostics diagnostics, [Required] Action<string> output, [Required] IWritableValue<T> context ) : base( context )
-		{
-			Diagnostics = diagnostics;
-			this.output = output;
-		}
-
-		public IDiagnostics Diagnostics { get; }
-
-		protected override void OnExecute( T parameter )
-		{
-			Diagnostics.Purge( output );
-			base.OnExecute( parameter );
-		}
-
-		protected override void OnDispose()
-		{
-			base.OnDispose();
-			Diagnostics.Complete( output );
-		}
-	}*/
 
 	public class RecordingLoggingConfigurationFactory : AggregateFactory<LoggerConfiguration>
 	{
-		public RecordingLoggingConfigurationFactory() : this( new RecordingLogEventSink(), new LoggingLevelSwitch() ) {}
+		// public RecordingLoggingConfigurationFactory() : this( new RecordingLogEventSink(), new LoggingLevelSwitch() ) {}
 
-		public RecordingLoggingConfigurationFactory( [Required] RecordingLogEventSink sink, [Required] LoggingLevelSwitch controller ) 
-			: base( new LoggingConfigurationCoreFactory( controller ), new RecordingLoggingConfigurationTransformer( sink ) ) {}
+		public RecordingLoggingConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
+			: base( new LoggingConfigurationCoreFactory( controller ), transformers.Append( new RecordingLoggingConfigurationTransformer( sink ) ).Fixed() ) {}
 	}
 
-	public class LoggingFactory : FactoryBase<ILogger>
+	public class LoggerFactory : FactoryBase<ILogger>
 	{
 		readonly Func<LoggerConfiguration> source;
 
-		public LoggingFactory( [Required] Func<LoggerConfiguration> source )
+		public LoggerFactory( [Required] Func<LoggerConfiguration> source )
 		{
 			this.source = source;
 		}
@@ -135,9 +118,9 @@ namespace DragonSpark.Diagnostics
 
 	public class RecordingLoggingConfigurationTransformer : TransformerBase<LoggerConfiguration>
 	{
-		readonly RecordingLogEventSink recorder;
+		readonly ILoggerHistory recorder;
 
-		public RecordingLoggingConfigurationTransformer( [Required] RecordingLogEventSink recorder )
+		public RecordingLoggingConfigurationTransformer( [Required] ILoggerHistory recorder )
 		{
 			this.recorder = recorder;
 		}
@@ -145,17 +128,19 @@ namespace DragonSpark.Diagnostics
 		protected override LoggerConfiguration CreateItem( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( recorder );
 	}
 
-	public class RecordingLoggerFactory : LoggingFactory
+	public class RecordingLoggerFactory : LoggerFactory
 	{
-		public RecordingLoggerFactory() : this( new RecordingLogEventSink(), new LoggingLevelSwitch() ) {}
+		public RecordingLoggerFactory() : this( new LoggerHistorySink(), new LoggingLevelSwitch() ) {}
 
-		public RecordingLoggerFactory( [Required]RecordingLogEventSink sink, [Required]LoggingLevelSwitch levelSwitch ) : base( new RecordingLoggingConfigurationFactory( sink, levelSwitch ).Create )
+		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch ) : this( history, levelSwitch, new RecordingLoggingConfigurationFactory( history, levelSwitch ).Create ) {}
+
+		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, Func<LoggerConfiguration> configuration ) : base( configuration )
 		{
-			Sink = sink;
+			History = history;
 			LevelSwitch = levelSwitch;
 		}
 
-		public virtual RecordingLogEventSink Sink { get; }
+		public virtual ILoggerHistory History { get; }
 		public virtual LoggingLevelSwitch LevelSwitch { get; }
 
 		/*protected override ILogger CreateItem()

@@ -27,8 +27,8 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Same( levelSwitch, sut.Resolve<LoggingLevelSwitch>() );
 			levelSwitch.MinimumLevel = LogEventLevel.Debug;
 
-			var sink = sut.Resolve<RecordingLogEventSink>();
-			Assert.Same( sink, sut.Resolve<RecordingLogEventSink>() );
+			var sink = sut.Resolve<LoggerHistorySink>();
+			Assert.Same( sink, sut.Resolve<LoggerHistorySink>() );
 			var initial = sink.Events.Count();
 			Assert.NotEmpty( sink.Events );
 

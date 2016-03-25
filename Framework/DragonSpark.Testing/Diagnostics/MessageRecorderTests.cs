@@ -10,7 +10,7 @@ namespace DragonSpark.Testing.Diagnostics
 	public class MessageRecorderTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
-		public void Message( RecordingLogEventSink sut, string message )
+		public void Message( LoggerHistorySink sut, string message )
 		{
 			var logger = new LoggerConfiguration().WriteTo.Sink( sut ).CreateLogger();
 
@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Diagnostics
 		}
 
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
-		public void Fatal( RecordingLogEventSink sut, string message, FatalApplicationException error )
+		public void Fatal( LoggerHistorySink sut, string message, FatalApplicationException error )
 		{
 			var logger = new LoggerConfiguration().WriteTo.Sink( sut ).CreateLogger();
 

@@ -1,20 +1,20 @@
+using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
-using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using Serilog;
+using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Composition;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -30,18 +30,18 @@ namespace DragonSpark.Activation.IoC
 			: this( container, assemblies, register, new RecordingLoggerFactory() ) {}
 
 		DefaultRegistrationsExtension( [Required] IUnityContainer container, [Required] Assembly[] assemblies, [Required] RegisterDefaultCommand register, [Required] RecordingLoggerFactory factory ) 
-			: this( container, assemblies, register, factory.Sink, factory.LevelSwitch, factory.Create() ) {}
+			: this( container, assemblies, register, factory.History, factory.LevelSwitch, factory.Create() ) {}
 
-		DefaultRegistrationsExtension( [Required] IUnityContainer container, [Required] Assembly[] assemblies, [Required] RegisterDefaultCommand register, [Required]RecordingLogEventSink sink, [Required]Serilog.Core.LoggingLevelSwitch levelSwitch, [Required]ILogger logger ) 
+		DefaultRegistrationsExtension( [Required] IUnityContainer container, [Required] Assembly[] assemblies, [Required] RegisterDefaultCommand register, [Required]ILoggerHistory sink, [Required]Serilog.Core.LoggingLevelSwitch levelSwitch, [Required]ILogger logger ) 
 			: this( assemblies, register, sink, levelSwitch, logger, new PersistentServiceRegistry( container, logger, new LifetimeManagerFactory<ContainerControlledLifetimeManager>( container ) ) ) {}
 
-		DefaultRegistrationsExtension( [Required]Assembly[] assemblies, [Required]RegisterDefaultCommand register, [Required]RecordingLogEventSink sink, [Required]Serilog.Core.LoggingLevelSwitch levelSwitch, [Required]ILogger logger, [Required]PersistentServiceRegistry registry )
+		DefaultRegistrationsExtension( [Required]Assembly[] assemblies, [Required]RegisterDefaultCommand register, [Required]ILoggerHistory history, [Required]Serilog.Core.LoggingLevelSwitch levelSwitch, [Required]ILogger logger, [Required]PersistentServiceRegistry registry )
 		{
 			this.register = register;
 			this.registry = registry;
 
 			var loggingParameter = new RegisterDefaultCommand.Parameter<ILogger>( logger );
-			var sinkParameter = new RegisterDefaultCommand.Parameter<RecordingLogEventSink>( sink );
+			var sinkParameter = new RegisterDefaultCommand.Parameter<ILoggerHistory>( history );
 			parameters = new RegisterDefaultCommand.Parameter[]
 			{
 				new RegisterDefaultCommand.Parameter<Assembly[]>( assemblies ),
@@ -50,7 +50,7 @@ namespace DragonSpark.Activation.IoC
 				sinkParameter,
 				loggingParameter
 			};
-			commands = new Collection<ICommand>( new ICommand[] { new MonitorLoggerRegistrationCommand( sink, loggingParameter ), new MonitorRecordingSinkRegistrationCommand( sinkParameter ) } );
+			commands = new Collection<ICommand>( new ICommand[] { new MonitorLoggerRegistrationCommand( history, loggingParameter ), new MonitorLoggerHistoryRegistrationCommand( sinkParameter ) } );
 		}
 
 		protected override void Initialize()
@@ -138,27 +138,29 @@ namespace DragonSpark.Activation.IoC
 
 	class MonitorLoggerRegistrationCommand : MonitorRegistrationCommandBase<ILogger>
 	{
-		readonly RecordingLogEventSink sink;
+		readonly ILoggerHistory history;
 
-		public MonitorLoggerRegistrationCommand( [Required]RecordingLogEventSink sink, RegisterDefaultCommand.Parameter<ILogger> parameter ) : base( parameter )
+		public MonitorLoggerRegistrationCommand( [Required]ILoggerHistory history, RegisterDefaultCommand.Parameter<ILogger> parameter ) : base( parameter )
 		{
-			this.sink = sink;
+			this.history = history;
 		}
 
 		protected override void OnExecute( ILogger parameter )
 		{
-			var messages = sink.Purge();
-			parameter.Information( $"A new logger of type '{parameter}' has been registered.  Purging existing logger with '{messages.Length}' messages and routing them through the new logger." );
-			messages.Each( parameter.Write );
+			parameter.Information( "A new logger of type {Type} has been registered.  Purging existing logger with {Messages} messages and routing them through the new logger.", 
+				parameter.GetType(),
+				history.Events.Count()
+				);
+			new PurgeLoggerHistoryCommand( history ).ExecuteWith( new Action<LogEvent>( parameter.Write ) );
 			base.OnExecute( parameter );
 		}
 	}
 
-	class MonitorRecordingSinkRegistrationCommand : MonitorRegistrationCommandBase<RecordingLogEventSink>
+	class MonitorLoggerHistoryRegistrationCommand : MonitorRegistrationCommandBase<ILoggerHistory>
 	{
-		public MonitorRecordingSinkRegistrationCommand( RegisterDefaultCommand.Parameter<RecordingLogEventSink> parameter ) : base( parameter ) {}
+		public MonitorLoggerHistoryRegistrationCommand( RegisterDefaultCommand.Parameter<ILoggerHistory> parameter ) : base( parameter ) {}
 
-		protected override void OnExecute( RecordingLogEventSink parameter )
+		protected override void OnExecute( ILoggerHistory parameter )
 		{
 			Parameter.Instance().Events.Each( parameter.Emit );
 			base.OnExecute( parameter );

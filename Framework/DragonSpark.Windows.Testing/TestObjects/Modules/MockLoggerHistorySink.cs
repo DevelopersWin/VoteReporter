@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace DragonSpark.Windows.Testing.TestObjects.Modules
 {
-	class MockRecordingLogEventSink : RecordingLogEventSink
+	class MockLoggerHistorySink : LoggerHistorySink
 	{
 		public string LastMessage { get; private set; }
 		public string LastMessageCategory;

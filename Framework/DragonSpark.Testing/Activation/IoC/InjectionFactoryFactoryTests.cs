@@ -42,8 +42,8 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.Same( logger, container.Resolve<ILogger>() );
 			Assert.True( new RegisterDefaultCommand.Default( logger ).Item );
 
-			var original = container.Resolve<RecordingLogEventSink>();
-			Assert.Same( original, container.Resolve<RecordingLogEventSink>() );
+			var original = container.Resolve<LoggerHistorySink>();
+			Assert.Same( original, container.Resolve<LoggerHistorySink>() );
 			Assert.NotEmpty( original.Events );
 
 			var current = original.Events.ToArray();
@@ -52,7 +52,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.NotEqual( current, original.Events );
 			Assert.Equal( 1, original.Events.Except( current ).Count() );
 
-			var sink = new RecordingLogEventSink();
+			var sink = new LoggerHistorySink();
 			Assert.Empty( sink.Events );
 
 			container.RegisterInstance( sink );
@@ -102,7 +102,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.True( new RegisterDefaultCommand.Default( @default ).Item );
 			Assert.Same( @default, container.Resolve<ILogger>() );
 
-			var defaultSink = container.Resolve<RecordingLogEventSink>();
+			var defaultSink = container.Resolve<LoggerHistorySink>();
 			Assert.True( new RegisterDefaultCommand.Default( defaultSink ).Item );
 			Assert.NotEmpty( defaultSink.Events );
 
@@ -176,11 +176,11 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.True( new RegisterDefaultCommand.Default( @default ).Item );
 			Assert.Same( @default, container.Resolve<ILogger>() );
 
-			var defaultSink = container.Resolve<RecordingLogEventSink>();
+			var defaultSink = container.Resolve<LoggerHistorySink>();
 			Assert.True( new RegisterDefaultCommand.Default( defaultSink ).Item );
 			Assert.NotEmpty( defaultSink.Events );
 			
-			var sink = new RecordingLogEventSink();
+			var sink = new LoggerHistorySink();
 			container.RegisterInstance( sink );
 
 			Assert.NotEmpty( defaultSink.Events );
@@ -208,7 +208,7 @@ namespace DragonSpark.Testing.Activation.IoC
 				.Extend<DefaultRegistrationsExtension>().Extend<BuildPipelineExtension>().Extend<CompositionExtension>();
 			Assert.NotNull( container );
 			var @default = container.Resolve<ILogger>();
-			var sink = new RecordingLogEventSink();
+			var sink = new LoggerHistorySink();
 			container.RegisterInstance( sink );
 
 			var before = sink.Events.ToArray();
@@ -252,14 +252,14 @@ namespace DragonSpark.Testing.Activation.IoC
 		class LoggerFactory : RecordingLoggerFactory
 		{
 			[ImportingConstructor]
-			public LoggerFactory( RecordingLogEventSink sink, LoggingLevelSwitch levelSwitch ) : base( sink, levelSwitch ) {}
+			public LoggerFactory( LoggerHistorySink history, LoggingLevelSwitch levelSwitch ) : base( history, levelSwitch ) {}
 		}
 
 		[Export( nameof(SharedLoggerFactory) ), Shared]
 		class SharedLoggerFactory : RecordingLoggerFactory
 		{
 			[ImportingConstructor]
-			public SharedLoggerFactory( RecordingLogEventSink sink, LoggingLevelSwitch levelSwitch ) : base( sink, levelSwitch ) {}
+			public SharedLoggerFactory( LoggerHistorySink history, LoggingLevelSwitch levelSwitch ) : base( history, levelSwitch ) {}
 		}
 
 		[Fact]

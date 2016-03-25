@@ -17,18 +17,35 @@ namespace DragonSpark.Aspects
 		protected override int CreateItem( IEnumerable<object> parameter ) => parameter.Aggregate( 0x2D2816FE, ( current, item ) => current * 31 + ( item?.GetHashCode() ?? 0 ) );
 	}
 
-	public class KeyFactory : KeyFactory<string>
+	public class KeyFactory : KeyFactory<int>
 	{
 		public static KeyFactory Instance { get; } = new KeyFactory();
 
-		protected override string CreateItem( IEnumerable<object> parameter ) => parameter.Aggregate( string.Empty, ( current, item ) => string.Concat( current, "_", item ) );
+		protected override int CreateItem( IEnumerable<object> parameter )
+		{
+			var result = 0x2D2816FE;
+			foreach ( var o in parameter )
+			{
+				var next = result * 31;
+				var increment = o?.GetHashCode() ?? 0;
+				result += next + increment;
+			}
+			return result;
+		}
+	}
+
+	/*public class KeyFactory : KeyFactory<string>
+	{
+		public static KeyFactory Instance { get; } = new KeyFactory();
+
+		protected override string CreateItem( IEnumerable<object> parameter ) => parameter.Aggregate( string.Empty, ( current, item ) => string.Concat( current, "_", item.GetHashCode() ) );
 	}
 
 	public class JoinFactory : KeyFactory<string>
 	{
 		public static JoinFactory Instance { get; } = new JoinFactory();
 
-		protected override string CreateItem( IEnumerable<object> parameter ) => string.Join( "_", parameter.Select( o => o.ToString() ) );
+		protected override string CreateItem( IEnumerable<object> parameter ) => string.Join( "_", parameter.Select( o => o.GetHashCode() ) );
 	}
 
 	class Builder : KeyFactory<string>
@@ -40,11 +57,11 @@ namespace DragonSpark.Aspects
 			var builder = new StringBuilder();
 			foreach ( var o in parameter )
 			{
-				builder.Append( o );
+				builder.Append( o.GetHashCode() );
 				builder.Append( "_" );
 			}
 			var result = builder.ToString();
 			return result;
 		}
-	}
+	}*/
 }

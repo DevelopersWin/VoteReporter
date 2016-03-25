@@ -290,7 +290,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var loader = new MockModuleInitializer();
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
-			var sink = new MockRecordingLogEventSink();
+			var sink = new MockLoggerHistorySink();
 			var logger = new RecordingLoggerFactory( sink, new LoggingLevelSwitch() ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			ModuleManager manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
@@ -317,7 +317,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var loader = new MockModuleInitializer();
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
-			var sink = new MockRecordingLogEventSink();
+			var sink = new MockLoggerHistorySink();
 			var logger = new RecordingLoggerFactory( sink, new LoggingLevelSwitch() ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManagerExtended(loader, catalog, logger, moduleTypeLoader);
@@ -360,7 +360,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var loader = new MockModuleInitializer();
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
-			var sink = new MockRecordingLogEventSink();
+			var sink = new MockLoggerHistorySink();
 			var logger = new RecordingLoggerFactory( sink, new LoggingLevelSwitch() ).Create();
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);

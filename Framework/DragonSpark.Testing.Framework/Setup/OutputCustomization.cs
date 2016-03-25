@@ -32,17 +32,6 @@ namespace DragonSpark.Testing.Framework.Setup
 			var autoData = Services.Get<AutoData>().With( OnInitializing );
 			var items = autoData?.Items ?? new Items<IAutoDataCustomization>( fixture ).Item;
 			items.Ensure( ( IAutoDataCustomization)this );
-
-			/*var autoData = Services.Get<AutoData>();
-			if ( autoData != null )
-			{
-				OnInitializing( autoData );
-			}
-			else
-			{
-				var list = new Items<IAutoDataCustomization>( fixture ).Item;
-				list.Ensure( (IAutoDataCustomization)this );
-			}*/
 		}
 
 		void IAutoDataCustomization.Initializing( AutoData data ) => OnInitializing( data );
@@ -88,29 +77,17 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class OutputCustomization : AutoDataCustomization
 	{
-		//readonly TraceListenerListValue value = new TraceListenerListValue();
-
-		/*[Service]
-		public ILogger Logger { [return: Required]get; set; }*/
-
 		[Service]
-		public RecordingLogEventSink Sink { [return: Required]get; set; }
-
-		protected override void OnInitializing( AutoData context )
-		{
-			// value.Assign( new SerilogTraceListener.SerilogTraceListener( Logger ) );
-			base.OnInitializing( context );
-		}
+		public ILoggerHistory History { [return: Required]get; set; }
 
 		protected override void OnInitialized( AutoData context )
 		{
 			var declaringType = context.Method.DeclaringType;
 			if ( declaringType.GetConstructors().Where( info => info.IsPublic ).Any( info => info.GetParameters().Any( parameterInfo => parameterInfo.ParameterType == typeof(ITestOutputHelper) ) ) )
 			{
-				var lines = PurgingEventFactory.Instance.Create( Sink );
+				var lines = LogEventMessageFactory.Instance.Create( History.Events );
 				new OutputValue( declaringType ).Assign( lines );	
 			}
-			// value.Dispose();
 		}
 	}
 }

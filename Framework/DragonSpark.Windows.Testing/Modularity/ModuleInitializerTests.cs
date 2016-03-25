@@ -66,7 +66,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		public void ShouldLogModuleInitializationError()
 		{
 			IServiceLocator containerFacade = new MockContainerAdapter();
-			var sink = new MockRecordingLogEventSink();
+			var sink = new MockLoggerHistorySink();
 			var logger = new RecordingLoggerFactory( sink, new LoggingLevelSwitch() ).Create();
 			var service = new ModuleInitializer(containerFacade, logger);
 			ExceptionThrowingModule.wasInitializedOnce = false;

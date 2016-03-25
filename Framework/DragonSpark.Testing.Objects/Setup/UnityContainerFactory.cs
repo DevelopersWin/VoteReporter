@@ -25,21 +25,17 @@ namespace DragonSpark.Testing.Objects.Setup
 		public UnityContainerFactory() : base( Default<Assembly>.Items ) {}
 	}
 
-	/*[Export( typeof(Serilog.Core.LoggingLevelSwitch) ), Shared]
-	public class LoggingLevelSwitch : Serilog.Core.LoggingLevelSwitch
-	{}*/
-
 	[Export, Shared]
 	public class RecordingLoggerFactory : Diagnostics.RecordingLoggerFactory
 	{
 		[ImportingConstructor]
-		public RecordingLoggerFactory() : base() {}
+		public RecordingLoggerFactory() {}
 
 		[Export]
 		public override LoggingLevelSwitch LevelSwitch => base.LevelSwitch;
 
 		[Export]
-		public override RecordingLogEventSink Sink => base.Sink;
+		public override ILoggerHistory History => base.History;
 	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute

@@ -1,31 +1,34 @@
 ﻿using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
-using PostSharp.Patterns.Model;
 using Serilog;
 using Serilog.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using DragonSpark.Aspects;
+using System.Runtime.CompilerServices;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	public class TracerFactory : ConfiguringFactory<Tracer>
+	public class TracerFactory : ConfiguringFactory<ITracer>
 	{
-		public TracerFactory( [Required] Action<string> output ) : this( new PurgeDiagnosticsCommand( output ), new List<TraceListener>() ) {}
+		public TracerFactory( [Required] Action<string> output ) : this( output, new LoggerHistorySink() ) {}
 
-		public TracerFactory( PurgeDiagnosticsCommand purgeCommand, IList<TraceListener> listeners ) 
-			: this( new DiagnosticsFactory( listeners ).Create, new DisposeTracerCommand( purgeCommand, listeners ).Run, new ConfigureTracer( purgeCommand ).Run ) {}
+		public TracerFactory( [Required] Action<string> output, [Required] ILoggerHistory history, [CallerMemberName]string context = null ) 
+			: this( new PurgeDiagnosticsCommand( history, output ), history, new List<TraceListener>(), context ) {}
 
-		public TracerFactory( Func<IDiagnostics> diagnostics, Action<Tracer> dispose, Action<Tracer> configure )
-			: base( new TracerFactoryCore( diagnostics, dispose ).Create, configure ) {}
+		TracerFactory( PurgeDiagnosticsCommand purgeCommand, ILoggerHistory history, IList<TraceListener> listeners, string context ) 
+			: this( new DiagnosticsFactory( history, listeners ).Create, context, new DisposeTracerCommand( purgeCommand, listeners ).Run, new ConfigureTracer( purgeCommand ).Run ) {}
+
+		public TracerFactory( Func<IDiagnostics> diagnostics, string context, Action<ITracer> dispose, Action<ITracer> configure )
+			: base( () => new Tracer( diagnostics(), context, dispose ), configure ) {}
 	}
 
-	public class ConfigureTracer : Command<Tracer>
+	public class ConfigureTracer : Command<ITracer>
 	{
 		readonly PurgeDiagnosticsCommand purge;
 
@@ -34,14 +37,14 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			this.purge = purge;
 		}
 
-		protected override void OnExecute( Tracer parameter )
+		protected override void OnExecute( ITracer parameter )
 		{
-			purge.ExecuteWith( parameter.Diagnostics );
-			parameter.Profiler.Start();
+			purge.ExecuteWith( parameter );
+			parameter.Start();
 		}
 	}
 
-	public class DisposeTracerCommand : Command<Tracer>
+	public class DisposeTracerCommand : Command<ITracer>
 	{
 		readonly PurgeDiagnosticsCommand purge;
 		readonly IList<TraceListener> listeners;
@@ -56,40 +59,48 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			this.remove = remove;
 		}
 
-		protected override void OnExecute( Tracer parameter )
+		protected override void OnExecute( ITracer parameter )
 		{
-			purge.ExecuteWith( parameter.Diagnostics );
+			purge.ExecuteWith( parameter );
 			listeners.Purge().Each( remove.Run );
 		}
 	}
 
-	public class PurgeDiagnosticsCommand : Command<IDiagnostics>
+	public class PurgeDiagnosticsCommand : FixedCommand
 	{
-		readonly Action<string> output;
-
-		public PurgeDiagnosticsCommand( [Required] Action<string> output )
-		{
-			this.output = output;
-		}
-
-		protected override void OnExecute( IDiagnostics parameter ) => parameter.Purge( output );
+		public PurgeDiagnosticsCommand( [Required] ILoggerHistory history, [Required] Action<string> output ) : this( new PurgeLoggerMessageHistoryCommand( history ), output ) {}
+		public PurgeDiagnosticsCommand( [Required] PurgeLoggerMessageHistoryCommand command, [Required] Action<string> output ) : base( command, output ) {}
 	}
 
 	public class DiagnosticsFactory : DragonSpark.Diagnostics.DiagnosticsFactory
 	{
-		public DiagnosticsFactory( IList<TraceListener> listeners ) : this( new RecordingLogEventSink(), new LoggingLevelSwitch(), listeners ) {}
+		public DiagnosticsFactory( [Required] ILoggerHistory history, [Required] IList<TraceListener> listeners ) : this( history, new LoggingLevelSwitch(), listeners ) {}
 
-		public DiagnosticsFactory( RecordingLogEventSink sink, LoggingLevelSwitch levelSwitch, IList<TraceListener> listeners ) : this( new RecordingLoggerFactory( sink, levelSwitch ).Create, sink, levelSwitch, listeners ) {}
-
-		public DiagnosticsFactory( Func<ILogger> source, RecordingLogEventSink sink, LoggingLevelSwitch levelSwitch, IList<TraceListener> listeners ) : base( new Factory( source, listeners ).Create, sink, levelSwitch ) {}
+		public DiagnosticsFactory( ILoggerHistory sink, LoggingLevelSwitch levelSwitch, IList<TraceListener> listeners ) : base( new TracingLoggerFactory( sink, levelSwitch, listeners ).Create, levelSwitch ) {}
 	}
 
-	public class Factory : FactoryBase<ILogger>
+	public class RecordingLoggerFactory : DragonSpark.Diagnostics.RecordingLoggerFactory
+	{
+		public RecordingLoggerFactory( ILoggerHistory history, LoggingLevelSwitch levelSwitch ) 
+			: base( history, levelSwitch, new RecordingLoggingConfigurationFactory( history, levelSwitch, SourceContextTransformer.Instance ).Create ) {}
+	}
+
+	public class SourceContextTransformer : TransformerBase<LoggerConfiguration>
+	{
+		public static SourceContextTransformer Instance { get; } = new SourceContextTransformer();
+
+		protected override LoggerConfiguration CreateItem( LoggerConfiguration parameter ) => parameter.Enrich.FromLogContext();
+	}
+
+	public class TracingLoggerFactory : FactoryBase<ILogger>
 	{
 		readonly Func<ILogger> inner;
 		readonly IList<TraceListener> listeners;
 
-		public Factory( [Required] Func<ILogger> inner, [Required] IList<TraceListener> listeners )
+		public TracingLoggerFactory( ILoggerHistory sink, LoggingLevelSwitch levelSwitch, [Required] IList<TraceListener> listeners ) 
+			: this( new RecordingLoggerFactory( sink, levelSwitch ).Create, listeners ) {}
+
+		TracingLoggerFactory( [Required] Func<ILogger> inner, [Required] IList<TraceListener> listeners )
 		{
 			this.inner = inner;
 			this.listeners = listeners;
@@ -98,44 +109,42 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		protected override ILogger CreateItem()
 		{
 			var command = new EnableTraceCommand( new LoggingTraceListenerFactory( listeners ).Create );
-			var result = new TracingLoggerFactory( inner, command ).Create();
+			var result = new ConfiguringFactory<ILogger>( inner, command.Run ).Create();
 			return result;
 		}
 	}
 
-	public class TracerFactoryCore : FactoryBase<Tracer>
+	/*public class TracerFactoryCore : FactoryBase<Tracer>
 	{
 		readonly Func<IDiagnostics> diagnosticsSource;
-		readonly Action<Tracer> dispose;
+		readonly Action<ITracer> dispose;
 
-		public TracerFactoryCore( [Required] Func<IDiagnostics> diagnosticsSource, [Required] Action<Tracer> dispose )
+		public TracerFactoryCore( [Required] Func<IDiagnostics> diagnosticsSource, [Required] Action<ITracer> dispose )
 		{
 			this.diagnosticsSource = diagnosticsSource;
 			this.dispose = dispose;
 		}
 
 		protected override Tracer CreateItem() => new Tracer( diagnosticsSource(), dispose );
-	}
+	}*/
+
+	public interface ITracer : IDiagnostics, IProfiler {}
 
 	// [Disposable( ThrowObjectDisposedException = true )]
-	public class Tracer : IDisposable
+	public class Tracer : ITracer
 	{
+		readonly IDiagnostics diagnostics;
+		readonly IProfiler profiler;
 		readonly Action<Tracer> dispose;
 
-		public Tracer( [Required] IDiagnostics diagnostics, Action<Tracer> dispose ) : this( diagnostics, new Profiler( diagnostics.Logger ), dispose ) {}
+		public Tracer( [Required] IDiagnostics diagnostics, string context, Action<ITracer> dispose ) : this( diagnostics, new Profiler( diagnostics.Logger, context ), dispose ) {}
 
-		public Tracer( [Required] IDiagnostics diagnostics, [Required] IProfiler profiler, [Required]Action<Tracer> dispose )
+		public Tracer( [Required] IDiagnostics diagnostics, [Required] IProfiler profiler, [Required]Action<ITracer> dispose )
 		{
+			this.diagnostics = diagnostics;
+			this.profiler = profiler;
 			this.dispose = dispose;
-			Diagnostics = diagnostics;
-			Profiler = profiler;
 		}
-
-		[Child]
-		public IDiagnostics Diagnostics { get; }
-
-		[Child]
-		public IProfiler Profiler { get; }
 
 		public void Dispose()
 		{
@@ -148,18 +157,25 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		[Freeze]
 		protected virtual void OnDispose()
 		{
-			Diagnostics.Dispose();
-			Profiler.Dispose();
+			profiler.Dispose();
 			dispose( this );
 		}
+
+		public ILogger Logger => diagnostics.Logger;
+
+		public LoggingLevelSwitch Switch => diagnostics.Switch;
+
+		public void Mark( string @event ) => profiler.Mark( @event );
+
+		public void Start() => profiler.Start();
 	}
 
-	public class TracingLoggerFactory : ConfiguringFactory<ILogger>
+	/*public class TracingLoggerFactory : ConfiguringFactory<ILogger>
 	{
-		public TracingLoggerFactory( Func<ILogger> inner, EnableTraceCommand enable ) : this( inner, enable.Run ) {}
+		//public TracingLoggerFactory( Func<ILogger> inner, EnableTraceCommand enable ) : this( inner, enable.Run ) {}
 
 		public TracingLoggerFactory( Func<ILogger> inner, Action<ILogger> configure ) : base( inner, configure ) {}
-	}
+	}*/
 
 	public class AddItemCommand<T> : Command<T>
 	{

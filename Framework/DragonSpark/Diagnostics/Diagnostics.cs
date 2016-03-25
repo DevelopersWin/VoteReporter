@@ -5,21 +5,16 @@ using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Core;
-using Serilog.Events;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace DragonSpark.Diagnostics
 {
 	public class Diagnostics : IDiagnostics
 	{
-		readonly RecordingLogEventSink sink;
-
-		public Diagnostics( [Required] ILogger logger, [Required] RecordingLogEventSink sink, [Required] LoggingLevelSwitch levelSwitch )
+		public Diagnostics( [Required] ILogger logger, [Required] LoggingLevelSwitch levelSwitch )
 		{
 			Logger = logger;
-			this.sink = sink;
 			Switch = levelSwitch;
 		}
 
@@ -27,11 +22,11 @@ namespace DragonSpark.Diagnostics
 
 		public LoggingLevelSwitch Switch { get; }
 
-		public IEnumerable<LogEvent> Events => sink.Events;
+		/*public IEnumerable<LogEvent> Events => sink.Events;
 
-		public void Purge( Action<string> writer ) => PurgingEventFactory.Instance.Create( sink ).Each( writer );
+		public void Purge( Action<string> writer ) => LogEventMessageFactory.Instance.Create( sink ).Each( writer );*/
 
-		public void Dispose()
+		/*public void Dispose()
 		{
 			Dispose( true );
 			GC.SuppressFinalize( this );
@@ -40,7 +35,7 @@ namespace DragonSpark.Diagnostics
 		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
 
 		[Freeze]
-		protected virtual void OnDispose() {}
+		protected virtual void OnDispose() {}*/
 	}
 
 	public static class ExceptionSupport
@@ -55,39 +50,45 @@ namespace DragonSpark.Diagnostics
 	// [Disposable( ThrowObjectDisposedException = true )]
 	public class Profiler : IProfiler
 	{
+		readonly string context;
 		readonly ILogger logger;
 
 		readonly Tracker tracker = new Tracker();
 
-		public Profiler( [Required] ILogger logger )
+		public Profiler( [Required] ILogger logger, [NotEmpty] string context )
 		{
+			this.context = context;
 			this.logger = logger.ForContext<Profiler>();
 		}
 
-		public virtual void Start() => tracker.Initialize();
+		public void Start()
+		{
+			Mark( "Starting" );
+			tracker.Initialize();
+		}
 
-		public void Mark( string @event ) => logger.Information( "{Time}: {Event} ({Since})", tracker.Time, @event, tracker.Mark() );
+		public void Mark( string @event ) => logger.Information( "{SourceContext} @ {Time:ss':'fff} ({Since:ss':'fff}): {Event}", context, tracker.Time, tracker.Mark(), @event );
 
 		class Tracker : IDisposable
 		{
-			readonly Stopwatch watcher = new Stopwatch();
+			readonly Stopwatch watcher = Stopwatch.StartNew();
 
-			readonly FixedValue<long> last = new FixedValue<long>();
+			readonly FixedValue<TimeSpan> last = new FixedValue<TimeSpan>();
 
 			public void Initialize() => Reset( watcher.Restart );
 
 			void Reset( Action action )
 			{
-				last.Assign( default(long) );
+				last.Assign( default(TimeSpan) );
 				action();
 			}
 
-			public long Time => watcher.ElapsedMilliseconds;
+			public TimeSpan Time => watcher.Elapsed;
 
-			public long Mark()
+			public TimeSpan Mark()
 			{
-				var result = watcher.ElapsedMilliseconds - last.Item;
-				last.Assign( watcher.ElapsedMilliseconds );
+				var result = watcher.Elapsed - last.Item;
+				last.Assign( watcher.Elapsed );
 				return result;
 			}
 

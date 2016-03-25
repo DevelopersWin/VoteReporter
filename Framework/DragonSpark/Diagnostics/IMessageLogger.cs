@@ -19,15 +19,6 @@ namespace DragonSpark.Diagnostics
 	[ContentProperty( nameof(Commands) )]
 	public class ConfiguringLoggerConfigurationFactory : TransformerBase<LoggerConfiguration>
 	{
-		/*public ConfiguringLoggerConfigurationFactory() : this( new LoggerConfiguration() ) {}
-
-		public ConfiguringLoggerConfigurationFactory( [Required]LoggerConfiguration configuration )
-		{
-			Configuration = configuration;
-		}
-
-		public LoggerConfiguration Configuration { get; set; }*/
-
 		public Collection<Command<LoggerConfiguration>> Commands { get; } = new Collection<Command<LoggerConfiguration>>();
 
 		protected override LoggerConfiguration CreateItem( LoggerConfiguration configuration ) => Commands.Aggregate( configuration, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Run ) );
