@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Aspects;
+﻿using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -11,12 +10,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
 	public class TracerFactory : ConfiguringFactory<ITracer>
 	{
-		public TracerFactory( [Required] Action<string> output ) : this( output, new LoggerHistorySink() ) {}
+		public TracerFactory( [Required] Action<string> output, [CallerMemberName]string context = null ) : this( output, new LoggerHistorySink(), context ) {}
 
 		public TracerFactory( [Required] Action<string> output, [Required] ILoggerHistory history, [CallerMemberName]string context = null ) 
 			: this( new PurgeDiagnosticsCommand( history, output ), history, new List<TraceListener>(), context ) {}
@@ -114,23 +114,8 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		}
 	}
 
-	/*public class TracerFactoryCore : FactoryBase<Tracer>
-	{
-		readonly Func<IDiagnostics> diagnosticsSource;
-		readonly Action<ITracer> dispose;
-
-		public TracerFactoryCore( [Required] Func<IDiagnostics> diagnosticsSource, [Required] Action<ITracer> dispose )
-		{
-			this.diagnosticsSource = diagnosticsSource;
-			this.dispose = dispose;
-		}
-
-		protected override Tracer CreateItem() => new Tracer( diagnosticsSource(), dispose );
-	}*/
-
 	public interface ITracer : IDiagnostics, IProfiler {}
 
-	// [Disposable( ThrowObjectDisposedException = true )]
 	public class Tracer : ITracer
 	{
 		readonly IDiagnostics diagnostics;

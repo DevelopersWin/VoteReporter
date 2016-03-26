@@ -1,5 +1,5 @@
-using DragonSpark.Activation.FactoryModel;
 using System;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Markup
 {

@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
@@ -14,6 +13,7 @@ using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 using Type = System.Type;
 
 namespace DragonSpark.Composition

@@ -1,13 +1,13 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
-using System.Diagnostics;
-using System.Reflection;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Testing.Setup;
-using Serilog;
+using System.Diagnostics;
+using System.Reflection;
+using DragonSpark.TypeSystem;
+using Ploeh.AutoFixture.Kernel;
 using Xunit;
 using Xunit.Abstractions;
-using Application = DragonSpark.Testing.Objects.IoC.Application;
 
 namespace DragonSpark.Testing.Setup.Registration
 {
@@ -18,6 +18,12 @@ namespace DragonSpark.Testing.Setup.Registration
 		[Fact]
 		public void First()
 		{
+			/*var first = Default<ISpecimenBuilder>.Items;
+			var second = Default<ISpecimenBuilder>.Items;
+
+			var third = Default<ISpecimenBuilder>.Item;
+			var fourth = Default<ISpecimenBuilder>.Item;*/
+
 			Create();
 			Second();
 			/*var stopwatch = new Stopwatch().With( sw => sw.Start() );
@@ -44,13 +50,17 @@ namespace DragonSpark.Testing.Setup.Registration
 					var application = new Windows.Testing.Setup.Application<LocationSetup>();
 					using ( new ExecuteApplicationCommand( application ).ExecuteWith( autoData ) )
 					{
+						/*var first = GetType().Assembly.Has<RegistrationBaseAttribute>();
+						var second = GetType().Assembly.Has<RegistrationBaseAttribute>();
+						Debugger.Break();*/
+
 						/*var logger1 = application.Get<ILogger>();
 						logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );*/
 						// autoData.Initialize();
 
 						/*var registerFromMetadataCommand = application.Get<RegisterFromMetadataCommand>();
 						registerFromMetadataCommand.ExecuteWith( new object() );*/
-						
+
 						/*var customization = new CompositionCustomization();
 						var item = customization.AutoData;*/
 						// Debugger.Break();

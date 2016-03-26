@@ -1,9 +1,9 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using System.Diagnostics;
 using System.Reflection;
+using DragonSpark.Activation;
 using Xunit;
 using Xunit.Abstractions;
 using Application = DragonSpark.Testing.Objects.IoC.Application;
@@ -49,7 +49,7 @@ namespace DragonSpark.Testing.Setup.Registration
 		}*/
 	}
 
-	public class MetadataRegistrationCommandOtherTests : Tests
+	/*public class MetadataRegistrationCommandOtherTests : Tests
 	{
 		public MetadataRegistrationCommandOtherTests( ITestOutputHelper output ) : base( output ) {}
 
@@ -68,21 +68,21 @@ namespace DragonSpark.Testing.Setup.Registration
 						autoData.Initialize();
 
 						/*var registerFromMetadataCommand = application.Get<RegisterFromMetadataCommand>();
-						registerFromMetadataCommand.ExecuteWith( new object() );*/
+						registerFromMetadataCommand.ExecuteWith( new object() );#1#
 						
 						/*var customization = new CompositionCustomization();
-						var item = customization.AutoData;*/
+						var item = customization.AutoData;#1#
 						// Debugger.Break();
 					}
 				}
 
-				/*ApplicationFactory.Instance.Create( methodUnderTest );*/
+				/*ApplicationFactory.Instance.Create( methodUnderTest );#1#
 			} );
 
 			/*var info = typeof(CompositionCustomization).GetProperty( nameof(CompositionCustomization.AutoData) );
 
 			var meets = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );
-			var asdf = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );*/
+			var asdf = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );#1#
 			Output.WriteLine( $"Complete: {stopwatch.ElapsedMilliseconds}." );
 		}
 
@@ -96,5 +96,5 @@ namespace DragonSpark.Testing.Setup.Registration
 			} );
 			Output.WriteLine( $"Complete: {stopwatch.ElapsedMilliseconds}." );
 		}
-	}
+	}*/
 }

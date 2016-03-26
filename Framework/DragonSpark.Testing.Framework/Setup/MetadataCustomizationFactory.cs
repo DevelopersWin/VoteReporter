@@ -1,9 +1,9 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using Ploeh.AutoFixture;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Testing.Framework.Setup
 {

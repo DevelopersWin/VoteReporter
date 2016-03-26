@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using Microsoft.Practices.Unity;
 
 namespace DragonSpark.Activation.IoC

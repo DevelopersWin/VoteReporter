@@ -1,6 +1,6 @@
 using System;
 using System.Configuration;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Setup
 {

@@ -59,14 +59,17 @@ namespace DragonSpark.Activation.IoC
 
 			parameters.Each( register.ExecuteWith );
 
+			registry.Register( Context );
+			registry.Register( Context.Policies );
+			registry.Register<IStagedStrategyChain>( Context.BuildPlanStrategies );
+
 			registry.Register<IServiceRegistry, ServiceRegistry>();
 			registry.Register<IActivator, Activator>();
-			registry.Register( Context );
 		}
 
 		class Activator : CompositeActivator
 		{
-			public Activator( [Required]IoC.Activator activator ) : base( activator, SystemActivator.Instance ) {}
+			public Activator( [Required]Locator locator, [Required]Constructor constructor ) : base( locator, constructor, Activation.Constructor.Instance ) {}
 		}
 
 		protected override void OnRegisteringInstance( object sender, RegisterInstanceEventArgs args ) => commands.ExecuteMany( args.Instance ).NotNull().ToArray().Each( command =>

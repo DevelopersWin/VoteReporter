@@ -1,8 +1,8 @@
-using DragonSpark.Extensions;
 using System;
 using System.Linq;
+using DragonSpark.Extensions;
 
-namespace DragonSpark.Activation.FactoryModel
+namespace DragonSpark.Activation
 {
 	public class FixedFactoryParameterCoercer<TParameter> : IFactoryParameterCoercer<TParameter>
 	{

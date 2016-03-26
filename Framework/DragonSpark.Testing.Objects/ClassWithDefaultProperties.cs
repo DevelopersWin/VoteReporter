@@ -52,10 +52,10 @@ namespace DragonSpark.Testing.Objects
 		[CurrentTime]
 		public DateTimeOffset CurrentDateTimeOffset { get; set; }
 
-		[Activate]
+		[Service]
 		public Class Activated { get; set; }
 
-		[Factory( typeof(ConstructFactory) )]
+		[Factory( typeof(Constructor) )]
 		public object Factory { get; set; }
 
 		[Collection]

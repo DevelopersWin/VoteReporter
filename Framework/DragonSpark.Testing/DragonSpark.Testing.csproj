@@ -202,7 +202,6 @@
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryReflectionSupportTests.cs" />
-    <Compile Include="Activation\FactoryTests.cs" />
     <Compile Include="Activation\IExecutionContextTests.cs" />
     <Compile Include="Activation\IoC\InjectionFactoryFactoryTests.cs" />
     <Compile Include="Activation\IoC\LifetimeManagerFactoryTests.cs" />
@@ -229,7 +228,7 @@
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
     <Compile Include="Diagnostics\MessageRecorderTests.cs" />
-    <Compile Include="Diagnostics\LoggingConfigurationTransformer.cs" />
+    <Compile Include="Diagnostics\CompositionTests.cs" />
     <Compile Include="Extensions\AssemblyExtensionsTests.cs" />
     <Compile Include="Extensions\BooleanExtensionsTests.cs">
       <SubType>Code</SubType>

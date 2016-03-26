@@ -1,7 +1,7 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 using DragonSpark.Setup.Registration;
 
 namespace DragonSpark.ComponentModel

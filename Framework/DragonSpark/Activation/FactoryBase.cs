@@ -1,11 +1,12 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
-using PostSharp.Patterns.Contracts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Aspects;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
+using PostSharp.Patterns.Contracts;
 
-namespace DragonSpark.Activation.FactoryModel
+namespace DragonSpark.Activation
 {
 	public class SelfTransformer<T> : TransformerBase<T>
 	{
@@ -97,9 +98,14 @@ namespace DragonSpark.Activation.FactoryModel
 
 		protected abstract TResult CreateItem( [Required]TParameter parameter );
 
-		public TResult Create( TParameter parameter ) => specification.IsSatisfiedBy( parameter ) ? CreateItem( parameter ) : default(TResult);
+		public TResult Create( TParameter parameter ) => CanCreate( parameter ) ? CreateItem( parameter ) : default(TResult);
 
-		object IFactoryWithParameter.Create( object parameter )
+		[Freeze]
+		public bool CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
+
+		object IFactoryWithParameter.Create( object parameter ) => CreateFromItem( parameter );
+
+		protected object CreateFromItem( object parameter )
 		{
 			var qualified = coercer.Coerce( parameter );
 			var result = Create( qualified );

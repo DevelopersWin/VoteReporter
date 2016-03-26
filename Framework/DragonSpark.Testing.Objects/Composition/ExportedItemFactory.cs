@@ -1,5 +1,5 @@
 using System.Composition;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 

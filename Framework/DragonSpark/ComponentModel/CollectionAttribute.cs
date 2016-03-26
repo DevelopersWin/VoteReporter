@@ -1,17 +1,17 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using System;
+using DragonSpark.Activation;
 
 namespace DragonSpark.ComponentModel
 {
-	public class CollectionAttribute : ActivateAttributeBase
+	public class CollectionAttribute : ServicesValueBase
 	{
 		public CollectionAttribute( Type elementType = null, string name = null ) : base( t => Create( elementType, name ) ) {}
 
-		static ActivatedValueProvider Create( Type type, string name ) => new ActivatedValueProvider( p =>
+		static ServicesValueProvider Create( Type type, string name ) => new ServicesValueProvider( p =>
 		{
 			var elementType = type ?? p.PropertyType.Adapt().GetEnumerableType();
-			var result = new ActivateParameter( elementType.With( Transformer.Instance.Create ), name );
+			var result = elementType.With( Transformer.Instance.Create );
 			return result;
 		} );
 

@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
@@ -23,10 +22,11 @@ using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.ComponentModel;
 using Xunit;
 using Xunit.Abstractions;
-using Activator = DragonSpark.Windows.Testing.TestObjects.Activator;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
+using Constructor = DragonSpark.Activation.Constructor;
 using Object = DragonSpark.Testing.Objects.Object;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
@@ -59,41 +59,41 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.IsType<LocationSetup>( sut );
 		}
 
-		[Map( typeof(IActivator), typeof(Activator))]
+		[Map( typeof(IActivator), typeof(Locator))]
 		[Theory, LocationSetup.AutoData]
-		public void CreateInstance( [Registered]IActivator activator )
+		public void CreateInstance( [Registered]IActivator locator )
 		{
 			var expected = Services.Get<IActivator>();
-			Assert.Same( expected, activator );
-			Assert.NotSame( SystemActivator.Instance, activator );
-			Assert.IsType<Activator>( activator );
-			var instance = activator.Activate<IObject>( typeof(Object) );
+			Assert.Same( expected, locator );
+			Assert.NotSame( Constructor.Instance, locator );
+			Assert.IsType<Locator>( locator );
+			var instance = locator.Activate<IObject>( typeof(Object) );
 			Assert.IsType<Object>( instance );
 
 			Assert.Equal( "DefaultActivation", instance.Name );
 		}
 
-		[Map( typeof( IActivator ), typeof( Activator ) )]
+		[Map( typeof(IActivator), typeof(Locator) )]
 		[Theory, LocationSetup.AutoData]
-		public void CreateNamedInstance( [Registered]IActivator activator, string name )
+		public void CreateNamedInstance( [Registered]ILocator locator, string name )
 		{
-			Assert.Same( Services.Get<IActivator>(), activator );
-			Assert.NotSame( SystemActivator.Instance, activator );
+			Assert.Same( Services.Get<ILocator>(), locator );
+			Assert.NotSame( Constructor.Instance, locator );
 
-			var instance = activator.Activate<IObject>( typeof(Object), name );
+			var instance = locator.Activate<IObject>( new LocateTypeRequest( typeof(Object), name ) );
 			Assert.IsType<Object>( instance );
 
 			Assert.Equal( name, instance.Name );
 		}
 
-		[Map( typeof(IActivator), typeof(Activator) )]
+		[Map( typeof(IConstructor), typeof(TestObjects.Constructor) )]
 		[Theory, LocationSetup.AutoData]
-		public void CreateItem( [Registered]IActivator activator )
+		public void CreateItem( [Registered]IConstructor locator )
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
-			Assert.Same( Services.Get<IActivator>(), activator );
-			Assert.NotSame( SystemActivator.Instance, activator );
-			var instance = activator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
+			Assert.Same( Services.Get<IActivator>(), locator );
+			Assert.NotSame( Constructor.Instance, locator );
+			var instance = locator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
 			Assert.NotNull( instance );
 
 			Assert.Equal( parameters, instance.Parameters );
@@ -177,7 +177,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Same( sut.Object, registered );
 			registered.Register<IInterface, Class>();
 
-			sut.Verify( x => x.Register( It.Is<MappingRegistrationParameter>( parameter => parameter.MappedTo == typeof(Class) && parameter.Type == typeof(IInterface) && parameter.Name == null ) ) );
+			sut.Verify( x => x.Register( It.Is<MappingRegistrationParameter>( parameter => parameter.MappedTo == typeof(Class) && parameter.RequestedType == typeof(IInterface) && parameter.Name == null ) ) );
 		}
 
 		[Theory, LocationSetup.AutoData]
@@ -189,7 +189,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void GetInstance( [Factory, Frozen( Matching.ExactType )]ServiceLocator sut, [Frozen, Registered]Mock<ILogger> logger )
+		void GetInstance( [DragonSpark.Testing.Framework.Factory, Frozen( Matching.ExactType )]ServiceLocator sut, [Frozen, Registered]Mock<ILogger> logger )
 		{
 			Assert.Same( sut.Get<ILogger>(), logger.Object );
 
@@ -207,7 +207,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void GetAllInstancesLocator( [Modest, Factory] ServiceLocator sut )
+		void GetAllInstancesLocator( [Modest, DragonSpark.Testing.Framework.Factory] ServiceLocator sut )
 		{
 			var registry = sut.GetInstance<IServiceRegistry>();
 			registry.Register<IInterface, Class>( "First" );
@@ -277,7 +277,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void Dispose( [Factory, Frozen] ServiceLocator sut )
+		void Dispose( [DragonSpark.Testing.Framework.Factory, Frozen] ServiceLocator sut )
 		{
 			var item = Services.Get<IInterface>( typeof(Class) );
 			Assert.NotNull( item );
@@ -300,8 +300,10 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void RelayedPropertyAttribute()
+		void RelayedPropertyAttribute( IUnityContainer container )
 		{
+			var temp = container.Resolve<ITypeDefinitionProvider>();
+
 			var attribute = typeof(Relayed).GetProperty( nameof(Relayed.Property) ).GetAttribute<Attribute>();
 			Assert.Equal( "This is a relayed property attribute.", attribute.PropertyName );
 		}

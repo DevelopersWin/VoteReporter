@@ -1,4 +1,4 @@
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
@@ -12,128 +12,141 @@ using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
+	abstract class RegistrationSpecificationBase : SpecificationBase<TypeRequest>
+	{
+		protected RegistrationSpecificationBase( [Required] IPolicyList policies )
+		{
+			Policies = policies;
+		}
+
+		protected IPolicyList Policies { get; }
+	}
+
+	class RegisteredSpecification : DecoratedSpecification<TypeRequest>
+	{
+		public RegisteredSpecification( InstanceSpecification instance, IsRegisteredSpecification registered, HasRegisteredBuildPolicySpecification registeredBuildPolicy )
+			: base( instance.Or( registered.And( registeredBuildPolicy ) ) ) {}
+	}
+
+	class InstanceSpecification : RegistrationSpecificationBase
+	{
+		public InstanceSpecification( IPolicyList policies ) : base( policies ) {}
+
+		protected override bool Verify( TypeRequest parameter ) => Policies.Get<ILifetimePolicy>( parameter ).With( policy => policy.GetValue() ) != null;
+	}
+
+	class HasRegisteredBuildPolicySpecification : RegistrationSpecificationBase
+	{
+		public HasRegisteredBuildPolicySpecification( [Required] IPolicyList policies ) : base( policies ) {}
+
+		protected override bool Verify( TypeRequest parameter ) => !( Policies.GetNoDefault<IBuildPlanPolicy>( parameter, false ) is DynamicMethodBuildPlan );
+	}
+
+	class StrategySpecification : DecoratedSpecification<TypeRequest>
+	{
+		readonly static ISpecification<StrategyValidatorParameter>[] DefaultValidators = { ArrayStrategyValidator.Instance, EnumerableStrategyValidator.Instance };
+
+		public StrategySpecification( IStagedStrategyChain strategies ) : this( strategies, DefaultValidators ) {}
+
+		protected StrategySpecification( IStagedStrategyChain strategies, [Required] IEnumerable<ISpecification<StrategyValidatorParameter>> validators ) 
+			: base( validators.Any(), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
+	}
+
+		
+	class ContainsSingletonSpecification : SpecificationBase<Type>
+	{
+		readonly ISingletonLocator locator;
+
+		public ContainsSingletonSpecification( ISingletonLocator locator )
+		{
+			this.locator = locator;
+		}
+
+		protected override bool Verify( Type parameter ) => locator.Locate( parameter ) != null;
+	}
+
+	class HasConventionSpecification : SpecificationBase<Type>
+	{
+		readonly BuildableTypeFromConventionLocator locator;
+
+		public HasConventionSpecification( BuildableTypeFromConventionLocator locator )
+		{
+			this.locator = locator;
+		}
+
+		protected override bool Verify( Type parameter ) => locator.Create( parameter ) != null;
+	}
+
+	class HasFactorySpecification : SpecificationBase<LocateTypeRequest>
+	{
+		readonly DiscoverableFactoryTypeLocator locator;
+
+		public HasFactorySpecification( [Required] DiscoverableFactoryTypeLocator locator )
+		{
+			this.locator = locator;
+		}
+
+		protected override bool Verify( LocateTypeRequest parameter ) => locator.Create( parameter ) != null;
+	}
+
 	public abstract class StrategyValidator<TStrategy> : SpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
 	{
 		protected override bool Verify( StrategyValidatorParameter parameter ) => parameter.Strategies.FirstOrDefaultOfType<TStrategy>().With( strategy => Check( parameter.Key ) );
 
-		protected abstract bool Check( NamedTypeBuildKey key );
+		protected abstract bool Check( TypeRequest key );
 	}
 
 	public class ArrayStrategyValidator : StrategyValidator<ArrayResolutionStrategy>
 	{
 		public static ArrayStrategyValidator Instance { get; } = new ArrayStrategyValidator();
 
-		protected override bool Check( NamedTypeBuildKey key ) => key.Type.IsArray;
+		protected override bool Check( TypeRequest key ) => key.RequestedType.IsArray;
 	}
 
 	public class EnumerableStrategyValidator : StrategyValidator<EnumerableResolutionStrategy>
 	{
 		public static EnumerableStrategyValidator Instance { get; } = new EnumerableStrategyValidator();
 
-		protected override bool Check( NamedTypeBuildKey key ) => key.Type.Adapt().IsGenericOf<IEnumerable<object>>();
+		protected override bool Check( TypeRequest key ) => key.RequestedType.Adapt().IsGenericOf<IEnumerable<object>>();
 	}
 
 	public class StrategyValidatorParameter
 	{
-		public StrategyValidatorParameter( IEnumerable<IBuilderStrategy> strategies, NamedTypeBuildKey key )
+		public StrategyValidatorParameter( IEnumerable<IBuilderStrategy> strategies, TypeRequest key )
 		{
 			Strategies = strategies;
 			Key = key;
 		}
 
 		public IEnumerable<IBuilderStrategy> Strategies { get; }
-		public NamedTypeBuildKey Key { get; }
-	}
-
-	class ResolutionSpecification : SpecificationBase<ResolutionSpecificationParameter>
-	{
-		readonly static ISpecification<StrategyValidatorParameter>[] DefaultValidators = { ArrayStrategyValidator.Instance, EnumerableStrategyValidator.Instance };
-
-		readonly BuildableTypeFromConventionLocator locator;
-		readonly ISingletonLocator singleton;
-		readonly Func<DiscoverableFactoryTypeLocator> factoryTypeLocator;
-		readonly IEnumerable<ISpecification<StrategyValidatorParameter>> validators;
-
-		public ResolutionSpecification( [Required]BuildableTypeFromConventionLocator locator, [Required]ISingletonLocator singleton, [Required]Func<DiscoverableFactoryTypeLocator> factoryTypeLocator ) : this( locator, singleton, factoryTypeLocator, DefaultValidators )
-		{}
-
-		ResolutionSpecification( BuildableTypeFromConventionLocator locator, ISingletonLocator singleton, Func<DiscoverableFactoryTypeLocator> factoryTypeLocator, IEnumerable<ISpecification<StrategyValidatorParameter>> validators )
-		{
-			this.locator = locator;
-			this.singleton = singleton;
-			this.factoryTypeLocator = factoryTypeLocator;
-			this.validators = validators;
-		}
-
-		static bool CheckInstance( ResolutionSpecificationParameter parameter ) => parameter.Context.Policies.Get<ILifetimePolicy>( parameter.Key ).With( policy => policy.GetValue() ) != null;
-
-		static bool CheckRegistered( ResolutionSpecificationParameter parameter ) => parameter.Context.Container.IsRegistered( parameter.Key.Type, parameter.Key.Name ) && !( parameter.Context.Policies.GetNoDefault<IBuildPlanPolicy>( parameter.Key, false ) is DynamicMethodBuildPlan );
-
-		bool Check( ResolutionSpecificationParameter parameter ) => 
-			CheckInstance( parameter ) || CheckRegistered( parameter ) 
-			|| 
-			new StrategyValidatorParameter( parameter.Context.Strategies.MakeStrategyChain(), parameter.Key ).With( p => validators.Any( specification => specification.IsSatisfiedBy( p ) ) )
-			||
-			singleton.Locate( parameter.Key.Type ) != null
-			||
-			locator.Create( parameter.Key.Type ) != null
-			||
-			factoryTypeLocator().Create( new TypeRequest( parameter.Key.Type ) ) != null
-			;
-
-		protected override bool Verify( ResolutionSpecificationParameter parameter ) => Check( parameter );
-	}
-
-	public class ResolutionSpecificationParameter
-	{
-		public ResolutionSpecificationParameter( ExtensionContext context, NamedTypeBuildKey key )
-		{
-			Context = context;
-			Key = key;
-		}
-		public ExtensionContext Context { get; }
-		public NamedTypeBuildKey Key { get; }
+		public TypeRequest Key { get; }
 	}
 
 	[Persistent]
-	class ResolutionSupport : IResolutionSupport
+	class ResolvableTypeSpecification : DecoratedSpecification<TypeRequest>
+	{
+		public ResolvableTypeSpecification( 
+			RegisteredSpecification registered, 
+			StrategySpecification strategies, 
+			HasConventionSpecification convention, 
+			ContainsSingletonSpecification singleton, 
+			HasFactorySpecification factory )
+				: base( registered.Or( strategies ).Or( convention ).Or( singleton ).Or( factory ) ) {}
+	}
+
+	public class ConstructorFactory : FactoryBase<LocateTypeRequest, ConstructorInfo>
 	{
 		readonly ExtensionContext context;
-		readonly ISpecification<ResolutionSpecificationParameter> specification;
-		readonly IList<NamedTypeBuildKey> resolvable = new List<NamedTypeBuildKey>();
 
-		public ResolutionSupport( ExtensionContext context, ResolutionSpecification specification ) 
+		public ConstructorFactory( [Required] ExtensionContext context )
 		{
 			this.context = context;
-			this.specification = specification;
-		}
-		
-		public bool CanResolve( Type type, string name, params object[] parameters )
-		{
-			var key = new NamedTypeBuildKey( type, name );
-			var result = resolvable.Contains( key ) || Validate( key, parameters.NotNull().Select( o => o.GetType() ).ToArray() );
-			return result;
 		}
 
-		bool Validate( NamedTypeBuildKey key, IEnumerable<Type> parameters )
+		[Freeze]
+		protected override ConstructorInfo CreateItem( LocateTypeRequest parameter )
 		{
-			var result = specification.IsSatisfiedBy( new ResolutionSpecificationParameter( context, key ) ) || GetConstructor( key ).With( x => Validate( x, parameters ) );
-			result.IsTrue( () => resolvable.Add( key ) );
-			return result;
-		}
-
-		bool Validate( MethodBase constructor, IEnumerable<Type> parameters )
-		{
-			var result = constructor
-				.GetParameters()
-				.Where( x => !x.ParameterType.GetTypeInfo().IsValueType )
-				.Select( parameterInfo => new NamedTypeBuildKey( parameterInfo.ParameterType ) )
-				.All( key => parameters.Any( key.Type.Adapt().IsAssignableFrom ) || GetConstructor( key ) != null || specification.IsSatisfiedBy( new ResolutionSpecificationParameter( context, key ) ) );
-			return result;
-		}
-
-		ConstructorInfo GetConstructor( NamedTypeBuildKey key )
-		{
+			var key = new NamedTypeBuildKey( parameter.RequestedType, parameter.Name );
 			var mapped = context.Policies.Get<IBuildKeyMappingPolicy>( key ).With( policy => policy.Map( key, null ) ) ?? key;
 			return context.Policies.Get<IConstructorSelectorPolicy>( mapped ).With( policy =>
 			{
@@ -143,5 +156,39 @@ namespace DragonSpark.Activation.IoC
 				return result;
 			} );
 		}
+	}
+
+	class ResolvableConstructorSpecification : SpecificationBase<ConstructTypeRequest>
+	{
+		readonly ConstructorFactory factory;
+		readonly ResolvableTypeSpecification resolvable;
+
+		public ResolvableConstructorSpecification( [Required] ConstructorFactory factory, [Required] ResolvableTypeSpecification resolvable )
+		{
+			this.factory = factory;
+			this.resolvable = resolvable;
+		}
+
+		protected override bool Verify( ConstructTypeRequest parameter ) => 
+			factory.Create( new LocateTypeRequest( parameter.RequestedType ) ).With( x => Validate( x, parameter.Arguments.NotNull().Select( o => o.GetType() ).ToArray() ) );
+
+		bool Validate( MethodBase constructor, IEnumerable<Type> parameters )
+		{
+			var result = constructor
+				.GetParameters()
+				.Where( x => !x.ParameterType.GetTypeInfo().IsValueType )
+				.Select( parameterInfo => new LocateTypeRequest( parameterInfo.ParameterType ) )
+				.All( key => parameters.Any( key.RequestedType.Adapt().IsAssignableFrom ) || factory.Create( key ) != null || resolvable.IsSatisfiedBy( key ) );
+			return result;
+		}
+	}
+
+	[Persistent]
+	class ResolutionSupport : DecoratedSpecification<TypeRequest>, IResolutionSupport
+	{
+		public ResolutionSupport( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ) ) {}
+
+		[Freeze]
+		protected override bool Verify( TypeRequest parameter ) => base.Verify( parameter );
 	}
 }

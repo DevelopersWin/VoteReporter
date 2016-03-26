@@ -1,9 +1,9 @@
 using DevelopersWin.VoteReporter.Entity;
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Windows.Entity;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
+using DragonSpark.Activation;
 
 namespace DevelopersWin.VoteReporter
 {

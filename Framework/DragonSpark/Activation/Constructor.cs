@@ -1,5 +1,7 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Threading;
 using System;
 using System.Linq;
@@ -9,18 +11,31 @@ using System.Reflection;
 namespace DragonSpark.Activation
 {
 	[Synchronized]
-	public class SystemActivator : IActivator
+	public class Constructor : ConstructorBase
 	{
-		public static SystemActivator Instance { get; } = new SystemActivator();
-
-		public bool CanActivate( Type type, string name ) => CanConstruct( type );
-
-		public object Activate( Type type, string name = null ) => Construct( type );
-
-		public bool CanConstruct( Type type, params object[] parameters )
+		class Specification : SpecificationBase<ConstructTypeRequest>
 		{
-			var info = type.GetTypeInfo();
-			var result = info.IsValueType || Coerce( type, parameters ) != null;
+			public static Specification Instance { get; } = new Specification();
+
+			protected override bool Verify( ConstructTypeRequest parameter )
+			{
+				var info = parameter.RequestedType.GetTypeInfo();
+				var result = info.IsValueType || Coerce( parameter.RequestedType, parameter.Arguments ) != null;
+				return result;
+			}
+		}
+
+		public static Constructor Instance { get; } = new Constructor();
+
+		Constructor() : base( Specification.Instance ) {}
+
+		protected override object CreateItem( ConstructTypeRequest parameter )
+		{
+			var args = Coerce( parameter.RequestedType, parameter.Arguments ) ?? Default<object>.Items;
+
+			var activator = parameter.RequestedType.Adapt().FindConstructor( args ).With( GetActivator );
+
+			var result = activator( args );
 			return result;
 		}
 
@@ -29,16 +44,6 @@ namespace DragonSpark.Activation
 			var candidates = new[] { parameters, parameters.NotNull() };
 			var adapter = type.Adapt();
 			var result = candidates.Select( objects => objects.Fixed() ).FirstOrDefault( x => adapter.FindConstructor( x ) != null );
-			return result;
-		}
-
-		public object Construct( Type type, params object[] parameters )
-		{
-			var args = Coerce( type, parameters ) ?? new object[0];
-
-			var activator = type.Adapt().FindConstructor( args ).With( GetActivator );
-
-			var result = activator( args );
 			return result;
 		}
 
@@ -65,5 +70,7 @@ namespace DragonSpark.Activation
 			var compiled = (ObjectActivator)lambda.Compile();
 			return compiled;
 		}
+
+		
 	}
 }

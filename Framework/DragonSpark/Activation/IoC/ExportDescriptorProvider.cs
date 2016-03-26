@@ -102,7 +102,7 @@ namespace DragonSpark.Activation.IoC
 		public object Create( CompositionContract contract )
 		{
 			var current = Ambient.GetCurrent<Operation>();
-			var result = current.With( operation => !operation.InProgress( contract.ContractType, contract.ContractName ), () => true ) ? activator.Activate<object>( contract.ContractType, contract.ContractName ) : null;
+			var result = current.With( operation => !operation.InProgress( contract.ContractType, contract.ContractName ), () => true ) ? activator.Create( new LocateTypeRequest( contract.ContractType, contract.ContractName ) ) : null;
 			return result;
 		}
 

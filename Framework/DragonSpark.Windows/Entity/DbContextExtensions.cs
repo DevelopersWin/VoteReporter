@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using Type = System.Type;

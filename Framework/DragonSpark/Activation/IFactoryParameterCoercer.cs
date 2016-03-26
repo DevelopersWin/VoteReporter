@@ -1,4 +1,4 @@
-namespace DragonSpark.Activation.FactoryModel
+namespace DragonSpark.Activation
 {
 	public interface IFactoryParameterCoercer<out TParameter>
 	{

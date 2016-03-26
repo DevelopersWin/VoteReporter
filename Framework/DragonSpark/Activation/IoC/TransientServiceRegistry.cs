@@ -46,24 +46,24 @@ namespace DragonSpark.Activation.IoC
 		public void Register( MappingRegistrationParameter parameter )
 		{
 			var lifetimeManager = lifetimeFactory( parameter.MappedTo ) ?? new TransientLifetimeManager();
-			container.RegisterType( parameter.Type, parameter.MappedTo, parameter.Name, lifetimeManager );
-			logger.Information( string.Format( Resources.ServiceRegistry_Registering, parameter.Type, parameter.MappedTo, lifetimeManager.GetType().FullName ) );
+			container.RegisterType( parameter.RequestedType, parameter.MappedTo, parameter.Name, lifetimeManager );
+			logger.Information( string.Format( Resources.ServiceRegistry_Registering, parameter.RequestedType, parameter.MappedTo, lifetimeManager.GetType().FullName ) );
 		}
 
 		public void Register( InstanceRegistrationParameter parameter )
 		{
 			var to = parameter.Instance.GetType();
-			var mapping = string.Concat( parameter.Type.FullName, to != parameter.Type ? $" -> {to.FullName}" : string.Empty );
+			var mapping = string.Concat( parameter.RequestedType.FullName, to != parameter.RequestedType ? $" -> {to.FullName}" : string.Empty );
 			var lifetimeManager = lifetimeFactory( to ) ?? new ContainerControlledLifetimeManager();
 			logger.Information( $"Registering Unity Instance: {mapping} ({lifetimeManager.GetType().FullName})" );
-			container.RegisterInstance( parameter.Type, parameter.Name, parameter.Instance, lifetimeManager );
+			container.RegisterInstance( parameter.RequestedType, parameter.Name, parameter.Instance, lifetimeManager );
 		}
 
 		public void RegisterFactory( FactoryRegistrationParameter parameter )
 		{
-			var lifetimeManager = lifetimeFactory( parameter.Type ) ?? new TransientLifetimeManager();
-			logger.Information( $"Registering Unity Factory: {parameter.Type} ({lifetimeManager.GetType().FullName})" );
-			container.RegisterType( parameter.Type, parameter.Name, lifetimeManager, new InjectionFactory( x => parameter.Factory() ) );
+			var lifetimeManager = lifetimeFactory( parameter.RequestedType ) ?? new TransientLifetimeManager();
+			logger.Information( $"Registering Unity Factory: {parameter.RequestedType} ({lifetimeManager.GetType().FullName})" );
+			container.RegisterType( parameter.RequestedType, parameter.Name, lifetimeManager, new InjectionFactory( x => parameter.Factory() ) );
 		}
 	}
 }

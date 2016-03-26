@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Windows.Runtime;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Modularity
 {

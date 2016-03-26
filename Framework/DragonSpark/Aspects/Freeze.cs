@@ -1,62 +1,73 @@
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
+using PostSharp.Patterns.Model;
+using PostSharp.Patterns.Threading;
 using PostSharp.Serialization;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using DragonSpark.Activation;
+using PostSharp.Patterns.Collections;
 
 namespace DragonSpark.Aspects
 {
-	[PSerializable, ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
-	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
+	// [ReaderWriterSynchronized]
+	public class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
-		/*class Cached : ConnectedValue<object>
-		{
-			public Cached( object instance, string key, Func<object> create ) : base( instance, key, () => create() ) {}
-		}*/
+		public static CacheValueFactory Instance { get; } = new CacheValueFactory();
 
 		// [Reference]
-		Cache Items { get; set; }
-		
-		public override void RuntimeInitialize( MethodBase method ) => Initialize();
+		readonly IDictionary<int, Lazy<object>> items = new AdvisableDictionary<int, Lazy<object>>();
 
-		void Initialize() => Items = new Cache();
-
-		// [Synchronized]
-		class Cache
+		Lazy<object> Get( int code, MethodInterceptionArgs args )
 		{
-			// [Reference]
-			readonly ConcurrentBag<int> keys = new ConcurrentBag<int>();
-
-			// [Reference]
-			readonly ConcurrentDictionary<int, object> items = new ConcurrentDictionary<int, object>();
-
-			public object Get( MethodInterceptionArgs args )
+			lock ( items )
 			{
-				var code = args.Arguments.Concat( new object[] { args.Method.DeclaringType, args.Method } ).Aggregate( 0x2D2816FE, ( current, item ) => current * 31 + ( item?.GetHashCode() ?? 0 ) );
-				var b = !keys.Contains( code );
-				var check = ( args.Method as MethodInfo )?.ReturnType != typeof(void) || b;
-				if ( b )
+				var add = !items.ContainsKey( code );
+				if ( add )
 				{
-					keys.Add( code );
+					items.Add( code, new Lazy<object>( args.GetReturnValue, LazyThreadSafetyMode.PublicationOnly ) );
 				}
-				var result = check ? items.GetOrAdd( code, x => args.GetReturnValue() ) : args.ReturnValue;
+				var check = add || ( args.Method as MethodInfo )?.ReturnType != typeof(void);
+				var result = check ? items[code] : null;
 				return result;
 			}
 		}
 
-		public override void OnInvoke( MethodInterceptionArgs args )
+		// [Writer]
+		protected override object CreateItem( MethodInterceptionArgs parameter )
 		{
-			if ( Items != null && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
+			var instance = parameter.Instance ?? parameter.Method.DeclaringType;
+			var enumerable = new[] { instance, parameter.DeclarationIdentifier }.Concat( parameter.Arguments );
+			var code = KeyFactory.Instance.Create( enumerable );
+			var deferred = Get( code, parameter );
+			var result = deferred != null ? deferred.Value : parameter.ReturnValue;
+			return result;
+		}
+	}
+
+	[PSerializable, ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
+	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
+	{
+		bool Enabled { get; set; }
+		
+		// public override void RuntimeInitialize( MethodBase method ) => Initialize();
+
+		void Initialize() => Enabled = true;
+
+		/*public override void OnInvoke( MethodInterceptionArgs args )
+		{
+			if ( Enabled && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
-				args.ReturnValue = Items.Get( args );
+				args.ReturnValue = CacheValueFactory.Instance.Create( args );
 			}
 			else
 			{
 				base.OnInvoke( args );
 			}
-		}
+		}*/
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
 

@@ -1,10 +1,10 @@
 using System;
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 using DragonSpark.TypeSystem;
 
 namespace DragonSpark.ComponentModel

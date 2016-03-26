@@ -1,6 +1,6 @@
-using DragonSpark.Activation.FactoryModel;
 using PostSharp.Patterns.Contracts;
 using System;
+using DragonSpark.Activation;
 
 namespace DragonSpark.TypeSystem
 {
@@ -12,6 +12,8 @@ namespace DragonSpark.TypeSystem
 		{
 			this.inner = inner;
 		}
+
+		public bool CanCreate( object parameter ) => true;
 
 		public object Create( object parameter ) => inner( parameter );
 	}

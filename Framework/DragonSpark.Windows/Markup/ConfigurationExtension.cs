@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
 using PostSharp.Patterns.Contracts;
@@ -6,6 +5,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Markup
 {

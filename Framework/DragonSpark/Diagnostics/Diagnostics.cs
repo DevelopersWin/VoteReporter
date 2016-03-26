@@ -67,7 +67,7 @@ namespace DragonSpark.Diagnostics
 			tracker.Initialize();
 		}
 
-		public void Mark( string @event ) => logger.Information( "{SourceContext} @ {Time:ss':'fff} ({Since:ss':'fff}): {Event}", context, tracker.Time, tracker.Mark(), @event );
+		public void Mark( string @event ) => logger.Information( "{SourceContext:l} @ {Time:ss':'fff} ({Since:ss':'fff}): {Event:l}", context, tracker.Time, tracker.Mark(), @event );
 
 		class Tracker : IDisposable
 		{

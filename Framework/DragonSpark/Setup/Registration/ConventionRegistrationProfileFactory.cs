@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 using Type = System.Type;
 
 namespace DragonSpark.Setup.Registration

@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
@@ -6,6 +5,7 @@ using System;
 using System.Composition;
 using System.IO;
 using System.Reflection;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Runtime
 {

@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.ComponentModel
 	[Freeze( typeof(IActivator), typeof(Activator) )]
 	public class DefaultValueProviderTests
 	{
-		public class Activator : IActivator
+		public class Activator : LocatorBase
 		{
 			readonly IServiceLocator locator;
 
@@ -22,14 +22,8 @@ namespace DragonSpark.Testing.ComponentModel
 			{
 				this.locator = locator;
 			}
-
-			public bool CanActivate( Type type, string name ) => true;
-
-			public object Activate( Type type, string name = null ) => locator.GetInstance( type, name );
-
-			public bool CanConstruct( Type type, params object[] parameters ) => true;
-
-			public object Construct( Type type, params object[] parameters ) => locator.GetInstance( type );
+			
+			protected override object CreateItem( LocateTypeRequest parameter ) => locator.GetInstance( parameter.RequestedType, parameter.Name );
 		}
 
 		[Theory, Objects.IoC.AutoData]

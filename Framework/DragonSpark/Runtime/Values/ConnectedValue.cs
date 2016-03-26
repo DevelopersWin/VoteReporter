@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
@@ -6,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using DragonSpark.Aspects;
 
 namespace DragonSpark.Runtime.Values
 {
@@ -44,7 +44,7 @@ namespace DragonSpark.Runtime.Values
 	{
 		readonly Func<T> create;
 
-		protected ConnectedValue( object instance, Type type, Func<T> create = null ) : this( instance, type.AssemblyQualifiedName, create )
+		protected ConnectedValue( object instance, Type type, Func<T> create = null ) : this( instance, type.GetHashCode().ToString(), create )
 		{}
 
 		protected ConnectedValue( [Required]object instance, [NotEmpty]string name, Func<T> create = null ) : this( PropertyConnector.Default.Get( instance, name, true ).Cast<T>(), create )
@@ -69,23 +69,23 @@ namespace DragonSpark.Runtime.Values
 		}
 	}
 
-	public class ConnectedValueKeyFactory<T> : FactoryBase<EqualityList, string>
+	/*public class ConnectedValueKeyFactory<T> : FactoryBase<EqualityList, string>
 	{
 		public static ConnectedValueKeyFactory<T> Instance { get; } = new ConnectedValueKeyFactory<T>();
 
 		protected override string CreateItem( EqualityList parameter ) => $"{typeof(T)}-{parameter.GetHashCode()}";
-	}
+	}*/
 
-	public class ConnectedValueKeyFactory : FactoryBase<object, string>
+	/*public class ConnectedValueKeyFactory : FactoryBase<object, string>
 	{
 		public static ConnectedValueKeyFactory Instance { get; } = new ConnectedValueKeyFactory();
 
 		protected override string CreateItem( object parameter ) => $"{parameter.GetType()}-{parameter.GetHashCode()}";
-	}
+	}*/
 
 	public class Reference<T> : ConnectedValue<T>
 	{
-		public Reference( object instance, T key ) : base( instance, ConnectedValueKeyFactory<T>.Instance.Create( new EqualityList( key ) ), () => key ) {}
+		public Reference( object instance, T key ) : base( instance, KeyFactory.Instance.CreateUsing( key ).ToString(), () => key ) {}
 	}
 
 	public class ListValue<T> : FixedValue<T>
@@ -126,7 +126,7 @@ namespace DragonSpark.Runtime.Values
 	{
 		public Checked( object instance ) : this( instance, instance ) {}
 
-		public Checked( object instance, [Required]object reference ) : this( instance, ConnectedValueKeyFactory.Instance.Create( reference ) ) {}
+		public Checked( object instance, [Required]object reference ) : this( instance, KeyFactory.Instance.CreateUsing( reference ).ToString() ) {}
 
 		public Checked( [Required]object instance, [Required]string key ) : base( instance, key, () => new ConditionMonitor() ) { }
 

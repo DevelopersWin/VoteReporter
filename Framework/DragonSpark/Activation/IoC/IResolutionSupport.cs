@@ -1,9 +1,9 @@
-using System;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Activation.IoC
 {
-	interface IResolutionSupport
+	interface IResolutionSupport : ISpecification<TypeRequest>
 	{
-		bool CanResolve( Type type, string name, params object[] parameters );
+		// bool CanResolve( TypeRequest request );
 	}
 }

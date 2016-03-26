@@ -27,7 +27,9 @@ namespace DragonSpark.ComponentModel
 
 		public object GetValue( DefaultValueParameter parameter )
 		{
-			var result = new SingletonLocator( locator, propertyName ).Locate( hostType ?? parameter.Metadata.PropertyType );
+			var targetType = hostType ?? parameter.Metadata.PropertyType;
+			var type = locator.Create( targetType ) ?? targetType;
+			var result = new SingletonLocator( propertyName ).Locate( type );
 			return result;
 		}
 	}

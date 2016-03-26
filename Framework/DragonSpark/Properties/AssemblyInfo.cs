@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using DragonSpark;
 using DragonSpark.Activation;
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Modularity;

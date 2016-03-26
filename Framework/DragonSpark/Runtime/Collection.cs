@@ -1,10 +1,8 @@
 using DragonSpark.Extensions;
 using Microsoft.Practices.Unity;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Markup;
 
 namespace DragonSpark.Runtime
@@ -12,7 +10,7 @@ namespace DragonSpark.Runtime
 	/// <summary>
 	/// ATTRIBUTION: http://stackoverflow.com/questions/2907372/why-does-c-sharp-not-implement-gethashcode-for-collections
 	/// </summary>
-	public class EqualityList : List<object>, IEquatable<EqualityList>
+	/*public class EqualityList : List<object>, IEquatable<EqualityList>
 	{
 		public EqualityList() {}
 
@@ -27,7 +25,7 @@ namespace DragonSpark.Runtime
 		public override bool Equals( object other ) => other.AsTo<EqualityList, bool>( Equals );
 
 		public override int GetHashCode() => this.Aggregate( 0x2D2816FE, ( current, item ) => current * 31 + ( item?.GetHashCode() ?? 0 ) );
-	}
+	}*/
 
 	public class Collection : Collection<object> {}
 

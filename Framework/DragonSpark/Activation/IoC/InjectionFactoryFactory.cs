@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using Microsoft.Practices.Unity;
 using System;

@@ -1,4 +1,4 @@
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Composition
 {

@@ -1,9 +1,7 @@
-﻿using DragonSpark.Aspects;
-using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
-using Serilog;
 using Serilog.Events;
 using Serilog.Parsing;
 using System;
@@ -17,13 +15,6 @@ namespace DragonSpark.Testing.Aspects
 	public class KeyFactoryTests : Tests
 	{
 		public KeyFactoryTests( ITestOutputHelper output ) : base( output ) {}
-
-		[Fact]
-		public void BasicLogger()
-		{
-			var logger = new LoggerConfiguration().WriteTo.Trace().Enrich.FromLogContext().CreateLogger().ForContext<KeyFactoryTests>();
-			logger.Information( "Hello World! {SourceContext}" );
-		}
 
 		[Fact]
 		public void TracerFactoryWorksAsExpected()
@@ -51,7 +42,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( 3, lines.Count );
 		}
 
-		[Fact]
+		/*[Fact]
 		public void Basic()
 		{
 			using ( var tracer = new TracerFactory( Output.WriteLine ).Create() )
@@ -86,8 +77,8 @@ namespace DragonSpark.Testing.Aspects
 					Builder.Instance.Create( objects );
 				}
 
-				tracer.Profiler.Mark( "Builder" );*/
+				tracer.Profiler.Mark( "Builder" );#1#
 			}
-		}
+		}*/
 	}
 }

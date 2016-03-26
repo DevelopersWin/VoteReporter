@@ -22,6 +22,6 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public bool IsSatisfiedBy( object request ) => TypeSupport.From( request ).With( CanLocate );
 
-		protected virtual bool CanLocate( System.Type type ) => activator.CanActivate( type );
+		protected virtual bool CanLocate( Type type ) => activator.CanCreate( type );
 	}
 }

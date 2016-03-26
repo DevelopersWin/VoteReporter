@@ -1,4 +1,8 @@
-using AutoMapper.Internal;
+using System;
+using System.Collections.Generic;
+using System.Composition;
+using System.Linq;
+using System.Reflection;
 using DragonSpark.Aspects;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
@@ -6,14 +10,9 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Composition;
-using System.Linq;
-using System.Reflection;
 using Type = System.Type;
 
-namespace DragonSpark.Activation.FactoryModel
+namespace DragonSpark.Activation
 {
 	public static class Factory
 	{
@@ -112,27 +111,15 @@ namespace DragonSpark.Activation.FactoryModel
 			var nestedTypes = info.DeclaredNestedTypes.ToArray();
 			var all = nestedTypes.Concat( info.Assembly.DefinedTypes.Except( nestedTypes ) );
 			var location = all.AsTypes().Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
-			var mapped = new TypeRequest( type( parameter ) );
+			var mapped = new LocateTypeRequest( type( parameter ) );
 			var locators = new[] { new DiscoverableFactoryTypeLocator( location ), locator };
 			var result = locators.FirstWhere( typeLocator => typeLocator.Create( mapped ) );
 			return result;
 		}
 	}
 
-	public class TypeRequest
-	{
-		public TypeRequest( [Required]Type requestedType, string name = null )
-		{
-			RequestedType = requestedType;
-			Name = name;
-		}
-
-		public Type RequestedType { get; }
-		public string Name { get; }
-	}
-
 	[Persistent]
-	public class DiscoverableFactoryTypeLocator : FactoryBase<TypeRequest, Type>
+	public class DiscoverableFactoryTypeLocator : FactoryBase<LocateTypeRequest, Type>
 	{
 		readonly IEnumerable<FactoryType> types;
 
@@ -142,7 +129,7 @@ namespace DragonSpark.Activation.FactoryModel
 		}
 
 		[Freeze]
-		protected override Type CreateItem( TypeRequest parameter )
+		protected override Type CreateItem( LocateTypeRequest parameter )
 		{
 			var name = $"{parameter.RequestedType.Name}Factory";
 			var candidates = types.Where( type => parameter.Name == type.Name && type.ResultType.Adapt().IsAssignableFrom( parameter.RequestedType ) ).ToArray();

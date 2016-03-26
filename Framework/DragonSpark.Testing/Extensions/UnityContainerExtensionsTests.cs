@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;

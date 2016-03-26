@@ -1,7 +1,7 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System.Linq;
+using DragonSpark.Activation;
 
 namespace DragonSpark.ComponentModel
 {

@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.True( sut.Contains( second ) );
 		}
 
-		[Fact]
+		/*[Fact]
 		public void BasicEquality()
 		{
 			Assert.Equal( new EqualityList { true }, new EqualityList { true } );
@@ -49,7 +49,7 @@ namespace DragonSpark.Testing.Runtime
 			var second = new EqualityList( items.ToArray() );
 			Assert.Equal( first.GetHashCode(), second.GetHashCode() );
 			Assert.NotEqual( items.ToArray().GetHashCode(), items.ToArray().GetHashCode() );
-		}
+		}*/
 
 		[Theory, AutoData]
 		public void EqualityDictionary( Dictionary<Tuple<object>, object> sut )

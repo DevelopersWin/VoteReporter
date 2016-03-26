@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
@@ -27,25 +26,23 @@ namespace DragonSpark.Setup
 
 	class ServiceProvider : IServiceProvider
 	{
-		readonly IServiceProvider locator;
+		readonly IServiceProvider provider;
 		readonly IActivator activator;
 
 		public ServiceProvider( [Required]IServiceProvider provider ) : this( provider, provider.Get<IActivator>() ) {}
 
-		public ServiceProvider( [Required]IServiceProvider locator, [Required]IActivator activator )
+		public ServiceProvider( [Required]IServiceProvider provider, [Required]IActivator activator )
 		{
-			this.locator = locator;
+			this.provider = provider;
 			this.activator = activator;
 		}
 
-		public object GetService( Type serviceType ) => locator.GetService( serviceType ) ?? activator.Activate<object>( serviceType );
+		public object GetService( Type serviceType ) => provider.GetService( serviceType ) ?? activator.Activate<object>( serviceType );
 	}
 
 	public class ServiceProviderFactory : ConfiguringFactory<IServiceProvider>
 	{
-		public ServiceProviderFactory( Func<IServiceProvider> inner, Action<IServiceProvider> configure ) : base( inner, configure )
-		{
-		}
+		public ServiceProviderFactory( Func<IServiceProvider> inner, Action<IServiceProvider> configure ) : base( inner, configure ) {}
 
 		protected override IServiceProvider CreateItem()
 		{

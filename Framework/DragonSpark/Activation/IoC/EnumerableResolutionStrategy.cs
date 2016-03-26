@@ -1,5 +1,5 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
@@ -7,43 +7,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class BuildPlanCreatorPolicy : IBuildPlanCreatorPolicy
 	{
-		readonly Func<IBuilderContext, TryContext> builder;
+		readonly Func<Action, Exception> tryDelegate;
 		readonly IList<IBuildPlanPolicy> policies;
 		readonly IBuildPlanCreatorPolicy[] creators;
 
-		public BuildPlanCreatorPolicy( [Required]Func<IBuilderContext, TryContext> builder, [Required]IList<IBuildPlanPolicy> policies, [Required]params IBuildPlanCreatorPolicy[] creators )
+		public BuildPlanCreatorPolicy( [Required]Func<Action, Exception> tryDelegate, [Required]IList<IBuildPlanPolicy> policies, [Required]params IBuildPlanCreatorPolicy[] creators )
 		{
-			this.builder = builder;
+			this.tryDelegate = tryDelegate;
 			this.policies = policies;
 			this.creators = creators;
 		}
 
 		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
-			new CompositeBuildPlanPolicy( builder, creators.Select( policy => policy.CreatePlan( context, buildKey ) ).Concat( policies ).ToArray() );
+			new CompositeBuildPlanPolicy( tryDelegate, creators.Select( policy => policy.CreatePlan( context, buildKey ) ).Concat( policies ).ToArray() );
 	}
 
 	public class CompositeBuildPlanPolicy : IBuildPlanPolicy
 	{
-		readonly Func<IBuilderContext, TryContext> builder;
+		readonly Func<Action, Exception> tryDelegate;
 		readonly IBuildPlanPolicy[] policies;
 
-		public CompositeBuildPlanPolicy( [Required]Func<IBuilderContext, TryContext> builder, params IBuildPlanPolicy[] policies )
+		public CompositeBuildPlanPolicy( [Required]Func<Action, Exception> tryDelegate, params IBuildPlanPolicy[] policies )
 		{
-			this.builder = builder;
+			this.tryDelegate = tryDelegate;
 			this.policies = policies;
 		}
 
 		public void BuildUp( IBuilderContext context )
 		{
-			var @try = new Func<Action, Exception>( builder( context ).Try );
 			Exception first = null;
-			foreach ( var exception in policies.Select( policy => @try( () => policy.BuildUp( context ) ) ) )
+			foreach ( var exception in policies.Select( policy => tryDelegate( () => policy.BuildUp( context ) ) ) )
 			{
 				if ( exception == null && context.Existing != null )
 				{
@@ -57,9 +55,17 @@ namespace DragonSpark.Activation.IoC
 
 	class SingletonBuildPlanPolicy : IBuildPlanPolicy
 	{
+		readonly ISingletonLocator locator;
+
+		public SingletonBuildPlanPolicy() : this( SingletonLocator.Instance ) {}
+
+		public SingletonBuildPlanPolicy( [Required] ISingletonLocator locator )
+		{
+			this.locator = locator;
+		}
+
 		public void BuildUp( IBuilderContext context )
 		{
-			var locator = context.New<ISingletonLocator>();
 			var singleton = locator.Locate( context.BuildKey.Type );
 			if ( singleton != null )
 			{

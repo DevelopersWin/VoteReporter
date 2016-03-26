@@ -1,8 +1,8 @@
 using System;
 
-namespace DragonSpark.Activation.FactoryModel
+namespace DragonSpark.Activation
 {
-	public abstract class ActivationFactoryParameterCoercer<TParameter, TResult> : FactoryParameterCoercer<TParameter>
+	public abstract class TypeRequestCoercer<TParameter, TResult> : FactoryParameterCoercer<TParameter>
 	{
 		protected override TParameter PerformCoercion( object context ) => Create( context as Type ?? typeof(TResult), context is Type ? null : context );
 

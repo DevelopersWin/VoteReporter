@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;

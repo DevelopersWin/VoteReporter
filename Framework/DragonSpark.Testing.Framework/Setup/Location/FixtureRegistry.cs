@@ -6,7 +6,6 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Runtime.Values;
 
 namespace DragonSpark.Testing.Framework.Setup.Location
@@ -26,13 +25,13 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		public void Register( [Required]MappingRegistrationParameter parameter )
 		{
-			fixture.Customizations.Insert( 0, new TypeRelay( parameter.Type, parameter.MappedTo ) );
+			fixture.Customizations.Insert( 0, new TypeRelay( parameter.RequestedType, parameter.MappedTo ) );
 			/*if ( new ApplyRegistration( parameter ).Item )
 			{}*/
-			new[] { parameter.Type, parameter.MappedTo }.Distinct().Each( registered.Ensure );
+			new[] { parameter.RequestedType, parameter.MappedTo }.Distinct().Each( registered.Ensure );
 		}
 
-		public void Register( [Required]InstanceRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterInstance), new[] { parameter.Type }, parameter.Instance/*, new ApplyRegistration( parameter ).Item*/ );
+		public void Register( [Required]InstanceRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterInstance), new[] { parameter.RequestedType }, parameter.Instance/*, new ApplyRegistration( parameter ).Item*/ );
 
 		void RegisterInstance<T>( [Required]T instance/*, bool applyRegistration*/ )
 		{
@@ -40,7 +39,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 			registered.Ensure( typeof(T) );
 		}
 
-		public void RegisterFactory( [Required]FactoryRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterFactory), parameter.Type.ToItem(), parameter.Factory/*, new ApplyRegistration( parameter ).Item*/ );
+		public void RegisterFactory( [Required]FactoryRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterFactory), parameter.RequestedType.ToItem(), parameter.Factory/*, new ApplyRegistration( parameter ).Item*/ );
 
 		void RegisterFactory<T>( [Required]Func<object> factory/*, bool applyRegistration*/ )
 		{

@@ -6,13 +6,13 @@ using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	public class LoggingConfigurationTransformer
+	public class CompositionTests
 	{
 		[Theory, DefaultSetup.AutoData]
 		public void BasicCompose( CompositionContext host )
 		{
-			var sinkOne = host.GetExport<LoggerHistorySink>();
-			var sinkTwo = host.GetExport<LoggerHistorySink>();
+			var sinkOne = host.GetExport<ILoggerHistory>();
+			var sinkTwo = host.GetExport<ILoggerHistory>();
 			Assert.Same( sinkOne, sinkTwo );
 
 			var first = host.GetExport<ILogger>();

@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Properties;
 using System;
 using System.Collections.Generic;
@@ -53,7 +52,7 @@ namespace DragonSpark.Setup
 		public SetupParameter( IMessageLogger logger, object arguments ) : base( logger, arguments ) {}
 	}*/
 
-	/*public class MessageLoggerFactory<TLogger> : ActivateFactory<TLogger> where TLogger : class, IMessageLogger
+	/*public class MessageLoggerFactory<TLogger> : ActivatorBase<TLogger> where TLogger : class, IMessageLogger
 	{
 		public new static MessageLoggerFactory<TLogger> Instance { get; } = new MessageLoggerFactory<TLogger>();
 

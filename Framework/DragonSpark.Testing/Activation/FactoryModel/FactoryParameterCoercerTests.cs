@@ -1,6 +1,6 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using Ploeh.AutoFixture.Xunit2;
+﻿using Ploeh.AutoFixture.Xunit2;
 using System;
+using DragonSpark.Activation;
 using Xunit;
 
 namespace DragonSpark.Testing.Activation.FactoryModel
@@ -17,11 +17,11 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		}
 
 		[Theory, AutoData]
-		void ConstructParameter( FactoryParameterCoercer<ConstructParameter> sut, Type item )
+		void ConstructParameter( FactoryParameterCoercer<ConstructTypeRequest> sut, Type item )
 		{
 			var parameter = sut.Coerce( item );
 			Assert.NotNull( parameter );
-			Assert.Equal( parameter.Type, item );
+			Assert.Equal( parameter.RequestedType, item );
 		}
 
 		[Theory, AutoData]

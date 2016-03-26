@@ -1,9 +1,9 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Composition.Hosting.Core;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Composition
 {

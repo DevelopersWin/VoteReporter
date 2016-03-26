@@ -1,10 +1,10 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 
 namespace DragonSpark.TypeSystem
 {

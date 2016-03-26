@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -6,6 +5,7 @@ using System.IO;
 using System.Xaml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Runtime.Data
 {

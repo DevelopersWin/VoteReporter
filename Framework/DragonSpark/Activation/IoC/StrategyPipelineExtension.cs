@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Aspects;
+﻿using DragonSpark.Aspects;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -16,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Setup;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -51,41 +49,23 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class BuildPipelineExtension : UnityContainerExtension
+	public class CachingBuildPlanExtension : UnityContainerExtension
 	{
-		readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
-		readonly ConventionStrategy conventionStrategy;
-		readonly DefaultValueStrategy defaultValueStrategy;
-		readonly EnumerableResolutionStrategy enumerableResolutionStrategy;
-		readonly TryContext tryContext;
+		readonly Func<ILogger> logger;
 
-		public BuildPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required] DefaultValueStrategy defaultValueStrategy, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy, [Required] TryContext tryContext )
+		public CachingBuildPlanExtension( [Required] Func<ILogger> logger )
 		{
-			this.metadataLifetimeStrategy = metadataLifetimeStrategy;
-			this.conventionStrategy = conventionStrategy;
-			this.defaultValueStrategy = defaultValueStrategy;
-			this.enumerableResolutionStrategy = enumerableResolutionStrategy;
-			this.tryContext = tryContext;
+			this.logger = logger;
 		}
 
 		protected override void Initialize()
 		{
-			Context.Strategies.Clear();
-			Context.Strategies.AddNew<BuildKeyMappingStrategy>( UnityBuildStage.TypeMapping );
-			Context.Strategies.Add( metadataLifetimeStrategy, UnityBuildStage.Lifetime );
-			Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
-			Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
-			Context.Strategies.Add( defaultValueStrategy, UnityBuildStage.Lifetime );
-			Context.Strategies.Add( conventionStrategy, UnityBuildStage.PreCreation );
-			Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
-			Context.Strategies.Add( enumerableResolutionStrategy, UnityBuildStage.Creation );
-			Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
-
 			var policy = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) );
-			// var builder = new Builder<TryContext>( Context.Strategies, policy.CreatePlan );
-			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( c => tryContext, Policies, policy ) );
+			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( new TryContext( logger ).Try, Policies, policy ) );
 			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
 		}
+
+		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 
 		public class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
@@ -106,6 +86,36 @@ namespace DragonSpark.Activation.IoC
 				var result = new Plan( context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Item;
 				return result;
 			}
+		}
+	}
+
+	public class StrategyPipelineExtension : UnityContainerExtension
+	{
+		readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
+		readonly ConventionStrategy conventionStrategy;
+		readonly DefaultValueStrategy defaultValueStrategy;
+		readonly EnumerableResolutionStrategy enumerableResolutionStrategy;
+		
+		public StrategyPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required] DefaultValueStrategy defaultValueStrategy, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy )
+		{
+			this.metadataLifetimeStrategy = metadataLifetimeStrategy;
+			this.conventionStrategy = conventionStrategy;
+			this.defaultValueStrategy = defaultValueStrategy;
+			this.enumerableResolutionStrategy = enumerableResolutionStrategy;
+		}
+
+		protected override void Initialize()
+		{
+			Context.Strategies.Clear();
+			Context.Strategies.AddNew<BuildKeyMappingStrategy>( UnityBuildStage.TypeMapping );
+			Context.Strategies.Add( metadataLifetimeStrategy, UnityBuildStage.Lifetime );
+			Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
+			Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
+			Context.Strategies.Add( defaultValueStrategy, UnityBuildStage.Lifetime );
+			Context.Strategies.Add( conventionStrategy, UnityBuildStage.PreCreation );
+			Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
+			Context.Strategies.Add( enumerableResolutionStrategy, UnityBuildStage.Creation );
+			Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
 		}
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
@@ -160,8 +170,6 @@ namespace DragonSpark.Activation.IoC
 				return result;
 			}
 		}*/
-
-		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 	}
 
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
@@ -172,9 +180,9 @@ namespace DragonSpark.Activation.IoC
 		readonly Func<Type, Type[]> strategy;
 		readonly CanBuildSpecification specification;
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AdditionalTypeLocationStrategy.Instance.Create, CanBuildSpecification.Instance ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, CanBuildSpecification.Instance ) {}
 
-		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, [Required]CanBuildSpecification specification ) : base( specification.Inverse<Type>() )
+		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, [Required]CanBuildSpecification specification ) : base( specification.Inverse() )
 		{
 			this.types = types;
 			this.strategy = strategy;
@@ -202,7 +210,7 @@ namespace DragonSpark.Activation.IoC
 			}
 		}*/
 
-		[Freeze]
+		// [Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
 			var adapter = parameter.Adapt();
@@ -210,20 +218,20 @@ namespace DragonSpark.Activation.IoC
 			var others = strategy( parameter );
 			var result = 
 				types.Union( others )
-				.Where( specification.IsSatisfiedBy )
 				.Where( adapter.IsAssignableFrom )
+				.Where( specification.IsSatisfiedBy )
 				.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
 			return result;
 		}
 	}
 
-	public class AdditionalTypeLocationStrategy : FactoryBase<Type, Type[]>
+	public class AllTypesInCandidateAssemblyStrategy : FactoryBase<Type, Type[]>
 	{
-		public static AdditionalTypeLocationStrategy Instance { get; } = new AdditionalTypeLocationStrategy( ApplicationAssemblySpecification.Instance );
+		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance );
 
 		readonly ApplicationAssemblySpecification specification;
 
-		public AdditionalTypeLocationStrategy( [Required] ApplicationAssemblySpecification specification )
+		public AllTypesInCandidateAssemblyStrategy( [Required] ApplicationAssemblySpecification specification )
 		{
 			this.specification = specification;
 		}

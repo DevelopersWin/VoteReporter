@@ -1,5 +1,5 @@
 using System;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.AutoMoq;
 

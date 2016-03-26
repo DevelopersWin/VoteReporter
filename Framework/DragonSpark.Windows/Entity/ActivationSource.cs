@@ -11,10 +11,12 @@ namespace DragonSpark.Windows.Entity
 	[Persistent]
 	class ActivationSource : IActivationSource
 	{
-		public static ActivationSource Default { get; } = new ActivationSource( SystemActivator.Instance );
+		public static ActivationSource Default { get; } = new ActivationSource( Constructor.Instance );
 
+		// [Reference]
 		readonly IActivator activator;
 
+		// [Reference]
 		readonly Collection<Type> watching = new Collection<Type>();
 
 		public ActivationSource( [Required]IActivator activator )
@@ -26,12 +28,11 @@ namespace DragonSpark.Windows.Entity
 		{
 			var current = activator;
 			var type = item.GetType();
-			var canActivate = current.CanActivate( type );
-			if ( canActivate && !watching.Contains( type ) )
+			if ( !watching.Contains( type ) )
 			{
 				using ( new Context( watching, type ) )
 				{
-					var instance = current.Activate( type );
+					var instance = current.Activate<object>( type );
 					if ( instance != item )
 					{
 						instance.MapInto( item, Mappings.OnlyProvidedValues() );

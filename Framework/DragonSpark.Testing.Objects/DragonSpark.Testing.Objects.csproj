@@ -52,7 +52,7 @@
     <Compile Include="Composition\ExportedItemFactory.cs" />
     <Compile Include="Composition\IBasicService.cs" />
     <Compile Include="Composition\SharedBasicServiceFactory.cs" />
-    <Compile Include="ConstructFactory.cs" />
+    <Compile Include="Constructor.cs" />
     <Compile Include="Convention.cs" />
     <Compile Include="ConventionMetadata.cs" />
     <Compile Include="Decorated.cs" />

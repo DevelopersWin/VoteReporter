@@ -1,8 +1,8 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Security
 {

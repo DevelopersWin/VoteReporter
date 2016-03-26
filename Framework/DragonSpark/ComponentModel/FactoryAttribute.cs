@@ -1,48 +1,47 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.FactoryModel;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class ServiceAttribute : ActivateAttributeBase
+	public sealed class ServiceAttribute : ServicesValueBase
 	{
-		static DelegatedCreator Creator { get; } = new DelegatedCreator( Services.Get );
+		//static DelegatedCreator Creator { get; } = new DelegatedCreator( Services.Get );
 
-		public ServiceAttribute( Type serviceType = null ) : base( new ActivatedValueProvider.Converter( serviceType, null ), Creator ) {}
+		public ServiceAttribute( Type serviceType = null ) : base( new ServicesValueProvider.Converter( serviceType ) ) {}
 	}
 
-	public sealed class ComposeAttribute : ActivateAttributeBase
+	public sealed class ComposeAttribute : ServicesValueBase
 	{
-		static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
+		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
 		static object Compose( Type arg ) => Services.Get<CompositionContext>().GetExport( arg );
 
-		public ComposeAttribute( Type composedType = null ) : base( new ActivatedValueProvider.Converter( composedType, null ), Creator ) {}
+		public ComposeAttribute( Type composedType = null ) : base( new ServicesValueProvider.Converter( composedType ), Compose ) {}
 	}
 
-	public sealed class ComposeManyAttribute : ActivateAttributeBase
+	public sealed class ComposeManyAttribute : ServicesValueBase
 	{
-		static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
+		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
 		static object Compose( Type arg ) => Services.Get<CompositionContext>().GetExports( arg );
 
-		public ComposeManyAttribute( Type composedType = null ) : base( new ActivatedValueProvider.Converter( composedType, null ), Creator ) {}
+		public ComposeManyAttribute( Type composedType = null ) : base( new ServicesValueProvider.Converter( composedType ), Compose ) {}
 	}
 
-	public sealed class FactoryAttribute : ActivateAttributeBase
+	public sealed class FactoryAttribute : ServicesValueBase
 	{
-		static DelegatedCreator Creator { get; } = new DelegatedCreator( Factory );
+		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Factory );
 
 		static object Factory( Type arg ) => Services.Get<InstanceFromFactoryTypeFactory>().Create( arg );
 
-		public FactoryAttribute( Type factoryType = null, string name = null ) : this( Services.Get<MemberInfoFactoryTypeLocator>, factoryType, name ) {}
+		public FactoryAttribute( Type factoryType = null ) : this( Services.Get<MemberInfoFactoryTypeLocator>, factoryType ) {}
 
-		public FactoryAttribute( Func<MemberInfoFactoryTypeLocator> locator, Type factoryType = null, string name = null ) : base( new ActivatedValueProvider.Converter( p => factoryType ?? locator().Create( p ), name ), Creator ) {}
+		public FactoryAttribute( Func<MemberInfoFactoryTypeLocator> locator, Type factoryType = null ) : base( new ServicesValueProvider.Converter( p => factoryType ?? locator().Create( p ) ), Factory ) {}
 	}
 
-	public class DelegatedCreator : ActivatedValueProvider.Creator
+	/*public class DelegatedCreator : ServicesValueProvider.Factory
 	{
 		readonly Func<Type, object> factory;
 
@@ -51,6 +50,6 @@ namespace DragonSpark.ComponentModel
 			this.factory = factory;
 		}
 
-		protected override object CreateItem( Tuple<ActivateParameter, DefaultValueParameter> parameter ) => factory( parameter.Item1.Type );
-	}
+		protected override object CreateItem( Tuple<LocateTypeRequest, DefaultValueParameter> parameter ) => factory( parameter.Item1.RequestedType );
+	}*/
 }

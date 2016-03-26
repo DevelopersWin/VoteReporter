@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Runtime;
 using Microsoft.Azure.KeyVault;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -17,6 +16,7 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using DragonSpark.Activation;
 using X509Certificate = System.Security.Cryptography.X509Certificates.X509Certificate;
 
 namespace DragonSpark.Windows.Security

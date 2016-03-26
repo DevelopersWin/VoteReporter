@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Activation
 		public void Default()
 		{
 			var activator = Services.Get<IActivator>();
-			Assert.Same( SystemActivator.Instance, activator );
+			Assert.Same( Constructor.Instance, activator );
 			var instance = activator.Activate<IInterface>( typeof(Class) );
 			Assert.IsType<Class>( instance );
 		}
@@ -22,8 +22,8 @@ namespace DragonSpark.Testing.Activation
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void DefaultCreate( string parameter )
 		{
-			var activator = Services.Get<IActivator>();
-			Assert.Same( SystemActivator.Instance, activator );
+			var activator = Services.Get<IConstructor>();
+			Assert.Same( Constructor.Instance, activator );
 			
 			var instance = activator.Construct<ClassWithParameter>( parameter );
 			Assert.NotNull( instance );

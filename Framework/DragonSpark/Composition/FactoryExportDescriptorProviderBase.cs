@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
@@ -7,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Runtime.Specifications;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
@@ -37,7 +37,7 @@ namespace DragonSpark.Composition
 			{
 				var resultContract = resolver.Create( contract );
 				var success = resultContract
-					.With( compositionContract => new TypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
+					.With( compositionContract => new LocateTypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
 					.With( locator.Create )
 					.With( type => descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( type ), true, out dependency ) );
 				if ( success )

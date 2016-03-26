@@ -4,7 +4,7 @@ using PostSharp.Patterns.Contracts;
 using PostSharp.Reflection;
 using System;
 using System.Linq;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Aspects
 {

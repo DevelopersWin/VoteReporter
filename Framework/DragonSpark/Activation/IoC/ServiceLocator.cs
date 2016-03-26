@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Composition;
+﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.TypeSystem;
@@ -86,8 +85,9 @@ namespace DragonSpark.Activation.IoC
 
 		protected override IUnityContainer CreateItem( IUnityContainer parameter ) => 
 			parameter
+				.Extend<CachingBuildPlanExtension>()
 				.Extend<DefaultRegistrationsExtension>()
-				.Extend<BuildPipelineExtension>()
+				.Extend<StrategyPipelineExtension>()
 				.Extend<InstanceTypeRegistrationMonitorExtension>();
 	}
 

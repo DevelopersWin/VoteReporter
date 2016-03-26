@@ -1,4 +1,3 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
@@ -10,6 +9,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
+using DragonSpark.Activation;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup

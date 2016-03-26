@@ -1,10 +1,10 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Aspects;
 using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 

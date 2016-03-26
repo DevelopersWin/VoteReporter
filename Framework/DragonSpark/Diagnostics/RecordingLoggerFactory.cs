@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 using Serilog;
@@ -8,6 +7,7 @@ using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Composition;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Diagnostics
 {

@@ -1,5 +1,5 @@
 using System.Linq;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Threading;

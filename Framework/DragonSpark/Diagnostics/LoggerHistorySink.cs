@@ -1,9 +1,9 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using Serilog.Events;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Diagnostics
 {

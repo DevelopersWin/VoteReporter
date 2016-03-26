@@ -1,11 +1,10 @@
-using DragonSpark.Runtime.Values;
 using System;
 using System.Linq;
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Registration;
+using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 
-namespace DragonSpark.Activation.FactoryModel
+namespace DragonSpark.Activation
 {
 	public interface IFactory
 	{
@@ -29,14 +28,16 @@ namespace DragonSpark.Activation.FactoryModel
 	{
 		class Delegate<T, U> : ConnectedValue<Func<T, U>>
 		{
-			public Delegate( IFactoryWithParameter instance ) : base( instance, typeof(Delegate<T, U>), () => new Func<object, object>( instance.Create ).Convert<T,U>() )
-			{}
+			public Delegate( IFactory<T, U> instance ) : base( instance, typeof(Delegate<T, U>), () => instance.Create ) {}
+
+			// public Delegate( IFactoryWithParameter instance ) : base( instance, typeof(Delegate<T, U>), () => new Func<object, object>( instance.Create ).Convert<T,U>() ) {}
 		}
 
 		class Delegate<T> : ConnectedValue<Func<T>>
 		{
-			public Delegate( IFactory instance ) : base( instance, typeof(Delegate<T>), () => new Func<object>( instance.Create ).Convert<T>() )
-			{}
+			public Delegate( IFactory<T> instance ) : base( instance, typeof(Delegate<T>), () => instance.Create ) {}
+
+			// public Delegate( IFactory instance ) : base( instance, typeof(Delegate<T>), () => new Func<object>( instance.Create ).Convert<T>() ) {}
 		}
 
 		public static Func<T> ToFactory<T>( [Required] this T @this ) => () => @this;

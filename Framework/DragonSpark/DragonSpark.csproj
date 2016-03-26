@@ -157,10 +157,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activation\FactoryModel\ActivateFactory.cs" />
-    <Compile Include="Activation\FactoryModel\ActivateFactoryParameterCoercer.cs" />
-    <Compile Include="Activation\FactoryModel\ActivationFactoryParameterCoercer.cs" />
-    <Compile Include="Activation\FactoryModel\Factory.cs" />
+    <Compile Include="Activation\ActivateRequestCoercer.cs" />
+    <Compile Include="Activation\TypeRequestCoercer.cs" />
+    <Compile Include="Activation\Factory.cs" />
     <Compile Include="Activation\IExecutionContext.cs" />
     <Compile Include="Activation\IoC\DefaultRegistrationsExtension.cs" />
     <Compile Include="Activation\IoC\ExportDescriptorProvider.cs" />
@@ -196,19 +195,16 @@
     <Compile Include="Runtime\Values\AmbientContextCommand.cs" />
     <Compile Include="Runtime\Values\CompositeWritableValue.cs" />
     <Compile Include="Runtime\Values\ConnectedValue.cs" />
-    <Compile Include="Activation\FactoryModel\ActivateParameter.cs" />
-    <Compile Include="Activation\FactoryModel\ActivationFactory.cs" />
-    <Compile Include="Activation\FactoryModel\ActivationParameter.cs" />
+    <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Runtime\Specifications\AlwaysSpecification.cs" />
     <Compile Include="Runtime\Specifications\FixedSpecification.cs" />
     <Compile Include="Runtime\Specifications\NeverSpecification.cs" />
     <Compile Include="Activation\CompositeActivator.cs" />
-    <Compile Include="Activation\FactoryModel\ConstructFactory.cs" />
-    <Compile Include="Activation\FactoryModel\ConstructFactoryParameterCoercer.cs" />
-    <Compile Include="Activation\FactoryModel\ConstructParameter.cs" />
-    <Compile Include="Activation\FactoryModel\FactoryParameterCoercer.cs" />
-    <Compile Include="Activation\FactoryModel\IFactoryParameterCoercer.cs" />
-    <Compile Include="Activation\FactoryModel\IFactoryWithParameter.cs" />
+    <Compile Include="Activation\ConstructorBase.cs" />
+    <Compile Include="Activation\ConstructorParameterCoercer.cs" />
+    <Compile Include="Activation\FactoryParameterCoercer.cs" />
+    <Compile Include="Activation\IFactoryParameterCoercer.cs" />
+    <Compile Include="Activation\IFactoryWithParameter.cs" />
     <Compile Include="Activation\IoC\ArrayResolutionStrategy.cs" />
     <Compile Include="Activation\IoC\DefaultUnityConstructorSelectorPolicy.cs" />
     <Compile Include="Activation\IoC\EnumerableResolutionStrategy.cs" />
@@ -263,16 +259,16 @@
     <Compile Include="Modularity\ModuleInfoExtensions.cs" />
     <Compile Include="Modularity\ModuleMonitor.cs" />
     <Compile Include="TypeSystem\AssemblySourceBase.cs" />
-    <Compile Include="Activation\FactoryModel\FactoryBase.cs" />
+    <Compile Include="Activation\FactoryBase.cs" />
     <Compile Include="Runtime\Collection.cs" />
     <Compile Include="TypeSystem\ApplicationAssemblyFilter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Activation\FactoryModel\IFactory.cs">
+    <Compile Include="Activation\IFactory.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Activation\IoC\Activator.cs" />
-    <Compile Include="ComponentModel\ActivateAttributeBase.cs" />
+    <Compile Include="Activation\IoC\Locator.cs" />
+    <Compile Include="ComponentModel\ServicesValueBase.cs" />
     <Compile Include="ComponentModel\CompositeTypeDefinitionProvider.cs" />
     <Compile Include="ComponentModel\DefaultAttribute.cs" />
     <Compile Include="ComponentModel\MemberInfoLocator.cs">
@@ -366,7 +362,7 @@
     <Compile Include="Setup\Commands\UnityInstance.cs" />
     <Compile Include="Setup\Commands\UnityRegistrationCommand.cs" />
     <Compile Include="Setup\Commands\UnityType.cs" />
-    <Compile Include="Activation\IoC\BuildPipelineExtension.cs" />
+    <Compile Include="Activation\IoC\StrategyPipelineExtension.cs" />
     <Compile Include="Activation\IoC\ServiceLocator.cs" />
     <Compile Include="Runtime\ApplicationInformation.cs">
       <SubType>Code</SubType>
@@ -409,12 +405,12 @@
     <Compile Include="Activation\Activator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Activation\IActivator.cs" />
+    <Compile Include="Activation\ILocator.cs" />
     <Compile Include="Activation\IServiceRegistry.cs" />
     <Compile Include="Activation\Services.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Activation\SystemActivator.cs" />
+    <Compile Include="Activation\Constructor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />

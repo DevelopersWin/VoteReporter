@@ -1,9 +1,9 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System.Reflection;
+using DragonSpark.Activation;
 using Xunit;
 using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
 

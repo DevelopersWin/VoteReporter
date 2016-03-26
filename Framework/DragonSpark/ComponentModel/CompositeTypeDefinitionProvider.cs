@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,7 +13,6 @@ namespace DragonSpark.ComponentModel
 			this.providers = providers;
 		}
 
-		[Freeze]
-		public TypeInfo GetDefinition( TypeInfo info ) => providers.FirstWhere( x => x.GetDefinition( info ) ) ?? info;
+		public virtual TypeInfo GetDefinition( TypeInfo info ) => providers.FirstWhere( x => x.GetDefinition( info ) ) ?? info;
 	}
 }

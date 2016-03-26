@@ -1,6 +1,6 @@
 using System;
 using System.Reflection;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Setup.Registration;

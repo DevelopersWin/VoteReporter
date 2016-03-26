@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -30,7 +29,7 @@ namespace DragonSpark.Activation
 
 	public class OnlyIfNotRegistered : DecoratedSpecification<Type>
 	{
-		public OnlyIfNotRegistered( IUnityContainer container ) : base( new InverseSpecification( new IsRegisteredSpecification( container ) ) ) { }
+		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse(), type => new LocateTypeRequest( type ) ) { }
 	}
 
 	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<IsATypeSpecification>
@@ -99,7 +98,7 @@ namespace DragonSpark.Activation
 			this.specification = specification;
 		}
 
-		public override bool CanExecute( T parameter ) => base.CanExecute( parameter ) && specification.IsSatisfiedBy( parameter.Type );
+		public override bool CanExecute( T parameter ) => base.CanExecute( parameter ) && specification.IsSatisfiedBy( parameter.RequestedType );
 
 		protected override void OnExecute( T parameter ) => command( parameter );
 	}
@@ -134,7 +133,7 @@ namespace DragonSpark.Activation
 		public RegisterFactoryCommand( [Required]IServiceRegistry registry, T specification ) : base( registry.RegisterFactory, specification ) { }
 	}
 	
-	public abstract class RegistrationParameter : ActivateParameter
+	public abstract class RegistrationParameter : LocateTypeRequest
 	{
 		protected RegistrationParameter( Type type, string name = null ) : base( type, name ) {}
 	}

@@ -1,42 +1,35 @@
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
-using PostSharp.Patterns.Contracts;
 using System;
 
 namespace DragonSpark.ComponentModel
 {
-	public class AmbientValueAttribute : ActivateAttributeBase
+	public class AmbientValueAttribute : ServicesValueBase
 	{
-		public AmbientValueAttribute( Type valueType = null, string name = null ) : base( new ActivatedValueProvider.Converter( valueType, name ), Creator.Instance ) {}
-
-		public class Creator : ActivatedValueProvider.Creator
-		{
-			public new static Creator Instance { get; } = new Creator();
-
-			protected override object CreateItem( Tuple<ActivateParameter, DefaultValueParameter> parameter ) => Ambient.GetCurrent( parameter.Item1.Type );
-		}
+		public AmbientValueAttribute( Type valueType = null ) : base( new ServicesValueProvider.Converter( valueType ), Ambient.GetCurrent ) {}
 	}
 
-	public class ValueAttribute : ActivateAttributeBase
+	public class ValueAttribute : ServicesValueBase
 	{
-		public ValueAttribute( [OfType( typeof(IValue) )]Type valueType, string name = null ) : base( new ActivatedValueProvider.Converter( valueType, name ), Creator.Instance ) {}
+		public ValueAttribute( [OfType( typeof(IValue) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Create ) {}
 
-		public class Creator : ActivatedValueProvider.Creator
+		static object Create( Type type ) => Services.Get<IValue>().Item;
+
+		/*public class Creator : ServicesValueProvider.Factory
 		{
 			public new static Creator Instance { get; } = new Creator();
 
-			readonly Func<Tuple<ActivateParameter, DefaultValueParameter>, IValue> factory;
+			readonly Func<Type, IValue> factory;
 
-			public Creator() : this( new ActivatedValueProvider.Creator<IValue>().Create ) { }
+			public Creator() : this( new ServicesValueProvider.Creator<IValue>().Create ) { }
 
-			protected Creator( [Required]Func<Tuple<ActivateParameter, DefaultValueParameter>, IValue> factory )
+			protected Creator( [Required]Func<Type, IValue> factory )
 			{
 				this.factory = factory;
 			}
 
-			protected override object CreateItem( Tuple<ActivateParameter, DefaultValueParameter> parameter ) => factory( parameter ).Item;
-		}
+			protected override object CreateItem( Type parameter ) => factory( parameter ).Item;
+		}*/
 	}
 }

@@ -11,6 +11,7 @@ using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Reflection;
 using Xunit;
+using SingletonLocator = DragonSpark.Activation.IoC.SingletonLocator;
 using Type = System.Type;
 
 namespace DragonSpark.Testing.Composition

@@ -14,9 +14,9 @@ namespace DragonSpark.Aspects
 	[AttributeUsage( AttributeTargets.Assembly )]
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect, IInstanceScopedAspect
 	{
-		public override bool CompileTimeValidate( LocationInfo locationInfo ) => DefaultValuePropertySpecification.Instance.IsSatisfiedBy( locationInfo.PropertyInfo );
+		public override bool CompileTimeValidate( LocationInfo locationInfo ) => false; // DefaultValuePropertySpecification.Instance.IsSatisfiedBy( locationInfo.PropertyInfo );
 
-		public override void OnGetValue( LocationInterceptionArgs args )
+		/*public override void OnGetValue( LocationInterceptionArgs args )
 		{
 			var apply = new Checked( this ).Item.Apply();
 			if ( apply )
@@ -35,7 +35,7 @@ namespace DragonSpark.Aspects
 		{
 			new Checked( this ).Item.Apply();
 			base.OnSetValue( args );
-		}
+		}*/
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
 

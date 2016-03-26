@@ -2,7 +2,7 @@ using System.Data.Entity;
 using System.Data.Entity.Core.Common;
 using System.Data.SqlClient;
 using System.IO;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 
 namespace DragonSpark.Windows.Entity

@@ -1,7 +1,7 @@
-using DragonSpark.Activation.FactoryModel;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 
 namespace DragonSpark.TypeSystem
 {

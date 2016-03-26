@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.FactoryModel;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Runtime;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
@@ -7,6 +6,7 @@ using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Composition;
 using System.Linq;
+using DragonSpark.Activation;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime

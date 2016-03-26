@@ -3,7 +3,7 @@ using PostSharp.Patterns.Contracts;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;

@@ -1,9 +1,9 @@
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Extensions;
 using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
 
 namespace DragonSpark.TypeSystem
 {

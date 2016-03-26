@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.FactoryModel;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
@@ -9,6 +8,8 @@ using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Specifications;
+using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Composition
 {
@@ -92,10 +93,10 @@ namespace DragonSpark.Composition
 			var factoryTypes = types.Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
 			var locator = new DiscoverableFactoryTypeLocator( factoryTypes );
 			var conventionLocator = new BuildableTypeFromConventionLocator( types );
-			var activator = new CompositeActivator( new SingletonActivator( new SingletonLocator( conventionLocator ) ), SystemActivator.Instance );
+			var activator = new CompositeActivator( new SingletonLocator( conventionLocator ), Constructor.Instance );
 
 			var result = configuration
-				.WithParts( types.Union( new []{ typeof(ConfigureProviderCommand.Context) } ) )
+				.WithParts( types.Union( new []{ typeof(ConfigureProviderCommand.Context) } )/*, AttributeProvider.Instance*/ )
 				.WithInstance( assemblies )
 				.WithInstance( types )
 				.WithInstance( conventionLocator )
@@ -119,21 +120,41 @@ namespace DragonSpark.Composition
 		}*/
 	}
 
-	class SingletonActivator : IActivator
+	class SingletonLocator : LocatorBase
 	{
-		readonly ISingletonLocator locator;
+		readonly Func<Type, Type> convention;
+		readonly ISingletonLocator singleton;
 
-		public SingletonActivator( [Required]ISingletonLocator locator )
+		public SingletonLocator( [Required] BuildableTypeFromConventionLocator convention ) : this( convention.Create, Activation.IoC.SingletonLocator.Instance ) {}
+
+		public SingletonLocator( [Required] Func<Type, Type> convention, [Required]ISingletonLocator singleton ) : base( new Specification( convention, singleton ).Wrap<LocateTypeRequest>( request => request.RequestedType ) )
 		{
-			this.locator = locator;
+			this.convention = convention;
+			this.singleton = singleton;
 		}
 
-		public bool CanActivate( Type type, string name = null ) => locator.Locate( type ) != null;
+		class Specification : ContainsSingletonSpecification
+		{
+			readonly Func<Type, Type> convention;
 
-		public object Activate( Type type, string name = null ) => locator.Locate( type );
+			public Specification( Func<Type, Type> convention, ISingletonLocator locator ) : base( locator )
+			{
+				this.convention = convention;
+			}
 
-		public bool CanConstruct( Type type, params object[] parameters ) => false;
+			protected override bool Verify( Type parameter )
+			{
+				var type = convention( parameter ) ?? parameter;
+				var result = base.Verify( type );
+				return result;
+			}
+		}
 
-		public object Construct( Type type, params object[] parameters ) => null;
+		protected override object CreateItem( LocateTypeRequest parameter )
+		{
+			var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;
+			var result = singleton.Locate( type );
+			return result;
+		}
 	}
 }
