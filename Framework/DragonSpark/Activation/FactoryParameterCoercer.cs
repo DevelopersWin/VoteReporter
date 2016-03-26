@@ -1,6 +1,6 @@
+using DragonSpark.Extensions;
 using System;
 using System.Linq;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Activation
 {
@@ -10,8 +10,7 @@ namespace DragonSpark.Activation
 
 		readonly TParameter item;
 
-		public FixedFactoryParameterCoercer() : this( default(TParameter) )
-		{}
+		public FixedFactoryParameterCoercer() : this( default(TParameter) ) {}
 
 		public FixedFactoryParameterCoercer( TParameter item )
 		{

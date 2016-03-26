@@ -7,9 +7,9 @@ namespace DragonSpark.Activation
 {
 	public interface IActivator : IFactory<TypeRequest, object> {}
 
-	public interface IConstructor : IActivator, IFactory<ConstructTypeRequest, object> {}
+	// public interface IConstructor : IActivator, IFactory<ConstructTypeRequest, object> {}
 
-	public interface ILocator : IActivator, IFactory<LocateTypeRequest, object> {}
+	// public interface ILocator : IActivator, IFactory<LocateTypeRequest, object> {}
 
 	public class LocateTypeRequest : TypeRequest
 	{

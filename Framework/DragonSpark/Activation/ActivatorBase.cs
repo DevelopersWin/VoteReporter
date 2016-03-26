@@ -1,26 +1,36 @@
+using System;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Activation
 {
-	public abstract class ActivatorBase<TParameter, TResult> : FactoryBase<TParameter, TResult>, IActivator where TParameter : TypeRequest where TResult : class
+	public abstract class ActivatorBase<TRequest, TResult> : FactoryBase<TRequest, TResult>, IActivator where TRequest : TypeRequest where TResult : class
 	{
-		protected ActivatorBase( ISpecification<TParameter> specification, IFactoryParameterCoercer<TParameter> coercer ) : base( specification, coercer ) {}
+		protected ActivatorBase( IFactoryParameterCoercer<TRequest> coercer ) : this( IsTypeSpecification<TRequest>.Instance, coercer ) {}
+
+		protected ActivatorBase( ISpecification<TRequest> specification, IFactoryParameterCoercer<TRequest> coercer ) : base( specification, coercer ) {}
 
 		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => CreateFromItem( parameter );
 	}
 
-	/*public abstract class ActivatorBase : ActivatorBase<object>
+	public abstract class LocatorBase : LocatorBase<object>
 	{
-		protected ActivatorBase( ISpecification<LocateTypeRequest> specification ) : base( specification ) {}
-	}*/
+		protected LocatorBase() {}
 
-	public abstract class LocatorBase : ActivatorBase<LocateTypeRequest, object>, ILocator
+		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( specification ) {}
+	}
+
+	public abstract class LocatorBase<T> : ActivatorBase<LocateTypeRequest, T> where T : class
 	{
-		protected LocatorBase() : this( AlwaysSpecification.Instance.Wrap<LocateTypeRequest>() ) {}
+		protected LocatorBase() : base( Coercer.Instance ) {}
 
-		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( specification, ActivateRequestCoercer<object>.Instance ) {}
+		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( specification, Coercer.Instance ) {}
 
-		// protected override TResult Activate( LocateTypeRequest parameter ) => Activator.Activate<TResult>( parameter.Type, parameter.Name );
-		// object IFactory<LocateTypeRequest, object>.Create( LocateTypeRequest parameter ) => Create( parameter );
+		public class Coercer : TypeRequestCoercer<LocateTypeRequest, T>
+		{
+			public new static Coercer Instance { get; } = new Coercer();
+		
+			protected override LocateTypeRequest Create( Type type, object parameter ) => new LocateTypeRequest( type, parameter.As<string>() );
+		}
 	}
 }

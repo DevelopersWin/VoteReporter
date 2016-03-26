@@ -6,61 +6,73 @@ using Xunit;
 
 namespace DragonSpark.Testing.Activation.IoC
 {
-	public class SingletonLocatorTests
-	{
-		[Fact]
-		public void SingletonFromItem()
-		{
-			var sut = new SingletonLocator();
-			Assert.Same( SingletonItem.Instance, sut.Locate( typeof(SingletonItem) ) );
-		}
+    public class SingletonLocatorTests
+    {
+        [Fact]
+        public void SingletonFromItem()
+        {
+            var sut = SingletonLocator.Instance;
+            Assert.Same( SingletonItem.Instance, sut.Locate( typeof(SingletonItem) ) );
+        }
 
-		[Fact]
-		public void SingletonFromMetadata()
-		{
-			var sut = new SingletonLocator();
-			Assert.Same( SingletonMetadata.Temp, sut.Locate( typeof(SingletonMetadata) ) );
-		}
+        [Fact]
+        public void SingletonFromMetadata()
+        {
+            var sut = SingletonLocator.Instance;
+            Assert.Same( SingletonMetadata.AnotherNameFromDefault, sut.Locate( typeof(SingletonMetadata) ) );
+        }
 
-		[Fact]
-		public void SingletonFromOther()
-		{
-			var sut = new SingletonLocator( nameof(SingletonOther.Other) );
-			Assert.Same( SingletonOther.Other, sut.Locate( typeof(SingletonOther) ) );
-		}
+        [Fact]
+        public void SingletonFromDifferentType()
+        {
+            var sut = SingletonLocator.Instance;
+            Assert.Null( sut.Locate( typeof(SingletonDifferentType) ) );
+        }
 
-		[Fact]
-		public void SingletonFromConvention()
-		{
-			var nestedTypes = GetType().GetTypeInfo().DeclaredNestedTypes.AsTypes().ToArray();
-			var conventionLocator = new BuildableTypeFromConventionLocator( nestedTypes );
-			var sut = new SingletonLocator();
-			var type = conventionLocator.Create( typeof(ISingleton) ) ?? typeof(ISingleton);
-			Assert.Same( Singleton.Instance, sut.Locate( type ) );
-		}
+        [Fact]
+        public void SingletonFromOther()
+        {
+            var sut = new SingletonLocator( nameof(SingletonOther.Other) );
+            Assert.Same( SingletonOther.Other, sut.Locate( typeof(SingletonOther) ) );
+        }
 
-		class SingletonItem
-		{
-			public static SingletonItem Instance { get; } = new SingletonItem();
-		}
+        [Fact]
+        public void SingletonFromConvention()
+        {
+            var nestedTypes = GetType().GetTypeInfo().DeclaredNestedTypes.AsTypes().ToArray();
+            var conventionLocator = new BuildableTypeFromConventionLocator( nestedTypes );
+            var sut = SingletonLocator.Instance;
+            var type = conventionLocator.Create( typeof(ISingleton) ) ?? typeof(ISingleton);
+            Assert.Same( Singleton.Instance, sut.Locate( type ) );
+        }
 
-		class SingletonMetadata
-		{
-			[Singleton]
-			public static SingletonItem Temp { get; } = new SingletonItem();
-		}
+        class SingletonItem
+        {
+            public static SingletonItem Instance { get; } = new SingletonItem();
+        }
 
-		class SingletonOther
-		{
-			public static SingletonOther Other { get; } = new SingletonOther();
-		}
+        class SingletonMetadata
+        {
+            [Singleton]
+            public static SingletonMetadata AnotherNameFromDefault { get; } = new SingletonMetadata();
+        }
 
-		class Singleton : ISingleton
-		{
-			public static Singleton Instance { get; } = new Singleton();
-		}
+        class SingletonDifferentType
+        {
+            public static SingletonMetadata Instance { get; } = new SingletonMetadata();
+        }
 
-		interface ISingleton
-		{}
-	}
+        class SingletonOther
+        {
+            public static SingletonOther Other { get; } = new SingletonOther();
+        }
+
+        class Singleton : ISingleton
+        {
+            public static Singleton Instance { get; } = new Singleton();
+        }
+
+        interface ISingleton
+        {}
+    }
 }

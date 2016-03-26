@@ -96,19 +96,22 @@ namespace DragonSpark.Activation
 			this.coercer = coercer;
 		}
 
-		protected abstract TResult CreateItem( [Required]TParameter parameter );
+		bool IFactoryWithParameter.CanCreate( object parameter ) => Coerce( parameter, CanCreate );
 
-		public TResult Create( TParameter parameter ) => CanCreate( parameter ) ? CreateItem( parameter ) : default(TResult);
-
-		[Freeze]
-		public bool CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
+		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
 		object IFactoryWithParameter.Create( object parameter ) => CreateFromItem( parameter );
 
-		protected object CreateFromItem( object parameter )
+		protected object CreateFromItem( object parameter ) => Coerce( parameter, Create );
+
+		public TResult Create( TParameter parameter ) => CanCreate( parameter ) ? CreateItem( parameter ) : default(TResult);
+
+		protected abstract TResult CreateItem( [Required]TParameter parameter );
+		
+		T Coerce<T>( object parameter, Func<TParameter, T> with )
 		{
 			var qualified = coercer.Coerce( parameter );
-			var result = Create( qualified );
+			var result = with( qualified );
 			return result;
 		}
 	}
@@ -147,7 +150,9 @@ namespace DragonSpark.Activation
 
 		public FirstFromParameterFactory( params IFactory<T, U>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
-		public FirstFromParameterFactory( [Required]params Func<T, U>[] inner )
+		public FirstFromParameterFactory( [Required]params Func<T, U>[] inner ) : this( FactoryDefaults<T>.Coercer, inner ) {}
+
+		public FirstFromParameterFactory( IFactoryParameterCoercer<T> coercer, [Required]params Func<T, U>[] inner ) : base( coercer )
 		{
 			this.inner = inner;
 		}

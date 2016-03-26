@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
 

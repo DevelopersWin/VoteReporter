@@ -75,25 +75,25 @@ namespace DragonSpark.Windows.Testing.Setup
 
 		[Map( typeof(IActivator), typeof(Locator) )]
 		[Theory, LocationSetup.AutoData]
-		public void CreateNamedInstance( [Registered]ILocator locator, string name )
+		public void CreateNamedInstance( [Registered]IActivator activator, string name )
 		{
-			Assert.Same( Services.Get<ILocator>(), locator );
-			Assert.NotSame( Constructor.Instance, locator );
+			Assert.Same( Services.Get<IActivator>(), activator );
+			Assert.NotSame( Constructor.Instance, activator );
 
-			var instance = locator.Activate<IObject>( new LocateTypeRequest( typeof(Object), name ) );
+			var instance = activator.Activate<IObject>( new LocateTypeRequest( typeof(Object), name ) );
 			Assert.IsType<Object>( instance );
 
 			Assert.Equal( name, instance.Name );
 		}
 
-		[Map( typeof(IConstructor), typeof(TestObjects.Constructor) )]
+		[Map( typeof(IActivator), typeof(TestObjects.Constructor) )]
 		[Theory, LocationSetup.AutoData]
-		public void CreateItem( [Registered]IConstructor locator )
+		public void CreateItem( [Registered]IActivator activator )
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
-			Assert.Same( Services.Get<IActivator>(), locator );
-			Assert.NotSame( Constructor.Instance, locator );
-			var instance = locator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
+			Assert.Same( Services.Get<IActivator>(), activator );
+			Assert.NotSame( Constructor.Instance, activator );
+			var instance = activator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
 			Assert.NotNull( instance );
 
 			Assert.Equal( parameters, instance.Parameters );

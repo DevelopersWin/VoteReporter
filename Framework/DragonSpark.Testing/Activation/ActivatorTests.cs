@@ -2,6 +2,7 @@
 using DragonSpark.Testing.Objects;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
+using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Testing.Activation
 {

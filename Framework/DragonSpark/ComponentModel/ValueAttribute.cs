@@ -14,7 +14,7 @@ namespace DragonSpark.ComponentModel
 	{
 		public ValueAttribute( [OfType( typeof(IValue) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Create ) {}
 
-		static object Create( Type type ) => Services.Get<IValue>().Item;
+		static object Create( Type type ) => Services.Get<IValue>( type ).Item;
 
 		/*public class Creator : ServicesValueProvider.Factory
 		{

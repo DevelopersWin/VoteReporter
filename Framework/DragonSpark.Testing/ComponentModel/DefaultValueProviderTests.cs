@@ -53,7 +53,9 @@ namespace DragonSpark.Testing.ComponentModel
 
 			Assert.NotNull( target.Activated );
 
-			Assert.IsType<ClassWithParameter>( target.Factory );
+			var created = Assert.IsType<ClassWithParameter>( target.Factory );
+			Assert.NotNull( created.Parameter );
+			Assert.IsType<Objects.Constructor>( created.Parameter );
 
 			Assert.NotNull( target.Collection );
 			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<object>>( target.Collection );

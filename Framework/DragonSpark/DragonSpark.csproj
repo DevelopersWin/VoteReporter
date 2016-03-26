@@ -157,7 +157,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activation\ActivateRequestCoercer.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Activation\Factory.cs" />
     <Compile Include="Activation\IExecutionContext.cs" />
@@ -201,7 +200,6 @@
     <Compile Include="Runtime\Specifications\NeverSpecification.cs" />
     <Compile Include="Activation\CompositeActivator.cs" />
     <Compile Include="Activation\ConstructorBase.cs" />
-    <Compile Include="Activation\ConstructorParameterCoercer.cs" />
     <Compile Include="Activation\FactoryParameterCoercer.cs" />
     <Compile Include="Activation\IFactoryParameterCoercer.cs" />
     <Compile Include="Activation\IFactoryWithParameter.cs" />

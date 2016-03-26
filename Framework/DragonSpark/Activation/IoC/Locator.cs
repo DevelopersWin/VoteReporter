@@ -9,7 +9,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		
-		public Locator( [Required]IUnityContainer container, [Required]IResolutionSupport support, [Required]RegisterEntireHierarchyCommand command ) : base( support )
+		public Locator( [Required]IUnityContainer container, IResolutionSupport support ) : base( support )
 		{
 			this.container = container;
 		}

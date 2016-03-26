@@ -1,15 +1,12 @@
+using DragonSpark.Activation;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
-using PostSharp.Patterns.Model;
-using PostSharp.Patterns.Threading;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using DragonSpark.Activation;
-using PostSharp.Patterns.Collections;
 
 namespace DragonSpark.Aspects
 {
@@ -19,7 +16,7 @@ namespace DragonSpark.Aspects
 		public static CacheValueFactory Instance { get; } = new CacheValueFactory();
 
 		// [Reference]
-		readonly IDictionary<int, Lazy<object>> items = new AdvisableDictionary<int, Lazy<object>>();
+		readonly IDictionary<int, Lazy<object>> items = new Dictionary<int, Lazy<object>>();
 
 		Lazy<object> Get( int code, MethodInterceptionArgs args )
 		{
@@ -45,6 +42,7 @@ namespace DragonSpark.Aspects
 			var deferred = Get( code, parameter );
 			var result = deferred != null ? deferred.Value : parameter.ReturnValue;
 			return result;
+			//return /*parameter.GetReturnValue()*/ null;
 		}
 	}
 
@@ -52,12 +50,16 @@ namespace DragonSpark.Aspects
 	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		bool Enabled { get; set; }
-		
-		// public override void RuntimeInitialize( MethodBase method ) => Initialize();
 
+		/*public override void RuntimeInitialize( MethodBase method )
+		{
+			throw new InvalidOperationException( "WTF" );
+
+			Message.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "0001", $"HELLO WTF", null, null, null ) );
+		}*/
 		void Initialize() => Enabled = true;
 
-		/*public override void OnInvoke( MethodInterceptionArgs args )
+		public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			if ( Enabled && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
@@ -67,7 +69,7 @@ namespace DragonSpark.Aspects
 			{
 				base.OnInvoke( args );
 			}
-		}*/
+		}
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
 
