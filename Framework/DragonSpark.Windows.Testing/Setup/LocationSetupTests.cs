@@ -26,6 +26,7 @@ using DragonSpark.ComponentModel;
 using DragonSpark.Windows.Runtime;
 using Xunit;
 using Xunit.Abstractions;
+using Activator = DragonSpark.Activation.Activator;
 using ApplicationAssemblyLocator = DragonSpark.TypeSystem.ApplicationAssemblyLocator;
 using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
@@ -69,7 +70,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var expected = Services.Get<IActivator>();
 			Assert.Same( expected, locator );
-			Assert.NotSame( Constructor.Instance, locator );
+			Assert.NotSame( Activator.Instance, locator );
 			Assert.IsType<Locator>( locator );
 			var instance = locator.Activate<IObject>( typeof(Object) );
 			Assert.IsType<Object>( instance );
@@ -82,7 +83,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void CreateNamedInstance( [Registered]IActivator activator, string name )
 		{
 			Assert.Same( Services.Get<IActivator>(), activator );
-			Assert.NotSame( Constructor.Instance, activator );
+			Assert.NotSame( Activator.Instance, activator );
 
 			var instance = activator.Activate<IObject>( new LocateTypeRequest( typeof(Object), name ) );
 			Assert.IsType<Object>( instance );
@@ -96,7 +97,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
 			Assert.Same( Services.Get<IActivator>(), activator );
-			Assert.NotSame( Constructor.Instance, activator );
+			Assert.NotSame( Activator.Instance, activator );
 			var instance = activator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
 			Assert.NotNull( instance );
 

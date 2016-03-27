@@ -2,6 +2,8 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Linq;
+using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation
 {
@@ -13,28 +15,32 @@ namespace DragonSpark.Activation
 
 	public class LocateTypeRequest : TypeRequest
 	{
+		readonly CodeContainer<LocateTypeRequest> container;
+
 		public LocateTypeRequest( [Required] Type type, string name = null ) : base( type )
 		{
 			Name = name;
+			container = new CodeContainer<LocateTypeRequest>( type, name );
 		}
 
 		public string Name { get; }
 
-		public override int GetHashCode() => KeyFactory.Instance.CreateUsing( typeof(LocateTypeRequest), RequestedType, Name );
+		public override int GetHashCode() => container.Code;
 	}
 
 	public class ConstructTypeRequest : TypeRequest
 	{
-		// public ConstructTypeRequest( Type type ) : this( type, Default<object>.Items ) {}
+		readonly CodeContainer<ConstructTypeRequest> container;
 
 		public ConstructTypeRequest( [Required] Type type, [Required] params object[] arguments ) : base( type )
 		{
 			Arguments = arguments;
+			container = new CodeContainer<ConstructTypeRequest>( Arguments.Prepend( RequestedType ).ToArray()  );
 		}
 
 		public object[] Arguments { get; }
 
-		public override int GetHashCode() => KeyFactory.Instance.Create( Arguments.Prepend( typeof(ConstructTypeRequest), RequestedType ) );
+		public override int GetHashCode() => container.Code;
 	}
 
 	public abstract class TypeRequest

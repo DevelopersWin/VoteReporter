@@ -400,7 +400,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Activation\Activator.cs">
+    <Compile Include="Activation\ActivatorExtensions.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Activation\ILocator.cs" />

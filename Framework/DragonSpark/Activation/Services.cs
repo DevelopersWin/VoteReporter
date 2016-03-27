@@ -20,7 +20,7 @@ namespace DragonSpark.Activation
 
 			readonly IActivator activator;
 
-			ServiceProvider() : this( Constructor.Instance ) {}
+			ServiceProvider() : this( Activator.Instance ) {}
 
 			ServiceProvider( [Required]IActivator activator )
 			{

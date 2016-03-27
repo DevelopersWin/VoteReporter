@@ -276,27 +276,16 @@ namespace DragonSpark.Activation.IoC
 		protected override bool Verify( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();
-			var result = parameter != typeof(object) && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && !typeof(Delegate).Adapt().IsAssignableFrom( parameter ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
+			var result = parameter != typeof(object) && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && !typeof(Delegate).Adapt().IsAssignableFrom( parameter ) && ( info.IsPublic || new AssemblyAttributeProvider( info.Assembly ).Has<RegistrationAttribute>() );
 			return result;
 		}
 	}
 
-	public class InvalidBuildFromContextSpecification : SpecificationBase<IBuilderContext>
+	public class ValidConstructorSpecification : SpecificationBase<IBuilderContext>
 	{
-		public static InvalidBuildFromContextSpecification Instance { get; } = new InvalidBuildFromContextSpecification();
+		public static ValidConstructorSpecification Instance { get; } = new ValidConstructorSpecification();
 
-		readonly CanBuildSpecification specification;
-
-		public InvalidBuildFromContextSpecification() : this( CanBuildSpecification.Instance ) {}
-
-		public InvalidBuildFromContextSpecification( [Required]CanBuildSpecification specification )
-		{
-			this.specification = specification;
-		}
-
-		protected override bool Verify( IBuilderContext parameter ) => !specification.IsSatisfiedBy( parameter.BuildKey.Type ) || !CanBuildFrom( parameter );
-
-		static bool CanBuildFrom( IBuilderContext parameter )
+		protected override bool Verify( IBuilderContext parameter )
 		{
 			IPolicyList containingPolicyList;
 			var constructor = parameter.Policies.Get<IConstructorSelectorPolicy>( parameter.BuildKey, out containingPolicyList ).SelectConstructor( parameter, containingPolicyList );
@@ -314,15 +303,16 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionStrategy : BuilderStrategy
 	{
+		static ISpecification<IBuilderContext> Specification { get; } = new DecoratedSpecification<IBuilderContext>( CanBuildSpecification.Instance.Wrap<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ) ).Inverse();
+
 		readonly ConventionCandidateLocator locator;
 		readonly IServiceRegistry registry;
 
-		// [Persistent]
 		public class ConventionCandidateLocator : DecoratedFactory<IBuilderContext, Type>
 		{
-			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : this( InvalidBuildFromContextSpecification.Instance, factory ) { }
+			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : this( Specification, factory ) { }
 
-			ConventionCandidateLocator( [Required]InvalidBuildFromContextSpecification specification, [Required]BuildableTypeFromConventionLocator factory ) : base( specification, context => factory.Create( context.BuildKey.Type ) ) { }
+			ConventionCandidateLocator( [Required]ISpecification<IBuilderContext> specification, [Required]BuildableTypeFromConventionLocator factory ) : base( specification, context => factory.Create( context.BuildKey.Type ) ) { }
 		}
 
 		public ConventionStrategy( [Required]ConventionCandidateLocator locator, [Required]IServiceRegistry registry )

@@ -93,10 +93,10 @@ namespace DragonSpark.Composition
 			var factoryTypes = types.Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
 			var locator = new DiscoverableFactoryTypeLocator( factoryTypes );
 			var conventionLocator = new BuildableTypeFromConventionLocator( types );
-			var activator = new CompositeActivator( new SingletonLocator( conventionLocator ), Constructor.Instance );
+			var activator = new Activation.Activator( conventionLocator );
 
 			var result = configuration
-				.WithParts( types.Union( new []{ typeof(ConfigureProviderCommand.Context) } )/*, AttributeProvider.Instance*/ )
+				.WithParts( types.Union( new []{ typeof(ConfigureProviderCommand.Context) } ), AttributeProvider.Instance )
 				.WithInstance( assemblies )
 				.WithInstance( types )
 				.WithInstance( conventionLocator )
@@ -110,51 +110,13 @@ namespace DragonSpark.Composition
 			return result;
 		}
 
-		/*class AttributeProvider : AttributedModelProvider
+		class AttributeProvider : AttributedModelProvider
 		{
 			public static AttributeProvider Instance { get; } = new AttributeProvider();
 
 			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, MemberInfo member ) => member.GetAttributes<Attribute>();
 
 			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, ParameterInfo parameter ) => parameter.GetAttributes<Attribute>();
-		}*/
-	}
-
-	class SingletonLocator : LocatorBase
-	{
-		readonly Func<Type, Type> convention;
-		readonly ISingletonLocator singleton;
-
-		public SingletonLocator( [Required] BuildableTypeFromConventionLocator convention ) : this( convention.Create, Activation.IoC.SingletonLocator.Instance ) {}
-
-		public SingletonLocator( [Required] Func<Type, Type> convention, [Required]ISingletonLocator singleton ) : base( new Specification( convention, singleton ).Wrap<LocateTypeRequest>( request => request.RequestedType ) )
-		{
-			this.convention = convention;
-			this.singleton = singleton;
-		}
-
-		class Specification : ContainsSingletonSpecification
-		{
-			readonly Func<Type, Type> convention;
-
-			public Specification( Func<Type, Type> convention, ISingletonLocator locator ) : base( locator )
-			{
-				this.convention = convention;
-			}
-
-			protected override bool Verify( Type parameter )
-			{
-				var type = convention( parameter ) ?? parameter;
-				var result = base.Verify( type );
-				return result;
-			}
-		}
-
-		protected override object CreateItem( LocateTypeRequest parameter )
-		{
-			var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;
-			var result = singleton.Locate( type );
-			return result;
 		}
 	}
 }

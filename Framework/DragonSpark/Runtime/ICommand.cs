@@ -5,7 +5,6 @@ using System;
 using System.Windows.Input;
 using DragonSpark.Activation;
 using DragonSpark.Runtime.Specifications;
-using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Runtime
 {

@@ -39,6 +39,7 @@ namespace DragonSpark.Activation
 			return result;
 		}
 
+		[Freeze]
 		static object[] Coerce( Type type, object[] parameters )
 		{
 			var candidates = new[] { parameters, parameters.NotNull() };

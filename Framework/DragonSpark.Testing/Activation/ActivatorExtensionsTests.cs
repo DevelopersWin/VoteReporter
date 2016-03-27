@@ -6,7 +6,7 @@ using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Testing.Activation
 {
-	public class ActivatorTests
+	public class ActivatorExtensionsTests
 	{
 		[Theory, AutoData]
 		public void ActivateMany( Constructor sut )

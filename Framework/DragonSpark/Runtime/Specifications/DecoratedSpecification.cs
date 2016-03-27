@@ -16,6 +16,7 @@ namespace DragonSpark.Runtime.Specifications
 			this.transform = transform;
 		}
 
+		// [Freeze]
 		protected override bool Verify( T parameter ) => inner.IsSatisfiedBy( transform( parameter ) );
 	}
 

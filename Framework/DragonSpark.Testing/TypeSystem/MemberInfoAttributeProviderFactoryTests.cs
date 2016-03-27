@@ -13,12 +13,12 @@ namespace DragonSpark.Testing.TypeSystem
 		public void AsExpected()
 		{
 			var propertyInfo = GetType().GetProperty( nameof(PropertyName) );
-			var local = new Tuple<MemberInfo, bool>( propertyInfo, false );
-			var all = new Tuple<MemberInfo, bool>( propertyInfo, true );
+			var local = new MemberInfoAttributeProviderFactory.Parameter( propertyInfo, false );
+			var all = new MemberInfoAttributeProviderFactory.Parameter( propertyInfo, true );
 			
 			var sut = MemberInfoAttributeProviderFactory.Instance;
 			var firstLocal = sut.Create( local );
-			var secondLocal = sut.Create( local );
+			var secondLocal = sut.Create( new MemberInfoAttributeProviderFactory.Parameter( propertyInfo, false ) );
 
 			Assert.Same( firstLocal, secondLocal );
 
@@ -28,6 +28,6 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Same( firstAll, secondAll );
 
 			Assert.NotSame( firstLocal, firstAll );
-		} 
+		}
 	}
 }

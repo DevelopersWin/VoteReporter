@@ -197,8 +197,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activation\ActivatorTests.cs" />
-    <Compile Include="Activation\CurrentActivatorTests.cs" />
+    <Compile Include="Activation\ActivatorExtensionsTests.cs" />
+    <Compile Include="Activation\ActivatorExtensionstivatorTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryReflectionSupportTests.cs" />

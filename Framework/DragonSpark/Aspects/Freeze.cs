@@ -4,19 +4,27 @@ using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Aspects
 {
 	// [ReaderWriterSynchronized]
 	public class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
+		// readonly object owner;
 		public static CacheValueFactory Instance { get; } = new CacheValueFactory();
 
 		// [Reference]
 		readonly IDictionary<int, Lazy<object>> items = new Dictionary<int, Lazy<object>>();
+
+		/*public CacheValueFactory( [Required] object owner )
+		{
+			this.owner = owner;
+		}*/
 
 		Lazy<object> Get( int code, MethodInterceptionArgs args )
 		{
@@ -25,7 +33,11 @@ namespace DragonSpark.Aspects
 				var add = !items.ContainsKey( code );
 				if ( add )
 				{
-					items.Add( code, new Lazy<object>( args.GetReturnValue ) );
+					var instance = args.Instance ?? args.Method.DeclaringType;
+					/*var arguments = args.Arguments.Aggregate( "Arguments: ", ( s, o ) => $" Argument: {o} (Code: {o.GetHashCode()} - {KeyFactory.Instance.CreateUsing( o )})" );
+					var message = $"Adding: {code} for {instance} ({instance.GetHashCode()}). {arguments}";
+					Debug.WriteLine( "Output = {0}", message );*/
+					items.Add( code, new Lazy<object>( args.GetReturnValue, LazyThreadSafetyMode.PublicationOnly ) );
 				}
 				var check = add || ( args.Method as MethodInfo )?.ReturnType != typeof(void);
 				var result = check ? items[code] : null;
@@ -40,6 +52,9 @@ namespace DragonSpark.Aspects
 			var enumerable = new[] { instance, parameter.DeclarationIdentifier }.Concat( parameter.Arguments );
 			var code = KeyFactory.Instance.Create( enumerable );
 			var deferred = Get( code, parameter );
+			/*var arguments = parameter.Arguments.Aggregate( "Arguments: ", ( s, o ) => $" Argument: {o} (Code: {o.GetHashCode()} - {KeyFactory.Instance.CreateUsing( o )})" );
+            var message = $"{this} is creating key: {code} for {instance} ({instance.GetHashCode()}). {arguments}";
+            Debug.WriteLine( "Output = {0}", message );*/
 			var result = deferred != null ? deferred.Value : parameter.ReturnValue;
 			return result;
 			//return /*parameter.GetReturnValue()*/ null;
@@ -50,6 +65,8 @@ namespace DragonSpark.Aspects
 	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		bool Enabled { get; set; }
+
+		// public bool UsingInstance { get; set; }
 
 		/*public override void RuntimeInitialize( MethodBase method )
 		{

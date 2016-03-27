@@ -4,8 +4,7 @@ using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Testing.Setup;
 using System.Diagnostics;
 using System.Reflection;
-using DragonSpark.TypeSystem;
-using Ploeh.AutoFixture.Kernel;
+using DragonSpark.Setup;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -47,23 +46,25 @@ namespace DragonSpark.Testing.Setup.Registration
 				using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
 				{
 					var autoData = new AutoData( FixtureFactory.Instance.Create(), methodUnderTest );
-					var application = new Windows.Testing.Setup.Application<LocationSetup>();
-					using ( new ExecuteApplicationCommand( application ).ExecuteWith( autoData ) )
+					using ( var application = new Windows.Testing.Setup.Application<LocationSetup>() )
 					{
-						/*var first = GetType().Assembly.Has<RegistrationBaseAttribute>();
-						var second = GetType().Assembly.Has<RegistrationBaseAttribute>();
-						Debugger.Break();*/
+						using ( new ExecuteApplicationCommand( application ).ExecuteWith( autoData ) )
+						{
+							/*var first = GetType().Assembly.Has<RegistrationBaseAttribute>();
+							var second = GetType().Assembly.Has<RegistrationBaseAttribute>();
+							Debugger.Break();*/
 
-						/*var logger1 = application.Get<ILogger>();
-						logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );*/
-						// autoData.Initialize();
+							/*var logger1 = application.Get<ILogger>();
+							logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );*/
+							// autoData.Initialize();
 
-						/*var registerFromMetadataCommand = application.Get<RegisterFromMetadataCommand>();
-						registerFromMetadataCommand.ExecuteWith( new object() );*/
+							/*var registerFromMetadataCommand = application.Get<RegisterFromMetadataCommand>();
+							registerFromMetadataCommand.ExecuteWith( new object() );*/
 
-						/*var customization = new CompositionCustomization();
-						var item = customization.AutoData;*/
-						// Debugger.Break();
+							/*var customization = new CompositionCustomization();
+							var item = customization.AutoData;*/
+							// Debugger.Break();
+						}
 					}
 				}
 

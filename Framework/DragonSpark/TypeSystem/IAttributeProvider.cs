@@ -7,17 +7,31 @@ using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
+	public class CodeContainer<T>
+	{
+		readonly Lazy<int> value;
+
+		public CodeContainer( [Required] params object[] items ) : this( KeyFactory.Instance.Create, items ) {}
+
+		public CodeContainer( Func<IEnumerable<object>, int> factory, [Required] params object[] items )
+		{
+			var all = items.Prepend( typeof(T) ).ToArray();
+			value = new Lazy<int>( () => factory( all ) );
+		}
+
+		public int Code => value.Value;
+	}
 	public static class Attributes
 	{
 		sealed class Cached<T> : AssociatedValue<IAttributeProvider> where T : AttributeProviderFactoryBase
 		{
 			public Cached( object instance ) : base( instance, () =>
 			{
-				var name = instance.AsTo<Type, string>( type => type.Name );
 				var activator = Services.Get<T>();
 				var result = activator.Create( instance );
 				return result;
@@ -36,8 +50,6 @@ namespace DragonSpark.TypeSystem
 	{
 		public static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory( MemberInfoAttributeProviderFactory.Instance );
 
-		// public MemberInfoProviderFactory() : this(  ) {}
-
 		public MemberInfoProviderFactory( MemberInfoAttributeProviderFactory inner ) : base( inner, false ) {}
 	}
 
@@ -55,7 +67,9 @@ namespace DragonSpark.TypeSystem
 		[Freeze]
 		protected override IAttributeProvider CreateItem( object parameter )
 		{
-			var item = new Tuple<MemberInfo, bool>( parameter as MemberInfo ?? ( parameter as System.Type ?? parameter.GetType() ).GetTypeInfo(), includeRelated );
+			var name = parameter.ToString();
+
+			var item = new MemberInfoAttributeProviderFactory.Parameter( parameter as MemberInfo ?? ( parameter as Type ?? parameter.GetType() ).GetTypeInfo(), includeRelated );
 			var result = inner.Create( item );
 			return result;
 		}
@@ -64,7 +78,7 @@ namespace DragonSpark.TypeSystem
 	[Persistent]
 	class ExpandedAttributeProviderFactory : AttributeProviderFactoryBase
 	{
-		public ExpandedAttributeProviderFactory() : this( MemberInfoWithRelatedProviderFactory.Instance ) {}
+		public static ExpandedAttributeProviderFactory Instance { get; } = new ExpandedAttributeProviderFactory( MemberInfoWithRelatedProviderFactory.Instance );
 
 		public ExpandedAttributeProviderFactory( MemberInfoWithRelatedProviderFactory factory ) : base( factory ) {}
 	}
@@ -72,8 +86,8 @@ namespace DragonSpark.TypeSystem
 	[Persistent]
 	class AttributeProviderFactory : AttributeProviderFactoryBase
 	{
-		public AttributeProviderFactory() : this( MemberInfoProviderFactory.Instance ) {}
-
+		public static AttributeProviderFactory Instance { get; } = new AttributeProviderFactory( MemberInfoProviderFactory.Instance );
+		
 		public AttributeProviderFactory( MemberInfoProviderFactory factory ) : base( factory ) {}
 	}
 
@@ -118,10 +132,10 @@ namespace DragonSpark.TypeSystem
 		}
 
 		[Freeze]
-		public bool Contains( System.Type attribute ) => defined( attribute );
+		public bool Contains( Type attribute ) => defined( attribute );
 
 		[Freeze]
-		public Attribute[] GetAttributes( System.Type attributeType ) => defined( attributeType ) ? factory( attributeType ).Fixed() : Default<Attribute>.Items;
+		public Attribute[] GetAttributes( Type attributeType ) => defined( attributeType ) ? factory( attributeType ).Fixed() : Default<Attribute>.Items;
 	}
 
 }

@@ -5,13 +5,14 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Windows.Entity
 {
 	[Persistent]
 	class ActivationSource : IActivationSource
 	{
-		public static ActivationSource Default { get; } = new ActivationSource( Constructor.Instance );
+		public static ActivationSource Default { get; } = new ActivationSource( Activator.Instance );
 
 		// [Reference]
 		readonly IActivator activator;
