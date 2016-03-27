@@ -8,6 +8,8 @@ namespace DragonSpark.Activation
 {
 	public static class Activator
 	{
+		public static TResult Activate<TResult>( this IActivator @this ) where TResult : class => Activate<TResult>( @this, typeof(TResult) );
+
 		public static TResult Activate<TResult>( this IActivator @this, [Required] Type requestedType ) where TResult : class => (TResult)@this.Create( requestedType );
 
 		public static TResult Activate<TResult>( this IActivator @this, TypeRequest request ) => (TResult)@this.Create( request );

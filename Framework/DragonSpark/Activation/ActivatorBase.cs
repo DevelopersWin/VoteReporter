@@ -4,7 +4,7 @@ using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Activation
 {
-	public abstract class ActivatorBase<TRequest, TResult> : FactoryBase<TRequest, TResult>, IActivator where TRequest : TypeRequest where TResult : class
+	public abstract class ActivatorBase<TRequest> : FactoryBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
 		protected ActivatorBase( IFactoryParameterCoercer<TRequest> coercer ) : this( IsTypeSpecification<TRequest>.Instance, coercer ) {}
 
@@ -20,17 +20,17 @@ namespace DragonSpark.Activation
 		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( specification ) {}
 	}
 
-	public abstract class LocatorBase<T> : ActivatorBase<LocateTypeRequest, T> where T : class
+	public abstract class LocatorBase<T> : ActivatorBase<LocateTypeRequest> where T : class
 	{
 		protected LocatorBase() : base( Coercer.Instance ) {}
 
 		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( specification, Coercer.Instance ) {}
 
-		public class Coercer : TypeRequestCoercer<LocateTypeRequest, T>
+		public class Coercer : TypeRequestCoercer<LocateTypeRequest>
 		{
 			public new static Coercer Instance { get; } = new Coercer();
 		
-			protected override LocateTypeRequest Create( Type type, object parameter ) => new LocateTypeRequest( type, parameter.As<string>() );
+			protected override LocateTypeRequest Create( Type type ) => new LocateTypeRequest( type );
 		}
 	}
 }

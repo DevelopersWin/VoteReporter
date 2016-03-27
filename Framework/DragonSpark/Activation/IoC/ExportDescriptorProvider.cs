@@ -78,12 +78,12 @@ namespace DragonSpark.Activation.IoC
 	[Persistent]
 	public class CompositionCoordinator
 	{
-		readonly IActivator activator;
+		readonly IUnityContainer container;
 		readonly CompositionHost host;
 
-		public CompositionCoordinator( [Required]IActivator activator, [Required]CompositionHost host )
+		public CompositionCoordinator( [Required]IUnityContainer container, [Required]CompositionHost host )
 		{
-			this.activator = activator;
+			this.container = container;
 			this.host = host;
 		}
 
@@ -102,7 +102,7 @@ namespace DragonSpark.Activation.IoC
 		public object Create( CompositionContract contract )
 		{
 			var current = Ambient.GetCurrent<Operation>();
-			var result = current.With( operation => !operation.InProgress( contract.ContractType, contract.ContractName ), () => true ) ? activator.Create( new LocateTypeRequest( contract.ContractType, contract.ContractName ) ) : null;
+			var result = current.With( operation => !operation.InProgress( contract.ContractType, contract.ContractName ), () => true ) ? container.Resolve( contract.ContractType, contract.ContractName ) : null;
 			return result;
 		}
 

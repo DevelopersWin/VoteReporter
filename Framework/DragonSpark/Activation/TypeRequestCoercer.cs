@@ -1,11 +1,12 @@
 using System;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Activation
 {
-	public abstract class TypeRequestCoercer<TParameter, TResult> : FactoryParameterCoercer<TParameter>
+	public abstract class TypeRequestCoercer<TParameter> : FactoryParameterCoercer<TParameter>
 	{
-		protected override TParameter PerformCoercion( object context ) => Create( context as Type ?? typeof(TResult), context is Type ? null : context );
+		protected override TParameter PerformCoercion( object context ) => context.AsTo<Type, TParameter>( Create );
 
-		protected abstract TParameter Create( Type type, object parameter );
+		protected abstract TParameter Create( Type type );
 	}
 }

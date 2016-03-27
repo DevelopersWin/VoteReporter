@@ -111,7 +111,7 @@ namespace DragonSpark.Activation
 		T Coerce<T>( object parameter, Func<TParameter, T> with )
 		{
 			var qualified = coercer.Coerce( parameter );
-			var result = with( qualified );
+			var result = qualified.With( with );
 			return result;
 		}
 	}

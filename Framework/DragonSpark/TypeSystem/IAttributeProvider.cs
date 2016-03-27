@@ -17,6 +17,7 @@ namespace DragonSpark.TypeSystem
 		{
 			public Cached( object instance ) : base( instance, () =>
 			{
+				var name = instance.AsTo<Type, string>( type => type.Name );
 				var activator = Services.Get<T>();
 				var result = activator.Create( instance );
 				return result;

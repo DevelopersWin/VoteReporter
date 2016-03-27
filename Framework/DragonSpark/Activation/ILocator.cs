@@ -20,7 +20,7 @@ namespace DragonSpark.Activation
 
 		public string Name { get; }
 
-		public override int GetHashCode() => KeyFactory.Instance.CreateUsing( RequestedType, Name );
+		public override int GetHashCode() => KeyFactory.Instance.CreateUsing( typeof(LocateTypeRequest), RequestedType, Name );
 	}
 
 	public class ConstructTypeRequest : TypeRequest
@@ -34,7 +34,7 @@ namespace DragonSpark.Activation
 
 		public object[] Arguments { get; }
 
-		public override int GetHashCode() => KeyFactory.Instance.Create( RequestedType.Append( Arguments ) );
+		public override int GetHashCode() => KeyFactory.Instance.Create( Arguments.Prepend( typeof(ConstructTypeRequest), RequestedType ) );
 	}
 
 	public abstract class TypeRequest

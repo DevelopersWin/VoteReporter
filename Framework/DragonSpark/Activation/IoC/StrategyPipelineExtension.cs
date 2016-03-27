@@ -178,11 +178,11 @@ namespace DragonSpark.Activation.IoC
 
 		readonly Type[] types;
 		readonly Func<Type, Type[]> strategy;
-		readonly CanBuildSpecification specification;
+		readonly ISpecification<Type> specification;
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, CanBuildSpecification.Instance ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).Wrap<Type>(), CanBuildSpecification.Instance.Inverse() ) {}
 
-		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, [Required]CanBuildSpecification specification ) : base( specification.Inverse() )
+		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
 		{
 			this.types = types;
 			this.strategy = strategy;
@@ -210,7 +210,7 @@ namespace DragonSpark.Activation.IoC
 			}
 		}*/
 
-		// [Freeze]
+		[Freeze]
 		protected override Type CreateItem( Type parameter )
 		{
 			var adapter = parameter.Adapt();

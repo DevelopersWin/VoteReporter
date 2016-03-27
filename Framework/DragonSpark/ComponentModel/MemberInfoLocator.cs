@@ -9,12 +9,9 @@ namespace DragonSpark.ComponentModel
 	[Persistent]
 	public class MemberInfoLocator : TransformerBase<MemberInfo>, IMemberInfoLocator
 	{
-		public static MemberInfoLocator Instance { get; } = new MemberInfoLocator();
+		public static MemberInfoLocator Instance { get; } = new MemberInfoLocator( TypeDefinitionProvider.Instance );
 
 		readonly ITypeDefinitionProvider provider;
-
-		public MemberInfoLocator() : this( TypeDefinitionProvider.Instance )
-		{}
 
 		public MemberInfoLocator( ITypeDefinitionProvider provider )
 		{

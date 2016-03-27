@@ -55,6 +55,8 @@ namespace DragonSpark.Activation.IoC
 		
 	class ContainsSingletonSpecification : SpecificationBase<Type>
 	{
+		public static ContainsSingletonSpecification Instance { get; } = new ContainsSingletonSpecification( SingletonLocator.Instance );
+
 		readonly ISingletonLocator locator;
 
 		public ContainsSingletonSpecification( ISingletonLocator locator )

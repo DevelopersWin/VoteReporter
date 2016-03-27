@@ -25,7 +25,7 @@ namespace DragonSpark.Aspects
 				var add = !items.ContainsKey( code );
 				if ( add )
 				{
-					items.Add( code, new Lazy<object>( args.GetReturnValue, LazyThreadSafetyMode.PublicationOnly ) );
+					items.Add( code, new Lazy<object>( args.GetReturnValue ) );
 				}
 				var check = add || ( args.Method as MethodInfo )?.ReturnType != typeof(void);
 				var result = check ? items[code] : null;

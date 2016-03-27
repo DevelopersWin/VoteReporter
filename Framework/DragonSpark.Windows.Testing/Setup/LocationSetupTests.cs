@@ -23,10 +23,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using DragonSpark.ComponentModel;
+using DragonSpark.Windows.Runtime;
 using Xunit;
 using Xunit.Abstractions;
+using ApplicationAssemblyLocator = DragonSpark.TypeSystem.ApplicationAssemblyLocator;
+using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 using Constructor = DragonSpark.Activation.Constructor;
+using ExceptionFormatter = DragonSpark.Diagnostics.ExceptionFormatter;
 using Object = DragonSpark.Testing.Objects.Object;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
@@ -302,8 +306,6 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		void RelayedPropertyAttribute( IUnityContainer container )
 		{
-			var temp = container.Resolve<ITypeDefinitionProvider>();
-
 			var attribute = typeof(Relayed).GetProperty( nameof(Relayed.Property) ).GetAttribute<Attribute>();
 			Assert.Equal( "This is a relayed property attribute.", attribute.PropertyName );
 		}
@@ -312,7 +314,6 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		void RelayedAttribute()
 		{
-			var temp = Attributes.Get( typeof(Relayed) );
 			var attribute = typeof(Relayed).GetAttribute<Attribute>();
 			Assert.Equal( "This is a relayed class attribute.", attribute.PropertyName );
 		}
@@ -417,13 +418,20 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void BasicComposition( Assembly[] assemblies, ExportDescriptorProvider provider )
+		public void EnsureActivatorResolvesAsExpected( IActivator activator )
 		{
-			using ( var container = new CompositionHostFactory( assemblies ).Create() )
-			{
-				container.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
+			var locator = activator.Activate<Assembly>();
+			Assert.NotNull( locator );
+		}
 
-				var test = container.GetExport<Assembly>();
+		[Theory, LocationSetup.AutoData]
+		public void BasicComposition( Assembly[] assemblies, IUnityContainer container, ExportDescriptorProvider provider )
+		{
+			using ( var host = new CompositionHostFactory( assemblies ).Create() )
+			{
+				host.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
+
+				var test = host.GetExport<Assembly>();
 				Assert.NotNull( test );
 			}
 		}

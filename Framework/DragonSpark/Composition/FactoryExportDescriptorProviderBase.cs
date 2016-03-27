@@ -207,7 +207,11 @@ namespace DragonSpark.Composition
 				FactoryType = factoryType;
 			}
 
-			public T Activate<T>( [Required] Type type ) => factory( type ).With( activator => (T)activator( context, operation ) );
+			public T Activate<T>( [Required] Type type )
+			{
+				var compositeActivator = factory( type );
+				return compositeActivator.With( activator => (T)activator( context, operation ) );
+			}
 
 			public Type FactoryType { get; }
 		}

@@ -1,28 +1,26 @@
-using System;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.TypeSystem;
+using System;
 
 namespace DragonSpark.Activation
 {
-	public abstract class ConstructorBase<T> : ActivatorBase<ConstructTypeRequest, T> where T : class
+	public abstract class ConstructorBase : ActivatorBase<ConstructTypeRequest>
 	{
 		protected ConstructorBase() : base( Coercer.Instance ) {}
 
 		protected ConstructorBase( ISpecification<ConstructTypeRequest> specification  ) : base( specification, Coercer.Instance ) {}
 
-		public class Coercer : TypeRequestCoercer<ConstructTypeRequest, T>
+		public class Coercer : TypeRequestCoercer<ConstructTypeRequest>
 		{
 			public new static Coercer Instance { get; } = new Coercer();
 
-			protected override ConstructTypeRequest Create( Type type, object parameter ) => new ConstructTypeRequest( type, parameter?.ToItem() ?? Default<object>.Items );
+			protected override ConstructTypeRequest Create( Type type ) => new ConstructTypeRequest( type );
 		}
 	}
 
-	public abstract class ConstructorBase : ConstructorBase<object>
+	/*public abstract class ConstructorBase : ConstructorBase<object>
 	{
 		protected ConstructorBase() {}
 
 		protected ConstructorBase( ISpecification<ConstructTypeRequest> specification ) : base( specification ) {}
-	}
+	}*/
 }
