@@ -67,7 +67,7 @@ namespace DragonSpark.Activation.IoC
 
 		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 
-		public class CachedCreatorPolicy : IBuildPlanCreatorPolicy
+		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
 			readonly IBuildPlanCreatorPolicy inner;
 
@@ -76,16 +76,12 @@ namespace DragonSpark.Activation.IoC
 				this.inner = inner;
 			}
 
-			class Plan : AssociatedValue<IBuildPlanPolicy>
+			class Plan : ThreadAmbientValue<IBuildPlanPolicy>
 			{
-				public Plan( Type key, Func<IBuildPlanPolicy> create ) : base( ThreadAmbientContext.GetCurrent(), $"{key}_{typeof(Plan)}", create ) {}
+				public Plan( Type key, Func<IBuildPlanPolicy> create ) : base( KeyFactory.Instance.CreateUsing( key, typeof(Plan) ).ToString(), create ) {}
 			}
 
-			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
-			{
-				var result = new Plan( context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Item;
-				return result;
-			}
+			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => new Plan( context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Item;
 		}
 	}
 

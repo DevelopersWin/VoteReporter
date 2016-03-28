@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void BasicComposition( Assembly[] assemblies, string text )
 		{
-			using ( var container = new CompositionHostFactory( assemblies ).Create() )
+			using ( var container = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
 			{
 				var test = container.GetExport<IBasicService>();
 				var message = test.HelloWorld( text );
@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void BasicCompositionWithParameter( Assembly[] assemblies, string text )
 		{
-			using ( var container = new CompositionHostFactory( assemblies ).Create() )
+			using ( var container = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
 			{
 				var test = container.GetExport<IParameterService>();
 				var parameter = Assert.IsType<Parameter>( test.Parameter );
@@ -39,7 +39,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void FactoryWithParameterDelegate( Assembly[] assemblies, string message )
 		{
-			using ( var container = new CompositionHostFactory( assemblies ).Create() )
+			using ( var container = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
 			{
 				var factory = container.GetExport<Func<Parameter, IParameterService>>();
 				Assert.NotNull( factory );
@@ -60,7 +60,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void ExportWhenAlreadyRegistered( Assembly[] assemblies )
 		{
-			using ( var container = new CompositionHostFactory( assemblies ).Create() )
+			using ( var container = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
 			{
 				var item = container.GetExport<ExportedItem>();
 				Assert.IsType<ExportedItem>( item );
@@ -71,7 +71,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void FactoryInstance( Assembly[] assemblies )
 		{
-			using ( var container = new CompositionHostFactory( assemblies ).Create() )
+			using ( var container = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
 			{
 				var service = container.GetExport<IBasicService>();
 				Assert.IsType<BasicService>( service );
@@ -90,7 +90,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void Composition( Assembly[] assemblies )
 		{
-			using ( var container = new CompositionHostFactory( assemblies ).Create() )
+			using ( var container = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
 			{
 				var item = container.GetExport<ExportedItem>();
 				Assert.NotNull( item );
@@ -113,7 +113,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void SharedComposition( Assembly[] assemblies )
 		{
-			using ( var container = new CompositionHostFactory( assemblies ).Create() )
+			using ( var container = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
 			{
 				var service = container.GetExport<ISharedService>();
 				Assert.IsType<SharedService>( service );

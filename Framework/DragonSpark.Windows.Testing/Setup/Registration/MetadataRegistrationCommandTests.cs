@@ -23,8 +23,22 @@ namespace DragonSpark.Testing.Setup.Registration
 			var third = Default<ISpecimenBuilder>.Item;
 			var fourth = Default<ISpecimenBuilder>.Item;*/
 
-			Create();
-			Second();
+			Output.WriteLine( "Basic:" );
+
+			Basic();
+			for ( int i = 0; i < 10; i++ )
+			{
+				Second();
+			}
+
+			Output.WriteLine( "Full:" );
+
+			Full();
+
+			for ( int i = 0; i < 10; i++ )
+			{
+				Third();
+			}
 			/*var stopwatch = new Stopwatch().With( sw => sw.Start() );
 			MethodBase.GetCurrentMethod().As<MethodInfo>( methodUnderTest =>
 			{
@@ -33,12 +47,57 @@ namespace DragonSpark.Testing.Setup.Registration
 			Output.WriteLine( $"Complete: {stopwatch.ElapsedMilliseconds}." );*/
 		}
 
-		void Second()
+		[Fact]
+		public void SecondFact()
 		{
-			Create();
+			First();
 		}
 
-		void Create()
+		void Second() => Basic();
+
+		void Third() => Full();
+
+		void Basic()
+		{
+			var stopwatch = new Stopwatch().With( sw => sw.Start() );
+			MethodBase.GetCurrentMethod().As<MethodInfo>( methodUnderTest =>
+			{
+				using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
+				{
+					var autoData = new AutoData( FixtureFactory.Instance.Create(), methodUnderTest );
+					using ( var application = new LocalAutoDataAttribute.Application( GetType() ) )
+					{
+						using ( new ExecuteApplicationCommand( application ).ExecuteWith( autoData ) )
+						{
+							/*var first = GetType().Assembly.Has<RegistrationBaseAttribute>();
+							var second = GetType().Assembly.Has<RegistrationBaseAttribute>();
+							Debugger.Break();*/
+
+							/*var logger1 = application.Get<ILogger>();
+							logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );*/
+							// autoData.Initialize();
+
+							/*var registerFromMetadataCommand = application.Get<RegisterFromMetadataCommand>();
+							registerFromMetadataCommand.ExecuteWith( new object() );*/
+
+							/*var customization = new CompositionCustomization();
+							var item = customization.AutoData;*/
+							// Debugger.Break();
+						}
+					}
+				}
+
+				/*ApplicationFactory.Instance.Create( methodUnderTest );*/
+			} );
+
+			/*var info = typeof(CompositionCustomization).GetProperty( nameof(CompositionCustomization.AutoData) );
+
+			var meets = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );
+			var asdf = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );*/
+			Output.WriteLine( $"Complete: {stopwatch.ElapsedMilliseconds}." );
+		}
+
+		void Full()
 		{
 			var stopwatch = new Stopwatch().With( sw => sw.Start() );
 			MethodBase.GetCurrentMethod().As<MethodInfo>( methodUnderTest =>

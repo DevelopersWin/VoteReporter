@@ -27,6 +27,7 @@ namespace DragonSpark.Activation.IoC
 			return result;
 		}
 
+		[Freeze]
 		static IDependencyResolverPolicy Create( ParameterInfo parameter )
 		{
 			var attributes = parameter.GetCustomAttributes( false ) ?? Enumerable.Empty<Attribute>();

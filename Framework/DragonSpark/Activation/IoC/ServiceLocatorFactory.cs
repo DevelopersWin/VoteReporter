@@ -12,8 +12,14 @@ namespace DragonSpark.Activation.IoC
 {
 	public class FrozenDisposeContainerControlledLifetimeManager : ContainerControlledLifetimeManager
 	{
+		readonly ConditionMonitor monitor = new ConditionMonitor();
+
 		[Freeze]
-		protected override void Dispose( bool disposing ) => base.Dispose( disposing );
+		protected override void Dispose( bool disposing )
+		{
+			monitor.Apply();
+			base.Dispose( disposing );
+		}
 	}
 
 	public class ConfigureProviderCommand : ConfigureProviderCommandBase<ConfigureProviderCommand.Context>

@@ -1,8 +1,7 @@
+using System.Collections;
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
+using System.Linq;
 
 namespace DragonSpark.Aspects
 {
@@ -15,18 +14,22 @@ namespace DragonSpark.Aspects
 	{
 		public static MemberInfoTransformer Instance { get; } = new MemberInfoTransformer();
 
+		public MemberInfoTransformer() : base( IsTypeSpecification<MemberInfo>.Instance ) {}
+
 		protected override int CreateItem( MemberInfo parameter ) => parameter is TypeInfo
 			? 
 			parameter.GetHashCode() : 
 			parameter.DeclaringType.GetTypeInfo().GUID.GetHashCode() * 6776 + parameter.ToString().GetHashCode();
+	}
 
-		/*static string Build( MemberInfo parameter )
-		{
-			var builder = new StringBuilder();
-			builder.AppendFormat( "{0}+{1}",  );
-			var result = builder.ToString();
-			return result;
-		}#1#
+	public class ParameterInfoTransformer : FactoryBase<ParameterInfo, int>
+	{
+		public static ParameterInfoTransformer Instance { get; } = new ParameterInfoTransformer();
+
+		public ParameterInfoTransformer() : base( IsTypeSpecification<ParameterInfo>.Instance ) {}
+
+		protected override int CreateItem( ParameterInfo parameter ) => 
+			parameter.Member.DeclaringType.GetTypeInfo().GUID.GetHashCode() * 6776 + parameter.ToString().GetHashCode();
 	}*/
 
 	public class KeyFactory : KeyFactory<int>
@@ -39,12 +42,31 @@ namespace DragonSpark.Aspects
 			foreach ( var o in parameter )
 			{
 				var next = result * 31;
-				/*var memberInfo = o as MemberInfo;
-				var item = memberInfo != null ? MemberInfoTransformer.Instance.Create( memberInfo ) : o;*/
-				var increment = o?.GetHashCode() ?? 0;
+				var increment = GetCode( o );
 				result += next + increment;
 			}
 			return result;
+		}
+
+		int GetCode( object o )
+		{
+			var items = o as IEnumerable;
+			if ( items != null )
+			{
+				return Create( items.Cast<object>() );
+			}
+
+			/*if ( o is MemberInfo )
+			{
+				return MemberInfoTransformer.Instance.Create( o as MemberInfo );
+			}
+
+			if ( o is ParameterInfo )
+			{
+				return ParameterInfoTransformer.Instance.Create( o as ParameterInfo );
+			}*/
+			
+			return o?.GetHashCode() ?? 0;
 		}
 	}
 }

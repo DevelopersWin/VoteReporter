@@ -58,7 +58,7 @@ namespace DragonSpark.Activation.IoC
 			}
 		}
 
-		 class Context
+		class Context
 		{
 			readonly CompositionCoordinator coordinator;
 			readonly CompositionContract contract;

@@ -108,27 +108,25 @@ namespace DragonSpark.Activation.IoC
 
 	public class IntegratedUnityContainerFactory : FactoryBase<IUnityContainer>
 	{
-		readonly Func<IServiceProvider> provider;
+		readonly Func<IServiceProvider> source;
 
-		public IntegratedUnityContainerFactory( [Required]Assembly[] assemblies ) : this( assemblies.ToFactory() ) {}
+		public IntegratedUnityContainerFactory( [Required]Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies, Default<ITransformer<ContainerConfiguration>>.Items ).Create ) ) {}
+		
+		public IntegratedUnityContainerFactory( [Required]Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types, Default<ITransformer<ContainerConfiguration>>.Items ).Create ) ) {}
 
-		public IntegratedUnityContainerFactory( Func<Assembly[]> assemblies ) : this( new CompositionHostFactory( assemblies, Default<ITransformer<ContainerConfiguration>>.Items ) ) {}
+		// public IntegratedUnityContainerFactory( Func<Type[]> types ) : this( new CompositionHostFactory( types, Default<ITransformer<ContainerConfiguration>>.Items ) ) {}
 
-		public IntegratedUnityContainerFactory( [Required]Type[] types ) : this( types.ToFactory() ) {}
+		public IntegratedUnityContainerFactory( Func<ContainerConfiguration> configuration ) : this( new Func<IServiceProvider>( new Composition.ServiceLocatorFactory( new CompositionHostFactory( configuration ).Create ).Create ) ) {}
 
-		public IntegratedUnityContainerFactory( Func<Type[]> types ) : this( new CompositionHostFactory( types, Default<ITransformer<ContainerConfiguration>>.Items ) ) {}
-
-		public IntegratedUnityContainerFactory( CompositionHostFactory factory ) : this( new Func<IServiceProvider>( new Composition.ServiceLocatorFactory( factory.Create ).Create ) ) {}
-
-		public IntegratedUnityContainerFactory( [Required] Func<IServiceProvider> provider )
+		public IntegratedUnityContainerFactory( [Required] Func<IServiceProvider> source )
 		{
-			this.provider = provider;
+			this.source = source;
 		}
 
 		protected override IUnityContainer CreateItem()
 		{
-			var instance = provider();
-			var factory = new UnityContainerFactory( instance.Get<Assembly[]>, instance.Get<Type[]>, instance.Get<BuildableTypeFromConventionLocator>, instance.Get<CompositionHost> );
+			var provider = source();
+			var factory = new UnityContainerFactory( provider.Get<Assembly[]>, provider.Get<Type[]>, provider.Get<BuildableTypeFromConventionLocator>, provider.Get<CompositionHost> );
 			var result = factory.Create();
 			return result;
 		}

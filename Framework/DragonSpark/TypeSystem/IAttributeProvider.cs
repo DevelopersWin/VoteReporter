@@ -67,8 +67,6 @@ namespace DragonSpark.TypeSystem
 		[Freeze]
 		protected override IAttributeProvider CreateItem( object parameter )
 		{
-			var name = parameter.ToString();
-
 			var item = new MemberInfoAttributeProviderFactory.Parameter( parameter as MemberInfo ?? ( parameter as Type ?? parameter.GetType() ).GetTypeInfo(), includeRelated );
 			var result = inner.Create( item );
 			return result;

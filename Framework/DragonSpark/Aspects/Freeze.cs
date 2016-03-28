@@ -4,83 +4,58 @@ using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Aspects
 {
-	// [ReaderWriterSynchronized]
 	public class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
-		// readonly object owner;
-		public static CacheValueFactory Instance { get; } = new CacheValueFactory();
+		readonly HashSet<int> codes = new HashSet<int>();
 
-		// [Reference]
-		readonly IDictionary<int, Lazy<object>> items = new Dictionary<int, Lazy<object>>();
+		readonly IDictionary<int, object> items = new Dictionary<int, object>();
 
-		/*public CacheValueFactory( [Required] object owner )
+		object Get( int code, MethodInterceptionArgs args )
 		{
-			this.owner = owner;
-		}*/
+			var check = Add( code, args ) || ( args.Method as MethodInfo )?.ReturnType != typeof(void);
+			var result = check ? items[code] : null;
+			return result;
+		}
 
-		Lazy<object> Get( int code, MethodInterceptionArgs args )
+		bool Add( int code, MethodInterceptionArgs args )
 		{
-			lock ( items )
+			lock ( codes )
 			{
-				var add = !items.ContainsKey( code );
-				if ( add )
+				var result = !codes.Contains( code );
+				if ( result )
 				{
-					var instance = args.Instance ?? args.Method.DeclaringType;
-					/*var arguments = args.Arguments.Aggregate( "Arguments: ", ( s, o ) => $" Argument: {o} (Code: {o.GetHashCode()} - {KeyFactory.Instance.CreateUsing( o )})" );
-					var message = $"Adding: {code} for {instance} ({instance.GetHashCode()}). {arguments}";
-					Debug.WriteLine( "Output = {0}", message );*/
-					items.Add( code, new Lazy<object>( args.GetReturnValue, LazyThreadSafetyMode.PublicationOnly ) );
+					codes.Add( code );
+					items.Add( code, args.GetReturnValue() );
 				}
-				var check = add || ( args.Method as MethodInfo )?.ReturnType != typeof(void);
-				var result = check ? items[code] : null;
 				return result;
 			}
 		}
 
-		// [Writer]
 		protected override object CreateItem( MethodInterceptionArgs parameter )
 		{
-			var instance = parameter.Instance ?? parameter.Method.DeclaringType;
-			var enumerable = new[] { instance, parameter.DeclarationIdentifier }.Concat( parameter.Arguments );
-			var code = KeyFactory.Instance.Create( enumerable );
-			var deferred = Get( code, parameter );
-			/*var arguments = parameter.Arguments.Aggregate( "Arguments: ", ( s, o ) => $" Argument: {o} (Code: {o.GetHashCode()} - {KeyFactory.Instance.CreateUsing( o )})" );
-            var message = $"{this} is creating key: {code} for {instance} ({instance.GetHashCode()}). {arguments}";
-            Debug.WriteLine( "Output = {0}", message );*/
-			var result = deferred != null ? deferred.Value : parameter.ReturnValue;
+			var code = KeyFactory.Instance.Create( parameter.Arguments );
+			var result = Get( code, parameter ) ?? parameter.ReturnValue;
 			return result;
-			//return /*parameter.GetReturnValue()*/ null;
 		}
 	}
 
 	[PSerializable, ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
 	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
 	{
-		bool Enabled { get; set; }
+		CacheValueFactory Factory { get; set; }
 
-		// public bool UsingInstance { get; set; }
-
-		/*public override void RuntimeInitialize( MethodBase method )
-		{
-			throw new InvalidOperationException( "WTF" );
-
-			Message.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "0001", $"HELLO WTF", null, null, null ) );
-		}*/
-		void Initialize() => Enabled = true;
+		void Initialize() => Factory = new CacheValueFactory();
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( Enabled && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
+			if ( Factory != null && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
-				args.ReturnValue = CacheValueFactory.Instance.Create( args );
+				args.ReturnValue = Factory.Create( args );
 			}
 			else
 			{

@@ -87,21 +87,21 @@ namespace DragonSpark.Composition
 
 	public class ServiceProviderFactory : Setup.ServiceProviderFactory
 	{
-		public ServiceProviderFactory( [Required] Func<CompositionHost> source ) : base( new ServiceLocatorFactory( source ).Create, ConfigureProviderCommand.Instance.Run ) {}
+		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : base( new ServiceLocatorFactory( new CompositionHostFactory( source ).Create ).Create, ConfigureProviderCommand.Instance.Run ) {}
 	}
 
-	public class ServiceLocatorFromPartsFactory : ServiceLocatorFactory
+	/*public class ServiceLocatorFromPartsFactory : ServiceLocatorFactory
 	{
-		public ServiceLocatorFromPartsFactory( [Required]Assembly[] assemblies ) : this( assemblies.ToFactory() ) {}
+		public ServiceLocatorFromPartsFactory( [Required]Assembly[] assemblies ) : this( new CompositionHostFactory( assemblies ) ) {}
 
-		public ServiceLocatorFromPartsFactory( Func<Assembly[]> assemblies ) : this( new CompositionHostFactory( assemblies ) ) {}
+		//public ServiceLocatorFromPartsFactory( Func<Assembly[]> assemblies ) : this( new CompositionHostFactory( assemblies ) ) {}
 
-		public ServiceLocatorFromPartsFactory( [Required]Type[] types ) : this( types.ToFactory() ) {}
+		public ServiceLocatorFromPartsFactory( [Required]Type[] types ) : this( new CompositionHostFactory( types ) ) {}
 
-		public ServiceLocatorFromPartsFactory( Func<Type[]> types ) : this( new CompositionHostFactory( types ) ) {}
+		// public ServiceLocatorFromPartsFactory( Func<Type[]> types ) : this( new CompositionHostFactory( types ) ) {}
 
 		public ServiceLocatorFromPartsFactory( CompositionHostFactory factory ) : base( factory.Create ) {}
-	}
+	}*/
 
 	public class ServiceLocatorFactory : FactoryBase<IServiceProvider>
 	{
@@ -137,7 +137,7 @@ namespace DragonSpark.Composition
 		protected override void Configure( ProviderContext context )
 		{
 			context.Context.Logger.Information( Resources.ConfiguringServiceLocatorSingleton );
-			context.Provider.As<IServiceLocator>( locator => context.Context.Registry.Register( new InstanceExportDescriptorProvider<IServiceLocator>( locator ) ) );
+			// context.Provider.As<IServiceLocator>( locator => context.Context.Registry.Register( new InstanceExportDescriptorProvider<IServiceLocator>( locator ) ) );
 		}
 	}
 
@@ -145,14 +145,17 @@ namespace DragonSpark.Composition
 	{
 		readonly CompositionHost host;
 
+		readonly object[] instances;
+
 		public ServiceLocator( [Required]CompositionHost host )
 		{
 			this.host = host;
+			instances = new object[] { this, host };
 		}
 
 		protected override IEnumerable<object> DoGetAllInstances(Type serviceType) => host.GetExports( serviceType, null );
 
-		protected override object DoGetInstance(Type serviceType, string key) => serviceType.Adapt().IsInstanceOfType( host ) ? host : Retrieve( serviceType, key );
+		protected override object DoGetInstance(Type serviceType, string key) => instances.FirstOrDefault( serviceType.Adapt().IsInstanceOfType ) ?? Retrieve( serviceType, key );
 
 		object Retrieve( Type serviceType, string key )
 		{

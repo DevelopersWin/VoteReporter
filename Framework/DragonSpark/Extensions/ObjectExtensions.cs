@@ -83,12 +83,12 @@ namespace DragonSpark.Extensions
 
 		public static TItem With<TItem>( this TItem @this, Action<TItem> action )
 		{
-			var result = @this.With( item =>
+			if ( !Equals( @this, default(TItem) ) )
 			{
-				action?.Invoke( item );
-				return item;
-			} );
-			return result;
+				action?.Invoke( @this );
+				return @this;
+			}
+			return default(TItem);
 		}
 
 		public static bool Is<T>( [Required] this object @this ) => @this is T;
@@ -104,19 +104,9 @@ namespace DragonSpark.Extensions
 
 		public static TResult With<TItem, TResult>( this TItem? @this, Func<TItem, TResult> action ) where TItem : struct => @this != null ? @this.Value.With( action ) : default( TResult );
 
-		/*public static TItem BuildUp<TItem>( [Required]this TItem target ) where TItem : class => ObjectBuilder.Instance.BuildUp<TItem>( target );
-
-		public static TItem BuildUp<TItem>( [Required]this IObjectBuilder @this, TItem target ) where TItem : class
-		{
-			@this.BuildUp( target );
-			return target;
-		}*/
-
 		public static TResult Evaluate<TResult>( [Required]this object container, string expression ) => Evaluate<TResult>( ExpressionEvaluator.Instance, container, expression );
 
 		public static TResult Evaluate<TResult>( [Required]this IExpressionEvaluator @this, object container, string expression ) => (TResult)@this.Evaluate( container, expression );
-
-		// public static TResult AsValid<TItem, TResult>( this object @this, Func<TItem, TResult> with ) => @this.AsValid<TItem>( _ => { } ).With( with );
 
 		public static TItem AsValid<TItem>( this TItem @this, Action<TItem> with ) => AsValid( @this, with, null );
 

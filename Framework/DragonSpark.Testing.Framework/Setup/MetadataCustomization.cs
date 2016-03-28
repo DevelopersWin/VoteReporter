@@ -48,9 +48,9 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		ServiceProviderFactory() : base( new CompositionHostFactory( new Func<Assembly[]>( AssemblyProvider.Instance.Create ) ).Create ) {}
+		ServiceProviderFactory() : base( new AssemblyBasedConfigurationContainerFactory( AssemblyProvider.Instance.Create() ).Create ) {}
 
-		public ServiceProviderFactory( [Required] Type[] types ) : base( new CompositionHostFactory( types ).Create ) {}
+		public ServiceProviderFactory( [Required] Type[] types ) : base( new TypeBasedConfigurationContainerFactory( types ).Create ) {}
 	}
 
 	public class AssemblyProvider : AssemblyProviderBase

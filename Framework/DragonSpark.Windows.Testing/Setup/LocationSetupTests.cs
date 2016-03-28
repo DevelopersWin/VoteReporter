@@ -428,7 +428,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void BasicComposition( Assembly[] assemblies, IUnityContainer container, ExportDescriptorProvider provider )
 		{
-			using ( var host = new CompositionHostFactory( assemblies ).Create() )
+			using ( var host = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
 			{
 				host.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
 

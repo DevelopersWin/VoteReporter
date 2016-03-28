@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using DragonSpark.Aspects;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DragonSpark.Activation
 {
@@ -191,8 +190,8 @@ namespace DragonSpark.Activation
 		readonly Func<T> primary;
 		readonly IEnumerable<Func<T, T>> transformers;
 
-		public AggregateFactory( [Required]IFactory<T> primary, [Required]params ITransformer<T>[] transformers ) : this( primary.Create, transformers.Select( factory => factory.ToDelegate() ).ToArray() )
-		{ }
+		public AggregateFactory( [Required]IFactory<T> primary, [Required]params ITransformer<T>[] transformers )
+			: this( primary.Create, transformers.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
 		public AggregateFactory( [Required]Func<T> primary, [Required]params Func<T, T>[] transformers )
 		{

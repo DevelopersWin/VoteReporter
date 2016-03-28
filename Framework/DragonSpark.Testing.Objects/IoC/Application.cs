@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Objects.IoC
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		public ServiceProviderFactory() : base( new IntegratedUnityContainerFactory( new Func<Assembly[]>( Framework.Setup.AssemblyProvider.Instance.Create ) ).Create ) {}
+		public ServiceProviderFactory() : base( new IntegratedUnityContainerFactory( Framework.Setup.AssemblyProvider.Instance.Create() ).Create ) {}
 	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute

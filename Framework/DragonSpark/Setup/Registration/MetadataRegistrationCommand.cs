@@ -23,13 +23,19 @@ namespace DragonSpark.Setup.Registration
 
 		protected override void OnExecute( Type[] parameter )
 		{
-			var typeInfos = parameter
-				.AsTypeInfos()
-				.WhereDecorated<RegistrationBaseAttribute>()
-				.Select( item => item.Item2 ).Fixed();
-			typeInfos
+			MetadataRegistrationTypeFactory.Instance.Create( parameter )
 				.SelectMany( HostedValueLocator<IRegistration>.Instance.Create )
 				.Each( registration => registration.Register( registry ) );
 		}
+	}
+
+	public class MetadataRegistrationTypeFactory : TransformerBase<Type[]>
+	{
+		public static MetadataRegistrationTypeFactory Instance { get; } = new MetadataRegistrationTypeFactory();
+
+		protected override Type[] CreateItem( Type[] parameter ) => parameter
+			.AsTypeInfos()
+			.WhereDecorated<RegistrationBaseAttribute>()
+			.Select( item => item.Item2 ).AsTypes().Fixed();
 	}
 }
