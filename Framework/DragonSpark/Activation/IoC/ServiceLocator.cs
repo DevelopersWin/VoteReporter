@@ -1,7 +1,5 @@
-﻿using DragonSpark.Composition;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Properties;
-using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
@@ -9,9 +7,7 @@ using PostSharp.Patterns.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Composition.Hosting;
 using System.Linq;
-using System.Reflection;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -19,7 +15,7 @@ namespace DragonSpark.Activation.IoC
 	[Disposable( ThrowObjectDisposedException = true )]
 	public class ServiceLocator : ServiceLocatorImplBase
 	{
-		public ServiceLocator( [Required]IUnityContainer container ) : this( container, container.Resolve<ILogger>() ) {}
+		// public ServiceLocator( [Required]IUnityContainer container ) : this( container, container.Resolve<ILogger>() ) {}
 
 		public ServiceLocator( [Required]IUnityContainer container, [Required]ILogger logger )
 		{
@@ -55,7 +51,7 @@ namespace DragonSpark.Activation.IoC
 
 	public abstract class UnityConfigurator : TransformerBase<IUnityContainer> {}
 
-	public class DefaultUnityInstances : UnityConfigurator
+	/*public class DefaultUnityInstances : UnityConfigurator
 	{
 		readonly Func<Assembly[]> assemblySource;
 		readonly Func<Type[]> types;
@@ -77,7 +73,7 @@ namespace DragonSpark.Activation.IoC
 				.RegisterInstance( instance )
 				.RegisterInstance( locator() );
 		}
-	}
+	}*/
 
 	public class DefaultUnityExtensions : UnityConfigurator
 	{
@@ -88,35 +84,36 @@ namespace DragonSpark.Activation.IoC
 				.Extend<CachingBuildPlanExtension>()
 				.Extend<DefaultRegistrationsExtension>()
 				.Extend<StrategyPipelineExtension>()
+				.Extend<ServicesIntegrationExtension>()
 				.Extend<InstanceTypeRegistrationMonitorExtension>();
 	}
 
-	public class CompositionConfigurator : UnityConfigurator
+	public class ServicesConfigurator : UnityConfigurator
 	{
-		readonly Func<CompositionHost> host;
+		readonly Func<IServiceProvider> provider;
 
-		public CompositionConfigurator( [Required] Func<CompositionHost> host )
+		public ServicesConfigurator( [Required] Func<IServiceProvider> provider )
 		{
-			this.host = host;
+			this.provider = provider;
 		}
 
 		protected override IUnityContainer CreateItem( IUnityContainer parameter ) => 
 			parameter
-				.RegisterInstance( host() )
-				.Extend<CompositionExtension>();
+				.RegisterInstance( provider() )
+				.Extend<ServicesIntegrationExtension>();
 	}
 
-	public class IntegratedUnityContainerFactory : FactoryBase<IUnityContainer>
+	/*public class IntegratedUnityContainerFactory : FactoryBase<IUnityContainer>
 	{
 		readonly Func<IServiceProvider> source;
 
-		public IntegratedUnityContainerFactory( [Required]Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies, Default<ITransformer<ContainerConfiguration>>.Items ).Create ) ) {}
+		public IntegratedUnityContainerFactory( [Required]Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
 		
-		public IntegratedUnityContainerFactory( [Required]Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types, Default<ITransformer<ContainerConfiguration>>.Items ).Create ) ) {}
+		public IntegratedUnityContainerFactory( [Required]Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
 
 		// public IntegratedUnityContainerFactory( Func<Type[]> types ) : this( new CompositionHostFactory( types, Default<ITransformer<ContainerConfiguration>>.Items ) ) {}
 
-		public IntegratedUnityContainerFactory( Func<ContainerConfiguration> configuration ) : this( new Func<IServiceProvider>( new Composition.ServiceLocatorFactory( new CompositionHostFactory( configuration ).Create ).Create ) ) {}
+		public IntegratedUnityContainerFactory( Func<ContainerConfiguration> configuration ) : this( new Func<IServiceProvider>( new Composition.ServiceLocatorFactory( configuration ).Create ) ) {}
 
 		public IntegratedUnityContainerFactory( [Required] Func<IServiceProvider> source )
 		{
@@ -126,20 +123,18 @@ namespace DragonSpark.Activation.IoC
 		protected override IUnityContainer CreateItem()
 		{
 			var provider = source();
-			var factory = new UnityContainerFactory( provider.Get<Assembly[]>, provider.Get<Type[]>, provider.Get<BuildableTypeFromConventionLocator>, provider.Get<CompositionHost> );
+			var factory = new UnityContainerFactory( provider.Get<Assembly[]>, provider.Get<Type[]>, provider.Get<BuildableTypeFromConventionLocator>, provider.Get<CompositionContext> );
 			var result = factory.Create();
 			return result;
 		}
-	}
+	}*/
 
 	public class UnityContainerFactory : AggregateFactory<IUnityContainer>
 	{
-		public UnityContainerFactory( [Required] Func<Assembly[]> assemblies, [Required] Func<Type[]> types, [Required] Func<BuildableTypeFromConventionLocator> locator, Func<CompositionHost> host )
+		public UnityContainerFactory( [Required] Func<IServiceProvider> provider )
 			: base( () => new UnityContainer(),
-				new DefaultUnityInstances( assemblies, types, locator ).Create,
-				DefaultUnityExtensions.Instance.Create,
-				new CompositionConfigurator( host ).Create
-			)
-		{}
+				new ServicesConfigurator( provider ).Create,
+				DefaultUnityExtensions.Instance.Create
+			) {}
 	}
 }

@@ -1,10 +1,9 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation.IoC;
+using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Activation.IoC;
-using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Activation
 {
@@ -22,11 +21,12 @@ namespace DragonSpark.Activation
 
 		public static IEnumerable<T> ActivateMany<T>( this IActivator @this, IEnumerable<Type> types ) => @this.ActivateMany( typeof(T), types ).Cast<T>();
 
-		public static IEnumerable<object> ActivateMany( this IActivator @this, Type objectType, IEnumerable<Type> types )
-		{
-			var enumerable = types.Where( @objectType.Adapt().IsAssignableFrom ).Where( @this.CanCreate ).Fixed();
-			return enumerable.Select( @this.Create ).NotNull();
-		}
+		public static IEnumerable<object> ActivateMany( this IActivator @this, Type objectType, IEnumerable<Type> types ) => 
+			types
+				.Where( @objectType.Adapt().IsAssignableFrom )
+				.Where( @this.CanCreate )
+				.Select( @this.Create )
+				.NotNull();
 	}
 
 	public class Activator : CompositeActivator

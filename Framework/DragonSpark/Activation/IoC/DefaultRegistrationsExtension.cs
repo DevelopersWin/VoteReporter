@@ -1,46 +1,19 @@
-using DragonSpark.Composition;
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
-using Serilog;
-using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Input;
-using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
 {
-	public class DefaultRegistrationsExtension : MonitorExtensionBase
+	public class DefaultRegistrationsExtension : UnityContainerExtension
 	{
-		readonly RegisterDefaultCommand register;
 		readonly PersistentServiceRegistry registry;
-		readonly RegisterDefaultCommand.Parameter[] parameters;
-		readonly ICollection<ICommand> commands;
 
-		public DefaultRegistrationsExtension( [Required]IUnityContainer container, [Required]Assembly[] assemblies, [Required]RegisterDefaultCommand register ) 
-			: this( container, assemblies, register, new RecordingLoggerFactory() ) {}
-
-		DefaultRegistrationsExtension( [Required] IUnityContainer container, [Required] Assembly[] assemblies, [Required] RegisterDefaultCommand register, [Required] RecordingLoggerFactory factory ) 
-			: this( container, assemblies, register, factory.History, factory.LevelSwitch, factory.Create() ) {}
-
-		DefaultRegistrationsExtension( [Required] IUnityContainer container, [Required] Assembly[] assemblies, [Required] RegisterDefaultCommand register, [Required]ILoggerHistory sink, [Required]Serilog.Core.LoggingLevelSwitch levelSwitch, [Required]ILogger logger ) 
-			: this( assemblies, register, sink, levelSwitch, logger, new PersistentServiceRegistry( container, logger, new LifetimeManagerFactory<ContainerControlledLifetimeManager>( container ) ) ) {}
-
-		DefaultRegistrationsExtension( [Required]Assembly[] assemblies, [Required]RegisterDefaultCommand register, [Required]ILoggerHistory history, [Required]Serilog.Core.LoggingLevelSwitch levelSwitch, [Required]ILogger logger, [Required]PersistentServiceRegistry registry )
+		public DefaultRegistrationsExtension( [Required]PersistentServiceRegistry registry )
 		{
-			this.register = register;
 			this.registry = registry;
 
-			var loggingParameter = new RegisterDefaultCommand.Parameter<ILogger>( logger );
+			/*var loggingParameter = new RegisterDefaultCommand.Parameter<ILogger>( logger );
 			var sinkParameter = new RegisterDefaultCommand.Parameter<ILoggerHistory>( history );
 			parameters = new RegisterDefaultCommand.Parameter[]
 			{
@@ -50,14 +23,14 @@ namespace DragonSpark.Activation.IoC
 				sinkParameter,
 				loggingParameter
 			};
-			commands = new Collection<ICommand>( new ICommand[] { new MonitorLoggerRegistrationCommand( history, loggingParameter ), new MonitorLoggerHistoryRegistrationCommand( sinkParameter ) } );
+			commands = new Collection<ICommand>( new ICommand[] { new MonitorLoggerRegistrationCommand( history, loggingParameter ), new MonitorLoggerHistoryRegistrationCommand( sinkParameter ) } );*/
 		}
 
 		protected override void Initialize()
 		{
-			base.Initialize();
+			// base.Initialize();
 
-			parameters.Each( register.ExecuteWith );
+			// parameters.Each( register.ExecuteWith );
 
 			registry.Register( Context );
 			registry.Register( Context.Policies );
@@ -72,7 +45,7 @@ namespace DragonSpark.Activation.IoC
 			public Activator( [Required]Locator locator, [Required]Constructor constructor ) : base( locator, constructor, Activation.Constructor.Instance ) {}
 		}
 
-		protected override void OnRegisteringInstance( object sender, RegisterInstanceEventArgs args ) => commands.ExecuteMany( args.Instance ).NotNull().ToArray().Each( command =>
+		/*protected override void OnRegisteringInstance( object sender, RegisterInstanceEventArgs args ) => commands.ExecuteMany( args.Instance ).NotNull().ToArray().Each( command =>
 		{
 			if ( commands.Remove( command ) )
 			{
@@ -84,10 +57,10 @@ namespace DragonSpark.Activation.IoC
 		{
 			base.Remove();
 			commands.Clear();
-		}
+		}*/
 	}
 
-	public class RegisterDefaultCommand : Command<RegisterDefaultCommand.Parameter>
+	/*public class RegisterDefaultCommand : Command<RegisterDefaultCommand.Parameter>
 	{
 		readonly IUnityContainer container;
 
@@ -137,9 +110,9 @@ namespace DragonSpark.Activation.IoC
 		{
 			public Default( object instance ) : base( instance ) {}
 		}
-	}
+	}*/
 
-	class MonitorLoggerRegistrationCommand : MonitorRegistrationCommandBase<ILogger>
+	/*class MonitorLoggerRegistrationCommand : MonitorRegistrationCommandBase<ILogger>
 	{
 		readonly ILoggerHistory history;
 
@@ -186,9 +159,9 @@ namespace DragonSpark.Activation.IoC
 			var result = parameter != Parameter.Instance() && base.CanExecute( parameter );
 			return result;
 		}
-	}
+	}*/
 
-	public class DefaultInjection : InjectionMember
+	/*public class DefaultInjection : InjectionMember
 	{
 		readonly InjectionMember inner;
 
@@ -212,9 +185,9 @@ namespace DragonSpark.Activation.IoC
 				policies.GetBuildPlan( key ).With( policy => new Applied( policy ).Item.Apply() );
 			}
 		}
-	}
+	}*/
 
-	public class DefaultValueStrategy : BuilderStrategy
+	/*public class DefaultValueStrategy : BuilderStrategy
 	{
 		readonly IUnityContainer container;
 		readonly Func<ILogger> logger;
@@ -239,5 +212,5 @@ namespace DragonSpark.Activation.IoC
 				context.Policies.ClearBuildPlan( reference );
 			}
 		} );
-	}
+	}*/
 }

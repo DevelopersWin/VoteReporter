@@ -1,11 +1,12 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Setup;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using System;
-using DragonSpark.Activation;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework
@@ -47,11 +48,26 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class AssignExecutionContextCommand : AssignValueCommand<Tuple<string>>
+	public class AssignExecutionContextCommand : AssignValueCommand<int?>
 	{
-		public AssignExecutionContextCommand() : this( CurrentExecution.Instance ) {}
+		readonly IWritableValue<IServiceProvider> serviceProvider;
 
-		public AssignExecutionContextCommand( IWritableValue<Tuple<string>> value ) : base( value ) {}
+		public AssignExecutionContextCommand() : this( new CurrentServiceProvider(), CurrentExecution.Instance ) {}
+
+		public AssignExecutionContextCommand( IWritableValue<IServiceProvider> serviceProvider, IWritableValue<int?> value ) : base( value )
+		{
+			this.serviceProvider = serviceProvider;
+		}
+
+		protected override void OnExecute( int? parameter )
+		{
+			if ( serviceProvider.Item == null )
+			{
+				serviceProvider.Assign( new ServiceProvider() );
+			}
+
+			base.OnExecute( parameter );
+		}
 	}
 
 	[Disposable]

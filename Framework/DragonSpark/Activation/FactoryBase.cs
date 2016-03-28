@@ -156,7 +156,9 @@ namespace DragonSpark.Activation
 			this.inner = inner;
 		}
 
-		protected override U CreateItem( T parameter ) => inner.FirstWhere( factory => factory( parameter ) );
+		protected sealed override U CreateItem( T parameter ) => DetermineFirst( inner, parameter );
+
+		protected virtual U DetermineFirst( IEnumerable<Func<T, U>> factories, T parameter ) => factories.FirstWhere( factory => factory( parameter ) );
 	}
 
 	public class FirstFactory<T> : FactoryBase<T>

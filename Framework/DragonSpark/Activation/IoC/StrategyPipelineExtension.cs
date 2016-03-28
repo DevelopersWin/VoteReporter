@@ -89,14 +89,14 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
 		readonly ConventionStrategy conventionStrategy;
-		readonly DefaultValueStrategy defaultValueStrategy;
+		//readonly DefaultValueStrategy defaultValueStrategy;
 		readonly EnumerableResolutionStrategy enumerableResolutionStrategy;
 		
-		public StrategyPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required] DefaultValueStrategy defaultValueStrategy, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy )
+		public StrategyPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy/*, [Required] DefaultValueStrategy defaultValueStrategy*/, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy )
 		{
 			this.metadataLifetimeStrategy = metadataLifetimeStrategy;
 			this.conventionStrategy = conventionStrategy;
-			this.defaultValueStrategy = defaultValueStrategy;
+			// this.defaultValueStrategy = defaultValueStrategy;
 			this.enumerableResolutionStrategy = enumerableResolutionStrategy;
 		}
 
@@ -107,7 +107,7 @@ namespace DragonSpark.Activation.IoC
 			Context.Strategies.Add( metadataLifetimeStrategy, UnityBuildStage.Lifetime );
 			Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
 			Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
-			Context.Strategies.Add( defaultValueStrategy, UnityBuildStage.Lifetime );
+			// Context.Strategies.Add( defaultValueStrategy, UnityBuildStage.Lifetime );
 			Context.Strategies.Add( conventionStrategy, UnityBuildStage.PreCreation );
 			Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
 			Context.Strategies.Add( enumerableResolutionStrategy, UnityBuildStage.Creation );
@@ -184,27 +184,6 @@ namespace DragonSpark.Activation.IoC
 			this.strategy = strategy;
 			this.specification = specification;
 		}
-
-		/*public class Specification : SpecificationBase<Type>
-		{
-			readonly ISpecification<Type> inner;
-			readonly ISingletonLocator locator;
-
-			public Specification() : this( CanBuildSpecification.Instance.Inverse<Type>(), SingletonLocator.Instance )
-			{
-			}
-
-			public Specification( [Required] ISpecification<Type> inner, [Required] ISingletonLocator locator )
-			{
-				this.inner = inner;
-				this.locator = locator;
-			}
-
-			protected override bool Verify( Type parameter )
-			{
-				
-			}
-		}*/
 
 		[Freeze]
 		protected override Type CreateItem( Type parameter )

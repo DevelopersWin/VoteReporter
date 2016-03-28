@@ -1,17 +1,11 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation.IoC;
 using Microsoft.Practices.Unity;
-using Serilog;
 using System;
 
 namespace DragonSpark.Extensions
 {
 	public static class UnityContainerExtensions
 	{
-		// public static IServiceRegistry Registry( this IUnityContainer @this ) => @this.Resolve<IServiceRegistry>();
-
-		public static ILogger Logger( this IUnityContainer @this ) => @this.Resolve<ILogger>();
-
 		public static T Resolve<T>( this IUnityContainer container, Type type ) => (T)container.Resolve( type );
 
 		public static T Resolve<T>( this IUnityContainer @this, Func<T> @default ) => @this.IsRegistered<T>() ? @this.Resolve<T>() : @default();
@@ -32,8 +26,6 @@ namespace DragonSpark.Extensions
 
 		static UnityContainerExtension Create( IUnityContainer container, Type extensionType )
 		{
-			// var activator = container.Resolve<IActivator>( () => SystemActivator.Instance );
-			// var extension = activator.Activate<UnityContainerExtension>( extensionType );
 			var extension = container.Resolve<UnityContainerExtension>( extensionType );
 			var result = extension.WithSelf( container.AddExtension );
 			return result;

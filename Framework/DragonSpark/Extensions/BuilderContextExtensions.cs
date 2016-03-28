@@ -1,7 +1,5 @@
-using DragonSpark.Activation.IoC;
 using DragonSpark.Runtime.Values;
 using Microsoft.Practices.ObjectBuilder2;
-using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Extensions
@@ -19,7 +17,7 @@ namespace DragonSpark.Extensions
 			return result;
 		}*/
 
-		public static bool HasRegisteredBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ).With( policy => !new DefaultInjection.Applied( policy ).Item.IsApplied );
+		// public static bool HasRegisteredBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ).With( policy => !new DefaultInjection.Applied( policy ).Item.IsApplied );
 
 		public static bool HasBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ) != null;
 

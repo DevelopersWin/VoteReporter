@@ -28,9 +28,9 @@ namespace DragonSpark.Activation.IoC
 		readonly ILogger logger;
 		readonly Func<Type, LifetimeManager> lifetimeFactory;
 
-		public ServiceRegistry( IUnityContainer container, Type lifetimeFactoryType ) : this( container, container.Logger(), t => container.Resolve<LifetimeManager>( lifetimeFactoryType ) ) { }
+		public ServiceRegistry( IUnityContainer container, Type lifetimeFactoryType ) : this( container, container.Resolve<ILogger>(), t => container.Resolve<LifetimeManager>( lifetimeFactoryType ) ) { }
 
-		public ServiceRegistry( IUnityContainer container, LifetimeManager lifetimeManager ) : this( container, container.Logger(), type => lifetimeManager ) { }
+		public ServiceRegistry( IUnityContainer container, LifetimeManager lifetimeManager ) : this( container, container.Resolve<ILogger>(), type => lifetimeManager ) { }
 
 		public ServiceRegistry( IUnityContainer container, ILogger logger, [Required]LifetimeManagerFactory factory ) : this( container, logger, factory.Create ) { }
 

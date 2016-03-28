@@ -8,18 +8,17 @@ using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using DragonSpark.Diagnostics;
-using Serilog;
-using ExportDescriptorProvider = System.Composition.Hosting.Core.ExportDescriptorProvider;
 
 namespace DragonSpark.Composition
 {
 	public static class CompositionHostExtensions
 	{
-		public static T TryGet<T>( this CompositionContext @this, string name = null )
+		public static T TryGet<T>( this CompositionContext @this, string name = null ) => TryGet<T>( @this, null, name );
+
+		public static T TryGet<T>( this CompositionContext @this, Type type, string name = null )
 		{
-			T existing;
-			var result = @this.TryGetExport( name, out existing ) ? existing : default(T);
+			object existing;
+			var result = @this.TryGetExport( type, name, out existing ) ? (T)existing : default(T);
 			return result;
 		}
 
@@ -78,7 +77,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class DefaultLoggingExportDescriptorProvider : ExportDescriptorProvider
+	/*public class DefaultLoggingExportDescriptorProvider : ExportDescriptorProvider
 	{
 		readonly Lazy<ILogger> logger;
 
@@ -100,7 +99,7 @@ namespace DragonSpark.Composition
 				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, _ => ExportDescriptor.Create( ( context, operation ) => logger.Value, NoMetadata ) );
 			}
 		}
-	}
+	}*/
 
 	public class RegisteredExportDescriptorProvider : ExportDescriptorProvider, IExportDescriptorProviderRegistry
 	{

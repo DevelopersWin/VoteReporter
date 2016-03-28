@@ -19,6 +19,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Composition;
+using System.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -426,11 +427,12 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void BasicComposition( Assembly[] assemblies, IUnityContainer container, ExportDescriptorProvider provider )
+		public void BasicComposition( Assembly[] assemblies, IUnityContainer container )
 		{
-			using ( var host = new CompositionHostFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
+			var provider = new Composition.ServiceProviderFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create();
+			using ( var host = provider.Get<CompositionHost>() )
 			{
-				host.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
+				// host.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
 
 				var test = host.GetExport<Assembly>();
 				Assert.NotNull( test );

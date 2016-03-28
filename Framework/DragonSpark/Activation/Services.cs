@@ -1,7 +1,11 @@
+using DragonSpark.Composition;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
+using Serilog;
+using Serilog.Core;
 using System;
 using ServiceLocator = Microsoft.Practices.ServiceLocation.ServiceLocator;
 
@@ -11,31 +15,50 @@ namespace DragonSpark.Activation
 	{
 		static Services()
 		{
+			Initialize( new ServiceProvider() );
+
 			ServiceLocator.SetLocatorProvider( Get<IServiceLocator> );
 		}
 
-		class ServiceProvider : IServiceProvider
-		{
-			public static ServiceProvider Instance { get; } = new ServiceProvider();
+		public static void Initialize( [Required] IServiceProvider provider ) => Provider = provider;
 
-			readonly IActivator activator;
-
-			ServiceProvider() : this( Activator.Instance ) {}
-
-			ServiceProvider( [Required]IActivator activator )
-			{
-				this.activator = activator;
-			}
-
-			public object GetService( Type serviceType ) => serviceType.Adapt().IsInstanceOfType( activator ) ? activator : activator.Activate<object>( serviceType );
-		}
-
-		static IServiceProvider Current => (IServiceProvider)new CurrentApplication().Item ?? ServiceProvider.Instance;
-
+		static IServiceProvider Provider {get; set; }
+		
 		public static T Get<T>() => Get<T>( typeof(T) );
 
 		public static T Get<T>( [Required]Type type ) => (T)Get( type );
-		
-		public static object Get( [Required] Type type ) => Current.GetService( type );
+
+		public static object Get( [Required] Type type ) =>
+			new[] { new CurrentServiceProvider().Item, Provider }.FirstWhere( provider => provider.GetService( type ) );
+	}
+
+	public class ServiceProvider : CompositeServiceProvider
+	{
+		public ServiceProvider() : base( new DefaultInstances(), ActivatedServiceProvider.Instance ) {}
+	}
+
+	class DefaultInstances : InstanceServiceProvider
+	{
+		public DefaultInstances() : this( new RecordingLoggerFactory() ) {}
+
+		DefaultInstances( RecordingLoggerFactory factory ) : this( factory.Create(), factory.History, factory.LevelSwitch, Activator.Instance ) {}
+
+		public DefaultInstances( ILogger logger, ILoggerHistory history, LoggingLevelSwitch level, IActivator activator ) : base( logger, history, level, activator ) {}
+	}
+
+	class ActivatedServiceProvider : IServiceProvider
+	{
+		public static ActivatedServiceProvider Instance { get; } = new ActivatedServiceProvider();
+
+		readonly IActivator activator;
+
+		ActivatedServiceProvider() : this( Activator.Instance ) {}
+
+		ActivatedServiceProvider( [Required]IActivator activator )
+		{
+			this.activator = activator;
+		}
+
+		public object GetService( Type serviceType ) => activator.Activate<object>( serviceType );
 	}
 }

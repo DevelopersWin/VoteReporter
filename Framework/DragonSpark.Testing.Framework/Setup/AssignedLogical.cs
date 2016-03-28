@@ -4,7 +4,6 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public class AssignedLogical<T> : LogicalValue<T>
 	{
-		public AssignedLogical() : base( typeof(T).AssemblyQualifiedName )
-		{ }
+		public AssignedLogical() : base( typeof(T).AssemblyQualifiedName ) {}
 	}
 }

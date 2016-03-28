@@ -4,10 +4,8 @@ using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
-using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -44,18 +42,18 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
-			var stopwatch = new Stopwatch().With( sw => sw.Start() );
+			// var stopwatch = new Stopwatch().With( sw => sw.Start() );
 			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
 			{
 				var autoData = new AutoData( Fixture, methodUnderTest );
 				var application = source( autoData );
 				using ( new ExecuteApplicationCommand( application ).ExecuteWith( autoData ) )
 				{
-					var logger1 = application.Get<ILogger>();
+					/*var logger1 = application.Get<ILogger>();
 					logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );
-					stopwatch.Restart();
+					stopwatch.Restart();*/
 					var result = base.GetData( methodUnderTest );
-					logger1.With( logger => logger.Information( $"Data Complete: {stopwatch.ElapsedMilliseconds}" ) );
+					// logger1.With( logger => logger.Information( $"Data Complete: {stopwatch.ElapsedMilliseconds}" ) );
 					return result;
 					
 				}

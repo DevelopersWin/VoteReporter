@@ -62,7 +62,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<Tuple<TFirst, TLast>> TupleWith<TFirst, TLast>( this IEnumerable<TFirst> target, IEnumerable<TLast> other ) => target.Select( ( first, i ) => new Tuple<TFirst, TLast>( first, other.ElementAtOrDefault( i ) ) ).ToArray();
 
-		public static U FirstWhere<T, U>( this IEnumerable<T> @this, Func<T, U> where ) => @this.Select( @where ).NotNull().FirstOrDefault();
+		public static U FirstWhere<T, U>( this IEnumerable<T> @this, Func<T, U> where ) => @this.NotNull().Select( @where ).NotNull().FirstOrDefault();
 
 		public static IEnumerable<TItem> NotNull<TItem>( this IEnumerable<TItem> target ) => NotNull( target, Default<TItem>.Self );
 
