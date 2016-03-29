@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
 using DragonSpark.Windows.Runtime;
 
 namespace DevelopersWin.VoteReporter.Application.Startup
@@ -8,7 +9,7 @@ namespace DevelopersWin.VoteReporter.Application.Startup
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
 		public ServiceProviderFactory() : base( 
-			new IntegratedUnityContainerFactory( AssemblyProvider.Instance.Create() ).Create
+			new AssemblyBasedConfigurationContainerFactory( AssemblyProvider.Instance.Create() ).Create
 		) {}
 	}
 }

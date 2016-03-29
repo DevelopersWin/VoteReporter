@@ -2,6 +2,7 @@
 using DragonSpark.TypeSystem;
 using System.Collections.Generic;
 using System.Windows.Input;
+using DragonSpark.Composition;
 using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 
 namespace DragonSpark.Windows.Testing.Setup
@@ -10,7 +11,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
-		ServiceProviderFactory() : base( new IntegratedUnityContainerFactory( AssemblyProvider.Instance.Create() ).Create ) {}
+		ServiceProviderFactory() : base( new AssemblyBasedConfigurationContainerFactory( AssemblyProvider.Instance.Create() ).Create ) {}
 	}
 
 	public class Application<T> : DragonSpark.Testing.Framework.Setup.Application<T> where T : ICommand

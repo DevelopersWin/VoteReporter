@@ -15,7 +15,7 @@ namespace DragonSpark.Activation.IoC
 	[Disposable( ThrowObjectDisposedException = true )]
 	public class ServiceLocator : ServiceLocatorImplBase
 	{
-		// public ServiceLocator( [Required]IUnityContainer container ) : this( container, container.Resolve<ILogger>() ) {}
+		public ServiceLocator( [Required]IUnityContainer container ) : this( container, container.Resolve<ILogger>() ) {}
 
 		public ServiceLocator( [Required]IUnityContainer container, [Required]ILogger logger )
 		{
@@ -50,30 +50,6 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	public abstract class UnityConfigurator : TransformerBase<IUnityContainer> {}
-
-	/*public class DefaultUnityInstances : UnityConfigurator
-	{
-		readonly Func<Assembly[]> assemblySource;
-		readonly Func<Type[]> types;
-		readonly Func<BuildableTypeFromConventionLocator> locator;
-
-		public DefaultUnityInstances( [Required] Func<Assembly[]> assemblySource, [Required] Func<Type[]> types, [Required] Func<BuildableTypeFromConventionLocator> locator )
-		{
-			this.assemblySource = assemblySource;
-			this.types = types;
-			this.locator = locator;
-		}
-
-		protected override IUnityContainer CreateItem( IUnityContainer parameter )
-		{
-			var instance = types();
-			var assemblies = assemblySource();
-			return parameter
-				.RegisterInstance( assemblies )
-				.RegisterInstance( instance )
-				.RegisterInstance( locator() );
-		}
-	}*/
 
 	public class DefaultUnityExtensions : UnityConfigurator
 	{

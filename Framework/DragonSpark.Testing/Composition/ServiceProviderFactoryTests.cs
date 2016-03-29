@@ -12,7 +12,7 @@ namespace DragonSpark.Testing.Composition
 {
 	[AssemblyProvider.Register]
 	[AssemblyProvider.Types]
-	public class ServiceProvidersFactoryTests
+	public class ServiceProviderFactoryTests
 	{
 		[Theory, AutoData]
 		public void BasicComposition( Assembly[] assemblies, string text )

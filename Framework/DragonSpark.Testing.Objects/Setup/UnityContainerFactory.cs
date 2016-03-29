@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
+﻿using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
@@ -13,7 +12,7 @@ using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
-	public class UnityContainerFactory : IntegratedUnityContainerFactory
+	public class UnityContainerFactory : Activation.IoC.UnityContainerFactory
 	{
 		public class Register : RegisterFactoryAttribute
 		{
@@ -22,7 +21,7 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		public UnityContainerFactory() : base( Default<Assembly>.Items ) {}
+		public UnityContainerFactory() : base( new DragonSpark.Composition.ServiceProviderFactory( new AssemblyBasedConfigurationContainerFactory( Default<Assembly>.Items ).Create ).Create ) {}
 	}
 
 	[Export, Shared]

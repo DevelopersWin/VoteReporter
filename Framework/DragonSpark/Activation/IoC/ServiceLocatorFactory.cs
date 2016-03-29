@@ -1,6 +1,3 @@
-using DragonSpark.Aspects;
-using DragonSpark.Composition;
-using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
@@ -9,12 +6,11 @@ using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
-using System.Composition;
 using System.Composition.Hosting;
 
 namespace DragonSpark.Activation.IoC
 {
-	public class FrozenDisposeContainerControlledLifetimeManager : ContainerControlledLifetimeManager
+	/*public class FrozenDisposeContainerControlledLifetimeManager : ContainerControlledLifetimeManager
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
@@ -24,7 +20,7 @@ namespace DragonSpark.Activation.IoC
 			monitor.Apply();
 			base.Dispose( disposing );
 		}
-	}
+	}*/
 
 	public class ConfigureProviderCommand : Command<IServiceLocator>
 	{
@@ -40,37 +36,35 @@ namespace DragonSpark.Activation.IoC
 		protected override void OnExecute( IServiceLocator parameter )
 		{
 			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
-			container.RegisterInstance( parameter, new FrozenDisposeContainerControlledLifetimeManager() );
-		}
-	}
-	
-	public class ServiceProvidersFactory : FactoryBase<IServiceProvider[]>
-	{
-		readonly Func<IUnityContainer> container;
-		readonly Func<CompositionContext> source;
-
-		public ServiceProvidersFactory( [Required] Func<ContainerConfiguration> configuration, [Required] Func<IUnityContainer> container )
-			: this( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ), container ) {}
-
-		public ServiceProvidersFactory( [Required] Func<CompositionContext> source, [Required] Func<IUnityContainer> container )
-		{
-			this.container = container;
-			this.source = source;
-		}
-
-		protected override IServiceProvider[] CreateItem()
-		{
-			var composition = new Composition.ServiceLocator( source() );
-			var @default = new CurrentServiceProvider().Item;
-			var combined = new CompositeServiceProvider( composition, @default );
-			var primary = new ServiceLocator( container(), combined.Get<ILogger>() );
-			var result = new[] { new InstanceServiceProvider( primary ), composition, primary, @default };
-			return result;
+			// container.RegisterInstance( parameter, new FrozenDisposeContainerControlledLifetimeManager() );
 		}
 	}
 
 	public class ServiceProviderFactory : ServiceProviderFactory<ConfigureProviderCommand, IServiceLocator>
 	{
-		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> configuration, [Required] Func<IUnityContainer> source ) : base( new ServiceProvidersFactory( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ), source ).Create ) {}
+		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> configuration ) 
+			: base( new ServiceProviderSourceFactory( configuration ).Create ) {}
+	}
+
+	public class ServiceProviderSourceFactory : FactoryBase<IServiceProvider>
+	{
+		readonly Func<IUnityContainer> source;
+
+		public ServiceProviderSourceFactory( [Required] Func<ContainerConfiguration> configuration )
+			: this( new Func<IServiceProvider>( new Composition.ServiceProviderSourceFactory( configuration ).Create ) ) {}
+
+		public ServiceProviderSourceFactory( [Required] Func<IServiceProvider> provider ) : this( new Func<IUnityContainer>( new UnityContainerFactory( provider ).Create ) ) {}
+
+		public ServiceProviderSourceFactory( [Required] Func<IUnityContainer> source )
+		{
+			this.source = source;
+		}
+
+		protected override IServiceProvider CreateItem()
+		{
+			var primary = new ServiceLocator( source() );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary ), primary );
+			return result;
+		}
 	}
 }

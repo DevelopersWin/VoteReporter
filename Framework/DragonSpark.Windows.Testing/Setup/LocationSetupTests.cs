@@ -35,6 +35,7 @@ using Constructor = DragonSpark.Activation.Constructor;
 using ExceptionFormatter = DragonSpark.Diagnostics.ExceptionFormatter;
 using Object = DragonSpark.Testing.Objects.Object;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
+using ServiceProviderSourceFactory = DragonSpark.Activation.IoC.ServiceProviderSourceFactory;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -511,9 +512,23 @@ namespace DragonSpark.Windows.Testing.Setup
 	}
 
 	[Export]
-	public class ServiceLocatorFactory : Activation.IoC.ServiceLocatorFactory
+	public class ServiceLocatorFactory : FactoryBase<IServiceLocator>
 	{
+		readonly Func<IServiceProvider> source;
+
 		[ImportingConstructor]
-		public ServiceLocatorFactory( Assembly[] assemblies ) : base( new IntegratedUnityContainerFactory( assemblies ).Create ) {}
+		public ServiceLocatorFactory( Assembly[] assemblies ) : this( new ServiceProviderSourceFactory( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ).Create ) {}
+
+		public ServiceLocatorFactory( Func<IServiceProvider> source )
+		{
+			this.source = source;
+		}
+
+		protected override IServiceLocator CreateItem()
+		{
+			var provider = source();
+			var result = provider.Get<IServiceLocator>();
+			return result;
+		}
 	}
 }

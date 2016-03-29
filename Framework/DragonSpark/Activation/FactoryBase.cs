@@ -41,7 +41,7 @@ namespace DragonSpark.Activation
 	{
 		readonly Action<T> configure;
 
-		public ConfiguringFactory( [Required]Func<T> inner, [Required]Action<T> configure ) : base( inner )
+		public ConfiguringFactory( [Required]Func<T> provider, [Required]Action<T> configure ) : base( provider )
 		{
 			this.configure = configure;
 		}
@@ -133,7 +133,7 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<T> inner;
 
-		public DecoratedFactory( Func<T> inner ) : this( AlwaysSpecification.Instance, inner ) {}
+		public DecoratedFactory( Func<T> provider ) : this( AlwaysSpecification.Instance, provider ) {}
 
 		public DecoratedFactory( [Required]ISpecification specification, [Required]Func<T> inner ) : base( specification )
 		{

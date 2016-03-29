@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Windows.Input;
+using PostSharp;
+using PostSharp.Extensibility;
 using Type = System.Type;
 
 namespace DragonSpark.Setup
@@ -60,11 +62,12 @@ namespace DragonSpark.Setup
 
 		protected override object DetermineFirst( IEnumerable<Func<Type, object>> factories, Type parameter )
 		{
-			var result = factories.WithFirst( func => !new IsActive( func ).Item, factory =>
+			var result = factories.Where( func => !new IsActive( func ).Item ).FirstWhere( factory =>
 			{
 				using ( new AssignValueCommand<bool>( new IsActive( factory ) ).ExecuteWith( true ) )
 				{
-					return factory( parameter );
+					var o = factory( parameter );
+					return o;
 				}
 			} );
 			return result;
@@ -76,7 +79,7 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
+	/*public class ServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
 		readonly Func<IServiceProvider[]> providers;
 
@@ -86,17 +89,17 @@ namespace DragonSpark.Setup
 		}
 
 		protected override IServiceProvider CreateItem() => new CompositeServiceProvider( providers().Fixed() );
-	}
+	}*/
 
 
 	public class ServiceProviderFactory<TCommand> : ServiceProviderFactory<TCommand, IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
 	{
-		public ServiceProviderFactory( [Required] Func<IServiceProvider[]> inner ) : base( inner ) {}
+		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider ) {}
 	}
 	
 	public class ServiceProviderFactory<TCommand, TProvider> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<TProvider> where TProvider : class, IServiceProvider
 	{
-		public ServiceProviderFactory( [Required] Func<IServiceProvider[]> inner ) : base( new ServiceProviderFactory( inner ).Create, Configure.Instance.Run ) {}
+		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure.Instance.Run ) {}
 
 		class Configure : Command<IServiceProvider>
 		{

@@ -4,6 +4,8 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PostSharp;
+using PostSharp.Extensibility;
 
 namespace DragonSpark.Activation
 {

@@ -32,7 +32,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.Equal( HelloWorld, container.Resolve<string>() );
 		}
 
-		[Fact]
+		/*[Fact]
 		public void SimpleContainer()
 		{
 			var container = new UnityContainer().Extend<DefaultRegistrationsExtension>();
@@ -109,7 +109,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			// var before = defaultSink.Events.ToArray();
 			var logger = container.Resolve<ILogger>( nameof(SharedLoggerFactory) );
 			/*var logEvents = defaultSink.Events.Except( before ).Fixed();
-			Assert.Equal( 2, logEvents.Count() );*/
+			Assert.Equal( 2, logEvents.Count() );#1#
 
 			Assert.False( new RegisterDefaultCommand.Default( logger ).Item );
 
@@ -134,7 +134,7 @@ namespace DragonSpark.Testing.Activation.IoC
 
 			var resolved = container.Resolve<ILogger>();
 			Assert.Same( logger, resolved );
-		}
+		}*/
 
 		[Fact]
 		public void DisposeCheck()
@@ -165,7 +165,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			}
 		}
 
-		[Fact]
+		/*[Fact]
 		public void RegisteredPipelineWithSharedComposition()
 		{
 			var assemblies = new[] { GetType().Assembly };
@@ -224,7 +224,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.False( new RegisterDefaultCommand.Default( logger ).Item );
 
 			Assert.Same( @default, container.Resolve<ILogger>() );
-		}
+		}*/
 
 		[Fact]
 		public void MetataLifetime()

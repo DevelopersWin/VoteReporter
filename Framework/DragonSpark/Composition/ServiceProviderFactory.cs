@@ -88,24 +88,24 @@ namespace DragonSpark.Composition
 
 	public class ServiceProviderFactory : ServiceProviderFactory<ConfigureProviderCommand>
 	{
-		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : base( new ServiceProvidersFactory( source ).Create ) {}
+		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : base( new ServiceProviderSourceFactory( source ).Create ) {}
 	}
 
-	public class ServiceProvidersFactory : FactoryBase<IServiceProvider[]>
+	public class ServiceProviderSourceFactory : FactoryBase<IServiceProvider>
 	{
 		readonly Func<CompositionContext> source;
 
-		public ServiceProvidersFactory( Func<ContainerConfiguration> configuration ) : this( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ) ) {}
+		public ServiceProviderSourceFactory( Func<ContainerConfiguration> configuration ) : this( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ) ) {}
 
-		public ServiceProvidersFactory( [Required] Func<CompositionContext> source )
+		public ServiceProviderSourceFactory( [Required] Func<CompositionContext> source )
 		{
 			this.source = source;
 		}
 
-		protected override IServiceProvider[] CreateItem()
+		protected override IServiceProvider CreateItem()
 		{
 			var primary = new ServiceLocator( source() );
-			var result = new[] { new InstanceServiceProvider( primary ), primary, new CurrentServiceProvider().Item };
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary ), primary, new CurrentServiceProvider().Item );
 			return result;
 		}
 	}

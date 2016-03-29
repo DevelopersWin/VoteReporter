@@ -1,12 +1,13 @@
-using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
-using Microsoft.Practices.ServiceLocation;
+using PostSharp;
+using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Core;
 using System;
+using IServiceLocator = Microsoft.Practices.ServiceLocation.IServiceLocator;
 using ServiceLocator = Microsoft.Practices.ServiceLocation.ServiceLocator;
 
 namespace DragonSpark.Activation
@@ -22,14 +23,16 @@ namespace DragonSpark.Activation
 
 		public static void Initialize( [Required] IServiceProvider provider ) => Provider = provider;
 
-		static IServiceProvider Provider {get; set; }
+		static IServiceProvider Provider { get; set; }
 		
 		public static T Get<T>() => Get<T>( typeof(T) );
 
 		public static T Get<T>( [Required]Type type ) => (T)Get( type );
 
-		public static object Get( [Required] Type type ) =>
-			new[] { new CurrentServiceProvider().Item, Provider }.FirstWhere( provider => provider.GetService( type ) );
+		public static object Get( [Required] Type type )
+		{
+			return new[] { new CurrentServiceProvider().Item, Provider }.FirstWhere( provider => provider.GetService( type ) );
+		}
 	}
 
 	public class ServiceProvider : CompositeServiceProvider
