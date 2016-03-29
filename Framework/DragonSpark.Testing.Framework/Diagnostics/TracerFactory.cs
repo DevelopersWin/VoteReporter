@@ -1,4 +1,5 @@
-﻿using DragonSpark.Aspects;
+﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -10,7 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {

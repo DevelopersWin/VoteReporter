@@ -1,17 +1,7 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
-using System.Diagnostics;
-using System.Reflection;
-using DragonSpark.Activation;
-using Xunit;
-using Xunit.Abstractions;
-using Application = DragonSpark.Testing.Objects.IoC.Application;
-
-namespace DragonSpark.Testing.Setup.Registration
+﻿namespace DragonSpark.Testing.Setup.Registration
 {
 	// [ReaderWriterSynchronized]
-	public class ApplicationFactory : FactoryBase<MethodInfo, IApplication>
+	/*public class ApplicationFactory : FactoryBase<MethodInfo, IApplication>
 	{
 		public static ApplicationFactory Instance { get; } = new ApplicationFactory();
 
@@ -20,8 +10,8 @@ namespace DragonSpark.Testing.Setup.Registration
 		{
 			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( parameter ) ) )
 			{
-				var autoData = new AutoData( FixtureFactory<OutputCustomization>.Instance.Create(), parameter );
-				var application = new LocalAutoDataAttribute.Application( GetType() );
+				var autoData = new AutoData( FixtureFactory.Instance.Create(), parameter );
+				var application = new Framework.Setup.ApplicationFactory( GetType().ToItem(), false ).Create( autoData );
 				using ( new ExecuteApplicationCommand( application ).ExecuteWith( autoData ) )
 				{
 					autoData.Initialize();
@@ -31,10 +21,10 @@ namespace DragonSpark.Testing.Setup.Registration
 					/*var logger = application.Get<ILogger>();
 					application.Get<LoggingLevelSwitch>().MinimumLevel = LogEventLevel.Debug;
 					logger.Information( "Basic Logging: TestingCommandPerformance" );
-					Testing( "Hello World!" );*/
+					Testing( "Hello World!" );#1#
 				}
 				// new InitializeOutputCommand( Output ).Run( GetType() );
-				/*application.Get<RecordingLogEventSink>().With( PurgingEventFactory.Instance.Create ).Each( Output.WriteLine );*/
+				/*application.Get<RecordingLogEventSink>().With( PurgingEventFactory.Instance.Create ).Each( Output.WriteLine );#1#
 			}
 		}
 
@@ -46,8 +36,8 @@ namespace DragonSpark.Testing.Setup.Registration
 
 			[Export]
 			public override RecordingLogEventSink Sink => base.Sink;
-		}*/
-	}
+		}#1#
+	}*/
 
 	/*public class MetadataRegistrationCommandOtherTests : Tests
 	{

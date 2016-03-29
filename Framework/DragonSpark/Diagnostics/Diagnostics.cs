@@ -50,15 +50,13 @@ namespace DragonSpark.Diagnostics
 	// [Disposable( ThrowObjectDisposedException = true )]
 	public class Profiler : IProfiler
 	{
-		readonly string context;
 		readonly ILogger logger;
 
 		readonly Tracker tracker = new Tracker();
 
 		public Profiler( [Required] ILogger logger, [NotEmpty] string context )
 		{
-			this.context = context;
-			this.logger = logger.ForContext<Profiler>();
+			this.logger = logger.ForContext( Constants.SourceContextPropertyName, context );
 		}
 
 		public void Start()
@@ -67,7 +65,7 @@ namespace DragonSpark.Diagnostics
 			tracker.Initialize();
 		}
 
-		public void Mark( string @event ) => logger.Information( "{SourceContext:l} @ {Time:ss':'fff} ({Since:ss':'fff}): {Event:l}", context, tracker.Time, tracker.Mark(), @event );
+		public void Mark( string @event ) => logger.Information( "@ {Time:ss':'fff} ({Since:ss':'fff}): {Event:l}", tracker.Time, tracker.Mark(), @event );
 
 		class Tracker : IDisposable
 		{

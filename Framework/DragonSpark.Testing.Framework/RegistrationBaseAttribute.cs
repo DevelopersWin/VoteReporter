@@ -56,11 +56,15 @@ namespace DragonSpark.Testing.Framework
 			this.serviceType = serviceType;
 		}
 
-		public void Register( IServiceRegistry registry ) => Services.Get( serviceType ).With( instance =>
+		public void Register( IServiceRegistry registry )
 		{
-			var parameter = new InstanceRegistrationParameter( serviceType, instance );
-			registry.Register( parameter );
-		} );
+			var o = Services.Get( serviceType );
+			o.With( instance =>
+			{
+				var parameter = new InstanceRegistrationParameter( serviceType, instance );
+				registry.Register( parameter );
+			} );
+		}
 
 		public void Customize( IFixture fixture ) => Register( new FixtureRegistry( fixture ) );
 	}

@@ -7,7 +7,7 @@ using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Testing.Activation
 {
-	public class ActivatorExtensionstivatorTests : Tests
+	public class ActivatorExtensionstivatorTests : TestBase
 	{
 		public ActivatorExtensionstivatorTests( ITestOutputHelper output ) : base( output ) {}
 

@@ -7,6 +7,9 @@ using DragonSpark.Testing.Framework.Setup;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using System;
+using System.Diagnostics;
+using DragonSpark.Diagnostics;
+using DragonSpark.Testing.Framework.Diagnostics;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework
@@ -37,52 +40,56 @@ namespace DragonSpark.Testing.Framework
 	{
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( args.Method ) ) )
+			using ( var command = new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( args.Method ) ) )
 			{
-				args.Proceed();
-				/*using ( Services.Get<IApplication>() )
+				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? ( s => Debug.WriteLine( s ) );
+				using ( new TracerFactory( output, command.Provider.Get<ILoggerHistory>(), args.Method.Name ).Create() )
 				{
-					
-				}*/
+					args.Proceed();
+				}
 			}
 		}
 	}
 
-	public class AssignExecutionContextCommand : AssignValueCommand<int?>
+	public class AssignExecutionContextCommand : AssignValueCommand<string>
 	{
 		readonly IWritableValue<IServiceProvider> serviceProvider;
 
 		public AssignExecutionContextCommand() : this( new CurrentServiceProvider(), CurrentExecution.Instance ) {}
 
-		public AssignExecutionContextCommand( IWritableValue<IServiceProvider> serviceProvider, IWritableValue<int?> value ) : base( value )
+		public AssignExecutionContextCommand( IWritableValue<IServiceProvider> serviceProvider, IWritableValue<string> value ) : base( value )
 		{
 			this.serviceProvider = serviceProvider;
 		}
 
-		protected override void OnExecute( int? parameter )
+		public IServiceProvider Provider => serviceProvider.Item;
+
+		protected override void OnExecute( string parameter )
 		{
+			base.OnExecute( parameter );
+
 			if ( serviceProvider.Item == null )
 			{
 				serviceProvider.Assign( new ServiceProvider() );
 			}
-
-			base.OnExecute( parameter );
 		}
 	}
 
 	[Disposable]
-	public abstract class Tests
+	public abstract class TestBase : FixedValue<ITestOutputHelper>
 	{
-		protected Tests( ITestOutputHelper output ) : this( output, new InitializeOutputCommand( output ).Run ) {}
+		protected TestBase( ITestOutputHelper output )
+		{
+			Assign( output );
+		}
 
-		protected Tests( ITestOutputHelper output, Action<Type> initialize )
+		/*protected TestBase( ITestOutputHelper output, Action<Type> initialize )
 		{
 			Output = output;
 			initialize( GetType() );
-		}
+		}*/
 
-		[Reference]
-		protected ITestOutputHelper Output { get; }
+		protected ITestOutputHelper Output => Item;
 
 		protected virtual void Dispose( bool disposing ) {}
 	}

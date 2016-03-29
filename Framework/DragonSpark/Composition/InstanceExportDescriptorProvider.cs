@@ -13,7 +13,7 @@ namespace DragonSpark.Composition
 {
 	public static class CompositionHostExtensions
 	{
-		public static T TryGet<T>( this CompositionContext @this, string name = null ) => TryGet<T>( @this, null, name );
+		public static T TryGet<T>( this CompositionContext @this, string name = null ) => TryGet<T>( @this, typeof(T), name );
 
 		public static T TryGet<T>( this CompositionContext @this, Type type, string name = null )
 		{
@@ -52,10 +52,10 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public interface IExportDescriptorProviderRegistry
+	/*public interface IExportDescriptorProviderRegistry
 	{
 		void Register( ExportDescriptorProvider provider );
-	}
+	}*/
 
 	// https://github.com/dotnet/corefx/issues/6857
 	public class TypeInitializingExportDescriptorProvider : ExportDescriptorProvider
@@ -101,7 +101,7 @@ namespace DragonSpark.Composition
 		}
 	}*/
 
-	public class RegisteredExportDescriptorProvider : ExportDescriptorProvider, IExportDescriptorProviderRegistry
+	/*public class RegisteredExportDescriptorProvider : ExportDescriptorProvider, IExportDescriptorProviderRegistry
 	{
 		readonly ICollection<ExportDescriptorProvider> providers = new List<ExportDescriptorProvider>();
 
@@ -133,5 +133,5 @@ namespace DragonSpark.Composition
 		}
 
 		public void Register( ExportDescriptorProvider provider ) => providers.Add( provider );
-	}
+	}*/
 }

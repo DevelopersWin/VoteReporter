@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Setup.Registration
 {
-	public class MetadataRegistrationCommandTests : Tests
+	public class MetadataRegistrationCommandTests : TestBase
 	{
 		public MetadataRegistrationCommandTests( ITestOutputHelper output ) : base( output ) {}
 
@@ -59,47 +59,47 @@ namespace DragonSpark.Testing.Setup.Registration
 
 		void Basic()
 		{
-			var stopwatch = new Stopwatch().With( sw => sw.Start() );
+			/*var stopwatch = new Stopwatch().With( sw => sw.Start() );
 			MethodBase.GetCurrentMethod().As<MethodInfo>( methodUnderTest =>
 			{
 				using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
 				{
 					var autoData = new AutoData( FixtureFactory.Instance.Create(), methodUnderTest );
-					using ( var application = new LocalAutoDataAttribute.Application( GetType() ) )
+					using ( var application = new Framework.Setup.ApplicationFactory( GetType().ToItem(), false ).Create( autoData ) )
 					{
 						using ( new ExecuteApplicationCommand( application ).ExecuteWith( autoData ) )
 						{
 							/*var first = GetType().Assembly.Has<RegistrationBaseAttribute>();
 							var second = GetType().Assembly.Has<RegistrationBaseAttribute>();
-							Debugger.Break();*/
+							Debugger.Break();#1#
 
 							/*var logger1 = application.Get<ILogger>();
-							logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );*/
+							logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );#1#
 							// autoData.Initialize();
 
 							/*var registerFromMetadataCommand = application.Get<RegisterFromMetadataCommand>();
-							registerFromMetadataCommand.ExecuteWith( new object() );*/
+							registerFromMetadataCommand.ExecuteWith( new object() );#1#
 
 							/*var customization = new CompositionCustomization();
-							var item = customization.AutoData;*/
+							var item = customization.AutoData;#1#
 							// Debugger.Break();
 						}
 					}
 				}
 
-				/*ApplicationFactory.Instance.Create( methodUnderTest );*/
-			} );
+				/*ApplicationFactory.Instance.Create( methodUnderTest );#1#
+			} );*/
 
 			/*var info = typeof(CompositionCustomization).GetProperty( nameof(CompositionCustomization.AutoData) );
 
 			var meets = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );
 			var asdf = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );*/
-			Output.WriteLine( $"Complete: {stopwatch.ElapsedMilliseconds}." );
+			// Output.WriteLine( $"Complete: {stopwatch.ElapsedMilliseconds}." );
 		}
 
 		void Full()
 		{
-			var stopwatch = new Stopwatch().With( sw => sw.Start() );
+			/*var stopwatch = new Stopwatch().With( sw => sw.Start() );
 			MethodBase.GetCurrentMethod().As<MethodInfo>( methodUnderTest =>
 			{
 				using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
@@ -111,30 +111,30 @@ namespace DragonSpark.Testing.Setup.Registration
 						{
 							/*var first = GetType().Assembly.Has<RegistrationBaseAttribute>();
 							var second = GetType().Assembly.Has<RegistrationBaseAttribute>();
-							Debugger.Break();*/
+							Debugger.Break();#1#
 
 							/*var logger1 = application.Get<ILogger>();
-							logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );*/
+							logger1.With( logger => logger.Information( $"Initialized: {stopwatch.ElapsedMilliseconds}" ) );#1#
 							// autoData.Initialize();
 
 							/*var registerFromMetadataCommand = application.Get<RegisterFromMetadataCommand>();
-							registerFromMetadataCommand.ExecuteWith( new object() );*/
+							registerFromMetadataCommand.ExecuteWith( new object() );#1#
 
 							/*var customization = new CompositionCustomization();
-							var item = customization.AutoData;*/
+							var item = customization.AutoData;#1#
 							// Debugger.Break();
 						}
 					}
 				}
 
-				/*ApplicationFactory.Instance.Create( methodUnderTest );*/
+				/*ApplicationFactory.Instance.Create( methodUnderTest );#1#
 			} );
 
 			/*var info = typeof(CompositionCustomization).GetProperty( nameof(CompositionCustomization.AutoData) );
 
 			var meets = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );
-			var asdf = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );*/
-			Output.WriteLine( $"Complete: {stopwatch.ElapsedMilliseconds}." );
+			var asdf = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( info );#1#
+			Output.WriteLine( $"Complete: {stopwatch.ElapsedMilliseconds}." );*/
 		}
 
 		/*[Fact]

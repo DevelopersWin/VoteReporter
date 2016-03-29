@@ -9,7 +9,7 @@ namespace DragonSpark.Composition
 {
 	public class FactoryDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
-		public FactoryDelegateExportDescriptorProvider( DiscoverableFactoryTypeLocator locator ) 
+		public FactoryDelegateExportDescriptorProvider( FactoryTypeRequestLocator locator ) 
 			: base( locator, 
 				FactoryDelegateTransformer.Instance,
 				new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, ActivatorDelegateFactory.Instance.Create )
@@ -18,7 +18,7 @@ namespace DragonSpark.Composition
 
 	public class FactoryWithParameterDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
-		public FactoryWithParameterDelegateExportDescriptorProvider( DiscoverableFactoryTypeLocator locator ) 
+		public FactoryWithParameterDelegateExportDescriptorProvider( FactoryTypeRequestLocator locator ) 
 			: base( locator, 
 				FactoryDelegateTransformer.InstanceWithParameter,
 				new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, ActivatorWithParameterDelegateFactory.Instance.Create )

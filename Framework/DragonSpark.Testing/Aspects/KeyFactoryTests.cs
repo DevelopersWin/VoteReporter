@@ -12,7 +12,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Aspects
 {
-	public class KeyFactoryTests : Tests
+	public class KeyFactoryTests : TestBase
 	{
 		public KeyFactoryTests( ITestOutputHelper output ) : base( output ) {}
 

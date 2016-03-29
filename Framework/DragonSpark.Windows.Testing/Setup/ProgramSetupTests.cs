@@ -17,7 +17,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	public class ProgramSetupTests
 	{
 		[Theory, ProgramSetup.AutoData]
-		public void Extension( [Located] IModuleMonitor sut )
+		public void Extension( IModuleMonitor sut )
 		{
 			var collection = new Items( sut ).Item;
 			var module = collection.FirstOrDefaultOfType<MonitoredModule>();
@@ -30,7 +30,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, ProgramSetup.AutoData]
-		public void Create( [Located, EnsureValues]ApplicationInformation sut, [Located]AssemblyInformation temp )
+		public void Create( [EnsureValues]ApplicationInformation sut, AssemblyInformation temp )
 		{
 			Assert.NotNull( sut.AssemblyInformation );
 			Assert.Equal( DateTimeOffset.Parse( "2/1/2016" ), sut.DeploymentDate.GetValueOrDefault() );
@@ -53,14 +53,14 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, ProgramSetup.AutoData]
-		public void Run( [Located]Program sut )
+		public void Run( Program sut )
 		{
 			Assert.True( sut.Ran, "Didn't Run" );
 			Assert.Equal( GetType().GetMethod( nameof(Run) ), sut.Arguments.Method );
 		}
 
 		[Theory, ProgramSetup.AutoData]
-		public void SetupModuleCommand( [Located] SetupModuleCommand sut, [Located] MonitoredModule module )
+		public void SetupModuleCommand( SetupModuleCommand sut, MonitoredModule module )
 		{
 			var added = new Items( module ).Item.FirstOrDefaultOfType<SomeCommand>();
 			Assert.Null( added );

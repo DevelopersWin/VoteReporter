@@ -9,16 +9,20 @@ using DragonSpark.Testing.Objects;
 using System.Composition;
 using System.Composition.Convention;
 using System.Composition.Hosting;
+using System.Linq;
 using System.Reflection;
 using Xunit;
+using Xunit.Abstractions;
 using SingletonLocator = DragonSpark.Activation.IoC.SingletonLocator;
 using Type = System.Type;
 
 namespace DragonSpark.Testing.Composition
 {
-	public class ConventionBuilderTests
+	public class ConventionBuilderTests : TestBase
 	{
-		[Theory, Framework.Setup.AutoData]
+		public ConventionBuilderTests( ITestOutputHelper output ) : base( output ) {}
+
+		[Theory, AutoData]
 		public void BasicConvention( ContainerConfiguration configuration, ConventionBuilder sut )
 		{
 			sut.ForTypesMatching( AlwaysSpecification.Instance.IsSatisfiedBy ).Export();
@@ -36,20 +40,25 @@ namespace DragonSpark.Testing.Composition
 			Assert.Same( shared, container.GetExport<SharedExport>() );
 		}
 
-		[RegisterService( typeof(Assembly[]) )]
-		[Theory, LocalAutoData( false )]
-		public void LocalData( [Service]Type[] sut, Assembly[] assemblies )
-		{
-			var nested = GetType().Adapt().WithNested();
-			Assert.Equal( nested.Length, sut.Length );
-			Assert.Equal( nested, sut );
+		// [RegisterService( typeof(Assembly[]) )]
 
-			Assert.Equal( 1, assemblies.Length );
-			Assert.Equal( GetType().Assembly, assemblies.Only() );
+		[Theory, AutoData( false )]
+		public void LocalData( [Service]Type[] sut, [Service]Assembly[] assemblies )
+		{
+			var items = sut.Except( FrameworkTypes.Instance.Create() ).Fixed();
+
+			var nested = GetType().Adapt().WithNested();
+			Assert.Equal( nested.Length, items.Length );
+			Assert.Equal( nested, items );
+
+			Assert.Empty( assemblies );
+
+			/*Assert.Equal( 1, assemblies.Length );
+			Assert.Equal( GetType().Assembly, assemblies.Only() );*/
 		}
 
-		[Theory, LocalAutoData]
-		public void LocalStrict( [Service]ISingletonLocator sut )
+		[Theory, AutoData]
+		public void LocalStrict( ISingletonLocator sut )
 		{
 			Assert.IsType<SingletonLocator>( sut );
 		}

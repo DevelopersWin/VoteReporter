@@ -75,12 +75,6 @@
     <Compile Include="RegisterAsMany.cs" />
     <Compile Include="RegisterAsSingleton.cs" />
     <Compile Include="Setup\UnityContainerFactory.cs" />
-    <Compile Include="Setup\DefaultCustomizeFixtureCommand.xaml.cs">
-      <DependentUpon>DefaultCustomizeFixtureCommand.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Setup\DefaultSetup.xaml.cs">
-      <DependentUpon>DefaultSetup.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Singleton.cs" />
     <Compile Include="Static.cs" />
     <Compile Include="YetAnotherClass.cs" />
@@ -234,16 +228,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Page Include="Setup\DefaultCustomizeFixtureCommand.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Setup\DefaultSetup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\PostSharp.4.2.22\tools\PostSharp.targets" Condition="Exists('$(SolutionDir)packages\PostSharp.4.2.22\tools\PostSharp.targets')" />
   <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">

@@ -6,7 +6,7 @@ using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class ConfigureLocationCustomization : CustomizationBase
+	/*public class ConfigureLocationCustomization : CustomizationBase
 	{
 		readonly Type locationType;
 		readonly bool enabled;
@@ -21,5 +21,5 @@ namespace DragonSpark.Testing.Framework.Setup
 		IServiceLocationAuthority Authority { [return: Required]get; set; }
 
 		protected override void OnCustomize( IFixture fixture ) => Authority.Register( locationType, enabled );
-	}
+	}*/
 }

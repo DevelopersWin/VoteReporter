@@ -15,7 +15,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
-	public class DirectoryModuleCatalogTests : Tests
+	public class DirectoryModuleCatalogTests : TestBase
 	{
 		internal const string ModulesDirectory1 = @".\DynamicModules\MocksModules1",
 			ModulesDirectory2 = @".\DynamicModules\AttributedModules",

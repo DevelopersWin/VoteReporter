@@ -42,7 +42,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	/// <summary>
 	/// This file can be seen as a bucket for all the testing done around setup.  It also can be seen as a huge learning bucket for xUnit and AutoFixture.  This does not contain best practices.  Always be learning. :)
 	/// </summary>
-	public class LocationSetupTests : Tests
+	public class LocationSetupTests : TestBase
 	{
 		public LocationSetupTests( ITestOutputHelper output ) : base( output )
 		{}
@@ -55,7 +55,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void MockAsExpected( [Located(false)]ISetup sut )
+		public void MockAsExpected( ISetup sut )
 		{
 			Assert.NotNull( Mock.Get( sut ) );
 		}
@@ -107,7 +107,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void RegisterInstanceGeneric( [Located]IServiceRegistry registry, Class instance )
+		void RegisterInstanceGeneric( IServiceRegistry registry, Class instance )
 		{
 			registry.Register<IInterface>( instance );
 
@@ -188,7 +188,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void Resolve( [Located]Interfaces sut )
+		void Resolve( Interfaces sut )
 		{
 			Assert.NotNull( sut.Items.FirstOrDefaultOfType<Item>() );
 			Assert.NotNull( sut.Items.FirstOrDefaultOfType<AnotherItem>() );
@@ -330,7 +330,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void GetAllTypesWith( [Located]Assembly[] sut )
+		public void GetAllTypesWith( Assembly[] sut )
 		{
 			var items = sut.GetAllTypesWith<PriorityAttribute>();
 			Assert.True( items.Select( tuple => tuple.Item2 ).AsTypes().Contains( typeof(NormalPriority) ) );
@@ -355,7 +355,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void Singleton( [Located] IUnityContainer sut )
+		public void Singleton( IUnityContainer sut )
 		{
 			var once = sut.Resolve<RegisterAsSingleton>();
 			var twice = sut.Resolve<RegisterAsSingleton>();
@@ -363,7 +363,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void Many( [Located] IUnityContainer sut )
+		public void Many( IUnityContainer sut )
 		{
 			var once = sut.Resolve<RegisterAsMany>();
 			var twice = sut.Resolve<RegisterAsMany>();
@@ -380,7 +380,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void Locate( [Located]ApplicationAssemblyLocator sut )
+		public void Locate( ApplicationAssemblyLocator sut )
 		{
 			Assert.Same( GetType().Assembly, sut.Create() );
 		}
@@ -395,7 +395,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void CreateAssemblies( IUnityContainer container, IAssemblyProvider provider, [Located]Assembly[] sut )
+		public void CreateAssemblies( IUnityContainer container, IAssemblyProvider provider, Assembly[] sut )
 		{
 			var registered = container.IsRegistered<Assembly[]>();
 			Assert.True( registered );
@@ -415,7 +415,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void CreateAssemblySimple( IUnityContainer container, IApplicationAssemblyLocator locator, [Located] Assembly sut )
+		public void CreateAssemblySimple( IUnityContainer container, IApplicationAssemblyLocator locator, Assembly sut )
 		{
 			Assert.True( container.IsRegistered<Assembly>() );
 		}
@@ -441,7 +441,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void CreateAssembly( AssemblyInformationFactory factory, IUnityContainer container, IApplicationAssemblyLocator locator, [Located]Assembly sut )
+		public void CreateAssembly( AssemblyInformationFactory factory, IUnityContainer container, IApplicationAssemblyLocator locator, Assembly sut )
 		{
 			Assert.True( container.IsRegistered<Assembly>() );
 
@@ -499,7 +499,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{ }
 
 		[Register.Mapped]
-		public class Item : IItem
+		public new class Item : IItem
 		{ }
 
 		[Register.Mapped( "AnotherItem" )]

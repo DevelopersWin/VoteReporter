@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Setup;
 
 namespace DragonSpark.TypeSystem
 {
@@ -33,6 +34,7 @@ namespace DragonSpark.TypeSystem
 			public Cached( object instance ) : base( instance, () =>
 			{
 				var activator = Services.Get<T>();
+				var temp = new CurrentServiceProvider().Item;
 				var result = activator.Create( instance );
 				return result;
 			} ) {}

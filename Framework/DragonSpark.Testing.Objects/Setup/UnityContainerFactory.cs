@@ -1,14 +1,11 @@
 ﻿using DragonSpark.Composition;
-using DragonSpark.Diagnostics;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
-using System.Composition;
 using System.Reflection;
 using System.Windows.Input;
-using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -24,7 +21,7 @@ namespace DragonSpark.Testing.Objects.Setup
 		public UnityContainerFactory() : base( new DragonSpark.Composition.ServiceProviderFactory( new AssemblyBasedConfigurationContainerFactory( Default<Assembly>.Items ).Create ).Create ) {}
 	}
 
-	[Export, Shared]
+	/*[Export, Shared]
 	public class RecordingLoggerFactory : Diagnostics.RecordingLoggerFactory
 	{
 		[ImportingConstructor]
@@ -35,11 +32,11 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		[Export]
 		public override ILoggerHistory History => base.History;
-	}
+	}*/
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		protected AutoDataAttribute( Func<AutoData, ApplicationBase> source ) : base( FixtureFactory.Instance.Create, source ) {}
+		protected AutoDataAttribute( Func<AutoData, ApplicationBase> providerSource ) : base( providerSource ) {}
 	}
 
 	public class ServiceProviderFactory : DragonSpark.Composition.ServiceProviderFactory

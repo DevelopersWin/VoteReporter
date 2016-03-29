@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ namespace DragonSpark.Composition
 		// public TypeBasedConfigurationContainerFactory( [Required] Type[] types ) : this( types, DefaultLoggingConfigurator.Instance ) {}
 
 		public TypeBasedConfigurationContainerFactory( [Required] Type[] types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) 
-			: base( AssembliesFactory.Instance.Create( types ), types, configurations ) {}
+			: base( Default<Assembly>.Items, types, configurations ) {}
 
 		// public CompositionHostFactory( [Required] Func<Type[]> types ) : this( types, DefaultLoggingConfigurator.Instance ) {}
 
@@ -84,7 +85,8 @@ namespace DragonSpark.Composition
 	{
 		public static ContainerConfigurationFactory Instance { get; } = new ContainerConfigurationFactory();
 
-		protected override ContainerConfiguration CreateItem() => new ContainerConfiguration()
+		protected override ContainerConfiguration CreateItem() => 
+			new ContainerConfiguration()
 				.WithProvider( new ServicesExportDescriptorProvider() );
 	}
 
@@ -182,7 +184,7 @@ namespace DragonSpark.Composition
 		protected override ContainerConfiguration CreateItem( ContainerConfiguration configuration )
 		{
 			var factoryTypes = types.Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
-			var locator = new DiscoverableFactoryTypeLocator( factoryTypes );
+			var locator = new FactoryTypeRequestLocator( factoryTypes );
 			var conventionLocator = new BuildableTypeFromConventionLocator( types );
 			var activator = new Activation.Activator( conventionLocator );
 

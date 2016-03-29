@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
+﻿using DragonSpark.Composition;
 using DragonSpark.Windows.Runtime;
 
 namespace DevelopersWin.VoteReporter.Application.Startup

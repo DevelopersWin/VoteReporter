@@ -83,7 +83,7 @@ namespace DragonSpark.Diagnostics
 		// public RecordingLoggingConfigurationFactory() : this( new RecordingLogEventSink(), new LoggingLevelSwitch() ) {}
 
 		public RecordingLoggingConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
-			: base( new LoggingConfigurationCoreFactory( controller ), transformers.Append( new RecordingLoggingConfigurationTransformer( sink ) ).Fixed() ) {}
+			: base( new LoggingConfigurationSourceFactory( controller ), transformers.Append( new RecordingLoggingConfigurationTransformer( sink ) ).Fixed() ) {}
 	}
 
 	public class LoggerFactory : FactoryBase<ILogger>
@@ -95,19 +95,17 @@ namespace DragonSpark.Diagnostics
 			this.source = source;
 		}
 
-		protected override ILogger CreateItem() => source().CreateLogger();
+		protected override ILogger CreateItem() => source().CreateLogger().ForContext( Constants.SourceContextPropertyName, "Default" );
 	}
 
-	public class LoggingConfigurationCoreFactory : FactoryBase<LoggerConfiguration>
+	public class LoggingConfigurationSourceFactory : FactoryBase<LoggerConfiguration>
 	{
 		readonly LoggerConfiguration configuration;
 		readonly LoggingLevelSwitch controller;
 
-		// public LoggingConfigurationCoreFactory() : this( new LoggerConfiguration(), new LoggingLevelSwitch() ) {}
+		public LoggingConfigurationSourceFactory( [Required] LoggingLevelSwitch logging ) : this( new LoggerConfiguration(), logging ) {}
 
-		public LoggingConfigurationCoreFactory( [Required] LoggingLevelSwitch logging ) : this( new LoggerConfiguration(), logging ) {}
-
-		public LoggingConfigurationCoreFactory( [Required] LoggerConfiguration configuration, [Required] LoggingLevelSwitch controller )
+		public LoggingConfigurationSourceFactory( [Required] LoggerConfiguration configuration, [Required] LoggingLevelSwitch controller )
 		{
 			this.configuration = configuration;
 			this.controller = controller;
@@ -140,31 +138,7 @@ namespace DragonSpark.Diagnostics
 			LevelSwitch = levelSwitch;
 		}
 
-		public virtual ILoggerHistory History { get; }
-		public virtual LoggingLevelSwitch LevelSwitch { get; }
-
-		/*protected override ILogger CreateItem()
-		{
-			var result = new LoggerConfiguration()
-				.WriteTo.Sink( Sink )
-				.MinimumLevel.ControlledBy( LevelSwitch )
-				.CreateLogger();
-			/*new LoggingProperties.AssociatedSink( result ).Assign( Sink );
-			new LoggingProperties.AssociatedSwitch( result ).Assign( LevelSwitch );#1#
-			return result;
-		}*/
+		public ILoggerHistory History { get; }
+		public LoggingLevelSwitch LevelSwitch { get; }
 	}
-
-	/*public static class LoggingProperties
-	{
-		public class AssociatedSink : AssociatedValue<ILogger, RecordingLogEventSink>
-		{
-			public AssociatedSink( ILogger instance ) : base( instance, typeof(AssociatedSink) ) {}
-		}
-
-		public class AssociatedSwitch : AssociatedValue<ILogger, Serilog.Core.LoggingLevelSwitch>
-		{
-			public AssociatedSwitch( ILogger instance ) : base( instance, typeof(AssociatedSwitch) ) {}
-		}
-	}*/
 }

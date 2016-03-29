@@ -60,7 +60,7 @@ namespace DragonSpark.Activation.IoC
 				.Extend<CachingBuildPlanExtension>()
 				.Extend<DefaultRegistrationsExtension>()
 				.Extend<StrategyPipelineExtension>()
-				.Extend<ServicesIntegrationExtension>()
+				.Extension<ServicesIntegrationExtension>().Refresh()
 				.Extend<InstanceTypeRegistrationMonitorExtension>();
 	}
 

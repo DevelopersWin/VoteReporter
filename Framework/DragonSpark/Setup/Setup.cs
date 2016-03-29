@@ -11,17 +11,17 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Windows.Input;
-using PostSharp;
-using PostSharp.Extensibility;
 using Type = System.Type;
 
 namespace DragonSpark.Setup
 {
 	public class AssignServiceProvider : AssignValueCommand<IServiceProvider>
 	{
-		public AssignServiceProvider() : this( new CurrentServiceProvider() ) {}
+		public AssignServiceProvider() : this( null ) {}
 
-		public AssignServiceProvider( IWritableValue<IServiceProvider> value ) : base( value ) {}
+		public AssignServiceProvider( IServiceProvider current ) : this( new CurrentServiceProvider(), current ) {}
+
+		public AssignServiceProvider( IWritableValue<IServiceProvider> value, IServiceProvider current ) : base( value, current ) {}
 
 		/*protected override void OnExecute( IServiceProvider parameter )
 		{
@@ -29,6 +29,57 @@ namespace DragonSpark.Setup
 			base.OnExecute( parameter );
 		}*/
 	}
+
+	public static class ApplicationExtensions
+	{
+		public static IApplication Run<T>( this IApplication<T> @this, T arguments )
+		{
+			using ( var command = new ExecuteApplicationCommand<T>( @this ) )
+			{
+				command.ExecuteWith( arguments );
+			}
+			return @this;
+		}
+	}
+
+	public class ExecuteApplicationCommand<T> : DisposingCommand<T>
+	{
+		readonly IApplication<T> application;
+		readonly AssignServiceProvider assign;
+
+		public ExecuteApplicationCommand( [Required]IApplication<T> application, IServiceProvider current = null ) : this( application, new AssignServiceProvider( current ) ) {}
+
+		public ExecuteApplicationCommand( [Required]IApplication<T> application, AssignServiceProvider assign )
+		{
+			this.application = application;
+			this.assign = assign;
+		}
+
+		protected override void OnExecute( T parameter )
+		{
+			assign.ExecuteWith( application );
+			application.ExecuteWith<ICommand>( parameter );
+		}
+
+		protected override void OnDispose()
+		{
+			assign.Dispose();
+			base.OnDispose();
+		}
+
+		// protected override void OnDispose() => application.Get<AutoData>().Dispose();
+	}
+
+	/*public class ExecuteApplicationCommand : DisposingCommand<IApplication>
+	{
+		public ExecuteApplicationCommand( IWritableValue<> )
+		{
+		}
+
+		protected override void OnExecute( IApplication parameter )
+		{
+		}
+	}*/
 
 	public class CurrentServiceProvider : ExecutionContextValue<IServiceProvider>
 	{
@@ -134,9 +185,11 @@ namespace DragonSpark.Setup
 		protected abstract void Configure( ProviderContext context );
 	}*/
 
+	public interface IApplication<in T> : IApplication, ICommand<T> {}
+	
 	public interface IApplication : ICommand, IServiceProvider, IDisposable {}
 
-	public class ApplicationCommandFactory : FactoryBase<IApplication, IEnumerable<ICommand>>
+	/*public class ApplicationCommandFactory : FactoryBase<IApplication, IEnumerable<ICommand>>
 	{
 		public static ApplicationCommandFactory Instance { get; } = new ApplicationCommandFactory();
 
@@ -145,9 +198,9 @@ namespace DragonSpark.Setup
 			new FixedCommand( new AssignServiceProvider(), () => parameter ),
 			new FixedCommand( new AmbientContextCommand<ITaskMonitor>(), () => new TaskMonitor() ) // TODO: Move?
 		};
-	}
+	}*/
 
-	public abstract class Application<TParameter> : CompositeCommand<TParameter, ISpecification<TParameter>>, IApplication
+	public abstract class Application<TParameter> : CompositeCommand<TParameter, ISpecification<TParameter>>, IApplication<TParameter>
 	{
 		protected Application( [Required]IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
 
@@ -156,19 +209,19 @@ namespace DragonSpark.Setup
 			Services = provider;
 		}
 
-		protected Application( IEnumerable<ICommand> commands ) : base( AlwaysSpecification.Instance.Wrap<TParameter>(), commands.ToArray() ) {}
+		protected Application( IEnumerable<ICommand> commands ) : base( new OnlyOnceSpecification().Wrap<TParameter>(), commands.ToArray() ) {}
 
-		[Default( true )]
-		public bool DisposeAfterExecution { get; set; }
+		/*/*[Default( true )]
+		public bool DisposeAfterExecution { get; set; }#1#
 
 		protected override void OnExecute( TParameter parameter )
 		{
-			ApplicationCommandFactory.Instance.Create( this ).Each( Commands.Insert );
+			// ApplicationCommandFactory.Instance.Create( this ).Each( Commands.Insert );
 
 			base.OnExecute( parameter );
 
-			DisposeAfterExecution.IsTrue( Dispose );
-		}
+			// DisposeAfterExecution.IsTrue( Dispose );
+		}*/
 
 		[Required]
 		public IServiceProvider Services { [return: Required]get; set; }

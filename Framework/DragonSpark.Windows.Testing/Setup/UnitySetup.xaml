@@ -15,11 +15,9 @@
 	<commands:SetupUnityCommand>
 		<commands:UnityInstance Instance="{x:Static testObjects:Singleton.Instance}" BuildName="SomeName" />
 		<commands:SetupUnityCommand.Extensions>
-			<location:FixtureExtension />
 			<localSetup:TestExtension />
 		</commands:SetupUnityCommand.Extensions>
 	</commands:SetupUnityCommand>
 
 	<registration:RegisterFromMetadataCommand />
-	<setupObjects:DefaultCustomizeFixtureCommand />
 </setup:Setup>

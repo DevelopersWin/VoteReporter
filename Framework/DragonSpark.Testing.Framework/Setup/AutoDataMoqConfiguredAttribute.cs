@@ -5,15 +5,15 @@ using Ploeh.AutoFixture.AutoMoq;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class DefaultAutoDataCustomization : CompositeCustomization
+	public class AutoDataCustomization : CompositeCustomization
 	{
-		public DefaultAutoDataCustomization() : base( MetadataCustomization.Instance, new AutoConfiguredMoqCustomization() ) { }
+		public AutoDataCustomization() : base( SericesCustomization.Instance, new AutoConfiguredMoqCustomization() ) { }
 	}
 
-	public class AutoDataMoqAttribute : AutoDataAttribute
+	/*public class AutoDataMoqAttribute : AutoDataAttribute
 	{
 		public AutoDataMoqAttribute() : base( FixtureFactory<AutoMoqCustomization>.Instance.Create ) {}
-	}
+	}*/
 
 	/*public class SetupFixtureFactory<T> : FixtureFactory<T> where T : SetupCustomization, new() {}*/
 

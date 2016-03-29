@@ -33,6 +33,8 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Add( strategy, UnityBuildStage.PreCreation );
 		}
+
+		public IUnityContainer Refresh() => Container.With( unityContainer => Initialize() );
 	}
 
 	public class ServicesStrategy : BuilderStrategy

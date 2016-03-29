@@ -192,27 +192,22 @@
   <ItemGroup>
     <Compile Include="Diagnostics\TracerFactory.cs" />
     <Compile Include="Initialize.cs" />
-    <Compile Include="Setup\ExecuteApplicationCommand.cs" />
     <Compile Include="Setup\Execution.cs" />
     <Compile Include="Setup\AutoDataMoqConfiguredAttribute.cs" />
     <Compile Include="Setup\Location\FixtureRegistry.cs" />
     <Compile Include="Setup\MetadataCustomizationFactory.cs" />
     <Compile Include="Setup\ResourceConfigurationFactory.cs" />
-    <Compile Include="Setup\AuthorizedLocationSpecification.cs" />
     <Compile Include="Setup\CanLocateSpecification.cs" />
     <Compile Include="Setup\ConfigureLocationCustomization.cs" />
     <Compile Include="Setup\CustomizeFixtureCommand.cs" />
     <Compile Include="Setup\GreedyMethodBuilderFactory.cs" />
-    <Compile Include="Setup\Location\IServiceLocationAuthority.cs" />
     <Compile Include="Setup\LocateTypeSpecification.cs" />
-    <Compile Include="Setup\MetadataCustomization.cs" />
+    <Compile Include="Setup\MetadataCommand.cs" />
     <Compile Include="Parameters\FromCustomization.cs" />
     <Compile Include="Setup\SetupEngineParts.cs" />
     <Compile Include="IAutoDataCustomization.cs" />
-    <Compile Include="Setup\OutputCustomization.cs" />
+    <Compile Include="Setup\OutputCommand.cs" />
     <Compile Include="RegisteredAttribute.cs" />
-    <Compile Include="Setup\Location\ServiceLocationAuthority.cs" />
-    <Compile Include="Setup\Location\ServiceLocationRelay.cs" />
     <Compile Include="Setup\AssignedLogical.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -228,10 +223,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Setup\Location\CustomizationBase.cs" />
-    <Compile Include="Parameters\LocatedAttribute.cs" />
+    <Compile Include="Parameters\EnsureValuesAttribute.cs" />
     <Compile Include="Setup\SetupAutoDataCommandBase.cs" />
     <Compile Include="Setup\AutoData.cs" />
-    <Compile Include="Tests.cs" />
+    <Compile Include="TestBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonSpark.Windows\DragonSpark.Windows.csproj">

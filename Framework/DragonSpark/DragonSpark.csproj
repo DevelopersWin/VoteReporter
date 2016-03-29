@@ -176,6 +176,7 @@
     <Compile Include="ComponentModel\DefaultValueProvider.cs" />
     <Compile Include="ComponentModel\HostedValueLocator.cs" />
     <Compile Include="ComponentModel\IDefaultValueProvider.cs" />
+    <Compile Include="Composition\Factory.cs" />
     <Compile Include="Composition\ServiceProviderFactory.cs" />
     <Compile Include="Composition\PartsContainerConfigurator.cs" />
     <Compile Include="Composition\FactoryDelegateExportDescriptorProvider.cs" />

@@ -81,9 +81,9 @@ namespace DragonSpark.Activation.IoC
 
 	class HasFactorySpecification : SpecificationBase<LocateTypeRequest>
 	{
-		readonly DiscoverableFactoryTypeLocator locator;
+		readonly FactoryTypeRequestLocator locator;
 
-		public HasFactorySpecification( [Required] DiscoverableFactoryTypeLocator locator )
+		public HasFactorySpecification( [Required] FactoryTypeRequestLocator locator )
 		{
 			this.locator = locator;
 		}

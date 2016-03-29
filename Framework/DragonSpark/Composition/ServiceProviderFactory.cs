@@ -19,21 +19,17 @@ using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
-	public class FactoryType
+	public class FactoryTypeRequest : LocateTypeRequest
 	{
-		public FactoryType( [Required]Type runtimeType, string name, [Required]Type resultType )
+		public FactoryTypeRequest( [Required]Type runtimeType, string name, [Required]Type resultType ) :  base( runtimeType, name )
 		{
-			RuntimeType = runtimeType;
-			Name = name;
 			ResultType = resultType;
 		}
 
-		public Type RuntimeType { get; }
-		public string Name { get; }
 		public Type ResultType { get; }
 	}
 
-	public class FactoryTypeFactory : FactoryBase<Type, FactoryType>
+	public class FactoryTypeFactory : FactoryBase<Type, FactoryTypeRequest>
 	{
 		public static FactoryTypeFactory Instance { get; } = new FactoryTypeFactory( Specification.Instance );
 
@@ -47,7 +43,7 @@ namespace DragonSpark.Composition
 			protected override bool Verify( Type parameter ) => base.Verify( parameter ) && Factory.IsFactory( parameter ) && parameter.Adapt().IsDefined<ExportAttribute>();
 		}
 
-		protected override FactoryType CreateItem( Type parameter ) => new FactoryType( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
+		protected override FactoryTypeRequest CreateItem( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
 	}
 
 	public class AssembliesFactory : FactoryBase<Type[], Assembly[]>
@@ -95,7 +91,7 @@ namespace DragonSpark.Composition
 	{
 		readonly Func<CompositionContext> source;
 
-		public ServiceProviderSourceFactory( Func<ContainerConfiguration> configuration ) : this( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ) ) {}
+		public ServiceProviderSourceFactory( Func<ContainerConfiguration> configuration ) : this( Composition.Create.Factory( configuration ) ) {}
 
 		public ServiceProviderSourceFactory( [Required] Func<CompositionContext> source )
 		{

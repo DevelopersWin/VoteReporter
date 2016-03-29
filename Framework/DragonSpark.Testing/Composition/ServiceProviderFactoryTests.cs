@@ -1,28 +1,36 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects.Composition;
+using Serilog;
 using System;
 using System.Composition.Hosting;
 using System.Reflection;
 using Xunit;
+using Xunit.Abstractions;
 using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 
 namespace DragonSpark.Testing.Composition
 {
 	[AssemblyProvider.Register]
 	[AssemblyProvider.Types]
-	public class ServiceProviderFactoryTests
+	public class ServiceProviderFactoryTests : TestBase
 	{
+		public ServiceProviderFactoryTests( ITestOutputHelper output ) : base( output ) {}
+
 		[Theory, AutoData]
-		public void BasicComposition( Assembly[] assemblies, string text )
+		public void BasicComposition( Assembly[] assemblies, string text, ILogger logger )
 		{
-			using ( var container = new CompositionFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create() )
+			using ( var container = Create.From( assemblies ) )
 			{
 				var test = container.GetExport<IBasicService>();
 				var message = test.HelloWorld( text );
 				Assert.Equal( $"Hello there! {text}", message );
+				Assert.Same( logger, container.GetExport<ILogger>() );
 			}
+
+			logger.Information( "This is a message" );
 		}
 
 		[Theory, AutoData]

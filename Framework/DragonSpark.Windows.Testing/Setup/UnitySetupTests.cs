@@ -1,25 +1,19 @@
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Parameters;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
-using DragonSpark.Testing.Objects.Setup;
 using Microsoft.Practices.Unity;
-using System.Reflection;
-using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	public class UnitySetupTests : Tests
+	public class UnitySetupTests : TestBase
 	{
 		public UnitySetupTests( ITestOutputHelper output ) : base( output )
 		{}
 
 		[Theory, UnitySetup.AutoData]
-		public void Extension( [Located]IUnityContainer sut )
+		public void Extension( IUnityContainer sut )
 		{
 			Assert.NotNull( sut.Configure<TestExtension>() );
 		}
@@ -54,7 +48,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}*/
 
 		[Theory, UnitySetup.AutoData]
-		public void RegisteredName( [Located]IUnityContainer sut )
+		public void RegisteredName( IUnityContainer sut )
 		{
 			Assert.NotNull( sut.Resolve<Singleton>( "SomeName" ) );
 		}

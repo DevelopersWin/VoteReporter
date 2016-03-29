@@ -5,13 +5,18 @@ using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using PostSharp.Patterns.Threading;
+using PostSharp.Patterns.Model;
 
 namespace DragonSpark.Aspects
 {
+	[ReaderWriterSynchronized]
 	public class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
+		[Reference]
 		readonly HashSet<int> codes = new HashSet<int>();
 
+		[Reference]
 		readonly IDictionary<int, object> items = new Dictionary<int, object>();
 
 		object Get( int code, MethodInterceptionArgs args )
@@ -21,9 +26,10 @@ namespace DragonSpark.Aspects
 			return result;
 		}
 
-		bool Add( int code, MethodInterceptionArgs args )
+		[Writer]
+		public bool Add( int code, MethodInterceptionArgs args )
 		{
-			lock ( codes )
+			// lock ( codes )
 			{
 				var result = !codes.Contains( code );
 				if ( result )

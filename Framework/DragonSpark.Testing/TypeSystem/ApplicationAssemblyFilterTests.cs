@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
-using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using Moq;
 using Xunit;
@@ -13,7 +12,7 @@ namespace DragonSpark.Testing.TypeSystem
 	[AssemblyProvider.Types]
 	public class ApplicationAssemblyFilterTests
 	{
-		[Theory, DefaultSetup.AutoData]
+		[Theory, Framework.Setup.AutoData()]
 		public void Basic( Mock<IAssemblyProvider> provider, ApplicationAssemblyFilter sut )
 		{
 			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.Assemblies() );

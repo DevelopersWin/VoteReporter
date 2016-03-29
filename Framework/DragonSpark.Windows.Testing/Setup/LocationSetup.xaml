@@ -3,8 +3,6 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:location="clr-namespace:DragonSpark.Testing.Framework.Setup.Location;assembly=DragonSpark.Testing.Framework"
-	xmlns:setupObjects="clr-namespace:DragonSpark.Testing.Objects.Setup;assembly=DragonSpark.Testing.Objects"
 	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
 	xmlns:registration="clr-namespace:DragonSpark.Setup.Registration;assembly=DragonSpark"
 	xmlns:ds="http://framework.dragonspark.us"
@@ -12,11 +10,7 @@
 	mc:Ignorable="d"
 >
 	<commands:SetupUnityCommand>
-		<commands:SetupUnityCommand.Extensions>
-			<location:FixtureExtension />
-		</commands:SetupUnityCommand.Extensions>
 		<commands:UnityInstance RegistrationType="{x:Type setup:ISetup}" Instance="{ds:Root}" />
 	</commands:SetupUnityCommand>
 	<registration:RegisterFromMetadataCommand />
-	<setupObjects:DefaultCustomizeFixtureCommand />
 </setup:Setup>

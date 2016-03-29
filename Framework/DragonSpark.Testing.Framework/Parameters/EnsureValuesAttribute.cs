@@ -1,6 +1,5 @@
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework.Setup;
 using Microsoft.Practices.Unity.Utility;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
@@ -18,7 +17,7 @@ namespace DragonSpark.Testing.Framework.Parameters
 		public override ICustomization GetCustomization( ParameterInfo parameter ) => new ServiceRegistration( parameter.ParameterType );
 	}
 
-	[AttributeUsage( AttributeTargets.Parameter )]
+	/*[AttributeUsage( AttributeTargets.Parameter )]
 	public class LocatedAttribute : CustomizeAttribute
 	{
 		readonly bool enabled;
@@ -29,7 +28,7 @@ namespace DragonSpark.Testing.Framework.Parameters
 		}
 
 		public override ICustomization GetCustomization( ParameterInfo parameter ) => new ConfigureLocationCustomization( parameter.ParameterType, enabled );
-	}
+	}*/
 
 	[AttributeUsage( AttributeTargets.Parameter )]
 	public class EnsureValuesAttribute : CustomizeAttribute

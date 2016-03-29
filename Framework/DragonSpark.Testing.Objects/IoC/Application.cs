@@ -1,12 +1,11 @@
 ﻿using DragonSpark.Composition;
-using DragonSpark.Testing.Framework.Setup;
 
 namespace DragonSpark.Testing.Objects.IoC
 {
-	public class Application : ApplicationBase
+	/*public class Application : ApplicationBase
 	{
 		public Application() : base( ServiceProviderFactory.Instance.Create() ) {}
-	}
+	}*/
 
 	public class ServiceProviderFactory : Activation.IoC.ServiceProviderFactory
 	{
@@ -17,6 +16,6 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		public AutoDataAttribute() : base( autoData => new Application() ) {}
+		public AutoDataAttribute() : base( autoData => ServiceProviderFactory.Instance.Create() ) {}
 	}
 }

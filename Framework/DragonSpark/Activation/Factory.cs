@@ -81,23 +81,23 @@ namespace DragonSpark.Activation
 	public sealed class MemberInfoFactoryTypeLocator : FactoryTypeLocatorBase<MemberInfo>
 	{
 		[ImportingConstructor]
-		public MemberInfoFactoryTypeLocator( DiscoverableFactoryTypeLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
+		public MemberInfoFactoryTypeLocator( FactoryTypeRequestLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
 	}
 
 	[Export]
 	public sealed class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
 	{
 		[ImportingConstructor]
-		public ParameterInfoFactoryTypeLocator( DiscoverableFactoryTypeLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
+		public ParameterInfoFactoryTypeLocator( FactoryTypeRequestLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
 	}
 
 	public abstract class FactoryTypeLocatorBase<T> : FactoryBase<T, Type>
 	{
-		readonly DiscoverableFactoryTypeLocator locator;
+		readonly FactoryTypeRequestLocator locator;
 		readonly Func<T, Type> type;
 		readonly Func<T, Type> context;
 
-		protected FactoryTypeLocatorBase( [Required]DiscoverableFactoryTypeLocator locator, [Required]Func<T, Type> type, [Required]Func<T, Type> context )
+		protected FactoryTypeLocatorBase( [Required]FactoryTypeRequestLocator locator, [Required]Func<T, Type> type, [Required]Func<T, Type> context )
 		{
 			this.locator = locator;
 			this.type = type;
@@ -112,18 +112,18 @@ namespace DragonSpark.Activation
 			var all = nestedTypes.Concat( info.Assembly.DefinedTypes.Except( nestedTypes ) );
 			var location = all.AsTypes().Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
 			var mapped = new LocateTypeRequest( type( parameter ) );
-			var locators = new[] { new DiscoverableFactoryTypeLocator( location ), locator };
+			var locators = new[] { new FactoryTypeRequestLocator( location ), locator };
 			var result = locators.FirstWhere( typeLocator => typeLocator.Create( mapped ) );
 			return result;
 		}
 	}
 
 	[Persistent]
-	public class DiscoverableFactoryTypeLocator : FactoryBase<LocateTypeRequest, Type>
+	public class FactoryTypeRequestLocator : FactoryBase<LocateTypeRequest, Type>
 	{
-		readonly IEnumerable<FactoryType> types;
+		readonly IEnumerable<FactoryTypeRequest> types;
 
-		public DiscoverableFactoryTypeLocator( [Required]IEnumerable<FactoryType> types )
+		public FactoryTypeRequestLocator( [Required]IEnumerable<FactoryTypeRequest> types )
 		{
 			this.types = types.Fixed();
 		}
@@ -134,12 +134,12 @@ namespace DragonSpark.Activation
 			var name = $"{parameter.RequestedType.Name}Factory";
 			var candidates = types.Where( type => parameter.Name == type.Name && type.ResultType.Adapt().IsAssignableFrom( parameter.RequestedType ) ).ToArray();
 			var item = 
-				candidates.Only( info => info.RuntimeType.Name == name )
+				candidates.Only( info => info.RequestedType.Name == name )
 				??
 				candidates.FirstOrDefault( arg => arg.ResultType == parameter.RequestedType )
 				??
 				candidates.FirstOrDefault();
-			var result = item.With( profile => profile.RuntimeType );
+			var result = item.With( profile => profile.RequestedType );
 			return result;
 		}
 	}

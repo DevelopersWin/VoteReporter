@@ -200,7 +200,16 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class AllTypesInCandidateAssemblyStrategy : FactoryBase<Type, Type[]>
+	public abstract class TypeSelectionStrategyBase : FactoryBase<Type, Type[]> {}
+
+	public class SelfAndNestedStrategy : TypeSelectionStrategyBase
+	{
+		public static SelfAndNestedStrategy Instance { get; } = new SelfAndNestedStrategy();
+
+		protected override Type[] CreateItem( Type parameter ) => parameter.Adapt().WithNested();
+	}
+
+	public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
 	{
 		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance );
 
