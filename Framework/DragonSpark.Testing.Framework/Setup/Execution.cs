@@ -10,6 +10,8 @@ namespace DragonSpark.Testing.Framework.Setup
 		public static CurrentExecution Instance { get; } = new CurrentExecution();
 
 		public override string Item => base.Item ?? MethodContext.Get( MethodBase.GetCurrentMethod() );
+
+		public override string ToString() => Item;
 	}
 
 	//[Serializable]
@@ -21,7 +23,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public static string Get( MethodBase method )
 		{
-			var key = KeyFactory.Instance.CreateUsing( method ).ToString();
+			var key = /*KeyFactory.Instance.CreateUsing( method )*/method.ToString();
 			var result = new Reference<string>( Reference, key ).Item;
 			return result;
 		}

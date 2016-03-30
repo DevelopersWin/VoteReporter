@@ -70,19 +70,10 @@ namespace DragonSpark.Testing.Framework.Setup
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance>( info => new AspectInstance( info, new AssignExecutionContextAspect() ) ).ToItem();
 	}
 
-	public class FrameworkTypes : FactoryBase<Type[]>
-	{
-		public static FrameworkTypes Instance { get; } = new FrameworkTypes();
-
-		[Freeze]
-		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand) };
-	}
-
 	public class TypeBasedServiceProviderFactory : FactoryBase<AutoData, IServiceProvider>
 	{
 		public static TypeBasedServiceProviderFactory Instance { get; } = new TypeBasedServiceProviderFactory();
 
-		readonly Type[] core;
 		readonly Type[] additional;
 		readonly bool includeFromParameters;
 		readonly Func<Type, Type[]> primaryStrategy;
@@ -90,11 +81,10 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public TypeBasedServiceProviderFactory() : this( Default<Type>.Items, true ) {}
 
-		public TypeBasedServiceProviderFactory( [Required] Type[] additional, bool includeFromParameters ) : this( FrameworkTypes.Instance.Create(), additional, includeFromParameters, SelfAndNestedStrategy.Instance.Create, AllTypesInCandidateAssemblyStrategy.Instance.Create ) {}
+		public TypeBasedServiceProviderFactory( [Required] Type[] additional, bool includeFromParameters ) : this( additional, includeFromParameters, SelfAndNestedStrategy.Instance.Create, AllTypesInCandidateAssemblyStrategy.Instance.Create ) {}
 
-		public TypeBasedServiceProviderFactory( [Required] Type[] core, [Required] Type[] additional, bool includeFromParameters, [Required] Func<Type, Type[]> primaryStrategy, [Required] Func<Type, Type[]> strategy )
+		public TypeBasedServiceProviderFactory( [Required] Type[] additional, bool includeFromParameters, [Required] Func<Type, Type[]> primaryStrategy, [Required] Func<Type, Type[]> strategy )
 		{
-			this.core = core;
 			this.additional = additional;
 			this.includeFromParameters = includeFromParameters;
 			this.primaryStrategy = primaryStrategy;
@@ -104,8 +94,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override IServiceProvider CreateItem( AutoData parameter )
 		{
 			var types = additional.Concat( includeFromParameters ? parameter.Method.GetParameters().Select( info => info.ParameterType ) : Default<Type>.Items );
-			var selected = primaryStrategy( parameter.Method.DeclaringType ).Union( types.SelectMany( strategy ) );
-			var all = selected.Union( core ).Fixed();
+			var all = primaryStrategy( parameter.Method.DeclaringType ).Union( types.SelectMany( strategy ) ).Fixed();
 			var result = new Composition.ServiceProviderFactory( new TypeBasedConfigurationContainerFactory( all ).Create ).Create();
 			return result;
 		}

@@ -45,7 +45,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData( false )]
 		public void LocalData( [Service]Type[] sut, [Service]Assembly[] assemblies )
 		{
-			var items = sut.Except( FrameworkTypes.Instance.Create() ).Fixed();
+			var items = sut./*Except( FrameworkTypes.Instance.Create() ).*/Fixed();
 
 			var nested = GetType().Adapt().WithNested();
 			Assert.Equal( nested.Length, items.Length );

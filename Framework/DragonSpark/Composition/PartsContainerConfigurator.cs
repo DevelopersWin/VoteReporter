@@ -10,6 +10,7 @@ using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Setup;
 
 namespace DragonSpark.Composition
 {
@@ -174,11 +175,15 @@ namespace DragonSpark.Composition
 	{
 		readonly Assembly[] assemblies;
 		readonly Type[] types;
+		readonly Type[] core;
 
-		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types )
+		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
+
+		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types, [Required] Type[] core )
 		{
 			this.assemblies = assemblies;
 			this.types = types;
+			this.core = core;
 		}
 
 		protected override ContainerConfiguration CreateItem( ContainerConfiguration configuration )
@@ -189,7 +194,7 @@ namespace DragonSpark.Composition
 			var activator = new Activation.Activator( conventionLocator );
 
 			var result = configuration
-				.WithParts( types, AttributeProvider.Instance )
+				.WithParts( types.Union( core ), AttributeProvider.Instance )
 				.WithInstance( assemblies )
 				.WithInstance( types )
 				.WithInstance( conventionLocator )

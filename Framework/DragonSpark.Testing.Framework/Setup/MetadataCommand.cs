@@ -8,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Activation;
+using DragonSpark.Aspects;
+using DragonSpark.Composition;
 
 namespace DragonSpark.Testing.Framework.Setup
 {

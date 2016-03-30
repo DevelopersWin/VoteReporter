@@ -41,36 +41,17 @@ namespace DragonSpark.Activation
 
 		class SingletonLocator : LocatorBase
 		{
-			// public static SingletonLocator Instance { get; } = new SingletonLocator( BuildableTypeFromConventionLocator.Instance );
-
 			readonly Func<Type, Type> convention;
 			readonly ISingletonLocator singleton;
 
-			public SingletonLocator( [Required] BuildableTypeFromConventionLocator convention ) : this( convention.Create, Activation.IoC.SingletonLocator.Instance ) {}
+			public SingletonLocator( [Required] BuildableTypeFromConventionLocator convention ) : this( convention.Create, IoC.SingletonLocator.Instance ) {}
 
-			SingletonLocator( [Required] Func<Type, Type> convention, [Required]ISingletonLocator singleton ) // : base( new Specification( convention, singleton ).Wrap<LocateTypeRequest>( request => request.RequestedType ) )
+			SingletonLocator( [Required] Func<Type, Type> convention, [Required]ISingletonLocator singleton )
 			{
 				this.convention = convention;
 				this.singleton = singleton;
 			}
 
-			/*class Specification : ContainsSingletonSpecification
-			{
-				readonly Func<Type, Type> convention;
-
-				public Specification( Func<Type, Type> convention, ISingletonLocator locator ) : base( locator )
-				{
-					this.convention = convention;
-				}
-
-				protected override bool Verify( Type parameter )
-				{
-					var type = convention( parameter ) ?? parameter;
-					var result = base.Verify( type );
-					return result;
-				}
-			}
-*/
 			protected override object CreateItem( LocateTypeRequest parameter )
 			{
 				var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;

@@ -1,15 +1,16 @@
 using DragonSpark.Activation;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
+using DragonSpark.Testing.Framework.Diagnostics;
 using DragonSpark.Testing.Framework.Setup;
 using PostSharp.Aspects;
+using PostSharp.Patterns.Contracts;
 using PostSharp.Patterns.Model;
 using System;
 using System.Diagnostics;
-using DragonSpark.Diagnostics;
-using DragonSpark.Testing.Framework.Diagnostics;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework
@@ -42,7 +43,7 @@ namespace DragonSpark.Testing.Framework
 		{
 			using ( var command = new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( args.Method ) ) )
 			{
-				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? ( s => Debug.WriteLine( s ) );
+				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? ( s => { Debug.WriteLine( s ); } );
 				using ( new TracerFactory( output, command.Provider.Get<ILoggerHistory>(), args.Method.Name ).Create() )
 				{
 					args.Proceed();
@@ -55,7 +56,7 @@ namespace DragonSpark.Testing.Framework
 	{
 		readonly IWritableValue<IServiceProvider> serviceProvider;
 
-		public AssignExecutionContextCommand() : this( new CurrentServiceProvider(), CurrentExecution.Instance ) {}
+		public AssignExecutionContextCommand() : this( CurrentServiceProvider.Instance, CurrentExecution.Instance ) {}
 
 		public AssignExecutionContextCommand( IWritableValue<IServiceProvider> serviceProvider, IWritableValue<string> value ) : base( value )
 		{
@@ -64,7 +65,7 @@ namespace DragonSpark.Testing.Framework
 
 		public IServiceProvider Provider => serviceProvider.Item;
 
-		protected override void OnExecute( string parameter )
+		protected override void OnExecute( [NotEmpty]string parameter )
 		{
 			base.OnExecute( parameter );
 

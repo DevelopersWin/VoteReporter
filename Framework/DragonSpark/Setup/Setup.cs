@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Windows.Input;
+using DragonSpark.Aspects;
+using DragonSpark.Composition;
 using Type = System.Type;
 
 namespace DragonSpark.Setup
@@ -19,7 +21,7 @@ namespace DragonSpark.Setup
 	{
 		public AssignServiceProvider() : this( null ) {}
 
-		public AssignServiceProvider( IServiceProvider current ) : this( new CurrentServiceProvider(), current ) {}
+		public AssignServiceProvider( IServiceProvider current ) : this( CurrentServiceProvider.Instance, current ) {}
 
 		public AssignServiceProvider( IWritableValue<IServiceProvider> value, IServiceProvider current ) : base( value, current ) {}
 
@@ -83,6 +85,10 @@ namespace DragonSpark.Setup
 
 	public class CurrentServiceProvider : ExecutionContextValue<IServiceProvider>
 	{
+		public static CurrentServiceProvider Instance { get; } = new CurrentServiceProvider();
+
+		CurrentServiceProvider() {}
+
 		public override void Assign( IServiceProvider item )
 		{
 			if ( Item != null && item != null && Item != item )
@@ -107,27 +113,56 @@ namespace DragonSpark.Setup
 	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
 	{
 		public CompositeServiceProvider( params IServiceProvider[] locators ) 
-			: base( locators.Select( activator => new Func<Type, object>( activator.GetService ) ).ToArray() ) {}
+			: base( locators.Select( activator => new Func<Type, object>( new RecursionAwareServiceProvider( activator ).GetService ) ).ToArray() ) {}
 
 		public object GetService( Type serviceType ) => serviceType == typeof(IServiceProvider) ? this : Create( serviceType );
 
-		protected override object DetermineFirst( IEnumerable<Func<Type, object>> factories, Type parameter )
+		/*protected override object DetermineFirst( IEnumerable<Func<Type, object>> factories, Type parameter )
 		{
-			var result = factories.Where( func => !new IsActive( func ).Item ).FirstWhere( factory =>
+			var result = factories.Select( func =>  ).Where( active => !active.Item ).FirstWhere( active =>
 			{
-				using ( new AssignValueCommand<bool>( new IsActive( factory ) ).ExecuteWith( true ) )
-				{
-					var o = factory( parameter );
-					return o;
-				}
+				
 			} );
 			return result;
+		}*/
+
+		
+	}
+
+	public class RecursionAwareServiceProvider : DecoratedServiceProvider
+	{
+		public RecursionAwareServiceProvider( IServiceProvider inner ) : base( inner ) {}
+
+		public override object GetService( Type serviceType )
+		{
+			var context = new IsActive( this, serviceType );
+			if ( !context.Item )
+			{
+				using ( new AssignValueCommand<bool>( context ).ExecuteWith( true ) )
+				{
+					return base.GetService( serviceType );
+				}
+			}
+
+			return null;
 		}
 
-		class IsActive : AssociatedValue<object, bool>
+		class IsActive : ThreadAmbientValue<bool>
 		{
-			public IsActive( object instance ) : base( instance ) {}
+			public IsActive( object owner, Type type ) : base( KeyFactory.Instance.CreateUsing( owner, type ).ToString() ) {}
 		}
+	}
+
+	public class DecoratedServiceProvider : IServiceProvider
+	{
+		readonly IServiceProvider inner;
+
+		public DecoratedServiceProvider( [Required] IServiceProvider inner )
+		{
+			this.inner = inner;
+		}
+
+		public virtual object GetService( Type serviceType ) => inner.GetService( serviceType );
 	}
 
 	/*public class ServiceProviderFactory : FactoryBase<IServiceProvider>
@@ -188,6 +223,14 @@ namespace DragonSpark.Setup
 	public interface IApplication<in T> : IApplication, ICommand<T> {}
 	
 	public interface IApplication : ICommand, IServiceProvider, IDisposable {}
+
+	public class FrameworkTypes : FactoryBase<Type[]>
+	{
+		public static FrameworkTypes Instance { get; } = new FrameworkTypes();
+
+		[Freeze]
+		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator) };
+	}
 
 	/*public class ApplicationCommandFactory : FactoryBase<IApplication, IEnumerable<ICommand>>
 	{

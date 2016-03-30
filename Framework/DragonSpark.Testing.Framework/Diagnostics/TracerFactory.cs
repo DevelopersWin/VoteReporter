@@ -18,8 +18,10 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 	{
 		public TracerFactory( [Required] Action<string> output, [CallerMemberName]string context = null ) : this( output, new LoggerHistorySink(), context ) {}
 
-		public TracerFactory( [Required] Action<string> output, [Required] ILoggerHistory history, [CallerMemberName]string context = null ) 
-			: this( new PurgeDiagnosticsCommand( history, output ), history, new List<TraceListener>(), context ) {}
+		public TracerFactory( [Required] Action<string> output, [Required] ILoggerHistory history, [CallerMemberName]string context = null ) : this( output, history, new List<TraceListener>(), context ) {}
+
+		public TracerFactory( [Required] Action<string> output, [Required] ILoggerHistory history, IList<TraceListener> listeners, [CallerMemberName]string context = null ) 
+			: this( new PurgeDiagnosticsCommand( history, output ), history, listeners, context ) {}
 
 		TracerFactory( PurgeDiagnosticsCommand purgeCommand, ILoggerHistory history, IList<TraceListener> listeners, string context ) 
 			: this( new DiagnosticsFactory( history, listeners ).Create, context, new DisposeTracerCommand( purgeCommand, listeners ).Run, new ConfigureTracer( purgeCommand ).Run ) {}

@@ -2,10 +2,10 @@
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-using DragonSpark.Aspects;
 using DragonSpark.TypeSystem;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using DragonSpark.Aspects;
 
 [assembly: AssemblyTitle( "DragonSpark.Testing" )]
 [assembly: AssemblyDescription( "" )]

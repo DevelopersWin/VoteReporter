@@ -7,19 +7,19 @@ using Serilog.Parsing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Aspects
 {
-	public class KeyFactoryTests : TestBase
+	public class TracerFactoryTests : TestBase
 	{
-		public KeyFactoryTests( ITestOutputHelper output ) : base( output ) {}
+		public TracerFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Fact]
 		public void TracerFactoryWorksAsExpected()
 		{
-			var count = Trace.Listeners.Count;
 			var history = new LoggerHistorySink();
 			var message = "Hello World";
 			var logEvent = new LogEvent( DateTimeOffset.Now, LogEventLevel.Information, null, new MessageTemplateParser().Parse( message ), new LogEventProperty[0] );
@@ -27,9 +27,13 @@ namespace DragonSpark.Testing.Aspects
 
 			Assert.Contains( logEvent, history.Events );
 			var lines = new List<string>();
-			using ( new TracerFactory( lines.Add, history ).Create() )
+			var listeners = new List<TraceListener>();
+			TraceListener only;
+			using ( new TracerFactory( lines.Add, history, listeners ).Create() )
 			{
-				Assert.Equal( count + 1, Trace.Listeners.Count );
+				only = listeners.Only();
+				Assert.Equal( 1, listeners.Count );
+				Assert.Contains( only, Trace.Listeners.Cast<TraceListener>() );
 
 				Assert.DoesNotContain( logEvent, history.Events );
 				Assert.NotEmpty( lines );
@@ -37,7 +41,9 @@ namespace DragonSpark.Testing.Aspects
 				Assert.NotEmpty( history.Events );
 				// Assert.Equal( lines.Count, history.Events.Count() );
 			}
-			Assert.Equal( count, Trace.Listeners.Count );
+
+			Assert.Empty( listeners );
+			Assert.DoesNotContain( only, Trace.Listeners.Cast<TraceListener>() );
 			Assert.Empty( history.Events );
 			Assert.Equal( 3, lines.Count );
 		}

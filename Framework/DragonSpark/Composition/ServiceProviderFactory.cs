@@ -101,7 +101,7 @@ namespace DragonSpark.Composition
 		protected override IServiceProvider CreateItem()
 		{
 			var primary = new ServiceLocator( source() );
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary ), primary, new CurrentServiceProvider().Item );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary ), primary, Services.Current );
 			return result;
 		}
 	}

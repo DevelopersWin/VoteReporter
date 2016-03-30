@@ -3,13 +3,13 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Setup;
 
 namespace DragonSpark.TypeSystem
 {
@@ -29,14 +29,22 @@ namespace DragonSpark.TypeSystem
 	}
 	public static class Attributes
 	{
+		readonly static object locker = new object();
+
 		sealed class Cached<T> : AssociatedValue<IAttributeProvider> where T : AttributeProviderFactoryBase
 		{
 			public Cached( object instance ) : base( instance, () =>
 			{
+				// var before = $"Current: {CurrentServiceProvider.Instance?.Item} ({CurrentServiceProvider.Instance?.Item?.GetHashCode()}), Services.Current: {Services.Current} ({Services.Current.GetHashCode()}) - , Services.Provider: {Services.Provider} ({Services.Provider.GetHashCode()}) - {Execution.Current}";
 				var activator = Services.Get<T>();
-				var temp = new CurrentServiceProvider().Item;
-				var result = activator.Create( instance );
-				return result;
+				//var after = $"Current: {CurrentServiceProvider.Instance?.Item} ({CurrentServiceProvider.Instance?.Item?.GetHashCode()}), Services.Current: {Services.Current} ({Services.Current.GetHashCode()}) - , Services.Provider: {Services.Provider} ({Services.Provider.GetHashCode()}) - {Execution.Current}";
+					/*if ( activator == null )
+					{
+						throw new InvalidOperationException( $"{typeof(T)} - {before}{Environment.NewLine}{after}" );
+					}*/
+
+					var result = activator.Create( instance );
+					return result;
 			} ) {}
 		}
 
