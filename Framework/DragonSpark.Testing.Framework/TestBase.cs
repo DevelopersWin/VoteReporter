@@ -43,6 +43,7 @@ namespace DragonSpark.Testing.Framework
 		{
 			using ( var command = new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( args.Method ) ) )
 			{
+
 				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? ( s => { Debug.WriteLine( s ); } );
 				using ( new TracerFactory( output, command.Provider.Get<ILoggerHistory>(), args.Method.Name ).Create() )
 				{

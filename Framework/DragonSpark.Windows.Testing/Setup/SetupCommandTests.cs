@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Setup;
-using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Windows.Input;
 using Xunit;
@@ -9,14 +8,14 @@ namespace DragonSpark.Windows.Testing.Setup
 {
 	public class SetupCommandTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Execute( Command sut )
 		{
 			sut.Execute( new object() );
 			Assert.True( sut.Executed, "Didn't call" );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Update( Command sut )
 		{
 			var called = false;
@@ -25,7 +24,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( called, "Didn't call" );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void CallWithNonContext( Command<SetupCommandTests> sut )
 		{
 			var context = new object();

@@ -1,13 +1,14 @@
 ﻿using System.Composition;
+using DragonSpark.Testing.Framework.Setup;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
 	[Export]
 	public partial class ProgramSetup
 	{
-		public class AutoDataAttribute : DragonSpark.Testing.Objects.Setup.AutoDataAttribute
+		public class AutoDataAttribute : Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( autoData => new Application<ProgramSetup>() ) {}
+			public AutoDataAttribute() : base( provider => new Application<ProgramSetup>( provider ) ) {}
 		}
 
 		public ProgramSetup()

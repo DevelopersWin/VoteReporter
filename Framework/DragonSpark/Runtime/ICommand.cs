@@ -78,8 +78,15 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( TParameter parameter ) => body.ExecuteWith( parameter );
 	}*/
 
-	public abstract class DisposingCommand<TParameter> : Command<TParameter>, IDisposable
+	public abstract class DisposingCommand<TParameter> : DisposingCommand<TParameter, ISpecification<TParameter>>
 	{
+		protected DisposingCommand() : base( Specification<TParameter>.Instance ) {}
+	}
+
+	public abstract class DisposingCommand<TParameter, TSpecification> : Command<TParameter, TSpecification>, IDisposable where TSpecification : ISpecification<TParameter>
+	{
+		protected DisposingCommand( TSpecification specification ) : base( specification ) {}
+
 		~DisposingCommand()
 		{
 			Dispose( false );

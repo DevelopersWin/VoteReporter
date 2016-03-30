@@ -1,13 +1,14 @@
 ﻿using System.Composition;
+using DragonSpark.Testing.Framework.Setup;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
 	[Export]
 	public partial class LocationSetup
 	{
-		public class AutoDataAttribute : DragonSpark.Testing.Objects.Setup.AutoDataAttribute
+		public class AutoDataAttribute : Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( autoData => new Application<LocationSetup>() ) {}
+			public AutoDataAttribute() : base( serviceProvider => new Application<LocationSetup>( serviceProvider ) ) {}
 		}
 
 		public LocationSetup()

@@ -29,13 +29,13 @@ namespace DragonSpark.Extensions
 
 		// public static NamedTypeBuildKey[] GetCurrentBuildChain( this IBuilderContext @this ) => Ambient.GetCurrentChain<NamedTypeBuildKey>();
 
-		public static T New<T>( this IBuilderContext @this, string name = null )
+		/*public static T New<T>( this IBuilderContext @this, string name = null )
 		{
 			using ( new AmbientContextCommand<NamedTypeBuildKey>().ExecuteWith( NamedTypeBuildKey.Make<T>( name ) ) )
 			{
 				return @this.NewBuildUp<T>( name );
 			}
-		}
+		}*/
 
 		public static void Complete( this IBuilderContext @this, object result )
 		{
@@ -43,7 +43,7 @@ namespace DragonSpark.Extensions
 			@this.BuildComplete = result != null;
 		}
 
-		public static bool HasBuildPlan( this IPolicyList @this, NamedTypeBuildKey key ) => GetBuildPlan( @this, key ) != null;
+		// public static bool HasBuildPlan( this IPolicyList @this, NamedTypeBuildKey key ) => GetBuildPlan( @this, key ) != null;
 
 		public static IBuildPlanPolicy GetBuildPlan( this IPolicyList @this, [Required]NamedTypeBuildKey key ) => @this.GetNoDefault<IBuildPlanPolicy>( key, false ).With( policy => policy.GetType().Name != "OverriddenBuildPlanMarkerPolicy" ? policy : null );
 

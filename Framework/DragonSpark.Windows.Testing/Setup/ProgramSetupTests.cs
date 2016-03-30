@@ -30,7 +30,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, ProgramSetup.AutoData]
-		public void Create( [EnsureValues]ApplicationInformation sut, AssemblyInformation temp )
+		public void Create( [EnsureValues, Service]ApplicationInformation sut, [Service]AssemblyInformation temp )
 		{
 			Assert.NotNull( sut.AssemblyInformation );
 			Assert.Equal( DateTimeOffset.Parse( "2/1/2016" ), sut.DeploymentDate.GetValueOrDefault() );
@@ -53,7 +53,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, ProgramSetup.AutoData]
-		public void Run( Program sut )
+		public void Run( [Service]Program sut )
 		{
 			Assert.True( sut.Ran, "Didn't Run" );
 			Assert.Equal( GetType().GetMethod( nameof(Run) ), sut.Arguments.Method );

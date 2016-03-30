@@ -1,7 +1,9 @@
+using System;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Windows.Input;
 using System.Windows.Markup;
 
@@ -20,7 +22,7 @@ namespace DragonSpark.Runtime
 	}
 
 	[ContentProperty( nameof(Commands) )]
-	public class CompositeCommand<TParameter, TSpecification> : Command<TParameter, TSpecification> where TSpecification : ISpecification<TParameter>
+	public class CompositeCommand<TParameter, TSpecification> : DisposingCommand<TParameter, TSpecification> where TSpecification : ISpecification<TParameter>
 	{
 		public CompositeCommand( TSpecification specification, [Required]params ICommand[] commands ) : base( specification )
 		{
@@ -29,11 +31,12 @@ namespace DragonSpark.Runtime
 
 		public CommandCollection Commands { get; }
 
-		/*protected override void OnExecute( TParameter parameter ) => ExecuteCore( DetermineCommands( parameter ).Fixed(), parameter );
-
-		protected virtual void ExecuteCore( ICommand[] commands, TParameter parameter ) => commands.ExecuteWith<ICommand>( parameter );
-
-		protected virtual IEnumerable<ICommand> DetermineCommands( TParameter parameter ) => Commands;*/
 		protected override void OnExecute( TParameter parameter ) => Commands.ExecuteMany( parameter );
+
+		protected override void OnDispose()
+		{
+			Commands.OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
+			Commands.Clear();
+		}
 	}
 }

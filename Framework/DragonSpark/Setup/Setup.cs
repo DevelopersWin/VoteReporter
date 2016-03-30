@@ -1,5 +1,7 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -11,8 +13,6 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Windows.Input;
-using DragonSpark.Aspects;
-using DragonSpark.Composition;
 using Type = System.Type;
 
 namespace DragonSpark.Setup
@@ -66,7 +66,7 @@ namespace DragonSpark.Setup
 		protected override void OnDispose()
 		{
 			assign.Dispose();
-			base.OnDispose();
+			application.Dispose();
 		}
 
 		// protected override void OnDispose() => application.Get<AutoData>().Dispose();
@@ -165,19 +165,6 @@ namespace DragonSpark.Setup
 		public virtual object GetService( Type serviceType ) => inner.GetService( serviceType );
 	}
 
-	/*public class ServiceProviderFactory : FactoryBase<IServiceProvider>
-	{
-		readonly Func<IServiceProvider[]> providers;
-
-		public ServiceProviderFactory( [Required] Func<IServiceProvider[]> providers )
-		{
-			this.providers = providers;
-		}
-
-		protected override IServiceProvider CreateItem() => new CompositeServiceProvider( providers().Fixed() );
-	}*/
-
-
 	public class ServiceProviderFactory<TCommand> : ServiceProviderFactory<TCommand, IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
 	{
 		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider ) {}
@@ -200,26 +187,6 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	/*public abstract class ConfigureProviderCommandBase<T> : Command<IServiceProvider> where T : class
-	{
-		public class ProviderContext
-		{
-			public ProviderContext( [Required] IServiceProvider provider ) : this( provider, provider.Get<T>() ) {}
-
-			public ProviderContext( [Required] IServiceProvider provider, [Required]T context )
-			{
-				Provider = provider;
-				Context = context;
-			}
-
-			public IServiceProvider Provider { get; }
-			public T Context { get; }
-		}
-
-		protected override void OnExecute( IServiceProvider parameter ) => new ProviderContext( parameter ).With( Configure );
-		protected abstract void Configure( ProviderContext context );
-	}*/
-
 	public interface IApplication<in T> : IApplication, ICommand<T> {}
 	
 	public interface IApplication : ICommand, IServiceProvider, IDisposable {}
@@ -232,17 +199,6 @@ namespace DragonSpark.Setup
 		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator) };
 	}
 
-	/*public class ApplicationCommandFactory : FactoryBase<IApplication, IEnumerable<ICommand>>
-	{
-		public static ApplicationCommandFactory Instance { get; } = new ApplicationCommandFactory();
-
-		protected override IEnumerable<ICommand> CreateItem( IApplication parameter ) => new ICommand[]
-		{
-			new FixedCommand( new AssignServiceProvider(), () => parameter ),
-			new FixedCommand( new AmbientContextCommand<ITaskMonitor>(), () => new TaskMonitor() ) // TODO: Move?
-		};
-	}*/
-
 	public abstract class Application<TParameter> : CompositeCommand<TParameter, ISpecification<TParameter>>, IApplication<TParameter>
 	{
 		protected Application( [Required]IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
@@ -254,50 +210,41 @@ namespace DragonSpark.Setup
 
 		protected Application( IEnumerable<ICommand> commands ) : base( new OnlyOnceSpecification().Wrap<TParameter>(), commands.ToArray() ) {}
 
-		/*/*[Default( true )]
-		public bool DisposeAfterExecution { get; set; }#1#
-
-		protected override void OnExecute( TParameter parameter )
-		{
-			// ApplicationCommandFactory.Instance.Create( this ).Each( Commands.Insert );
-
-			base.OnExecute( parameter );
-
-			// DisposeAfterExecution.IsTrue( Dispose );
-		}*/
-
 		[Required]
 		public IServiceProvider Services { [return: Required]get; set; }
-
-		public void Dispose()
-		{
-			Dispose( true );
-			GC.SuppressFinalize( this );
-		}
-
-		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
-
-		// [Freeze]
-		protected virtual void OnDispose()
-		{
-			Commands.OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
-			Commands.Clear();
-		}
 
 		public virtual object GetService( Type serviceType ) => typeof(IApplication).Adapt().IsAssignableFrom( serviceType ) ? this : Services.GetService( serviceType );
 	}
 
-	public class ApplyExportedCommandsCommand<T> : Command<object> where T : ICommand
+	public class ApplyExportedCommandsCommand<T> : DisposingCommand<object> where T : ICommand
 	{
 		[Required, Service]
 		public CompositionContext Host { [return: Required]get; set; }
 
 		public string ContractName { get; set; }
 
-		protected override void OnExecute( object parameter ) => 
-			Host.GetExports<T>( ContractName )
+		readonly ICollection<T> watching = new Collection<T>();
+
+		protected override void OnExecute( object parameter )
+		{
+			var exports = Host.GetExports<T>( ContractName ).Fixed();
+			watching.AddRange( exports );
+
+			exports
 				.Prioritize()
 				.Each( setup => setup.ExecuteWith( parameter ) );
+		}
+
+		protected override void OnDispose()
+		{
+			watching.Purge().OfType<IDisposable>().Each( obj => obj.Dispose() );
+			base.OnDispose();
+		}
+	}
+
+	public class ApplyTaskMonitorCommand : FixedCommand
+	{
+		public ApplyTaskMonitorCommand() : base( new AmbientContextCommand<ITaskMonitor>(), new TaskMonitor() ) {}
 	}
 
 	public class ApplySetup : ApplyExportedCommandsCommand<ISetup> {}
@@ -306,6 +253,8 @@ namespace DragonSpark.Setup
 
 	public class Setup : CompositeCommand, ISetup
 	{
+		public Setup() : this( Default<ICommand>.Items ) {}
+
 		public Setup( params ICommand[] commands ) : base( commands ) {}
 
 		public Collection<object> Items { get; } = new Collection<object>();

@@ -1,5 +1,4 @@
 ﻿using DragonSpark.ComponentModel;
-using DragonSpark.Diagnostics;
 using DragonSpark.Modularity;
 using DragonSpark.Properties;
 using PostSharp.Patterns.Contracts;

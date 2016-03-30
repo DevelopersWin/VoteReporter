@@ -1,21 +1,28 @@
 ﻿using DragonSpark.Composition;
+using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.TypeSystem;
+using DragonSpark.Windows.Runtime;
+using System;
+using System.Reflection;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Testing.Objects.IoC
 {
-	/*public class Application : ApplicationBase
-	{
-		public Application() : base( ServiceProviderFactory.Instance.Create() ) {}
-	}*/
-
-	public class ServiceProviderFactory : Activation.IoC.ServiceProviderFactory
-	{
-		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
-
-		public ServiceProviderFactory() : base( new AssemblyBasedConfigurationContainerFactory( Framework.Setup.AssemblyProvider.Instance.Create() ).Create ) {}
-	}
-
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		public AutoDataAttribute() : base( autoData => ServiceProviderFactory.Instance.Create() ) {}
+		public AutoDataAttribute() : this( provider => new Application( provider ) ) {}
+
+		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblyProvider.Instance.Create, applicationSource ) {}
+
+		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) : this( data => new Activation.IoC.ServiceProviderFactory( new AssemblyBasedConfigurationContainerFactory( assemblySource() ).Create ).Create(), applicationSource ) {}
+
+		protected AutoDataAttribute( Func<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : base( providerSource, applicationSource ) {}
+	}
+
+	public class AssemblyProvider : AssemblyProviderBase
+	{
+		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
+
+		public AssemblyProvider( params Type[] others ) : base( others.Append( typeof(AssemblySourceBase) ).Fixed(), DomainApplicationAssemblyLocator.Instance.Create() ) {}
 	}
 }

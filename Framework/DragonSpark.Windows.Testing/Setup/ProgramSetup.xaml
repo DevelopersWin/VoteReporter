@@ -10,6 +10,7 @@
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
+	<setup:ApplyTaskMonitorCommand />
 	<commands:SetupUnityCommand>
 		<commands:ConfigureUnityCommand.Types>
 			<commands:UnityType RegistrationType="{x:Type localSetup:ITyper}" MapTo="{x:Type localSetup:SomeTypeist}" />

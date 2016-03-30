@@ -1,7 +1,10 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Properties;
+using DragonSpark.TypeSystem;
+using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
+using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using PostSharp.Patterns.Model;
 using Serilog;
@@ -60,7 +63,7 @@ namespace DragonSpark.Activation.IoC
 				.Extend<CachingBuildPlanExtension>()
 				.Extend<DefaultRegistrationsExtension>()
 				.Extend<StrategyPipelineExtension>()
-				.Extension<ServicesIntegrationExtension>().Refresh()
+				//.Extension<ServicesIntegrationExtension>().Refresh()
 				.Extend<InstanceTypeRegistrationMonitorExtension>();
 	}
 
@@ -108,9 +111,66 @@ namespace DragonSpark.Activation.IoC
 	public class UnityContainerFactory : AggregateFactory<IUnityContainer>
 	{
 		public UnityContainerFactory( [Required] Func<IServiceProvider> provider )
-			: base( () => new UnityContainer(),
+			: base( () => new UnityContainer().Extend<DefaultBehaviorExtension>(),
 				new ServicesConfigurator( provider ).Create,
 				DefaultUnityExtensions.Instance.Create
 			) {}
+	}
+
+	public class DefaultBehaviorExtension : UnityContainerExtension
+	{
+		protected override void Initialize()
+		{
+			var repository = new StrategyRepository( Context.Strategies ) { new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.Setup, Priority.High ) };
+			Container.RegisterInstance<IStrategyRepository>( repository );
+		}
+	}
+
+	public class StrategyEntry
+	{
+		public StrategyEntry( [Required] IBuilderStrategy strategy, UnityBuildStage stage, Priority priority = Priority.Normal )
+		{
+			Strategy = strategy;
+			Stage = stage;
+			Priority = priority;
+		}
+
+		public IBuilderStrategy Strategy { get; }
+		public UnityBuildStage Stage { get; }
+		public Priority Priority { get; }
+	}
+
+	public interface IStrategyRepository
+	{
+		void Add( StrategyEntry entry );
+
+		IEnumerable<StrategyEntry> Get();
+	}
+
+	class StrategyRepository : List<StrategyEntry>, IStrategyRepository
+	{
+		readonly StagedStrategyChain<UnityBuildStage> strategies;
+
+		public StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies ) : this( strategies, new[]
+			{
+				new StrategyEntry( new BuildKeyMappingStrategy(), UnityBuildStage.TypeMapping ),
+				new StrategyEntry( new HierarchicalLifetimeStrategy(), UnityBuildStage.Lifetime ),
+				new StrategyEntry( new LifetimeStrategy(), UnityBuildStage.Lifetime ),
+				new StrategyEntry( new ArrayResolutionStrategy(), UnityBuildStage.Creation ),
+				new StrategyEntry( new BuildPlanStrategy(), UnityBuildStage.Creation ),
+			} ) {}
+
+		public StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies, IEnumerable<StrategyEntry> entry ) : base( entry )
+		{
+			this.strategies = strategies;
+		}
+
+		public IEnumerable<StrategyEntry> Get() => this.OrderBy( entry => entry.Stage ).ThenByDescending( entry => entry.Priority ).Fixed();
+
+		void IStrategyRepository.Add( StrategyEntry entry )
+		{
+			Add( entry );
+			strategies.Add( entry.Strategy, entry.Stage );
+		}
 	}
 }

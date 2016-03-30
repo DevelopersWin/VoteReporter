@@ -1,7 +1,6 @@
-using System.Reflection;
 using DragonSpark.Modularity;
 using DragonSpark.Setup.Registration;
-using DragonSpark.TypeSystem;
+using System.Reflection;
 
 namespace DragonSpark.Windows.Modularity
 {

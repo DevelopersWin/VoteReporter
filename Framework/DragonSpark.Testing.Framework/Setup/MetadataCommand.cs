@@ -1,5 +1,4 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
@@ -8,9 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Composition;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -34,41 +30,36 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public abstract class Application<T> : ApplicationBase where T : ICommand
+	public class Application<T> : Application where T : ICommand
 	{
-		protected Application( IServiceProvider context, IEnumerable<ICommand> commands ) : base( context, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
+		public Application( IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
+
+		public Application( IServiceProvider provider, IEnumerable<ICommand> commands ) : base( provider, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
 	}
 
 	public interface IApplication : IApplication<AutoData> { }
 
-	public class AssemblyProvider : AssemblyProviderBase
-	{
-		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
-
-		AssemblyProvider() : base( new[] { typeof(AssemblySourceBase) }, DomainApplicationAssemblyLocator.Instance.Create() ) {}
-	}
-
-	public class Application : ApplicationBase
+	/*public class Application : ApplicationBase
 	{
 		// public Application() : this( ServiceProviderFactory.Instance.Create() ) {}
 
-		public Application( IServiceProvider context ) : base( context ) {}
+		public Application( IServiceProvider provider ) : base( provider ) {}
 		
-	}
+	}*/
 
-	public abstract class ApplicationBase : DragonSpark.Setup.Application<AutoData>, IApplication
+	public class Application : DragonSpark.Setup.Application<AutoData>, IApplication
 	{
-		protected ApplicationBase( IServiceProvider context ) : this( context, Default<ICommand>.Items ) {}
+		public Application( IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
 
-		protected ApplicationBase( IServiceProvider context, IEnumerable<ICommand> commands ) : base( context, MetadataCommand.Instance.Append( commands ) ) {}
+		public Application( IServiceProvider provider, IEnumerable<ICommand> commands ) : base( provider, MetadataCommand.Instance.Append( commands ) ) {}
 
-		protected override void OnExecute( AutoData parameter )
+		/*protected override void OnExecute( AutoData parameter )
 		{
 			/*var registry = Services.Get<IExportDescriptorProviderRegistry>();
-			registry.Register( new InstanceExportDescriptorProvider<AutoData>( parameter ) );*/
+			registry.Register( new InstanceExportDescriptorProvider<AutoData>( parameter ) );#1#
 			
 			base.OnExecute( parameter );
-		}
+		}*/
 
 		/*public override object GetService( Type serviceType )
 		{

@@ -1,11 +1,7 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Windows.Input;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -34,22 +30,17 @@ namespace DragonSpark.Testing.Objects.Setup
 		public override ILoggerHistory History => base.History;
 	}*/
 
-	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
-	{
-		protected AutoDataAttribute( Func<AutoData, ApplicationBase> providerSource ) : base( providerSource ) {}
-	}
-
-	public class ServiceProviderFactory : DragonSpark.Composition.ServiceProviderFactory
+	/*public class ServiceProviderFactory : DragonSpark.Composition.ServiceProviderFactory
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 
 		ServiceProviderFactory() : base( new AssemblyBasedConfigurationContainerFactory( AssemblyProvider.Instance.Create() ).Create ) {}
-	}
+	}*/
 
-	public class Application<T> : Framework.Setup.Application<T> where T : ICommand
+	/*public class Application<T> : Framework.Setup.Application<T> where T : ICommand
 	{
-		public Application() : this( Default<ICommand>.Items ) {}
+		public Application( IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
 
-		public Application( IEnumerable<ICommand> commands ) : base( ServiceProviderFactory.Instance.Create(), commands ) {}
-	}
+		public Application( IServiceProvider provider, IEnumerable<ICommand> commands ) : base( , commands ) {}
+	}*/
 }

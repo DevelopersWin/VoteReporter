@@ -287,7 +287,7 @@
     <Compile Include="Security\KeyVaultApplicationFactoryTests.cs" />
     <Compile Include="Security\CertificateFactoryTests.cs" />
     <Compile Include="Security\SecretFactoryTests.cs" />
-    <Compile Include="Setup\ServiceProviderFactory.cs" />
+    <Compile Include="Setup\AutoDataAttribute.cs" />
     <Compile Include="Setup\LocationSetup.cs">
       <DependentUpon>LocationSetup.xaml</DependentUpon>
     </Compile>

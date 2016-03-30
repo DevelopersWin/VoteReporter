@@ -112,7 +112,7 @@ namespace DragonSpark.Activation.IoC
 				.With( policy => policy.GetRegisteredNames( typeof(T) )
 					.Concat( defaultName ).Concat( typeof(T).GetTypeInfo().IsGenericType ? policy.GetRegisteredNames( typeof(T).GetGenericTypeDefinition() ) : Enumerable.Empty<string>() )
 					.Distinct()
-					.Select( context.New<T> )
+					.Select( context.NewBuildUp<T> )
 					.ToArray() 
 				) ?? Default<T>.Items;
 			return result;

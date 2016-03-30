@@ -9,5 +9,6 @@
 	mc:Ignorable="d" 
 	Services="{ds:Factory {x:Static startup:ServiceProviderFactory.Instance}}"
 >
+	<setup:ApplyTaskMonitorCommand />
 	<setup:ApplySetup />
 </ds:ConsoleApplication>

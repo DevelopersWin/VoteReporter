@@ -157,6 +157,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Activation\Factory.cs" />
     <Compile Include="Activation\IExecutionContext.cs" />

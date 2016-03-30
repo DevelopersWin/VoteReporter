@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Runtime.Values
@@ -36,6 +37,6 @@ namespace DragonSpark.Runtime.Values
 
 		protected override void OnExecute( T parameter ) => stack.Push( parameter );
 
-		protected override void OnDispose() => stack.Pop();
+		protected override void OnDispose() => stack.Pop().TryDispose();
 	}
 }

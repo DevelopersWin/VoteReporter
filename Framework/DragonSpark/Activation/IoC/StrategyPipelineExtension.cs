@@ -87,31 +87,54 @@ namespace DragonSpark.Activation.IoC
 
 	public class StrategyPipelineExtension : UnityContainerExtension
 	{
-		readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
-		readonly ConventionStrategy conventionStrategy;
-		//readonly DefaultValueStrategy defaultValueStrategy;
-		readonly EnumerableResolutionStrategy enumerableResolutionStrategy;
-		
-		public StrategyPipelineExtension( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy/*, [Required] DefaultValueStrategy defaultValueStrategy*/, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy )
+		readonly IStrategyRepository strategyRepository;
+		readonly StrategyEntryFactory factory;
+
+		public class StrategyEntryFactory : FactoryBase<IEnumerable<StrategyEntry>>
 		{
-			this.metadataLifetimeStrategy = metadataLifetimeStrategy;
-			this.conventionStrategy = conventionStrategy;
-			// this.defaultValueStrategy = defaultValueStrategy;
-			this.enumerableResolutionStrategy = enumerableResolutionStrategy;
+			readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
+			readonly ConventionStrategy conventionStrategy;
+			readonly EnumerableResolutionStrategy enumerableResolutionStrategy;
+
+			public StrategyEntryFactory( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy )
+			{
+				this.metadataLifetimeStrategy = metadataLifetimeStrategy;
+				this.conventionStrategy = conventionStrategy;
+				this.enumerableResolutionStrategy = enumerableResolutionStrategy;
+			}
+
+			protected override IEnumerable<StrategyEntry> CreateItem() => new[]
+			{
+				new StrategyEntry( metadataLifetimeStrategy, UnityBuildStage.Lifetime, Priority.Higher ),
+				new StrategyEntry( conventionStrategy, UnityBuildStage.PreCreation ),
+				new StrategyEntry( enumerableResolutionStrategy, UnityBuildStage.Creation, Priority.Higher )
+			};
+		}
+
+		
+		public StrategyPipelineExtension( [Required]IStrategyRepository strategyRepository, [Required] StrategyEntryFactory factory )
+		{
+			this.strategyRepository = strategyRepository;
+			this.factory = factory;
 		}
 
 		protected override void Initialize()
 		{
+			factory.Create().Each( strategyRepository.Add );
+
 			Context.Strategies.Clear();
-			Context.Strategies.AddNew<BuildKeyMappingStrategy>( UnityBuildStage.TypeMapping );
-			Context.Strategies.Add( metadataLifetimeStrategy, UnityBuildStage.Lifetime );
-			Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
-			Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
+
+			strategyRepository.Get().Each( entry => Context.Strategies.Add( entry.Strategy, entry.Stage ) );
+
+			//Context.Strategies.AddNew<BuildKeyMappingStrategy>( UnityBuildStage.TypeMapping );
+			// Context.Strategies.Add( metadataLifetimeStrategy, UnityBuildStage.Lifetime ); // Insert
+			// Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
+			// Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
 			// Context.Strategies.Add( defaultValueStrategy, UnityBuildStage.Lifetime );
-			Context.Strategies.Add( conventionStrategy, UnityBuildStage.PreCreation );
-			Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
-			Context.Strategies.Add( enumerableResolutionStrategy, UnityBuildStage.Creation );
-			Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
+			// Context.Strategies.Add( conventionStrategy, UnityBuildStage.PreCreation );
+			//Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
+			// Context.Strategies.Add( enumerableResolutionStrategy, UnityBuildStage.Creation ); // Insert
+			// Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
 		}
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
