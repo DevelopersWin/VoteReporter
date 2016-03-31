@@ -12,6 +12,7 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -33,8 +34,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, TypeBasedServiceProviderFactory.Instance.Create, DefaultApplicationFactory ) {}
 
-		protected AutoDataAttribute( [Required]Func<AutoData, IServiceProvider> providerSource ) 
-			: this( providerSource, DefaultApplicationFactory ) {}
+		protected AutoDataAttribute( [Required]Func<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationFactory ) {}
 
 		protected AutoDataAttribute( [Required]Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource ) 
 			: this( DefaultFixtureFactory, providerSource, applicationSource ) {}
@@ -47,7 +47,8 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
-			using ( var command = new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( methodUnderTest ) ) )
+			var parameter = MethodContext.Get( methodUnderTest );
+			using ( var command = new AssignExecutionContextCommand().ExecuteWith( parameter ) )
 			{
 				using ( var profiler = new Profiler( command.Provider.Get<ILogger>(), $"{methodUnderTest.Name}-GetData" ) )
 				{

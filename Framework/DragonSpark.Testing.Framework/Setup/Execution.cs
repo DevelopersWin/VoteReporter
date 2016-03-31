@@ -24,6 +24,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		public static string Get( MethodBase method )
 		{
 			var key = /*KeyFactory.Instance.CreateUsing( method )*/method.ToString();
+			// var code = KeyFactory.Instance.CreateUsing( key ).ToString();
 			var result = new Reference<string>( Reference, key ).Item;
 			return result;
 		}

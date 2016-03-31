@@ -1,5 +1,6 @@
 ﻿using System.Composition;
 using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Testing.Objects;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -8,7 +9,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public class AutoDataAttribute : Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( serviceProvider => new Application<LocationSetup>( serviceProvider ) ) {}
+			public AutoDataAttribute() : base( AssemblyProvider.Instance.Create, serviceProvider => new Application<LocationSetup>( serviceProvider ) ) {}
 		}
 
 		public LocationSetup()

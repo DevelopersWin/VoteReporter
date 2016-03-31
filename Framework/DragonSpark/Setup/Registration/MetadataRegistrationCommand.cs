@@ -23,7 +23,8 @@ namespace DragonSpark.Setup.Registration
 
 		protected override void OnExecute( Type[] parameter )
 		{
-			MetadataRegistrationTypeFactory.Instance.Create( parameter )
+			var types = MetadataRegistrationTypeFactory.Instance.Create( parameter );
+			types
 				.SelectMany( HostedValueLocator<IRegistration>.Instance.Create )
 				.Each( registration => registration.Register( registry ) );
 		}

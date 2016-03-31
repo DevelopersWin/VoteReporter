@@ -50,6 +50,12 @@ namespace DragonSpark.Aspects
 
 		int GetCode( object o )
 		{
+			var text = o as string;
+			if ( text != null )
+			{
+				return text.GetHashCode();
+			}
+
 			var items = o as IEnumerable;
 			if ( items != null )
 			{
