@@ -10,7 +10,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class MetadataCommand : AutoDataCommand
+	public class MetadataCommand : AutoDataCommandBase
 	{
 		public static MetadataCommand Instance { get; } = new MetadataCommand();
 

@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Objects.IoC
 
 		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) : this( data => new Activation.IoC.ServiceProviderFactory( new AssemblyBasedConfigurationContainerFactory( assemblySource() ).Create ).Create(), applicationSource ) {}
 
-		protected AutoDataAttribute( Func<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : base( providerSource, applicationSource ) {}
+		protected AutoDataAttribute( Func<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : base( AttributeServices.From( providerSource, applicationSource ) ) {}
 	}
 
 	public class AssemblyProvider : AssemblyProviderBase

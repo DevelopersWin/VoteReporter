@@ -10,7 +10,7 @@ using System;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public abstract class AutoDataCommand : Command<AutoData> {}
+	public abstract class AutoDataCommandBase : Command<AutoData> {}
 
 	public class SericesCustomization : CustomizationBase
 	{
@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		readonly Func<Type, object> provider;
 
-		public ServiceRelay() : this( Services.Get ) {}
+		public ServiceRelay() : this( Activation.Services.Get ) {}
 
 		public ServiceRelay( [Required]Func<Type, object> provider )
 		{

@@ -3,6 +3,7 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
@@ -12,7 +13,6 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -23,41 +23,29 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
 		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Create;
-		readonly static Func<IServiceProvider, IApplication> DefaultApplicationFactory = provider => new Application( provider );
+		
+		readonly Func<AutoData, IAutoDataCommand> commandSource;
 
-		readonly Func<AutoData, IServiceProvider> providerSource;
-		readonly Func<IServiceProvider, IApplication> applicationSource;
+		public AutoDataAttribute( bool includeFromParameters = true, params Type[] others ) : this( AttributeServices.From( new TypeBasedServiceProviderFactory( others, includeFromParameters ) ) ) {}
 
-		public AutoDataAttribute( bool includeFromParameters = true, params Type[] others ) : this( new TypeBasedServiceProviderFactory( others, includeFromParameters ).Create ) {}
+		protected AutoDataAttribute( [Required] Func<AutoData, IAutoDataCommand> commandSource ) : this( DefaultFixtureFactory, commandSource ) {}
 
-		protected AutoDataAttribute( Func<IServiceProvider, IApplication> application ) : this( DefaultFixtureFactory, TypeBasedServiceProviderFactory.Instance.Create, application ) {}
-
-		protected AutoDataAttribute( Func<IFixture> fixture  ) : this( fixture, TypeBasedServiceProviderFactory.Instance.Create, DefaultApplicationFactory ) {}
-
-		protected AutoDataAttribute( [Required]Func<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationFactory ) {}
-
-		protected AutoDataAttribute( [Required]Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource ) 
-			: this( DefaultFixtureFactory, providerSource, applicationSource ) {}
-
-		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required]Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource  ) : base( fixture() )
+		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required] Func<AutoData, IAutoDataCommand> commandSource ) : base( fixture() )
 		{
-			this.providerSource = providerSource;
-			this.applicationSource = applicationSource;
+			this.commandSource = commandSource;
 		}
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
 			var parameter = MethodContext.Get( methodUnderTest );
-			using ( var command = new AssignExecutionContextCommand().ExecuteWith( parameter ) )
+			using ( var assign = new AssignExecutionContextCommand().ExecuteWith( parameter ) )
 			{
-				using ( var profiler = new Profiler( command.Provider.Get<ILogger>(), $"{methodUnderTest.Name}-GetData" ) )
+				using ( var profiler = new Profiler( assign.Provider.Get<ILogger>(), $"{methodUnderTest.Name}-GetData" ) )
 				{
 					profiler.Start();
 					var autoData = new AutoData( Fixture, methodUnderTest );
-					var provider = new ServiceProviderFactory( providerSource( autoData ) ).Create( autoData );
-					var application = applicationSource( provider );
-					profiler.Mark( "Created Application" );
-					using ( new ExecuteApplicationCommand<AutoData>( application, provider ).ExecuteWith( autoData ) )
+					var command = commandSource( autoData );
+					using ( command.ExecuteWith( autoData ) )
 					{
 						var result = base.GetData( methodUnderTest );
 						return result;
@@ -67,6 +55,54 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance>( info => new AspectInstance( info, new AssignExecutionContextAspect() ) ).ToItem();
+	}
+
+	public interface IAutoDataCommand : ICommand<AutoData>, IDisposable {}
+
+	public class AutoDataCommand : ExecuteApplicationCommand<AutoData>, IAutoDataCommand
+	{
+		public AutoDataCommand( IApplication<AutoData> application, [Required] IServiceProvider current ) : base( application, current ) {}
+
+		// public AutoDataCommand( IApplication<AutoData> application, AssignServiceProvider assign ) : base( application, assign ) {}
+	}
+
+	public static class AttributeServices
+	{
+		readonly static Func<IServiceProvider, IApplication> DefaultApplicationFactory = provider => new Application( provider );
+
+		public static Func<AutoData, IAutoDataCommand> From( [Required] IFactory<AutoData, IServiceProvider> providerSource ) => From( providerSource.Create );
+
+		public static Func<AutoData, IAutoDataCommand> From( [Required] Func<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource = null ) => 
+			new AutoDataCommandFactory( Logger, providerSource, applicationSource ?? DefaultApplicationFactory ).Create;
+
+		static ILogger Logger() => CurrentServiceProvider.Instance.Item.Get<ILogger>();
+	}
+
+	public class AutoDataCommandFactory : FactoryBase<AutoData, IAutoDataCommand>
+	{
+		readonly Func<ILogger> logger;
+		readonly Func<AutoData, IServiceProvider> providerSource;
+		readonly Func<IServiceProvider, IApplication> applicationSource;
+
+		public AutoDataCommandFactory( [Required] Func<ILogger> logger, [Required]Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource )
+		{
+			this.logger = logger;
+			this.providerSource = providerSource;
+			this.applicationSource = applicationSource;
+		}
+
+		protected override IAutoDataCommand CreateItem( AutoData parameter )
+		{
+			using ( var profiler = new Profiler( logger(), $"{parameter.Method.Name}-CommandFactory" ) )
+			{
+				profiler.Start();
+				var provider = new ServiceProviderFactory( providerSource( parameter ) ).Create( parameter );
+				var application = applicationSource( provider );
+				profiler.Mark( "Created Application" );
+				var result = new AutoDataCommand( application, provider );
+				return result;
+			}
+		}
 	}
 
 	public class TypeBasedServiceProviderFactory : FactoryBase<AutoData, IServiceProvider>
