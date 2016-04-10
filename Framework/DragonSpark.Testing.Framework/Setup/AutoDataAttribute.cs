@@ -23,6 +23,15 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
 		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Create;
+
+		static AutoDataAttribute()
+		{
+			// TODO: figure out a better way to do this:
+			AppDomainFactory.Instance.Create().FirstOrDefault( appDomain => appDomain.FriendlyName.Contains( "JetBrains.ReSharper.TaskRunner" ) ).With( domain =>
+			{
+				new InitializeTestRunnerEnvironmentCommand( domain ).ExecuteWith( new object() );
+			});
+		}
 		
 		readonly Func<AutoData, IDisposable> commandSource;
 

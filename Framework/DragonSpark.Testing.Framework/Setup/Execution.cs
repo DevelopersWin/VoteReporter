@@ -14,17 +14,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		// public override string ToString() => Item.ToString();
 	}
 
-	public static class Environment
-	{
-		static Environment()
-		{
-			AppDomainFactory.Instance.Create().FirstOrDefault( appDomain => appDomain.FriendlyName.Contains( "JetBrains.ReSharper.TaskRunner" ) ).With( domain =>
-			{
-				new InitializeTestRunnerEnvironmentCommand( domain ).ExecuteWith( new object() );
-			});
-		}
-	}
-
 	/*//[Serializable]
 	public class MethodContext
 	{
