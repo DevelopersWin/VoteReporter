@@ -1,4 +1,6 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework.Setup;
 using mscoree;
@@ -6,7 +8,9 @@ using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -16,18 +20,73 @@ namespace DragonSpark.Testing.Framework
 	{
 		[ModuleInitializer( 0 )]
 		public static void Execution() => Activation.Execution.Initialize( CurrentExecution.Instance );
+
+		[ModuleInitializer( 1 )]
+		public static void Environment() => InitializeJetBrainsTaskRunnerCommand.Instance.ExecuteWith( AppDomain.CurrentDomain.SetupInformation );
 	}
 
-	public class AppDomainFactory : FactoryBase<IEnumerable<AppDomain>>
+	public class JetBrainsApplicationDomainFactory : FactoryBase<AppDomain>
+	{
+		public static JetBrainsApplicationDomainFactory Instance { get; } = new JetBrainsApplicationDomainFactory();
+
+		readonly Func<ImmutableArray<AppDomain>> source;
+		readonly string domainName;
+
+		public JetBrainsApplicationDomainFactory() : this( AppDomainFactory.Instance.Create ) {}
+
+		public JetBrainsApplicationDomainFactory( [Required] Func<ImmutableArray<AppDomain>> source, [NotEmpty] string domainName = "JetBrains.ReSharper.TaskRunner" )
+		{
+			this.source = source;
+			this.domainName = domainName;
+		}
+
+		[Freeze]
+		protected override AppDomain CreateItem() => source().Except( AppDomain.CurrentDomain.ToItem() ).FirstOrDefault( domain => domain.FriendlyName.Contains( domainName ) );
+	}
+
+	public class JetBrainsAssemblyLoaderFactory : FactoryBase<string, AssemblyLoader>
+	{
+		public static JetBrainsAssemblyLoaderFactory Instance { get; } = new JetBrainsAssemblyLoaderFactory();
+
+		readonly Func<AppDomain> source;
+
+		public JetBrainsAssemblyLoaderFactory() : this( JetBrainsApplicationDomainFactory.Instance.Create ) {}
+
+		public JetBrainsAssemblyLoaderFactory( [Required] Func<AppDomain> source )
+		{
+			this.source = source;
+		}
+
+		protected override AssemblyLoader CreateItem( string parameter ) => source.Use( domain => new ApplicationDomainProxyFactory<AssemblyLoader>( domain ).CreateUsing( parameter ) );
+	}
+
+	public class InitializeJetBrainsTaskRunnerCommand : Command<AppDomainSetup>
+	{
+		public static InitializeJetBrainsTaskRunnerCommand Instance { get; } = new InitializeJetBrainsTaskRunnerCommand();
+
+		readonly Func<string, AssemblyLoader> source;
+
+		public InitializeJetBrainsTaskRunnerCommand() : this( JetBrainsAssemblyLoaderFactory.Instance.Create ) {}
+
+		public InitializeJetBrainsTaskRunnerCommand( [Required] Func<string, AssemblyLoader> source )
+		{
+			this.source = source;
+		}
+
+		protected override void OnExecute( AppDomainSetup parameter ) => source( parameter.ApplicationBase ).With( loader => loader.Initialize() );
+	}
+
+	public class AppDomainFactory : FactoryBase<ImmutableArray<AppDomain>>
 	{
 		public static AppDomainFactory Instance { get; } = new AppDomainFactory();
 
-		protected override IEnumerable<AppDomain> CreateItem()
+		[Freeze]
+		protected override ImmutableArray<AppDomain> CreateItem()
 		{
 			var enumHandle = IntPtr.Zero;
 			var host = new CorRuntimeHostClass();
 
-			var result = new List<AppDomain>();
+			var items = new List<AppDomain>();
 
 			try
 			{
@@ -37,14 +96,11 @@ namespace DragonSpark.Testing.Framework
 				host.NextDomain( enumHandle, out domain );
 				while ( domain != null )
 				{
-					result.Add( (AppDomain)domain );
+					items.Add( (AppDomain)domain );
 					host.NextDomain( enumHandle, out domain );
 				}
 			}
-			catch ( InvalidCastException )
-			{
-				
-			}
+			catch ( InvalidCastException ) {}
 			finally
 			{
 				if ( enumHandle != IntPtr.Zero )
@@ -54,38 +110,29 @@ namespace DragonSpark.Testing.Framework
 
 				Marshal.ReleaseComObject( host );	
 			}
+			var result = items.ToImmutableArray();
 			return result;
 		}
 	}
 
-	public class InitializeTestRunnerEnvironmentCommand : DisposingCommand<object>
+	public class ApplicationDomainProxyFactory<T> : FactoryBase<object[], T>
 	{
-		readonly AssemblyLoader loader;
+		readonly AppDomain domain;
 
-		public InitializeTestRunnerEnvironmentCommand( [Required] AppDomain domain ) : this( domain, AppDomain.CurrentDomain.SetupInformation.ApplicationBase ) {}
+		public ApplicationDomainProxyFactory( [Required] AppDomain domain )
+		{
+			this.domain = domain;
+		}
 
-		public InitializeTestRunnerEnvironmentCommand( [Required] AppDomain domain, [Required] string basePath ) : this( CreateFrom<AssemblyLoader>( domain, basePath ) ) {}
+		public T CreateUsing( params object[] arguments ) => Create( arguments );
 
-		static T CreateFrom<T>( AppDomain domain, params object[] arguments )
+		protected override T CreateItem( object[] parameter )
 		{
 			var assemblyPath = new Uri( typeof(T).Assembly.CodeBase).LocalPath;
 			var result = (T)domain.CreateInstanceFromAndUnwrap(assemblyPath, typeof(T).FullName, false
 				, BindingFlags.CreateInstance | BindingFlags.Public | BindingFlags.Instance
-				, null, arguments, null, null );
+				, null, parameter, null, null );
 			return result;
-		}
-
-		public InitializeTestRunnerEnvironmentCommand( [Required] AssemblyLoader loader )
-		{
-			this.loader = loader;
-		}
-
-		protected override void OnExecute( object parameter ) => loader.Initialize();
-
-		protected override void OnDispose()
-		{
-			base.OnDispose();
-			loader.Dispose();
 		}
 	}
 

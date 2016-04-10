@@ -24,15 +24,6 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Create;
 
-		static AutoDataAttribute()
-		{
-			// TODO: figure out a better way to do this:
-			AppDomainFactory.Instance.Create().FirstOrDefault( appDomain => appDomain.FriendlyName.Contains( "JetBrains.ReSharper.TaskRunner" ) ).With( domain =>
-			{
-				new InitializeTestRunnerEnvironmentCommand( domain ).ExecuteWith( new object() );
-			});
-		}
-		
 		readonly Func<AutoData, IDisposable> commandSource;
 
 		public AutoDataAttribute( bool includeFromParameters = true, params Type[] others ) : this( AttributeServices.From( new TypeBasedServiceProviderFactory( others, includeFromParameters ) ) ) {}
