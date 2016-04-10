@@ -7,26 +7,6 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Runtime
 {
-	/// <summary>
-	/// ATTRIBUTION: http://stackoverflow.com/questions/2907372/why-does-c-sharp-not-implement-gethashcode-for-collections
-	/// </summary>
-	/*public class EqualityList : List<object>, IEquatable<EqualityList>
-	{
-		public EqualityList() {}
-
-		public EqualityList( [Required] params object[] items ) : base( items ) {}
-
-		public bool Equals( EqualityList other )
-		{
-			var result = other.With( list => ReferenceEquals( this, other ) || list.Count == Count && list.GetHashCode() == GetHashCode() );
-			return result;
-		}
-
-		public override bool Equals( object other ) => other.AsTo<EqualityList, bool>( Equals );
-
-		public override int GetHashCode() => this.Aggregate( 0x2D2816FE, ( current, item ) => current * 31 + ( item?.GetHashCode() ?? 0 ) );
-	}*/
-
 	public class Collection : Collection<object> {}
 
 	[Ambient]

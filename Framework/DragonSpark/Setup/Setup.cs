@@ -112,21 +112,10 @@ namespace DragonSpark.Setup
 
 	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
 	{
-		public CompositeServiceProvider( params IServiceProvider[] locators ) 
-			: base( locators.Select( activator => new Func<Type, object>( new RecursionAwareServiceProvider( activator ).GetService ) ).ToArray() ) {}
+		public CompositeServiceProvider( [Required] params IServiceProvider[] providers ) 
+			: base( providers.Select( provider => new Func<Type, object>( new RecursionAwareServiceProvider( provider ).GetService ) ).ToArray() ) {}
 
 		public object GetService( Type serviceType ) => serviceType == typeof(IServiceProvider) ? this : Create( serviceType );
-
-		/*protected override object DetermineFirst( IEnumerable<Func<Type, object>> factories, Type parameter )
-		{
-			var result = factories.Select( func =>  ).Where( active => !active.Item ).FirstWhere( active =>
-			{
-				
-			} );
-			return result;
-		}*/
-
-		
 	}
 
 	public class RecursionAwareServiceProvider : DecoratedServiceProvider
@@ -165,14 +154,14 @@ namespace DragonSpark.Setup
 		public virtual object GetService( Type serviceType ) => inner.GetService( serviceType );
 	}
 
-	public class ServiceProviderFactory<TCommand> : ServiceProviderFactory<TCommand, IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
+	public class ServiceProviderFactory<TCommand> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
 	{
-		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider ) {}
-	}
+		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure.Instance.Run ) {}
+	/*}
 	
 	public class ServiceProviderFactory<TCommand, TProvider> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<TProvider> where TProvider : class, IServiceProvider
 	{
-		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure.Instance.Run ) {}
+		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure.Instance.Run ) {}*/
 
 		class Configure : Command<IServiceProvider>
 		{
@@ -180,9 +169,9 @@ namespace DragonSpark.Setup
 
 			protected override void OnExecute( IServiceProvider parameter )
 			{
-				var provider = parameter as TProvider ?? parameter.Get<TProvider>();
+				// var provider = parameter as TProvider ?? parameter.Get<TProvider>();
 				var command = parameter.Get<TCommand>();
-				command.ExecuteWith( provider );
+				command.ExecuteWith( parameter );
 			}
 		}
 	}

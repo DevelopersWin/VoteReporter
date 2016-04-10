@@ -1,3 +1,4 @@
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
@@ -5,7 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using DragonSpark.Aspects;
 
 namespace DragonSpark.Runtime.Values
 {
@@ -97,7 +97,7 @@ namespace DragonSpark.Runtime.Values
 			this.list = list;
 		}
 
-		public override void Assign( T item )
+		protected override void OnAssign( T item )
 		{
 			if ( item == null )
 			{
@@ -108,7 +108,7 @@ namespace DragonSpark.Runtime.Values
 				list.Add( item );
 			}
 			
-			base.Assign( item );
+			base.OnAssign( item );
 		}
 
 		void Remove( T item )

@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		public UnityContainerFactory() : base( new DragonSpark.Composition.ServiceProviderFactory( new AssemblyBasedConfigurationContainerFactory( Default<Assembly>.Items ).Create ).Create ) {}
+		public UnityContainerFactory() : base( new ServiceProviderFactory( Default<Assembly>.Items ).Create ) {}
 	}
 
 	/*[Export, Shared]

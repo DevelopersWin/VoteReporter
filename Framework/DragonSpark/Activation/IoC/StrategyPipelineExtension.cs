@@ -124,17 +124,7 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Clear();
 
-			strategyRepository.Get().Each( entry => Context.Strategies.Add( entry.Strategy, entry.Stage ) );
-
-			//Context.Strategies.AddNew<BuildKeyMappingStrategy>( UnityBuildStage.TypeMapping );
-			// Context.Strategies.Add( metadataLifetimeStrategy, UnityBuildStage.Lifetime ); // Insert
-			// Context.Strategies.AddNew<HierarchicalLifetimeStrategy>( UnityBuildStage.Lifetime );
-			// Context.Strategies.AddNew<LifetimeStrategy>( UnityBuildStage.Lifetime );
-			// Context.Strategies.Add( defaultValueStrategy, UnityBuildStage.Lifetime );
-			// Context.Strategies.Add( conventionStrategy, UnityBuildStage.PreCreation );
-			//Context.Strategies.AddNew<ArrayResolutionStrategy>( UnityBuildStage.Creation );
-			// Context.Strategies.Add( enumerableResolutionStrategy, UnityBuildStage.Creation ); // Insert
-			// Context.Strategies.AddNew<BuildPlanStrategy>( UnityBuildStage.Creation );
+			strategyRepository.List().Each( entry => Context.Strategies.Add( entry.Item, entry.Stage ) );
 		}
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
@@ -167,28 +157,6 @@ namespace DragonSpark.Activation.IoC
 				}
 			}
 		}
-
-		/*public class Builder<T> : FactoryBase<IBuilderContext, T>
-		{
-			readonly NamedTypeBuildKey key = NamedTypeBuildKey.Make<T>();
-			readonly IStagedStrategyChain strategies;
-			readonly Func<IBuilderContext, NamedTypeBuildKey, IBuildPlanPolicy> creator;
-
-			public Builder( [Required]IStagedStrategyChain strategies, [Required]Func<IBuilderContext, NamedTypeBuildKey, IBuildPlanPolicy> creator )
-			{
-				this.strategies = strategies;
-				this.creator = creator;
-			}
-
-			protected override T CreateItem( IBuilderContext parameter )
-			{
-				var context = new BuilderContext( strategies.MakeStrategyChain(), parameter.Lifetime, parameter.PersistentPolicies, parameter.Policies, key, null );
-				var plan = creator( context, key );
-				plan.BuildUp( context );
-				var result = context.Existing.To<T>();
-				return result;
-			}
-		}*/
 	}
 
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>

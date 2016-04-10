@@ -1,4 +1,4 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.TypeSystem;
 using System.Linq;
 using System.Reflection;
 

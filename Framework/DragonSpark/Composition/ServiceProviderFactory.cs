@@ -6,6 +6,7 @@ using DragonSpark.Properties;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using Serilog;
@@ -13,23 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
-using System.Linq;
 using System.Reflection;
-using DragonSpark.TypeSystem;
 using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
-	public class FactoryTypeRequest : LocateTypeRequest
-	{
-		public FactoryTypeRequest( [Required]Type runtimeType, string name, [Required]Type resultType ) :  base( runtimeType, name )
-		{
-			ResultType = resultType;
-		}
-
-		public Type ResultType { get; }
-	}
-
 	public class FactoryTypeFactory : FactoryBase<Type, FactoryTypeRequest>
 	{
 		public static FactoryTypeFactory Instance { get; } = new FactoryTypeFactory( Specification.Instance );
@@ -47,54 +36,24 @@ namespace DragonSpark.Composition
 		protected override FactoryTypeRequest CreateItem( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
 	}
 
-	/*public class AssembliesFactory : FactoryBase<Type[], Assembly[]>
-	{
-		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
-
-		[Freeze]
-		protected override Assembly[] CreateItem( Type[] parameter ) => parameter.Assemblies().Distinct().ToArray();
-	}*/
-
-	public static class AssemblyTypes
-	{
-		public static AssemblyTypesFactory All { get; } = new AssemblyTypesFactory( assembly => assembly.DefinedTypes.AsTypes() );
-
-		public static AssemblyTypesFactory Public { get; } = new AssemblyTypesFactory( assembly => assembly.ExportedTypes );
-	}
-
-	public class AssemblyTypesFactory : FactoryBase<Assembly, Type[]>
-	{
-		readonly Func<Assembly, IEnumerable<Type>> types;
-
-		public AssemblyTypesFactory( [Required] Func<Assembly, IEnumerable<Type>> types )
-		{
-			this.types = types;
-		}
-
-		[Freeze]
-		protected override Type[] CreateItem( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).Fixed();
-	}
-
-	public class TypesFactory : FactoryBase<Assembly[], Type[]>
-	{
-		public static TypesFactory Instance { get; } = new TypesFactory();
-
-		[Freeze]
-		protected override Type[] CreateItem( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.Create ).ToArray();
-	}
-
 	public class ServiceProviderFactory : ServiceProviderFactory<ConfigureProviderCommand>
 	{
-		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : base( new ServiceProviderSourceFactory( source ).Create ) {}
+		public ServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
+
+		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
+
+		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new ServiceProviderCoreFactory( source ).Create ) ) {}
+
+		public ServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
 	}
 
-	public class ServiceProviderSourceFactory : FactoryBase<IServiceProvider>
+	public class ServiceProviderCoreFactory : FactoryBase<IServiceProvider>
 	{
 		readonly Func<CompositionContext> source;
 
-		public ServiceProviderSourceFactory( Func<ContainerConfiguration> configuration ) : this( Composition.Create.Factory( configuration ) ) {}
+		public ServiceProviderCoreFactory( Func<ContainerConfiguration> configuration ) : this( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ) ) {}
 
-		public ServiceProviderSourceFactory( [Required] Func<CompositionContext> source )
+		public ServiceProviderCoreFactory( [Required] Func<CompositionContext> source )
 		{
 			this.source = source;
 		}
@@ -108,21 +67,32 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	[Export]
+	// [Export]
 	public sealed class ConfigureProviderCommand : Command<IServiceProvider>
 	{
 		readonly ILogger logger;
-		
-		[ImportingConstructor]
-		public ConfigureProviderCommand( [Required]ILogger logger )
+		readonly CompositionContext context;
+
+		// [ImportingConstructor]
+		public ConfigureProviderCommand( [Required]ILogger logger, [Required]CompositionContext context )
 		{
 			this.logger = logger;
+			this.context = context;
 		}
 
 		protected override void OnExecute( IServiceProvider parameter )
 		{
 			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
-			// context.Provider.As<IServiceLocator>( locator => context.Context.Registry.Register( new InstanceExportDescriptorProvider<IServiceLocator>( locator ) ) );
+
+			var host = context.TryGet<IServiceProviderHost>();
+			if ( host == null )
+			{
+				logger.Warning( $"The {nameof( IServiceProviderHost )} is not registered for this {nameof( CompositionContext )}." );
+			}
+			else
+			{
+				host.Assign( parameter );
+			}
 		}
 	}
 

@@ -77,17 +77,17 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	[Export]
+	// [Export]
 	public sealed class MemberInfoFactoryTypeLocator : FactoryTypeLocatorBase<MemberInfo>
 	{
-		[ImportingConstructor]
+		// [ImportingConstructor]
 		public MemberInfoFactoryTypeLocator( FactoryTypeRequestLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
 	}
 
-	[Export]
+	// [Export]
 	public sealed class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
 	{
-		[ImportingConstructor]
+		// [ImportingConstructor]
 		public ParameterInfoFactoryTypeLocator( FactoryTypeRequestLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
 	}
 

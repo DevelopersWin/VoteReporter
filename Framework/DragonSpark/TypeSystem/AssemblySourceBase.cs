@@ -10,6 +10,52 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
+	public class FactoryTypeRequest : LocateTypeRequest
+	{
+		public FactoryTypeRequest( [Required]Type runtimeType, string name, [Required]Type resultType ) :  base( runtimeType, name )
+		{
+			ResultType = resultType;
+		}
+
+		public Type ResultType { get; }
+	}
+
+	public class AssembliesFactory : FactoryBase<Type[], Assembly[]>
+	{
+		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
+
+		[Freeze]
+		protected override Assembly[] CreateItem( Type[] parameter ) => parameter.Assemblies();
+	}
+
+	public static class AssemblyTypes
+	{
+		public static AssemblyTypesFactory All { get; } = new AssemblyTypesFactory( assembly => assembly.DefinedTypes.AsTypes() );
+
+		public static AssemblyTypesFactory Public { get; } = new AssemblyTypesFactory( assembly => assembly.ExportedTypes );
+	}
+
+	public class AssemblyTypesFactory : FactoryBase<Assembly, Type[]>
+	{
+		readonly Func<Assembly, IEnumerable<Type>> types;
+
+		public AssemblyTypesFactory( [Required] Func<Assembly, IEnumerable<Type>> types )
+		{
+			this.types = types;
+		}
+
+		[Freeze]
+		protected override Type[] CreateItem( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).Fixed();
+	}
+
+	public class TypesFactory : FactoryBase<Assembly[], Type[]>
+	{
+		public static TypesFactory Instance { get; } = new TypesFactory();
+
+		[Freeze]
+		protected override Type[] CreateItem( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.Create ).ToArray();
+	}
+
 	public abstract class AssemblySourceBase : FactoryBase<Assembly[]>
 	{
 		[Freeze( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
@@ -20,13 +66,13 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly Assembly[] assemblies;
 
-		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( types.Assemblies().Union( assemblies ).ToArray() ) {}
+		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( AssembliesFactory.Instance.Create( types.Fixed() ).Union( assemblies ).ToArray() ) {}
 
-		protected AssemblyProviderBase( params Type[] types ) : this( types.Assemblies() ) {}
+		protected AssemblyProviderBase( params Type[] types ) : this( AssembliesFactory.Instance.Create( types ) ) {}
 
 		AssemblyProviderBase( [Required] IEnumerable<Assembly> assemblies )
 		{
-			this.assemblies = assemblies.NotNull().Distinct().Prioritize().ToArray();
+			this.assemblies = assemblies.NotNull().Distinct().Prioritize().Fixed();
 		}
 
 		protected override Assembly[] CreateItem() => assemblies;

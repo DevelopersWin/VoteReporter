@@ -11,10 +11,10 @@ namespace DragonSpark.Runtime.Values
 			this.values = values;
 		}
 
-		public override void Assign( T item )
+		protected override void OnAssign( T item )
 		{
 			values.Each( value => value.Assign( item ) );
-			base.Assign( item );
+			base.OnAssign( item );
 		}
 	}
 }

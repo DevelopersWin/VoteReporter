@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Properties;
-using DragonSpark.TypeSystem;
+using DragonSpark.Runtime;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
@@ -63,7 +63,6 @@ namespace DragonSpark.Activation.IoC
 				.Extend<CachingBuildPlanExtension>()
 				.Extend<DefaultRegistrationsExtension>()
 				.Extend<StrategyPipelineExtension>()
-				//.Extension<ServicesIntegrationExtension>().Refresh()
 				.Extend<InstanceTypeRegistrationMonitorExtension>();
 	}
 
@@ -82,72 +81,46 @@ namespace DragonSpark.Activation.IoC
 				.Extend<ServicesIntegrationExtension>();
 	}
 
-	/*public class IntegratedUnityContainerFactory : FactoryBase<IUnityContainer>
-	{
-		readonly Func<IServiceProvider> source;
-
-		public IntegratedUnityContainerFactory( [Required]Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
-		
-		public IntegratedUnityContainerFactory( [Required]Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
-
-		// public IntegratedUnityContainerFactory( Func<Type[]> types ) : this( new CompositionHostFactory( types, Default<ITransformer<ContainerConfiguration>>.Items ) ) {}
-
-		public IntegratedUnityContainerFactory( Func<ContainerConfiguration> configuration ) : this( new Func<IServiceProvider>( new Composition.ServiceLocatorFactory( configuration ).Create ) ) {}
-
-		public IntegratedUnityContainerFactory( [Required] Func<IServiceProvider> source )
-		{
-			this.source = source;
-		}
-
-		protected override IUnityContainer CreateItem()
-		{
-			var provider = source();
-			var factory = new UnityContainerFactory( provider.Get<Assembly[]>, provider.Get<Type[]>, provider.Get<BuildableTypeFromConventionLocator>, provider.Get<CompositionContext> );
-			var result = factory.Create();
-			return result;
-		}
-	}*/
-
 	public class UnityContainerFactory : AggregateFactory<IUnityContainer>
 	{
 		public UnityContainerFactory( [Required] Func<IServiceProvider> provider )
-			: base( () => new UnityContainer().Extend<DefaultBehaviorExtension>(),
+			: base( UnityContainerCoreFactory.Instance.Create,
 				new ServicesConfigurator( provider ).Create,
 				DefaultUnityExtensions.Instance.Create
 			) {}
+	}
+
+	public class UnityContainerCoreFactory : FactoryBase<IUnityContainer>
+	{
+		public static UnityContainerCoreFactory Instance { get; } = new UnityContainerCoreFactory();
+
+		protected override IUnityContainer CreateItem() => new UnityContainer().Extend<DefaultBehaviorExtension>();
 	}
 
 	public class DefaultBehaviorExtension : UnityContainerExtension
 	{
 		protected override void Initialize()
 		{
-			var repository = new StrategyRepository( Context.Strategies ) { new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.Setup, Priority.High ) };
+			var repository = new StrategyRepository( Context.Strategies );
+			repository.Add( new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.Setup, Priority.High ) );
+
 			Container.RegisterInstance<IStrategyRepository>( repository );
 		}
 	}
 
-	public class StrategyEntry
+	public class StrategyEntry : Entry<IBuilderStrategy>
 	{
-		public StrategyEntry( [Required] IBuilderStrategy strategy, UnityBuildStage stage, Priority priority = Priority.Normal )
+		public StrategyEntry( [Required] IBuilderStrategy strategy, UnityBuildStage stage, Priority priority = Priority.Normal ) : base( strategy, priority )
 		{
-			Strategy = strategy;
 			Stage = stage;
-			Priority = priority;
 		}
 
-		public IBuilderStrategy Strategy { get; }
 		public UnityBuildStage Stage { get; }
-		public Priority Priority { get; }
 	}
 
-	public interface IStrategyRepository
-	{
-		void Add( StrategyEntry entry );
+	public interface IStrategyRepository : IRepository<StrategyEntry> {}
 
-		IEnumerable<StrategyEntry> Get();
-	}
-
-	class StrategyRepository : List<StrategyEntry>, IStrategyRepository
+	class StrategyRepository : RepositoryBase<StrategyEntry, IBuilderStrategy>, IStrategyRepository
 	{
 		readonly StagedStrategyChain<UnityBuildStage> strategies;
 
@@ -160,17 +133,17 @@ namespace DragonSpark.Activation.IoC
 				new StrategyEntry( new BuildPlanStrategy(), UnityBuildStage.Creation ),
 			} ) {}
 
-		public StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies, IEnumerable<StrategyEntry> entry ) : base( entry )
+		StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies, IEnumerable<StrategyEntry> entry ) : base( entry.ToList() )
 		{
 			this.strategies = strategies;
 		}
 
-		public IEnumerable<StrategyEntry> Get() => this.OrderBy( entry => entry.Stage ).ThenByDescending( entry => entry.Priority ).Fixed();
+		protected override IEnumerable<StrategyEntry> Query() => Store.OrderBy( entry => entry.Stage ).ThenByDescending( entry => entry.Priority );
 
-		void IStrategyRepository.Add( StrategyEntry entry )
+		protected override void OnAdd( StrategyEntry entry )
 		{
-			Add( entry );
-			strategies.Add( entry.Strategy, entry.Stage );
+			base.OnAdd( entry );
+			strategies.Add( entry.Item, entry.Stage );
 		}
 	}
 }

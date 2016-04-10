@@ -6,7 +6,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Testing.TestObjects;
@@ -14,7 +13,6 @@ using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using Moq;
 using Ploeh.AutoFixture.Xunit2;
-using PostSharp.Patterns.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -23,19 +21,16 @@ using System.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.ComponentModel;
-using DragonSpark.Windows.Runtime;
 using Xunit;
 using Xunit.Abstractions;
 using Activator = DragonSpark.Activation.Activator;
 using ApplicationAssemblyLocator = DragonSpark.TypeSystem.ApplicationAssemblyLocator;
 using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
-using Constructor = DragonSpark.Activation.Constructor;
 using ExceptionFormatter = DragonSpark.Diagnostics.ExceptionFormatter;
 using Object = DragonSpark.Testing.Objects.Object;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
-using ServiceProviderSourceFactory = DragonSpark.Activation.IoC.ServiceProviderSourceFactory;
+using ServiceProviderCoreFactory = DragonSpark.Activation.IoC.ServiceProviderCoreFactory;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -424,7 +419,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void BasicComposition( [DragonSpark.Testing.Framework.Parameters.Service]Assembly[] assemblies, IUnityContainer container )
 		{
-			var provider = new Composition.ServiceProviderFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create();
+			var provider = new ServiceProviderFactory( assemblies ).Create();
 			using ( var host = provider.Get<CompositionHost>() )
 			{
 				// host.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
@@ -511,7 +506,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		readonly Func<IServiceProvider> source;
 
 		[ImportingConstructor]
-		public ServiceLocatorFactory( Assembly[] assemblies ) : this( new ServiceProviderSourceFactory( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ).Create ) {}
+		public ServiceLocatorFactory( Assembly[] assemblies ) : this( new ServiceProviderCoreFactory( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ).Create ) {}
 
 		public ServiceLocatorFactory( Func<IServiceProvider> source )
 		{
