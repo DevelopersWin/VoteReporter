@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
@@ -41,18 +42,18 @@ namespace DragonSpark.Runtime
 
 	public class FixedCommand : DisposingCommand<object>
 	{
-		readonly ICommand command;
+		readonly Func<ICommand> command;
 		readonly Func<object> parameter;
 
-		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command, () => parameter ) {}
+		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.ToFactory(), parameter.ToFactory() ) {}
 
-		public FixedCommand( [Required]ICommand command, [Required]Func<object> parameter )
+		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter )
 		{
 			this.command = command;
 			this.parameter = parameter;
 		}
 
-		protected override void OnExecute( object p ) => command.ExecuteWith( parameter() );
+		protected override void OnExecute( object p ) => command().ExecuteWith( parameter() );
 
 		protected override void OnDispose()
 		{
@@ -78,14 +79,16 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( TParameter parameter ) => body.ExecuteWith( parameter );
 	}*/
 
-	public abstract class DisposingCommand<TParameter> : DisposingCommand<TParameter, ISpecification<TParameter>>
+	/*public abstract class DisposingCommand<TParameter> : DisposingCommand<TParameter, ISpecification<TParameter>>
 	{
 		protected DisposingCommand() : base( Specification<TParameter>.Instance ) {}
-	}
+	}*/
 
-	public abstract class DisposingCommand<TParameter, TSpecification> : Command<TParameter, TSpecification>, IDisposable where TSpecification : ISpecification<TParameter>
+	public abstract class DisposingCommand<TParameter> : Command<TParameter>, IDisposable
 	{
-		protected DisposingCommand( TSpecification specification ) : base( specification ) {}
+		protected DisposingCommand() {}
+
+		protected DisposingCommand( ISpecification<TParameter> specification ) : base( specification ) {}
 
 		~DisposingCommand()
 		{
@@ -131,12 +134,12 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( T parameter ) => inner.Execute( parameter );
 	}
 
-	public abstract class Command<TParameter> : Command<TParameter, ISpecification<TParameter>>
+	/*public abstract class Command<TParameter> : Command<TParameter, ISpecification<TParameter>>
 	{
 		protected Command() : this( Specification<TParameter>.Instance ) {}
 
 		protected Command( ISpecification<TParameter> specification ) : base( specification ) {}
-	}
+	}*/
 
 	public class Specification<TParameter> : DecoratedSpecification<TParameter>
 	{
@@ -145,13 +148,15 @@ namespace DragonSpark.Runtime
 		Specification() : base( NullSpecification.NotNull ) {}
 	}
 
-	public abstract class Command<TParameter, TSpecification> : ICommand<TParameter> where TSpecification : ISpecification<TParameter>
+	public abstract class Command<TParameter> : ICommand<TParameter>
 	{
-		readonly TSpecification specification;
+		readonly ISpecification<TParameter> specification;
 
 		public event EventHandler CanExecuteChanged = delegate {};
 
-		protected Command( TSpecification specification )
+		protected Command() : this( Specification<TParameter>.Instance ) {}
+
+		protected Command( ISpecification<TParameter> specification )
 		{
 			this.specification = specification;
 		}

@@ -1,7 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
-using DragonSpark.Windows.Runtime;
 using Ploeh.AutoFixture;
 using System;
 using System.Collections.Generic;

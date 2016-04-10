@@ -15,6 +15,7 @@ using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.TypeSystem;
 using Type = System.Type;
 
 namespace DragonSpark.Composition
@@ -46,13 +47,13 @@ namespace DragonSpark.Composition
 		protected override FactoryTypeRequest CreateItem( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
 	}
 
-	public class AssembliesFactory : FactoryBase<Type[], Assembly[]>
+	/*public class AssembliesFactory : FactoryBase<Type[], Assembly[]>
 	{
 		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
 
 		[Freeze]
 		protected override Assembly[] CreateItem( Type[] parameter ) => parameter.Assemblies().Distinct().ToArray();
-	}
+	}*/
 
 	public static class AssemblyTypes
 	{
@@ -71,7 +72,7 @@ namespace DragonSpark.Composition
 		}
 
 		[Freeze]
-		protected override Type[] CreateItem( Assembly parameter ) => types( parameter ).Fixed();
+		protected override Type[] CreateItem( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).Fixed();
 	}
 
 	public class TypesFactory : FactoryBase<Assembly[], Type[]>

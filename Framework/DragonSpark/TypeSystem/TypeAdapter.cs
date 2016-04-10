@@ -47,11 +47,10 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}*/
 
-		public System.Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes.WhereNot( typeof(MethodBinding).Adapt().IsAssignableFrom ) ).AsTypes().ToArray();
+		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).ToArray();
 
 		public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
-
-
+		
 		public object GetDefaultValue() => Info.IsValueType && Nullable.GetUnderlyingType( Type ) == null ? Activator.CreateInstance( Type ) : null;
 
 		public ConstructorInfo FindConstructor( params object[] parameters ) => FindConstructor( parameters.Select( o => o?.GetType() ).ToArray() );
@@ -71,7 +70,7 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsAssignableFrom( TypeInfo other ) => IsAssignableFrom( other.AsType() );
 
-		public bool IsAssignableFrom( System.Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() ) /*|| GetCaster( other ) != null*/;
+		public bool IsAssignableFrom( Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() ) /*|| GetCaster( other ) != null*/;
 
 		public bool IsInstanceOfType( object context ) => context.With( o => IsAssignableFrom( o.GetType() ) );
 

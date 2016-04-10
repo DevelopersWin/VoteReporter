@@ -223,7 +223,12 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public abstract class TypeSelectionStrategyBase : FactoryBase<Type, Type[]> {}
+	public abstract class TypeSelectionStrategyBase : FactoryBase<Type, Type[]>
+	{
+		protected TypeSelectionStrategyBase() {}
+
+		protected TypeSelectionStrategyBase( ISpecification<Type> specification ) : base( specification ) {}
+	}
 
 	public class SelfAndNestedStrategy : TypeSelectionStrategyBase
 	{
@@ -234,21 +239,11 @@ namespace DragonSpark.Activation.IoC
 
 	public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
 	{
-		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance );
+		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance.Wrap<Type>( type => type.Assembly() ) );
 
-		readonly ApplicationAssemblySpecification specification;
+		public AllTypesInCandidateAssemblyStrategy( [Required] ISpecification<Type> specification ) : base( specification ) {}
 
-		public AllTypesInCandidateAssemblyStrategy( [Required] ApplicationAssemblySpecification specification )
-		{
-			this.specification = specification;
-		}
-
-		protected override Type[] CreateItem( Type parameter )
-		{
-			var assembly = parameter.Assembly();
-			var result = specification.IsSatisfiedBy( assembly ) ? TypesFactory.Instance.Create( assembly.ToItem() ) : Default<Type>.Items;
-			return result;
-		}
+		protected override Type[] CreateItem( Type parameter ) => TypesFactory.Instance.Create( parameter.Assembly().ToItem() );
 	}
 
 	[Persistent]

@@ -34,7 +34,7 @@ namespace DragonSpark.Setup
 
 	public static class ApplicationExtensions
 	{
-		public static IApplication Run<T>( this IApplication<T> @this, T arguments )
+		public static IApplication<T> Run<T>( this IApplication<T> @this, T arguments )
 		{
 			using ( var command = new ExecuteApplicationCommand<T>( @this ) )
 			{
@@ -199,7 +199,7 @@ namespace DragonSpark.Setup
 		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator) };
 	}
 
-	public abstract class Application<TParameter> : CompositeCommand<TParameter, ISpecification<TParameter>>, IApplication<TParameter>
+	public abstract class Application<TParameter> : CompositeCommand<TParameter>, IApplication<TParameter>
 	{
 		protected Application( [Required]IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
 

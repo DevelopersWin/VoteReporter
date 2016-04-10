@@ -47,6 +47,15 @@ namespace DragonSpark.Diagnostics
 		public static void Process( this IExceptionHandler target, Exception exception ) => target.Handle( exception ).With( a => a.RethrowRecommended.IsTrue( () => { throw a.Exception; } ) );
 	}
 
+	public static class ProfilerExtensions
+	{
+		public static IProfiler Mark<T>( this IProfiler @this, string message )
+		{
+			@this.Mark( $"[{typeof(T).Name}] {message}" );
+			return @this;
+		}
+	}
+
 	// [Disposable( ThrowObjectDisposedException = true )]
 	public class Profiler : IProfiler
 	{
@@ -64,6 +73,11 @@ namespace DragonSpark.Diagnostics
 			Mark( "Starting" );
 			tracker.Initialize();
 		}
+
+		/*public IProfiler New()
+		{
+			return new Profiler( logger );
+		}*/
 
 		public void Mark( string @event ) => logger.Information( "@ {Time:ss':'fff} ({Since:ss':'fff}): {Event:l}", tracker.Time, tracker.Mark(), @event );
 

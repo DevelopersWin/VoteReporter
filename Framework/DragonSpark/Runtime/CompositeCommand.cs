@@ -16,15 +16,12 @@ namespace DragonSpark.Runtime
 		public CompositeCommand( [Required]params ICommand[] commands ) : base( commands ) {}
 	}
 
-	public class CompositeCommand<TParameter> : CompositeCommand<TParameter, ISpecification<TParameter>>
-	{
-		public CompositeCommand( params ICommand[] commands ) : base( Specification<TParameter>.Instance, commands ) {}
-	}
-
 	[ContentProperty( nameof(Commands) )]
-	public class CompositeCommand<TParameter, TSpecification> : DisposingCommand<TParameter, TSpecification> where TSpecification : ISpecification<TParameter>
+	public class CompositeCommand<TParameter> : DisposingCommand<TParameter>
 	{
-		public CompositeCommand( TSpecification specification, [Required]params ICommand[] commands ) : base( specification )
+		public CompositeCommand( [Required]params ICommand[] commands ) : this( Specification<TParameter>.Instance, commands ) {}
+
+		public CompositeCommand( ISpecification<TParameter> specification, [Required]params ICommand[] commands ) : base( specification )
 		{
 			Commands = new CommandCollection( commands );
 		}

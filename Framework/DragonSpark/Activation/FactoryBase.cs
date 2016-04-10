@@ -4,6 +4,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation
 {
@@ -103,7 +104,7 @@ namespace DragonSpark.Activation
 
 		protected object CreateFromItem( object parameter ) => Coerce( parameter, Create );
 
-		public TResult Create( TParameter parameter ) => CanCreate( parameter ) ? CreateItem( parameter ) : default(TResult);
+		public TResult Create( TParameter parameter ) => CanCreate( parameter ) ? CreateItem( parameter ) : Default<TResult>.Item;
 
 		protected abstract TResult CreateItem( [Required]TParameter parameter );
 		

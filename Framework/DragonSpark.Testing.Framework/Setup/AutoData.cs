@@ -1,30 +1,34 @@
+using DragonSpark.Setup;
 using Ploeh.AutoFixture;
 using PostSharp.Patterns.Contracts;
 using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class AutoData // : IDisposable
+	public class AutoData : CompositeServiceProvider
 	{
-		public AutoData( [Required]IFixture fixture, [Required]MethodInfo method )
+		public AutoData( [Required]IFixture fixture, [Required]MethodBase method/*, [Required] IProfiler profiler*/ ) : base(  )
 		{
 			Fixture = fixture;
 			Method = method;
-			// Items = new List<IAutoDataCustomization>( new object[] { Fixture, Method }.SelectMany( o => new Items<IAutoDataCustomization>( o ).Item.Purge() ) );
+			// Profiler = profiler;
 		}
 
 		/*public AutoData Initialize()
 		{
-			Items.ToArray().Each( customization => customization.Initializing( this ) );
+			Profiler.Start();
 			return this;
 		}*/
 
 		public IFixture Fixture { get; }
 
-		public MethodInfo Method { get; }
+		public MethodBase Method { get; }
 
-		// public IList<IAutoDataCustomization> Items { get; }
+		// public IProfiler Profiler { get; set; }
 
-		// public void Dispose() => Items.Purge().Reverse().Each( customization => customization.Initialized( this ) );
+		public void Dispose()
+		{
+			// Profiler.Dispose();
+		}
 	}
 }

@@ -1,12 +1,12 @@
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Extensions;
 using PostSharp.Extensibility;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.TypeSystem
 {
@@ -20,21 +20,21 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly Assembly[] assemblies;
 
-		protected AssemblyProviderBase( IEnumerable<System.Type> types, params Assembly[] assemblies ) : this( types.Assemblies().Concat( assemblies ).ToArray() ) {}
+		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( types.Assemblies().Union( assemblies ).ToArray() ) {}
 
-		protected AssemblyProviderBase( params System.Type[] types ) : this( types.Assemblies() ) {}
+		protected AssemblyProviderBase( params Type[] types ) : this( types.Assemblies() ) {}
 
-		protected AssemblyProviderBase( [Required]params Assembly[] assemblies )
+		AssemblyProviderBase( [Required] IEnumerable<Assembly> assemblies )
 		{
-			this.assemblies = assemblies;
+			this.assemblies = assemblies.NotNull().Distinct().Prioritize().ToArray();
 		}
 
-		protected override Assembly[] CreateItem() => assemblies.NotNull().Distinct().Prioritize().ToArray();
+		protected override Assembly[] CreateItem() => assemblies;
 	}
 
 	public class AggregateAssemblyFactory : AggregateFactory<Assembly[]>, IAssemblyProvider
 	{
-		public AggregateAssemblyFactory( IFactory<Assembly[]> primary, params ITransformer<Assembly[]>[] transformers ) : base( primary, transformers ) {}
+		// public AggregateAssemblyFactory( IFactory<Assembly[]> primary, params ITransformer<Assembly[]>[] transformers ) : base( primary, transformers ) {}
 
 		public AggregateAssemblyFactory( Func<Assembly[]> primary, params Func<Assembly[], Assembly[]>[] transformers ) : base( primary, transformers ) {}
 	}
