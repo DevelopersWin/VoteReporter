@@ -1,3 +1,4 @@
+using System.Composition;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Reflection;

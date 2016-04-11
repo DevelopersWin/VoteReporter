@@ -165,14 +165,16 @@ namespace DragonSpark.Activation.IoC
 
 		readonly Type[] types;
 		readonly Func<Type, Type[]> strategy;
+		readonly Func<Type, ITypeCandidateWeightProvider> weight;
 		readonly ISpecification<Type> specification;
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).Wrap<Type>(), CanBuildSpecification.Instance.Inverse() ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, type => new TypeCandidateWeightProvider( type ), CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).Wrap<Type>(), CanBuildSpecification.Instance.Inverse() ) {}
 
-		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
+		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, Func<Type, ITypeCandidateWeightProvider> weight, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
 		{
 			this.types = types;
 			this.strategy = strategy;
+			this.weight = weight;
 			this.specification = specification;
 		}
 
@@ -182,13 +184,35 @@ namespace DragonSpark.Activation.IoC
 			var adapter = parameter.Adapt();
 			var name = parameter.Name.TrimStartOf( 'I' );
 			var others = strategy( parameter );
+			var order = weight( parameter );
 			var result = 
-				types.Union( others )
-				.Where( adapter.IsAssignableFrom )
-				.Where( specification.IsSatisfiedBy )
-				.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
+				types
+					.Union( others )
+					.Where( adapter.IsAssignableFrom )
+					.Where( specification.IsSatisfiedBy )
+					.OrderByDescending( order.GetWeight )
+					.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
 			return result;
 		}
+	}
+
+	public interface ITypeCandidateWeightProvider
+	{
+		int GetWeight( Type candidate );
+	}
+
+	public class TypeCandidateWeightProvider : FactoryBase<Type, int>, ITypeCandidateWeightProvider
+	{
+		readonly Type subject;
+
+		public TypeCandidateWeightProvider( Type subject )
+		{
+			this.subject = subject;
+		}
+
+		protected override int CreateItem( Type parameter ) => parameter.IsNested ? subject.GetTypeInfo().DeclaredNestedTypes.Contains( parameter.GetTypeInfo() ) ? 2 : -1 : 0;
+
+		public int GetWeight( Type candidate ) => Create( candidate );
 	}
 
 	public abstract class TypeSelectionStrategyBase : FactoryBase<Type, Type[]>
@@ -280,9 +304,7 @@ namespace DragonSpark.Activation.IoC
 
 		public class ConventionCandidateLocator : DecoratedFactory<IBuilderContext, Type>
 		{
-			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : this( Specification, factory ) { }
-
-			ConventionCandidateLocator( [Required]ISpecification<IBuilderContext> specification, [Required]BuildableTypeFromConventionLocator factory ) : base( specification, context => factory.Create( context.BuildKey.Type ) ) { }
+			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : base( Specification, context => factory.Create( context.BuildKey.Type ) ) {}
 		}
 
 		public ConventionStrategy( [Required]ConventionCandidateLocator locator, [Required]IServiceRegistry registry )

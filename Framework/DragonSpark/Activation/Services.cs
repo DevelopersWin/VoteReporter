@@ -6,6 +6,7 @@ using Serilog;
 using Serilog.Core;
 using System;
 using System.Linq;
+using DragonSpark.Runtime;
 using IServiceLocator = Microsoft.Practices.ServiceLocation.IServiceLocator;
 using ServiceLocator = Microsoft.Practices.ServiceLocation.ServiceLocator;
 
@@ -42,9 +43,9 @@ namespace DragonSpark.Activation
 	{
 		public DefaultInstances() : this( new RecordingLoggerFactory() ) {}
 
-		DefaultInstances( RecordingLoggerFactory factory ) : this( factory.Create(), factory.History, factory.LevelSwitch, Activator.Instance ) {}
+		DefaultInstances( RecordingLoggerFactory factory ) : this( factory.Create(), factory.History, factory.LevelSwitch, Activator.Instance, new DisposableRepository() ) {}
 
-		public DefaultInstances( ILogger logger, ILoggerHistory history, LoggingLevelSwitch level, IActivator activator ) : base( logger, history, level, activator ) {}
+		public DefaultInstances( ILogger logger, ILoggerHistory history, LoggingLevelSwitch level, IActivator activator, IDisposableRepository repository ) : base( logger, history, level, activator, repository ) {}
 	}
 
 	class ActivatedServiceProvider : IServiceProvider

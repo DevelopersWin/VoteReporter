@@ -15,11 +15,22 @@ namespace DragonSpark.Runtime
 		IEnumerable<T> List();
 	}
 
-	public abstract class RepositoryBase<T> : RepositoryBase<Entry<T>, T>
+	public interface IDisposableRepository : IRepository<IDisposable>, IDisposable {}
+
+	public class DisposableRepository : RepositoryBase<IDisposable>, IDisposableRepository
+	{
+		public void Dispose() => Store.Purge().Each( entry => entry.Item.Dispose() );
+	}
+
+	public abstract class RepositoryBase<T> : RepositoryBase<Entry<T>, T>, IRepository<T>
 	{
 		protected RepositoryBase() {}
 
 		protected RepositoryBase( ICollection<Entry<T>> store ) : base( store ) {}
+
+		public void Add( T entry ) => Add( new Entry<T>( entry ) );
+
+		IEnumerable<T> IRepository<T>.List() => Query().Select( entry => entry.Item ).ToImmutableList();
 	}
 
 	public abstract class RepositoryBase<TEntry, TItem> : IRepository<TEntry> where TEntry : Entry<TItem>

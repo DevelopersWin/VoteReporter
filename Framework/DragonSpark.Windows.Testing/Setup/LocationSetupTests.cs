@@ -30,7 +30,7 @@ using Attribute = DragonSpark.Testing.Objects.Attribute;
 using ExceptionFormatter = DragonSpark.Diagnostics.ExceptionFormatter;
 using Object = DragonSpark.Testing.Objects.Object;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
-using ServiceProviderCoreFactory = DragonSpark.Activation.IoC.ServiceProviderCoreFactory;
+using ServiceProviderFactory = DragonSpark.Activation.IoC.ServiceProviderFactory;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -419,21 +419,18 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void BasicComposition( [DragonSpark.Testing.Framework.Parameters.Service]Assembly[] assemblies, IUnityContainer container )
 		{
-			var provider = new ServiceProviderFactory( assemblies ).Create();
+			var provider = new ServiceProviderContainerFactory( assemblies ).Create();
 			using ( var host = provider.Get<CompositionHost>() )
 			{
-				// host.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
-
-				var test = host.GetExport<Assembly>();
-				Assert.NotNull( test );
+				var assembly = host.GetExport<Assembly>();
+				Assert.NotNull( assembly );
+				Assert.Equal( GetType().Assembly, assembly );
 			}
 		}
 
 		[Theory, LocationSetup.AutoData]
 		public void CreateAssembly( [DragonSpark.Testing.Framework.Parameters.Service]AssemblyInformationFactory factory, IUnityContainer container, IApplicationAssemblyLocator locator, [DragonSpark.Testing.Framework.Parameters.Service]Assembly sut )
 		{
-			// Assert.True( container.IsRegistered<Assembly>() );
-
 			var fromFactory = locator.Create();
 			var fromContainer = container.Resolve<Assembly>();
 			Assert.Same( fromFactory, fromContainer );
@@ -506,7 +503,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		readonly Func<IServiceProvider> source;
 
 		[ImportingConstructor]
-		public ServiceLocatorFactory( Assembly[] assemblies ) : this( new ServiceProviderCoreFactory( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ).Create ) {}
+		public ServiceLocatorFactory( Assembly[] assemblies ) : this( new ServiceProviderContainerFactory( new Func<IServiceProvider>( new ServiceProviderFactory( new Func<IServiceProvider>( new Composition.ServiceProviderFactory( assemblies ).Create ) ).Create ) ).Create ) {}
 
 		public ServiceLocatorFactory( Func<IServiceProvider> source )
 		{

@@ -8,7 +8,7 @@ namespace DragonSpark.Extensions
 	{
 		public static T Resolve<T>( this IUnityContainer container, Type type ) => (T)container.Resolve( type );
 
-		public static T Resolve<T>( this IUnityContainer @this, Func<T> @default ) => @this.IsRegistered<T>() ? @this.Resolve<T>() : @default();
+		// public static T Resolve<T>( this IUnityContainer @this, Func<T> @default ) => @this.IsRegistered<T>() ? @this.Resolve<T>() : @default();
 
 		public static T TryResolve<T>(this IUnityContainer container) => (T)TryResolve( container, typeof(T) );
 

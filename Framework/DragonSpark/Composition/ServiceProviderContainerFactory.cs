@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Reflection;
+using DragonSpark.Diagnostics;
 using Type = System.Type;
 
 namespace DragonSpark.Composition
@@ -36,24 +37,26 @@ namespace DragonSpark.Composition
 		protected override FactoryTypeRequest CreateItem( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
 	}
 
-	public class ServiceProviderFactory : ServiceProviderFactory<ConfigureProviderCommand>
+	public class ServiceProviderContainerFactory : ServiceProviderFactory<ConfigureProviderCommand>
 	{
-		public ServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
+		public ServiceProviderContainerFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
 
-		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
+		public ServiceProviderContainerFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
 
-		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new ServiceProviderCoreFactory( source ).Create ) ) {}
+		public ServiceProviderContainerFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new ServiceProviderFactory( source ).Create ) ) {}
 
-		public ServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
+		public ServiceProviderContainerFactory( Func<IServiceProvider> provider ) : base( provider ) {}
 	}
 
-	public class ServiceProviderCoreFactory : FactoryBase<IServiceProvider>
+	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
 		readonly Func<CompositionContext> source;
 
-		public ServiceProviderCoreFactory( Func<ContainerConfiguration> configuration ) : this( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ) ) {}
+		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
 
-		public ServiceProviderCoreFactory( [Required] Func<CompositionContext> source )
+		public ServiceProviderFactory( Func<ContainerConfiguration> configuration ) : this( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ) ) {}
+
+		public ServiceProviderFactory( [Required] Func<CompositionContext> source )
 		{
 			this.source = source;
 		}
@@ -62,37 +65,29 @@ namespace DragonSpark.Composition
 		{
 			var context = source();
 			var primary = new ServiceLocator( context );
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, Services.Current );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, DefaultServiceProvider.Instance.Item );
 			return result;
 		}
 	}
 
-	// [Export]
 	public sealed class ConfigureProviderCommand : Command<IServiceProvider>
 	{
 		readonly ILogger logger;
-		readonly CompositionContext context;
+		readonly IServiceProviderHost host;
+		readonly IDisposableRepository repository;
 
-		// [ImportingConstructor]
-		public ConfigureProviderCommand( [Required]ILogger logger, [Required]CompositionContext context )
+		public ConfigureProviderCommand( [Required]ILogger logger, [Required]IServiceProviderHost host, [Required] IDisposableRepository repository )
 		{
 			this.logger = logger;
-			this.context = context;
+			this.host = host;
+			this.repository = repository;
 		}
 
 		protected override void OnExecute( IServiceProvider parameter )
 		{
 			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
 
-			var host = context.TryGet<IServiceProviderHost>();
-			if ( host == null )
-			{
-				logger.Warning( $"The {nameof( IServiceProviderHost )} is not registered for this {nameof( CompositionContext )}." );
-			}
-			else
-			{
-				host.Assign( parameter );
-			}
+			new IDisposable[] { new AssignValueCommand<IServiceProvider>( host ).ExecuteWith( parameter ), parameter.Get<IProfiler>() }.NotNull().Each( repository.Add );
 		}
 	}
 

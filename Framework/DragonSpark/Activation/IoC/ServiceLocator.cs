@@ -11,6 +11,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Modularity;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC

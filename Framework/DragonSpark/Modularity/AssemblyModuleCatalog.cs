@@ -1,6 +1,4 @@
 using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,9 +18,6 @@ namespace DragonSpark.Modularity
 
 		protected IModuleInfoBuilder Builder { get; }
 
-		/// <summary>
-		///     Drives the main logic of building the child domain and searching for the assemblies.
-		/// </summary>
 		protected override void InnerLoad()
 		{
 			var items = GetModuleInfos( assemblies );
@@ -37,10 +32,9 @@ namespace DragonSpark.Modularity
 			return result;
 		}
 
-		protected virtual IEnumerable<ModuleInfo> GetModuleInfos( IEnumerable<Assembly> assemblies )
+		protected virtual IEnumerable<ModuleInfo> GetModuleInfos( IEnumerable<Assembly> candidates )
 		{
-			var info = typeof(IModule);
-			var result = assemblies.Except( info.Assembly().ToItem() ).SelectMany( assembly => assembly.ExportedTypes.Where( CanLocate<IModule> ) )
+			var result = candidates.Except( typeof(IModule).Assembly().ToItem() ).SelectMany( assembly => assembly.ExportedTypes.Where( CanLocate<IModule> ) )
 				.Select( Builder.CreateModuleInfo )
 				.ToArray();
 			return result;

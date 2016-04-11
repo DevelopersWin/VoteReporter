@@ -162,7 +162,7 @@ namespace DragonSpark.Modularity
 		{
 			if (modules == null)
 			{
-				throw new ArgumentNullException("modules");
+				throw new ArgumentNullException( nameof(modules) );
 			}
 
 			this.EnsureCatalogValidated();

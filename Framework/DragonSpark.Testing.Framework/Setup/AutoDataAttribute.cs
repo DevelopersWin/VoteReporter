@@ -1,12 +1,10 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Aspects;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
@@ -28,7 +26,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		readonly Func<AutoData, IDisposable> context;
 
-		public AutoDataAttribute( bool includeFromParameters = true, params Type[] others ) : this( new Factory( includeFromParameters, others ).Create ) {}
+		public AutoDataAttribute( bool includeFromParameters = true, params Type[] others ) : this( Providers.From( new Cache( includeFromParameters, others ).Create ) ) {}
 
 		protected AutoDataAttribute( [Required] Func<AutoData, IDisposable> commandSource ) : this( DefaultFixtureFactory, commandSource ) {}
 
@@ -49,60 +47,43 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance[]>( info => new AspectInstance( info, AssignExecutionContextAspect.Instance ).ToItem() );
 
-		class Factory : FactoryBase<IServiceProvider>
+		class Cache : CacheFactoryBase
 		{
-			readonly bool includeFromParameters;
-			readonly Type[] others;
-			readonly IFactory<AutoData, Type[]> factory;
+			public Cache( bool includeFromParameters = true, params Type[] others ) : base( new Factory( includeFromParameters, others ).Create, includeFromParameters, others ) {}
 
-			public Factory( bool includeFromParameters = true, params Type[] others ) : this( new TypeProviderFactory( others, includeFromParameters ) )
+			class Factory : FactoryBase<AutoData, IServiceProvider>
 			{
-				this.includeFromParameters = includeFromParameters;
-				this.others = others;
-			}
+				readonly Func<AutoData, Type[]> factory;
 
-			Factory( IFactory<AutoData, Type[]> factory )
-			{
-				this.factory = factory;
-			}
+				public Factory( bool includeFromParameters = true, params Type[] others ) : this( new ServiceProviderTypeFactory( others, includeFromParameters ).Create ) {}
 
-			protected override IServiceProvider CreateItem()
-			{
-				Providers.Cached( autoData => new ServiceProviderFactory( factory.Create( autoData ) ).Create(), includeFromParameters, others )
-				return null;
+				Factory( Func<AutoData, Type[]> factory )
+				{
+					this.factory = factory;
+				}
+
+				protected override IServiceProvider CreateItem( AutoData parameter ) => new ServiceProviderContainerFactory( factory( parameter ) ).Create();
 			}
 		}
 	}
 
-	public class CachedServiceProviderFactory : DecoratedFactory<AutoData, IServiceProvider>
+	public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
 	{
-		readonly int key;
-
-		public CachedServiceProviderFactory( Func<AutoData, IServiceProvider> provider, params object[] items ) : this( KeyFactory.Instance.Create( items ), provider ) {}
-
-		public CachedServiceProviderFactory( int key, Func<AutoData, IServiceProvider> provider ) : base( provider )
-		{
-			this.key = key;
-		}
-
-		protected override IServiceProvider CreateItem( AutoData parameter ) => new Cache( parameter.Method.DeclaringType, key, () => base.CreateItem( parameter ) ).Item;
-
-		class Cache : AssociatedValue<Type, IServiceProvider>
-		{
-			public Cache( Type instance, int key, Func<IServiceProvider> create = null ) : base( instance, key.ToString(), create ) {}
-		}
+		protected CacheFactoryBase( Func<AutoData, IServiceProvider> inner, params object[] items ) : base( data => data.Method.DeclaringType, inner, items ) {}
 	}
 
 	public static class Providers
 	{
 		readonly static Func<IServiceProvider, IApplication> DefaultApplicationFactory = provider => new Application( provider );
 
-		public static Func<AutoData, IDisposable> Cached( [Required] IFactory<AutoData, IServiceProvider> providerSource, params object[] items ) => From( new CachedServiceProviderFactory( providerSource.Create, items ).Create );
+		// public static Func<AutoData, IDisposable> Cached( [Required] IFactory<AutoData, IServiceProvider> providerSource, params object[] items ) => From( new CachedDecoratedFactory( providerSource.Create, items ).Create );
 
 		// public static Func<AutoData, IDisposable> From( [Required] IFactory<AutoData, IServiceProvider> providerSource ) => From( providerSource.Create );
 
-		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource = null ) => 
-			new AutoDataExecutionContextFactory( providerSource, applicationSource ?? DefaultApplicationFactory ).Create;
+		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource ) => From( providerSource, DefaultApplicationFactory );
+
+		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource, [Required] Func<IServiceProvider, IApplication> applicationSource ) => 
+			new AutoDataExecutionContextFactory( providerSource, applicationSource ).Create;
 	}
 
 	class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
@@ -130,15 +111,15 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>
 	{
-		static ILogger GetLogger() => CurrentServiceProvider.Instance.Item.Get<ILogger>();
+		static T Get<T>() where T : class => CurrentServiceProvider.Instance.Item.Get<T>();
 
 		readonly AutoData autoData;
 		readonly Func<ILogger> logger;
 		readonly Func<AutoData, IServiceProvider> providerSource;
 		readonly Func<IServiceProvider, IApplication> applicationSource;
 
-		public AutoDataConfiguringCommandFactory( [Required] AutoData autoData, [Required]Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource ) 
-			: this( autoData, GetLogger, providerSource, applicationSource ) {}
+		public AutoDataConfiguringCommandFactory( [Required] AutoData autoData, [Required] Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource ) 
+			: this( autoData, Get<ILogger>, providerSource, applicationSource ) {}
 
 		public AutoDataConfiguringCommandFactory( [Required] AutoData autoData, [Required] Func<ILogger> logger, [Required]Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource )
 		{
@@ -148,7 +129,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.applicationSource = applicationSource;
 		}
 
-		CompositeServiceProvider Create( IProfiler profiler )
+		IServiceProvider Create( IProfiler profiler )
 		{
 			var result = new CompositeServiceProvider( new InstanceServiceProvider( profiler, autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), providerSource( autoData ) );
 			profiler.Mark<AutoDataConfiguringCommandFactory>( "Created Provider" );
@@ -160,22 +141,23 @@ namespace DragonSpark.Testing.Framework.Setup
 			var profiler = new Profiler( logger(), $"{autoData.Method.Name}-{nameof(AutoData)}" ).With( p => p.Start() );
 			var provider = Create( profiler );
 			var application = applicationSource( provider );
+			//application.Get<IDisposableRepository>().With( repository => repository.Add( profiler ) );
 			profiler.Mark<AutoDataConfiguringCommandFactory>( "Created Application" );
 			var result = new ExecuteApplicationCommand<AutoData>( application, provider );
 			return result;
 		}
 	}
 
-	public class TypeProviderFactory : FactoryBase<AutoData, Type[]>
+	public class ServiceProviderTypeFactory : FactoryBase<AutoData, Type[]>
 	{
 		readonly Type[] additional;
 		readonly bool includeFromParameters;
 		readonly Func<Type, Type[]> primaryStrategy;
 		readonly Func<Type, Type[]> otherStrategy;
 
-		public TypeProviderFactory( [Required] Type[] additional, bool includeFromParameters ) : this( additional, includeFromParameters, SelfAndNestedStrategy.Instance.Create, AllTypesInCandidateAssemblyStrategy.Instance.Create ) {}
+		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters ) : this( additional, includeFromParameters, SelfAndNestedStrategy.Instance.Create, AllTypesInCandidateAssemblyStrategy.Instance.Create ) {}
 
-		public TypeProviderFactory( [Required] Type[] additional, bool includeFromParameters, [Required] Func<Type, Type[]> primaryStrategy, [Required] Func<Type, Type[]> otherStrategy )
+		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters, [Required] Func<Type, Type[]> primaryStrategy, [Required] Func<Type, Type[]> otherStrategy )
 		{
 			this.additional = additional;
 			this.includeFromParameters = includeFromParameters;

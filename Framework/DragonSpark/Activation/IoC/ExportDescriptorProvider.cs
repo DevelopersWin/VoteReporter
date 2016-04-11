@@ -4,6 +4,7 @@ using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using System;
+using DragonSpark.Modularity;
 
 namespace DragonSpark.Activation.IoC
 {

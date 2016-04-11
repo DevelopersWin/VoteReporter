@@ -16,11 +16,11 @@ namespace DragonSpark.Testing.Composition
 {
 	[AssemblyProvider.Register]
 	[AssemblyProvider.Types]
-	public class ServiceProviderFactoryTests : TestBase
+	public class ServiceProviderContainerFactoryTests : TestBase
 	{
 		public static CompositionHost From( [Required] Assembly[] assemblies ) => new CompositionFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create();
 
-		public ServiceProviderFactoryTests( ITestOutputHelper output ) : base( output ) {}
+		public ServiceProviderContainerFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Theory, AutoData]
 		public void BasicComposition( Assembly[] assemblies, string text, ILogger logger )

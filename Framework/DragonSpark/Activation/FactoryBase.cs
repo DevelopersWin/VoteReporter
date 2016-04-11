@@ -4,6 +4,8 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Aspects;
+using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation
@@ -113,6 +115,27 @@ namespace DragonSpark.Activation
 			var qualified = coercer.Coerce( parameter );
 			var result = qualified.With( with );
 			return result;
+		}
+	}
+
+	public class CachedDecoratedFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult>
+	{
+		readonly Func<TParameter, object> instance;
+		readonly int key;
+
+		public CachedDecoratedFactory( Func<TParameter, object> instance, Func<TParameter, TResult> inner, params object[] items ) : this( instance, KeyFactory.Instance.Create( items ), inner ) {}
+
+		protected CachedDecoratedFactory( [Required] Func<TParameter, object> instance, int key, Func<TParameter, TResult> provider ) : base( provider )
+		{
+			this.instance = instance;
+			this.key = key;
+		}
+
+		protected override TResult CreateItem( TParameter parameter ) => new Cache( instance( parameter ), key, () => base.CreateItem( parameter ) ).Item;
+
+		class Cache : AssociatedValue<TResult>
+		{
+			public Cache( object instance, int key, Func<TResult> create = null ) : base( instance, key.ToString(), create ) {}
 		}
 	}
 

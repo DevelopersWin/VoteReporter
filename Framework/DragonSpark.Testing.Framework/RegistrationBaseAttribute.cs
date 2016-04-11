@@ -58,8 +58,7 @@ namespace DragonSpark.Testing.Framework
 
 		public void Register( IServiceRegistry registry )
 		{
-			var o = Services.Get( serviceType );
-			o.With( instance =>
+			Services.Get( serviceType ).With( instance =>
 			{
 				var parameter = new InstanceRegistrationParameter( serviceType, instance );
 				registry.Register( parameter );

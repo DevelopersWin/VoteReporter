@@ -44,7 +44,7 @@ namespace DragonSpark.Runtime.Values
 	{
 		readonly Func<T> create;
 
-		protected ConnectedValue( object instance, Type type, Func<T> create = null ) : this( instance, type.GetHashCode().ToString(), create )
+		protected ConnectedValue( [Required] object instance, Type type, Func<T> create = null ) : this( instance, type.GetHashCode().ToString(), create )
 		{}
 
 		protected ConnectedValue( [Required]object instance, [NotEmpty]string name, Func<T> create = null ) : this( PropertyConnector.Default.Get( instance, name, true ).Cast<T>(), create )

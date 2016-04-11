@@ -42,23 +42,23 @@ namespace DragonSpark.Runtime
 
 	public class FixedCommand : DisposingCommand<object>
 	{
-		readonly Func<ICommand> command;
-		readonly Func<object> parameter;
+		readonly Lazy<ICommand> command;
+		readonly Lazy<object> parameter;
 
 		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.ToFactory(), parameter.ToFactory() ) {}
 
 		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter )
 		{
-			this.command = command;
-			this.parameter = parameter;
+			this.command = new Lazy<ICommand>( command );
+			this.parameter = new Lazy<object>( parameter );
 		}
 
-		protected override void OnExecute( object p ) => command().ExecuteWith( parameter() );
+		protected override void OnExecute( object p ) => command.Value.ExecuteWith( parameter.Value );
 
 		protected override void OnDispose()
 		{
 			base.OnDispose();
-			command.TryDispose();
+			command.Value.TryDispose();
 		}
 	}
 

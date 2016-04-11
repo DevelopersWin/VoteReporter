@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 using Type = System.Type;
 
@@ -82,6 +83,13 @@ namespace DragonSpark.Setup
 		{
 		}
 	}*/
+
+	public class DefaultServiceProvider : ExecutionContextValue<ServiceProvider>
+	{
+		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider();
+
+		DefaultServiceProvider() : base( () => new ServiceProvider() ) {}
+	}
 
 	public class CurrentServiceProvider : ExecutionContextValue<IServiceProvider>
 	{
@@ -157,19 +165,13 @@ namespace DragonSpark.Setup
 	public class ServiceProviderFactory<TCommand> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
 	{
 		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure.Instance.Run ) {}
-	/*}
 	
-	public class ServiceProviderFactory<TCommand, TProvider> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<TProvider> where TProvider : class, IServiceProvider
-	{
-		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure.Instance.Run ) {}*/
-
 		class Configure : Command<IServiceProvider>
 		{
 			public static Configure Instance { get; } = new Configure();
 
 			protected override void OnExecute( IServiceProvider parameter )
 			{
-				// var provider = parameter as TProvider ?? parameter.Get<TProvider>();
 				var command = parameter.Get<TCommand>();
 				command.ExecuteWith( parameter );
 			}
@@ -177,15 +179,18 @@ namespace DragonSpark.Setup
 	}
 
 	public interface IApplication<in T> : IApplication, ICommand<T> {}
-	
-	public interface IApplication : ICommand, IServiceProvider, IDisposable {}
+
+	public interface IApplication : ICommand, IServiceProvider, IDisposable
+	{
+		// void Register( IDisposable disposable );
+	}
 
 	public class FrameworkTypes : FactoryBase<Type[]>
 	{
 		public static FrameworkTypes Instance { get; } = new FrameworkTypes();
 
 		[Freeze]
-		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator) };
+		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator) };
 	}
 
 	public abstract class Application<TParameter> : CompositeCommand<TParameter>, IApplication<TParameter>
@@ -203,6 +208,16 @@ namespace DragonSpark.Setup
 		public IServiceProvider Services { [return: Required]get; set; }
 
 		public virtual object GetService( Type serviceType ) => typeof(IApplication).Adapt().IsAssignableFrom( serviceType ) ? this : Services.GetService( serviceType );
+
+		protected override void OnDispose()
+		{
+			base.OnDispose();
+			Services.Get<IDisposableRepository>().With( repository => repository.Dispose() );
+		}
+
+		/*public void Register( IDisposable disposable )
+		{
+		}*/
 	}
 
 	public class ApplyExportedCommandsCommand<T> : DisposingCommand<object> where T : ICommand

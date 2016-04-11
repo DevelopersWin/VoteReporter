@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Windows.Runtime;
@@ -6,21 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Modularity
 {
-	/// <summary>
-	/// Represets a catalog created from a directory on disk.
-	/// </summary>
-	/// <remarks>
-	/// The directory catalog will scan the contents of a directory, locating classes that implement
-	/// <see cref="IModule"/> and add them to the catalog based on contents in their associated <see cref="ModuleAttribute"/>.
-	/// Assemblies are loaded into a new application domain with ReflectionOnlyLoad.  The application domain is destroyed
-	/// once the assemblies have been discovered.
-	/// 
-	/// The diretory catalog does not continue to monitor the directory after it has created the initialze catalog.
-	/// </remarks>
 	public class DirectoryModuleCatalog : AssemblyModuleCatalog
 	{
 		readonly IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory;
@@ -33,9 +22,6 @@ namespace DragonSpark.Windows.Modularity
 			ModulePath = ".";
 		}
 
-		/// <summary>
-		/// Directory containing modules to search for.
-		/// </summary>
 		public string ModulePath { get; set; }
 
 		protected override IEnumerable<ModuleInfo> GetModuleInfos( IEnumerable<Assembly> assemblies )

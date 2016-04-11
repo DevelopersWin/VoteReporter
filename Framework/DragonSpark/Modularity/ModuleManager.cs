@@ -1,11 +1,10 @@
-using DragonSpark.Diagnostics;
 using DragonSpark.Properties;
 using PostSharp.Patterns.Contracts;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Serilog;
 
 namespace DragonSpark.Modularity
 {

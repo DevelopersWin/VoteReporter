@@ -1,4 +1,3 @@
-using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -15,27 +14,6 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework
 {
-	/*public class OutputValue : AssociatedValue<Type, string[]>
-	{
-		public OutputValue( Type instance ) : base( instance ) {}
-	}*/
-
-	/*public class InitializeOutputCommand : Command<Type>
-	{
-		readonly ITestOutputHelper helper;
-
-		public InitializeOutputCommand( ITestOutputHelper helper )
-		{
-			this.helper = helper;
-		}
-
-		protected override void OnExecute( Type parameter )
-		{
-			var item = new OutputValue( parameter ).Item;
-			item.With( lines => lines.Each( helper.WriteLine ) );
-		}
-	}*/
-
 	[Serializable, LinesOfCodeAvoided( 8 )]
 	public class AssignExecutionContextAspect : MethodInterceptionAspect
 	{
@@ -52,6 +30,8 @@ namespace DragonSpark.Testing.Framework
 				{
 					args.Proceed();
 				}
+
+				// Services.Get<IApplication>().With( application => application.Dispose() );
 			}
 		}
 	}
@@ -75,7 +55,7 @@ namespace DragonSpark.Testing.Framework
 
 			if ( serviceProvider.Item == null )
 			{
-				serviceProvider.Assign( new ServiceProvider() );
+				serviceProvider.Assign( DefaultServiceProvider.Instance.Item );
 			}
 		}
 	}
@@ -87,12 +67,6 @@ namespace DragonSpark.Testing.Framework
 		{
 			Assign( output );
 		}
-
-		/*protected TestBase( ITestOutputHelper output, Action<Type> initialize )
-		{
-			Output = output;
-			initialize( GetType() );
-		}*/
 
 		protected ITestOutputHelper Output => Item;
 

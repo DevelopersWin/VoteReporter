@@ -22,7 +22,7 @@ namespace DragonSpark.Runtime.Values
 
 	public class ExecutionContextValue<T> : DeferredValue<T>
 	{
-		public ExecutionContextValue() : base( () => new AssociatedValue<T>( Execution.Current ) ) {}
+		public ExecutionContextValue( Func<T> create = null ) : base( () => new AssociatedValue<T>( Execution.Current, create ) ) {}
 
 		// public ExecutionContextValue( string key, Func<T> create ) : base( () => new AssociatedValue<T>( Execution.Current, key, create ) ) {}
 	}

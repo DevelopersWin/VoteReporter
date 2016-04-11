@@ -30,10 +30,6 @@ namespace DragonSpark.Runtime
 
 		protected override void OnExecute( TParameter parameter ) => Commands.ExecuteMany( parameter );
 
-		protected override void OnDispose()
-		{
-			Commands.OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
-			Commands.Clear();
-		}
+		protected override void OnDispose() => Commands.Purge().OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
 	}
 }

@@ -44,7 +44,7 @@ namespace DragonSpark.Composition
 		public ContainerConfigurationFromPartsFactory( [Required] Assembly[] assemblies, [Required] Type[] types, params ITransformer<ContainerConfiguration>[] configurations )
 			: base( 
 				ContainerConfigurationFactory.Instance, 
-				new ContainerServicesConfigurator().Append( configurations ).Append( new PartsContainerConfigurator( assemblies, types ) ).ToArray()
+				configurations.Prepend( /*new DisposingConfigurator(),*/ new ContainerServicesConfigurator(), new PartsContainerConfigurator( assemblies, types ) ).ToArray()
 			) {}
 	}
 
@@ -54,6 +54,11 @@ namespace DragonSpark.Composition
 
 		protected override ContainerConfiguration CreateItem() => new ContainerConfiguration();
 	}
+
+	/*public class DisposingConfigurator : ContainerConfigurator
+	{
+		protected override ContainerConfiguration CreateItem( ContainerConfiguration parameter ) => parameter.WithInstance<IDisposableRepository>( new DisposableRepository() );
+	}*/
 
 	public class ContainerServicesConfigurator : ContainerConfigurator
 	{
@@ -68,7 +73,7 @@ namespace DragonSpark.Composition
 	{
 		public ServiceProviderHost()
 		{
-			Assign( Services.Current );
+			Assign( DefaultServiceProvider.Instance.Item );
 		}
 	}
 
@@ -94,16 +99,18 @@ namespace DragonSpark.Composition
 			CompositionDependency dependency;
 			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
 			{
-				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Context( host.Item, contract ).Create );
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Context( Get, contract ).Create );
 			}
 		}
 
+		object Get( Type type ) => host.Item.GetService( type );
+
 		class Context
 		{
-			readonly IServiceProvider provider;
+			readonly Func<Type, object> provider;
 			readonly CompositionContract contract;
 
-			public Context( [Required]IServiceProvider provider, [Required]CompositionContract contract )
+			public Context( [Required]Func<Type, object> provider, [Required]CompositionContract contract )
 			{
 				this.provider = provider;
 				this.contract = contract;
@@ -111,7 +118,7 @@ namespace DragonSpark.Composition
 
 			public ExportDescriptor Create( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( Activate, NoMetadata );
 
-			object Activate( LifetimeContext context, CompositionOperation operation ) => provider.GetService( contract.ContractType );
+			object Activate( LifetimeContext context, CompositionOperation operation ) => provider( contract.ContractType );
 		}
 	}
 
@@ -138,20 +145,30 @@ namespace DragonSpark.Composition
 			var activator = new Activation.Activator( conventionLocator );
 
 			var result = configuration
-				.WithParts( core, new ConventionBuilder().WithSelf( builder => builder.ForTypesMatching( type => true ).Export() ) )
-				.WithParts( types, AttributeProvider.Instance )
 				.WithInstance( assemblies )
 				.WithInstance( types )
 				.WithInstance( conventionLocator )
 				.WithInstance( factoryTypes )
 				.WithInstance( locator )
 				.WithInstance<IActivator>( activator )
+				//.WithPart<Assembly[]>( new ConventionBuilder().WithSelf( builder => builder.ForType<Assembly[]>().im.AddPartMetadata( "IsImportMany", false ) ) )
+				.WithParts( core, new ConventionBuilder().WithSelf( builder => builder.ForTypesMatching( type => true ).Export().Shared().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) ) ) )
+				.WithParts( types, AttributeProvider.Instance )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryExportDescriptorProvider( locator ) )
 				.WithProvider( new TypeInitializingExportDescriptorProvider( conventionLocator ) );
 			return result;
 		}
+
+		/*class ConventionBuilder : System.Composition.Convention.ConventionBuilder
+		{
+			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, ParameterInfo parameter )
+			{
+				var customAttributes = base.GetCustomAttributes( reflectedType, parameter ).Concat( parameter.ParameterType.IsArray ? new ImportAttribute().ToItem() : Default<Attribute>.Items ).ToArray();
+				return customAttributes;
+			}
+		}*/
 
 		class AttributeProvider : AttributedModelProvider
 		{

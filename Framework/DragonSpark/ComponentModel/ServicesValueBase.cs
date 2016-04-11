@@ -34,7 +34,8 @@ namespace DragonSpark.ComponentModel
 
 			protected override object CreateItem( LocateTypeRequest parameter )
 			{
-				var instance = locator()?.GetInstance( parameter.RequestedType, parameter.Name );
+				var serviceLocator = locator();
+				var instance = serviceLocator?.GetInstance( parameter.RequestedType, parameter.Name );
 				var result = instance ?? Services.Get( parameter.RequestedType );
 				return result;
 			}
