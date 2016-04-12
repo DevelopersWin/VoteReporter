@@ -4,6 +4,8 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -62,27 +64,41 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	/*public class DisposingCompositeCommand : DisposingCompositeCommand<object>
+	public class AddItemCommand<T> : Command<T>
 	{
-		public DisposingCompositeCommand( params ICommand<object>[] commands ) : base( commands ) {}
-	}
+		readonly IList<T> list;
 
-	public class DisposingCompositeCommand<TParameter> : DisposingCommand<TParameter>
-	{
-		readonly CompositeCommand<TParameter> body;
-
-		public DisposingCompositeCommand( [Required]params ICommand<TParameter>[] commands )
+		public AddItemCommand( [Required] IList<T> list )
 		{
-			body = new CompositeCommand<TParameter>( commands );
+			this.list = list;
 		}
 
-		protected override void OnExecute( TParameter parameter ) => body.ExecuteWith( parameter );
-	}*/
+		protected override void OnExecute( T parameter ) => list.Add( parameter );
+	}
 
-	/*public abstract class DisposingCommand<TParameter> : DisposingCommand<TParameter, ISpecification<TParameter>>
+	public class AddItemCommand : Command<object>
 	{
-		protected DisposingCommand() : base( Specification<TParameter>.Instance ) {}
-	}*/
+		readonly IList list;
+
+		public AddItemCommand( [Required] IList list )
+		{
+			this.list = list;
+		}
+
+		protected override void OnExecute( object parameter ) => list.Add( parameter );
+	}
+
+	public class RemoveItemCommand : Command<object>
+	{
+		readonly IList list;
+
+		public RemoveItemCommand( [Required] IList list )
+		{
+			this.list = list;
+		}
+
+		protected override void OnExecute( object parameter ) => list.Remove( parameter );
+	}
 
 	public abstract class DisposingCommand<TParameter> : Command<TParameter>, IDisposable
 	{

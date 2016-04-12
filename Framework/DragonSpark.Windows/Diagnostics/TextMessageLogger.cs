@@ -1,12 +1,123 @@
+using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
+using PostSharp.Serialization;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 using System;
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace DragonSpark.Windows.Diagnostics
 {
+	[PSerializable]
+	public sealed class ProfileAttribute : Aspects.ProfileAttribute
+	{
+		public ProfileAttribute() : base( typeof(Factory) ) {}
+
+		class Factory : FactoryBase<MethodBase, Performance.Data>
+		{
+			readonly static Action<Data> Complete = new Performance.OutputMessageCommand( data => data.AsTo<Data, string>( Formatter.Instance.Create ), s => Trace.WriteLine( s ) ).Run;
+
+			protected override Performance.Data CreateItem( MethodBase parameter ) => new Data( Complete, parameter );
+		}
+	}
+
+	public class ThreadTimer : Performance.TimerBase
+	{
+		public ThreadTimer( Func<ulong> current ) : base( current ) {}
+
+		public override TimeSpan Time => TimeSpan.FromMilliseconds( Total * 0.0001 );
+	}
+
+	public class Formatter : FactoryBase<Data, string>
+	{
+		public static Formatter Instance { get; } = new Formatter();
+
+		readonly Performance.Formatter inner;
+
+		Formatter() : this( Performance.Formatter.Instance ) {}
+
+		Formatter( Performance.Formatter inner )
+		{
+			this.inner = inner;
+		}
+
+		protected override string CreateItem( Data parameter ) => $"{inner.Create( parameter )}; CPU time: {parameter.UserTime.Time.TotalMilliseconds + parameter.KernelTime.Time.TotalMilliseconds} ms";
+	}
+
+	public class Data : Performance.Data
+	{
+		readonly FixedValue<ThreadTime> threadTime = new FixedValue<ThreadTime>();
+
+		public Data( Action<Data> complete, MethodBase method ) : base( data => data.As( complete ), method )
+		{
+			UserTime = new ThreadTimer( () => threadTime.Item.User );
+			KernelTime = new ThreadTimer( () => threadTime.Item.Kernel );
+		}
+
+		public ThreadTimer KernelTime { get; }
+
+		public ThreadTimer UserTime { get; }
+
+		void Update( Action<ThreadTimer> action )
+		{
+			threadTime.Assign( ThreadTimeFactory.Instance.Create() );
+			new[] { KernelTime, UserTime }.Each( action );
+		}
+
+		public override void Resume()
+		{
+			base.Resume();
+			Update( time => time.Initialize() );
+		}
+
+		public override void Pause()
+		{
+			base.Pause();
+			Update( time => time.Mark() );
+		}
+	}
+
+	public class ThreadTime
+	{
+		public ThreadTime( ulong kernel, ulong user )
+		{
+			Kernel = kernel;
+			User = user;
+		}
+
+		public ulong Kernel { get; }
+		public ulong User { get; }
+	}
+
+	public class ThreadTimeFactory : FactoryBase<ThreadTime>
+	{
+		public static ThreadTimeFactory Instance { get; } = new ThreadTimeFactory();
+
+		[DllImport( "kernel32.dll", SetLastError = true )]
+		[SuppressUnmanagedCodeSecurity]
+		static extern bool GetThreadTimes(IntPtr threadHandle, out ulong creationTime, out ulong exitTime, out ulong kernelTime, out ulong userTime);
+ 
+		[DllImport( "kernel32.dll" )]
+		[SuppressUnmanagedCodeSecurity]
+		static extern IntPtr GetCurrentThread();
+
+		protected override ThreadTime CreateItem()
+		{
+			ulong creationTime, exitTime, kernel, user;
+			GetThreadTimes( GetCurrentThread(), out creationTime, out exitTime, out kernel, out user );
+			var result = new ThreadTime( kernel, user );
+			return result;
+		}
+	}
+
 	/*public class TracingContext : AssignValueCommand<TraceListener>
 	{
 		public TracingContext() : this( new TraceListenerListValue() ) {}

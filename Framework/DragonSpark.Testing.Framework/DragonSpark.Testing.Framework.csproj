@@ -194,7 +194,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Diagnostics\TracerFactory.cs" />
+    <Compile Include="Diagnostics\TracingProfilerFactory.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="Setup\Execution.cs" />
     <Compile Include="Setup\AutoDataMoqConfiguredAttribute.cs" />

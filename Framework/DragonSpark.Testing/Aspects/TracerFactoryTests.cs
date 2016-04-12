@@ -29,7 +29,7 @@ namespace DragonSpark.Testing.Aspects
 			var lines = new List<string>();
 			var listeners = new List<TraceListener>();
 			TraceListener only;
-			using ( new TracerFactory( lines.Add, history, listeners ).Create() )
+			using ( new TracingProfilerFactory( lines.Add, history ).Create() )
 			{
 				only = listeners.Only();
 				Assert.Equal( 1, listeners.Count );
@@ -51,7 +51,7 @@ namespace DragonSpark.Testing.Aspects
 		/*[Fact]
 		public void Basic()
 		{
-			using ( var tracer = new TracerFactory( Output.WriteLine ).Create() )
+			using ( var tracer = new ProfilerFactory( Output.WriteLine ).Create() )
 			{
 				tracer.Mark( "Enter" );
 				var objects = new[] { new object(), new object(), new object(), new object(), new object(), new object(), new object(), new object(), new object(), new object() };

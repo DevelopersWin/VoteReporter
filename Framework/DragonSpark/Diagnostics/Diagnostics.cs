@@ -10,34 +10,6 @@ using System.Diagnostics;
 
 namespace DragonSpark.Diagnostics
 {
-	public class Diagnostics : IDiagnostics
-	{
-		public Diagnostics( [Required] ILogger logger, [Required] LoggingLevelSwitch levelSwitch )
-		{
-			Logger = logger;
-			Switch = levelSwitch;
-		}
-
-		public ILogger Logger { get;  }
-
-		public LoggingLevelSwitch Switch { get; }
-
-		/*public IEnumerable<LogEvent> Events => sink.Events;
-
-		public void Purge( Action<string> writer ) => LogEventMessageFactory.Instance.Create( sink ).Each( writer );*/
-
-		/*public void Dispose()
-		{
-			Dispose( true );
-			GC.SuppressFinalize( this );
-		}
-
-		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
-
-		[Freeze]
-		protected virtual void OnDispose() {}*/
-	}
-
 	public static class ExceptionSupport
 	{
 		public static Exception Try( Action action ) => Try( Services.Get<TryContext>, action );

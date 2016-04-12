@@ -241,6 +241,7 @@
     <Compile Include="Configuration\Item.xaml.cs">
       <DependentUpon>Item.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
     <Compile Include="Io\FileSystemTests.cs" />
     <Compile Include="Modularity\DirectoryModuleInfoProviderTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

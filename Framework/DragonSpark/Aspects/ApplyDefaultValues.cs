@@ -41,4 +41,20 @@ namespace DragonSpark.Aspects
 
 		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 	}
+
+	/*[Serializable, LinesOfCodeAvoided( 8 )]
+	public class AssignExecutionContextAspect : MethodInterceptionAspect
+	{
+		public static AssignExecutionContextAspect Instance { get; } = new AssignExecutionContextAspect();
+
+		AssignExecutionContextAspect() {}
+
+		public sealed override void OnInvoke( MethodInterceptionArgs args )
+		{
+			using ( new ProfilerFactory( output, command.Provider.Get<ILoggerHistory>(), args.Method.Name )).Create() )
+			{
+				args.Proceed();
+			}
+		}
+	}*/
 }
