@@ -1,4 +1,8 @@
-﻿using DragonSpark.Windows.Diagnostics;
+﻿using DragonSpark.Diagnostics;
+using DragonSpark.Testing.Framework;
+using Serilog.Core;
+using Serilog.Events;
+using System.Reflection;
 using System.Threading;
 using Xunit;
 
@@ -9,15 +13,29 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		[Fact]
 		public void Profile()
 		{
-			var tester = new PerformanceTester();
-			tester.Perform();
-			// tester.Perform();
+			var history = new LoggerHistorySink();
+			var level = new LoggingLevelSwitch();
+			using ( MethodBase.GetCurrentMethod().Assign( history, level ) )
+			{
+				Assert.Empty( history.Events );
+
+				var tester = new PerformanceTester();
+				tester.Perform();
+
+				Assert.Empty( history.Events );
+
+				level.MinimumLevel = LogEventLevel.Debug;
+
+				tester.Perform();
+
+				Assert.NotEmpty( history.Events );
+			}
 		}
 
 		class PerformanceTester
 		{
-			[Profile]
-			public void Perform() => Thread.Sleep( 1000 );
+			[Aspects.Profile]
+			public void Perform() => Thread.Sleep( 50 );
 		}
 	}
 }

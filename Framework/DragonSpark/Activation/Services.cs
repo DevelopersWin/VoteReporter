@@ -36,14 +36,16 @@ namespace DragonSpark.Activation
 
 	public class ServiceProvider : CompositeServiceProvider
 	{
-		public ServiceProvider() : base( new DefaultInstances(), ActivatedServiceProvider.Instance ) {}
+		public ServiceProvider() : this( new RecordingLoggerFactory() ) {}
+
+		public ServiceProvider( RecordingLoggerFactory factory ) : base( new DefaultInstances( factory ), ActivatedServiceProvider.Instance ) {}
 	}
 
 	class DefaultInstances : InstanceServiceProvider
 	{
-		public DefaultInstances() : this( new RecordingLoggerFactory() ) {}
+		// public DefaultInstances() : this( new RecordingLoggerFactory() ) {}
 
-		DefaultInstances( RecordingLoggerFactory factory ) : this( factory.Create(), factory.History, factory.LevelSwitch, Activator.Instance, new DisposableRepository() ) {}
+		public DefaultInstances( RecordingLoggerFactory factory ) : this( factory.Create(), factory.History, factory.LevelSwitch, Activator.Instance, new DisposableRepository() ) {}
 
 		public DefaultInstances( ILogger logger, ILoggerHistory history, LoggingLevelSwitch level, IActivator activator, IDisposableRepository repository ) : base( logger, history, level, activator, repository ) {}
 	}

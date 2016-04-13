@@ -1,12 +1,12 @@
 using DragonSpark.Activation;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
+using PostSharp.Patterns.Model;
+using PostSharp.Patterns.Threading;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using PostSharp.Patterns.Threading;
-using PostSharp.Patterns.Model;
 
 namespace DragonSpark.Aspects
 {
@@ -54,8 +54,6 @@ namespace DragonSpark.Aspects
 	{
 		CacheValueFactory Factory { get; set; }
 
-		void Initialize() => Factory = new CacheValueFactory();
-
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			if ( Factory != null && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
@@ -70,6 +68,6 @@ namespace DragonSpark.Aspects
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
 
-		void IInstanceScopedAspect.RuntimeInitializeInstance() => Initialize();
+		void IInstanceScopedAspect.RuntimeInitializeInstance() => Factory = new CacheValueFactory();
 	}
 }

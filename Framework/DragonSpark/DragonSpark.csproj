@@ -182,7 +182,7 @@
     <Compile Include="ComponentModel\DefaultValueProvider.cs" />
     <Compile Include="ComponentModel\HostedValueLocator.cs" />
     <Compile Include="ComponentModel\IDefaultValueProvider.cs" />
-    <Compile Include="Composition\ServiceProviderContainerFactory.cs" />
+    <Compile Include="Composition\ConfiguredServiceProviderFactory.cs" />
     <Compile Include="Composition\PartsContainerConfigurator.cs" />
     <Compile Include="Composition\FactoryDelegateExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />

@@ -20,7 +20,7 @@ namespace DragonSpark.Setup
 {
 	public class AssignServiceProvider : AssignValueCommand<IServiceProvider>
 	{
-		public AssignServiceProvider() : this( null ) {}
+		// public AssignServiceProvider() : this( null ) {}
 
 		public AssignServiceProvider( IServiceProvider current ) : this( CurrentServiceProvider.Instance, current ) {}
 
@@ -69,26 +69,13 @@ namespace DragonSpark.Setup
 			assign.Dispose();
 			application.Dispose();
 		}
-
-		// protected override void OnDispose() => application.Get<AutoData>().Dispose();
 	}
-
-	/*public class ExecuteApplicationCommand : DisposingCommand<IApplication>
-	{
-		public ExecuteApplicationCommand( IWritableValue<> )
-		{
-		}
-
-		protected override void OnExecute( IApplication parameter )
-		{
-		}
-	}*/
 
 	public class DefaultServiceProvider : ExecutionContextValue<ServiceProvider>
 	{
-		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider();
+		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider( () => new ServiceProvider() );
 
-		DefaultServiceProvider() : base( () => new ServiceProvider() ) {}
+		public DefaultServiceProvider( Func<ServiceProvider> create ) : base( create ) {}
 	}
 
 	public class CurrentServiceProvider : ExecutionContextValue<IServiceProvider>
@@ -162,9 +149,9 @@ namespace DragonSpark.Setup
 		public virtual object GetService( Type serviceType ) => inner.GetService( serviceType );
 	}
 
-	public class ServiceProviderFactory<TCommand> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
+	public class ConfiguredServiceProviderFactory<TCommand> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
 	{
-		public ServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure.Instance.Run ) {}
+		public ConfiguredServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure.Instance.Run ) {}
 	
 		class Configure : Command<IServiceProvider>
 		{

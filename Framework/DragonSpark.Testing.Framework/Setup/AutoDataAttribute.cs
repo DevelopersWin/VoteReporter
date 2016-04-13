@@ -62,7 +62,7 @@ namespace DragonSpark.Testing.Framework.Setup
 					this.factory = factory;
 				}
 
-				protected override IServiceProvider CreateItem( AutoData parameter ) => new ServiceProviderContainerFactory( factory( parameter ) ).Create();
+				protected override IServiceProvider CreateItem( AutoData parameter ) => new ConfiguredServiceProviderFactory( factory( parameter ) ).Create();
 			}
 		}
 	}

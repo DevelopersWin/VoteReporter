@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.Objects.IoC
 			}
 
 			protected override IServiceProvider CreateItem( AutoData parameter ) => 
-				new ServiceProviderContainerFactory( new Func<IServiceProvider>( new Activation.IoC.ServiceProviderFactory( () => factory( parameter ) ).Create ) ).Create();
+				new ConfiguredServiceProviderFactory( new Func<IServiceProvider>( new Activation.IoC.ServiceProviderFactory( () => factory( parameter ) ).Create ) ).Create();
 		}
 	}
 

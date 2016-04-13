@@ -138,9 +138,9 @@ namespace DragonSpark.Runtime
 
 	public class DecoratedCommand<T> : Command<T>
 	{
-		readonly ICommand inner;
+		readonly ICommand<T> inner;
 
-		public DecoratedCommand( [Required]ICommand inner )
+		public DecoratedCommand( [Required]ICommand<T> inner )
 		{
 			this.inner = inner;
 		}
@@ -150,18 +150,27 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( T parameter ) => inner.Execute( parameter );
 	}
 
-	/*public abstract class Command<TParameter> : Command<TParameter, ISpecification<TParameter>>
-	{
-		protected Command() : this( Specification<TParameter>.Instance ) {}
-
-		protected Command( ISpecification<TParameter> specification ) : base( specification ) {}
-	}*/
-
 	public class Specification<TParameter> : DecoratedSpecification<TParameter>
 	{
 		public static Specification<TParameter> Instance { get; } = new Specification<TParameter>();
 
 		Specification() : base( NullSpecification.NotNull ) {}
+	}
+
+	public abstract class DecoratedCommand<TFrom, TTo> : Command<TFrom>
+	{
+		readonly Func<TFrom, TTo> transform;
+		readonly ICommand<TTo> inner;
+
+		protected DecoratedCommand( Func<TFrom, TTo> transform, ICommand<TTo> inner )
+		{
+			this.transform = transform;
+			this.inner = inner;
+		}
+
+		protected DecoratedCommand( ISpecification<TFrom> specification ) : base( specification ) {}
+
+		protected override void OnExecute( TFrom parameter ) => inner.ExecuteWith( transform( parameter ) );
 	}
 
 	public abstract class Command<TParameter> : ICommand<TParameter>

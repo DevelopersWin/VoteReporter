@@ -37,15 +37,15 @@ namespace DragonSpark.Composition
 		protected override FactoryTypeRequest CreateItem( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
 	}
 
-	public class ServiceProviderContainerFactory : ServiceProviderFactory<ConfigureProviderCommand>
+	public class ConfiguredServiceProviderFactory : ConfiguredServiceProviderFactory<ConfigureProviderCommand>
 	{
-		public ServiceProviderContainerFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
+		public ConfiguredServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
 
-		public ServiceProviderContainerFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
+		public ConfiguredServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
 
-		public ServiceProviderContainerFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new ServiceProviderFactory( source ).Create ) ) {}
+		public ConfiguredServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new ServiceProviderFactory( source ).Create ) ) {}
 
-		public ServiceProviderContainerFactory( Func<IServiceProvider> provider ) : base( provider ) {}
+		public ConfiguredServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
 	}
 
 	public class ServiceProviderFactory : FactoryBase<IServiceProvider>

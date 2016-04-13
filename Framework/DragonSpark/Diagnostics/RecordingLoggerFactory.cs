@@ -117,17 +117,8 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	/*public interface IDiagnostics
-	{
-		ILogger Logger { get; }
-
-		LoggingLevelSwitch Switch { get; }
-	}*/
-
 	public class RecordingLoggingConfigurationFactory : AggregateFactory<LoggerConfiguration>
 	{
-		// public RecordingLoggingConfigurationFactory() : this( new RecordingLogEventSink(), new LoggingLevelSwitch() ) {}
-
 		public RecordingLoggingConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
 			: base( new LoggingConfigurationSourceFactory( controller ), transformers.Append( new RecordingLoggingConfigurationTransformer( sink ) ).Fixed() ) {}
 	}
@@ -174,9 +165,9 @@ namespace DragonSpark.Diagnostics
 
 	public class RecordingLoggerFactory : LoggerFactory
 	{
-		public RecordingLoggerFactory() : this( new LoggerHistorySink(), new LoggingLevelSwitch() ) {}
+		public RecordingLoggerFactory( params ITransformer<LoggerConfiguration>[] transformers ) : this( new LoggerHistorySink(), new LoggingLevelSwitch(), transformers ) {}
 
-		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch ) : this( history, levelSwitch, new RecordingLoggingConfigurationFactory( history, levelSwitch ).Create ) {}
+		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, levelSwitch, new RecordingLoggingConfigurationFactory( history, levelSwitch, transformers ).Create ) {}
 
 		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, Func<LoggerConfiguration> configuration ) : base( configuration )
 		{

@@ -21,11 +21,44 @@ namespace DragonSpark.Windows.Diagnostics
 	{
 		public ProfileAttribute() : base( typeof(Factory) ) {}
 
-		class Factory : FactoryBase<MethodBase, Performance.Data>
+		class Factory : FactoryBase<MethodBase, Performance.MethodExecution>
 		{
-			readonly static Action<Data> Complete = new Performance.OutputMessageCommand( data => data.AsTo<Data, string>( Formatter.Instance.Create ), s => Trace.WriteLine( s ) ).Run;
+			readonly static Action<MethodExecution> Complete = new Performance.OutputMessageCommand( data => data.AsTo<MethodExecution, string>( Formatter.Instance.Create ), s => Trace.WriteLine( s ) ).Run;
 
-			protected override Performance.Data CreateItem( MethodBase parameter ) => new Data( Complete, parameter );
+			protected override Performance.MethodExecution CreateItem( MethodBase parameter ) => new MethodExecution( Complete, parameter );
+		}
+	}
+
+	public class Timer : Performance.Timer
+	{
+		readonly FixedValue<ThreadTime> threadTime = new FixedValue<ThreadTime>();
+
+		public Timer()
+		{
+			UserTime = new ThreadTimer( () => threadTime.Item.User );
+			KernelTime = new ThreadTimer( () => threadTime.Item.Kernel );
+		}
+
+		public ThreadTimer KernelTime { get; }
+
+		public ThreadTimer UserTime { get; }
+
+		public override void Initialize()
+		{
+			base.Initialize();
+			Update( time => time.Initialize() );
+		}
+
+		public override void Mark()
+		{
+			base.Mark();
+			Update( time => time.Mark() );
+		}
+
+		void Update( Action<ThreadTimer> action )
+		{
+			threadTime.Assign( ThreadTimeFactory.Instance.Create() );
+			new[] { KernelTime, UserTime }.Each( action );
 		}
 	}
 
@@ -36,7 +69,7 @@ namespace DragonSpark.Windows.Diagnostics
 		public override TimeSpan Time => TimeSpan.FromMilliseconds( Total * 0.0001 );
 	}
 
-	public class Formatter : FactoryBase<Data, string>
+	public class Formatter : FactoryBase<MethodExecution, string>
 	{
 		public static Formatter Instance { get; } = new Formatter();
 
@@ -49,39 +82,14 @@ namespace DragonSpark.Windows.Diagnostics
 			this.inner = inner;
 		}
 
-		protected override string CreateItem( Data parameter ) => $"{inner.Create( parameter )}; CPU time: {parameter.UserTime.Time.TotalMilliseconds + parameter.KernelTime.Time.TotalMilliseconds} ms";
+		protected override string CreateItem( MethodExecution parameter ) => $"{inner.Create( parameter )}; CPU time: {parameter.UserTime.Time.TotalMilliseconds + parameter.KernelTime.Time.TotalMilliseconds} ms";
 	}
 
-	public class Data : Performance.Data
+	public class MethodExecution : Performance.MethodExecution
 	{
-		readonly FixedValue<ThreadTime> threadTime = new FixedValue<ThreadTime>();
-
-		public Data( Action<Data> complete, MethodBase method ) : base( data => data.As( complete ), method )
+		public MethodExecution( Action<MethodExecution> complete, MethodBase method ) : base( data => data.As( complete ), method )
 		{
-			UserTime = new ThreadTimer( () => threadTime.Item.User );
-			KernelTime = new ThreadTimer( () => threadTime.Item.Kernel );
-		}
-
-		public ThreadTimer KernelTime { get; }
-
-		public ThreadTimer UserTime { get; }
-
-		void Update( Action<ThreadTimer> action )
-		{
-			threadTime.Assign( ThreadTimeFactory.Instance.Create() );
-			new[] { KernelTime, UserTime }.Each( action );
-		}
-
-		public override void Resume()
-		{
-			base.Resume();
-			Update( time => time.Initialize() );
-		}
-
-		public override void Pause()
-		{
-			base.Pause();
-			Update( time => time.Mark() );
+			
 		}
 	}
 
