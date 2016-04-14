@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
@@ -21,11 +20,11 @@ namespace DragonSpark.Windows.Diagnostics
 	{
 		public ProfileAttribute() : base( typeof(Factory) ) {}
 
-		class Factory : FactoryBase<MethodBase, Performance.MethodExecution>
+		class Factory : FactoryBase<MethodBase, Performance.MethodTimer>
 		{
-			readonly static Action<MethodExecution> Complete = new Performance.OutputMessageCommand( data => data.AsTo<MethodExecution, string>( Formatter.Instance.Create ), s => Trace.WriteLine( s ) ).Run;
+			readonly static Action<MethodTimer> Complete = new Performance.OutputMessageCommand( data => data.AsTo<MethodTimer, string>( Formatter.Instance.Create ), s => Trace.WriteLine( s ) ).Run;
 
-			protected override Performance.MethodExecution CreateItem( MethodBase parameter ) => new MethodExecution( Complete, parameter );
+			protected override Performance.MethodTimer CreateItem( MethodBase parameter ) => new MethodTimer( Complete, parameter );
 		}
 	}
 
@@ -51,8 +50,8 @@ namespace DragonSpark.Windows.Diagnostics
 
 		public override void Mark()
 		{
-			base.Mark();
-			Update( time => time.Mark() );
+			base.Event();
+			Update( time => time.Event() );
 		}
 
 		void Update( Action<ThreadTimer> action )
@@ -69,7 +68,7 @@ namespace DragonSpark.Windows.Diagnostics
 		public override TimeSpan Time => TimeSpan.FromMilliseconds( Total * 0.0001 );
 	}
 
-	public class Formatter : FactoryBase<MethodExecution, string>
+	public class Formatter : FactoryBase<MethodTimer, string>
 	{
 		public static Formatter Instance { get; } = new Formatter();
 
@@ -82,12 +81,12 @@ namespace DragonSpark.Windows.Diagnostics
 			this.inner = inner;
 		}
 
-		protected override string CreateItem( MethodExecution parameter ) => $"{inner.Create( parameter )}; CPU time: {parameter.UserTime.Time.TotalMilliseconds + parameter.KernelTime.Time.TotalMilliseconds} ms";
+		protected override string CreateItem( MethodTimer parameter ) => $"{inner.Create( parameter )}; CPU time: {parameter.UserTime.Time.TotalMilliseconds + parameter.KernelTime.Time.TotalMilliseconds} ms";
 	}
 
-	public class MethodExecution : Performance.MethodExecution
+	public class MethodTimer : Performance.MethodTimer
 	{
-		public MethodExecution( Action<MethodExecution> complete, MethodBase method ) : base( data => data.As( complete ), method )
+		public MethodTimer( Action<MethodTimer> complete, MethodBase method ) : base( data => data.As( complete ), method )
 		{
 			
 		}

@@ -53,7 +53,7 @@ namespace DragonSpark.Testing.Aspects
 		{
 			using ( var tracer = new ProfilerFactory( Output.WriteLine ).Create() )
 			{
-				tracer.Mark( "Enter" );
+				tracer.Event( "Enter" );
 				var objects = new[] { new object(), new object(), new object(), new object(), new object(), new object(), new object(), new object(), new object(), new object() };
 
 
@@ -62,28 +62,28 @@ namespace DragonSpark.Testing.Aspects
 					HashCodeKeyFactory.Instance.Create( objects );
 				}
 
-				tracer.Mark( "HashCodeKeyFactory" );
+				tracer.Event( "HashCodeKeyFactory" );
 
 				for ( int i = 0; i < 100000; i++ )
 				{
 					KeyFactory.Instance.Create( objects );
 				}
 
-				tracer.Mark( "KeyFactory" );
+				tracer.Event( "KeyFactory" );
 
 				/*for ( int i = 0; i < 100000; i++ )
 				{
 					JoinFactory.Instance.Create( objects );
 				}
 
-				tracer.Profiler.Mark( "JoinFactory" );
+				tracer.Profiler.Event( "JoinFactory" );
 
 				for ( int i = 0; i < 100000; i++ )
 				{
 					Builder.Instance.Create( objects );
 				}
 
-				tracer.Profiler.Mark( "Builder" );#1#
+				tracer.Profiler.Event( "Builder" );#1#
 			}
 		}*/
 	}

@@ -23,7 +23,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public static IProfiler Mark<T>( this IProfiler @this, string message )
 		{
-			@this.Mark( $"[{typeof(T).Name}] {message}" );
+			@this.Event( $"[{typeof(T).Name}] {message}" );
 			return @this;
 		}
 	}
@@ -42,7 +42,7 @@ namespace DragonSpark.Diagnostics
 
 		public void Start()
 		{
-			Mark( "Starting" );
+			Event( "Starting" );
 			tracker.Initialize();
 		}
 
@@ -51,7 +51,7 @@ namespace DragonSpark.Diagnostics
 			return new Profiler( logger );
 		}*/
 
-		public void Mark( string @event ) => logger.Information( "@ {Time:ss':'fff} ({Since:ss':'fff}): {Event:l}", tracker.Time, tracker.Mark(), @event );
+		public void Event( string @event ) => logger.Information( "@ {Time:ss':'fff} ({Since:ss':'fff}): {Event:l}", tracker.Time, tracker.Mark(), @event );
 
 		class Tracker : IDisposable
 		{
@@ -88,6 +88,6 @@ namespace DragonSpark.Diagnostics
 		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
 
 		[Freeze]
-		protected virtual void OnDispose() => Mark( "Complete" );
+		protected virtual void OnDispose() => Event( "Complete" );
 	}
 }

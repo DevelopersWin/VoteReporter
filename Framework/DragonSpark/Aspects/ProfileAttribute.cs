@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using PostSharp.Aspects;
 using PostSharp.Serialization;
@@ -14,85 +15,129 @@ namespace DragonSpark.Aspects
 	[PSerializable]
 	public class ProfileAttribute : OnMethodBoundaryAspect
 	{
-		public ProfileAttribute() : this( typeof(DataLoggerCommand<LoggerDebugFactory>) ) {}
+		public ProfileAttribute() : this( typeof(TimerControllerFactory<LoggerDebugFactory>) ) {}
 
-		public ProfileAttribute( [OfFactoryType] Type commandType )
+		public ProfileAttribute( [OfFactoryType] Type factoryType )
 		{
-			CommandType = commandType;
+			FactoryType = factoryType;
 		}
 
-		Type CommandType { get; set; }
+		Type FactoryType { get; set; }
 
-		ICommand<Performance.MethodExecution> Command { get; set; }
+		IFactory<MethodBase, ITimerController> Factory { get; set; }
 
-		public override void RuntimeInitialize( MethodBase method ) => Command = Services.Get<ICommand<Performance.MethodExecution>>( CommandType );
+		public override void RuntimeInitialize( MethodBase method ) => Factory = Services.Get<IFactory<MethodBase, ITimerController>>( FactoryType );
 
-		public override void OnEntry( MethodExecutionArgs args ) => args.MethodExecutionTag = new Performance.MethodExecution( args.Method, Command.Run ).With( data => data.Start() );
+		public override void OnEntry( MethodExecutionArgs args ) => args.MethodExecutionTag = Factory.Create( args.Method ).With( data => data.Start() );
 
-		public override void OnYield( MethodExecutionArgs args ) => args.MethodExecutionTag.As<Performance.MethodExecution>( data => data.Pause() );
+		public override void OnYield( MethodExecutionArgs args ) => args.MethodExecutionTag.As<MethodTimerController>( data => data.Pause() );
 
-		public override void OnResume( MethodExecutionArgs args ) => args.MethodExecutionTag.As<Performance.MethodExecution>( data => data.Resume() );
+		public override void OnResume( MethodExecutionArgs args ) => args.MethodExecutionTag.As<MethodTimerController>( data => data.Resume() );
 
-		public override void OnExit( MethodExecutionArgs args ) => args.MethodExecutionTag.As<Performance.MethodExecution>( data => data.Dispose() );
+		public override void OnExit( MethodExecutionArgs args ) => args.MethodExecutionTag.As<MethodTimerController>( data => data.Dispose() );
 	}
 
-	/*class DebugDataFactory : FactoryBase<MethodBase, Performance.Data>
+	public class TimerControllerFactory<T> : TimerControllerFactory where T : LogFactoryBase
 	{
-		protected override Performance.Data CreateItem( MethodBase parameter ) => new Performance.Data( Performance.DebugMessageCommand.Instance.Execute, parameter );
-	}*/
+		public static TimerControllerFactory<T> Instance { get; } = new TimerControllerFactory<T>( Services.Get<ILogger>() );
+		
+		public TimerControllerFactory( ILogger logger ) : base( Services.Get<LogFactoryBase>( typeof(T) ).Create( logger ) ) {}
+	}
 
-	/*public class LoggerDataFactory<T> : FactoryBase<MethodBase, Performance.Data> where T : LogFactoryBase
+	public class TimerControllerFactory : FactoryBase<MethodBase, ITimerController>
 	{
-		public static LoggerDataFactory<T> Instance { get; } = new LoggerDataFactory<T>();
+		readonly Func<ITimer> timerSource;
+		readonly Action<ProfilerEvent> handler;
 
-		readonly ILogger logger;
+		public TimerControllerFactory( Log log ) : this( () => new Timer(), new LoggerHandler( log ).Run ) {}
 
-		public LoggerDataFactory() : this( Services.Get<ILogger>() ) {}
-
-		public LoggerDataFactory( ILogger logger )
+		public TimerControllerFactory( Func<ITimer> timerSource, Action<ProfilerEvent> handler )
 		{
-			this.logger = logger;
+			this.timerSource = timerSource;
+			this.handler = handler;
 		}
 
-		protected override Performance.Data CreateItem( MethodBase parameter ) => new Performance.Data( new DataLoggerCommand<T>( logger ).Run, parameter );
-	}*/
-
-	public class DataLoggerCommand<T> : DataLoggerCommand where T : LogFactoryBase
-	{
-		public static DataLoggerCommand<T> Instance { get; } = new DataLoggerCommand<T>( Services.Get<ILogger>() );
-
-		public DataLoggerCommand( ILogger logger ) : base( Services.Get<LogFactoryBase>( typeof(T) ).Create( logger ) ) {}
+		protected override ITimerController CreateItem( MethodBase parameter )
+		{
+			var controller = new MethodTimerController( parameter, timerSource() );
+			var result = new TimerController( controller, new ProfileEventHandler( controller, handler ).Run );
+			return result;
+		}
 	}
 
-	public class DataLoggerCommand : Command<Performance.MethodExecution>
+	public class LoggerHandler : DecoratedCommand<ProfilerEvent, MethodTimerTemplate>
+	{
+		public LoggerHandler( Log log ) : this( log, ConvertTemplate.Instance.Create ) {}
+
+		public LoggerHandler( Log logger, Func<ProfilerEvent, MethodTimerTemplate> transform )
+			: base( transform, new LoggerCommand( logger ) ) {}
+	}
+
+	public class ConvertTemplate : Converter<MethodProfilerEvent, MethodTimerTemplate>
+	{
+		public static ConvertTemplate Instance { get; } = new ConvertTemplate();
+
+		public ConvertTemplate() : base( @event => new MethodTimerTemplate( @event ) ) {}
+	}
+
+	public class Converter<TFrom, TTo> : FactoryBase<ProfilerEvent, TTo> where TFrom : ProfilerEvent
+	{
+		readonly Func<TFrom, TTo> convert;
+
+		public Converter( Func<TFrom, TTo> convert )
+		{
+			this.convert = convert;
+		}
+
+		protected override TTo CreateItem( ProfilerEvent parameter ) => parameter.AsTo<TFrom, TTo>( @from => convert( @from ) );
+	}
+
+	public class ProfilerEvent
+	{
+		public ProfilerEvent( string eventName, MethodBase method, ITimer timer )
+		{
+			EventName = eventName;
+			Method = method;
+			Timer = timer;
+		}
+
+		public string EventName { get; }
+
+		public MethodBase Method { get; }
+
+		public ITimer Timer { get; }
+	}
+
+	public class MethodTimerTemplate : LoggerTemplate
+	{
+		public MethodTimerTemplate( MethodProfilerEvent profilerEvent ) 
+			: base(	"{Type}.{Method} [{Event}] - Wall time {WallTime} ms; Synchronous time {SynchronousTime} ms", 
+					new object[] { profilerEvent.Method.DeclaringType.Name, profilerEvent.Method, profilerEvent.EventName, profilerEvent.Timer.Elapsed, profilerEvent.Timer.TrackingTimer.Elapsed } ) {}
+	}
+
+	public class LoggerTemplate
+	{
+		public LoggerTemplate( string template, object[] parameters )
+		{
+			Template = template;
+			Parameters = parameters;
+		}
+
+		public string Template { get; }
+
+		public object[] Parameters { get; }
+	}
+
+	public class LoggerCommand : Command<LoggerTemplate>
 	{
 		readonly Log log;
 
-		public DataLoggerCommand( Log log )
+		public LoggerCommand( Log log ) 
 		{
 			this.log = log;
 		}
 
-		protected override void OnExecute( Performance.MethodExecution parameter ) => new LogDataCommand( parameter ).Run( log );
-	}
-
-	public class LogDataCommand : TemplatedLoggerActionCommand
-	{
-		public LogDataCommand( Performance.MethodExecution execution ) : base( "{Type}.{Method} - Wall time {WallTime} ms; Synchronous time {SynchronousTime} ms", new object[] { execution.Method.DeclaringType.Name, execution.Method, execution.WallTime.Time, execution.SynchronousTime.Time } ) {}
-	}
-
-	public class TemplatedLoggerActionCommand : Command<Log>
-	{
-		readonly string template;
-		readonly object[] parameters;
-
-		public TemplatedLoggerActionCommand( string template, object[] parameters )
-		{
-			this.template = template;
-			this.parameters = parameters;
-		}
-
-		protected override void OnExecute( Log parameter ) => parameter( template, parameters );
+		protected override void OnExecute( LoggerTemplate parameter ) => log( parameter.Template, parameter.Parameters );
 	}
 
 	public delegate void Log( string template, object[] parameters );
@@ -134,110 +179,201 @@ namespace DragonSpark.Aspects
 		protected override Log CreateItem( ILogger parameter ) => parameter.Fatal;
 	}
 
-	public class DebugMessageCommand : Performance.OutputMessageCommand
+	public class Formatter : Converter<MethodProfilerEvent, string>
 	{
-		public static DebugMessageCommand Instance { get; } = new DebugMessageCommand();
+		public static Formatter Instance { get; } = new Formatter();
 
-		public DebugMessageCommand() : this( Performance.Formatter.Instance.Create ) {}
-
-		public DebugMessageCommand( Func<Performance.MethodExecution, string> formatter ) : base( formatter, s => Debug.WriteLine( s ) ) {}
+		Formatter() : base( @event => $"{@event.Method.DeclaringType.Name}.{@event.Method} [{@event.EventName}] - Wall time {@event.Timer.Elapsed.TotalMilliseconds} ms; Synchronous time {@event.Timer.TrackingTimer.Elapsed.TotalMilliseconds} ms" ) {}
 	}
 
-	public static class Performance
+	public class MethodProfilerEvent : ProfilerEvent<MethodTimerController>
 	{
-		public class Formatter : FactoryBase<MethodExecution, string>
-		{
-			public static Formatter Instance { get; } = new Formatter();
+		public MethodProfilerEvent( string eventName, MethodTimerController timer ) : base( eventName, timer.Method, timer ) {}
+	}
 
-			protected override string CreateItem( MethodExecution parameter ) => 
-				$"{parameter.Method.DeclaringType.Name}.{parameter.Method} - Wall time {parameter.WallTime.Time.TotalMilliseconds} ms; Synchronous time {parameter.SynchronousTime.Time.TotalMilliseconds} ms";
+	public abstract class ProfilerEvent<T> : ProfilerEvent where T : ITimer
+	{
+		protected ProfilerEvent( string eventName, MethodBase method, T timer ) : base( eventName, method, timer ) {}
+
+		public new T Timer => (T)base.Timer;
+	}
+
+	/*public class MethodTimerControllerFormatter : FactoryBase<MethodTimerController, string>
+	{
+		public static MethodTimerControllerFormatter Instance { get; } = new MethodTimerControllerFormatter();
+
+		protected override string CreateItem( MethodTimerController parameter ) => $"";
+	}
+
+	public class ObjectFormatter : FactoryBase<object, string>
+	{
+		public static ObjectFormatter Instance { get; } = new ObjectFormatter( MethodTimerControllerFormatter.Instance );
+
+		readonly IEnumerable<IFactoryWithParameter> items;
+
+		public ObjectFormatter( params IFactoryWithParameter[] items )
+		{
+			this.items = items;
 		}
 
-		public class OutputMessageCommand : Command<MethodExecution>
+		protected override string CreateItem( object parameter )
 		{
-			readonly Func<MethodExecution, string> formatter;
-			readonly Action<string> output;
+			var target = parameter.GetType();
+			var result = items.WithFirst( item => item.CanCreate( parameter ) /*&& Factory.GetParameterType( item.GetType() ) == target#1#, factory => (string)factory.Create( parameter ) );
+			return result;
+		}
+	}*/
 
-			public OutputMessageCommand( Action<string> output ) : this( Formatter.Instance.Create, output ) {}
+	public class DebugOutputCommand : DelegatedCommand<string>
+	{
+		public static DebugOutputCommand Instance { get; } = new DebugOutputCommand();
 
-			public OutputMessageCommand( Func<MethodExecution, string> formatter, Action<string> output )
-			{
-				this.formatter = formatter;
-				this.output = output;
-			}
+		public DebugOutputCommand() : this( Specification<string>.Instance ) {}
 
-			protected override void OnExecute( MethodExecution parameter )
-			{
-				var message = formatter( parameter );
-				output( message );
-			}
+		public DebugOutputCommand( ISpecification<string> specification ) : base( s => Debug.WriteLine( s ), specification ) {}
+	}
+
+	public class OutputMessageCommand : DecoratedCommand<ProfilerEvent, string>
+	{
+		public static OutputMessageCommand Instance { get; } = new OutputMessageCommand();
+
+		public OutputMessageCommand() : this( DebugOutputCommand.Instance ) {}
+
+		public OutputMessageCommand( ICommand<string> output ) : base( Formatter.Instance.Create, output ) {}
+	}
+
+	public class Timer : TimerBase
+	{
+		readonly static Stopwatch Stopwatch = Stopwatch.StartNew();
+
+		public Timer() : base( () => (ulong)Stopwatch.ElapsedTicks, total => TimeSpan.FromSeconds( (double)total / Stopwatch.Frequency ) ) {}
+	}
+
+	public interface ITimer
+	{
+		void Start();
+
+		void Update();
+
+		TimeSpan Elapsed { get; }
+	}
+
+	public abstract class TimerBase : FixedValue<ulong>, ITimer
+	{
+		readonly Func<ulong> current;
+		readonly Func<ulong, TimeSpan> time;
+
+		protected TimerBase( Func<ulong> current, Func<ulong, TimeSpan> time )
+		{
+			this.current = current;
+			this.time = time;
 		}
 
-		public class Timer : TimerBase
+		public virtual void Start()
 		{
-			readonly static Stopwatch Stopwatch = Stopwatch.StartNew();
-
-			public Timer() : base( () => (ulong)Stopwatch.ElapsedTicks ) {}
+			Total = 0;
+			Assign( current() );
 		}
 
-		public abstract class TimerBase : FixedValue<ulong>
+		public void Update()
 		{
-			readonly Func<ulong> current;
-
-			protected TimerBase( Func<ulong> current )
-			{
-				this.current = current;
-			}
-
-			public virtual void Initialize() => Assign( current() );
-
-			public ulong Total { get; private set; }
-
-			public virtual TimeSpan Time => TimeSpan.FromSeconds( (double)Total / Stopwatch.Frequency );
-
-			public virtual void Mark() => Total += current() - Item;
+			Total += current() - Item;
+			Elapsed = time( Total );
 		}
 
-		public class MethodExecution : MethodExecution<Timer>
+		ulong Total { get; set; }
+
+		public virtual TimeSpan Elapsed { get; private set; }
+	}
+
+	public interface ITimerController : IDisposable
+	{
+		void Start();
+
+		void Resume();
+
+		void Pause();
+	}
+
+	public interface IMethodTimerController : ITimerController
+	{
+		MethodBase Method { get; }
+	}
+
+	public class ProfileEventHandler : ProfileEventHandler<MethodProfilerEvent>
+	{
+		public ProfileEventHandler( MethodTimerController controller, Action<ProfilerEvent> inner ) : base( s => new MethodProfilerEvent( s, controller ), new DelegatedCommand<ProfilerEvent>( inner ) ) {}
+	}
+
+	public abstract class ProfileEventHandler<T> : DecoratedCommand<string, ProfilerEvent> where T : ProfilerEvent
+	{
+		protected ProfileEventHandler( Func<string, T> transform, ICommand<ProfilerEvent> inner ) : base( transform, inner ) {}
+	}
+
+	public class TimerController : ITimerController
+	{
+		readonly ITimerController inner;
+		readonly Action<string> handler;
+
+		public TimerController( ITimerController inner, Action<string> handler )
 		{
-			public MethodExecution( MethodBase method, Action<MethodExecution<Timer>> complete ) : base( method, complete ) {}
+			this.inner = inner;
+			this.handler = handler;
 		}
 
-		public class MethodExecution<T> : IDisposable where T : TimerBase, new()
+		public void Start()
 		{
-			readonly Action<MethodExecution<T>> complete;
+			inner.Start();
+			handler( nameof(Start) );
+		}
 
-			public MethodExecution( MethodBase method, Action<MethodExecution<T>> complete )
-			{
-				Method = method;
-				this.complete = complete;
-			}
+		public void Resume()
+		{
+			inner.Resume();
+			handler( nameof(Resume) );
+		}
 
-			public MethodBase Method { get; }
+		public void Pause()
+		{
+			inner.Pause();
+			handler( nameof(Pause) );
+		}
 
-			public Timer WallTime { get; } = new Timer();
+		public void Dispose()
+		{
+			inner.Dispose();
+			handler( "Completed" );
+		}
+	}
 
-			public T SynchronousTime { get; } = new T();
+	public class MethodTimerController : Timer, IMethodTimerController
+	{
+		public MethodTimerController( MethodBase method ) : this( method, new Timer() ) {}
 
-			public virtual void Start()
-			{
-				WallTime.Initialize();
- 
-				Resume();
-			}
- 
-			public virtual void Resume() => SynchronousTime.Initialize();
+		public MethodTimerController( MethodBase method, ITimer trackingTimer )
+		{
+			Method = method;
+			TrackingTimer = trackingTimer;
+		}
 
-			public virtual void Pause() => SynchronousTime.Mark();
+		public MethodBase Method { get; }
 
-			public virtual void Dispose()
-			{
-				Pause();
- 
-				WallTime.Mark();
+		public ITimer TrackingTimer { get; }
 
-				complete( this );
-			}
+		public override void Start()
+		{
+			base.Start();
+			Resume();
+		}
+
+		public virtual void Resume() => TrackingTimer.Start();
+
+		public virtual void Pause() => TrackingTimer.Update();
+
+		protected override void OnDispose()
+		{
+			base.OnDispose();
+			Pause();
 		}
 	}
 }
