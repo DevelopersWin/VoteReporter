@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Composition;
-using System.Linq;
-using System.Reflection;
 using DragonSpark.Aspects;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
@@ -10,6 +5,10 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Type = System.Type;
 
 namespace DragonSpark.Activation
@@ -45,6 +44,23 @@ namespace DragonSpark.Activation
 				.FirstOrDefault();
 			return result;
 		}
+	}
+
+	public class Converter<TFrom, TTo> : Converter<object, TFrom, TTo>
+	{
+		public Converter( Func<TFrom, TTo> convert ) : base( convert ) {}
+	}
+
+	public class Converter<TBase, TFrom, TTo> : FactoryBase<TBase, TTo> where TFrom : TBase
+	{
+		readonly Func<TFrom, TTo> convert;
+
+		public Converter( Func<TFrom, TTo> convert )
+		{
+			this.convert = convert;
+		}
+
+		protected override TTo CreateItem( TBase parameter ) => parameter.AsTo<TFrom, TTo>( @from => convert( @from ) );
 	}
 
 	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>

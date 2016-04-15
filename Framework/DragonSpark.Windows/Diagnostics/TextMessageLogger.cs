@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
@@ -8,50 +9,53 @@ using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 using System;
-using System.Diagnostics;
-using System.Reflection;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
+using Log = DragonSpark.Aspects.Log;
 
 namespace DragonSpark.Windows.Diagnostics
 {
 	[PSerializable]
 	public sealed class ProfileAttribute : Aspects.ProfileAttribute
 	{
-		public ProfileAttribute() : base( typeof(Factory) ) {}
-
-		class Factory : FactoryBase<MethodBase, Performance.MethodTimer>
-		{
-			readonly static Action<MethodTimer> Complete = new Performance.OutputMessageCommand( data => data.AsTo<MethodTimer, string>( Formatter.Instance.Create ), s => Trace.WriteLine( s ) ).Run;
-
-			protected override Performance.MethodTimer CreateItem( MethodBase parameter ) => new MethodTimer( Complete, parameter );
-		}
+		public ProfileAttribute() : base( typeof(TimerControllerFactory<LoggerDebugFactory>) ) {}
 	}
 
-	public class Timer : Performance.Timer
+	public class TimerControllerFactory<T> : TimerControllerFactory<T, Timer> where T : LogFactoryBase
+	{
+		public TimerControllerFactory() : this( Services.Get<ILogger>() ) {}
+
+		public TimerControllerFactory( ILogger logger ) : this( Services.Get<LogFactoryBase>( typeof(T) ).Create( logger ) ) {}
+
+		public TimerControllerFactory( Log log ) : base( new LoggerHandler( log, ConvertTemplate.Instance.Create ).Run ) {}
+	}
+
+
+	public class Timer : Aspects.Timer
 	{
 		readonly FixedValue<ThreadTime> threadTime = new FixedValue<ThreadTime>();
 
 		public Timer()
 		{
-			UserTime = new ThreadTimer( () => threadTime.Item.User );
 			KernelTime = new ThreadTimer( () => threadTime.Item.Kernel );
+			UserTime = new ThreadTimer( () => threadTime.Item.User );
 		}
 
 		public ThreadTimer KernelTime { get; }
 
 		public ThreadTimer UserTime { get; }
 
-		public override void Initialize()
+		public override void Start()
 		{
-			base.Initialize();
-			Update( time => time.Initialize() );
+			base.Start();
+			Update( time => time.Start() );
 		}
 
-		public override void Mark()
+		public override void Update()
 		{
-			base.Event();
-			Update( time => time.Event() );
+			base.Update();
+			Update( time => time.Update() );
 		}
 
 		void Update( Action<ThreadTimer> action )
@@ -61,35 +65,29 @@ namespace DragonSpark.Windows.Diagnostics
 		}
 	}
 
-	public class ThreadTimer : Performance.TimerBase
+	public class ThreadTimer : TimerBase
 	{
-		public ThreadTimer( Func<ulong> current ) : base( current ) {}
-
-		public override TimeSpan Time => TimeSpan.FromMilliseconds( Total * 0.0001 );
+		public ThreadTimer( Func<ulong> current ) : base( current, total => TimeSpan.FromMilliseconds( total * 0.0001 ) ) {}
 	}
 
-	public class Formatter : FactoryBase<MethodTimer, string>
+	public class Formatter : Activation.Converter<TimerEvent<Timer>, string>
 	{
-		public static Formatter Instance { get; } = new Formatter();
+		public static Formatter Instance { get; } = new Formatter( Aspects.Formatter.Instance );
 
-		readonly Performance.Formatter inner;
-
-		Formatter() : this( Performance.Formatter.Instance ) {}
-
-		Formatter( Performance.Formatter inner )
-		{
-			this.inner = inner;
-		}
-
-		protected override string CreateItem( MethodTimer parameter ) => $"{inner.Create( parameter )}; CPU time: {parameter.UserTime.Time.TotalMilliseconds + parameter.KernelTime.Time.TotalMilliseconds} ms";
+		Formatter( Aspects.Formatter formatter ) : base( @event => $"{formatter.Create( @event )}; CPU time: {@event.Tracker.UserTime.Elapsed.Milliseconds + @event.Tracker.KernelTime.Elapsed.Milliseconds} ms" ) {}
 	}
 
-	public class MethodTimer : Performance.MethodTimer
+	public class ConvertTemplate : Activation.Converter<TimerEvent<Timer>, TimerEventTemplate>
 	{
-		public MethodTimer( Action<MethodTimer> complete, MethodBase method ) : base( data => data.As( complete ), method )
-		{
-			
-		}
+		public static ConvertTemplate Instance { get; } = new ConvertTemplate();
+
+		public ConvertTemplate() : base( @event => new TimerEventTemplate( new Aspects.TimerEventTemplate( new TimerEvent<Aspects.Timer>( @event.EventName, @event.Method, @event.Timer, @event.Tracker ) ), @event ) ) {}
+	}
+
+	public class TimerEventTemplate : LoggerTemplate
+	{
+		public TimerEventTemplate( Aspects.TimerEventTemplate inner, TimerEvent<Timer> timerEvent ) 
+			: base(	string.Concat( inner.Template, "; CPU time: {ThreadTime} ms" ), inner.Parameters.Append( timerEvent.Tracker.UserTime.Elapsed + timerEvent.Tracker.KernelTime.Elapsed ).ToArray() ) {}
 	}
 
 	public class ThreadTime
@@ -124,24 +122,6 @@ namespace DragonSpark.Windows.Diagnostics
 			return result;
 		}
 	}
-
-	/*public class TracingContext : AssignValueCommand<TraceListener>
-	{
-		public TracingContext() : this( new TraceListenerListValue() ) {}
-
-		public TracingContext( [Required] IWritableValue<TraceListener> value ) : base( value ) {}
-	}
-
-	public class TraceListenerListValue : ListValue<TraceListener>
-	{
-		public TraceListenerListValue() : base( Trace.Listeners ) {}
-
-		protected override void OnDispose()
-		{
-			Item.Dispose();
-			base.OnDispose();
-		}
-	}*/
 
 	public class AddSeqSinkCommand : AddSinkCommand
 	{

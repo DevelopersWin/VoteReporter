@@ -176,6 +176,7 @@
     <Compile Include="Aspects\KeyFactory.cs" />
     <Compile Include="Aspects\OfTypeAttribute.cs" />
     <Compile Include="Aspects\ProfileAttribute.cs" />
+    <Compile Include="Aspects\TimerControllerFactory.cs" />
     <Compile Include="ComponentModel\BuildablePropertyCollectionFactory.cs" />
     <Compile Include="ComponentModel\DefaultPropertyValueFactory.cs" />
     <Compile Include="ComponentModel\DefaultValueBase.cs" />
