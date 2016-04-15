@@ -12,25 +12,19 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
-using Log = DragonSpark.Aspects.Log;
 
 namespace DragonSpark.Windows.Diagnostics
 {
 	[PSerializable]
 	public sealed class ProfileAttribute : Aspects.ProfileAttribute
 	{
-		public ProfileAttribute() : base( typeof(TimerControllerFactory<LoggerDebugFactory>) ) {}
+		public ProfileAttribute() : base( typeof(LoggerTimerFactory<LoggerDebugFactory>) ) {}
 	}
 
-	public class TimerControllerFactory<T> : TimerControllerFactory<T, Timer> where T : LogFactoryBase
+	public class LoggerTimerFactory<T> : LoggerTimerFactory<T, Timer> where T : LogFactoryBase
 	{
-		public TimerControllerFactory() : this( Services.Get<ILogger>() ) {}
-
-		public TimerControllerFactory( ILogger logger ) : this( Services.Get<LogFactoryBase>( typeof(T) ).Create( logger ) ) {}
-
-		public TimerControllerFactory( Log log ) : base( new LoggerHandler( log, ConvertTemplate.Instance.Create ).Run ) {}
+		public LoggerTimerFactory() : base( ConvertTemplate.Instance.Create ) {}
 	}
-
 
 	public class Timer : Aspects.Timer
 	{
