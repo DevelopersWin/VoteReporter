@@ -87,7 +87,7 @@ namespace DragonSpark.Composition
 		{
 			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
 
-			new IDisposable[] { new AssignValueCommand<IServiceProvider>( host ).ExecuteWith( parameter ), parameter.Get<IProfiler>() }.NotNull().Each( repository.Add );
+			repository.Add( new AssignValueCommand<IServiceProvider>( host ).ExecuteWith( parameter ) );
 		}
 	}
 

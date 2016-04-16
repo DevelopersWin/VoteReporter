@@ -102,6 +102,12 @@ namespace DragonSpark.Diagnostics
 	public static class Profile
 	{
 		public static void Event( string name ) => Ambient.GetCurrent<ProfileEvent>()( name );
+
+		public static T Emit<T>( this T @this, string name )
+		{
+			Event( name );
+			return @this;
+		}
 	}
 
 	public class HandlerFactory<T> : FactoryBase<MethodBase, CreateProfilerEvent> where T : ITimer

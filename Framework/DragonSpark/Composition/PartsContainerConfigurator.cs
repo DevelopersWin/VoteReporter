@@ -88,11 +88,8 @@ namespace DragonSpark.Composition
 			this.host = host;
 		}
 
-		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
-		{
-			var exportDescriptorPromises = base.GetExportDescriptors( contract, descriptorAccessor ).AnyOr( () => DeterminePromise( contract, descriptorAccessor ) );
-			return exportDescriptorPromises;
-		}
+		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor ) => 
+			base.GetExportDescriptors( contract, descriptorAccessor ).AnyOr( () => DeterminePromise( contract, descriptorAccessor ) );
 
 		IEnumerable<ExportDescriptorPromise> DeterminePromise( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{

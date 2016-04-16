@@ -7,10 +7,10 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
+using DragonSpark.Windows.Diagnostics;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public AutoDataAttribute( bool includeFromParameters = true, params Type[] others ) : this( Providers.From( new Cache( includeFromParameters, others ).Create ) ) {}
 
-		protected AutoDataAttribute( [Required] Func<AutoData, IDisposable> commandSource ) : this( DefaultFixtureFactory, commandSource ) {}
+		protected AutoDataAttribute( [Required] Func<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
 
 		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required] Func<AutoData, IDisposable> context ) : base( fixture() )
 		{
@@ -97,55 +97,33 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.applicationSource = applicationSource;
 		}
 
-		protected override IDisposable CreateItem( AutoData parameter ) => new ExecuteAutoDataCommand( parameter, providerSource, applicationSource ).ExecuteWith( this );
-	}
-
-	public class ExecuteAutoDataCommand : CompositeCommand
-	{
-		public ExecuteAutoDataCommand( AutoData autoData, [Required]Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource )
-			: this( autoData, new AssignExecutionContextCommand(), new AutoDataConfiguringCommandFactory( autoData, providerSource, applicationSource ).Create ) {}
-
-		ExecuteAutoDataCommand( AutoData autoData, ICommand assign, Func<ICommand<AutoData>> command )
-			: base( new FixedCommand( assign, autoData.Method ), new FixedCommand( command, autoData.ToFactory() ) ) {}
+		protected override IDisposable CreateItem( AutoData parameter )
+		{
+			var assign = new FixedCommand( new AssignExecutionContextCommand(), parameter.Method );
+			var configure = new FixedCommand( new AutoDataConfiguringCommandFactory( parameter, providerSource, applicationSource ).Create, parameter.ToFactory() );
+			var result = new CompositeCommand( assign, configure );
+			return result;
+		}
 	}
 
 	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>
 	{
-		static T Get<T>() where T : class => CurrentServiceProvider.Instance.Item.Get<T>();
-
 		readonly AutoData autoData;
-		readonly Func<ILogger> logger;
 		readonly Func<AutoData, IServiceProvider> providerSource;
 		readonly Func<IServiceProvider, IApplication> applicationSource;
 
 		public AutoDataConfiguringCommandFactory( [Required] AutoData autoData, [Required] Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource ) 
-			: this( autoData, Get<ILogger>, providerSource, applicationSource ) {}
-
-		public AutoDataConfiguringCommandFactory( [Required] AutoData autoData, [Required] Func<ILogger> logger, [Required]Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource )
 		{
 			this.autoData = autoData;
-			this.logger = logger;
 			this.providerSource = providerSource;
 			this.applicationSource = applicationSource;
 		}
 
-		/*IServiceProvider Create( IProfiler profileProcess )
-		{
-			// MethodBase.GetCurrentMethod().Event(  );
-
-			// profileProcess.Mark<AutoDataConfiguringCommandFactory>( "Created Provider" );
-			return result;
-		}*/
-
+		[Profile]
 		protected override ICommand<AutoData> CreateItem()
 		{
-			var provider = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), providerSource( autoData ) );
-			//var profiler = new Profiler( logger(), $"{autoData.Method.Name}-{nameof(AutoData)}" ).With( p => p.Start() );
-			// var provider = Create( profiler );
-			var application = applicationSource( provider );
-			//application.Get<IDisposableRepository>().With( repository => repository.Add( Profiler ) );
-			// profiler.Mark<AutoDataConfiguringCommandFactory>( "Created Application" );
-
+			var provider = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), providerSource( autoData ) ).Emit( "Created Provider" );
+			var application = applicationSource( provider ).Emit( "Created Application" );
 			var result = new ExecuteApplicationCommand<AutoData>( application, provider );
 			return result;
 		}

@@ -62,6 +62,7 @@ namespace DragonSpark.Setup
 		{
 			assign.ExecuteWith( application );
 			application.ExecuteWith<ICommand>( parameter );
+			application.Get<IDisposableRepository>().With( application.AssociateForDispose );
 		}
 
 		protected override void OnDispose()
@@ -199,7 +200,7 @@ namespace DragonSpark.Setup
 		protected override void OnDispose()
 		{
 			base.OnDispose();
-			Services.Get<IDisposableRepository>().With( repository => repository.Dispose() );
+			// Services.Get<IDisposableRepository>().With( repository => repository.Dispose() );
 		}
 
 		/*public void Register( IDisposable disposable )
