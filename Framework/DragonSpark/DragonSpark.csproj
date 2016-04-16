@@ -176,7 +176,6 @@
     <Compile Include="Aspects\KeyFactory.cs" />
     <Compile Include="Aspects\OfTypeAttribute.cs" />
     <Compile Include="Aspects\ProfileAttribute.cs" />
-    <Compile Include="Aspects\LoggerTimerFactory.cs" />
     <Compile Include="ComponentModel\BuildablePropertyCollectionFactory.cs" />
     <Compile Include="ComponentModel\DefaultPropertyValueFactory.cs" />
     <Compile Include="ComponentModel\DefaultValueBase.cs" />
@@ -191,8 +190,11 @@
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
     <Compile Include="Configuration\CompositeConfigurationKey.cs" />
     <Compile Include="Configuration\ConfigurationRegistry.cs" />
-    <Compile Include="Diagnostics\IProfiler.cs" />
+    <Compile Include="Diagnostics\DebugOutputCommand.cs" />
+    <Compile Include="Diagnostics\Logger\Log.cs" />
+    <Compile Include="Diagnostics\TimerEvents.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
+    <Compile Include="Runtime\DisposableExtensions.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
     <Compile Include="Runtime\IRepository.cs" />

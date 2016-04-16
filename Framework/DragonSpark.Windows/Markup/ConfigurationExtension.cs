@@ -45,7 +45,7 @@ namespace DragonSpark.Windows.Markup
 
 	/*public class MemberInfoFromPropertyFactory : FirstFromParameterFactory<object, MemberInfo>
 	{
-		public class PropertyInfoFactory : FactoryBase<object, MemberInfo>
+		public class PropertyInfoFactory : Factory<object, MemberInfo>
 		{
 			public static PropertyInfoFactory Instance { get; } = new PropertyInfoFactory();
 

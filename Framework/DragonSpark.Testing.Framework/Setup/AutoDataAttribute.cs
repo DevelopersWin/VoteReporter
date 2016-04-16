@@ -129,20 +129,23 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.applicationSource = applicationSource;
 		}
 
-		IServiceProvider Create( IProfiler profiler )
+		/*IServiceProvider Create( IProfiler profileProcess )
 		{
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( profiler, autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), providerSource( autoData ) );
-			profiler.Mark<AutoDataConfiguringCommandFactory>( "Created Provider" );
+			// MethodBase.GetCurrentMethod().Event(  );
+
+			// profileProcess.Mark<AutoDataConfiguringCommandFactory>( "Created Provider" );
 			return result;
-		}
+		}*/
 
 		protected override ICommand<AutoData> CreateItem()
 		{
-			var profiler = new Profiler( logger(), $"{autoData.Method.Name}-{nameof(AutoData)}" ).With( p => p.Start() );
-			var provider = Create( profiler );
+			var provider = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), providerSource( autoData ) );
+			//var profiler = new Profiler( logger(), $"{autoData.Method.Name}-{nameof(AutoData)}" ).With( p => p.Start() );
+			// var provider = Create( profiler );
 			var application = applicationSource( provider );
-			//application.Get<IDisposableRepository>().With( repository => repository.Add( profiler ) );
-			profiler.Mark<AutoDataConfiguringCommandFactory>( "Created Application" );
+			//application.Get<IDisposableRepository>().With( repository => repository.Add( Profiler ) );
+			// profiler.Mark<AutoDataConfiguringCommandFactory>( "Created Application" );
+
 			var result = new ExecuteApplicationCommand<AutoData>( application, provider );
 			return result;
 		}

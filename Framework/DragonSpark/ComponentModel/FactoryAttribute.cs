@@ -31,7 +31,7 @@ namespace DragonSpark.ComponentModel
 
 	public sealed class FactoryAttribute : ServicesValueBase
 	{
-		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Factory );
+		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Category );
 
 		static object Factory( Type arg ) => Services.Get<InstanceFromFactoryTypeFactory>().Create( arg );
 
@@ -40,7 +40,7 @@ namespace DragonSpark.ComponentModel
 		public FactoryAttribute( Func<MemberInfoFactoryTypeLocator> locator, Type factoryType = null ) : base( new ServicesValueProvider.Converter( p => factoryType ?? locator().Create( p ) ), Factory ) {}
 	}
 
-	/*public class DelegatedCreator : ServicesValueProvider.Factory
+	/*public class DelegatedCreator : ServicesValueProvider.Category
 	{
 		readonly Func<Type, object> factory;
 

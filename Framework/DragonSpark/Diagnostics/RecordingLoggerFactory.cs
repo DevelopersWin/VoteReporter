@@ -7,35 +7,9 @@ using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using PostSharp.Aspects.Advices;
 
 namespace DragonSpark.Diagnostics
 {
-	/*public class DiagnosticsFactory : FactoryBase<IDiagnostics>
-	{
-		readonly Func<ILogger> source;
-		readonly LoggingLevelSwitch levelSwitch;
-
-		/*public DiagnosticsFactory() : this( new RecordingLoggerFactory() ) {}
-
-		DiagnosticsFactory( RecordingLoggerFactory factory ) : this( factory.Create, factory.LevelSwitch ) { }#1#
-
-		public DiagnosticsFactory( [Required] Func<ILogger> source, [Required]LoggingLevelSwitch levelSwitch )
-		{
-			this.source = source;
-			this.levelSwitch = levelSwitch;
-		}
-
-		protected override IDiagnostics CreateItem()
-		{
-			var logger = source();
-			var result = new Diagnostics( logger, levelSwitch );
-			return result;
-		}
-	}*/
-
 	public interface ILoggerHistory : ILogEventSink
 	{
 		IEnumerable<LogEvent> Events { get; }
@@ -44,47 +18,8 @@ namespace DragonSpark.Diagnostics
 	}
 
 	
-	public class ProfilerFactory : ConfiguringFactory<IProfiler>
-	{
-		/*public ProfilerFactory( [Required] Action<string> output, [CallerMemberName]string context = null ) : this( output, new LoggerHistorySink(), context ) {}
-
-		public ProfilerFactory( [Required] Action<string> output, [Required] ILoggerHistory history, [CallerMemberName]string context = null ) 
-			: this( new PurgeLoggerHistoryFixedCommand( history, output ), history, context ) {}*/
-
-		public ProfilerFactory( ILogger logger, string context, PurgeLoggerHistoryFixedCommand purgeCommand ) 
-			: base( () => new Profiler( logger, context ), new ConfigureProfilerCommand( purgeCommand ).Run ) {}
-
-		// ProfilerFactory( ILogger logger, string context, Action<IProfiler> dispose, Action<IProfiler> configure ) : base( , configure ) {}
-	}
-
-	public class ConfigureProfilerCommand : CompositeCommand
-	{
-		readonly PurgeLoggerHistoryFixedCommand purge;
-
-		public ConfigureProfilerCommand( [Required] PurgeLoggerHistoryFixedCommand purge ) : base( purge, StartProfilerCommand.Instance )
-		{
-			this.purge = purge;
-		}
-
-		protected override void OnDispose()
-		{
-			base.OnDispose();
-			purge.ExecuteWith( this );
-		}
-	}
-
-	public class StartProfilerCommand : Command<IProfiler>
-	{
-		public static StartProfilerCommand Instance { get; } = new StartProfilerCommand();
-
-		// public StartProfilerCommand( [Required] ICommand<IProfiler> purge ) : base( purge ) {}
-
-		protected override void OnExecute( IProfiler parameter ) => parameter.Start();
-	}
-
 	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommand<string>
 	{
-		// [ImportingConstructor]
 		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, LogEventMessageFactory.Instance.Create ) {}
 	}
 
@@ -93,10 +28,10 @@ namespace DragonSpark.Diagnostics
 		public PurgeLoggerHistoryFixedCommand( [Required] ILoggerHistory history, [Required] Action<string> output ) : base( new PurgeLoggerMessageHistoryCommand( history ), output ) {}
 	}
 
-	public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
+	/*public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
 	{
 		public PurgeLoggerHistoryCommand( ILoggerHistory history ) : base( history, events => events.Fixed() ) {}
-	}
+	}*/
 
 	public abstract class PurgeLoggerHistoryCommand<T> : Command<Action<T>>
 	{

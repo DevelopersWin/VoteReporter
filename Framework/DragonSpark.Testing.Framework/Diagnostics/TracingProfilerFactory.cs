@@ -8,37 +8,28 @@ using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	public class TracingProfilerFactory : ProfilerFactory
+	/*public class TracingProfilerFactory<T> : ProfilerFactory<T> where T : Category.Factory
 	{
-		public TracingProfilerFactory( [Required] Action<string> output, [CallerMemberName]string context = null ) : this( output, new LoggerHistorySink(), context ) {}
+		// public TracingProfilerFactory( [Required] Action<string> output, [CallerMemberName]string context = null ) : this( output, new LoggerHistorySink(), context ) {}
 
 		public TracingProfilerFactory( [Required] Action<string> output, [Required] ILoggerHistory history, [CallerMemberName]string context = null ) 
 			: this( new PurgeLoggerHistoryFixedCommand( history, output ), history, context ) {}
 
 		TracingProfilerFactory( PurgeLoggerHistoryFixedCommand purgeCommand, ILoggerHistory history, string context ) 
 			: base( new TracingLoggerFactory( history ).Create(), context, purgeCommand ) {}
-	}
-
-	public class SourceContextTransformer : TransformerBase<LoggerConfiguration>
-	{
-		public static SourceContextTransformer Instance { get; } = new SourceContextTransformer();
-
-		protected override LoggerConfiguration CreateItem( LoggerConfiguration parameter ) => parameter.Enrich.FromLogContext();
-	}
+	}*/
 
 	public class TracingLoggerFactory : ConfiguringFactory<ILogger>
 	{
-		public TracingLoggerFactory( ILoggerHistory history ) : this( history, new LoggingLevelSwitch() ) {}
+		public TracingLoggerFactory( ILoggerHistory history ) : this( history, new LoggingLevelSwitch(), new LoggerTraceListenerTrackingCommand() ) {}
 
-		TracingLoggerFactory( ILoggerHistory history, LoggingLevelSwitch levelSwitch ) 
-			: base( 
-				  new RecordingLoggerFactory( history, levelSwitch, SourceContextTransformer.Instance ).Create,
-				  new LoggerTraceListenerTrackingCommand().Run
-				  ) {}
+		//public TracingLoggerFactory( ILoggerHistory history, LoggerTraceListenerTrackingCommand command ) : this( history, new LoggingLevelSwitch(), command ) {}
+
+		public TracingLoggerFactory( ILoggerHistory history, LoggingLevelSwitch levelSwitch, ICommand<ILogger> command ) 
+			: base( new RecordingLoggerFactory( history, levelSwitch ).Create, command.Run ) {}
 	}
 
 	public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>
@@ -55,7 +46,9 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		readonly AddItemCommand add;
 		readonly RemoveItemCommand remove;
 
-		public LoggerTraceListenerTrackingCommand() : this( LoggingTraceListenerFactory.Instance.Create, new List<TraceListener>(), new AddItemCommand( Trace.Listeners ), new RemoveItemCommand( Trace.Listeners ) ) {}
+		public LoggerTraceListenerTrackingCommand() : this( new List<TraceListener>() ) {}
+
+		public LoggerTraceListenerTrackingCommand( IList<TraceListener> listeners ) : this( LoggingTraceListenerFactory.Instance.Create, listeners, new AddItemCommand( Trace.Listeners ), new RemoveItemCommand( Trace.Listeners ) ) {}
 
 		public LoggerTraceListenerTrackingCommand( [Required] Func<ILogger, TraceListener> factory, [Required] IList<TraceListener> listeners, [Required] AddItemCommand add, [Required] RemoveItemCommand remove )
 		{

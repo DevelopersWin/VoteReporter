@@ -69,14 +69,14 @@ namespace DragonSpark.Runtime.Values
 		}
 	}
 
-	/*public class ConnectedValueKeyFactory<T> : FactoryBase<EqualityList, string>
+	/*public class ConnectedValueKeyFactory<T> : Factory<EqualityList, string>
 	{
 		public static ConnectedValueKeyFactory<T> Instance { get; } = new ConnectedValueKeyFactory<T>();
 
 		protected override string CreateItem( EqualityList parameter ) => $"{typeof(T)}-{parameter.GetHashCode()}";
 	}*/
 
-	/*public class ConnectedValueKeyFactory : FactoryBase<object, string>
+	/*public class ConnectedValueKeyFactory : Factory<object, string>
 	{
 		public static ConnectedValueKeyFactory Instance { get; } = new ConnectedValueKeyFactory();
 

@@ -177,7 +177,7 @@ namespace DragonSpark.Windows.Entity
 			static IEnumerable<string> GetAssociationPropertyNames( IObjectContextAdapter target, Type type ) => target.GetEntityProperties( type ).Select( x => type.GetProperty( x.Name ) ).Where( x => x.PropertyType.Adapt().GetInnerType() == null ).Select( x => x.Name );
 		}
 
-		/*public class DefaultAssociationPathsFactory : FactoryBase<Type, string[]>
+		/*public class DefaultAssociationPathsFactory : Factory<Type, string[]>
 		{
 			readonly IAttributeProvider provider;
 			readonly IObjectContextAdapter adapter;

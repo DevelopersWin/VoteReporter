@@ -1,12 +1,11 @@
-using System;
-using PostSharp.Patterns.Contracts;
-using System.IO;
-using System.Reflection;
-using System.Runtime.Serialization;
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
+using PostSharp.Patterns.Contracts;
+using System;
+using System.IO;
+using System.Runtime.Serialization;
 using Type = System.Type;
 
 namespace DragonSpark.Runtime

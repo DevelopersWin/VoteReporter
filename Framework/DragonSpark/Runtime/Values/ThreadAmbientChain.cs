@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
-using PostSharp.Patterns.Model;
+using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Runtime.Values
 {

@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects
 		public T CreateUsing( params object[] parameter ) => Create( parameter );
 	}
 
-	/*public class MemberInfoTransformer : FactoryBase<MemberInfo, int>
+	/*public class MemberInfoTransformer : Factory<MemberInfo, int>
 	{
 		public static MemberInfoTransformer Instance { get; } = new MemberInfoTransformer();
 
@@ -22,7 +22,7 @@ namespace DragonSpark.Aspects
 			parameter.DeclaringType.GetTypeInfo().GUID.GetHashCode() * 6776 + parameter.ToString().GetHashCode();
 	}
 
-	public class ParameterInfoTransformer : FactoryBase<ParameterInfo, int>
+	public class ParameterInfoTransformer : Factory<ParameterInfo, int>
 	{
 		public static ParameterInfoTransformer Instance { get; } = new ParameterInfoTransformer();
 

@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
@@ -9,26 +9,30 @@ using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 
 namespace DragonSpark.Windows.Diagnostics
 {
+	public class EnrichFromLogContextCommand : EnrichCommandBase
+	{
+		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.FromLogContext();
+	}
+
 	[PSerializable]
 	public sealed class ProfileAttribute : Aspects.ProfileAttribute
 	{
-		public ProfileAttribute() : base( typeof(LoggerTimerFactory<LoggerDebugFactory>) ) {}
+		public ProfileAttribute() : base( typeof(ProfilerFactory<Category.Debug>) ) {}
 	}
 
-	public class LoggerTimerFactory<T> : LoggerTimerFactory<T, Timer> where T : LogFactoryBase
+	public class ProfilerFactory<T> : ProfilerFactory<Timer, T> where T : Category.Factory
 	{
-		public LoggerTimerFactory() : base( ConvertTemplate.Instance.Create ) {}
+		public ProfilerFactory() : base( TimerEventConverter.Instance.Create ) {}
 	}
 
-	public class Timer : Aspects.Timer
+	public class Timer : DragonSpark.Diagnostics.Timer
 	{
-		readonly FixedValue<ThreadTime> threadTime = new FixedValue<ThreadTime>();
+		readonly FixedValue<CpuTime> threadTime = new FixedValue<CpuTime>();
 
 		public Timer()
 		{
@@ -36,9 +40,11 @@ namespace DragonSpark.Windows.Diagnostics
 			UserTime = new ThreadTimer( () => threadTime.Item.User );
 		}
 
-		public ThreadTimer KernelTime { get; }
+		ThreadTimer KernelTime { get; }
 
-		public ThreadTimer UserTime { get; }
+		ThreadTimer UserTime { get; }
+
+		public TimeSpan CpuElapsed => KernelTime.Elapsed + UserTime.Elapsed;
 
 		public override void Start()
 		{
@@ -64,29 +70,24 @@ namespace DragonSpark.Windows.Diagnostics
 		public ThreadTimer( Func<ulong> current ) : base( current, total => TimeSpan.FromMilliseconds( total * 0.0001 ) ) {}
 	}
 
-	public class Formatter : Activation.Converter<TimerEvent<Timer>, string>
+	public class TimerEventConverter : Activation.Converter<TimerEvent<Timer>, LoggerTemplate>
 	{
-		public static Formatter Instance { get; } = new Formatter( Aspects.Formatter.Instance );
+		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
 
-		Formatter( Aspects.Formatter formatter ) : base( @event => $"{formatter.Create( @event )}; CPU time: {@event.Tracker.UserTime.Elapsed.Milliseconds + @event.Tracker.KernelTime.Elapsed.Milliseconds} ms" ) {}
-	}
-
-	public class ConvertTemplate : Activation.Converter<TimerEvent<Timer>, TimerEventTemplate>
-	{
-		public static ConvertTemplate Instance { get; } = new ConvertTemplate();
-
-		public ConvertTemplate() : base( @event => new TimerEventTemplate( new Aspects.TimerEventTemplate( new TimerEvent<Aspects.Timer>( @event.EventName, @event.Method, @event.Timer, @event.Tracker ) ), @event ) ) {}
+		public TimerEventConverter() : base( @event => new CompositeLoggerTemplate( 
+			new DragonSpark.Diagnostics.TimerEventTemplate( new TimerEvent<DragonSpark.Diagnostics.Timer>( @event.EventName, @event.Method, @event.Timer, @event.Tracker ) ),
+			new TimerEventTemplate( @event )
+		) ) {}
 	}
 
 	public class TimerEventTemplate : LoggerTemplate
 	{
-		public TimerEventTemplate( Aspects.TimerEventTemplate inner, TimerEvent<Timer> timerEvent ) 
-			: base(	string.Concat( inner.Template, "; CPU time: {ThreadTime} ms" ), inner.Parameters.Append( timerEvent.Tracker.UserTime.Elapsed + timerEvent.Tracker.KernelTime.Elapsed ).ToArray() ) {}
+		public TimerEventTemplate( TimerEvent<Timer> timerEvent ) : base( "CPU time: {CpuTime} ms", timerEvent.Tracker.CpuElapsed ) {}
 	}
 
-	public class ThreadTime
+	public class CpuTime
 	{
-		public ThreadTime( ulong kernel, ulong user )
+		public CpuTime( ulong kernel, ulong user )
 		{
 			Kernel = kernel;
 			User = user;
@@ -96,7 +97,7 @@ namespace DragonSpark.Windows.Diagnostics
 		public ulong User { get; }
 	}
 
-	public class ThreadTimeFactory : FactoryBase<ThreadTime>
+	public class ThreadTimeFactory : FactoryBase<CpuTime>
 	{
 		public static ThreadTimeFactory Instance { get; } = new ThreadTimeFactory();
 
@@ -108,11 +109,11 @@ namespace DragonSpark.Windows.Diagnostics
 		[SuppressUnmanagedCodeSecurity]
 		static extern IntPtr GetCurrentThread();
 
-		protected override ThreadTime CreateItem()
+		protected override CpuTime CreateItem()
 		{
 			ulong creationTime, exitTime, kernel, user;
 			GetThreadTimes( GetCurrentThread(), out creationTime, out exitTime, out kernel, out user );
-			var result = new ThreadTime( kernel, user );
+			var result = new CpuTime( kernel, user );
 			return result;
 		}
 	}

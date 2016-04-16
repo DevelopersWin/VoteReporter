@@ -16,7 +16,7 @@ namespace DragonSpark.ComponentModel
 
 		static object Create( Type type ) => Services.Get<IValue>( type ).Item;
 
-		/*public class Creator : ServicesValueProvider.Factory
+		/*public class Creator : ServicesValueProvider.Category
 		{
 			public new static Creator Instance { get; } = new Creator();
 

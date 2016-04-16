@@ -5,7 +5,7 @@ using DragonSpark.Runtime;
 
 namespace DragonSpark.Windows.Entity
 {
-	[ContentProperty( "Attach" )]
+	[ContentProperty( nameof(Attach) )]
 	public class EntityInstallationStep : IInstallationStep
 	{
 		public void Execute( DbContext context )

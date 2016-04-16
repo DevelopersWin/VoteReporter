@@ -409,7 +409,7 @@ namespace DragonSpark.Diagnostics
 		public Priority Priority { get; }
 	}
 
-	public abstract class MessageFactoryBase<T> : FactoryBase<T, Message> where T : MessageParameter
+	public abstract class MessageFactoryBase<T> : Factory<T, Message> where T : MessageParameter
 	{
 		readonly Func<DateTimeOffset> time;
 		readonly Func<T, string> message;

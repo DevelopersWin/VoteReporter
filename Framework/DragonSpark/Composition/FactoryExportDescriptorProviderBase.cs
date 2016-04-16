@@ -39,7 +39,7 @@ namespace DragonSpark.Composition
 				var success = resultContract
 					.With( compositionContract => new LocateTypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
 					.With( locator.Create )
-					.With( type => descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( type ), true, out dependency ) );
+					.With( type => descriptorAccessor.TryResolveOptionalDependency( "Category Request", contract.ChangeType( type ), true, out dependency ) );
 				if ( success )
 				{
 					var promise = dependency.Target;

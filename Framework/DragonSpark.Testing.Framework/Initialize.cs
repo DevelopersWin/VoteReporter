@@ -80,6 +80,7 @@ namespace DragonSpark.Testing.Framework
 	{
 		public static AppDomainFactory Instance { get; } = new AppDomainFactory();
 
+		#pragma warning disable 3305
 		[Freeze]
 		protected override ImmutableArray<AppDomain> CreateItem()
 		{

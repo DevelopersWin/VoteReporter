@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
@@ -15,7 +16,6 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Reflection;
-using DragonSpark.Diagnostics;
 using Type = System.Type;
 
 namespace DragonSpark.Composition

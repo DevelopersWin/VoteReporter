@@ -273,7 +273,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		/*[Theory, LocationSetup.AutoData]
-		void Dispose( [DragonSpark.Testing.Framework.Factory, Frozen] ServiceLocator sut )
+		void Dispose( [DragonSpark.Testing.Framework.Category, Frozen] ServiceLocator sut )
 		{
 			var item = Services.Get<IInterface>( typeof(Class) );
 			Assert.NotNull( item );

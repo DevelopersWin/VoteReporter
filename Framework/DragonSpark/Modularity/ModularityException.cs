@@ -5,7 +5,7 @@ using System;
 namespace DragonSpark.Modularity
 {
     /// <summary>
-    /// Base class for exceptions that are thrown because of a problem with modules. 
+    /// Factory class for exceptions that are thrown because of a problem with modules. 
     /// </summary>
     public partial class ModularityException : Exception
     {

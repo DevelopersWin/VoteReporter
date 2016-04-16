@@ -96,14 +96,14 @@ namespace DragonSpark.ComponentModel
 			protected override Type CreateItem( PropertyInfo parameter ) => type( parameter );
 		}
 
-		/*public class Factory : Creator<object>
+		/*public class Category : Creator<object>
 		{
-			public static Factory Instance { get; } = new Factory();
+			public static Category Instance { get; } = new Category();
 
-			public Factory() : base( Services.Get<object> ) { }
+			public Category() : base( Services.Get<object> ) { }
 		}
 
-		public class Creator<T> : FactoryBase<Type, T> where T : class
+		public class Creator<T> : Factory<Type, T> where T : class
 		{
 			// public static Creator<T> Instance { get; } = new Creator<T>();
 
@@ -147,7 +147,7 @@ namespace DragonSpark.ComponentModel
 			public Converter( string name ) : base( typeof(T), name ) { }
 		}*/
 
-		/*public abstract class Converter : FactoryBase<PropertyInfo, TRequest>
+		/*public abstract class Converter : Factory<PropertyInfo, TRequest>
 		{
 			/*readonly Func<PropertyInfo, TRequest> type;
 

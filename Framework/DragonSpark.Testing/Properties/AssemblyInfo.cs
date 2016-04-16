@@ -6,6 +6,7 @@ using DragonSpark.TypeSystem;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using DragonSpark.Aspects;
+using DragonSpark.Runtime;
 
 [assembly: AssemblyTitle( "DragonSpark.Testing" )]
 [assembly: AssemblyDescription( "" )]
@@ -25,3 +26,4 @@ using DragonSpark.Aspects;
 [assembly: Application]
 
 [assembly: ApplyDefaultValues]
+[assembly: DisposeAssociatedAspect]

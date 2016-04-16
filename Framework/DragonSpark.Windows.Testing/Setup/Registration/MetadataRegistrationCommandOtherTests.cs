@@ -1,7 +1,7 @@
 ﻿namespace DragonSpark.Testing.Setup.Registration
 {
 	// [ReaderWriterSynchronized]
-	/*public class ApplicationFactory : FactoryBase<MethodInfo, IApplication>
+	/*public class ApplicationFactory : Factory<MethodInfo, IApplication>
 	{
 		public static ApplicationFactory Instance { get; } = new ApplicationFactory();
 

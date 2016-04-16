@@ -57,7 +57,7 @@ namespace DragonSpark.Activation.IoC
 				{
 					/*if ( new Checked( o, this ).Item.Apply() )
 					{
-						var instance = o.Has<SharedAttribute>() || new ExportProperties.Instance( o ).Item || new ExportProperties.Factory( o ).Item.With( promise => promise.Contract.ContractType.Has<SharedAttribute>() );
+						var instance = o.Has<SharedAttribute>() || new ExportProperties.Instance( o ).Item || new ExportProperties.Category( o ).Item.With( promise => promise.Contract.ContractType.Has<SharedAttribute>() );
 						if ( instance )
 						{
 							registry().Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );

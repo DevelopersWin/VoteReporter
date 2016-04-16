@@ -4,13 +4,11 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
-using DragonSpark.Testing.Framework.Diagnostics;
 using DragonSpark.Testing.Framework.Setup;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using Serilog.Core;
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using Xunit.Abstractions;
 
@@ -27,11 +25,13 @@ namespace DragonSpark.Testing.Framework
 		{
 			using ( new AssignExecutionContextCommand().ExecuteWith( args.Method ) )
 			{
-				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? ( s => { Debug.WriteLine( s ); } );
+				args.Proceed();
+				/*
+				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? DebugOutputCommand.Instance.Run;
 				using ( new TracingProfilerFactory( output, Services.Get<ILoggerHistory>(), args.Method.Name ).Create() )
 				{
-					args.Proceed();
-				}
+					
+				}*/
 			}
 		}
 	}
