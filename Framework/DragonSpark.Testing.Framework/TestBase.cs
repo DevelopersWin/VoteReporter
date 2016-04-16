@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Framework
 			using ( new AssignExecutionContextCommand().ExecuteWith( args.Method ) )
 			{
 				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? DebugOutputCommand.Instance.Run;
-				using ( new Diagnostics.ProfilerFactory<Category.Debug>( output, Services.Get<ILoggerHistory>(), Services.Get<ILogger>() ).Create( args.Method ) )
+				using ( new Diagnostics.ProfilerFactory<Category.Debug>( output, Services.Get<ILogger>(), Services.Get<ILoggerHistory>() ).Create( args.Method ) )
 				{
 					args.Proceed();
 				}

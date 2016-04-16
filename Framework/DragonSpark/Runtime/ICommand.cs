@@ -136,6 +136,18 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( T parameter ) => factory().ExecuteWith( parameter );
 	}*/
 
+	public class DelegatedCommand : Command<object>
+	{
+		readonly Action action;
+
+		public DelegatedCommand( Action action )
+		{
+			this.action = action;
+		}
+
+		protected override void OnExecute( object parameter ) => action();
+	}
+
 	public class DelegatedCommand<T> : Command<T>
 	{
 		readonly Action<T> command;

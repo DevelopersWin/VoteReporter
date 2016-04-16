@@ -31,7 +31,8 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 			var lines = new List<string>();
 			var listeners = new List<TraceListener>();
 			TraceListener only;
-			using ( var profiler = new DragonSpark.Testing.Framework.Diagnostics.ProfilerFactory<Category.Debug>( lines.Add, history, listeners, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ).Create( MethodBase.GetCurrentMethod() ) )
+			var logger = new RecordingLoggerFactory( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ).Create();
+			using ( new DragonSpark.Testing.Framework.Diagnostics.ProfilerFactory<Category.Debug>( lines.Add, logger, history, listeners ).Create( MethodBase.GetCurrentMethod() ) )
 			{
 				only = listeners.Only();
 				Assert.Equal( 1, listeners.Count );
