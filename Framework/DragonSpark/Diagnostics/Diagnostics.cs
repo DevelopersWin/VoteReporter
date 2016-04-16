@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Aspects;
 using Log = DragonSpark.Diagnostics.Logger.Log;
 
 namespace DragonSpark.Diagnostics
@@ -26,22 +27,24 @@ namespace DragonSpark.Diagnostics
 
 	public class ProfilerFactory<TTimer, TLog> : FactoryBase<MethodBase, IProfiler> where TLog : Category.Factory where TTimer : ITimer, new()
 	{
-		readonly ILogger logger;
+		readonly Func<MethodBase, ILogger> loggerSource;
 		readonly Func<Log, Action<TimerEvent>> handlerSource;
 		readonly ISessionTimer timer;
 		readonly Func<MethodBase, CreateProfilerEvent> createSource;
 
 		public ProfilerFactory() : this( TimerEventConverter.Instance.Create ) {}
 
-		public ProfilerFactory( Func<TimerEvent, LoggerTemplate> templateSource ) : this( Services.Get<ILogger>(), new TTimer(), log => new Handler<TimerEvent>( log, templateSource ).Run ) {}
+		public ProfilerFactory( Func<TimerEvent, LoggerTemplate> templateSource ) : this( new MethodLoggerFactory( Services.Get<ILogger>() ).Create, templateSource ) {}
 
-		public ProfilerFactory( ILogger logger, TTimer tracker, Func<Log, Action<TimerEvent>> handlerSource ) : this( logger, tracker, new SessionTimer( tracker ), handlerSource ) {}
+		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, LoggerTemplate> templateSource ) : this( loggerSource, new TTimer(), log => new Handler<TimerEvent>( log, templateSource ).Run ) {}
 
-		public ProfilerFactory( ILogger logger, TTimer tracker, ISessionTimer timer, Func<Log, Action<TimerEvent>> handlerSource ) : this( logger, timer, handlerSource, new HandlerFactory<TTimer>( timer, tracker ).Create ) {}
+		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource, TTimer tracker, Func<Log, Action<TimerEvent>> handlerSource ) : this( loggerSource, tracker, new SessionTimer( tracker ), handlerSource ) {}
 
-		public ProfilerFactory( ILogger logger, ISessionTimer timer, Func<Log, Action<TimerEvent>> handlerSource, Func<MethodBase, CreateProfilerEvent> createSource )
+		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource, TTimer tracker, ISessionTimer timer, Func<Log, Action<TimerEvent>> handlerSource ) : this( loggerSource, timer, handlerSource, new HandlerFactory<TTimer>( timer, tracker ).Create ) {}
+
+		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource, ISessionTimer timer, Func<Log, Action<TimerEvent>> handlerSource, Func<MethodBase, CreateProfilerEvent> createSource )
 		{
-			this.logger = logger;
+			this.loggerSource = loggerSource;
 			this.handlerSource = handlerSource;
 			this.timer = timer;
 			this.createSource = createSource;
@@ -49,14 +52,27 @@ namespace DragonSpark.Diagnostics
 
 		protected override IProfiler CreateItem( MethodBase parameter )
 		{
-			var context = logger.ForContext( Constants.SourceContextPropertyName, $"{parameter.DeclaringType.Name}.{parameter}" );
-			var log = Services.Get<IFactory<ILogger, Log>>( typeof(TLog) ).Create( context );
+			var logger = loggerSource( parameter );
+			var log = Services.Get<IFactory<ILogger, Log>>( typeof(TLog) ).Create( logger );
 			var handler = handlerSource( log );
 
 			var factory = new ProfilerFactory( timer, createSource, handler );
 			var result = factory.Create( parameter );
 			return result;
 		}
+	}
+
+	public class MethodLoggerFactory : FactoryBase<MethodBase, ILogger>
+	{
+		readonly ILogger logger;
+
+		public MethodLoggerFactory( ILogger logger )
+		{
+			this.logger = logger;
+		}
+
+		[Freeze]
+		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForContext( Constants.SourceContextPropertyName, $"{parameter.DeclaringType.Name}.{parameter}" );
 	}
 
 	public class ProfilerFactory : FactoryBase<MethodBase, IProfiler>
@@ -301,106 +317,11 @@ namespace DragonSpark.Diagnostics
 			base.OnDispose();
 		}
 	}
-
-	/*public class ProfilerFactory : ConfiguringFactory<IProfileProcess>
-	{
-		public ProfilerFactory( ILogger logger, string context, PurgeLoggerHistoryFixedCommand purgeCommand ) 
-			: base( () => new Profiler( logger, context ), new ConfigureProfilerCommand( purgeCommand ).Run ) {}
-	}*/
-
-	/*public class ConfigureProfilerCommand : CompositeCommand
-	{
-		readonly PurgeLoggerHistoryFixedCommand purge;
-
-		public ConfigureProfilerCommand( [Required] PurgeLoggerHistoryFixedCommand purge ) : base( purge, StartProcessCommand.Instance )
-		{
-			this.purge = purge;
-		}
-
-		protected override void OnDispose()
-		{
-			base.OnDispose();
-			purge.ExecuteWith( this );
-		}
-	}*/
-
+	
 	public class StartProcessCommand : Command<IProcess>
 	{
 		public static StartProcessCommand Instance { get; } = new StartProcessCommand();
 
 		protected override void OnExecute( IProcess parameter ) => parameter.Start();
 	}
-
-	/*
-	public static class ProfilerExtensions
-	{
-		public static IProfileProcess Mark<T>( this IProfileProcess @this, string message )
-		{
-			@this.Event( $"[{typeof(T).Name}] {message}" );
-			return @this;
-		}
-	}
-
-	// [Disposable( ThrowObjectDisposedException = true )]
-	public class Profiler : IProfileProcess
-	{
-		readonly ILogger logger;
-
-		readonly Tracker timer = new Tracker();
-
-		public Profiler( [Required] ILogger logger, [NotEmpty] string context )
-		{
-			this.logger = logger.ForContext( Constants.SourceContextPropertyName, context );
-		}
-
-		public void Start()
-		{
-			Event( "Starting" );
-			timer.Initialize();
-		}
-
-		/*public IProfileProcess New()
-		{
-			return new Profiler( logger );
-		}#1#
-
-		public void Event( string @event ) => logger.Information( "@ {Time:ss':'fff} ({Since:ss':'fff}): {Event:l}", timer.Time, timer.Mark(), @event );
-
-		class Tracker : IDisposable
-		{
-			readonly Stopwatch watcher = Stopwatch.StartNew();
-
-			readonly FixedValue<TimeSpan> last = new FixedValue<TimeSpan>();
-
-			public void Initialize() => Reset( watcher.Restart );
-
-			void Reset( Action action )
-			{
-				last.Assign( default(TimeSpan) );
-				action();
-			}
-
-			public TimeSpan Time => watcher.Elapsed;
-
-			public TimeSpan Mark()
-			{
-				var result = watcher.Elapsed - last.Item;
-				last.Assign( watcher.Elapsed );
-				return result;
-			}
-
-			public void Dispose() => Reset( watcher.Stop );
-		}
-
-		public void Dispose()
-		{
-			Dispose( true );
-			GC.SuppressFinalize( this );
-		}
-
-		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
-
-		[Freeze]
-		protected virtual void OnDispose() => Event( "Complete" );
-	}*/
 }

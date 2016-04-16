@@ -23,10 +23,10 @@ namespace DragonSpark.Diagnostics
 		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, LogEventMessageFactory.Instance.Create ) {}
 	}
 
-	public class PurgeLoggerHistoryFixedCommand : FixedCommand
+	/*public class PurgeLoggerHistoryFixedCommand : FixedCommand
 	{
 		public PurgeLoggerHistoryFixedCommand( [Required] ILoggerHistory history, [Required] Action<string> output ) : base( new PurgeLoggerMessageHistoryCommand( history ), output ) {}
-	}
+	}*/
 
 	/*public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
 	{

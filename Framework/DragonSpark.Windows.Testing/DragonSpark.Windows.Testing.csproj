@@ -242,6 +242,7 @@
       <DependentUpon>Item.xaml</DependentUpon>
     </Compile>
     <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
+    <Compile Include="Diagnostics\ProfilerFactoryTests.cs" />
     <Compile Include="Io\FileSystemTests.cs" />
     <Compile Include="Modularity\DirectoryModuleInfoProviderTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

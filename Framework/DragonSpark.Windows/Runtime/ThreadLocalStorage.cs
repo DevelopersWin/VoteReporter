@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using DragonSpark.Runtime;
 
 namespace DragonSpark.Windows.Runtime
 {
@@ -27,7 +28,7 @@ namespace DragonSpark.Windows.Runtime
 		{
 			var stack = GetStack<T>();
 			stack.Push( instance );
-			return new DisposableActionContext( () => stack.Pop() );
+			return new DisposableAction( () => stack.Pop() );
 		}
 
 		public static T Peek<T>()

@@ -211,7 +211,6 @@
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
-    <Compile Include="Aspects\TracerFactoryTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="ComponentModel\AttributeProviderTests.cs">
       <SubType>Code</SubType>

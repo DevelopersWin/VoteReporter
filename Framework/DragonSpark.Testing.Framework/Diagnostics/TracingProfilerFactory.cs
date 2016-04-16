@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
@@ -8,28 +9,45 @@ using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	/*public class TracingProfilerFactory<T> : ProfilerFactory<T> where T : Category.Factory
+	public class ProfilerFactory<T> : Windows.Diagnostics.ProfilerFactory<T> where T : Category.Factory
 	{
-		// public TracingProfilerFactory( [Required] Action<string> output, [CallerMemberName]string context = null ) : this( output, new LoggerHistorySink(), context ) {}
+		readonly Action<string> output;
+		readonly ILoggerHistory history;
+		readonly IDisposable tracker;
 
-		public TracingProfilerFactory( [Required] Action<string> output, [Required] ILoggerHistory history, [CallerMemberName]string context = null ) 
-			: this( new PurgeLoggerHistoryFixedCommand( history, output ), history, context ) {}
+		public ProfilerFactory( [Required] Action<string> output ) : this( output, new LoggerHistorySink() ) {}
 
-		TracingProfilerFactory( PurgeLoggerHistoryFixedCommand purgeCommand, ILoggerHistory history, string context ) 
-			: base( new TracingLoggerFactory( history ).Create(), context, purgeCommand ) {}
-	}*/
+		public ProfilerFactory( [Required] Action<string> output, ILoggerHistory history ) : this( output, history, new List<TraceListener>() ) {}
 
-	public class TracingLoggerFactory : ConfiguringFactory<ILogger>
-	{
-		public TracingLoggerFactory( ILoggerHistory history ) : this( history, new LoggingLevelSwitch(), new LoggerTraceListenerTrackingCommand() ) {}
+		public ProfilerFactory( [Required] Action<string> output, ILoggerHistory history, IList<TraceListener> listeners ) : this( output, history, listeners, new LoggingLevelSwitch() ) {}
 
-		//public TracingLoggerFactory( ILoggerHistory history, LoggerTraceListenerTrackingCommand command ) : this( history, new LoggingLevelSwitch(), command ) {}
+		public ProfilerFactory( [Required] Action<string> output, ILoggerHistory history, IList<TraceListener> listeners, LoggingLevelSwitch levelSwitch ) : this( output, history, new RecordingLoggerFactory( history, levelSwitch ).Create(), listeners ) {}
 
-		public TracingLoggerFactory( ILoggerHistory history, LoggingLevelSwitch levelSwitch, ICommand<ILogger> command ) 
-			: base( new RecordingLoggerFactory( history, levelSwitch ).Create, command.Run ) {}
+		public ProfilerFactory( [Required] Action<string> output, ILoggerHistory history, ILogger logger ) : this( output, history, logger, new List<TraceListener>() ) {}
+
+		public ProfilerFactory( [Required] Action<string> output, ILoggerHistory history, ILogger logger, IList<TraceListener> listeners ) : this( output, history, logger, new LoggerTraceListenerTrackingCommand( listeners) ) {}
+
+		public ProfilerFactory( [Required] Action<string> output, ILoggerHistory history, ILogger logger, LoggerTraceListenerTrackingCommand command ) : this( output, history, command, new ConfiguringFactory<MethodBase, ILogger>( new MethodLoggerFactory( logger ).Create, command.Run ).Create ) {}
+
+		public ProfilerFactory( [Required] Action<string> output, ILoggerHistory history, IDisposable tracker, Func<MethodBase, ILogger> loggerSource ) : base( loggerSource )
+		{
+			this.output = output;
+			this.history = history;
+			this.tracker = tracker;
+		}
+
+		protected override IProfiler CreateItem( MethodBase parameter )
+		{
+			Action purge = () => new PurgeLoggerMessageHistoryCommand( history ).ExecuteWith( output );
+			purge();
+
+			var result = base.CreateItem( parameter ).AssociateForDispose( tracker, new DisposableAction( purge ) ).With( StartProcessCommand.Instance.Run );
+			return result;
+		}
 	}
 
 	public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>

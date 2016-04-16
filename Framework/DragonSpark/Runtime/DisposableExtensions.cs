@@ -12,9 +12,9 @@ namespace DragonSpark.Runtime
 {
 	public static class DisposableExtensions
 	{
-		public static T AssociateForDispose<T>( this T @this, IDisposable associated ) where T : IDisposable
+		public static T AssociateForDispose<T>( this T @this, params IDisposable[] associated ) where T : IDisposable
 		{
-			new Associated( @this ).Item.Ensure( associated );
+			new Associated( @this ).Item.AddRange( associated );
 			return @this;
 		}
 	}
