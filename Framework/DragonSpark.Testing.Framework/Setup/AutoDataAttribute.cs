@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Aspects;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -7,7 +8,6 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
-using DragonSpark.Windows.Diagnostics;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
@@ -15,8 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Windows.Input;
-using DragonSpark.Aspects;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -102,7 +100,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			var assign = new FixedCommand( new AssignExecutionContextCommand(), parameter.Method );
 			var configure = new FixedCommand( new AutoDataConfiguringCommandFactory( parameter, providerSource, applicationSource ).Create, parameter.ToFactory() );
-			var result = new CompositeCommand( assign, configure );
+			var result = new CompositeCommand( assign, configure ).ExecuteWith( parameter );
 			return result;
 		}
 	}

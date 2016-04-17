@@ -1,14 +1,8 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Testing.Setup;
-using System.Diagnostics;
-using System.Reflection;
-using DragonSpark.Setup;
+﻿using DragonSpark.Testing.Framework;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DragonSpark.Testing.Setup.Registration
+namespace DragonSpark.Windows.Testing.Setup.Registration
 {
 	public class MetadataRegistrationCommandTests : TestBase
 	{

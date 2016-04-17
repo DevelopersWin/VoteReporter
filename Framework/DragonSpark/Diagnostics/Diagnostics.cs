@@ -221,10 +221,15 @@ namespace DragonSpark.Diagnostics
 		public virtual void Start()
 		{
 			Total = 0;
-			Assign( current() );
+			var item = current();
+			Assign( item );
 		}
 
-		public virtual void Update() => Total += current() - Item;
+		public virtual void Update()
+		{
+			var current1 = current();
+			Total += current1 - Item;
+		}
 
 		ulong Total
 		{

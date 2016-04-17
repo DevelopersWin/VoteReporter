@@ -10,43 +10,29 @@ using System.Reflection;
 namespace DragonSpark.Aspects
 {
 	[PSerializable]
-	public class ProfileAttribute : OnMethodBoundaryAspect
+	public sealed class ProfileAttribute : OnMethodBoundaryAspect
 	{
-		readonly static Type DefaultFactoryType = typeof(ProfilerFactory<Category.Debug>);
+		public static void Initialize( [OfFactoryType]Type defaultFactoryType ) => DefaultFactoryType = defaultFactoryType;
 
-		static ProfileAttribute()
-		{
-			Initialize( DefaultFactoryType );
-		}
+		static Type DefaultFactoryType { get; set; } = typeof(ProfilerFactory<Category.Debug>);
 
-		public static void Initialize( [OfFactoryType]Type defaultFactoryType )
-		{
-			AssignedFactoryType = defaultFactoryType;
-		}
-
-		static Type AssignedFactoryType { get; set; }
-
-		public ProfileAttribute() : this( AssignedFactoryType ) {}
+		public ProfileAttribute() {}
 
 		public ProfileAttribute( [OfFactoryType] Type factoryType )
 		{
-			FactoryType = factoryType;
+			FactoryType = factoryType; 
 		}
 
 		Type FactoryType { get; set; }
 
-		Type DetermineType() => FactoryType == DefaultFactoryType ? AssignedFactoryType : FactoryType;
+		IProfiler Create( MethodBase method ) => Services.Get<IFactory<MethodBase, IProfiler>>( FactoryType ?? DefaultFactoryType ).Create( method );
 
-		IFactory<MethodBase, IProfiler> Factory { get; set; }
+		public override void OnEntry( MethodExecutionArgs args ) => args.MethodExecutionTag = Create( args.Method ).With( profiler => profiler.Start() );
 
-		public override void RuntimeInitialize( MethodBase method ) => Factory = Services.Get<IFactory<MethodBase, IProfiler>>( DetermineType() );
+		public override void OnYield( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( profiler => profiler.Pause() );
 
-		public override void OnEntry( MethodExecutionArgs args ) => args.MethodExecutionTag = Factory.Create( args.Method ).With( controller => controller.Start() );
+		public override void OnResume( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( profiler => profiler.Resume() );
 
-		public override void OnYield( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( controller => controller.Pause() );
-
-		public override void OnResume( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( controller => controller.Resume() );
-
-		public override void OnExit( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( controller => controller.Dispose() );
+		public override void OnExit( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( profiler => profiler.Dispose() );
 	}
 }

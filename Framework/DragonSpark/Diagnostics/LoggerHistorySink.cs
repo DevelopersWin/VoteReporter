@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using Serilog.Formatting.Display;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace DragonSpark.Diagnostics
 
 		public IEnumerable<LogEvent> Events => events;
 
-		public virtual void Emit( LogEvent logEvent )
+		public virtual void Emit( [Required]LogEvent logEvent )
 		{
 			source.Ensure( logEvent );
 		}

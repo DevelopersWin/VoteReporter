@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Setup;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
