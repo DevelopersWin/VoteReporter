@@ -13,8 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Diagnostics.Logger;
-using DragonSpark.Windows.Diagnostics;
 
 namespace DragonSpark.Testing.Framework
 {

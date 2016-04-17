@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	[ReaderWriterSynchronized]
+	[Synchronized]
 	public class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
 		[Reference]
@@ -26,19 +26,15 @@ namespace DragonSpark.Aspects
 			return result;
 		}
 
-		[Writer]
-		public bool Add( int code, MethodInterceptionArgs args )
+		bool Add( int code, MethodInterceptionArgs args )
 		{
-			// lock ( codes )
+			var result = !codes.Contains( code );
+			if ( result )
 			{
-				var result = !codes.Contains( code );
-				if ( result )
-				{
-					codes.Add( code );
-					items.Add( code, args.GetReturnValue() );
-				}
-				return result;
+				codes.Add( code );
+				items.Add( code, args.GetReturnValue() );
 			}
+			return result;
 		}
 
 		protected override object CreateItem( MethodInterceptionArgs parameter )
