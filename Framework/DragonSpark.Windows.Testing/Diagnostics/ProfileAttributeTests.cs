@@ -1,7 +1,5 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework;
 using Serilog.Core;
 using Serilog.Events;
@@ -24,14 +22,13 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 				Assert.Empty( history.Events );
 
 				var tester = new PerformanceTester();
-				tester.Perform();
 				tester.PlatformSpecific();
 
 				Assert.Empty( history.Events );
 
 				level.MinimumLevel = LogEventLevel.Debug;
 
-				tester.Perform();
+				tester.PlatformSpecific();
 
 				var messages = LogEventMessageFactory.Instance.Create( history.Events );
 
@@ -40,85 +37,20 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 				Assert.Contains( TimerEvents.Instance.Starting, messages.First() );
 				Assert.Contains( TimerEvents.Instance.Completed, messages.Last() );
 
-				tester.Perform();
-
-				var second = LogEventMessageFactory.Instance.Create( history.Events );
-
-				Assert.NotEmpty( second );
-				Assert.Equal( 4, second.Length );
-
-				var newest = second.Except( messages ).ToArray();
-				Assert.Equal( 2, messages.Length );
-				Assert.All( newest, s =>
-				{
-					Assert.Contains( nameof(PerformanceTester.Perform), s );
-					Assert.DoesNotContain( "CPU time: ", s );
-				} );
-				Assert.Contains( TimerEvents.Instance.Starting, newest.First() );
-				Assert.Contains( TimerEvents.Instance.Completed, newest.Last() );
-				
-				tester.PlatformSpecific();
-
-				var platform = LogEventMessageFactory.Instance.Create( history.Events );
-				Assert.Equal( 6, platform.Length );
-
-				var latest = platform.Except( second ).ToArray();
-				Assert.Equal( 2, latest.Length );
-				Assert.All( latest, s =>
+				Assert.All( messages, s =>
 				{
 					Assert.Contains( nameof(PerformanceTester.PlatformSpecific), s );
 					Assert.Contains( "CPU time: ", s );
 				} );
-				Assert.Contains( TimerEvents.Instance.Starting, latest.First() );
-				Assert.Contains( TimerEvents.Instance.Completed, latest.Last() );
+				Assert.Contains( TimerEvents.Instance.Starting, messages.First() );
+				Assert.Contains( TimerEvents.Instance.Completed, messages.Last() );
 			}
 		}
 
 		class PerformanceTester
 		{
 			[Profile]
-			public void Perform() => Thread.Sleep( 1 );
-
-			[Windows.Diagnostics.Profile]
 			public void PlatformSpecific() => Thread.Sleep( 1 );
-		}
-
-		[Fact]
-		public void Eventing()
-		{
-			Assert.Null( Ambient.GetCurrent<ProfileEvent>() );
-
-			var history = new LoggerHistorySink();
-			using ( MethodBase.GetCurrentMethod().Assign( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ) )
-			{
-				Assert.Empty( history.Events );
-
-				var sut = new EventingTester();
-				var item = sut.First();
-				Assert.NotNull( item );
-				Assert.Null( Ambient.GetCurrent<ProfileEvent>() );
-
-				var messages = LogEventMessageFactory.Instance.Create( history.Events );
-				Assert.Equal( 4, messages.Length );
-
-				var events = messages.Except( messages.First().Append( messages.Last() ) ).ToArray();
-				Assert.Contains( "Inside First", events.First() );
-				Assert.Contains( "Inside Second", events.Last() );
-			}
-			Assert.Null( Ambient.GetCurrent<ProfileEvent>() );
-		}
-
-		class EventingTester
-		{
-			[Profile]
-			public ProfileEvent First()
-			{
-				Profile.Event( "Inside First" );
-				Second();
-				return Ambient.GetCurrent<ProfileEvent>();
-			}
-
-			static void Second() => Profile.Event( "Inside Second" );
 		}
 	}
 }

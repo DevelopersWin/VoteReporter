@@ -4,7 +4,6 @@ using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
-using PostSharp.Serialization;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
@@ -18,12 +17,6 @@ namespace DragonSpark.Windows.Diagnostics
 	public class EnrichFromLogContextCommand : EnrichCommandBase
 	{
 		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.FromLogContext();
-	}
-
-	[PSerializable]
-	public sealed class ProfileAttribute : Aspects.ProfileAttribute
-	{
-		public ProfileAttribute() : base( typeof(ProfilerFactory<Category.Debug>) ) {}
 	}
 
 	public class ProfilerFactory<T> : ProfilerFactory<Timer, T> where T : Category.Factory

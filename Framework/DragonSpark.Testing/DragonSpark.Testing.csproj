@@ -228,6 +228,7 @@
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
     <Compile Include="Diagnostics\MessageRecorderTests.cs" />
     <Compile Include="Diagnostics\CompositionTests.cs" />
+    <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
     <Compile Include="Extensions\AssemblyExtensionsTests.cs" />
     <Compile Include="Extensions\BooleanExtensionsTests.cs">
       <SubType>Code</SubType>

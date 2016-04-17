@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Aspects;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
