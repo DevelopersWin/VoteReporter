@@ -19,7 +19,11 @@ namespace DragonSpark.Runtime
 
 	public class DisposableRepository : RepositoryBase<IDisposable>, IDisposableRepository
 	{
-		public void Dispose() => Store.Purge().Each( entry => entry.Item.Dispose() );
+		public void Dispose()
+		{
+			var entries = Store.Purge();
+			entries.Each( entry => entry.Item.Dispose() );
+		}
 	}
 
 	public abstract class RepositoryBase<T> : RepositoryBase<Entry<T>, T>, IRepository<T>

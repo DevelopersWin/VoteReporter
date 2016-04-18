@@ -16,11 +16,11 @@ namespace DragonSpark.Testing.Composition
 {
 	[AssemblyProvider.Register]
 	[AssemblyProvider.Types]
-	public class ConfiguredServiceProviderFactoryTests : TestBase
+	public class ApplicationServiceProviderFactoryTests : TestBase
 	{
 		public static CompositionHost From( [Required] Assembly[] assemblies ) => new CompositionFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create();
 
-		public ConfiguredServiceProviderFactoryTests( ITestOutputHelper output ) : base( output ) {}
+		public ApplicationServiceProviderFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Theory, AutoData]
 		public void BasicComposition( Assembly[] assemblies, string text, ILogger logger )
@@ -30,7 +30,8 @@ namespace DragonSpark.Testing.Composition
 				var test = container.GetExport<IBasicService>();
 				var message = test.HelloWorld( text );
 				Assert.Equal( $"Hello there! {text}", message );
-				Assert.Same( logger, container.GetExport<ILogger>() );
+				var export = container.GetExport<ILogger>();
+				Assert.Same( logger, export );
 			}
 
 			logger.Information( "This is a message" );
@@ -99,7 +100,7 @@ namespace DragonSpark.Testing.Composition
 		}
 
 		[Theory, AutoData]
-		public void Composition( Assembly[] assemblies )
+		public void Composition( Assembly[] assemblies, ILogger logger )
 		{
 			using ( var container = From( assemblies ) )
 			{

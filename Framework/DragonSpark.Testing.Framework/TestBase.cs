@@ -40,36 +40,39 @@ namespace DragonSpark.Testing.Framework
 	{
 		public static AssignExecutionContextCommand Assign( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => Assign( @this, new RecordingLoggerFactory( history, level ) );
 
-		public static AssignExecutionContextCommand Assign( this MethodBase @this, RecordingLoggerFactory factory ) => new AssignExecutionContextCommand( () => new ServiceProvider( factory ) ).ExecuteWith( @this );
+		static AssignExecutionContextCommand Assign( this MethodBase @this, RecordingLoggerFactory factory )
+		{
+			var result = new AssignExecutionContextCommand().ExecuteWith( @this );
+			DefaultServiceProvider.Instance.Assign( new ServiceProvider( factory ) );
+			return result;
+		}
 	}
 
 	public class AssignExecutionContextCommand : AssignValueCommand<MethodBase>
 	{
-		readonly IWritableValue<IServiceProvider> serviceProvider;
-		readonly IWritableValue<ServiceProvider> defaultProvider;
+		/*readonly IWritableValue<IServiceProvider> serviceProvider;
+		readonly IWritableValue<ServiceProvider> defaultProvider;*/
 
-		public AssignExecutionContextCommand() : this( DefaultServiceProvider.Instance ) {}
+		public AssignExecutionContextCommand() : this( /*CurrentServiceProvider.Instance,*/ CurrentExecution.Instance ) {}
 
-		public AssignExecutionContextCommand( Func<ServiceProvider> defaultProvider ) : this( new DefaultServiceProvider( defaultProvider ) ) {}
+		// public AssignExecutionContextCommand( Func<ServiceProvider> defaultProvider ) : this( new DefaultServiceProvider( defaultProvider ) ) {}
 
-		public AssignExecutionContextCommand( IWritableValue<ServiceProvider> defaultProvider ) : this( CurrentServiceProvider.Instance, defaultProvider, CurrentExecution.Instance ) {}
+		// public AssignExecutionContextCommand( IWritableValue<ServiceProvider> defaultProvider ) : this( CurrentServiceProvider.Instance, defaultProvider, CurrentExecution.Instance ) {}
 
-		public AssignExecutionContextCommand( IWritableValue<IServiceProvider> serviceProvider, IWritableValue<ServiceProvider> defaultProvider, IWritableValue<MethodBase> value ) : base( value )
+		public AssignExecutionContextCommand( /*IWritableValue<IServiceProvider> serviceProvider,*/ IWritableValue<MethodBase> value ) : base( value )
 		{
-			this.serviceProvider = serviceProvider;
-			this.defaultProvider = defaultProvider;
+			/*this.serviceProvider = serviceProvider;
+			this.defaultProvider = defaultProvider;*/
 		}
-
-		public IServiceProvider Provider => serviceProvider.Item;
 
 		protected override void OnExecute( MethodBase parameter )
 		{
 			base.OnExecute( parameter );
 
-			if ( serviceProvider.Item == null )
+			/*if ( serviceProvider.Item == null )
 			{
 				serviceProvider.Assign( defaultProvider.Item );
-			}
+			}*/
 		}
 	}
 

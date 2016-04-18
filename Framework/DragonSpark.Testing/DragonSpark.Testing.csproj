@@ -217,7 +217,7 @@
     </Compile>
     <Compile Include="Aspects\BuildUpTests.cs" />
     <Compile Include="ComponentModel\DefaultValueProviderTests.cs" />
-    <Compile Include="Composition\ConfiguredServiceProviderFactoryTests.cs" />
+    <Compile Include="Composition\ApplicationServiceProviderFactoryTests.cs" />
     <Compile Include="Composition\ConventionBuilderTests.cs" />
     <Compile Include="ConditionMonitorTests.cs">
       <SubType>Code</SubType>

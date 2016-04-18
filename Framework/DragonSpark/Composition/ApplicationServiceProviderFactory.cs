@@ -37,20 +37,15 @@ namespace DragonSpark.Composition
 		protected override FactoryTypeRequest CreateItem( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
 	}
 
-	public class ConfiguredServiceProviderFactory : ConfiguredServiceProviderFactory<ConfigureProviderCommand>
-	{
-		public ConfiguredServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
-
-		public ConfiguredServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
-
-		public ConfiguredServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new ServiceProviderFactory( source ).Create ) ) {}
-
-		public ConfiguredServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
-	}
-
 	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
+		static IServiceProvider Decorated { get; } = new DecoratedServiceProvider( Get );
+
+		static object Get( Type type ) => DefaultServiceProvider.Instance.Item.GetService( type );
+
 		readonly Func<CompositionContext> source;
+
+		public ServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
 
 		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
 
@@ -65,29 +60,8 @@ namespace DragonSpark.Composition
 		{
 			var context = source();
 			var primary = new ServiceLocator( context );
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, DefaultServiceProvider.Instance.Item );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, Decorated );
 			return result;
-		}
-	}
-
-	public sealed class ConfigureProviderCommand : Command<IServiceProvider>
-	{
-		readonly ILogger logger;
-		readonly IServiceProviderHost host;
-		readonly IDisposableRepository repository;
-
-		public ConfigureProviderCommand( [Required]ILogger logger, [Required]IServiceProviderHost host, [Required] IDisposableRepository repository )
-		{
-			this.logger = logger;
-			this.host = host;
-			this.repository = repository;
-		}
-
-		protected override void OnExecute( IServiceProvider parameter )
-		{
-			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
-
-			repository.Add( new AssignValueCommand<IServiceProvider>( host ).ExecuteWith( parameter ) );
 		}
 	}
 

@@ -55,11 +55,6 @@ namespace DragonSpark.Composition
 		protected override ContainerConfiguration CreateItem() => new ContainerConfiguration();
 	}
 
-	/*public class DisposingConfigurator : ContainerConfigurator
-	{
-		protected override ContainerConfiguration CreateItem( ContainerConfiguration parameter ) => parameter.WithInstance<IDisposableRepository>( new DisposableRepository() );
-	}*/
-
 	public class ContainerServicesConfigurator : ContainerConfigurator
 	{
 		protected override ContainerConfiguration CreateItem( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
@@ -124,14 +119,16 @@ namespace DragonSpark.Composition
 		readonly Assembly[] assemblies;
 		readonly Type[] types;
 		readonly Type[] core;
+		// readonly Type[] shared;
 
-		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
+		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types ) : this( assemblies, types, /*FrameworkTypes.Instance.Create(),*/ SharedFrameworkTypes.Instance.Create() ) {}
 
-		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types, [Required] Type[] core )
+		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types, [Required] Type[] core/*, [Required] Type[] shared*/ )
 		{
 			this.assemblies = assemblies;
 			this.types = types;
 			this.core = core;
+			// this.shared = shared;
 		}
 
 		protected override ContainerConfiguration CreateItem( ContainerConfiguration configuration )
@@ -148,8 +145,8 @@ namespace DragonSpark.Composition
 				.WithInstance( factoryTypes )
 				.WithInstance( locator )
 				.WithInstance<IActivator>( activator )
-				//.WithPart<Assembly[]>( new ConventionBuilder().WithSelf( builder => builder.ForType<Assembly[]>().im.AddPartMetadata( "IsImportMany", false ) ) )
-				.WithParts( core, new ConventionBuilder().WithSelf( builder => builder.ForTypesMatching( type => true ).Export().Shared().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) ) ) )
+				// .WithParts( shared, SharedFrameworkConventionBuilder.Instance.Create() )
+				.WithParts( core, FrameworkConventionBuilder.Instance.Create() )
 				.WithParts( types, AttributeProvider.Instance )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider( locator ) )
@@ -158,14 +155,21 @@ namespace DragonSpark.Composition
 			return result;
 		}
 
-		/*class ConventionBuilder : System.Composition.Convention.ConventionBuilder
+		class SharedFrameworkConventionBuilder : FrameworkConventionBuilder
 		{
-			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, ParameterInfo parameter )
-			{
-				var customAttributes = base.GetCustomAttributes( reflectedType, parameter ).Concat( parameter.ParameterType.IsArray ? new ImportAttribute().ToItem() : Default<Attribute>.Items ).ToArray();
-				return customAttributes;
-			}
-		}*/
+			public new static SharedFrameworkConventionBuilder Instance { get; } = new SharedFrameworkConventionBuilder();
+
+			protected override PartConventionBuilder Configure( ConventionBuilder builder ) => base.Configure( builder ).Shared();
+		}
+
+		public class FrameworkConventionBuilder : FactoryBase<ConventionBuilder>
+		{
+			public static FrameworkConventionBuilder Instance { get; } = new FrameworkConventionBuilder();
+
+			protected override ConventionBuilder CreateItem() => new ConventionBuilder().WithSelf( Configure );
+
+			protected virtual PartConventionBuilder Configure( ConventionBuilder builder ) => builder.ForTypesMatching( type => true ).Export().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) );
+		}
 
 		class AttributeProvider : AttributedModelProvider
 		{

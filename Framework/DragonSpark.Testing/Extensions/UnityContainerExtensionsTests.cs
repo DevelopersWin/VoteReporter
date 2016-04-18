@@ -29,14 +29,12 @@ namespace DragonSpark.Testing.Extensions
 			var sink = sut.Resolve<LoggerHistorySink>();
 			Assert.Same( sink, sut.Resolve<LoggerHistorySink>() );
 			var initial = sink.Events.Count();
-			Assert.NotEmpty( sink.Events );
+			Assert.Empty( sink.Events );
 
 			var item = sut.TryResolve<IInterface>();
 			Assert.Null( item );
 
 			Assert.Same( sut.Resolve<ISingletonLocator>(), sut.Resolve<ISingletonLocator>() );
-
-			// Assert.True( sut.IsRegistered<ISingletonLocator>() );
 
 			Assert.NotEmpty( sink.Events );
 			var count = sink.Events.Count();

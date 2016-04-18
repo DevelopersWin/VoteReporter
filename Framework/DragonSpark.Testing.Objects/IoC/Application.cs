@@ -17,28 +17,11 @@ namespace DragonSpark.Testing.Objects.IoC
 		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblyProvider.Instance.Create, applicationSource ) {}
 
 		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) 
-			: this( new Factory( assemblySource() ).Create, applicationSource ) {}
+			: base( Providers.From( data => new Activation.IoC.ServiceProviderFactory( () => new Cache( assemblySource() ).Create( data ) ).Create(), applicationSource ) ) {}
 
-		AutoDataAttribute( Func<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : base( Providers.From( providerSource, applicationSource ) ) {}
-
-		class Cache : Framework.Setup.CacheFactoryBase
+		class Cache : CacheFactoryBase
 		{
-			public Cache( Assembly[] assemblies ) : base( autoData => new ServiceProviderFactory( assemblies ).Create(), assemblies.Cast<object>().ToArray() ) {}
-		}
-
-		class Factory : FactoryBase<AutoData, IServiceProvider>
-		{
-			readonly Func<AutoData, IServiceProvider> factory;
-
-			public Factory( Assembly[] assemblies ) : this( new Cache( assemblies ).Create ) {}
-
-			Factory( Func<AutoData, IServiceProvider> factory )
-			{
-				this.factory = factory;
-			}
-
-			protected override IServiceProvider CreateItem( AutoData parameter ) => 
-				new ConfiguredServiceProviderFactory( new Func<IServiceProvider>( new Activation.IoC.ServiceProviderFactory( () => factory( parameter ) ).Create ) ).Create();
+			public Cache( Assembly[] assemblies ) : base( new ServiceProviderFactory( assemblies ).Create, assemblies.Cast<object>().ToArray() ) {}
 		}
 	}
 

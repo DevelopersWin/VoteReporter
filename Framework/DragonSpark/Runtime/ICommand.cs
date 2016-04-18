@@ -48,7 +48,7 @@ namespace DragonSpark.Runtime
 		readonly Lazy<ICommand> command;
 		readonly Lazy<object> parameter;
 
-		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.ToFactory(), parameter.ToFactory() ) {}
+		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.AsFactory, parameter.AsFactory ) {}
 
 		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter )
 		{

@@ -169,7 +169,7 @@
     <Compile Include="Activation\IoC\ExportDescriptorProvider.cs" />
     <Compile Include="Activation\IoC\IsRegisteredSpecification.cs" />
     <Compile Include="Activation\IoC\LifetimeManagerFactory.cs" />
-    <Compile Include="Activation\IoC\ServiceLocatorFactory.cs" />
+    <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
     <Compile Include="Aspects\Freeze.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />
     <Compile Include="Aspects\InterceptionArgsExtensions.cs" />
@@ -182,7 +182,7 @@
     <Compile Include="ComponentModel\DefaultValueProvider.cs" />
     <Compile Include="ComponentModel\HostedValueLocator.cs" />
     <Compile Include="ComponentModel\IDefaultValueProvider.cs" />
-    <Compile Include="Composition\ConfiguredServiceProviderFactory.cs" />
+    <Compile Include="Composition\ApplicationServiceProviderFactory.cs" />
     <Compile Include="Composition\PartsContainerConfigurator.cs" />
     <Compile Include="Composition\FactoryDelegateExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />

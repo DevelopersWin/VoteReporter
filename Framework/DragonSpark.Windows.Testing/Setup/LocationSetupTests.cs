@@ -419,7 +419,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void BasicComposition( [DragonSpark.Testing.Framework.Parameters.Service]Assembly[] assemblies, IUnityContainer container )
 		{
-			var provider = new ConfiguredServiceProviderFactory( assemblies ).Create();
+			var provider = new ServiceProviderFactory( assemblies ).Create();
 			using ( var host = provider.Get<CompositionHost>() )
 			{
 				var assembly = host.GetExport<Assembly>();
@@ -503,7 +503,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		readonly Func<IServiceProvider> source;
 
 		[ImportingConstructor]
-		public ServiceLocatorFactory( Assembly[] assemblies ) : this( new ConfiguredServiceProviderFactory( new Func<IServiceProvider>( new ServiceProviderFactory( new Func<IServiceProvider>( new Composition.ServiceProviderFactory( assemblies ).Create ) ).Create ) ).Create ) {}
+		public ServiceLocatorFactory( Assembly[] assemblies ) : this( new ServiceProviderFactory( assemblies ).Create ) {}
 
 		public ServiceLocatorFactory( Func<IServiceProvider> source )
 		{

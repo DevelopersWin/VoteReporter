@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -61,13 +62,15 @@ namespace DragonSpark.Testing.Framework.Setup
 					this.factory = factory;
 				}
 
-				protected override IServiceProvider CreateItem( AutoData parameter ) => new ConfiguredServiceProviderFactory( factory( parameter ) ).Create();
+				protected override IServiceProvider CreateItem( AutoData parameter ) => new ServiceProviderFactory( factory( parameter ) ).Create();
 			}
 		}
 	}
 
 	public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
 	{
+		protected CacheFactoryBase( Func<IServiceProvider> inner, params object[] items ) : base( data => data.Method.DeclaringType, data => inner(), items ) {}
+
 		protected CacheFactoryBase( Func<AutoData, IServiceProvider> inner, params object[] items ) : base( data => data.Method.DeclaringType, inner, items ) {}
 	}
 
@@ -81,8 +84,22 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource ) => From( providerSource, DefaultApplicationFactory );
 
-		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource, [Required] Func<IServiceProvider, IApplication> applicationSource ) => 
-			new AutoDataExecutionContextFactory( providerSource, applicationSource ).Create;
+		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource, [Required] Func<IServiceProvider, IApplication> applicationSource )
+		{
+			return new AutoDataExecutionContextFactory( providerSource, applicationSource ).Create;
+		}
+
+		/*class Factory : FactoryBase<AutoData, IServiceProvider>
+		{
+			readonly Func<AutoData, IServiceProvider> factory;
+
+			public Factory( Func<AutoData, IServiceProvider> factory )
+			{
+				this.factory = factory;
+			}
+
+			protected override IServiceProvider CreateItem( AutoData parameter ) => new ApplicationServiceProviderFactory( () => factory( parameter ) ).Create();
+		}*/
 	}
 
 	class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
@@ -99,7 +116,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override IDisposable CreateItem( AutoData parameter )
 		{
 			var assign = new FixedCommand( new AssignExecutionContextCommand(), parameter.Method );
-			var configure = new FixedCommand( new AutoDataConfiguringCommandFactory( parameter, providerSource, applicationSource ).Create, parameter.ToFactory() );
+			var configure = new FixedCommand( new AutoDataConfiguringCommandFactory( parameter, providerSource, applicationSource ).Create, parameter.AsFactory );
 			var result = new CompositeCommand( assign, configure ).ExecuteWith( parameter );
 			return result;
 		}
@@ -121,7 +138,8 @@ namespace DragonSpark.Testing.Framework.Setup
 		[Profile]
 		protected override ICommand<AutoData> CreateItem()
 		{
-			var provider = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), providerSource( autoData ) ).Emit( "Created Provider" );
+			var primary = new ApplicationServiceProviderFactory( () => providerSource( autoData ) ).Create();
+			var provider = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), primary ).Emit( "Created Provider" );
 			var application = applicationSource( provider ).Emit( "Created Application" );
 			var result = new ExecuteApplicationCommand<AutoData>( application, provider );
 			return result;

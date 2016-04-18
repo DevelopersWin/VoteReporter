@@ -1,14 +1,12 @@
 using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
+using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Core;
 using System;
-using System.Linq;
-using DragonSpark.Runtime;
-using IServiceLocator = Microsoft.Practices.ServiceLocation.IServiceLocator;
-using ServiceLocator = Microsoft.Practices.ServiceLocation.ServiceLocator;
 
 namespace DragonSpark.Activation
 {
@@ -16,26 +14,30 @@ namespace DragonSpark.Activation
 	{
 		static Services()
 		{
-			Initialize( new ServiceProvider() );
+			Initialize( CurrentServiceProvider.Instance );
 
 			ServiceLocator.SetLocatorProvider( Get<IServiceLocator> );
 		}
 
-		public static void Initialize( [Required] IServiceProvider provider ) => Provider = provider;
+		public static void Initialize( [Required] IValue<IServiceProvider> provider ) => Provider = provider;
 
-		static IServiceProvider Provider { get; set; }
+		static IValue<IServiceProvider> Provider { get; set; }
 
-		public static IServiceProvider Current => CurrentServiceProvider.Instance.Item ?? Provider;
+		/*static IServiceProvider Default { get; set; }
+
+		static IServiceProvider Current => CurrentServiceProvider.Instance.Item ?? Default;*/
 		
 		public static T Get<T>() => Get<T>( typeof(T) );
 
 		public static T Get<T>( [Required]Type type ) => (T)Get( type );
 
-		public static object Get( [Required] Type type ) => new[] { Current, Provider }.Distinct().FirstWhere( provider => provider.GetService( type ) );
+		public static object Get( [Required] Type type ) => Provider.Item.GetService( type );
 	}
 
 	public class ServiceProvider : CompositeServiceProvider
 	{
+		// public static ServiceProvider Instance { get; } = new ServiceProvider();
+
 		public ServiceProvider() : this( new RecordingLoggerFactory() ) {}
 
 		public ServiceProvider( RecordingLoggerFactory factory ) : base( new DefaultInstances( factory ), ActivatedServiceProvider.Instance ) {}

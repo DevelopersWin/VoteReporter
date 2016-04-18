@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
 
-			Assert.NotEmpty( sinkOne.Events );
+			Assert.Empty( sinkOne.Events );
 			var current = sinkOne.Events.Count();
 			first.Information( "Testing this out." );
 			Assert.NotEmpty( sinkOne.Events );
@@ -42,7 +42,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
 
-			Assert.NotEmpty( sinkOne.Events );
+			Assert.Empty( sinkOne.Events );
 			var current = sinkOne.Events.Count();
 			first.Information( "Testing this out." );
 			Assert.NotEmpty( sinkOne.Events );

@@ -4,6 +4,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Globalization;
 using System.Reflection;
+using DragonSpark.Extensions;
 using Serilog;
 
 namespace DragonSpark.Modularity
@@ -13,19 +14,19 @@ namespace DragonSpark.Modularity
 	/// </summary>
 	public class ModuleInitializer : IModuleInitializer
 	{
-		readonly private IServiceLocator serviceLocator;
+		readonly private IServiceProvider provider;
 		readonly private ILogger messageLoggerFacade;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ModuleInitializer"/>.
 		/// </summary>
-		/// <param name="serviceLocator">The container that will be used to resolve the modules by specifying its type.</param>
+		/// <param name="provider">The container that will be used to resolve the modules by specifying its type.</param>
 		/// <param name="messageLoggerFacade">The logger to use.</param>
-		public ModuleInitializer(IServiceLocator serviceLocator, ILogger messageLoggerFacade)
+		public ModuleInitializer(IServiceProvider provider, ILogger messageLoggerFacade)
 		{
-			if (serviceLocator == null)
+			if (provider == null)
 			{
-				throw new ArgumentNullException("serviceLocator");
+				throw new ArgumentNullException("provider");
 			}
 
 			if (messageLoggerFacade == null)
@@ -33,7 +34,7 @@ namespace DragonSpark.Modularity
 				throw new ArgumentNullException("messageLoggerFacade");
 			}
 
-			this.serviceLocator = serviceLocator;
+			this.provider = provider;
 			this.messageLoggerFacade = messageLoggerFacade;
 		}
 
@@ -92,15 +93,16 @@ namespace DragonSpark.Modularity
 		/// </summary>
 		/// <param name="typeName">The type name to resolve. This type must implement <see cref="IModule"/>.</param>
 		/// <returns>A new instance of <paramref name="typeName"/>.</returns>
-		protected virtual IModule CreateModule(string typeName)
-		{
-			Type moduleType = Type.GetType(typeName);
-			if (moduleType == null)
-			{
-				throw new ModuleInitializeException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedToGetType, typeName));
-			}
+		protected virtual IModule CreateModule(string typeName) => provider.Get<IModule>( DetermineType( typeName ) );
 
-			return (IModule)this.serviceLocator.GetInstance(moduleType);
+		static Type DetermineType( string typeName )
+		{
+			var moduleType = Type.GetType( typeName );
+			if ( moduleType == null )
+			{
+				throw new ModuleInitializeException( string.Format( CultureInfo.CurrentCulture, Properties.Resources.FailedToGetType, typeName ) );
+			}
+			return moduleType;
 		}
 	}
 }

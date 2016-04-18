@@ -40,7 +40,7 @@ namespace DragonSpark.Activation
 			// public Delegate( IFactory instance ) : base( instance, typeof(Delegate<T>), () => new Func<object>( instance.Create ).Convert<T>() ) {}
 		}
 
-		public static Func<T> ToFactory<T>( [Required] this T @this ) => () => @this;
+		public static T AsFactory<T>( [Required] this T @this ) => @this;
 
 		public static Delegate Convert( [Required]this Func<object> @this, [Required]Type resultType ) => (Delegate)typeof(FactoryExtensions).InvokeGeneric( nameof(Convert), resultType.ToItem(), @this );
 
