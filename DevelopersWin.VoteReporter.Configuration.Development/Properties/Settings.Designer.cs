@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DevelopersWin.VoteReporter.Configuration.Development.Properties {
+namespace DevelopersWin.VoteReporter.Parts.Development.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

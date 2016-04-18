@@ -1,6 +1,6 @@
 ﻿using System.Composition;
 
-namespace DevelopersWin.VoteReporter.Configuration.Development
+namespace DevelopersWin.VoteReporter.Parts.Development
 {
 	/// <summary>
 	/// Interaction logic for Logger.xaml

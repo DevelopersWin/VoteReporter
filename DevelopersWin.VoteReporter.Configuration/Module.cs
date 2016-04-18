@@ -2,7 +2,7 @@
 using DragonSpark.Modularity;
 using System.Globalization;
 
-namespace DevelopersWin.VoteReporter.Configuration
+namespace DevelopersWin.VoteReporter.Parts
 {
 	public class Module : MonitoredModule<Setup>
 	{

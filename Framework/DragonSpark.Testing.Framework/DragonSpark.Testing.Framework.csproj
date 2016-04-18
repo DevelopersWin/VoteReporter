@@ -18,7 +18,6 @@
     <DontImportPostSharp>True</DontImportPostSharp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PostSharpProperties>SolutionDir=$(SolutionDir);$(PostSharpProperties)</PostSharpProperties>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -28,6 +27,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <PostSharpProperties>SolutionDir=$(SolutionDir);$(PostSharpProperties)</PostSharpProperties>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <PostSharpProperties>SolutionDir=$(SolutionDir);$(PostSharpProperties)</PostSharpProperties>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">

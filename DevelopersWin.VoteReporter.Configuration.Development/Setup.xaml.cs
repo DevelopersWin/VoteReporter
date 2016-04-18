@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
 
-namespace DevelopersWin.VoteReporter.Configuration.Development
+namespace DevelopersWin.VoteReporter.Parts.Development
 {
 	/// <summary>
 	/// Interaction logic for Setup.xaml

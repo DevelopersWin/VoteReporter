@@ -1,4 +1,4 @@
-﻿namespace DevelopersWin.VoteReporter.Configuration
+﻿namespace DevelopersWin.VoteReporter.Parts
 {
 	/// <summary>
 	/// Interaction logic for Setup.xaml

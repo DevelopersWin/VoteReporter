@@ -4,7 +4,7 @@ using DragonSpark.Modularity;
 using System;
 using System.Linq;
 
-namespace DevelopersWin.VoteReporter.Configuration.Development
+namespace DevelopersWin.VoteReporter.Parts.Development
 {
 	public class Module : MonitoredModule<Setup>
 	{
