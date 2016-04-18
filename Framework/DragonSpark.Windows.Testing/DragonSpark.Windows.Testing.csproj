@@ -355,6 +355,10 @@
       <Project>{65ccd995-c347-48b1-b017-d09e917bd252}</Project>
       <Name>DragonSpark.Testing.Objects</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DragonSpark.Testing.Parts.Development\DragonSpark.Testing.Parts.Development.csproj" Condition=" '$(Configuration)' == 'Debug' ">
+      <Project>{5f01891d-ffb9-485b-bd5f-c072ef00de59}</Project>
+      <Name>DragonSpark.Testing.Parts.Development</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DragonSpark.Types.Windows\DragonSpark.Types.Windows.csproj">
       <Project>{82e56091-dd33-4f8d-a9d9-8948f3d6f820}</Project>
       <Name>DragonSpark.Types.Windows</Name>
