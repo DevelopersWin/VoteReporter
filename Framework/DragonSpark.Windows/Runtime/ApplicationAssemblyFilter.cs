@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class ApplicationAssemblyFilter : TypeSystem.ApplicationAssemblyFilter
+	public class ApplicationAssemblyFilter : DragonSpark.TypeSystem.ApplicationAssemblyFilter
 	{
 		public new static ApplicationAssemblyFilter Instance { get; } = new ApplicationAssemblyFilter();
 

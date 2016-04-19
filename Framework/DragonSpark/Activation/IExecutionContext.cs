@@ -24,8 +24,8 @@ namespace DragonSpark.Activation
 	{
 		public static ExecutionContext Instance { get; } = new ExecutionContext();
 
-		readonly object defaultContext = new object();
+		const string Default = "DefaultExecutionContext";
 
-		public override object Item => base.Item ?? defaultContext;
+		public override object Item => base.Item ?? Default;
 	}
 }

@@ -13,7 +13,9 @@ namespace DragonSpark.Windows.Runtime
 	public class ApplicationAssemblyLocator : FirstFactory<Assembly>, IApplicationAssemblyLocator
 	{
 		[ImportingConstructor]
-		public ApplicationAssemblyLocator( [Required]DomainApplicationAssemblyLocator domain, [Required]TypeSystem.ApplicationAssemblyLocator system ) : base( domain, system ) {}
+		public ApplicationAssemblyLocator( [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( DomainApplicationAssemblyLocator.Instance, system ) {}
+
+		public ApplicationAssemblyLocator( [Required]DomainApplicationAssemblyLocator domain, [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( domain, system ) {}
 	}
 
 	public class DomainApplicationAssemblyLocator : FactoryBase<Assembly>

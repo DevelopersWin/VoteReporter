@@ -3,6 +3,7 @@ using DragonSpark.Testing.Framework;
 using Serilog;
 using System.Composition;
 using System.Linq;
+using DragonSpark.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,7 +24,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
 
-			Assert.Empty( sinkOne.Events );
+			Assert.Single( sinkOne.Events );
 			var current = sinkOne.Events.Count();
 			first.Information( "Testing this out." );
 			Assert.NotEmpty( sinkOne.Events );
@@ -42,7 +43,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
 
-			Assert.Empty( sinkOne.Events );
+			Assert.Single( sinkOne.Events );
 			var current = sinkOne.Events.Count();
 			first.Information( "Testing this out." );
 			Assert.NotEmpty( sinkOne.Events );

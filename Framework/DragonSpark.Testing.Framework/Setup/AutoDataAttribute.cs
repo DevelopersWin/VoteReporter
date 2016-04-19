@@ -78,28 +78,10 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly static Func<IServiceProvider, IApplication> DefaultApplicationFactory = provider => new Application( provider );
 
-		// public static Func<AutoData, IDisposable> Cached( [Required] IFactory<AutoData, IServiceProvider> providerSource, params object[] items ) => From( new CachedDecoratedFactory( providerSource.Create, items ).Create );
-
-		// public static Func<AutoData, IDisposable> From( [Required] IFactory<AutoData, IServiceProvider> providerSource ) => From( providerSource.Create );
-
 		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource ) => From( providerSource, DefaultApplicationFactory );
 
-		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource, [Required] Func<IServiceProvider, IApplication> applicationSource )
-		{
-			return new AutoDataExecutionContextFactory( providerSource, applicationSource ).Create;
-		}
-
-		/*class Factory : FactoryBase<AutoData, IServiceProvider>
-		{
-			readonly Func<AutoData, IServiceProvider> factory;
-
-			public Factory( Func<AutoData, IServiceProvider> factory )
-			{
-				this.factory = factory;
-			}
-
-			protected override IServiceProvider CreateItem( AutoData parameter ) => new ApplicationServiceProviderFactory( () => factory( parameter ) ).Create();
-		}*/
+		public static Func<AutoData, IDisposable> From( [Required] Func<AutoData, IServiceProvider> providerSource, [Required] Func<IServiceProvider, IApplication> applicationSource ) => 
+			new AutoDataExecutionContextFactory( providerSource, applicationSource ).Create;
 	}
 
 	class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>

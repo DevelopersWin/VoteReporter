@@ -12,7 +12,9 @@ using Serilog;
 using Serilog.Core;
 using System;
 using System.Reflection;
+using DragonSpark.Windows.TypeSystem;
 using Xunit.Abstractions;
+using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework
 {
@@ -27,8 +29,10 @@ namespace DragonSpark.Testing.Framework
 		{
 			using ( new AssignExecutionContextCommand().ExecuteWith( args.Method ) )
 			{
-				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? DebugOutputCommand.Instance.Run;
-				using ( new Diagnostics.ProfilerFactory<Category.Debug>( output, Services.Get<ILogger>(), Services.Get<ILoggerHistory>() ).Create( args.Method ) )
+				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? IgnoredOutputCommand.Instance.Run;
+				var history = Services.Get<ILoggerHistory>();
+				var logger = Services.Get<ILogger>();
+				using ( new Diagnostics.ProfilerFactory<Category.Debug>( output, logger, history ).Create( args.Method ) )
 				{
 					args.Proceed();
 				}
@@ -53,11 +57,11 @@ namespace DragonSpark.Testing.Framework
 		/*readonly IWritableValue<IServiceProvider> serviceProvider;
 		readonly IWritableValue<ServiceProvider> defaultProvider;*/
 
-		public AssignExecutionContextCommand() : this( /*CurrentServiceProvider.Instance,*/ CurrentExecution.Instance ) {}
+		public AssignExecutionContextCommand() : this( /*CurrentServiceProvider.Instance,*/ ExecutionContext.Instance ) {}
 
 		// public AssignExecutionContextCommand( Func<ServiceProvider> defaultProvider ) : this( new DefaultServiceProvider( defaultProvider ) ) {}
 
-		// public AssignExecutionContextCommand( IWritableValue<ServiceProvider> defaultProvider ) : this( CurrentServiceProvider.Instance, defaultProvider, CurrentExecution.Instance ) {}
+		// public AssignExecutionContextCommand( IWritableValue<ServiceProvider> defaultProvider ) : this( CurrentServiceProvider.Instance, defaultProvider, ExecutionContext.Instance ) {}
 
 		public AssignExecutionContextCommand( /*IWritableValue<IServiceProvider> serviceProvider,*/ IWritableValue<MethodBase> value ) : base( value )
 		{
@@ -67,6 +71,8 @@ namespace DragonSpark.Testing.Framework
 
 		protected override void OnExecute( MethodBase parameter )
 		{
+			AssemblyInitializer.Instance.ExecuteWith( parameter.DeclaringType.Assembly );
+
 			base.OnExecute( parameter );
 
 			/*if ( serviceProvider.Item == null )

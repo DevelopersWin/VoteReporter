@@ -24,10 +24,7 @@ namespace DragonSpark.Diagnostics
 
 		public IEnumerable<LogEvent> Events => events;
 
-		public virtual void Emit( LogEvent logEvent )
-		{
-			source.Ensure( logEvent );
-		}
+		public virtual void Emit( LogEvent logEvent ) => source.Ensure( logEvent );
 	}
 
 	public class LogEventMessageFactory : FactoryBase<IEnumerable<LogEvent>, string[]>

@@ -78,7 +78,7 @@ namespace DragonSpark.Windows.Diagnostics
 
 	public class TimerEventTemplate : LoggerTemplate
 	{
-		public TimerEventTemplate( TimerEvent<Timer> timerEvent ) : base( "CPU time: {CpuTime} ms", timerEvent.Tracker.CpuElapsed ) {}
+		public TimerEventTemplate( TimerEvent<Timer> timerEvent ) : base( "CPU time: {CpuTime:ss':'fff}", timerEvent.Tracker.CpuElapsed ) {}
 	}
 
 	public class CpuTime

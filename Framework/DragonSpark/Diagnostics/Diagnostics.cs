@@ -91,7 +91,11 @@ namespace DragonSpark.Diagnostics
 		protected override IProfiler CreateItem( MethodBase parameter )
 		{
 			EmitProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Run;
-			var command = new AmbientContextCommand<EmitProfileEvent>().ExecuteWith( action );
+			var command = new AmbientContextCommand<EmitProfileEvent>().ExecuteWith( new EmitProfileEvent( name =>
+			{
+				timer.Update();
+				action( name );
+			} ) );
 			var result = new Profiler( timer, action ).AssociateForDispose( command );
 			return result;
 		}
@@ -152,7 +156,7 @@ namespace DragonSpark.Diagnostics
 	public class TimerEventTemplate : LoggerTemplate
 	{
 		public TimerEventTemplate( TimerEvent<Timer> profilerEvent ) 
-			: base(	"[{Event:l}] - Wall time {WallTime:ss':'fff} ms; Synchronous time {SynchronousTime:ss':'fff} ms", profilerEvent.EventName, profilerEvent.Timer.Elapsed, profilerEvent.Tracker.Elapsed ) {}
+			: base(	"[{Event:l}] - Wall time {WallTime:ss':'fff}; Synchronous time {SynchronousTime:ss':'fff}", profilerEvent.EventName, profilerEvent.Timer.Elapsed, profilerEvent.Tracker.Elapsed ) {}
 	}
 
 	public class CompositeLoggerTemplate : LoggerTemplate
@@ -221,15 +225,10 @@ namespace DragonSpark.Diagnostics
 		public virtual void Start()
 		{
 			Total = 0;
-			var item = current();
-			Assign( item );
+			Assign( current() );
 		}
 
-		public virtual void Update()
-		{
-			var current1 = current();
-			Total += current1 - Item;
-		}
+		public virtual void Update() => Total += current() - Item;
 
 		ulong Total
 		{

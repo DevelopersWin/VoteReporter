@@ -69,7 +69,7 @@ namespace DragonSpark.Diagnostics
 			this.source = source;
 		}
 
-		protected override ILogger CreateItem() => source().CreateLogger().ForContext( Constants.SourceContextPropertyName, "Default" );
+		protected override ILogger CreateItem() => source().CreateLogger().ForContext( Constants.SourceContextPropertyName, Execution.Current.AsString() );
 	}
 
 	public class LoggingConfigurationSourceFactory : FactoryBase<LoggerConfiguration>

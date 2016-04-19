@@ -1,15 +1,16 @@
 using System.Linq;
 using DragonSpark.Activation;
 using System.Reflection;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class CurrentExecution : AssignedLogical<MethodBase>, IExecutionContext
+	public class ExecutionContext : AssignedLogical<MethodBase>, IExecutionContext
 	{
-		public static CurrentExecution Instance { get; } = new CurrentExecution();
+		readonly MethodInfo Default = typeof(Services).GetMethods().First( info => info.Name == nameof(Services.Get) );
 
-		public override MethodBase Item => base.Item ?? MethodBase.GetCurrentMethod();
+		public static ExecutionContext Instance { get; } = new ExecutionContext();
+
+		public override MethodBase Item => base.Item ?? Default;
 
 		// public override string ToString() => Item.ToString();
 	}

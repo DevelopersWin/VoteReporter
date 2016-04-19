@@ -13,13 +13,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework
 {
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Activation.Execution.Initialize( CurrentExecution.Instance );
+		public static void Execution() => Activation.Execution.Initialize( ExecutionContext.Instance );
 
 		[ModuleInitializer( 1 )]
 		public static void Environment() => InitializeJetBrainsTaskRunnerCommand.Instance.ExecuteWith( AppDomain.CurrentDomain.SetupInformation );

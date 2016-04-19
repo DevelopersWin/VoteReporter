@@ -16,7 +16,7 @@ namespace DragonSpark.Windows.TypeSystem
 		protected override Assembly[] CreateItem( string parameter )
 		{
 			var directoryInfo = new DirectoryInfo( "." );
-			var result = directoryInfo.GetFileSystemInfos( parameter ).Where( info => info.Extension == ".dll" ).Select( info => info.FullName ).Select( Assembly.Load ).Fixed();
+			var result = directoryInfo.GetFileSystemInfos( parameter ).Where( info => info.Extension == ".dll" ).Select( info => info.FullName ).Select( Assembly.LoadFile ).Fixed();
 			return result;
 		}
 	}

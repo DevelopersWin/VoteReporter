@@ -29,7 +29,7 @@ namespace DragonSpark.Testing.Extensions
 			var sink = sut.Resolve<LoggerHistorySink>();
 			Assert.Same( sink, sut.Resolve<LoggerHistorySink>() );
 			var initial = sink.Events.Count();
-			Assert.Empty( sink.Events );
+			Assert.Single( sink.Events );
 
 			var item = sut.TryResolve<IInterface>();
 			Assert.Null( item );
