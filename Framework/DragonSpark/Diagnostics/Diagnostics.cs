@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -9,7 +10,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Aspects;
 using Log = DragonSpark.Diagnostics.Logger.Log;
 
 namespace DragonSpark.Diagnostics
@@ -90,18 +90,18 @@ namespace DragonSpark.Diagnostics
 
 		protected override IProfiler CreateItem( MethodBase parameter )
 		{
-			ProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Run;
-			var command = new AmbientContextCommand<ProfileEvent>().ExecuteWith( action );
+			EmitProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Run;
+			var command = new AmbientContextCommand<EmitProfileEvent>().ExecuteWith( action );
 			var result = new Profiler( timer, action ).AssociateForDispose( command );
 			return result;
 		}
 	}
 
-	public delegate void ProfileEvent( string name );
+	public delegate void EmitProfileEvent( string name );
 
 	public static class Profile
 	{
-		public static void Event( string name ) => Ambient.GetCurrent<ProfileEvent>()( name );
+		public static void Event( string name ) => Ambient.GetCurrent<EmitProfileEvent>()( name );
 
 		public static T Emit<T>( this T @this, string name )
 		{
@@ -264,12 +264,12 @@ namespace DragonSpark.Diagnostics
 	public class Profiler : IProfiler
 	{
 		readonly ISessionTimer inner;
-		readonly ProfileEvent handler;
+		readonly EmitProfileEvent handler;
 		readonly TimerEvents events;
 
-		public Profiler( ISessionTimer inner, ProfileEvent handler ) : this( inner, handler, TimerEvents.Instance ) {}
+		public Profiler( ISessionTimer inner, EmitProfileEvent handler ) : this( inner, handler, TimerEvents.Instance ) {}
 
-		public Profiler( ISessionTimer inner, ProfileEvent handler, TimerEvents events )
+		public Profiler( ISessionTimer inner, EmitProfileEvent handler, TimerEvents events )
 		{
 			this.inner = inner;
 			this.handler = handler;

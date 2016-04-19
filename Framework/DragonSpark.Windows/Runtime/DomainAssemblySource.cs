@@ -14,8 +14,7 @@ namespace DragonSpark.Windows.Runtime
 
 		readonly AppDomain domain;
 
-		public DomainAssemblySource() : this( AppDomain.CurrentDomain )
-		{}
+		public DomainAssemblySource() : this( AppDomain.CurrentDomain ) {}
 
 		public DomainAssemblySource( [Required]AppDomain domain )
 		{

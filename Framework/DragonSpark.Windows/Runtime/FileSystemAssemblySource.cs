@@ -11,7 +11,8 @@ namespace DragonSpark.Windows.Runtime
 
 		protected override Assembly[] CreateItem()
 		{
-			var result = AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true )
+			var fromAssembliesInBasePath = AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true );
+			var result = fromAssembliesInBasePath
 				.Where( x => x.Namespace != null )
 				.GroupBy( type => type.Assembly )
 				.Select( types => types.Key ).ToArray();

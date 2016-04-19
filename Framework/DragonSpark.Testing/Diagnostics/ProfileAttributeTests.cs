@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework;
@@ -8,7 +9,6 @@ using Serilog.Events;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using DragonSpark.Diagnostics.Logger;
 using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
@@ -19,7 +19,7 @@ namespace DragonSpark.Testing.Diagnostics
 		public void Logger()
 		{
 			var history = new LoggerHistorySink();
-			var level = new LoggingLevelSwitch();
+			var level = LoggingLevelSwitchFactory.Instance.Create();
 			using ( MethodBase.GetCurrentMethod().Assign( history, level ) )
 			{
 				Assert.Empty( history.Events );
@@ -68,7 +68,7 @@ namespace DragonSpark.Testing.Diagnostics
 		[Fact]
 		public void Eventing()
 		{
-			Assert.Null( Ambient.GetCurrent<ProfileEvent>() );
+			Assert.Null( Ambient.GetCurrent<EmitProfileEvent>() );
 
 			var history = new LoggerHistorySink();
 			using ( MethodBase.GetCurrentMethod().Assign( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ) )
@@ -78,7 +78,7 @@ namespace DragonSpark.Testing.Diagnostics
 				var sut = new EventingTester();
 				var item = sut.First();
 				Assert.NotNull( item );
-				Assert.Null( Ambient.GetCurrent<ProfileEvent>() );
+				Assert.Null( Ambient.GetCurrent<EmitProfileEvent>() );
 
 				var messages = LogEventMessageFactory.Instance.Create( history.Events );
 				Assert.Equal( 4, messages.Length );
@@ -87,17 +87,17 @@ namespace DragonSpark.Testing.Diagnostics
 				Assert.Contains( "Inside First", events.First() );
 				Assert.Contains( "Inside Second", events.Last() );
 			}
-			Assert.Null( Ambient.GetCurrent<ProfileEvent>() );
+			Assert.Null( Ambient.GetCurrent<EmitProfileEvent>() );
 		}
 
 		class EventingTester
 		{
 			[Profile]
-			public ProfileEvent First()
+			public EmitProfileEvent First()
 			{
 				Profile.Event( "Inside First" );
 				Second();
-				return Ambient.GetCurrent<ProfileEvent>();
+				return Ambient.GetCurrent<EmitProfileEvent>();
 			}
 
 			static void Second() => Profile.Event( "Inside Second" );

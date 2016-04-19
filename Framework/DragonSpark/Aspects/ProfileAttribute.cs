@@ -12,10 +12,6 @@ namespace DragonSpark.Aspects
 	[PSerializable]
 	public sealed class ProfileAttribute : OnMethodBoundaryAspect
 	{
-		public static void Initialize( [OfFactoryType]Type defaultFactoryType ) => DefaultFactoryType = defaultFactoryType;
-
-		static Type DefaultFactoryType { get; set; } = typeof(ProfilerFactory<Category.Debug>);
-
 		public ProfileAttribute() {}
 
 		public ProfileAttribute( [OfFactoryType] Type factoryType )
@@ -25,7 +21,7 @@ namespace DragonSpark.Aspects
 
 		Type FactoryType { get; set; }
 
-		IProfiler Create( MethodBase method ) => Services.Get<IFactory<MethodBase, IProfiler>>( FactoryType ?? DefaultFactoryType ).Create( method );
+		IProfiler Create( MethodBase method ) => Services.Get<IFactory<MethodBase, IProfiler>>( FactoryType ?? Diagnostics.Configuration.Default.ProfilerFactoryType ).Create( method );
 
 		public override void OnEntry( MethodExecutionArgs args ) => args.MethodExecutionTag = Create( args.Method ).With( profiler => profiler.Start() );
 

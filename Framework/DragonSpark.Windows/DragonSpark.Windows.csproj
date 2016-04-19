@@ -321,6 +321,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\ThreadLocalStorage.cs" />
     <Compile Include="Runtime\TaskLocalValue.cs" />
+    <Compile Include="TypeSystem\Class1.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

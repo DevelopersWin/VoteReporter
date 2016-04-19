@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 		// public ProfilerFactory( Action<string> output ) : this( output, new LoggerHistorySink() ) {}
 
-		// public ProfilerFactory( Action<string> output, ILoggerHistory history ) : this( output, history, new LoggingLevelSwitch(), new List<TraceListener>() ) {}
+		// public ProfilerFactory( Action<string> output, ILoggerHistory history ) : this( output, history, LoggingLevelSwitchFactory.Instance.Create(), new List<TraceListener>() ) {}
 
 		// public ProfilerFactory( Action<string> output, ILoggerHistory history, LoggingLevelSwitch levelSwitch, IList<TraceListener> listeners ) : this( output, new RecordingLoggerFactory( history, levelSwitch ).Create(), history, listeners ) {}
 

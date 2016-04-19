@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Testing.Framework;
-using Serilog.Core;
 using Serilog.Events;
 using System.Linq;
 using System.Reflection;
@@ -16,7 +15,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		public void Logger()
 		{
 			var history = new LoggerHistorySink();
-			var level = new LoggingLevelSwitch();
+			var level = LoggingLevelSwitchFactory.Instance.Create();
 			using ( MethodBase.GetCurrentMethod().Assign( history, level ) )
 			{
 				Assert.Empty( history.Events );

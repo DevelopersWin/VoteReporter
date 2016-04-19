@@ -39,6 +39,12 @@ namespace DragonSpark.Windows.Testing.Setup
 	/// </summary>
 	public class LocationSetupTests : TestBase
 	{
+		/*static LocationSetupTests()
+		{
+			var s = typeof(DragonSpark.Testing.Parts.Development.Initialize).ToString();
+			Debugger.Break();
+		}*/
+
 		public LocationSetupTests( ITestOutputHelper output ) : base( output )
 		{}
 

@@ -127,7 +127,7 @@
     <value>Module {0} depends on other modules that don't belong to the same group.</value>
   </data>
   <data name="DuplicatedModule" xml:space="preserve">
-    <value>A duplicated module with name {0} has been found by the loader.</value>
+    <value>A duplicated module with name {0} has been found by the resolver.</value>
   </data>
   <data name="StartupModuleDependsOnAnOnDemandModule" xml:space="preserve">
     <value>Module {0} is marked for automatic initialization when the application starts, but it depends on modules that are marked as OnDemand initialization. To fix this error, mark the dependency modules for InitializationMode=WhenAvailable, or remove this validation by extending the ModuleCatalog class.</value>

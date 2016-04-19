@@ -1,4 +1,6 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
@@ -98,9 +100,37 @@ namespace DragonSpark.Diagnostics
 		protected override LoggerConfiguration CreateItem( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( recorder );
 	}
 
+	public class Configuration
+	{
+		public static Configuration Default { get; } = new Configuration();
+
+		static Configuration()
+		{
+			Initialize( typeof(ProfilerFactory<Category.Debug>) );
+			Initialize( LogEventLevel.Information );
+		}
+
+		public static void Initialize( [OfFactoryType]Type defaultFactoryType ) => Default.ProfilerFactoryType = defaultFactoryType;
+
+		public static void Initialize( LogEventLevel level ) => Default.Level = level;
+
+		public Type ProfilerFactoryType { get; private set; }
+
+		public LogEventLevel Level { get; private set; }
+	}
+
+	public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>
+	{
+		public static LoggingLevelSwitchFactory Instance { get; } = new LoggingLevelSwitchFactory();
+
+		protected override LoggingLevelSwitch CreateItem() => new LoggingLevelSwitch { MinimumLevel = Configuration.Default.Level };
+	}
+
 	public class RecordingLoggerFactory : LoggerFactory
 	{
-		public RecordingLoggerFactory( params ITransformer<LoggerConfiguration>[] transformers ) : this( new LoggerHistorySink(), new LoggingLevelSwitch(), transformers ) {}
+		public RecordingLoggerFactory( params ITransformer<LoggerConfiguration>[] transformers ) : this( new LoggerHistorySink(), transformers ) {}
+
+		public RecordingLoggerFactory( [Required]ILoggerHistory history, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, LoggingLevelSwitchFactory.Instance.Create(), transformers ) {}
 
 		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, levelSwitch, new RecordingLoggingConfigurationFactory( history, levelSwitch, transformers ).Create ) {}
 

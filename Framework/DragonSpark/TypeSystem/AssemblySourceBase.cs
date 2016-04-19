@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -10,6 +11,71 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
+	public interface IAssemblyLoader
+	{
+		void Load( Assembly reference, string search );
+	}
+
+	public class LoadPartAssemblyCommand : Command<Assembly>
+	{
+		readonly IAssemblyLoader provider;
+		readonly string searchQuery;
+
+		public LoadPartAssemblyCommand( IAssemblyLoader provider, string searchQuery = "{0}.Parts.*" )
+		{
+			this.provider = provider;
+			this.searchQuery = searchQuery;
+		}
+
+		protected override void OnExecute( Assembly parameter ) => provider.Load( parameter, searchQuery );
+	}
+
+	public class AssemblyHintProvider : FactoryBase<Assembly, string>
+	{
+		public static AssemblyHintProvider Instance { get; } = new AssemblyHintProvider();
+
+		protected override string CreateItem( Assembly parameter ) => parameter.GetName().Name;
+	}
+
+	public class AssemblyLoader : IAssemblyLoader
+	{
+		readonly Func<Assembly, string> hintSource;
+		readonly Func<string, IEnumerable<Assembly>> assemblySource;
+		readonly Action<Assembly> initialize;
+
+		// public static AssemblyLoader Instance { get; } = new AssemblyLoader( AssemblyHintProvider.Instance.Create );
+
+		public AssemblyLoader( Func<string, IEnumerable<Assembly>> assemblySource, Action<Assembly> initialize ) : this( AssemblyHintProvider.Instance.Create, assemblySource, initialize ) {}
+
+		public AssemblyLoader( Func<Assembly, string> hintSource, Func<string, IEnumerable<Assembly>> assemblySource, Action<Assembly> initialize )
+		{
+			this.hintSource = hintSource;
+			this.assemblySource = assemblySource;
+			this.initialize = initialize;
+		}
+
+		public void Load( Assembly reference, string search )
+		{
+			var hint = hintSource( reference );
+			var stack = new Stack<string>( hint.Split( '.' ) );
+			while ( stack.Any() )
+			{
+				var name = string.Join( ".", stack.Reverse() );
+				var path = string.Format( search, name );
+				var items = assemblySource( path ).Fixed();
+				if ( items.Any() )
+				{
+					items.Each( initialize );
+					stack.Clear();
+				}
+				else
+				{
+					stack.Pop();
+				}
+			}
+		}
+	}
+
 	public class FactoryTypeRequest : LocateTypeRequest
 	{
 		public FactoryTypeRequest( [Required]Type runtimeType, string name, [Required]Type resultType ) :  base( runtimeType, name )
