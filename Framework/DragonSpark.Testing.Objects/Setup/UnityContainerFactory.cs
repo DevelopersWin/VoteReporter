@@ -3,6 +3,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using System.Reflection;
 using DragonSpark.Setup;
+using ServiceProviderFactory = DragonSpark.Setup.ServiceProviderFactory;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -15,7 +16,7 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		public UnityContainerFactory() : base( new ApplicationServiceProviderFactory( Default<Assembly>.Items ).Create ) {}
+		public UnityContainerFactory() : base( new ServiceProviderFactory( Default<Assembly>.Items ).Create ) {}
 	}
 
 	/*[Export, Shared]

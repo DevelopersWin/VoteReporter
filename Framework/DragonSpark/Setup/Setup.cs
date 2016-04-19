@@ -21,15 +21,15 @@ using Type = System.Type;
 
 namespace DragonSpark.Setup
 {
-	public class ApplicationServiceProviderFactory : ConfiguredServiceProviderFactory<ConfigureProviderCommand>
+	public class ServiceProviderFactory : ConfiguredServiceProviderFactory<ConfigureProviderCommand>
 	{
-		public ApplicationServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
+		public ServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
 
-		public ApplicationServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
+		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
 
-		public ApplicationServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new ServiceProviderFactory( source ).Create ) ) {}
+		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new Composition.ServiceProviderFactory( source ).Create ) ) {}
 
-		public ApplicationServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
+		public ServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
 	}
 
 	public sealed class ConfigureProviderCommand : Command<IServiceProvider>
