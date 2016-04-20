@@ -56,7 +56,6 @@ namespace DragonSpark.Activation.IoC
 	class ConstructorSelectorPolicy : IConstructorSelectorPolicy
 	{
 		readonly Func<ISpecification<TypeRequest>> source;
-		// public static ConstructorSelectorPolicy Instance { get; } = new ConstructorSelectorPolicy();
 
 		public ConstructorSelectorPolicy( Func<ISpecification<TypeRequest>> source )
 		{
