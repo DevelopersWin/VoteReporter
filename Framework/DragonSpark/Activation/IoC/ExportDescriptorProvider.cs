@@ -1,4 +1,5 @@
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
 using Microsoft.Practices.ObjectBuilder2;
@@ -7,7 +8,6 @@ using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
-using System.Composition;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -17,22 +17,25 @@ namespace DragonSpark.Activation.IoC
 		readonly ILogger logger;
 		readonly IBuildPlanRepository repository;
 		readonly Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
+		readonly ISpecification<LocateTypeRequest> specification;
 		readonly IStrategyRepository strategies;
 
-		public ServicesIntegrationExtension( IServiceProvider provider, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, provider.Get<ILogger>(), strategies, repository, registry ) {}
+		public ServicesIntegrationExtension( IServiceProvider provider, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, provider.Get<ILogger>(), strategies, repository, registry, new HasFactorySpecification( provider.Get<FactoryTypeRequestLocator>() ).Inverse() ) {}
 
-		ServicesIntegrationExtension( IServiceProvider provider, ILogger logger, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry )
+		ServicesIntegrationExtension( IServiceProvider provider, ILogger logger, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
 		{
 			this.provider = provider;
 			this.logger = logger;
 			this.repository = repository;
 			this.registry = registry;
+			this.specification = specification;
 			this.strategies = strategies;
 		}
 
 		protected override void Initialize()
 		{
 			Container.RegisterInstance( logger );
+			Container.RegisterInstance( specification );
 
 			var entries = new[]
 			{

@@ -52,9 +52,9 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly ILogger logger;
 		readonly IBuildPlanRepository repository;
-		readonly HasFactorySpecification specification;
+		readonly ISpecification<LocateTypeRequest> specification;
 
-		public CachingBuildPlanExtension( ILogger logger, IBuildPlanRepository repository, HasFactorySpecification specification )
+		public CachingBuildPlanExtension( ILogger logger, IBuildPlanRepository repository, ISpecification<LocateTypeRequest> specification )
 		{
 			this.logger = logger;
 			this.repository = repository;
@@ -65,7 +65,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			var policies = repository.List();
 			var policy = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) );
-			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( new TryContext( logger ).Try, specification.Inverse(), policies, policy ) );
+			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( new TryContext( logger ).Try, specification, policies, policy ) );
 			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
 		}
 
