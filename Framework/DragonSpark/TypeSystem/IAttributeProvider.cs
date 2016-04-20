@@ -3,13 +3,13 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
-using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Nito.ConnectedProperties;
 
 namespace DragonSpark.TypeSystem
 {
@@ -27,32 +27,21 @@ namespace DragonSpark.TypeSystem
 
 		public int Code => value.Value;
 	}
+
 	public static class Attributes
 	{
-		readonly static object locker = new object();
-
-		sealed class Cached<T> : AssociatedValue<IAttributeProvider> where T : AttributeProviderFactoryBase
+		/*sealed class Cached<T> : AssociatedValue<IAttributeProvider> where T : AttributeProviderFactoryBase
 		{
-			public Cached( object instance ) : base( instance, () =>
-			{
-				// var before = $"Current: {CurrentServiceProvider.Instance?.Item} ({CurrentServiceProvider.Instance?.Item?.GetHashCode()}), Services.Current: {Services.Current} ({Services.Current.GetHashCode()}) - , Services.Provider: {Services.Provider} ({Services.Provider.GetHashCode()}) - {Execution.Current}";
-				var activator = Services.Get<T>();
-				//var after = $"Current: {CurrentServiceProvider.Instance?.Item} ({CurrentServiceProvider.Instance?.Item?.GetHashCode()}), Services.Current: {Services.Current} ({Services.Current.GetHashCode()}) - , Services.Provider: {Services.Provider} ({Services.Provider.GetHashCode()}) - {Execution.Current}";
-					/*if ( activator == null )
-					{
-						throw new InvalidOperationException( $"{typeof(T)} - {before}{Environment.NewLine}{after}" );
-					}*/
+			public Cached( object instance ) : this( instance, Services.Get<T>() ) {}
 
-					var result = activator.Create( instance );
-					return result;
-			} ) {}
-		}
+			public Cached( object instance, T factory ) : base( instance, factory.GetHashCode().ToString(), () => factory.Create( instance ) ) {}
+		}*/
 
-		public static IAttributeProvider Get( [Required]object target ) => new Cached<AttributeProviderFactory>( target ).Item;
+		public static IAttributeProvider Get( [Required]object target ) => Services.Get<AttributeProviderFactory>().Create( target );
 
 		public static IAttributeProvider Get( [Required]MemberInfo target, bool includeRelated ) => includeRelated ? GetWithRelated( target ) : Get( target );
 
-		public static IAttributeProvider GetWithRelated( [Required]object target ) => new Cached<ExpandedAttributeProviderFactory>( target ).Item;
+		public static IAttributeProvider GetWithRelated( [Required]object target ) => Services.Get<ExpandedAttributeProviderFactory>().Create( target );
 	}
 
 	[Persistent]

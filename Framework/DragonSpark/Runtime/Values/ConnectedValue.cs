@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using Nito.ConnectedProperties;
@@ -163,12 +164,38 @@ namespace DragonSpark.Runtime.Values
 	public class Items : Items<object>
 	{
 		public Items( object instance ) : base( instance ) {}
+
+		// public Items( object instance, Type key ) : base( instance, key ) {}
 	}
 
 	public class Items<T> : ConnectedValue<IList<T>>
 	{
-		public Items( object instance ) : base( instance, typeof(Items<T>), () => new List<T>() ) {}
+		public Items( object instance ) : this( instance, typeof(Items<T>) ) {}
 
-		public TItem Get<TItem>() => Item.FirstOrDefaultOfType<TItem>();
+		public Items( object instance, Type key ) : base( instance, key, () => new List<T>() ) {}
+
+		// public TItem Get<TItem>() => Item.FirstOrDefaultOfType<TItem>();
 	}
+
+	/*class Tracked<T> : AssociatedValue<T>
+	{
+		public Tracked( object instance, ConnectedValue<T> inner ) : base( instance, typeof(Tracked<T>), () =>
+		{
+			new TrackedActions().Item.Add( () => inner.Property.TryDisconnect() );
+			return inner.Item;
+		} ) {}
+	}*/
+
+	/*class TrackedActions : Items<Action>
+	{
+		public TrackedActions() : this( Execution.Current ) {}
+
+		public TrackedActions( object instance ) : base( instance, typeof(TrackedActions) ) {}
+
+		public void Clear()
+		{
+			var actions = Item.Purge();
+			actions.Each( action => action() );
+		}
+	}*/
 }

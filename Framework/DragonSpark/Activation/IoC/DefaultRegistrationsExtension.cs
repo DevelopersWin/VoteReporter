@@ -12,26 +12,10 @@ namespace DragonSpark.Activation.IoC
 		public DefaultRegistrationsExtension( [Required]PersistentServiceRegistry registry )
 		{
 			this.registry = registry;
-
-			/*var loggingParameter = new RegisterDefaultCommand.Parameter<ILogger>( logger );
-			var sinkParameter = new RegisterDefaultCommand.Parameter<ILoggerHistory>( history );
-			parameters = new RegisterDefaultCommand.Parameter[]
-			{
-				new RegisterDefaultCommand.Parameter<Assembly[]>( assemblies ),
-				new RegisterDefaultCommand.Parameter<Type[]>( TypesFactory.Instance.Create( assemblies ) ),
-				new RegisterDefaultCommand.Parameter<Serilog.Core.LoggingLevelSwitch>( levelSwitch ),
-				sinkParameter,
-				loggingParameter
-			};
-			commands = new Collection<ICommand>( new ICommand[] { new MonitorLoggerRegistrationCommand( history, loggingParameter ), new MonitorLoggerHistoryRegistrationCommand( sinkParameter ) } );*/
 		}
 
 		protected override void Initialize()
 		{
-			// base.Initialize();
-
-			// parameters.Each( register.ExecuteWith );
-
 			registry.Register( Context );
 			registry.Register( Context.Policies );
 			registry.Register<IStagedStrategyChain>( Context.BuildPlanStrategies );
@@ -159,58 +143,5 @@ namespace DragonSpark.Activation.IoC
 			var result = parameter != Parameter.Instance() && base.CanExecute( parameter );
 			return result;
 		}
-	}*/
-
-	/*public class DefaultInjection : InjectionMember
-	{
-		readonly InjectionMember inner;
-
-		public DefaultInjection( [Required]InjectionMember inner )
-		{
-			this.inner = inner;
-		}
-
-		public class Applied : Checked
-		{
-			public Applied( IBuildPlanPolicy instance ) : base( instance, typeof(Applied) ) {}
-		}
-
-		public override void AddPolicies( Type serviceType, Type implementationType, string name, IPolicyList policies )
-		{
-			var key = new NamedTypeBuildKey( implementationType, name );
-			var before = policies.HasBuildPlan( key );
-			if ( !before )
-			{
-				inner.AddPolicies( serviceType, implementationType, name, policies );
-				policies.GetBuildPlan( key ).With( policy => new Applied( policy ).Item.Apply() );
-			}
-		}
-	}*/
-
-	/*public class DefaultValueStrategy : BuilderStrategy
-	{
-		readonly IUnityContainer container;
-		readonly Func<ILogger> logger;
-
-		public DefaultValueStrategy( [Required]IUnityContainer container, [Required]Func<ILogger> logger )
-		{
-			this.container = container;
-			this.logger = logger;
-		}
-
-		public override void PostBuildUp( IBuilderContext context ) => context.Existing.With( existing =>
-		{
-			var reference = new KeyReference( container, context.BuildKey ).Item;
-			var @default = new RegisterDefaultCommand.Default( reference );
-			var isDefault = new RegisterDefaultCommand.Default( existing ).Item;
-			if ( @default.Item && !isDefault )
-			{
-				@default.Assign( false );
-				var message = $"'{GetType().Name}' is clearing the default registration of '{context.BuildKey.Type}'.";
-				logger().Debug( message );
-
-				context.Policies.ClearBuildPlan( reference );
-			}
-		} );
 	}*/
 }

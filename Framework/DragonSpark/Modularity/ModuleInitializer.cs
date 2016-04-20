@@ -1,4 +1,5 @@
-using Microsoft.Practices.ServiceLocation;
+using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
@@ -12,27 +13,12 @@ namespace DragonSpark.Modularity
 	/// </summary>
 	public class ModuleInitializer : IModuleInitializer
 	{
-		readonly private IServiceLocator serviceLocator;
-		readonly private ILogger messageLoggerFacade;
+		readonly IActivator activator;
+		readonly ILogger messageLoggerFacade;
 
-		/// <summary>
-		/// Initializes a new instance of <see cref="ModuleInitializer"/>.
-		/// </summary>
-		/// <param name="serviceLocator">The container that will be used to resolve the modules by specifying its type.</param>
-		/// <param name="messageLoggerFacade">The logger to use.</param>
-		public ModuleInitializer(IServiceLocator serviceLocator, ILogger messageLoggerFacade)
+		public ModuleInitializer(IActivator activator, ILogger messageLoggerFacade)
 		{
-			if (serviceLocator == null)
-			{
-				throw new ArgumentNullException("serviceLocator");
-			}
-
-			if (messageLoggerFacade == null)
-			{
-				throw new ArgumentNullException("messageLoggerFacade");
-			}
-
-			this.serviceLocator = serviceLocator;
+			this.activator = activator;
 			this.messageLoggerFacade = messageLoggerFacade;
 		}
 
@@ -46,7 +32,7 @@ namespace DragonSpark.Modularity
 			IModule moduleInstance = null;
 			try
 			{
-				moduleInstance = this.CreateModule(moduleInfo);
+				moduleInstance = CreateModule( moduleInfo.ModuleType );
 				moduleInstance?.Initialize();
 			}
 			catch (Exception ex)
@@ -79,27 +65,23 @@ namespace DragonSpark.Modularity
 		/// <summary>
 		/// Uses the container to resolve a new <see cref="IModule"/> by specifying its <see cref="Type"/>.
 		/// </summary>
-		/// <param name="moduleInfo">The module to create.</param>
-		/// <returns>A new instance of the module specified by <paramref name="moduleInfo"/>.</returns>
-		protected virtual IModule CreateModule([Required]ModuleInfo moduleInfo)
-		{
-			return this.CreateModule(moduleInfo.ModuleType);
-		}
-
-		/// <summary>
-		/// Uses the container to resolve a new <see cref="IModule"/> by specifying its <see cref="Type"/>.
-		/// </summary>
 		/// <param name="typeName">The type name to resolve. This type must implement <see cref="IModule"/>.</param>
 		/// <returns>A new instance of <paramref name="typeName"/>.</returns>
 		protected virtual IModule CreateModule(string typeName)
 		{
-			Type moduleType = Type.GetType(typeName);
-			if (moduleType == null)
-			{
-				throw new ModuleInitializeException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedToGetType, typeName));
-			}
+			var type = DetermineType( typeName );
+			var module = activator.Activate<IModule>( type );
+			return module;
+		}
 
-			return (IModule)this.serviceLocator.GetInstance(moduleType);
+		static Type DetermineType( string typeName )
+		{
+			var moduleType = Type.GetType( typeName );
+			if ( moduleType == null )
+			{
+				throw new ModuleInitializeException( string.Format( CultureInfo.CurrentCulture, Properties.Resources.FailedToGetType, typeName ) );
+			}
+			return moduleType;
 		}
 	}
 }

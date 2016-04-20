@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace DragonSpark
 {
-	public interface IAllowsPriority
+	public interface IPriorityAware
 	{
 		[DefaultValue( Priority.Normal )]
 		Priority Priority { get; }

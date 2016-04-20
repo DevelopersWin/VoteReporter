@@ -7,24 +7,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class BuildPlanCreatorPolicy : IBuildPlanCreatorPolicy
 	{
 		readonly Func<Action, Exception> tryDelegate;
-		readonly IList<IBuildPlanPolicy> policies;
+		readonly ISpecification<LocateTypeRequest> specification;
+		readonly IEnumerable<IBuildPlanPolicy> policies;
 		readonly IBuildPlanCreatorPolicy[] creators;
 
-		public BuildPlanCreatorPolicy( [Required]Func<Action, Exception> tryDelegate, [Required]IList<IBuildPlanPolicy> policies, [Required]params IBuildPlanCreatorPolicy[] creators )
+		public BuildPlanCreatorPolicy( [Required] Func<Action, Exception> tryDelegate, ISpecification<LocateTypeRequest> specification, [Required] IEnumerable<IBuildPlanPolicy> policies, [Required] params IBuildPlanCreatorPolicy[] creators )
 		{
 			this.tryDelegate = tryDelegate;
+			this.specification = specification;
 			this.policies = policies;
 			this.creators = creators;
 		}
 
-		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
-			new CompositeBuildPlanPolicy( tryDelegate, creators.Select( policy => policy.CreatePlan( context, buildKey ) ).Concat( policies ).ToArray() );
+		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
+		{
+			var plans = specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) ) ? creators.Select( policy => policy.CreatePlan( context, buildKey ) ) : Default<IBuildPlanPolicy>.Items;
+			var result = new CompositeBuildPlanPolicy( tryDelegate, plans.Concat( policies ).ToArray() );
+			return result;
+		}
 	}
 
 	public class CompositeBuildPlanPolicy : IBuildPlanPolicy
@@ -55,6 +62,8 @@ namespace DragonSpark.Activation.IoC
 
 	class SingletonBuildPlanPolicy : IBuildPlanPolicy
 	{
+		public static SingletonBuildPlanPolicy Instance { get; } = new SingletonBuildPlanPolicy();
+
 		readonly ISingletonLocator locator;
 
 		public SingletonBuildPlanPolicy() : this( SingletonLocator.Instance ) {}
@@ -81,27 +90,43 @@ namespace DragonSpark.Activation.IoC
 		readonly static MethodInfo GenericResolveArrayMethod = typeof(EnumerableResolutionStrategy).GetTypeInfo().DeclaredMethods.First( m => m.Name == nameof(Resolve) && !m.IsPublic );
 
 		readonly IUnityContainer container;
+		readonly IServiceProvider provider;
 
-		public EnumerableResolutionStrategy( [Required]IUnityContainer container )
+		public EnumerableResolutionStrategy( [Required]IUnityContainer container, IServiceProvider provider )
 		{
 			this.container = container;
+			this.provider = provider;
 		}
 
 		public override void PreBuildUp( [Required]IBuilderContext context )
 		{
 			if ( !context.HasBuildPlan() )
 			{
-				var adapt = context.BuildKey.Type.Adapt();
-				if ( adapt.IsGenericOf<IEnumerable<object>>( false ) )
-				{
-					adapt.GetEnumerableType().With( type =>
-					{
-						var resolver = (Resolver)GenericResolveArrayMethod.MakeGenericMethod( type ).CreateDelegate( typeof(Resolver), this );
+				BuildUp( context );
 
-						var result = resolver( context );
+				if ( context.BuildComplete )
+				{
+					context.Existing.As<Array>( array =>
+					{
+						var result = array.Length > 0 ? array : provider.GetService( context.BuildKey.Type ) ?? array;
 						context.Complete( result );
 					} );
 				}
+			}
+		}
+
+		void BuildUp( IBuilderContext context )
+		{
+			var adapt = context.BuildKey.Type.Adapt();
+			if ( adapt.IsGenericOf<IEnumerable<object>>( false ) )
+			{
+				adapt.GetEnumerableType().With( type =>
+				{
+					var resolver = (Resolver)GenericResolveArrayMethod.MakeGenericMethod( type ).CreateDelegate( typeof(Resolver), this );
+
+					var result = resolver( context );
+					context.Complete( result );
+				} );
 			}
 		}
 

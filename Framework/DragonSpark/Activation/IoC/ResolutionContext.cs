@@ -1,9 +1,9 @@
+using DragonSpark.Diagnostics;
 using DragonSpark.Properties;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
-using PostSharp.Patterns.Contracts;
-using Serilog;
 using System;
+using Serilog;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -12,7 +12,9 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly Func<ILogger> logger;
 
-		public ResolutionContext( [Required]Func<ILogger> logger )
+		// public ResolutionContext( LoggerSource logger ) : this( logger.Create ) {}
+
+		public ResolutionContext( Func<ILogger> logger )
 		{
 			this.logger = logger;
 		}

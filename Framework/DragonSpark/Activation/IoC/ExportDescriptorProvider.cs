@@ -3,68 +3,81 @@ using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
+using Serilog;
 using System;
-using DragonSpark.Modularity;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class ServicesIntegrationExtension : UnityContainerExtension
 	{
-		readonly IStrategyRepository repository;
-		readonly ServicesStrategy strategy;
-		// readonly CompositionContext host;
-		// readonly ExportDescriptorProvider provider;
-		// readonly RegisterHierarchyCommand<OnlyIfNotRegistered> command;
+		readonly IServiceProvider provider;
+		readonly Func<ILogger> logger;
+		readonly IBuildPlanRepository repository;
+		readonly IStrategyRepository strategies;
 
-		public ServicesIntegrationExtension( [Required]IStrategyRepository repository, [Required]ServicesStrategy strategy/*, [Required]CompositionHost host, [Required]ExportDescriptorProvider provider, [Required]RegisterHierarchyCommand<OnlyIfNotRegistered> command*/ )
+		public ServicesIntegrationExtension( IServiceProvider provider, Func<ILogger> logger, IStrategyRepository strategies, IBuildPlanRepository repository )
 		{
+			this.provider = provider;
+			this.logger = new FirstFactory<ILogger>( logger, provider.Get<ILogger> ).Create;
 			this.repository = repository;
-			this.strategy = strategy;
-			// this.host = host;
-			// this.provider = provider;
-			// this.command = command;
+			this.strategies = strategies;
 		}
 
 		protected override void Initialize()
 		{
-			repository.Add( new StrategyEntry( strategy, UnityBuildStage.PreCreation, Priority.Highest ) );
+			Container.RegisterInstance( logger );
 
-			// command.ExecuteWith( new InstanceRegistrationParameter( host ) );
+			var entries = new[]
+			{
+				new StrategyEntry( new EnumerableResolutionStrategy( Container, provider ), UnityBuildStage.Creation, Priority.Higher ),
+				new StrategyEntry( new ArrayResolutionStrategy( provider ), UnityBuildStage.Creation, Priority.AboveNormal )
+			};
+			entries.Each( strategies.Add );
 
-			// host.GetExport<IExportDescriptorProviderRegistry>().Register( provider );
-			// Context.Strategies.Add( , UnityBuildStage.PreCreation );
+			var policy = new ServicesBuildPlanPolicy( provider );
+			Context.Strategies.Add( new ServicesStrategy( policy ), UnityBuildStage.PreCreation );
 			
+			repository.Add( policy );
+		}
+	}
+
+	public class ServicesBuildPlanPolicy : IBuildPlanPolicy
+	{
+		readonly IServiceProvider provider;
+
+		public ServicesBuildPlanPolicy( IServiceProvider provider )
+		{
+			this.provider = provider;
 		}
 
-		// public IUnityContainer Refresh() => Container.With( unityContainer => Initialize() );
+		public void BuildUp( IBuilderContext context )
+		{
+			var existing = provider.GetService( context.BuildKey.Type );
+			context.Complete( existing );
+		}
 	}
+
+	/*public class NativeTypesFactory : FactoryBase<Type[]>
+	{
+		public static NativeTypesFactory Instance { get; } = new NativeTypesFactory();
+
+		protected override Type[] CreateItem() => new[] { typeof(AttributeProviderFactoryBase), typeof(MemberInfoProviderFactoryBase), typeof(MemberInfoAttributeProviderFactory), typeof(IAttributeProvider), typeof(IMemberInfoLocator) };
+	}*/
 
 	public class ServicesStrategy : BuilderStrategy
 	{
-		readonly IServiceProvider provider;
-		
-		public ServicesStrategy( [Required] IServiceProvider provider )
+		readonly ServicesBuildPlanPolicy policy;
+
+		public ServicesStrategy( [Required] ServicesBuildPlanPolicy policy )
 		{
-			this.provider = provider;
+			this.policy = policy;
 		}
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
 			if ( !context.HasBuildPlan() )
 			{
-				var existing = provider.GetService( context.BuildKey.Type );
-				/*existing.With( o =>
-				{
-					/*if ( new Checked( o, this ).Item.Apply() )
-					{
-						var instance = o.Has<SharedAttribute>() || new ExportProperties.Instance( o ).Item || new ExportProperties.Category( o ).Item.With( promise => promise.Contract.ContractType.Has<SharedAttribute>() );
-						if ( instance )
-						{
-							registry().Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );
-						}
-					}#1#
-				} );*/
-				context.Complete( existing );
+				policy.BuildUp( context );
 			}
 		}
 	}

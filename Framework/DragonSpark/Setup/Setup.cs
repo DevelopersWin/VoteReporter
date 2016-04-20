@@ -144,8 +144,7 @@ namespace DragonSpark.Setup
 
 	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
 	{
-		public CompositeServiceProvider( [Required] params IServiceProvider[] providers ) 
-			: base( providers.Select( provider => new Func<Type, object>( new RecursionAwareServiceProvider( provider ).GetService ) ).ToArray() ) {}
+		public CompositeServiceProvider( [Required] params IServiceProvider[] providers ) : base( providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
 
 		public object GetService( Type serviceType ) => serviceType == typeof(IServiceProvider) ? this : Create( serviceType );
 	}

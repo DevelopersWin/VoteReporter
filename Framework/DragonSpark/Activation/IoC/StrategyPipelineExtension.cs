@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
@@ -52,20 +51,25 @@ namespace DragonSpark.Activation.IoC
 	public class CachingBuildPlanExtension : UnityContainerExtension
 	{
 		readonly Func<ILogger> logger;
+		readonly IBuildPlanRepository repository;
+		readonly HasFactorySpecification specification;
 
-		public CachingBuildPlanExtension( [Required] Func<ILogger> logger )
+		public CachingBuildPlanExtension( [Required] Func<ILogger> logger, IBuildPlanRepository repository, HasFactorySpecification specification )
 		{
 			this.logger = logger;
+			this.repository = repository;
+			this.specification = specification;
 		}
 
 		protected override void Initialize()
 		{
+			var policies = repository.List();
 			var policy = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) );
-			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( new TryContext( logger ).Try, Policies, policy ) );
+			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( new TryContext( logger ).Try, specification.Inverse(), policies, policy ) );
 			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
 		}
 
-		public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
+		// public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };
 
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
@@ -94,23 +98,19 @@ namespace DragonSpark.Activation.IoC
 		{
 			readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
 			readonly ConventionStrategy conventionStrategy;
-			readonly EnumerableResolutionStrategy enumerableResolutionStrategy;
 
-			public StrategyEntryFactory( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy, [Required]EnumerableResolutionStrategy enumerableResolutionStrategy )
+			public StrategyEntryFactory( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy )
 			{
 				this.metadataLifetimeStrategy = metadataLifetimeStrategy;
 				this.conventionStrategy = conventionStrategy;
-				this.enumerableResolutionStrategy = enumerableResolutionStrategy;
 			}
 
 			protected override IEnumerable<StrategyEntry> CreateItem() => new[]
 			{
 				new StrategyEntry( metadataLifetimeStrategy, UnityBuildStage.Lifetime, Priority.Higher ),
-				new StrategyEntry( conventionStrategy, UnityBuildStage.PreCreation ),
-				new StrategyEntry( enumerableResolutionStrategy, UnityBuildStage.Creation, Priority.Higher )
+				new StrategyEntry( conventionStrategy, UnityBuildStage.PreCreation )
 			};
 		}
-
 		
 		public StrategyPipelineExtension( [Required]IStrategyRepository strategyRepository, [Required] StrategyEntryFactory factory )
 		{
@@ -124,7 +124,7 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Clear();
 
-			strategyRepository.List().Each( entry => Context.Strategies.Add( entry.Item, entry.Stage ) );
+			strategyRepository.List().Cast<StrategyEntry>().Each( entry => Context.Strategies.Add( entry.Item, entry.Stage ) );
 		}
 
 		public class MetadataLifetimeStrategy : BuilderStrategy

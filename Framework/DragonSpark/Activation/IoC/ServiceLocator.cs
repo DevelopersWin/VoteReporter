@@ -11,7 +11,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Modularity;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -100,11 +99,18 @@ namespace DragonSpark.Activation.IoC
 
 	public class DefaultBehaviorExtension : UnityContainerExtension
 	{
+		readonly Func<ILogger> logger;
+
+		public DefaultBehaviorExtension( Func<ILogger> logger )
+		{
+			this.logger = logger;
+		}
+
 		protected override void Initialize()
 		{
 			var repository = new StrategyRepository( Context.Strategies );
 			repository.Add( new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.Setup, Priority.High ) );
-
+			Container.RegisterInstance<IBuildPlanRepository>( new BuildPlanRepository( SingletonBuildPlanPolicy.Instance ) );
 			Container.RegisterInstance<IStrategyRepository>( repository );
 		}
 	}
@@ -119,9 +125,16 @@ namespace DragonSpark.Activation.IoC
 		public UnityBuildStage Stage { get; }
 	}
 
-	public interface IStrategyRepository : IRepository<StrategyEntry> {}
+	public interface IStrategyRepository : IEntryRepository<IBuilderStrategy> {}
 
-	class StrategyRepository : RepositoryBase<StrategyEntry, IBuilderStrategy>, IStrategyRepository
+	public interface IBuildPlanRepository : IRepository<IBuildPlanPolicy> {}
+
+	class BuildPlanRepository : RepositoryBase<IBuildPlanPolicy>, IBuildPlanRepository
+	{
+		public BuildPlanRepository( params IBuildPlanPolicy[] items ) : base( new List<IBuildPlanPolicy>( items ) ) {}
+	}
+
+	class StrategyRepository : EntryRepositoryBase<StrategyEntry, IBuilderStrategy>, IStrategyRepository
 	{
 		readonly StagedStrategyChain<UnityBuildStage> strategies;
 
@@ -130,7 +143,6 @@ namespace DragonSpark.Activation.IoC
 				new StrategyEntry( new BuildKeyMappingStrategy(), UnityBuildStage.TypeMapping ),
 				new StrategyEntry( new HierarchicalLifetimeStrategy(), UnityBuildStage.Lifetime ),
 				new StrategyEntry( new LifetimeStrategy(), UnityBuildStage.Lifetime ),
-				new StrategyEntry( new ArrayResolutionStrategy(), UnityBuildStage.Creation ),
 				new StrategyEntry( new BuildPlanStrategy(), UnityBuildStage.Creation ),
 			} ) {}
 
@@ -146,5 +158,7 @@ namespace DragonSpark.Activation.IoC
 			base.OnAdd( entry );
 			strategies.Add( entry.Item, entry.Stage );
 		}
+
+		protected override StrategyEntry Create( IBuilderStrategy item ) => new StrategyEntry( item, UnityBuildStage.PreCreation );
 	}
 }

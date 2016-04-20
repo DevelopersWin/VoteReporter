@@ -4,14 +4,26 @@ using Microsoft.Practices.ObjectBuilder2;
 
 namespace DragonSpark.Activation.IoC
 {
+	public class ClearTrackingDataExtension : BuilderStrategy
+	{
+		public override void PreBuildUp( IBuilderContext context )
+		{
+			if ( !new Checked( context.BuildKey.Type, this ).Item.IsApplied )
+			{
+				
+			}
+			base.PreBuildUp( context );
+		}
+	}
+
 	public class BuildKeyMonitorExtension : BuilderStrategy, IRequiresRecovery
 	{
-		Stack<NamedTypeBuildKey> Stack => new ThreadAmbientChain<NamedTypeBuildKey>().Item;
+		static Stack<NamedTypeBuildKey> Stack => new ThreadAmbientChain<NamedTypeBuildKey>().Item;
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var item = Stack;
-			if ( item.Contains( context.BuildKey ) )
+			var stack = Stack;
+			if ( stack.Contains( context.BuildKey ) )
 			{
 				context.BuildComplete = true;
 				context.Existing = null;
@@ -19,7 +31,7 @@ namespace DragonSpark.Activation.IoC
 			else
 			{
 				context.RecoveryStack.Add( this );
-				item.Push( context.BuildKey );
+				stack.Push( context.BuildKey );
 			}
 		}
 

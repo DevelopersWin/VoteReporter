@@ -8,8 +8,7 @@ namespace DragonSpark.Modularity
 	{
 		/*public static ModuleInfoBuilder Instance { get; } = new ModuleInfoBuilder();*/
 
-		public ModuleInfoBuilder() : this( AttributeDataProvider.Instance )
-		{}
+		public ModuleInfoBuilder() : this( AttributeDataProvider.Instance ) {}
 
 		public ModuleInfoBuilder( IAttributeDataProvider provider )
 		{
@@ -26,16 +25,12 @@ namespace DragonSpark.Modularity
 
 		public ModuleInfo CreateModuleInfo(Type type)
 		{
-			string moduleName = Provider.Get<string>( typeof(ModuleAttribute), type, nameof(ModuleDependencyAttribute.ModuleName) ) ?? type.Name;
+			var moduleName = Provider.Get<string>( typeof(ModuleAttribute), type, nameof(ModuleAttribute.ModuleName) ) ?? type.Name;
 			var result = Create( type, moduleName, type.AssemblyQualifiedName );
 			Apply( result, type );
 			return result;
 		}
 
-		protected virtual ModuleInfo Create( Type host, string moduleName, string assemblyQualifiedName )
-		{
-			var result = new ModuleInfo( moduleName, assemblyQualifiedName );
-			return result;
-		}
+		protected virtual ModuleInfo Create( Type host, string moduleName, string assemblyQualifiedName ) => new ModuleInfo( moduleName, assemblyQualifiedName );
 	}
 }

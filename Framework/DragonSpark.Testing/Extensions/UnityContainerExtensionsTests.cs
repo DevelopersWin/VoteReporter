@@ -1,3 +1,4 @@
+using System;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -20,14 +21,14 @@ namespace DragonSpark.Testing.Extensions
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
 			var assemblies = sut.Resolve<Assembly[]>();
-			Assert.Equal( Default<Assembly>.Items, assemblies);
+			Assert.Same( Default<Assembly>.Items, assemblies );
 
-			var levelSwitch = sut.Resolve<LoggingLevelSwitch>();
-			Assert.Same( levelSwitch, sut.Resolve<LoggingLevelSwitch>() );
+			var levelSwitch = sut.Resolve<IServiceProvider>().Get<LoggingLevelSwitch>();
+			Assert.Same( levelSwitch, sut.Resolve<IServiceProvider>().Get<LoggingLevelSwitch>() );
 			levelSwitch.MinimumLevel = LogEventLevel.Debug;
 
-			var sink = sut.Resolve<LoggerHistorySink>();
-			Assert.Same( sink, sut.Resolve<LoggerHistorySink>() );
+			var sink = sut.Resolve<IServiceProvider>().Get<LoggerHistorySink>();
+			Assert.Same( sink, sut.Resolve<IServiceProvider>().Get<LoggerHistorySink>() );
 			var initial = sink.Events.Count();
 			Assert.Single( sink.Events );
 

@@ -16,7 +16,7 @@ namespace DragonSpark.Windows.Entity
 	}
 
 	/*[AttributeUsage( AttributeTargets.Property  )]
-	public class ApplyValueAttribute : Attribute, IAllowsPriority
+	public class ApplyValueAttribute : Attribute, IPriorityAware
 	{
 		public ApplyValueAttribute( Type type )
 		{

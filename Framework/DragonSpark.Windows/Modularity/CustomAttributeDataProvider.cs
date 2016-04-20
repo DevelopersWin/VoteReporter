@@ -29,7 +29,7 @@ namespace DragonSpark.Windows.Modularity
 		static T Position<T>( CustomAttributeData data )
 		{
 			var argument = data.ConstructorArguments.FirstOrDefault( typedArgument => typeof(T).IsAssignableFrom( typedArgument.ArgumentType ) );
-			var result = argument.ArgumentType != null ? (T)argument.Value : Position<T>( data );
+			var result = argument.ArgumentType != null ? (T)argument.Value : default(T);
 			return result;
 		}
 

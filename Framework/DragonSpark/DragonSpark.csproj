@@ -399,7 +399,7 @@
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="Extensions\WeakReferenceListExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="IAllowsPriority.cs" />
+    <Compile Include="IPriorityAware.cs" />
     <Compile Include="Priority.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -60,7 +60,7 @@ namespace DragonSpark.Composition
 		{
 			var context = source();
 			var primary = new ServiceLocator( context );
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, Decorated );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), new RecursionAwareServiceProvider( primary ), Decorated );
 			return result;
 		}
 	}

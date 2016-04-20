@@ -49,7 +49,7 @@ namespace DragonSpark.Composition
 					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, promise.IsShared, NoDependencies,
 						_ => ExportDescriptor.Create( ( context, operation ) =>
 						{
-							Func<object> create = () => activator( context, operation ).With( context.Checked ).With( o => new ExportProperties.Factory( o ).Assign( promise ) );
+							Func<object> create = () => activator( context, operation ).With( context.Checked )/*.With( o => new ExportProperties.Factory( o ).Assign( promise ) )*/;
 							var item = promise.IsShared ? new SharedValue( context.FindContextWithin( boundary ), resultContract, create ).Item : create();
 							return item;
 						}, NoMetadata ) );
@@ -235,7 +235,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public static class ExportProperties
+	/*public static class ExportProperties
 	{
 		public class Instance : AssociatedValue<bool>
 		{
@@ -246,5 +246,5 @@ namespace DragonSpark.Composition
 		{
 			public Factory( object instance ) : base( instance ) {}
 		}
-	}
+	}*/
 }

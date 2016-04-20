@@ -79,7 +79,8 @@ namespace DragonSpark.Activation.IoC
 		protected override bool Verify( Type parameter ) => locator.Create( parameter ) != null;
 	}
 
-	class HasFactorySpecification : SpecificationBase<LocateTypeRequest>
+	[Persistent]
+	public class HasFactorySpecification : SpecificationBase<LocateTypeRequest>
 	{
 		readonly FactoryTypeRequestLocator locator;
 
@@ -133,7 +134,7 @@ namespace DragonSpark.Activation.IoC
 			HasConventionSpecification convention, 
 			ContainsSingletonSpecification singleton, 
 			HasFactorySpecification factory )
-				: base( registered.Or( strategies ).Or( convention ).Or( singleton ).Or( factory ) ) {}
+				: base( registered.Or( strategies ).Or( convention.Wrap<LocateTypeRequest>( request => request.RequestedType ) ).Or( singleton.Wrap<LocateTypeRequest>( request => request.RequestedType ) ).Or( factory ) ) {}
 	}
 
 	public class ConstructorFactory : FactoryBase<LocateTypeRequest, ConstructorInfo>

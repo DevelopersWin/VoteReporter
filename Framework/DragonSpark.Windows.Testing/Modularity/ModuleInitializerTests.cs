@@ -7,6 +7,7 @@ using Moq;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using DragonSpark.Activation;
 using Serilog.Core;
 using Xunit;
 
@@ -17,24 +18,24 @@ namespace DragonSpark.Windows.Testing.Modularity
 	/// </summary>
 	public class ModuleInitializerTests
 	{
-		[Fact]
+		/*[Fact]
 		public void NullContainerThrows()
 		{
-			Assert.Throws<ArgumentNullException>( () => new ModuleInitializer( null, new Mock<ILogger>().Object ) );
+			Assert.Throws<ArgumentNullException>( () => new ModuleInitializer( new Mock<IActivator>().Object, null, new Mock<ILogger>().Object ) );
 		}
 
 		[Fact]
 		public void NullLoggerThrows()
 		{
-			Assert.Throws<ArgumentNullException>( () => new ModuleInitializer(new MockContainerAdapter(), null ) );
-		}
+			Assert.Throws<ArgumentNullException>( () => new ModuleInitializer(new Mock<IActivator>().Object, new MockContainerAdapter(), null ) );
+		}*/
 
 		[Fact]
 		public void InitializationExceptionsAreWrapped()
 		{
 			var moduleInfo = CreateModuleInfo( typeof(ExceptionThrowingModule) );
 
-			var loader = new ModuleInitializer( new MockContainerAdapter(), new Mock<ILogger>().Object );
+			var loader = new ModuleInitializer( Constructor.Instance, new Mock<ILogger>().Object );
 
 			Assert.Throws<ModuleInitializeException>( () => loader.Initialize( moduleInfo ) );
 		}
@@ -42,8 +43,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		[Fact]
 		public void ShouldResolveModuleAndInitializeSingleModule()
 		{
-			IServiceLocator containerFacade = new MockContainerAdapter();
-			var service = new ModuleInitializer(containerFacade, new Mock<ILogger>().Object);
+			var service = new ModuleInitializer(Constructor.Instance, new Mock<ILogger>().Object);
 			FirstTestModule.wasInitializedOnce = false;
 			var info = CreateModuleInfo(typeof(FirstTestModule));
 			service.Initialize(info);
@@ -53,8 +53,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		[Fact]
 		public void ShouldLogModuleInitializeErrorsAndContinueLoading()
 		{
-			IServiceLocator containerFacade = new MockContainerAdapter();
-			var service = new CustomModuleInitializerService(containerFacade, new Mock<ILogger>().Object);
+			var service = new CustomModuleInitializerService(Constructor.Instance, new Mock<ILogger>().Object);
 			var invalidModule = CreateModuleInfo(typeof(InvalidModule));
 
 			Assert.False(service.HandleModuleInitializeErrorCalled);
@@ -65,10 +64,9 @@ namespace DragonSpark.Windows.Testing.Modularity
 		[Fact]
 		public void ShouldLogModuleInitializationError()
 		{
-			IServiceLocator containerFacade = new MockContainerAdapter();
 			var sink = new MockLoggerHistorySink();
 			var logger = new RecordingLoggerFactory( sink ).Create();
-			var service = new ModuleInitializer(containerFacade, logger);
+			var service = new ModuleInitializer(Constructor.Instance, logger);
 			ExceptionThrowingModule.wasInitializedOnce = false;
 			var exceptionModule = CreateModuleInfo(typeof(ExceptionThrowingModule));
 
@@ -89,7 +87,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		{
 			var moduleInfo = new ModuleInfo("TestModule", "BadAssembly.BadType");
 
-			ModuleInitializer loader = new ModuleInitializer(new MockContainerAdapter(), new Mock<ILogger>().Object);
+			ModuleInitializer loader = new ModuleInitializer(Constructor.Instance, new Mock<ILogger>().Object);
 
 			try
 			{
@@ -168,7 +166,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		{
 			public bool HandleModuleInitializeErrorCalled;
 
-			public CustomModuleInitializerService(IServiceLocator containerFacade, ILogger messageLogger) : base(containerFacade, messageLogger)
+			public CustomModuleInitializerService(IActivator activator, ILogger messageLogger) : base(activator, messageLogger)
 			{}
 
 			public override void HandleModuleInitializationError(ModuleInfo moduleInfo, string assemblyName, Exception exception)

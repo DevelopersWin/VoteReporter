@@ -137,11 +137,11 @@ namespace DragonSpark.Activation
 	[Persistent]
 	public class FactoryTypeRequestLocator : FactoryBase<LocateTypeRequest, Type>
 	{
-		readonly IEnumerable<FactoryTypeRequest> types;
+		readonly FactoryTypeRequest[] types;
 
-		public FactoryTypeRequestLocator( [Required]IEnumerable<FactoryTypeRequest> types )
+		public FactoryTypeRequestLocator( [Required] FactoryTypeRequest[] types )
 		{
-			this.types = types.Fixed();
+			this.types = types;
 		}
 
 		[Freeze]

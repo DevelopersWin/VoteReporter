@@ -8,11 +8,9 @@ namespace DragonSpark.Windows.Modularity
 	{
 		public static ModuleInfoBuilder Instance { get; } = new ModuleInfoBuilder();
 
-		public ModuleInfoBuilder() : this( CustomAttributeDataProvider.Instance )
-		{}
+		public ModuleInfoBuilder() : this( CustomAttributeDataProvider.Instance ) {}
 
-		public ModuleInfoBuilder( IAttributeDataProvider provider ) : base( provider )
-		{}
+		public ModuleInfoBuilder( IAttributeDataProvider provider ) : base( provider ) {}
 
 		protected override ModuleInfo Create( Type host, string moduleName, string assemblyQualifiedName )
 		{
