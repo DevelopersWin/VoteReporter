@@ -18,20 +18,22 @@ namespace DragonSpark.Aspects
 
 		public override void OnGetValue( LocationInterceptionArgs args )
 		{
-			lock ( this )
+			var apply = new Checked( this ).Item.Apply();
+			if ( apply )
 			{
-				var apply = new Checked( this ).Item.Apply();
-				if ( apply )
-				{
-					var parameter = new DefaultValueParameter( args.Instance ?? args.Location.DeclaringType, args.Location.PropertyInfo );
-					var value = DefaultPropertyValueFactory.Instance.Create( parameter );
-					args.SetNewValue( args.Value = value );
-				}
-				else
-				{
-					base.OnGetValue( args );
-				}
+				var parameter = new DefaultValueParameter( args.Instance ?? args.Location.DeclaringType, args.Location.PropertyInfo );
+				var value = DefaultPropertyValueFactory.Instance.Create( parameter );
+				args.SetNewValue( args.Value = value );
 			}
+			else
+			{
+				base.OnGetValue( args );
+			}
+
+			/*lock ( this )
+			{
+				
+			}*/
 		}
 
 		public override void OnSetValue( LocationInterceptionArgs args )

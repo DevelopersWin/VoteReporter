@@ -26,27 +26,32 @@ namespace DragonSpark.Diagnostics
 		public virtual void Emit( LogEvent logEvent ) => source.Ensure( logEvent );
 	}
 
-	public class LogEventMessageFactory : FactoryBase<IEnumerable<LogEvent>, string[]>
+	public class LogEventTextFactory : FactoryBase<LogEvent, string>
 	{
-		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
+		public static LogEventTextFactory Instance { get; } = new LogEventTextFactory();
 
 		readonly MessageTemplateTextFormatter formatter;
 
-		public LogEventMessageFactory( string template = "{Timestamp:HH:mm:ss:fff} [{Level}] ({SourceContext}) {Message}{NewLine}{Exception}" ) : this( new MessageTemplateTextFormatter( template, null ) ) {}
+		public LogEventTextFactory( string template = "{Timestamp:HH:mm:ss:fff} [{Level}] ({SourceContext}) {Message}{NewLine}{Exception}" ) : this( new MessageTemplateTextFormatter( template, null ) ) {}
 
-		public LogEventMessageFactory( MessageTemplateTextFormatter formatter )
+		public LogEventTextFactory( MessageTemplateTextFormatter formatter )
 		{
 			this.formatter = formatter;
 		}
 
-		protected override string[] CreateItem( IEnumerable<LogEvent> parameter ) => parameter.OrderBy( line => line.Timestamp ).Select( Create ).ToArray();
-
-		string Create( LogEvent logEvent )
+		protected override string CreateItem( LogEvent parameter )
 		{
 			var writer = new StringWriter();
-			formatter.Format( logEvent, writer );
+			formatter.Format( parameter, writer );
 			var result = writer.ToString().Trim();
 			return result;
 		}
+	}
+
+	public class LogEventMessageFactory : FactoryBase<IEnumerable<LogEvent>, string[]>
+	{
+		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
+
+		protected override string[] CreateItem( IEnumerable<LogEvent> parameter ) => parameter.OrderBy( line => line.Timestamp ).Select( LogEventTextFactory.Instance.Create ).ToArray();
 	}
 }

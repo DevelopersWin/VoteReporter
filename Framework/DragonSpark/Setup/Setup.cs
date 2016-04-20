@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
-using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
@@ -56,17 +55,9 @@ namespace DragonSpark.Setup
 
 	public class AssignServiceProvider : AssignValueCommand<IServiceProvider>
 	{
-		// public AssignServiceProvider() : this( null ) {}
-
 		public AssignServiceProvider( IServiceProvider current ) : this( CurrentServiceProvider.Instance, current ) {}
 
 		public AssignServiceProvider( IWritableValue<IServiceProvider> value, IServiceProvider current ) : base( value, current ) {}
-
-		/*protected override void OnExecute( IServiceProvider parameter )
-		{
-			var current = 
-			base.OnExecute( parameter );
-		}*/
 	}
 
 	public static class ApplicationExtensions
@@ -113,25 +104,6 @@ namespace DragonSpark.Setup
 		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider( () => new ServiceProvider() );
 
 		DefaultServiceProvider( Func<ServiceProvider> create ) : base( create ) {}
-	}
-
-	public class CurrentServiceProvider : ExecutionContextValue<IServiceProvider>
-	{
-		public static CurrentServiceProvider Instance { get; } = new CurrentServiceProvider();
-
-		CurrentServiceProvider() {}
-
-		public override IServiceProvider Item => base.Item ?? DefaultServiceProvider.Instance.Item;
-
-		public override void Assign( IServiceProvider item )
-		{
-			if ( Item != null && item != null && Item != item )
-			{
-				
-			}
-
-			base.Assign( item );
-		}
 	}
 
 	public static class ActivationProperties

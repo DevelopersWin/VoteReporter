@@ -225,6 +225,8 @@
     <Compile Include="Activation\IoC\HandleTypeRequestSpecification.cs" />
     <Compile Include="Activation\IoC\TransientServiceRegistry.cs" />
     <Compile Include="Runtime\Values\ThreadAmbientChain.cs" />
+    <Compile Include="Setup\ApplyMigrationCommand.cs" />
+    <Compile Include="Setup\CurrentServiceProvider.cs" />
     <Compile Include="Setup\Registration\FactoryRegistration.cs" />
     <Compile Include="Setup\Registration\LifetimeFactoryParameterCoercer.cs" />
     <Compile Include="Setup\Registration\MappingRegistration.cs" />

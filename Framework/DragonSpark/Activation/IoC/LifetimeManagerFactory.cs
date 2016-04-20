@@ -1,11 +1,10 @@
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
-using DragonSpark.Aspects;
-using DragonSpark.Setup;
 
 namespace DragonSpark.Activation.IoC
 {

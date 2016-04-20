@@ -3,13 +3,14 @@ using DragonSpark.Configuration;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using PostSharp.Aspects;
+using PostSharp.Patterns.Threading;
 using PostSharp.Serialization;
 using System;
 using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	[PSerializable]
+	[PSerializable, Synchronized] // TODO: Move this to ApplyDefaultValues
 	public sealed class ProfileAttribute : OnMethodBoundaryAspect
 	{
 		public ProfileAttribute() {}

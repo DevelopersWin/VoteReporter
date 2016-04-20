@@ -2,6 +2,7 @@
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Core;
@@ -29,10 +30,10 @@ namespace DragonSpark.Diagnostics
 		public PurgeLoggerHistoryFixedCommand( [Required] ILoggerHistory history, [Required] Action<string> output ) : base( new PurgeLoggerMessageHistoryCommand( history ), output ) {}
 	}*/
 
-	/*public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
+	public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
 	{
 		public PurgeLoggerHistoryCommand( ILoggerHistory history ) : base( history, events => events.Fixed() ) {}
-	}*/
+	}
 
 	public abstract class PurgeLoggerHistoryCommand<T> : Command<Action<T>>
 	{
@@ -108,6 +109,8 @@ namespace DragonSpark.Diagnostics
 
 	public class RecordingLoggerFactory : LoggerFactory
 	{
+		public RecordingLoggerFactory() : this( Default<ITransformer<LoggerConfiguration>>.Items ) {}
+
 		public RecordingLoggerFactory( params ITransformer<LoggerConfiguration>[] transformers ) : this( new LoggerHistorySink(), transformers ) {}
 
 		public RecordingLoggerFactory( [Required]ILoggerHistory history, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, LoggingLevelSwitchFactory.Instance.Create(), transformers ) {}

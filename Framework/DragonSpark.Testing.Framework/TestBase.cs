@@ -5,7 +5,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
-using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using Serilog;
@@ -43,7 +42,7 @@ namespace DragonSpark.Testing.Framework
 	{
 		public static AssignExecutionContextCommand Assign( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => Assign( @this, new RecordingLoggerFactory( history, level ) );
 
-		static AssignExecutionContextCommand Assign( this MethodBase @this, RecordingLoggerFactory factory )
+		public static AssignExecutionContextCommand Assign( this MethodBase @this, RecordingLoggerFactory factory )
 		{
 			var result = new AssignExecutionContextCommand().ExecuteWith( @this );
 			DefaultServiceProvider.Instance.Assign( new ServiceProvider( factory ) );
