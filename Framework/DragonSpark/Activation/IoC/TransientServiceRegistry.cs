@@ -47,7 +47,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			var lifetimeManager = lifetimeFactory( parameter.MappedTo ) ?? new TransientLifetimeManager();
 			container.RegisterType( parameter.RequestedType, parameter.MappedTo, parameter.Name, lifetimeManager );
-			logger.Information( string.Format( Resources.ServiceRegistry_Registering, parameter.RequestedType, parameter.MappedTo, lifetimeManager.GetType().FullName ) );
+			logger.Debug( string.Format( Resources.ServiceRegistry_Registering, parameter.RequestedType, parameter.MappedTo, lifetimeManager.GetType().FullName ) );
 		}
 
 		public void Register( InstanceRegistrationParameter parameter )
@@ -55,14 +55,14 @@ namespace DragonSpark.Activation.IoC
 			var to = parameter.Instance.GetType();
 			var mapping = string.Concat( parameter.RequestedType.FullName, to != parameter.RequestedType ? $" -> {to.FullName}" : string.Empty );
 			var lifetimeManager = lifetimeFactory( to ) ?? new ContainerControlledLifetimeManager();
-			logger.Information( $"Registering Unity Instance: {mapping} ({lifetimeManager.GetType().FullName})" );
+			logger.Debug( $"Registering Unity Instance: {mapping} ({lifetimeManager.GetType().FullName})" );
 			container.RegisterInstance( parameter.RequestedType, parameter.Name, parameter.Instance, lifetimeManager );
 		}
 
 		public void RegisterFactory( FactoryRegistrationParameter parameter )
 		{
 			var lifetimeManager = lifetimeFactory( parameter.RequestedType ) ?? new TransientLifetimeManager();
-			logger.Information( $"Registering Unity Factory: {parameter.RequestedType} ({lifetimeManager.GetType().FullName})" );
+			logger.Debug( $"Registering Unity Factory: {parameter.RequestedType} ({lifetimeManager.GetType().FullName})" );
 			container.RegisterType( parameter.RequestedType, parameter.Name, lifetimeManager, new InjectionFactory( x => parameter.Factory() ) );
 		}
 	}

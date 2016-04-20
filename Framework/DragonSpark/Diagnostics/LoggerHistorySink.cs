@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using Serilog.Formatting.Display;
 using System.Collections.Generic;

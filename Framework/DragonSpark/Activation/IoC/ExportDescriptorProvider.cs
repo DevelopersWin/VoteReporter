@@ -1,25 +1,32 @@
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Values;
+using DragonSpark.Setup;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
+using System.Composition;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class ServicesIntegrationExtension : UnityContainerExtension
 	{
 		readonly IServiceProvider provider;
-		readonly Func<ILogger> logger;
+		readonly ILogger logger;
 		readonly IBuildPlanRepository repository;
+		readonly Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
 		readonly IStrategyRepository strategies;
 
-		public ServicesIntegrationExtension( IServiceProvider provider, Func<ILogger> logger, IStrategyRepository strategies, IBuildPlanRepository repository )
+		public ServicesIntegrationExtension( IServiceProvider provider, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, provider.Get<ILogger>(), strategies, repository, registry ) {}
+
+		ServicesIntegrationExtension( IServiceProvider provider, ILogger logger, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry )
 		{
 			this.provider = provider;
-			this.logger = new FirstFactory<ILogger>( logger, provider.Get<ILogger> ).Create;
+			this.logger = logger;
 			this.repository = repository;
+			this.registry = registry;
 			this.strategies = strategies;
 		}
 
@@ -34,7 +41,7 @@ namespace DragonSpark.Activation.IoC
 			};
 			entries.Each( strategies.Add );
 
-			var policy = new ServicesBuildPlanPolicy( provider );
+			var policy = new ServicesBuildPlanPolicy( provider, registry );
 			Context.Strategies.Add( new ServicesStrategy( policy ), UnityBuildStage.PreCreation );
 			
 			repository.Add( policy );
@@ -44,30 +51,39 @@ namespace DragonSpark.Activation.IoC
 	public class ServicesBuildPlanPolicy : IBuildPlanPolicy
 	{
 		readonly IServiceProvider provider;
+		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
 
-		public ServicesBuildPlanPolicy( IServiceProvider provider )
+		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry ) ) {}
+
+		public ServicesBuildPlanPolicy( IServiceProvider provider, Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry )
 		{
 			this.provider = provider;
+			this.registry = registry;
 		}
 
 		public void BuildUp( IBuilderContext context )
 		{
 			var existing = provider.GetService( context.BuildKey.Type );
+
+			existing.With( o =>
+			{
+				if ( new Checked( o, this ).Item.Apply() )
+				{
+					var instance = ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy( o );
+					if ( instance )
+					{
+						registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );
+					}
+				}
+			} );
 			context.Complete( existing );
 		}
 	}
 
-	/*public class NativeTypesFactory : FactoryBase<Type[]>
-	{
-		public static NativeTypesFactory Instance { get; } = new NativeTypesFactory();
-
-		protected override Type[] CreateItem() => new[] { typeof(AttributeProviderFactoryBase), typeof(MemberInfoProviderFactoryBase), typeof(MemberInfoAttributeProviderFactory), typeof(IAttributeProvider), typeof(IMemberInfoLocator) };
-	}*/
-
 	public class ServicesStrategy : BuilderStrategy
 	{
 		readonly ServicesBuildPlanPolicy policy;
-
+		
 		public ServicesStrategy( [Required] ServicesBuildPlanPolicy policy )
 		{
 			this.policy = policy;

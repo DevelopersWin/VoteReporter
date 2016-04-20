@@ -4,20 +4,14 @@ using System;
 
 namespace DragonSpark.Diagnostics
 {
-	/*[Persistent]
-	public class LoggerSource : FirstFactory<ILogger>
-	{
-		public LoggerSource( Func<ILogger> inner ) : base( inner, Services.Get<ILogger> ) {}
-	}*/
-
 	[Persistent]
 	public class TryContext
 	{
-		readonly Func<ILogger> source;
+		readonly ILogger logger;
 
-		public TryContext( Func<ILogger> source )
+		public TryContext( ILogger logger )
 		{
-			this.source = source;
+			this.logger = logger;
 		}
 
 		public Exception Try( Action action )
@@ -28,7 +22,6 @@ namespace DragonSpark.Diagnostics
 			}
 			catch ( Exception exception )
 			{
-				var logger = source();
 				logger.Debug( exception, "An exception has occurred while executing an application delegate." );
 				return exception;
 			}

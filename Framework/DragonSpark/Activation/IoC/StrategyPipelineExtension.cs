@@ -50,11 +50,11 @@ namespace DragonSpark.Activation.IoC
 
 	public class CachingBuildPlanExtension : UnityContainerExtension
 	{
-		readonly Func<ILogger> logger;
+		readonly ILogger logger;
 		readonly IBuildPlanRepository repository;
 		readonly HasFactorySpecification specification;
 
-		public CachingBuildPlanExtension( [Required] Func<ILogger> logger, IBuildPlanRepository repository, HasFactorySpecification specification )
+		public CachingBuildPlanExtension( ILogger logger, IBuildPlanRepository repository, HasFactorySpecification specification )
 		{
 			this.logger = logger;
 			this.repository = repository;
@@ -129,10 +129,10 @@ namespace DragonSpark.Activation.IoC
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
 		{
-			readonly Func<ILogger> logger;
+			readonly ILogger logger;
 			readonly LifetimeManagerFactory factory;
 
-			public MetadataLifetimeStrategy( [Required]Func<ILogger> logger, [Required]LifetimeManagerFactory factory )
+			public MetadataLifetimeStrategy( [Required]ILogger logger, [Required]LifetimeManagerFactory factory )
 			{
 				this.logger = logger;
 				this.factory = factory;
@@ -149,7 +149,7 @@ namespace DragonSpark.Activation.IoC
 						var lifetimeManager = factory.Create( reference.Type );
 						lifetimeManager.With( manager =>
 						{
-							logger().Debug( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
+							logger.Debug( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
 
 							context.PersistentPolicies.Set<ILifetimePolicy>( manager, reference );
 						} );
@@ -191,7 +191,7 @@ namespace DragonSpark.Activation.IoC
 					.Where( adapter.IsAssignableFrom )
 					.Where( specification.IsSatisfiedBy )
 					.OrderByDescending( order.GetWeight )
-					.FirstOrDefault( candidate => candidate.Name.StartsWith( name ) );
+					.FirstOrDefault( candidate => candidate.Name.Equals( name ) );
 			return result;
 		}
 	}

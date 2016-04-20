@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Aspects;
 
 namespace DragonSpark.Windows.TypeSystem
 {
@@ -25,6 +26,7 @@ namespace DragonSpark.Windows.TypeSystem
 	{
 		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();
 
+		[Freeze]
 		protected override void OnExecute( Assembly parameter ) => parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
 	}
 

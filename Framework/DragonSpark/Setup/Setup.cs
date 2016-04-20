@@ -14,9 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
+using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using static DragonSpark.Setup.ActivationProperties;
 using Type = System.Type;
 
 namespace DragonSpark.Setup
@@ -132,11 +134,31 @@ namespace DragonSpark.Setup
 		}
 	}
 
+	public static class ActivationProperties
+	{
+		public class IsActivatedInstanceSpecification : SpecificationBase<object>
+		{
+			public static IsActivatedInstanceSpecification Instance { get; } = new IsActivatedInstanceSpecification();
+
+			protected override bool Verify( object parameter ) => new Instance( parameter ).Item || new[] { parameter, new Factory( parameter ).Item }.NotNull().Any( o => o.Has<SharedAttribute>() );
+		}
+
+		public class Instance : AssociatedValue<bool>
+		{
+			public Instance( object instance ) : base( instance ) {}
+		}
+
+		public class Factory : AssociatedValue<Type>
+		{
+			public Factory( object instance ) : base( instance ) {}
+		}
+	}
+
 	public class InstanceServiceProvider : Collection<object>, IServiceProvider
 	{
 		public InstanceServiceProvider( [Required] params object[] instances )
 		{
-			this.AddRange( instances );
+			this.AddRange( instances.Select( o => o.With( self => new Instance( self ).Assign( true ) ) ) );
 		}
 
 		public object GetService( Type serviceType ) => this.FirstOrDefault( serviceType.Adapt().IsInstanceOfType );

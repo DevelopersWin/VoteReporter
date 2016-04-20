@@ -9,6 +9,7 @@ using System.Linq;
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 
@@ -49,7 +50,7 @@ namespace DragonSpark.Composition
 					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, promise.IsShared, NoDependencies,
 						_ => ExportDescriptor.Create( ( context, operation ) =>
 						{
-							Func<object> create = () => activator( context, operation ).With( context.Checked )/*.With( o => new ExportProperties.Factory( o ).Assign( promise ) )*/;
+							Func<object> create = () => activator( context, operation ).With( context.Checked ).With( o => new ActivationProperties.Factory( o ).Assign( promise.Contract.ContractType ) );
 							var item = promise.IsShared ? new SharedValue( context.FindContextWithin( boundary ), resultContract, create ).Item : create();
 							return item;
 						}, NoMetadata ) );
@@ -234,17 +235,4 @@ namespace DragonSpark.Composition
 			return result;
 		}
 	}
-
-	/*public static class ExportProperties
-	{
-		public class Instance : AssociatedValue<bool>
-		{
-			public Instance( object instance ) : base( instance ) {}
-		}
-
-		public class Factory : AssociatedValue<ExportDescriptorPromise>
-		{
-			public Factory( object instance ) : base( instance ) {}
-		}
-	}*/
 }

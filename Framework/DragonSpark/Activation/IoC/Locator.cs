@@ -20,18 +20,17 @@ namespace DragonSpark.Activation.IoC
 	class Constructor : ConstructorBase
 	{
 		readonly IUnityContainer container;
-		readonly RegisterEntireHierarchyCommand command;
-
-		public Constructor( [Required]IUnityContainer container, [Required]IResolutionSupport support, [Required]RegisterEntireHierarchyCommand command ) : base( support )
+		
+		public Constructor( [Required]IUnityContainer container, [Required]IResolutionSupport support ) : base( support )
 		{
 			this.container = container;
-			this.command = command;
 		}
 
 		protected override object CreateItem( ConstructTypeRequest parameter )
 		{
-			using ( var child = container.CreateChildContainer() )
+			using ( var child = container.CreateChildContainer().Extend<DefaultRegistrationsExtension>() )
 			{
+				var command = child.Resolve<RegisterEntireHierarchyCommand>();
 				parameter.Arguments.NotNull().Select( o => new InstanceRegistrationParameter( o ) ).Each( command.ExecuteWith );
 
 				var result = child.TryResolve( parameter.RequestedType );

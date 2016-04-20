@@ -99,13 +99,6 @@ namespace DragonSpark.Activation.IoC
 
 	public class DefaultBehaviorExtension : UnityContainerExtension
 	{
-		readonly Func<ILogger> logger;
-
-		public DefaultBehaviorExtension( Func<ILogger> logger )
-		{
-			this.logger = logger;
-		}
-
 		protected override void Initialize()
 		{
 			var repository = new StrategyRepository( Context.Strategies );

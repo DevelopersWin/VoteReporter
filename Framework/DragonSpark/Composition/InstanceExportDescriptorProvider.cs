@@ -8,6 +8,7 @@ using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Setup;
 
 namespace DragonSpark.Composition
 {
@@ -46,6 +47,7 @@ namespace DragonSpark.Composition
 		{
 			if ( contracts.Contains( contract ) )
 			{
+				new ActivationProperties.Instance( instance ).Assign( true );
 				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => instance, NoMetadata ) );
 			}
 		}

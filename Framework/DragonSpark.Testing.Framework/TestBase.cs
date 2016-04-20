@@ -5,14 +5,13 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
-using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using Serilog;
 using Serilog.Core;
 using System;
 using System.Reflection;
-using DragonSpark.Windows.TypeSystem;
 using Xunit.Abstractions;
 using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 

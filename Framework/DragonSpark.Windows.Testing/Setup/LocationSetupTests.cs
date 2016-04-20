@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
@@ -412,7 +411,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void CreateAssemblySimple( IUnityContainer container, IApplicationAssemblyLocator locator, [DragonSpark.Testing.Framework.Parameters.Service]Assembly sut )
 		{
-			Assert.False( container.IsRegistered<Assembly>() );
+			Assert.True( container.IsRegistered<Assembly>() );
 		}
 
 		[Theory, LocationSetup.AutoData]
