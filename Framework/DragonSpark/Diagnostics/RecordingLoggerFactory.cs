@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Diagnostics.Logger;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
@@ -100,30 +99,11 @@ namespace DragonSpark.Diagnostics
 		protected override LoggerConfiguration CreateItem( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( recorder );
 	}
 
-	public class Configuration
-	{
-		public static Configuration Default { get; } = new Configuration();
-
-		static Configuration()
-		{
-			Initialize( typeof(ProfilerFactory<Category.Debug>) );
-			Initialize( LogEventLevel.Information );
-		}
-
-		public static void Initialize( [OfFactoryType]Type defaultFactoryType ) => Default.ProfilerFactoryType = defaultFactoryType;
-
-		public static void Initialize( LogEventLevel level ) => Default.Level = level;
-
-		public Type ProfilerFactoryType { get; private set; }
-
-		public LogEventLevel Level { get; private set; }
-	}
-
 	public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>
 	{
 		public static LoggingLevelSwitchFactory Instance { get; } = new LoggingLevelSwitchFactory();
 
-		protected override LoggingLevelSwitch CreateItem() => new LoggingLevelSwitch { MinimumLevel = Configuration.Default.Level };
+		protected override LoggingLevelSwitch CreateItem() => new LoggingLevelSwitch { MinimumLevel = FrameworkConfiguration.Current.Diagnostics.Level };
 	}
 
 	public class RecordingLoggerFactory : LoggerFactory

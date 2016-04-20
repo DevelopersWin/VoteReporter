@@ -50,7 +50,7 @@ namespace DragonSpark.Runtime
 
 		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.AsFactory, parameter.AsFactory ) {}
 
-		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter )
+		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( FactoryDefaults<object>.Always )
 		{
 			this.command = new Lazy<ICommand>( command );
 			this.parameter = new Lazy<object>( parameter );
@@ -223,8 +223,8 @@ namespace DragonSpark.Runtime
 
 		protected abstract void OnExecute( TParameter parameter );
 
-		bool ICommand.CanExecute( object parameter ) => parameter.AsTo<TParameter, bool>( CanExecute );
+		bool ICommand.CanExecute( object parameter ) => CanExecute( parameter.As<TParameter>() );
 
-		void ICommand.Execute( object parameter ) => parameter.AsValid<TParameter>( Execute, $"'{GetType().FullName}' expects a '{typeof( TParameter ).FullName}' object to execute." );
+		void ICommand.Execute( object parameter ) => Execute( parameter.As<TParameter>() );
 	}
 }

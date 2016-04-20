@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -7,6 +8,8 @@ namespace DragonSpark.Setup.Commands
 {
 	public class ServicedCommand<TCommand, TParameter> : SetupCommandBase where TCommand : ICommand<TParameter>
 	{
+		public ServicedCommand() : base( FactoryDefaults<object>.Always ) {}
+
 		protected override void OnExecute( object parameter ) => Command.ExecuteWith( Parameter );
 
 		[Required, Service]

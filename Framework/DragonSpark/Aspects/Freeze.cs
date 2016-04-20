@@ -7,6 +7,7 @@ using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using DragonSpark.Configuration;
 
 namespace DragonSpark.Aspects
 {
@@ -52,7 +53,7 @@ namespace DragonSpark.Aspects
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( Factory != null && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
+			if ( Factory != null && FrameworkConfiguration.Current.EnableMethodCaching && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
 				args.ReturnValue = Factory.Create( args );
 			}

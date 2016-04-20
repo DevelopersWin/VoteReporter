@@ -1,5 +1,8 @@
 ﻿using DragonSpark.Setup.Registration;
 using System.Linq;
+using DragonSpark.Activation;
+using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using Xunit;
 using AssemblyProvider = DragonSpark.Windows.Runtime.AssemblyProvider;
 
@@ -11,7 +14,10 @@ namespace DragonSpark.Windows.Testing.Runtime
 		public void Assemblies( AssemblyProvider sut )
 		{
 			Assert.NotEqual( sut, AssemblyProvider.Instance );
-			Assert.True( sut.Create().All( assembly => assembly.IsDefined( typeof(RegistrationAttribute), false ) ) );
+			var assemblies = sut.Create();
+			var specification = new ApplicationAssemblySpecification( typeof(IFactory).Assembly.GetRootNamespace() );
+
+			Assert.True( assemblies.All( specification.IsSatisfiedBy ) );
 		} 
 	}
 }

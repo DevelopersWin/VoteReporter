@@ -197,7 +197,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Initialize.cs" />
     <Compile Include="Markup\ConfigurationExtension.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
     <Compile Include="Security\CertificateFactory.cs" />

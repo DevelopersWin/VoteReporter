@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using PostSharp.Aspects;
 using PostSharp.Serialization;
@@ -21,7 +21,12 @@ namespace DragonSpark.Aspects
 
 		Type FactoryType { get; set; }
 
-		IProfiler Create( MethodBase method ) => Services.Get<IFactory<MethodBase, IProfiler>>( FactoryType ?? Diagnostics.Configuration.Default.ProfilerFactoryType ).Create( method );
+		IProfiler Create( MethodBase method )
+		{
+			var type = FactoryType ?? FrameworkConfiguration.Current.Diagnostics.ProfilerFactoryType;
+			var result = Services.Get<IFactory<MethodBase, IProfiler>>( type ).Create( method );
+			return result;
+		}
 
 		public override void OnEntry( MethodExecutionArgs args ) => args.MethodExecutionTag = Create( args.Method ).With( profiler => profiler.Start() );
 

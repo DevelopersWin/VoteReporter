@@ -13,6 +13,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using DragonSpark.Windows.Runtime;
+using DragonSpark.Windows.TypeSystem;
 using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework
@@ -23,7 +25,13 @@ namespace DragonSpark.Testing.Framework
 		public static void Execution() => Activation.Execution.Initialize( ExecutionContext.Instance );
 
 		[ModuleInitializer( 1 )]
-		public static void Environment() => InitializeJetBrainsTaskRunnerCommand.Instance.ExecuteWith( AppDomain.CurrentDomain.SetupInformation );
+		public static void Environment()
+		{
+			var assembly = DomainApplicationAssemblyLocator.Instance.Create();
+			assembly.With( AssemblyInitializer.Instance.ExecuteWith );
+			
+			InitializeJetBrainsTaskRunnerCommand.Instance.ExecuteWith( AppDomain.CurrentDomain.SetupInformation );
+		}
 	}
 
 	public class JetBrainsApplicationDomainFactory : FactoryBase<AppDomain>

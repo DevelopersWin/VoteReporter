@@ -2,14 +2,12 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Nito.ConnectedProperties;
 
 namespace DragonSpark.TypeSystem
 {

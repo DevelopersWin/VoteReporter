@@ -1,5 +1,4 @@
-﻿using DragonSpark.Extensions;
-using PostSharp.Patterns.Threading;
+﻿using PostSharp.Patterns.Threading;
 using System;
 
 namespace DragonSpark

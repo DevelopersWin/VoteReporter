@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Diagnostics.Logger.Categories;
 using Log = DragonSpark.Diagnostics.Logger.Log;
 
 namespace DragonSpark.Diagnostics
@@ -23,9 +24,9 @@ namespace DragonSpark.Diagnostics
 		public static void Process( this IExceptionHandler target, Exception exception ) => target.Handle( exception ).With( a => a.RethrowRecommended.IsTrue( () => { throw a.Exception; } ) );
 	}
 
-	public class ProfilerFactory<T> : ProfilerFactory<Timer, T> where T : Category.Factory {}
+	public class ProfilerFactory<T> : ProfilerFactory<Timer, T> where T : CategoryFactory {}
 
-	public class ProfilerFactory<TTimer, TLog> : FactoryBase<MethodBase, IProfiler> where TLog : Category.Factory where TTimer : ITimer, new()
+	public class ProfilerFactory<TTimer, TLog> : FactoryBase<MethodBase, IProfiler> where TLog : CategoryFactory where TTimer : ITimer, new()
 	{
 		readonly Func<MethodBase, ILogger> loggerSource;
 		readonly Func<Log, Action<TimerEvent>> handlerSource;

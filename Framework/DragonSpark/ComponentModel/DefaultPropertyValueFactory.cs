@@ -48,25 +48,6 @@ namespace DragonSpark.ComponentModel
 			Metadata.SetValue( Instance, value );
 			return this;
 		}
-
-		/*protected bool Equals( DefaultValueParameter other )
-		{
-			return Equals( Instance, other.Instance ) && Equals( Metadata, other.Metadata );
-		}
-
-		public override bool Equals( object obj )
-		{
-			return !ReferenceEquals( null, obj ) && ( ReferenceEquals( this, obj ) || obj.GetType() == this.GetType() && Equals( (DefaultValueParameter)obj ) );
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				var result = Instance.GetHashCode() * 397 ^ Metadata.GetHashCode();
-				return result;
-			}
-		}*/
 	}
 
 }

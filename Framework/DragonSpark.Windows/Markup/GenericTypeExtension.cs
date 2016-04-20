@@ -24,23 +24,14 @@ namespace DragonSpark.Windows.Markup
 	[MarkupExtensionReturnType( typeof(Type) )]
 	public class GenericTypeExtension : MarkupExtensionBase
 	{
-		public GenericTypeExtension()
-		{}
-
 		public GenericTypeExtension( [NotEmpty]string typeName )
 		{
-			// var items = typeName.Split( new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
 			TypeName = typeName;
-			// ProvidedTypes = items.Skip( 1 ).ToArray();
 		}
 
 		[NotEmpty]
 		public string TypeName { [return: NotEmpty]get; set; }
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider )
-		{
-			var result = serviceProvider.Get<IXamlTypeResolver>().Resolve( TypeName );
-			return result;
-		}
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => serviceProvider.Get<IXamlTypeResolver>().Resolve( TypeName );
 	}
 }

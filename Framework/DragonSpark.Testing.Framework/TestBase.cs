@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger;
+using DragonSpark.Diagnostics.Logger.Categories;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
@@ -31,7 +31,7 @@ namespace DragonSpark.Testing.Framework
 				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? IgnoredOutputCommand.Instance.Run;
 				var history = Services.Get<ILoggerHistory>();
 				var logger = Services.Get<ILogger>();
-				using ( new Diagnostics.ProfilerFactory<Category.Debug>( output, logger, history ).Create( args.Method ) )
+				using ( new Diagnostics.ProfilerFactory<Debug>( output, logger, history ).Create( args.Method ) )
 				{
 					args.Proceed();
 				}
@@ -53,32 +53,9 @@ namespace DragonSpark.Testing.Framework
 
 	public class AssignExecutionContextCommand : AssignValueCommand<MethodBase>
 	{
-		/*readonly IWritableValue<IServiceProvider> serviceProvider;
-		readonly IWritableValue<ServiceProvider> defaultProvider;*/
+		public AssignExecutionContextCommand() : this( ExecutionContext.Instance ) {}
 
-		public AssignExecutionContextCommand() : this( /*CurrentServiceProvider.Instance,*/ ExecutionContext.Instance ) {}
-
-		// public AssignExecutionContextCommand( Func<ServiceProvider> defaultProvider ) : this( new DefaultServiceProvider( defaultProvider ) ) {}
-
-		// public AssignExecutionContextCommand( IWritableValue<ServiceProvider> defaultProvider ) : this( CurrentServiceProvider.Instance, defaultProvider, ExecutionContext.Instance ) {}
-
-		public AssignExecutionContextCommand( /*IWritableValue<IServiceProvider> serviceProvider,*/ IWritableValue<MethodBase> value ) : base( value )
-		{
-			/*this.serviceProvider = serviceProvider;
-			this.defaultProvider = defaultProvider;*/
-		}
-
-		protected override void OnExecute( MethodBase parameter )
-		{
-			AssemblyInitializer.Instance.ExecuteWith( parameter.DeclaringType.Assembly );
-
-			base.OnExecute( parameter );
-
-			/*if ( serviceProvider.Item == null )
-			{
-				serviceProvider.Assign( defaultProvider.Item );
-			}*/
-		}
+		public AssignExecutionContextCommand( IWritableValue<MethodBase> value ) : base( value ) {}
 	}
 
 	[Disposable]

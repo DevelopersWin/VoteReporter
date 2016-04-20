@@ -1,6 +1,5 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using PostSharp.Aspects.Internals;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;

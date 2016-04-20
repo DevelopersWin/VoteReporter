@@ -189,9 +189,11 @@
     <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProviderBase.cs" />
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
+    <Compile Include="Configuration\FrameworkConfiguration.cs" />
     <Compile Include="Configuration\CompositeConfigurationKey.cs" />
     <Compile Include="Configuration\ConfigurationRegistry.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
+    <Compile Include="Diagnostics\Logger\Categories\Class1.cs" />
     <Compile Include="Diagnostics\Logger\Log.cs" />
     <Compile Include="Diagnostics\TimerEvents.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />

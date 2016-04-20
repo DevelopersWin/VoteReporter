@@ -9,10 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using DragonSpark.Diagnostics.Logger.Categories;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	public class ProfilerFactory<T> : ConfiguringFactory<MethodBase, IProfiler> where T : Category.Factory
+	public class ProfilerFactory<T> : ConfiguringFactory<MethodBase, IProfiler> where T : CategoryFactory
 	{
 		readonly IDisposable[] disposables;
 

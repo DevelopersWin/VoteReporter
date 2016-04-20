@@ -3,7 +3,6 @@ using DragonSpark.Testing.Framework;
 using Serilog;
 using System.Composition;
 using System.Linq;
-using DragonSpark.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 

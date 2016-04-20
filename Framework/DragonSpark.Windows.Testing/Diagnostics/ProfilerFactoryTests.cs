@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Parsing;
 using System;
@@ -9,9 +9,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Serilog.Core;
+using DragonSpark.Diagnostics.Logger.Categories;
 using Xunit;
 using Xunit.Abstractions;
+using Debug = DragonSpark.Diagnostics.Logger.Categories.Debug;
 
 namespace DragonSpark.Windows.Testing.Diagnostics
 {
@@ -32,7 +33,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 			var listeners = new List<TraceListener>();
 			TraceListener only;
 			var logger = new RecordingLoggerFactory( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ).Create();
-			using ( new DragonSpark.Testing.Framework.Diagnostics.ProfilerFactory<Category.Debug>( lines.Add, logger, history, listeners ).Create( MethodBase.GetCurrentMethod() ) )
+			using ( new DragonSpark.Testing.Framework.Diagnostics.ProfilerFactory<Debug>( lines.Add, logger, history, listeners ).Create( MethodBase.GetCurrentMethod() ) )
 			{
 				only = listeners.Only();
 				Assert.Equal( 1, listeners.Count );

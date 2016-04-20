@@ -9,7 +9,9 @@ namespace DragonSpark.Extensions
 	{
 		public static IEnumerable<T> ExecuteMany<T>( this IEnumerable<T> @this, object parameter ) where T : ICommand => @this.Select( x => x.ExecuteWith( parameter ) ).NotNull().ToArray();
 
-		public static void Run<T, TParameter>( this T @this, TParameter parameter ) where T : ICommand<TParameter> => ExecuteWith<T>( @this, parameter );
+		public static void Run<T>( this ICommand<T> @this ) => Run( @this, default(T) );
+
+		public static void Run<T>( this ICommand<T> @this, T parameter ) => ExecuteWith<ICommand<T>>( @this, parameter );
 
 		public static T ExecuteWith<T, TParameter>( this T @this, TParameter parameter ) where T : ICommand<TParameter> 
 			=> ExecuteWith<T>( @this, parameter );
