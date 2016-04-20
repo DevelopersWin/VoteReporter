@@ -9,7 +9,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		
-		public Locator( [Required]IUnityContainer container, IResolutionSupport support ) : base( support )
+		public Locator( [Required]IUnityContainer container, IHandleTypeRequestSpecification support ) : base( support )
 		{
 			this.container = container;
 		}
@@ -21,7 +21,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		
-		public Constructor( [Required]IUnityContainer container, [Required]IResolutionSupport support ) : base( support )
+		public Constructor( [Required]IUnityContainer container, [Required]IHandleTypeRequestSpecification support ) : base( support )
 		{
 			this.container = container;
 		}

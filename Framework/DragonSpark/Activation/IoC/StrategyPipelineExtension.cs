@@ -53,12 +53,14 @@ namespace DragonSpark.Activation.IoC
 		readonly ILogger logger;
 		readonly IBuildPlanRepository repository;
 		readonly ISpecification<LocateTypeRequest> specification;
+		readonly Func<ResolvableTypeSpecification> source;
 
-		public CachingBuildPlanExtension( ILogger logger, IBuildPlanRepository repository, ISpecification<LocateTypeRequest> specification )
+		public CachingBuildPlanExtension( ILogger logger, IBuildPlanRepository repository, ISpecification<LocateTypeRequest> specification, Func<ResolvableTypeSpecification> source )
 		{
 			this.logger = logger;
 			this.repository = repository;
 			this.specification = specification;
+			this.source = source;
 		}
 
 		protected override void Initialize()
@@ -66,7 +68,7 @@ namespace DragonSpark.Activation.IoC
 			var policies = repository.List();
 			var policy = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( new TryContext( logger ).Try, specification, policies, policy ) );
-			Context.Policies.SetDefault<IConstructorSelectorPolicy>( DefaultUnityConstructorSelectorPolicy.Instance );
+			Context.Policies.SetDefault<IConstructorSelectorPolicy>( new ConstructorSelectorPolicy( source ) );
 		}
 
 		// public IList<IBuildPlanPolicy> Policies { get; } = new List<IBuildPlanPolicy> { new SingletonBuildPlanPolicy() };

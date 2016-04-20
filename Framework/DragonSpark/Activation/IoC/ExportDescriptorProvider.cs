@@ -67,16 +67,11 @@ namespace DragonSpark.Activation.IoC
 		public void BuildUp( IBuilderContext context )
 		{
 			var existing = provider.GetService( context.BuildKey.Type );
-
 			existing.With( o =>
 			{
-				if ( new Checked( o, this ).Item.Apply() )
+				if ( new Checked( o, this ).Item.Apply() && ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy( o ) )
 				{
-					var instance = ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy( o );
-					if ( instance )
-					{
-						registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );
-					}
+					registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );
 				}
 			} );
 			context.Complete( existing );

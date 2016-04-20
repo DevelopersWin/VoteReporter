@@ -24,7 +24,7 @@ namespace DragonSpark.Runtime
 
 		// readonly ConditionMonitor built = new ConditionMonitor();
 
-		[InjectionConstructor]
+		// [InjectionConstructor]
 		public Collection() : this( new T[0] )
 		{}
 

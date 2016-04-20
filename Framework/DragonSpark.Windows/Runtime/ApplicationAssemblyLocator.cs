@@ -24,7 +24,7 @@ namespace DragonSpark.Windows.Runtime
 
 		readonly AppDomain primary;
 
-		[InjectionConstructor]
+		// [InjectionConstructor]
 		public DomainApplicationAssemblyLocator() : this( AppDomain.CurrentDomain ) {}
 
 		public DomainApplicationAssemblyLocator( [Required]AppDomain primary ) 

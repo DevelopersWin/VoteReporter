@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
-	abstract class RegistrationSpecificationBase : SpecificationBase<TypeRequest>
+	public abstract class RegistrationSpecificationBase : SpecificationBase<TypeRequest>
 	{
 		protected RegistrationSpecificationBase( [Required] IPolicyList policies )
 		{
@@ -22,27 +22,27 @@ namespace DragonSpark.Activation.IoC
 		protected IPolicyList Policies { get; }
 	}
 
-	class RegisteredSpecification : DecoratedSpecification<TypeRequest>
+	public class RegisteredSpecification : DecoratedSpecification<TypeRequest>
 	{
 		public RegisteredSpecification( InstanceSpecification instance, IsRegisteredSpecification registered, HasRegisteredBuildPolicySpecification registeredBuildPolicy )
 			: base( instance.Or( registered.And( registeredBuildPolicy ) ) ) {}
 	}
 
-	class InstanceSpecification : RegistrationSpecificationBase
+	public class InstanceSpecification : RegistrationSpecificationBase
 	{
 		public InstanceSpecification( IPolicyList policies ) : base( policies ) {}
 
 		protected override bool Verify( TypeRequest parameter ) => Policies.Get<ILifetimePolicy>( parameter ).With( policy => policy.GetValue() ) != null;
 	}
 
-	class HasRegisteredBuildPolicySpecification : RegistrationSpecificationBase
+	public class HasRegisteredBuildPolicySpecification : RegistrationSpecificationBase
 	{
 		public HasRegisteredBuildPolicySpecification( [Required] IPolicyList policies ) : base( policies ) {}
 
 		protected override bool Verify( TypeRequest parameter ) => !( Policies.GetNoDefault<IBuildPlanPolicy>( parameter, false ) is DynamicMethodBuildPlan );
 	}
 
-	class StrategySpecification : DecoratedSpecification<TypeRequest>
+	public class StrategySpecification : DecoratedSpecification<TypeRequest>
 	{
 		readonly static ISpecification<StrategyValidatorParameter>[] DefaultValidators = { ArrayStrategyValidator.Instance, EnumerableStrategyValidator.Instance };
 
@@ -52,8 +52,7 @@ namespace DragonSpark.Activation.IoC
 			: base( validators.Any(), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
 	}
 
-		
-	class ContainsSingletonSpecification : SpecificationBase<Type>
+	public class ContainsSingletonSpecification : SpecificationBase<Type>
 	{
 		public static ContainsSingletonSpecification Instance { get; } = new ContainsSingletonSpecification( SingletonLocator.Instance );
 
@@ -67,7 +66,7 @@ namespace DragonSpark.Activation.IoC
 		protected override bool Verify( Type parameter ) => locator.Locate( parameter ) != null;
 	}
 
-	class HasConventionSpecification : SpecificationBase<Type>
+	public class HasConventionSpecification : SpecificationBase<Type>
 	{
 		readonly BuildableTypeFromConventionLocator locator;
 
@@ -126,7 +125,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	class ResolvableTypeSpecification : DecoratedSpecification<TypeRequest>
+	public class ResolvableTypeSpecification : DecoratedSpecification<TypeRequest>
 	{
 		public ResolvableTypeSpecification( 
 			RegisteredSpecification registered, 
@@ -161,6 +160,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
+	[Persistent]
 	class ResolvableConstructorSpecification : SpecificationBase<ConstructTypeRequest>
 	{
 		readonly ConstructorFactory factory;
@@ -187,9 +187,9 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	class ResolutionSupport : DecoratedSpecification<TypeRequest>, IResolutionSupport
+	class HandleTypeRequestSpecification : DecoratedSpecification<TypeRequest>, IHandleTypeRequestSpecification
 	{
-		public ResolutionSupport( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ) ) {}
+		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ) ) {}
 
 		[Freeze]
 		protected override bool Verify( TypeRequest parameter ) => base.Verify( parameter );
