@@ -1,17 +1,17 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using Serilog;
 using Serilog.Core;
+using Serilog.Events;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Diagnostics.Logger.Categories;
-using Log = DragonSpark.Diagnostics.Logger.Log;
 
 namespace DragonSpark.Diagnostics
 {
@@ -24,26 +24,31 @@ namespace DragonSpark.Diagnostics
 		public static void Process( this IExceptionHandler target, Exception exception ) => target.Handle( exception ).With( a => a.RethrowRecommended.IsTrue( () => { throw a.Exception; } ) );
 	}
 
-	public class ProfilerFactory<T> : ProfilerFactory<Timer, T> where T : CategoryFactory {}
-
-	public class ProfilerFactory<TTimer, TLog> : FactoryBase<MethodBase, IProfiler> where TLog : CategoryFactory where TTimer : ITimer, new()
+	public class ProfilerFactory : ProfilerFactoryBase<Timer>
+	{
+		public ProfilerFactory() : base( TimerEventConverter.Instance.Create ) {}
+	}
+	
+	public abstract class ProfilerFactoryBase<TTimer> : FactoryBase<MethodBase, IProfiler> where TTimer : ITimer, new()
 	{
 		readonly Func<MethodBase, ILogger> loggerSource;
-		readonly Func<Log, Action<TimerEvent>> handlerSource;
+		readonly Func<ILogger, Action<TimerEvent>> handlerSource;
 		readonly ISessionTimer timer;
 		readonly Func<MethodBase, CreateProfilerEvent> createSource;
 
-		public ProfilerFactory() : this( TimerEventConverter.Instance.Create ) {}
+		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( FrameworkConfiguration.Current.Diagnostics.Profiler.Level, templateSource ) {}
 
-		public ProfilerFactory( Func<TimerEvent, LoggerTemplate> templateSource ) : this( new MethodLoggerFactory( Services.Get<ILogger>() ).Create, templateSource ) {}
+		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( new MethodLoggerFactory( Services.Get<ILogger>() ).Create, level, templateSource ) {}
 
-		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, LoggerTemplate> templateSource ) : this( loggerSource, new TTimer(), log => new Handler<TimerEvent>( log, templateSource ).Run ) {}
+		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, FrameworkConfiguration.Current.Diagnostics.Profiler.Level, templateSource ) {}
 
-		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource, TTimer tracker, Func<Log, Action<TimerEvent>> handlerSource ) : this( loggerSource, tracker, new SessionTimer( tracker ), handlerSource ) {}
+		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, new TTimer(), log => new Handler<TimerEvent>( log, level, templateSource ).Run ) {}
 
-		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource, TTimer tracker, ISessionTimer timer, Func<Log, Action<TimerEvent>> handlerSource ) : this( loggerSource, timer, handlerSource, new HandlerFactory<TTimer>( timer, tracker ).Create ) {}
+		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, TTimer tracker, Func<ILogger, Action<TimerEvent>> handlerSource ) : this( loggerSource, tracker, new SessionTimer( tracker ), handlerSource ) {}
 
-		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource, ISessionTimer timer, Func<Log, Action<TimerEvent>> handlerSource, Func<MethodBase, CreateProfilerEvent> createSource )
+		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, TTimer tracker, ISessionTimer timer, Func<ILogger, Action<TimerEvent>> handlerSource ) : this( loggerSource, timer, handlerSource, new HandlerFactory<TTimer>( timer, tracker ).Create ) {}
+
+		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, ISessionTimer timer, Func<ILogger, Action<TimerEvent>> handlerSource, Func<MethodBase, CreateProfilerEvent> createSource )
 		{
 			this.loggerSource = loggerSource;
 			this.handlerSource = handlerSource;
@@ -54,10 +59,9 @@ namespace DragonSpark.Diagnostics
 		protected override IProfiler CreateItem( MethodBase parameter )
 		{
 			var logger = loggerSource( parameter );
-			var log = Services.Get<IFactory<ILogger, Log>>( typeof(TLog) ).Create( logger );
-			var handler = handlerSource( log );
+			var handler = handlerSource( logger );
 
-			var factory = new ProfilerFactory( timer, createSource, handler );
+			var factory = new ProfilerSourceFactory( timer, createSource, handler );
 			var result = factory.Create( parameter );
 			return result;
 		}
@@ -76,13 +80,13 @@ namespace DragonSpark.Diagnostics
 		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForContext( Constants.SourceContextPropertyName, $"{parameter.DeclaringType.Name}.{parameter}" );
 	}
 
-	public class ProfilerFactory : FactoryBase<MethodBase, IProfiler>
+	public class ProfilerSourceFactory : FactoryBase<MethodBase, IProfiler>
 	{
 		readonly ISessionTimer timer;
 		readonly Func<MethodBase, CreateProfilerEvent> source;
 		readonly Action<TimerEvent> handler;
 
-		public ProfilerFactory( ISessionTimer timer, Func<MethodBase, CreateProfilerEvent> source, Action<TimerEvent> handler )
+		public ProfilerSourceFactory( ISessionTimer timer, Func<MethodBase, CreateProfilerEvent> source, Action<TimerEvent> handler )
 		{
 			this.timer = timer;
 			this.source = source;
@@ -162,22 +166,84 @@ namespace DragonSpark.Diagnostics
 
 	public class CompositeLoggerTemplate : LoggerTemplate
 	{
-		public CompositeLoggerTemplate( params LoggerTemplate[] templates ) : this( string.Empty, templates ) {}
+		public CompositeLoggerTemplate( params ILoggerTemplate[] templates ) : this( string.Empty, templates ) {}
 
-		public CompositeLoggerTemplate( string separator, params LoggerTemplate[] templates ) : base( string.Join( separator, templates.Select( template => template.Template ) ), templates.SelectMany( template => template.Parameters ).ToArray() ) {}
+		public CompositeLoggerTemplate( string separator, params ILoggerTemplate[] templates ) : base( string.Join( separator, templates.Select( template => template.Template ) ), templates.SelectMany( template => template.Parameters ).ToArray() ) {}
 	}
 
-	public class LoggerTemplate
+	/*public class LoggerTemplate : LoggerTemplate<Information>
 	{
-		public LoggerTemplate( string template, params object[] parameters )
+		public LoggerTemplate( string template, params object[] parameters ) : base( template, parameters ) {}
+	}
+
+	public class LoggerTemplate<T> : LoggerTemplateBase where T : CategoryFactory
+	{
+		public LoggerTemplate( string template, params object[] parameters ) : base( Activator.Instance.Activate<T>().Create, template, parameters ) {}
+	}*/
+
+	public interface ILoggerExceptionTemplate : ILoggerTemplate
+	{
+		Exception Exception { get; }
+	}
+
+	public interface ILoggerTemplate
+	{
+		string Template { get; }
+
+		object[] Parameters { get; }
+
+		LogEventLevel IntendedLevel { get; }
+	}
+
+	public class ExceptionLoggerTemplate : LoggerTemplate, ILoggerExceptionTemplate
+	{
+		public ExceptionLoggerTemplate( Exception exception, string template, params object[] parameters ) : this( exception, LogEventLevel.Information, template, parameters ) {}
+
+		public ExceptionLoggerTemplate( Exception exception, LogEventLevel intendedLevel, string template, params object[] parameters ) : base( intendedLevel, template, parameters )
 		{
+			Exception = exception;
+		}
+
+		public Exception Exception { get; }
+	}
+
+	/*public class LoggerTemplateWithLevel : ILoggerExceptionTemplate
+	{
+		public LoggerTemplateWithLevel( ) {}
+
+		public string Template
+		{
+			get { return null; }
+		}
+
+		public object[] Parameters
+		{
+			get { return new object[] { }; }
+		}
+
+		public Exception Exception
+		{
+			get { return null; }
+		}
+	}*/
+
+	public class LoggerTemplate : ILoggerTemplate
+	{
+		protected LoggerTemplate( string template, params object[] parameters ) : this( LogEventLevel.Information, template, parameters ) {}
+
+		protected LoggerTemplate( LogEventLevel intendedLevel, string template, params object[] parameters )
+		{
+			IntendedLevel = intendedLevel;
 			Template = template;
 			Parameters = parameters;
 		}
 
+		public LogEventLevel IntendedLevel { get; }
 		public string Template { get; }
 
 		public object[] Parameters { get; }
+
+		// public Func<ILogger, Log> PreferredLog { get; }
 	}
 
 	public class TimerEvent<T> : TimerEvent where T : ITimer

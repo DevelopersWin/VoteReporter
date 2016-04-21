@@ -1,6 +1,5 @@
 ﻿using DragonSpark.ComponentModel;
 using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger.Categories;
 using DragonSpark.Runtime;
 using DragonSpark.Setup.Commands;
 using Serilog.Events;
@@ -14,6 +13,10 @@ namespace DragonSpark.Configuration
 
 	public class FrameworkConfiguration
 	{
+		public static Func<T> Factory<T>( Func<FrameworkConfiguration, T> get ) => () => get( Current );
+
+		// public static T Get<T>( Func<FrameworkConfiguration, T> get ) => get( Current );
+
 		public static FrameworkConfiguration Current { get; private set; } = new FrameworkConfiguration();
 
 		public static void Initialize( FrameworkConfiguration configuration ) => Current = configuration;
@@ -24,13 +27,22 @@ namespace DragonSpark.Configuration
 		public Diagnostics Diagnostics { get; set; } = new Diagnostics();
 	}
 
+	public class Profiler
+	{
+		[Default( typeof(ProfilerFactory) )]
+		public Type FactoryType { get; set; }
+
+		[Default( LogEventLevel.Debug )]
+		public LogEventLevel Level { get; set; }
+	}
+
+	[ContentProperty( nameof(Profiler) )]
 	public class Diagnostics
 	{
-		[Default( typeof(ProfilerFactory<Debug>) )]
-		public Type ProfilerFactoryType { get; set; }
+		public Profiler Profiler { get; set; } = new Profiler();
 
 		[Default( LogEventLevel.Information )]
-		public LogEventLevel Level { get; set; }
+		public LogEventLevel MinimumLevel { get; set; }
 	}
 
 	public class ConfigureFrameworkCommand : Command<FrameworkConfiguration>

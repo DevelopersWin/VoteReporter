@@ -1,11 +1,16 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Windows.Properties;
 using Serilog;
+using Serilog.Events;
 using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -20,18 +25,7 @@ namespace DragonSpark.Windows.Setup
 			this.level = level;
 		}
 
-		protected override string CreateItem()
-		{
-			try
-			{
-				var result = ConfigurationManager.OpenExeConfiguration( level ).FilePath;
-				return result;
-			}
-			catch ( ConfigurationException e )
-			{
-				return e.Filename;
-			}
-		}
+		protected override string CreateItem() => ConfigurationManager.OpenExeConfiguration( level ).FilePath;
 	}
 
 	public class ClearUserSettingCommand : Command<ApplicationSettingsBase>
@@ -59,54 +53,88 @@ namespace DragonSpark.Windows.Setup
 
 	public class InitializeUserSettingsCommand : Command<ApplicationSettingsBase>
 	{
-		readonly ILogger logger;
+		readonly LogCommand log;
 		readonly Func<string> pathSource;
 
-		public InitializeUserSettingsCommand( ILogger logger ) : this( logger, UserSettingsPathFactory.Instance.Create ) {}
+		public InitializeUserSettingsCommand( ILogger logger ) : this( new LogCommand( logger ), UserSettingsPathFactory.Instance.Create ) {}
 
-		public InitializeUserSettingsCommand( ILogger logger, Func<string> pathSource )
+		public InitializeUserSettingsCommand( LogCommand log, Func<string> pathSource ) : base( new OnlyOnceSpecification() )
 		{
-			this.logger = logger;
+			this.log = log;
 			this.pathSource = pathSource;
 		}
 
 		protected override void OnExecute( ApplicationSettingsBase parameter )
 		{
 			var path = pathSource();
-			if ( !File.Exists( path ) )
-			{
-				logger.Warning( "User setting file was not found at {Location}. Creating...", path );
-				try
-				{
-					var properties = parameter.Providers
-											  .Cast<SettingsProvider>()
-											  .SelectMany( provider => provider.GetPropertyValues( parameter.Context, parameter.Properties ).Cast<SettingsPropertyValue>() )
-											  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed();
+			var exists = !File.Exists( path );
 
-					if ( properties.Any() )
+			var templates = new[]
+			{
+				exists ? (ILoggerTemplate)new NotFound( path ) : new Upgrading( path ),
+				Run( parameter, path, exists )
+			};
+
+			templates.Each( log.Run );
+		}
+
+		static ILoggerTemplate Run( ApplicationSettingsBase parameter, string path, bool exists )
+		{
+			if ( exists )
+			{
+				var properties = parameter.Providers
+										  .Cast<SettingsProvider>()
+										  .SelectMany( provider => provider.GetPropertyValues( parameter.Context, parameter.Properties ).Cast<SettingsPropertyValue>() )
+										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute )
+										  .Fixed();
+				var any = properties.Any();
+				if ( any )
+				{
+					properties.Each( property => parameter[property.Name] = property.PropertyValue );
+					try
 					{
-						properties.Each( property => parameter[property.Name] = property.PropertyValue );
 						parameter.Save();
-						logger.Information( "User setting file created at {Location}", path );
 					}
-					else
+					catch ( ConfigurationErrorsException e )
 					{
-						logger.Warning( "Could not find a user-defined setting in setting {Type}.  User file not saved.", parameter.GetType().AssemblyQualifiedName );
+						return new ErrorSaving( e, path );
 					}
 				}
-				catch ( Exception e )
-				{
-					logger.Information( e, "Error occurred while creating user setting file at {Location}", path );
-				}
+				return any ? (ILoggerTemplate)new Created( path ) : new NotSaved( parameter.GetType() );
 			}
-			else
-			{
-				logger.Information( "Found user settings file at {Location}.  Upgrading...", path );
 
-				parameter.Upgrade();
+			parameter.Upgrade();
+			return new Complete( path );
+		}
 
-				logger.Information( "User settings file at {Location} is up to date.", path );
-			}
+		class ErrorSaving : ExceptionLoggerTemplate
+		{
+			public ErrorSaving( Exception exception, string path ) : base( exception, Resources.LoggerTemplates_ErrorSaving, path ) {}
+		}
+
+		class NotFound : LoggerTemplate
+		{
+			public NotFound( string path ) : base( LogEventLevel.Warning, Resources.LoggerTemplates_NotFound, path ) {}
+		}
+
+		class Created : LoggerTemplate
+		{
+			public Created( string path ) : base( Resources.LoggerTemplates_Created, path ) {}
+		}
+
+		class NotSaved : LoggerTemplate
+		{
+			public NotSaved( Type type ) : base( LogEventLevel.Warning, Resources.LoggerTemplates_NotSaved, type.AssemblyQualifiedName ) {}
+		}
+
+		class Upgrading : LoggerTemplate
+		{
+			public Upgrading( string path ) : base( Resources.LoggerTemplates_Upgrading, path ) {}
+		}
+
+		class Complete : LoggerTemplate
+		{
+			public Complete( string path ) : base( Resources.LoggerTemplates_Complete, path ) {}
 		}
 	}
 }

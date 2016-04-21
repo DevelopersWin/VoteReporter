@@ -117,6 +117,60 @@ namespace DragonSpark.Windows.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User settings file at {Location} is up to date..
+        /// </summary>
+        internal static string LoggerTemplates_Complete {
+            get {
+                return ResourceManager.GetString("LoggerTemplates.Complete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User setting file created at {Location}.
+        /// </summary>
+        internal static string LoggerTemplates_Created {
+            get {
+                return ResourceManager.GetString("LoggerTemplates_Created", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error occurred while creating user setting file at {Location}.
+        /// </summary>
+        internal static string LoggerTemplates_ErrorSaving {
+            get {
+                return ResourceManager.GetString("LoggerTemplates.ErrorSaving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User setting file was not found at {Location}. Creating....
+        /// </summary>
+        internal static string LoggerTemplates_NotFound {
+            get {
+                return ResourceManager.GetString("LoggerTemplates.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a user-defined setting in setting {Type}.  User file not saved..
+        /// </summary>
+        internal static string LoggerTemplates_NotSaved {
+            get {
+                return ResourceManager.GetString("LoggerTemplates.NotSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found user settings file at {Location}.  Upgrading....
+        /// </summary>
+        internal static string LoggerTemplates_Upgrading {
+            get {
+                return ResourceManager.GetString("LoggerTemplates.Upgrading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The ModulePath cannot contain a null value or be empty.
         /// </summary>
         internal static string ModulePathCannotBeNullOrEmpty {

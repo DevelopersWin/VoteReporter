@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
@@ -9,11 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using DragonSpark.Diagnostics.Logger.Categories;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	public class ProfilerFactory<T> : ConfiguringFactory<MethodBase, IProfiler> where T : CategoryFactory
+	public class ProfilerFactory : ConfiguringFactory<MethodBase, IProfiler>
 	{
 		readonly IDisposable[] disposables;
 
@@ -31,7 +29,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		
 		ProfilerFactory( ILogger logger, LoggerTraceListenerTrackingCommand command, Action purge ) : this( new ConfiguringFactory<MethodBase, ILogger>( new MethodLoggerFactory( logger ).Create, command.Run ).Create, new CompositeCommand( new DelegatedCommand( purge ), StartProcessCommand.Instance ), command, new DisposableAction( purge ) ) {}
 
-		ProfilerFactory( Func<MethodBase, ILogger> loggerSource, ICommand<IProfiler> command, params IDisposable[] disposables ) : base( new Windows.Diagnostics.ProfilerFactory<T>( loggerSource ).Create, command.Run )
+		ProfilerFactory( Func<MethodBase, ILogger> loggerSource, ICommand<IProfiler> command, params IDisposable[] disposables ) : base( new Windows.Diagnostics.ProfilerFactory( loggerSource ).Create, command.Run )
 		{
 			this.disposables = disposables;
 		}

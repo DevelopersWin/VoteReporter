@@ -4,13 +4,13 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
-	xmlns:ds="http://framework.dragonspark.us"
 	xmlns:diagnostics="clr-namespace:DragonSpark.Windows.Diagnostics;assembly=DragonSpark.Windows"
-	xmlns:categories="clr-namespace:DragonSpark.Diagnostics.Logger.Categories;assembly=DragonSpark"
 	mc:Ignorable="d">
 	<configuration:FrameworkConfiguration>
 		<configuration:FrameworkConfiguration.Diagnostics>
-			<configuration:Diagnostics Level="Debug" ProfilerFactoryType="{ds:GenericType diagnostics:ProfilerFactory(categories:Debug)}" />
+			<configuration:Diagnostics MinimumLevel="Debug">
+				<configuration:Profiler FactoryType="{x:Type diagnostics:ProfilerFactory}" />
+			</configuration:Diagnostics>
 		</configuration:FrameworkConfiguration.Diagnostics>
 	</configuration:FrameworkConfiguration>
 </configuration:InitializeFrameworkConfigurationCommand>

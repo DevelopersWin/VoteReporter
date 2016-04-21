@@ -194,7 +194,7 @@
     <Compile Include="Configuration\ValueStore.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
     <Compile Include="Diagnostics\Logger\Categories\Class1.cs" />
-    <Compile Include="Diagnostics\Logger\Log.cs" />
+    <Compile Include="Diagnostics\Logger\LogTemplate.cs" />
     <Compile Include="Diagnostics\TimerEvents.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Runtime\DisposableAction.cs" />

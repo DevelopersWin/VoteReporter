@@ -1,7 +1,7 @@
-using System;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Windows.Input;
@@ -9,6 +9,15 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Runtime
 {
+	public class FirstCommand<T> : CompositeCommand<T>
+	{
+		public FirstCommand( params ICommand[] commands ) : base( commands ) {}
+
+		public FirstCommand( ISpecification<T> specification, params ICommand[] commands ) : base( specification, commands ) {}
+
+		protected override void OnExecute( T parameter ) => Commands.FirstWhere( command => command.ExecuteWith<ICommand>( parameter ) );
+	}
+
 	public class CompositeCommand : CompositeCommand<object>
 	{
 		public CompositeCommand() : this( Default<ICommand>.Items ) {}

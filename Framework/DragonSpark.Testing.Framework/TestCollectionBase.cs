@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger.Categories;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
@@ -30,7 +29,7 @@ namespace DragonSpark.Testing.Framework
 				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? IgnoredOutputCommand.Instance.Run;
 				var history = Services.Get<ILoggerHistory>();
 				var logger = Services.Get<ILogger>();
-				using ( new Diagnostics.ProfilerFactory<Debug>( output, logger, history ).Create( args.Method ) )
+				using ( new Diagnostics.ProfilerFactory( output, logger, history ).Create( args.Method ) )
 				{
 					args.Proceed();
 				}

@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework;
@@ -9,7 +8,6 @@ using Serilog.Events;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using DragonSpark.Diagnostics.Logger.Categories;
 using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
@@ -62,7 +60,7 @@ namespace DragonSpark.Testing.Diagnostics
 
 		class PerformanceTester
 		{
-			[Profile( typeof(ProfilerFactory<Debug>) )]
+			[Profile( typeof(ProfilerFactory) )]
 			public void Perform() => Thread.Sleep( 1 );
 		}
 

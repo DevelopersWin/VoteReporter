@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger.Categories;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
@@ -19,7 +18,7 @@ namespace DragonSpark.Windows.Diagnostics
 		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.FromLogContext();
 	}
 
-	public class ProfilerFactory<T> : ProfilerFactory<Timer, T> where T : CategoryFactory
+	public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
 		public ProfilerFactory() : base( TimerEventConverter.Instance.Create ) {}
 
