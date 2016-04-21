@@ -193,7 +193,6 @@
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStore.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
-    <Compile Include="Diagnostics\Logger\Categories\Class1.cs" />
     <Compile Include="Diagnostics\Logger\LogTemplate.cs" />
     <Compile Include="Diagnostics\TimerEvents.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
@@ -450,7 +449,9 @@
       <Name>DragonSpark.Types</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Diagnostics\Logger\Categories\" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

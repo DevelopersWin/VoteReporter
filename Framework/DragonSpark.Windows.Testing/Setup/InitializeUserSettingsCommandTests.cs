@@ -1,10 +1,9 @@
-﻿using System;
-using System.Configuration;
-using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Setup;
 using DragonSpark.Windows.Testing.Properties;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using Xunit;
