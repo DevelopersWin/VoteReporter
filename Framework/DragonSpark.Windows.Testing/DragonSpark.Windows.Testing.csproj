@@ -235,8 +235,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\Configuration.xaml.cs">
-      <DependentUpon>Configuration.xaml</DependentUpon>
+    <Compile Include="Configuration\Values.xaml.cs">
+      <DependentUpon>Values.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configuration\ConfigurationTests.cs" />
     <Compile Include="Configuration\Item.xaml.cs">
@@ -257,6 +257,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Setup\InitializeUserSettingsCommandTests.cs" />
     <Compile Include="Setup\Registration\MetadataRegistrationCommandOtherTests.cs" />
     <Compile Include="Setup\Registration\MetadataRegistrationCommandTests.cs" />
     <Compile Include="Runtime\ApplicationExceptionFormatterTests.cs" />
@@ -388,7 +389,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Configuration\Configuration.xaml">
+    <Page Include="Configuration\Values.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

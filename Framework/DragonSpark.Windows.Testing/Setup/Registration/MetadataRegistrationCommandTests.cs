@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Setup.Registration
 {
-	public class MetadataRegistrationCommandTests : TestBase
+	public class MetadataRegistrationCommandTests : TestCollectionBase
 	{
 		public MetadataRegistrationCommandTests( ITestOutputHelper output ) : base( output ) {}
 

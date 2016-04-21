@@ -5,10 +5,10 @@ using Xunit;
 
 namespace DragonSpark.Testing.Configuration
 {
-	public class ConfigurationRegistryTests
+	public class IValueStoreests
 	{
 		[Theory, AutoData]
-		public void CheckEquality( ConfigurationRegistry sut, object value, string secondKey, Guid id, int number )
+		public void CheckEquality( ValueStore sut, object value, string secondKey, Guid id, int number )
 		{
 			Assert.Empty( sut );
 

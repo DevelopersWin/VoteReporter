@@ -35,6 +35,10 @@ namespace DragonSpark.Configuration
 
 	public class ConfigureFrameworkCommand : Command<FrameworkConfiguration>
 	{
+		public static ConfigureFrameworkCommand Instance { get; } = new ConfigureFrameworkCommand();
+
+		ConfigureFrameworkCommand() {}
+
 		protected override void OnExecute( FrameworkConfiguration parameter ) => FrameworkConfiguration.Initialize( parameter );
 	}
 }

@@ -1,11 +1,11 @@
 ﻿namespace DragonSpark.Windows.Testing.Configuration
 {
 	/// <summary>
-	/// Interaction logic for Configuration.xaml
+	/// Interaction logic for Values.xaml
 	/// </summary>
-	public partial class Configuration
+	public partial class Values
 	{
-		public Configuration()
+		public Values()
 		{
 			InitializeComponent();
 		}

@@ -16,7 +16,7 @@ using Debug = DragonSpark.Diagnostics.Logger.Categories.Debug;
 
 namespace DragonSpark.Windows.Testing.Diagnostics
 {
-	public class ProfilerFactoryTests : TestBase
+	public class ProfilerFactoryTests : TestCollectionBase
 	{
 		public ProfilerFactoryTests( ITestOutputHelper output ) : base( output ) {}
 

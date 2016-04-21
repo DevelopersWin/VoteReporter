@@ -25,7 +25,7 @@ namespace DragonSpark.Windows.Markup
 		}
 
 		[Required, Service]
-		IConfigurationRegistry Registry { [return: Required]get; set; }
+		IValueStore Registry { [return: Required]get; set; }
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{

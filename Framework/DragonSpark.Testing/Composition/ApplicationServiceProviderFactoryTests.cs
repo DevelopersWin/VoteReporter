@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Composition
 {
 	[AssemblyProvider.Register]
 	[AssemblyProvider.Types]
-	public class ApplicationServiceProviderFactoryTests : TestBase
+	public class ApplicationServiceProviderFactoryTests : TestCollectionBase
 	{
 		public static CompositionHost From( [Required] Assembly[] assemblies ) => new CompositionFactory( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ).Create();
 

@@ -235,7 +235,7 @@
     <Compile Include="Parameters\EnsureValuesAttribute.cs" />
     <Compile Include="Setup\SetupAutoDataCommandBase.cs" />
     <Compile Include="Setup\AutoData.cs" />
-    <Compile Include="TestBase.cs" />
+    <Compile Include="TestCollectionBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonSpark.Windows\DragonSpark.Windows.csproj">

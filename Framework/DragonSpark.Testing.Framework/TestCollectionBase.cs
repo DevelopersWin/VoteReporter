@@ -58,9 +58,9 @@ namespace DragonSpark.Testing.Framework
 	}
 
 	[Disposable]
-	public abstract class TestBase : FixedValue<ITestOutputHelper>
+	public abstract class TestCollectionBase : FixedValue<ITestOutputHelper>
 	{
-		protected TestBase( ITestOutputHelper output )
+		protected TestCollectionBase( ITestOutputHelper output )
 		{
 			Assign( output );
 		}

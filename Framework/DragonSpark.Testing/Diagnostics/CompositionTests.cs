@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	public class CompositionTests : TestBase
+	public class CompositionTests : TestCollectionBase
 	{
 		public CompositionTests( ITestOutputHelper output ) : base( output ) {}
 
