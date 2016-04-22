@@ -1,9 +1,7 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.Activation;
 using DragonSpark.Testing.Framework;
-using DragonSpark.TypeSystem;
-using System.Reflection;
+using System;
 using DragonSpark.Setup;
-using ServiceProviderFactory = DragonSpark.Setup.ServiceProviderFactory;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -16,33 +14,19 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		public UnityContainerFactory() : base( new ServiceProviderFactory( Default<Assembly>.Items ).Create ) {}
+		public UnityContainerFactory() : base( Services.Get<IServiceProvider> ) {}
 	}
 
-	/*[Export, Shared]
-	public class RecordingLoggerFactory : Diagnostics.RecordingLoggerFactory
+
+	public class DefaultUnityContainerFactory : Activation.IoC.UnityContainerFactory
 	{
-		[ImportingConstructor]
-		public RecordingLoggerFactory() {}
+		public class Register : RegisterFactoryAttribute
+		{
+			public Register() : base( typeof(DefaultUnityContainerFactory) ) {}
+		}
 
-		[Export]
-		public override LoggingLevelSwitch LevelSwitch => base.LevelSwitch;
+		public static DefaultUnityContainerFactory Instance { get; } = new DefaultUnityContainerFactory();
 
-		[Export]
-		public override ILoggerHistory History => base.History;
-	}*/
-
-	/*public class ServiceProviderFactory : DragonSpark.Composition.ServiceProviderFactory
-	{
-		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
-
-		ServiceProviderFactory() : base( new AssemblyBasedConfigurationContainerFactory( AssemblyProvider.Instance.Create() ).Create ) {}
-	}*/
-
-	/*public class Application<T> : Framework.Setup.Application<T> where T : ICommand
-	{
-		public Application( IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
-
-		public Application( IServiceProvider provider, IEnumerable<ICommand> commands ) : base( , commands ) {}
-	}*/
+		public DefaultUnityContainerFactory() : base( DefaultServiceProvider.Instance.Item.AsFactory ) {}
+	}
 }

@@ -12,6 +12,17 @@ using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
+	interface IHandleTypeRequestSpecification : ISpecification<TypeRequest> {}
+
+	[Persistent]
+	class HandleTypeRequestSpecification : DecoratedSpecification<TypeRequest>, IHandleTypeRequestSpecification
+	{
+		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ) ) {}
+
+		[Freeze]
+		protected override bool Verify( TypeRequest parameter ) => base.Verify( parameter );
+	}
+
 	public abstract class RegistrationSpecificationBase : SpecificationBase<TypeRequest>
 	{
 		protected RegistrationSpecificationBase( [Required] IPolicyList policies )
@@ -184,14 +195,5 @@ namespace DragonSpark.Activation.IoC
 				.All( key => parameters.Any( key.RequestedType.Adapt().IsAssignableFrom ) || factory.Create( key ) != null || resolvable.IsSatisfiedBy( key ) );
 			return result;
 		}
-	}
-
-	[Persistent]
-	class HandleTypeRequestSpecification : DecoratedSpecification<TypeRequest>, IHandleTypeRequestSpecification
-	{
-		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ) ) {}
-
-		[Freeze]
-		protected override bool Verify( TypeRequest parameter ) => base.Verify( parameter );
 	}
 }

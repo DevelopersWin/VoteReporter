@@ -15,7 +15,6 @@ namespace DragonSpark.Runtime.Specifications
 		public bool IsSatisfiedBy( object context ) => !inner.IsSatisfiedBy( context );
 	}
 	
-
 	public class NullSpecification : ISpecification<object>
 	{
 		public static NullSpecification Instance { get; } = new NullSpecification();

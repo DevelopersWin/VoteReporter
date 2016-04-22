@@ -1,4 +1,4 @@
-﻿using DragonSpark.Testing.Objects.Setup;
+﻿using DragonSpark.Testing.Objects.IoC;
 using Ploeh.AutoFixture.Xunit2;
 using PostSharp.Patterns.Model;
 using System;

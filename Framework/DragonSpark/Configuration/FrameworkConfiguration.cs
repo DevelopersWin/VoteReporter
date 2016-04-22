@@ -1,6 +1,7 @@
 ﻿using DragonSpark.ComponentModel;
 using DragonSpark.Diagnostics;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Commands;
 using Serilog.Events;
 using System;
@@ -11,15 +12,20 @@ namespace DragonSpark.Configuration
 	[ContentProperty( nameof(Parameter) )]
 	public class InitializeFrameworkConfigurationCommand : ServicedCommand<ConfigureFrameworkCommand, FrameworkConfiguration> {}
 
+	class CurrentFrameworkConfiguration : ExecutionContextValue<FrameworkConfiguration>
+	{
+		public static CurrentFrameworkConfiguration Instance { get; } = new CurrentFrameworkConfiguration();
+
+		CurrentFrameworkConfiguration() : base( () => new FrameworkConfiguration() ) {}
+	}
+
 	public class FrameworkConfiguration
 	{
 		public static Func<T> Factory<T>( Func<FrameworkConfiguration, T> get ) => () => get( Current );
 
-		// public static T Get<T>( Func<FrameworkConfiguration, T> get ) => get( Current );
+		public static FrameworkConfiguration Current { get; } = CurrentFrameworkConfiguration.Instance.Item;
 
-		public static FrameworkConfiguration Current { get; private set; } = new FrameworkConfiguration();
-
-		public static void Initialize( FrameworkConfiguration configuration ) => Current = configuration;
+		public static void Initialize( FrameworkConfiguration configuration ) => CurrentFrameworkConfiguration.Instance.Assign( configuration );
 
 		[Default( true )]
 		public bool EnableMethodCaching { get; set; }

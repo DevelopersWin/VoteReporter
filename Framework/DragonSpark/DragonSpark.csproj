@@ -163,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />
+    <Compile Include="Activation\IoC\UnityContainerFactory.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Activation\Factory.cs" />
     <Compile Include="Activation\IExecutionContext.cs" />
@@ -219,7 +220,6 @@
     <Compile Include="Activation\IoC\ArrayResolutionStrategy.cs" />
     <Compile Include="Activation\IoC\ConstructorSelectorPolicy.cs" />
     <Compile Include="Activation\IoC\EnumerableResolutionStrategy.cs" />
-    <Compile Include="Activation\IoC\IHandleTypeRequestSpecification.cs" />
     <Compile Include="Activation\IoC\ResolutionContext.cs" />
     <Compile Include="Activation\IoC\HandleTypeRequestSpecification.cs" />
     <Compile Include="Activation\IoC\TransientServiceRegistry.cs" />

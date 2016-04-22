@@ -3,7 +3,6 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
@@ -21,12 +20,12 @@ namespace DragonSpark.Setup.Registration
 			this.parameter = parameter;
 		}
 
-		public void Register( IServiceRegistry registry )
-		{
-			new ICommand<RegisterFactoryParameter>[] { new RegisterFactoryWithParameterCommand( registry ), new RegisterFactoryCommand( registry ) }
-				.FirstOrDefault( command => command.CanExecute( parameter ) )
-				.With( command => command.Run( parameter ) );
-		}
+		public void Register( IServiceRegistry registry ) => new FactoryRegistrationCommand( registry ).Run( parameter );
+	}
+
+	class FactoryRegistrationCommand : FirstCommand<RegisterFactoryParameter>
+	{
+		public FactoryRegistrationCommand( IServiceRegistry registry ) : base( new RegisterFactoryWithParameterCommand( registry ), new RegisterFactoryCommand( registry ) ) {}
 	}
 
 	public static class ServiceRegistryExtensions

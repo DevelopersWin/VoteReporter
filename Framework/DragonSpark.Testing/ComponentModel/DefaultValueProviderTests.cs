@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Objects;
-using DragonSpark.Testing.Objects.Setup;
+using DragonSpark.Testing.Objects.IoC;
 using Microsoft.Practices.ServiceLocation;
 using System;
 using Xunit;

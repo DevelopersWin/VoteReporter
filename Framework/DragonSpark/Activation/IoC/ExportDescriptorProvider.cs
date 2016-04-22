@@ -11,6 +11,14 @@ using System;
 
 namespace DragonSpark.Activation.IoC
 {
+	public class ServiceProviderSpecificationFactory : FactoryBase<IServiceProvider, ISpecification<LocateTypeRequest>>
+	{
+		public static ServiceProviderSpecificationFactory Instance { get; } = new ServiceProviderSpecificationFactory();
+		
+		protected override ISpecification<LocateTypeRequest> CreateItem( IServiceProvider parameter ) => 
+			parameter.Get<FactoryTypeRequestLocator>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? FactoryDefaults<LocateTypeRequest>.Always;
+	}
+
 	public class ServicesIntegrationExtension : UnityContainerExtension
 	{
 		readonly IServiceProvider provider;
@@ -20,7 +28,7 @@ namespace DragonSpark.Activation.IoC
 		readonly ISpecification<LocateTypeRequest> specification;
 		readonly IStrategyRepository strategies;
 
-		public ServicesIntegrationExtension( IServiceProvider provider, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, provider.Get<ILogger>(), strategies, repository, registry, new HasFactorySpecification( provider.Get<FactoryTypeRequestLocator>() ).Inverse() ) {}
+		public ServicesIntegrationExtension( IServiceProvider provider, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, provider.Get<ILogger>(), strategies, repository, registry, ServiceProviderSpecificationFactory.Instance.Create( provider ) ) {}
 
 		ServicesIntegrationExtension( IServiceProvider provider, ILogger logger, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
 		{

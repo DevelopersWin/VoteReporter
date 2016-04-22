@@ -64,7 +64,6 @@ namespace DragonSpark.Activation.IoC
 
 		public SelectedConstructor SelectConstructor( IBuilderContext context, IPolicyList resolverPolicyDestination ) => Create( context.BuildKey.Type ) ?? DefaultUnityConstructorSelectorPolicy.Instance.SelectConstructor( context, resolverPolicyDestination );
 
-		[Freeze]
 		SelectedConstructor Create( Type type )
 		{
 			var ctor = FromMetadata( type ) ?? Search( type );
@@ -90,7 +89,7 @@ namespace DragonSpark.Activation.IoC
 				case 1:
 					return array[0];
 				default:
-					throw new InvalidOperationException( string.Format( CultureInfo.CurrentCulture, "Resources.MultipleInjectionConstructors: {0}", (object)typeToConstruct.GetTypeInfo().Name ) );
+					throw new InvalidOperationException( string.Format( CultureInfo.CurrentCulture, "Resources.MultipleInjectionConstructors: {0}", typeToConstruct.GetTypeInfo().Name ) );
 			}
 		}
 

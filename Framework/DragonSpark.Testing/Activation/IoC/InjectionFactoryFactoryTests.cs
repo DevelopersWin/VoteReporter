@@ -1,11 +1,9 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
-using Serilog;
 using System;
 using System.Composition;
 using Xunit;
@@ -267,7 +265,7 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void Create()
 		{
-			var container = Objects.Setup.UnityContainerFactory.Instance.Create();
+			var container = Objects.IoC.UnityContainerFactory.Instance.Create();
 			var sut = new InjectionFactoryFactory( typeof(Factory) );
 			container.RegisterType<IItem, Item>( new ContainerControlledLifetimeManager() );
 			var expected = container.Resolve<IItem>();

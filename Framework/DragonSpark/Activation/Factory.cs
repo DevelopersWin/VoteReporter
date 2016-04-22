@@ -137,6 +137,8 @@ namespace DragonSpark.Activation
 	[Persistent]
 	public class FactoryTypeRequestLocator : FactoryBase<LocateTypeRequest, Type>
 	{
+		/*public static FactoryTypeRequestLocator Instance { get; } = new FactoryTypeRequestLocator( Default<FactoryTypeRequest>.Items );*/
+
 		readonly FactoryTypeRequest[] types;
 
 		public FactoryTypeRequestLocator( [Required] FactoryTypeRequest[] types )

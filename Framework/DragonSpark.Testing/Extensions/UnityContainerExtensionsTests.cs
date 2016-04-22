@@ -43,6 +43,6 @@ namespace DragonSpark.Testing.Extensions
 		}
 
 		[Export]
-		class UnityContainerFactory : Objects.Setup.UnityContainerFactory {}
+		class UnityContainerFactory : Objects.IoC.UnityContainerFactory {}
 	}
 }

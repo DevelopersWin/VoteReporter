@@ -6,7 +6,6 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Runtime.Values;
 
 namespace DragonSpark.Testing.Framework.Setup.Location
 {
@@ -26,31 +25,24 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 		public void Register( [Required]MappingRegistrationParameter parameter )
 		{
 			fixture.Customizations.Insert( 0, new TypeRelay( parameter.RequestedType, parameter.MappedTo ) );
-			/*if ( new ApplyRegistration( parameter ).Item )
-			{}*/
 			new[] { parameter.RequestedType, parameter.MappedTo }.Distinct().Each( registered.Ensure );
 		}
 
-		public void Register( [Required]InstanceRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterInstance), new[] { parameter.RequestedType }, parameter.Instance/*, new ApplyRegistration( parameter ).Item*/ );
+		public void Register( [Required]InstanceRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterInstance), new[] { parameter.RequestedType }, parameter.Instance );
 
-		void RegisterInstance<T>( [Required]T instance/*, bool applyRegistration*/ )
+		void RegisterInstance<T>( [Required]T instance )
 		{
 			fixture.Inject( instance );
 			registered.Ensure( typeof(T) );
 		}
 
-		public void RegisterFactory( [Required]FactoryRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterFactory), parameter.RequestedType.ToItem(), parameter.Factory/*, new ApplyRegistration( parameter ).Item*/ );
+		public void RegisterFactory( [Required]FactoryRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterFactory), parameter.RequestedType.ToItem(), parameter.Factory );
 
-		void RegisterFactory<T>( [Required]Func<object> factory/*, bool applyRegistration*/ )
+		void RegisterFactory<T>( [Required]Func<object> factory )
 		{
 			var convert = factory.Convert<T>();
 			fixture.Register( convert );
 			registered.Ensure( typeof(T) );
 		}
-
-		/*public class ApplyRegistration : AssociatedValue<RegistrationParameter, bool>
-		{
-			public ApplyRegistration( RegistrationParameter instance ) : base( instance, typeof(ApplyRegistration), () => true ) {}
-		}*/
 	}
 }

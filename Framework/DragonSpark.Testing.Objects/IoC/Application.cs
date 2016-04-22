@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Composition;
+﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
@@ -7,9 +6,22 @@ using DragonSpark.Windows.Runtime;
 using System;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Testing.Framework;
 
 namespace DragonSpark.Testing.Objects.IoC
 {
+	public class UnityContainerFactory : Activation.IoC.UnityContainerFactory
+	{
+		public class Register : RegisterFactoryAttribute
+		{
+			public Register() : base( typeof(UnityContainerFactory) ) {}
+		}
+
+		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
+
+		public UnityContainerFactory() : base( new DragonSpark.Setup.ServiceProviderFactory( Default<Assembly>.Items ).Create ) {}
+	}
+
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
 		public AutoDataAttribute() : this( provider => new Application( provider ) ) {}
