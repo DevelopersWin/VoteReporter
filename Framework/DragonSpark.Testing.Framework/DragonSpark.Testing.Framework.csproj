@@ -98,20 +98,20 @@
       <HintPath>$(SolutionDir)packages\Albedo.1.0.2\lib\net35\Ploeh.Albedo.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ploeh.AutoFixture, Version=3.44.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\AutoFixture.3.44.0\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+    <Reference Include="Ploeh.AutoFixture, Version=3.44.1.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoFixture.3.44.1\lib\net40\Ploeh.AutoFixture.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ploeh.AutoFixture.AutoMoq, Version=3.44.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\AutoFixture.AutoMoq.3.44.0\lib\net40\Ploeh.AutoFixture.AutoMoq.dll</HintPath>
+    <Reference Include="Ploeh.AutoFixture.AutoMoq, Version=3.44.1.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoFixture.AutoMoq.3.44.1\lib\net40\Ploeh.AutoFixture.AutoMoq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ploeh.AutoFixture.Idioms, Version=3.44.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\AutoFixture.Idioms.3.44.0\lib\net40\Ploeh.AutoFixture.Idioms.dll</HintPath>
+    <Reference Include="Ploeh.AutoFixture.Idioms, Version=3.44.1.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoFixture.Idioms.3.44.1\lib\net40\Ploeh.AutoFixture.Idioms.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ploeh.AutoFixture.Xunit2, Version=3.44.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\AutoFixture.Xunit2.3.44.0\lib\net45\Ploeh.AutoFixture.Xunit2.dll</HintPath>
+    <Reference Include="Ploeh.AutoFixture.Xunit2, Version=3.44.1.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoFixture.Xunit2.3.44.1\lib\net45\Ploeh.AutoFixture.Xunit2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PostSharp, Version=4.2.25.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
@@ -141,7 +141,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="SerilogTraceListener, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\SerilogTraceListener.1.0.7\lib\net45\SerilogTraceListener.dll</HintPath>
+      <HintPath>..\..\packages\SerilogTraceListener.1.0.15\lib\net45\SerilogTraceListener.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
