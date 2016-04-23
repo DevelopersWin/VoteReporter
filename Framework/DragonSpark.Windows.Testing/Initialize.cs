@@ -7,11 +7,9 @@ namespace DragonSpark.Windows.Testing
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Parts()
-		{
-			var assemblyLoader = new TypeSystem.AssemblyLoader( assembly => "DragonSpark.Testing" );
-			var command = new LoadPartAssemblyCommand( assemblyLoader );
-			command.Run( typeof(Initialize).Assembly );
-		}
+		public static void Settings() => Properties.Settings.Default.Reset();
+
+		[ModuleInitializer( 1 )]
+		public static void Parts() => new LoadPartAssemblyCommand( new TypeSystem.AssemblyLoader( assembly => "DragonSpark.Testing" ) ).Run( typeof(Initialize).Assembly );
 	}
 }

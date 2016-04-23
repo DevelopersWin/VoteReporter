@@ -26,7 +26,7 @@ namespace DragonSpark.Configuration
 
 		T New<T>() where T : IConfiguration, new()
 		{
-			lock ( Store )
+			// lock ( Store )
 			{
 				var result = new T();
 				Add( result );
