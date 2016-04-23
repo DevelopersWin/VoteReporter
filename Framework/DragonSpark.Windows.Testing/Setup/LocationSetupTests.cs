@@ -484,7 +484,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{ }
 
 		[Register.Mapped]
-		public new class Item : IItem
+		public class Item : IItem
 		{ }
 
 		[Register.Mapped( "AnotherItem" )]

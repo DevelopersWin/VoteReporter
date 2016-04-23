@@ -1,6 +1,6 @@
 namespace DragonSpark.Activation
 {
-	public interface IFactoryWithParameter
+	public interface IFactoryWithParameter : ICreator
 	{
 		bool CanCreate( object parameter );
 
@@ -8,4 +8,6 @@ namespace DragonSpark.Activation
 
 		/*Type ParameterType { get; }*/
 	}
+
+	public interface ICreator {}
 }

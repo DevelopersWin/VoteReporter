@@ -48,44 +48,58 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
+	public class ConstructorExtension : UnityContainerExtension
+	{
+		readonly ResolvableTypeSpecification specification;
+
+		public ConstructorExtension( ResolvableTypeSpecification specification )
+		{
+			this.specification = specification;
+		}
+
+		protected override void Initialize() => Context.Policies.SetDefault<IConstructorSelectorPolicy>( new ConstructorSelectorPolicy( specification ) );
+	}
+
 	public class CachingBuildPlanExtension : UnityContainerExtension
 	{
 		readonly ILogger logger;
 		readonly IBuildPlanRepository repository;
 		readonly ISpecification<LocateTypeRequest> specification;
-		readonly ResolvableTypeSpecification resolvableTypeSpecification;
 
-		public CachingBuildPlanExtension( ILogger logger, IBuildPlanRepository repository, ISpecification<LocateTypeRequest> specification, ResolvableTypeSpecification resolvableTypeSpecification )
+		public CachingBuildPlanExtension( ILogger logger, IBuildPlanRepository repository, ISpecification<LocateTypeRequest> specification )
 		{
 			this.logger = logger;
 			this.repository = repository;
 			this.specification = specification;
-			this.resolvableTypeSpecification = resolvableTypeSpecification;
 		}
 
 		protected override void Initialize()
 		{
 			var policies = repository.List();
-			var policy = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) );
-			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( new BuildPlanCreatorPolicy( new TryContext( logger ).Try, specification, policies, policy ) );
-			Context.Policies.SetDefault<IConstructorSelectorPolicy>( new ConstructorSelectorPolicy( resolvableTypeSpecification ) );
+			var creator = new Creator( Container ).Item.With( c => c.GetType() ) ?? ThreadAmbientContext.GetCurrent();
+			var creators = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ), creator );
+			var policy = new BuildPlanCreatorPolicy( new TryContext( logger ).Try, specification, policies, creators );
+			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
 		}
 
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
 			readonly IBuildPlanCreatorPolicy inner;
+			readonly object creator;
 
-			public CachedCreatorPolicy( [Required] IBuildPlanCreatorPolicy inner )
+			public CachedCreatorPolicy( [Required] IBuildPlanCreatorPolicy inner, object creator )
 			{
 				this.inner = inner;
+				this.creator = creator;
 			}
 
-			class Plan : ThreadAmbientValue<IBuildPlanPolicy>
+			class Plan : AssociatedValue<IBuildPlanPolicy>
 			{
-				public Plan( Type key, Func<IBuildPlanPolicy> create ) : base( KeyFactory.Instance.CreateUsing( key, typeof(Plan) ).ToString(), create ) {}
+				public Plan( object creator, Type key, Func<IBuildPlanPolicy> create ) : base( creator, KeyFactory.Instance.CreateUsing( key, typeof(Plan) ).ToString(), create ) {}
 			}
 
-			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => new Plan( context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Item;
+			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) 
+				=> new Plan( creator, context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Item;
 		}
 	}
 

@@ -65,6 +65,7 @@
     <Compile Include="IClassWithParameter.cs" />
     <Compile Include="IInterface.cs" />
     <Compile Include="IItem.cs" />
+    <Compile Include="Initialize.cs" />
     <Compile Include="IObject.cs" />
     <Compile Include="IoC\Application.cs" />
     <Compile Include="Item.cs" />

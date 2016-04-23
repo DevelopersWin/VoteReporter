@@ -106,7 +106,7 @@ namespace DragonSpark.Activation
 
 		protected object CreateFromItem( object parameter ) => Coerce( parameter, Create );
 
-		public TResult Create( TParameter parameter ) => CanCreate( parameter ) ? CreateItem( parameter ) : Default<TResult>.Item;
+		public TResult Create( TParameter parameter ) => CanCreate( parameter ) ? CreateItem( parameter ).With( result => Creator.Tag( this, result ) ) : Default<TResult>.Item;
 
 		protected abstract TResult CreateItem( [Required]TParameter parameter );
 		
@@ -241,8 +241,15 @@ namespace DragonSpark.Activation
 
 		protected abstract TResult CreateItem();
 
-		public virtual TResult Create() => specification.IsSatisfiedBy( this ) ? CreateItem() : default(TResult);
+		public virtual TResult Create() => specification.IsSatisfiedBy( this ) ? CreateItem().With( result => Creator.Tag( this, result ) ) : default(TResult);
 
 		object IFactory.Create() => Create();
+	}
+
+	public class Creator : AssociatedValue<ICreator>
+	{
+		public static void Tag( ICreator @this, object item ) => new Creator( item ).Assign( @this );
+
+		public Creator( object instance ) : base( instance, typeof(Creator) ) {}
 	}
 }

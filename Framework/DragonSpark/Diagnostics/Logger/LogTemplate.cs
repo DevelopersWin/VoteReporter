@@ -31,7 +31,7 @@ namespace DragonSpark.Diagnostics.Logger
 			var level = levelSource( parameter );
 			var method = typeof(ILogger).GetRuntimeMethod( level.ToString(), parameters.Select( o => o.GetType() ).ToArray() );
 			var @delegate = method.CreateDelegate( typeof(TDelegate), logger );
-			@delegate.FastDynamicInvoke( parameters );
+			@delegate.DynamicInvoke( parameters );
 		}
 	}
 

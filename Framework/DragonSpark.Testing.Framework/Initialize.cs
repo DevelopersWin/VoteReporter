@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using PostSharp.Aspects;
+using System.Diagnostics;
 using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework

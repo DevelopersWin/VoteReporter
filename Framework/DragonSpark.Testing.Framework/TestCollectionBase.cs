@@ -8,7 +8,6 @@ using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
-using Serilog;
 using Serilog.Core;
 using System;
 using System.Reflection;
@@ -24,7 +23,7 @@ namespace DragonSpark.Testing.Framework
 
 		ExecuteMethodAspect() {}
 
-		public override void OnInvoke( MethodInterceptionArgs args ) => new ApplicationOutputCommand().Run( args );
+		public override void OnInvoke( MethodInterceptionArgs args ) => new ApplicationOutputCommand().Run( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 	}
 
 	public class ApplicationOutputCommand : OutputCommand

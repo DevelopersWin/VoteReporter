@@ -6,7 +6,7 @@ using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Activation
 {
-	public interface IFactory
+	public interface IFactory : ICreator
 	{
 		object Create();
 	}
@@ -15,9 +15,7 @@ namespace DragonSpark.Activation
 	{
 		new T Create();
 	}
-
-	public interface ITransformer<T> : IFactory<T, T>
-	{}
+	public interface ITransformer<T> : IFactory<T, T> {}
 
 	public interface IFactory<in TParameter, out TResult> : IFactoryWithParameter
 	{

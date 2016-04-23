@@ -60,8 +60,9 @@ namespace DragonSpark.Activation.IoC
 
 		protected override IUnityContainer CreateItem( IUnityContainer parameter ) => 
 			parameter
-				.Extend<DefaultRegistrationsExtension>()
 				.Extend<CachingBuildPlanExtension>()
+				.Extend<DefaultRegistrationsExtension>()
+				.Extend<ConstructorExtension>()
 				.Extend<StrategyPipelineExtension>()
 				.Extend<InstanceTypeRegistrationMonitorExtension>();
 	}
