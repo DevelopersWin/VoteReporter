@@ -31,16 +31,18 @@ namespace DragonSpark.Diagnostics
 	
 	public abstract class ProfilerFactoryBase<TTimer> : FactoryBase<MethodBase, IProfiler> where TTimer : ITimer, new()
 	{
+		static LogEventLevel Level() => Configure.Get<Configuration>().Profiler.Level;
+
 		readonly Func<MethodBase, ILogger> loggerSource;
 		readonly Func<ILogger, Action<TimerEvent>> handlerSource;
 		readonly ISessionTimer timer;
 		readonly Func<MethodBase, CreateProfilerEvent> createSource;
 
-		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( FrameworkConfiguration.Current.Diagnostics.Profiler.Level, templateSource ) {}
+		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( Level(), templateSource ) {}
 
 		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( new MethodLoggerFactory( Services.Get<ILogger>() ).Create, level, templateSource ) {}
 
-		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, FrameworkConfiguration.Current.Diagnostics.Profiler.Level, templateSource ) {}
+		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, Level(), templateSource ) {}
 
 		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, new TTimer(), log => new Handler<TimerEvent>( log, level, templateSource ).Run ) {}
 

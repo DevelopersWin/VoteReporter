@@ -1,6 +1,7 @@
 using System;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Modularity;
 using Moq;
 using Xunit;
@@ -8,6 +9,7 @@ using ModuleTypeLoader = DragonSpark.Windows.Modularity.ModuleTypeLoader;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
+	[Trait( Traits.Category, Traits.Categories.FileSystem )]
 	public class FileModuleTypeLoaderTests
 	{
 		[Fact]

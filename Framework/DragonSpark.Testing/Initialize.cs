@@ -1,13 +1,13 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
+using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
-using AssemblyLoader = DragonSpark.Windows.TypeSystem.AssemblyLoader;
 
 namespace DragonSpark.Testing
 {
+	// [Synchronized]
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Parts() => new LoadPartAssemblyCommand( AssemblyLoader.Instance ).ExecuteWith( typeof(Initialize).Assembly );
+		public static void Parts() => LoadPartAssemblyCommand.Instance.Run( typeof(Initialize).Assembly );
 	}
 }

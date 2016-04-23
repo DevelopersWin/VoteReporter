@@ -1,16 +1,18 @@
-﻿<configuration:InitializeFrameworkConfigurationCommand x:Class="DragonSpark.Testing.Parts.Development.Initialize"
+﻿<configuration:InitializeConfigurationCommand x:Class="DragonSpark.Testing.Parts.Development.Initialize"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
 	xmlns:diagnostics="clr-namespace:DragonSpark.Windows.Diagnostics;assembly=DragonSpark.Windows"
+	xmlns:diagnosticsCore="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
 	mc:Ignorable="d">
-	<configuration:FrameworkConfiguration>
-		<configuration:FrameworkConfiguration.Diagnostics>
-			<configuration:Diagnostics MinimumLevel="Debug">
-				<configuration:Profiler FactoryType="{x:Type diagnostics:ProfilerFactory}" />
-			</configuration:Diagnostics>
-		</configuration:FrameworkConfiguration.Diagnostics>
-	</configuration:FrameworkConfiguration>
-</configuration:InitializeFrameworkConfigurationCommand>
+	<configuration:InitializeConfigurationCommand.Parameter>
+		<x:Array Type="{x:Type configuration:IConfiguration}">
+			<configuration:Configuration EnableMethodCaching="True" />
+			<diagnosticsCore:Configuration MinimumLevel="Debug">
+				<diagnosticsCore:ProfilerConfiguration FactoryType="{x:Type diagnostics:ProfilerFactory}" />
+			</diagnosticsCore:Configuration>
+		</x:Array>
+	</configuration:InitializeConfigurationCommand.Parameter>
+</configuration:InitializeConfigurationCommand>

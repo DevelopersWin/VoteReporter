@@ -36,16 +36,10 @@ namespace DragonSpark.Windows.Testing.Setup
 	/// <summary>
 	/// This file can be seen as a bucket for all the testing done around setup.  It also can be seen as a huge learning bucket for xUnit and AutoFixture.  This does not contain best practices.  Always be learning. :)
 	/// </summary>
+	[Trait( Traits.Category, Traits.Categories.IoC )]
 	public class LocationSetupTests : TestCollectionBase
 	{
-		/*static LocationSetupTests()
-		{
-			var s = typeof(DragonSpark.Testing.Parts.Development.Initialize).ToString();
-			Debugger.Break();
-		}*/
-
-		public LocationSetupTests( ITestOutputHelper output ) : base( output )
-		{}
+		public LocationSetupTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Theory, LocationSetup.AutoData]
 		public void CoreLocation( IServiceLocator sut )

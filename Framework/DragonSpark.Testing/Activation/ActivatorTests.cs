@@ -3,7 +3,6 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using Xunit;
 using Xunit.Abstractions;
-using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Testing.Activation
 {

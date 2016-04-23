@@ -102,10 +102,11 @@ namespace DragonSpark.Diagnostics
 
 	public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>
 	{
-		readonly Func<LogEventLevel> source;
 		public static LoggingLevelSwitchFactory Instance { get; } = new LoggingLevelSwitchFactory();
 
-		public LoggingLevelSwitchFactory() : this( FrameworkConfiguration.Factory( configuration => configuration.Diagnostics.MinimumLevel ) ) {}
+		readonly Func<LogEventLevel> source;
+
+		public LoggingLevelSwitchFactory() : this( Configure.Get<Configuration, LogEventLevel>( configuration => configuration.MinimumLevel ) ) {}
 
 		public LoggingLevelSwitchFactory( Func<LogEventLevel> source )
 		{

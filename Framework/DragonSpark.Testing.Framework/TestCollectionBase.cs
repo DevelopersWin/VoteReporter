@@ -4,6 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
+using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using Serilog;
@@ -51,9 +52,21 @@ namespace DragonSpark.Testing.Framework
 
 	public class AssignExecutionContextCommand : AssignValueCommand<MethodBase>
 	{
-		public AssignExecutionContextCommand() : this( ExecutionContext.Instance ) {}
+		readonly Action<Assembly> initialize;
 
-		public AssignExecutionContextCommand( IWritableValue<MethodBase> value ) : base( value ) {}
+		public AssignExecutionContextCommand() : this( AssemblyInitializer.Instance.Run, ExecutionContext.Instance ) {}
+
+		public AssignExecutionContextCommand( Action<Assembly> initialize, IWritableValue<MethodBase> value ) : base( value )
+		{
+			this.initialize = initialize;
+		}
+
+		protected override void OnExecute( MethodBase parameter )
+		{
+			initialize( parameter.DeclaringType.Assembly );
+
+			base.OnExecute( parameter );
+		}
 	}
 
 	[Disposable]
@@ -67,5 +80,15 @@ namespace DragonSpark.Testing.Framework
 		protected ITestOutputHelper Output => Item;
 
 		protected virtual void Dispose( bool disposing ) {}
+	}
+
+	public static class Traits
+	{
+		public const string Category = "Category";
+
+		public static class Categories
+		{
+			public const string FileSystem = "FileSystem", IoC = "IoC";
+		}
 	}
 }

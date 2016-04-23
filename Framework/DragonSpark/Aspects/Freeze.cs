@@ -7,7 +7,6 @@ using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using DragonSpark.Configuration;
 
 namespace DragonSpark.Aspects
 {
@@ -46,14 +45,14 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	[PSerializable, ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
+	[PSerializable, ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
 	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		CacheValueFactory Factory { get; set; }
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( Factory != null && FrameworkConfiguration.Current.EnableMethodCaching && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
+			if ( Factory != null && /*Configure.Get<Configuration.Configuration>().EnableMethodCaching &&*/ ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
 				args.ReturnValue = Factory.Create( args );
 			}

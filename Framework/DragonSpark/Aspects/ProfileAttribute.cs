@@ -3,14 +3,13 @@ using DragonSpark.Configuration;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using PostSharp.Aspects;
-using PostSharp.Patterns.Threading;
 using PostSharp.Serialization;
 using System;
 using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	[PSerializable, Synchronized] // TODO: Move this to ApplyDefaultValues
+	[PSerializable]
 	public sealed class ProfileAttribute : OnMethodBoundaryAspect
 	{
 		public ProfileAttribute() {}
@@ -24,7 +23,7 @@ namespace DragonSpark.Aspects
 
 		IProfiler Create( MethodBase method )
 		{
-			var type = FactoryType ?? FrameworkConfiguration.Current.Diagnostics.Profiler.FactoryType;
+			var type = FactoryType ?? Configure.Get<Diagnostics.Configuration>().Profiler.FactoryType;
 			var result = Services.Get<IFactory<MethodBase, IProfiler>>( type ).Create( method );
 			return result;
 		}

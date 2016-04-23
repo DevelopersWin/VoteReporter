@@ -55,11 +55,11 @@ namespace DragonSpark.Activation.IoC
 
 	class ConstructorSelectorPolicy : IConstructorSelectorPolicy
 	{
-		readonly Func<ISpecification<TypeRequest>> source;
+		readonly ISpecification<TypeRequest> specification;
 
-		public ConstructorSelectorPolicy( Func<ISpecification<TypeRequest>> source )
+		public ConstructorSelectorPolicy( ISpecification<TypeRequest> specification )
 		{
-			this.source = source;
+			this.specification = specification;
 		}
 
 		public SelectedConstructor SelectConstructor( IBuilderContext context, IPolicyList resolverPolicyDestination ) => Create( context.BuildKey.Type ) ?? DefaultUnityConstructorSelectorPolicy.Instance.SelectConstructor( context, resolverPolicyDestination );
@@ -95,16 +95,12 @@ namespace DragonSpark.Activation.IoC
 
 		ConstructorInfo Search( Type typeToConstruct )
 		{
-			var result = source.Use( specification =>
-			{
-				var constructors = new ReflectionHelper( typeToConstruct ).InstanceConstructors;
-				var constructor = constructors
-					.OrderByDescending( info => info.GetParameters().Length )
-					.FirstOrDefault( info => 
-						info.GetParameters().With( infos => !infos.Any() || infos.Select( parameterInfo => new LocateTypeRequest( parameterInfo.ParameterType ) ).All( specification.IsSatisfiedBy ) ) 
-						);
-				return constructor;
-			} );
+			var constructors = new ReflectionHelper( typeToConstruct ).InstanceConstructors;
+			var result = constructors
+				.OrderByDescending( info => info.GetParameters().Length )
+				.FirstOrDefault( info => 
+					info.GetParameters().With( infos => !infos.Any() || infos.Select( parameterInfo => new LocateTypeRequest( parameterInfo.ParameterType ) ).All( specification.IsSatisfiedBy ) ) 
+					);
 			return result;
 		}
 	}

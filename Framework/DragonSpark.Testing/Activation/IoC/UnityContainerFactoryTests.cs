@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Activation.IoC
 
 			Assert.NotNull( container );
 
-			var sut = new ConstructorSelectorPolicy( () => container.Resolve<ResolvableTypeSpecification>() );
+			var sut = new ConstructorSelectorPolicy( container.Resolve<ResolvableTypeSpecification>() );
 
 			var context = container.Resolve<ExtensionContext>();
 			var policyList = container.Resolve<IPolicyList>();

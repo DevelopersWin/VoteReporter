@@ -1,15 +1,22 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Aspects;
 
 namespace DragonSpark.Windows.TypeSystem
 {
+	public class LoadPartAssemblyCommand : DragonSpark.TypeSystem.LoadPartAssemblyCommand
+	{
+		public static LoadPartAssemblyCommand Instance { get; } = new LoadPartAssemblyCommand();
+
+		LoadPartAssemblyCommand() : base( AssemblyLoader.Instance ) {}
+	}
+
 	public class AssemblyPathLoader : FactoryBase<string, Assembly[]>
 	{
 		public static AssemblyPathLoader Instance { get; } = new AssemblyPathLoader();
@@ -26,7 +33,8 @@ namespace DragonSpark.Windows.TypeSystem
 	{
 		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();
 
-		[Freeze]
+		AssemblyInitializer() : base( new CheckSpecification<Assembly>() ) {}
+
 		protected override void OnExecute( Assembly parameter ) => parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
 	}
 

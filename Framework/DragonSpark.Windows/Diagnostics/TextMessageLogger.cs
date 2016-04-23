@@ -13,11 +13,6 @@ using System.Security;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public class EnrichFromLogContextCommand : EnrichCommandBase
-	{
-		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.FromLogContext();
-	}
-
 	public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
 		public ProfilerFactory() : base( TimerEventConverter.Instance.Create ) {}

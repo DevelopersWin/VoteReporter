@@ -1,4 +1,5 @@
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Runtime.Specifications
@@ -24,6 +25,11 @@ namespace DragonSpark.Runtime.Specifications
 		bool ISpecification<object>.IsSatisfiedBy( object parameter ) => IsSatisfiedBy( parameter );
 
 		public bool IsSatisfiedBy( object context ) => context.IsNull();
+	}
+
+	public class CheckSpecification<T> : SpecificationBase<T>
+	{
+		protected override bool Verify( T parameter ) => new Checked( parameter, this ).Item.Apply();
 	}
 
 	public abstract class SpecificationBase<TParameter> : ISpecification<TParameter>

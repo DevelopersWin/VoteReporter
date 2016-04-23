@@ -3,6 +3,7 @@ using DragonSpark.Modularity;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
@@ -14,6 +15,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
+	[Trait( Traits.Category, Traits.Categories.IoC )]
 	public class ProgramSetupTests
 	{
 		[Theory, ProgramSetup.AutoData]

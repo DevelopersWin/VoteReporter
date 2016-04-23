@@ -43,10 +43,6 @@ namespace DragonSpark.TypeSystem
 		readonly Func<string, IEnumerable<Assembly>> assemblySource;
 		readonly Action<Assembly> initialize;
 
-		// public static AssemblyLoader Instance { get; } = new AssemblyLoader( AssemblyHintProvider.Instance.Create );
-
-		public AssemblyLoader( Func<string, IEnumerable<Assembly>> assemblySource, Action<Assembly> initialize ) : this( AssemblyHintProvider.Instance.Create, assemblySource, initialize ) {}
-
 		public AssemblyLoader( Func<Assembly, string> hintSource, Func<string, IEnumerable<Assembly>> assemblySource, Action<Assembly> initialize )
 		{
 			this.hintSource = hintSource;

@@ -190,7 +190,9 @@
     <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProviderBase.cs" />
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
-    <Compile Include="Configuration\FrameworkConfiguration.cs" />
+    <Compile Include="Configuration\Configuration.cs" />
+    <Compile Include="Configuration\Store.cs" />
+    <Compile Include="Diagnostics\Configuration.cs" />
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStore.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />

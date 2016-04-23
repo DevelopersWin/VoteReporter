@@ -258,8 +258,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Setup\InitializeUserSettingsCommandTests.cs" />
-    <Compile Include="Setup\Registration\MetadataRegistrationCommandOtherTests.cs" />
-    <Compile Include="Setup\Registration\MetadataRegistrationCommandTests.cs" />
     <Compile Include="Runtime\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Runtime\AssemblyProviderTests.cs" />
     <Compile Include="Runtime\DomainAssemblySourceTests.cs" />
@@ -289,9 +287,6 @@
     <Compile Include="Runtime\ApplicationAssemblyLocatorTests.cs" />
     <Compile Include="Runtime\ExceptionFormatterTests.cs" />
     <Compile Include="Runtime\ThreadDataValueTests.cs" />
-    <Compile Include="Security\KeyVaultApplicationFactoryTests.cs" />
-    <Compile Include="Security\CertificateFactoryTests.cs" />
-    <Compile Include="Security\SecretFactoryTests.cs" />
     <Compile Include="Setup\AutoDataAttribute.cs" />
     <Compile Include="Setup\LocationSetup.cs">
       <DependentUpon>LocationSetup.xaml</DependentUpon>

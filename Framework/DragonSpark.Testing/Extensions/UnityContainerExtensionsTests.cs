@@ -10,6 +10,7 @@ using Serilog.Events;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Configuration;
 using Xunit;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
@@ -25,7 +26,7 @@ namespace DragonSpark.Testing.Extensions
 
 			var levelSwitch = sut.Resolve<IServiceProvider>().Get<LoggingLevelSwitch>();
 			Assert.Same( levelSwitch, sut.Resolve<IServiceProvider>().Get<LoggingLevelSwitch>() );
-			levelSwitch.MinimumLevel = LogEventLevel.Debug;
+			Configure.Get<DragonSpark.Diagnostics.Configuration>().Profiler.Level = levelSwitch.MinimumLevel = LogEventLevel.Debug;
 
 			var sink = sut.Resolve<IServiceProvider>().Get<LoggerHistorySink>();
 			Assert.Same( sink, sut.Resolve<IServiceProvider>().Get<LoggerHistorySink>() );

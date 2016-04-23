@@ -5,7 +5,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Configuration
 {
-	public class IValueStoreests
+	public class ValueStoreTests
 	{
 		[Theory, AutoData]
 		public void CheckEquality( ValueStore sut, object value, string secondKey, Guid id, int number )

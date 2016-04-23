@@ -12,6 +12,7 @@ using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;

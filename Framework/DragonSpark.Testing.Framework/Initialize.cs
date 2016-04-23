@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Testing.Framework.Setup;
 using mscoree;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
@@ -13,8 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Windows.Runtime;
-using DragonSpark.Windows.TypeSystem;
+using DragonSpark.Configuration;
 using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework
@@ -22,15 +20,18 @@ namespace DragonSpark.Testing.Framework
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Activation.Execution.Initialize( ExecutionContext.Instance );
+		public static void Execution()
+		{
+			Activation.Execution.Initialize( ExecutionContext.Instance );
+		}
 
 		[ModuleInitializer( 1 )]
 		public static void Environment()
 		{
-			var assembly = DomainApplicationAssemblyLocator.Instance.Create();
-			assembly.With( AssemblyInitializer.Instance.ExecuteWith );
-			
-			InitializeJetBrainsTaskRunnerCommand.Instance.ExecuteWith( AppDomain.CurrentDomain.SetupInformation );
+			// InitializeJetBrainsTaskRunnerCommand.Instance.ExecuteWith( AppDomain.CurrentDomain.SetupInformation );
+			// var temp = AppDomain.CurrentDomain.GetAssemblies();
+			/*var assembly = DomainApplicationAssemblyLocator.Instance.Create();
+			assembly.With( AssemblyInitializer.Instance.ExecuteWith );*/
 		}
 	}
 

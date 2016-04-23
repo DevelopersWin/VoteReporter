@@ -7,6 +7,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
+	[Trait( Traits.Category, Traits.Categories.IoC )]
 	public class UnitySetupTests : TestCollectionBase
 	{
 		public UnitySetupTests( ITestOutputHelper output ) : base( output )
