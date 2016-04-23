@@ -1,7 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Configuration;
-using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
@@ -24,51 +22,6 @@ namespace DragonSpark.Diagnostics
 		public static void Process( this IExceptionHandler target, Exception exception ) => target.Handle( exception ).With( a => a.RethrowRecommended.IsTrue( () => { throw a.Exception; } ) );
 	}
 
-	public class ProfilerFactory : ProfilerFactoryBase<Timer>
-	{
-		public ProfilerFactory() : base( TimerEventConverter.Instance.Create ) {}
-	}
-	
-	public abstract class ProfilerFactoryBase<TTimer> : FactoryBase<MethodBase, IProfiler> where TTimer : ITimer, new()
-	{
-		static LogEventLevel Level() => Configure.Get<Configuration>().Profiler.Level;
-
-		readonly Func<MethodBase, ILogger> loggerSource;
-		readonly Func<ILogger, Action<TimerEvent>> handlerSource;
-		readonly ISessionTimer timer;
-		readonly Func<MethodBase, CreateProfilerEvent> createSource;
-
-		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( Level(), templateSource ) {}
-
-		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( new MethodLoggerFactory( Services.Get<ILogger>() ).Create, level, templateSource ) {}
-
-		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, Level(), templateSource ) {}
-
-		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, new TTimer(), log => new Handler<TimerEvent>( log, level, templateSource ).Run ) {}
-
-		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, TTimer tracker, Func<ILogger, Action<TimerEvent>> handlerSource ) : this( loggerSource, tracker, new SessionTimer( tracker ), handlerSource ) {}
-
-		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, TTimer tracker, ISessionTimer timer, Func<ILogger, Action<TimerEvent>> handlerSource ) : this( loggerSource, timer, handlerSource, new HandlerFactory<TTimer>( timer, tracker ).Create ) {}
-
-		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, ISessionTimer timer, Func<ILogger, Action<TimerEvent>> handlerSource, Func<MethodBase, CreateProfilerEvent> createSource )
-		{
-			this.loggerSource = loggerSource;
-			this.handlerSource = handlerSource;
-			this.timer = timer;
-			this.createSource = createSource;
-		}
-
-		protected override IProfiler CreateItem( MethodBase parameter )
-		{
-			var logger = loggerSource( parameter );
-			var handler = handlerSource( logger );
-
-			var factory = new ProfilerSourceFactory( timer, createSource, handler );
-			var result = factory.Create( parameter );
-			return result;
-		}
-	}
-
 	public class MethodLoggerFactory : FactoryBase<MethodBase, ILogger>
 	{
 		readonly ILogger logger;
@@ -80,32 +33,6 @@ namespace DragonSpark.Diagnostics
 
 		[Freeze]
 		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForContext( Constants.SourceContextPropertyName, $"{parameter.DeclaringType.Name}.{parameter.Name}" );
-	}
-
-	public class ProfilerSourceFactory : FactoryBase<MethodBase, IProfiler>
-	{
-		readonly ISessionTimer timer;
-		readonly Func<MethodBase, CreateProfilerEvent> source;
-		readonly Action<TimerEvent> handler;
-
-		public ProfilerSourceFactory( ISessionTimer timer, Func<MethodBase, CreateProfilerEvent> source, Action<TimerEvent> handler )
-		{
-			this.timer = timer;
-			this.source = source;
-			this.handler = handler;
-		}
-
-		protected override IProfiler CreateItem( MethodBase parameter )
-		{
-			EmitProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Run;
-			var command = new AmbientContextCommand<EmitProfileEvent>().ExecuteWith( new EmitProfileEvent( name =>
-			{
-				timer.Update();
-				action( name );
-			} ) );
-			var result = new Profiler( timer, action ).AssociateForDispose( command );
-			return result;
-		}
 	}
 
 	public delegate void EmitProfileEvent( string name );
@@ -325,48 +252,6 @@ namespace DragonSpark.Diagnostics
 	public class TimerEventHandler : DecoratedCommand<string, TimerEvent>
 	{
 		public TimerEventHandler( CreateProfilerEvent transform, Action<TimerEvent> inner ) : base( new Func<string, TimerEvent>( transform ), new DelegatedCommand<TimerEvent>( inner ) ) {}
-	}
-
-	public interface IProfiler : IProcess, IContinuation {}
-
-	public class Profiler : IProfiler
-	{
-		readonly ISessionTimer inner;
-		readonly EmitProfileEvent handler;
-		readonly TimerEvents events;
-
-		public Profiler( ISessionTimer inner, EmitProfileEvent handler ) : this( inner, handler, TimerEvents.Instance ) {}
-
-		public Profiler( ISessionTimer inner, EmitProfileEvent handler, TimerEvents events )
-		{
-			this.inner = inner;
-			this.handler = handler;
-			this.events = events;
-		}
-
-		public void Start()
-		{
-			inner.Start();
-			handler( events.Starting );
-		}
-
-		public void Resume()
-		{
-			inner.Resume();
-			handler( events.Resuming );
-		}
-
-		public void Pause()
-		{
-			inner.Pause();
-			handler( events.Paused );
-		}
-
-		public void Dispose()
-		{
-			inner.Dispose();
-			handler( events.Completed );
-		}
 	}
 
 	public interface ISessionTimer : ITimer, IContinuation {}

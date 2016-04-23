@@ -109,8 +109,8 @@
       <HintPath>$(SolutionDir)\packages\Unity.4.0.1\lib\portable-net45+wp80+win8+wpa81+MonoAndroid10+MonoTouch10\Microsoft.Practices.Unity.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NReco.LambdaParser, Version=1.0.0.0, Culture=neutral, PublicKeyToken=50b5ad72a1d364c6, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\NReco.LambdaParser.1.0.0.0\lib\portable-net40+sl50+win+WindowsPhoneApp81+wp80\NReco.LambdaParser.dll</HintPath>
+    <Reference Include="NReco.LambdaParser, Version=1.0.1.0, Culture=neutral, PublicKeyToken=50b5ad72a1d364c6, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\NReco.LambdaParser.1.0.1.0\lib\portable-net45+win+wpa81+wp80\NReco.LambdaParser.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PostSharp, Version=4.2.25.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
@@ -196,7 +196,9 @@
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStore.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
+    <Compile Include="Diagnostics\IProfiler.cs" />
     <Compile Include="Diagnostics\Logger\LogTemplate.cs" />
+    <Compile Include="Diagnostics\ProfilerFactory.cs" />
     <Compile Include="Diagnostics\TimerEvents.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Runtime\DisposableAction.cs" />
