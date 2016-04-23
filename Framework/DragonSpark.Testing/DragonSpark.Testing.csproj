@@ -219,7 +219,7 @@
     </Compile>
     <Compile Include="Aspects\BuildUpTests.cs" />
     <Compile Include="ComponentModel\DefaultValueProviderTests.cs" />
-    <Compile Include="Composition\ApplicationServiceProviderFactoryTests.cs" />
+    <Compile Include="Composition\CompositionTests.cs" />
     <Compile Include="Composition\ConventionBuilderTests.cs" />
     <Compile Include="ConditionMonitorTests.cs">
       <SubType>Code</SubType>
@@ -229,7 +229,6 @@
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
     <Compile Include="Diagnostics\MessageRecorderTests.cs" />
-    <Compile Include="Diagnostics\CompositionTests.cs" />
     <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
     <Compile Include="Extensions\AssemblyExtensionsTests.cs" />
     <Compile Include="Extensions\BooleanExtensionsTests.cs">

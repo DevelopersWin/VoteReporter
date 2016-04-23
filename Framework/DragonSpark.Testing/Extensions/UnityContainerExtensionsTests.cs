@@ -1,16 +1,16 @@
-using System;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using Serilog.Events;
+using System;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Configuration;
 using Xunit;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Extensions
 {
 	public class UnityContainerExtensionsTests
 	{
-		[Theory, Framework.Setup.AutoData]
+		[Theory, AutoData, MinimalLevel( LogEventLevel.Debug )]
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
 			var assemblies = sut.Resolve<Assembly[]>();
@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Extensions
 
 			var levelSwitch = sut.Resolve<IServiceProvider>().Get<LoggingLevelSwitch>();
 			Assert.Same( levelSwitch, sut.Resolve<IServiceProvider>().Get<LoggingLevelSwitch>() );
-			Configure.Get<DragonSpark.Diagnostics.Configuration>().Profiler.Level = levelSwitch.MinimumLevel = LogEventLevel.Debug;
+			levelSwitch.MinimumLevel = LogEventLevel.Debug;
 
 			var sink = sut.Resolve<IServiceProvider>().Get<LoggerHistorySink>();
 			Assert.Same( sink, sut.Resolve<IServiceProvider>().Get<LoggerHistorySink>() );

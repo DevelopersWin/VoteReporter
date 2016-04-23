@@ -1,12 +1,12 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Aspects;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Values;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Aspects;
-using DragonSpark.Runtime.Values;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation
 {
@@ -121,17 +121,17 @@ namespace DragonSpark.Activation
 	public class CachedDecoratedFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult>
 	{
 		readonly Func<TParameter, object> instance;
-		readonly int key;
+		readonly Func<TParameter, IEnumerable<object>> keySource;
 
-		public CachedDecoratedFactory( Func<TParameter, object> instance, Func<TParameter, TResult> inner, params object[] items ) : this( instance, KeyFactory.Instance.Create( items ), inner ) {}
+		// public CachedDecoratedFactory( Func<TParameter, object> instance, Func<TParameter, TResult> inner, params object[] items ) : this( instance, KeyFactory.Instance.Create( items ), inner ) {}
 
-		protected CachedDecoratedFactory( [Required] Func<TParameter, object> instance, int key, Func<TParameter, TResult> provider ) : base( provider )
+		protected CachedDecoratedFactory( Func<TParameter, IEnumerable<object>> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
 		{
 			this.instance = instance;
-			this.key = key;
+			this.keySource = keySource;
 		}
 
-		protected override TResult CreateItem( TParameter parameter ) => new Cache( instance( parameter ), key, () => base.CreateItem( parameter ) ).Item;
+		protected override TResult CreateItem( TParameter parameter ) => new Cache( instance( parameter ), KeyFactory.Instance.Create( keySource( parameter ) ), () => base.CreateItem( parameter ) ).Item;
 
 		class Cache : AssociatedValue<TResult>
 		{

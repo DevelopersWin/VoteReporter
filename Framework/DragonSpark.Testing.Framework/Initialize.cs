@@ -1,18 +1,5 @@
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using mscoree;
+using System.Diagnostics;
 using PostSharp.Aspects;
-using PostSharp.Patterns.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using DragonSpark.Configuration;
 using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework
@@ -20,113 +7,13 @@ namespace DragonSpark.Testing.Framework
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution()
-		{
-			Activation.Execution.Initialize( ExecutionContext.Instance );
-		}
+		public static void Execution() => Activation.Execution.Initialize( ExecutionContext.Instance );
 
 		[ModuleInitializer( 1 )]
-		public static void Environment()
-		{
-			// InitializeJetBrainsTaskRunnerCommand.Instance.ExecuteWith( AppDomain.CurrentDomain.SetupInformation );
-			// var temp = AppDomain.CurrentDomain.GetAssemblies();
-			/*var assembly = DomainApplicationAssemblyLocator.Instance.Create();
-			assembly.With( AssemblyInitializer.Instance.ExecuteWith );*/
-		}
+		public static void Tracing() => Trace.WriteLine( $"Initializing {typeof(Initialize)}" );
 	}
 
-	public class JetBrainsApplicationDomainFactory : FactoryBase<AppDomain>
-	{
-		public static JetBrainsApplicationDomainFactory Instance { get; } = new JetBrainsApplicationDomainFactory();
-
-		readonly Func<ImmutableArray<AppDomain>> source;
-		readonly string domainName;
-
-		public JetBrainsApplicationDomainFactory() : this( AppDomainFactory.Instance.Create ) {}
-
-		public JetBrainsApplicationDomainFactory( [Required] Func<ImmutableArray<AppDomain>> source, [NotEmpty] string domainName = "JetBrains.ReSharper.TaskRunner" )
-		{
-			this.source = source;
-			this.domainName = domainName;
-		}
-
-		[Freeze]
-		protected override AppDomain CreateItem() => source().Except( AppDomain.CurrentDomain.ToItem() ).FirstOrDefault( domain => domain.FriendlyName.Contains( domainName ) );
-	}
-
-	public class JetBrainsAssemblyLoaderFactory : FactoryBase<string, AssemblyLoader>
-	{
-		public static JetBrainsAssemblyLoaderFactory Instance { get; } = new JetBrainsAssemblyLoaderFactory();
-
-		readonly Func<AppDomain> source;
-
-		public JetBrainsAssemblyLoaderFactory() : this( JetBrainsApplicationDomainFactory.Instance.Create ) {}
-
-		public JetBrainsAssemblyLoaderFactory( [Required] Func<AppDomain> source )
-		{
-			this.source = source;
-		}
-
-		protected override AssemblyLoader CreateItem( string parameter ) => source.Use( domain => new ApplicationDomainProxyFactory<AssemblyLoader>( domain ).CreateUsing( parameter ) );
-	}
-
-	public class InitializeJetBrainsTaskRunnerCommand : Command<AppDomainSetup>
-	{
-		public static InitializeJetBrainsTaskRunnerCommand Instance { get; } = new InitializeJetBrainsTaskRunnerCommand();
-
-		readonly Func<string, AssemblyLoader> source;
-
-		public InitializeJetBrainsTaskRunnerCommand() : this( JetBrainsAssemblyLoaderFactory.Instance.Create ) {}
-
-		public InitializeJetBrainsTaskRunnerCommand( [Required] Func<string, AssemblyLoader> source )
-		{
-			this.source = source;
-		}
-
-		protected override void OnExecute( AppDomainSetup parameter ) => source( parameter.ApplicationBase ).With( loader => loader.Initialize() );
-	}
-
-	public class AppDomainFactory : FactoryBase<ImmutableArray<AppDomain>>
-	{
-		public static AppDomainFactory Instance { get; } = new AppDomainFactory();
-
-		#pragma warning disable 3305
-		[Freeze]
-		protected override ImmutableArray<AppDomain> CreateItem()
-		{
-			var enumHandle = IntPtr.Zero;
-			var host = new CorRuntimeHostClass();
-
-			var items = new List<AppDomain>();
-
-			try
-			{
-				host.EnumDomains( out enumHandle );
-
-				object domain;
-				host.NextDomain( enumHandle, out domain );
-				while ( domain != null )
-				{
-					items.Add( (AppDomain)domain );
-					host.NextDomain( enumHandle, out domain );
-				}
-			}
-			catch ( InvalidCastException ) {}
-			finally
-			{
-				if ( enumHandle != IntPtr.Zero )
-				{
-					host.CloseEnum( enumHandle );
-				}
-
-				Marshal.ReleaseComObject( host );	
-			}
-			var result = items.ToImmutableArray();
-			return result;
-		}
-	}
-
-	public class ApplicationDomainProxyFactory<T> : FactoryBase<object[], T>
+	/*public class ApplicationDomainProxyFactory<T> : FactoryBase<object[], T>
 	{
 		readonly AppDomain domain;
 
@@ -167,5 +54,5 @@ namespace DragonSpark.Testing.Framework
 		}
 
 		public void Dispose() => AppDomain.CurrentDomain.AssemblyResolve -= Resolve;
-	}
+	}*/
 }

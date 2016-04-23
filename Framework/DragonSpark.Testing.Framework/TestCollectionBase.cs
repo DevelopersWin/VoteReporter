@@ -4,6 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
@@ -17,25 +18,18 @@ using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 namespace DragonSpark.Testing.Framework
 {
 	[Serializable, LinesOfCodeAvoided( 8 )]
-	public class AssignExecutionContextAspect : MethodInterceptionAspect
+	public sealed class ExecuteMethodAspect : MethodInterceptionAspect
 	{
-		public static AssignExecutionContextAspect Instance { get; } = new AssignExecutionContextAspect();
+		public static ExecuteMethodAspect Instance { get; } = new ExecuteMethodAspect();
 
-		AssignExecutionContextAspect() {}
+		ExecuteMethodAspect() {}
 
-		public sealed override void OnInvoke( MethodInterceptionArgs args )
-		{
-			using ( new AssignExecutionContextCommand().ExecuteWith( args.Method ) )
-			{
-				var output = args.Instance.AsTo<IValue<ITestOutputHelper>, Action<string>>( value => value.Item.WriteLine ) ?? IgnoredOutputCommand.Instance.Run;
-				var history = Services.Get<ILoggerHistory>();
-				var logger = Services.Get<ILogger>();
-				using ( new Diagnostics.ProfilerFactory( output, logger, history ).Create( args.Method ) )
-				{
-					args.Proceed();
-				}
-			}
-		}
+		public override void OnInvoke( MethodInterceptionArgs args ) => new ApplicationOutputCommand().Run( args );
+	}
+
+	public class ApplicationOutputCommand : OutputCommand
+	{
+		public ApplicationOutputCommand() : base( method => new AssignExecutionContextCommand( new AssociatedContext( method ).Item.Dispose ) ) {}
 	}
 
 	public static class MethodBaseExtensions
@@ -52,9 +46,15 @@ namespace DragonSpark.Testing.Framework
 
 	public class AssignExecutionContextCommand : AssignValueCommand<MethodBase>
 	{
+		readonly Action complete;
 		readonly Action<Assembly> initialize;
 
-		public AssignExecutionContextCommand() : this( AssemblyInitializer.Instance.Run, ExecutionContext.Instance ) {}
+		public AssignExecutionContextCommand() : this( () => {} ) {}
+
+		public AssignExecutionContextCommand( Action complete ) : this( AssemblyInitializer.Instance.Run, ExecutionContext.Instance )
+		{
+			this.complete = complete;
+		}
 
 		public AssignExecutionContextCommand( Action<Assembly> initialize, IWritableValue<MethodBase> value ) : base( value )
 		{
@@ -67,19 +67,31 @@ namespace DragonSpark.Testing.Framework
 
 			base.OnExecute( parameter );
 		}
+
+		protected override void OnDispose()
+		{
+			base.OnDispose();
+			complete();
+		}
 	}
 
 	[Disposable]
-	public abstract class TestCollectionBase : FixedValue<ITestOutputHelper>
+	public abstract class TestCollectionBase : ITestOutputAware
 	{
 		protected TestCollectionBase( ITestOutputHelper output )
 		{
-			Assign( output );
+			Output = output;
 		}
 
-		protected ITestOutputHelper Output => Item;
+		[Reference]
+		public ITestOutputHelper Output { get; }
 
 		protected virtual void Dispose( bool disposing ) {}
+	}
+
+	public interface ITestOutputAware
+	{
+		ITestOutputHelper Output { get; }
 	}
 
 	public static class Traits

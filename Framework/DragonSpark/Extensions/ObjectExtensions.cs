@@ -59,6 +59,8 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable GetAllPropertyValuesOf( this object target, Type propertyType ) => target.GetType().GetRuntimeProperties().Where( x => !x.GetIndexParameters().Any() && propertyType.GetTypeInfo().IsAssignableFrom( x.PropertyType.GetTypeInfo() ) ).Select( x => x.GetValue( target, null ) ).ToArray();
 
+		/*public static Func<U> Get<T, U>( this T @this, Func<T, U> getter ) => () => getter( @this );*/
+
 		public static TItem Use<TItem>( this Func<TItem> @this, Action<TItem> function )
 		{
 			var item = @this();

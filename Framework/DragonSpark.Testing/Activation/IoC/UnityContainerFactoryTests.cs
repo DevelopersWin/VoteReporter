@@ -38,13 +38,13 @@ namespace DragonSpark.Testing.Activation.IoC
 			var first = sut.SelectConstructor( builder, policyList );
 			Assert.Equal( 2, first.Constructor.GetParameters().Length );
 
-			container.RegisterInstance( Item );
+			container.RegisterInstance( Output );
 			var constructor = sut.SelectConstructor( builder, policyList );
 			Assert.Equal( 1, constructor.Constructor.GetParameters().Length );
 
 			var resolved = container.Resolve<Target>();
 			Assert.NotNull( resolved );
-			Assert.Same( Item, resolved.Second() );
+			Assert.Same( Output, resolved.Second() );
 			Assert.Same( ClassFactory.Instance.Create(), resolved.First );
 		}
 

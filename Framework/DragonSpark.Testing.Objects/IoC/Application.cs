@@ -1,12 +1,11 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using System;
-using System.Linq;
 using System.Reflection;
-using DragonSpark.Testing.Framework;
 
 namespace DragonSpark.Testing.Objects.IoC
 {
@@ -33,7 +32,7 @@ namespace DragonSpark.Testing.Objects.IoC
 
 		class Cache : CacheFactoryBase
 		{
-			public Cache( Assembly[] assemblies ) : base( new ServiceProviderFactory( assemblies ).Create, assemblies.Cast<object>().ToArray() ) {}
+			public Cache( Assembly[] assemblies ) : base( data => assemblies, new ServiceProviderFactory( assemblies ).Create ) {}
 		}
 	}
 

@@ -1,20 +1,26 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Objects.Setup;
 using Microsoft.Practices.Unity;
 using System;
 using System.Composition;
 using Xunit;
+using Xunit.Abstractions;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 using RecordingLoggerFactory = DragonSpark.Diagnostics.RecordingLoggerFactory;
 
 namespace DragonSpark.Testing.Activation.IoC
 {
-	public class InjectionFactoryFactoryTests
+	public class InjectionFactoryFactoryTests : TestCollectionBase
 	{
 		const string HelloWorld = "Hello World";
+
+		public InjectionFactoryFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Fact]
 		public void Simple()
@@ -262,17 +268,23 @@ namespace DragonSpark.Testing.Activation.IoC
 			public SharedLoggerFactory( ILoggerHistory history, LoggingLevelSwitch levelSwitch ) : base( history, levelSwitch ) {}
 		}
 
-		[Fact]
+		[Fact, Output]
 		public void Create()
 		{
-			var container = Objects.IoC.UnityContainerFactory.Instance.Create();
+			One();
+		}
+
+		[Profile]
+		static void One()
+		{
+			var container = DefaultUnityContainerFactory.Instance.Create();
 			var sut = new InjectionFactoryFactory( typeof(Factory) );
 			container.RegisterType<IItem, Item>( new ContainerControlledLifetimeManager() );
 			var expected = container.Resolve<IItem>();
 			var create = sut.Create( new InjectionMemberParameter( container, typeof(IItem) ) );
 			container.RegisterType( typeof(IItem), create );
 			Assert.Equal( expected, container.Resolve<IItem>() );
-		} 
+		}
 
 		class SimpleFactory : FactoryBase<string>
 		{

@@ -79,7 +79,7 @@ namespace DragonSpark.Diagnostics
 		}
 
 		[Freeze]
-		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForContext( Constants.SourceContextPropertyName, $"{parameter.DeclaringType.Name}.{parameter}" );
+		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForContext( Constants.SourceContextPropertyName, $"{parameter.DeclaringType.Name}.{parameter.Name}" );
 	}
 
 	public class ProfilerSourceFactory : FactoryBase<MethodBase, IProfiler>

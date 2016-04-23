@@ -3,6 +3,7 @@ using DragonSpark.Configuration;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using PostSharp.Aspects;
+using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
 using System.Reflection;
@@ -10,6 +11,8 @@ using System.Reflection;
 namespace DragonSpark.Aspects
 {
 	[PSerializable]
+	[ProvideAspectRole( StandardRoles.Tracing ), LinesOfCodeAvoided( 3 )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public sealed class ProfileAttribute : OnMethodBoundaryAspect
 	{
 		public ProfileAttribute() {}

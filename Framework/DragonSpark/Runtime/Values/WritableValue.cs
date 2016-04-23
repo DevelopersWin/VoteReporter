@@ -5,6 +5,15 @@ using System;
 
 namespace DragonSpark.Runtime.Values
 {
+	public static class ValueExtensions
+	{
+		public static T Assigned<T, U>( this T @this, U value ) where T : IWritableValue<U>
+		{
+			@this.Assign( value );
+			return @this;
+		}
+	}
+
 	public abstract class WritableValue<T> : Value<T>, IWritableValue<T>, IDisposable
 	{
 		public abstract void Assign( T item );
