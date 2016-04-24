@@ -26,7 +26,7 @@ namespace DragonSpark.Extensions
 
 		public static Assembly[] Assemblies( [Required] this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToArray();
 
-		public static TypeAdapter Adapt( [Required]this Type @this ) => new AssociatedValue<TypeAdapter>( @this, () => new TypeAdapter( @this ) ).Item;
+		public static TypeAdapter Adapt( [Required]this Type @this ) => new AssociatedStore<TypeAdapter>( @this, () => new TypeAdapter( @this ) ).Value;
 
 		public static TypeAdapter Adapt( this object @this ) => @this.GetType().Adapt();
 

@@ -76,7 +76,7 @@ namespace DragonSpark.Activation.IoC
 		protected override void Initialize()
 		{
 			var policies = repository.List();
-			var creator = new Creator( Container ).Item.With( c => c.GetType() ) ?? ThreadAmbientContext.GetCurrent();
+			var creator = new Creator( Container ).Value.With( c => c.GetType() ) ?? ThreadAmbientContext.GetCurrent();
 			var creators = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ), creator );
 			var policy = new BuildPlanCreatorPolicy( new TryContext( logger ).Try, specification, policies, creators );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
@@ -93,13 +93,13 @@ namespace DragonSpark.Activation.IoC
 				this.creator = creator;
 			}
 
-			class Plan : AssociatedValue<IBuildPlanPolicy>
+			class Plan : AssociatedStore<IBuildPlanPolicy>
 			{
 				public Plan( object creator, Type key, Func<IBuildPlanPolicy> create ) : base( creator, KeyFactory.Instance.CreateUsing( key, typeof(Plan) ).ToString(), create ) {}
 			}
 
 			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) 
-				=> new Plan( creator, context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Item;
+				=> new Plan( creator, context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Value;
 		}
 	}
 
@@ -138,7 +138,7 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Clear();
 
-			strategyRepository.List().Cast<StrategyEntry>().Each( entry => Context.Strategies.Add( entry.Item, entry.Stage ) );
+			strategyRepository.List().Cast<StrategyEntry>().Each( entry => Context.Strategies.Add( entry.Value, entry.Stage ) );
 		}
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
@@ -154,8 +154,8 @@ namespace DragonSpark.Activation.IoC
 
 			public override void PreBuildUp( IBuilderContext context )
 			{
-				var reference = new KeyReference( this, context.BuildKey ).Item;
-				if ( new Checked( reference, this ).Item.Apply() )
+				var reference = new KeyReference( this, context.BuildKey ).Value;
+				if ( new Checked( reference, this ).Value.Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
 					lifetimePolicy.Null( () =>
@@ -329,8 +329,8 @@ namespace DragonSpark.Activation.IoC
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var reference = new KeyReference( this, context.BuildKey ).Item;
-			if ( new Checked( reference, this ).Item.Apply() )
+			var reference = new KeyReference( this, context.BuildKey ).Value;
+			if ( new Checked( reference, this ).Value.Apply() )
 			{
 				var convention = locator.Create( context );
 				convention.With( located =>

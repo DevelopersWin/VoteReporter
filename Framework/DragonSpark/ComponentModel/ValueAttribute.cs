@@ -12,9 +12,9 @@ namespace DragonSpark.ComponentModel
 
 	public class ValueAttribute : ServicesValueBase
 	{
-		public ValueAttribute( [OfType( typeof(IValue) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Create ) {}
+		public ValueAttribute( [OfType( typeof(IStore) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Create ) {}
 
-		static object Create( Type type ) => Services.Get<IValue>( type ).Item;
+		static object Create( Type type ) => Services.Get<IStore>( type ).Value;
 
 		/*public class Creator : ServicesValueProvider.Category
 		{

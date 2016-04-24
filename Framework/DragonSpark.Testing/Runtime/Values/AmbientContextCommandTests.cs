@@ -12,8 +12,8 @@ namespace DragonSpark.Testing.Runtime.Values
 		[Fact]
 		public void ContextAsExpected()
 		{
-			var stack = new ThreadAmbientChain<Class>().Item;
-			Assert.Same( stack, new ThreadAmbientChain<Class>().Item );
+			var stack = new ThreadAmbientChain<Class>().Value;
+			Assert.Same( stack, new ThreadAmbientChain<Class>().Value );
 
 			Assert.Null( Ambient.GetCurrent<Class>() );
 
@@ -45,7 +45,7 @@ namespace DragonSpark.Testing.Runtime.Values
 
 						Task.Run( () =>
 						{
-							var thread = new ThreadAmbientChain<Class>().Item;
+							var thread = new ThreadAmbientChain<Class>().Value;
 							Assert.NotSame( stack, thread );
 							Assert.Empty( thread );
 							var other = new Class();
@@ -54,7 +54,7 @@ namespace DragonSpark.Testing.Runtime.Values
 								Assert.Same( other, Ambient.GetCurrent<Class>() );
 								Assert.Single( thread, other );
 							}
-							Assert.NotSame( thread, new ThreadAmbientChain<Class>().Item );
+							Assert.NotSame( thread, new ThreadAmbientChain<Class>().Value );
 						} ).Wait();
 					}
 
@@ -67,7 +67,7 @@ namespace DragonSpark.Testing.Runtime.Values
 
 			Assert.Null( Ambient.GetCurrent<Class>() );
 
-			Assert.NotSame( stack, new ThreadAmbientChain<Class>().Item );
+			Assert.NotSame( stack, new ThreadAmbientChain<Class>().Value );
 		} 
 	}
 }

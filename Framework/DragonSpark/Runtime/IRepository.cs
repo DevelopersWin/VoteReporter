@@ -66,7 +66,7 @@ namespace DragonSpark.Runtime
 		public IEnumerable<TItem> Items()
 		{
 			var enumerable = Query();
-			var result = enumerable.Select( entry => entry.Item ).ToImmutableList();
+			var result = enumerable.Select( entry => entry.Value ).ToImmutableList();
 			return result;
 		}
 	}
@@ -127,7 +127,7 @@ namespace DragonSpark.Runtime
 		protected virtual IEnumerable<TEntry> Query() => Store.Prioritize();
 	}*/
 
-	public class Entry<T> : FixedValue<T>, IPriorityAware
+	public class Entry<T> : FixedStore<T>, IPriorityAware
 	{
 		public Entry( [Required] T item, Priority priority = Priority.Normal )
 		{

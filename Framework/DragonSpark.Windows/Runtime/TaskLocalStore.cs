@@ -3,14 +3,14 @@ using System.Threading;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class TaskLocalValue<T> : WritableValue<T>
+	public class TaskLocalStore<T> : WritableStore<T>
 	{
 		readonly AsyncLocal<T> local;
 
-		public TaskLocalValue() : this( new AsyncLocal<T>() )
+		public TaskLocalStore() : this( new AsyncLocal<T>() )
 		{}
 
-		public TaskLocalValue( AsyncLocal<T> local )
+		public TaskLocalStore( AsyncLocal<T> local )
 		{
 			this.local = local;
 		}

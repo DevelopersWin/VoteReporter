@@ -13,18 +13,18 @@ namespace DragonSpark.Runtime.Values
 	{
 		public static object GetCurrent( [Required]Type type ) => typeof(Ambient).InvokeGeneric( nameof(GetCurrent), type.ToItem() );
 
-		public static T GetCurrent<T>() => new ThreadAmbientChain<T>().Item.PeekOrDefault();
+		public static T GetCurrent<T>() => new ThreadAmbientChain<T>().Value.PeekOrDefault();
 
-		public static T[] GetCurrentChain<T>() => new ThreadAmbientChain<T>().Item.ToArray();
+		public static T[] GetCurrentChain<T>() => new ThreadAmbientChain<T>().Value.ToArray();
 	}
 
-	public class ThreadLocalValue<T> : WritableValue<T>
+	public class ThreadLocalStore<T> : WritableStore<T>
 	{
 		readonly ThreadLocal<T> local;
 
-		public ThreadLocalValue( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
+		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
 
-		public ThreadLocalValue( ThreadLocal<T> local )
+		public ThreadLocalStore( ThreadLocal<T> local )
 		{
 			this.local = local;
 		}
@@ -40,17 +40,17 @@ namespace DragonSpark.Runtime.Values
 		}
 	}
 
-	public abstract class ConnectedValue<T> : WritableValue<T>
+	public abstract class ConnectedStore<T> : WritableStore<T>
 	{
 		readonly Func<T> create;
 
-		protected ConnectedValue( [Required] object instance, Type type, Func<T> create = null ) : this( instance, type.GetHashCode().ToString(), create )
+		protected ConnectedStore( [Required] object instance, Type type, Func<T> create = null ) : this( instance, type.GetHashCode().ToString(), create )
 		{}
 
-		protected ConnectedValue( [Required]object instance, [NotEmpty]string name, Func<T> create = null ) : this( PropertyConnector.Default.Get( instance, name, true ).Cast<T>(), create )
+		protected ConnectedStore( [Required]object instance, [NotEmpty]string name, Func<T> create = null ) : this( PropertyConnector.Default.Get( instance, name, true ).Cast<T>(), create )
 		{}
 
-		protected ConnectedValue( [Required]ConnectibleProperty<T> property, Func<T> create )
+		protected ConnectedStore( [Required]ConnectibleProperty<T> property, Func<T> create )
 		{
 			Property = property;
 			this.create = create ?? ( () => default(T) );
@@ -83,16 +83,16 @@ namespace DragonSpark.Runtime.Values
 		protected override string CreateItem( object parameter ) => $"{parameter.GetType()}-{parameter.GetHashCode()}";
 	}*/
 
-	public class Reference<T> : ConnectedValue<T>
+	public class Reference<T> : ConnectedStore<T>
 	{
 		public Reference( object instance, T key ) : base( instance, KeyFactory.Instance.CreateUsing( key ).ToString(), () => key ) {}
 	}
 
-	public class ListValue<T> : FixedValue<T>
+	public class ListStore<T> : FixedStore<T>
 	{
 		readonly IList list;
 
-		public ListValue( [Required] IList list )
+		public ListStore( [Required] IList list )
 		{
 			this.list = list;
 		}
@@ -101,7 +101,7 @@ namespace DragonSpark.Runtime.Values
 		{
 			if ( item == null )
 			{
-				Remove( Item );
+				Remove( Value );
 			}
 			else if ( !list.Contains( item ) )
 			{
@@ -119,10 +119,10 @@ namespace DragonSpark.Runtime.Values
 			}
 		}
 
-		protected override void OnDispose() => Remove( Item );
+		protected override void OnDispose() => Remove( Value );
 	}
 
-	public class Checked : AssociatedValue<ConditionMonitor>
+	public class Checked : AssociatedStore<ConditionMonitor>
 	{
 		public Checked( object instance ) : this( instance, instance ) {}
 
@@ -133,31 +133,31 @@ namespace DragonSpark.Runtime.Values
 		protected Checked( [Required]object instance, [Required]Type key ) : base( instance, key, () => new ConditionMonitor() ) { }
 	}
 
-	public class ThreadAmbientValue<T> : AssociatedValue<T>
+	public class ThreadAmbientStore<T> : AssociatedStore<T>
 	{
-		public ThreadAmbientValue( Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), typeof(T), create ) {}
+		public ThreadAmbientStore( Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), typeof(T), create ) {}
 
-		public ThreadAmbientValue( string key, Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), key, create ) {}
+		public ThreadAmbientStore( string key, Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), key, create ) {}
 
-		public ThreadAmbientValue( Type key, Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), key, create ) {}
+		public ThreadAmbientStore( Type key, Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), key, create ) {}
 	}
 
-	public class AssociatedValue<T> : AssociatedValue<object, T>
+	public class AssociatedStore<T> : AssociatedStore<object, T>
 	{
-		public AssociatedValue( object instance, Func<T> create = null ) : this( instance, typeof(AssociatedValue<object, T>), create ) {}
+		public AssociatedStore( object instance, Func<T> create = null ) : this( instance, typeof(AssociatedStore<object, T>), create ) {}
 
-		public AssociatedValue( object instance, string key, Func<T> create = null ) : base( instance, key, create ) {}
+		public AssociatedStore( object instance, string key, Func<T> create = null ) : base( instance, key, create ) {}
 
-		protected AssociatedValue( object instance, Type key, Func<T> create = null ) : base( instance, key, create ) {}
+		protected AssociatedStore( object instance, Type key, Func<T> create = null ) : base( instance, key, create ) {}
 	}
 
-	public class AssociatedValue<T, U> : ConnectedValue<U>
+	public class AssociatedStore<T, U> : ConnectedStore<U>
 	{
-		public AssociatedValue( T instance, Func<U> create = null ) : this( instance, typeof(AssociatedValue<T, U>), create ) {}
+		public AssociatedStore( T instance, Func<U> create = null ) : this( instance, typeof(AssociatedStore<T, U>), create ) {}
 
-		protected AssociatedValue( T instance, string key, Func<U> create = null ) : base( instance, key, create ) {}
+		protected AssociatedStore( T instance, string key, Func<U> create = null ) : base( instance, key, create ) {}
 
-		protected AssociatedValue( T instance, Type key, Func<U> create = null ) : base( instance, key, create ) {}
+		protected AssociatedStore( T instance, Type key, Func<U> create = null ) : base( instance, key, create ) {}
 	}
 
 	public class Items : Items<object>
@@ -167,7 +167,7 @@ namespace DragonSpark.Runtime.Values
 		// public Items( object instance, Type key ) : base( instance, key ) {}
 	}
 
-	public class Items<T> : ConnectedValue<IList<T>>
+	public class Items<T> : ConnectedStore<IList<T>>
 	{
 		public Items( object instance ) : this( instance, typeof(Items<T>) ) {}
 

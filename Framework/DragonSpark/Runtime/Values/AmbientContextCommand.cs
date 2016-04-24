@@ -11,7 +11,7 @@ namespace DragonSpark.Runtime.Values
 
 		public AmbientContextCommand() : this( new ThreadAmbientChain<T>() ) {}
 
-		public AmbientContextCommand( [Required]ThreadAmbientChain<T> chain ) : base( chain.Item )
+		public AmbientContextCommand( [Required]ThreadAmbientChain<T> chain ) : base( chain.Value )
 		{
 			this.chain = chain;
 		}
@@ -19,7 +19,7 @@ namespace DragonSpark.Runtime.Values
 		protected override void OnDispose()
 		{
 			base.OnDispose();
-			if ( !chain.Item.Any() )
+			if ( !chain.Value.Any() )
 			{
 				chain.Dispose();
 			}

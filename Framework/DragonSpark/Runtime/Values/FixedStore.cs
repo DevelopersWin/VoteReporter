@@ -1,6 +1,6 @@
 namespace DragonSpark.Runtime.Values
 {
-	public class FixedValue<T> : WritableValue<T>
+	public class FixedStore<T> : WritableStore<T>
 	{
 		T reference;
 

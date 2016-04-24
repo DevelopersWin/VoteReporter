@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Objects.Composition
 	[Export, Shared]
 	public class SharedServiceFactory : FactoryBase<ISharedService>
 	{
-		protected override ISharedService CreateItem() => new SharedService().WithSelf( service => new Checked( service ).Item.Apply() );
+		protected override ISharedService CreateItem() => new SharedService().WithSelf( service => new Checked( service ).Value.Apply() );
 	}
 
 	public interface ISharedService

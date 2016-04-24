@@ -111,7 +111,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public class AssociatedContext : AssociatedValue<MethodBase, IDisposable>
+	public class AssociatedContext : AssociatedStore<MethodBase, IDisposable>
 	{
 		public AssociatedContext( MethodBase instance ) : base( instance, typeof(AssociatedContext) ) {}
 	}
@@ -214,7 +214,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly IServiceRegistry registry;
 
-		public Specification( [Required] IFixture fixture ) : this( new RegistrationCustomization.AssociatedRegistry( fixture ).Item ) {}
+		public Specification( [Required] IFixture fixture ) : this( new RegistrationCustomization.AssociatedRegistry( fixture ).Value ) {}
 
 		Specification( [Required] IServiceRegistry registry )
 		{

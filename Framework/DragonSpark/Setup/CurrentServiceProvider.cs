@@ -11,19 +11,19 @@ using System.Linq;
 
 namespace DragonSpark.Setup
 {
-	public class CurrentServiceProvider : ExecutionContextValue<IServiceProvider>
+	public class CurrentServiceProvider : ExecutionContextStore<IServiceProvider>
 	{
 		public static CurrentServiceProvider Instance { get; } = new CurrentServiceProvider();
 
 		CurrentServiceProvider() {}
 
-		protected override IServiceProvider Get() => base.Get() ?? DefaultServiceProvider.Instance.Item;
+		protected override IServiceProvider Get() => base.Get() ?? DefaultServiceProvider.Instance.Value;
 
 		public override void Assign( IServiceProvider item )
 		{
-			if ( item.With( provider => provider != Item ) )
+			if ( item.With( provider => provider != Value ) )
 			{
-				var parameter = new MigrationParameter<IServiceProvider>( Item, item );
+				var parameter = new MigrationParameter<IServiceProvider>( Value, item );
 				ApplyMigrationCommand.Instance.Run( parameter );
 			}
 

@@ -8,8 +8,8 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void Item()
 		{
-			Assert.Equal( typeof(string), ExecutionContext.Instance.Item.GetType() );
-			Assert.Equal( "DefaultExecutionContext", ExecutionContext.Instance.Item );
+			Assert.Equal( typeof(string), ExecutionContext.Instance.Value.GetType() );
+			Assert.Equal( "DefaultExecutionContext", ExecutionContext.Instance.Value );
 		} 
 	}
 }

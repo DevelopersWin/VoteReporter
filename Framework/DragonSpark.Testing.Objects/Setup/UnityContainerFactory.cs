@@ -27,6 +27,6 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public static DefaultUnityContainerFactory Instance { get; } = new DefaultUnityContainerFactory();
 
-		DefaultUnityContainerFactory() : base( () => DefaultServiceProvider.Instance.Item ) {}
+		DefaultUnityContainerFactory() : base( () => DefaultServiceProvider.Instance.Value ) {}
 	}
 }

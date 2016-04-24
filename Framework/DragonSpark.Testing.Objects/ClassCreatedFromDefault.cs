@@ -7,8 +7,8 @@ namespace DragonSpark.Testing.Objects
 	{
 		public ClassCreatedFromDefault( string message )
 		{
-			var associated = new AssociatedValue<Type, int>( GetType() );
-			var count = associated.Item;
+			var associated = new AssociatedStore<Type, int>( GetType() );
+			var count = associated.Value;
 			switch ( count )
 			{
 				case 0:

@@ -158,7 +158,7 @@ namespace DragonSpark.Diagnostics
 		TimeSpan Elapsed { get; }
 	}
 
-	public abstract class TimerBase : FixedValue<ulong>, ITimer
+	public abstract class TimerBase : FixedStore<ulong>, ITimer
 	{
 		readonly Func<ulong> current;
 		readonly Func<ulong, TimeSpan> time;
@@ -176,7 +176,7 @@ namespace DragonSpark.Diagnostics
 			Assign( current() );
 		}
 
-		public virtual void Update() => Total += current() - Item;
+		public virtual void Update() => Total += current() - Value;
 
 		ulong Total
 		{

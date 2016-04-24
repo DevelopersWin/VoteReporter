@@ -8,6 +8,6 @@ namespace DragonSpark.Testing.Objects.Composition
 	[Export]
 	public class ExportedItemFactory : FactoryBase<ExportedItem>
 	{
-		protected override ExportedItem CreateItem() => new ExportedItem().WithSelf( item => new Checked( item ).Item.Apply() );
+		protected override ExportedItem CreateItem() => new ExportedItem().WithSelf( item => new Checked( item ).Value.Apply() );
 	}
 }

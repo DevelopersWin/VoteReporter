@@ -3,15 +3,15 @@ using System;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class AppDomainValue<T> : WritableValue<T>
+	public class AppDomainStore<T> : WritableStore<T>
 	{
 		readonly AppDomain domain;
 		readonly string key;
 
-		public AppDomainValue( string key ) : this( AppDomain.CurrentDomain, key )
+		public AppDomainStore( string key ) : this( AppDomain.CurrentDomain, key )
 		{}
 
-		public AppDomainValue( AppDomain domain, string key )
+		public AppDomainStore( AppDomain domain, string key )
 		{
 			this.domain = domain;
 			this.key = key;

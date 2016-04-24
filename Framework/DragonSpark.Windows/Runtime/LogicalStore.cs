@@ -3,11 +3,11 @@ using System.Runtime.Remoting.Messaging;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class LogicalValue<T> : WritableValue<T>
+	public class LogicalStore<T> : WritableStore<T>
 	{
 		readonly string slot;
 
-		public LogicalValue( string slot )
+		public LogicalStore( string slot )
 		{
 			this.slot = slot;
 		}

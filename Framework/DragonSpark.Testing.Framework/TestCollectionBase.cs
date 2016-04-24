@@ -29,7 +29,7 @@ namespace DragonSpark.Testing.Framework
 
 	public class ApplicationOutputCommand : OutputCommand
 	{
-		public ApplicationOutputCommand() : base( method => new AssignExecutionContextCommand( new AssociatedContext( method ).Item.Dispose ) ) {}
+		public ApplicationOutputCommand() : base( method => new AssignExecutionContextCommand( new AssociatedContext( method ).Value.Dispose ) ) {}
 	}
 
 	public static class MethodBaseExtensions
@@ -58,7 +58,7 @@ namespace DragonSpark.Testing.Framework
 			this.complete = complete;
 		}
 
-		public AssignExecutionContextCommand( Action<Assembly> initialize, IWritableValue<MethodBase> value ) : base( value )
+		public AssignExecutionContextCommand( Action<Assembly> initialize, IWritableStore<MethodBase> store ) : base( store )
 		{
 			this.initialize = initialize.Synchronized();
 		}

@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Setup
 		{
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( source ) )
 			{
-				var current = DefaultServiceProvider.Instance.Item;
+				var current = DefaultServiceProvider.Instance.Value;
 				Assert.Same( source.History, current.Get<ILoggerHistory>() );
 				Assert.Same( source.LevelSwitch, current.Get<LoggingLevelSwitch>() );
 
@@ -53,7 +53,7 @@ namespace DragonSpark.Testing.Setup
 		{
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( factory ) )
 			{
-				var current = DefaultServiceProvider.Instance.Item;
+				var current = DefaultServiceProvider.Instance.Value;
 				
 				var logger = current.Get<ILogger>();
 				logger.Information( $"This is from the source logger: {message}" );
@@ -69,10 +69,10 @@ namespace DragonSpark.Testing.Setup
 				Assert.NotNull( destination.Get<IServiceProviderMigrationCommandSource>() );
 
 				var destinationHistory = destination.Get<ILoggerHistory>();
-				Assert.False( new Checked( factory.History, source ).Item.IsApplied );
+				Assert.False( new Checked( factory.History, source ).Value.IsApplied );
 				Assert.Empty( destinationHistory.Events );
 				ApplyMigrationCommand.Instance.Run( new MigrationParameter<IServiceProvider>( current, destination ) );
-				Assert.True( new Checked( factory.History, source ).Item.IsApplied );
+				Assert.True( new Checked( factory.History, source ).Value.IsApplied );
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace DragonSpark.Testing.Setup
 		{
 			protected override ICommand<MigrationParameter<IServiceProvider>> CreateItem( IServiceProvider parameter )
 			{
-				new Checked( parameter.Get<ILoggerHistory>(), this ).Item.Apply();
+				new Checked( parameter.Get<ILoggerHistory>(), this ).Value.Apply();
 				return base.CreateItem( parameter );
 			}
 		}

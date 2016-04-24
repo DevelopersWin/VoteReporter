@@ -41,7 +41,7 @@ namespace DragonSpark.Composition
 	{
 		static IServiceProvider Decorated { get; } = new DecoratedServiceProvider( Get );
 
-		static object Get( Type type ) => DefaultServiceProvider.Instance.Item.GetService( type );
+		static object Get( Type type ) => DefaultServiceProvider.Instance.Value.GetService( type );
 
 		readonly Func<CompositionContext> source;
 

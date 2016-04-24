@@ -64,12 +64,12 @@ namespace DragonSpark.Testing.Objects
 		[Collection( typeof(Class) )]
 		public IEnumerable<Class> Classes { get; set; }
 		
-		[Value( typeof(Value) )]
+		[Value( typeof(Store) )]
 		public int ValuedInt { get; set; }
 
-		internal class Value : FixedValue<int>
+		internal class Store : FixedStore<int>
 		{
-			public Value()
+			public Store()
 			{
 				Assign( 6776 );
 			}

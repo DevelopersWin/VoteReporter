@@ -1,22 +1,20 @@
 namespace DragonSpark.Runtime.Values
 {
-	public abstract class ValueBase<T> : IValue<T>
+	public abstract class StoreBase<T> : IStore<T>
 	{
-		public T Item => Get();
+		public T Value => Get();
 
-		// public abstract T Item { get; }
-
-		object IValue.Item => Get();
+		object IStore.Value => Get();
 
 		protected abstract T Get();
 	}
 
-	public class PropertyStore<T> : WritableValue<T>
+	public class PropertyStore<T> : WritableStore<T>
 	{
-		public new T Item { get; set; }
+		public new T Value { get; set; }
 
-		protected override T Get() => Item;
+		protected override T Get() => Value;
 
-		public override void Assign( T item ) => Item = item;
+		public override void Assign( T item ) => Value = item;
 	}
 }

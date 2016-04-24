@@ -3,13 +3,13 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
-	public class AppDomainValueTests
+	public class TaskLocalValueTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
-		public void Assign( AppDomainValue<int> sut, int number )
+		public void Assign( int number, TaskLocalStore<int> sut )
 		{
 			sut.Assign( number );
-			Assert.Equal( number, sut.Item );
+			Assert.Equal( number, sut.Value );
 		}
 	}
 }

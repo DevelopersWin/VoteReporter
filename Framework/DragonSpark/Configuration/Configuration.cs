@@ -9,22 +9,22 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Configuration
 {
-	class StoreValue<T, TValue> : ExecutionContextValue<T> where T : class, IValue<TValue>, IConfiguration
+	class StoreStore<T, TValue> : ExecutionContextStore<T> where T : class, IStore<TValue>, IConfiguration
 	{
-		public StoreValue() : base( Store.Instance.Create<T> ) {}
+		public StoreStore() : base( Store.Instance.Create<T> ) {}
 	}
 
-	public static class Load<T, TValue> where T : class, IWritableValue<TValue>, IConfiguration
+	public static class Load<T, TValue> where T : class, IWritableStore<TValue>, IConfiguration
 	{
-		public static TValue Get() => new StoreValue<T, TValue>().Item.Item;
+		public static TValue Get() => new StoreStore<T, TValue>().Value.Value;
 	}
 
-	public static class Assign<T, TValue> where T : class, IWritableValue<TValue>, IConfiguration
+	public static class Assign<T, TValue> where T : class, IWritableStore<TValue>, IConfiguration
 	{
-		public static void With( TValue value ) => new StoreValue<T, TValue>().Item.Assign( value );
+		public static void With( TValue value ) => new StoreStore<T, TValue>().Value.Assign( value );
 	}
 
-	public interface IConfiguration : IValue
+	public interface IConfiguration : IStore
 	{
 		IConfiguration Clone();
 	}
@@ -38,7 +38,7 @@ namespace DragonSpark.Configuration
 	{
 		protected ConfigurationBase( T value )
 		{
-			Item = value;
+			Value = value;
 		}
 
 		public IConfiguration Clone() => (IConfiguration)MemberwiseClone();

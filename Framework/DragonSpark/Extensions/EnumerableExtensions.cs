@@ -42,12 +42,12 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<TResult> Each<T, TResult>( this IEnumerable<T> enumerable, Func<T, TResult> action ) => enumerable.Select( action ).ToArray();
 
-		class Array<T> : ConnectedValue<T[]>
+		class Array<T> : ConnectedStore<T[]>
 		{
 			public Array( T instance ) : base( instance, typeof(Array<T>), () => new[] { instance } ) {}
 		}
 
-		public static TItem[] ToItem<TItem>( this TItem target ) => new Array<TItem>( target ).Item;
+		public static TItem[] ToItem<TItem>( this TItem target ) => new Array<TItem>( target ).Value;
 
 		public static IEnumerable<TItem> Append<TItem>( this TItem target, IEnumerable<TItem> second ) => target.Append( second.Fixed() );
 		public static IEnumerable<TItem> Append<TItem>( this TItem target, params TItem[] second ) => target.ToItem().Concat( second );

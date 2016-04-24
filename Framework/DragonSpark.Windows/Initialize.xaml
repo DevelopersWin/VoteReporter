@@ -7,5 +7,5 @@
 	xmlns:diagnosticsCore="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
 	xmlns:diagnostics="clr-namespace:DragonSpark.Windows.Diagnostics"
 	mc:Ignorable="d">
-	<diagnosticsCore:ProfilerFactoryConfiguration Item="{x:Type diagnostics:ProfilerFactory}" />
+	<diagnosticsCore:ProfilerFactoryConfiguration Value="{x:Type diagnostics:ProfilerFactory}" />
 </configuration:InitializeConfigurationCommand>

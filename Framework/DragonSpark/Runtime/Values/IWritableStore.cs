@@ -1,6 +1,6 @@
 namespace DragonSpark.Runtime.Values
 {
-	public interface IWritableValue<T> : IValue<T>
+	public interface IWritableStore<T> : IStore<T>
 	{
 		void Assign( T item );
 	}

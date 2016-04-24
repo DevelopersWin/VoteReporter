@@ -96,7 +96,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var item = host.GetExport<ExportedItem>();
 			Assert.IsType<ExportedItem>( item );
-			Assert.False( new Checked( item ).Item.IsApplied );
+			Assert.False( new Checked( item ).Value.IsApplied );
 		}
 
 		[Theory, CompositionTests.AutoData]
@@ -105,14 +105,14 @@ namespace DragonSpark.Testing.Composition
 			var service = host.GetExport<IBasicService>();
 			Assert.IsType<BasicService>( service );
 			Assert.NotSame( service, host.GetExport<IBasicService>() );
-			Assert.True( new Checked( service ).Item.IsApplied );
+			Assert.True( new Checked( service ).Value.IsApplied );
 
 			var factory = host.GetExport<Func<IBasicService>>();
 			Assert.NotNull( factory );
 			var created = factory();
 			Assert.NotSame( factory, service );
 			Assert.IsType<BasicService>( created );
-			Assert.True( new Checked( created ).Item.IsApplied );
+			Assert.True( new Checked( created ).Value.IsApplied );
 		}
 
 		[Theory, CompositionTests.AutoData]
@@ -120,7 +120,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var item = host.GetExport<ExportedItem>();
 			Assert.NotNull( item );
-			Assert.False( new Checked( item ).Item.IsApplied );
+			Assert.False( new Checked( item ).Value.IsApplied );
 		}
 
 		[Theory, CompositionTests.AutoData]
@@ -136,7 +136,7 @@ namespace DragonSpark.Testing.Composition
 			var service = host.GetExport<ISharedService>();
 			Assert.IsType<SharedService>( service );
 			Assert.Same( service, host.GetExport<ISharedService>() );
-			Assert.True( new Checked( service ).Item.IsApplied );
+			Assert.True( new Checked( service ).Value.IsApplied );
 		}
 
 		internal class AutoData : AutoDataAttribute

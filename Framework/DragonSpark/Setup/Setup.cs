@@ -57,7 +57,7 @@ namespace DragonSpark.Setup
 	{
 		public AssignServiceProvider( IServiceProvider current ) : this( CurrentServiceProvider.Instance, current ) {}
 
-		public AssignServiceProvider( IWritableValue<IServiceProvider> value, IServiceProvider current ) : base( value, current ) {}
+		public AssignServiceProvider( IWritableStore<IServiceProvider> store, IServiceProvider current ) : base( store, current ) {}
 	}
 
 	public static class ApplicationExtensions
@@ -99,7 +99,7 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class DefaultServiceProvider : ExecutionContextValue<ServiceProvider>
+	public class DefaultServiceProvider : ExecutionContextStore<ServiceProvider>
 	{
 		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider( () => new ServiceProvider() );
 
@@ -112,15 +112,15 @@ namespace DragonSpark.Setup
 		{
 			public static IsActivatedInstanceSpecification Instance { get; } = new IsActivatedInstanceSpecification();
 
-			protected override bool Verify( object parameter ) => new Instance( parameter ).Item || new[] { parameter, new Factory( parameter ).Item }.NotNull().Any( o => o.Has<SharedAttribute>() );
+			protected override bool Verify( object parameter ) => new Instance( parameter ).Value || new[] { parameter, new Factory( parameter ).Value }.NotNull().Any( o => o.Has<SharedAttribute>() );
 		}
 
-		public class Instance : AssociatedValue<bool>
+		public class Instance : AssociatedStore<bool>
 		{
 			public Instance( object instance ) : base( instance ) {}
 		}
 
-		public class Factory : AssociatedValue<Type>
+		public class Factory : AssociatedStore<Type>
 		{
 			public Factory( object instance ) : base( instance ) {}
 		}
@@ -150,7 +150,7 @@ namespace DragonSpark.Setup
 		public override object GetService( Type serviceType )
 		{
 			var context = new IsActive( this, serviceType );
-			if ( !context.Item )
+			if ( !context.Value )
 			{
 				using ( new AssignValueCommand<bool>( context ).ExecuteWith( true ) )
 				{
@@ -161,7 +161,7 @@ namespace DragonSpark.Setup
 			return null;
 		}
 
-		class IsActive : ThreadAmbientValue<bool>
+		class IsActive : ThreadAmbientStore<bool>
 		{
 			public IsActive( object owner, Type type ) : base( KeyFactory.Instance.CreateUsing( owner, type ).ToString() ) {}
 		}

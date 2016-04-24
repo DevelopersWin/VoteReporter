@@ -16,7 +16,7 @@ namespace DragonSpark.Runtime
 
 		public static T AssociateForDispose<T>( this T @this, params IDisposable[] associated ) where T : IDisposable
 		{
-			new Associated( @this ).Item.AddRange( associated );
+			new Associated( @this ).Value.AddRange( associated );
 			return @this;
 		}
 	}
@@ -25,10 +25,10 @@ namespace DragonSpark.Runtime
 	{
 		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand();
 
-		protected override void OnExecute( IDisposable parameter ) => new Associated( parameter ).Item.Purge().Each( disposable => disposable.Dispose() );
+		protected override void OnExecute( IDisposable parameter ) => new Associated( parameter ).Value.Purge().Each( disposable => disposable.Dispose() );
 	}
 
-	class Associated : AssociatedValue<IDisposable, ICollection<IDisposable>>
+	class Associated : AssociatedStore<IDisposable, ICollection<IDisposable>>
 	{
 		public Associated( IDisposable instance ) : base( instance, typeof(Associated), () => new Collection<IDisposable>() ) {}
 	}

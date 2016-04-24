@@ -29,7 +29,7 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class CheckSpecification<T> : SpecificationBase<T>
 	{
-		protected override bool Verify( T parameter ) => new Checked( parameter, this ).Item.Apply();
+		protected override bool Verify( T parameter ) => new Checked( parameter, this ).Value.Apply();
 	}
 
 	public abstract class SpecificationBase<TParameter> : ISpecification<TParameter>

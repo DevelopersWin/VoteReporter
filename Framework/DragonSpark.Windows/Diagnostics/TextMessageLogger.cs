@@ -22,12 +22,12 @@ namespace DragonSpark.Windows.Diagnostics
 
 	public class Timer : DragonSpark.Diagnostics.Timer
 	{
-		readonly FixedValue<CpuTime> threadTime = new FixedValue<CpuTime>();
+		readonly FixedStore<CpuTime> threadTime = new FixedStore<CpuTime>();
 
 		public Timer()
 		{
-			KernelTime = new ThreadTimer( () => threadTime.Item.Kernel );
-			UserTime = new ThreadTimer( () => threadTime.Item.User );
+			KernelTime = new ThreadTimer( () => threadTime.Value.Kernel );
+			UserTime = new ThreadTimer( () => threadTime.Value.User );
 		}
 
 		ThreadTimer KernelTime { get; }

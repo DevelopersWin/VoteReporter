@@ -27,9 +27,9 @@ namespace DragonSpark.Testing.Framework
 			this.registration = registration;
 		}
 
-		public void Customize( IFixture fixture ) => registration.Register( new AssociatedRegistry( fixture ).Item );
+		public void Customize( IFixture fixture ) => registration.Register( new AssociatedRegistry( fixture ).Value );
 
-		public class AssociatedRegistry : AssociatedValue<IFixture, IServiceRegistry>
+		public class AssociatedRegistry : AssociatedStore<IFixture, IServiceRegistry>
 		{
 			public AssociatedRegistry( [Required]IFixture instance ) : base( instance, () => new FixtureRegistry( instance ) ) {}
 

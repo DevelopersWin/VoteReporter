@@ -5,20 +5,20 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Runtime.Values
 {
-	public class ThreadAmbientContext : ThreadValueBase<object>
+	public class ThreadAmbientContext : ThreadStoreBase<object>
 	{
 		public ThreadAmbientContext() : base( typeof(ThreadAmbientContext), () => new object() ) { }
 
-		public static object GetCurrent() => new ThreadAmbientContext().Item;
+		public static object GetCurrent() => new ThreadAmbientContext().Value;
 	}
 
-	public abstract class DecoratedAssociatedValue<T> : DecoratedValue<T>
+	public abstract class DecoratedAssociatedStore<T> : DecoratedStore<T>
 	{
-		readonly ConnectedValue<IWritableValue<T>> inner;
+		readonly ConnectedStore<IWritableStore<T>> inner;
 
-		protected DecoratedAssociatedValue( object instance, Func<IWritableValue<T>> create = null ) : this( new AssociatedValue<IWritableValue<T>>( instance, create ) ) { }
+		protected DecoratedAssociatedStore( object instance, Func<IWritableStore<T>> create = null ) : this( new AssociatedStore<IWritableStore<T>>( instance, create ) ) { }
 
-		protected DecoratedAssociatedValue( [Required]ConnectedValue<IWritableValue<T>> inner ) : base( inner.Item )
+		protected DecoratedAssociatedStore( [Required]ConnectedStore<IWritableStore<T>> inner ) : base( inner.Value )
 		{
 			this.inner = inner;
 		}
@@ -30,18 +30,18 @@ namespace DragonSpark.Runtime.Values
 		}
 	}
 
-	public abstract class ThreadValueBase<T> : DecoratedAssociatedValue<T>
+	public abstract class ThreadStoreBase<T> : DecoratedAssociatedStore<T>
 	{
-		protected ThreadValueBase( object instance, Func<T> create = null ) : base( instance, () => new ThreadLocalValue<T>( create ) ) {}
+		protected ThreadStoreBase( object instance, Func<T> create = null ) : base( instance, () => new ThreadLocalStore<T>( create ) ) {}
 	}
 
-	public class ThreadAmbientChain<T> : ThreadValueBase<Stack<T>>
+	public class ThreadAmbientChain<T> : ThreadStoreBase<Stack<T>>
 	{
 		public ThreadAmbientChain() : base( ThreadAmbientContext.GetCurrent(), () => new Stack<T>() ) {}
 
 		protected override void OnDispose()
 		{
-			Item.Clear();
+			Value.Clear();
 			base.OnDispose();
 		}
 	}

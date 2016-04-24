@@ -8,12 +8,12 @@ namespace DragonSpark.Windows.Markup
 		public int Next( object context )
 		{
 			var count = new Count( context );
-			var result = count.Item + 1;
+			var result = count.Value + 1;
 			count.Assign( result );
 			return result;
 		}
 
-		class Count : AssociatedValue<int>
+		class Count : AssociatedStore<int>
 		{
 			public Count( object instance ) : base( instance, typeof(Count) ) {}
 		}

@@ -192,14 +192,14 @@ namespace DragonSpark.Windows.Markup
 
 	public class ValueExtension : MarkupExtensionBase
 	{
-		readonly IValue value;
+		readonly IStore store;
 
-		public ValueExtension( [Required]IValue value )
+		public ValueExtension( [Required]IStore store )
 		{
-			this.value = value;
+			this.store = store;
 		}
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => value.Item;
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => store.Value;
 	}
 
 	public class FactoryTypeExtension : MarkupExtensionBase

@@ -141,7 +141,7 @@ namespace DragonSpark.Activation.IoC
 		protected override void OnAdd( StrategyEntry entry )
 		{
 			base.OnAdd( entry );
-			strategies.Add( entry.Item, entry.Stage );
+			strategies.Add( entry.Value, entry.Stage );
 		}
 
 		protected override StrategyEntry Create( IBuilderStrategy item ) => new StrategyEntry( item, UnityBuildStage.PreCreation );

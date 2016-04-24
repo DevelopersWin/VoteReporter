@@ -19,9 +19,9 @@ namespace DragonSpark.Activation
 			ServiceLocator.SetLocatorProvider( Get<IServiceLocator> );
 		}
 
-		public static void Initialize( [Required] IValue<IServiceProvider> provider ) => Provider = provider;
+		public static void Initialize( [Required] IStore<IServiceProvider> provider ) => Provider = provider;
 
-		static IValue<IServiceProvider> Provider { get; set; }
+		static IStore<IServiceProvider> Provider { get; set; }
 
 		/*static IServiceProvider Default { get; set; }
 
@@ -31,7 +31,7 @@ namespace DragonSpark.Activation
 
 		public static T Get<T>( [Required]Type type ) => (T)Get( type );
 
-		public static object Get( [Required] Type type ) => Provider.Item.GetService( type );
+		public static object Get( [Required] Type type ) => Provider.Value.GetService( type );
 	}
 
 	public class ServiceProvider : CompositeServiceProvider

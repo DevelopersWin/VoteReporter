@@ -77,7 +77,7 @@ namespace DragonSpark.Activation.IoC
 			var existing = provider.GetService( context.BuildKey.Type );
 			existing.With( o =>
 			{
-				if ( new Checked( o, this ).Item.Apply() && ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy( o ) )
+				if ( new Checked( o, this ).Value.Apply() && ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy( o ) )
 				{
 					registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );
 				}

@@ -131,9 +131,9 @@ namespace DragonSpark.Activation
 			this.keySource = keySource;
 		}
 
-		protected override TResult CreateItem( TParameter parameter ) => new Cache( instance( parameter ), KeyFactory.Instance.Create( keySource( parameter ) ), () => base.CreateItem( parameter ) ).Item;
+		protected override TResult CreateItem( TParameter parameter ) => new Cache( instance( parameter ), KeyFactory.Instance.Create( keySource( parameter ) ), () => base.CreateItem( parameter ) ).Value;
 
-		class Cache : AssociatedValue<TResult>
+		class Cache : AssociatedStore<TResult>
 		{
 			public Cache( object instance, int key, Func<TResult> create = null ) : base( instance, key.ToString(), create ) {}
 		}
@@ -246,7 +246,7 @@ namespace DragonSpark.Activation
 		object IFactory.Create() => Create();
 	}
 
-	public class Creator : AssociatedValue<ICreator>
+	public class Creator : AssociatedStore<ICreator>
 	{
 		public static void Tag( ICreator @this, object item ) => new Creator( item ).Assign( @this );
 

@@ -32,14 +32,14 @@ namespace DragonSpark.Activation
 																							   }
 																						   };
 
-		class Delegate<T, U> : ConnectedValue<Func<T, U>>
+		class Delegate<T, U> : ConnectedStore<Func<T, U>>
 		{
 			public Delegate( IFactory<T, U> instance ) : base( instance, typeof(Delegate<T, U>), () => instance.Create ) {}
 
 			// public Delegate( IFactoryWithParameter instance ) : base( instance, typeof(Delegate<T, U>), () => new Func<object, object>( instance.Create ).Convert<T,U>() ) {}
 		}
 
-		class Delegate<T> : ConnectedValue<Func<T>>
+		class Delegate<T> : ConnectedStore<Func<T>>
 		{
 			public Delegate( IFactory<T> instance ) : base( instance, typeof(Delegate<T>), () => instance.Create ) {}
 
@@ -56,8 +56,8 @@ namespace DragonSpark.Activation
 
 		public static Func<T, U> Convert<T, U>( this Func<object, object> @this ) => arg => (U)@this( arg );
 
-		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => new Delegate<T>( @this ).Item;
+		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => new Delegate<T>( @this ).Value;
 
-		public static Func<T, U> ToDelegate<T, U>( this IFactory<T, U> @this ) => new Delegate<T,U>( @this ).Item;
+		public static Func<T, U> ToDelegate<T, U>( this IFactory<T, U> @this ) => new Delegate<T,U>( @this ).Value;
 	}
 }

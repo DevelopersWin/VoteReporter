@@ -4,13 +4,13 @@ using System.Threading;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class ThreadDataValue<T> : WritableValue<T>
+	public class ThreadDataStore<T> : WritableStore<T>
 	{
 		readonly LocalDataStoreSlot slot;
 
-		public ThreadDataValue( string key ) : this( Thread.GetNamedDataSlot( key ) ) {}
+		public ThreadDataStore( string key ) : this( Thread.GetNamedDataSlot( key ) ) {}
 
-		public ThreadDataValue( LocalDataStoreSlot slot )
+		public ThreadDataStore( LocalDataStoreSlot slot )
 		{
 			this.slot = slot;
 		}

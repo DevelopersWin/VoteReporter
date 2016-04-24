@@ -212,8 +212,8 @@
     <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsTypeSpecification.cs" />
     <Compile Include="Runtime\Values\AmbientContextCommand.cs" />
-    <Compile Include="Runtime\Values\CompositeWritableValue.cs" />
-    <Compile Include="Runtime\Values\ConnectedValue.cs" />
+    <Compile Include="Runtime\Values\CompositeWritableStore.cs" />
+    <Compile Include="Runtime\Values\ConnectedStore.cs" />
     <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Runtime\Specifications\AlwaysSpecification.cs" />
     <Compile Include="Runtime\Specifications\FixedSpecification.cs" />
@@ -255,8 +255,8 @@
     <Compile Include="Runtime\Specifications\CompositeSpecification.cs" />
     <Compile Include="Runtime\CurrentTime.cs" />
     <Compile Include="Runtime\Specifications\EqualityContextAwareSpecification.cs" />
-    <Compile Include="Runtime\Values\IWritableValue.cs" />
-    <Compile Include="Runtime\Values\FixedValue.cs" />
+    <Compile Include="Runtime\Values\IWritableStore.cs" />
+    <Compile Include="Runtime\Values\FixedStore.cs" />
     <Compile Include="Runtime\Specifications\ContextAwareSpecification.cs" />
     <Compile Include="Runtime\Specifications\SpecificationBase.cs" />
     <Compile Include="Runtime\Specifications\SpecificationExtensions.cs" />
@@ -309,7 +309,7 @@
     <Compile Include="TypeSystem\IApplicationAssemblyLocator.cs" />
     <Compile Include="Runtime\ICurrentTime.cs" />
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
-    <Compile Include="Runtime\Values\IValue.cs" />
+    <Compile Include="Runtime\Values\IStore.cs" />
     <Compile Include="Runtime\ListDictionary.cs" />
     <Compile Include="Diagnostics\RecordingLoggerFactory.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
@@ -347,7 +347,7 @@
     <Compile Include="Modularity\ModuleTypeLoadingException.cs" />
     <Compile Include="Runtime\Specifications\TypeAssignableSpecification.cs" />
     <Compile Include="Runtime\Values\Value.cs" />
-    <Compile Include="Runtime\Values\WritableValue.cs" />
+    <Compile Include="Runtime\Values\WritableStore.cs" />
     <Compile Include="Setup\AllTypesOfFactory.cs" />
     <Compile Include="Runtime\CommandCollection.cs" />
     <Compile Include="Runtime\CompositeCommand.cs" />

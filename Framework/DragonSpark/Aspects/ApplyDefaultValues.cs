@@ -21,7 +21,7 @@ namespace DragonSpark.Aspects
 		{
 			lock ( args.Instance ?? args.Location.DeclaringType ) // TODO: Move to aspect.
 			{
-				var apply = new Checked( this ).Item.Apply();
+				var apply = new Checked( this ).Value.Apply();
 				if ( apply )
 				{
 					var parameter = new DefaultValueParameter( args.Instance ?? args.Location.DeclaringType, args.Location.PropertyInfo );
@@ -37,7 +37,7 @@ namespace DragonSpark.Aspects
 
 		public override void OnSetValue( LocationInterceptionArgs args )
 		{
-			new Checked( this ).Item.Apply();
+			new Checked( this ).Value.Apply();
 			base.OnSetValue( args );
 		}
 

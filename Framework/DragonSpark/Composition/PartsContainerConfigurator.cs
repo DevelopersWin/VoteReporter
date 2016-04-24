@@ -62,13 +62,13 @@ namespace DragonSpark.Composition
 
 	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}
 
-	public interface IServiceProviderHost : IWritableValue<IServiceProvider> {}
+	public interface IServiceProviderHost : IWritableStore<IServiceProvider> {}
 
-	class ServiceProviderHost : FixedValue<IServiceProvider>, IServiceProviderHost
+	class ServiceProviderHost : FixedStore<IServiceProvider>, IServiceProviderHost
 	{
 		public ServiceProviderHost()
 		{
-			Assign( DefaultServiceProvider.Instance.Item );
+			Assign( DefaultServiceProvider.Instance.Value );
 		}
 	}
 
@@ -95,7 +95,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		object Get( Type type ) => host.Item.GetService( type );
+		object Get( Type type ) => host.Value.GetService( type );
 
 		class Context
 		{

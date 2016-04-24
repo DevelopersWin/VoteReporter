@@ -22,23 +22,23 @@ namespace DragonSpark.Runtime
 
 	public class AssignValueCommand<T> : DisposingCommand<T>
 	{
-		readonly IWritableValue<T> value;
+		readonly IWritableStore<T> store;
 		readonly T current;
 
-		public AssignValueCommand( [Required]IWritableValue<T> value ) : this( value, value.Item ) {}
+		public AssignValueCommand( [Required]IWritableStore<T> store ) : this( store, store.Value ) {}
 
-		public AssignValueCommand( [Required]IWritableValue<T> value, T current )
+		public AssignValueCommand( [Required]IWritableStore<T> store, T current )
 		{
-			this.value = value;
+			this.store = store;
 			this.current = current;
 		}
 
-		protected override void OnExecute( T parameter ) => value.Assign( parameter );
+		protected override void OnExecute( T parameter ) => store.Assign( parameter );
 
 		protected override void OnDispose()
 		{
-			value.TryDispose();
-			value.Assign( current );
+			store.TryDispose();
+			store.Assign( current );
 			base.OnDispose();
 		}
 	}

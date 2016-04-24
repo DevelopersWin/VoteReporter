@@ -267,7 +267,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Runtime\AppDomainValue.cs" />
+    <Compile Include="Runtime\AppDomainStore.cs" />
     <Compile Include="Runtime\ApplicationAssemblyLocator.cs" />
     <Compile Include="Runtime\FileSystemAssemblySource.cs" />
     <Compile Include="Runtime\DomainAssemblySource.cs" />
@@ -292,8 +292,8 @@
     <Compile Include="Modularity\ModulesConfigurationSection.cs" />
     <Compile Include="Modularity\RemotingModuleInfoProvider.cs" />
     <Compile Include="Runtime\ApplicationAssemblyFilter.cs" />
-    <Compile Include="Runtime\LogicalValue.cs" />
-    <Compile Include="Runtime\ThreadDataValue.cs" />
+    <Compile Include="Runtime\LogicalStore.cs" />
+    <Compile Include="Runtime\ThreadDataStore.cs" />
     <Compile Include="Setup\FileConfigurationFactory.cs" />
     <Compile Include="Setup\SetupUnityFromConfigurationCommand.cs" />
     <Compile Include="Setup\SetupExceptionHandling.cs" />
@@ -324,7 +324,7 @@
     <Compile Include="Runtime\TypeDefinitionProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\ThreadLocalStorage.cs" />
-    <Compile Include="Runtime\TaskLocalValue.cs" />
+    <Compile Include="Runtime\TaskLocalStore.cs" />
     <Compile Include="TypeSystem\Class1.cs" />
   </ItemGroup>
   <ItemGroup>

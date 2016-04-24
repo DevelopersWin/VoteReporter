@@ -51,16 +51,16 @@ namespace DragonSpark.Composition
 						_ => ExportDescriptor.Create( ( context, operation ) =>
 						{
 							Func<object> create = () => activator( context, operation ).With( context.Checked ).With( o => new ActivationProperties.Factory( o ).Assign( promise.Contract.ContractType ) );
-							var item = promise.IsShared ? new SharedValue( context.FindContextWithin( boundary ), resultContract, create ).Item : create();
+							var item = promise.IsShared ? new SharedStore( context.FindContextWithin( boundary ), resultContract, create ).Value : create();
 							return item;
 						}, NoMetadata ) );
 				}
 			}
 		}
 
-		class SharedValue : AssociatedValue<LifetimeContext, object>
+		class SharedStore : AssociatedStore<LifetimeContext, object>
 		{
-			public SharedValue( LifetimeContext instance, CompositionContract key, Func<object> create = null ) : base( instance, key.ToString(), create ) {}
+			public SharedStore( LifetimeContext instance, CompositionContract key, Func<object> create = null ) : base( instance, key.ToString(), create ) {}
 		}
 	}
 

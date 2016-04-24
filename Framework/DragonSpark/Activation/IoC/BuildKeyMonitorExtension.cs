@@ -8,7 +8,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			if ( !new Checked( context.BuildKey.Type, this ).Item.IsApplied )
+			if ( !new Checked( context.BuildKey.Type, this ).Value.IsApplied )
 			{
 				
 			}
@@ -18,7 +18,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class BuildKeyMonitorExtension : BuilderStrategy, IRequiresRecovery
 	{
-		static Stack<NamedTypeBuildKey> Stack => new ThreadAmbientChain<NamedTypeBuildKey>().Item;
+		static Stack<NamedTypeBuildKey> Stack => new ThreadAmbientChain<NamedTypeBuildKey>().Value;
 
 		public override void PreBuildUp( IBuilderContext context )
 		{

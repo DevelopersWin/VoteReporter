@@ -21,7 +21,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, ProgramSetup.AutoData]
 		public void Extension( IModuleMonitor sut )
 		{
-			var collection = new Items( sut ).Item;
+			var collection = new Items( sut ).Value;
 			var module = collection.FirstOrDefaultOfType<MonitoredModule>();
 			Assert.NotNull( module );
 			Assert.True( module.Initialized );
@@ -64,11 +64,11 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, ProgramSetup.AutoData]
 		public void SetupModuleCommand( SetupModuleCommand sut, MonitoredModule module )
 		{
-			var added = new Items( module ).Item.FirstOrDefaultOfType<SomeCommand>();
+			var added = new Items( module ).Value.FirstOrDefaultOfType<SomeCommand>();
 			Assert.Null( added );
 			sut.Execute( module );
 
-			Assert.NotNull( new Items( module ).Item.FirstOrDefaultOfType<SomeCommand>() );
+			Assert.NotNull( new Items( module ).Value.FirstOrDefaultOfType<SomeCommand>() );
 		}
 	}
 
@@ -93,14 +93,14 @@ namespace DragonSpark.Windows.Testing.Setup
 
 	public class SomeCommand : ModuleCommand
 	{
-		protected override void OnExecute( IMonitoredModule parameter ) => new Items( parameter ).Item.Add( this );
+		protected override void OnExecute( IMonitoredModule parameter ) => new Items( parameter ).Value.Add( this );
 	}
 
 	public class MonitoredModule : MonitoredModule<MonitoredModule.Command>
 	{
 		public MonitoredModule( IModuleMonitor moduleMonitor, Command command ) : base( moduleMonitor, command )
 		{
-			new Items( moduleMonitor ).Item.Add( this );
+			new Items( moduleMonitor ).Value.Add( this );
 		}
 
 		public bool Initialized { get; private set; }
@@ -128,7 +128,7 @@ namespace DragonSpark.Windows.Testing.Setup
 				this.monitor = monitor;
 			}
 
-			protected override void OnExecute( IMonitoredModule parameter ) => new Items( monitor ).Item.Add( this );
+			protected override void OnExecute( IMonitoredModule parameter ) => new Items( monitor ).Value.Add( this );
 		}
 	}
 }
