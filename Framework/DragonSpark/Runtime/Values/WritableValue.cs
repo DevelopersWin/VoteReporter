@@ -14,7 +14,7 @@ namespace DragonSpark.Runtime.Values
 		}
 	}
 
-	public abstract class WritableValue<T> : Value<T>, IWritableValue<T>, IDisposable
+	public abstract class WritableValue<T> : ValueBase<T>, IWritableValue<T>, IDisposable
 	{
 		public abstract void Assign( T item );
 
@@ -47,7 +47,7 @@ namespace DragonSpark.Runtime.Values
 
 		public override void Assign( T item ) => deferred.Use( value => value.Assign( item ) );
 
-		public override T Item => deferred.Use( value => value.Item );
+		protected override T Get() => deferred.Use( value => value.Item );
 	}
 
 	public class DecoratedValue<T> : WritableValue<T>
@@ -61,7 +61,7 @@ namespace DragonSpark.Runtime.Values
 
 		public override void Assign( T item ) => inner.Assign( item );
 
-		public override T Item => inner.Item;
+		protected override T Get() => inner.Item;
 
 		protected override void OnDispose()
 		{

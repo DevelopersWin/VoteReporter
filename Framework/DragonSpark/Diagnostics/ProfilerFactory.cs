@@ -18,7 +18,7 @@ namespace DragonSpark.Diagnostics
 
 	public abstract class ProfilerFactoryBase<TTimer> : FactoryBase<MethodBase, IProfiler> where TTimer : ITimer, new()
 	{
-		static LogEventLevel Level() => Configure.Get<Configuration>().Profiler.Level;
+		static LogEventLevel Level() => Load<ProfilerLevelConfiguration, LogEventLevel>.Get();
 
 		readonly Func<MethodBase, ILogger> loggerSource;
 		readonly Func<ILogger, Action<TimerEvent>> handlerSource;

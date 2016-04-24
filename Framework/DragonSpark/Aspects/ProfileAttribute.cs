@@ -26,7 +26,7 @@ namespace DragonSpark.Aspects
 
 		IProfiler Create( MethodBase method )
 		{
-			var type = FactoryType ?? Configure.Get<Diagnostics.Configuration>().Profiler.FactoryType;
+			var type = FactoryType ?? Load<ProfilerFactoryConfiguration, Type>.Get();
 			var result = Services.Get<IFactory<MethodBase, IProfiler>>( type ).Create( method );
 			return result;
 		}

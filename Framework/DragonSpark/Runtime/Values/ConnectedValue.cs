@@ -1,4 +1,3 @@
-using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using Nito.ConnectedProperties;
@@ -32,7 +31,7 @@ namespace DragonSpark.Runtime.Values
 
 		public override void Assign( T item ) => local.Value = item;
 
-		public override T Item => local.Value;
+		protected override T Get() => local.Value;
 
 		protected override void OnDispose()
 		{
@@ -59,7 +58,7 @@ namespace DragonSpark.Runtime.Values
 
 		public override void Assign( T item ) => Property.Set( item );
 
-		public override T Item => Property.GetOrCreate( create );
+		protected override T Get() => Property.GetOrCreate( create );
 
 		public ConnectibleProperty<T> Property { get; }
 

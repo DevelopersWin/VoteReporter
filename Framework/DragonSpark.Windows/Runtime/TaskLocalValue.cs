@@ -20,6 +20,6 @@ namespace DragonSpark.Windows.Runtime
 			local.Value = item;
 		}
 
-		public override T Item => local.Value;
+		protected override T Get() => local.Value;
 	}
 }

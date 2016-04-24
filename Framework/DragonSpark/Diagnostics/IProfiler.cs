@@ -1,3 +1,5 @@
+using DragonSpark.Runtime;
+
 namespace DragonSpark.Diagnostics
 {
 	public interface IProfiler : IProcess, IContinuation {}

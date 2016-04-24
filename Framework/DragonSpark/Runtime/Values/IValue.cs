@@ -5,8 +5,8 @@ namespace DragonSpark.Runtime.Values
 		object Item { get; }
 	}
 
-	public interface IValue<out T>
+	public interface IValue<out T> : IValue
 	{
-		T Item { get; }
+		new T Item { get; }
 	}
 }

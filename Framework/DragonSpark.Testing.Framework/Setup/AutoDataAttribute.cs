@@ -15,8 +15,10 @@ using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Serilog.Core;
 using Xunit.Sdk;
 using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 
@@ -138,11 +140,11 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 	
-	public class MinimalLevel : BeforeAfterTestAttribute
+	public class MinimumLevel : BeforeAfterTestAttribute
 	{
 		readonly LogEventLevel level;
 
-		public MinimalLevel( LogEventLevel level )
+		public MinimumLevel( LogEventLevel level )
 		{
 			this.level = level;
 		}
@@ -151,7 +153,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			using ( new AssignExecutionContextCommand().ExecuteWith( methodUnderTest ) )
 			{
-				Configure.Get<DragonSpark.Diagnostics.Configuration>().Profiler.Level = level;
+				Services.Get<LoggingLevelSwitch>().MinimumLevel = level;
 			}
 		}
 	}

@@ -18,18 +18,19 @@ namespace DragonSpark.Testing.Extensions
 {
 	public class UnityContainerExtensionsTests
 	{
-		[Theory, AutoData, MinimalLevel( LogEventLevel.Debug )]
+		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
 			var assemblies = sut.Resolve<Assembly[]>();
 			Assert.Same( Default<Assembly>.Items, assemblies );
 
-			var levelSwitch = sut.Resolve<IServiceProvider>().Get<LoggingLevelSwitch>();
-			Assert.Same( levelSwitch, sut.Resolve<IServiceProvider>().Get<LoggingLevelSwitch>() );
-			levelSwitch.MinimumLevel = LogEventLevel.Debug;
+			var provider = sut.Resolve<IServiceProvider>();
+			var levelSwitch = provider.Get<LoggingLevelSwitch>();
+			Assert.Same( levelSwitch, provider.Get<LoggingLevelSwitch>() );
+			
 
-			var sink = sut.Resolve<IServiceProvider>().Get<LoggerHistorySink>();
-			Assert.Same( sink, sut.Resolve<IServiceProvider>().Get<LoggerHistorySink>() );
+			var sink = provider.Get<LoggerHistorySink>();
+			Assert.Same( sink, provider.Get<LoggerHistorySink>() );
 			var initial = sink.Events.Count();
 			Assert.Single( sink.Events );
 

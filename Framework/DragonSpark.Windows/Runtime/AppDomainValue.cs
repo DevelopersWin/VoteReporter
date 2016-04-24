@@ -17,11 +17,8 @@ namespace DragonSpark.Windows.Runtime
 			this.key = key;
 		}
 
-		public override void Assign( T item )
-		{
-			domain.SetData( key, item );
-		}
+		public override void Assign( T item ) => domain.SetData( key, item );
 
-		public override T Item => (T)domain.GetData( key );
+		protected override T Get() => (T)domain.GetData( key );
 	}
 }

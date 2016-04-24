@@ -24,6 +24,14 @@ namespace DragonSpark.Activation
 
 	public static class FactoryExtensions
 	{
+		public static Action<T> Synchronized<T>( this Action<T> @this ) where T : class => parameter =>
+																						   {
+																							   lock ( parameter )
+																							   {
+																								   @this( parameter );
+																							   }
+																						   };
+
 		class Delegate<T, U> : ConnectedValue<Func<T, U>>
 		{
 			public Delegate( IFactory<T, U> instance ) : base( instance, typeof(Delegate<T, U>), () => instance.Create ) {}

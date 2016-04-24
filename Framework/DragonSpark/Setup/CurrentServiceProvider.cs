@@ -17,7 +17,7 @@ namespace DragonSpark.Setup
 
 		CurrentServiceProvider() {}
 
-		public override IServiceProvider Item => base.Item ?? DefaultServiceProvider.Instance.Item;
+		protected override IServiceProvider Get() => base.Get() ?? DefaultServiceProvider.Instance.Item;
 
 		public override void Assign( IServiceProvider item )
 		{

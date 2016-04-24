@@ -17,7 +17,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		{
 			var history = new LoggerHistorySink();
 			var level = new LoggingLevelSwitch();
-			using ( MethodBase.GetCurrentMethod().Assign( history, level ) )
+			using ( MethodBase.GetCurrentMethod().AsCurrentContext( history, level ) )
 			{
 				Assert.Empty( history.Events );
 

@@ -26,6 +26,6 @@ namespace DragonSpark.Activation
 
 		const string Default = "DefaultExecutionContext";
 
-		public override object Item => base.Item ?? Default;
+		protected override object Get() => base.Get() ?? Default;
 	}
 }

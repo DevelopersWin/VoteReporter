@@ -11,6 +11,7 @@ using PostSharp.Patterns.Model;
 using Serilog.Core;
 using System;
 using System.Reflection;
+using PostSharp.Patterns.Threading;
 using Xunit.Abstractions;
 using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
@@ -33,9 +34,11 @@ namespace DragonSpark.Testing.Framework
 
 	public static class MethodBaseExtensions
 	{
-		public static AssignExecutionContextCommand Assign( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => Assign( @this, new RecordingLoggerFactory( history, level ) );
+		public static AssignExecutionContextCommand AsCurrentContext( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => AsCurrentContext( @this, new RecordingLoggerFactory( history, level ) );
 
-		public static AssignExecutionContextCommand Assign( this MethodBase @this, RecordingLoggerFactory factory )
+		public static AssignExecutionContextCommand AsCurrentContext( this MethodBase @this ) => AsCurrentContext( @this, new RecordingLoggerFactory() );
+
+		public static AssignExecutionContextCommand AsCurrentContext( this MethodBase @this, RecordingLoggerFactory factory )
 		{
 			var result = new AssignExecutionContextCommand().ExecuteWith( @this );
 			DefaultServiceProvider.Instance.Assign( new ServiceProvider( factory ) );
@@ -57,7 +60,7 @@ namespace DragonSpark.Testing.Framework
 
 		public AssignExecutionContextCommand( Action<Assembly> initialize, IWritableValue<MethodBase> value ) : base( value )
 		{
-			this.initialize = initialize;
+			this.initialize = initialize.Synchronized();
 		}
 
 		protected override void OnExecute( MethodBase parameter )

@@ -8,8 +8,7 @@ namespace DragonSpark.Windows.Runtime
 	{
 		readonly LocalDataStoreSlot slot;
 
-		public ThreadDataValue( string key ) : this( Thread.GetNamedDataSlot( key ) )
-		{}
+		public ThreadDataValue( string key ) : this( Thread.GetNamedDataSlot( key ) ) {}
 
 		public ThreadDataValue( LocalDataStoreSlot slot )
 		{
@@ -18,6 +17,6 @@ namespace DragonSpark.Windows.Runtime
 
 		public override void Assign( T item ) => Thread.SetData( slot, item );
 
-		public override T Item => (T)Thread.GetData( slot );
+		protected override T Get() => (T)Thread.GetData( slot );
 	}
 }

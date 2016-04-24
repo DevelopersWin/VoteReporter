@@ -19,7 +19,7 @@ namespace DragonSpark.Testing.Composition
 	{
 		public CompositionTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Theory, CompositionTests.AutoData, MinimalLevel( LogEventLevel.Debug )]
+		[Theory, CompositionTests.AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void BasicCompose( CompositionContext host )
 		{
 			var sinkOne = host.GetExport<ILoggerHistory>();
@@ -37,7 +37,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( sinkOne.Events.Count() > current );
 		}
 
-		[Theory, CompositionTests.AutoData, MinimalLevel( LogEventLevel.Debug )]
+		[Theory, CompositionTests.AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void BasicComposeAgain( CompositionContext host )
 		{
 			var sinkOne = host.GetExport<ILoggerHistory>();

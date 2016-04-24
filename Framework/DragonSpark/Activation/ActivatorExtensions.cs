@@ -4,16 +4,14 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PostSharp;
-using PostSharp.Extensibility;
 
 namespace DragonSpark.Activation
 {
 	public static class ActivatorExtensions
 	{
-		public static TResult Activate<TResult>( this IActivator @this ) where TResult : class => Activate<TResult>( @this, typeof(TResult) );
+		public static TResult Activate<TResult>( this IActivator @this ) => Activate<TResult>( @this, typeof(TResult) );
 
-		public static TResult Activate<TResult>( this IActivator @this, [Required] Type requestedType ) where TResult : class => (TResult)@this.Create( requestedType );
+		public static TResult Activate<TResult>( this IActivator @this, [Required] Type requestedType ) => (TResult)@this.Create( requestedType );
 
 		public static TResult Activate<TResult>( this IActivator @this, TypeRequest request ) => (TResult)@this.Create( request );
 

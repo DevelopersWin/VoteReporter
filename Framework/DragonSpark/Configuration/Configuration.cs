@@ -1,43 +1,46 @@
-﻿using DragonSpark.ComponentModel;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Commands;
-using System;
 using System.Collections.Generic;
 using System.Windows.Markup;
 
 namespace DragonSpark.Configuration
 {
-	class ConfigurationValue<T> : ExecutionContextValue<T> where T : class, IConfiguration, new()
+	class StoreValue<T, TValue> : ExecutionContextValue<T> where T : class, IValue<TValue>, IConfiguration
 	{
-		public ConfigurationValue() : base( Store.Instance.Create<T> ) {}
+		public StoreValue() : base( Store.Instance.Create<T> ) {}
 	}
 
-	public static class Configure
+	public static class Load<T, TValue> where T : class, IWritableValue<TValue>, IConfiguration
 	{
-		public static void Initialize( IConfiguration configuration ) => Store.Instance.Add( configuration );
-
-		public static T Get<T>() where T : class, IConfiguration, new() => new ConfigurationValue<T>().Item;
-
-		public static Func<U> Get<T, U>( Func<T, U> get ) where T : class, IConfiguration, new() => () => get( Get<T>() );
+		public static TValue Get() => new StoreValue<T, TValue>().Item.Item;
 	}
 
-	public interface IConfiguration
+	public static class Assign<T, TValue> where T : class, IWritableValue<TValue>, IConfiguration
+	{
+		public static void With( TValue value ) => new StoreValue<T, TValue>().Item.Assign( value );
+	}
+
+	public interface IConfiguration : IValue
 	{
 		IConfiguration Clone();
 	}
 
-	public abstract class ConfigurationBase : IConfiguration
+	public class EnableMethodCaching : ConfigurationBase<bool>
 	{
-		public IConfiguration Clone() => (IConfiguration)MemberwiseClone();
+		public EnableMethodCaching() : base( true ) {}
 	}
 
-	public class Configuration : ConfigurationBase
+	public abstract class ConfigurationBase<T> : PropertyStore<T>, IConfiguration
 	{
-		[Default( true )]
-		public bool EnableMethodCaching { get; set; }
+		protected ConfigurationBase( T value )
+		{
+			Item = value;
+		}
+
+		public IConfiguration Clone() => (IConfiguration)MemberwiseClone();
 	}
 
 	[ContentProperty( nameof( Parameter ) )]
@@ -52,6 +55,6 @@ namespace DragonSpark.Configuration
 
 		ConfigureCommand() {}
 
-		protected override void OnExecute( IEnumerable<IConfiguration> parameter ) => parameter.Each( Configure.Initialize );
+		protected override void OnExecute( IEnumerable<IConfiguration> parameter ) => parameter.Each( Store.Instance.Add );
 	}
 }

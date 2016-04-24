@@ -19,7 +19,7 @@ namespace DragonSpark.Testing.Diagnostics
 		{
 			var history = new LoggerHistorySink();
 			var level = new LoggingLevelSwitch();
-			using ( MethodBase.GetCurrentMethod().Assign( history, level ) )
+			using ( MethodBase.GetCurrentMethod().AsCurrentContext( history, level ) )
 			{
 				Assert.Empty( history.Events );
 
@@ -70,7 +70,7 @@ namespace DragonSpark.Testing.Diagnostics
 			Assert.Null( Ambient.GetCurrent<EmitProfileEvent>() );
 
 			var history = new LoggerHistorySink();
-			using ( MethodBase.GetCurrentMethod().Assign( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ) )
+			using ( MethodBase.GetCurrentMethod().AsCurrentContext( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ) )
 			{
 				Assert.Empty( history.Events );
 

@@ -8,6 +8,6 @@ namespace DragonSpark.Runtime.Values
 
 		protected virtual void OnAssign( T item ) => reference = item;
 
-		public override T Item => reference;
+		protected override T Get() => reference;
 	}
 }

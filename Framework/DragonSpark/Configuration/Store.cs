@@ -1,5 +1,7 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using PostSharp.Patterns.Model;
 using PostSharp.Patterns.Threading;
 using System.Linq;
 
@@ -10,28 +12,29 @@ namespace DragonSpark.Configuration
 	{
 		public static Store Instance { get; } = new Store();
 
-		public T Create<T>() where T : class, IConfiguration, new()
+		[Reference]
+		readonly IActivator activator;
+
+		public Store() : this( Activator.Instance ) {}
+
+		public Store( IActivator activator )
 		{
-			var foo = Get<T>();
-			var clone = (T)foo.Clone();
-			return clone;
+			this.activator = activator;
 		}
 
-		public T Get<T>() where T : class, IConfiguration, new()
+		public T Create<T>() where T : class, IConfiguration => (T)Get<T>().Clone();
+
+		T Get<T>() where T : class, IConfiguration
 		{
-			var firstOrDefaultOfType = Store.FirstOrDefaultOfType<T>();
-			var foo = firstOrDefaultOfType ?? New<T>();
+			var foo = Store.FirstOrDefaultOfType<T>() ?? New<T>();
 			return foo;
 		}
 
-		T New<T>() where T : IConfiguration, new()
+		T New<T>() where T : IConfiguration
 		{
-			// lock ( Store )
-			{
-				var result = new T();
-				Add( result );
-				return result;
-			}
+			var result = activator.Activate<T>();
+			Add( result );
+			return result;
 		}
 
 		protected override void OnAdd( IConfiguration entry )

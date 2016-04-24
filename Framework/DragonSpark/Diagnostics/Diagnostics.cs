@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using Serilog;
@@ -13,15 +12,6 @@ using System.Reflection;
 
 namespace DragonSpark.Diagnostics
 {
-	public static class ExceptionSupport
-	{
-		public static Exception Try( Action action ) => Try( Services.Get<TryContext>, action );
-
-		public static Exception Try( this Func<TryContext> @this, Action action ) => @this().Try( action );
-
-		public static void Process( this IExceptionHandler target, Exception exception ) => target.Handle( exception ).With( a => a.RethrowRecommended.IsTrue( () => { throw a.Exception; } ) );
-	}
-
 	public class MethodLoggerFactory : FactoryBase<MethodBase, ILogger>
 	{
 		readonly ILogger logger;
@@ -32,7 +22,7 @@ namespace DragonSpark.Diagnostics
 		}
 
 		[Freeze]
-		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForContext( Constants.SourceContextPropertyName, $"{parameter.DeclaringType.Name}.{parameter.Name}" );
+		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForContext( Constants.SourceContextPropertyName, parameter );
 	}
 
 	public delegate void EmitProfileEvent( string name );
@@ -93,23 +83,6 @@ namespace DragonSpark.Diagnostics
 			: base(	"[{Event:l}] - Wall time {WallTime:ss':'fff}; Synchronous time {SynchronousTime:ss':'fff}", profilerEvent.EventName, profilerEvent.Timer.Elapsed, profilerEvent.Tracker.Elapsed ) {}
 	}
 
-	public class CompositeLoggerTemplate : LoggerTemplate
-	{
-		public CompositeLoggerTemplate( params ILoggerTemplate[] templates ) : this( string.Empty, templates ) {}
-
-		public CompositeLoggerTemplate( string separator, params ILoggerTemplate[] templates ) : base( string.Join( separator, templates.Select( template => template.Template ) ), templates.SelectMany( template => template.Parameters ).ToArray() ) {}
-	}
-
-	/*public class LoggerTemplate : LoggerTemplate<Information>
-	{
-		public LoggerTemplate( string template, params object[] parameters ) : base( template, parameters ) {}
-	}
-
-	public class LoggerTemplate<T> : LoggerTemplateBase where T : CategoryFactory
-	{
-		public LoggerTemplate( string template, params object[] parameters ) : base( Activator.Instance.Activate<T>().Create, template, parameters ) {}
-	}*/
-
 	public interface ILoggerExceptionTemplate : ILoggerTemplate
 	{
 		Exception Exception { get; }
@@ -136,25 +109,12 @@ namespace DragonSpark.Diagnostics
 		public Exception Exception { get; }
 	}
 
-	/*public class LoggerTemplateWithLevel : ILoggerExceptionTemplate
+	public class CompositeLoggerTemplate : LoggerTemplate
 	{
-		public LoggerTemplateWithLevel( ) {}
+		public CompositeLoggerTemplate( params ILoggerTemplate[] templates ) : this( string.Empty, templates ) {}
 
-		public string Template
-		{
-			get { return null; }
-		}
-
-		public object[] Parameters
-		{
-			get { return new object[] { }; }
-		}
-
-		public Exception Exception
-		{
-			get { return null; }
-		}
-	}*/
+		public CompositeLoggerTemplate( string separator, params ILoggerTemplate[] templates ) : base( string.Join( separator, templates.Select( template => template.Template ) ), templates.SelectMany( template => template.Parameters ).ToArray() ) {}
+	}
 
 	public class LoggerTemplate : ILoggerTemplate
 	{
@@ -171,8 +131,7 @@ namespace DragonSpark.Diagnostics
 		public string Template { get; }
 
 		public object[] Parameters { get; }
-
-		// public Func<ILogger, Log> PreferredLog { get; }
+		
 	}
 
 	public class TimerEvent<T> : TimerEvent where T : ITimer
@@ -184,13 +143,6 @@ namespace DragonSpark.Diagnostics
 
 		public T Tracker { get; }
 	}
-
-	/*public class OutputMessageCommand : DecoratedCommand<TimerEvent, string>
-	{
-		public static OutputMessageCommand Instance { get; } = new OutputMessageCommand( DebugOutputCommand.Instance );
-
-		public OutputMessageCommand( ICommand<string> output ) : base( Formatter.Instance.Create, output ) {}
-	}*/
 
 	public class Timer : TimerBase
 	{
@@ -235,18 +187,6 @@ namespace DragonSpark.Diagnostics
 		public virtual TimeSpan Elapsed { get; private set; }
 
 		protected override void OnDispose() => Update();
-	}
-
-	public interface IProcess : IDisposable
-	{
-		void Start();
-	}
-
-	public interface IContinuation
-	{
-		void Resume();
-
-		void Pause();
 	}
 
 	public class TimerEventHandler : DecoratedCommand<string, TimerEvent>

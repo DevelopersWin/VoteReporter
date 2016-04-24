@@ -24,6 +24,6 @@ namespace DragonSpark.Windows.Runtime
 			}
 		}
 
-		public override T Item => (T)CallContext.LogicalGetData( slot );
+		protected override T Get() => (T)CallContext.LogicalGetData( slot );
 	}
 }

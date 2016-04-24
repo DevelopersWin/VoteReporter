@@ -196,6 +196,7 @@
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStore.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
+    <Compile Include="Diagnostics\ExceptionSupport.cs" />
     <Compile Include="Diagnostics\IProfiler.cs" />
     <Compile Include="Diagnostics\Logger\LogTemplate.cs" />
     <Compile Include="Diagnostics\ProfilerFactory.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="Runtime\ICommand.cs" />
     <Compile Include="Runtime\IRepository.cs" />
     <Compile Include="Runtime\ISerializer.cs" />
+    <Compile Include="Runtime\Process.cs" />
     <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsTypeSpecification.cs" />
     <Compile Include="Runtime\Values\AmbientContextCommand.cs" />

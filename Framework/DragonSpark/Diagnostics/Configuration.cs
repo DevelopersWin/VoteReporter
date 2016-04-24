@@ -1,13 +1,25 @@
-﻿using System;
-using System.Diagnostics;
-using System.Windows.Markup;
-using DragonSpark.ComponentModel;
-using DragonSpark.Configuration;
+﻿using DragonSpark.Configuration;
 using Serilog.Events;
+using System;
 
 namespace DragonSpark.Diagnostics
 {
-	[ContentProperty( nameof(Profiler) )]
+	public class MinimumLevelConfiguration : ConfigurationBase<LogEventLevel>
+	{
+		public MinimumLevelConfiguration() : base( LogEventLevel.Information ) {}
+	}
+
+	public class ProfilerFactoryConfiguration : ConfigurationBase<Type>
+	{
+		public ProfilerFactoryConfiguration() : base( typeof(ProfilerFactory) ) {}
+	}
+
+	public class ProfilerLevelConfiguration : ConfigurationBase<LogEventLevel>
+	{
+		public ProfilerLevelConfiguration() : base( LogEventLevel.Debug ) {}
+	}
+
+	/*[ContentProperty( nameof(Profiler) )]
 	public class Configuration : ConfigurationBase
 	{
 		public ProfilerConfiguration Profiler { get; set; } = new ProfilerConfiguration();
@@ -18,10 +30,10 @@ namespace DragonSpark.Diagnostics
 
 	public class ProfilerConfiguration
 	{
-		[Default( typeof(ProfilerFactory) )]
+		[Default(  )]
 		public Type FactoryType { get; set; }
 
-		[Default( LogEventLevel.Debug )]
+		[Default(  )]
 		public LogEventLevel Level { get; set; }
-	}
+	}*/
 }

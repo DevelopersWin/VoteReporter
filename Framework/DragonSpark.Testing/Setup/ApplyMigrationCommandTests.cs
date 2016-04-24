@@ -20,7 +20,7 @@ namespace DragonSpark.Testing.Setup
 		[Theory, AutoData]
 		public void EnsureMigrationPerformsAsExpected( RecordingLoggerFactory source, ServiceProvider destination, string message )
 		{
-			using ( MethodBase.GetCurrentMethod().Assign( source ) )
+			using ( MethodBase.GetCurrentMethod().AsCurrentContext( source ) )
 			{
 				var current = DefaultServiceProvider.Instance.Item;
 				Assert.Same( source.History, current.Get<ILoggerHistory>() );
@@ -51,7 +51,7 @@ namespace DragonSpark.Testing.Setup
 		[Theory, AutoData]
 		public void EnsureMigrationSourceUtilizedAsExpected( RecordingLoggerFactory factory, string message )
 		{
-			using ( MethodBase.GetCurrentMethod().Assign( factory ) )
+			using ( MethodBase.GetCurrentMethod().AsCurrentContext( factory ) )
 			{
 				var current = DefaultServiceProvider.Instance.Item;
 				

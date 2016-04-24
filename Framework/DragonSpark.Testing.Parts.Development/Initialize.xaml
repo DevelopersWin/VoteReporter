@@ -9,10 +9,9 @@
 	mc:Ignorable="d">
 	<configuration:InitializeConfigurationCommand.Parameter>
 		<x:Array Type="{x:Type configuration:IConfiguration}">
-			<configuration:Configuration EnableMethodCaching="True" />
-			<diagnosticsCore:Configuration MinimumLevel="Debug">
-				<diagnosticsCore:ProfilerConfiguration FactoryType="{x:Type diagnostics:ProfilerFactory}" />
-			</diagnosticsCore:Configuration>
+			<!--<configuration:EnableMethodCaching Item="True" />-->
+			<diagnosticsCore:MinimumLevelConfiguration Item="Debug" />
+			<diagnosticsCore:ProfilerFactoryConfiguration Item="{x:Type diagnostics:ProfilerFactory}" />
 		</x:Array>
 	</configuration:InitializeConfigurationCommand.Parameter>
 </configuration:InitializeConfigurationCommand>
