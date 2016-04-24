@@ -9,7 +9,7 @@ using ModuleTypeLoader = DragonSpark.Windows.Modularity.ModuleTypeLoader;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
-	[Trait( Traits.Category, Traits.Categories.FileSystem )]
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class FileModuleTypeLoaderTests
 	{
 		[Fact]

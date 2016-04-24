@@ -1,15 +1,17 @@
+using DragonSpark.Extensions;
+using DragonSpark.Modularity;
+using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Windows.Modularity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Extensions;
-using DragonSpark.Modularity;
-using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Modularity;
 using Xunit;
 using InitializationMode = DragonSpark.Windows.Modularity.InitializationMode;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class ModuleCatalogTests
 	{
 		[Fact]

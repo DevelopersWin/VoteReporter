@@ -102,7 +102,7 @@ namespace DragonSpark.Testing.Framework
 
 		public static class Categories
 		{
-			public const string FileSystem = "FileSystem", IoC = "IoC";
+			public const string Modularity = "Modularity", IoC = "IoC";
 		}
 	}
 }

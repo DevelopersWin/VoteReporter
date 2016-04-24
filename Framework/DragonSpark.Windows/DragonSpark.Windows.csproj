@@ -198,6 +198,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Diagnostics\EnrichFromLogContextCommand.cs" />
+    <Compile Include="Initialize.xaml.cs">
+      <DependentUpon>Initialize.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Markup\ConfigurationExtension.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
     <Compile Include="Security\CertificateFactory.cs" />
@@ -345,10 +348,20 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DragonSpark.Types.Windows\DragonSpark.Types.Windows.csproj">
+      <Project>{82e56091-dd33-4f8d-a9d9-8948f3d6f820}</Project>
+      <Name>DragonSpark.Types.Windows</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DragonSpark\DragonSpark.csproj">
       <Project>{167df420-328c-4acc-abd0-42dbe268efdf}</Project>
       <Name>DragonSpark</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Initialize.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

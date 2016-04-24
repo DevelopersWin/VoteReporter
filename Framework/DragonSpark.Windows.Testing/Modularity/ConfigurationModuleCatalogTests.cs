@@ -1,12 +1,14 @@
+using DragonSpark.Testing.Framework;
+using DragonSpark.Windows.Modularity;
+using DragonSpark.Windows.Testing.TestObjects.Modules;
 using System;
 using System.Configuration;
 using System.Linq;
-using DragonSpark.Windows.Modularity;
-using DragonSpark.Windows.Testing.TestObjects.Modules;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class ConfigurationModuleCatalogTests
 	{
 		[Fact]

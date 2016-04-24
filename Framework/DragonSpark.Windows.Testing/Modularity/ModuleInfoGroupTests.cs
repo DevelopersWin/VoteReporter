@@ -1,14 +1,16 @@
+using DragonSpark.Extensions;
+using DragonSpark.Modularity;
+using DragonSpark.Testing.Framework;
+using DragonSpark.Windows.Modularity;
+using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Collections;
 using System.Linq;
-using DragonSpark.Extensions;
-using DragonSpark.Modularity;
-using DragonSpark.Windows.Modularity;
-using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class ModuleInfoGroupTests
 	{
 		[Fact]

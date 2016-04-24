@@ -4,6 +4,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Commands;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Markup;
 
 namespace DragonSpark.Configuration
@@ -43,10 +44,14 @@ namespace DragonSpark.Configuration
 		public IConfiguration Clone() => (IConfiguration)MemberwiseClone();
 	}
 
-	[ContentProperty( nameof( Parameter ) )]
+	[ContentProperty( nameof(Configurations) )]
 	public class InitializeConfigurationCommand : ServicedCommand<ConfigureCommand, IList<IConfiguration>>
 	{
 		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification() ) {}
+
+		public Collection<IConfiguration> Configurations { get; } = new Collection<IConfiguration>();
+
+		public override IList<IConfiguration> Parameter => Configurations.ToArray();
 	}
 
 	public class ConfigureCommand : Command<IEnumerable<IConfiguration>>

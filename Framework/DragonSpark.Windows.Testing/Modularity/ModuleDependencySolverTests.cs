@@ -1,10 +1,12 @@
+using DragonSpark.Modularity;
+using DragonSpark.Testing.Framework;
 using System;
 using System.Collections.Generic;
-using DragonSpark.Modularity;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class ModuleDependencySolverTests
 	{
 		readonly ModuleDependencySolver solver = new ModuleDependencySolver();

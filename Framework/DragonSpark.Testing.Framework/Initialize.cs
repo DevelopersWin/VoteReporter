@@ -23,9 +23,11 @@ namespace DragonSpark.Testing.Framework
 		public static void Execution() => Activation.Execution.Initialize( ExecutionContext.Instance );
 
 		[ModuleInitializer( 1 )]
-		public static void Tracing() => Trace.WriteLine( $"Initializing {typeof(Initialize)}" );
+		public static void Tracing()
+		{
+			Trace.WriteLine( $"Initializing {typeof(Initialize)}" );
+		}
 
-		
 		[ModuleInitializer( 2 )]
 		public static void Environment()
 		{

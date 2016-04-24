@@ -225,7 +225,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Configuration\RegistrationTests.cs" />
-    <Compile Include="Configuration\StoreTests.cs" />
     <Compile Include="Configuration\ValueStoreTests.cs" />
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />

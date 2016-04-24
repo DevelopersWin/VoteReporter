@@ -1,17 +1,18 @@
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Modularity;
 using DragonSpark.Windows.Testing.TestObjects.Modules;
 using Moq;
 using Serilog;
-using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class ModuleManagerTests
 	{
 		[Fact]

@@ -1,6 +1,7 @@
+using DragonSpark.Modularity;
+using DragonSpark.Testing.Framework;
 using System;
 using System.Linq;
-using DragonSpark.Modularity;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
@@ -8,6 +9,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 	/// <summary>
 	/// Summary description for ModuleInfoGroupExtensionsTests
 	/// </summary>
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class ModuleInfoGroupExtensionsTests
 	{
 		[Fact]

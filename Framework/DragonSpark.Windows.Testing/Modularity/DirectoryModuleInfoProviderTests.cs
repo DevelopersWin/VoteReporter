@@ -1,10 +1,12 @@
 ﻿using DragonSpark.Modularity;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Modularity;
 using Xunit;
 using ModuleInfoBuilder = DragonSpark.Windows.Modularity.ModuleInfoBuilder;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class DirectoryModuleInfoProviderTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]

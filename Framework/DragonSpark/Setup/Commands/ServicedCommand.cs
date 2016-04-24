@@ -19,6 +19,6 @@ namespace DragonSpark.Setup.Commands
 		public TCommand Command { [return: Required]get; set; }
 
 		[Required, Service]
-		public TParameter Parameter { [return: Required]get; set; }
+		public virtual TParameter Parameter { [return: Required]get; set; }
 	}
 }

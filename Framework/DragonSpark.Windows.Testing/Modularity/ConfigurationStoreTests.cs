@@ -1,8 +1,10 @@
+using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Modularity;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class ConfigurationStoreTests
 	{
 		[Fact]

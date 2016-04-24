@@ -8,6 +8,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using DragonSpark.Activation;
+using DragonSpark.Testing.Framework;
 using Serilog.Core;
 using Xunit;
 
@@ -16,6 +17,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 	/// <summary>
 	/// Summary description for ModuleInitializerTests
 	/// </summary>
+	[Trait( Traits.Category, Traits.Categories.Modularity )]
 	public class ModuleInitializerTests
 	{
 		/*[Fact]
