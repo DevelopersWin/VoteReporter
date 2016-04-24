@@ -1,10 +1,8 @@
-﻿using DragonSpark.Aspects;
-using DragonSpark.ComponentModel;
+﻿using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
+using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 using Serilog;
-using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Windows.Markup;
@@ -12,12 +10,12 @@ using System.Windows.Markup;
 namespace DragonSpark.Windows.Entity
 {
 	[ContentProperty( nameof(Installers) )]
-	public abstract class InitializeDatabaseCommand<TContext> : SetupCommandBase where TContext : DbContext, IEntityInstallationStorage, new()
+	public abstract class InitializeDatabaseCommand<TContext> : Command<object> where TContext : DbContext, IEntityInstallationStorage, new()
 	{
 		[Locate, Required]
 		public IDatabaseInitializer<TContext> Initializer { [return: Required]get; set; }
 
-		public Collection<IInstaller> Installers { get; } = new Collection<IInstaller>();
+		public System.Collections.ObjectModel.Collection<IInstaller> Installers { get; } = new System.Collections.ObjectModel.Collection<IInstaller>();
 
 		[Locate, Required]
 		public ILogger MessageLogger { [return: Required]get; set; }

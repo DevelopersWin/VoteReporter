@@ -233,7 +233,7 @@
     </Compile>
     <Compile Include="Setup\Location\CustomizationBase.cs" />
     <Compile Include="Parameters\EnsureValuesAttribute.cs" />
-    <Compile Include="Setup\SetupAutoDataCommandBase.cs" />
+    <Compile Include="Setup\AutoDataCommandBase.cs" />
     <Compile Include="Setup\AutoData.cs" />
     <Compile Include="TestCollectionBase.cs" />
   </ItemGroup>

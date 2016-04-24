@@ -1,13 +1,12 @@
-using System.IO;
-using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
+using DragonSpark.Runtime;
 using DragonSpark.Windows.Properties;
+using System.IO;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class InstallDatabaseCommand : SetupCommandBase
+	public class InstallDatabaseCommand : Command<object>
 	{
 		[Factory( typeof(AttachedDatabaseFileFactory) )]
 		public FileInfo Database { get; set; }

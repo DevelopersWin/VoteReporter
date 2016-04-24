@@ -239,7 +239,7 @@ namespace DragonSpark.Diagnostics
 		protected override void Configure( LoggerMinimumLevelConfiguration configuration ) => configuration.Is( Level );
 	}
 
-	public abstract class LoggerConfigurationCommandBase<T> : SetupCommandBase<LoggerConfiguration>
+	public abstract class LoggerConfigurationCommandBase<T> : Command<LoggerConfiguration>
 	{
 		readonly Func<LoggerConfiguration, T> transform;
 

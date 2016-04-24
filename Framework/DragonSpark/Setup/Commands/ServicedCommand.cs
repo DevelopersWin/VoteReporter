@@ -7,7 +7,7 @@ using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Setup.Commands
 {
-	public class ServicedCommand<TCommand, TParameter> : SetupCommandBase where TCommand : ICommand<TParameter>
+	public class ServicedCommand<TCommand, TParameter> : Command<object> where TCommand : ICommand<TParameter>
 	{
 		public ServicedCommand() : base( FactoryDefaults<object>.Always ) {}
 

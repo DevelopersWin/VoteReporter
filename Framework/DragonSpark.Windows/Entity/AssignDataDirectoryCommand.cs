@@ -1,12 +1,11 @@
 using DragonSpark.ComponentModel;
-using DragonSpark.Setup;
-using System.IO;
-using DragonSpark.Aspects;
+using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
+using System.IO;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class AssignDataDirectoryCommand : SetupCommandBase
+	public class AssignDataDirectoryCommand : Command<object>
 	{
 		[Singleton( typeof(EntityFiles), nameof(EntityFiles.DefaultDataDirectory) ), Required]
 		public DirectoryInfo Directory { [return: Required]get; set; }

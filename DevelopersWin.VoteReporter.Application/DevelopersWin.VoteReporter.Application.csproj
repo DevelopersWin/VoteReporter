@@ -219,15 +219,15 @@
   <ItemGroup>
     <ProjectReference Include="..\DevelopersWin.VoteReporter.Configuration.Common\DevelopersWin.VoteReporter.Parts.Common.csproj">
       <Project>{1f72ab3c-9f4b-4ad8-8a3f-9cebc1c336c2}</Project>
-      <Name>DevelopersWin.VoteReporter.Configuration.Common</Name>
+      <Name>DevelopersWin.VoteReporter.Parts.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\DevelopersWin.VoteReporter.Configuration.Development\DevelopersWin.VoteReporter.Parts.Development.csproj" Condition=" '$(Configuration)' == 'Debug' ">
       <Project>{c28b714b-07f5-4193-92df-3bea93d938c9}</Project>
-      <Name>DevelopersWin.VoteReporter.Configuration.Development</Name>
+      <Name>DevelopersWin.VoteReporter.Parts.Development</Name>
     </ProjectReference>
     <ProjectReference Include="..\DevelopersWin.VoteReporter.Configuration\DevelopersWin.VoteReporter.Parts.csproj" Condition=" '$(Configuration)' == 'Release' ">
       <Project>{304a81c9-3b30-448f-9ab6-ef7355311ffb}</Project>
-      <Name>DevelopersWin.VoteReporter.Configuration</Name>
+      <Name>DevelopersWin.VoteReporter.Parts</Name>
     </ProjectReference>
     <ProjectReference Include="..\DevelopersWin.VoteReporter\DevelopersWin.VoteReporter.csproj">
       <Project>{AE7C3390-95D0-4558-B992-F7EF3FAE89DA}</Project>

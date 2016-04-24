@@ -115,15 +115,7 @@ namespace DragonSpark.Diagnostics
 			this.source = source;
 		}
 
-		protected override LoggingLevelSwitch CreateItem()
-		{
-			var logEventLevel = source();
-			if ( Execution.Current.AsTo<MethodBase, bool>( method => method.DeclaringType != typeof(Services), () => false )  && logEventLevel == LogEventLevel.Information )
-			{
-				throw new InvalidOperationException( $"WTF: {Execution.Current}" );
-			}
-			return new LoggingLevelSwitch { MinimumLevel = logEventLevel };
-		}
+		protected override LoggingLevelSwitch CreateItem() => new LoggingLevelSwitch { MinimumLevel = source() };
 	}
 
 	public class RecordingLoggerFactory : LoggerFactory

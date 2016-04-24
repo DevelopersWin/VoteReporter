@@ -1,6 +1,4 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework.Setup.Location;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
@@ -10,7 +8,7 @@ using System;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public abstract class AutoDataCommandBase : Command<AutoData> {}
+	/*public abstract class AutoDataCommandBase : Command<AutoData> {}*/
 
 	public class SericesCustomization : CustomizationBase
 	{

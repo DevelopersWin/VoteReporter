@@ -367,7 +367,6 @@
     <Compile Include="Setup\Registration\RegistrationBaseAttribute.cs" />
     <Compile Include="Setup\Commands\RunProgramCommand.cs" />
     <Compile Include="Setup\Setup.cs" />
-    <Compile Include="Setup\SetupCommandBase.cs" />
     <Compile Include="Setup\SetupParameter.cs" />
     <Compile Include="Setup\Commands\ServicedCommand.cs" />
     <Compile Include="Setup\Registration\LifetimeManagerAttribute.cs" />

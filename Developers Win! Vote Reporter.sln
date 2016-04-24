@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Parts.Common", "DevelopersWin.VoteReporter.Configuration.Common\DevelopersWin.VoteReporter.Parts.Common.csproj", "{1F72AB3C-9F4B-4AD8-8A3F-9CEBC1C336C2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{A39BEAEC-8A6B-4F8C-905E-C030FEDA4E5D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Parts", "Parts", "{A39BEAEC-8A6B-4F8C-905E-C030FEDA4E5D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark", "Framework\DragonSpark\DragonSpark.csproj", "{167DF420-328C-4ACC-ABD0-42DBE268EFDF}"
 EndProject

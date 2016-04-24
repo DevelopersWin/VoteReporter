@@ -6,7 +6,7 @@ using System.Windows.Markup;
 namespace DragonSpark.Testing.Framework.Setup
 {
 	[ContentProperty( nameof(Customizations) )]
-	public class CustomizeFixtureCommand : SetupAutoDataCommandBase
+	public class CustomizeFixtureCommand : AutoDataCommandBase
 	{
 		public Collection<ICustomization> PreCustomizations { get; } = new Collection<ICustomization>();
 

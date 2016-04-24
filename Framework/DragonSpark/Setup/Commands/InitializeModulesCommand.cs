@@ -1,12 +1,13 @@
 ﻿using DragonSpark.ComponentModel;
 using DragonSpark.Modularity;
 using DragonSpark.Properties;
+using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 
 namespace DragonSpark.Setup.Commands
 {
-	public class InitializeModulesCommand : SetupCommandBase
+	public class InitializeModulesCommand : Command<object>
 	{
 		[Locate, Required]
 		public IModuleMonitor Monitor { [return: Required]get; set; }
