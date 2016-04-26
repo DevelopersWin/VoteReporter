@@ -55,7 +55,7 @@ namespace DragonSpark.Runtime
 			this.parameter = new Lazy<object>( parameter );
 		}
 
-		protected override void OnExecute( object p ) => command.Value.ExecuteWith( parameter.Value );
+		protected override void OnExecute( object p ) => command.Value.Executed( parameter.Value );
 
 		protected override void OnDispose()
 		{
@@ -154,7 +154,11 @@ namespace DragonSpark.Runtime
 
 		public DelegatedCommand( Action<T> command ) : this( command, Specification<T>.Instance ) {}
 
-		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : base( specification )
+		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : this( command, specification, Coercer<T>.Instance ) {}
+
+		public DelegatedCommand( Action<T> command, ICoercer<T> coercer ) : this( command, Specification<T>.Instance, coercer ) {}
+
+		public DelegatedCommand( Action<T> command, ISpecification<T> specification, ICoercer<T> coercer ) : base( specification, coercer )
 		{
 			this.command = command;
 		}
@@ -171,9 +175,21 @@ namespace DragonSpark.Runtime
 			this.inner = inner;
 		}
 
-		public override bool CanExecute( T parameter ) => inner.CanExecute( parameter );
-
 		protected override void OnExecute( T parameter ) => inner.Execute( parameter );
+	}
+
+	public abstract class DecoratedCommand<TFrom, TTo> : CommandBase<TTo>
+	{
+		readonly ICommand<TTo> inner;
+
+		protected DecoratedCommand( Func<TFrom, TTo> projection, ICommand<TTo> inner ) : base( new Projector<TFrom, TTo>( projection ) )
+		{
+			this.inner = inner;
+		}
+
+		public override bool CanExecute( TTo parameter ) => inner.CanExecute( parameter );
+
+		protected override void OnExecute( TTo parameter ) => inner.Execute( parameter );
 	}
 
 	public class Specification<TParameter> : DecoratedSpecification<TParameter>
@@ -183,47 +199,37 @@ namespace DragonSpark.Runtime
 		Specification() : base( NullSpecification.NotNull ) {}
 	}
 
-	public abstract class DecoratedCommand<TFrom, TTo> : CommandBase<TFrom>
+	public abstract class CommandBase<T> : ICommand<T>
 	{
-		readonly Func<TFrom, TTo> transform;
-		readonly ICommand<TTo> inner;
-
-		protected DecoratedCommand( Func<TFrom, TTo> transform, ICommand<TTo> inner )
-		{
-			this.transform = transform;
-			this.inner = inner;
-		}
-
-		protected DecoratedCommand( ISpecification<TFrom> specification ) : base( specification ) {}
-
-		protected override void OnExecute( TFrom parameter ) => inner.ExecuteWith( transform( parameter ) );
-	}
-
-	public abstract class CommandBase<TParameter> : ICommand<TParameter>
-	{
-		readonly ISpecification<TParameter> specification;
+		readonly ParameterSupport<T> support;
 
 		public event EventHandler CanExecuteChanged = delegate {};
 
-		protected CommandBase() : this( Specification<TParameter>.Instance ) {}
+		protected CommandBase() : this( Coercer<T>.Instance ) {}
 
-		protected CommandBase( ISpecification<TParameter> specification )
+		protected CommandBase( [Required]ICoercer<T> coercer ) : this( Common<T>.Always, coercer ) {}
+
+		protected CommandBase( [Required]ISpecification<T> specification ) : this( specification, Coercer<T>.Instance ) {}
+
+		protected CommandBase( [Required]ISpecification<T> specification, [Required]ICoercer<T> coercer ) : this( new ParameterSupport<T>( specification, coercer ) ) {}
+
+		CommandBase( ParameterSupport<T> support )
 		{
-			this.specification = specification;
+			this.support = support;
 		}
 
 		public void Update() => OnUpdate();
 
 		protected virtual void OnUpdate() => CanExecuteChanged( this, EventArgs.Empty );
 
-		public virtual bool CanExecute( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		public virtual bool CanExecute( T parameter ) => support.IsValid( parameter );
 
-		public void Execute( TParameter parameter ) => OnExecute( parameter );
+		public void Execute( T parameter ) => OnExecute( parameter );
 
-		protected abstract void OnExecute( TParameter parameter );
+		protected abstract void OnExecute( T parameter );
 
-		bool ICommand.CanExecute( object parameter ) => CanExecute( parameter.As<TParameter>() );
+		bool ICommand.CanExecute( object parameter ) => support.IsValid( parameter );
 
-		void ICommand.Execute( object parameter ) => Execute( parameter.As<TParameter>() );
+		public void Execute( object parameter ) => support.Coerce( parameter, Execute );
 	}
 }

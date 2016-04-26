@@ -1,16 +1,15 @@
-using System;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using System;
 
 namespace DragonSpark.Activation
 {
 	public abstract class ActivatorBase<TRequest> : FactoryBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
-		protected ActivatorBase( IParameterCoercer<TRequest> coercer ) : this( IsTypeSpecification<TRequest>.Instance, coercer ) {}
+		protected ActivatorBase( ICoercer<TRequest> coercer ) : this( IsTypeSpecification<TRequest>.Instance, coercer ) {}
 
-		protected ActivatorBase( ISpecification<TRequest> specification, IParameterCoercer<TRequest> coercer ) : base( specification, coercer ) {}
+		protected ActivatorBase( ISpecification<TRequest> specification, ICoercer<TRequest> coercer ) : base( specification, coercer ) {}
 
-		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => CreateFromItem( parameter );
+		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => this.CreateUsing<object>( parameter );
 	}
 
 	public abstract class LocatorBase : LocatorBase<object>

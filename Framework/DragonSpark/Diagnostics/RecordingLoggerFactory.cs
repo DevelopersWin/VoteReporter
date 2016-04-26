@@ -55,27 +55,6 @@ namespace DragonSpark.Diagnostics
 			: base( new LoggerConfigurationSource( controller ), transformers.Append( new LoggerHistoryConfigurationTransformer( sink ) ).Fixed() ) {}
 	}
 
-	/*public class ConstructionFactory<T> : ConstructionFactory
-	{
-		public ConstructionFactory() : base( typeof(T) ) {}
-	}*/
-
-	public class ConstructFromParameterFactory : FactoryBase<object, object>
-	{
-		readonly IActivator activator;
-		readonly Type type;
-
-		public ConstructFromParameterFactory( Type type ) : this( Constructor.Instance, type ) {}
-
-		public ConstructFromParameterFactory( IActivator activator, Type type )
-		{
-			this.activator = activator;
-			this.type = type;
-		}
-
-		protected override object CreateItem( object parameter ) => activator.Create( new ConstructTypeRequest( type, parameter ) );
-	}
-
 	public class MethodFormatter : IFormattable
 	{
 		readonly MethodBase method;

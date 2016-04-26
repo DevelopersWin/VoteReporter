@@ -7,16 +7,16 @@ namespace DragonSpark.Extensions
 {
 	public static class CommandExtensions
 	{
-		public static IEnumerable<T> ExecuteMany<T>( this IEnumerable<T> @this, object parameter ) where T : ICommand => @this.Select( x => x.ExecuteWith( parameter ) ).NotNull().ToArray();
+		public static IEnumerable<T> ExecuteMany<T>( this IEnumerable<T> @this, object parameter ) where T : ICommand => @this.Select( x => x.Executed( parameter ) ).NotNull().ToArray();
 
-		public static void Run<T>( this ICommand<T> @this ) => Run( @this, default(T) );
+		public static void Run<T>( this ICommand<T> @this ) => @this.Run( default(T) );
 
-		public static void Run<T>( this ICommand<T> @this, T parameter ) => ExecuteWith<ICommand<T>>( @this, parameter );
+		public static void Run<T>( this ICommand<T> @this, T parameter ) => @this.Execute( parameter );
 
-		public static T ExecuteWith<T, TParameter>( this T @this, TParameter parameter ) where T : ICommand<TParameter> 
-			=> ExecuteWith<T>( @this, parameter );
+		/*public static T Executed<T, TParameter>( this T @this, TParameter parameter ) where T : ICommand<TParameter> 
+			=> Executed<T>( @this, parameter );*/
 
-		public static T ExecuteWith<T>( this T @this, object parameter ) where T : ICommand
+		public static T Executed<T>( this T @this, object parameter ) where T : ICommand
 		{
 			var result = @this.CanExecute( parameter ) ? @this : default(T);
 			result.With( x => x.Execute( parameter ) );

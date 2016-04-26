@@ -223,8 +223,8 @@
     <Compile Include="Runtime\Specifications\NeverSpecification.cs" />
     <Compile Include="Activation\CompositeActivator.cs" />
     <Compile Include="Activation\ConstructorBase.cs" />
-    <Compile Include="Activation\ParameterCoercer.cs" />
-    <Compile Include="Activation\IParameterCoercer.cs" />
+    <Compile Include="Activation\Coercer.cs" />
+    <Compile Include="Activation\ICoercer.cs" />
     <Compile Include="Activation\IFactoryWithParameter.cs" />
     <Compile Include="Activation\IoC\ArrayResolutionStrategy.cs" />
     <Compile Include="Activation\IoC\ConstructorSelectorPolicy.cs" />
@@ -270,8 +270,6 @@
     <Compile Include="TypeSystem\HostingAttribute.cs" />
     <Compile Include="TypeSystem\IAttributeProvider.cs" />
     <Compile Include="TypeSystem\KnownTypeFactory.cs" />
-    <Compile Include="TypeSystem\MemberInfoAttributeProviderFactory.cs" />
-    <Compile Include="TypeSystem\MemberInfoWithRelatedProviderFactory.cs" />
     <Compile Include="TypeSystem\TypeAdapter.cs" />
     <Compile Include="ComponentModel\CollectionAttribute.cs" />
     <Compile Include="ComponentModel\IExpressionEvaluator.cs" />
@@ -293,11 +291,7 @@
     </Compile>
     <Compile Include="Activation\IoC\Locator.cs" />
     <Compile Include="ComponentModel\ServicesValueBase.cs" />
-    <Compile Include="ComponentModel\CompositeTypeDefinitionProvider.cs" />
     <Compile Include="ComponentModel\DefaultAttribute.cs" />
-    <Compile Include="ComponentModel\MemberInfoLocator.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Diagnostics\ApplicationExceptionFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -395,7 +389,6 @@
     </Compile>
     <Compile Include="ComponentModel\CurrentTimeAttribute.cs" />
     <Compile Include="ComponentModel\FactoryAttribute.cs" />
-    <Compile Include="ComponentModel\IMemberInfoLocator.cs" />
     <Compile Include="ComponentModel\ITypeDefinitionProvider.cs" />
     <Compile Include="ComponentModel\NewGuidAttribute.cs" />
     <Compile Include="ConditionMonitor.cs">

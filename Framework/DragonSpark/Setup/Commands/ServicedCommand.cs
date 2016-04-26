@@ -13,7 +13,7 @@ namespace DragonSpark.Setup.Commands
 
 		public ServicedCommand( ISpecification<object> specification ) : base( specification ) {}
 
-		protected override void OnExecute( object parameter ) => Command.ExecuteWith( Parameter );
+		protected override void OnExecute( object parameter ) => Command.Executed( Parameter );
 
 		[Required, Service]
 		public TCommand Command { [return: Required]get; set; }

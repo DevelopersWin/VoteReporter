@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.ComponentModel;
@@ -23,15 +22,7 @@ namespace DragonSpark.ComponentModel
 
 		protected override object CreateItem( DefaultValueParameter parameter )
 		{
-			var result = factory( parameter.Metadata ).FirstWhere( p => p.GetValue( parameter ) ) ?? FromComponentModel( parameter.Metadata );
-			return result;
-		}
-
-		static object FromComponentModel( PropertyInfo parameter )
-		{
-			var projected = new MemberInfoAttributeProviderFactory.Parameter( parameter, parameter.GetMethod.With( info => info.IsVirtual ) );
-			var provider = MemberInfoAttributeProviderFactory.Instance.Create( projected );
-			var result = provider.From<DefaultValueAttribute, object>( attribute => attribute.Value );
+			var result = factory( parameter.Metadata ).FirstWhere( p => p.GetValue( parameter ) ) ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
 			return result;
 		}
 	}

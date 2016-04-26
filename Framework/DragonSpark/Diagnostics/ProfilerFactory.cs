@@ -31,7 +31,7 @@ namespace DragonSpark.Diagnostics
 
 		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, Level(), templateSource ) {}
 
-		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, new TTimer(), log => new Handler<TimerEvent>( log, level, templateSource ).Run ) {}
+		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, new TTimer(), log => new Handler<TimerEvent>( log, level, templateSource ).Run() ) {}
 
 		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, TTimer tracker, Func<ILogger, Action<TimerEvent>> handlerSource ) : this( loggerSource, tracker, new SessionTimer( tracker ), handlerSource ) {}
 
@@ -71,8 +71,8 @@ namespace DragonSpark.Diagnostics
 
 		protected override IProfiler CreateItem( MethodBase parameter )
 		{
-			EmitProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Run;
-			var command = new AmbientContextCommand<EmitProfileEvent>().ExecuteWith( new EmitProfileEvent( name =>
+			EmitProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Execute;
+			var command = new AmbientContextCommand<EmitProfileEvent>().Executed( new EmitProfileEvent( name =>
 																										   {
 																											   timer.Update();
 																											   action( name );

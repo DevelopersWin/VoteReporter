@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
@@ -78,52 +79,59 @@ namespace DragonSpark.Activation
 	{
 		public static ISpecification<T> Always { get; } = AlwaysSpecification.Instance.Wrap<T>();
 
-		public static IParameterCoercer<T> Coercer { get; } = ParameterCoercer<T>.Instance;
+		// public static ICoercer<T> Coercer { get; } = Coercer<T>.Instance;
 	}
 
-	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
+	public class ParameterSupport<TParameter>
 	{
 		readonly ISpecification<TParameter> specification;
-		readonly IParameterCoercer<TParameter> coercer;
+		readonly ICoercer<TParameter> coercer;
 
-		protected FactoryBase() : this( Common<TParameter>.Coercer ) {}
-
-		protected FactoryBase( [Required]IParameterCoercer<TParameter> coercer ) : this( Common<TParameter>.Always, coercer ) {}
-
-		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( specification, Common<TParameter>.Coercer ) {}
-
-		protected FactoryBase( [Required]ISpecification<TParameter> specification, [Required]IParameterCoercer<TParameter> coercer )
+		public ParameterSupport( [Required]ISpecification<TParameter> specification, [Required]ICoercer<TParameter> coercer )
 		{
 			this.specification = specification;
 			this.coercer = coercer;
 		}
 
-		bool IFactoryWithParameter.CanCreate( object parameter ) => Coerce( parameter, CanCreate );
+		public bool IsValid( object parameter ) => Coerce( parameter, IsValid );
 
-		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		public bool IsValid( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
-		object IFactoryWithParameter.Create( object parameter ) => CreateFromItem( parameter );
+		public void Coerce( object parameter, Action<TParameter> with ) => coercer.Coerce( parameter ).With( with );
 
-		protected object CreateFromItem( object parameter ) => Coerce( parameter, Create );
+		public T Coerce<T>( object parameter, Func<TParameter, T> with ) => coercer.Coerce( parameter ).With( with );
+	}
 
-		public TResult Create( TParameter parameter ) => CanCreate( parameter ) ? CreateItem( parameter ).With( result => Creator.Tag( this, result ) ) : Default<TResult>.Item;
+	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
+	{
+		readonly ParameterSupport<TParameter> support;
+
+		protected FactoryBase() : this( Coercer<TParameter>.Instance ) {}
+
+		protected FactoryBase( [Required]ICoercer<TParameter> coercer ) : this( Common<TParameter>.Always, coercer ) {}
+
+		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( specification, Coercer<TParameter>.Instance ) {}
+
+		protected FactoryBase( [Required]ISpecification<TParameter> specification, [Required]ICoercer<TParameter> coercer ) : this( new ParameterSupport<TParameter>( specification, coercer ) ) {}
+
+		FactoryBase( ParameterSupport<TParameter> support )
+		{
+			this.support = support;
+		}
+
+		bool IFactoryWithParameter.CanCreate( object parameter ) => support.IsValid( parameter );
+
+		object IFactoryWithParameter.Create( object parameter ) => support.Coerce( parameter, Create );
+
+		public TResult Create( TParameter parameter ) => support.IsValid( parameter ) ? CreateItem( parameter ).With( result => Creator.Tag( this, result ) ) : Default<TResult>.Item;
 
 		protected abstract TResult CreateItem( [Required]TParameter parameter );
-		
-		T Coerce<T>( object parameter, Func<TParameter, T> with )
-		{
-			var qualified = coercer.Coerce( parameter );
-			var result = qualified.With( with );
-			return result;
-		}
 	}
 
 	public class CachedDecoratedFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult>
 	{
 		readonly Func<TParameter, object> instance;
 		readonly Func<TParameter, IEnumerable<object>> keySource;
-
-		// public CachedDecoratedFactory( Func<TParameter, object> instance, Func<TParameter, TResult> inner, params object[] items ) : this( instance, KeyFactory.Instance.Create( items ), inner ) {}
 
 		protected CachedDecoratedFactory( Func<TParameter, IEnumerable<object>> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
 		{
@@ -138,17 +146,6 @@ namespace DragonSpark.Activation
 			public Cache( object instance, int key, Func<TResult> create = null ) : base( instance, key.ToString(), create ) {}
 		}
 	}
-
-	/*public class DecoratedFactory<TFrom, TTo, TResult> : DecoratedFactory<TTo, TResult>
-	{
-		public DecoratedFactory( Func<TTo, TResult> inner ) : base( inner ) {}
-		public DecoratedFactory( ISpecification<TTo> specification, Func<TTo, TResult> inner ) : base( specification, inner ) {}
-
-		protected override TResult CreateItem( TTo parameter )
-		{
-			return base.CreateItem( parameter );
-		}
-	}*/
 
 	public class DecoratedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
@@ -168,9 +165,9 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<T> inner;
 
-		public DecoratedFactory( Func<T> provider ) : this( AlwaysSpecification.Instance, provider ) {}
+		public DecoratedFactory( Func<T> provider ) : this( Specification<T>.Instance, provider ) {}
 
-		public DecoratedFactory( [Required]ISpecification specification, [Required]Func<T> inner ) : base( specification )
+		public DecoratedFactory( [Required]ISpecification<T> specification, [Required]Func<T> inner ) : base( specification )
 		{
 			this.inner = inner;
 		}
@@ -178,22 +175,20 @@ namespace DragonSpark.Activation
 		protected override T CreateItem() => inner();
 	}
 
-	public class FirstFromParameterFactory<T, U> : FactoryBase<T, U>
+	public class FirstFromParameterFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
-		readonly IEnumerable<Func<T, U>> inner;
+		readonly IEnumerable<Func<TParameter, TResult>> inner;
 
-		public FirstFromParameterFactory( params IFactory<T, U>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
+		public FirstFromParameterFactory( params IFactory<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
-		public FirstFromParameterFactory( [Required]params Func<T, U>[] inner ) : this( Common<T>.Coercer, inner ) {}
+		public FirstFromParameterFactory( [Required]params Func<TParameter, TResult>[] inner ) : this( Coercer<TParameter>.Instance, inner ) {}
 
-		public FirstFromParameterFactory( IParameterCoercer<T> coercer, [Required]params Func<T, U>[] inner ) : base( coercer )
+		public FirstFromParameterFactory( ICoercer<TParameter> coercer, [Required]params Func<TParameter, TResult>[] inner ) : base( coercer )
 		{
 			this.inner = inner;
 		}
 
-		protected override U CreateItem( T parameter ) => inner.FirstWhere( factory => factory( parameter ) );
-
-		// protected virtual U DetermineFirst( IEnumerable<Func<T, U>> factories, T parameter ) => factories.FirstWhere( factory => factory( parameter ) );
+		protected override TResult CreateItem( TParameter parameter ) => inner.FirstWhere( factory => factory( parameter ) );
 	}
 
 	public class FirstFactory<T> : FactoryBase<T>
@@ -210,7 +205,7 @@ namespace DragonSpark.Activation
 		protected override T CreateItem() => inner.FirstWhere( factory => factory() );
 	}
 
-	public class FixedFactory<T> : FactoryBase<T>
+	/*public class FixedFactory<T> : FactoryBase<T>
 	{
 		readonly T item;
 
@@ -220,7 +215,7 @@ namespace DragonSpark.Activation
 		}
 
 		protected override T CreateItem() => item;
-	}
+	}*/
 
 	public class AggregateFactory<T> : FactoryBase<T>
 	{

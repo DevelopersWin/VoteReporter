@@ -1,8 +1,8 @@
-using System;
-using System.Linq;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Linq;
 
 namespace DragonSpark.Activation
 {
@@ -45,6 +45,8 @@ namespace DragonSpark.Activation
 
 			// public Delegate( IFactory instance ) : base( instance, typeof(Delegate<T>), () => new Func<object>( instance.Create ).Convert<T>() ) {}
 		}
+
+		public static T CreateUsing<T>( this IFactoryWithParameter @this, object parameter ) => (T)@this.Create( parameter );
 
 		public static T Self<T>( [Required] this T @this ) => @this;
 

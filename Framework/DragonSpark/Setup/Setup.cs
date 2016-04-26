@@ -48,7 +48,7 @@ namespace DragonSpark.Setup
 		{
 			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
 
-			var assign = new AssignValueCommand<IServiceProvider>( host ).ExecuteWith( parameter );
+			var assign = new AssignValueCommand<IServiceProvider>( host ).Executed( parameter );
 			parameter.Get<IDisposableRepository>().With( repository => repository.Add( assign ) );
 		}
 	}
@@ -66,7 +66,7 @@ namespace DragonSpark.Setup
 		{
 			using ( var command = new ExecuteApplicationCommand<T>( @this ) )
 			{
-				command.ExecuteWith( arguments );
+				command.Executed( arguments );
 			}
 			return @this;
 		}
@@ -87,8 +87,8 @@ namespace DragonSpark.Setup
 
 		protected override void OnExecute( T parameter )
 		{
-			assign.ExecuteWith( application );
-			application.ExecuteWith<ICommand>( parameter );
+			assign.Executed( application );
+			application.Executed<ICommand>( parameter );
 			application.Get<IDisposableRepository>().With( application.AssociateForDispose );
 		}
 
@@ -163,7 +163,7 @@ namespace DragonSpark.Setup
 			var context = new IsActive( this, serviceType );
 			if ( !context.Value )
 			{
-				using ( new AssignValueCommand<bool>( context ).ExecuteWith( true ) )
+				using ( new AssignValueCommand<bool>( context ).Executed( true ) )
 				{
 					return base.GetService( serviceType );
 				}
@@ -201,7 +201,7 @@ namespace DragonSpark.Setup
 	{
 		public static Configure<T> Instance { get; } = new Configure<T>();
 
-		protected override void OnExecute( IServiceProvider parameter ) => parameter.Get<T>().ExecuteWith( parameter );
+		protected override void OnExecute( IServiceProvider parameter ) => parameter.Get<T>().Executed( parameter );
 	}
 
 	public interface IApplication<in T> : IApplication, ICommand<T> {}
@@ -260,7 +260,7 @@ namespace DragonSpark.Setup
 
 			exports
 				.Prioritize()
-				.Each( setup => setup.ExecuteWith( parameter ) );
+				.Each( setup => setup.Executed( parameter ) );
 		}
 
 		protected override void OnDispose()

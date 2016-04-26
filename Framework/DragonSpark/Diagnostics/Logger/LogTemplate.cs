@@ -57,6 +57,6 @@ namespace DragonSpark.Diagnostics.Logger
 
 	public class Handler<T> : DecoratedCommand<T, ILoggerTemplate>
 	{
-		public Handler( ILogger logger, LogEventLevel level, Func<T, ILoggerTemplate> transform ) : base( transform, new LogTemplateCommand( logger, level ) ) {}
+		public Handler( ILogger logger, LogEventLevel level, Func<T, ILoggerTemplate> projection ) : base( projection, new LogTemplateCommand( logger, level ) ) {}
 	}
 }

@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using System.Linq;
 using System.Windows.Input;
 
 namespace DragonSpark.Modularity
@@ -52,6 +51,6 @@ namespace DragonSpark.Modularity
 
 		void IMonitoredModule.Load() => OnLoad();
 
-		protected virtual void OnLoad() => command.ExecuteWith( (object)this );
+		protected virtual void OnLoad() => command.Execute( this );
 	}
 }

@@ -38,7 +38,7 @@ using System.Runtime.InteropServices;
 [assembly: XmlnsDefinition("http://framework.dragonspark.us", "DragonSpark.Logging.Configuration")]
 */
 
-[assembly: Registration( Priority.AboveLowest, typeof( IServiceLocator ), typeof( IModule ), typeof( IExecutionContext ), typeof( Collection ), typeof( Collection<> ), typeof( ParameterCoercer<> ), Namespaces = "DragonSpark.Aspects" )]
+[assembly: Registration( Priority.AboveLowest, typeof( IServiceLocator ), typeof( IModule ), typeof( IExecutionContext ), typeof( Collection ), typeof( Collection<> ), typeof( Coercer<> ), Namespaces = "DragonSpark.Aspects" )]
 // [assembly: AddAspect( AttributeTargetAssemblies = "regex:^mscorlib", AttributeTargetTypes = "System.Collections.Collection`1", AttributeTargetMembers = "Add" )]
 
 [assembly: ApplyDefaultValues]

@@ -40,7 +40,7 @@ namespace DragonSpark.Testing.Framework
 
 		public static AssignExecutionContextCommand AsCurrentContext( this MethodBase @this, RecordingLoggerFactory factory )
 		{
-			var result = new AssignExecutionContextCommand().ExecuteWith( @this );
+			var result = new AssignExecutionContextCommand().Executed( @this );
 			DefaultServiceProvider.Instance.Assign( new ServiceProvider( factory ) );
 			return result;
 		}

@@ -193,7 +193,7 @@ namespace DragonSpark.Diagnostics
 
 	public class TimerEventHandler : DecoratedCommand<string, TimerEvent>
 	{
-		public TimerEventHandler( CreateProfilerEvent transform, Action<TimerEvent> inner ) : base( new Func<string, TimerEvent>( transform ), new DelegatedCommand<TimerEvent>( inner ) ) {}
+		public TimerEventHandler( CreateProfilerEvent projection, Action<TimerEvent> inner ) : base( new Func<string, TimerEvent>( projection ), new DelegatedCommand<TimerEvent>( inner ) ) {}
 	}
 
 	public interface ISessionTimer : ITimer, IContinuation {}

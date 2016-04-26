@@ -1,6 +1,6 @@
 namespace DragonSpark.Activation
 {
-	public interface IParameterCoercer<out TParameter>
+	public interface ICoercer<out TParameter>
 	{
 		TParameter Coerce( object context );
 	}
