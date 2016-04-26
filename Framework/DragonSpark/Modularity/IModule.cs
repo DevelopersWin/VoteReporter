@@ -33,7 +33,7 @@ namespace DragonSpark.Modularity
 
 	public interface IModuleCommand : ICommand<IMonitoredModule> {}
 
-	public abstract class ModuleCommand : Command<IMonitoredModule>, IModuleCommand {}
+	public abstract class ModuleCommand : CommandBase<IMonitoredModule>, IModuleCommand {}
 
 	public abstract class MonitoredModule<TCommand> : IMonitoredModule where TCommand : ICommand
 	{

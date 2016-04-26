@@ -10,7 +10,7 @@ using System.Windows.Markup;
 namespace DragonSpark.Windows.Entity
 {
 	[ContentProperty( nameof(Installers) )]
-	public abstract class InitializeDatabaseCommand<TContext> : Command<object> where TContext : DbContext, IEntityInstallationStorage, new()
+	public abstract class InitializeDatabaseCommand<TContext> : CommandBase<object> where TContext : DbContext, IEntityInstallationStorage, new()
 	{
 		[Locate, Required]
 		public IDatabaseInitializer<TContext> Initializer { [return: Required]get; set; }

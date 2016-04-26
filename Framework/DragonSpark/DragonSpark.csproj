@@ -172,6 +172,7 @@
     <Compile Include="Activation\IoC\IsRegisteredSpecification.cs" />
     <Compile Include="Activation\IoC\LifetimeManagerFactory.cs" />
     <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
+    <Compile Include="Aspects\FormattedAttribute.cs" />
     <Compile Include="Aspects\Freeze.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />
     <Compile Include="Aspects\InterceptionArgsExtensions.cs" />
@@ -197,7 +198,9 @@
     <Compile Include="Configuration\ValueStore.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
     <Compile Include="Diagnostics\ExceptionSupport.cs" />
+    <Compile Include="Diagnostics\FormatterFactory.cs" />
     <Compile Include="Diagnostics\IProfiler.cs" />
+    <Compile Include="Diagnostics\LoggerFactory.cs" />
     <Compile Include="Diagnostics\Logger\LogTemplate.cs" />
     <Compile Include="Diagnostics\ProfilerFactory.cs" />
     <Compile Include="Diagnostics\TimerEvents.cs" />
@@ -220,8 +223,8 @@
     <Compile Include="Runtime\Specifications\NeverSpecification.cs" />
     <Compile Include="Activation\CompositeActivator.cs" />
     <Compile Include="Activation\ConstructorBase.cs" />
-    <Compile Include="Activation\FactoryParameterCoercer.cs" />
-    <Compile Include="Activation\IFactoryParameterCoercer.cs" />
+    <Compile Include="Activation\ParameterCoercer.cs" />
+    <Compile Include="Activation\IParameterCoercer.cs" />
     <Compile Include="Activation\IFactoryWithParameter.cs" />
     <Compile Include="Activation\IoC\ArrayResolutionStrategy.cs" />
     <Compile Include="Activation\IoC\ConstructorSelectorPolicy.cs" />
@@ -260,8 +263,10 @@
     <Compile Include="Runtime\Specifications\ContextAwareSpecification.cs" />
     <Compile Include="Runtime\Specifications\SpecificationBase.cs" />
     <Compile Include="Runtime\Specifications\SpecificationExtensions.cs" />
+    <Compile Include="TypeSystem\Attributes.cs" />
     <Compile Include="TypeSystem\Default.cs" />
     <Compile Include="TypeSystem\DefaultFactory.cs" />
+    <Compile Include="TypeSystem\DerivedMethodSpecification.cs" />
     <Compile Include="TypeSystem\HostingAttribute.cs" />
     <Compile Include="TypeSystem\IAttributeProvider.cs" />
     <Compile Include="TypeSystem\KnownTypeFactory.cs" />

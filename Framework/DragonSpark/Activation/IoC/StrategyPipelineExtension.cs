@@ -236,10 +236,18 @@ namespace DragonSpark.Activation.IoC
 		protected TypeSelectionStrategyBase( ISpecification<Type> specification ) : base( specification ) {}
 	}
 
+	public class SelfStrategy : TypeSelectionStrategyBase
+	{
+		public static SelfStrategy Instance { get; } = new SelfStrategy();
+
+		protected override Type[] CreateItem( Type parameter ) => parameter.ToItem();
+	}
+
 	public class SelfAndNestedStrategy : TypeSelectionStrategyBase
 	{
 		public static SelfAndNestedStrategy Instance { get; } = new SelfAndNestedStrategy();
 
+		[Freeze]
 		protected override Type[] CreateItem( Type parameter ) => parameter.Adapt().WithNested();
 	}
 
@@ -249,6 +257,7 @@ namespace DragonSpark.Activation.IoC
 
 		public AllTypesInCandidateAssemblyStrategy( [Required] ISpecification<Type> specification ) : base( specification ) {}
 
+		[Freeze]
 		protected override Type[] CreateItem( Type parameter ) => TypesFactory.Instance.Create( parameter.Assembly().ToItem() );
 	}
 

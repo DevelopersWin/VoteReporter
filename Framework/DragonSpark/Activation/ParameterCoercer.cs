@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace DragonSpark.Activation
 {
-	public class FixedFactoryParameterCoercer<TParameter> : IFactoryParameterCoercer<TParameter>
+	public class FixedParameterCoercer<TParameter> : IParameterCoercer<TParameter>
 	{
-		public static FixedFactoryParameterCoercer<TParameter> Null { get; } = new FixedFactoryParameterCoercer<TParameter>();
+		public static FixedParameterCoercer<TParameter> Null { get; } = new FixedParameterCoercer<TParameter>();
 
 		readonly TParameter item;
 
-		public FixedFactoryParameterCoercer() : this( default(TParameter) ) {}
+		public FixedParameterCoercer() : this( default(TParameter) ) {}
 
-		public FixedFactoryParameterCoercer( TParameter item )
+		public FixedParameterCoercer( TParameter item )
 		{
 			this.item = item;
 		}
@@ -20,11 +20,11 @@ namespace DragonSpark.Activation
 		public TParameter Coerce( object context ) => item;
 	}
 
-	public class FactoryParameterCoercer<TParameter> : IFactoryParameterCoercer<TParameter>
+	public class ParameterCoercer<TParameter> : IParameterCoercer<TParameter>
 	{
-		public static FactoryParameterCoercer<TParameter> Instance { get; } = new FactoryParameterCoercer<TParameter>();
+		public static ParameterCoercer<TParameter> Instance { get; } = new ParameterCoercer<TParameter>();
 
-		protected FactoryParameterCoercer() {}
+		protected ParameterCoercer() {}
 
 		public TParameter Coerce( object context ) => context is TParameter ? (TParameter)context : PerformCoercion( context );
 

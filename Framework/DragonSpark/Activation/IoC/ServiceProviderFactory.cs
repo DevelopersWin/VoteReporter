@@ -1,7 +1,7 @@
+using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using System;
 using System.Reflection;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Activation.IoC
 {

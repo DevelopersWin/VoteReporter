@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
-using DragonSpark.Configuration;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -12,13 +11,12 @@ using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
+using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Serilog.Core;
 using Xunit.Sdk;
 using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 
@@ -177,7 +175,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		readonly Func<Type, Type[]> primaryStrategy;
 		readonly Func<Type, Type[]> otherStrategy;
 
-		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters ) : this( additional, includeFromParameters, SelfAndNestedStrategy.Instance.Create, AllTypesInCandidateAssemblyStrategy.Instance.Create ) {}
+		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters ) : this( additional, includeFromParameters, SelfAndNestedStrategy.Instance.Create, SelfStrategy.Instance.Create ) {}
 
 		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters, [Required] Func<Type, Type[]> primaryStrategy, [Required] Func<Type, Type[]> otherStrategy )
 		{
@@ -191,7 +189,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override Type[] CreateItem( MethodBase parameter )
 		{
 			var types = additional.Concat( includeFromParameters ? parameter.GetParameters().Select( info => info.ParameterType ) : Default<Type>.Items );
-			var result = primaryStrategy( parameter.DeclaringType ).Union( types.SelectMany( otherStrategy ) ).Fixed();
+			var result = primaryStrategy( parameter.DeclaringType ).Union( types.SelectMany( otherStrategy ) ).Distinct().Fixed();
 			return result;
 		}
 	}
@@ -214,7 +212,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly IServiceRegistry registry;
 
-		public Specification( [Required] IFixture fixture ) : this( new RegistrationCustomization.AssociatedRegistry( fixture ).Value ) {}
+		public Specification( [Required] IFixture fixture ) : this( new AssociatedRegistry( fixture ).Value ) {}
 
 		Specification( [Required] IServiceRegistry registry )
 		{

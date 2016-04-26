@@ -30,7 +30,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 	public class Command : Command<object> {}
 
-	public class Command<T> : DragonSpark.Runtime.Command<T>
+	public class Command<T> : DragonSpark.Runtime.CommandBase<T>
 	{
 		public bool Executed { get; private set; }
 		

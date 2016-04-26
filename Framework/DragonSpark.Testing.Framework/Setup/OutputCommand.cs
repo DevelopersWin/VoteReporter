@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework.Setup.Location;
 using DragonSpark.TypeSystem;
@@ -5,16 +6,36 @@ using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	/*public abstract class AutoDataCommandBase : Command<AutoData> {}*/
-
-	public class SericesCustomization : CustomizationBase
+	public class ServicesCustomization : CustomizationBase
 	{
-		public static SericesCustomization Instance { get; } = new SericesCustomization();
+		public static ServicesCustomization Instance { get; } = new ServicesCustomization();
 
-		protected override void OnCustomize( IFixture fixture ) => fixture.ResidueCollectors.Add( ServiceRelay.Instance );
+		protected override void OnCustomize( IFixture fixture )
+		{
+			fixture.Customizations.Insert( 0, FrameworkSpecimenBuilder.Instance );
+			fixture.ResidueCollectors.Add( ServiceRelay.Instance );
+		}
+
+		public class FrameworkSpecimenBuilder : ISpecimenBuilder
+		{
+			public static FrameworkSpecimenBuilder Instance { get; } = new FrameworkSpecimenBuilder();
+
+			readonly Type[] types;
+
+			public FrameworkSpecimenBuilder() : this( new[] { typeof(Type[]), typeof(Assembly[]) } ) {}
+
+			public FrameworkSpecimenBuilder( Type[] types )
+			{
+				this.types = types;
+			}
+
+			public object Create( object request, ISpecimenContext context ) => TypeSupport.From( request ).With( type => types.Contains( type ) ? Services.Get( type ) : null ) ?? new NoSpecimen();
+		}
 	}
 
 	public class ServiceRelay : ISpecimenBuilder

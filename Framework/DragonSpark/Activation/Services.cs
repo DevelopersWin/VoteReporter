@@ -4,12 +4,15 @@ using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
-using Serilog;
-using Serilog.Core;
 using System;
 
 namespace DragonSpark.Activation
 {
+	/*public interface IServiceProviderSource : IStore<IServiceProvider>
+	{
+		bool IsAvailable { get; }
+	}*/
+
 	public static class Services
 	{
 		static Services()
@@ -23,10 +26,6 @@ namespace DragonSpark.Activation
 
 		static IStore<IServiceProvider> Provider { get; set; }
 
-		/*static IServiceProvider Default { get; set; }
-
-		static IServiceProvider Current => CurrentServiceProvider.Instance.Item ?? Default;*/
-		
 		public static T Get<T>() => Get<T>( typeof(T) );
 
 		public static T Get<T>( [Required]Type type ) => (T)Get( type );
@@ -36,8 +35,6 @@ namespace DragonSpark.Activation
 
 	public class ServiceProvider : CompositeServiceProvider
 	{
-		// public static ServiceProvider Instance { get; } = new ServiceProvider();
-
 		public ServiceProvider() : this( new RecordingLoggerFactory() ) {}
 
 		public ServiceProvider( RecordingLoggerFactory factory ) : base( new DefaultInstances( factory ), ActivatedServiceProvider.Instance ) {}
@@ -45,11 +42,7 @@ namespace DragonSpark.Activation
 
 	class DefaultInstances : InstanceServiceProvider
 	{
-		// public DefaultInstances() : this( new RecordingLoggerFactory() ) {}
-
-		public DefaultInstances( RecordingLoggerFactory factory ) : this( factory.Create(), factory.History, factory.LevelSwitch, Activator.Instance, new DisposableRepository() ) {}
-
-		public DefaultInstances( ILogger logger, ILoggerHistory history, LoggingLevelSwitch level, IActivator activator, IDisposableRepository repository ) : base( logger, history, level, activator, repository ) {}
+		public DefaultInstances( RecordingLoggerFactory factory ) : base( new Func<object>[] { factory.Create, FrameworkTypes.Instance.Create }, factory.History, factory.LevelSwitch, Activator.Instance, new DisposableRepository() ) {}
 	}
 
 	class ActivatedServiceProvider : IServiceProvider

@@ -29,7 +29,7 @@ namespace DragonSpark.Windows.TypeSystem
 		}
 	}
 
-	public class AssemblyInitializer : Command<Assembly>
+	public class AssemblyInitializer : CommandBase<Assembly>
 	{
 		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();
 

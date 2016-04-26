@@ -1,8 +1,8 @@
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
-using DragonSpark.Activation;
 
 namespace DragonSpark.TypeSystem
 {
@@ -16,9 +16,10 @@ namespace DragonSpark.TypeSystem
 		}
 
 		[Freeze]
-		protected override System.Type[] CreateItem( System.Type parameter ) => types.AsTypeInfos()
-																	.Where( z => z.IsSubclassOf( parameter ) && parameter.Namespace != "System.Data.Entity.DynamicProxies" )
-																	.AsTypes()
-																	.Fixed();
+		protected override System.Type[] CreateItem( System.Type parameter ) =>
+			types.AsTypeInfos()
+				 .Where( z => parameter.Adapt().IsAssignableFrom( z ) )
+				 .AsTypes()
+				 .Fixed();
 	}
 }

@@ -4,7 +4,7 @@ using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Setup.Commands
 {
-	public class RunProgramCommand : Command<object>
+	public class RunProgramCommand : CommandBase<object>
 	{
 		[Locate]
 		public IProgram Program { [return: Required]get; set; }

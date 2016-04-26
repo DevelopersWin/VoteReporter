@@ -4,6 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using mscoree;
 using PostSharp.Aspects;
+using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -20,19 +21,19 @@ namespace DragonSpark.Testing.Framework
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Activation.Execution.Initialize( ExecutionContext.Instance );
+		public static void Execution() => PostSharpEnvironment.IsPostSharpRunning.IsFalse( () => 
+			Activation.Execution.Initialize( ExecutionContext.Instance ) 
+		);
 
 		[ModuleInitializer( 1 )]
-		public static void Tracing()
-		{
-			Trace.WriteLine( $"Initializing {typeof(Initialize)}" );
-		}
+		public static void Tracing() => PostSharpEnvironment.IsPostSharpRunning.IsFalse( () => 
+			Trace.WriteLine( $"Initializing {typeof(Initialize)}" )
+		);
 
 		[ModuleInitializer( 2 )]
-		public static void Environment()
-		{
-			InitializeJetBrainsTaskRunnerCommand.Instance.Run( AppDomain.CurrentDomain.SetupInformation );
-		}
+		public static void Environment() => PostSharpEnvironment.IsPostSharpRunning.IsFalse( () => 
+			InitializeJetBrainsTaskRunnerCommand.Instance.Run( AppDomain.CurrentDomain.SetupInformation )
+		);
 	}
 
 	public class JetBrainsApplicationDomainFactory : FactoryBase<AppDomain>
@@ -110,7 +111,7 @@ namespace DragonSpark.Testing.Framework
 		protected override AssemblyLoader CreateItem( string parameter ) => source.Use( domain => new ApplicationDomainProxyFactory<AssemblyLoader>( domain ).CreateUsing( parameter ) );
 	}
 
-	public class InitializeJetBrainsTaskRunnerCommand : Command<AppDomainSetup>
+	public class InitializeJetBrainsTaskRunnerCommand : CommandBase<AppDomainSetup>
 	{
 		public static InitializeJetBrainsTaskRunnerCommand Instance { get; } = new InitializeJetBrainsTaskRunnerCommand();
 

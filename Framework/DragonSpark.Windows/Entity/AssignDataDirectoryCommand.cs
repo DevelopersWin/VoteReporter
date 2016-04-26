@@ -5,7 +5,7 @@ using System.IO;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class AssignDataDirectoryCommand : Command<object>
+	public class AssignDataDirectoryCommand : CommandBase<object>
 	{
 		[Singleton( typeof(EntityFiles), nameof(EntityFiles.DefaultDataDirectory) ), Required]
 		public DirectoryInfo Directory { [return: Required]get; set; }

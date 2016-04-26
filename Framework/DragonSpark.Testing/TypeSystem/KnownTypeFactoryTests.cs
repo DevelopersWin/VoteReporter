@@ -1,18 +1,16 @@
 ﻿using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
-using System.Reflection;
 using Xunit;
-using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 
 namespace DragonSpark.Testing.TypeSystem
 {
-	[AssemblyProvider.Register]
-	[AssemblyProvider.Types]
+	/*[AssemblyProvider.Register]*/
+	/*[AssemblyProvider.Types]*/
 	public class KnownTypeFactoryTests
 	{
-		[Theory, AutoData]
-		public void Testing( Assembly[] assemblies, KnownTypeFactory sut )
+		[Theory, AutoData( false, typeof(Class), typeof(ClassWithProperty), typeof(Derived) )]
+		public void Testing( KnownTypeFactory sut )
 		{
 			var parameter = typeof(Class);
 
@@ -20,7 +18,7 @@ namespace DragonSpark.Testing.TypeSystem
 
 			Assert.NotEmpty( items );
 
-			Assert.All( items, type => Assert.True( type.IsSubclassOf( parameter ) ) );
+			Assert.All( items, item => Assert.True( parameter.IsAssignableFrom( item ) ) );
 		}
 	}
 }

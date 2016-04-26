@@ -7,7 +7,7 @@ using Serilog;
 
 namespace DragonSpark.Setup.Commands
 {
-	public class InitializeModulesCommand : Command<object>
+	public class InitializeModulesCommand : CommandBase<object>
 	{
 		[Locate, Required]
 		public IModuleMonitor Monitor { [return: Required]get; set; }

@@ -11,9 +11,6 @@ namespace DragonSpark.Windows.Testing.TestObjects.Modules
 			set { section.Modules = new ModuleConfigurationElementCollection(value); }
 		}
 
-		public ModulesConfigurationSection RetrieveModuleConfigurationSection()
-		{
-			return section;
-		}
+		public ModulesConfigurationSection RetrieveModuleConfigurationSection() => section;
 	}
 }

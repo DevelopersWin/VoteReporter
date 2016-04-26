@@ -12,7 +12,7 @@ namespace DragonSpark.Setup.Registration
 {
 	public class RegisterFromMetadataCommand : ServicedCommand<MetadataRegistrationCommand, Type[]> {}
 
-	public class MetadataRegistrationCommand : Command<Type[]>
+	public class MetadataRegistrationCommand : CommandBase<Type[]>
 	{
 		readonly IServiceRegistry registry;
 

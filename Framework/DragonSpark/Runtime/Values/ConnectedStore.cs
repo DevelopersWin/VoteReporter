@@ -1,9 +1,9 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -53,7 +53,7 @@ namespace DragonSpark.Runtime.Values
 		protected ConnectedStore( [Required]ConnectibleProperty<T> property, Func<T> create )
 		{
 			Property = property;
-			this.create = create ?? ( () => default(T) );
+			this.create = create ?? DefaultFactory<T>.Instance.Create;
 		}
 
 		public override void Assign( T item ) => Property.Set( item );
@@ -88,7 +88,7 @@ namespace DragonSpark.Runtime.Values
 		public Reference( object instance, T key ) : base( instance, KeyFactory.Instance.CreateUsing( key ).ToString(), () => key ) {}
 	}
 
-	public class ListStore<T> : FixedStore<T>
+	/*public class ListStore<T> : FixedStore<T>
 	{
 		readonly IList list;
 
@@ -120,7 +120,7 @@ namespace DragonSpark.Runtime.Values
 		}
 
 		protected override void OnDispose() => Remove( Value );
-	}
+	}*/
 
 	public class Checked : AssociatedStore<ConditionMonitor>
 	{

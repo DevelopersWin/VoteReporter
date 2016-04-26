@@ -54,7 +54,7 @@ namespace DragonSpark.Configuration
 		public override IList<IConfiguration> Parameter => Configurations.ToArray();
 	}
 
-	public class ConfigureCommand : Command<IEnumerable<IConfiguration>>
+	public class ConfigureCommand : CommandBase<IEnumerable<IConfiguration>>
 	{
 		public static ConfigureCommand Instance { get; } = new ConfigureCommand();
 

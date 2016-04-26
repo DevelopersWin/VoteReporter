@@ -64,7 +64,7 @@ namespace DragonSpark.Windows.Security
 		protected override string CreateItem( string parameter ) => client.GetSecretAsync( location.ToString(), parameter ).Result.Value;
 	}
 
-	public class SaveCertificateCommand : Command<SaveCertificateCommand.Parameter>
+	public class SaveCertificateCommand : CommandBase<SaveCertificateCommand.Parameter>
 	{
 		public class Parameter
 		{

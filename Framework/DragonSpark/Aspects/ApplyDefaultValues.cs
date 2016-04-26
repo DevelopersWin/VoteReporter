@@ -1,48 +1,68 @@
 using DragonSpark.ComponentModel;
-using DragonSpark.Runtime.Values;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Extensibility;
+using PostSharp.Patterns.Model;
+using PostSharp.Patterns.Threading;
 using PostSharp.Reflection;
 using PostSharp.Serialization;
 using System;
 
 namespace DragonSpark.Aspects
 {
-	[MulticastAttributeUsage( MulticastTargets.Property, PersistMetaData = false ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
+	[MulticastAttributeUsage( MulticastTargets.Property, PersistMetaData = false )]
 	[PSerializable, ProvideAspectRole( "Default Object Values" ), LinesOfCodeAvoided( 6 )]
 	[AttributeUsage( AttributeTargets.Assembly )]
-	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect, IInstanceScopedAspect
 	{
+		ValueProcessor Processor { get; set; }
+
 		public override bool CompileTimeValidate( LocationInfo locationInfo ) => DefaultValuePropertySpecification.Instance.IsSatisfiedBy( locationInfo.PropertyInfo );
 
-		public override void OnGetValue( LocationInterceptionArgs args )
-		{
-			lock ( args.Instance ?? args.Location.DeclaringType ) // TODO: Move to aspect.
-			{
-				var apply = new Checked( this ).Value.Apply();
-				if ( apply )
-				{
-					var parameter = new DefaultValueParameter( args.Instance ?? args.Location.DeclaringType, args.Location.PropertyInfo );
-					var value = DefaultPropertyValueFactory.Instance.Create( parameter );
-					args.SetNewValue( args.Value = value );
-				}
-				else
-				{
-					base.OnGetValue( args );
-				}
-			}
-		}
+		public override void OnGetValue( LocationInterceptionArgs args ) => Processor.With( processor => processor.Run( args ) );
 
 		public override void OnSetValue( LocationInterceptionArgs args )
 		{
-			new Checked( this ).Value.Apply();
+			Processor.With( processor => processor.Apply() );
 			base.OnSetValue( args );
 		}
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
 
-		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
+		void IInstanceScopedAspect.RuntimeInitializeInstance() => Processor = new ValueProcessor( base.OnGetValue );
+
+		[Synchronized]
+		class ValueProcessor : CommandBase<LocationInterceptionArgs>
+		{
+			[Reference]
+			readonly ConditionMonitor monitor = new ConditionMonitor();
+
+			readonly Action<LocationInterceptionArgs> @continue;
+
+			public ValueProcessor( Action<LocationInterceptionArgs> @continue )
+			{
+				this.@continue = @continue;
+			}
+
+			protected override void OnExecute( LocationInterceptionArgs parameter )
+			{
+				var apply = monitor.Apply();
+				if ( apply )
+				{
+					var context = new DefaultValueParameter( parameter.Instance ?? parameter.Location.DeclaringType, parameter.Location.PropertyInfo );
+					var value = DefaultPropertyValueFactory.Instance.Create( context );
+					parameter.SetNewValue( parameter.Value = value );
+				}
+				else
+				{
+					@continue( parameter );
+				}
+			}
+
+			public void Apply() => monitor.Apply();
+		}
 	}
 }

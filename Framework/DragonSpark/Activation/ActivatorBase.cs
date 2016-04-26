@@ -6,9 +6,9 @@ namespace DragonSpark.Activation
 {
 	public abstract class ActivatorBase<TRequest> : FactoryBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
-		protected ActivatorBase( IFactoryParameterCoercer<TRequest> coercer ) : this( IsTypeSpecification<TRequest>.Instance, coercer ) {}
+		protected ActivatorBase( IParameterCoercer<TRequest> coercer ) : this( IsTypeSpecification<TRequest>.Instance, coercer ) {}
 
-		protected ActivatorBase( ISpecification<TRequest> specification, IFactoryParameterCoercer<TRequest> coercer ) : base( specification, coercer ) {}
+		protected ActivatorBase( ISpecification<TRequest> specification, IParameterCoercer<TRequest> coercer ) : base( specification, coercer ) {}
 
 		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => CreateFromItem( parameter );
 	}

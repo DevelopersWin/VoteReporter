@@ -6,7 +6,7 @@ using System.IO;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class InstallDatabaseCommand : Command<object>
+	public class InstallDatabaseCommand : CommandBase<object>
 	{
 		[Factory( typeof(AttachedDatabaseFileFactory) )]
 		public FileInfo Database { get; set; }

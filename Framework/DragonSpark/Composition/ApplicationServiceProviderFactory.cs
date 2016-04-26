@@ -1,16 +1,12 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
-using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Properties;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Composition;

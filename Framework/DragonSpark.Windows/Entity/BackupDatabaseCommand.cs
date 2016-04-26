@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class BackupDatabaseCommand : Command<object>
+	public class BackupDatabaseCommand : CommandBase<object>
 	{
 		[Factory( typeof(AttachedDatabaseFileFactory) )]
 		public FileInfo Database { get; set; }

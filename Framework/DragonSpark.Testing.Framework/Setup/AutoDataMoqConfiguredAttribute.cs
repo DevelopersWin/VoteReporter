@@ -1,4 +1,3 @@
-using System;
 using DragonSpark.Activation;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.AutoMoq;
@@ -7,7 +6,7 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public class AutoDataCustomization : CompositeCustomization
 	{
-		public AutoDataCustomization() : base( SericesCustomization.Instance, new AutoConfiguredMoqCustomization() ) { }
+		public AutoDataCustomization() : base( ServicesCustomization.Instance, new AutoConfiguredMoqCustomization() ) { }
 	}
 
 	/*public class AutoDataMoqAttribute : AutoDataAttribute

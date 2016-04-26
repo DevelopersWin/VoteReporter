@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using PostSharp.Aspects;
+using PostSharp.Extensibility;
 
 namespace DragonSpark.Testing.Parts.Development
 {
@@ -8,7 +9,7 @@ namespace DragonSpark.Testing.Parts.Development
 		public static Initialize Instance { get; } = new Initialize();
 
 		[ModuleInitializer( 0 )]
-		public static void Execute() => Instance.Run();
+		public static void Execute() => PostSharpEnvironment.IsPostSharpRunning.IsFalse( Instance.Run );
 
 		Initialize()
 		{

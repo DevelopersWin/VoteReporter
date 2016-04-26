@@ -36,6 +36,20 @@ namespace DragonSpark.Runtime.Values
 		// public ExecutionContextValue( string key, Func<T> create ) : base( () => new AssociatedValue<T>( Execution.Current, key, create ) ) {}
 	}
 
+	public class DeferredInstanceStore<T> : StoreBase<T>
+	{
+		readonly Lazy<T> lazy;
+
+		public DeferredInstanceStore( Func<T> factory ) : this( new Lazy<T>( factory ) ) {}
+
+		public DeferredInstanceStore( Lazy<T> lazy )
+		{
+			this.lazy = lazy;
+		}
+
+		protected override T Get() => lazy.Value;
+	}
+
 	public class DeferredStore<T> : WritableStore<T>
 	{
 		readonly Func<IWritableStore<T>> deferred;

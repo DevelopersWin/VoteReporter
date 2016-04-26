@@ -126,7 +126,7 @@ namespace DragonSpark.Setup.Registration
 		public Type[] RegisterTypes { get; }
 	}
 
-	public abstract class RegisterFactoryCommandBase<TFactory> : Command<RegisterFactoryParameter>
+	public abstract class RegisterFactoryCommandBase<TFactory> : CommandBase<RegisterFactoryParameter>
 	{
 		readonly IServiceRegistry registry;
 		readonly ISingletonLocator locator;

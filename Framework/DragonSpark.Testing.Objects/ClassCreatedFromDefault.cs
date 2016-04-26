@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Objects
 					throw new InvalidOperationException( message );
 				default:
 					Message = message;
-					associated.Property.TryDisconnect();
+					associated.Dispose();
 					break;
 			}
 		}

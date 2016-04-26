@@ -8,11 +8,9 @@ using AutoDataAttribute = Ploeh.AutoFixture.Xunit2.AutoDataAttribute;
 
 namespace DragonSpark.Testing.TypeSystem
 {
-	[AssemblyProvider.Register]
-	[AssemblyProvider.Types]
 	public class ApplicationAssemblyFilterTests
 	{
-		[Theory, Framework.Setup.AutoData()]
+		[Theory, Framework.Setup.AutoData]
 		public void Basic( Mock<IAssemblyProvider> provider, ApplicationAssemblyFilter sut )
 		{
 			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.Assemblies() );
@@ -23,6 +21,7 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.NotEqual( assemblies, provider.Object.Create() );
 		}
 
+		[AssemblyProvider.Register]
 		[Theory, Framework.Setup.AutoData]
 		public void DefaultProvider( IAssemblyProvider sut )
 		{

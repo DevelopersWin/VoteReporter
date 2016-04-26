@@ -16,7 +16,7 @@ namespace DragonSpark.TypeSystem
 		void Load( Assembly reference, string search );
 	}
 
-	public class LoadPartAssemblyCommand : Command<Assembly>
+	public class LoadPartAssemblyCommand : CommandBase<Assembly>
 	{
 		readonly IAssemblyLoader provider;
 		readonly string searchQuery;
@@ -126,7 +126,7 @@ namespace DragonSpark.TypeSystem
 
 	public abstract class AssemblyProviderBase : AssemblySourceBase, IAssemblyProvider
 	{
-		readonly Assembly[] assemblies;
+		readonly IEnumerable<Assembly> assemblies;
 
 		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( AssembliesFactory.Instance.Create( types.Fixed() ).Union( assemblies ).ToArray() ) {}
 
@@ -134,10 +134,10 @@ namespace DragonSpark.TypeSystem
 
 		AssemblyProviderBase( [Required] IEnumerable<Assembly> assemblies )
 		{
-			this.assemblies = assemblies.NotNull().Distinct().Prioritize().Fixed();
+			this.assemblies = assemblies;
 		}
 
-		protected override Assembly[] CreateItem() => assemblies;
+		protected override Assembly[] CreateItem() => assemblies.NotNull().Distinct().Prioritize().Fixed();
 	}
 
 	public class AggregateAssemblyFactory : AggregateFactory<Assembly[]>, IAssemblyProvider

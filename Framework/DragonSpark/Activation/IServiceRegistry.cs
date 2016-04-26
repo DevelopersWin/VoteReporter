@@ -87,7 +87,7 @@ namespace DragonSpark.Activation
 		} );
 	}
 
-	public abstract class RegistrationCommandBase<T, U> : Command<T> where T : RegistrationParameter where U : ISpecification<Type>
+	public abstract class RegistrationCommandBase<T, U> : CommandBase<T> where T : RegistrationParameter where U : ISpecification<Type>
 	{
 		readonly Action<T> command;
 		readonly U specification;

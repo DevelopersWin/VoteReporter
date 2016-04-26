@@ -22,7 +22,7 @@ namespace DragonSpark.Windows.Entity
 		public DbModelBuilder Builder { get; }
 	}
 
-	public class RegisterComplexTypesCommand : Command<DbContextBuildingParameter>
+	public class RegisterComplexTypesCommand : CommandBase<DbContextBuildingParameter>
 	{
 		protected override void OnExecute( DbContextBuildingParameter parameter )
 		{
@@ -42,7 +42,7 @@ namespace DragonSpark.Windows.Entity
 		public DefaultCommands() : base( new EnableLocalStoragePropertyCommand(), new RegisterComplexTypesCommand() ) {}
 	}
 
-	public class EnableLocalStoragePropertyCommand : Command<DbContextBuildingParameter>
+	public class EnableLocalStoragePropertyCommand : CommandBase<DbContextBuildingParameter>
 	{
 		readonly static MethodInfo ApplyMethod = typeof(EnableLocalStoragePropertyCommand).GetMethod( nameof(Apply), BindingOptions.AllProperties );
 

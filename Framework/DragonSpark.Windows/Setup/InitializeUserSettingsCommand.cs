@@ -28,7 +28,7 @@ namespace DragonSpark.Windows.Setup
 		protected override string CreateItem() => ConfigurationManager.OpenExeConfiguration( level ).FilePath;
 	}
 
-	public class ClearUserSettingCommand : Command<ApplicationSettingsBase>
+	public class ClearUserSettingCommand : CommandBase<ApplicationSettingsBase>
 	{
 		public static ClearUserSettingCommand Instance { get; } = new ClearUserSettingCommand();
 
@@ -51,7 +51,7 @@ namespace DragonSpark.Windows.Setup
 		}
 	}
 
-	public class InitializeUserSettingsCommand : Command<ApplicationSettingsBase>
+	public class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
 		readonly LogCommand log;
 		readonly Func<string> pathSource;

@@ -110,7 +110,7 @@ namespace DragonSpark.Setup
 		protected override void OnExecute( MigrationParameter<ILoggerHistory> parameter ) => parameter.From.Events.Each( parameter.To.Emit );
 	}
 
-	public abstract class MigrationCommandBase<T> : Command<MigrationParameter<T>>
+	public abstract class MigrationCommandBase<T> : CommandBase<MigrationParameter<T>>
 	{
 		protected MigrationCommandBase() : base( IsTypeSpecification<MigrationParameter<T>>.Instance.And( new OnlyOnceSpecification() ).Wrap<MigrationParameter<T>>() ) {}
 	}

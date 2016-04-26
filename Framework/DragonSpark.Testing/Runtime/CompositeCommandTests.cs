@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.True( command.Executed );
 		}
 
-		class Command : Command<object>
+		class Command : CommandBase<object>
 		{
 			public bool Executed { get; private set; }
 			

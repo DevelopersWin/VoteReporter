@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Framework
 		protected override OutputCommand.Parameter CreateItem( MethodInterceptionArgs parameter ) => new OutputCommand.Parameter( parameter.Instance, parameter.Method, parameter.Proceed );
 	}*/
 
-	public class OutputCommand : Command<OutputCommand.Parameter>
+	public class OutputCommand : CommandBase<OutputCommand.Parameter>
 	{
 		public class Parameter
 		{

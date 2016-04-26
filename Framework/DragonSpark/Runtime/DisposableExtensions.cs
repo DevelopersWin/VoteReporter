@@ -21,7 +21,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class DisposeAssociatedCommand : Command<IDisposable>
+	public class DisposeAssociatedCommand : CommandBase<IDisposable>
 	{
 		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand();
 

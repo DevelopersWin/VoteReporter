@@ -12,7 +12,7 @@ namespace DragonSpark.Diagnostics.Logger
 
 	public delegate void LogException( Exception exception, string template, object[] parameters );
 
-	public abstract class LogCommandBase<TDelegate, TTemplate> : Command<TTemplate> where TTemplate : ILoggerTemplate
+	public abstract class LogCommandBase<TDelegate, TTemplate> : CommandBase<TTemplate> where TTemplate : ILoggerTemplate
 	{
 		readonly ILogger logger;
 		readonly Func<TTemplate, LogEventLevel> levelSource;

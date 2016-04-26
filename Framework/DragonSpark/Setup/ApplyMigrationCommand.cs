@@ -4,7 +4,7 @@ using System;
 
 namespace DragonSpark.Setup
 {
-	public class ApplyMigrationCommand : Command<MigrationParameter<IServiceProvider>>
+	public class ApplyMigrationCommand : CommandBase<MigrationParameter<IServiceProvider>>
 	{
 		public static ApplyMigrationCommand Instance { get; } = new ApplyMigrationCommand();
 

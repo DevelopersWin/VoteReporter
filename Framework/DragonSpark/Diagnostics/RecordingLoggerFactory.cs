@@ -30,7 +30,7 @@ namespace DragonSpark.Diagnostics
 		public PurgeLoggerHistoryCommand( ILoggerHistory history ) : base( history, events => events.Fixed() ) {}
 	}
 
-	public abstract class PurgeLoggerHistoryCommand<T> : Command<Action<T>>
+	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
 	{
 		readonly ILoggerHistory history;
 		readonly Func<IEnumerable<LogEvent>, T[]> factory;
@@ -49,39 +49,58 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public class RecordingLoggingConfigurationFactory : AggregateFactory<LoggerConfiguration>
+	public class RecordingLoggerConfigurationFactory : LoggerConfigurationFactory
 	{
-		public RecordingLoggingConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
-			: base( new LoggerConfigurationFactory( controller ), transformers.Append( new LoggerHistoryConfigurationTransformer( sink ) ).Fixed() ) {}
+		public RecordingLoggerConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
+			: base( new LoggerConfigurationSource( controller ), transformers.Append( new LoggerHistoryConfigurationTransformer( sink ) ).Fixed() ) {}
 	}
 
-	public class MethodFormatter : FactoryBase<MethodBase, string>
+	/*public class ConstructionFactory<T> : ConstructionFactory
 	{
-		public static MethodFormatter Instance { get; } = new MethodFormatter();
+		public ConstructionFactory() : base( typeof(T) ) {}
+	}*/
 
-		protected override string CreateItem( MethodBase parameter ) => $"{parameter.DeclaringType.Name}.{parameter.Name}";
-	}
-
-	public class LoggerFactory : FactoryBase<ILogger>
+	public class ConstructFromParameterFactory : FactoryBase<object, object>
 	{
-		readonly Func<LoggerConfiguration> source;
+		readonly IActivator activator;
+		readonly Type type;
 
-		public LoggerFactory( [Required] Func<LoggerConfiguration> source )
+		public ConstructFromParameterFactory( Type type ) : this( Constructor.Instance, type ) {}
+
+		public ConstructFromParameterFactory( IActivator activator, Type type )
 		{
-			this.source = source;
+			this.activator = activator;
+			this.type = type;
 		}
 
-		protected override ILogger CreateItem() => source().CreateLogger().ForContext( Constants.SourceContextPropertyName, Execution.Current );
+		protected override object CreateItem( object parameter ) => activator.Create( new ConstructTypeRequest( type, parameter ) );
 	}
 
-	public class LoggerConfigurationFactory : FactoryBase<LoggerConfiguration>
+	public class MethodFormatter : IFormattable
+	{
+		readonly MethodBase method;
+
+		public MethodFormatter( MethodBase method )
+		{
+			this.method = method;
+		}
+
+		public string ToString( string format, IFormatProvider formatProvider ) => $"{method.DeclaringType.Name}.{method.Name}";
+	}
+
+	public class LoggerConfigurationFactory : AggregateFactory<LoggerConfiguration>
+	{
+		public LoggerConfigurationFactory( IFactory<LoggerConfiguration> primary, params ITransformer<LoggerConfiguration>[] transformers ) : base( primary, transformers ) {}
+	}
+
+	public class LoggerConfigurationSource : FactoryBase<LoggerConfiguration>
 	{
 		readonly LoggerConfiguration configuration;
 		readonly LoggingLevelSwitch controller;
 
-		public LoggerConfigurationFactory( [Required] LoggingLevelSwitch logging ) : this( new LoggerConfiguration(), logging ) {}
+		public LoggerConfigurationSource( [Required] LoggingLevelSwitch logging ) : this( new LoggerConfiguration(), logging ) {}
 
-		public LoggerConfigurationFactory( [Required] LoggerConfiguration configuration, [Required] LoggingLevelSwitch controller )
+		public LoggerConfigurationSource( [Required] LoggerConfiguration configuration, [Required] LoggingLevelSwitch controller )
 		{
 			this.configuration = configuration;
 			this.controller = controller;
@@ -126,7 +145,7 @@ namespace DragonSpark.Diagnostics
 
 		public RecordingLoggerFactory( [Required]ILoggerHistory history, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, LoggingLevelSwitchFactory.Instance.Create(), transformers ) {}
 
-		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, levelSwitch, new RecordingLoggingConfigurationFactory( history, levelSwitch, transformers ).Create ) {}
+		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, levelSwitch, new RecordingLoggerConfigurationFactory( history, levelSwitch, transformers ).Create ) {}
 
 		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, Func<LoggerConfiguration> configuration ) : base( configuration )
 		{

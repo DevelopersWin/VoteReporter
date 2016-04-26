@@ -3,7 +3,6 @@ using DragonSpark.Aspects;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Diagnostics;
@@ -22,7 +21,7 @@ namespace DragonSpark.Diagnostics
 		}
 
 		[Freeze]
-		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForContext( Constants.SourceContextPropertyName, parameter );
+		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForSource( parameter );
 	}
 
 	public delegate void EmitProfileEvent( string name );
@@ -120,7 +119,7 @@ namespace DragonSpark.Diagnostics
 	{
 		protected LoggerTemplate( string template, params object[] parameters ) : this( LogEventLevel.Information, template, parameters ) {}
 
-		protected LoggerTemplate( LogEventLevel intendedLevel, string template, params object[] parameters )
+		protected LoggerTemplate( LogEventLevel intendedLevel, string template, [Formatted]params object[] parameters )
 		{
 			IntendedLevel = intendedLevel;
 			Template = template;
@@ -131,7 +130,6 @@ namespace DragonSpark.Diagnostics
 		public string Template { get; }
 
 		public object[] Parameters { get; }
-		
 	}
 
 	public class TimerEvent<T> : TimerEvent where T : ITimer
@@ -186,7 +184,11 @@ namespace DragonSpark.Diagnostics
 
 		public virtual TimeSpan Elapsed { get; private set; }
 
-		protected override void OnDispose() => Update();
+		protected override void OnDispose()
+		{
+			Update();
+			base.OnDispose();
+		}
 	}
 
 	public class TimerEventHandler : DecoratedCommand<string, TimerEvent>
@@ -222,7 +224,7 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 	
-	public class StartProcessCommand : Command<IProcess>
+	public class StartProcessCommand : CommandBase<IProcess>
 	{
 		public static StartProcessCommand Instance { get; } = new StartProcessCommand();
 

@@ -2,6 +2,7 @@
 using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Composition;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
@@ -17,7 +18,6 @@ using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using static DragonSpark.Setup.ActivationProperties;
 using Type = System.Type;
 
 namespace DragonSpark.Setup
@@ -33,7 +33,7 @@ namespace DragonSpark.Setup
 		public ServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
 	}
 
-	public sealed class ConfigureProviderCommand : Command<IServiceProvider>
+	public sealed class ConfigureProviderCommand : CommandBase<IServiceProvider>
 	{
 		readonly ILogger logger;
 		readonly IServiceProviderHost host;
@@ -126,14 +126,25 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class InstanceServiceProvider : Collection<object>, IServiceProvider
+	public class InstanceServiceProvider : RepositoryBase<IStore>, IServiceProvider
 	{
-		public InstanceServiceProvider( [Required] params object[] instances )
-		{
-			this.AddRange( instances.Select( o => o.With( self => new Instance( self ).Assign( true ) ) ) );
-		}
+		public InstanceServiceProvider( IEnumerable<Func<object>> factories, params object[] instances ) : this( factories.Select( func => new DeferredInstanceStore<object>( func ) ).Concat( Instances( instances ) ) ) {}
 
-		public object GetService( Type serviceType ) => this.FirstOrDefault( serviceType.Adapt().IsInstanceOfType );
+		public InstanceServiceProvider( params object[] instances ) : this( Instances( instances ) ) {}
+
+		InstanceServiceProvider( IEnumerable<IStore> stores ) : base( stores ) {}
+
+		static IEnumerable<IStore> Instances( IEnumerable<object> instances ) => instances.Select( o => new FixedStore<object>( o ) );
+
+		[Freeze]
+		[RecursionGuard]
+		public object GetService( Type serviceType )
+		{
+			/*throw new InvalidOperationException( "WTF" );
+			return Store;*/
+			var result = List().Select( store => store.Value ).FirstOrDefault( serviceType.Adapt().IsInstanceOfType ).With( o => new ActivationProperties.Instance( o ).Assigned( true ) );
+			return result;
+		}
 	}
 
 	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
@@ -186,7 +197,7 @@ namespace DragonSpark.Setup
 		public ConfiguredServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure<TCommand>.Instance.Run ) {}
 	}
 
-	class Configure<T> : Command<IServiceProvider> where T : class, ICommand<IServiceProvider>
+	class Configure<T> : CommandBase<IServiceProvider> where T : class, ICommand<IServiceProvider>
 	{
 		public static Configure<T> Instance { get; } = new Configure<T>();
 
@@ -208,12 +219,12 @@ namespace DragonSpark.Setup
 		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand) };
 	}*/
 
-	public class SharedFrameworkTypes : FactoryBase<Type[]>
+	public class FrameworkTypes : FactoryBase<Type[]>
 	{
-		public static SharedFrameworkTypes Instance { get; } = new SharedFrameworkTypes();
+		public static FrameworkTypes Instance { get; } = new FrameworkTypes();
 
 		[Freeze]
-		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator) };
+		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) };
 	}
 
 	public abstract class Application<TParameter> : CompositeCommand<TParameter>, IApplication<TParameter>

@@ -502,18 +502,9 @@ namespace DragonSpark.Windows.Testing.Modularity
 		public Func<IEnumerable<ModuleInfo>, IEnumerable<ModuleInfo>> CompleteListWithDependencies;
 		public Action ValidateCatalog;
 
-		public void Initialize()
-		{
-			if (this.ValidateCatalog != null)
-			{
-				this.ValidateCatalog();
-			}
-		}
+		public void Initialize() => this.ValidateCatalog?.Invoke();
 
-		IEnumerable<ModuleInfo> IModuleCatalog.Modules
-		{
-			get { return this.Modules; }
-		}
+		IEnumerable<ModuleInfo> IModuleCatalog.Modules => Modules;
 
 		IEnumerable<ModuleInfo> IModuleCatalog.GetDependentModules(ModuleInfo moduleInfo)
 		{

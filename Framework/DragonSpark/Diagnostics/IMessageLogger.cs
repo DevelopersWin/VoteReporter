@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Setup;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
@@ -12,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Markup;
 
 namespace DragonSpark.Diagnostics
@@ -20,7 +18,7 @@ namespace DragonSpark.Diagnostics
 	[ContentProperty( nameof(Commands) )]
 	public class ConfiguringLoggerConfigurationFactory : TransformerBase<LoggerConfiguration>
 	{
-		public Collection<Command<LoggerConfiguration>> Commands { get; } = new Collection<Command<LoggerConfiguration>>();
+		public Collection<CommandBase<LoggerConfiguration>> Commands { get; } = new Collection<CommandBase<LoggerConfiguration>>();
 
 		protected override LoggerConfiguration CreateItem( LoggerConfiguration configuration ) => Commands.Aggregate( configuration, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Run ) );
 	}
@@ -116,12 +114,12 @@ namespace DragonSpark.Diagnostics
 		protected DestructureCommandBase() : base( configuration => configuration.Destructure ) {}
 	}
 
-	public class DestructureMethodCommand : DestructureByFactoryCommand<MethodBase>
+	/*public class DestructureMethodCommand : DestructureByFactoryCommand<MethodInfo>
 	{
 		public static DestructureMethodCommand Instance { get; } = new DestructureMethodCommand();
 
 		public DestructureMethodCommand() : base( MethodFormatter.Instance ) {}
-	}
+	}*/
 
 	public abstract class DestructureByFactoryCommand<TParameter> : DestructureCommandBase
 	{
@@ -239,7 +237,7 @@ namespace DragonSpark.Diagnostics
 		protected override void Configure( LoggerMinimumLevelConfiguration configuration ) => configuration.Is( Level );
 	}
 
-	public abstract class LoggerConfigurationCommandBase<T> : Command<LoggerConfiguration>
+	public abstract class LoggerConfigurationCommandBase<T> : CommandBase<LoggerConfiguration>
 	{
 		readonly Func<LoggerConfiguration, T> transform;
 

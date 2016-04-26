@@ -121,7 +121,7 @@ namespace DragonSpark.Composition
 		readonly Type[] core;
 		// readonly Type[] shared;
 
-		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types ) : this( assemblies, types, /*FrameworkTypes.Instance.Create(),*/ SharedFrameworkTypes.Instance.Create() ) {}
+		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types ) : this( assemblies, types, /*FrameworkTypes.Instance.Create(),*/ FrameworkTypes.Instance.Create() ) {}
 
 		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types, [Required] Type[] core/*, [Required] Type[] shared*/ )
 		{

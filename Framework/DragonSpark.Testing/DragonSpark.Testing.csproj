@@ -228,6 +228,8 @@
     <Compile Include="Configuration\ValueStoreTests.cs" />
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
+    <Compile Include="Diagnostics\FormatterFactoryTests.cs" />
+    <Compile Include="Diagnostics\LoggerFactoryTests.cs" />
     <Compile Include="Diagnostics\MessageRecorderTests.cs" />
     <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
     <Compile Include="Extensions\AssemblyExtensionsTests.cs" />
@@ -275,6 +277,7 @@
     <Compile Include="Runtime\Values\AmbientContextCommandTests.cs" />
     <Compile Include="Setup\ApplyMigrationCommandTests.cs" />
     <Compile Include="TypeSystem\ApplicationAssemblyFilterTests.cs" />
+    <Compile Include="TypeSystem\DerivedMethodSpecificationTests.cs" />
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
     <Compile Include="TypeSystem\KnownTypeFactoryTests.cs" />
     <Compile Include="TypeSystem\MemberInfoAttributeProviderFactoryTests.cs" />

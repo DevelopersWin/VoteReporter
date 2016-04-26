@@ -6,7 +6,6 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -50,7 +49,7 @@ namespace DragonSpark.Runtime
 
 		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.Self, parameter.Self ) {}
 
-		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( FactoryDefaults<object>.Always )
+		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( Common<object>.Always )
 		{
 			this.command = new Lazy<ICommand>( command );
 			this.parameter = new Lazy<object>( parameter );
@@ -65,7 +64,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class AddItemCommand<T> : Command<T>
+	public class AddItemCommand<T> : CommandBase<T>
 	{
 		readonly IList<T> list;
 
@@ -77,7 +76,7 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( T parameter ) => list.Add( parameter );
 	}
 
-	public class AddItemCommand : Command<object>
+	public class AddItemCommand : CommandBase<object>
 	{
 		readonly IList list;
 
@@ -89,7 +88,7 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( object parameter ) => list.Add( parameter );
 	}
 
-	public class RemoveItemCommand : Command<object>
+	public class RemoveItemCommand : CommandBase<object>
 	{
 		readonly IList list;
 
@@ -101,7 +100,7 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( object parameter ) => list.Remove( parameter );
 	}
 
-	public abstract class DisposingCommand<TParameter> : Command<TParameter>, IDisposable
+	public abstract class DisposingCommand<TParameter> : CommandBase<TParameter>, IDisposable
 	{
 		protected DisposingCommand() {}
 
@@ -137,7 +136,7 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( T parameter ) => factory().ExecuteWith( parameter );
 	}*/
 
-	public class DelegatedCommand : Command<object>
+	public class DelegatedCommand : CommandBase<object>
 	{
 		readonly Action action;
 
@@ -149,7 +148,7 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( object parameter ) => action();
 	}
 
-	public class DelegatedCommand<T> : Command<T>
+	public class DelegatedCommand<T> : CommandBase<T>
 	{
 		readonly Action<T> command;
 
@@ -163,7 +162,7 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( T parameter ) => command( parameter );
 	}
 
-	public class DecoratedCommand<T> : Command<T>
+	public class DecoratedCommand<T> : CommandBase<T>
 	{
 		readonly ICommand<T> inner;
 
@@ -184,7 +183,7 @@ namespace DragonSpark.Runtime
 		Specification() : base( NullSpecification.NotNull ) {}
 	}
 
-	public abstract class DecoratedCommand<TFrom, TTo> : Command<TFrom>
+	public abstract class DecoratedCommand<TFrom, TTo> : CommandBase<TFrom>
 	{
 		readonly Func<TFrom, TTo> transform;
 		readonly ICommand<TTo> inner;
@@ -200,15 +199,15 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( TFrom parameter ) => inner.ExecuteWith( transform( parameter ) );
 	}
 
-	public abstract class Command<TParameter> : ICommand<TParameter>
+	public abstract class CommandBase<TParameter> : ICommand<TParameter>
 	{
 		readonly ISpecification<TParameter> specification;
 
 		public event EventHandler CanExecuteChanged = delegate {};
 
-		protected Command() : this( Specification<TParameter>.Instance ) {}
+		protected CommandBase() : this( Specification<TParameter>.Instance ) {}
 
-		protected Command( ISpecification<TParameter> specification )
+		protected CommandBase( ISpecification<TParameter> specification )
 		{
 			this.specification = specification;
 		}

@@ -12,7 +12,7 @@ using System.Windows.Markup;
 namespace DragonSpark.Setup.Registration
 {
 	[ContentProperty( nameof(Types) )]
-	public class RegisterFrameworkExceptionTypesCommand : Command<object>
+	public class RegisterFrameworkExceptionTypesCommand : CommandBase<object>
 	{
 		[Locate, Required]
 		public ILogger MessageLogger { [return: Required]get; set; }
