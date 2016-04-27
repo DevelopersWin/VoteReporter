@@ -11,65 +11,6 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class CodeContainer<T>
-	{
-		readonly Lazy<int> value;
-
-		public CodeContainer( [Required] params object[] items ) : this( KeyFactory.Instance.Create, items ) {}
-
-		public CodeContainer( Func<IEnumerable<object>, int> factory, [Required] params object[] items )
-		{
-			var all = items.Prepend( typeof(T) ).ToArray();
-			value = new Lazy<int>( () => factory( all ) );
-		}
-
-		public int Code => value.Value;
-	}
-
-	/*[Persistent]
-	class MemberInfoProviderFactory : MemberInfoProviderFactoryBase
-	{
-		public static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory( MemberInfoAttributeProviderFactory.Instance );
-
-		public MemberInfoProviderFactory( MemberInfoAttributeProviderFactory inner ) : base( inner, false ) {}
-	}
-
-	abstract class MemberInfoProviderFactoryBase : FactoryBase<object, IAttributeProvider>
-	{
-		readonly MemberInfoAttributeProviderFactory inner;
-		readonly bool includeRelated;
-
-		protected MemberInfoProviderFactoryBase( [Required]MemberInfoAttributeProviderFactory inner, bool includeRelated )
-		{
-			this.inner = inner;
-			this.includeRelated = includeRelated;
-		}
-
-		[Freeze]
-		protected override IAttributeProvider CreateItem( object parameter )
-		{
-			var item = new MemberInfoAttributeProviderFactory.Parameter( parameter as MemberInfo ?? ( parameter as Type ?? parameter.GetType() ).GetTypeInfo(), includeRelated );
-			var result = inner.Create( item );
-			return result;
-		}
-	}*/
-
-	/*[Persistent]
-	class ExpandedAttributeProviderFactory : AttributeProviderFactoryBase
-	{
-		public static ExpandedAttributeProviderFactory Instance { get; } = new ExpandedAttributeProviderFactory( MemberInfoWithRelatedProviderFactory.Instance );
-
-		public ExpandedAttributeProviderFactory( MemberInfoWithRelatedProviderFactory factory ) : base( factory ) {}
-	}
-
-	[Persistent]
-	class AttributeProviderFactory : AttributeProviderFactoryBase
-	{
-		public static AttributeProviderFactory Instance { get; } = new AttributeProviderFactory( MemberInfoProviderFactory.Instance );
-		
-		public AttributeProviderFactory( MemberInfoProviderFactory factory ) : base( factory ) {}
-	}*/
-
 	class ProviderResolver : FactoryBase<object, IAttributeProvider>
 	{
 		public static ProviderResolver Instance { get; } = new ProviderResolver( TypeDefinitionProvider.Instance );
@@ -93,16 +34,17 @@ namespace DragonSpark.TypeSystem
 		{
 			var definition = projector.Create( parameter );
 			var transformed = transformer.Create( definition );
-			var member = members.Create( transformed );
+			var factory = members.Create( transformed );
+			var member = factory.Create( parameter );
 			var result = provider.Create( member );
 			return result;
 		}
 
-		public class Members : FirstFromParameterFactory<TypeInfo, MemberInfo>
+		public class Members : FirstConstructedFromParameterFactory<object, MemberInfo>
 		{
 			public static Members Instance { get; } = new Members();
 
-			Members() : base( new[] { typeof(TypeInfoStore), typeof(PropertyInfoStore) }.Select( type => new ConstructFromParameterFactory<MemberInfo>( type ) ).Fixed() ) {}
+			Members() : base( typeof(TypeInfoStore), typeof(PropertyInfoStore) ) {}
 		}
 
 		public class PropertyInfoStore : MemberInfoStoreBase<PropertyInfo>
@@ -170,23 +112,25 @@ namespace DragonSpark.TypeSystem
 		abstract class TypeInfoProviderBase<T> : FactoryBase<T, TypeInfo> {}
 	}
 
-	public class MemberInfoProvider : FirstFromParameterFactory<MemberInfo, IAttributeProvider>
+	public class MemberInfoProvider : FirstConstructedFromParameterFactory<IAttributeProvider>
 	{
 		public static MemberInfoProvider Instance { get; } = new MemberInfoProvider();
 
-		MemberInfoProvider() : base( new[] { typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) }.Select( type => new ConstructFromParameterFactory<IAttributeProvider>( type ) ).Fixed() ) {}
+		MemberInfoProvider() : base( typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ) {}
 	}
 
-	public class AttributeProviderFactory : FirstFromParameterFactory<object, IAttributeProvider>, IAttributeProviderLocator
+	public class AttributeProviderFactory : FirstConstructedFromParameterFactory<IAttributeProvider>, IAttributeProviderLocator
 	{
 		public static AttributeProviderFactory Instance { get; } = new AttributeProviderFactory( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(DecoratedProvider) );
 
-		static Func<object,IAttributeProvider>[] Factories { get; } = 
+		/*static Func<object,IAttributeProvider>[] Factories { get; } = 
 			new[] { typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(DecoratedProvider) }
-				.Select( type => new Func<object, IAttributeProvider>( new ConstructFromParameterFactory<IAttributeProvider>( type ).Create ) ).ToArray();
+				.Select( type => new Func<object, IAttributeProvider>( new ConstructFromParameterFactory<IAttributeProvider>( type ).Create ) ).ToArray();*/
 
-		
-		public AttributeProviderFactory( params Type[] types ) : base( types.Select( type => new Func<object, IAttributeProvider>( new ConstructFromParameterFactory<IAttributeProvider>( type ).Create ) ).ToArray() ) {}
+		protected AttributeProviderFactory( params Type[] types ) : base( types/*.Select( type => new Func<object, IAttributeProvider>( new ConstructFromParameterFactory<IAttributeProvider>( type ).Create ) ).ToArray()*/ ) {}
+
+		[Freeze]
+		protected override IAttributeProvider CreateItem( object parameter ) => base.CreateItem( parameter );
 	}
 
 	public interface IAttributeProviderLocator : IFactory<object, IAttributeProvider> {}
@@ -221,12 +165,14 @@ namespace DragonSpark.TypeSystem
 
 	public class PropertyInfoAttributeProvider : MethodInfoAttributeProvider
 	{
-		public PropertyInfoAttributeProvider( PropertyInfo property ) : base( property.GetMethod ) {}
+		public PropertyInfoAttributeProvider( PropertyInfo property ) : base( property, property.GetMethod ) {}
 	}
 
 	public class MethodInfoAttributeProvider : MemberInfoAttributeProvider
 	{
-		public MethodInfoAttributeProvider( MethodInfo method ) : base( method, DerivedMethodSpecification.Instance.IsSatisfiedBy( method ) ) {}
+		public MethodInfoAttributeProvider( MethodInfo method ) : this( method, method ) {}
+
+		public MethodInfoAttributeProvider( MemberInfo member, MethodInfo method ) : base( member, DerivedMethodSpecification.Instance.IsSatisfiedBy( method ) ) {}
 	}
 
 	public class MemberInfoAttributeProvider : AttributeProviderBase

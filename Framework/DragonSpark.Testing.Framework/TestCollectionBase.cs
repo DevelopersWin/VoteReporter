@@ -11,7 +11,6 @@ using PostSharp.Patterns.Model;
 using Serilog.Core;
 using System;
 using System.Reflection;
-using PostSharp.Patterns.Threading;
 using Xunit.Abstractions;
 using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 

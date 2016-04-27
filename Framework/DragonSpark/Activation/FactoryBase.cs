@@ -102,6 +102,17 @@ namespace DragonSpark.Activation
 		public TResult Coerce<TResult>( object parameter, Func<T, TResult> with ) => coercer.Coerce( parameter ).With( with );
 	}
 
+	public class BoxedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	{
+		readonly IFactoryWithParameter inner;
+		public BoxedFactory( IFactoryWithParameter inner )
+		{
+			this.inner = inner;
+		}
+
+		protected override TResult CreateItem( TParameter parameter ) => inner.CreateUsing<TResult>( parameter );
+	}
+
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
 	{
 		readonly ParameterSupport<TParameter> support;
@@ -175,6 +186,39 @@ namespace DragonSpark.Activation
 		protected override T CreateItem() => inner();
 	}
 
+	public class FromKnownFactory<T> : FirstConstructedFromParameterFactory<object>
+	{
+		public FromKnownFactory( KnownTypeFactory factory ) : base( factory.Create( typeof(T) ) ) {}
+
+		public T CreateAs( object parameter ) => (T)Create(	parameter );
+	}
+
+	public class FirstConstructedFromParameterFactory<TParameter, TResult> : FactoryBase<object, IFactory<TParameter, TResult>>
+	{
+		readonly IFactory<object, IFactoryWithParameter>[] factories;
+		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ).Fixed() ) {}
+		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  )
+		{
+			this.factories = factories;
+		}
+
+		protected override IFactory<TParameter, TResult> CreateItem( object parameter )
+		{
+			var boxedFactories = factories
+				.Select( factory => factory.Create( parameter ) )
+				.NotNull()
+				.Select( inner => new BoxedFactory<TParameter, TResult>( inner ) )
+				.ToArray();
+			var result = new FirstFromParameterFactory<TParameter, TResult>( boxedFactories );
+			return result;
+		}
+	}
+
+	public class FirstConstructedFromParameterFactory<TResult> : FirstFromParameterFactory<object, TResult>
+	{
+		public FirstConstructedFromParameterFactory( params Type[] types ) : base( types.Select( type => new ConstructFromParameterFactory<TResult>( type ) ).Fixed() ) {}
+	}
+
 	public class FirstFromParameterFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
 		readonly IEnumerable<Func<TParameter, TResult>> inner;
@@ -238,7 +282,7 @@ namespace DragonSpark.Activation
 	{
 		readonly ISpecification specification;
 
-		protected FactoryBase() : this( AlwaysSpecification<object>.Instance ) {}
+		protected FactoryBase() : this( AlwaysSpecification.Instance ) {}
 
 		protected FactoryBase( [Required]ISpecification specification )
 		{

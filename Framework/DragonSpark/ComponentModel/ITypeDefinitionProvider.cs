@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public interface ITypeDefinitionProvider : ITransformer<TypeInfo>
+	public interface ITypeDefinitionProvider : IFactory<TypeInfo, TypeInfo>
 	{
 		/*var result = type.FromMetadata<MetadataTypeAttribute, Type>( item => item.MetadataClassType );
 		return result;*/

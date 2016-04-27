@@ -4,6 +4,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Threading;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -44,7 +45,19 @@ namespace DragonSpark.Activation
 		{
 			var candidates = new[] { parameters, parameters.NotNull() };
 			var adapter = type.Adapt();
-			var result = candidates.Select( objects => objects.Fixed() ).FirstOrDefault( x => adapter.FindConstructor( x ) != null );
+			var result = candidates
+				.Select( objects => objects.Fixed() )
+				.Select( objects => new { arguments = objects, constructor = adapter.FindConstructor( objects ) } )
+				.Where( arg => arg.constructor != null )
+				.Select( arg => Ensure( arg.constructor.GetParameters(), arg.arguments ) )
+				.FirstOrDefault();
+			return result;
+		}
+
+		static object[] Ensure( IEnumerable<ParameterInfo> parameters, IReadOnlyCollection<object> arguments )
+		{
+			var optional = parameters.Skip( arguments.Count ).Where( info => info.IsOptional ).Select( info => info.DefaultValue );
+			var result = arguments.Concat( optional ).Fixed();
 			return result;
 		}
 

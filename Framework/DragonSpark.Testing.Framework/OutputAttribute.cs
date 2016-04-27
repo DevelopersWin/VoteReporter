@@ -80,7 +80,7 @@ namespace DragonSpark.Testing.Framework
 			protected override IProfiler CreateItem( Parameter parameter )
 			{
 				var output = parameter.Instance.AsTo<ITestOutputAware, Action<string>>( value => value.Output.WriteLine ) ?? IgnoredOutputCommand.Instance.Run;
-				var result = new Diagnostics.ProfilerFactory( output, logger, history ).Create( parameter.Method );
+				var result = new Diagnostics.TraceAwareProfilerFactory( output, logger, history ).Create( parameter.Method );
 				return result;
 			}
 		}

@@ -1,20 +1,11 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
-using DragonSpark.TypeSystem;
 using System;
 using System.Composition;
-using System.Linq;
 
 namespace DragonSpark.Diagnostics
 {
-	public class FromKnownFactory<T> : FirstFromParameterFactory<object, object>
-	{
-		public FromKnownFactory( KnownTypeFactory factory ) : base( factory.Create( typeof(T) ).Select( type => new ConstructFromParameterFactory( type ) ).Fixed() ) {}
-
-		public T CreateAs( object parameter ) => (T)Create(	parameter );
-	}
-
 	[Persistent, Shared]
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, object>
 	{

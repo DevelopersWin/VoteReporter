@@ -264,6 +264,7 @@
     <Compile Include="Runtime\Specifications\SpecificationBase.cs" />
     <Compile Include="Runtime\Specifications\SpecificationExtensions.cs" />
     <Compile Include="TypeSystem\Attributes.cs" />
+    <Compile Include="TypeSystem\CodeContainer.cs" />
     <Compile Include="TypeSystem\Default.cs" />
     <Compile Include="TypeSystem\DefaultFactory.cs" />
     <Compile Include="TypeSystem\DerivedMethodSpecification.cs" />
@@ -384,7 +385,7 @@
     <Compile Include="Runtime\ApplicationInformation.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ComponentModel\TypeDefinitionProvider.cs">
+    <Compile Include="ComponentModel\ConventionTypeDefinitionProvider.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ComponentModel\CurrentTimeAttribute.cs" />

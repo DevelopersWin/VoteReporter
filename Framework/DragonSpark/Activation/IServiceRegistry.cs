@@ -24,7 +24,7 @@ namespace DragonSpark.Activation
 	{
 		public static IsATypeSpecification Instance { get; } = new IsATypeSpecification();
 
-		public IsATypeSpecification() : base( AlwaysSpecification<object>.Instance ) { }
+		public IsATypeSpecification() : base( AlwaysSpecification.Instance ) { }
 	}
 
 	public class OnlyIfNotRegistered : BoxedSpecification<Type>

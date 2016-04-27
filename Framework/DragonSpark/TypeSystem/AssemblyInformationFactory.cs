@@ -1,9 +1,9 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation;
 
 namespace DragonSpark.TypeSystem
 {
@@ -24,7 +24,7 @@ namespace DragonSpark.TypeSystem
 		{
 			var result = new AssemblyInformation { Version = parameter.GetName().Version };
 			Attributes.Select( parameter.GetCustomAttribute ).Cast<object>().NotNull().Each( item => item.MapInto( result ) );
-			result.Configuration = result.Configuration.NullIfEmpty() ?? TypeSystem.Attributes.Get( parameter ).From<DebuggableAttribute, string>( attribute => "DEBUG" );
+			result.Configuration = result.Configuration.NullIfEmpty() ?? parameter.From<DebuggableAttribute, string>( attribute => "DEBUG" );
 			return result;
 		}
 	}

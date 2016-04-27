@@ -8,7 +8,7 @@ namespace DragonSpark.Setup.Commands
 {
 	public class ServicedCommand<TCommand, TParameter> : CommandBase<object> where TCommand : ICommand<TParameter>
 	{
-		public ServicedCommand() : base( AlwaysSpecification<object>.Instance ) {}
+		public ServicedCommand() : base( AlwaysSpecification.Instance ) {}
 
 		public ServicedCommand( ISpecification<object> specification ) : base( specification ) {}
 

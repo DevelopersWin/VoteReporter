@@ -214,7 +214,7 @@
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
-    <Compile Include="ComponentModel\AttributeProviderTests.cs">
+    <Compile Include="TypeSystem\AttributesTests.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Aspects\BuildUpTests.cs" />
@@ -280,7 +280,6 @@
     <Compile Include="TypeSystem\DerivedMethodSpecificationTests.cs" />
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
     <Compile Include="TypeSystem\KnownTypeFactoryTests.cs" />
-    <Compile Include="TypeSystem\MemberInfoAttributeProviderFactoryTests.cs" />
     <Compile Include="TypeSystem\RegistrationTests.cs" />
     <Compile Include="TypeSystem\TypeAdapterTests.cs" />
   </ItemGroup>

@@ -144,7 +144,7 @@ namespace DragonSpark.Activation.IoC
 			HasConventionSpecification convention, 
 			ContainsSingletonSpecification singleton, 
 			HasFactorySpecification factory )
-				: base( registered.Or( strategies ).Or( convention.Wrap<LocateTypeRequest>( request => request.RequestedType ) ).Or( singleton.Wrap<LocateTypeRequest>( request => request.RequestedType ) ).Or( factory ) ) {}
+				: base( registered.Or( strategies ).Or( convention.Box<LocateTypeRequest>( request => request.RequestedType ) ).Or( singleton.Box<LocateTypeRequest>( request => request.RequestedType ) ).Or( factory ) ) {}
 	}
 
 	public class ConstructorFactory : FactoryBase<LocateTypeRequest, ConstructorInfo>

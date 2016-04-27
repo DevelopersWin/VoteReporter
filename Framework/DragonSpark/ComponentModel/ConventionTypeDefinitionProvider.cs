@@ -1,13 +1,27 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Setup.Registration;
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class TypeDefinitionProvider : TransformerBase<TypeInfo>, ITypeDefinitionProvider
+	[Persistent]
+	public class TypeDefinitionProvider : FirstFromParameterFactory<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
 		public static TypeDefinitionProvider Instance { get; } = new TypeDefinitionProvider();
+
+		protected TypeDefinitionProvider( params ITypeDefinitionProvider[] others ) : base( others.Concat( new IFactory<TypeInfo, TypeInfo>[] { ConventionTypeDefinitionProvider.Instance, SelfTransformer<TypeInfo>.Instance } ).Fixed() ) {}
+
+		[Freeze]
+		protected override TypeInfo CreateItem( TypeInfo parameter ) => base.CreateItem( parameter );
+	}
+
+	public class ConventionTypeDefinitionProvider : FactoryBase<TypeInfo, TypeInfo>, ITypeDefinitionProvider
+	{
+		public static ConventionTypeDefinitionProvider Instance { get; } = new ConventionTypeDefinitionProvider();
 
 		protected override TypeInfo CreateItem( TypeInfo parameter )
 		{

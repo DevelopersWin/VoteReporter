@@ -13,15 +13,19 @@ namespace DragonSpark.Diagnostics
 {
 	public class MethodLoggerFactory : FactoryBase<MethodBase, ILogger>
 	{
-		readonly ILogger logger;
+		public static MethodLoggerFactory Instance { get; } = new MethodLoggerFactory();
 
-		public MethodLoggerFactory( ILogger logger )
+		readonly Func<ILogger> source;
+
+		public MethodLoggerFactory() : this( Services.Get<ILogger> ) {}
+
+		public MethodLoggerFactory( Func<ILogger> source )
 		{
-			this.logger = logger;
+			this.source = source;
 		}
 
 		[Freeze]
-		protected override ILogger CreateItem( MethodBase parameter ) => logger.ForSource( parameter );
+		protected override ILogger CreateItem( MethodBase parameter ) => source().ForSource( parameter );
 	}
 
 	public delegate void EmitProfileEvent( string name );
@@ -191,7 +195,7 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public class TimerEventHandler : DecoratedCommand<TimerEvent>
+	public class TimerEventHandler : BoxedCommand<string>
 	{
 		public TimerEventHandler( CreateProfilerEvent projection, Action<TimerEvent> inner ) : base( new DelegatedCommand<TimerEvent>( inner, new Projector<string,TimerEvent>( new Func<string, TimerEvent>( projection ) ) )  ) {}
 	}

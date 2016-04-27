@@ -1,11 +1,28 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
+using DragonSpark.TypeSystem;
 using Xunit;
 
-namespace DragonSpark.Testing.ComponentModel
+namespace DragonSpark.Testing.TypeSystem
 {
-	public class AttributeProviderTests
+	public class AttributesTests
 	{
+		public string PropertyName { get; set; }
+
+		[Fact]
+		public void SameInstances()
+		{
+			var propertyInfo = GetType().GetProperty( nameof(PropertyName) );
+			
+			var sut = Attributes.Get( propertyInfo );
+			Assert.Same( sut, Attributes.Get( propertyInfo ) );
+
+			var firstAll = sut.GetAttributes<Attribute>();
+			var secondAll = sut.GetAttributes<Attribute>();
+
+			Assert.Same( firstAll, secondAll );
+		}
+
 		[Fact]
 		void ClassAttribute()
 		{
@@ -54,14 +71,14 @@ namespace DragonSpark.Testing.ComponentModel
 		[Fact]
 		void ConventionProperty()
 		{
-			var attribute = typeof(Convention).GetProperty( "Property" ).GetAttribute<Attribute>();
+			var attribute = typeof(Convention).GetProperty( nameof(Objects.Convention.Property) ).GetAttribute<Attribute>();
 			Assert.Equal( "This is a property attribute through convention.", attribute.PropertyName );
 		}
 
 		[Fact]
 		void PropertyAttribute()
 		{
-			var attribute = typeof(Decorated).GetProperty( "Property" ).GetAttribute<Attribute>();
+			var attribute = typeof(Decorated).GetProperty( nameof(Objects.Decorated.Property) ).GetAttribute<Attribute>();
 			Assert.Equal( "This is a property attribute.", attribute.PropertyName );
 		}
 	}

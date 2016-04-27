@@ -182,7 +182,7 @@ namespace DragonSpark.Activation.IoC
 		readonly Func<Type, ITypeCandidateWeightProvider> weight;
 		readonly ISpecification<Type> specification;
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, type => new TypeCandidateWeightProvider( type ), CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).Wrap<Type>(), CanBuildSpecification.Instance.Inverse() ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, type => new TypeCandidateWeightProvider( type ), CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).Box<Type>(), CanBuildSpecification.Instance.Inverse() ) {}
 
 		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, Func<Type, ITypeCandidateWeightProvider> weight, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
 		{
@@ -253,7 +253,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
 	{
-		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance.Wrap<Type>( type => type.Assembly() ) );
+		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance.Box<Type>( type => type.Assembly() ) );
 
 		public AllTypesInCandidateAssemblyStrategy( [Required] ISpecification<Type> specification ) : base( specification ) {}
 
@@ -293,7 +293,7 @@ namespace DragonSpark.Activation.IoC
 		protected override bool Verify( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();
-			var result = parameter != typeof(object) && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && !typeof(Delegate).Adapt().IsAssignableFrom( parameter ) && ( info.IsPublic || new AssemblyAttributeProvider( info.Assembly ).Has<RegistrationAttribute>() );
+			var result = parameter != typeof(object) && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && !typeof(Delegate).Adapt().IsAssignableFrom( parameter ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
 			return result;
 		}
 	}
@@ -320,7 +320,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionStrategy : BuilderStrategy
 	{
-		static ISpecification<IBuilderContext> Specification { get; } = new BoxedSpecification<IBuilderContext>( CanBuildSpecification.Instance.Wrap<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ) ).Inverse();
+		static ISpecification<IBuilderContext> Specification { get; } = new BoxedSpecification<IBuilderContext>( CanBuildSpecification.Instance.Box<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ) ).Inverse();
 
 		readonly ConventionCandidateLocator locator;
 		readonly IServiceRegistry registry;

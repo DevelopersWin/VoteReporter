@@ -236,7 +236,7 @@ namespace DragonSpark.Setup
 			Services = provider;
 		}
 
-		protected Application( IEnumerable<ICommand> commands ) : base( new OnlyOnceSpecification().Wrap<TParameter>(), commands.ToArray() ) {}
+		protected Application( IEnumerable<ICommand> commands ) : base( new OnlyOnceSpecification().Box<TParameter>(), commands.ToArray() ) {}
 
 		[Required]
 		public IServiceProvider Services { [return: Required]get; set; }

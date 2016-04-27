@@ -9,7 +9,6 @@ using DragonSpark.Testing.Objects;
 using System.Composition;
 using System.Composition.Convention;
 using System.Composition.Hosting;
-using System.Linq;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;

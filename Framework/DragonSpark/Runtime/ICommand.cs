@@ -49,7 +49,7 @@ namespace DragonSpark.Runtime
 
 		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.Self, parameter.Self ) {}
 
-		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( AlwaysSpecification<object>.Instance )
+		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( AlwaysSpecification.Instance )
 		{
 			this.command = new Lazy<ICommand>( command );
 			this.parameter = new Lazy<object>( parameter );
@@ -124,7 +124,7 @@ namespace DragonSpark.Runtime
 
 	public class DelegatedCommand : DelegatedCommand<object>
 	{
-		public DelegatedCommand( Action action ) : base( o => action(), AlwaysSpecification<object>.Instance ) {}
+		public DelegatedCommand( Action action ) : base( o => action(), AlwaysSpecification.Instance ) {}
 	}
 
 	public class DelegatedCommand<T> : CommandBase<T>
@@ -198,6 +198,6 @@ namespace DragonSpark.Runtime
 
 		bool ICommand.CanExecute( object parameter ) => support.IsValid( parameter );
 
-		public void Execute( object parameter ) => support.Coerce( parameter, Execute );
+		void ICommand.Execute( object parameter ) => support.Coerce( parameter, Execute );
 	}
 }
