@@ -320,7 +320,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionStrategy : BuilderStrategy
 	{
-		static ISpecification<IBuilderContext> Specification { get; } = new DecoratedSpecification<IBuilderContext>( CanBuildSpecification.Instance.Wrap<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ) ).Inverse();
+		static ISpecification<IBuilderContext> Specification { get; } = new BoxedSpecification<IBuilderContext>( CanBuildSpecification.Instance.Wrap<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ) ).Inverse();
 
 		readonly ConventionCandidateLocator locator;
 		readonly IServiceRegistry registry;

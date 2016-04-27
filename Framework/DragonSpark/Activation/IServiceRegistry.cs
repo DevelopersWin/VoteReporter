@@ -24,10 +24,10 @@ namespace DragonSpark.Activation
 	{
 		public static IsATypeSpecification Instance { get; } = new IsATypeSpecification();
 
-		public IsATypeSpecification() : base( AlwaysSpecification.Instance ) { }
+		public IsATypeSpecification() : base( AlwaysSpecification<object>.Instance ) { }
 	}
 
-	public class OnlyIfNotRegistered : DecoratedSpecification<Type>
+	public class OnlyIfNotRegistered : BoxedSpecification<Type>
 	{
 		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse(), type => new LocateTypeRequest( type ) ) { }
 	}

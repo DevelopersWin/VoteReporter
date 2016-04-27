@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ICommand = System.Windows.Input.ICommand;
@@ -7,6 +8,10 @@ namespace DragonSpark.Extensions
 {
 	public static class CommandExtensions
 	{
+		public static ICommand<T> Box<T>( this ICommand @this ) => Box<T>( @this, t => t );
+
+		public static ICommand<T> Box<T>( this ICommand @this, Func<T, object> box ) => new BoxedCommand<T>( @this, box );
+
 		public static IEnumerable<T> ExecuteMany<T>( this IEnumerable<T> @this, object parameter ) where T : ICommand => @this.Select( x => x.Executed( parameter ) ).NotNull().ToArray();
 
 		public static void Run<T>( this ICommand<T> @this ) => @this.Run( default(T) );

@@ -49,7 +49,7 @@ namespace DragonSpark.Runtime
 
 		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.Self, parameter.Self ) {}
 
-		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( Common<object>.Always )
+		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( AlwaysSpecification<object>.Instance )
 		{
 			this.command = new Lazy<ICommand>( command );
 			this.parameter = new Lazy<object>( parameter );
@@ -122,43 +122,22 @@ namespace DragonSpark.Runtime
 		protected virtual void OnDispose() {}
 	}
 
-	/*public class DeferredCommand<TCommand, T> : Command<T> where TCommand : ICommand<T>
+	public class DelegatedCommand : DelegatedCommand<object>
 	{
-		readonly Func<TCommand> factory;
-
-		public DeferredCommand() : this( Services.Get<TCommand> ) {}
-
-		public DeferredCommand( [Required]Func<TCommand> factory )
-		{
-			this.factory = factory;
-		}
-
-		protected override void OnExecute( T parameter ) => factory().ExecuteWith( parameter );
-	}*/
-
-	public class DelegatedCommand : CommandBase<object>
-	{
-		readonly Action action;
-
-		public DelegatedCommand( Action action )
-		{
-			this.action = action;
-		}
-
-		protected override void OnExecute( object parameter ) => action();
+		public DelegatedCommand( Action action ) : base( o => action(), AlwaysSpecification<object>.Instance ) {}
 	}
 
 	public class DelegatedCommand<T> : CommandBase<T>
 	{
 		readonly Action<T> command;
 
-		public DelegatedCommand( Action<T> command ) : this( command, Specification<T>.Instance ) {}
+		public DelegatedCommand( Action<T> command ) : this( command, NotNullSpecification<T>.Instance ) {}
 
-		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : this( command, specification, Coercer<T>.Instance ) {}
+		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : this( command, Coercer<T>.Instance, specification ) {}
 
-		public DelegatedCommand( Action<T> command, ICoercer<T> coercer ) : this( command, Specification<T>.Instance, coercer ) {}
+		public DelegatedCommand( Action<T> command, ICoercer<T> coercer ) : this( command, coercer, NotNullSpecification<T>.Instance ) {}
 
-		public DelegatedCommand( Action<T> command, ISpecification<T> specification, ICoercer<T> coercer ) : base( specification, coercer )
+		public DelegatedCommand( Action<T> command, ICoercer<T> coercer, ISpecification<T> specification ) : base( coercer, specification )
 		{
 			this.command = command;
 		}
@@ -166,37 +145,26 @@ namespace DragonSpark.Runtime
 		protected override void OnExecute( T parameter ) => command( parameter );
 	}
 
-	public class DecoratedCommand<T> : CommandBase<T>
+	public class BoxedCommand<T> : CommandBase<T>
 	{
-		readonly ICommand<T> inner;
+		readonly ICommand command;
+		readonly Func<T, object> box;
 
-		public DecoratedCommand( [Required]ICommand<T> inner )
+		public BoxedCommand( ICommand command ) : this( command, t => t ) {}
+
+		public BoxedCommand( ICommand command, Func<T, object> box )
 		{
-			this.inner = inner;
+			this.command = command;
+			this.box = box;
 		}
 
-		protected override void OnExecute( T parameter ) => inner.Execute( parameter );
+		protected override void OnExecute( T parameter ) => command.Execute( box( parameter ) );
 	}
 
-	public abstract class DecoratedCommand<TFrom, TTo> : CommandBase<TTo>
+	public class DecoratedCommand<T> : DelegatedCommand<T>
 	{
-		readonly ICommand<TTo> inner;
-
-		protected DecoratedCommand( Func<TFrom, TTo> projection, ICommand<TTo> inner ) : base( new Projector<TFrom, TTo>( projection ) )
-		{
-			this.inner = inner;
-		}
-
-		public override bool CanExecute( TTo parameter ) => inner.CanExecute( parameter );
-
-		protected override void OnExecute( TTo parameter ) => inner.Execute( parameter );
-	}
-
-	public class Specification<TParameter> : DecoratedSpecification<TParameter>
-	{
-		public static Specification<TParameter> Instance { get; } = new Specification<TParameter>();
-
-		Specification() : base( NullSpecification.NotNull ) {}
+		public DecoratedCommand( [Required]ICommand<T> inner ) : this( inner, Coercer<T>.Instance ) {}
+		public DecoratedCommand( [Required]ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
 	}
 
 	public abstract class CommandBase<T> : ICommand<T>
@@ -207,11 +175,11 @@ namespace DragonSpark.Runtime
 
 		protected CommandBase() : this( Coercer<T>.Instance ) {}
 
-		protected CommandBase( [Required]ICoercer<T> coercer ) : this( Common<T>.Always, coercer ) {}
+		protected CommandBase( [Required]ICoercer<T> coercer ) : this( coercer, AlwaysSpecification<T>.Instance ) {}
 
-		protected CommandBase( [Required]ISpecification<T> specification ) : this( specification, Coercer<T>.Instance ) {}
+		protected CommandBase( [Required]ISpecification<T> specification ) : this( Coercer<T>.Instance, specification ) {}
 
-		protected CommandBase( [Required]ISpecification<T> specification, [Required]ICoercer<T> coercer ) : this( new ParameterSupport<T>( specification, coercer ) ) {}
+		protected CommandBase( [Required]ICoercer<T> coercer, [Required]ISpecification<T> specification ) : this( new ParameterSupport<T>( specification, coercer ) ) {}
 
 		CommandBase( ParameterSupport<T> support )
 		{

@@ -15,7 +15,7 @@ namespace DragonSpark.Activation.IoC
 	interface IHandleTypeRequestSpecification : ISpecification<TypeRequest> {}
 
 	[Persistent]
-	class HandleTypeRequestSpecification : DecoratedSpecification<TypeRequest>, IHandleTypeRequestSpecification
+	class HandleTypeRequestSpecification : BoxedSpecification<TypeRequest>, IHandleTypeRequestSpecification
 	{
 		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ) ) {}
 
@@ -33,7 +33,7 @@ namespace DragonSpark.Activation.IoC
 		protected IPolicyList Policies { get; }
 	}
 
-	public class RegisteredSpecification : DecoratedSpecification<TypeRequest>
+	public class RegisteredSpecification : BoxedSpecification<TypeRequest>
 	{
 		public RegisteredSpecification( InstanceSpecification instance, IsRegisteredSpecification registered, HasRegisteredBuildPolicySpecification registeredBuildPolicy )
 			: base( instance.Or( registered.And( registeredBuildPolicy ) ) ) {}
@@ -53,14 +53,14 @@ namespace DragonSpark.Activation.IoC
 		protected override bool Verify( TypeRequest parameter ) => !( Policies.GetNoDefault<IBuildPlanPolicy>( parameter, false ) is DynamicMethodBuildPlan );
 	}
 
-	public class StrategySpecification : DecoratedSpecification<TypeRequest>
+	public class StrategySpecification : BoxedSpecification<TypeRequest>
 	{
 		readonly static ISpecification<StrategyValidatorParameter>[] DefaultValidators = { ArrayStrategyValidator.Instance, EnumerableStrategyValidator.Instance };
 
 		public StrategySpecification( IStagedStrategyChain strategies ) : this( strategies, DefaultValidators ) {}
 
 		protected StrategySpecification( IStagedStrategyChain strategies, [Required] IEnumerable<ISpecification<StrategyValidatorParameter>> validators ) 
-			: base( validators.Any(), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
+			: base( new AnySpecification( validators.ToArray() ), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
 	}
 
 	public class ContainsSingletonSpecification : SpecificationBase<Type>
@@ -136,7 +136,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	public class ResolvableTypeSpecification : DecoratedSpecification<TypeRequest>
+	public class ResolvableTypeSpecification : BoxedSpecification<TypeRequest>
 	{
 		public ResolvableTypeSpecification( 
 			RegisteredSpecification registered, 

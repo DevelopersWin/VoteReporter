@@ -1,9 +1,9 @@
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Composition.Hosting.Core;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Composition
 {
@@ -31,7 +31,7 @@ namespace DragonSpark.Composition
 
 		public static FactoryDelegateTransformer InstanceWithParameter { get; } = new FactoryDelegateTransformer( typeof(Func<,>) );
 
-		public FactoryDelegateTransformer( [OfFactoryType]Type factoryDelegateType ) : base( new DecoratedSpecification<CompositionContract>( new GenericTypeAssignableSpecification( factoryDelegateType ), contract => contract.ContractType ) ) {}
+		public FactoryDelegateTransformer( [OfFactoryType]Type factoryDelegateType ) : base( new BoxedSpecification<CompositionContract>( new GenericTypeAssignableSpecification( factoryDelegateType ), contract => contract.ContractType ) ) {}
 
 		protected override CompositionContract CreateItem( CompositionContract parameter ) => Factory.GetResultType( parameter.ContractType ).With( parameter.ChangeType );
 	}

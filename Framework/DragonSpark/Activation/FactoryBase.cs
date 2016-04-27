@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
@@ -75,31 +74,32 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public static class Common<T>
+	public class ParameterSupport<T> : CoercionSupport<T>
 	{
-		public static ISpecification<T> Always { get; } = AlwaysSpecification.Instance.Wrap<T>();
-
-		// public static ICoercer<T> Coercer { get; } = Coercer<T>.Instance;
-	}
-
-	public class ParameterSupport<TParameter>
-	{
-		readonly ISpecification<TParameter> specification;
-		readonly ICoercer<TParameter> coercer;
-
-		public ParameterSupport( [Required]ISpecification<TParameter> specification, [Required]ICoercer<TParameter> coercer )
+		readonly ISpecification<T> specification;
+		
+		public ParameterSupport( [Required]ISpecification<T> specification, [Required]ICoercer<T> coercer ) : base( coercer )
 		{
 			this.specification = specification;
-			this.coercer = coercer;
 		}
 
 		public bool IsValid( object parameter ) => Coerce( parameter, IsValid );
 
-		public bool IsValid( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		public bool IsValid( T parameter ) => specification.IsSatisfiedBy( parameter );
+	}
 
-		public void Coerce( object parameter, Action<TParameter> with ) => coercer.Coerce( parameter ).With( with );
+	public class CoercionSupport<T>
+	{
+		readonly ICoercer<T> coercer;
 
-		public T Coerce<T>( object parameter, Func<TParameter, T> with ) => coercer.Coerce( parameter ).With( with );
+		public CoercionSupport( ICoercer<T> coercer )
+		{
+			this.coercer = coercer;
+		}
+
+		public void Coerce( object parameter, Action<T> with ) => coercer.Coerce( parameter ).With( with );
+
+		public TResult Coerce<TResult>( object parameter, Func<T, TResult> with ) => coercer.Coerce( parameter ).With( with );
 	}
 
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
@@ -108,7 +108,7 @@ namespace DragonSpark.Activation
 
 		protected FactoryBase() : this( Coercer<TParameter>.Instance ) {}
 
-		protected FactoryBase( [Required]ICoercer<TParameter> coercer ) : this( Common<TParameter>.Always, coercer ) {}
+		protected FactoryBase( [Required]ICoercer<TParameter> coercer ) : this( AlwaysSpecification<TParameter>.Instance, coercer ) {}
 
 		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( specification, Coercer<TParameter>.Instance ) {}
 
@@ -151,7 +151,7 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<TParameter, TResult> inner;
 
-		public DecoratedFactory( Func<TParameter, TResult> inner ) : this( Common<TParameter>.Always, inner ) {}
+		public DecoratedFactory( Func<TParameter, TResult> inner ) : this( AlwaysSpecification<TParameter>.Instance, inner ) {}
 
 		public DecoratedFactory( [Required]ISpecification<TParameter> specification, [Required]Func<TParameter, TResult> inner ) : base( specification )
 		{
@@ -165,7 +165,7 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<T> inner;
 
-		public DecoratedFactory( Func<T> provider ) : this( Specification<T>.Instance, provider ) {}
+		public DecoratedFactory( Func<T> provider ) : this( NotNullSpecification<T>.Instance, provider ) {}
 
 		public DecoratedFactory( [Required]ISpecification<T> specification, [Required]Func<T> inner ) : base( specification )
 		{
@@ -238,7 +238,7 @@ namespace DragonSpark.Activation
 	{
 		readonly ISpecification specification;
 
-		protected FactoryBase() : this( AlwaysSpecification.Instance ) {}
+		protected FactoryBase() : this( AlwaysSpecification<object>.Instance ) {}
 
 		protected FactoryBase( [Required]ISpecification specification )
 		{

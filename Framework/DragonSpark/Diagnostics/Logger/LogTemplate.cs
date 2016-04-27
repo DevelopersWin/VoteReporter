@@ -1,5 +1,5 @@
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using Dynamitey;
 using Serilog;
 using Serilog.Events;
 using System;
@@ -55,8 +55,8 @@ namespace DragonSpark.Diagnostics.Logger
 		public LogExceptionCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, template => new object[] { template.Exception, template.Template, template.Parameters } ) {}
 	}
 
-	public class Handler<T> : DecoratedCommand<T, ILoggerTemplate>
+	public class Handler<T> : DecoratedCommand<T>
 	{
-		public Handler( ILogger logger, LogEventLevel level, Func<T, ILoggerTemplate> projection ) : base( projection, new LogTemplateCommand( logger, level ) ) {}
+		public Handler( ILogger logger, LogEventLevel level, Func<T, ILoggerTemplate> projection ) : base( new LogTemplateCommand( logger, level ).Box( projection ) ) {}
 	}
 }

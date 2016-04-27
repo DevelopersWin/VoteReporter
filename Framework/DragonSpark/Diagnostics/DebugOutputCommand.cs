@@ -1,7 +1,7 @@
-using System;
-using System.Diagnostics;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using System;
+using System.Diagnostics;
 
 namespace DragonSpark.Diagnostics
 {
@@ -21,7 +21,7 @@ namespace DragonSpark.Diagnostics
 
 	public class DelegatedTextCommand : DelegatedCommand<string>
 	{
-		public DelegatedTextCommand( Action<string> action ) : this( action, Specification<string>.Instance ) {}
+		public DelegatedTextCommand( Action<string> action ) : this( action, AlwaysSpecification<string>.Instance ) {}
 
 		public DelegatedTextCommand( Action<string> action, ISpecification<string> specification ) : base( action, specification ) {}
 	}

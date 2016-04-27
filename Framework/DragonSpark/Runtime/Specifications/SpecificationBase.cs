@@ -1,30 +1,29 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class InverseSpecification : ISpecification
+	public class InverseSpecification<T> : SpecificationBase<T>
 	{
-		readonly ISpecification inner;
+		readonly ISpecification<T> inner;
 
-		public InverseSpecification( [Required]ISpecification inner )
+		public InverseSpecification( [Required]ISpecification<T> inner )
 		{
 			this.inner = inner;
 		}
 
-		public bool IsSatisfiedBy( object context ) => !inner.IsSatisfiedBy( context );
+		protected override bool Verify( T parameter ) => !inner.IsSatisfiedBy( parameter );
 	}
 	
-	public class NullSpecification : ISpecification<object>
+	public class NotNullSpecification<T> : SpecificationBase<T>
 	{
-		public static NullSpecification Instance { get; } = new NullSpecification();
+		public static ISpecification<T> Instance { get; } = new NotNullSpecification<T>();
 
-		public static InverseSpecification NotNull { get; } = new InverseSpecification( Instance );
+		// public static ISpecification<T> Null { get; } = Instance.Inverse();
 
-		bool ISpecification<object>.IsSatisfiedBy( object parameter ) => IsSatisfiedBy( parameter );
-
-		public bool IsSatisfiedBy( object context ) => context.IsNull();
+		protected override bool Verify( T parameter ) => !parameter.IsNull();
 	}
 
 	public class CheckSpecification<T> : SpecificationBase<T>
@@ -32,12 +31,23 @@ namespace DragonSpark.Runtime.Specifications
 		protected override bool Verify( T parameter ) => new Checked( parameter, this ).Value.Apply();
 	}
 
-	public abstract class SpecificationBase<TParameter> : ISpecification<TParameter>
+	public abstract class SpecificationBase<T> : ISpecification<T>
 	{
-		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter.AsTo<TParameter, bool>( IsSatisfiedBy );
+		readonly CoercionSupport<T> support;
 
-		public bool IsSatisfiedBy( TParameter parameter ) => Verify( parameter );
+		protected SpecificationBase() : this( Coercer<T>.Instance ) {}
 
-		protected abstract bool Verify( TParameter parameter );
+		protected SpecificationBase( ICoercer<T> coercer ) : this( new CoercionSupport<T>( coercer ) ) {}
+
+		SpecificationBase( CoercionSupport<T> support )
+		{
+			this.support = support;
+		}
+
+		bool ISpecification.IsSatisfiedBy( object parameter ) => support.Coerce( parameter, Verify );
+
+		public bool IsSatisfiedBy( T parameter ) => Verify( parameter );
+
+		protected abstract bool Verify( T parameter );
 	}
 }

@@ -1,10 +1,9 @@
 namespace DragonSpark.Runtime.Specifications
 {
-	public class AlwaysSpecification : FixedSpecification
+	public class AlwaysSpecification<T> : BoxedSpecification<T>
 	{
-		public static AlwaysSpecification Instance { get; } = new AlwaysSpecification();
+		public static AlwaysSpecification<T> Instance { get; } = new AlwaysSpecification<T>();
 
-		AlwaysSpecification() : base( true )
-		{}
+		AlwaysSpecification() : base( new FixedSpecification( true ) ) {}
 	}
 }

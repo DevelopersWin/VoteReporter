@@ -1,4 +1,3 @@
-using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -9,7 +8,7 @@ namespace DragonSpark.Setup.Commands
 {
 	public class ServicedCommand<TCommand, TParameter> : CommandBase<object> where TCommand : ICommand<TParameter>
 	{
-		public ServicedCommand() : base( Common<object>.Always ) {}
+		public ServicedCommand() : base( AlwaysSpecification<object>.Instance ) {}
 
 		public ServicedCommand( ISpecification<object> specification ) : base( specification ) {}
 

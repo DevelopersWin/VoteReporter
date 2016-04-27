@@ -1,33 +1,48 @@
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Activation;
 using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class DecoratedSpecification<T> : SpecificationBase<T>
+	public class DecoratedSpecification<T> : DelegatedSpecification<T>
 	{
-		readonly ISpecification inner;
-		readonly Func<T, object> transform;
+		public DecoratedSpecification( ISpecification<T> inner ) : this( inner, Coercer<T>.Instance ) {}
+		public DecoratedSpecification( ISpecification<T> inner, ICoercer<T> coercer ) : base( inner.IsSatisfiedBy, coercer ) {}
+	}
 
-		public DecoratedSpecification( [Required]ISpecification inner  ) : this( inner, t => t ) {}
+	public class BoxedSpecification<T> : SpecificationBase<T>
+	{
+		readonly ISpecification specification;
+		readonly Func<T, object> box;
 
-		public DecoratedSpecification( [Required]ISpecification inner, [Required]Func<T, object> transform )
+		public BoxedSpecification( ISpecification specification ) : this( specification, t => t ) {}
+
+		public BoxedSpecification( ISpecification specification, Func<T, object> box )
 		{
-			this.inner = inner;
-			this.transform = transform;
+			this.specification = specification;
+			this.box = box;
 		}
 
-		// [Freeze]
-		protected override bool Verify( T parameter ) => inner.IsSatisfiedBy( transform( parameter ) );
+		protected override bool Verify( T parameter ) => specification.IsSatisfiedBy( box( parameter ) );
+	}
+
+	public class DelegatedSpecification<T> : SpecificationBase<T>
+	{
+		readonly Func<T, bool> @delegate;
+
+		public DelegatedSpecification( Func<T, bool> @delegate ) : this( @delegate, Coercer<T>.Instance ) {}
+
+		public DelegatedSpecification( Func<T, bool> @delegate, ICoercer<T> coercer ) : base( coercer )
+		{
+			this.@delegate = @delegate;
+		}
+
+		protected override bool Verify( T parameter ) => @delegate( parameter );
 	}
 
 	public class OnlyOnceSpecification : SpecificationBase<object>
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
-		protected override bool Verify( object parameter )
-		{
-			var verify = monitor.Apply();
-			return verify;
-		}
+		protected override bool Verify( object parameter ) => monitor.Apply();
 	}
 }
