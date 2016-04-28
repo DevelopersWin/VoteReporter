@@ -6,11 +6,14 @@ using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
-	[Persistent, Shared]
+	[Persistent, Shared, Export]
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, object>
 	{
+		public static FormatterFactory Instance { get; } = new FormatterFactory( FromKnownFactory<IFormattable>.Instance );
+
 		readonly Func<object, IFormattable> factory;
 
+		[ImportingConstructor]
 		public FormatterFactory( FromKnownFactory<IFormattable> factory ) : this( factory.CreateAs ) {}
 
 		public FormatterFactory( Func<object, IFormattable> factory )

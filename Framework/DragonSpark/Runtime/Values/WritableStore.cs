@@ -27,6 +27,8 @@ namespace DragonSpark.Runtime.Values
 		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
 
 		protected virtual void OnDispose() {}
+
+		void IWritableStore.Assign( object item ) => CoercionSupport<T>.Instance.Coerce( item, Assign );
 	}
 
 	public class ExecutionContextStore<T> : DeferredStore<T>

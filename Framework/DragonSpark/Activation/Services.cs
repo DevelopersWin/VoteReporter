@@ -8,11 +8,6 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	/*public interface IServiceProviderSource : IStore<IServiceProvider>
-	{
-		bool IsAvailable { get; }
-	}*/
-
 	public static class Services
 	{
 		static Services()

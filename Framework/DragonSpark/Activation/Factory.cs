@@ -6,7 +6,6 @@ using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -126,7 +125,7 @@ namespace DragonSpark.Activation
 			var info = context( parameter ).GetTypeInfo();
 			var nestedTypes = info.DeclaredNestedTypes.ToArray();
 			var all = nestedTypes.Concat( info.Assembly.DefinedTypes.Except( nestedTypes ) );
-			var location = all.AsTypes().Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
+			var location = FactoryTypeFactory.Instance.CreateMany( all.AsTypes() );
 			var mapped = new LocateTypeRequest( type( parameter ) );
 			var locators = new[] { new FactoryTypeRequestLocator( location ), locator };
 			var result = locators.FirstWhere( typeLocator => typeLocator.Create( mapped ) );

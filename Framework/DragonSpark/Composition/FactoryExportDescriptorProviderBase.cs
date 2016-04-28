@@ -1,15 +1,14 @@
+using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.Setup;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 
@@ -137,6 +136,7 @@ namespace DragonSpark.Composition
 	{
 		public static ActivatorDelegateFactory Instance { get; } = new ActivatorDelegateFactory();
 
+		[RecursionGuard()]
 		protected override Delegate CreateItem( Activator.Parameter parameter )
 		{
 			var factory = new FactoryDelegateLocatorFactory(

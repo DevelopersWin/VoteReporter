@@ -123,7 +123,7 @@ namespace DragonSpark.Diagnostics
 	{
 		protected LoggerTemplate( string template, params object[] parameters ) : this( LogEventLevel.Information, template, parameters ) {}
 
-		protected LoggerTemplate( LogEventLevel intendedLevel, string template, [Formatted]params object[] parameters )
+		protected LoggerTemplate( LogEventLevel intendedLevel, string template, params object[] parameters )
 		{
 			IntendedLevel = intendedLevel;
 			Template = template;

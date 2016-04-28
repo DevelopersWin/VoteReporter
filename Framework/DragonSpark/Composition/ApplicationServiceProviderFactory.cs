@@ -27,7 +27,7 @@ namespace DragonSpark.Composition
 			public new static Specification Instance { get; } = new Specification();
 
 			[Freeze]
-			protected override bool Verify( Type parameter ) => base.Verify( parameter ) && Factory.IsFactory( parameter ) && parameter.Adapt().IsDefined<ExportAttribute>();
+			protected override bool Verify( Type parameter ) => base.Verify( parameter ) && Factory.IsFactory( parameter ) && Factory.GetResultType( parameter ) != typeof(object) && parameter.Adapt().IsDefined<ExportAttribute>();
 		}
 
 		protected override FactoryTypeRequest CreateItem( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );

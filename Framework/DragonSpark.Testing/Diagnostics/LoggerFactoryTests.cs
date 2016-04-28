@@ -6,6 +6,7 @@ using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Diagnostics;
+using DragonSpark.Windows.Runtime;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -18,7 +19,7 @@ namespace DragonSpark.Testing.Diagnostics
 {
 	public class LoggerFactoryTests
 	{
-		[Theory, AutoData]
+		[Theory, AutoData( additionalTypes: typeof(FormatterFactory) )]
 		public void EnsureComposition( CompositionContext context, string text )
 		{
 			var logger = context.GetExport<ILogger>();
@@ -27,7 +28,7 @@ namespace DragonSpark.Testing.Diagnostics
 
 			Assert.NotSame( DefaultServiceProvider.Instance.Value.Get<ILogger>(), logger );
 
-			var method = GetType().GetMethod( nameof(EnsureComposition) );
+			var method = GetType().GetMethod( nameof(AnotherMethod), BindingOptions.AllMembers );
 			var command = new LogCommand( logger );
 
 			command.Run( new HelloWorld( text, method ) );
@@ -39,6 +40,8 @@ namespace DragonSpark.Testing.Diagnostics
 			
 			Assert.Contains( new MethodFormatter( method ).ToString( null, null ), message );
 		}
+
+		void AnotherMethod() {}
 
 		class HelloWorld : LoggerTemplate
 		{

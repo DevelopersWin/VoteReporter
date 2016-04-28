@@ -171,7 +171,7 @@ namespace DragonSpark.Windows.Entity
 		public static void DeleteObjectEnsured( this ObjectContext target, object entity )
 		{
 			// HACK: Ensure all ends are loaded:
-			var query = from property in entity.GetType().GetProperties( BindingOptions.AllProperties )
+			var query = from property in entity.GetType().GetProperties( BindingOptions.AllMembers )
 				where typeof(IRelatedEnd).IsAssignableFrom( property.PropertyType )
 				let end = property.GetValue( entity, null ) as IRelatedEnd
 				where end != null && !end.IsLoaded

@@ -90,7 +90,12 @@ namespace DragonSpark.Activation
 
 	public class CoercionSupport<T>
 	{
+		public static CoercionSupport<T> Instance { get; } = new CoercionSupport<T>();
+
 		readonly ICoercer<T> coercer;
+
+		public CoercionSupport() : this( Coercer<T>.Instance ) {}
+
 
 		public CoercionSupport( ICoercer<T> coercer )
 		{
@@ -197,6 +202,8 @@ namespace DragonSpark.Activation
 
 	public class FromKnownFactory<T> : FirstConstructedFromParameterFactory<object>
 	{
+		public static FromKnownFactory<T> Instance { get; } = new FromKnownFactory<T>( KnownTypeFactory.Instance );
+
 		public FromKnownFactory( KnownTypeFactory factory ) : base( factory.Create( typeof(T) ) ) {}
 
 		public T CreateAs( object parameter ) => (T)Create(	parameter );

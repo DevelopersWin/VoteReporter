@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using Serilog;
@@ -40,11 +41,46 @@ namespace DragonSpark.Diagnostics.Logger
 		public LogCommand( ILogger logger ) : base( new LogExceptionCommand( logger ), new LogTemplateCommand( logger ) ) {}
 	}
 
+	abstract class LoggerTemplateParameterFactoryBase<T> : FactoryBase<T, object[]> where T : ILoggerTemplate
+	{
+		// public static TemplateParameterFactoryBase Instance { get; } = new TemplateParameterFactoryBase<T>();
+
+		readonly Func<FormatterFactory> source;
+
+		protected LoggerTemplateParameterFactoryBase() : this( Services.Get<FormatterFactory> ) {}
+
+		protected LoggerTemplateParameterFactoryBase( Func<FormatterFactory> source )
+		{
+			this.source = source;
+		}
+
+		protected object[] Parameters( T parameter )
+		{
+			var formatter = source();
+			var result = formatter.CreateMany<object>( parameter.Parameters );
+			return result;
+		}
+	}
+
+	class LoggerTemplateParameterFactory : LoggerTemplateParameterFactoryBase<ILoggerTemplate>
+	{
+		public static LoggerTemplateParameterFactory Instance { get; } = new LoggerTemplateParameterFactory();
+
+		protected override object[] CreateItem( ILoggerTemplate parameter ) => new object[] { parameter.Template, Parameters( parameter ) };
+	}
+
+	class LoggerExceptionTemplateParameterFactory : LoggerTemplateParameterFactoryBase<ILoggerExceptionTemplate>
+	{
+		public static LoggerExceptionTemplateParameterFactory Instance { get; } = new LoggerExceptionTemplateParameterFactory();
+
+		protected override object[] CreateItem( ILoggerExceptionTemplate parameter ) => new object[] { parameter.Exception, parameter.Template, Parameters( parameter ) };
+	}
+
 	public class LogTemplateCommand : LogCommandBase<LogTemplate, ILoggerTemplate>
 	{
 		public LogTemplateCommand( ILogger logger ) : this( logger, template => template.IntendedLevel ) {}
 		public LogTemplateCommand( ILogger logger, LogEventLevel level ) : this( logger, template => level ) {}
-		public LogTemplateCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, template => new object[] { template.Template, template.Parameters } ) {}
+		public LogTemplateCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerTemplateParameterFactory.Instance.Create ) {}
 	}
 
 	public class LogExceptionCommand : LogCommandBase<LogException, ILoggerExceptionTemplate>
@@ -52,7 +88,7 @@ namespace DragonSpark.Diagnostics.Logger
 		public LogExceptionCommand( ILogger logger ) : this( logger, template => template.IntendedLevel ) {}
 		public LogExceptionCommand( ILogger logger, LogEventLevel level ) : this( logger, template => level ) {}
 
-		public LogExceptionCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, template => new object[] { template.Exception, template.Template, template.Parameters } ) {}
+		public LogExceptionCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerExceptionTemplateParameterFactory.Instance.Create ) {}
 	}
 
 	public class Handler<T> : DecoratedCommand<T>

@@ -44,7 +44,7 @@ namespace DragonSpark.Windows.Entity
 
 	public class EnableLocalStoragePropertyCommand : CommandBase<DbContextBuildingParameter>
 	{
-		readonly static MethodInfo ApplyMethod = typeof(EnableLocalStoragePropertyCommand).GetMethod( nameof(Apply), BindingOptions.AllProperties );
+		readonly static MethodInfo ApplyMethod = typeof(EnableLocalStoragePropertyCommand).GetMethod( nameof(Apply), BindingOptions.AllMembers );
 
 		readonly bool useConvention;
 
@@ -57,7 +57,7 @@ namespace DragonSpark.Windows.Entity
 		{
 			var types = parameter.Context.GetDeclaredEntityTypes().Select( x => x.Adapt().GetHierarchy( false ).Last() ).Distinct().SelectMany( x => x.Assembly.GetTypes().Where( y => x.Namespace == y.Namespace ) ).Distinct().ToArray();
 
-			types.SelectMany( y => y.GetProperties( BindingOptions.AllProperties ).Where( z => z.Has<LocalStorageAttribute>() || ( useConvention && FollowsConvention( z ) )  ) ).Each( x =>
+			types.SelectMany( y => y.GetProperties( BindingOptions.AllMembers ).Where( z => z.Has<LocalStorageAttribute>() || ( useConvention && FollowsConvention( z ) )  ) ).Each( x =>
 			{
 				ApplyMethod.MakeGenericMethod( x.DeclaringType, x.PropertyType ).Invoke( this, new object[] { parameter.Builder, x } );
 			} );

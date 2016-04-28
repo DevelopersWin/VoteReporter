@@ -19,14 +19,9 @@ namespace DragonSpark.Activation
 
 		public static TResult Construct<TResult>( this IActivator @this, Type type, params object[] parameters ) => (TResult)@this.Create( new ConstructTypeRequest( type, parameters ) );
 
-		public static IEnumerable<T> ActivateMany<T>( this IActivator @this, IEnumerable<Type> types ) => @this.ActivateMany( typeof(T), types ).Cast<T>();
+		public static T[] ActivateMany<T>( this IActivator @this, IEnumerable<Type> types ) => @this.ActivateMany<T>( typeof(T), types );
 
-		public static IEnumerable<object> ActivateMany( this IActivator @this, Type objectType, IEnumerable<Type> types ) => 
-			types
-				.Where( @objectType.Adapt().IsAssignableFrom )
-				.Where( @this.CanCreate )
-				.Select( @this.Create )
-				.NotNull();
+		public static T[] ActivateMany<T>( this IActivator @this, Type objectType, IEnumerable<Type> types ) => @this.CreateMany<T>( types.Where( objectType.Adapt().IsAssignableFrom ) );
 	}
 
 	public class Activator : CompositeActivator

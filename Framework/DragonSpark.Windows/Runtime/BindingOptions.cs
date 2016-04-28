@@ -4,6 +4,6 @@ namespace DragonSpark.Windows.Runtime
 {
 	public static class BindingOptions
 	{
-		public const BindingFlags AllProperties = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+		public const BindingFlags AllMembers = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 	}
 }

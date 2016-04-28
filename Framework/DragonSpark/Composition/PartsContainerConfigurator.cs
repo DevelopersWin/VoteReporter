@@ -133,14 +133,14 @@ namespace DragonSpark.Composition
 
 		protected override ContainerConfiguration CreateItem( ContainerConfiguration configuration )
 		{
-			var factoryTypes = types.Where( FactoryTypeFactory.Specification.Instance.IsSatisfiedBy ).Select( FactoryTypeFactory.Instance.Create ).ToArray();
+			var factoryTypes = FactoryTypeFactory.Instance.CreateMany( types );
 			var locator = new FactoryTypeRequestLocator( factoryTypes );
 			var conventionLocator = new BuildableTypeFromConventionLocator( types );
 			var activator = new Activation.Activator( conventionLocator );
-
+			var all = types.Union( core ).Fixed();
 			var result = configuration
 				.WithInstance( assemblies )
-				.WithInstance( types )
+				.WithInstance( all )
 				.WithInstance( conventionLocator )
 				.WithInstance( factoryTypes )
 				.WithInstance( locator )
@@ -155,12 +155,12 @@ namespace DragonSpark.Composition
 			return result;
 		}
 
-		class SharedFrameworkConventionBuilder : FrameworkConventionBuilder
+		/*class SharedFrameworkConventionBuilder : FrameworkConventionBuilder
 		{
 			public new static SharedFrameworkConventionBuilder Instance { get; } = new SharedFrameworkConventionBuilder();
 
 			protected override PartConventionBuilder Configure( ConventionBuilder builder ) => base.Configure( builder ).Shared();
-		}
+		}*/
 
 		public class FrameworkConventionBuilder : FactoryBase<ConventionBuilder>
 		{

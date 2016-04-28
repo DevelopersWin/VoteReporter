@@ -2,6 +2,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DragonSpark.Activation
@@ -61,5 +62,17 @@ namespace DragonSpark.Activation
 		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => new Delegate<T>( @this ).Value;
 
 		public static Func<T, U> ToDelegate<T, U>( this IFactory<T, U> @this ) => new Delegate<T,U>( @this ).Value;
+
+		public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters ) => 
+			parameters
+				// .Where( parameter => @this.CanCreate( parameter ) )
+				.Select( @this.Create )
+				.NotNull().Fixed();
+
+		public static TResult[] CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters ) => 
+			parameters
+				// .Where( parameter => @this.CanCreate( parameter ) )
+				.Select( @this.Create )
+				.NotNull().Cast<TResult>().Fixed();
 	}
 }
