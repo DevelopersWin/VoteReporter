@@ -1,13 +1,18 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.ComponentModel;
+using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
+using System;
 using Xunit;
+using Attribute = DragonSpark.Testing.Objects.Attribute;
 
 namespace DragonSpark.Testing.TypeSystem
 {
 	public class AttributesTests
 	{
 		public string PropertyName { get; set; }
+
+		public string Setter { set {} }
 
 		[Fact]
 		public void SameInstances()
@@ -81,5 +86,90 @@ namespace DragonSpark.Testing.TypeSystem
 			var attribute = typeof(Decorated).GetProperty( nameof(Objects.Decorated.Property) ).GetAttribute<Attribute>();
 			Assert.Equal( "This is a property attribute.", attribute.PropertyName );
 		}
+
+		[Fact]
+		public void SetterDoesApply()
+		{
+			var property = GetType().GetProperty( nameof(Setter) );
+			Assert.False( DefaultValuePropertySpecification.Instance.IsSatisfiedBy( property ) );
+		}
+
+		[Fact]
+		public void ObjectProvider()
+		{
+			var instance = new Class();
+			var provider = Attributes.Get( instance );
+			Assert.NotNull( provider );
+		}
+
+		[Fact]
+		public void ConstructorClass()
+		{
+			var type = typeof(ClassWithConstructor);
+			var provider = Attributes.Get( type );
+			var attribute = provider.GetAttribute<ConstructorAttribute>();
+			Assert.Null( attribute );
+		}
+
+		[Fact]
+		public void Constructor()
+		{
+			var constructor = typeof(ClassWithConstructor).GetConstructor( Type.EmptyTypes );
+			var provider = Attributes.Get( constructor );
+			var attribute = provider.GetAttribute<ConstructorAttribute>();
+			Assert.NotNull( attribute );
+			Assert.Equal( "DefaultConstructor", attribute.PropertyName );
+		}
+
+		[Fact]
+		public void ConstructorMetadata()
+		{
+			var constructor = typeof(ClassWithConstructor).GetConstructor( new []{ typeof(int) } );
+			var provider = Attributes.Get( constructor );
+			var attribute = provider.GetAttribute<ConstructorAttribute>();
+			Assert.NotNull( attribute );
+			Assert.Equal( "With Number", attribute.PropertyName );
+		}
+
+		class ClassWithConstructor
+		{
+			[Constructor( "DefaultConstructor" )]
+			public ClassWithConstructor() {}
+
+
+			public ClassWithConstructor( int number ) {}
+		}
+
+		class ClassWithConstructorMetadata
+		{
+			[Constructor( "With Number" )]
+			public ClassWithConstructorMetadata( int number ) {}
+		}
+
+		[AttributeUsage( AttributeTargets.Constructor )]
+		class ConstructorAttribute : System.Attribute
+		{
+			public ConstructorAttribute( string propertyName )
+			{
+				PropertyName = propertyName;
+			}
+
+			public string PropertyName { get; set; }
+		}
+
+		/*[Fact]
+		public void SingletonTest()
+		{
+			var property = typeof(SingletonLocatorTests.Singleton).GetProperty( nameof(SingletonLocatorTests.Singleton.Instance) );
+			var provider = Attributes.Get( property );
+			Assert.NotNull( provider );
+		}
+
+		class Singleton : ISingleton
+		{
+			public static Singleton Instance { get; } = new Singleton();
+		}
+
+		interface ISingleton {}*/
 	}
-}	
+}

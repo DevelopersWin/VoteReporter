@@ -7,7 +7,7 @@ namespace DevelopersWin.VoteReporter.Application
 	/// </summary>
 	public partial class Program
 	{
-		static void Main( string[] args ) => new Program().Run( args );
+		static void Main( string[] args ) => new Program().AsExecuted( args );
 
 		public Program()
 		{

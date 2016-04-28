@@ -48,7 +48,7 @@ namespace DragonSpark.Setup
 		{
 			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
 
-			var assign = new AssignValueCommand<IServiceProvider>( host ).Executed( parameter );
+			var assign = new AssignValueCommand<IServiceProvider>( host ).AsExecuted( parameter );
 			parameter.Get<IDisposableRepository>().With( repository => repository.Add( assign ) );
 		}
 	}
@@ -62,11 +62,11 @@ namespace DragonSpark.Setup
 
 	public static class ApplicationExtensions
 	{
-		public static IApplication<T> Run<T>( this IApplication<T> @this, T arguments )
+		public static IApplication<T> AsExecuted<T>( this IApplication<T> @this, T arguments )
 		{
 			using ( var command = new ExecuteApplicationCommand<T>( @this ) )
 			{
-				command.Executed( arguments );
+				command.Run( arguments );
 			}
 			return @this;
 		}
@@ -87,8 +87,8 @@ namespace DragonSpark.Setup
 
 		protected override void OnExecute( T parameter )
 		{
-			assign.Executed( application );
-			application.Executed<ICommand>( parameter );
+			assign.Run( application );
+			application.Execute( parameter );
 			application.Get<IDisposableRepository>().With( application.AssociateForDispose );
 		}
 
@@ -126,25 +126,48 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class InstanceServiceProvider : RepositoryBase<IStore>, IServiceProvider
+	public class InstanceServiceProvider : RepositoryBase<IInstanceRegistration>, IServiceProvider
 	{
-		public InstanceServiceProvider( IEnumerable<Func<object>> factories, params object[] instances ) : this( factories.Select( func => new DeferredInstanceStore<object>( func ) ).Concat( Instances( instances ) ) ) {}
+		public InstanceServiceProvider( IEnumerable<IFactory> factories, params object[] instances ) : this( factories.Select( factory => new FactoryStore( factory ) ).Concat( Instances( instances ) ) ) {}
 
 		public InstanceServiceProvider( params object[] instances ) : this( Instances( instances ) ) {}
 
-		InstanceServiceProvider( IEnumerable<IStore> stores ) : base( stores ) {}
+		InstanceServiceProvider( IEnumerable<IInstanceRegistration> stores ) : base( stores ) {}
 
-		static IEnumerable<IStore> Instances( IEnumerable<object> instances ) => instances.Select( o => new FixedStore<object>( o ) );
+		static IEnumerable<IInstanceRegistration> Instances( IEnumerable<object> instances ) => instances.Select( o => new InstanceStore( o ) );
 
 		[Freeze]
-		[RecursionGuard]
+		// [RecursionGuard]
 		public object GetService( Type serviceType )
 		{
-			/*throw new InvalidOperationException( "WTF" );
-			return Store;*/
-			var result = List().Select( store => store.Value ).FirstOrDefault( serviceType.Adapt().IsInstanceOfType ).With( o => new ActivationProperties.Instance( o ).Assigned( true ) );
+			var result = List().Where( registration => serviceType.Adapt().IsAssignableFrom( registration.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault().WithSelf( o => new ActivationProperties.Instance( o ).Assigned( true ) );
 			return result;
 		}
+	}
+
+	public interface IInstanceRegistration : IStore
+	{
+		Type RegisteredType { get; }
+	}
+
+	class FactoryStore : DeferredInstanceStore<object>, IInstanceRegistration
+	{
+		public FactoryStore( IFactory factory ) : base( factory.Create )
+		{
+			RegisteredType = Factory.GetResultType( factory.GetType() );
+		}
+
+		public Type RegisteredType { get; }
+	}
+
+	class InstanceStore : FixedStore<object>, IInstanceRegistration
+	{
+		public InstanceStore( object reference ) : base( reference )
+		{
+			RegisteredType = reference.GetType();
+		}
+
+		public Type RegisteredType { get; }
 	}
 
 	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
@@ -163,7 +186,7 @@ namespace DragonSpark.Setup
 			var context = new IsActive( this, serviceType );
 			if ( !context.Value )
 			{
-				using ( new AssignValueCommand<bool>( context ).Executed( true ) )
+				using ( new AssignValueCommand<bool>( context ).AsExecuted( true ) )
 				{
 					return base.GetService( serviceType );
 				}
@@ -201,7 +224,7 @@ namespace DragonSpark.Setup
 	{
 		public static Configure<T> Instance { get; } = new Configure<T>();
 
-		protected override void OnExecute( IServiceProvider parameter ) => parameter.Get<T>().Executed( parameter );
+		protected override void OnExecute( IServiceProvider parameter ) => parameter.Get<T>().Run( parameter );
 	}
 
 	public interface IApplication<in T> : IApplication, ICommand<T> {}
@@ -260,7 +283,7 @@ namespace DragonSpark.Setup
 
 			exports
 				.Prioritize()
-				.Each( setup => setup.Executed( parameter ) );
+				.ExecuteMany( parameter );
 		}
 
 		protected override void OnDispose()

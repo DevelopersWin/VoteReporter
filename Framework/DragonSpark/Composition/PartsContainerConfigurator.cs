@@ -44,7 +44,7 @@ namespace DragonSpark.Composition
 		public ContainerConfigurationFromPartsFactory( [Required] Assembly[] assemblies, [Required] Type[] types, params ITransformer<ContainerConfiguration>[] configurations )
 			: base( 
 				ContainerConfigurationFactory.Instance, 
-				configurations.Prepend( /*new DisposingConfigurator(),*/ new ContainerServicesConfigurator(), new PartsContainerConfigurator( assemblies, types ) ).ToArray()
+				configurations.Prepend( new ContainerServicesConfigurator(), new PartsContainerConfigurator( assemblies, types ) ).ToArray()
 			) {}
 	}
 

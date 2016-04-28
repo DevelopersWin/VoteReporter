@@ -55,7 +55,7 @@ namespace DragonSpark.Runtime
 			this.parameter = new Lazy<object>( parameter );
 		}
 
-		protected override void OnExecute( object p ) => command.Value.Executed( parameter.Value );
+		protected override void OnExecute( object p ) => command.Value.Execute( parameter.Value );
 
 		protected override void OnDispose()
 		{
@@ -131,11 +131,11 @@ namespace DragonSpark.Runtime
 	{
 		readonly Action<T> command;
 
-		public DelegatedCommand( Action<T> command ) : this( command, NotNullSpecification<T>.Instance ) {}
+		public DelegatedCommand( Action<T> command ) : this( command, AlwaysSpecification<T>.Instance ) {}
 
 		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : this( command, Coercer<T>.Instance, specification ) {}
 
-		public DelegatedCommand( Action<T> command, ICoercer<T> coercer ) : this( command, coercer, NotNullSpecification<T>.Instance ) {}
+		public DelegatedCommand( Action<T> command, ICoercer<T> coercer ) : this( command, coercer, AlwaysSpecification<T>.Instance ) {}
 
 		public DelegatedCommand( Action<T> command, ICoercer<T> coercer, ISpecification<T> specification ) : base( coercer, specification )
 		{
@@ -175,7 +175,7 @@ namespace DragonSpark.Runtime
 
 		protected CommandBase() : this( Coercer<T>.Instance ) {}
 
-		protected CommandBase( [Required]ICoercer<T> coercer ) : this( coercer, AlwaysSpecification<T>.Instance ) {}
+		protected CommandBase( [Required]ICoercer<T> coercer ) : this( coercer, NotNullSpecification<T>.Instance ) {}
 
 		protected CommandBase( [Required]ISpecification<T> specification ) : this( Coercer<T>.Instance, specification ) {}
 

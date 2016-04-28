@@ -100,7 +100,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		protected override IDisposable CreateItem( AutoData parameter )
 		{
-			var result = new AssignExecutionContextCommand().Executed( parameter.Method );
+			var result = new AssignExecutionContextCommand().AsExecuted( parameter.Method );
 
 			var configure = new AutoDataConfiguringCommandFactory( parameter, providerSource, applicationSource ).Create();
 			configure.Run( parameter );
@@ -149,7 +149,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override void Before( MethodInfo methodUnderTest )
 		{
-			using ( new AssignExecutionContextCommand().Executed( methodUnderTest ) )
+			using ( new AssignExecutionContextCommand().AsExecuted( methodUnderTest ) )
 			{
 				Services.Get<LoggingLevelSwitch>().MinimumLevel = level;
 			}

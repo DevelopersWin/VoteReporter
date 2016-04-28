@@ -179,7 +179,7 @@
     <Compile Include="Aspects\KeyFactory.cs" />
     <Compile Include="Aspects\OfTypeAttribute.cs" />
     <Compile Include="Aspects\ProfileAttribute.cs" />
-    <Compile Include="ComponentModel\BuildablePropertyCollectionFactory.cs" />
+    <Compile Include="ComponentModel\DefaultValuePropertySpecification.cs" />
     <Compile Include="ComponentModel\DefaultPropertyValueFactory.cs" />
     <Compile Include="ComponentModel\DefaultValueBase.cs" />
     <Compile Include="ComponentModel\DefaultValueProvider.cs" />
@@ -270,6 +270,7 @@
     <Compile Include="TypeSystem\DerivedMethodSpecification.cs" />
     <Compile Include="TypeSystem\HostingAttribute.cs" />
     <Compile Include="TypeSystem\IAttributeProvider.cs" />
+    <Compile Include="TypeSystem\IAttributeProviderLocator.cs" />
     <Compile Include="TypeSystem\KnownTypeFactory.cs" />
     <Compile Include="TypeSystem\TypeAdapter.cs" />
     <Compile Include="ComponentModel\CollectionAttribute.cs" />
@@ -368,7 +369,7 @@
     <Compile Include="Setup\Commands\RunProgramCommand.cs" />
     <Compile Include="Setup\Setup.cs" />
     <Compile Include="Setup\SetupParameter.cs" />
-    <Compile Include="Setup\Commands\ServicedCommand.cs" />
+    <Compile Include="Setup\Commands\ServiceAssignedCommand.cs" />
     <Compile Include="Setup\Registration\LifetimeManagerAttribute.cs" />
     <Compile Include="Setup\Registration\RegistrationAttribute.cs" />
     <Compile Include="Setup\Commands\SetupUnityCommand.cs" />

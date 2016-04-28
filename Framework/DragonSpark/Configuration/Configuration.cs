@@ -45,13 +45,13 @@ namespace DragonSpark.Configuration
 	}
 
 	[ContentProperty( nameof(Configurations) )]
-	public class InitializeConfigurationCommand : ServicedCommand<ConfigureCommand, IList<IConfiguration>>
+	public class InitializeConfigurationCommand : ServiceAssignedCommand<ConfigureCommand, IList<IConfiguration>>
 	{
 		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification() ) {}
 
 		public Collection<IConfiguration> Configurations { get; } = new Collection<IConfiguration>();
 
-		public override IList<IConfiguration> Parameter => Configurations.ToArray();
+		public override object GetParameter() => Configurations.ToArray();
 	}
 
 	public class ConfigureCommand : CommandBase<IEnumerable<IConfiguration>>

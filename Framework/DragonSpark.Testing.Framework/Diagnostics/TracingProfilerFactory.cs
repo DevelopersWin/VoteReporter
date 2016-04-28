@@ -19,7 +19,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 		public TraceAwareProfilerFactory( Action<string> output, ILogger logger, ILoggerHistory history, IList<TraceListener> listeners ) : this( output, logger, new PurgeLoggerMessageHistoryCommand( history ), new LoggerTraceListenerTrackingCommand( listeners ) ) {}
 
-		TraceAwareProfilerFactory( Action<string> output, ILogger logger, PurgeLoggerMessageHistoryCommand purge, LoggerTraceListenerTrackingCommand tracker ) : this( logger, tracker, () => purge.Executed( output ) ) {}
+		TraceAwareProfilerFactory( Action<string> output, ILogger logger, PurgeLoggerMessageHistoryCommand purge, LoggerTraceListenerTrackingCommand tracker ) : this( logger, tracker, () => purge.Run( output ) ) {}
 		
 		TraceAwareProfilerFactory( ILogger logger, LoggerTraceListenerTrackingCommand command, Action purge ) : this( new ConfiguringFactory<MethodBase, ILogger>( new MethodLoggerFactory( logger.Self ).Create, command.Run ).Create, new CompositeCommand( new DelegatedCommand( purge ), StartProcessCommand.Instance ), command, new DisposableAction( purge ) ) {}
 
@@ -60,7 +60,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		protected override void OnExecute( ILogger parameter )
 		{
 			var listener = factory( parameter );
-			add.Executed( listener );
+			add.Run( listener );
 			listeners.Add( listener );
 		}
 

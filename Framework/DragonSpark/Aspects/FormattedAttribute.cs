@@ -26,18 +26,20 @@ namespace DragonSpark.Aspects
 	}
 
 	[PSerializable, LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Caching )]
-	public class RecursionGuardAttribute : OnMethodBoundaryAspect
+	public class RecursionGuardAttribute : OnMethodBoundaryAspect, IInstanceScopedAspect
 	{
 		public RecursionGuardAttribute( int maxCallCount = 4 )
 		{
 			MaxCallCount = maxCallCount;
 		}
 
+		bool Enabled { get; set; }
+
 		int MaxCallCount { get; set; }
 
 		class Count : ThreadAmbientStore<int>
 		{
-			public Count( MethodBase method ) : base( method.GetHashCode().ToString() ) {}
+			public Count( MethodExecutionArgs args ) : base( KeyFactory.Instance.CreateUsing( args.Instance, args.Method, args.Arguments ).ToString() ) {}
 
 			int Update( bool up = true )
 			{
@@ -52,15 +54,9 @@ namespace DragonSpark.Aspects
 			public int Decrement() => Update( false );
 		}
 
-		/*public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			throw new InvalidOperationException( "WTF" );
-			base.OnInvoke( args );
-		}*/
-
 		public override void OnEntry( MethodExecutionArgs args )
 		{
-			if ( new Count( args.Method ).Increment() == MaxCallCount )
+			if ( Enabled && new Count( args ).Increment() == MaxCallCount )
 			{
 				throw new InvalidOperationException( $"Recursion detected in method {new MethodFormatter(args.Method).ToString( null, null )}" );
 			}
@@ -71,8 +67,12 @@ namespace DragonSpark.Aspects
 		public override void OnExit( MethodExecutionArgs args )
 		{
 			base.OnExit( args );
-			new Count( args.Method ).Decrement();
+			new Count( args ).Decrement();
 		}
+
+		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
+
+		void IInstanceScopedAspect.RuntimeInitializeInstance() => Enabled = true;
 	}
 
 	[PSerializable, ProvideAspectRole( StandardRoles.Validation )]
@@ -87,15 +87,8 @@ namespace DragonSpark.Aspects
 		int Index { get; set; }
 		bool IsArray { get; set; }
 
-		// int count = 0;
-
 		public override void OnEntry( MethodExecutionArgs args )
 		{
-			/*if ( count++ >= 3 )
-			{
-				throw new InvalidOperationException( "WTF" );
-			}*/
-
 			var formatter = Services.Get<Type[]>().With( types => new Func<FormatterFactory.Parameter, object>( new FormatterFactory( new FromKnownFactory<IFormattable>( new KnownTypeFactory( types ) ) ).Create ) );
 			formatter.With( f =>
 							{
@@ -105,7 +98,6 @@ namespace DragonSpark.Aspects
 									: f( new FormatterFactory.Parameter( current ) );
 
 								args.Arguments.SetArgument( Index, formatted );
-								// var temp = 9;
 							} );
 	
 			base.OnEntry( args );

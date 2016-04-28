@@ -15,7 +15,7 @@ namespace DragonSpark.Runtime
 
 		public FirstCommand( ISpecification<T> specification, params ICommand[] commands ) : base( specification, commands ) {}
 
-		protected override void OnExecute( T parameter ) => Commands.FirstWhere( command => command.Executed( parameter ) );
+		protected override void OnExecute( T parameter ) => Commands.FirstWhere( command => command.AsExecuted( parameter ) );
 	}
 
 	public class CompositeCommand : CompositeCommand<object>

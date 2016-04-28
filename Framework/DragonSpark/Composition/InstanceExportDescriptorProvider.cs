@@ -1,5 +1,6 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -8,7 +9,6 @@ using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using DragonSpark.Setup;
 
 namespace DragonSpark.Composition
 {
@@ -68,7 +68,7 @@ namespace DragonSpark.Composition
 			new[] { contract.ContractType, locator.Create( contract.ContractType ) }
 				.NotNull()
 				.Distinct()
-				.Each( InitializeTypeCommand.Instance.Executed );
+				.Each( InitializeTypeCommand.Instance.Run );
 			yield break;
 		}
 	}

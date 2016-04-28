@@ -16,6 +16,11 @@ namespace DragonSpark.Runtime.Specifications
 
 		protected override bool Verify( T parameter ) => !inner.IsSatisfiedBy( parameter );
 	}
+
+	public class NotNullSpecification : NotNullSpecification<object>
+	{
+		public new static NotNullSpecification Instance { get; } = new NotNullSpecification();
+	}
 	
 	public class NotNullSpecification<T> : SpecificationBase<T>
 	{

@@ -47,6 +47,7 @@ namespace DragonSpark.Runtime.Values
 			this.lazy = lazy;
 		}
 
+		// [RecursionGuard( 2 )]
 		protected override T Get() => lazy.Value;
 	}
 

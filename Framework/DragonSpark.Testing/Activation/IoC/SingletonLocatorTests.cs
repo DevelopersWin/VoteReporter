@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using System.Reflection;
-using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using System.Linq;
+using System.Reflection;
 using Xunit;
 
 namespace DragonSpark.Testing.Activation.IoC
 {
-    public class SingletonLocatorTests
+	public class SingletonLocatorTests
     {
         [Fact]
         public void SingletonFromItem()
