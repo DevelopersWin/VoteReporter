@@ -1,5 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -63,16 +64,20 @@ namespace DragonSpark.Activation
 
 		public static Func<T, U> ToDelegate<T, U>( this IFactory<T, U> @this ) => new Delegate<T,U>( @this ).Value;
 
-		public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters ) => 
-			parameters
-				// .Where( parameter => @this.CanCreate( parameter ) )
-				.Select( @this.Create )
-				.NotNull().Fixed();
+		// public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters ) => CreateMany( @this, parameters, Where<TResult>.NotNull );
 
-		public static TResult[] CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters ) => 
-			parameters
-				// .Where( parameter => @this.CanCreate( parameter ) )
+		public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
+			@this.CreateMany( parameters.Cast<object>(), where );
+			/*parameters
 				.Select( @this.Create )
-				.NotNull().Cast<TResult>().Fixed();
+				.Where( where )
+				.Fixed();*/
+
+		public static TResult[] CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
+			parameters
+				.Select( @this.Create )
+				.Cast<TResult>()
+				.Where( where ?? Where<TResult>.NotNull )
+				.Fixed();
 	}
 }

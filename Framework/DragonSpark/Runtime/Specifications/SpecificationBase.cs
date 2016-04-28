@@ -1,6 +1,8 @@
+using System;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Runtime.Specifications
@@ -26,9 +28,18 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		public static ISpecification<T> Instance { get; } = new NotNullSpecification<T>();
 
+		readonly Func<T, object> projection;
+
 		// public static ISpecification<T> Null { get; } = Instance.Inverse();
 
-		protected override bool Verify( T parameter ) => !parameter.IsNull();
+		public NotNullSpecification() : this( arg => arg ) {}
+
+		public NotNullSpecification( Func<T, object> projection )
+		{
+			this.projection = projection;
+		}
+
+		protected override bool Verify( T parameter ) => !projection( parameter ).IsNull();
 	}
 
 	public class CheckSpecification<T> : SpecificationBase<T>

@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.TypeSystem;
 using Serilog;
 using Serilog.Events;
 using System;
@@ -57,7 +58,7 @@ namespace DragonSpark.Diagnostics.Logger
 		protected object[] Parameters( T parameter )
 		{
 			var formatter = source();
-			var result = formatter.CreateMany<object>( parameter.Parameters );
+			var result = formatter.CreateMany( parameter.Parameters, Where<object>.Always );
 			return result;
 		}
 	}

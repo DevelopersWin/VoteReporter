@@ -9,6 +9,13 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
+	public static class Where<T>
+	{
+		public static Func<T, bool> NotNull => t => !t.IsNull();
+
+		public static Func<T, bool> Always => t => true;
+	}
+
 	public static class Default<T>
 	{
 		public static Func<T, T> Self => t => t;

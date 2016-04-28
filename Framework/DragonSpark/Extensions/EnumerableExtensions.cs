@@ -65,7 +65,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<TItem> NotNull<TItem>( this IEnumerable<TItem> target ) => NotNull( target, Default<TItem>.Self );
 
-		public static IEnumerable<TItem> NotNull<TItem, TCheck>( this IEnumerable<TItem> target, Func<TItem, TCheck> check ) => target.Where( x => !check( x ).IsNull() );
+		public static IEnumerable<TItem> NotNull<TItem, TProject>( this IEnumerable<TItem> target, Func<TItem, TProject> project ) => target.Where( x => !project( x ).IsNull() );
 
 		public static T FirstOrDefaultOfType<T>(this IEnumerable enumerable) => enumerable.OfType<T>().FirstOrDefault();
 

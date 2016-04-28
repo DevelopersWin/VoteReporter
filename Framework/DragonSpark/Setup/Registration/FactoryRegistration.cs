@@ -3,6 +3,7 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
@@ -135,7 +136,7 @@ namespace DragonSpark.Setup.Registration
 
 		protected RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]ISingletonLocator locator, [Required]Func<Type, Func<object>> create ) : this( registry, locator, create, type => null ) {}
 
-		protected RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]ISingletonLocator locator, [Required]Func<Type, Func<object>> create, [Required]Func<Type, Delegate> determineDelegate )
+		protected RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]ISingletonLocator locator, [Required]Func<Type, Func<object>> create, [Required]Func<Type, Delegate> determineDelegate ) : base( Specification.Instance )
 		{
 			this.registry = registry;
 			this.locator = locator;
@@ -167,6 +168,13 @@ namespace DragonSpark.Setup.Registration
 		}
 
 		protected abstract Type MakeGenericType( Type parameter, Type itemType );
+
+		class Specification : DelegatedSpecification<RegisterFactoryParameter>
+		{
+			public static Specification Instance { get; } = new Specification();
+
+			public Specification() : base( parameter => typeof(TFactory).Adapt().IsAssignableFrom( parameter.FactoryType ) ) {}
+		}
 	}
 
 	public class RegisterFactoryCommand : RegisterFactoryCommandBase<IFactory>

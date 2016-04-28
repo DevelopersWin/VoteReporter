@@ -18,9 +18,13 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect, IInstanceScopedAspect
 	{
+		void Initialize() => Processor = Processor ?? new ValueProcessor( base.OnGetValue );
+
 		ValueProcessor Processor { get; set; }
 
 		public override bool CompileTimeValidate( LocationInfo locationInfo ) => DefaultValuePropertySpecification.Instance.IsSatisfiedBy( locationInfo.PropertyInfo );
+
+		public override void RuntimeInitialize( LocationInfo locationInfo ) => Initialize();
 
 		public override void OnGetValue( LocationInterceptionArgs args ) => Processor.With( processor => processor.Run( args ) );
 
@@ -32,7 +36,7 @@ namespace DragonSpark.Aspects
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
 
-		void IInstanceScopedAspect.RuntimeInitializeInstance() => Processor = new ValueProcessor( base.OnGetValue );
+		void IInstanceScopedAspect.RuntimeInitializeInstance() => Initialize();
 
 		[Synchronized]
 		class ValueProcessor : CommandBase<LocationInterceptionArgs>

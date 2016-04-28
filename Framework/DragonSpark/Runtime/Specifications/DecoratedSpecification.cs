@@ -39,10 +39,17 @@ namespace DragonSpark.Runtime.Specifications
 		protected override bool Verify( T parameter ) => @delegate( parameter );
 	}
 
-	public class OnlyOnceSpecification : SpecificationBase<object>
+	public interface IApplyAware
+	{
+		void Apply();
+	}
+
+	public class OnlyOnceSpecification : SpecificationBase<object>, IApplyAware
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
-		protected override bool Verify( object parameter ) => monitor.Apply();
+		protected override bool Verify( object parameter ) => !monitor.IsApplied;
+
+		public void Apply() => monitor.Apply();
 	}
 }

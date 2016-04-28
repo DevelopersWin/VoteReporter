@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using Ploeh.AutoFixture.Xunit2;
+﻿using Ploeh.AutoFixture.Xunit2;
+using System.ComponentModel;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects
@@ -36,7 +36,12 @@ namespace DragonSpark.Testing.Aspects
 			var next = new ValueHost();
 			Assert.True( next.PropertyName );
 
-			Assert.True( StaticValueHost.PropertyName );
+			/*var property = typeof(StaticValueHost).GetProperty( nameof(StaticValueHost.PropertyName) );
+			var satisfied = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( property );
+			Assert.True( satisfied );*/
+
+			var name = StaticValueHost.PropertyName;
+			Assert.True( name );
 		}
 
 		[Theory, AutoData]

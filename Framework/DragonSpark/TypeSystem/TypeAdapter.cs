@@ -54,18 +54,20 @@ namespace DragonSpark.TypeSystem
 
 		public ConstructorInfo FindConstructor( params object[] parameters ) => FindConstructor( parameters.Select( o => o?.GetType() ).ToArray() );
 
-		public ConstructorInfo FindConstructor( params System.Type[] parameterTypes ) => Info.DeclaredConstructors.SingleOrDefault( c => c.IsPublic && !c.IsStatic && Match( c.GetParameters(), parameterTypes ) );
+		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => Info.DeclaredConstructors.SingleOrDefault( c => c.IsPublic && !c.IsStatic && Match( c.GetParameters(), parameterTypes ) );
 
 		static bool Match( IReadOnlyCollection<ParameterInfo> parameters, IReadOnlyCollection<System.Type> provided )
 		{
 			var result = 
 				provided.Count >= parameters.Count( info => !info.IsOptional ) && 
 				provided.Count <= parameters.Count && 
-				parameters.Select( ( t, i ) => provided.ElementAtOrDefault( i ).With( t.ParameterType.Adapt().IsAssignableFrom, () => i < provided.Count || t.IsOptional ) ).All( b => b );
+				parameters
+					.Select( ( t, i ) => provided.ElementAtOrDefault( i ).With( t.ParameterType.Adapt().IsAssignableFrom, () => i < provided.Count || t.IsOptional ) )
+					.All( b => b );
 			return result;
 		}
 
-		public object Qualify( object instance ) => instance.With( o => Info.IsAssignableFrom( o.GetType().GetTypeInfo() ) ? o : /*GetCaster( o.GetType() ).With( caster => caster.Invoke( null, new[] { o } ) ) )*/ null );
+		// public object Qualify( object instance ) => instance.With( o => Info.IsAssignableFrom( o.GetType().GetTypeInfo() ) ? o : /*GetCaster( o.GetType() ).With( caster => caster.Invoke( null, new[] { o } ) ) )*/ null );
 
 		public bool IsAssignableFrom( TypeInfo other ) => IsAssignableFrom( other.AsType() );
 

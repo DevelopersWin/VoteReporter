@@ -2,6 +2,7 @@
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -9,6 +10,7 @@ using DragonSpark.Testing.Objects;
 using System.Composition;
 using System.Composition.Convention;
 using System.Composition.Hosting;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
@@ -44,11 +46,11 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData( false )]
 		public void LocalData( [Service]Type[] sut, [Service]Assembly[] assemblies )
 		{
-			var items = sut./*Except( FrameworkTypes.Instance.Create() ).*/Fixed();
+			var items = sut.Fixed();
 
-			var nested = GetType().Adapt().WithNested();
+			var nested = FrameworkTypes.Instance.Create().Union( GetType().Adapt().WithNested() ).Fixed();
 			Assert.Equal( nested.Length, items.Length );
-			Assert.Equal( nested, items );
+			Assert.Equal( nested.OrderBy( type => type.FullName ), items.OrderBy( type => type.FullName ) );
 
 			Assert.Empty( assemblies );
 

@@ -192,12 +192,14 @@ namespace DragonSpark.Runtime
 
 		public virtual bool CanExecute( T parameter ) => support.IsValid( parameter );
 
-		public void Execute( T parameter ) => OnExecute( parameter );
+		public void Execute( T parameter ) => Validate( parameter );
 
 		protected abstract void OnExecute( T parameter );
 
 		bool ICommand.CanExecute( object parameter ) => support.IsValid( parameter );
 
-		void ICommand.Execute( object parameter ) => support.Coerce( parameter, Execute );
+		void ICommand.Execute( object parameter ) => Validate( parameter );
+
+		void Validate( object parameter ) => support.Coerce( parameter, OnExecute );
 	}
 }

@@ -86,6 +86,21 @@ namespace DragonSpark.Activation
 		public bool IsValid( object parameter ) => Coerce( parameter, IsValid );
 
 		public bool IsValid( T parameter ) => specification.IsSatisfiedBy( parameter );
+
+		public override void Coerce( object parameter, Action<T> with ) => base.Coerce( parameter, Validate( with ) );
+
+		public override TResult Coerce<TResult>( object parameter, Func<T, TResult> with ) => base.Coerce( parameter, Validate( with ) );
+
+		Action<T> Validate( Action<T> with ) => parameter =>
+												{
+													if ( IsValid( parameter ) )
+													{
+														with( parameter );
+														specification.As<IApplyAware>( aware => aware.Apply() );
+													}
+												};
+
+		Func<T, TResult> Validate<TResult>( Func<T, TResult> with ) => parameter => IsValid( parameter ) ? with( parameter ) : Default<TResult>.Item;
 	}
 
 	public class CoercionSupport<T>
@@ -102,13 +117,13 @@ namespace DragonSpark.Activation
 			this.coercer = coercer;
 		}
 
-		public void Coerce( object parameter, Action<T> with )
+		public virtual void Coerce( object parameter, Action<T> with )
 		{
 			var coerced = coercer.Coerce( parameter );
 			with( coerced );
 		}
 
-		public TResult Coerce<TResult>( object parameter, Func<T, TResult> with )
+		public virtual TResult Coerce<TResult>( object parameter, Func<T, TResult> with )
 		{
 			var coerced = coercer.Coerce( parameter );
 			var result = with( coerced );
