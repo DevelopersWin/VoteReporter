@@ -18,7 +18,7 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect, IInstanceScopedAspect
 	{
-		void Initialize() => Processor = Processor ?? new ValueProcessor( base.OnGetValue );
+		void Initialize() => Processor = new ValueProcessor( base.OnGetValue );
 
 		ValueProcessor Processor { get; set; }
 
@@ -65,7 +65,7 @@ namespace DragonSpark.Aspects
 					@continue( parameter );
 				}
 			}
-
+			
 			public void Apply() => monitor.Apply();
 		}
 	}

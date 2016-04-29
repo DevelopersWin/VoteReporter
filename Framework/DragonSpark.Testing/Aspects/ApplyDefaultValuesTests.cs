@@ -33,12 +33,12 @@ namespace DragonSpark.Testing.Aspects
 			var second = sut.PropertyName;
 			Assert.True( second );
 
-			var next = new ValueHost();
-			Assert.True( next.PropertyName );
-
-			/*var property = typeof(StaticValueHost).GetProperty( nameof(StaticValueHost.PropertyName) );
+			/*var property = typeof(ValueHost).GetProperty( nameof(ValueHost.PropertyName) );
 			var satisfied = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( property );
 			Assert.True( satisfied );*/
+
+			var next = new ValueHost();
+			Assert.True( next.PropertyName );
 
 			var name = StaticValueHost.PropertyName;
 			Assert.True( name );

@@ -28,9 +28,7 @@ namespace DragonSpark.Activation
 	{
 		public static Activator Instance { get; } = new Activator( BuildableTypeFromConventionLocator.Instance );
 
-		public Activator( [Required] BuildableTypeFromConventionLocator locator ) : this( new SingletonLocator( locator ), Constructor.Instance ) {}
-
-		Activator( SingletonLocator locator, Constructor constructor ) : base( locator, constructor ) {}
+		public Activator( [Required] BuildableTypeFromConventionLocator locator ) : base( new SingletonLocator( locator ), Constructor.Instance ) {}
 
 		class SingletonLocator : LocatorBase
 		{

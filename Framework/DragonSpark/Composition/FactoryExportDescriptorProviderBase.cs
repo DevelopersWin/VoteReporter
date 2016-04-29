@@ -136,7 +136,6 @@ namespace DragonSpark.Composition
 	{
 		public static ActivatorDelegateFactory Instance { get; } = new ActivatorDelegateFactory();
 
-		[RecursionGuard()]
 		protected override Delegate CreateItem( Activator.Parameter parameter )
 		{
 			var factory = new FactoryDelegateLocatorFactory(

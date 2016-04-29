@@ -31,6 +31,11 @@ namespace DragonSpark.Runtime.Values
 		void IWritableStore.Assign( object item ) => CoercionSupport<T>.Instance.Coerce( item, Assign );
 	}
 
+	/*public class ExecutionAssociatedStore<T> : AssociatedStore<T>
+	{
+		public ExecutionAssociatedStore( object instance, Func<T> create = null ) : base( instance, create ) {}
+	}*/
+
 	public class ExecutionContextStore<T> : DeferredStore<T>
 	{
 		public ExecutionContextStore( Func<T> create = null ) : base( () => new AssociatedStore<T>( Execution.Current, create ) ) {}
@@ -49,7 +54,6 @@ namespace DragonSpark.Runtime.Values
 			this.lazy = lazy;
 		}
 
-		// [RecursionGuard( 2 )]
 		protected override T Get() => lazy.Value;
 	}
 

@@ -1,7 +1,6 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using PostSharp.Patterns.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	[Synchronized]
+	// [Synchronized]
 	public class Constructor : ConstructorBase
 	{
 		readonly Func<ConstructTypeRequest, Func<object>> source;

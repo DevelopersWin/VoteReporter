@@ -9,21 +9,6 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Configuration
 {
-	/*class StoreStore<T, TValue> : ExecutionContextStore<T> where T : class, IStore<TValue>, IConfiguration
-	{
-		public StoreStore() : base( Store.Instance.Create<T> ) {}
-	}*/
-
-	/*public static class Load<T, TValue> where T : class, IWritableStore<TValue>, IConfiguration
-	{
-		public static TValue Get() => new StoreStore<T, TValue>().Value.Value;
-	}
-
-	public static class Assign<T, TValue> where T : class, IWritableStore<TValue>, IConfiguration
-	{
-		public static void With( TValue value ) => new StoreStore<T, TValue>().Value.Assign( value );
-	}*/
-
 	public class EnableMethodCaching : ConfigurationBase<bool>
 	{
 		public EnableMethodCaching() : base( true ) {}
@@ -31,9 +16,9 @@ namespace DragonSpark.Configuration
 
 	public static class Configure
 	{
-		public static T Load<T>() where T : class, IWritableStore => new ExecutionContextStore<T>( Store.Instance.Create<T> ).Value;
+		public static T Load<T>() where T : class, IWritableStore, new() => new ConfigurationStore<T>().Value;
 
-		public static TValue Get<TConfiguration, TValue>() where TConfiguration : ConfigurationBase<TValue> => Load<TConfiguration>().Value;
+		public static TValue Get<TConfiguration, TValue>() where TConfiguration : ConfigurationBase<TValue>, new() => Load<TConfiguration>().Value;
 	}
 
 	public abstract class ConfigurationBase<T> : PropertyStore<T>
@@ -42,8 +27,6 @@ namespace DragonSpark.Configuration
 		{
 			Value = value;
 		}
-
-		// public IConfiguration Clone() => (IConfiguration)MemberwiseClone();
 	}
 
 	[ContentProperty( nameof(Configurations) )]
@@ -62,6 +45,11 @@ namespace DragonSpark.Configuration
 
 		ConfigureCommand() {}
 
-		protected override void OnExecute( IEnumerable<IWritableStore> parameter ) => parameter.Each( Store.Instance.Add );
+		protected override void OnExecute( IEnumerable<IWritableStore> parameter ) => parameter.Each( store =>
+		{
+			GetType().InvokeGenericAction( nameof(Add), store.GetType().ToItem(), store );
+		} );
+
+		static void Add<T>( T store ) where T : class, IWritableStore, new() => PrototypeStore<T>.Instance.Assign( store );
 	}
 }

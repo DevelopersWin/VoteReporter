@@ -1,27 +1,25 @@
-using System;
 using DragonSpark.Diagnostics;
 using DragonSpark.Runtime.Values;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
+using System;
 
 namespace DragonSpark.Aspects
 {
 	[PSerializable, LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Caching )]
-	public class RecursionGuardAttribute : OnMethodBoundaryAspect, IInstanceScopedAspect
+	public class RecursionGuardAttribute : OnMethodBoundaryAspect
 	{
 		public RecursionGuardAttribute( int maxCallCount = 4 )
 		{
 			MaxCallCount = maxCallCount;
 		}
 
-		bool Enabled { get; set; }
-
 		int MaxCallCount { get; set; }
 
 		class Count : ThreadAmbientStore<int>
 		{
-			public Count( MethodExecutionArgs args ) : base( KeyFactory.Instance.CreateUsing( args.Instance, args.Method, args.Arguments ).ToString() ) {}
+			public Count( MethodExecutionArgs args ) : base( KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments ).ToString() ) {}
 
 			int Update( bool up = true )
 			{
@@ -38,7 +36,7 @@ namespace DragonSpark.Aspects
 
 		public override void OnEntry( MethodExecutionArgs args )
 		{
-			if ( Enabled && new Count( args ).Increment() == MaxCallCount )
+			if ( new Count( args ).Increment() >= MaxCallCount )
 			{
 				throw new InvalidOperationException( $"Recursion detected in method {new MethodFormatter(args.Method).ToString( null, null )}" );
 			}
@@ -51,9 +49,5 @@ namespace DragonSpark.Aspects
 			base.OnExit( args );
 			new Count( args ).Decrement();
 		}
-
-		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
-
-		void IInstanceScopedAspect.RuntimeInitializeInstance() => Enabled = true;
 	}
 }
