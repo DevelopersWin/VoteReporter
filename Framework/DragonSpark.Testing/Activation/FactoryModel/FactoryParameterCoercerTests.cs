@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 	public class FactoryParameterCoercerTests
 	{
 		[Theory, AutoData]
-		void Parameter( Coercer<IntegerParameter> sut, int item )
+		void Parameter( ConstructCoercer<IntegerParameter> sut, int item )
 		{
 			var parameter = sut.Coerce( item );
 			Assert.NotNull( parameter );

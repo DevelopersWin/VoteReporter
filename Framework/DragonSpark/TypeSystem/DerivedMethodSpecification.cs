@@ -3,13 +3,13 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class DerivedMethodSpecification : SpecificationBase<MethodInfo>
+	public class DerivedMethodSpecification : CoercedSpecificationBase<MethodInfo>
 	{
 		public static DerivedMethodSpecification Instance { get; } = new DerivedMethodSpecification();
 
 		DerivedMethodSpecification() {}
 
-		protected override bool Verify( MethodInfo parameter )
+		public override bool IsSatisfiedBy( MethodInfo parameter )
 		{
 			var methodInfo = parameter.GetRuntimeBaseDefinition();
 			var result = methodInfo.DeclaringType != parameter.DeclaringType;

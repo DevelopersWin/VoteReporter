@@ -200,6 +200,8 @@
   <ItemGroup>
     <Compile Include="Activation\ActivatorExtensionsTests.cs" />
     <Compile Include="Activation\ActivatorTests.cs" />
+    <Compile Include="Activation\ConstructionActivatorFactoryTests.cs" />
+    <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryReflectionSupportTests.cs" />
@@ -252,7 +254,7 @@
     <Compile Include="Runtime\SerializerTests.cs" />
     <Compile Include="Runtime\ListDictionaryTests.cs" />
     <Compile Include="Runtime\Specifications\AllSpecificationTests.cs" />
-    <Compile Include="Runtime\Specifications\EqualityContextAwareSpecificationTests.cs" />
+    <Compile Include="Runtime\Specifications\SpecificationWithContextBasetionTests.cs" />
     <Compile Include="Runtime\Specifications\NeverSpecificationTests.cs" />
     <Compile Include="Runtime\Specifications\SpecificationExtensionsTests.cs" />
     <Compile Include="Runtime\Specifications\TypeAssignableSpecificationTests.cs" />

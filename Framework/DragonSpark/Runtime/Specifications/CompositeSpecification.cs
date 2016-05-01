@@ -11,9 +11,9 @@ namespace DragonSpark.Runtime.Specifications
 			this.@where = @where;
 		}
 
-		public bool IsSatisfiedBy( object context )
+		public bool IsSatisfiedBy( object parameter )
 		{
-			var result = where( condition => condition.IsSatisfiedBy( context ) );
+			var result = where( condition => condition.IsSatisfiedBy( parameter ) );
 			return result;
 		}
 	}

@@ -16,7 +16,7 @@ namespace DragonSpark.Activation.IoC
 		public static ServiceProviderSpecificationFactory Instance { get; } = new ServiceProviderSpecificationFactory();
 		
 		protected override ISpecification<LocateTypeRequest> CreateItem( IServiceProvider parameter ) => 
-			parameter.Get<FactoryTypeRequestLocator>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? AlwaysSpecification<LocateTypeRequest>.Instance;
+			parameter.Get<FactoryTypeRequestLocator>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? Specifications<object>.Always;
 	}
 
 	public class ServicesIntegrationExtension : UnityContainerExtension

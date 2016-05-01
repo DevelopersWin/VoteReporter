@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Aspects;
 
 namespace DragonSpark.TypeSystem
 {
@@ -14,7 +14,9 @@ namespace DragonSpark.TypeSystem
 
 	public class AttributeProviderLocator : FirstConstructedFromParameterFactory<IAttributeProvider>, IAttributeProviderLocator
 	{
-		public static AttributeProviderLocator Instance { get; } = new AttributeProviderLocator( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(GeneralAttributeProvider) );
+		public static AttributeProviderLocator Default { get; } = new AttributeProviderLocator();
+
+		AttributeProviderLocator() : this( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
 
 		protected AttributeProviderLocator( params Type[] types ) : base( types ) {}
 
@@ -24,12 +26,12 @@ namespace DragonSpark.TypeSystem
 
 	public class AttributeProviderConfiguration : ConfigurationBase<IAttributeProviderLocator>
 	{
-		public AttributeProviderConfiguration() : base( AttributeProviderLocator.Instance ) {}
+		public AttributeProviderConfiguration() : base( AttributeProviderLocator.Default ) {}
 	}
 
-	class GeneralAttributeProvider : DelegatedParameterFactoryBase<object, IAttributeProvider>
+	class ObjectAttributeProvider : DelegatedParameterFactoryBase<object, IAttributeProvider>
 	{
-		public GeneralAttributeProvider( object item ) : base( item, MemberInfoProviderFactory.Instance.Create ) {}
+		public ObjectAttributeProvider( object item ) : base( item, MemberInfoProviderFactory.Instance.Create ) {}
 	}
 
 	public class MemberInfoProvider : FirstConstructedFromParameterFactory<IAttributeProvider>
@@ -39,7 +41,7 @@ namespace DragonSpark.TypeSystem
 		MemberInfoProvider() : base( typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ) {}
 	}
 
-	class MemberInfoProviderFactory : FactoryBase<object, IAttributeProvider>
+	public class MemberInfoProviderFactory : FactoryBase<object, IAttributeProvider>
 	{
 		public static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory( ComponentModel.TypeDefinitionProvider.Instance );
 
@@ -50,7 +52,7 @@ namespace DragonSpark.TypeSystem
 
 		public MemberInfoProviderFactory( ITypeDefinitionProvider transformer ) : this( TypeDefinitionProvider.Instance, transformer, TypeDefinitionLocator.Instance, MemberInfoProvider.Instance ) {}
 
-		public MemberInfoProviderFactory( TypeDefinitionProvider definition, ITypeDefinitionProvider transformer, TypeDefinitionLocator locator, MemberInfoProvider provider )
+		protected MemberInfoProviderFactory( TypeDefinitionProvider definition, ITypeDefinitionProvider transformer, TypeDefinitionLocator locator, MemberInfoProvider provider )
 		{
 			this.definition = definition;
 			this.transformer = transformer;
@@ -69,7 +71,7 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
-	class TypeDefinitionProvider : FirstFromParameterFactory<object, TypeInfo>
+	public class TypeDefinitionProvider : FirstFromParameterFactory<object, TypeInfo>
 	{
 		public static TypeDefinitionProvider Instance { get; } = new TypeDefinitionProvider();
 

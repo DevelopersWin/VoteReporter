@@ -2,7 +2,9 @@
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
+using Serilog;
 using System;
+using System.Diagnostics;
 using Xunit;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 

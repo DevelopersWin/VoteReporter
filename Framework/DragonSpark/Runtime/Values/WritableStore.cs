@@ -16,6 +16,17 @@ namespace DragonSpark.Runtime.Values
 
 	public abstract class WritableStore<T> : StoreBase<T>, IWritableStore<T>, IDisposable
 	{
+		readonly Func<object, T> projection;
+
+		protected WritableStore() : this( Coercer<T>.Instance ) {}
+
+		protected WritableStore( ICoercer<T> coercer ) : this( coercer.Coerce ) {}
+
+		protected WritableStore( Func<object, T> projection )
+		{
+			this.projection = projection;
+		}
+
 		public abstract void Assign( T item );
 
 		public void Dispose()
@@ -28,7 +39,7 @@ namespace DragonSpark.Runtime.Values
 
 		protected virtual void OnDispose() {}
 
-		void IWritableStore.Assign( object item ) => CoercionSupport<T>.Instance.Coerce( item, Assign );
+		void IWritableStore.Assign( object item ) => Assign( projection( item ) );
 	}
 
 	/*public class ExecutionAssociatedStore<T> : AssociatedStore<T>

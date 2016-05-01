@@ -4,7 +4,7 @@ using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Activation.IoC
 {
-	public class IsRegisteredSpecification : SpecificationBase<LocateTypeRequest>
+	public class IsRegisteredSpecification : CoercedSpecificationBase<LocateTypeRequest>
 	{
 		readonly IUnityContainer container;
 
@@ -13,6 +13,6 @@ namespace DragonSpark.Activation.IoC
 			this.container = container;
 		}
 
-		protected override bool Verify( LocateTypeRequest parameter ) => container.IsRegistered( parameter.RequestedType, parameter.Name );
+		public override bool IsSatisfiedBy( LocateTypeRequest parameter ) => container.IsRegistered( parameter.RequestedType, parameter.Name );
 	}
 }

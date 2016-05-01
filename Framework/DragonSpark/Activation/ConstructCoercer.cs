@@ -1,6 +1,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using System;
+using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation
 {
@@ -17,14 +18,14 @@ namespace DragonSpark.Activation
 			this.item = item;
 		}
 
-		public TParameter Coerce( object context ) => item;
+		public TParameter Coerce( object parameter ) => item;
 	}
 
-	public class ConstructFromParameterFactory : ConstructFromParameterFactory<object>
+	/*public class ConstructFromParameterFactory : ConstructFromParameterFactory<object>
 	{
 		public ConstructFromParameterFactory( Type type ) : base( type ) {}
 		public ConstructFromParameterFactory( IActivator activator, Type type ) : base( activator, type ) {}
-	}
+	}*/
 
 	public class ConstructFromParameterFactory<T> : FactoryBase<object, T>
 	{
@@ -53,17 +54,23 @@ namespace DragonSpark.Activation
 	{
 		public static Coercer<T> Instance { get; } = new Coercer<T>();
 
-		public Coercer() {}
+		protected override T PerformCoercion( object parameter ) => Default<T>.Item;
+	}
 
-		protected override T PerformCoercion( object parameter ) => /*(T)Constructor.Instance.Create( new ConstructTypeRequest( typeof(T), parameter ) )*/ ConstructFromParameterFactory<T>.Instance.Create( parameter );
+	public class ConstructCoercer<T> : CoercerBase<T>
+	{
+		public static ConstructCoercer<T> Instance { get; } = new ConstructCoercer<T>();
 
-		/*var constructor = typeof(T).Adapt().FindConstructor( parameter.GetType() );
-			var result = (T)constructor.With( info =>
-			{
-				var parameters = info.GetParameters().First().ParameterType.Adapt().Qualify( parameter ).Append( Enumerable.Repeat( Type.Missing, Math.Max( 0, constructor.GetParameters().Length - 1 ) ) ).ToArray();
-				return info.Invoke( parameters );
-			} );
-			return result;*/
+		readonly Func<object, T> projector;
+
+		ConstructCoercer() : this( ConstructFromParameterFactory<T>.Instance.Create ) {}
+
+		protected ConstructCoercer( Func<object, T> projector )
+		{
+			this.projector = projector;
+		}
+
+		protected override T PerformCoercion( object parameter ) => projector( parameter );
 	}
 
 	public class Projector<TFrom, TTo> : CoercerBase<TTo>
@@ -79,7 +86,7 @@ namespace DragonSpark.Activation
 
 	public abstract class CoercerBase<T> : ICoercer<T>
 	{
-		public T Coerce( object context ) => context is T ? (T)context : context.With( PerformCoercion );
+		public T Coerce( object parameter ) => parameter is T ? (T)parameter : parameter.With( PerformCoercion );
 
 		protected abstract T PerformCoercion( object parameter );
 	}

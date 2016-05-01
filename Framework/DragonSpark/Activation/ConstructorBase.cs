@@ -11,7 +11,7 @@ namespace DragonSpark.Activation
 
 		public class Coercer : TypeRequestCoercer<ConstructTypeRequest>
 		{
-			public new static Coercer Instance { get; } = new Coercer();
+			public static Coercer Instance { get; } = new Coercer();
 
 			protected override ConstructTypeRequest Create( Type type ) => new ConstructTypeRequest( type );
 		}

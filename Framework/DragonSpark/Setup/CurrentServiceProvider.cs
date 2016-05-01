@@ -112,6 +112,6 @@ namespace DragonSpark.Setup
 
 	public abstract class MigrationCommandBase<T> : CommandBase<MigrationParameter<T>>
 	{
-		protected MigrationCommandBase() : base( IsTypeSpecification<MigrationParameter<T>>.Instance.And( new OnlyOnceSpecification() ).Box<MigrationParameter<T>>() ) {}
+		protected MigrationCommandBase() : base( IsInstanceOfSpecification<MigrationParameter<T>>.Instance.And( new OnlyOnceSpecification() ).Box<MigrationParameter<T>>() ) {}
 	}
 }

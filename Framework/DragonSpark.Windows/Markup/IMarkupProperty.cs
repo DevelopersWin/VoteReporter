@@ -1,8 +1,8 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Windows.Markup;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -15,11 +15,11 @@ namespace DragonSpark.Windows.Markup
 		object SetValue( object value );
 	}
 
-	public class Specification<TTarget, TProperty> : SpecificationBase<IServiceProvider>
+	public class Specification<TTarget, TProperty> : CoercedSpecificationBase<IServiceProvider>
 	{
 		public static Specification<TTarget, TProperty> Instance { get; } = new Specification<TTarget, TProperty>();
 
-		protected override bool Verify( IServiceProvider parameter ) => 
+		public override bool IsSatisfiedBy( IServiceProvider parameter ) => 
 			parameter.Get<IProvideValueTarget>().With( target => target.TargetObject is TTarget && target.TargetProperty is TProperty )
 			;
 	}

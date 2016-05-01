@@ -1,5 +1,4 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Commands;
@@ -30,26 +29,12 @@ namespace DragonSpark.Configuration
 	}
 
 	[ContentProperty( nameof(Configurations) )]
-	public class InitializeConfigurationCommand : ServiceAssignedCommand<ConfigureCommand, IList<IWritableStore>>
+	public class InitializeConfigurationCommand : ServicedCommand<ConfigureCommand, IList<IWritableStore>>
 	{
-		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification() ) {}
+		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification().Box<object>() ) {}
 
 		public Collection<IWritableStore> Configurations { get; } = new Collection<IWritableStore>();
 
 		public override object GetParameter() => Configurations.ToArray();
-	}
-
-	public class ConfigureCommand : CommandBase<IEnumerable<IWritableStore>>
-	{
-		public static ConfigureCommand Instance { get; } = new ConfigureCommand();
-
-		ConfigureCommand() {}
-
-		protected override void OnExecute( IEnumerable<IWritableStore> parameter ) => parameter.Each( store =>
-		{
-			GetType().InvokeGenericAction( nameof(Add), store.GetType().ToItem(), store );
-		} );
-
-		static void Add<T>( T store ) where T : class, IWritableStore, new() => PrototypeStore<T>.Instance.Assign( store );
 	}
 }

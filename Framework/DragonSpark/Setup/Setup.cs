@@ -108,11 +108,11 @@ namespace DragonSpark.Setup
 
 	public static class ActivationProperties
 	{
-		public class IsActivatedInstanceSpecification : SpecificationBase<object>
+		public class IsActivatedInstanceSpecification : CoercedSpecificationBase<object>
 		{
 			public static IsActivatedInstanceSpecification Instance { get; } = new IsActivatedInstanceSpecification();
 
-			protected override bool Verify( object parameter ) => new Instance( parameter ).Value || new[] { parameter, new Factory( parameter ).Value }.NotNull().Any( o => o.Has<SharedAttribute>() );
+			public override bool IsSatisfiedBy( object parameter ) => new Instance( parameter ).Value || new[] { parameter, new Factory( parameter ).Value }.NotNull().Any( o => o.Has<SharedAttribute>() );
 		}
 
 		public class Instance : AssociatedStore<bool>

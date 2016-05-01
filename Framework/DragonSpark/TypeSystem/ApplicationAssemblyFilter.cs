@@ -1,14 +1,14 @@
-using System;
+using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
+using PostSharp.Aspects.Internals;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using PostSharp.Aspects.Internals;
 
 namespace DragonSpark.TypeSystem
 {
@@ -32,17 +32,17 @@ namespace DragonSpark.TypeSystem
 		protected override Assembly[] CreateItem( Assembly[] parameter ) => parameter.Where( specification.IsSatisfiedBy ).Prioritize().ToArray();
 	}
 
-	public class ApplicationTypeSpecification : SpecificationBase<Type>
+	public class ApplicationTypeSpecification : CoercedSpecificationBase<Type>
 	{
 		public static ApplicationTypeSpecification Instance { get; } = new ApplicationTypeSpecification();
 
 		ApplicationTypeSpecification() {}
 
 		[Freeze]
-		protected override bool Verify( Type parameter ) => !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Adapt().IsDefined<CompilerGeneratedAttribute>();
+		public override bool IsSatisfiedBy( Type parameter ) => !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Adapt().IsDefined<CompilerGeneratedAttribute>();
 	}
 
-	public class ApplicationAssemblySpecification : SpecificationBase<Assembly>
+	public class ApplicationAssemblySpecification : CoercedSpecificationBase<Assembly>
 	{
 		public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification();
 
@@ -53,6 +53,6 @@ namespace DragonSpark.TypeSystem
 			this.rootNamespaces = rootNamespaces;
 		}
 
-		protected override bool Verify( Assembly parameter ) => parameter.Has<RegistrationAttribute>() || rootNamespaces.Any( parameter.GetName().Name.StartsWith );
+		public override bool IsSatisfiedBy( Assembly parameter ) => parameter.Has<RegistrationAttribute>() || rootNamespaces.Any( parameter.GetName().Name.StartsWith );
 	}
 }

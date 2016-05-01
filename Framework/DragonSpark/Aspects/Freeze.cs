@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Configuration;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Patterns.Model;
@@ -51,7 +50,7 @@ namespace DragonSpark.Aspects
 	{
 		CacheValueFactory Factory { get; set; }
 
-		public override void OnInvoke( MethodInterceptionArgs args )
+		/*public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			if ( Factory != null && Configure.Load<EnableMethodCaching>().Value && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
@@ -61,7 +60,7 @@ namespace DragonSpark.Aspects
 			{
 				base.OnInvoke( args );
 			}
-		}
+		}*/
 
 		// public override void RuntimeInitialize( MethodBase method ) => Initialize();
 

@@ -4,7 +4,6 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		public static NeverSpecification Instance { get; } = new NeverSpecification();
 
-		NeverSpecification() : base( false )
-		{}
+		NeverSpecification() : base( false ) {}
 	}
 }

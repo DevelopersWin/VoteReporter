@@ -6,6 +6,6 @@
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
 	xmlns:diagnosticsCore="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
 	mc:Ignorable="d">
-	<!--<configuration:EnableMethodCaching Value="False" />-->
+	<configuration:EnableMethodCaching Value="False" />
 	<diagnosticsCore:MinimumLevelConfiguration Value="Debug" />
 </configuration:InitializeConfigurationCommand>

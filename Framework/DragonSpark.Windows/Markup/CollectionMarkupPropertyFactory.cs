@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
@@ -9,7 +10,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using DragonSpark.Activation;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
@@ -31,11 +31,11 @@ namespace DragonSpark.Windows.Markup
 			propertyFactory( parameter ).With( reference => new CollectionMarkupProperty( (IList)parameter.Get<IProvideValueTarget>().TargetObject, reference ) );
 	}
 
-	public class CollectionSpecification : SpecificationBase<IServiceProvider>
+	public class CollectionSpecification : CoercedSpecificationBase<IServiceProvider>
 	{
 		public static CollectionSpecification Instance { get; } = new CollectionSpecification();
 
-		protected override bool Verify( IServiceProvider parameter ) => 
+		public override bool IsSatisfiedBy( IServiceProvider parameter ) => 
 			parameter.Get<IProvideValueTarget>().TargetObject.With( o => o is IList && o.Adapt().GetEnumerableType() != null );
 	}
 

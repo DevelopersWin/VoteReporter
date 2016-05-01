@@ -1,6 +1,7 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,13 @@ using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	// [Synchronized]
 	public class Constructor : ConstructorBase
 	{
 		readonly Func<ConstructTypeRequest, Func<object>> source;
 
 		public static Constructor Instance { get; } = new Constructor();
 
-		Constructor() : this( ActivatorFactory.Instance.Create ) {}
+		Constructor() : this( ConstructionActivatorFactory.Instance.Create ) {}
 
 		Constructor( Func<ConstructTypeRequest, Func<object>> source ) : base( new Specification( source ) )
 		{
@@ -25,32 +25,30 @@ namespace DragonSpark.Activation
 
 		protected override object CreateItem( ConstructTypeRequest parameter )
 		{
-			var factory = source( parameter );
-			var result = factory();
+			var activator = source( parameter );
+			var result = activator?.Invoke() ?? DefaultItemProvider.Instance.Create( parameter.RequestedType );
 			return result;
 		}
 
-		class Specification : SpecificationBase<ConstructTypeRequest>
+		class Specification : CoercedSpecificationBase<ConstructTypeRequest>
 		{
 			readonly Func<ConstructTypeRequest, Func<object>> source;
 
 			// public Specification() : this( ActivatorFactory.Instance.Create ) {}
 
-			public Specification( Func<ConstructTypeRequest, Func<object>> source )
+			public Specification( Func<ConstructTypeRequest, Func<object>> source ) : base( Coercer.Instance.Coerce )
 			{
 				this.source = source;
 			}
 
-			protected override bool Verify( ConstructTypeRequest parameter )
-			{
-				var result = source( parameter ) != null;
-				return result;
-			}
+			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || source( parameter ) != null;
 		}
 
 		class ArgumentsFactory : FactoryBase<ConstructTypeRequest, object[]>
 		{
 			public static ArgumentsFactory Instance { get; } = new ArgumentsFactory();
+
+			ArgumentsFactory() : base( ConstructCoercer<ConstructTypeRequest>.Instance ) {}
 
 			[Freeze]
 			protected override object[] CreateItem( ConstructTypeRequest parameter )
@@ -74,15 +72,15 @@ namespace DragonSpark.Activation
 			}
 		}
 
-		class ActivatorFactory : FactoryBase<ConstructTypeRequest, Func<object>>
+		internal class ConstructionActivatorFactory : FactoryBase<ConstructTypeRequest, Func<object>>
 		{
-			public static ActivatorFactory Instance { get; } = new ActivatorFactory();
+			public static ConstructionActivatorFactory Instance { get; } = new ConstructionActivatorFactory();
 
 			readonly Func<ConstructTypeRequest, object[]> arguments;
 
-			ActivatorFactory() : this( ArgumentsFactory.Instance.Create ) {}
+			ConstructionActivatorFactory() : this( ArgumentsFactory.Instance.Create ) {}
 
-			public ActivatorFactory( Func<ConstructTypeRequest, object[]> arguments )
+			public ConstructionActivatorFactory( Func<ConstructTypeRequest, object[]> arguments )
 			{
 				this.arguments = arguments;
 			}
@@ -90,36 +88,33 @@ namespace DragonSpark.Activation
 			[Freeze]
 			protected override Func<object> CreateItem( ConstructTypeRequest parameter )
 			{
-				var result = parameter
-									.RequestedType
-									.Adapt().With( adapter => 
-										new[] { arguments( parameter ), new object[0] }
-											.WithFirst( 
-												objects => adapter.FindConstructor( objects ).With( GetActivator ).With( activator => new Func<object>( () => activator( objects ) ) )
+				var result = parameter.RequestedType.Adapt().With( adapter => new[] { arguments( parameter ), Default<object>.Items }
+																						.WithFirst( objects => adapter
+																												.FindConstructor( objects )
+																												.With( GetActivator )
+																												.With( activator => new Func<object>( () => activator( objects ) ) )
 												)
 										);
+
 				return result;
 			}
 
-			static ObjectActivator GetActivator( ConstructorInfo ctor )
+			static ObjectActivator GetActivator( ConstructorInfo constructor )
 			{
-				var paramsInfo = ctor.GetParameters();
+				var parameters = constructor.GetParameters();
 				var param = Expression.Parameter( typeof(object[]), "args" );
 
-				var argsExp = new Expression[paramsInfo.Length];
-				for ( var i = 0; i < paramsInfo.Length; i++ )
+				var array = new Expression[parameters.Length];
+				for ( var i = 0; i < parameters.Length; i++ )
 				{
-					var paramAccessorExp = Expression.ArrayIndex( param, Expression.Constant( i ) );
-					argsExp[i] = Expression.Convert( paramAccessorExp, paramsInfo[i].ParameterType );
+					var index = Expression.ArrayIndex( param, Expression.Constant( i ) );
+					array[i] = Expression.Convert( index, parameters[i].ParameterType );
 				}
 
-				var newExp = Expression.New( ctor, argsExp );
+				var create = Expression.New( constructor, array );
 
-				var lambda = Expression.Lambda( typeof(ObjectActivator), newExp, param );
-
-				//compile it
-				var compiled = (ObjectActivator)lambda.Compile();
-				return compiled;
+				var result = Expression.Lambda<ObjectActivator>( create, param ).Compile();
+				return result;
 			}
 		}
 

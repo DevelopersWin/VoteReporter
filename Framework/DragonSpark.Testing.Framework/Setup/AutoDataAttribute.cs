@@ -208,7 +208,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		public object GetService( Type serviceType ) => Create( serviceType );
 	}
 
-	sealed class Specification : SpecificationBase<Type>
+	sealed class Specification : CoercedSpecificationBase<Type>
 	{
 		readonly IServiceRegistry registry;
 
@@ -219,6 +219,6 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.registry = registry;
 		}
 
-		protected override bool Verify( Type parameter ) => registry.IsRegistered( parameter );
+		public override bool IsSatisfiedBy( Type parameter ) => registry.IsRegistered( parameter );
 	}
 }

@@ -20,6 +20,8 @@ namespace DragonSpark.TypeSystem
 	{
 		public static Func<T, T> Self => t => t;
 
+		public static Func<T, object> Boxed => t => t;
+
 		[Freeze]
 		public static T Item => DefaultFactory<T>.Instance.Create();
 

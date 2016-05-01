@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Runtime.Specifications
 {
-	public class EqualityContextAwareSpecificationTests
+	public class SpecificationWithContextBasetionTests
 	{
 		[Theory, AutoData]
 		public void Equal( [Frozen]object item, EqualityContextAwareSpecification sut )

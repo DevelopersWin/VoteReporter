@@ -1,11 +1,11 @@
-using System;
 using DragonSpark.Extensions;
+using System;
 
 namespace DragonSpark.Activation
 {
-	public abstract class TypeRequestCoercer<TParameter> : Coercer<TParameter>
+	public abstract class TypeRequestCoercer<TParameter> : CoercerBase<TParameter>
 	{
-		protected override TParameter PerformCoercion( object context ) => context.AsTo<Type, TParameter>( Create );
+		protected override TParameter PerformCoercion( object parameter ) => parameter.AsTo<Type, TParameter>( Create );
 
 		protected abstract TParameter Create( Type type );
 	}

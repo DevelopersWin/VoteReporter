@@ -5,10 +5,10 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class DefaultValuePropertySpecification : SpecificationBase<PropertyInfo>
+	public class DefaultValuePropertySpecification : CoercedSpecificationBase<PropertyInfo>
 	{
 		public static DefaultValuePropertySpecification Instance { get; } = new DefaultValuePropertySpecification();
 
-		protected override bool Verify( PropertyInfo parameter ) => parameter.GetMethod != null && ( parameter.Has<DefaultValueAttribute>() || parameter.Has<DefaultValueBase>() );
+		public override bool IsSatisfiedBy( PropertyInfo parameter ) => parameter.GetMethod != null && ( parameter.Has<DefaultValueAttribute>() || parameter.Has<DefaultValueBase>() );
 	}
 }

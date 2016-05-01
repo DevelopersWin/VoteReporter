@@ -32,7 +32,7 @@ namespace DragonSpark.Runtime
 	[ContentProperty( nameof(Commands) )]
 	public class CompositeCommand<TParameter> : DisposingCommand<TParameter>
 	{
-		public CompositeCommand( [Required]params ICommand[] commands ) : this( AlwaysSpecification<TParameter>.Instance, commands ) {}
+		public CompositeCommand( [Required]params ICommand[] commands ) : this( Specifications<TParameter>.Always, commands ) {}
 
 		public CompositeCommand( ISpecification<TParameter> specification, [Required]params ICommand[] commands ) : base( specification )
 		{

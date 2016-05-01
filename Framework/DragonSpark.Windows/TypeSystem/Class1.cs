@@ -33,7 +33,7 @@ namespace DragonSpark.Windows.TypeSystem
 	{
 		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();
 
-		AssemblyInitializer() : base( new CheckSpecification<Assembly>() ) {}
+		AssemblyInitializer() : base( new OnlyOnceSpecification().Box<object>() ) {}
 
 		protected override void OnExecute( Assembly parameter ) => parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
 	}

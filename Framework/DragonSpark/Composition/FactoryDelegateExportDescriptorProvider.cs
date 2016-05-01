@@ -31,7 +31,7 @@ namespace DragonSpark.Composition
 
 		public static FactoryDelegateTransformer InstanceWithParameter { get; } = new FactoryDelegateTransformer( typeof(Func<,>) );
 
-		public FactoryDelegateTransformer( [OfFactoryType]Type factoryDelegateType ) : base( new BoxedSpecification<CompositionContract>( new GenericTypeAssignableSpecification( factoryDelegateType ), contract => contract.ContractType ) ) {}
+		public FactoryDelegateTransformer( [OfFactoryType]Type factoryDelegateType ) : base( new GenericTypeAssignableSpecification( factoryDelegateType ).Box<CompositionContract>( contract => contract.ContractType ) ) {}
 
 		protected override CompositionContract CreateItem( CompositionContract parameter ) => Factory.GetResultType( parameter.ContractType ).With( parameter.ChangeType );
 	}

@@ -7,6 +7,22 @@ using System;
 
 namespace DragonSpark.Aspects
 {
+	/*[PSerializable, LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	public class AllowAttribute : MethodInterceptionAspect
+	{
+		public override void OnInvoke( MethodInterceptionArgs args )
+		{
+			if ( args.Arguments.All( o => o != null ) )
+			{
+				base.OnInvoke( args );
+			}
+			else
+			{
+				// args.ReturnValue = args.Method.AsTo<MethodInfo, object>( info => info.ReturnType.Adapt().GetDefaultValue() );
+			}
+		}
+	}*/
+
 	[PSerializable, LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Caching )]
 	public class RecursionGuardAttribute : OnMethodBoundaryAspect
 	{

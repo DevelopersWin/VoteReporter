@@ -1,13 +1,9 @@
 namespace DragonSpark.Runtime.Specifications
 {
-	public class EqualityContextAwareSpecification : ContextAwareSpecificationBase<object>
+	public class EqualityContextAwareSpecification : SpecificationWithContextBase<object>
 	{
-		public EqualityContextAwareSpecification( object context ) : base( context )
-		{}
-		protected override bool Verify( object parameter )
-		{
-			var result = Equals( Context, parameter );
-			return result;
-		}
+		public EqualityContextAwareSpecification( object context ) : base( context ) {}
+
+		public override bool IsSatisfiedBy( object parameter ) => Equals( Context, parameter );
 	}
 }

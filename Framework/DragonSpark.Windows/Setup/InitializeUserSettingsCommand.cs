@@ -3,6 +3,7 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Windows.Properties;
 using Serilog;
 using Serilog.Events;
@@ -10,7 +11,6 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -58,7 +58,7 @@ namespace DragonSpark.Windows.Setup
 
 		public InitializeUserSettingsCommand( ILogger logger ) : this( new LogCommand( logger ), UserSettingsPathFactory.Instance.Create ) {}
 
-		public InitializeUserSettingsCommand( LogCommand log, Func<string> pathSource ) : base( new OnlyOnceSpecification() )
+		public InitializeUserSettingsCommand( LogCommand log, Func<string> pathSource ) : base( new OnlyOnceSpecification().Box<object>() )
 		{
 			this.log = log;
 			this.pathSource = pathSource;

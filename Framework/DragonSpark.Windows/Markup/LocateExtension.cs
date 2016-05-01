@@ -54,11 +54,11 @@ namespace DragonSpark.Windows.Markup
 	{
 		public static MockFactory Instance { get; } = new MockFactory();
 
-		public class Specification : SpecificationBase<Type>
+		public class Specification : CoercedSpecificationBase<Type>
 		{
 			public static Specification Instance { get; } = new Specification();
 
-			protected override bool Verify( Type parameter ) => parameter.IsInterface || !parameter.IsSealed;
+			public override bool IsSatisfiedBy( Type parameter ) => parameter.IsInterface || !parameter.IsSealed;
 		}
 
 		public MockFactory() : base( Specification.Instance ) {}
@@ -78,22 +78,6 @@ namespace DragonSpark.Windows.Markup
 		public StringDesignerValueFactory() : base( TypeAssignableSpecification<string>.Instance ) {}
 
 		protected override object CreateItem( Type parameter ) => parameter.AssemblyQualifiedName;
-	}
-
-	public class DefaultItemProvider : FactoryBase<Type, object>
-	{
-		public static DefaultItemProvider Instance { get; } = new DefaultItemProvider();
-
-		protected override object CreateItem( Type parameter )
-		{
-			var enumerableType = parameter.Adapt().GetEnumerableType();
-			var items = enumerableType == null;
-			var name = items ? nameof(Default<object>.Item) : nameof(Default<object>.Items);
-			var targetType = enumerableType ?? parameter;
-			var property = typeof(Default<>).MakeGenericType( targetType ).GetProperty( name );
-			var result = property.GetValue( null );
-			return result;
-		}
 	}
 
 	public class DesignTimeValueProvider : FirstFromParameterFactory<Type, object>

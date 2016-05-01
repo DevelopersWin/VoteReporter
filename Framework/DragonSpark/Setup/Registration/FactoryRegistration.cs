@@ -173,7 +173,7 @@ namespace DragonSpark.Setup.Registration
 		{
 			public static Specification Instance { get; } = new Specification();
 
-			public Specification() : base( parameter => typeof(TFactory).Adapt().IsAssignableFrom( parameter.FactoryType ) ) {}
+			Specification() : base( parameter => typeof(TFactory).Adapt().IsAssignableFrom( parameter.FactoryType ) ) {}
 		}
 	}
 

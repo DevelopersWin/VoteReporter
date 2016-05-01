@@ -74,60 +74,41 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class ParameterSupport<T> : CoercionSupport<T>
+	public class ParameterSupport<T>
 	{
-		readonly ISpecification<T> specification;
-		
-		public ParameterSupport( [Required]ISpecification<T> specification, [Required]ICoercer<T> coercer ) : base( coercer )
+		public ParameterSupport( [Required]ISpecification<T> specification, [Required]ICoercer<T> coercer )
 		{
-			this.specification = specification;
+			Specification = specification;
+			Coercer = coercer;
 		}
+
+		public ISpecification<T> Specification { get; }
+		public ICoercer<T> Coercer { get; }
 
 		public bool IsValid( object parameter ) => Coerce( parameter, IsValid );
 
-		public bool IsValid( T parameter ) => specification.IsSatisfiedBy( parameter );
+		public bool IsValid( T parameter ) => Specification.IsSatisfiedBy( parameter );
 
-		public override void Coerce( object parameter, Action<T> with ) => base.Coerce( parameter, Validate( with ) );
-
-		public override TResult Coerce<TResult>( object parameter, Func<T, TResult> with ) => base.Coerce( parameter, Validate( with ) );
-
-		Action<T> Validate( Action<T> with ) => parameter =>
-												{
-													if ( IsValid( parameter ) )
-													{
-														with( parameter );
-														specification.As<IApplyAware>( aware => aware.Apply() );
-													}
-												};
-
-		Func<T, TResult> Validate<TResult>( Func<T, TResult> with ) => parameter => IsValid( parameter ) ? with( parameter ) : Default<TResult>.Item;
-	}
-
-	public class CoercionSupport<T>
-	{
-		public static CoercionSupport<T> Instance { get; } = new CoercionSupport<T>();
-
-		readonly ICoercer<T> coercer;
-
-		public CoercionSupport() : this( Coercer<T>.Instance ) {}
-
-
-		public CoercionSupport( ICoercer<T> coercer )
+		public void Coerce( object parameter, Action<T> with )
 		{
-			this.coercer = coercer;
+			var coerced = Coercer.Coerce( parameter );
+			if ( IsValid( coerced ) )
+			{
+				with( coerced );
+				Specification.As<IApplyAware>( aware => aware.Apply() );
+			}
 		}
 
-		public virtual void Coerce( object parameter, Action<T> with )
+		public TResult Coerce<TResult>( object parameter, Func<T, TResult> with )
 		{
-			var coerced = coercer.Coerce( parameter );
-			with( coerced );
-		}
-
-		public virtual TResult Coerce<TResult>( object parameter, Func<T, TResult> with )
-		{
-			var coerced = coercer.Coerce( parameter );
-			var result = with( coerced );
-			return result;
+			var coerced = Coercer.Coerce( parameter );
+			if ( IsValid( coerced ) )
+			{
+				var result = with( coerced );
+				Specification.As<IApplyAware>( aware => aware.Apply() );
+				return result;
+			}
+			return Default<TResult>.Item;
 		}
 	}
 
@@ -144,11 +125,9 @@ namespace DragonSpark.Activation
 
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
 	{
-		readonly ParameterSupport<TParameter> support;
-
 		protected FactoryBase() : this( Coercer<TParameter>.Instance ) {}
 
-		protected FactoryBase( [Required]ICoercer<TParameter> coercer ) : this( NotNullSpecification<TParameter>.Instance, coercer ) {}
+		protected FactoryBase( [Required]ICoercer<TParameter> coercer ) : this( Specifications<TParameter>.NotNull, coercer ) {}
 
 		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( specification, Coercer<TParameter>.Instance ) {}
 
@@ -156,14 +135,20 @@ namespace DragonSpark.Activation
 
 		FactoryBase( ParameterSupport<TParameter> support )
 		{
-			this.support = support;
+			Support = support;
 		}
 
-		bool IFactoryWithParameter.CanCreate( object parameter ) => support.IsValid( parameter );
+		protected ParameterSupport<TParameter> Support { get; }
+		
+		bool IFactoryWithParameter.CanCreate( object parameter ) => Support.IsValid( parameter );
 
-		object IFactoryWithParameter.Create( object parameter ) => support.Coerce( parameter, Create );
+		object IFactoryWithParameter.Create( object parameter ) => Coerce( parameter );
 
-		public TResult Create( TParameter parameter ) => support.IsValid( parameter ) ? CreateItem( parameter ).With( result => Creator.Tag( this, result ) ) : Default<TResult>.Item;
+		public TResult Create( TParameter parameter ) => Coerce( parameter );
+
+		TResult Coerce( object parameter ) => Support.Coerce( parameter, Continue );
+
+		TResult Continue( TParameter parameter ) => CreateItem( parameter ).With( result => Creator.Tag( this, result ) );
 
 		protected abstract TResult CreateItem( [Required]TParameter parameter );
 	}
@@ -191,7 +176,7 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<TParameter, TResult> inner;
 
-		public DecoratedFactory( Func<TParameter, TResult> inner ) : this( AlwaysSpecification<TParameter>.Instance, inner ) {}
+		public DecoratedFactory( Func<TParameter, TResult> inner ) : this( Specifications<TParameter>.Always, inner ) {}
 
 		public DecoratedFactory( [Required]ISpecification<TParameter> specification, [Required]Func<TParameter, TResult> inner ) : base( specification )
 		{
@@ -205,7 +190,7 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<T> inner;
 
-		public DecoratedFactory( Func<T> provider ) : this( AlwaysSpecification<T>.Instance, provider ) {}
+		public DecoratedFactory( Func<T> provider ) : this( Specifications<T>.Always, provider ) {}
 
 		public DecoratedFactory( [Required]ISpecification<T> specification, [Required]Func<T> inner ) : base( specification )
 		{
@@ -228,7 +213,7 @@ namespace DragonSpark.Activation
 	{
 		readonly IFactory<object, IFactoryWithParameter>[] factories;
 		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ).Fixed() ) {}
-		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  ) : base( AlwaysSpecification.Instance )
+		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  ) : base( Specifications<object>.Always )
 		{
 			this.factories = factories;
 		}
@@ -274,7 +259,7 @@ namespace DragonSpark.Activation
 
 		public FirstFromParameterFactory( [Required]params Func<TParameter, TResult>[] inner ) : this( Coercer<TParameter>.Instance, inner ) {}
 
-		public FirstFromParameterFactory( ICoercer<TParameter> coercer, [Required]params Func<TParameter, TResult>[] inner ) : base( AlwaysSpecification<TParameter>.Instance, coercer )
+		public FirstFromParameterFactory( ICoercer<TParameter> coercer, [Required]params Func<TParameter, TResult>[] inner ) : base( Specifications<TParameter>.Always, coercer )
 		{
 			this.inner = inner;
 		}
@@ -288,7 +273,7 @@ namespace DragonSpark.Activation
 
 		public FirstFactory( params IFactory<T>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) { }
 
-		public FirstFactory( [Required]params Func<T>[] inner ) : base( AlwaysSpecification<T>.Instance )
+		public FirstFactory( [Required]params Func<T>[] inner ) : base( Specifications<object>.Always )
 		{
 			this.inner = inner;
 		}
@@ -338,7 +323,11 @@ namespace DragonSpark.Activation
 
 		protected abstract TResult CreateItem();
 
-		public virtual TResult Create() => specification.IsSatisfiedBy( this ) ? CreateItem().With( result => Creator.Tag( this, result ) ) : default(TResult);
+		public virtual TResult Create()
+		{
+			var isSatisfiedBy = specification.IsSatisfiedBy( this );
+			return isSatisfiedBy ? CreateItem().With( result => Creator.Tag( this, result ) ) : default(TResult);
+		}
 
 		object IFactory.Create() => Create();
 	}

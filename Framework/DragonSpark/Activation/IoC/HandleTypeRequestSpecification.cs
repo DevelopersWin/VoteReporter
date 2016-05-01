@@ -15,15 +15,15 @@ namespace DragonSpark.Activation.IoC
 	interface IHandleTypeRequestSpecification : ISpecification<TypeRequest> {}
 
 	[Persistent]
-	class HandleTypeRequestSpecification : BoxedSpecification<TypeRequest>, IHandleTypeRequestSpecification
+	class HandleTypeRequestSpecification : DecoratedSpecification<TypeRequest>, IHandleTypeRequestSpecification
 	{
-		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ) ) {}
+		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ).Box<TypeRequest>() ) {}
 
 		[Freeze]
-		protected override bool Verify( TypeRequest parameter ) => base.Verify( parameter );
+		public override bool IsSatisfiedBy( object parameter ) => base.IsSatisfiedBy( parameter );
 	}
 
-	public abstract class RegistrationSpecificationBase : SpecificationBase<TypeRequest>
+	public abstract class RegistrationSpecificationBase : CoercedSpecificationBase<TypeRequest>
 	{
 		protected RegistrationSpecificationBase( [Required] IPolicyList policies )
 		{
@@ -33,37 +33,37 @@ namespace DragonSpark.Activation.IoC
 		protected IPolicyList Policies { get; }
 	}
 
-	public class RegisteredSpecification : BoxedSpecification<TypeRequest>
+	public class RegisteredSpecification : DecoratedSpecification<Type>
 	{
 		public RegisteredSpecification( InstanceSpecification instance, IsRegisteredSpecification registered, HasRegisteredBuildPolicySpecification registeredBuildPolicy )
-			: base( instance.Or( registered.And( registeredBuildPolicy ) ) ) {}
+			: base( instance.Or( registered.And( registeredBuildPolicy ) ).Box<Type>() ) {}
 	}
 
 	public class InstanceSpecification : RegistrationSpecificationBase
 	{
 		public InstanceSpecification( IPolicyList policies ) : base( policies ) {}
 
-		protected override bool Verify( TypeRequest parameter ) => Policies.Get<ILifetimePolicy>( parameter ).With( policy => policy.GetValue() ) != null;
+		public override bool IsSatisfiedBy( TypeRequest parameter ) => Policies.Get<ILifetimePolicy>( parameter ).With( policy => policy.GetValue() ) != null;
 	}
 
 	public class HasRegisteredBuildPolicySpecification : RegistrationSpecificationBase
 	{
 		public HasRegisteredBuildPolicySpecification( [Required] IPolicyList policies ) : base( policies ) {}
 
-		protected override bool Verify( TypeRequest parameter ) => !( Policies.GetNoDefault<IBuildPlanPolicy>( parameter, false ) is DynamicMethodBuildPlan );
+		public override bool IsSatisfiedBy( TypeRequest parameter ) => !( Policies.GetNoDefault<IBuildPlanPolicy>( parameter, false ) is DynamicMethodBuildPlan );
 	}
 
-	public class StrategySpecification : BoxedSpecification<TypeRequest>
+	public class StrategySpecification : ProjectedSpecification<TypeRequest>
 	{
 		readonly static ISpecification<StrategyValidatorParameter>[] DefaultValidators = { ArrayStrategyValidator.Instance, EnumerableStrategyValidator.Instance };
 
 		public StrategySpecification( IStagedStrategyChain strategies ) : this( strategies, DefaultValidators ) {}
 
 		protected StrategySpecification( IStagedStrategyChain strategies, [Required] IEnumerable<ISpecification<StrategyValidatorParameter>> validators ) 
-			: base( new AnySpecification( validators.ToArray() ), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
+			: base( new AnySpecification( validators.ToArray() ).Box<TypeRequest>(), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
 	}
 
-	public class ContainsSingletonSpecification : SpecificationBase<Type>
+	public class ContainsSingletonSpecification : CoercedSpecificationBase<Type>
 	{
 		public static ContainsSingletonSpecification Instance { get; } = new ContainsSingletonSpecification( SingletonLocator.Instance );
 
@@ -74,10 +74,10 @@ namespace DragonSpark.Activation.IoC
 			this.locator = locator;
 		}
 
-		protected override bool Verify( Type parameter ) => locator.Locate( parameter ) != null;
+		public override bool IsSatisfiedBy( Type parameter ) => locator.Locate( parameter ) != null;
 	}
 
-	public class HasConventionSpecification : SpecificationBase<Type>
+	public class HasConventionSpecification : CoercedSpecificationBase<Type>
 	{
 		readonly BuildableTypeFromConventionLocator locator;
 
@@ -86,11 +86,11 @@ namespace DragonSpark.Activation.IoC
 			this.locator = locator;
 		}
 
-		protected override bool Verify( Type parameter ) => locator.Create( parameter ) != null;
+		public override bool IsSatisfiedBy( Type parameter ) => locator.Create( parameter ) != null;
 	}
 
 	[Persistent]
-	public class HasFactorySpecification : SpecificationBase<LocateTypeRequest>
+	public class HasFactorySpecification : CoercedSpecificationBase<LocateTypeRequest>
 	{
 		readonly FactoryTypeRequestLocator locator;
 
@@ -99,12 +99,12 @@ namespace DragonSpark.Activation.IoC
 			this.locator = locator;
 		}
 
-		protected override bool Verify( LocateTypeRequest parameter ) => locator.Create( parameter ) != null;
+		public override bool IsSatisfiedBy( LocateTypeRequest parameter ) => locator.Create( parameter ) != null;
 	}
 
-	public abstract class StrategyValidator<TStrategy> : SpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
+	public abstract class StrategyValidator<TStrategy> : CoercedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
 	{
-		protected override bool Verify( StrategyValidatorParameter parameter ) => parameter.Strategies.FirstOrDefaultOfType<TStrategy>().With( strategy => Check( parameter.Key ) );
+		public override bool IsSatisfiedBy( StrategyValidatorParameter parameter ) => parameter.Strategies.FirstOrDefaultOfType<TStrategy>().With( strategy => Check( parameter.Key ) );
 
 		protected abstract bool Check( TypeRequest key );
 	}
@@ -136,7 +136,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	public class ResolvableTypeSpecification : BoxedSpecification<TypeRequest>
+	public class ResolvableTypeSpecification : DecoratedSpecification<TypeRequest>
 	{
 		public ResolvableTypeSpecification( 
 			RegisteredSpecification registered, 
@@ -144,7 +144,7 @@ namespace DragonSpark.Activation.IoC
 			HasConventionSpecification convention, 
 			ContainsSingletonSpecification singleton, 
 			HasFactorySpecification factory )
-				: base( registered.Or( strategies ).Or( convention.Box<LocateTypeRequest>( request => request.RequestedType ) ).Or( singleton.Box<LocateTypeRequest>( request => request.RequestedType ) ).Or( factory ) ) {}
+				: base( registered.Or( strategies ).Or( convention.Box<LocateTypeRequest>( request => request.RequestedType ) ).Or( singleton.Box<LocateTypeRequest>( request => request.RequestedType ) ).Or( factory ).Box<TypeRequest>() ) {}
 	}
 
 	public class ConstructorFactory : FactoryBase<LocateTypeRequest, ConstructorInfo>
@@ -172,7 +172,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	class ResolvableConstructorSpecification : SpecificationBase<ConstructTypeRequest>
+	class ResolvableConstructorSpecification : CoercedSpecificationBase<ConstructTypeRequest>
 	{
 		readonly ConstructorFactory factory;
 		readonly ResolvableTypeSpecification resolvable;
@@ -183,7 +183,7 @@ namespace DragonSpark.Activation.IoC
 			this.resolvable = resolvable;
 		}
 
-		protected override bool Verify( ConstructTypeRequest parameter ) => 
+		public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => 
 			factory.Create( new LocateTypeRequest( parameter.RequestedType ) ).With( x => Validate( x, parameter.Arguments.NotNull().Select( o => o.GetType() ).ToArray() ) );
 
 		bool Validate( MethodBase constructor, IEnumerable<Type> parameters )

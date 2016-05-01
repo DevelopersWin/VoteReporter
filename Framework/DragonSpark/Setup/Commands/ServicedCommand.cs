@@ -7,24 +7,24 @@ using System.Windows.Input;
 
 namespace DragonSpark.Setup.Commands
 {
-	public abstract class AssignedCommand : CommandBase<object>
+	public abstract class DelegatedFixedCommand : CommandBase<object>
 	{
-		protected AssignedCommand() : base( AlwaysSpecification.Instance ) {}
+		protected DelegatedFixedCommand() : base( Specifications<object>.Always ) {}
 
-		protected AssignedCommand( ISpecification<object> specification ) : base( specification ) {}
+		protected DelegatedFixedCommand( ISpecification<object> specification ) : base( specification ) {}
 
 		protected override void OnExecute( object parameter ) => new FixedCommand( GetCommand, GetParameter ).Run();
-		
+
 		public abstract ICommand GetCommand();
 
 		public abstract object GetParameter();
 	}
 
-	public class ServiceAssignedCommand<TCommand, TParameter> : AssignedCommand where TCommand : ICommand<TParameter>
+	public class ServicedCommand<TCommand, TParameter> : DelegatedFixedCommand where TCommand : ICommand<TParameter>
 	{
-		public ServiceAssignedCommand() : base( AlwaysSpecification.Instance ) {}
+		public ServicedCommand() : base( Specifications<object>.Always ) {}
 
-		public ServiceAssignedCommand( ISpecification<object> specification ) : base( specification ) {}
+		public ServicedCommand( ISpecification<object> specification ) : base( specification ) {}
 
 		public override ICommand GetCommand() => Command;
 

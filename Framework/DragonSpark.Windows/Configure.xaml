@@ -6,6 +6,9 @@
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
 	xmlns:diagnosticsCore="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
 	xmlns:diagnostics="clr-namespace:DragonSpark.Windows.Diagnostics"
+	xmlns:typeSystem="clr-namespace:DragonSpark.TypeSystem;assembly=DragonSpark"
+	xmlns:windows="clr-namespace:DragonSpark.Windows"
 	mc:Ignorable="d">
 	<diagnosticsCore:ProfilerFactoryConfiguration Value="{x:Type diagnostics:ProfilerFactory}" />
+	<typeSystem:AttributeProviderConfiguration Value="{x:Static windows:AttributeProviderLocator.Instance}" />
 </configuration:InitializeConfigurationCommand>

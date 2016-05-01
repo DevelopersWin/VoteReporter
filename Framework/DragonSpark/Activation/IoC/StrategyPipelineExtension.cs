@@ -182,7 +182,7 @@ namespace DragonSpark.Activation.IoC
 		readonly Func<Type, ITypeCandidateWeightProvider> weight;
 		readonly ISpecification<Type> specification;
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, type => new TypeCandidateWeightProvider( type ), CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).Box<Type>(), CanBuildSpecification.Instance.Inverse() ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, type => new TypeCandidateWeightProvider( type ), CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).Box<Type>(), CanBuildSpecification.Instance.Inverse<Type>() ) {}
 
 		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, Func<Type, ITypeCandidateWeightProvider> weight, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
 		{
@@ -258,7 +258,11 @@ namespace DragonSpark.Activation.IoC
 		public AllTypesInCandidateAssemblyStrategy( [Required] ISpecification<Type> specification ) : base( specification ) {}
 
 		[Freeze]
-		protected override Type[] CreateItem( Type parameter ) => TypesFactory.Instance.Create( parameter.Assembly().ToItem() );
+		protected override Type[] CreateItem( Type parameter )
+		{
+			var types = TypesFactory.Instance.Create( parameter.Assembly().ToItem() );
+			return types;
+		}
 	}
 
 	[Persistent]
@@ -285,12 +289,12 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class CanBuildSpecification : SpecificationBase<Type>
+	public class CanBuildSpecification : CoercedSpecificationBase<Type>
 	{
 		public static CanBuildSpecification Instance { get; } = new CanBuildSpecification();
 
 		[Freeze]
-		protected override bool Verify( Type parameter )
+		public override bool IsSatisfiedBy( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();
 			var result = parameter != typeof(object) && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && !typeof(Delegate).Adapt().IsAssignableFrom( parameter ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
@@ -298,11 +302,11 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class ValidConstructorSpecification : SpecificationBase<IBuilderContext>
+	public class ValidConstructorSpecification : CoercedSpecificationBase<IBuilderContext>
 	{
 		public static ValidConstructorSpecification Instance { get; } = new ValidConstructorSpecification();
 
-		protected override bool Verify( IBuilderContext parameter )
+		public override bool IsSatisfiedBy( IBuilderContext parameter )
 		{
 			IPolicyList containingPolicyList;
 			var constructor = parameter.Policies.Get<IConstructorSelectorPolicy>( parameter.BuildKey, out containingPolicyList ).SelectConstructor( parameter, containingPolicyList );
@@ -320,13 +324,13 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionStrategy : BuilderStrategy
 	{
-		static ISpecification<IBuilderContext> Specification { get; } = new BoxedSpecification<IBuilderContext>( CanBuildSpecification.Instance.Box<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ) ).Inverse();
-
 		readonly ConventionCandidateLocator locator;
 		readonly IServiceRegistry registry;
 
 		public class ConventionCandidateLocator : DecoratedFactory<IBuilderContext, Type>
 		{
+			static ISpecification<IBuilderContext> Specification { get; } = CanBuildSpecification.Instance.Box<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ).Inverse<IBuilderContext>();
+
 			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : base( Specification, context => factory.Create( context.BuildKey.Type ) ) {}
 		}
 

@@ -30,11 +30,11 @@ namespace DragonSpark.TypeSystem
 		// Attribution: https://weblogs.asp.net/ricardoperes/detecting-default-values-of-value-types
 		/*bool IsDefaultUsingLinqAndDynamic()
 		{
-			var arguments = new Expression[] { Expression.Default( type ) };
-			var paramExpression = Expression.Parameter(type, "x");
-			var equalsMethod = type.GetRuntimeMethod( nameof(Equals), new [] { type } );
+			var arguments = new Expression[] { Expression.Default( Type ) };
+			var paramExpression = Expression.Parameter(Type, "x");
+			var equalsMethod = Type.GetRuntimeMethod( nameof(Equals), new [] { Type } );
 			var call = Expression.Call(paramExpression, equalsMethod, arguments);
-			var lambdaArgType = typeof(Func<,>).MakeGenericType(type, typeof(bool));
+			var lambdaArgType = typeof(Func<,>).MakeGenericType(Type, typeof(bool));
 			var lambdaMethod = LambdaMethod.MakeGenericMethod(lambdaArgType);
 			var expression = lambdaMethod.Invoke(null, new object[] { call, new[] { paramExpression } }) as LambdaExpression;
  
@@ -49,8 +49,11 @@ namespace DragonSpark.TypeSystem
 		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).ToArray();
 
 		public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
-		
-		public object GetDefaultValue() => Info.IsValueType && Nullable.GetUnderlyingType( Type ) == null ? Activator.CreateInstance( Type ) : null;
+
+		// readonly static Func<object> Default = Expression.Lambda<Func<object>>( Expression.Default( Type ) ).Compile();
+
+		[Freeze]
+		public object GetDefaultValue() => null; // Info.IsValueType && Nullable.GetUnderlyingType( Type ) == null ? CreateUsing() : null;
 
 		public ConstructorInfo FindConstructor( params object[] parameters ) => FindConstructor( parameters.Select( o => o?.GetType() ).ToArray() );
 

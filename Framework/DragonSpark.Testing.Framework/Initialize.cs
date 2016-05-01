@@ -32,7 +32,7 @@ namespace DragonSpark.Testing.Framework
 
 		[ModuleInitializer( 2 )]
 		public static void Environment() => PostSharpEnvironment.IsPostSharpRunning.IsFalse( () => 
-			InitializeJetBrainsTaskRunnerCommand.Instance.Run( AppDomain.CurrentDomain.SetupInformation )
+			InitializeJetBrainsTaskRunnerCommand.Instance.Run( AppDomain.CurrentDomain.SetupInformation ) 
 		);
 	}
 

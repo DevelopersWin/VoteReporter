@@ -3,11 +3,11 @@ using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class GenericTypeAssignableSpecification : ContextAwareSpecificationBase<Type>
+	public class GenericTypeAssignableSpecification : SpecificationWithContextBase<Type>
 	{
 		public GenericTypeAssignableSpecification( Type context ) : base( context ) {}
 
-		protected override bool Verify( Type parameter ) => Context.Adapt().IsGenericOf( parameter );
+		public override bool IsSatisfiedBy( Type parameter ) => Context.Adapt().IsGenericOf( parameter );
 	}
 
 	public class TypeAssignableSpecification<T> : TypeAssignableSpecification
@@ -17,10 +17,10 @@ namespace DragonSpark.Runtime.Specifications
 		public TypeAssignableSpecification() : base( typeof(T) ) {}
 	}
 
-	public class TypeAssignableSpecification : ContextAwareSpecificationBase<Type>
+	public class TypeAssignableSpecification : SpecificationWithContextBase<Type>
 	{
 		public TypeAssignableSpecification( Type targetType ) : base( targetType ) {}
 
-		protected override bool Verify( Type parameter ) => Context.Adapt().IsAssignableFrom( parameter );
+		public override bool IsSatisfiedBy( Type parameter ) => Context.Adapt().IsAssignableFrom( parameter );
 	}
 }
