@@ -5,6 +5,8 @@ namespace DragonSpark.Runtime.Specifications
 {
 	public static class SpecificationExtensions
 	{
+		public static ISpecification Inverse( this ISpecification @this ) => new InverseSpecification( @this );
+
 		public static ISpecification<T> Inverse<T>( this ISpecification<T> @this ) => InverseAndProject<T>( @this );
 
 		public static ISpecification<T> Inverse<T>( this ISpecification @this ) => InverseAndProject<T>( @this );

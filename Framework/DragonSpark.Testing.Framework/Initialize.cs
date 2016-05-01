@@ -2,9 +2,9 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using mscoree;
 using PostSharp.Aspects;
-using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -20,20 +20,40 @@ namespace DragonSpark.Testing.Framework
 {
 	public static class Initialize
 	{
-		[ModuleInitializer( 0 )]
-		public static void Execution() => PostSharpEnvironment.IsPostSharpRunning.IsFalse( () => 
-			Activation.Execution.Initialize( ExecutionContext.Instance ) 
-		);
+		[ModuleInitializer( 0 ), Runtime]
+		public static void Execute()
+		{
+			InitializeJetBrainsTaskRunnerCommand.Instance.Run( AppDomain.CurrentDomain.SetupInformation );
+			Execution.Initialize( ExecutionContext.Instance );
+			Trace.WriteLine( $"Initializing {typeof(Initialize)}" );
+		}
+	}
 
-		[ModuleInitializer( 1 )]
-		public static void Tracing() => PostSharpEnvironment.IsPostSharpRunning.IsFalse( () => 
-			Trace.WriteLine( $"Initializing {typeof(Initialize)}" )
-		);
+	public sealed class Runtime : SpecificationBasedAspect
+	{
+		readonly static ISpecification Specification = JetBrainsAppDomainSpecification.Instance.Inverse().And( RuntimeSpecification.Instance );
 
-		[ModuleInitializer( 2 )]
-		public static void Environment() => PostSharpEnvironment.IsPostSharpRunning.IsFalse( () => 
-			InitializeJetBrainsTaskRunnerCommand.Instance.Run( AppDomain.CurrentDomain.SetupInformation ) 
-		);
+		public Runtime() : base( Specification ) {}
+	}
+
+	class JetBrainsAppDomainSpecification : SpecificationBase
+	{
+		readonly AppDomain domain;
+		public static JetBrainsAppDomainSpecification Instance { get; } = new JetBrainsAppDomainSpecification();
+
+		public JetBrainsAppDomainSpecification() : this( AppDomain.CurrentDomain ) {}
+
+		public JetBrainsAppDomainSpecification( AppDomain domain )
+		{
+			this.domain = domain;
+		}
+
+		public override bool IsSatisfiedBy( object parameter ) => domain.FriendlyName.Contains( JetBrainsEnvironment.JetbrainsResharperTaskrunner );
+	}
+
+	public static class JetBrainsEnvironment
+	{
+		public const string JetbrainsResharperTaskrunner = "JetBrains.ReSharper.TaskRunner";
 	}
 
 	public class JetBrainsApplicationDomainFactory : FactoryBase<AppDomain>
@@ -41,25 +61,23 @@ namespace DragonSpark.Testing.Framework
 		public static JetBrainsApplicationDomainFactory Instance { get; } = new JetBrainsApplicationDomainFactory();
 
 		readonly Func<ImmutableArray<AppDomain>> source;
-		readonly string domainName;
 
-		public JetBrainsApplicationDomainFactory() : this( AppDomainFactory.Instance.Create ) {}
+		JetBrainsApplicationDomainFactory() : this( AppDomainFactory.Instance.Create ) {}
 
-		public JetBrainsApplicationDomainFactory( [Required] Func<ImmutableArray<AppDomain>> source, [NotEmpty] string domainName = "JetBrains.ReSharper.TaskRunner" )
+		public JetBrainsApplicationDomainFactory( [Required] Func<ImmutableArray<AppDomain>> source )
 		{
 			this.source = source;
-			this.domainName = domainName;
 		}
 
 		[Freeze]
-		protected override AppDomain CreateItem() => source().Except( AppDomain.CurrentDomain.ToItem() ).FirstOrDefault( domain => domain.FriendlyName.Contains( domainName ) );
+		protected override AppDomain CreateItem() => source().Except( AppDomain.CurrentDomain.ToItem() ).FirstOrDefault( JetBrainsAppDomainSpecification.Instance.IsSatisfiedBy );
 	}
 
 	public class AppDomainFactory : FactoryBase<ImmutableArray<AppDomain>>
 	{
 		public static AppDomainFactory Instance { get; } = new AppDomainFactory();
 
-		#pragma warning disable 3305
+		// #pragma warning disable 3305
 		[Freeze]
 		protected override ImmutableArray<AppDomain> CreateItem()
 		{

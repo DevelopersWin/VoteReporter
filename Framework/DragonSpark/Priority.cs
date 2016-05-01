@@ -1,25 +1,25 @@
 namespace DragonSpark
 {
-	public enum Priority
+	public enum Priority : byte
 	{
-		Lowest = -9,
-		AboveLowest = -8,
-		BelowLower = -7,
-		Lower = -6,
-		AboveLower = -5,
-		BelowLow = -4,
-		Low = -3,
-		AboveLow = -2,
-		BelowNormal = -1,
-		Normal = 0,
-		AboveNormal = 1,
-		BelowHigh = 2,
-		High = 3,
-		AboveHigh = 4,
-		BelowHigher = 5,
-		Higher = 6,
-		AboveHigher = 7,
-		BelowHighest = 8,
-		Highest = 9
+		Highest = 0,
+		AfterHighest = 1,
+		BeforeHigher = 2,
+		Higher = 3,
+		AfterHigher = 4,
+		BeforeHigh = 5,
+		High = 6,
+		AfterHigh = 7,
+		BeforeNormal = 8,
+		Normal = 9,
+		AfterNormal = 10,
+		BeforeLow = 11,
+		Low = 12,
+		AfterLow = 13,
+		BeforeLower = 14,
+		Lower = 15,
+		AfterLower = 16,
+		BeforeLowest = 17,
+		Lowest = 18
 	}
 }

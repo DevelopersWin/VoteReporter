@@ -4,8 +4,6 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
-using PostSharp;
-using PostSharp.Extensibility;
 using System;
 using System.Reflection;
 
@@ -46,21 +44,7 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AssemblyProvider : AssemblyProviderBase
 	{
-		public static AssemblyProvider Instance { get; } = Instanceasdf();
-
-		static AssemblyProvider Instanceasdf()
-		{
-			try
-			{
-			return new AssemblyProvider();	
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "0001", $"HELLO THERE: {e}", null, null, null ));
-				throw;
-			}
-			
-		}
+		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
 
 		public AssemblyProvider( params Type[] others ) : base( others.Append( typeof(AssemblySourceBase) ).Fixed(), DomainApplicationAssemblyLocator.Instance.Create() ) {}
 	}

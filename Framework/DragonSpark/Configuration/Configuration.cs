@@ -2,6 +2,7 @@
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Commands;
+using PostSharp.Extensibility;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Markup;
@@ -10,7 +11,7 @@ namespace DragonSpark.Configuration
 {
 	public class EnableMethodCaching : ConfigurationBase<bool>
 	{
-		public EnableMethodCaching() : base( true ) {}
+		public EnableMethodCaching() : base( !PostSharpEnvironment.IsPostSharpRunning ) {}
 	}
 
 	public static class Configure

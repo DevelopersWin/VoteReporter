@@ -48,7 +48,7 @@ namespace DragonSpark.Activation.IoC
 			var entries = new[]
 			{
 				new StrategyEntry( new EnumerableResolutionStrategy( Container, provider ), UnityBuildStage.Creation, Priority.Higher ),
-				new StrategyEntry( new ArrayResolutionStrategy( provider ), UnityBuildStage.Creation, Priority.AboveNormal )
+				new StrategyEntry( new ArrayResolutionStrategy( provider ), UnityBuildStage.Creation, Priority.BeforeNormal )
 			};
 			entries.Each( strategies.Add );
 

@@ -44,7 +44,7 @@ using DragonSpark.Runtime;
 [assembly: XmlnsPrefix( "http://framework.dragonspark.us", "ds" )]
 [assembly: XmlnsDefinition( "http://framework.dragonspark.us", "DragonSpark.Windows.Markup" )]
 [assembly: XmlnsDefinition( "http://framework.dragonspark.us", "DragonSpark.Windows.Setup" )]
-[assembly: Registration( Priority.BelowLower )]
+[assembly: Registration( Priority.AfterLower )]
 [assembly: InternalsVisibleTo( "DragonSpark.Windows.Testing" )]
 // [assembly: Include( typeof( Setup ) )]
 

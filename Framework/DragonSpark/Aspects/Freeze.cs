@@ -7,6 +7,9 @@ using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using DragonSpark.Configuration;
+using PostSharp.Aspects.Configuration;
+using PostSharp.Aspects.Serialization;
 
 namespace DragonSpark.Aspects
 {
@@ -45,29 +48,37 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	[PSerializable, ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
+	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
 	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
 	{
-		CacheValueFactory Factory { get; set; }
+		readonly CacheValueFactory factory;
 
-		/*public override void OnInvoke( MethodInterceptionArgs args )
+		public Freeze() : this( new CacheValueFactory() ) {}
+
+		public Freeze( CacheValueFactory factory )
 		{
-			if ( Factory != null && Configure.Load<EnableMethodCaching>().Value && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
+			this.factory = factory;
+		}
+
+		public override void OnInvoke( MethodInterceptionArgs args )
+		{
+			if ( Configure.Load<EnableMethodCaching>().Value && ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
-				args.ReturnValue = Factory.Create( args );
+				args.ReturnValue = factory.Create( args );
 			}
 			else
 			{
 				base.OnInvoke( args );
 			}
-		}*/
+		}
 
 		// public override void RuntimeInitialize( MethodBase method ) => Initialize();
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
 
-		void IInstanceScopedAspect.RuntimeInitializeInstance() => Initialize();
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 
-		void Initialize() => Factory = new CacheValueFactory();
+		// void Initialize() => Factory = new CacheValueFactory();
 	}
 }

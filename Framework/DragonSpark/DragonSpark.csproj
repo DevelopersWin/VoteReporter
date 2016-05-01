@@ -180,6 +180,7 @@
     <Compile Include="Aspects\OfTypeAttribute.cs" />
     <Compile Include="Aspects\ProfileAttribute.cs" />
     <Compile Include="Aspects\RecursionGuardAttribute.cs" />
+    <Compile Include="Aspects\Runtime.cs" />
     <Compile Include="ComponentModel\DefaultValuePropertySpecification.cs" />
     <Compile Include="ComponentModel\DefaultPropertyValueFactory.cs" />
     <Compile Include="ComponentModel\DefaultValueBase.cs" />
@@ -238,6 +239,7 @@
     <Compile Include="Runtime\Values\ThreadAmbientChain.cs" />
     <Compile Include="Setup\ApplyMigrationCommand.cs" />
     <Compile Include="Setup\CurrentServiceProvider.cs" />
+    <Compile Include="Setup\InitializeCommand.cs" />
     <Compile Include="Setup\Registration\FactoryRegistration.cs" />
     <Compile Include="Setup\Registration\LifetimeFactoryParameterCoercer.cs" />
     <Compile Include="Setup\Registration\MappingRegistration.cs" />
