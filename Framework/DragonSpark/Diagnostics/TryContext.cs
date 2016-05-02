@@ -1,20 +1,28 @@
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Setup.Registration;
 using Serilog;
 using System;
 
 namespace DragonSpark.Diagnostics
 {
+	public class TryContextElevated : TryContext
+	{
+		public TryContextElevated( ILogger logger ) : base( logger.Debug ) {}
+	}
+
 	[Persistent]
 	public class TryContext
 	{
-		readonly ILogger logger;
+		readonly LogException log;
 
-		public TryContext( ILogger logger )
+		public TryContext( ILogger logger ) : this( logger.Verbose ) {}
+
+		protected TryContext( LogException log )
 		{
-			this.logger = logger;
+			this.log = log;
 		}
 
-		public Exception Try( Action action )
+		public Exception Invoke( Action action )
 		{
 			try
 			{
@@ -22,10 +30,39 @@ namespace DragonSpark.Diagnostics
 			}
 			catch ( Exception exception )
 			{
-				logger.Debug( exception, "An exception has occurred while executing an application delegate." );
+				log( exception, "An exception has occurred while executing an application delegate." );
 				return exception;
 			}
 			return null;
+		}
+
+		public Result Get( Func<object> resolve )
+		{
+			try
+			{
+				return new Result( resolve() );
+			}
+			catch ( Exception e )
+			{
+				log( e, "An exception has occurred while attempting to create an object via a factory delegate." );
+				return new Result( e );
+			}
+		}
+
+		public class Result
+		{
+			public Result( Exception exception ) : this( null, exception ) {}
+
+			public Result( object instance ) : this( instance, null ) {}
+
+			Result( object instance, Exception exception )
+			{
+				Instance = instance;
+				Exception = exception;
+			}
+
+			public object Instance { get; }
+			public Exception Exception { get; }
 		}
 	}
 }

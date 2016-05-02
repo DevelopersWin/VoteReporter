@@ -54,8 +54,13 @@ namespace DragonSpark.TypeSystem
 		public MethodInfoAttributeProvider( MemberInfo member, MethodInfo method ) : base( member, DerivedMethodSpecification.Instance.IsSatisfiedBy( method ) ) {}
 	}
 
+	public class TypeInfoAttributeProvider : MemberInfoAttributeProvider
+	{
+		public TypeInfoAttributeProvider( TypeInfo info ) : base( info, DerivedTypeSpecification.Instance.IsSatisfiedBy( info ) ) {}
+	}
+
 	public class MemberInfoAttributeProvider : AttributeProviderBase
 	{
-		public MemberInfoAttributeProvider( [Required]MemberInfo info, bool inherit = false ) : base( type => info.IsDefined( type, inherit ), type => info.GetCustomAttributes( type, inherit ) ) {}
+		public MemberInfoAttributeProvider( MemberInfo info, bool inherit = false ) : base( type => info.IsDefined( type, inherit ), type => info.GetCustomAttributes( type, inherit ) ) {}
 	}
 }

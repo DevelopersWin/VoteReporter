@@ -2,9 +2,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
-using Serilog;
 using System;
-using System.Diagnostics;
 using Xunit;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 
@@ -133,6 +131,14 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Equal( "With Number", attribute.PropertyName );
 		}
 
+		[Fact]
+		public void Inheritance()
+		{
+			var provider = Attributes.Get( typeof(DerivedClass) );
+			var attribute = provider.GetAttribute<Attribute>();
+			Assert.Equal( "This is the base class", attribute.PropertyName );
+		}
+
 		class ClassWithConstructor
 		{
 			[Constructor( "DefaultConstructor" )]
@@ -158,6 +164,11 @@ namespace DragonSpark.Testing.TypeSystem
 
 			public string PropertyName { get; set; }
 		}
+
+		[Attribute( "This is the base class" )]
+		class BaseClass {}
+
+		class DerivedClass : BaseClass {}
 
 		/*[Fact]
 		public void SingletonTest()

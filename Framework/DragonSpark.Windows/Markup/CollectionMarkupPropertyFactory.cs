@@ -31,7 +31,7 @@ namespace DragonSpark.Windows.Markup
 			propertyFactory( parameter ).With( reference => new CollectionMarkupProperty( (IList)parameter.Get<IProvideValueTarget>().TargetObject, reference ) );
 	}
 
-	public class CollectionSpecification : CoercedSpecificationBase<IServiceProvider>
+	public class CollectionSpecification : GuardedSpecificationBase<IServiceProvider>
 	{
 		public static CollectionSpecification Instance { get; } = new CollectionSpecification();
 

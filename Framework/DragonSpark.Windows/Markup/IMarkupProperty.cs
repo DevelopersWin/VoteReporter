@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Markup
 		object SetValue( object value );
 	}
 
-	public class Specification<TTarget, TProperty> : CoercedSpecificationBase<IServiceProvider>
+	public class Specification<TTarget, TProperty> : GuardedSpecificationBase<IServiceProvider>
 	{
 		public static Specification<TTarget, TProperty> Instance { get; } = new Specification<TTarget, TProperty>();
 

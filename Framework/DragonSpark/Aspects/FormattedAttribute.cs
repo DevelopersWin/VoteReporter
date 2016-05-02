@@ -20,6 +20,7 @@ namespace DragonSpark.Aspects
 		}
 	}
 
+
 	[PSerializable, ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 6 )]
 	class ApplyFormatAspect : MethodInterceptionAspect
 	{

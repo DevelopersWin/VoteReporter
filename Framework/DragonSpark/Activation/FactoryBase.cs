@@ -127,11 +127,11 @@ namespace DragonSpark.Activation
 	{
 		protected FactoryBase() : this( Coercer<TParameter>.Instance ) {}
 
-		protected FactoryBase( [Required]ICoercer<TParameter> coercer ) : this( Specifications<TParameter>.NotNull, coercer ) {}
+		protected FactoryBase( [Required]ICoercer<TParameter> coercer ) : this( coercer, Specifications<TParameter>.NotNull ) {}
 
-		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( specification, Coercer<TParameter>.Instance ) {}
+		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( Coercer<TParameter>.Instance, specification ) {}
 
-		protected FactoryBase( [Required]ISpecification<TParameter> specification, [Required]ICoercer<TParameter> coercer ) : this( new ParameterSupport<TParameter>( specification, coercer ) ) {}
+		protected FactoryBase( [Required]ICoercer<TParameter> coercer, [Required]ISpecification<TParameter> specification ) : this( new ParameterSupport<TParameter>( specification, coercer ) ) {}
 
 		FactoryBase( ParameterSupport<TParameter> support )
 		{
@@ -206,7 +206,7 @@ namespace DragonSpark.Activation
 
 		public FromKnownFactory( KnownTypeFactory factory ) : base( factory.Create( typeof(T) ) ) {}
 
-		public T CreateAs( object parameter ) => (T)Create(	parameter );
+		public T CreateUsing( object parameter ) => (T)Create( parameter );
 	}
 
 	public class FirstConstructedFromParameterFactory<TParameter, TResult> : FactoryBase<object, IFactory<TParameter, TResult>>
@@ -259,7 +259,11 @@ namespace DragonSpark.Activation
 
 		public FirstFromParameterFactory( [Required]params Func<TParameter, TResult>[] inner ) : this( Coercer<TParameter>.Instance, inner ) {}
 
-		public FirstFromParameterFactory( ICoercer<TParameter> coercer, [Required]params Func<TParameter, TResult>[] inner ) : base( Specifications<TParameter>.Always, coercer )
+		public FirstFromParameterFactory( ISpecification<TParameter> specification, [Required] params Func<TParameter, TResult>[] inner ) : this( specification, Coercer<TParameter>.Instance, inner ) {}
+
+		public FirstFromParameterFactory( ICoercer<TParameter> coercer, [Required] params Func<TParameter, TResult>[] inner ) : this( Specifications<TParameter>.Always, coercer, inner ) {}
+
+		public FirstFromParameterFactory( ISpecification<TParameter> specification, ICoercer<TParameter> coercer, [Required]params Func<TParameter, TResult>[] inner ) : base( coercer, specification )
 		{
 			this.inner = inner;
 		}

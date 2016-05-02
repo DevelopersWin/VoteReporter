@@ -199,6 +199,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configure.cs" />
     <Compile Include="Diagnostics\TracingProfilerFactory.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="OutputAttribute.cs" />

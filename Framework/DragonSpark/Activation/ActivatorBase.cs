@@ -5,9 +5,9 @@ namespace DragonSpark.Activation
 {
 	public abstract class ActivatorBase<TRequest> : FactoryBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
-		protected ActivatorBase( ICoercer<TRequest> coercer ) : this( Specifications<TRequest>.IsInstanceOf, coercer ) {}
+		protected ActivatorBase( ICoercer<TRequest> coercer ) : this( coercer, Specifications<TRequest>.IsInstanceOf ) {}
 
-		protected ActivatorBase( ISpecification<TRequest> specification, ICoercer<TRequest> coercer ) : base( specification, coercer ) {}
+		protected ActivatorBase( ICoercer<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification ) {}
 
 		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => this.CreateUsing<object>( parameter );
 	}
@@ -23,7 +23,7 @@ namespace DragonSpark.Activation
 	{
 		protected LocatorBase() : base( Coercer.Instance ) {}
 
-		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( specification, Coercer.Instance ) {}
+		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( Coercer.Instance, specification ) {}
 
 		public class Coercer : TypeRequestCoercer<LocateTypeRequest>
 		{

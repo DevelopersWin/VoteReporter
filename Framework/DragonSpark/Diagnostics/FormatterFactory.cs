@@ -1,12 +1,11 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Registration;
 using System;
 using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
-	[Persistent, Shared, Export]
+	[Shared, Export]
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, object>
 	{
 		public static FormatterFactory Instance { get; } = new FormatterFactory( FromKnownFactory<IFormattable>.Instance );
@@ -14,15 +13,15 @@ namespace DragonSpark.Diagnostics
 		readonly Func<object, IFormattable> factory;
 
 		[ImportingConstructor]
-		public FormatterFactory( FromKnownFactory<IFormattable> factory ) : this( factory.CreateAs ) {}
+		public FormatterFactory( FromKnownFactory<IFormattable> factory ) : this( factory.CreateUsing ) {}
 
-		public FormatterFactory( Func<object, IFormattable> factory )
+		public FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance )
 		{
 			this.factory = factory;
 		}
 
 		protected override object CreateItem( Parameter parameter ) => 
-			factory( parameter.Instance ).With( o => o.ToString( parameter.Format, parameter.Provider ), () => parameter.Instance );
+			factory( parameter.Instance ).With( o => o.ToString( parameter.Format, parameter.Provider ), parameter.Instance.Self );
 
 		public class Parameter
 		{

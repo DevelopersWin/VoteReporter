@@ -54,7 +54,7 @@ namespace DragonSpark.Windows.Markup
 	{
 		public static MockFactory Instance { get; } = new MockFactory();
 
-		public class Specification : CoercedSpecificationBase<Type>
+		public class Specification : GuardedSpecificationBase<Type>
 		{
 			public static Specification Instance { get; } = new Specification();
 

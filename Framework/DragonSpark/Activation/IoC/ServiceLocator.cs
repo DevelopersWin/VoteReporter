@@ -136,7 +136,7 @@ namespace DragonSpark.Activation.IoC
 			this.strategies = strategies;
 		}
 
-		protected override IEnumerable<StrategyEntry> Query() => Store.OrderBy( entry => entry.Stage ).ThenByDescending( entry => entry.Priority );
+		protected override IEnumerable<StrategyEntry> Query() => Store.OrderBy( entry => entry.Stage ).ThenBy( entry => entry.Priority );
 
 		protected override void OnAdd( StrategyEntry entry )
 		{

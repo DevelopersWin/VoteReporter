@@ -10,9 +10,9 @@ using System.Reflection;
 
 namespace DragonSpark.Diagnostics.Logger
 {
-	public delegate void LogTemplate( string template, object[] parameters );
+	public delegate void LogTemplate( string template, params object[] parameters );
 
-	public delegate void LogException( Exception exception, string template, object[] parameters );
+	public delegate void LogException( Exception exception, string template, params object[] parameters );
 
 	public abstract class LogCommandBase<TDelegate, TTemplate> : CommandBase<TTemplate> where TTemplate : ILoggerTemplate
 	{

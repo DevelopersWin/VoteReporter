@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class DefaultValuePropertySpecification : CoercedSpecificationBase<PropertyInfo>
+	public class DefaultValuePropertySpecification : GuardedSpecificationBase<PropertyInfo>
 	{
 		public static DefaultValuePropertySpecification Instance { get; } = new DefaultValuePropertySpecification();
 

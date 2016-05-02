@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -21,27 +22,27 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
-			var assemblies = sut.Resolve<Assembly[]>();
-			Assert.Same( Default<Assembly>.Items, assemblies );
+			Assert.IsType<UnityContainerFactory>( new Creator( sut ).Value );
 
 			var provider = sut.Resolve<IServiceProvider>();
-			var levelSwitch = provider.Get<LoggingLevelSwitch>();
-			Assert.Same( levelSwitch, provider.Get<LoggingLevelSwitch>() );
-			
-
 			var sink = provider.Get<LoggerHistorySink>();
-			Assert.Same( sink, provider.Get<LoggerHistorySink>() );
+			
 			var initial = sink.Events.Count();
 			Assert.Single( sink.Events );
 
 			var item = sut.TryResolve<IInterface>();
 			Assert.Null( item );
 
-			Assert.Same( sut.Resolve<ISingletonLocator>(), sut.Resolve<ISingletonLocator>() );
-
 			Assert.NotEmpty( sink.Events );
 			var count = sink.Events.Count();
 			Assert.True( count > initial );
+
+			Assert.Same( sut.Resolve<TryContextElevated>(), sut.Resolve<TryContextElevated>() );
+
+			Assert.Same( provider.Get<LoggingLevelSwitch>(), provider.Get<LoggingLevelSwitch>() );
+			Assert.Same( sut.Resolve<ISingletonLocator>(), sut.Resolve<ISingletonLocator>() );
+			Assert.Same( sink, provider.Get<LoggerHistorySink>() );
+			Assert.Same( Default<Assembly>.Items, sut.Resolve<Assembly[]>() );
 		}
 
 		[Export]

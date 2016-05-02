@@ -1,4 +1,4 @@
-﻿using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Diagnostics;
 using Microsoft.Practices.Unity;
 using System;
 
@@ -8,11 +8,9 @@ namespace DragonSpark.Extensions
 	{
 		public static T Resolve<T>( this IUnityContainer container, Type type ) => (T)container.Resolve( type );
 
-		// public static T Resolve<T>( this IUnityContainer @this, Func<T> @default ) => @this.IsRegistered<T>() ? @this.Resolve<T>() : @default();
-
 		public static T TryResolve<T>(this IUnityContainer container) => (T)TryResolve( container, typeof(T) );
 
-		public static object TryResolve(this IUnityContainer container, Type typeToResolve, string name = null ) => container.Resolve<ResolutionContext>().Execute( () => container.Resolve( typeToResolve, name ) );
+		public static object TryResolve(this IUnityContainer container, Type typeToResolve, string name = null ) => container.Resolve<TryContextElevated>().Get( () => container.Resolve( typeToResolve, name ) ).Instance;
 
 		public static IUnityContainer Extend<TExtension>( this IUnityContainer @this ) where TExtension : UnityContainerExtension => @this.Extension<TExtension>().Container;
 

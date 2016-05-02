@@ -30,7 +30,7 @@ namespace DragonSpark.Activation
 			return result;
 		}
 
-		class Specification : CoercedSpecificationBase<ConstructTypeRequest>
+		class Specification : GuardedSpecificationBase<ConstructTypeRequest>
 		{
 			readonly Func<ConstructTypeRequest, Func<object>> source;
 

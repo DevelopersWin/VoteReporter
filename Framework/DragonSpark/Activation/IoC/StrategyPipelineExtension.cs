@@ -78,7 +78,7 @@ namespace DragonSpark.Activation.IoC
 			var policies = repository.List();
 			var creator = new Creator( Container ).Value.With( c => c.GetType() ) ?? ThreadAmbientContext.GetCurrent();
 			var creators = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ), creator );
-			var policy = new BuildPlanCreatorPolicy( new TryContext( logger ).Try, specification, policies, creators );
+			var policy = new BuildPlanCreatorPolicy( new TryContext( logger ).Invoke, specification, policies, creators );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
 		}
 
@@ -138,7 +138,8 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Clear();
 
-			strategyRepository.List().Cast<StrategyEntry>().Each( entry => Context.Strategies.Add( entry.Value, entry.Stage ) );
+			var strategyEntries = strategyRepository.List().Cast<StrategyEntry>();
+			strategyEntries.Each( entry => Context.Strategies.Add( entry.Value, entry.Stage ) );
 		}
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
@@ -289,7 +290,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class CanBuildSpecification : CoercedSpecificationBase<Type>
+	public class CanBuildSpecification : GuardedSpecificationBase<Type>
 	{
 		public static CanBuildSpecification Instance { get; } = new CanBuildSpecification();
 
@@ -302,7 +303,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class ValidConstructorSpecification : CoercedSpecificationBase<IBuilderContext>
+	public class ValidConstructorSpecification : GuardedSpecificationBase<IBuilderContext>
 	{
 		public static ValidConstructorSpecification Instance { get; } = new ValidConstructorSpecification();
 

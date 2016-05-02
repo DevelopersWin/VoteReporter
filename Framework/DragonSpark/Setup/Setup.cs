@@ -108,7 +108,7 @@ namespace DragonSpark.Setup
 
 	public static class ActivationProperties
 	{
-		public class IsActivatedInstanceSpecification : CoercedSpecificationBase<object>
+		public class IsActivatedInstanceSpecification : GuardedSpecificationBase<object>
 		{
 			public static IsActivatedInstanceSpecification Instance { get; } = new IsActivatedInstanceSpecification();
 
@@ -172,9 +172,16 @@ namespace DragonSpark.Setup
 
 	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
 	{
-		public CompositeServiceProvider( [Required] params IServiceProvider[] providers ) : base( providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
+		public CompositeServiceProvider( [Required] params IServiceProvider[] providers ) : base( IsServiceTypeSpecification.Instance, providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
 
 		public object GetService( Type serviceType ) => serviceType == typeof(IServiceProvider) ? this : Create( serviceType );
+	}
+
+	public class IsServiceTypeSpecification : GuardedSpecificationBase<Type>
+	{
+		public static IsServiceTypeSpecification Instance { get; } = new IsServiceTypeSpecification();
+
+		public override bool IsSatisfiedBy( Type parameter ) => !parameter.GetTypeInfo().IsValueType;
 	}
 
 	public class RecursionAwareServiceProvider : DecoratedServiceProvider

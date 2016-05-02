@@ -208,7 +208,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		public object GetService( Type serviceType ) => Create( serviceType );
 	}
 
-	sealed class Specification : CoercedSpecificationBase<Type>
+	sealed class Specification : GuardedSpecificationBase<Type>
 	{
 		readonly IServiceRegistry registry;
 

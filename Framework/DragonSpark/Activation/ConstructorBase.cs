@@ -7,7 +7,7 @@ namespace DragonSpark.Activation
 	{
 		protected ConstructorBase() : base( Coercer.Instance ) {}
 
-		protected ConstructorBase( ISpecification<ConstructTypeRequest> specification  ) : base( specification, Coercer.Instance ) {}
+		protected ConstructorBase( ISpecification<ConstructTypeRequest> specification  ) : base( Coercer.Instance, specification ) {}
 
 		public class Coercer : TypeRequestCoercer<ConstructTypeRequest>
 		{

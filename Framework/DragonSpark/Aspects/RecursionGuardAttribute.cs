@@ -23,6 +23,13 @@ namespace DragonSpark.Aspects
 		}
 	}*/
 
+	public static class Keys
+	{
+		public static int For( MethodExecutionArgs args ) => KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments );
+
+		public static int For( MethodInterceptionArgs args ) => KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments );
+	}
+
 	[PSerializable, LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Caching )]
 	public class RecursionGuardAttribute : OnMethodBoundaryAspect
 	{
@@ -35,7 +42,7 @@ namespace DragonSpark.Aspects
 
 		class Count : ThreadAmbientStore<int>
 		{
-			public Count( MethodExecutionArgs args ) : base( KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments ).ToString() ) {}
+			public Count( MethodExecutionArgs args ) : base( Keys.For( args ).ToString() ) {}
 
 			int Update( bool up = true )
 			{

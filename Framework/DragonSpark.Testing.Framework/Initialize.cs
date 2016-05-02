@@ -4,31 +4,17 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using mscoree;
-using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework
 {
-	public static class Initialize
-	{
-		[ModuleInitializer( 0 ), Runtime]
-		public static void Execute()
-		{
-			InitializeJetBrainsTaskRunnerCommand.Instance.Run( AppDomain.CurrentDomain.SetupInformation );
-			Execution.Initialize( ExecutionContext.Instance );
-			Trace.WriteLine( $"Initializing {typeof(Initialize)}" );
-		}
-	}
-
 	public sealed class Runtime : SpecificationBasedAspect
 	{
 		readonly static ISpecification Specification = JetBrainsAppDomainSpecification.Instance.Inverse().And( RuntimeSpecification.Instance );

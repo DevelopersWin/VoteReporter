@@ -39,6 +39,11 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.Equal( 2, first.Constructor.GetParameters().Length );
 
 			container.RegisterInstance( Output );
+
+			var specification = container.Resolve<RegisteredSpecification>();
+			var condition = specification.IsSatisfiedBy( typeof(ITestOutputHelper) );
+			Assert.True( condition );
+
 			var constructor = sut.SelectConstructor( builder, policyList );
 			Assert.Equal( 1, constructor.Constructor.GetParameters().Length );
 

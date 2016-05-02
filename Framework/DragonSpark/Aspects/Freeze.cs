@@ -1,15 +1,14 @@
 using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using PostSharp.Aspects;
+using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
+using PostSharp.Aspects.Serialization;
 using PostSharp.Patterns.Model;
 using PostSharp.Patterns.Threading;
-using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using DragonSpark.Configuration;
-using PostSharp.Aspects.Configuration;
-using PostSharp.Aspects.Serialization;
 
 namespace DragonSpark.Aspects
 {
@@ -22,8 +21,9 @@ namespace DragonSpark.Aspects
 		[Reference]
 		readonly IDictionary<int, object> items = new Dictionary<int, object>();
 
-		object Get( int code, MethodInterceptionArgs args )
+		object Get( MethodInterceptionArgs args )
 		{
+			var code = Keys.For( args );
 			var check = Add( code, args ) || ( args.Method as MethodInfo )?.ReturnType != typeof(void);
 			var result = check ? items[code] : null;
 			return result;
@@ -42,8 +42,7 @@ namespace DragonSpark.Aspects
 
 		protected override object CreateItem( MethodInterceptionArgs parameter )
 		{
-			var code = KeyFactory.Instance.Create( parameter.Arguments );
-			var result = Get( code, parameter ) ?? parameter.ReturnValue;
+			var result = Get( parameter ) ?? parameter.ReturnValue;
 			return result;
 		}
 	}

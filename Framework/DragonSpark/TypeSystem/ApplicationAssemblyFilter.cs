@@ -32,7 +32,7 @@ namespace DragonSpark.TypeSystem
 		protected override Assembly[] CreateItem( Assembly[] parameter ) => parameter.Where( specification.IsSatisfiedBy ).Prioritize().ToArray();
 	}
 
-	public class ApplicationTypeSpecification : CoercedSpecificationBase<Type>
+	public class ApplicationTypeSpecification : GuardedSpecificationBase<Type>
 	{
 		public static ApplicationTypeSpecification Instance { get; } = new ApplicationTypeSpecification();
 
@@ -42,7 +42,7 @@ namespace DragonSpark.TypeSystem
 		public override bool IsSatisfiedBy( Type parameter ) => !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Adapt().IsDefined<CompilerGeneratedAttribute>();
 	}
 
-	public class ApplicationAssemblySpecification : CoercedSpecificationBase<Assembly>
+	public class ApplicationAssemblySpecification : GuardedSpecificationBase<Assembly>
 	{
 		public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification();
 

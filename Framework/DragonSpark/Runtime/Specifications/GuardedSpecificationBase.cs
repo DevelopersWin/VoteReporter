@@ -34,15 +34,15 @@ namespace DragonSpark.Runtime.Specifications
 
 	}
 
-	public abstract class CoercedSpecificationBase<T> : ISpecification<T>
+	public abstract class GuardedSpecificationBase<T> : ISpecification<T>
 	{
 		readonly Func<object, T> projection;
 
-		protected CoercedSpecificationBase() : this( Coercer<T>.Instance ) {}
+		protected GuardedSpecificationBase() : this( Coercer<T>.Instance ) {}
 
-		protected CoercedSpecificationBase( ICoercer<T> coercer ) : this( coercer.Coerce ) {}
+		protected GuardedSpecificationBase( ICoercer<T> coercer ) : this( coercer.Coerce ) {}
 
-		protected CoercedSpecificationBase( Func<object, T> projection )
+		protected GuardedSpecificationBase( Func<object, T> projection )
 		{
 			this.projection = projection;
 		}
