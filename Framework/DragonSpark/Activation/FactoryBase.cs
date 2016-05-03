@@ -95,7 +95,8 @@ namespace DragonSpark.Activation
 			if ( IsValid( coerced ) )
 			{
 				with( coerced );
-				Specification.As<IApplyAware>( aware => aware.Apply() );
+				var specification = Specification.AsTo<ISpecificationAware, ISpecification>( aware => aware.Specification ) ?? Specification;
+				specification.As<IApplyAware>( aware => aware.Apply() );
 			}
 		}
 

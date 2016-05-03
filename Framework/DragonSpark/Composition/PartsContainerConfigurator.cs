@@ -147,7 +147,7 @@ namespace DragonSpark.Composition
 				.WithInstance<IActivator>( activator )
 				// .WithParts( shared, SharedFrameworkConventionBuilder.Instance.Create() )
 				.WithParts( core, FrameworkConventionBuilder.Instance.Create() )
-				.WithParts( types, AttributeProvider.Instance )
+				.WithParts( types/*, AttributeProvider.Instance*/ )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryExportDescriptorProvider( locator ) )

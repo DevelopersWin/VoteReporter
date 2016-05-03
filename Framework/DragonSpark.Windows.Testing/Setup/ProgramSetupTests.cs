@@ -18,6 +18,14 @@ namespace DragonSpark.Windows.Testing.Setup
 	[Trait( Traits.Category, Traits.Categories.IoC )]
 	public class ProgramSetupTests
 	{
+		/*[Theory, ProgramSetup.AutoData]
+		public void TypeCheck( IUnityContainer sut )
+		{
+			var specification = sut.Resolve<ResolvableTypeSpecification>();
+			var valid = specification.IsSatisfiedBy( typeof(MonitoredModule) );
+			Assert.True( valid );
+		}*/
+
 		[Theory, ProgramSetup.AutoData]
 		public void Extension( IModuleMonitor sut )
 		{

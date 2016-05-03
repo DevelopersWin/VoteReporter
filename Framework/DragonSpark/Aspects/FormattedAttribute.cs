@@ -14,15 +14,13 @@ namespace DragonSpark.Aspects
 	[AttributeUsage( AttributeTargets.Parameter ), LinesOfCodeAvoided( 6 )]
 	public class FormattedAttribute : Attribute, IAspectProvider
 	{
-		public IEnumerable<AspectInstance> ProvideAspects( object targetElement )
-		{
-			return targetElement.AsTo<ParameterInfo, IEnumerable<AspectInstance>>( info => new AspectInstance( info.Member, new ApplyFormatAspect( info.Position ) ).ToItem() );
-		}
+		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => 
+			targetElement.AsTo<ParameterInfo, IEnumerable<AspectInstance>>( info => new AspectInstance( info.Member, new ApplyFormatAspect( info.Position ) ).ToItem() );
 	}
 
 
 	[PSerializable, ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 6 )]
-	class ApplyFormatAspect : MethodInterceptionAspect
+	sealed class ApplyFormatAspect : MethodInterceptionAspect
 	{
 		public ApplyFormatAspect( int index )
 		{

@@ -1,4 +1,5 @@
-﻿using DragonSpark.Aspects;
+﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
@@ -72,6 +73,9 @@ namespace DragonSpark.Testing.Diagnostics
 			var history = new LoggerHistorySink();
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ) )
 			{
+				var loggerHistory = Services.Get<ILoggerHistory>();
+				Assert.Same( history, loggerHistory );
+
 				Assert.Empty( history.Events );
 
 				var sut = new EventingTester();

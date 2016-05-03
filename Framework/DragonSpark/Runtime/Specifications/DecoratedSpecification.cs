@@ -1,46 +1,77 @@
 using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class DecoratedSpecification<T> : DelegatedSpecification<T>
+	public class DecoratedSpecification<T> : DecoratedSpecification, ISpecification<T>
 	{
-		public DecoratedSpecification( ISpecification<T> inner ) : this( inner, Coercer<T>.Instance ) {}
-		public DecoratedSpecification( ISpecification<T> inner, ICoercer<T> coercer ) : base( inner.IsSatisfiedBy, coercer ) {}
+		public DecoratedSpecification( ISpecification inner ) : base( inner ) {}
+
+		public bool IsSatisfiedBy( T parameter ) => base.IsSatisfiedBy( parameter );
 	}
 
-	public class ProjectedSpecification<T> : SpecificationBase<T>
+	public interface ISpecificationAware
 	{
-		readonly ISpecification specification;
-		readonly Func<T, object> projection;
+		ISpecification Specification { get; }
+	}
 
-		public ProjectedSpecification( ISpecification specification ) : this( specification, Default<T>.Boxed ) {}
-
-		public ProjectedSpecification( ISpecification specification, Func<T, object> projection )
+	public class DecoratedSpecification : DelegatedSpecification, ISpecificationAware
+	{
+		public DecoratedSpecification( ISpecification inner ) : base( inner.IsSatisfiedBy )
 		{
-			this.specification = specification;
+			Specification = inner;
+		}
+
+		public ISpecification Specification { get; }
+	}
+
+	public class ProjectedSpecification<T> : ProjectedSpecification, ISpecification<T>
+	{
+		public ProjectedSpecification( ISpecification specification ) : base( specification ) {}
+
+		public ProjectedSpecification( ISpecification specification, Func<T, object> projection ) : this( specification, projection, Coercer<T>.Instance ) {}
+		public ProjectedSpecification( ISpecification specification, ICoercer<T> coercer ) : this( specification, Default<T>.Boxed, coercer ) {}
+		public ProjectedSpecification( ISpecification specification, Func<T, object> projection, ICoercer<T> coercer ) : base( specification, o => projection( coercer.Coerce( o ) ) ) {}
+
+		public bool IsSatisfiedBy( T parameter ) => base.IsSatisfiedBy( parameter );
+	}
+
+	public class ProjectedSpecification : DecoratedSpecification
+	{
+		readonly Func<object, object> projection;
+
+		public ProjectedSpecification( ISpecification specification ) : this( specification, Default<object>.Boxed ) {}
+
+		public ProjectedSpecification( ISpecification specification, Func<object, object> projection ) : base( specification )
+		{
 			this.projection = projection;
 		}
 
-		public override bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( projection( parameter ) );
+		public override bool IsSatisfiedBy( object parameter ) => base.IsSatisfiedBy( parameter.With( projection ) );
 	}
 
-	public class DelegatedSpecification<T> : SpecificationBase<T>
+	public class DelegatedSpecification<T> : DelegatedSpecification, ISpecification<T>
 	{
-		readonly Func<T, bool> @delegate;
+		public DelegatedSpecification( Func<T, bool> @delegate ) : base( o => @delegate( (T)o ) ) {}
 
-		public DelegatedSpecification( Func<T, bool> @delegate ) : this( @delegate, Coercer<T>.Instance ) { }
+		public bool IsSatisfiedBy( T parameter ) => base.IsSatisfiedBy( parameter );
+	}
 
-		public DelegatedSpecification( Func<T, bool> @delegate, ICoercer<T> coercer ) : base( coercer )
+	public class DelegatedSpecification : SpecificationBase
+	{
+		readonly Func<object, bool> @delegate;
+
+		public DelegatedSpecification( Func<object, bool> @delegate )
 		{
 			this.@delegate = @delegate;
 		}
 
-		public override bool IsSatisfiedBy( T parameter ) => @delegate( parameter );
+		public override bool IsSatisfiedBy( object parameter ) => @delegate( parameter );
 	}
 
-	public abstract class SpecificationBase<T> : SpecificationBase, ISpecification<T>
+	/*public abstract class SpecificationBase<T> : SpecificationBase, ISpecification<T>
 	{
 		readonly Func<object, T> coercer;
 
@@ -55,7 +86,7 @@ namespace DragonSpark.Runtime.Specifications
 		public abstract bool IsSatisfiedBy( T parameter );
 
 		public override bool IsSatisfiedBy( object parameter ) => IsSatisfiedBy( coercer( parameter ) );
-	}
+	}*/
 
 	/*public class DecoratedSpecification : SpecificationBase
 	{

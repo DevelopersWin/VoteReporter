@@ -21,6 +21,6 @@ namespace DragonSpark.TypeSystem
 	{
 		public static DerivedTypeSpecification Instance { get; } = new DerivedTypeSpecification();
 
-		public override bool IsSatisfiedBy( TypeInfo parameter ) => parameter.BaseType != typeof(object);
+		public override bool IsSatisfiedBy( TypeInfo parameter ) => false;// parameter.BaseType != typeof(object);
 	}
 }

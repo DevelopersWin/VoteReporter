@@ -41,7 +41,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			container.RegisterInstance( Output );
 
 			var specification = container.Resolve<RegisteredSpecification>();
-			var condition = specification.IsSatisfiedBy( typeof(ITestOutputHelper) );
+			var condition = specification.IsSatisfiedBy( LocatorBase.Coercer.Instance.Coerce( typeof(ITestOutputHelper) ) );
 			Assert.True( condition );
 
 			var constructor = sut.SelectConstructor( builder, policyList );

@@ -23,7 +23,7 @@ namespace DragonSpark.Activation.IoC
 		public override bool IsSatisfiedBy( object parameter ) => base.IsSatisfiedBy( parameter );
 	}
 
-	public abstract class RegistrationSpecificationBase : SpecificationBase<TypeRequest>
+	public abstract class RegistrationSpecificationBase : GuardedSpecificationBase<TypeRequest>
 	{
 		protected RegistrationSpecificationBase( [Required] IPolicyList policies )
 		{
@@ -35,7 +35,7 @@ namespace DragonSpark.Activation.IoC
 
 	public abstract class TypeRequestSpecification : DecoratedSpecification<TypeRequest>
 	{
-		protected TypeRequestSpecification( ISpecification<TypeRequest> inner ) : base( inner, LocatorBase.Coercer.Instance ) {}
+		protected TypeRequestSpecification( ISpecification<TypeRequest> inner ) : base( inner ) {}
 	}
 
 	public class RegisteredSpecification : TypeRequestSpecification

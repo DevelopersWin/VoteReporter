@@ -1,17 +1,25 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using Serilog.Formatting.Display;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using PostSharp.Patterns.Model;
+using PostSharp.Patterns.Threading;
 
 namespace DragonSpark.Diagnostics
 {
+	[ThreadAffine]
 	public class LoggerHistorySink : ILoggerHistory
 	{
+		[Reference]
 		readonly IList<LogEvent> source = new Collection<LogEvent>();
+
+		[Reference]
 		readonly IReadOnlyCollection<LogEvent> events;
 
 		public LoggerHistorySink()
@@ -21,9 +29,28 @@ namespace DragonSpark.Diagnostics
 
 		public void Clear() => source.Clear();
 
-		public IEnumerable<LogEvent> Events => events;
+		public IEnumerable<LogEvent> Events
+		{
+			get
+			{
+				/*if ( context.ToString() == "T Get[T]()" )
+				{
+					throw new InvalidOperationException( $"WTF {context}" );
+				}*/
+				return events;
+			}
+		}
 
-		public virtual void Emit( LogEvent logEvent ) => source.Ensure( logEvent );
+		public virtual void Emit( [Required]LogEvent logEvent )
+		{
+			/*if ( context.ToString() == "T Get[T]()" )
+			{
+				throw new InvalidOperationException( "WTF" );
+			}*/
+
+
+			source.Ensure( logEvent );
+		}
 	}
 
 	public class LogEventTextFactory : FactoryBase<LogEvent, string>

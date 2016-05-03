@@ -17,7 +17,7 @@ namespace DragonSpark.Aspects
 			this.specification = specification;
 		}
 
-		public override void OnInvoke( MethodInterceptionArgs args )
+		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
 			if ( specification.IsSatisfiedBy( this ) )
 			{

@@ -30,11 +30,8 @@ namespace DragonSpark.Testing.Objects.IoC
 		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) 
 			: base( Context( assemblySource, applicationSource ) ) {}
 
-		static Func<AutoData, IDisposable> Context( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource )
-		{
-			return Providers.From( data => new Activation.IoC.ServiceProviderFactory( () => new Cache( assemblySource() ).Create( data ) ).Create(), applicationSource );
-			
-		}
+		static Func<AutoData, IDisposable> Context( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) => 
+			Providers.From( data => new Activation.IoC.ServiceProviderFactory( () => new Cache( assemblySource() ).Create( data ) ).Create(), applicationSource );
 
 		class Cache : CacheFactoryBase
 		{

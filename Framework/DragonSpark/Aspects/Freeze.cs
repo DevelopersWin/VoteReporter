@@ -4,21 +4,16 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Patterns.Model;
-using PostSharp.Patterns.Threading;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	[Synchronized]
 	public class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
-		[Reference]
 		readonly HashSet<int> codes = new HashSet<int>();
 
-		[Reference]
 		readonly IDictionary<int, object> items = new Dictionary<int, object>();
 
 		object Get( MethodInterceptionArgs args )
@@ -31,13 +26,16 @@ namespace DragonSpark.Aspects
 
 		bool Add( int code, MethodInterceptionArgs args )
 		{
-			var result = !codes.Contains( code );
-			if ( result )
+			lock ( codes )
 			{
-				codes.Add( code );
-				items.Add( code, args.GetReturnValue() );
+				var result = !codes.Contains( code );
+				if ( result )
+				{
+					codes.Add( code );
+					items.Add( code, args.GetReturnValue() );
+				}
+				return result;	
 			}
-			return result;
 		}
 
 		protected override object CreateItem( MethodInterceptionArgs parameter )
@@ -74,7 +72,7 @@ namespace DragonSpark.Aspects
 
 		// public override void RuntimeInitialize( MethodBase method ) => Initialize();
 
-		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
+		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new Freeze();
 
 		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 
