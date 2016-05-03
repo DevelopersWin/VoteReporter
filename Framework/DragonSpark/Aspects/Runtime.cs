@@ -32,7 +32,7 @@ namespace DragonSpark.Aspects
 		public Runtime() : base( RuntimeSpecification.Instance ) {}
 	}
 
-	public class RuntimeSpecification : SpecificationBase
+	public class RuntimeSpecification : SpecificationBase<object>
 	{
 		public static RuntimeSpecification Instance { get; } = new RuntimeSpecification();
 

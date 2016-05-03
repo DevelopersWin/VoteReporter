@@ -27,17 +27,6 @@ namespace DragonSpark.Runtime.Specifications
 		public ProjectedSpecification( ISpecification specification, Func<T, object> projection ) : base( specification, projection ) {}
 	}
 
-	public class ProjectedSpecification : ProjectedSpecification<object>
-	{
-		public ProjectedSpecification( ISpecification specification, Func<object, object> projection ) : base( specification, projection ) {}
-	}
-
-	public abstract class SpecificationBase : SpecificationBase<object>
-	{
-
-		// public abstract bool IsSatisfiedBy( object parameter );
-	}
-
 	public abstract class SpecificationBase<T> : ISpecification<T>
 	{
 		readonly Func<object, T> coercer;
@@ -75,19 +64,21 @@ namespace DragonSpark.Runtime.Specifications
 		public override bool IsSatisfiedBy( T parameter ) => @delegate( parameter );
 	}
 
-	public class DelegatedSpecification : DelegatedSpecification<object>
+	/*public class DelegatedSpecification : DelegatedSpecification<object>
 	{
 		public DelegatedSpecification( Func<object, bool> @delegate ) : base( @delegate ) {}
-	}
+	}*/
 
 	public interface IApplyAware
 	{
 		void Apply();
 	}
 
-	public class OnlyOnceSpecification : SpecificationBase, IApplyAware
+	public class OnlyOnceSpecification : SpecificationBase<object>, IApplyAware
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
+
+		public OnlyOnceSpecification() {}
 
 		public override bool IsSatisfiedBy( object parameter ) => !monitor.IsApplied;
 

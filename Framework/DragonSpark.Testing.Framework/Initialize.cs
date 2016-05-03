@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Framework
 		public Runtime() : base( Specification ) {}
 	}
 
-	class JetBrainsAppDomainSpecification : SpecificationBase
+	class JetBrainsAppDomainSpecification : SpecificationBase<object>
 	{
 		readonly AppDomain domain;
 		public static JetBrainsAppDomainSpecification Instance { get; } = new JetBrainsAppDomainSpecification();
