@@ -54,9 +54,8 @@ namespace DragonSpark.Runtime.Specifications
 
 	public abstract class SpecificationBase : SpecificationBase<object>
 	{
-		protected SpecificationBase() {}
-		protected SpecificationBase( ICoercer<object> coercer ) : base( coercer ) {}
-		protected SpecificationBase( Func<object, object> coercer ) : base( coercer ) {}
+
+		// public abstract bool IsSatisfiedBy( object parameter );
 	}
 
 	public abstract class SpecificationBase<T> : ISpecification<T>
@@ -82,23 +81,29 @@ namespace DragonSpark.Runtime.Specifications
 		}
 	}
 
-	public class DelegatedSpecification<T> : DelegatedSpecification, ISpecification<T>
+	public class DelegatedSpecification<T> : SpecificationBase<T>
 	{
-		public DelegatedSpecification( Func<T, bool> @delegate ) : base( o => @delegate( (T)o ) ) {}
+		readonly Func<T, bool> @delegate;
 
-		public bool IsSatisfiedBy( T parameter ) => base.IsSatisfiedBy( parameter );
-	}
-
-	public class DelegatedSpecification : SpecificationBase
-	{
-		readonly Func<object, bool> @delegate;
-
-		public DelegatedSpecification( Func<object, bool> @delegate )
+		public DelegatedSpecification( Func<T, bool> @delegate )
 		{
 			this.@delegate = @delegate;
 		}
 
-		public override bool IsSatisfiedBy( object parameter ) => @delegate( parameter );
+		public override bool IsSatisfiedBy( T parameter ) => @delegate( parameter );
+
+		/*/*public DelegatedSpecification( Func<T, bool> @delegate ) : base( o => @delegate( (T)o ) ) {}
+
+		public bool IsSatisfiedBy( T parameter ) => base.IsSatisfiedBy( parameter );#1#
+		public override bool IsSatisfiedBy(  parameter )
+		{
+			return false;
+		}*/
+	}
+
+	public class DelegatedSpecification : DelegatedSpecification<object>
+	{
+		public DelegatedSpecification( Func<object, bool> @delegate ) : base( @delegate ) {}
 	}
 
 	/*public abstract class SpecificationBase<T> : SpecificationBase, ISpecification<T>
