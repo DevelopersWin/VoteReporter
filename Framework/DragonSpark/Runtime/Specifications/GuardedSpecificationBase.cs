@@ -26,14 +26,6 @@ namespace DragonSpark.Runtime.Specifications
 		public override bool IsSatisfiedBy( object parameter ) => !parameter.IsNull();
 	}
 
-	public abstract class SpecificationBase : ISpecification // <T>
-	{
-		// bool ISpecification<T>.IsSatisfiedBy( T parameter ) => IsSatisfiedBy( parameter );
-
-		public abstract bool IsSatisfiedBy( object parameter );
-
-	}
-
 	public abstract class GuardedSpecificationBase<T> : ISpecification<T>
 	{
 		readonly Func<object, T> projection;

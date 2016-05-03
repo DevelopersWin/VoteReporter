@@ -7,7 +7,7 @@ namespace DragonSpark.Runtime.Specifications
 {
 	public class DecoratedSpecification<T> : DecoratedSpecification, ISpecification<T>
 	{
-		public DecoratedSpecification( ISpecification inner ) : base( inner ) {}
+		public DecoratedSpecification( ISpecification<T> inner ) : base( inner ) {}
 
 		public bool IsSatisfiedBy( T parameter ) => base.IsSatisfiedBy( parameter );
 	}
@@ -50,6 +50,36 @@ namespace DragonSpark.Runtime.Specifications
 		}
 
 		public override bool IsSatisfiedBy( object parameter ) => base.IsSatisfiedBy( parameter.With( projection ) );
+	}
+
+	public abstract class SpecificationBase : SpecificationBase<object>
+	{
+		protected SpecificationBase() {}
+		protected SpecificationBase( ICoercer<object> coercer ) : base( coercer ) {}
+		protected SpecificationBase( Func<object, object> coercer ) : base( coercer ) {}
+	}
+
+	public abstract class SpecificationBase<T> : ISpecification<T>
+	{
+		readonly Func<object, T> coercer;
+
+		protected SpecificationBase() : this( Coercer<T>.Instance ) {}
+
+		protected SpecificationBase(  ICoercer<T> coercer ) : this( coercer.Coerce ) {}
+
+		protected SpecificationBase( Func<object, T> coercer )
+		{
+			this.coercer = coercer;
+		}
+
+		public abstract bool IsSatisfiedBy( T parameter );
+
+		bool ISpecification.IsSatisfiedBy( object parameter )
+		{
+			var coerced = coercer( parameter );
+			var result = IsSatisfiedBy( coerced );
+			return result;
+		}
 	}
 
 	public class DelegatedSpecification<T> : DelegatedSpecification, ISpecification<T>

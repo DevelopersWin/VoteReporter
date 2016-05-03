@@ -48,7 +48,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public InstanceSpecification( IPolicyList policies ) : base( policies ) {}
 
-		public override bool IsSatisfiedBy( TypeRequest parameter ) => Policies.Get<ILifetimePolicy>( parameter ).With( policy => policy.GetValue() ) != null;
+		public override bool IsSatisfiedBy( TypeRequest parameter ) => Policies.Get<ILifetimePolicy>( parameter.RequestedType ).With( policy => policy.GetValue() ) != null;
 	}
 
 	public class HasRegisteredBuildPolicySpecification : RegistrationSpecificationBase
