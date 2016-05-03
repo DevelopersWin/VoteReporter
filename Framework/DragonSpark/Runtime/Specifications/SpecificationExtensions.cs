@@ -23,7 +23,7 @@ namespace DragonSpark.Runtime.Specifications
 
 		public static ISpecification<T> Box<T>( this ISpecification @this ) => @this.Box( Default<T>.Boxed );
 
-		public static ISpecification<T> Box<T>( this ISpecification @this, Func<T, object> projection ) => new ProjectedSpecification<T>( @this, projection );
+		public static ISpecification<T> Box<T>( this ISpecification @this, Func<T, object> projection ) => new DecoratedSpecification<T>( @this, projection );
 
 		// public static ISpecification<T> Box<T>( this ISpecification<T> @this ) => @this.Box( Default<T>.Boxed );
 	}

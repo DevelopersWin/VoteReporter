@@ -22,11 +22,6 @@ namespace DragonSpark.Runtime.Specifications
 		ISpecification Specification { get; }
 	}
 
-	public class ProjectedSpecification<T> : DecoratedSpecification<T>
-	{
-		public ProjectedSpecification( ISpecification specification, Func<T, object> projection ) : base( specification, projection ) {}
-	}
-
 	public abstract class SpecificationBase<T> : ISpecification<T>
 	{
 		readonly Func<object, T> coercer;
@@ -63,11 +58,6 @@ namespace DragonSpark.Runtime.Specifications
 
 		public override bool IsSatisfiedBy( T parameter ) => @delegate( parameter );
 	}
-
-	/*public class DelegatedSpecification : DelegatedSpecification<object>
-	{
-		public DelegatedSpecification( Func<object, bool> @delegate ) : base( @delegate ) {}
-	}*/
 
 	public interface IApplyAware
 	{

@@ -58,7 +58,7 @@ namespace DragonSpark.Activation.IoC
 		public override bool IsSatisfiedBy( TypeRequest parameter ) => !( Policies.GetNoDefault<IBuildPlanPolicy>( parameter, false ) is DynamicMethodBuildPlan );
 	}
 
-	public class StrategySpecification : ProjectedSpecification<TypeRequest>
+	public class StrategySpecification : DecoratedSpecification<TypeRequest>
 	{
 		readonly static ISpecification<StrategyValidatorParameter>[] DefaultValidators = { ArrayStrategyValidator.Instance, EnumerableStrategyValidator.Instance };
 
