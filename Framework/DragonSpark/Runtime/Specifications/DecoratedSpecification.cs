@@ -28,7 +28,7 @@ namespace DragonSpark.Runtime.Specifications
 
 		protected SpecificationBase() : this( Coercer<T>.Instance ) {}
 
-		protected SpecificationBase(  ICoercer<T> coercer ) : this( coercer.Coerce ) {}
+		protected SpecificationBase( ICoercer<T> coercer ) : this( coercer.Coerce ) {}
 
 		protected SpecificationBase( Func<object, T> coercer )
 		{
@@ -64,13 +64,15 @@ namespace DragonSpark.Runtime.Specifications
 		void Apply();
 	}
 
-	public class OnlyOnceSpecification : SpecificationBase<object>, IApplyAware
+	public class OnlyOnceSpecification : OnlyOnceSpecification<object> {}
+
+	public class OnlyOnceSpecification<T> : SpecificationBase<T>, IApplyAware
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
 		public OnlyOnceSpecification() {}
 
-		public override bool IsSatisfiedBy( object parameter ) => !monitor.IsApplied;
+		public override bool IsSatisfiedBy( T parameter ) => !monitor.IsApplied;
 
 		public void Apply() => monitor.Apply();
 	}

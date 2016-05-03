@@ -257,7 +257,7 @@ namespace DragonSpark.Setup
 		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) };
 	}
 
-	public abstract class Application<TParameter> : CompositeCommand<TParameter>, IApplication<TParameter>
+	public abstract class Application<T> : CompositeCommand<T>, IApplication<T>
 	{
 		protected Application( [Required]IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
 
@@ -266,7 +266,7 @@ namespace DragonSpark.Setup
 			Services = provider;
 		}
 
-		protected Application( IEnumerable<ICommand> commands ) : base( new OnlyOnceSpecification().Box<TParameter>(), commands.ToArray() ) {}
+		protected Application( IEnumerable<ICommand> commands ) : base( new OnlyOnceSpecification<T>(), commands.ToArray() ) {}
 
 		[Required]
 		public IServiceProvider Services { [return: Required]get; set; }

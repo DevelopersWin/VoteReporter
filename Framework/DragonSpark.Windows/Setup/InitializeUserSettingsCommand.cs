@@ -58,7 +58,7 @@ namespace DragonSpark.Windows.Setup
 
 		public InitializeUserSettingsCommand( ILogger logger ) : this( new LogCommand( logger ), UserSettingsPathFactory.Instance.Create ) {}
 
-		public InitializeUserSettingsCommand( LogCommand log, Func<string> pathSource ) : base( new OnlyOnceSpecification().Box<object>() )
+		public InitializeUserSettingsCommand( LogCommand log, Func<string> pathSource ) : base( new OnlyOnceSpecification() )
 		{
 			this.log = log;
 			this.pathSource = pathSource;

@@ -32,7 +32,7 @@ namespace DragonSpark.Configuration
 	[ContentProperty( nameof(Configurations) )]
 	public class InitializeConfigurationCommand : ServicedCommand<ConfigureCommand, IList<IWritableStore>>
 	{
-		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification().Box<object>() ) {}
+		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification() ) {}
 
 		public Collection<IWritableStore> Configurations { get; } = new Collection<IWritableStore>();
 
