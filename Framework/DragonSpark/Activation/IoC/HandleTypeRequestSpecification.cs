@@ -20,7 +20,7 @@ namespace DragonSpark.Activation.IoC
 		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ).Box<TypeRequest>() ) {}
 
 		[Freeze]
-		public override bool IsSatisfiedBy( object parameter ) => base.IsSatisfiedBy( parameter );
+		public override bool IsSatisfiedBy( TypeRequest parameter ) => base.IsSatisfiedBy( parameter );
 	}
 
 	public abstract class RegistrationSpecificationBase : GuardedSpecificationBase<TypeRequest>
