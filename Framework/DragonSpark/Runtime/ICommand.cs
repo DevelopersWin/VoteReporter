@@ -1,12 +1,20 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
+using PostSharp.Aspects;
+using PostSharp.Aspects.Configuration;
+using PostSharp.Aspects.Dependencies;
+using PostSharp.Aspects.Serialization;
 using PostSharp.Patterns.Contracts;
+using PostSharp.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -25,9 +33,9 @@ namespace DragonSpark.Runtime
 		readonly IWritableStore<T> store;
 		readonly T current;
 
-		public AssignValueCommand( [Required]IWritableStore<T> store ) : this( store, store.Value ) {}
+		public AssignValueCommand( [Required] IWritableStore<T> store ) : this( store, store.Value ) {}
 
-		public AssignValueCommand( [Required]IWritableStore<T> store, T current )
+		public AssignValueCommand( [Required] IWritableStore<T> store, T current )
 		{
 			this.store = store;
 			this.current = current;
@@ -48,9 +56,9 @@ namespace DragonSpark.Runtime
 		readonly Lazy<ICommand> command;
 		readonly Lazy<object> parameter;
 
-		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.Self, parameter.Self ) {}
+		public FixedCommand( [Required] ICommand command, [Required] object parameter ) : this( command.Self, parameter.Self ) {}
 
-		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( Specifications.Specifications.Always )
+		public FixedCommand( [Required] Func<ICommand> command, [Required] Func<object> parameter ) : base( Specifications.Specifications.Always )
 		{
 			this.command = new Lazy<ICommand>( command );
 			this.parameter = new Lazy<object>( parameter );
@@ -164,46 +172,42 @@ namespace DragonSpark.Runtime
 
 	public class DecoratedCommand<T> : DelegatedCommand<T>
 	{
-		public DecoratedCommand( [Required]ICommand<T> inner ) : this( inner, Coercer<T>.Instance ) {}
-		public DecoratedCommand( [Required]ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
+		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Coercer<T>.Instance ) {}
+		public DecoratedCommand( [Required] ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
 	}
 
 	public abstract class CommandBase<T> : ICommand<T>
 	{
-		public event EventHandler CanExecuteChanged = delegate {};
+		readonly ICoercer<T> coercer;
+		readonly ISpecification<T> specification;
+		public event EventHandler CanExecuteChanged = delegate { };
 
 		protected CommandBase() : this( Coercer<T>.Instance ) {}
 
-		protected CommandBase( [Required]ICoercer<T> coercer ) : this( coercer, Specifications<T>.NotNull ) {}
+		protected CommandBase( [Required] ICoercer<T> coercer ) : this( coercer, Specifications<T>.NotNull ) {}
 
-		protected CommandBase( [Required]ISpecification<T> specification ) : this( Coercer<T>.Instance, specification ) {}
+		protected CommandBase( [Required] ISpecification<T> specification ) : this( Coercer<T>.Instance, specification ) {}
 
-		protected CommandBase( [Required]ICoercer<T> coercer, [Required]ISpecification<T> specification ) : this( new ParameterSupport<T>( specification, coercer ) ) {}
-
-		CommandBase( ParameterSupport<T> support )
+		protected CommandBase( [Required] ICoercer<T> coercer, [Required] ISpecification<T> specification )
 		{
-			Support = support;
+			this.coercer = coercer;
+			this.specification = specification;
 		}
-
-		protected ParameterSupport<T> Support { get; }
-
-		/*protected ISpecification<T> Specification => support.Specification;
-		protected ICoercer<T> Coercer => support.Coercer;*/
 
 		public void Update() => OnUpdate();
 
 		protected virtual void OnUpdate() => CanExecuteChanged( this, EventArgs.Empty );
 
-		bool ICommand.CanExecute( object parameter ) => Support.IsValid( parameter );
+		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		void ICommand.Execute( object parameter ) => Coerce( parameter );
-		
-		public virtual bool CanExecute( T parameter ) => Support.IsValid( parameter );
+		[ValidatedBy( nameof(CanExecute) )]
+		void ICommand.Execute( object parameter ) => OnExecute( coercer.Coerce( parameter ) );
 
-		public void Execute( T parameter ) => Coerce( parameter );
+		public virtual bool CanExecute( T parameter ) => specification.IsSatisfiedBy( parameter );
+
+		[ValidatedBy( nameof(CanExecute) )]
+		public void Execute( T parameter ) => OnExecute( parameter );
 
 		protected abstract void OnExecute( T parameter );
-
-		void Coerce( object parameter ) => Support.Coerce( parameter, OnExecute );
 	}
 }

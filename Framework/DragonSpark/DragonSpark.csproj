@@ -181,6 +181,7 @@
     <Compile Include="Aspects\ProfileAttribute.cs" />
     <Compile Include="Aspects\RecursionGuardAttribute.cs" />
     <Compile Include="Aspects\Runtime.cs" />
+    <Compile Include="Aspects\Validator.cs" />
     <Compile Include="ComponentModel\DefaultValuePropertySpecification.cs" />
     <Compile Include="ComponentModel\DefaultPropertyValueFactory.cs" />
     <Compile Include="ComponentModel\DefaultValueBase.cs" />

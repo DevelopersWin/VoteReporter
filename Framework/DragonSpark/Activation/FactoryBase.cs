@@ -87,7 +87,11 @@ namespace DragonSpark.Activation
 
 		public bool IsValid( object parameter ) => Coerce( parameter, IsValid );
 
-		public bool IsValid( T parameter ) => Specification.IsSatisfiedBy( parameter );
+		public bool IsValid( T parameter )
+		{
+			var isSatisfiedBy = Specification.IsSatisfiedBy( parameter );
+			return isSatisfiedBy;
+		}
 
 		public void Coerce( object parameter, Action<T> with ) => Coerce( parameter, arg =>
 																					 {
@@ -98,7 +102,8 @@ namespace DragonSpark.Activation
 		public TResult Coerce<TResult>( object parameter, Func<T, TResult> with )
 		{
 			var coerced = Coercer.Coerce( parameter );
-			if ( IsValid( coerced ) )
+			var isValid = IsValid( coerced );
+			if ( isValid )
 			{
 				var result = with( coerced );
 				return result;
