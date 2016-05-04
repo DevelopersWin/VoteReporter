@@ -22,31 +22,6 @@ namespace DragonSpark.Runtime.Specifications
 		ISpecification Specification { get; }
 	}
 
-	public abstract class SpecificationBase<T> : ISpecification<T>
-	{
-		readonly Func<object, T> coercer;
-
-		protected SpecificationBase() : this( Coercer<T>.Instance ) {}
-
-		protected SpecificationBase( ICoercer<T> coercer ) : this( coercer.Coerce ) {}
-
-		protected SpecificationBase( Func<object, T> coercer )
-		{
-			this.coercer = coercer;
-		}
-
-		public abstract bool IsSatisfiedBy( T parameter );
-
-		bool ISpecification.IsSatisfiedBy( object parameter ) => Coerce( parameter );
-
-		protected bool Coerce( object parameter )
-		{
-			var coerced = coercer( parameter );
-			var result = IsSatisfiedBy( coerced );
-			return result;
-		}
-	}
-
 	public class DelegatedSpecification<T> : SpecificationBase<T>
 	{
 		readonly Func<T, bool> @delegate;

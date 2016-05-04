@@ -26,21 +26,32 @@ namespace DragonSpark.Runtime.Specifications
 		public override bool IsSatisfiedBy( T parameter ) => !parameter.IsNull();
 	}
 
-	public abstract class GuardedSpecificationBase<T> : ISpecification<T>
+	public abstract class SpecificationBase<T> : ISpecification<T>
 	{
-		readonly Func<object, T> projection;
+		readonly Func<object, T> coercer;
 
-		protected GuardedSpecificationBase() : this( Coercer<T>.Instance ) {}
+		protected SpecificationBase() : this( Coercer<T>.Instance ) {}
 
-		protected GuardedSpecificationBase( ICoercer<T> coercer ) : this( coercer.Coerce ) {}
+		protected SpecificationBase( ICoercer<T> coercer ) : this( coercer.Coerce ) {}
 
-		protected GuardedSpecificationBase( Func<object, T> projection )
+		protected SpecificationBase( Func<object, T> coercer )
 		{
-			this.projection = projection;
+			this.coercer = coercer;
 		}
 
-		bool ISpecification.IsSatisfiedBy( object parameter ) => projection( parameter ).With( IsSatisfiedBy );
+		public abstract bool IsSatisfiedBy( T parameter );
 
-		public abstract bool IsSatisfiedBy( [Required]T parameter );
+		bool ISpecification.IsSatisfiedBy( object parameter ) => IsSatisfiedByCoerced( coercer( parameter ) );
+
+		protected virtual bool IsSatisfiedByCoerced( T parameter ) => IsSatisfiedBy( parameter );
+	}
+
+	public abstract class GuardedSpecificationBase<T> : SpecificationBase<T>
+	{
+		protected GuardedSpecificationBase() {}
+		protected GuardedSpecificationBase( ICoercer<T> coercer ) : base( coercer ) {}
+		protected GuardedSpecificationBase( Func<object, T> coercer ) : base( coercer ) {}
+
+		protected override bool IsSatisfiedByCoerced( T parameter ) => parameter.With( IsSatisfiedBy );
 	}
 }
