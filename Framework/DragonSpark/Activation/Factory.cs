@@ -86,7 +86,7 @@ namespace DragonSpark.Activation
 			new Factory<IFactoryWithParameter>( factoryWithParameter )
 		) {}
 
-		class Factory<T> : DecoratedFactory<Type, Func<object>>
+		class Factory<T> : DelegatedFactory<Type, Func<object>>
 		{
 			public Factory( IFactory<Type, Func<object>> inner ) : base( TypeAssignableSpecification<T>.Instance, inner.Create ) {}
 		}

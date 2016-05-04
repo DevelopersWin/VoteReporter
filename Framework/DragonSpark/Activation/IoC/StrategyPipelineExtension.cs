@@ -328,7 +328,7 @@ namespace DragonSpark.Activation.IoC
 		readonly ConventionCandidateLocator locator;
 		readonly IServiceRegistry registry;
 
-		public class ConventionCandidateLocator : DecoratedFactory<IBuilderContext, Type>
+		public class ConventionCandidateLocator : DelegatedFactory<IBuilderContext, Type>
 		{
 			static ISpecification<IBuilderContext> Specification { get; } = CanBuildSpecification.Instance.Cast<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ).Inverse();
 

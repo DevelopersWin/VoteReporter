@@ -5,7 +5,12 @@ using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class InverseSpecification : SpecificationBase<object>
+	public class InverseSpecification : InverseSpecification<object>
+	{
+		public InverseSpecification( ISpecification inner ) : base( inner ) {}
+	}
+
+	public class InverseSpecification<T> : SpecificationBase<T>
 	{
 		readonly ISpecification inner;
 
@@ -14,7 +19,7 @@ namespace DragonSpark.Runtime.Specifications
 			this.inner = inner;
 		}
 
-		public override bool IsSatisfiedBy( object parameter ) => !inner.IsSatisfiedBy( parameter );
+		public override bool IsSatisfiedBy( T parameter ) => !inner.IsSatisfiedBy( parameter );
 	}
 
 	public class NotNullSpecification<T> : SpecificationBase<T>

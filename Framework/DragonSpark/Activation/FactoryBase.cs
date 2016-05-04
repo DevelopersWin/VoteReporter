@@ -40,7 +40,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class ConfiguringFactory<T> : DecoratedFactory<T>
+	public class ConfiguringFactory<T> : DelegatedFactory<T>
 	{
 		readonly Action<T> configure;
 
@@ -57,7 +57,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class ConfiguringFactory<T, TResult> : DecoratedFactory<T, TResult>
+	public class ConfiguringFactory<T, TResult> : DelegatedFactory<T, TResult>
 	{
 		readonly Action<TResult> configure;
 
@@ -89,16 +89,11 @@ namespace DragonSpark.Activation
 
 		public bool IsValid( T parameter ) => Specification.IsSatisfiedBy( parameter );
 
-		public void Coerce( object parameter, Action<T> with )
-		{
-			var coerced = Coercer.Coerce( parameter );
-			if ( IsValid( coerced ) )
-			{
-				with( coerced );
-				var specification = Specification.AsTo<ISpecificationAware, ISpecification>( aware => aware.Specification ) ?? Specification;
-				specification.As<IApplyAware>( aware => aware.Apply() );
-			}
-		}
+		public void Coerce( object parameter, Action<T> with ) => Coerce( parameter, arg =>
+																					 {
+																						 with( arg );
+																						 return Default<T>.Item;
+																					 } );
 
 		public TResult Coerce<TResult>( object parameter, Func<T, TResult> with )
 		{
@@ -106,17 +101,16 @@ namespace DragonSpark.Activation
 			if ( IsValid( coerced ) )
 			{
 				var result = with( coerced );
-				Specification.As<IApplyAware>( aware => aware.Apply() );
 				return result;
 			}
 			return Default<TResult>.Item;
 		}
 	}
 
-	public class BoxedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	public class DecoratedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
 		readonly IFactoryWithParameter inner;
-		public BoxedFactory( IFactoryWithParameter inner )
+		public DecoratedFactory( IFactoryWithParameter inner )
 		{
 			this.inner = inner;
 		}
@@ -154,12 +148,12 @@ namespace DragonSpark.Activation
 		protected abstract TResult CreateItem( [Required]TParameter parameter );
 	}
 
-	public class CachedDecoratedFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult>
+	public class CachedDelegatedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
 		readonly Func<TParameter, object> instance;
 		readonly Func<TParameter, IEnumerable<object>> keySource;
 
-		protected CachedDecoratedFactory( Func<TParameter, IEnumerable<object>> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
+		protected CachedDelegatedFactory( Func<TParameter, IEnumerable<object>> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
 		{
 			this.instance = instance;
 			this.keySource = keySource;
@@ -173,13 +167,13 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class DecoratedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	public class DelegatedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
 		readonly Func<TParameter, TResult> inner;
 
-		public DecoratedFactory( Func<TParameter, TResult> inner ) : this( Specifications<TParameter>.Always, inner ) {}
+		public DelegatedFactory( Func<TParameter, TResult> inner ) : this( Specifications<TParameter>.Always, inner ) {}
 
-		public DecoratedFactory( [Required]ISpecification<TParameter> specification, [Required]Func<TParameter, TResult> inner ) : base( specification )
+		public DelegatedFactory( [Required]ISpecification<TParameter> specification, [Required]Func<TParameter, TResult> inner ) : base( specification )
 		{
 			this.inner = inner;
 		}
@@ -187,13 +181,13 @@ namespace DragonSpark.Activation
 		protected override TResult CreateItem( TParameter parameter ) => inner( parameter );
 	}
 
-	public class DecoratedFactory<T> : FactoryBase<T>
+	public class DelegatedFactory<T> : FactoryBase<T>
 	{
 		readonly Func<T> inner;
 
-		public DecoratedFactory( Func<T> provider ) : this( Specifications<T>.Always, provider ) {}
+		public DelegatedFactory( Func<T> provider ) : this( Specifications<T>.Always, provider ) {}
 
-		public DecoratedFactory( [Required]ISpecification<T> specification, [Required]Func<T> inner ) : base( specification )
+		public DelegatedFactory( [Required]ISpecification<T> specification, [Required]Func<T> inner ) : base( specification )
 		{
 			this.inner = inner;
 		}
@@ -224,7 +218,7 @@ namespace DragonSpark.Activation
 			var boxedFactories = factories
 				.Select( factory => factory.Create( parameter ) )
 				.NotNull()
-				.Select( inner => new BoxedFactory<TParameter, TResult>( inner ) )
+				.Select( inner => new DecoratedFactory<TParameter, TResult>( inner ) )
 				.ToArray();
 			var result = new FirstFromParameterFactory<TParameter, TResult>( boxedFactories );
 			return result;

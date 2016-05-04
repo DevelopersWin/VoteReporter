@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DragonSpark.Runtime.Specifications
 {
 	public interface ISpecification
@@ -5,8 +7,8 @@ namespace DragonSpark.Runtime.Specifications
 		bool IsSatisfiedBy( object parameter );
 	}
 
-	public interface ISpecification<in TContext> : ISpecification
+	public interface ISpecification<in T> : ISpecification
 	{
-		bool IsSatisfiedBy( TContext parameter );
+		bool IsSatisfiedBy( T parameter );
 	}
 }

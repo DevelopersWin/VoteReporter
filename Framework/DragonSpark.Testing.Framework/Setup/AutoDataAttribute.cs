@@ -70,7 +70,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
+	public abstract class CacheFactoryBase : CachedDelegatedFactory<AutoData, IServiceProvider>
 	{
 		protected CacheFactoryBase( Func<AutoData, IEnumerable<object>> keySource, Func<IServiceProvider> inner ) : base( keySource, data => data.Method.DeclaringType, data => inner() ) {}
 
