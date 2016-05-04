@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Runtime.Specifications
 		[Fact]
 		public void Never()
 		{
-			Assert.False( NeverSpecification.Instance.IsSatisfiedBy( null ), null );
+			Assert.False( DragonSpark.Runtime.Specifications.Specifications.Never.IsSatisfiedBy( null ) );
 		} 
 	}
 }

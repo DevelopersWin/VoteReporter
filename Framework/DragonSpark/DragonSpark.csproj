@@ -224,7 +224,6 @@
     <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Runtime\Specifications\AlwaysSpecification.cs" />
     <Compile Include="Runtime\Specifications\FixedSpecification.cs" />
-    <Compile Include="Runtime\Specifications\NeverSpecification.cs" />
     <Compile Include="Activation\CompositeActivator.cs" />
     <Compile Include="Activation\ConstructorBase.cs" />
     <Compile Include="Activation\ConstructCoercer.cs" />

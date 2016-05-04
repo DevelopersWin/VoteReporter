@@ -29,7 +29,7 @@ namespace DragonSpark.Activation
 
 	public class OnlyIfNotRegistered : DecoratedSpecification<Type>
 	{
-		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse().Box<Type>( LocatorBase.Coercer.Instance.Coerce ) ) { }
+		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse().Cast<Type>( LocatorBase.Coercer.Instance.Coerce ) ) { }
 	}
 
 	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<IsATypeSpecification>

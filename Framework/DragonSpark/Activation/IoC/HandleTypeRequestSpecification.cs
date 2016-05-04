@@ -17,7 +17,7 @@ namespace DragonSpark.Activation.IoC
 	[Persistent]
 	class HandleTypeRequestSpecification : TypeRequestSpecification, IHandleTypeRequestSpecification
 	{
-		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ).Box<TypeRequest>() ) {}
+		public HandleTypeRequestSpecification( ResolvableTypeSpecification type, ResolvableConstructorSpecification constructor ) : base( type.Or( constructor ) ) {}
 
 		[Freeze]
 		public override bool IsSatisfiedBy( TypeRequest parameter ) => base.IsSatisfiedBy( parameter );
@@ -41,7 +41,7 @@ namespace DragonSpark.Activation.IoC
 	public class RegisteredSpecification : TypeRequestSpecification
 	{
 		public RegisteredSpecification( InstanceSpecification instance, IsRegisteredSpecification registered, HasRegisteredBuildPolicySpecification registeredBuildPolicy )
-			: base( instance.Or( registered.And( registeredBuildPolicy ) ).Box<TypeRequest>() ) {}
+			: base( instance.Or( registered.And( registeredBuildPolicy ) ) ) {}
 	}
 
 	public class InstanceSpecification : RegistrationSpecificationBase
@@ -65,7 +65,7 @@ namespace DragonSpark.Activation.IoC
 		public StrategySpecification( IStagedStrategyChain strategies ) : this( strategies, DefaultValidators ) {}
 
 		protected StrategySpecification( IStagedStrategyChain strategies, [Required] IEnumerable<ISpecification<StrategyValidatorParameter>> validators ) 
-			: base( new AnySpecification( validators.ToArray() ).Box<TypeRequest>(), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
+			: base( new AnySpecification( validators.ToArray() ), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
 	}
 
 	public class ContainsSingletonSpecification : GuardedSpecificationBase<Type>
@@ -151,7 +151,7 @@ namespace DragonSpark.Activation.IoC
 			StrategySpecification strategies, 
 			HasFactorySpecification factory )
 				: base( 
-					  new AnySpecification( convention, singleton ).Box<TypeRequest>( request => request.RequestedType ).Or( new AnySpecification( registered, strategies, factory ) ).Box<TypeRequest>()
+					  new AnySpecification( convention, singleton ).Cast<TypeRequest>( request => request.RequestedType ).Or( new AnySpecification( registered, strategies, factory ) )
 					   ) {}
 	}
 

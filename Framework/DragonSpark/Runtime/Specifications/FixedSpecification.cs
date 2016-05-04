@@ -1,6 +1,11 @@
 namespace DragonSpark.Runtime.Specifications
 {
-	public class FixedSpecification : ISpecification
+	public class FixedSpecification : FixedSpecification<object>
+	{
+		public FixedSpecification( bool satisfied ) : base( satisfied ) {}
+	}
+
+	public class FixedSpecification<T> : SpecificationBase<T>
 	{
 		readonly bool satisfied;
 
@@ -9,6 +14,6 @@ namespace DragonSpark.Runtime.Specifications
 			this.satisfied = satisfied;
 		}
 
-		public bool IsSatisfiedBy( object parameter ) => satisfied;
+		public override bool IsSatisfiedBy( T parameter ) => satisfied;
 	}
 }

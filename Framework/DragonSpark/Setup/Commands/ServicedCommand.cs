@@ -9,7 +9,7 @@ namespace DragonSpark.Setup.Commands
 {
 	public abstract class DelegatedFixedCommand : CommandBase<object>
 	{
-		protected DelegatedFixedCommand() : base( Specifications<object>.Always ) {}
+		protected DelegatedFixedCommand() : base( Specifications.Always ) {}
 
 		protected DelegatedFixedCommand( ISpecification<object> specification ) : base( specification ) {}
 
@@ -22,7 +22,7 @@ namespace DragonSpark.Setup.Commands
 
 	public class ServicedCommand<TCommand, TParameter> : DelegatedFixedCommand where TCommand : ICommand<TParameter>
 	{
-		public ServicedCommand() : base( Specifications<object>.Always ) {}
+		public ServicedCommand() : base( Specifications.Always ) {}
 
 		public ServicedCommand( ISpecification<object> specification ) : base( specification ) {}
 

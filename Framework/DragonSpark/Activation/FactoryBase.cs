@@ -214,7 +214,7 @@ namespace DragonSpark.Activation
 	{
 		readonly IFactory<object, IFactoryWithParameter>[] factories;
 		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ).Fixed() ) {}
-		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  ) : base( Specifications<object>.Always )
+		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  ) : base( Specifications.Always )
 		{
 			this.factories = factories;
 		}
@@ -278,7 +278,7 @@ namespace DragonSpark.Activation
 
 		public FirstFactory( params IFactory<T>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) { }
 
-		public FirstFactory( [Required]params Func<T>[] inner ) : base( Specifications<object>.Always )
+		public FirstFactory( [Required]params Func<T>[] inner ) : base( Specifications.Always )
 		{
 			this.inner = inner;
 		}
@@ -319,7 +319,7 @@ namespace DragonSpark.Activation
 	{
 		readonly ISpecification specification;
 
-		protected FactoryBase() : this( AlwaysSpecification.Instance ) {}
+		protected FactoryBase() : this( Specifications.Always ) {}
 
 		protected FactoryBase( [Required]ISpecification specification )
 		{

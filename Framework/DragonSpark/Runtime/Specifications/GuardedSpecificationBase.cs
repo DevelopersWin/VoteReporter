@@ -17,13 +17,13 @@ namespace DragonSpark.Runtime.Specifications
 		public override bool IsSatisfiedBy( object parameter ) => !inner.IsSatisfiedBy( parameter );
 	}
 
-	public class NotNullSpecification : SpecificationBase<object>
+	public class NotNullSpecification<T> : SpecificationBase<T>
 	{
-		public static ISpecification Instance { get; } = new NotNullSpecification();
+		public static ISpecification<T> Instance { get; } = new NotNullSpecification<T>();
 
 		NotNullSpecification() {}
 	
-		public override bool IsSatisfiedBy( object parameter ) => !parameter.IsNull();
+		public override bool IsSatisfiedBy( T parameter ) => !parameter.IsNull();
 	}
 
 	public abstract class GuardedSpecificationBase<T> : ISpecification<T>

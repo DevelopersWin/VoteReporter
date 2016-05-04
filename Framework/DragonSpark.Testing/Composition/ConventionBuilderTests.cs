@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void BasicConvention( ContainerConfiguration configuration, ConventionBuilder sut )
 		{
-			sut.ForTypesMatching( AlwaysSpecification.Instance.IsSatisfiedBy ).Export();
+			sut.ForTypesMatching( Specifications.Always.IsSatisfiedBy ).Export();
 			var types = this.Adapt().WithNested();
 			var container = configuration.WithParts( types, sut ).CreateContainer();
 			var export = container.GetExport<SomeExport>();

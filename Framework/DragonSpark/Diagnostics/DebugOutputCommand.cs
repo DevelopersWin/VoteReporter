@@ -21,7 +21,7 @@ namespace DragonSpark.Diagnostics
 
 	public class DelegatedTextCommand : DelegatedCommand<string>
 	{
-		public DelegatedTextCommand( Action<string> action ) : this( action, Specifications<object>.Always ) {}
+		public DelegatedTextCommand( Action<string> action ) : this( action, Specifications.Always ) {}
 
 		public DelegatedTextCommand( Action<string> action, ISpecification<string> specification ) : base( action, specification ) {}
 	}

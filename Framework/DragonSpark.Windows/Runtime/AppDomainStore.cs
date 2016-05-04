@@ -1,5 +1,6 @@
 using DragonSpark.Runtime.Values;
 using System;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Windows.Runtime
 {
@@ -19,6 +20,6 @@ namespace DragonSpark.Windows.Runtime
 
 		public override void Assign( T item ) => domain.SetData( key, item );
 
-		protected override T Get() => (T)domain.GetData( key );
+		protected override T Get() => domain.GetData( key ).As<T>();
 	}
 }

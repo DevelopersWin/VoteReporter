@@ -183,7 +183,7 @@ namespace DragonSpark.Activation.IoC
 		readonly Func<Type, ITypeCandidateWeightProvider> weight;
 		readonly ISpecification<Type> specification;
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, type => new TypeCandidateWeightProvider( type ), CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).Box<Type>(), CanBuildSpecification.Instance.Inverse<Type>() ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, type => new TypeCandidateWeightProvider( type ), CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ), CanBuildSpecification.Instance.Inverse() ) {}
 
 		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, Func<Type, ITypeCandidateWeightProvider> weight, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
 		{
@@ -254,7 +254,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
 	{
-		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance.Box<Type>( type => type.Assembly() ) );
+		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance.Cast<Type>( type => type.Assembly() ) );
 
 		public AllTypesInCandidateAssemblyStrategy( [Required] ISpecification<Type> specification ) : base( specification ) {}
 
@@ -330,7 +330,7 @@ namespace DragonSpark.Activation.IoC
 
 		public class ConventionCandidateLocator : DecoratedFactory<IBuilderContext, Type>
 		{
-			static ISpecification<IBuilderContext> Specification { get; } = CanBuildSpecification.Instance.Box<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ).Inverse<IBuilderContext>();
+			static ISpecification<IBuilderContext> Specification { get; } = CanBuildSpecification.Instance.Cast<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ).Inverse();
 
 			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : base( Specification, context => factory.Create( context.BuildKey.Type ) ) {}
 		}

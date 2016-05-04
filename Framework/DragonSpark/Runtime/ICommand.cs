@@ -50,7 +50,7 @@ namespace DragonSpark.Runtime
 
 		public FixedCommand( [Required]ICommand command, [Required]object parameter ) : this( command.Self, parameter.Self ) {}
 
-		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( Specifications<object>.Always )
+		public FixedCommand( [Required]Func<ICommand> command, [Required]Func<object> parameter ) : base( Specifications.Specifications.Always )
 		{
 			this.command = new Lazy<ICommand>( command );
 			this.parameter = new Lazy<object>( parameter );
@@ -125,7 +125,7 @@ namespace DragonSpark.Runtime
 
 	public class DelegatedCommand : DelegatedCommand<object>
 	{
-		public DelegatedCommand( Action action ) : base( o => action(), Specifications<object>.Always ) {}
+		public DelegatedCommand( Action action ) : base( o => action(), Specifications.Specifications.Always ) {}
 	}
 
 	public class DelegatedCommand<T> : CommandBase<T>
