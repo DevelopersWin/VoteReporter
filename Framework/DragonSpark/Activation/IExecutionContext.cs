@@ -2,7 +2,7 @@ using DragonSpark.Runtime.Values;
 
 namespace DragonSpark.Activation
 {
-	public interface IExecutionContext : IStore
+	public interface IExecutionContext : IWritableStore
 	{}
 
 	public static class Execution
@@ -16,6 +16,8 @@ namespace DragonSpark.Activation
 		{
 			Context = current;
 		}	static IExecutionContext Context { get; set; }
+
+		public static void Assign( object current ) => Context.Assign( current );
 
 		public static object Current => Context.Value;
 	}

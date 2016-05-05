@@ -3,7 +3,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
-	public class TaskLocalValueTests
+	public class TaskLocalStoreTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Assign( int number, TaskLocalStore<int> sut )

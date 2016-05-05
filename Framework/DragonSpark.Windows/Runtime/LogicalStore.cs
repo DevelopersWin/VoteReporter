@@ -20,10 +20,10 @@ namespace DragonSpark.Windows.Runtime
 			}
 			else
 			{
-				CallContext.LogicalSetData( slot, item );
+				CallContext.SetData( slot, item );
 			}
 		}
 
-		protected override T Get() => (T)CallContext.LogicalGetData( slot );
+		protected override T Get() => (T)CallContext.GetData( slot );
 	}
 }
