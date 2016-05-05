@@ -5,7 +5,7 @@ namespace DragonSpark.Testing.Parts.Development
 {
 	public partial class Initialize
 	{
-		[ModuleInitializer( 0 ), Framework.Runtime]
+		[ModuleInitializer( 0 ), Aspects.Runtime]
 		public static void Execute() => new Initialize().Run();
 
 		Initialize()

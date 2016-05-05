@@ -6,7 +6,7 @@ namespace DragonSpark.Windows.Testing
 {
 	public static class Initialize
 	{
-		[ModuleInitializer( 0 ), DragonSpark.Testing.Framework.Runtime]
+		[ModuleInitializer( 0 ), Aspects.Runtime]
 		public static void Execute()
 		{
 			Properties.Settings.Default.Reset();

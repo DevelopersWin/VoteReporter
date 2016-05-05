@@ -1,28 +1,13 @@
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
-using mscoree;
-using PostSharp.Patterns.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-
 namespace DragonSpark.Testing.Framework
 {
-	public sealed class Runtime : SpecificationBasedAspect
+	/*public sealed class Runtime : SpecificationBasedAspect
 	{
 		readonly static ISpecification Specification = JetBrainsAppDomainSpecification.Instance.Inverse().And( RuntimeSpecification.Instance );
 
 		public Runtime() : base( Specification ) {}
-	}
+	}*/
 
-	class JetBrainsAppDomainSpecification : SpecificationBase<object>
+	/*class JetBrainsAppDomainSpecification : SpecificationBase<object>
 	{
 		readonly AppDomain domain;
 		public static JetBrainsAppDomainSpecification Instance { get; } = new JetBrainsAppDomainSpecification();
@@ -129,48 +114,7 @@ namespace DragonSpark.Testing.Framework
 		}
 
 		protected override void OnExecute( AppDomainSetup parameter ) => source( parameter.ApplicationBase ).With( loader => loader.Initialize() );
-	}
+	}*/
 
-	public class ApplicationDomainProxyFactory<T> : FactoryBase<object[], T>
-	{
-		readonly AppDomain domain;
 
-		public ApplicationDomainProxyFactory( [Required] AppDomain domain )
-		{
-			this.domain = domain;
-		}
-
-		public T CreateUsing( params object[] arguments ) => Create( arguments );
-
-		protected override T CreateItem( object[] parameter )
-		{
-			var assemblyPath = new Uri( typeof(T).Assembly.CodeBase).LocalPath;
-			var result = (T)domain.CreateInstanceFromAndUnwrap(assemblyPath, typeof(T).FullName, false
-				, BindingFlags.CreateInstance | BindingFlags.Public | BindingFlags.Instance
-				, null, parameter, null, null );
-			return result;
-		}
-	}
-
-	[Serializable]
-	public class AssemblyLoader : MarshalByRefObject, IDisposable
-	{
-		readonly string basePath;
-
-		public AssemblyLoader( [NotEmpty]string basePath )
-		{
-			this.basePath = basePath;
-		}
-
-		public void Initialize() => AppDomain.CurrentDomain.AssemblyResolve += Resolve;
-
-		Assembly Resolve( object sender, ResolveEventArgs args )
-		{
-			var assemblyName = new AssemblyName( args.Name ).Name;
-			var result = Assembly.LoadFile( Path.Combine( basePath, $"{assemblyName}.dll" ) );
-			return result;
-		}
-
-		public void Dispose() => AppDomain.CurrentDomain.AssemblyResolve -= Resolve;
-	}
 }
