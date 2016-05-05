@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.TypeSystem;
+using PostSharp;
+using PostSharp.Extensibility;
 
 namespace DragonSpark.Aspects
 {
@@ -68,6 +71,8 @@ namespace DragonSpark.Aspects
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	public sealed class ValidatedByAttribute : MethodInterceptionAspect, IAspectProvider
 	{
+		readonly static Type[] Exempt = { typeof(DefaultItemProvider), typeof(KeyFactory), typeof(ValidatingMethodFactory) };
+
 		readonly string validatingMethodName;
 
 		public ValidatedByAttribute( string validatingMethodName )
@@ -103,12 +108,29 @@ namespace DragonSpark.Aspects
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var method = new ValidatingMethodFactory( validatingMethodName ).Create( args.Method );
-			var validator = new Validator( args.Instance, method, args.Arguments );
-			if ( validator.IsValid() )
+			//var isValid = IsValid( args );
+			if ( Exempt.Contains( args.Instance.GetType() ) || Validate( args ) )
 			{
 				base.OnInvoke( args );
 			}
+			else
+			{
+				args.Method.As<MethodInfo>( info =>
+											{
+												if ( info.ReturnType != typeof(void) )
+												{
+													args.ReturnValue = args.ReturnValue ?? DefaultItemProvider.Instance.Create( info.ReturnType );
+												}
+											} );
+			}
+		}
+
+		bool Validate( MethodInterceptionArgs args )
+		{
+			var method = new ValidatingMethodFactory( validatingMethodName ).Create( args.Method );
+			var validator = new Validator( args.Instance, method, args.Arguments );
+			var result = validator.IsValid();
+			return result;
 		}
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) =>

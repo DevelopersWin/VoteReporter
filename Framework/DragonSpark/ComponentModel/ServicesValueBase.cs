@@ -58,15 +58,6 @@ namespace DragonSpark.ComponentModel
 		}
 	}
 
-	/*public class ActivateAttribute : ActivateAttributeBase
-	{
-		public ActivateAttribute() : this( null ) { }
-
-		public ActivateAttribute( string name ) : this( null, name ) { }
-
-		public ActivateAttribute( Type locatedType, string name = null ) : base( t => new ActivatedValueProvider( new ActivatedValueProvider.Converter( locatedType, name ).Create, ActivatedValueProvider.Creator.Instance.Create ) ) { }
-	}*/
-
 	public abstract class ServicesValueBase : DefaultValueBase
 	{
 		protected ServicesValueBase( ServicesValueProvider.Converter converter ) : this( converter, Services.Get ) {}
@@ -95,39 +86,12 @@ namespace DragonSpark.ComponentModel
 
 			protected override Type CreateItem( PropertyInfo parameter ) => type( parameter );
 		}
-
-		/*public class Category : Creator<object>
-		{
-			public static Category Instance { get; } = new Category();
-
-			public Category() : base( Services.Get<object> ) { }
-		}
-
-		public class Creator<T> : Factory<Type, T> where T : class
-		{
-			// public static Creator<T> Instance { get; } = new Creator<T>();
-
-			readonly Func<Type, T> factory;
-
-			public Creator( [Required]Func<Type, T> factory )
-			{
-				this.factory = factory;
-			}
-
-			protected override T CreateItem( Type parameter ) => factory( parameter );
-		}*/
 	}
 
 	public class ValueProvider<TRequest> : IDefaultValueProvider
 	{
 		readonly Func<PropertyInfo, TRequest> convert;
 		readonly Func<TRequest, object> create;
-
-		// public ActivatedValueProvider( Converter converter ) : this( converter, Creator.Instance ) {}
-
-		// public ActivatedValueProvider( Converter converter, Creator creator ) : this( converter.Create, creator.Create ) {}
-
-		// public ActivatedValueProvider( [Required]Func<PropertyInfo, TRequest> convert ) : this( convert, Creator.Instance.Create ) {}
 
 		public ValueProvider( [Required]Func<PropertyInfo, TRequest> convert, [Required]Func<TRequest, object> create )
 		{
@@ -141,24 +105,5 @@ namespace DragonSpark.ComponentModel
 			var result = create( request );
 			return result;
 		}
-
-		/*public class Converter<T> : Converter
-		{
-			public Converter( string name ) : base( typeof(T), name ) { }
-		}*/
-
-		/*public abstract class Converter : Factory<PropertyInfo, TRequest>
-		{
-			/*readonly Func<PropertyInfo, TRequest> type;
-
-			// protected Converter( Type activatedType ) : this( p => activatedType ?? p.PropertyType ) { }
-
-			protected Converter( [Required]Func<PropertyInfo, TRequest> type )
-			{
-				this.type = type;
-			}
-
-			// protected override Type CreateItem( PropertyInfo parameter ) => new LocateTypeRequest( type( parameter ), name );#1#
-		}*/
 	}
 }

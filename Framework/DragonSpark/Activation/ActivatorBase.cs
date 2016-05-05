@@ -5,11 +5,18 @@ namespace DragonSpark.Activation
 {
 	public abstract class ActivatorBase<TRequest> : FactoryBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
-		protected ActivatorBase( ICoercer<TRequest> coercer ) : this( coercer, Specifications<TRequest>.IsInstanceOf ) {}
+		protected ActivatorBase( ICoercer<TRequest> coercer ) : this( coercer, Specification.Instance ) {}
 
 		protected ActivatorBase( ICoercer<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification ) {}
 
 		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => this.CreateUsing<object>( parameter );
+
+		class Specification : IsInstanceOfSpecification<TRequest>
+		{
+			public new static Specification Instance { get; } = new Specification();
+
+			public override bool IsSatisfiedBy( object parameter ) => base.IsSatisfiedBy( parameter ) || IsInstanceOfSpecification<Type>.Instance.IsSatisfiedBy( parameter );
+		}
 	}
 
 	/*public abstract class LocatorBase : LocatorBase<object>

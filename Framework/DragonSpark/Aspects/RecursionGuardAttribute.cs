@@ -31,9 +31,9 @@ namespace DragonSpark.Aspects
 	}
 
 	[PSerializable, LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Caching )]
-	public class RecursionGuardAttribute : OnMethodBoundaryAspect
+	public sealed class RecursionGuardAttribute : OnMethodBoundaryAspect
 	{
-		public RecursionGuardAttribute( int maxCallCount = 4 )
+		public RecursionGuardAttribute( int maxCallCount = 2 )
 		{
 			MaxCallCount = maxCallCount;
 		}
@@ -57,9 +57,11 @@ namespace DragonSpark.Aspects
 			public int Decrement() => Update( false );
 		}
 
+		int Current { get; set; }
+
 		public override void OnEntry( MethodExecutionArgs args )
 		{
-			if ( new Count( args ).Increment() >= MaxCallCount )
+			if ( ++Current >= MaxCallCount )
 			{
 				throw new InvalidOperationException( $"Recursion detected in method {new MethodFormatter(args.Method).ToString( null, null )}" );
 			}
@@ -70,7 +72,8 @@ namespace DragonSpark.Aspects
 		public override void OnExit( MethodExecutionArgs args )
 		{
 			base.OnExit( args );
-			new Count( args ).Decrement();
+			// new Count( args ).Decrement();
+			Current--;
 		}
 	}
 }
