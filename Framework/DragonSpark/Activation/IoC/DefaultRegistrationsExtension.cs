@@ -26,7 +26,7 @@ namespace DragonSpark.Activation.IoC
 
 		class Activator : CompositeActivator
 		{
-			public Activator( [Required]Locator locator, [Required]Constructor constructor ) : base( locator, constructor, Activation.Constructor.Instance ) {}
+			public Activator( [Required]Locator activator, [Required]Constructor constructor ) : base( activator, constructor, Activation.Constructor.Instance ) {}
 		}
 	}
 }

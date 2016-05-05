@@ -2,14 +2,15 @@ using DragonSpark.Extensions;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Activation.IoC
 {
-	class Locator : LocatorBase
+	public class Locator : LocatorBase
 	{
 		readonly IUnityContainer container;
 		
-		public Locator( [Required]IUnityContainer container, IHandleTypeRequestSpecification support ) : base( support )
+		public Locator( [Required]IUnityContainer container, IHandleTypeRequestSpecification support ) : base( new DecoratedSpecification<LocateTypeRequest>( support, Coercer.Instance ) )
 		{
 			this.container = container;
 		}
@@ -17,11 +18,11 @@ namespace DragonSpark.Activation.IoC
 		protected override object CreateItem( LocateTypeRequest parameter ) => container.TryResolve( parameter.RequestedType, parameter.Name );
 	}
 
-	class Constructor : ConstructorBase
+	public class Constructor : ConstructorBase
 	{
 		readonly IUnityContainer container;
 		
-		public Constructor( [Required]IUnityContainer container, [Required]IHandleTypeRequestSpecification support ) : base( support )
+		public Constructor( [Required]IUnityContainer container, [Required]IHandleTypeRequestSpecification support ) : base( new DecoratedSpecification<ConstructTypeRequest>( support, Coercer.Instance ) )
 		{
 			this.container = container;
 		}

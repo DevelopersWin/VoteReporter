@@ -27,6 +27,7 @@ using ApplicationAssemblyLocator = DragonSpark.TypeSystem.ApplicationAssemblyLoc
 using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 using ExceptionFormatter = DragonSpark.Diagnostics.ExceptionFormatter;
+using Locator = DragonSpark.Windows.Testing.TestObjects.Locator;
 using Object = DragonSpark.Testing.Objects.Object;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 using ServiceProviderFactory = DragonSpark.Activation.IoC.ServiceProviderFactory;

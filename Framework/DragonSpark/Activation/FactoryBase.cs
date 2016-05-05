@@ -105,7 +105,11 @@ namespace DragonSpark.Activation
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
 
 		[ValidatedBy( nameof(IFactoryWithParameter.CanCreate) )]
-		object IFactoryWithParameter.Create( object parameter ) => coercer.Coerce( parameter ).With( Create );
+		object IFactoryWithParameter.Create( object parameter )
+		{
+			var coerce = coercer.Coerce( parameter );
+			return coerce.With( Create );
+		}
 
 		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 

@@ -2,6 +2,7 @@
 using DragonSpark.Extensions;
 using System;
 using System.Composition;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Diagnostics
 {
@@ -15,7 +16,7 @@ namespace DragonSpark.Diagnostics
 		[ImportingConstructor]
 		public FormatterFactory( FromKnownFactory<IFormattable> factory ) : this( factory.CreateUsing ) {}
 
-		public FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance )
+		public FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance, Specifications.NotNull )
 		{
 			this.factory = factory;
 		}

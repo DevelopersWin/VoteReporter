@@ -70,8 +70,8 @@ namespace DragonSpark.Modularity
 		protected virtual IModule CreateModule(string typeName)
 		{
 			var type = DetermineType( typeName );
-			var module = activator.Activate<IModule>( type );
-			return module;
+			var result = activator.Activate<IModule>( type );
+			return result;
 		}
 
 		static Type DetermineType( string typeName )

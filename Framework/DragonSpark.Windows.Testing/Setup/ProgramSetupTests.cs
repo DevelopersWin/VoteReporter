@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
@@ -6,25 +7,39 @@ using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Testing.Objects.IoC;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
+using Constructor = DragonSpark.Activation.IoC.Constructor;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
 	[Trait( Traits.Category, Traits.Categories.IoC )]
 	public class ProgramSetupTests
 	{
-		/*[Theory, ProgramSetup.AutoData]
-		public void TypeCheck( IUnityContainer sut )
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		public void TypeCheck( [Factory( typeof(UnityContainerFactory) )]IUnityContainer container )
 		{
-			var specification = sut.Resolve<ResolvableTypeSpecification>();
+			var constructor = container.Resolve<Constructor>().To<IFactoryWithParameter>();
+			var cancan = constructor.CanCreate( typeof(MonitoredModule) );
+			Assert.True( cancan );
+
+			var activator = container.Resolve<IActivator>();
+			var can = activator.CanCreate( typeof(MonitoredModule) );
+			Assert.True( can );
+
+			/*var created = activator.Create( typeof(MonitoredModule) );
+			Assert.NotNull( created );*/
+
+			/*var activator = sut.Resolve<IActivator>()
+			var specification = new DecoratedSpecification<TypeRequest>( sut.Resolve<ResolvableConstructorSpecification>(), ConstructorBase.Coercer.Instance ).To<ISpecification>();
 			var valid = specification.IsSatisfiedBy( typeof(MonitoredModule) );
-			Assert.True( valid );
-		}*/
+			Assert.True( valid );*/
+		}
 
 		[Theory, ProgramSetup.AutoData]
 		public void Extension( IModuleMonitor sut )

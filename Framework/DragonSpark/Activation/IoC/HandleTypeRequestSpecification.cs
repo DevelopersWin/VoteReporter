@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
-	interface IHandleTypeRequestSpecification : ISpecification<TypeRequest> {}
+	public interface IHandleTypeRequestSpecification : ISpecification<TypeRequest> {}
 
 	[Persistent]
 	class HandleTypeRequestSpecification : TypeRequestSpecification, IHandleTypeRequestSpecification
@@ -180,7 +180,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	class ResolvableConstructorSpecification : GuardedSpecificationBase<ConstructTypeRequest>
+	public class ResolvableConstructorSpecification : GuardedSpecificationBase<ConstructTypeRequest>
 	{
 		readonly ConstructorFactory factory;
 		readonly ResolvableTypeSpecification resolvable;
