@@ -4,6 +4,7 @@ using DragonSpark.TypeSystem;
 using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -42,13 +43,13 @@ namespace DragonSpark.Runtime.Values
 
 	public abstract class ConnectedStore<T> : WritableStore<T>
 	{
+		readonly static ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>> Cache = new ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>>();
+
 		readonly Func<T> create;
 
-		protected ConnectedStore( [Required] object instance, Type type, Func<T> create = null ) : this( instance, type.GetHashCode().ToString(), create )
-		{}
+		protected ConnectedStore( [Required] object instance, Type type, Func<T> create = null ) : this( instance, type.AssemblyQualifiedName, create ) {}
 
-		protected ConnectedStore( [Required]object instance, [NotEmpty]string name, Func<T> create = null ) : this( PropertyConnector.Default.Get( instance, name, true ).Cast<T>(), create )
-		{}
+		protected ConnectedStore( [Required] object instance, [NotEmpty] string name, Func<T> create = null ) : this( Cache.GetOrAdd( new Tuple<object, string>( instance, name ), t => PropertyConnector.Default.Get( t.Item1, t.Item2, true ).Cast<T>() ), create ) {}
 
 		protected ConnectedStore( [Required]ConnectibleProperty<T> property, Func<T> create )
 		{

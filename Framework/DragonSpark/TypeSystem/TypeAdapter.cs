@@ -50,8 +50,6 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
 
-		// readonly static Func<object> Default = Expression.Lambda<Func<object>>( Expression.Default( Type ) ).Compile();
-
 		[Freeze]
 		public object GetDefaultValue() => null; // Info.IsValueType && Nullable.GetUnderlyingType( Type ) == null ? CreateUsing() : null;
 

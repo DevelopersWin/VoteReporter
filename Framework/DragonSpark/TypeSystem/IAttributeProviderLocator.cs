@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
@@ -19,9 +18,6 @@ namespace DragonSpark.TypeSystem
 		AttributeProviderLocator() : this( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
 
 		protected AttributeProviderLocator( params Type[] types ) : base( types ) {}
-
-		[Freeze]
-		protected override IAttributeProvider CreateItem( object parameter ) => base.CreateItem( parameter );
 	}
 
 	public class AttributeProviderConfiguration : ConfigurationBase<IAttributeProviderLocator>
