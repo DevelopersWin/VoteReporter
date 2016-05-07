@@ -7,11 +7,11 @@ namespace DragonSpark.Testing.Activation
 	public class ConstructionActivatorFactoryTests
 	{
 		[Theory, AutoData]
-		void CachesAsExpected( Constructor.ConstructionActivatorFactory constructor )
+		void CachesAsExpected( Constructor.Locator locator )
 		{
 			var parameter = new ConstructTypeRequest( typeof(ConstructedItem), 6776 );
-			var first = constructor.Create( parameter );
-			Assert.Same( first, constructor.Create( parameter ) );
+			var first = locator.Create( parameter );
+			Assert.Same( first, locator.Create( parameter ) );
 		}
 
 		class ConstructedItem
