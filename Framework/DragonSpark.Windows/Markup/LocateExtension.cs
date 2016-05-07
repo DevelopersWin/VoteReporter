@@ -84,7 +84,7 @@ namespace DragonSpark.Windows.Markup
 	{
 		public static DesignTimeValueProvider Instance { get; } = new DesignTimeValueProvider();
 
-		public DesignTimeValueProvider() : base( DefaultItemProvider.Instance, MockFactory.Instance, StringDesignerValueFactory.Instance ) {}
+		public DesignTimeValueProvider() : base( DefaultValueFactory.Instance, MockFactory.Instance, StringDesignerValueFactory.Instance ) {}
 	}
 
 	public class MarkupValueSetterFactory : FirstFromParameterFactory<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory

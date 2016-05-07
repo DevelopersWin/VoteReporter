@@ -5,12 +5,12 @@ using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	public class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
+	[Validation( false )]
+	public sealed class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
 		readonly HashSet<int> codes = new HashSet<int>();
 
@@ -40,8 +40,6 @@ namespace DragonSpark.Aspects
 				var increment = items[i].GetHashCode();
 				result += next + increment;
 			}
-
-
 
 			return result;
 		}

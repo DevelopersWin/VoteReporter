@@ -258,7 +258,7 @@ namespace DragonSpark.Activation.IoC
 
 		public AllTypesInCandidateAssemblyStrategy( [Required] ISpecification<Type> specification ) : base( specification ) {}
 
-		[Freeze]
+		// [Freeze]
 		protected override Type[] CreateItem( Type parameter )
 		{
 			var types = TypesFactory.Instance.Create( parameter.Assembly().ToItem() );

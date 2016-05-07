@@ -78,7 +78,7 @@ namespace DragonSpark.Extensions
 
 		public static TResult With<TItem, TResult>( this TItem target, Func<TItem, TResult> function, Func<TResult> defaultFunction = null )
 		{
-			var getDefault = defaultFunction ?? DefaultFactory<TResult>.Instance.Create;
+			var getDefault = defaultFunction ?? DefaultValueFactory<TResult>.Instance.Create;
 			var result = target != null ? function( target ) : getDefault();
 			return result;
 		}
@@ -141,7 +141,7 @@ namespace DragonSpark.Extensions
 
 		public static TResult AsTo<TSource, TResult>( this object target, Func<TSource,TResult> transform, Func<TResult> resolve = null )
 		{
-			var @default = resolve ?? DefaultFactory<TResult>.Instance.Create;
+			var @default = resolve ?? DefaultValueFactory<TResult>.Instance.Create;
 			var result = target is TSource ? transform( (TSource)target ) : @default();
 			return result;
 		}

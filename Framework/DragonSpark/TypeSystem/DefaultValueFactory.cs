@@ -7,13 +7,13 @@ using System.Linq.Expressions;
 
 namespace DragonSpark.TypeSystem
 {
-	public class DefaultFactory<T> : FactoryBase<T>
+	public class DefaultValueFactory<T> : FactoryBase<T>
 	{
 		readonly Func<Type, object> source;
 
-		public static DefaultFactory<T> Instance { get; } = new DefaultFactory<T>( DefaultItemProvider.Instance.Create );
+		public static DefaultValueFactory<T> Instance { get; } = new DefaultValueFactory<T>( DefaultValueFactory.Instance.Create );
 
-		DefaultFactory( Func<Type, object> source )
+		DefaultValueFactory( Func<Type, object> source )
 		{
 			this.source = source;
 		}
@@ -21,11 +21,12 @@ namespace DragonSpark.TypeSystem
 		protected override T CreateItem() => (T)source( typeof(T) );
 	}
 
-	public class DefaultItemProvider : FactoryBase<Type, object>
+	// [Validation( false )]
+	public class DefaultValueFactory : FactoryBase<Type, object>
 	{
-		public static DefaultItemProvider Instance { get; } = new DefaultItemProvider();
+		public static DefaultValueFactory Instance { get; } = new DefaultValueFactory();
 
-		DefaultItemProvider() {}
+		DefaultValueFactory() {}
 
 		[Freeze]
 		protected override object CreateItem( Type parameter )
@@ -43,6 +44,6 @@ namespace DragonSpark.TypeSystem
 			return result;*/
 		}
 
-		static object Default( Type parameter ) => Expression.Lambda<Func<object>>( Expression.Default( parameter ) ).Compile()();
+		static object Default( Type parameter ) => Expression.Lambda( Expression.Default( parameter ) ).Compile().DynamicInvoke();
 	}
 }

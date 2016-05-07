@@ -17,15 +17,17 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void SameInstances()
 		{
-			var propertyInfo = GetType().GetProperty( nameof(PropertyName) );
+			for ( int i = 0; i < 10000; i++ )
+			{
+				var propertyInfo = GetType().GetProperty( nameof(PropertyName) );
 			
 			var sut = Attributes.Get( propertyInfo );
 			Assert.Same( sut, Attributes.Get( propertyInfo ) );
 
 			var firstAll = sut.GetAttributes<Attribute>();
 			var secondAll = sut.GetAttributes<Attribute>();
-
-			Assert.Same( firstAll, secondAll );
+				Assert.Same( firstAll, secondAll );
+			}
 		}
 
 		[Fact]

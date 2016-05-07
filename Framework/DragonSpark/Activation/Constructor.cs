@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -26,11 +27,23 @@ namespace DragonSpark.Activation
 
 		protected override object CreateItem( ConstructTypeRequest parameter )
 		{
-			var result = LocateAndCreate( parameter ) ?? DefaultItemProvider.Instance.Create( parameter.RequestedType );
+			var result = LocateAndCreate( parameter ) ?? DefaultValueFactory.Instance.Create( parameter.RequestedType );
 			return result;
 		}
 
-		object LocateAndCreate( ConstructTypeRequest parameter ) => constructorSource( parameter ).With( activatorSource ).With( activator => activator( parameter.Arguments ) );
+		object LocateAndCreate( ConstructTypeRequest parameter )
+		{
+			var info = constructorSource( parameter );
+			var result = info.With( activatorSource ).With( activator => activator( Ensure( info.GetParameters(), parameter.Arguments ) ) );
+			return result;
+		}
+
+		static object[] Ensure( IEnumerable<ParameterInfo> parameters, IReadOnlyCollection<object> arguments )
+		{
+			var optional = parameters.Skip( arguments.Count ).Where( info => info.IsOptional ).Select( info => info.DefaultValue );
+			var result = arguments.Concat( optional ).Fixed();
+			return result;
+		}
 
 		class Specification : GuardedSpecificationBase<ConstructTypeRequest>
 		{
@@ -86,12 +99,7 @@ namespace DragonSpark.Activation
 				return result;
 			}
 
-			static object[] Ensure( IEnumerable<ParameterInfo> parameters, IReadOnlyCollection<object> arguments )
-			{
-				var optional = parameters.Skip( arguments.Count ).Where( info => info.IsOptional ).Select( info => info.DefaultValue );
-				var result = arguments.Concat( optional ).Fixed();
-				return result;
-			}
+			
 		}*/
 
 		class ObjectActivatorFactory : FactoryBase<ConstructorInfo, ObjectActivator>

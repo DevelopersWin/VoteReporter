@@ -23,10 +23,10 @@ namespace DragonSpark.TypeSystem
 		public static Func<T, object> Boxed => t => t;
 
 		// [Freeze]
-		public static T Item => (T)DefaultItemProvider.Instance.Create( typeof(T) );
+		public static T Item => (T)DefaultValueFactory.Instance.Create( typeof(T) );
 
 		// [Freeze]
-		public static T[] Items => (T[])DefaultItemProvider.Instance.Create( typeof(T[]) ) /*Enumerable.Empty<T>().Fixed()*/;
+		public static T[] Items => (T[])DefaultValueFactory.Instance.Create( typeof(T[]) ) /*Enumerable.Empty<T>().Fixed()*/;
 	}
 
 	[Synchronized] // http://stackoverflow.com/questions/35976558/is-constructorinfo-getparameters-thread-safe/35976798

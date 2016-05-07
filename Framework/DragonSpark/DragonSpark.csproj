@@ -272,7 +272,7 @@
     <Compile Include="TypeSystem\Attributes.cs" />
     <Compile Include="TypeSystem\CodeContainer.cs" />
     <Compile Include="TypeSystem\Default.cs" />
-    <Compile Include="TypeSystem\DefaultFactory.cs" />
+    <Compile Include="TypeSystem\DefaultValueFactory.cs" />
     <Compile Include="TypeSystem\DerivedMethodSpecification.cs" />
     <Compile Include="TypeSystem\HostingAttribute.cs" />
     <Compile Include="TypeSystem\IAttributeProvider.cs" />

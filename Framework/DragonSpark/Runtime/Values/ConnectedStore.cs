@@ -54,7 +54,7 @@ namespace DragonSpark.Runtime.Values
 		protected ConnectedStore( [Required]ConnectibleProperty<T> property, Func<T> create )
 		{
 			Property = property;
-			this.create = create ?? DefaultFactory<T>.Instance.Create;
+			this.create = create ?? DefaultValueFactory<T>.Instance.Create;
 		}
 
 		public override void Assign( T item ) => Property.Set( item );

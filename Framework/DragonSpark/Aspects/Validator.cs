@@ -10,14 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.TypeSystem;
-using PostSharp;
-using PostSharp.Extensibility;
 
 namespace DragonSpark.Aspects
 {
 	[PSerializable, ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
-	public sealed class ValidatorForAttribute : MethodInterceptionAspect
+	public sealed class ValidatorAttribute : MethodInterceptionAspect
 	{
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
@@ -67,24 +64,38 @@ namespace DragonSpark.Aspects
 		}
 	}
 
+	[AttributeUsage( AttributeTargets.Class )]
+	public class ValidationAttribute : Attribute
+	{
+		public ValidationAttribute( bool enabled )
+		{
+			Enabled = enabled;
+		}
+
+		public bool Enabled { get; }
+	}
+
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
-	public sealed class ValidatedByAttribute : MethodInterceptionAspect, IAspectProvider
+	public sealed class ValidateAttribute : MethodInterceptionAspect, IAspectProvider
 	{
-		readonly static Type[] Exempt = { typeof(DefaultItemProvider), typeof(KeyFactory), typeof(ValidatingMethodFactory) };
+		// readonly static Type[] Exempt = { typeof(DefaultValueFactory), typeof(KeyFactory), typeof(ValidatingMethodFactory) };
 
 		readonly string validatingMethodName;
 
-		public ValidatedByAttribute( string validatingMethodName )
+		public ValidateAttribute() {}
+
+		public ValidateAttribute( string validatingMethodName )
 		{
 			this.validatingMethodName = validatingMethodName;
 		}
 
+		[Validation( false )]
 		class ValidatingMethodFactory : FactoryBase<MethodBase, MethodBase>
 		{
 			readonly string name;
 
-			public ValidatingMethodFactory( string name )
+			public ValidatingMethodFactory( string name = null )
 			{
 				this.name = name;
 			}
@@ -93,41 +104,57 @@ namespace DragonSpark.Aspects
 			{
 				var typeInfo = parameter.DeclaringType.GetTypeInfo();
 				var types = parameter.GetParameters().Select( info => info.ParameterType ).ToArray();
-				var result = parameter.DeclaringType.GetRuntimeMethod( name, types ) ?? FromInterface( parameter, typeInfo, types );
+				var target = DetermineName( parameter.Name );
+				var result = parameter.DeclaringType.GetRuntimeMethod( target, types ) ?? FromInterface( target, parameter, typeInfo, types );
 				return result;
 			}
 
-			MethodInfo FromInterface( MemberInfo parameter, TypeInfo typeInfo, Type[] types ) => 
-				parameter.DeclaringType.Adapt()
-						 .GetAllInterfaces()
-						 .Select( typeInfo.GetRuntimeInterfaceMap )
-						 .SelectMany( mapping => mapping.TargetMethods.Select( info => new { info, mapping.InterfaceType } ) )
-						 .Where( item => item.info.ReturnType == typeof(bool) && new[] { name, $"{item.InterfaceType.FullName}.{name}" }.Contains( item.info.Name ) && types.SequenceEqual( item.info.GetParameters().Select( p => p.ParameterType ) ) )
-						 .WithFirst( item => item.info );
+			string DetermineName( string parameter ) => name ?? $"Can{parameter.ToStringArray( '.' ).Last()}";
+
+			static MethodInfo FromInterface( string methodName, MemberInfo parameter, TypeInfo typeInfo, Type[] types )
+			{
+				var fromInterface = parameter.DeclaringType.Adapt()
+											 .GetAllInterfaces()
+											 .Select( typeInfo.GetRuntimeInterfaceMap )
+											 .SelectMany( mapping => mapping.TargetMethods.Select( info => new { info, mapping.InterfaceType } ) )
+											 .Where( item => item.info.ReturnType == typeof(bool) && Contains( methodName, item.InterfaceType, item.info ) && types.SequenceEqual( item.info.GetParameters().Select( p => p.ParameterType ) ) )
+											 .WithFirst( item => item.info );
+
+				return fromInterface;
+			}
+
+			static bool Contains( string methodName, Type interfaceType, MemberInfo candidate ) => new[] { methodName, $"{interfaceType.FullName}.{methodName}" }.Contains( candidate.Name );
+		}
+
+		class Enabled : AssociatedStore<object, bool>
+		{
+			public Enabled( object instance ) : this( instance.GetType().GetTypeInfo() ) {}
+
+			Enabled( MemberInfo type ) : base( type, () => type.GetCustomAttribute<ValidationAttribute>().With( attribute => attribute.Enabled, () => true ) ) {}
 		}
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			//var isValid = IsValid( args );
-			if ( Exempt.Contains( args.Instance.GetType() ) || Validate( args ) )
+			var applied = new Enabled( args.Instance ).Value;
+			
+			if ( !applied || Validate( args ) )
 			{
 				base.OnInvoke( args );
 			}
 			else
 			{
-				args.Method.As<MethodInfo>( info =>
-											{
-												if ( info.ReturnType != typeof(void) )
-												{
-													args.ReturnValue = args.ReturnValue ?? DefaultItemProvider.Instance.Create( info.ReturnType );
-												}
-											} );
+				args.ApplyReturnValue();
 			}
+		}
+
+		class ValidatingMethod : AssociatedStore<MethodBase, MethodBase>
+		{
+			public ValidatingMethod( MethodBase instance, string name = null ) : base( instance, () => new ValidatingMethodFactory( name ).Create( instance )  ) {}
 		}
 
 		bool Validate( MethodInterceptionArgs args )
 		{
-			var method = new ValidatingMethodFactory( validatingMethodName ).Create( args.Method );
+			var method = new ValidatingMethod( args.Method, validatingMethodName ).Value;
 			var validator = new Validator( args.Instance, method, args.Arguments );
 			var result = validator.IsValid();
 			return result;
@@ -136,9 +163,8 @@ namespace DragonSpark.Aspects
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) =>
 			targetElement.AsTo<MethodBase, AspectInstance[]>( method =>
 															  {
-																  var target = new ValidatingMethodFactory( validatingMethodName ).Create( method );
-																  // MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "0001", $"HELLO THERE: {target}", null, null, null ));
-																  var items = new AspectInstance( target, new ValidatorForAttribute() ).ToItem();
+																  var other = new ValidatingMethod( method, validatingMethodName ).Value;
+																  var items = new AspectInstance( other, new ValidatorAttribute() ).ToItem();
 																  return items;
 															  } );
 	}
