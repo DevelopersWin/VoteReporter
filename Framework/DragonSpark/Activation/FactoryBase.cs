@@ -100,7 +100,6 @@ namespace DragonSpark.Activation
 			this.coercer = coercer;
 			this.specification = specification;
 		}
-
 	
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
 

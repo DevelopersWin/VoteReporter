@@ -28,16 +28,17 @@ namespace DragonSpark.Aspects
 		{
 			var result = 0x2D2816FE;
 
-			var array1 = new[] { args.Instance ?? args.Method.DeclaringType, args.Method };
-			var array2 = args.Arguments.ToArray();
-			var items = new object[array1.Length + array2.Length];
-			Array.Copy(array1, items, array1.Length);
-			Array.Copy(array2, 0, items, array1.Length, array2.Length);
+			var first = new[] { args.Instance ?? args.Method.DeclaringType, args.Method };
+			var second = args.Arguments.ToArray();
 
-			for ( var i = 0; i < items.Length; i++ )
+			var index = first.Length;
+			Array.Resize( ref first, index + second.Length );
+			Array.Copy( second, 0, first, index, second.Length );
+			
+			for ( var i = 0; i < first.Length; i++ )
 			{
 				var next = result * 31;
-				var increment = items[i].GetHashCode();
+				var increment = first[i]?.GetHashCode() ?? 0;
 				result += next + increment;
 			}
 
@@ -58,11 +59,7 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		protected override object CreateItem( MethodInterceptionArgs parameter )
-		{
-			var result = Get( parameter ) ?? parameter.ReturnValue;
-			return result;
-		}
+		protected override object CreateItem( MethodInterceptionArgs parameter ) => Get( parameter ) ?? parameter.ReturnValue;
 	}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]

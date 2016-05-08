@@ -2,10 +2,10 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using PostSharp.Aspects;
+using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +13,6 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	[PSerializable, ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
-	public sealed class ValidatorAttribute : MethodInterceptionAspect
-	{
-		public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			base.OnInvoke( args );
-
-			var validator = new Validator( args.Instance, args.Method, args.Arguments );
-			args.ReturnValue.As<bool>( validator.Mark );
-		}
-	}
-
 	class Validator
 	{
 		readonly object instance;
@@ -77,10 +65,8 @@ namespace DragonSpark.Aspects
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
-	public sealed class ValidateAttribute : MethodInterceptionAspect, IAspectProvider
+	public sealed class ValidateAttribute : MethodInterceptionAspect
 	{
-		// readonly static Type[] Exempt = { typeof(DefaultValueFactory), typeof(KeyFactory), typeof(ValidatingMethodFactory) };
-
 		readonly string validatingMethodName;
 
 		public ValidateAttribute() {}
@@ -111,17 +97,13 @@ namespace DragonSpark.Aspects
 
 			string DetermineName( string parameter ) => name ?? $"Can{parameter.ToStringArray( '.' ).Last()}";
 
-			static MethodInfo FromInterface( string methodName, MemberInfo parameter, TypeInfo typeInfo, Type[] types )
-			{
-				var fromInterface = parameter.DeclaringType.Adapt()
-											 .GetAllInterfaces()
-											 .Select( typeInfo.GetRuntimeInterfaceMap )
-											 .SelectMany( mapping => mapping.TargetMethods.Select( info => new { info, mapping.InterfaceType } ) )
-											 .Where( item => item.info.ReturnType == typeof(bool) && Contains( methodName, item.InterfaceType, item.info ) && types.SequenceEqual( item.info.GetParameters().Select( p => p.ParameterType ) ) )
-											 .WithFirst( item => item.info );
-
-				return fromInterface;
-			}
+			static MethodInfo FromInterface( string methodName, MemberInfo parameter, TypeInfo typeInfo, Type[] types ) => 
+				parameter.DeclaringType.Adapt()
+						 .GetAllInterfaces()
+						 .Select( typeInfo.GetRuntimeInterfaceMap )
+						 .SelectMany( mapping => mapping.TargetMethods.Select( info => new { info, mapping.InterfaceType } ) )
+						 .Where( item => item.info.ReturnType == typeof(bool) && Contains( methodName, item.InterfaceType, item.info ) && types.SequenceEqual( item.info.GetParameters().Select( p => p.ParameterType ) ) )
+						 .WithFirst( item => item.info );
 
 			static bool Contains( string methodName, Type interfaceType, MemberInfo candidate ) => new[] { methodName, $"{interfaceType.FullName}.{methodName}" }.Contains( candidate.Name );
 		}
@@ -160,12 +142,18 @@ namespace DragonSpark.Aspects
 			return result;
 		}
 
-		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) =>
-			targetElement.AsTo<MethodBase, AspectInstance[]>( method =>
-															  {
-																  var other = new ValidatingMethod( method, validatingMethodName ).Value;
-																  var items = new AspectInstance( other, new ValidatorAttribute() ).ToItem();
-																  return items;
-															  } );
+		[OnMethodInvokeAdvice, MethodPointcut( nameof(GetValidationMethod) )]
+		public void OnInvokeValidator( MethodInterceptionArgs args )
+		{
+			args.Proceed();
+
+			var validator = new Validator( args.Instance, args.Method, args.Arguments );
+			args.ReturnValue.As<bool>( validator.Mark );
+		}
+
+		IEnumerable<MethodBase> GetValidationMethod( MethodBase source )
+		{
+			yield return new ValidatingMethod( source, validatingMethodName ).Value;
+		}
 	}
 }
