@@ -1,21 +1,9 @@
-using System.Collections.Generic;
 using DragonSpark.Runtime.Values;
 using Microsoft.Practices.ObjectBuilder2;
+using System.Collections.Generic;
 
 namespace DragonSpark.Activation.IoC
 {
-	public class ClearTrackingDataExtension : BuilderStrategy
-	{
-		public override void PreBuildUp( IBuilderContext context )
-		{
-			if ( !new Checked( context.BuildKey.Type, this ).Value.IsApplied )
-			{
-				
-			}
-			base.PreBuildUp( context );
-		}
-	}
-
 	public class BuildKeyMonitorExtension : BuilderStrategy, IRequiresRecovery
 	{
 		static Stack<NamedTypeBuildKey> Stack => new ThreadAmbientChain<NamedTypeBuildKey>().Value;

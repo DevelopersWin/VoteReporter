@@ -16,7 +16,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> AnyOr<T>( this IEnumerable<T> @this, [Required]Func<IEnumerable<T>> defaultFunction ) => @this.With( x => x.Any() ) ? @this : defaultFunction();
 		
-		public static T[] Fixed<T>( this IEnumerable<T> @this ) => @this as T[] ?? @this.With( x => x.ToArray() );
+		public static T[] Fixed<T>( this IEnumerable<T> @this ) => @this as T[] ?? @this.With( x => x.ToArray().With( arg => arg.Any() ? arg : Default<T>.Items ) );
 
 		public static IEnumerable<T> NullIfEmpty<T>( this IEnumerable<T> @this ) => @this.With( x => x.Any() ) ? @this : null;
 

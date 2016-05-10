@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -28,7 +27,9 @@ namespace DragonSpark.Extensions
 
 		public static void Null<TItem>( this TItem target, Action action ) => target.IsNull().IsTrue( action );
 
-		public static bool IsNull<T>( this T @this ) => Equals( @this, null );
+		// public static bool IsNull<T>( this T @this ) => Equals( @this, null );
+
+		public static bool IsNull<T>( this T @this ) => Equals( @this, default(T) );
 
 		public static IEnumerable<TItem> Enumerate<TItem>( this IEnumerator<TItem> target )
 		{

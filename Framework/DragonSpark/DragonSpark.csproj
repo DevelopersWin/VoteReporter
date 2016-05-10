@@ -217,6 +217,7 @@
     <Compile Include="Runtime\IRepository.cs" />
     <Compile Include="Runtime\ISerializer.cs" />
     <Compile Include="Runtime\Process.cs" />
+    <Compile Include="Runtime\Specifications\AssignableSpecification.cs" />
     <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsInstanceOfSpecification.cs" />
     <Compile Include="Runtime\TaskFactory.cs" />
@@ -234,7 +235,7 @@
     <Compile Include="Activation\IoC\ArrayResolutionStrategy.cs" />
     <Compile Include="Activation\IoC\ConstructorSelectorPolicy.cs" />
     <Compile Include="Activation\IoC\EnumerableResolutionStrategy.cs" />
-    <Compile Include="Activation\IoC\HandleTypeRequestSpecification.cs" />
+    <Compile Include="Activation\IoC\Specifications\HandleTypeRequestSpecification.cs" />
     <Compile Include="Activation\IoC\TransientServiceRegistry.cs" />
     <Compile Include="Runtime\Values\ExecutionContextStore.cs" />
     <Compile Include="Runtime\Values\ThreadAmbientChain.cs" />

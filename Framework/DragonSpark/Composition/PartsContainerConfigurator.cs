@@ -119,16 +119,14 @@ namespace DragonSpark.Composition
 		readonly Assembly[] assemblies;
 		readonly Type[] types;
 		readonly Type[] core;
-		// readonly Type[] shared;
 
-		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types ) : this( assemblies, types, /*FrameworkTypes.Instance.Create(),*/ FrameworkTypes.Instance.Create() ) {}
+		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
 
-		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types, [Required] Type[] core/*, [Required] Type[] shared*/ )
+		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types, [Required] Type[] core )
 		{
 			this.assemblies = assemblies;
 			this.types = types;
 			this.core = core;
-			// this.shared = shared;
 		}
 
 		protected override ContainerConfiguration CreateItem( ContainerConfiguration configuration )

@@ -6,6 +6,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace DragonSpark.Runtime.Values
@@ -41,15 +42,43 @@ namespace DragonSpark.Runtime.Values
 		}
 	}
 
+	public class DisposableRepository : RepositoryBase<IDisposable>
+	{
+		public static DisposableRepository Instance { get; } = new DisposableRepository();
+
+		DisposableRepository() {}
+
+		public void DisposeAll()
+		{
+			var disposables = List();
+			disposables.Each( disposable => disposable.Dispose() );
+			Store.Clear();
+		}
+	}
+
 	public abstract class ConnectedStore<T> : WritableStore<T>
 	{
-		readonly static ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>> Cache = new ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>>();
+		/*readonly static ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>> Cache = new ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>>();
+
+		static ConnectedStore()
+		{
+			DisposableRepository.Instance.Add( new DisposableAction( () =>
+																	 {
+																		 Cache.Values.Each( property => property.TryDisconnect() );
+																		 Cache.Clear();
+																		 Debugger.Break();
+																	 } ) );
+		}*/
 
 		readonly Func<T> create;
 
 		protected ConnectedStore( [Required] object instance, Type type, Func<T> create = null ) : this( instance, type.AssemblyQualifiedName, create ) {}
 
-		protected ConnectedStore( [Required] object instance, [NotEmpty] string name, Func<T> create = null ) : this( Cache.GetOrAdd( new Tuple<object, string>( instance, name ), t => PropertyConnector.Default.Get( t.Item1, t.Item2, true ).Cast<T>() ), create ) {}
+		protected ConnectedStore( [Required] object instance, [NotEmpty] string name, Func<T> create = null ) : this( 
+			// Cache.GetOrAdd( new Tuple<object, string>( instance, name ), t => PropertyConnector.Default.Get( t.Item1, t.Item2, true ).Cast<T>() )
+			PropertyConnector.Default.Get( instance, name, true ).Cast<T>()
+			
+			, create ) {}
 
 		protected ConnectedStore( [Required]ConnectibleProperty<T> property, Func<T> create )
 		{

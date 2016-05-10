@@ -1,3 +1,4 @@
+using DragonSpark.Aspects;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using System;
@@ -19,6 +20,7 @@ namespace DragonSpark.Diagnostics
 		IgnoredOutputCommand() : base( s => {} ) {}
 	}
 
+	[Validation( false )]
 	public class DelegatedTextCommand : DelegatedCommand<string>
 	{
 		public DelegatedTextCommand( Action<string> action ) : this( action, Specifications.Always ) {}

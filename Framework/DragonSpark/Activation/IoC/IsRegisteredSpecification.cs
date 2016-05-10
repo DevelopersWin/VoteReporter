@@ -1,10 +1,10 @@
-using DragonSpark.Runtime.Specifications;
+using DragonSpark.Activation.IoC.Specifications;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Activation.IoC
 {
-	public class IsRegisteredSpecification : GuardedSpecificationBase<LocateTypeRequest>
+	public class IsRegisteredSpecification : TypeRequestSpecificationBase<LocateTypeRequest>
 	{
 		readonly IUnityContainer container;
 

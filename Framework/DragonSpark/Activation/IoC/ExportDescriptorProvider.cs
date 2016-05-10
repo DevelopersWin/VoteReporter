@@ -1,3 +1,4 @@
+using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
@@ -8,6 +9,7 @@ using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
+using System.Diagnostics;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -16,25 +18,23 @@ namespace DragonSpark.Activation.IoC
 		public static ServiceProviderSpecificationFactory Instance { get; } = new ServiceProviderSpecificationFactory();
 		
 		protected override ISpecification<LocateTypeRequest> CreateItem( IServiceProvider parameter ) => 
-			parameter.Get<FactoryTypeRequestLocator>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? Specifications.Always;
+			parameter.Get<FactoryTypeRequestLocator>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? Runtime.Specifications.Specifications.Always;
 	}
 
 	public class ServicesIntegrationExtension : UnityContainerExtension
 	{
 		readonly IServiceProvider provider;
 		readonly ILogger logger;
-		readonly IBuildPlanRepository repository;
 		readonly Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
 		readonly ISpecification<LocateTypeRequest> specification;
 		readonly IStrategyRepository strategies;
 
-		public ServicesIntegrationExtension( IServiceProvider provider, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, provider.Get<ILogger>(), strategies, repository, registry, ServiceProviderSpecificationFactory.Instance.Create( provider ) ) {}
+		public ServicesIntegrationExtension( IServiceProvider provider, IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, provider.Get<ILogger>(), strategies, registry, ServiceProviderSpecificationFactory.Instance.Create( provider ) ) {}
 
-		ServicesIntegrationExtension( IServiceProvider provider, ILogger logger, IStrategyRepository strategies, IBuildPlanRepository repository, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
+		ServicesIntegrationExtension( IServiceProvider provider, ILogger logger, IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
 		{
 			this.provider = provider;
 			this.logger = logger;
-			this.repository = repository;
 			this.registry = registry;
 			this.specification = specification;
 			this.strategies = strategies;
@@ -45,17 +45,18 @@ namespace DragonSpark.Activation.IoC
 			Container.RegisterInstance( logger );
 			Container.RegisterInstance( specification );
 
+			var policy = new ServicesBuildPlanPolicy( provider, registry );
 			var entries = new[]
 			{
+				new StrategyEntry( new ServicesStrategy( policy ), UnityBuildStage.PreCreation, Priority.Higher ), 
+
 				new StrategyEntry( new EnumerableResolutionStrategy( Container, provider ), UnityBuildStage.Creation, Priority.Higher ),
 				new StrategyEntry( new ArrayResolutionStrategy( provider ), UnityBuildStage.Creation, Priority.BeforeNormal )
 			};
 			entries.Each( strategies.Add );
 
-			var policy = new ServicesBuildPlanPolicy( provider, registry );
-			Context.Strategies.Add( new ServicesStrategy( policy ), UnityBuildStage.PreCreation );
 			
-			repository.Add( policy );
+			// repository.Add( policy );
 		}
 	}
 
@@ -63,13 +64,17 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IServiceProvider provider;
 		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
+		readonly Func<object, bool> isActivated;
 
-		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry ) ) {}
+		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, registry, ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy ) {}
 
-		public ServicesBuildPlanPolicy( IServiceProvider provider, Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry )
+		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, Func<object, bool> isActivated ) : this( provider, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry ), isActivated ) {}
+
+		ServicesBuildPlanPolicy( IServiceProvider provider, Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, Func<object, bool> isActivated )
 		{
 			this.provider = provider;
 			this.registry = registry;
+			this.isActivated = isActivated;
 		}
 
 		public void BuildUp( IBuilderContext context )
@@ -77,7 +82,8 @@ namespace DragonSpark.Activation.IoC
 			var existing = provider.GetService( context.BuildKey.Type );
 			existing.With( o =>
 			{
-				if ( new Checked( o, this ).Value.Apply() && ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy( o ) )
+				Debug.WriteLine( $"Output = {o.GetType()}" );
+				if ( new Checked( o, this ).Value.Apply() && isActivated( o ) )
 				{
 					registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );
 				}

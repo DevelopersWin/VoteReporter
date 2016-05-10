@@ -1,12 +1,10 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
+using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Aspects;
-using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using DragonSpark.Testing.Objects.Setup;
-using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using System;
 using Xunit;
@@ -28,15 +26,12 @@ namespace DragonSpark.Testing.Activation.IoC
 
 			Assert.NotNull( container );
 
-			var sut = new ConstructorSelectorPolicy( container.Resolve<ResolvableTypeSpecification>() );
+			var sut = container.Resolve<ConstructorLocator>();
 
-			var context = container.Resolve<ExtensionContext>();
-			var policyList = container.Resolve<IPolicyList>();
+			// var builder = new BuilderContext( context.BuildPlanStrategies.MakeStrategyChain(), context.Lifetime, context.Policies, new NamedTypeBuildKey<Target>(), null );
 
-			var builder = new BuilderContext( context.BuildPlanStrategies.MakeStrategyChain(), context.Lifetime, context.Policies, new NamedTypeBuildKey<Target>(), null );
-
-			var first = sut.SelectConstructor( builder, policyList );
-			Assert.Equal( 2, first.Constructor.GetParameters().Length );
+			var parameter = new ConstructTypeRequest( typeof(Target), new object() );
+			Assert.Null( sut.Create( parameter ) );
 
 			container.RegisterInstance( Output );
 
@@ -44,8 +39,8 @@ namespace DragonSpark.Testing.Activation.IoC
 			var condition = specification.IsSatisfiedBy( LocatorBase.Coercer.Instance.Coerce( typeof(ITestOutputHelper) ) );
 			Assert.True( condition );
 
-			var constructor = sut.SelectConstructor( builder, policyList );
-			Assert.Equal( 1, constructor.Constructor.GetParameters().Length );
+			var constructor = sut.Create( new ConstructTypeRequest( typeof(Target), new object() ) );
+			Assert.Equal( 1, constructor.GetParameters().Length );
 
 			var resolved = container.Resolve<Target>();
 			Assert.NotNull( resolved );

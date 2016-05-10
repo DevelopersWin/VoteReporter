@@ -24,15 +24,17 @@ namespace DragonSpark.Activation
 		TResult Create( TParameter parameter );
 	}
 
+	
+
 	public static class FactoryExtensions
 	{
-		public static Action<T> Synchronized<T>( this Action<T> @this ) where T : class => parameter =>
+		/*public static Action<T> Synchronized<T>( this Action<T> @this ) where T : class => parameter =>
 																						   {
 																							   lock ( parameter )
 																							   {
 																								   @this( parameter );
 																							   }
-																						   };
+																						   };*/
 
 		class Delegate<T, U> : ConnectedStore<Func<T, U>>
 		{

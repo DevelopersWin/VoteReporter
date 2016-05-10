@@ -59,7 +59,7 @@ namespace DragonSpark.Testing.Framework
 
 		public AssignExecutionContextCommand( Action<Assembly> initialize, IWritableStore<MethodBase> store ) : base( store )
 		{
-			this.initialize = initialize.Synchronized();
+			this.initialize = initialize/*.Synchronized()*/;
 		}
 
 		protected override void OnExecute( MethodBase parameter )

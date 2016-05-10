@@ -387,7 +387,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void CreateAssemblies( IUnityContainer container, IAssemblyProvider provider, [DragonSpark.Testing.Framework.Parameters.Service]Assembly[] sut )
 		{
 			var registered = container.IsRegistered<Assembly[]>();
-			Assert.False( registered );
+			Assert.True( registered );
 
 			var fromContainer = container.Resolve<Assembly[]>();
 			var fromProvider = provider.Create();

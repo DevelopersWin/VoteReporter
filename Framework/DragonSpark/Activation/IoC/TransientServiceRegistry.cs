@@ -1,7 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using Microsoft.Practices.Unity;
-using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 
@@ -32,9 +31,9 @@ namespace DragonSpark.Activation.IoC
 
 		public ServiceRegistry( IUnityContainer container, LifetimeManager lifetimeManager ) : this( container, container.Resolve<ILogger>(), type => lifetimeManager ) { }
 
-		public ServiceRegistry( IUnityContainer container, ILogger logger, [Required]LifetimeManagerFactory factory ) : this( container, logger, factory.Create ) { }
+		public ServiceRegistry( IUnityContainer container, ILogger logger, LifetimeManagerFactory factory ) : this( container, logger, factory.Create ) { }
 
-		protected ServiceRegistry( [Required]IUnityContainer container, [Required]ILogger logger, [Required]Func<Type, LifetimeManager> lifetimeFactory )
+		protected ServiceRegistry( IUnityContainer container, ILogger logger, Func<Type, LifetimeManager> lifetimeFactory )
 		{
 			this.container = container;
 			this.logger = logger;

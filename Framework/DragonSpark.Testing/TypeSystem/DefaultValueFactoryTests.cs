@@ -5,7 +5,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
 {
-	public class DefaultValueFactory
+	public class DefaultValueFactoryTests
 	{
 		[Fact]
 		public void DefaultValue()

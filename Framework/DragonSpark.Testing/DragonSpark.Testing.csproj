@@ -285,7 +285,7 @@
     <Compile Include="Runtime\Values\AmbientContextCommandTests.cs" />
     <Compile Include="Setup\ApplyMigrationCommandTests.cs" />
     <Compile Include="TypeSystem\ApplicationAssemblyFilterTests.cs" />
-    <Compile Include="TypeSystem\DefaultValueFactory.cs" />
+    <Compile Include="TypeSystem\DefaultValueFactoryTests.cs" />
     <Compile Include="TypeSystem\DerivedMethodSpecificationTests.cs" />
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
     <Compile Include="TypeSystem\KnownTypeFactoryTests.cs" />

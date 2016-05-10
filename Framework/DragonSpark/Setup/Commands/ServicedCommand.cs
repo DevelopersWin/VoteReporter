@@ -1,3 +1,4 @@
+using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -7,6 +8,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Setup.Commands
 {
+	[Validation( false )]
 	public abstract class DelegatedFixedCommand : CommandBase<object>
 	{
 		protected DelegatedFixedCommand() : base( Specifications.Always ) {}

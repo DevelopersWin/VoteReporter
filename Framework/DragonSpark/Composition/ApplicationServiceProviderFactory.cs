@@ -22,7 +22,7 @@ namespace DragonSpark.Composition
 
 		public FactoryTypeFactory( ISpecification<Type> specification ) : base( specification ) {}
 
-		public class Specification : CanBuildSpecification
+		public class Specification : CanInstantiateSpecification
 		{
 			public new static Specification Instance { get; } = new Specification();
 

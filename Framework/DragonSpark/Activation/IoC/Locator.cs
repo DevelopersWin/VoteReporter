@@ -1,8 +1,9 @@
+using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
-using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -10,7 +11,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		
-		public Locator( [Required]IUnityContainer container, IHandleTypeRequestSpecification support ) : base( new DecoratedSpecification<LocateTypeRequest>( support, Coercer.Instance ) )
+		public Locator( [Required]IUnityContainer container, ICanResolveSpecification support ) : base( new DecoratedSpecification<LocateTypeRequest>( support, Coercer.Instance ) )
 		{
 			this.container = container;
 		}
@@ -22,7 +23,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		
-		public Constructor( [Required]IUnityContainer container, [Required]IHandleTypeRequestSpecification support ) : base( new DecoratedSpecification<ConstructTypeRequest>( support, Coercer.Instance ) )
+		public Constructor( [Required]IUnityContainer container, [Required]ICanResolveSpecification support ) : base( new DecoratedSpecification<ConstructTypeRequest>( support, Coercer.Instance ) )
 		{
 			this.container = container;
 		}

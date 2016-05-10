@@ -39,7 +39,7 @@ namespace DragonSpark.TypeSystem
 		ApplicationTypeSpecification() {}
 
 		[Freeze]
-		public override bool IsSatisfiedBy( Type parameter ) => !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Adapt().IsDefined<CompilerGeneratedAttribute>();
+		public override bool IsSatisfiedBy( Type parameter ) => !parameter.GetTypeInfo().IsGenericType && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Adapt().IsDefined<CompilerGeneratedAttribute>();
 	}
 
 	public class ApplicationAssemblySpecification : GuardedSpecificationBase<Assembly>

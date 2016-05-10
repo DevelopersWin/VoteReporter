@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Testing.Objects;
 using Ploeh.AutoFixture.Xunit2;
-using System;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects
@@ -23,6 +22,16 @@ namespace DragonSpark.Testing.Aspects
 			var second = sut.CreateUsing( typeof(Class), typeof(CacheKeyFactoryTests).GetMethod( nameof(EnsureSame) ), true );
 			Assert.NotEqual( first, second );
 		}
+
+		/*[Fact]
+		public void MemoryTest()
+		{
+			CacheValueFactory.Instance.Flush();
+			DisposableRepository.Instance.DisposeAll();
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			var temp = PropertyConnector.Default;
+		}*/
 
 		/*[Fact]
 		public void ArrayCopyMetrics()

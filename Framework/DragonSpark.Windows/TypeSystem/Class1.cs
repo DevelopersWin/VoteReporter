@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using PostSharp.Patterns.Threading;
 
 namespace DragonSpark.Windows.TypeSystem
 {
@@ -29,6 +30,7 @@ namespace DragonSpark.Windows.TypeSystem
 		}
 	}
 
+	[Synchronized]
 	public class AssemblyInitializer : CommandBase<Assembly>
 	{
 		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();

@@ -60,11 +60,12 @@ namespace DragonSpark.Activation.IoC
 
 		protected override IUnityContainer CreateItem( IUnityContainer parameter ) => 
 			parameter
+				.Extend<InstanceTypeRegistrationMonitorExtension>()
 				.Extend<CachingBuildPlanExtension>()
 				.Extend<DefaultRegistrationsExtension>()
-				.Extend<ConstructorExtension>()
-				.Extend<StrategyPipelineExtension>()
-				.Extend<InstanceTypeRegistrationMonitorExtension>();
+				.Extend<StrategyPipelineExtension>()	
+				.Extend<DefaultConstructorPolicyExtension>()
+				;
 	}
 
 	public class ServicesConfigurator : UnityConfigurator
@@ -94,7 +95,7 @@ namespace DragonSpark.Activation.IoC
 		protected override void Initialize()
 		{
 			var repository = new StrategyRepository( Context.Strategies );
-			repository.Add( new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.Setup, Priority.High ) );
+			repository.Add( new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.PreCreation, Priority.High ) );
 			Container.RegisterInstance<IBuildPlanRepository>( new BuildPlanRepository( SingletonBuildPlanPolicy.Instance ) );
 			Container.RegisterInstance<IStrategyRepository>( repository );
 		}

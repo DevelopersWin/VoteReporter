@@ -2,19 +2,15 @@ using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public abstract class CompositeSpecification : ISpecification
+	public abstract class CompositeSpecification<T> : SpecificationBase<T>
 	{
-		readonly Func<Func<ISpecification, bool>, bool> @where;
+		readonly Func<Func<ISpecification, bool>, bool> where;
 		
 		protected CompositeSpecification( Func<Func<ISpecification, bool>, bool> where )
 		{
-			this.@where = @where;
+			this.where = where;
 		}
 
-		public bool IsSatisfiedBy( object parameter )
-		{
-			var result = where( condition => condition.IsSatisfiedBy( parameter ) );
-			return result;
-		}
+		public override bool IsSatisfiedBy( T parameter ) => where( condition => condition.IsSatisfiedBy( parameter ) );
 	}
 }

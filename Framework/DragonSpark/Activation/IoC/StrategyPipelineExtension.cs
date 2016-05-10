@@ -1,4 +1,5 @@
-﻿using DragonSpark.Aspects;
+﻿using DragonSpark.Activation.IoC.Specifications;
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
@@ -48,16 +49,16 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class ConstructorExtension : UnityContainerExtension
+	public class DefaultConstructorPolicyExtension : UnityContainerExtension
 	{
-		readonly ResolvableTypeSpecification specification;
+		readonly ConstructorLocator locator;
 
-		public ConstructorExtension( ResolvableTypeSpecification specification )
+		public DefaultConstructorPolicyExtension( ConstructorLocator locator )
 		{
-			this.specification = specification;
+			this.locator = locator;
 		}
 
-		protected override void Initialize() => Context.Policies.SetDefault<IConstructorSelectorPolicy>( new ConstructorSelectorPolicy( specification ) );
+		protected override void Initialize() => Context.Policies.SetDefault<IConstructorSelectorPolicy>( new ConstructorSelectorPolicy( locator ) );
 	}
 
 	public class CachingBuildPlanExtension : UnityContainerExtension
@@ -174,41 +175,74 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
+	/*public class AdditionalTypesStrategyConfiguration : ConfigurationBase<TypeSelectionStrategyBase>
+	{
+		public AdditionalTypesStrategyConfiguration() : base( NoTypesStrategy.Instance ) {}
+	}*/
+
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
 		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator();
 
 		readonly Type[] types;
-		readonly Func<Type, Type[]> strategy;
 		readonly Func<Type, ITypeCandidateWeightProvider> weight;
 		readonly ISpecification<Type> specification;
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, AllTypesInCandidateAssemblyStrategy.Instance.Create, type => new TypeCandidateWeightProvider( type ), CanBuildSpecification.Instance.Or( ContainsSingletonSpecification.Instance ), CanBuildSpecification.Instance.Inverse() ) {}
+		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, type => new TypeCandidateWeightProvider( type ), CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ), CanInstantiateSpecification.Instance.Inverse() ) {}
 
-		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, Type[]> strategy, Func<Type, ITypeCandidateWeightProvider> weight, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
+		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, ITypeCandidateWeightProvider> weight, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
 		{
 			this.types = types;
-			this.strategy = strategy;
 			this.weight = weight;
 			this.specification = specification;
 		}
 
+		static Type Map( Type parameter )
+		{
+			var name = ConventionCandidateNameFactory.Instance.Create( parameter );
+			var result = name !=parameter.Name ? parameter.Assembly().GetType( $"{parameter.Namespace}.{name}" ) : null;
+			return result;
+		}
+
 		[Freeze]
-		protected override Type CreateItem( Type parameter )
+		protected override Type CreateItem( Type parameter ) => Map( parameter ) ?? Search( parameter );
+
+		Type Search( Type parameter )
 		{
 			var adapter = parameter.Adapt();
-			var name = parameter.Name.TrimStartOf( 'I' );
-			var others = strategy( parameter );
+			// var others = strategy().Create( parameter );
 			var order = weight( parameter );
-			var result = 
+			var convention = new IsConventionCandidateSpecification( parameter );
+			var result =
 				types
-					.Union( others )
+					// .Union( others )
 					.Where( adapter.IsAssignableFrom )
 					.Where( specification.IsSatisfiedBy )
 					.OrderByDescending( order.GetWeight )
-					.FirstOrDefault( candidate => candidate.Name.Equals( name ) );
+					.FirstOrDefault( convention.IsSatisfiedBy );
 			return result;
 		}
+	}
+
+	class IsConventionCandidateSpecification : GuardedSpecificationBase<Type>
+	{
+		readonly string type;
+
+		public IsConventionCandidateSpecification( Type type ) : this( type, ConventionCandidateNameFactory.Instance.Create ) {}
+		public IsConventionCandidateSpecification( Type type, Func<Type, string> sanitizer ) : this( sanitizer( type ) ) {}
+		IsConventionCandidateSpecification( string type )
+		{
+			this.type = type;
+		}
+
+		public override bool IsSatisfiedBy( Type parameter ) => parameter.Name.Equals( type );
+	}
+
+	class ConventionCandidateNameFactory : FactoryBase<Type, string>
+	{
+		public static ConventionCandidateNameFactory Instance { get; } = new ConventionCandidateNameFactory();
+
+		protected override string CreateItem( Type parameter ) => parameter.Name.TrimStartOf( 'I' );
 	}
 
 	public interface ITypeCandidateWeightProvider
@@ -241,6 +275,8 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static SelfStrategy Instance { get; } = new SelfStrategy();
 
+		SelfStrategy() {}
+
 		protected override Type[] CreateItem( Type parameter ) => parameter.ToItem();
 	}
 
@@ -248,23 +284,21 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static SelfAndNestedStrategy Instance { get; } = new SelfAndNestedStrategy();
 
+		SelfAndNestedStrategy() {}
+
 		[Freeze]
 		protected override Type[] CreateItem( Type parameter ) => parameter.Adapt().WithNested();
 	}
 
-	public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
+	/*public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
 	{
-		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy( ApplicationAssemblySpecification.Instance.Cast<Type>( type => type.Assembly() ) );
+		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy();
 
-		public AllTypesInCandidateAssemblyStrategy( [Required] ISpecification<Type> specification ) : base( specification ) {}
+		AllTypesInCandidateAssemblyStrategy() : base( ApplicationAssemblySpecification.Instance.Cast<Type>( type => type.Assembly() ) ) {}
 
-		// [Freeze]
-		protected override Type[] CreateItem( Type parameter )
-		{
-			var types = TypesFactory.Instance.Create( parameter.Assembly().ToItem() );
-			return types;
-		}
-	}
+		[Freeze]
+		protected override Type[] CreateItem( Type parameter ) => TypesFactory.Instance.Create( parameter.Assembly().ToItem() );
+	}*/
 
 	[Persistent]
 	public class ImplementedInterfaceFromConventionLocator : FactoryBase<Type, Type>
@@ -283,27 +317,41 @@ namespace DragonSpark.Activation.IoC
 			var result =
 				parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore ).ToArray().With( interfaces => 
 					interfaces.FirstOrDefault( i => parameter.Name.Contains( i.Name.TrimStartOf( 'I' ) ) )
-					/*??
-					interfaces.FirstOrDefault( t => assemblies.Contains( t.Assembly() ) )*/
 				);
 			return result;
 		}
 	}
 
-	public class CanBuildSpecification : GuardedSpecificationBase<Type>
+	public class CanInstantiateSpecification : GuardedSpecificationBase<Type>
 	{
-		public static CanBuildSpecification Instance { get; } = new CanBuildSpecification();
+		public static CanInstantiateSpecification Instance { get; } = new CanInstantiateSpecification();
 
-		[Freeze]
+		// [Freeze]
 		public override bool IsSatisfiedBy( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();
-			var result = parameter != typeof(object) && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && !typeof(Delegate).Adapt().IsAssignableFrom( parameter ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
+			var result = !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
 			return result;
 		}
 	}
 
-	public class ValidConstructorSpecification : GuardedSpecificationBase<IBuilderContext>
+	public class InstantiableTypeSpecification : GuardedSpecificationBase<Type>
+	{
+		public static InstantiableTypeSpecification Instance { get; } = new InstantiableTypeSpecification();
+
+		readonly TypeAdapter[] exempt;
+
+		public InstantiableTypeSpecification() : this( new[] { typeof(Delegate), typeof(Array) }.Select( type => type.Adapt() ).ToArray() ) {}
+
+		public InstantiableTypeSpecification( TypeAdapter[] exempt )
+		{
+			this.exempt = exempt;
+		}
+
+		public override bool IsSatisfiedBy( Type parameter ) => parameter != typeof(object) && exempt.All( adapter => !adapter.IsAssignableFrom( parameter ) );
+	}
+
+	/*public class ValidConstructorSpecification : GuardedSpecificationBase<IBuilderContext>
 	{
 		public static ValidConstructorSpecification Instance { get; } = new ValidConstructorSpecification();
 
@@ -316,7 +364,7 @@ namespace DragonSpark.Activation.IoC
 		}
 
 		static bool IsValidConstructor( SelectedConstructor selectedConstructor ) => selectedConstructor.Constructor.GetParameters().All( pi => !pi.ParameterType.IsByRef );
-	}
+	}*/
 
 	class KeyReference : Reference<NamedTypeBuildKey>
 	{
@@ -330,7 +378,8 @@ namespace DragonSpark.Activation.IoC
 
 		public class ConventionCandidateLocator : DelegatedFactory<IBuilderContext, Type>
 		{
-			static ISpecification<IBuilderContext> Specification { get; } = CanBuildSpecification.Instance.Cast<IBuilderContext>( context => context.BuildKey.Type ).And( ValidConstructorSpecification.Instance ).Inverse();
+			static ISpecification<IBuilderContext> Specification { get; } = InstantiableTypeSpecification.Instance.And(
+				CanInstantiateSpecification.Instance.Inverse() ).Cast<IBuilderContext>( context => context.BuildKey.Type )/*.And( ValidConstructorSpecification.Instance.Inverse() )*/;
 
 			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : base( Specification, context => factory.Create( context.BuildKey.Type ) ) {}
 		}

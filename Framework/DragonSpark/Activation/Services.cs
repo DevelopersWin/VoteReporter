@@ -1,10 +1,10 @@
 using DragonSpark.Diagnostics;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
+using DisposableRepository = DragonSpark.Runtime.DisposableRepository;
 
 namespace DragonSpark.Activation
 {

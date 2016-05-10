@@ -12,8 +12,6 @@ namespace DragonSpark.Aspects
 	[Validation( false )]
 	public sealed class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
-		readonly HashSet<int> codes = new HashSet<int>();
-
 		readonly IDictionary<int, object> items = new Dictionary<int, object>();
 
 		object Get( MethodInterceptionArgs args )
@@ -45,32 +43,40 @@ namespace DragonSpark.Aspects
 			return result;
 		}
 
+		// [Writer]
 		bool Add( int code, MethodInterceptionArgs args )
 		{
-			lock ( codes )
+			lock ( items )
 			{
-				var result = !codes.Contains( code );
+				var result = !items.ContainsKey( code );
 				if ( result )
 				{
-					codes.Add( code );
+					// codes.Add( code );
 					items.Add( code, args.GetReturnValue() );
 				}
-				return result;	
+				return result;
 			}
 		}
 
+		// [Yielder]
 		protected override object CreateItem( MethodInterceptionArgs parameter ) => Get( parameter ) ?? parameter.ReturnValue;
+
+		/*public void Flush()
+		{
+			codes.Clear();
+			items.Clear();
+		}*/
 	}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
-	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
+	public sealed class Freeze : MethodInterceptionAspect// , IInstanceScopedAspect
 	{
-		readonly CacheValueFactory factory;
+		readonly Func<MethodInterceptionArgs, object> factory;
 
-		public Freeze() : this( new CacheValueFactory() ) {}
+		public Freeze() : this( new CacheValueFactory().Create ) {}
 
-		public Freeze( CacheValueFactory factory )
+		public Freeze( Func<MethodInterceptionArgs, object> factory )
 		{
 			this.factory = factory;
 		}
@@ -79,7 +85,7 @@ namespace DragonSpark.Aspects
 		{
 			if ( /*Configure.Load<EnableMethodCaching>().Value &&*/ ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
-				args.ReturnValue = factory.Create( args );
+				args.ReturnValue = factory( args );
 			}
 			else
 			{
@@ -87,12 +93,8 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		// public override void RuntimeInitialize( MethodBase method ) => Initialize();
+		/*object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new Freeze();
 
-		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new Freeze();
-
-		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
-
-		// void Initialize() => Factory = new CacheValueFactory();
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}*/
 	}
 }

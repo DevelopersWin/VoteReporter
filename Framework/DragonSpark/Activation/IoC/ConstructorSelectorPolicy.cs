@@ -1,12 +1,9 @@
-using DragonSpark.Aspects;
+using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
-using Microsoft.Practices.Unity.Utility;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -53,54 +50,25 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	class ConstructorSelectorPolicy : IConstructorSelectorPolicy
+	public class ConstructorSelectorPolicy : IConstructorSelectorPolicy
 	{
-		readonly ISpecification<TypeRequest> specification;
+		readonly Func<ConstructTypeRequest, ConstructorInfo> locator;
+		readonly Func<ParameterInfo, IDependencyResolverPolicy> resolver;
 
-		public ConstructorSelectorPolicy( ISpecification<TypeRequest> specification )
+		public ConstructorSelectorPolicy( ConstructorLocator locator ) : this( locator.Create, ResolverFactory.Instance.Create ) {}
+
+		protected ConstructorSelectorPolicy( Func<ConstructTypeRequest, ConstructorInfo> locator, Func<ParameterInfo, IDependencyResolverPolicy> resolver )
 		{
-			this.specification = specification;
+			this.locator = locator;
+			this.resolver = resolver;
 		}
 
-		public SelectedConstructor SelectConstructor( IBuilderContext context, IPolicyList resolverPolicyDestination ) => Create( context.BuildKey.Type ) ?? DefaultUnityConstructorSelectorPolicy.Instance.SelectConstructor( context, resolverPolicyDestination );
+		public SelectedConstructor SelectConstructor( IBuilderContext context, IPolicyList resolverPolicyDestination ) => locator( new ConstructTypeRequest( context.BuildKey.Type ) ).With( CreateSelectedConstructor ) ?? DefaultUnityConstructorSelectorPolicy.Instance.SelectConstructor( context, resolverPolicyDestination );
 
-		SelectedConstructor Create( Type type )
-		{
-			var ctor = FromMetadata( type ) ?? Search( type );
-			var result = ctor.With( CreateSelectedConstructor );
-			return result;
-		}
-
-		static SelectedConstructor CreateSelectedConstructor( ConstructorInfo ctor )
+		SelectedConstructor CreateSelectedConstructor( ConstructorInfo ctor )
 		{
 			var result = new SelectedConstructor( ctor );
-			foreach ( var parameter in ctor.GetParameters() )
-				result.AddParameterResolver( ResolverFactory.Instance.Create( parameter ) );
-			return result;
-		}
-
-		private static ConstructorInfo FromMetadata( Type typeToConstruct )
-		{
-			var array = new ReflectionHelper( typeToConstruct ).InstanceConstructors.Where( ctor => ctor.IsDefined( typeof(InjectionConstructorAttribute), true ) ).ToArray();
-			switch ( array.Length )
-			{
-				case 0:
-					return null;
-				case 1:
-					return array[0];
-				default:
-					throw new InvalidOperationException( string.Format( CultureInfo.CurrentCulture, "Resources.MultipleInjectionConstructors: {0}", typeToConstruct.GetTypeInfo().Name ) );
-			}
-		}
-
-		ConstructorInfo Search( Type typeToConstruct )
-		{
-			var constructors = new ReflectionHelper( typeToConstruct ).InstanceConstructors;
-			var result = constructors
-				.OrderByDescending( info => info.GetParameters().Length )
-				.FirstOrDefault( info => 
-					info.GetParameters().With( infos => !infos.Any() || infos.Select( parameterInfo => new LocateTypeRequest( parameterInfo.ParameterType ) ).All( specification.IsSatisfiedBy ) ) 
-					);
+			ctor.GetParameters().Select( resolver ).Each( result.AddParameterResolver );
 			return result;
 		}
 	}

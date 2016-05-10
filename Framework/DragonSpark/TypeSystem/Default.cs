@@ -34,7 +34,7 @@ namespace DragonSpark.TypeSystem
 	{
 		public static InitializeTypeCommand Instance { get; } = new InitializeTypeCommand();
 
-		public InitializeTypeCommand() : this( CanBuildSpecification.Instance ) {}
+		public InitializeTypeCommand() : this( CanInstantiateSpecification.Instance.And( InstantiableTypeSpecification.Instance ) ) {}
 
 		public InitializeTypeCommand( ISpecification<Type> specification ) : base( specification ) {}
 

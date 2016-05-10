@@ -21,11 +21,11 @@ namespace DragonSpark.Testing.TypeSystem
 			{
 				var propertyInfo = GetType().GetProperty( nameof(PropertyName) );
 			
-			var sut = Attributes.Get( propertyInfo );
-			Assert.Same( sut, Attributes.Get( propertyInfo ) );
+				var sut = Attributes.Get( propertyInfo );
+				Assert.Same( sut, Attributes.Get( propertyInfo ) );
 
-			var firstAll = sut.GetAttributes<Attribute>();
-			var secondAll = sut.GetAttributes<Attribute>();
+				var firstAll = sut.GetAttributes<Attribute>();
+				var secondAll = sut.GetAttributes<Attribute>();
 				Assert.Same( firstAll, secondAll );
 			}
 		}

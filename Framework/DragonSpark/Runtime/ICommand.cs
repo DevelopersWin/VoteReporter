@@ -44,6 +44,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
+	[Validation( false )]
 	public class FixedCommand : DisposingCommand<object>
 	{
 		readonly Lazy<ICommand> command;
@@ -129,6 +130,7 @@ namespace DragonSpark.Runtime
 		public DelegatedCommand( Action action ) : base( o => action(), Specifications.Specifications.Always ) {}
 	}
 
+	[Validation( false )]
 	public class DelegatedCommand<T> : CommandBase<T>
 	{
 		readonly Action<T> command;
@@ -167,6 +169,11 @@ namespace DragonSpark.Runtime
 	{
 		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Coercer<T>.Instance ) {}
 		public DecoratedCommand( [Required] ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
+	}
+
+	public class SynchronizedCommand : CommandBase<object>
+	{
+		protected override void OnExecute( object parameter ) {}
 	}
 
 	public abstract class CommandBase<T> : ICommand<T>
