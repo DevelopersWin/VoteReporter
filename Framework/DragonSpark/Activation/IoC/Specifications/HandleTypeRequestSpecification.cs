@@ -213,7 +213,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 			create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( CreateItem );
 		}
 
-		// [Freeze]
+		[Freeze]
 		protected override IEnumerable<ConstructorInfo> CreateItem( ConstructTypeRequest parameter )
 		{
 			var result = new ReflectionHelper( parameter.RequestedType )

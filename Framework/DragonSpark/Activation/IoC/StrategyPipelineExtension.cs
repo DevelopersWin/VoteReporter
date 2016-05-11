@@ -199,8 +199,8 @@ namespace DragonSpark.Activation.IoC
 
 		static Type Map( Type parameter )
 		{
-			var name = ConventionCandidateNameFactory.Instance.Create( parameter );
-			var result = name !=parameter.Name ? parameter.Assembly().GetType( $"{parameter.Namespace}.{name}" ) : null;
+			var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
+			var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
 			return result;
 		}
 
@@ -210,12 +210,10 @@ namespace DragonSpark.Activation.IoC
 		Type Search( Type parameter )
 		{
 			var adapter = parameter.Adapt();
-			// var others = strategy().Create( parameter );
 			var order = weight( parameter );
 			var convention = new IsConventionCandidateSpecification( parameter );
 			var result =
 				types
-					// .Union( others )
 					.Where( adapter.IsAssignableFrom )
 					.Where( specification.IsSatisfiedBy )
 					.OrderByDescending( order.GetWeight )

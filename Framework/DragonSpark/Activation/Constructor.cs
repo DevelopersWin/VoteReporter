@@ -79,29 +79,6 @@ namespace DragonSpark.Activation
 			}
 		}
 
-		/*class ArgumentsFactory : FactoryBase<ConstructTypeRequest, object[]>
-		{
-			public static ArgumentsFactory Instance { get; } = new ArgumentsFactory();
-
-			ArgumentsFactory() : base( ConstructCoercer<ConstructTypeRequest>.Instance ) {}
-
-			// [Freeze]
-			protected override object[] CreateItem( ConstructTypeRequest parameter )
-			{
-				var candidates = new[] { parameter.Arguments, parameter.Arguments.NotNull() };
-				var adapter = parameter.RequestedType.Adapt();
-				var result = candidates
-					.Select( objects => objects.Fixed() )
-					.Select( objects => new { arguments = objects, constructor = adapter.FindConstructor( objects ) } )
-					.Where( arg => arg.constructor != null )
-					.Select( arg => Ensure( arg.constructor.GetParameters(), arg.arguments ) )
-					.FirstOrDefault();
-				return result;
-			}
-
-			
-		}*/
-
 		class ObjectActivatorFactory : FactoryBase<ConstructorInfo, ObjectActivator>
 		{
 			public static ObjectActivatorFactory Instance { get; } = new ObjectActivatorFactory();
