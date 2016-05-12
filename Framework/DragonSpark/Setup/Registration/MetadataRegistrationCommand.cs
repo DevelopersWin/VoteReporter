@@ -21,7 +21,7 @@ namespace DragonSpark.Setup.Registration
 			this.registry = registry;
 		}
 
-		protected override void OnExecute( Type[] parameter )
+		public override void Execute( Type[] parameter )
 		{
 			var types = MetadataRegistrationTypeFactory.Instance.Create( parameter );
 			types

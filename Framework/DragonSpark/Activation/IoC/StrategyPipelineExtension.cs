@@ -77,7 +77,7 @@ namespace DragonSpark.Activation.IoC
 		protected override void Initialize()
 		{
 			var policies = repository.List();
-			var creator = new Creator( Container ).Value.With( c => c.GetType() ) ?? ThreadAmbientContext.GetCurrent();
+			var creator = new Creator( Container ).Value?.GetType() ?? ThreadAmbientContext.GetCurrent();
 			var creators = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ), creator );
 			var policy = new BuildPlanCreatorPolicy( new TryContext( logger ).Invoke, specification, policies, creators );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
@@ -366,7 +366,7 @@ namespace DragonSpark.Activation.IoC
 
 	class KeyReference : Reference<NamedTypeBuildKey>
 	{
-		public KeyReference( object instance, NamedTypeBuildKey key ) : base( instance, key ) { }
+		public KeyReference( object source, NamedTypeBuildKey key ) : base( source, key ) { }
 	}
 
 	public class ConventionStrategy : BuilderStrategy

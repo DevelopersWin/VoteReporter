@@ -32,7 +32,7 @@ namespace DragonSpark.Testing.Framework
 
 	public class AssociatedRegistry : AssociatedStore<IFixture, IServiceRegistry>
 	{
-		public AssociatedRegistry( [Required]IFixture instance ) : base( instance, () => new FixtureRegistry( instance ) ) {}
+		public AssociatedRegistry( [Required]IFixture source ) : base( source, () => new FixtureRegistry( source ) ) {}
 
 		/*public AssociatedRegistry( IFixture instance, Func<IServiceRegistry> create = null ) : base( instance, create ) {}*/
 	}

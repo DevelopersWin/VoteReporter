@@ -21,7 +21,7 @@ namespace DragonSpark.Setup.Commands
 		[AmbientValue, Required]
 		public ITaskMonitor Tasks { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter )
+		public override void Execute( object parameter )
 		{
 			MessageLogger.Information( Resources.InitializingModules );
 			Manager.Run();

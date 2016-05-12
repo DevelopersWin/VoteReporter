@@ -41,7 +41,7 @@ namespace DragonSpark.Diagnostics
 			this.factory = factory;
 		}
 
-		protected override void OnExecute( Action<T> parameter )
+		public override void Execute( Action<T> parameter )
 		{
 			var messages = factory( history.Events );
 			messages.Each( parameter );

@@ -44,7 +44,7 @@ namespace DragonSpark.Setup
 			this.host = host;
 		}
 
-		protected override void OnExecute( IServiceProvider parameter )
+		public override void Execute( IServiceProvider parameter )
 		{
 			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
 
@@ -85,7 +85,7 @@ namespace DragonSpark.Setup
 			this.assign = assign;
 		}
 
-		protected override void OnExecute( T parameter )
+		public override void Execute( T parameter )
 		{
 			assign.Run( application );
 			application.Execute( parameter );
@@ -117,12 +117,12 @@ namespace DragonSpark.Setup
 
 		public class Instance : AssociatedStore<bool>
 		{
-			public Instance( object instance ) : base( instance ) {}
+			public Instance( object source ) : base( source ) {}
 		}
 
 		public class Factory : AssociatedStore<Type>
 		{
-			public Factory( object instance ) : base( instance ) {}
+			public Factory( object source ) : base( source ) {}
 		}
 	}
 
@@ -231,7 +231,7 @@ namespace DragonSpark.Setup
 	{
 		public static Configure<T> Instance { get; } = new Configure<T>();
 
-		protected override void OnExecute( IServiceProvider parameter ) => parameter.Get<T>().Run( parameter );
+		public override void Execute( IServiceProvider parameter ) => parameter.Get<T>().Run( parameter );
 	}
 
 	public interface IApplication<in T> : IApplication, ICommand<T> {}
@@ -283,7 +283,7 @@ namespace DragonSpark.Setup
 
 		readonly ICollection<T> watching = new Collection<T>();
 
-		protected override void OnExecute( object parameter )
+		public override void Execute( object parameter )
 		{
 			var exports = Host.GetExports<T>( ContractName ).Fixed();
 			watching.AddRange( exports );

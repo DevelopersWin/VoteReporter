@@ -64,7 +64,7 @@ namespace DragonSpark.Testing.Aspects
 
 			public void Reset() => Executed = false;
 
-			protected override void OnExecute( object parameter ) => Executed = true;
+			public override void Execute( object parameter ) => Executed = true;
 		}
 	}
 }

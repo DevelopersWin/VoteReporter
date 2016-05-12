@@ -116,7 +116,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 	public class SomeCommand : ModuleCommand
 	{
-		protected override void OnExecute( IMonitoredModule parameter ) => new Items( parameter ).Value.Add( this );
+		public override void Execute( IMonitoredModule parameter ) => new Items( parameter ).Value.Add( this );
 	}
 
 	public class MonitoredModule : MonitoredModule<MonitoredModule.Command>
@@ -151,7 +151,7 @@ namespace DragonSpark.Windows.Testing.Setup
 				this.monitor = monitor;
 			}
 
-			protected override void OnExecute( IMonitoredModule parameter ) => new Items( monitor ).Value.Add( this );
+			public override void Execute( IMonitoredModule parameter ) => new Items( monitor ).Value.Add( this );
 		}
 	}
 }

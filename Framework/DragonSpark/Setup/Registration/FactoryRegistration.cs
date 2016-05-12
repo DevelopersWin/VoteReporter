@@ -146,7 +146,7 @@ namespace DragonSpark.Setup.Registration
 
 		public override bool CanExecute( RegisterFactoryParameter parameter ) => base.CanExecute( parameter ) && typeof(TFactory).Adapt().IsAssignableFrom( parameter.FactoryType );
 
-		protected override void OnExecute( RegisterFactoryParameter parameter )
+		public override void Execute( RegisterFactoryParameter parameter )
 		{
 			var func = create( parameter.FactoryType );
 			parameter.RegisterTypes.Each( type =>

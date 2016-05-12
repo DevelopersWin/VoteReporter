@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.factory = factory;
 		}
 
-		protected override void OnExecute( AutoData parameter )
+		public override void Execute( AutoData parameter )
 		{
 			var customizations = factory( parameter.Method );
 			customizations.Each( customization => customization.Customize( parameter.Fixture ) );
@@ -52,7 +52,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public Application( IServiceProvider provider, IEnumerable<ICommand> commands ) : base( provider, MetadataCommand.Instance.Append( commands ) ) {}
 
-		/*protected override void OnExecute( AutoData parameter )
+		/*public override void Execute( AutoData parameter )
 		{
 			/*var registry = Services.Get<IExportDescriptorProviderRegistry>();
 			registry.Register( new InstanceExportDescriptorProvider<AutoData>( parameter ) );#1#

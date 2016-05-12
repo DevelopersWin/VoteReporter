@@ -27,7 +27,7 @@ namespace DragonSpark.TypeSystem
 			this.searchQuery = searchQuery;
 		}
 
-		protected override void OnExecute( Assembly parameter ) => provider.Load( parameter, searchQuery );
+		public override void Execute( Assembly parameter ) => provider.Load( parameter, searchQuery );
 	}
 
 	public class AssemblyHintProvider : FactoryBase<Assembly, string>

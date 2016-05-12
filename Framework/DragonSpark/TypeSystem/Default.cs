@@ -39,7 +39,7 @@ namespace DragonSpark.TypeSystem
 		public InitializeTypeCommand( ISpecification<Type> specification ) : base( specification ) {}
 
 		[Freeze]
-		protected override void OnExecute( Type parameter ) => parameter.GetTypeInfo().DeclaredConstructors.Each( info => info.GetParameters() );
+		public override void Execute( Type parameter ) => parameter.GetTypeInfo().DeclaredConstructors.Each( info => info.GetParameters() );
 	}
 
 	public static class TypeSupport

@@ -113,7 +113,7 @@ namespace DragonSpark.Testing.Framework
 			this.source = source;
 		}
 
-		protected override void OnExecute( AppDomainSetup parameter ) => source( parameter.ApplicationBase ).With( loader => loader.Initialize() );
+		public override void Execute( AppDomainSetup parameter ) => source( parameter.ApplicationBase ).With( loader => loader.Initialize() );
 	}*/
 
 

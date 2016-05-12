@@ -111,7 +111,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class AssociatedContext : AssociatedStore<MethodBase, IDisposable>
 	{
-		public AssociatedContext( MethodBase instance ) : base( instance, typeof(AssociatedContext) ) {}
+		public AssociatedContext( MethodBase source ) : base( source, typeof(AssociatedContext) ) {}
 	}
 
 	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>
@@ -160,11 +160,11 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		public ExecuteApplicationCommand( IApplication<AutoData> application ) : base( application ) {}
 		
-		protected override void OnExecute( AutoData parameter )
+		public override void Execute( AutoData parameter )
 		{
 			var context = new AssociatedContext( parameter.Method );
 			context.Assign( this );
-			base.OnExecute( parameter );
+			base.Execute( parameter );
 		}
 	}
 

@@ -57,7 +57,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			this.remove = remove;
 		}
 
-		protected override void OnExecute( ILogger parameter )
+		public override void Execute( ILogger parameter )
 		{
 			var listener = factory( parameter );
 			add.Run( listener );

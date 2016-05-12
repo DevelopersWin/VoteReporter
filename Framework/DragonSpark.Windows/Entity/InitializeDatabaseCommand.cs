@@ -20,7 +20,7 @@ namespace DragonSpark.Windows.Entity
 		[Locate, Required]
 		public ILogger MessageLogger { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter )
+		public override void Execute( object parameter )
 		{
 			Database.SetInitializer( Initializer );
 

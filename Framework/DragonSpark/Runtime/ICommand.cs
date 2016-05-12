@@ -4,6 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
+using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
@@ -34,7 +35,7 @@ namespace DragonSpark.Runtime
 			this.current = current;
 		}
 
-		protected override void OnExecute( T parameter ) => store.Assign( parameter );
+		public override void Execute( T parameter ) => store.Assign( parameter );
 
 		protected override void OnDispose()
 		{
@@ -58,7 +59,7 @@ namespace DragonSpark.Runtime
 			this.parameter = new Lazy<object>( parameter );
 		}
 
-		protected override void OnExecute( object p ) => command.Value.Execute( parameter.Value );
+		public override void Execute( object p ) => command.Value.Execute( parameter.Value );
 
 		protected override void OnDispose()
 		{
@@ -76,7 +77,7 @@ namespace DragonSpark.Runtime
 			this.list = list;
 		}
 
-		protected override void OnExecute( T parameter ) => list.Add( parameter );
+		public override void Execute( T parameter ) => list.Add( parameter );
 	}
 
 	public class AddItemCommand : CommandBase<object>
@@ -88,7 +89,7 @@ namespace DragonSpark.Runtime
 			this.list = list;
 		}
 
-		protected override void OnExecute( object parameter ) => list.Add( parameter );
+		public override void Execute( object parameter ) => list.Add( parameter );
 	}
 
 	public class RemoveItemCommand : CommandBase<object>
@@ -100,7 +101,7 @@ namespace DragonSpark.Runtime
 			this.list = list;
 		}
 
-		protected override void OnExecute( object parameter ) => list.Remove( parameter );
+		public override void Execute( object parameter ) => list.Remove( parameter );
 	}
 
 	public abstract class DisposingCommand<TParameter> : CommandBase<TParameter>, IDisposable
@@ -146,7 +147,7 @@ namespace DragonSpark.Runtime
 			this.command = command;
 		}
 
-		protected override void OnExecute( T parameter ) => command( parameter );
+		public override void Execute( T parameter ) => command( parameter );
 	}
 
 	public class BoxedCommand<T> : CommandBase<T>
@@ -162,7 +163,7 @@ namespace DragonSpark.Runtime
 			this.box = box;
 		}
 
-		protected override void OnExecute( T parameter ) => command.Execute( box( parameter ) );
+		public override void Execute( T parameter ) => command.Execute( box( parameter ) );
 	}
 
 	public class DecoratedCommand<T> : DelegatedCommand<T>
@@ -173,14 +174,14 @@ namespace DragonSpark.Runtime
 
 	public class SynchronizedCommand : CommandBase<object>
 	{
-		protected override void OnExecute( object parameter ) {}
+		public override void Execute( object parameter ) {}
 	}
 
 	public abstract class CommandBase<T> : ICommand<T>
 	{
+		public event EventHandler CanExecuteChanged = delegate { };
 		readonly ICoercer<T> coercer;
 		readonly ISpecification<T> specification;
-		public event EventHandler CanExecuteChanged = delegate { };
 
 		protected CommandBase() : this( Coercer<T>.Instance ) {}
 
@@ -194,20 +195,20 @@ namespace DragonSpark.Runtime
 			this.specification = specification;
 		}
 
-		public void Update() => OnUpdate();
+		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
-		protected virtual void OnUpdate() => CanExecuteChanged( this, EventArgs.Empty );
-
+		[Validator]
 		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( parameter );
 
 		[Validate]
-		void ICommand.Execute( object parameter ) => OnExecute( coercer.Coerce( parameter ) );
+		void ICommand.Execute( object parameter ) => Execute( coercer.Coerce( parameter ) );
 
+		[Validator]
 		public virtual bool CanExecute( T parameter ) => specification.IsSatisfiedBy( parameter );
 
-		[Validate]
-		public void Execute( T parameter ) => OnExecute( parameter );
+		[Validate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		public abstract void Execute( T parameter );
 
-		protected abstract void OnExecute( T parameter );
+		// protected abstract void OnExecute( T parameter );
 	}
 }

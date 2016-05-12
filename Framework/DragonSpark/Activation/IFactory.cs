@@ -38,14 +38,14 @@ namespace DragonSpark.Activation
 
 		class Delegate<T, U> : ConnectedStore<Func<T, U>>
 		{
-			public Delegate( IFactory<T, U> instance ) : base( instance, typeof(Delegate<T, U>), () => instance.Create ) {}
+			public Delegate( IFactory<T, U> source ) : base( source, typeof(Delegate<T, U>), () => source.Create ) {}
 
 			// public Delegate( IFactoryWithParameter instance ) : base( instance, typeof(Delegate<T, U>), () => new Func<object, object>( instance.Create ).Convert<T,U>() ) {}
 		}
 
 		class Delegate<T> : ConnectedStore<Func<T>>
 		{
-			public Delegate( IFactory<T> instance ) : base( instance, typeof(Delegate<T>), () => instance.Create ) {}
+			public Delegate( IFactory<T> source ) : base( source, typeof(Delegate<T>), () => source.Create ) {}
 
 			// public Delegate( IFactory instance ) : base( instance, typeof(Delegate<T>), () => new Func<object>( instance.Create ).Convert<T>() ) {}
 		}

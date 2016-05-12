@@ -246,7 +246,7 @@ namespace DragonSpark.Diagnostics
 			this.transform = transform;
 		}
 
-		protected sealed override void OnExecute( LoggerConfiguration parameter )
+		public sealed override void Execute( LoggerConfiguration parameter )
 		{
 			var transformed = transform( parameter );
 			Configure( transformed );

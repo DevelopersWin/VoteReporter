@@ -37,7 +37,7 @@ namespace DragonSpark.Windows.TypeSystem
 
 		AssemblyInitializer() : base( new OnlyOnceSpecification() ) {}
 
-		protected override void OnExecute( Assembly parameter ) => parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
+		public override void Execute( Assembly parameter ) => parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
 	}
 
 	public class AssemblyLoader : DragonSpark.TypeSystem.AssemblyLoader

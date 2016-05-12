@@ -11,7 +11,7 @@ namespace DragonSpark.Windows.Entity
 		[Factory( typeof(AttachedDatabaseFileFactory) )]
 		public FileInfo Database { get; set; }
 
-		protected override void OnExecute( object parameter ) => Database.Exists.IsFalse( () =>
+		public override void Execute( object parameter ) => Database.Exists.IsFalse( () =>
 		{
 			var items = EntityFiles.WithLog( Database ).TupleWith( new[] { Resources.Blank, Resources.Blank_log } );
 			items.Each( tuple => 

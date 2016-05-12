@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Entity
 		[Default( 6 )]
 		public int? MaximumBackups { get; set; }
 
-		protected override void OnExecute( object parameter ) => 
+		public override void Execute( object parameter ) => 
 			Database.With( file =>
 						   {
 							   var files = EntityFiles.WithLog( Database ).Where( info => !info.IsLocked() ).ToArray();

@@ -20,7 +20,7 @@ namespace DragonSpark.Windows.Setup
 		[Locate, Required]
 		public IServiceRegistry Registry { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter )
+		public override void Execute( object parameter )
 		{
 			Registry.Register( new InstanceRegistrationParameter( new ExceptionManager( Policies ) ) );
 

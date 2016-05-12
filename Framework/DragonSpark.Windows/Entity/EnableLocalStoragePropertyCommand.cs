@@ -24,7 +24,7 @@ namespace DragonSpark.Windows.Entity
 
 	public class RegisterComplexTypesCommand : CommandBase<DbContextBuildingParameter>
 	{
-		protected override void OnExecute( DbContextBuildingParameter parameter )
+		public override void Execute( DbContextBuildingParameter parameter )
 		{
 			var method = parameter.Builder.GetType().GetMethod( nameof(parameter.Builder.ComplexType) );
 			parameter.Context.GetDeclaredEntityTypes().First().Assembly.GetTypes().Where( x => x.Has<ComplexTypeAttribute>() ).Each( x =>
@@ -53,7 +53,7 @@ namespace DragonSpark.Windows.Entity
 			this.useConvention = useConvention;
 		}
 
-		protected override void OnExecute( DbContextBuildingParameter parameter )
+		public override void Execute( DbContextBuildingParameter parameter )
 		{
 			var types = parameter.Context.GetDeclaredEntityTypes().Select( x => x.Adapt().GetHierarchy( false ).Last() ).Distinct().SelectMany( x => x.Assembly.GetTypes().Where( y => x.Namespace == y.Namespace ) ).Distinct().ToArray();
 

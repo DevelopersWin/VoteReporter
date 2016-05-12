@@ -12,7 +12,7 @@ namespace DragonSpark.Setup.Commands
 		[Required]
 		public object Instance { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter )
+		public override void Execute( object parameter )
 		{
 			var type = RegistrationType ?? Instance.With( item => item.GetType() );
 			var registration = Instance.ConvertTo( type );

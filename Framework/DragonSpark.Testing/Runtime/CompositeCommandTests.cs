@@ -20,7 +20,7 @@ namespace DragonSpark.Testing.Runtime
 		{
 			public bool Executed { get; private set; }
 			
-			protected override void OnExecute( object parameter )
+			public override void Execute( object parameter )
 			{
 				Executed = true;
 			}

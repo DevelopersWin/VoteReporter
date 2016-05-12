@@ -41,7 +41,7 @@ namespace DragonSpark.Windows.Setup
 			this.pathSource = pathSource;
 		}
 
-		protected override void OnExecute( ApplicationSettingsBase parameter )
+		public override void Execute( ApplicationSettingsBase parameter )
 		{
 			var path = pathSource();
 			if ( File.Exists( path ) )
@@ -64,7 +64,7 @@ namespace DragonSpark.Windows.Setup
 			this.pathSource = pathSource;
 		}
 
-		protected override void OnExecute( ApplicationSettingsBase parameter )
+		public override void Execute( ApplicationSettingsBase parameter )
 		{
 			var path = pathSource();
 			var exists = !File.Exists( path );

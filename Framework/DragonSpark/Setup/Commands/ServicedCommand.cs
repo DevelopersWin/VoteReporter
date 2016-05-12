@@ -15,7 +15,7 @@ namespace DragonSpark.Setup.Commands
 
 		protected DelegatedFixedCommand( ISpecification<object> specification ) : base( specification ) {}
 
-		protected override void OnExecute( object parameter ) => new FixedCommand( GetCommand, GetParameter ).Run();
+		public override void Execute( object parameter ) => new FixedCommand( GetCommand, GetParameter ).Run();
 
 		public abstract ICommand GetCommand();
 

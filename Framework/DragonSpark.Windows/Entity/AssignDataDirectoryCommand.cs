@@ -13,6 +13,6 @@ namespace DragonSpark.Windows.Entity
 		[Locate, Required]
 		public DataDirectoryPath Path { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter ) => Path.Assign( Directory.FullName );
+		public override void Execute( object parameter ) => Path.Assign( Directory.FullName );
 	}
 }

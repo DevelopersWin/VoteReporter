@@ -72,11 +72,11 @@ namespace DragonSpark.Runtime.Values
 
 		readonly Func<T> create;
 
-		protected ConnectedStore( [Required] object instance, Type type, Func<T> create = null ) : this( instance, type.AssemblyQualifiedName, create ) {}
+		protected ConnectedStore( [Required] object source, Type type, Func<T> create = null ) : this( source, type.AssemblyQualifiedName, create ) {}
 
-		protected ConnectedStore( [Required] object instance, [NotEmpty] string name, Func<T> create = null ) : this( 
+		protected ConnectedStore( [Required] object source, [NotEmpty] string name, Func<T> create = null ) : this( 
 			// Cache.GetOrAdd( new Tuple<object, string>( instance, name ), t => PropertyConnector.Default.Get( t.Item1, t.Item2, true ).Cast<T>() )
-			PropertyConnector.Default.Get( instance, name, true ).Cast<T>()
+			PropertyConnector.Default.Get( source, name, true ).Cast<T>()
 			
 			, create ) {}
 
@@ -115,7 +115,7 @@ namespace DragonSpark.Runtime.Values
 
 	public class Reference<T> : ConnectedStore<T>
 	{
-		public Reference( object instance, T key ) : base( instance, KeyFactory.Instance.CreateUsing( key ).ToString(), () => key ) {}
+		public Reference( object source, T key ) : base( source, KeyFactory.Instance.CreateUsing( key ).ToString(), () => key ) {}
 	}
 
 	/*public class ListStore<T> : FixedStore<T>
@@ -154,13 +154,13 @@ namespace DragonSpark.Runtime.Values
 
 	public class Checked : AssociatedStore<ConditionMonitor>
 	{
-		public Checked( object instance ) : this( instance, instance ) {}
+		public Checked( object source ) : this( source, source ) {}
 
-		public Checked( object instance, [Required]object reference ) : this( instance, KeyFactory.Instance.CreateUsing( reference ).ToString() ) {}
+		public Checked( object source, [Required]object reference ) : this( source, KeyFactory.Instance.CreateUsing( reference ).ToString() ) {}
 
-		public Checked( [Required]object instance, [Required]string key ) : base( instance, key, () => new ConditionMonitor() ) { }
+		public Checked( [Required]object source, [Required]string key ) : base( source, key, () => new ConditionMonitor() ) { }
 
-		protected Checked( [Required]object instance, [Required]Type key ) : base( instance, key, () => new ConditionMonitor() ) { }
+		protected Checked( [Required]object source, [Required]Type key ) : base( source, key, () => new ConditionMonitor() ) { }
 	}
 
 	public class ThreadAmbientStore<T> : AssociatedStore<T>
@@ -174,34 +174,34 @@ namespace DragonSpark.Runtime.Values
 
 	public class AssociatedStore<T> : AssociatedStore<object, T>
 	{
-		public AssociatedStore( object instance, Func<T> create = null ) : this( instance, typeof(AssociatedStore<object, T>), create ) {}
+		public AssociatedStore( object source, Func<T> create = null ) : this( source, typeof(AssociatedStore<object, T>), create ) {}
 
-		public AssociatedStore( object instance, string key, Func<T> create = null ) : base( instance, key, create ) {}
+		public AssociatedStore( object source, string key, Func<T> create = null ) : base( source, key, create ) {}
 
-		protected AssociatedStore( object instance, Type key, Func<T> create = null ) : base( instance, key, create ) {}
+		protected AssociatedStore( object source, Type key, Func<T> create = null ) : base( source, key, create ) {}
 	}
 
 	public class AssociatedStore<T, U> : ConnectedStore<U>
 	{
-		public AssociatedStore( T instance, Func<U> create = null ) : this( instance, typeof(AssociatedStore<T, U>), create ) {}
+		public AssociatedStore( T source, Func<U> create = null ) : this( source, typeof(AssociatedStore<T, U>), create ) {}
 
-		protected AssociatedStore( T instance, string key, Func<U> create = null ) : base( instance, key, create ) {}
+		protected AssociatedStore( T source, string key, Func<U> create = null ) : base( source, key, create ) {}
 
-		protected AssociatedStore( T instance, Type key, Func<U> create = null ) : base( instance, key, create ) {}
+		protected AssociatedStore( T source, Type key, Func<U> create = null ) : base( source, key, create ) {}
 	}
 
 	public class Items : Items<object>
 	{
-		public Items( object instance ) : base( instance ) {}
+		public Items( object source ) : base( source ) {}
 
 		// public Items( object instance, Type key ) : base( instance, key ) {}
 	}
 
 	public class Items<T> : ConnectedStore<IList<T>>
 	{
-		public Items( object instance ) : this( instance, typeof(Items<T>) ) {}
+		public Items( object source ) : this( source, typeof(Items<T>) ) {}
 
-		public Items( object instance, Type key ) : base( instance, key, () => new List<T>() ) {}
+		public Items( object source, Type key ) : base( source, key, () => new List<T>() ) {}
 
 		// public TItem Get<TItem>() => Item.FirstOrDefaultOfType<TItem>();
 	}

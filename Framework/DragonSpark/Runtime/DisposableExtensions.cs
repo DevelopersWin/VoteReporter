@@ -25,12 +25,12 @@ namespace DragonSpark.Runtime
 	{
 		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand();
 
-		protected override void OnExecute( IDisposable parameter ) => new Associated( parameter ).Value.Purge().Each( disposable => disposable.Dispose() );
+		public override void Execute( IDisposable parameter ) => new Associated( parameter ).Value.Purge().Each( disposable => disposable.Dispose() );
 	}
 
 	class Associated : AssociatedStore<IDisposable, ICollection<IDisposable>>
 	{
-		public Associated( IDisposable instance ) : base( instance, typeof(Associated), () => new Collection<IDisposable>() ) {}
+		public Associated( IDisposable source ) : base( source, typeof(Associated), () => new Collection<IDisposable>() ) {}
 	}
 
 	[ProvideAspectRole( "Dispose Associated Disposables" ), LinesOfCodeAvoided( 1 )]

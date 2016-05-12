@@ -14,6 +14,6 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public Collection<ICustomization> PostCustomizations { get; } = new Collection<ICustomization>();
 
-		protected override void OnExecute( AutoData parameter ) => parameter.Fixture.Customize( new CompositeCustomization( PreCustomizations.Concat( Customizations ).Concat( PostCustomizations ) ) );
+		public override void Execute( AutoData parameter ) => parameter.Fixture.Customize( new CompositeCustomization( PreCustomizations.Concat( Customizations ).Concat( PostCustomizations ) ) );
 	}
 }

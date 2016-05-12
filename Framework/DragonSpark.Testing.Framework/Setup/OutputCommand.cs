@@ -64,7 +64,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		[Service]
 		public ILoggerHistory History { [return: Required]get; set; }
 
-		protected override void OnExecute( AutoData parameter )
+		public override void Execute( AutoData parameter )
 		{
 			var declaringType = parameter.Method.DeclaringType;
 			if ( declaringType.GetConstructors().Where( info => info.IsPublic ).Any( info => info.GetParameters().Any( parameterInfo => parameterInfo.ParameterType == typeof(ITestOutputHelper) ) ) )

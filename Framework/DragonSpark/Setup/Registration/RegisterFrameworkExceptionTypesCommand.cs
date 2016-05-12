@@ -17,7 +17,7 @@ namespace DragonSpark.Setup.Registration
 		[Locate, Required]
 		public ILogger MessageLogger { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter )
+		public override void Execute( object parameter )
 		{
 			MessageLogger.Information( Resources.RegisteringFrameworkExceptionTypes );
 			Types.Each( ExceptionExtensions.RegisterFrameworkExceptionType );

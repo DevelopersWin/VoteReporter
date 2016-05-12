@@ -46,9 +46,9 @@ namespace DragonSpark.Activation
 			this.locator = locator;
 		}
 
-		protected override void OnExecute( InstanceRegistrationParameter parameter ) => locator.Create( parameter.Instance.GetType() ).With( type =>
+		public override void Execute( InstanceRegistrationParameter parameter ) => locator.Create( parameter.Instance.GetType() ).With( type =>
 		{
-			base.OnExecute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
+			base.Execute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
 		} );
 	}
 
@@ -81,9 +81,9 @@ namespace DragonSpark.Activation
 			this.typeResolver = typeResolver;
 		}
 
-		protected override void OnExecute( InstanceRegistrationParameter parameter ) => typeResolver( parameter ).Each( type =>
+		public override void Execute( InstanceRegistrationParameter parameter ) => typeResolver( parameter ).Each( type =>
 		{
-			base.OnExecute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
+			base.Execute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
 		} );
 	}
 
@@ -100,7 +100,7 @@ namespace DragonSpark.Activation
 
 		public override bool CanExecute( T parameter ) => base.CanExecute( parameter ) && specification.IsSatisfiedBy( parameter.RequestedType );
 
-		protected override void OnExecute( T parameter ) => command( parameter );
+		public override void Execute( T parameter ) => command( parameter );
 	}
 
 	public class RegisterCommand : RegisterCommand<IsATypeSpecification>

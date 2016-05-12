@@ -62,11 +62,11 @@ namespace DragonSpark.Testing.Framework
 			this.initialize = initialize/*.Synchronized()*/;
 		}
 
-		protected override void OnExecute( MethodBase parameter )
+		public override void Execute( MethodBase parameter )
 		{
 			initialize( parameter.DeclaringType.Assembly );
 
-			base.OnExecute( parameter );
+			base.Execute( parameter );
 		}
 
 		protected override void OnDispose()

@@ -15,9 +15,9 @@ namespace DragonSpark.Runtime
 
 		public FirstCommand( ISpecification<T> specification, params ICommand[] commands ) : base( specification, commands ) {}
 
-		protected override void OnExecute( T parameter ) => Commands.FirstWhere( command =>
+		public override void Execute( T parameter ) => Commands.FirstWhere( command =>
 																				 {
-																					 var asExecuted = command.AsExecuted( parameter );
+																					 var asExecuted = command.AsExecuted( (object)parameter );
 																					 return asExecuted;
 																				 } );
 	}
@@ -41,7 +41,7 @@ namespace DragonSpark.Runtime
 
 		public CommandCollection Commands { get; }
 
-		protected override void OnExecute( TParameter parameter ) => Commands.ExecuteMany( parameter );
+		public override void Execute( TParameter parameter ) => Commands.ExecuteMany( parameter );
 
 		protected override void OnDispose() => Commands.Purge().OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
 	}

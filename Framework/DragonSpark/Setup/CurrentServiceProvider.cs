@@ -58,7 +58,7 @@ namespace DragonSpark.Setup
 			this.inner = inner;
 		}
 
-		protected override void OnExecute( MigrationParameter<IServiceProvider> parameter )
+		public override void Execute( MigrationParameter<IServiceProvider> parameter )
 		{
 			var from = parameter.From.Get<T>();
 			var to = parameter.To.Get<T>();
@@ -94,7 +94,7 @@ namespace DragonSpark.Setup
 			this.purge = purge;
 		}
 
-		protected override void OnExecute( MigrationParameter<ILogger> parameter )
+		public override void Execute( MigrationParameter<ILogger> parameter )
 		{
 			parameter.To.Information( "A new logger of type {Type} has been registered.  Purging existing logger with {Messages} messages and routing them through the new logger.", 
 				parameter.To.GetType(),
@@ -107,7 +107,7 @@ namespace DragonSpark.Setup
 
 	class LoggerHistoryMigrationCommand : MigrationCommandBase<ILoggerHistory>
 	{
-		protected override void OnExecute( MigrationParameter<ILoggerHistory> parameter ) => parameter.From.Events.Each( parameter.To.Emit );
+		public override void Execute( MigrationParameter<ILoggerHistory> parameter ) => parameter.From.Events.Each( parameter.To.Emit );
 	}
 
 	public abstract class MigrationCommandBase<T> : CommandBase<MigrationParameter<T>>

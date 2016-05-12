@@ -9,6 +9,6 @@ namespace DragonSpark.Setup.Commands
 		[Locate]
 		public IProgram Program { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter ) => Program.Run( parameter );
+		public override void Execute( object parameter ) => Program.Run( parameter );
 	}
 }

@@ -84,7 +84,7 @@ namespace DragonSpark.Windows.Security
 			public string Password { get; }
 		}
 
-		protected override void OnExecute( Parameter parameter )
+		public override void Execute( Parameter parameter )
 		{
 			var entry = new X509CertificateEntry( parameter.Certificate );
 

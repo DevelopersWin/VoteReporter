@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Markup
 
 		class Count : AssociatedStore<int>
 		{
-			public Count( object instance ) : base( instance, typeof(Count) ) {}
+			public Count( object source ) : base( source, typeof(Count) ) {}
 		}
 	}
 }

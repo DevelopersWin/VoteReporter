@@ -232,6 +232,6 @@ namespace DragonSpark.Diagnostics
 	{
 		public static StartProcessCommand Instance { get; } = new StartProcessCommand();
 
-		protected override void OnExecute( IProcess parameter ) => parameter.Start();
+		public override void Execute( IProcess parameter ) => parameter.Start();
 	}
 }

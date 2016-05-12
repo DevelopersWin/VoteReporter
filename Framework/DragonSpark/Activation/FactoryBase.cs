@@ -101,11 +101,13 @@ namespace DragonSpark.Activation
 			this.specification = specification;
 		}
 	
+		[Validator]
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
 
 		[Validate]
 		object IFactoryWithParameter.Create( object parameter ) => coercer.Coerce( parameter ).With( Create );
 
+		[Validator]
 		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
 		[Validate]
@@ -129,7 +131,7 @@ namespace DragonSpark.Activation
 
 		class Cache : AssociatedStore<TResult>
 		{
-			public Cache( object instance, int key, Func<TResult> create = null ) : base( instance, key.ToString(), create ) {}
+			public Cache( object source, int key, Func<TResult> create = null ) : base( source, key.ToString(), create ) {}
 		}
 	}
 
@@ -303,6 +305,6 @@ namespace DragonSpark.Activation
 	{
 		public static void Tag( [Required]ICreator @this, [Required]object item ) => new Creator( item ).Assign( @this );
 
-		public Creator( object instance ) : base( instance, typeof(Creator) ) {}
+		public Creator( object source ) : base( source, typeof(Creator) ) {}
 	}
 }

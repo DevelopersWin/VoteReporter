@@ -51,7 +51,7 @@ namespace DragonSpark.Testing.Framework
 			this.profilerSource = profilerSource;
 		}
 
-		protected override void OnExecute( Parameter parameter )
+		public override void Execute( Parameter parameter )
 		{
 			using ( commandSource( parameter.Method ).AsExecuted( parameter.Method ) )
 			{

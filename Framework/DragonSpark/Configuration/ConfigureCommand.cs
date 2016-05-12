@@ -11,7 +11,7 @@ namespace DragonSpark.Configuration
 
 		ConfigureCommand() {}
 
-		protected override void OnExecute( IEnumerable<IWritableStore> parameter ) =>
+		public override void Execute( IEnumerable<IWritableStore> parameter ) =>
 			parameter.Each( store =>
 							{
 								GetType().InvokeGenericAction( nameof( Add ), store.GetType().ToItem(), store );

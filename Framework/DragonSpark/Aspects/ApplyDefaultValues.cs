@@ -51,7 +51,7 @@ namespace DragonSpark.Aspects
 				this.@continue = @continue;
 			}
 
-			protected override void OnExecute( LocationInterceptionArgs parameter )
+			public override void Execute( LocationInterceptionArgs parameter )
 			{
 				var apply = monitor.Apply();
 				if ( apply )

@@ -21,6 +21,6 @@ namespace DragonSpark.Windows.Setup
 		[Locate, Required]
 		public UnityConfigurationSection Section { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter ) => Section.Containers.Any().IsTrue( () => Container.LoadConfiguration() );
+		public override void Execute( object parameter ) => Section.Containers.Any().IsTrue( () => Container.LoadConfiguration() );
 	}
 }

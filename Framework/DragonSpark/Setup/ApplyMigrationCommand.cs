@@ -8,7 +8,7 @@ namespace DragonSpark.Setup
 	{
 		public static ApplyMigrationCommand Instance { get; } = new ApplyMigrationCommand();
 
-		protected override void OnExecute( MigrationParameter<IServiceProvider> parameter )
+		public override void Execute( MigrationParameter<IServiceProvider> parameter )
 		{
 			var source = parameter.To.Get<IServiceProviderMigrationCommandSource>() ?? ServiceProviderMigrationCommandFactory.Instance;
 			var command = source.Create( parameter.From );

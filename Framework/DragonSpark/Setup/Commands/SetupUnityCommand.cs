@@ -1,5 +1,4 @@
 ﻿using DragonSpark.ComponentModel;
-using DragonSpark.Diagnostics;
 using DragonSpark.Properties;
 using PostSharp.Patterns.Contracts;
 using Serilog;
@@ -11,10 +10,10 @@ namespace DragonSpark.Setup.Commands
 		[Locate, Required]
 		public ILogger Logger { [return: Required]get; set; }
 
-		protected override void OnExecute( object parameter )
+		public override void Execute( object parameter )
 		{
 			Logger.Information( Resources.ConfiguringUnityContainer );
-			base.OnExecute( parameter );
+			base.Execute( parameter );
 		}
 	}
 }

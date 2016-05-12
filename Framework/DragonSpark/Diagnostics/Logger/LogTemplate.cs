@@ -27,7 +27,7 @@ namespace DragonSpark.Diagnostics.Logger
 			this.parameterSource = parameterSource;
 		}
 
-		protected override void OnExecute( TTemplate parameter )
+		public override void Execute( TTemplate parameter )
 		{
 			var parameters = parameterSource( parameter );
 			var level = levelSource( parameter );
@@ -94,6 +94,6 @@ namespace DragonSpark.Diagnostics.Logger
 
 	public class Handler<T> : DecoratedCommand<T>
 	{
-		public Handler( ILogger logger, LogEventLevel level, Func<T, ILoggerTemplate> projection ) : base( new LogTemplateCommand( logger, level ).Box( projection ) ) {}
+		public Handler( ILogger logger, LogEventLevel level, Func<T, ILoggerTemplate> projection ) : base( new LogTemplateCommand( logger, level ).Cast( projection ) ) {}
 	}
 }

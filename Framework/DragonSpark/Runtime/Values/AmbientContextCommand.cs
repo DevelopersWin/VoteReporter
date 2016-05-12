@@ -35,7 +35,7 @@ namespace DragonSpark.Runtime.Values
 			this.stack = stack;
 		}
 
-		protected override void OnExecute( T parameter ) => stack.Push( parameter );
+		public override void Execute( T parameter ) => stack.Push( parameter );
 
 		protected override void OnDispose() => stack.Pop().TryDispose();
 	}

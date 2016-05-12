@@ -24,7 +24,7 @@ namespace DragonSpark.Modularity
 			this.activator = activator;
 		}
 
-		protected override void OnExecute( IMonitoredModule parameter ) => 
+		public override void Execute( IMonitoredModule parameter ) => 
 			activator
 				.ActivateMany<IModuleCommand>( parameter.GetType().Assembly().ExportedTypes )
 				.ExecuteMany( parameter );
