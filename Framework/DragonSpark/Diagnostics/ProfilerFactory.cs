@@ -45,7 +45,7 @@ namespace DragonSpark.Diagnostics
 			this.createSource = createSource;
 		}
 
-		protected override IProfiler CreateItem( MethodBase parameter )
+		public override IProfiler Create( MethodBase parameter )
 		{
 			var logger = loggerSource( parameter );
 			var handler = handlerSource( logger );
@@ -69,7 +69,7 @@ namespace DragonSpark.Diagnostics
 			this.handler = handler;
 		}
 
-		protected override IProfiler CreateItem( MethodBase parameter )
+		public override IProfiler Create( MethodBase parameter )
 		{
 			EmitProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Execute;
 			var command = new AmbientContextCommand<EmitProfileEvent>().AsExecuted( new EmitProfileEvent( name =>

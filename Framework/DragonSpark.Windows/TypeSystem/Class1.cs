@@ -3,11 +3,11 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
+using PostSharp.Patterns.Threading;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using PostSharp.Patterns.Threading;
 
 namespace DragonSpark.Windows.TypeSystem
 {
@@ -22,7 +22,7 @@ namespace DragonSpark.Windows.TypeSystem
 	{
 		public static AssemblyPathLoader Instance { get; } = new AssemblyPathLoader();
 
-		protected override Assembly[] CreateItem( string parameter )
+		public override Assembly[] Create( string parameter )
 		{
 			var directoryInfo = new DirectoryInfo( "." );
 			var result = directoryInfo.GetFileSystemInfos( parameter ).Where( info => info.Extension == ".dll" ).Select( info => info.FullName ).Select( Assembly.LoadFile ).Fixed();

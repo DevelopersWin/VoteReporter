@@ -65,7 +65,7 @@ namespace DragonSpark.Testing.Framework.Setup
 					this.factory = factory;
 				}
 
-				protected override IServiceProvider CreateItem( AutoData parameter ) => new ServiceProviderFactory( factory( parameter.Method ) ).Create();
+				public override IServiceProvider Create( AutoData parameter ) => new ServiceProviderFactory( factory( parameter.Method ) ).Create();
 			}
 		}
 	}
@@ -98,7 +98,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.applicationSource = applicationSource;
 		}
 
-		protected override IDisposable CreateItem( AutoData parameter )
+		public override IDisposable Create( AutoData parameter )
 		{
 			var result = new AssignExecutionContextCommand().AsExecuted( parameter.Method );
 
@@ -186,7 +186,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 
 		[Freeze]
-		protected override Type[] CreateItem( MethodBase parameter )
+		public override Type[] Create( MethodBase parameter )
 		{
 			var types = additional.Concat( includeFromParameters ? parameter.GetParameters().Select( info => info.ParameterType ) : Default<Type>.Items );
 			var result = primaryStrategy( parameter.DeclaringType ).Union( types.SelectMany( otherStrategy ) ).Distinct().Fixed();
@@ -203,7 +203,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.fixture = fixture;
 		}
 
-		protected override object CreateItem( Type parameter ) => fixture.Create<object>( parameter );
+		public override object Create( Type parameter ) => fixture.Create<object>( parameter );
 
 		public object GetService( Type serviceType ) => Create( serviceType );
 	}

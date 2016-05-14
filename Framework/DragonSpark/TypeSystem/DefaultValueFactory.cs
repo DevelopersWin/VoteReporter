@@ -29,7 +29,7 @@ namespace DragonSpark.TypeSystem
 		DefaultValueFactory() {}
 
 		[Freeze]
-		protected override object CreateItem( Type parameter )
+		public override object Create( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
 			var result = type != null ? typeof(Enumerable).InvokeGeneric( nameof(Enumerable.Empty), type.ToItem() ) : Default( parameter );

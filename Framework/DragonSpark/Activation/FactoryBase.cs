@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
+using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace DragonSpark.Activation
 	{
 		public static SelfTransformer<T> Instance { get; } = new SelfTransformer<T>();
 
-		protected override T CreateItem( T parameter ) => parameter;
+		public override T Create( T parameter ) => parameter;
 	}
 
 	public abstract class TransformerBase<T> : FactoryBase<T, T>, ITransformer<T>
@@ -33,7 +34,7 @@ namespace DragonSpark.Activation
 			this.configure = configure;
 		}
 
-		protected override T CreateItem( T parameter )
+		public override T Create( T parameter )
 		{
 			configure( parameter );
 			return parameter;
@@ -66,9 +67,9 @@ namespace DragonSpark.Activation
 			this.configure = configure;
 		}
 
-		protected override TResult CreateItem( T parameter )
+		public override TResult Create( T parameter )
 		{
-			var result = base.CreateItem( parameter );
+			var result = base.Create( parameter );
 			configure( result );
 			return result;
 		}
@@ -82,7 +83,7 @@ namespace DragonSpark.Activation
 			this.inner = inner;
 		}
 
-		protected override TResult CreateItem( TParameter parameter ) => inner.CreateUsing<TResult>( parameter );
+		public override TResult Create( TParameter parameter ) => inner.CreateUsing<TResult>( parameter );
 	}
 
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
@@ -110,10 +111,10 @@ namespace DragonSpark.Activation
 		[Validator]
 		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
-		[Validate]
-		public TResult Create( [Required]TParameter parameter ) => CreateItem( parameter )/*.With( result => Creator.Tag( this, result ) )*/;
+		[Validate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		public abstract TResult Create( [Required]TParameter parameter ); /*=> CreateItem( parameter )*//*.With( result => Creator.Tag( this, result ) )*/
 
-		protected abstract TResult CreateItem( TParameter parameter );
+		// protected abstract TResult CreateItem( TParameter parameter );
 	}
 
 	public class CachedDelegatedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
@@ -127,7 +128,7 @@ namespace DragonSpark.Activation
 			this.keySource = keySource;
 		}
 
-		protected override TResult CreateItem( TParameter parameter ) => new Cache( instance( parameter ), KeyFactory.Instance.Create( keySource( parameter ) ), () => base.CreateItem( parameter ) ).Value;
+		public override TResult Create( TParameter parameter ) => new Cache( instance( parameter ), KeyFactory.Instance.Create( keySource( parameter ) ), () => base.Create( parameter ) ).Value;
 
 		class Cache : AssociatedStore<TResult>
 		{
@@ -146,7 +147,7 @@ namespace DragonSpark.Activation
 			this.inner = inner;
 		}
 
-		protected override TResult CreateItem( TParameter parameter ) => inner( parameter );
+		public override TResult Create( TParameter parameter ) => inner( parameter );
 	}
 
 	public class DelegatedFactory<T> : FactoryBase<T>
@@ -182,7 +183,7 @@ namespace DragonSpark.Activation
 			this.factories = factories;
 		}
 
-		protected override IFactory<TParameter, TResult> CreateItem( object parameter )
+		public override IFactory<TParameter, TResult> Create( object parameter )
 		{
 			var boxedFactories = factories
 				.Select( factory => factory.Create( parameter ) )
@@ -232,7 +233,7 @@ namespace DragonSpark.Activation
 			this.inner = inner;
 		}
 
-		protected override TResult CreateItem( TParameter parameter ) => inner.FirstWhere( factory => factory( parameter ) );
+		public override TResult Create( TParameter parameter ) => inner.FirstWhere( factory => factory( parameter ) );
 	}
 
 	[Validation( false )]

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using CPI.DirectoryServices;
+﻿using CPI.DirectoryServices;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DragonSpark.Windows.Security
 {
@@ -27,7 +27,7 @@ namespace DragonSpark.Windows.Security
 	{
 		public static KeyVaultApplicationFactory Instance { get; } = new KeyVaultApplicationFactory();
 
-		protected override KeyVaultApplication CreateItem( X509Certificate2 parameter )
+		public override KeyVaultApplication Create( X509Certificate2 parameter )
 		{
 			var name = new DN( parameter.IssuerName.Name );
 			var components = name.RDNs.SelectMany( rdn => rdn.Components ).ToArray();

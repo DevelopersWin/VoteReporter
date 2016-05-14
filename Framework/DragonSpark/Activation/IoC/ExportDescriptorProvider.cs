@@ -17,7 +17,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static ServiceProviderSpecificationFactory Instance { get; } = new ServiceProviderSpecificationFactory();
 		
-		protected override ISpecification<LocateTypeRequest> CreateItem( IServiceProvider parameter ) => 
+		public override ISpecification<LocateTypeRequest> Create( IServiceProvider parameter ) => 
 			parameter.Get<FactoryTypeRequestLocator>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? Runtime.Specifications.Specifications.Always;
 	}
 

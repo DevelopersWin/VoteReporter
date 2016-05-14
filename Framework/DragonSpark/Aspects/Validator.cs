@@ -2,13 +2,10 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
-using Microsoft.Practices.Unity.Utility;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Extensibility;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -123,17 +120,7 @@ namespace DragonSpark.Aspects
 			this.name = name;
 		}
 
-		class Enabled : AssociatedStore<Type, bool>
-		{
-			public Enabled( Type source ) : base( source, typeof(Enabled), () => source.GetTypeInfo().GetCustomAttribute<ValidationAttribute>( true ).With( attribute => attribute.Enabled, () => true ) ) {}
-		}
-
 		public object GetValidatedValue( ValidateParameter parameter )
-		{
-			return new Enabled( parameter.Instance.GetType() ).Value ? DetermineValue( parameter ) : parameter.Result();
-		}
-
-		object DetermineValue( ValidateParameter parameter )
 		{
 			var store = new Validated( parameter.Instance );
 			var result = store.Value || Validate( parameter ) ? AsValidated( store, parameter.Result ) : null;
@@ -143,7 +130,8 @@ namespace DragonSpark.Aspects
 		bool Validate( ValidateParameter parameter )
 		{
 			var type = parameter.Instance.GetType();
-			var mapped = type.GetMethodHierarchical( reference.Name, Factory.GetParameterType( type ).ToItem() );
+			var parameters = Factory.GetParameterType( type ).ToItem();
+			var mapped = type.GetRuntimeMethods().First( info => info.Name == reference.Name && info.GetParameters().Select( parameterInfo => parameterInfo.ParameterType ).SequenceEqual( parameters ) );
 			var validator = new ValidatingMethodFactory( name ).Create( mapped );
 			var result = (bool)validator.Invoke( parameter.Instance, new[] { parameter.Value } );
 			return result;
@@ -183,7 +171,7 @@ namespace DragonSpark.Aspects
 			this.name = name;
 		}
 
-		protected override MethodBase CreateItem( MethodBase parameter )
+		public override MethodBase Create( MethodBase parameter )
 		{
 			var typeInfo = parameter.DeclaringType.GetTypeInfo();
 			var types = parameter.GetParameters().Select( info => info.ParameterType ).ToArray();
@@ -263,39 +251,31 @@ namespace DragonSpark.Aspects
 			this.validatingMethodName = validatingMethodName;
 		}
 
-		/*ValidateAttribute( IParameterValidation validator )
+		/*class Enabled : AssociatedStore<Type, bool>
 		{
-			Validator = validator;
-		}
+			public Enabled( Type source ) : base( source, typeof(Enabled), () => source.GetTypeInfo().GetCustomAttribute<ValidationAttribute>( true ).With( attribute => attribute.Enabled, () => true ) ) {}
+		}*/
 
-		MethodBase Method { get; set; }*/
+		bool IsEnabled( Type type ) => type.GetTypeInfo().GetCustomAttribute<ValidationAttribute>( true ).With( attribute => attribute.Enabled, () => true );
+
+		public override bool CompileTimeValidate( MethodBase method ) => IsEnabled( method.DeclaringType );
 
 		IParameterValidation Validator { get; set; }
 
-		public override void RuntimeInitialize( MethodBase method )
-		{
-			// Debugger.Break();
-			Validator = /*!PostSharpEnvironment.IsPostSharpRunning ?*/ new ParameterValidation( method, validatingMethodName ) /*: null*/;
-		}
+		public override void RuntimeInitialize( MethodBase method ) => Validator = new ParameterValidation( method, validatingMethodName );
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {args.Instance}", null, null, null ));
-			var parameter = new ValidateParameter( args.Instance, args.Arguments.Single(), args.GetReturnValue );
-			var result = Validator.GetValidatedValue( parameter );
-			args.ApplyReturnValue( result );
-			/*
-			
-			*/
-
-			/*if ( !PostSharpEnvironment.IsPostSharpRunning )
+			if ( IsEnabled( args.Instance.GetType() ) )
 			{
-				
+				var parameter = new ValidateParameter( args.Instance, args.Arguments.Single(), args.GetReturnValue );
+				var result = Validator.GetValidatedValue( parameter );
+				args.ApplyReturnValue( result );
 			}
 			else
 			{
 				base.OnInvoke( args );
-			}*/
+			}
 		}
 
 		/*[OnMethodInvokeAdvice, MethodPointcut( nameof(GetValidationMethod) )]

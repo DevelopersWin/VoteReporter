@@ -59,7 +59,7 @@ namespace DragonSpark.Activation
 			this.convert = convert;
 		}
 
-		protected override TTo CreateItem( TBase parameter ) => parameter.AsTo<TFrom, TTo>( @from => convert( @from ) );
+		public override TTo Create( TBase parameter ) => parameter.AsTo<TFrom, TTo>( @from => convert( @from ) );
 	}
 
 	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>
@@ -71,7 +71,7 @@ namespace DragonSpark.Activation
 			this.factory = factory;
 		}
 
-		protected override object CreateItem( Type parameter )
+		public override object Create( Type parameter )
 		{
 			var @delegate = factory.Create( parameter );
 			var result = @delegate.With( d => d() );
@@ -120,7 +120,7 @@ namespace DragonSpark.Activation
 		}
 
 		[Freeze]
-		protected override Type CreateItem( T parameter )
+		public override Type Create( T parameter )
 		{
 			var info = context( parameter ).GetTypeInfo();
 			var nestedTypes = info.DeclaredNestedTypes.ToArray();
@@ -146,7 +146,7 @@ namespace DragonSpark.Activation
 		}
 
 		[Freeze]
-		protected override Type CreateItem( LocateTypeRequest parameter )
+		public override Type Create( LocateTypeRequest parameter )
 		{
 			var name = $"{parameter.RequestedType.Name}Factory";
 			var candidates = types.Where( type => parameter.Name == type.Name && type.ResultType.Adapt().IsAssignableFrom( parameter.RequestedType ) ).ToArray();

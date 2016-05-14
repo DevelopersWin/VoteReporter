@@ -1,15 +1,14 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
+using PostSharp.Patterns.Model;
+using PostSharp.Patterns.Threading;
 using Serilog.Events;
 using Serilog.Formatting.Display;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using PostSharp.Patterns.Model;
-using PostSharp.Patterns.Threading;
 
 namespace DragonSpark.Diagnostics
 {
@@ -66,7 +65,7 @@ namespace DragonSpark.Diagnostics
 			this.formatter = formatter;
 		}
 
-		protected override string CreateItem( LogEvent parameter )
+		public override string Create( LogEvent parameter )
 		{
 			var writer = new StringWriter();
 			formatter.Format( parameter, writer );
@@ -79,6 +78,6 @@ namespace DragonSpark.Diagnostics
 	{
 		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
 
-		protected override string[] CreateItem( IEnumerable<LogEvent> parameter ) => parameter.OrderBy( line => line.Timestamp ).Select( LogEventTextFactory.Instance.Create ).ToArray();
+		public override string[] Create( IEnumerable<LogEvent> parameter ) => parameter.OrderBy( line => line.Timestamp ).Select( LogEventTextFactory.Instance.Create ).ToArray();
 	}
 }

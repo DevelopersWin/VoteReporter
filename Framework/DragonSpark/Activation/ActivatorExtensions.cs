@@ -43,7 +43,7 @@ namespace DragonSpark.Activation
 				this.singleton = singleton;
 			}
 
-			protected override object CreateItem( LocateTypeRequest parameter )
+			public override object Create( LocateTypeRequest parameter )
 			{
 				var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;
 				var result = singleton.Locate( type );

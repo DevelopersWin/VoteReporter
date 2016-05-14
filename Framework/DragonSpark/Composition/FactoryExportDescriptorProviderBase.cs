@@ -90,7 +90,7 @@ namespace DragonSpark.Composition
 			public CompositionContract FactoryContract { get; }
 		}
 
-		protected override CompositeActivator CreateItem( Parameter parameter )
+		public override CompositeActivator Create( Parameter parameter )
 		{
 			var activators = registryFactory.Create( parameter );
 			var activator = new Activator( activatorFactory, activators, parameter.FactoryContract.ContractType );
@@ -123,7 +123,7 @@ namespace DragonSpark.Composition
 		{
 			public static ActivatorRegistryFactory Instance { get; } = new ActivatorRegistryFactory();
 
-			protected override ActivatorRegistry CreateItem( Parameter parameter )
+			public override ActivatorRegistry Create( Parameter parameter )
 			{
 				var result = new ActivatorRegistry( parameter.Accessor, parameter.FactoryContract );
 				new[] { parameter.FactoryContract.ContractType, Factory.GetParameterType( parameter.FactoryContract.ContractType ) }.NotNull().Each( result.Register );
@@ -136,7 +136,7 @@ namespace DragonSpark.Composition
 	{
 		public static ActivatorDelegateFactory Instance { get; } = new ActivatorDelegateFactory();
 
-		protected override Delegate CreateItem( Activator.Parameter parameter )
+		public override Delegate Create( Activator.Parameter parameter )
 		{
 			var factory = new FactoryDelegateLocatorFactory(
 								new FactoryDelegateFactory( parameter.Activate<IFactory> ),
@@ -151,7 +151,7 @@ namespace DragonSpark.Composition
 	{
 		public static ActivatorWithParameterDelegateFactory Instance { get; } = new ActivatorWithParameterDelegateFactory();
 
-		protected override Delegate CreateItem( Activator.Parameter parameter )
+		public override Delegate Create( Activator.Parameter parameter )
 		{
 			var @delegate = new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create( parameter.FactoryType );
 			var result = @delegate.Convert( Factory.GetParameterType( parameter.FactoryType ), Factory.GetResultType( parameter.FactoryType ) );
@@ -172,7 +172,7 @@ namespace DragonSpark.Composition
 			this.factory = factory;
 		}
 
-		protected override object CreateItem( Activator.Parameter parameter )
+		public override object Create( Activator.Parameter parameter )
 		{
 			var @delegate = factory.Create( parameter );
 			var result = @delegate.DynamicInvoke();

@@ -20,7 +20,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public Collection<CommandBase<LoggerConfiguration>> Commands { get; } = new Collection<CommandBase<LoggerConfiguration>>();
 
-		protected override LoggerConfiguration CreateItem( LoggerConfiguration configuration ) => Commands.Aggregate( configuration, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Run ) );
+		public override LoggerConfiguration Create( LoggerConfiguration configuration ) => Commands.Aggregate( configuration, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Run ) );
 	}
 
 	public class AddTextWriterCommand : AddSinkCommand

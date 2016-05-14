@@ -20,7 +20,7 @@ namespace DragonSpark.ComponentModel
 			this.factory = factory;
 		}
 
-		protected override object CreateItem( DefaultValueParameter parameter )
+		public override object Create( DefaultValueParameter parameter )
 		{
 			var result = factory( parameter.Metadata ).FirstWhere( p => p.GetValue( parameter ) ) ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
 			return result;

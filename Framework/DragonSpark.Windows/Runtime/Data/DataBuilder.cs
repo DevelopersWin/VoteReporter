@@ -1,8 +1,8 @@
+using DragonSpark.Activation;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Xml;
 using System.Xml.XPath;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Runtime.Data
 			this.load = load;
 		}
 
-		protected override IXPathNavigable CreateItem( TParameter parameter )
+		public override IXPathNavigable Create( TParameter parameter )
 		{
 			var result = new XmlDocument();
 			load( result, parameter );

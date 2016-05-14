@@ -34,7 +34,7 @@ namespace DragonSpark.TypeSystem
 	{
 		public static AssemblyHintProvider Instance { get; } = new AssemblyHintProvider();
 
-		protected override string CreateItem( Assembly parameter ) => parameter.GetName().Name;
+		public override string Create( Assembly parameter ) => parameter.GetName().Name;
 	}
 
 	public class AssemblyLoader : IAssemblyLoader
@@ -87,7 +87,7 @@ namespace DragonSpark.TypeSystem
 		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
 
 		[Freeze]
-		protected override Assembly[] CreateItem( Type[] parameter ) => parameter.Assemblies();
+		public override Assembly[] Create( Type[] parameter ) => parameter.Assemblies();
 	}
 
 	public static class AssemblyTypes
@@ -107,7 +107,7 @@ namespace DragonSpark.TypeSystem
 		}
 
 		[Freeze]
-		protected override Type[] CreateItem( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).Fixed();
+		public override Type[] Create( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).Fixed();
 	}
 
 	public class TypesFactory : FactoryBase<Assembly[], Type[]>
@@ -115,7 +115,7 @@ namespace DragonSpark.TypeSystem
 		public static TypesFactory Instance { get; } = new TypesFactory();
 
 		[Freeze]
-		protected override Type[] CreateItem( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.Create ).ToArray();
+		public override Type[] Create( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.Create ).ToArray();
 	}
 
 	public abstract class AssemblySourceBase : FactoryBase<Assembly[]>

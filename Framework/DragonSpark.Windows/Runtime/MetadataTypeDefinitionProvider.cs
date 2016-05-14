@@ -12,6 +12,6 @@ namespace DragonSpark.Windows.Runtime
 
 		MetadataTypeDefinitionProvider() {}
 
-		protected override TypeInfo CreateItem( TypeInfo parameter ) => parameter.GetCustomAttribute<MetadataTypeAttribute>().With( item => item.MetadataClassType.GetTypeInfo() );
+		public override TypeInfo Create( TypeInfo parameter ) => parameter.GetCustomAttribute<MetadataTypeAttribute>().With( item => item.MetadataClassType.GetTypeInfo() );
 	}
 }

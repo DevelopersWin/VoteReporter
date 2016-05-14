@@ -25,7 +25,7 @@ namespace DragonSpark.Activation
 			this.activatorSource = activatorSource;
 		}
 
-		protected override object CreateItem( ConstructTypeRequest parameter )
+		public override object Create( ConstructTypeRequest parameter )
 		{
 			var result = LocateAndCreate( parameter ) ?? DefaultValueFactory.Instance.Create( parameter.RequestedType );
 			return result;
@@ -62,12 +62,13 @@ namespace DragonSpark.Activation
 			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || source( parameter ) != null;
 		}
 
+		[Validation( false )]
 		public class Locator  : FactoryBase<ConstructTypeRequest, ConstructorInfo>
 		{
 			public static Locator Instance { get; } = new Locator();
 
 			[Freeze]
-			protected override ConstructorInfo CreateItem( ConstructTypeRequest parameter )
+			public override ConstructorInfo Create( ConstructTypeRequest parameter )
 			{
 				var candidates = new[] { parameter.Arguments, parameter.Arguments.NotNull(), Default<object>.Items };
 				var adapter = parameter.RequestedType.Adapt();
@@ -79,12 +80,13 @@ namespace DragonSpark.Activation
 			}
 		}
 
+		[Validation( false )]
 		class ObjectActivatorFactory : FactoryBase<ConstructorInfo, ObjectActivator>
 		{
 			public static ObjectActivatorFactory Instance { get; } = new ObjectActivatorFactory();
 
 			[Freeze]
-			protected override ObjectActivator CreateItem( ConstructorInfo parameter )
+			public override ObjectActivator Create( ConstructorInfo parameter )
 			{
 				var parameters = parameter.GetParameters();
 				var param = Expression.Parameter( typeof(object[]), "args" );

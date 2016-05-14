@@ -29,7 +29,7 @@ namespace DragonSpark.TypeSystem
 			this.specification = specification;
 		}
 
-		protected override Assembly[] CreateItem( Assembly[] parameter ) => parameter.Where( specification.IsSatisfiedBy ).Prioritize().ToArray();
+		public override Assembly[] Create( Assembly[] parameter ) => parameter.Where( specification.IsSatisfiedBy ).Prioritize().ToArray();
 	}
 
 	public class ApplicationTypeSpecification : GuardedSpecificationBase<Type>

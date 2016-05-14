@@ -19,7 +19,7 @@ namespace DragonSpark.TypeSystem
 		}
 
 		[Freeze]
-		protected override System.Type[] CreateItem( System.Type parameter ) =>
+		public override System.Type[] Create( System.Type parameter ) =>
 			types.AsTypeInfos()
 				 .Where( z => parameter.Adapt().IsAssignableFrom( z ) )
 				 .AsTypes()

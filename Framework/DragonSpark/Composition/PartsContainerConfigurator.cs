@@ -57,7 +57,7 @@ namespace DragonSpark.Composition
 
 	public class ContainerServicesConfigurator : ContainerConfigurator
 	{
-		protected override ContainerConfiguration CreateItem( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
+		public override ContainerConfiguration Create( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
 	}
 
 	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}
@@ -129,7 +129,7 @@ namespace DragonSpark.Composition
 			this.core = core;
 		}
 
-		protected override ContainerConfiguration CreateItem( ContainerConfiguration configuration )
+		public override ContainerConfiguration Create( ContainerConfiguration configuration )
 		{
 			var factoryTypes = FactoryTypeFactory.Instance.CreateMany( types );
 			var locator = new FactoryTypeRequestLocator( factoryTypes );

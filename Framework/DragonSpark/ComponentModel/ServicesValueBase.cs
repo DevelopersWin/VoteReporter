@@ -32,7 +32,7 @@ namespace DragonSpark.ComponentModel
 				this.locator = locator;
 			}
 
-			protected override object CreateItem( LocateTypeRequest parameter )
+			public override object Create( LocateTypeRequest parameter )
 			{
 				var serviceLocator = locator();
 				var instance = serviceLocator?.GetInstance( parameter.RequestedType, parameter.Name );
@@ -54,7 +54,7 @@ namespace DragonSpark.ComponentModel
 				this.name = name;
 			}
 
-			protected override LocateTypeRequest CreateItem( PropertyInfo parameter ) => new LocateTypeRequest( type( parameter ), name );
+			public override LocateTypeRequest Create( PropertyInfo parameter ) => new LocateTypeRequest( type( parameter ), name );
 		}
 	}
 
@@ -84,7 +84,7 @@ namespace DragonSpark.ComponentModel
 				this.type = type;
 			}
 
-			protected override Type CreateItem( PropertyInfo parameter ) => type( parameter );
+			public override Type Create( PropertyInfo parameter ) => type( parameter );
 		}
 	}
 

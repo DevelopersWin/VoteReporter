@@ -25,7 +25,7 @@ namespace DragonSpark.Diagnostics
 		}
 
 		[Freeze]
-		protected override ILogger CreateItem( MethodBase parameter ) => source().ForSource( parameter );
+		public override ILogger Create( MethodBase parameter ) => source().ForSource( parameter );
 	}
 
 	public delegate void EmitProfileEvent( string name );
@@ -52,7 +52,7 @@ namespace DragonSpark.Diagnostics
 			this.timer = timer;
 		}
 
-		protected override CreateProfilerEvent CreateItem( MethodBase parameter ) => s => new TimerEvent<T>( s, parameter, sessionTimer, timer );
+		public override CreateProfilerEvent Create( MethodBase parameter ) => s => new TimerEvent<T>( s, parameter, sessionTimer, timer );
 	}
 
 	public delegate TimerEvent CreateProfilerEvent( string eventName );

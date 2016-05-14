@@ -1,7 +1,7 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System.Linq;
-using DragonSpark.Activation;
 
 namespace DragonSpark.ComponentModel
 {
@@ -9,6 +9,6 @@ namespace DragonSpark.ComponentModel
 	{
 		public static HostedValueLocator<T> Instance { get; } = new HostedValueLocator<T>();
 
-		protected override T[] CreateItem( object parameter ) => parameter.GetAttributes<HostingAttribute>().Select( attribute => attribute.Create( parameter ) ).OfType<T>().ToArray();
+		public override T[] Create( object parameter ) => parameter.GetAttributes<HostingAttribute>().Select( attribute => attribute.Create( parameter ) ).OfType<T>().ToArray();
 	}
 }

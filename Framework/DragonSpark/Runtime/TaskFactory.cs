@@ -28,7 +28,7 @@ namespace DragonSpark.Runtime
 	{
 		public static TaskFactory Instance { get; } = new TaskFactory();
 
-		protected override Task CreateItem( Action parameter )
+		public override Task Create( Action parameter )
 		{
 			var current = Execution.Current;
 			var result = Task.Factory.StartNew( () =>

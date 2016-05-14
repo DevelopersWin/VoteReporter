@@ -97,7 +97,7 @@ namespace DragonSpark.Diagnostics
 			this.history = history;
 		}
 
-		protected override LoggerConfiguration CreateItem( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
+		public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
 	}
 
 	public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>

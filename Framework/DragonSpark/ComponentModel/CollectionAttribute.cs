@@ -1,6 +1,6 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using System;
-using DragonSpark.Activation;
 
 namespace DragonSpark.ComponentModel
 {
@@ -21,7 +21,7 @@ namespace DragonSpark.ComponentModel
 		{
 			public static Transformer Instance { get; } = new Transformer();
 
-			protected override Type CreateItem( Type parameter ) => typeof(Collection<>).MakeGenericType( parameter );
+			public override Type Create( Type parameter ) => typeof(Collection<>).MakeGenericType( parameter );
 		}
 	}
 }

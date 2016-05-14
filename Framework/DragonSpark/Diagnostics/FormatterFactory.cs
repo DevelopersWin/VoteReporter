@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 using System;
 using System.Composition;
-using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Diagnostics
 {
@@ -21,7 +21,7 @@ namespace DragonSpark.Diagnostics
 			this.factory = factory;
 		}
 
-		protected override object CreateItem( Parameter parameter ) => 
+		public override object Create( Parameter parameter ) => 
 			factory( parameter.Instance ).With( o => o.ToString( parameter.Format, parameter.Provider ), parameter.Instance.Self );
 
 		public class Parameter

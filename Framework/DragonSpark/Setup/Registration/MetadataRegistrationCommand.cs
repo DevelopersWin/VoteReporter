@@ -1,4 +1,3 @@
-using System;
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.ComponentModel;
@@ -6,6 +5,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup.Commands;
 using PostSharp.Patterns.Contracts;
+using System;
 using System.Linq;
 
 namespace DragonSpark.Setup.Registration
@@ -34,7 +34,7 @@ namespace DragonSpark.Setup.Registration
 	{
 		public static MetadataRegistrationTypeFactory Instance { get; } = new MetadataRegistrationTypeFactory();
 
-		protected override Type[] CreateItem( Type[] parameter ) => parameter
+		public override Type[] Create( Type[] parameter ) => parameter
 			.AsTypeInfos()
 			.WhereDecorated<RegistrationBaseAttribute>()
 			.Select( item => item.Item2 ).AsTypes().Fixed();

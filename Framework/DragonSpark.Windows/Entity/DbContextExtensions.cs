@@ -1,4 +1,6 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,13 +11,9 @@ using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using DragonSpark.Activation;
-using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Entity
@@ -166,7 +164,7 @@ namespace DragonSpark.Windows.Entity
 				this.adapter = adapter;
 			}
 
-			protected override string[] CreateItem( Type parameter )
+			public override string[] Create( Type parameter )
 			{
 				var names = GetAssociationPropertyNames( adapter, parameter );
 				var decorated = parameter.GetProperties().Where( x => x.Has<DefaultIncludeAttribute>() ).Select( x => x.Name );
@@ -286,7 +284,7 @@ namespace DragonSpark.Windows.Entity
 				this.context = context;
 			}
 
-			protected override IDictionary<string, object> CreateItem( object parameter )
+			public override IDictionary<string, object> Create( object parameter )
 			{
 				var names = context.ObjectContext.DetermineEntitySet( typeof(TEntity) ).With( x => x.ElementType.KeyMembers.Select( y => y.Name ).ToArray() );
 				return parameter.GetType().IsPrimitive ? new Dictionary<string, object> { { names.First(), parameter } } : DetermineKeyComplex( context, parameter, names );

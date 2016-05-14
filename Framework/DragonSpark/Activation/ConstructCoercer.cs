@@ -1,7 +1,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
-using System;
 using DragonSpark.TypeSystem;
+using System;
 
 namespace DragonSpark.Activation
 {
@@ -42,7 +42,7 @@ namespace DragonSpark.Activation
 			this.type = type;
 		}
 
-		protected override T CreateItem( object parameter )
+		public override T Create( object parameter )
 		{
 			var activate = activator.Create( new ConstructTypeRequest( type, parameter ) );
 			var result = activate.AsTo<IStore<T>, T>( store => store.Value, () => activate.AsTo<IFactory<T>, T>( factory => factory.Create(), activate.As<T> ) );

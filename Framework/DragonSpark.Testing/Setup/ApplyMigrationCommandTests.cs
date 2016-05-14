@@ -78,10 +78,10 @@ namespace DragonSpark.Testing.Setup
 
 		class Source : ServiceProviderMigrationCommandFactory
 		{
-			protected override ICommand<MigrationParameter<IServiceProvider>> CreateItem( IServiceProvider parameter )
+			public override ICommand<MigrationParameter<IServiceProvider>> Create( IServiceProvider parameter )
 			{
 				new Checked( parameter.Get<ILoggerHistory>(), this ).Value.Apply();
-				return base.CreateItem( parameter );
+				return base.Create( parameter );
 			}
 		}
 	}

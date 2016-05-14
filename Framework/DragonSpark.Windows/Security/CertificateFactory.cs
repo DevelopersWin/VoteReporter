@@ -1,8 +1,8 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Security
 {
@@ -19,7 +19,7 @@ namespace DragonSpark.Windows.Security
 			this.store = store;
 		}
 
-		protected override X509Certificate2 CreateItem( string parameter )
+		public override X509Certificate2 Create( string parameter )
 		{
 			try
 			{

@@ -16,14 +16,14 @@ namespace DragonSpark.ComponentModel
 		protected TypeDefinitionProvider( params ITypeDefinitionProvider[] others ) : base( others.Concat( new IFactory<TypeInfo, TypeInfo>[] { ConventionTypeDefinitionProvider.Instance, SelfTransformer<TypeInfo>.Instance } ).Fixed() ) {}
 
 		[Freeze]
-		protected override TypeInfo CreateItem( TypeInfo parameter ) => base.CreateItem( parameter );
+		public override TypeInfo Create( TypeInfo parameter ) => base.Create( parameter );
 	}
 
 	public class ConventionTypeDefinitionProvider : FactoryBase<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
 		public static ConventionTypeDefinitionProvider Instance { get; } = new ConventionTypeDefinitionProvider();
 
-		protected override TypeInfo CreateItem( TypeInfo parameter )
+		public override TypeInfo Create( TypeInfo parameter )
 		{
 			var context = new Context( parameter );
 			var result = context.Loop( 

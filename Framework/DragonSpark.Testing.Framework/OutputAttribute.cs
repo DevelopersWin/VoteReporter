@@ -77,7 +77,7 @@ namespace DragonSpark.Testing.Framework
 				this.history = history;
 			}
 
-			protected override IProfiler CreateItem( Parameter parameter )
+			public override IProfiler Create( Parameter parameter )
 			{
 				var output = parameter.Instance.AsTo<ITestOutputAware, Action<string>>( value => value.Output.WriteLine ) ?? IgnoredOutputCommand.Instance.Run;
 				var result = new Diagnostics.TraceAwareProfilerFactory( output, logger, history ).Create( parameter.Method );

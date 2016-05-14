@@ -19,6 +19,12 @@ namespace DragonSpark.TypeSystem
 		AttributeProviderLocator() : this( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
 
 		protected AttributeProviderLocator( params Type[] types ) : base( types ) {}
+
+		public override IAttributeProvider Create( object parameter )
+		{
+			var attributeProvider = base.Create( parameter );
+			return attributeProvider;
+		}
 	}
 
 	public class AttributeProviderConfiguration : ConfigurationBase<IAttributeProviderLocator>
@@ -57,7 +63,7 @@ namespace DragonSpark.TypeSystem
 			this.providerSource = providerSource;
 		}
 
-		protected override IAttributeProvider CreateItem( object parameter )
+		public override IAttributeProvider Create( object parameter )
 		{
 			var type = typeSource( parameter );
 			var transformed = transformer.Create( type );
@@ -79,21 +85,21 @@ namespace DragonSpark.TypeSystem
 		{
 			public static TypeInfoDefinitionProvider Instance { get; } = new TypeInfoDefinitionProvider();
 
-			protected override TypeInfo CreateItem( TypeInfo parameter ) => parameter;
+			public override TypeInfo Create( TypeInfo parameter ) => parameter;
 		}
 
 		class MemberInfoDefinitionProvider : TypeDefinitionProviderBase<MemberInfo>
 		{
 			public static MemberInfoDefinitionProvider Instance { get; } = new MemberInfoDefinitionProvider();
 
-			protected override TypeInfo CreateItem( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();
+			public override TypeInfo Create( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();
 		}
 
 		class GeneralDefinitionProvider : TypeDefinitionProviderBase<object>
 		{
 			public static GeneralDefinitionProvider Instance { get; } = new GeneralDefinitionProvider();
 
-			protected override TypeInfo CreateItem( object parameter ) => parameter.GetType().GetTypeInfo();
+			public override TypeInfo Create( object parameter ) => parameter.GetType().GetTypeInfo();
 		}
 
 		[Validation( false )]
@@ -168,7 +174,7 @@ namespace DragonSpark.TypeSystem
 				Definition = definition;
 			}
 
-			protected override MemberInfo CreateItem( T parameter ) => From( parameter ) ?? parameter as MemberInfo ?? Definition;
+			public override MemberInfo Create( T parameter ) => From( parameter ) ?? parameter as MemberInfo ?? Definition;
 
 			protected abstract MemberInfo From( T parameter );
 

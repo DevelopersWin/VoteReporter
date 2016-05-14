@@ -14,7 +14,7 @@ namespace DragonSpark.Activation.IoC
 			this.factoryType = factoryType;
 		}
 
-		protected override InjectionFactory CreateItem( InjectionMemberParameter parameter )
+		public override InjectionFactory Create( InjectionMemberParameter parameter )
 		{
 			var previous = parameter.Container.Registrations.FirstOrDefault( x => x.RegisteredType == parameter.TargetType && x.MappedToType != x.RegisteredType ).With( x => x.MappedToType );
 

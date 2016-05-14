@@ -37,7 +37,7 @@ namespace DragonSpark.Setup
 
 		protected ServiceProviderMigrationCommandFactory() {}
 
-		protected override ICommand<MigrationParameter<IServiceProvider>> CreateItem( IServiceProvider parameter ) => new MigrationCommand( parameter.Get<ILoggerHistory>() );
+		public override ICommand<MigrationParameter<IServiceProvider>> Create( IServiceProvider parameter ) => new MigrationCommand( parameter.Get<ILoggerHistory>() );
 	}
 
 	public interface IServiceProviderMigrationCommandSource : IFactory<IServiceProvider, ICommand<MigrationParameter<IServiceProvider>>> {}

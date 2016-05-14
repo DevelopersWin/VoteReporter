@@ -46,7 +46,7 @@ namespace DragonSpark.Windows.Modularity
 			this.factory = factory;
 		}
 
-		protected override ModuleInfo[] CreateItem( LoadRemoteModuleInfoParameter parameter )
+		public override ModuleInfo[] Create( LoadRemoteModuleInfoParameter parameter )
 		{
 			using ( var loader = factory.Create( parameter ) )
 			{
@@ -84,7 +84,7 @@ namespace DragonSpark.Windows.Modularity
 			this.factory = factory;
 		}
 
-		protected override IModuleInfoProvider CreateItem( LoadRemoteModuleInfoParameter parameter )
+		public override IModuleInfoProvider Create( LoadRemoteModuleInfoParameter parameter )
 		{
 			var loaded = parameter.Locations.ToArray();
 			var child = factory.Create( AppDomain.CurrentDomain );
@@ -104,7 +104,7 @@ namespace DragonSpark.Windows.Modularity
 			this.name = name;
 		}
 
-		protected override AppDomain CreateItem( AppDomain parameter )
+		public override AppDomain Create( AppDomain parameter )
 		{
 			var evidence = new Evidence(parameter.Evidence);
 			var setup = parameter.SetupInformation;

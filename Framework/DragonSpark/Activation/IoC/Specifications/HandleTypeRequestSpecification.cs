@@ -163,7 +163,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 		}
 
 		[Freeze]
-		protected override ConstructorInfo CreateItem( ConstructTypeRequest parameter ) => query.Create( parameter ).FirstOrDefault();
+		public override ConstructorInfo Create( ConstructTypeRequest parameter ) => query.Create( parameter ).FirstOrDefault();
 	}
 
 	/*public class HasValidConstructorSpecification : TypeRequestSpecification
@@ -210,11 +210,11 @@ namespace DragonSpark.Activation.IoC.Specifications
 		public ConstructorQueryProvider( CanLocateSpecification locate )
 		{
 			this.locate = locate;
-			create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( CreateItem );
+			create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( Create );
 		}
 
 		[Freeze]
-		protected override IEnumerable<ConstructorInfo> CreateItem( ConstructTypeRequest parameter )
+		public override IEnumerable<ConstructorInfo> Create( ConstructTypeRequest parameter )
 		{
 			var result = new ReflectionHelper( parameter.RequestedType )
 				.InstanceConstructors

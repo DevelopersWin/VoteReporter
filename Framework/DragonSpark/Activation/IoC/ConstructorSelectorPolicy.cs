@@ -28,7 +28,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static ResolverFactory Instance { get; } = new ResolverFactory();
 
-		protected override IDependencyResolverPolicy CreateItem( ParameterInfo parameter )
+		public override IDependencyResolverPolicy Create( ParameterInfo parameter )
 		{
 			var isOptional = parameter.IsOptional && !parameter.IsDefined( typeof(OptionalDependencyAttribute) );
 			var result = isOptional ? 

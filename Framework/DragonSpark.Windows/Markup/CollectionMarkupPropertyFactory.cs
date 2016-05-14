@@ -27,7 +27,7 @@ namespace DragonSpark.Windows.Markup
 			this.propertyFactory = propertyFactory;
 		}
 
-		protected override IMarkupProperty CreateItem( IServiceProvider parameter ) => 
+		public override IMarkupProperty Create( IServiceProvider parameter ) => 
 			propertyFactory( parameter ).With( reference => new CollectionMarkupProperty( (IList)parameter.Get<IProvideValueTarget>().TargetObject, reference ) );
 	}
 
@@ -52,7 +52,7 @@ namespace DragonSpark.Windows.Markup
 			this.evaluator = evaluator;
 		}
 
-		protected override PropertyReference CreateItem( IServiceProvider parameter ) => 
+		public override PropertyReference Create( IServiceProvider parameter ) => 
 			parameter.Get<IXamlNameResolver>().With( resolver => resolver.GetFixupToken( Default<string>.Items ).With( Create ) );
 
 		PropertyReference Create( object token )

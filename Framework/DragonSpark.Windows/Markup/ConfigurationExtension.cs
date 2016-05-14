@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
 using PostSharp.Patterns.Contracts;
@@ -5,7 +6,6 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -61,7 +61,7 @@ namespace DragonSpark.Windows.Markup
 	{
 		public static MemberInfoKeyFactory Instance { get; } = new MemberInfoKeyFactory();
 
-		protected override string CreateItem( PropertyReference parameter ) => $"{parameter.DeclaringType.FullName}::{parameter.PropertyName}";
+		public override string Create( PropertyReference parameter ) => $"{parameter.DeclaringType.FullName}::{parameter.PropertyName}";
 	}
 
 	[MarkupExtensionReturnType( typeof(string) )]

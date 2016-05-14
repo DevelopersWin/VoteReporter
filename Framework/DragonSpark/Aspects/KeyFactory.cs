@@ -37,7 +37,7 @@ namespace DragonSpark.Aspects
 	{
 		public static KeyFactory Instance { get; } = new KeyFactory();
 
-		protected override int CreateItem( IEnumerable<object> parameter )
+		public override int Create( IEnumerable<object> parameter )
 		{
 			var result = 0x2D2816FE;
 			foreach ( var o in parameter )

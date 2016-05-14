@@ -1,6 +1,5 @@
-using System;
-using System.Configuration;
 using DragonSpark.Activation;
+using System.Configuration;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -16,6 +15,6 @@ namespace DragonSpark.Windows.Setup
 			this.map = map;
 		}
 
-		protected override object CreateItem( string parameter ) => ConfigurationManager.OpenMappedMachineConfiguration( map ).GetSection( parameter );
+		public override object Create( string parameter ) => ConfigurationManager.OpenMappedMachineConfiguration( map ).GetSection( parameter );
 	}
 }

@@ -21,6 +21,6 @@ namespace DragonSpark.Setup
 
 		public T[] Create<T>() => Create( typeof(T) ).Cast<T>().ToArray();
 
-		protected override Array CreateItem( Type parameter ) => activator.ActivateMany<object>( parameter, types );
+		public override Array Create( Type parameter ) => activator.ActivateMany<object>( parameter, types );
 	}
 }

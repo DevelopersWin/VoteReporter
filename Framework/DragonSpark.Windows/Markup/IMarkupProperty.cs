@@ -35,7 +35,7 @@ namespace DragonSpark.Windows.Markup
 
 		// protected MarkupPropertyFactoryBase( ISpecification<IServiceProvider> specification ) : base( specification ) {}
 
-		protected sealed override IMarkupProperty CreateItem( IServiceProvider parameter ) => 
+		public sealed override IMarkupProperty Create( IServiceProvider parameter ) => 
 			parameter.Get<IProvideValueTarget>().With( target => Create( (TTarget)target.TargetObject, (TProperty)target.TargetProperty ) );
 
 		protected abstract IMarkupProperty Create( TTarget targetObject, TProperty targetProperty );

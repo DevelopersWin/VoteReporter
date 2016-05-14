@@ -20,7 +20,7 @@ namespace DragonSpark.TypeSystem
 			typeof(AssemblyCopyrightAttribute)
 		};
 
-		protected override AssemblyInformation CreateItem( Assembly parameter )
+		public override AssemblyInformation Create( Assembly parameter )
 		{
 			var result = new AssemblyInformation { Version = parameter.GetName().Version };
 			Attributes.Select( parameter.GetCustomAttribute ).Cast<object>().NotNull().Each( item => item.MapInto( result ) );

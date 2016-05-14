@@ -67,14 +67,14 @@ namespace DragonSpark.Diagnostics.Logger
 	{
 		public static LoggerTemplateParameterFactory Instance { get; } = new LoggerTemplateParameterFactory();
 
-		protected override object[] CreateItem( ILoggerTemplate parameter ) => new object[] { parameter.Template, Parameters( parameter ) };
+		public override object[] Create( ILoggerTemplate parameter ) => new object[] { parameter.Template, Parameters( parameter ) };
 	}
 
 	class LoggerExceptionTemplateParameterFactory : LoggerTemplateParameterFactoryBase<ILoggerExceptionTemplate>
 	{
 		public static LoggerExceptionTemplateParameterFactory Instance { get; } = new LoggerExceptionTemplateParameterFactory();
 
-		protected override object[] CreateItem( ILoggerExceptionTemplate parameter ) => new object[] { parameter.Exception, parameter.Template, Parameters( parameter ) };
+		public override object[] Create( ILoggerExceptionTemplate parameter ) => new object[] { parameter.Exception, parameter.Template, Parameters( parameter ) };
 	}
 
 	public class LogTemplateCommand : LogCommandBase<LogTemplate, ILoggerTemplate>

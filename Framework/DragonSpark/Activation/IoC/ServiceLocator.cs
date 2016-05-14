@@ -58,7 +58,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static DefaultUnityExtensions Instance { get; } = new DefaultUnityExtensions();
 
-		protected override IUnityContainer CreateItem( IUnityContainer parameter ) => 
+		public override IUnityContainer Create( IUnityContainer parameter ) => 
 			parameter
 				.Extend<InstanceTypeRegistrationMonitorExtension>()
 				.Extend<CachingBuildPlanExtension>()
@@ -77,7 +77,7 @@ namespace DragonSpark.Activation.IoC
 			this.provider = provider;
 		}
 
-		protected override IUnityContainer CreateItem( IUnityContainer parameter ) => 
+		public override IUnityContainer Create( IUnityContainer parameter ) => 
 			parameter
 				.RegisterInstance( provider() )
 				.Extend<ServicesIntegrationExtension>();

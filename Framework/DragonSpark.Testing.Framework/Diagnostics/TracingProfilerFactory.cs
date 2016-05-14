@@ -28,14 +28,14 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			this.disposables = disposables;
 		}
 
-		protected override IProfiler CreateItem( MethodBase parameter ) => base.CreateItem( parameter ).AssociateForDispose( disposables );
+		public override IProfiler Create( MethodBase parameter ) => base.Create( parameter ).AssociateForDispose( disposables );
 	}
 	
 	public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>
 	{
 		public static LoggingTraceListenerFactory Instance { get; } = new LoggingTraceListenerFactory();
 
-		protected override TraceListener CreateItem( ILogger parameter ) => new SerilogTraceListener.SerilogTraceListener( parameter );
+		public override TraceListener Create( ILogger parameter ) => new SerilogTraceListener.SerilogTraceListener( parameter );
 	}
 
 	public class LoggerTraceListenerTrackingCommand : DisposingCommand<ILogger>

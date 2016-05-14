@@ -17,7 +17,7 @@ namespace DragonSpark.Extensions
 			this.locator = locator;
 		}
 
-		protected override T CreateItem( ObjectMappingParameter<T> parameter )
+		public override T Create( ObjectMappingParameter<T> parameter )
 		{
 			var sourceType = parameter.Source.GetType();
 			var destinationType = parameter.Existing?.GetType() ?? ( typeof(T) == typeof(object) ? sourceType : typeof(T) );

@@ -1,7 +1,7 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using System.Composition;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Testing.Objects.Composition
 {
@@ -22,6 +22,6 @@ namespace DragonSpark.Testing.Objects.Composition
 	{
 		public ParameterServiceFactory() {}
 
-		protected override IParameterService CreateItem( Parameter parameter ) => new ParameterService( parameter );
+		public override IParameterService Create( Parameter parameter ) => new ParameterService( parameter );
 	}
 }

@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Runtime;
 using Microsoft.Azure.KeyVault;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -16,7 +17,6 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using DragonSpark.Activation;
 using X509Certificate = System.Security.Cryptography.X509Certificates.X509Certificate;
 
 namespace DragonSpark.Windows.Security
@@ -61,7 +61,7 @@ namespace DragonSpark.Windows.Security
 			this.location = location;
 		}
 
-		protected override string CreateItem( string parameter ) => client.GetSecretAsync( location.ToString(), parameter ).Result.Value;
+		public override string Create( string parameter ) => client.GetSecretAsync( location.ToString(), parameter ).Result.Value;
 	}
 
 	public class SaveCertificateCommand : CommandBase<SaveCertificateCommand.Parameter>
@@ -115,7 +115,7 @@ namespace DragonSpark.Windows.Security
 	{
 		public static RsaKeyPairFactory Instance { get; } = new RsaKeyPairFactory();
 
-		protected override AsymmetricCipherKeyPair CreateItem( int parameter )
+		public override AsymmetricCipherKeyPair Create( int parameter )
 		{
 			var generator = new RsaKeyPairGenerator();
 			var parameters = new KeyGenerationParameters( new SecureRandom( new CryptoApiRandomGenerator() ), parameter );
@@ -155,7 +155,7 @@ namespace DragonSpark.Windows.Security
 			public AsymmetricCipherKeyPair KeyPair { get; }
 		}
 
-		protected override Org.BouncyCastle.X509.X509Certificate CreateItem( Parameter parameter )
+		public override Org.BouncyCastle.X509.X509Certificate Create( Parameter parameter )
 		{
 			var generator = new X509V3CertificateGenerator();
  

@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -5,7 +6,6 @@ using System.IO;
 using System.Xaml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
@@ -33,7 +33,7 @@ namespace DragonSpark.Windows.Runtime.Data
 			this.transformer = transformer;
 		}
 
-		protected override T CreateItem( DataTransformParameter parameter )
+		public override T Create( DataTransformParameter parameter )
 		{
 			var stream = factory( parameter );
 			var result = transformer( stream );
@@ -67,7 +67,7 @@ namespace DragonSpark.Windows.Runtime.Data
 	{
 		public static DataStreamFactory Instance { get; } = new DataStreamFactory();
 
-		protected override MemoryStream CreateItem( DataTransformParameter parameter )
+		public override MemoryStream Create( DataTransformParameter parameter )
 		{
 			var transform = new XslCompiledTransform();
 			transform.Load( parameter.Stylesheet );

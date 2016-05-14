@@ -1,10 +1,10 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		public static OptionalParameterTransformer Instance { get; } = new OptionalParameterTransformer();
 
-		protected override ISpecimenBuilder CreateItem( Ploeh.AutoFixture.Kernel.ParameterRequestRelay parameter ) => new ParameterRequestRelay( parameter );
+		public override ISpecimenBuilder Create( Ploeh.AutoFixture.Kernel.ParameterRequestRelay parameter ) => new ParameterRequestRelay( parameter );
 	}
 
 	public class ParameterRequestRelay : ISpecimenBuilder

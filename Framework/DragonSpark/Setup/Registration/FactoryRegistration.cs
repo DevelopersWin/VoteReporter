@@ -52,7 +52,7 @@ namespace DragonSpark.Setup.Registration
 			this.createFactory = createFactory;
 		}
 
-		protected override Func<object> CreateItem( Type parameter ) => createFactory( parameter ).With( f => new Func<object>( f.Create ) );
+		public override Func<object> Create( Type parameter ) => createFactory( parameter ).With( f => new Func<object>( f.Create ) );
 	}
 
 	public class FactoryWithParameterDelegateFactory : FactoryBase<Type, Func<object, object>>
@@ -69,7 +69,7 @@ namespace DragonSpark.Setup.Registration
 			this.createFactory = createFactory;
 		}
 
-		protected override Func<object, object> CreateItem( Type parameter ) => createFactory( parameter ).With( f => new Func<object, object>( f.Create ) );
+		public override Func<object, object> Create( Type parameter ) => createFactory( parameter ).With( f => new Func<object, object>( f.Create ) );
 	}
 
 	public class FactoryWithActivatedParameterDelegateFactory : FactoryBase<Type, Func<object>>
@@ -88,7 +88,7 @@ namespace DragonSpark.Setup.Registration
 			this.createParameter = createParameter;
 		}
 
-		protected override Func<object> CreateItem( Type parameter ) => factory( parameter ).With( func => new Func<object>( () =>
+		public override Func<object> Create( Type parameter ) => factory( parameter ).With( func => new Func<object>( () =>
 		{
 			var createdParameter = createParameter( Factory.GetParameterType( parameter ) );
 			var result = func( createdParameter );
@@ -102,7 +102,7 @@ namespace DragonSpark.Setup.Registration
 
 		FuncFactory() {}
 
-		protected override Func<T, U> CreateItem( Func<object, object> parameter ) => t => (U)parameter( t );
+		public override Func<T, U> Create( Func<object, object> parameter ) => t => (U)parameter( t );
 	}
 
 	public class FuncFactory<T> : FactoryBase<Func<object>, Func<T>>
@@ -111,7 +111,7 @@ namespace DragonSpark.Setup.Registration
 
 		FuncFactory() {}
 
-		protected override Func<T> CreateItem( Func<object> parameter ) => () => (T)parameter();
+		public override Func<T> Create( Func<object> parameter ) => () => (T)parameter();
 	}
 
 	public class RegisterFactoryParameter

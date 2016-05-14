@@ -38,7 +38,7 @@ namespace DragonSpark.Windows.Runtime
 
 		public T CreateUsing( params object[] arguments ) => Create( arguments );
 
-		protected override T CreateItem( object[] parameter )
+		public override T Create( object[] parameter )
 		{
 			var assemblyPath = new Uri( typeof(T).Assembly.CodeBase).LocalPath;
 			var result = (T)domain.CreateInstanceFromAndUnwrap(assemblyPath, typeof(T).FullName, false

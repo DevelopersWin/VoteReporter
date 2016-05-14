@@ -63,7 +63,7 @@ namespace DragonSpark.Windows.Markup
 
 		public MockFactory() : base( Specification.Instance ) {}
 
-		protected override object CreateItem( Type parameter )
+		public override object Create( Type parameter )
 		{
 			var type = typeof(Mock<>).MakeGenericType( parameter );
 			var result = Services.Get<Mock>( type ).Object;
@@ -77,7 +77,7 @@ namespace DragonSpark.Windows.Markup
 
 		public StringDesignerValueFactory() : base( TypeAssignableSpecification<string>.Instance ) {}
 
-		protected override object CreateItem( Type parameter ) => parameter.AssemblyQualifiedName;
+		public override object Create( Type parameter ) => parameter.AssemblyQualifiedName;
 	}
 
 	public class DesignTimeValueProvider : FirstFromParameterFactory<Type, object>

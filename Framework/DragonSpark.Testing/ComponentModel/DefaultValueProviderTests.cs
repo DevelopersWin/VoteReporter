@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.ComponentModel
 				this.locator = locator;
 			}
 			
-			protected override object CreateItem( LocateTypeRequest parameter ) => locator.GetInstance( parameter.RequestedType, parameter.Name );
+			public override object Create( LocateTypeRequest parameter ) => locator.GetInstance( parameter.RequestedType, parameter.Name );
 		}
 
 		[Theory, AutoData]

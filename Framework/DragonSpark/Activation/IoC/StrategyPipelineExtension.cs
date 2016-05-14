@@ -205,7 +205,7 @@ namespace DragonSpark.Activation.IoC
 		}
 
 		[Freeze]
-		protected override Type CreateItem( Type parameter ) => Map( parameter ) ?? Search( parameter );
+		public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
 
 		Type Search( Type parameter )
 		{
@@ -240,7 +240,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static ConventionCandidateNameFactory Instance { get; } = new ConventionCandidateNameFactory();
 
-		protected override string CreateItem( Type parameter ) => parameter.Name.TrimStartOf( 'I' );
+		public override string Create( Type parameter ) => parameter.Name.TrimStartOf( 'I' );
 	}
 
 	public interface ITypeCandidateWeightProvider
@@ -257,7 +257,7 @@ namespace DragonSpark.Activation.IoC
 			this.subject = subject;
 		}
 
-		protected override int CreateItem( Type parameter ) => parameter.IsNested ? subject.GetTypeInfo().DeclaredNestedTypes.Contains( parameter.GetTypeInfo() ) ? 2 : -1 : 0;
+		public override int Create( Type parameter ) => parameter.IsNested ? subject.GetTypeInfo().DeclaredNestedTypes.Contains( parameter.GetTypeInfo() ) ? 2 : -1 : 0;
 
 		public int GetWeight( Type candidate ) => Create( candidate );
 	}
@@ -275,7 +275,7 @@ namespace DragonSpark.Activation.IoC
 
 		SelfStrategy() {}
 
-		protected override Type[] CreateItem( Type parameter ) => parameter.ToItem();
+		public override Type[] Create( Type parameter ) => parameter.ToItem();
 	}
 
 	public class SelfAndNestedStrategy : TypeSelectionStrategyBase
@@ -285,7 +285,7 @@ namespace DragonSpark.Activation.IoC
 		SelfAndNestedStrategy() {}
 
 		[Freeze]
-		protected override Type[] CreateItem( Type parameter ) => parameter.Adapt().WithNested();
+		public override Type[] Create( Type parameter ) => parameter.Adapt().WithNested();
 	}
 
 	/*public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
@@ -310,7 +310,7 @@ namespace DragonSpark.Activation.IoC
 		}
 
 		[Freeze]
-		protected override Type CreateItem( Type parameter )
+		public override Type Create( Type parameter )
 		{
 			var result =
 				parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore ).ToArray().With( interfaces => 
