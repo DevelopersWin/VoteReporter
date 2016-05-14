@@ -21,7 +21,7 @@ namespace DragonSpark.TypeSystem
 		protected override T CreateItem() => (T)source( typeof(T) );
 	}
 
-	// [Validation( false )]
+	[Validation( false )]
 	public class DefaultValueFactory : FactoryBase<Type, object>
 	{
 		public static DefaultValueFactory Instance { get; } = new DefaultValueFactory();
