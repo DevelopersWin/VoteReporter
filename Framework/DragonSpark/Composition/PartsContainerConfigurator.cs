@@ -132,7 +132,7 @@ namespace DragonSpark.Composition
 		public override ContainerConfiguration Create( ContainerConfiguration configuration )
 		{
 			var factoryTypes = FactoryTypeFactory.Instance.CreateMany( types );
-			var locator = new FactoryTypeRequestLocator( factoryTypes );
+			var locator = new FactoryTypeLocator( factoryTypes );
 			var conventionLocator = new BuildableTypeFromConventionLocator( types );
 			var activator = new Activation.Activator( conventionLocator );
 			var all = types.Union( core ).Fixed();

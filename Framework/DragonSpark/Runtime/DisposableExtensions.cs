@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Extensibility;
@@ -53,7 +52,7 @@ namespace DragonSpark.Runtime
 			readonly TypeAdapter adapter = typeof(IDisposable).Adapt();
 
 			public override bool IsSatisfiedBy( MethodBase parameter ) => 
-				parameter.Name == nameof(IDisposable.Dispose) && AspectSupport.Instance.IsEnabled<AssociatedDisposeAttribute>( parameter.DeclaringType ) && adapter.IsAssignableFrom( parameter.DeclaringType );
+				parameter.Name == nameof(IDisposable.Dispose) && AspectSupport.IsEnabled<AssociatedDisposeAttribute>( parameter.DeclaringType ) && adapter.IsAssignableFrom( parameter.DeclaringType );
 		}
 
 		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );
@@ -61,10 +60,8 @@ namespace DragonSpark.Runtime
 		public override void OnSuccess( MethodExecutionArgs args )
 		{
 			var type = args.Instance.GetType();
-			if ( AspectSupport.Instance.IsEnabled<AssociatedDisposeAttribute>( type ) )
+			if ( AspectSupport.IsEnabled<AssociatedDisposeAttribute>( type ) )
 			{
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"Associated Dispose: {type}", null, null, null ));
-
 				args.Instance.As<IDisposable>( DisposeAssociatedCommand.Instance.Run );
 			}
 		}

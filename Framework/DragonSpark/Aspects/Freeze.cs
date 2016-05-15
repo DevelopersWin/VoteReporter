@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	// [AutoValidation( false )]
+	[AutoValidation( false )]
 	public sealed class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
 		readonly IDictionary<int, object> items = new Dictionary<int, object>();
@@ -81,9 +81,9 @@ namespace DragonSpark.Aspects
 			this.factory = factory;
 		}
 
-		/*public override void OnInvoke( MethodInterceptionArgs args )
+		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( /*Configure.Load<EnableMethodCaching>().Value &&#1# ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
+			if ( /*Configure.Load<EnableMethodCaching>().Value &&*/ ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
 			{
 				args.ReturnValue = factory( args );
 			}
@@ -91,7 +91,7 @@ namespace DragonSpark.Aspects
 			{
 				base.OnInvoke( args );
 			}
-		}*/
+		}
 
 		/*object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new Freeze();
 

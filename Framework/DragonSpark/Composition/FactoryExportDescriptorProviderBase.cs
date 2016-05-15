@@ -16,13 +16,13 @@ namespace DragonSpark.Composition
 {
 	public abstract class FactoryExportDescriptorProviderBase : ExportDescriptorProvider
 	{
-		readonly FactoryTypeRequestLocator locator;
+		readonly FactoryTypeLocator locator;
 		readonly ITransformer<CompositionContract> resolver;
 		readonly ActivatorFactory factory;
 
-		protected FactoryExportDescriptorProviderBase( [Required]FactoryTypeRequestLocator locator, [Required]ActivatorFactory factory ) : this( locator, SelfTransformer<CompositionContract>.Instance, factory ) {}
+		protected FactoryExportDescriptorProviderBase( [Required]FactoryTypeLocator locator, [Required]ActivatorFactory factory ) : this( locator, SelfTransformer<CompositionContract>.Instance, factory ) {}
 
-		protected FactoryExportDescriptorProviderBase( [Required]FactoryTypeRequestLocator locator, [Required]ITransformer<CompositionContract> resolver, [Required]ActivatorFactory factory )
+		protected FactoryExportDescriptorProviderBase( [Required]FactoryTypeLocator locator, [Required]ITransformer<CompositionContract> resolver, [Required]ActivatorFactory factory )
 		{
 			this.locator = locator;
 			this.resolver = resolver;

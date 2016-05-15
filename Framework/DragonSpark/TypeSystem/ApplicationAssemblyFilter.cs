@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
@@ -39,7 +40,7 @@ namespace DragonSpark.TypeSystem
 		ApplicationTypeSpecification() {}
 
 		[Freeze]
-		public override bool IsSatisfiedBy( Type parameter ) => !parameter.GetTypeInfo().IsGenericType && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Adapt().IsDefined<CompilerGeneratedAttribute>();
+		public override bool IsSatisfiedBy( Type parameter ) => CanInstantiateSpecification.Instance.IsSatisfiedBy( parameter ) && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Adapt().IsDefined<CompilerGeneratedAttribute>();
 	}
 
 	public class ApplicationAssemblySpecification : GuardedSpecificationBase<Assembly>

@@ -19,11 +19,11 @@ namespace DragonSpark.TypeSystem
 
 		protected AttributeProviderLocator( params Type[] types ) : base( types ) {}
 
-		public override IAttributeProvider Create( object parameter )
+		/*public override IAttributeProvider Create( object parameter )
 		{
 			var attributeProvider = base.Create( parameter );
 			return attributeProvider;
-		}
+		}*/
 	}
 
 	public class AttributeProviderConfiguration : ConfigurationBase<IAttributeProviderLocator>

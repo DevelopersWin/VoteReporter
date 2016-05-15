@@ -1,5 +1,4 @@
 using DragonSpark.Aspects;
-using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -186,51 +185,24 @@ namespace DragonSpark.Activation
 	public sealed class MemberInfoFactoryTypeLocator : FactoryTypeLocatorBase<MemberInfo>
 	{
 		// [ImportingConstructor]
-		public MemberInfoFactoryTypeLocator( FactoryTypeRequestLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
+		public MemberInfoFactoryTypeLocator( FactoryTypeLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
 	}
 
 	// [Export]
 	public sealed class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
 	{
 		// [ImportingConstructor]
-		public ParameterInfoFactoryTypeLocator( FactoryTypeRequestLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
-	}
-
-	public abstract class FactoryTypeLocatorBase<T> : FactoryBase<T, Type>
-	{
-		readonly FactoryTypeRequestLocator locator;
-		readonly Func<T, Type> type;
-		readonly Func<T, Type> context;
-
-		protected FactoryTypeLocatorBase( [Required]FactoryTypeRequestLocator locator, [Required]Func<T, Type> type, [Required]Func<T, Type> context )
-		{
-			this.locator = locator;
-			this.type = type;
-			this.context = context;
-		}
-
-		[Freeze]
-		public override Type Create( T parameter )
-		{
-			var info = context( parameter ).GetTypeInfo();
-			var nestedTypes = info.DeclaredNestedTypes.ToArray();
-			var all = nestedTypes.Concat( info.Assembly.DefinedTypes.Except( nestedTypes ) );
-			var location = FactoryTypeFactory.Instance.CreateMany( all.AsTypes() );
-			var mapped = new LocateTypeRequest( type( parameter ) );
-			var locators = new[] { new FactoryTypeRequestLocator( location ), locator };
-			var result = locators.FirstWhere( typeLocator => typeLocator.Create( mapped ) );
-			return result;
-		}
+		public ParameterInfoFactoryTypeLocator( FactoryTypeLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
 	}
 
 	[Persistent]
-	public class FactoryTypeRequestLocator : FactoryBase<LocateTypeRequest, Type>
+	public class FactoryTypeLocator : FactoryBase<LocateTypeRequest, Type>
 	{
-		/*public static FactoryTypeRequestLocator Instance { get; } = new FactoryTypeRequestLocator( Default<FactoryTypeRequest>.Items );*/
+		/*public static FactoryTypeLocator Instance { get; } = new FactoryTypeLocator( Default<FactoryTypeRequest>.Items );*/
 
 		readonly FactoryTypeRequest[] types;
 
-		public FactoryTypeRequestLocator( [Required] FactoryTypeRequest[] types )
+		public FactoryTypeLocator( [Required] FactoryTypeRequest[] types )
 		{
 			this.types = types;
 		}

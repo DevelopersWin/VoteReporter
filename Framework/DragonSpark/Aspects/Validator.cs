@@ -73,15 +73,13 @@ namespace DragonSpark.Aspects
 		public static ParameterValidator Instance { get; } = new ParameterValidator();
 		ParameterValidator() {}
 
-		// readonly ConditionMonitor monitor = new ConditionMonitor();
-
 		public bool IsValid( IsValidParameter parameter )
 		{
 			var deferred = new Lazy<bool>( parameter.Result );
 			var monitor = new Checked( parameter.Instance, parameter.Arguments ).Value;
 			var result = monitor.IsApplied || deferred.Value;
 			monitor.Reset();
-			if ( deferred.IsValueCreated )
+			if ( deferred.IsValueCreated && deferred.Value )
 			{
 				monitor.Apply();
 			}
@@ -129,6 +127,7 @@ namespace DragonSpark.Aspects
 		{
 			var store = new Validated( parameter.Instance );
 			var validated = store.Value;
+			// var stop = !validated && /*parameter.Instance is FactoryTypeFactory &&*/ parameter.Arguments.FirstOrDefault().AsTo<Type, bool>( type => type.Name.Contains( "RegistrationSupportTests" ) );
 			var result = validated || Validate( parameter ) ? AsValidated( store, parameter.Result ) : null;
 			return result;
 		}
@@ -235,9 +234,11 @@ namespace DragonSpark.Aspects
 
 	public class AspectSupport
 	{
-		public static AspectSupport Instance { get; } = new AspectSupport();
+		// public static AspectSupport Instance { get; } = new AspectSupport();
 
-		public bool IsEnabled<T>( Type type, bool defaultValue = true ) where T : AspectAttributeBase => type.GetTypeInfo().GetCustomAttribute<T>( true ).With( attribute => attribute.Enabled, () => defaultValue );
+		[Freeze]
+		public static bool IsEnabled<T>( Type type, bool defaultValue = true ) where T : AspectAttributeBase 
+			=> type.GetTypeInfo().GetCustomAttribute<T>( true ).With( attribute => attribute.Enabled, () => defaultValue );
 	}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
@@ -253,16 +254,15 @@ namespace DragonSpark.Aspects
 		{
 			this.validatingMethodName = validatingMethodName;
 		}
-
-		public override bool CompileTimeValidate( MethodBase method ) => AspectSupport.Instance.IsEnabled<AutoValidationAttribute>( method.DeclaringType );
-
 		IParameterValidation Validator { get; set; }
+
+		public override bool CompileTimeValidate( MethodBase method ) => AspectSupport.IsEnabled<AutoValidationAttribute>( method.DeclaringType );
 
 		public override void RuntimeInitialize( MethodBase method ) => Validator = new ParameterValidation( method, validatingMethodName );
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var enabled = AspectSupport.Instance.IsEnabled<AutoValidationAttribute>( args.Instance.GetType() );
+			var enabled = AspectSupport.IsEnabled<AutoValidationAttribute>( args.Instance.GetType() );
 			if ( enabled )
 			{
 				var parameter = new ValidateParameter( args.Instance, args.Arguments.ToArray(), args.GetReturnValue );

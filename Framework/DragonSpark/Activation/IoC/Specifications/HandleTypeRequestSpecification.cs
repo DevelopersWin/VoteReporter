@@ -101,7 +101,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	public class HasFactorySpecification : CanCreateSpecification<LocateTypeRequest>
 	{
-		public HasFactorySpecification( [Required] FactoryTypeRequestLocator locator ) : base( locator.Create, TypeRequestCoercer<LocateTypeRequest>.Instance ) {}
+		public HasFactorySpecification( [Required] FactoryTypeLocator locator ) : base( locator.Create, TypeRequestCoercer<LocateTypeRequest>.Instance ) {}
 	}
 
 	public abstract class StrategyValidator<TStrategy> : GuardedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
