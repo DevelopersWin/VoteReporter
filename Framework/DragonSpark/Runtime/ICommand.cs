@@ -4,6 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
+using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
@@ -44,7 +45,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	[Validation( false )]
+	[AutoValidation( false )]
 	public class FixedCommand : DisposingCommand<object>
 	{
 		readonly Lazy<ICommand> command;
@@ -130,7 +131,7 @@ namespace DragonSpark.Runtime
 		public DelegatedCommand( Action action ) : base( o => action(), Specifications.Specifications.Always ) {}
 	}
 
-	[Validation( false )]
+	// [AutoValidation( false )]
 	public class DelegatedCommand<T> : CommandBase<T>
 	{
 		readonly Action<T> command;
@@ -196,18 +197,16 @@ namespace DragonSpark.Runtime
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
-		// [Validator]
+		[Validator]
 		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		// [Validate]
+		[AutoValidate]
 		void ICommand.Execute( object parameter ) => Execute( coercer.Coerce( parameter ) );
 
-		// [Validator]
+		[Validator]
 		public virtual bool CanExecute( T parameter ) => specification.IsSatisfiedBy( parameter );
 
-		// [Validate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		[AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract void Execute( T parameter );
-
-		// protected abstract void OnExecute( T parameter );
 	}
 }

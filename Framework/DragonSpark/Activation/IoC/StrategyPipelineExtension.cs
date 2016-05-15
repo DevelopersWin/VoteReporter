@@ -120,7 +120,7 @@ namespace DragonSpark.Activation.IoC
 				this.conventionStrategy = conventionStrategy;
 			}
 
-			protected override IEnumerable<StrategyEntry> CreateItem() => new[]
+			public override IEnumerable<StrategyEntry> Create() => new[]
 			{
 				new StrategyEntry( metadataLifetimeStrategy, UnityBuildStage.Lifetime, Priority.Higher ),
 				new StrategyEntry( conventionStrategy, UnityBuildStage.PreCreation )

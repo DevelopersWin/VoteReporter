@@ -85,7 +85,7 @@ namespace DragonSpark.Diagnostics
 			this.controller = controller;
 		}
 
-		protected override LoggerConfiguration CreateItem() => configuration.MinimumLevel.ControlledBy( controller );
+		public override LoggerConfiguration Create() => configuration.MinimumLevel.ControlledBy( controller );
 	}
 
 	public class LoggerHistoryConfigurationTransformer : TransformerBase<LoggerConfiguration>
@@ -113,7 +113,7 @@ namespace DragonSpark.Diagnostics
 			this.source = source;
 		}
 
-		protected override LoggingLevelSwitch CreateItem() => new LoggingLevelSwitch { MinimumLevel = source() };
+		public override LoggingLevelSwitch Create() => new LoggingLevelSwitch { MinimumLevel = source() };
 	}
 
 	public class RecordingLoggerFactory : LoggerFactory

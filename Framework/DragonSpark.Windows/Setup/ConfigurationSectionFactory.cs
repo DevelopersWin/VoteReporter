@@ -1,9 +1,9 @@
-using System;
-using System.Configuration;
-using System.Linq;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Configuration;
+using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -18,7 +18,7 @@ namespace DragonSpark.Windows.Setup
 			this.factory = factory;
 		}
 
-		protected override T CreateItem()
+		public override T Create()
 		{
 			var name = typeof(T).Name.SplitCamelCase().First().ToLower();
 			var result = factory( name ) as T;

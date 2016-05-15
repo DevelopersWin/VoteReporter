@@ -12,7 +12,7 @@ namespace DragonSpark.Aspects
 {
 	[PSerializable]
 	[ProvideAspectRole( StandardRoles.Tracing ), LinesOfCodeAvoided( 3 )]
-	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
 	public sealed class ProfileAttribute : OnMethodBoundaryAspect
 	{
 		public ProfileAttribute() {}

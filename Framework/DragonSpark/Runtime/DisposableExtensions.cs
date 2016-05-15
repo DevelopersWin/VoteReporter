@@ -1,5 +1,9 @@
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
+using DragonSpark.TypeSystem;
+using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Extensibility;
@@ -33,12 +37,36 @@ namespace DragonSpark.Runtime
 		public Associated( IDisposable source ) : base( source, typeof(Associated), () => new Collection<IDisposable>() ) {}
 	}
 
+	public class AssociatedDisposeAttribute : AspectAttributeBase
+	{
+		public AssociatedDisposeAttribute( bool enabled ) : base( enabled ) {}
+	}
+
 	[ProvideAspectRole( "Dispose Associated Disposables" ), LinesOfCodeAvoided( 1 )]
 	[PSerializable, MulticastAttributeUsage( MulticastTargets.Method, PersistMetaData = false ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public sealed class DisposeAssociatedAspect : OnMethodBoundaryAspect
 	{
-		public override bool CompileTimeValidate( MethodBase method ) => typeof(IDisposable).Adapt().IsAssignableFrom( method.DeclaringType ) && method.Name == nameof(IDisposable.Dispose);
+		public class Specification : SpecificationBase<MethodBase>
+		{
+			public static Specification Instance { get; } = new Specification();
 
-		public override void OnSuccess( MethodExecutionArgs args ) => args.Instance.As<IDisposable>( DisposeAssociatedCommand.Instance.Run );
+			readonly TypeAdapter adapter = typeof(IDisposable).Adapt();
+
+			public override bool IsSatisfiedBy( MethodBase parameter ) => 
+				parameter.Name == nameof(IDisposable.Dispose) && AspectSupport.Instance.IsEnabled<AssociatedDisposeAttribute>( parameter.DeclaringType ) && adapter.IsAssignableFrom( parameter.DeclaringType );
+		}
+
+		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );
+
+		public override void OnSuccess( MethodExecutionArgs args )
+		{
+			var type = args.Instance.GetType();
+			if ( AspectSupport.Instance.IsEnabled<AssociatedDisposeAttribute>( type ) )
+			{
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"Associated Dispose: {type}", null, null, null ));
+
+				args.Instance.As<IDisposable>( DisposeAssociatedCommand.Instance.Run );
+			}
+		}
 	}
 }

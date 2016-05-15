@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	[Validation( false )]
+	// [AutoValidation( false )]
 	public sealed class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
 		readonly IDictionary<int, object> items = new Dictionary<int, object>();

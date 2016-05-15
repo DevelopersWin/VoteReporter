@@ -16,7 +16,7 @@ namespace DragonSpark.Activation.IoC
 			this.factory = factory;
 		}
 
-		protected override IServiceProvider CreateItem()
+		public override IServiceProvider Create()
 		{
 			var container = new UnityContainerFactory( factory ).Create();
 			var primary = new ServiceLocator( container );

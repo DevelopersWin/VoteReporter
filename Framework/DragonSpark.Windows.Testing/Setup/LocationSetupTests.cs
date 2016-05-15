@@ -510,7 +510,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			this.source = source;
 		}
 
-		protected override IServiceLocator CreateItem()
+		public override IServiceLocator Create()
 		{
 			var provider = source();
 			var result = provider.Get<IServiceLocator>();

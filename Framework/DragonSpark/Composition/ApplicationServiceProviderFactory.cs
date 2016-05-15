@@ -27,10 +27,10 @@ namespace DragonSpark.Composition
 			public new static Specification Instance { get; } = new Specification();
 
 			[Freeze]
-			public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && Factory.IsFactory( parameter ) && Factory.GetResultType( parameter ) != typeof(object) && parameter.Adapt().IsDefined<ExportAttribute>();
+			public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.IsSatisfiedBy( parameter ) && ResultTypeLocator.Instance.Create( parameter ) != typeof(object) && parameter.Adapt().IsDefined<ExportAttribute>();
 		}
 
-		public override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Factory.GetResultType( parameter ) );
+		public override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultTypeLocator.Instance.Create( parameter ) );
 	}
 
 	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
@@ -52,7 +52,7 @@ namespace DragonSpark.Composition
 			this.source = source;
 		}
 
-		protected override IServiceProvider CreateItem()
+		public override IServiceProvider Create()
 		{
 			var context = source();
 			var primary = new ServiceLocator( context );

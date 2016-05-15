@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Setup.Commands
 {
-	[Validation( false )]
+	[AutoValidation( false )]
 	public abstract class DelegatedFixedCommand : CommandBase<object>
 	{
 		protected DelegatedFixedCommand() : base( Specifications.Always ) {}

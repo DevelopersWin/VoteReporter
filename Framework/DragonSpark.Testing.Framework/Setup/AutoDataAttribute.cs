@@ -128,7 +128,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 
 		[Profile]
-		protected override ICommand<AutoData> CreateItem()
+		public override ICommand<AutoData> Create()
 		{
 			var primary = new DragonSpark.Setup.ServiceProviderFactory( () => providerSource( autoData ) ).Create().Emit( "Created Provider" );
 			var provider = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), primary );

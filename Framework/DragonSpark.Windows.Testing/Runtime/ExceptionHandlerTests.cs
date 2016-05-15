@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Runtime;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
@@ -6,7 +7,6 @@ using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Composition;
 using System.Linq;
-using DragonSpark.Activation;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
@@ -48,7 +48,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		{
 			internal const string ExceptionReplaced = "Exception Replaced", ExceptionWrapped = "Exception Wrapped";
 
-			protected override ExceptionManager CreateItem()
+			public override ExceptionManager Create()
 			{
 				var policies = new[]
 				{

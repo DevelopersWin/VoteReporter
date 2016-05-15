@@ -26,7 +26,7 @@ namespace DragonSpark.Diagnostics
 			this.context = context;
 		}
 
-		protected override ILogger CreateItem()
+		public override ILogger Create()
 		{
 			var loggerConfiguration = configurationSource();
 			var logger = loggerConfiguration.CreateLogger();

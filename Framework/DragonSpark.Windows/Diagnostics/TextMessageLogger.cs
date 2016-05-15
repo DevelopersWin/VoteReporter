@@ -99,7 +99,7 @@ namespace DragonSpark.Windows.Diagnostics
 		[SuppressUnmanagedCodeSecurity]
 		static extern IntPtr GetCurrentThread();
 
-		protected override CpuTime CreateItem()
+		public override CpuTime Create()
 		{
 			ulong creationTime, exitTime, kernel, user;
 			GetThreadTimes( GetCurrentThread(), out creationTime, out exitTime, out kernel, out user );

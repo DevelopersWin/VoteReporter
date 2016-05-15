@@ -32,7 +32,7 @@ namespace DragonSpark.Windows.Security
 			this.certificate = certificate;
 		}
 
-		protected override KeyVaultClient CreateItem() => new KeyVaultClient( GetToken );
+		public override KeyVaultClient Create() => new KeyVaultClient( GetToken );
 
 		async Task<string> GetToken(string authority, string resource, string scope)
 		{

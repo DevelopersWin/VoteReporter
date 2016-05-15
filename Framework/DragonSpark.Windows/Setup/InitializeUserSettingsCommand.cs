@@ -25,7 +25,7 @@ namespace DragonSpark.Windows.Setup
 			this.level = level;
 		}
 
-		protected override string CreateItem() => ConfigurationManager.OpenExeConfiguration( level ).FilePath;
+		public override string Create() => ConfigurationManager.OpenExeConfiguration( level ).FilePath;
 	}
 
 	public class ClearUserSettingCommand : CommandBase<ApplicationSettingsBase>

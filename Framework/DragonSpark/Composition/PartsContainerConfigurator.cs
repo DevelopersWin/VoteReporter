@@ -24,7 +24,7 @@ namespace DragonSpark.Composition
 			this.configuration = configuration;
 		}
 
-		protected override CompositionHost CreateItem() => configuration().CreateContainer();
+		public override CompositionHost Create() => configuration().CreateContainer();
 	}
 
 	public class AssemblyBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
@@ -52,7 +52,7 @@ namespace DragonSpark.Composition
 	{
 		public static ContainerConfigurationFactory Instance { get; } = new ContainerConfigurationFactory();
 
-		protected override ContainerConfiguration CreateItem() => new ContainerConfiguration();
+		public override ContainerConfiguration Create() => new ContainerConfiguration();
 	}
 
 	public class ContainerServicesConfigurator : ContainerConfigurator
@@ -164,7 +164,7 @@ namespace DragonSpark.Composition
 		{
 			public static FrameworkConventionBuilder Instance { get; } = new FrameworkConventionBuilder();
 
-			protected override ConventionBuilder CreateItem() => new ConventionBuilder().WithSelf( Configure );
+			public override ConventionBuilder Create() => new ConventionBuilder().WithSelf( Configure );
 
 			protected virtual PartConventionBuilder Configure( ConventionBuilder builder ) => builder.ForTypesMatching( type => true ).Export().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) );
 		}

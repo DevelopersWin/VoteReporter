@@ -53,7 +53,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			public static ClassFactory Instance { get; } = new ClassFactory();
 
 			[Freeze]
-			protected override Class CreateItem() => new Class();
+			public override Class Create() => new Class();
 		}
 
 		class Target

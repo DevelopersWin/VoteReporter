@@ -62,7 +62,7 @@ namespace DragonSpark.Activation
 			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || source( parameter ) != null;
 		}
 
-		[Validation( false )]
+		//[AutoValidation( false )]
 		public class Locator  : FactoryBase<ConstructTypeRequest, ConstructorInfo>
 		{
 			public static Locator Instance { get; } = new Locator();
@@ -80,7 +80,7 @@ namespace DragonSpark.Activation
 			}
 		}
 
-		[Validation( false )]
+		// [AutoValidation( false )]
 		class ObjectActivatorFactory : FactoryBase<ConstructorInfo, ObjectActivator>
 		{
 			public static ObjectActivatorFactory Instance { get; } = new ObjectActivatorFactory();

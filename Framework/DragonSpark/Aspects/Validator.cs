@@ -53,14 +53,19 @@ namespace DragonSpark.Aspects
 	}*/
 
 	[AttributeUsage( AttributeTargets.Class )]
-	public class ValidationAttribute : Attribute
+	public abstract class AspectAttributeBase : Attribute
 	{
-		public ValidationAttribute( bool enabled )
+		protected AspectAttributeBase( bool enabled )
 		{
 			Enabled = enabled;
 		}
 
 		public bool Enabled { get; }
+	}
+
+	public class AutoValidationAttribute : AspectAttributeBase
+	{
+		public AutoValidationAttribute( bool enabled ) : base( enabled ) {}
 	}
 
 	public class ParameterValidator : IParameterValidator
@@ -73,7 +78,7 @@ namespace DragonSpark.Aspects
 		public bool IsValid( IsValidParameter parameter )
 		{
 			var deferred = new Lazy<bool>( parameter.Result );
-			var monitor = new Checked( parameter.Instance, parameter.Value ).Value;
+			var monitor = new Checked( parameter.Instance, parameter.Arguments ).Value;
 			var result = monitor.IsApplied || deferred.Value;
 			monitor.Reset();
 			if ( deferred.IsValueCreated )
@@ -86,27 +91,27 @@ namespace DragonSpark.Aspects
 
 	public class IsValidParameter : ValidateParameterBase<bool>
 	{
-		public IsValidParameter( object instance, object value, Func<bool> result ) : base( instance, value, result ) {}
+		public IsValidParameter( object instance, object[] arguments, Func<bool> result ) : base( instance, arguments, result ) {}
 	}
 
 	public abstract class ValidateParameterBase<T>
 	{
-		protected ValidateParameterBase( object instance, object value, Func<T> result )
+		protected ValidateParameterBase( object instance, object[] arguments, Func<T> result )
 		{
 			Instance = instance;
-			Value = value;
+			Arguments = arguments;
 			Result = result;
 		}
 
 		public object Instance { get; }
-		public object Value { get; }
+		public object[] Arguments { get; }
 
 		public Func<T> Result { get; }
 	}
 
 	public class ValidateParameter : ValidateParameterBase<object>
 	{
-		public ValidateParameter( object instance, object value, Func<object> result ) : base( instance, value, result ) {}
+		public ValidateParameter( object instance, object[] arguments, Func<object> result ) : base( instance, arguments, result ) {}
 	}
 
 	public class ParameterValidation : IParameterValidation
@@ -123,28 +128,36 @@ namespace DragonSpark.Aspects
 		public object GetValidatedValue( ValidateParameter parameter )
 		{
 			var store = new Validated( parameter.Instance );
-			var result = store.Value || Validate( parameter ) ? AsValidated( store, parameter.Result ) : null;
+			var validated = store.Value;
+			var result = validated || Validate( parameter ) ? AsValidated( store, parameter.Result ) : null;
 			return result;
 		}
 
 		bool Validate( ValidateParameter parameter )
 		{
 			var type = parameter.Instance.GetType();
-			var parameters = Factory.GetParameterType( type ).ToItem();
-			var mapped = type.GetRuntimeMethods().First( info => info.Name == reference.Name && info.GetParameters().Select( parameterInfo => parameterInfo.ParameterType ).SequenceEqual( parameters ) );
-			var validator = new ValidatingMethodFactory( name ).Create( mapped );
-			var result = (bool)validator.Invoke( parameter.Instance, new[] { parameter.Value } );
+			var mapped = new MethodLocator( reference ).Create( type );
+			var itemName = name ?? $"Can{mapped.Name.ToStringArray( '.' ).Last()}";
+			var validator = new MethodLocator( mapped, itemName ).Create( type );
+			var result = (bool)validator.Invoke( parameter.Instance, parameter.Arguments );
 			return result;
 		}
 
 		static object AsValidated( Validated store, Func<object> factory )
 		{
-			using ( new AssignValueCommand<bool>( store ).AsExecuted( true ) )
+			using ( new AssignValidation( store ).AsExecuted( true ) )
 			{
 				return factory();
 			}
 		}
 
+		[AutoValidation( false ), AssociatedDispose( false )]
+		class AssignValidation : AssignValueCommand<bool>
+		{
+			public AssignValidation( IWritableStore<bool> store ) : base( store ) {}
+		}
+
+		[AssociatedDispose( false )]
 		class Validated : ThreadAmbientStore<bool>
 		{
 			public Validated( object instance ) : base( instance.GetHashCode().ToString() ) {}
@@ -161,53 +174,50 @@ namespace DragonSpark.Aspects
 		object GetValidatedValue( ValidateParameter parameter );
 	}
 
-	[Validation( false )]
-	class ValidatingMethodFactory : FactoryBase<MethodBase, MethodBase>
+	[AutoValidation( false )]
+	class MethodLocator : FactoryBase<Type, MethodInfo>
 	{
+		readonly Type[] types;
+		readonly MethodBase reference;
 		readonly string name;
 
-		public ValidatingMethodFactory( string name = null )
+		public MethodLocator( MethodBase reference ) : this( reference, reference.Name ) {}
+
+		public MethodLocator( MethodBase reference, string name ) : this( reference, name, GetParameterTypes( reference ) ) {}
+
+		public MethodLocator( MethodBase reference, string name, Type[] types )
 		{
+			this.reference = reference;
 			this.name = name;
+			this.types = types;
 		}
 
-		public override MethodBase Create( MethodBase parameter )
+		public override MethodInfo Create( Type parameter )
 		{
-			var typeInfo = parameter.DeclaringType.GetTypeInfo();
-			var types = parameter.GetParameters().Select( info => info.ParameterType ).ToArray();
-			var target = DetermineName( parameter.Name );
-			var result = parameter.DeclaringType.GetRuntimeMethod( target, types ) ?? FromInterface( target, parameter, typeInfo, types );
+			var parameters = reference.ContainsGenericParameters ? ParameterTypeLocator.Instance.Create( parameter ).With( type => type.ToItem(), () => types ) : types;
+			var result = parameter.GetRuntimeMethods().FirstOrDefault( info => info.Name == name && GetParameterTypes( info ).SequenceEqual( parameters ) )
+						 ?? FromInterface( parameter, types );
 			return result;
 		}
 
-		string DetermineName( string parameter ) => name ?? $"Can{parameter.ToStringArray( '.' ).Last()}";
+		static Type[] GetParameterTypes( MethodBase @this ) => @this.GetParameters().Select( parameterInfo => parameterInfo.ParameterType ).ToArray();
 
-		static MethodInfo FromInterface( string methodName, MemberInfo parameter, TypeInfo typeInfo, Type[] types ) => 
-			parameter.DeclaringType.Adapt()
-						.GetAllInterfaces()
-						.Select( typeInfo.GetRuntimeInterfaceMap )
-						.SelectMany( mapping => mapping.TargetMethods.Select( info => new { info, mapping.InterfaceType } ) )
-						.Where( item => item.info.ReturnType == typeof(bool) && Contains( methodName, item.InterfaceType, item.info ) && types.SequenceEqual( item.info.GetParameters().Select( p => p.ParameterType ) ) )
-						.WithFirst( item => item.info );
+		MethodInfo FromInterface( Type parameter, Type[] parameterTypes ) => 
+			parameter.Adapt()
+					 .GetAllInterfaces()
+					 .Select( parameter.GetTypeInfo().GetRuntimeInterfaceMap )
+					 .SelectMany( mapping => mapping.TargetMethods.Select( info => new { info, mapping.InterfaceType } ) )
+					 .Where( item => /*item.info.ReturnType == reference &&*/ Contains( item.InterfaceType, item.info ) && GetParameterTypes( item.info ).SequenceEqual( parameterTypes ) )
+					 .WithFirst( item => item.info );
 
-		static bool Contains( string methodName, Type interfaceType, MemberInfo candidate ) => new[] { methodName, $"{interfaceType.FullName}.{methodName}" }.Contains( candidate.Name );
+		bool Contains( Type interfaceType, MemberInfo candidate ) => new[] { name, $"{interfaceType.FullName}.{name}" }.Contains( candidate.Name );
 	}
-
-	/*public class MethodLocator : FactoryBase<string, MethodInfo>
-	{
-		protected override MethodInfo CreateItem( string parameter )
-		{
-			return null;
-		}
-	}*/
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public sealed class ValidatorAttribute : MethodInterceptionAspect //, IInstanceScopedAspect
+	public sealed class ValidatorAttribute : MethodInterceptionAspect
 	{
-		// public static ValidatorAttribute Instance { get; } = new ValidatorAttribute();
-
 		readonly IParameterValidator validator;
 
 		public ValidatorAttribute() : this( ParameterValidator.Instance ) {}
@@ -218,47 +228,33 @@ namespace DragonSpark.Aspects
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var parameter = new IsValidParameter( args.Instance, args.Arguments.Single(), args.GetReturnValue<bool> );
+			var parameter = new IsValidParameter( args.Instance, args.Arguments.ToArray(), args.GetReturnValue<bool> );
 			args.ReturnValue = validator.IsValid( parameter );
-			//args.ApplyReturnValue( result );
-
-			/*if ( !PostSharpEnvironment.IsPostSharpRunning )
-			{
-				
-			}
-			else
-			{
-				base.OnInvoke( args );
-			}*/
 		}
+	}
 
-		/*object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => /*!PostSharpEnvironment.IsPostSharpRunning ?  : MemberwiseClone()#1#new ValidatorAttribute();
+	public class AspectSupport
+	{
+		public static AspectSupport Instance { get; } = new AspectSupport();
 
-		void IInstanceScopedAspect.RuntimeInitializeInstance() {}*/
+		public bool IsEnabled<T>( Type type, bool defaultValue = true ) where T : AspectAttributeBase => type.GetTypeInfo().GetCustomAttribute<T>( true ).With( attribute => attribute.Enabled, () => defaultValue );
 	}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public sealed class ValidateAttribute : MethodInterceptionAspect//, IInstanceScopedAspect
+	public sealed class AutoValidateAttribute : MethodInterceptionAspect
 	{
 		readonly string validatingMethodName;
 
-		public ValidateAttribute() {}
+		public AutoValidateAttribute() {}
 
-		public ValidateAttribute( [Optional]string validatingMethodName )
+		public AutoValidateAttribute( [Optional]string validatingMethodName )
 		{
 			this.validatingMethodName = validatingMethodName;
 		}
 
-		/*class Enabled : AssociatedStore<Type, bool>
-		{
-			public Enabled( Type source ) : base( source, typeof(Enabled), () => source.GetTypeInfo().GetCustomAttribute<ValidationAttribute>( true ).With( attribute => attribute.Enabled, () => true ) ) {}
-		}*/
-
-		bool IsEnabled( Type type ) => type.GetTypeInfo().GetCustomAttribute<ValidationAttribute>( true ).With( attribute => attribute.Enabled, () => true );
-
-		public override bool CompileTimeValidate( MethodBase method ) => IsEnabled( method.DeclaringType );
+		public override bool CompileTimeValidate( MethodBase method ) => AspectSupport.Instance.IsEnabled<AutoValidationAttribute>( method.DeclaringType );
 
 		IParameterValidation Validator { get; set; }
 
@@ -266,9 +262,10 @@ namespace DragonSpark.Aspects
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( IsEnabled( args.Instance.GetType() ) )
+			var enabled = AspectSupport.Instance.IsEnabled<AutoValidationAttribute>( args.Instance.GetType() );
+			if ( enabled )
 			{
-				var parameter = new ValidateParameter( args.Instance, args.Arguments.Single(), args.GetReturnValue );
+				var parameter = new ValidateParameter( args.Instance, args.Arguments.ToArray(), args.GetReturnValue );
 				var result = Validator.GetValidatedValue( parameter );
 				args.ApplyReturnValue( result );
 			}
@@ -277,26 +274,5 @@ namespace DragonSpark.Aspects
 				base.OnInvoke( args );
 			}
 		}
-
-		/*[OnMethodInvokeAdvice, MethodPointcut( nameof(GetValidationMethod) )]
-		public void OnInvokeValidator( MethodInterceptionArgs args )
-		{
-			var parameter = CreateParameter( args );
-			args.ReturnValue = Validator.Validate( parameter );
-		}
-
-		IEnumerable<MethodBase> GetValidationMethod( MethodInfo source )
-		{
-			// source.DeclaringType.GetTypeInfo().
-			yield return new ValidatingMethodFactory( validatingMethodName ).Create( source );
-		}*/
-
-		/*object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs )
-		{
-			var parameterValidation = !PostSharpEnvironment.IsPostSharpRunning ? new ParameterValidation( Method, validatingMethodName ) : Validator;
-			return new ValidateAttribute( parameterValidation );
-		}
-
-		void IInstanceScopedAspect.RuntimeInitializeInstance() {}*/
 	}
 }

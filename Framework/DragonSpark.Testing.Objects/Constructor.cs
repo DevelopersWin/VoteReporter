@@ -4,6 +4,6 @@ namespace DragonSpark.Testing.Objects
 {
 	public class Constructor : FactoryBase<ClassWithParameter>
 	{
-		protected override ClassWithParameter CreateItem() => new ClassWithParameter( this );
+		public override ClassWithParameter Create() => new ClassWithParameter( this );
 	}
 }

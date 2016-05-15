@@ -126,7 +126,7 @@ namespace DragonSpark.Composition
 			public override ActivatorRegistry Create( Parameter parameter )
 			{
 				var result = new ActivatorRegistry( parameter.Accessor, parameter.FactoryContract );
-				new[] { parameter.FactoryContract.ContractType, Factory.GetParameterType( parameter.FactoryContract.ContractType ) }.NotNull().Each( result.Register );
+				new[] { parameter.FactoryContract.ContractType, ParameterTypeLocator.Instance.Create( parameter.FactoryContract.ContractType ) }.NotNull().Each( result.Register );
 				return result;
 			}
 		}
@@ -142,7 +142,7 @@ namespace DragonSpark.Composition
 								new FactoryDelegateFactory( parameter.Activate<IFactory> ),
 								new FactoryWithActivatedParameterDelegateFactory( new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create, parameter.Activate<object> ) );
 
-			var result = factory.Create( parameter.FactoryType ).Convert( Factory.GetResultType( parameter.FactoryType ) );
+			var result = factory.Create( parameter.FactoryType ).Convert( ResultTypeLocator.Instance.Create( parameter.FactoryType ) );
 			return result;
 		}
 	}
@@ -154,7 +154,7 @@ namespace DragonSpark.Composition
 		public override Delegate Create( Activator.Parameter parameter )
 		{
 			var @delegate = new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create( parameter.FactoryType );
-			var result = @delegate.Convert( Factory.GetParameterType( parameter.FactoryType ), Factory.GetResultType( parameter.FactoryType ) );
+			var result = @delegate.Convert( ParameterTypeLocator.Instance.Create( parameter.FactoryType ), ResultTypeLocator.Instance.Create( parameter.FactoryType ) );
 			return result;
 		}
 	}

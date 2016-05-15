@@ -9,7 +9,7 @@ namespace DragonSpark.Windows.Runtime
 	{
 		public static FileSystemAssemblySource Instance { get; } = new FileSystemAssemblySource();
 
-		protected override Assembly[] CreateItem()
+		public override Assembly[] Create()
 		{
 			var fromAssembliesInBasePath = AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true );
 			var result = fromAssembliesInBasePath

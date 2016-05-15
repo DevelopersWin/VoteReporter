@@ -1,8 +1,7 @@
-using System.Composition;
+using DragonSpark.Activation;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation;
 
 namespace DragonSpark.TypeSystem
 {
@@ -26,6 +25,6 @@ namespace DragonSpark.TypeSystem
 			this.assemblies = assemblies;
 		}
 
-		protected override Assembly CreateItem() => assemblies.SingleOrDefault( assembly => assembly.GetCustomAttribute<ApplicationAttribute>() != null );
+		public override Assembly Create() => assemblies.SingleOrDefault( assembly => assembly.GetCustomAttribute<ApplicationAttribute>() != null );
 	}
 }

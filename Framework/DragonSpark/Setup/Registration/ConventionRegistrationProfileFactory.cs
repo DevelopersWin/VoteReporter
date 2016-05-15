@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
@@ -6,7 +7,6 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation;
 using Type = System.Type;
 
 namespace DragonSpark.Setup.Registration
@@ -22,7 +22,7 @@ namespace DragonSpark.Setup.Registration
 		}
 
 		[Freeze]
-		protected override Type[] CreateItem() => assemblies.SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToArray();
+		public override Type[] Create() => assemblies.SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToArray();
 	}
 
 	public class ConventionTypesFactory : FactoryBase<Type[]>
@@ -37,7 +37,7 @@ namespace DragonSpark.Setup.Registration
 		}
 
 		[Freeze]
-		protected override Type[] CreateItem()
+		public override Type[] Create()
 		{
 			var result = types
 						.Where( info => !info.IsAbstract && ( !info.IsNested || info.IsNestedPublic ) )
@@ -63,6 +63,6 @@ namespace DragonSpark.Setup.Registration
 		}
 
 		[Freeze]
-		protected override ConventionTypeContainer CreateItem() => new ConventionTypeContainer( types() );
+		public override ConventionTypeContainer Create() => new ConventionTypeContainer( types() );
 	}
 }

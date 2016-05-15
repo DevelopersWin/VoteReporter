@@ -1,11 +1,10 @@
+using DragonSpark.Activation;
 using DragonSpark.TypeSystem;
-using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
 using System.IO;
 using System.Reflection;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Runtime
 {
@@ -32,7 +31,7 @@ namespace DragonSpark.Windows.Runtime
 			this.primary = primary;
 		}
 
-		protected override Assembly CreateItem()
+		public override Assembly Create()
 		{
 			try
 			{

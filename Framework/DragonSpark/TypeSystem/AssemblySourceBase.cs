@@ -121,7 +121,7 @@ namespace DragonSpark.TypeSystem
 	public abstract class AssemblySourceBase : FactoryBase<Assembly[]>
 	{
 		[Freeze( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
-		protected abstract override Assembly[] CreateItem();
+		public abstract override Assembly[] Create();
 	}
 
 	public abstract class AssemblyProviderBase : AssemblySourceBase, IAssemblyProvider
@@ -137,7 +137,7 @@ namespace DragonSpark.TypeSystem
 			this.assemblies = assemblies;
 		}
 
-		protected override Assembly[] CreateItem() => assemblies.NotNull().Distinct().Prioritize().Fixed();
+		public override Assembly[] Create() => assemblies.NotNull().Distinct().Prioritize().Fixed();
 	}
 
 	public class AggregateAssemblyFactory : AggregateFactory<Assembly[]>, IAssemblyProvider

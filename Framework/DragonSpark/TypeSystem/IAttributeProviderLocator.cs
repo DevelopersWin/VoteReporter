@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
@@ -74,7 +73,7 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
-	[Validation( false )]
+	// [AutoValidation( false )]
 	public class TypeDefinitionLocator : FirstFromParameterFactory<object, TypeInfo>
 	{
 		public static TypeDefinitionLocator Instance { get; } = new TypeDefinitionLocator();
@@ -102,11 +101,11 @@ namespace DragonSpark.TypeSystem
 			public override TypeInfo Create( object parameter ) => parameter.GetType().GetTypeInfo();
 		}
 
-		[Validation( false )]
+		// [AutoValidation( false )]
 		abstract class TypeDefinitionProviderBase<T> : FactoryBase<T, TypeInfo> {}
 	}
 
-	[Validation( false )]
+	// [AutoValidation( false )]
 	public class MemberInfoDefinitionLocator : FirstConstructedFromParameterFactory<object, MemberInfo>
 	{
 		public static MemberInfoDefinitionLocator Instance { get; } = new MemberInfoDefinitionLocator();
@@ -166,7 +165,7 @@ namespace DragonSpark.TypeSystem
 			protected override MemberInfo From( object parameter ) => Definition;
 		}
 
-		[Validation( false )]
+		// [AutoValidation( false )]
 		public abstract class MemberInfoDefinitionLocatorBase<T> : FactoryBase<T, MemberInfo>
 		{
 			protected MemberInfoDefinitionLocatorBase( TypeInfo definition )

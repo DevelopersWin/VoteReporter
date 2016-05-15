@@ -87,7 +87,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static UnityContainerCoreFactory Instance { get; } = new UnityContainerCoreFactory();
 
-		protected override IUnityContainer CreateItem() => new UnityContainer().Extend<DefaultBehaviorExtension>();
+		public override IUnityContainer Create() => new UnityContainer().Extend<DefaultBehaviorExtension>();
 	}
 
 	public class DefaultBehaviorExtension : UnityContainerExtension

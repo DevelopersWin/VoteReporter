@@ -50,9 +50,9 @@ namespace DragonSpark.Activation
 			this.configure = configure;
 		}
 
-		protected override T CreateItem()
+		public override T Create()
 		{
-			var result = base.CreateItem();
+			var result = base.Create();
 			configure( result );
 			return result;
 		}
@@ -102,19 +102,17 @@ namespace DragonSpark.Activation
 			this.specification = specification;
 		}
 	
-		// [Validator]
+		[Validator]
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		// [Validate]
+		[AutoValidate]
 		object IFactoryWithParameter.Create( object parameter ) => coercer.Coerce( parameter ).With( Create );
 
 		[Validator]
 		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
-		[Validate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		[AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract TResult Create( [Required]TParameter parameter ); /*=> CreateItem( parameter )*//*.With( result => Creator.Tag( this, result ) )*/
-
-		// protected abstract TResult CreateItem( TParameter parameter );
 	}
 
 	public class CachedDelegatedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
@@ -154,14 +152,12 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<T> inner;
 
-		public DelegatedFactory( Func<T> provider ) : this( Specifications<T>.Always, provider ) {}
-
-		public DelegatedFactory( [Required]ISpecification<T> specification, [Required]Func<T> inner ) : base( specification )
+		public DelegatedFactory( Func<T> inner )
 		{
 			this.inner = inner;
 		}
 
-		protected override T CreateItem() => inner();
+		public override T Create() => inner();
 	}
 
 	public class FromKnownFactory<T> : FirstConstructedFromParameterFactory<object>
@@ -173,7 +169,7 @@ namespace DragonSpark.Activation
 		public T CreateUsing( object parameter ) => (T)Create( parameter );
 	}
 
-	[Validation( false )]
+	// [AutoValidation( false )]
 	public class FirstConstructedFromParameterFactory<TParameter, TResult> : FactoryBase<object, IFactory<TParameter, TResult>>
 	{
 		readonly IFactory<object, IFactoryWithParameter>[] factories;
@@ -208,7 +204,7 @@ namespace DragonSpark.Activation
 			this.create = create;
 		}
 
-		protected override TResult CreateItem() => create( item );
+		public override TResult Create() => create( item );
 	}
 
 	public class FirstConstructedFromParameterFactory<TResult> : FirstFromParameterFactory<object, TResult>
@@ -236,19 +232,19 @@ namespace DragonSpark.Activation
 		public override TResult Create( TParameter parameter ) => inner.FirstWhere( factory => factory( parameter ) );
 	}
 
-	[Validation( false )]
+	// [Validation( false )]
 	public class FirstFactory<T> : FactoryBase<T>
 	{
 		readonly IEnumerable<Func<T>> inner;
 
 		public FirstFactory( params IFactory<T>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) { }
 
-		public FirstFactory( [Required]params Func<T>[] inner ) : base( Specifications.Always )
+		public FirstFactory( [Required]params Func<T>[] inner )
 		{
 			this.inner = inner;
 		}
 
-		protected override T CreateItem() => inner.FirstWhere( factory => factory() );
+		public override T Create() => inner.FirstWhere( factory => factory() );
 	}
 
 	/*public class FixedFactory<T> : FactoryBase<T>
@@ -277,10 +273,10 @@ namespace DragonSpark.Activation
 			this.transformers = transformers;
 		}
 
-		protected override T CreateItem() => transformers.Aggregate( primary(), ( item, transformer ) => transformer( item ) );
+		public override T Create() => transformers.Aggregate( primary(), ( item, transformer ) => transformer( item ) );
 	}
 
-	public abstract class FactoryBase<TResult> : IFactory<TResult>
+	public abstract class FactoryBase<T> : IFactory<T>
 	{
 		readonly ISpecification specification;
 
@@ -291,13 +287,14 @@ namespace DragonSpark.Activation
 			this.specification = specification;
 		}
 
-		protected abstract TResult CreateItem();
+		// public bool CanCreate()
+		[Validator]
+		public bool CanCreate() => specification.IsSatisfiedBy( this );
 
-		public virtual TResult Create()
-		{
-			var isSatisfiedBy = specification.IsSatisfiedBy( this );
-			return isSatisfiedBy ? CreateItem().With( result => Creator.Tag( this, result ) ) : default(TResult);
-		}
+		[AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		public abstract T Create();
+
+		// public T Create()
 
 		object IFactory.Create() => Create();
 	}

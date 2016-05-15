@@ -154,7 +154,7 @@ namespace DragonSpark.Setup
 	{
 		public FactoryStore( IFactory factory ) : base( factory.Create )
 		{
-			RegisteredType = Factory.GetResultType( factory.GetType() );
+			RegisteredType = ResultTypeLocator.Instance.Create( factory.GetType() );
 		}
 
 		public Type RegisteredType { get; }
@@ -254,7 +254,7 @@ namespace DragonSpark.Setup
 		public static FrameworkTypes Instance { get; } = new FrameworkTypes();
 
 		[Freeze]
-		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) };
+		public override Type[] Create() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) };
 	}
 
 	public abstract class Application<T> : CompositeCommand<T>, IApplication<T>

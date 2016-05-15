@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 
 namespace DragonSpark.TypeSystem
 {
+	[AutoValidation( false )]
 	public class DefaultValueFactory<T> : FactoryBase<T>
 	{
 		readonly Func<Type, object> source;
@@ -18,10 +19,10 @@ namespace DragonSpark.TypeSystem
 			this.source = source;
 		}
 
-		protected override T CreateItem() => (T)source( typeof(T) );
+		public override T Create() => (T)source( typeof(T) );
 	}
 
-	[Validation( false )]
+	[AutoValidation( false )]
 	public class DefaultValueFactory : FactoryBase<Type, object>
 	{
 		public static DefaultValueFactory Instance { get; } = new DefaultValueFactory();

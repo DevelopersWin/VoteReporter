@@ -21,7 +21,7 @@ namespace DragonSpark.Windows.Runtime
 			this.domain = domain;
 		}
 		
-		protected override Assembly[] CreateItem()
+		public override Assembly[] Create()
 		{
 			var query = from assembly in domain.GetAssemblies()
 						where assembly.Not<AssemblyBuilder>()

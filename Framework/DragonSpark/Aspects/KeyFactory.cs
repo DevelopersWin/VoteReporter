@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace DragonSpark.Aspects
 {
-	[Validation( false )]
+	[AutoValidation( false )]
 	public abstract class KeyFactory<T> : FactoryBase<IEnumerable<object>, T>
 	{
 		public T CreateUsing( params object[] parameter ) => Create( parameter );

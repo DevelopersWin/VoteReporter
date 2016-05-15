@@ -30,7 +30,7 @@ namespace DragonSpark.Runtime
 		}
 
 		[Freeze]
-		protected override DataContractSerializer CreateItem() => typeof(T).With( type => new DataContractSerializer( type, knownTypes( type ) ) );
+		public override DataContractSerializer Create() => typeof(T).With( type => new DataContractSerializer( type, knownTypes( type ) ) );
 	}
 
 	/*public class Serializer<T> : ISerializer

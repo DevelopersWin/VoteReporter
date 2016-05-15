@@ -1,13 +1,13 @@
-using System.Composition;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
+using System.Composition;
 
 namespace DragonSpark.Testing.Objects.Composition
 {
 	[Export]
 	public class ExportedItemFactory : FactoryBase<ExportedItem>
 	{
-		protected override ExportedItem CreateItem() => new ExportedItem().WithSelf( item => new Checked( item ).Value.Apply() );
+		public override ExportedItem Create() => new ExportedItem().WithSelf( item => new Checked( item ).Value.Apply() );
 	}
 }

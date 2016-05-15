@@ -20,13 +20,13 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		public new static FixtureFactory<TWith> Instance { get; } = new FixtureFactory<TWith>();
 
-		protected override IFixture CreateItem() => base.CreateItem().Customize( new TWith() );
+		public override IFixture Create() => base.Create().Customize( new TWith() );
 	}
 
 	public class FixtureFactory : FactoryBase<IFixture>
 	{
 		public static FixtureFactory Instance { get; } = new FixtureFactory();
 
-		protected override IFixture CreateItem() => new Fixture( DefaultEngineParts.Instance );
+		public override IFixture Create() => new Fixture( DefaultEngineParts.Instance );
 	}
 }

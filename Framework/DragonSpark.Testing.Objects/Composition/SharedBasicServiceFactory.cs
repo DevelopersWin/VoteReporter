@@ -1,14 +1,14 @@
-﻿using System.Composition;
-using DragonSpark.Activation;
+﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
+using System.Composition;
 
 namespace DragonSpark.Testing.Objects.Composition
 {
 	[Export, Shared]
 	public class SharedServiceFactory : FactoryBase<ISharedService>
 	{
-		protected override ISharedService CreateItem() => new SharedService().WithSelf( service => new Checked( service ).Value.Apply() );
+		public override ISharedService Create() => new SharedService().WithSelf( service => new Checked( service ).Value.Apply() );
 	}
 
 	public interface ISharedService

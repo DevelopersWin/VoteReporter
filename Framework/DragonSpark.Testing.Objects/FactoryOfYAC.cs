@@ -1,7 +1,7 @@
+using DragonSpark.Activation;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Testing.Objects
 {
@@ -17,6 +17,6 @@ namespace DragonSpark.Testing.Objects
 			this.inner = inner;
 		}
 
-		protected override YetAnotherClass CreateItem() => inner();
+		public override YetAnotherClass Create() => inner();
 	}
 }

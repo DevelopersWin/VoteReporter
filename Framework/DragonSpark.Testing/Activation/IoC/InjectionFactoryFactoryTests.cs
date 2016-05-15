@@ -35,7 +35,7 @@ namespace DragonSpark.Testing.Activation.IoC
 
 		class Factory : FactoryBase<IItem>
 		{
-			protected override IItem CreateItem() => null;
+			public override IItem Create() => null;
 		}
 
 		interface IItem
