@@ -13,6 +13,26 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.Aspects
 {
+	public class ParameterValidationAttribute : InstanceLevelAspect
+	{
+		/*readonly Type interfaceType;
+		readonly string methodBaseName;
+
+		public ParameterValidationAttribute( Type interfaceType, string methodBaseName )
+		{
+			this.interfaceType = interfaceType;
+			this.methodBaseName = methodBaseName;
+		}*/
+
+		public override void RuntimeInitializeInstance()
+		{
+			base.RuntimeInitializeInstance();
+
+		}
+	}
+
+	
+
 	/*class Validator
 	{
 		readonly object instance;

@@ -21,6 +21,8 @@ namespace DragonSpark.Activation
 
 	public interface IFactory<in TParameter, out TResult> : IFactoryWithParameter
 	{
+		bool CanCreate( TParameter parameter );
+
 		TResult Create( TParameter parameter );
 	}
 
@@ -65,6 +67,14 @@ namespace DragonSpark.Activation
 		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => new Delegate<T>( @this ).Value;
 
 		public static Func<T, U> ToDelegate<T, U>( this IFactory<T, U> @this ) => new Delegate<T,U>( @this ).Value;
+
+		public static Func<T, T> ToFactory<T>( this Action<T> action ) => action.ToFactory<T, T>();
+
+		public static Func<T,U> ToFactory<T,U>( this Action<T> action ) => parameter =>
+																   {
+																	   action( parameter );
+																	   return Default<U>.Item;
+																   };
 
 		// public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters ) => CreateMany( @this, parameters, Where<TResult>.NotNull );
 

@@ -9,6 +9,8 @@ namespace DragonSpark.Activation
 
 		protected ActivatorBase( ICoercer<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification ) {}
 
+		bool IFactory<TypeRequest, object>.CanCreate( TypeRequest parameter ) => base.CanCreate( (TRequest)parameter );
+
 		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => this.CreateUsing<object>( parameter );
 
 		class Specification : IsInstanceOfSpecification<TRequest>

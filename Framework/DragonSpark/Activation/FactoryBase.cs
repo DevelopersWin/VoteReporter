@@ -86,6 +86,7 @@ namespace DragonSpark.Activation
 		public override TResult Create( TParameter parameter ) => inner.CreateUsing<TResult>( parameter );
 	}
 
+
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
 	{
 		readonly ICoercer<TParameter> coercer;
@@ -102,16 +103,16 @@ namespace DragonSpark.Activation
 			this.specification = specification;
 		}
 	
-		[Validator]
+		// [Validator]
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		[AutoValidate]
+		// [AutoValidate]
 		object IFactoryWithParameter.Create( object parameter ) => coercer.Coerce( parameter ).With( Create );
 
-		[Validator]
+		// [Validator]
 		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
-		[AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		// [AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract TResult Create( [Required]TParameter parameter ); /*=> CreateItem( parameter )*//*.With( result => Creator.Tag( this, result ) )*/
 	}
 
@@ -278,23 +279,7 @@ namespace DragonSpark.Activation
 
 	public abstract class FactoryBase<T> : IFactory<T>
 	{
-		readonly ISpecification specification;
-
-		protected FactoryBase() : this( Specifications.Always ) {}
-
-		protected FactoryBase( [Required]ISpecification specification )
-		{
-			this.specification = specification;
-		}
-
-		// public bool CanCreate()
-		[Validator]
-		public bool CanCreate() => specification.IsSatisfiedBy( this );
-
-		[AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract T Create();
-
-		// public T Create()
 
 		object IFactory.Create() => Create();
 	}
