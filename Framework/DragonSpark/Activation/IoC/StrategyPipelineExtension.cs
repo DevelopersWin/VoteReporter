@@ -366,7 +366,7 @@ namespace DragonSpark.Activation.IoC
 
 	class KeyReference : Reference<NamedTypeBuildKey>
 	{
-		public KeyReference( object source, NamedTypeBuildKey key ) : base( source, key ) { }
+		public KeyReference( object instance, NamedTypeBuildKey key ) : base( instance, key ) { }
 	}
 
 	public class ConventionStrategy : BuilderStrategy

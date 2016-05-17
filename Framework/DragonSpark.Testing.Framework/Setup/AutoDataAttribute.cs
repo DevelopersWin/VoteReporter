@@ -111,7 +111,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class AssociatedContext : AssociatedStore<MethodBase, IDisposable>
 	{
-		public AssociatedContext( MethodBase source ) : base( source, typeof(AssociatedContext) ) {}
+		public AssociatedContext( MethodBase instance ) : base( instance, typeof(AssociatedContext) ) {}
 	}
 
 	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>

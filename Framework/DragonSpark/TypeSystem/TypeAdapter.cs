@@ -10,7 +10,7 @@ namespace DragonSpark.TypeSystem
 {
 	public class TypeAdapter
 	{
-		public TypeAdapter( [Required]System.Type type ) : this( type.GetTypeInfo() )
+		public TypeAdapter( [Required]Type type ) : this( type.GetTypeInfo() )
 		{
 			Type = type;
 		}
@@ -20,7 +20,7 @@ namespace DragonSpark.TypeSystem
 			Info = info;
 		}
 
-		public System.Type Type { get; }
+		public Type Type { get; }
 
 		public TypeInfo Info { get; }
 
@@ -50,14 +50,14 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
 
-		[Freeze]
-		public object GetDefaultValue() => null; // Info.IsValueType && Nullable.GetUnderlyingType( Type ) == null ? CreateUsing() : null;
+		/*[Freeze]
+		public object GetDefaultValue() => null; // Info.IsValueType && Nullable.GetUnderlyingType( Type ) == null ? CreateUsing() : null;*/
 
 		public ConstructorInfo FindConstructor( params object[] parameters ) => FindConstructor( parameters.Select( o => o?.GetType() ).ToArray() );
 
 		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => Info.DeclaredConstructors.SingleOrDefault( c => c.IsPublic && !c.IsStatic && Match( c.GetParameters(), parameterTypes ) );
 
-		static bool Match( IReadOnlyCollection<ParameterInfo> parameters, IReadOnlyCollection<System.Type> provided )
+		static bool Match( IReadOnlyCollection<ParameterInfo> parameters, IReadOnlyCollection<Type> provided )
 		{
 			var result = 
 				provided.Count >= parameters.Count( info => !info.IsOptional ) && 
@@ -76,13 +76,13 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsInstanceOfType( object context ) => context.With( o => IsAssignableFrom( o.GetType() ) );
 
-		// MethodInfo GetCaster( System.Type other ) => null; // Info.DeclaredMethods.SingleOrDefault( method => method.Name == "op_Implicit" && method.GetParameters().First().ParameterType.GetTypeInfo().IsAssignableFrom( other.GetTypeInfo() ) );
+		// MethodInfo GetCaster( Type other ) => null; // Info.DeclaredMethods.SingleOrDefault( method => method.Name == "op_Implicit" && method.GetParameters().First().ParameterType.GetTypeInfo().IsAssignableFrom( other.GetTypeInfo() ) );
 
 		public Assembly Assembly => Info.Assembly;
 
-		public System.Type[] GetHierarchy( bool includeRoot = true )
+		public Type[] GetHierarchy( bool includeRoot = true )
 		{
-			var result = new List<System.Type> { Type };
+			var result = new List<Type> { Type };
 			var current = Info.BaseType;
 			while ( current != null )
 			{
@@ -95,13 +95,13 @@ namespace DragonSpark.TypeSystem
 			return result.ToArray();
 		}
 
-		public System.Type GetEnumerableType() => InnerType( Type, types => types.FirstOrDefault(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
+		public Type GetEnumerableType() => InnerType( Type, types => types.FirstOrDefault(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
 
 		// public Type GetResultType() => type.Append( ExpandInterfaces( type ) ).FirstWhere( t => InnerType( t, types => types.LastOrDefault() ) );
 
-		public System.Type GetInnerType() => InnerType( Type, types => types.Only() );
+		public Type GetInnerType() => InnerType( Type, types => types.Only() );
 
-		static System.Type InnerType( System.Type target, Func<System.Type[], System.Type> fromGenerics, Func<TypeInfo, bool> check = null )
+		static Type InnerType( Type target, Func<Type[], Type> fromGenerics, Func<TypeInfo, bool> check = null )
 		{
 			var info = target.GetTypeInfo();
 			var result = info.IsGenericType && info.GenericTypeArguments.Any() && check.With( func => func( info ), () => true ) ? fromGenerics( info.GenericTypeArguments ) :
@@ -111,14 +111,37 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsGenericOf<T>( bool includeInterfaces = true ) => IsGenericOf( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
 
+		public Type[] GetImplementations<T>( bool includeInterfaces = true ) => GetImplementations( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
+
 		[Freeze]
-		public bool IsGenericOf( System.Type genericDefinition, bool includeInterfaces = true ) =>
-			Type.Append( includeInterfaces ? ExpandInterfaces( Type ) : Default<System.Type>.Items ).AsTypeInfos().Any( typeInfo => typeInfo.IsGenericType && genericDefinition.GetTypeInfo().IsGenericType && typeInfo.GetGenericTypeDefinition() == genericDefinition.GetGenericTypeDefinition() );
+		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true ) =>
+			Type.Append( includeInterfaces ? ExpandInterfaces( Type ) : Default<Type>.Items )
+				.AsTypeInfos()
+				.Where( typeInfo => typeInfo.IsGenericType && genericDefinition.GetTypeInfo().IsGenericType && typeInfo.GetGenericTypeDefinition() == genericDefinition.GetGenericTypeDefinition() )
+				.AsTypes()
+				.Fixed();
 
-		public System.Type[] GetAllInterfaces() => ExpandInterfaces( Type ).ToArray();
+		public Type DetermineImplementation( Type type ) => CheckGeneric( type ) ?? ( type.Adapt().IsAssignableFrom( Type ) ? type : null );
 
-		static IEnumerable<System.Type> ExpandInterfaces( System.Type target ) => target.Append( target.GetTypeInfo().ImplementedInterfaces.SelectMany( ExpandInterfaces ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();
+		Type CheckGeneric( Type type )
+		{
+			if ( type.GetTypeInfo().IsGenericTypeDefinition )
+			{
+				var implementations = GetImplementations( type );
+				if ( implementations.Any() )
+				{
+					return implementations.First();
+				}
+			}
+			return null;
+		}
 
-		public System.Type[] GetEntireHierarchy() => ExpandInterfaces( Type ).Union( GetHierarchy( false ) ).Distinct().ToArray();
+		public bool IsGenericOf( Type genericDefinition, bool includeInterfaces = true ) => GetImplementations( genericDefinition, includeInterfaces ).Any();
+
+		public Type[] GetAllInterfaces() => ExpandInterfaces( Type ).ToArray();
+
+		static IEnumerable<Type> ExpandInterfaces( Type target ) => target.Append( target.GetTypeInfo().ImplementedInterfaces.SelectMany( ExpandInterfaces ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();
+
+		public Type[] GetEntireHierarchy() => ExpandInterfaces( Type ).Union( GetHierarchy( false ) ).Distinct().ToArray();
 	}
 }

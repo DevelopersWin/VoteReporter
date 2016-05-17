@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
-using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -131,7 +130,7 @@ namespace DragonSpark.Activation
 
 		class Cache : AssociatedStore<TResult>
 		{
-			public Cache( object source, int key, Func<TResult> create = null ) : base( source, key.ToString(), create ) {}
+			public Cache( object instance, int key, Func<TResult> create = null ) : base( instance, key.ToString(), create ) {}
 		}
 	}
 
@@ -288,6 +287,6 @@ namespace DragonSpark.Activation
 	{
 		public static void Tag( [Required]ICreator @this, [Required]object item ) => new Creator( item ).Assign( @this );
 
-		public Creator( object source ) : base( source, typeof(Creator) ) {}
+		public Creator( object instance ) : base( instance, typeof(Creator) ) {}
 	}
 }

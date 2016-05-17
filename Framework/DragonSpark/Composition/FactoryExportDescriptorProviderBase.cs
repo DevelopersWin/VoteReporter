@@ -59,7 +59,7 @@ namespace DragonSpark.Composition
 
 		class SharedStore : AssociatedStore<LifetimeContext, object>
 		{
-			public SharedStore( LifetimeContext source, CompositionContract key, Func<object> create = null ) : base( source, key.ToString(), create ) {}
+			public SharedStore( LifetimeContext instance, CompositionContract key, Func<object> create = null ) : base( instance, key.ToString(), create ) {}
 		}
 	}
 

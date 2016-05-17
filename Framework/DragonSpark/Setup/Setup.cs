@@ -117,12 +117,12 @@ namespace DragonSpark.Setup
 
 		public class Instance : AssociatedStore<bool>
 		{
-			public Instance( object source ) : base( source ) {}
+			public Instance( object instance ) : base( instance ) {}
 		}
 
 		public class Factory : AssociatedStore<Type>
 		{
-			public Factory( object source ) : base( source ) {}
+			public Factory( object instance ) : base( instance ) {}
 		}
 	}
 

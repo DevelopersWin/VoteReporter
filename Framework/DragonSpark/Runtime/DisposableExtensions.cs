@@ -33,7 +33,7 @@ namespace DragonSpark.Runtime
 
 	class Associated : AssociatedStore<IDisposable, ICollection<IDisposable>>
 	{
-		public Associated( IDisposable source ) : base( source, typeof(Associated), () => new Collection<IDisposable>() ) {}
+		public Associated( IDisposable instance ) : base( instance, typeof(Associated), () => new Collection<IDisposable>() ) {}
 	}
 
 	public class AssociatedDisposeAttribute : AspectAttributeBase

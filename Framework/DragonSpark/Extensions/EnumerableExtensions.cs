@@ -43,7 +43,7 @@ namespace DragonSpark.Extensions
 
 		class Array<T> : ConnectedStore<T[]>
 		{
-			public Array( T source ) : base( source, typeof(Array<T>), () => new[] { source } ) {}
+			public Array( T instance ) : base( instance, typeof(Array<T>), () => new[] { instance } ) {}
 		}
 
 		public static TItem[] ToItem<TItem>( this TItem target ) => new Array<TItem>( target ).Value;
