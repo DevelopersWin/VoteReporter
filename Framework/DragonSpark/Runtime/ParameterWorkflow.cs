@@ -1,8 +1,12 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Windows.Input;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Runtime
 {
@@ -98,22 +102,36 @@ namespace DragonSpark.Runtime
 
 	public class ParameterWorkflowState : IParameterWorkflowState
 	{
-		readonly object instance;
-
-		public ParameterWorkflowState( object instance )
+		class Container
 		{
-			this.instance = instance;
+			readonly ThreadLocal<ISet<object>> store = new ThreadLocal<ISet<object>>( () => new HashSet<object>() );
+
+			public void SetEnabled( object parameter, bool on )
+			{
+				if ( on )
+				{
+					store.Value.Ensure( parameter );
+				}
+				else
+				{
+					store.Value.Remove( parameter );
+				}
+			}
+
+			public bool IsEnabled( object parameter ) => store.Value.Contains( parameter );
 		}
 
-		public void Activate( object parameter, bool on ) => new Active( Key<Active>( parameter ) ).Assign( on );
+		readonly Container active = new Container(), valid = new Container();
 
-		public bool IsActive( object parameter ) => new Active( Key<Active>( parameter ) ).Value;
+		public void Activate( object parameter, bool on ) => active.SetEnabled( parameter, @on );
 
-		public void Validate( object parameter, bool on ) => new Valid( Key<Valid>( parameter ) ).Assign( on );
+		public bool IsActive( object parameter ) => active.IsEnabled( parameter );
 
-		public bool IsValidated( object parameter ) => new Valid( Key<Valid>( parameter ) ).Value;
+		public void Validate( object parameter, bool on ) => valid.SetEnabled( parameter, @on );
 
-		string Key<T>( object parameter ) => KeyFactory.Instance.ToString( typeof(T), instance, parameter );
+		public bool IsValidated( object parameter ) => valid.IsEnabled( parameter );
+
+		/*string Key<T>( object parameter ) => KeyFactory.Instance.ToString( typeof(T), instance, parameter );
 
 		class Valid : ThreadAmbientStore<bool>
 		{
@@ -123,35 +141,8 @@ namespace DragonSpark.Runtime
 		class Active : ThreadAmbientStore<bool>
 		{
 			public Active( string key ) : base( key ) {}
-		}
+		}*/
 	}
-
-	/*public class CommandWorkflow<T> : ParameterWorkflow<T, object>
-	{
-		public CommandWorkflow( ICommand<T> command ) : base( command.CanExecute, new Action<T>( command.Execute ) ) {}
-	}
-
-	public class CommandWorkflow : ParameterWorkflow<object, object>
-	{
-		public CommandWorkflow( ICommand command ) : base( command.CanExecute, new Action<object>( command.Execute ) ) {}
-	}
-
-	public class FactoryWorkflow<TParameter, TResult> : ParameterWorkflow<TParameter, TResult>
-	{
-		public FactoryWorkflow( IFactory<TParameter, TResult> factory ) : base( factory.CanCreate, factory.Create ) {}
-	}*/
-
-	/*public class FactoryWorkflow : ParameterWorkflow
-	{
-		public FactoryWorkflow( IFactoryWithParameter instance ) : base( instance.CanCreate, instance.Create ) {}
-	}
-
-	public interface IParameterWorkflow
-	{
-		bool IsValid( object parameter );
-
-		object Apply( object parameter );
-	}*/
 
 	public interface IParameterAware
 	{
@@ -186,32 +177,63 @@ namespace DragonSpark.Runtime
 		public object Execute( object parameter ) => inner.Create( (TParameter)parameter );
 	}
 
+	public class CommandParameterAware : IParameterAware
+	{
+		readonly ICommand inner;
+		public CommandParameterAware( ICommand inner )
+		{
+			this.inner = inner;
+		}
+
+		public bool IsAllowed( object parameter ) => inner.CanExecute( parameter );
+
+		public object Execute( object parameter )
+		{
+			inner.Execute( parameter );
+			return null;
+		}
+	}
+
+	public class CommandParameterAware<T> : IParameterAware
+	{
+		readonly ICommand<T> inner;
+		public CommandParameterAware( ICommand<T> inner )
+		{
+			this.inner = inner;
+		}
+
+		public bool IsAllowed( object parameter ) => inner.CanExecute( (T)parameter );
+
+		public object Execute( object parameter )
+		{
+			inner.Execute( (T)parameter );
+			return null;
+		}
+	}
+
 	public class ParameterWorkflow : ParameterWorkflow<object, object>, IParameterAware
 	{
-		public ParameterWorkflow( object target, Func<object, bool> specification, Action<object> action ) : base( target, specification, action ) {}
+		public ParameterWorkflow( IParameterWorkflowState state, IParameterAware aware ) : this ( state, aware.IsAllowed, aware.Execute ) {}
 
-		public ParameterWorkflow( object target, IParameterAware aware ) : this ( target, aware.IsAllowed, aware.Execute ) {}
-
-		public ParameterWorkflow( object target, Func<object, bool> specification, Func<object, object> factory ) : base( target, specification, factory ) {}
-		// public ParameterWorkflow( IParameterWorkflowState state, Func<object, bool> specification, Func<object, object> factory, object defaultValue ) : base( state, specification, factory, defaultValue ) {}
+		ParameterWorkflow( IParameterWorkflowState state, Func<object, bool> specification, Func<object, object> execute ) : base( state, specification, execute ) {}
 	}
 
 	public class ParameterWorkflow<TParameter, TResult>
 	{
 		readonly IParameterWorkflowState state;
 		readonly Func<TParameter, bool> specification;
-		readonly Func<TParameter, TResult> factory;
+		readonly Func<TParameter, TResult> execute;
 		readonly TResult defaultValue;
 
-		public ParameterWorkflow( object target, Func<TParameter, bool> specification, Action<TParameter> action ) : this( target, specification, action.ToFactory<TParameter, TResult>() ) {}
+		public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Action<TParameter> action ) : this( state, specification, action.ToFactory<TParameter, TResult>() ) {}
 
-		public ParameterWorkflow( object target, Func<TParameter, bool> specification, Func<TParameter, TResult> factory ) : this( new ParameterWorkflowState( target ), specification, factory, Default<TResult>.Item ) {}
+		public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Func<TParameter, TResult> execute ) : this( state, specification, execute, Default<TResult>.Item ) {}
 
-		public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Func<TParameter, TResult> factory, TResult defaultValue )
+		public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Func<TParameter, TResult> execute, TResult defaultValue )
 		{
 			this.state = state;
 			this.specification = specification;
-			this.factory = factory;
+			this.execute = execute;
 			this.defaultValue = defaultValue;
 		}
 
@@ -236,7 +258,7 @@ namespace DragonSpark.Runtime
 		{
 			using ( new Assignment( state.Validate, parameter ) )
 			{
-				return factory( parameter );
+				return execute( parameter );
 			}
 		}
 

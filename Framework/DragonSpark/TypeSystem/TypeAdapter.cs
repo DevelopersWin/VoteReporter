@@ -68,6 +68,25 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}
 
+		public object Invoke( string methodName, Type[] types, params object[] parameters ) => Invoke( null, methodName, types, parameters );
+
+		public object Invoke( object instance, string methodName, Type[] types, params object[] parameters ) => Invoke<object>( instance, methodName, types, parameters );
+
+		public T Invoke<T>( string methodName, Type[] types, params object[] parameters ) => Invoke<T>( null, methodName, types, parameters );
+
+		public T Invoke<T>( object instance, string methodName, Type[] types, params object[] parameters )
+		{
+			var methodInfo = MakeGenericMethod( methodName, types );
+			var result = (T)methodInfo.Invoke( methodInfo.IsStatic ? null : instance, parameters );
+			return result;
+		}
+
+		[Freeze]
+		MethodInfo MakeGenericMethod( string methodName, Type[] types )
+		{
+			return Type.GetRuntimeMethods().Single( info => info.IsGenericMethod && info.Name == methodName && info.GetGenericArguments().Length == types.Length ).MakeGenericMethod( types );
+		}
+
 		// public object Qualify( object instance ) => instance.With( o => Info.IsAssignableFrom( o.GetType().GetTypeInfo() ) ? o : /*GetCaster( o.GetType() ).With( caster => caster.Invoke( null, new[] { o } ) ) )*/ null );
 
 		public bool IsAssignableFrom( TypeInfo other ) => IsAssignableFrom( other.AsType() );

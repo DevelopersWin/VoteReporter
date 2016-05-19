@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 			new[] { parameter.RequestedType, parameter.MappedTo }.Distinct().Each( registered.Ensure );
 		}
 
-		public void Register( [Required]InstanceRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterInstance), new[] { parameter.RequestedType }, parameter.Instance );
+		public void Register( [Required]InstanceRegistrationParameter parameter ) => GetType().Adapt().Invoke( this, nameof(RegisterInstance), new[] { parameter.RequestedType }, parameter.Instance );
 
 		void RegisterInstance<T>( [Required]T instance )
 		{
@@ -36,7 +36,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 			registered.Ensure( typeof(T) );
 		}
 
-		public void RegisterFactory( [Required]FactoryRegistrationParameter parameter ) => this.InvokeGenericAction( nameof(RegisterFactory), parameter.RequestedType.ToItem(), parameter.Factory );
+		public void RegisterFactory( [Required]FactoryRegistrationParameter parameter ) => GetType().Adapt().Invoke( nameof(RegisterFactory), parameter.RequestedType.ToItem(), parameter.Factory );
 
 		void RegisterFactory<T>( [Required]Func<object> factory )
 		{

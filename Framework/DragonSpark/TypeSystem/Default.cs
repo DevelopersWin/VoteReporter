@@ -16,19 +16,6 @@ namespace DragonSpark.TypeSystem
 		public static Func<T, bool> Always => t => true;
 	}
 
-	public static class Default<T>
-	{
-		public static Func<T, T> Self => t => t;
-
-		public static Func<T, object> Boxed => t => t;
-
-		// [Freeze]
-		public static T Item => (T)DefaultValueFactory.Instance.Create( typeof(T) );
-
-		// [Freeze]
-		public static T[] Items => (T[])DefaultValueFactory.Instance.Create( typeof(T[]) ) /*Enumerable.Empty<T>().Fixed()*/;
-	}
-
 	[Synchronized] // http://stackoverflow.com/questions/35976558/is-constructorinfo-getparameters-thread-safe/35976798
 	public class InitializeTypeCommand : CommandBase<Type>
 	{
@@ -44,6 +31,6 @@ namespace DragonSpark.TypeSystem
 
 	public static class TypeSupport
 	{
-		public static Type From( object item ) => item.AsTo<ParameterInfo, Type>( info => info.ParameterType ) ?? item.AsTo<MemberInfo, Type>( info => info.GetMemberType() ) ?? item as Type;
+		public static Type From( object item ) => item.AsTo<ParameterInfo, Type>( info => info.ParameterType ) ?? item.AsTo<MemberInfo, Type>( info => info.GetMemberType() ) ?? item as Type ?? item.GetType();
 	}
 }

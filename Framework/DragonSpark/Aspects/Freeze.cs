@@ -81,6 +81,8 @@ namespace DragonSpark.Aspects
 			this.factory = factory;
 		}
 
+		// public override bool CompileTimeValidate( MethodBase method ) => false;
+
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			if ( /*Configure.Load<EnableMethodCaching>().Value &&*/ ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )

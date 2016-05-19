@@ -10,11 +10,11 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, AutoData]
 		void GenericInvoke( Class @class )
 		{
-			typeof(Static).InvokeGenericAction( "Assign", new []{ typeof(Class) }, null );
+			typeof(Static).Adapt().Invoke( nameof(Static.Assign), new [] { typeof(Class) }, null );
 			
 			Assert.Null( Static.Instance );
 			
-			typeof(Static).InvokeGenericAction( "Assign", new []{ typeof(Class) }, @class );
+			typeof(Static).Adapt().Invoke( nameof(Static.Assign), new [] { typeof(Class) }, @class );
 
 			Assert.Equal( @class, Static.Instance );
 		}

@@ -4,7 +4,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
-using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
@@ -197,16 +196,16 @@ namespace DragonSpark.Runtime
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
-		[Validator]
+		// [Validator]
 		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		[AutoValidate]
+		// [AutoValidate]
 		void ICommand.Execute( object parameter ) => Execute( coercer.Coerce( parameter ) );
 
-		[Validator]
+		// [Validator]
 		public virtual bool CanExecute( T parameter ) => specification.IsSatisfiedBy( parameter );
 
-		[AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		// [AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract void Execute( T parameter );
 	}
 }

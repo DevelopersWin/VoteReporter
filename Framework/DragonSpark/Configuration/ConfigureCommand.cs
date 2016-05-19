@@ -14,7 +14,7 @@ namespace DragonSpark.Configuration
 		public override void Execute( IEnumerable<IWritableStore> parameter ) =>
 			parameter.Each( store =>
 							{
-								GetType().InvokeGenericAction( nameof( Add ), store.GetType().ToItem(), store );
+								GetType().Adapt().Invoke( nameof(Add), store.GetType().ToItem(), store );
 							} );
 
 		static void Add<T>( T store ) where T : class, IWritableStore, new() => PrototypeStore<T>.Instance.Assign( store );

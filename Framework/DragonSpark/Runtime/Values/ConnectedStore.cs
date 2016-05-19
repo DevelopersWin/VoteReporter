@@ -4,14 +4,17 @@ using DragonSpark.TypeSystem;
 using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace DragonSpark.Runtime.Values
 {
 	public static class Ambient
 	{
-		public static object GetCurrent( [Required]Type type ) => typeof(Ambient).InvokeGeneric( nameof(GetCurrent), type.ToItem() );
+		public static object GetCurrent( [Required]Type type ) => typeof(Ambient).Adapt().Invoke( nameof(GetCurrent), type.ToItem() );
 
 		public static T GetCurrent<T>() => new ThreadAmbientChain<T>().Value.PeekOrDefault();
 
@@ -56,15 +59,15 @@ namespace DragonSpark.Runtime.Values
 
 	public abstract class ConnectedStore<T> : WritableStore<T>
 	{
-		/*readonly static ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>> Cache = new ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>>();
+		// readonly static ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>> Cache = new ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>>();
 
-		static ConnectedStore()
+		/*static ConnectedStore()
 		{
 			DisposableRepository.Instance.Add( new DisposableAction( () =>
 																	 {
 																		 Cache.Values.Each( property => property.TryDisconnect() );
 																		 Cache.Clear();
-																		 Debugger.Break();
+																		 // Debugger.Break();
 																	 } ) );
 		}*/
 

@@ -142,19 +142,18 @@ namespace DragonSpark.Extensions
 
 		public static TResult AsTo<TSource, TResult>( this object target, Func<TSource,TResult> transform, Func<TResult> resolve = null )
 		{
-			var @default = resolve ?? DefaultValueFactory<TResult>.Instance.Create;
+			var @default = resolve ?? /*DefaultValueFactory<TResult>.Instance.Create*/ ( () => default(TResult) );
 			var result = target is TSource ? transform( (TSource)target ) : @default();
 			return result;
 		}
 
 		public static TResult To<TResult>( this object target ) => (TResult)target;
 
-		public static T ConvertTo<T>( this object @this ) => @this.With( x => (T)ConvertTo( @this, typeof( T ) ) );
+		public static T ConvertTo<T>( this object @this ) => @this.With( x => (T)ConvertTo( @this, typeof(T) ) );
 
 		public static object ConvertTo( this object @this, Type to )
 		{
-			var info = to.GetTypeInfo();
-			return !info.IsAssignableFrom( @this.GetType().GetTypeInfo() ) ? ( info.IsEnum ? Enum.Parse( to, @this.ToString() ) : ChangeType( @this, to ) ) : @this;
+			return !to.Adapt().IsInstanceOfType( @this ) ? ( to.GetTypeInfo().IsEnum ? Enum.Parse( to, @this.ToString() ) : ChangeType( @this, to ) ) : @this;
 		}
 
 		static object ChangeType( object @this, Type to )

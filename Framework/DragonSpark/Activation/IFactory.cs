@@ -56,9 +56,9 @@ namespace DragonSpark.Activation
 
 		public static T Self<T>( [Required] this T @this ) => @this;
 
-		public static Delegate Convert( [Required]this Func<object> @this, [Required]Type resultType ) => (Delegate)typeof(FactoryExtensions).InvokeGeneric( nameof(Convert), resultType.ToItem(), @this );
+		public static Delegate Convert( [Required]this Func<object> @this, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().Invoke<Delegate>( nameof(Convert), resultType.ToItem(), @this );
 
-		public static Delegate Convert( [Required]this Func<object, object> @this, [Required]Type parameterType, [Required]Type resultType ) => (Delegate)typeof(FactoryExtensions).InvokeGeneric( nameof(Convert), parameterType.Append( resultType ).ToArray(), @this );
+		public static Delegate Convert( [Required]this Func<object, object> @this, [Required]Type parameterType, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().Invoke<Delegate>( nameof(Convert), parameterType.Append( resultType ).ToArray(), @this );
 
 		public static Func<T> Convert<T>( this Func<object> @this ) => () => (T)@this();
 

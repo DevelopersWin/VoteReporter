@@ -36,13 +36,13 @@ namespace DragonSpark.Runtime
 		public Associated( IDisposable instance ) : base( instance, typeof(Associated), () => new Collection<IDisposable>() ) {}
 	}
 
-	public class AssociatedDisposeAttribute : AspectAttributeBase
+	/*public class AssociatedDisposeAttribute : AspectAttributeBase
 	{
 		public AssociatedDisposeAttribute( bool enabled ) : base( enabled ) {}
-	}
+	}*/
 
 	[ProvideAspectRole( "Dispose Associated Disposables" ), LinesOfCodeAvoided( 1 )]
-	[PSerializable, MulticastAttributeUsage( MulticastTargets.Method, PersistMetaData = false ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[PSerializable, MulticastAttributeUsage( MulticastTargets.Method, PersistMetaData = false, TargetMemberAttributes = MulticastAttributes.Instance ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public sealed class DisposeAssociatedAspect : OnMethodBoundaryAspect
 	{
 		public class Specification : SpecificationBase<MethodBase>
@@ -52,18 +52,14 @@ namespace DragonSpark.Runtime
 			readonly TypeAdapter adapter = typeof(IDisposable).Adapt();
 
 			public override bool IsSatisfiedBy( MethodBase parameter ) => 
-				parameter.Name == nameof(IDisposable.Dispose) && AspectSupport.IsEnabled<AssociatedDisposeAttribute>( parameter.DeclaringType ) && adapter.IsAssignableFrom( parameter.DeclaringType );
+				parameter.Name == nameof(IDisposable.Dispose) /*&& AspectSupport.IsEnabled<AssociatedDisposeAttribute>( parameter.DeclaringType )*/ && adapter.IsAssignableFrom( parameter.DeclaringType );
 		}
 
 		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );
 
 		public override void OnSuccess( MethodExecutionArgs args )
 		{
-			var type = args.Instance.GetType();
-			if ( AspectSupport.IsEnabled<AssociatedDisposeAttribute>( type ) )
-			{
-				args.Instance.As<IDisposable>( DisposeAssociatedCommand.Instance.Run );
-			}
+			// args.Instance.As<IDisposable>( DisposeAssociatedCommand.Instance.Run );
 		}
 	}
 }

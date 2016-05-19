@@ -170,13 +170,13 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		[AutoValidation( false ), AssociatedDispose( false )]
+		[AutoValidation( false )/*, AssociatedDispose( false )*/]
 		class AssignValidation : AssignValueCommand<bool>
 		{
 			public AssignValidation( IWritableStore<bool> store ) : base( store ) {}
 		}
 
-		[AssociatedDispose( false )]
+		// [AssociatedDispose( false )]
 		class Validated : ThreadAmbientStore<bool>
 		{
 			public Validated( object instance ) : base( instance.GetHashCode().ToString() ) {}

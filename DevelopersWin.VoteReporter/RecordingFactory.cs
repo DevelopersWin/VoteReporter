@@ -20,7 +20,7 @@ namespace DevelopersWin.VoteReporter
 			this.updater = updater;
 		}
 
-		protected override Recording Create()
+		public override Recording Create()
 		{
 			var result = context.Create<Recording>();
 			var votes = provider.Retrieve( result ).ToArray();

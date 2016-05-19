@@ -16,7 +16,7 @@ namespace DevelopersWin.VoteReporter
 			this.context = context;
 		}
 
-		protected override VoteReport Create()
+		public override VoteReport Create()
 		{
 			var recordings = context.Recordings.OrderByDescending( recording => recording.Created );
 			var current = recordings.First();

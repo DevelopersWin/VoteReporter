@@ -3,10 +3,22 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace DragonSpark.TypeSystem
 {
+	public static class Default<T>
+	{
+		public static Func<T, T> Self => t => t;
+
+		public static Func<T, object> Boxed => t => t;
+
+		// [Freeze]
+		public static T Item => /*(T)DefaultValueFactory.Instance.Create( typeof(T) )*/default(T);
+
+		// [Freeze]
+		public static T[] Items => (T[])/*DefaultValueFactory.Instance.Create( typeof(T[]) )*/Enumerable.Empty<T>() /*Enumerable.Empty<T>().Fixed()*/;
+	}
+
 	[AutoValidation( false )]
 	public class DefaultValueFactory<T> : FactoryBase<T>
 	{
@@ -33,18 +45,10 @@ namespace DragonSpark.TypeSystem
 		public override object Create( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
-			var result = type != null ? typeof(Enumerable).InvokeGeneric( nameof(Enumerable.Empty), type.ToItem() ) : Default( parameter );
+			var result = type != null ? typeof(Enumerable).Adapt().Invoke( nameof(Enumerable.Empty), type.ToItem() ) : GetType().Adapt().Invoke( nameof(Default), new [] { parameter } );
 			return result;
-
-			/*var enumerableType = parameter.Adapt().GetEnumerableType();
-			var items = enumerableType == null;
-			var name = items ? nameof(Default<object>.Item) : nameof(Default<object>.Items);
-			var targetType = enumerableType ?? parameter;
-			var property = typeof(Default<>).MakeGenericType( targetType ).GetTypeInfo().GetDeclaredProperty( name );
-			var result = property.GetValue( null );
-			return result;*/
 		}
 
-		static object Default( Type parameter ) => Expression.Lambda( Expression.Default( parameter ) ).Compile().DynamicInvoke();
+		static object Default<T>() => default(T);
 	}
 }
