@@ -8,6 +8,7 @@ using Serilog;
 using Serilog.Events;
 using System;
 using System.Reflection;
+using Configure = DragonSpark.Configuration.Configure;
 
 namespace DragonSpark.Diagnostics
 {

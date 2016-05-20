@@ -30,18 +30,18 @@ namespace DragonSpark.Runtime
 	}
 
 	[ContentProperty( nameof(Commands) )]
-	public class CompositeCommand<TParameter> : DisposingCommand<TParameter>
+	public class CompositeCommand<T> : DisposingCommand<T>
 	{
-		public CompositeCommand( [Required]params ICommand[] commands ) : this( Specifications<TParameter>.Always, commands ) {}
+		public CompositeCommand( [Required]params ICommand[] commands ) : this( Specifications<T>.Always, commands ) {}
 
-		public CompositeCommand( ISpecification<TParameter> specification, [Required]params ICommand[] commands ) : base( specification )
+		public CompositeCommand( ISpecification<T> specification, [Required]params ICommand[] commands ) : base( specification )
 		{
 			Commands = new CommandCollection( commands );
 		}
 
 		public CommandCollection Commands { get; }
 
-		public override void Execute( TParameter parameter ) => Commands.ExecuteMany( parameter );
+		public override void Execute( T parameter ) => Commands.ExecuteMany( parameter );
 
 		protected override void OnDispose() => Commands.Purge().OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
 	}

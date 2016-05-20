@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
@@ -13,28 +12,55 @@ using System.Reflection;
 
 namespace DragonSpark.Runtime
 {
+	public class AssociatedDisposables : AttachedProperty<IDisposable, ICollection<IDisposable>>
+	{
+		public static AssociatedDisposables Instance { get; } = new AssociatedDisposables();
+
+		AssociatedDisposables() : base( key => new System.Collections.ObjectModel.Collection<IDisposable>() ) {}
+	}
+
+	public class ConfigureAssociatedDisposables : AttachedProperty<IDisposable, Tuple<bool>>
+	{
+		public static ConfigureAssociatedDisposables Instance { get; } = new ConfigureAssociatedDisposables();
+
+		ConfigureAssociatedDisposables() : base( key => new Tuple<bool>( true ) ) {}
+	}
+
 	public static class DisposableExtensions
 	{
+		public static T Configured<T>( this T @this, bool on ) where T : IDisposable
+		{
+			ConfigureAssociatedDisposables.Instance.Set( @this, new Tuple<bool>( on ) );
+			return @this;
+		}
+
 		public static T AssociateForDispose<T>( this T @this, IDisposable associated ) where T : IDisposable => @this.AssociateForDispose( new[] { associated } );
 
 		public static T AssociateForDispose<T>( this T @this, params IDisposable[] associated ) where T : IDisposable
 		{
-			new Associated( @this ).Value.AddRange( associated );
+			AssociatedDisposables.Instance.Attach( @this ).AddRange( associated );
 			return @this;
 		}
 	}
 
 	public class DisposeAssociatedCommand : CommandBase<IDisposable>
 	{
-		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand();
+		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand( AssociatedDisposables.Instance );
 
-		public override void Execute( IDisposable parameter ) => new Associated( parameter ).Value.Purge().Each( disposable => disposable.Dispose() );
+		readonly AssociatedDisposables property;
+
+		DisposeAssociatedCommand( AssociatedDisposables property ) : base( new IsAttachedSpecification<IDisposable, ICollection<IDisposable>>( property ) )
+		{
+			this.property = property;
+		}
+
+		public override void Execute( IDisposable parameter ) => property.Attach( parameter ).Purge().Each( disposable => disposable.Dispose() );
 	}
 
-	class Associated : AssociatedStore<IDisposable, ICollection<IDisposable>>
+	/*class Associated : AssociatedStore<IDisposable, ICollection<IDisposable>>
 	{
-		public Associated( IDisposable instance ) : base( instance, typeof(Associated), () => new Collection<IDisposable>() ) {}
-	}
+		public Associated( IDisposable instance ) : base( instance, typeof(Associated), () =>  ) {}
+	}*/
 
 	/*public class AssociatedDisposeAttribute : AspectAttributeBase
 	{
@@ -57,9 +83,13 @@ namespace DragonSpark.Runtime
 
 		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );
 
-		public override void OnSuccess( MethodExecutionArgs args )
-		{
-			// args.Instance.As<IDisposable>( DisposeAssociatedCommand.Instance.Run );
-		}
+		public override void OnSuccess( MethodExecutionArgs args ) =>
+			args.Instance.As<IDisposable>( disposable =>
+										   {
+											   if ( ConfigureAssociatedDisposables.Instance.Attach( disposable ).Item1 )
+											   {
+												   DisposeAssociatedCommand.Instance.Run( disposable );
+											   }
+										   } );
 	}
 }

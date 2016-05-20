@@ -1,12 +1,10 @@
 using DragonSpark.Activation;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace DragonSpark.Aspects
 {
-	[AutoValidation( false )]
-	public abstract class KeyFactory<T> : FactoryBase<IEnumerable<object>, T>
+	// [AutoValidation( false )]
+	public abstract class KeyFactory<T> : FactoryBase<IList, T>
 	{
 		public T CreateUsing( params object[] parameter ) => Create( parameter );
 	}
@@ -33,49 +31,37 @@ namespace DragonSpark.Aspects
 			parameter.Member.DeclaringType.GetTypeInfo().GUID.GetHashCode() * 6776 + parameter.ToString().GetHashCode();
 	}*/
 
+	/*class AssociatedHash : AttachedProperty<object, Tuple<int>>
+	{
+		public static AssociatedHash Instance { get; } = new AssociatedHash();
+
+		AssociatedHash() : base( key => new Tuple<int>( key.GetHashCode() ) ) {}
+	}*/
+
 	public class KeyFactory : KeyFactory<int>
 	{
 		public static KeyFactory Instance { get; } = new KeyFactory();
 
 		public string ToString( params object[] items ) => Create( items ).ToString();
 
-		public override int Create( IEnumerable<object> parameter )
+		public override int Create( IList parameter )
 		{
 			var result = 0x2D2816FE;
-			foreach ( var o in parameter )
+			for ( var i = 0; i < parameter.Count; i++ )
 			{
 				var next = result * 31;
-				var increment = GetCode( o );
+				var item = parameter[i];
+				var increment = item != null ? GetCode( item ) : 0;
 				result += next + increment;
 			}
 			return result;
 		}
 
-		int GetCode( object o )
+		int GetCode( object key )
 		{
-			var text = o as string;
-			if ( text != null )
-			{
-				return text.GetHashCode();
-			}
-
-			var items = o as IEnumerable;
-			if ( items != null )
-			{
-				return Create( items.Cast<object>() );
-			}
-
-			/*if ( o is MemberInfo )
-			{
-				return MemberInfoTransformer.Instance.Create( o as MemberInfo );
-			}
-
-			if ( o is ParameterInfo )
-			{
-				return ParameterInfoTransformer.Instance.Create( o as ParameterInfo );
-			}*/
-			
-			return o?.GetHashCode() ?? 0;
+			var items = key as IList;
+			var result = items != null ? Create( items ) : key.GetHashCode();
+			return result;
 		}
 	}
 }

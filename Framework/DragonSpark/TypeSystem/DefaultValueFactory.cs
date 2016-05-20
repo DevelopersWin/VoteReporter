@@ -19,7 +19,7 @@ namespace DragonSpark.TypeSystem
 		public static T[] Items => (T[])/*DefaultValueFactory.Instance.Create( typeof(T[]) )*/Enumerable.Empty<T>() /*Enumerable.Empty<T>().Fixed()*/;
 	}
 
-	[AutoValidation( false )]
+	// [AutoValidation( false )]
 	public class DefaultValueFactory<T> : FactoryBase<T>
 	{
 		readonly Func<Type, object> source;
@@ -34,7 +34,7 @@ namespace DragonSpark.TypeSystem
 		public override T Create() => (T)source( typeof(T) );
 	}
 
-	[AutoValidation( false )]
+	// [AutoValidation( false )]
 	public class DefaultValueFactory : FactoryBase<Type, object>
 	{
 		public static DefaultValueFactory Instance { get; } = new DefaultValueFactory();

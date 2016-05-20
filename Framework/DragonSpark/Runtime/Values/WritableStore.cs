@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 
@@ -11,6 +12,21 @@ namespace DragonSpark.Runtime.Values
 		{
 			@this.Assign( value );
 			return @this;
+		}
+	}
+
+	public class IsAttachedSpecification<T, TValue> : SpecificationBase<T> where TValue : class where T : class
+	{
+		readonly AttachedProperty<T, TValue> property;
+		public IsAttachedSpecification( AttachedProperty<T, TValue> property )
+		{
+			this.property = property;
+		}
+
+		public override bool IsSatisfiedBy( T parameter )
+		{
+			var isSatisfiedBy = property.Has( parameter );
+			return isSatisfiedBy;
 		}
 	}
 

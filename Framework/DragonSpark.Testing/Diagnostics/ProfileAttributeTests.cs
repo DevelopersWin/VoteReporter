@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Xunit;
+using Profile = DragonSpark.Diagnostics.Profile;
 
 namespace DragonSpark.Testing.Diagnostics
 {

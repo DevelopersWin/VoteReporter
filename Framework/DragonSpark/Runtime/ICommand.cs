@@ -4,6 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
+using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
@@ -44,7 +45,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	[AutoValidation( false )]
+	// [AutoValidation( false )]
 	public class FixedCommand : DisposingCommand<object>
 	{
 		readonly Lazy<ICommand> command;
@@ -103,11 +104,11 @@ namespace DragonSpark.Runtime
 		public override void Execute( object parameter ) => list.Remove( parameter );
 	}
 
-	public abstract class DisposingCommand<TParameter> : CommandBase<TParameter>, IDisposable
+	public abstract class DisposingCommand<T> : CommandBase<T>, IDisposable
 	{
 		protected DisposingCommand() {}
 
-		protected DisposingCommand( ISpecification<TParameter> specification ) : base( specification ) {}
+		protected DisposingCommand( ISpecification<T> specification ) : base( specification ) {}
 
 		~DisposingCommand()
 		{
@@ -171,11 +172,13 @@ namespace DragonSpark.Runtime
 		public DecoratedCommand( [Required] ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
 	}
 
-	public class SynchronizedCommand : CommandBase<object>
+	/*public class SynchronizedCommand : CommandBase<object>
 	{
 		public override void Execute( object parameter ) {}
-	}
+	}*/
 
+	// [CommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance ), GenericCommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+	[CommandParameterValidator, GenericCommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract )]
 	public abstract class CommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate { };

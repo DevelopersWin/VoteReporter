@@ -2,11 +2,8 @@
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Input;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Runtime
 {
@@ -110,7 +107,7 @@ namespace DragonSpark.Runtime
 			{
 				if ( on )
 				{
-					store.Value.Ensure( parameter );
+					store.Value.Add( parameter );
 				}
 				else
 				{
@@ -225,7 +222,7 @@ namespace DragonSpark.Runtime
 		readonly Func<TParameter, TResult> execute;
 		readonly TResult defaultValue;
 
-		public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Action<TParameter> action ) : this( state, specification, action.ToFactory<TParameter, TResult>() ) {}
+		// public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Action<TParameter> action ) : this( state, specification, action.ToFactory<TParameter, TResult>() ) {}
 
 		public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Func<TParameter, TResult> execute ) : this( state, specification, execute, Default<TResult>.Item ) {}
 
@@ -248,7 +245,7 @@ namespace DragonSpark.Runtime
 
 		bool AsActive( TParameter parameter )
 		{
-			using ( new Assignment( state.Activate, parameter ) )
+			using ( new Assignment( state.Activate, parameter ).Configured( false ) )
 			{
 				return IsAllowed( parameter );
 			}
@@ -256,7 +253,7 @@ namespace DragonSpark.Runtime
 
 		TResult AsValid( TParameter parameter )
 		{
-			using ( new Assignment( state.Validate, parameter ) )
+			using ( new Assignment( state.Validate, parameter ).Configured( false ) )
 			{
 				return execute( parameter );
 			}

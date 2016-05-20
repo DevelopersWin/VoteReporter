@@ -5,6 +5,7 @@ using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -118,9 +119,9 @@ namespace DragonSpark.Activation
 	public class CachedDelegatedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
 		readonly Func<TParameter, object> instance;
-		readonly Func<TParameter, IEnumerable<object>> keySource;
+		readonly Func<TParameter, IList> keySource;
 
-		protected CachedDelegatedFactory( Func<TParameter, IEnumerable<object>> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
+		protected CachedDelegatedFactory( Func<TParameter, IList> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
 		{
 			this.instance = instance;
 			this.keySource = keySource;

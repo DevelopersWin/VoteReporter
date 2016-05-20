@@ -10,13 +10,13 @@ namespace DragonSpark.TypeSystem
 {
 	public class TypeAdapter
 	{
-		public TypeAdapter( [Required]Type type ) : this( type.GetTypeInfo() )
+		public TypeAdapter( [Required]Type type ) : this( type, type.GetTypeInfo() ) {}
+
+		public TypeAdapter( [Required]TypeInfo info ) : this( info.AsType(), info ) {}
+
+		public TypeAdapter( [Required]Type type,  [Required]TypeInfo info )
 		{
 			Type = type;
-		}
-
-		public TypeAdapter( [Required]TypeInfo info )
-		{
 			Info = info;
 		}
 
@@ -130,7 +130,10 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsGenericOf<T>( bool includeInterfaces = true ) => IsGenericOf( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
 
-		public Type[] GetImplementations<T>( bool includeInterfaces = true ) => GetImplementations( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
+		[Freeze]
+		public Type[] GetTypeArgumentsFor( Type implementationType, bool includeInterfaces = true ) => GetImplementations( implementationType, includeInterfaces ).First().GenericTypeArguments;
+
+		// public Type[] GetImplementations<T>( bool includeInterfaces = true ) => GetImplementations( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
 
 		[Freeze]
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true ) =>

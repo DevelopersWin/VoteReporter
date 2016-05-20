@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	[AutoValidation( false )]
+	// [AutoValidation( false )]
 	public sealed class CacheValueFactory : FactoryBase<MethodInterceptionArgs, object>
 	{
 		readonly IDictionary<int, object> items = new Dictionary<int, object>();
@@ -24,22 +24,14 @@ namespace DragonSpark.Aspects
 
 		static int Code( MethodInterceptionArgs args )
 		{
-			var result = 0x2D2816FE;
-
-			var first = new[] { args.Instance ?? args.Method.DeclaringType, args.Method };
+			/*var first = new[] { args.Instance ?? args.Method.DeclaringType, args.Method };
 			var second = args.Arguments.ToArray();
 
 			var index = first.Length;
 			Array.Resize( ref first, index + second.Length );
-			Array.Copy( second, 0, first, index, second.Length );
-			
-			for ( var i = 0; i < first.Length; i++ )
-			{
-				var next = result * 31;
-				var increment = first[i]?.GetHashCode() ?? 0;
-				result += next + increment;
-			}
+			Array.Copy( second, 0, first, index, second.Length );*/
 
+			var result = KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments.ToArray() );
 			return result;
 		}
 

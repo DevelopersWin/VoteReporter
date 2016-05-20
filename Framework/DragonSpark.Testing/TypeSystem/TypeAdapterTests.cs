@@ -1,6 +1,7 @@
 ﻿using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
@@ -13,13 +14,6 @@ namespace DragonSpark.Testing.TypeSystem
 			var item = new TypeAdapter( typeof(List<int>) ).GetEnumerableType();
 			Assert.Equal( typeof(int), item );
 		}
-
-		/*[Theory, AutoData]
-		public void Qualify( int item )
-		{
-			var qualified = new TypeAdapter( typeof(Casted) ).Qualify( item );
-			Assert.Equal( item, Assert.IsType<Casted>( qualified ).Item );
-		}*/
 
 		[Fact]
 		public void IsInstanceOfType()

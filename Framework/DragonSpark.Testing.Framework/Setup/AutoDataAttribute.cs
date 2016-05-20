@@ -14,6 +14,7 @@ using PostSharp.Patterns.Contracts;
 using Serilog.Core;
 using Serilog.Events;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -72,9 +73,9 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public abstract class CacheFactoryBase : CachedDelegatedFactory<AutoData, IServiceProvider>
 	{
-		protected CacheFactoryBase( Func<AutoData, IEnumerable<object>> keySource, Func<IServiceProvider> inner ) : base( keySource, data => data.Method.DeclaringType, data => inner() ) {}
+		protected CacheFactoryBase( Func<AutoData, IList> keySource, Func<IServiceProvider> inner ) : base( keySource, data => data.Method.DeclaringType, data => inner() ) {}
 
-		protected CacheFactoryBase( Func<AutoData, IEnumerable<object>> keySource, Func<AutoData, IServiceProvider> inner ) : base( keySource, data => data.Method.DeclaringType, inner ) {}
+		protected CacheFactoryBase( Func<AutoData, IList> keySource, Func<AutoData, IServiceProvider> inner ) : base( keySource, data => data.Method.DeclaringType, inner ) {}
 	}
 
 	public static class Providers
