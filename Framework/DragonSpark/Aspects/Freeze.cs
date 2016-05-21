@@ -2,12 +2,11 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Reflection;
 using PostSharp.Patterns.Model;
 using PostSharp.Patterns.Threading;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
@@ -15,7 +14,7 @@ namespace DragonSpark.Aspects
 	[Synchronized]
 	public sealed class CacheValueFactory // : FactoryBase<MethodInterceptionArgs, object>
 	{
-		public static CacheValueFactory Instance { get; } = new CacheValueFactory();
+		// public static CacheValueFactory Instance { get; } = new CacheValueFactory();
 
 		[Reference]
 		readonly IDictionary<int, Lazy<object>> items = new Dictionary<int, Lazy<object>>();
@@ -48,7 +47,7 @@ namespace DragonSpark.Aspects
 	{
 		readonly Func<MethodInterceptionArgs, object> factory;
 
-		public Freeze() : this( CacheValueFactory.Instance.Create ) {}
+		public Freeze() : this( new CacheValueFactory().Create ) {}
 
 		Freeze( Func<MethodInterceptionArgs, object> factory )
 		{

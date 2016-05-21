@@ -2,6 +2,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Threading;
 using System;
@@ -35,9 +36,25 @@ namespace DragonSpark.Windows.TypeSystem
 	{
 		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();
 
-		AssemblyInitializer() : base( OncePerParameterSpecification<Assembly>.Instance ) {}
+		AssemblyInitializer() : base( Specification.Instance ) {}
 
-		public override void Execute( Assembly parameter ) => parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
+		public override void Execute( Assembly parameter )
+		{
+			parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
+			if ( !Activated( parameter ) )
+			{
+				parameter.Set( DragonSpark.TypeSystem.Activated.Property, new Tuple<bool>( true ) );
+			}
+		}
+
+		static bool Activated( Assembly parameter ) => parameter.Get( DragonSpark.TypeSystem.Activated.Property ).Item1;
+
+		class Specification : OncePerParameterSpecification<Assembly>
+		{
+			public new static Specification Instance { get; } = new Specification();
+
+			public override bool IsSatisfiedBy( Assembly parameter ) => !Activated( parameter ) && base.IsSatisfiedBy( parameter );
+		}
 	}
 
 	public class AssemblyLoader : DragonSpark.TypeSystem.AssemblyLoader

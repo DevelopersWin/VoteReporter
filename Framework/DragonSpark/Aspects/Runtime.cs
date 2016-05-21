@@ -1,13 +1,20 @@
-﻿using DragonSpark.Runtime.Specifications;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Values;
+using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
+using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
+using PostSharp.Serialization;
+using System;
 
 namespace DragonSpark.Aspects
 {
-	[LinesOfCodeAvoided( 4 )]
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public abstract class SpecificationBasedAspect : MethodInterceptionAspect
 	{
 		readonly ISpecification specification;
@@ -26,6 +33,17 @@ namespace DragonSpark.Aspects
 		}
 	}
 
+	// [OnMethodBoundaryAspectConfiguration( AspectPriority = (int)Priority.Highest )]
+	[PSerializable, ProvideAspectRole( "Data" ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
+	public sealed class AssemblyInitializeAttribute : OnMethodBoundaryAspect
+	{
+		public override void OnEntry( MethodExecutionArgs args )
+		{
+			args.Method.DeclaringType.Assembly().Set( Activated.Property, new Tuple<bool>( true ) );
+			base.OnEntry( args );
+		}
+	}
 
 	public sealed class Runtime : SpecificationBasedAspect
 	{

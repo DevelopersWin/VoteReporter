@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Values;
 using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -35,6 +36,12 @@ namespace DragonSpark.TypeSystem
 		public static AssemblyHintProvider Instance { get; } = new AssemblyHintProvider();
 
 		public override string Create( Assembly parameter ) => parameter.GetName().Name;
+	}
+
+	public class Activated : AttachedProperty<Assembly, Tuple<bool>>
+	{
+		public static Activated Property { get; } = new Activated();
+		Activated() : base( key => new Tuple<bool>( false ) ) {}
 	}
 
 	public class AssemblyLoader : IAssemblyLoader
