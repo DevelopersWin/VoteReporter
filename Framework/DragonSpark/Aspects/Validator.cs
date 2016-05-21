@@ -3,13 +3,11 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Extensibility;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
@@ -24,7 +22,7 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Tracing )]
-	public class CreatorAttribute : OnMethodBoundaryAspect
+	public sealed class CreatorAttribute : OnMethodBoundaryAspect
 	{
 		public override void OnSuccess( MethodExecutionArgs args )
 		{

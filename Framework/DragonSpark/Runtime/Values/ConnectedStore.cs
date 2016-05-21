@@ -4,10 +4,7 @@ using DragonSpark.TypeSystem;
 using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace DragonSpark.Runtime.Values
@@ -152,6 +149,12 @@ namespace DragonSpark.Runtime.Values
 
 		protected override void OnDispose() => Remove( Value );
 	}*/
+
+	public class Condition : AttachedProperty<object, ConditionMonitor>
+	{
+		public static Condition Property { get; } = new Condition();
+		protected Condition() : base( key => new ConditionMonitor() ) {}
+	}
 
 	public class Checked : AssociatedStore<ConditionMonitor>
 	{

@@ -1,7 +1,8 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using System;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -26,6 +27,18 @@ namespace DragonSpark.Runtime.Specifications
 		}
 
 		public override bool IsSatisfiedBy( T parameter ) => @delegate( parameter );
+	}
+
+	public class OncePerParameterSpecification<T> : SpecificationBase<T> where T : class
+	{
+		public static OncePerParameterSpecification<T> Instance { get; } = new OncePerParameterSpecification<T>();
+
+		public override bool IsSatisfiedBy( T parameter ) => parameter.Get( Condition.Property ).Apply();
+
+		class Condition : Values.Condition
+		{
+			public new static Condition Property { get; } = new Condition();
+		}
 	}
 
 	public class OnlyOnceSpecification : OnlyOnceSpecification<object> {}

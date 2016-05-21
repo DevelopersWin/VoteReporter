@@ -19,7 +19,7 @@ namespace DragonSpark.Aspects
 
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( specification.IsSatisfiedBy( this ) )
+			if ( specification.IsSatisfiedBy( args.Instance ?? args.Method.DeclaringType ) )
 			{
 				base.OnInvoke( args );
 			}

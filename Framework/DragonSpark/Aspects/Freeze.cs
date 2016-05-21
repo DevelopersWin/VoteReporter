@@ -2,11 +2,12 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Patterns.Model;
-using PostSharp.Patterns.Threading;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using PostSharp.Patterns.Model;
+using PostSharp.Patterns.Threading;
 
 namespace DragonSpark.Aspects
 {
@@ -14,6 +15,8 @@ namespace DragonSpark.Aspects
 	[Synchronized]
 	public sealed class CacheValueFactory // : FactoryBase<MethodInterceptionArgs, object>
 	{
+		public static CacheValueFactory Instance { get; } = new CacheValueFactory();
+
 		[Reference]
 		readonly IDictionary<int, Lazy<object>> items = new Dictionary<int, Lazy<object>>();
 
@@ -30,7 +33,6 @@ namespace DragonSpark.Aspects
 			var result = !items.ContainsKey( code );
 			if ( result )
 			{
-				// codes.Add( code );
 				items.Add( code, new Lazy<object>( args.GetReturnValue ) );
 			}
 			return result;
@@ -38,23 +40,17 @@ namespace DragonSpark.Aspects
 
 		// [Yielder]
 		public object Create( MethodInterceptionArgs parameter ) => Get( parameter ) ?? parameter.ReturnValue;
-
-		/*public void Flush()
-		{
-			codes.Clear();
-			items.Clear();
-		}*/
 	}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
-	public sealed class Freeze : MethodInterceptionAspect// , IInstanceScopedAspect
+	public sealed class Freeze : MethodInterceptionAspect //, IInstanceScopedAspect
 	{
 		readonly Func<MethodInterceptionArgs, object> factory;
 
-		public Freeze() : this( new CacheValueFactory().Create ) {}
+		public Freeze() : this( CacheValueFactory.Instance.Create ) {}
 
-		public Freeze( Func<MethodInterceptionArgs, object> factory )
+		Freeze( Func<MethodInterceptionArgs, object> factory )
 		{
 			this.factory = factory;
 		}

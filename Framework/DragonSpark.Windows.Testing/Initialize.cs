@@ -9,8 +9,11 @@ namespace DragonSpark.Windows.Testing
 		[ModuleInitializer( 0 ), Aspects.Runtime]
 		public static void Execute()
 		{
-			Properties.Settings.Default.Reset();
 			new LoadPartAssemblyCommand( new TypeSystem.AssemblyLoader( assembly => "DragonSpark.Testing" ) ).Run( typeof(Initialize).Assembly );
+			lock ( Properties.Settings.Default )
+			{
+				Properties.Settings.Default.Reset();
+			}
 		}
 	}
 }
