@@ -37,7 +37,7 @@ namespace DragonSpark.Runtime.Specifications
 		[Freeze]
 		public override bool IsSatisfiedBy( TParameter parameter )
 		{
-			var result = !Equals( creator( parameter ), Default<TResult>.Item );
+			var result = !Equals( creator( parameter ), DefaultValueFactory<TResult>.Instance.Create() );
 			return result;
 		}
 	}

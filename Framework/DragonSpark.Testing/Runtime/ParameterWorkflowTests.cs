@@ -29,9 +29,7 @@ namespace DragonSpark.Testing.Runtime
 		[Fact]
 		public void ExtendedCheck()
 		{
-			for ( int i = 0; i < 10000; i++ )
-			{
-				var sut = new ExtendedFactory();
+			var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
 			var cannot = sut.CanCreate( (object)456 );
@@ -53,7 +51,6 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 1, sut.CreateCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, created );
-			}
 		}
 
 		[FactoryParameterValidator]

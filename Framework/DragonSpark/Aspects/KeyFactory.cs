@@ -1,14 +1,8 @@
-using DragonSpark.Activation;
 using System.Collections;
 
 namespace DragonSpark.Aspects
 {
 	// [AutoValidation( false )]
-	public abstract class KeyFactory<T> : FactoryBase<IList, T>
-	{
-		public T CreateUsing( params object[] parameter ) => Create( parameter );
-	}
-
 	/*public class MemberInfoTransformer : Factory<MemberInfo, int>
 	{
 		public static MemberInfoTransformer Instance { get; } = new MemberInfoTransformer();
@@ -38,13 +32,15 @@ namespace DragonSpark.Aspects
 		AssociatedHash() : base( key => new Tuple<int>( key.GetHashCode() ) ) {}
 	}*/
 
-	public class KeyFactory : KeyFactory<int>
+	public sealed class KeyFactory //  : KeyFactory<int>
 	{
 		public static KeyFactory Instance { get; } = new KeyFactory();
 
 		public string ToString( params object[] items ) => Create( items ).ToString();
 
-		public override int Create( IList parameter )
+		public int CreateUsing( params object[] parameter ) => Create( parameter );
+
+		public int Create( IList parameter )
 		{
 			var result = 0x2D2816FE;
 			for ( var i = 0; i < parameter.Count; i++ )
@@ -63,5 +59,26 @@ namespace DragonSpark.Aspects
 			var result = items != null ? Create( items ) : key.GetHashCode();
 			return result;
 		}
+
+		
+
+		/*readonly CacheContext context = new CacheContext();
+
+		class CacheContext
+		{
+			readonly ISet<object> keys = new HashSet<object>();
+			readonly IDictionary<object, int> dictionary = new Dictionary<object, int>();
+
+			public int Get( object item )
+			{
+				if ( !keys.Contains( item ) )
+				{
+					keys.Add( item );
+					dictionary[item] = item.GetHashCode();
+				}
+
+				return dictionary[item];
+			}
+		}*/
 	}
 }

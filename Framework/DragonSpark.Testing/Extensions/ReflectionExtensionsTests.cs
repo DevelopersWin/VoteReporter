@@ -10,7 +10,7 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, AutoData]
 		void GenericInvoke( Class @class )
 		{
-			typeof(Static).Adapt().Invoke( nameof(Static.Assign), new [] { typeof(Class) }, null );
+			typeof(Static).Adapt().Invoke( nameof(Static.Assign), new [] { typeof(Class) }, new object[] { null } );
 			
 			Assert.Null( Static.Instance );
 			

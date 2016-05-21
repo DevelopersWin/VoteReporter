@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
+using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
@@ -86,7 +87,7 @@ namespace DragonSpark.Activation
 		public override TResult Create( TParameter parameter ) => inner.CreateUsing<TResult>( parameter );
 	}
 
-
+	[FactoryParameterValidator, GenericFactoryParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract, AttributeTargetExternalTypeAttributes = MulticastAttributes.NonAbstract )]
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
 	{
 		readonly ICoercer<TParameter> coercer;
@@ -103,17 +104,14 @@ namespace DragonSpark.Activation
 			this.specification = specification;
 		}
 	
-		// [Validator]
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		// [AutoValidate]
 		object IFactoryWithParameter.Create( object parameter ) => coercer.Coerce( parameter ).With( Create );
 
-		// [Validator]
 		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
-		// [AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
-		public abstract TResult Create( [Required]TParameter parameter ); /*=> CreateItem( parameter )*//*.With( result => Creator.Tag( this, result ) )*/
+		[Creator( AttributeInheritance =  MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		public abstract TResult Create( [Required]TParameter parameter );
 	}
 
 	public class CachedDelegatedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
@@ -279,15 +277,20 @@ namespace DragonSpark.Activation
 
 	public abstract class FactoryBase<T> : IFactory<T>
 	{
+		[Creator( AttributeInheritance =  MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract T Create();
 
 		object IFactory.Create() => Create();
 	}
 
-	public class Creator : AssociatedStore<ICreator>
+	public class Creator : AttachedProperty<object, ICreator>
 	{
-		public static void Tag( [Required]ICreator @this, [Required]object item ) => new Creator( item ).Assign( @this );
+		public static Creator Property { get; } = new Creator();
 
-		public Creator( object instance ) : base( instance, typeof(Creator) ) {}
+		Creator() {}
+
+		// public static void Tag( [Required]ICreator @this, [Required]object item ) => new Creator( item ).Assign( @this );
+
+		// public Creator( object instance ) : base( instance, typeof(Creator) ) {}
 	}
 }

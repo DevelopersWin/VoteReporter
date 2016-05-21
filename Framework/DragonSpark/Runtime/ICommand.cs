@@ -172,12 +172,6 @@ namespace DragonSpark.Runtime
 		public DecoratedCommand( [Required] ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
 	}
 
-	/*public class SynchronizedCommand : CommandBase<object>
-	{
-		public override void Execute( object parameter ) {}
-	}*/
-
-	// [CommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance ), GenericCommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 	[CommandParameterValidator, GenericCommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract )]
 	public abstract class CommandBase<T> : ICommand<T>
 	{

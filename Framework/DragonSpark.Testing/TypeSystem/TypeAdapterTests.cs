@@ -1,7 +1,6 @@
 ﻿using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
@@ -25,7 +24,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void Throws()
 		{
-			Assert.Throws<ArgumentNullException>( () => { new TypeAdapter( null ); } );
+			Assert.Throws<ArgumentNullException>( () => { new TypeAdapter( null, null ); } );
 		}
 
 		class Casted

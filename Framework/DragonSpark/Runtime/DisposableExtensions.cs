@@ -38,7 +38,7 @@ namespace DragonSpark.Runtime
 
 		public static T AssociateForDispose<T>( this T @this, params IDisposable[] associated ) where T : IDisposable
 		{
-			AssociatedDisposables.Instance.Attach( @this ).AddRange( associated );
+			AssociatedDisposables.Instance.Get( @this ).AddRange( associated );
 			return @this;
 		}
 	}
@@ -54,7 +54,7 @@ namespace DragonSpark.Runtime
 			this.property = property;
 		}
 
-		public override void Execute( IDisposable parameter ) => property.Attach( parameter ).Purge().Each( disposable => disposable.Dispose() );
+		public override void Execute( IDisposable parameter ) => property.Get( parameter ).Purge().Each( disposable => disposable.Dispose() );
 	}
 
 	/*class Associated : AssociatedStore<IDisposable, ICollection<IDisposable>>
@@ -86,7 +86,7 @@ namespace DragonSpark.Runtime
 		public override void OnSuccess( MethodExecutionArgs args ) =>
 			args.Instance.As<IDisposable>( disposable =>
 										   {
-											   if ( ConfigureAssociatedDisposables.Instance.Attach( disposable ).Item1 )
+											   if ( ConfigureAssociatedDisposables.Instance.Get( disposable ).Item1 )
 											   {
 												   DisposeAssociatedCommand.Instance.Run( disposable );
 											   }

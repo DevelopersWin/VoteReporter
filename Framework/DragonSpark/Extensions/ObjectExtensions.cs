@@ -8,45 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Type = System.Type;
 
 namespace DragonSpark.Extensions
 {
-	public abstract class AttachedProperty<T, TValue> where TValue : class where T : class
-	{
-		readonly ConditionalWeakTable<T, TValue>.CreateValueCallback create;
-		readonly ConditionalWeakTable<T, TValue> items = new ConditionalWeakTable<T, TValue>();
-		// readonly IDictionary<T, TValue> items = new Dictionary<T, TValue>();
-
-		protected AttachedProperty( ConditionalWeakTable<T, TValue>.CreateValueCallback create = null )
-		{
-			this.create = create;
-		}
-
-		public bool Has( T instance )
-		{
-			TValue temp;
-			return items.TryGetValue( instance, out temp );
-		}
-
-		public void Set( T instance, TValue value )
-		{
-			if ( Has( instance ) )
-			{
-				items.Remove( instance );
-			}
-			items.Add( instance, value );
-		}
-
-		public TValue Attach( T instance )
-		{
-			// TValue temp;
-			var result = /*items.TryGetValue( instance, out temp ) ? temp :*/ items.GetValue( instance, create );
-			return result;
-		}
-	}
-
 	public static class ObjectExtensions
 	{
 		// public static T Attached<T>( this object @this, ConditionalWeakTable<object,object>.CreateValueCallback create ) => (T)Pairs.GetValue( @this, create );

@@ -31,7 +31,8 @@ namespace DragonSpark.Testing.Activation.IoC
 			// var builder = new BuilderContext( context.BuildPlanStrategies.MakeStrategyChain(), context.Lifetime, context.Policies, new NamedTypeBuildKey<Target>(), null );
 
 			var parameter = new ConstructTypeRequest( typeof(Target), new object() );
-			Assert.Null( sut.Create( parameter ) );
+			var constructorInfo = sut.Create( parameter );
+			Assert.Null( constructorInfo );
 
 			container.RegisterInstance( Output );
 

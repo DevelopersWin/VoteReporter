@@ -1,33 +1,44 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
+using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
-using PostSharp.Reflection;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using PostSharp;
 
 namespace DragonSpark.Aspects
 {
+	[PSerializable]
+	[ProvideAspectRole( "Data" ), LinesOfCodeAvoided( 1 ), AttributeUsage( AttributeTargets.Method )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Tracing )]
+	public class CreatorAttribute : OnMethodBoundaryAspect
+	{
+		public override void OnSuccess( MethodExecutionArgs args )
+		{
+			if ( args.ReturnValue != null )
+			{
+				args.Instance.As<ICreator>( creator => args.ReturnValue.Set( Creator.Property, creator ) );
+			}
+		}
+	}
+
 	public class Controller
 	{
 		readonly IParameterAware workflow;
 		readonly IAssignableParameterAware assignable;
-
-		// public Controller( IParameterWorkflowState state, IAssignableParameterAware assignable ) : this( workflow, assignable ) {}
 
 		public Controller( IParameterAware workflow, IAssignableParameterAware assignable )
 		{
@@ -86,8 +97,8 @@ namespace DragonSpark.Aspects
 		public Controller Create( object instance )
 		{
 			var aware = instance.AsTo<T, IParameterAware>( Create );
+			var state = instance.Get( AssociatedState.Property );
 			var assignable = new AssignableParameterAware( aware );
-			var state = AssociatedState.Instance.Attach( instance );
 			var result = new Controller( new ParameterWorkflow( state, assignable ), assignable );
 			return result;
 		}
@@ -97,7 +108,7 @@ namespace DragonSpark.Aspects
 
 	class AssociatedState : AttachedProperty<object, IParameterWorkflowState>
 	{
-		public static AssociatedState Instance { get; } = new AssociatedState();
+		public static AssociatedState Property { get; } = new AssociatedState();
 
 		AssociatedState() : base( key => new ParameterWorkflowState() ) {}
 	}
@@ -181,7 +192,7 @@ namespace DragonSpark.Aspects
 		public Controller Create( object instance ) => controllers.GetValue( instance, inner.Create );
 	}*/
 
-	public interface IResourceRepository<in TKey, TValue>
+	/*public interface IResourceRepository<in TKey, TValue>
 	{
 		void Add( TKey key, TValue resource );
 
@@ -203,9 +214,9 @@ namespace DragonSpark.Aspects
 			TValue result;
 			return resources.TryGetValue( key, out result ) ? result : null;
 		}
-	}
+	}*/
 
-	public class ObservableResourceRepository<TKey, TValue> : IResourceRepository<TKey, TValue>, IObservable<TKey> where TValue : class where TKey : class
+	/*public class ObservableResourceRepository<TKey, TValue> : IResourceRepository<TKey, TValue>, IObservable<TKey> where TValue : class where TKey : class
 	{
 		// public static ObservableResourceRepository<TKey, TValue> Instance { get; } = new ObservableResourceRepository<TKey, TValue>( AmbientResourceRepository<TKey, TValue>.Instance );
 
@@ -233,14 +244,14 @@ namespace DragonSpark.Aspects
 		public static ResourceRepository Instance { get; } = new ResourceRepository();
 
 		public ResourceRepository() : base( new AmbientResourceRepository<ResourceKey, IControllerFactory>() ) {}
-	}
+	}*/
 
 	/*public static class ResourceRepositoryExtensions
 	{
 		public static T Get<T>( this IResourceRepository @this, object key ) => (T)@this.Get( key );
 	}*/
 
-	public class ResourceKey : IEquatable<ResourceKey>
+	/*public class ResourceKey : IEquatable<ResourceKey>
 	{
 		readonly static ReflectionTypeComparer Comparer = ReflectionTypeComparer.GetInstance();
 
@@ -268,9 +279,9 @@ namespace DragonSpark.Aspects
 		public static bool operator ==( ResourceKey left, ResourceKey right ) => Equals( left, right );
 
 		public static bool operator !=( ResourceKey left, ResourceKey right ) => !Equals( left, right );
-	}
+	}*/
 
-	[MulticastAttributeUsage]
+	// [MulticastAttributeUsage( AllowExternalAssemblies = true )]
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
@@ -278,15 +289,15 @@ namespace DragonSpark.Aspects
 	{
 		readonly Profile profile;
 		readonly IControllerFactory factory;
-		readonly IResourceRepository<ResourceKey, IControllerFactory> repository;
+		/*readonly IResourceRepository<ResourceKey, IControllerFactory> repository;*/
 
-		protected ParameterValidatorBase( Profile profile, IControllerFactory factory ) : this( profile, factory, ResourceRepository.Instance ) {}
+		protected ParameterValidatorBase( Profile profile, IControllerFactory factory ) /*: this( profile, factory, ResourceRepository.Instance ) {}
 
-		protected ParameterValidatorBase( Profile profile, IControllerFactory factory, IResourceRepository<ResourceKey, IControllerFactory> repository )
+		protected ParameterValidatorBase( Profile profile, IControllerFactory factory, IResourceRepository<ResourceKey, IControllerFactory> repository )*/
 		{
 			this.profile = profile;
 			this.factory = factory;
-			this.repository = repository;
+			// this.repository = repository;
 			// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"Constructor! {profile.Type}", null, null, null ));
 		}
 
@@ -302,8 +313,6 @@ namespace DragonSpark.Aspects
 
 		public override void CompileTimeInitialize( Type type, AspectInfo aspectInfo )
 		{
-			base.CompileTimeInitialize( type, aspectInfo );
-			// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"CompileTimeInitialize: {type}", null, null, null ));
 			var implementation = type.Adapt().DetermineImplementation( profile.Type );
 			var map = type.GetTypeInfo().GetRuntimeInterfaceMap( implementation );
 			Maps = map.InterfaceMethods.TupleWith( map.TargetMethods );
@@ -329,12 +338,12 @@ namespace DragonSpark.Aspects
 		IEnumerable<MethodInfo> Locate( Type type, string name )
 		{
 			var map = Maps.Single( m => m.Item1.Name == name );
-			var defined = map.Item2.DeclaringType == type && !map.Item2.IsAbstract && ( map.Item2.IsFinal || map.Item1.IsVirtual /*|| ( map.Item2.Attributes & MethodAttributes.NewSlot ) == 0*/ );
+			var defined = map.Item2.DeclaringType == type && !map.Item2.IsAbstract && ( map.Item2.IsFinal || map.Item2.IsVirtual /*|| ( map.Item2.Attributes & MethodAttributes.NewSlot ) == 0*/ );
 			// var result = defined ? map.Item2 : null;
 			if ( defined )
 			{
 				// var methodInfo = /*b ? map.Item2.DeclaringType.GetGenericTypeDefinition().GetRuntimeMethods().First( info => info.Name == map.Item2.Name ) :*/ map.Item2;
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{this} {name}: {type} ({map.Item2})", null, null, null ) );
+				// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{this} {name}: {type} ({map.Item2})", null, null, null ) );
 				yield return map.Item2;
 			}
 		}
@@ -416,7 +425,7 @@ namespace DragonSpark.Aspects
 			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), GenericCommandControllerFactory.Instance ) {}
 	}
 
-	[PSerializable]
+	/*[PSerializable]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	public abstract class ParameterValidationMethodBase : MethodInterceptionAspect
 	{
@@ -465,7 +474,7 @@ namespace DragonSpark.Aspects
 		public ExecuteAspect( Type implementationType ) : base( implementationType ) {}
 
 		protected override object GetValue( Controller controller, Func<object> factory, object parameter ) => controller.Execute( o => factory(), parameter );
-	}
+	}*/
 
 	class AssignableParameterAware : IAssignableParameterAware
 	{

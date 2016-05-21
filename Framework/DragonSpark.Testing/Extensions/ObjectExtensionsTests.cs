@@ -162,11 +162,11 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		void DetermineDefault()
 		{
-			var item = Default<IEnumerable<object>>.Item;
+			var item = Default<object>.Items;
 			Assert.IsType<object[]>( item );
 			Assert.Empty( item );
-			Assert.Same( item, Default<IEnumerable<object>>.Item );
-			Assert.Same( Enumerable.Empty<object>(), Enumerable.Empty<object>() );
+			Assert.Same( item, Default<object>.Items );
+			Assert.Same( Default<object>.Items, Enumerable.Empty<object>() );
 			var objects = Default<object>.Items;
 			Assert.Same( item, objects );
 

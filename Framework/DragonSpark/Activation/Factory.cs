@@ -84,7 +84,7 @@ namespace DragonSpark.Activation
 
 		protected TypeLocatorBase( params Type[] types ) : this( types.Select( type => type.Adapt() ).Fixed() ) {}
 
-		protected TypeLocatorBase( params TypeAdapter[] adapters )
+		TypeLocatorBase( params TypeAdapter[] adapters )
 		{
 			this.adapters = adapters;
 		}
@@ -92,13 +92,12 @@ namespace DragonSpark.Activation
 		[Freeze]
 		public override Type Create( Type parameter )
 		{
-			var result = parameter.Adapt().GetAllInterfaces()
+			var result = parameter.Append( parameter.Adapt().GetAllInterfaces() )
 				.AsTypeInfos()
-				.Where( type => type.IsGenericType && adapters.Any( adapter => adapter.IsAssignableFrom( type.GetGenericTypeDefinition() ) ) )
+				.Where( type => type.IsGenericType && type.GetGenericTypeDefinition().With( definition => adapters.Any( adapter => adapter.IsAssignableFrom( definition ) ) ) )
 				.Select( type => Select( type.GenericTypeArguments ) )
 				.FirstOrDefault();
 			return result;
-			// return parameter;
 		}
 
 		protected abstract Type Select( IEnumerable<Type> genericTypeArguments );

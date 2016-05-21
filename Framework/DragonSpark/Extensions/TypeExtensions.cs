@@ -1,11 +1,9 @@
 ﻿using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
-using System;
+using PostSharp.Patterns.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using PostSharp.Patterns.Contracts;
 using Type = System.Type;
 
 namespace DragonSpark.Extensions
@@ -27,7 +25,7 @@ namespace DragonSpark.Extensions
 
 		public static Assembly[] Assemblies( [Required] this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToArray();
 
-		public static TypeAdapter Adapt( [Required]this Type @this ) => TypeAdapterProperty.Instance.Attach( @this );
+		public static TypeAdapter Adapt( [Required]this Type @this ) => TypeAdapterProperty.Instance.Get( @this );
 
 		public static TypeAdapter Adapt( this object @this ) => @this.GetType().Adapt();
 
