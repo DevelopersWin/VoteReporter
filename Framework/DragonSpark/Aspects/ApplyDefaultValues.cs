@@ -38,7 +38,7 @@ namespace DragonSpark.Aspects
 
 		void IInstanceScopedAspect.RuntimeInitializeInstance() => Initialize();
 
-		[Synchronized]
+		// [Synchronized]
 		class ValueProcessor : CommandBase<LocationInterceptionArgs>
 		{
 			[Reference]

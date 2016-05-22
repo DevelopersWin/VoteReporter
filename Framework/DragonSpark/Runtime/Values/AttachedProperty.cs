@@ -1,9 +1,13 @@
 ﻿using PostSharp.Patterns.Model;
 using PostSharp.Patterns.Threading;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using PostSharp.Patterns.Collections;
 
 namespace DragonSpark.Runtime.Values
 {
@@ -26,8 +30,9 @@ namespace DragonSpark.Runtime.Values
 	{
 		readonly ConditionalWeakTable<T, TValue>.CreateValueCallback create;
 
-		// [Reference]
-		readonly IDictionary<T, TValue> items = new Dictionary<T, TValue>();
+		// [Child]
+		// readonly ConcurrentDictionary<T, TValue> items = new ConcurrentDictionary<T, TValue>();
+		readonly ConditionalWeakTable<T, TValue> items = new ConditionalWeakTable<T, TValue>();
 
 		protected AttachedProperty() : this( key => default(TValue) ) {}
 
@@ -39,23 +44,24 @@ namespace DragonSpark.Runtime.Values
 		// [Reader]
 		public bool IsAttached( T instance )
 		{
-			/*TValue temp;
-			return items.TryGetValue( instance, out temp );*/
-			return items.ContainsKey( instance );
+			TValue temp;
+			return items.TryGetValue( instance, out temp );
+			// return items.ContainsKey( instance );
 		}
 
 		// [Writer]
 		public void Set( T instance, TValue value )
 		{
-			/*if ( IsAttached( instance ) )
+			if ( IsAttached( instance ) )
 			{
 				items.Remove( instance );
 			}
-			items.Add( instance, value );*/
-			items[instance] = value;
+			items.Add( instance, value );
+			// items.AddOrUpdate( instance, arg => value, ( arg1, value1 ) => value );
+			// items[instance] = value;
 		}
 
-		// [Reader]
-		public TValue Get( T instance ) => items.Ensure( instance, new Func<T, TValue>( create ) );
+		// [Writer]
+		public TValue Get( T instance ) => items.GetValue( instance, create );
 	}
 }

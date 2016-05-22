@@ -1,4 +1,5 @@
-﻿using DragonSpark.Activation;
+﻿using System.Collections.Concurrent;
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Model;
@@ -7,12 +8,12 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Configuration
 {
-	[Synchronized]
+	// [ReaderWriterSynchronized]
 	class PrototypeStore<T> : FixedStore<T> where T : class, new()
 	{
 		public static PrototypeStore<T> Instance { get; } = new PrototypeStore<T>();
 
-		[Reference]
+		// [Reference]
 		readonly IActivator activator;
 
 		PrototypeStore() : this( Activator.Instance ) {}
@@ -22,6 +23,7 @@ namespace DragonSpark.Configuration
 			this.activator = activator;
 		}
 
+		// [Writer]
 		protected override void OnAssign( T item )
 		{
 			base.OnAssign( item );
@@ -32,19 +34,26 @@ namespace DragonSpark.Configuration
 
 		protected override T Get() => base.Get() ?? /*activator.Activate<T>()*/ new T().With( Assign );
 
+		// [Writer]
 		public T Register( IWritableStore<T> store )
 		{
 			Copies.Add( store.With( Assign ) );
 			return store.Value;
 		}
 
-		[Reference]
-		ICollection<IWritableStore<T>> Copies { get; } = new List<IWritableStore<T>>();
+		// [Reference]
+		ConcurrentBag<IWritableStore<T>> Copies { get; } = new ConcurrentBag<IWritableStore<T>>();
 
+		// [Writer]
 		protected override void OnDispose()
 		{
 			base.OnDispose();
-			Copies.Clear();
+			while ( !Copies.IsEmpty )
+			{
+				IWritableStore<T> item;
+				Copies.TryTake( out item );
+			}
+			// Copies.Clear();
 		}
 	}
 }

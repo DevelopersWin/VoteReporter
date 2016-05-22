@@ -2,48 +2,35 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Patterns.Model;
-using PostSharp.Patterns.Threading;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Collections;
+using System.Collections.Concurrent;
 
 namespace DragonSpark.Aspects
 {
-	// [AutoValidation( false )]
-	[Synchronized]
 	public sealed class CacheValueFactory // : FactoryBase<MethodInterceptionArgs, object>
 	{
-		// public static CacheValueFactory Instance { get; } = new CacheValueFactory();
+		readonly Func<IList, int> factory;
+		readonly ConcurrentDictionary<int, object> items = new ConcurrentDictionary<int, object>();
 
-		[Reference]
-		readonly IDictionary<int, Lazy<object>> items = new Dictionary<int, Lazy<object>>();
+		public CacheValueFactory() : this( KeyFactory.Instance.Create ) {}
 
-		object Get( MethodInterceptionArgs args )
+		CacheValueFactory( Func<IList, int> factory )
 		{
-			var code = KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments.ToArray() );
-			var check = Add( code, args ) || ( args.Method as MethodInfo )?.ReturnType != typeof(void);
-			var result = check ? items[code].Value : null;
-			return result;
+			this.factory = factory;
 		}
 
-		bool Add( int code, MethodInterceptionArgs args )
+		public object Create( MethodInterceptionArgs parameter )
 		{
-			var result = !items.ContainsKey( code );
-			if ( result )
-			{
-				items.Add( code, new Lazy<object>( args.GetReturnValue ) );
-			}
+			var code = factory( parameter.Arguments.ToArray() );
+			var result = items.GetOrAdd( code, key => parameter.GetReturnValue() );
 			return result;
 		}
-
-		// [Yielder]
-		public object Create( MethodInterceptionArgs parameter ) => Get( parameter ) ?? parameter.ReturnValue;
 	}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
-	public sealed class Freeze : MethodInterceptionAspect //, IInstanceScopedAspect
+	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		readonly Func<MethodInterceptionArgs, object> factory;
 
@@ -68,8 +55,8 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		/*object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new Freeze();
+		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new Freeze();
 
-		void IInstanceScopedAspect.RuntimeInitializeInstance() {}*/
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 	}
 }
