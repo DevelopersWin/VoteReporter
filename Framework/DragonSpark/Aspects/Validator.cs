@@ -199,13 +199,24 @@ namespace DragonSpark.Aspects
 			this.factory = factory;
 		}
 
-		IEnumerable<Tuple<MethodInfo, MethodInfo>> Maps { get; set; }
+		public override bool CompileTimeValidate( Type type ) => Maps.Any( pair => pair.Value.Any() );
 
-		public override void CompileTimeInitialize( Type type, AspectInfo aspectInfo )
+		IDictionary<string, MethodInfo[]> Maps { get; set; }
+
+		public override void CompileTimeInitialize( Type type, AspectInfo aspectInfo ) => Maps = CreateMaps( type );
+
+		IDictionary<string, MethodInfo[]> CreateMaps( Type type )
 		{
 			var implementation = type.Adapt().DetermineImplementation( profile.Type );
 			var map = type.GetTypeInfo().GetRuntimeInterfaceMap( implementation );
-			Maps = map.InterfaceMethods.TupleWith( map.TargetMethods );
+			var paired = map.InterfaceMethods.TupleWith( map.TargetMethods );
+
+			var result = new[] { profile.IsAllowed, profile.Execute }
+				.ToDictionary( s => s, s => paired.Where( pair => pair.Item1.Name == s && pair.Item2.DeclaringType == type && !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
+												  .Select( pair => pair.Item2 )
+												  .ToArray() );
+			// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{this} {name}: {type} ({map.Item2})", null, null, null ) );
+			return result;
 		}
 
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
@@ -215,19 +226,8 @@ namespace DragonSpark.Aspects
 			args.ReturnValue = controller.IsAllowed( o => args.GetReturnValue<bool>(), args.Arguments.Single() );
 		}
 
-		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Locate( type, profile.IsAllowed );
+		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Maps[ profile.IsAllowed ];
 			
-		IEnumerable<MethodInfo> Locate( Type type, string name )
-		{
-			var map = Maps.Single( m => m.Item1.Name == name );
-			var defined = map.Item2.DeclaringType == type && !map.Item2.IsAbstract && ( map.Item2.IsFinal || map.Item2.IsVirtual /*|| ( map.Item2.Attributes & MethodAttributes.NewSlot ) == 0*/ );
-			if ( defined )
-			{
-				// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{this} {name}: {type} ({map.Item2})", null, null, null ) );
-				yield return map.Item2;
-			}
-		}
-
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
 		public void OnExecute( MethodInterceptionArgs args )
 		{
@@ -235,7 +235,7 @@ namespace DragonSpark.Aspects
 			args.ReturnValue = controller.Execute( o => args.GetReturnValue(), args.Arguments.Single() );
 		}
 
-		IEnumerable<MethodInfo> FindExecute( Type type ) => Locate( type, profile.Execute );
+		IEnumerable<MethodInfo> FindExecute( Type type ) => Maps[ profile.Execute ];
 	}
 
 	public sealed class FactoryParameterValidator : ParameterValidatorBase
