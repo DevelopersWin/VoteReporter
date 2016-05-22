@@ -4,12 +4,12 @@ using PostSharp.Aspects;
 
 namespace DragonSpark.Testing.Parts.Development
 {
-	public partial class Initialize
+	public partial class Configure
 	{
 		[ModuleInitializer( 0 ), Aspects.Runtime, AssemblyInitialize]
-		public static void Execute() => new Initialize().Run();
+		public static void Initialize() => new Configure().Run();
 
-		Initialize()
+		Configure()
 		{
 			InitializeComponent();
 		}

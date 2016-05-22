@@ -7,7 +7,7 @@ namespace DragonSpark.Windows
 	public partial class Configure
 	{
 		[ModuleInitializer( 0 ), Aspects.Runtime, AssemblyInitialize]
-		public static void Execute() => new Configure().Run();
+		public static void Initialize() => new Configure().Run();
 
 		public Configure()
 		{

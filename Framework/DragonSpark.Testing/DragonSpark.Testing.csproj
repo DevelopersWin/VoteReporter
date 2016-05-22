@@ -265,7 +265,7 @@
     <Compile Include="Extensions\ExceptionExtensionsTests.cs" />
     <Compile Include="Extensions\StringExtensionsTests.cs" />
     <Compile Include="Extensions\UnityContainerExtensionsTests.cs" />
-    <Compile Include="Initialize.cs" />
+    <Compile Include="Configure.cs" />
     <Compile Include="Properties\ResourcesTests.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

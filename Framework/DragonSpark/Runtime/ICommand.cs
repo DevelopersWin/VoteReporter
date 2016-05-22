@@ -172,7 +172,7 @@ namespace DragonSpark.Runtime
 		public DecoratedCommand( [Required] ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
 	}
 
-	[/*CommandParameterValidator,*/ GenericCommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract )]
+	[CommandParameterValidator, GenericCommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract )]
 	public abstract class CommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate { };

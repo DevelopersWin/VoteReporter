@@ -5,9 +5,9 @@ using PostSharp.Aspects;
 
 namespace DragonSpark.Testing
 {
-	public static class Initialize
+	public static class Configure
 	{
 		[ModuleInitializer( 0 ), DragonSpark.Aspects.Runtime, AssemblyInitialize]
-		public static void Execute() => LoadPartAssemblyCommand.Instance.Run( typeof(Initialize).Assembly );
+		public static void Initialize() => LoadPartAssemblyCommand.Instance.Run( typeof(Configure).Assembly );
 	}
 }
