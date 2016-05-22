@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Runtime;
 using Xunit;
 
 namespace DragonSpark.Testing.Runtime
@@ -51,6 +52,28 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 1, sut.CreateCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, created );
+		}
+
+		[Fact]
+		public void VerifyCommand()
+		{
+			var sut = new Command();
+			Assert.Equal( 0, sut.CanExecuteCalled );
+			var cannot = sut.CanExecute( 456 );
+			Assert.False( cannot );
+			Assert.Equal( 1, sut.CanExecuteCalled );
+			
+			var can = sut.CanExecute( 1212 );
+			Assert.True( can );
+			Assert.Equal( 2, sut.CanExecuteCalled );
+			
+
+			Assert.Equal( 0, sut.ExecuteCalled );
+			
+			sut.Execute( 1212 );
+			Assert.Equal( 2, sut.CanExecuteCalled );
+			Assert.Equal( 1, sut.ExecuteCalled );
+			Assert.Equal( 1212, sut.LastResult.GetValueOrDefault() );
 		}
 
 		[FactoryParameterValidator]
@@ -106,6 +129,27 @@ namespace DragonSpark.Testing.Runtime
 			{
 				CreateGenericCalled++;
 				return parameter + 123;
+			}
+		}
+
+		class Command : CommandBase<int>
+		{
+			public int CanExecuteCalled { get; private set; }
+
+			public int ExecuteCalled { get; private set; }
+
+			public int? LastResult { get; set; }
+
+			public override bool CanExecute( int parameter )
+			{
+				CanExecuteCalled++;
+				return parameter == 1212;
+			}
+
+			public override void Execute( int parameter )
+			{
+				ExecuteCalled++;
+				LastResult = parameter;
 			}
 		}
 	}
