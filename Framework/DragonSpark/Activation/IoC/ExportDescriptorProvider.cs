@@ -9,7 +9,6 @@ using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
-using System.Diagnostics;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -82,7 +81,6 @@ namespace DragonSpark.Activation.IoC
 			var existing = provider.GetService( context.BuildKey.Type );
 			existing.With( o =>
 			{
-				Debug.WriteLine( $"Output = {o.GetType()}" );
 				if ( new Checked( o, this ).Value.Apply() && isActivated( o ) )
 				{
 					registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );

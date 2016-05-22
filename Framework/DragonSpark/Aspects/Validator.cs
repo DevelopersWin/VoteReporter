@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using PostSharp;
+using PostSharp.Extensibility;
 
 namespace DragonSpark.Aspects
 {
@@ -33,7 +35,14 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	public class Controller
+	public interface IController
+	{
+		bool IsAllowed( Func<object, bool> assign, object parameter );
+
+		object Execute( Func<object, object> assign, object parameter );
+	}
+
+	class Controller : IController
 	{
 		readonly IParameterAware workflow;
 		readonly IAssignableParameterAware assignable;
@@ -87,15 +96,15 @@ namespace DragonSpark.Aspects
 
 	public interface IControllerFactory
 	{
-		Controller Create( object instance );
+		IController Create( object instance );
 	}
 
 	abstract class ControllerFactoryBase<T> : IControllerFactory
 	{
-		public Controller Create( object instance )
+		public IController Create( object instance )
 		{
 			var aware = instance.AsTo<T, IParameterAware>( Create );
-			var state = instance.Get( AssociatedState.Property );
+			var state = instance.Get( WorkflowState.Property );
 			var assignable = new AssignableParameterAware( aware );
 			var result = new Controller( new ParameterWorkflow( state, assignable ), assignable );
 			return result;
@@ -104,11 +113,11 @@ namespace DragonSpark.Aspects
 		protected abstract IParameterAware Create( T instance );
 	}
 
-	class AssociatedState : AttachedProperty<object, IParameterWorkflowState>
+	class WorkflowState : AttachedProperty<object, IParameterWorkflowState>
 	{
-		public static AssociatedState Property { get; } = new AssociatedState();
+		public static WorkflowState Property { get; } = new WorkflowState();
 
-		AssociatedState() : base( key => new ParameterWorkflowState() ) {}
+		WorkflowState() : base( key => new ParameterWorkflowState() ) {}
 	}
 
 	abstract class GenericControllerFactoryBase : IControllerFactory
@@ -124,10 +133,10 @@ namespace DragonSpark.Aspects
 			adapter = GetType().Adapt();
 		}
 
-		public Controller Create( object instance )
+		public IController Create( object instance )
 		{
 			var arguments = instance.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = adapter.Invoke<Controller>( methodName, arguments, instance );
+			var result = adapter.Invoke<IController>( methodName, arguments, instance );
 			return result;
 		}
 	}
@@ -138,7 +147,7 @@ namespace DragonSpark.Aspects
 
 		GenericFactoryControllerFactory() : base( typeof(IFactory<,>), nameof(Create) ) {}
 
-		static Controller Create<TParameter, TResult>( object instance ) => FactoryControllerFactory<TParameter, TResult>.Instance.Create( instance );
+		static IController Create<TParameter, TResult>( object instance ) => FactoryControllerFactory<TParameter, TResult>.Instance.Create( instance );
 	}
 	class GenericCommandControllerFactory : GenericControllerFactoryBase
 	{
@@ -146,7 +155,7 @@ namespace DragonSpark.Aspects
 
 		GenericCommandControllerFactory() : base( typeof(ICommand<>), nameof(Create) ) {}
 
-		static Controller Create<T>( object instance ) => CommandControllerFactory<T>.Instance.Create( instance );
+		static IController Create<T>( object instance ) => CommandControllerFactory<T>.Instance.Create( instance );
 	}
 
 	class FactoryControllerFactory<TParameter, TResult> : ControllerFactoryBase<IFactory<TParameter, TResult>>
@@ -177,109 +186,7 @@ namespace DragonSpark.Aspects
 		protected override IParameterAware Create( IFactoryWithParameter instance ) => new FactoryWithParameterAware( instance );
 	}
 
-	/*class ControllerRepository : IControllerFactory
-	{
-		readonly IControllerFactory inner;
-		readonly ConditionalWeakTable<object, Controller> controllers = new ConditionalWeakTable<object, Controller>();
-
-		public ControllerRepository( IControllerFactory inner )
-		{
-			this.inner = inner;
-		}
-
-		public Controller Create( object instance ) => controllers.GetValue( instance, inner.Create );
-	}*/
-
-	/*public interface IResourceRepository<in TKey, TValue>
-	{
-		void Add( TKey key, TValue resource );
-
-		TValue Get( TKey key );
-
-		// void Attach( object key, Action<object> callback );
-	}
-
-	class AmbientResourceRepository<TKey, TValue> : IResourceRepository<TKey, TValue> where TValue : class where TKey : class
-	{
-		// public static AmbientResourceRepository<TKey, TValue> Instance { get; } = new AmbientResourceRepository<TKey, TValue>();
-
-		readonly ConditionalWeakTable<TKey, TValue> resources = new ConditionalWeakTable<TKey, TValue>();
-
-		public void Add( TKey key, TValue resource ) => resources.Add( key, resource );
-
-		public TValue Get( TKey key )
-		{
-			TValue result;
-			return resources.TryGetValue( key, out result ) ? result : null;
-		}
-	}*/
-
-	/*public class ObservableResourceRepository<TKey, TValue> : IResourceRepository<TKey, TValue>, IObservable<TKey> where TValue : class where TKey : class
-	{
-		// public static ObservableResourceRepository<TKey, TValue> Instance { get; } = new ObservableResourceRepository<TKey, TValue>( AmbientResourceRepository<TKey, TValue>.Instance );
-
-		readonly ISubject<TKey> subject = new ReplaySubject<TKey>();
-
-		readonly IResourceRepository<TKey, TValue> inner;
-		public ObservableResourceRepository( IResourceRepository<TKey, TValue> inner )
-		{
-			this.inner = inner;
-		}
-
-		public void Add( TKey key, TValue resource )
-		{
-			inner.Add( key, resource );
-			subject.OnNext( key );
-		}
-
-		public TValue Get( TKey key ) => inner.Get( key );
-
-		public IDisposable Subscribe( IObserver<TKey> observer ) => subject.Subscribe( observer );
-	}
-
-	class ResourceRepository : ObservableResourceRepository<ResourceKey, IControllerFactory>
-	{
-		public static ResourceRepository Instance { get; } = new ResourceRepository();
-
-		public ResourceRepository() : base( new AmbientResourceRepository<ResourceKey, IControllerFactory>() ) {}
-	}*/
-
-	/*public static class ResourceRepositoryExtensions
-	{
-		public static T Get<T>( this IResourceRepository @this, object key ) => (T)@this.Get( key );
-	}*/
-
-	/*public class ResourceKey : IEquatable<ResourceKey>
-	{
-		readonly static ReflectionTypeComparer Comparer = ReflectionTypeComparer.GetInstance();
-
-		public ResourceKey( Type targetType, Type implementationType )
-		{
-			TargetType = targetType;
-			ImplementationType = implementationType;
-		}
-
-		public Type TargetType { get; }
-		public Type ImplementationType { get; }
-
-		public bool Equals( ResourceKey other ) => !ReferenceEquals( null, other ) && ( ReferenceEquals( this, other ) || Comparer.Equals( TargetType, other.TargetType ) && Comparer.Equals( ImplementationType, other.ImplementationType ) );
-
-		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( ReferenceEquals( this, obj ) || obj.GetType() == GetType() && Equals( (ResourceKey)obj ) );
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				return ( ( TargetType?.GetHashCode() ?? 0 ) * 397 ) ^ ( ImplementationType?.GetHashCode() ?? 0 );
-			}
-		}
-
-		public static bool operator ==( ResourceKey left, ResourceKey right ) => Equals( left, right );
-
-		public static bool operator !=( ResourceKey left, ResourceKey right ) => !Equals( left, right );
-	}*/
-
-	// [MulticastAttributeUsage( AllowExternalAssemblies = true )]
+	
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
@@ -316,14 +223,15 @@ namespace DragonSpark.Aspects
 			Maps = map.InterfaceMethods.TupleWith( map.TargetMethods );
 		}
 
-		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
+		/*[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
-			var controller = factory.Create( args.Instance );
-			args.ReturnValue = controller.IsAllowed( o => args.GetReturnValue<bool>(), args.Arguments.Single() );
+			/*var controller = factory.Create( args.Instance );
+			args.ReturnValue = controller.IsAllowed( o => args.GetReturnValue<bool>(), args.Arguments.Single() );#1#
+			// args.ReturnValue = true;
 		}
 
-		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Locate( type, profile.IsAllowed );
+		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Locate( type, profile.IsAllowed );*/
 			
 		/*if ( )
 			/*var map = Maps.Single( m => m.Item1.Name == profile.IsAllowed );
@@ -341,17 +249,28 @@ namespace DragonSpark.Aspects
 			if ( defined )
 			{
 				// var methodInfo = /*b ? map.Item2.DeclaringType.GetGenericTypeDefinition().GetRuntimeMethods().First( info => info.Name == map.Item2.Name ) :*/ map.Item2;
-				// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{this} {name}: {type} ({map.Item2})", null, null, null ) );
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{this} {name}: {type} ({map.Item2})", null, null, null ) );
 				yield return map.Item2;
 			}
 		}
 
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
-		public void Execute( MethodInterceptionArgs args )
+		public void OnExecute( MethodInterceptionArgs args )
 		{
-			var controller = factory.Create( args.Instance );
-			args.ReturnValue = controller.Execute( o => args.GetReturnValue(), args.Arguments.Single() );
+			// args.Instance.As<ICommand<MethodBase>>( Create );
+
+			// var controller = factory.Create( args.Instance );
+			// args.ReturnValue = controller.Execute( o => args.GetReturnValue(), args.Arguments.Single() );
 		}
+
+		/*public void Create( ICommand<MethodBase> instance )
+		{
+			// var aware = new CommandParameterAware<MethodBase>( instance );
+			// var state = instance.Get( WorkflowState.Property );
+			// var assignable = new AssignableParameterAware( aware );
+			//var result = new Controller( new ParameterWorkflow( state, assignable ), assignable );
+			// return result;
+		}*/
 
 		IEnumerable<MethodInfo> FindExecute( Type type ) => Locate( type, profile.Execute );
 

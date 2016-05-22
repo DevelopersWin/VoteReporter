@@ -99,9 +99,20 @@ namespace DragonSpark.Runtime
 
 	public class ParameterWorkflowState : IParameterWorkflowState
 	{
+		readonly Container active = new Container(), valid = new Container();
+
+		public void Activate( object parameter, bool on ) => active.SetEnabled( parameter, @on );
+
+		public bool IsActive( object parameter ) => active.IsEnabled( parameter );
+
+		public void Validate( object parameter, bool on ) => valid.SetEnabled( parameter, @on );
+
+		public bool IsValidated( object parameter ) => valid.IsEnabled( parameter );
+
 		class Container
 		{
 			readonly ThreadLocal<ISet<object>> store = new ThreadLocal<ISet<object>>( () => new HashSet<object>() );
+			// readonly ISet<object> store = new HashSet<object>();
 
 			public void SetEnabled( object parameter, bool on )
 			{
@@ -117,16 +128,6 @@ namespace DragonSpark.Runtime
 
 			public bool IsEnabled( object parameter ) => store.Value.Contains( parameter );
 		}
-
-		readonly Container active = new Container(), valid = new Container();
-
-		public void Activate( object parameter, bool on ) => active.SetEnabled( parameter, @on );
-
-		public bool IsActive( object parameter ) => active.IsEnabled( parameter );
-
-		public void Validate( object parameter, bool on ) => valid.SetEnabled( parameter, @on );
-
-		public bool IsValidated( object parameter ) => valid.IsEnabled( parameter );
 
 		/*string Key<T>( object parameter ) => KeyFactory.Instance.ToString( typeof(T), instance, parameter );
 

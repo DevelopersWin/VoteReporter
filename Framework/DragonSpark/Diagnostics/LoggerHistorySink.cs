@@ -12,13 +12,13 @@ using System.Linq;
 
 namespace DragonSpark.Diagnostics
 {
-	[ThreadAffine]
+	// [ThreadAffine]
 	public class LoggerHistorySink : ILoggerHistory
 	{
-		[Reference]
+		// [Reference]
 		readonly IList<LogEvent> source = new Collection<LogEvent>();
 
-		[Reference]
+		// [Reference]
 		readonly IReadOnlyCollection<LogEvent> events;
 
 		public LoggerHistorySink()
@@ -28,28 +28,9 @@ namespace DragonSpark.Diagnostics
 
 		public void Clear() => source.Clear();
 
-		public IEnumerable<LogEvent> Events
-		{
-			get
-			{
-				/*if ( context.ToString() == "T Get[T]()" )
-				{
-					throw new InvalidOperationException( $"WTF {context}" );
-				}*/
-				return events;
-			}
-		}
+		public IEnumerable<LogEvent> Events => events;
 
-		public virtual void Emit( [Required]LogEvent logEvent )
-		{
-			/*if ( context.ToString() == "T Get[T]()" )
-			{
-				throw new InvalidOperationException( "WTF" );
-			}*/
-
-
-			source.Ensure( logEvent );
-		}
+		public virtual void Emit( [Required]LogEvent logEvent ) => source.Ensure( logEvent );
 	}
 
 	public class LogEventTextFactory : FactoryBase<LogEvent, string>

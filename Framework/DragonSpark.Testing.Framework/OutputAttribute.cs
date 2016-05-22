@@ -5,7 +5,9 @@ using DragonSpark.Runtime;
 using PostSharp.Aspects;
 using Serilog;
 using System;
+using System.Diagnostics;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace DragonSpark.Testing.Framework
 {

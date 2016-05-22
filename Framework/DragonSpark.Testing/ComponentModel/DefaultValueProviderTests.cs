@@ -1,20 +1,15 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Testing.Framework.Parameters;
-using DragonSpark.Testing.Objects;
-using DragonSpark.Testing.Objects.IoC;
-using Microsoft.Practices.ServiceLocation;
-using System;
+﻿using DragonSpark.Testing.Framework;
+using System.Reflection;
 using Xunit;
-using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
 namespace DragonSpark.Testing.ComponentModel
 {
-	[UnityContainerFactory.Register]
+	/*[UnityContainerFactory.Register]
 	[Freeze( typeof(IServiceLocator), typeof(ServiceLocator) )]
-	[Freeze( typeof(IActivator), typeof(Activator) )]
+	[Freeze( typeof(IActivator), typeof(Activator) )]*/
 	public class DefaultValueProviderTests
 	{
-		public class Activator : LocatorBase
+		/*public class Activator : LocatorBase
 		{
 			readonly IServiceLocator locator;
 
@@ -24,12 +19,21 @@ namespace DragonSpark.Testing.ComponentModel
 			}
 			
 			public override object Create( LocateTypeRequest parameter ) => locator.GetInstance( parameter.RequestedType, parameter.Name );
-		}
+		}*/
 
-		[Theory, AutoData]
+		/*public class Command : AssignExecutionContextCommand
+		{
+			public override void Execute( MethodBase parameter ) {}
+		}*/
+
+			
+
+		[Fact]
 		void Apply()
 		{
-			var current = DateTime.Now;
+			new Command().Execute( MethodBase.GetCurrentMethod() );
+
+			/*var current = DateTime.Now;
 			var target = new ClassWithDefaultProperties();
 
 			Assert.Equal( 'd', target.Char );
@@ -71,7 +75,7 @@ namespace DragonSpark.Testing.ComponentModel
 
 			Assert.Equal( new Guid( "66570344-BA99-4C90-A7BE-AEC903441F97" ), target.ProvidedGuid );
 
-			Assert.Equal( "Already Set", target.AlreadySet );
+			Assert.Equal( "Already Set", target.AlreadySet );*/
 		}
 	}
 }
