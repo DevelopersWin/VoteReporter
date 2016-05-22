@@ -19,11 +19,11 @@ namespace DragonSpark.Runtime
 		AssociatedDisposables() : base( key => new System.Collections.ObjectModel.Collection<IDisposable>() ) {}
 	}
 
-	public class ConfigureAssociatedDisposables : AttachedProperty<IDisposable, Tuple<bool>>
+	public class ConfigureAssociatedDisposables : AttachedValue<IDisposable, bool>
 	{
 		public static ConfigureAssociatedDisposables Instance { get; } = new ConfigureAssociatedDisposables();
 
-		ConfigureAssociatedDisposables() : base( key => new Tuple<bool>( true ) ) {}
+		ConfigureAssociatedDisposables() : base( key => true ) {}
 	}
 
 	public static class DisposableExtensions

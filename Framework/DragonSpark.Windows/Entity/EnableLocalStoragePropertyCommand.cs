@@ -27,7 +27,7 @@ namespace DragonSpark.Windows.Entity
 		public override void Execute( DbContextBuildingParameter parameter )
 		{
 			var method = parameter.Builder.GetType().GetMethod( nameof(parameter.Builder.ComplexType) );
-			parameter.Context.GetDeclaredEntityTypes().First().Assembly.GetTypes().Where( x => x.Has<ComplexTypeAttribute>() ).Each( x =>
+			parameter.Context.GetDeclaredEntityTypes().First().Assembly.GetTypes().Where( x => AttributeProviderExtensions.Has<ComplexTypeAttribute>( x ) ).Each( x =>
 			{
 				var info = method.MakeGenericMethod( x );
 				info.Invoke( parameter.Builder, null );
@@ -57,14 +57,14 @@ namespace DragonSpark.Windows.Entity
 		{
 			var types = parameter.Context.GetDeclaredEntityTypes().Select( x => x.Adapt().GetHierarchy( false ).Last() ).Distinct().SelectMany( x => x.Assembly.GetTypes().Where( y => x.Namespace == y.Namespace ) ).Distinct().ToArray();
 
-			types.SelectMany( y => y.GetProperties( BindingOptions.AllMembers ).Where( z => z.Has<LocalStorageAttribute>() || ( useConvention && FollowsConvention( z ) )  ) ).Each( x =>
+			types.SelectMany( y => y.GetProperties( BindingOptions.AllMembers ).Where( z => AttributeProviderExtensions.Has<LocalStorageAttribute>( z ) || ( useConvention && FollowsConvention( z ) )  ) ).Each( x =>
 			{
 				ApplyMethod.MakeGenericMethod( x.DeclaringType, x.PropertyType ).Invoke( this, new object[] { parameter.Builder, x } );
 			} );
 		}
 
 		static bool FollowsConvention( PropertyInfo propertyInfo ) => 
-			propertyInfo.Name.EndsWith( "Storage" ) && propertyInfo.DeclaringType.GetProperty( propertyInfo.Name.Replace( "Storage", string.Empty ) ).With( x => x.Has<NotMappedAttribute>() );
+			propertyInfo.Name.EndsWith( "Storage" ) && propertyInfo.DeclaringType.GetProperty( propertyInfo.Name.Replace( "Storage", string.Empty ) ).With( x => AttributeProviderExtensions.Has<NotMappedAttribute>( x ) );
 
 		static void Apply<TEntity, TProperty>( DbModelBuilder builder, PropertyInfo property ) where TEntity : class
 		{

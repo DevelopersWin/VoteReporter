@@ -38,10 +38,10 @@ namespace DragonSpark.TypeSystem
 		public override string Create( Assembly parameter ) => parameter.GetName().Name;
 	}
 
-	public class Activated : AttachedProperty<Assembly, Tuple<bool>>
+	public class Activated : AttachedValue<Assembly, bool>
 	{
 		public static Activated Property { get; } = new Activated();
-		Activated() : base( key => new Tuple<bool>( false ) ) {}
+		Activated() {}
 	}
 
 	public class AssemblyLoader : IAssemblyLoader

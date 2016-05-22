@@ -1,6 +1,9 @@
-﻿using System.Runtime.CompilerServices;
-using PostSharp.Patterns.Model;
+﻿using PostSharp.Patterns.Model;
 using PostSharp.Patterns.Threading;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Runtime.Values
 {
@@ -11,13 +14,20 @@ namespace DragonSpark.Runtime.Values
 		public static void Set<T, TValue>( this T @this, AttachedProperty<T, TValue> property, TValue value ) where T : class where TValue : class => property.Set( @this, value );
 	}
 
-	[ReaderWriterSynchronized]
+	public abstract class AttachedValue<T, TValue> : AttachedProperty<T, Tuple<TValue>> where TValue : struct where T : class
+	{
+		protected AttachedValue() : this( arg => default(TValue) ) {}
+		protected AttachedValue( Func<T, TValue> creator ) : this( arg => new Tuple<TValue>( creator( arg ) ) ) {}
+		AttachedValue( ConditionalWeakTable<T, Tuple<TValue>>.CreateValueCallback create ) : base( create ) {}
+	}
+
+	// [ReaderWriterSynchronized]
 	public abstract class AttachedProperty<T, TValue> where TValue : class where T : class
 	{
 		readonly ConditionalWeakTable<T, TValue>.CreateValueCallback create;
 
-		[Reference]
-		readonly ConditionalWeakTable<T, TValue> items = new ConditionalWeakTable<T, TValue>();
+		// [Reference]
+		readonly IDictionary<T, TValue> items = new Dictionary<T, TValue>();
 
 		protected AttachedProperty() : this( key => default(TValue) ) {}
 
@@ -26,24 +36,26 @@ namespace DragonSpark.Runtime.Values
 			this.create = create;
 		}
 
-		[Reader]
-		public bool Has( T instance )
+		// [Reader]
+		public bool IsAttached( T instance )
 		{
-			TValue temp;
-			return items.TryGetValue( instance, out temp );
+			/*TValue temp;
+			return items.TryGetValue( instance, out temp );*/
+			return items.ContainsKey( instance );
 		}
 
-		[Writer]
+		// [Writer]
 		public void Set( T instance, TValue value )
 		{
-			if ( Has( instance ) )
+			/*if ( IsAttached( instance ) )
 			{
 				items.Remove( instance );
 			}
-			items.Add( instance, value );
+			items.Add( instance, value );*/
+			items[instance] = value;
 		}
 
-		[Reader]
-		public TValue Get( T instance ) => items.GetValue( instance, create );
+		// [Reader]
+		public TValue Get( T instance ) => items.Ensure( instance, new Func<T, TValue>( create ) );
 	}
 }

@@ -64,6 +64,7 @@ namespace DragonSpark.Activation.IoC
 		readonly IServiceProvider provider;
 		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
 		readonly Func<object, bool> isActivated;
+		readonly Condition condition = new Condition();
 
 		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, registry, ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy ) {}
 
@@ -81,7 +82,7 @@ namespace DragonSpark.Activation.IoC
 			var existing = provider.GetService( context.BuildKey.Type );
 			existing.With( o =>
 			{
-				if ( new Checked( o, this ).Value.Apply() && isActivated( o ) )
+				if ( o.Get( condition ).Apply() && isActivated( o ) )
 				{
 					registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );
 				}

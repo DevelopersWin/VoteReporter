@@ -12,13 +12,13 @@ using System.Linq;
 
 namespace DragonSpark.Diagnostics
 {
-	// [ThreadAffine]
+	[ThreadAffine]
 	public class LoggerHistorySink : ILoggerHistory
 	{
-		// [Reference]
+		[Reference]
 		readonly IList<LogEvent> source = new Collection<LogEvent>();
 
-		// [Reference]
+		[Reference]
 		readonly IReadOnlyCollection<LogEvent> events;
 
 		public LoggerHistorySink()

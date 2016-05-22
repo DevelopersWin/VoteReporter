@@ -1,5 +1,4 @@
 using DragonSpark.Diagnostics;
-using DragonSpark.Runtime.Values;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
@@ -40,7 +39,7 @@ namespace DragonSpark.Aspects
 
 		int MaxCallCount { get; set; }
 
-		class Count : ThreadAmbientStore<int>
+		/*class Count : ThreadAmbientStore<int>
 		{
 			public Count( MethodExecutionArgs args ) : base( Keys.For( args ).ToString() ) {}
 
@@ -55,7 +54,7 @@ namespace DragonSpark.Aspects
 			public int Increment() => Update();
 
 			public int Decrement() => Update( false );
-		}
+		}*/
 
 		int Current { get; set; }
 

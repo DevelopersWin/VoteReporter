@@ -153,19 +153,17 @@ namespace DragonSpark.Runtime.Values
 	public class Condition : AttachedProperty<object, ConditionMonitor>
 	{
 		public static Condition Property { get; } = new Condition();
-		protected Condition() : base( key => new ConditionMonitor() ) {}
+		public Condition() : base( key => new ConditionMonitor() ) {}
 	}
 
-	public class Checked : AssociatedStore<ConditionMonitor>
+	/*public class Checked : AssociatedStore<ConditionMonitor>
 	{
-		public Checked( object instance ) : this( instance, instance ) {}
-
-		public Checked( object instance, [Required]object reference ) : this( instance, KeyFactory.Instance.CreateUsing( reference ).ToString() ) {}
+		// public Checked( object instance, [Required]object reference ) : this( instance, KeyFactory.Instance.ToString( reference ) ) {}
 
 		public Checked( [Required]object instance, [Required]string key ) : base( instance, key, () => new ConditionMonitor() ) { }
 
 		protected Checked( [Required]object instance, [Required]Type key ) : base( instance, key, () => new ConditionMonitor() ) { }
-	}
+	}*/
 
 	public class ThreadAmbientStore<T> : AssociatedStore<T>
 	{

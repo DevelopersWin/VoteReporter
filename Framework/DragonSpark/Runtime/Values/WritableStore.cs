@@ -25,7 +25,7 @@ namespace DragonSpark.Runtime.Values
 
 		public override bool IsSatisfiedBy( T parameter )
 		{
-			var isSatisfiedBy = property.Has( parameter );
+			var isSatisfiedBy = property.IsAttached( parameter );
 			return isSatisfiedBy;
 		}
 	}

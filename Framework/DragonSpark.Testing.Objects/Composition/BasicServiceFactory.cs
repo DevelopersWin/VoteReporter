@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Objects.Composition
 	[Export]
 	public class BasicServiceFactory : FactoryBase<IBasicService>
 	{
-		public override IBasicService Create() => new BasicService().WithSelf( service => new Checked( service ).Value.Apply() );
+		public override IBasicService Create() => new BasicService().WithSelf( service => service.Get( Condition.Property ).Apply() );
 	}
 
 	[Export]

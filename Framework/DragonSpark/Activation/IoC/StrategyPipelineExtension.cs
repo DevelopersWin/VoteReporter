@@ -147,6 +147,8 @@ namespace DragonSpark.Activation.IoC
 		{
 			readonly ILogger logger;
 			readonly LifetimeManagerFactory factory;
+			readonly Condition condition = new Condition();
+
 
 			public MetadataLifetimeStrategy( [Required]ILogger logger, [Required]LifetimeManagerFactory factory )
 			{
@@ -157,7 +159,7 @@ namespace DragonSpark.Activation.IoC
 			public override void PreBuildUp( IBuilderContext context )
 			{
 				var reference = new KeyReference( this, context.BuildKey ).Value;
-				if ( new Checked( reference, this ).Value.Apply() )
+				if ( reference.Get( condition ).Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
 					lifetimePolicy.Null( () =>
@@ -371,6 +373,8 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionStrategy : BuilderStrategy
 	{
+		readonly Condition condition = new Condition();
+
 		readonly ConventionCandidateLocator locator;
 		readonly IServiceRegistry registry;
 
@@ -391,7 +395,7 @@ namespace DragonSpark.Activation.IoC
 		public override void PreBuildUp( IBuilderContext context )
 		{
 			var reference = new KeyReference( this, context.BuildKey ).Value;
-			if ( new Checked( reference, this ).Value.Apply() )
+			if ( reference.Get( condition ).Apply() )
 			{
 				var convention = locator.Create( context );
 				convention.With( located =>

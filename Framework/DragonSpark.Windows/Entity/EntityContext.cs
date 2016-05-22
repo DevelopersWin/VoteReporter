@@ -33,7 +33,7 @@ namespace DragonSpark.Windows.Entity
 			{
 				case EntityState.Modified:
 				case EntityState.Unchanged:
-					var names = entityEntry.Entity.GetType().GetProperties().Where( x => x.Has<RequiredAttribute>() ).Select( x => x.Name ).ToArray();
+					var names = entityEntry.Entity.GetType().GetProperties().Where( x => AttributeProviderExtensions.Has<RequiredAttribute>( x ) ).Select( x => x.Name ).ToArray();
 					names.Any().IsTrue( () => this.Load( entityEntry.Entity, names, 0, false ) );
 					break;
 			}

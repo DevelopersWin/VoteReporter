@@ -167,7 +167,7 @@ namespace DragonSpark.Windows.Entity
 			public override string[] Create( Type parameter )
 			{
 				var names = GetAssociationPropertyNames( adapter, parameter );
-				var decorated = parameter.GetProperties().Where( x => x.Has<DefaultIncludeAttribute>() ).Select( x => x.Name );
+				var decorated = parameter.GetProperties().Where( x => AttributeProviderExtensions.Has<DefaultIncludeAttribute>( x ) ).Select( x => x.Name );
 				var result = decorated.Union( names ).ToArray();
 				return result;
 			}

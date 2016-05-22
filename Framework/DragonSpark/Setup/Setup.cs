@@ -204,7 +204,7 @@ namespace DragonSpark.Setup
 
 		class IsActive : ThreadAmbientStore<bool>
 		{
-			public IsActive( object owner, Type type ) : base( KeyFactory.Instance.CreateUsing( owner, type ).ToString() ) {}
+			public IsActive( object owner, Type type ) : base( KeyFactory.Instance.ToString( owner, type ) ) {}
 		}
 	}
 
