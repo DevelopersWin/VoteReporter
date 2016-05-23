@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Extensions
 {
 	public class WeakReferenceListExtensionsTests
 	{
-		[Fact]
+		/*[Fact]
 		void CheckWith()
 		{
 			var list = new List<WeakReference<Class>>();
@@ -28,6 +28,6 @@ namespace DragonSpark.Testing.Extensions
 
 			Assert.Equal( 0, list.AliveOnly().Count );
 
-		}
+		}*/
 	}
 }
