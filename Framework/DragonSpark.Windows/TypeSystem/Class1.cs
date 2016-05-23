@@ -51,7 +51,7 @@ namespace DragonSpark.Windows.TypeSystem
 
 		class Specification : OncePerParameterSpecification<Assembly>
 		{
-			public new static Specification Instance { get; } = new Specification();
+			public static Specification Instance { get; } = new Specification();
 
 			public override bool IsSatisfiedBy( Assembly parameter ) => !Activated( parameter ) && base.IsSatisfiedBy( parameter );
 		}

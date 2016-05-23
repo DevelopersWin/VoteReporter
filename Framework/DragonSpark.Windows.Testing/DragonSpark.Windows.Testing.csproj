@@ -58,10 +58,6 @@
       <HintPath>$(SolutionDir)packages\DNParser.1.2.0.0\lib\net40-Client\CPI.DirectoryServices.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Dynamitey, Version=1.0.2.0, Culture=neutral, PublicKeyToken=cbf53ea3aeb972c6, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Dynamitey.1.0.2.0\lib\net40\Dynamitey.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Hyak.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Hyak.Common.1.1.0\lib\net45\Hyak.Common.dll</HintPath>
       <Private>True</Private>
