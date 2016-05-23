@@ -42,10 +42,6 @@
       <HintPath>$(SolutionDir)packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BouncyCastle.CryptoExt, Version=1.7.4114.6378, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <HintPath>$(SolutionDir)packages\BouncyCastle-Ext.1.7.0\lib\net20\BouncyCastle.CryptoExt.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="ConnectedProperties, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Nito.ConnectedProperties.3.0.0\lib\net40\ConnectedProperties.dll</HintPath>
       <Private>True</Private>
@@ -54,32 +50,8 @@
       <HintPath>$(SolutionDir)packages\Nito.ConnectedProperties.3.0.0\lib\net40\ConnectedProperties.Enlightenment.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CPI.DirectoryServices, Version=1.2.0.0, Culture=neutral, PublicKeyToken=9acea252523a2304, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\DNParser.1.2.0.0\lib\net40-Client\CPI.DirectoryServices.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Hyak.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Hyak.Common.1.1.0\lib\net45\Hyak.Common.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Azure.Common, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Microsoft.Azure.Common.2.1.0\lib\net45\Microsoft.Azure.Common.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Azure.Common.NetFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Microsoft.Azure.Common.2.1.0\lib\net45\Microsoft.Azure.Common.NetFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Azure.KeyVault, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Microsoft.Azure.KeyVault.1.0.0\lib\net45\Microsoft.Azure.KeyVault.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=3.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.10.305161347\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.Platform, Version=3.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.10.305161347\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">

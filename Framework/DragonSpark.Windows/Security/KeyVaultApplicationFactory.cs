@@ -1,15 +1,6 @@
-﻿using CPI.DirectoryServices;
-using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-
-namespace DragonSpark.Windows.Security
+﻿namespace DragonSpark.Windows.Security
 {
-	public class KeyVaultApplication
+	/*public class KeyVaultApplication
 	{
 		public KeyVaultApplication( [Required]X509Certificate2 certificate, [Required]Guid id, [Required]Uri location )
 		{
@@ -21,9 +12,9 @@ namespace DragonSpark.Windows.Security
 		public X509Certificate2 Certificate { get; }
 		public Guid Id { get; }
 		public Uri Location { get; }
-	}
+	}*/
 
-	public class KeyVaultApplicationFactory : FactoryBase<X509Certificate2, KeyVaultApplication>
+	/*public class KeyVaultApplicationFactory : FactoryBase<X509Certificate2, KeyVaultApplication>
 	{
 		public static KeyVaultApplicationFactory Instance { get; } = new KeyVaultApplicationFactory();
 
@@ -38,5 +29,5 @@ namespace DragonSpark.Windows.Security
 		}
 
 		static string Get( IEnumerable<RDNComponent> components, string name ) => components.WithFirst( component => string.Equals( component.ComponentType, name, StringComparison.CurrentCultureIgnoreCase ), component => component.ComponentValue );
-	}
+	}*/
 }

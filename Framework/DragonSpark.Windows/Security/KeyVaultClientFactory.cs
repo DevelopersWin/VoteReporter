@@ -1,27 +1,6 @@
-using DragonSpark.Activation;
-using DragonSpark.Runtime;
-using Microsoft.Azure.KeyVault;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Org.BouncyCastle.Asn1;
-using Org.BouncyCastle.Asn1.X509;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Prng;
-using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Pkcs;
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.X509;
-using PostSharp.Patterns.Contracts;
-using System;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using X509Certificate = System.Security.Cryptography.X509Certificates.X509Certificate;
-
 namespace DragonSpark.Windows.Security
 {
-	public class KeyVaultClientFactory : FactoryBase<KeyVaultClient>
+	/*public class KeyVaultClientFactory : FactoryBase<KeyVaultClient>
 	{
 		readonly ClientAssertionCertificate certificate;
 
@@ -98,7 +77,7 @@ namespace DragonSpark.Windows.Security
 			/*using ( var certFile = File.Create( parameter.FilePath ) )
 			{
 				store.Save( certFile, parameter.Password.ToCharArray(), new SecureRandom( new CryptoApiRandomGenerator() ) );
-			}*/
+			}#1#
 
 			var stream = new MemoryStream();
 			store.Save( stream, parameter.Password.ToCharArray(), new SecureRandom( new CryptoApiRandomGenerator() ) );
@@ -190,11 +169,11 @@ namespace DragonSpark.Windows.Security
 			 1.3.6.1.5.5.7.3.7 - id-kp-ipsecUser 
 			 1.3.6.1.5.5.7.3.8 - id_kp_timeStamping 
 			 1.3.6.1.5.5.7.3.9 - OCSPSigning
-			 */
+			 #1#
 			generator.AddExtension( X509Extensions.ExtendedKeyUsage.Id, false, new ExtendedKeyUsage( KeyPurposeID.IdKPCodeSigning ) );
  
 			var result = generator.Generate( parameter.KeyPair.Private );
 			return result;
 		}
-	}
+	}*/
 }
