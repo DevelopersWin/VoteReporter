@@ -44,87 +44,74 @@ namespace DragonSpark.Runtime.Values
 		TupleConverter() : base( arg => new Tuple<T>( arg ), tuple => tuple.Item1 ) {}
 	}
 
-	public class AttachedValue<T> : AttachedValue<object, T>, IAttachedProperty<T> where T : struct
-	{
-		public AttachedValue() : this( o => default(T) ) {}
-		public AttachedValue( Func<object, T> creator ) : base( creator ) {}
-	}
-
-
 	public abstract class AttachedSetProperty<TItem> : AttachedSetProperty<object, TItem>, IAttachedProperty<ISet<TItem>>
 	{
 		protected AttachedSetProperty() {}
-		protected AttachedSetProperty( ConditionalWeakTable<object, ISet<TItem>>.CreateValueCallback create ) : base( create ) {}
+		protected AttachedSetProperty( Func<object, ISet<TItem>> create ) : base( create ) {}
 	}
 
 	public abstract class AttachedSetProperty<TInstance, TItem> : AttachedPropertyBase<TInstance, ISet<TItem>> where TInstance : class
 	{
 		protected AttachedSetProperty() : base( key => new HashSet<TItem>() ) {}
-		protected AttachedSetProperty( ConditionalWeakTable<TInstance, ISet<TItem>>.CreateValueCallback create ) : base( create ) {}
+		protected AttachedSetProperty( Func<TInstance, ISet<TItem>> create ) : base( create ) {}
 	}
 
 	public abstract class AttachedCollectionProperty<TItem> : AttachedCollectionProperty<object, TItem>, IAttachedProperty<ICollection<TItem>>
 	{
 		protected AttachedCollectionProperty() {}
-		protected AttachedCollectionProperty( ConditionalWeakTable<object, ICollection<TItem>>.CreateValueCallback create ) : base( create ) {}
+		protected AttachedCollectionProperty( Func<object, ICollection<TItem>> create ) : base( create ) {}
 	}
 	
 	public abstract class AttachedCollectionProperty<TInstance, TItem> : AttachedPropertyBase<TInstance, ICollection<TItem>> where TInstance : class
 	{
 		protected AttachedCollectionProperty() : base( key => new System.Collections.ObjectModel.Collection<TItem>() ) {}
-		protected AttachedCollectionProperty( ConditionalWeakTable<TInstance, ICollection<TItem>>.CreateValueCallback create ) : base( create ) {}
+		protected AttachedCollectionProperty( Func<TInstance, ICollection<TItem>> create ) : base( create ) {}
 	}
 
-	public abstract class AttachedValue<TInstance, TValue> : AttachedPropertyBase<TInstance, Tuple<TValue>, TValue> where TValue : struct where TInstance : class
-	{
-		protected AttachedValue() : this( arg => default(TValue) ) {}
-		protected AttachedValue( Func<TInstance, TValue> creator ) : this( arg => new Tuple<TValue>( creator( arg ) ) ) {}
-		AttachedValue( ConditionalWeakTable<TInstance, Tuple<TValue>>.CreateValueCallback create ) : base( create, TupleConverter<TValue>.Instance ) {}
-	}
-
-	public abstract class AttachedPropertyBase<TValue> : AttachedPropertyBase<object, TValue>, IAttachedProperty<TValue> where TValue : class
+	public abstract class AttachedPropertyBase<TValue> : AttachedPropertyBase<object, TValue>, IAttachedProperty<TValue>
 	{
 		protected AttachedPropertyBase() {}
-		protected AttachedPropertyBase( ConditionalWeakTable<object, TValue>.CreateValueCallback create ) : base( create ) {}
+		protected AttachedPropertyBase( Func<object, TValue> create ) : base( create ) {}
+
+		protected AttachedPropertyBase( Func<object, IWritableStore<TValue>> create ) : base( create ) {}
 	}
 
 
-	public abstract class AttachedPropertyBase<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue, TValue> where TInstance : class where TValue : class
+	/*public abstract class AttachedPropertyBase<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue, TValue> where TInstance : class where TValue : class
 	{
 		protected AttachedPropertyBase() : this( key => default(TValue) ) {}
 		protected AttachedPropertyBase( ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create ) : base( create, SelfConverter<TValue>.Instance ) {}
-	}
+	}*/
 
 	// [Synchronized]
-	public abstract class AttachedPropertyBase<TInstance, TStore, TValue> : IAttachedProperty<TInstance, TValue> where TStore : class where TInstance : class
+	public abstract class AttachedPropertyBase<TInstance, TValue> : IAttachedProperty<TInstance, TValue> where TInstance : class
 	{
-		readonly ConditionalWeakTable<TInstance, TStore>.CreateValueCallback create;
-		readonly IConverter<TValue, TStore> converter;
+		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create;
+		
+		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>> items = new ConditionalWeakTable<TInstance, IWritableStore<TValue>>();
 
-		readonly ConditionalWeakTable<TInstance, TStore> items = new ConditionalWeakTable<TInstance, TStore>();
+		protected AttachedPropertyBase() : this( instance => default(TValue) ) {}
 
-		protected AttachedPropertyBase( ConditionalWeakTable<TInstance, TStore>.CreateValueCallback create, IConverter<TValue, TStore> converter )
+		protected AttachedPropertyBase( Func<TInstance, TValue> create ) : this( new Func<TInstance, IWritableStore<TValue>>( instance => new FixedStore<TValue>().Assigned( create( instance ) ) ) ) {}
+
+		protected AttachedPropertyBase( Func<TInstance, IWritableStore<TValue>> create ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( create  ) ) {}
+
+		AttachedPropertyBase( ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create )
 		{
 			this.create = create;
-			this.converter = converter;
 		}
 
 		public bool IsAttached( TInstance instance )
 		{
-			TStore temp;
+			IWritableStore<TValue> temp;
 			return items.TryGetValue( instance, out temp );
 		}
 
-		public void Set( TInstance instance, TValue value )
-		{
-			if ( IsAttached( instance ) )
-			{
-				items.Remove( instance );
-			}
-			items.Add( instance, converter.Convert( value ) );
-		}
+		public void Set( TInstance instance, TValue value ) => GetValue( instance ).Assign( value );
 
-		public TValue Get( TInstance instance ) => converter.Convert( items.GetValue( instance, create ) );
+		public TValue Get( TInstance instance ) => GetValue( instance ).Value;
+
+		IWritableStore<TValue> GetValue( TInstance instance ) => items.GetValue( instance, create );
 	}
 
 	/*public abstract class AttachedPropertyBase<T, TValue> : IAttachedProperty<T, TValue> where TValue : class where T : class

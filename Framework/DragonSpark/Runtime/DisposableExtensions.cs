@@ -21,7 +21,7 @@ namespace DragonSpark.Runtime
 		AssociatedDisposables() {}
 	}
 
-	public class ConfigureAssociatedDisposables : AttachedValue<IDisposable, bool>
+	public class ConfigureAssociatedDisposables : AttachedPropertyBase<IDisposable, bool>
 	{
 		public static ConfigureAssociatedDisposables Instance { get; } = new ConfigureAssociatedDisposables();
 
