@@ -3,20 +3,23 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
+using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
+using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
-using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using DragonSpark.Aspects;
 
 namespace DragonSpark.Runtime
 {
-	public class AssociatedDisposables : AttachedProperty<IDisposable, ICollection<IDisposable>>
+	public class AssociatedDisposables : AttachedCollectionProperty<IDisposable>
 	{
 		public static AssociatedDisposables Instance { get; } = new AssociatedDisposables();
 
-		AssociatedDisposables() : base( key => new System.Collections.ObjectModel.Collection<IDisposable>() ) {}
+		AssociatedDisposables() {}
 	}
 
 	public class ConfigureAssociatedDisposables : AttachedValue<IDisposable, bool>
@@ -30,7 +33,7 @@ namespace DragonSpark.Runtime
 	{
 		public static T Configured<T>( this T @this, bool on ) where T : IDisposable
 		{
-			ConfigureAssociatedDisposables.Instance.Set( @this, new Tuple<bool>( on ) );
+			ConfigureAssociatedDisposables.Instance.Set( @this, on );
 			return @this;
 		}
 
@@ -68,17 +71,34 @@ namespace DragonSpark.Runtime
 	}*/
 
 	[ProvideAspectRole( "Dispose Associated Disposables" ), LinesOfCodeAvoided( 1 )]
-	[PSerializable, MulticastAttributeUsage( MulticastTargets.Method, PersistMetaData = false, TargetMemberAttributes = MulticastAttributes.Instance ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[OnMethodBoundaryAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	[MulticastAttributeUsage( MulticastTargets.Method, PersistMetaData = false, TargetMemberAttributes = MulticastAttributes.Instance ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public sealed class DisposeAssociatedAspect : OnMethodBoundaryAspect
 	{
+		readonly Func<IDisposable, bool> property;
+		readonly Action<IDisposable> command;
+
+		public DisposeAssociatedAspect() : this( ConfigureAssociatedDisposables.Instance.Get, DisposeAssociatedCommand.Instance.Execute ) {}
+
+		public DisposeAssociatedAspect( Func<IDisposable, bool> property, Action<IDisposable> command )
+		{
+			this.property = property;
+			this.command = command;
+		}
+
 		public class Specification : SpecificationBase<MethodBase>
 		{
 			public static Specification Instance { get; } = new Specification();
 
-			readonly TypeAdapter adapter = typeof(IDisposable).Adapt();
+			// readonly TypeAdapter adapter = typeof(IDisposable).Adapt();
 
 			public override bool IsSatisfiedBy( MethodBase parameter ) => 
-				parameter.Name == nameof(IDisposable.Dispose) /*&& AspectSupport.IsEnabled<AssociatedDisposeAttribute>( parameter.DeclaringType )*/ && adapter.IsAssignableFrom( parameter.DeclaringType );
+				GetMappedMethods( parameter ).Any( tuple => tuple.Item1.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item2, parameter ) );
+
+			[Freeze]
+			static IEnumerable<Tuple<MethodInfo, MethodInfo>> GetMappedMethods( MemberInfo parameter ) => parameter.DeclaringType.Adapt().GetMappedMethods( typeof(IDisposable) );
+
+			// parameter.Name == nameof(IDisposable.Dispose) && adapter.IsAssignableFrom( parameter.DeclaringType );
 		}
 
 		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );
@@ -86,9 +106,9 @@ namespace DragonSpark.Runtime
 		public override void OnSuccess( MethodExecutionArgs args ) =>
 			args.Instance.As<IDisposable>( disposable =>
 										   {
-											   if ( ConfigureAssociatedDisposables.Instance.Get( disposable ).Item1 )
+											   if ( property( disposable ) )
 											   {
-												   DisposeAssociatedCommand.Instance.Run( disposable );
+												   command( disposable );
 											   }
 										   } );
 	}

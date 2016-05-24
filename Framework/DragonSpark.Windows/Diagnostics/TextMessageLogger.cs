@@ -60,7 +60,7 @@ namespace DragonSpark.Windows.Diagnostics
 		public ThreadTimer( Func<ulong> current ) : base( current, total => TimeSpan.FromMilliseconds( total * 0.0001 ) ) {}
 	}
 
-	public class TimerEventConverter : Activation.Converter<TimerEvent<Timer>, LoggerTemplate>
+	public class TimerEventConverter : Converter<TimerEvent, TimerEvent<Timer>, LoggerTemplate>
 	{
 		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
 

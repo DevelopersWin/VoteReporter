@@ -133,21 +133,55 @@ namespace DragonSpark.Activation
 		}
 	}*/
 
-	public class Converter<TFrom, TTo> : Converter<object, TFrom, TTo>
+	/*public class Converter<TFrom, TTo> : FactoryBase<TFrom, TTo>
 	{
 		public Converter( Func<TFrom, TTo> convert ) : base( convert ) {}
+
+		// public TTo Convert( TFrom from ) => Create( from );
+
+		// public TFrom Convert( TTo to ) => Create( to );
+	}*/
+
+	public interface IConverter<TFrom, TTo>
+	{
+		TTo Convert( TFrom parameter );
+
+		TFrom Convert( TTo parameter );
 	}
 
-	public class Converter<TBase, TFrom, TTo> : FactoryBase<TBase, TTo> where TFrom : TBase
+	public abstract class Converter<TFrom, TTo> : IConverter<TFrom, TTo>
+	{
+		readonly Func<TFrom, TTo> to;
+		readonly Func<TTo, TFrom> @from;
+
+		protected Converter( Func<TFrom, TTo> to, Func<TTo, TFrom> from )
+		{
+			this.to = to;
+			this.from = from;
+		}
+
+		public TTo Convert( TFrom parameter ) => to( parameter );
+
+		public TFrom Convert( TTo parameter ) => from( parameter );
+	}
+
+	public abstract class Converter<TBase, TFrom, TTo> : FactoryBase<TBase, TTo>, IConverter<TFrom, TTo> where TFrom : TBase
 	{
 		readonly Func<TFrom, TTo> convert;
 
-		public Converter( Func<TFrom, TTo> convert )
+		protected Converter( Func<TFrom, TTo> convert )
 		{
 			this.convert = convert;
 		}
 
-		public override TTo Create( TBase parameter ) => parameter.AsTo<TFrom, TTo>( @from => convert( @from ) );
+		public override TTo Create( TBase parameter ) => parameter.AsTo<TFrom, TTo>( Convert );
+
+		public TTo Convert( TFrom parameter ) => convert( parameter );
+
+		TFrom IConverter<TFrom, TTo>.Convert( TTo parameter )
+		{
+			throw new NotSupportedException();
+		}
 	}
 
 	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>

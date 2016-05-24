@@ -40,7 +40,7 @@ namespace DragonSpark.Aspects
 	{
 		public override void OnEntry( MethodExecutionArgs args )
 		{
-			args.Method.DeclaringType.Assembly().Set( Activated.Property, new Tuple<bool>( true ) );
+			args.Method.DeclaringType.Assembly().Set( Activated.Property, true );
 			base.OnEntry( args );
 		}
 	}

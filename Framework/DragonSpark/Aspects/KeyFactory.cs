@@ -25,7 +25,7 @@ namespace DragonSpark.Aspects
 			parameter.Member.DeclaringType.GetTypeInfo().GUID.GetHashCode() * 6776 + parameter.ToString().GetHashCode();
 	}*/
 
-	/*class AssociatedHash : AttachedProperty<object, Tuple<int>>
+	/*class AssociatedHash : AttachedPropertyBase<object, Tuple<int>>
 	{
 		public static AssociatedHash Instance { get; } = new AssociatedHash();
 

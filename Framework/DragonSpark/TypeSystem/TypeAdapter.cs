@@ -130,7 +130,7 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsGenericOf<T>( bool includeInterfaces = true ) => IsGenericOf( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
 
-		[Freeze]
+		// [Freeze]
 		public Type[] GetTypeArgumentsFor( Type implementationType, bool includeInterfaces = true ) => GetImplementations( implementationType, includeInterfaces ).First().GenericTypeArguments;
 
 		// public Type[] GetImplementations<T>( bool includeInterfaces = true ) => GetImplementations( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
@@ -143,7 +143,18 @@ namespace DragonSpark.TypeSystem
 				.AsTypes()
 				.Fixed();
 
-		public Type DetermineImplementation( Type type ) => CheckGeneric( type ) ?? ( type.Adapt().IsAssignableFrom( Type ) ? type : null );
+		// [Freeze]
+		public Tuple<MethodInfo, MethodInfo>[] GetMappedMethods( Type implementedType )
+		{
+			var implementation = CheckGeneric( implementedType ) ?? ( implementedType.Adapt().IsAssignableFrom( Type ) ? implementedType : null );
+			if ( implementation != null )
+			{
+				var map = Info.GetRuntimeInterfaceMap( implementation );
+				var result = map.InterfaceMethods.TupleWith( map.TargetMethods ).Fixed();
+				return result;
+			}
+			return Default<Tuple<MethodInfo, MethodInfo>>.Items;
+		}
 
 		Type CheckGeneric( Type type )
 		{

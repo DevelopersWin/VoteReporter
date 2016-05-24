@@ -43,11 +43,11 @@ namespace DragonSpark.Windows.TypeSystem
 			parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
 			if ( !Activated( parameter ) )
 			{
-				parameter.Set( DragonSpark.TypeSystem.Activated.Property, new Tuple<bool>( true ) );
+				parameter.Set( DragonSpark.TypeSystem.Activated.Property, true );
 			}
 		}
 
-		static bool Activated( Assembly parameter ) => parameter.Get( DragonSpark.TypeSystem.Activated.Property ).Item1;
+		static bool Activated( Assembly parameter ) => parameter.Get( DragonSpark.TypeSystem.Activated.Property );
 
 		class Specification : OncePerParameterSpecification<Assembly>
 		{

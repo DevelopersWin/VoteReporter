@@ -111,7 +111,7 @@ namespace DragonSpark.Aspects
 		protected abstract IParameterAware Create( T instance );
 	}
 
-	class WorkflowState : AttachedProperty<object, IParameterWorkflowState>
+	class WorkflowState : AttachedPropertyBase<IParameterWorkflowState>
 	{
 		public static WorkflowState Property { get; } = new WorkflowState();
 
@@ -191,9 +191,9 @@ namespace DragonSpark.Aspects
 	public abstract class ParameterValidatorBase : TypeLevelAspect
 	{
 		readonly Profile profile;
-		readonly IControllerFactory factory;
+		readonly Func<object, IController> factory;
 
-		protected ParameterValidatorBase( Profile profile, IControllerFactory factory )
+		protected ParameterValidatorBase( Profile profile, Func<object, IController> factory )
 		{
 			this.profile = profile;
 			this.factory = factory;
@@ -207,12 +207,9 @@ namespace DragonSpark.Aspects
 
 		IDictionary<string, MethodInfo[]> CreateMaps( Type type )
 		{
-			var implementation = type.Adapt().DetermineImplementation( profile.Type );
-			var map = type.GetTypeInfo().GetRuntimeInterfaceMap( implementation );
-			var paired = map.InterfaceMethods.TupleWith( map.TargetMethods );
-
+			var methods = type.Adapt().GetMappedMethods( profile.Type );
 			var result = new[] { profile.IsAllowed, profile.Execute }
-				.ToDictionary( s => s, s => paired.Where( pair => pair.Item1.Name == s && pair.Item2.DeclaringType == type && !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
+				.ToDictionary( s => s, s => methods.Where( pair => pair.Item1.Name == s && pair.Item2.DeclaringType == type && !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
 												  .Select( pair => pair.Item2 )
 												  .ToArray() );
 			// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{this} {name}: {type} ({map.Item2})", null, null, null ) );
@@ -222,7 +219,7 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
-			var controller = factory.Create( args.Instance );
+			var controller = factory( args.Instance );
 			args.ReturnValue = controller.IsAllowed( o => args.GetReturnValue<bool>(), args.Arguments.Single() );
 		}
 
@@ -231,7 +228,7 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
 		public void OnExecute( MethodInterceptionArgs args )
 		{
-			var controller = factory.Create( args.Instance );
+			var controller = factory( args.Instance );
 			args.ReturnValue = controller.Execute( o => args.GetReturnValue(), args.Arguments.Single() );
 		}
 
@@ -241,25 +238,25 @@ namespace DragonSpark.Aspects
 	public sealed class FactoryParameterValidator : ParameterValidatorBase
 	{
 		public FactoryParameterValidator() : 
-			base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), FactoryControllerFactory.Instance ) {}
+			base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), FactoryControllerFactory.Instance.Create ) {}
 	}
 
 	public sealed class GenericFactoryParameterValidator : ParameterValidatorBase
 	{
 		public GenericFactoryParameterValidator() : 
-			base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), GenericFactoryControllerFactory.Instance ) {}
+			base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), GenericFactoryControllerFactory.Instance.Create ) {}
 	}
 
 	public sealed class CommandParameterValidator : ParameterValidatorBase
 	{
 		public CommandParameterValidator() : 
-			base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), CommandControllerFactory.Instance ) {}
+			base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), CommandControllerFactory.Instance.Create ) {}
 	}
 
 	public sealed class GenericCommandParameterValidator : ParameterValidatorBase
 	{
 		public GenericCommandParameterValidator() : 
-			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), GenericCommandControllerFactory.Instance ) {}
+			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), GenericCommandControllerFactory.Instance.Create ) {}
 	}
 
 	class AssignableParameterAware : IAssignableParameterAware

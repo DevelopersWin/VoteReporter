@@ -73,7 +73,7 @@ namespace DragonSpark.Diagnostics
 		public ITimer Timer { get; }
 	}
 
-	public class TimerEventConverter : Converter<TimerEvent<Timer>, TimerEventTemplate>
+	public class TimerEventConverter : Converter<TimerEvent, TimerEvent<Timer>, TimerEventTemplate>
 	{
 		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
 

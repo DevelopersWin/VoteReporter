@@ -15,19 +15,15 @@ namespace DragonSpark.Runtime.Values
 		}
 	}
 
-	public class IsAttachedSpecification<T, TValue> : SpecificationBase<T> where TValue : class where T : class
+	public class IsAttachedSpecification<TInstance, TValue> : SpecificationBase<TInstance> where TValue : class where TInstance : class
 	{
-		readonly AttachedProperty<T, TValue> property;
-		public IsAttachedSpecification( AttachedProperty<T, TValue> property )
+		readonly IAttachedProperty<TInstance, TValue> property;
+		public IsAttachedSpecification( IAttachedProperty<TInstance, TValue> property )
 		{
 			this.property = property;
 		}
 
-		public override bool IsSatisfiedBy( T parameter )
-		{
-			var isSatisfiedBy = property.IsAttached( parameter );
-			return isSatisfiedBy;
-		}
+		public override bool IsSatisfiedBy( TInstance parameter ) => property.IsAttached( parameter );
 	}
 
 	public abstract class WritableStore<T> : StoreBase<T>, IWritableStore<T>, IDisposable
