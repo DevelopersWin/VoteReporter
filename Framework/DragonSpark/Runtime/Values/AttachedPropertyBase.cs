@@ -44,11 +44,11 @@ namespace DragonSpark.Runtime.Values
 		TupleConverter() : base( arg => new Tuple<T>( arg ), tuple => tuple.Item1 ) {}
 	}
 
-	/*public class AttachedValue<T> : AttachedValue<object, T>, IAttachedProperty<T> where T : struct
+	public class AttachedValue<T> : AttachedValue<object, T>, IAttachedProperty<T> where T : struct
 	{
 		public AttachedValue() : this( o => default(T) ) {}
 		public AttachedValue( Func<object, T> creator ) : base( creator ) {}
-	}*/
+	}
 
 
 	public abstract class AttachedSetProperty<TItem> : AttachedSetProperty<object, TItem>, IAttachedProperty<ISet<TItem>>
@@ -75,12 +75,12 @@ namespace DragonSpark.Runtime.Values
 		protected AttachedCollectionProperty( ConditionalWeakTable<TInstance, ICollection<TItem>>.CreateValueCallback create ) : base( create ) {}
 	}
 
-	/*public abstract class AttachedValue<TInstance, TValue> : AttachedPropertyBase<TInstance, Tuple<TValue>> where TValue : struct where TInstance : class
+	public abstract class AttachedValue<TInstance, TValue> : AttachedPropertyBase<TInstance, Tuple<TValue>, TValue> where TValue : struct where TInstance : class
 	{
 		protected AttachedValue() : this( arg => default(TValue) ) {}
 		protected AttachedValue( Func<TInstance, TValue> creator ) : this( arg => new Tuple<TValue>( creator( arg ) ) ) {}
 		AttachedValue( ConditionalWeakTable<TInstance, Tuple<TValue>>.CreateValueCallback create ) : base( create, TupleConverter<TValue>.Instance ) {}
-	}*/
+	}
 
 	public abstract class AttachedPropertyBase<TValue> : AttachedPropertyBase<object, TValue>, IAttachedProperty<TValue> where TValue : class
 	{
@@ -89,13 +89,13 @@ namespace DragonSpark.Runtime.Values
 	}
 
 
-	/*public abstract class AttachedPropertyBase<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue, TValue> where TInstance : class where TValue : class
+	public abstract class AttachedPropertyBase<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue, TValue> where TInstance : class where TValue : class
 	{
 		protected AttachedPropertyBase() : this( key => default(TValue) ) {}
 		protected AttachedPropertyBase( ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create ) : base( create, SelfConverter<TValue>.Instance ) {}
-	}*/
+	}
 
-	/*[Synchronized]
+	// [Synchronized]
 	public abstract class AttachedPropertyBase<TInstance, TStore, TValue> : IAttachedProperty<TInstance, TValue> where TStore : class where TInstance : class
 	{
 		readonly ConditionalWeakTable<TInstance, TStore>.CreateValueCallback create;
@@ -125,9 +125,9 @@ namespace DragonSpark.Runtime.Values
 		}
 
 		public TValue Get( TInstance instance ) => converter.Convert( items.GetValue( instance, create ) );
-	}*/
+	}
 
-	public abstract class AttachedPropertyBase<T, TValue> where TValue : class where T : class
+	/*public abstract class AttachedPropertyBase<T, TValue> : IAttachedProperty<T, TValue> where TValue : class where T : class
 	{
 		readonly ConditionalWeakTable<T, TValue>.CreateValueCallback create;
 
@@ -164,5 +164,5 @@ namespace DragonSpark.Runtime.Values
 
 		// [Writer]
 		public TValue Get( T instance ) => items.GetValue( instance, create );
-	}
+	}*/
 }

@@ -5,7 +5,6 @@ using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 
 namespace DragonSpark.Aspects
 {
@@ -27,7 +26,7 @@ namespace DragonSpark.Aspects
 			var result = items.GetOrAdd( code, key => parameter.GetReturnValue() );
 			if ( result == null )
 			{
-				Debug.WriteLine( $"{items.GetHashCode()} - Code: {code}. Instance: {parameter.Instance}. Method: {parameter.Method}" );
+				// Debug.WriteLine( $"{items.GetHashCode()} - Code: {code}. Instance: {parameter.Instance}. Method: {parameter.Method}" );
 			}
 			return result;
 		}
