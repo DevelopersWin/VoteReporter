@@ -6,9 +6,9 @@ namespace DragonSpark.Extensions
 {
 	public static class BuilderContextExtensions
 	{
-		/*public static BuilderContext Context<T>( this ExtensionContext @this ) => new BuilderContext( @this.Strategies.MakeStrategyChain(), @this.Lifetime, @this.Policies, NamedTypeBuildKey.Make<T>(), null );
+		/*public static BuilderContext RelayParameterAware<T>( this ExtensionContext @this ) => new BuilderContext( @this.Strategies.MakeStrategyChain(), @this.Lifetime, @this.Policies, NamedTypeBuildKey.Make<T>(), null );
 
-		public static T New<T>( this ExtensionContext @this ) => @this.Context<T>().With( context => context.New<T>() );*/
+		public static T New<T>( this ExtensionContext @this ) => @this.RelayParameterAware<T>().With( context => context.New<T>() );*/
 
 		/*public static T AddStrategy<T>( this ExtensionContext @this, UnityBuildStage stage ) where T : IBuilderStrategy
 		{

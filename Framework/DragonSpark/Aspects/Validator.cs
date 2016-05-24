@@ -33,54 +33,9 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	/*public interface IController
-	{
-		bool IsAllowed( Func<object, bool> assign, object parameter );
-
-		object Execute( Func<object, object> assign, object parameter );
-	}*/
-
 	public delegate bool IsValid( object parameter );
 
 	public delegate object Execute( object parameter );
-
-	/*class Controller : IController
-	{
-		readonly IParameterAware workflow;
-		readonly IParameterAware adapter;
-
-		public Controller( IParameterAware adapter )
-		{
-			this.adapter = adapter;
-		}
-
-		public bool IsAllowed( IsValid assign, object parameter )
-		{
-			
-			/*using ( new IsAllowedAssignment( adapter, assign ).Configured( false ) )
-			{
-				return workflow.IsValid( parameter );
-			}#1#
-		}
-
-		public object Execute( Func<object, object> assign, object parameter )
-		{
-			using ( new ExecuteAssignment( adapter, assign ).Configured( false ) )
-			{
-				return workflow.Execute( parameter );
-			}
-		}
-
-		/*class IsAllowedAssignment : Assignment<IsValid>
-		{
-			public IsAllowedAssignment( IAssignableParameterAware adapter, Func<object, bool> first ) : base( adapter.Assign, new Value<Func<object, bool>>( first ) ) {}
-		}
-
-		class ExecuteAssignment : Assignment<Execute>
-		{
-			public ExecuteAssignment( IAssignableParameterAware adapter, Func<object, object> first ) : base( adapter.Assign, new Value<Func<object, object>>( first ) ) {}
-		}#1#
-	}*/
 
 	public class Profile
 	{
@@ -96,22 +51,9 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}
 
-	/*public interface IControllerFactory
-	{
-		IController Create( object instance );
-	}*/
-
 	abstract class AdapterFactoryBase<T> : ProjectedStore<T, IParameterAware>
 	{
-		/*public IController Create( object instance )
-		{
-			var state = instance.Get( WorkflowState.Property );
-			var assignable = new AssignableParameterAware( aware );
-			var result = new Controller( new ParameterWorkflow( state, assignable ), assignable );
-			return result;
-		}*/
-
-		
+		protected override IParameterAware CreateValue( object instance ) => new RelayParameterAware( base.CreateValue( instance ), WorkflowState.Property.Get( instance ) );
 	}
 
 	class WorkflowState : AttachedProperty<ParameterWorkflowState>
@@ -159,20 +101,6 @@ namespace DragonSpark.Aspects
 		static IParameterAware Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
-	/*class FactoryAdapterFactory<TParameter, TResult> : AdapterFactoryBase<IFactory<TParameter, TResult>>
-	{
-		public new static FactoryAdapterFactory<TParameter, TResult> Instance { get; } = new FactoryAdapterFactory<TParameter, TResult>();
-
-		protected override IParameterAware Project( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
-	}
-
-	class GenericCommandAdapterFactory<T> : AdapterFactoryBase<ICommand<T>>
-	{
-		public new static GenericCommandAdapterFactory<T> Instance { get; } = new GenericCommandAdapterFactory<T>();
-
-		protected override IParameterAware Project( ICommand<T> instance ) => new CommandAdapter<T>( instance );
-	}*/
-
 	class CommandAdapterFactory : AdapterFactoryBase<ICommand>
 	{
 		public new static CommandAdapterFactory Instance { get; } = new CommandAdapterFactory();
@@ -187,6 +115,47 @@ namespace DragonSpark.Aspects
 		protected override IParameterAware Project( IFactoryWithParameter instance ) => new DelegatedParameterAware( instance.CanCreate, instance.Create );
 	}
 
+	public class RelayParameterAware : IParameterAware
+	{
+		readonly IParameterAware adapter;
+		readonly IParameterWorkflowState state;
+
+		public RelayParameterAware( IParameterAware adapter, IParameterWorkflowState state )
+		{
+			this.adapter = adapter;
+			this.state = state;
+		}
+
+		public bool IsValid( object parameter ) => parameter.AsTo<RelayParameter<bool>, bool>( IsValid );
+
+		bool IsValid( RelayParameter<bool> parameter )
+		{
+			var workflow = new ParameterWorkflow( state, new DelegatedParameterAware( o => parameter.Factory(), adapter.Execute ) );
+			var result = workflow.IsValid( parameter.Parameter );
+			return result;
+		}
+
+		public object Execute( object parameter ) => parameter.AsTo<RelayParameter<object>, object>( Execute );
+
+		object Execute( RelayParameter<object> parameter )
+		{
+			var workflow = new ParameterWorkflow( state, new DelegatedParameterAware( adapter.IsValid, o => parameter.Factory() ) );
+			var result = workflow.Execute( parameter.Parameter );
+			return result;
+		}
+	}
+
+	public class RelayParameter<T>
+	{
+		public RelayParameter( Func<T> factory, object parameter )
+		{
+			Factory = factory;
+			Parameter = parameter;
+		}
+
+		public Func<T> Factory { get; }
+		public object Parameter { get; }
+	}
 	
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
@@ -224,10 +193,8 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
-			var adapter = factory( args.Instance );
-			var state = WorkflowState.Property.Get( args.Instance );
-			var workflow = new ParameterWorkflow( state, new DelegatedParameterAware( o => args.GetReturnValue<bool>(), adapter.Execute ) );
-			args.ReturnValue = workflow.IsValid( args.Arguments.Single() );
+			var parameter = new RelayParameter<bool>( args.GetReturnValue<bool>, args.Arguments.Single() );
+			args.ReturnValue = factory( args.Instance ).IsValid( parameter );
 		}
 
 		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Maps[ profile.IsAllowed ];
@@ -235,10 +202,8 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
 		public void OnExecute( MethodInterceptionArgs args )
 		{
-			var adapter = factory( args.Instance );
-			var state = WorkflowState.Property.Get( args.Instance );
-			var workflow = new ParameterWorkflow( state, new DelegatedParameterAware( adapter.IsValid, o => args.GetReturnValue() ) );
-			args.ReturnValue = workflow.Execute( args.Arguments.Single() );
+			var parameter = new RelayParameter<object>( args.GetReturnValue, args.Arguments.Single() );
+			args.ReturnValue = factory( args.Instance ).Execute( parameter );
 		}
 
 		IEnumerable<MethodInfo> FindExecute( Type type ) => Maps[ profile.Execute ];

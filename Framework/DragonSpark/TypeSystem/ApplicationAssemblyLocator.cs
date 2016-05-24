@@ -7,7 +7,7 @@ namespace DragonSpark.TypeSystem
 {
 	/*public static class Assemblies
 	{
-		public static Assembly[] GetCurrent() => new CurrentApplication().Item.Context.Assemblies;
+		public static Assembly[] GetCurrent() => new CurrentApplication().Item.RelayParameterAware.Assemblies;
 
 		public delegate Assembly[] Get();
 
