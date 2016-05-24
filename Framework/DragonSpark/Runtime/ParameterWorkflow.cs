@@ -113,27 +113,11 @@ namespace DragonSpark.Runtime
 		{
 			readonly static object Null = new object();
 
-			/*public Container() /*: base( o => new ThreadLocalStore<bool>( () => false ) )#1# {}
-
-			public override bool Get( object instance )
-			{
-				var o = instance ?? Null;
-				var b = base.Get( o );
-				return b;
-			}
-
-			public override void Set( object instance, bool value )
-			{
-				var o = instance ?? Null;
-				base.Set( o, value );
-			}*/
-
-			// readonly ThreadLocal<ISet<object>> store = new ThreadLocal<ISet<object>>( () => new HashSet<object>() );
-			readonly ISet<object> store = new HashSet<object>();
+			readonly ISet<int> store = new HashSet<int>();
 
 			public void Set( object parameter, bool on )
 			{
-				var @checked = parameter ?? Null;
+				var @checked = ( parameter ?? Null ).GetHashCode();
 				if ( on )
 				{
 					store.Add( @checked );
@@ -144,20 +128,8 @@ namespace DragonSpark.Runtime
 				}
 			}
 
-			public bool Get( object parameter ) => store.Contains( parameter ?? Null );
+			public bool Get( object parameter ) => store.Contains( ( parameter ?? Null ).GetHashCode() );
 		}
-
-		/*string Key<T>( object parameter ) => KeyFactory.Instance.ToString( typeof(T), instance, parameter );
-
-		class Valid : ThreadAmbientStore<bool>
-		{
-			public Valid( string key ) : base( key ) {}
-		}
-
-		class Active : ThreadAmbientStore<bool>
-		{
-			public Active( string key ) : base( key ) {}
-		}*/
 	}
 
 	public interface IParameterAware
@@ -166,19 +138,6 @@ namespace DragonSpark.Runtime
 
 		object Execute( object parameter );
 	}
-
-	/*public class FactoryAdapter : IParameterAware
-	{
-		readonly IFactoryWithParameter inner;
-		public FactoryAdapter( IFactoryWithParameter inner )
-		{
-			this.inner = inner;
-		}
-
-		public bool IsValid( object parameter ) => inner.CanCreate( parameter );
-
-		public object Execute( object parameter ) => inner.Create( parameter );
-	}*/
 
 	public class FactoryAdapter<TParameter, TResult> : IParameterAware
 	{
@@ -233,8 +192,6 @@ namespace DragonSpark.Runtime
 		readonly IsValid specification;
 		readonly Execute execute;
 		
-		// public ParameterWorkflow( IParameterWorkflowState state, IParameterAware aware ) : this ( state, aware.IsValid, aware.Execute ) {}
-
 		public ParameterWorkflow( IParameterWorkflowState state, IsValid specification, Execute execute )
 		{
 			this.state = state;

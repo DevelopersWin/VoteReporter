@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
@@ -111,11 +110,9 @@ namespace DragonSpark.Runtime.Values
 			return items.TryGetValue( instance, out temp );
 		}
 
-		public virtual void Set( TInstance instance, TValue value ) => GetValue( instance ).Assign( value );
+		public virtual void Set( TInstance instance, TValue value ) => items.GetValue( instance, create ).Assign( value );
 
-		public virtual TValue Get( TInstance instance ) => GetValue( instance ).Value;
-
-		IWritableStore<TValue> GetValue( TInstance instance ) => items.GetValue( instance, create );
+		public virtual TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
 	}
 
 	public class ActivatedAttachedPropertyStore<TValue> : ActivatedAttachedPropertyStore<object, TValue> where TValue : new()
@@ -132,7 +129,7 @@ namespace DragonSpark.Runtime.Values
 
 	public abstract class ProjectedStore<TInstance, TValue> : AssignedAttachedPropertyStore<object, TValue>
 	{
-		protected override TValue CreateValue( object instance ) => instance.AsTo<TInstance, TValue>( Project );
+		protected override TValue CreateValue( object instance ) => instance is TInstance ? Project( (TInstance)instance ) : default(TValue);
 
 		protected abstract TValue Project( TInstance instance );
 	}
