@@ -3,7 +3,6 @@ using DragonSpark.Aspects;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -102,32 +101,50 @@ namespace DragonSpark.Runtime
 	{
 		readonly Container active = new Container(), valid = new Container();
 
-		public void Activate( object parameter, bool on ) => active.SetEnabled( parameter, @on );
+		public void Activate( object parameter, bool on ) => active.Set( parameter, @on );
 
-		public bool IsActive( object parameter ) => active.IsEnabled( parameter );
+		public bool IsActive( object parameter ) => active.Get( parameter );
 
-		public void Validate( object parameter, bool on ) => valid.SetEnabled( parameter, @on );
+		public void Validate( object parameter, bool on ) => valid.Set( parameter, @on );
 
-		public bool IsValidated( object parameter ) => valid.IsEnabled( parameter );
+		public bool IsValidated( object parameter ) => valid.Get( parameter );
 
-		class Container
+		class Container // : AttachedProperty<bool>
 		{
-			readonly ThreadLocal<ISet<object>> store = new ThreadLocal<ISet<object>>( () => new HashSet<object>() );
-			// readonly ISet<object> store = new HashSet<object>();
+			readonly static object Null = new object();
 
-			public void SetEnabled( object parameter, bool on )
+			/*public Container() /*: base( o => new ThreadLocalStore<bool>( () => false ) )#1# {}
+
+			public override bool Get( object instance )
 			{
+				var o = instance ?? Null;
+				var b = base.Get( o );
+				return b;
+			}
+
+			public override void Set( object instance, bool value )
+			{
+				var o = instance ?? Null;
+				base.Set( o, value );
+			}*/
+
+			// readonly ThreadLocal<ISet<object>> store = new ThreadLocal<ISet<object>>( () => new HashSet<object>() );
+			readonly ISet<object> store = new HashSet<object>();
+
+			public void Set( object parameter, bool on )
+			{
+				var @checked = parameter ?? Null;
 				if ( on )
 				{
-					store.Value.Add( parameter );
+					store.Add( @checked );
 				}
 				else
 				{
-					store.Value.Remove( parameter );
+					store.Remove( @checked );
 				}
 			}
 
-			public bool IsEnabled( object parameter ) => store.Value.Contains( parameter );
+			public bool Get( object parameter ) => store.Contains( parameter ?? Null );
 		}
 
 		/*string Key<T>( object parameter ) => KeyFactory.Instance.ToString( typeof(T), instance, parameter );
@@ -216,7 +233,7 @@ namespace DragonSpark.Runtime
 		readonly IsValid specification;
 		readonly Execute execute;
 		
-		public ParameterWorkflow( IParameterWorkflowState state, IParameterAware aware ) : this ( state, aware.IsValid, aware.Execute ) {}
+		// public ParameterWorkflow( IParameterWorkflowState state, IParameterAware aware ) : this ( state, aware.IsValid, aware.Execute ) {}
 
 		public ParameterWorkflow( IParameterWorkflowState state, IsValid specification, Execute execute )
 		{

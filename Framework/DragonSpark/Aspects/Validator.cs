@@ -53,14 +53,14 @@ namespace DragonSpark.Aspects
 
 	abstract class AdapterFactoryBase<T> : ProjectedStore<T, IParameterAware>
 	{
-		protected override IParameterAware CreateValue( object instance ) => new RelayParameterAware( base.CreateValue( instance ), WorkflowState.Property.Get( instance ) );
+		protected override IParameterAware CreateValue( object instance ) => new RelayParameterAware( base.CreateValue( instance ), () => WorkflowState.Property.Get( instance ) );
 	}
 
-	class WorkflowState : AttachedProperty<ParameterWorkflowState>
+	class WorkflowState : AttachedProperty<IParameterWorkflowState>
 	{
 		public static WorkflowState Property { get; } = new WorkflowState();
 
-		WorkflowState() : base( ActivatedAttachedPropertyStore<object, ParameterWorkflowState>.Instance ) {}
+		WorkflowState() : base( o => new ThreadLocalStore<IParameterWorkflowState>( () => new ParameterWorkflowState() ) ) {}
 	}
 
 	abstract class GenericAdapterFactoryBase : AdapterFactoryBase<object>
@@ -118,9 +118,9 @@ namespace DragonSpark.Aspects
 	public class RelayParameterAware : IParameterAware
 	{
 		readonly IParameterAware adapter;
-		readonly IParameterWorkflowState state;
+		readonly Func<IParameterWorkflowState> state;
 
-		public RelayParameterAware( IParameterAware adapter, IParameterWorkflowState state )
+		public RelayParameterAware( IParameterAware adapter, Func<IParameterWorkflowState> state )
 		{
 			this.adapter = adapter;
 			this.state = state;
@@ -130,7 +130,7 @@ namespace DragonSpark.Aspects
 
 		bool IsValid( RelayParameter<bool> parameter )
 		{
-			var workflow = new ParameterWorkflow( state, new DelegatedParameterAware( o => parameter.Factory(), adapter.Execute ) );
+			var workflow = new ParameterWorkflow( state(), o => parameter.Factory(), adapter.Execute );
 			var result = workflow.IsValid( parameter.Parameter );
 			return result;
 		}
@@ -139,7 +139,7 @@ namespace DragonSpark.Aspects
 
 		object Execute( RelayParameter<object> parameter )
 		{
-			var workflow = new ParameterWorkflow( state, new DelegatedParameterAware( adapter.IsValid, o => parameter.Factory() ) );
+			var workflow = new ParameterWorkflow( state(), adapter.IsValid, o => parameter.Factory() );
 			var result = workflow.Execute( parameter.Parameter );
 			return result;
 		}
@@ -165,7 +165,7 @@ namespace DragonSpark.Aspects
 		readonly Profile profile;
 		readonly Func<object, IParameterAware> factory;
 
-		// protected ParameterValidatorBase( Profile profile, AttachedPropertyStore<object, IParameterAware> store ) : this( profile, new AttachedProperty<IParameterAware>( store ).Get ) {}
+		// protected ParameterValidatorBase( Profile profile, AssignedAttachedPropertyStore<object, IParameterAware> store ) : this( profile, new AttachedProperty<IParameterAware>( store ).Get ) {}
 
 		protected ParameterValidatorBase( Profile profile, Func<object, IParameterAware> factory )
 		{
@@ -246,11 +246,11 @@ namespace DragonSpark.Aspects
 		readonly IsValid valid;
 		readonly Execute execute;
 
-		public DelegatedParameterAware( IsValid valid, Action<object> execute ) : this( valid, new Execute( parameter =>
+		/*public DelegatedParameterAware( IsValid valid, Action<object> execute ) : this( valid, new Execute( parameter =>
 																											{
 																												execute( parameter );
 																												return null;
-																											} ) ) {}
+																											} ) ) {}*/
 
 		public DelegatedParameterAware( IsValid valid, Execute execute )
 		{

@@ -74,7 +74,8 @@ namespace DragonSpark.Runtime.Values
 		public AttachedProperty() {}
 		public AttachedProperty( Func<object, TValue> create ) : this( create, o => new FixedStore<TValue>() ) {}
 
-		public AttachedProperty( Func<object, TValue> create, Func<object, IWritableStore<TValue>> store ) : base( new AttachedPropertyStore<object, TValue>( create, store ) ) {}
+		public AttachedProperty( Func<object, IWritableStore<TValue>> store ) : this( new AttachedPropertyStore<object, TValue>( store ) ) {}
+		public AttachedProperty( Func<object, TValue> create, Func<object, IWritableStore<TValue>> store ) : base( new AssignedAttachedPropertyStore<object, TValue>( create, store ) ) {}
 
 		public AttachedProperty( AttachedPropertyStore<object, TValue> create ) : base( create ) {}
 	}
@@ -95,7 +96,7 @@ namespace DragonSpark.Runtime.Values
 
 		public AttachedProperty() : this( instance => default(TValue) ) {}
 
-		public AttachedProperty( Func<TInstance, TValue> create ) : this( new AttachedPropertyStore<TInstance, TValue>( create ) ) {}
+		public AttachedProperty( Func<TInstance, TValue> create ) : this( new AssignedAttachedPropertyStore<TInstance, TValue>( create ) ) {}
 
 		public AttachedProperty( AttachedPropertyStore<TInstance, TValue> create ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( create.Create ) ) {}
 
@@ -110,9 +111,9 @@ namespace DragonSpark.Runtime.Values
 			return items.TryGetValue( instance, out temp );
 		}
 
-		public void Set( TInstance instance, TValue value ) => GetValue( instance ).Assign( value );
+		public virtual void Set( TInstance instance, TValue value ) => GetValue( instance ).Assign( value );
 
-		public TValue Get( TInstance instance ) => GetValue( instance ).Value;
+		public virtual TValue Get( TInstance instance ) => GetValue( instance ).Value;
 
 		IWritableStore<TValue> GetValue( TInstance instance ) => items.GetValue( instance, create );
 	}
@@ -122,80 +123,55 @@ namespace DragonSpark.Runtime.Values
 		public new static ActivatedAttachedPropertyStore<TValue> Instance { get; } = new ActivatedAttachedPropertyStore<TValue>();
 	}
 
-	public class ActivatedAttachedPropertyStore<TInstance, TValue> : AttachedPropertyStore<TInstance, TValue> where TValue : new() where TInstance : class
+	public class ActivatedAttachedPropertyStore<TInstance, TValue> : AssignedAttachedPropertyStore<TInstance, TValue> where TValue : new() where TInstance : class
 	{
 		public new static ActivatedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new ActivatedAttachedPropertyStore<TInstance, TValue>();
 
 		public ActivatedAttachedPropertyStore() : base( instance => new TValue() ) {}
 	}
 
-	public abstract class ProjectedStore<TInstance, TValue> : AttachedPropertyStore<object, TValue>
+	public abstract class ProjectedStore<TInstance, TValue> : AssignedAttachedPropertyStore<object, TValue>
 	{
 		protected override TValue CreateValue( object instance ) => instance.AsTo<TInstance, TValue>( Project );
 
 		protected abstract TValue Project( TInstance instance );
 	}
 
-	public class AttachedPropertyStore<TInstance, TValue> where TInstance : class
+
+
+	public class AssignedAttachedPropertyStore<TInstance, TValue> : AttachedPropertyStore<TInstance, TValue> where TInstance : class
 	{
-		public static AttachedPropertyStore<TInstance, TValue> Instance { get; } = new AttachedPropertyStore<TInstance, TValue>();
+		public new static AssignedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new AssignedAttachedPropertyStore<TInstance, TValue>();
 
 		readonly Func<TInstance, TValue> create;
-		readonly Func<TInstance, IWritableStore<TValue>> store;
 
-		public AttachedPropertyStore() : this( default(TValue) ) {}
+		protected AssignedAttachedPropertyStore() : this( instance => default(TValue) ) {}
 
-		public AttachedPropertyStore( TValue value ) : this( instance => value ) {}
+		public AssignedAttachedPropertyStore( Func<TInstance, TValue> create ) : this( create, instance => new FixedStore<TValue>() ) {}
 
-		public AttachedPropertyStore( Func<TInstance, TValue> create ) : this( create, instance => new FixedStore<TValue>() ) {}
-
-		public AttachedPropertyStore( Func<TInstance, TValue> create, Func<TInstance, IWritableStore<TValue>> store )
+		public AssignedAttachedPropertyStore( Func<TInstance, TValue> create, Func<TInstance, IWritableStore<TValue>> store ) : base( store )
 		{
 			this.create = create;
-			this.store = store;
 		}
 
 		protected virtual TValue CreateValue( TInstance instance ) => create( instance );
 
-		public IWritableStore<TValue> Create( TInstance instance ) => store( instance ).Assigned( CreateValue( instance ) );
+		public override IWritableStore<TValue> Create( TInstance instance ) => base.Create( instance ).Assigned( CreateValue( instance ) );
 	}
 
-	/*public abstract class AttachedPropertyBase<T, TValue> : IAttachedProperty<T, TValue> where TValue : class where T : class
+	public class AttachedPropertyStore<TInstance, TValue> where TInstance : class
 	{
-		readonly ConditionalWeakTable<T, TValue>.CreateValueCallback create;
+		public static AttachedPropertyStore<TInstance, TValue> Instance { get; } = new AttachedPropertyStore<TInstance, TValue>();
 
-		// [Child]
-		// readonly ConcurrentDictionary<T, TValue> items = new ConcurrentDictionary<T, TValue>();
-		readonly ConditionalWeakTable<T, TValue> items = new ConditionalWeakTable<T, TValue>();
+		readonly Func<TInstance, IWritableStore<TValue>> store;
 
-		protected AttachedPropertyBase() : this( key => default(TValue) ) {}
+		protected AttachedPropertyStore() : this( instance => new FixedStore<TValue>() ) {}
 
-		protected AttachedPropertyBase( ConditionalWeakTable<T, TValue>.CreateValueCallback create )
+		public AttachedPropertyStore( Func<TInstance, IWritableStore<TValue>> store )
 		{
-			this.create = create;
+			this.store = store;
 		}
 
-		// [Reader]
-		public bool IsAttached( T instance )
-		{
-			TValue temp;
-			return items.TryGetValue( instance, out temp );
-			// return items.ContainsKey( instance );
-		}
-
-		// [Writer]
-		public void Set( T instance, TValue value )
-		{
-			if ( IsAttached( instance ) )
-			{
-				items.Remove( instance );
-			}
-			items.Add( instance, value );
-			// items.AddOrUpdate( instance, arg => value, ( arg1, value1 ) => value );
-			// items[instance] = value;
-		}
-
-		// [Writer]
-		public TValue Get( T instance ) => items.GetValue( instance, create );
-	}*/
+		public virtual IWritableStore<TValue> Create( TInstance instance ) => store( instance );
+	}
 }
