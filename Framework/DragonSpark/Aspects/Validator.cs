@@ -33,50 +33,54 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	public interface IController
+	/*public interface IController
 	{
 		bool IsAllowed( Func<object, bool> assign, object parameter );
 
 		object Execute( Func<object, object> assign, object parameter );
-	}
+	}*/
 
-	class Controller : IController
+	public delegate bool IsValid( object parameter );
+
+	public delegate object Execute( object parameter );
+
+	/*class Controller : IController
 	{
 		readonly IParameterAware workflow;
-		readonly IAssignableParameterAware assignable;
+		readonly IParameterAware adapter;
 
-		public Controller( IParameterAware workflow, IAssignableParameterAware assignable )
+		public Controller( IParameterAware adapter )
 		{
-			this.workflow = workflow;
-			this.assignable = assignable;
+			this.adapter = adapter;
 		}
 
-		public bool IsAllowed( Func<object, bool> assign, object parameter )
+		public bool IsAllowed( IsValid assign, object parameter )
 		{
-			using ( new IsAllowedAssignment( assignable, assign ).Configured( false ) )
+			
+			/*using ( new IsAllowedAssignment( adapter, assign ).Configured( false ) )
 			{
-				return workflow.IsAllowed( parameter );
-			}
+				return workflow.IsValid( parameter );
+			}#1#
 		}
 
 		public object Execute( Func<object, object> assign, object parameter )
 		{
-			using ( new ExecuteAssignment( assignable, assign ).Configured( false ) )
+			using ( new ExecuteAssignment( adapter, assign ).Configured( false ) )
 			{
 				return workflow.Execute( parameter );
 			}
 		}
 
-		class IsAllowedAssignment : Assignment<Func<object, bool>>
+		/*class IsAllowedAssignment : Assignment<IsValid>
 		{
-			public IsAllowedAssignment( IAssignableParameterAware assignable, Func<object, bool> first ) : base( assignable.Assign, new Value<Func<object, bool>>( first ) ) {}
+			public IsAllowedAssignment( IAssignableParameterAware adapter, Func<object, bool> first ) : base( adapter.Assign, new Value<Func<object, bool>>( first ) ) {}
 		}
 
-		class ExecuteAssignment : Assignment<Func<object, object>>
+		class ExecuteAssignment : Assignment<Execute>
 		{
-			public ExecuteAssignment( IAssignableParameterAware assignable, Func<object, object> first ) : base( assignable.Assign, new Value<Func<object, object>>( first ) ) {}
-		}
-	}
+			public ExecuteAssignment( IAssignableParameterAware adapter, Func<object, object> first ) : base( adapter.Assign, new Value<Func<object, object>>( first ) ) {}
+		}#1#
+	}*/
 
 	public class Profile
 	{
@@ -92,96 +96,95 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}
 
-	public interface IControllerFactory
+	/*public interface IControllerFactory
 	{
 		IController Create( object instance );
-	}
+	}*/
 
-	abstract class ControllerFactoryBase<T> : IControllerFactory
+	abstract class AdapterFactoryBase<T> : ProjectedStore<T, IParameterAware>
 	{
-		public IController Create( object instance )
+		/*public IController Create( object instance )
 		{
-			var aware = instance.AsTo<T, IParameterAware>( Create );
 			var state = instance.Get( WorkflowState.Property );
 			var assignable = new AssignableParameterAware( aware );
 			var result = new Controller( new ParameterWorkflow( state, assignable ), assignable );
 			return result;
-		}
+		}*/
 
-		protected abstract IParameterAware Create( T instance );
+		
 	}
 
-	class WorkflowState : AttachedPropertyBase<IParameterWorkflowState>
+	class WorkflowState : AttachedProperty<ParameterWorkflowState>
 	{
 		public static WorkflowState Property { get; } = new WorkflowState();
 
-		WorkflowState() : base( key => new ParameterWorkflowState() ) {}
+		WorkflowState() : base( ActivatedAttachedPropertyStore<object, ParameterWorkflowState>.Instance ) {}
 	}
 
-	abstract class GenericControllerFactoryBase : IControllerFactory
+	abstract class GenericAdapterFactoryBase : AdapterFactoryBase<object>
 	{
 		readonly Type genericType;
 		readonly string methodName;
 		readonly TypeAdapter adapter;
 
-		protected GenericControllerFactoryBase( Type genericType, string methodName = nameof(Create) )
+		protected GenericAdapterFactoryBase( Type genericType, string methodName = nameof(Create) )
 		{
 			this.genericType = genericType;
 			this.methodName = methodName;
 			adapter = GetType().Adapt();
 		}
 
-		public IController Create( object instance )
+		protected override IParameterAware Project( object instance )
 		{
 			var arguments = instance.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = adapter.Invoke<IController>( methodName, arguments, instance );
+			var result = adapter.Invoke<IParameterAware>( methodName, arguments, instance );
 			return result;
 		}
 	}
 
-	class GenericFactoryControllerFactory : GenericControllerFactoryBase
+	class GenericFactoryAdapterFactory : GenericAdapterFactoryBase
 	{
-		public static GenericFactoryControllerFactory Instance { get; } = new GenericFactoryControllerFactory();
+		public new static GenericFactoryAdapterFactory Instance { get; } = new GenericFactoryAdapterFactory();
 
-		GenericFactoryControllerFactory() : base( typeof(IFactory<,>), nameof(Create) ) {}
+		GenericFactoryAdapterFactory() : base( typeof(IFactory<,>), nameof(Create) ) {}
 
-		static IController Create<TParameter, TResult>( object instance ) => FactoryControllerFactory<TParameter, TResult>.Instance.Create( instance );
+		static IParameterAware Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
-	class GenericCommandControllerFactory : GenericControllerFactoryBase
+	class GenericCommandAdapterFactory : GenericAdapterFactoryBase
 	{
-		public static GenericCommandControllerFactory Instance { get; } = new GenericCommandControllerFactory();
+		public new static GenericCommandAdapterFactory Instance { get; } = new GenericCommandAdapterFactory();
 
-		GenericCommandControllerFactory() : base( typeof(ICommand<>), nameof(Create) ) {}
+		GenericCommandAdapterFactory() : base( typeof(ICommand<>), nameof(Create) ) {}
 
-		static IController Create<T>( object instance ) => CommandControllerFactory<T>.Instance.Create( instance );
-	}
-
-	class FactoryControllerFactory<TParameter, TResult> : ControllerFactoryBase<IFactory<TParameter, TResult>>
-	{
-		public static FactoryControllerFactory<TParameter, TResult> Instance { get; } = new FactoryControllerFactory<TParameter, TResult>();
-
-		protected override IParameterAware Create( IFactory<TParameter, TResult> instance ) => new FactoryParameterAware<TParameter, TResult>( instance );
+		static IParameterAware Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
-	class CommandControllerFactory<T> : ControllerFactoryBase<ICommand<T>>
+	/*class FactoryAdapterFactory<TParameter, TResult> : AdapterFactoryBase<IFactory<TParameter, TResult>>
 	{
-		public static CommandControllerFactory<T> Instance { get; } = new CommandControllerFactory<T>();
+		public new static FactoryAdapterFactory<TParameter, TResult> Instance { get; } = new FactoryAdapterFactory<TParameter, TResult>();
 
-		protected override IParameterAware Create( ICommand<T> instance ) => new CommandParameterAware<T>( instance );
+		protected override IParameterAware Project( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
 
-	class CommandControllerFactory : ControllerFactoryBase<ICommand>
+	class GenericCommandAdapterFactory<T> : AdapterFactoryBase<ICommand<T>>
 	{
-		public static CommandControllerFactory Instance { get; } = new CommandControllerFactory();
+		public new static GenericCommandAdapterFactory<T> Instance { get; } = new GenericCommandAdapterFactory<T>();
 
-		protected override IParameterAware Create( ICommand instance ) => new CommandParameterAware( instance );
+		protected override IParameterAware Project( ICommand<T> instance ) => new CommandAdapter<T>( instance );
+	}*/
+
+	class CommandAdapterFactory : AdapterFactoryBase<ICommand>
+	{
+		public new static CommandAdapterFactory Instance { get; } = new CommandAdapterFactory();
+
+		protected override IParameterAware Project( ICommand instance ) => new CommandAdapter( instance );
 	}
 
-	class FactoryControllerFactory : ControllerFactoryBase<IFactoryWithParameter>
+	class FactoryAdapterFactory : AdapterFactoryBase<IFactoryWithParameter>
 	{
-		public static FactoryControllerFactory Instance { get; } = new FactoryControllerFactory();
+		public new static FactoryAdapterFactory Instance { get; } = new FactoryAdapterFactory();
 
-		protected override IParameterAware Create( IFactoryWithParameter instance ) => new FactoryWithParameterAware( instance );
+		protected override IParameterAware Project( IFactoryWithParameter instance ) => new DelegatedParameterAware( instance.CanCreate, instance.Create );
 	}
 
 	
@@ -191,9 +194,11 @@ namespace DragonSpark.Aspects
 	public abstract class ParameterValidatorBase : TypeLevelAspect
 	{
 		readonly Profile profile;
-		readonly Func<object, IController> factory;
+		readonly Func<object, IParameterAware> factory;
 
-		protected ParameterValidatorBase( Profile profile, Func<object, IController> factory )
+		// protected ParameterValidatorBase( Profile profile, AttachedPropertyStore<object, IParameterAware> store ) : this( profile, new AttachedProperty<IParameterAware>( store ).Get ) {}
+
+		protected ParameterValidatorBase( Profile profile, Func<object, IParameterAware> factory )
 		{
 			this.profile = profile;
 			this.factory = factory;
@@ -219,8 +224,10 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
-			var controller = factory( args.Instance );
-			args.ReturnValue = controller.IsAllowed( o => args.GetReturnValue<bool>(), args.Arguments.Single() );
+			var adapter = factory( args.Instance );
+			var state = WorkflowState.Property.Get( args.Instance );
+			var workflow = new ParameterWorkflow( state, new DelegatedParameterAware( o => args.GetReturnValue<bool>(), adapter.Execute ) );
+			args.ReturnValue = workflow.IsValid( args.Arguments.Single() );
 		}
 
 		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Maps[ profile.IsAllowed ];
@@ -228,8 +235,10 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
 		public void OnExecute( MethodInterceptionArgs args )
 		{
-			var controller = factory( args.Instance );
-			args.ReturnValue = controller.Execute( o => args.GetReturnValue(), args.Arguments.Single() );
+			var adapter = factory( args.Instance );
+			var state = WorkflowState.Property.Get( args.Instance );
+			var workflow = new ParameterWorkflow( state, new DelegatedParameterAware( adapter.IsValid, o => args.GetReturnValue() ) );
+			args.ReturnValue = workflow.Execute( args.Arguments.Single() );
 		}
 
 		IEnumerable<MethodInfo> FindExecute( Type type ) => Maps[ profile.Execute ];
@@ -237,62 +246,62 @@ namespace DragonSpark.Aspects
 
 	public sealed class FactoryParameterValidator : ParameterValidatorBase
 	{
+		readonly static IAttachedProperty<object, IParameterAware> Property = new AttachedProperty<IParameterAware>( FactoryAdapterFactory.Instance );
+
 		public FactoryParameterValidator() : 
-			base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), FactoryControllerFactory.Instance.Create ) {}
+			base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), Property.Get ) {}
 	}
 
 	public sealed class GenericFactoryParameterValidator : ParameterValidatorBase
 	{
+		readonly static IAttachedProperty<object, IParameterAware> Property = new AttachedProperty<IParameterAware>( GenericFactoryAdapterFactory.Instance );
+
 		public GenericFactoryParameterValidator() : 
-			base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), GenericFactoryControllerFactory.Instance.Create ) {}
+			base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), Property.Get ) {}
 	}
 
 	public sealed class CommandParameterValidator : ParameterValidatorBase
 	{
+		readonly static IAttachedProperty<object, IParameterAware> Property = new AttachedProperty<IParameterAware>( CommandAdapterFactory.Instance );
+
 		public CommandParameterValidator() : 
-			base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), CommandControllerFactory.Instance.Create ) {}
+			base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), Property.Get ) {}
 	}
 
 	public sealed class GenericCommandParameterValidator : ParameterValidatorBase
 	{
+		readonly static IAttachedProperty<object, IParameterAware> Property = new AttachedProperty<IParameterAware>( GenericCommandAdapterFactory.Instance );
+
 		public GenericCommandParameterValidator() : 
-			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), GenericCommandControllerFactory.Instance.Create ) {}
+			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), Property.Get ) {}
 	}
 
-	class AssignableParameterAware : IAssignableParameterAware
+	class DelegatedParameterAware : IParameterAware
 	{
-		readonly IParameterAware inner;
+		readonly IsValid valid;
+		readonly Execute execute;
 
-		public AssignableParameterAware( IParameterAware inner )
+		public DelegatedParameterAware( IsValid valid, Action<object> execute ) : this( valid, new Execute( parameter =>
+																											{
+																												execute( parameter );
+																												return null;
+																											} ) ) {}
+
+		public DelegatedParameterAware( IsValid valid, Execute execute )
 		{
-			this.inner = inner;
+			this.valid = valid;
+			this.execute = execute;
 		}
 
-		public void Assign( Func<object, bool> condition ) => Condition = condition;
+		public bool IsValid( object parameter ) => valid( parameter );
 
-		public void Assign( Func<object, object> execute ) => Factory = execute;
-
-		Func<object, bool> Condition { get; set; }
-
-		Func<object, object> Factory { get; set; }
-
-		public bool IsAllowed( object parameter )
-		{
-			var condition = Condition ?? inner.IsAllowed;
-			return condition( parameter );
-		}
-
-		public object Execute( object parameter )
-		{
-			var factory = Factory ?? inner.Execute;
-			return factory( parameter );
-		}
+		public object Execute( object parameter ) => execute( parameter );
 	}
 
-	public interface IAssignableParameterAware : IParameterAware
+	/*public interface IAssignableParameterAware : IParameterAware
 	{
-		void Assign( Func<object, bool> condition );
+		void Assign( IsValid condition );
 
-		void Assign( Func<object, object> execute );
-	}
+		void Assign( Execute execute );
+	}*/
 }

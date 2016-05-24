@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
@@ -144,46 +145,46 @@ namespace DragonSpark.Runtime
 
 	public interface IParameterAware
 	{
-		bool IsAllowed( object parameter );
+		bool IsValid( object parameter );
 
 		object Execute( object parameter );
 	}
 
-	public class FactoryWithParameterAware : IParameterAware
+	/*public class FactoryAdapter : IParameterAware
 	{
 		readonly IFactoryWithParameter inner;
-		public FactoryWithParameterAware( IFactoryWithParameter inner )
+		public FactoryAdapter( IFactoryWithParameter inner )
 		{
 			this.inner = inner;
 		}
 
-		public bool IsAllowed( object parameter ) => inner.CanCreate( parameter );
+		public bool IsValid( object parameter ) => inner.CanCreate( parameter );
 
 		public object Execute( object parameter ) => inner.Create( parameter );
-	}
+	}*/
 
-	public class FactoryParameterAware<TParameter, TResult> : IParameterAware
+	public class FactoryAdapter<TParameter, TResult> : IParameterAware
 	{
 		readonly IFactory<TParameter, TResult> inner;
-		public FactoryParameterAware( IFactory<TParameter, TResult> inner )
+		public FactoryAdapter( IFactory<TParameter, TResult> inner )
 		{
 			this.inner = inner;
 		}
 
-		public bool IsAllowed( object parameter ) => inner.CanCreate( (TParameter)parameter );
+		public bool IsValid( object parameter ) => inner.CanCreate( (TParameter)parameter );
 
 		public object Execute( object parameter ) => inner.Create( (TParameter)parameter );
 	}
 
-	public class CommandParameterAware : IParameterAware
+	public class CommandAdapter : IParameterAware
 	{
 		readonly ICommand inner;
-		public CommandParameterAware( ICommand inner )
+		public CommandAdapter( ICommand inner )
 		{
 			this.inner = inner;
 		}
 
-		public bool IsAllowed( object parameter ) => inner.CanExecute( parameter );
+		public bool IsValid( object parameter ) => inner.CanExecute( parameter );
 
 		public object Execute( object parameter )
 		{
@@ -192,15 +193,15 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class CommandParameterAware<T> : IParameterAware
+	public class CommandAdapter<T> : IParameterAware
 	{
 		readonly ICommand<T> inner;
-		public CommandParameterAware( ICommand<T> inner )
+		public CommandAdapter( ICommand<T> inner )
 		{
 			this.inner = inner;
 		}
 
-		public bool IsAllowed( object parameter ) => inner.CanExecute( (T)parameter );
+		public bool IsValid( object parameter ) => inner.CanExecute( (T)parameter );
 
 		public object Execute( object parameter )
 		{
@@ -209,33 +210,22 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class ParameterWorkflow : ParameterWorkflow<object, object>, IParameterAware
-	{
-		public ParameterWorkflow( IParameterWorkflowState state, IParameterAware aware ) : this ( state, aware.IsAllowed, aware.Execute ) {}
-
-		ParameterWorkflow( IParameterWorkflowState state, Func<object, bool> specification, Func<object, object> execute ) : base( state, specification, execute ) {}
-	}
-
-	public class ParameterWorkflow<TParameter, TResult>
+	public class ParameterWorkflow : IParameterAware
 	{
 		readonly IParameterWorkflowState state;
-		readonly Func<TParameter, bool> specification;
-		readonly Func<TParameter, TResult> execute;
-		readonly TResult defaultValue;
+		readonly IsValid specification;
+		readonly Execute execute;
+		
+		public ParameterWorkflow( IParameterWorkflowState state, IParameterAware aware ) : this ( state, aware.IsValid, aware.Execute ) {}
 
-		// public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Action<TParameter> action ) : this( state, specification, action.ToFactory<TParameter, TResult>() ) {}
-
-		public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Func<TParameter, TResult> execute ) : this( state, specification, execute, Default<TResult>.Item ) {}
-
-		public ParameterWorkflow( IParameterWorkflowState state, Func<TParameter, bool> specification, Func<TParameter, TResult> execute, TResult defaultValue )
+		public ParameterWorkflow( IParameterWorkflowState state, IsValid specification, Execute execute )
 		{
 			this.state = state;
 			this.specification = specification;
 			this.execute = execute;
-			this.defaultValue = defaultValue;
 		}
 
-		public bool IsAllowed( TParameter parameter )
+		public bool IsValid( object parameter )
 		{
 			var result = specification( parameter );
 			var valid = state.IsValidated( parameter );
@@ -244,15 +234,15 @@ namespace DragonSpark.Runtime
 			return result;
 		}
 
-		bool AsActive( TParameter parameter )
+		bool AsActive( object parameter )
 		{
 			using ( new Assignment( state.Activate, parameter ).Configured( false ) )
 			{
-				return IsAllowed( parameter );
+				return IsValid( parameter );
 			}
 		}
 
-		TResult AsValid( TParameter parameter )
+		object AsValid( object parameter )
 		{
 			using ( new Assignment( state.Validate, parameter ).Configured( false ) )
 			{
@@ -260,13 +250,13 @@ namespace DragonSpark.Runtime
 			}
 		}
 
-		public TResult Execute( TParameter parameter )
+		public object Execute( object parameter )
 		{
-			var result = Check( parameter ) || AsActive( parameter ) ? AsValid( parameter ) : defaultValue;
+			var result = Check( parameter ) || AsActive( parameter ) ? AsValid( parameter ) : null;
 			return result;
 		}
 
-		bool Check( TParameter parameter )
+		bool Check( object parameter )
 		{
 			var result = state.IsValidated( parameter );
 			if ( result )

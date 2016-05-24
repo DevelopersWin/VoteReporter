@@ -233,7 +233,7 @@
     <Compile Include="Runtime\Specifications\IsInstanceOfSpecification.cs" />
     <Compile Include="Runtime\TaskFactory.cs" />
     <Compile Include="Runtime\Values\AmbientContextCommand.cs" />
-    <Compile Include="Runtime\Values\AttachedPropertyBase.cs" />
+    <Compile Include="Runtime\Values\AttachedProperty.cs" />
     <Compile Include="Runtime\Values\CompositeWritableStore.cs" />
     <Compile Include="Runtime\Values\ConnectedStore.cs" />
     <Compile Include="Activation\ActivatorBase.cs" />

@@ -34,7 +34,7 @@ namespace DragonSpark.Extensions
 		public static Assembly Assembly( [Required]this Type @this ) => Adapt( @this ).Assembly;
 	}
 
-	public class TypeAdapterProperty : AttachedPropertyBase<Type, TypeAdapter>
+	public class TypeAdapterProperty : AttachedProperty<Type, TypeAdapter>
 	{
 		public static TypeAdapterProperty Instance { get; } = new TypeAdapterProperty();
 

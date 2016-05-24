@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace DragonSpark.Runtime.Values
 		protected AttachedSetProperty( Func<object, ISet<TItem>> create ) : base( create ) {}
 	}
 
-	public abstract class AttachedSetProperty<TInstance, TItem> : AttachedPropertyBase<TInstance, ISet<TItem>> where TInstance : class
+	public abstract class AttachedSetProperty<TInstance, TItem> : AttachedProperty<TInstance, ISet<TItem>> where TInstance : class
 	{
 		protected AttachedSetProperty() : base( key => new HashSet<TItem>() ) {}
 		protected AttachedSetProperty( Func<TInstance, ISet<TItem>> create ) : base( create ) {}
@@ -62,18 +63,20 @@ namespace DragonSpark.Runtime.Values
 		protected AttachedCollectionProperty( Func<object, ICollection<TItem>> create ) : base( create ) {}
 	}
 	
-	public abstract class AttachedCollectionProperty<TInstance, TItem> : AttachedPropertyBase<TInstance, ICollection<TItem>> where TInstance : class
+	public abstract class AttachedCollectionProperty<TInstance, TItem> : AttachedProperty<TInstance, ICollection<TItem>> where TInstance : class
 	{
 		protected AttachedCollectionProperty() : base( key => new System.Collections.ObjectModel.Collection<TItem>() ) {}
 		protected AttachedCollectionProperty( Func<TInstance, ICollection<TItem>> create ) : base( create ) {}
 	}
 
-	public abstract class AttachedPropertyBase<TValue> : AttachedPropertyBase<object, TValue>, IAttachedProperty<TValue>
+	public class AttachedProperty<TValue> : AttachedProperty<object, TValue>, IAttachedProperty<TValue>
 	{
-		protected AttachedPropertyBase() {}
-		protected AttachedPropertyBase( Func<object, TValue> create ) : base( create ) {}
+		public AttachedProperty() {}
+		public AttachedProperty( Func<object, TValue> create ) : this( create, o => new FixedStore<TValue>() ) {}
 
-		protected AttachedPropertyBase( Func<object, IWritableStore<TValue>> create ) : base( create ) {}
+		public AttachedProperty( Func<object, TValue> create, Func<object, IWritableStore<TValue>> store ) : base( new AttachedPropertyStore<object, TValue>( create, store ) ) {}
+
+		public AttachedProperty( AttachedPropertyStore<object, TValue> create ) : base( create ) {}
 	}
 
 
@@ -84,19 +87,19 @@ namespace DragonSpark.Runtime.Values
 	}*/
 
 	// [Synchronized]
-	public abstract class AttachedPropertyBase<TInstance, TValue> : IAttachedProperty<TInstance, TValue> where TInstance : class
+	public class AttachedProperty<TInstance, TValue> : IAttachedProperty<TInstance, TValue> where TInstance : class
 	{
 		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create;
 		
 		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>> items = new ConditionalWeakTable<TInstance, IWritableStore<TValue>>();
 
-		protected AttachedPropertyBase() : this( instance => default(TValue) ) {}
+		public AttachedProperty() : this( instance => default(TValue) ) {}
 
-		protected AttachedPropertyBase( Func<TInstance, TValue> create ) : this( new Func<TInstance, IWritableStore<TValue>>( instance => new FixedStore<TValue>().Assigned( create( instance ) ) ) ) {}
+		public AttachedProperty( Func<TInstance, TValue> create ) : this( new AttachedPropertyStore<TInstance, TValue>( create ) ) {}
 
-		protected AttachedPropertyBase( Func<TInstance, IWritableStore<TValue>> create ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( create  ) ) {}
+		public AttachedProperty( AttachedPropertyStore<TInstance, TValue> create ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( create.Create ) ) {}
 
-		AttachedPropertyBase( ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create )
+		AttachedProperty( ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create )
 		{
 			this.create = create;
 		}
@@ -112,6 +115,49 @@ namespace DragonSpark.Runtime.Values
 		public TValue Get( TInstance instance ) => GetValue( instance ).Value;
 
 		IWritableStore<TValue> GetValue( TInstance instance ) => items.GetValue( instance, create );
+	}
+
+	public class ActivatedAttachedPropertyStore<TValue> : ActivatedAttachedPropertyStore<object, TValue> where TValue : new()
+	{
+		public new static ActivatedAttachedPropertyStore<TValue> Instance { get; } = new ActivatedAttachedPropertyStore<TValue>();
+	}
+
+	public class ActivatedAttachedPropertyStore<TInstance, TValue> : AttachedPropertyStore<TInstance, TValue> where TValue : new() where TInstance : class
+	{
+		public new static ActivatedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new ActivatedAttachedPropertyStore<TInstance, TValue>();
+
+		public ActivatedAttachedPropertyStore() : base( instance => new TValue() ) {}
+	}
+
+	public abstract class ProjectedStore<TInstance, TValue> : AttachedPropertyStore<object, TValue>
+	{
+		protected override TValue CreateValue( object instance ) => instance.AsTo<TInstance, TValue>( Project );
+
+		protected abstract TValue Project( TInstance instance );
+	}
+
+	public class AttachedPropertyStore<TInstance, TValue> where TInstance : class
+	{
+		public static AttachedPropertyStore<TInstance, TValue> Instance { get; } = new AttachedPropertyStore<TInstance, TValue>();
+
+		readonly Func<TInstance, TValue> create;
+		readonly Func<TInstance, IWritableStore<TValue>> store;
+
+		public AttachedPropertyStore() : this( default(TValue) ) {}
+
+		public AttachedPropertyStore( TValue value ) : this( instance => value ) {}
+
+		public AttachedPropertyStore( Func<TInstance, TValue> create ) : this( create, instance => new FixedStore<TValue>() ) {}
+
+		public AttachedPropertyStore( Func<TInstance, TValue> create, Func<TInstance, IWritableStore<TValue>> store )
+		{
+			this.create = create;
+			this.store = store;
+		}
+
+		protected virtual TValue CreateValue( TInstance instance ) => create( instance );
+
+		public IWritableStore<TValue> Create( TInstance instance ) => store( instance ).Assigned( CreateValue( instance ) );
 	}
 
 	/*public abstract class AttachedPropertyBase<T, TValue> : IAttachedProperty<T, TValue> where TValue : class where T : class

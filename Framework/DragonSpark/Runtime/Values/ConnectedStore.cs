@@ -150,7 +150,7 @@ namespace DragonSpark.Runtime.Values
 		protected override void OnDispose() => Remove( Value );
 	}*/
 
-	public class Condition : AttachedPropertyBase<ConditionMonitor>
+	public class Condition : AttachedProperty<ConditionMonitor>
 	{
 		public static Condition Property { get; } = new Condition();
 		public Condition() : base( key => new ConditionMonitor() ) {}

@@ -283,7 +283,7 @@ namespace DragonSpark.Activation
 		object IFactory.Create() => Create();
 	}
 
-	public class Creator : AttachedPropertyBase<ICreator>
+	public class Creator : AttachedProperty<ICreator>
 	{
 		public static Creator Property { get; } = new Creator();
 
