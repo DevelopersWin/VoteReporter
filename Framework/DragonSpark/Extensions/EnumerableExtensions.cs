@@ -46,18 +46,20 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<TResult> Each<T, TResult>( this IEnumerable<T> enumerable, Func<T, TResult> action ) => enumerable.Select( action ).ToArray();
 
-		class Array<T> : ConnectedStore<T[]>
+		public class Array<T> : AttachedProperty<T, T[]> where T : class
 		{
-			public Array( T instance ) : base( instance, typeof(Array<T>), () => new[] { instance } ) {}
+			public static Array<T> Property { get; } = new Array<T>();
+
+			Array() : base( arg => new[] { arg } ) {}
 		}
 
-		public static TItem[] ToItem<TItem>( this TItem target ) => new Array<TItem>( target ).Value;
+		public static TItem[] ToItem<TItem>( this TItem target ) where TItem : class => Array<TItem>.Property.Get( target );
 
-		public static IEnumerable<TItem> Append<TItem>( this TItem target, IEnumerable<TItem> second ) => target.Append( second.Fixed() );
-		public static IEnumerable<TItem> Append<TItem>( this TItem target, params TItem[] second ) => target.ToItem().Concat( second );
+		public static IEnumerable<TItem> Append<TItem>( this TItem target, IEnumerable<TItem> second ) where TItem : class => target.Append( second.Fixed() );
+		public static IEnumerable<TItem> Append<TItem>( this TItem target, params TItem[] second ) where TItem : class => target.ToItem().Concat( second );
 
-		public static IEnumerable<TItem> Prepend<TItem>( this TItem target, IEnumerable<TItem> second ) => target.Prepend( second.Fixed() );
-		public static IEnumerable<TItem> Prepend<TItem>( this TItem target, params TItem[] second ) => second.Concat( target.ToItem() );
+		public static IEnumerable<TItem> Prepend<TItem>( this TItem target, IEnumerable<TItem> second ) where TItem : class=> target.Prepend( second.Fixed() );
+		public static IEnumerable<TItem> Prepend<TItem>( this TItem target, params TItem[] second ) where TItem : class => second.Concat( target.ToItem() );
 
 		public static IEnumerable<TItem> Append<TItem>( this IEnumerable<TItem> target, params TItem[] items ) => target.Concat( items );
 

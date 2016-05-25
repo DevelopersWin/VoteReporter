@@ -32,39 +32,13 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		readonly Func<AutoData, IDisposable> context;
 
-		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( Context( includeFromParameters, additionalTypes ) ) {}
-
-		static Func<AutoData, IDisposable> Context( bool includeFromParameters, Type[] additionalTypes )
-		{
-			try
-			{
-				return Providers.From( new Cache( includeFromParameters, additionalTypes ).Create );
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new PostSharp.Extensibility.Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-				throw;
-			}
-		}
+		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( Providers.From( new Cache( includeFromParameters, additionalTypes ).Create ) ) {}
 
 		protected AutoDataAttribute( [Required] Func<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
 
-		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required] Func<AutoData, IDisposable> context ) : base( Fixture1( fixture ) )
+		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required] Func<AutoData, IDisposable> context ) : base( fixture() )
 		{
 			this.context = context;
-		}
-
-		static IFixture Fixture1( Func<IFixture> fixture )
-		{
-			try
-			{
-				return fixture();
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new PostSharp.Extensibility.Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-				throw;
-			}
 		}
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )

@@ -1,10 +1,8 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
-using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -76,7 +74,7 @@ namespace DragonSpark.Runtime.Values
 		}
 	}*/
 
-	public abstract class ConnectedStore<T> : WritableStore<T>
+	/*public abstract class ConnectedStore<T> : WritableStore<T>
 	{
 		// readonly static ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>> Cache = new ConcurrentDictionary<Tuple<object, string>, ConnectibleProperty<T>>();
 
@@ -88,7 +86,7 @@ namespace DragonSpark.Runtime.Values
 																		 Cache.Clear();
 																		 // Debugger.Break();
 																	 } ) );
-		}*/
+		}#1#
 
 		readonly Func<T> create;
 
@@ -117,7 +115,7 @@ namespace DragonSpark.Runtime.Values
 			Property.TryDisconnect();
 			base.OnDispose();
 		}
-	}
+	}*/
 
 	/*public class ConnectedValueKeyFactory<T> : Factory<EqualityList, string>
 	{
@@ -133,9 +131,23 @@ namespace DragonSpark.Runtime.Values
 		protected override string CreateItem( object parameter ) => $"{parameter.GetType()}-{parameter.GetHashCode()}";
 	}*/
 
-	public class Reference<T> : ConnectedStore<T>
+	public class EqualityReference<T> : AttachedPropertyBase<object, T>
 	{
-		public Reference( object instance, T key ) : base( instance, KeyFactory.Instance.CreateUsing( key ).ToString(), () => key ) {}
+		readonly AttachedProperty<object, ConcurrentDictionary<int, T>> property = new AttachedProperty<ConcurrentDictionary<int, T>>( ActivatedAttachedPropertyStore<ConcurrentDictionary<int, T>>.Instance );
+
+		public override bool IsAttached( object instance ) => property.Get( Execution.Current ).ContainsKey( instance.GetHashCode() );
+
+		public override void Set( object instance, T value ) => property.Get( Execution.Current )[instance.GetHashCode()] = value;
+
+		public override T Get( object instance ) => property.Get( Execution.Current ).GetOrAdd( instance.GetHashCode(), i => (T)instance );
+
+		public override bool Clear( object instance )
+		{
+			property.Get( Execution.Current ).Clear();
+			return true;
+		} 
+
+		// public Reference( object instance, T key ) : base( instance, KeyFactory.Instance.CreateUsing( key ).ToString(), () => key ) {}
 	}
 
 	/*public class ListStore<T> : FixedStore<T>

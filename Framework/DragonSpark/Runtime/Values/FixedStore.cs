@@ -17,4 +17,6 @@ namespace DragonSpark.Runtime.Values
 
 		protected override T Get() => reference;
 	}
+
+	// public class DictionaryStore<T>
 }

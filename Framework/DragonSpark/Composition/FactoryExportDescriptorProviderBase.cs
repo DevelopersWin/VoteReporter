@@ -17,7 +17,8 @@ namespace DragonSpark.Composition
 {
 	public abstract class FactoryExportDescriptorProviderBase : ExportDescriptorProvider
 	{
-		readonly static ConditionalWeakTable<CompositionContract, AttachedProperty<LifetimeContext, object>> Cache = new ConditionalWeakTable<CompositionContract, AttachedProperty<LifetimeContext, object>>();
+		// readonly static ConditionalWeakTable<CompositionContract, AttachedProperty<LifetimeContext, object>> Cache = new ConditionalWeakTable<CompositionContract, AttachedProperty<LifetimeContext, object>>();
+		readonly static AttachedProperty<LifetimeContext, ConditionalWeakTable<CompositionContract, object>> Property = new AttachedProperty<LifetimeContext, ConditionalWeakTable<CompositionContract, object>>( ActivatedAttachedPropertyStore<LifetimeContext, ConditionalWeakTable<CompositionContract, object>>.Instance );
 
 		readonly FactoryTypeLocator locator;
 		readonly ITransformer<CompositionContract> resolver;
@@ -53,7 +54,10 @@ namespace DragonSpark.Composition
 						_ => ExportDescriptor.Create( ( context, operation ) =>
 						{
 							Func<object> create = () => activator( context, operation ).With( context.Checked ).With( o => ActivationProperties.Factory.Set( o, promise.Contract.ContractType ) );
-							var item = promise.IsShared ? Cache.GetValue( resultContract, key => new AttachedProperty<LifetimeContext, object>( lifetimeContext => create() ) ).Get( context.FindContextWithin( boundary ) ) : create();
+							var item = promise.IsShared ? 
+								Property.Get( context.FindContextWithin( boundary ) ).GetValue( resultContract, lifetimeContext => create() )
+								// Cache.GetValue( resultContract, key => new AttachedProperty<LifetimeContext, object>( lifetimeContext => create() ) ).Get( context.FindContextWithin( boundary ) )
+								: create();
 							return item;
 						}, NoMetadata ) );
 				}

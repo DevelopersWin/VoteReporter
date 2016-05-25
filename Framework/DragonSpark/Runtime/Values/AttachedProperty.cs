@@ -119,8 +119,16 @@ namespace DragonSpark.Runtime.Values
 		protected AttachedPropertyBase( ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create ) : base( create, SelfConverter<TValue>.Instance ) {}
 	}*/
 
+	public abstract class AttachedPropertyBase<TInstance, TValue> : IAttachedProperty<TInstance, TValue> where TInstance : class
+	{
+		public abstract bool IsAttached( TInstance instance );
+		public abstract void Set( TInstance instance, TValue value );
+		public abstract TValue Get( TInstance instance );
+		public abstract bool Clear( TInstance instance );
+	}
+
 	// [Synchronized]
-	public class AttachedProperty<TInstance, TValue> : IAttachedProperty<TInstance, TValue> where TInstance : class
+	public class AttachedProperty<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue> where TInstance : class
 	{
 		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create;
 		
@@ -139,17 +147,17 @@ namespace DragonSpark.Runtime.Values
 			this.create = create;
 		}
 
-		public bool IsAttached( TInstance instance )
+		public override bool IsAttached( TInstance instance )
 		{
 			IWritableStore<TValue> temp;
 			return items.TryGetValue( instance, out temp );
 		}
 
-		public virtual void Set( TInstance instance, TValue value ) => items.GetValue( instance, create ).Assign( value );
+		public override void Set( TInstance instance, TValue value ) => items.GetValue( instance, create ).Assign( value );
 
-		public virtual TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
+		public override TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
 
-		public virtual bool Clear( TInstance instance )
+		public override bool Clear( TInstance instance )
 		{
 			var store = Dispose( instance );
 			var result = Remove( instance, store );
@@ -158,7 +166,7 @@ namespace DragonSpark.Runtime.Values
 
 		protected virtual bool Remove( TInstance instance, IWritableStore<TValue> store ) => items.Remove( instance );
 
-		public virtual IWritableStore<TValue> Dispose( TInstance instance )
+		protected virtual IWritableStore<TValue> Dispose( TInstance instance )
 		{
 			IWritableStore<TValue> store;
 			if ( items.TryGetValue( instance, out store ) )

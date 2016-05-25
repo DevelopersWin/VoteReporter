@@ -86,7 +86,8 @@ namespace DragonSpark.Activation.IoC
 
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
-			readonly static ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>> Properties = new ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>>();
+			readonly static AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>> Property = new AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>>( ActivatedAttachedPropertyStore<object, ConditionalWeakTable<Type, IBuildPlanPolicy>>.Instance );
+			// readonly static ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>> Properties = new ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>>();
 			readonly IBuildPlanCreatorPolicy inner;
 			readonly object creator;
 
@@ -106,12 +107,11 @@ namespace DragonSpark.Activation.IoC
 				return new Plan( creator, context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Value;
 			}*/
 
-public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
-			{
-				var property = Properties.GetValue( context.BuildKey.Type, key => new AttachedProperty<IBuildPlanPolicy>( o => inner.CreatePlan( context, buildKey ) ) );
-				var result = property.Get( creator );
-				return result;
-			}
+			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
+				Property.Get( creator ).GetValue( context.BuildKey.Type, o => inner.CreatePlan( context, buildKey ) );
+
+			/*class Plan : AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>>
+			{}*/
 		}
 	}
 
@@ -156,6 +156,8 @@ public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey b
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
 		{
+			readonly EqualityReference<NamedTypeBuildKey> property = new EqualityReference<NamedTypeBuildKey>();
+
 			readonly ILogger logger;
 			readonly LifetimeManagerFactory factory;
 			readonly Condition condition = new Condition();
@@ -169,7 +171,7 @@ public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey b
 
 			public override void PreBuildUp( IBuilderContext context )
 			{
-				var reference = new KeyReference( this, context.BuildKey ).Value;
+				var reference = property.Get( context.BuildKey );
 				if ( reference.Get( condition ).Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
@@ -377,13 +379,14 @@ public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey b
 		static bool IsValidConstructor( SelectedConstructor selectedConstructor ) => selectedConstructor.Constructor.GetParameters().All( pi => !pi.ParameterType.IsByRef );
 	}*/
 
-	class KeyReference : Reference<NamedTypeBuildKey>
+	/*class KeyReference : Reference<NamedTypeBuildKey>
 	{
 		public KeyReference( object instance, NamedTypeBuildKey key ) : base( instance, key ) { }
-	}
+	}*/
 
 	public class ConventionStrategy : BuilderStrategy
 	{
+		readonly EqualityReference<NamedTypeBuildKey> property = new EqualityReference<NamedTypeBuildKey>();
 		readonly Condition condition = new Condition();
 
 		readonly ConventionCandidateLocator locator;
@@ -405,7 +408,7 @@ public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey b
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var reference = new KeyReference( this, context.BuildKey ).Value;
+			var reference = property.Get( context.BuildKey );
 			if ( reference.Get( condition ).Apply() )
 			{
 				var convention = locator.Create( context );

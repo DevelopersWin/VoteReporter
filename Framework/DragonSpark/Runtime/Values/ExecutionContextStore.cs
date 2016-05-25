@@ -21,7 +21,7 @@ namespace DragonSpark.Runtime.Values
 		public override void Assign( T item ) => property.Set( Execution.Current, item );
 	}
 
-/*	public class DecoratedAttachedProperty<T> : IAttachedProperty<T>
+	/*public class DecoratedAttachedProperty<T> : IAttachedProperty<T>
 	{
 		readonly IAttachedProperty<T> inner;
 
@@ -35,5 +35,6 @@ namespace DragonSpark.Runtime.Values
 		public void Set( object instance, T value ) => inner.Set( instance, value );
 
 		public T Get( object instance ) => inner.Get( instance );
+		public bool Clear( object instance ) => inner.Clear( instance );
 	}*/
 }
