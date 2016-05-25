@@ -165,14 +165,14 @@ namespace DragonSpark.Runtime.Values
 		protected Checked( [Required]object instance, [Required]Type key ) : base( instance, key, () => new ConditionMonitor() ) { }
 	}*/
 
-	public class ThreadAmbientStore<T> : AssociatedStore<T>
+	/*public class ThreadAmbientStore<T> : AssociatedStore<T>
 	{
 		public ThreadAmbientStore( Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), typeof(T), create ) {}
 
 		public ThreadAmbientStore( string key, Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), key, create ) {}
 
 		public ThreadAmbientStore( Type key, Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), key, create ) {}
-	}
+	}*/
 
 	public class AssociatedStore<T> : AssociatedStore<object, T>
 	{

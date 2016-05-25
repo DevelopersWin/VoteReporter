@@ -186,14 +186,16 @@ namespace DragonSpark.Setup
 
 	public class RecursionAwareServiceProvider : DecoratedServiceProvider
 	{
+		readonly IsActive property = new IsActive();
+
 		public RecursionAwareServiceProvider( IServiceProvider inner ) : base( inner ) {}
 
 		public override object GetService( Type serviceType )
 		{
-			var context = new IsActive( this, serviceType );
-			if ( !context.Value )
+			var active = property.Get( serviceType );
+			if ( !active )
 			{
-				using ( new AssignValueCommand<bool>( context ).AsExecuted( true ) )
+				using ( property.Assignment( serviceType, true ) )
 				{
 					return base.GetService( serviceType );
 				}
@@ -202,9 +204,12 @@ namespace DragonSpark.Setup
 			return null;
 		}
 
-		class IsActive : ThreadAmbientStore<bool>
+		class IsActive : AttachedProperty<Type, bool>
 		{
-			public IsActive( object owner, Type type ) : base( KeyFactory.Instance.ToString( owner, type ) ) {}
+			// public static IsActive Instance { get; } = new IsActive();
+
+			public IsActive() : base( o => new ThreadLocalStore<bool>( () => false ) ) {}
+			// public IsActive( object owner, Type type ) : base( KeyFactory.Instance.ToString( owner, type ) ) {}
 		}
 	}
 

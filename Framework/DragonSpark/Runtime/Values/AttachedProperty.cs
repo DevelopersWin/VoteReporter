@@ -11,6 +11,8 @@ namespace DragonSpark.Runtime.Values
 		public static TValue Get<TInstance, TValue>( this TInstance @this, IAttachedProperty<TInstance, TValue> property ) where TInstance : class => property.Get( @this );
 
 		public static void Set<TInstance, TValue>( this TInstance @this, IAttachedProperty<TInstance, TValue> property, TValue value ) where TInstance : class => property.Set( @this, value );
+
+		public static PropertyAssignment<T1, T2> Assignment<T1, T2>( this IAttachedProperty<T1, T2> @this, T1 first, T2 second ) where T1 : class => new PropertyAssignment<T1, T2>( @this, first, second );
 	}
 
 	public interface IAttachedProperty<TValue> : IAttachedProperty<object, TValue>
@@ -96,6 +98,8 @@ namespace DragonSpark.Runtime.Values
 		public AttachedProperty() : this( instance => default(TValue) ) {}
 
 		public AttachedProperty( Func<TInstance, TValue> create ) : this( new AssignedAttachedPropertyStore<TInstance, TValue>( create ) ) {}
+
+		public AttachedProperty( Func<TInstance, IWritableStore<TValue>> store ) : this( new AttachedPropertyStore<TInstance, TValue>( store ) ) {}
 
 		public AttachedProperty( AttachedPropertyStore<TInstance, TValue> create ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( create.Create ) ) {}
 

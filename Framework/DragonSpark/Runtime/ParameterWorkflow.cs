@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,13 @@ namespace DragonSpark.Runtime
 		public T Finish { get; }
 	}
 
+	public class PropertyAssignment<T1, T2> : Assignment<T1, T2> where T1 : class
+	{
+		public PropertyAssignment( IAttachedProperty<T1, T2> assign, T1 first, T2 second ) : this( assign, From( first ), new Value<T2>( second ) ) {}
+
+		public PropertyAssignment( IAttachedProperty<T1, T2> assign, Value<T1> first, Value<T2> second ) : base( assign.Set, first, second ) {}
+	}
+
 	public class Assignment<T1, T2> : AssignmentBase
 	{
 		readonly Action<T1, T2> assign;
@@ -85,6 +93,8 @@ namespace DragonSpark.Runtime
 	{
 		readonly Action<T> assign;
 		readonly Value<T> first;
+
+		public Assignment( Action<T> assign, T first ) : this( assign, new Value<T>( first ) ) {}
 
 		public Assignment( Action<T> assign, Value<T> first )
 		{
