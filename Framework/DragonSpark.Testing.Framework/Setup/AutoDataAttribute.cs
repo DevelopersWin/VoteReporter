@@ -138,9 +138,11 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public class AssociatedContext : AssociatedStore<MethodBase, IDisposable>
+	public class AssociatedContext : AttachedProperty<MethodBase, IDisposable>
 	{
-		public AssociatedContext( MethodBase instance ) : base( instance, typeof(AssociatedContext) ) {}
+		public static AssociatedContext Property { get; } = new AssociatedContext();
+
+		// public AssociatedContext( MethodBase instance ) : base( instance, typeof(AssociatedContext) ) {}
 	}
 
 	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>
@@ -191,8 +193,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		
 		public override void Execute( AutoData parameter )
 		{
-			var context = new AssociatedContext( parameter.Method );
-			context.Assign( this );
+			parameter.Method.Set( AssociatedContext.Property, this );
 			base.Execute( parameter );
 		}
 	}
@@ -241,7 +242,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly IServiceRegistry registry;
 
-		public Specification( [Required] IFixture fixture ) : this( new AssociatedRegistry( fixture ).Value ) {}
+		public Specification( [Required] IFixture fixture ) : this( AssociatedRegistry.Property.Get( fixture ) ) {}
 
 		Specification( [Required] IServiceRegistry registry )
 		{

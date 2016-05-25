@@ -205,14 +205,14 @@ namespace DragonSpark.Runtime.Values
 		protected AssociatedStore( object instance, Type key, Func<T> create = null ) : base( instance, key, create ) {}
 	}*/
 
-	public class AssociatedStore<T, U> : ConnectedStore<U>
+	/*public class AssociatedStore<T, U> : ConnectedStore<U>
 	{
 		public AssociatedStore( T instance, Func<U> create = null ) : this( instance, typeof(AssociatedStore<T, U>), create ) {}
 
 		protected AssociatedStore( T instance, string key, Func<U> create = null ) : base( instance, key, create ) {}
 
 		protected AssociatedStore( T instance, Type key, Func<U> create = null ) : base( instance, key, create ) {}
-	}
+	}*/
 
 	public class Items : Items<object>
 	{

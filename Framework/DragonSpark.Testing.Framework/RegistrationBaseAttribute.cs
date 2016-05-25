@@ -27,14 +27,14 @@ namespace DragonSpark.Testing.Framework
 			this.registration = registration;
 		}
 
-		public void Customize( IFixture fixture ) => registration.Register( new AssociatedRegistry( fixture ).Value );
+		public void Customize( IFixture fixture ) => registration.Register( AssociatedRegistry.Property.Get( fixture ) );
 	}
 
-	public class AssociatedRegistry : AssociatedStore<IFixture, IServiceRegistry>
+	public class AssociatedRegistry : AttachedProperty<IFixture, IServiceRegistry>
 	{
-		public AssociatedRegistry( [Required]IFixture instance ) : base( instance, () => new FixtureRegistry( instance ) ) {}
+		public static AssociatedRegistry Property { get; } = new AssociatedRegistry();
 
-		/*public AssociatedRegistry( IFixture instance, Func<IServiceRegistry> create = null ) : base( instance, create ) {}*/
+		AssociatedRegistry() : base( instance => new FixtureRegistry( instance ) ) {}
 	}
 
 	public class RegisterFactoryAttribute : RegistrationBaseAttribute
@@ -65,6 +65,6 @@ namespace DragonSpark.Testing.Framework
 			} );
 		}
 
-		public void Customize( IFixture fixture ) => Register( new AssociatedRegistry( fixture ).Value );
+		public void Customize( IFixture fixture ) => Register( AssociatedRegistry.Property.Get( fixture ) );
 	}
 }

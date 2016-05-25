@@ -5,21 +5,23 @@ namespace DragonSpark.Testing.Objects
 {
 	public class ClassCreatedFromDefault
 	{
+		readonly static IAttachedProperty<Type, int> Property = new AttachedProperty<Type, int>();
+
 		public ClassCreatedFromDefault( string message )
 		{
-			var associated = new AssociatedStore<Type, int>( GetType() );
-			var count = associated.Value;
-			switch ( count )
+			var instance = GetType();
+			switch ( Property.Get( instance ) )
 			{
 				case 0:
-					associated.Assign( 1 );
+					Property.Set( instance, 1 );
 					throw new InvalidOperationException( message );
 				default:
 					Message = message;
-					associated.Dispose();
+					Property.Clear( instance );
 					break;
 			}
 		}
+
 		public string Message { get; private set; }
 	}
 }

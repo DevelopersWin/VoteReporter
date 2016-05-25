@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 
@@ -16,10 +17,12 @@ namespace DragonSpark.Composition
 {
 	public abstract class FactoryExportDescriptorProviderBase : ExportDescriptorProvider
 	{
+		readonly static ConditionalWeakTable<CompositionContract, AttachedProperty<LifetimeContext, object>> Cache = new ConditionalWeakTable<CompositionContract, AttachedProperty<LifetimeContext, object>>();
+
 		readonly FactoryTypeLocator locator;
 		readonly ITransformer<CompositionContract> resolver;
 		readonly ActivatorFactory factory;
-
+		
 		protected FactoryExportDescriptorProviderBase( [Required]FactoryTypeLocator locator, [Required]ActivatorFactory factory ) : this( locator, SelfTransformer<CompositionContract>.Instance, factory ) {}
 
 		protected FactoryExportDescriptorProviderBase( [Required]FactoryTypeLocator locator, [Required]ITransformer<CompositionContract> resolver, [Required]ActivatorFactory factory )
@@ -50,17 +53,17 @@ namespace DragonSpark.Composition
 						_ => ExportDescriptor.Create( ( context, operation ) =>
 						{
 							Func<object> create = () => activator( context, operation ).With( context.Checked ).With( o => ActivationProperties.Factory.Set( o, promise.Contract.ContractType ) );
-							var item = promise.IsShared ? new SharedStore( context.FindContextWithin( boundary ), resultContract, create ).Value : create();
+							var item = promise.IsShared ? Cache.GetValue( resultContract, key => new AttachedProperty<LifetimeContext, object>( lifetimeContext => create() ) ).Get( context.FindContextWithin( boundary ) ) : create();
 							return item;
 						}, NoMetadata ) );
 				}
 			}
 		}
 
-		class SharedStore : AssociatedStore<LifetimeContext, object>
+		/*class SharedStore : AssociatedStore<LifetimeContext, object>
 		{
 			public SharedStore( LifetimeContext instance, CompositionContract key, Func<object> create = null ) : base( instance, key.ToString(), create ) {}
-		}
+		}*/
 	}
 
 	public class ActivatorFactory : FactoryBase<ActivatorFactory.Parameter, CompositeActivator>

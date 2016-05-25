@@ -25,7 +25,7 @@ namespace DragonSpark.Runtime.Values
 
 		TValue Get( TInstance instance );
 
-		void Clear( TInstance instance );
+		bool Clear( TInstance instance );
 
 		// void Dispose( TInstance instance );
 	}
@@ -137,10 +137,11 @@ namespace DragonSpark.Runtime.Values
 
 		public virtual TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
 
-		public virtual void Clear( TInstance instance )
+		public virtual bool Clear( TInstance instance )
 		{
 			var store = Dispose( instance );
-			Remove( instance, store );
+			var result = Remove( instance, store );
+			return result;
 		}
 
 		protected virtual bool Remove( TInstance instance, IWritableStore<TValue> store ) => items.Remove( instance );
