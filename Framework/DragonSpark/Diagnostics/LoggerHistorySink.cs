@@ -1,8 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
-using PostSharp.Patterns.Model;
-using PostSharp.Patterns.Threading;
 using Serilog.Events;
 using Serilog.Formatting.Display;
 using System.Collections.Generic;
@@ -12,13 +10,13 @@ using System.Linq;
 
 namespace DragonSpark.Diagnostics
 {
-	[ThreadAffine]
+	// [ThreadAffine]
 	public class LoggerHistorySink : ILoggerHistory
 	{
-		[Reference]
+		// [Reference]
 		readonly IList<LogEvent> source = new Collection<LogEvent>();
 
-		[Reference]
+		// [Reference]
 		readonly IReadOnlyCollection<LogEvent> events;
 
 		public LoggerHistorySink()
