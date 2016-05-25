@@ -214,21 +214,21 @@ namespace DragonSpark.Runtime.Values
 		protected AssociatedStore( T instance, Type key, Func<U> create = null ) : base( instance, key, create ) {}
 	}*/
 
-	public class Items : Items<object>
+	/*public class Items : Items<object>
 	{
 		public Items( object instance ) : base( instance ) {}
 
 		// public Items( object instance, Type key ) : base( instance, key ) {}
-	}
+	}*/
 
-	public class Items<T> : ConnectedStore<IList<T>>
+	/*public class Items<T> : ConnectedStore<IList<T>>
 	{
 		public Items( object instance ) : this( instance, typeof(Items<T>) ) {}
 
 		public Items( object instance, Type key ) : base( instance, key, () => new List<T>() ) {}
 
 		// public TItem Get<TItem>() => Item.FirstOrDefaultOfType<TItem>();
-	}
+	}*/
 
 	/*class Tracked<T> : AssociatedValue<T>
 	{

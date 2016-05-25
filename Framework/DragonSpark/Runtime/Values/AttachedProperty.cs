@@ -77,16 +77,28 @@ namespace DragonSpark.Runtime.Values
 		protected AttachedSetProperty( Func<TInstance, ISet<TItem>> create ) : base( create ) {}
 	}
 
-	public abstract class AttachedCollectionProperty<TItem> : AttachedCollectionProperty<object, TItem>, IAttachedProperty<ICollection<TItem>>
+	public class AttachedCollection : AttachedCollectionProperty<object>
 	{
-		protected AttachedCollectionProperty() {}
-		protected AttachedCollectionProperty( Func<object, ICollection<TItem>> create ) : base( create ) {}
+		public new static AttachedCollection Property { get; } = new AttachedCollection();
+
+		public AttachedCollection() {}
+		public AttachedCollection( Func<object, ICollection<object>> create ) : base( create ) {}
+	}
+
+	public class AttachedCollectionProperty<TItem> : AttachedCollectionProperty<object, TItem>, IAttachedProperty<ICollection<TItem>>
+	{
+		public new static AttachedCollection Property { get; } = new AttachedCollection();
+
+		public AttachedCollectionProperty() {}
+		public AttachedCollectionProperty( Func<object, ICollection<TItem>> create ) : base( create ) {}
 	}
 	
-	public abstract class AttachedCollectionProperty<TInstance, TItem> : AttachedProperty<TInstance, ICollection<TItem>> where TInstance : class
+	public class AttachedCollectionProperty<TInstance, TItem> : AttachedProperty<TInstance, ICollection<TItem>> where TInstance : class
 	{
-		protected AttachedCollectionProperty() : base( key => new System.Collections.ObjectModel.Collection<TItem>() ) {}
-		protected AttachedCollectionProperty( Func<TInstance, ICollection<TItem>> create ) : base( create ) {}
+		public static AttachedCollection Property { get; } = new AttachedCollection();
+
+		public AttachedCollectionProperty() : base( key => new System.Collections.ObjectModel.Collection<TItem>() ) {}
+		public AttachedCollectionProperty( Func<TInstance, ICollection<TItem>> create ) : base( create ) {}
 	}
 
 	public class AttachedProperty<TValue> : AttachedProperty<object, TValue>, IAttachedProperty<TValue>
