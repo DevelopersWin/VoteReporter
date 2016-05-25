@@ -108,14 +108,18 @@ namespace DragonSpark.Setup
 
 	public static class ActivationProperties
 	{
+		public static IAttachedProperty<bool> Instance { get; } = new AttachedProperty<bool>();
+
+		public static IAttachedProperty<Type> Factory { get; } = new AttachedProperty<Type>();
+
 		public class IsActivatedInstanceSpecification : GuardedSpecificationBase<object>
 		{
-			public static IsActivatedInstanceSpecification Instance { get; } = new IsActivatedInstanceSpecification();
+			public static IsActivatedInstanceSpecification Default { get; } = new IsActivatedInstanceSpecification();
 
-			public override bool IsSatisfiedBy( object parameter ) => new Instance( parameter ).Value || new[] { parameter, new Factory( parameter ).Value }.NotNull().Any( o => o.Has<SharedAttribute>() );
+			public override bool IsSatisfiedBy( object parameter ) => Instance.Get( parameter ) || new[] { parameter, Factory.Get( parameter ) }.NotNull().Any( o => o.Has<SharedAttribute>() );
 		}
 
-		public class Instance : AssociatedStore<bool>
+		/*public class Instance : AssociatedStore<bool>
 		{
 			public Instance( object instance ) : base( instance ) {}
 		}
@@ -123,7 +127,7 @@ namespace DragonSpark.Setup
 		public class Factory : AssociatedStore<Type>
 		{
 			public Factory( object instance ) : base( instance ) {}
-		}
+		}*/
 	}
 
 	public class InstanceServiceProvider : RepositoryBase<IInstanceRegistration>, IServiceProvider
@@ -140,7 +144,7 @@ namespace DragonSpark.Setup
 		// [RecursionGuard]
 		public object GetService( Type serviceType )
 		{
-			var result = List().Where( registration => serviceType.Adapt().IsAssignableFrom( registration.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault().WithSelf( o => new ActivationProperties.Instance( o ).Assigned( true ) );
+			var result = List().Where( registration => serviceType.Adapt().IsAssignableFrom( registration.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault().With( o => ActivationProperties.Instance.Set( o, true ) );
 			return result;
 		}
 	}

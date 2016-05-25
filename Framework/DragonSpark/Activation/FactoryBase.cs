@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace DragonSpark.Activation
 {
@@ -119,17 +120,20 @@ namespace DragonSpark.Activation
 		readonly Func<TParameter, object> instance;
 		readonly Func<TParameter, IList> keySource;
 
+		readonly ConditionalWeakTable<object, AttachedProperty<TResult>> properties = new ConditionalWeakTable<object, AttachedProperty<TResult>>();
+
 		protected CachedDelegatedFactory( Func<TParameter, IList> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
 		{
 			this.instance = instance;
 			this.keySource = keySource;
 		}
 
-		public override TResult Create( TParameter parameter ) => new Cache( instance( parameter ), KeyFactory.Instance.Create( keySource( parameter ) ), () => base.Create( parameter ) ).Value;
-
-		class Cache : AssociatedStore<TResult>
+		public override TResult Create( TParameter parameter )
 		{
-			public Cache( object instance, int key, Func<TResult> create = null ) : base( instance, key.ToString(), create ) {}
+			var key = keySource( parameter );
+			var property = properties.GetValue( key, i => new AttachedProperty<TResult>( k => base.Create( parameter ) ) );
+			var result = property.Get( instance( parameter ) );
+			return result;
 		}
 	}
 

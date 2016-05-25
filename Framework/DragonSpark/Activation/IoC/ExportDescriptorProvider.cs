@@ -66,7 +66,7 @@ namespace DragonSpark.Activation.IoC
 		readonly Func<object, bool> isActivated;
 		readonly Condition condition = new Condition();
 
-		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, registry, ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy ) {}
+		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, registry, ActivationProperties.IsActivatedInstanceSpecification.Default.IsSatisfiedBy ) {}
 
 		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, Func<object, bool> isActivated ) : this( provider, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry ), isActivated ) {}
 

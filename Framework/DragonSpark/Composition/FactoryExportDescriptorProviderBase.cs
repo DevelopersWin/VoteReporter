@@ -49,7 +49,7 @@ namespace DragonSpark.Composition
 					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, promise.IsShared, NoDependencies,
 						_ => ExportDescriptor.Create( ( context, operation ) =>
 						{
-							Func<object> create = () => activator( context, operation ).With( context.Checked ).With( o => new ActivationProperties.Factory( o ).Assign( promise.Contract.ContractType ) );
+							Func<object> create = () => activator( context, operation ).With( context.Checked ).With( o => ActivationProperties.Factory.Set( o, promise.Contract.ContractType ) );
 							var item = promise.IsShared ? new SharedStore( context.FindContextWithin( boundary ), resultContract, create ).Value : create();
 							return item;
 						}, NoMetadata ) );

@@ -47,7 +47,7 @@ namespace DragonSpark.Composition
 		{
 			if ( contracts.Contains( contract ) )
 			{
-				new ActivationProperties.Instance( instance ).Assign( true );
+				ActivationProperties.Instance.Set( instance, true );
 				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, dependencies => ExportDescriptor.Create( ( context, operation ) => instance, NoMetadata ) );
 			}
 		}

@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Diagnostics
 		public void EnsureComposition( CompositionContext context, string text )
 		{
 			var logger = context.GetExport<ILogger>();
-			var actual = new ActivationProperties.Factory( logger ).Value;
+			var actual = ActivationProperties.Factory.Get( logger );
 			Assert.Equal( typeof(LoggerFactory), actual );
 
 			Assert.NotSame( DefaultServiceProvider.Instance.Value.Get<ILogger>(), logger );

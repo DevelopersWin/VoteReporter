@@ -12,9 +12,11 @@ using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -87,6 +89,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			readonly IBuildPlanCreatorPolicy inner;
 			readonly object creator;
+			readonly static ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>> Properties = new ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>>();
 
 			public CachedCreatorPolicy( [Required] IBuildPlanCreatorPolicy inner, object creator )
 			{
@@ -94,13 +97,22 @@ namespace DragonSpark.Activation.IoC
 				this.creator = creator;
 			}
 
-			class Plan : AssociatedStore<IBuildPlanPolicy>
+			/*class Plan : AssociatedStore<IBuildPlanPolicy>
 			{
-				public Plan( object creator, Type key, Func<IBuildPlanPolicy> create ) : base( creator, KeyFactory.Instance.CreateUsing( key, typeof(Plan) ).ToString(), create ) {}
+				public Plan( object creator, Type key, Func<IBuildPlanPolicy> create ) : base( creator, KeyFactory.Instance.ToString( key, typeof(Plan) ), create ) {}
 			}
 
-			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) 
-				=> new Plan( creator, context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Value;
+			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
+			{
+				return new Plan( creator, context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Value;
+			}*/
+
+public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
+			{
+				var property = Properties.GetValue( context.BuildKey.Type, key => new AttachedProperty<IBuildPlanPolicy>( o => inner.CreatePlan( context, buildKey ) ) );
+				var result = property.Get( creator );
+				return result;
+			}
 		}
 	}
 
