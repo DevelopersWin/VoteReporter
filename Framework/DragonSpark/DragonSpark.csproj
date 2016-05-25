@@ -250,7 +250,7 @@
     <Compile Include="Activation\IoC\Specifications\HandleTypeRequestSpecification.cs" />
     <Compile Include="Activation\IoC\TransientServiceRegistry.cs" />
     <Compile Include="Runtime\Values\ExecutionContextStore.cs" />
-    <Compile Include="Runtime\Values\ThreadAmbientChain.cs" />
+    <Compile Include="Runtime\Values\ThreadLocalStackProperty.cs" />
     <Compile Include="Setup\ApplyMigrationCommand.cs" />
     <Compile Include="Setup\CurrentServiceProvider.cs" />
     <Compile Include="Setup\InitializeCommand.cs" />

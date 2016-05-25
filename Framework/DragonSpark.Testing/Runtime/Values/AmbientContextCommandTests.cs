@@ -9,11 +9,13 @@ namespace DragonSpark.Testing.Runtime.Values
 {
 	public class AmbientContextCommandTests
 	{
+		// readonly ThreadLocalStackProperty<Class> property = new ThreadLocalStackProperty<Class>();
+
 		[Fact]
 		public void ContextAsExpected()
 		{
-			var stack = new ThreadAmbientChain<Class>().Value;
-			Assert.Same( stack, new ThreadAmbientChain<Class>().Value );
+			var stack = ThreadLocalStack<Class>.GetCurrent();
+			Assert.Same( stack, ThreadLocalStack<Class>.GetCurrent() );
 
 			Assert.Null( Ambient.GetCurrent<Class>() );
 
@@ -45,7 +47,8 @@ namespace DragonSpark.Testing.Runtime.Values
 
 						Task.Run( () =>
 						{
-							var thread = new ThreadAmbientChain<Class>().Value;
+							var thread = ThreadLocalStack<Class>.GetCurrent();
+							Assert.Same( thread, ThreadLocalStack<Class>.GetCurrent() );
 							Assert.NotSame( stack, thread );
 							Assert.Empty( thread );
 							var other = new Class();
@@ -54,7 +57,7 @@ namespace DragonSpark.Testing.Runtime.Values
 								Assert.Same( other, Ambient.GetCurrent<Class>() );
 								Assert.Single( thread, other );
 							}
-							Assert.NotSame( thread, new ThreadAmbientChain<Class>().Value );
+							Assert.Same( thread, ThreadLocalStack<Class>.GetCurrent() );
 						} ).Wait();
 					}
 
@@ -67,7 +70,7 @@ namespace DragonSpark.Testing.Runtime.Values
 
 			Assert.Null( Ambient.GetCurrent<Class>() );
 
-			Assert.NotSame( stack, new ThreadAmbientChain<Class>().Value );
+			Assert.NotSame( stack, ThreadLocalStack<Class>.GetCurrent() );
 		} 
 	}
 }

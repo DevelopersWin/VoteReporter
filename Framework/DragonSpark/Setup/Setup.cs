@@ -99,7 +99,7 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class DefaultServiceProvider : ExecutionContextStore<ServiceProvider>
+	public class DefaultServiceProvider : ExecutionContextStore<IServiceProvider>
 	{
 		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider( () => new ServiceProvider() );
 
@@ -208,11 +208,11 @@ namespace DragonSpark.Setup
 			return null;
 		}
 
-		class IsActive : AttachedProperty<Type, bool>
+		class IsActive : ThreadLocalAttachedProperty<Type, bool>
 		{
 			// public static IsActive Instance { get; } = new IsActive();
 
-			public IsActive() : base( o => new ThreadLocalStore<bool>( () => false ) ) {}
+			public IsActive() : base( () => false ) {}
 			// public IsActive( object owner, Type type ) : base( KeyFactory.Instance.ToString( owner, type ) ) {}
 		}
 	}

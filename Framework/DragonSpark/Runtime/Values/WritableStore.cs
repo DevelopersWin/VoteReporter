@@ -77,6 +77,23 @@ namespace DragonSpark.Runtime.Values
 		protected override T Get() => lazy.Value;
 	}
 
+	public class AttachedPropertyStore<T> : WritableStore<T>
+	{
+		readonly object instance;
+		readonly IAttachedProperty<T> property;
+
+		public AttachedPropertyStore( object instance, IAttachedProperty<T> property ) : this( instance, property, Coercer<T>.Instance ) {}
+		public AttachedPropertyStore( object instance, IAttachedProperty<T> property, ICoercer<T> coercer ) : base( coercer )
+		{
+			this.instance = instance;
+			this.property = property;
+		}
+
+		protected override T Get() => property.Get( instance );
+
+		public override void Assign( T item ) => property.Set( instance, item );
+	}
+
 	public class DeferredStore<T> : WritableStore<T>
 	{
 		readonly Func<IWritableStore<T>> deferred;

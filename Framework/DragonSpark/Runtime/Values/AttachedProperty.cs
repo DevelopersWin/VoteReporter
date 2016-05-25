@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.TypeSystem;
+﻿using DragonSpark.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -25,6 +24,10 @@ namespace DragonSpark.Runtime.Values
 		void Set( TInstance instance, TValue value );
 
 		TValue Get( TInstance instance );
+
+		void Clear( TInstance instance );
+
+		// void Dispose( TInstance instance );
 	}
 
 	/*class StoreConverter<T> : Converter<T, T>
@@ -32,7 +35,7 @@ namespace DragonSpark.Runtime.Values
 		public StoreConverter( IWritableStore<T> store ) : base( arg => store., @from ) {}
 	}*/
 
-	class SelfConverter<T> : Converter<T, T>
+	/*class SelfConverter<T> : Converter<T, T>
 	{
 		public static SelfConverter<T> Instance { get; } = new SelfConverter<T>();
 
@@ -44,12 +47,28 @@ namespace DragonSpark.Runtime.Values
 		public static TupleConverter<T> Instance { get; } = new TupleConverter<T>();
 
 		TupleConverter() : base( arg => new Tuple<T>( arg ), tuple => tuple.Item1 ) {}
+	}*/
+
+	public class ThreadLocalAttachedProperty<TResult> : ThreadLocalAttachedProperty<object, TResult>
+	{
+		public ThreadLocalAttachedProperty( Func<TResult> create ) : base( create ) {}
 	}
 
-	public abstract class AttachedSetProperty<TItem> : AttachedSetProperty<object, TItem>, IAttachedProperty<ISet<TItem>>
+	public class ThreadLocalAttachedProperty<TInstance, TResult> : AttachedProperty<TInstance, TResult> where TInstance : class
+	{
+		public ThreadLocalAttachedProperty( Func<TResult> create ) : base( o => new ThreadLocalStore<TResult>( create ) ) {}
+
+		protected override bool Remove( TInstance instance, IWritableStore<TResult> store )
+		{
+			var local = store as ThreadLocalStore<TResult>;
+			return ( local == null || local.IsDisposed ) && base.Remove( instance, store );
+		}
+	}
+
+	public abstract class AttachedSetProperty<T> : AttachedSetProperty<object, T>, IAttachedProperty<ISet<T>>
 	{
 		protected AttachedSetProperty() {}
-		protected AttachedSetProperty( Func<object, ISet<TItem>> create ) : base( create ) {}
+		protected AttachedSetProperty( Func<object, ISet<T>> create ) : base( create ) {}
 	}
 
 	public abstract class AttachedSetProperty<TInstance, TItem> : AttachedProperty<TInstance, ISet<TItem>> where TInstance : class
@@ -117,6 +136,24 @@ namespace DragonSpark.Runtime.Values
 		public virtual void Set( TInstance instance, TValue value ) => items.GetValue( instance, create ).Assign( value );
 
 		public virtual TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
+
+		public virtual void Clear( TInstance instance )
+		{
+			var store = Dispose( instance );
+			Remove( instance, store );
+		}
+
+		protected virtual bool Remove( TInstance instance, IWritableStore<TValue> store ) => items.Remove( instance );
+
+		public virtual IWritableStore<TValue> Dispose( TInstance instance )
+		{
+			IWritableStore<TValue> store;
+			if ( items.TryGetValue( instance, out store ) )
+			{
+				store.TryDispose();
+			}
+			return store;
+		}
 	}
 
 	public class ActivatedAttachedPropertyStore<TValue> : ActivatedAttachedPropertyStore<object, TValue> where TValue : new()

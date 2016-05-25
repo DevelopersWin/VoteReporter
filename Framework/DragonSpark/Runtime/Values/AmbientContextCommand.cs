@@ -1,27 +1,35 @@
-using System.Collections.Generic;
-using System.Linq;
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DragonSpark.Runtime.Values
 {
 	public class AmbientContextCommand<T> : StackCommand<T>
 	{
-		readonly ThreadAmbientChain<T> chain;
+		readonly object instance;
+		readonly IAttachedProperty<object, Stack<T>> property;
 
-		public AmbientContextCommand() : this( new ThreadAmbientChain<T>() ) {}
+		public AmbientContextCommand() : this( ThreadLocalStack<T>.Property ) {}
 
-		public AmbientContextCommand( [Required]ThreadAmbientChain<T> chain ) : base( chain.Value )
+		public AmbientContextCommand( IAttachedProperty<object, Stack<T>> property ) : this( Execution.Current, property ) {}
+
+		public AmbientContextCommand( object instance, IAttachedProperty<object, Stack<T>> property  ) : base( instance.Get( property ) )
 		{
-			this.chain = chain;
+			this.instance = instance;
+			this.property = property;
 		}
 
 		protected override void OnDispose()
 		{
 			base.OnDispose();
-			if ( !chain.Value.Any() )
+			var chain = instance.Get( property );
+
+			if ( !chain.Any() )
 			{
-				chain.Dispose();
+				property.Clear( instance );
+				
 			}
 		}
 	}

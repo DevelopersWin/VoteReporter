@@ -56,11 +56,11 @@ namespace DragonSpark.Aspects
 		protected override IParameterAware CreateValue( object instance ) => new RelayParameterAware( base.CreateValue( instance ), () => WorkflowState.Property.Get( instance ) );
 	}
 
-	class WorkflowState : AttachedProperty<IParameterWorkflowState>
+	class WorkflowState : ThreadLocalAttachedProperty<IParameterWorkflowState>
 	{
 		public static WorkflowState Property { get; } = new WorkflowState();
 
-		WorkflowState() : base( o => new ThreadLocalStore<IParameterWorkflowState>( () => new ParameterWorkflowState() ) ) {}
+		WorkflowState() : base( () => new ParameterWorkflowState() ) {}
 	}
 
 	abstract class GenericAdapterFactoryBase : AdapterFactoryBase<object>

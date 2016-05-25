@@ -142,7 +142,7 @@ namespace DragonSpark.Activation
 		// public TFrom Convert( TTo to ) => Create( to );
 	}*/
 
-	public interface IConverter<TFrom, TTo>
+	/*public interface IConverter<TFrom, TTo>
 	{
 		TTo Convert( TFrom parameter );
 
@@ -163,9 +163,9 @@ namespace DragonSpark.Activation
 		public TTo Convert( TFrom parameter ) => to( parameter );
 
 		public TFrom Convert( TTo parameter ) => from( parameter );
-	}
+	}*/
 
-	public abstract class Converter<TBase, TFrom, TTo> : FactoryBase<TBase, TTo>, IConverter<TFrom, TTo> where TFrom : TBase
+	public abstract class Converter<TBase, TFrom, TTo> : FactoryBase<TBase, TTo>/*, IConverter<TFrom, TTo>*/ where TFrom : TBase
 	{
 		readonly Func<TFrom, TTo> convert;
 
@@ -178,10 +178,10 @@ namespace DragonSpark.Activation
 
 		public TTo Convert( TFrom parameter ) => convert( parameter );
 
-		TFrom IConverter<TFrom, TTo>.Convert( TTo parameter )
+		/*TFrom IConverter<TFrom, TTo>.Convert( TTo parameter )
 		{
 			throw new NotSupportedException();
-		}
+		}*/
 	}
 
 	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>

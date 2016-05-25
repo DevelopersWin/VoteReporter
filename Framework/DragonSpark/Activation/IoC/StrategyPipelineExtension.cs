@@ -12,7 +12,6 @@ using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -87,9 +86,9 @@ namespace DragonSpark.Activation.IoC
 
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
+			readonly static ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>> Properties = new ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>>();
 			readonly IBuildPlanCreatorPolicy inner;
 			readonly object creator;
-			readonly static ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>> Properties = new ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>>();
 
 			public CachedCreatorPolicy( [Required] IBuildPlanCreatorPolicy inner, object creator )
 			{

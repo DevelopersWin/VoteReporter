@@ -1,9 +1,5 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Testing.Framework;
-using System.Reflection;
-using Xunit;
+﻿using DragonSpark.Testing.Framework;
 using Xunit.Abstractions;
-using TaskFactory = DragonSpark.Runtime.TaskFactory;
 
 namespace DragonSpark.Testing.Runtime
 {
@@ -11,7 +7,7 @@ namespace DragonSpark.Testing.Runtime
 	{
 		public TaskFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Fact]
+		/*[Fact]
 		public void EnsureFlow()
 		{
 			var currentMethod = MethodBase.GetCurrentMethod();
@@ -26,6 +22,6 @@ namespace DragonSpark.Testing.Runtime
 				Assert.Same( current, fromTask );
 			}
 			Assert.NotSame( Execution.Current, current );
-		}
+		}*/
 	}
 }

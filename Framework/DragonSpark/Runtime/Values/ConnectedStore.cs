@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
@@ -5,6 +6,8 @@ using Nito.ConnectedProperties;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 
 namespace DragonSpark.Runtime.Values
@@ -13,16 +16,27 @@ namespace DragonSpark.Runtime.Values
 	{
 		public static object GetCurrent( [Required]Type type ) => typeof(Ambient).Adapt().Invoke( nameof(GetCurrent), type.ToItem() );
 
-		public static T GetCurrent<T>() => new ThreadAmbientChain<T>().Value.PeekOrDefault();
+		public static T GetCurrent<T>() => ThreadLocalStack<T>.GetCurrent().PeekOrDefault();
 
-		public static T[] GetCurrentChain<T>() => new ThreadAmbientChain<T>().Value.ToArray();
+		public static ImmutableArray<T> GetCurrentChain<T>() => ThreadLocalStack<T>.GetCurrent().ToImmutableArray();
+	}
+
+	public static class ThreadLocalStack<T>
+	{
+		public static ThreadLocalStackProperty<T> Property { get; } = new ThreadLocalStackProperty<T>();
+
+		public static Stack<T> GetCurrent() => Property.Get( Execution.Current );
 	}
 
 	public class ThreadLocalStore<T> : WritableStore<T>
 	{
+		readonly AttachedProperty<bool> disposed = new AttachedProperty<bool>();
+
+		readonly ConditionMonitor monitor = new ConditionMonitor();
+
 		readonly ThreadLocal<T> local;
 
-		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
+		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create, true ) ) {}
 
 		public ThreadLocalStore( ThreadLocal<T> local )
 		{
@@ -33,14 +47,22 @@ namespace DragonSpark.Runtime.Values
 
 		protected override T Get() => local.Value;
 
+		public bool IsDisposed => monitor.IsApplied;
+
 		protected override void OnDispose()
 		{
-			local.Dispose();
+			if ( !local.Value.IsNull() )
+			{
+				local.Value.Set( disposed, true );
+			}
+
+			monitor.ApplyIf( () => !local.Values.Any() || local.Values.NotNull().All( arg => arg.Get( disposed ) ), local.Dispose );
+	
 			base.OnDispose();
 		}
 	}
 
-	public class DisposableRepository : RepositoryBase<IDisposable>
+	/*public class DisposableRepository : RepositoryBase<IDisposable>
 	{
 		public static DisposableRepository Instance { get; } = new DisposableRepository();
 
@@ -52,7 +74,7 @@ namespace DragonSpark.Runtime.Values
 			disposables.Each( disposable => disposable.Dispose() );
 			Store.Clear();
 		}
-	}
+	}*/
 
 	public abstract class ConnectedStore<T> : WritableStore<T>
 	{
@@ -174,14 +196,14 @@ namespace DragonSpark.Runtime.Values
 		public ThreadAmbientStore( Type key, Func<T> create = null ) : base( ThreadAmbientContext.GetCurrent(), key, create ) {}
 	}*/
 
-	public class AssociatedStore<T> : AssociatedStore<object, T>
+	/*public class AssociatedStore<T> : AssociatedStore<object, T>
 	{
 		public AssociatedStore( object instance, Func<T> create = null ) : this( instance, typeof(AssociatedStore<object, T>), create ) {}
 
 		public AssociatedStore( object instance, string key, Func<T> create = null ) : base( instance, key, create ) {}
 
 		protected AssociatedStore( object instance, Type key, Func<T> create = null ) : base( instance, key, create ) {}
-	}
+	}*/
 
 	public class AssociatedStore<T, U> : ConnectedStore<U>
 	{

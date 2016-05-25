@@ -6,7 +6,9 @@ namespace DragonSpark.Activation.IoC
 {
 	public class BuildKeyMonitorExtension : BuilderStrategy, IRequiresRecovery
 	{
-		static Stack<NamedTypeBuildKey> Stack => new ThreadAmbientChain<NamedTypeBuildKey>().Value;
+		readonly static ThreadLocalStackProperty<NamedTypeBuildKey> Property = new ThreadLocalStackProperty<NamedTypeBuildKey>();
+
+		static Stack<NamedTypeBuildKey> Stack => Execution.Current.Get( Property );
 
 		public override void PreBuildUp( IBuilderContext context )
 		{

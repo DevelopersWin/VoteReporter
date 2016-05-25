@@ -1,8 +1,5 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime.Values;
-using System;
-using System.Threading.Tasks;
 
 namespace DragonSpark.Runtime
 {
@@ -24,7 +21,7 @@ namespace DragonSpark.Runtime
 		public override void Assign( object item ) => Execution.Assign( item );
 	}
 
-	public class TaskFactory : FactoryBase<Action, Task>
+	/*public class TaskFactory : FactoryBase<Action, Task>
 	{
 		public static TaskFactory Instance { get; } = new TaskFactory();
 
@@ -40,5 +37,5 @@ namespace DragonSpark.Runtime
 												} );
 			return result;
 		}
-	}
+	}*/
 }
