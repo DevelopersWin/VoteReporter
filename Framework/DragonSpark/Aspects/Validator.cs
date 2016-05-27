@@ -43,7 +43,7 @@ namespace DragonSpark.Aspects
 
 	public delegate object Execute( object parameter );
 
-	public class Profile
+	public struct Profile
 	{
 		public Profile( Type type, string isAllowed, string execute )
 		{
@@ -57,13 +57,11 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}
 
-	abstract class ParameterStoreBase<T> : AssignedAttachedPropertyStore<object, ParameterRelay>
+	abstract class ParameterStoreBase<T> : ProjectedStore<T, IParameterAware>
 	{
-		protected override ParameterRelay CreateValue( object instance ) => new ParameterRelay( CreateFrom( instance ), new StateProvider( instance ) );
+		/*protected override IParameterAware CreateValue( object instance ) => instance is T ? Project( (T)instance ) : null;
 
-		 IParameterAware CreateFrom( object instance ) => instance is T ? Project( (T)instance ) : null;
-
-		protected abstract IParameterAware Project( T instance );
+		protected abstract IParameterAware Project( T instance );*/
 	}
 
 	class WorkflowState : ThreadLocalAttachedProperty<IParameterWorkflowState>
@@ -122,7 +120,7 @@ namespace DragonSpark.Aspects
 	{
 		public new static FactoryParameterStore Instance { get; } = new FactoryParameterStore();
 
-		protected override IParameterAware Project( IFactoryWithParameter instance ) => new DelegatedParameterAware( instance.CanCreate, instance.Create );
+		protected override IParameterAware Project( IFactoryWithParameter instance ) => new FactoryAdapter( instance );
 	}
 
 	/*public interface IStateProvider
@@ -130,7 +128,7 @@ namespace DragonSpark.Aspects
 		IParameterWorkflowState Get();
 	}*/
 
-	public struct StateProvider
+	/*public struct StateProvider
 	{
 		readonly object instance;
 
@@ -141,9 +139,9 @@ namespace DragonSpark.Aspects
 
 		// [Pure]
 		public IParameterWorkflowState Get() => WorkflowState.Property.Get( instance );
-	}
+	}*/
 
-	public struct ParameterRelay
+	/*public struct ParameterRelay
 	{
 		readonly IParameterAware adapter;
 		readonly StateProvider state;
@@ -154,32 +152,32 @@ namespace DragonSpark.Aspects
 			this.state = state;
 		}
 
-		// [RecursionGuard()]
-		public bool IsValid( RelayParameter<bool> parameter )
+		public void IsValid( RelayParameter<bool> parameter )
 		{
-			var workflow = new ParameterWorkflow( state.Get(), new ParameterWorkflowContext( adapter, parameter ) );
-			var result = workflow.IsValid( parameter.Parameter );
-			return result;
+			var workflow = new ParameterInvocation( state.Get(), new ParameterWorkflowContext( adapter, parameter ) );
+			workflow.IsValid( parameter.Parameter );
 		}
 
-		// [RecursionGuard()]
-		public object Execute( RelayParameter<object> parameter )
+		public void Execute( RelayParameter<object> parameter )
 		{
-			var workflow = new ParameterWorkflow( state.Get(), new ParameterWorkflowContext( adapter, execute: parameter ) );
-			var result = workflow.Execute( parameter.Parameter );
-			return result;
+			var workflow = new ParameterInvocation( state.Get(), new ParameterWorkflowContext( adapter, execute: parameter ) );
+			workflow.Execute( parameter.Parameter );
 		}
-	}
+	}*/
 
-	public struct RelayParameter<T>
+	public struct RelayParameter
 	{
-		public RelayParameter( Func<T> factory, object parameter )
+		readonly MethodInterceptionArgs args;
+
+		public RelayParameter( MethodInterceptionArgs args ) : this( args, args.Arguments.Single() ) {}
+
+		RelayParameter( MethodInterceptionArgs args, object parameter )
 		{
-			Factory = factory;
+			this.args = args;
 			Parameter = parameter;
 		}
 
-		public Func<T> Factory { get; }
+		public T Proceed<T>() => args.GetReturnValue<T>();
 		public object Parameter { get; }
 	}
 	
@@ -189,19 +187,22 @@ namespace DragonSpark.Aspects
 	public abstract class ParameterValidatorBase : TypeLevelAspect
 	{
 		readonly Profile profile;
-		readonly Func<object, ParameterRelay> factory;
+		readonly Func<object, IParameterAware> factory;
 
-		protected ParameterValidatorBase( Profile profile, Func<object, ParameterRelay> factory )
+		protected ParameterValidatorBase( Profile profile, Func<object, IParameterAware> factory )
 		{
 			this.profile = profile;
 			this.factory = factory;
 		}
 
+		public override void CompileTimeInitialize( Type type, AspectInfo aspectInfo ) => Maps = CreateMaps( type );
+
 		public override bool CompileTimeValidate( Type type ) => Maps.Any( pair => pair.Value.Any() );
 
 		IDictionary<string, MethodInfo[]> Maps { get; set; }
 
-		public override void CompileTimeInitialize( Type type, AspectInfo aspectInfo ) => Maps = CreateMaps( type );
+		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Maps[ profile.IsAllowed ];
+		IEnumerable<MethodInfo> FindExecute( Type type ) => Maps[ profile.Execute ];
 
 		IDictionary<string, MethodInfo[]> CreateMaps( Type type )
 		{
@@ -217,25 +218,26 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
-			var parameter = new RelayParameter<bool>( args.GetReturnValue<bool>, args.Arguments.Single() );
-			args.ReturnValue = factory( args.Instance ).IsValid( parameter );
+			var parameter = new RelayParameter( args );
+			var workflow = new ValidationInvocation<RelayInvocation>( WorkflowState.Property.Get( args.Instance ), new RelayInvocation( parameter ) );
+			workflow.Invoke( parameter.Parameter );
 		}
 
-		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Maps[ profile.IsAllowed ];
-			
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
 		public void OnExecute( MethodInterceptionArgs args )
 		{
-			var parameter = new RelayParameter<object>( args.GetReturnValue, args.Arguments.Single() );
-			args.ReturnValue = factory( args.Instance ).Execute( parameter );
+			var adapter = factory( args.Instance );
+			var state = WorkflowState.Property.Get( args.Instance );
+			var validation = new ValidationInvocation<AdapterInvocation>( state, new AdapterInvocation( adapter ) );
+			var parameter = new RelayParameter( args );
+			var invocation = new ParameterInvocation( state, validation, parameter );
+			invocation.Invoke( parameter.Parameter );
 		}
-
-		IEnumerable<MethodInfo> FindExecute( Type type ) => Maps[ profile.Execute ];
 	}
 
 	public sealed class FactoryParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<object, ParameterRelay> Property = new AttachedProperty<ParameterRelay>( FactoryParameterStore.Instance );
+		readonly static IAttachedProperty<IParameterAware> Property = new AttachedProperty<IParameterAware>( FactoryParameterStore.Instance );
 
 		public FactoryParameterValidator() : 
 			base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), Property.Get ) {}
@@ -243,7 +245,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class GenericFactoryParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<object, ParameterRelay> Property = new AttachedProperty<ParameterRelay>( GenericFactoryParameterStore.Instance );
+		readonly static IAttachedProperty<IParameterAware> Property = new AttachedProperty<IParameterAware>( GenericFactoryParameterStore.Instance );
 
 		public GenericFactoryParameterValidator() : 
 			base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), Property.Get ) {}
@@ -251,7 +253,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class CommandParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<object, ParameterRelay> Property = new AttachedProperty<ParameterRelay>( CommandParameterStore.Instance );
+		readonly static IAttachedProperty<IParameterAware> Property = new AttachedProperty<IParameterAware>( CommandParameterStore.Instance );
 
 		public CommandParameterValidator() : 
 			base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), Property.Get ) {}
@@ -259,13 +261,13 @@ namespace DragonSpark.Aspects
 
 	public sealed class GenericCommandParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<object, ParameterRelay> Property = new AttachedProperty<ParameterRelay>( GenericCommandParameterStore.Instance );
+		readonly static IAttachedProperty<IParameterAware> Property = new AttachedProperty<IParameterAware>( GenericCommandParameterStore.Instance );
 
 		public GenericCommandParameterValidator() : 
 			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), Property.Get ) {}
 	}
 
-	class DelegatedParameterAware : IParameterAware
+	/*class DelegatedParameterAware : IParameterAware
 	{
 		readonly IsValid valid;
 		readonly Execute execute;
@@ -274,7 +276,7 @@ namespace DragonSpark.Aspects
 																											{
 																												execute( parameter );
 																												return null;
-																											} ) ) {}*/
+																											} ) ) {}#1#
 
 		public DelegatedParameterAware( IsValid valid, Execute execute )
 		{
@@ -285,7 +287,7 @@ namespace DragonSpark.Aspects
 		public bool IsValid( object parameter ) => valid( parameter );
 
 		public object Execute( object parameter ) => execute( parameter );
-	}
+	}*/
 
 	/*public interface IAssignableParameterAware : IParameterAware
 	{

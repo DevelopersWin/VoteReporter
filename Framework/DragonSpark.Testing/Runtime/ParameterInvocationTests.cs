@@ -5,7 +5,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Runtime
 {
-	public class ParameterWorkflowTests
+	public class ParameterInvocationTests
 	{
 		[Fact]
 		public void BasicCondition()

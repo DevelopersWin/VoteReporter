@@ -61,7 +61,7 @@ namespace DragonSpark.Runtime.Values
 		{
 			if ( !local.IsValueCreated )
 			{
-				threads.Ensure( Environment.CurrentManagedThreadId );
+				threads.Add( Environment.CurrentManagedThreadId );
 			}
 			return local.Value;
 		}

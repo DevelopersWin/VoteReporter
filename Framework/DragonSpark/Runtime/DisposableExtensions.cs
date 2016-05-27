@@ -98,13 +98,16 @@ namespace DragonSpark.Runtime
 
 		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );
 
-		public override void OnSuccess( MethodExecutionArgs args ) =>
-			args.Instance.As<IDisposable>( disposable =>
-										   {
-											   if ( property( disposable ) )
-											   {
-												   command( disposable );
-											   }
-										   } );
+		public override void OnSuccess( MethodExecutionArgs args )
+		{
+			var disposable = args.Instance as IDisposable;
+			if ( disposable != null )
+			{
+				if ( property( disposable ) )
+				{
+					command( disposable );
+				}
+			}
+		}
 	}
 }

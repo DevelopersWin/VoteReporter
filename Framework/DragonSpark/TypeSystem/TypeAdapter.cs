@@ -93,7 +93,7 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsAssignableFrom( Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() ) /*|| GetCaster( other ) != null*/;
 
-		public bool IsInstanceOfType( object context ) => context.With( o => IsAssignableFrom( o.GetType() ) );
+		public bool IsInstanceOfType( object context ) => IsAssignableFrom( context.GetType() );
 
 		// MethodInfo GetCaster( Type other ) => null; // Info.DeclaredMethods.SingleOrDefault( method => method.Name == "op_Implicit" && method.GetParameters().First().ParameterType.GetTypeInfo().IsAssignableFrom( other.GetTypeInfo() ) );
 

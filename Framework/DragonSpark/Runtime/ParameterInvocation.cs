@@ -109,37 +109,32 @@ namespace DragonSpark.Runtime
 
 	public class ParameterWorkflowState : IParameterWorkflowState
 	{
-		readonly Container active = new Container(), valid = new Container();
+		readonly static object Null = new object();
 
-		public void Activate( object parameter, bool on ) => active.Set( parameter, @on );
+		readonly ISet<int> active = new HashSet<int>(), valid = new HashSet<int>();
 
-		public bool IsActive( object parameter ) => active.Get( parameter );
+		public void Activate( object parameter, bool on ) => Set( active, parameter, @on );
 
-		public void Validate( object parameter, bool on ) => valid.Set( parameter, @on );
+		public bool IsActive( object parameter ) => Get( active, parameter );
 
-		public bool IsValidated( object parameter ) => valid.Get( parameter );
+		public void Validate( object parameter, bool on ) => Set( valid, parameter, @on );
 
-		class Container // : AttachedProperty<bool>
+		public bool IsValidated( object parameter ) => Get( valid, parameter );
+
+		static void Set( ISet<int> store, object parameter, bool on )
 		{
-			readonly static object Null = new object();
-
-			readonly ISet<int> store = new HashSet<int>();
-
-			public void Set( object parameter, bool on )
+			var @checked = ( parameter ?? Null ).GetHashCode();
+			if ( on )
 			{
-				var @checked = ( parameter ?? Null ).GetHashCode();
-				if ( on )
-				{
-					store.Add( @checked );
-				}
-				else
-				{
-					store.Remove( @checked );
-				}
+				store.Add( @checked );
 			}
-
-			public bool Get( object parameter ) => store.Contains( ( parameter ?? Null ).GetHashCode() );
+			else
+			{
+				store.Remove( @checked );
+			}
 		}
+
+		static bool Get( ICollection<int> store, object parameter ) => store.Contains( ( parameter ?? Null ).GetHashCode() );
 	}
 
 	public interface IParameterAware
@@ -160,6 +155,20 @@ namespace DragonSpark.Runtime
 		public bool IsValid( object parameter ) => inner.CanCreate( (TParameter)parameter );
 
 		public object Execute( object parameter ) => inner.Create( (TParameter)parameter );
+	}
+
+	public class FactoryAdapter : IParameterAware
+	{
+		readonly IFactoryWithParameter factory;
+
+		public FactoryAdapter( IFactoryWithParameter factory )
+		{
+			this.factory = factory;
+		}
+
+		public bool IsValid( object parameter ) => factory.CanCreate( parameter );
+
+		public object Execute( object parameter ) => factory.Create( parameter );
 	}
 
 	public class CommandAdapter : IParameterAware
@@ -196,49 +205,72 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public struct ParameterWorkflowContext
+	public interface IInvocation<out T>
 	{
-		readonly IParameterAware adapter;
-		readonly RelayParameter<bool>? valid;
-		readonly RelayParameter<object>? execute;
-
-		public ParameterWorkflowContext( IParameterAware adapter, RelayParameter<bool>? valid = null, RelayParameter<object>? execute = null )
-		{
-			this.adapter = adapter;
-			this.valid = valid;
-			this.execute = execute;
-		}
-
-		public bool IsValid( object parameter ) => valid?.Factory() ?? adapter.IsValid( parameter );
-
-		public object Execute( object parameter ) => execute.HasValue ? execute.Value.Factory() : adapter.Execute( parameter );
+		T Invoke( object parameter );
 	}
 
-	public struct ParameterWorkflow : IParameterAware
+	struct RelayInvocation : IInvocation<bool>
 	{
-		readonly IParameterWorkflowState state;
-		readonly ParameterWorkflowContext context;
-		
-		public ParameterWorkflow( IParameterWorkflowState state, ParameterWorkflowContext context )
+		readonly RelayParameter valid;
+
+		public RelayInvocation( RelayParameter valid )
 		{
-			this.state = state;
-			this.context = context;
+			this.valid = valid;
 		}
 
-		public bool IsValid( object parameter )
+		public bool Invoke( object parameter ) => valid.Proceed<bool>();
+	}
+
+	public struct AdapterInvocation : IInvocation<bool>
+	{
+		readonly IParameterAware adapter;
+		public AdapterInvocation( IParameterAware adapter )
 		{
-			var result = context.IsValid( parameter );
-			var valid = state.IsValidated( parameter );
-			var isValid = result && !valid && !state.IsActive( parameter );
-			state.Validate( parameter, isValid );
+			this.adapter = adapter;
+		}
+
+		public bool Invoke( object parameter ) => adapter.IsValid( parameter );
+	}
+
+	public struct ValidationInvocation<T> where T : IInvocation<bool>
+	{
+		readonly T invocation;
+		readonly IParameterWorkflowState state;
+		
+		public ValidationInvocation( IParameterWorkflowState state, T invocation )
+		{
+			this.state = state;
+			this.invocation = invocation;
+		}
+
+		public bool Invoke( object parameter )
+		{
+			var result = invocation.Invoke( parameter );
+			var validated = result && !state.IsValidated( parameter ) && !state.IsActive( parameter );
+			state.Validate( parameter, validated );
 			return result;
+		}
+	}
+
+	public struct ParameterInvocation : IInvocation<object>
+	{
+		readonly RelayParameter execute;
+		readonly IParameterWorkflowState state;
+		readonly ValidationInvocation<AdapterInvocation> validation;
+
+		public ParameterInvocation( IParameterWorkflowState state, ValidationInvocation<AdapterInvocation> validation, RelayParameter execute )
+		{
+			this.state = state;
+			this.validation = validation;
+			this.execute = execute;
 		}
 
 		bool AsActive( object parameter )
 		{
 			using ( new Assignment( state.Activate, parameter ).Configured( false ) )
 			{
-				return IsValid( parameter );
+				return validation.Invoke( parameter );
 			}
 		}
 
@@ -246,17 +278,13 @@ namespace DragonSpark.Runtime
 		{
 			using ( new Assignment( state.Validate, parameter ).Configured( false ) )
 			{
-				return context.Execute( parameter );
+				return execute.Proceed<object>();
 			}
 		}
 
-		public object Execute( object parameter )
-		{
-			var result = Check( parameter ) || AsActive( parameter ) ? AsValid( parameter ) : null;
-			return result;
-		}
+		public object Invoke( object parameter ) => state.IsValidated( parameter ) || AsActive( parameter ) ? AsValid( parameter ) : null;
 
-		bool Check( object parameter )
+		/*bool Check( object parameter )
 		{
 			var result = state.IsValidated( parameter );
 			if ( result )
@@ -264,6 +292,6 @@ namespace DragonSpark.Runtime
 				state.Validate( parameter, false );
 			}
 			return result;
-		}
+		}*/
 	}
 }

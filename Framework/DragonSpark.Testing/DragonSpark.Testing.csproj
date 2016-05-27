@@ -230,7 +230,7 @@
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="Aspects\ValidationAspectTests.cs" />
-    <Compile Include="Runtime\ParameterWorkflowTests.cs" />
+    <Compile Include="Runtime\ParameterInvocationTests.cs" />
     <Compile Include="Runtime\TaskFactoryTests.cs" />
     <Compile Include="TypeSystem\AttributesTests.cs">
       <SubType>Code</SubType>
