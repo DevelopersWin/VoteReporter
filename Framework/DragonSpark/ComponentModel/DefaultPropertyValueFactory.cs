@@ -27,7 +27,7 @@ namespace DragonSpark.ComponentModel
 		}
 	}
 
-	public class DefaultValueParameter
+	public struct DefaultValueParameter
 	{
 		public DefaultValueParameter( [Required]object instance, [Required]PropertyInfo metadata )
 		{
@@ -39,11 +39,11 @@ namespace DragonSpark.ComponentModel
 
 		public PropertyInfo Metadata { get; }
 
-		public DefaultValueParameter Assign( object value )
+		/*public DefaultValueParameter Assign( object value )
 		{
 			Metadata.SetValue( Instance, value );
 			return this;
-		}
+		}*/
 	}
 
 }

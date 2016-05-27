@@ -33,6 +33,15 @@ namespace DragonSpark.Runtime
 		}
 	}
 
+	public abstract class EntryRepositoryBase<TItem> : EntryRepositoryBase<Entry<TItem>, TItem>
+	{
+		protected EntryRepositoryBase() {}
+		protected EntryRepositoryBase( IEnumerable<TItem> items ) : base( items ) {}
+		protected EntryRepositoryBase( ICollection<Entry<TItem>> store ) : base( store ) {}
+
+		protected override Entry<TItem> Create( TItem item ) => new Entry<TItem>( item );
+	}
+
 	public abstract class EntryRepositoryBase<TEntry, TItem> : RepositoryBase<TEntry>, IEntryRepository<TItem> where TEntry : Entry<TItem>
 	{
 		protected EntryRepositoryBase() {}

@@ -27,10 +27,20 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 6776, created );
 		}
 
+		/*[Fact]
+		public void EqualityTest()
+		{
+			var one = 123;
+			var two = 123;
+			var hashOne = one.GetHashCode();
+			var hashTwo = two.GetHashCode();
+			Assert.Same( one, two );
+		}*/
+
 		[Fact]
 		public void ExtendedCheck()
 		{
-			// for ( int i = 0; i < 10000; i++ )
+			for ( int i = 0; i < 10000; i++ )
 			{
 				var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );

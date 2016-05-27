@@ -28,34 +28,56 @@ namespace DragonSpark.Runtime.Values
 
 	public class ThreadLocalStore<T> : WritableStore<T>
 	{
-		readonly AttachedProperty<bool> disposed = new AttachedProperty<bool>();
+		// readonly AttachedProperty<bool> disposed = new AttachedProperty<bool>();
+
+		readonly IList<int> threads = new System.Collections.ObjectModel.Collection<int>();
 
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
 		readonly ThreadLocal<T> local;
 
-		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create, true ) ) {}
+		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
 
-		public ThreadLocalStore( ThreadLocal<T> local )
+		ThreadLocalStore( ThreadLocal<T> local )
 		{
 			this.local = local;
 		}
 
-		public override void Assign( T item ) => local.Value = item;
+		public override void Assign( T item )
+		{
+			if ( item.IsNull() )
+			{
+				threads.Remove( Environment.CurrentManagedThreadId );
+			}
+			else
+			{
+				threads.Ensure( Environment.CurrentManagedThreadId );
+			}
 
-		protected override T Get() => local.Value;
+			local.Value = item;
+		}
+
+		protected override T Get()
+		{
+			if ( !local.IsValueCreated )
+			{
+				threads.Ensure( Environment.CurrentManagedThreadId );
+			}
+			return local.Value;
+		}
 
 		public bool IsDisposed => monitor.IsApplied;
 
 		protected override void OnDispose()
 		{
-			if ( !local.Value.IsNull() )
-			{
-				local.Value.Set( disposed, true );
-			}
+			threads.Remove( Environment.CurrentManagedThreadId );
 
-			monitor.ApplyIf( () => !local.Values.Any() || local.Values.NotNull().All( arg => arg.Get( disposed ) ), local.Dispose );
-	
+			if ( !threads.Any() )
+			{
+				monitor.Apply();
+				local.Dispose();
+			}
+			
 			base.OnDispose();
 		}
 	}

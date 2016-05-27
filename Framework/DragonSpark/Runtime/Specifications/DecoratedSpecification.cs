@@ -31,18 +31,30 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class OncePerParameterSpecification<T> : SpecificationBase<T> where T : class
 	{
-		// public static OncePerParameterSpecification<T> Instance { get; } = new OncePerParameterSpecification<T>();
+		readonly IAttachedProperty<T, ConditionMonitor> property;
+		
+		public OncePerParameterSpecification() : this( new Condition() ) {}
 
-		readonly Condition condition = new Condition();
+		public OncePerParameterSpecification( IAttachedProperty<T, ConditionMonitor> property )
+		{
+			this.property = property;
+		}
 
-		public override bool IsSatisfiedBy( T parameter ) => parameter.Get( condition ).Apply();
+		public override bool IsSatisfiedBy( T parameter ) => parameter.Get( property ).Apply();
 	}
 
-	public class OnlyOnceSpecification : OnlyOnceSpecification<object> {}
+	public class OnlyOnceSpecification : ConditionMonitorSpecification<object> {}
 
-	public class OnlyOnceSpecification<T> : SpecificationBase<T>
+	public class ConditionMonitorSpecification<T> : SpecificationBase<T>
 	{
-		readonly ConditionMonitor monitor = new ConditionMonitor();
+		readonly ConditionMonitor monitor;
+
+		public ConditionMonitorSpecification() : this( new ConditionMonitor() ) {}
+
+		public ConditionMonitorSpecification( ConditionMonitor monitor )
+		{
+			this.monitor = monitor;
+		}
 
 		public override bool IsSatisfiedBy( T parameter ) => monitor.Apply();
 	}

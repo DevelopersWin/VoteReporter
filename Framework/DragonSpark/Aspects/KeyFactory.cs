@@ -36,7 +36,7 @@ namespace DragonSpark.Aspects
 	{
 		public static KeyFactory Instance { get; } = new KeyFactory();
 
-		public string ToString( params object[] items ) => Create( items ).ToString();
+		// public string ToString( params object[] items ) => Create( items ).ToString();
 
 		public int CreateUsing( params object[] parameter ) => Create( parameter );
 

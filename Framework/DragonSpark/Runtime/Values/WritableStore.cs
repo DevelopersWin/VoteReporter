@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using PostSharp.Patterns.Contracts;
 using System;
 
 namespace DragonSpark.Runtime.Values
@@ -63,13 +62,13 @@ namespace DragonSpark.Runtime.Values
 		public ExecutionAssociatedStore( object instance, Func<T> create = null ) : base( instance, create ) {}
 	}*/
 
-	public class DeferredInstanceStore<T> : StoreBase<T>
+	public class DeferredStore<T> : StoreBase<T>
 	{
 		readonly Lazy<T> lazy;
 
-		public DeferredInstanceStore( Func<T> factory ) : this( new Lazy<T>( factory ) ) {}
+		public DeferredStore( Func<T> factory ) : this( new Lazy<T>( factory ) ) {}
 
-		public DeferredInstanceStore( Lazy<T> lazy )
+		public DeferredStore( Lazy<T> lazy )
 		{
 			this.lazy = lazy;
 		}
@@ -77,7 +76,7 @@ namespace DragonSpark.Runtime.Values
 		protected override T Get() => lazy.Value;
 	}
 
-	public class AttachedPropertyStore<T> : WritableStore<T>
+	/*public class AttachedPropertyStore<T> : WritableStore<T>
 	{
 		readonly object instance;
 		readonly IAttachedProperty<T> property;
@@ -92,9 +91,9 @@ namespace DragonSpark.Runtime.Values
 		protected override T Get() => property.Get( instance );
 
 		public override void Assign( T item ) => property.Set( instance, item );
-	}
+	}*/
 
-	public class DeferredStore<T> : WritableStore<T>
+	/*public class DeferredStore<T> : WritableStore<T>
 	{
 		readonly Func<IWritableStore<T>> deferred;
 		
@@ -106,9 +105,9 @@ namespace DragonSpark.Runtime.Values
 		public override void Assign( T item ) => deferred.Use( value => value.Assign( item ) );
 
 		protected override T Get() => deferred.Use( value => value.Value );
-	}
+	}*/
 
-	public class DecoratedStore<T> : WritableStore<T>
+	/*public class DecoratedStore<T> : WritableStore<T>
 	{
 		readonly IWritableStore<T> inner;
 
@@ -126,5 +125,5 @@ namespace DragonSpark.Runtime.Values
 			inner.TryDispose();
 			base.OnDispose();
 		}
-	}
+	}*/
 }

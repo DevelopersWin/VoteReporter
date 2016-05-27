@@ -2,6 +2,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Values;
+using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
@@ -33,6 +34,11 @@ namespace DragonSpark.Aspects
 		}
 	}
 
+	public static class Properties
+	{
+		public static IAttachedProperty<InstanceServiceProvider> Services = new ActivatedAttachedProperty<InstanceServiceProvider>();
+	}
+
 	public delegate bool IsValid( object parameter );
 
 	public delegate object Execute( object parameter );
@@ -51,9 +57,13 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}
 
-	abstract class AdapterFactoryBase<T> : ProjectedStore<T, IParameterAware>
+	abstract class ParameterStoreBase<T> : AssignedAttachedPropertyStore<object, ParameterRelay>
 	{
-		protected override IParameterAware CreateValue( object instance ) => new RelayParameterAware( base.CreateValue( instance ), () => WorkflowState.Property.Get( instance ) );
+		protected override ParameterRelay CreateValue( object instance ) => new ParameterRelay( CreateFrom( instance ), new StateProvider( instance ) );
+
+		 IParameterAware CreateFrom( object instance ) => instance is T ? Project( (T)instance ) : null;
+
+		protected abstract IParameterAware Project( T instance );
 	}
 
 	class WorkflowState : ThreadLocalAttachedProperty<IParameterWorkflowState>
@@ -63,13 +73,13 @@ namespace DragonSpark.Aspects
 		WorkflowState() : base( () => new ParameterWorkflowState() ) {}
 	}
 
-	abstract class GenericAdapterFactoryBase : AdapterFactoryBase<object>
+	abstract class GenericParameterStoreBase : ParameterStoreBase<object>
 	{
 		readonly Type genericType;
 		readonly string methodName;
 		readonly TypeAdapter adapter;
 
-		protected GenericAdapterFactoryBase( Type genericType, string methodName = nameof(Create) )
+		protected GenericParameterStoreBase( Type genericType, string methodName = nameof(Create) )
 		{
 			this.genericType = genericType;
 			this.methodName = methodName;
@@ -84,68 +94,84 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	class GenericFactoryAdapterFactory : GenericAdapterFactoryBase
+	class GenericFactoryParameterStore : GenericParameterStoreBase
 	{
-		public new static GenericFactoryAdapterFactory Instance { get; } = new GenericFactoryAdapterFactory();
+		public new static GenericFactoryParameterStore Instance { get; } = new GenericFactoryParameterStore();
 
-		GenericFactoryAdapterFactory() : base( typeof(IFactory<,>), nameof(Create) ) {}
+		GenericFactoryParameterStore() : base( typeof(IFactory<,>), nameof(Create) ) {}
 
 		static IParameterAware Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
-	class GenericCommandAdapterFactory : GenericAdapterFactoryBase
+	class GenericCommandParameterStore : GenericParameterStoreBase
 	{
-		public new static GenericCommandAdapterFactory Instance { get; } = new GenericCommandAdapterFactory();
+		public new static GenericCommandParameterStore Instance { get; } = new GenericCommandParameterStore();
 
-		GenericCommandAdapterFactory() : base( typeof(ICommand<>), nameof(Create) ) {}
+		GenericCommandParameterStore() : base( typeof(ICommand<>), nameof(Create) ) {}
 
 		static IParameterAware Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
-	class CommandAdapterFactory : AdapterFactoryBase<ICommand>
+	class CommandParameterStore : ParameterStoreBase<ICommand>
 	{
-		public new static CommandAdapterFactory Instance { get; } = new CommandAdapterFactory();
+		public new static CommandParameterStore Instance { get; } = new CommandParameterStore();
 
 		protected override IParameterAware Project( ICommand instance ) => new CommandAdapter( instance );
 	}
 
-	class FactoryAdapterFactory : AdapterFactoryBase<IFactoryWithParameter>
+	class FactoryParameterStore : ParameterStoreBase<IFactoryWithParameter>
 	{
-		public new static FactoryAdapterFactory Instance { get; } = new FactoryAdapterFactory();
+		public new static FactoryParameterStore Instance { get; } = new FactoryParameterStore();
 
 		protected override IParameterAware Project( IFactoryWithParameter instance ) => new DelegatedParameterAware( instance.CanCreate, instance.Create );
 	}
 
-	public class RelayParameterAware : IParameterAware
+	/*public interface IStateProvider
+	{
+		IParameterWorkflowState Get();
+	}*/
+
+	public struct StateProvider
+	{
+		readonly object instance;
+
+		public StateProvider( object instance )
+		{
+			this.instance = instance;
+		}
+
+		// [Pure]
+		public IParameterWorkflowState Get() => WorkflowState.Property.Get( instance );
+	}
+
+	public struct ParameterRelay
 	{
 		readonly IParameterAware adapter;
-		readonly Func<IParameterWorkflowState> state;
+		readonly StateProvider state;
 
-		public RelayParameterAware( IParameterAware adapter, Func<IParameterWorkflowState> state )
+		public ParameterRelay( IParameterAware adapter, StateProvider state )
 		{
 			this.adapter = adapter;
 			this.state = state;
 		}
 
-		public bool IsValid( object parameter ) => parameter.AsTo<RelayParameter<bool>, bool>( IsValid );
-
-		bool IsValid( RelayParameter<bool> parameter )
+		// [RecursionGuard()]
+		public bool IsValid( RelayParameter<bool> parameter )
 		{
-			var workflow = new ParameterWorkflow( state(), o => parameter.Factory(), adapter.Execute );
+			var workflow = new ParameterWorkflow( state.Get(), new ParameterWorkflowContext( adapter, parameter ) );
 			var result = workflow.IsValid( parameter.Parameter );
 			return result;
 		}
 
-		public object Execute( object parameter ) => parameter.AsTo<RelayParameter<object>, object>( Execute );
-
-		object Execute( RelayParameter<object> parameter )
+		// [RecursionGuard()]
+		public object Execute( RelayParameter<object> parameter )
 		{
-			var workflow = new ParameterWorkflow( state(), adapter.IsValid, o => parameter.Factory() );
+			var workflow = new ParameterWorkflow( state.Get(), new ParameterWorkflowContext( adapter, execute: parameter ) );
 			var result = workflow.Execute( parameter.Parameter );
 			return result;
 		}
 	}
 
-	public class RelayParameter<T>
+	public struct RelayParameter<T>
 	{
 		public RelayParameter( Func<T> factory, object parameter )
 		{
@@ -163,11 +189,9 @@ namespace DragonSpark.Aspects
 	public abstract class ParameterValidatorBase : TypeLevelAspect
 	{
 		readonly Profile profile;
-		readonly Func<object, IParameterAware> factory;
+		readonly Func<object, ParameterRelay> factory;
 
-		// protected ParameterValidatorBase( Profile profile, AssignedAttachedPropertyStore<object, IParameterAware> store ) : this( profile, new AttachedProperty<IParameterAware>( store ).Get ) {}
-
-		protected ParameterValidatorBase( Profile profile, Func<object, IParameterAware> factory )
+		protected ParameterValidatorBase( Profile profile, Func<object, ParameterRelay> factory )
 		{
 			this.profile = profile;
 			this.factory = factory;
@@ -211,7 +235,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class FactoryParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<object, IParameterAware> Property = new AttachedProperty<IParameterAware>( FactoryAdapterFactory.Instance );
+		readonly static IAttachedProperty<object, ParameterRelay> Property = new AttachedProperty<ParameterRelay>( FactoryParameterStore.Instance );
 
 		public FactoryParameterValidator() : 
 			base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), Property.Get ) {}
@@ -219,7 +243,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class GenericFactoryParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<object, IParameterAware> Property = new AttachedProperty<IParameterAware>( GenericFactoryAdapterFactory.Instance );
+		readonly static IAttachedProperty<object, ParameterRelay> Property = new AttachedProperty<ParameterRelay>( GenericFactoryParameterStore.Instance );
 
 		public GenericFactoryParameterValidator() : 
 			base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), Property.Get ) {}
@@ -227,7 +251,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class CommandParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<object, IParameterAware> Property = new AttachedProperty<IParameterAware>( CommandAdapterFactory.Instance );
+		readonly static IAttachedProperty<object, ParameterRelay> Property = new AttachedProperty<ParameterRelay>( CommandParameterStore.Instance );
 
 		public CommandParameterValidator() : 
 			base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), Property.Get ) {}
@@ -235,7 +259,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class GenericCommandParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<object, IParameterAware> Property = new AttachedProperty<IParameterAware>( GenericCommandAdapterFactory.Instance );
+		readonly static IAttachedProperty<object, ParameterRelay> Property = new AttachedProperty<ParameterRelay>( GenericCommandParameterStore.Instance );
 
 		public GenericCommandParameterValidator() : 
 			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), Property.Get ) {}

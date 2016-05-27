@@ -130,8 +130,10 @@ namespace DragonSpark.Setup
 		}*/
 	}
 
-	public class InstanceServiceProvider : RepositoryBase<IInstanceRegistration>, IServiceProvider
+	public class InstanceServiceProvider : RepositoryBase<IInstanceRegistration>, IServiceProvider, IServiceRegistry
 	{
+		public InstanceServiceProvider() {}
+
 		public InstanceServiceProvider( IEnumerable<IFactory> factories, params object[] instances ) : this( factories.Select( factory => new FactoryStore( factory ) ).Concat( Instances( instances ) ) ) {}
 
 		public InstanceServiceProvider( params object[] instances ) : this( Instances( instances ) ) {}
@@ -140,11 +142,31 @@ namespace DragonSpark.Setup
 
 		static IEnumerable<IInstanceRegistration> Instances( IEnumerable<object> instances ) => instances.Select( o => new InstanceStore( o ) );
 
+		public bool IsRegistered( Type type )
+		{
+			var adapt = type.Adapt();
+			var result = List().Any( registration => adapt.IsAssignableFrom( registration.RegisteredType ) );
+			return result;
+		}
+
+		void IServiceRegistry.Register( MappingRegistrationParameter parameter )
+		{
+			throw new NotSupportedException( $"{GetType().Name} does not support type mapping-based service location." );
+		}
+
+		public void Register( InstanceRegistrationParameter parameter ) => Add( new InstanceStore( parameter.Instance, parameter.RequestedType ) );
+
+		public void RegisterFactory( FactoryRegistrationParameter parameter )
+		{
+			Add( new FactoryStore( parameter.Factory, parameter.RequestedType ) );
+		}
+
 		[Freeze]
 		// [RecursionGuard]
 		public object GetService( Type serviceType )
 		{
-			var result = List().Where( registration => serviceType.Adapt().IsAssignableFrom( registration.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault().With( o => ActivationProperties.Instance.Set( o, true ) );
+			var adapt = serviceType.Adapt();
+			var result = List().Where( registration => adapt.IsAssignableFrom( registration.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault().With( o => ActivationProperties.Instance.Set( o, true ) );
 			return result;
 		}
 	}
@@ -154,11 +176,13 @@ namespace DragonSpark.Setup
 		Type RegisteredType { get; }
 	}
 
-	class FactoryStore : DeferredInstanceStore<object>, IInstanceRegistration
+	class FactoryStore : DeferredStore<object>, IInstanceRegistration
 	{
-		public FactoryStore( IFactory factory ) : base( factory.Create )
+		public FactoryStore( IFactory factory ) : this( factory.Create, ResultTypeLocator.Instance.Create( factory.GetType() ) ) {}
+
+		public FactoryStore( Func<object> factory, Type registeredType ) : base( factory )
 		{
-			RegisteredType = ResultTypeLocator.Instance.Create( factory.GetType() );
+			RegisteredType = registeredType;
 		}
 
 		public Type RegisteredType { get; }
@@ -166,9 +190,11 @@ namespace DragonSpark.Setup
 
 	class InstanceStore : FixedStore<object>, IInstanceRegistration
 	{
-		public InstanceStore( object reference ) : base( reference )
+		public InstanceStore( object reference ) : this( reference, reference.GetType() ) {}
+
+		public InstanceStore( object reference, Type registeredType ) : base( reference )
 		{
-			RegisteredType = reference.GetType();
+			RegisteredType = registeredType;
 		}
 
 		public Type RegisteredType { get; }
@@ -275,7 +301,7 @@ namespace DragonSpark.Setup
 			Services = provider;
 		}
 
-		protected Application( IEnumerable<ICommand> commands ) : base( new OnlyOnceSpecification<T>(), commands.ToArray() ) {}
+		protected Application( IEnumerable<ICommand> commands ) : base( new ConditionMonitorSpecification<T>(), commands.ToArray() ) {}
 
 		[Required]
 		public IServiceProvider Services { [return: Required]get; set; }

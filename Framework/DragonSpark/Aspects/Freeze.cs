@@ -1,3 +1,5 @@
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -5,13 +7,14 @@ using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	public sealed class CacheValueFactory // : FactoryBase<MethodInterceptionArgs, object>
+	public sealed class CacheValueFactory
 	{
 		readonly Func<IList, int> factory;
-		readonly ConcurrentDictionary<int, object> items = new ConcurrentDictionary<int, object>();
+		readonly ConcurrentDictionary<Entry, object> items = new ConcurrentDictionary<Entry, object>();
 
 		public CacheValueFactory() : this( KeyFactory.Instance.Create ) {}
 
@@ -23,12 +26,33 @@ namespace DragonSpark.Aspects
 		public object Create( MethodInterceptionArgs parameter )
 		{
 			var code = factory( parameter.Arguments.ToArray() );
-			var result = items.GetOrAdd( code, key => parameter.GetReturnValue() );
-			if ( result == null )
-			{
-				// Debug.WriteLine( $"{items.GetHashCode()} - Code: {code}. Instance: {parameter.Instance}. Method: {parameter.Method}" );
-			}
+			var entry = new Entry( code, parameter );
+			var result = items.GetOrAdd( entry, e => e.Get() );
 			return result;
+		}
+
+		struct Entry : IEquatable<Entry>
+		{
+			readonly int code;
+			readonly MethodInterceptionArgs factory;
+
+			public Entry( int code, MethodInterceptionArgs factory )
+			{
+				this.code = code;
+				this.factory = factory;
+			}
+
+			public object Get() => factory.GetReturnValue();
+
+			public bool Equals( Entry other ) => code == other.code;
+
+			public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is Entry && Equals( (Entry)obj ) );
+
+			public override int GetHashCode() => code;
+
+			public static bool operator ==( Entry left, Entry right ) => left.Equals( right );
+
+			public static bool operator !=( Entry left, Entry right ) => !left.Equals( right );
 		}
 	}
 
@@ -45,11 +69,9 @@ namespace DragonSpark.Aspects
 			this.factory = factory;
 		}
 
-		// public override bool CompileTimeValidate( MethodBase method ) => false;
-
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( /*Configure.Load<EnableMethodCaching>().Value &&*/ ( !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) ) )
+			if ( /*Configure.Load<EnableMethodCaching>().Value &&*/ !args.Method.IsSpecialName || args.Method.Name.Contains( "get_" ) )
 			{
 				args.ReturnValue = factory( args );
 			}
@@ -59,8 +81,36 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new Freeze();
+		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs )
+		{
+			var result = new Freeze();
+			//adviceArgs.Instance.Get( Properties.Services ).Register();
+			return result;
+		}
 
 		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
+	}
+
+	public class MethodInvocationSpecificationRepository : EntryRepositoryBase<ISpecification<MethodInvocationParameter>>
+	{
+		
+	}
+
+	public struct MethodInvocationParameter
+	{
+		public static MethodInvocationParameter From( MethodInterceptionArgs args ) => new MethodInvocationParameter( args.Method, args.Instance, args.Arguments.ToArray(), args.GetReturnValue );
+
+		public MethodInvocationParameter( MethodBase method, object instance, object[] arguments, Func<object> @continue )
+		{
+			Instance = instance;
+			Method = method;
+			Arguments = arguments;
+			Continue = @continue;
+		}
+
+		public object Instance { get; }
+		public MethodBase Method { get; }
+		public object[] Arguments { get; }
+		public Func<object> Continue { get; }
 	}
 }

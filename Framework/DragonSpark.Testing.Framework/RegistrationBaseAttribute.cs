@@ -42,10 +42,10 @@ namespace DragonSpark.Testing.Framework
 		public RegisterFactoryAttribute( [Required, OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( factoryType ) ) ) {}
 	}
 
-	public class RegisterServiceAttribute : RegistrationBaseAttribute
+	/*public class RegisterServiceAttribute : RegistrationBaseAttribute
 	{
 		public RegisterServiceAttribute( [Required] Type serviceType ) : base( t => new RegistrationCustomization( new ServiceRegistration( serviceType ) ) ) {}
-	}
+	}*/
 
 	public class ServiceRegistration : IRegistration, ICustomization
 	{

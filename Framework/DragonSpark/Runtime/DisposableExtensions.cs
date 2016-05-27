@@ -89,15 +89,11 @@ namespace DragonSpark.Runtime
 		{
 			public static Specification Instance { get; } = new Specification();
 
-			// readonly TypeAdapter adapter = typeof(IDisposable).Adapt();
-
-			public override bool IsSatisfiedBy( MethodBase parameter ) => 
+			public override bool IsSatisfiedBy( MethodBase parameter ) => !parameter.IsSpecialName &&
 				GetMappedMethods( parameter ).Any( tuple => tuple.Item1.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item2, parameter ) );
 
 			[Freeze]
 			static IEnumerable<Tuple<MethodInfo, MethodInfo>> GetMappedMethods( MemberInfo parameter ) => parameter.DeclaringType.Adapt().GetMappedMethods( typeof(IDisposable) );
-
-			// parameter.Name == nameof(IDisposable.Dispose) && adapter.IsAssignableFrom( parameter.DeclaringType );
 		}
 
 		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );

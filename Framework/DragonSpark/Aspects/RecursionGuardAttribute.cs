@@ -1,4 +1,5 @@
 using DragonSpark.Diagnostics;
+using DragonSpark.Runtime.Values;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
@@ -6,32 +7,18 @@ using System;
 
 namespace DragonSpark.Aspects
 {
-	/*[PSerializable, LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public class AllowAttribute : MethodInterceptionAspect
-	{
-		public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			if ( args.Arguments.All( o => o != null ) )
-			{
-				base.OnInvoke( args );
-			}
-			else
-			{
-				// args.ReturnValue = args.Method.AsTo<MethodInfo, object>( info => info.ReturnType.Adapt().GetDefaultValue() );
-			}
-		}
-	}*/
-
-	public static class Keys
+	/*public static class Keys
 	{
 		public static int For( MethodExecutionArgs args ) => KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments );
 
 		public static int For( MethodInterceptionArgs args ) => KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments );
-	}
+	}*/
 
 	[PSerializable, LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Caching )/*, AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )*/]
 	public sealed class RecursionGuardAttribute : OnMethodBoundaryAspect
 	{
+		readonly static IAttachedProperty<int> Property = new ThreadLocalAttachedProperty<int>();
+
 		public RecursionGuardAttribute( int maxCallCount = 2 )
 		{
 			MaxCallCount = maxCallCount;
@@ -56,11 +43,11 @@ namespace DragonSpark.Aspects
 			public int Decrement() => Update( false );
 		}*/
 
-		int Current { get; set; }
-
 		public override void OnEntry( MethodExecutionArgs args )
 		{
-			if ( ++Current >= MaxCallCount )
+			var current = Property.Get( args.Instance ) + 1;
+			Property.Set( args.Instance, current );
+			if ( current >= MaxCallCount )
 			{
 				throw new InvalidOperationException( $"Recursion detected in method {new MethodFormatter(args.Method).ToString( null, null )}" );
 			}
@@ -71,8 +58,8 @@ namespace DragonSpark.Aspects
 		public override void OnExit( MethodExecutionArgs args )
 		{
 			base.OnExit( args );
-			// new Count( args ).Decrement();
-			Current--;
+			var current = Property.Get( args.Instance ) - 1;
+			Property.Set( args.Instance, current );
 		}
 	}
 }

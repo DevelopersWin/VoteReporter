@@ -14,15 +14,15 @@ namespace DragonSpark
 
 		public bool Apply( Action action ) => ApplyIf( null, action );
 
-		public bool ApplyIf( bool condition, Action action ) => ApplyIf( () => condition, action );
+		public bool ApplyIf( bool? condition ) => ApplyIf( condition, null );
 
-		public bool ApplyIf( Func<bool> condition, Action action )
+		public bool ApplyIf( bool? condition, Action action )
 		{
 			switch ( State )
 			{
 				case ConditionMonitorState.None:
 					State = ConditionMonitorState.Applying;
-					var updated = condition == null || condition();
+					var updated = condition.GetValueOrDefault( true );
 					if ( updated )
 					{
 						action?.Invoke();

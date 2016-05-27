@@ -69,7 +69,7 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class MigrationParameter<T>
+	public struct MigrationParameter<T>
 	{
 		public MigrationParameter( T from, T to )
 		{

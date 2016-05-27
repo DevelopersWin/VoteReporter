@@ -49,9 +49,10 @@ namespace DragonSpark.Runtime.Values
 		TupleConverter() : base( arg => new Tuple<T>( arg ), tuple => tuple.Item1 ) {}
 	}*/
 
-	public class ThreadLocalAttachedProperty<TResult> : ThreadLocalAttachedProperty<object, TResult>
+	public class ThreadLocalAttachedProperty<T> : ThreadLocalAttachedProperty<object, T>, IAttachedProperty<T>
 	{
-		public ThreadLocalAttachedProperty( Func<TResult> create ) : base( create ) {}
+		public ThreadLocalAttachedProperty() : this( () => default(T) ) {}
+		public ThreadLocalAttachedProperty( Func<T> create ) : base( create ) {}
 	}
 
 	public class ThreadLocalAttachedProperty<TInstance, TResult> : AttachedProperty<TInstance, TResult> where TInstance : class
@@ -130,6 +131,7 @@ namespace DragonSpark.Runtime.Values
 	// [Synchronized]
 	public class AttachedProperty<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue> where TInstance : class
 	{
+		// readonly AttachedPropertyStore<TInstance, TValue> store;
 		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create;
 		
 		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>> items = new ConditionalWeakTable<TInstance, IWritableStore<TValue>>();
@@ -140,7 +142,10 @@ namespace DragonSpark.Runtime.Values
 
 		public AttachedProperty( Func<TInstance, IWritableStore<TValue>> store ) : this( new AttachedPropertyStore<TInstance, TValue>( store ) ) {}
 
-		public AttachedProperty( AttachedPropertyStore<TInstance, TValue> create ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( create.Create ) ) {}
+		public AttachedProperty( AttachedPropertyStore<TInstance, TValue> store ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( store.Create ) )
+		{
+		//	this.store = store;
+		}
 
 		AttachedProperty( ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create )
 		{
@@ -153,14 +158,17 @@ namespace DragonSpark.Runtime.Values
 			return items.TryGetValue( instance, out temp );
 		}
 
-		public override void Set( TInstance instance, TValue value ) => items.GetValue( instance, create ).Assign( value );
+		public override void Set( TInstance instance, TValue value )
+		{
+			items.GetValue( instance, create ).Assign( value );
+		}
 
 		public override TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
 
 		public override bool Clear( TInstance instance )
 		{
-			var store = Dispose( instance );
-			var result = Remove( instance, store );
+			var item = Dispose( instance );
+			var result = item != null && Remove( instance, item );
 			return result;
 		}
 
@@ -168,14 +176,22 @@ namespace DragonSpark.Runtime.Values
 
 		protected virtual IWritableStore<TValue> Dispose( TInstance instance )
 		{
-			IWritableStore<TValue> store;
-			if ( items.TryGetValue( instance, out store ) )
+			IWritableStore<TValue> item;
+			if ( items.TryGetValue( instance, out item ) )
 			{
-				store.TryDispose();
+				item.TryDispose();
 			}
-			return store;
+			return item;
 		}
 	}
+
+	public class ActivatedAttachedProperty<TResult> : ActivatedAttachedProperty<object, TResult>, IAttachedProperty<TResult> where TResult : new() {}
+
+	public class ActivatedAttachedProperty<TInstance, TResult> : AttachedProperty<TInstance, TResult> where TInstance : class where TResult : new()
+	{
+		public ActivatedAttachedProperty() : base( ActivatedAttachedPropertyStore<TInstance, TResult>.Instance ) {}
+	}
+	
 
 	public class ActivatedAttachedPropertyStore<TValue> : ActivatedAttachedPropertyStore<object, TValue> where TValue : new()
 	{
@@ -189,12 +205,12 @@ namespace DragonSpark.Runtime.Values
 		public ActivatedAttachedPropertyStore() : base( instance => new TValue() ) {}
 	}
 
-	public abstract class ProjectedStore<TInstance, TValue> : AssignedAttachedPropertyStore<object, TValue>
+	/*public abstract class ProjectedStore<TInstance, TValue> : AssignedAttachedPropertyStore<object, TValue>
 	{
 		protected override TValue CreateValue( object instance ) => instance is TInstance ? Project( (TInstance)instance ) : default(TValue);
 
 		protected abstract TValue Project( TInstance instance );
-	}
+	}*/
 
 
 

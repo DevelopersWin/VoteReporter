@@ -12,7 +12,7 @@ namespace DragonSpark.ComponentModel
 
 		public static DefaultValuePropertySpecification Instance { get; } = new DefaultValuePropertySpecification();
 
-		public override bool IsSatisfiedBy( PropertyInfo parameter ) => parameter.GetMethod != null && Attributes.Any( parameter.IsDefined );
+		public override bool IsSatisfiedBy( PropertyInfo parameter ) => parameter.GetMethod != null && parameter.DeclaringType.GetTypeInfo().IsClass && Attributes.Any( parameter.IsDefined );
 
 		
 	}

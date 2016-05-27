@@ -50,7 +50,7 @@ namespace DragonSpark.Runtime
 		public static Value<T> From<T>( T item ) => new Value<T>( item, item );
 	}
 
-	public class Value<T>
+	public struct Value<T>
 	{
 		public Value( T start ) : this( start, Default<T>.Item ) {}
 
@@ -196,22 +196,38 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class ParameterWorkflow : IParameterAware
+	public struct ParameterWorkflowContext
+	{
+		readonly IParameterAware adapter;
+		readonly RelayParameter<bool>? valid;
+		readonly RelayParameter<object>? execute;
+
+		public ParameterWorkflowContext( IParameterAware adapter, RelayParameter<bool>? valid = null, RelayParameter<object>? execute = null )
+		{
+			this.adapter = adapter;
+			this.valid = valid;
+			this.execute = execute;
+		}
+
+		public bool IsValid( object parameter ) => valid?.Factory() ?? adapter.IsValid( parameter );
+
+		public object Execute( object parameter ) => execute.HasValue ? execute.Value.Factory() : adapter.Execute( parameter );
+	}
+
+	public struct ParameterWorkflow : IParameterAware
 	{
 		readonly IParameterWorkflowState state;
-		readonly IsValid specification;
-		readonly Execute execute;
+		readonly ParameterWorkflowContext context;
 		
-		public ParameterWorkflow( IParameterWorkflowState state, IsValid specification, Execute execute )
+		public ParameterWorkflow( IParameterWorkflowState state, ParameterWorkflowContext context )
 		{
 			this.state = state;
-			this.specification = specification;
-			this.execute = execute;
+			this.context = context;
 		}
 
 		public bool IsValid( object parameter )
 		{
-			var result = specification( parameter );
+			var result = context.IsValid( parameter );
 			var valid = state.IsValidated( parameter );
 			var isValid = result && !valid && !state.IsActive( parameter );
 			state.Validate( parameter, isValid );
@@ -230,7 +246,7 @@ namespace DragonSpark.Runtime
 		{
 			using ( new Assignment( state.Validate, parameter ).Configured( false ) )
 			{
-				return execute( parameter );
+				return context.Execute( parameter );
 			}
 		}
 
