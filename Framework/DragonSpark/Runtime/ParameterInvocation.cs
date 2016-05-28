@@ -3,7 +3,6 @@ using DragonSpark.Aspects;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using System;
-using System.Threading;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -143,25 +142,22 @@ namespace DragonSpark.Runtime
 		protected override void OnDispose() => assign( first.Finish );
 	}*/
 
-	public struct BitwiseValue : IEquatable<BitwiseValue>
+	/*public struct BitwiseValue : IEquatable<BitwiseValue>
 	{
-		int value;
+		readonly int value;
+
+		public BitwiseValue( int value )
+		{
+			this.value = value;
+		}
 
 		public int Value => value;
 
-		public int If( bool condition, int bit ) => condition ? Add( bit ) : Remove( bit );
+		public BitwiseValue If( bool condition, int bit ) => condition ? Add( bit ) : Remove( bit );
 
-		public int Add( int bit )
-		{
-			Interlocked.CompareExchange( ref value, value | bit, value );
-			return value;
-		}
+		public BitwiseValue Add( int bit ) => new BitwiseValue( value | bit );
 
-		public int Remove( int bit )
-		{
-			Interlocked.CompareExchange( ref value, value & ~bit, value );
-			return Value;
-		}
+		public BitwiseValue Remove( int bit ) => new BitwiseValue( value & ~bit );
 
 		public bool Contains( int bit ) => ( value & bit ) == bit;
 
@@ -174,11 +170,15 @@ namespace DragonSpark.Runtime
 		public static bool operator ==( BitwiseValue left, BitwiseValue right ) => left.Equals( right );
 
 		public static bool operator !=( BitwiseValue left, BitwiseValue right ) => !left.Equals( right );
-	}
+
+	/*	public static implicit operator BitwiseValue( int item ) => new BitwiseValue( item );
+
+		public static implicit operator int( BitwiseValue item ) => item.value;#1#
+	}*/
 
 	public class ParameterState /*: IParameterWorkflowState*/
 	{
-		public ParameterState() : this( new EnabledState( new BitwiseValue() ), new EnabledState( new BitwiseValue() ) ) {}
+		public ParameterState() : this( new EnabledState(), new EnabledState() ) {}
 
 		public ParameterState( EnabledState active, EnabledState valid )
 		{
@@ -231,21 +231,20 @@ namespace DragonSpark.Runtime
 	{
 		readonly static object Null = new object();
 
-		BitwiseValue store;
-
-		public EnabledState( BitwiseValue store )
-		{
-			this.store = store;
-		}
+		int store;
 
 		static int GetCode( object item ) => ( item ?? Null ).GetHashCode();
 
-		public bool IsEnabled( object item ) => store.Contains( GetCode( item ) );
+		public bool IsEnabled( object item )
+		{
+			var code = GetCode( item );
+			return ( store & code ) == code;
+		}
 
 		public void Enable( object item, bool on )
 		{
 			var code = GetCode( item );
-			store.If( @on, code );
+			store = on ? store | code : store & ~code;
 		}
 	}
 
