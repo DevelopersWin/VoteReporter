@@ -25,17 +25,22 @@ namespace DragonSpark.Runtime.Values
 		public static Stack<T> GetCurrent() => Property.Get( Execution.Current );
 	}
 
+	// [Synchronized]
 	public class ThreadLocalStore<T> : WritableStore<T>
 	{
+		// readonly static object Lock = new object();
+
 		// readonly AttachedProperty<bool> disposed = new AttachedProperty<bool>();
 
 		// readonly IList<int> threads = new System.Collections.ObjectModel.Collection<int>();
 
-		int threads;
-
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
 		readonly ThreadLocal<T> local;
+
+		readonly BitwiseValueStore store = new BitwiseValueStore();
+
+		// int threads;
 
 		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
 
@@ -46,21 +51,8 @@ namespace DragonSpark.Runtime.Values
 
 		public override void Assign( T item )
 		{
-			/*var isNull = item.IsNull();
-			var host = isNull ? local.Value : item;
-			var code = host.GetHashCode();*/
-
-			if ( item.IsNull() )
-			{
-				threads &= ~Environment.CurrentManagedThreadId;
-				// threads.Remove( Environment.CurrentManagedThreadId );
-			}
-			else
-			{
-				threads |= Environment.CurrentManagedThreadId;
-				// threads.Ensure( Environment.CurrentManagedThreadId );
-			}
-
+			store.If( item.IsNull(), Environment.CurrentManagedThreadId );
+			
 			local.Value = item;
 		}
 
@@ -68,8 +60,7 @@ namespace DragonSpark.Runtime.Values
 		{
 			if ( !local.IsValueCreated )
 			{
-				threads |= Environment.CurrentManagedThreadId;
-				// threads.Add( Environment.CurrentManagedThreadId );
+				store.Add( Environment.CurrentManagedThreadId );
 			}
 			return local.Value;
 		}
@@ -78,8 +69,7 @@ namespace DragonSpark.Runtime.Values
 
 		protected override void OnDispose()
 		{
-			threads &= ~Environment.CurrentManagedThreadId;
-
+			var threads = store.Remove( Environment.CurrentManagedThreadId );
 			if ( monitor.ApplyIf( threads == 0 ) )
 			{
 				local.Dispose();

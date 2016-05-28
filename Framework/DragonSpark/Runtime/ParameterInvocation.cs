@@ -106,7 +106,36 @@ namespace DragonSpark.Runtime
 		protected override void OnDispose() => assign( first.Finish );
 	}
 
-	public class ParameterWorkflowState : IParameterWorkflowState
+	public class BitwiseValueStore : FixedStore<int>
+	{
+		readonly object @lock = new object();
+
+		public int If( bool condition, int value ) => condition ? Add( value ) : Remove( value );
+
+		public int Add( int value )
+		{
+			lock ( @lock )
+			{
+				var result = Value | value;
+				Assign( result );
+				return result;
+			}
+		}
+
+		public int Remove( int value )
+		{
+			lock ( @lock )
+			{
+				var result = Value & ~value;
+				Assign( result );
+				return result;
+			}
+		}
+
+		public bool Contains( int value ) => ( Value & value ) == value;
+	}
+
+	public struct ParameterWorkflowState : IParameterWorkflowState
 	{
 		readonly static object Null = new object();
 
@@ -143,14 +172,14 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public interface IParameterAware
+	public interface IParameterValidator
 	{
 		bool IsValid( object parameter );
 
-		object Execute( object parameter );
+		// object Execute( object parameter );
 	}
 
-	public class FactoryAdapter<TParameter, TResult> : IParameterAware
+	public class FactoryAdapter<TParameter, TResult> : IParameterValidator
 	{
 		readonly IFactory<TParameter, TResult> inner;
 		public FactoryAdapter( IFactory<TParameter, TResult> inner )
@@ -160,10 +189,10 @@ namespace DragonSpark.Runtime
 
 		public bool IsValid( object parameter ) => inner.CanCreate( (TParameter)parameter );
 
-		public object Execute( object parameter ) => inner.Create( (TParameter)parameter );
+		// public object Execute( object parameter ) => inner.Create( (TParameter)parameter );
 	}
 
-	public class FactoryAdapter : IParameterAware
+	public class FactoryAdapter : IParameterValidator
 	{
 		readonly IFactoryWithParameter factory;
 
@@ -174,10 +203,10 @@ namespace DragonSpark.Runtime
 
 		public bool IsValid( object parameter ) => factory.CanCreate( parameter );
 
-		public object Execute( object parameter ) => factory.Create( parameter );
+		// public object Execute( object parameter ) => factory.Create( parameter );
 	}
 
-	public class CommandAdapter : IParameterAware
+	public class CommandAdapter : IParameterValidator
 	{
 		readonly ICommand inner;
 		public CommandAdapter( ICommand inner )
@@ -194,7 +223,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class CommandAdapter<T> : IParameterAware
+	public class CommandAdapter<T> : IParameterValidator
 	{
 		readonly ICommand<T> inner;
 		public CommandAdapter( ICommand<T> inner )
@@ -230,8 +259,8 @@ namespace DragonSpark.Runtime
 
 	public struct AdapterInvocation : IInvocation<bool>
 	{
-		readonly IParameterAware adapter;
-		public AdapterInvocation( IParameterAware adapter )
+		readonly IParameterValidator adapter;
+		public AdapterInvocation( IParameterValidator adapter )
 		{
 			this.adapter = adapter;
 		}
