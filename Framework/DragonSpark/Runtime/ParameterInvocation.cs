@@ -3,6 +3,7 @@ using DragonSpark.Aspects;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using System;
+using System.Threading;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -106,40 +107,43 @@ namespace DragonSpark.Runtime
 		protected override void OnDispose() => assign( first.Finish );
 	}
 
-	public class BitwiseValueStore : FixedStore<int>
+	public struct BitwiseValueStore : IEquatable<BitwiseValueStore>
 	{
-		readonly object @lock = new object();
+		int value;
 
-		public int If( bool condition, int value ) => condition ? Add( value ) : Remove( value );
+		public int Value => value;
 
-		public int Add( int value )
+		public int If( bool condition, int bit ) => condition ? Add( bit ) : Remove( bit );
+
+		public int Add( int bit )
 		{
-			lock ( @lock )
-			{
-				var result = Value | value;
-				Assign( result );
-				return result;
-			}
+			Interlocked.CompareExchange( ref value, value | bit, value );
+			return value;
 		}
 
-		public int Remove( int value )
+		public int Remove( int bit )
 		{
-			lock ( @lock )
-			{
-				var result = Value & ~value;
-				Assign( result );
-				return result;
-			}
+			Interlocked.CompareExchange( ref value, value & ~bit, value );
+			return Value;
 		}
 
-		public bool Contains( int value ) => ( Value & value ) == value;
+		public bool Contains( int bit ) => ( value & bit ) == bit;
+
+		public bool Equals( BitwiseValueStore other ) => value == other.value;
+
+		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is BitwiseValueStore && Equals( (BitwiseValueStore)obj ) );
+
+		public override int GetHashCode() => Value;
+
+		public static bool operator ==( BitwiseValueStore left, BitwiseValueStore right ) => left.Equals( right );
+
+		public static bool operator !=( BitwiseValueStore left, BitwiseValueStore right ) => !left.Equals( right );
 	}
 
 	public struct ParameterWorkflowState : IParameterWorkflowState
 	{
 		readonly static object Null = new object();
 
-		// readonly ISet<int> active = new HashSet<int>(), valid = new HashSet<int>();
 		int active, valid;
 
 		public void Activate( object parameter, bool on ) => Set( ref active, parameter, @on );
@@ -156,12 +160,10 @@ namespace DragonSpark.Runtime
 			if ( on )
 			{
 				store |= @checked;
-				// store.Add( @checked );
 			}
 			else
 			{
 				store &= ~@checked;
-				// store.Remove( @checked );
 			}
 		}
 

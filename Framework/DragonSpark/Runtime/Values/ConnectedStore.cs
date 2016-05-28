@@ -25,22 +25,13 @@ namespace DragonSpark.Runtime.Values
 		public static Stack<T> GetCurrent() => Property.Get( Execution.Current );
 	}
 
-	// [Synchronized]
 	public class ThreadLocalStore<T> : WritableStore<T>
 	{
-		// readonly static object Lock = new object();
-
-		// readonly AttachedProperty<bool> disposed = new AttachedProperty<bool>();
-
-		// readonly IList<int> threads = new System.Collections.ObjectModel.Collection<int>();
-
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
 		readonly ThreadLocal<T> local;
 
-		readonly BitwiseValueStore store = new BitwiseValueStore();
-
-		// int threads;
+		BitwiseValueStore store = new BitwiseValueStore();
 
 		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
 
