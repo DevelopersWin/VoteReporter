@@ -182,7 +182,7 @@ namespace DragonSpark.Aspects
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class ParameterValidatorBase : TypeLevelAspect
+	public abstract class ParameterValidatorBase : InstanceLevelAspect
 	{
 		readonly Profile profile;
 		readonly Func<object, IParameterValidator> factory;
