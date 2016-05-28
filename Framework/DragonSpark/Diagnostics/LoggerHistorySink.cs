@@ -57,6 +57,9 @@ namespace DragonSpark.Diagnostics
 	{
 		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
 
-		public override string[] Create( IEnumerable<LogEvent> parameter ) => parameter.OrderBy( line => line.Timestamp ).Select( LogEventTextFactory.Instance.Create ).ToArray();
+		public override string[] Create( IEnumerable<LogEvent> parameter ) => parameter
+			.OrderBy( line => line.Timestamp )
+			.Select( LogEventTextFactory.Instance.Create )
+			.ToArray();
 	}
 }

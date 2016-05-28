@@ -56,7 +56,7 @@ namespace DragonSpark.Diagnostics
 			: base( new LoggerConfigurationSource( controller ), transformers.Append( new LoggerHistoryConfigurationTransformer( sink ) ).Fixed() ) {}
 	}
 
-	public class MethodFormatter : IFormattable
+	public struct MethodFormatter : IFormattable
 	{
 		readonly MethodBase method;
 
