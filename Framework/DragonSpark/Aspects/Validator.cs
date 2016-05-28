@@ -217,8 +217,8 @@ namespace DragonSpark.Aspects
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
 			var parameter = new RelayParameter( args, args.Arguments.Single() );
-			var parameterState = WorkflowState.Property.Get( args.Instance );
-			var workflow = new ValidationInvocation<RelayInvocation>( parameterState, new RelayInvocation( parameter ) );
+			var state = WorkflowState.Property.Get( args.Instance );
+			var workflow = new ValidationInvocation<RelayInvocation>( state.Active, state.Valid, new RelayInvocation( parameter ) );
 			workflow.Invoke( parameter.Parameter );
 		}
 
@@ -227,7 +227,7 @@ namespace DragonSpark.Aspects
 		{
 			var adapter = factory( args.Instance );
 			var state = WorkflowState.Property.Get( args.Instance );
-			var validation = new ValidationInvocation<AdapterInvocation>( state, new AdapterInvocation( adapter ) );
+			var validation = new ValidationInvocation<AdapterInvocation>( state.Active, state.Valid, new AdapterInvocation( adapter ) );
 			var parameter = new RelayParameter( args, args.Arguments.Single() );
 			var invocation = new ParameterInvocation( state, validation, parameter );
 			invocation.Invoke( parameter.Parameter );

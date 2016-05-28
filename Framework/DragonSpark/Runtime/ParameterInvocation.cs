@@ -109,7 +109,7 @@ namespace DragonSpark.Runtime
 	}
 
 	// [Disposable]
-	struct Assignment<T, T1, T2> : IDisposable where T : IAssign<T1, T2>
+	public struct Assignment<T, T1, T2> : IDisposable where T : IAssign<T1, T2>
 	{
 		readonly T assign;
 		readonly Value<T1> first;
@@ -353,19 +353,20 @@ namespace DragonSpark.Runtime
 	public struct ValidationInvocation<T> where T : IInvocation<bool>
 	{
 		readonly T invocation;
-		readonly ParameterState state;
+		readonly EnabledState active, valid;
 		
-		public ValidationInvocation( ParameterState state, T invocation )
+		public ValidationInvocation( EnabledState active, EnabledState valid, T invocation )
 		{
-			this.state = state;
+			this.active = active;
+			this.valid = valid;
 			this.invocation = invocation;
 		}
 
 		public bool Invoke( object parameter )
 		{
 			var result = invocation.Invoke( parameter );
-			var validated = result && !state.Valid.IsEnabled( parameter ) && !state.Active.IsEnabled( parameter );
-			state.Valid.Enable( parameter, validated );
+			var validated = result && !valid.IsEnabled( parameter ) && !active.IsEnabled( parameter );
+			valid.Enable( parameter, validated );
 			return result;
 		}
 	}
