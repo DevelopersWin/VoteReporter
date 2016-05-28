@@ -3,7 +3,6 @@ using DragonSpark.Aspects;
 using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -111,30 +110,37 @@ namespace DragonSpark.Runtime
 	{
 		readonly static object Null = new object();
 
-		readonly ISet<int> active = new HashSet<int>(), valid = new HashSet<int>();
+		// readonly ISet<int> active = new HashSet<int>(), valid = new HashSet<int>();
+		int active, valid;
 
-		public void Activate( object parameter, bool on ) => Set( active, parameter, @on );
+		public void Activate( object parameter, bool on ) => Set( ref active, parameter, @on );
 
 		public bool IsActive( object parameter ) => Get( active, parameter );
 
-		public void Validate( object parameter, bool on ) => Set( valid, parameter, @on );
+		public void Validate( object parameter, bool on ) => Set( ref valid, parameter, @on );
 
 		public bool IsValidated( object parameter ) => Get( valid, parameter );
 
-		static void Set( ISet<int> store, object parameter, bool on )
+		static void Set( ref int store, object parameter, bool on )
 		{
 			var @checked = ( parameter ?? Null ).GetHashCode();
 			if ( on )
 			{
-				store.Add( @checked );
+				store |= @checked;
+				// store.Add( @checked );
 			}
 			else
 			{
-				store.Remove( @checked );
+				store &= ~@checked;
+				// store.Remove( @checked );
 			}
 		}
 
-		static bool Get( ICollection<int> store, object parameter ) => store.Contains( ( parameter ?? Null ).GetHashCode() );
+		static bool Get( int store, object parameter )
+		{
+			var code = ( parameter ?? Null ).GetHashCode();
+			return ( store & code ) == code;
+		}
 	}
 
 	public interface IParameterAware

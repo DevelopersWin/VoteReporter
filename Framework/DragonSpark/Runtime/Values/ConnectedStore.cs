@@ -5,7 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 
 namespace DragonSpark.Runtime.Values
@@ -30,7 +29,9 @@ namespace DragonSpark.Runtime.Values
 	{
 		// readonly AttachedProperty<bool> disposed = new AttachedProperty<bool>();
 
-		readonly IList<int> threads = new System.Collections.ObjectModel.Collection<int>();
+		// readonly IList<int> threads = new System.Collections.ObjectModel.Collection<int>();
+
+		int threads;
 
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
@@ -45,13 +46,19 @@ namespace DragonSpark.Runtime.Values
 
 		public override void Assign( T item )
 		{
+			/*var isNull = item.IsNull();
+			var host = isNull ? local.Value : item;
+			var code = host.GetHashCode();*/
+
 			if ( item.IsNull() )
 			{
-				threads.Remove( Environment.CurrentManagedThreadId );
+				threads &= ~Environment.CurrentManagedThreadId;
+				// threads.Remove( Environment.CurrentManagedThreadId );
 			}
 			else
 			{
-				threads.Ensure( Environment.CurrentManagedThreadId );
+				threads |= Environment.CurrentManagedThreadId;
+				// threads.Ensure( Environment.CurrentManagedThreadId );
 			}
 
 			local.Value = item;
@@ -61,7 +68,8 @@ namespace DragonSpark.Runtime.Values
 		{
 			if ( !local.IsValueCreated )
 			{
-				threads.Add( Environment.CurrentManagedThreadId );
+				threads |= Environment.CurrentManagedThreadId;
+				// threads.Add( Environment.CurrentManagedThreadId );
 			}
 			return local.Value;
 		}
@@ -70,11 +78,10 @@ namespace DragonSpark.Runtime.Values
 
 		protected override void OnDispose()
 		{
-			threads.Remove( Environment.CurrentManagedThreadId );
+			threads &= ~Environment.CurrentManagedThreadId;
 
-			if ( !threads.Any() )
+			if ( monitor.ApplyIf( threads == 0 ) )
 			{
-				monitor.Apply();
 				local.Dispose();
 			}
 			

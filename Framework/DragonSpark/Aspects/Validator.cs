@@ -169,9 +169,7 @@ namespace DragonSpark.Aspects
 	{
 		readonly MethodInterceptionArgs args;
 
-		public RelayParameter( MethodInterceptionArgs args ) : this( args, args.Arguments.Single() ) {}
-
-		RelayParameter( MethodInterceptionArgs args, object parameter )
+		public RelayParameter( MethodInterceptionArgs args, object parameter )
 		{
 			this.args = args;
 			Parameter = parameter;
@@ -218,7 +216,7 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
-			var parameter = new RelayParameter( args );
+			var parameter = new RelayParameter( args, args.Arguments.Single() );
 			var workflow = new ValidationInvocation<RelayInvocation>( WorkflowState.Property.Get( args.Instance ), new RelayInvocation( parameter ) );
 			workflow.Invoke( parameter.Parameter );
 		}
@@ -229,7 +227,7 @@ namespace DragonSpark.Aspects
 			var adapter = factory( args.Instance );
 			var state = WorkflowState.Property.Get( args.Instance );
 			var validation = new ValidationInvocation<AdapterInvocation>( state, new AdapterInvocation( adapter ) );
-			var parameter = new RelayParameter( args );
+			var parameter = new RelayParameter( args, args.Arguments.Single() );
 			var invocation = new ParameterInvocation( state, validation, parameter );
 			invocation.Invoke( parameter.Parameter );
 		}
