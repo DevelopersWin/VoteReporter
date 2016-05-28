@@ -64,11 +64,11 @@ namespace DragonSpark.Aspects
 		protected abstract IParameterAware Project( T instance );*/
 	}
 
-	class WorkflowState : ThreadLocalAttachedProperty<IParameterWorkflowState>
+	class WorkflowState : ThreadLocalAttachedProperty<ParameterState>
 	{
 		public static WorkflowState Property { get; } = new WorkflowState();
 
-		WorkflowState() : base( () => new ParameterWorkflowState() ) {}
+		WorkflowState() : base( () => new ParameterState() ) {}
 	}
 
 	abstract class GenericParameterStoreBase : ParameterStoreBase<object>
@@ -87,7 +87,7 @@ namespace DragonSpark.Aspects
 		protected override IParameterValidator Project( object instance )
 		{
 			var arguments = instance.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = adapter.Invoke<IParameterValidator>( methodName, arguments, instance );
+			var result = adapter.Invoke<IParameterValidator>( methodName, arguments, instance.ToItem() );
 			return result;
 		}
 	}
@@ -217,7 +217,8 @@ namespace DragonSpark.Aspects
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
 			var parameter = new RelayParameter( args, args.Arguments.Single() );
-			var workflow = new ValidationInvocation<RelayInvocation>( WorkflowState.Property.Get( args.Instance ), new RelayInvocation( parameter ) );
+			var parameterState = WorkflowState.Property.Get( args.Instance );
+			var workflow = new ValidationInvocation<RelayInvocation>( parameterState, new RelayInvocation( parameter ) );
 			workflow.Invoke( parameter.Parameter );
 		}
 

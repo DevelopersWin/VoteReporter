@@ -195,7 +195,7 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public class TimerEventHandler : BoxedCommand<string>
+	public class TimerEventHandler : ProjectedCommand<string>
 	{
 		public TimerEventHandler( CreateProfilerEvent projection, Action<TimerEvent> inner ) : base( new DelegatedCommand<TimerEvent>( inner, new Projector<string,TimerEvent>( new Func<string, TimerEvent>( projection ) ) )  ) {}
 	}

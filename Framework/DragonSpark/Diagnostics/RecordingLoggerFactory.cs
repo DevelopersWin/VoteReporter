@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
@@ -56,7 +55,7 @@ namespace DragonSpark.Diagnostics
 			: base( new LoggerConfigurationSource( controller ), transformers.Append( new LoggerHistoryConfigurationTransformer( sink ) ).Fixed() ) {}
 	}
 
-	public struct MethodFormatter : IFormattable
+	public class MethodFormatter : IFormattable
 	{
 		readonly MethodBase method;
 

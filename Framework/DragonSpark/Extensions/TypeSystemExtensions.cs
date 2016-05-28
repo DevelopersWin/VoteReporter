@@ -6,7 +6,7 @@ using Type = System.Type;
 
 namespace DragonSpark.Extensions
 {
-	public static class AssemblyLocatorExtensions
+	public static class TypeSystemExtensions
 	{
 		public static Tuple<TAttribute, TypeInfo>[] GetAllTypesWith<TAttribute>( this IEnumerable<Assembly> target ) where TAttribute : Attribute
 			=> target.SelectMany( assembly => assembly.DefinedTypes ).WhereDecorated<TAttribute>();

@@ -10,7 +10,7 @@ namespace DragonSpark.Extensions
 	{
 		// public static ICommand<T> Cast<T>( this ICommand @this ) => Cast<T>( @this, Default<T>.Boxed );
 
-		public static ICommand<T> Cast<T>( this ICommand @this, Func<T, object> box ) => new BoxedCommand<T>( @this, box );
+		public static ICommand<T> Cast<T>( this ICommand @this, Func<T, object> box ) => new ProjectedCommand<T>( @this, box );
 
 		public static IEnumerable<T> ExecuteMany<T>( this IEnumerable<T> @this, object parameter ) where T : ICommand => @this.Select( x => x.AsExecuted( parameter ) ).NotNull().ToArray();
 

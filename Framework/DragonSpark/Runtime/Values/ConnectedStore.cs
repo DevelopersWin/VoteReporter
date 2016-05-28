@@ -31,7 +31,7 @@ namespace DragonSpark.Runtime.Values
 
 		readonly ThreadLocal<T> local;
 
-		BitwiseValueStore store = new BitwiseValueStore();
+		BitwiseValue store = new BitwiseValue();
 
 		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
 

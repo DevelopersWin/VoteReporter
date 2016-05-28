@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Runtime
 {
-	public interface IParameterWorkflowState
+	/*public interface IParameterWorkflowState
 	{
 		void Activate( object parameter, bool on );
 
@@ -17,13 +17,13 @@ namespace DragonSpark.Runtime
 		bool IsActive( object parameter );
 
 		bool IsValidated( object parameter );
-	}
+	}*/
 
-	public class Assignment : Assignment<object, bool>
+	/*public class Assignment : Assignment<object, bool>
 	{
 		public Assignment( Action<object, bool> assign, object parameter )
-			: base( assign, From( parameter ), new Value<bool>( true ) ) {}
-	}
+			: base( assign, Assignments.From( parameter ), new Value<bool>( true ) ) {}
+	}*/
 
 	public class Disposable : IDisposable
 	{
@@ -40,12 +40,12 @@ namespace DragonSpark.Runtime
 			GC.SuppressFinalize( this );
 		}
 
-		void Dispose( bool disposing ) => monitor.ApplyIf( disposing, OnDispose );
+		void Dispose( bool disposing ) => monitor.Apply( OnDispose );
 
 		protected virtual void OnDispose() {}
 	}
 
-	public abstract class AssignmentBase : Disposable
+	public static class Assignments
 	{
 		public static Value<T> From<T>( T item ) => new Value<T>( item, item );
 	}
@@ -64,32 +64,68 @@ namespace DragonSpark.Runtime
 		public T Finish { get; }
 	}
 
-	public class PropertyAssignment<T1, T2> : Assignment<T1, T2> where T1 : class
+	public struct PropertyAssignment<T1, T2> : IAssign<T1, T2> where T1 : class
 	{
-		public PropertyAssignment( IAttachedProperty<T1, T2> assign, T1 first, T2 second ) : this( assign, From( first ), new Value<T2>( second ) ) {}
+		readonly IAttachedProperty<T1, T2> property;
+		public PropertyAssignment( IAttachedProperty<T1, T2> property )
+		{
+			this.property = property;
+		}
 
-		public PropertyAssignment( IAttachedProperty<T1, T2> assign, Value<T1> first, Value<T2> second ) : base( assign.Set, first, second ) {}
+		public void Assign( T1 first, T2 second ) => property.Set( first, second );
 	}
 
-	public class Assignment<T1, T2> : AssignmentBase
+	public interface IAssign<in T1, in T2>
+	{
+		void Assign( T1 first, T2 second );
+	}
+
+	struct DelegatedAssign<T1, T2> : IAssign<T1, T2>
 	{
 		readonly Action<T1, T2> assign;
+		public DelegatedAssign( Action<T1, T2> assign )
+		{
+			this.assign = assign;
+		}
+
+		public void Assign( T1 first, T2 second ) => assign( first, second );
+	}
+
+	struct EnabledStateAssign : IAssign<object, bool>
+	{
+		EnabledState value;
+
+		public EnabledStateAssign( EnabledState value )
+		{
+			this.value = value;
+		}
+
+		public void Assign( object first, bool second ) => value.Enable( first, second );
+	}
+
+	// [Disposable]
+	public struct Assignment<T, T1, T2> : IDisposable where T : IAssign<T1, T2>
+	{
+		readonly T assign;
 		readonly Value<T1> first;
 		readonly Value<T2> second;
 
-		public Assignment( Action<T1, T2> assign, Value<T1> first, Value<T2> second )
+		public Assignment( T assign, T1 first, T2 second ) : this( assign, new Value<T1>( first ), new Value<T2>( second ) ) {}
+
+		public Assignment( T assign, Value<T1> first, Value<T2> second )
 		{
 			this.assign = assign;
 			this.first = first;
 			this.second = second;
 
-			assign( first.Start, second.Start );
+			assign.Assign( first.Start, second.Start );
 		}
 
-		protected override void OnDispose() => assign( first.Finish, second.Finish );
+		// protected override void OnDispose() => assign.Assign( first.Finish, second.Finish );
+		public void Dispose() => assign.Assign( first.Finish, second.Finish );
 	}
 
-	public class Assignment<T> : AssignmentBase
+	/*public class Assignment<T> : Disposable
 	{
 		readonly Action<T> assign;
 		readonly Value<T> first;
@@ -105,9 +141,9 @@ namespace DragonSpark.Runtime
 		}
 
 		protected override void OnDispose() => assign( first.Finish );
-	}
+	}*/
 
-	public struct BitwiseValueStore : IEquatable<BitwiseValueStore>
+	public struct BitwiseValue : IEquatable<BitwiseValue>
 	{
 		int value;
 
@@ -129,20 +165,37 @@ namespace DragonSpark.Runtime
 
 		public bool Contains( int bit ) => ( value & bit ) == bit;
 
-		public bool Equals( BitwiseValueStore other ) => value == other.value;
+		public bool Equals( BitwiseValue other ) => value == other.value;
 
-		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is BitwiseValueStore && Equals( (BitwiseValueStore)obj ) );
+		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is BitwiseValue && Equals( (BitwiseValue)obj ) );
 
 		public override int GetHashCode() => Value;
 
-		public static bool operator ==( BitwiseValueStore left, BitwiseValueStore right ) => left.Equals( right );
+		public static bool operator ==( BitwiseValue left, BitwiseValue right ) => left.Equals( right );
 
-		public static bool operator !=( BitwiseValueStore left, BitwiseValueStore right ) => !left.Equals( right );
+		public static bool operator !=( BitwiseValue left, BitwiseValue right ) => !left.Equals( right );
 	}
 
-	public struct ParameterWorkflowState : IParameterWorkflowState
+	public class ParameterState /*: IParameterWorkflowState*/
 	{
-		readonly static object Null = new object();
+		public ParameterState() : this( new EnabledState( new BitwiseValue() ), new EnabledState( new BitwiseValue() ) ) {}
+
+		public ParameterState( EnabledState active, EnabledState valid )
+		{
+			Active = active;
+			Valid = valid;
+		}
+
+		/*public ParameterWorkflowState()
+		{
+			Active = new BitwiseValue();
+		}*/
+
+		public EnabledState Active { get; }
+
+		public EnabledState Valid { get; }
+
+		/*readonly static object Null = new object();
 
 		int active, valid;
 
@@ -171,6 +224,28 @@ namespace DragonSpark.Runtime
 		{
 			var code = ( parameter ?? Null ).GetHashCode();
 			return ( store & code ) == code;
+		}*/
+	}
+
+	public class EnabledState
+	{
+		readonly static object Null = new object();
+
+		BitwiseValue store;
+
+		public EnabledState( BitwiseValue store )
+		{
+			this.store = store;
+		}
+
+		static int GetCode( object item ) => ( item ?? Null ).GetHashCode();
+
+		public bool IsEnabled( object item ) => store.Contains( GetCode( item ) );
+
+		public void Enable( object item, bool on )
+		{
+			var code = GetCode( item );
+			store.If( @on, code );
 		}
 	}
 
@@ -218,11 +293,11 @@ namespace DragonSpark.Runtime
 
 		public bool IsValid( object parameter ) => inner.CanExecute( parameter );
 
-		public object Execute( object parameter )
+		/*public object Execute( object parameter )
 		{
 			inner.Execute( parameter );
 			return null;
-		}
+		}*/
 	}
 
 	public class CommandAdapter<T> : IParameterValidator
@@ -235,11 +310,11 @@ namespace DragonSpark.Runtime
 
 		public bool IsValid( object parameter ) => inner.CanExecute( (T)parameter );
 
-		public object Execute( object parameter )
+		/*public object Execute( object parameter )
 		{
 			inner.Execute( (T)parameter );
 			return null;
-		}
+		}*/
 	}
 
 	public interface IInvocation<out T>
@@ -273,9 +348,9 @@ namespace DragonSpark.Runtime
 	public struct ValidationInvocation<T> where T : IInvocation<bool>
 	{
 		readonly T invocation;
-		readonly IParameterWorkflowState state;
+		readonly ParameterState state;
 		
-		public ValidationInvocation( IParameterWorkflowState state, T invocation )
+		public ValidationInvocation( ParameterState state, T invocation )
 		{
 			this.state = state;
 			this.invocation = invocation;
@@ -284,28 +359,31 @@ namespace DragonSpark.Runtime
 		public bool Invoke( object parameter )
 		{
 			var result = invocation.Invoke( parameter );
-			var validated = result && !state.IsValidated( parameter ) && !state.IsActive( parameter );
-			state.Validate( parameter, validated );
+			var validated = result && !state.Valid.IsEnabled( parameter ) && !state.Active.IsEnabled( parameter );
+			state.Valid.Enable( parameter, validated );
 			return result;
 		}
 	}
 
-	public struct ParameterInvocation : IInvocation<object>
+	struct ParameterInvocation : IInvocation<object>
 	{
 		readonly RelayParameter execute;
-		readonly IParameterWorkflowState state;
+		readonly ParameterState state;
 		readonly ValidationInvocation<AdapterInvocation> validation;
 
-		public ParameterInvocation( IParameterWorkflowState state, ValidationInvocation<AdapterInvocation> validation, RelayParameter execute )
+		public ParameterInvocation( ParameterState state, ValidationInvocation<AdapterInvocation> validation, RelayParameter execute )
 		{
 			this.state = state;
 			this.validation = validation;
 			this.execute = execute;
 		}
 
+		static Assignment<EnabledStateAssign, object, bool> Create( EnabledState item, object parameter ) => 
+			new Assignment<EnabledStateAssign, object, bool>( new EnabledStateAssign( item ), Assignments.From( parameter ), new Value<bool>( true ) ).Configured( false );
+
 		bool AsActive( object parameter )
 		{
-			using ( new Assignment( state.Activate, parameter ).Configured( false ) )
+			using ( Create( state.Active, parameter ) )
 			{
 				return validation.Invoke( parameter );
 			}
@@ -313,22 +391,12 @@ namespace DragonSpark.Runtime
 
 		object AsValid( object parameter )
 		{
-			using ( new Assignment( state.Validate, parameter ).Configured( false ) )
+			using ( Create( state.Valid, parameter ) )
 			{
 				return execute.Proceed<object>();
 			}
 		}
 
-		public object Invoke( object parameter ) => state.IsValidated( parameter ) || AsActive( parameter ) ? AsValid( parameter ) : null;
-
-		/*bool Check( object parameter )
-		{
-			var result = state.IsValidated( parameter );
-			if ( result )
-			{
-				state.Validate( parameter, false );
-			}
-			return result;
-		}*/
+		public object Invoke( object parameter ) => state.Valid.IsEnabled( parameter ) || AsActive( parameter ) ? AsValid( parameter ) : null;
 	}
 }

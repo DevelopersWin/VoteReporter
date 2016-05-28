@@ -89,7 +89,7 @@ namespace DragonSpark.Runtime
 		{
 			public static Specification Instance { get; } = new Specification();
 
-			public override bool IsSatisfiedBy( MethodBase parameter ) => !parameter.IsSpecialName &&
+			public override bool IsSatisfiedBy( MethodBase parameter ) => parameter.DeclaringType.GetTypeInfo().IsClass && !parameter.IsSpecialName &&
 				GetMappedMethods( parameter ).Any( tuple => tuple.Item1.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item2, parameter ) );
 
 			[Freeze]

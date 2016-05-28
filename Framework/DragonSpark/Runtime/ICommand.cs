@@ -150,20 +150,20 @@ namespace DragonSpark.Runtime
 		public override void Execute( T parameter ) => command( parameter );
 	}
 
-	public class BoxedCommand<T> : CommandBase<T>
+	public class ProjectedCommand<T> : CommandBase<T>
 	{
 		readonly ICommand command;
-		readonly Func<T, object> box;
+		readonly Func<T, object> projection;
 
-		public BoxedCommand( ICommand command ) : this( command, Default<T>.Boxed ) {}
+		public ProjectedCommand( ICommand command ) : this( command, Default<T>.Boxed ) {}
 
-		public BoxedCommand( ICommand command, Func<T, object> box )
+		public ProjectedCommand( ICommand command, Func<T, object> projection )
 		{
 			this.command = command;
-			this.box = box;
+			this.projection = projection;
 		}
 
-		public override void Execute( T parameter ) => command.Execute( box( parameter ) );
+		public override void Execute( T parameter ) => command.Execute( projection( parameter ) );
 	}
 
 	public class DecoratedCommand<T> : DelegatedCommand<T>
