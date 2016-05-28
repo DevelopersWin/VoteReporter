@@ -40,7 +40,7 @@ namespace DragonSpark.Testing.Runtime
 		[Fact]
 		public void ExtendedCheck()
 		{
-			for ( int i = 0; i < 10000; i++ )
+			// for ( int i = 0; i < 10000; i++ )
 			{
 				var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );
