@@ -39,9 +39,15 @@ namespace DragonSpark.Runtime
 			GC.SuppressFinalize( this );
 		}
 
-		void Dispose( bool disposing ) => monitor.Apply( OnDispose );
+		void Dispose( bool disposing )
+		{
+			if ( monitor.Apply() )
+			{
+				OnDispose( disposing );
+			}
+		}
 
-		protected virtual void OnDispose() {}
+		protected virtual void OnDispose( bool disposing ) {}
 	}
 
 	public static class Assignments
@@ -63,10 +69,10 @@ namespace DragonSpark.Runtime
 		public T Finish { get; }
 	}
 
-	public struct PropertyAssignment<T1, T2> : IAssign<T1, T2> where T1 : class
+	public struct PropertyAssign<T1, T2> : IAssign<T1, T2> where T1 : class
 	{
 		readonly IAttachedProperty<T1, T2> property;
-		public PropertyAssignment( IAttachedProperty<T1, T2> property )
+		public PropertyAssign( IAttachedProperty<T1, T2> property )
 		{
 			this.property = property;
 		}
@@ -79,7 +85,7 @@ namespace DragonSpark.Runtime
 		void Assign( T1 first, T2 second );
 	}
 
-	struct DelegatedAssign<T1, T2> : IAssign<T1, T2>
+	/*struct DelegatedAssign<T1, T2> : IAssign<T1, T2>
 	{
 		readonly Action<T1, T2> assign;
 		public DelegatedAssign( Action<T1, T2> assign )
@@ -88,11 +94,11 @@ namespace DragonSpark.Runtime
 		}
 
 		public void Assign( T1 first, T2 second ) => assign( first, second );
-	}
+	}*/
 
 	struct EnabledStateAssign : IAssign<object, bool>
 	{
-		EnabledState value;
+		readonly EnabledState value;
 
 		public EnabledStateAssign( EnabledState value )
 		{
@@ -103,7 +109,7 @@ namespace DragonSpark.Runtime
 	}
 
 	// [Disposable]
-	public struct Assignment<T, T1, T2> : IDisposable where T : IAssign<T1, T2>
+	struct Assignment<T, T1, T2> : IDisposable where T : IAssign<T1, T2>
 	{
 		readonly T assign;
 		readonly Value<T1> first;
