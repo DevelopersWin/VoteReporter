@@ -76,7 +76,7 @@ namespace DragonSpark.Aspects
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer), AspectPriority = -1 )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
-	public class ThreadCacheAttribute : MethodInterceptionAspect
+	public class ThreadCacheAttribute : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		readonly AmbientStack<ThreadCache> current;
 		public ThreadCacheAttribute() : this( AmbientStack<ThreadCache>.Instance ) {}
@@ -85,19 +85,34 @@ namespace DragonSpark.Aspects
 		{
 			this.current = current;
 		}
-
+		
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var item = current.GetCurrentItem();
+			var item = GetValue( args );
 			if ( item != null )
 			{
-				var entry = new CacheEntry( args );
-				args.ReturnValue = item.Get( entry );
+				args.ReturnValue = item;
 			}
 			else
 			{
 				base.OnInvoke( args );
 			}
 		}
+
+		object GetValue( MethodInterceptionArgs args )
+		{
+			if ( current != args.Instance )
+			{
+				var item = current.GetCurrentItem();
+				var entry = new CacheEntry( args );
+				var result = item.Get( entry );
+				return result;
+			}
+			return null;
+		}
+
+		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new ThreadCacheAttribute( current );
+
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 	}
 }

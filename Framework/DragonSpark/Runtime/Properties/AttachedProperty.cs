@@ -1,4 +1,5 @@
-﻿using DragonSpark.Runtime.Stores;
+﻿using DragonSpark.Aspects;
+using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -175,6 +176,7 @@ namespace DragonSpark.Runtime.Properties
 
 		public override void Set( TInstance instance, TValue value ) => items.GetValue( instance, create ).Assign( value );
 
+		[ThreadCache]
 		public override TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
 
 		public override bool Clear( TInstance instance ) => items.Remove( instance );

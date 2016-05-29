@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
@@ -14,7 +15,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Aspects
 {
@@ -225,12 +225,15 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
 		public void OnExecute( MethodInterceptionArgs args )
 		{
-			var adapter = factory( args.Instance );
-			var state = WorkflowState.Property.Get( args.Instance );
-			var validation = new ValidationInvocation<AdapterInvocation>( state.Active, state.Valid, new AdapterInvocation( adapter ) );
-			var parameter = new RelayParameter( args, args.Arguments.Single() );
-			var invocation = new ParameterInvocation( state, validation, parameter );
-			invocation.Invoke( parameter.Parameter );
+			using ( new ThreadCacheContext() )
+			{
+				var adapter = factory( args.Instance );
+				var state = WorkflowState.Property.Get( args.Instance );
+				var validation = new ValidationInvocation<AdapterInvocation>( state.Active, state.Valid, new AdapterInvocation( adapter ) );
+				var parameter = new RelayParameter( args, args.Arguments.Single() );
+				var invocation = new ParameterInvocation( state, validation, parameter );
+				invocation.Invoke( parameter.Parameter );
+			}
 		}
 	}
 

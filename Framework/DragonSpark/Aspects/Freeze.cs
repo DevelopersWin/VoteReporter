@@ -37,7 +37,7 @@ namespace DragonSpark.Aspects
 		readonly int code;
 		readonly MethodInterceptionArgs factory;
 
-		public CacheEntry( MethodInterceptionArgs args ) : this( KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments.ToArray() ), args ) {}
+		public CacheEntry( MethodInterceptionArgs args ) : this( KeyFactory.Instance.CreateUsing( args.Arguments.ToArray() ), args ) {}
 
 		public CacheEntry( int code, MethodInterceptionArgs factory )
 		{
