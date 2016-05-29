@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework.Setup.Location;
 using Microsoft.Practices.ServiceLocation;
@@ -16,7 +15,7 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework
 {
-	public class AmbientAttribute : CustomizeAttribute
+	/*public class AmbientAttribute : CustomizeAttribute
 	{
 		public class Registration : IRegistration
 		{
@@ -29,13 +28,13 @@ namespace DragonSpark.Testing.Framework
 
 			public void Register( IServiceRegistry registry )
 			{
-				var instance = Ambient.GetCurrent( type );
+				var instance = AmbientStack.GetCurrent( type );
 				registry.Register( new InstanceRegistrationParameter( type, instance ) );
 			}
 		}
 
 		public override ICustomization GetCustomization( ParameterInfo parameter ) => new RegistrationCustomization( new Registration( parameter.ParameterType ) );
-	}
+	}*/
 
 	public class FactoryAttribute : CustomizeAttribute
 	{

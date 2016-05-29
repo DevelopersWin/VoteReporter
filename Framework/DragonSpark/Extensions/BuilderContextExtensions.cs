@@ -30,7 +30,7 @@ namespace DragonSpark.Extensions
 
 		/*public static T New<T>( this IBuilderContext @this, string name = null )
 		{
-			using ( new AmbientContextCommand<NamedTypeBuildKey>().ExecuteWith( NamedTypeBuildKey.Make<T>( name ) ) )
+			using ( new AmbientStackCommand<NamedTypeBuildKey>().ExecuteWith( NamedTypeBuildKey.Make<T>( name ) ) )
 			{
 				return @this.NewBuildUp<T>( name );
 			}

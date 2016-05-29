@@ -1,16 +1,13 @@
-using DragonSpark.Activation;
-using System.Collections.Generic;
-
 namespace DragonSpark.Runtime.Values
 {
-	public class ThreadAmbientContext : ThreadLocalAttachedProperty<object>
+	/*public class ThreadAmbientContext : ThreadLocalAttachedProperty<object>
 	{
 		static ThreadAmbientContext Property { get; } = new ThreadAmbientContext();
 
 		ThreadAmbientContext() : base( () => new object() ) { }
 
 		public static object GetCurrent() => Property.Get( Execution.Current );
-	}
+	}*/
 
 	/*public abstract class DecoratedAssociatedStore<T> : DecoratedStore<T>
 	{
@@ -34,11 +31,4 @@ namespace DragonSpark.Runtime.Values
 	{
 		protected ThreadStoreBase( object instance, Func<T> create = null ) : base( instance, () => new ThreadLocalStore<T>( create ) ) {}
 	}*/
-
-	public class ThreadLocalStackProperty<T> : ThreadLocalAttachedProperty<Stack<T>>
-	{
-		public ThreadLocalStackProperty() : base( () => new Stack<T>() ) {}
-
-		// 
-	}
 }

@@ -33,7 +33,7 @@ namespace DragonSpark.Runtime
 			Dispose( false );
 		}
 
-		void IDisposable.Dispose()
+		public void Dispose()
 		{
 			Dispose( true );
 			GC.SuppressFinalize( this );

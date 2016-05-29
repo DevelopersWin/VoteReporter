@@ -178,6 +178,7 @@
     <Compile Include="Activation\IoC\IsRegisteredSpecification.cs" />
     <Compile Include="Activation\IoC\LifetimeManagerFactory.cs" />
     <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
+    <Compile Include="Aspects\ThreadCachePoint.cs" />
     <Compile Include="Aspects\FormattedAttribute.cs" />
     <Compile Include="Aspects\Freeze.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />
@@ -228,7 +229,7 @@
     <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsInstanceOfSpecification.cs" />
     <Compile Include="Runtime\TaskFactory.cs" />
-    <Compile Include="Runtime\Values\AmbientContextCommand.cs" />
+    <Compile Include="Runtime\Values\AmbientStackCommand.cs" />
     <Compile Include="Runtime\Values\AttachedProperty.cs" />
     <Compile Include="Runtime\Values\CompositeWritableStore.cs" />
     <Compile Include="Runtime\Values\ConnectedStore.cs" />

@@ -8,6 +8,8 @@ namespace DragonSpark.TypeSystem
 {
 	public static class Default<T>
 	{
+		public static Action<T> Empty => t => { };
+
 		public static Func<T, T> Self => t => t;
 
 		public static Func<T, object> Boxed => t => t;

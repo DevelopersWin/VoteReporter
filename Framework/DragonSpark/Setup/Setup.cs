@@ -337,7 +337,7 @@ namespace DragonSpark.Setup
 
 	public class ApplyTaskMonitorCommand : FixedCommand
 	{
-		public ApplyTaskMonitorCommand() : base( new AmbientContextCommand<ITaskMonitor>(), new TaskMonitor() ) {}
+		public ApplyTaskMonitorCommand() : base( new AmbientStackCommand<ITaskMonitor>(), new TaskMonitor() ) {}
 	}
 
 	public class ApplySetup : ApplyExportedCommandsCommand<ISetup> {}

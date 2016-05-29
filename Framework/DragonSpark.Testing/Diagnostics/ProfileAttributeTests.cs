@@ -69,7 +69,7 @@ namespace DragonSpark.Testing.Diagnostics
 		[Fact]
 		public void Eventing()
 		{
-			Assert.Null( Ambient.GetCurrent<EmitProfileEvent>() );
+			Assert.Null( AmbientStack.GetCurrentItem<EmitProfileEvent>() );
 
 			var history = new LoggerHistorySink();
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ) )
@@ -82,7 +82,7 @@ namespace DragonSpark.Testing.Diagnostics
 				var sut = new EventingTester();
 				var item = sut.First();
 				Assert.NotNull( item );
-				Assert.Null( Ambient.GetCurrent<EmitProfileEvent>() );
+				Assert.Null( AmbientStack.GetCurrentItem<EmitProfileEvent>() );
 
 				var messages = LogEventMessageFactory.Instance.Create( history.Events );
 				Assert.Equal( 4, messages.Length );
@@ -91,7 +91,7 @@ namespace DragonSpark.Testing.Diagnostics
 				Assert.Contains( "Inside First", events.First() );
 				Assert.Contains( "Inside Second", events.Last() );
 			}
-			Assert.Null( Ambient.GetCurrent<EmitProfileEvent>() );
+			Assert.Null( AmbientStack.GetCurrentItem<EmitProfileEvent>() );
 		}
 
 		class EventingTester
@@ -101,7 +101,7 @@ namespace DragonSpark.Testing.Diagnostics
 			{
 				Profile.Event( "Inside First" );
 				Second();
-				return Ambient.GetCurrent<EmitProfileEvent>();
+				return AmbientStack.GetCurrentItem<EmitProfileEvent>();
 			}
 
 			static void Second() => Profile.Event( "Inside Second" );

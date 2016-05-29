@@ -1,5 +1,4 @@
-﻿using DragonSpark.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -15,8 +14,7 @@ namespace DragonSpark.Runtime.Values
 			new Assignment<PropertyAssign<T1, T2>, T1, T2>( new PropertyAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
 	}
 
-	public interface IAttachedProperty<TValue> : IAttachedProperty<object, TValue>
-	{}
+	public interface IAttachedProperty<TValue> : IAttachedProperty<object, TValue> {}
 
 	public interface IAttachedProperty<in TInstance, TValue> where TInstance : class
 	{
@@ -54,55 +52,60 @@ namespace DragonSpark.Runtime.Values
 	{
 		public ThreadLocalAttachedProperty() : this( () => default(T) ) {}
 		public ThreadLocalAttachedProperty( Func<T> create ) : base( create ) {}
+
+		protected ThreadLocalAttachedProperty( IAttachedPropertyStore<object, T> store ) : base( store ) {}
+
+		// protected ThreadLocalAttachedProperty( Func<object, IWritableStore<T>> store ) : base( store ) {}
 	}
 
 	public class ThreadLocalAttachedProperty<TInstance, TResult> : AttachedProperty<TInstance, TResult> where TInstance : class
 	{
-		public ThreadLocalAttachedProperty( Func<TResult> create ) : this( new Context( create ) ) {}
-		ThreadLocalAttachedProperty( Context context ) : base( new Func<TInstance, IWritableStore<TResult>>( context.Get ) ) {}
+		public ThreadLocalAttachedProperty( Func<TResult> create ) : this( new Store( create ) ) {}
 
-		protected override bool Remove( TInstance instance, IWritableStore<TResult> store )
+		protected ThreadLocalAttachedProperty( IAttachedPropertyStore<TInstance, TResult> store ) : base( store ) {}
+
+		/*protected override bool Remove( TInstance instance, IWritableStore<TResult> store )
 		{
 			var local = store as ThreadLocalStore<TResult>;
 			return ( local == null || local.IsDisposed ) && base.Remove( instance, store );
-		}
+		}*/
 
-		struct Context
+		class Store : AttachedPropertyStoreBase<TInstance, TResult>
 		{
 			readonly Func<TResult> create;
 
-			public Context( Func<TResult> create )
+			public Store( Func<TResult> create )
 			{
 				this.create = create;
 			}
 
-			public IWritableStore<TResult> Get( TInstance item ) => new ThreadLocalStore<TResult>( create );
+			public override IWritableStore<TResult> Create( TInstance instance ) => new ThreadLocalStore<TResult>( create );
 		}
 	}
 
-	public abstract class AttachedSetProperty<T> : AttachedSetProperty<object, T>, IAttachedProperty<ISet<T>>
+	public class AttachedSetProperty<T> : AttachedSetProperty<object, T>, IAttachedProperty<ISet<T>>
 	{
-		protected AttachedSetProperty() {}
-		protected AttachedSetProperty( Func<object, ISet<T>> create ) : base( create ) {}
+		public AttachedSetProperty() {}
+		public AttachedSetProperty( Func<object, ISet<T>> create ) : base( create ) {}
 	}
 
-	public abstract class AttachedSetProperty<TInstance, TItem> : AttachedProperty<TInstance, ISet<TItem>> where TInstance : class
+	public class AttachedSetProperty<TInstance, TItem> : AttachedProperty<TInstance, ISet<TItem>> where TInstance : class
 	{
-		protected AttachedSetProperty() : base( key => new HashSet<TItem>() ) {}
-		protected AttachedSetProperty( Func<TInstance, ISet<TItem>> create ) : base( create ) {}
+		public AttachedSetProperty() : base( key => new HashSet<TItem>() ) {}
+		public AttachedSetProperty( Func<TInstance, ISet<TItem>> create ) : base( create ) {}
 	}
 
-	public class AttachedCollection : AttachedCollectionProperty<object>
+	public class AttachedCollectionProperty : AttachedCollectionProperty<object>
 	{
-		public new static AttachedCollection Property { get; } = new AttachedCollection();
+		public new static AttachedCollectionProperty Default { get; } = new AttachedCollectionProperty();
 
-		public AttachedCollection() {}
-		public AttachedCollection( Func<object, ICollection<object>> create ) : base( create ) {}
+		public AttachedCollectionProperty() {}
+		public AttachedCollectionProperty( Func<object, ICollection<object>> create ) : base( create ) {}
 	}
 
 	public class AttachedCollectionProperty<TItem> : AttachedCollectionProperty<object, TItem>, IAttachedProperty<ICollection<TItem>>
 	{
-		public new static AttachedCollection Property { get; } = new AttachedCollection();
+		public new static AttachedCollectionProperty Default { get; } = new AttachedCollectionProperty();
 
 		public AttachedCollectionProperty() {}
 		public AttachedCollectionProperty( Func<object, ICollection<TItem>> create ) : base( create ) {}
@@ -110,7 +113,7 @@ namespace DragonSpark.Runtime.Values
 	
 	public class AttachedCollectionProperty<TInstance, TItem> : AttachedProperty<TInstance, ICollection<TItem>> where TInstance : class
 	{
-		public static AttachedCollection Property { get; } = new AttachedCollection();
+		public static AttachedCollectionProperty Default { get; } = new AttachedCollectionProperty();
 
 		public AttachedCollectionProperty() : base( key => new System.Collections.ObjectModel.Collection<TItem>() ) {}
 		public AttachedCollectionProperty( Func<TInstance, ICollection<TItem>> create ) : base( create ) {}
@@ -156,7 +159,7 @@ namespace DragonSpark.Runtime.Values
 
 		public AttachedProperty( Func<TInstance, IWritableStore<TValue>> store ) : this( new AttachedPropertyStore<TInstance, TValue>( store ) ) {}
 
-		public AttachedProperty( AttachedPropertyStore<TInstance, TValue> store ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( store.Create ) ) {}
+		public AttachedProperty( IAttachedPropertyStore<TInstance, TValue> store ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( store.Create ) ) {}
 
 		AttachedProperty( ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create )
 		{
@@ -171,23 +174,13 @@ namespace DragonSpark.Runtime.Values
 
 		public override void Set( TInstance instance, TValue value ) => items.GetValue( instance, create ).Assign( value );
 
-		public override TValue Get( TInstance instance )
-		{
-			var writableStore = items.GetValue( instance, create );
-			var value = writableStore.Value;
-			return value;
-		}
+		public override TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
 
-		public override bool Clear( TInstance instance )
-		{
-			var item = Dispose( instance );
-			var result = item != null && Remove( instance, item );
-			return result;
-		}
+		public override bool Clear( TInstance instance ) => items.Remove( instance );
 
-		protected virtual bool Remove( TInstance instance, IWritableStore<TValue> store ) => items.Remove( instance );
+		//protected virtual bool Remove( TInstance instance, IWritableStore<TValue> store ) => ;
 
-		protected virtual IWritableStore<TValue> Dispose( TInstance instance )
+		/*protected virtual IWritableStore<TValue> Dispose( TInstance instance )
 		{
 			IWritableStore<TValue> item;
 			if ( items.TryGetValue( instance, out item ) )
@@ -195,7 +188,7 @@ namespace DragonSpark.Runtime.Values
 				item.TryDispose();
 			}
 			return item;
-		}
+		}*/
 	}
 
 	public class ActivatedAttachedProperty<TResult> : ActivatedAttachedProperty<object, TResult>, IAttachedProperty<TResult> where TResult : new() {}
@@ -213,7 +206,7 @@ namespace DragonSpark.Runtime.Values
 
 	public class ActivatedAttachedPropertyStore<TInstance, TValue> : AssignedAttachedPropertyStore<TInstance, TValue> where TValue : new() where TInstance : class
 	{
-		public new static ActivatedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new ActivatedAttachedPropertyStore<TInstance, TValue>();
+		public static ActivatedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new ActivatedAttachedPropertyStore<TInstance, TValue>();
 
 		public ActivatedAttachedPropertyStore() : base( instance => new TValue() ) {}
 	}
@@ -229,7 +222,7 @@ namespace DragonSpark.Runtime.Values
 
 	public class AssignedAttachedPropertyStore<TInstance, TValue> : AttachedPropertyStore<TInstance, TValue> where TInstance : class
 	{
-		public new static AssignedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new AssignedAttachedPropertyStore<TInstance, TValue>();
+		//public new static AssignedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new AssignedAttachedPropertyStore<TInstance, TValue>();
 
 		readonly Func<TInstance, TValue> create;
 
@@ -247,19 +240,25 @@ namespace DragonSpark.Runtime.Values
 		public override IWritableStore<TValue> Create( TInstance instance ) => base.Create( instance ).Assigned( CreateValue( instance ) );
 	}
 
-	public class AttachedPropertyStore<TInstance, TValue> where TInstance : class
+	public interface IAttachedPropertyStore<in TInstance, TValue> where TInstance : class
 	{
-		public static AttachedPropertyStore<TInstance, TValue> Instance { get; } = new AttachedPropertyStore<TInstance, TValue>();
+		IWritableStore<TValue> Create( TInstance instance );
+	}
 
+	public abstract class AttachedPropertyStoreBase<TInstance, TValue> : IAttachedPropertyStore<TInstance, TValue> where TInstance : class
+	{
+		public abstract IWritableStore<TValue> Create( TInstance instance );
+	}
+
+	public class AttachedPropertyStore<TInstance, TValue> : AttachedPropertyStoreBase<TInstance, TValue> where TInstance : class
+	{
 		readonly Func<TInstance, IWritableStore<TValue>> store;
-
-		protected AttachedPropertyStore() : this( instance => new FixedStore<TValue>() ) {}
 
 		public AttachedPropertyStore( Func<TInstance, IWritableStore<TValue>> store )
 		{
 			this.store = store;
 		}
 
-		public virtual IWritableStore<TValue> Create( TInstance instance ) => store( instance );
+		public override IWritableStore<TValue> Create( TInstance instance ) => store( instance );
 	}
 }

@@ -32,7 +32,7 @@ namespace DragonSpark.Diagnostics
 
 	public static class Profile
 	{
-		public static void Event( string name ) => Ambient.GetCurrent<EmitProfileEvent>()( name );
+		public static void Event( string name ) => AmbientStack.GetCurrentItem<EmitProfileEvent>()( name );
 
 		public static T Emit<T>( this T @this, string name )
 		{

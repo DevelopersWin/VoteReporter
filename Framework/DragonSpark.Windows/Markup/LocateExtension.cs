@@ -16,7 +16,7 @@ using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
 {
-	[ContentProperty( nameof( Properties ) )]
+	/*[ContentProperty( nameof( Properties ) )]
 	public class AmbientExtension : MarkupExtensionBase
 	{
 		readonly Type type;
@@ -26,8 +26,8 @@ namespace DragonSpark.Windows.Markup
 			this.type = type;
 		}
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Ambient.GetCurrent( type );
-	}
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => AmbientStack.GetCurrent( type );
+	}*/
 
 	public class RootExtension : MarkupExtensionBase
 	{

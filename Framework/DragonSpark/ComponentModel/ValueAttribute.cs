@@ -7,7 +7,7 @@ namespace DragonSpark.ComponentModel
 {
 	public class AmbientValueAttribute : ServicesValueBase
 	{
-		public AmbientValueAttribute( Type valueType = null ) : base( new ServicesValueProvider.Converter( valueType ), Ambient.GetCurrent ) {}
+		public AmbientValueAttribute( Type valueType = null ) : base( new ServicesValueProvider.Converter( valueType ), AmbientStack.GetCurrentItem ) {}
 	}
 
 	public class ValueAttribute : ServicesValueBase

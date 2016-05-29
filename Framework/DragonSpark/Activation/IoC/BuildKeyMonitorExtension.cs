@@ -1,14 +1,11 @@
 using DragonSpark.Runtime.Values;
 using Microsoft.Practices.ObjectBuilder2;
-using System.Collections.Generic;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class BuildKeyMonitorExtension : BuilderStrategy, IRequiresRecovery
 	{
-		readonly static ThreadLocalStackProperty<NamedTypeBuildKey> Property = new ThreadLocalStackProperty<NamedTypeBuildKey>();
-
-		static Stack<NamedTypeBuildKey> Stack => Execution.Current.Get( Property );
+		static IStack<NamedTypeBuildKey> Stack => AmbientStack.GetCurrent<NamedTypeBuildKey>();
 
 		public override void PreBuildUp( IBuilderContext context )
 		{

@@ -73,7 +73,7 @@ namespace DragonSpark.Diagnostics
 		public override IProfiler Create( MethodBase parameter )
 		{
 			EmitProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Execute;
-			var command = new AmbientContextCommand<EmitProfileEvent>().AsExecuted( new EmitProfileEvent( name =>
+			var command = new AmbientStackCommand<EmitProfileEvent>().AsExecuted( new EmitProfileEvent( name =>
 																										   {
 																											   timer.Update();
 																											   action( name );

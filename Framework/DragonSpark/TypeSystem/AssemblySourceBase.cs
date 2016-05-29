@@ -60,7 +60,7 @@ namespace DragonSpark.TypeSystem
 		public void Load( Assembly reference, string search )
 		{
 			var hint = hintSource( reference );
-			var stack = new Stack<string>( hint.Split( '.' ) );
+			var stack = new System.Collections.Generic.Stack<string>( hint.Split( '.' ) );
 			while ( stack.Any() )
 			{
 				var name = string.Join( ".", stack.Reverse() );

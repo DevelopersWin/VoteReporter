@@ -75,6 +75,6 @@ namespace DragonSpark.Extensions
 
 		public static T FirstOrDefaultOfType<T>(this IEnumerable enumerable) => enumerable.OfType<T>().FirstOrDefault();
 
-		public static T PeekOrDefault<T>( this Stack<T> @this ) => @this.Any() ? @this.Peek() : default(T);
+		public static T PeekOrDefault<T>( this System.Collections.Generic.Stack<T> @this ) => @this.Any() ? @this.Peek() : default(T);
 	}
 }

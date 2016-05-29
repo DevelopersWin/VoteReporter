@@ -68,6 +68,8 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}
 
+		public object Invoke( string methodName, Type[] types ) => Invoke( methodName, types, Default<object>.Items );
+
 		public object Invoke( string methodName, Type[] types, params object[] parameters ) => Invoke( null, methodName, types, parameters );
 
 		public object Invoke( object instance, string methodName, Type[] types, params object[] parameters ) => Invoke<object>( instance, methodName, types, parameters );

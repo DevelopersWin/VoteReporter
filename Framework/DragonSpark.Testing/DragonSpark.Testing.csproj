@@ -296,7 +296,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Runtime\Values\AmbientContextCommandTests.cs" />
+    <Compile Include="Runtime\Values\AmbientStackPropertyTests.cs" />
     <Compile Include="Setup\ApplyMigrationCommandTests.cs" />
     <Compile Include="TypeSystem\ApplicationAssemblyFilterTests.cs" />
     <Compile Include="TypeSystem\DefaultValueFactoryTests.cs" />
