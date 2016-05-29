@@ -1,6 +1,6 @@
 using DragonSpark.Extensions;
 
-namespace DragonSpark.Runtime.Values
+namespace DragonSpark.Runtime.Stores
 {
 	public class CompositeWritableStore<T> : FixedStore<T>
 	{

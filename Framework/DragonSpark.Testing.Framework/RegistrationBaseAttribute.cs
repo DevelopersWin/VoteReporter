@@ -1,13 +1,13 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework.Setup.Location;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Patterns.Contracts;
 using System;
+using DragonSpark.Runtime.Properties;
 using Type = System.Type;
 
 namespace DragonSpark.Testing.Framework

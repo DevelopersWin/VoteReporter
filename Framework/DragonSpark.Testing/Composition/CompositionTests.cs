@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Diagnostics;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -10,6 +9,7 @@ using System;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Properties;
 using Xunit;
 using Xunit.Abstractions;
 

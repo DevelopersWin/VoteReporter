@@ -1,13 +1,14 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Values;
 using Serilog;
 using Serilog.Events;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Diagnostics
 {

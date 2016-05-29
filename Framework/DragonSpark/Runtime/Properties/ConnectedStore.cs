@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -9,8 +10,42 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace DragonSpark.Runtime.Values
+namespace DragonSpark.Runtime.Properties
 {
+	public abstract class ExecutionAttachedPropertyStoreBase<T> : DeferredAttachedPropertyStore<object, T>
+	{
+		/*readonly IAttachedProperty<T> property;
+
+		public ExecutionContextStore() : this( () => default(T) ) {}
+
+		public ExecutionContextStore( Func<T> create ) : this( new AttachedProperty<T>( o => create() ) ) {}
+
+		public ExecutionContextStore( IAttachedProperty<T> property )
+		{
+			this.property = property;
+		}
+
+		protected override T Get() => property.Get( Execution.GetCurrent() );
+
+		public override void Assign( T item ) => property.Set( Execution.GetCurrent(), item );*/
+		protected ExecutionAttachedPropertyStoreBase() : this( () => default(T) ) {}
+		protected ExecutionAttachedPropertyStoreBase( Func<T> create ) : this( new AttachedProperty<T>( new Func<object, T>( new Context( create ).Create ) ) ) {}
+		protected ExecutionAttachedPropertyStoreBase( IAttachedProperty<object, T> property ) : this( Execution.GetCurrent, property ) {}
+		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property ) : this( instance, property, Coercer<T>.Instance ) {}
+		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property, ICoercer<T> coercer ) : base( instance, property, coercer ) {}
+
+		struct Context
+		{
+			readonly Func<T> create;
+			public Context( Func<T> create )
+			{
+				this.create = create;
+			}
+
+			public T Create( object instance ) => create();
+		}
+	}
+
 	public class Stack<T> : IStack<T>
 	{
 		readonly System.Collections.Generic.Stack<T> store;
@@ -74,13 +109,24 @@ namespace DragonSpark.Runtime.Values
 	{
 		public static object GetCurrentItem( [Required]Type type ) => typeof(AmbientStack).Adapt().Invoke( nameof(GetCurrentItem), type.ToItem() );
 
-		public static T GetCurrentItem<T>() => GetCurrent<T>().Peek();
+		public static T GetCurrentItem<T>() => AmbientStack<T>.Instance.GetCurrentItem();
 
 		// public static object GetCurrent( [Required]Type type ) => typeof(AmbientStack).Adapt().Invoke( nameof(GetCurrent), type.ToItem() );
 
 		// static ImmutableArray<T> List<T>() => GetCurrent<T>().All();
 
-		public static IStack<T> GetCurrent<T>() => AmbientStackProperty<T>.Default.Get( Execution.Current );
+		/*public static IStack<T> GetCurrent<T>() => AmbientStackProperty<T>.Default.Get( Execution.Current );*/
+	}
+
+	public class AmbientStack<T> : ExecutionAttachedPropertyStoreBase<IStack<T>>
+	{
+		public static AmbientStack<T> Instance { get; } = new AmbientStack<T>();
+
+		public AmbientStack() : this( Execution.GetCurrent ) {}
+		public AmbientStack( Func<object> host ) : this( host, AmbientStackProperty<T>.Default ) {}
+		public AmbientStack( Func<object> host, IAttachedProperty<object, IStack<T>> property ) : base( host, property ) {}
+
+		public T GetCurrentItem() => Value.Peek();
 	}
 
 	public class AmbientStackProperty<T> : ThreadLocalAttachedProperty<IStack<T>>
@@ -154,7 +200,7 @@ namespace DragonSpark.Runtime.Values
 
 	public class ThreadLocalStore<T> : WritableStore<T>
 	{
-		readonly ConditionMonitor monitor = new ConditionMonitor();
+		// readonly ConditionMonitor monitor = new ConditionMonitor();
 
 		readonly ThreadLocal<T> local;
 
@@ -198,21 +244,37 @@ namespace DragonSpark.Runtime.Values
 		}
 	}
 
-	public class EqualityReference<T> : AttachedPropertyBase<object, T>
+	public class EqualityReference<T> : DeferredAttachedPropertyStore<object, ConcurrentDictionary<int, T>>
 	{
-		readonly AttachedProperty<object, ConcurrentDictionary<int, T>> property = new AttachedProperty<ConcurrentDictionary<int, T>>( ActivatedAttachedPropertyStore<ConcurrentDictionary<int, T>>.Instance );
+		// public override bool IsAttached( object instance ) => property.Get( Execution.GetCurrent() ).ContainsKey( instance.GetHashCode() );
 
-		public override bool IsAttached( object instance ) => property.Get( Execution.Current ).ContainsKey( instance.GetHashCode() );
+		// public void Set( T instance, T value ) => new Context( Value, instance ).Set();
 
-		public override void Set( object instance, T value ) => property.Get( Execution.Current )[instance.GetHashCode()] = value;
+		public T From( T instance ) => new Context( Value, instance ).Get();
 
-		public override T Get( object instance ) => property.Get( Execution.Current ).GetOrAdd( instance.GetHashCode(), i => (T)instance );
-
-		public override bool Clear( object instance )
+		struct Context
 		{
-			property.Get( Execution.Current ).Clear();
-			return true;
+			readonly ConcurrentDictionary<int, T> store;
+			readonly T item;
+
+			public Context( ConcurrentDictionary<int, T> store, T item )
+			{
+				this.store = store;
+				this.item = item;
+			}
+
+			T Add( int code ) => item;
+
+			T Update( int code, T current ) => item;
+
+			public T Get() => store.GetOrAdd( item.GetHashCode(), Add );
+
+			public void Set() => store.AddOrUpdate( item.GetHashCode(), Add, Update );
 		}
+
+		public EqualityReference() : this( Execution.GetCurrent, new AttachedProperty<ConcurrentDictionary<int, T>>( ActivatedAttachedPropertyStore<ConcurrentDictionary<int, T>>.Instance ), Coercer<ConcurrentDictionary<int, T>>.Instance ) {}
+
+		public EqualityReference( Func<object> instance, IAttachedProperty<object, ConcurrentDictionary<int, T>> property, ICoercer<ConcurrentDictionary<int, T>> coercer ) : base( instance, property, coercer ) {}
 	}
 	
 	public class Condition : AttachedProperty<ConditionMonitor>

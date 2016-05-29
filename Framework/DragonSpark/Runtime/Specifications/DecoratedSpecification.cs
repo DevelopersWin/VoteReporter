@@ -1,8 +1,8 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using System;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Runtime.Specifications
 {

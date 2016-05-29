@@ -1,11 +1,11 @@
 ﻿using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Commands;
 using PostSharp.Extensibility;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Markup;
+using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Configuration
 {

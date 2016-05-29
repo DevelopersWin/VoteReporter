@@ -3,11 +3,11 @@ using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Values;
 using Serilog;
 using Serilog.Events;
 using System;
 using System.Reflection;
+using DragonSpark.Runtime.Stores;
 using Configure = DragonSpark.Configuration.Configure;
 
 namespace DragonSpark.Diagnostics

@@ -1,7 +1,6 @@
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
@@ -9,6 +8,7 @@ using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Activation.IoC
 {

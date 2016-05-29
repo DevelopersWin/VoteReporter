@@ -1,5 +1,5 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -68,6 +68,8 @@ namespace DragonSpark.Activation
 
 		public static Delegate Convert( [Required]this Func<object, object> @this, [Required]Type parameterType, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().Invoke<Delegate>( nameof(Convert), parameterType.Append( resultType ).ToArray(), @this );
 
+		public static Action<T> Convert<T>( this Action<object> @this ) => t => @this( t );
+
 		public static Func<T> Convert<T>( this Func<object> @this ) => () => (T)@this();
 
 		public static Func<T, U> Convert<T, U>( this Func<object, object> @this ) => arg => (U)@this( arg );
@@ -76,13 +78,13 @@ namespace DragonSpark.Activation
 
 		public static Func<T, U> ToDelegate<T, U>( this IFactory<T, U> @this ) => Delegate<T,U>.Instance.Get( @this );
 
-		public static Func<T, T> ToFactory<T>( this Action<T> action ) => action.ToFactory<T, T>();
+		/*public static Func<T, T> ToFactory<T>( this Action<T> action ) => action.ToFactory<T, T>();
 
 		public static Func<T,U> ToFactory<T,U>( this Action<T> action ) => parameter =>
 																   {
 																	   action( parameter );
 																	   return Default<U>.Item;
-																   };
+																   };*/
 
 		// public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters ) => CreateMany( @this, parameters, Where<TResult>.NotNull );
 

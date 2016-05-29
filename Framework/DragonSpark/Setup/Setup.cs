@@ -6,8 +6,9 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using Serilog;
@@ -99,7 +100,7 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class DefaultServiceProvider : ExecutionContextStore<IServiceProvider>
+	public class DefaultServiceProvider : ExecutionAttachedPropertyStoreBase<IServiceProvider>
 	{
 		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider( () => new ServiceProvider() );
 

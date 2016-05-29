@@ -2,8 +2,8 @@ using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using Serilog;
 using Serilog.Events;
 using System;
@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace DragonSpark.Setup
 {
-	public class CurrentServiceProvider : ExecutionContextStore<IServiceProvider>
+	public class CurrentServiceProvider : ExecutionAttachedPropertyStoreBase<IServiceProvider>
 	{
 		public static CurrentServiceProvider Instance { get; } = new CurrentServiceProvider();
 

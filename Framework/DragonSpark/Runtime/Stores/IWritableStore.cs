@@ -1,4 +1,4 @@
-namespace DragonSpark.Runtime.Values
+namespace DragonSpark.Runtime.Stores
 {
 	public interface IWritableStore<T> : IStore<T>, IWritableStore
 	{

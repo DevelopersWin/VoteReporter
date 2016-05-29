@@ -1,4 +1,4 @@
-using DragonSpark.Runtime.Values;
+using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Activation
 {
@@ -19,14 +19,14 @@ namespace DragonSpark.Activation
 
 		public static void Assign( object current ) => Context.Assign( current );
 
-		public static object Current => Context.Value;
+		public static object GetCurrent() => Context.Value;
 	}
 
 	public class ExecutionContext : FixedStore<object>, IExecutionContext
 	{
-		public static ExecutionContext Instance { get; } = new ExecutionContext();
-
 		const string Default = "DefaultExecutionContext";
+
+		public static ExecutionContext Instance { get; } = new ExecutionContext();
 
 		protected override object Get() => base.Get() ?? Default;
 	}

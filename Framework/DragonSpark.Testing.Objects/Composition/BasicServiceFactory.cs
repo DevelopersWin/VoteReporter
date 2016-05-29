@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using System.Composition;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Testing.Objects.Composition
 {

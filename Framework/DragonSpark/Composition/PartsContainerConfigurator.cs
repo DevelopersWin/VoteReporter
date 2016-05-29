@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -12,6 +11,7 @@ using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Composition
 {

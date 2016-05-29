@@ -1,8 +1,8 @@
 using DragonSpark.ComponentModel;
-using DragonSpark.Runtime.Values;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Testing.Objects
 {

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DragonSpark.Runtime.Stores;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace DragonSpark.Runtime.Values
+namespace DragonSpark.Runtime.Properties
 {
 	public static class AttachedPropertyExtensions
 	{

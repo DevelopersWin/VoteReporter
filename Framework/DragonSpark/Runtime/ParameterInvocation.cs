@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using System;
 using System.Windows.Input;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Runtime
 {

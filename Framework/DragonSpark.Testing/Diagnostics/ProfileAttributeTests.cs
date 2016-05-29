@@ -2,13 +2,13 @@
 using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework;
 using Serilog.Core;
 using Serilog.Events;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using DragonSpark.Runtime.Properties;
 using Xunit;
 using Profile = DragonSpark.Diagnostics.Profile;
 

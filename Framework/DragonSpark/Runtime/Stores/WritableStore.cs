@@ -1,11 +1,12 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
 
-namespace DragonSpark.Runtime.Values
+namespace DragonSpark.Runtime.Stores
 {
-	public static class ValueExtensions
+	public static class StoreExtensions
 	{
 		public static T Assigned<T, U>( this T @this, U value ) where T : IWritableStore<U>
 		{
@@ -25,10 +26,25 @@ namespace DragonSpark.Runtime.Values
 		public override bool IsSatisfiedBy( TInstance parameter ) => property.IsAttached( parameter );
 	}
 
+	public class DelegatedWritableStore<T> : WritableStore<T>
+	{
+		readonly Func<T> get;
+		readonly Action<T> set;
+		public DelegatedWritableStore( Func<T> get, Action<T> set ) : this( get, set, Coercer<T>.Instance ) {}
+		public DelegatedWritableStore( Func<T> get, Action<T> set, ICoercer<T> coercer ) : base( coercer )
+		{
+			this.get = get;
+			this.set = set;
+		}
+
+		protected override T Get() => get();
+
+		public override void Assign( T item ) => set( item );
+	}
+
 	public abstract class WritableStore<T> : StoreBase<T>, IWritableStore<T>, IDisposable
 	{
 		readonly ICoercer<T> coercer;
-		// readonly Func<object, T> projection;
 
 		protected WritableStore() : this( Coercer<T>.Instance ) {}
 
@@ -36,11 +52,6 @@ namespace DragonSpark.Runtime.Values
 		{
 			this.coercer = coercer;
 		}
-
-		/*protected WritableStore( Func<object, T> projection )
-		{
-			this.projection = projection;
-		}*/
 
 		public abstract void Assign( T item );
 
@@ -76,22 +87,39 @@ namespace DragonSpark.Runtime.Values
 		protected override T Get() => lazy.Value;
 	}
 
-	/*public class AttachedPropertyStore<T> : WritableStore<T>
+	public class DeferredAttachedPropertyStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{
-		readonly object instance;
-		readonly IAttachedProperty<T> property;
+		readonly Func<TInstance> instance;
+		readonly IAttachedProperty<TInstance, TResult> property;
 
-		public AttachedPropertyStore( object instance, IAttachedProperty<T> property ) : this( instance, property, Coercer<T>.Instance ) {}
-		public AttachedPropertyStore( object instance, IAttachedProperty<T> property, ICoercer<T> coercer ) : base( coercer )
+		public DeferredAttachedPropertyStore( Func<TInstance> instance, IAttachedProperty<TInstance, TResult> property ) : this( instance, property, Coercer<TResult>.Instance ) {}
+		public DeferredAttachedPropertyStore( Func<TInstance> instance, IAttachedProperty<TInstance, TResult> property, ICoercer<TResult> coercer ) : base( coercer )
 		{
 			this.instance = instance;
 			this.property = property;
 		}
 
-		protected override T Get() => property.Get( instance );
+		protected override TResult Get() => property.Get( instance() );
 
-		public override void Assign( T item ) => property.Set( instance, item );
-	}*/
+		public override void Assign( TResult item ) => property.Set( instance(), item );
+	}
+
+	public class AttachedPropertyStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
+	{
+		readonly TInstance instance;
+		readonly IAttachedProperty<TInstance, TResult> property;
+
+		public AttachedPropertyStore( TInstance instance, IAttachedProperty<TInstance, TResult> property ) : this( instance, property, Coercer<TResult>.Instance ) {}
+		public AttachedPropertyStore( TInstance instance, IAttachedProperty<TInstance, TResult> property, ICoercer<TResult> coercer ) : base( coercer )
+		{
+			this.instance = instance;
+			this.property = property;
+		}
+
+		protected override TResult Get() => property.Get( instance );
+
+		public override void Assign( TResult item ) => property.Set( instance, item );
+	}
 
 	/*public class DeferredStore<T> : WritableStore<T>
 	{

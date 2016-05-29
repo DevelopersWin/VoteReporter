@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
@@ -13,6 +12,7 @@ using System;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Properties;
 using Xunit;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 

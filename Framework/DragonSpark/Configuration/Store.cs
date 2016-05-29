@@ -1,8 +1,9 @@
-﻿using DragonSpark.Runtime.Values;
+﻿using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Configuration
 {
-	class ConfigurationStore<T> : ExecutionContextStore<T> where T : class, new()
+	class ConfigurationStore<T> : ExecutionAttachedPropertyStoreBase<T> where T : class, new()
 	{
 		public ConfigurationStore() : this( PrototypeStore<T>.Instance ) {}
 

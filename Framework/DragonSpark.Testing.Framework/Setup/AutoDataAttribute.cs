@@ -5,7 +5,6 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
@@ -18,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Properties;
 using Xunit.Sdk;
 using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 

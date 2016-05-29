@@ -1,10 +1,10 @@
-using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Extensions
 {

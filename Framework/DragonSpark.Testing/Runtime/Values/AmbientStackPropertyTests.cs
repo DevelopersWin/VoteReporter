@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Testing.Objects;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -13,74 +13,74 @@ namespace DragonSpark.Testing.Runtime.Values
 	{
 		readonly AmbientStackProperty<Class> property = new AmbientStackProperty<Class>();
 
-		IStack<Class> GetStack() => property.Get( Execution.Current );
+		/*IStack<Class> GetStack() => property.Get( Execution.Current );
 
 		IEnumerable<Class> Items() => GetStack().All().ToArray();
 
-		Class GetItem() => GetStack().Peek();
+		Class GetItem() => GetStack().Peek();*/
 
 		[Fact]
 		public void ContextAsExpected()
 		{
-			var stack = GetStack();
-			Assert.Same( stack, GetStack() );
+			var stack = new AmbientStack<Class>( this.Self, property );
 
-			Assert.Null( GetItem() );
+			var expected = stack.Value;
+			Assert.Same( expected, stack.Value );
+
+			Assert.Null( stack.GetCurrentItem() );
 
 			var first = new Class();
-			using ( new AmbientStackCommand<Class>( property ).AsExecuted( first ) )
+			using ( new AmbientStackCommand<Class>( stack ).AsExecuted( first ) )
 			{
-				Assert.Same( first, GetItem() );
+				Assert.Same( first, stack.GetCurrentItem() );
 
 				var second = new Class();
-				using ( new AmbientStackCommand<Class>( property ).AsExecuted( second ) )
+				using ( new AmbientStackCommand<Class>( stack ).AsExecuted( second ) )
 				{
-					Assert.Same( second, GetItem() );
+					Assert.Same( second, stack.GetCurrentItem() );
 
 					var third = new Class();
-					using ( new AmbientStackCommand<Class>( property ).AsExecuted( third ) )
+					using ( new AmbientStackCommand<Class>( stack ).AsExecuted( third ) )
 					{
-						Assert.Same( third, GetItem() );
+						Assert.Same( third, stack.GetCurrentItem() );
 
-						var chain = GetStack().All();
+						var chain = stack.Value.All();
 						Assert.Equal( 3, chain.Length );
 						Assert.Same( chain.First(), third );
 						Assert.Same( chain.Last(), first );
 
 						var inside = new Class();
-						var appended = inside.Append( Items() ).ToArray();
+						var appended = inside.Append( stack.Value.All().ToArray() ).ToArray();
 						Assert.Equal( 4, appended.Length );
 						Assert.Same( appended.First(), inside );
 						Assert.Same( appended.Last(), first );
 
 						Task.Run( () =>
 						{
-							var thread = GetStack();
-							Assert.Same( thread, GetStack() );
-							Assert.NotSame( stack, thread );
-							Assert.Empty( Items() );
+							var thread = stack.Value;
+							Assert.Same( thread, stack.Value );
+							Assert.NotSame( expected, thread );
+							Assert.Empty( stack.Value.All().ToArray() );
 							var other = new Class();
-							using ( new AmbientStackCommand<Class>( property ).AsExecuted( other ) )
+							using ( new AmbientStackCommand<Class>( stack ).AsExecuted( other ) )
 							{
-								Assert.Same( other, GetItem() );
-								Assert.Single( Items(), other );
+								Assert.Same( other, stack.GetCurrentItem() );
+								Assert.Single( stack.Value.All().ToArray(), other );
 							}
-							var one = GetStack();
-							var two = GetStack();
-							Assert.Same( thread, one );
+							Assert.Same( thread, stack.Value );
 						} ).Wait();
 					}
 
-					Assert.Same( second, GetItem() );
+					Assert.Same( second, stack.GetCurrentItem() );
 				}
 
-				Assert.Single( GetStack().All().ToArray(), first );
-				Assert.Same( first, GetItem() );
+				Assert.Single( stack.Value.All().ToArray(), first );
+				Assert.Same( first, stack.GetCurrentItem() );
 			}
 
-			Assert.Null( GetItem() );
+			Assert.Null( stack.GetCurrentItem() );
 
-			Assert.NotSame( stack, GetStack() );
+			Assert.NotSame( expected, stack.Value );
 		} 
 	}
 }

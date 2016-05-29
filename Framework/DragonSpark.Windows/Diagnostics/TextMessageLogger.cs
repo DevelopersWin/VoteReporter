@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Values;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
@@ -10,6 +9,7 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
+using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Windows.Diagnostics
 {

@@ -14,7 +14,7 @@ namespace DragonSpark.Aspects
 	public sealed class CacheValueFactory
 	{
 		readonly Func<IList, int> factory;
-		readonly ConcurrentDictionary<Entry, object> items = new ConcurrentDictionary<Entry, object>();
+		readonly ConcurrentDictionary<CacheEntry, object> items = new ConcurrentDictionary<CacheEntry, object>();
 
 		public CacheValueFactory() : this( KeyFactory.Instance.Create ) {}
 
@@ -26,34 +26,36 @@ namespace DragonSpark.Aspects
 		public object Create( MethodInterceptionArgs parameter )
 		{
 			var code = factory( parameter.Arguments.ToArray() );
-			var entry = new Entry( code, parameter );
+			var entry = new CacheEntry( code, parameter );
 			var result = items.GetOrAdd( entry, e => e.Get() );
 			return result;
 		}
+	}
 
-		struct Entry : IEquatable<Entry>
+	public struct CacheEntry : IEquatable<CacheEntry>
+	{
+		readonly int code;
+		readonly MethodInterceptionArgs factory;
+
+		public CacheEntry( MethodInterceptionArgs args ) : this( KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments.ToArray() ), args ) {}
+
+		public CacheEntry( int code, MethodInterceptionArgs factory )
 		{
-			readonly int code;
-			readonly MethodInterceptionArgs factory;
-
-			public Entry( int code, MethodInterceptionArgs factory )
-			{
-				this.code = code;
-				this.factory = factory;
-			}
-
-			public object Get() => factory.GetReturnValue();
-
-			public bool Equals( Entry other ) => code == other.code;
-
-			public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is Entry && Equals( (Entry)obj ) );
-
-			public override int GetHashCode() => code;
-
-			public static bool operator ==( Entry left, Entry right ) => left.Equals( right );
-
-			public static bool operator !=( Entry left, Entry right ) => !left.Equals( right );
+			this.code = code;
+			this.factory = factory;
 		}
+
+		public object Get() => factory.GetReturnValue();
+
+		public bool Equals( CacheEntry other ) => code == other.code;
+
+		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is CacheEntry && Equals( (CacheEntry)obj ) );
+
+		public override int GetHashCode() => code;
+
+		public static bool operator ==( CacheEntry left, CacheEntry right ) => left.Equals( right );
+
+		public static bool operator !=( CacheEntry left, CacheEntry right ) => !left.Equals( right );
 	}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]

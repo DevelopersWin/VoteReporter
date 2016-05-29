@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
@@ -10,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Activation
 {

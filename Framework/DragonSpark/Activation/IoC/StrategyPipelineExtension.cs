@@ -2,8 +2,8 @@
 using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
@@ -78,7 +78,7 @@ namespace DragonSpark.Activation.IoC
 		protected override void Initialize()
 		{
 			var policies = repository.List();
-			var creator = Container.Get( Creator.Property )?.GetType() ?? Execution.Current;
+			var creator = Container.Get( Creator.Property )?.GetType() ?? Execution.GetCurrent();
 			var creators = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ), creator );
 			var policy = new BuildPlanCreatorPolicy( new TryContext( logger ).Invoke, specification, policies, creators );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
@@ -171,7 +171,7 @@ namespace DragonSpark.Activation.IoC
 
 			public override void PreBuildUp( IBuilderContext context )
 			{
-				var reference = property.Get( context.BuildKey );
+				var reference = property.From( context.BuildKey );
 				if ( reference.Get( condition ).Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
@@ -408,7 +408,7 @@ namespace DragonSpark.Activation.IoC
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var reference = property.Get( context.BuildKey );
+			var reference = property.From( context.BuildKey );
 			if ( reference.Get( condition ).Apply() )
 			{
 				var convention = locator.Create( context );

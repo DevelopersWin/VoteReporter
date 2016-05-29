@@ -1,11 +1,12 @@
-using DragonSpark.Runtime.Values;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using Microsoft.Practices.ObjectBuilder2;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class BuildKeyMonitorExtension : BuilderStrategy, IRequiresRecovery
 	{
-		static IStack<NamedTypeBuildKey> Stack => AmbientStack.GetCurrent<NamedTypeBuildKey>();
+		static IStack<NamedTypeBuildKey> Stack => AmbientStack<NamedTypeBuildKey>.Instance.Value;
 
 		public override void PreBuildUp( IBuilderContext context )
 		{

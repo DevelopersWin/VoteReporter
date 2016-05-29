@@ -2,7 +2,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Values;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
@@ -13,6 +12,7 @@ using Microsoft.Practices.Unity;
 using System;
 using System.Diagnostics;
 using System.Reflection;
+using DragonSpark.Runtime.Properties;
 using Xunit;
 using Constructor = DragonSpark.Activation.IoC.Constructor;
 

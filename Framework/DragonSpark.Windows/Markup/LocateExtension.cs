@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Values;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Moq;
@@ -12,6 +11,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
+using DragonSpark.Runtime.Stores;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup

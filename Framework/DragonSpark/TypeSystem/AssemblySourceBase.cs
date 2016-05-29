@@ -2,13 +2,13 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Values;
 using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.TypeSystem
 {

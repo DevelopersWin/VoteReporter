@@ -2,7 +2,8 @@ using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Values;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.TypeSystem;
@@ -45,7 +46,7 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class AssignExecutionContextCommand : AssignValueCommand<MethodBase>
+	public class AssignExecutionContextCommand : AssignExecutionContextCommand<MethodBase>
 	{
 		readonly Action complete;
 		readonly Action<Assembly> initialize;

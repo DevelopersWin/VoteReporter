@@ -1,4 +1,4 @@
-using DragonSpark.Runtime.Values;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Windows.Markup
 {

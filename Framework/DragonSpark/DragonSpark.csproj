@@ -178,7 +178,7 @@
     <Compile Include="Activation\IoC\IsRegisteredSpecification.cs" />
     <Compile Include="Activation\IoC\LifetimeManagerFactory.cs" />
     <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
-    <Compile Include="Aspects\ThreadCachePoint.cs" />
+    <Compile Include="Aspects\ThreadCache.cs" />
     <Compile Include="Aspects\FormattedAttribute.cs" />
     <Compile Include="Aspects\Freeze.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />
@@ -219,6 +219,7 @@
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Runtime\DisposableAction.cs" />
     <Compile Include="Runtime\DisposableExtensions.cs" />
+    <Compile Include="Runtime\Execution.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
     <Compile Include="Runtime\IRepository.cs" />
@@ -228,11 +229,10 @@
     <Compile Include="Runtime\Specifications\AssignableSpecification.cs" />
     <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsInstanceOfSpecification.cs" />
-    <Compile Include="Runtime\TaskFactory.cs" />
-    <Compile Include="Runtime\Values\AmbientStackCommand.cs" />
-    <Compile Include="Runtime\Values\AttachedProperty.cs" />
-    <Compile Include="Runtime\Values\CompositeWritableStore.cs" />
-    <Compile Include="Runtime\Values\ConnectedStore.cs" />
+    <Compile Include="Runtime\Stores\AmbientStackCommand.cs" />
+    <Compile Include="Runtime\Properties\AttachedProperty.cs" />
+    <Compile Include="Runtime\Stores\CompositeWritableStore.cs" />
+    <Compile Include="Runtime\Properties\ConnectedStore.cs" />
     <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Runtime\Specifications\AlwaysSpecification.cs" />
     <Compile Include="Runtime\Specifications\FixedSpecification.cs" />
@@ -246,8 +246,6 @@
     <Compile Include="Activation\IoC\EnumerableResolutionStrategy.cs" />
     <Compile Include="Activation\IoC\Specifications\HandleTypeRequestSpecification.cs" />
     <Compile Include="Activation\IoC\TransientServiceRegistry.cs" />
-    <Compile Include="Runtime\Values\ExecutionContextStore.cs" />
-    <Compile Include="Runtime\Values\ThreadLocalStackProperty.cs" />
     <Compile Include="Setup\ApplyMigrationCommand.cs" />
     <Compile Include="Setup\CurrentServiceProvider.cs" />
     <Compile Include="Setup\InitializeCommand.cs" />
@@ -274,8 +272,8 @@
     <Compile Include="Runtime\Specifications\CompositeSpecification.cs" />
     <Compile Include="Runtime\CurrentTime.cs" />
     <Compile Include="Runtime\Specifications\EqualityContextAwareSpecification.cs" />
-    <Compile Include="Runtime\Values\IWritableStore.cs" />
-    <Compile Include="Runtime\Values\FixedStore.cs" />
+    <Compile Include="Runtime\Stores\IWritableStore.cs" />
+    <Compile Include="Runtime\Stores\FixedStore.cs" />
     <Compile Include="Runtime\Specifications\ContextAwareSpecification.cs" />
     <Compile Include="Runtime\Specifications\GuardedSpecificationBase.cs" />
     <Compile Include="Runtime\Specifications\SpecificationExtensions.cs" />
@@ -326,7 +324,7 @@
     <Compile Include="TypeSystem\IApplicationAssemblyLocator.cs" />
     <Compile Include="Runtime\ICurrentTime.cs" />
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
-    <Compile Include="Runtime\Values\IStore.cs" />
+    <Compile Include="Runtime\Stores\IStore.cs" />
     <Compile Include="Runtime\ListDictionary.cs" />
     <Compile Include="Diagnostics\RecordingLoggerFactory.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
@@ -363,8 +361,8 @@
     <Compile Include="Modularity\ModuleTypeLoaderNotFoundException.cs" />
     <Compile Include="Modularity\ModuleTypeLoadingException.cs" />
     <Compile Include="Runtime\Specifications\TypeAssignableSpecification.cs" />
-    <Compile Include="Runtime\Values\Value.cs" />
-    <Compile Include="Runtime\Values\WritableStore.cs" />
+    <Compile Include="Runtime\Stores\Value.cs" />
+    <Compile Include="Runtime\Stores\WritableStore.cs" />
     <Compile Include="Setup\AllTypesOfFactory.cs" />
     <Compile Include="Runtime\CommandCollection.cs" />
     <Compile Include="Runtime\CompositeCommand.cs" />

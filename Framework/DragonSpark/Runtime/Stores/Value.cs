@@ -1,4 +1,4 @@
-namespace DragonSpark.Runtime.Values
+namespace DragonSpark.Runtime.Stores
 {
 	public abstract class StoreBase<T> : IStore<T>
 	{
