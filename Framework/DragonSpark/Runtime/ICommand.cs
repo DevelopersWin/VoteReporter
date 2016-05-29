@@ -22,6 +22,11 @@ namespace DragonSpark.Runtime
 		void Update();
 	}
 
+	public static class DelegateExtensions
+	{
+		public static Action<T> Convert<T>( this Action<object> @this ) => t => @this( t );
+	}
+
 	public class AssignValueCommand<T> : DisposingCommand<T>
 	{
 		readonly IWritableStore<T> store;

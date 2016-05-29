@@ -68,8 +68,6 @@ namespace DragonSpark.Activation
 
 		public static Delegate Convert( [Required]this Func<object, object> @this, [Required]Type parameterType, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().Invoke<Delegate>( nameof(Convert), parameterType.Append( resultType ).ToArray(), @this );
 
-		public static Action<T> Convert<T>( this Action<object> @this ) => t => @this( t );
-
 		public static Func<T> Convert<T>( this Func<object> @this ) => () => (T)@this();
 
 		public static Func<T, U> Convert<T, U>( this Func<object, object> @this ) => arg => (U)@this( arg );

@@ -14,13 +14,6 @@ namespace DragonSpark.Testing.Aspects
 
 		static AmbientStack<ThreadCache> Cache { get; } = new AmbientStack<ThreadCache>( Context.Self );
 
-		// readonly static AmbientStack<CachedClass> Stack = new AmbientStack<CachedClass>( () => Context, new AmbientStackProperty<CachedClass>() );
-
-		/*class TestStack : AmbientStack<ThreadCache>
-		{
-			public TestCache( object context, IDictionary<CacheEntry, object> cache ) : base( context.Self, new AmbientStackProperty<ThreadCache>( cache ) ) {}
-		}*/
-
 		[Theory, AutoData]
 		void SinglePoint( CachedClass sut )
 		{
@@ -41,19 +34,33 @@ namespace DragonSpark.Testing.Aspects
 				Task.Run( () =>
 				{
 					Assert.Equal( 4, sut.Call() );
-					Assert.Equal( 4, sut.Call() );
+					Assert.Equal( 5, sut.Call() );
+
+					var inner = new Dictionary<CacheEntry, object>();
+					using ( new ThreadCacheContext( new ThreadCache( inner ).Self, Cache ) )
+					{
+						Assert.Equal( 6, sut.Call() );
+						Assert.Equal( 6, sut.Call() );
+						Assert.NotEmpty( inner );
+					}
+
+					Assert.Empty( inner );
+
+					Assert.Equal( 7, sut.Call() );
+					Assert.Equal( 8, sut.Call() );
+
 				} ).Wait();
-				Assert.Equal( 4, sut.Call() );
-				Assert.Equal( 4, sut.Call() );
+				Assert.Equal( 3, sut.Call() );
+				Assert.Equal( 3, sut.Call() );
 				Assert.NotEmpty( dictionary );
 			}
 
 			Assert.Empty( Cache.Value.All() );
 			Assert.Empty( dictionary );
 
-			Assert.Equal( 3, sut.Call() );
-			Assert.Equal( 4, sut.Call() );
-			Assert.Equal( 5, sut.Call() );
+			Assert.Equal( 9, sut.Call() );
+			Assert.Equal( 10, sut.Call() );
+			Assert.Equal( 11, sut.Call() );
 		}
 
 		class CachedClass
