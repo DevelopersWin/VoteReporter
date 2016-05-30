@@ -295,7 +295,7 @@ namespace DragonSpark.Setup
 
 	public abstract class Application<T> : CompositeCommand<T>, IApplication<T>
 	{
-		protected Application( [Required]IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
+		protected Application( [Required]IServiceProvider provider ) : this( provider, Items<ICommand>.Default ) {}
 
 		protected Application( [Required]IServiceProvider provider, IEnumerable<ICommand> commands ) : this( commands )
 		{
@@ -347,7 +347,7 @@ namespace DragonSpark.Setup
 
 	public class Setup : CompositeCommand, ISetup
 	{
-		public Setup() : this( Default<ICommand>.Items ) {}
+		public Setup() : this( Items<ICommand>.Default ) {}
 
 		public Setup( params ICommand[] commands ) : base( commands ) {}
 

@@ -1,6 +1,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -32,33 +33,23 @@ namespace DragonSpark.Aspects
 
 	class ThreadCacheContext : Disposable
 	{
-		readonly AmbientStack<ThreadCache> stack;
-		readonly ThreadCache item;
-
-		public ThreadCacheContext() : this( () => new ThreadCache() ) {}
+		readonly IStack<ThreadCache> stack;
+		
+		public ThreadCacheContext() : this( () => new ThreadCache().Configured( false ) ) {}
 
 		public ThreadCacheContext( Func<ThreadCache> create ) : this( create, AmbientStack<ThreadCache>.Instance ) {}
 
 		public ThreadCacheContext( Func<ThreadCache> create, AmbientStack<ThreadCache> stack  )
 		{
-			this.stack = stack;
-
-			item = stack.GetCurrentItem() == null ? create() : null;
-
+			var item = stack.GetCurrentItem() == null ? create() : null;
 			if ( item != null )
 			{
-				stack.Value.Push( item );
+				this.stack = stack.Value;
+				this.stack.Push( item );
 			}
 		}
 
-		protected override void OnDispose( bool disposing )
-		{
-			if ( item != null )
-			{
-				item.Dispose();
-				stack.Value.Pop();
-			}
-		}
+		protected override void OnDispose( bool disposing ) => stack?.Pop().Dispose();
 	}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer), AspectPriority = -1 )]
@@ -76,7 +67,7 @@ namespace DragonSpark.Aspects
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer), AspectPriority = -1 )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
-	public class ThreadCacheAttribute : MethodInterceptionAspect, IInstanceScopedAspect
+	public class ThreadCacheAttribute : MethodInterceptionAspect//, IInstanceScopedAspect
 	{
 		readonly AmbientStack<ThreadCache> current;
 		public ThreadCacheAttribute() : this( AmbientStack<ThreadCache>.Instance ) {}
@@ -104,15 +95,18 @@ namespace DragonSpark.Aspects
 			if ( current != args.Instance )
 			{
 				var item = current.GetCurrentItem();
-				var entry = new CacheEntry( args );
-				var result = item.Get( entry );
-				return result;
+				if ( item != null )
+				{
+					var entry = new CacheEntry( args );
+					var result = item.Get( entry );
+					return result;
+				}
 			}
 			return null;
 		}
 
-		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new ThreadCacheAttribute( current );
+		/*object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs ) => new ThreadCacheAttribute( current );
 
-		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}*/
 	}
 }

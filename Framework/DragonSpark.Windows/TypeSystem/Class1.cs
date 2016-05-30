@@ -1,14 +1,11 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Threading;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Windows.TypeSystem
 {
@@ -32,29 +29,30 @@ namespace DragonSpark.Windows.TypeSystem
 	}
 
 	[Synchronized]
-	public class AssemblyInitializer : CommandBase<Assembly>
+	public class AssemblyInitializer //: CommandBase<Assembly>
 	{
 		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();
 
-		AssemblyInitializer() : base( Specification.Instance ) {}
+		AssemblyInitializer() /*: base( Specification.Instance )*/ {}
 
-		public override void Execute( Assembly parameter )
+		public void Run( Assembly parameter )
 		{
-			parameter.GetModules().Select( module => module.ModuleHandle ).Each( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
-			if ( !Activated( parameter ) )
+			// Thread.Sleep( 2000 );
+			parameter.GetModules().Select( module => module.ModuleHandle ).ToList().ForEach( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
+			/*if ( !Activated( parameter ) )
 			{
 				parameter.Set( DragonSpark.TypeSystem.Activated.Property, true );
-			}
+			}*/
 		}
 
-		static bool Activated( Assembly parameter ) => parameter.Get( DragonSpark.TypeSystem.Activated.Property );
+		// static bool Activated( Assembly parameter ) => parameter.Get( DragonSpark.TypeSystem.Activated.Property );
 
-		class Specification : OncePerParameterSpecification<Assembly>
+		/*class Specification : OncePerParameterSpecification<Assembly>
 		{
 			public static Specification Instance { get; } = new Specification();
 
 			public override bool IsSatisfiedBy( Assembly parameter ) => !Activated( parameter ) && base.IsSatisfiedBy( parameter );
-		}
+		}*/
 	}
 
 	public class AssemblyLoader : DragonSpark.TypeSystem.AssemblyLoader

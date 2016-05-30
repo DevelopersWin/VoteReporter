@@ -5,9 +5,7 @@ using DragonSpark.Runtime;
 using PostSharp.Aspects;
 using Serilog;
 using System;
-using System.Diagnostics;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace DragonSpark.Testing.Framework
 {
@@ -26,24 +24,10 @@ namespace DragonSpark.Testing.Framework
 
 	public class OutputCommand : CommandBase<OutputCommand.Parameter>
 	{
-		public class Parameter
-		{
-			public Parameter( object instance, MethodBase method, Action @continue )
-			{
-				Instance = instance;
-				Method = method;
-				Continue = @continue;
-			}
-
-			public object Instance { get; }
-			public MethodBase Method { get; }
-			public Action Continue { get; }
-		}
-
 		readonly Func<MethodBase, DisposingCommand<MethodBase>> commandSource;
 		readonly Func<Parameter, IProfiler> profilerSource;
 
-		public OutputCommand() : this( method => new AssignExecutionContextCommand() ) {}
+		public OutputCommand() : this( method => new InitializeMethodCommand() ) {}
 
 		public OutputCommand( Func<MethodBase, DisposingCommand<MethodBase>> commandSource ) : this( commandSource, Factory.New ) {}
 
@@ -62,6 +46,20 @@ namespace DragonSpark.Testing.Framework
 					parameter.Continue();
 				}
 			}
+		}
+
+		public struct Parameter
+		{
+			public Parameter( object instance, MethodBase method, Action @continue )
+			{
+				Instance = instance;
+				Method = method;
+				Continue = @continue;
+			}
+
+			public object Instance { get; }
+			public MethodBase Method { get; }
+			public Action Continue { get; }
 		}
 
 		class Factory : FactoryBase<Parameter, IProfiler>

@@ -1,7 +1,6 @@
 using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
-using System;
 using DragonSpark.Runtime.Stores;
+using System;
 
 namespace DragonSpark.Activation
 {
@@ -54,7 +53,7 @@ namespace DragonSpark.Activation
 	{
 		public static Coercer<T> Instance { get; } = new Coercer<T>();
 
-		protected override T PerformCoercion( object parameter ) => Default<T>.Item;
+		protected override T PerformCoercion( object parameter ) => default(T);
 	}
 
 	public class ConstructCoercer<T> : CoercerBase<T>

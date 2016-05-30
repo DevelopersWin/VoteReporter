@@ -219,7 +219,6 @@
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Runtime\DisposableAction.cs" />
     <Compile Include="Runtime\DisposableExtensions.cs" />
-    <Compile Include="Runtime\Execution.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
     <Compile Include="Runtime\IRepository.cs" />

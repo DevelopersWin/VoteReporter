@@ -13,7 +13,7 @@ namespace DragonSpark.Configuration
 	{
 		public Registration() {}
 
-		public Registration( [NotEmpty]string key, [Required]object value ) : this( key, value, Default<string>.Items ) {}
+		public Registration( [NotEmpty]string key, [Required]object value ) : this( key, value, Items<string>.Default ) {}
 
 		public Registration( [NotEmpty]string key, [Required]object value, [Required]params string[] aliases )
 		{

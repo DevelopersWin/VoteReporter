@@ -1,9 +1,8 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.TypeSystem;
+using DragonSpark.Runtime.Properties;
 using System;
 using System.Windows.Input;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Runtime
 {
@@ -57,9 +56,7 @@ namespace DragonSpark.Runtime
 
 	public struct Value<T>
 	{
-		public Value( T start ) : this( start, Default<T>.Item ) {}
-
-		public Value( T start, T finish )
+		public Value( T start, T finish = default(T) )
 		{
 			Start = start;
 			Finish = finish;

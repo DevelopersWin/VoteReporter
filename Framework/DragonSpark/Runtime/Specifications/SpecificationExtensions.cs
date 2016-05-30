@@ -23,7 +23,7 @@ namespace DragonSpark.Runtime.Specifications
 		public static ISpecification<T> And<T>( this ISpecification<T> @this, params ISpecification[] others ) 
 			=> new AllSpecification<T>( @this.Append( others.Select( specification =>  specification.Cast<T>() ) ).Fixed() );
 
-		public static ISpecification<T> Cast<T>( this ISpecification @this ) => @this.Cast( Default<T>.Boxed );
+		public static ISpecification<T> Cast<T>( this ISpecification @this ) => @this.Cast( Delegates<T>.Object );
 
 		public static ISpecification<T> Cast<T>( this ISpecification @this, Func<T, object> projection ) => @this as ISpecification<T> ?? new DecoratedSpecification<T>( @this, projection );
 

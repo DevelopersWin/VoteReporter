@@ -28,7 +28,7 @@ namespace DragonSpark.Runtime.Properties
 		protected override T Get() => property.Get( Execution.GetCurrent() );
 
 		public override void Assign( T item ) => property.Set( Execution.GetCurrent(), item );*/
-		protected ExecutionAttachedPropertyStoreBase() : this( () => default(T) ) {}
+		protected ExecutionAttachedPropertyStoreBase() : this( Delegates<T>.Default ) {}
 		protected ExecutionAttachedPropertyStoreBase( Func<T> create ) : this( new AttachedProperty<T>( new Func<object, T>( new Context( create ).Create ) ) ) {}
 		protected ExecutionAttachedPropertyStoreBase( IAttachedProperty<object, T> property ) : this( Execution.GetCurrent, property ) {}
 		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property ) : this( instance, property, Coercer<T>.Instance ) {}
@@ -50,9 +50,9 @@ namespace DragonSpark.Runtime.Properties
 	{
 		readonly System.Collections.Generic.Stack<T> store;
 		readonly Action<IStack<T>> onEmpty;
-		public Stack() : this( Default<IStack<T>>.Empty ) {}
+		public Stack() : this( Delegates<IStack<T>>.Empty ) {}
 
-		public Stack( System.Collections.Generic.Stack<T> store ) : this( store, Default<IStack<T>>.Empty ) {}
+		public Stack( System.Collections.Generic.Stack<T> store ) : this( store, Delegates<IStack<T>>.Empty ) {}
 
 		public Stack( Action<IStack<T>> onEmpty ) : this( new System.Collections.Generic.Stack<T>(), onEmpty ) {}
 
@@ -153,35 +153,37 @@ namespace DragonSpark.Runtime.Properties
 
 			public override IWritableStore<IStack<T>> Create( object instance ) => new Factory( this, instance ).Create();
 
-			class Factory : Disposable
+			class Factory
 			{
 				readonly Store owner;
 				readonly object instance;
-				readonly ThreadLocal<IStack<T>> local;
+				readonly ThreadLocalStore<IStack<T>> store;
 				readonly ConcurrentDictionary<IStack<T>, bool> empty = new ConcurrentDictionary<IStack<T>, bool>();
+				readonly ThreadLocal<IStack<T>> local;
 
 				public Factory( Store owner, object instance )
 				{
 					this.owner = owner;
 					this.instance = instance;
+
 					local = new ThreadLocal<IStack<T>>( New, true );
+					store = new ThreadLocalStore<IStack<T>>( local ).Configured( false );
 				}
 
-				public IWritableStore<IStack<T>> Create()
-				{
-					var result = new ThreadLocalStore<IStack<T>>( local );
-					this.AssociateForDispose( result );
-					return result;
-				}
+				public IWritableStore<IStack<T>> Create() => store;
 
 				IStack<T> New() => new Stack<T>( OnEmpty );
 
 				void OnEmpty( IStack<T> item )
 				{
+					// bool current;
+					
 					if ( empty.TryAdd( item, true ) && local.Values.All( IsEmpty ) )
+					//if ( empty.TryGetValue( item, out current ) && empty.TryUpdate( item, true, current ) && empty.Values.All( b => b ) )
 					{
 						empty.Clear();
-						Dispose();
+						owner.Clear( instance );
+						// store.Dispose();
 					}
 				}
 
@@ -190,8 +192,6 @@ namespace DragonSpark.Runtime.Properties
 					bool isEmpty;
 					return empty.ContainsKey( stack ) && empty.TryGetValue( stack, out isEmpty ) && isEmpty;
 				}
-
-				protected override void OnDispose( bool disposing ) => owner.Clear( instance );
 			}
 
 			void Clear( object instance ) => callback( this, instance );

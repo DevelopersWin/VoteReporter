@@ -70,7 +70,7 @@ namespace DragonSpark.Activation
 			[Freeze]
 			public override ConstructorInfo Create( ConstructTypeRequest parameter )
 			{
-				var candidates = new[] { parameter.Arguments, parameter.Arguments.NotNull(), Default<object>.Items };
+				var candidates = new[] { parameter.Arguments, parameter.Arguments.NotNull(), Items<object>.Default };
 				var adapter = parameter.RequestedType.Adapt();
 				var result = candidates
 					.Select( objects => objects.Fixed() )

@@ -3,9 +3,9 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.TypeSystem;
 using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
@@ -13,7 +13,6 @@ using Serilog.Core;
 using System;
 using System.Reflection;
 using Xunit.Abstractions;
-using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework
 {
@@ -29,46 +28,39 @@ namespace DragonSpark.Testing.Framework
 
 	public class ApplicationOutputCommand : OutputCommand
 	{
-		public ApplicationOutputCommand() : base( method => new AssignExecutionContextCommand( method.Get( AssociatedContext.Property ).Dispose ) ) {}
+		public ApplicationOutputCommand() : base( method => new InitializeMethodCommand( method.Get( AssociatedContext.Property ).Dispose ) ) {}
 	}
 
 	public static class MethodBaseExtensions
 	{
-		public static AssignExecutionContextCommand AsCurrentContext( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => AsCurrentContext( @this, new RecordingLoggerFactory( history, level ) );
+		public static InitializeMethodCommand AsCurrentContext( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => AsCurrentContext( @this, new RecordingLoggerFactory( history, level ) );
 
-		public static AssignExecutionContextCommand AsCurrentContext( this MethodBase @this ) => AsCurrentContext( @this, new RecordingLoggerFactory() );
+		public static InitializeMethodCommand AsCurrentContext( this MethodBase @this ) => AsCurrentContext( @this, new RecordingLoggerFactory() );
 
-		public static AssignExecutionContextCommand AsCurrentContext( this MethodBase @this, RecordingLoggerFactory factory )
+		public static InitializeMethodCommand AsCurrentContext( this MethodBase @this, RecordingLoggerFactory factory )
 		{
-			var result = new AssignExecutionContextCommand().AsExecuted( @this );
+			var result = new InitializeMethodCommand().AsExecuted( @this );
 			DefaultServiceProvider.Instance.Assign( new ServiceProvider( factory ) );
 			return result;
 		}
 	}
 
-	public class AssignExecutionContextCommand : AssignExecutionContextCommand<MethodBase>
+	public class InitializeMethodCommand : DisposingCommand<MethodBase>
 	{
 		readonly Action complete;
 		readonly Action<Assembly> initialize;
 
-		public AssignExecutionContextCommand() : this( () => {} ) {}
+		public InitializeMethodCommand(  ) : this( Delegates.Empty ) {}
 
-		public AssignExecutionContextCommand( Action complete ) : this( AssemblyInitializer.Instance.Run, ExecutionContext.Instance )
+		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Instance.Run, complete ) {}
+
+		public InitializeMethodCommand( Action<Assembly> initialize, Action complete )
 		{
+			this.initialize = initialize;
 			this.complete = complete;
 		}
 
-		public AssignExecutionContextCommand( Action<Assembly> initialize, IWritableStore<MethodBase> store ) : base( store )
-		{
-			this.initialize = initialize/*.Synchronized()*/;
-		}
-
-		public override void Execute( MethodBase parameter )
-		{
-			initialize( parameter.DeclaringType.Assembly );
-
-			base.Execute( parameter );
-		}
+		public override void Execute( MethodBase parameter ) => initialize( parameter.DeclaringType.Assembly );
 
 		protected override void OnDispose()
 		{

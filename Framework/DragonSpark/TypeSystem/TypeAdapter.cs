@@ -68,7 +68,7 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}
 
-		public object Invoke( string methodName, Type[] types ) => Invoke( methodName, types, Default<object>.Items );
+		public object Invoke( string methodName, Type[] types ) => Invoke( methodName, types, Items<object>.Default );
 
 		public object Invoke( string methodName, Type[] types, params object[] parameters ) => Invoke( null, methodName, types, parameters );
 
@@ -139,7 +139,7 @@ namespace DragonSpark.TypeSystem
 
 		[Freeze]
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true ) =>
-			Type.Append( includeInterfaces ? ExpandInterfaces( Type ) : Default<Type>.Items )
+			Type.Append( includeInterfaces ? ExpandInterfaces( Type ) : Items<Type>.Default )
 				.AsTypeInfos()
 				.Where( typeInfo => typeInfo.IsGenericType && genericDefinition.GetTypeInfo().IsGenericType && typeInfo.GetGenericTypeDefinition() == genericDefinition.GetGenericTypeDefinition() )
 				.AsTypes()
@@ -155,7 +155,7 @@ namespace DragonSpark.TypeSystem
 				var result = map.InterfaceMethods.TupleWith( map.TargetMethods ).Fixed();
 				return result;
 			}
-			return Default<Tuple<MethodInfo, MethodInfo>>.Items;
+			return Items<Tuple<MethodInfo, MethodInfo>>.Default;
 		}
 
 		Type CheckGeneric( Type type )

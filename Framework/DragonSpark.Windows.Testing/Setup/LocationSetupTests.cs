@@ -314,7 +314,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Map(typeof(IExceptionFormatter), typeof(ExceptionFormatter) )]
 		public void Try()
 		{
-			var exception = ExceptionSupport.Try( () => {} );
+			var exception = ExceptionSupport.Try( Delegates.Empty );
 			Assert.Null( exception );
 		}
 

@@ -1,10 +1,10 @@
+using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Extensions
 {
@@ -69,7 +69,7 @@ namespace DragonSpark.Extensions
 
 		public static U FirstWhere<T, U>( this IEnumerable<T> @this, Func<T, U> where ) => @this.NotNull().Select( @where ).NotNull().FirstOrDefault();
 
-		public static IEnumerable<TItem> NotNull<TItem>( this IEnumerable<TItem> target ) => NotNull( target, Default<TItem>.Self );
+		public static IEnumerable<TItem> NotNull<TItem>( this IEnumerable<TItem> target ) => NotNull( target, Delegates<TItem>.Self );
 
 		public static IEnumerable<TItem> NotNull<TItem, TProject>( this IEnumerable<TItem> target, Func<TItem, TProject> project ) => target.Where( x => !project( x ).IsNull() );
 

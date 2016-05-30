@@ -1,17 +1,17 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using System;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Runtime.Specifications
 {
 	public class DecoratedSpecification<T> : DelegatedSpecification<T>
 	{
-		public DecoratedSpecification( ISpecification inner ) : this( inner, Default<T>.Boxed ) {}
+		public DecoratedSpecification( ISpecification inner ) : this( inner, Delegates<T>.Object ) {}
 
 		public DecoratedSpecification( ISpecification inner, Func<T, object> projection ) : this( inner, projection, Coercer<T>.Instance ) {}
-		public DecoratedSpecification( ISpecification inner, ICoercer<T> coercer ) : this( inner, Default<T>.Boxed, coercer ) {}
+		public DecoratedSpecification( ISpecification inner, ICoercer<T> coercer ) : this( inner, Delegates<T>.Object, coercer ) {}
 		public DecoratedSpecification( ISpecification inner, Func<T, object> projection, ICoercer<T> coercer ) : base( arg => inner.IsSatisfiedBy( arg.With( projection ) ), coercer ) {}
 	}
 

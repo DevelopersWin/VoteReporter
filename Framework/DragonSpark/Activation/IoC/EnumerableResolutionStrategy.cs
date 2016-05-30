@@ -28,7 +28,7 @@ namespace DragonSpark.Activation.IoC
 
 		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
 		{
-			var plans = specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) ) ? creators.Select( policy => policy.CreatePlan( context, buildKey ) ) : Default<IBuildPlanPolicy>.Items;
+			var plans = specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) ) ? creators.Select( policy => policy.CreatePlan( context, buildKey ) ) : Items<IBuildPlanPolicy>.Default;
 			var result = new CompositeBuildPlanPolicy( tryDelegate, plans.Concat( policies ).ToArray() );
 			return result;
 		}
@@ -132,14 +132,14 @@ namespace DragonSpark.Activation.IoC
 
 		object Resolve<T>( IBuilderContext context )
 		{
-			var defaultName = container.IsRegistered<T>() ? new string[] { null } : Default<string>.Items;
+			var defaultName = container.IsRegistered<T>() ? new string[] { null } : Items<string>.Default;
 			var result = context.Policies.Get<IRegisteredNamesPolicy>( null )
 				.With( policy => policy.GetRegisteredNames( typeof(T) )
 					.Concat( defaultName ).Concat( typeof(T).GetTypeInfo().IsGenericType ? policy.GetRegisteredNames( typeof(T).GetGenericTypeDefinition() ) : Enumerable.Empty<string>() )
 					.Distinct()
 					.Select( context.NewBuildUp<T> )
 					.ToArray() 
-				) ?? Default<T>.Items;
+				) ?? Items<T>.Default;
 			return result;
 		}
 	}

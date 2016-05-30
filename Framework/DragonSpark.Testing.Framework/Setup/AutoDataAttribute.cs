@@ -4,6 +4,7 @@ using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
@@ -17,7 +18,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Properties;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit.Sdk;
 using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 
@@ -41,6 +43,13 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
+			/*var one = TaskScheduler.Current.Id;
+			var two = TaskScheduler.Default.Id;
+			var thr = Task.CurrentId;
+			var fou = SynchronizationContext.Current;
+			var fiv = System.Threading.ExecutionContext.IsFlowSuppressed();
+			var current = ExecutionContext.Instance.temp.Value;*/
+
 			var autoData = new AutoData( Fixture, methodUnderTest );
 			using ( context( autoData ) )
 			{
@@ -101,7 +110,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IDisposable Create( AutoData parameter )
 		{
-			var result = new AssignExecutionContextCommand().AsExecuted( parameter.Method );
+			var result = new InitializeMethodCommand().AsExecuted( parameter.Method );
 
 			var configure = new AutoDataConfiguringCommandFactory( parameter, providerSource, applicationSource ).Create();
 			configure.Run( parameter );
@@ -152,7 +161,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override void Before( MethodInfo methodUnderTest )
 		{
-			using ( new AssignExecutionContextCommand().AsExecuted( methodUnderTest ) )
+			using ( new InitializeMethodCommand().AsExecuted( methodUnderTest ) )
 			{
 				Services.Get<LoggingLevelSwitch>().MinimumLevel = level;
 			}
@@ -190,7 +199,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		[Freeze]
 		public override Type[] Create( MethodBase parameter )
 		{
-			var types = additional.Concat( includeFromParameters ? parameter.GetParameters().Select( info => info.ParameterType ) : Default<Type>.Items );
+			var types = additional.Concat( includeFromParameters ? parameter.GetParameters().Select( info => info.ParameterType ) : Items<Type>.Default );
 			var result = primaryStrategy( parameter.DeclaringType ).Union( types.SelectMany( otherStrategy ) ).Distinct().Fixed();
 			return result;
 		}

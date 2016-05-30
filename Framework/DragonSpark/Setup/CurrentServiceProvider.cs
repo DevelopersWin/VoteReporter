@@ -29,6 +29,8 @@ namespace DragonSpark.Setup
 
 			base.Assign( item );
 		}
+
+		
 	}
 
 	public class ServiceProviderMigrationCommandFactory : FactoryBase<IServiceProvider, ICommand<MigrationParameter<IServiceProvider>>>, IServiceProviderMigrationCommandSource

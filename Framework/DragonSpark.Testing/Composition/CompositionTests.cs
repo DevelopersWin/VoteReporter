@@ -1,4 +1,7 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Activation;
+using DragonSpark.Diagnostics;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -9,12 +12,30 @@ using System;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Properties;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Composition
 {
+	public class CompositionTests1 : TestCollectionBase
+	{
+		public CompositionTests1( ITestOutputHelper output ) : base( output ) {}
+
+		[Theory, Framework.Setup.AutoData]
+		public void BasicComposeAgain( CompositionContext host ) {}
+	}
+
+	public class CompositionTests2 : TestCollectionBase
+	{
+		public CompositionTests2( ITestOutputHelper output ) : base( output ) {}
+
+		[Theory, Framework.Setup.AutoData]
+		public void BasicComposeAgain( CompositionContext host ) {}
+	}
+
 	public class CompositionTests : TestCollectionBase
 	{
 		public CompositionTests( ITestOutputHelper output ) : base( output ) {}
@@ -37,9 +58,17 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( sinkOne.Events.Count() > current );
 		}
 
-		[Theory, CompositionTests.AutoData, MinimumLevel( LogEventLevel.Debug )]
+		[Theory, Framework.Setup.AutoData/*, MinimumLevel( LogEventLevel.Debug )*/]
 		public void BasicComposeAgain( CompositionContext host )
 		{
+			var one = TaskScheduler.Current.Id;
+			var two = TaskScheduler.Default.Id;
+			var thr = Task.CurrentId;
+			var fou = SynchronizationContext.Current;
+			var fiv = System.Threading.ExecutionContext.IsFlowSuppressed();
+
+			var asdf = ExecutionContext.Instance.temp.Value;
+
 			var sinkOne = host.GetExport<ILoggerHistory>();
 			var sinkTwo = host.GetExport<ILoggerHistory>();
 			Assert.Same( sinkOne, sinkTwo );

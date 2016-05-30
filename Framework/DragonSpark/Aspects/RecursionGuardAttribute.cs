@@ -1,9 +1,9 @@
 using DragonSpark.Diagnostics;
+using DragonSpark.Runtime.Properties;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Aspects
 {

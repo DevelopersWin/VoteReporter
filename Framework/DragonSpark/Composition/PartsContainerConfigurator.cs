@@ -36,7 +36,7 @@ namespace DragonSpark.Composition
 	public class TypeBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
 	{
 		public TypeBasedConfigurationContainerFactory( [Required] Type[] types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) 
-			: base( Default<Assembly>.Items, types, configurations ) {}
+			: base( Items<Assembly>.Default, types, configurations ) {}
 	}
 
 	public class ContainerConfigurationFromPartsFactory : AggregateFactory<ContainerConfiguration>

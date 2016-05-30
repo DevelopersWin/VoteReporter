@@ -162,20 +162,20 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		void DetermineDefault()
 		{
-			var item = Default<object>.Items;
+			var item = Items<object>.Default;
 			Assert.IsType<object[]>( item );
 			Assert.Empty( item );
-			Assert.Same( item, Default<object>.Items );
-			Assert.Same( Default<object>.Items, Enumerable.Empty<object>() );
-			var objects = Default<object>.Items;
+			Assert.Same( item, Items<object>.Default );
+			Assert.Same( Items<object>.Default, Enumerable.Empty<object>() );
+			var objects = Items<object>.Default;
 			Assert.Same( item, objects );
 
-			var ints = Default<int>.Items;
+			var ints = Items<int>.Default;
 			Assert.Empty( ints );
-			Assert.Same( ints, Default<int>.Items );
+			Assert.Same( ints, Items<int>.Default );
 
-			Assert.Null( Default<object>.Item );
-			Assert.Null( Default<Generic<object>>.Item );
+			//Assert.Null( Default<object>.Item );
+			//Assert.Null( Default<Generic<object>>.Item );
 		}
 
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]

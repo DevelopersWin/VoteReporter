@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Objects.IoC
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		public UnityContainerFactory() : base( new DragonSpark.Setup.ServiceProviderFactory( Default<Assembly>.Items ).Create ) {}
+		public UnityContainerFactory() : base( new DragonSpark.Setup.ServiceProviderFactory( Items<Assembly>.Default ).Create ) {}
 	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute

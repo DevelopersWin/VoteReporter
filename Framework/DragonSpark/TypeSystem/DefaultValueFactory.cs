@@ -6,22 +6,29 @@ using System.Linq;
 
 namespace DragonSpark.TypeSystem
 {
-	public static class Default<T>
+	public static class Delegates
 	{
-		public static Action<T> Empty => t => { };
+		public static Action Empty { get; } = () => {};
 
-		public static Func<T, T> Self => t => t;
-
-		public static Func<T, object> Boxed => t => t;
-
-		// [Freeze]
-		public static T Item => /*(T)DefaultValueFactory.Instance.Create( typeof(T) )*/default(T);
-
-		// [Freeze]
-		public static T[] Items => (T[])/*DefaultValueFactory.Instance.Create( typeof(T[]) )*/Enumerable.Empty<T>() /*Enumerable.Empty<T>().Fixed()*/;
+		// public static Func<object, object> Self { get; } = t => t;
 	}
 
-	// [AutoValidation( false )]
+	public static class Delegates<T>
+	{
+		public static Action<T> Empty { get; } = t => {};
+
+		public static Func<T, T> Self { get; } = t => t;
+
+		public static Func<T, object> Object { get; } = t => t;
+
+		public static Func<T> Default { get; } = () => default(T);
+	}
+
+	public static class Items<T>
+	{
+		public static T[] Default { get; } = (T[])Enumerable.Empty<T>();
+	}
+
 	public class DefaultValueFactory<T> : FactoryBase<T>
 	{
 		readonly Func<Type, object> source;

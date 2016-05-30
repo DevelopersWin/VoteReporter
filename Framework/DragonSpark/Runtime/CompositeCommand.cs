@@ -24,7 +24,7 @@ namespace DragonSpark.Runtime
 
 	public class CompositeCommand : CompositeCommand<object>
 	{
-		public CompositeCommand() : this( Default<ICommand>.Items ) {}
+		public CompositeCommand() : this( Items<ICommand>.Default ) {}
 
 		public CompositeCommand( [Required]params ICommand[] commands ) : base( commands ) {}
 	}

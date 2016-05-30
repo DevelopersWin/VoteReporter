@@ -17,7 +17,7 @@ namespace DragonSpark.Extensions
 		{
 			var attributeProvider = Attributes.Get( @this );
 			var attributes = attributeProvider.GetAttributes( typeof(T) );
-			return attributes as T[] ?? Default<T>.Items;
+			return attributes as T[] ?? Items<T>.Default;
 		}
 	}
 }

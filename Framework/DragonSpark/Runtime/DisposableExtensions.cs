@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -25,20 +24,7 @@ namespace DragonSpark.Runtime
 
 	public class ConfigureAssociatedDisposables : AttachedProperty<IDisposable, bool>
 	{
-		public static ConfigureAssociatedDisposables Instance { get; } = Get();
-
-		static ConfigureAssociatedDisposables Get()
-		{
-			try
-			{
-				return new ConfigureAssociatedDisposables();
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-				throw;
-			}
-		}
+		public static ConfigureAssociatedDisposables Instance { get; } = new ConfigureAssociatedDisposables();
 
 		ConfigureAssociatedDisposables() : base( key => true ) {}
 	}
@@ -92,20 +78,7 @@ namespace DragonSpark.Runtime
 		readonly Func<IDisposable, bool> property;
 		readonly Action<IDisposable> command;
 
-		public DisposeAssociatedAspect() : this( Property(), DisposeAssociatedCommand.Instance.Execute ) {}
-
-		static Func<IDisposable, bool> Property()
-		{
-			try
-			{
-				return ConfigureAssociatedDisposables.Instance.Get;
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-				throw;
-			}
-		}
+		public DisposeAssociatedAspect() : this( ConfigureAssociatedDisposables.Instance.Get, DisposeAssociatedCommand.Instance.Execute ) {}
 
 		public DisposeAssociatedAspect( Func<IDisposable, bool> property, Action<IDisposable> command )
 		{

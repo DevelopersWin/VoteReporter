@@ -31,7 +31,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class Application<T> : Application where T : ICommand
 	{
-		public Application( IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
+		public Application( IServiceProvider provider ) : this( provider, Items<ICommand>.Default ) {}
 
 		public Application( IServiceProvider provider, IEnumerable<ICommand> commands ) : base( provider, commands.Append( new ApplyExportedCommandsCommand<T>() ) ) {}
 	}
@@ -48,7 +48,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class Application : DragonSpark.Setup.Application<AutoData>, IApplication
 	{
-		public Application( IServiceProvider provider ) : this( provider, Default<ICommand>.Items ) {}
+		public Application( IServiceProvider provider ) : this( provider, Items<ICommand>.Default ) {}
 
 		public Application( IServiceProvider provider, IEnumerable<ICommand> commands ) : base( provider, MetadataCommand.Instance.Append( commands ) ) {}
 

@@ -29,7 +29,7 @@ namespace DragonSpark.TypeSystem
 		public bool Contains( Type attribute ) => defined( attribute );
 
 		[Freeze]
-		public Attribute[] GetAttributes( Type attributeType ) => defined( attributeType ) ? factory( attributeType ).Fixed() : Default<Attribute>.Items;
+		public Attribute[] GetAttributes( Type attributeType ) => defined( attributeType ) ? factory( attributeType ).Fixed() : Items<Attribute>.Default;
 	}
 
 	public class AssemblyAttributeProvider : AttributeProviderBase

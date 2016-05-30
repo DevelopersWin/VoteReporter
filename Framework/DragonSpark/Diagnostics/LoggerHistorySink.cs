@@ -3,14 +3,16 @@ using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using Serilog.Formatting.Display;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DragonSpark.Diagnostics
 {
-	// [ThreadAffine]
+	// [ThreadAffine()]
 	public class LoggerHistorySink : ILoggerHistory
 	{
 		// [Reference]
@@ -19,16 +21,50 @@ namespace DragonSpark.Diagnostics
 		// [Reference]
 		readonly IReadOnlyCollection<LogEvent> events;
 
+		int threadId;
+		int? taskId;
+
 		public LoggerHistorySink()
 		{
+			threadId = Environment.CurrentManagedThreadId;
+			taskId = Task.CurrentId;
+
 			events = new ReadOnlyCollection<LogEvent>( source );
 		}
 
 		public void Clear() => source.Clear();
 
-		public IEnumerable<LogEvent> Events => events;
+		public IEnumerable<LogEvent> Events
+		{
+			get
+			{
+				/*if ( Environment.CurrentManagedThreadId != threadId )
+				{
+					throw new InvalidOperationException( $"WTF! {taskId} - {Task.CurrentId} - {SynchronizationContext.Current}" );
+				}*/
 
-		public virtual void Emit( [Required]LogEvent logEvent ) => source.Ensure( logEvent );
+				return events;
+			}
+		}
+
+		public virtual void Emit( [Required]LogEvent logEvent )
+		{
+			if ( Environment.CurrentManagedThreadId != threadId )
+			{
+				throw new InvalidOperationException( $"WTF! {taskId} - {Task.CurrentId}" );
+			}
+
+			if ( logEvent == null )
+			{
+				throw new InvalidOperationException( "WTF!" );
+			}
+			source.Ensure( logEvent );
+
+			if ( source.Any( @e => e == null ) )
+			{
+				throw new InvalidOperationException( "WTF!" );
+			}
+		}
 	}
 
 	public class LogEventTextFactory : FactoryBase<LogEvent, string>

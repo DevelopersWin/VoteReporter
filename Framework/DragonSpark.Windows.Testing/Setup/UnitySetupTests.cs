@@ -27,7 +27,7 @@ namespace DragonSpark.Windows.Testing.Setup
 				var temp = container.GetExport<ConfigureServiceLocationContext>();
 			}
 			/*var currentMethod = (MethodInfo)MethodBase.GetCurrentMethod();
-			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( currentMethod ) ) )
+			using ( new InitializeMethodCommand().ExecuteWith( MethodContext.Get( currentMethod ) ) )
 			{
 				var autoData = new AutoData( FixtureFactory.Instance.Create(), currentMethod );
 				using ( new AssignAutoDataCommand().ExecuteWith( autoData ) )
@@ -38,7 +38,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			}#1#
 
 			/*var currentMethod = (MethodInfo)MethodBase.GetCurrentMethod();
-			using ( new AssignExecutionContextCommand().ExecuteWith( MethodContext.Get( currentMethod ) ) )
+			using ( new InitializeMethodCommand().ExecuteWith( MethodContext.Get( currentMethod ) ) )
 			{
 				using ( var container = CompositionHostFactory.Instance.Create( AssemblyProvider.Instance.Create() ) )
 				{

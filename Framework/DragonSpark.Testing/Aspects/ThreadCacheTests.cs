@@ -12,7 +12,7 @@ namespace DragonSpark.Testing.Aspects
 	{
 		readonly static object Context = new object();
 
-		static AmbientStack<ThreadCache> Cache { get; } = new AmbientStack<ThreadCache>( Context.Self );
+		static AmbientStack<ThreadCache> Stack { get; } = new AmbientStack<ThreadCache>( Context.Self );
 
 		[Theory, AutoData]
 		void SinglePoint( CachedClass sut )
@@ -24,9 +24,9 @@ namespace DragonSpark.Testing.Aspects
 
 			var cache = new ThreadCache( dictionary );
 
-			Assert.Empty( Cache.Value.All() );
+			Assert.Empty( Stack.Value.All() );
 
-			using ( new ThreadCacheContext( cache.Self, Cache ) )
+			using ( new ThreadCacheContext( cache.Self, Stack ) )
 			{
 				Assert.Equal( 3, sut.Call() );
 				Assert.Equal( 3, sut.Call() );
@@ -37,7 +37,7 @@ namespace DragonSpark.Testing.Aspects
 					Assert.Equal( 5, sut.Call() );
 
 					var inner = new Dictionary<CacheEntry, object>();
-					using ( new ThreadCacheContext( new ThreadCache( inner ).Self, Cache ) )
+					using ( new ThreadCacheContext( new ThreadCache( inner ).Self, Stack ) )
 					{
 						Assert.Equal( 6, sut.Call() );
 						Assert.Equal( 6, sut.Call() );
@@ -50,12 +50,24 @@ namespace DragonSpark.Testing.Aspects
 					Assert.Equal( 8, sut.Call() );
 
 				} ).Wait();
+
+				Assert.Single( Stack.Value.All() );
+
+				using ( new ThreadCacheContext( cache.Self, Stack ) )
+				{
+					Assert.Equal( 3, sut.Call() );
+					Assert.Equal( 3, sut.Call() );
+					Assert.Single( Stack.Value.All() );
+				}
+
+				Assert.Single( Stack.Value.All() );
+
 				Assert.Equal( 3, sut.Call() );
 				Assert.Equal( 3, sut.Call() );
 				Assert.NotEmpty( dictionary );
 			}
 
-			Assert.Empty( Cache.Value.All() );
+			Assert.Empty( Stack.Value.All() );
 			Assert.Empty( dictionary );
 
 			Assert.Equal( 9, sut.Call() );
@@ -73,7 +85,7 @@ namespace DragonSpark.Testing.Aspects
 
 		public class ThreadCacheAttribute : DragonSpark.Aspects.ThreadCacheAttribute
 		{
-			public ThreadCacheAttribute() : base( Cache ) {}
+			public ThreadCacheAttribute() : base( Stack ) {}
 		}
 	}
 }

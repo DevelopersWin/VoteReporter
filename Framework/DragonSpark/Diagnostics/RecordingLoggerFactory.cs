@@ -118,7 +118,7 @@ namespace DragonSpark.Diagnostics
 
 	public class RecordingLoggerFactory : LoggerFactory
 	{
-		public RecordingLoggerFactory() : this( Default<ITransformer<LoggerConfiguration>>.Items ) {}
+		public RecordingLoggerFactory() : this( Items<ITransformer<LoggerConfiguration>>.Default ) {}
 
 		public RecordingLoggerFactory( params ITransformer<LoggerConfiguration>[] transformers ) : this( new LoggerHistorySink(), transformers ) {}
 

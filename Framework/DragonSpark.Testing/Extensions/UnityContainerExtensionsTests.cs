@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
@@ -12,7 +13,6 @@ using System;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Properties;
 using Xunit;
 using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
@@ -44,7 +44,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Same( provider.Get<LoggingLevelSwitch>(), provider.Get<LoggingLevelSwitch>() );
 			Assert.Same( sut.Resolve<ISingletonLocator>(), sut.Resolve<ISingletonLocator>() );
 			Assert.Same( sink, provider.Get<LoggerHistorySink>() );
-			Assert.Same( Default<Assembly>.Items, sut.Resolve<Assembly[]>() );
+			Assert.Same( Items<Assembly>.Default, sut.Resolve<Assembly[]>() );
 		}
 
 		[Export]

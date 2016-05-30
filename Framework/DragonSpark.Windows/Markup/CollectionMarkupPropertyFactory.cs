@@ -53,7 +53,7 @@ namespace DragonSpark.Windows.Markup
 		}
 
 		public override PropertyReference Create( IServiceProvider parameter ) => 
-			parameter.Get<IXamlNameResolver>().With( resolver => resolver.GetFixupToken( Default<string>.Items ).With( Create ) );
+			parameter.Get<IXamlNameResolver>().With( resolver => resolver.GetFixupToken( Items<string>.Default ).With( Create ) );
 
 		PropertyReference Create( object token )
 		{

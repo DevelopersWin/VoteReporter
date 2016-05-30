@@ -9,7 +9,7 @@ namespace DragonSpark.Windows.Setup
 	{
 		public ConsoleApplication( IServiceProvider provider ) : base( provider ) {}
 
-		public ConsoleApplication() : base( Default<ICommand>.Items ) {}
+		public ConsoleApplication() : base( Items<ICommand>.Default ) {}
 
 		public ConsoleApplication( params ICommand[] commands ) : base( commands ) {}
 	}
