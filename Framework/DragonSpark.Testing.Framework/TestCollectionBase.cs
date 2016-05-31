@@ -3,6 +3,7 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
@@ -11,11 +12,31 @@ using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using Serilog.Core;
 using System;
+using System.Reactive.Threading.Tasks;
 using System.Reflection;
+using System.Threading.Tasks;
 using Xunit.Abstractions;
+using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
 
 namespace DragonSpark.Testing.Framework
 {
+	public static class Defer
+	{
+		public static Task Run( Action action, object context )
+		{
+			var task = context as Task;
+			if ( task != null )
+			{
+				var continueWith = task.ContinueWith( t => action() );
+				// continueWith.ConfigureAwait( false );
+				return continueWith;
+				// task.ToObservable().Subscribe( unit => action() );
+			}
+			action();
+			return null;
+		}
+	}
+
 	[Serializable, LinesOfCodeAvoided( 8 )]
 	public sealed class ExecuteMethodAspect : MethodInterceptionAspect
 	{
@@ -23,7 +44,19 @@ namespace DragonSpark.Testing.Framework
 
 		ExecuteMethodAspect() {}
 
-		public override void OnInvoke( MethodInterceptionArgs args ) => new ApplicationOutputCommand().Run( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
+		public override void OnInvoke( MethodInterceptionArgs args )
+		{
+			ExecutionContext.Instance.Verify(); // TODO: Remove.
+			new ApplicationOutputCommand().Run( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
+
+			args.ReturnValue = 
+
+			Defer.Run( () =>
+					   {
+						   ExecutionContext.Instance.Verify(); // TODO: Remove.
+						   ExecutionContext.Instance.Value.Dispose();
+					   }, args.ReturnValue );
+		}
 	}
 
 	public class ApplicationOutputCommand : OutputCommand
@@ -45,7 +78,7 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class InitializeMethodCommand : DisposingCommand<MethodBase>
+	public class InitializeMethodCommand : AssignValueCommand<MethodBase>
 	{
 		readonly Action complete;
 		readonly Action<Assembly> initialize;
@@ -54,17 +87,23 @@ namespace DragonSpark.Testing.Framework
 
 		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Instance.Run, complete ) {}
 
-		public InitializeMethodCommand( Action<Assembly> initialize, Action complete )
+		public InitializeMethodCommand( Action<Assembly> initialize, Action complete ) : this( ExecutionContext.Instance.Value, initialize, complete ) {}
+
+		InitializeMethodCommand( IWritableStore<MethodBase> store, Action<Assembly> initialize, Action complete ) : base( store )
 		{
 			this.initialize = initialize;
 			this.complete = complete;
 		}
 
-		public override void Execute( MethodBase parameter ) => initialize( parameter.DeclaringType.Assembly );
+		public override void Execute( MethodBase parameter )
+		{
+			initialize( parameter.DeclaringType.Assembly );
+			base.Execute( parameter );
+		}
 
 		protected override void OnDispose()
 		{
-			base.OnDispose();
+			// base.OnDispose();
 			complete();
 		}
 	}

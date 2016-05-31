@@ -54,7 +54,7 @@ namespace DragonSpark.Aspects
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer), AspectPriority = -1 )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
-	public class ThreadCacheEntryPoint : OnMethodBoundaryAspect
+	public sealed class ThreadCacheEntryPoint : OnMethodBoundaryAspect
 	{
 		public override void OnEntry( MethodExecutionArgs args ) => args.MethodExecutionTag = new ThreadCacheContext();
 
@@ -77,7 +77,7 @@ namespace DragonSpark.Aspects
 			this.current = current;
 		}
 		
-		public override void OnInvoke( MethodInterceptionArgs args )
+		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
 			var item = GetValue( args );
 			if ( item != null )

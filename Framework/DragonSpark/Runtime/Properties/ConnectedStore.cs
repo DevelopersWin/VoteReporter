@@ -183,7 +183,7 @@ namespace DragonSpark.Runtime.Properties
 					{
 						empty.Clear();
 						owner.Clear( instance );
-						// store.Dispose();
+						store.Dispose();
 					}
 				}
 
@@ -200,11 +200,7 @@ namespace DragonSpark.Runtime.Properties
 
 	public class ThreadLocalStore<T> : WritableStore<T>
 	{
-		// readonly ConditionMonitor monitor = new ConditionMonitor();
-
 		readonly ThreadLocal<T> local;
-
-		// int threads;
 
 		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
 
@@ -213,31 +209,12 @@ namespace DragonSpark.Runtime.Properties
 			this.local = local;
 		}
 
-		public override void Assign( T item )
-		{
-			/*var update = !item.IsNull() ? threads | Environment.CurrentManagedThreadId : threads & ~Environment.CurrentManagedThreadId;
-			Interlocked.Exchange( ref threads, update );*/
-			local.Value = item;
-		}
+		public override void Assign( T item ) => local.Value = item;
 
-		protected override T Get()
-		{
-			/*if ( !local.IsValueCreated )
-			{
-				Interlocked.Exchange( ref threads, threads | Environment.CurrentManagedThreadId );
-			}*/
-			return local.Value;
-		}
-
-		// public bool IsDisposed => monitor.IsApplied;
+		protected override T Get() => local.Value;
 
 		protected override void OnDispose()
 		{
-			/*Interlocked.Exchange( ref threads, threads & ~Environment.CurrentManagedThreadId );
-			if ( monitor.ApplyIf( threads == 0 ) )
-			{
-				local.Dispose();
-			}*/
 			local.Dispose();
 			
 			base.OnDispose();

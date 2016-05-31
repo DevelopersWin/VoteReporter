@@ -1,4 +1,5 @@
 using System.Threading;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Windows.Runtime
@@ -7,8 +8,7 @@ namespace DragonSpark.Windows.Runtime
 	{
 		readonly AsyncLocal<T> local;
 
-		public TaskLocalStore() : this( new AsyncLocal<T>() )
-		{}
+		public TaskLocalStore() : this( new AsyncLocal<T>() ) {}
 
 		public TaskLocalStore( AsyncLocal<T> local )
 		{
@@ -21,5 +21,11 @@ namespace DragonSpark.Windows.Runtime
 		}
 
 		protected override T Get() => local.Value;
+
+		protected override void OnDispose()
+		{
+			local.Value?.TryDispose();
+			local.Value = default(T);
+		}
 	}
 }

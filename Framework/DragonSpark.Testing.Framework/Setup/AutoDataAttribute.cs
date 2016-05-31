@@ -18,8 +18,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit.Sdk;
 using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 
@@ -43,13 +41,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
-			/*var one = TaskScheduler.Current.Id;
-			var two = TaskScheduler.Default.Id;
-			var thr = Task.CurrentId;
-			var fou = SynchronizationContext.Current;
-			var fiv = System.Threading.ExecutionContext.IsFlowSuppressed();
-			var current = ExecutionContext.Instance.temp.Value;*/
-
+			ExecutionContext.Instance.Verify(); // TODO: Remove.
 			var autoData = new AutoData( Fixture, methodUnderTest );
 			using ( context( autoData ) )
 			{
@@ -161,6 +153,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override void Before( MethodInfo methodUnderTest )
 		{
+			ExecutionContext.Instance.Verify(); // TODO: Remove.
 			using ( new InitializeMethodCommand().AsExecuted( methodUnderTest ) )
 			{
 				Services.Get<LoggingLevelSwitch>().MinimumLevel = level;

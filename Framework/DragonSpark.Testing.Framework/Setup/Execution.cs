@@ -1,74 +1,164 @@
 using DragonSpark.Activation;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.Windows.Runtime;
+using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Runtime.Remoting.Messaging;
+using System.Collections.Immutable;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Xunit.Sdk;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class ExecutionContext : StoreBase<object>, IExecutionContext
+	public interface ITaskExecutionContext : IWritableStore<MethodBase>, IDisposable
+	{
+		TaskContext Id { get; }
+
+		void Add( TaskContext context );
+
+		void Remove( TaskContext context );
+
+		bool Contains( TaskContext context );
+	}
+
+	public class ExecutionContext : TaskLocalStore<ITaskExecutionContext>, IExecutionContext
 	{
 		public static ExecutionContext Instance { get; } = new ExecutionContext();
 
-		readonly ConcurrentDictionary<int, TaskExecutionContext> items = new ConcurrentDictionary<int, TaskExecutionContext>();
+		readonly ConcurrentDictionary<TaskContext, ITaskExecutionContext> contexts = new ConcurrentDictionary<TaskContext, ITaskExecutionContext>();
 
-		public int count;
+		ExecutionContext() : base( new Factory().Value ) {}
 
-
-
-		public AsyncLocal<TaskExecutionContext> temp;
-		public ExecutionContext()
+		public void Verify()
 		{
-			temp = new AsyncLocal<TaskExecutionContext>( OnChange );
-		}
-
-		void OnChange( AsyncLocalValueChangedArgs<TaskExecutionContext> obj )
-		{
-			var one = TaskScheduler.Current.Id;
-			var two = TaskScheduler.Default.Id;
-			var thr = Task.CurrentId;
-			var fou = SynchronizationContext.Current;
-			var fiv = System.Threading.ExecutionContext.IsFlowSuppressed();
-		}
-
-		protected override object Get()
-		{
-			var one = TaskScheduler.Current.Id;
-			var two = TaskScheduler.Default.Id;
-			var thr = Task.CurrentId;
-			var fou = SynchronizationContext.Current;
-			var fiv = System.Threading.ExecutionContext.IsFlowSuppressed();
-			/*var current = temp.Value;
-			if ( current == null )
+			var current = TaskContext.Current();
+			if ( !Value.Contains( current ) )
 			{
+				throw new InvalidOperationException( $@"'{Value}' does not contain '{current}'" );
+			}
+		}
 
-				temp.Value = count++;
-			}*/
-			
-			
-			// var tasked = SynchronizationContext.Current != null || TaskScheduler.Current.Id != TaskScheduler.Default.Id;
-			 
-			var result = temp.Value = /*tasked && Task.CurrentId.HasValue*/ /*SynchronizationContext.Current is AsyncTestSyncContext &&*/ Task.CurrentId.HasValue ? items.GetOrAdd( Task.CurrentId.Value, i => new TaskExecutionContext( i ) ) : TaskExecutionContext.Default;
-			// Assign( result );
+		protected override ITaskExecutionContext Get() => base.Get() ?? Create();
+
+		ITaskExecutionContext Create()
+		{
+			var result = contexts.GetOrAdd( TaskContext.Current(), context => new TaskExecutionContext( context, OnRemove ).Configured( false ) );
+			Assign( result );
 			return result;
 		}
 
-		[DebuggerDisplay( "TaskExecutionContext: {TaskId}" )]
-		public class TaskExecutionContext : IExecutionContext
+		void OnRemove( TaskExecutionContext context )
 		{
-			public static TaskExecutionContext Default { get; } = new TaskExecutionContext();
+			ITaskExecutionContext removed;
+			contexts.TryRemove( context.Id, out removed );
+		}
 
-			public TaskExecutionContext( int? taskId = null )
+		class Factory : StoreBase<AsyncLocal<ITaskExecutionContext>>
+		{
+			readonly AsyncLocal<ITaskExecutionContext> store;
+
+			public Factory()
 			{
-				TaskId = taskId;
+				store = new AsyncLocal<ITaskExecutionContext>( OnChange );
 			}
 
-			int? TaskId { get; }
+			static void OnChange( AsyncLocalValueChangedArgs<ITaskExecutionContext> arguments )
+			{
+				if ( arguments.ThreadContextChanged /*&& Task.CurrentId.HasValue*/ )
+				{
+					if ( arguments.PreviousValue == null ) // new task
+					{
+						arguments.CurrentValue?.Add( TaskContext.Current() );
+					}
+					else if ( arguments.CurrentValue == null )
+					{
+						arguments.PreviousValue?.Remove( TaskContext.Current() );
+					}
+				}
+			}
 
-			object IStore.Value => TaskId;
+			protected override AsyncLocal<ITaskExecutionContext> Get() => store;
 		}
+
+		// [DebuggerDisplay]
+		internal class TaskExecutionContext : FixedStore<MethodBase>, ITaskExecutionContext
+		{
+			readonly Action<TaskExecutionContext> onDispose;
+			readonly ConcurrentDictionary<TaskContext, bool> children = new ConcurrentDictionary<TaskContext, bool>();
+
+			//static void Update( TaskExecutionContext context ) => context.Id = TaskContext.Current();
+
+			// public TaskExecutionContext() : this( TaskContext.Current() ) {}
+
+			public TaskExecutionContext( TaskContext id, Action<TaskExecutionContext> onDispose )
+			{
+				Id = id;
+				this.onDispose = onDispose;
+			}
+
+			public TaskContext Id { get; }
+
+			public void Add( TaskContext context )
+			{
+				if ( Contains( context ) )
+				{
+					throw new InvalidOperationException( $"{this} already contains {context}." );
+				}
+
+				children.TryAdd( context, true );
+			}
+
+			public void Remove( TaskContext context )
+			{
+				bool result;
+				if ( Id != context && !children.TryRemove( context, out result ) )
+				{
+					throw new InvalidOperationException( $@"The provided context '{context}' was not found in root context '{this}'" );
+				}
+			}
+
+			public bool Contains( TaskContext context ) => Id == context || children.ContainsKey( context );
+
+			public override string ToString() => $"{Id} ({Value})";
+
+			protected override void OnDispose()
+			{
+				Assign( null );
+				onDispose( this );
+			}
+		}
+	}
+
+	public struct TaskContext : IEquatable<TaskContext>
+	{
+		public static TaskContext Current() => new TaskContext( Environment.CurrentManagedThreadId, Task.CurrentId );
+
+		readonly int threadId;
+		readonly int? taskId;
+
+		public TaskContext( int threadId, int? taskId = null )
+		{
+			this.threadId = threadId;
+			this.taskId = taskId;
+		}
+
+		public override string ToString() => $"Task {taskId} on thread {threadId}";
+
+		public bool Equals( TaskContext other ) => taskId == other.taskId && threadId == other.threadId;
+
+		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is TaskContext && Equals( (TaskContext)obj ) );
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return ( taskId.GetHashCode() * 397 ) ^ threadId;
+			}
+		}
+
+		public static bool operator ==( TaskContext left, TaskContext right ) => left.Equals( right );
+
+		public static bool operator !=( TaskContext left, TaskContext right ) => !left.Equals( right );
 	}
 }

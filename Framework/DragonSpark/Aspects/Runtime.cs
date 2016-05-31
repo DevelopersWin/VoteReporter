@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
@@ -8,14 +9,13 @@ using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
 using PostSharp.Serialization;
 using System;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Aspects
 {
-	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	[OnMethodBoundaryAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class SpecificationBasedAspect : MethodInterceptionAspect
+	public abstract class SpecificationBasedAspect : OnMethodBoundaryAspect
 	{
 		readonly ISpecification specification;
 
@@ -24,17 +24,15 @@ namespace DragonSpark.Aspects
 			this.specification = specification;
 		}
 
-		public sealed override void OnInvoke( MethodInterceptionArgs args )
+		public sealed override void OnEntry( MethodExecutionArgs args )
 		{
-			if ( specification.IsSatisfiedBy( args.Instance ?? args.Method.DeclaringType ) )
-			{
-				base.OnInvoke( args );
-			}
+			args.FlowBehavior = specification.IsSatisfiedBy( args.Instance ?? args.Method.DeclaringType ) ? FlowBehavior.Continue : FlowBehavior.Return;
+			base.OnEntry( args );
 		}
 	}
 
 	// [OnMethodBoundaryAspectConfiguration( AspectPriority = (int)Priority.Highest )]
-	[PSerializable, ProvideAspectRole( "Data" ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
+	[PSerializable, ProvideAspectRole( "Critical Data" ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
 	public sealed class AssemblyInitializeAttribute : OnMethodBoundaryAspect
 	{
