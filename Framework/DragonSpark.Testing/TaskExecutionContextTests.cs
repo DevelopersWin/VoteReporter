@@ -116,26 +116,8 @@ namespace DragonSpark.Testing
 
 	class Wrapper : BeforeAfterTestAttribute
 	{
-		readonly bool expectedToVerify;
-
-		public Wrapper( bool expectedToVerify = true )
-		{
-			this.expectedToVerify = expectedToVerify;
-		}
-
 		public override void Before( MethodInfo methodUnderTest ) => ExecutionContext.Instance.Verify();
 
-		public override void After( MethodInfo methodUnderTest )
-		{
-			var action = new Action( ExecutionContext.Instance.Verify );
-			if ( expectedToVerify )
-			{
-				action();
-			}
-			else
-			{
-				Assert.Throws<InvalidOperationException>( action );
-			}
-		}
+		public override void After( MethodInfo methodUnderTest ) => ExecutionContext.Instance.Verify();
 	}
 }

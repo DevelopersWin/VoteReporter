@@ -12,7 +12,6 @@ using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using Serilog.Core;
 using System;
-using System.Reactive.Threading.Tasks;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit.Abstractions;

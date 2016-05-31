@@ -10,16 +10,18 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using PostSharp.Patterns.Model;
+using PostSharp.Patterns.Threading;
 
 namespace DragonSpark.Diagnostics
 {
-	// [ThreadAffine()]
+	[ThreadUnsafe]
 	public class LoggerHistorySink : ILoggerHistory
 	{
-		// [Reference]
+		[Reference]
 		readonly IList<LogEvent> source = new Collection<LogEvent>();
 
-		// [Reference]
+		[Reference]
 		readonly IReadOnlyCollection<LogEvent> events;
 
 		int threadId;
@@ -39,10 +41,10 @@ namespace DragonSpark.Diagnostics
 		{
 			get
 			{
-				if ( Environment.CurrentManagedThreadId != threadId )
+				/*if ( Environment.CurrentManagedThreadId != threadId )
 				{
 					throw new InvalidOperationException( $"WTF! {taskId} - {Task.CurrentId} - {SynchronizationContext.Current}" );
-				}
+				}*/
 
 				return events;
 			}
@@ -50,10 +52,10 @@ namespace DragonSpark.Diagnostics
 
 		public virtual void Emit( [Required]LogEvent logEvent )
 		{
-			if ( Environment.CurrentManagedThreadId != threadId )
+			/*if ( Environment.CurrentManagedThreadId != threadId )
 			{
 				throw new InvalidOperationException( $"WTF! {taskId} - {Task.CurrentId}" );
-			}
+			}*/
 
 			if ( logEvent == null )
 			{

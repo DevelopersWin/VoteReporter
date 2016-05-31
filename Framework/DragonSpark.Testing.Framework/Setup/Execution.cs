@@ -4,10 +4,11 @@ using DragonSpark.Runtime.Stores;
 using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -15,9 +16,9 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		TaskContext Id { get; }
 
-		void Add( TaskContext context );
+		void Attach( TaskContext context );
 
-		void Remove( TaskContext context );
+		void Detach( TaskContext context );
 
 		bool Contains( TaskContext context );
 	}
@@ -44,6 +45,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		ITaskExecutionContext Create()
 		{
 			var result = contexts.GetOrAdd( TaskContext.Current(), context => new TaskExecutionContext( context, OnRemove ).Configured( false ) );
+			// Debug.WriteLine( $"Assigned: {result.Id} ({SynchronizationContext.Current})" );
 			Assign( result );
 			return result;
 		}
@@ -65,15 +67,21 @@ namespace DragonSpark.Testing.Framework.Setup
 
 			static void OnChange( AsyncLocalValueChangedArgs<ITaskExecutionContext> arguments )
 			{
-				if ( arguments.ThreadContextChanged /*&& Task.CurrentId.HasValue*/ )
+				if ( arguments.ThreadContextChanged )
 				{
-					if ( arguments.PreviousValue == null ) // new task
+					var current = TaskContext.Current();
+
+					var item = arguments.CurrentValue ?? arguments.PreviousValue;
+					if ( item.Id != current )
 					{
-						arguments.CurrentValue?.Add( TaskContext.Current() );
-					}
-					else if ( arguments.CurrentValue == null )
-					{
-						arguments.PreviousValue?.Remove( TaskContext.Current() );
+						if ( arguments.PreviousValue == null )
+						{
+							arguments.CurrentValue?.Attach( current );
+						}
+						else if ( arguments.CurrentValue == null )
+						{
+							arguments.PreviousValue?.Detach( current );
+						}
 					}
 				}
 			}
@@ -84,6 +92,8 @@ namespace DragonSpark.Testing.Framework.Setup
 		// [DebuggerDisplay]
 		internal class TaskExecutionContext : FixedStore<MethodBase>, ITaskExecutionContext
 		{
+			// public static TaskExecutionContext Instance { get; } = new TaskExecutionContext( TaskContext.None, Delegates<TaskExecutionContext>.Empty );
+
 			readonly Action<TaskExecutionContext> onDispose;
 			readonly ConcurrentDictionary<TaskContext, bool> children = new ConcurrentDictionary<TaskContext, bool>();
 
@@ -95,24 +105,28 @@ namespace DragonSpark.Testing.Framework.Setup
 			{
 				Id = id;
 				this.onDispose = onDispose;
+				// Debug.WriteLine( $"Creating {Id} ({SynchronizationContext.Current})" );
 			}
 
 			public TaskContext Id { get; }
 
-			public void Add( TaskContext context )
+			public void Attach( TaskContext context )
 			{
-				if ( Contains( context ) )
+				if ( children.ContainsKey( context ) )
 				{
 					throw new InvalidOperationException( $"{this} already contains {context}." );
 				}
 
+				// Debug.WriteLine( $"Attaching {context} to {Id} ({SynchronizationContext.Current})" );
 				children.TryAdd( context, true );
 			}
 
-			public void Remove( TaskContext context )
+			public void Detach( TaskContext context )
 			{
+				// Debug.WriteLine( $"Detaching {context} from {Id} ({SynchronizationContext.Current})" );
+
 				bool result;
-				if ( Id != context && !children.TryRemove( context, out result ) )
+				if ( !children.TryRemove( context, out result ) )
 				{
 					throw new InvalidOperationException( $@"The provided context '{context}' was not found in root context '{this}'" );
 				}
@@ -132,6 +146,8 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public struct TaskContext : IEquatable<TaskContext>
 	{
+		public static TaskContext None { get; } = new TaskContext();
+
 		public static TaskContext Current() => new TaskContext( Environment.CurrentManagedThreadId, Task.CurrentId );
 
 		readonly int threadId;
