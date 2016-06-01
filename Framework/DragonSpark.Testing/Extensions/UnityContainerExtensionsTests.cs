@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Extensions
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
 			var creator = sut.Get( Creator.Property );
-			Assert.IsType<UnityContainerFactory>( creator );
+			Assert.IsType<UnityContainerCoreFactory>( creator );
 
 			var provider = sut.Resolve<IServiceProvider>();
 			var sink = provider.Get<LoggerHistorySink>();

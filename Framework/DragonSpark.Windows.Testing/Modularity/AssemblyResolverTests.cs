@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
-	[Trait( Traits.Category, Traits.Categories.Modularity )]
+	[Trait( Traits.Category, Traits.Categories.FileSystem )]
 	public class AssemblyResolverTests : TestCollectionBase
 	{
 		const string ModulesDirectory1 = @".\DynamicModules\MocksModulesAssemblyResolve";

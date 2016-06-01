@@ -1,5 +1,4 @@
-﻿using DragonSpark.Aspects;
-using Microsoft.Practices.Unity;
+﻿using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 
@@ -12,12 +11,6 @@ namespace DragonSpark.Activation.IoC
 					new ServicesConfigurator( provider ).Create,
 					DefaultUnityExtensions.Instance.Create
 				) {}
-
-		[Creator]
-		public override IUnityContainer Create()
-		{
-			return base.Create();
-		}
 	}
 
 	/*public class DefaultUnityContainerFactory : AggregateFactory<IUnityContainer>

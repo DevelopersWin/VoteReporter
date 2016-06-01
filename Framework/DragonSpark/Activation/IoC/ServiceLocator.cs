@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Aspects;
+using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
 using Microsoft.Practices.ObjectBuilder2;
@@ -87,6 +88,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static UnityContainerCoreFactory Instance { get; } = new UnityContainerCoreFactory();
 
+		[Creator]
 		public override IUnityContainer Create() => new UnityContainer().Extend<DefaultBehaviorExtension>();
 	}
 

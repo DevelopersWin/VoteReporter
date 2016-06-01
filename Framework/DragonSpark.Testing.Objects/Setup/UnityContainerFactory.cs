@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using System;
-using DragonSpark.Setup;
 
 namespace DragonSpark.Testing.Objects.Setup
 {

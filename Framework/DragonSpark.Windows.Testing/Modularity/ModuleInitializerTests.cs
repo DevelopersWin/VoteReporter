@@ -1,15 +1,13 @@
+using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Testing.TestObjects.Modules;
-using Microsoft.Practices.ServiceLocation;
 using Moq;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using DragonSpark.Activation;
-using DragonSpark.Testing.Framework;
-using Serilog.Core;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
@@ -17,7 +15,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 	/// <summary>
 	/// Summary description for ModuleInitializerTests
 	/// </summary>
-	[Trait( Traits.Category, Traits.Categories.Modularity )]
+	[Trait( Traits.Category, Traits.Categories.FileSystem )]
 	public class ModuleInitializerTests
 	{
 		/*[Fact]

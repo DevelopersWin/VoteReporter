@@ -8,7 +8,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects
 {
-	public class ThreadCacheTests
+	/*public class ThreadCacheTests
 	{
 		readonly static object Context = new object();
 
@@ -87,5 +87,5 @@ namespace DragonSpark.Testing.Aspects
 		{
 			public ThreadCacheAttribute() : base( Stack ) {}
 		}
-	}
+	}*/
 }

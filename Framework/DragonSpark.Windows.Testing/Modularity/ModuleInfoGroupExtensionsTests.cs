@@ -9,7 +9,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 	/// <summary>
 	/// Summary description for ModuleInfoGroupExtensionsTests
 	/// </summary>
-	[Trait( Traits.Category, Traits.Categories.Modularity )]
+	[Trait( Traits.Category, Traits.Categories.FileSystem )]
 	public class ModuleInfoGroupExtensionsTests
 	{
 		[Fact]

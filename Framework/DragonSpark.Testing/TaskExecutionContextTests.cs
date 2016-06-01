@@ -9,7 +9,7 @@ using Xunit.Sdk;
 
 namespace DragonSpark.Testing
 {
-	public class TaskExecutionContextTests : TestCollectionBase
+	/*public class TaskExecutionContextTests : TestCollectionBase
 	{
 		public TaskExecutionContextTests( ITestOutputHelper output ) : base( output ) {}
 
@@ -19,7 +19,7 @@ namespace DragonSpark.Testing
 			if ( ExecutionContext.Instance.Value.Id != current )
 			{
 				throw new System.InvalidOperationException( $@"'{ExecutionContext.Instance.Value}' does not contain '{current}'" );
-			}*/
+			}#1#
 
 			if ( method != null && ExecutionContext.Instance.Value.Value != method )
 			{
@@ -59,7 +59,7 @@ namespace DragonSpark.Testing
 			Assert.Equal( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
 			Assert.NotNull( ExecutionContext.Instance.Value.Value );
 			Assert.Equal( method, ExecutionContext.Instance.Value.Value );
-		}*/
+		}#1#
 	}
 
 	// ReSharper disable once TestClassNameDoesNotMatchFileNameWarning
@@ -127,7 +127,7 @@ namespace DragonSpark.Testing
 								Assert.NotNull( ExecutionContext.Instance.Value.Value );
 								Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 							 } );
-		}*/
+		}#1#
 	}
 
 	class ExecutionContextAutoData : AutoDataAttribute
@@ -138,7 +138,7 @@ namespace DragonSpark.Testing
 			TaskExecutionContextTests.Verify( methodUnderTest );
 			return enumerable;
 		}
-	}
+	}*/
 
 	/*class Wrapper : BeforeAfterTestAttribute
 	{

@@ -1,15 +1,13 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Activation
 {
@@ -89,7 +87,7 @@ namespace DragonSpark.Activation
 	}
 
 	[FactoryParameterValidator, GenericFactoryParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract, AttributeTargetExternalTypeAttributes = MulticastAttributes.NonAbstract )]
-	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
+	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>, IValidationAware
 	{
 		readonly ICoercer<TParameter> coercer;
 		readonly ISpecification<TParameter> specification;
@@ -107,12 +105,18 @@ namespace DragonSpark.Activation
 	
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		object IFactoryWithParameter.Create( object parameter ) => coercer.Coerce( parameter ).With( Create );
+		object IFactoryWithParameter.Create( object parameter )
+		{
+			var coerced = coercer.Coerce( parameter );
+			var result = !coerced.IsNull() ? Create( coerced ) : default(TResult);
+			return result;
+		}
 
 		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
-		// [Creator( AttributeInheritance =  MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract TResult Create( [Required]TParameter parameter );
+
+		bool IValidationAware.ShouldValidate() => specification != Specifications.Always && specification != Specifications<TParameter>.Always;
 	}
 
 	public class DelegatedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>

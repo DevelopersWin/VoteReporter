@@ -11,7 +11,7 @@ using InitializationMode = DragonSpark.Windows.Modularity.InitializationMode;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
-	[Trait( Traits.Category, Traits.Categories.Modularity )]
+	[Trait( Traits.Category, Traits.Categories.FileSystem )]
 	public class ModuleCatalogTests
 	{
 		[Fact]

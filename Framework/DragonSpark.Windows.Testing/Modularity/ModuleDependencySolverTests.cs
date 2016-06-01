@@ -6,7 +6,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
-	[Trait( Traits.Category, Traits.Categories.Modularity )]
+	[Trait( Traits.Category, Traits.Categories.FileSystem )]
 	public class ModuleDependencySolverTests
 	{
 		readonly ModuleDependencySolver solver = new ModuleDependencySolver();

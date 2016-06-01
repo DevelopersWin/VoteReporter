@@ -25,17 +25,21 @@ namespace DragonSpark.Activation
 			this.activatorSource = activatorSource;
 		}
 
-		public override object Create( ConstructTypeRequest parameter )
-		{
-			var result = LocateAndCreate( parameter ) ?? DefaultValueFactory.Instance.Create( parameter.RequestedType );
-			return result;
-		}
+		public override object Create( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? DefaultValueFactory.Instance.Create( parameter.RequestedType );
 
 		object LocateAndCreate( ConstructTypeRequest parameter )
 		{
 			var info = constructorSource( parameter );
-			var result = info.With( activatorSource ).With( activator => activator( Ensure( info.GetParameters(), parameter.Arguments ) ) );
-			return result;
+			if ( info != null )
+			{
+				var activator = activatorSource( info );
+				if ( activator != null )
+				{
+					var result = activator( Ensure( info.GetParameters(), parameter.Arguments ) );
+					return result;
+				}
+			}
+			return null;
 		}
 
 		static object[] Ensure( IEnumerable<ParameterInfo> parameters, IReadOnlyCollection<object> arguments )

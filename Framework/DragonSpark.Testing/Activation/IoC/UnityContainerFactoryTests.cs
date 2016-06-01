@@ -49,6 +49,24 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.Same( ClassFactory.Instance.Create(), resolved.First );
 		}
 
+		/*[Fact]
+		public void Caching()
+		{
+			var container = DefaultUnityContainerFactory.Instance.Create();
+			var first = container.Resolve<Item>();
+			var second = container.Resolve<Item>();
+			Debugger.Break();
+		}
+
+		class Item
+		{
+			readonly ClassFactory factory;
+			public Item( ClassFactory factory )
+			{
+				this.factory = factory;
+			}
+		}*/
+
 		class ClassFactory : FactoryBase<Class>
 		{
 			public static ClassFactory Instance { get; } = new ClassFactory();

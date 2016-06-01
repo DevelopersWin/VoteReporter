@@ -1,11 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -135,6 +131,8 @@ namespace DragonSpark.Testing.Runtime
 				CreateCalled++;
 				return 6776;
 			}
+
+			public bool ShouldValidate() => true;
 		}
 
 		[FactoryParameterValidator, GenericFactoryParameterValidator]
@@ -171,6 +169,8 @@ namespace DragonSpark.Testing.Runtime
 				CreateGenericCalled++;
 				return parameter + 123;
 			}
+
+			public bool ShouldValidate() => true;
 		}
 
 		class Command : CommandBase<int>

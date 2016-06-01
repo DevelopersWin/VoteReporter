@@ -216,25 +216,54 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindIsAllowed) )]
 		public void IsAllowed( MethodInterceptionArgs args )
 		{
-			var parameter = new RelayParameter( args, args.Arguments.Single() );
-			var state = WorkflowState.Property.Get( args.Instance );
-			var workflow = new ValidationInvocation<RelayInvocation>( state.Active, state.Valid, new RelayInvocation( parameter ) );
-			workflow.Invoke( parameter.Parameter );
+			var enabled = Enabled( args.Instance );
+			if ( enabled )
+			{
+				var parameter = new RelayParameter( args, args.Arguments.Single() );
+				var state = WorkflowState.Property.Get( args.Instance );
+				var workflow = new ValidationInvocation<RelayInvocation>( state.Active, state.Valid, new RelayInvocation( parameter ) );
+				workflow.Invoke( parameter.Parameter );
+			}
+			else
+			{
+				args.Proceed();
+			}
 		}
 
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
 		public void OnExecute( MethodInterceptionArgs args )
 		{
-			// using ( new ThreadCacheContext().Configured( false ) )
+			var enabled = Enabled( args.Instance );
+			if ( enabled )
 			{
-				var adapter = factory( args.Instance );
-				var state = WorkflowState.Property.Get( args.Instance );
-				var validation = new ValidationInvocation<AdapterInvocation>( state.Active, state.Valid, new AdapterInvocation( adapter ) );
-				var parameter = new RelayParameter( args, args.Arguments.Single() );
-				var invocation = new ParameterInvocation( state, validation, parameter );
-				invocation.Invoke( parameter.Parameter );
+				// using ( new ThreadCacheContext().Configured( false ) )
+				{
+					var adapter = factory( args.Instance );
+					var state = WorkflowState.Property.Get( args.Instance );
+					var validation = new ValidationInvocation<AdapterInvocation>( state.Active, state.Valid, new AdapterInvocation( adapter ) );
+					var parameter = new RelayParameter( args, args.Arguments.Single() );
+					var invocation = new ParameterInvocation( state, validation, parameter );
+					invocation.Invoke( parameter.Parameter );
+				}
 			}
+			else
+			{
+				args.Proceed();
+			}
+			
 		}
+
+		static bool Enabled( object instance )
+		{
+			var aware = instance as IValidationAware;
+			var result = aware == null || aware.ShouldValidate();
+			return result;
+		}
+	}
+
+	public interface IValidationAware
+	{
+		bool ShouldValidate();
 	}
 
 	public sealed class FactoryParameterValidator : ParameterValidatorBase

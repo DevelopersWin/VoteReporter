@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Runtime
 {
-	public interface ICommand<in TParameter> : ICommand
+	public interface ICommand<in TParameter> : ICommand, IValidationAware
 	{
 		bool CanExecute( TParameter parameter );
 
@@ -178,7 +178,7 @@ namespace DragonSpark.Runtime
 	}
 
 	[CommandParameterValidator, GenericCommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract )]
-	public abstract class CommandBase<T> : ICommand<T>
+	public abstract class CommandBase<T> : ICommand<T>, IValidationAware
 	{
 		public event EventHandler CanExecuteChanged = delegate { };
 		readonly ICoercer<T> coercer;
@@ -209,6 +209,8 @@ namespace DragonSpark.Runtime
 
 		// [AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract void Execute( T parameter );
+
+		bool IValidationAware.ShouldValidate() => specification != Specifications.Specifications.Always && specification != Specifications<T>.Always;
 	}
 
 }

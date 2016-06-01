@@ -6,7 +6,7 @@ using ModuleInfoBuilder = DragonSpark.Windows.Modularity.ModuleInfoBuilder;
 
 namespace DragonSpark.Windows.Testing.Modularity
 {
-	[Trait( Traits.Category, Traits.Categories.Modularity )]
+	[Trait( Traits.Category, Traits.Categories.FileSystem )]
 	public class DirectoryModuleInfoProviderTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
