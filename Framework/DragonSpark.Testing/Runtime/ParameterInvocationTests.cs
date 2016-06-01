@@ -1,7 +1,11 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -55,8 +59,8 @@ namespace DragonSpark.Testing.Runtime
 										var methodInfo = typeof(Mock).GetMethod( nameof(Mock.Hello) );
 										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
 										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
-										ExecutionContext.Instance.Verify(); // TODO: Remove.
-										ExecutionContext.Instance.Value.Dispose();
+										Framework.Setup.ExecutionContext.Instance.Verify(); // TODO: Remove.
+										Framework.Setup.ExecutionContext.Instance.Value.Dispose();
 									} );
 			Assert.True( result.IsCompleted );
 		}*/

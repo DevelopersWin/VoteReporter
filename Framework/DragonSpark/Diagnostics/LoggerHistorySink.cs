@@ -1,31 +1,24 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
-using PostSharp.Patterns.Threading;
 using Serilog.Events;
 using Serilog.Formatting.Display;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using PostSharp.Patterns.Model;
 
 namespace DragonSpark.Diagnostics
 {
-	[ReaderWriterSynchronized]
 	public class LoggerHistorySink : ILoggerHistory
 	{
-		[Reference]
-		readonly IList<LogEvent> source = new Collection<LogEvent>();
+		readonly ConcurrentStack<LogEvent> source = new ConcurrentStack<LogEvent>();
 
-		[Writer]
 		public void Clear() => source.Clear();
 
-		public ImmutableArray<LogEvent> Events => source.ToImmutableArray();
+		public IEnumerable<LogEvent> Events => source.ToArray().Reverse().ToArray();
 
-		[Writer]
-		public virtual void Emit( [Required]LogEvent logEvent ) => source.Ensure( logEvent );
+		public virtual void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
 	}
 
 	public class LogEventTextFactory : FactoryBase<LogEvent, string>
@@ -55,7 +48,7 @@ namespace DragonSpark.Diagnostics
 		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
 
 		public override string[] Create( IEnumerable<LogEvent> parameter ) => parameter
-			.OrderBy( line => line.Timestamp )
+			// .OrderBy( line => line.Timestamp )
 			.Select( LogEventTextFactory.Instance.Create )
 			.ToArray();
 	}

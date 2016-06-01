@@ -81,9 +81,14 @@ namespace DragonSpark.Extensions
 
 		public static TResult With<TItem, TResult>( this TItem target, Func<TItem, TResult> function, Func<TResult> defaultFunction = null )
 		{
-			var getDefault = defaultFunction ?? DefaultValueFactory<TResult>.Instance.Create;
+			var getDefault = defaultFunction ?? Defaults<TResult>.Default;
 			var result = target != null ? function( target ) : getDefault();
 			return result;
+		}
+
+		struct Defaults<T>
+		{
+			public static Func<T> Default { get; } = DefaultValueFactory<T>.Instance.Create;
 		}
 
 		public static TItem With<TItem>( this TItem @this, Action<TItem> action )

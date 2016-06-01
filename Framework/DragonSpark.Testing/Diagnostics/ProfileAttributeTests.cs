@@ -10,11 +10,12 @@ using System.Reflection;
 using System.Threading;
 using DragonSpark.Runtime.Properties;
 using Xunit;
+using Xunit.Abstractions;
 using Profile = DragonSpark.Diagnostics.Profile;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	public class ProfileAttributeTests
+	public class ProfileAttributeTests : TestCollectionBase
 	{
 		[Fact]
 		public void Logger()
@@ -87,7 +88,12 @@ namespace DragonSpark.Testing.Diagnostics
 				var messages = LogEventMessageFactory.Instance.Create( history.Events );
 				Assert.Equal( 4, messages.Length );
 
+				messages.Each( Output.WriteLine );
+
 				var events = messages.Except( messages.First().Append( messages.Last() ) ).ToArray();
+
+
+				Assert.Equal( 2, events.Length );
 				Assert.Contains( "Inside First", events.First() );
 				Assert.Contains( "Inside Second", events.Last() );
 			}
@@ -106,5 +112,7 @@ namespace DragonSpark.Testing.Diagnostics
 
 			static void Second() => Profile.Event( "Inside Second" );
 		}
+
+		public ProfileAttributeTests( ITestOutputHelper output ) : base( output ) {}
 	}
 }

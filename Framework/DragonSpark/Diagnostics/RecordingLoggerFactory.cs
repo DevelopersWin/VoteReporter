@@ -8,7 +8,6 @@ using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Reflection;
 using Configure = DragonSpark.Configuration.Configure;
 
@@ -16,7 +15,7 @@ namespace DragonSpark.Diagnostics
 {
 	public interface ILoggerHistory : ILogEventSink
 	{
-		ImmutableArray<LogEvent> Events { get; }
+		IEnumerable<LogEvent> Events { get; }
 
 		void Clear();
 	}

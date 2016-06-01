@@ -21,7 +21,7 @@ namespace DragonSpark.Setup
 
 		public override void Assign( IServiceProvider item )
 		{
-			if ( item.With( provider => provider != Value ) )
+			if ( item != null && item != Value )
 			{
 				var parameter = new MigrationParameter<IServiceProvider>( Value, item );
 				ApplyMigrationCommand.Instance.Run( parameter );
@@ -29,8 +29,6 @@ namespace DragonSpark.Setup
 
 			base.Assign( item );
 		}
-
-		
 	}
 
 	public class ServiceProviderMigrationCommandFactory : FactoryBase<IServiceProvider, ICommand<MigrationParameter<IServiceProvider>>>, IServiceProviderMigrationCommandSource
@@ -47,8 +45,8 @@ namespace DragonSpark.Setup
 	public class MigrationCommand : CompositeCommand<MigrationParameter<IServiceProvider>>
 	{
 		public MigrationCommand( ILoggerHistory history ) : base( 
-			new MigrationCommand<ILoggerHistory>( new LoggerHistoryMigrationCommand() ),
-			new MigrationCommand<ILogger>( new LoggerMigrationCommand( history ) ) ) {}
+			new MigrationCommand<ILogger>( new LoggerMigrationCommand( history ) ),
+			new MigrationCommand<ILoggerHistory>( new LoggerHistoryMigrationCommand() ) ) {}
 	}
 
 	public class MigrationCommand<T> : MigrationCommandBase<IServiceProvider> where T : class
@@ -109,7 +107,7 @@ namespace DragonSpark.Setup
 
 	class LoggerHistoryMigrationCommand : MigrationCommandBase<ILoggerHistory>
 	{
-		public override void Execute( MigrationParameter<ILoggerHistory> parameter ) => parameter.From.Events.Each( parameter.To.Emit );
+		public override void Execute( MigrationParameter<ILoggerHistory> parameter ) => parameter.From.Events.Except( parameter.To.Events ).Each( parameter.To.Emit );
 	}
 
 	public abstract class MigrationCommandBase<T> : CommandBase<MigrationParameter<T>>

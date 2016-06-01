@@ -24,43 +24,29 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class ExecutionContext : TaskLocalStore<ITaskExecutionContext>, IExecutionContext
 	{
-		readonly IDictionary<TaskContext, TaskContext> keys;
+		// readonly IDictionary<TaskContext, TaskContext> keys;
 		public static ExecutionContext Instance { get; } = new ExecutionContext();
 
 		readonly ConcurrentDictionary<TaskContext, ITaskExecutionContext> contexts = new ConcurrentDictionary<TaskContext, ITaskExecutionContext>();
 
-		ExecutionContext() : this( new ConcurrentDictionary<TaskContext, TaskContext>() ) {}
+		ExecutionContext() /*: this( new ConcurrentDictionary<TaskContext, TaskContext>() )*/ {}
 
-		ExecutionContext( IDictionary<TaskContext, TaskContext> keys ) : base( new Monitor( keys ).Value )
+		/*ExecutionContext( IDictionary<TaskContext, TaskContext> keys ) : base( new Monitor( keys ).Value )
 		{
 			this.keys = keys;
-		}
-
-		public void Verify( MethodBase method = null)
-		{
-			var current = TaskContext.Current();
-			if ( !keys.ContainsKey( current ) && Value.Id != current )
-			{
-				throw new InvalidOperationException( $@"'{Value}' does not contain '{current}'" );
-			}
-
-			if ( method != null && Value.Value != method )
-			{
-				throw new InvalidOperationException( $"Assigned Method is different from expected.  Expected: {method}.  Actual: {Value.Value}" );
-			}
-		}
+		}*/
 
 		protected override ITaskExecutionContext Get() => base.Get() ?? Create();
 
 		ITaskExecutionContext Create()
 		{
-			var current = TaskContext.Current();
-			var key = keys.ContainsKey( current ) ? keys[current] : current;
-			if ( keys.ContainsKey( current ) )
+			var key = TaskContext.Current();
+			/*var key = keys.ContainsKey( current ) ? keys[current] : current;
+			if ( key != current )
 			{
 				// File.WriteAllText( $@"C:\Temp\Create-{FileSystem.GetValidPath()}.txt", $"{current}" );
-				// throw new InvalidOperationException( "Awwww snap!" );
-			}
+				throw new InvalidOperationException( "Awwww snap!" );
+			}*/
 			var result = contexts.GetOrAdd( key, context => new TaskExecutionContext( context, OnRemove ).Configured( false ) );
 			// Debug.WriteLine( $"Assigned: {result.Id} ({SynchronizationContext.Current})" );
 			Assign( result );
@@ -73,7 +59,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			contexts.TryRemove( context.Id, out removed );
 		}
 
-		class Monitor : StoreBase<AsyncLocal<ITaskExecutionContext>>
+		/*class Monitor : StoreBase<AsyncLocal<ITaskExecutionContext>>
 		{
 			readonly IDictionary<TaskContext, TaskContext> items;
 			readonly AsyncLocal<ITaskExecutionContext> store;
@@ -120,7 +106,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			}
 
 			protected override AsyncLocal<ITaskExecutionContext> Get() => store;
-		}
+		}*/
 
 		// [DebuggerDisplay]
 		internal class TaskExecutionContext : FixedStore<MethodBase>, ITaskExecutionContext
