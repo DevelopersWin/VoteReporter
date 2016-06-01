@@ -4,11 +4,10 @@ using DragonSpark.Runtime.Stores;
 using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -16,27 +15,38 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		TaskContext Id { get; }
 
-		void Attach( TaskContext context );
+		/*void Attach( TaskContext context );
 
 		void Detach( TaskContext context );
 
-		bool Contains( TaskContext context );
+		bool Contains( TaskContext context );*/
 	}
 
 	public class ExecutionContext : TaskLocalStore<ITaskExecutionContext>, IExecutionContext
 	{
+		readonly IDictionary<TaskContext, TaskContext> keys;
 		public static ExecutionContext Instance { get; } = new ExecutionContext();
 
 		readonly ConcurrentDictionary<TaskContext, ITaskExecutionContext> contexts = new ConcurrentDictionary<TaskContext, ITaskExecutionContext>();
 
-		ExecutionContext() : base( new Factory().Value ) {}
+		ExecutionContext() : this( new ConcurrentDictionary<TaskContext, TaskContext>() ) {}
 
-		public void Verify()
+		ExecutionContext( IDictionary<TaskContext, TaskContext> keys ) : base( new Monitor( keys ).Value )
+		{
+			this.keys = keys;
+		}
+
+		public void Verify( MethodBase method = null)
 		{
 			var current = TaskContext.Current();
-			if ( !Value.Contains( current ) )
+			if ( !keys.ContainsKey( current ) && Value.Id != current )
 			{
 				throw new InvalidOperationException( $@"'{Value}' does not contain '{current}'" );
+			}
+
+			if ( method != null && Value.Value != method )
+			{
+				throw new InvalidOperationException( $"Assigned Method is different from expected.  Expected: {method}.  Actual: {Value.Value}" );
 			}
 		}
 
@@ -44,7 +54,14 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		ITaskExecutionContext Create()
 		{
-			var result = contexts.GetOrAdd( TaskContext.Current(), context => new TaskExecutionContext( context, OnRemove ).Configured( false ) );
+			var current = TaskContext.Current();
+			var key = keys.ContainsKey( current ) ? keys[current] : current;
+			if ( keys.ContainsKey( current ) )
+			{
+				// File.WriteAllText( $@"C:\Temp\Create-{FileSystem.GetValidPath()}.txt", $"{current}" );
+				// throw new InvalidOperationException( "Awwww snap!" );
+			}
+			var result = contexts.GetOrAdd( key, context => new TaskExecutionContext( context, OnRemove ).Configured( false ) );
 			// Debug.WriteLine( $"Assigned: {result.Id} ({SynchronizationContext.Current})" );
 			Assign( result );
 			return result;
@@ -56,16 +73,18 @@ namespace DragonSpark.Testing.Framework.Setup
 			contexts.TryRemove( context.Id, out removed );
 		}
 
-		class Factory : StoreBase<AsyncLocal<ITaskExecutionContext>>
+		class Monitor : StoreBase<AsyncLocal<ITaskExecutionContext>>
 		{
+			readonly IDictionary<TaskContext, TaskContext> items;
 			readonly AsyncLocal<ITaskExecutionContext> store;
 
-			public Factory()
+			public Monitor( IDictionary<TaskContext, TaskContext> items )
 			{
+				this.items = items;
 				store = new AsyncLocal<ITaskExecutionContext>( OnChange );
 			}
 
-			static void OnChange( AsyncLocalValueChangedArgs<ITaskExecutionContext> arguments )
+			void OnChange( AsyncLocalValueChangedArgs<ITaskExecutionContext> arguments )
 			{
 				if ( arguments.ThreadContextChanged )
 				{
@@ -76,11 +95,25 @@ namespace DragonSpark.Testing.Framework.Setup
 					{
 						if ( arguments.PreviousValue == null )
 						{
-							arguments.CurrentValue?.Attach( current );
+							if ( items.ContainsKey( current ) )
+							{
+								// File.WriteAllText( $@"C:\Temp\Add-{FileSystem.GetValidPath()}.txt", $"{current}" );
+								throw new InvalidOperationException( $"{this} already contains {current}." );
+							}
+
+							items[current] = item.Id;
+							//arguments.CurrentValue?.Attach( current );
 						}
 						else if ( arguments.CurrentValue == null )
 						{
-							arguments.PreviousValue?.Detach( current );
+							if ( !items.ContainsKey( current ) )
+							{
+								// File.WriteAllText( $@"C:\Temp\Remove-{FileSystem.GetValidPath()}.txt", $"{current}" );
+								throw new InvalidOperationException( $"{this} does not contain {current}." );
+							}
+
+							items.Remove( current );
+							// arguments.PreviousValue?.Detach( current );
 						}
 					}
 				}
@@ -92,47 +125,15 @@ namespace DragonSpark.Testing.Framework.Setup
 		// [DebuggerDisplay]
 		internal class TaskExecutionContext : FixedStore<MethodBase>, ITaskExecutionContext
 		{
-			// public static TaskExecutionContext Instance { get; } = new TaskExecutionContext( TaskContext.None, Delegates<TaskExecutionContext>.Empty );
-
 			readonly Action<TaskExecutionContext> onDispose;
-			readonly ConcurrentDictionary<TaskContext, bool> children = new ConcurrentDictionary<TaskContext, bool>();
-
-			//static void Update( TaskExecutionContext context ) => context.Id = TaskContext.Current();
-
-			// public TaskExecutionContext() : this( TaskContext.Current() ) {}
-
+			
 			public TaskExecutionContext( TaskContext id, Action<TaskExecutionContext> onDispose )
 			{
 				Id = id;
 				this.onDispose = onDispose;
-				// Debug.WriteLine( $"Creating {Id} ({SynchronizationContext.Current})" );
 			}
 
 			public TaskContext Id { get; }
-
-			public void Attach( TaskContext context )
-			{
-				if ( children.ContainsKey( context ) )
-				{
-					throw new InvalidOperationException( $"{this} already contains {context}." );
-				}
-
-				// Debug.WriteLine( $"Attaching {context} to {Id} ({SynchronizationContext.Current})" );
-				children.TryAdd( context, true );
-			}
-
-			public void Detach( TaskContext context )
-			{
-				// Debug.WriteLine( $"Detaching {context} from {Id} ({SynchronizationContext.Current})" );
-
-				bool result;
-				if ( !children.TryRemove( context, out result ) )
-				{
-					throw new InvalidOperationException( $@"The provided context '{context}' was not found in root context '{this}'" );
-				}
-			}
-
-			public bool Contains( TaskContext context ) => Id == context || children.ContainsKey( context );
 
 			public override string ToString() => $"{Id} ({Value})";
 

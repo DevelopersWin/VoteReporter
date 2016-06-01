@@ -87,13 +87,13 @@ namespace DragonSpark.Runtime.Stores
 		protected override T Get() => lazy.Value;
 	}
 
-	public class DeferredAttachedPropertyStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
+	public class DeferredAttachedPropertyTargetStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{
 		readonly Func<TInstance> instance;
 		readonly IAttachedProperty<TInstance, TResult> property;
 
-		public DeferredAttachedPropertyStore( Func<TInstance> instance, IAttachedProperty<TInstance, TResult> property ) : this( instance, property, Coercer<TResult>.Instance ) {}
-		public DeferredAttachedPropertyStore( Func<TInstance> instance, IAttachedProperty<TInstance, TResult> property, ICoercer<TResult> coercer ) : base( coercer )
+		public DeferredAttachedPropertyTargetStore( Func<TInstance> instance, IAttachedProperty<TInstance, TResult> property ) : this( instance, property, Coercer<TResult>.Instance ) {}
+		public DeferredAttachedPropertyTargetStore( Func<TInstance> instance, IAttachedProperty<TInstance, TResult> property, ICoercer<TResult> coercer ) : base( coercer )
 		{
 			this.instance = instance;
 			this.property = property;

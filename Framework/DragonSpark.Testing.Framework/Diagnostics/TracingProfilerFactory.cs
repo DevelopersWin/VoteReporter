@@ -2,7 +2,6 @@
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -11,24 +10,34 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	public class TraceAwareProfilerFactory : ConfiguringFactory<MethodBase, IProfiler>
+	public class TraceAwareProfilerFactory : FactoryBase<MethodBase, IProfiler>
 	{
-		readonly IDisposable[] disposables;
+		readonly Action<string> output;
+		readonly ILogger logger;
+		readonly ILoggerHistory history;
+		readonly IList<TraceListener> listeners;
 
 		public TraceAwareProfilerFactory( Action<string> output, ILogger logger, ILoggerHistory history ) : this( output, logger, history, new List<TraceListener>() ) {}
 
-		public TraceAwareProfilerFactory( Action<string> output, ILogger logger, ILoggerHistory history, IList<TraceListener> listeners ) : this( output, logger, new PurgeLoggerMessageHistoryCommand( history ), new LoggerTraceListenerTrackingCommand( listeners ) ) {}
-
-		TraceAwareProfilerFactory( Action<string> output, ILogger logger, PurgeLoggerMessageHistoryCommand purge, LoggerTraceListenerTrackingCommand tracker ) : this( logger, tracker, () => purge.Run( output ) ) {}
-		
-		TraceAwareProfilerFactory( ILogger logger, LoggerTraceListenerTrackingCommand command, Action purge ) : this( new ConfiguringFactory<MethodBase, ILogger>( new MethodLoggerFactory( logger.Self ).Create, command.Run ).Create, new CompositeCommand( new DelegatedCommand( purge ), StartProcessCommand.Instance ), command, new DisposableAction( purge ) ) {}
-
-		TraceAwareProfilerFactory( Func<MethodBase, ILogger> loggerSource, ICommand<IProfiler> command, params IDisposable[] disposables ) : base( new Windows.Diagnostics.ProfilerFactory( loggerSource ).Create, command.Run )
+		public TraceAwareProfilerFactory( Action<string> output, ILogger logger, ILoggerHistory history, IList<TraceListener> listeners )
 		{
-			this.disposables = disposables;
+			this.output = output;
+			this.logger = logger;
+			this.history = history;
+			this.listeners = listeners;
 		}
 
-		public override IProfiler Create( MethodBase parameter ) => base.Create( parameter ).AssociateForDispose( disposables );
+		public override IProfiler Create( MethodBase parameter )
+		{
+			var command = new PurgeLoggerMessageHistoryCommand( history );
+			var tracker = new LoggerTraceListenerTrackingCommand( listeners );
+			var configured = new ConfiguringFactory<MethodBase, ILogger>( new LoggerFromMethodFactory( logger.Self ).Create, tracker.Run );
+			var inner = new Windows.Diagnostics.ProfilerFactory( configured.Create );
+			var purge = new FixedCommand( command, output );
+			var start = new CompositeCommand( purge, StartProcessCommand.Instance );
+			var result = inner.Create( parameter ).With( start.Run ).AssociateForDispose( new DisposableAction( purge.Run ), tracker );
+			return result;
+		}
 	}
 	
 	public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>
@@ -45,11 +54,9 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		readonly AddItemCommand add;
 		readonly RemoveItemCommand remove;
 
-		// public LoggerTraceListenerTrackingCommand() : this( new List<TraceListener>() ) {}
+		public LoggerTraceListenerTrackingCommand( IList<TraceListener> listeners ) : this( Defaults.Factory, listeners, Defaults.AddItemCommand, Defaults.RemoveItemCommand ) {}
 
-		public LoggerTraceListenerTrackingCommand( IList<TraceListener> listeners ) : this( LoggingTraceListenerFactory.Instance.Create, listeners, new AddItemCommand( Trace.Listeners ), new RemoveItemCommand( Trace.Listeners ) ) {}
-
-		public LoggerTraceListenerTrackingCommand( [Required] Func<ILogger, TraceListener> factory, [Required] IList<TraceListener> listeners, [Required] AddItemCommand add, [Required] RemoveItemCommand remove )
+		public LoggerTraceListenerTrackingCommand( Func<ILogger, TraceListener> factory, IList<TraceListener> listeners, AddItemCommand add, RemoveItemCommand remove )
 		{
 			this.factory = factory;
 			this.listeners = listeners;
@@ -65,5 +72,12 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		}
 
 		protected override void OnDispose() => listeners.Purge().Each( remove.Run );
+
+		static class Defaults
+		{
+			public static Func<ILogger, TraceListener> Factory { get; } = LoggingTraceListenerFactory.Instance.Create;
+			public static AddItemCommand AddItemCommand { get; } = new AddItemCommand( Trace.Listeners );
+			public static RemoveItemCommand RemoveItemCommand { get; } = new RemoveItemCommand( Trace.Listeners );
+		}
 	}
 }

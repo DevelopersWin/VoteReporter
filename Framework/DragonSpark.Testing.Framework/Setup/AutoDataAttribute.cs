@@ -45,6 +45,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			var autoData = new AutoData( Fixture, methodUnderTest );
 			using ( context( autoData ) )
 			{
+				ExecutionContext.Instance.Verify( methodUnderTest ); // TODO: Remove.
 				var result = base.GetData( methodUnderTest );
 				return result;
 			}
@@ -153,7 +154,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override void Before( MethodInfo methodUnderTest )
 		{
-			ExecutionContext.Instance.Verify(); // TODO: Remove.
+			ExecutionContext.Instance.Verify( methodUnderTest ); // TODO: Remove.
 			using ( new InitializeMethodCommand().AsExecuted( methodUnderTest ) )
 			{
 				Services.Get<LoggingLevelSwitch>().MinimumLevel = level;

@@ -45,14 +45,14 @@ namespace DragonSpark.Testing.Framework
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			ExecutionContext.Instance.Verify(); // TODO: Remove.
+			ExecutionContext.Instance.Verify( args.Method ); // TODO: Remove.
 			new ApplicationOutputCommand().Run( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 
 			args.ReturnValue = 
 
 			Defer.Run( () =>
 					   {
-						   ExecutionContext.Instance.Verify(); // TODO: Remove.
+						   ExecutionContext.Instance.Verify( args.Method ); // TODO: Remove.
 						   ExecutionContext.Instance.Value.Dispose();
 					   }, args.ReturnValue );
 		}

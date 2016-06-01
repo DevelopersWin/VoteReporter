@@ -8,6 +8,7 @@ namespace DragonSpark.Windows.Testing.TestObjects.Modules
 	{
 		[ExplicitlySynchronized]
 		public string LastMessage { get; private set; }
+
 		[ExplicitlySynchronized]
 		public string LastMessageCategory;
 

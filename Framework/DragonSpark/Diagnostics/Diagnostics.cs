@@ -1,26 +1,26 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using Serilog;
 using Serilog.Events;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Diagnostics
 {
-	public class MethodLoggerFactory : FactoryBase<MethodBase, ILogger>
+	public class LoggerFromMethodFactory : FactoryBase<MethodBase, ILogger>
 	{
-		public static MethodLoggerFactory Instance { get; } = new MethodLoggerFactory();
+		public static LoggerFromMethodFactory Instance { get; } = new LoggerFromMethodFactory();
 
 		readonly Func<ILogger> source;
 
-		public MethodLoggerFactory() : this( Services.Get<ILogger> ) {}
+		public LoggerFromMethodFactory() : this( Services.Get<ILogger> ) {}
 
-		public MethodLoggerFactory( Func<ILogger> source )
+		public LoggerFromMethodFactory( Func<ILogger> source )
 		{
 			this.source = source;
 		}
@@ -53,7 +53,23 @@ namespace DragonSpark.Diagnostics
 			this.timer = timer;
 		}
 
-		public override CreateProfilerEvent Create( MethodBase parameter ) => s => new TimerEvent<T>( s, parameter, sessionTimer, timer );
+		public override CreateProfilerEvent Create( MethodBase parameter ) => new Context( parameter, sessionTimer, timer ).Get;
+
+		struct Context
+		{
+			readonly MethodBase method;
+			readonly ISessionTimer sessionTimer;
+			readonly T timer;
+
+			public Context( MethodBase method, ISessionTimer sessionTimer, T timer )
+			{
+				this.method = method;
+				this.sessionTimer = sessionTimer;
+				this.timer = timer;
+			}
+
+			public TimerEvent<T> Get( string name ) => new TimerEvent<T>( name, method, sessionTimer, timer );
+		}
 	}
 
 	public delegate TimerEvent CreateProfilerEvent( string eventName );

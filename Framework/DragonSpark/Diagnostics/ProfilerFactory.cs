@@ -1,13 +1,12 @@
 using DragonSpark.Activation;
-using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Stores;
 using Serilog;
 using Serilog.Events;
 using System;
 using System.Reflection;
-using DragonSpark.Runtime.Stores;
 using Configure = DragonSpark.Configuration.Configure;
 
 namespace DragonSpark.Diagnostics
@@ -28,7 +27,7 @@ namespace DragonSpark.Diagnostics
 
 		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( Level(), templateSource ) {}
 
-		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( MethodLoggerFactory.Instance.Create, level, templateSource ) {}
+		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( LoggerFromMethodFactory.Instance.Create, level, templateSource ) {}
 
 		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, Level(), templateSource ) {}
 

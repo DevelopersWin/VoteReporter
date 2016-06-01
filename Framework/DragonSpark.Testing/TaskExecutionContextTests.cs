@@ -1,4 +1,3 @@
-using System;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using System.Collections.Generic;
@@ -25,9 +24,11 @@ namespace DragonSpark.Testing
 		[Theory, ExecutionContextAutoData]
 		public void Theory()
 		{
-			ExecutionContext.Instance.Verify();
+			var method = GetType().GetMethod( nameof(Theory) );
+			ExecutionContext.Instance.Verify( method );
 			Assert.Equal( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
 			Assert.NotNull( ExecutionContext.Instance.Value.Value );
+			Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 		}
 
 		[Fact, Wrapper]
@@ -41,9 +42,11 @@ namespace DragonSpark.Testing
 		[Theory, ExecutionContextAutoData, Wrapper]
 		public void TheoryWrapped()
 		{
-			ExecutionContext.Instance.Verify();
+			var method = GetType().GetMethod( nameof(TheoryWrapped) );
+			ExecutionContext.Instance.Verify( method );
 			Assert.Equal( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
 			Assert.NotNull( ExecutionContext.Instance.Value.Value );
+			Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 		}
 	}
 
@@ -56,6 +59,8 @@ namespace DragonSpark.Testing
 		public Task Fact()
 		{
 			var current = ExecutionContext.Instance.Value;
+			Assert.Equal( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
+			Assert.Null( ExecutionContext.Instance.Value.Value );
 			return Task.Run( () =>
 							 {
 								 Assert.Same( current, ExecutionContext.Instance.Value );
@@ -69,12 +74,16 @@ namespace DragonSpark.Testing
 		public Task Theory()
 		{
 			var current = ExecutionContext.Instance.Value;
+			Assert.Equal( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
+			var method = GetType().GetMethod( nameof(Theory) );
+			Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 			return Task.Run( () =>
 							 {
 								Assert.Same( current, ExecutionContext.Instance.Value );
-								ExecutionContext.Instance.Verify();
+								ExecutionContext.Instance.Verify( method );
 								Assert.NotEqual( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
 								Assert.NotNull( ExecutionContext.Instance.Value.Value );
+								Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 							 } );
 		}
 
@@ -82,6 +91,8 @@ namespace DragonSpark.Testing
 		public Task FactWrapped()
 		{
 			var current = ExecutionContext.Instance.Value;
+			Assert.Equal( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
+			Assert.Null( ExecutionContext.Instance.Value.Value );
 			return Task.Run( () =>
 							 {
 								Assert.Same( current, ExecutionContext.Instance.Value );
@@ -95,12 +106,16 @@ namespace DragonSpark.Testing
 		public Task TheoryWrapped()
 		{
 			var current = ExecutionContext.Instance.Value;
+			Assert.Equal( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
+			var method = GetType().GetMethod( nameof(TheoryWrapped) );
+			Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 			return Task.Run( () =>
 							 {
 								Assert.Same( current, ExecutionContext.Instance.Value );
-								ExecutionContext.Instance.Verify();
+								ExecutionContext.Instance.Verify( method );
 								Assert.NotEqual( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
 								Assert.NotNull( ExecutionContext.Instance.Value.Value );
+								Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 							 } );
 		}
 	}
@@ -110,7 +125,9 @@ namespace DragonSpark.Testing
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
 			ExecutionContext.Instance.Verify();
-			return base.GetData( methodUnderTest );
+			var enumerable = base.GetData( methodUnderTest );
+			ExecutionContext.Instance.Verify( methodUnderTest );
+			return enumerable;
 		}
 	}
 

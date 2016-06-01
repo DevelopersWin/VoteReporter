@@ -1,12 +1,16 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Runtime;
+using DragonSpark.Testing.Framework;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Runtime
 {
-	public class ParameterInvocationTests
+	public class ParameterInvocationTests : TestCollectionBase
 	{
+		public ParameterInvocationTests( ITestOutputHelper output ) : base( output ) {}
+
 		[Fact]
 		public void BasicCondition()
 		{
@@ -37,10 +41,30 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Same( one, two );
 		}*/
 
+		/*class Mock
+		{
+			public void Hello() => Debug.WriteLine( "Hello World!" );
+		}
+
+		[Fact]
+		public void Stress()
+		{
+			var result = Parallel.For( 0, 10000, i =>
+									{
+										var mock = new Mock();
+										var methodInfo = typeof(Mock).GetMethod( nameof(Mock.Hello) );
+										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
+										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
+										ExecutionContext.Instance.Verify(); // TODO: Remove.
+										ExecutionContext.Instance.Value.Dispose();
+									} );
+			Assert.True( result.IsCompleted );
+		}*/
+
 		[Fact]
 		public void ExtendedCheck()
 		{
-			for ( int i = 0; i < 10000; i++ )
+			// for ( int i = 0; i < 10000; i++ )
 			{
 				var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );

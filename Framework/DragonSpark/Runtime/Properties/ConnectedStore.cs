@@ -12,22 +12,8 @@ using System.Threading;
 
 namespace DragonSpark.Runtime.Properties
 {
-	public abstract class ExecutionAttachedPropertyStoreBase<T> : DeferredAttachedPropertyStore<object, T>
+	public abstract class ExecutionAttachedPropertyStoreBase<T> : DeferredAttachedPropertyTargetStore<object, T>
 	{
-		/*readonly IAttachedProperty<T> property;
-
-		public ExecutionContextStore() : this( () => default(T) ) {}
-
-		public ExecutionContextStore( Func<T> create ) : this( new AttachedProperty<T>( o => create() ) ) {}
-
-		public ExecutionContextStore( IAttachedProperty<T> property )
-		{
-			this.property = property;
-		}
-
-		protected override T Get() => property.Get( Execution.GetCurrent() );
-
-		public override void Assign( T item ) => property.Set( Execution.GetCurrent(), item );*/
 		protected ExecutionAttachedPropertyStoreBase() : this( Delegates<T>.Default ) {}
 		protected ExecutionAttachedPropertyStoreBase( Func<T> create ) : this( new AttachedProperty<T>( new Func<object, T>( new Context( create ).Create ) ) ) {}
 		protected ExecutionAttachedPropertyStoreBase( IAttachedProperty<object, T> property ) : this( Execution.GetCurrent, property ) {}
@@ -221,7 +207,7 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public class EqualityReference<T> : DeferredAttachedPropertyStore<object, ConcurrentDictionary<int, T>>
+	public class EqualityReference<T> : DeferredAttachedPropertyTargetStore<object, ConcurrentDictionary<int, T>>
 	{
 		// public override bool IsAttached( object instance ) => property.Get( Execution.GetCurrent() ).ContainsKey( instance.GetHashCode() );
 

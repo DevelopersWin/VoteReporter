@@ -225,7 +225,7 @@ namespace DragonSpark.Aspects
 		[OnMethodInvokeAdvice, MethodPointcut( nameof(FindExecute) )]
 		public void OnExecute( MethodInterceptionArgs args )
 		{
-			using ( new ThreadCacheContext().Configured( false ) )
+			// using ( new ThreadCacheContext().Configured( false ) )
 			{
 				var adapter = factory( args.Instance );
 				var state = WorkflowState.Property.Get( args.Instance );

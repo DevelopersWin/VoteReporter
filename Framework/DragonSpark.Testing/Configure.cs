@@ -8,6 +8,10 @@ namespace DragonSpark.Testing
 	public static class Configure
 	{
 		[ModuleInitializer( 0 ), DragonSpark.Aspects.Runtime, AssemblyInitialize]
-		public static void Initialize() => LoadPartAssemblyCommand.Instance.Run( typeof(Configure).Assembly );
+		public static void Initialize()
+		{
+			LoadPartAssemblyCommand.Instance.Run( typeof(Configure).Assembly );
+			// Debugger.Launch();
+		}
 	}
 }
