@@ -115,38 +115,6 @@ namespace DragonSpark.Activation
 		public abstract TResult Create( [Required]TParameter parameter );
 	}
 
-	public class CachedDelegatedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult> where TResult : class
-	{
-		readonly Func<TParameter, object> instance;
-		readonly Func<TParameter, IList> keySource;
-
-		// readonly ConditionalWeakTable<object, AttachedProperty<TResult>> properties = new ConditionalWeakTable<object, AttachedProperty<TResult>>();
-		readonly static AttachedProperty<ConditionalWeakTable<IList, TResult>> Property = new AttachedProperty<ConditionalWeakTable<IList, TResult>>( ActivatedAttachedPropertyStore<object, ConditionalWeakTable<IList, TResult>>.Instance );
-
-		protected CachedDelegatedFactory( Func<TParameter, IList> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
-		{
-			this.instance = instance;
-			this.keySource = keySource;
-		}
-
-		public override TResult Create( TParameter parameter )
-		{
-			var result = Property.Get( instance( parameter ) ).GetValue( keySource( parameter ), k => base.Create( parameter ) );
-			return result;
-			/*var key = keySource( parameter );
-			var property = properties.GetValue( key, i => new AttachedProperty<TResult>( k => base.Create( parameter ) ) );
-			var result = property.Get( instance( parameter ) );
-			return result;*/
-		}
-
-/*public override TResult Create( TParameter parameter ) => new Cache( instance( parameter ), KeyFactory.Instance.Create( keySource( parameter ) ), () => base.Create( parameter ) ).Value;
-
-		class Cache : AssociatedStore<TResult>
-		{
-			public Cache( object instance, int key, Func<TResult> create = null ) : base( instance, key.ToString(), create ) {}
-		}*/
-	}
-
 	public class DelegatedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
 		readonly Func<TParameter, TResult> inner;

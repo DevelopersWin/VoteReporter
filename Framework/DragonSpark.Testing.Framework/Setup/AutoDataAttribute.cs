@@ -18,6 +18,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Xunit.Sdk;
 using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 
@@ -53,9 +54,23 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		class Cache : CacheFactoryBase
 		{
-			public Cache( bool includeFromParameters = true, params Type[] others ) : this( new ServiceProviderTypeFactory( others, includeFromParameters ).Create ) {}
+			public Cache( bool includeFromParameters = true, params Type[] others ) : this( new Key( includeFromParameters, others ), new ServiceProviderTypeFactory( others, includeFromParameters ).Create ) {}
 
-			Cache( Func<MethodBase, Type[]> factory ) : base( data => factory( data.Method ), new Factory( factory ).Create ) {}
+			Cache( Key key, Func<MethodBase, Type[]> factory ) : base( key.Create, new Factory( factory ).Create ) {}
+
+			struct Key
+			{
+				readonly bool includeFromParameters;
+				readonly Type[] others;
+
+				public Key( bool includeFromParameters, Type[] others )
+				{
+					this.includeFromParameters = includeFromParameters;
+					this.others = others;
+				}
+
+				public IList Create( AutoData parameter ) => new object[] { includeFromParameters, others, parameter.Method.DeclaringType };
+			}
 
 			class Factory : FactoryBase<AutoData, IServiceProvider>
 			{
@@ -68,6 +83,42 @@ namespace DragonSpark.Testing.Framework.Setup
 
 				public override IServiceProvider Create( AutoData parameter ) => new ServiceProviderFactory( factory( parameter.Method ) ).Create();
 			}
+		}
+	}
+
+	public class CachedDelegatedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult> where TResult : class
+	{
+		readonly Func<TParameter, object> instance;
+		readonly Func<TParameter, IList> keySource;
+
+		readonly static AttachedProperty<Dictionary<int, TResult>> Property = new AttachedProperty<Dictionary<int, TResult>>( ActivatedAttachedPropertyStore<object, Dictionary<int, TResult>>.Instance );
+
+		protected CachedDelegatedFactory( Func<TParameter, IList> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
+		{
+			this.instance = instance;
+			this.keySource = keySource;
+		}
+
+		public override TResult Create( TParameter parameter )
+		{
+			var source = keySource( parameter );
+			var key = KeyFactory.Instance.Create( source );
+			var result = Property.Get( instance( parameter ) ).Ensure( key, new Creator( base.Create, parameter ).Create );
+			return result;
+		}
+
+		struct Creator
+		{
+			readonly Func<TParameter, TResult> create;
+			readonly TParameter parameter;
+
+			public Creator( Func<TParameter, TResult> create, TParameter parameter )
+			{
+				this.create = create;
+				this.parameter = parameter;
+			}
+
+			public TResult Create( int key ) => create( parameter );
 		}
 	}
 
