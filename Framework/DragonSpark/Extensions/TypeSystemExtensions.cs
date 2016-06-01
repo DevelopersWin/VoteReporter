@@ -1,3 +1,4 @@
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,11 @@ namespace DragonSpark.Extensions
 {
 	public static class TypeSystemExtensions
 	{
-		public static Tuple<TAttribute, TypeInfo>[] GetAllTypesWith<TAttribute>( this IEnumerable<Assembly> target ) where TAttribute : Attribute
-			=> target.SelectMany( assembly => assembly.DefinedTypes ).WhereDecorated<TAttribute>();
+		public static Tuple<TAttribute, Type>[] GetAllTypesWith<TAttribute>( this IEnumerable<Assembly> target ) where TAttribute : Attribute
+			=> target.SelectMany( AssemblyTypes.Public.Create ).WhereDecorated<TAttribute>();
 		
-		public static Tuple<TAttribute, TypeInfo>[] WhereDecorated<TAttribute>( this IEnumerable<TypeInfo> target ) where TAttribute : Attribute
-			=> target.Where( info => info.Has<TAttribute>() ).Select( info => new Tuple<TAttribute, TypeInfo>( info.GetAttribute<TAttribute>(), info ) ).ToArray();
+		public static Tuple<TAttribute, Type>[] WhereDecorated<TAttribute>( this IEnumerable<Type> target ) where TAttribute : Attribute
+			=> target.Where( info => info.Has<TAttribute>() ).Select( info => new Tuple<TAttribute, Type>( info.GetAttribute<TAttribute>(), info ) ).ToArray();
 
 		public static IEnumerable<Type> AsTypes( this IEnumerable<TypeInfo> target ) => target.Select( info => info.AsType() );
 

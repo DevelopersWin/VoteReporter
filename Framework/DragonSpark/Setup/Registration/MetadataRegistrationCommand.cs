@@ -35,8 +35,7 @@ namespace DragonSpark.Setup.Registration
 		public static MetadataRegistrationTypeFactory Instance { get; } = new MetadataRegistrationTypeFactory();
 
 		public override Type[] Create( Type[] parameter ) => parameter
-			.AsTypeInfos()
 			.WhereDecorated<RegistrationBaseAttribute>()
-			.Select( item => item.Item2 ).AsTypes().Fixed();
+			.Select( item => item.Item2 ).Fixed();
 	}
 }

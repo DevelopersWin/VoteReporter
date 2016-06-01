@@ -322,7 +322,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void GetAllTypesWith( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut )
 		{
 			var items = sut.GetAllTypesWith<PriorityAttribute>();
-			Assert.True( items.Select( tuple => tuple.Item2 ).AsTypes().Contains( typeof(NormalPriority) ) );
+			Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );
 		}
 
 		[Theory, LocationSetup.AutoData]

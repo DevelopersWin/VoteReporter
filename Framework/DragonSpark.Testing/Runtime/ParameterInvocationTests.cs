@@ -1,7 +1,15 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Testing.Objects;
+using DragonSpark.Windows.Runtime;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -47,16 +55,36 @@ namespace DragonSpark.Testing.Runtime
 		}
 
 		[Fact]
+		public void GetAllTypesWith2()
+		{
+			var sut = new[] { GetType(), typeof(NormalPriority), typeof(ServiceLocator), typeof(AutoDataAttribute), typeof(FileSystemAssemblySource) }.Select( type => type.Assembly ).ToArray();
+
+			var result = Parallel.For( 0, 100000, i =>
+									{
+										var items = sut.GetAllTypesWith<PriorityAttribute>();
+			Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );
+
+										/*var mock = new Mock();
+										var methodInfo = typeof(Mock).GetMethod( nameof<>(Mock.Hello) );
+										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
+										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
+										Framework.Setup.ExecutionContext.Instance.Verify(); // TODO: Remove.
+										Framework.Setup.ExecutionContext.Instance.Value.Dispose();#1#
+									} );
+			Assert.True( result.IsCompleted );
+		}
+
+		[Fact]
 		public void Stress()
 		{
 			var result = Parallel.For( 0, 10000, i =>
 									{
-										var mock = new Mock();
-										var methodInfo = typeof(Mock).GetMethod( nameof(Mock.Hello) );
+										/*var mock = new Mock();
+										var methodInfo = typeof(Mock).GetMethod( nameof<>(Mock.Hello) );
 										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
 										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
 										Framework.Setup.ExecutionContext.Instance.Verify(); // TODO: Remove.
-										Framework.Setup.ExecutionContext.Instance.Value.Dispose();
+										Framework.Setup.ExecutionContext.Instance.Value.Dispose();#1#
 									} );
 			Assert.True( result.IsCompleted );
 		}*/
