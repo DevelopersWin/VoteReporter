@@ -1,15 +1,6 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Testing.Objects;
-using DragonSpark.Windows.Runtime;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -92,7 +83,7 @@ namespace DragonSpark.Testing.Runtime
 		[Fact]
 		public void ExtendedCheck()
 		{
-			// for ( int i = 0; i < 10000; i++ )
+			for ( int i = 0; i < 10000; i++ )
 			{
 				var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );
@@ -119,7 +110,7 @@ namespace DragonSpark.Testing.Runtime
 			}
 		}
 
-		[Fact]
+		/*[Fact]
 		public void VerifyCommand()
 		{
 			var sut = new Command();
@@ -139,9 +130,9 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 2, sut.CanExecuteCalled );
 			Assert.Equal( 1, sut.ExecuteCalled );
 			Assert.Equal( 1212, sut.LastResult.GetValueOrDefault() );
-		}
+		}*/
 
-		[FactoryParameterValidator]
+		[ValidatedFactory]
 		public class Factory : IFactoryWithParameter
 		{
 			public int CanCreateCalled { get; private set; }
@@ -163,7 +154,7 @@ namespace DragonSpark.Testing.Runtime
 			public bool ShouldValidate() => true;
 		}
 
-		[FactoryParameterValidator, GenericFactoryParameterValidator]
+		[ValidatedGenericFactory]
 		class ExtendedFactory : IFactory<int, float>
 		{
 			public int CanCreateCalled { get; private set; }
@@ -201,7 +192,7 @@ namespace DragonSpark.Testing.Runtime
 			public bool ShouldValidate() => true;
 		}
 
-		class Command : CommandBase<int>
+		/*class Command : CommandBase<int>
 		{
 			public int CanExecuteCalled { get; private set; }
 
@@ -220,6 +211,6 @@ namespace DragonSpark.Testing.Runtime
 				ExecuteCalled++;
 				LastResult = parameter;
 			}
-		}
+		}*/
 	}
 }

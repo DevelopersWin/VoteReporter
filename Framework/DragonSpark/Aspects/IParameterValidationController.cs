@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -9,8 +10,11 @@ using PostSharp.Aspects.Serialization;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Input;
+using PostSharp;
+using PostSharp.Extensibility;
 
 namespace DragonSpark.Aspects
 {
@@ -69,8 +73,8 @@ namespace DragonSpark.Aspects
 
 		public override object Execute( RelayParameter parameter )
 		{
-			var valid = base.IsValid( parameter.Parameter );
-			return generic.Handles( parameter.Parameter ) ? generic.Execute( parameter.Parameter ) : base.Execute( parameter );
+			var result = generic.Handles( parameter.Parameter ) ? generic.Execute( parameter.Parameter ) : base.Execute( parameter );
+			return result;
 		}
 
 		public object ExecuteGeneric( RelayParameter parameter ) => base.Execute( parameter );
@@ -85,6 +89,34 @@ namespace DragonSpark.Aspects
 			public static ProfileProvider Instance { get; } = new ProfileProvider();
 
 			ProfileProvider() : base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
+		}
+
+		public override IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => ProfileProvider.Instance.ProvideAspects( targetElement );
+	}
+
+	public sealed class ValidatedFactory : ValidatedParameterAspect
+	{
+		public ValidatedFactory() : base( new ParameterValidationControllerFactory( FactoryParameterAdapterStore.Instance ) ) {}
+
+		class ProfileProvider : ProviderBase
+		{
+			public static ProfileProvider Instance { get; } = new ProfileProvider();
+
+			ProfileProvider() : base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
+		}
+
+		public override IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => ProfileProvider.Instance.ProvideAspects( targetElement );
+	}
+
+	public sealed class ValidatedGenericFactory : ValidatedParameterAspect
+	{
+		public ValidatedGenericFactory() : base( new GenericParameterValidationControllerFactory( GenericFactoryParameterAdapterStore.Instance, FactoryParameterAdapterStore.Instance ) ) {}
+
+		class ProfileProvider : ProviderBase
+		{
+			public static ProfileProvider Instance { get; } = new ProfileProvider();
+
+			ProfileProvider() : base( new Profile( typeof(IFactory<>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
 		}
 
 		public override IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => ProfileProvider.Instance.ProvideAspects( targetElement );
@@ -130,7 +162,7 @@ namespace DragonSpark.Aspects
 							var aspect = pair.Item1.Name == profile.IsValid ? ValidatorAspect.Instance :
 										 pair.Item1.Name == profile.Execute ? isGeneric ? GenericExecutionAspect.Instance : ExecutionAspect.Instance
 										 : default(IAspect);
-							/*if ( type.Name == "GenericCommand" && aspect != null )
+							/*if ( type.Name == "ExtendedFactory" && aspect != null )
 							{
 								MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {pair.Item2} : {aspect}", null, null, null ));
 							}*/
@@ -185,7 +217,8 @@ namespace DragonSpark.Aspects
 			var generic = controller as IGenericParameterValidationController;
 			if ( generic != null )
 			{
-				generic.ExecuteGeneric( parameter );
+				var temp = generic.ExecuteGeneric( parameter );
+				Debugger.Break();
 			}
 			else
 			{
