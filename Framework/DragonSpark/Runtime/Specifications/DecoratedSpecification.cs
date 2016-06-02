@@ -33,7 +33,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly IAttachedProperty<T, ConditionMonitor> property;
 		
-		public OncePerParameterSpecification() : this( new Condition() ) {}
+		public OncePerParameterSpecification() : this( new Condition<T>() ) {}
 
 		public OncePerParameterSpecification( IAttachedProperty<T, ConditionMonitor> property )
 		{

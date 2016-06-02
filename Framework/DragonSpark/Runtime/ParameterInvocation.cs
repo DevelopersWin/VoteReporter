@@ -230,27 +230,6 @@ namespace DragonSpark.Runtime
 		}*/
 	}
 
-	public class EnabledState
-	{
-		readonly static object Null = new object();
-
-		int store;
-
-		static int GetCode( object item ) => ( item ?? Null ).GetHashCode();
-
-		public bool IsEnabled( object item )
-		{
-			var code = GetCode( item );
-			return ( store & code ) == code;
-		}
-
-		public void Enable( object item, bool on )
-		{
-			var code = GetCode( item );
-			store = on ? store | code : store & ~code;
-		}
-	}
-
 	public interface IParameterValidator
 	{
 		bool IsValid( object parameter );
@@ -258,7 +237,7 @@ namespace DragonSpark.Runtime
 		// object Execute( object parameter );
 	}
 
-	public class FactoryAdapter<TParameter, TResult> : IParameterValidator
+	public class FactoryAdapter<TParameter, TResult> : IGenericParameterValidator
 	{
 		readonly IFactory<TParameter, TResult> inner;
 		public FactoryAdapter( IFactory<TParameter, TResult> inner )
@@ -268,7 +247,9 @@ namespace DragonSpark.Runtime
 
 		public bool IsValid( object parameter ) => inner.CanCreate( (TParameter)parameter );
 
-		// public object Execute( object parameter ) => inner.Create( (TParameter)parameter );
+		public bool Handles( object parameter ) => parameter is TParameter;
+
+		public object Execute( object parameter ) => inner.Create( (TParameter)parameter );
 	}
 
 	public class FactoryAdapter : IParameterValidator
@@ -302,7 +283,7 @@ namespace DragonSpark.Runtime
 		}*/
 	}
 
-	public class CommandAdapter<T> : IParameterValidator
+	public class CommandAdapter<T> : IGenericParameterValidator
 	{
 		readonly ICommand<T> inner;
 		public CommandAdapter( ICommand<T> inner )
@@ -312,11 +293,13 @@ namespace DragonSpark.Runtime
 
 		public bool IsValid( object parameter ) => inner.CanExecute( (T)parameter );
 
-		/*public object Execute( object parameter )
+		public bool Handles( object parameter ) => parameter is T;
+
+		public object Execute( object parameter )
 		{
 			inner.Execute( (T)parameter );
 			return null;
-		}*/
+		}
 	}
 
 	public interface IInvocation<out T>

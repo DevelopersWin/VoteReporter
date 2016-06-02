@@ -232,10 +232,12 @@
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
+    <Compile Include="Aspects\ParameterValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="Aspects\ThreadCacheTests.cs" />
     <Compile Include="Aspects\ValidationAspectTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
+    <Compile Include="Runtime\EnabledStateTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
     <Compile Include="Runtime\ParameterInvocationTests.cs" />
     <Compile Include="Runtime\TaskFactoryTests.cs" />

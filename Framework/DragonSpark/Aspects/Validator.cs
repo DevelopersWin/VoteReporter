@@ -45,15 +45,15 @@ namespace DragonSpark.Aspects
 
 	public struct Profile
 	{
-		public Profile( Type type, string isAllowed, string execute )
+		public Profile( Type type, string isValid, string execute )
 		{
 			Type = type;
-			IsAllowed = isAllowed;
+			IsValid = isValid;
 			Execute = execute;
 		}
 
 		public Type Type { get; }
-		public string IsAllowed { get; }
+		public string IsValid { get; }
 		public string Execute { get; }
 	}
 
@@ -71,7 +71,7 @@ namespace DragonSpark.Aspects
 		WorkflowState() : base( () => new ParameterState() ) {}
 	}
 
-	abstract class GenericParameterAdapterStoreBase : ParameterAdapterStoreBase<object>
+	abstract class GenericParameterAdapterStoreBase : ProjectedStore<object, IGenericParameterValidator>
 	{
 		readonly Type genericType;
 		readonly string methodName;
@@ -84,10 +84,10 @@ namespace DragonSpark.Aspects
 			adapter = GetType().Adapt();
 		}
 
-		protected override IParameterValidator Project( object instance )
+		protected override IGenericParameterValidator Project( object instance )
 		{
 			var arguments = instance.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = adapter.Invoke<IParameterValidator>( methodName, arguments, instance.ToItem() );
+			var result = adapter.Invoke<IGenericParameterValidator>( methodName, arguments, instance.ToItem() );
 			return result;
 		}
 	}
@@ -98,7 +98,7 @@ namespace DragonSpark.Aspects
 
 		GenericFactoryParameterAdapterStore() : base( typeof(IFactory<,>), nameof(Create) ) {}
 
-		static IParameterValidator Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
+		static IGenericParameterValidator Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
 	class GenericCommandParameterAdapterStore : GenericParameterAdapterStoreBase
 	{
@@ -169,11 +169,15 @@ namespace DragonSpark.Aspects
 	{
 		readonly MethodInterceptionArgs args;
 
+		public RelayParameter( MethodInterceptionArgs args ) : this( args, args.Arguments.Single() ) {}
+
 		public RelayParameter( MethodInterceptionArgs args, object parameter )
 		{
 			this.args = args;
 			Parameter = parameter;
 		}
+
+		public void Assign<T>( T result ) => args.ReturnValue = result;
 
 		public T Proceed<T>() => args.GetReturnValue<T>();
 		public object Parameter { get; }
@@ -199,13 +203,13 @@ namespace DragonSpark.Aspects
 
 		IDictionary<string, MethodInfo[]> Maps { get; set; }
 
-		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Maps[ profile.IsAllowed ];
+		IEnumerable<MethodInfo> FindIsAllowed( Type type ) => Maps[ profile.IsValid ];
 		IEnumerable<MethodInfo> FindExecute( Type type ) => Maps[ profile.Execute ];
 
 		IDictionary<string, MethodInfo[]> CreateMaps( Type type )
 		{
 			var methods = type.Adapt().GetMappedMethods( profile.Type );
-			var result = new[] { profile.IsAllowed, profile.Execute }
+			var result = new[] { profile.IsValid, profile.Execute }
 				.ToDictionary( s => s, s => methods.Where( pair => pair.Item1.Name == s && pair.Item2.DeclaringType == type && !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
 												  .Select( pair => pair.Item2 )
 												  .ToArray() );
@@ -276,7 +280,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class GenericFactoryParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<IParameterValidator> Property = new AttachedProperty<IParameterValidator>( GenericFactoryParameterAdapterStore.Instance );
+		readonly static IAttachedProperty<IGenericParameterValidator> Property = new AttachedProperty<IGenericParameterValidator>( GenericFactoryParameterAdapterStore.Instance );
 
 		public GenericFactoryParameterValidator() : 
 			base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ), Property.Get ) {}
@@ -292,38 +296,9 @@ namespace DragonSpark.Aspects
 
 	public sealed class GenericCommandParameterValidator : ParameterValidatorBase
 	{
-		readonly static IAttachedProperty<IParameterValidator> Property = new AttachedProperty<IParameterValidator>( GenericCommandParameterAdapterStore.Instance );
+		readonly static IAttachedProperty<IGenericParameterValidator> Property = new AttachedProperty<IGenericParameterValidator>( GenericCommandParameterAdapterStore.Instance );
 
 		public GenericCommandParameterValidator() : 
 			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), Property.Get ) {}
 	}
-
-	/*class DelegatedParameterAware : IParameterAware
-	{
-		readonly IsValid valid;
-		readonly Execute execute;
-
-		/*public DelegatedParameterAware( IsValid valid, Action<object> execute ) : this( valid, new Execute( parameter =>
-																											{
-																												execute( parameter );
-																												return null;
-																											} ) ) {}#1#
-
-		public DelegatedParameterAware( IsValid valid, Execute execute )
-		{
-			this.valid = valid;
-			this.execute = execute;
-		}
-
-		public bool IsValid( object parameter ) => valid( parameter );
-
-		public object Execute( object parameter ) => execute( parameter );
-	}*/
-
-	/*public interface IAssignableParameterAware : IParameterAware
-	{
-		void Assign( IsValid condition );
-
-		void Assign( Execute execute );
-	}*/
 }

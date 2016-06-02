@@ -15,7 +15,7 @@ using System.Reflection;
 
 namespace DragonSpark.Runtime
 {
-	public class AssociatedDisposables : AttachedCollectionProperty<IDisposable>
+	public class AssociatedDisposables : AttachedCollectionProperty<IDisposable, IDisposable>
 	{
 		public static AssociatedDisposables Instance { get; } = new AssociatedDisposables();
 

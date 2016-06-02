@@ -239,10 +239,16 @@ namespace DragonSpark.Runtime.Properties
 
 		public EqualityReference( Func<object> instance, IAttachedProperty<object, ConcurrentDictionary<int, T>> property, ICoercer<ConcurrentDictionary<int, T>> coercer ) : base( instance, property, coercer ) {}
 	}
-	
-	public class Condition : AttachedProperty<ConditionMonitor>
+
+	public class Condition : Condition<object>
 	{
-		public static Condition Property { get; } = new Condition();
+		public new static Condition Property { get; } = new Condition();
+	}
+	
+	public class Condition<T> : AttachedProperty<T, ConditionMonitor> where T : class
+	{
+		public static Condition<T> Property { get; } = new Condition<T>();
+
 		public Condition() : base( key => new ConditionMonitor() ) {}
 	}
 }
