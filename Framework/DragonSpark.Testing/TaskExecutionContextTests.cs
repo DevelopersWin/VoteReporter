@@ -5,10 +5,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace DragonSpark.Testing
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class TaskExecutionContextTests : TestCollectionBase
 	{
 		public TaskExecutionContextTests( ITestOutputHelper output ) : base( output ) {}
@@ -62,6 +62,7 @@ namespace DragonSpark.Testing
 		}*/
 	}
 
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	// ReSharper disable once TestClassNameDoesNotMatchFileNameWarning
 	public class TaskedTaskExecutionContextTests : TestCollectionBase
 	{

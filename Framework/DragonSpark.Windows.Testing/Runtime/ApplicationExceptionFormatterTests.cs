@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
@@ -10,6 +11,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class ApplicationExceptionFormatterTests
 	{
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]

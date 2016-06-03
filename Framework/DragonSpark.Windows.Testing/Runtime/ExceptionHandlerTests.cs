@@ -11,6 +11,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class ExceptionHandlerTests
 	{
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]

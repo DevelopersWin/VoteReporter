@@ -18,7 +18,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Xunit.Sdk;
 using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 

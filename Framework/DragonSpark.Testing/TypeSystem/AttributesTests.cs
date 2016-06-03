@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void SameInstances()
 		{
-			for ( int i = 0; i < 10000; i++ )
+			// for ( int i = 0; i < 10000; i++ )
 			{
 				var propertyInfo = GetType().GetProperty( nameof(PropertyName) );
 			

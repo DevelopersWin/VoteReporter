@@ -6,6 +6,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Configuration
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class ConfigurationTests
 	{
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]

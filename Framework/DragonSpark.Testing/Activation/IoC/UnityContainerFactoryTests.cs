@@ -12,6 +12,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Activation.IoC
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	[DefaultUnityContainerFactory.Register]
 	public class UnityContainerFactoryTests : TestCollectionBase
 	{

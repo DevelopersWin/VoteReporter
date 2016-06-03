@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Diagnostics;
-using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Xunit2;
 using System;
@@ -7,6 +7,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class ApplicationExceptionFormatterTests
 	{
 		[Theory, Framework.Setup.AutoData]

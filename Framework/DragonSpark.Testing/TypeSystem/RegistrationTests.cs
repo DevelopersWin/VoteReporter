@@ -13,6 +13,7 @@ namespace DragonSpark.Testing.TypeSystem
 	{
 		[RegisterFactory( typeof(AssemblySource) )]
 		[Theory, Framework.Setup.AutoData]
+		[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 		public void Testing( Assembly[] sut )
 		{
 			Assert.Same( AssemblySource.Result, sut );

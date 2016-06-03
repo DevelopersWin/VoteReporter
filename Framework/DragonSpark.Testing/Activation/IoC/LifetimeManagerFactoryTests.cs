@@ -6,6 +6,7 @@ using LifetimeManagerFactory = DragonSpark.Activation.IoC.LifetimeManagerFactory
 
 namespace DragonSpark.Testing.Activation.IoC
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class LifetimeManagerFactoryTests
 	{
 		[Map( typeof(IUnityContainer), typeof(UnityContainer) )]

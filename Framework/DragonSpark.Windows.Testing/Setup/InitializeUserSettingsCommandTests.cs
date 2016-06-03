@@ -12,6 +12,7 @@ using Resources = DragonSpark.Windows.Properties.Resources;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class InitializeUserSettingsCommandTests : TestCollectionBase
 	{
 		public InitializeUserSettingsCommandTests( ITestOutputHelper output ) : base( output )

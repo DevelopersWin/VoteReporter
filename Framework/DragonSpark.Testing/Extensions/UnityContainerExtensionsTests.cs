@@ -18,6 +18,7 @@ using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 namespace DragonSpark.Testing.Extensions
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class UnityContainerExtensionsTests
 	{
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]

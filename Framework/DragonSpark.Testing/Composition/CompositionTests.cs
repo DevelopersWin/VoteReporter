@@ -65,6 +65,7 @@ namespace DragonSpark.Testing.Composition
 		public void BasicComposeAgain( CompositionContext host ) {}
 	}*/
 
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class CompositionTests : TestCollectionBase
 	{
 		public CompositionTests( ITestOutputHelper output ) : base( output ) {}

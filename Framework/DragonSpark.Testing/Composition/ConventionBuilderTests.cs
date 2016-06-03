@@ -19,6 +19,7 @@ using Type = System.Type;
 
 namespace DragonSpark.Testing.Composition
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class ConventionBuilderTests : TestCollectionBase
 	{
 		public ConventionBuilderTests( ITestOutputHelper output ) : base( output ) {}

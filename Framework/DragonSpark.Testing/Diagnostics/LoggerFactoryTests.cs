@@ -4,6 +4,7 @@ using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Diagnostics;
 using DragonSpark.Windows.Runtime;
@@ -17,6 +18,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class LoggerFactoryTests
 	{
 		[Theory, AutoData( additionalTypes: typeof(FormatterFactory) )]

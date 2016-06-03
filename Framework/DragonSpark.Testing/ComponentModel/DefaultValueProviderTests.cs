@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Objects;
 using DragonSpark.Testing.Objects.IoC;
@@ -9,6 +10,7 @@ using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
 namespace DragonSpark.Testing.ComponentModel
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	[UnityContainerFactory.Register]
 	[Freeze( typeof(IServiceLocator), typeof(ServiceLocator) )]
 	[Freeze( typeof(IActivator), typeof(Activator) )]

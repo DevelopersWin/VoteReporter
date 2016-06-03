@@ -9,6 +9,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Activation.IoC
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class RegistrationSupportTests
 	{
 		[Theory, Framework.Setup.AutoData]

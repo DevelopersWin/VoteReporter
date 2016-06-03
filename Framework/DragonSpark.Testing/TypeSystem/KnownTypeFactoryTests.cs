@@ -1,4 +1,5 @@
-﻿using DragonSpark.Testing.Framework.Setup;
+﻿using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Xunit;
@@ -7,6 +8,7 @@ namespace DragonSpark.Testing.TypeSystem
 {
 	/*[AssemblyProvider.Register]*/
 	/*[AssemblyProvider.Types]*/
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class KnownTypeFactoryTests
 	{
 		[Theory, AutoData( false, typeof(Class), typeof(ClassWithProperty), typeof(Derived) )]

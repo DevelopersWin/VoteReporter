@@ -8,6 +8,7 @@ using AutoDataAttribute = Ploeh.AutoFixture.Xunit2.AutoDataAttribute;
 
 namespace DragonSpark.Testing.TypeSystem
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class ApplicationAssemblyFilterTests
 	{
 		[Theory, Framework.Setup.AutoData]

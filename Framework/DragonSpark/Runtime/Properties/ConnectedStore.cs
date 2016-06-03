@@ -146,6 +146,8 @@ namespace DragonSpark.Runtime.Properties
 				readonly ThreadLocalStore<IStack<T>> store;
 				readonly ConcurrentDictionary<IStack<T>, bool> empty = new ConcurrentDictionary<IStack<T>, bool>();
 				readonly ThreadLocal<IStack<T>> local;
+				readonly Action<IStack<T>> onEmpty;
+				readonly Func<IStack<T>, bool> isEmpty;
 
 				public Factory( Store owner, object instance )
 				{
@@ -154,17 +156,19 @@ namespace DragonSpark.Runtime.Properties
 
 					local = new ThreadLocal<IStack<T>>( New, true );
 					store = new ThreadLocalStore<IStack<T>>( local ).Configured( false );
+					onEmpty = OnEmpty;
+					isEmpty = IsEmpty;
 				}
 
 				public IWritableStore<IStack<T>> Create() => store;
 
-				IStack<T> New() => new Stack<T>( OnEmpty );
+				IStack<T> New() => new Stack<T>( onEmpty );
 
 				void OnEmpty( IStack<T> item )
 				{
 					// bool current;
-					
-					if ( empty.TryAdd( item, true ) && local.Values.All( IsEmpty ) )
+
+					if ( empty.TryAdd( item, true ) && local.Values.All( isEmpty ) )
 					//if ( empty.TryGetValue( item, out current ) && empty.TryUpdate( item, true, current ) && empty.Values.All( b => b ) )
 					{
 						empty.Clear();
@@ -175,8 +179,8 @@ namespace DragonSpark.Runtime.Properties
 
 				bool IsEmpty( IStack<T> stack )
 				{
-					bool isEmpty;
-					return empty.ContainsKey( stack ) && empty.TryGetValue( stack, out isEmpty ) && isEmpty;
+					bool stored;
+					return empty.ContainsKey( stack ) && empty.TryGetValue( stack, out stored ) && stored;
 				}
 			}
 
