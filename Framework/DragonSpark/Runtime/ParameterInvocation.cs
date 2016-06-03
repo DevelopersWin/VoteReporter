@@ -66,7 +66,7 @@ namespace DragonSpark.Runtime
 		public T Finish { get; }
 	}
 
-	public struct PropertyAssign<T1, T2> : IAssign<T1, T2> where T1 : class
+	public class PropertyAssign<T1, T2> : IAssign<T1, T2> where T1 : class
 	{
 		readonly IAttachedProperty<T1, T2> property;
 		public PropertyAssign( IAttachedProperty<T1, T2> property )
@@ -93,7 +93,7 @@ namespace DragonSpark.Runtime
 		public void Assign( T1 first, T2 second ) => assign( first, second );
 	}*/
 
-	struct EnabledStateAssign : IAssign<object, bool>
+	public class EnabledStateAssign : IAssign<object, bool>
 	{
 		readonly EnabledState value;
 
@@ -106,15 +106,15 @@ namespace DragonSpark.Runtime
 	}
 
 	// [Disposable]
-	public struct Assignment<T, T1, T2> : IDisposable where T : IAssign<T1, T2>
+	public class Assignment<T1, T2> : IDisposable
 	{
-		readonly T assign;
+		readonly IAssign<T1, T2> assign;
 		readonly Value<T1> first;
 		readonly Value<T2> second;
 
-		public Assignment( T assign, T1 first, T2 second ) : this( assign, new Value<T1>( first ), new Value<T2>( second ) ) {}
+		public Assignment( IAssign<T1, T2> assign, T1 first, T2 second ) : this( assign, new Value<T1>( first ), new Value<T2>( second ) ) {}
 
-		public Assignment( T assign, Value<T1> first, Value<T2> second )
+		public Assignment( IAssign<T1, T2> assign, Value<T1> first, Value<T2> second )
 		{
 			this.assign = assign;
 			this.first = first;
@@ -179,7 +179,7 @@ namespace DragonSpark.Runtime
 		public static implicit operator int( BitwiseValue item ) => item.value;#1#
 	}*/
 
-	public class ParameterState /*: IParameterWorkflowState*/
+	/*public class ParameterState /*: IParameterWorkflowState#1#
 	{
 		public ParameterState() : this( new EnabledState(), new EnabledState() ) {}
 
@@ -192,7 +192,7 @@ namespace DragonSpark.Runtime
 		/*public ParameterWorkflowState()
 		{
 			Active = new BitwiseValue();
-		}*/
+		}#1#
 
 		public EnabledState Active { get; }
 
@@ -227,8 +227,8 @@ namespace DragonSpark.Runtime
 		{
 			var code = ( parameter ?? Null ).GetHashCode();
 			return ( store & code ) == code;
-		}*/
-	}
+		}#1#
+	}*/
 
 	public interface IParameterValidator
 	{
@@ -302,7 +302,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public interface IInvocation<out T>
+	/*public interface IInvocation<out T>
 	{
 		T Invoke( object parameter );
 	}
@@ -384,5 +384,5 @@ namespace DragonSpark.Runtime
 		}
 
 		public object Invoke( object parameter ) => state.Valid.IsEnabled( parameter ) || AsActive( parameter ) ? AsValid( parameter ) : null;
-	}
+	}*/
 }

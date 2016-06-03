@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
-using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -86,8 +85,8 @@ namespace DragonSpark.Activation
 		public override TResult Create( TParameter parameter ) => inner.CreateUsing<TResult>( parameter );
 	}
 
-	[FactoryParameterValidator, GenericFactoryParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract, AttributeTargetExternalTypeAttributes = MulticastAttributes.NonAbstract )]
-	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>, IValidationAware
+	[ValidatedGenericFactory, ValidatedGenericFactory.Supplemental]
+	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult> // , IValidationAware
 	{
 		readonly ICoercer<TParameter> coercer;
 		readonly ISpecification<TParameter> specification;
@@ -116,7 +115,7 @@ namespace DragonSpark.Activation
 
 		public abstract TResult Create( [Required]TParameter parameter );
 
-		bool IValidationAware.ShouldValidate() => specification != Specifications.Always && specification != Specifications<TParameter>.Always;
+		// bool IValidationAware.ShouldValidate() => specification != Specifications.Always && specification != Specifications<TParameter>.Always;
 	}
 
 	public class DelegatedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>

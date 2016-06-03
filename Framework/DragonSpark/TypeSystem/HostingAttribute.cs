@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using PostSharp.Patterns.Contracts;
 using System;
 
@@ -18,6 +17,6 @@ namespace DragonSpark.TypeSystem
 
 		public object Create( object parameter ) => inner( parameter );
 
-		bool IValidationAware.ShouldValidate() => false;
+		// bool IValidationAware.ShouldValidate() => false;
 	}
 }

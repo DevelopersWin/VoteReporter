@@ -5,15 +5,10 @@ using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
-using PostSharp.Aspects.Advices;
-using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
-using PostSharp.Aspects.Serialization;
 using PostSharp.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects
@@ -43,6 +38,7 @@ namespace DragonSpark.Aspects
 
 	public delegate object Execute( object parameter );*/
 
+	// [PSerializable]
 	public struct Profile
 	{
 		public Profile( Type type, string isValid, string execute )
@@ -64,12 +60,12 @@ namespace DragonSpark.Aspects
 		protected abstract IParameterAware Project( T instance );*/
 	}
 
-	class WorkflowState : ThreadLocalAttachedProperty<ParameterState>
+	/*class WorkflowState : ThreadLocalAttachedProperty<ParameterState>
 	{
 		public static WorkflowState Property { get; } = new WorkflowState();
 
 		WorkflowState() : base( () => new ParameterState() ) {}
-	}
+	}*/
 
 	abstract class GenericParameterAdapterStoreBase : ProjectedStore<object, IGenericParameterValidator>
 	{
@@ -183,7 +179,7 @@ namespace DragonSpark.Aspects
 		public object Parameter { get; }
 	}
 	
-	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	/*[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public abstract class ParameterValidatorBase : TypeLevelAspect
@@ -268,9 +264,9 @@ namespace DragonSpark.Aspects
 	public interface IValidationAware
 	{
 		bool ShouldValidate();
-	}
+	}*/
 
-	public sealed class FactoryParameterValidator : ParameterValidatorBase
+	/*public sealed class FactoryParameterValidator : ParameterValidatorBase
 	{
 		readonly static IAttachedProperty<IParameterValidator> Property = new AttachedProperty<IParameterValidator>( FactoryParameterAdapterStore.Instance );
 
@@ -300,5 +296,5 @@ namespace DragonSpark.Aspects
 
 		public GenericCommandParameterValidator() : 
 			base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ), Property.Get ) {}
-	}
+	}*/
 }

@@ -4,7 +4,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
-using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
@@ -13,7 +12,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Runtime
 {
-	public interface ICommand<in TParameter> : ICommand, IValidationAware
+	public interface ICommand<in TParameter> : ICommand//, IValidationAware
 	{
 		bool CanExecute( TParameter parameter );
 
@@ -177,8 +176,8 @@ namespace DragonSpark.Runtime
 		public DecoratedCommand( [Required] ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
 	}
 
-	[CommandParameterValidator, GenericCommandParameterValidator( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetTypeAttributes = MulticastAttributes.NonAbstract )]
-	public abstract class CommandBase<T> : ICommand<T>, IValidationAware
+	[ValidatedGenericCommand, ValidatedGenericCommand.Supplemental]
+	public abstract class CommandBase<T> : ICommand<T> //, IValidationAware
 	{
 		public event EventHandler CanExecuteChanged = delegate { };
 		readonly ICoercer<T> coercer;
@@ -198,19 +197,15 @@ namespace DragonSpark.Runtime
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
-		// [Validator]
 		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		// [AutoValidate]
 		void ICommand.Execute( object parameter ) => Execute( coercer.Coerce( parameter ) );
 
-		// [Validator]
 		public virtual bool CanExecute( T parameter ) => specification.IsSatisfiedBy( parameter );
 
-		// [AutoValidate( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract void Execute( T parameter );
 
-		bool IValidationAware.ShouldValidate() => specification != Specifications.Specifications.Always && specification != Specifications<T>.Always;
+		// bool IValidationAware.ShouldValidate() => specification != Specifications.Specifications.Always && specification != Specifications<T>.Always;
 	}
 
 }

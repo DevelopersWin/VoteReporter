@@ -2,19 +2,18 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
+using PostSharp.Extensibility;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Input;
-using PostSharp;
-using PostSharp.Extensibility;
 
 namespace DragonSpark.Aspects
 {
@@ -64,6 +63,8 @@ namespace DragonSpark.Aspects
 	{
 		readonly IGenericParameterValidator generic;
 
+		readonly EnabledState active = new EnabledState();
+
 		public GenericParameterValidationController( IGenericParameterValidator generic, IParameterValidator validator ) : base( validator )
 		{
 			this.generic = generic;
@@ -73,108 +74,20 @@ namespace DragonSpark.Aspects
 
 		public override object Execute( RelayParameter parameter )
 		{
-			var result = generic.Handles( parameter.Parameter ) ? generic.Execute( parameter.Parameter ) : base.Execute( parameter );
-			return result;
+			var handle = generic.Handles( parameter.Parameter ) && !active.IsEnabled( parameter.Parameter );
+			if ( handle )
+			{
+				using ( active.Assignment( parameter.Parameter ) )
+				{
+					var result = generic.Execute( parameter.Parameter );
+					return result;
+				}
+			}
+			return base.Execute( parameter );
 		}
 
 		public object ExecuteGeneric( RelayParameter parameter ) => base.Execute( parameter );
-	}
-
-	public sealed class ValidatedGenericCommand : ValidatedParameterAspect
-	{
-		public ValidatedGenericCommand() : base( new GenericParameterValidationControllerFactory( GenericCommandParameterAdapterStore.Instance, CommandParameterAdapterStore.Instance ) ) {}
-
-		class ProfileProvider : ProviderBase
-		{
-			public static ProfileProvider Instance { get; } = new ProfileProvider();
-
-			ProfileProvider() : base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
-		}
-
-		public override IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => ProfileProvider.Instance.ProvideAspects( targetElement );
-	}
-
-	public sealed class ValidatedFactory : ValidatedParameterAspect
-	{
-		public ValidatedFactory() : base( new ParameterValidationControllerFactory( FactoryParameterAdapterStore.Instance ) ) {}
-
-		class ProfileProvider : ProviderBase
-		{
-			public static ProfileProvider Instance { get; } = new ProfileProvider();
-
-			ProfileProvider() : base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
-		}
-
-		public override IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => ProfileProvider.Instance.ProvideAspects( targetElement );
-	}
-
-	public sealed class ValidatedGenericFactory : ValidatedParameterAspect
-	{
-		public ValidatedGenericFactory() : base( new GenericParameterValidationControllerFactory( GenericFactoryParameterAdapterStore.Instance, FactoryParameterAdapterStore.Instance ) ) {}
-
-		class ProfileProvider : ProviderBase
-		{
-			public static ProfileProvider Instance { get; } = new ProfileProvider();
-
-			ProfileProvider() : base( new Profile( typeof(IFactory<>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
-		}
-
-		public override IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => ProfileProvider.Instance.ProvideAspects( targetElement );
-	}
-
-	public sealed class ValidatedCommand : ValidatedParameterAspect
-	{
-		public ValidatedCommand() : base( new ParameterValidationControllerFactory( CommandParameterAdapterStore.Instance ) ) {}
-
-		class ProfileProvider : ProviderBase
-		{
-			public static ProfileProvider Instance { get; } = new ProfileProvider();
-
-			ProfileProvider() : base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
-		}
-
-		public override IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => ProfileProvider.Instance.ProvideAspects( targetElement );
-	}
-
-	public abstract class ProviderBase : IAspectProvider
-	{
-		readonly Profile profile;
-
-		protected ProviderBase( Profile profile )
-		{
-			this.profile = profile;
-		}
-
-		public IEnumerable<AspectInstance> ProvideAspects( object targetElement )
-		{
-			var type = targetElement as Type;
-			if ( type != null )
-			{
-				var implementedType = profile.Type;
-				var types = implementedType.Append( implementedType.GetTypeInfo().IsGenericTypeDefinition ? implementedType.GetTypeInfo().ImplementedInterfaces : Items<Type>.Default );
-				foreach ( var check in types )
-				{
-					var isGeneric = check.GetTypeInfo().IsGenericTypeDefinition;
-					foreach ( var pair in type.Adapt().GetMappedMethods( check ) )
-					{
-						if ( pair.Item2.DeclaringType == type && !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
-						{
-							var aspect = pair.Item1.Name == profile.IsValid ? ValidatorAspect.Instance :
-										 pair.Item1.Name == profile.Execute ? isGeneric ? GenericExecutionAspect.Instance : ExecutionAspect.Instance
-										 : default(IAspect);
-							/*if ( type.Name == "ExtendedFactory" && aspect != null )
-							{
-								MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {pair.Item2} : {aspect}", null, null, null ));
-							}*/
-							if ( aspect != null )
-							{
-								yield return new AspectInstance( pair.Item2, aspect );
-							}
-						}
-					}
-				}
-			}
-		}
+		
 	}
 
 	[PSerializable]
@@ -184,19 +97,20 @@ namespace DragonSpark.Aspects
 	{
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var controller = ParameterValidation.Controller.Get( args.Instance );
+			var property = ParameterValidation.Controller;
+			var controller = property.Get( args.Instance );
 			if ( controller != null )
 			{
 				var parameter = new RelayParameter( args );
-				Execute( controller, parameter );
+				args.ReturnValue = Execute( controller, parameter ) ?? args.ReturnValue;
 			}
 			else
 			{
-				throw new InvalidOperationException( $"Controller not set for {args.Instance}" );
+				throw new InvalidOperationException( $"Controller not set for {args.Instance} - {args.Instance.GetHashCode()}" );
 			}
 		}
 
-		protected abstract void Execute( IParameterValidationController controller, RelayParameter parameter );
+		protected abstract object Execute( IParameterValidationController controller, RelayParameter parameter );
 	}
 
 	[PSerializable]
@@ -204,26 +118,25 @@ namespace DragonSpark.Aspects
 	{
 		public static ExecutionAspect Instance { get; } = new ExecutionAspect();
 
-		protected override void Execute( IParameterValidationController controller, RelayParameter parameter ) => controller.Execute( parameter );
+		protected override object Execute( IParameterValidationController controller, RelayParameter parameter ) => controller.Execute( parameter );
 	}
 
 	[PSerializable]
+	// [MulticastAttributeUsage( Inheritance = MulticastInheritance.Multicast, TargetMemberAttributes = MulticastAttributes.NonAbstract )]
 	public sealed class GenericExecutionAspect : ExecutionAspect
 	{
-		public new static GenericExecutionAspect Instance { get; } = new GenericExecutionAspect();
+		public new static GenericExecutionAspect Instance { get; } = new GenericExecutionAspect()/* { AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.NonAbstract }*/;
 
-		protected override void Execute( IParameterValidationController controller, RelayParameter parameter )
+		GenericExecutionAspect() {}
+
+		protected override object Execute( IParameterValidationController controller, RelayParameter parameter )
 		{
 			var generic = controller as IGenericParameterValidationController;
 			if ( generic != null )
 			{
-				var temp = generic.ExecuteGeneric( parameter );
-				Debugger.Break();
+				return generic.ExecuteGeneric( parameter );
 			}
-			else
-			{
-				throw new InvalidOperationException( "Expecting a generic controller." );
-			}
+			throw new InvalidOperationException( "Expecting a generic controller." );
 		}
 	}
 
@@ -232,9 +145,11 @@ namespace DragonSpark.Aspects
 	{
 		public static ValidatorAspect Instance { get; } = new ValidatorAspect();
 
-		protected override void Execute( IParameterValidationController controller, RelayParameter parameter )
+		protected override object Execute( IParameterValidationController controller, RelayParameter parameter )
 		{
-			controller.MarkValid( parameter.Parameter, parameter.Proceed<bool>() );
+			var result = parameter.Proceed<bool>();
+			controller.MarkValid( parameter.Parameter, result );
+			return null;
 
 			/*var isValid = controller.IsValid( parameter.Parameter );
 			if ( !isValid && parameter.Proceed<bool>() )
@@ -250,24 +165,151 @@ namespace DragonSpark.Aspects
 
 	public static class ParameterValidation
 	{
-		public static IAttachedProperty<IParameterValidationController> Controller { get; } = new ThreadLocalAttachedProperty<IParameterValidationController>();
+		public static IAttachedProperty<IParameterValidationControllerFactory> Factory { get; } = new AttachedProperty<IParameterValidationControllerFactory>();
+
+		public static IAttachedProperty<IParameterValidationController> Controller { get; } = new ControllerProperty();
+	}
+
+	class ControllerProperty : ThreadLocalAttachedProperty<IParameterValidationController>
+	{
+		public ControllerProperty() : base( Store.Instance ) {}
+
+		class Store : AttachedPropertyStoreBase<object, IParameterValidationController>
+		{
+			public static Store Instance { get; } = new Store();
+
+			public override IWritableStore<IParameterValidationController> Create( object instance )
+			{
+				var factory = ParameterValidation.Factory.Get( instance );
+				var result = new ThreadLocalStore<IParameterValidationController>( new CreateContext( factory, instance ).Create );
+				return result;
+			}
+
+			struct CreateContext
+			{
+				readonly IParameterValidationControllerFactory factory;
+				readonly object instance;
+
+				public CreateContext( IParameterValidationControllerFactory factory, object instance )
+				{
+					this.factory = factory;
+					this.instance = instance;
+				}
+
+				public IParameterValidationController Create() => factory.Create( instance );
+			}
+		}
+	}
+
+	public sealed class ValidatedCommand : ValidatedParameterAspectBase
+	{
+		readonly static IParameterValidationControllerFactory Factory = new ParameterValidationControllerFactory( CommandParameterAdapterStore.Instance );
+
+		public ValidatedCommand() : base( Factory ) {}
+
+		public class Supplemental : SupplementalAspect
+		{
+			public Supplemental() : base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
+		}
+	}
+
+	public sealed class ValidatedGenericCommand : ValidatedParameterAspectBase
+	{
+		readonly static IParameterValidationControllerFactory Factory = new GenericParameterValidationControllerFactory( GenericCommandParameterAdapterStore.Instance, CommandParameterAdapterStore.Instance );
+
+		public ValidatedGenericCommand() : base( Factory ) {}
+
+		public class Supplemental : SupplementalAspect
+		{
+			public Supplemental() : base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
+		}
+	}
+
+	public sealed class ValidatedFactory : ValidatedParameterAspectBase
+	{
+		readonly static IParameterValidationControllerFactory Factory = new ParameterValidationControllerFactory( FactoryParameterAdapterStore.Instance );
+
+		public ValidatedFactory() : base( Factory ) {}
+
+		public class Supplemental : SupplementalAspect
+		{
+			public Supplemental() : base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
+		}
+	}
+
+	public sealed class ValidatedGenericFactory : ValidatedParameterAspectBase
+	{
+		readonly static IParameterValidationControllerFactory Factory = new GenericParameterValidationControllerFactory( GenericFactoryParameterAdapterStore.Instance, FactoryParameterAdapterStore.Instance );
+		
+		public ValidatedGenericFactory() : base( Factory ) {}
+
+		public class Supplemental : SupplementalAspect
+		{
+			public Supplemental() : base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
+		}
 	}
 
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class ValidatedParameterAspect : InstanceLevelAspect, IAspectProvider
+	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict, TargetMemberAttributes = MulticastAttributes.NonAbstract | MulticastAttributes.Instance )]
+	public class SupplementalAspect : TypeLevelAspect, IAspectProvider
+	{
+		readonly Profile profile;
+
+		public SupplementalAspect( Profile profile )
+		{
+			this.profile = profile;
+		}
+
+		public IEnumerable<AspectInstance> ProvideAspects( object targetElement )
+		{
+			var type = targetElement as Type;
+			if ( type != null )
+			{
+				var implementedType = profile.Type;
+				var types = implementedType.Append( implementedType.GetTypeInfo().IsGenericTypeDefinition ? implementedType.GetTypeInfo().ImplementedInterfaces : Items<Type>.Default );
+
+				foreach ( var check in types )
+				{
+					var isGeneric = check.GetTypeInfo().IsGenericTypeDefinition;
+					
+					var mappedMethods = type.Adapt().GetMappedMethods( check );
+
+					foreach ( var pair in mappedMethods )
+					{
+						if ( pair.Item2.DeclaringType == type && !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
+						{
+							var aspect = pair.Item1.Name == profile.IsValid ? ValidatorAspect.Instance :
+										 pair.Item1.Name == profile.Execute ? isGeneric ? GenericExecutionAspect.Instance : ExecutionAspect.Instance
+										 : default(IAspect);
+
+							if ( aspect != null )
+							{
+								// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"IAspectProvider.ProvideAspects: {pair.Item1} -> {type}.{pair.Item2} : ({aspect})", null, null, null ));
+
+								yield return new AspectInstance( pair.Item2, aspect );
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	public abstract class ValidatedParameterAspectBase : InstanceLevelAspect
 	{
 		readonly IParameterValidationControllerFactory factory;
-
-		protected ValidatedParameterAspect( IParameterValidationControllerFactory factory )
+		
+		protected ValidatedParameterAspectBase( IParameterValidationControllerFactory factory )
 		{
 			this.factory = factory;
 		}
 
-		public override void RuntimeInitializeInstance() => ParameterValidation.Controller.Set( Instance, factory.Create( Instance ) );
-
-		public abstract IEnumerable<AspectInstance> ProvideAspects( object targetElement );
+		public override void RuntimeInitializeInstance() => ParameterValidation.Factory.Set( Instance, factory );
 	}
 
 	public interface IParameterValidationControllerFactory

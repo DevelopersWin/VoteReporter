@@ -145,7 +145,7 @@ namespace DragonSpark.TypeSystem
 				.AsTypes()
 				.Fixed();
 
-		// [Freeze]
+		[Freeze]
 		public Tuple<MethodInfo, MethodInfo>[] GetMappedMethods( Type implementedType )
 		{
 			var implementation = CheckGeneric( implementedType ) ?? ( implementedType.Adapt().IsAssignableFrom( Type ) ? implementedType : null );

@@ -38,4 +38,10 @@ namespace DragonSpark.Runtime
 			}
 		}
 	}
+
+	public static class EnabledStateExtensions
+	{
+		public static Assignment<object, bool> Assignment( this EnabledState @this, object first, bool second = true ) => 
+			new Assignment<object, bool>( new EnabledStateAssign( @this ), Assignments.From( first ), new Value<bool>( second ) );
+	}
 }

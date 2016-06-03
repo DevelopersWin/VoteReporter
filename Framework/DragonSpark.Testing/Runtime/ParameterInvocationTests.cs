@@ -132,7 +132,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 1212, sut.LastResult.GetValueOrDefault() );
 		}*/
 
-		[ValidatedFactory]
+		[ValidatedFactory, ValidatedFactory.Supplemental]
 		public class Factory : IFactoryWithParameter
 		{
 			public int CanCreateCalled { get; private set; }

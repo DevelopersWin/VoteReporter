@@ -30,7 +30,12 @@ namespace DragonSpark.Composition
 			public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.IsSatisfiedBy( parameter ) && ResultTypeLocator.Instance.Create( parameter ) != typeof(object) && parameter.Adapt().IsDefined<ExportAttribute>();
 		}
 
-		public override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultTypeLocator.Instance.Create( parameter ) );
+		public override FactoryTypeRequest Create( Type parameter )
+		{
+			var resultType = ResultTypeLocator.Instance.Create( parameter );
+			var request = new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), resultType );
+			return request;
+		}
 	}
 
 	public class ServiceProviderFactory : FactoryBase<IServiceProvider>

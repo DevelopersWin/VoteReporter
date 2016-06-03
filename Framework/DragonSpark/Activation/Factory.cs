@@ -77,7 +77,6 @@ namespace DragonSpark.Activation
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
 
-	// [AutoValidation( false )]
 	public abstract class TypeLocatorBase : FactoryBase<Type, Type>
 	{
 		readonly TypeAdapter[] adapters;

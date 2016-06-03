@@ -1,6 +1,8 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -11,7 +13,6 @@ using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Composition
 {
@@ -173,10 +174,10 @@ namespace DragonSpark.Composition
 		{
 			public static AttributeProvider Instance { get; } = new AttributeProvider();
 
-			// [Freeze]
+			[Freeze]
 			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, MemberInfo member ) => member.GetAttributes<Attribute>();
 
-			// [Freeze]
+			[Freeze]
 			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, ParameterInfo parameter ) => parameter.GetAttributes<Attribute>();
 		}
 	}

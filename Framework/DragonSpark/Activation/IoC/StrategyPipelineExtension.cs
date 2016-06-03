@@ -339,7 +339,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static CanInstantiateSpecification Instance { get; } = new CanInstantiateSpecification();
 
-		// [Freeze]
+		[Freeze]
 		public override bool IsSatisfiedBy( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();

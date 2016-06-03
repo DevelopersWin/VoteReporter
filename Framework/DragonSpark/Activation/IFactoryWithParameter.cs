@@ -1,8 +1,6 @@
-using DragonSpark.Aspects;
-
 namespace DragonSpark.Activation
 {
-	public interface IFactoryWithParameter : ICreator, IValidationAware
+	public interface IFactoryWithParameter : ICreator //, IValidationAware
 	{
 		bool CanCreate( object parameter );
 
