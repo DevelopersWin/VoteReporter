@@ -127,7 +127,7 @@ namespace DragonSpark.TypeSystem
 
 	public abstract class AssemblySourceBase : FactoryBase<Assembly[]>
 	{
-		[Freeze( AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
+		[Freeze( AttributeInheritance = MulticastInheritance.Strict, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract override Assembly[] Create();
 	}
 

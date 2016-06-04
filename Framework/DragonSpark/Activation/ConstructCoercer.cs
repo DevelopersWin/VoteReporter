@@ -44,7 +44,19 @@ namespace DragonSpark.Activation
 		public override T Create( object parameter )
 		{
 			var activate = activator.Create( new ConstructTypeRequest( type, parameter ) );
-			var result = activate.AsTo<IStore<T>, T>( store => store.Value, () => activate.AsTo<IFactory<T>, T>( factory => factory.Create(), activate.As<T> ) );
+			var store = activate as IStore<T>;
+			if ( store != null )
+			{
+				return store.Value;
+			}
+
+			var factory = activate as IFactory<T>;
+			if ( factory != null )
+			{
+				return factory.Create();
+			}
+
+			var result = activate.As<T>();
 			return result;
 		}
 	}

@@ -13,19 +13,11 @@ namespace DragonSpark.Aspects
 {
 	public sealed class CacheValueFactory
 	{
-		readonly Func<IList, int> factory;
 		readonly ConcurrentDictionary<CacheEntry, object> items = new ConcurrentDictionary<CacheEntry, object>();
-
-		public CacheValueFactory() : this( KeyFactory.Instance.Create ) {}
-
-		CacheValueFactory( Func<IList, int> factory )
-		{
-			this.factory = factory;
-		}
 
 		public object Create( MethodInterceptionArgs parameter )
 		{
-			var code = factory( parameter.Arguments.ToArray() );
+			var code = KeyFactory.Instance.Create( parameter.Arguments.ToArray() );
 			var entry = new CacheEntry( code, parameter );
 			var result = items.GetOrAdd( entry, e => e.Get() );
 			return result;

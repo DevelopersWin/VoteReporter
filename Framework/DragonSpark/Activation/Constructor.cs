@@ -4,6 +4,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -74,11 +75,11 @@ namespace DragonSpark.Activation
 			[Freeze]
 			public override ConstructorInfo Create( ConstructTypeRequest parameter )
 			{
-				var candidates = new[] { parameter.Arguments, parameter.Arguments.NotNull(), Items<object>.Default };
+				var candidates = ImmutableArray.Create( parameter.Arguments, parameter.Arguments.NotNull(), Items<object>.Default );
 				var adapter = parameter.RequestedType.Adapt();
 				var result = candidates
 					.Select( objects => objects.Fixed() )
-					.Select( objects => adapter.FindConstructor( objects ) )
+					.Select( adapter.FindConstructor )
 					.FirstOrDefault();
 				return result;
 			}

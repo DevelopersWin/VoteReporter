@@ -15,32 +15,32 @@ namespace DragonSpark.Activation
 
 	public class LocateTypeRequest : TypeRequest
 	{
-		readonly CodeContainer<LocateTypeRequest> container;
+		readonly int code;
 
 		public LocateTypeRequest( [Required] Type type, string name = null ) : base( type )
 		{
 			Name = name;
-			container = new CodeContainer<LocateTypeRequest>( type, name );
+			code = KeyFactory.Instance.CreateUsing( RequestedType, name );
 		}
 
 		public string Name { get; }
 
-		public override int GetHashCode() => container.Code;
+		public override int GetHashCode() => code;
 	}
 
 	public class ConstructTypeRequest : TypeRequest
 	{
-		readonly CodeContainer<ConstructTypeRequest> container;
+		readonly int code;
 
 		public ConstructTypeRequest( [Required] Type type, [Required] params object[] arguments ) : base( type )
 		{
 			Arguments = arguments;
-			container = new CodeContainer<ConstructTypeRequest>( Arguments.Prepend( RequestedType ).ToArray()  );
+			code = KeyFactory.Instance.CreateUsing( RequestedType, Arguments );
 		}
 
 		public object[] Arguments { get; }
 
-		public override int GetHashCode() => container.Code;
+		public override int GetHashCode() => code;
 	}
 
 	public abstract class TypeRequest

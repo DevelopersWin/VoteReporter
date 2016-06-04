@@ -33,7 +33,12 @@ namespace DragonSpark.ComponentModel
 	{
 		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Category );
 
-		static object Factory( Type arg ) => Services.Get<InstanceFromFactoryTypeFactory>().Create( arg );
+		static object Factory( Type arg )
+		{
+			var factory = Services.Get<InstanceFromFactoryTypeFactory>();
+			var o = factory.Create( arg );
+			return o;
+		}
 
 		public FactoryAttribute( Type factoryType = null ) : this( Services.Get<MemberInfoFactoryTypeLocator>, factoryType ) {}
 

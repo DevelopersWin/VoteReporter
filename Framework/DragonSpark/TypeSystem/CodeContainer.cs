@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DragonSpark.TypeSystem
 {
-	public class CodeContainer<T>
+	/*public class CodeContainer<T>
 	{
 		readonly Lazy<int> value;
 
@@ -20,5 +20,5 @@ namespace DragonSpark.TypeSystem
 		}
 
 		public int Code => value.Value;
-	}
+	}*/
 }
