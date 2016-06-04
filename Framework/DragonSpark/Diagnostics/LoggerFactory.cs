@@ -1,33 +1,42 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Core;
+using Serilog.Filters;
 using System;
+using Serilog.Events;
 
 namespace DragonSpark.Diagnostics
 {
 	public static class LoggerExtensions
 	{
-		public static ILogger ForSource( this ILogger @this, [Formatted]object context ) => @this.ForContext( Constants.SourceContextPropertyName, context, true );
+		public static ILogger ForSource( this ILogger @this, object context )
+		{
+			var factory = Services.Get<FormatterFactory>();
+			var formatted = factory.From( context );
+			var result = @this.ForContext( Constants.SourceContextPropertyName, formatted, true );
+			return result;
+		}
 	}
 
 
 	public class LoggerFactory : FactoryBase<ILogger>
 	{
+		
 		readonly Func<LoggerConfiguration> configurationSource;
-		readonly object context;
+		readonly Func<object> contextSource;
 
-		public LoggerFactory( [Required] Func<LoggerConfiguration> configurationSource ) : this( configurationSource, Execution.GetCurrent() ) {}
+		public LoggerFactory( [Required] Func<LoggerConfiguration> configurationSource ) : this( configurationSource, Execution.GetCurrent ) {}
 
-		public LoggerFactory( [Required] Func<LoggerConfiguration> configurationSource, object context )
+		public LoggerFactory( [Required] Func<LoggerConfiguration> configurationSource, Func<object> contextSource )
 		{
 			this.configurationSource = configurationSource;
-			this.context = context;
+			this.contextSource = contextSource;
 		}
 
 		public override ILogger Create()
 		{
+			var context = contextSource();
 			var loggerConfiguration = configurationSource();
 			var logger = loggerConfiguration.CreateLogger();
 			var forContext = logger.ForSource( context );

@@ -15,15 +15,33 @@ namespace DragonSpark.Runtime.Stores
 		}
 	}
 
-	public class IsAttachedSpecification<TInstance, TValue> : SpecificationBase<TInstance> where TValue : class where TInstance : class
+	public abstract class AttachedPropertySpecificationBase<TInstance, TValue> : SpecificationBase<TInstance> where TInstance : class
 	{
-		readonly IAttachedProperty<TInstance, TValue> property;
-		public IsAttachedSpecification( IAttachedProperty<TInstance, TValue> property )
+		protected AttachedPropertySpecificationBase( IAttachedProperty<TInstance, TValue> property )
 		{
-			this.property = property;
+			Property = property;
 		}
 
-		public override bool IsSatisfiedBy( TInstance parameter ) => property.IsAttached( parameter );
+		protected IAttachedProperty<TInstance, TValue> Property { get; }
+	}
+
+	public class AttachedPropertyValueSpecification<TInstance, TValue> : IsAttachedSpecification<TInstance, TValue> where TInstance : class
+	{
+		readonly Func<TValue> value;
+
+		public AttachedPropertyValueSpecification( IAttachedProperty<TInstance, TValue> property, Func<TValue> value ) : base( property )
+		{
+			this.value = value;
+		}
+
+		public override bool IsSatisfiedBy( TInstance parameter ) => base.IsSatisfiedBy( parameter ) && Equals( Property.Get( parameter ), value() );
+	}
+
+	public class IsAttachedSpecification<TInstance, TValue> : AttachedPropertySpecificationBase<TInstance, TValue> where TInstance : class
+	{
+		public IsAttachedSpecification( IAttachedProperty<TInstance, TValue> property ) : base( property ) {}
+
+		public override bool IsSatisfiedBy( TInstance parameter ) => Property.IsAttached( parameter );
 	}
 
 	public class DelegatedWritableStore<T> : WritableStore<T>

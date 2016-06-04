@@ -2,6 +2,7 @@
 using DragonSpark.Aspects;
 using DragonSpark.Runtime.Properties;
 using System;
+using System.Collections;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -82,6 +83,36 @@ namespace DragonSpark.Runtime
 		void Assign( T1 first, T2 second );
 	}
 
+	public interface IAssign<in T>
+	{
+		void Assign( T first );
+	}
+
+	public class CollectionAssign<T> : IAssign<T, CollectionAction>
+	{
+		readonly IList collection;
+
+		public CollectionAssign( IList collection )
+		{
+			this.collection = collection;
+		}
+
+		public void Assign( T first, CollectionAction second )
+		{
+			switch ( second )
+			{
+				case CollectionAction.Add:
+					collection.Add( first );
+					break;
+				case CollectionAction.Remove:
+					collection.Remove( first );
+					break;
+			}
+		}
+	}
+
+	public enum CollectionAction { Add, Remove }
+
 	/*struct DelegatedAssign<T1, T2> : IAssign<T1, T2>
 	{
 		readonly Action<T1, T2> assign;
@@ -112,7 +143,7 @@ namespace DragonSpark.Runtime
 		readonly Value<T1> first;
 		readonly Value<T2> second;
 
-		public Assignment( IAssign<T1, T2> assign, T1 first, T2 second ) : this( assign, new Value<T1>( first ), new Value<T2>( second ) ) {}
+		public Assignment( IAssign<T1, T2> assign, T1 first, T2 second ) : this( assign, Assignments.From( first ), new Value<T2>( second ) ) {}
 
 		public Assignment( IAssign<T1, T2> assign, Value<T1> first, Value<T2> second )
 		{
@@ -125,6 +156,22 @@ namespace DragonSpark.Runtime
 
 		// protected override void OnDispose() => assign.Assign( first.Finish, second.Finish );
 		public void Dispose() => assign.Assign( first.Finish, second.Finish );
+	}
+
+	public class Assignment<T> : IDisposable
+	{
+		readonly IAssign<T> assign;
+		readonly Value<T> first;
+		
+		public Assignment( IAssign<T> assign, Value<T> first )
+		{
+			this.assign = assign;
+			this.first = first;
+			
+			assign.Assign( first.Start );
+		}
+
+		public void Dispose() => assign.Assign( first.Finish );
 	}
 
 	/*public class Assignment<T> : Disposable

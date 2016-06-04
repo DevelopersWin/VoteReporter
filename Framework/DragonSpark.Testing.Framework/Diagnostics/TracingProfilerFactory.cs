@@ -1,65 +1,79 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	public class TraceAwareProfilerFactory : FactoryBase<MethodBase, IProfiler>
+	public class ProfilerFactory : Windows.Diagnostics.ProfilerFactory
 	{
 		readonly Action<string> output;
-		readonly ILogger logger;
 		readonly ILoggerHistory history;
-		readonly IList<TraceListener> listeners;
 
-		public TraceAwareProfilerFactory( Action<string> output, ILogger logger, ILoggerHistory history ) : this( output, logger, history, new List<TraceListener>() ) {}
-
-		public TraceAwareProfilerFactory( Action<string> output, ILogger logger, ILoggerHistory history, IList<TraceListener> listeners )
+		public ProfilerFactory( Action<string> output, ILoggerHistory history ) : this( output, history, DiagnosticProperties.Logger.Get ) {}
+		public ProfilerFactory( Action<string> output, ILoggerHistory history, Func<MethodBase, ILogger> loggerSource ) : base( loggerSource )
 		{
 			this.output = output;
-			this.logger = logger;
 			this.history = history;
-			this.listeners = listeners;
 		}
 
 		public override IProfiler Create( MethodBase parameter )
 		{
-			var command = new PurgeLoggerMessageHistoryCommand( history );
-			var tracker = new LoggerTraceListenerTrackingCommand( listeners );
-			var configured = new ConfiguringFactory<MethodBase, ILogger>( new LoggerFromMethodFactory( logger.Self ).Create, tracker.Run );
-			var inner = new Windows.Diagnostics.ProfilerFactory( configured.Create );
-			var purge = new FixedCommand( command, output );
+			var purge = new FixedCommand( new PurgeLoggerMessageHistoryCommand( history ), output );
 			var start = new CompositeCommand( purge, StartProcessCommand.Instance );
-			var result = inner.Create( parameter ).With( start.Run ).AssociateForDispose( new DisposableAction( purge.Run ), tracker );
+			var result = base.Create( parameter ).With( start.Run ).AssociateForDispose( new DisposableAction( purge.Run ) );
 			return result;
 		}
 	}
+
+	public static class Tracing
+	{
+		// public static IAttachedProperty<ILogger, IList<TraceListener>> Listeners { get; } = new AttachedProperty<ILogger, IList<TraceListener>>( logger => new List<TraceListener>() );
+
+		public static IAttachedProperty<ILogger, TraceListener> Listener { get; } = new AttachedProperty<ILogger, TraceListener>( logger => new SerilogTraceListener.SerilogTraceListener() );
+
+		public static IDisposable WithTracing( this ILogger @this ) => new TracingAssignment( Listener.Get( @this ) );
+	}
+
+	class TracingAssignment : Assignment<TraceListener, CollectionAction>
+	{
+		public TracingAssignment( TraceListener first ) : base( new CollectionAssign<TraceListener>( Trace.Listeners ), Assignments.From( first ), new Value<CollectionAction>( CollectionAction.Add, CollectionAction.Remove ) ) {}
+		// public TracingAssignment( IAssign<TraceListener, CollectionAction> assign, Value<TraceListener> first, Value<CollectionAction> second ) : base( assign, first, second ) {}
+	}
+
+	/*public class TraceAwareProfilerFactory : FactoryBase<ILogger, IDisposable>
+	{
+		public override IDisposable Create( ILogger parameter )
+		{
+			var result = new LoggerTraceListenerTrackingCommand(  );
+			parameter.With( result.Run );
+			return result;
+		}
+	}*/
 	
-	public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>
+	/*public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>
 	{
 		public static LoggingTraceListenerFactory Instance { get; } = new LoggingTraceListenerFactory();
 
 		public override TraceListener Create( ILogger parameter ) => new SerilogTraceListener.SerilogTraceListener( parameter );
-	}
+	}*/
 
-	public class LoggerTraceListenerTrackingCommand : DisposingCommand<ILogger>
+	
+	/*public class LoggerTraceListenerTrackingCommand : DisposingCommand<ILogger>
 	{
 		readonly Func<ILogger, TraceListener> factory;
-		readonly IList<TraceListener> listeners;
-		readonly AddItemCommand add;
-		readonly RemoveItemCommand remove;
+		readonly Action<TraceListener> add;
+		readonly Action<TraceListener> remove;
 
-		public LoggerTraceListenerTrackingCommand( IList<TraceListener> listeners ) : this( Defaults.Factory, listeners, Defaults.AddItemCommand, Defaults.RemoveItemCommand ) {}
+		public LoggerTraceListenerTrackingCommand() : this( Defaults.Factory, Defaults.Add, Defaults.Remove ) {}
 
-		public LoggerTraceListenerTrackingCommand( Func<ILogger, TraceListener> factory, IList<TraceListener> listeners, AddItemCommand add, RemoveItemCommand remove )
+		public LoggerTraceListenerTrackingCommand( Func<ILogger, TraceListener> factory, Action<TraceListener> add, Action<TraceListener> remove )
 		{
 			this.factory = factory;
-			this.listeners = listeners;
 			this.add = add;
 			this.remove = remove;
 		}
@@ -67,17 +81,17 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		public override void Execute( ILogger parameter )
 		{
 			var listener = factory( parameter );
-			add.Run( listener );
-			listeners.Add( listener );
+			add( listener );
+			Properties.Listeners.Get( parameter ).Add( listener );
 		}
 
-		protected override void OnDispose() => listeners.Purge().Each( remove.Run );
+		protected override void OnDispose() => listeners.Purge().Each( remove );
 
 		static class Defaults
 		{
 			public static Func<ILogger, TraceListener> Factory { get; } = LoggingTraceListenerFactory.Instance.Create;
-			public static AddItemCommand AddItemCommand { get; } = new AddItemCommand( Trace.Listeners );
-			public static RemoveItemCommand RemoveItemCommand { get; } = new RemoveItemCommand( Trace.Listeners );
+			public static Action<TraceListener> Add { get; } = new AddItemCommand( Trace.Listeners ).Execute;
+			public static Action<TraceListener> Remove { get; } = new RemoveItemCommand( Trace.Listeners ).Execute;
 		}
-	}
+	}*/
 }

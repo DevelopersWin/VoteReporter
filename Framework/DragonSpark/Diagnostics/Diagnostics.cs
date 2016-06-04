@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
@@ -12,21 +11,9 @@ using System.Reflection;
 
 namespace DragonSpark.Diagnostics
 {
-	public class LoggerFromMethodFactory : FactoryBase<MethodBase, ILogger>
+	public static class DiagnosticProperties
 	{
-		public static LoggerFromMethodFactory Instance { get; } = new LoggerFromMethodFactory();
-
-		readonly Func<ILogger> source;
-
-		public LoggerFromMethodFactory() : this( Services.Get<ILogger> ) {}
-
-		public LoggerFromMethodFactory( Func<ILogger> source )
-		{
-			this.source = source;
-		}
-
-		[Freeze]
-		public override ILogger Create( MethodBase parameter ) => source().ForSource( parameter );
+		public static IAttachedProperty<ILogger> Logger { get; } = new AttachedProperty<ILogger>( o => Services.Get<ILogger>().ForSource( o ) );
 	}
 
 	public delegate void EmitProfileEvent( string name );

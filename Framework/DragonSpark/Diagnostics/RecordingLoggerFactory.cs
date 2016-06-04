@@ -8,7 +8,11 @@ using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using Configure = DragonSpark.Configuration.Configure;
 
 namespace DragonSpark.Diagnostics
@@ -25,9 +29,34 @@ namespace DragonSpark.Diagnostics
 		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, LogEventMessageFactory.Instance.Create ) {}
 	}
 
+	public static class MigrationProperties
+	{
+		public static IAttachedProperty<LogEvent, bool> IsMigrating { get; } = new AttachedProperty<LogEvent, bool>();
+	}
+
 	public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
 	{
 		public PurgeLoggerHistoryCommand( ILoggerHistory history ) : base( history, events => events.Fixed() ) {}
+
+		public override void Execute( Action<LogEvent> parameter ) => base.Execute( new Migrater( parameter ).Execute );
+
+		struct Migrater
+		{
+			readonly Action<LogEvent> action;
+
+			public Migrater( Action<LogEvent> action )
+			{
+				this.action = action;
+			}
+
+			public void Execute( LogEvent parameter )
+			{
+				using ( MigrationProperties.IsMigrating.Assignment( parameter, true ) )
+				{
+					action( parameter );
+				}
+			}
+		}
 	}
 
 	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
@@ -52,7 +81,7 @@ namespace DragonSpark.Diagnostics
 	public class RecordingLoggerConfigurationFactory : LoggerConfigurationFactory
 	{
 		public RecordingLoggerConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
-			: base( new LoggerConfigurationSource( controller ), transformers.Append( new LoggerHistoryConfigurationTransformer( sink ) ).Fixed() ) {}
+			: base( new LoggerConfigurationSource( controller ), transformers.Append( new CreatorFilterTransformer(), new LoggerHistoryConfigurationTransformer( sink ) ).Fixed() ) {}
 	}
 
 	public class MethodFormatter : IFormattable
@@ -98,6 +127,69 @@ namespace DragonSpark.Diagnostics
 		}
 
 		public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
+	}
+
+	public class CreatorFilterTransformer : TransformerBase<LoggerConfiguration>
+	{
+		readonly CreatorFilter filter;
+
+		public CreatorFilterTransformer() : this( new CreatorFilter() ) {}
+
+		public CreatorFilterTransformer( CreatorFilter filter )
+		{
+			this.filter = filter;
+		}
+
+		public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.Filter.With( filter ).Enrich.With( filter );
+
+		public class CreatorFilter : DecoratedSpecification<LogEvent>, ILogEventEnricher, ILogEventFilter
+		{
+			const string CreatorId = "CreatorId";
+			readonly Guid id;
+
+			public CreatorFilter() : this( Guid.NewGuid() ) {}
+
+			public CreatorFilter( Guid id ) : base( MigratingSpecification.Instance.Or( new CreatorSpecification( id ) ) )
+			{
+				this.id = id;
+			}
+			
+			public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( CreatorId, id ) );
+
+			class MigratingSpecification : AttachedPropertyValueSpecification<LogEvent, bool>
+			{
+				public static MigratingSpecification Instance { get; } = new MigratingSpecification();
+
+				MigratingSpecification() : base( MigrationProperties.IsMigrating, () => true ) {}
+			}
+
+			class CreatorSpecification : SpecificationBase<LogEvent>
+			{
+				readonly Guid id;
+				public CreatorSpecification( Guid id )
+				{
+					this.id = id;
+				}
+
+				public override bool IsSatisfiedBy( LogEvent parameter )
+				{
+					if ( parameter.Properties.ContainsKey( CreatorId ) )
+					{
+						var property = parameter.Properties[CreatorId] as ScalarValue;
+						var result = property != null && Equals( property.Value, id );
+						return result;
+					}
+
+					return false;
+				}
+			}
+
+			public bool IsEnabled( LogEvent logEvent )
+			{
+				var isSatisfiedBy = IsSatisfiedBy( logEvent );
+				return isSatisfiedBy;
+			}
+		}
 	}
 
 	public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>

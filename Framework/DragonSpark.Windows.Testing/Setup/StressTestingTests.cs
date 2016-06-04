@@ -1,12 +1,11 @@
-using System;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
+using JetBrains.dotMemoryUnit;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,7 +16,8 @@ namespace DragonSpark.Windows.Testing.Setup
 		public StressTestingTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Fact]
-		
+		[DotMemoryUnit( SavingStrategy = SavingStrategy.OnCheckFail, Directory = @"C:\dotMemory", CollectAllocations = true, FailIfRunWithoutSupport = false )]
+		[AssertTraffic( AllocatedObjectsCount = 0 )]
 		public void GetAllTypesWith()
 		{
 			/*var result = Parallel.For( 0, 100000, i =>
@@ -27,14 +27,19 @@ namespace DragonSpark.Windows.Testing.Setup
 										
 									} );
 			Assert.True( result.IsCompleted );*/
+			// var snapshot = dotMemory.Check();
+			/*Body();
 
-			Body();
-
+			dotMemory.Check( memory =>
+							 {
+								 var temp = memory.GetDifference( snapshot ).GetSurvivedObjects().ObjectsCount;
+								 Assert.Equal( 0, temp );
+							 } );*/
 		}
 
 		void Body()
 		{
-			var method = GetType().GetMethod( nameof( Host ) );
+			var method = GetType().GetMethod( nameof(Host) );
 			var autoData = new AutoData( FixtureFactory<AutoDataCustomization>.Instance.Create(), method );
 			var factory = Providers.From( data => new ServiceProviderFactory( new Composition.ServiceProviderFactory( AssemblyProvider.Instance.Create() ).Create ).Create(), serviceProvider => new Application<LocationSetup>( serviceProvider ) );
 			using ( factory( autoData ) )

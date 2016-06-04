@@ -3,30 +3,32 @@ using DragonSpark.Configuration;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using PostSharp.Aspects;
+using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
-using PostSharp.Serialization;
+using PostSharp.Aspects.Serialization;
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Aspects
 {
-	[PSerializable]
+	[OnMethodBoundaryAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Tracing ), LinesOfCodeAvoided( 3 )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
 	public sealed class ProfileAttribute : OnMethodBoundaryAspect
 	{
+		readonly Type factoryType;
+
 		public ProfileAttribute() {}
 
-		public ProfileAttribute( [OfFactoryType] Type factoryType )
+		public ProfileAttribute( [OfFactoryType, Optional] Type factoryType )
 		{
-			FactoryType = factoryType; 
+			this.factoryType = factoryType;
 		}
-
-		Type FactoryType { get; set; }
 
 		IProfiler Create( MethodBase method )
 		{
-			var type = FactoryType ?? Configure.Load<ProfilerFactoryConfiguration>().Value;
+			var type = factoryType ?? Configure.Load<ProfilerFactoryConfiguration>().Value;
 			var result = Services.Get<IFactory<MethodBase, IProfiler>>( type ).Create( method );
 			return result;
 		}

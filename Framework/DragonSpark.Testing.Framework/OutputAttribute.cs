@@ -2,18 +2,16 @@ using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using PostSharp.Aspects;
-using Serilog;
 using System;
 using System.Reflection;
 
 namespace DragonSpark.Testing.Framework
 {
-	[Serializable, LinesOfCodeAvoided( 8 )]
+	/*[Serializable, LinesOfCodeAvoided( 8 )]
 	public sealed class OutputAttribute : MethodInterceptionAspect
 	{
 		public override void OnInvoke( MethodInterceptionArgs args ) => new OutputCommand().Run( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
-	}
+	}*/
 
 	/*public class ParameterFactory : FactoryBase<MethodInterceptionArgs, OutputCommand.Parameter>
 	{
@@ -64,23 +62,21 @@ namespace DragonSpark.Testing.Framework
 
 		class Factory : FactoryBase<Parameter, IProfiler>
 		{
-			readonly ILogger logger;
 			readonly ILoggerHistory history;
 
 			public static IProfiler New( Parameter arg ) => new Factory().Create( arg );
 
-			Factory() : this( Services.Get<ILogger>(), Services.Get<ILoggerHistory>() ) {}
+			Factory() : this( Services.Get<ILoggerHistory>() ) {}
 
-			Factory( ILogger logger, ILoggerHistory history )
+			Factory( ILoggerHistory history )
 			{
-				this.logger = logger;
 				this.history = history;
 			}
 
 			public override IProfiler Create( Parameter parameter )
 			{
 				var output = parameter.Instance.AsTo<ITestOutputAware, Action<string>>( value => value.Output.WriteLine ) ?? IgnoredOutputCommand.Instance.Run;
-				var result = new Diagnostics.TraceAwareProfilerFactory( output, logger, history ).Create( parameter.Method );
+				var result = new Diagnostics.ProfilerFactory( output, history ).Create( parameter.Method );
 				return result;
 			}
 		}

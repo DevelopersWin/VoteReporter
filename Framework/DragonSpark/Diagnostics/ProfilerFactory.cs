@@ -27,7 +27,7 @@ namespace DragonSpark.Diagnostics
 
 		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( Level(), templateSource ) {}
 
-		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( LoggerFromMethodFactory.Instance.Create, level, templateSource ) {}
+		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( DiagnosticProperties.Logger.Get, level, templateSource ) {}
 
 		protected ProfilerFactoryBase( Func<MethodBase, ILogger> loggerSource, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( loggerSource, Level(), templateSource ) {}
 
@@ -52,6 +52,7 @@ namespace DragonSpark.Diagnostics
 
 			var factory = new ProfilerSourceFactory( timer, createSource, handler );
 			var result = factory.Create( parameter );
+			DiagnosticProperties.Logger.Set( result, logger );
 			return result;
 		}
 	}

@@ -58,7 +58,7 @@ namespace DragonSpark.Diagnostics.Logger
 		protected object[] Parameters( T parameter )
 		{
 			var formatter = source();
-			var result = formatter.CreateMany( parameter.Parameters, Where<object>.Always );
+			var result =  parameter.Parameters.Select( formatter.From ).ToArray();
 			return result;
 		}
 	}

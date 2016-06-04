@@ -11,7 +11,11 @@ namespace DragonSpark.Runtime.Properties
 	{
 		public static TValue Get<TInstance, TValue>( this TInstance @this, IAttachedProperty<TInstance, TValue> property ) where TInstance : class => property.Get( @this );
 
-		public static void Set<TInstance, TValue>( this TInstance @this, IAttachedProperty<TInstance, TValue> property, TValue value ) where TInstance : class => property.Set( @this, value );
+		public static TInstance Set<TInstance, TValue>( this TInstance @this, IAttachedProperty<TInstance, TValue> property, TValue value ) where TInstance : class
+		{
+			property.Set( @this, value );
+			return @this;
+		}
 
 		public static Assignment<T1, T2> Assignment<T1, T2>( this IAttachedProperty<T1, T2> @this, T1 first, T2 second ) where T1 : class => 
 			new Assignment<T1, T2>( new PropertyAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );

@@ -1,6 +1,8 @@
 ﻿using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Diagnostics;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Parsing;
@@ -28,24 +30,25 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 
 			Assert.Contains( logEvent, history.Events );
 			var lines = new List<string>();
-			var listeners = new List<TraceListener>();
-			TraceListener only;
 			var logger = new RecordingLoggerFactory( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ).Create();
-			using ( new DragonSpark.Testing.Framework.Diagnostics.TraceAwareProfilerFactory( lines.Add, logger, history, listeners ).Create( MethodBase.GetCurrentMethod() ) )
+
+			var listener = logger.Get( Tracing.Listener );
+			Assert.NotNull( listener );
+			Assert.Same( listener, logger.Get( Tracing.Listener ) );
+
+			Assert.DoesNotContain( listener, Trace.Listeners.Cast<TraceListener>() );
+			using ( MethodBase.GetCurrentMethod().Profile( lines.Add, history, logger ) )
 			{
-				only = listeners.Only();
-				Assert.Equal( 1, listeners.Count );
-				Assert.Contains( only, Trace.Listeners.Cast<TraceListener>() );
+				Assert.Contains( listener, Trace.Listeners.Cast<TraceListener>() );
 
 				Assert.DoesNotContain( logEvent, history.Events );
 				Assert.NotEmpty( lines );
 				Assert.Contains( message, lines.Only() );
 				Assert.NotEmpty( history.Events );
-				
 			}
 
-			Assert.Empty( listeners );
-			Assert.DoesNotContain( only, Trace.Listeners.Cast<TraceListener>() );
+			Assert.DoesNotContain( listener, Trace.Listeners.Cast<TraceListener>() );
+
 			Assert.Empty( history.Events );
 			Assert.Equal( 3, lines.Count );
 		}

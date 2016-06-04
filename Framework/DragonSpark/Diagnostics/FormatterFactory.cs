@@ -1,30 +1,45 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Composition;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Diagnostics
 {
 	[Shared, Export]
-	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, object>
+	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
 	{
 		public static FormatterFactory Instance { get; } = new FormatterFactory( FromKnownFactory<IFormattable>.Instance );
+
+		public static string Format( object item ) 
+		{
+			var formatter = Instance; // TODO: Make configurable: Services.Get
+			var result = formatter.Create( new Parameter( item ) );
+			return result;
+		}
 
 		readonly Func<object, IFormattable> factory;
 
 		[ImportingConstructor]
 		public FormatterFactory( FromKnownFactory<IFormattable> factory ) : this( factory.CreateUsing ) {}
 
-		public FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance, Specifications.NotNull )
+		public FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance, Specifications<Parameter>.NotNull )
 		{
 			this.factory = factory;
 		}
 
-		public override object Create( Parameter parameter ) => 
-			factory( parameter.Instance ).With( o => o.ToString( parameter.Format, parameter.Provider ), parameter.Instance.Self );
+		public override string Create( Parameter parameter ) => (string)CreateFrom( parameter, p => p.Instance.AsString() );
 
-		public class Parameter
+		object CreateFrom( Parameter parameter, Func<Parameter, object> @default )
+		{
+			var formattable = factory( parameter.Instance );
+			var result = formattable != null ? formattable.ToString( parameter.Format, parameter.Provider ) : @default( parameter );
+			return result;
+		}
+
+		public object From( object item ) => CreateFrom( new Parameter( item ), p => p.Instance.AsString() );
+
+		public struct Parameter
 		{
 			public Parameter( object instance, string format = null, IFormatProvider provider = null )
 			{

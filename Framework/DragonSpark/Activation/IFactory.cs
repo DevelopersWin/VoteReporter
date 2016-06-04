@@ -62,6 +62,19 @@ namespace DragonSpark.Activation
 
 		public static T CreateUsing<T>( this IFactoryWithParameter @this, object parameter ) => (T)@this.Create( parameter );
 
+		public static Func<object, TResult> Wrap<TResult>( [Required] this TResult @this ) => new Wrapper<TResult>( @this ).Get;
+
+		struct Wrapper<TResult>
+		{
+			readonly TResult item;
+			public Wrapper( TResult item )
+			{
+				this.item = item;
+			}
+
+			public TResult Get( object parameter ) => item;
+		}
+
 		public static T Self<T>( [Required] this T @this ) => @this;
 
 		public static Delegate Convert( [Required]this Func<object> @this, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().Invoke<Delegate>( nameof(Convert), resultType.ToItem(), @this );
