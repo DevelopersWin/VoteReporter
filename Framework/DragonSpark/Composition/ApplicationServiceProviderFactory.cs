@@ -44,22 +44,22 @@ namespace DragonSpark.Composition
 
 		static object Get( Type type ) => DefaultServiceProvider.Instance.Value.GetService( type );
 
-		readonly Func<CompositionContext> source;
+		readonly IFactory<CompositionContext> source;
 
-		public ServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
+		public ServiceProviderFactory( [Required] Type[] types ) : this( new TypeBasedConfigurationContainerFactory( types ) ) {}
 
-		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
+		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new AssemblyBasedConfigurationContainerFactory( assemblies ) ) {}
 
-		public ServiceProviderFactory( Func<ContainerConfiguration> configuration ) : this( new Func<CompositionContext>( new CompositionFactory( configuration ).Create ) ) {}
+		public ServiceProviderFactory( IFactory<ContainerConfiguration> configuration ) : this( new CompositionFactory( configuration ) ) {}
 
-		public ServiceProviderFactory( [Required] Func<CompositionContext> source )
+		public ServiceProviderFactory( [Required] IFactory<CompositionContext> source )
 		{
 			this.source = source;
 		}
 
 		public override IServiceProvider Create()
 		{
-			var context = source();
+			var context = source.Create();
 			var primary = new ServiceLocator( context );
 			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), new RecursionAwareServiceProvider( primary ), Decorated );
 			return result;

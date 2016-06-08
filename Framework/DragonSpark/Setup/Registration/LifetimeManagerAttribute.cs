@@ -1,5 +1,5 @@
-using System;
 using Microsoft.Practices.Unity;
+using System;
 
 namespace DragonSpark.Setup.Registration
 {
@@ -13,7 +13,7 @@ namespace DragonSpark.Setup.Registration
 		public TransientAttribute() : base( typeof(TransientLifetimeManager) ) { }
 	}
 
-	[AttributeUsage( AttributeTargets.Class )]
+	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Struct )]
 	public class LifetimeManagerAttribute : Attribute
 	{
 		public LifetimeManagerAttribute( Type lifetimeManagerType )

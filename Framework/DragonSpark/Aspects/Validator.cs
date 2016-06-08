@@ -173,7 +173,7 @@ namespace DragonSpark.Aspects
 			Parameter = parameter;
 		}
 
-		public void Assign<T>( T result ) => args.ReturnValue = result;
+		// public void Assign<T>( T result ) => args.ReturnValue = result;
 
 		public T Proceed<T>() => args.GetReturnValue<T>();
 		public object Parameter { get; }

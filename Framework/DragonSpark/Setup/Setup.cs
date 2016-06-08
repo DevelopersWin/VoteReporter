@@ -25,13 +25,13 @@ namespace DragonSpark.Setup
 {
 	public class ServiceProviderFactory : ConfiguredServiceProviderFactory<ConfigureProviderCommand>
 	{
-		public ServiceProviderFactory( [Required] Type[] types ) : this( new Func<ContainerConfiguration>( new TypeBasedConfigurationContainerFactory( types ).Create ) ) {}
+		public ServiceProviderFactory( Type[] types ) : this( new TypeBasedConfigurationContainerFactory( types ) ) {}
 
-		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new Func<ContainerConfiguration>( new AssemblyBasedConfigurationContainerFactory( assemblies ).Create ) ) {}
+		public ServiceProviderFactory( Assembly[] assemblies ) : this( new AssemblyBasedConfigurationContainerFactory( assemblies ) ) {}
 
-		public ServiceProviderFactory( [Required] Func<ContainerConfiguration> source ) : this( new Func<IServiceProvider>( new Composition.ServiceProviderFactory( source ).Create ) ) {}
+		public ServiceProviderFactory( IFactory<ContainerConfiguration> source ) : this( new Composition.ServiceProviderFactory( source ) ) {}
 
-		public ServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
+		public ServiceProviderFactory( IFactory<IServiceProvider> provider ) : base( provider ) {}
 	}
 
 	public sealed class ConfigureProviderCommand : CommandBase<IServiceProvider>
@@ -260,7 +260,7 @@ namespace DragonSpark.Setup
 
 	public class ConfiguredServiceProviderFactory<TCommand> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
 	{
-		public ConfiguredServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure<TCommand>.Instance.Run ) {}
+		public ConfiguredServiceProviderFactory( [Required] IFactory<IServiceProvider> provider ) : base( provider, Configure<TCommand>.Instance ) {}
 	}
 
 	class Configure<T> : CommandBase<IServiceProvider> where T : class, ICommand<IServiceProvider>

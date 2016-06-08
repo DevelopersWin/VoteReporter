@@ -153,7 +153,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			var result = new InitializeMethodCommand().AsExecuted( parameter.Method );
 
-			var configure = new AutoDataConfiguringCommandFactory( parameter, providerSource, applicationSource ).Create();
+			var configure = new AutoDataConfiguringCommandFactory( parameter, providerSource( parameter ), applicationSource ).Create();
 			configure.Run( parameter );
 
 			return result;
@@ -170,22 +170,22 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>
 	{
 		readonly AutoData autoData;
-		readonly Func<AutoData, IServiceProvider> providerSource;
+		readonly IServiceProvider provider;
 		readonly Func<IServiceProvider, IApplication> applicationSource;
 
-		public AutoDataConfiguringCommandFactory( [Required] AutoData autoData, [Required] Func<AutoData, IServiceProvider> providerSource, [Required]Func<IServiceProvider, IApplication> applicationSource ) 
+		public AutoDataConfiguringCommandFactory( [Required] AutoData autoData, [Required] IServiceProvider provider, [Required]Func<IServiceProvider, IApplication> applicationSource ) 
 		{
 			this.autoData = autoData;
-			this.providerSource = providerSource;
+			this.provider = provider;
 			this.applicationSource = applicationSource;
 		}
 
 		[Profile]
 		public override ICommand<AutoData> Create()
 		{
-			var primary = new DragonSpark.Setup.ServiceProviderFactory( () => providerSource( autoData ) ).Create().Emit( "Created Provider" );
-			var provider = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), primary );
-			var application = applicationSource( provider ).Emit( "Created Application" );
+			var primary = new DragonSpark.Setup.ServiceProviderFactory( new InstanceFactory<IServiceProvider>( provider ) ).Create().Emit( "Created Provider" );
+			var composite = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), primary );
+			var application = applicationSource( composite ).Emit( "Created Application" );
 			var result = new ExecuteApplicationCommand( application );
 			return result;
 		}

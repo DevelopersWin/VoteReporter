@@ -18,14 +18,14 @@ namespace DragonSpark.Composition
 {
 	public class CompositionFactory : FactoryBase<CompositionHost>
 	{
-		readonly Func<ContainerConfiguration> configuration;
+		readonly IFactory<ContainerConfiguration> configuration;
 		
-		public CompositionFactory( [Required] Func<ContainerConfiguration> configuration )
+		public CompositionFactory( [Required] IFactory<ContainerConfiguration> configuration )
 		{
 			this.configuration = configuration;
 		}
 
-		public override CompositionHost Create() => configuration().CreateContainer();
+		public override CompositionHost Create() => configuration.Create().CreateContainer();
 	}
 
 	public class AssemblyBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory

@@ -5,19 +5,19 @@ using System;
 
 namespace DragonSpark.Diagnostics
 {
-	public class TryContextElevated : TryContext
+	/*public class TryContextElevated : TryContext
 	{
 		public TryContextElevated( ILogger logger ) : base( logger.Debug ) {}
-	}
+	}*/
 
 	[Persistent]
-	public class TryContext
+	public struct TryContext
 	{
 		readonly LogException log;
 
 		public TryContext( ILogger logger ) : this( logger.Verbose ) {}
 
-		protected TryContext( LogException log )
+		public TryContext( LogException log )
 		{
 			this.log = log;
 		}
@@ -36,7 +36,7 @@ namespace DragonSpark.Diagnostics
 			return null;
 		}
 
-		public Result Get( Func<object> resolve )
+		public Result Invoke( Func<object> resolve )
 		{
 			try
 			{
@@ -49,7 +49,7 @@ namespace DragonSpark.Diagnostics
 			}
 		}
 
-		public class Result
+		public struct Result
 		{
 			public Result( Exception exception ) : this( null, exception ) {}
 

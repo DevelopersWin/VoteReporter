@@ -87,7 +87,6 @@ namespace DragonSpark.Activation.IoC
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
 			readonly static AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>> Property = new AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>>( ActivatedAttachedPropertyStore<object, ConditionalWeakTable<Type, IBuildPlanPolicy>>.Instance );
-			// readonly static ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>> Properties = new ConditionalWeakTable<Type, AttachedProperty<IBuildPlanPolicy>>();
 			readonly IBuildPlanCreatorPolicy inner;
 			readonly object creator;
 
@@ -97,21 +96,24 @@ namespace DragonSpark.Activation.IoC
 				this.creator = creator;
 			}
 
-			/*class Plan : AssociatedStore<IBuildPlanPolicy>
-			{
-				public Plan( object creator, Type key, Func<IBuildPlanPolicy> create ) : base( creator, KeyFactory.Instance.ToString( key, typeof(Plan) ), create ) {}
-			}
-
-			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
-			{
-				return new Plan( creator, context.BuildKey.Type, () => inner.CreatePlan( context, buildKey ) ).Value;
-			}*/
-
 			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
-				Property.Get( creator ).GetValue( context.BuildKey.Type, o => inner.CreatePlan( context, buildKey ) );
+				Property.Get( creator ).GetValue( context.BuildKey.Type, new Context( inner, context, buildKey ).Create );
 
-			/*class Plan : AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>>
-			{}*/
+			struct Context
+			{
+				readonly IBuildPlanCreatorPolicy inner;
+				readonly IBuilderContext context;
+				readonly NamedTypeBuildKey buildKey;
+
+				public Context( IBuildPlanCreatorPolicy inner, IBuilderContext context, NamedTypeBuildKey buildKey )
+				{
+					this.inner = inner;
+					this.context = context;
+					this.buildKey = buildKey;
+				}
+
+				public IBuildPlanPolicy Create( object instance ) => inner.CreatePlan( context, buildKey );
+			}
 		}
 	}
 
@@ -212,15 +214,15 @@ namespace DragonSpark.Activation.IoC
 			this.specification = specification;
 		}
 
+		[Freeze]
+		public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
+
 		static Type Map( Type parameter )
 		{
 			var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
 			var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
 			return result;
 		}
-
-		[Freeze]
-		public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
 
 		Type Search( Type parameter )
 		{

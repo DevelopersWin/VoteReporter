@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
@@ -42,9 +43,9 @@ namespace DragonSpark.Activation
 
 	public class ConfiguringFactory<T> : DelegatedFactory<T>
 	{
-		readonly Action<T> configure;
+		readonly ICommand<T> configure;
 
-		public ConfiguringFactory( [Required]Func<T> provider, [Required]Action<T> configure ) : base( provider )
+		public ConfiguringFactory( [Required]IFactory<T> provider, [Required]ICommand<T> configure ) : base( provider )
 		{
 			this.configure = configure;
 		}
@@ -52,27 +53,27 @@ namespace DragonSpark.Activation
 		public override T Create()
 		{
 			var result = base.Create();
-			configure( result );
+			configure.Execute( result );
 			return result;
 		}
 	}
 
-	public class ConfiguringFactory<T, TResult> : DelegatedFactory<T, TResult>
+	/*public class ConfiguringFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
 		readonly Action<TResult> configure;
 
-		public ConfiguringFactory( [Required]Func<T, TResult> inner, [Required]Action<TResult> configure ) : base( inner )
+		public ConfiguringFactory( [Required]Func<TParameter, TResult> inner, [Required]Action<TResult> configure ) : base( inner )
 		{
 			this.configure = configure;
 		}
 
-		public override TResult Create( T parameter )
+		public override TResult Create( TParameter parameter )
 		{
 			var result = base.Create( parameter );
 			configure( result );
 			return result;
 		}
-	}
+	}*/
 
 	public class DecoratedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
@@ -134,14 +135,14 @@ namespace DragonSpark.Activation
 
 	public class DelegatedFactory<T> : FactoryBase<T>
 	{
-		readonly Func<T> inner;
+		readonly IFactory<T> inner;
 
-		public DelegatedFactory( Func<T> inner )
+		public DelegatedFactory( IFactory<T> inner )
 		{
 			this.inner = inner;
 		}
 
-		public override T Create() => inner();
+		public override T Create() => inner.Create();
 	}
 
 	public class FromKnownFactory<T> : FirstConstructedFromParameterFactory<object>
@@ -266,6 +267,17 @@ namespace DragonSpark.Activation
 		public abstract T Create();
 
 		object IFactory.Create() => Create();
+	}
+
+	public class InstanceFactory<T> : FactoryBase<T>
+	{
+		readonly T instance;
+		public InstanceFactory( T instance )
+		{
+			this.instance = instance;
+		}
+
+		public override T Create() => instance;
 	}
 
 	public class Creator : AttachedProperty<ICreator>
