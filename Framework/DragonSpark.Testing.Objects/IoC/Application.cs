@@ -6,6 +6,7 @@ using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using System;
+using System.Collections.Immutable;
 using System.Reflection;
 
 namespace DragonSpark.Testing.Objects.IoC
@@ -54,7 +55,7 @@ namespace DragonSpark.Testing.Objects.IoC
 
 		class Cache : CacheFactoryBase
 		{
-			public Cache( Assembly[] assemblies ) : base( assemblies, new AssemblyBasedServiceProviderFactory( assemblies ).ToDelegate() ) {}
+			public Cache( Assembly[] assemblies ) : base( assemblies.ToImmutableArray<object>(), new AssemblyBasedServiceProviderFactory( assemblies ).ToDelegate() ) {}
 		}
 	}
 

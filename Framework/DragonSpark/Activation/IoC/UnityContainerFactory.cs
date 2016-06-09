@@ -1,15 +1,15 @@
 ﻿using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class UnityContainerFactory : AggregateFactory<IUnityContainer>
 	{
 		public UnityContainerFactory( [Required] IServiceProvider provider )
-			: base( UnityContainerCoreFactory.Instance.Create,
-					new ServicesConfigurator( provider ).Create,
-					DefaultUnityExtensions.Instance.Create
+			: base( UnityContainerCoreFactory.Instance,
+					ImmutableArray.Create<ITransformer<IUnityContainer>>( new ServicesConfigurator( provider ), DefaultUnityExtensions.Instance )
 				) {}
 	}
 

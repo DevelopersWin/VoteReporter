@@ -2,13 +2,14 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.TypeSystem
 {
@@ -151,6 +152,6 @@ namespace DragonSpark.TypeSystem
 	{
 		// public AggregateAssemblyFactory( IFactory<Assembly[]> primary, params ITransformer<Assembly[]>[] transformers ) : base( primary, transformers ) {}
 
-		public AggregateAssemblyFactory( Func<Assembly[]> primary, params Func<Assembly[], Assembly[]>[] transformers ) : base( primary, transformers ) {}
+		public AggregateAssemblyFactory( IFactory<Assembly[]> primary, ImmutableArray<ITransformer<Assembly[]>> transformers ) : base( primary, transformers ) {}
 	}
 }

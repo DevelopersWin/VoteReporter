@@ -14,8 +14,8 @@ using PostSharp.Patterns.Contracts;
 using Serilog.Core;
 using Serilog.Events;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Xunit.Sdk;
@@ -68,7 +68,7 @@ namespace DragonSpark.Testing.Framework.Setup
 					this.others = others;
 				}
 
-				public IList Create( AutoData parameter ) => new object[] { includeFromParameters, others, parameter.Method.DeclaringType };
+				public ImmutableArray<object> Create( AutoData parameter ) => ImmutableArray.Create<object>( includeFromParameters, others, parameter.Method.DeclaringType );
 			}
 
 			class Factory : FactoryBase<AutoData, IServiceProvider>
@@ -88,11 +88,11 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class CachedDelegatedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult> where TResult : class
 	{
 		readonly Func<TParameter, object> instance;
-		readonly Func<TParameter, IList> keySource;
+		readonly Func<TParameter, ImmutableArray<object>> keySource;
 
 		readonly static AttachedProperty<Dictionary<int, TResult>> Property = new AttachedProperty<Dictionary<int, TResult>>( ActivatedAttachedPropertyStore<object, Dictionary<int, TResult>>.Instance );
 
-		protected CachedDelegatedFactory( Func<TParameter, IList> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
+		protected CachedDelegatedFactory( Func<TParameter, ImmutableArray<object>> keySource, [Required] Func<TParameter, object> instance, Func<TParameter, TResult> provider ) : base( provider )
 		{
 			this.instance = instance;
 			this.keySource = keySource;
@@ -123,9 +123,9 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public abstract class CacheFactoryBase : CachedDelegatedFactory<AutoData, IServiceProvider>
 	{
-		protected CacheFactoryBase( IList keySource, Func<IServiceProvider> inner ) : this( keySource.Wrap<AutoData, IList>().ToDelegate(), inner.Wrap<AutoData, IServiceProvider>().ToDelegate() ) {}
+		protected CacheFactoryBase( ImmutableArray<object> keySource, Func<IServiceProvider> inner ) : this( new WrappedFactory<AutoData, ImmutableArray<object>>( keySource ).ToDelegate(), inner.Wrap<AutoData, IServiceProvider>().ToDelegate() ) {}
 
-		protected CacheFactoryBase( Func<AutoData, IList> keySource, Func<AutoData, IServiceProvider> inner ) : base( keySource, data => data.Method.DeclaringType, inner ) {}
+		protected CacheFactoryBase( Func<AutoData, ImmutableArray<object>> keySource, Func<AutoData, IServiceProvider> inner ) : base( keySource, data => data.Method.DeclaringType, inner ) {}
 
 		/*public struct Context
 		{

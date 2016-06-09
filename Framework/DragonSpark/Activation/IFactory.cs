@@ -38,7 +38,7 @@ namespace DragonSpark.Activation
 
 		public static IFactory<object, TResult> Wrap<TResult>( this Func<TResult> @this ) => @this.Wrap<object, TResult>();
 
-		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => Factory<TParameter, TResult>.FactoryInstance.Default.Get( @this );
+		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => WrappedFactory<TParameter, TResult>.FactoryInstance.Default.Get( @this );
 
 		public static IFactory<T> ToFactory<T>( this T @this ) where T : class => Instance<T>.Default.Get( @this );
 
@@ -52,103 +52,38 @@ namespace DragonSpark.Activation
 
 		public static Func<TParameter, TResult> Convert<TParameter, TResult>( this Func<object, object> @this ) => Converter<object, object, TParameter, TResult>.Delegate.Default.Get( @this );
 
-		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => Factory<T>.Delegate.Default.Get( @this );
+		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => FixedFactory<T>.Delegate.Default.Get( @this );
 
-		public static Func<TParameter, TResult> ToDelegate<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => Factory<TParameter, TResult>.Delegate.Default.Get( @this );
-
-		/*public static Func<T, T> ToFactory<T>( this Action<T> action ) => action.ToFactory<T, T>();
-
-		public static Func<T,U> ToFactory<T,U>( this Action<T> action ) => parameter =>
-																   {
-																	   action( parameter );
-																	   return Default<U>.Item;
-																   };*/
-
-		// public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters ) => CreateMany( @this, parameters, Where<TResult>.NotNull );
+		public static Func<TParameter, TResult> ToDelegate<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => WrappedFactory<TParameter, TResult>.Delegate.Default.Get( @this );
 
 		public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
-			EnumerableExtensions.Fixed( parameters
-							.Where( @this.CanCreate )
-							.Select( @this.Create )
-							.Where( @where ?? Where<TResult>.NotNull ) );
-			/*parameters
+			parameters
+				.Where( @this.CanCreate )
 				.Select( @this.Create )
-				.Where( where )
-				.Fixed();*/
-
+				.Where( @where ?? Where<TResult>.NotNull ).Fixed();
 		public static TResult[] CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
-			EnumerableExtensions.Fixed( parameters
-							.Where( @this.CanCreate )
-							.Select( @this.Create )
-							.Cast<TResult>()
-							.Where( @where ?? Where<TResult>.NotNull ) );
-
-		class Factory<T> : IFactory<T>
-		{
-			readonly T instance;
-
-			public Factory( T instance )
-			{
-				this.instance = instance;
-			}
-
-			public T Create() => instance;
-
-			object IFactory.Create() => Create();
-
-			public class Delegate : AttachedProperty<IFactory<T>, Func<T>>
-			{
-				public static Delegate Default { get; } = new Delegate();
-
-				Delegate() : base( factory => factory.Create ) {}
-			}
-		}
+			parameters
+				.Where( @this.CanCreate )
+				.Select( @this.Create )
+				.Cast<TResult>()
+				.Where( @where ?? Where<TResult>.NotNull ).Fixed();
 
 		class Instance<T> : AttachedProperty<T, IFactory<T>> where T : class
 		{
 			public static Instance<T> Default { get; } = new Instance<T>();
 			
-			Instance() : base( result => new Factory<T>( result ) ) {}
+			Instance() : base( result => new FixedFactory<T>( result ) ) {}
 		}
 
-		class InstanceFactory<TParameter, TResult> : Factory<TParameter, TResult> where TResult : class
+		public class InstanceFactory<TParameter, TResult> : WrappedFactory<TParameter, TResult> where TResult : class
 		{
-			InstanceFactory( TResult instance ) : base( instance.ToFactory().ToDelegate() ) {}
+			public InstanceFactory( TResult instance ) : base( instance.ToFactory().ToDelegate() ) {}
 
 			public class Instance : AttachedProperty<TResult, IFactory<TParameter, TResult>>
 			{
 				public static Instance Default { get; } = new Instance();
 			
 				Instance() : base( result => new InstanceFactory<TParameter, TResult>( result ) ) {}
-			}
-		}
-
-		class Factory<TParameter, TResult> : IFactory<TParameter, TResult>
-		{
-			readonly Func<TResult> item;
-
-			protected Factory( Func<TResult> item )
-			{
-				this.item = item;
-			}
-
-			bool IFactoryWithParameter.CanCreate( object parameter ) => true;
-			object IFactoryWithParameter.Create( object parameter ) => Create( default(TParameter) );
-			bool IFactory<TParameter, TResult>.CanCreate( TParameter parameter ) => true;
-			public TResult Create( TParameter parameter ) => item();
-
-			public class Delegate : AttachedProperty<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
-			{
-				public static Delegate Default { get; } = new Delegate();
-
-				Delegate() : base( factory => factory.Create ) {}
-			}
-
-			public class FactoryInstance : AttachedProperty<Func<TResult>, Factory<TParameter, TResult>>
-			{
-				public static FactoryInstance Default { get; } = new FactoryInstance();
-			
-				FactoryInstance() : base( result => new Factory<TParameter, TResult>( result ) ) {}
 			}
 		}
 

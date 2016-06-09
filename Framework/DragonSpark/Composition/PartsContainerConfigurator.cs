@@ -8,6 +8,7 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
@@ -42,7 +43,7 @@ namespace DragonSpark.Composition
 	public class ContainerConfigurationFromPartsFactory : AggregateFactory<ContainerConfiguration>
 	{
 		public ContainerConfigurationFromPartsFactory( [Required] Assembly[] assemblies, [Required] Type[] types )
-			: base( ContainerConfigurationFactory.Instance, new ITransformer<ContainerConfiguration>[] { ContainerServicesConfigurator.Instance, new PartsContainerConfigurator( assemblies, types ) } ) {}
+			: base( ContainerConfigurationFactory.Instance, ImmutableArray.Create<ITransformer<ContainerConfiguration>>( ContainerServicesConfigurator.Instance, new PartsContainerConfigurator( assemblies, types ) ) ) {}
 	}
 
 	public class ContainerConfigurationFactory : FactoryBase<ContainerConfiguration>

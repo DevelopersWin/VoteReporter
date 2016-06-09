@@ -5,8 +5,8 @@ using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Reflection;
 
 namespace DragonSpark.Aspects
@@ -17,7 +17,7 @@ namespace DragonSpark.Aspects
 
 		public object Create( MethodInterceptionArgs parameter )
 		{
-			var code = KeyFactory.Instance.Create( parameter.Arguments.ToArray() );
+			var code = KeyFactory.Instance.Create( parameter.Arguments.ToImmutableArray() );
 			var entry = new CacheEntry( code, parameter );
 			var result = items.GetOrAdd( entry, e => e.Get() );
 			return result;
@@ -29,7 +29,7 @@ namespace DragonSpark.Aspects
 		readonly int code;
 		readonly MethodInterceptionArgs factory;
 
-		public CacheEntry( MethodInterceptionArgs args ) : this( KeyFactory.Instance.CreateUsing( args.Arguments.ToArray() ), args ) {}
+		public CacheEntry( MethodInterceptionArgs args ) : this( KeyFactory.Instance.Create( args.Arguments.ToImmutableArray() ), args ) {}
 
 		public CacheEntry( int code, MethodInterceptionArgs factory )
 		{

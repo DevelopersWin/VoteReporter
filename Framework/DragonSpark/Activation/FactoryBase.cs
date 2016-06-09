@@ -7,6 +7,7 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace DragonSpark.Activation
@@ -41,7 +42,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class ConfiguringFactory<T> : DelegatedFactory<T>
+	public class ConfiguringFactory<T> : DecoratedFactory<T>
 	{
 		readonly ICommand<T> configure;
 
@@ -58,7 +59,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	/*public class ConfiguringFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
+	/*public class ConfiguringFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult>
 	{
 		readonly Action<TResult> configure;
 
@@ -133,11 +134,11 @@ namespace DragonSpark.Activation
 		public override TResult Create( TParameter parameter ) => inner( parameter );
 	}
 
-	public class DelegatedFactory<T> : FactoryBase<T>
+	public class DecoratedFactory<T> : FactoryBase<T>
 	{
 		readonly IFactory<T> inner;
 
-		public DelegatedFactory( IFactory<T> inner )
+		public DecoratedFactory( IFactory<T> inner )
 		{
 			this.inner = inner;
 		}
@@ -158,7 +159,7 @@ namespace DragonSpark.Activation
 	public class FirstConstructedFromParameterFactory<TParameter, TResult> : FactoryBase<object, IFactory<TParameter, TResult>>
 	{
 		readonly IFactory<object, IFactoryWithParameter>[] factories;
-		public FirstConstructedFromParameterFactory( params Type[] types ) : this( EnumerableExtensions.Fixed( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ) ) ) {}
+		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ).Fixed() ) {}
 		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  ) : base( Specifications.Always )
 		{
 			this.factories = factories;
@@ -246,18 +247,26 @@ namespace DragonSpark.Activation
 
 	public class AggregateFactory<T> : FactoryBase<T>
 	{
-		readonly Func<T> primary;
-		readonly IEnumerable<Func<T, T>> transformers;
+		readonly IFactory<T> primary;
+		readonly ImmutableArray<ITransformer<T>> transformers;
 
-		public AggregateFactory( [Required]IFactory<T> primary, [Required]params ITransformer<T>[] transformers ) : this( primary.ToDelegate(), transformers.Select( factory => factory.ToDelegate() ).ToArray() ) {}
+		// public AggregateFactory( [Required]IFactory<T> primary, [Required]params ITransformer<T>[] transformers ) : this( primary.ToDelegate(), transformers.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
-		public AggregateFactory( [Required]Func<T> primary, [Required]params Func<T, T>[] transformers )
+		public AggregateFactory( [Required]IFactory<T> primary, [Required]ImmutableArray<ITransformer<T>> transformers )
 		{
 			this.primary = primary;
 			this.transformers = transformers;
 		}
 
-		public override T Create() => transformers.Aggregate( primary(), ( item, transformer ) => transformer( item ) );
+		public override T Create()
+		{
+			var result = primary.Create();
+			foreach ( var transformer in transformers )
+			{
+				result = transformer.Create( result );
+			}
+			return result;
+		}
 	}
 
 	public abstract class FactoryBase<T> : IFactory<T>
@@ -266,6 +275,58 @@ namespace DragonSpark.Activation
 		public abstract T Create();
 
 		object IFactory.Create() => Create();
+	}
+
+	public class WrappedFactory<TParameter, TResult> : IFactory<TParameter, TResult>
+	{
+		readonly Func<TResult> item;
+
+		public WrappedFactory( TResult instance ) : this( new FixedFactory<TResult>( instance ).ToDelegate() ) {}
+
+		public WrappedFactory( Func<TResult> item )
+		{
+			this.item = item;
+		}
+
+		bool IFactoryWithParameter.CanCreate( object parameter ) => true;
+		object IFactoryWithParameter.Create( object parameter ) => Create( default(TParameter) );
+		bool IFactory<TParameter, TResult>.CanCreate( TParameter parameter ) => true;
+		public TResult Create( TParameter parameter ) => item();
+
+		public class Delegate : AttachedProperty<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
+		{
+			public static Delegate Default { get; } = new Delegate();
+
+			Delegate() : base( factory => factory.Create ) {}
+		}
+
+		public class FactoryInstance : AttachedProperty<Func<TResult>, WrappedFactory<TParameter, TResult>>
+		{
+			public static FactoryInstance Default { get; } = new FactoryInstance();
+			
+			FactoryInstance() : base( result => new WrappedFactory<TParameter, TResult>( result ) ) {}
+		}
+	}
+
+	public class FixedFactory<T> : IFactory<T>
+	{
+		readonly T instance;
+
+		public FixedFactory( T instance )
+		{
+			this.instance = instance;
+		}
+
+		public T Create() => instance;
+
+		object IFactory.Create() => Create();
+
+		public class Delegate : AttachedProperty<IFactory<T>, Func<T>>
+		{
+			public static Delegate Default { get; } = new Delegate();
+
+			Delegate() : base( factory => factory.Create ) {}
+		}
 	}
 
 	/*public class FixedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>

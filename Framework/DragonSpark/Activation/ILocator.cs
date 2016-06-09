@@ -1,9 +1,7 @@
 using DragonSpark.Aspects;
-using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Linq;
-using DragonSpark.TypeSystem;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Activation
 {
@@ -20,7 +18,7 @@ namespace DragonSpark.Activation
 		public LocateTypeRequest( [Required] Type type, string name = null ) : base( type )
 		{
 			Name = name;
-			code = KeyFactory.Instance.CreateUsing( RequestedType, name );
+			code = KeyFactory.Instance.Create( ImmutableArray.Create<object>( RequestedType, name ) );
 		}
 
 		public string Name { get; }
@@ -35,7 +33,7 @@ namespace DragonSpark.Activation
 		public ConstructTypeRequest( [Required] Type type, [Required] params object[] arguments ) : base( type )
 		{
 			Arguments = arguments;
-			code = KeyFactory.Instance.CreateUsing( RequestedType, Arguments );
+			code = KeyFactory.Instance.Create( ImmutableArray.Create<object>( RequestedType, Arguments ) );
 		}
 
 		public object[] Arguments { get; }
