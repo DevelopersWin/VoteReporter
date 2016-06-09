@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -7,7 +8,7 @@ namespace DragonSpark.ComponentModel
 {
 	public sealed class CurrentTimeAttribute : DefaultValueBase
 	{
-		public CurrentTimeAttribute() : base( t => Services.Get<CurrentTimeValueProvider>() ) {}
+		public CurrentTimeAttribute() : base( t => GlobalServiceProvider.Instance.Get<CurrentTimeValueProvider>() ) {}
 	}
 
 	public class CurrentTimeValueProvider : IDefaultValueProvider

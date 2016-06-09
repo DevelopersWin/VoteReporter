@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
 
@@ -9,7 +10,7 @@ namespace DragonSpark.ComponentModel
 	{
 		public SingletonAttribute() : this( null ) {}
 
-		public SingletonAttribute( Type hostType, string propertyName = nameof(SingletonLocator.Instance) ) : base( t => new SingletonDefaultValueProvider( Services.Get<BuildableTypeFromConventionLocator>(), hostType, propertyName ) ) {}
+		public SingletonAttribute( Type hostType, string propertyName = nameof(SingletonLocator.Instance) ) : base( t => new SingletonDefaultValueProvider( GlobalServiceProvider.Instance.Get<BuildableTypeFromConventionLocator>(), hostType, propertyName ) ) {}
 	}
 
 	public class SingletonDefaultValueProvider : IDefaultValueProvider

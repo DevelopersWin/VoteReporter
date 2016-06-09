@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Moq;
@@ -11,7 +12,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using DragonSpark.Runtime.Stores;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
@@ -66,7 +66,7 @@ namespace DragonSpark.Windows.Markup
 		public override object Create( Type parameter )
 		{
 			var type = typeof(Mock<>).MakeGenericType( parameter );
-			var result = Services.Get<Mock>( type ).Object;
+			var result = GlobalServiceProvider.Instance.Get<Mock>( type ).Object;
 			return result;
 		}
 	}

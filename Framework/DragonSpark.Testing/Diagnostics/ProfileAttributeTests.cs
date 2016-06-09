@@ -2,13 +2,13 @@
 using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
 using Serilog.Core;
 using Serilog.Events;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using DragonSpark.Runtime.Properties;
 using Xunit;
 using Xunit.Abstractions;
 using Profile = DragonSpark.Diagnostics.Profile;
@@ -75,7 +75,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var history = new LoggerHistorySink();
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ) )
 			{
-				var loggerHistory = Services.Get<ILoggerHistory>();
+				var loggerHistory = GlobalServiceProvider.Instance.Get<ILoggerHistory>();
 				Assert.Same( history, loggerHistory );
 
 				Assert.Empty( history.Events );

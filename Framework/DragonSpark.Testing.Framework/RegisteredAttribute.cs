@@ -41,7 +41,7 @@ namespace DragonSpark.Testing.Framework
 		readonly Func<ParameterInfoFactoryTypeLocator> factoryLocator;
 		readonly Type factoryType;
 
-		public FactoryAttribute( Type factoryType = null ) : this( Services.Get<ParameterInfoFactoryTypeLocator>, factoryType ) {}
+		public FactoryAttribute( Type factoryType = null ) : this( GlobalServiceProvider.Instance.Get<ParameterInfoFactoryTypeLocator>, factoryType ) {}
 
 		public FactoryAttribute( [Required]Func<ParameterInfoFactoryTypeLocator> factoryLocator, Type factoryType = null )
 		{

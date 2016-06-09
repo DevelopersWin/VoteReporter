@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.TypeSystem;
 using Serilog;
 using Serilog.Events;
 using System;
@@ -48,7 +47,7 @@ namespace DragonSpark.Diagnostics.Logger
 
 		readonly Func<FormatterFactory> source;
 
-		protected LoggerTemplateParameterFactoryBase() : this( Services.Get<FormatterFactory> ) {}
+		protected LoggerTemplateParameterFactoryBase() : this( GlobalServiceProvider.Instance.Get<FormatterFactory> ) {}
 
 		protected LoggerTemplateParameterFactoryBase( Func<FormatterFactory> source )
 		{

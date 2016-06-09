@@ -34,7 +34,12 @@ namespace DragonSpark.Testing.Framework.Setup
 				this.types = types;
 			}
 
-			public object Create( object request, ISpecimenContext context ) => TypeSupport.From( request ).With( type => types.Contains( type ) ? Services.Get( type ) : null ) ?? new NoSpecimen();
+			public object Create( object request, ISpecimenContext context )
+			{
+				var type = TypeSupport.From( request );
+				var result = type != null && types.Contains( type ) ? GlobalServiceProvider.Instance.GetService( type ) : new NoSpecimen();
+				return result;
+			}
 		}
 	}
 
@@ -44,7 +49,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		readonly Func<Type, object> provider;
 
-		public ServiceRelay() : this( Activation.Services.Get ) {}
+		public ServiceRelay() : this( GlobalServiceProvider.Instance.GetService ) {}
 
 		public ServiceRelay( [Required]Func<Type, object> provider )
 		{

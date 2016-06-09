@@ -45,7 +45,7 @@ namespace DragonSpark.Setup.Registration
 		public static FactoryDelegateFactory Instance { get; } = new FactoryDelegateFactory();
 
 		// [InjectionConstructor]
-		public FactoryDelegateFactory() : this( Services.Get<IFactory> ) {}
+		public FactoryDelegateFactory() : this( GlobalServiceProvider.Instance.Get<IFactory> ) {}
 
 		public FactoryDelegateFactory( [Required]Func<Type, IFactory> createFactory )
 		{
@@ -62,7 +62,7 @@ namespace DragonSpark.Setup.Registration
 		readonly Func<Type, IFactoryWithParameter> createFactory;
 
 		// [InjectionConstructor]
-		public FactoryWithParameterDelegateFactory() : this( Services.Get<IFactoryWithParameter> ) {}
+		public FactoryWithParameterDelegateFactory() : this( GlobalServiceProvider.Instance.Get<IFactoryWithParameter> ) {}
 
 		public FactoryWithParameterDelegateFactory( [Required]Func<Type, IFactoryWithParameter> createFactory )
 		{
@@ -80,7 +80,7 @@ namespace DragonSpark.Setup.Registration
 		readonly Func<Type, object> createParameter;
 
 		// [InjectionConstructor]
-		public FactoryWithActivatedParameterDelegateFactory() : this( FactoryWithParameterDelegateFactory.Instance.Create, Services.Get<object> ) {}
+		public FactoryWithActivatedParameterDelegateFactory() : this( FactoryWithParameterDelegateFactory.Instance.Create, GlobalServiceProvider.Instance.Get<object> ) {}
 
 		public FactoryWithActivatedParameterDelegateFactory( [Required]Func<Type, Func<object, object>> factory, [Required]Func<Type, object> createParameter )
 		{

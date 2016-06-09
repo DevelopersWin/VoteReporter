@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using System;
 using System.Composition;
 
@@ -15,7 +16,7 @@ namespace DragonSpark.ComponentModel
 	{
 		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
-		static object Compose( Type arg ) => Services.Get<CompositionContext>().GetExport( arg );
+		static object Compose( Type arg ) => GlobalServiceProvider.Instance.Get<CompositionContext>().GetExport( arg );
 
 		public ComposeAttribute( Type composedType = null ) : base( new ServicesValueProvider.Converter( composedType ), Compose ) {}
 	}
@@ -24,7 +25,7 @@ namespace DragonSpark.ComponentModel
 	{
 		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
-		static object Compose( Type arg ) => Services.Get<CompositionContext>().GetExports( arg );
+		static object Compose( Type arg ) => GlobalServiceProvider.Instance.Get<CompositionContext>().GetExports( arg );
 
 		public ComposeManyAttribute( Type composedType = null ) : base( new ServicesValueProvider.Converter( composedType ), Compose ) {}
 	}
@@ -35,12 +36,12 @@ namespace DragonSpark.ComponentModel
 
 		static object Factory( Type arg )
 		{
-			var factory = Services.Get<InstanceFromFactoryTypeFactory>();
+			var factory = GlobalServiceProvider.Instance.Get<InstanceFromFactoryTypeFactory>();
 			var o = factory.Create( arg );
 			return o;
 		}
 
-		public FactoryAttribute( Type factoryType = null ) : this( Services.Get<MemberInfoFactoryTypeLocator>, factoryType ) {}
+		public FactoryAttribute( Type factoryType = null ) : this( GlobalServiceProvider.Instance.Get<MemberInfoFactoryTypeLocator>, factoryType ) {}
 
 		public FactoryAttribute( Func<MemberInfoFactoryTypeLocator> locator, Type factoryType = null ) : base( new ServicesValueProvider.Converter( p => factoryType ?? locator().Create( p ) ), Factory ) {}
 	}

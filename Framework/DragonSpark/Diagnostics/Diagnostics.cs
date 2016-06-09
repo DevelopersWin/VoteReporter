@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
@@ -13,7 +14,7 @@ namespace DragonSpark.Diagnostics
 {
 	public static class DiagnosticProperties
 	{
-		public static IAttachedProperty<ILogger> Logger { get; } = new AttachedProperty<ILogger>( o => Services.Get<ILogger>().ForSource( o ) );
+		public static IAttachedProperty<ILogger> Logger { get; } = new AttachedProperty<ILogger>( o => GlobalServiceProvider.Instance.Get<ILogger>().ForSource( o ) );
 	}
 
 	public delegate void EmitProfileEvent( string name );

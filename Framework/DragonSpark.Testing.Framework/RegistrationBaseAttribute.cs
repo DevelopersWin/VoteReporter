@@ -1,13 +1,13 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework.Setup.Location;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Patterns.Contracts;
 using System;
-using DragonSpark.Runtime.Properties;
 using Type = System.Type;
 
 namespace DragonSpark.Testing.Framework
@@ -58,11 +58,12 @@ namespace DragonSpark.Testing.Framework
 
 		public void Register( IServiceRegistry registry )
 		{
-			Services.Get( serviceType ).With( instance =>
+			var instance = GlobalServiceProvider.Instance.GetService( serviceType );
+			if ( instance != null )
 			{
 				var parameter = new InstanceRegistrationParameter( serviceType, instance );
 				registry.Register( parameter );
-			} );
+			}
 		}
 
 		public void Customize( IFixture fixture ) => Register( AssociatedRegistry.Property.Get( fixture ) );

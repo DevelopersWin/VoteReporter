@@ -1,10 +1,9 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Core;
-using Serilog.Filters;
 using System;
-using Serilog.Events;
 
 namespace DragonSpark.Diagnostics
 {
@@ -12,7 +11,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public static ILogger ForSource( this ILogger @this, object context )
 		{
-			var factory = Services.Get<FormatterFactory>();
+			var factory = GlobalServiceProvider.Instance.Get<FormatterFactory>();
 			var formatted = factory.From( context );
 			var result = @this.ForContext( Constants.SourceContextPropertyName, formatted, true );
 			return result;

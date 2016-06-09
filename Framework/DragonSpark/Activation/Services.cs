@@ -8,15 +8,6 @@ using DisposableRepository = DragonSpark.Runtime.DisposableRepository;
 
 namespace DragonSpark.Activation
 {
-	public static class Services
-	{
-		public static T Get<T>() => GlobalServiceProvider.Instance.Get<T>();
-
-		public static T Get<T>( [Required]Type type ) => GlobalServiceProvider.Instance.Get<T>( type );
-
-		public static object Get( [Required] Type type ) => GlobalServiceProvider.Instance.GetService( type );
-	}
-
 	public class GlobalServiceProvider : StoreServiceProvider
 	{
 		static GlobalServiceProvider()

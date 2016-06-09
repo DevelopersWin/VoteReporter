@@ -66,7 +66,7 @@ namespace DragonSpark.Testing.Framework
 
 			public static IProfiler New( Parameter arg ) => new Factory().Create( arg );
 
-			Factory() : this( Services.Get<ILoggerHistory>() ) {}
+			Factory() : this( GlobalServiceProvider.Instance.Get<ILoggerHistory>() ) {}
 
 			Factory( ILoggerHistory history )
 			{

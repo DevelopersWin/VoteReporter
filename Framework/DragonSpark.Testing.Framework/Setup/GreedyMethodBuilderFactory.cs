@@ -32,6 +32,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		public object Create( object request, [Required]ISpecimenContext context ) => request.AsTo<ParameterInfo, object>( info => ShouldDefault( info ) ? info.DefaultValue : inner.Create( request, context ), () => new NoSpecimen() );
 
 		static bool ShouldDefault( ParameterInfo info ) => 
-			info.IsOptional && !Activation.Services.Get<AutoData>().Method.GetParameters().Select( pi => pi.ParameterType ).Any( new TypeAdapter( info.ParameterType ).IsAssignableFrom );
+			info.IsOptional && !GlobalServiceProvider.Instance.Get<AutoData>().Method.GetParameters().Select( pi => pi.ParameterType ).Any( new TypeAdapter( info.ParameterType ).IsAssignableFrom );
 	}
 }

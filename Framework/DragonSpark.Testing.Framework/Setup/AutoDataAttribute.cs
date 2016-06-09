@@ -220,7 +220,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			using ( new InitializeMethodCommand().AsExecuted( methodUnderTest ) )
 			{
-				Services.Get<LoggingLevelSwitch>().MinimumLevel = level;
+				GlobalServiceProvider.Instance.Get<LoggingLevelSwitch>().MinimumLevel = level;
 			}
 		}
 	}

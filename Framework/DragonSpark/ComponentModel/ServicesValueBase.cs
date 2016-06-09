@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -25,7 +26,7 @@ namespace DragonSpark.ComponentModel
 
 			readonly ServiceLocatorProvider locator;
 
-			Factory() : this( Services.Get<IServiceLocator> ) {}
+			Factory() : this( GlobalServiceProvider.Instance.Get<IServiceLocator> ) {}
 
 			Factory( [Required]ServiceLocatorProvider locator )
 			{
@@ -36,7 +37,7 @@ namespace DragonSpark.ComponentModel
 			{
 				var serviceLocator = locator();
 				var instance = serviceLocator?.GetInstance( parameter.RequestedType, parameter.Name );
-				var result = instance ?? Services.Get( parameter.RequestedType );
+				var result = instance ?? GlobalServiceProvider.Instance.GetService( parameter.RequestedType );
 				return result;
 			}
 		}
@@ -60,7 +61,7 @@ namespace DragonSpark.ComponentModel
 
 	public abstract class ServicesValueBase : DefaultValueBase
 	{
-		protected ServicesValueBase( ServicesValueProvider.Converter converter ) : this( converter, Services.Get ) {}
+		protected ServicesValueBase( ServicesValueProvider.Converter converter ) : this( converter, GlobalServiceProvider.Instance.GetService ) {}
 
 		protected ServicesValueBase( ServicesValueProvider.Converter converter, Func<Type, object> creator ) : base( t => new ServicesValueProvider( converter.Create, creator ) ) {}
 
@@ -69,7 +70,7 @@ namespace DragonSpark.ComponentModel
 
 	public class ServicesValueProvider : ValueProvider<Type>
 	{
-		public ServicesValueProvider( Func<PropertyInfo, Type> convert ) : this( convert, Services.Get ) {}
+		public ServicesValueProvider( Func<PropertyInfo, Type> convert ) : this( convert, GlobalServiceProvider.Instance.GetService ) {}
 
 		public ServicesValueProvider( Func<PropertyInfo, Type> convert, Func<Type, object> create ) : base( convert, create ) {}
 
