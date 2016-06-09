@@ -1,7 +1,5 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Setup;
+﻿using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
-using System;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
@@ -14,7 +12,7 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		public UnityContainerFactory() : base( Services.Get<IServiceProvider> ) {}
+		UnityContainerFactory() : base( GlobalServiceProvider.Instance ) {}
 	}
 
 
@@ -27,6 +25,6 @@ namespace DragonSpark.Testing.Objects.Setup
 
 		public static DefaultUnityContainerFactory Instance { get; } = new DefaultUnityContainerFactory();
 
-		DefaultUnityContainerFactory() : base( () => DefaultServiceProvider.Instance.Value ) {}
+		DefaultUnityContainerFactory() : base( DefaultStoreServiceProvider.Instance ) {}
 	}
 }

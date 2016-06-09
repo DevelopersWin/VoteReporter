@@ -82,11 +82,10 @@ namespace DragonSpark.Windows.Setup
 		{
 			if ( exists )
 			{
-				var properties = parameter.Providers
-										  .Cast<SettingsProvider>()
-										  .SelectMany( provider => provider.GetPropertyValues( parameter.Context, parameter.Properties ).Cast<SettingsPropertyValue>() )
-										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute )
-										  .Fixed();
+				var properties = EnumerableExtensions.Fixed<SettingsPropertyValue>( parameter.Providers
+																				  .Cast<SettingsProvider>()
+																				  .SelectMany( provider => provider.GetPropertyValues( parameter.Context, parameter.Properties ).Cast<SettingsPropertyValue>() )
+																				  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ) );
 				var any = properties.Any();
 				if ( any )
 				{

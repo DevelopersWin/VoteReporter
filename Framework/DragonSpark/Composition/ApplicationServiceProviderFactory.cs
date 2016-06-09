@@ -38,30 +38,30 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
+	public class TypeBasedServiceProviderFactory : ServiceProviderFactory
 	{
-		static IServiceProvider Decorated { get; } = new DecoratedServiceProvider( Get );
+		public TypeBasedServiceProviderFactory( Type[] types ) : base( new TypeBasedConfigurationContainerFactory( types ) ) {}
+	}
 
-		static object Get( Type type ) => DefaultServiceProvider.Instance.Value.GetService( type );
+	public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
+	{
+		public AssemblyBasedServiceProviderFactory( Assembly[] assemblies ) : base( new AssemblyBasedConfigurationContainerFactory( assemblies ) ) {}
+	}
 
-		readonly IFactory<CompositionContext> source;
+	public abstract class ServiceProviderFactory : FactoryBase<IServiceProvider>
+	{
+		readonly IFactory<ContainerConfiguration> configuration;
 
-		public ServiceProviderFactory( [Required] Type[] types ) : this( new TypeBasedConfigurationContainerFactory( types ) ) {}
-
-		public ServiceProviderFactory( [Required] Assembly[] assemblies ) : this( new AssemblyBasedConfigurationContainerFactory( assemblies ) ) {}
-
-		public ServiceProviderFactory( IFactory<ContainerConfiguration> configuration ) : this( new CompositionFactory( configuration ) ) {}
-
-		public ServiceProviderFactory( [Required] IFactory<CompositionContext> source )
+		protected ServiceProviderFactory( IFactory<ContainerConfiguration> configuration )
 		{
-			this.source = source;
+			this.configuration = configuration;
 		}
 
 		public override IServiceProvider Create()
 		{
-			var context = source.Create();
+			var context = new CompositionFactory( configuration ).Create();
 			var primary = new ServiceLocator( context );
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), new RecursionAwareServiceProvider( primary ), Decorated );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), new RecursionAwareServiceProvider( primary ), DefaultStoreServiceProvider.Instance );
 			return result;
 		}
 	}

@@ -40,7 +40,7 @@ namespace DragonSpark.Activation
 
 	public abstract class AdapterSpecificationBase : SpecificationBase<Type>
 	{
-		protected AdapterSpecificationBase( params Type[] types ) : this( types.Select( type => type.Adapt() ).Fixed() ) {}
+		protected AdapterSpecificationBase( params Type[] types ) : this( EnumerableExtensions.Fixed( types.Select( type => type.Adapt() ) ) ) {}
 
 		protected AdapterSpecificationBase( params TypeAdapter[] adapters )
 		{
@@ -81,7 +81,7 @@ namespace DragonSpark.Activation
 	{
 		readonly TypeAdapter[] adapters;
 
-		protected TypeLocatorBase( params Type[] types ) : this( types.Select( type => type.Adapt() ).Fixed() ) {}
+		protected TypeLocatorBase( params Type[] types ) : this( EnumerableExtensions.Fixed( types.Select( type => type.Adapt() ) ) ) {}
 
 		TypeLocatorBase( params TypeAdapter[] adapters )
 		{

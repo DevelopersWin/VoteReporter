@@ -1,8 +1,10 @@
+using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using JetBrains.dotMemoryUnit;
+using System;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
@@ -20,8 +22,10 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var method = GetType().GetMethod( nameof(Host) );
 			var autoData = new AutoData( FixtureFactory<AutoDataCustomization>.Instance.Create(), method );
-			var factory = Providers.From( data => new ServiceProviderFactory( new Composition.ServiceProviderFactory( GetType().ToItem() ).Create ).Create(), serviceProvider => new Application<LocationSetup>( serviceProvider ) );
-			using ( factory( autoData ) )
+			var providerFactory = new Composition.TypeBasedServiceProviderFactory( GetType().ToItem() );
+			var provider = new ServiceProviderFactory( providerFactory ).Create();
+			var factory = Providers.From( provider.Wrap<AutoData, IServiceProvider>(), new DelegatedFactory<IServiceProvider, IApplication>( serviceProvider => new Application<LocationSetup>( serviceProvider ) ) );
+			using ( factory.Create( autoData ) )
 			{
 				var data = new Ploeh.AutoFixture.Xunit2.AutoDataAttribute( autoData.Fixture ).GetData( method );
 

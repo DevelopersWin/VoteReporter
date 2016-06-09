@@ -46,7 +46,7 @@ namespace DragonSpark.Activation
 		static object[] Ensure( IEnumerable<ParameterInfo> parameters, IReadOnlyCollection<object> arguments )
 		{
 			var optional = parameters.Skip( arguments.Count ).Where( info => info.IsOptional ).Select( info => info.DefaultValue );
-			var result = arguments.Concat( optional ).Fixed();
+			var result = EnumerableExtensions.Fixed( arguments.Concat( optional ) );
 			return result;
 		}
 
@@ -78,7 +78,7 @@ namespace DragonSpark.Activation
 				var candidates = ImmutableArray.Create( parameter.Arguments, parameter.Arguments.NotNull(), Items<object>.Default );
 				var adapter = parameter.RequestedType.Adapt();
 				var result = candidates
-					.Select( objects => objects.Fixed() )
+					.Select( objects => EnumerableExtensions.Fixed( objects ) )
 					.Select( adapter.FindConstructor )
 					.FirstOrDefault();
 				return result;

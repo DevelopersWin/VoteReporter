@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class AutoData : IEquatable<AutoData>
+	public struct AutoData : IEquatable<AutoData>
 	{
 		public AutoData( [Required]IFixture fixture, [Required]MethodBase method )
 		{
@@ -17,14 +17,20 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public MethodBase Method { get; }
 
-		public bool Equals( AutoData other ) => !ReferenceEquals( null, other ) && ( ReferenceEquals( this, other ) || Equals( Method, other.Method ) );
+		public bool Equals( AutoData other ) => Equals( Fixture, other.Fixture ) && Equals( Method, other.Method );
 
-		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( ReferenceEquals( this, obj ) || obj.GetType() == this.GetType() && Equals( (AutoData)obj ) );
+		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is AutoData && Equals( (AutoData)obj ) );
 
-		public override int GetHashCode() => Method?.GetHashCode() ?? 0;
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return ( Fixture?.GetHashCode() ?? 0 ) * 397 ^ ( Method?.GetHashCode() ?? 0 );
+			}
+		}
 
-		public static bool operator ==( AutoData left, AutoData right ) => Equals( left, right );
+		public static bool operator ==( AutoData left, AutoData right ) => left.Equals( right );
 
-		public static bool operator !=( AutoData left, AutoData right ) => !Equals( left, right );
+		public static bool operator !=( AutoData left, AutoData right ) => !left.Equals( right );
 	}
 }

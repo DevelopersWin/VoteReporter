@@ -1,4 +1,5 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.Activation;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
@@ -18,24 +19,42 @@ namespace DragonSpark.Testing.Objects.IoC
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		public UnityContainerFactory() : base( new DragonSpark.Setup.ServiceProviderFactory( Items<Assembly>.Default ).Create ) {}
+		public UnityContainerFactory() : base( new DragonSpark.Setup.AssemblyBasedServiceProviderFactory( Items<Assembly>.Default ).Create() ) {}
 	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		public AutoDataAttribute() : this( provider => new Application( provider ) ) {}
+		readonly static DelegatedFactory<IServiceProvider, IApplication> ApplicationSource = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) );
 
-		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblyProvider.Instance.Create, applicationSource ) {}
+		public AutoDataAttribute() : this( ApplicationSource ) {}
 
-		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) 
-			: base( Context( assemblySource, applicationSource ) ) {}
+		protected AutoDataAttribute( IFactory<IServiceProvider, IApplication> applicationSource ) : this( AssemblyProvider.Instance, applicationSource ) {}
 
-		static Func<AutoData, IDisposable> Context( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) => 
-			Providers.From( data => new Activation.IoC.ServiceProviderFactory( () => new Cache( assemblySource() ).Create( data ) ).Create(), applicationSource );
+		protected AutoDataAttribute( IFactory<Assembly[]> assemblySource, IFactory<IServiceProvider, IApplication> applicationSource ) : base( new Context( assemblySource, applicationSource ) ) {}
+
+		class Context : FactoryBase<AutoData, IDisposable>
+		{
+			readonly IFactory<Assembly[]> assemblySource;
+			readonly IFactory<IServiceProvider, IApplication> applicationSource;
+
+			public Context( IFactory<Assembly[]> assemblySource, IFactory<IServiceProvider, IApplication> applicationSource )
+			{
+				this.assemblySource = assemblySource;
+				this.applicationSource = applicationSource;
+			}
+
+			public override IDisposable Create( AutoData parameter )
+			{
+				var cached = new Cache( assemblySource.Create() ).Create( parameter );
+				var provider = new Activation.IoC.ServiceProviderFactory( cached.ToFactory() ).Create();
+				var result = Providers.From( provider.Wrap<AutoData, IServiceProvider>(), applicationSource ).Create( parameter );
+				return result;
+			}
+		}
 
 		class Cache : CacheFactoryBase
 		{
-			public Cache( Assembly[] assemblies ) : base( data => assemblies, new ServiceProviderFactory( assemblies ).Create ) {}
+			public Cache( Assembly[] assemblies ) : base( assemblies, new AssemblyBasedServiceProviderFactory( assemblies ).ToDelegate() ) {}
 		}
 	}
 

@@ -71,16 +71,16 @@ namespace DragonSpark.Activation.IoC
 
 	public class ServicesConfigurator : UnityConfigurator
 	{
-		readonly Func<IServiceProvider> provider;
+		readonly IServiceProvider provider;
 
-		public ServicesConfigurator( [Required] Func<IServiceProvider> provider )
+		public ServicesConfigurator( [Required] IServiceProvider provider )
 		{
 			this.provider = provider;
 		}
 
 		public override IUnityContainer Create( IUnityContainer parameter ) => 
 			parameter
-				.RegisterInstance( provider() )
+				.RegisterInstance( provider )
 				.Extend<ServicesIntegrationExtension>();
 	}
 

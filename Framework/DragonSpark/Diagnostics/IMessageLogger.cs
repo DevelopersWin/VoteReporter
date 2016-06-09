@@ -138,7 +138,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public Collection<IDestructuringPolicy> Policies { get; } = new Collection<IDestructuringPolicy>();
 
-		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.With( Policies.Fixed() );
+		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Policies ) );
 	}
 
 	public class DestructureTypeCommand : DestructureCommandBase
@@ -180,7 +180,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public Collection<ILogEventFilter> Items { get; } = new Collection<ILogEventFilter>();
 
-		protected override void Configure( LoggerFilterConfiguration configuration ) => configuration.With( Items.Fixed() );
+		protected override void Configure( LoggerFilterConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Items ) );
 	}
 
 	public class FilterByIncludingOnlyCommand : FilterBySpecificationCommandBase
@@ -204,7 +204,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public Collection<ILogEventEnricher> Items { get; } = new Collection<ILogEventEnricher>();
 		
-		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.With( Items.Fixed() );
+		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Items ) );
 	}
 
 	public class EnrichWithPropertyCommand : EnrichCommandBase

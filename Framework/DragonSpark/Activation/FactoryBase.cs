@@ -158,7 +158,7 @@ namespace DragonSpark.Activation
 	public class FirstConstructedFromParameterFactory<TParameter, TResult> : FactoryBase<object, IFactory<TParameter, TResult>>
 	{
 		readonly IFactory<object, IFactoryWithParameter>[] factories;
-		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ).Fixed() ) {}
+		public FirstConstructedFromParameterFactory( params Type[] types ) : this( EnumerableExtensions.Fixed( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ) ) ) {}
 		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  ) : base( Specifications.Always )
 		{
 			this.factories = factories;
@@ -249,8 +249,7 @@ namespace DragonSpark.Activation
 		readonly Func<T> primary;
 		readonly IEnumerable<Func<T, T>> transformers;
 
-		public AggregateFactory( [Required]IFactory<T> primary, [Required]params ITransformer<T>[] transformers )
-			: this( primary.Create, transformers.Select( factory => factory.ToDelegate() ).ToArray() ) {}
+		public AggregateFactory( [Required]IFactory<T> primary, [Required]params ITransformer<T>[] transformers ) : this( primary.ToDelegate(), transformers.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
 		public AggregateFactory( [Required]Func<T> primary, [Required]params Func<T, T>[] transformers )
 		{
@@ -269,16 +268,30 @@ namespace DragonSpark.Activation
 		object IFactory.Create() => Create();
 	}
 
-	public class InstanceFactory<T> : FactoryBase<T>
+	/*public class FixedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	{
+		readonly Func<TResult> instance;
+
+		public FixedFactory( TResult instance ) : this( new DelegateContext<TResult>( instance ).Get ) {}
+
+		public FixedFactory( Func<TResult> instance ) : base( Specifications<TParameter>.Always )
+		{
+			this.instance = instance;
+		}
+
+		public override TResult Create( TParameter parameter ) => instance();
+	}*/
+
+	/*public class FixedFactory<T> : FactoryBase<T>
 	{
 		readonly T instance;
-		public InstanceFactory( T instance )
+		public FixedFactory( T instance )
 		{
 			this.instance = instance;
 		}
 
 		public override T Create() => instance;
-	}
+	}*/
 
 	public class Creator : AttachedProperty<ICreator>
 	{

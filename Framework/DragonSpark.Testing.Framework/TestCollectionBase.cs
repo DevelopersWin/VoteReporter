@@ -72,7 +72,7 @@ namespace DragonSpark.Testing.Framework
 			return result;
 		}
 
-		public static IProfiler Profile( this MethodBase method, Action<string> output, ILoggerHistory history, ILogger logger ) => Profile( method, output, history, logger.Wrap() );
+		public static IProfiler Profile( this MethodBase method, Action<string> output, ILoggerHistory history, ILogger logger ) => Profile( method, output, history, logger.Wrap().ToDelegate() );
 
 		public static IProfiler Profile( this MethodBase method, Action<string> output, ILoggerHistory history, Func<MethodBase, ILogger> loggerSource )
 		{

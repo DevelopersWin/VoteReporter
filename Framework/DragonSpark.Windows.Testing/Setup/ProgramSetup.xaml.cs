@@ -1,5 +1,7 @@
-﻿using System.Composition;
+﻿using DragonSpark.Activation;
 using DragonSpark.Testing.Framework.Setup;
+using System;
+using System.Composition;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -8,7 +10,9 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public class AutoDataAttribute : Setup.AutoDataAttribute
 		{
-			public AutoDataAttribute() : base( provider => new Application<ProgramSetup>( provider ) ) {}
+			readonly static DelegatedFactory<IServiceProvider, IApplication> ApplicationSource = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application<ProgramSetup>( provider ) );
+
+			public AutoDataAttribute() : base( ApplicationSource ) {}
 		}
 
 		public ProgramSetup()

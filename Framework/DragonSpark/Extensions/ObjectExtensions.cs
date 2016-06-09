@@ -64,7 +64,7 @@ namespace DragonSpark.Extensions
 
 		/*public static Func<U> Get<T, U>( this T @this, Func<T, U> getter ) => () => getter( @this );*/
 
-		public static TItem Use<TItem>( this Func<TItem> @this, Action<TItem> function )
+		/*public static T Use<T>( this Func<T> @this, Action<T> function )
 		{
 			var item = @this();
 			var with = item.With( function );
@@ -75,7 +75,7 @@ namespace DragonSpark.Extensions
 		{
 			var item = @this();
 			return item.With( function, defaultFunction );
-		}
+		}*/
 
 		public static T OrDefault<T>( this T @this, [Required]Func<T> defaultFunction ) => @this.With( Delegates<T>.Self, defaultFunction );
 

@@ -6,7 +6,7 @@ namespace DragonSpark.Activation.IoC
 {
 	public class UnityContainerFactory : AggregateFactory<IUnityContainer>
 	{
-		public UnityContainerFactory( [Required] Func<IServiceProvider> provider )
+		public UnityContainerFactory( [Required] IServiceProvider provider )
 			: base( UnityContainerCoreFactory.Instance.Create,
 					new ServicesConfigurator( provider ).Create,
 					DefaultUnityExtensions.Instance.Create

@@ -1,4 +1,5 @@
-﻿using DragonSpark.Windows.Modularity;
+﻿using DragonSpark.Activation;
+using DragonSpark.Windows.Modularity;
 using System;
 using System.Reflection;
 using IApplication = DragonSpark.Testing.Framework.Setup.IApplication;
@@ -9,8 +10,8 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public static DragonSpark.Testing.Objects.IoC.AssemblyProvider Provider { get; } = new DragonSpark.Testing.Objects.IoC.AssemblyProvider( typeof(AssemblyModuleCatalog) );
 
-		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( Provider.Create, applicationSource ) {}
+		protected AutoDataAttribute( IFactory<IServiceProvider, IApplication> applicationSource ) : this( Provider, applicationSource ) {}
 
-		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) : base( assemblySource, applicationSource ) {}
+		protected AutoDataAttribute( IFactory<Assembly[]> assemblySource, IFactory<IServiceProvider, IApplication> applicationSource ) : base( assemblySource, applicationSource ) {}
 	}
 }

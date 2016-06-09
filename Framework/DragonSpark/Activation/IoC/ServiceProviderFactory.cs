@@ -5,20 +5,29 @@ using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
+	public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
+	{
+		public AssemblyBasedServiceProviderFactory( Assembly[] assemblies ) : base( new Composition.AssemblyBasedServiceProviderFactory( assemblies ) ) {}
+	}
+
+	public class TypeBasedServiceProviderFactory : ServiceProviderFactory
+	{
+		public TypeBasedServiceProviderFactory( Type[] types ) : base( new Composition.TypeBasedServiceProviderFactory( types ) ) {}
+	}
+
 	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
-		readonly Func<IServiceProvider> factory;
+		readonly IFactory<IServiceProvider> factory;
 
-		public ServiceProviderFactory( Assembly[] assemblies ) : this( new Composition.ServiceProviderFactory( assemblies ).Create ) {}
-
-		public ServiceProviderFactory( Func<IServiceProvider> factory )
+		public ServiceProviderFactory( IFactory<IServiceProvider> factory )
 		{
 			this.factory = factory;
 		}
 
 		public override IServiceProvider Create()
 		{
-			var container = new UnityContainerFactory( factory ).Create();
+			var provider = factory.Create();
+			var container = new UnityContainerFactory( provider ).Create();
 			var primary = new ServiceLocator( container );
 			var secondary = primary.Get<IServiceProvider>();
 			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary ), new RecursionAwareServiceProvider( primary ), secondary );

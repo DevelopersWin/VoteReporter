@@ -15,7 +15,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Composition;
-using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
@@ -23,13 +22,23 @@ using Type = System.Type;
 
 namespace DragonSpark.Setup
 {
+	public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
+	{
+		public AssemblyBasedServiceProviderFactory( Assembly[] assemblies ) : base( new Composition.AssemblyBasedServiceProviderFactory( assemblies ) ) {}
+	}
+
+	public class TypeBasedServiceProviderFactory : ServiceProviderFactory
+	{
+		public TypeBasedServiceProviderFactory( Type[] types ) : base( new Composition.TypeBasedServiceProviderFactory( types ) ) {}
+	}
+
 	public class ServiceProviderFactory : ConfiguredServiceProviderFactory<ConfigureProviderCommand>
 	{
-		public ServiceProviderFactory( Type[] types ) : this( new TypeBasedConfigurationContainerFactory( types ) ) {}
+		/*public ServiceProviderFactory( Type[] types ) : this( new TypeBasedServiceProviderFactory( types ) ) {}
 
-		public ServiceProviderFactory( Assembly[] assemblies ) : this( new AssemblyBasedConfigurationContainerFactory( assemblies ) ) {}
+		public ServiceProviderFactory( Assembly[] assemblies ) : this( new AssemblyBasedServiceProviderFactory( assemblies ) ) {}*/
 
-		public ServiceProviderFactory( IFactory<ContainerConfiguration> source ) : this( new Composition.ServiceProviderFactory( source ) ) {}
+		// public ServiceProviderFactory( IFactory<ContainerConfiguration> source ) : this( new Composition.ServiceProviderFactory( source ) ) {}
 
 		public ServiceProviderFactory( IFactory<IServiceProvider> provider ) : base( provider ) {}
 	}
@@ -102,9 +111,15 @@ namespace DragonSpark.Setup
 
 	public class DefaultServiceProvider : ExecutionAttachedPropertyStoreBase<IServiceProvider>
 	{
-		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider( () => new ServiceProvider() );
+		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider();
 
-		DefaultServiceProvider( Func<ServiceProvider> create ) : base( create ) {}
+		DefaultServiceProvider() : base( () => new ServiceProvider() ) {}
+	}
+
+	public class DefaultStoreServiceProvider : StoreServiceProvider
+	{
+		public static DefaultStoreServiceProvider Instance { get; } = new DefaultStoreServiceProvider();
+		DefaultStoreServiceProvider() : base( DefaultServiceProvider.Instance ) {}
 	}
 
 	public static class ActivationProperties
@@ -244,6 +259,13 @@ namespace DragonSpark.Setup
 		}
 	}
 
+	public class GlobalServiceProvider : DecoratedServiceProvider
+	{
+		public static GlobalServiceProvider Instance { get; } = new GlobalServiceProvider();
+
+		GlobalServiceProvider() : base( Services.Get<IServiceProvider> ) {}
+	}
+
 	public class DecoratedServiceProvider : IServiceProvider
 	{
 		readonly Func<Type, object> inner;
@@ -256,6 +278,18 @@ namespace DragonSpark.Setup
 		}
 
 		public virtual object GetService( Type serviceType ) => inner( serviceType );
+	}
+
+	public class StoreServiceProvider : IServiceProvider
+	{
+		readonly IStore<IServiceProvider> store;
+
+		public StoreServiceProvider( IStore<IServiceProvider> store )
+		{
+			this.store = store;
+		}
+
+		public object GetService( Type serviceType ) => store.Value.GetService( serviceType );
 	}
 
 	public class ConfiguredServiceProviderFactory<TCommand> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<IServiceProvider>

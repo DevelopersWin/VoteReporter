@@ -30,34 +30,34 @@ namespace DragonSpark.Composition
 
 	public class AssemblyBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
 	{
-		public AssemblyBasedConfigurationContainerFactory( [Required] Assembly[] assemblies, [Required] params ITransformer<ContainerConfiguration>[] configurations )
-			: base( assemblies, TypesFactory.Instance.Create( assemblies ), configurations ) {}
+		public AssemblyBasedConfigurationContainerFactory( [Required] Assembly[] assemblies )
+			: base( assemblies, TypesFactory.Instance.Create( assemblies ) ) {}
 	}
 
 	public class TypeBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
 	{
-		public TypeBasedConfigurationContainerFactory( [Required] Type[] types, [Required] params ITransformer<ContainerConfiguration>[] configurations ) 
-			: base( Items<Assembly>.Default, types, configurations ) {}
+		public TypeBasedConfigurationContainerFactory( Type[] types )  : base( Items<Assembly>.Default, types ) {}
 	}
 
 	public class ContainerConfigurationFromPartsFactory : AggregateFactory<ContainerConfiguration>
 	{
-		public ContainerConfigurationFromPartsFactory( [Required] Assembly[] assemblies, [Required] Type[] types, params ITransformer<ContainerConfiguration>[] configurations )
-			: base( 
-				ContainerConfigurationFactory.Instance, 
-				configurations.Prepend( new ContainerServicesConfigurator(), new PartsContainerConfigurator( assemblies, types ) ).ToArray()
-			) {}
+		public ContainerConfigurationFromPartsFactory( [Required] Assembly[] assemblies, [Required] Type[] types )
+			: base( ContainerConfigurationFactory.Instance, new ITransformer<ContainerConfiguration>[] { ContainerServicesConfigurator.Instance, new PartsContainerConfigurator( assemblies, types ) } ) {}
 	}
 
 	public class ContainerConfigurationFactory : FactoryBase<ContainerConfiguration>
 	{
 		public static ContainerConfigurationFactory Instance { get; } = new ContainerConfigurationFactory();
+		ContainerConfigurationFactory() {}
 
 		public override ContainerConfiguration Create() => new ContainerConfiguration();
 	}
 
 	public class ContainerServicesConfigurator : ContainerConfigurator
 	{
+		public static ContainerServicesConfigurator Instance { get; } = new ContainerServicesConfigurator();
+		ContainerServicesConfigurator() {}
+
 		public override ContainerConfiguration Create( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
 	}
 

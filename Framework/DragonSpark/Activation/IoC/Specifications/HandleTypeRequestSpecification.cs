@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using EnumerableExtensions = DragonSpark.Extensions.EnumerableExtensions;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {
@@ -216,13 +217,12 @@ namespace DragonSpark.Activation.IoC.Specifications
 		[Freeze]
 		public override IEnumerable<ConstructorInfo> Create( ConstructTypeRequest parameter )
 		{
-			var result = new ReflectionHelper( parameter.RequestedType )
-				.InstanceConstructors
-				.Select( constructor => new { constructor, parameters = constructor.GetParameters() } )
-				.OrderByDescending( item => item.parameters.Length )
-				.Where( item => item.parameters.Select( info => new ConstructTypeRequest( info.ParameterType, parameter.Arguments ) ).All( Check ) )
-				.Select( item => item.constructor )
-				.Fixed();
+			var result = EnumerableExtensions.Fixed( new ReflectionHelper( parameter.RequestedType )
+							.InstanceConstructors
+							.Select( constructor => new { constructor, parameters = constructor.GetParameters() } )
+							.OrderByDescending( item => item.parameters.Length )
+							.Where( item => item.parameters.Select( info => new ConstructTypeRequest( info.ParameterType, parameter.Arguments ) ).All( Check ) )
+							.Select( item => item.constructor ) );
 			return result;
 		}
 
