@@ -1,4 +1,5 @@
-﻿using DragonSpark.Setup;
+﻿using DragonSpark.Activation;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 
 namespace DragonSpark.Testing.Objects.Setup

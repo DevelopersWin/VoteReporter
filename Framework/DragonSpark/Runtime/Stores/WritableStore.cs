@@ -153,11 +153,11 @@ namespace DragonSpark.Runtime.Stores
 		protected override T Get() => deferred.Use( value => value.Value );
 	}*/
 
-	/*public class DecoratedStore<T> : WritableStore<T>
+	public class DecoratedStore<T> : WritableStore<T>
 	{
 		readonly IWritableStore<T> inner;
 
-		public DecoratedStore( [Required]IWritableStore<T> inner )
+		public DecoratedStore( IWritableStore<T> inner )
 		{
 			this.inner = inner;
 		}
@@ -171,5 +171,5 @@ namespace DragonSpark.Runtime.Stores
 			inner.TryDispose();
 			base.OnDispose();
 		}
-	}*/
+	}
 }

@@ -259,13 +259,6 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class GlobalServiceProvider : DecoratedServiceProvider
-	{
-		public static GlobalServiceProvider Instance { get; } = new GlobalServiceProvider();
-
-		GlobalServiceProvider() : base( Services.Get<IServiceProvider> ) {}
-	}
-
 	public class DecoratedServiceProvider : IServiceProvider
 	{
 		readonly Func<Type, object> inner;
@@ -280,16 +273,11 @@ namespace DragonSpark.Setup
 		public virtual object GetService( Type serviceType ) => inner( serviceType );
 	}
 
-	public class StoreServiceProvider : IServiceProvider
+	public abstract class StoreServiceProvider : DecoratedStore<IServiceProvider>, IServiceProvider
 	{
-		readonly IStore<IServiceProvider> store;
+		protected StoreServiceProvider( IWritableStore<IServiceProvider> store ) : base( store ) {}
 
-		public StoreServiceProvider( IStore<IServiceProvider> store )
-		{
-			this.store = store;
-		}
-
-		public object GetService( Type serviceType ) => store.Value.GetService( serviceType );
+		public object GetService( Type serviceType ) => Value.GetService( serviceType );
 	}
 
 	public class ConfiguredServiceProviderFactory<TCommand> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<IServiceProvider>

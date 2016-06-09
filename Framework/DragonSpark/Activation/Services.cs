@@ -1,37 +1,32 @@
 using DragonSpark.Diagnostics;
+using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime.Stores;
 using DisposableRepository = DragonSpark.Runtime.DisposableRepository;
 
 namespace DragonSpark.Activation
 {
 	public static class Services
 	{
-		static Services()
-		{
-			Initialize( CurrentServiceProvider.Instance );
+		public static T Get<T>() => GlobalServiceProvider.Instance.Get<T>();
 
-			ServiceLocator.SetLocatorProvider( Get<IServiceLocator> );
+		public static T Get<T>( [Required]Type type ) => GlobalServiceProvider.Instance.Get<T>( type );
+
+		public static object Get( [Required] Type type ) => GlobalServiceProvider.Instance.GetService( type );
+	}
+
+	public class GlobalServiceProvider : StoreServiceProvider
+	{
+		static GlobalServiceProvider()
+		{
+			ServiceLocator.SetLocatorProvider( Instance.Get<IServiceLocator> );
 		}
 
-		public static void Initialize( [Required] IStore<IServiceProvider> provider ) => Provider = provider;
+		public static GlobalServiceProvider Instance { get; } = new GlobalServiceProvider();
 
-		static IStore<IServiceProvider> Provider { get; set; }
-
-		public static T Get<T>() => Get<T>( typeof(T) );
-
-		public static T Get<T>( [Required]Type type )
-		{
-			var found = Get( type );
-			var result = !found.IsNull() ? (T)found : default(T);
-			return result;
-		}
-
-		public static object Get( [Required] Type type ) => Provider.Value.GetService( type );
+		GlobalServiceProvider() : base( CurrentServiceProvider.Instance ) {}
 	}
 
 	public class ServiceProvider : CompositeServiceProvider

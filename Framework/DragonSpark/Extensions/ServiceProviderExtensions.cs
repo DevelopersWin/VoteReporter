@@ -4,9 +4,9 @@ namespace DragonSpark.Extensions
 {
 	public static class ServiceProviderExtensions
 	{
-		public static TService Get<TService>( this IServiceProvider serviceProvider ) => Get<TService>( serviceProvider, typeof(TService) );
+		public static T Get<T>( this IServiceProvider serviceProvider ) => Get<T>( serviceProvider, typeof(T) );
 
-		public static TService Get<TService>( this IServiceProvider serviceProvider, Type type ) => (TService)serviceProvider.GetService( type );
+		public static T Get<T>( this IServiceProvider serviceProvider, Type type ) => (T)serviceProvider.GetService( type );
 
 		/*public static TService Get<TService>( this object @this )
 		{
