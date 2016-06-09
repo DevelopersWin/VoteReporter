@@ -68,7 +68,7 @@ namespace DragonSpark.Composition
 			new[] { contract.ContractType, locator.Create( contract.ContractType ) }
 				.NotNull()
 				.Distinct()
-				.Each( InitializeTypeCommand.Instance.Run );
+				.Each( InitializeTypeCommand.Instance.Execute );
 			yield break;
 		}
 	}

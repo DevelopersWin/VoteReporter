@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Activation.IoC
 		{
 			var provider = container.Resolve<IServiceProvider>();
 			Assert.NotSame( CurrentServiceProvider.Instance.Value, provider );
-			Assert.Same( DefaultServiceProvider.Instance.Value, provider );
+			Assert.Same( DefaultStoreServiceProvider.Instance, provider );
 
 			Assert.NotNull( container );
 

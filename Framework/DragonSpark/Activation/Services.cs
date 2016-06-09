@@ -3,6 +3,7 @@ using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Stores;
 using DisposableRepository = DragonSpark.Runtime.DisposableRepository;
 
@@ -23,7 +24,12 @@ namespace DragonSpark.Activation
 
 		public static T Get<T>() => Get<T>( typeof(T) );
 
-		public static T Get<T>( [Required]Type type ) => (T)Get( type );
+		public static T Get<T>( [Required]Type type )
+		{
+			var found = Get( type );
+			var result = !found.IsNull() ? (T)found : default(T);
+			return result;
+		}
 
 		public static object Get( [Required] Type type ) => Provider.Value.GetService( type );
 	}

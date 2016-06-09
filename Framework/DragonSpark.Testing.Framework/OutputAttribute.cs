@@ -75,7 +75,7 @@ namespace DragonSpark.Testing.Framework
 
 			public override IProfiler Create( Parameter parameter )
 			{
-				var output = parameter.Instance.AsTo<ITestOutputAware, Action<string>>( value => value.Output.WriteLine ) ?? IgnoredOutputCommand.Instance.Run;
+				var output = parameter.Instance.AsTo<ITestOutputAware, Action<string>>( value => value.Output.WriteLine ) ?? IgnoredOutputCommand.Instance.Execute;
 				var result = new Diagnostics.ProfilerFactory( output, history ).Create( parameter.Method );
 				return result;
 			}

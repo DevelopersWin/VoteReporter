@@ -20,7 +20,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Clear();
 		}
 
-		static void Clear() => ClearUserSettingCommand.Instance.Run( Settings.Default );
+		static void Clear() => ClearUserSettingCommand.Instance.Execute( Settings.Default );
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void Create( InitializeUserSettingsCommand sut, ILoggerHistory history, UserSettingsPathFactory factory )
@@ -28,7 +28,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			var path = factory.Create();
 			Assert.False( File.Exists( path ) );
 			var before = history.Events.Fixed();
-			sut.Run( Settings.Default );
+			sut.Execute( Settings.Default );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
 			Assert.Contains( Resources.LoggerTemplates_Created, items );
@@ -37,7 +37,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			Clear();
 			Assert.False( File.Exists( path ) );
-			sut.Run( Settings.Default );
+			sut.Execute( Settings.Default );
 			Assert.False( File.Exists( path ) );
 			Assert.Equal( before.Length + 2, history.Events.Count() );
 		}
@@ -45,14 +45,14 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void CreateThenRecreate( InitializeUserSettingsCommand create, InitializeUserSettingsCommand sut, ILoggerHistory history )
 		{
-			create.Run( Settings.Default );
+			create.Execute( Settings.Default );
 			var created = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_NotFound, created );
 			Assert.Contains( Resources.LoggerTemplates_Created, created );
 
 			var count = history.Events.Count();
 
-			sut.Run( Settings.Default );
+			sut.Execute( Settings.Default );
 			Assert.Equal( count + 2, history.Events.Count() );
 			var upgraded = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_Upgrading, upgraded );
@@ -63,7 +63,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void NoProperties( InitializeUserSettingsCommand create, InitializeUserSettingsCommand sut, ILoggerHistory history )
 		{
 			var before = history.Events.Fixed();
-			sut.Run( new SettingsWithNoProperties() );
+			sut.Execute( new SettingsWithNoProperties() );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
 			Assert.Contains( Resources.LoggerTemplates_NotSaved, items );
@@ -74,7 +74,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void Error( InitializeUserSettingsCommand create, InitializeUserSettingsCommand sut, ILoggerHistory history )
 		{
 			var before = history.Events.Fixed();
-			sut.Run( new SettingsWithException() );
+			sut.Execute( new SettingsWithException() );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
 			Assert.Contains( Resources.LoggerTemplates_ErrorSaving, items );

@@ -48,7 +48,7 @@ namespace DragonSpark.Testing.Framework
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			new ApplicationOutputCommand().Run( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
+			new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 
 			args.ReturnValue = Defer.Run( ExecutionContextStore.Instance.Value.Dispose, args.ReturnValue );
 		}
@@ -89,7 +89,7 @@ namespace DragonSpark.Testing.Framework
 
 		public InitializeMethodCommand() : this( Delegates.Empty ) {}
 
-		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Instance.Run, complete ) {}
+		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Instance.Execute, complete ) {}
 
 		public InitializeMethodCommand( Action<Assembly> initialize, Action complete ) : this( ExecutionContextStore.Instance.Value, initialize, complete ) {}
 

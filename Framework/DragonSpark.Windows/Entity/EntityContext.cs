@@ -60,7 +60,7 @@ namespace DragonSpark.Windows.Entity
 
 		protected override void OnModelCreating( DbModelBuilder modelBuilder )
 		{
-			command.Run( new DbContextBuildingParameter( this, modelBuilder) );
+			command.Execute( new DbContextBuildingParameter( this, modelBuilder) );
 
 			base.OnModelCreating( modelBuilder );
 		}

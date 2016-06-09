@@ -238,6 +238,7 @@
     <Compile Include="Aspects\ValidationAspectTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
     <Compile Include="Runtime\EnabledStateTests.cs" />
+    <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
     <Compile Include="Runtime\ParameterInvocationTests.cs" />
     <Compile Include="Runtime\TaskFactoryTests.cs" />

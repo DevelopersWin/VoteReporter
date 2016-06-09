@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 
@@ -14,7 +13,7 @@ namespace DragonSpark.Windows.Testing
 			{
 				Properties.Settings.Default.Reset();
 			}
-			new LoadPartAssemblyCommand( new TypeSystem.AssemblyLoader( assembly => "DragonSpark.Testing" ) ).Run( typeof(Configure).Assembly );
+			new LoadPartAssemblyCommand( new TypeSystem.AssemblyLoader( assembly => "DragonSpark.Testing" ) ).Execute( typeof(Configure).Assembly );
 		}
 	}
 }

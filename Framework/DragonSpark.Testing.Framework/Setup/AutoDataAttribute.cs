@@ -169,8 +169,8 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			var result = new InitializeMethodCommand().AsExecuted( parameter.Method );
 
-			var configure = new AutoDataConfiguringCommandFactory( parameter, providerSource.Create( parameter ), applicationSource.Create ).Create();
-			configure.Run( parameter );
+			var configure = new AutoDataConfiguringCommandFactory( parameter, providerSource.Create( parameter ), applicationSource.ToDelegate() ).Create();
+			configure.Execute( parameter );
 
 			return result;
 		}
@@ -243,7 +243,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		readonly Func<Type, Type[]> primaryStrategy;
 		readonly Func<Type, Type[]> otherStrategy;
 
-		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters ) : this( additional, includeFromParameters, SelfAndNestedStrategy.Instance.Create, SelfStrategy.Instance.Create ) {}
+		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters ) : this( additional, includeFromParameters, SelfAndNestedStrategy.Instance.ToDelegate(), SelfStrategy.Instance.ToDelegate() ) {}
 
 		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters, [Required] Func<Type, Type[]> primaryStrategy, [Required] Func<Type, Type[]> otherStrategy )
 		{

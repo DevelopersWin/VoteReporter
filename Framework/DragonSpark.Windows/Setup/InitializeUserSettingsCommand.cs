@@ -75,17 +75,17 @@ namespace DragonSpark.Windows.Setup
 				Run( parameter, path, exists )
 			};
 
-			templates.Each( log.Run );
+			templates.Each( log.Execute );
 		}
 
 		static ILoggerTemplate Run( ApplicationSettingsBase parameter, string path, bool exists )
 		{
 			if ( exists )
 			{
-				var properties = EnumerableExtensions.Fixed<SettingsPropertyValue>( parameter.Providers
-																				  .Cast<SettingsProvider>()
-																				  .SelectMany( provider => provider.GetPropertyValues( parameter.Context, parameter.Properties ).Cast<SettingsPropertyValue>() )
-																				  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ) );
+				var properties = parameter.Providers
+										  .Cast<SettingsProvider>()
+										  .SelectMany( provider => provider.GetPropertyValues( parameter.Context, parameter.Properties ).Cast<SettingsPropertyValue>() )
+										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed<SettingsPropertyValue>();
 				var any = properties.Any();
 				if ( any )
 				{

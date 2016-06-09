@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var method = GetType().GetMethod( nameof(AnotherMethod), BindingOptions.AllMembers );
 			var command = new LogCommand( logger );
 
-			command.Run( new HelloWorld( text, method ) );
+			command.Execute( new HelloWorld( text, method ) );
 			
 			var history = context.GetExport<ILoggerHistory>();
 			Assert.Same( DefaultServiceProvider.Instance.Value.Get<ILoggerHistory>(), history );
@@ -65,7 +65,7 @@ namespace DragonSpark.Testing.Diagnostics
 		{
 			[ImportingConstructor]
 			public Factory( ILoggerHistory history, LoggingLevelSwitch controller ) : base( history, controller, 
-				new ICommand<LoggerConfiguration>[] { /*DestructureMethodCommand.Instance,*/ EnrichFromLogContextCommand.Instance }.Select( command => new ConfiguringTransformer<LoggerConfiguration>( command.Run ) ).Fixed()  
+				new ICommand<LoggerConfiguration>[] { /*DestructureMethodCommand.Instance,*/ EnrichFromLogContextCommand.Instance }.Select( command => new ConfiguringTransformer<LoggerConfiguration>( command.Execute ) ).Fixed()  
 				) {}
 		}
 	}

@@ -12,7 +12,7 @@ namespace DragonSpark.Setup
 		{
 			var source = parameter.To.Get<IServiceProviderMigrationCommandSource>() ?? ServiceProviderMigrationCommandFactory.Instance;
 			var command = source.Create( parameter.From );
-			command.Run( parameter );
+			command.Execute( parameter );
 		}
 	}
 }

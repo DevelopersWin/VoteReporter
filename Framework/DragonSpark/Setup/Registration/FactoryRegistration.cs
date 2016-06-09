@@ -21,7 +21,7 @@ namespace DragonSpark.Setup.Registration
 			this.parameter = parameter;
 		}
 
-		public void Register( IServiceRegistry registry ) => new FactoryRegistrationCommand( registry ).Run( parameter );
+		public void Register( IServiceRegistry registry ) => new FactoryRegistrationCommand( registry ).Execute( parameter );
 	}
 
 	class FactoryRegistrationCommand : FirstCommand<RegisterFactoryParameter>

@@ -2,6 +2,7 @@
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using Ploeh.AutoFixture.Xunit2;
@@ -10,7 +11,6 @@ using Serilog.Core;
 using System;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Properties;
 using Xunit;
 
 namespace DragonSpark.Testing.Setup
@@ -39,7 +39,7 @@ namespace DragonSpark.Testing.Setup
 
 				var destinationHistory = destination.Get<ILoggerHistory>();
 				Assert.Empty( destinationHistory.Events );
-				ApplyMigrationCommand.Instance.Run( new MigrationParameter<IServiceProvider>( current, destination ) );
+				ApplyMigrationCommand.Instance.Execute( new MigrationParameter<IServiceProvider>( current, destination ) );
 
 				Assert.Empty( source.History.Events );
 
@@ -71,7 +71,7 @@ namespace DragonSpark.Testing.Setup
 				var destinationHistory = destination.Get<ILoggerHistory>();
 				Assert.False( factory.History.Get( Source.Property ).IsApplied );
 				Assert.Empty( destinationHistory.Events );
-				ApplyMigrationCommand.Instance.Run( new MigrationParameter<IServiceProvider>( current, destination ) );
+				ApplyMigrationCommand.Instance.Execute( new MigrationParameter<IServiceProvider>( current, destination ) );
 				Assert.True( factory.History.Get( Source.Property ).IsApplied );
 			}
 		}

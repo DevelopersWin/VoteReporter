@@ -24,7 +24,7 @@ namespace DragonSpark.Setup
 			if ( item != null && item != Value )
 			{
 				var parameter = new MigrationParameter<IServiceProvider>( Value, item );
-				ApplyMigrationCommand.Instance.Run( parameter );
+				ApplyMigrationCommand.Instance.Execute( parameter );
 			}
 
 			base.Assign( item );
@@ -64,7 +64,7 @@ namespace DragonSpark.Setup
 			var to = parameter.To.Get<T>();
 			if ( from != null && to != null && from != to )
 			{
-				inner.Run( new MigrationParameter<T>( from, to ) );
+				inner.Execute( new MigrationParameter<T>( from, to ) );
 			}
 		}
 	}
@@ -86,7 +86,7 @@ namespace DragonSpark.Setup
 		readonly ILoggerHistory history;
 		readonly Action<Action<LogEvent>> purge;
 
-		public LoggerMigrationCommand( ILoggerHistory history ) : this( history, new PurgeLoggerHistoryCommand( history ).Run ) {}
+		public LoggerMigrationCommand( ILoggerHistory history ) : this( history, new PurgeLoggerHistoryCommand( history ).Execute ) {}
 
 		public LoggerMigrationCommand( ILoggerHistory history, Action<Action<LogEvent>> purge )
 		{

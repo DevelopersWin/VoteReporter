@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Extensions;
 using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 
@@ -10,7 +9,7 @@ namespace DragonSpark.Testing
 		[ModuleInitializer( 0 ), DragonSpark.Aspects.Runtime, AssemblyInitialize]
 		public static void Initialize()
 		{
-			LoadPartAssemblyCommand.Instance.Run( typeof(Configure).Assembly );
+			LoadPartAssemblyCommand.Instance.Execute( typeof(Configure).Assembly );
 			// Debugger.Launch();
 		}
 	}

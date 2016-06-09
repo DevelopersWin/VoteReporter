@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		{
 			var purge = new FixedCommand( new PurgeLoggerMessageHistoryCommand( history ), output );
 			var start = new CompositeCommand( purge, StartProcessCommand.Instance );
-			var result = base.Create( parameter ).With( start.Run ).AssociateForDispose( new DisposableAction( purge.Run ) );
+			var result = base.Create( parameter ).With( start.Execute ).AssociateForDispose( new DisposableAction( purge.Run ) );
 			return result;
 		}
 	}

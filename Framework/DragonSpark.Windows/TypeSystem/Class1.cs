@@ -63,6 +63,6 @@ namespace DragonSpark.Windows.TypeSystem
 
 		AssemblyLoader() : this( AssemblyHintProvider.Instance.Create ) {}
 
-		public AssemblyLoader( Func<Assembly, string> hintSource ) : base( hintSource, AssemblyPathLoader.Instance.Create, AssemblyInitializer.Instance.Run ) {}
+		public AssemblyLoader( Func<Assembly, string> hintSource ) : base( hintSource, AssemblyPathLoader.Instance.Create, AssemblyInitializer.Instance.Execute ) {}
 	}
 }

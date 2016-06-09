@@ -76,7 +76,7 @@ namespace DragonSpark.Setup
 		{
 			using ( var command = new ExecuteApplicationCommand<T>( @this ) )
 			{
-				command.Run( arguments );
+				command.Execute( arguments );
 			}
 			return @this;
 		}
@@ -97,7 +97,7 @@ namespace DragonSpark.Setup
 
 		public override void Execute( T parameter )
 		{
-			assign.Run( application );
+			assign.Execute( application );
 			application.Execute( parameter );
 			application.Get<IDisposableRepository>().With( application.AssociateForDispose );
 		}
@@ -218,17 +218,17 @@ namespace DragonSpark.Setup
 
 	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
 	{
-		public CompositeServiceProvider( [Required] params IServiceProvider[] providers ) : base( IsServiceTypeSpecification.Instance, providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
+		public CompositeServiceProvider( [Required] params IServiceProvider[] providers ) : base( /*IsServiceTypeSpecification.Instance,*/ providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
 
 		public object GetService( Type serviceType ) => serviceType == typeof(IServiceProvider) ? this : Create( serviceType );
 	}
 
-	public class IsServiceTypeSpecification : GuardedSpecificationBase<Type>
+	/*public class IsServiceTypeSpecification : GuardedSpecificationBase<Type>
 	{
 		public static IsServiceTypeSpecification Instance { get; } = new IsServiceTypeSpecification();
 
 		public override bool IsSatisfiedBy( Type parameter ) => !parameter.GetTypeInfo().IsValueType;
-	}
+	}*/
 
 	public class RecursionAwareServiceProvider : DecoratedServiceProvider
 	{
@@ -301,7 +301,7 @@ namespace DragonSpark.Setup
 	{
 		public static Configure<T> Instance { get; } = new Configure<T>();
 
-		public override void Execute( IServiceProvider parameter ) => parameter.Get<T>().Run( parameter );
+		public override void Execute( IServiceProvider parameter ) => parameter.Get<T>().Execute( parameter );
 	}
 
 	public interface IApplication<in T> : IApplication, ICommand<T> {}
