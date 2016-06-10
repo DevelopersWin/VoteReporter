@@ -11,7 +11,7 @@ namespace DragonSpark.Diagnostics
 	}*/
 
 	[Persistent]
-	public struct TryContext
+	public class TryContext
 	{
 		readonly LogException log;
 

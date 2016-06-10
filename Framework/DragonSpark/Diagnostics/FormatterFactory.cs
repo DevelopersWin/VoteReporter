@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Composition;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Diagnostics
 {
@@ -10,13 +10,14 @@ namespace DragonSpark.Diagnostics
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
 	{
 		public static FormatterFactory Instance { get; } = new FormatterFactory( FromKnownFactory<IFormattable>.Instance );
+		/*
 
 		public static string Format( object item ) 
 		{
 			var formatter = Instance; // TODO: Make configurable: Services.Get
 			var result = formatter.Create( new Parameter( item ) );
 			return result;
-		}
+		}*/
 
 		readonly Func<object, IFormattable> factory;
 

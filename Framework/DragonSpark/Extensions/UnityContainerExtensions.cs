@@ -1,4 +1,5 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Activation;
+using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
@@ -16,7 +17,7 @@ namespace DragonSpark.Extensions
 
 		TryContextProperty( Container container ) : base( new Func<IUnityContainer, TryContext>( container.Create ) ) {}
 
-		struct Container
+		class Container : FactoryBase<IUnityContainer, TryContext>
 		{
 			public static Container Debug { get; } = new Container( logger => logger.Debug );
 
@@ -29,7 +30,7 @@ namespace DragonSpark.Extensions
 				this.create = create;
 			}
 
-			public TryContext Create( IUnityContainer container )
+			public override TryContext Create( IUnityContainer container )
 			{
 				var logger = container.Resolve<ILogger>( Items<ResolverOverride>.Default );
 				var @delegate = create( logger );

@@ -93,7 +93,7 @@ namespace DragonSpark.Extensions
 
 		public static TItem With<TItem>( this TItem @this, Action<TItem> action )
 		{
-			if ( !Equals( @this, default(TItem) ) )
+			if ( !@this.IsNull() )
 			{
 				action?.Invoke( @this );
 				return @this;
@@ -106,11 +106,14 @@ namespace DragonSpark.Extensions
 
 		public static TItem WithSelf<TItem>( this TItem @this, Func<TItem, object> action )
 		{
-			@this.With( action );
+			if ( !@this.IsNull() )
+			{
+				action( @this );
+			}
 			return @this;
 		}
 
-		public static TItem With<TItem>( this TItem? @this, Action<TItem> action ) where TItem : struct => @this?.With( action ) ?? default( TItem );
+		public static T With<T>( this T? @this, Action<T> action ) where T : struct => @this?.With( action ) ?? default(T);
 
 		public static TResult With<TItem, TResult>( this TItem? @this, Func<TItem, TResult> action ) where TItem : struct => @this != null ? @this.Value.With( action ) : default( TResult );
 
@@ -156,7 +159,7 @@ namespace DragonSpark.Extensions
 
 		public static TResult To<TResult>( this object target ) => (TResult)target;
 
-		public static T ConvertTo<T>( this object @this ) => @this.With( x => (T)ConvertTo( @this, typeof(T) ) );
+		public static T ConvertTo<T>( this object @this ) => !@this.IsNull() ? (T)ConvertTo( @this, typeof(T) ) : default(T);
 
 		public static object ConvertTo( this object @this, Type to )
 		{

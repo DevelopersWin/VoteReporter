@@ -41,23 +41,7 @@ namespace DragonSpark.Diagnostics
 			this.timer = timer;
 		}
 
-		public override CreateProfilerEvent Create( MethodBase parameter ) => new Context( parameter, sessionTimer, timer ).Get;
-
-		struct Context
-		{
-			readonly MethodBase method;
-			readonly ISessionTimer sessionTimer;
-			readonly T timer;
-
-			public Context( MethodBase method, ISessionTimer sessionTimer, T timer )
-			{
-				this.method = method;
-				this.sessionTimer = sessionTimer;
-				this.timer = timer;
-			}
-
-			public TimerEvent<T> Get( string name ) => new TimerEvent<T>( name, method, sessionTimer, timer );
-		}
+		public override CreateProfilerEvent Create( MethodBase parameter ) => name => new TimerEvent<T>( name, parameter, sessionTimer, timer );
 	}
 
 	public delegate TimerEvent CreateProfilerEvent( string eventName );

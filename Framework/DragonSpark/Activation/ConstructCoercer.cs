@@ -4,7 +4,7 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	public class FixedCoercer<TParameter> : ICoercer<TParameter>
+	/*public class FixedCoercer<TParameter> : ICoercer<TParameter>
 	{
 		public static FixedCoercer<TParameter> Null { get; } = new FixedCoercer<TParameter>();
 
@@ -18,7 +18,7 @@ namespace DragonSpark.Activation
 		}
 
 		public TParameter Coerce( object parameter ) => item;
-	}
+	}*/
 
 	/*public class ConstructFromParameterFactory : ConstructFromParameterFactory<object>
 	{
@@ -43,7 +43,7 @@ namespace DragonSpark.Activation
 
 		public override T Create( object parameter )
 		{
-			var activate = activator.Create( new ConstructTypeRequest( type, parameter ) );
+			var activate = activator.Create( new ConstructTypeRequest( type, parameter.ToItem() ) );
 			var store = activate as IStore<T>;
 			if ( store != null )
 			{

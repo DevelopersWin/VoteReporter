@@ -47,14 +47,14 @@ namespace DragonSpark.TypeSystem
 	{
 		public static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory( TypeDefinitionProvider.Instance );
 
-		readonly Func<object, TypeInfo> typeSource;
+		readonly IFactory<object, TypeInfo> typeSource;
 		readonly ITypeDefinitionProvider transformer;
-		readonly Func<object, IFactory<object, MemberInfo>> factorySource;
-		readonly Func<object, IAttributeProvider> providerSource;
+		readonly IFactory<TypeInfo, IFactory<object, MemberInfo>> factorySource;
+		readonly IFactory<object, IAttributeProvider> providerSource;
 
-		public MemberInfoProviderFactory( ITypeDefinitionProvider transformer ) : this( TypeDefinitionLocator.Instance.Create, transformer, MemberInfoDefinitionLocator.Instance.Create, MemberInfoProvider.Instance.Create ) {}
+		public MemberInfoProviderFactory( ITypeDefinitionProvider transformer ) : this( TypeDefinitionLocator.Instance, transformer, MemberInfoDefinitionLocator.Instance, MemberInfoProvider.Instance ) {}
 
-		protected MemberInfoProviderFactory( Func<object, TypeInfo> typeSource, ITypeDefinitionProvider transformer, Func<object, IFactory<object, MemberInfo>> factorySource, Func<object, IAttributeProvider> providerSource )
+		MemberInfoProviderFactory( IFactory<object, TypeInfo> typeSource, ITypeDefinitionProvider transformer, IFactory<TypeInfo, IFactory<object, MemberInfo>> factorySource, IFactory<object, IAttributeProvider> providerSource )
 		{
 			this.typeSource = typeSource;
 			this.transformer = transformer;
@@ -64,11 +64,11 @@ namespace DragonSpark.TypeSystem
 
 		public override IAttributeProvider Create( object parameter )
 		{
-			var type = typeSource( parameter );
+			var type = typeSource.Create( parameter );
 			var transformed = transformer.Create( type );
-			var factory = factorySource( transformed );
+			var factory = factorySource.Create( transformed );
 			var member = factory.Create( parameter );
-			var result = providerSource( member );
+			var result = providerSource.Create( member );
 			return result;
 		}
 	}

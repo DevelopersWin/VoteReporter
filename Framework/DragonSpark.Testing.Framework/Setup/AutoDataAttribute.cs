@@ -57,7 +57,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 			Cache( Key key, Func<MethodBase, Type[]> factory ) : base( key.Create, new Factory( factory ).Create ) {}
 
-			struct Key
+			class Key
 			{
 				readonly bool includeFromParameters;
 				readonly Type[] others;
@@ -102,22 +102,8 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			var source = keySource( parameter );
 			var key = KeyFactory.Instance.Create( source );
-			var result = Property.Get( instance( parameter ) ).Ensure( key, new Creator( base.Create, parameter ).Create );
+			var result = Property.Get( instance( parameter ) ).Ensure( key, i => base.Create( parameter ) );
 			return result;
-		}
-
-		struct Creator
-		{
-			readonly Func<TParameter, TResult> create;
-			readonly TParameter parameter;
-
-			public Creator( Func<TParameter, TResult> create, TParameter parameter )
-			{
-				this.create = create;
-				this.parameter = parameter;
-			}
-
-			public TResult Create( int key ) => create( parameter );
 		}
 	}
 

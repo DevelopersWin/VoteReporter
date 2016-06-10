@@ -181,22 +181,8 @@ namespace DragonSpark.Aspects
 			public override IWritableStore<IParameterValidationController> Create( object instance )
 			{
 				var factory = ParameterValidation.Factory.Get( instance );
-				var result = new ThreadLocalStore<IParameterValidationController>( new CreateContext( factory, instance ).Create );
+				var result = new ThreadLocalStore<IParameterValidationController>( () => factory.Create( instance ) );
 				return result;
-			}
-
-			struct CreateContext
-			{
-				readonly IParameterValidationControllerFactory factory;
-				readonly object instance;
-
-				public CreateContext( IParameterValidationControllerFactory factory, object instance )
-				{
-					this.factory = factory;
-					this.instance = instance;
-				}
-
-				public IParameterValidationController Create() => factory.Create( instance );
 			}
 		}
 	}

@@ -1,14 +1,12 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Testing.Framework;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Runtime
 {
-	public class ParameterInvocationTests : TestCollectionBase
+	public class ParameterInvocationTests // : TestCollectionBase
 	{
-		public ParameterInvocationTests( ITestOutputHelper output ) : base( output ) {}
+		// public ParameterInvocationTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Fact]
 		public void BasicCondition()
@@ -83,7 +81,7 @@ namespace DragonSpark.Testing.Runtime
 		[Fact]
 		public void ExtendedCheck()
 		{
-			// for ( int i = 0; i < 10000; i++ )
+			for ( int i = 0; i < 10000; i++ )
 			{
 				var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );

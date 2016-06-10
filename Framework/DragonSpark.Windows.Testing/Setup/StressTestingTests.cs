@@ -20,7 +20,15 @@ namespace DragonSpark.Windows.Testing.Setup
 		[AssertTraffic( AllocatedObjectsCount = 0 )]
 		public void GetAllTypesWith()
 		{
-			var method = GetType().GetMethod( nameof(Host) );
+			First();
+			Second();
+		}
+
+		void Second() => First();
+
+		void First()
+		{
+			var method = GetType().GetMethod( nameof( Host ) );
 			var autoData = new AutoData( FixtureFactory<AutoDataCustomization>.Instance.Create(), method );
 			var providerFactory = new Composition.TypeBasedServiceProviderFactory( GetType().ToItem() );
 			var provider = new ServiceProviderFactory( providerFactory ).Create();
@@ -31,28 +39,9 @@ namespace DragonSpark.Windows.Testing.Setup
 
 				var sut = data.Only().FirstOrDefaultOfType<Assembly[]>();
 				Assert.NotNull( sut );
-				/*
-				var items = sut.GetAllTypesWith<PriorityAttribute>();
-				Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );*/
 			}
-
-			/*var result = Parallel.For( 0, 100000, i =>
-									{
-										
-
-										
-									} );
-			Assert.True( result.IsCompleted );*/
-			// var snapshot = dotMemory.Check();
-			/*Body();
-
-			dotMemory.Check( memory =>
-							 {
-								 var temp = memory.GetDifference( snapshot ).GetSurvivedObjects().ObjectsCount;
-								 Assert.Equal( 0, temp );
-							 } );*/
 		}
-		
+
 		public void Host( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut ) {}
 
 

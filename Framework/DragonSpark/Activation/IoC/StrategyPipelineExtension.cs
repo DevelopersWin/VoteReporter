@@ -97,7 +97,7 @@ namespace DragonSpark.Activation.IoC
 			}
 
 			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
-				Property.Get( creator ).GetValue( context.BuildKey.Type, new Context( inner, context, buildKey ).Create );
+				Property.Get( creator ).GetValue( context.BuildKey.Type, key => inner.CreatePlan( context, buildKey ) );
 
 			struct Context
 			{

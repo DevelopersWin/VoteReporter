@@ -38,25 +38,13 @@ namespace DragonSpark.Diagnostics
 	{
 		public PurgeLoggerHistoryCommand( ILoggerHistory history ) : base( history, events => events.Fixed() ) {}
 
-		public override void Execute( Action<LogEvent> parameter ) => base.Execute( new Migrater( parameter ).Execute );
-
-		struct Migrater
-		{
-			readonly Action<LogEvent> action;
-
-			public Migrater( Action<LogEvent> action )
-			{
-				this.action = action;
-			}
-
-			public void Execute( LogEvent parameter )
-			{
-				using ( MigrationProperties.IsMigrating.Assignment( parameter, true ) )
-				{
-					action( parameter );
-				}
-			}
-		}
+		public override void Execute( Action<LogEvent> parameter ) => base.Execute( logEvent =>
+																					{
+																						using ( MigrationProperties.IsMigrating.Assignment( logEvent, true ) )
+																						{
+																							parameter( logEvent );
+																						}
+																					} );
 	}
 
 	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>

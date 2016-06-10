@@ -15,21 +15,12 @@ namespace DragonSpark.Runtime.Properties
 	public abstract class ExecutionAttachedPropertyStoreBase<T> : DeferredAttachedPropertyTargetStore<object, T>
 	{
 		protected ExecutionAttachedPropertyStoreBase() : this( Delegates<T>.Default ) {}
-		protected ExecutionAttachedPropertyStoreBase( Func<T> create ) : this( new AttachedProperty<T>( new Func<object, T>( new Context( create ).Create ) ) ) {}
+		protected ExecutionAttachedPropertyStoreBase( Func<T> create ) : this( new AttachedProperty<T>( o => create() ) ) {}
 		protected ExecutionAttachedPropertyStoreBase( IAttachedProperty<object, T> property ) : this( Execution.GetCurrent, property ) {}
 		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property ) : this( instance, property, Coercer<T>.Instance ) {}
 		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property, ICoercer<T> coercer ) : base( instance, property, coercer ) {}
 
-		struct Context
-		{
-			readonly Func<T> create;
-			public Context( Func<T> create )
-			{
-				this.create = create;
-			}
-
-			public T Create( object instance ) => create();
-		}
+		
 	}
 
 	public class Stack<T> : IStack<T>

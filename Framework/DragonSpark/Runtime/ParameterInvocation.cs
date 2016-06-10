@@ -322,12 +322,6 @@ namespace DragonSpark.Runtime
 		}
 
 		public bool IsValid( object parameter ) => inner.CanExecute( parameter );
-
-		/*public object Execute( object parameter )
-		{
-			inner.Execute( parameter );
-			return null;
-		}*/
 	}
 
 	public class CommandAdapter<T> : IGenericParameterValidator
@@ -348,88 +342,4 @@ namespace DragonSpark.Runtime
 			return null;
 		}
 	}
-
-	/*public interface IInvocation<out T>
-	{
-		T Invoke( object parameter );
-	}
-
-	struct RelayInvocation : IInvocation<bool>
-	{
-		readonly RelayParameter valid;
-
-		public RelayInvocation( RelayParameter valid )
-		{
-			this.valid = valid;
-		}
-
-		public bool Invoke( object parameter ) => valid.Proceed<bool>();
-	}
-
-	public struct AdapterInvocation : IInvocation<bool>
-	{
-		readonly IParameterValidator adapter;
-		public AdapterInvocation( IParameterValidator adapter )
-		{
-			this.adapter = adapter;
-		}
-
-		public bool Invoke( object parameter ) => adapter.IsValid( parameter );
-	}
-
-	public struct ValidationInvocation<T> where T : IInvocation<bool>
-	{
-		readonly T invocation;
-		readonly EnabledState active, valid;
-		
-		public ValidationInvocation( EnabledState active, EnabledState valid, T invocation )
-		{
-			this.active = active;
-			this.valid = valid;
-			this.invocation = invocation;
-		}
-
-		public bool Invoke( object parameter )
-		{
-			var result = invocation.Invoke( parameter );
-			var validated = result && !valid.IsEnabled( parameter ) && !active.IsEnabled( parameter );
-			valid.Enable( parameter, validated );
-			return result;
-		}
-	}
-
-	struct ParameterInvocation : IInvocation<object>
-	{
-		readonly RelayParameter execute;
-		readonly ParameterState state;
-		readonly ValidationInvocation<AdapterInvocation> validation;
-
-		public ParameterInvocation( ParameterState state, ValidationInvocation<AdapterInvocation> validation, RelayParameter execute )
-		{
-			this.state = state;
-			this.validation = validation;
-			this.execute = execute;
-		}
-
-		static Assignment<EnabledStateAssign, object, bool> Create( EnabledState item, object parameter ) => 
-			new Assignment<EnabledStateAssign, object, bool>( new EnabledStateAssign( item ), Assignments.From( parameter ), new Value<bool>( true ) ).Configured( false );
-
-		bool AsActive( object parameter )
-		{
-			using ( Create( state.Active, parameter ) )
-			{
-				return validation.Invoke( parameter );
-			}
-		}
-
-		object AsValid( object parameter )
-		{
-			using ( Create( state.Valid, parameter ) )
-			{
-				return execute.Proceed<object>();
-			}
-		}
-
-		public object Invoke( object parameter ) => state.Valid.IsEnabled( parameter ) || AsActive( parameter ) ? AsValid( parameter ) : null;
-	}*/
 }
