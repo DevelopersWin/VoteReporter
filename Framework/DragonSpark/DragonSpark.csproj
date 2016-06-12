@@ -222,6 +222,7 @@
     <Compile Include="Runtime\EnabledState.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
+    <Compile Include="Runtime\Invocation.cs" />
     <Compile Include="Runtime\IRepository.cs" />
     <Compile Include="Runtime\ISerializer.cs" />
     <Compile Include="Runtime\ParameterInvocation.cs" />

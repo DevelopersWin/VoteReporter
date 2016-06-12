@@ -48,14 +48,20 @@ namespace DragonSpark.Testing.Objects.IoC
 			{
 				var cached = new Cache( assemblySource.Create() ).Create( parameter );
 				var provider = new Activation.IoC.ServiceProviderFactory( cached.ToFactory() ).Create();
-				var result = Providers.From( provider.Wrap<AutoData, IServiceProvider>(), applicationSource ).Create( parameter );
+				var result = new AutoDataExecutionContextFactory( provider.Wrap<AutoData, IServiceProvider>(), applicationSource ).Create( parameter );
 				return result;
 			}
 		}
 
 		class Cache : CacheFactoryBase
 		{
-			public Cache( Assembly[] assemblies ) : base( assemblies.ToImmutableArray<object>(), new AssemblyBasedServiceProviderFactory( assemblies ).ToDelegate() ) {}
+			readonly Assembly[] assemblies;
+			public Cache( Assembly[] assemblies ) : base( new AssemblyBasedServiceProviderFactory( assemblies ).Wrap<AutoData, IServiceProvider>() )
+			{
+				this.assemblies = assemblies;
+			}
+
+			protected override ImmutableArray<object> GetKeyItems( AutoData parameter ) => assemblies.ToImmutableArray<object>();
 		}
 	}
 

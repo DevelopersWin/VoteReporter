@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Aspects;
-using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -64,13 +63,11 @@ namespace DragonSpark.Activation.IoC
 
 	public class CachingBuildPlanExtension : UnityContainerExtension
 	{
-		readonly ILogger logger;
 		readonly IBuildPlanRepository repository;
 		readonly ISpecification<LocateTypeRequest> specification;
 
-		public CachingBuildPlanExtension( ILogger logger, IBuildPlanRepository repository, ISpecification<LocateTypeRequest> specification )
+		public CachingBuildPlanExtension( IBuildPlanRepository repository, ISpecification<LocateTypeRequest> specification )
 		{
-			this.logger = logger;
 			this.repository = repository;
 			this.specification = specification;
 		}
@@ -80,7 +77,7 @@ namespace DragonSpark.Activation.IoC
 			var policies = repository.List();
 			var creator = Container.Get( Creator.Property )?.GetType() ?? Execution.GetCurrent();
 			var creators = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ), creator );
-			var policy = new BuildPlanCreatorPolicy( new TryContext( logger ).Invoke, specification, policies, creators );
+			var policy = new BuildPlanCreatorPolicy( TryContextProperty.Verbose.Get( Container ).Invoke, specification, policies, creators.ToItem() );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
 		}
 

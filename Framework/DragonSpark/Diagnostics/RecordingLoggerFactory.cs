@@ -38,13 +38,25 @@ namespace DragonSpark.Diagnostics
 	{
 		public PurgeLoggerHistoryCommand( ILoggerHistory history ) : base( history, events => events.Fixed() ) {}
 
-		public override void Execute( Action<LogEvent> parameter ) => base.Execute( logEvent =>
-																					{
-																						using ( MigrationProperties.IsMigrating.Assignment( logEvent, true ) )
-																						{
-																							parameter( logEvent );
-																						}
-																					} );
+		public override void Execute( Action<LogEvent> parameter ) => base.Execute( new Migrater( parameter ).Execute );
+
+		struct Migrater
+		{
+			readonly Action<LogEvent> action;
+
+			public Migrater( Action<LogEvent> action )
+			{
+				this.action = action;
+			}
+
+			public void Execute( LogEvent parameter )
+			{
+				using ( MigrationProperties.IsMigrating.Assignment( parameter, true ) )
+				{
+					action( parameter );
+				}
+			}
+		}
 	}
 
 	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
@@ -128,7 +140,11 @@ namespace DragonSpark.Diagnostics
 			this.filter = filter;
 		}
 
-		public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.Filter.With( filter ).Enrich.With( filter );
+		public override LoggerConfiguration Create( LoggerConfiguration parameter )
+		{
+			var item = filter.ToItem();
+			return parameter.Filter.With( item ).Enrich.With( item );
+		}
 
 		public class CreatorFilter : DecoratedSpecification<LogEvent>, ILogEventEnricher, ILogEventFilter
 		{
@@ -164,7 +180,7 @@ namespace DragonSpark.Diagnostics
 					if ( parameter.Properties.ContainsKey( CreatorId ) )
 					{
 						var property = parameter.Properties[CreatorId] as ScalarValue;
-						var result = property != null && Equals( property.Value, id );
+						var result = property != null && (Guid)property.Value == id;
 						return result;
 					}
 
@@ -172,11 +188,7 @@ namespace DragonSpark.Diagnostics
 				}
 			}
 
-			public bool IsEnabled( LogEvent logEvent )
-			{
-				var isSatisfiedBy = IsSatisfiedBy( logEvent );
-				return isSatisfiedBy;
-			}
+			public bool IsEnabled( LogEvent logEvent ) => IsSatisfiedBy( logEvent );
 		}
 	}
 

@@ -30,7 +30,7 @@ namespace DragonSpark.Activation.IoC
 			var container = new UnityContainerFactory( provider ).Create();
 			var primary = new ServiceLocator( container );
 			var secondary = primary.Get<IServiceProvider>();
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary ), new RecursionAwareServiceProvider( primary ), secondary );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary.ToItem() ), new RecursionAwareServiceProvider( primary ), secondary );
 			return result;
 		}
 	}

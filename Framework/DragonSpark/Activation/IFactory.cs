@@ -36,11 +36,13 @@ namespace DragonSpark.Activation
 
 		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) where TResult : class => InstanceFactory<TParameter, TResult>.Instance.Default.Get( @this );
 
-		public static IFactory<object, TResult> Wrap<TResult>( this Func<TResult> @this ) => @this.Wrap<object, TResult>();
+		public static IFactory<object, TResult> Wrap<TResult>( this IFactory<TResult> @this ) => @this.Wrap<object, TResult>();
 
-		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => WrappedFactory<TParameter, TResult>.FactoryInstance.Default.Get( @this );
+		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this IFactory<TResult> @this ) => WrappedFactory<TParameter, TResult>.FactoryInstance.Default.Get( @this.ToDelegate() );
 
 		public static IFactory<T> ToFactory<T>( this T @this ) where T : class => Instance<T>.Default.Get( @this );
+
+		public static IFactory<TParameter, TResult> ToFactory<TParameter, TResult>( this TResult @this ) where TResult : class => Instance<TResult>.Default.Get( @this ).Wrap<TParameter, TResult>();
 
 		public static T Self<T>( [Required] this T @this ) => @this;
 

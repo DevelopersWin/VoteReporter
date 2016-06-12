@@ -32,6 +32,8 @@ namespace DragonSpark.Diagnostics
 
 	public class HandlerFactory<T> : FactoryBase<MethodBase, CreateProfilerEvent> where T : ITimer
 	{
+		readonly IAttachedProperty<CreateProfilerEvent, MethodBase> property = new AttachedProperty<CreateProfilerEvent, MethodBase>();
+
 		readonly ISessionTimer sessionTimer;
 		readonly T timer;
 		
@@ -41,7 +43,9 @@ namespace DragonSpark.Diagnostics
 			this.timer = timer;
 		}
 
-		public override CreateProfilerEvent Create( MethodBase parameter ) => name => new TimerEvent<T>( name, parameter, sessionTimer, timer );
+		public override CreateProfilerEvent Create( MethodBase parameter ) => property.Apply( Get, parameter );
+
+		TimerEvent Get( string name ) => new TimerEvent<T>( name, property.Context(), sessionTimer, timer );
 	}
 
 	public delegate TimerEvent CreateProfilerEvent( string eventName );

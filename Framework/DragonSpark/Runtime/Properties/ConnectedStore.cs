@@ -15,12 +15,21 @@ namespace DragonSpark.Runtime.Properties
 	public abstract class ExecutionAttachedPropertyStoreBase<T> : DeferredAttachedPropertyTargetStore<object, T>
 	{
 		protected ExecutionAttachedPropertyStoreBase() : this( Delegates<T>.Default ) {}
-		protected ExecutionAttachedPropertyStoreBase( Func<T> create ) : this( new AttachedProperty<T>( o => create() ) ) {}
+		protected ExecutionAttachedPropertyStoreBase( Func<T> create ) : this( new AttachedProperty<T>( new Func<object, T>( new Context( create ).Create ) ) ) {}
 		protected ExecutionAttachedPropertyStoreBase( IAttachedProperty<object, T> property ) : this( Execution.GetCurrent, property ) {}
 		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property ) : this( instance, property, Coercer<T>.Instance ) {}
 		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property, ICoercer<T> coercer ) : base( instance, property, coercer ) {}
 
-		
+		struct Context
+		{
+			readonly Func<T> create;
+			public Context( Func<T> create )
+			{
+				this.create = create;
+			}
+
+			public T Create( object instance ) => create();
+		}
 	}
 
 	public class Stack<T> : IStack<T>
@@ -104,6 +113,16 @@ namespace DragonSpark.Runtime.Properties
 		public AmbientStack( Func<object> host, IAttachedProperty<object, IStack<T>> property ) : base( host, property ) {}
 
 		public T GetCurrentItem() => Value.Peek();
+
+		public struct Assignment : IDisposable
+		{
+			public Assignment( T item )
+			{
+				Instance.Value.Push( item );
+			}
+
+			public void Dispose() => Instance.Value.Pop();
+		}
 	}
 
 	public class AmbientStackProperty<T> : ThreadLocalAttachedProperty<IStack<T>>
@@ -157,10 +176,7 @@ namespace DragonSpark.Runtime.Properties
 
 				void OnEmpty( IStack<T> item )
 				{
-					// bool current;
-
 					if ( empty.TryAdd( item, true ) && local.Values.All( isEmpty ) )
-					//if ( empty.TryGetValue( item, out current ) && empty.TryUpdate( item, true, current ) && empty.Values.All( b => b ) )
 					{
 						empty.Clear();
 						owner.Clear( instance );
@@ -202,33 +218,9 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public class EqualityReference<T> : DeferredAttachedPropertyTargetStore<object, ConcurrentDictionary<int, T>>
+	public class EqualityReference<T> : DeferredAttachedPropertyTargetStore<object, ConcurrentDictionary<int, T>> where T : class
 	{
-		// public override bool IsAttached( object instance ) => property.Get( Execution.GetCurrent() ).ContainsKey( instance.GetHashCode() );
-
-		// public void Set( T instance, T value ) => new Context( Value, instance ).Set();
-
-		public T From( T instance ) => new Context( Value, instance ).Get();
-
-		struct Context
-		{
-			readonly ConcurrentDictionary<int, T> store;
-			readonly T item;
-
-			public Context( ConcurrentDictionary<int, T> store, T item )
-			{
-				this.store = store;
-				this.item = item;
-			}
-
-			T Add( int code ) => item;
-
-			T Update( int code, T current ) => item;
-
-			public T Get() => store.GetOrAdd( item.GetHashCode(), Add );
-
-			public void Set() => store.AddOrUpdate( item.GetHashCode(), Add, Update );
-		}
+		public T From( T instance ) => Value.GetOrAdd( instance.GetHashCode(), instance.ToFactory<int, T>().ToDelegate() );
 
 		public EqualityReference() : this( Execution.GetCurrent, new AttachedProperty<ConcurrentDictionary<int, T>>( ActivatedAttachedPropertyStore<ConcurrentDictionary<int, T>>.Instance ), Coercer<ConcurrentDictionary<int, T>>.Instance ) {}
 

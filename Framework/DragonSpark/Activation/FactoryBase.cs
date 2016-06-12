@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -75,6 +76,49 @@ namespace DragonSpark.Activation
 			return result;
 		}
 	}*/
+
+	public abstract class CachedDecoratedFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult> where TResult : class
+	{
+		readonly IDictionary<int, IAttachedProperty<IWritableStore<TResult>>> stores;
+
+		protected CachedDecoratedFactory( IFactory<TParameter, TResult> inner ) : base( inner )
+		{
+			stores = Property.Default.Get( GetType() );
+		}
+
+		protected abstract ImmutableArray<object> GetKeyItems( TParameter parameter );
+
+		protected abstract object GetInstance( TParameter parameter );
+
+		protected virtual IWritableStore<TResult> CreateStore( TParameter parameter )
+		{
+			var key = KeyFactory.Instance.Create( GetKeyItems( parameter ) );
+			var instance = GetInstance( parameter );
+			var property = stores.Ensure( key, i => new AttachedProperty<IWritableStore<TResult>>( o => new FixedStore<TResult>() ) );
+			var result = property.Get( instance );
+			return result;
+		}
+
+		public override TResult Create( TParameter parameter )
+		{
+			var store = CreateStore( parameter );
+
+			if ( store.Value.IsNull() )
+			{
+				store.Assign( base.Create( parameter ) );
+			}
+
+			var result = store.Value;
+			return result;
+		}
+
+		class Property : AttachedProperty<Type, Dictionary<int, IAttachedProperty<IWritableStore<TResult>>>>
+		{
+			public static Property Default { get; } = new Property();
+
+			Property() : base( ActivatedAttachedPropertyStore<Type, Dictionary<int, IAttachedProperty<IWritableStore<TResult>>>>.Instance ) {}
+		}
+	}
 
 	public class DecoratedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{

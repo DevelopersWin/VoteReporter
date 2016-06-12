@@ -19,6 +19,20 @@ namespace DragonSpark.Runtime.Properties
 
 		public static Assignment<T1, T2> Assignment<T1, T2>( this IAttachedProperty<T1, T2> @this, T1 first, T2 second ) where T1 : class => 
 			new Assignment<T1, T2>( new PropertyAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
+
+		public static TDelegate Apply<TContext, TDelegate>( this IAttachedProperty<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class
+		{
+			@this.Set( source, context );
+			var result = Invocation.Create( source );
+			return result;
+		}
+
+		public static TContext Context<TContext, TDelegate>( this IAttachedProperty<TDelegate, TContext> @this ) where TDelegate : class
+		{
+			var instance = Invocation.GetCurrent() as TDelegate;
+			var result = instance != null ? @this.Get( instance ) : default(TContext);
+			return result;
+		}
 	}
 
 	public interface IAttachedProperty<TValue> : IAttachedProperty<object, TValue> {}
@@ -102,7 +116,11 @@ namespace DragonSpark.Runtime.Properties
 
 		class Store : AttachedPropertyStoreBase<TInstance, TResult>
 		{
+			public static Store Instance { get; } = new Store();
+
 			readonly Func<TResult> create;
+
+			Store() : this( () => default(TResult) ) {}
 
 			public Store( Func<TResult> create )
 			{
