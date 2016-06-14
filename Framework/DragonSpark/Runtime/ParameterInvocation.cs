@@ -69,8 +69,8 @@ namespace DragonSpark.Runtime
 
 	public class PropertyAssign<T1, T2> : IAssign<T1, T2> where T1 : class
 	{
-		readonly IAttachedProperty<T1, T2> property;
-		public PropertyAssign( IAttachedProperty<T1, T2> property )
+		readonly ICache<T1, T2> property;
+		public PropertyAssign( ICache<T1, T2> property )
 		{
 			this.property = property;
 		}

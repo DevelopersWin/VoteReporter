@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -79,44 +78,41 @@ namespace DragonSpark.Activation
 
 	public abstract class CachedDecoratedFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult> where TResult : class
 	{
-		readonly IDictionary<int, IAttachedProperty<IWritableStore<TResult>>> stores;
-
-		protected CachedDecoratedFactory( IFactory<TParameter, TResult> inner ) : base( inner )
-		{
-			stores = Property.Default.Get( GetType() );
-		}
+		protected CachedDecoratedFactory( IFactory<TParameter, TResult> inner ) : base( inner ) {}
 
 		protected abstract ImmutableArray<object> GetKeyItems( TParameter parameter );
 
 		protected abstract object GetInstance( TParameter parameter );
 
-		protected virtual IWritableStore<TResult> CreateStore( TParameter parameter )
+		/*protected virtual IWritableStore<TResult> CreateStore( TParameter parameter )
 		{
-			var key = KeyFactory.Instance.Create( GetKeyItems( parameter ) );
-			var instance = GetInstance( parameter );
-			var property = stores.Ensure( key, i => new AttachedProperty<IWritableStore<TResult>>( o => new FixedStore<TResult>() ) );
+					
+			var property = stores.Ensure( key, i => new Cache<TResult>() );
 			var result = property.Get( instance );
 			return result;
-		}
+		}*/
 
 		public override TResult Create( TParameter parameter )
 		{
-			var store = CreateStore( parameter );
+			var instance = GetInstance( parameter );
 
-			if ( store.Value.IsNull() )
+			var key = KeyFactory.Instance.Create( GetKeyItems( parameter ) );
+			var items = Property.Default.Get( instance );
+
+			if ( !items.ContainsKey( key ) )
 			{
-				store.Assign( base.Create( parameter ) );
+				items.Add( key, base.Create( parameter ) );
 			}
 
-			var result = store.Value;
+			var result = items[key];
 			return result;
 		}
 
-		class Property : AttachedProperty<Type, Dictionary<int, IAttachedProperty<IWritableStore<TResult>>>>
+		class Property : ActivatedCache<Dictionary<int, TResult>>
 		{
 			public static Property Default { get; } = new Property();
 
-			Property() : base( ActivatedAttachedPropertyStore<Type, Dictionary<int, IAttachedProperty<IWritableStore<TResult>>>>.Instance ) {}
+			Property() {}
 		}
 	}
 
@@ -142,7 +138,7 @@ namespace DragonSpark.Activation
 
 		protected FactoryBase( [Required]ISpecification<TParameter> specification ) : this( Coercer<TParameter>.Instance, specification ) {}
 
-		protected FactoryBase( [Required] ICoercer<TParameter> coercer, [Required] ISpecification<TParameter> specification )
+		protected FactoryBase( [Required]ICoercer<TParameter> coercer, [Required] ISpecification<TParameter> specification )
 		{
 			this.coercer = coercer;
 			this.specification = specification;
@@ -164,6 +160,32 @@ namespace DragonSpark.Activation
 		// bool IValidationAware.ShouldValidate() => specification != Specifications.Always && specification != Specifications<TParameter>.Always;
 	}
 
+	public abstract class BasicFactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
+	{
+		readonly ICoercer<TParameter> coercer;
+
+		protected BasicFactoryBase() : this( Coercer<TParameter>.Instance ) {}
+
+		protected BasicFactoryBase( ICoercer<TParameter> coercer )
+		{
+			this.coercer = coercer;
+		}
+
+		bool IFactoryWithParameter.CanCreate( object parameter ) => true;
+
+		object IFactoryWithParameter.Create( object parameter )
+		{
+			var coerced = coercer.Coerce( parameter );
+			var result = !coerced.IsNull() ? Create( coerced ) : default(TResult);
+			return result;
+		}
+
+		public virtual bool CanCreate( TParameter parameter ) => true;
+
+		public abstract TResult Create( TParameter parameter );
+
+	}
+
 	public class DelegatedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
 		readonly Func<TParameter, TResult> inner;
@@ -178,16 +200,21 @@ namespace DragonSpark.Activation
 		public override TResult Create( TParameter parameter ) => inner( parameter );
 	}
 
-	public class DecoratedFactory<T> : FactoryBase<T>
+	public class DecoratedFactory<T> : DelegatedFactory<T>
 	{
-		readonly IFactory<T> inner;
+		public DecoratedFactory( IFactory<T> inner ) : base( inner.ToDelegate() ) {}
+	}
 
-		public DecoratedFactory( IFactory<T> inner )
+	public class DelegatedFactory<T> : FactoryBase<T>
+	{
+		readonly Func<T> inner;
+
+		public DelegatedFactory( Func<T> inner )
 		{
 			this.inner = inner;
 		}
 
-		public override T Create() => inner.Create();
+		public override T Create() => inner();
 	}
 
 	public class FromKnownFactory<T> : FirstConstructedFromParameterFactory<object>
@@ -337,14 +364,14 @@ namespace DragonSpark.Activation
 		bool IFactory<TParameter, TResult>.CanCreate( TParameter parameter ) => true;
 		public TResult Create( TParameter parameter ) => item();
 
-		public class Delegate : AttachedProperty<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
+		public class Delegate : Cache<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
 		{
 			public static Delegate Default { get; } = new Delegate();
 
 			Delegate() : base( factory => factory.Create ) {}
 		}
 
-		public class FactoryInstance : AttachedProperty<Func<TResult>, WrappedFactory<TParameter, TResult>>
+		public class FactoryInstance : Cache<Func<TResult>, WrappedFactory<TParameter, TResult>>
 		{
 			public static FactoryInstance Default { get; } = new FactoryInstance();
 			
@@ -365,7 +392,7 @@ namespace DragonSpark.Activation
 
 		object IFactory.Create() => Create();
 
-		public class Delegate : AttachedProperty<IFactory<T>, Func<T>>
+		public class Delegate : Cache<IFactory<T>, Func<T>>
 		{
 			public static Delegate Default { get; } = new Delegate();
 
@@ -398,7 +425,7 @@ namespace DragonSpark.Activation
 		public override T Create() => instance;
 	}*/
 
-	public class Creator : AttachedProperty<ICreator>
+	public class Creator : Cache<ICreator>
 	{
 		public static Creator Property { get; } = new Creator();
 

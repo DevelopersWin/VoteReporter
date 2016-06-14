@@ -1,11 +1,11 @@
-using System;
 using DragonSpark.Runtime.Properties;
+using System;
 
 namespace DragonSpark.Testing.Objects
 {
 	public class ClassCreatedFromDefault
 	{
-		readonly static IAttachedProperty<Type, int> Property = new AttachedProperty<Type, int>();
+		readonly static ICache<Type, int> Property = new StoreCache<Type, int>();
 
 		public ClassCreatedFromDefault( string message )
 		{
@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Objects
 					throw new InvalidOperationException( message );
 				default:
 					Message = message;
-					Property.Clear( instance );
+					Property.Remove( instance );
 					break;
 			}
 		}

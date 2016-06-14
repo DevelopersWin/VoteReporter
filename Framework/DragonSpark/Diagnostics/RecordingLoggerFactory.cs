@@ -31,7 +31,7 @@ namespace DragonSpark.Diagnostics
 
 	public static class MigrationProperties
 	{
-		public static IAttachedProperty<LogEvent, bool> IsMigrating { get; } = new AttachedProperty<LogEvent, bool>();
+		public static ICache<LogEvent, bool> IsMigrating { get; } = new StoreCache<LogEvent, bool>();
 	}
 
 	public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>

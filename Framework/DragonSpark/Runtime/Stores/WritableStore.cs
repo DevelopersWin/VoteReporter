@@ -17,19 +17,19 @@ namespace DragonSpark.Runtime.Stores
 
 	public abstract class AttachedPropertySpecificationBase<TInstance, TValue> : SpecificationBase<TInstance> where TInstance : class
 	{
-		protected AttachedPropertySpecificationBase( IAttachedProperty<TInstance, TValue> property )
+		protected AttachedPropertySpecificationBase( ICache<TInstance, TValue> property )
 		{
 			Property = property;
 		}
 
-		protected IAttachedProperty<TInstance, TValue> Property { get; }
+		protected ICache<TInstance, TValue> Property { get; }
 	}
 
 	public class AttachedPropertyValueSpecification<TInstance, TValue> : IsAttachedSpecification<TInstance, TValue> where TInstance : class
 	{
 		readonly Func<TValue> value;
 
-		public AttachedPropertyValueSpecification( IAttachedProperty<TInstance, TValue> property, Func<TValue> value ) : base( property )
+		public AttachedPropertyValueSpecification( ICache<TInstance, TValue> property, Func<TValue> value ) : base( property )
 		{
 			this.value = value;
 		}
@@ -39,9 +39,9 @@ namespace DragonSpark.Runtime.Stores
 
 	public class IsAttachedSpecification<TInstance, TValue> : AttachedPropertySpecificationBase<TInstance, TValue> where TInstance : class
 	{
-		public IsAttachedSpecification( IAttachedProperty<TInstance, TValue> property ) : base( property ) {}
+		public IsAttachedSpecification( ICache<TInstance, TValue> property ) : base( property ) {}
 
-		public override bool IsSatisfiedBy( TInstance parameter ) => Property.IsAttached( parameter );
+		public override bool IsSatisfiedBy( TInstance parameter ) => Property.Contains( parameter );
 	}
 
 	/*public class DelegatedWritableStore<T> : WritableStore<T>
@@ -117,30 +117,30 @@ namespace DragonSpark.Runtime.Stores
 		protected override T Get() => lazy.Value;
 	}
 
-	public class DeferredAttachedPropertyTargetStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
+	public class DeferredTargetCachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{
 		readonly Func<TInstance> instance;
-		readonly IAttachedProperty<TInstance, TResult> property;
+		readonly ICache<TInstance, TResult> cache;
 
-		public DeferredAttachedPropertyTargetStore( Func<TInstance> instance, IAttachedProperty<TInstance, TResult> property ) : this( instance, property, Coercer<TResult>.Instance ) {}
-		public DeferredAttachedPropertyTargetStore( Func<TInstance> instance, IAttachedProperty<TInstance, TResult> property, ICoercer<TResult> coercer ) : base( coercer )
+		public DeferredTargetCachedStore( Func<TInstance> instance, ICache<TInstance, TResult> cache ) : this( instance, cache, Coercer<TResult>.Instance ) {}
+		public DeferredTargetCachedStore( Func<TInstance> instance, ICache<TInstance, TResult> cache, ICoercer<TResult> coercer ) : base( coercer )
 		{
 			this.instance = instance;
-			this.property = property;
+			this.cache = cache;
 		}
 
-		protected override TResult Get() => property.Get( instance() );
+		protected override TResult Get() => cache.Get( instance() );
 
-		public override void Assign( TResult item ) => property.Set( instance(), item );
+		public override void Assign( TResult item ) => cache.Set( instance(), item );
 	}
 
-	public class AttachedPropertyStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
+	public class CachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{
 		readonly TInstance instance;
-		readonly IAttachedProperty<TInstance, TResult> property;
+		readonly ICache<TInstance, TResult> property;
 
-		public AttachedPropertyStore( TInstance instance, IAttachedProperty<TInstance, TResult> property ) : this( instance, property, Coercer<TResult>.Instance ) {}
-		public AttachedPropertyStore( TInstance instance, IAttachedProperty<TInstance, TResult> property, ICoercer<TResult> coercer ) : base( coercer )
+		public CachedStore( TInstance instance, ICache<TInstance, TResult> property ) : this( instance, property, Coercer<TResult>.Instance ) {}
+		public CachedStore( TInstance instance, ICache<TInstance, TResult> property, ICoercer<TResult> coercer ) : base( coercer )
 		{
 			this.instance = instance;
 			this.property = property;

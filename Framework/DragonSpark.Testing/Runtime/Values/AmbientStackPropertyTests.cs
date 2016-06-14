@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Runtime.Values
 {
 	public class AmbientStackPropertyTests
 	{
-		readonly AmbientStackProperty<Class> property = new AmbientStackProperty<Class>();
+		readonly AmbientStackCache<Class> cache = new AmbientStackCache<Class>();
 
 		/*IStack<Class> GetStack() => property.Get( Execution.Current );
 
@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Runtime.Values
 		[Fact]
 		public void ContextAsExpected()
 		{
-			var stack = new AmbientStack<Class>( this.Self, property );
+			var stack = new AmbientStack<Class>( this.Self, cache );
 
 			var expected = stack.Value;
 			Assert.Same( expected, stack.Value );

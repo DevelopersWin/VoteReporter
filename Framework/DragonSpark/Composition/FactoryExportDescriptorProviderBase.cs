@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
@@ -9,7 +10,6 @@ using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using DragonSpark.Runtime.Properties;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 
@@ -17,8 +17,7 @@ namespace DragonSpark.Composition
 {
 	public abstract class FactoryExportDescriptorProviderBase : ExportDescriptorProvider
 	{
-		// readonly static ConditionalWeakTable<CompositionContract, AttachedProperty<LifetimeContext, object>> Cache = new ConditionalWeakTable<CompositionContract, AttachedProperty<LifetimeContext, object>>();
-		readonly static AttachedProperty<LifetimeContext, ConditionalWeakTable<CompositionContract, object>> Property = new AttachedProperty<LifetimeContext, ConditionalWeakTable<CompositionContract, object>>( ActivatedAttachedPropertyStore<LifetimeContext, ConditionalWeakTable<CompositionContract, object>>.Instance );
+		readonly static ICache<LifetimeContext, ConditionalWeakTable<CompositionContract, object>> Property = new ActivatedCache<LifetimeContext, ConditionalWeakTable<CompositionContract, object>>();
 
 		readonly FactoryTypeLocator locator;
 		readonly ITransformer<CompositionContract> resolver;

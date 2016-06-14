@@ -50,35 +50,14 @@ namespace DragonSpark.Diagnostics
 			var logger = loggerSource( parameter );
 			var handler = handlerSource( logger );
 
-			var factory = new ProfilerSourceFactory( timer, createSource, handler );
-			var result = factory.Create( parameter );
-			DiagnosticProperties.Logger.Set( result, logger );
-			return result;
-		}
-	}
-
-	public class ProfilerSourceFactory : FactoryBase<MethodBase, IProfiler>
-	{
-		readonly ISessionTimer timer;
-		readonly Func<MethodBase, CreateProfilerEvent> source;
-		readonly Action<TimerEvent> handler;
-
-		public ProfilerSourceFactory( ISessionTimer timer, Func<MethodBase, CreateProfilerEvent> source, Action<TimerEvent> handler )
-		{
-			this.timer = timer;
-			this.source = source;
-			this.handler = handler;
-		}
-
-		public override IProfiler Create( MethodBase parameter )
-		{
-			EmitProfileEvent action = new TimerEventHandler( source( parameter ), handler ).Execute;
+			EmitProfileEvent action = new TimerEventHandler( createSource( parameter ), handler ).Execute;
 			var command = new AmbientStackCommand<EmitProfileEvent>().AsExecuted( new EmitProfileEvent( name =>
 																										   {
 																											   timer.Update();
 																											   action( name );
 																										   } ) );
 			var result = new Profiler( timer, action ).AssociateForDispose( command );
+			DiagnosticProperties.Logger.Set( result, logger );
 			return result;
 		}
 	}

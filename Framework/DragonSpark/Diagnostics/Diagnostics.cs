@@ -14,7 +14,7 @@ namespace DragonSpark.Diagnostics
 {
 	public static class DiagnosticProperties
 	{
-		public static IAttachedProperty<ILogger> Logger { get; } = new AttachedProperty<ILogger>( o => GlobalServiceProvider.Instance.Get<ILogger>().ForSource( o ) );
+		public static ICache<ILogger> Logger { get; } = new Cache<ILogger>( o => GlobalServiceProvider.Instance.Get<ILogger>().ForSource( o ) );
 	}
 
 	public delegate void EmitProfileEvent( string name );
@@ -81,7 +81,7 @@ namespace DragonSpark.Diagnostics
 		public ITimer Timer { get; }
 	}
 
-	public class TimerEventConverter : Converter<TimerEvent, TimerEvent<Timer>, TimerEventTemplate>
+	public class TimerEventConverter : ProjectedFactory<TimerEvent, TimerEvent<Timer>, TimerEventTemplate>
 	{
 		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
 

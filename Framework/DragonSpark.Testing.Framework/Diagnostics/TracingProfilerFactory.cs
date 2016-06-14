@@ -37,7 +37,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 	{
 		// public static IAttachedProperty<ILogger, IList<TraceListener>> Listeners { get; } = new AttachedProperty<ILogger, IList<TraceListener>>( logger => new List<TraceListener>() );
 
-		public static IAttachedProperty<ILogger, TraceListener> Listener { get; } = new AttachedProperty<ILogger, TraceListener>( logger => new SerilogTraceListener.SerilogTraceListener() );
+		public static ICache<ILogger, TraceListener> Listener { get; } = new Cache<ILogger, TraceListener>( logger => new SerilogTraceListener.SerilogTraceListener() );
 
 		public static IDisposable WithTracing( this ILogger @this ) => new TracingAssignment( Listener.Get( @this ) );
 	}

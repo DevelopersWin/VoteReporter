@@ -32,13 +32,17 @@ namespace DragonSpark.Activation
 	{
 		public static T CreateUsing<T>( this IFactoryWithParameter @this, object parameter ) => (T)@this.Create( parameter );
 
-		public static IFactory<object, TResult> Wrap<TResult>( this TResult @this ) where TResult : class => @this.Wrap<object, TResult>();
+		public static IFactory<object, T> Wrap<T>( this T @this ) where T : class => @this.Wrap<object, T>();
 
 		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) where TResult : class => InstanceFactory<TParameter, TResult>.Instance.Default.Get( @this );
 
-		public static IFactory<object, TResult> Wrap<TResult>( this IFactory<TResult> @this ) => @this.Wrap<object, TResult>();
+		public static IFactory<object, T> Wrap<T>( this IFactory<T> @this ) => @this.Wrap<object, T>();
 
-		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this IFactory<TResult> @this ) => WrappedFactory<TParameter, TResult>.FactoryInstance.Default.Get( @this.ToDelegate() );
+		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this IFactory<TResult> @this ) => @this.ToDelegate().Wrap<TParameter, TResult>();
+
+		public static IFactory<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
+
+		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => WrappedFactory<TParameter, TResult>.FactoryInstance.Default.Get( @this );
 
 		public static IFactory<T> ToFactory<T>( this T @this ) where T : class => Instance<T>.Default.Get( @this );
 
@@ -70,7 +74,7 @@ namespace DragonSpark.Activation
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.NotNull ).Fixed();
 
-		class Instance<T> : AttachedProperty<T, IFactory<T>> where T : class
+		class Instance<T> : Cache<T, IFactory<T>> where T : class
 		{
 			public static Instance<T> Default { get; } = new Instance<T>();
 			
@@ -81,7 +85,7 @@ namespace DragonSpark.Activation
 		{
 			public InstanceFactory( TResult instance ) : base( instance.ToFactory().ToDelegate() ) {}
 
-			public class Instance : AttachedProperty<TResult, IFactory<TParameter, TResult>>
+			public class Instance : Cache<TResult, IFactory<TParameter, TResult>>
 			{
 				public static Instance Default { get; } = new Instance();
 			
@@ -100,7 +104,7 @@ namespace DragonSpark.Activation
 
 			TTo To() => (TTo)from();
 
-			public class Delegate : AttachedProperty<Func<TFrom>, Func<TTo>>
+			public class Delegate : Cache<Func<TFrom>, Func<TTo>>
 			{
 				public static Delegate Default { get; } = new Delegate();
 
@@ -119,7 +123,7 @@ namespace DragonSpark.Activation
 
 			TToResult To( TToParameter parameter ) => (TToResult)from( parameter );
 
-			public class Delegate : AttachedProperty<Func<TFromParameter, TFromResult>, Func<TToParameter, TToResult>>
+			public class Delegate : Cache<Func<TFromParameter, TFromResult>, Func<TToParameter, TToResult>>
 			{
 				public static Delegate Default { get; } = new Delegate();
 

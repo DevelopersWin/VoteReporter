@@ -11,16 +11,16 @@ namespace DragonSpark.Runtime
 	{
 		public static Delegate GetCurrent() => AmbientStack.GetCurrentItem<Delegate>();
 
-		public static T Create<T>( T @delegate ) => Invocation<T>.Default.Get( @delegate as Delegate );
+		public static T Create<T>( T @delegate ) where T : class => Invocation<T>.Default.Get( @delegate as Delegate );
 	}
 
-	public class Invocation<T> : AttachedProperty<Delegate, T>
+	public class Invocation<T> : Cache<Delegate, T> where T : class
 	{
 		readonly static MethodInfo MethodInfo = typeof(Invocation<T>).GetTypeInfo().GetDeclaredMethod( nameof(Invoke) );
 
 		public static Invocation<T> Default { get; } = new Invocation<T>();
 
-		Invocation() : base( new Func<Delegate, T>( Create ) ) {}
+		Invocation() : base( Create ) {}
 
 		static T Create( Delegate inner )
 		{
@@ -43,7 +43,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	class Parameters : AttachedProperty<MethodBase, ParameterExpression[]>
+	class Parameters : Cache<MethodBase, ParameterExpression[]>
 	{
 		public static Parameters Default { get; } = new Parameters();
 

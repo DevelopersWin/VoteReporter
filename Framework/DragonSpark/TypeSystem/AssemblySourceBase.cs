@@ -39,7 +39,7 @@ namespace DragonSpark.TypeSystem
 		public override string Create( Assembly parameter ) => parameter.GetName().Name;
 	}
 
-	public class Activated : AttachedProperty<Assembly, bool>
+	public class Activated : StoreCache<Assembly, bool>
 	{
 		public static Activated Property { get; } = new Activated();
 		Activated() {}

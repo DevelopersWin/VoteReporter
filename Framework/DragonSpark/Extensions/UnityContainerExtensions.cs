@@ -9,13 +9,13 @@ using System;
 
 namespace DragonSpark.Extensions
 {
-	public class TryContextProperty : AttachedProperty<IUnityContainer, TryContext>
+	public class TryContextProperty : Cache<IUnityContainer, TryContext>
 	{
 		public static TryContextProperty Debug { get; } = new TryContextProperty( Container.Debug );
 
 		public static TryContextProperty Verbose { get; } = new TryContextProperty( Container.Verbose );
 
-		TryContextProperty( Container container ) : base( new Func<IUnityContainer, TryContext>( container.Create ) ) {}
+		TryContextProperty( Container container ) : base( container.Create ) {}
 
 		class Container : FactoryBase<IUnityContainer, TryContext>
 		{

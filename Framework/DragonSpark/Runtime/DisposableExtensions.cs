@@ -15,18 +15,18 @@ using System.Reflection;
 
 namespace DragonSpark.Runtime
 {
-	public class AssociatedDisposables : AttachedCollectionProperty<IDisposable, IDisposable>
+	public class AssociatedDisposables : CollectionCache<IDisposable, IDisposable>
 	{
 		public static AssociatedDisposables Instance { get; } = new AssociatedDisposables();
 
 		AssociatedDisposables() {}
 	}
 
-	public class ConfigureAssociatedDisposables : AttachedProperty<IDisposable, bool>
+	public class ConfigureAssociatedDisposables : StoreCache<IDisposable, bool>
 	{
 		public static ConfigureAssociatedDisposables Instance { get; } = new ConfigureAssociatedDisposables();
 
-		ConfigureAssociatedDisposables() : base( key => true ) {}
+		ConfigureAssociatedDisposables() : base( new Cache<IDisposable, IWritableStore<bool>>( disposable => new FixedStore<bool>( true ) ) ) {}
 	}
 
 	public static class DisposableExtensions
@@ -37,7 +37,7 @@ namespace DragonSpark.Runtime
 			return @this;
 		}
 
-		public static T AssociateForDispose<T>( this T @this, IDisposable associated ) where T : IDisposable => @this.AssociateForDispose( new[] { associated } );
+		public static T AssociateForDispose<T>( this T @this, IDisposable associated ) where T : IDisposable => @this.AssociateForDispose( associated.ToItem() );
 
 		public static T AssociateForDispose<T>( this T @this, params IDisposable[] associated ) where T : IDisposable
 		{
@@ -50,14 +50,14 @@ namespace DragonSpark.Runtime
 	{
 		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand( AssociatedDisposables.Instance );
 
-		readonly AssociatedDisposables property;
+		readonly AssociatedDisposables cache;
 
-		DisposeAssociatedCommand( AssociatedDisposables property ) : base( new IsAttachedSpecification<IDisposable, ICollection<IDisposable>>( property ) )
+		DisposeAssociatedCommand( AssociatedDisposables cache ) : base( new IsAttachedSpecification<IDisposable, ICollection<IDisposable>>( cache ) )
 		{
-			this.property = property;
+			this.cache = cache;
 		}
 
-		public override void Execute( IDisposable parameter ) => property.Get( parameter ).Purge().Each( disposable => disposable.Dispose() );
+		public override void Execute( IDisposable parameter ) => cache.Get( parameter ).Purge().Each( disposable => disposable.Dispose() );
 	}
 
 	/*class Associated : AssociatedStore<IDisposable, ICollection<IDisposable>>

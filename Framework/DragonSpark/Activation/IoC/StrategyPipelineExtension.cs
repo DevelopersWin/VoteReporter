@@ -83,9 +83,9 @@ namespace DragonSpark.Activation.IoC
 
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
-			readonly static AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>> Policies = new AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>>( ActivatedAttachedPropertyStore<object, ConditionalWeakTable<Type, IBuildPlanPolicy>>.Instance );
+			readonly static ICache<ConditionalWeakTable<Type, IBuildPlanPolicy>> Policies = new ActivatedCache<ConditionalWeakTable<Type, IBuildPlanPolicy>>();
 
-			readonly IAttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>.CreateValueCallback, PropertyContext> contexts = new AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>.CreateValueCallback, PropertyContext>();
+			readonly ICache<ConditionalWeakTable<Type, IBuildPlanPolicy>.CreateValueCallback, PropertyContext> contexts = new StoreCache<ConditionalWeakTable<Type, IBuildPlanPolicy>.CreateValueCallback, PropertyContext>();
 
 			readonly IBuildPlanCreatorPolicy inner;
 			readonly object creator;

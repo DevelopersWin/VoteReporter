@@ -1,9 +1,9 @@
-﻿using DragonSpark.TypeSystem;
+﻿using DragonSpark.Runtime.Properties;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Properties;
 using Type = System.Type;
 
 namespace DragonSpark.Extensions
@@ -34,7 +34,7 @@ namespace DragonSpark.Extensions
 		public static Assembly Assembly( [Required]this Type @this ) => Adapt( @this ).Assembly;
 	}
 
-	public class TypeAdapterProperty : AttachedProperty<Type, TypeAdapter>
+	public class TypeAdapterProperty : Cache<Type, TypeAdapter>
 	{
 		public static TypeAdapterProperty Instance { get; } = new TypeAdapterProperty();
 

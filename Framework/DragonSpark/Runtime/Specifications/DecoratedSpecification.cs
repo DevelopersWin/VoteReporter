@@ -31,11 +31,11 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class OncePerParameterSpecification<T> : SpecificationBase<T> where T : class
 	{
-		readonly IAttachedProperty<T, ConditionMonitor> property;
+		readonly ICache<T, ConditionMonitor> property;
 		
 		public OncePerParameterSpecification() : this( new Condition<T>() ) {}
 
-		public OncePerParameterSpecification( IAttachedProperty<T, ConditionMonitor> property )
+		public OncePerParameterSpecification( ICache<T, ConditionMonitor> property )
 		{
 			this.property = property;
 		}

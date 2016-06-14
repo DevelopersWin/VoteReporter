@@ -113,7 +113,7 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class DefaultServiceProvider : ExecutionAttachedPropertyStoreBase<IServiceProvider>
+	public class DefaultServiceProvider : ExecutionCachedStoreBase<IServiceProvider>
 	{
 		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider();
 
@@ -128,9 +128,9 @@ namespace DragonSpark.Setup
 
 	public static class ActivationProperties
 	{
-		public static IAttachedProperty<bool> Instance { get; } = new AttachedProperty<bool>();
+		public static ICache<bool> Instance { get; } = new StoreCache<bool>();
 
-		public static IAttachedProperty<Type> Factory { get; } = new AttachedProperty<Type>();
+		public static ICache<Type> Factory { get; } = new Cache<Type>();
 
 		public class IsActivatedInstanceSpecification : GuardedSpecificationBase<object>
 		{
@@ -254,12 +254,9 @@ namespace DragonSpark.Setup
 			return null;
 		}
 
-		class IsActive : ThreadLocalAttachedProperty<Type, bool>
+		class IsActive : StoreCache<Type, bool>
 		{
-			// public static IsActive Instance { get; } = new IsActive();
-
-			public IsActive() : base( () => false ) {}
-			// public IsActive( object owner, Type type ) : base( KeyFactory.Instance.ToString( owner, type ) ) {}
+			public IsActive() : base( new ThreadLocalStoreCache<Type, bool>() ) {}
 		}
 	}
 

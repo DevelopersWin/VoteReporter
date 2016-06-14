@@ -44,7 +44,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, ProgramSetup.AutoData]
 		public void Extension( IModuleMonitor sut )
 		{
-			var collection = AttachedCollectionProperty.Default.Get( sut );
+			var collection = CollectionCache.Default.Get( sut );
 			var module = collection.FirstOrDefaultOfType<MonitoredModule>();
 			Assert.NotNull( module );
 			Assert.True( module.Initialized );
@@ -87,11 +87,11 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, ProgramSetup.AutoData]
 		public void SetupModuleCommand( SetupModuleCommand sut, MonitoredModule module )
 		{
-			var added = AttachedCollectionProperty.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>();
+			var added = CollectionCache.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>();
 			Assert.Null( added );
 			sut.Execute( module );
 
-			Assert.NotNull( AttachedCollectionProperty.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>() );
+			Assert.NotNull( CollectionCache.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>() );
 		}
 	}
 
@@ -116,14 +116,14 @@ namespace DragonSpark.Windows.Testing.Setup
 
 	public class SomeCommand : ModuleCommand
 	{
-		public override void Execute( IMonitoredModule parameter ) => AttachedCollectionProperty.Default.Get( parameter ).Add( this );
+		public override void Execute( IMonitoredModule parameter ) => CollectionCache.Default.Get( parameter ).Add( this );
 	}
 
 	public class MonitoredModule : MonitoredModule<MonitoredModule.Command>
 	{
 		public MonitoredModule( IModuleMonitor moduleMonitor, Command command ) : base( moduleMonitor, command )
 		{
-			AttachedCollectionProperty.Default.Get( moduleMonitor ).Add( this );
+			CollectionCache.Default.Get( moduleMonitor ).Add( this );
 		}
 
 		public bool Initialized { get; private set; }
@@ -151,7 +151,7 @@ namespace DragonSpark.Windows.Testing.Setup
 				this.monitor = monitor;
 			}
 
-			public override void Execute( IMonitoredModule parameter ) => AttachedCollectionProperty.Default.Get( monitor ).Add( this );
+			public override void Execute( IMonitoredModule parameter ) => CollectionCache.Default.Get( monitor ).Add( this );
 		}
 	}
 }

@@ -4,7 +4,7 @@ namespace DragonSpark.Windows.Markup
 {
 	class Incrementer : IIncrementer
 	{
-		readonly AttachedProperty<int> count = new AttachedProperty<int>();
+		readonly StoreCache<int> count = new StoreCache<int>();
 
 		public int Next( object context )
 		{

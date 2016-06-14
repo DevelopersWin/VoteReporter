@@ -1,4 +1,5 @@
 using DragonSpark.ComponentModel;
+using DragonSpark.Runtime.Properties;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -9,7 +10,6 @@ using PostSharp.Serialization;
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Aspects
 {
@@ -20,7 +20,7 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect
 	{
-		readonly static IAttachedProperty<object, ConditionalWeakTable<object, ConditionMonitor>> Property = new AttachedProperty<ConditionalWeakTable<object, ConditionMonitor>>( o => new ConditionalWeakTable<object, ConditionMonitor>() );
+		readonly static ICache<ConditionalWeakTable<object, ConditionMonitor>> Property = new Cache<ConditionalWeakTable<object, ConditionMonitor>>( o => new ConditionalWeakTable<object, ConditionMonitor>() );
 
 		readonly Func<PropertyInfo, bool> specification;
 		readonly Func<DefaultValueParameter, object> source;

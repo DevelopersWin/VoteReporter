@@ -116,11 +116,9 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public class AssociatedContext : AttachedProperty<MethodBase, IDisposable>
+	public class AssociatedContext : Cache<MethodBase, IDisposable>
 	{
 		public static AssociatedContext Property { get; } = new AssociatedContext();
-
-		// public AssociatedContext( MethodBase instance ) : base( instance, typeof(AssociatedContext) ) {}
 	}
 
 	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>

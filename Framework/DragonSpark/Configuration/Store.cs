@@ -3,7 +3,7 @@ using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Configuration
 {
-	class ConfigurationStore<T> : ExecutionAttachedPropertyStoreBase<T> where T : class, new()
+	class ConfigurationStore<T> : ExecutionCachedStoreBase<T> where T : class, new()
 	{
 		public ConfigurationStore() : this( PrototypeStore<T>.Instance ) {}
 

@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace DragonSpark.Setup
 {
-	public class CurrentServiceProvider : ExecutionAttachedPropertyStoreBase<IServiceProvider>
+	public class CurrentServiceProvider : ExecutionCachedStoreBase<IServiceProvider>
 	{
 		public static CurrentServiceProvider Instance { get; } = new CurrentServiceProvider();
 

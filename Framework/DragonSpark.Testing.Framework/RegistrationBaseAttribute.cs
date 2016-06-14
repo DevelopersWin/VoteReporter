@@ -30,7 +30,7 @@ namespace DragonSpark.Testing.Framework
 		public void Customize( IFixture fixture ) => registration.Register( AssociatedRegistry.Property.Get( fixture ) );
 	}
 
-	public class AssociatedRegistry : AttachedProperty<IFixture, IServiceRegistry>
+	public class AssociatedRegistry : Cache<IFixture, IServiceRegistry>
 	{
 		public static AssociatedRegistry Property { get; } = new AssociatedRegistry();
 

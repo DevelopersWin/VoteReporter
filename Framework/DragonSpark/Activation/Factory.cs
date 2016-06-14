@@ -164,23 +164,24 @@ namespace DragonSpark.Activation
 		public TFrom Convert( TTo parameter ) => from( parameter );
 	}*/
 
-	public abstract class Converter<TBase, TFrom, TTo> : FactoryBase<TBase, TTo>/*, IConverter<TFrom, TTo>*/ where TFrom : TBase
+	
+	public class ProjectedFactory<TFrom, TTo> : ProjectedFactory<object, TFrom, TTo>
+	{
+		public ProjectedFactory( Func<TFrom, TTo> convert ) : base( convert ) {}
+	}
+
+	public class ProjectedFactory<TBase, TFrom, TTo> : BasicFactoryBase<TBase, TTo>/*, IConverter<TFrom, TTo>*/ where TFrom : TBase
 	{
 		readonly Func<TFrom, TTo> convert;
 
-		protected Converter( Func<TFrom, TTo> convert )
+		public ProjectedFactory( Func<TFrom, TTo> convert )
 		{
 			this.convert = convert;
 		}
 
-		public override TTo Create( TBase parameter ) => parameter.AsTo<TFrom, TTo>( Convert );
+		public override bool CanCreate( TBase parameter ) => parameter is TFrom;
 
-		public TTo Convert( TFrom parameter ) => convert( parameter );
-
-		/*TFrom IConverter<TFrom, TTo>.Convert( TTo parameter )
-		{
-			throw new NotSupportedException();
-		}*/
+		public override TTo Create( TBase parameter ) => parameter is TFrom ? convert( (TFrom)parameter ) : default(TTo);
 	}
 
 	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>

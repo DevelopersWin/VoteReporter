@@ -12,15 +12,15 @@ using System.Threading;
 
 namespace DragonSpark.Runtime.Properties
 {
-	public abstract class ExecutionAttachedPropertyStoreBase<T> : DeferredAttachedPropertyTargetStore<object, T>
+	public abstract class ExecutionCachedStoreBase<T> : DeferredTargetCachedStore<object, T> where T : class
 	{
-		protected ExecutionAttachedPropertyStoreBase() : this( Delegates<T>.Default ) {}
-		protected ExecutionAttachedPropertyStoreBase( Func<T> create ) : this( new AttachedProperty<T>( new Func<object, T>( new Context( create ).Create ) ) ) {}
-		protected ExecutionAttachedPropertyStoreBase( IAttachedProperty<object, T> property ) : this( Execution.GetCurrent, property ) {}
-		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property ) : this( instance, property, Coercer<T>.Instance ) {}
-		protected ExecutionAttachedPropertyStoreBase( Func<object> instance, IAttachedProperty<object, T> property, ICoercer<T> coercer ) : base( instance, property, coercer ) {}
+		protected ExecutionCachedStoreBase() : this( Delegates<T>.Default ) {}
+		protected ExecutionCachedStoreBase( Func<T> create ) : this( new Cache<T>( create.Wrap().ToDelegate() ) ) {}
+		protected ExecutionCachedStoreBase( ICache<object, T> cache ) : this( Execution.GetCurrent, cache ) {}
+		protected ExecutionCachedStoreBase( Func<object> instance, ICache<object, T> cache ) : this( instance, cache, Coercer<T>.Instance ) {}
+		protected ExecutionCachedStoreBase( Func<object> instance, ICache<object, T> cache, ICoercer<T> coercer ) : base( instance, cache, coercer ) {}
 
-		struct Context
+		/*struct Context
 		{
 			readonly Func<T> create;
 			public Context( Func<T> create )
@@ -29,7 +29,7 @@ namespace DragonSpark.Runtime.Properties
 			}
 
 			public T Create( object instance ) => create();
-		}
+		}*/
 	}
 
 	public class Stack<T> : IStack<T>
@@ -69,7 +69,7 @@ namespace DragonSpark.Runtime.Properties
 
 	public interface IPropertyRegistry<T>
 	{
-		void Register( object key, IAttachedProperty<T> instance );
+		void Register( object key, ICache<T> instance );
 		void Clear( object key, object instance );
 	}
 
@@ -77,16 +77,16 @@ namespace DragonSpark.Runtime.Properties
 	{
 		public static PropertyRegistry<T> Instance { get; } = new PropertyRegistry<T>();
 
-		readonly ConditionalWeakTable<object, IAttachedProperty<T>> cache = new ConditionalWeakTable<object, IAttachedProperty<T>>();
+		readonly ConditionalWeakTable<object, ICache<T>> cache = new ConditionalWeakTable<object, ICache<T>>();
 
-		public void Register( object key, IAttachedProperty<T> instance ) => cache.Add( key, instance );
+		public void Register( object key, ICache<T> instance ) => cache.Add( key, instance );
 
 		public void Clear( object key, object instance )
 		{
-			IAttachedProperty<T> property;
+			ICache<T> property;
 			if ( cache.TryGetValue( key, out property ) )
 			{
-				property.Clear( instance );
+				property.Remove( instance );
 			}
 		}
 	}
@@ -109,13 +109,13 @@ namespace DragonSpark.Runtime.Properties
 		T GetCurrentItem();
 	}
 
-	public class AmbientStack<T> : ExecutionAttachedPropertyStoreBase<IStack<T>>, IStackStore<T>
+	public class AmbientStack<T> : ExecutionCachedStoreBase<IStack<T>>, IStackStore<T>
 	{
 		public static AmbientStack<T> Default { get; } = new AmbientStack<T>();
 
 		public AmbientStack() : this( Execution.GetCurrent ) {}
-		public AmbientStack( Func<object> host ) : this( host, AmbientStackProperty<T>.Default ) {}
-		public AmbientStack( Func<object> host, IAttachedProperty<object, IStack<T>> property ) : base( host, property ) {}
+		public AmbientStack( Func<object> host ) : this( host, AmbientStackCache<T>.Default ) {}
+		public AmbientStack( Func<object> host, ICache<object, IStack<T>> cache ) : base( host, cache ) {}
 
 		public T GetCurrentItem() => Value.Peek();
 
@@ -135,20 +135,20 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public class AmbientStackProperty<T> : ThreadLocalAttachedProperty<IStack<T>>
+	public class AmbientStackCache<T> : StoreCache<IStack<T>>
 	{
-		public static AmbientStackProperty<T> Default { get; } = new AmbientStackProperty<T>();
+		public static AmbientStackCache<T> Default { get; } = new AmbientStackCache<T>();
 
-		public AmbientStackProperty() : this( PropertyRegistry<IStack<T>>.Instance ) {}
+		public AmbientStackCache() : this( PropertyRegistry<IStack<T>>.Instance ) {}
 
-		protected AmbientStackProperty( IPropertyRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
+		protected AmbientStackCache( IPropertyRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
 
-		protected AmbientStackProperty( IPropertyRegistry<IStack<T>> registry, IAttachedPropertyStore<object, IStack<T>> store ) : base( store )
+		protected AmbientStackCache( IPropertyRegistry<IStack<T>> registry, IFactory<object, IWritableStore<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.ToDelegate() ) )
 		{
-			registry.Register( store, this );
+			registry.Register( factory, this );
 		}
 
-		public class Store : AttachedPropertyStoreBase<object, IStack<T>>
+		public class Store : FactoryBase<object, IWritableStore<IStack<T>>>
 		{
 			readonly Action<Store, object> callback;
 
@@ -228,13 +228,13 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public class EqualityReference<T> : ExecutionAttachedPropertyStoreBase<ConcurrentDictionary<int, T>> where T : class
+	public class EqualityReference<T> : ExecutionCachedStoreBase<ConcurrentDictionary<int, T>> where T : class
 	{
 		public T From( T instance ) => Value.GetOrAdd( instance.GetHashCode(), instance.ToFactory<int, T>().ToDelegate() );
 
-		public EqualityReference() : base( new AttachedProperty<ConcurrentDictionary<int, T>>( ActivatedAttachedPropertyStore<ConcurrentDictionary<int, T>>.Instance ) ) {}
+		public EqualityReference() : base( new ActivatedCache<ConcurrentDictionary<int, T>>() ) {}
 
-		// public EqualityReference( Func<object> instance, IAttachedProperty<object, ConcurrentDictionary<int, T>> property, ICoercer<ConcurrentDictionary<int, T>> coercer ) : base( instance, property, coercer ) {}
+		// public EqualityReference( Func<object> instance, IAttachedProperty<object, ConcurrentDictionary<int, T>> cache, ICoercer<ConcurrentDictionary<int, T>> coercer ) : base( instance, cache, coercer ) {}
 	}
 
 	public class Condition : Condition<object>
@@ -242,7 +242,7 @@ namespace DragonSpark.Runtime.Properties
 		public new static Condition Property { get; } = new Condition();
 	}
 	
-	public class Condition<T> : AttachedProperty<T, ConditionMonitor> where T : class
+	public class Condition<T> : Cache<T, ConditionMonitor> where T : class
 	{
 		public static Condition<T> Property { get; } = new Condition<T>();
 

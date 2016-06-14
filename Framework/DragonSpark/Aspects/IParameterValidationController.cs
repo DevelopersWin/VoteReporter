@@ -165,18 +165,18 @@ namespace DragonSpark.Aspects
 
 	public static class ParameterValidation
 	{
-		public static IAttachedProperty<IParameterValidationControllerFactory> Factory { get; } = new AttachedProperty<IParameterValidationControllerFactory>();
+		public static ICache<IParameterValidationControllerFactory> Factory { get; } = new Cache<IParameterValidationControllerFactory>();
 
-		public static IAttachedProperty<IParameterValidationController> Controller { get; } = new ControllerProperty();
+		public static ICache<IParameterValidationController> Controller { get; } = new ControllerCache();
 	}
 
-	class ControllerProperty : ThreadLocalAttachedProperty<IParameterValidationController>
+	class ControllerCache : StoreCache<IParameterValidationController>
 	{
-		public ControllerProperty() : base( Store.Instance ) {}
+		public ControllerCache() : base( new ThreadLocalStoreCache<IParameterValidationController>( Factory.Instance.ToDelegate() ) ) {}
 
-		class Store : AttachedPropertyStoreBase<object, IParameterValidationController>
+		class Factory : BasicFactoryBase<object, IWritableStore<IParameterValidationController>>
 		{
-			public static Store Instance { get; } = new Store();
+			public static Factory Instance { get; } = new Factory();
 
 			public override IWritableStore<IParameterValidationController> Create( object instance )
 			{
@@ -189,7 +189,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedCommand : ValidatedParameterAspectBase
 	{
-		readonly static IParameterValidationControllerFactory Factory = new ParameterValidationControllerFactory( CommandParameterAdapterStore.Instance );
+		readonly static IParameterValidationControllerFactory Factory = new ParameterValidationControllerFactory( CommandParameterAdapterCache.Instance );
 
 		public ValidatedCommand() : base( Factory ) {}
 
@@ -201,7 +201,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedGenericCommand : ValidatedParameterAspectBase
 	{
-		readonly static IParameterValidationControllerFactory Factory = new GenericParameterValidationControllerFactory( GenericCommandParameterAdapterStore.Instance, CommandParameterAdapterStore.Instance );
+		readonly static IParameterValidationControllerFactory Factory = new GenericParameterValidationControllerFactory( GenericCommandParameterAdapterStore.Instance, CommandParameterAdapterCache.Instance );
 
 		public ValidatedGenericCommand() : base( Factory ) {}
 
@@ -213,7 +213,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedFactory : ValidatedParameterAspectBase
 	{
-		readonly static IParameterValidationControllerFactory Factory = new ParameterValidationControllerFactory( FactoryParameterAdapterStore.Instance );
+		readonly static IParameterValidationControllerFactory Factory = new ParameterValidationControllerFactory( FactoryParameterAdapterCache.Instance );
 
 		public ValidatedFactory() : base( Factory ) {}
 
@@ -225,7 +225,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedGenericFactory : ValidatedParameterAspectBase
 	{
-		readonly static IParameterValidationControllerFactory Factory = new GenericParameterValidationControllerFactory( GenericFactoryParameterAdapterStore.Instance, FactoryParameterAdapterStore.Instance );
+		readonly static IParameterValidationControllerFactory Factory = new GenericParameterValidationControllerFactory( GenericFactoryParameterAdapterStore.Instance, FactoryParameterAdapterCache.Instance );
 		
 		public ValidatedGenericFactory() : base( Factory ) {}
 
@@ -305,34 +305,32 @@ namespace DragonSpark.Aspects
 
 	class ParameterValidationControllerFactory : IParameterValidationControllerFactory
 	{
-		readonly IAttachedPropertyStore<object, IParameterValidator> store;
+		readonly ICache<IParameterValidator> store;
 
-		public ParameterValidationControllerFactory( IAttachedPropertyStore<object, IParameterValidator> store )
+		public ParameterValidationControllerFactory( ICache<IParameterValidator> store )
 		{
 			this.store = store;
 		}
 
-		public IParameterValidationController Create( object instance ) => new ParameterValidationController( store.Create( instance ).Value );
+		public IParameterValidationController Create( object instance ) => new ParameterValidationController( store.Get( instance ) );
 	}
 
 	class GenericParameterValidationControllerFactory : IParameterValidationControllerFactory
 	{
-		readonly IAttachedPropertyStore<object, IGenericParameterValidator> generic;
-		readonly IAttachedPropertyStore<object, IParameterValidator> store;
+		readonly ICache<IGenericParameterValidator> generic;
+		readonly ICache<IParameterValidator> store;
 
-		public GenericParameterValidationControllerFactory( IAttachedPropertyStore<object, IGenericParameterValidator> generic, IAttachedPropertyStore<object, IParameterValidator> store )
+		public GenericParameterValidationControllerFactory( ICache<IGenericParameterValidator> generic, ICache<IParameterValidator> store )
 		{
 			this.generic = generic;
 			this.store = store;
 		}
 
-		public IParameterValidationController Create( object instance ) => new GenericParameterValidationController( generic.Create( instance ).Value, store.Create( instance ).Value );
+		public IParameterValidationController Create( object instance ) => new GenericParameterValidationController( generic.Get( instance ), store.Get( instance ) );
 	}
 
 	public interface IGenericParameterValidationController : IParameterValidationController
 	{
 		object ExecuteGeneric( RelayParameter parameter );
 	}
-
-	
 }

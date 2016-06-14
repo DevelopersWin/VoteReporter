@@ -1,4 +1,5 @@
-﻿using DragonSpark.Runtime.Stores;
+﻿using DragonSpark.Activation;
+using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -8,25 +9,25 @@ namespace DragonSpark.Runtime.Properties
 {
 	public static class AttachedPropertyExtensions
 	{
-		public static TValue Get<TInstance, TValue>( this TInstance @this, IAttachedProperty<TInstance, TValue> property ) where TInstance : class => property.Get( @this );
+		public static TValue Get<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> property ) where TInstance : class => property.Get( @this );
 
-		public static TInstance Set<TInstance, TValue>( this TInstance @this, IAttachedProperty<TInstance, TValue> property, TValue value ) where TInstance : class
+		public static TInstance Set<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> property, TValue value ) where TInstance : class
 		{
 			property.Set( @this, value );
 			return @this;
 		}
 
-		public static Assignment<T1, T2> Assignment<T1, T2>( this IAttachedProperty<T1, T2> @this, T1 first, T2 second ) where T1 : class => 
+		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 first, T2 second ) where T1 : class => 
 			new Assignment<T1, T2>( new PropertyAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
 
-		public static TDelegate Apply<TContext, TDelegate>( this IAttachedProperty<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class
+		public static TDelegate Apply<TContext, TDelegate>( this ICache<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class
 		{
 			@this.Set( source, context );
 			var result = Invocation.Create( source );
 			return result;
 		}
 
-		public static TContext Context<TContext, TDelegate>( this IAttachedProperty<TDelegate, TContext> @this ) where TDelegate : class
+		public static TContext Context<TContext, TDelegate>( this ICache<TDelegate, TContext> @this ) where TDelegate : class
 		{
 			var instance = Invocation.GetCurrent() as TDelegate;
 			var result = instance != null ? @this.Get( instance ) : default(TContext);
@@ -34,28 +35,7 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public interface IAttachedProperty<TValue> : IAttachedProperty<object, TValue> {}
-
-	public interface IInstanceStore<in TInstance, TValue>
-	{
-		void Set( TInstance instance, TValue value );
-
-		TValue Get( TInstance instance );
-	}
-
-	public interface IAttachedProperty<in TInstance, TValue> : IInstanceStore<TInstance, TValue> 
-/*: IObservable<AttachedPropertyChangedEvent<TInstance, TValue>>*/ where TInstance : class
-	{
-		bool IsAttached( TInstance instance );
-		
-		bool Clear( TInstance instance );
-
-		// IObservable<TInstance> Subscription { get; }
-
-		// void Dispose( TInstance instance );
-	}
-
-	public enum AttachedPropertyChangedEventType
+	/*public enum AttachedPropertyChangedEventType
 	{
 		Set, Clear
 	}
@@ -74,7 +54,7 @@ namespace DragonSpark.Runtime.Properties
 		public TInstance Instance { get; }
 		public TValue Value { get; }
 		public AttachedPropertyChangedEventType Type { get; }
-	}
+	}*/
 
 	/*class StoreConverter<T> : Converter<T, T>
 	{
@@ -95,29 +75,29 @@ namespace DragonSpark.Runtime.Properties
 		TupleConverter() : base( arg => new Tuple<T>( arg ), tuple => tuple.Item1 ) {}
 	}*/
 
-	public class ThreadLocalAttachedProperty<T> : ThreadLocalAttachedProperty<object, T>, IAttachedProperty<T>
+	public class ThreadLocalStoreCache<T> : ThreadLocalStoreCache<object, T>
 	{
-		public ThreadLocalAttachedProperty() : this( () => default(T) ) {}
-		public ThreadLocalAttachedProperty( Func<T> create ) : base( create ) {}
+		public ThreadLocalStoreCache() {}
+		public ThreadLocalStoreCache( Func<T> create ) : base( create ) {}
 
-		protected ThreadLocalAttachedProperty( IAttachedPropertyStore<object, T> store ) : base( store ) {}
+		public ThreadLocalStoreCache( Func<object, IWritableStore<T>> create ) : base( create ) {}
+		/*public ThreadLocalStoreCache() : this( () => default(T) ) {}
+		public ThreadLocalStoreCache( Func<T> create ) : base( create ) {}
+
+		protected ThreadLocalStoreCache( IAttachedPropertyStore<object, T> store ) : base( store ) {}*/
 
 		// protected ThreadLocalAttachedProperty( Func<object, IWritableStore<T>> store ) : base( store ) {}
 	}
 
-	public class ThreadLocalAttachedProperty<TInstance, TResult> : AttachedProperty<TInstance, TResult> where TInstance : class
+	public class ThreadLocalStoreCache<TInstance, TResult> : CacheStore<TInstance, TResult> where TInstance : class
 	{
-		public ThreadLocalAttachedProperty( Func<TResult> create ) : this( new Store( create ) ) {}
+		public ThreadLocalStoreCache() : this( Store.Instance.ToDelegate() ) {}
 
-		protected ThreadLocalAttachedProperty( IAttachedPropertyStore<TInstance, TResult> store ) : base( store ) {}
+		public ThreadLocalStoreCache( Func<TResult> create ) : this( new Store( create ).ToDelegate() ) {}
 
-		/*protected override bool Remove( TInstance instance, IWritableStore<TResult> store )
-		{
-			var local = store as ThreadLocalStore<TResult>;
-			return ( local == null || local.IsDisposed ) && base.Remove( instance, store );
-		}*/
+		public ThreadLocalStoreCache( Func<TInstance, IWritableStore<TResult>> create ) : base( create ) {}
 
-		class Store : AttachedPropertyStoreBase<TInstance, TResult>
+		class Store : BasicFactoryBase<TInstance, IWritableStore<TResult>>
 		{
 			public static Store Instance { get; } = new Store();
 
@@ -134,53 +114,41 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public class AttachedSetProperty<T> : AttachedSetProperty<object, T>, IAttachedProperty<ISet<T>>
+	public class SetCache<T> : SetCache<object, T>, ICache<ISet<T>>
 	{
-		public AttachedSetProperty() {}
-		public AttachedSetProperty( Func<object, ISet<T>> create ) : base( create ) {}
+		public SetCache() {}
+		public SetCache( Func<object, ISet<T>> create ) : base( create ) {}
 	}
 
-	public class AttachedSetProperty<TInstance, TItem> : AttachedProperty<TInstance, ISet<TItem>> where TInstance : class
+	public class SetCache<TInstance, TItem> : Cache<TInstance, ISet<TItem>> where TInstance : class
 	{
-		public AttachedSetProperty() : base( key => new HashSet<TItem>() ) {}
-		public AttachedSetProperty( Func<TInstance, ISet<TItem>> create ) : base( create ) {}
+		public SetCache() : base( key => new HashSet<TItem>() ) {}
+		public SetCache( Func<TInstance, ISet<TItem>> create ) : base( create ) {}
 	}
 
-	public class AttachedCollectionProperty : AttachedCollectionProperty<object>
+	public class CollectionCache : CollectionCache<object>
 	{
-		public new static AttachedCollectionProperty Default { get; } = new AttachedCollectionProperty();
+		public new static CollectionCache Default { get; } = new CollectionCache();
 
-		public AttachedCollectionProperty() {}
-		public AttachedCollectionProperty( Func<object, ICollection<object>> create ) : base( create ) {}
+		public CollectionCache() {}
+		public CollectionCache( Func<object, ICollection<object>> create ) : base( create ) {}
 	}
 
-	public class AttachedCollectionProperty<TItem> : AttachedCollectionProperty<object, TItem>, IAttachedProperty<ICollection<TItem>>
+	public class CollectionCache<TItem> : CollectionCache<object, TItem>, ICache<ICollection<TItem>>
 	{
-		public new static AttachedCollectionProperty Default { get; } = new AttachedCollectionProperty();
+		public new static CollectionCache Default { get; } = new CollectionCache();
 
-		public AttachedCollectionProperty() {}
-		public AttachedCollectionProperty( Func<object, ICollection<TItem>> create ) : base( create ) {}
+		public CollectionCache() {}
+		public CollectionCache( Func<object, ICollection<TItem>> create ) : base( create ) {}
 	}
 	
-	public class AttachedCollectionProperty<TInstance, TItem> : AttachedProperty<TInstance, ICollection<TItem>> where TInstance : class
+	public class CollectionCache<TInstance, TItem> : Cache<TInstance, ICollection<TItem>> where TInstance : class
 	{
-		public static AttachedCollectionProperty Default { get; } = new AttachedCollectionProperty();
+		public static CollectionCache Default { get; } = new CollectionCache();
 
-		public AttachedCollectionProperty() : base( key => new System.Collections.ObjectModel.Collection<TItem>() ) {}
-		public AttachedCollectionProperty( Func<TInstance, ICollection<TItem>> create ) : base( create ) {}
+		public CollectionCache() : base( key => new System.Collections.ObjectModel.Collection<TItem>() ) {}
+		public CollectionCache( Func<TInstance, ICollection<TItem>> create ) : base( create ) {}
 	}
-
-	public class AttachedProperty<TValue> : AttachedProperty<object, TValue>, IAttachedProperty<TValue>
-	{
-		public AttachedProperty() {}
-		public AttachedProperty( Func<object, TValue> create ) : this( create, o => new FixedStore<TValue>() ) {}
-
-		public AttachedProperty( Func<object, IWritableStore<TValue>> store ) : this( new AttachedPropertyStore<object, TValue>( store ) ) {}
-		public AttachedProperty( Func<object, TValue> create, Func<object, IWritableStore<TValue>> store ) : base( new AssignedAttachedPropertyStore<object, TValue>( create, store ) ) {}
-
-		public AttachedProperty( AttachedPropertyStore<object, TValue> create ) : base( create ) {}
-	}
-
 
 	/*public abstract class AttachedPropertyBase<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue, TValue> where TInstance : class where TValue : class
 	{
@@ -188,19 +156,30 @@ namespace DragonSpark.Runtime.Properties
 		protected AttachedPropertyBase( ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create ) : base( create, SelfConverter<TValue>.Instance ) {}
 	}*/
 
-	public abstract class AttachedPropertyBase<TInstance, TValue> : IAttachedProperty<TInstance, TValue> where TInstance : class
+	
+	
+	public interface ICache<TValue> : ICache<object, TValue> {}
+	public interface ICache<in TInstance, TValue>
 	{
-		public abstract bool IsAttached( TInstance instance );
-		public abstract void Set( TInstance instance, TValue value );
-		public abstract TValue Get( TInstance instance );
-		public abstract bool Clear( TInstance instance );
+		bool Contains( TInstance instance );
+		
+		bool Remove( TInstance instance );
 
-		// public abstract IDisposable Subscribe( IObserver<AttachedPropertyChangedEvent<TInstance, TValue>> observer );
+		void Set( TInstance instance, TValue value );
+
+		TValue Get( TInstance instance );
 	}
 
-	public class Cache<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue> where TInstance : class where TValue : class
+	public class Cache<T> : Cache<object, T>, ICache<T> where T : class
 	{
-		// readonly ISubject<AttachedPropertyChangedEvent<TInstance, TValue>> subject = new ReplaySubject<AttachedPropertyChangedEvent<TInstance, TValue>>();
+		public Cache() {}
+		public Cache( Func<object, T> create ) : base( create ) {}
+	}
+	
+
+	public class Cache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class where TValue : class
+	{
+		readonly ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create;
 
 		readonly ConditionalWeakTable<TInstance, TValue> items = new ConditionalWeakTable<TInstance, TValue>();
 
@@ -210,12 +189,10 @@ namespace DragonSpark.Runtime.Properties
 
 		Cache( ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create )
 		{
-			this.Create = create;
+			this.create = create;
 		}
 
-		protected ConditionalWeakTable<TInstance, TValue>.CreateValueCallback Create { get; set; }
-
-		public override bool IsAttached( TInstance instance )
+		public override bool Contains( TInstance instance )
 		{
 			TValue temp;
 			return items.TryGetValue( instance, out temp );
@@ -227,82 +204,87 @@ namespace DragonSpark.Runtime.Properties
 			items.Add( instance, value );
 		}
 
-		public override TValue Get( TInstance instance ) => items.GetValue( instance, Create );
+		public override TValue Get( TInstance instance ) => items.GetValue( instance, create );
 
-		public override bool Clear( TInstance instance ) => items.Remove( instance );
+		public override bool Remove( TInstance instance ) => items.Remove( instance );
 	}
 
-	// [Synchronized]
-	public class AttachedProperty<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue> where TInstance : class
+	public abstract class CacheBase<TInstance, TValue> : ICache<TInstance, TValue> where TInstance : class
 	{
+		public abstract bool Contains( TInstance instance );
+		public abstract void Set( TInstance instance, TValue value );
+		public abstract TValue Get( TInstance instance );
+		public abstract bool Remove( TInstance instance );
+	}
+
+	public class StoreCache<TValue> : StoreCache<object, TValue>, ICache<TValue>
+	{
+		/*public StoreCache() {}
+		public StoreCache( Func<object, TValue> create ) : this( create, o => new FixedStore<TValue>() ) {}
+
+		public StoreCache( Func<object, IWritableStore<TValue>> store ) : this( new CachedStore<object, TValue>( store ) ) {}
+		public StoreCache( Func<object, TValue> create, Func<object, IWritableStore<TValue>> store ) : base( new AssignedAttachedPropertyStore<object, TValue>( create, store ) ) {}
+
+		public StoreCache( CachedStore<object, TValue> create ) : base( create ) {}*/
+		public StoreCache() : this( new CacheStore<object, TValue>() ) {}
+		public StoreCache( ICache<object, IWritableStore<TValue>> inner ) : base( inner ) {}
+	}
+
+	public class StoreCache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class
+	{
+		readonly ICache<TInstance, IWritableStore<TValue>> inner;
 		// readonly ISubject<AttachedPropertyChangedEvent<TInstance, TValue>> subject = new ReplaySubject<AttachedPropertyChangedEvent<TInstance, TValue>>();
 
-		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create;
-		
-		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>> items = new ConditionalWeakTable<TInstance, IWritableStore<TValue>>();
+		/*public StoreCache() : this( instance => default(TValue) ) {}
 
-		public AttachedProperty() : this( instance => default(TValue) ) {}
+		public StoreCache( Func<TInstance, TValue> create ) : this( new AssignedAttachedPropertyStore<TInstance, TValue>( create ) ) {}
 
-		public AttachedProperty( Func<TInstance, TValue> create ) : this( new AssignedAttachedPropertyStore<TInstance, TValue>( create ) ) {}
+		public StoreCache( Func<TInstance, IWritableStore<TValue>> store ) : this( new CachedStore<TInstance, TValue>( store ) ) {}
 
-		public AttachedProperty( Func<TInstance, IWritableStore<TValue>> store ) : this( new AttachedPropertyStore<TInstance, TValue>( store ) ) {}
+		public StoreCache( IAttachedPropertyStore<TInstance, TValue> store ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( store.Create ) ) {}
 
-		public AttachedProperty( IAttachedPropertyStore<TInstance, TValue> store ) : this( new ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback( store.Create ) ) {}
-
-		AttachedProperty( ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create )
+		StoreCache( ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create )
 		{
 			this.create = create;
-		}
-
-		public override bool IsAttached( TInstance instance )
-		{
-			IWritableStore<TValue> temp;
-			return items.TryGetValue( instance, out temp );
-		}
-
-		public override void Set( TInstance instance, [Optional]TValue value )
-		{
-			items.GetValue( instance, create ).Assign( value );
-			// subject.OnNext( new AttachedPropertyChangedEvent<TInstance, TValue>( this, instance, value, AttachedPropertyChangedEventType.Set ) );
-		}
-
-		// [ThreadCache]
-		public override TValue Get( TInstance instance ) => items.GetValue( instance, create ).Value;
-
-		public override bool Clear( TInstance instance )
-		{
-			var result = items.Remove( instance );
-			/*if ( result )
-			{
-				subject.OnNext( new AttachedPropertyChangedEvent<TInstance, TValue>( this, instance ) );
-			}*/
-			return result;
-		}
-
-		// public override IDisposable Subscribe( IObserver<AttachedPropertyChangedEvent<TInstance, TValue>> observer ) => subject.Subscribe( observer );
-
-		//protected virtual bool Remove( TInstance instance, IWritableStore<TValue> store ) => ;
-
-		/*protected virtual IWritableStore<TValue> Dispose( TInstance instance )
-		{
-			IWritableStore<TValue> item;
-			if ( items.TryGetValue( instance, out item ) )
-			{
-				item.TryDispose();
-			}
-			return item;
 		}*/
+
+		public StoreCache() : this( new CacheStore<TInstance, TValue>() ) {}
+
+		public StoreCache( ICache<TInstance, IWritableStore<TValue>> inner )
+		{
+			this.inner = inner;
+		}
+
+		public override bool Contains( TInstance instance ) => inner.Contains( instance );
+
+		public override void Set( TInstance instance, [Optional]TValue value ) => inner.Get( instance ).Assign( value );
+
+		public override TValue Get( TInstance instance ) => inner.Get( instance ).Value;
+
+		public override bool Remove( TInstance instance ) => inner.Remove( instance );
 	}
 
-	public class ActivatedAttachedProperty<TResult> : ActivatedAttachedProperty<object, TResult>, IAttachedProperty<TResult> where TResult : new() {}
-
-	public class ActivatedAttachedProperty<TInstance, TResult> : AttachedProperty<TInstance, TResult> where TInstance : class where TResult : new()
+	public class CacheStore<TInstance, TValue> : Cache<TInstance, IWritableStore<TValue>> where TInstance : class
 	{
-		public ActivatedAttachedProperty() : base( ActivatedAttachedPropertyStore<TInstance, TResult>.Instance ) {}
+		public CacheStore() : this( instance => new FixedStore<TValue>() ) {}
+		public CacheStore( Func<TInstance, IWritableStore<TValue>> create ) : base( create ) {}
+	}
+
+
+	public class ActivatedCache<T> : ActivatedCache<object, T>, ICache<T> where T : class, new()
+	{
+		public new static ActivatedCache<T> Instance { get; } = new ActivatedCache<T>();
+		public ActivatedCache() {}
+	}
+
+	public class ActivatedCache<TInstance, TResult> : Cache<TInstance, TResult> where TInstance : class where TResult : class, new()
+	{
+		public static ActivatedCache<TInstance, TResult> Instance { get; } = new ActivatedCache<TInstance, TResult>();
+		public ActivatedCache() : base( instance => new TResult() ) {}
 	}
 	
-
-	public class ActivatedAttachedPropertyStore<TValue> : ActivatedAttachedPropertyStore<object, TValue> where TValue : new()
+	
+	/*public class ActivatedAttachedPropertyStore<TValue> : ActivatedAttachedPropertyStore<object, TValue> where TValue : new()
 	{
 		public new static ActivatedAttachedPropertyStore<TValue> Instance { get; } = new ActivatedAttachedPropertyStore<TValue>();
 	}
@@ -312,18 +294,16 @@ namespace DragonSpark.Runtime.Properties
 		public static ActivatedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new ActivatedAttachedPropertyStore<TInstance, TValue>();
 
 		public ActivatedAttachedPropertyStore() : base( instance => new TValue() ) {}
-	}
+	}*/
 
-	public abstract class ProjectedStore<TInstance, TValue> : AssignedAttachedPropertyStore<object, TValue>
+	/*public abstract class ProjectedStore<TInstance, TValue> : ProjectedFactory<TInstance, TValue>
 	{
-		protected override TValue CreateValue( object instance ) => instance is TInstance ? Project( (TInstance)instance ) : default(TValue);
-
-		protected abstract TValue Project( TInstance instance );
-	}
+		protected ProjectedStore( Func<TInstance, TValue> convert ) : base( convert ) {}
+	}*/
 
 
 
-	public class AssignedAttachedPropertyStore<TInstance, TValue> : AttachedPropertyStore<TInstance, TValue> where TInstance : class
+	/*public class AssignedAttachedPropertyStore<TInstance, TValue> : CachedStore<TInstance, TValue> where TInstance : class
 	{
 		//public new static AssignedAttachedPropertyStore<TInstance, TValue> Instance { get; } = new AssignedAttachedPropertyStore<TInstance, TValue>();
 
@@ -341,27 +321,27 @@ namespace DragonSpark.Runtime.Properties
 		protected virtual TValue CreateValue( TInstance instance ) => create( instance );
 
 		public override IWritableStore<TValue> Create( TInstance instance ) => base.Create( instance ).Assigned( CreateValue( instance ) );
-	}
+	}*/
 
-	public interface IAttachedPropertyStore<in TInstance, TValue> where TInstance : class
+	/*public interface IAttachedPropertyStore<in TInstance, TValue> where TInstance : class
 	{
 		IWritableStore<TValue> Create( TInstance instance );
-	}
+	}*/
 
-	public abstract class AttachedPropertyStoreBase<TInstance, TValue> : IAttachedPropertyStore<TInstance, TValue> where TInstance : class
+	/*public abstract class AttachedPropertyStoreBase<TInstance, TValue> : IAttachedPropertyStore<TInstance, TValue> where TInstance : class
 	{
 		public abstract IWritableStore<TValue> Create( TInstance instance );
-	}
+	}*/
 
-	public class AttachedPropertyStore<TInstance, TValue> : AttachedPropertyStoreBase<TInstance, TValue> where TInstance : class
+	/*public class CachedStore<TInstance, TValue> : AttachedPropertyStoreBase<TInstance, TValue> where TInstance : class
 	{
 		readonly Func<TInstance, IWritableStore<TValue>> store;
 
-		public AttachedPropertyStore( Func<TInstance, IWritableStore<TValue>> store )
+		public CachedStore( Func<TInstance, IWritableStore<TValue>> store )
 		{
 			this.store = store;
 		}
 
 		public override IWritableStore<TValue> Create( TInstance instance ) => store( instance );
-	}
+	}*/
 }

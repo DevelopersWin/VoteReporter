@@ -46,7 +46,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<TResult> Each<T, TResult>( this IEnumerable<T> enumerable, Func<T, TResult> action ) => enumerable.Select( action ).ToArray();
 
-		public class Array<T> : AttachedProperty<T, T[]> where T : class
+		public class Array<T> : Cache<T, T[]> where T : class
 		{
 			public static Array<T> Property { get; } = new Array<T>();
 
