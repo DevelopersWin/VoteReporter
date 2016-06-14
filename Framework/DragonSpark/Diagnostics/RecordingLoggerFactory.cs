@@ -26,7 +26,7 @@ namespace DragonSpark.Diagnostics
 	
 	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommand<string>
 	{
-		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, LogEventMessageFactory.Instance.Create ) {}
+		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, LogEventMessageFactory.Instance.ToDelegate() ) {}
 	}
 
 	public static class MigrationProperties

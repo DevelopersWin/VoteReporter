@@ -23,7 +23,7 @@ namespace DragonSpark.Runtime.Stores
 
 	public class AmbientStackCommand<T> : StackCommand<T>
 	{
-		public AmbientStackCommand() : this( AmbientStack<T>.Instance ) {}
+		public AmbientStackCommand() : this( AmbientStack<T>.Default ) {}
 
 		public AmbientStackCommand( AmbientStack<T> stack ) : base( stack.Value ) {}
 	}

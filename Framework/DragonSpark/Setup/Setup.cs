@@ -56,10 +56,10 @@ namespace DragonSpark.Setup
 
 		public override void Execute( IServiceProvider parameter )
 		{
-			logger.Information( Resources.ConfiguringServiceLocatorSingleton );
+			logger.Information( Resources.ConfiguringServiceLocatorSingleton, Items<object>.Default );
 
 			var assign = new AssignValueCommand<IServiceProvider>( host ).AsExecuted( parameter );
-			parameter.Get<IDisposableRepository>().With( repository => repository.Add( assign ) );
+			parameter.Get<IDisposableRepository>()?.Add( assign );
 		}
 	}
 
@@ -99,7 +99,11 @@ namespace DragonSpark.Setup
 		{
 			assign.Execute( application );
 			application.Execute( parameter );
-			application.Get<IDisposableRepository>().With( application.AssociateForDispose );
+			var repository = application.Get<IDisposableRepository>();
+			if ( repository != null )
+			{
+				application.AssociateForDispose( repository );
+			}
 		}
 
 		protected override void OnDispose()

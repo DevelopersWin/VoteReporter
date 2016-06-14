@@ -95,7 +95,7 @@ namespace DragonSpark.Runtime.Properties
 	{
 		public static object GetCurrentItem( [Required]Type type ) => typeof(AmbientStack).Adapt().Invoke( nameof(GetCurrentItem), type.ToItem() );
 
-		public static T GetCurrentItem<T>() => AmbientStack<T>.Instance.GetCurrentItem();
+		public static T GetCurrentItem<T>() => AmbientStack<T>.Default.GetCurrentItem();
 
 		// public static object GetCurrent( [Required]Type type ) => typeof(AmbientStack).Adapt().Invoke( nameof(GetCurrent), type.ToItem() );
 
@@ -104,9 +104,14 @@ namespace DragonSpark.Runtime.Properties
 		/*public static IStack<T> GetCurrent<T>() => AmbientStackProperty<T>.Default.Get( Execution.Current );*/
 	}
 
-	public class AmbientStack<T> : ExecutionAttachedPropertyStoreBase<IStack<T>>
+	public interface IStackStore<T> : IWritableStore<IStack<T>>
 	{
-		public static AmbientStack<T> Instance { get; } = new AmbientStack<T>();
+		T GetCurrentItem();
+	}
+
+	public class AmbientStack<T> : ExecutionAttachedPropertyStoreBase<IStack<T>>, IStackStore<T>
+	{
+		public static AmbientStack<T> Default { get; } = new AmbientStack<T>();
 
 		public AmbientStack() : this( Execution.GetCurrent ) {}
 		public AmbientStack( Func<object> host ) : this( host, AmbientStackProperty<T>.Default ) {}
@@ -116,12 +121,17 @@ namespace DragonSpark.Runtime.Properties
 
 		public struct Assignment : IDisposable
 		{
-			public Assignment( T item )
+			readonly IStackStore<T> store;
+
+			public Assignment( T item ) : this( Default, item ) {}
+
+			public Assignment( IStackStore<T> store, T item )
 			{
-				Instance.Value.Push( item );
+				this.store = store;
+				store.Value.Push( item );
 			}
 
-			public void Dispose() => Instance.Value.Pop();
+			public void Dispose() => store.Value.Pop();
 		}
 	}
 
@@ -218,13 +228,13 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public class EqualityReference<T> : DeferredAttachedPropertyTargetStore<object, ConcurrentDictionary<int, T>> where T : class
+	public class EqualityReference<T> : ExecutionAttachedPropertyStoreBase<ConcurrentDictionary<int, T>> where T : class
 	{
 		public T From( T instance ) => Value.GetOrAdd( instance.GetHashCode(), instance.ToFactory<int, T>().ToDelegate() );
 
-		public EqualityReference() : this( Execution.GetCurrent, new AttachedProperty<ConcurrentDictionary<int, T>>( ActivatedAttachedPropertyStore<ConcurrentDictionary<int, T>>.Instance ), Coercer<ConcurrentDictionary<int, T>>.Instance ) {}
+		public EqualityReference() : base( new AttachedProperty<ConcurrentDictionary<int, T>>( ActivatedAttachedPropertyStore<ConcurrentDictionary<int, T>>.Instance ) ) {}
 
-		public EqualityReference( Func<object> instance, IAttachedProperty<object, ConcurrentDictionary<int, T>> property, ICoercer<ConcurrentDictionary<int, T>> coercer ) : base( instance, property, coercer ) {}
+		// public EqualityReference( Func<object> instance, IAttachedProperty<object, ConcurrentDictionary<int, T>> property, ICoercer<ConcurrentDictionary<int, T>> coercer ) : base( instance, property, coercer ) {}
 	}
 
 	public class Condition : Condition<object>

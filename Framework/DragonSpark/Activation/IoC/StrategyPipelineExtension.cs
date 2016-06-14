@@ -83,7 +83,10 @@ namespace DragonSpark.Activation.IoC
 
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
-			readonly static AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>> Property = new AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>>( ActivatedAttachedPropertyStore<object, ConditionalWeakTable<Type, IBuildPlanPolicy>>.Instance );
+			readonly static AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>> Policies = new AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>>( ActivatedAttachedPropertyStore<object, ConditionalWeakTable<Type, IBuildPlanPolicy>>.Instance );
+
+			readonly IAttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>.CreateValueCallback, PropertyContext> contexts = new AttachedProperty<ConditionalWeakTable<Type, IBuildPlanPolicy>.CreateValueCallback, PropertyContext>();
+
 			readonly IBuildPlanCreatorPolicy inner;
 			readonly object creator;
 
@@ -93,23 +96,30 @@ namespace DragonSpark.Activation.IoC
 				this.creator = creator;
 			}
 
-			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
-				Property.Get( creator ).GetValue( context.BuildKey.Type, key => inner.CreatePlan( context, buildKey ) );
-
-			struct Context
+			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
 			{
-				readonly IBuildPlanCreatorPolicy inner;
-				readonly IBuilderContext context;
-				readonly NamedTypeBuildKey buildKey;
+				var callback = contexts.Apply( Create, new PropertyContext( context, buildKey ) );
+				var result = Policies.Get( creator ).GetValue( context.BuildKey.Type, callback );
+				return result;
+			}
 
-				public Context( IBuildPlanCreatorPolicy inner, IBuilderContext context, NamedTypeBuildKey buildKey )
+			IBuildPlanPolicy Create( Type key )
+			{
+				var context = contexts.Context();
+				var result = inner.CreatePlan( context.Context, context.BuildKey );
+				return result;
+			}
+
+			struct PropertyContext
+			{
+				public PropertyContext( IBuilderContext context, NamedTypeBuildKey buildKey )
 				{
-					this.inner = inner;
-					this.context = context;
-					this.buildKey = buildKey;
+					Context = context;
+					BuildKey = buildKey;
 				}
 
-				public IBuildPlanPolicy Create( object instance ) => inner.CreatePlan( context, buildKey );
+				public IBuilderContext Context { get; }
+				public NamedTypeBuildKey BuildKey { get; }
 			}
 		}
 	}

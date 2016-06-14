@@ -30,22 +30,37 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public class HandlerFactory<T> : FactoryBase<MethodBase, CreateProfilerEvent> where T : ITimer
+	public class HandlerFactory<T> : Cache<MethodBase, CreateProfilerEvent> where T : ITimer
 	{
-		readonly IAttachedProperty<CreateProfilerEvent, MethodBase> property = new AttachedProperty<CreateProfilerEvent, MethodBase>();
+		public HandlerFactory( ISessionTimer sessionTimer, T timer ) : base( new Owner( sessionTimer, timer ).Create ) {}
 
-		readonly ISessionTimer sessionTimer;
-		readonly T timer;
-		
-		public HandlerFactory( ISessionTimer sessionTimer, T timer )
+		class Owner
 		{
-			this.sessionTimer = sessionTimer;
-			this.timer = timer;
+			readonly ISessionTimer sessionTimer;
+			readonly T timer;
+		
+			public Owner( ISessionTimer sessionTimer, T timer )
+			{
+				this.sessionTimer = sessionTimer;
+				this.timer = timer;
+			}
+
+			public CreateProfilerEvent Create( MethodBase parameter ) => new Context( this, parameter ).Get;
+
+			class Context
+			{
+				readonly Owner owner;
+				readonly MethodBase parameter;
+				
+				public Context( Owner owner, MethodBase parameter )
+				{
+					this.owner = owner;
+					this.parameter = parameter;
+				}
+
+				public TimerEvent Get( string name ) => new TimerEvent<T>( name, parameter, owner.sessionTimer, owner.timer );
+			}
 		}
-
-		public override CreateProfilerEvent Create( MethodBase parameter ) => property.Apply( Get, parameter );
-
-		TimerEvent Get( string name ) => new TimerEvent<T>( name, property.Context(), sessionTimer, timer );
 	}
 
 	public delegate TimerEvent CreateProfilerEvent( string eventName );
@@ -70,13 +85,15 @@ namespace DragonSpark.Diagnostics
 	{
 		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
 
-		public TimerEventConverter() : base( @event => new TimerEventTemplate( @event ) ) {}
+		TimerEventConverter() : base( @event => new TimerEventTemplate( @event ) ) {}
 	}
 
 	public class TimerEventTemplate : LoggerTemplate
 	{
+		new const string Template = "[{Event:l}] - Wall time {WallTime:ss':'fff}; Synchronous time {SynchronousTime:ss':'fff}";
+
 		public TimerEventTemplate( TimerEvent<Timer> profilerEvent ) 
-			: base(	"[{Event:l}] - Wall time {WallTime:ss':'fff}; Synchronous time {SynchronousTime:ss':'fff}", profilerEvent.EventName, profilerEvent.Timer.Elapsed, profilerEvent.Tracker.Elapsed ) {}
+			: base(	Template, profilerEvent.EventName, profilerEvent.Timer.Elapsed, profilerEvent.Tracker.Elapsed ) {}
 	}
 
 	public interface ILoggerExceptionTemplate : ILoggerTemplate

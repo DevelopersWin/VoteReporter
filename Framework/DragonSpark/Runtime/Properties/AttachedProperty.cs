@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Generic;
-using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -37,14 +36,18 @@ namespace DragonSpark.Runtime.Properties
 
 	public interface IAttachedProperty<TValue> : IAttachedProperty<object, TValue> {}
 
-	public interface IAttachedProperty<TInstance, TValue> : IObservable<AttachedPropertyChangedEvent<TInstance, TValue>> where TInstance : class
+	public interface IInstanceStore<in TInstance, TValue>
 	{
-		bool IsAttached( TInstance instance );
-
 		void Set( TInstance instance, TValue value );
 
 		TValue Get( TInstance instance );
+	}
 
+	public interface IAttachedProperty<in TInstance, TValue> : IInstanceStore<TInstance, TValue> 
+/*: IObservable<AttachedPropertyChangedEvent<TInstance, TValue>>*/ where TInstance : class
+	{
+		bool IsAttached( TInstance instance );
+		
 		bool Clear( TInstance instance );
 
 		// IObservable<TInstance> Subscription { get; }
@@ -192,13 +195,47 @@ namespace DragonSpark.Runtime.Properties
 		public abstract TValue Get( TInstance instance );
 		public abstract bool Clear( TInstance instance );
 
-		public abstract IDisposable Subscribe( IObserver<AttachedPropertyChangedEvent<TInstance, TValue>> observer );
+		// public abstract IDisposable Subscribe( IObserver<AttachedPropertyChangedEvent<TInstance, TValue>> observer );
+	}
+
+	public class Cache<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue> where TInstance : class where TValue : class
+	{
+		// readonly ISubject<AttachedPropertyChangedEvent<TInstance, TValue>> subject = new ReplaySubject<AttachedPropertyChangedEvent<TInstance, TValue>>();
+
+		readonly ConditionalWeakTable<TInstance, TValue> items = new ConditionalWeakTable<TInstance, TValue>();
+
+		public Cache() : this( new Func<TInstance, TValue>( instance => default(TValue) ) ) {}
+
+		public Cache( Func<TInstance, TValue> create ) : this( new ConditionalWeakTable<TInstance, TValue>.CreateValueCallback( create ) ) {}
+
+		Cache( ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create )
+		{
+			this.Create = create;
+		}
+
+		protected ConditionalWeakTable<TInstance, TValue>.CreateValueCallback Create { get; set; }
+
+		public override bool IsAttached( TInstance instance )
+		{
+			TValue temp;
+			return items.TryGetValue( instance, out temp );
+		}
+
+		public override void Set( TInstance instance, [Optional]TValue value )
+		{
+			items.Remove( instance );
+			items.Add( instance, value );
+		}
+
+		public override TValue Get( TInstance instance ) => items.GetValue( instance, Create );
+
+		public override bool Clear( TInstance instance ) => items.Remove( instance );
 	}
 
 	// [Synchronized]
 	public class AttachedProperty<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue> where TInstance : class
 	{
-		readonly ISubject<AttachedPropertyChangedEvent<TInstance, TValue>> subject = new ReplaySubject<AttachedPropertyChangedEvent<TInstance, TValue>>();
+		// readonly ISubject<AttachedPropertyChangedEvent<TInstance, TValue>> subject = new ReplaySubject<AttachedPropertyChangedEvent<TInstance, TValue>>();
 
 		readonly ConditionalWeakTable<TInstance, IWritableStore<TValue>>.CreateValueCallback create;
 		
@@ -226,7 +263,7 @@ namespace DragonSpark.Runtime.Properties
 		public override void Set( TInstance instance, [Optional]TValue value )
 		{
 			items.GetValue( instance, create ).Assign( value );
-			subject.OnNext( new AttachedPropertyChangedEvent<TInstance, TValue>( this, instance, value, AttachedPropertyChangedEventType.Set ) );
+			// subject.OnNext( new AttachedPropertyChangedEvent<TInstance, TValue>( this, instance, value, AttachedPropertyChangedEventType.Set ) );
 		}
 
 		// [ThreadCache]
@@ -235,14 +272,14 @@ namespace DragonSpark.Runtime.Properties
 		public override bool Clear( TInstance instance )
 		{
 			var result = items.Remove( instance );
-			if ( result )
+			/*if ( result )
 			{
 				subject.OnNext( new AttachedPropertyChangedEvent<TInstance, TValue>( this, instance ) );
-			}
+			}*/
 			return result;
 		}
 
-		public override IDisposable Subscribe( IObserver<AttachedPropertyChangedEvent<TInstance, TValue>> observer ) => subject.Subscribe( observer );
+		// public override IDisposable Subscribe( IObserver<AttachedPropertyChangedEvent<TInstance, TValue>> observer ) => subject.Subscribe( observer );
 
 		//protected virtual bool Remove( TInstance instance, IWritableStore<TValue> store ) => ;
 

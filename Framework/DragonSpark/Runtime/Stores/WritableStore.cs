@@ -44,7 +44,7 @@ namespace DragonSpark.Runtime.Stores
 		public override bool IsSatisfiedBy( TInstance parameter ) => Property.IsAttached( parameter );
 	}
 
-	public class DelegatedWritableStore<T> : WritableStore<T>
+	/*public class DelegatedWritableStore<T> : WritableStore<T>
 	{
 		readonly Func<T> get;
 		readonly Action<T> set;
@@ -58,6 +58,18 @@ namespace DragonSpark.Runtime.Stores
 		protected override T Get() => get();
 
 		public override void Assign( T item ) => set( item );
+	}*/
+
+	public class DelegatedStore<T> : StoreBase<T>
+	{
+		readonly Func<T> get;
+
+		public DelegatedStore( Func<T> get )
+		{
+			this.get = get;
+		}
+
+		protected override T Get() => get();
 	}
 
 	public abstract class WritableStore<T> : StoreBase<T>, IWritableStore<T>, IDisposable

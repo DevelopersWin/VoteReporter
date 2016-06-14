@@ -37,7 +37,7 @@ namespace DragonSpark.Aspects
 		
 		public ThreadCacheContext() : this( () => new ThreadCache().Configured( false ) ) {}
 
-		public ThreadCacheContext( Func<ThreadCache> create ) : this( create, AmbientStack<ThreadCache>.Instance ) {}
+		public ThreadCacheContext( Func<ThreadCache> create ) : this( create, AmbientStack<ThreadCache>.Default ) {}
 
 		public ThreadCacheContext( Func<ThreadCache> create, AmbientStack<ThreadCache> stack  )
 		{
@@ -70,7 +70,7 @@ namespace DragonSpark.Aspects
 	public class ThreadCacheAttribute : MethodInterceptionAspect//, IInstanceScopedAspect
 	{
 		readonly AmbientStack<ThreadCache> current;
-		public ThreadCacheAttribute() : this( AmbientStack<ThreadCache>.Instance ) {}
+		public ThreadCacheAttribute() : this( AmbientStack<ThreadCache>.Default ) {}
 
 		protected ThreadCacheAttribute( AmbientStack<ThreadCache> current )
 		{
