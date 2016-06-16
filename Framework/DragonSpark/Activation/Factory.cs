@@ -1,12 +1,14 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -15,39 +17,58 @@ namespace DragonSpark.Activation
 {
 	public class IsFactorySpecification : AdapterSpecificationBase
 	{
-		public static IsFactorySpecification Instance { get; } = new IsFactorySpecification( typeof(IFactory), typeof(IFactoryWithParameter) );
+		public static IsFactorySpecification Instance { get; } = new IsFactorySpecification( ImmutableArray.Create( typeof(IFactory), typeof(IFactoryWithParameter) ) );
 
-		public IsFactorySpecification( params Type[] types ) : base( types ) {}
+		public IsFactorySpecification( ImmutableArray<Type> types ) : base( types ) {}
 
 		[Freeze]
-		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Any( adapter => adapter.IsAssignableFrom( parameter ) );
+		public override bool IsSatisfiedBy( Type parameter )
+		{
+			foreach ( var adapter in Adapters )
+			{
+				if ( adapter.IsAssignableFrom( parameter ) )
+				{
+					return true;
+				}
+			}
+			return false;
+			//return Adapters.Any( adapter => adapter.IsAssignableFrom( parameter ) );
+		}
 	}
 
 	public class IsGenericFactorySpecification : AdapterSpecificationBase
 	{
-		public static IsGenericFactorySpecification Instance { get; } = new IsGenericFactorySpecification( typeof(IFactory<>), typeof(IFactory<,>) );
+		public static IsGenericFactorySpecification Instance { get; } = new IsGenericFactorySpecification( ImmutableArray.Create( typeof(IFactory<>), typeof(IFactory<,>) ) );
 
-		public IsGenericFactorySpecification( params Type[] types ) : base( types ) {}
+		public IsGenericFactorySpecification( ImmutableArray<Type> types ) : base( types ) {}
 
 		[Freeze]
 		public override bool IsSatisfiedBy( Type parameter )
 		{
 			var typeAdapter = parameter.Adapt();
-			var result = Adapters.Any( adapter => typeAdapter.IsGenericOf( adapter.Type ) );
-			return result;
+			foreach ( var adapter in Adapters )
+			{
+				if ( typeAdapter.IsGenericOf( adapter.Type ) )
+				{
+					return true;
+				}
+			}
+			return false;
+			/*var result = Adapters.Any( adapter => typeAdapter.IsGenericOf( adapter.Type ) );
+			return result;*/
 		}
 	}
 
 	public abstract class AdapterSpecificationBase : SpecificationBase<Type>
 	{
-		protected AdapterSpecificationBase( params Type[] types ) : this( EnumerableExtensions.Fixed( types.Select( type => type.Adapt() ) ) ) {}
+		protected AdapterSpecificationBase( ImmutableArray<Type> types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
-		protected AdapterSpecificationBase( params TypeAdapter[] adapters )
+		protected AdapterSpecificationBase( ImmutableArray<TypeAdapter> adapters )
 		{
 			Adapters = adapters;
 		}
 
-		protected TypeAdapter[] Adapters { get; }
+		protected ImmutableArray<TypeAdapter> Adapters { get; }
 	}
 
 	// [AutoValidation( false )]
@@ -59,44 +80,64 @@ namespace DragonSpark.Activation
 		public override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().With( types => types.FirstOrDefault( IsGenericFactorySpecification.Instance.IsSatisfiedBy ) ?? types.FirstOrDefault( IsFactorySpecification.Instance.IsSatisfiedBy ) );
 	}
 
-	public class ParameterTypeLocator : TypeLocatorBase
+	public class ParameterTypeLocator : TypeLocatorCacheBase
 	{
-		public static ParameterTypeLocator Instance { get; } = new ParameterTypeLocator( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) );
+		public static ICache<Type, Type> Instance { get; } = new ParameterTypeLocator( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) ).Cached();
 
-		public ParameterTypeLocator( params Type[] types ) : base( types ) {}
+		public ParameterTypeLocator( ImmutableArray<Type> types ) : base( types ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.First();
 	}
 
-	public class ResultTypeLocator : TypeLocatorBase
+	public class ResultTypeLocator : TypeLocatorCacheBase
 	{
-		public static ResultTypeLocator Instance { get; } = new ResultTypeLocator( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) );
+		public static ICache<Type, Type> Instance { get; } = new ResultTypeLocator( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) ).Cached();
 
-		public ResultTypeLocator( params Type[] types ) : base( types ) {}
+		public ResultTypeLocator( ImmutableArray<Type> types ) : base( types ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
 
-	public abstract class TypeLocatorBase : FactoryBase<Type, Type>
+	public abstract class TypeLocatorCacheBase : FactoryBase<Type, Type>
 	{
-		readonly TypeAdapter[] adapters;
+		readonly ImmutableArray<TypeAdapter> adapters;
+		readonly Func<TypeInfo, bool> isAssignable;
+		readonly Func<Type[], Type> selector;
 
-		protected TypeLocatorBase( params Type[] types ) : this( EnumerableExtensions.Fixed( types.Select( type => type.Adapt() ) ) ) {}
+		protected TypeLocatorCacheBase( ImmutableArray<Type> types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
-		TypeLocatorBase( params TypeAdapter[] adapters )
+		TypeLocatorCacheBase( ImmutableArray<TypeAdapter> adapters )
 		{
 			this.adapters = adapters;
+			isAssignable = IsAssignable;
+			selector = Select;
 		}
 
-		[Freeze]
 		public override Type Create( Type parameter )
 		{
 			var result = parameter.Append( parameter.Adapt().GetAllInterfaces() )
 				.AsTypeInfos()
-				.Where( type => type.IsGenericType && type.GetGenericTypeDefinition().With( definition => adapters.Any( adapter => adapter.IsAssignableFrom( definition ) ) ) )
-				.Select( type => Select( type.GenericTypeArguments ) )
+				.Where( isAssignable )
+				.Select( info => info.GenericTypeArguments )
+				.Select( selector )
 				.FirstOrDefault();
 			return result;
+		}
+
+		bool IsAssignable( TypeInfo type )
+		{
+			if ( type.IsGenericType )
+			{
+				var typeDefinition = type.GetGenericTypeDefinition();
+				foreach ( var adapter in adapters )
+				{
+					if ( adapter.IsAssignableFrom( typeDefinition ) )
+					{
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		protected abstract Type Select( IEnumerable<Type> genericTypeArguments );

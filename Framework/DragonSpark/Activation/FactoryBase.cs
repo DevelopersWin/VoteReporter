@@ -118,13 +118,22 @@ namespace DragonSpark.Activation
 
 	public class DecoratedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
-		readonly IFactoryWithParameter inner;
-		public DecoratedFactory( IFactoryWithParameter inner )
+		readonly IFactory<TParameter, TResult> inner;
+
+		public DecoratedFactory( IFactoryWithParameter inner ) : this( inner.Cast<TParameter, TResult>() ) {}
+
+		public DecoratedFactory( IFactory<TParameter, TResult> inner ) : this( inner, Coercer<TParameter>.Instance ) {}
+
+		public DecoratedFactory( IFactory<TParameter, TResult> inner, ICoercer<TParameter> coercer  ) : this( inner, coercer, new DelegatedSpecification<TParameter>( inner.CanCreate ) ) {}
+
+		public DecoratedFactory( IFactory<TParameter, TResult> inner, ISpecification<TParameter> specification  ) : this( inner, Coercer<TParameter>.Instance, specification ) {}
+
+		public DecoratedFactory( IFactory<TParameter, TResult> inner, ICoercer<TParameter> coercer, ISpecification<TParameter> specification  ) : base( coercer, specification )
 		{
 			this.inner = inner;
 		}
 
-		public override TResult Create( TParameter parameter ) => inner.CreateUsing<TResult>( parameter );
+		public override TResult Create( TParameter parameter ) => inner.Create( parameter );
 	}
 
 	[ValidatedGenericFactory, ValidatedGenericFactory.Supplemental]
@@ -156,8 +165,7 @@ namespace DragonSpark.Activation
 		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
 		public abstract TResult Create( [Required]TParameter parameter );
-
-		// bool IValidationAware.ShouldValidate() => specification != Specifications.Always && specification != Specifications<TParameter>.Always;
+	
 	}
 
 	public abstract class BasicFactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
@@ -227,23 +235,23 @@ namespace DragonSpark.Activation
 	}
 
 	// [AutoValidation( false )]
-	public class FirstConstructedFromParameterFactory<TParameter, TResult> : FactoryBase<object, IFactory<TParameter, TResult>>
+	public class FirstConstructedFromParameterFactory<TParameter, TResult> : BasicFactoryBase<object, IFactory<TParameter, TResult>>
 	{
 		readonly IFactory<object, IFactoryWithParameter>[] factories;
 		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ).Fixed() ) {}
-		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  ) : base( Specifications.Always )
+		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  )
 		{
 			this.factories = factories;
 		}
 
 		public override IFactory<TParameter, TResult> Create( object parameter )
 		{
-			var boxedFactories = factories
+			var items = factories
 				.Select( factory => factory.Create( parameter ) )
 				.NotNull()
 				.Select( inner => new DecoratedFactory<TParameter, TResult>( inner ) )
 				.ToArray();
-			var result = new FirstFromParameterFactory<TParameter, TResult>( boxedFactories );
+			var result = new FirstFromParameterFactory<TParameter, TResult>( items );
 			return result;
 		}
 	}

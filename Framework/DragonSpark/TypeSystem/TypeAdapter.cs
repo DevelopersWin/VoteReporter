@@ -152,7 +152,7 @@ namespace DragonSpark.TypeSystem
 			if ( implementation != null )
 			{
 				var map = Info.GetRuntimeInterfaceMap( implementation );
-				var result = map.InterfaceMethods.TupleWith( map.TargetMethods ).Fixed();
+				var result = map.InterfaceMethods.Tuple( map.TargetMethods ).Fixed();
 				return result;
 			}
 			return Items<Tuple<MethodInfo, MethodInfo>>.Default;

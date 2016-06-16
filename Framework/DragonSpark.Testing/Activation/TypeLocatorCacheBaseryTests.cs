@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Activation
 {
-	public class FactoryTypeLocatorFactoryTests
+	public class TypeLocatorCacheBaseryTests
 	{
 		[Theory, AutoData]
 		void CachesAsExpected( Constructor.Locator locator )

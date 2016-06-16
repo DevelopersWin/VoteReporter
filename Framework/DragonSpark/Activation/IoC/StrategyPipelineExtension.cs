@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
@@ -63,6 +62,8 @@ namespace DragonSpark.Activation.IoC
 
 	public class CachingBuildPlanExtension : UnityContainerExtension
 	{
+		readonly static ICache<IBuildPlanCreatorPolicy[]> Policies = new Cache<IBuildPlanCreatorPolicy[]>();
+
 		readonly IBuildPlanRepository repository;
 		readonly ISpecification<LocateTypeRequest> specification;
 
@@ -76,51 +77,23 @@ namespace DragonSpark.Activation.IoC
 		{
 			var policies = repository.List();
 			var creator = Container.Get( Creator.Property )?.GetType() ?? Execution.GetCurrent();
-			var creators = new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ), creator );
-			var policy = new BuildPlanCreatorPolicy( TryContextProperty.Verbose.Get( Container ).Invoke, specification, policies, creators.ToItem() );
+			var creators = Policies.GetOrSet( creator, Create );
+			var policy = new BuildPlanCreatorPolicy( TryContextProperty.Verbose.Get( Container ).Invoke, specification, policies, creators );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
 		}
 
+		IBuildPlanCreatorPolicy[] Create( object instance ) => new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) ).ToItem();
+
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
-			readonly static ICache<ConditionalWeakTable<Type, IBuildPlanPolicy>> Policies = new ActivatedCache<ConditionalWeakTable<Type, IBuildPlanPolicy>>();
-
-			readonly ICache<ConditionalWeakTable<Type, IBuildPlanPolicy>.CreateValueCallback, PropertyContext> contexts = new StoreCache<ConditionalWeakTable<Type, IBuildPlanPolicy>.CreateValueCallback, PropertyContext>();
-
 			readonly IBuildPlanCreatorPolicy inner;
-			readonly object creator;
 
-			public CachedCreatorPolicy( [Required] IBuildPlanCreatorPolicy inner, object creator )
+			public CachedCreatorPolicy( IBuildPlanCreatorPolicy inner )
 			{
 				this.inner = inner;
-				this.creator = creator;
 			}
 
-			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
-			{
-				var callback = contexts.Apply( Create, new PropertyContext( context, buildKey ) );
-				var result = Policies.Get( creator ).GetValue( context.BuildKey.Type, callback );
-				return result;
-			}
-
-			IBuildPlanPolicy Create( Type key )
-			{
-				var context = contexts.Context();
-				var result = inner.CreatePlan( context.Context, context.BuildKey );
-				return result;
-			}
-
-			struct PropertyContext
-			{
-				public PropertyContext( IBuilderContext context, NamedTypeBuildKey buildKey )
-				{
-					Context = context;
-					BuildKey = buildKey;
-				}
-
-				public IBuilderContext Context { get; }
-				public NamedTypeBuildKey BuildKey { get; }
-			}
+			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => inner.CreatePlan( context, buildKey );
 		}
 	}
 
@@ -159,8 +132,10 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Clear();
 
-			var strategyEntries = strategyRepository.List().Cast<StrategyEntry>();
-			strategyEntries.Each( entry => Context.Strategies.Add( entry.Value, entry.Stage ) );
+			foreach ( var entry in strategyRepository.List().Cast<StrategyEntry>() )
+			{
+				Context.Strategies.Add( entry.Value, entry.Stage );
+			}
 		}
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
@@ -184,16 +159,16 @@ namespace DragonSpark.Activation.IoC
 				if ( reference.Get( condition ).Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
-					lifetimePolicy.Null( () =>
+					if ( lifetimePolicy == null )
 					{
-						var lifetimeManager = factory.Create( reference.Type );
-						lifetimeManager.With( manager =>
+						var manager = factory.Create( reference.Type );
+						if ( manager != null )
 						{
-							logger.Debug( $"'{GetType().Name}' is assigning a lifetime manager of '{manager.GetType()}' for type '{reference.Type}'." );
+							logger.Debug( "'{TypeName}' is assigning a lifetime manager of '{LifetimeManager}' for type '{Reference}'.", GetType().Name, manager.GetType(), reference.Type );
 
 							context.PersistentPolicies.Set<ILifetimePolicy>( manager, reference );
-						} );
-					} );
+						}
+					}
 				}
 			}
 		}
@@ -250,7 +225,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly string type;
 
-		public IsConventionCandidateSpecification( Type type ) : this( type, ConventionCandidateNameFactory.Instance.Create ) {}
+		public IsConventionCandidateSpecification( Type type ) : this( type, ConventionCandidateNameFactory.Instance.ToDelegate() ) {}
 		public IsConventionCandidateSpecification( Type type, Func<Type, string> sanitizer ) : this( sanitizer( type ) ) {}
 		IsConventionCandidateSpecification( string type )
 		{
@@ -336,11 +311,15 @@ namespace DragonSpark.Activation.IoC
 		[Freeze]
 		public override Type Create( Type parameter )
 		{
-			var result =
-				parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore ).ToArray().With( interfaces => 
-					interfaces.FirstOrDefault( i => parameter.Name.Contains( i.Name.TrimStartOf( 'I' ) ) )
-				);
-			return result;
+			var types = parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore ).ToArray();
+			foreach ( var type in types )
+			{
+				if ( parameter.Name.Contains( type.Name.TrimStartOf( 'I' ) ) )
+				{
+					return type;
+				}
+			}
+			return null;
 		}
 	}
 
@@ -370,7 +349,25 @@ namespace DragonSpark.Activation.IoC
 			this.exempt = exempt;
 		}
 
-		public override bool IsSatisfiedBy( Type parameter ) => parameter != typeof(object) && exempt.All( adapter => !adapter.IsAssignableFrom( parameter ) );
+		// readonly ICache<Type, >
+
+		public override bool IsSatisfiedBy( Type parameter )
+		{
+			// return parameter != typeof(object) && exempt.All( adapter => !adapter.IsAssignableFrom( parameter ) );
+
+			if ( parameter != typeof(object) )
+			{
+				foreach ( var adapter in exempt )
+				{
+					if ( adapter.IsAssignableFrom( parameter ) )
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			return false;
+		}
 	}
 
 	/*public class ValidConstructorSpecification : GuardedSpecificationBase<IBuilderContext>
@@ -401,15 +398,14 @@ namespace DragonSpark.Activation.IoC
 		readonly ConventionCandidateLocator locator;
 		readonly IServiceRegistry registry;
 
-		public class ConventionCandidateLocator : DelegatedFactory<IBuilderContext, Type>
+		public class ConventionCandidateLocator : Cache<Type, Type>
 		{
-			static ISpecification<IBuilderContext> Specification { get; } = InstantiableTypeSpecification.Instance.And(
-				CanInstantiateSpecification.Instance.Inverse() ).Cast<IBuilderContext>( context => context.BuildKey.Type )/*.And( ValidConstructorSpecification.Instance.Inverse() )*/;
+			static ISpecification<Type> Specification { get; } = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
 
-			public ConventionCandidateLocator( [Required]BuildableTypeFromConventionLocator factory ) : base( Specification, context => factory.Create( context.BuildKey.Type ) ) {}
+			public ConventionCandidateLocator( BuildableTypeFromConventionLocator factory ) : base( new DecoratedFactory<Type, Type>( factory, Specification ).ToDelegate() ) {}
 		}
 
-		public ConventionStrategy( [Required]ConventionCandidateLocator locator, [Required]IServiceRegistry registry )
+		public ConventionStrategy( ConventionCandidateLocator locator, IServiceRegistry registry )
 		{
 			this.locator = locator;
 			this.registry = registry;
@@ -418,16 +414,16 @@ namespace DragonSpark.Activation.IoC
 		public override void PreBuildUp( IBuilderContext context )
 		{
 			var reference = property.From( context.BuildKey );
-			if ( reference.Get( condition ).Apply() )
+			if ( condition.Get( reference ).Apply() )
 			{
-				var convention = locator.Create( context );
-				convention.With( located =>
+				var from = context.BuildKey.Type;
+				var convention = locator.Get( from );
+				if ( convention != null )
 				{
-					var from = context.BuildKey.Type;
-					context.BuildKey = new NamedTypeBuildKey( located, context.BuildKey.Name );
+					context.BuildKey = new NamedTypeBuildKey( convention, context.BuildKey.Name );
 					
 					registry.Register( new MappingRegistrationParameter( from, context.BuildKey.Type, context.BuildKey.Name ) );
-				} );
+				}
 			}
 		}
 	}

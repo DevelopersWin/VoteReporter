@@ -7,20 +7,29 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.Runtime.Properties
 {
-	public static class AttachedPropertyExtensions
+	public static class CacheExtensions
 	{
-		public static TValue Get<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> property ) where TInstance : class => property.Get( @this );
+		public static TValue Get<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> cache ) where TInstance : class => cache.Get( @this );
 
-		public static TInstance Set<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> property, TValue value ) where TInstance : class
+		public static TInstance Set<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> cache, TValue value ) where TInstance : class
 		{
-			property.Set( @this, value );
+			cache.Set( @this, value );
 			return @this;
+		}
+
+		public static TValue GetOrSet<TInstance, TValue>( this ICache<TInstance, TValue> @this, TInstance instance, Func<TInstance, TValue> create )
+		{
+			if ( !@this.Contains( instance ) )
+			{
+				@this.Set( instance, create( instance ) );
+			}
+			return @this.Get( instance );
 		}
 
 		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 first, T2 second ) where T1 : class => 
 			new Assignment<T1, T2>( new PropertyAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
 
-		public static TDelegate Apply<TContext, TDelegate>( this ICache<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class
+		/*public static TDelegate Apply<TContext, TDelegate>( this ICache<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class
 		{
 			@this.Set( source, context );
 			var result = Invocation.Create( source );
@@ -32,7 +41,7 @@ namespace DragonSpark.Runtime.Properties
 			var instance = Invocation.GetCurrent() as TDelegate;
 			var result = instance != null ? @this.Get( instance ) : default(TContext);
 			return result;
-		}
+		}*/
 	}
 
 	/*public enum AttachedPropertyChangedEventType
@@ -42,9 +51,9 @@ namespace DragonSpark.Runtime.Properties
 
 	public struct AttachedPropertyChangedEvent<TInstance, TValue> where TInstance : class
 	{
-		public AttachedPropertyChangedEvent( IAttachedProperty<TInstance, TValue> property, TInstance instance, TValue value = default(TValue), AttachedPropertyChangedEventType type = AttachedPropertyChangedEventType.Clear )
+		public AttachedPropertyChangedEvent( IAttachedProperty<TInstance, TValue> cache, TInstance instance, TValue value = default(TValue), AttachedPropertyChangedEventType type = AttachedPropertyChangedEventType.Clear )
 		{
-			Property = property;
+			Property = cache;
 			Instance = instance;
 			Value = value;
 			Type = type;
@@ -134,12 +143,12 @@ namespace DragonSpark.Runtime.Properties
 		public CollectionCache( Func<object, ICollection<object>> create ) : base( create ) {}
 	}
 
-	public class CollectionCache<TItem> : CollectionCache<object, TItem>, ICache<ICollection<TItem>>
+	public class CollectionCache<T> : CollectionCache<object, T>, ICache<ICollection<T>>
 	{
 		public new static CollectionCache Default { get; } = new CollectionCache();
 
 		public CollectionCache() {}
-		public CollectionCache( Func<object, ICollection<TItem>> create ) : base( create ) {}
+		public CollectionCache( Func<object, ICollection<T>> create ) : base( create ) {}
 	}
 	
 	public class CollectionCache<TInstance, TItem> : Cache<TInstance, ICollection<TItem>> where TInstance : class
@@ -209,7 +218,32 @@ namespace DragonSpark.Runtime.Properties
 		public override bool Remove( TInstance instance ) => items.Remove( instance );
 	}
 
-	public abstract class CacheBase<TInstance, TValue> : ICache<TInstance, TValue> where TInstance : class
+	/*public interface ICompoundCache<T1, T2, TValue> : ICache<ValueTuple<T1, T2>, TValue> {}
+
+	public class CompoundCache<T1, T2, TValue> : CacheBase<ValueTuple<T1, T2>, TValue>, ICompoundCache<T1, T2, TValue> where T2 : class where T1 : class where TValue : class
+	{
+		readonly static ICache<T1, Cache<T2, TValue>> Default = new ActivatedCache<T1, Cache<T2, TValue>>();
+		
+		readonly ICache<T1, ICache<T2, TValue>> inner;
+
+		public CompoundCache() : this( Default.Get ) {}
+		public CompoundCache( Func<T1, ICache<T2, TValue>> factory ) : this( new Cache<T1, ICache<T2, TValue>>( factory ) ) {}
+
+		public CompoundCache( ICache<T1, ICache<T2, TValue>> inner )
+		{
+			this.inner = inner;
+		}
+
+		public override bool Contains( ValueTuple<T1, T2> instance ) => inner.Get( instance.Item1 ).Contains( instance.Item2 );
+
+		public override bool Remove( ValueTuple<T1, T2> instance ) => inner.Get( instance.Item1 ).Remove( instance.Item2 );
+
+		public override void Set( ValueTuple<T1, T2> instance, TValue value ) => inner.Get( instance.Item1 ).Set( instance.Item2, value );
+
+		public override TValue Get( ValueTuple<T1, T2> instance ) => inner.Get( instance.Item1 ).Get( instance.Item2 );
+	}*/
+
+	public abstract class CacheBase<TInstance, TValue> : ICache<TInstance, TValue>
 	{
 		public abstract bool Contains( TInstance instance );
 		public abstract void Set( TInstance instance, TValue value );

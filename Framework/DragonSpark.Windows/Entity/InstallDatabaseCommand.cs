@@ -13,7 +13,7 @@ namespace DragonSpark.Windows.Entity
 
 		public override void Execute( object parameter ) => Database.Exists.IsFalse( () =>
 		{
-			var items = EntityFiles.WithLog( Database ).TupleWith( new[] { Resources.Blank, Resources.Blank_log } );
+			var items = EntityFiles.WithLog( Database ).Tuple( new[] { Resources.Blank, Resources.Blank_log } );
 			items.Each( tuple => 
 			{
 				using ( var stream = File.Create( tuple.Item1.FullName ) )

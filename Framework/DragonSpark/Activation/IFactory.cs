@@ -1,5 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -56,6 +57,8 @@ namespace DragonSpark.Activation
 
 		public static Func<T> Convert<T>( this Func<object> @this ) => Converter<object, T>.Delegate.Default.Get( @this );
 
+		public static IFactory<TParameter, TResult> Cast<TParameter, TResult>( this IFactoryWithParameter @this ) => @this as IFactory<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
+
 		public static Func<TParameter, TResult> Convert<TParameter, TResult>( this Func<object, object> @this ) => Converter<object, object, TParameter, TResult>.Delegate.Default.Get( @this );
 
 		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => FixedFactory<T>.Delegate.Default.Get( @this );
@@ -74,6 +77,15 @@ namespace DragonSpark.Activation
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.NotNull ).Fixed();
 
+		public static ICache<TParameter, TResult> Cached<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) where TParameter : class where TResult : class => FactoryCache<TParameter, TResult>.Default.Get( @this );
+
+		class FactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ICache<TParameter, TResult>> where TParameter : class where TResult : class
+		{
+			public static FactoryCache<TParameter, TResult> Default { get; } = new FactoryCache<TParameter, TResult>();
+
+			public FactoryCache() : base( factory => new Cache<TParameter, TResult>( factory.ToDelegate() ) ) {}
+		}
+
 		class Instance<T> : Cache<T, IFactory<T>> where T : class
 		{
 			public static Instance<T> Default { get; } = new Instance<T>();
@@ -91,6 +103,24 @@ namespace DragonSpark.Activation
 			
 				Instance() : base( result => new InstanceFactory<TParameter, TResult>( result ) ) {}
 			}
+		}
+
+		class Casted<TParameter, TResult> : Cache<IFactoryWithParameter, IFactory<TParameter, TResult>>
+		{
+			public static Casted<TParameter, TResult> Default { get; } = new Casted<TParameter, TResult>();
+			
+			Casted() : base( result => new CastedFactory<TParameter, TResult>( result ) ) {}
+		}
+
+		public class CastedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+		{
+			readonly IFactoryWithParameter inner;
+			public CastedFactory( IFactoryWithParameter inner ) : base( new DelegatedSpecification<object>( inner.CanCreate ).Cast<TParameter>() )
+			{
+				this.inner = inner;
+			}
+
+			public override TResult Create( TParameter parameter ) => (TResult)inner.Create( parameter );
 		}
 
 		class Converter<TFrom, TTo> where TTo : TFrom where TFrom : class

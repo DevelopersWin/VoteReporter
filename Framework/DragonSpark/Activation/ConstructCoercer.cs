@@ -74,7 +74,7 @@ namespace DragonSpark.Activation
 
 		readonly Func<object, T> projector;
 
-		ConstructCoercer() : this( ConstructFromParameterFactory<T>.Instance.Create ) {}
+		ConstructCoercer() : this( ConstructFromParameterFactory<T>.Instance.ToDelegate() ) {}
 
 		protected ConstructCoercer( Func<object, T> projector )
 		{
@@ -97,7 +97,7 @@ namespace DragonSpark.Activation
 
 	public abstract class CoercerBase<T> : ICoercer<T>
 	{
-		public T Coerce( object parameter ) => parameter is T ? (T)parameter : parameter.With( PerformCoercion );
+		public T Coerce( object parameter ) => parameter is T ? (T)parameter : parameter != null ? PerformCoercion( parameter ) : default(T);
 
 		protected abstract T PerformCoercion( object parameter );
 	}

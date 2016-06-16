@@ -12,7 +12,7 @@ namespace DragonSpark.Composition
 		public FactoryDelegateExportDescriptorProvider( FactoryTypeLocator locator ) 
 			: base( locator, 
 				FactoryDelegateTransformer.Instance,
-				new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, ActivatorDelegateFactory.Instance.Create )
+				new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, ActivatorDelegateFactory.Instance.ToDelegate() )
 			) {}
 	}
 
@@ -21,7 +21,7 @@ namespace DragonSpark.Composition
 		public FactoryWithParameterDelegateExportDescriptorProvider( FactoryTypeLocator locator ) 
 			: base( locator, 
 				FactoryDelegateTransformer.InstanceWithParameter,
-				new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, ActivatorWithParameterDelegateFactory.Instance.Create )
+				new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, ActivatorWithParameterDelegateFactory.Instance.ToDelegate() )
 			) {}
 	}
 
@@ -33,6 +33,6 @@ namespace DragonSpark.Composition
 
 		public FactoryDelegateTransformer( [OfFactoryType]Type factoryDelegateType ) : base( new GenericTypeAssignableSpecification( factoryDelegateType ).Cast<CompositionContract>( contract => contract.ContractType ) ) {}
 
-		public override CompositionContract Create( CompositionContract parameter ) => ResultTypeLocator.Instance.Create( parameter.ContractType ).With( parameter.ChangeType );
+		public override CompositionContract Create( CompositionContract parameter ) => ResultTypeLocator.Instance.Get( parameter.ContractType ).With( parameter.ChangeType );
 	}
 }

@@ -65,7 +65,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<TItem> Prepend<TItem>( this IEnumerable<TItem> target, params TItem[] items ) => items.Concat( target );
 
-		public static IEnumerable<Tuple<TFirst, TLast>> TupleWith<TFirst, TLast>( this IEnumerable<TFirst> target, IEnumerable<TLast> other ) => target.Select( ( first, i ) => new Tuple<TFirst, TLast>( first, other.ElementAtOrDefault( i ) ) ).ToArray();
+		public static IEnumerable<Tuple<T1, T2>> Tuple<T1, T2>( this IEnumerable<T1> target, IEnumerable<T2> other ) => target.Zip( other, System.Tuple.Create ).ToArray();
 
 		public static U FirstWhere<T, U>( this IEnumerable<T> @this, Func<T, U> where ) => @this.NotNull().Select( @where ).NotNull().FirstOrDefault();
 

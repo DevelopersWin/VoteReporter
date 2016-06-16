@@ -101,7 +101,7 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void TupleWith( Type[] types, string[] strings )
 		{
-			var tuple = types.TupleWith( strings ).ToList();
+			var tuple = types.Tuple( strings ).ToList();
 			Assert.Equal( tuple.Count, types.Length );
 			Assert.Equal( tuple.Count, strings.Length );
 

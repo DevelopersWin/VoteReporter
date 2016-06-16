@@ -90,7 +90,7 @@ namespace DragonSpark.Setup.Registration
 
 		public override Func<object> Create( Type parameter ) => factory( parameter ).With( func => new Func<object>( () =>
 		{
-			var createdParameter = createParameter( ParameterTypeLocator.Instance.Create( parameter ) );
+			var createdParameter = createParameter( ParameterTypeLocator.Instance.Get( parameter ) );
 			var result = func( createdParameter );
 			return result;
 		} ) );
@@ -119,7 +119,7 @@ namespace DragonSpark.Setup.Registration
 		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes )
 		{
 			FactoryType = factoryType;
-			RegisterTypes = registrationTypes.NotNull().Append( ResultTypeLocator.Instance.Create( factoryType ) ).Distinct().ToArray();
+			RegisterTypes = registrationTypes.NotNull().Append( ResultTypeLocator.Instance.Get( factoryType ) ).Distinct().ToArray();
 		}
 		
 		public Type FactoryType { get; }
@@ -179,9 +179,9 @@ namespace DragonSpark.Setup.Registration
 
 	public class RegisterFactoryCommand : RegisterFactoryCommandBase<IFactory>
 	{
-		public RegisterFactoryCommand( IServiceRegistry registry ) : base( registry, SingletonLocator.Instance, FactoryDelegateFactory.Instance.Create ) {}
+		public RegisterFactoryCommand( IServiceRegistry registry ) : base( registry, SingletonLocator.Instance, FactoryDelegateFactory.Instance.ToDelegate() ) {}
 
-		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<>).MakeGenericType( itemType );
+		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<>).MakeGenericType( itemType.ToItem() );
 	}
 
 	public class RegisterFactoryWithParameterCommand : RegisterFactoryCommandBase<IFactoryWithParameter>
@@ -190,6 +190,6 @@ namespace DragonSpark.Setup.Registration
 
 		public RegisterFactoryWithParameterCommand( IServiceRegistry registry, ISingletonLocator locator, [Required]FactoryWithParameterDelegateFactory delegateFactory ) : base( registry, locator, FactoryWithActivatedParameterDelegateFactory.Instance.Create, delegateFactory.Create ) {}
 
-		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<,>).MakeGenericType( ParameterTypeLocator.Instance.Create( parameter ), itemType );
+		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<,>).MakeGenericType( ParameterTypeLocator.Instance.Get( parameter ), itemType );
 	}
 }
