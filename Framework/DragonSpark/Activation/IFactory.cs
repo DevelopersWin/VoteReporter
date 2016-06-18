@@ -35,7 +35,7 @@ namespace DragonSpark.Activation
 
 		public static IFactory<object, T> Wrap<T>( this T @this ) where T : class => @this.Wrap<object, T>();
 
-		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) where TResult : class => InstanceFactory<TParameter, TResult>.Instance.Default.Get( @this );
+		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) where TResult : class => WrappedInstanceCache<TParameter, TResult>.Default.Get( @this );
 
 		public static IFactory<object, T> Wrap<T>( this IFactory<T> @this ) => @this.Wrap<object, T>();
 
@@ -43,123 +43,200 @@ namespace DragonSpark.Activation
 
 		public static IFactory<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
 
-		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => WrappedFactory<TParameter, TResult>.FactoryInstance.Default.Get( @this );
+		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => WrappedDelegateCache<TParameter, TResult>.Default.Get( @this );
 
-		public static IFactory<T> ToFactory<T>( this T @this ) where T : class => Instance<T>.Default.Get( @this );
+		public static IFactory<T> ToFactory<T>( this T @this ) where T : class => FixedFactoryCache<T>.Default.Get( @this );
 
-		public static IFactory<TParameter, TResult> ToFactory<TParameter, TResult>( this TResult @this ) where TResult : class => Instance<TResult>.Default.Get( @this ).Wrap<TParameter, TResult>();
+		public static IFactory<TParameter, TResult> ToFactory<TParameter, TResult>( this TResult @this ) where TResult : class => FixedFactoryCache<TResult>.Default.Get( @this ).Wrap<TParameter, TResult>();
 
 		public static T Self<T>( [Required] this T @this ) => @this;
 
-		public static Delegate Convert( [Required]this Func<object> @this, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().Invoke<Delegate>( nameof(Convert), resultType.ToItem(), @this );
+		public static Delegate Convert( [Required]this Func<object> @this, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().Invoke<Delegate>( nameof(Convert), resultType.ToItem(), @this.ToItem() );
 
 		public static Delegate Convert( [Required]this Func<object, object> @this, [Required]Type parameterType, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().Invoke<Delegate>( nameof(Convert), parameterType.Append( resultType ).ToArray(), @this );
 
-		public static Func<T> Convert<T>( this Func<object> @this ) => Converter<object, T>.Delegate.Default.Get( @this );
+		public static Func<T> Convert<T>( this Func<object> @this ) => @this.Convert<object, T>();
+
+		public static Func<object> Convert<T>( this Func<T> @this ) => DelegateCache<T>.Default.Get( @this );
+
+		public static Func<TTo> Convert<TFrom, TTo>( this Func<TFrom> @this ) where TTo : TFrom => DelegateCache<TFrom, TTo>.Default.Get( @this );
+
+		public static Func<TParameter, TResult> Convert<TParameter, TResult>( this Func<object, object> @this ) => DelegateWithParameterCache<object, object, TParameter, TResult>.Default.Get( @this );
 
 		public static IFactory<TParameter, TResult> Cast<TParameter, TResult>( this IFactoryWithParameter @this ) => @this as IFactory<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
 
-		public static Func<TParameter, TResult> Convert<TParameter, TResult>( this Func<object, object> @this ) => Converter<object, object, TParameter, TResult>.Delegate.Default.Get( @this );
+		public static Func<object> ToDelegate( this IFactory @this ) => FactoryDelegateCache.Default.Get( @this );
 
-		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => FixedFactory<T>.Delegate.Default.Get( @this );
+		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => FactoryDelegateCache<T>.Default.Get( @this );
 
-		public static Func<TParameter, TResult> ToDelegate<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => WrappedFactory<TParameter, TResult>.Delegate.Default.Get( @this );
+		public static Func<object, object> ToDelegate( this IFactoryWithParameter @this ) => FactoryWithParameterDelegateCache.Default.Get( @this );
+
+		public static Func<TParameter, TResult> ToDelegate<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => FactoryDelegateCache<TParameter, TResult>.Default.Get( @this );
 
 		public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
 			parameters
 				.Where( @this.CanCreate )
 				.Select( @this.Create )
-				.Where( @where ?? Where<TResult>.NotNull ).Fixed();
+				.Where( @where ?? Where<TResult>.Assigned ).Fixed();
 		public static TResult[] CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
 			parameters
 				.Where( @this.CanCreate )
 				.Select( @this.Create )
 				.Cast<TResult>()
-				.Where( @where ?? Where<TResult>.NotNull ).Fixed();
+				.Where( @where ?? Where<TResult>.Assigned ).Fixed();
 
 		public static ICache<TParameter, TResult> Cached<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) where TParameter : class where TResult : class => FactoryCache<TParameter, TResult>.Default.Get( @this );
+
+		public static Func<T, bool> Inverse<T>( this Func<T, bool> @this ) => InverseCache<T>.Default.Get( @this );
+
+		class InverseCache<T> : Cache<Func<T, bool>, Func<T, bool>>
+		{
+			public static InverseCache<T> Default { get; } = new InverseCache<T>();
+			InverseCache() : base( factory => new Converter( factory ).ToDelegate() ) {}
+
+			class Converter : BasicFactoryBase<T, bool>
+			{
+				readonly Func<T, bool> @from;
+				public Converter( Func<T, bool> @from )
+				{
+					this.@from = @from;
+				}
+
+				public override bool Create( T parameter ) => !from( parameter );
+			}
+		}
 
 		class FactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ICache<TParameter, TResult>> where TParameter : class where TResult : class
 		{
 			public static FactoryCache<TParameter, TResult> Default { get; } = new FactoryCache<TParameter, TResult>();
 
-			public FactoryCache() : base( factory => new Cache<TParameter, TResult>( factory.ToDelegate() ) ) {}
-		}
-
-		class Instance<T> : Cache<T, IFactory<T>> where T : class
-		{
-			public static Instance<T> Default { get; } = new Instance<T>();
-			
-			Instance() : base( result => new FixedFactory<T>( result ) ) {}
-		}
-
-		public class InstanceFactory<TParameter, TResult> : WrappedFactory<TParameter, TResult> where TResult : class
-		{
-			public InstanceFactory( TResult instance ) : base( instance.ToFactory().ToDelegate() ) {}
-
-			public class Instance : Cache<TResult, IFactory<TParameter, TResult>>
-			{
-				public static Instance Default { get; } = new Instance();
-			
-				Instance() : base( result => new InstanceFactory<TParameter, TResult>( result ) ) {}
-			}
+			FactoryCache() : base( factory => new Cache<TParameter, TResult>( factory.ToDelegate() ) ) {}
 		}
 
 		class Casted<TParameter, TResult> : Cache<IFactoryWithParameter, IFactory<TParameter, TResult>>
 		{
 			public static Casted<TParameter, TResult> Default { get; } = new Casted<TParameter, TResult>();
 			
-			Casted() : base( result => new CastedFactory<TParameter, TResult>( result ) ) {}
-		}
+			Casted() : base( result => new CastedFactory( result ) ) {}
 
-		public class CastedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
-		{
-			readonly IFactoryWithParameter inner;
-			public CastedFactory( IFactoryWithParameter inner ) : base( new DelegatedSpecification<object>( inner.CanCreate ).Cast<TParameter>() )
+			class CastedFactory : FactoryBase<TParameter, TResult>
 			{
-				this.inner = inner;
-			}
+				readonly IFactoryWithParameter inner;
+				public CastedFactory( IFactoryWithParameter inner ) : base( new DelegatedSpecification<object>( inner.CanCreate ).Cast<TParameter>() )
+				{
+					this.inner = inner;
+				}
 
-			public override TResult Create( TParameter parameter ) => (TResult)inner.Create( parameter );
-		}
-
-		class Converter<TFrom, TTo> where TTo : TFrom where TFrom : class
-		{
-			readonly Func<TFrom> from;
-
-			Converter( Func<TFrom> from )
-			{
-				this.from = from;
-			}
-
-			TTo To() => (TTo)from();
-
-			public class Delegate : Cache<Func<TFrom>, Func<TTo>>
-			{
-				public static Delegate Default { get; } = new Delegate();
-
-				Delegate() : base( result => new Converter<TFrom, TTo>( result ).To ) {}
+				public override TResult Create( TParameter parameter ) => (TResult)inner.Create( parameter );
 			}
 		}
 
-		class Converter<TFromParameter, TFromResult, TToParameter, TToResult> where TToResult : TFromResult where TToParameter : TFromParameter
+		class FactoryDelegateCache : Cache<IFactory, Func<object>>
 		{
-			readonly Func<TFromParameter, TFromResult> from;
+			public static FactoryDelegateCache Default { get; } = new FactoryDelegateCache();
 
-			Converter( Func<TFromParameter, TFromResult> from )
+			FactoryDelegateCache() : base( factory => factory.Create ) {}
+		}
+
+		class FactoryWithParameterDelegateCache : Cache<IFactoryWithParameter, Func<object, object>>
+		{
+			public static FactoryWithParameterDelegateCache Default { get; } = new FactoryWithParameterDelegateCache();
+
+			FactoryWithParameterDelegateCache() : base( factory => factory.Create ) {}
+		}
+
+		class FactoryDelegateCache<T> : Cache<IFactory<T>, Func<T>>
+		{
+			public static FactoryDelegateCache<T> Default { get; } = new FactoryDelegateCache<T>();
+
+			FactoryDelegateCache() : base( factory => factory.Create ) {}
+		}
+
+		class FactoryDelegateCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
+		{
+			public static FactoryDelegateCache<TParameter, TResult> Default { get; } = new FactoryDelegateCache<TParameter, TResult>();
+
+			FactoryDelegateCache() : base( factory => factory.Create ) {}
+		}
+
+		class FixedFactoryCache<T> : Cache<T, IFactory<T>> where T : class
+		{
+			public static FixedFactoryCache<T> Default { get; } = new FixedFactoryCache<T>();
+			
+			FixedFactoryCache() : base( result => new FixedFactory<T>( result ) ) {}
+		}
+
+		class WrappedInstanceCache<TParameter, TResult> : Cache<TResult, IFactory<TParameter, TResult>> where TResult : class
+		{
+			public static WrappedInstanceCache<TParameter, TResult> Default { get; } = new WrappedInstanceCache<TParameter, TResult>();
+			
+			WrappedInstanceCache() : base( result => new InstanceFactory( result ) ) {}
+
+			class InstanceFactory : WrappedFactory<TParameter, TResult>
 			{
-				this.from = from;
+				public InstanceFactory( TResult instance ) : base( instance.ToFactory().ToDelegate() ) {}
 			}
+		}
 
-			TToResult To( TToParameter parameter ) => (TToResult)from( parameter );
+		class WrappedDelegateCache<TParameter, TResult> : Cache<Func<TResult>, WrappedFactory<TParameter, TResult>>
+		{
+			public static WrappedDelegateCache<TParameter, TResult> Default { get; } = new WrappedDelegateCache<TParameter, TResult>();
+			
+			WrappedDelegateCache() : base( result => new WrappedFactory<TParameter, TResult>( result ) ) {}
+		}
 
-			public class Delegate : Cache<Func<TFromParameter, TFromResult>, Func<TToParameter, TToResult>>
+		class DelegateCache<T> : Cache<Func<T>, Func<object>>
+		{
+			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
+
+			DelegateCache() : base( result => new Converter( result ).ToDelegate() ) {}
+
+			class Converter : FactoryBase<object>
 			{
-				public static Delegate Default { get; } = new Delegate();
+				readonly Func<T> @from;
+				public Converter( Func<T> from )
+				{
+					this.@from = @from;
+				}
 
-				Delegate() : base( result => new Converter<TFromParameter, TFromResult, TToParameter, TToResult>( result ).To ) {}
+				public override object Create() => from();
 			}
+		}
+		public class DelegateCache<TFrom, TTo> : Cache<Func<TFrom>, Func<TTo>> where TTo : TFrom
+		{
+			public static DelegateCache<TFrom, TTo> Default { get; } = new DelegateCache<TFrom, TTo>();
 
+			DelegateCache() : base( result => new Converter( result ).ToDelegate() ) {}
+
+			class Converter : FactoryBase<TTo>
+			{
+				readonly Func<TFrom> @from;
+				public Converter( Func<TFrom> from )
+				{
+					this.@from = @from;
+				}
+
+				public override TTo Create() => (TTo)from();
+			}
+		}
+
+		public class DelegateWithParameterCache<TFromParameter, TFromResult, TToParameter, TToResult> : Cache<Func<TFromParameter, TFromResult>, Func<TToParameter, TToResult>> where TToResult : TFromResult where TToParameter : TFromParameter
+		{
+			public static DelegateWithParameterCache<TFromParameter, TFromResult, TToParameter, TToResult> Default { get; } = new DelegateWithParameterCache<TFromParameter, TFromResult, TToParameter, TToResult>();
+
+			DelegateWithParameterCache() : base( result => new Converter( result ).To ) {}
+
+			class Converter 
+			{
+				readonly Func<TFromParameter, TFromResult> from;
+
+				public Converter( Func<TFromParameter, TFromResult> from )
+				{
+					this.from = from;
+				}
+
+				public TToResult To( TToParameter parameter ) => (TToResult)from( parameter );
+			}
 		}
 	}
 }

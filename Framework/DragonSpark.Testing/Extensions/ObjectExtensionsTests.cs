@@ -3,7 +3,6 @@ using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Xunit2;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
@@ -118,7 +117,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.True( sut.Disposed );
 		}
 
-		[Fact]
+		/*[Fact]
 		void Null()
 		{
 			Class @class = null;
@@ -126,23 +125,23 @@ namespace DragonSpark.Testing.Extensions
 			var called = false;
 			@class.Null( () => called = true );
 			Assert.True( called );
-		}
+		}*/
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		/*[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void Enumerate( List<object> sut )
 		{
 			var items = sut.GetEnumerator().Enumerate().ToList();
 			Assert.True( items.Any() && items.All( x => sut.Contains( x ) && sut.ToList().IndexOf( x ) == items.IndexOf( x ) ) );
-		}
+		}*/
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		/*[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void GetAllPropertyValuesOf( ClassWithProperties sut )
 		{
 			var expected = new[] { sut.PropertyOne, sut.PropertyFour };
 
 			var values = sut.GetAllPropertyValuesOf<string>();
 			Assert.True( expected.Length == values.Count() && expected.All( x => values.Contains( x ) ) );
-		}
+		}*/
 
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void AsValid( Class sut )

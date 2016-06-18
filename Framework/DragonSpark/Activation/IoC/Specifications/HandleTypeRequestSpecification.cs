@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using EnumerableExtensions = DragonSpark.Extensions.EnumerableExtensions;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {
@@ -19,8 +18,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	class CanResolveSpecification : AnySpecification<TypeRequest>, ICanResolveSpecification
 	{
-		public CanResolveSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) 
-			: base( locate, constructor ) {}
+		public CanResolveSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor ) {}
 
 		[Freeze]
 		public override bool IsSatisfiedBy( TypeRequest parameter ) => base.IsSatisfiedBy( parameter );
@@ -102,12 +100,17 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	public class HasFactorySpecification : CanCreateSpecification<LocateTypeRequest>
 	{
-		public HasFactorySpecification( [Required] FactoryTypeLocator locator ) : base( locator.Create, TypeRequestCoercer<LocateTypeRequest>.Instance ) {}
+		public HasFactorySpecification( [Required] FactoryTypeLocator locator ) : base( locator.ToDelegate(), TypeRequestCoercer<LocateTypeRequest>.Instance ) {}
 	}
 
 	public abstract class StrategyValidator<TStrategy> : GuardedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
 	{
-		public override bool IsSatisfiedBy( StrategyValidatorParameter parameter ) => parameter.Strategies.FirstOrDefaultOfType<TStrategy>().With( strategy => Check( parameter.Key ) );
+		public override bool IsSatisfiedBy( StrategyValidatorParameter parameter )
+		{
+			var type = parameter.Strategies.FirstOrDefaultOfType<TStrategy>();
+			var result = type != null && Check( parameter.Key );
+			return result;
+		}
 
 		protected abstract bool Check( TypeRequest key );
 	}
@@ -176,7 +179,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	{
 		protected TypeRequestSpecificationBase() : base( TypeRequestCoercer<T>.Instance ) {}
 
-		public sealed override bool IsSatisfiedBy( TypeRequest parameter ) => parameter.AsTo<T, bool>( IsSatisfiedBy );
+		public sealed override bool IsSatisfiedBy( TypeRequest parameter ) => parameter is T && IsSatisfiedBy( (T)parameter );
 
 		public abstract bool IsSatisfiedBy( T parameter );
 	}
@@ -185,7 +188,12 @@ namespace DragonSpark.Activation.IoC.Specifications
 	{
 		public static TypeRequestCoercer<T> Instance { get; } = new TypeRequestCoercer<T>();
 
-		protected override T PerformCoercion( object parameter ) => parameter.AsTo<TypeRequest, T>( request => ConstructCoercer<T>.Instance.Coerce( request.RequestedType ) );
+		protected override T PerformCoercion( object parameter )
+		{
+			var request = parameter as TypeRequest;
+			var result = request != null ? ConstructCoercer<T>.Instance.Coerce( request.RequestedType ) : default(T);
+			return result;
+		}
 	}
 
 	/*public class HasLocatableConstructorSpecification : TypeRequestSpecificationBase<ConstructTypeRequest>
@@ -207,23 +215,53 @@ namespace DragonSpark.Activation.IoC.Specifications
 	{
 		readonly CanLocateSpecification locate;
 		readonly ISpecification<ConstructTypeRequest> create;
+		readonly Func<ConstructTypeRequest, bool> predicate;
 
 		public ConstructorQueryProvider( CanLocateSpecification locate )
 		{
 			this.locate = locate;
-			create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( Create );
+			create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( this.ToDelegate() );
+			predicate = Check;
 		}
 
 		[Freeze]
 		public override IEnumerable<ConstructorInfo> Create( ConstructTypeRequest parameter )
 		{
-			var result = EnumerableExtensions.Fixed( new ReflectionHelper( parameter.RequestedType )
-							.InstanceConstructors
-							.Select( constructor => new { constructor, parameters = constructor.GetParameters() } )
-							.OrderByDescending( item => item.parameters.Length )
-							.Where( item => item.parameters.Select( info => new ConstructTypeRequest( info.ParameterType, parameter.Arguments ) ).All( Check ) )
-							.Select( item => item.constructor ) );
+			var result = new ReflectionHelper( parameter.RequestedType )
+				.InstanceConstructors
+				.Introduce( new ContextFactory( parameter.Arguments ), tuple => tuple.Item2.Create( tuple.Item1 ) )
+				.OrderByDescending( item => item.Parameters.Length )
+				.Introduce( predicate, context => context.Item1.Parameters.All( context.Item2 ) )
+				.Select( item => item.Constructor ).Fixed();
 			return result;
+		}
+
+		struct ContextFactory
+		{
+			readonly object[] arguments;
+			public ContextFactory( object[] arguments )
+			{
+				this.arguments = arguments;
+			}
+
+			public Context Create( ConstructorInfo constructor )
+			{
+				var parameters = constructor.GetParameters().Introduce( arguments, tuple => new ConstructTypeRequest( tuple.Item1.ParameterType, tuple.Item2 ) ).ToArray();
+				var result = new Context( constructor, parameters );
+				return result;
+			}
+		}
+
+		struct Context
+		{
+			public Context( ConstructorInfo constructor, ConstructTypeRequest[] parameters )
+			{
+				Constructor = constructor;
+				Parameters = parameters;
+			}
+
+			public ConstructorInfo Constructor { get; }
+			public ConstructTypeRequest[] Parameters { get; }
 		}
 
 		bool Check( ConstructTypeRequest parameter )
@@ -250,7 +288,8 @@ namespace DragonSpark.Activation.IoC.Specifications
 		public override bool IsSatisfiedBy( ConstructTypeRequest parameter )
 		{
 			var key = new NamedTypeBuildKey( parameter.RequestedType );
-			var mapped = context.Policies.Get<IBuildKeyMappingPolicy>( key ).With( policy => policy.Map( key, null ).With( buildKey => new ConstructTypeRequest( buildKey.Type, parameter.Arguments ) ) ) ?? parameter;
+			var buildKey = context.Policies.Get<IBuildKeyMappingPolicy>( key )?.Map( key, null );
+			var mapped = buildKey != null ? new ConstructTypeRequest( buildKey.Type, parameter.Arguments ) : parameter;
 			var result = query.Create( mapped ).Any();
 			return result;
 		}

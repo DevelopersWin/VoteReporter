@@ -27,9 +27,9 @@ namespace DragonSpark.Setup
 			return result;
 		}*/
 
-		/*public static T Monitor<T>( this ISetupParameter @this, T task ) where T : Task
+		/*public static T ReferenceMonitor<T>( this ISetupParameter @this, T task ) where T : Task
 		{
-			@this.Monitor( task );
+			@this.ReferenceMonitor( task );
 			return task;
 		}*/
 	}

@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Runtime
 			instance = () =>
 					   {
 						   var current = Invocation.GetCurrent();
-						   Assert.NotNull( current );
+						   Assert.Exists( current );
 						   Assert.Same( instance, current );
 						   called = true;
 					   };
@@ -168,7 +168,7 @@ namespace DragonSpark.Testing.Runtime
 		{
 			public static DelegateRelay Instance { get; } = new DelegateRelay();
 
-			public void Relay( Delegate source, Delegate destination )
+			public void Relay( DelegateWithParameterCache source, DelegateWithParameterCache destination )
 			{
 				var relay = source.Target as Closure;
 				if ( relay != null && relay.Constants.Length == 2 )

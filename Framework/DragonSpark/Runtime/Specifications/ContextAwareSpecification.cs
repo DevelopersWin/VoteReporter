@@ -1,12 +1,17 @@
 namespace DragonSpark.Runtime.Specifications
 {
-	public abstract class SpecificationWithContextBase<TParameter> : GuardedSpecificationBase<TParameter>
+	public abstract class SpecificationWithContextBase<T> : SpecificationWithContextBase<T, T>
 	{
-		protected SpecificationWithContextBase( TParameter context )
+		protected SpecificationWithContextBase( T context ) : base( context ) {}
+	}
+
+	public abstract class SpecificationWithContextBase<TParameter, TContext> : GuardedSpecificationBase<TParameter>
+	{
+		protected SpecificationWithContextBase( TContext context )
 		{
 			Context = context;
 		}
 
-		protected TParameter Context { get; }
+		protected TContext Context { get; }
 	}
 }

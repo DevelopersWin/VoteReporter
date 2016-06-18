@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 			readonly Type[] types;
 
-			public FrameworkSpecimenBuilder() : this( new[] { typeof(Type[]), typeof(Assembly[]) } ) {}
+			FrameworkSpecimenBuilder() : this( new[] { typeof(Type[]), typeof(Assembly[]) } ) {}
 
 			public FrameworkSpecimenBuilder( Type[] types )
 			{

@@ -33,7 +33,7 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly Func<Type, object> source;
 
-		public static DefaultValueFactory<T> Instance { get; } = new DefaultValueFactory<T>( DefaultValueFactory.Instance.Create );
+		public static DefaultValueFactory<T> Instance { get; } = new DefaultValueFactory<T>( DefaultValueFactory.Instance.ToDelegate() );
 
 		DefaultValueFactory( Func<Type, object> source )
 		{
@@ -54,7 +54,7 @@ namespace DragonSpark.TypeSystem
 		public override object Create( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
-			var result = type != null ? typeof(Enumerable).Adapt().Invoke( nameof(Enumerable.Empty), type.ToItem() ) : GetType().Adapt().Invoke( nameof(Default), new [] { parameter } );
+			var result = type != null ? typeof(Enumerable).Adapt().Invoke( nameof(Enumerable.Empty), type.ToItem() ) : GetType().Adapt().Invoke( nameof(Default), parameter.ToItem() );
 			return result;
 		}
 

@@ -2,6 +2,7 @@
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -21,23 +22,36 @@ namespace DragonSpark.Extensions
 		  return null;
 		}
 
-		// public static Type Initialized( this Type @this ) => TypeInitializer.Instance.Create( @this );
-
 		public static Assembly[] Assemblies( [Required] this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToArray();
 
-		public static TypeAdapter Adapt( [Required]this Type @this ) => TypeAdapterProperty.Instance.Get( @this );
+		public static TypeAdapter Adapt( [Required]this Type @this ) => TypeAdapterCache.Default.Get( @this );
 
 		public static TypeAdapter Adapt( this object @this ) => @this.GetType().Adapt();
 
 		public static TypeAdapter Adapt( [Required]this TypeInfo @this ) => Adapt( @this.AsType() );
 
 		public static Assembly Assembly( [Required]this Type @this ) => Adapt( @this ).Assembly;
+
+		public static bool IsAssignableFrom( this ImmutableArray<TypeAdapter> @this, Type type )
+		{
+			foreach ( var adapter in @this )
+			{
+				if ( adapter.IsAssignableFrom( type ) )
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		readonly static ICache<MethodBase, Type[]> Parameters = new Cache<MethodBase, Type[]>( method => method.GetParameters().Select( info => info.ParameterType ).ToArray() );
+		public static Type[] GetParameterTypes( this MethodBase @this ) => Parameters.Get( @this );
 	}
 
-	public class TypeAdapterProperty : Cache<Type, TypeAdapter>
+	public class TypeAdapterCache : Cache<Type, TypeAdapter>
 	{
-		public static TypeAdapterProperty Instance { get; } = new TypeAdapterProperty();
+		public static TypeAdapterCache Default { get; } = new TypeAdapterCache();
 
-		public TypeAdapterProperty() : base( t => new TypeAdapter( t ) ) {}
+		TypeAdapterCache() : base( t => new TypeAdapter( t ) ) {}
 	}
 }

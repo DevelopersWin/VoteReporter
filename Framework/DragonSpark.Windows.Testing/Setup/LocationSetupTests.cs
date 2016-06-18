@@ -276,7 +276,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		void Dispose( [DragonSpark.Testing.Framework.Category, Frozen] ServiceLocator sut )
 		{
 			var item = Services.Get<IInterface>( typeof(Class) );
-			Assert.NotNull( item );
+			Assert.Exists( item );
 
 			var disposable = new Disposable();
 

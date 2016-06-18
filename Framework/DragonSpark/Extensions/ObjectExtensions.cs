@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
+using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Type = System.Type;
@@ -27,13 +25,13 @@ namespace DragonSpark.Extensions
 
 		public static void TryDispose( this object target ) => target.As<IDisposable>( x => x.Dispose() );
 
-		public static void Null<TItem>( this TItem target, Action action ) => target.IsNull().IsTrue( action );
+		// public static void Null<TItem>( this TItem target, Action action ) => target.IsAssigned().IsTrue( action );
 
-		// public static bool IsNull<T>( this T @this ) => Equals( @this, null );
+		// public static bool IsAssigned<T>( this T @this ) => Equals( @this, null );
 
-		public static bool IsNull<T>( this T @this ) => Equals( @this, default(T) );
+		public static bool IsAssigned<T>( this T @this ) => !Equals( @this, default(T) );
 
-		public static IEnumerable<TItem> Enumerate<TItem>( this IEnumerator<TItem> target )
+		/*public static IEnumerable<TItem> Enumerate<TItem>( this IEnumerator<TItem> target )
 		{
 			var result = new List<TItem>();
 			while ( target.MoveNext() )
@@ -41,7 +39,7 @@ namespace DragonSpark.Extensions
 				result.Add( target.Current );
 			}
 			return result;
-		}
+		}*/
 
 		public static TResult Loop<TItem,TResult>( this TItem current, Func<TItem,TItem> resolveParent, Func<TItem, bool> condition, Func<TItem, TResult> extract = null, TResult defaultValue = default(TResult) )
 		{
@@ -58,9 +56,9 @@ namespace DragonSpark.Extensions
 			return defaultValue;
 		}
 
-		public static IEnumerable<TItem> GetAllPropertyValuesOf<TItem>( this object target ) => target.GetAllPropertyValuesOf( typeof( TItem ) ).Cast<TItem>().ToArray();
+		/*public static IEnumerable<TItem> GetAllPropertyValuesOf<TItem>( this object target ) => target.GetAllPropertyValuesOf( typeof( TItem ) ).Cast<TItem>().ToArray();
 
-		public static IEnumerable GetAllPropertyValuesOf( this object target, Type propertyType ) => target.GetType().GetRuntimeProperties().Where( x => !x.GetIndexParameters().Any() && propertyType.GetTypeInfo().IsAssignableFrom( x.PropertyType.GetTypeInfo() ) ).Select( x => x.GetValue( target, null ) ).ToArray();
+		public static IEnumerable GetAllPropertyValuesOf( this object target, Type propertyType ) => target.GetType().GetRuntimeProperties().Where( x => !x.GetIndexParameters().Any() && propertyType.GetTypeInfo().IsAssignableFrom( x.PropertyType.GetTypeInfo() ) ).Select( x => x.GetValue( target, null ) ).ToArray();*/
 
 		/*public static Func<U> Get<T, U>( this T @this, Func<T, U> getter ) => () => getter( @this );*/
 
@@ -88,12 +86,12 @@ namespace DragonSpark.Extensions
 
 		struct Defaults<T>
 		{
-			public static Func<T> Default { get; } = DefaultValueFactory<T>.Instance.Create;
+			public static Func<T> Default { get; } = DefaultValueFactory<T>.Instance.ToDelegate();
 		}
 
 		public static TItem With<TItem>( this TItem @this, Action<TItem> action )
 		{
-			if ( !@this.IsNull() )
+			if ( @this.IsAssigned() )
 			{
 				action?.Invoke( @this );
 				return @this;
@@ -106,7 +104,7 @@ namespace DragonSpark.Extensions
 
 		public static TItem WithSelf<TItem>( this TItem @this, Func<TItem, object> action )
 		{
-			if ( !@this.IsNull() )
+			if ( @this.IsAssigned() )
 			{
 				action( @this );
 			}
@@ -159,7 +157,7 @@ namespace DragonSpark.Extensions
 
 		public static TResult To<TResult>( this object target ) => (TResult)target;
 
-		public static T ConvertTo<T>( this object @this ) => !@this.IsNull() ? (T)ConvertTo( @this, typeof(T) ) : default(T);
+		public static T ConvertTo<T>( this object @this ) => @this.IsAssigned() ? (T)ConvertTo( @this, typeof(T) ) : default(T);
 
 		public static object ConvertTo( this object @this, Type to )
 		{

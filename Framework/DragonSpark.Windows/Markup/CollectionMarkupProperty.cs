@@ -1,11 +1,10 @@
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using PostSharp.Patterns.Contracts;
-using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
 {

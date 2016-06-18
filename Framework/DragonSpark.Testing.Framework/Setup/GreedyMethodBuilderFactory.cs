@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public abstract class EnginePartFactory<T> : FactoryBase<T, ISpecimenBuilder>, ISpecimenBuilderTransformation where T : ISpecimenBuilder
 	{
-		public ISpecimenBuilder Transform( ISpecimenBuilder builder ) => builder.AsTo<T, ISpecimenBuilder>( Create );
+		public ISpecimenBuilder Transform( ISpecimenBuilder builder ) => builder.AsTo( this.ToDelegate() );
 	}
 
 	public class OptionalParameterTransformer : EnginePartFactory<Ploeh.AutoFixture.Kernel.ParameterRequestRelay>
@@ -23,15 +22,21 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class ParameterRequestRelay : ISpecimenBuilder
 	{
 		readonly Ploeh.AutoFixture.Kernel.ParameterRequestRelay inner;
+		readonly static NoSpecimen NoSpecimen = new NoSpecimen();
 
 		public ParameterRequestRelay( [Required]Ploeh.AutoFixture.Kernel.ParameterRequestRelay inner )
 		{
 			this.inner = inner;
 		}
 
-		public object Create( object request, [Required]ISpecimenContext context ) => request.AsTo<ParameterInfo, object>( info => ShouldDefault( info ) ? info.DefaultValue : inner.Create( request, context ), () => new NoSpecimen() );
+		public object Create( object request, [Required]ISpecimenContext context )
+		{
+			var parameter = request as ParameterInfo;
+			var result = parameter != null ? ( ShouldDefault( parameter ) ? parameter.DefaultValue : inner.Create( request, context ) ) : NoSpecimen;
+			return result;
+		}
 
 		static bool ShouldDefault( ParameterInfo info ) => 
-			info.IsOptional && !GlobalServiceProvider.Instance.Get<AutoData>().Method.GetParameters().Select( pi => pi.ParameterType ).Any( new TypeAdapter( info.ParameterType ).IsAssignableFrom );
+			info.IsOptional && !GlobalServiceProvider.Instance.Get<AutoData>().Method.GetParameterTypes().Any( info.ParameterType.Adapt().IsAssignableFrom );
 	}
 }

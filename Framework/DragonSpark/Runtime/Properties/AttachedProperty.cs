@@ -1,7 +1,14 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Stores;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -242,6 +249,158 @@ namespace DragonSpark.Runtime.Properties
 
 		public override TValue Get( ValueTuple<T1, T2> instance ) => inner.Get( instance.Item1 ).Get( instance.Item2 );
 	}*/
+
+		class ReferenceMonitor : IObservable<object>
+		{
+			readonly object subject;
+
+			readonly Subject<object> inner = new Subject<object>();
+
+			public ReferenceMonitor( object subject )
+			{
+				this.subject = subject;
+			}
+
+			public IDisposable Subscribe( IObserver<object> observer ) => inner.Subscribe( observer );
+
+			~ReferenceMonitor()
+			{
+				inner.OnNext( subject );
+				inner.OnCompleted();
+				inner.Dispose();
+			}
+		}
+
+		class ReferenceMonitorCache : Cache<ReferenceMonitor>
+		{
+			public static ReferenceMonitorCache Default { get; } = new ReferenceMonitorCache();
+
+			public static Func<object, ReferenceMonitor> Selector { get; } = Default.Get;
+
+			ReferenceMonitorCache() : base( o => new ReferenceMonitor( o ) ) {}
+		}
+
+	/*class ReferenceMonitorDictionary<T> : IDictionary<int, T>
+	{
+		public ReferenceMonitorDictionary( IDictionary<> ) {}
+	}*/
+		class WeakCache<T> : Cache<T, WeakReference<T>> where T : class
+		{
+			public static WeakCache<T> Default { get; } = new WeakCache<T>();
+
+			WeakCache() : base( arg => new WeakReference<T>( arg ) ) {}
+		}
+
+		struct Key : IEquatable<Key>
+		{
+			readonly int code;
+
+			public Key( ImmutableArray<object> subjects )
+			{
+				code = KeyFactory.Instance.Create( subjects );				
+			}
+
+			public bool Equals( Key other ) => code == other.code;
+
+			public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is Key && Equals( (Key)obj ) );
+
+			public override int GetHashCode() => code;
+
+			public static bool operator ==( Key left, Key right ) => left.Equals( right );
+
+			public static bool operator !=( Key left, Key right ) => !left.Equals( right );
+		}
+
+
+		class CompoundReferenceCache<T> : ICache<ImmutableArray<object>, T>
+		{
+			readonly ICache<ICollection<int>> keys = new Cache<ICollection<int>>();
+
+			readonly Action<int> remove;
+			readonly Action<object> purge;
+			readonly ConcurrentDictionary<int, T> inner = new ConcurrentDictionary<int, T>();
+
+			public CompoundReferenceCache()
+			{
+				remove = RemoveAction;
+				purge = Purge;
+			}
+
+			void Purge( object subject ) => keys.Get( subject ).Purge().ForEach( remove );
+
+			void RemoveAction( int key ) => Remove( key );
+
+			bool Remove( int key )
+			{
+				T result;
+				return inner.TryRemove( key, out result );
+			}
+
+			public bool Contains( ImmutableArray<object> instance )
+			{
+				var key = KeyFactory.Instance.Create( instance );
+				var result = inner.ContainsKey( key );
+				return result;
+			}
+
+			public bool Remove( ImmutableArray<object> instance )
+			{
+				var key = KeyFactory.Instance.Create( instance );
+				return Remove( key );
+			}
+
+			public void Set( ImmutableArray<object> instance, T value )
+			{
+				var key = KeyFactory.Instance.Create( instance );
+				remove( key );
+				instance.Select( ReferenceMonitorCache.Selector ).Amb().Take( 1 ).Subscribe( purge );
+				inner.TryAdd( key, value );
+			}
+
+			public T Get( ImmutableArray<object> instance )
+			{
+				var key = KeyFactory.Instance.Create( instance );
+				T result;
+				return inner.TryGetValue( key, out result ) ? result : default(T);
+			}
+		}
+
+	class ConcurrentEqualityCache<TKey, TValue> : EqualityCache<TKey, TValue>
+	{
+		readonly ConcurrentDictionary<TKey, TValue> store;
+		readonly Func<TKey, TValue> create;
+		public ConcurrentEqualityCache( Func<TKey, TValue> create ) : this( new ConcurrentDictionary<TKey, TValue>(), create ) {}
+
+		ConcurrentEqualityCache( ConcurrentDictionary<TKey, TValue> store, Func<TKey, TValue> create ) : base( store, create )
+		{
+			this.store = store;
+			this.create = create;
+		}
+
+		public override TValue Get( TKey instance ) => store.GetOrAdd( instance, create );
+	}
+
+	class EqualityCache<TKey, TValue> : CacheBase<TKey, TValue>
+	{
+		readonly IDictionary<TKey, TValue> store;
+		readonly Func<TKey, TValue> create;
+
+		public EqualityCache( Func<TKey, TValue> create ) : this( new Dictionary<TKey, TValue>(), create ) {}
+
+		protected EqualityCache( IDictionary<TKey, TValue> store, Func<TKey, TValue> create )
+		{
+			this.store = store;
+			this.create = create;
+		}
+
+		public override bool Contains( TKey instance ) => store.ContainsKey( instance );
+
+		public override bool Remove( TKey instance ) => store.Remove( instance );
+
+		public override void Set( TKey instance, TValue value ) => store[instance] = value;
+
+		public override TValue Get( TKey instance ) => store.Ensure( instance, create );
+	}
 
 	public abstract class CacheBase<TInstance, TValue> : ICache<TInstance, TValue>
 	{

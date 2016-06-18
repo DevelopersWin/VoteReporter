@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using System.Collections.Generic;
 using DragonSpark.Runtime.Stores;
+using System.Collections.Generic;
 
 namespace DragonSpark.Configuration
 {
@@ -11,11 +11,13 @@ namespace DragonSpark.Configuration
 
 		ConfigureCommand() {}
 
-		public override void Execute( IEnumerable<IWritableStore> parameter ) =>
-			parameter.Each( store =>
-							{
-								GetType().Adapt().Invoke( nameof(Add), store.GetType().ToItem(), store );
-							} );
+		public override void Execute( IEnumerable<IWritableStore> parameter )
+		{
+			foreach ( var store in parameter )
+			{
+				GetType().Adapt().Invoke( nameof(Add), store.GetType().ToItem(), store.ToItem() ); 
+			}
+		}
 
 		static void Add<T>( T store ) where T : class, IWritableStore, new() => PrototypeStore<T>.Instance.Assign( store );
 	}

@@ -15,27 +15,6 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework
 {
-	/*public class AmbientAttribute : CustomizeAttribute
-	{
-		public class Registration : IRegistration
-		{
-			readonly Type type;
-
-			public Registration( [Required]Type type )
-			{
-				this.type = type;
-			}
-
-			public void Register( IServiceRegistry registry )
-			{
-				var instance = AmbientStack.GetCurrent( type );
-				registry.Register( new InstanceRegistrationParameter( type, instance ) );
-			}
-		}
-
-		public override ICustomization GetCustomization( ParameterInfo parameter ) => new RegistrationCustomization( new Registration( parameter.ParameterType ) );
-	}*/
-
 	public class FactoryAttribute : CustomizeAttribute
 	{
 		readonly Func<ParameterInfoFactoryTypeLocator> factoryLocator;
@@ -104,7 +83,7 @@ namespace DragonSpark.Testing.Framework
 
 		public override ICustomization GetCustomization( ParameterInfo parameter )
 		{
-			var serviceLocatorType = parameter.Member.AsTo<MethodInfo, Type>( x => x.GetParameters().Select( info => info.ParameterType ).FirstOrDefault( typeof(IServiceLocator).IsAssignableFrom ) ) ?? typeof(IServiceLocator);
+			var serviceLocatorType = parameter.Member.AsTo<MethodInfo, Type>( x => x.GetParameterTypes().FirstOrDefault( typeof(IServiceLocator).IsAssignableFrom ) ) ?? typeof(IServiceLocator);
 			var result = new Customization( serviceLocatorType, parameter.ParameterType );
 			return result;
 		}

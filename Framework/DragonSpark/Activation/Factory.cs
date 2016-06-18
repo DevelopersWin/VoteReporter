@@ -22,18 +22,7 @@ namespace DragonSpark.Activation
 		public IsFactorySpecification( ImmutableArray<Type> types ) : base( types ) {}
 
 		[Freeze]
-		public override bool IsSatisfiedBy( Type parameter )
-		{
-			foreach ( var adapter in Adapters )
-			{
-				if ( adapter.IsAssignableFrom( parameter ) )
-				{
-					return true;
-				}
-			}
-			return false;
-			//return Adapters.Any( adapter => adapter.IsAssignableFrom( parameter ) );
-		}
+		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
 	}
 
 	public class IsGenericFactorySpecification : AdapterSpecificationBase
@@ -43,20 +32,7 @@ namespace DragonSpark.Activation
 		public IsGenericFactorySpecification( ImmutableArray<Type> types ) : base( types ) {}
 
 		[Freeze]
-		public override bool IsSatisfiedBy( Type parameter )
-		{
-			var typeAdapter = parameter.Adapt();
-			foreach ( var adapter in Adapters )
-			{
-				if ( typeAdapter.IsGenericOf( adapter.Type ) )
-				{
-					return true;
-				}
-			}
-			return false;
-			/*var result = Adapters.Any( adapter => typeAdapter.IsGenericOf( adapter.Type ) );
-			return result;*/
-		}
+		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );
 	}
 
 	public abstract class AdapterSpecificationBase : SpecificationBase<Type>
@@ -77,7 +53,7 @@ namespace DragonSpark.Activation
 		public static FactoryInterfaceLocator Instance { get; } = new FactoryInterfaceLocator();
 
 		[Freeze]
-		public override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().With( types => types.FirstOrDefault( IsGenericFactorySpecification.Instance.IsSatisfiedBy ) ?? types.FirstOrDefault( IsFactorySpecification.Instance.IsSatisfiedBy ) );
+		public override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().With( types => types.FirstOrDefault( IsGenericFactorySpecification.Instance.ToDelegate() ) ?? types.FirstOrDefault( IsFactorySpecification.Instance.ToDelegate() ) );
 	}
 
 	public class ParameterTypeLocator : TypeLocatorCacheBase
@@ -124,21 +100,7 @@ namespace DragonSpark.Activation
 			return result;
 		}
 
-		bool IsAssignable( TypeInfo type )
-		{
-			if ( type.IsGenericType )
-			{
-				var typeDefinition = type.GetGenericTypeDefinition();
-				foreach ( var adapter in adapters )
-				{
-					if ( adapter.IsAssignableFrom( typeDefinition ) )
-					{
-						return true;
-					}
-				}
-			}
-			return false;
-		}
+		bool IsAssignable( TypeInfo type ) => type.IsGenericType && adapters.IsAssignableFrom( type.GetGenericTypeDefinition() );
 
 		protected abstract Type Select( IEnumerable<Type> genericTypeArguments );
 	}
@@ -251,7 +213,7 @@ namespace DragonSpark.Activation
 
 		class Factory<T> : DelegatedFactory<Type, Func<object>>
 		{
-			public Factory( IFactory<Type, Func<object>> inner ) : base( TypeAssignableSpecification<T>.Instance, inner.Create ) {}
+			public Factory( IFactory<Type, Func<object>> inner ) : base( inner.ToDelegate(), TypeAssignableSpecification<T>.Instance ) {}
 		}
 	}
 
@@ -272,8 +234,6 @@ namespace DragonSpark.Activation
 	[Persistent]
 	public class FactoryTypeLocator : FactoryBase<LocateTypeRequest, Type>
 	{
-		/*public static FactoryTypeLocator Instance { get; } = new FactoryTypeLocator( Default<FactoryTypeRequest>.Items );*/
-
 		readonly FactoryTypeRequest[] types;
 
 		public FactoryTypeLocator( [Required] FactoryTypeRequest[] types )
@@ -284,15 +244,15 @@ namespace DragonSpark.Activation
 		[Freeze]
 		public override Type Create( LocateTypeRequest parameter )
 		{
-			var name = $"{parameter.RequestedType.Name}Factory";
-			var candidates = types.Where( type => parameter.Name == type.Name && type.ResultType.Adapt().IsAssignableFrom( parameter.RequestedType ) ).ToArray();
+			var candidates = types.Introduce( parameter, tuple => tuple.Item1.Name == tuple.Item2.Name && tuple.Item1.ResultType.Adapt().IsAssignableFrom( tuple.Item2.RequestedType ) ).ToArray();
 			var item = 
-				candidates.Only( info => info.RequestedType.Name == name )
+				candidates.Introduce( $"{parameter.RequestedType.Name}Factory", info => info.Item1.RequestedType.Name == info.Item2 ).Only(  )
 				??
-				candidates.FirstOrDefault( arg => arg.ResultType == parameter.RequestedType )
+				candidates.Introduce( parameter, arg => arg.Item1.ResultType == arg.Item2.RequestedType ).FirstOrDefault()
 				??
 				candidates.FirstOrDefault();
-			var result = item.With( profile => profile.RequestedType );
+
+			var result = item?.RequestedType;
 			return result;
 		}
 	}

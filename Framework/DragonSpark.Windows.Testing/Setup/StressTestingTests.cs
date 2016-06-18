@@ -70,15 +70,15 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( target.CurrentDateTime >= current );
 			Assert.True( target.CurrentDateTimeOffset >= current );
 
-			Assert.NotNull( target.Activated );
+			Assert.Exists( target.Activated );
 
 			var created = Assert.IsType<ClassWithParameter>( target.Factory );
-			Assert.NotNull( created.Parameter );
+			Assert.Exists( created.Parameter );
 			Assert.IsType<DragonSpark.Testing.Objects.Constructor>( created.Parameter );
 
-			Assert.NotNull( target.Collection );
+			Assert.Exists( target.Collection );
 			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<object>>( target.Collection );
-			Assert.NotNull( target.Classes );
+			Assert.Exists( target.Classes );
 			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<Class>>( target.Classes );
 
 			Assert.Equal( 6776, target.ValuedInt );

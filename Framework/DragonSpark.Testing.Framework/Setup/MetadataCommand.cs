@@ -66,7 +66,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			{
 				Services.Get<AutoData>().With( data => new AssociatedFactory( data.Fixture ).Item ),
 				base.GetService
-			}.NotNull().FirstWhere( func => func( serviceType ) );
+			}.Exists().FirstWhere( func => func( serviceType ) );
 			return result;
 		}*/
 	}

@@ -14,7 +14,7 @@ namespace DragonSpark.Activation.IoC
 		readonly Func<ParameterInfo, IDependencyResolverPolicy> resolver;
 		public static DefaultUnityConstructorSelectorPolicy Instance { get; } = new DefaultUnityConstructorSelectorPolicy();
 
-		public DefaultUnityConstructorSelectorPolicy() : this( ResolverFactory.Instance.Create ) {}
+		public DefaultUnityConstructorSelectorPolicy() : this( ResolverFactory.Instance.ToDelegate() ) {}
 
 		public DefaultUnityConstructorSelectorPolicy( Func<ParameterInfo, IDependencyResolverPolicy> resolver )
 		{
@@ -54,16 +54,18 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly Func<ConstructTypeRequest, ConstructorInfo> locator;
 		readonly Func<ParameterInfo, IDependencyResolverPolicy> resolver;
+		readonly Func<ConstructorInfo, SelectedConstructor> createDelegate;
 
-		public ConstructorSelectorPolicy( ConstructorLocator locator ) : this( locator.Create, ResolverFactory.Instance.Create ) {}
+		public ConstructorSelectorPolicy( ConstructorLocator locator ) : this( locator.ToDelegate(), ResolverFactory.Instance.ToDelegate() ) {}
 
 		protected ConstructorSelectorPolicy( Func<ConstructTypeRequest, ConstructorInfo> locator, Func<ParameterInfo, IDependencyResolverPolicy> resolver )
 		{
 			this.locator = locator;
 			this.resolver = resolver;
+			createDelegate = CreateSelectedConstructor;
 		}
 
-		public SelectedConstructor SelectConstructor( IBuilderContext context, IPolicyList resolverPolicyDestination ) => locator( new ConstructTypeRequest( context.BuildKey.Type ) ).With( CreateSelectedConstructor ) ?? DefaultUnityConstructorSelectorPolicy.Instance.SelectConstructor( context, resolverPolicyDestination );
+		public SelectedConstructor SelectConstructor( IBuilderContext context, IPolicyList resolverPolicyDestination ) => locator( new ConstructTypeRequest( context.BuildKey.Type ) ).With( createDelegate ) ?? DefaultUnityConstructorSelectorPolicy.Instance.SelectConstructor( context, resolverPolicyDestination );
 
 		SelectedConstructor CreateSelectedConstructor( ConstructorInfo ctor )
 		{

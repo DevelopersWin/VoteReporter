@@ -158,7 +158,7 @@ namespace DragonSpark.Activation
 		object IFactoryWithParameter.Create( object parameter )
 		{
 			var coerced = coercer.Coerce( parameter );
-			var result = !coerced.IsNull() ? Create( coerced ) : default(TResult);
+			var result = coerced.IsAssigned() ? Create( coerced ) : default(TResult);
 			return result;
 		}
 
@@ -184,7 +184,7 @@ namespace DragonSpark.Activation
 		object IFactoryWithParameter.Create( object parameter )
 		{
 			var coerced = coercer.Coerce( parameter );
-			var result = !coerced.IsNull() ? Create( coerced ) : default(TResult);
+			var result = coerced.IsAssigned() ? Create( coerced ) : default(TResult);
 			return result;
 		}
 
@@ -198,14 +198,28 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<TParameter, TResult> inner;
 
-		public DelegatedFactory( Func<TParameter, TResult> inner ) : this( Specifications<TParameter>.Always, inner ) {}
+		public DelegatedFactory( Func<TParameter, TResult> inner ) : this( inner, Specifications<TParameter>.Always ) {}
 
-		public DelegatedFactory( [Required]ISpecification<TParameter> specification, [Required]Func<TParameter, TResult> inner ) : base( specification )
+		public DelegatedFactory( [Required]Func<TParameter, TResult> inner, [Required]ISpecification<TParameter> specification ) : base( specification )
 		{
 			this.inner = inner;
 		}
 
 		public override TResult Create( TParameter parameter ) => inner( parameter );
+	}
+
+	public class FixedFactory<TParameter, TResult> : FactoryBase<TResult>
+	{
+		readonly Func<TParameter, TResult> inner;
+		readonly TParameter parameter;
+
+		public FixedFactory( Func<TParameter, TResult> inner, TParameter parameter )
+		{
+			this.inner = inner;
+			this.parameter = parameter;
+		}
+
+		public override TResult Create() => inner( parameter );
 	}
 
 	public class DecoratedFactory<T> : DelegatedFactory<T>
@@ -246,9 +260,8 @@ namespace DragonSpark.Activation
 
 		public override IFactory<TParameter, TResult> Create( object parameter )
 		{
-			var items = factories
-				.Select( factory => factory.Create( parameter ) )
-				.NotNull()
+			var items = factories.Introduce( parameter, tuple => tuple.Item1.Create( tuple.Item2 ) )
+				.Alive()
 				.Select( inner => new DecoratedFactory<TParameter, TResult>( inner ) )
 				.ToArray();
 			var result = new FirstFromParameterFactory<TParameter, TResult>( items );
@@ -294,7 +307,7 @@ namespace DragonSpark.Activation
 			this.inner = inner;
 		}
 
-		public override TResult Create( TParameter parameter ) => inner.FirstWhere( factory => factory( parameter ) );
+		public override TResult Create( TParameter parameter ) => inner.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) ).FirstAssigned( factory => factory );
 	}
 
 	// [Validation( false )]
@@ -309,7 +322,7 @@ namespace DragonSpark.Activation
 			this.inner = inner;
 		}
 
-		public override T Create() => inner.FirstWhere( factory => factory() );
+		public override T Create() => inner.FirstAssigned( factory => factory() );
 	}
 
 	/*public class FixedFactory<T> : FactoryBase<T>
@@ -350,7 +363,6 @@ namespace DragonSpark.Activation
 
 	public abstract class FactoryBase<T> : IFactory<T>
 	{
-		// [Creator( AttributeInheritance =  MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
 		public abstract T Create();
 
 		object IFactory.Create() => Create();
@@ -360,7 +372,7 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<TResult> item;
 
-		public WrappedFactory( TResult instance ) : this( new FixedFactory<TResult>( instance ).ToDelegate() ) {}
+		// public WrappedFactory( TResult instance ) : this( instance.to.ToDelegate() ) {}
 
 		public WrappedFactory( Func<TResult> item )
 		{
@@ -371,20 +383,6 @@ namespace DragonSpark.Activation
 		object IFactoryWithParameter.Create( object parameter ) => Create( default(TParameter) );
 		bool IFactory<TParameter, TResult>.CanCreate( TParameter parameter ) => true;
 		public TResult Create( TParameter parameter ) => item();
-
-		public class Delegate : Cache<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
-		{
-			public static Delegate Default { get; } = new Delegate();
-
-			Delegate() : base( factory => factory.Create ) {}
-		}
-
-		public class FactoryInstance : Cache<Func<TResult>, WrappedFactory<TParameter, TResult>>
-		{
-			public static FactoryInstance Default { get; } = new FactoryInstance();
-			
-			FactoryInstance() : base( result => new WrappedFactory<TParameter, TResult>( result ) ) {}
-		}
 	}
 
 	public class FixedFactory<T> : IFactory<T>
@@ -399,13 +397,6 @@ namespace DragonSpark.Activation
 		public T Create() => instance;
 
 		object IFactory.Create() => Create();
-
-		public class Delegate : Cache<IFactory<T>, Func<T>>
-		{
-			public static Delegate Default { get; } = new Delegate();
-
-			Delegate() : base( factory => factory.Create ) {}
-		}
 	}
 
 	/*public class FixedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>

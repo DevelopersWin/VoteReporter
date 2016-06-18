@@ -175,7 +175,7 @@ namespace DragonSpark.Modularity
 			IModuleTypeLoader moduleTypeLoader = this.GetTypeLoaderForModule(moduleInfoToLoadType);
 			moduleInfoToLoadType.State = ModuleState.LoadingTypes;
 
-			// Delegate += works differently betweem SL and WPF.
+			// DelegateWithParameterCache += works differently betweem SL and WPF.
 			// We only want to subscribe to each instance once.
 			if (!this.subscribedToModuleTypeLoaders.Contains(moduleTypeLoader))
 			{

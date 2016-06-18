@@ -32,12 +32,38 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new AutoDataExecutionContextFactory( new Cache( includeFromParameters, additionalTypes ) ) ) {}
 
+		/*static AutoDataExecutionContextFactory Create( bool includeFromParameters, Type[] additionalTypes )
+		{
+			try
+			{
+				return new AutoDataExecutionContextFactory( new Cache( includeFromParameters, additionalTypes ) );
+			}
+			catch ( Exception e )
+			{
+				MessageSource.MessageSink.Write( new PostSharp.Extensibility.Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
+					throw;
+			}
+		}*/
+
 		protected AutoDataAttribute( [Required] IFactory<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
 
 		protected AutoDataAttribute( [Required]IFactory<IFixture> fixture, [Required] IFactory<AutoData, IDisposable> factory ) : base( fixture.Create() )
 		{
 			this.factory = factory;
 		}
+
+		/*static IFixture Create( IFactory<IFixture> fixture )
+		{
+			try
+			{
+				return fixture.Create();
+			}
+			catch ( Exception e )
+			{
+				MessageSource.MessageSink.Write( new PostSharp.Extensibility.Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
+					throw;
+			}
+		}*/
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
@@ -194,7 +220,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		[Freeze]
 		public override Type[] Create( MethodBase parameter )
 		{
-			var types = additional.Concat( includeFromParameters ? parameter.GetParameters().Select( info => info.ParameterType ) : Items<Type>.Default );
+			var types = additional.Concat( includeFromParameters ? parameter.GetParameterTypes() : Items<Type>.Default );
 			var result = primaryStrategy( parameter.DeclaringType ).Union( types.SelectMany( otherStrategy ) ).Distinct().Fixed();
 			return result;
 		}

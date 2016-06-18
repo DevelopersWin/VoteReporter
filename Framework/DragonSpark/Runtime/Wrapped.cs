@@ -1,18 +1,11 @@
-﻿using DragonSpark.Runtime.Properties;
-using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-
-namespace DragonSpark.Runtime
+﻿namespace DragonSpark.Runtime
 {
-	public static class Invocation
+	/*public static class Invocation
 	{
 		public static Delegate GetCurrent() => AmbientStack.GetCurrentItem<Delegate>();
 
 		public static T Create<T>( T @delegate ) where T : class => Invocation<T>.Default.Get( @delegate as Delegate );
-	}
+	}*//*
 
 	public class Invocation<T> : Cache<Delegate, T> where T : class
 	{
@@ -41,33 +34,33 @@ namespace DragonSpark.Runtime
 				return result;
 			}
 		}
-	}
+	}*/
 
-	class Parameters : Cache<MethodBase, ParameterExpression[]>
+	/*class Parameters : Cache<MethodBase, ParameterExpression[]>
 	{
 		public static Parameters Default { get; } = new Parameters();
 
-		Parameters() : base( method => method.GetParameters().ToImmutableArray().Select( info => Expression.Parameter( info.ParameterType, info.Name ) ).ToArray() ) {}
-	}
+		Parameters() : base( method => method.GetParameters().Select( info => Expression.Parameter( info.ParameterType, info.Name ) ).ToArray() ) {}
+	}*/
 	/*public static class Invocation
 	{
-		public static Delegate GetCurrent() => DelegateStore.Instance.Value;
+		public static DelegateWithParameterCache GetCurrent() => DelegateStore.Instance.Value;
 
 		public static T Create<T>( T @delegate )
 		{
 			
-			return Wrapped.Default.Get( @delegate as Delegate );
+			return Wrapped.Default.Get( @delegate as DelegateWithParameterCache );
 			
 		}
 	}
 
-	public class Wrapped : AttachedProperty<Delegate, Delegate>
+	public class Wrapped : AttachedProperty<DelegateWithParameterCache, DelegateWithParameterCache>
 	{
 		public static Wrapped Default { get; } = new Wrapped();
 
 		Wrapped() : base( Create ) {}
 
-		static Delegate Create( Delegate inner )
+		static DelegateWithParameterCache Create( DelegateWithParameterCache inner )
 		{
 			var parameters = Parameters.Default.Get( inner.GetMethodInfo() );
 			var expressions = ImmutableArray.Create<Expression>( Expression.Constant( inner ), Expression.NewArrayInit( typeof(object), parameters ) ).ToArray();
@@ -78,9 +71,9 @@ namespace DragonSpark.Runtime
 			return result;
 		}
 		
-		static object Invoke( Delegate target, object[] parameters )
+		static object Invoke( DelegateWithParameterCache target, object[] parameters )
 		{
-			using ( new AmbientStack<Delegate>.Assignment( target ) )
+			using ( new AmbientStack<DelegateWithParameterCache>.Assignment( target ) )
 			{
 				var result = target.DynamicInvoke( parameters );
 				return result;
@@ -88,40 +81,40 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	class DelegateStack : AmbientStack<Delegate>
+	class DelegateStack : AmbientStack<DelegateWithParameterCache>
 	{
 		public new static DelegateStack Default { get; } = new DelegateStack();
 	}
 
-	interface IDelegateStore : IStore<Delegate> {}
+	interface IDelegateStore : IStore<DelegateWithParameterCache> {}
 
-	class DelegateStore : DelegatedStore<Delegate>, IDelegateStore
+	class DelegateStore : DelegatedStore<DelegateWithParameterCache>, IDelegateStore
 	{
 		public static DelegateStore Instance { get; } = new DelegateStore();
 
 		public DelegateStore() : this( DelegateStack.Default ) {}
 
-		public DelegateStore( IStackStore<Delegate> store ) : base( store.GetCurrentItem ) {}
+		public DelegateStore( IStackStore<DelegateWithParameterCache> store ) : base( store.GetCurrentItem ) {}
 	}*/
 
 	/*public static class CurrentDelegate
 	{
 		public static T Get<T>() where T : class => GlobalDelegateContext<T>.Instance.Value.Get( DelegateStore.Instance.Value );
-		public static void Set<T>( Delegate target, T value ) where T : class => GlobalDelegateContext<T>.Instance.Value.Set( target, value );
+		public static void Set<T>( DelegateWithParameterCache target, T value ) where T : class => GlobalDelegateContext<T>.Instance.Value.Set( target, value );
 	}
 
 	/*class Temp<T>
 	{
-		readonly Delegate inner;
+		readonly DelegateWithParameterCache inner;
 
-		public Temp( Delegate inner ) : this( inner, Factory<T>.Instance.Create( inner ) ) {}
+		public Temp( DelegateWithParameterCache inner ) : this( inner, Factory<T>.Instance.Create( inner ) ) {}
 
-		public Temp( Delegate inner, T created )
+		public Temp( DelegateWithParameterCache inner, T created )
 		{
 			this.inner = inner;
 		}
 
-		public Delegate Create()
+		public DelegateWithParameterCache Create()
 		{
 			return null;
 		}
@@ -142,11 +135,11 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class EmptyDelegateProperty : Cache<MethodInfo, Delegate>
+	public class EmptyDelegateProperty : Cache<MethodInfo, DelegateWithParameterCache>
 	{
-		public EmptyDelegateProperty( Func<MethodInfo, Delegate> factory ) : base( factory ) {}
+		public EmptyDelegateProperty( Func<MethodInfo, DelegateWithParameterCache> factory ) : base( factory ) {}
 
-		public class Factory : FactoryBase<MethodInfo, Delegate>
+		public class Factory : FactoryBase<MethodInfo, DelegateWithParameterCache>
 		{
 			readonly Type compiledType;
 
@@ -155,7 +148,7 @@ namespace DragonSpark.Runtime
 				this.compiledType = compiledType;
 			}
 
-			public override Delegate Create( MethodInfo parameter )
+			public override DelegateWithParameterCache Create( MethodInfo parameter )
 			{
 				var parameters = Parameters.Default.Get( parameter );
 				var body = parameter.ReturnType != typeof(void) ? Expression.Default( parameter.ReturnType ) : Expression.Empty();
@@ -170,19 +163,19 @@ namespace DragonSpark.Runtime
 		public static MethodInfo Invoke { get; } = typeof(IDelegateInvoker).GetTypeInfo().GetDeclaredMethod( nameof(IDelegateInvoker.Invoke) );
 		public static MethodInfo Relay { get; } = typeof(IDelegateRelay).GetTypeInfo().GetDeclaredMethod( nameof(IDelegateRelay.Relay) );
 
-		public static Func<Delegate, ConstantExpression> Constant { get; } = Expression.Constant;
+		public static Func<DelegateWithParameterCache, ConstantExpression> Constant { get; } = Expression.Constant;
 	}
 
 	public interface IDelegateRelay
 	{
-		void Relay( Delegate source, Delegate destination );
+		void Relay( DelegateWithParameterCache source, DelegateWithParameterCache destination );
 	}
 
 	public class ContextAwareDelegateProperty<T> : ContextAwareDelegateProperty where T : class
 	{
-		public ContextAwareDelegateProperty( Func<Delegate, Delegate> create ) : base( create ) {}
+		public ContextAwareDelegateProperty( Func<DelegateWithParameterCache, DelegateWithParameterCache> create ) : base( create ) {}
 
-		public T GetDirect( Delegate parameter ) => Get( parameter ) as T;
+		public T GetDirect( DelegateWithParameterCache parameter ) => Get( parameter ) as T;
 
 		public new class Factory : ContextAwareDelegateProperty.Factory
 		{
@@ -190,20 +183,20 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class ContextAwareDelegateProperty : Cache<Delegate, Delegate>
+	public class ContextAwareDelegateProperty : Cache<DelegateWithParameterCache, DelegateWithParameterCache>
 	{
-		public ContextAwareDelegateProperty( Func<Delegate, Delegate> create ) : base( create ) {}
+		public ContextAwareDelegateProperty( Func<DelegateWithParameterCache, DelegateWithParameterCache> create ) : base( create ) {}
 
-		public class Factory : TransformerBase<Delegate>
+		public class Factory : TransformerBase<DelegateWithParameterCache>
 		{
 			readonly IDelegateRelay relay;
-			readonly Func<MethodInfo, Delegate> relaySource;
+			readonly Func<MethodInfo, DelegateWithParameterCache> relaySource;
 			readonly Func<CallDelegateExpressionFactory.Parameter, Expression> callSource;
 			readonly Type compiledType;
 
-			public Factory( IDelegateRelay relay, Func<MethodInfo, Delegate> relaySource, Type compiledType ) : this( relay, relaySource, CallDelegateExpressionFactory.Instance.ToDelegate(), compiledType ) {}
+			public Factory( IDelegateRelay relay, Func<MethodInfo, DelegateWithParameterCache> relaySource, Type compiledType ) : this( relay, relaySource, CallDelegateExpressionFactory.Instance.ToDelegate(), compiledType ) {}
 
-			public Factory( IDelegateRelay relay, Func<MethodInfo, Delegate> relaySource, Func<CallDelegateExpressionFactory.Parameter, Expression> callSource, Type compiledType )
+			public Factory( IDelegateRelay relay, Func<MethodInfo, DelegateWithParameterCache> relaySource, Func<CallDelegateExpressionFactory.Parameter, Expression> callSource, Type compiledType )
 			{
 				this.relay = relay;
 				this.relaySource = relaySource;
@@ -211,7 +204,7 @@ namespace DragonSpark.Runtime
 				this.compiledType = compiledType;
 			}
 
-			public override Delegate Create( Delegate parameter )
+			public override DelegateWithParameterCache Create( DelegateWithParameterCache parameter )
 			{
 				var methodInfo = parameter.GetMethodInfo();
 				var relayDelegate = relaySource( methodInfo );
@@ -241,13 +234,13 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class RelayDelegateProperty : Cache<MethodInfo, Delegate>
+	public class RelayDelegateProperty : Cache<MethodInfo, DelegateWithParameterCache>
 	{
-		public RelayDelegateProperty( Func<MethodInfo, Delegate> factory ) : base( factory ) {}
+		public RelayDelegateProperty( Func<MethodInfo, DelegateWithParameterCache> factory ) : base( factory ) {}
 
-		public class Factory : FactoryBase<MethodInfo, Delegate>
+		public class Factory : FactoryBase<MethodInfo, DelegateWithParameterCache>
 		{
-			readonly Func<MethodInfo, Delegate> emptySource;
+			readonly Func<MethodInfo, DelegateWithParameterCache> emptySource;
 			readonly Func<CallDelegateExpressionFactory.Parameter, Expression> callSource;
 			readonly Type compiledType;
 
@@ -255,16 +248,16 @@ namespace DragonSpark.Runtime
 
 			public Factory( IDelegateInvoker invoker, Type compiledType ) : this( invoker, new EmptyDelegateProperty( new Factory( compiledType ).ToDelegate() ), compiledType ) {}#1#
 
-			public Factory( Func<MethodInfo, Delegate> emptySource, Type compiledType ) : this( emptySource, CallDelegateExpressionFactory.Instance.ToDelegate(), compiledType ) {}
+			public Factory( Func<MethodInfo, DelegateWithParameterCache> emptySource, Type compiledType ) : this( emptySource, CallDelegateExpressionFactory.Instance.ToDelegate(), compiledType ) {}
 
-			public Factory( Func<MethodInfo, Delegate> emptySource, Func<CallDelegateExpressionFactory.Parameter, Expression> callSource, Type compiledType )
+			public Factory( Func<MethodInfo, DelegateWithParameterCache> emptySource, Func<CallDelegateExpressionFactory.Parameter, Expression> callSource, Type compiledType )
 			{
 				this.emptySource = emptySource;
 				this.callSource = callSource;
 				this.compiledType = compiledType;
 			}
 
-			public override Delegate Create( MethodInfo parameter )
+			public override DelegateWithParameterCache Create( MethodInfo parameter )
 			{
 				var call = callSource( new CallDelegateExpressionFactory.Parameter( parameter, emptySource( parameter ) ) );
 				var result = Expression.Lambda( compiledType, call, Parameters.Default.Get( parameter ).ToArray() ).Compile();
@@ -299,7 +292,7 @@ namespace DragonSpark.Runtime
 		{
 			var parameterExpressions = Parameters.Default.Get( parameter.Source );
 			var array = Expression.NewArrayInit( typeof(object), parameterExpressions.Select( expression => Expression.TypeAs( expression, typeof(object) ) ) );
-			var expressions = ImmutableArray.Create<Expression>( Expression.Constant( parameter.Delegate ), array ).ToArray();
+			var expressions = ImmutableArray.Create<Expression>( Expression.Constant( parameter.DelegateWithParameterCache ), array ).ToArray();
 			var call = Expression.Call( Expression.Constant( invoker ), Elements.Invoke, expressions );
 			var type = parameter.Source.ReturnType;
 			var result = type != typeof(void) ? (Expression)Expression.Convert( call, type ) : call;
@@ -315,14 +308,14 @@ namespace DragonSpark.Runtime
 
 		public struct Parameter
 		{
-			public Parameter( MethodInfo source, Delegate @delegate )
+			public Parameter( MethodInfo source, DelegateWithParameterCache @delegate )
 			{
 				Source = source;
-				Delegate = @delegate;
+				DelegateWithParameterCache = @delegate;
 			}
 
 			public MethodInfo Source { get; }
-			public Delegate Delegate { get; }
+			public DelegateWithParameterCache DelegateWithParameterCache { get; }
 		}
 	}
 
@@ -330,17 +323,17 @@ namespace DragonSpark.Runtime
 
 	public interface IDelegateInvoker
 	{
-		object Invoke( Delegate target, object[] arguments );
+		object Invoke( DelegateWithParameterCache target, object[] arguments );
 	}
 
 	class DelegateInvoker : IDelegateInvoker
 	{
 		public static DelegateInvoker Instance { get; } = new DelegateInvoker();
 
-		public object Invoke( Delegate target, object[] arguments ) => target.DynamicInvoke( arguments );
+		public object Invoke( DelegateWithParameterCache target, object[] arguments ) => target.DynamicInvoke( arguments );
 	}
 
-	public interface IDelegateContextProvider<T> : IInstanceStore<Delegate, T> {}
+	public interface IDelegateContextProvider<T> : IInstanceStore<DelegateWithParameterCache, T> {}
 
 	public class GlobalDelegateContext<T> : DecoratedStore<IDelegateContextProvider<T>> where T : class
 	{
@@ -360,34 +353,34 @@ namespace DragonSpark.Runtime
 	{
 		public static DelegateContextProvider<T> Instance { get; } = new DelegateContextProvider<T>();
 
-		readonly IAttachedProperty<Delegate, T> property;
+		readonly IAttachedProperty<DelegateWithParameterCache, T> property;
 
-		DelegateContextProvider() : this( new Cache<Delegate, T>() ) {}
+		DelegateContextProvider() : this( new Cache<DelegateWithParameterCache, T>() ) {}
 
-		public DelegateContextProvider( IAttachedProperty<Delegate, T> property )
+		public DelegateContextProvider( IAttachedProperty<DelegateWithParameterCache, T> property )
 		{
 			this.property = property;
 		}
 
-		public T Get( Delegate source ) => property.Get( source );
+		public T Get( DelegateWithParameterCache source ) => property.Get( source );
 
-		public void Set( Delegate source, T value ) => property.Set( source, value );
+		public void Set( DelegateWithParameterCache source, T value ) => property.Set( source, value );
 	}
 
-	class DelegateStack : AmbientStack<Delegate>
+	class DelegateStack : AmbientStack<DelegateWithParameterCache>
 	{
 		public new static DelegateStack Default { get; } = new DelegateStack();
 	}
 
-	interface IDelegateStore : IStore<Delegate> {}
+	interface IDelegateStore : IStore<DelegateWithParameterCache> {}
 
-	class DelegateStore : DelegatedStore<Delegate>, IDelegateStore
+	class DelegateStore : DelegatedStore<DelegateWithParameterCache>, IDelegateStore
 	{
 		public static DelegateStore Instance { get; } = new DelegateStore();
 
 		public DelegateStore() : this( DelegateStack.Default ) {}
 
-		public DelegateStore( IStackStore<Delegate> store ) : base( store.GetCurrentItem ) {}
+		public DelegateStore( IStackStore<DelegateWithParameterCache> store ) : base( store.GetCurrentItem ) {}
 	}
 
 	class ContextAwareDelegateInvoker : IDelegateInvoker
@@ -395,19 +388,19 @@ namespace DragonSpark.Runtime
 		public static ContextAwareDelegateInvoker Instance { get; } = new ContextAwareDelegateInvoker();
 
 		readonly IDelegateInvoker invoker;
-		readonly IStackStore<Delegate> store;
+		readonly IStackStore<DelegateWithParameterCache> store;
 
 		ContextAwareDelegateInvoker() : this( DelegateInvoker.Instance ) {}
 
 		public ContextAwareDelegateInvoker( IDelegateInvoker invoker ) : this( invoker, DelegateStack.Default ) {}
 
-		public ContextAwareDelegateInvoker( IDelegateInvoker invoker, IStackStore<Delegate> store )
+		public ContextAwareDelegateInvoker( IDelegateInvoker invoker, IStackStore<DelegateWithParameterCache> store )
 		{
 			this.invoker = invoker;
 			this.store = store;
 		}
 
-		public object Invoke( Delegate target, object[] arguments )
+		public object Invoke( DelegateWithParameterCache target, object[] arguments )
 		{
 			using ( new DelegateStack.Assignment( store, target ) )
 			{

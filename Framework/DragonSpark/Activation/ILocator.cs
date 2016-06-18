@@ -1,4 +1,5 @@
 using DragonSpark.Aspects;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Immutable;
@@ -30,7 +31,9 @@ namespace DragonSpark.Activation
 	{
 		readonly int code;
 
-		public ConstructTypeRequest( [Required] Type type, [Required] params object[] arguments ) : base( type )
+		public ConstructTypeRequest( Type type ) : this( type, Items<object>.Default ) {}
+
+		public ConstructTypeRequest( Type type, params object[] arguments ) : base( type )
 		{
 			Arguments = arguments;
 			code = KeyFactory.Instance.Create( ImmutableArray.Create<object>( RequestedType, Arguments ) );

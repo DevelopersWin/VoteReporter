@@ -22,13 +22,13 @@ namespace DragonSpark.Runtime.Specifications
 		public override bool IsSatisfiedBy( T parameter ) => !inner.IsSatisfiedBy( parameter );
 	}
 
-	public class NotNullSpecification<T> : SpecificationBase<T>
+	public class AssignedSpecification<T> : SpecificationBase<T>
 	{
-		public static ISpecification<T> Instance { get; } = new NotNullSpecification<T>();
+		public static ISpecification<T> Instance { get; } = new AssignedSpecification<T>();
 
-		NotNullSpecification() {}
+		AssignedSpecification() {}
 	
-		public override bool IsSatisfiedBy( T parameter ) => !parameter.IsNull();
+		public override bool IsSatisfiedBy( T parameter ) => parameter.IsAssigned();
 	}
 
 	public abstract class SpecificationBase<T> : ISpecification<T>
@@ -57,6 +57,6 @@ namespace DragonSpark.Runtime.Specifications
 		protected GuardedSpecificationBase( ICoercer<T> coercer ) : base( coercer ) {}
 		protected GuardedSpecificationBase( Func<object, T> coercer ) : base( coercer ) {}
 
-		protected override bool IsSatisfiedByCoerced( T parameter ) => parameter.With( IsSatisfiedBy );
+		protected override bool IsSatisfiedByCoerced( T parameter ) => parameter.With( this.ToDelegate() );
 	}
 }

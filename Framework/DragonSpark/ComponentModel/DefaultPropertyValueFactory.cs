@@ -22,7 +22,7 @@ namespace DragonSpark.ComponentModel
 
 		public override object Create( DefaultValueParameter parameter )
 		{
-			var result = factory( parameter.Metadata ).FirstWhere( p => p.GetValue( parameter ) ) ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
+			var result = factory( parameter.Metadata ).FirstAssigned( p => p.GetValue( parameter ) ) ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
 			return result;
 		}
 	}

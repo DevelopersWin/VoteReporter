@@ -7,6 +7,17 @@ namespace DragonSpark.Configuration
 	{
 		public ConfigurationStore() : this( PrototypeStore<T>.Instance ) {}
 
-		public ConfigurationStore( PrototypeStore<T> store ) : base( () => store.Register( new FixedStore<T>() ) ) {}
+		ConfigurationStore( PrototypeStore<T> store ) : base( new Cache( store ).Create ) {} // TODO: Fixist.
+
+		class Cache
+		{
+			readonly PrototypeStore<T> store;
+			public Cache( PrototypeStore<T> store )
+			{
+				this.store = store;
+			}
+
+			public T Create() => store.Register( new FixedStore<T>() );
+		}
 	}
 }

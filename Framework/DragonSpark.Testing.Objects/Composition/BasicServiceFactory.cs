@@ -1,14 +1,14 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using System.Composition;
 using DragonSpark.Runtime.Properties;
+using System.Composition;
 
 namespace DragonSpark.Testing.Objects.Composition
 {
 	[Export]
 	public class BasicServiceFactory : FactoryBase<IBasicService>
 	{
-		public override IBasicService Create() => new BasicService().WithSelf( service => service.Get( Condition.Property ).Apply() );
+		public override IBasicService Create() => new BasicService().WithSelf( service => Condition.Default.Get( service ).Apply() );
 	}
 
 	[Export]

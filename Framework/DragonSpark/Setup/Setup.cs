@@ -136,7 +136,7 @@ namespace DragonSpark.Setup
 		{
 			public static IsActivatedInstanceSpecification Default { get; } = new IsActivatedInstanceSpecification();
 
-			public override bool IsSatisfiedBy( object parameter ) => Instance.Get( parameter ) || new[] { parameter, Factory.Get( parameter ) }.NotNull().Any( o => o.Has<SharedAttribute>() );
+			public override bool IsSatisfiedBy( object parameter ) => Instance.Get( parameter ) || new[] { parameter, Factory.Get( parameter ) }.Alive().Any( o => o.Has<SharedAttribute>() );
 		}
 
 		/*public class Instance : AssociatedStore<bool>
@@ -162,12 +162,7 @@ namespace DragonSpark.Setup
 
 		static IEnumerable<IInstanceRegistration> Instances( IEnumerable<object> instances ) => instances.Select( o => new InstanceStore( o ) );
 
-		public bool IsRegistered( Type type )
-		{
-			var adapt = type.Adapt();
-			var result = List().Any( registration => adapt.IsAssignableFrom( registration.RegisteredType ) );
-			return result;
-		}
+		public bool IsRegistered( Type type ) => List().Select( registration => registration.RegisteredType ).Any( type.Adapt().IsAssignableFrom );
 
 		void IServiceRegistry.Register( MappingRegistrationParameter parameter )
 		{
@@ -176,17 +171,16 @@ namespace DragonSpark.Setup
 
 		public void Register( InstanceRegistrationParameter parameter ) => Add( new InstanceStore( parameter.Instance, parameter.RequestedType ) );
 
-		public void RegisterFactory( FactoryRegistrationParameter parameter )
-		{
-			Add( new FactoryStore( parameter.Factory, parameter.RequestedType ) );
-		}
+		public void RegisterFactory( FactoryRegistrationParameter parameter ) => Add( new FactoryStore( parameter.Factory, parameter.RequestedType ) );
 
 		[Freeze]
-		// [RecursionGuard]
 		public object GetService( Type serviceType )
 		{
-			var adapt = serviceType.Adapt();
-			var result = List().Where( registration => adapt.IsAssignableFrom( registration.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault().With( o => ActivationProperties.Instance.Set( o, true ) );
+			var result = List().Introduce( serviceType.Adapt(), tuple => tuple.Item2.IsAssignableFrom( tuple.Item1.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault();
+			if ( result != null )
+			{
+				ActivationProperties.Instance.Set( result, true );
+			}
 			return result;
 		}
 	}

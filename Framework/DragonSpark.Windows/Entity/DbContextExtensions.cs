@@ -313,7 +313,7 @@ namespace DragonSpark.Windows.Entity
 		
 		public static IEnumerable<NavigationProperty> GetEntityProperties( this IObjectContextAdapter target, Type type ) => target.ObjectContext.MetadataWorkspace.GetEntityMetaData( type ).NavigationProperties;
 
-		public static Type[] GetDeclaredEntityTypes( this DbContext context ) => context.GetType().GetProperties().Where( x => x.PropertyType.IsGenericType && typeof( DbSet<> ).IsAssignableFrom( x.PropertyType.GetGenericTypeDefinition() ) ).Select( x => x.PropertyType.GetGenericArguments().FirstOrDefault() ).NotNull().ToArray();
+		public static Type[] GetDeclaredEntityTypes( this DbContext context ) => EnumerableExtensions.Alive( context.GetType().GetProperties().Where( x => x.PropertyType.IsGenericType && typeof( DbSet<> ).IsAssignableFrom( x.PropertyType.GetGenericTypeDefinition() ) ).Select( x => x.PropertyType.GetGenericArguments().FirstOrDefault() ) ).ToArray();
 
 		// public static IDisposable Configured<TContext>( this TContext target, Action<DbContextConfiguration> configure ) where TContext : DbContext => new ConfigurationContext( target, configure );
 
@@ -355,7 +355,7 @@ namespace DragonSpark.Windows.Entity
 
 				if ( !levels.HasValue || ++count < levels.Value )
 				{
-					associationNames.Select( y => type.GetProperty( y ).GetValue( entity ) ).NotNull().Each( z =>
+					associationNames.Select( y => type.GetProperty( y ).GetValue( entity ) ).Alive().Each( z =>
 					{
 						var items = z.Adapt().GetInnerType() != null ? z.AsTo<IEnumerable, object[]>( a => a.Cast<object>().ToArray() ) : z.ToItem();
 						items.Each( a => LoadAll( target, a, list, null, loadAllProperties, levels, count ) );

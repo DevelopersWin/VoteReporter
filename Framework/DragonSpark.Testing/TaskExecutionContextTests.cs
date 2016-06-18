@@ -57,7 +57,7 @@ namespace DragonSpark.Testing
 			var method = GetType().GetMethod( nameof(TheoryWrapped) );
 			Verify( method );
 			Assert.Equal( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
-			Assert.NotNull( ExecutionContext.Instance.Value.Value );
+			Assert.Exists( ExecutionContext.Instance.Value.Value );
 			Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 		}*/
 	}
@@ -125,7 +125,7 @@ namespace DragonSpark.Testing
 								Assert.Same( current, ExecutionContext.Instance.Value );
 								TaskExecutionContextTests.Verify( method );
 								Assert.NotEqual( ExecutionContext.Instance.Value.Id, TaskContext.Current() );
-								Assert.NotNull( ExecutionContext.Instance.Value.Value );
+								Assert.Exists( ExecutionContext.Instance.Value.Value );
 								Assert.Equal( method, ExecutionContext.Instance.Value.Value );
 							 } );
 		}*/

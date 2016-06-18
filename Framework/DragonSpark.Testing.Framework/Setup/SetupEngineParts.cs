@@ -1,7 +1,6 @@
 using DragonSpark.Extensions;
 using Ploeh.AutoFixture.Kernel;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -13,8 +12,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public static DefaultEngineParts Instance { get; } = new DefaultEngineParts();
 
-		public DefaultEngineParts() : this( Default )
-		{}
+		public DefaultEngineParts() : this( Default ) {}
 
 		public DefaultEngineParts( IEnumerable<ISpecimenBuilderTransformation> transformers )
 		{
@@ -26,7 +24,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			var enumerator = base.GetEnumerator();
 			while ( enumerator.MoveNext() )
 			{
-				yield return transformers.Select( transformation => transformation.Transform( enumerator.Current ) ).NotNull().Only() ?? enumerator.Current;
+				yield return transformers.Introduce( enumerator, transformation => transformation.Item1.Transform( transformation.Item2.Current ) ).Alive().Only() ?? enumerator.Current;
 			}
 		}
 	}

@@ -1,8 +1,13 @@
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -10,6 +15,8 @@ namespace DragonSpark.TypeSystem
 {
 	public class TypeAdapter
 	{
+		readonly ICache<MethodDescriptor, MethodInfo> methods;
+
 		public TypeAdapter( [Required]Type type ) : this( type, type.GetTypeInfo() ) {}
 
 		public TypeAdapter( [Required]TypeInfo info ) : this( info.AsType(), info ) {}
@@ -18,78 +25,144 @@ namespace DragonSpark.TypeSystem
 		{
 			Type = type;
 			Info = info;
+			methods = new ConcurrentEqualityCache<MethodDescriptor, MethodInfo>( new GenericMethodFactory( Type ).Create );
 		}
 
 		public Type Type { get; }
 
 		public TypeInfo Info { get; }
 
-		// readonly static MethodInfo LambdaMethod = typeof(Expression).GetRuntimeMethods().First(x => x.Name == nameof(Expression.Lambda) && x.GetParameters()[1].ParameterType == typeof(ParameterExpression[]));
-// static readonly MethodInfo EqualsMethod = typeof (object).GetMethod("Equals", BindingFlags.Instance | BindingFlags.Public);
-
-		// Attribution: https://weblogs.asp.net/ricardoperes/detecting-default-values-of-value-types
-		/*bool IsDefaultUsingLinqAndDynamic()
-		{
-			var arguments = new Expression[] { Expression.Default( Type ) };
-			var paramExpression = Expression.Parameter(Type, "x");
-			var equalsMethod = Type.GetRuntimeMethod( nameof(Equals), new [] { Type } );
-			var call = Expression.Call(paramExpression, equalsMethod, arguments);
-			var lambdaArgType = typeof(Func<,>).MakeGenericType(Type, typeof(bool));
-			var lambdaMethod = LambdaMethod.MakeGenericMethod(lambdaArgType);
-			var expression = lambdaMethod.Invoke(null, new object[] { call, new[] { paramExpression } }) as LambdaExpression;
- 
-			//cache this, please
-			var func = expression.Compile();
-			dynamic arg = obj;
-			dynamic del = func;
-			var result = del( arg );
-			return result;
-		}*/
-
-		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).ToArray();
+		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( ApplicationTypeSpecification.Instance.ToDelegate() ).ToArray();
 
 		public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
 
-		/*[Freeze]
-		public object GetDefaultValue() => null; // Info.IsValueType && Nullable.GetUnderlyingType( Type ) == null ? CreateUsing() : null;*/
-
 		public ConstructorInfo FindConstructor( params object[] parameters ) => FindConstructor( parameters.Select( o => o?.GetType() ).ToArray() );
 
-		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => Info.DeclaredConstructors.SingleOrDefault( c => c.IsPublic && !c.IsStatic && Match( c.GetParameters(), parameterTypes ) );
+		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
+			Info.DeclaredConstructors
+				.Introduce( parameterTypes, tuple => tuple.Item1.IsPublic && !tuple.Item1.IsStatic && CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
+				.SingleOrDefault();
 
-		static bool Match( IReadOnlyCollection<ParameterInfo> parameters, IReadOnlyCollection<Type> provided )
+		public object Invoke( string methodName, IEnumerable<Type> types ) => Invoke( methodName, types, Items<object>.Default );
+
+		public object Invoke( string methodName, IEnumerable<Type> types, params object[] parameters ) => Invoke( null, methodName, types, parameters );
+
+		public object Invoke( object instance, string methodName, IEnumerable<Type> types, params object[] parameters ) => Invoke<object>( instance, methodName, types, parameters );
+
+		public T Invoke<T>( string methodName, IEnumerable<Type> types, params object[] parameters ) => Invoke<T>( null, methodName, types, parameters );
+
+		public T Invoke<T>( object instance, string methodName, IEnumerable<Type> types, params object[] parameters )
 		{
-			var result = 
-				provided.Count >= parameters.Count( info => !info.IsOptional ) && 
-				provided.Count <= parameters.Count && 
-				parameters
-					.Select( ( t, i ) => provided.ElementAtOrDefault( i ).With( t.ParameterType.Adapt().IsAssignableFrom, () => i < provided.Count || t.IsOptional ) )
-					.All( b => b );
+			var descriptor = new MethodDescriptor( methodName, types, parameters );
+			var methodInfo = methods.Get( descriptor );
+			var result = (T)methodInfo.Invoke( methodInfo.IsStatic ? null : instance, parameters.ToArray() );
 			return result;
 		}
 
-		public object Invoke( string methodName, Type[] types ) => Invoke( methodName, types, Items<object>.Default );
-
-		public object Invoke( string methodName, Type[] types, params object[] parameters ) => Invoke( null, methodName, types, parameters );
-
-		public object Invoke( object instance, string methodName, Type[] types, params object[] parameters ) => Invoke<object>( instance, methodName, types, parameters );
-
-		public T Invoke<T>( string methodName, Type[] types, params object[] parameters ) => Invoke<T>( null, methodName, types, parameters );
-
-		public T Invoke<T>( object instance, string methodName, Type[] types, params object[] parameters )
+		class GenericMethodFactory : BasicFactoryBase<MethodDescriptor, MethodInfo>
 		{
-			var methodInfo = MakeGenericMethod( methodName, types );
-			var result = (T)methodInfo.Invoke( methodInfo.IsStatic ? null : instance, parameters );
-			return result;
+			readonly static Func<ValueTuple<MethodInfo, MethodDescriptor>, MethodInfo> CreateSelector = Create;
+
+			readonly Type type;
+
+			public GenericMethodFactory( Type type )
+			{
+				this.type = type;
+			}
+
+			public override MethodInfo Create( MethodDescriptor parameter )
+			{
+				var result = type.GetRuntimeMethods()
+								 .Introduce( parameter, tuple => GenericMethodEqualitySpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ), CreateSelector )
+								 .Introduce( parameter, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2.ParameterTypes ) )
+								 .SingleOrDefault();
+				return result;
+			}
+
+			static MethodInfo Create( ValueTuple<MethodInfo, MethodDescriptor> item )
+			{
+				try
+				{
+					return item.Item1.MakeGenericMethod( item.Item2.GenericTypes );
+				}
+				catch ( ArgumentException e )
+				{
+					DiagnosticProperties.Logger.Get( typeof(TypeAdapter) ).Verbose( e, "Could not create a generic method for {Method} with types {Types}", item.Item1, item.Item2.GenericTypes );
+					return item.Item1;
+				}
+			}
 		}
 
-		[Freeze]
-		MethodInfo MakeGenericMethod( string methodName, Type[] types )
+		class CompatibleArgumentsSpecification : SpecificationWithContextBase<Type[], ParameterInfo[]>
 		{
-			return Type.GetRuntimeMethods().Single( info => info.IsGenericMethod && info.Name == methodName && info.GetGenericArguments().Length == types.Length ).MakeGenericMethod( types );
+			public static ICache<MethodBase, ISpecification<Type[]>> Default { get; } = new Cache<MethodBase, ISpecification<Type[]>>( method => new CompatibleArgumentsSpecification( method ) );
+
+			readonly static Func<ValueTuple<ParameterInfo, Type[]>, int, bool> SelectCompatible = Compatible;
+			CompatibleArgumentsSpecification( MethodBase context ) : base( context.GetParameters() ) {}
+			
+			public override bool IsSatisfiedBy( Type[] parameter )
+			{
+				var result = 
+					parameter.Length >= Context.Count( info => !info.IsOptional ) && 
+					parameter.Length <= Context.Length && 
+					Context
+						.Introduce( parameter )
+						.Select( SelectCompatible )
+						.All();
+				return result;
+			}
+
+			static bool Compatible( ValueTuple<ParameterInfo, Type[]> context, int i )
+			{
+				var type = context.Item2.ElementAtOrDefault( i );
+				var result = type != null ? context.Item1.ParameterType.Adapt().IsAssignableFrom( type ) : i < context.Item2.Length || context.Item1.IsOptional;
+				return result;
+			}
 		}
 
-		// public object Qualify( object instance ) => instance.With( o => Info.IsAssignableFrom( o.GetType().GetTypeInfo() ) ? o : /*GetCaster( o.GetType() ).With( caster => caster.Invoke( null, new[] { o } ) ) )*/ null );
+		class GenericMethodEqualitySpecification : SpecificationWithContextBase<MethodDescriptor, MethodBase>
+		{
+			public static ICache<MethodBase, ISpecification<MethodDescriptor>> Default { get; } = new Cache<MethodBase, ISpecification<MethodDescriptor>>( method => new GenericMethodEqualitySpecification( method ) );
+			GenericMethodEqualitySpecification( MethodBase method ) : base( method ) {}
+
+			public override bool IsSatisfiedBy( MethodDescriptor parameter ) => 
+				Context.IsGenericMethod
+				&&
+				Context.Name == parameter.Name 
+				&& 
+				Context.GetGenericArguments().Length == parameter.GenericTypes.Length;
+		}
+
+		public struct MethodDescriptor : IEquatable<MethodDescriptor>
+		{
+			readonly int code;
+			public MethodDescriptor( string name, IEnumerable<Type> genericTypes, params object[] parameters ) : this( name, genericTypes.ToArray(), parameters.Select( o => o?.GetType() ).ToArray() ) {}
+
+			MethodDescriptor( string name, Type[] genericTypes, Type[] parameterTypes )
+			{
+				Name = name;
+				GenericTypes = genericTypes;
+				ParameterTypes = parameterTypes;
+				code = KeyFactory.Instance.CreateUsing( Name, GenericTypes, ParameterTypes );
+			}
+
+			public string Name { get; }
+			public Type[] GenericTypes { get; }
+			public Type[] ParameterTypes { get; }
+
+			public bool Equals( MethodDescriptor other ) => code == other.code;
+
+			public override bool Equals( object obj )
+			{
+				return !ReferenceEquals( null, obj ) && ( obj is MethodDescriptor && Equals( (MethodDescriptor)obj ) );
+			}
+
+			public override int GetHashCode() => code;
+
+			public static bool operator ==( MethodDescriptor left, MethodDescriptor right ) => left.Equals( right );
+
+			public static bool operator !=( MethodDescriptor left, MethodDescriptor right ) => !left.Equals( right );
+		}
 
 		public bool IsAssignableFrom( TypeInfo other ) => IsAssignableFrom( other.AsType() );
 
@@ -97,23 +170,23 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsInstanceOfType( object context ) => IsAssignableFrom( context.GetType() );
 
-		// MethodInfo GetCaster( Type other ) => null; // Info.DeclaredMethods.SingleOrDefault( method => method.Name == "op_Implicit" && method.GetParameters().First().ParameterType.GetTypeInfo().IsAssignableFrom( other.GetTypeInfo() ) );
-
 		public Assembly Assembly => Info.Assembly;
 
 		public Type[] GetHierarchy( bool includeRoot = true )
 		{
-			var result = new List<Type> { Type };
+			var builder = ImmutableArray.CreateBuilder<Type>();
+			builder.Add( Type );
 			var current = Info.BaseType;
 			while ( current != null )
 			{
 				if ( current != typeof(object) || includeRoot )
 				{
-					result.Add( current );
+					builder.Add( current );
 				}
 				current = current.GetTypeInfo().BaseType;
 			}
-			return result.ToArray();
+			var result = builder.ToArray();
+			return result;
 		}
 
 		public Type GetEnumerableType() => InnerType( Type, types => types.FirstOrDefault(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
@@ -171,7 +244,9 @@ namespace DragonSpark.TypeSystem
 			return null;
 		}
 
-		public bool IsGenericOf( Type genericDefinition, bool includeInterfaces = true ) => GetImplementations( genericDefinition, includeInterfaces ).Any();
+		public bool IsGenericOf( Type genericDefinition ) => IsGenericOf( genericDefinition, true );
+
+		public bool IsGenericOf( Type genericDefinition, bool includeInterfaces ) => GetImplementations( genericDefinition, includeInterfaces ).Any();
 
 		public Type[] GetAllInterfaces() => ExpandInterfaces( Type ).ToArray();
 

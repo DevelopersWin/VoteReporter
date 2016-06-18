@@ -1,5 +1,6 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
@@ -18,7 +19,7 @@ namespace DragonSpark.Activation
 
 		public static Constructor Instance { get; } = new Constructor();
 
-		Constructor() : this( Locator.Instance.Create, ObjectActivatorFactory.Instance.Create ) {}
+		Constructor() : this( Locator.Instance.ToDelegate(), ObjectActivatorFactory.Instance.Get ) {}
 
 		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, ObjectActivator> activatorSource ) : base( Specification.Instance )
 		{
@@ -31,22 +32,14 @@ namespace DragonSpark.Activation
 		object LocateAndCreate( ConstructTypeRequest parameter )
 		{
 			var info = constructorSource( parameter );
-			if ( info != null )
-			{
-				var activator = activatorSource( info );
-				if ( activator != null )
-				{
-					var result = activator( Ensure( info.GetParameters(), parameter.Arguments ) );
-					return result;
-				}
-			}
-			return null;
+			var result = info != null ? activatorSource( info )?.Invoke( WithOptional( parameter.Arguments, info.GetParameters() ) ) : null;
+			return result;
 		}
 
-		static object[] Ensure( IEnumerable<ParameterInfo> parameters, IReadOnlyCollection<object> arguments )
+		static object[] WithOptional( IReadOnlyCollection<object> arguments, IEnumerable<ParameterInfo> parameters )
 		{
 			var optional = parameters.Skip( arguments.Count ).Where( info => info.IsOptional ).Select( info => info.DefaultValue );
-			var result = EnumerableExtensions.Fixed( arguments.Concat( optional ) );
+			var result = arguments.Concat( optional ).Fixed();
 			return result;
 		}
 
@@ -58,7 +51,7 @@ namespace DragonSpark.Activation
 
 			// public Specification() : this( ActivatorFactory.Instance.Create ) {}
 
-			Specification() : this( Locator.Instance.Create ) {}
+			Specification() : this( Locator.Instance.ToDelegate() ) {}
 			Specification( Func<ConstructTypeRequest, ConstructorInfo> source ) : base( Coercer.Instance.Coerce )
 			{
 				this.source = source;
@@ -75,10 +68,9 @@ namespace DragonSpark.Activation
 			[Freeze]
 			public override ConstructorInfo Create( ConstructTypeRequest parameter )
 			{
-				var candidates = ImmutableArray.Create( parameter.Arguments, parameter.Arguments.NotNull(), Items<object>.Default );
+				var candidates = ImmutableArray.Create( parameter.Arguments, parameter.Arguments.Alive().Fixed(), Items<object>.Default );
 				var adapter = parameter.RequestedType.Adapt();
 				var result = candidates
-					.Select( objects => EnumerableExtensions.Fixed( objects ) )
 					.Select( adapter.FindConstructor )
 					.FirstOrDefault();
 				return result;
@@ -86,12 +78,13 @@ namespace DragonSpark.Activation
 		}
 
 		// [AutoValidation( false )]
-		class ObjectActivatorFactory : FactoryBase<ConstructorInfo, ObjectActivator>
+		class ObjectActivatorFactory : Cache<ConstructorInfo, ObjectActivator>
 		{
 			public static ObjectActivatorFactory Instance { get; } = new ObjectActivatorFactory();
+			ObjectActivatorFactory() : base( Create ) {}
 
-			[Freeze]
-			public override ObjectActivator Create( ConstructorInfo parameter )
+			// [Freeze]
+			static ObjectActivator Create( ConstructorInfo parameter )
 			{
 				var parameters = parameter.GetParameters();
 				var param = Expression.Parameter( typeof(object[]), "args" );

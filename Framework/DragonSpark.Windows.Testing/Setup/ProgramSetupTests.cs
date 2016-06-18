@@ -33,7 +33,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( can );
 
 			/*var created = activator.Create( typeof(MonitoredModule) );
-			Assert.NotNull( created );*/
+			Assert.Exists( created );*/
 
 			/*var activator = sut.Resolve<IActivator>()
 			var specification = new DecoratedSpecification<TypeRequest>( sut.Resolve<ResolvableConstructorSpecification>(), ConstructorBase.Coercer.Instance ).To<ISpecification>();

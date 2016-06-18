@@ -298,7 +298,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		{
 			var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream( "Prism.Wpf.Tests.Modularity.ModuleCatalogXaml.SimpleModuleCatalog.xaml" );
 			var catalog = ModuleCatalog.CreateFromXaml(stream);
-			Assert.NotNull(catalog);
+			Assert.Exists(catalog);
 
 			Assert.Equal(4, catalog.Modules.Count());
 		}*/

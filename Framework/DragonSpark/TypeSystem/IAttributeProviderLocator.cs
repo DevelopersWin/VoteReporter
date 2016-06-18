@@ -33,7 +33,7 @@ namespace DragonSpark.TypeSystem
 
 	class ObjectAttributeProvider : DelegatedParameterFactoryBase<object, IAttributeProvider>
 	{
-		public ObjectAttributeProvider( object item ) : base( item, MemberInfoProviderFactory.Instance.Create ) {}
+		public ObjectAttributeProvider( object item ) : base( item, MemberInfoProviderFactory.Instance.ToDelegate() ) {}
 	}
 
 	public class MemberInfoProvider : FirstConstructedFromParameterFactory<IAttributeProvider>
@@ -125,12 +125,8 @@ namespace DragonSpark.TypeSystem
 		public class ConstructorInfoDefinitionLocator : MemberInfoDefinitionLocatorBase<ConstructorInfo>
 		{
 			public ConstructorInfoDefinitionLocator( TypeInfo definition ) : base( definition ) {}
-			protected override MemberInfo From( ConstructorInfo parameter )
-			{
-				var types = parameter.GetParameters().Select( info => info.ParameterType ).ToArray();
-				var result = Definition.DeclaredConstructors.FirstOrDefault( info => types.SequenceEqual( info.GetParameters().Select( parameterInfo => parameterInfo.ParameterType ) ) );
-				return result;
-			}
+			protected override MemberInfo From( ConstructorInfo parameter ) => 
+				Definition.DeclaredConstructors.Introduce( parameter.GetParameterTypes(), tuple => tuple.Item1.GetParameterTypes().SequenceEqual( tuple.Item2 ) ).FirstOrDefault();
 		}
 
 		public abstract class NamedMemberInfoDefinitionLocatorBase<T> : MemberInfoDefinitionLocatorBase<T> where T : MemberInfo
@@ -152,7 +148,7 @@ namespace DragonSpark.TypeSystem
 				}
 				catch ( AmbiguousMatchException )
 				{
-					var result = all.FirstOrDefault( info => info.Name == parameter.Name );
+					var result = all.Introduce( parameter, tuple => tuple.Item1.Name == tuple.Item2.Name ).FirstOrDefault();
 					return result;
 				}
 			}

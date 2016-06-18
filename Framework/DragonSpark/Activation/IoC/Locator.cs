@@ -33,7 +33,7 @@ namespace DragonSpark.Activation.IoC
 			using ( var child = container.CreateChildContainer().Extend<DefaultRegistrationsExtension>() )
 			{
 				var command = child.Resolve<RegisterEntireHierarchyCommand>();
-				parameter.Arguments.NotNull().Select( o => new InstanceRegistrationParameter( o ) ).Each( command.Execute );
+				parameter.Arguments.Alive().Select( o => new InstanceRegistrationParameter( o ) ).Each( command.Execute );
 
 				var result = child.TryResolve( parameter.RequestedType );
 				return result;

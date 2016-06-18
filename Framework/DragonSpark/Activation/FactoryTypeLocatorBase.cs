@@ -31,7 +31,7 @@ namespace DragonSpark.Activation
 			var requests = FactoryTypeFactory.Instance.CreateMany( all );
 			var candidates = new[] { new FactoryTypeLocator( requests ), locator };
 			var mapped = new LocateTypeRequest( type( parameter ) );
-			var result = candidates.FirstWhere( typeLocator => typeLocator.Create( mapped ) );
+			var result = candidates.FirstAssigned( typeLocator => typeLocator.Create( mapped ) );
 			return result;
 		}
 	}

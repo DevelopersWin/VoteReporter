@@ -33,9 +33,9 @@ namespace DragonSpark.Setup.Registration
 	{
 		public static void Register<TFrom, TTo>( this IServiceRegistry @this, string name = null ) where TTo : TFrom => @this.Register( new MappingRegistrationParameter( typeof(TFrom), typeof(TTo), name ) );
 
-		public static void Register<TService>( this IServiceRegistry @this, TService instance, string name = null ) => @this.Register( new InstanceRegistrationParameter( typeof(TService), instance, name ) );
+		public static void Register<T>( this IServiceRegistry @this, T instance, string name = null ) => @this.Register( new InstanceRegistrationParameter( typeof(T), instance, name ) );
 
-		public static void Register<TService>( this IServiceRegistry @this, Func<TService> factory, string name = null ) => @this.RegisterFactory( new FactoryRegistrationParameter( typeof(TService), () => factory(), name ) );
+		public static void Register<T>( this IServiceRegistry @this, Func<T> factory, string name = null ) => @this.RegisterFactory( new FactoryRegistrationParameter( typeof(T), factory.Convert(), name ) );
 	}
 
 	public class FactoryDelegateFactory : FactoryBase<Type, Func<object>>
@@ -44,15 +44,14 @@ namespace DragonSpark.Setup.Registration
 
 		public static FactoryDelegateFactory Instance { get; } = new FactoryDelegateFactory();
 
-		// [InjectionConstructor]
-		public FactoryDelegateFactory() : this( GlobalServiceProvider.Instance.Get<IFactory> ) {}
+		FactoryDelegateFactory() : this( GlobalServiceProvider.Instance.Get<IFactory> ) {}
 
 		public FactoryDelegateFactory( [Required]Func<Type, IFactory> createFactory )
 		{
 			this.createFactory = createFactory;
 		}
 
-		public override Func<object> Create( Type parameter ) => createFactory( parameter ).With( f => new Func<object>( f.Create ) );
+		public override Func<object> Create( Type parameter ) => createFactory( parameter ).ToDelegate();
 	}
 
 	public class FactoryWithParameterDelegateFactory : FactoryBase<Type, Func<object, object>>
@@ -61,15 +60,14 @@ namespace DragonSpark.Setup.Registration
 
 		readonly Func<Type, IFactoryWithParameter> createFactory;
 
-		// [InjectionConstructor]
-		public FactoryWithParameterDelegateFactory() : this( GlobalServiceProvider.Instance.Get<IFactoryWithParameter> ) {}
+		FactoryWithParameterDelegateFactory() : this( GlobalServiceProvider.Instance.Get<IFactoryWithParameter> ) {}
 
 		public FactoryWithParameterDelegateFactory( [Required]Func<Type, IFactoryWithParameter> createFactory )
 		{
 			this.createFactory = createFactory;
 		}
 
-		public override Func<object, object> Create( Type parameter ) => createFactory( parameter ).With( f => new Func<object, object>( f.Create ) );
+		public override Func<object, object> Create( Type parameter ) => createFactory( parameter ).ToDelegate();
 	}
 
 	public class FactoryWithActivatedParameterDelegateFactory : FactoryBase<Type, Func<object>>
@@ -79,8 +77,7 @@ namespace DragonSpark.Setup.Registration
 		readonly Func<Type, Func<object, object>> factory;
 		readonly Func<Type, object> createParameter;
 
-		// [InjectionConstructor]
-		public FactoryWithActivatedParameterDelegateFactory() : this( FactoryWithParameterDelegateFactory.Instance.Create, GlobalServiceProvider.Instance.Get<object> ) {}
+		FactoryWithActivatedParameterDelegateFactory() : this( FactoryWithParameterDelegateFactory.Instance.ToDelegate(), GlobalServiceProvider.Instance.Get<object> ) {}
 
 		public FactoryWithActivatedParameterDelegateFactory( [Required]Func<Type, Func<object, object>> factory, [Required]Func<Type, object> createParameter )
 		{
@@ -88,12 +85,17 @@ namespace DragonSpark.Setup.Registration
 			this.createParameter = createParameter;
 		}
 
-		public override Func<object> Create( Type parameter ) => factory( parameter ).With( func => new Func<object>( () =>
+		public override Func<object> Create( Type parameter )
 		{
-			var createdParameter = createParameter( ParameterTypeLocator.Instance.Get( parameter ) );
-			var result = func( createdParameter );
-			return result;
-		} ) );
+			var @delegate = factory( parameter );
+			if ( @delegate != null )
+			{
+				var createdParameter = createParameter( ParameterTypeLocator.Instance.Get( parameter ) );
+				var result = new FixedFactory<object, object>( @delegate, createdParameter ).ToDelegate();
+				return result;
+			}
+			return null;
+		}
 	}
 
 	public class FuncFactory<T, U> : FactoryBase<Func<object, object>, Func<T, U>>
@@ -102,7 +104,7 @@ namespace DragonSpark.Setup.Registration
 
 		FuncFactory() {}
 
-		public override Func<T, U> Create( Func<object, object> parameter ) => t => (U)parameter( t );
+		public override Func<T, U> Create( Func<object, object> parameter ) => parameter.Convert<T, U>();
 	}
 
 	public class FuncFactory<T> : FactoryBase<Func<object>, Func<T>>
@@ -111,7 +113,7 @@ namespace DragonSpark.Setup.Registration
 
 		FuncFactory() {}
 
-		public override Func<T> Create( Func<object> parameter ) => () => (T)parameter();
+		public override Func<T> Create( Func<object> parameter ) => parameter.Convert<T>();
 	}
 
 	public class RegisterFactoryParameter
@@ -119,7 +121,7 @@ namespace DragonSpark.Setup.Registration
 		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes )
 		{
 			FactoryType = factoryType;
-			RegisterTypes = registrationTypes.NotNull().Append( ResultTypeLocator.Instance.Get( factoryType ) ).Distinct().ToArray();
+			RegisterTypes = registrationTypes.Alive().Append( ResultTypeLocator.Instance.Get( factoryType ) ).Distinct().ToArray();
 		}
 		
 		public Type FactoryType { get; }
@@ -161,7 +163,7 @@ namespace DragonSpark.Setup.Registration
 			} );
 
 			new[] { ImplementedInterfaceFromConventionLocator.Instance.Create( parameter.FactoryType ), FactoryInterfaceLocator.Instance.Create( parameter.FactoryType ) }
-				.NotNull()
+				.Alive()
 				.Distinct()
 				.Select( type => new MappingRegistrationParameter( type, parameter.FactoryType ) )
 				.Each( registry.Register );

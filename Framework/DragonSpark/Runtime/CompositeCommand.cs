@@ -15,7 +15,7 @@ namespace DragonSpark.Runtime
 
 		public FirstCommand( ISpecification<T> specification, params ICommand[] commands ) : base( specification, commands ) {}
 
-		public override void Execute( T parameter ) => Commands.FirstWhere( command =>
+		public override void Execute( T parameter ) => Commands.FirstAssigned( command =>
 																				 {
 																					 var asExecuted = command.AsExecuted( (object)parameter );
 																					 return asExecuted;

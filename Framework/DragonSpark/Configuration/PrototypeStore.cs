@@ -1,10 +1,7 @@
-﻿using System.Collections.Concurrent;
-using DragonSpark.Activation;
+﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using PostSharp.Patterns.Model;
-using PostSharp.Patterns.Threading;
-using System.Collections.Generic;
 using DragonSpark.Runtime.Stores;
+using System.Collections.Concurrent;
 
 namespace DragonSpark.Configuration
 {

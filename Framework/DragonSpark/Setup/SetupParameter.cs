@@ -19,7 +19,7 @@ namespace DragonSpark.Setup
 
 		IReadOnlyCollection<object> Items { get; }
 
-		void Monitor( Task task );
+		void ReferenceMonitor( Task task );
 
 		void Register( object item );
 
@@ -83,7 +83,7 @@ namespace DragonSpark.Setup
 
 		object ISetupParameter.Arguments => Arguments;
 
-		public void Monitor( Task task ) => tasks.Add( task );
+		public void ReferenceMonitor( Task task ) => tasks.Add( task );
 
 		public IReadOnlyCollection<object> Items { get; }
 		

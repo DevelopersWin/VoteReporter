@@ -15,56 +15,6 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Composition
 {
-	/*public class CompositionTests1
-	{
-		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
-		public void BasicComposeAgainAnother( CompositionContext host )
-		{
-			var sinkOne = host.GetExport<ILoggerHistory>();
-			var sinkTwo = host.GetExport<ILoggerHistory>();
-			Assert.Same( sinkOne, sinkTwo );
-
-			var first = host.GetExport<ILogger>();
-			var second = host.GetExport<ILogger>();
-			Assert.Same( first, second );
-
-			Assert.Single( sinkOne.Events );
-			var current = sinkOne.Events.Count();
-			first.Information( "Testing this out." );
-			Assert.NotEmpty( sinkOne.Events );
-			Assert.True( sinkOne.Events.Count() > current );
-		}
-	}
-
-	public class CompositionTests2
-	{
-		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
-		public void BasicComposeAgainAnother( CompositionContext host )
-		{
-			var sinkOne = host.GetExport<ILoggerHistory>();
-			var sinkTwo = host.GetExport<ILoggerHistory>();
-			Assert.Same( sinkOne, sinkTwo );
-
-			var first = host.GetExport<ILogger>();
-			var second = host.GetExport<ILogger>();
-			Assert.Same( first, second );
-
-			Assert.Single( sinkOne.Events );
-			var current = sinkOne.Events.Count();
-			first.Information( "Testing this out." );
-			Assert.NotEmpty( sinkOne.Events );
-			Assert.True( sinkOne.Events.Count() > current );
-		}
-	}*/
-
-	/*public class CompositionTests2 : TestCollectionBase
-	{
-		public CompositionTests2( ITestOutputHelper output ) : base( output ) {}
-
-		[Theory, Framework.Setup.AutoData]
-		public void BasicComposeAgain( CompositionContext host ) {}
-	}*/
-
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class CompositionTests : TestCollectionBase
 	{
@@ -154,7 +104,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var item = host.GetExport<ExportedItem>();
 			Assert.IsType<ExportedItem>( item );
-			Assert.False( item.Get( Condition.Property ).IsApplied );
+			Assert.False( item.Get( Condition.Default ).IsApplied );
 		}
 
 		[Theory, CompositionTests.AutoData]
@@ -163,14 +113,14 @@ namespace DragonSpark.Testing.Composition
 			var service = host.GetExport<IBasicService>();
 			Assert.IsType<BasicService>( service );
 			Assert.NotSame( service, host.GetExport<IBasicService>() );
-			Assert.True( service.Get( Condition.Property ).IsApplied );
+			Assert.True( service.Get( Condition.Default ).IsApplied );
 
 			var factory = host.GetExport<Func<IBasicService>>();
 			Assert.NotNull( factory );
 			var created = factory();
 			Assert.NotSame( factory, service );
 			Assert.IsType<BasicService>( created );
-			Assert.True( created.Get( Condition.Property ).IsApplied );
+			Assert.True( created.Get( Condition.Default ).IsApplied );
 		}
 
 		[Theory, CompositionTests.AutoData]
@@ -178,7 +128,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var item = host.GetExport<ExportedItem>();
 			Assert.NotNull( item );
-			Assert.False( item.Get( Condition.Property ).IsApplied );
+			Assert.False( item.Get( Condition.Default ).IsApplied );
 		}
 
 		[Theory, CompositionTests.AutoData]
@@ -194,7 +144,7 @@ namespace DragonSpark.Testing.Composition
 			var service = host.GetExport<ISharedService>();
 			Assert.IsType<SharedService>( service );
 			Assert.Same( service, host.GetExport<ISharedService>() );
-			Assert.True( service.Get( Condition.Property ).IsApplied );
+			Assert.True( service.Get( Condition.Default ).IsApplied );
 		}
 
 		internal class AutoData : AutoDataAttribute

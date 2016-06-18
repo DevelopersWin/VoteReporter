@@ -177,7 +177,7 @@ namespace DragonSpark.Testing.TypeSystem
 		{
 			var property = typeof(SingletonLocatorTests.Singleton).GetProperty( nameof(SingletonLocatorTests.Singleton.Instance) );
 			var provider = Attributes.Get( property );
-			Assert.NotNull( provider );
+			Assert.Exists( provider );
 		}
 
 		class Singleton : ISingleton
