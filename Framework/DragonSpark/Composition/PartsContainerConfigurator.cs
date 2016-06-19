@@ -14,6 +14,7 @@ using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
 {
@@ -77,42 +78,46 @@ namespace DragonSpark.Composition
 	public class ServicesExportDescriptorProvider : InstanceExportDescriptorProvider<IServiceProviderHost>
 	{
 		readonly IServiceProviderHost host;
+		readonly Func<Type, object> get;
 
 		public ServicesExportDescriptorProvider() : this( new ServiceProviderHost() ) {}
 
-		public ServicesExportDescriptorProvider( [Required]IServiceProviderHost host ) : base( host )
+		public ServicesExportDescriptorProvider( IServiceProviderHost host ) : base( host )
 		{
 			this.host = host;
+			get = Get;
 		}
 
-		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor ) => 
-			base.GetExportDescriptors( contract, descriptorAccessor ).AnyOr( () => DeterminePromise( contract, descriptorAccessor ) );
+		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
+		{
+			var promises = base.GetExportDescriptors( contract, descriptorAccessor ).Fixed();
+			var result = promises.Any() ? promises : DeterminePromise( contract, descriptorAccessor );
+			return result;
+		}
 
 		IEnumerable<ExportDescriptorPromise> DeterminePromise( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
 			CompositionDependency dependency;
 			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
 			{
-				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Context( Get, contract ).Create );
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Factory( get, contract.ContractType ).Create );
 			}
 		}
 
 		object Get( Type type ) => host.Value.GetService( type );
 
-		class Context
+		class Factory : FixedFactory<Type, object>
 		{
-			readonly Func<Type, object> provider;
-			readonly CompositionContract contract;
+			readonly CompositeActivator activate;
 
-			public Context( [Required]Func<Type, object> provider, [Required]CompositionContract contract )
+			public Factory( Func<Type, object> provider, Type contract ) : base( provider, contract )
 			{
-				this.provider = provider;
-				this.contract = contract;
+				activate = Activate;
 			}
 
-			public ExportDescriptor Create( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( Activate, NoMetadata );
+			object Activate( LifetimeContext context, CompositionOperation operation ) => Create();
 
-			object Activate( LifetimeContext context, CompositionOperation operation ) => provider( contract.ContractType );
+			public ExportDescriptor Create( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( activate, NoMetadata );
 		}
 	}
 
