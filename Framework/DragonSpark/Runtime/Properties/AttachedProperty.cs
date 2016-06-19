@@ -51,6 +51,29 @@ namespace DragonSpark.Runtime.Properties
 		}*/
 	}
 
+	public class CacheContext<TInstance, TKey, TResult> where TResult : class where TInstance : class
+	{
+		readonly Func<TKey, Func<TInstance, TResult>> creator;
+		readonly ICache<TInstance, TResult> cache;
+
+		public CacheContext( Func<TKey, Func<TInstance, TResult>> creator ) : this( new Cache<TInstance, TResult>(), creator ) {}
+
+		public CacheContext( ICache<TInstance, TResult> cache, Func<TKey, Func<TInstance, TResult>> creator )
+		{
+			this.cache = cache;
+			this.creator = creator;
+		}
+
+		public TResult GetOrSet( TInstance instance, TKey key ) => cache.Contains( instance ) ? cache.Get( instance ) : Set( instance, key );
+
+		TResult Set( TInstance instance, TKey key )
+		{
+			var result = creator( key )( instance );
+			cache.Set( instance, result );
+			return result;
+		}
+	}
+
 	/*public enum AttachedPropertyChangedEventType
 	{
 		Set, Clear

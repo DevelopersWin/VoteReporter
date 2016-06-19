@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 
@@ -51,25 +50,25 @@ namespace DragonSpark.Composition
 
 		class Promise : ExportDescriptorPromise
 		{
-			public Promise( CompositionDependency dependency, string origin, CompositionContract resultContract, DependencyAccessor descriptorAccessor, Func<Activator.Parameter, object> delegateSource ) : this( dependency, origin, resultContract, new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, delegateSource ).Create( new ActivatorFactory.Parameter( descriptorAccessor, resultContract, dependency.Contract ) ) ) {}
-			Promise( CompositionDependency dependency, string origin, CompositionContract resultContract, CompositeActivator activator ) : this( dependency, origin, new Context( dependency, resultContract, activator ) ) {}
+			public Promise( CompositionDependency dependency, string origin, CompositionContract resultContract, DependencyAccessor descriptorAccessor, Func<Activator.Parameter, object> delegateSource ) : this( dependency, origin, new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, delegateSource ).Create( new ActivatorFactory.Parameter( descriptorAccessor, resultContract, dependency.Contract ) ) ) {}
+			Promise( CompositionDependency dependency, string origin, CompositeActivator activator ) : this( dependency, origin, new Context( dependency, activator ) ) {}
 			Promise( CompositionDependency dependency, string origin, Context context ) : base( dependency.Contract, origin, dependency.Target.IsShared, NoDependencies, context.Create ) {}
 
 			class Context : FactoryBase<Context.Parameter, object>
 			{
-				readonly static ICache<LifetimeContext, ConditionalWeakTable<CompositionContract, object>> Property = new ActivatedCache<LifetimeContext, ConditionalWeakTable<CompositionContract, object>>();
+				readonly CacheContext<LifetimeContext, Parameter, object> cache;
 
 				readonly CompositionDependency dependency;
-				readonly CompositionContract resultContract;
 				readonly CompositeActivator activator;
 				readonly CompositeActivator create;
 				readonly Func<Parameter, object> @new;
 
-				public Context( CompositionDependency dependency, CompositionContract resultContract, CompositeActivator activator )
+				public Context( CompositionDependency dependency, CompositeActivator activator )
 				{
 					this.dependency = dependency;
-					this.resultContract = resultContract;
 					this.activator = activator;
+
+					cache = new CacheContext<LifetimeContext, Parameter, object>( Factory );
 					create = Create;
 					@new = New;
 				}
@@ -82,28 +81,13 @@ namespace DragonSpark.Composition
 
 				object FromCache( Parameter parameter )
 				{
-					object found;
-					var table = GetTable( parameter );
-					var result = table.TryGetValue( resultContract, out found ) ? found : Create( parameter, table );
-					return result;
-				}
-
-				ConditionalWeakTable<CompositionContract, object> GetTable( Parameter parameter )
-				{
 					var boundary = ContractSupport.Default.Get( dependency.Contract );
-					var lifetimeContext = parameter.Context.FindContextWithin( boundary );
-					var result = Property.Get( lifetimeContext );
+					var context = parameter.Context.FindContextWithin( boundary );
+					var result = cache.GetOrSet( context, parameter );
 					return result;
 				}
 
-				object Create( Parameter parameter, ConditionalWeakTable<CompositionContract, object> table )
-				{
-					var factory = new FixedFactory<Parameter, object>( @new, parameter );
-					var @delegate = factory.Wrap<object>().ToDelegate();
-					var callback = new ConditionalWeakTable<CompositionContract, object>.CreateValueCallback( @delegate );
-					var result = table.GetValue( resultContract, callback );
-					return result;
-				}
+				Func<LifetimeContext, object> Factory( Parameter parameter ) => new FixedFactory<Parameter, object>( @new, parameter ).Wrap<object>().ToDelegate();
 
 				object New( Parameter parameter )
 				{
