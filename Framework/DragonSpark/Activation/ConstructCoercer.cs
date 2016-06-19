@@ -27,7 +27,7 @@ namespace DragonSpark.Activation
 		public ConstructFromParameterFactory( IActivator activator, Type type ) : base( activator, type ) {}
 	}*/
 
-	public class ConstructFromParameterFactory<T> : FactoryBase<object, T>
+	public class ConstructFromParameterFactory<T> : FactoryWithSpecificationBase<object, T>
 	{
 		public static ICache<Type, Func<object, T>> Cache { get; } = new Cache<Type, Func<object, T>>( t => new ConstructFromParameterFactory<T>( t ).ToDelegate() );
 

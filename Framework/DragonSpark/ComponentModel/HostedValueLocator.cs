@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace DragonSpark.ComponentModel
 {
-	public class HostedValueLocator<T> : FactoryBase<object, T[]> where T : class
+	public class HostedValueLocator<T> : FactoryWithSpecificationBase<object, T[]> where T : class
 	{
 		public static HostedValueLocator<T> Instance { get; } = new HostedValueLocator<T>();
 

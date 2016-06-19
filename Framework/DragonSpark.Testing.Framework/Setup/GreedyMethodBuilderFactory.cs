@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public abstract class EnginePartFactory<T> : FactoryBase<T, ISpecimenBuilder>, ISpecimenBuilderTransformation where T : ISpecimenBuilder
+	public abstract class EnginePartFactory<T> : FactoryWithSpecificationBase<T, ISpecimenBuilder>, ISpecimenBuilderTransformation where T : ISpecimenBuilder
 	{
 		public ISpecimenBuilder Transform( ISpecimenBuilder builder ) => builder.AsTo( this.ToDelegate() );
 	}

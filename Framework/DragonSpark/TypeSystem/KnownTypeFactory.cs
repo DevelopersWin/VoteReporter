@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DragonSpark.TypeSystem
 {
-	public class KnownTypeFactory : FactoryBase<System.Type, System.Type[]>
+	public class KnownTypeFactory : FactoryWithSpecificationBase<System.Type, System.Type[]>
 	{
 		public static KnownTypeFactory Instance { get; } = new KnownTypeFactory( FrameworkTypes.Instance.Create() );
 

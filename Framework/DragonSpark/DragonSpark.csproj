@@ -302,7 +302,7 @@
     <Compile Include="Modularity\ModuleInfoExtensions.cs" />
     <Compile Include="Modularity\ModuleMonitor.cs" />
     <Compile Include="TypeSystem\AssemblySourceBase.cs" />
-    <Compile Include="Activation\FactoryBase.cs" />
+    <Compile Include="Activation\FactoryWithSpecificationBase.cs" />
     <Compile Include="Runtime\Collection.cs" />
     <Compile Include="TypeSystem\ApplicationAssemblyFilter.cs">
       <SubType>Code</SubType>

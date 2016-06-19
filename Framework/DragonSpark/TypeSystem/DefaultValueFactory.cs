@@ -44,7 +44,7 @@ namespace DragonSpark.TypeSystem
 	}
 
 	// [AutoValidation( false )]
-	public class DefaultValueFactory : FactoryBase<Type, object>
+	public class DefaultValueFactory : FactoryWithSpecificationBase<Type, object>
 	{
 		public static DefaultValueFactory Instance { get; } = new DefaultValueFactory();
 

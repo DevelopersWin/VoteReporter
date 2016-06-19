@@ -90,7 +90,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 			protected override ImmutableArray<object> GetKeyItems( AutoData parameter ) => ImmutableArray.Create<object>( includeFromParameters, others, parameter.Method.DeclaringType );
 
-			class Factory : FactoryBase<AutoData, IServiceProvider>
+			class Factory : FactoryWithSpecificationBase<AutoData, IServiceProvider>
 			{
 				readonly IFactory<MethodBase, Type[]> types;
 
@@ -115,7 +115,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override object GetInstance( AutoData parameter ) => parameter.Method.DeclaringType;
 	}
 
-	public class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
+	public class AutoDataExecutionContextFactory : FactoryWithSpecificationBase<AutoData, IDisposable>
 	{
 		readonly static IFactory<IServiceProvider, IApplication> DefaultApplicationFactory = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) );
 
@@ -200,7 +200,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public class ServiceProviderTypeFactory : FactoryBase<MethodBase, Type[]>
+	public class ServiceProviderTypeFactory : FactoryWithSpecificationBase<MethodBase, Type[]>
 	{
 		readonly Type[] additional;
 		readonly bool includeFromParameters;
@@ -226,7 +226,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	sealed class FixtureServiceProvider : FactoryBase<Type, object>, IServiceProvider
+	sealed class FixtureServiceProvider : FactoryWithSpecificationBase<Type, object>, IServiceProvider
 	{
 		readonly IFixture fixture;
 

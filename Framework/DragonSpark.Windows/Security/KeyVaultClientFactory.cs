@@ -1,6 +1,6 @@
 namespace DragonSpark.Windows.Security
 {
-	/*public class KeyVaultClientFactory : FactoryBase<KeyVaultClient>
+	/*public class KeyVaultClientFactory : FactoryWithSpecificationBase<KeyVaultClient>
 	{
 		readonly ClientAssertionCertificate certificate;
 
@@ -27,7 +27,7 @@ namespace DragonSpark.Windows.Security
 		}
 	}
 
-	public class SecretFactory : FactoryBase<string, string>
+	public class SecretFactory : FactoryWithSpecificationBase<string, string>
 	{
 		readonly KeyVaultClient client;
 		readonly Uri location;
@@ -90,7 +90,7 @@ namespace DragonSpark.Windows.Security
 		}
 	}
 
-	class RsaKeyPairFactory : FactoryBase<int, AsymmetricCipherKeyPair>
+	class RsaKeyPairFactory : FactoryWithSpecificationBase<int, AsymmetricCipherKeyPair>
 	{
 		public static RsaKeyPairFactory Instance { get; } = new RsaKeyPairFactory();
 
@@ -104,7 +104,7 @@ namespace DragonSpark.Windows.Security
 		}
 	}
 
-	public class CertificateContextFactory : FactoryBase<CertificateContextFactory.Parameter, Org.BouncyCastle.X509.X509Certificate>
+	public class CertificateContextFactory : FactoryWithSpecificationBase<CertificateContextFactory.Parameter, Org.BouncyCastle.X509.X509Certificate>
 	{
 		public class Parameter
 		{

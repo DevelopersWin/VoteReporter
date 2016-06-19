@@ -16,7 +16,7 @@ using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
-	public class FactoryTypeFactory : FactoryBase<Type, FactoryTypeRequest>
+	public class FactoryTypeFactory : FactoryWithSpecificationBase<Type, FactoryTypeRequest>
 	{
 		public static FactoryTypeFactory Instance { get; } = new FactoryTypeFactory( Specification.Instance );
 

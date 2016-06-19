@@ -294,7 +294,7 @@ namespace DragonSpark.Setup
 		// void Register( IDisposable disposable );
 	}
 
-	/*public class FrameworkTypes : FactoryBase<Type[]>
+	/*public class FrameworkTypes : FactoryWithSpecificationBase<Type[]>
 	{
 		public static FrameworkTypes Instance { get; } = new FrameworkTypes();
 

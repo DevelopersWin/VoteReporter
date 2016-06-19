@@ -6,7 +6,7 @@ using System.Xml.XPath;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
-	public abstract class DocumentFactory<TParameter> : FactoryBase<TParameter, IXPathNavigable>
+	public abstract class DocumentFactory<TParameter> : FactoryWithSpecificationBase<TParameter, IXPathNavigable>
 	{
 		readonly Action<XmlDocument, TParameter> load;
 

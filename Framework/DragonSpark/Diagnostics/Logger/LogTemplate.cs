@@ -41,7 +41,7 @@ namespace DragonSpark.Diagnostics.Logger
 		public LogCommand( ILogger logger ) : base( new LogExceptionCommand( logger ), new LogTemplateCommand( logger ) ) {}
 	}
 
-	abstract class LoggerTemplateParameterFactoryBase<T> : FactoryBase<T, object[]> where T : ILoggerTemplate
+	abstract class LoggerTemplateParameterFactoryBase<T> : FactoryWithSpecificationBase<T, object[]> where T : ILoggerTemplate
 	{
 		// public static TemplateParameterFactoryBase Instance { get; } = new TemplateParameterFactoryBase<T>();
 

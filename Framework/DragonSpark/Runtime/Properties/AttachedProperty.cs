@@ -144,7 +144,7 @@ namespace DragonSpark.Runtime.Properties
 
 		public ThreadLocalStoreCache( Func<TInstance, IWritableStore<TResult>> create ) : base( create ) {}
 
-		class Store : BasicFactoryBase<TInstance, IWritableStore<TResult>>
+		class Store : FactoryBase<TInstance, IWritableStore<TResult>>
 		{
 			public static Store Instance { get; } = new Store();
 

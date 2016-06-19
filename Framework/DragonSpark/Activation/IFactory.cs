@@ -99,7 +99,7 @@ namespace DragonSpark.Activation
 			public static InverseCache<T> Default { get; } = new InverseCache<T>();
 			InverseCache() : base( factory => new Converter( factory ).ToDelegate() ) {}
 
-			class Converter : BasicFactoryBase<T, bool>
+			class Converter : FactoryBase<T, bool>
 			{
 				readonly Func<T, bool> @from;
 				public Converter( Func<T, bool> @from )
@@ -124,7 +124,7 @@ namespace DragonSpark.Activation
 			
 			Casted() : base( result => new CastedFactory( result ) ) {}
 
-			class CastedFactory : FactoryBase<TParameter, TResult>
+			class CastedFactory : FactoryWithSpecificationBase<TParameter, TResult>
 			{
 				readonly IFactoryWithParameter inner;
 				public CastedFactory( IFactoryWithParameter inner ) : base( inner.ToSpecification().Cast<TParameter>() )

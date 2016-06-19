@@ -17,7 +17,7 @@ namespace DragonSpark.Extensions
 
 		TryContextProperty( Container container ) : base( container.Create ) {}
 
-		class Container : FactoryBase<IUnityContainer, TryContext>
+		class Container : FactoryWithSpecificationBase<IUnityContainer, TryContext>
 		{
 			public static Container Debug { get; } = new Container( logger => logger.Debug );
 

@@ -18,7 +18,7 @@ namespace DragonSpark
 		public Priority Priority { get; } = Priority.Normal;
 	}
 
-	public class PriorityAwareLocator<T> : FactoryBase<T, IPriorityAware>
+	public class PriorityAwareLocator<T> : FactoryWithSpecificationBase<T, IPriorityAware>
 	{
 		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>();
 

@@ -59,7 +59,7 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}
 
-		class GenericMethodFactory : BasicFactoryBase<MethodDescriptor, MethodInfo>
+		class GenericMethodFactory : FactoryBase<MethodDescriptor, MethodInfo>
 		{
 			readonly static Func<ValueTuple<MethodInfo, MethodDescriptor>, MethodInfo> CreateSelector = Create;
 

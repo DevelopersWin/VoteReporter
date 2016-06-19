@@ -61,7 +61,7 @@ namespace DragonSpark.Aspects
 	{
 		protected GenericParameterAdapterStoreBase( Factory factory ) : base( factory.ToDelegate() ) {}
 
-		protected class Factory : BasicFactoryBase<object, IGenericParameterValidator>
+		protected class Factory : FactoryBase<object, IGenericParameterValidator>
 		{
 			readonly Type genericType;
 			readonly string methodName;

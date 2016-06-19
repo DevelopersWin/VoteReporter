@@ -48,7 +48,7 @@ namespace DragonSpark.Activation
 	}
 
 	// [AutoValidation( false )]
-	public class FactoryInterfaceLocator : FactoryBase<Type, Type>
+	public class FactoryInterfaceLocator : FactoryWithSpecificationBase<Type, Type>
 	{
 		public static FactoryInterfaceLocator Instance { get; } = new FactoryInterfaceLocator();
 
@@ -74,7 +74,7 @@ namespace DragonSpark.Activation
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
 
-	public abstract class TypeLocatorCacheBase : FactoryBase<Type, Type>
+	public abstract class TypeLocatorCacheBase : FactoryWithSpecificationBase<Type, Type>
 	{
 		readonly ImmutableArray<TypeAdapter> adapters;
 		readonly Func<TypeInfo, bool> isAssignable;
@@ -135,7 +135,7 @@ namespace DragonSpark.Activation
 		}
 	}*/
 
-	/*public class Converter<TFrom, TTo> : FactoryBase<TFrom, TTo>
+	/*public class Converter<TFrom, TTo> : FactoryWithSpecificationBase<TFrom, TTo>
 	{
 		public Converter( Func<TFrom, TTo> convert ) : base( convert ) {}
 
@@ -173,7 +173,7 @@ namespace DragonSpark.Activation
 		public ProjectedFactory( Func<TFrom, TTo> convert ) : base( convert ) {}
 	}
 
-	public class ProjectedFactory<TBase, TFrom, TTo> : BasicFactoryBase<TBase, TTo>/*, IConverter<TFrom, TTo>*/ where TFrom : TBase
+	public class ProjectedFactory<TBase, TFrom, TTo> : FactoryBase<TBase, TTo>/*, IConverter<TFrom, TTo>*/ where TFrom : TBase
 	{
 		readonly Func<TFrom, TTo> convert;
 
@@ -187,7 +187,7 @@ namespace DragonSpark.Activation
 		public override TTo Create( TBase parameter ) => parameter is TFrom ? convert( (TFrom)parameter ) : default(TTo);
 	}
 
-	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>
+	public class InstanceFromFactoryTypeFactory : FactoryWithSpecificationBase<Type, object>
 	{
 		readonly FactoryDelegateLocatorFactory factory;
 
@@ -232,7 +232,7 @@ namespace DragonSpark.Activation
 	}
 
 	[Persistent]
-	public class FactoryTypeLocator : FactoryBase<LocateTypeRequest, Type>
+	public class FactoryTypeLocator : FactoryWithSpecificationBase<LocateTypeRequest, Type>
 	{
 		readonly FactoryTypeRequest[] types;
 

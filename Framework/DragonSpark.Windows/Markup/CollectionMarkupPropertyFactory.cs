@@ -39,7 +39,7 @@ namespace DragonSpark.Windows.Markup
 			parameter.Get<IProvideValueTarget>().TargetObject.With( o => o is IList && o.Adapt().GetEnumerableType() != null );
 	}
 
-	public class PropertyReferenceFactory : FactoryBase<IServiceProvider, PropertyReference>
+	public class PropertyReferenceFactory : FactoryWithSpecificationBase<IServiceProvider, PropertyReference>
 	{
 		public static PropertyReferenceFactory Instance { get; } = new PropertyReferenceFactory();
 

@@ -61,7 +61,7 @@ namespace DragonSpark.Activation
 		}
 
 		//[AutoValidation( false )]
-		public class Locator  : FactoryBase<ConstructTypeRequest, ConstructorInfo>
+		public class Locator  : FactoryWithSpecificationBase<ConstructTypeRequest, ConstructorInfo>
 		{
 			public static Locator Instance { get; } = new Locator();
 

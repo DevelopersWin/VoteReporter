@@ -19,7 +19,7 @@ namespace DragonSpark.ComponentModel
 		public override TypeInfo Create( TypeInfo parameter ) => base.Create( parameter );
 	}
 
-	public class ConventionTypeDefinitionProvider : FactoryBase<TypeInfo, TypeInfo>, ITypeDefinitionProvider
+	public class ConventionTypeDefinitionProvider : FactoryWithSpecificationBase<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
 		public static ConventionTypeDefinitionProvider Instance { get; } = new ConventionTypeDefinitionProvider();
 

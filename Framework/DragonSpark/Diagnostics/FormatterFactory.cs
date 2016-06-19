@@ -7,7 +7,7 @@ using System.Composition;
 namespace DragonSpark.Diagnostics
 {
 	[Shared, Export]
-	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
+	public class FormatterFactory : FactoryWithSpecificationBase<FormatterFactory.Parameter, string>
 	{
 		public static FormatterFactory Instance { get; } = new FormatterFactory( FromKnownFactory<IFormattable>.Instance );
 		/*

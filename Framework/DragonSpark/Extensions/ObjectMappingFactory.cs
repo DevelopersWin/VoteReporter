@@ -4,7 +4,7 @@ using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Extensions
 {
-	public class ObjectMappingFactory<T> : FactoryBase<ObjectMappingParameter<T>, T> where T : class
+	public class ObjectMappingFactory<T> : FactoryWithSpecificationBase<ObjectMappingParameter<T>, T> where T : class
 	{
 		public static ObjectMappingFactory<T> Default { get; } = new ObjectMappingFactory<T>( Activator.Instance );
 

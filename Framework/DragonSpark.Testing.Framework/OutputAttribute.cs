@@ -13,7 +13,7 @@ namespace DragonSpark.Testing.Framework
 		public override void OnInvoke( MethodInterceptionArgs args ) => new OutputCommand().Run( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 	}*/
 
-	/*public class ParameterFactory : FactoryBase<MethodInterceptionArgs, OutputCommand.Parameter>
+	/*public class ParameterFactory : FactoryWithSpecificationBase<MethodInterceptionArgs, OutputCommand.Parameter>
 	{
 		public static ParameterFactory Instance { get; } = new ParameterFactory();
 
@@ -60,7 +60,7 @@ namespace DragonSpark.Testing.Framework
 			public Action Continue { get; }
 		}
 
-		class Factory : FactoryBase<Parameter, IProfiler>
+		class Factory : FactoryWithSpecificationBase<Parameter, IProfiler>
 		{
 			readonly ILoggerHistory history;
 

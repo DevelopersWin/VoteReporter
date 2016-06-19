@@ -165,7 +165,7 @@ namespace DragonSpark.Aspects
 	{
 		public ControllerCache() : base( new ThreadLocalStoreCache<IParameterValidationController>( Factory.Instance.ToDelegate() ) ) {}
 
-		class Factory : BasicFactoryBase<object, IWritableStore<IParameterValidationController>>
+		class Factory : FactoryBase<object, IWritableStore<IParameterValidationController>>
 		{
 			public static Factory Instance { get; } = new Factory();
 
@@ -289,7 +289,7 @@ namespace DragonSpark.Aspects
 
 	public interface IParameterValidationControllerFactory : IFactory<object, IParameterValidationController> {}
 
-	class ParameterValidationControllerFactory : BasicFactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
+	class ParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
 	{
 		readonly ICache<IParameterValidator> store;
 
@@ -301,7 +301,7 @@ namespace DragonSpark.Aspects
 		public override IParameterValidationController Create( object instance ) => new ParameterValidationController( store.Get( instance ) );
 	}
 
-	class GenericParameterValidationControllerFactory : BasicFactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
+	class GenericParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
 	{
 		readonly ICache<IGenericParameterValidator> generic;
 		readonly ICache<IParameterValidator> store;

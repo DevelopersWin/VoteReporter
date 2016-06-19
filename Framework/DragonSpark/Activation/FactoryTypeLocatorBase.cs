@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	public abstract class FactoryTypeLocatorBase<T> : FactoryBase<T, Type>
+	public abstract class FactoryTypeLocatorBase<T> : FactoryWithSpecificationBase<T, Type>
 	{
 		readonly FactoryTypeLocator locator;
 		readonly Func<T, Type> type;

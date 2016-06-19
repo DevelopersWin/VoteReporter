@@ -42,7 +42,7 @@ namespace DragonSpark.TypeSystem
 
 		protected MemberInfoProviderFactory( ITypeDefinitionProvider transformer ) : base( new Factory( transformer ).ToDelegate() ) {}
 
-		class Factory : BasicFactoryBase<object, IAttributeProvider>
+		class Factory : FactoryBase<object, IAttributeProvider>
 		{
 			readonly Func<object, TypeInfo> typeSource;
 			readonly Func<TypeInfo, TypeInfo> transformer;
@@ -100,7 +100,7 @@ namespace DragonSpark.TypeSystem
 		}
 
 		// [AutoValidation( false )]
-		abstract class TypeDefinitionProviderBase<T> : FactoryBase<T, TypeInfo> {}
+		abstract class TypeDefinitionProviderBase<T> : FactoryWithSpecificationBase<T, TypeInfo> {}
 	}
 
 	// [AutoValidation( false )]
@@ -160,7 +160,7 @@ namespace DragonSpark.TypeSystem
 		}
 
 		// [AutoValidation( false )]
-		public abstract class MemberInfoDefinitionLocatorBase<T> : FactoryBase<T, MemberInfo>
+		public abstract class MemberInfoDefinitionLocatorBase<T> : FactoryWithSpecificationBase<T, MemberInfo>
 		{
 			protected MemberInfoDefinitionLocatorBase( TypeInfo definition )
 			{

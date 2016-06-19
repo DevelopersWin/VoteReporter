@@ -20,7 +20,7 @@ namespace DragonSpark.ComponentModel
 			public LocationValueProvider( Func<PropertyInfo, LocateTypeRequest> convert, Func<LocateTypeRequest, object> create ) : base( convert, create ) {}
 		}
 
-		public class Factory : FactoryBase<LocateTypeRequest, object>
+		public class Factory : FactoryWithSpecificationBase<LocateTypeRequest, object>
 		{
 			public static Factory Instance { get; } = new Factory();
 
@@ -42,7 +42,7 @@ namespace DragonSpark.ComponentModel
 			}
 		}
 
-		public class Converter : FactoryBase<PropertyInfo, LocateTypeRequest>
+		public class Converter : FactoryWithSpecificationBase<PropertyInfo, LocateTypeRequest>
 		{
 			readonly Func<PropertyInfo, Type> type;
 			readonly string name;
@@ -74,7 +74,7 @@ namespace DragonSpark.ComponentModel
 
 		public ServicesValueProvider( Func<PropertyInfo, Type> convert, Func<Type, object> create ) : base( convert, create ) {}
 
-		public class Converter : FactoryBase<PropertyInfo, Type>
+		public class Converter : FactoryWithSpecificationBase<PropertyInfo, Type>
 		{
 			readonly Func<PropertyInfo, Type> type;
 

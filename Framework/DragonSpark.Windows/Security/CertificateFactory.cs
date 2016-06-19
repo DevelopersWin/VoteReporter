@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace DragonSpark.Windows.Security
 {
-	public class CertificateFactory : FactoryBase<string, X509Certificate2>
+	public class CertificateFactory : FactoryWithSpecificationBase<string, X509Certificate2>
 	{
 		public static CertificateFactory Instance { get; } = new CertificateFactory();
 

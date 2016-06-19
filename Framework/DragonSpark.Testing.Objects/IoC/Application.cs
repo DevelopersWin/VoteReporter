@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.Objects.IoC
 
 		protected AutoDataAttribute( IFactory<Assembly[]> assemblySource, IFactory<IServiceProvider, IApplication> applicationSource ) : base( new Context( assemblySource, applicationSource ) ) {}
 
-		class Context : FactoryBase<AutoData, IDisposable>
+		class Context : FactoryWithSpecificationBase<AutoData, IDisposable>
 		{
 			readonly IFactory<Assembly[]> assemblySource;
 			readonly IFactory<IServiceProvider, IApplication> applicationSource;

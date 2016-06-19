@@ -157,7 +157,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	}
 
 	[Persistent]
-	public class ConstructorLocator : FactoryBase<ConstructTypeRequest, ConstructorInfo>
+	public class ConstructorLocator : FactoryWithSpecificationBase<ConstructTypeRequest, ConstructorInfo>
 	{
 		readonly ConstructorQueryProvider query;
 
@@ -211,7 +211,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	}*/
 
 	[Persistent]
-	public class ConstructorQueryProvider : FactoryBase<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
+	public class ConstructorQueryProvider : FactoryWithSpecificationBase<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
 	{
 		readonly CanLocateSpecification locate;
 		readonly ISpecification<ConstructTypeRequest> create;

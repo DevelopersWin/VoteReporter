@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class FileConfigurationFactory : FactoryBase<string, object>
+	public class FileConfigurationFactory : FactoryWithSpecificationBase<string, object>
 	{
 		readonly ConfigurationFileMap map;
 
