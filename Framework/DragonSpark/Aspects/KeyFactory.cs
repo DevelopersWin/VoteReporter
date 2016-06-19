@@ -460,13 +460,13 @@ namespace DragonSpark.Aspects
 
 	public sealed class KeyFactory //  : KeyFactory<int>
 	{
-		public static KeyFactory Instance { get; } = new KeyFactory();
+		// public static KeyFactory Instance { get; } = new KeyFactory();
 
 		// public string ToString( params object[] items ) => Create( items ).ToString();
 
-		public int CreateUsing( params object[] parameter ) => Create( ImmutableArray.Create( parameter ) );
+		public static int CreateUsing( params object[] parameter ) => Create( ImmutableArray.Create( parameter ) );
 
-		public int Create( ImmutableArray<object> parameter )
+		public static int Create( ImmutableArray<object> parameter )
 		{
 			var result = Hash.CombineValues( Expand( parameter ) );
 			return result;

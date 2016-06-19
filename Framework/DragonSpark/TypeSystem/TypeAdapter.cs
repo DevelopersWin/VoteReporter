@@ -143,7 +143,7 @@ namespace DragonSpark.TypeSystem
 				Name = name;
 				GenericTypes = genericTypes;
 				ParameterTypes = parameterTypes;
-				code = KeyFactory.Instance.CreateUsing( Name, GenericTypes, ParameterTypes );
+				code = KeyFactory.CreateUsing( Name, GenericTypes, ParameterTypes );
 			}
 
 			public string Name { get; }

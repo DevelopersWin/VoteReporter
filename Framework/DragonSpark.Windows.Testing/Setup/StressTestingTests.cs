@@ -32,7 +32,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			var autoData = new AutoData( FixtureFactory<AutoDataCustomization>.Instance.Create(), method );
 			var providerFactory = new Composition.TypeBasedServiceProviderFactory( GetType().ToItem() );
 			var provider = new ServiceProviderFactory( providerFactory ).Create();
-			var factory = new AutoDataExecutionContextFactory( provider.Wrap<AutoData, IServiceProvider>(), LocationSetup.AutoDataAttribute.ApplicationSource );
+			var factory = new AutoDataExecutionContextFactory( provider.Wrap<AutoData, IServiceProvider>().ToDelegate(), LocationSetup.AutoDataAttribute.ApplicationSource );
 			using ( factory.Create( autoData ) )
 			{
 				var data = new Ploeh.AutoFixture.Xunit2.AutoDataAttribute( autoData.Fixture ).GetData( method );

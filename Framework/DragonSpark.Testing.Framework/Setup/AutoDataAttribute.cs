@@ -26,11 +26,11 @@ namespace DragonSpark.Testing.Framework.Setup
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
-		readonly static IFactory<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance;
+		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.ToDelegate();
 
-		readonly IFactory<AutoData, IDisposable> factory;
+		readonly Func<AutoData, IDisposable> factory;
 
-		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new AutoDataExecutionContextFactory( new Cache( includeFromParameters, additionalTypes ) ) ) {}
+		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new AutoDataExecutionContextFactory( new Cache( includeFromParameters, additionalTypes ).ToDelegate() ).ToDelegate() ) {}
 
 		/*static AutoDataExecutionContextFactory Create( bool includeFromParameters, Type[] additionalTypes )
 		{
@@ -45,9 +45,9 @@ namespace DragonSpark.Testing.Framework.Setup
 			}
 		}*/
 
-		protected AutoDataAttribute( [Required] IFactory<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
+		protected AutoDataAttribute( [Required] Func<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
 
-		protected AutoDataAttribute( [Required]IFactory<IFixture> fixture, [Required] IFactory<AutoData, IDisposable> factory ) : base( fixture.Create() )
+		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required] Func<AutoData, IDisposable> factory ) : base( fixture() )
 		{
 			this.factory = factory;
 		}
@@ -68,7 +68,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
 			var autoData = new AutoData( Fixture, methodUnderTest );
-			using ( factory.Create( autoData ) )
+			using ( factory( autoData ) )
 			{
 				var result = base.GetData( methodUnderTest );
 				return result;
@@ -117,14 +117,14 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class AutoDataExecutionContextFactory : FactoryWithSpecificationBase<AutoData, IDisposable>
 	{
-		readonly static IFactory<IServiceProvider, IApplication> DefaultApplicationFactory = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) );
+		readonly static Func<IServiceProvider, IApplication> DefaultApplicationFactory = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) ).ToDelegate();
 
-		readonly IFactory<AutoData, IServiceProvider> providerSource;
-		readonly IFactory<IServiceProvider, IApplication> applicationSource;
+		readonly Func<AutoData, IServiceProvider> providerSource;
+		readonly Func<IServiceProvider, IApplication> applicationSource;
 
-		public AutoDataExecutionContextFactory( [Required]IFactory<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationFactory ) {}
+		public AutoDataExecutionContextFactory( Func<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationFactory ) {}
 
-		public AutoDataExecutionContextFactory( [Required]IFactory<AutoData, IServiceProvider> providerSource, [Required]IFactory<IServiceProvider, IApplication> applicationSource )
+		public AutoDataExecutionContextFactory( Func<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource )
 		{
 			this.providerSource = providerSource;
 			this.applicationSource = applicationSource;
@@ -134,7 +134,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			var result = new InitializeMethodCommand().AsExecuted( parameter.Method );
 
-			new AutoDataConfiguringCommandFactory( parameter, providerSource.Create( parameter ), applicationSource.ToDelegate() )
+			new AutoDataConfiguringCommandFactory( parameter, providerSource( parameter ), applicationSource )
 				.Create()
 				.Execute( parameter );
 

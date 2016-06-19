@@ -25,20 +25,20 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		readonly static DelegatedFactory<IServiceProvider, IApplication> ApplicationSource = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) );
+		readonly static Func<IServiceProvider, IApplication> ApplicationSource = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) ).ToDelegate();
 
 		public AutoDataAttribute() : this( ApplicationSource ) {}
 
-		protected AutoDataAttribute( IFactory<IServiceProvider, IApplication> applicationSource ) : this( AssemblyProvider.Instance, applicationSource ) {}
+		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblyProvider.Instance.ToDelegate(), applicationSource ) {}
 
-		protected AutoDataAttribute( IFactory<Assembly[]> assemblySource, IFactory<IServiceProvider, IApplication> applicationSource ) : base( new Context( assemblySource, applicationSource ) ) {}
+		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) : base( new Context( assemblySource, applicationSource ).ToDelegate() ) {}
 
 		class Context : FactoryWithSpecificationBase<AutoData, IDisposable>
 		{
-			readonly IFactory<Assembly[]> assemblySource;
-			readonly IFactory<IServiceProvider, IApplication> applicationSource;
+			readonly Func<Assembly[]> assemblySource;
+			readonly Func<IServiceProvider, IApplication> applicationSource;
 
-			public Context( IFactory<Assembly[]> assemblySource, IFactory<IServiceProvider, IApplication> applicationSource )
+			public Context( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource )
 			{
 				this.assemblySource = assemblySource;
 				this.applicationSource = applicationSource;
@@ -46,9 +46,9 @@ namespace DragonSpark.Testing.Objects.IoC
 
 			public override IDisposable Create( AutoData parameter )
 			{
-				var cached = new Cache( assemblySource.Create() ).Create( parameter );
+				var cached = new Cache( assemblySource() ).Create( parameter );
 				var provider = new Activation.IoC.ServiceProviderFactory( cached.ToFactory() ).Create();
-				var result = new AutoDataExecutionContextFactory( provider.Wrap<AutoData, IServiceProvider>(), applicationSource ).Create( parameter );
+				var result = new AutoDataExecutionContextFactory( provider.Wrap<AutoData, IServiceProvider>().ToDelegate(), applicationSource ).Create( parameter );
 				return result;
 			}
 		}

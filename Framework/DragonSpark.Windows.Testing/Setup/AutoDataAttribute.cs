@@ -8,10 +8,10 @@ namespace DragonSpark.Windows.Testing.Setup
 {
 	public class AutoDataAttribute : DragonSpark.Testing.Objects.IoC.AutoDataAttribute
 	{
-		public static DragonSpark.Testing.Objects.IoC.AssemblyProvider Provider { get; } = new DragonSpark.Testing.Objects.IoC.AssemblyProvider( typeof(AssemblyModuleCatalog) );
+		public static Func<Assembly[]> Provider { get; } = new DragonSpark.Testing.Objects.IoC.AssemblyProvider( typeof(AssemblyModuleCatalog) ).ToDelegate();
 
-		protected AutoDataAttribute( IFactory<IServiceProvider, IApplication> applicationSource ) : this( Provider, applicationSource ) {}
+		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( Provider, applicationSource ) {}
 
-		protected AutoDataAttribute( IFactory<Assembly[]> assemblySource, IFactory<IServiceProvider, IApplication> applicationSource ) : base( assemblySource, applicationSource ) {}
+		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) : base( assemblySource, applicationSource ) {}
 	}
 }

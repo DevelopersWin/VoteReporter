@@ -78,6 +78,8 @@ namespace DragonSpark.Activation
 
 	public abstract class CachedDecoratedFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult> where TResult : class
 	{
+		static ICache<Dictionary<int, TResult>> Items { get; } = new ActivatedCache<Dictionary<int, TResult>>();
+
 		protected CachedDecoratedFactory( IFactory<TParameter, TResult> inner ) : base( inner ) {}
 
 		protected abstract ImmutableArray<object> GetKeyItems( TParameter parameter );
@@ -88,8 +90,8 @@ namespace DragonSpark.Activation
 		{
 			var instance = GetInstance( parameter );
 
-			var items = Property.Default.Get( instance );
-			var key = KeyFactory.Instance.Create( GetKeyItems( parameter ) );
+			var items = Items.Get( instance );
+			var key = KeyFactory.Create( GetKeyItems( parameter ) );
 			
 			if ( !items.ContainsKey( key ) )
 			{
@@ -98,13 +100,6 @@ namespace DragonSpark.Activation
 
 			var result = items[key];
 			return result;
-		}
-
-		class Property : ActivatedCache<Dictionary<int, TResult>>
-		{
-			public static Property Default { get; } = new Property();
-
-			Property() {}
 		}
 	}
 

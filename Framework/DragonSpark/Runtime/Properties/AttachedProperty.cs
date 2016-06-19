@@ -328,7 +328,7 @@ namespace DragonSpark.Runtime.Properties
 
 			public Key( ImmutableArray<object> subjects )
 			{
-				code = KeyFactory.Instance.Create( subjects );				
+				code = KeyFactory.Create( subjects );				
 			}
 
 			public bool Equals( Key other ) => code == other.code;
@@ -369,20 +369,20 @@ namespace DragonSpark.Runtime.Properties
 
 			public bool Contains( ImmutableArray<object> instance )
 			{
-				var key = KeyFactory.Instance.Create( instance );
+				var key = KeyFactory.Create( instance );
 				var result = inner.ContainsKey( key );
 				return result;
 			}
 
 			public bool Remove( ImmutableArray<object> instance )
 			{
-				var key = KeyFactory.Instance.Create( instance );
+				var key = KeyFactory.Create( instance );
 				return Remove( key );
 			}
 
 			public void Set( ImmutableArray<object> instance, T value )
 			{
-				var key = KeyFactory.Instance.Create( instance );
+				var key = KeyFactory.Create( instance );
 				remove( key );
 				instance.Select( ReferenceMonitorCache.Selector ).Amb().Take( 1 ).Subscribe( purge );
 				inner.TryAdd( key, value );
@@ -390,7 +390,7 @@ namespace DragonSpark.Runtime.Properties
 
 			public T Get( ImmutableArray<object> instance )
 			{
-				var key = KeyFactory.Instance.Create( instance );
+				var key = KeyFactory.Create( instance );
 				T result;
 				return inner.TryGetValue( key, out result ) ? result : default(T);
 			}
