@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
-using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -33,13 +32,11 @@ namespace DragonSpark.Runtime.Specifications
 
 	public abstract class SpecificationBase<T> : ISpecification<T>
 	{
-		readonly Func<object, T> coercer;
+		readonly Coerce<T> coercer;
 
-		protected SpecificationBase() : this( Coercer<T>.Instance ) {}
+		protected SpecificationBase() : this( Parameter<T>.Coercer ) {}
 
-		protected SpecificationBase( ICoercer<T> coercer ) : this( coercer.Coerce ) {}
-
-		protected SpecificationBase( Func<object, T> coercer )
+		protected SpecificationBase( Coerce<T> coercer )
 		{
 			this.coercer = coercer;
 		}
@@ -54,9 +51,8 @@ namespace DragonSpark.Runtime.Specifications
 	public abstract class GuardedSpecificationBase<T> : SpecificationBase<T>
 	{
 		protected GuardedSpecificationBase() {}
-		protected GuardedSpecificationBase( ICoercer<T> coercer ) : base( coercer ) {}
-		protected GuardedSpecificationBase( Func<object, T> coercer ) : base( coercer ) {}
-
+		protected GuardedSpecificationBase( Coerce<T> coercer ) : base( coercer ) {}
+		
 		protected override bool IsSatisfiedByCoerced( T parameter ) => parameter.With( this.ToDelegate() );
 	}
 }

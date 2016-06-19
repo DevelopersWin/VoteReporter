@@ -12,6 +12,7 @@ using PostSharp.Extensibility;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
 
@@ -183,9 +184,9 @@ namespace DragonSpark.Aspects
 
 		public ValidatedCommand() : base( Factory ) {}
 
-		public class Supplemental : SupplementalAspect
+		public class Aspects : SupplementalAspect
 		{
-			public Supplemental() : base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
+			public Aspects() : base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
 		}
 	}
 
@@ -195,9 +196,9 @@ namespace DragonSpark.Aspects
 
 		public ValidatedGenericCommand() : base( Factory ) {}
 
-		public class Supplemental : SupplementalAspect
+		public class Aspects : SupplementalAspect
 		{
-			public Supplemental() : base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
+			public Aspects() : base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
 		}
 	}
 
@@ -207,9 +208,9 @@ namespace DragonSpark.Aspects
 
 		public ValidatedFactory() : base( Factory ) {}
 
-		public class Supplemental : SupplementalAspect
+		public class Aspects : SupplementalAspect
 		{
-			public Supplemental() : base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
+			public Aspects() : base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
 		}
 	}
 
@@ -219,9 +220,9 @@ namespace DragonSpark.Aspects
 		
 		public ValidatedGenericFactory() : base( Factory ) {}
 
-		public class Supplemental : SupplementalAspect
+		public class Aspects : SupplementalAspect
 		{
-			public Supplemental() : base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
+			public Aspects() : base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
 		}
 	}
 
@@ -244,7 +245,7 @@ namespace DragonSpark.Aspects
 			if ( type != null )
 			{
 				var implementedType = profile.Type;
-				var types = implementedType.Append( implementedType.GetTypeInfo().IsGenericTypeDefinition ? implementedType.GetTypeInfo().ImplementedInterfaces : Items<Type>.Default );
+				var types = implementedType.Append( implementedType.GetTypeInfo().IsGenericTypeDefinition ? implementedType.GetTypeInfo().ImplementedInterfaces : Items<Type>.Default ).ToImmutableArray();
 
 				foreach ( var check in types )
 				{

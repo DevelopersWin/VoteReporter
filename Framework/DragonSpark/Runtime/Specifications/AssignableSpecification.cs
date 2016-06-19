@@ -21,15 +21,15 @@ namespace DragonSpark.Runtime.Specifications
 	public class CanCreateSpecification<T> : CanCreateSpecification<T, object>
 	{
 		public CanCreateSpecification( Func<T, object> creator ) : base( creator ) {}
-		public CanCreateSpecification( Func<T, object> creator, ICoercer<T> coercer ) : base( creator, coercer ) {}
+		public CanCreateSpecification( Func<T, object> creator, Coerce<T> coercer ) : base( creator, coercer ) {}
 	}
 
 	public class CanCreateSpecification<TParameter, TResult> : GuardedSpecificationBase<TParameter>
 	{
 		readonly Func<TParameter, TResult> creator;
 
-		public CanCreateSpecification( Func<TParameter, TResult> creator ) : this( creator, Coercer<TParameter>.Instance ) {}
-		public CanCreateSpecification( Func<TParameter, TResult> creator, ICoercer<TParameter> coercer ) : base( coercer )
+		public CanCreateSpecification( Func<TParameter, TResult> creator ) : this( creator, Parameter<TParameter>.Coercer ) {}
+		public CanCreateSpecification( Func<TParameter, TResult> creator, Coerce<TParameter> coercer ) : base( coercer )
 		{
 			this.creator = creator;
 		}

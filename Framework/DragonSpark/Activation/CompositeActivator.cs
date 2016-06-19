@@ -7,7 +7,7 @@ namespace DragonSpark.Activation
 	{
 		readonly ISpecification<object> specification;
 
-		public CompositeActivator( params IActivator[] activators ) : this( new AnySpecification( activators.Select( activator => new DelegatedSpecification<object>( activator.CanCreate ) ).ToArray() ).Cast<object>(), activators )
+		public CompositeActivator( params IActivator[] activators ) : this( new AnySpecification( activators.Cast<IFactoryWithParameter>().Select( activator => activator.ToSpecification() ).ToArray() ).Cast<object>(), activators )
 		{}
 
 		public CompositeActivator( ISpecification<object> specification, params IActivator[] activators ) : base( activators.Cast<IFactoryWithParameter>().Select( activator => activator.ToDelegate() ).ToArray() )

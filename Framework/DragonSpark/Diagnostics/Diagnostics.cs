@@ -207,7 +207,7 @@ namespace DragonSpark.Diagnostics
 
 	public class TimerEventHandler : ProjectedCommand<string>
 	{
-		public TimerEventHandler( CreateProfilerEvent projection, Action<TimerEvent> inner ) : base( new DelegatedCommand<TimerEvent>( inner, new Projector<string,TimerEvent>( new Func<string, TimerEvent>( projection ) ) )  ) {}
+		public TimerEventHandler( Action<TimerEvent> inner, CreateProfilerEvent projection ) : base( new DelegatedCommand<TimerEvent>( inner, new Projector<string, TimerEvent>( new Func<string, TimerEvent>( projection ) ).ToDelegate() ) ) {}
 	}
 
 	public interface ISessionTimer : ITimer, IContinuation {}

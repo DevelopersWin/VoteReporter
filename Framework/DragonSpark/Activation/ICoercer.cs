@@ -4,4 +4,6 @@ namespace DragonSpark.Activation
 	{
 		TParameter Coerce( object parameter );
 	}
+
+	public delegate T Coerce<out T>( object parameter );
 }

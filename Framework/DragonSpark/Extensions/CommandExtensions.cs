@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,6 +50,22 @@ namespace DragonSpark.Extensions
 			public static DelegateCache Default { get; } = new DelegateCache();
 
 			DelegateCache() : base( command => command.Execute ) {}
+		}
+
+		public static ISpecification<object> ToSpecification( this ICommand @this ) => SpecificationCache.Default.Get( @this );
+		class SpecificationCache : Cache<ICommand, ISpecification<object>>
+		{
+			public static SpecificationCache Default { get; } = new SpecificationCache();
+
+			SpecificationCache() : base( command => new DelegatedSpecification<object>( command.CanExecute ) ) {}
+		}
+
+		public static ISpecification<T> ToSpecification<T>( this ICommand<T> @this ) => SpecificationCache<T>.Default.Get( @this );
+		class SpecificationCache<T> : Cache<ICommand<T>, ISpecification<T>>
+		{
+			public static SpecificationCache<T> Default { get; } = new SpecificationCache<T>();
+
+			SpecificationCache() : base( command => new DelegatedSpecification<T>( command.CanExecute ) ) {}
 		}
 	}
 }

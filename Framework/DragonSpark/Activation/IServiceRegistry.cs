@@ -24,7 +24,7 @@ namespace DragonSpark.Activation
 	{
 		public static IsATypeSpecification Instance { get; } = new IsATypeSpecification();
 
-		public IsATypeSpecification() : base( Specifications<Type>.NotNull ) { }
+		public IsATypeSpecification() : base( Specifications<Type>.Assigned ) { }
 	}
 
 	public class OnlyIfNotRegistered : DecoratedSpecification<Type>

@@ -105,9 +105,14 @@ namespace DragonSpark.Runtime
 
 	public abstract class DisposingCommand<T> : CommandBase<T>, IDisposable
 	{
-		protected DisposingCommand() {}
+		readonly Action onDispose;
 
-		protected DisposingCommand( ISpecification<T> specification ) : base( specification ) {}
+		protected DisposingCommand() : this( Specifications<T>.Assigned ) {}
+
+		protected DisposingCommand( ISpecification<T> specification ) : base( specification )
+		{
+			onDispose = OnDispose;
+		}
 
 		~DisposingCommand()
 		{
@@ -120,15 +125,15 @@ namespace DragonSpark.Runtime
 			GC.SuppressFinalize( this );
 		}
 
-		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
+		void Dispose( bool disposing ) => disposing.IsTrue( onDispose );
 
 		protected virtual void OnDispose() {}
 	}
 
-	public class DelegatedCommand : DelegatedCommand<object>
+	/*public class DelegatedCommand : DelegatedCommand<object>
 	{
 		public DelegatedCommand( Action action ) : base( o => action(), Specifications.Specifications.Always ) {}
-	}
+	}*/
 
 	// [AutoValidation( false )]
 	public class DelegatedCommand<T> : CommandBase<T>
@@ -137,11 +142,11 @@ namespace DragonSpark.Runtime
 
 		public DelegatedCommand( Action<T> command ) : this( command, Specifications<T>.Always ) {}
 
-		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : this( command, Coercer<T>.Instance, specification ) {}
+		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : this( command, Parameter<T>.Coercer, specification ) {}
 
-		public DelegatedCommand( Action<T> command, ICoercer<T> coercer ) : this( command, coercer, Specifications<T>.Always ) {}
+		public DelegatedCommand( Action<T> command, Coerce<T> coercer ) : this( command, coercer, Specifications<T>.Always ) {}
 
-		public DelegatedCommand( Action<T> command, ICoercer<T> coercer, ISpecification<T> specification ) : base( coercer, specification )
+		public DelegatedCommand( Action<T> command, Coerce<T> coercer, ISpecification<T> specification ) : base( coercer, specification )
 		{
 			this.command = command;
 		}
@@ -167,24 +172,24 @@ namespace DragonSpark.Runtime
 
 	public class DecoratedCommand<T> : DelegatedCommand<T>
 	{
-		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Coercer<T>.Instance ) {}
-		public DecoratedCommand( [Required] ICommand<T> inner, ICoercer<T> coercer ) : base( inner.Execute, coercer, new DelegatedSpecification<T>( inner.CanExecute ) ) {}
+		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Parameter<T>.Coercer ) {}
+		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer ) : base( inner.ToDelegate(), coercer, inner.ToSpecification() ) {}
 	}
 
-	[ValidatedGenericCommand, ValidatedGenericCommand.Supplemental]
+	[ValidatedGenericCommand, ValidatedGenericCommand.Aspects]
 	public abstract class CommandBase<T> : ICommand<T> //, IValidationAware
 	{
 		public event EventHandler CanExecuteChanged = delegate { };
-		readonly ICoercer<T> coercer;
+		readonly Coerce<T> coercer;
 		readonly ISpecification<T> specification;
 
-		protected CommandBase() : this( Coercer<T>.Instance ) {}
+		protected CommandBase() : this( Parameter<T>.Coercer ) {}
 
-		protected CommandBase( [Required] ICoercer<T> coercer ) : this( coercer, Specifications<T>.NotNull ) {}
+		protected CommandBase( [Required] Coerce<T> coercer ) : this( coercer, Specifications<T>.Assigned ) {}
 
-		protected CommandBase( [Required] ISpecification<T> specification ) : this( Coercer<T>.Instance, specification ) {}
+		protected CommandBase( [Required] ISpecification<T> specification ) : this( Parameter<T>.Coercer, specification ) {}
 
-		protected CommandBase( [Required] ICoercer<T> coercer, [Required] ISpecification<T> specification )
+		protected CommandBase( [Required] Coerce<T> coercer, [Required] ISpecification<T> specification )
 		{
 			this.coercer = coercer;
 			this.specification = specification;
@@ -194,7 +199,7 @@ namespace DragonSpark.Runtime
 
 		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		void ICommand.Execute( object parameter ) => Execute( coercer.Coerce( parameter ) );
+		void ICommand.Execute( object parameter ) => Execute( coercer( parameter ) );
 
 		public virtual bool CanExecute( T parameter ) => specification.IsSatisfiedBy( parameter );
 

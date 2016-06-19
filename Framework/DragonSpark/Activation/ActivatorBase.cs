@@ -5,9 +5,9 @@ namespace DragonSpark.Activation
 {
 	public abstract class ActivatorBase<TRequest> : FactoryBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
-		protected ActivatorBase( ICoercer<TRequest> coercer ) : this( coercer, Specification.Instance ) {}
+		protected ActivatorBase( Coerce<TRequest> coercer ) : this( coercer, Specification.Instance ) {}
 
-		protected ActivatorBase( ICoercer<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification ) {}
+		protected ActivatorBase( Coerce<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification ) {}
 
 		bool IFactory<TypeRequest, object>.CanCreate( TypeRequest parameter ) => base.CanCreate( (TRequest)parameter );
 
@@ -30,9 +30,11 @@ namespace DragonSpark.Activation
 
 	public abstract class LocatorBase : ActivatorBase<LocateTypeRequest>
 	{
-		protected LocatorBase() : base( Coercer.Instance ) {}
+		readonly protected static Coerce<LocateTypeRequest> Coerce = Coercer.Instance.ToDelegate();
 
-		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( Coercer.Instance, specification ) {}
+		protected LocatorBase() : base( Coerce ) {}
+
+		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( Coerce, specification ) {}
 
 		public class Coercer : TypeRequestCoercer<LocateTypeRequest>
 		{

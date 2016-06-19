@@ -74,6 +74,10 @@ namespace DragonSpark.Activation
 
 		public static Func<TParameter, TResult> ToDelegate<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => FactoryDelegateCache<TParameter, TResult>.Default.Get( @this );
 
+		public static ISpecification<object> ToSpecification( this IFactoryWithParameter @this ) => FactorySpecificationCache.Default.Get( @this );
+
+		public static ISpecification<TParameter> ToSpecification<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => FactorySpecificationCache<TParameter, TResult>.Default.Get( @this );
+
 		public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
 			parameters
 				.Where( @this.CanCreate )
@@ -123,7 +127,7 @@ namespace DragonSpark.Activation
 			class CastedFactory : FactoryBase<TParameter, TResult>
 			{
 				readonly IFactoryWithParameter inner;
-				public CastedFactory( IFactoryWithParameter inner ) : base( new DelegatedSpecification<object>( inner.CanCreate ).Cast<TParameter>() )
+				public CastedFactory( IFactoryWithParameter inner ) : base( inner.ToSpecification().Cast<TParameter>() )
 				{
 					this.inner = inner;
 				}
@@ -151,6 +155,20 @@ namespace DragonSpark.Activation
 			public static FactoryDelegateCache<T> Default { get; } = new FactoryDelegateCache<T>();
 
 			FactoryDelegateCache() : base( factory => factory.Create ) {}
+		}
+
+		class FactorySpecificationCache : Cache<IFactoryWithParameter, ISpecification<object>>
+		{
+			public static FactorySpecificationCache Default { get; } = new FactorySpecificationCache();
+
+			FactorySpecificationCache() : base( factory => new DelegatedSpecification<object>( factory.CanCreate ) ) {}
+		}
+
+		class FactorySpecificationCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ISpecification<TParameter>>
+		{
+			public static FactorySpecificationCache<TParameter, TResult> Default { get; } = new FactorySpecificationCache<TParameter, TResult>();
+
+			FactorySpecificationCache() : base( factory => new DelegatedSpecification<TParameter>( factory.CanCreate ) ) {}
 		}
 
 		class FactoryDelegateCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, Func<TParameter, TResult>>

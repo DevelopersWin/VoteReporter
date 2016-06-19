@@ -13,7 +13,7 @@ namespace DragonSpark.Diagnostics
 {
 	public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
-		public ProfilerFactory() : base( TimerEventConverter.Instance.Create ) {}
+		public ProfilerFactory() : base( TimerEventConverter.Instance.ToDelegate() ) {}
 	}
 
 	public abstract class ProfilerFactoryBase<TTimer> : FactoryBase<MethodBase, IProfiler> where TTimer : ITimer, new()
@@ -50,7 +50,8 @@ namespace DragonSpark.Diagnostics
 			var logger = loggerSource( parameter );
 			var handler = handlerSource( logger );
 
-			EmitProfileEvent action = new TimerEventHandler( createSource( parameter ), handler ).Execute;
+			// TODO: YUCK!
+			EmitProfileEvent action = new TimerEventHandler( handler, createSource( parameter ) ).Execute;
 			var command = new AmbientStackCommand<EmitProfileEvent>().AsExecuted( new EmitProfileEvent( name =>
 																										   {
 																											   timer.Update();

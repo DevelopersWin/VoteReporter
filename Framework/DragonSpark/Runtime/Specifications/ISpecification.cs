@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace DragonSpark.Runtime.Specifications
 {
 	public interface ISpecification
@@ -12,5 +10,5 @@ namespace DragonSpark.Runtime.Specifications
 		bool IsSatisfiedBy( T parameter );
 	}
 
-	public delegate bool Specification<in T>( T parameter );
+	// public delegate bool Specification<in T>( T parameter );
 }

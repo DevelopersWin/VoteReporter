@@ -24,7 +24,7 @@ namespace DragonSpark.Diagnostics
 		[ImportingConstructor]
 		public FormatterFactory( FromKnownFactory<IFormattable> factory ) : this( factory.CreateUsing ) {}
 
-		public FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance, Specifications<Parameter>.NotNull )
+		public FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance.ToDelegate(), Specifications<Parameter>.Assigned )
 		{
 			this.factory = factory;
 		}

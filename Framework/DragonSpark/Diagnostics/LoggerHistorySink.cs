@@ -15,7 +15,7 @@ namespace DragonSpark.Diagnostics
 
 		public void Clear() => source.Clear();
 
-		public IEnumerable<LogEvent> Events => source.Reverse().ToArray();
+		public IEnumerable<LogEvent> Events => source.ToArray().Reverse().ToArray();
 
 		public virtual void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
 	}

@@ -100,7 +100,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	public class HasFactorySpecification : CanCreateSpecification<LocateTypeRequest>
 	{
-		public HasFactorySpecification( [Required] FactoryTypeLocator locator ) : base( locator.ToDelegate(), TypeRequestCoercer<LocateTypeRequest>.Instance ) {}
+		public HasFactorySpecification( [Required] FactoryTypeLocator locator ) : base( locator.ToDelegate(), TypeRequestCoercer<LocateTypeRequest>.Instance.ToDelegate() ) {}
 	}
 
 	public abstract class StrategyValidator<TStrategy> : GuardedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
@@ -177,7 +177,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 	public abstract class TypeRequestSpecificationBase<T> : GuardedSpecificationBase<TypeRequest> where T : TypeRequest
 	{
-		protected TypeRequestSpecificationBase() : base( TypeRequestCoercer<T>.Instance ) {}
+		protected TypeRequestSpecificationBase() : base( TypeRequestCoercer<T>.Instance.ToDelegate() ) {}
 
 		public sealed override bool IsSatisfiedBy( TypeRequest parameter ) => parameter is T && IsSatisfiedBy( (T)parameter );
 

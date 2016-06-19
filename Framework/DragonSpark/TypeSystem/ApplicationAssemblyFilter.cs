@@ -21,7 +21,7 @@ namespace DragonSpark.TypeSystem
 		
 		static string[] Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.WhereAssigned().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToArray();
 
-		public ApplicationAssemblyFilter( [PostSharp.Patterns.Contracts.Required]params Assembly[] coreAssemblies ) : this( Determine( coreAssemblies ) ) {}
+		public ApplicationAssemblyFilter( params Assembly[] coreAssemblies ) : this( Determine( coreAssemblies ) ) {}
 
 		public ApplicationAssemblyFilter( string[] namespaces ) : this( new ApplicationAssemblySpecification( namespaces ) ) {}
 

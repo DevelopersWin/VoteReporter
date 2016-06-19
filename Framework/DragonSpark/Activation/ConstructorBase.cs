@@ -5,9 +5,11 @@ namespace DragonSpark.Activation
 {
 	public abstract class ConstructorBase : ActivatorBase<ConstructTypeRequest>
 	{
-		protected ConstructorBase() : base( Coercer.Instance ) {}
+		readonly protected static Coerce<ConstructTypeRequest> Coerce = Coercer.Instance.ToDelegate();
 
-		protected ConstructorBase( ISpecification<ConstructTypeRequest> specification  ) : base( Coercer.Instance, specification ) {}
+		protected ConstructorBase() : base( Coerce ) {}
+
+		protected ConstructorBase( ISpecification<ConstructTypeRequest> specification  ) : base( Coerce, specification ) {}
 
 		public class Coercer : TypeRequestCoercer<ConstructTypeRequest>
 		{

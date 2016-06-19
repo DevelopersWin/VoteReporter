@@ -4,7 +4,7 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class Specifications<T>
 	{
-		public static ISpecification<T> NotNull { get; } = AssignedSpecification<T>.Instance;
+		public static ISpecification<T> Assigned { get; } = AssignedSpecification<T>.Instance;
 		
 		public static ISpecification<T> Always { get; } = new FixedSpecification<T>( true );
 
