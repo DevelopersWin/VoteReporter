@@ -84,21 +84,13 @@ namespace DragonSpark.Activation
 
 		protected abstract object GetInstance( TParameter parameter );
 
-		/*protected virtual IWritableStore<TResult> CreateStore( TParameter parameter )
-		{
-					
-			var property = stores.Ensure( key, i => new Cache<TResult>() );
-			var result = property.Get( instance );
-			return result;
-		}*/
-
 		public override TResult Create( TParameter parameter )
 		{
 			var instance = GetInstance( parameter );
 
-			var key = KeyFactory.Instance.Create( GetKeyItems( parameter ) );
 			var items = Property.Default.Get( instance );
-
+			var key = KeyFactory.Instance.Create( GetKeyItems( parameter ) );
+			
 			if ( !items.ContainsKey( key ) )
 			{
 				items.Add( key, base.Create( parameter ) );
@@ -118,9 +110,11 @@ namespace DragonSpark.Activation
 
 	public class DecoratedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
+		public static ICache<IFactoryWithParameter, Func<TParameter, TResult>> Cache { get; } = new Cache<IFactoryWithParameter, Func<TParameter, TResult>>( parameter => new DecoratedFactory<TParameter, TResult>( parameter ).ToDelegate() );
+
 		readonly IFactory<TParameter, TResult> inner;
 
-		public DecoratedFactory( IFactoryWithParameter inner ) : this( inner.Cast<TParameter, TResult>() ) {}
+		DecoratedFactory( IFactoryWithParameter inner ) : this( inner.Cast<TParameter, TResult>() ) {}
 
 		public DecoratedFactory( IFactory<TParameter, TResult> inner ) : this( inner, Coercer<TParameter>.Instance ) {}
 
@@ -248,23 +242,30 @@ namespace DragonSpark.Activation
 		public T CreateUsing( object parameter ) => (T)Create( parameter );
 	}
 
-	// [AutoValidation( false )]
-	public class FirstConstructedFromParameterFactory<TParameter, TResult> : BasicFactoryBase<object, IFactory<TParameter, TResult>>
+	struct Defaults
 	{
-		readonly IFactory<object, IFactoryWithParameter>[] factories;
-		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( type => new ConstructFromParameterFactory<IFactoryWithParameter>( type ) ).Fixed() ) {}
-		public FirstConstructedFromParameterFactory( IFactory<object, IFactoryWithParameter>[] factories  )
+		public static Func<Type, Func<object, IFactoryWithParameter>> ConstructFromParameterFactory { get; } = ConstructFromParameterFactory<IFactoryWithParameter>.Cache.ToDelegate();
+	}
+
+	public class FirstConstructedFromParameterFactory<TParameter, TResult> : BasicFactoryBase<object, Func<TParameter, TResult>>
+	{
+		readonly Func<object, IFactoryWithParameter>[] factories;
+		readonly static Func<IFactoryWithParameter, Func<TParameter, TResult>> ToDelegate = DecoratedFactory<TParameter, TResult>.Cache.ToDelegate();
+
+		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( Defaults.ConstructFromParameterFactory ).Fixed() ) {}
+
+		FirstConstructedFromParameterFactory( Func<object, IFactoryWithParameter>[] factories  )
 		{
 			this.factories = factories;
 		}
 
-		public override IFactory<TParameter, TResult> Create( object parameter )
+		public override Func<TParameter, TResult> Create( object parameter )
 		{
-			var items = factories.Introduce( parameter, tuple => tuple.Item1.Create( tuple.Item2 ) )
+			var items = factories.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) )
 				.WhereAssigned()
-				.Select( inner => new DecoratedFactory<TParameter, TResult>( inner ) )
+				.Select( ToDelegate )
 				.ToArray();
-			var result = new FirstFromParameterFactory<TParameter, TResult>( items );
+			var result = new FirstFromParameterFactory<TParameter, TResult>( items ).ToDelegate();
 			return result;
 		}
 	}
@@ -287,7 +288,8 @@ namespace DragonSpark.Activation
 
 	public class FirstConstructedFromParameterFactory<T> : FirstFromParameterFactory<object, T>
 	{
-		public FirstConstructedFromParameterFactory( params Type[] types ) : base( types.Select( type => new ConstructFromParameterFactory<T>( type ) ).Fixed() ) {}
+		readonly static Func<Type, Func<object, T>> ToDelegate = ConstructFromParameterFactory<T>.Cache.ToDelegate();
+		public FirstConstructedFromParameterFactory( params Type[] types ) : base( types.Select( ToDelegate ).Fixed() ) {}
 	}
 
 	public class FirstFromParameterFactory<TParameter, TResult> : BasicFactoryBase<TParameter, TResult>

@@ -1,4 +1,5 @@
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using System;
 
@@ -28,12 +29,15 @@ namespace DragonSpark.Activation
 
 	public class ConstructFromParameterFactory<T> : FactoryBase<object, T>
 	{
-		public static ConstructFromParameterFactory<T> Instance { get; } = new ConstructFromParameterFactory<T>( typeof(T) );
+		public static ICache<Type, Func<object, T>> Cache { get; } = new Cache<Type, Func<object, T>>( t => new ConstructFromParameterFactory<T>( t ).ToDelegate() );
+
+		public static ConstructFromParameterFactory<T> Instance { get; } = new ConstructFromParameterFactory<T>();
 
 		readonly IActivator activator;
 		readonly Type type;
 
-		public ConstructFromParameterFactory( Type type ) : this( Constructor.Instance, type ) {}
+		ConstructFromParameterFactory() : this( typeof(T) ) {}
+		ConstructFromParameterFactory( Type type ) : this( Constructor.Instance, type ) {}
 
 		public ConstructFromParameterFactory( IActivator activator, Type type )
 		{

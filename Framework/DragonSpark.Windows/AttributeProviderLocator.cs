@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using TypeDefinitionProvider = DragonSpark.Windows.Runtime.TypeDefinitionProvider;
 
@@ -18,7 +19,7 @@ namespace DragonSpark.Windows
 
 	class MemberInfoProviderFactory : DragonSpark.TypeSystem.MemberInfoProviderFactory
 	{
-		public new static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory();
-		public MemberInfoProviderFactory() : base( TypeDefinitionProvider.Instance ) {}
+		public new static ICache<object, IAttributeProvider> Instance { get; } = new MemberInfoProviderFactory();
+		MemberInfoProviderFactory() : base( TypeDefinitionProvider.Instance ) {}
 	}
 }

@@ -36,6 +36,14 @@ namespace DragonSpark.Runtime.Properties
 		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 first, T2 second ) where T1 : class => 
 			new Assignment<T1, T2>( new PropertyAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
 
+		public static Func<TInstance, TValue> ToDelegate<TInstance, TValue>( this ICache<TInstance, TValue> @this ) => DelegateCache<TInstance, TValue>.Default.Get( @this );
+		class DelegateCache<TInstance, TValue> : Cache<ICache<TInstance, TValue>, Func<TInstance, TValue>>
+		{
+			public static DelegateCache<TInstance, TValue> Default { get; } = new DelegateCache<TInstance, TValue>();
+
+			DelegateCache() : base( command => command.Get ) {}
+		}
+
 		/*public static TDelegate Apply<TContext, TDelegate>( this ICache<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class
 		{
 			@this.Set( source, context );

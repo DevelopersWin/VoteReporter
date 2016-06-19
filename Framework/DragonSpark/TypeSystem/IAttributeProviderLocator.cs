@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,24 +10,16 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public interface IAttributeProviderLocator : IFactory<object, IAttributeProvider> {}
-
-	public class AttributeProviderLocator : FirstConstructedFromParameterFactory<IAttributeProvider>, IAttributeProviderLocator
+	public class AttributeProviderLocator : Cache<IAttributeProvider>
 	{
-		public static AttributeProviderLocator Default { get; } = new AttributeProviderLocator();
+		public static ICache<object, IAttributeProvider> Default { get; } = new AttributeProviderLocator();
 
 		AttributeProviderLocator() : this( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
 
-		protected AttributeProviderLocator( params Type[] types ) : base( types ) {}
-
-		/*public override IAttributeProvider Create( object parameter )
-		{
-			var attributeProvider = base.Create( parameter );
-			return attributeProvider;
-		}*/
+		protected AttributeProviderLocator( params Type[] types ) : base( new FirstConstructedFromParameterFactory<IAttributeProvider>( types ).ToDelegate() ) {}
 	}
 
-	public class AttributeProviderConfiguration : ConfigurationBase<IAttributeProviderLocator>
+	public class AttributeProviderConfiguration : ConfigurationBase<ICache<object, IAttributeProvider>>
 	{
 		public AttributeProviderConfiguration() : base( AttributeProviderLocator.Default ) {}
 	}
@@ -36,40 +29,45 @@ namespace DragonSpark.TypeSystem
 		public ObjectAttributeProvider( object item ) : base( MemberInfoProviderFactory.Instance.ToDelegate(), item ) {}
 	}
 
-	public class MemberInfoProvider : FirstConstructedFromParameterFactory<IAttributeProvider>
+	public class MemberInfoProvider : Cache<IAttributeProvider>
 	{
-		public static MemberInfoProvider Instance { get; } = new MemberInfoProvider();
+		public static ICache<object, IAttributeProvider> Default { get; } = new MemberInfoProvider();
 
-		MemberInfoProvider() : base( typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(TypeInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ) {}
+		MemberInfoProvider() : base( new FirstConstructedFromParameterFactory<IAttributeProvider>( typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(TypeInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).ToDelegate() ) {}
 	}
 
-	public class MemberInfoProviderFactory : FactoryBase<object, IAttributeProvider>
+	public class MemberInfoProviderFactory : Cache<object, IAttributeProvider>
 	{
-		public static MemberInfoProviderFactory Instance { get; } = new MemberInfoProviderFactory( TypeDefinitionProvider.Instance );
+		public static ICache<object, IAttributeProvider> Instance { get; } = new MemberInfoProviderFactory( TypeDefinitionProvider.Instance );
 
-		readonly IFactory<object, TypeInfo> typeSource;
-		readonly ITypeDefinitionProvider transformer;
-		readonly IFactory<TypeInfo, IFactory<object, MemberInfo>> factorySource;
-		readonly IFactory<object, IAttributeProvider> providerSource;
+		protected MemberInfoProviderFactory( ITypeDefinitionProvider transformer ) : base( new Factory( transformer ).ToDelegate() ) {}
 
-		public MemberInfoProviderFactory( ITypeDefinitionProvider transformer ) : this( TypeDefinitionLocator.Instance, transformer, MemberInfoDefinitionLocator.Instance, MemberInfoProvider.Instance ) {}
-
-		MemberInfoProviderFactory( IFactory<object, TypeInfo> typeSource, ITypeDefinitionProvider transformer, IFactory<TypeInfo, IFactory<object, MemberInfo>> factorySource, IFactory<object, IAttributeProvider> providerSource )
+		class Factory : BasicFactoryBase<object, IAttributeProvider>
 		{
-			this.typeSource = typeSource;
-			this.transformer = transformer;
-			this.factorySource = factorySource;
-			this.providerSource = providerSource;
-		}
+			readonly Func<object, TypeInfo> typeSource;
+			readonly Func<TypeInfo, TypeInfo> transformer;
+			readonly Func<TypeInfo, Func<object, MemberInfo>> factorySource;
+			readonly Func<object, IAttributeProvider> providerSource;
 
-		public override IAttributeProvider Create( object parameter )
-		{
-			var type = typeSource.Create( parameter );
-			var transformed = transformer.Create( type );
-			var factory = factorySource.Create( transformed );
-			var member = factory.Create( parameter );
-			var result = providerSource.Create( member );
-			return result;
+			public Factory( ITypeDefinitionProvider transformer ) : this( TypeDefinitionLocator.Instance.ToDelegate(), transformer.ToDelegate(), MemberInfoDefinitionLocator.Instance.ToDelegate(), MemberInfoProvider.Default.ToDelegate() ) {}
+
+			Factory( Func<object, TypeInfo> typeSource, Func<TypeInfo, TypeInfo> transformer, Func<TypeInfo, Func<object, MemberInfo>> factorySource, Func<object, IAttributeProvider> providerSource )
+			{
+				this.typeSource = typeSource;
+				this.transformer = transformer;
+				this.factorySource = factorySource;
+				this.providerSource = providerSource;
+			}
+
+			public override IAttributeProvider Create( object parameter )
+			{
+				var type = typeSource( parameter );
+				var transformed = transformer( type );
+				var factory = factorySource( transformed );
+				var member = factory( parameter );
+				var result = providerSource( member );
+				return result;
+			}
 		}
 	}
 
@@ -108,7 +106,7 @@ namespace DragonSpark.TypeSystem
 	// [AutoValidation( false )]
 	public class MemberInfoDefinitionLocator : FirstConstructedFromParameterFactory<object, MemberInfo>
 	{
-		public static MemberInfoDefinitionLocator Instance { get; } = new MemberInfoDefinitionLocator();
+		public static ICache<object, Func<object, MemberInfo>> Instance { get; } = new MemberInfoDefinitionLocator().Cached();
 
 		MemberInfoDefinitionLocator() : base( typeof(PropertyInfoDefinitionLocator), typeof(ConstructorInfoDefinitionLocator), typeof(MethodInfoDefinitionLocator), typeof(TypeInfoDefinitionLocator) ) {}
 

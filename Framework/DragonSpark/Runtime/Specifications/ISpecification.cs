@@ -11,4 +11,6 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		bool IsSatisfiedBy( T parameter );
 	}
+
+	public delegate bool Specification<in T>( T parameter );
 }
