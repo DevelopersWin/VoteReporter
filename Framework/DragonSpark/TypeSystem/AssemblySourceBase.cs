@@ -3,6 +3,7 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -65,7 +66,7 @@ namespace DragonSpark.TypeSystem
 			while ( stack.Any() )
 			{
 				var name = string.Join( ".", stack.Reverse() );
-				var path = string.Format( search, name );
+				var path = string.Format( search, name.ToItem() );
 				var items = assemblySource( path ).Fixed();
 				if ( items.Any() )
 				{
@@ -115,7 +116,7 @@ namespace DragonSpark.TypeSystem
 		}
 
 		[Freeze]
-		public override Type[] Create( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).Fixed();
+		public override Type[] Create( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.ToDelegate() ).Fixed();
 	}
 
 	public class TypesFactory : FactoryBase<Assembly[], Type[]>
@@ -123,7 +124,7 @@ namespace DragonSpark.TypeSystem
 		public static TypesFactory Instance { get; } = new TypesFactory();
 
 		[Freeze]
-		public override Type[] Create( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.Create ).ToArray();
+		public override Type[] Create( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.ToDelegate() ).ToArray();
 	}
 
 	public abstract class AssemblySourceBase : FactoryBase<Assembly[]>

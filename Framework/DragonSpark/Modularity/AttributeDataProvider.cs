@@ -1,8 +1,8 @@
+using DragonSpark.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Modularity
 {
@@ -32,7 +32,7 @@ namespace DragonSpark.Modularity
 		public IEnumerable<T> GetAll<T>( Type attributeType, Type type, string name )
 		{
 			var attributes = type.GetTypeInfo().GetCustomAttributes( attributeType );
-			var result = attributes.Select( attribute => GetDeclaredProperty<T>( attribute, attributeType, name ) ).WhereAssigned().ToArray();
+			var result = attributes.Introduce( Tuple.Create( attributeType, name ), tuple => GetDeclaredProperty<T>( tuple.Item1, tuple.Item2.Item1, tuple.Item2.Item2 ) ).WhereAssigned().ToArray();
 			return result;
 		}
 	}

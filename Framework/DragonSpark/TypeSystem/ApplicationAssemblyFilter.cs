@@ -15,7 +15,7 @@ namespace DragonSpark.TypeSystem
 {
 	public class ApplicationAssemblyFilter : TransformerBase<Assembly[]>
 	{
-		public static ApplicationAssemblyFilter Instance { get; } = new ApplicationAssemblyFilter();
+		// public static ApplicationAssemblyFilter Instance { get; } = new ApplicationAssemblyFilter( Items<string>.Default );
 
 		readonly ISpecification<Assembly> specification;
 		
@@ -30,7 +30,7 @@ namespace DragonSpark.TypeSystem
 			this.specification = specification;
 		}
 
-		public override Assembly[] Create( Assembly[] parameter ) => parameter.Where( specification.IsSatisfiedBy ).Prioritize().ToArray();
+		public override Assembly[] Create( Assembly[] parameter ) => parameter.Where( specification.ToDelegate() ).Prioritize().ToArray();
 	}
 
 	public class ApplicationTypeSpecification : GuardedSpecificationBase<Type>
@@ -45,7 +45,7 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationAssemblySpecification : GuardedSpecificationBase<Assembly>
 	{
-		public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification();
+		public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification( Items<string>.Default );
 
 		readonly string[] rootNamespaces;
 

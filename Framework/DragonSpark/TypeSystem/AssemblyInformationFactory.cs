@@ -23,7 +23,10 @@ namespace DragonSpark.TypeSystem
 		public override AssemblyInformation Create( Assembly parameter )
 		{
 			var result = new AssemblyInformation { Version = parameter.GetName().Version };
-			Attributes.Select( parameter.GetCustomAttribute ).Cast<object>().WhereAssigned().Each( item => item.MapInto( result ) );
+			foreach ( var item in Attributes.Select( parameter.GetCustomAttribute ).WhereAssigned() )
+			{
+				item.MapInto( result );
+			}
 			result.Configuration = result.Configuration.NullIfEmpty() ?? parameter.From<DebuggableAttribute, string>( attribute => "DEBUG" );
 			return result;
 		}

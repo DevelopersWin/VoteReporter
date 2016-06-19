@@ -150,22 +150,20 @@ namespace DragonSpark.Setup.Registration
 
 		public override void Execute( RegisterFactoryParameter parameter )
 		{
-			var func = create( parameter.FactoryType );
-			parameter.RegisterTypes.Each( type =>
+			var created = create( parameter.FactoryType );
+			foreach ( var type in parameter.RegisterTypes )
 			{
-				registry.RegisterFactory( new FactoryRegistrationParameter( type, func ) );
-				locator.Locate( MakeGenericType( parameter.FactoryType, type ) ).AsValid<IFactoryWithParameter>( factory =>
-				{
-					var @delegate = determineDelegate( parameter.FactoryType ) ?? func;
-					var typed = factory.Create( @delegate );
-					registry.Register( new InstanceRegistrationParameter( typed.GetType(), typed ) );
-				} );
-			} );
-
+				registry.RegisterFactory( new FactoryRegistrationParameter( type, created ) );
+				var factory = locator.Locate( MakeGenericType( parameter.FactoryType, type ) ).AsValid<IFactoryWithParameter>();
+				var @delegate = determineDelegate( parameter.FactoryType ) ?? created;
+				var typed = factory.Create( @delegate );
+				registry.Register( new InstanceRegistrationParameter( typed.GetType(), typed ) );
+			}
+			
 			new[] { ImplementedInterfaceFromConventionLocator.Instance.Create( parameter.FactoryType ), FactoryInterfaceLocator.Instance.Create( parameter.FactoryType ) }
 				.WhereAssigned()
 				.Distinct()
-				.Select( type => new MappingRegistrationParameter( type, parameter.FactoryType ) )
+				.Introduce( parameter.FactoryType, tuple => new MappingRegistrationParameter( tuple.Item1, tuple.Item2 ) )
 				.Each( registry.Register );
 		}
 

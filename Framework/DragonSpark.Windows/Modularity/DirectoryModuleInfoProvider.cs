@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation;
+using DragonSpark.Aspects;
+using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Windows.Modularity
 {
@@ -12,15 +15,18 @@ namespace DragonSpark.Windows.Modularity
 	{
 		readonly IModuleInfoBuilder builder;
 		readonly DirectoryInfo directory;
+		readonly ResolveEventHandler resolve;
+		readonly static Func<string, Assembly> LoadFactory = Load;
 
 		public DirectoryModuleInfoProvider( IModuleInfoBuilder builder, IEnumerable<string> assemblies, string directoryPath )
 		{
 			this.builder = builder;
 			directory = new DirectoryInfo( directoryPath );
 
-			assemblies.Each( Load );
+			assemblies.Each( LoadFactory );
 
-			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomainOnReflectionOnlyAssemblyResolve;
+			resolve = CurrentDomainOnReflectionOnlyAssemblyResolve;
+			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += resolve;
 		}
 
 		public IEnumerable<ModuleInfo> GetModuleInfos()
@@ -36,7 +42,7 @@ namespace DragonSpark.Windows.Modularity
 		{
 			var resolver = resolve ?? ( assembly => assembly.FullName );
 			var assemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-			var result = assemblies.FirstOrDefault( asm => string.Equals(resolver( asm ), name, StringComparison.OrdinalIgnoreCase));
+			var result = assemblies.Introduce( ValueTuple.Create( name, resolver ), asm => string.Equals( asm.Item2.Item2( asm.Item1 ), asm.Item2.Item1, StringComparison.OrdinalIgnoreCase) ).FirstOrDefault();
 			return result;
 		}
 
@@ -89,19 +95,14 @@ namespace DragonSpark.Windows.Modularity
 			var loaded = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies().Select( assembly => Path.GetFileName(assembly.Location) ).ToArray();
 
 			var names = directory.GetFiles("*.dll")
-				.Where(file => !loaded.Any( s => string.Equals(file.Name, s, StringComparison.OrdinalIgnoreCase) ) )
+				.Introduce( loaded, tuple => !tuple.Item2.Introduce( tuple.Item1.Name ).Any( t => string.Equals( t.Item1, t.Item2, StringComparison.OrdinalIgnoreCase) ) )
 				.Select( info => info.FullName );
 
-			var valid = names.Select( Load ).WhereAssigned();
+			var valid = names.Select( LoadFactory ).WhereAssigned();
 
-			var result = valid.SelectMany( assembly => assembly
-				.GetExportedTypes()
-				.Where( moduleType.IsAssignableFrom )
-				.Where( t => t != moduleType )
-				.Where( t => !t.IsAbstract )
-				.Select( builder.CreateModuleInfo )
-				.OfType<DynamicModuleInfo>()
-				);
+			var result = valid.SelectMany( assembly => assembly.ExportedTypes ).Introduce( ValueTuple.Create( moduleType, builder ), 
+				tuple => !tuple.Item1.IsAbstract && tuple.Item1 != tuple.Item2.Item1 && tuple.Item2.Item1.IsAssignableFrom( tuple.Item1 ), tuple => tuple.Item2.Item2.CreateModuleInfo( tuple.Item1 ) )
+				.OfType<DynamicModuleInfo>();
 			return result;
 		}
 
@@ -113,7 +114,7 @@ namespace DragonSpark.Windows.Modularity
 		{
 			if (disposing)
 			{
-				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= CurrentDomainOnReflectionOnlyAssemblyResolve;
+				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= resolve;
 			}
 		}
 

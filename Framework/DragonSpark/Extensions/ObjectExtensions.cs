@@ -119,33 +119,35 @@ namespace DragonSpark.Extensions
 
 		public static TResult Evaluate<TResult>( [Required]this IExpressionEvaluator @this, object container, string expression ) => (TResult)@this.Evaluate( container, expression );
 
-		public static TItem AsValid<TItem>( this TItem @this, Action<TItem> with ) => AsValid( @this, with, null );
+		public static T AsValid<T>( this object @this ) => AsValid( @this, Delegates<T>.Empty );
 
-		public static TItem AsValid<TItem>( this object @this, Action<TItem> with ) => AsValid( @this, with, null );
+		//public static T AsValid<T>( this T @this, Action<T> with ) => AsValid( @this, with, null );
 
-		public static TItem AsValid<TItem>( this object @this, Action<TItem> with, string message )
+		public static T AsValid<T>( this object @this, Action<T> with ) => AsValid( @this, with, null );
+
+		public static T AsValid<T>( this object @this, Action<T> with, string message )
 		{
-			if ( @this.Not<TItem>() )
+			if ( @this.Not<T>() )
 			{
-				throw new InvalidOperationException( message ?? $"'{@this.GetType().FullName}' is not of type {typeof(TItem).FullName}." );
+				throw new InvalidOperationException( message ?? $"'{@this.GetType().FullName}' is not of type {typeof(T).FullName}." );
 			}
 			
 			return @this.As( with );
 		}
 
-		public static TResult As<TResult>( this object target ) => As( target, (Action<TResult>)null );
+		public static T As<T>( this object target ) => As( target, (Action<T>)null );
 
 		/*public static TResult As<TResult, TReturn>( this object target, Func<TResult, TReturn> action ) => target.As<TResult>( x => { action( x ); } );*/
 
-		public static TResult As<TResult>( this object target, Action<TResult> action )
+		public static T As<T>( this object target, Action<T> action )
 		{
-			if ( target is TResult )
+			if ( target is T )
 			{
-				var result = (TResult)target;
+				var result = (T)target;
 				result.With( action );
 				return result;
 			}
-			return default(TResult);
+			return default(T);
 		}
 
 		public static TResult AsTo<TSource, TResult>( this object target, Func<TSource,TResult> transform, Func<TResult> resolve = null )
@@ -159,10 +161,7 @@ namespace DragonSpark.Extensions
 
 		public static T ConvertTo<T>( this object @this ) => @this.IsAssigned() ? (T)ConvertTo( @this, typeof(T) ) : default(T);
 
-		public static object ConvertTo( this object @this, Type to )
-		{
-			return !to.Adapt().IsInstanceOfType( @this ) ? ( to.GetTypeInfo().IsEnum ? Enum.Parse( to, @this.ToString() ) : ChangeType( @this, to ) ) : @this;
-		}
+		public static object ConvertTo( this object @this, Type to ) => !to.Adapt().IsInstanceOfType( @this ) ? ( to.GetTypeInfo().IsEnum ? Enum.Parse( to, @this.ToString() ) : ChangeType( @this, to ) ) : @this;
 
 		static object ChangeType( object @this, Type to )
 		{
