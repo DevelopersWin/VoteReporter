@@ -121,7 +121,7 @@ namespace DragonSpark.Setup.Registration
 		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes )
 		{
 			FactoryType = factoryType;
-			RegisterTypes = registrationTypes.Alive().Append( ResultTypeLocator.Instance.Get( factoryType ) ).Distinct().ToArray();
+			RegisterTypes = registrationTypes.Assigned().Append( ResultTypeLocator.Instance.Get( factoryType ) ).Distinct().ToArray();
 		}
 		
 		public Type FactoryType { get; }
@@ -163,7 +163,7 @@ namespace DragonSpark.Setup.Registration
 			} );
 
 			new[] { ImplementedInterfaceFromConventionLocator.Instance.Create( parameter.FactoryType ), FactoryInterfaceLocator.Instance.Create( parameter.FactoryType ) }
-				.Alive()
+				.Assigned()
 				.Distinct()
 				.Select( type => new MappingRegistrationParameter( type, parameter.FactoryType ) )
 				.Each( registry.Register );

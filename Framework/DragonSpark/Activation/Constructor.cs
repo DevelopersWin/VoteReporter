@@ -68,7 +68,7 @@ namespace DragonSpark.Activation
 			[Freeze]
 			public override ConstructorInfo Create( ConstructTypeRequest parameter )
 			{
-				var candidates = ImmutableArray.Create( parameter.Arguments, parameter.Arguments.Alive().Fixed(), Items<object>.Default );
+				var candidates = ImmutableArray.Create( parameter.Arguments, parameter.Arguments.Assigned().Fixed(), Items<object>.Default );
 				var adapter = parameter.RequestedType.Adapt();
 				var result = candidates
 					.Select( adapter.FindConstructor )

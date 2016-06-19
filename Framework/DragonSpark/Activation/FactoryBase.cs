@@ -261,7 +261,7 @@ namespace DragonSpark.Activation
 		public override IFactory<TParameter, TResult> Create( object parameter )
 		{
 			var items = factories.Introduce( parameter, tuple => tuple.Item1.Create( tuple.Item2 ) )
-				.Alive()
+				.Assigned()
 				.Select( inner => new DecoratedFactory<TParameter, TResult>( inner ) )
 				.ToArray();
 			var result = new FirstFromParameterFactory<TParameter, TResult>( items );

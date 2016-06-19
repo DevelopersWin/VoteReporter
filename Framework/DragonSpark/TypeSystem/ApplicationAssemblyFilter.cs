@@ -19,7 +19,7 @@ namespace DragonSpark.TypeSystem
 
 		readonly ISpecification<Assembly> specification;
 		
-		static string[] Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.Alive().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToArray();
+		static string[] Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.Assigned().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToArray();
 
 		public ApplicationAssemblyFilter( [PostSharp.Patterns.Contracts.Required]params Assembly[] coreAssemblies ) : this( Determine( coreAssemblies ) ) {}
 

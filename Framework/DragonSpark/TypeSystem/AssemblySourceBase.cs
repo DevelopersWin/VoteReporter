@@ -145,7 +145,7 @@ namespace DragonSpark.TypeSystem
 			this.assemblies = assemblies;
 		}
 
-		public override Assembly[] Create() => assemblies.Alive().Distinct().Prioritize().Fixed();
+		public override Assembly[] Create() => assemblies.Assigned().Distinct().Prioritize().Fixed();
 	}
 
 	public class AggregateAssemblyFactory : AggregateFactory<Assembly[]>, IAssemblyProvider

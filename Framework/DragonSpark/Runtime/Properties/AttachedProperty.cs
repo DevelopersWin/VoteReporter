@@ -365,41 +365,39 @@ namespace DragonSpark.Runtime.Properties
 			}
 		}
 
-	class ConcurrentEqualityCache<TKey, TValue> : EqualityCache<TKey, TValue>
+	public class ConcurrentEqualityCache<TKey, TValue> : EqualityCache<TKey, TValue>
 	{
 		readonly ConcurrentDictionary<TKey, TValue> store;
-		readonly Func<TKey, TValue> create;
 		public ConcurrentEqualityCache( Func<TKey, TValue> create ) : this( new ConcurrentDictionary<TKey, TValue>(), create ) {}
 
 		ConcurrentEqualityCache( ConcurrentDictionary<TKey, TValue> store, Func<TKey, TValue> create ) : base( store, create )
 		{
 			this.store = store;
-			this.create = create;
 		}
 
-		public override TValue Get( TKey instance ) => store.GetOrAdd( instance, create );
+		public override TValue Get( TKey instance ) => store.GetOrAdd( instance, Create );
 	}
 
-	class EqualityCache<TKey, TValue> : CacheBase<TKey, TValue>
+	public class EqualityCache<TKey, TValue> : CacheBase<TKey, TValue>
 	{
-		readonly IDictionary<TKey, TValue> store;
-		readonly Func<TKey, TValue> create;
-
 		public EqualityCache( Func<TKey, TValue> create ) : this( new Dictionary<TKey, TValue>(), create ) {}
 
 		protected EqualityCache( IDictionary<TKey, TValue> store, Func<TKey, TValue> create )
 		{
-			this.store = store;
-			this.create = create;
+			Store = store;
+			Create = create;
 		}
 
-		public override bool Contains( TKey instance ) => store.ContainsKey( instance );
+		protected IDictionary<TKey, TValue> Store { get; }
+		protected Func<TKey, TValue> Create { get; }
 
-		public override bool Remove( TKey instance ) => store.Remove( instance );
+		public override bool Contains( TKey instance ) => Store.ContainsKey( instance );
 
-		public override void Set( TKey instance, TValue value ) => store[instance] = value;
+		public override bool Remove( TKey instance ) => Store.Remove( instance );
 
-		public override TValue Get( TKey instance ) => store.Ensure( instance, create );
+		public override void Set( TKey instance, TValue value ) => Store[instance] = value;
+
+		public override TValue Get( TKey instance ) => Store.Ensure( instance, Create );
 	}
 
 	public abstract class CacheBase<TInstance, TValue> : ICache<TInstance, TValue>
