@@ -32,7 +32,7 @@ namespace DragonSpark.Modularity
 		public IEnumerable<T> GetAll<T>( Type attributeType, Type type, string name )
 		{
 			var attributes = type.GetTypeInfo().GetCustomAttributes( attributeType );
-			var result = attributes.Select( attribute => GetDeclaredProperty<T>( attribute, attributeType, name ) ).Assigned().ToArray();
+			var result = attributes.Select( attribute => GetDeclaredProperty<T>( attribute, attributeType, name ) ).WhereAssigned().ToArray();
 			return result;
 		}
 	}

@@ -66,7 +66,7 @@ namespace DragonSpark.Composition
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
 			new[] { contract.ContractType, locator.Create( contract.ContractType ) }
-				.Assigned()
+				.WhereAssigned()
 				.Distinct()
 				.Each( InitializeTypeCommand.Instance.Execute );
 			yield break;

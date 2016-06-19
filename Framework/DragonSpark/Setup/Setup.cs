@@ -136,7 +136,7 @@ namespace DragonSpark.Setup
 		{
 			public static IsActivatedInstanceSpecification Default { get; } = new IsActivatedInstanceSpecification();
 
-			public override bool IsSatisfiedBy( object parameter ) => Instance.Get( parameter ) || new[] { parameter, Factory.Get( parameter ) }.Assigned().Any( o => o.Has<SharedAttribute>() );
+			public override bool IsSatisfiedBy( object parameter ) => Instance.Get( parameter ) || new[] { parameter, Factory.Get( parameter ) }.WhereAssigned().Any( o => o.Has<SharedAttribute>() );
 		}
 
 		/*public class Instance : AssociatedStore<bool>

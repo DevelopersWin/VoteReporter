@@ -534,7 +534,7 @@ namespace DragonSpark.Runtime.Properties
 
 		protected virtual TValue CreateValue( TInstance instance ) => create( instance );
 
-		public override IWritableStore<TValue> Create( TInstance instance ) => base.Create( instance ).Assigned( CreateValue( instance ) );
+		public override IWritableStore<TValue> Create( TInstance instance ) => base.Create( instance ).WhereAssigned( CreateValue( instance ) );
 	}*/
 
 	/*public interface IAttachedPropertyStore<in TInstance, TValue> where TInstance : class

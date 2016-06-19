@@ -24,19 +24,18 @@ namespace DragonSpark.Testing.Framework
 {
 	public static class Defer
 	{
-		public static Task Run( Action action, object context )
+		public static Task Run( Action<Task> action, object context )
 		{
 			var task = context as Task;
 			if ( task != null )
 			{
-				var continueWith = task.ContinueWith( t => action() );
-				// continueWith.ConfigureAwait( false );
-				return continueWith;
-				// task.ToObservable().Subscribe( unit => action() );
+				return task.ContinueWith( action );
 			}
-			action();
+			action( Task.CompletedTask );
 			return null;
 		}
+
+		public static void Dispose<T>( this IDisposable @this, T item ) => @this.Dispose(); // TODO: Make more generalized.
 	}
 
 	[Serializable, LinesOfCodeAvoided( 8 )]
@@ -89,7 +88,7 @@ namespace DragonSpark.Testing.Framework
 
 		public InitializeMethodCommand() : this( Delegates.Empty ) {}
 
-		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Instance.Execute, complete ) {}
+		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Instance.ToDelegate(), complete ) {}
 
 		public InitializeMethodCommand( Action<Assembly> initialize, Action complete ) : this( ExecutionContextStore.Instance.Value, initialize, complete ) {}
 
@@ -105,11 +104,7 @@ namespace DragonSpark.Testing.Framework
 			base.Execute( parameter );
 		}
 
-		protected override void OnDispose()
-		{
-			// base.OnDispose();
-			complete();
-		}
+		protected override void OnDispose() => complete();
 	}
 
 	[Disposable]

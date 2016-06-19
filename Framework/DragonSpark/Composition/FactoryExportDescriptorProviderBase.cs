@@ -117,8 +117,6 @@ namespace DragonSpark.Composition
 
 	public class ActivatorFactory : FactoryBase<ActivatorFactory.Parameter, CompositeActivator>
 	{
-		// public static ActivatorFactory Instance { get; } = new ActivatorFactory( ActivatorRegistryFactory.Instance, ActivatorResultFactory.Instance.ToDelegate() );
-
 		readonly ActivatorRegistryFactory registryFactory;
 		readonly Func<Activator.Parameter, object> activatorFactory;
 
@@ -178,7 +176,7 @@ namespace DragonSpark.Composition
 			public override ActivatorRegistry Create( Parameter parameter )
 			{
 				var result = new ActivatorRegistry( parameter.Accessor, parameter.FactoryContract );
-				new[] { parameter.FactoryContract.ContractType, ParameterTypeLocator.Instance.Get( parameter.FactoryContract.ContractType ) }.Assigned().Each( result.Register );
+				new[] { parameter.FactoryContract.ContractType, ParameterTypeLocator.Instance.Get( parameter.FactoryContract.ContractType ) }.WhereAssigned().Each( result.Register );
 				return result;
 			}
 		}

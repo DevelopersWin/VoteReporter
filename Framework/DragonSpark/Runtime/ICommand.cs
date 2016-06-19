@@ -12,18 +12,13 @@ using System.Windows.Input;
 
 namespace DragonSpark.Runtime
 {
-	public interface ICommand<in TParameter> : ICommand//, IValidationAware
+	public interface ICommand<in TParameter> : ICommand
 	{
 		bool CanExecute( TParameter parameter );
 
 		void Execute( TParameter parameter );
 
 		void Update();
-	}
-
-	public static class DelegateExtensions
-	{
-		public static Action<T> Convert<T>( this Action<object> @this ) => t => @this( t );
 	}
 
 	public class AssignValueCommand<T> : DisposingCommand<T>

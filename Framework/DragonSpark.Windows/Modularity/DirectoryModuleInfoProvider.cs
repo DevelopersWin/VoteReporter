@@ -92,7 +92,7 @@ namespace DragonSpark.Windows.Modularity
 				.Where(file => !loaded.Any( s => string.Equals(file.Name, s, StringComparison.OrdinalIgnoreCase) ) )
 				.Select( info => info.FullName );
 
-			var valid = names.Select( Load ).Assigned();
+			var valid = names.Select( Load ).WhereAssigned();
 
 			var result = valid.SelectMany( assembly => assembly
 				.GetExportedTypes()

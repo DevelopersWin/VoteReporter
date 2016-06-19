@@ -86,7 +86,7 @@ namespace DragonSpark.Extensions
 
 		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, U> with, Func<U> defaultFunction = null ) => WithFirst( @this, Where<T>.Always, with, defaultFunction );
 
-		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, bool> where, Func<T, U> with, Func<U> defaultFunction = null ) => @this.Assigned().FirstOrDefault( @where ).With( with, defaultFunction );
+		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, bool> where, Func<T, U> with, Func<U> defaultFunction = null ) => @this.WhereAssigned().FirstOrDefault( @where ).With( with, defaultFunction );
 
 		public static T Only<T>( this IEnumerable<T> @this ) => Only( @this, Where<T>.Always );
 
@@ -122,13 +122,13 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<Tuple<T1, T2>> Tuple<T1, T2>( this IEnumerable<T1> target, IEnumerable<T2> other ) => target.Zip( other, System.Tuple.Create ).ToArray();
 
-		public static T FirstAssigned<T>( this IEnumerable<T> @this ) => @this.Assigned().FirstOrDefault();
+		public static T FirstAssigned<T>( this IEnumerable<T> @this ) => @this.WhereAssigned().FirstOrDefault();
 
-		public static U FirstAssigned<T, U>( this IEnumerable<T> @this, Func<T, U> projection ) => @this.Assigned().Select( projection ).FirstAssigned();
+		public static U FirstAssigned<T, U>( this IEnumerable<T> @this, Func<T, U> projection ) => @this.WhereAssigned().Select( projection ).FirstAssigned();
 
-		public static IEnumerable<T> Assigned<T>( this IEnumerable<T> target ) => target.Where( Where<T>.Assigned );
+		public static IEnumerable<T> WhereAssigned<T>( this IEnumerable<T> target ) => target.Where( Where<T>.Assigned );
 
-		//public static IEnumerable<TItem> Assigned<TItem, TProject>( this IEnumerable<TItem> target, Func<TItem, TProject> project ) => target.Where(  );
+		//public static IEnumerable<TItem> WhereAssigned<TItem, TProject>( this IEnumerable<TItem> target, Func<TItem, TProject> project ) => target.Where(  );
 
 		public static T FirstOrDefaultOfType<T>(this IEnumerable enumerable) => enumerable.OfType<T>().FirstOrDefault();
 
