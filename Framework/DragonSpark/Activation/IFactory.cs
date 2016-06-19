@@ -61,8 +61,9 @@ namespace DragonSpark.Activation
 
 		public static Func<TTo> Convert<TFrom, TTo>( this Func<TFrom> @this ) where TTo : TFrom => DelegateCache<TFrom, TTo>.Default.Get( @this );
 
-		public static Func<TParameter, TResult> Convert<TParameter, TResult>( this Func<object, object> @this ) => DelegateWithParameterCache<object, object, TParameter, TResult>.Default.Get( @this );
-
+		public static Func<TParameter, TResult> Convert<TParameter, TResult>( this Func<object, object> @this ) => Convert<object, object, TParameter, TResult>( @this );
+		public static Func<TToParameter, TToResult> Convert<TFromParameter, TFromResult, TToParameter, TToResult>( this Func<TFromParameter, TFromResult> @this ) => DelegateWithParameterCache<TFromParameter, TFromResult, TToParameter, TToResult>.Default.Get( @this );
+		
 		public static IFactory<TParameter, TResult> Cast<TParameter, TResult>( this IFactoryWithParameter @this ) => @this as IFactory<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
 
 		public static Func<object> ToDelegate( this IFactory @this ) => FactoryDelegateCache.Default.Get( @this );
@@ -220,7 +221,7 @@ namespace DragonSpark.Activation
 			}
 		}
 
-		public class DelegateWithParameterCache<TFromParameter, TFromResult, TToParameter, TToResult> : Cache<Func<TFromParameter, TFromResult>, Func<TToParameter, TToResult>> where TToResult : TFromResult where TToParameter : TFromParameter
+		public class DelegateWithParameterCache<TFromParameter, TFromResult, TToParameter, TToResult> : Cache<Func<TFromParameter, TFromResult>, Func<TToParameter, TToResult>>
 		{
 			public static DelegateWithParameterCache<TFromParameter, TFromResult, TToParameter, TToResult> Default { get; } = new DelegateWithParameterCache<TFromParameter, TFromResult, TToParameter, TToResult>();
 
@@ -235,7 +236,7 @@ namespace DragonSpark.Activation
 					this.from = from;
 				}
 
-				public TToResult To( TToParameter parameter ) => (TToResult)from( parameter );
+				public TToResult To( TToParameter parameter ) => (TToResult)(object)from( (TFromParameter)(object)parameter );
 			}
 		}
 	}

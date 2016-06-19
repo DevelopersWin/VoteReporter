@@ -269,7 +269,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public abstract class DelegatedParameterFactoryBase<TParameter, TResult> : FactoryBase<TResult>
+	/*public abstract class DelegatedParameterFactoryBase<TParameter, TResult> : FactoryBase<TResult>
 	{
 		readonly TParameter item;
 		readonly Func<TParameter, TResult> create;
@@ -283,31 +283,27 @@ namespace DragonSpark.Activation
 		}
 
 		public override TResult Create() => create( item );
-	}
+	}*/
 
-	public class FirstConstructedFromParameterFactory<TResult> : FirstFromParameterFactory<object, TResult>
+	public class FirstConstructedFromParameterFactory<T> : FirstFromParameterFactory<object, T>
 	{
-		public FirstConstructedFromParameterFactory( params Type[] types ) : base( types.Select( type => new ConstructFromParameterFactory<TResult>( type ) ).Fixed() ) {}
+		public FirstConstructedFromParameterFactory( params Type[] types ) : base( types.Select( type => new ConstructFromParameterFactory<T>( type ) ).Fixed() ) {}
 	}
 
-	public class FirstFromParameterFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	public class FirstFromParameterFactory<TParameter, TResult> : BasicFactoryBase<TParameter, TResult>
 	{
 		readonly IEnumerable<Func<TParameter, TResult>> inner;
 
 		public FirstFromParameterFactory( params IFactory<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
-		public FirstFromParameterFactory( [Required]params Func<TParameter, TResult>[] inner ) : this( Coercer<TParameter>.Instance, inner ) {}
+		public FirstFromParameterFactory( [Required] params Func<TParameter, TResult>[] inner ) : this( Coercer<TParameter>.Instance, inner ) {}
 
-		public FirstFromParameterFactory( ISpecification<TParameter> specification, [Required] params Func<TParameter, TResult>[] inner ) : this( specification, Coercer<TParameter>.Instance, inner ) {}
-
-		public FirstFromParameterFactory( ICoercer<TParameter> coercer, [Required] params Func<TParameter, TResult>[] inner ) : this( Specifications<TParameter>.Always, coercer, inner ) {}
-
-		public FirstFromParameterFactory( ISpecification<TParameter> specification, ICoercer<TParameter> coercer, [Required]params Func<TParameter, TResult>[] inner ) : base( coercer, specification )
+		public FirstFromParameterFactory( ICoercer<TParameter> coercer, [Required]params Func<TParameter, TResult>[] inner ) : base( coercer )
 		{
 			this.inner = inner;
 		}
 
-		public override TResult Create( TParameter parameter ) => inner.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) ).FirstAssigned( factory => factory );
+		public override TResult Create( TParameter parameter ) => inner.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) ).FirstAssigned();
 	}
 
 	// [Validation( false )]
@@ -339,12 +335,12 @@ namespace DragonSpark.Activation
 
 	public class AggregateFactory<T> : FactoryBase<T>
 	{
-		readonly IFactory<T> primary;
-		readonly ImmutableArray<ITransformer<T>> transformers;
+		readonly Func<T> primary;
+		readonly Func<T, T>[] transformers;
 
 		// public AggregateFactory( [Required]IFactory<T> primary, [Required]params ITransformer<T>[] transformers ) : this( primary.ToDelegate(), transformers.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
-		public AggregateFactory( [Required]IFactory<T> primary, [Required]ImmutableArray<ITransformer<T>> transformers )
+		public AggregateFactory( Func<T> primary, params Func<T, T>[] transformers )
 		{
 			this.primary = primary;
 			this.transformers = transformers;
@@ -352,10 +348,10 @@ namespace DragonSpark.Activation
 
 		public override T Create()
 		{
-			var result = primary.Create();
+			var result = primary();
 			foreach ( var transformer in transformers )
 			{
-				result = transformer.Create( result );
+				result = transformer( result );
 			}
 			return result;
 		}

@@ -11,9 +11,9 @@ namespace DragonSpark.Windows
 		AttributeProviderLocator() : base( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
 	}
 
-	class ObjectAttributeProvider : DelegatedParameterFactoryBase<object, IAttributeProvider>
+	class ObjectAttributeProvider : FixedFactory<object, IAttributeProvider>
 	{
-		public ObjectAttributeProvider( object item ) : base( item, MemberInfoProviderFactory.Instance.Create ) {}
+		public ObjectAttributeProvider( object item ) : base( MemberInfoProviderFactory.Instance.ToDelegate(), item ) {}
 	}
 
 	class MemberInfoProviderFactory : DragonSpark.TypeSystem.MemberInfoProviderFactory

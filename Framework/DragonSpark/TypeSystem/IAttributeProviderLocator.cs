@@ -31,9 +31,9 @@ namespace DragonSpark.TypeSystem
 		public AttributeProviderConfiguration() : base( AttributeProviderLocator.Default ) {}
 	}
 
-	class ObjectAttributeProvider : DelegatedParameterFactoryBase<object, IAttributeProvider>
+	class ObjectAttributeProvider : FixedFactory<object, IAttributeProvider>
 	{
-		public ObjectAttributeProvider( object item ) : base( item, MemberInfoProviderFactory.Instance.ToDelegate() ) {}
+		public ObjectAttributeProvider( object item ) : base( MemberInfoProviderFactory.Instance.ToDelegate(), item ) {}
 	}
 
 	public class MemberInfoProvider : FirstConstructedFromParameterFactory<IAttributeProvider>

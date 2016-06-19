@@ -11,7 +11,7 @@ using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 using Configure = DragonSpark.Configuration.Configure;
 
@@ -81,7 +81,7 @@ namespace DragonSpark.Diagnostics
 	public class RecordingLoggerConfigurationFactory : LoggerConfigurationFactory
 	{
 		public RecordingLoggerConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
-			: base( new LoggerConfigurationSource( controller ), transformers.Append( new CreatorFilterTransformer(), new LoggerHistoryConfigurationTransformer( sink ) ).ToImmutableArray() ) {}
+			: base( new LoggerConfigurationSource( controller ).ToDelegate(), transformers.Append( new CreatorFilterTransformer(), new LoggerHistoryConfigurationTransformer( sink ) ).Select( transformer => transformer.ToDelegate() ).ToArray() ) {}
 	}
 
 	public class MethodFormatter : IFormattable
@@ -98,7 +98,7 @@ namespace DragonSpark.Diagnostics
 
 	public class LoggerConfigurationFactory : AggregateFactory<LoggerConfiguration>
 	{
-		public LoggerConfigurationFactory( IFactory<LoggerConfiguration> primary, ImmutableArray<ITransformer<LoggerConfiguration>> transformers ) : base( primary, transformers ) {}
+		public LoggerConfigurationFactory( Func<LoggerConfiguration> primary, params Func<LoggerConfiguration, LoggerConfiguration>[] transformers ) : base( primary, transformers ) {}
 	}
 
 	public class LoggerConfigurationSource : FactoryBase<LoggerConfiguration>

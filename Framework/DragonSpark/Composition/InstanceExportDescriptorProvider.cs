@@ -36,15 +36,15 @@ namespace DragonSpark.Composition
 	{
 		readonly T instance;
 		readonly CompositionContract[] contracts;
-		readonly CompositeActivator compositeActivator;
-		readonly Func<IEnumerable<CompositionDependency>, ExportDescriptor> getDescriptor;
+		readonly CompositeActivator activate;
+		readonly Func<IEnumerable<CompositionDependency>, ExportDescriptor> get;
 
 		public InstanceExportDescriptorProvider( [Required]T instance, string name = null )
 		{
 			this.instance = instance;
 			contracts = new [] { typeof(T), instance.GetType() }.Distinct().Introduce( name, tuple => new CompositionContract( tuple.Item1, tuple.Item2 ) ).ToArray();
-			compositeActivator = Activator;
-			getDescriptor = GetDescriptor;
+			activate = Activator;
+			get = GetDescriptor;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
@@ -52,11 +52,11 @@ namespace DragonSpark.Composition
 			if ( contracts.Contains( contract ) )
 			{
 				ActivationProperties.Instance.Set( instance, true );
-				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, getDescriptor );
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, get );
 			}
 		}
 
-		ExportDescriptor GetDescriptor( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( compositeActivator, NoMetadata );
+		ExportDescriptor GetDescriptor( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( activate, NoMetadata );
 
 		object Activator( LifetimeContext context, CompositionOperation operation ) => instance;
 	}

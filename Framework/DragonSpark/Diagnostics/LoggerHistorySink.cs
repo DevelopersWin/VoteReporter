@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using Serilog.Formatting.Display;
@@ -16,7 +15,7 @@ namespace DragonSpark.Diagnostics
 
 		public void Clear() => source.Clear();
 
-		public IEnumerable<LogEvent> Events => source.ToArray().Reverse().ToArray();
+		public IEnumerable<LogEvent> Events => source.Reverse().ToArray();
 
 		public virtual void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
 	}
@@ -49,7 +48,7 @@ namespace DragonSpark.Diagnostics
 
 		public override string[] Create( IEnumerable<LogEvent> parameter ) => parameter
 			// .OrderBy( line => line.Timestamp )
-			.Select( LogEventTextFactory.Instance.Create )
+			.Select( LogEventTextFactory.Instance.ToDelegate() )
 			.ToArray();
 	}
 }
