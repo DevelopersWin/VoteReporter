@@ -177,7 +177,7 @@ namespace DragonSpark.Runtime
 	}
 
 	[ValidatedGenericCommand, ValidatedGenericCommand.Aspects]
-	public abstract class CommandBase<T> : ICommand<T> //, IValidationAware
+	public abstract class CommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate { };
 		readonly Coerce<T> coercer;
@@ -204,8 +204,5 @@ namespace DragonSpark.Runtime
 		public virtual bool CanExecute( T parameter ) => specification.IsSatisfiedBy( parameter );
 
 		public abstract void Execute( T parameter );
-
-		// bool IValidationAware.ShouldValidate() => specification != Specifications.Specifications.Always && specification != Specifications<T>.Always;
 	}
-
 }

@@ -52,64 +52,59 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}
 
-	abstract class ParameterAdapterCacheBase<T> : Cache<IParameterValidator> where T : class
+	abstract class ParameterAdapterFactoryBase<T> : ProjectedFactory<T, IParameterValidator> where T : class
 	{
-		protected ParameterAdapterCacheBase( Func<T, IParameterValidator> create ) : base( new ProjectedFactory<T, IParameterValidator>( create ).ToDelegate()  ) {}
+		protected ParameterAdapterFactoryBase( Func<T, IParameterValidator> create ) : base( create ) {}
 	}
 
-	abstract class GenericParameterAdapterStoreBase : Cache<IGenericParameterValidator>
+	abstract class GenericParameterAdapterFactoryBase : FactoryBase<object, IGenericParameterValidator>
 	{
-		protected GenericParameterAdapterStoreBase( Factory factory ) : base( factory.ToDelegate() ) {}
+		readonly Type genericType;
+		readonly string methodName;
+		readonly TypeAdapter adapter;
 
-		protected class Factory : FactoryBase<object, IGenericParameterValidator>
+		protected GenericParameterAdapterFactoryBase( Type parentType, Type genericType, string methodName = nameof(Create) )
 		{
-			readonly Type genericType;
-			readonly string methodName;
-			readonly TypeAdapter adapter;
+			this.genericType = genericType;
+			this.methodName = methodName;
+			adapter = parentType.Adapt();
+		}
 
-			public Factory( Type parentType, Type genericType, string methodName = nameof(Create) )
-			{
-				this.genericType = genericType;
-				this.methodName = methodName;
-				adapter = parentType.Adapt();
-			}
-
-			public override IGenericParameterValidator Create( object parameter )
-			{
-				var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
-				var result = adapter.Invoke<IGenericParameterValidator>( methodName, arguments, parameter.ToItem() );
-				return result;
-			}
+		public override IGenericParameterValidator Create( object parameter )
+		{
+			var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
+			var result = adapter.Invoke<IGenericParameterValidator>( methodName, arguments, parameter.ToItem() );
+			return result;
 		}
 	}
-
-	class GenericFactoryParameterAdapterStore : GenericParameterAdapterStoreBase
+	
+	class GenericFactoryParameterAdapterFactory : GenericParameterAdapterFactoryBase
 	{
-		public static GenericFactoryParameterAdapterStore Instance { get; } = new GenericFactoryParameterAdapterStore();
+		public static GenericFactoryParameterAdapterFactory Instance { get; } = new GenericFactoryParameterAdapterFactory();
 
-		GenericFactoryParameterAdapterStore() : base( new Factory( typeof(GenericFactoryParameterAdapterStore), typeof(IFactory<,>) ) ) {}
+		GenericFactoryParameterAdapterFactory() : base( typeof(GenericFactoryParameterAdapterFactory), typeof(IFactory<,>) ) {}
 
 		static IGenericParameterValidator Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
-	class GenericCommandParameterAdapterStore : GenericParameterAdapterStoreBase
+	class GenericCommandParameterAdapterFactory : GenericParameterAdapterFactoryBase
 	{
-		public static GenericCommandParameterAdapterStore Instance { get; } = new GenericCommandParameterAdapterStore();
+		public static GenericCommandParameterAdapterFactory Instance { get; } = new GenericCommandParameterAdapterFactory();
 
-		GenericCommandParameterAdapterStore() : base( new Factory( typeof(GenericCommandParameterAdapterStore), typeof(ICommand<>) ) ) {}
+		GenericCommandParameterAdapterFactory() : base( typeof(GenericCommandParameterAdapterFactory), typeof(ICommand<>) ) {}
 
 		static IParameterValidator Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
-	class CommandParameterAdapterCache : ParameterAdapterCacheBase<ICommand>
+	class CommandParameterAdapterFactory : ParameterAdapterFactoryBase<ICommand>
 	{
-		public static CommandParameterAdapterCache Instance { get; } = new CommandParameterAdapterCache();
-		CommandParameterAdapterCache() : base( command => new CommandAdapter( command ) ) {}
+		public static CommandParameterAdapterFactory Instance { get; } = new CommandParameterAdapterFactory();
+		CommandParameterAdapterFactory() : base( command => new CommandAdapter( command ) ) {}
 	}
 
-	class FactoryParameterAdapterCache : ParameterAdapterCacheBase<IFactoryWithParameter>
+	class FactoryParameterAdapterFactory : ParameterAdapterFactoryBase<IFactoryWithParameter>
 	{
-		public static FactoryParameterAdapterCache Instance { get; } = new FactoryParameterAdapterCache();
-		FactoryParameterAdapterCache() : base( parameter => new FactoryAdapter( parameter ) ) {}
+		public static FactoryParameterAdapterFactory Instance { get; } = new FactoryParameterAdapterFactory();
+		FactoryParameterAdapterFactory() : base( parameter => new FactoryAdapter( parameter ) ) {}
 	}
 
 	public struct RelayParameter

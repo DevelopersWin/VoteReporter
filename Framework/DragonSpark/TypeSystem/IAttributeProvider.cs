@@ -33,7 +33,7 @@ namespace DragonSpark.TypeSystem
 	public class AssemblyAttributeProvider : AttributeProviderBase
 	{
 		readonly Assembly assembly;
-		public AssemblyAttributeProvider( Assembly assembly )/* : base( ,  )*/
+		public AssemblyAttributeProvider( Assembly assembly )
 		{
 			this.assembly = assembly;
 		}

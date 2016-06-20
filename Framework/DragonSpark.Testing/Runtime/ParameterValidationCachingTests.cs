@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Runtime
 {
-	public class CacheAssignationTests // : TestCollectionBase
+	public class ParameterValidationCachingTests // : TestCollectionBase
 	{
 		// public ParameterInvocationTests( ITestOutputHelper output ) : base( output ) {}
 
@@ -28,60 +28,11 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 6776, created );
 		}
 
-		/*[Fact]
-		public void EqualityTest()
-		{
-			var one = 123;
-			var two = 123;
-			var hashOne = one.GetHashCode();
-			var hashTwo = two.GetHashCode();
-			Assert.Same( one, two );
-		}*/
-
-		/*class Mock
-		{
-			public void Hello() => Debug.WriteLine( "Hello World!" );
-		}
-
-		[Fact]
-		public void GetAllTypesWith2()
-		{
-			var sut = new[] { GetType(), typeof(NormalPriority), typeof(ServiceLocator), typeof(AutoDataAttribute), typeof(FileSystemAssemblySource) }.Select( type => type.Assembly ).ToArray();
-
-			var result = Parallel.For( 0, 100000, i =>
-									{
-										var items = sut.GetAllTypesWith<PriorityAttribute>();
-			Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );
-
-										/*var mock = new Mock();
-										var methodInfo = typeof(Mock).GetMethod( nameof<>(Mock.Hello) );
-										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
-										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
-										Framework.Setup.ExecutionContext.Instance.Verify(); // TODO: Remove.
-										Framework.Setup.ExecutionContext.Instance.Value.Dispose();#1#
-									} );
-			Assert.True( result.IsCompleted );
-		}
-
-		[Fact]
-		public void Stress()
-		{
-			var result = Parallel.For( 0, 10000, i =>
-									{
-										/*var mock = new Mock();
-										var methodInfo = typeof(Mock).GetMethod( nameof<>(Mock.Hello) );
-										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
-										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
-										Framework.Setup.ExecutionContext.Instance.Verify(); // TODO: Remove.
-										Framework.Setup.ExecutionContext.Instance.Value.Dispose();#1#
-									} );
-			Assert.True( result.IsCompleted );
-		}*/
-
 		[Fact]
 		public void ExtendedCheck()
 		{
-			// for ( int i = 0; i < 10000; i++ )
+			// Parallel.For( 0, 10000, i =>
+			for ( int i = 0; i < 10000; i++ )
 			{
 				var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );
@@ -102,10 +53,11 @@ namespace DragonSpark.Testing.Runtime
 			var created = sut.Create( (object)6776 );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 2, sut.CanCreateGenericCalled );
-			Assert.Equal( 1, sut.CreateCalled );
+			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, created );
 			}
+			// );
 		}
 
 		/*[Fact]
@@ -152,7 +104,7 @@ namespace DragonSpark.Testing.Runtime
 			public bool ShouldValidate() => true;
 		}
 
-		[ValidatedGenericFactory]
+		[ValidatedGenericFactory, ValidatedGenericFactory.Aspects]
 		class ExtendedFactory : IFactory<int, float>
 		{
 			public int CanCreateCalled { get; private set; }

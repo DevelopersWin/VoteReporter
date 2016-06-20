@@ -49,14 +49,6 @@ namespace DragonSpark.Testing.Composition
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
 
-			if ( sinkOne.Events.Count() != 1 )
-			{
-				foreach ( var logEvent in sinkOne.Events )
-				{
-					Output.WriteLine( LogEventTextFactory.Instance.Create( logEvent ) );
-				}
-			}
-
 			Assert.Single( sinkOne.Events );
 			var current = sinkOne.Events.Count();
 			first.Information( "Testing this out." );

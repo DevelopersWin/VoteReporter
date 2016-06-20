@@ -53,6 +53,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			var count = history.Events.Count();
 
 			sut.Execute( Settings.Default );
+
 			Assert.Equal( count + 2, history.Events.Count() );
 			var upgraded = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_Upgrading, upgraded );

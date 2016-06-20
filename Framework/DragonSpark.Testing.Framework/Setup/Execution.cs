@@ -1,11 +1,9 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -14,40 +12,42 @@ namespace DragonSpark.Testing.Framework.Setup
 	public interface ITaskExecutionContext : IWritableStore<MethodBase>, IDisposable
 	{
 		TaskContext Id { get; }
+
+		/*void Attach( TaskContext context );
+
+		void Detach( TaskContext context );
+
+		bool Contains( TaskContext context );*/
 	}
 
-	public class ExecutionContext : StoreBase<object>, IExecutionContext
+	public class ExecutionContextStore : TaskLocalStore<ITaskExecutionContext>, IExecutionContext
 	{
-		public static ExecutionContext Instance { get; } = new ExecutionContext();
-		protected override object Get()
-		{
-			var context = ExecutionContextStore.Instance.Value;
-			var result = (object)context.Value ?? context;
-			return result;
-		}
-	}
-
-	public class ExecutionContextStore : TaskLocalStore<ITaskExecutionContext>
-	{
+		// readonly IDictionary<TaskContext, TaskContext> keys;
 		public static ExecutionContextStore Instance { get; } = new ExecutionContextStore();
 
 		readonly ConcurrentDictionary<TaskContext, ITaskExecutionContext> contexts = new ConcurrentDictionary<TaskContext, ITaskExecutionContext>();
-		readonly Action<TaskExecutionContext> onDispose;
-		readonly Action<ITaskExecutionContext> assign;
 
-		ExecutionContextStore()
+		ExecutionContextStore() /*: this( new ConcurrentDictionary<TaskContext, TaskContext>() )*/ {}
+
+		/*ExecutionContext( IDictionary<TaskContext, TaskContext> keys ) : base( new Monitor( keys ).Value )
 		{
-			onDispose = OnRemove;
-			assign = Assign;
-		}
+			this.keys = keys;
+		}*/
 
-		protected override ITaskExecutionContext Get() => base.Get() ?? Create().With( assign );
+		protected override ITaskExecutionContext Get() => base.Get() ?? Create();
 
 		ITaskExecutionContext Create()
 		{
 			var key = TaskContext.Current();
-			var result = contexts.GetOrAdd( key, context => new TaskExecutionContext( context, onDispose ).Configured( false ) );
-			assign( result );
+			/*var key = keys.ContainsKey( current ) ? keys[current] : current;
+			if ( key != current )
+			{
+				// File.WriteAllText( $@"C:\Temp\Create-{FileSystem.GetValidPath()}.txt", $"{current}" );
+				throw new InvalidOperationException( "Awwww snap!" );
+			}*/
+			var result = contexts.GetOrAdd( key, context => new TaskExecutionContext( context, OnRemove ).Configured( false ) );
+			// Debug.WriteLine( $"Assigned: {result.Id} ({SynchronizationContext.Current})" );
+			Assign( result );
 			return result;
 		}
 
@@ -57,7 +57,56 @@ namespace DragonSpark.Testing.Framework.Setup
 			contexts.TryRemove( context.Id, out removed );
 		}
 
-		[DebuggerDisplay( "{Id} ({Value})" )]
+		/*class Monitor : StoreBase<AsyncLocal<ITaskExecutionContext>>
+		{
+			readonly IDictionary<TaskContext, TaskContext> items;
+			readonly AsyncLocal<ITaskExecutionContext> store;
+
+			public Monitor( IDictionary<TaskContext, TaskContext> items )
+			{
+				this.items = items;
+				store = new AsyncLocal<ITaskExecutionContext>( OnChange );
+			}
+
+			void OnChange( AsyncLocalValueChangedArgs<ITaskExecutionContext> arguments )
+			{
+				if ( arguments.ThreadContextChanged )
+				{
+					var current = TaskContext.Current();
+
+					var item = arguments.CurrentValue ?? arguments.PreviousValue;
+					if ( item.Id != current )
+					{
+						if ( arguments.PreviousValue == null )
+						{
+							if ( items.ContainsKey( current ) )
+							{
+								// File.WriteAllText( $@"C:\Temp\Add-{FileSystem.GetValidPath()}.txt", $"{current}" );
+								throw new InvalidOperationException( $"{this} already contains {current}." );
+							}
+
+							items[current] = item.Id;
+							//arguments.CurrentValue?.Attach( current );
+						}
+						else if ( arguments.CurrentValue == null )
+						{
+							if ( !items.ContainsKey( current ) )
+							{
+								// File.WriteAllText( $@"C:\Temp\Remove-{FileSystem.GetValidPath()}.txt", $"{current}" );
+								throw new InvalidOperationException( $"{this} does not contain {current}." );
+							}
+
+							items.Remove( current );
+							// arguments.PreviousValue?.Detach( current );
+						}
+					}
+				}
+			}
+
+			protected override AsyncLocal<ITaskExecutionContext> Get() => store;
+		}*/
+
+		// [DebuggerDisplay]
 		internal class TaskExecutionContext : FixedStore<MethodBase>, ITaskExecutionContext
 		{
 			readonly Action<TaskExecutionContext> onDispose;
@@ -70,7 +119,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 			public TaskContext Id { get; }
 
-			// public override string ToString() => $"{Id} ({Value})";
+			public override string ToString() => $"{Id} ({Value})";
 
 			protected override void OnDispose()
 			{
@@ -80,7 +129,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	[DebuggerDisplay( "Task {taskId} on thread {threadId}" )]
 	public struct TaskContext : IEquatable<TaskContext>
 	{
 		public static TaskContext None { get; } = new TaskContext();
@@ -96,7 +144,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.taskId = taskId;
 		}
 
-		// public override string ToString() => $;
+		public override string ToString() => $"Task {taskId} on thread {threadId}";
 
 		public bool Equals( TaskContext other ) => taskId == other.taskId && threadId == other.threadId;
 

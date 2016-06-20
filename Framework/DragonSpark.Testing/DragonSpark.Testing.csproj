@@ -221,7 +221,7 @@
   <ItemGroup>
     <Compile Include="Activation\ActivatorExtensionsTests.cs" />
     <Compile Include="Activation\ActivatorTests.cs" />
-    <Compile Include="Activation\TypeLocatorCacheBaseryTests.cs" />
+    <Compile Include="Activation\LocatorTests.cs" />
     <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
@@ -243,9 +243,10 @@
     <Compile Include="ImmutableArrayTests.cs" />
     <Compile Include="Runtime\CacheTests.cs" />
     <Compile Include="Runtime\EnabledStateTests.cs" />
+    <Compile Include="Runtime\Properties\EqualityCacheTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
-    <Compile Include="Runtime\CacheAssignationTests.cs" />
+    <Compile Include="Runtime\ParameterValidationCachingTests.cs" />
     <Compile Include="Runtime\DelegateTests.cs" />
     <Compile Include="TypeSystem\AttributesTests.cs">
       <SubType>Code</SubType>

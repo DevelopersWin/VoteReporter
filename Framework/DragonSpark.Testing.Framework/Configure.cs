@@ -2,7 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using PostSharp.Aspects;
 using System.Diagnostics;
-using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContext;
+using ExecutionContext = DragonSpark.Testing.Framework.Setup.ExecutionContextStore;
 
 namespace DragonSpark.Testing.Framework
 {

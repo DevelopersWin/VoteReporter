@@ -144,7 +144,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class AssociatedContext : Cache<MethodBase, IDisposable>
 	{
-		public static AssociatedContext Property { get; } = new AssociatedContext();
+		public static AssociatedContext Default { get; } = new AssociatedContext();
 	}
 
 	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>
@@ -195,7 +195,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		
 		public override void Execute( AutoData parameter )
 		{
-			parameter.Method.Set( AssociatedContext.Property, this );
+			parameter.Method.Set( AssociatedContext.Default, this );
 			base.Execute( parameter );
 		}
 	}

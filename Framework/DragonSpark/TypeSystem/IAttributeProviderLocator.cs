@@ -33,7 +33,7 @@ namespace DragonSpark.TypeSystem
 	{
 		public static ICache<object, IAttributeProvider> Default { get; } = new AttributeProvider();
 
-		AttributeProvider() : base( new FirstConstructedFromParameterFactory<IAttributeProvider>( typeof(PropertyInfoAttributeProvider), typeof(TypeInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).ToDelegate() ) {}
+		AttributeProvider() : base( new FirstConstructedFromParameterFactory<IAttributeProvider>( typeof(TypeInfoAttributeProvider), typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).ToDelegate() ) {}
 	}
 
 	public class MemberInfoProviderFactory : Cache<object, IAttributeProvider>

@@ -1,11 +1,17 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Testing.Objects;
+using DragonSpark.Windows.Runtime;
 using JetBrains.dotMemoryUnit;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -28,7 +34,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 		void First()
 		{
-			var method = GetType().GetMethod( nameof( Host ) );
+			var method = new Action<Assembly[]>( Host ).Method;
 			var autoData = new AutoData( FixtureFactory<AutoDataCustomization>.Instance.Create(), method );
 			var providerFactory = new Composition.TypeBasedServiceProviderFactory( GetType().ToItem() );
 			var provider = new ServiceProviderFactory( providerFactory ).Create();
@@ -42,59 +48,48 @@ namespace DragonSpark.Windows.Testing.Setup
 			}
 		}
 
-		public void Host( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut ) {}
+		void Host( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut ) {}
 
-
-		/*[Fact]
-		public void Properties()
+		[Fact]
+		public void GetAllTypesWith2()
 		{
-			var current = DateTime.Now;
-			var target = new ClassWithDefaultProperties();
+			var sut = new[] { GetType(), typeof(NormalPriority), typeof(ServiceLocator), typeof(AutoDataAttribute), typeof(FileSystemAssemblySource) }.Select( type => type.Assembly ).ToArray();
 
-			Assert.Equal( 'd', target.Char );
-			Assert.Equal( 7, target.Byte );
-			Assert.Equal( 8, target.Short );
-			Assert.Equal( 9, target.Int );
-			Assert.Equal( 6776, target.Long );
-			Assert.Equal( 6.7F, target.Float );
-			Assert.Equal( 7.1, target.Double );
-			Assert.True( target.Boolean );
-			Assert.Equal( "Hello World", target.String );
-			Assert.Equal( "Legacy", target.Legacy );
-			
-			Assert.Equal( typeof(ClassWithDefaultProperties), target.Object );
+			var mock = new Mock();
+			var result = Parallel.For( 0, 10000, i =>
+									{
+										/*var items = sut.GetAllTypesWith<PriorityAttribute>();
+										Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );*/
 
-			Assert.NotEqual( DateTime.MinValue, target.CurrentDateTime );
-			Assert.NotEqual( DateTimeOffset.MinValue, target.CurrentDateTimeOffset );
+										Action action = mock.Hello;
+										AssociatedContext.Default.Set( action.Method, new DisposableAction( () => {} ) );
+										new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( action ) );
+										
+									} );
+			Assert.True( result.IsCompleted );
+		}
 
-			Assert.True( target.CurrentDateTime >= current );
-			Assert.True( target.CurrentDateTimeOffset >= current );
-
-			Assert.Exists( target.Activated );
-
-			var created = Assert.IsType<ClassWithParameter>( target.Factory );
-			Assert.Exists( created.Parameter );
-			Assert.IsType<DragonSpark.Testing.Objects.Constructor>( created.Parameter );
-
-			Assert.Exists( target.Collection );
-			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<object>>( target.Collection );
-			Assert.Exists( target.Classes );
-			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<Class>>( target.Classes );
-
-			Assert.Equal( 6776, target.ValuedInt );
-
-			Assert.NotEqual( Guid.Empty, target.Guid );
-			Assert.NotEqual( Guid.Empty, target.AnotherGuid );
-
-			Assert.NotEqual( target.Guid, target.AnotherGuid );
-
-			Assert.Equal( new Guid( "66570344-BA99-4C90-A7BE-AEC903441F97" ), target.ProvidedGuid );
-
-			Assert.Equal( "Already Set", target.AlreadySet );
-		}*/
-		/*class Cache : CacheFactoryBase
+		[Fact]
+		public void Stress()
 		{
-			public Cache( Assembly[] assemblies ) : base( data => assemblies,  ) {}
-		}*/
+			var result = Parallel.For( 0, 100000, i =>
+									{
+										/*var mock = new Mock();
+										var methodInfo = typeof(Mock).GetMethod( nameof<>(Mock.Hello) );
+										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
+										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
+										Framework.Setup.ExecutionContext.Instance.Verify(); // TODO: Remove.
+										Framework.Setup.ExecutionContext.Instance.Value.Dispose();*/
+									} );
+			Assert.True( result.IsCompleted );
+		}
+
+		class Mock
+		{
+			public void Hello()
+			{
+				Debug.WriteLine( "Hello World!" );
+			}
+		}
 	}
 }

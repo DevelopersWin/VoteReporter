@@ -226,6 +226,7 @@
     <Compile Include="Runtime\EnabledState.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
+    <Compile Include="Runtime\Properties\EqualityCache.cs" />
     <Compile Include="Runtime\Wrapped.cs" />
     <Compile Include="Runtime\IRepository.cs" />
     <Compile Include="Runtime\ISerializer.cs" />

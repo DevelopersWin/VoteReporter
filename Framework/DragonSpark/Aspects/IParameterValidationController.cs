@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
@@ -14,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects
@@ -30,16 +30,16 @@ namespace DragonSpark.Aspects
 	public class ParameterValidationController : IParameterValidationController
 	{
 		readonly IParameterValidator validator;
-		readonly EnabledState validated = new EnabledState();
+		readonly ThreadLocal<EnabledState> validated = new ThreadLocal<EnabledState>( () => new EnabledState() );
 
 		public ParameterValidationController( IParameterValidator validator )
 		{
 			this.validator = validator;
 		}
 
-		public bool IsValid( object parameter ) => validated.IsEnabled( parameter );
+		public bool IsValid( object parameter ) => validated.Value.IsEnabled( parameter );
 
-		public void MarkValid( object parameter, bool valid ) => validated.Enable( parameter, valid );
+		public void MarkValid( object parameter, bool valid ) => validated.Value.Enable( parameter, valid );
 
 		protected virtual bool PerformValidation( object parameter ) => validator.IsValid( parameter );
 
@@ -48,7 +48,7 @@ namespace DragonSpark.Aspects
 		protected object Proceed( RelayParameter parameter )
 		{
 			var result = parameter.Proceed<object>();
-			validated.Enable( parameter.Parameter, false );
+			validated.Value.Enable( parameter.Parameter, false );
 			return result;
 		}
 	}
@@ -64,7 +64,7 @@ namespace DragonSpark.Aspects
 	{
 		readonly IGenericParameterValidator generic;
 
-		readonly EnabledState active = new EnabledState();
+		readonly ThreadLocal<EnabledState> active = new ThreadLocal<EnabledState>( () => new EnabledState() );
 
 		public GenericParameterValidationController( IGenericParameterValidator generic, IParameterValidator validator ) : base( validator )
 		{
@@ -75,10 +75,10 @@ namespace DragonSpark.Aspects
 
 		public override object Execute( RelayParameter parameter )
 		{
-			var handle = generic.Handles( parameter.Parameter ) && !active.IsEnabled( parameter.Parameter );
+			var handle = generic.Handles( parameter.Parameter ) && !active.Value.IsEnabled( parameter.Parameter );
 			if ( handle )
 			{
-				using ( active.Assignment( parameter.Parameter ) )
+				using ( active.Value.Assignment( parameter.Parameter ) )
 				{
 					var result = generic.Execute( parameter.Parameter );
 					return result;
@@ -88,7 +88,6 @@ namespace DragonSpark.Aspects
 		}
 
 		public object ExecuteGeneric( RelayParameter parameter ) => base.Execute( parameter );
-		
 	}
 
 	[PSerializable]
@@ -123,11 +122,9 @@ namespace DragonSpark.Aspects
 	}
 
 	[PSerializable]
-	// [MulticastAttributeUsage( Inheritance = MulticastInheritance.Multicast, TargetMemberAttributes = MulticastAttributes.NonAbstract )]
 	public sealed class GenericExecutionAspect : ExecutionAspect
 	{
-		public new static GenericExecutionAspect Instance { get; } = new GenericExecutionAspect()/* { AttributeInheritance = MulticastInheritance.Multicast, AttributeTargetMemberAttributes = MulticastAttributes.NonAbstract }*/;
-
+		public new static GenericExecutionAspect Instance { get; } = new GenericExecutionAspect();
 		GenericExecutionAspect() {}
 
 		protected override object Execute( IParameterValidationController controller, RelayParameter parameter )
@@ -156,16 +153,16 @@ namespace DragonSpark.Aspects
 
 	public static class ParameterValidation
 	{
-		public static ICache<IParameterValidationControllerFactory> Factory { get; } = new Cache<IParameterValidationControllerFactory>();
+		// public static ICache<IParameterValidationControllerFactory> Factory { get; } = new Cache<IParameterValidationControllerFactory>();
 
 		public static ICache<IParameterValidationController> Controller { get; } = new ControllerCache();
 	}
 
-	class ControllerCache : StoreCache<IParameterValidationController>
+	class ControllerCache : Cache<IParameterValidationController>
 	{
-		public ControllerCache() : base( new ThreadLocalStoreCache<IParameterValidationController>( Factory.Instance.ToDelegate() ) ) {}
+		public ControllerCache() /*: base( new ThreadLocalStoreCache<IParameterValidationController>( Factory.Instance.ToDelegate() ) )*/ {}
 
-		class Factory : FactoryBase<object, IWritableStore<IParameterValidationController>>
+		/*class Factory : FactoryBase<object, IWritableStore<IParameterValidationController>>
 		{
 			public static Factory Instance { get; } = new Factory();
 
@@ -175,12 +172,12 @@ namespace DragonSpark.Aspects
 				var result = new ThreadLocalStore<IParameterValidationController>( factory );
 				return result;
 			}
-		}
+		}*/
 	}
 
 	public sealed class ValidatedCommand : ValidatedParameterAspectBase
 	{
-		readonly static IParameterValidationControllerFactory Factory = new ParameterValidationControllerFactory( CommandParameterAdapterCache.Instance );
+		readonly static Func<object, IParameterValidationController> Factory = new ParameterValidationControllerFactory( CommandParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
 
 		public ValidatedCommand() : base( Factory ) {}
 
@@ -192,7 +189,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedGenericCommand : ValidatedParameterAspectBase
 	{
-		readonly static IParameterValidationControllerFactory Factory = new GenericParameterValidationControllerFactory( GenericCommandParameterAdapterStore.Instance, CommandParameterAdapterCache.Instance );
+		readonly static Func<object, IParameterValidationController> Factory = new GenericParameterValidationControllerFactory( GenericCommandParameterAdapterFactory.Instance.ToDelegate(), CommandParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
 
 		public ValidatedGenericCommand() : base( Factory ) {}
 
@@ -204,7 +201,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedFactory : ValidatedParameterAspectBase
 	{
-		readonly static IParameterValidationControllerFactory Factory = new ParameterValidationControllerFactory( FactoryParameterAdapterCache.Instance );
+		readonly static Func<object, IParameterValidationController> Factory = new ParameterValidationControllerFactory( FactoryParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
 
 		public ValidatedFactory() : base( Factory ) {}
 
@@ -216,7 +213,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedGenericFactory : ValidatedParameterAspectBase
 	{
-		readonly static IParameterValidationControllerFactory Factory = new GenericParameterValidationControllerFactory( GenericFactoryParameterAdapterStore.Instance, FactoryParameterAdapterCache.Instance );
+		readonly static Func<object, IParameterValidationController> Factory = new GenericParameterValidationControllerFactory( GenericFactoryParameterAdapterFactory.Instance.ToDelegate(), FactoryParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
 		
 		public ValidatedGenericFactory() : base( Factory ) {}
 
@@ -277,42 +274,42 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public abstract class ValidatedParameterAspectBase : InstanceLevelAspect
 	{
-		readonly IParameterValidationControllerFactory factory;
+		readonly Func<object, IParameterValidationController> factory;
 		
-		protected ValidatedParameterAspectBase( IParameterValidationControllerFactory factory )
+		protected ValidatedParameterAspectBase( Func<object, IParameterValidationController> factory )
 		{
 			this.factory = factory;
 		}
 
-		public override void RuntimeInitializeInstance() => ParameterValidation.Factory.Set( Instance, factory );
+		public override void RuntimeInitializeInstance() => ParameterValidation.Controller.Set( Instance, factory( Instance ) );
 	}
 
 	public interface IParameterValidationControllerFactory : IFactory<object, IParameterValidationController> {}
 
 	class ParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
 	{
-		readonly ICache<IParameterValidator> store;
+		readonly Func<object, IParameterValidator> create;
 
-		public ParameterValidationControllerFactory( ICache<IParameterValidator> store )
+		public ParameterValidationControllerFactory( Func<object, IParameterValidator> create )
 		{
-			this.store = store;
+			this.create = create;
 		}
 
-		public override IParameterValidationController Create( object instance ) => new ParameterValidationController( store.Get( instance ) );
+		public override IParameterValidationController Create( object instance ) => new ParameterValidationController( create( instance ) );
 	}
 
 	class GenericParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
 	{
-		readonly ICache<IGenericParameterValidator> generic;
-		readonly ICache<IParameterValidator> store;
+		readonly Func<object, IGenericParameterValidator> generic;
+		readonly Func<object, IParameterValidator> store;
 
-		public GenericParameterValidationControllerFactory( ICache<IGenericParameterValidator> generic, ICache<IParameterValidator> store )
+		public GenericParameterValidationControllerFactory( Func<object, IGenericParameterValidator> generic, Func<object, IParameterValidator> store )
 		{
 			this.generic = generic;
 			this.store = store;
 		}
 
-		public override IParameterValidationController Create( object instance ) => new GenericParameterValidationController( generic.Get( instance ), store.Get( instance ) );
+		public override IParameterValidationController Create( object instance ) => new GenericParameterValidationController( generic( instance ), store( instance ) );
 	}
 
 	public interface IGenericParameterValidationController : IParameterValidationController

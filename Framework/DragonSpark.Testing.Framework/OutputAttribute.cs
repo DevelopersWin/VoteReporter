@@ -7,19 +7,6 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework
 {
-	/*[Serializable, LinesOfCodeAvoided( 8 )]
-	public sealed class OutputAttribute : MethodInterceptionAspect
-	{
-		public override void OnInvoke( MethodInterceptionArgs args ) => new OutputCommand().Run( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
-	}*/
-
-	/*public class ParameterFactory : FactoryWithSpecificationBase<MethodInterceptionArgs, OutputCommand.Parameter>
-	{
-		public static ParameterFactory Instance { get; } = new ParameterFactory();
-
-		protected override OutputCommand.Parameter CreateItem( MethodInterceptionArgs parameter ) => new OutputCommand.Parameter( parameter.Instance, parameter.Method, parameter.Proceed );
-	}*/
-
 	public class OutputCommand : CommandBase<OutputCommand.Parameter>
 	{
 		readonly Func<MethodBase, DisposingCommand<MethodBase>> commandSource;
@@ -48,6 +35,9 @@ namespace DragonSpark.Testing.Framework
 
 		public struct Parameter
 		{
+			public Parameter( Action @continue ) : this( @continue.Target, @continue ) {}
+			public Parameter( object instance, Action @continue ) : this( instance, @continue.Method, @continue ) {}
+
 			public Parameter( object instance, MethodBase method, Action @continue )
 			{
 				Instance = instance;

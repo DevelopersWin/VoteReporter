@@ -55,7 +55,7 @@ namespace DragonSpark.Testing.Framework
 
 	public class ApplicationOutputCommand : OutputCommand
 	{
-		public ApplicationOutputCommand() : base( method => new InitializeMethodCommand( method.Get( AssociatedContext.Property ).Dispose ) ) {}
+		public ApplicationOutputCommand() : base( method => new InitializeMethodCommand( method.Get( AssociatedContext.Default ).Dispose ) ) {}
 	}
 
 	public static class MethodBaseExtensions

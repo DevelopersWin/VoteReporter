@@ -55,7 +55,7 @@ namespace DragonSpark.TypeSystem
 		{
 			var descriptor = new MethodDescriptor( methodName, types, parameters );
 			var methodInfo = methods.Get( descriptor );
-			var result = (T)methodInfo.Invoke( methodInfo.IsStatic ? null : instance, parameters.ToArray() );
+			var result = (T)methodInfo.Invoke( methodInfo.IsStatic ? null : instance, parameters );
 			return result;
 		}
 
@@ -136,14 +136,14 @@ namespace DragonSpark.TypeSystem
 		public struct MethodDescriptor : IEquatable<MethodDescriptor>
 		{
 			readonly int code;
-			public MethodDescriptor( string name, IEnumerable<Type> genericTypes, params object[] parameters ) : this( name, genericTypes.ToArray(), parameters.Select( o => o?.GetType() ).ToArray() ) {}
+			public MethodDescriptor( string name, IEnumerable<Type> genericTypes, params object[] parameters ) : this( name, genericTypes.Fixed(), parameters.Select( o => o?.GetType() ).ToArray() ) {}
 
 			MethodDescriptor( string name, Type[] genericTypes, Type[] parameterTypes )
 			{
 				Name = name;
 				GenericTypes = genericTypes;
 				ParameterTypes = parameterTypes;
-				code = KeyFactory.CreateUsing( Name, GenericTypes, ParameterTypes );
+				code = Hash.CombineValues( EnumerableEx.Return<object>( Name ).Concat( GenericTypes ).Concat( ParameterTypes ) );
 			}
 
 			public string Name { get; }
