@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
-			var creator = sut.Get( Creator.Property );
+			var creator = sut.Get( Creator.Default );
 			Assert.IsType<UnityContainerCoreFactory>( creator );
 
 			var provider = sut.Resolve<IServiceProvider>();

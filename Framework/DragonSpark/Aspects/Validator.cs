@@ -27,7 +27,7 @@ namespace DragonSpark.Aspects
 				var creator = args.Instance as ICreator;
 				if ( creator != null )
 				{
-					args.ReturnValue.Set( Creator.Property, creator );
+					args.ReturnValue.Set( Creator.Default, creator );
 				}
 			}
 		}

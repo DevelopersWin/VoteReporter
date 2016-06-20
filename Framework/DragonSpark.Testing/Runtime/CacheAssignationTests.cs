@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Runtime
 {
-	public class ParameterInvocationTests // : TestCollectionBase
+	public class CacheAssignationTests // : TestCollectionBase
 	{
 		// public ParameterInvocationTests( ITestOutputHelper output ) : base( output ) {}
 

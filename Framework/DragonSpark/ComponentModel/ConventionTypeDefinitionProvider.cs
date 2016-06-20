@@ -1,22 +1,18 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Registration;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	[Persistent]
 	public class TypeDefinitionProvider : FirstFromParameterFactory<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
-		public static TypeDefinitionProvider Instance { get; } = new TypeDefinitionProvider();
+		public static ICache<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitionProvider( Items<ITypeDefinitionProvider>.Default ).Cached();
 
 		protected TypeDefinitionProvider( params ITypeDefinitionProvider[] others ) : base( others.Concat( new IFactory<TypeInfo, TypeInfo>[] { ConventionTypeDefinitionProvider.Instance, SelfTransformer<TypeInfo>.Instance } ).Fixed() ) {}
-
-		[Freeze]
-		public override TypeInfo Create( TypeInfo parameter ) => base.Create( parameter );
 	}
 
 	public class ConventionTypeDefinitionProvider : FactoryWithSpecificationBase<TypeInfo, TypeInfo>, ITypeDefinitionProvider
@@ -37,8 +33,10 @@ namespace DragonSpark.ComponentModel
 		class Context
 		{
 			readonly TypeInfo current;
+
+			readonly static ICache<TypeInfo, TypeInfo> Cache = new Cache<TypeInfo, TypeInfo>( info => Type.GetType( $"{info.FullName}Metadata, {info.Assembly.FullName}", false )?.GetTypeInfo() );
 			
-			public Context( TypeInfo current ) : this( current, Type.GetType( $"{current.FullName}Metadata, {current.Assembly.FullName}", false )?.GetTypeInfo() ) {}
+			public Context( TypeInfo current ) : this( current, Cache.Get( current ) ) {}
 
 			Context( TypeInfo current, TypeInfo metadata )
 			{

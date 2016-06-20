@@ -10,8 +10,8 @@ namespace DragonSpark.Testing.Activation
 		void CachesAsExpected( Constructor.Locator locator )
 		{
 			var parameter = new ConstructTypeRequest( typeof(ConstructedItem), 6776 );
-			var first = locator.Create( parameter );
-			Assert.Same( first, locator.Create( parameter ) );
+			var first = locator.Get( parameter );
+			Assert.Same( first, locator.Get( parameter ) );
 		}
 
 		class ConstructedItem

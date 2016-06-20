@@ -192,7 +192,7 @@ namespace DragonSpark.Setup
 
 	class FactoryStore : DeferredStore<object>, IInstanceRegistration
 	{
-		public FactoryStore( IFactory factory ) : this( factory.Create, ResultTypeLocator.Instance.Get( factory.GetType() ) ) {}
+		public FactoryStore( IFactory factory ) : this( factory.ToDelegate(), ResultTypeLocator.Instance.Get( factory.GetType() ) ) {}
 
 		public FactoryStore( Func<object> factory, Type registeredType ) : base( factory )
 		{
@@ -216,7 +216,7 @@ namespace DragonSpark.Setup
 
 	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
 	{
-		public CompositeServiceProvider( [Required] params IServiceProvider[] providers ) : base( /*IsServiceTypeSpecification.Instance,*/ providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
+		public CompositeServiceProvider( params IServiceProvider[] providers ) : base( /*IsServiceTypeSpecification.Instance,*/ providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
 
 		public object GetService( Type serviceType ) => serviceType == typeof(IServiceProvider) ? this : Create( serviceType );
 	}

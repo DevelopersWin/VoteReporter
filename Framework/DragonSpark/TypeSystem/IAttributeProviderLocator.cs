@@ -29,18 +29,18 @@ namespace DragonSpark.TypeSystem
 		public ObjectAttributeProvider( object item ) : base( MemberInfoProviderFactory.Instance.ToDelegate(), item ) {}
 	}
 
-	public class MemberInfoProvider : Cache<IAttributeProvider>
+	public class AttributeProvider : Cache<IAttributeProvider>
 	{
-		public static ICache<object, IAttributeProvider> Default { get; } = new MemberInfoProvider();
+		public static ICache<object, IAttributeProvider> Default { get; } = new AttributeProvider();
 
-		MemberInfoProvider() : base( new FirstConstructedFromParameterFactory<IAttributeProvider>( typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(TypeInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).ToDelegate() ) {}
+		AttributeProvider() : base( new FirstConstructedFromParameterFactory<IAttributeProvider>( typeof(PropertyInfoAttributeProvider), typeof(TypeInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).ToDelegate() ) {}
 	}
 
 	public class MemberInfoProviderFactory : Cache<object, IAttributeProvider>
 	{
-		public static ICache<object, IAttributeProvider> Instance { get; } = new MemberInfoProviderFactory( TypeDefinitionProvider.Instance );
+		public static ICache<object, IAttributeProvider> Instance { get; } = new MemberInfoProviderFactory( TypeDefinitionProvider.Instance.ToDelegate() );
 
-		protected MemberInfoProviderFactory( ITypeDefinitionProvider transformer ) : base( new Factory( transformer ).ToDelegate() ) {}
+		protected MemberInfoProviderFactory( Func<TypeInfo, TypeInfo> transformer ) : base( new Factory( transformer ).ToDelegate() ) {}
 
 		class Factory : FactoryBase<object, IAttributeProvider>
 		{
@@ -49,7 +49,7 @@ namespace DragonSpark.TypeSystem
 			readonly Func<TypeInfo, Func<object, MemberInfo>> factorySource;
 			readonly Func<object, IAttributeProvider> providerSource;
 
-			public Factory( ITypeDefinitionProvider transformer ) : this( TypeDefinitionLocator.Instance.ToDelegate(), transformer.ToDelegate(), MemberInfoDefinitionLocator.Instance.ToDelegate(), MemberInfoProvider.Default.ToDelegate() ) {}
+			public Factory( Func<TypeInfo, TypeInfo> transformer ) : this( TypeDefinitionLocator.Instance.ToDelegate(), transformer, MemberInfoDefinitionLocator.Instance.ToDelegate(), AttributeProvider.Default.ToDelegate() ) {}
 
 			Factory( Func<object, TypeInfo> typeSource, Func<TypeInfo, TypeInfo> transformer, Func<TypeInfo, Func<object, MemberInfo>> factorySource, Func<object, IAttributeProvider> providerSource )
 			{
@@ -74,7 +74,7 @@ namespace DragonSpark.TypeSystem
 	// [AutoValidation( false )]
 	public class TypeDefinitionLocator : FirstFromParameterFactory<object, TypeInfo>
 	{
-		public static TypeDefinitionLocator Instance { get; } = new TypeDefinitionLocator();
+		public static ICache<object, TypeInfo> Instance { get; } = new TypeDefinitionLocator().Cached();
 
 		TypeDefinitionLocator() : base( new IFactoryWithParameter[] { TypeInfoDefinitionProvider.Instance, MemberInfoDefinitionProvider.Instance, GeneralDefinitionProvider.Instance }.Select( parameter => new Func<object, TypeInfo>( parameter.CreateUsing<TypeInfo> ) ).Fixed() ) {}
 
@@ -100,7 +100,7 @@ namespace DragonSpark.TypeSystem
 		}
 
 		// [AutoValidation( false )]
-		abstract class TypeDefinitionProviderBase<T> : FactoryWithSpecificationBase<T, TypeInfo> {}
+		abstract class TypeDefinitionProviderBase<T> : FactoryBase<T, TypeInfo> {}
 	}
 
 	// [AutoValidation( false )]
@@ -160,7 +160,7 @@ namespace DragonSpark.TypeSystem
 		}
 
 		// [AutoValidation( false )]
-		public abstract class MemberInfoDefinitionLocatorBase<T> : FactoryWithSpecificationBase<T, MemberInfo>
+		public abstract class MemberInfoDefinitionLocatorBase<T> : FactoryBase<T, MemberInfo>
 		{
 			protected MemberInfoDefinitionLocatorBase( TypeInfo definition )
 			{

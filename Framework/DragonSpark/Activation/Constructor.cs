@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -19,7 +18,7 @@ namespace DragonSpark.Activation
 
 		public static Constructor Instance { get; } = new Constructor();
 
-		Constructor() : this( Locator.Instance.ToDelegate(), ObjectActivatorFactory.Instance.Get ) {}
+		Constructor() : this( Locator.Instance.ToDelegate(), ObjectActivatorFactory.Instance.ToDelegate() ) {}
 
 		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, ObjectActivator> activatorSource ) : base( Specification.Instance )
 		{
@@ -49,10 +48,8 @@ namespace DragonSpark.Activation
 
 			readonly Func<ConstructTypeRequest, ConstructorInfo> source;
 
-			// public Specification() : this( ActivatorFactory.Instance.Create ) {}
-
 			Specification() : this( Locator.Instance.ToDelegate() ) {}
-			Specification( Func<ConstructTypeRequest, ConstructorInfo> source ) : base( Coercer.Instance.Coerce )
+			Specification( Func<ConstructTypeRequest, ConstructorInfo> source ) : base( Coercer.Instance.ToDelegate() )
 			{
 				this.source = source;
 			}
@@ -60,13 +57,12 @@ namespace DragonSpark.Activation
 			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || source( parameter ) != null;
 		}
 
-		//[AutoValidation( false )]
-		public class Locator  : FactoryWithSpecificationBase<ConstructTypeRequest, ConstructorInfo>
+		internal class Locator  : ConcurrentEqualityCache<ConstructTypeRequest, ConstructorInfo>
 		{
 			public static Locator Instance { get; } = new Locator();
+			Locator() : base( Determine ) {}
 
-			[Freeze]
-			public override ConstructorInfo Create( ConstructTypeRequest parameter )
+			static ConstructorInfo Determine( ConstructTypeRequest parameter )
 			{
 				var candidates = ImmutableArray.Create( parameter.Arguments, parameter.Arguments.WhereAssigned().Fixed(), Items<object>.Default );
 				var adapter = parameter.RequestedType.Adapt();

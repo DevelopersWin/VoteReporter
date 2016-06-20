@@ -27,7 +27,7 @@ namespace DragonSpark.Activation
 		public ConstructFromParameterFactory( IActivator activator, Type type ) : base( activator, type ) {}
 	}*/
 
-	public class ConstructFromParameterFactory<T> : FactoryWithSpecificationBase<object, T>
+	public class ConstructFromParameterFactory<T> : FactoryBase<object, T>
 	{
 		public static ICache<Type, Func<object, T>> Cache { get; } = new Cache<Type, Func<object, T>>( t => new ConstructFromParameterFactory<T>( t ).ToDelegate() );
 
@@ -47,7 +47,9 @@ namespace DragonSpark.Activation
 
 		public override T Create( object parameter )
 		{
-			var activate = activator.Create( new ConstructTypeRequest( type, parameter.ToItem() ) );
+			var request = new ConstructTypeRequest( type, parameter.ToItem() );
+			var temp = activator.CanCreate( request );
+			var activate = activator.Create( request );
 			var store = activate as IStore<T>;
 			if ( store != null )
 			{

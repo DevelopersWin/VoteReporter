@@ -245,7 +245,7 @@
     <Compile Include="Runtime\EnabledStateTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
-    <Compile Include="Runtime\ParameterInvocationTests.cs" />
+    <Compile Include="Runtime\CacheAssignationTests.cs" />
     <Compile Include="Runtime\DelegateTests.cs" />
     <Compile Include="TypeSystem\AttributesTests.cs">
       <SubType>Code</SubType>

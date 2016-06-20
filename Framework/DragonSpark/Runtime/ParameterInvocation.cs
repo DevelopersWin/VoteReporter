@@ -67,15 +67,15 @@ namespace DragonSpark.Runtime
 		public T Finish { get; }
 	}
 
-	public class PropertyAssign<T1, T2> : IAssign<T1, T2> where T1 : class
+	public class CacheAssign<T1, T2> : IAssign<T1, T2> where T1 : class
 	{
-		readonly ICache<T1, T2> property;
-		public PropertyAssign( ICache<T1, T2> property )
+		readonly ICache<T1, T2> cache;
+		public CacheAssign( ICache<T1, T2> cache )
 		{
-			this.property = property;
+			this.cache = cache;
 		}
 
-		public void Assign( T1 first, T2 second ) => property.Set( first, second );
+		public void Assign( T1 first, T2 second ) => cache.Set( first, second );
 	}
 
 	public interface IAssign<in T1, in T2>

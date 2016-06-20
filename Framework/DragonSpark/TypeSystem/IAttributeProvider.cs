@@ -1,6 +1,4 @@
-using DragonSpark.Aspects;
-using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Runtime.Properties;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -9,37 +7,53 @@ namespace DragonSpark.TypeSystem
 {
 	public interface IAttributeProvider
 	{
-		bool Contains( Type attribute );
+		bool Contains( Type attributeType );
 
-		Attribute[] GetAttributes( [Required]Type attributeType );
+		IEnumerable<Attribute> GetAttributes( Type attributeType );
 	}
 
 	public abstract class AttributeProviderBase : IAttributeProvider
 	{
-		readonly Func<Type, bool> defined;
-		readonly Func<Type, IEnumerable<Attribute>> factory;
+		readonly ICache<Type, bool> defined;
+		readonly ICache<Type, IEnumerable<Attribute>> factory;
 
-		protected AttributeProviderBase( [Required]Func<Type, bool> defined, [Required]Func<Type, IEnumerable<Attribute>> factory )
+		protected AttributeProviderBase()
 		{
-			this.defined = defined;
-			this.factory = factory;
+			defined = new StoreCache<Type, bool>( new CacheStore<Type, bool>( new Func<Type, bool>( Contains ) ) );
+			factory = new Cache<Type, IEnumerable<Attribute>>( GetAttributes );
 		}
 
-		[Freeze]
-		public bool Contains( Type attribute ) => defined( attribute );
+		public abstract bool Contains( Type attributeType );
 
-		[Freeze]
-		public Attribute[] GetAttributes( Type attributeType ) => defined( attributeType ) ? factory( attributeType ).Fixed() : Items<Attribute>.Default;
+		public abstract IEnumerable<Attribute> GetAttributes( Type attributeType );
+
+		IEnumerable<Attribute> IAttributeProvider.GetAttributes( Type attributeType ) => defined.Get( attributeType ) ? factory.Get( attributeType ) : Items<Attribute>.Default;
 	}
 
 	public class AssemblyAttributeProvider : AttributeProviderBase
 	{
-		public AssemblyAttributeProvider( [Required]Assembly assembly ) : base( assembly.IsDefined, assembly.GetCustomAttributes ) {}
+		readonly Assembly assembly;
+		public AssemblyAttributeProvider( Assembly assembly )/* : base( ,  )*/
+		{
+			this.assembly = assembly;
+		}
+
+		public override bool Contains( Type attributeType ) => assembly.IsDefined( attributeType );
+
+		public override IEnumerable<Attribute> GetAttributes( Type attributeType ) => assembly.GetCustomAttributes( attributeType );
 	}
 
 	public class ParameterInfoAttributeProvider : AttributeProviderBase
 	{
-		public ParameterInfoAttributeProvider( [Required]ParameterInfo parameter ) : base( parameter.IsDefined, parameter.GetCustomAttributes ) {}
+		readonly ParameterInfo parameter;
+		public ParameterInfoAttributeProvider( ParameterInfo parameter )
+		{
+			this.parameter = parameter;
+		}
+
+		public override bool Contains( Type attributeType ) => parameter.IsDefined( attributeType );
+
+		public override IEnumerable<Attribute> GetAttributes( Type attributeType ) => parameter.GetCustomAttributes( attributeType );
 	}
 
 	public class PropertyInfoAttributeProvider : MethodInfoAttributeProvider
@@ -61,6 +75,17 @@ namespace DragonSpark.TypeSystem
 
 	public class MemberInfoAttributeProvider : AttributeProviderBase
 	{
-		public MemberInfoAttributeProvider( MemberInfo info, bool inherit = false ) : base( type => info.IsDefined( type, inherit ), type => info.GetCustomAttributes( type, inherit ) ) {}
+		readonly MemberInfo info;
+		readonly bool inherit;
+
+		public MemberInfoAttributeProvider( MemberInfo info, bool inherit = false )
+		{
+			this.info = info;
+			this.inherit = inherit;
+		}
+
+		public override bool Contains( Type attributeType ) => info.IsDefined( attributeType, inherit );
+
+		public override IEnumerable<Attribute> GetAttributes( Type attributeType ) => info.GetCustomAttributes( attributeType, inherit );
 	}
 }

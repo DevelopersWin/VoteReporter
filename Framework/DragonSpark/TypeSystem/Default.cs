@@ -31,6 +31,23 @@ namespace DragonSpark.TypeSystem
 
 	public static class TypeSupport
 	{
-		public static Type From( object item ) => item.AsTo<ParameterInfo, Type>( info => info.ParameterType ) ?? item.AsTo<MemberInfo, Type>( info => info.GetMemberType() ) ?? item as Type ?? item.GetType();
+		public static Type From( object item )
+		{
+			var parameter = item as ParameterInfo;
+			if ( parameter != null )
+			{
+				return parameter.ParameterType;
+			}
+
+			var type = item as Type;
+			if ( type != null )
+			{
+				return type;
+			}
+
+			var member = item as MemberInfo;
+			var result = member?.GetMemberType() ?? item.GetType();
+			return result;
+		}
 	}
 }

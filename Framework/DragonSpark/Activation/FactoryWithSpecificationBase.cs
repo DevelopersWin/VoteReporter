@@ -306,7 +306,6 @@ namespace DragonSpark.Activation
 		public override TResult Create( TParameter parameter ) => inner.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) ).FirstAssigned();
 	}
 
-	// [Validation( false )]
 	public class FirstFactory<T> : FactoryBase<T>
 	{
 		readonly IEnumerable<Func<T>> inner;
@@ -321,24 +320,10 @@ namespace DragonSpark.Activation
 		public override T Create() => inner.FirstAssigned( factory => factory() );
 	}
 
-	/*public class FixedFactory<T> : FactoryWithSpecificationBase<T>
-	{
-		readonly T item;
-
-		public FixedFactory( [Required] T item )
-		{
-			this.item = item;
-		}
-
-		protected override T CreateItem() => item;
-	}*/
-
 	public class AggregateFactory<T> : FactoryBase<T>
 	{
 		readonly Func<T> primary;
 		readonly Func<T, T>[] transformers;
-
-		// public AggregateFactory( [Required]IFactory<T> primary, [Required]params ITransformer<T>[] transformers ) : this( primary.ToDelegate(), transformers.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
 		public AggregateFactory( Func<T> primary, params Func<T, T>[] transformers )
 		{
@@ -368,8 +353,6 @@ namespace DragonSpark.Activation
 	{
 		readonly Func<TResult> item;
 
-		// public WrappedFactory( TResult instance ) : this( instance.to.ToDelegate() ) {}
-
 		public WrappedFactory( Func<TResult> item )
 		{
 			this.item = item;
@@ -395,39 +378,10 @@ namespace DragonSpark.Activation
 		object IFactory.Create() => Create();
 	}
 
-	/*public class FixedFactory<TParameter, TResult> : FactoryWithSpecificationBase<TParameter, TResult>
-	{
-		readonly Func<TResult> instance;
-
-		public FixedFactory( TResult instance ) : this( new DelegateContext<TResult>( instance ).Get ) {}
-
-		public FixedFactory( Func<TResult> instance ) : base( Specifications<TParameter>.Always )
-		{
-			this.instance = instance;
-		}
-
-		public override TResult Create( TParameter parameter ) => instance();
-	}*/
-
-	/*public class FixedFactory<T> : FactoryWithSpecificationBase<T>
-	{
-		readonly T instance;
-		public FixedFactory( T instance )
-		{
-			this.instance = instance;
-		}
-
-		public override T Create() => instance;
-	}*/
-
 	public class Creator : Cache<ICreator>
 	{
-		public static Creator Property { get; } = new Creator();
+		public static Creator Default { get; } = new Creator();
 
 		Creator() {}
-
-		// public static void Tag( [Required]ICreator @this, [Required]object item ) => new Creator( item ).Assign( @this );
-
-		// public Creator( object instance ) : base( instance, typeof(Creator) ) {}
 	}
 }
