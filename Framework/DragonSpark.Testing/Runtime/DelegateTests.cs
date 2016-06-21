@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
+using DragonSpark.TypeSystem;
 using Moq;
 using Ploeh.AutoFixture.Xunit2;
 using System;
@@ -29,7 +30,26 @@ namespace DragonSpark.Testing.Runtime
 		DateTime Factory( string message ) => DateTime.Now;
 
 		[Theory, AutoData]
-		void Invoke( Mock<InvokeSubject> sut, string message )
+		void Action( Mock<Subject> sut )
+		{
+			var command = new Action( sut.Object.Action );
+			// var factory = new Func<string, DateTime>( Factory );
+			var invoker = Invokers.Default.Get( sut.Object ).Get( command.Method );
+			Assert.NotNull( invoker );
+			Assert.IsType<ActionInvoker>( invoker );
+			Assert.Same( invoker, Invokers.Default.Get( sut.Object ).Get( command.Method ) );
+			
+			sut.Verify( subject => subject.Action(), Times.Never() );
+
+			invoker.Invoke( Items<object>.Default );
+
+			sut.Verify( subject => subject.Action(), Times.Once() );
+
+			Assert.Throws<ArgumentException>( () => invoker.Invoke( new object[] { 234 } ) );
+		}
+
+		[Theory, AutoData]
+		void Command( Mock<Subject> sut, string message )
 		{
 			var command = new Action<string>( sut.Object.Action );
 			// var factory = new Func<string, DateTime>( Factory );
@@ -44,13 +64,35 @@ namespace DragonSpark.Testing.Runtime
 
 			sut.Verify( subject => subject.Action( message ), Times.Once() );
 
-			// Assert.Equal( typeof(Action<int>), type );
+			Assert.Throws<ArgumentException>( () => invoker.Invoke( new object[] { 234 } ) );
 		}
 
-		public class InvokeSubject
+		
+		[Theory, AutoData]
+		void Factory( Mock<Subject> sut, int number )
 		{
-			public void Action() { }
+			var factory = new Func<int, int>( sut.Object.Create );
+
+			var invoker = Invokers.Default.Get( factory.Target ).Get( factory.Method );
+			Assert.NotNull( invoker );
+			Assert.IsType<FactoryInvoker<int, int>>( invoker );
+			Assert.Same( invoker, Invokers.Default.Get( factory.Target ).Get( factory.Method ) );
+			
+			sut.Verify( subject => subject.Create( number ), Times.Never() );
+
+			invoker.Invoke( new object[] { number } );
+
+			sut.Verify( subject => subject.Create( number ), Times.Once() );
+
+			Assert.Throws<ArgumentException>( () => invoker.Invoke( new object[] { "Hello there!" } ) );
+		}
+
+		public class Subject
+		{
+			public virtual void Action() { }
 			public virtual void Action( string message ) { }
+
+			public virtual int Create( int input ) => input + 123;
 		}
 
 		/*[Fact]
