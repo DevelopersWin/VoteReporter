@@ -2,6 +2,8 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
@@ -13,6 +15,57 @@ namespace DragonSpark.Runtime
 	public interface IDelegateInvoker
 	{
 		object Invoke( object[] arguments );
+	}
+
+	public static class DelegateInvokerExtensions
+	{
+		public static IDelegateInvoker Cached( this IDelegateInvoker @this ) => CachedInvoker.Default.Get( @this );
+		class CachedInvoker : Cache<IDelegateInvoker, IDelegateInvoker>
+		{
+			public static ICache<IDelegateInvoker, IDelegateInvoker> Default { get; } = new CachedInvoker();
+			CachedInvoker() : base( invoker => new CachedDelegateInvoker( invoker ) ) {}
+		}
+
+		public static Func<object[], object> ToDelegate( this IDelegateInvoker @this ) => DelegateCache.Default.Get( @this );
+
+		class DelegateCache : Cache<IDelegateInvoker, Func<object[], object>>
+		{
+			public static DelegateCache Default { get; } = new DelegateCache();
+
+			DelegateCache() : base( invoker => invoker.Invoke ) {}
+		}
+	}
+
+	public class StructuralEqualityComparer<T> : IEqualityComparer<T>
+	{
+		readonly IEqualityComparer comparer;
+		public static StructuralEqualityComparer<T> Instance { get; } = new StructuralEqualityComparer<T>();
+		StructuralEqualityComparer() : this( StructuralComparisons.StructuralEqualityComparer ) {}
+
+		public StructuralEqualityComparer( IEqualityComparer comparer )
+		{
+			this.comparer = comparer;
+		}
+
+		public bool Equals( T x, T y ) => comparer.Equals( x, y );
+
+		public int GetHashCode( T obj ) => comparer.GetHashCode( obj );
+	}
+
+	class CachedDelegateInvoker : IDelegateInvoker
+	{
+		readonly Func<object[], object> inner;
+		readonly ConcurrentDictionary<object[], object> cache;
+
+		public CachedDelegateInvoker( IDelegateInvoker inner ) : this( inner.ToDelegate(), new ConcurrentDictionary<object[], object>( StructuralEqualityComparer<object[]>.Instance ) ) {}
+
+		public CachedDelegateInvoker( Func<object[], object> inner, ConcurrentDictionary<object[], object> cache )
+		{
+			this.inner = inner;
+			this.cache = cache;
+		}
+
+		public object Invoke( object[] arguments ) => cache.GetOrAdd( arguments, inner );
 	}
 
 	public abstract class DelegateInvokerBase<T> : IDelegateInvoker
@@ -142,7 +195,7 @@ namespace DragonSpark.Runtime
 			public override Delegate Create( MethodInfo parameter )
 			{
 				var delegateType = DelegateType.Default.Get( parameter );
-				var result = parameter.CreateDelegate( delegateType, instance );
+				var result = parameter.CreateDelegate( delegateType, parameter.IsStatic ? null : instance );
 				return result;
 			}
 		}

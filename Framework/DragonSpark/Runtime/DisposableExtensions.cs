@@ -78,7 +78,7 @@ namespace DragonSpark.Runtime
 		readonly Func<IDisposable, bool> property;
 		readonly Action<IDisposable> command;
 
-		public DisposeAssociatedAspect() : this( ConfigureAssociatedDisposables.Instance.Get, DisposeAssociatedCommand.Instance.Execute ) {}
+		public DisposeAssociatedAspect() : this( ConfigureAssociatedDisposables.Instance.ToDelegate(), DisposeAssociatedCommand.Instance.ToDelegate() ) {}
 
 		public DisposeAssociatedAspect( Func<IDisposable, bool> property, Action<IDisposable> command )
 		{
@@ -91,7 +91,7 @@ namespace DragonSpark.Runtime
 			public static Specification Instance { get; } = new Specification();
 
 			public override bool IsSatisfiedBy( MethodBase parameter ) => parameter.DeclaringType.GetTypeInfo().IsClass && !parameter.IsSpecialName &&
-				GetMappedMethods( parameter ).Any( tuple => tuple.Item1.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item2, parameter ) );
+				GetMappedMethods( parameter ).Introduce( parameter ).Any( tuple => tuple.Item1.Item1.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item1.Item2, tuple.Item2 ) );
 
 			[Freeze]
 			static IEnumerable<Tuple<MethodInfo, MethodInfo>> GetMappedMethods( MemberInfo parameter ) => parameter.DeclaringType.Adapt().GetMappedMethods( typeof(IDisposable) );

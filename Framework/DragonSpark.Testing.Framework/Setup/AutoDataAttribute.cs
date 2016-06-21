@@ -9,9 +9,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
-using PostSharp;
 using PostSharp.Aspects;
-using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using Serilog.Core;
 using Serilog.Events;
@@ -32,54 +30,13 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		readonly Func<AutoData, IDisposable> factory;
 
-		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( ToDelegate( includeFromParameters, additionalTypes ) ) {}
-
-		static Func<AutoData, IDisposable> ToDelegate( bool includeFromParameters, Type[] additionalTypes )
-		{
-			try
-			{
-				return new AutoDataExecutionContextFactory( new Cache( includeFromParameters, additionalTypes ).ToDelegate() ).ToDelegate();
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new PostSharp.Extensibility.Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-					throw;
-			}
-			
-		}
-
-		/*static AutoDataExecutionContextFactory Create( bool includeFromParameters, Type[] additionalTypes )
-		{
-			try
-			{
-				return new AutoDataExecutionContextFactory( new Cache( includeFromParameters, additionalTypes ) );
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new PostSharp.Extensibility.Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-					throw;
-			}
-		}*/
+		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new AutoDataExecutionContextFactory( new Cache( includeFromParameters, additionalTypes ).ToDelegate() ).ToDelegate() ) {}
 
 		protected AutoDataAttribute( [Required] Func<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
 
-		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required] Func<AutoData, IDisposable> factory ) : base( Fixture1( fixture ) )
+		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required] Func<AutoData, IDisposable> factory ) : base( fixture() )
 		{
 			this.factory = factory;
-		}
-
-		static IFixture Fixture1( Func<IFixture> fixture )
-		{
-			try
-			{
-				return fixture();
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new PostSharp.Extensibility.Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-					throw;
-			}
-			
 		}
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )

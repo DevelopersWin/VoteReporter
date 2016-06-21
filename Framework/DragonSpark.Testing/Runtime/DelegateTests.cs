@@ -89,10 +89,25 @@ namespace DragonSpark.Testing.Runtime
 
 		public class Subject
 		{
+			int called;
+
 			public virtual void Action() { }
 			public virtual void Action( string message ) { }
 
 			public virtual int Create( int input ) => input + 123;
+
+			public virtual int Called( string message, int number ) => ++called;
+		}
+
+		[Theory, AutoData]
+		public void Cached( Mock<Subject> sut, string message, int number )
+		{
+			var factory = new Func<string, int, int>( sut.Object.Called );
+			var cached = Invokers.Default.Get( factory.Target ).Get( factory.Method ).Cached();
+			var first = cached.Invoke( new object[] { message, number } );
+			var second = cached.Invoke( new object[] { message, number } );
+			Assert.Equal( 1, first );
+			Assert.Equal( first, second );
 		}
 
 		/*[Fact]

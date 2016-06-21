@@ -198,7 +198,7 @@ namespace DragonSpark.TypeSystem
 		static Type InnerType( Type target, Func<Type[], Type> fromGenerics, Func<TypeInfo, bool> check = null )
 		{
 			var info = target.GetTypeInfo();
-			var result = info.IsGenericType && info.GenericTypeArguments.Any() && check.With( func => func( info ), () => true ) ? fromGenerics( info.GenericTypeArguments ) :
+			var result = info.IsGenericType && info.GenericTypeArguments.Any() && ( check == null || check( info ) ) ? fromGenerics( info.GenericTypeArguments ) :
 				target.IsArray ? target.GetElementType() : null;
 			return result;
 		}
@@ -213,9 +213,7 @@ namespace DragonSpark.TypeSystem
 		[Freeze]
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true ) =>
 			Type.Append( includeInterfaces ? ExpandInterfaces( Type ) : Items<Type>.Default )
-				.AsTypeInfos()
-				.Where( typeInfo => typeInfo.IsGenericType && genericDefinition.GetTypeInfo().IsGenericType && typeInfo.GetGenericTypeDefinition() == genericDefinition.GetGenericTypeDefinition() )
-				.AsTypes()
+				.Introduce( genericDefinition, tuple => tuple.Item1.GetTypeInfo().IsGenericType && tuple.Item2.GetTypeInfo().IsGenericType && tuple.Item1.GetGenericTypeDefinition() == tuple.Item2.GetGenericTypeDefinition() )
 				.Fixed();
 
 		[Freeze]
