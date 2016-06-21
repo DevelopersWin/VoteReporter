@@ -7,7 +7,6 @@ using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Diagnostics;
 using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.TypeSystem;
 using DragonSpark.Windows.TypeSystem;
 using JetBrains.dotMemoryUnit;
 using PostSharp.Aspects;
@@ -18,6 +17,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
+using Delegates = DragonSpark.TypeSystem.Delegates;
 using ProfilerFactory = DragonSpark.Testing.Framework.Diagnostics.ProfilerFactory;
 
 namespace DragonSpark.Testing.Framework

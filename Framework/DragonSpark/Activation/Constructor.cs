@@ -26,6 +26,8 @@ namespace DragonSpark.Activation
 			this.activatorSource = activatorSource;
 		}
 
+		public T Create<T>( ConstructTypeRequest parameter ) => (T)Create( parameter );
+
 		public override object Create( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? DefaultValueFactory.Instance.Create( parameter.RequestedType );
 
 		object LocateAndCreate( ConstructTypeRequest parameter )

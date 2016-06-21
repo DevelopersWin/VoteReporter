@@ -24,32 +24,6 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	public struct CacheEntry : IEquatable<CacheEntry>
-	{
-		readonly int code;
-		readonly MethodInterceptionArgs factory;
-
-		public CacheEntry( MethodInterceptionArgs args ) : this( KeyFactory.Create( args.Arguments.ToImmutableArray() ), args ) {}
-
-		public CacheEntry( int code, MethodInterceptionArgs factory )
-		{
-			this.code = code;
-			this.factory = factory;
-		}
-
-		public object Get() => factory.GetReturnValue();
-
-		public bool Equals( CacheEntry other ) => code == other.code;
-
-		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && ( obj is CacheEntry && Equals( (CacheEntry)obj ) );
-
-		public override int GetHashCode() => code;
-
-		public static bool operator ==( CacheEntry left, CacheEntry right ) => left.Equals( right );
-
-		public static bool operator !=( CacheEntry left, CacheEntry right ) => !left.Equals( right );
-	}
-
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
 	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
@@ -73,6 +47,9 @@ namespace DragonSpark.Aspects
 			{
 				base.OnInvoke( args );
 			}
+
+			//Expression.GetActionType()
+
 		}
 
 		object IInstanceScopedAspect.CreateInstance( AdviceArgs adviceArgs )
@@ -85,6 +62,7 @@ namespace DragonSpark.Aspects
 		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 	}
 
+	
 	public class MethodInvocationSpecificationRepository : EntryRepositoryBase<ISpecification<MethodInvocationParameter>>
 	{
 		

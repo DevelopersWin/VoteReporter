@@ -6,7 +6,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.Runtime.Properties
 {
@@ -45,7 +44,7 @@ namespace DragonSpark.Runtime.Properties
 		public override TValue Get( TKey instance ) => store.GetOrAdd( instance, Create );
 	}
 
-	public struct StructureOrWeakReference
+	/*public struct StructureOrWeakReference
 	{
 		public StructureOrWeakReference( object structure ) {}
 	}
@@ -89,7 +88,7 @@ namespace DragonSpark.Runtime.Properties
 		IEnumerable<object> All() => structures.Concat( references );
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-	}
+	}*/
 
 	// ATTRIBUTION: https://github.com/dotnet/roslyn/blob/master/src/Compilers/Core/Portable/InternalUtilities/WeakList.cs
 	public sealed class WeakList<T> : ICollection<T> where T : class
@@ -151,7 +150,7 @@ namespace DragonSpark.Runtime.Properties
 				Compact( firstDead, items );
 			}
 
-			// Debug.Assert(_items.Length > 0 && _size < 3 * _items.Length / 4, "length: " + _items.Length + " size: " + _size);
+			Debug.Assert( items.Length > 0 && size < 3 * items.Length / 4, "length: " + items.Length + " size: " + size );
 		}
 
 		void Shrink( int firstDead, int alive )

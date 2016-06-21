@@ -110,6 +110,13 @@ namespace DragonSpark.Extensions
 
 		public static TItem[] ToItem<TItem>( this TItem target ) where TItem : class => Array<TItem>.Property.Get( target );
 
+		public static IEnumerable<TSource> Append<TSource>( this IEnumerable<TSource> collection, TSource element )
+		{
+			foreach ( var element1 in collection )
+				yield return element1;
+			yield return element;
+		}
+
 		public static IEnumerable<TItem> Append<TItem>( this TItem target, IEnumerable<TItem> second ) where TItem : class => target.Append( second.Fixed() );
 		public static IEnumerable<TItem> Append<TItem>( this TItem target, params TItem[] second ) where TItem : class => target.ToItem().Concat( second );
 

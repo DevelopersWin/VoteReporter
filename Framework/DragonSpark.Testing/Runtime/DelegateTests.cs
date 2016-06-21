@@ -1,5 +1,10 @@
-﻿using DragonSpark.Testing.Framework;
-using System.Collections.Generic;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using DragonSpark.Testing.Framework;
+using Moq;
+using Ploeh.AutoFixture.Xunit2;
+using System;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Runtime
@@ -7,6 +12,46 @@ namespace DragonSpark.Testing.Runtime
 	public class DelegateTests : TestCollectionBase
 	{
 		public DelegateTests( ITestOutputHelper output ) : base( output ) {}
+
+		[Fact]
+		public void DelegateType()
+		{
+			var cache = DragonSpark.Runtime.DelegateType.Default;
+			Assert.Equal( typeof(Action), cache.Get( new Action( Command ).Method ) );
+			Assert.Equal( typeof(Action<int>), cache.Get( new Action<int>( Command ).Method ) );
+			Assert.Equal( typeof(Func<string, DateTime>), cache.Get( new Func<string, DateTime>( Factory ).Method ) );
+		}
+
+		void Command( int number ) {}
+
+		void Command() {}
+
+		DateTime Factory( string message ) => DateTime.Now;
+
+		[Theory, AutoData]
+		void Invoke( Mock<InvokeSubject> sut, string message )
+		{
+			var command = new Action<string>( sut.Object.Action );
+			// var factory = new Func<string, DateTime>( Factory );
+			var invoker = Invokers.Default.Get( sut.Object ).Get( command.Method );
+			Assert.NotNull( invoker );
+			Assert.IsType<ActionInvoker<string>>( invoker );
+			Assert.Same( invoker, Invokers.Default.Get( sut.Object ).Get( command.Method ) );
+			
+			sut.Verify( subject => subject.Action( message ), Times.Never() );
+
+			invoker.Invoke( message.ToItem() );
+
+			sut.Verify( subject => subject.Action( message ), Times.Once() );
+
+			// Assert.Equal( typeof(Action<int>), type );
+		}
+
+		public class InvokeSubject
+		{
+			public void Action() { }
+			public virtual void Action( string message ) { }
+		}
 
 		/*[Fact]
 		public void BasicInvocation()
@@ -227,15 +272,5 @@ namespace DragonSpark.Testing.Runtime
 			public Parameter Context { get; }
 		}
 		*/
-	}
-
-	public static class Temp1
-	{
-		public static IEnumerable<TSource> Append<TSource>( this IEnumerable<TSource> collection, TSource element )
-		{
-			foreach ( var element1 in collection )
-				yield return element1;
-			yield return element;
-		}
 	}
 }

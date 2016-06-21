@@ -2,11 +2,11 @@
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
+using DragonSpark.Aspects;
+using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Aspects;
-using DragonSpark.Runtime;
 
 [assembly: AssemblyTitle( "DragonSpark.Testing" )]
 [assembly: AssemblyDescription( "" )]
@@ -27,3 +27,5 @@ using DragonSpark.Runtime;
 
 [assembly: ApplyDefaultValues]
 [assembly: DisposeAssociatedAspect]
+
+// [assembly: InternalsVisibleTo( "DynamicProxyGenAssembly2" )]

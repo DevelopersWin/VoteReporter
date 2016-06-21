@@ -1,5 +1,204 @@
-﻿namespace DragonSpark.Runtime
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq.Expressions;
+using System.Reflection;
+using Constructor = DragonSpark.Activation.Constructor;
+
+namespace DragonSpark.Runtime
 {
+	public interface IDelegateInvoker
+	{
+		object Invoke( object[] arguments );
+	}
+
+	public abstract class DelegateInvokerBase<T> : IDelegateInvoker
+	{
+		readonly int numberOfArguments;
+
+		protected DelegateInvokerBase( T @delegate ) : this( @delegate, @delegate.AsValid<Delegate>().GetMethodInfo().GetParameterTypes().Length ) {}
+
+		DelegateInvokerBase( T @delegate, int numberOfArguments )
+		{
+			Delegate = @delegate;
+			this.numberOfArguments = numberOfArguments;
+		}
+
+		protected T Delegate { get; }
+
+		object IDelegateInvoker.Invoke( object[] arguments )
+		{
+			if ( !Validate( arguments ) )
+			{
+				throw new ArgumentException( "Provided arguments are not valid for this invoker." );
+			}
+
+			return Invoke( arguments );
+		}
+
+		protected virtual bool Validate( object[] arguments ) => arguments.Length == numberOfArguments;
+
+		protected abstract object Invoke( object[] arguments );
+	}
+
+	public abstract class CommandInvokerBase<T> : DelegateInvokerBase<T>
+	{
+		protected CommandInvokerBase( T @delegate ) : base( @delegate ) {}
+
+		protected sealed override object Invoke( object[] arguments )
+		{
+			Execute( arguments );
+			return null;
+		}
+
+		protected abstract void Execute( object[] arguments );
+	}
+
+	public class ActionInvoker : CommandInvokerBase<Action>
+	{
+		public ActionInvoker( Action action ) : base( action ) {}
+
+		protected override void Execute( object[] arguments ) => Delegate();
+	}
+
+	public class ActionInvoker<T> : CommandInvokerBase<Action<T>>
+	{
+		public ActionInvoker( Action<T> action ) : base( action ) {}
+
+		protected override bool Validate( object[] arguments ) => base.Validate( arguments ) && arguments[0] is T;
+
+		protected override void Execute( object[] arguments ) => Delegate( (T)arguments[0] );
+	}
+
+	public class ActionInvoker<T1, T2> : CommandInvokerBase<Action<T1, T2>>
+	{
+		public ActionInvoker( Action<T1, T2> @delegate ) : base( @delegate ) {}
+
+		protected override bool Validate( object[] arguments ) => base.Validate( arguments ) && arguments[0] is T1 && arguments[1] is T2;
+
+		protected override void Execute( object[] arguments ) => Delegate( (T1)arguments[0], (T2)arguments[1] );
+	}
+
+	public class ActionInvoker<T1, T2, T3> : CommandInvokerBase<Action<T1, T2, T3>>
+	{
+		public ActionInvoker( Action<T1, T2, T3> @delegate ) : base( @delegate ) {}
+
+		protected override bool Validate( object[] arguments ) => base.Validate( arguments ) && arguments[0] is T1 && arguments[1] is T2 && arguments[2] is T3;
+
+		protected override void Execute( object[] arguments ) => Delegate( (T1)arguments[0], (T2)arguments[1], (T3)arguments[2] );
+	}
+
+	public class FactoryInvoker<T> : DelegateInvokerBase<Func<T>>
+	{
+		public FactoryInvoker( Func<T> @delegate ) : base( @delegate ) {}
+
+		protected override object Invoke( object[] arguments ) => Delegate();
+	}
+
+	public class FactoryInvoker<T1, T> : DelegateInvokerBase<Func<T1, T>>
+	{
+		public FactoryInvoker( Func<T1, T> @delegate ) : base( @delegate ) {}
+
+		protected override bool Validate( object[] arguments ) => base.Validate( arguments ) && arguments[0] is T1;
+
+		protected override object Invoke( object[] arguments ) => Delegate( (T1)arguments[0] );
+	}
+
+	public class FactoryInvoker<T1, T2, T> : DelegateInvokerBase<Func<T1, T2, T>>
+	{
+		public FactoryInvoker( Func<T1, T2, T> @delegate ) : base( @delegate ) {}
+
+		protected override bool Validate( object[] arguments ) => base.Validate( arguments ) && arguments[0] is T1 && arguments[1] is T2;
+
+		protected override object Invoke( object[] arguments ) => Delegate( (T1)arguments[0], (T2)arguments[1] );
+	}
+
+	public class FactoryInvoker<T1, T2, T3, T> : DelegateInvokerBase<Func<T1, T2, T3, T>>
+	{
+		public FactoryInvoker( Func<T1, T2, T3, T> @delegate ) : base( @delegate ) {}
+
+		protected override bool Validate( object[] arguments ) => base.Validate( arguments ) && arguments[0] is T1 && arguments[1] is T2 && arguments[2] is T3;
+
+		protected override object Invoke( object[] arguments ) => Delegate( (T1)arguments[0], (T2)arguments[1], (T3)arguments[2] );
+	}
+
+	public class Delegates : Cache<object, ICache<MethodInfo, Delegate>>
+	{
+		public static Delegates Default { get; } = new Delegates();
+
+		Delegates() : base( o => new Cache<MethodInfo, Delegate>( new Factory( o ).Create ) ) {}
+
+		class Factory : FactoryBase<MethodInfo, Delegate>
+		{
+			readonly object instance;
+			public Factory( object instance )
+			{
+				this.instance = instance;
+			}
+
+			public override Delegate Create( MethodInfo parameter )
+			{
+				var delegateType = DelegateType.Default.Get( parameter );
+				var result = parameter.CreateDelegate( delegateType, instance );
+				return result;
+			}
+		}
+	}
+
+	public class Invokers : Cache<object, ICache<MethodInfo, IDelegateInvoker>>
+	{
+		public static Invokers Default { get; } = new Invokers();
+
+		Invokers() : base( o => new Cache<MethodInfo, IDelegateInvoker>( new Factory( o ).Create ) ) {}
+
+		class Factory : FactoryBase<MethodInfo, IDelegateInvoker>
+		{
+			readonly object instance;
+			public Factory( object instance )
+			{
+				this.instance = instance;
+			}
+
+			public override IDelegateInvoker Create( MethodInfo parameter ) => Invoker.Default.Get( Delegates.Default.Get( instance ).Get( parameter ) );
+		}
+	}
+
+	class Invoker : FactoryBase<Delegate, IDelegateInvoker>
+	{
+		public static ICache<Delegate, IDelegateInvoker> Default { get; } = new Invoker().Cached();
+
+		readonly static IDictionary<Type, Type> Mappings = new Dictionary<Type, Type>
+														   {
+															   { typeof(Action), typeof(ActionInvoker) },
+															   { typeof(Action<>), typeof(ActionInvoker<>) },
+															   { typeof(Action<,>), typeof(ActionInvoker<,>) },
+															   { typeof(Action<,,>), typeof(ActionInvoker<,,>) },
+															   { typeof(Func<>), typeof(FactoryInvoker<>) },
+															   { typeof(Func<,>), typeof(FactoryInvoker<,>) },
+															   { typeof(Func<,,>), typeof(FactoryInvoker<,,>) },
+															   { typeof(FactoryInvoker<,,,>), typeof(FactoryInvoker<,,,>) }
+														   }.ToImmutableDictionary();
+
+		public override IDelegateInvoker Create( Delegate parameter )
+		{
+			var delegateType = parameter.GetType();
+			var mapped = Mappings[delegateType.IsConstructedGenericType ? delegateType.GetGenericTypeDefinition() : delegateType];
+			var type = mapped.GetTypeInfo().IsGenericTypeDefinition ? mapped.MakeGenericType( delegateType.GenericTypeArguments ) : mapped;
+
+			var result = Constructor.Instance.Create<IDelegateInvoker>( new ConstructTypeRequest( type, parameter ) );
+			return result;
+		}
+	}
+
+	class DelegateType : Cache<MethodInfo, Type>
+	{
+		public static DelegateType Default { get; } = new DelegateType();
+		DelegateType() : base( info => Expression.GetDelegateType( info.GetParameterTypes().Append( info.ReturnType ).Fixed() ) ) {}
+	}
+
 	/*public static class Invocation
 	{
 		public static Delegate GetCurrent() => AmbientStack.GetCurrentItem<Delegate>();

@@ -7,6 +7,7 @@ using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
+using Delegate = System.Delegate;
 
 namespace DragonSpark.Setup.Registration
 {
