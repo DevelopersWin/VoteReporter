@@ -1,15 +1,52 @@
-﻿using Xunit;
+﻿using DragonSpark.Runtime.Properties;
+using DragonSpark.Testing.Objects;
+using Microsoft.Practices.ObjectBuilder2;
+using Ploeh.AutoFixture.Xunit2;
+using Xunit;
 
 namespace DragonSpark.Testing.Runtime.Properties
 {
 	public class EqualityCacheTests
 	{
-		[Fact]
-		public void EqualityCheck()
+		/*class EqualityReference<T>
 		{
-			/*var temp = true;
-			Assert.Same( temp, temp );*/
+			
+		}*/
+
+		[Theory, AutoData]
+		public void EqualityCheck( EqualityReference<NamedTypeBuildKey> sut )
+		{
+			var one = NamedTypeBuildKey.Make<Class>();
+			var two = NamedTypeBuildKey.Make<Class>();
+
+			Assert.NotSame( one, two );
+
+			Assert.Same( one, sut.Create( one ) );
+			Assert.Same( one, sut.Create( two ) );
 		}
+
+		/*[Theory, AutoData]
+		public void EqualityCheck( string name, int[] numbers, DateTime[] dates )
+		{
+			var one = new object[] { name }.Concat( numbers.Cast<object>() ).Concat( dates.Cast<object>() ).ToArray();
+			var two = new object[] { name }.Concat( numbers.Cast<object>() ).Concat( dates.Cast<object>() ).ToArray();
+
+			var equal = StructuralComparisons.StructuralEqualityComparer.Equals( one, two );
+			Assert.True( equal );
+		}
+
+
+		[Theory, AutoData]
+		public void DeepEqualityCheck( string name, int[] numbers, IEnumerable<DateTime> dates )
+		{
+			var one = new object[] { name, numbers, dates };
+			var two = new object[] { name, numbers, dates };
+
+			var equal = StructuralComparisons.StructuralEqualityComparer.Equals( one, two );
+			Assert.True( equal );
+
+			new Dictionary<object[], object>( StructuralComparisons.StructuralEqualityComparer )
+		}*/
 
 		/*struct Key
 		{

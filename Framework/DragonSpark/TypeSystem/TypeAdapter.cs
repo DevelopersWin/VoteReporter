@@ -25,7 +25,7 @@ namespace DragonSpark.TypeSystem
 		{
 			Type = type;
 			Info = info;
-			methods = new ConcurrentEqualityCache<MethodDescriptor, MethodInfo>( new GenericMethodFactory( Type ).Create );
+			methods = new ConcurrentEqualityCache<MethodDescriptor, MethodInfo>( new GenericMethodFactory( Type ).ToDelegate() );
 		}
 
 		public Type Type { get; }
@@ -143,7 +143,7 @@ namespace DragonSpark.TypeSystem
 				Name = name;
 				GenericTypes = genericTypes;
 				ParameterTypes = parameterTypes;
-				code = Hash.CombineValues( EnumerableEx.Return<object>( Name ).Concat( GenericTypes ).Concat( ParameterTypes ) );
+				code = Hash.CombineValues( EnumerableEx.Return<object>( Name ).Concat( GenericTypes ).Concat( ParameterTypes ).ToImmutableArray() );
 			}
 
 			public string Name { get; }

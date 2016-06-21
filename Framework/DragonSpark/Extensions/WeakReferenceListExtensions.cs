@@ -1,12 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace DragonSpark.Extensions
 {
 	public static class WeakReferenceListExtensions
 	{
-		public static void CheckWith<TItem>( this IList<WeakReference<TItem>> target, TItem item, Action<TItem> action ) where TItem : class
+		public static T Get<T>( this WeakReference<T> @this ) where T : class
+		{
+			T result;
+			return @this.TryGetTarget( out result ) ? result : null;
+		}
+
+		/*public static void CheckWith<TItem>( this IList<WeakReference<TItem>> target, TItem item, Action<TItem> action ) where TItem : class
 		{
 			if ( !target.Exists( item ) )
 			{
@@ -14,9 +18,9 @@ namespace DragonSpark.Extensions
 				action( item );
 				// target.Loaded += new Loader<TFrameworkElement>( callback ).OnLoad;
 			}
-		}
+		}*/
 
-		public static TItem[] Targets<TItem>( this IList<WeakReference<TItem>> target ) where TItem : class
+		/*public static TItem[] Targets<TItem>( this IList<WeakReference<TItem>> target ) where TItem : class
 		{
 			TItem item;
 			var result = target.AliveOnly().Select( x => x.TryGetTarget( out item ).With( y => item ) ).ToArray();
@@ -35,6 +39,6 @@ namespace DragonSpark.Extensions
 		{
 			var result = target.Targets().Contains( item );
 			return result;
-		}
+		}*/
 	}
 }

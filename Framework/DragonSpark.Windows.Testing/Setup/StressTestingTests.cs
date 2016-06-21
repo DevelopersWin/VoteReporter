@@ -1,17 +1,11 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Testing.Objects;
-using DragonSpark.Windows.Runtime;
-using JetBrains.dotMemoryUnit;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,14 +15,14 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public StressTestingTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Fact]
+		/*[Fact]
 		[DotMemoryUnit( SavingStrategy = SavingStrategy.OnCheckFail, Directory = @"C:\dotMemory", CollectAllocations = true, FailIfRunWithoutSupport = false )]
 		[AssertTraffic( AllocatedObjectsCount = 0 )]
 		public void GetAllTypesWith()
 		{
 			First();
 			Second();
-		}
+		}*/
 
 		void Second() => First();
 
@@ -50,7 +44,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 		void Host( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut ) {}
 
-		[Fact]
+		/*[Fact]
 		public void GetAllTypesWith2()
 		{
 			var sut = new[] { GetType(), typeof(NormalPriority), typeof(ServiceLocator), typeof(AutoDataAttribute), typeof(FileSystemAssemblySource) }.Select( type => type.Assembly ).ToArray();
@@ -59,7 +53,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			var result = Parallel.For( 0, 10000, i =>
 									{
 										/*var items = sut.GetAllTypesWith<PriorityAttribute>();
-										Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );*/
+										Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );#1#
 
 										Action action = mock.Hello;
 										AssociatedContext.Default.Set( action.Method, new DisposableAction( () => {} ) );
@@ -67,9 +61,9 @@ namespace DragonSpark.Windows.Testing.Setup
 										
 									} );
 			Assert.True( result.IsCompleted );
-		}
+		}*/
 
-		[Fact]
+		/*[Fact]
 		public void Stress()
 		{
 			var result = Parallel.For( 0, 100000, i =>
@@ -79,10 +73,10 @@ namespace DragonSpark.Windows.Testing.Setup
 										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
 										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
 										Framework.Setup.ExecutionContext.Instance.Verify(); // TODO: Remove.
-										Framework.Setup.ExecutionContext.Instance.Value.Dispose();*/
+										Framework.Setup.ExecutionContext.Instance.Value.Dispose();#1#
 									} );
 			Assert.True( result.IsCompleted );
-		}
+		}*/
 
 		class Mock
 		{

@@ -140,7 +140,7 @@ namespace DragonSpark.Activation.IoC
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
 		{
-			readonly EqualityReference<NamedTypeBuildKey> property = new EqualityReference<NamedTypeBuildKey>();
+			readonly EqualityReference<NamedTypeBuildKey> references = new EqualityReference<NamedTypeBuildKey>();
 
 			readonly ILogger logger;
 			readonly LifetimeManagerFactory factory;
@@ -155,7 +155,7 @@ namespace DragonSpark.Activation.IoC
 
 			public override void PreBuildUp( IBuilderContext context )
 			{
-				var reference = property.From( context.BuildKey );
+				var reference = references.Create( context.BuildKey );
 				if ( reference.Get( condition ).Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
@@ -392,7 +392,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionStrategy : BuilderStrategy
 	{
-		readonly EqualityReference<NamedTypeBuildKey> property = new EqualityReference<NamedTypeBuildKey>();
+		readonly EqualityReference<NamedTypeBuildKey> references = new EqualityReference<NamedTypeBuildKey>();
 		readonly Condition condition = new Condition();
 
 		readonly ConventionCandidateLocator locator;
@@ -413,7 +413,7 @@ namespace DragonSpark.Activation.IoC
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var reference = property.From( context.BuildKey );
+			var reference = references.Create( context.BuildKey );
 			if ( condition.Get( reference ).Apply() )
 			{
 				var from = context.BuildKey.Type;

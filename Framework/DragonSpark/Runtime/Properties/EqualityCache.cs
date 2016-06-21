@@ -1,9 +1,12 @@
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Runtime.Properties
 {
@@ -42,8 +45,54 @@ namespace DragonSpark.Runtime.Properties
 		public override TValue Get( TKey instance ) => store.GetOrAdd( instance, Create );
 	}
 
+	public struct StructureOrWeakReference
+	{
+		public StructureOrWeakReference( object structure ) {}
+	}
+
+	class StructureOrWeakReferenceCollection : ICollection<object>
+	{
+		readonly ICache<Type, ICollection<object>> value;
+
+		readonly HashSet<object> structures = new HashSet<object>();
+		readonly WeakList<object> references = new WeakList<object>();
+
+		public StructureOrWeakReferenceCollection()
+		{
+			value = new Cache<Type, ICollection<object>>( Create );
+		}
+
+		ICollection<object> Create( Type type ) => type.GetTypeInfo().IsValueType ? (ICollection<object>)structures : references;
+
+		public void Clear()
+		{
+			structures.Clear();
+			references.Clear();
+		}
+
+		public bool Contains( object item ) => structures.Contains( item ) || references.Contains( item );
+
+		void ICollection<object>.CopyTo( object[] array, int arrayIndex ) => Array.Copy( All().ToArray(), arrayIndex, array, arrayIndex, array.Length );
+
+		public bool Remove( object item ) => Collection( item ).Remove( item );
+
+		public int Count => structures.Count + references.Count;
+
+		public bool IsReadOnly => false;
+
+		public void Add( object item ) => Collection( item ).Add( item );
+
+		ICollection<object> Collection( object item ) => value.Get( item.GetType() );
+
+		public IEnumerator<object> GetEnumerator() => All().GetEnumerator();
+
+		IEnumerable<object> All() => structures.Concat( references );
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+	}
+
 	// ATTRIBUTION: https://github.com/dotnet/roslyn/blob/master/src/Compilers/Core/Portable/InternalUtilities/WeakList.cs
-	sealed class WeakList<T> : IEnumerable<T> where T : class
+	public sealed class WeakList<T> : ICollection<T> where T : class
 	{
 		const int MinimalNonEmptySize = 4;
 
@@ -108,7 +157,7 @@ namespace DragonSpark.Runtime.Properties
 		void Shrink( int firstDead, int alive )
 		{
 			var newSize = GetExpandedSize( alive );
-			var newItems = ( newSize == items.Length ) ? items : new WeakReference<T>[newSize];
+			var newItems = newSize == items.Length ? items : new WeakReference<T>[newSize];
 			Compact( firstDead, newItems );
 			items = newItems;
 		}
@@ -176,6 +225,28 @@ namespace DragonSpark.Runtime.Properties
 			items[size++] = new WeakReference<T>( item );
 		}
 
+		public void Clear() => items.ForEach( reference => reference.SetTarget( null ) );
+		public bool Contains( T item ) => Items().Contains( item );
+
+		public void CopyTo( T[] array, int arrayIndex ) => Array.Copy( Items().ToArray(), arrayIndex, array, arrayIndex, array.Length );
+
+		public bool Remove( T item )
+		{
+			var index = Array.IndexOf( Items().ToArray(), item );
+			var result = index > 1;
+			if ( result )
+			{
+				items[index].SetTarget( null );
+			}
+			return result;
+		}
+
+		IEnumerable<T> Items() => items.Select( reference => reference?.Get() );
+
+		public int Count => WeakCount;
+
+		public bool IsReadOnly => false;
+
 		public IEnumerator<T> GetEnumerator()
 		{
 			int count = size;
@@ -214,7 +285,7 @@ namespace DragonSpark.Runtime.Properties
 			}
 		}
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		//  internal WeakReference<T>[] TestOnly_UnderlyingArray { get { return _items; } }
 	}

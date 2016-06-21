@@ -228,13 +228,34 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public class EqualityReference<T> : ExecutionCachedStoreBase<ConcurrentDictionary<int, T>> where T : class
+	/*public class EqualityReference<T> : ExecutionCachedStoreBase<ConcurrentDictionary<int, T>> where T : class
 	{
 		public T From( T instance ) => Value.GetOrAdd( instance.GetHashCode(), instance.ToFactory<int, T>().ToDelegate() );
 
 		public EqualityReference() : base( new ActivatedCache<ConcurrentDictionary<int, T>>() ) {}
 
 		// public EqualityReference( Func<object> instance, IAttachedProperty<object, ConcurrentDictionary<int, T>> cache, ICoercer<ConcurrentDictionary<int, T>> coercer ) : base( instance, cache, coercer ) {}
+	}*/
+
+	public class EqualityReference<T> : TransformerBase<T> where T : class
+	{
+		readonly WeakList<T> list = new WeakList<T>();
+
+		T GetOrAdd( T item )
+		{
+			lock ( list )
+			{
+				var current = list.Introduce( item, tuple => Equals( tuple.Item1, tuple.Item2 ) ).SingleOrDefault();
+				if ( current == null )
+				{
+					list.Add( item );
+					return item;
+				}
+				return current;
+			}
+		}
+
+		public override T Create( T parameter ) => GetOrAdd( parameter );
 	}
 
 	public class Condition : Condition<object>

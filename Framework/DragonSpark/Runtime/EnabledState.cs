@@ -4,43 +4,30 @@ namespace DragonSpark.Runtime
 {
 	public class EnabledState
 	{
-		readonly static int Null = new object().GetHashCode();
+		readonly static object Null = new object();
 
-		readonly HashSet<int> codes = new HashSet<int>();
+		readonly ISet<object> objects = new HashSet<object>();
 
-		// long store;
-
-		static int GetCode( object item ) => item?.GetHashCode() ?? Null;
-
-		public bool IsEnabled( object item )
-		{
-			var code = GetCode( item );
-			return codes.Contains( code );
-		}
+		public bool IsEnabled( object item ) => objects.Contains( item ?? Null );
 
 		public void Enable( object item, bool on )
 		{
-			var code = GetCode( item );
-			/*
-			BitArray bits = new BitArray(System.BitConverter.GetBytes(code));
+			var check = item ?? Null;
 
-			bits.*/
 			if ( on )
 			{
-				codes.Add( code );
-				// store |= code;
+				objects.Add( check );
 			}
 			else
 			{
-				codes.Remove( code );
-				// store &= ~code;
+				objects.Remove( check );
 			}
 		}
 	}
 
 	public static class EnabledStateExtensions
 	{
-		public static Assignment<object, bool> Assignment( this EnabledState @this, object first, bool second = true ) => 
+		public static Assignment<object, bool> Assignment( this EnabledState @this, object first, bool second = true ) =>
 			new Assignment<object, bool>( new EnabledStateAssign( @this ), Assignments.From( first ), new Value<bool>( second ) );
 	}
 }
