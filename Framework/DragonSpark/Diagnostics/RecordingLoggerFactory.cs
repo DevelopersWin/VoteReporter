@@ -160,7 +160,7 @@ namespace DragonSpark.Diagnostics
 			
 			public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( CreatorId, id ) );
 
-			class MigratingSpecification : AttachedPropertyValueSpecification<LogEvent, bool>
+			class MigratingSpecification : CacheValueSpecification<LogEvent, bool>
 			{
 				public static MigratingSpecification Instance { get; } = new MigratingSpecification();
 

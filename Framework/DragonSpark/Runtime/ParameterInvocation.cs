@@ -1,8 +1,10 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -67,7 +69,7 @@ namespace DragonSpark.Runtime
 		public T Finish { get; }
 	}
 
-	public class CacheAssign<T1, T2> : IAssign<T1, T2> where T1 : class
+	public class CacheAssign<T1, T2> : IAssign<T1, T2>
 	{
 		readonly ICache<T1, T2> cache;
 		public CacheAssign( ICache<T1, T2> cache )
@@ -76,6 +78,17 @@ namespace DragonSpark.Runtime
 		}
 
 		public void Assign( T1 first, T2 second ) => cache.Set( first, second );
+	}
+
+	public class StoreAssign<T> : IAssign<T>
+	{
+		readonly IWritableStore<T> store;
+		public StoreAssign( IWritableStore<T> store )
+		{
+			this.store = store;
+		}
+
+		public void Assign( T first ) => store.Assign( first );
 	}
 
 	public interface IAssign<in T1, in T2>
@@ -109,6 +122,18 @@ namespace DragonSpark.Runtime
 					break;
 			}
 		}
+	}
+
+	public class DictionaryAssign<T1, T2> : IAssign<T1, T2>
+	{
+		readonly IDictionary<T1, T2> dictionary;
+
+		public DictionaryAssign( IDictionary<T1, T2> dictionary )
+		{
+			this.dictionary = dictionary;
+		}
+
+		public void Assign( T1 first, T2 second ) => dictionary[first] = second;
 	}
 
 	public enum CollectionAction { Add, Remove }

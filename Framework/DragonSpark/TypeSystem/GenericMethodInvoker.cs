@@ -53,20 +53,20 @@ namespace DragonSpark.TypeSystem
 			static Delegate Create( MethodInfo parameter )
 			{
 				var parameters = parameter.GetParameterTypes();
-					var instance = Expression.Parameter( typeof(object), "instance" );
-					var arguments = Expression.Parameter( typeof(object[]), "args" );
+				var instance = Expression.Parameter( typeof(object), "instance" );
+				var arguments = Expression.Parameter( typeof(object[]), "args" );
 
-					var array = new Expression[parameters.Length];
-					for ( var i = 0; i < parameters.Length; i++ )
-					{
-						var index = Expression.ArrayIndex( arguments, Expression.Constant( i ) );
-						array[i] = Expression.Convert( index, parameters[i] );
-					}
+				var array = new Expression[parameters.Length];
+				for ( var i = 0; i < parameters.Length; i++ )
+				{
+					var index = Expression.ArrayIndex( arguments, Expression.Constant( i ) );
+					array[i] = Expression.Convert( index, parameters[i] );
+				}
 
-					var body = parameter.IsStatic ? Expression.Call( parameter, array ) : Expression.Call( instance, parameter, array );
+				var body = parameter.IsStatic ? Expression.Call( parameter, array ) : Expression.Call( Expression.Convert( instance, parameter.DeclaringType ), parameter, array );
 
-					var result = Expression.Lambda( body, instance, arguments ).Compile();
-					return result;
+				var result = Expression.Lambda( body, instance, arguments ).Compile();
+				return result;
 			}
 		}
 

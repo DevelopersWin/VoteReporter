@@ -52,7 +52,7 @@ namespace DragonSpark.Runtime
 
 		readonly AssociatedDisposables cache;
 
-		DisposeAssociatedCommand( AssociatedDisposables cache ) : base( new IsAttachedSpecification<IDisposable, ICollection<IDisposable>>( cache ) )
+		DisposeAssociatedCommand( AssociatedDisposables cache ) : base( new CacheContains<IDisposable, ICollection<IDisposable>>( cache ) )
 		{
 			this.cache = cache;
 		}

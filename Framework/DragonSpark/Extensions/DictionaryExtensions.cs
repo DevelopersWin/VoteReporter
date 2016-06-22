@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DragonSpark.Runtime;
+using System;
 using System.Collections.Generic;
 
 namespace DragonSpark.Extensions
@@ -7,7 +8,7 @@ namespace DragonSpark.Extensions
 	{
 		public static TValue TryGet<TKey,TValue>( this IDictionary<TKey,TValue> target, TKey key ) => TryGet( target, key, null );
 
-		public static TValue TryGet<TKey,TValue>( this IDictionary<TKey,TValue> target, TKey key, Func<TValue> defaultValue ) => !Equals( default(TKey), key  ) && target.ContainsKey( key ) ? target[ key ] : defaultValue.With( x => x() );
+		public static TValue TryGet<TKey,TValue>( this IDictionary<TKey,TValue> target, TKey key, Func<TValue> defaultValue ) => key.IsAssigned() && target.ContainsKey( key ) ? target[ key ] : defaultValue.With( x => x() );
 
 		// public static void ExecuteOn<TKey, TValue>( this IDictionary<TKey, TValue> target, TKey key, Action<TValue> action ) => target.ContainsKey( key ).IsTrue( () => action( target[key] ) );
 
@@ -19,5 +20,7 @@ namespace DragonSpark.Extensions
 			}
 			return target[ key ];
 		}
+
+		public static Assignment<T1, T2> Assignment<T1, T2>( this IDictionary<T1, T2> @this, T1 first, T2 second )  => new Assignment<T1, T2>( new DictionaryAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
 	}
 }

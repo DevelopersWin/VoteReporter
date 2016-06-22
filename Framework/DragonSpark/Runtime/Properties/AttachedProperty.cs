@@ -26,8 +26,15 @@ namespace DragonSpark.Runtime.Properties
 			return @this.Get( instance );
 		}
 
-		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 first, T2 second ) where T1 : class => 
-			new Assignment<T1, T2>( new CacheAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
+		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 first, T2 second )  => new Assignment<T1, T2>( new CacheAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
+
+		/*static class Assign<T1, T2>
+		{
+			public static ICache<ICache<T1, T2>, CacheAssign<T1, T2>> Cache { get; } = new Cache<ICache<T1, T2>, CacheAssign<T1, T2>>( c => new CacheAssign<T1, T2>( c ) );
+
+		}*/
+
+		
 
 		public static Func<TInstance, TValue> ToDelegate<TInstance, TValue>( this ICache<TInstance, TValue> @this ) => DelegateCache<TInstance, TValue>.Default.Get( @this );
 		class DelegateCache<TInstance, TValue> : Cache<ICache<TInstance, TValue>, Func<TInstance, TValue>>

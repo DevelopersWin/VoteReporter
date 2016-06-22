@@ -13,35 +13,42 @@ namespace DragonSpark.Runtime.Stores
 			@this.Assign( value );
 			return @this;
 		}
+
+		public static Assignment<T> Assignment<T>( this IWritableStore<T> @this, T first )  => new Assignment<T>( new StoreAssign<T>( @this ), new Value<T>( first ) );
+
+		static class Assign<T>
+		{
+			public static ICache<IWritableStore<T>, StoreAssign<T>> Cache { get; } = new Cache<IWritableStore<T>, StoreAssign<T>>( c => new StoreAssign<T>( c ) );
+		}
 	}
 
-	public abstract class AttachedPropertySpecificationBase<TInstance, TValue> : SpecificationBase<TInstance> where TInstance : class
+	public abstract class CacheSpecificationBase<TInstance, TValue> : SpecificationBase<TInstance> where TInstance : class
 	{
-		protected AttachedPropertySpecificationBase( ICache<TInstance, TValue> property )
+		protected CacheSpecificationBase( ICache<TInstance, TValue> cache )
 		{
-			Property = property;
+			Cache = cache;
 		}
 
-		protected ICache<TInstance, TValue> Property { get; }
+		protected ICache<TInstance, TValue> Cache { get; }
 	}
 
-	public class AttachedPropertyValueSpecification<TInstance, TValue> : IsAttachedSpecification<TInstance, TValue> where TInstance : class
+	public class CacheValueSpecification<TInstance, TValue> : CacheContains<TInstance, TValue> where TInstance : class
 	{
 		readonly Func<TValue> value;
 
-		public AttachedPropertyValueSpecification( ICache<TInstance, TValue> property, Func<TValue> value ) : base( property )
+		public CacheValueSpecification( ICache<TInstance, TValue> cache, Func<TValue> value ) : base( cache )
 		{
 			this.value = value;
 		}
 
-		public override bool IsSatisfiedBy( TInstance parameter ) => base.IsSatisfiedBy( parameter ) && Equals( Property.Get( parameter ), value() );
+		public override bool IsSatisfiedBy( TInstance parameter ) => base.IsSatisfiedBy( parameter ) && Equals( Cache.Get( parameter ), value() );
 	}
 
-	public class IsAttachedSpecification<TInstance, TValue> : AttachedPropertySpecificationBase<TInstance, TValue> where TInstance : class
+	public class CacheContains<TInstance, TValue> : CacheSpecificationBase<TInstance, TValue> where TInstance : class
 	{
-		public IsAttachedSpecification( ICache<TInstance, TValue> property ) : base( property ) {}
+		public CacheContains( ICache<TInstance, TValue> cache ) : base( cache ) {}
 
-		public override bool IsSatisfiedBy( TInstance parameter ) => Property.Contains( parameter );
+		public override bool IsSatisfiedBy( TInstance parameter ) => Cache.Contains( parameter );
 	}
 
 	/*public class DelegatedWritableStore<T> : WritableStore<T>

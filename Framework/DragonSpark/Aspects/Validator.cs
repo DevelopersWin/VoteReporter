@@ -8,7 +8,6 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
-using System.Linq;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects
@@ -110,8 +109,6 @@ namespace DragonSpark.Aspects
 	public struct RelayParameter
 	{
 		readonly MethodInterceptionArgs args;
-
-		public RelayParameter( MethodInterceptionArgs args ) : this( args, args.Arguments.Single() ) {}
 
 		public RelayParameter( MethodInterceptionArgs args, object parameter )
 		{
