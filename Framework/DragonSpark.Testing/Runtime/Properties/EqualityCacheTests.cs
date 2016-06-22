@@ -1,10 +1,4 @@
-﻿using DragonSpark.Runtime.Properties;
-using DragonSpark.Testing.Objects;
-using Microsoft.Practices.ObjectBuilder2;
-using Ploeh.AutoFixture.Xunit2;
-using Xunit;
-
-namespace DragonSpark.Testing.Runtime.Properties
+﻿namespace DragonSpark.Testing.Runtime.Properties
 {
 	public class EqualityCacheTests
 	{
@@ -13,7 +7,7 @@ namespace DragonSpark.Testing.Runtime.Properties
 			
 		}*/
 
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		public void EqualityCheck( EqualityReference<NamedTypeBuildKey> sut )
 		{
 			var one = NamedTypeBuildKey.Make<Class>();
@@ -23,7 +17,7 @@ namespace DragonSpark.Testing.Runtime.Properties
 
 			Assert.Same( one, sut.Create( one ) );
 			Assert.Same( one, sut.Create( two ) );
-		}
+		}*/
 
 		/*[Fact]
 		public void HashCodeCheck()

@@ -2,6 +2,7 @@ using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -286,6 +287,49 @@ namespace DragonSpark.Runtime.Properties
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		//  internal WeakReference<T>[] TestOnly_UnderlyingArray { get { return _items; } }
+	}
+
+	class ArgumentCache : ArgumentCache<object[]>
+	{
+		public ArgumentCache( Func<object[], object> resultSelector ) : base( Delegates<object[]>.Self, resultSelector ) {}
+	}
+
+	class ArgumentCache<T> : ArgumentCache<T, object>
+	{
+		public ArgumentCache( Func<T, object[]> keySelector, Func<T, object> resultSelector ) : base( keySelector, resultSelector ) {}
+	}
+
+	class ArgumentCache<TContext, TValue> : SelectedCache<TContext, object[], TValue>
+	{
+		public ArgumentCache( Func<TContext, object[]> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, StructuralEqualityComparer<object[]>.Instance ) {}
+		public ArgumentCache( Func<TContext, object[]> keySelector, Func<TContext, TValue> resultSelector, IEqualityComparer<object[]> comparer ) : base( keySelector, resultSelector, comparer ) {}
+	}
+
+	class SelectedCache<TKey, TValue> : SelectedCache<TKey, TKey, TValue>
+	{
+		public SelectedCache( Func<TKey, TValue> resultSelector ) : this( resultSelector, EqualityComparer<TKey>.Default ) {}
+		public SelectedCache( Func<TKey, TValue> resultSelector, IEqualityComparer<TKey> comparer ) : base( Delegates<TKey>.Self, resultSelector, comparer ) {}
+	}
+
+	class SelectedCache<TContext, TKey, TValue> : ConcurrentDictionary<TKey, TValue>
+	{
+		readonly Func<TContext, TKey> keySelector;
+		readonly Func<TContext, TValue> resultSelector;
+
+		public SelectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, EqualityComparer<TKey>.Default ) {}
+
+		public SelectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector, IEqualityComparer<TKey> comparer ) : base( comparer )
+		{
+			this.keySelector = keySelector;
+			this.resultSelector = resultSelector;
+		}
+
+		public TValue Get( TContext context )
+		{
+			TValue result;
+			var key = keySelector( context );
+			return TryGetValue( key, out result ) ? result : GetOrAdd( key, resultSelector( context ) );
+		}
 	}
 
 	/*class ReferenceMonitor : IObservable<object>

@@ -85,8 +85,6 @@ namespace DragonSpark.TypeSystem
 		[Freeze]
 		public Type[] GetTypeArgumentsFor( Type implementationType, bool includeInterfaces = true ) => GetImplementations( implementationType, includeInterfaces ).First().GenericTypeArguments;
 
-		// public Type[] GetImplementations<T>( bool includeInterfaces = true ) => GetImplementations( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
-
 		[Freeze]
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true ) =>
 			Type.Append( includeInterfaces ? ExpandInterfaces( Type ) : Items<Type>.Default )
