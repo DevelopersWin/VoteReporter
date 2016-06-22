@@ -67,7 +67,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( 0, command.ExecuteGenericCalled );
 
 			command.Execute( new object() );
-			Assert.True( controller.IsValid( 6776 ) );
+			Assert.False( controller.IsValid( 6776 ) );
 
 			Assert.Equal( 5, command.CanExecuteCalled );
 			Assert.Equal( 3, command.CanExecuteGenericCalled );
@@ -75,13 +75,15 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( 0, command.ExecuteGenericCalled );
 
 			command.Execute( 123 );
-			Assert.True( controller.IsValid( 6776 ) );
+			Assert.False( controller.IsValid( 123 ) );
+			Assert.False( controller.IsValid( 6776 ) );
 
 			Assert.Equal( 6, command.CanExecuteCalled );
 			Assert.Equal( 4, command.CanExecuteGenericCalled );
 			Assert.Equal( 0, command.ExecuteCalled );
 			Assert.Equal( 0, command.ExecuteGenericCalled );
 
+			controller.MarkValid( 6776, true );
 			command.Execute( 6776 );
 
 			Assert.Equal( 6, command.CanExecuteCalled );

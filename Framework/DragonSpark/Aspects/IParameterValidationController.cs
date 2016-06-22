@@ -32,21 +32,16 @@ namespace DragonSpark.Aspects
 		readonly protected static object Null = new object();
 
 		readonly IParameterValidator validator;
-		readonly IWritableStore<IDictionary<object, bool>> validated = new ThreadLocalStore<IDictionary<object, bool>>( () => new Dictionary<object, bool>() );
+		readonly IWritableStore<object> validated = new ThreadLocalStore<object>( () => null );
 		
 		public ParameterValidationController( IParameterValidator validator )
 		{
 			this.validator = validator;
 		}
 
-		public bool IsValid( object parameter )
-		{
-			var key = parameter ?? Null;
-			var result = validated.Value.ContainsKey( key ) && validated.Value[ key ];
-			return result;
-		}
+		public bool IsValid( object parameter ) => Equals( validated.Value, parameter ?? Null );
 
-		public void MarkValid( object parameter, bool valid ) => validated.Value[parameter ?? Null] = valid;
+		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? Null : null );
 
 		protected virtual bool PerformValidation( object parameter ) => validator.IsValid( parameter );
 
@@ -55,7 +50,7 @@ namespace DragonSpark.Aspects
 		protected object Proceed( RelayParameter parameter )
 		{
 			var result = parameter.Proceed<object>();
-			validated.Value.Clear();
+			validated.Assign( null );
 			return result;
 		}
 	}
@@ -71,7 +66,7 @@ namespace DragonSpark.Aspects
 	{
 		readonly IGenericParameterValidator generic;
 
-		readonly IWritableStore<IDictionary<object, bool>> active = new ThreadLocalStore<IDictionary<object, bool>>( () => new Dictionary<object, bool>() );
+		readonly IWritableStore<object> active = new ThreadLocalStore<object>( () => null );
 
 		public GenericParameterValidationController( IGenericParameterValidator generic, IParameterValidator validator ) : base( validator )
 		{
@@ -82,14 +77,13 @@ namespace DragonSpark.Aspects
 
 		public override object Execute( RelayParameter parameter )
 		{
-			var dictionary = active.Value;
 			var key = parameter.Parameter ?? Null;
-			var handle = generic.Handles( parameter.Parameter ) && !dictionary.TryGet( key );
+			var handle = generic.Handles( parameter.Parameter ) && !Equals( active.Value, key );
 			if ( handle )
 			{
-				using ( dictionary.Assignment( key, true ) )
+				using ( active.Assignment( key ) )
 				{
-					var result = generic.Execute( key );
+					var result = generic.Execute( parameter.Parameter );
 					return result;
 				}
 			}
