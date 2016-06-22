@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -84,14 +83,14 @@ namespace DragonSpark.Activation
 
 			static ObjectActivator Create( ConstructorInfo parameter )
 			{
-				var parameters = parameter.GetParameters();
+				var parameters = parameter.GetParameterTypes();
 				var param = Expression.Parameter( typeof(object[]), "args" );
 
 				var array = new Expression[parameters.Length];
 				for ( var i = 0; i < parameters.Length; i++ )
 				{
 					var index = Expression.ArrayIndex( param, Expression.Constant( i ) );
-					array[i] = Expression.Convert( index, parameters[i].ParameterType );
+					array[i] = Expression.Convert( index, parameters[i] );
 				}
 
 				var create = Expression.New( parameter, array );

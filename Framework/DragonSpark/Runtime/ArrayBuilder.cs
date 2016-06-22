@@ -580,7 +580,7 @@ namespace DragonSpark.Runtime
 		/// </remarks>
 		internal void Free( T obj )
 		{
-			Validate( obj );
+			// Validate( obj );
 			// ForgetTrackedObject(obj);
 
 			if ( _firstItem == null )
@@ -611,7 +611,7 @@ namespace DragonSpark.Runtime
 				}
 			}
 		}
-
+/*
 		[Conditional( "DEBUG" )]
 		private void Validate( object obj )
 		{
@@ -630,7 +630,7 @@ namespace DragonSpark.Runtime
 
 				Debug.Assert( value != obj, "freeing twice?" );
 			}
-		}
+		}*/
 	}
 
 	internal class PooledHashSet<T> : HashSet<T>

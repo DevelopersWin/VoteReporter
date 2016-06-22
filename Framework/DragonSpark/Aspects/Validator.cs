@@ -61,19 +61,19 @@ namespace DragonSpark.Aspects
 	{
 		readonly Type genericType;
 		readonly string methodName;
-		readonly TypeAdapter adapter;
+		readonly GenericMethodInvoker invoker;
 
 		protected GenericParameterAdapterFactoryBase( Type parentType, Type genericType, string methodName = nameof(Create) )
 		{
 			this.genericType = genericType;
 			this.methodName = methodName;
-			adapter = parentType.Adapt();
+			invoker = parentType.Adapt().GenericMethods;
 		}
 
 		public override IGenericParameterValidator Create( object parameter )
 		{
 			var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = adapter.GenericMethods.Invoke<IGenericParameterValidator>( methodName, arguments, parameter.ToItem() );
+			var result = invoker.Invoke<IGenericParameterValidator>( methodName, arguments, parameter.ToItem() );
 			return result;
 		}
 	}

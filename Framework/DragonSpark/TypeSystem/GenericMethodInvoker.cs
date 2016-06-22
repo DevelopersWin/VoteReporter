@@ -2,11 +2,11 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace DragonSpark.TypeSystem
@@ -33,16 +33,48 @@ namespace DragonSpark.TypeSystem
 		public object Invoke( object instance, string methodName, Type[] genericTypes, params object[] arguments )
 		{
 			var key = new MethodDescriptor( methodName, genericTypes, ObjectTypeFactory.Instance.Create( arguments ) );
-			var info = cache.Get( key );
-			var result = info.Invoke( info.IsStatic ? null : instance, arguments );
-			return result;
+			var @delegate = cache.Get( key );
+
+			var factory = @delegate as Func<object, object[], object>;
+			if ( factory != null )
+			{
+				return factory( instance, arguments );
+			}
+
+			( (Action<object, object[]>)@delegate )( instance, arguments );
+			return null;
 		}
 
-		class ArgumentCache : ArgumentCache<MethodDescriptor, MethodInfo>
+		class InvokeDelegateFactory : Cache<MethodInfo, Delegate>
+		{
+			public static InvokeDelegateFactory Instance { get; } = new InvokeDelegateFactory();
+			InvokeDelegateFactory() : base( Create ) {}
+
+			static Delegate Create( MethodInfo parameter )
+			{
+				var parameters = parameter.GetParameterTypes();
+					var instance = Expression.Parameter( typeof(object), "instance" );
+					var arguments = Expression.Parameter( typeof(object[]), "args" );
+
+					var array = new Expression[parameters.Length];
+					for ( var i = 0; i < parameters.Length; i++ )
+					{
+						var index = Expression.ArrayIndex( arguments, Expression.Constant( i ) );
+						array[i] = Expression.Convert( index, parameters[i] );
+					}
+
+					var body = parameter.IsStatic ? Expression.Call( parameter, array ) : Expression.Call( instance, parameter, array );
+
+					var result = Expression.Lambda( body, instance, arguments ).Compile();
+					return result;
+			}
+		}
+
+		class ArgumentCache : ArgumentCache<MethodDescriptor, Delegate>
 		{
 			public ArgumentCache( Type type ) : base( descriptor => descriptor.Key, new Factory( type ).Create ) {}
 
-			class Factory : FactoryBase<MethodDescriptor, MethodInfo>
+			class Factory : FactoryBase<MethodDescriptor, Delegate>
 			{
 				readonly static Func<ValueTuple<MethodInfo, MethodDescriptor>, MethodInfo> CreateSelector = Create;
 
@@ -53,12 +85,13 @@ namespace DragonSpark.TypeSystem
 					this.type = type;
 				}
 
-				public override MethodInfo Create( MethodDescriptor parameter )
+				public override Delegate Create( MethodDescriptor parameter )
 				{
-					var result = type.GetRuntimeMethods()
+					var method = type.GetRuntimeMethods()
 									 .Introduce( parameter, tuple => GenericMethodEqualitySpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ), CreateSelector )
 									 .Introduce( parameter, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2.ArgumentTypes ) )
 									 .SingleOrDefault();
+					var result = InvokeDelegateFactory.Instance.Get( method );
 					return result;
 				}
 
@@ -90,33 +123,20 @@ namespace DragonSpark.TypeSystem
 				Context.GetGenericArguments().Length == parameter.GenericTypes.Length;
 		}
 
-		public struct MethodDescriptor : IEquatable<MethodDescriptor>
+		struct MethodDescriptor
 		{
-			readonly int code;
-
 			public MethodDescriptor( string name, Type[] genericTypes, Type[] argumentTypes )
 			{
 				Name = name;
 				GenericTypes = genericTypes;
 				ArgumentTypes = argumentTypes;
 				Key = new object[] { name, genericTypes, argumentTypes };
-				code = StructuralEqualityComparer<object[]>.Instance.GetHashCode( Key );
 			}
 
 			public string Name { get; }
 			public Type[] GenericTypes { get; }
 			public Type[] ArgumentTypes { get; }
 			public object[] Key { get; }
-
-			public bool Equals( MethodDescriptor other ) => code == other.code;
-
-			public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && obj is MethodDescriptor && Equals( (MethodDescriptor)obj );
-
-			public override int GetHashCode() => code;
-
-			public static bool operator ==( MethodDescriptor left, MethodDescriptor right ) => left.Equals( right );
-
-			public static bool operator !=( MethodDescriptor left, MethodDescriptor right ) => !left.Equals( right );
 		}
 	}
 
@@ -124,14 +144,14 @@ namespace DragonSpark.TypeSystem
 	{
 		public static ObjectTypeFactory Instance { get; } = new ObjectTypeFactory();
 
+		// [Freeze]
 		public override Type[] Create( object[] parameter )
 		{
-			var builder = ArrayBuilder<Type>.GetInstance();
-			foreach ( var item in parameter )
+			var result = new Type[parameter.Length];
+			for ( var i = 0; i < parameter.Length; i++ )
 			{
-				builder.Add( item?.GetType() );
+				result[i] = parameter[i]?.GetType();
 			}
-			var result = builder.ToArrayAndFree();
 			return result;
 		}
 	}
