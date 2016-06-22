@@ -2,14 +2,13 @@ using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
 namespace DragonSpark.Runtime.Properties
 {
-	public class EqualityCache<TKey, TValue> : CacheBase<TKey, TValue>
+	/*public class EqualityCache<TKey, TValue> : CacheBase<TKey, TValue>
 	{
 		public EqualityCache( Func<TKey, TValue> create ) : this( new Dictionary<TKey, TValue>(), create ) {}
 
@@ -29,9 +28,9 @@ namespace DragonSpark.Runtime.Properties
 		public override void Set( TKey instance, TValue value ) => Store[instance] = value;
 
 		public override TValue Get( TKey instance ) => Store.Ensure( instance, Create );
-	}
+	}*/
 
-	public class ConcurrentEqualityCache<TKey, TValue> : EqualityCache<TKey, TValue>
+	/*public class ConcurrentEqualityCache<TKey, TValue> : EqualityCache<TKey, TValue>
 	{
 		readonly ConcurrentDictionary<TKey, TValue> store;
 		public ConcurrentEqualityCache( Func<TKey, TValue> create ) : this( new ConcurrentDictionary<TKey, TValue>(), create ) {}
@@ -42,7 +41,7 @@ namespace DragonSpark.Runtime.Properties
 		}
 
 		public override TValue Get( TKey instance ) => store.GetOrAdd( instance, Create );
-	}
+	}*/
 
 	/*public struct StructureOrWeakReference
 	{

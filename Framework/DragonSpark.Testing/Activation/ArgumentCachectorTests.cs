@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Activation
 {
-	public class ConstructorTests
+	public class ArgumentCachectorTests
 	{
 		[Theory, AutoData]
 		public void CreateDefault( Constructor sut )

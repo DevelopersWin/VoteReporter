@@ -1,8 +1,7 @@
-using DragonSpark.Aspects;
+using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections.Immutable;
 
 namespace DragonSpark.Activation
 {
@@ -19,7 +18,7 @@ namespace DragonSpark.Activation
 		public LocateTypeRequest( [Required] Type type, string name = null ) : base( type )
 		{
 			Name = name;
-			code = KeyFactory.Create( ImmutableArray.Create<object>( RequestedType, name ) );
+			code = StructuralEqualityComparer<object[]>.Instance.GetHashCode( new object[] { RequestedType, name } );
 		}
 
 		public string Name { get; }
@@ -36,7 +35,7 @@ namespace DragonSpark.Activation
 		public ConstructTypeRequest( Type type, params object[] arguments ) : base( type )
 		{
 			Arguments = arguments;
-			code = KeyFactory.Create( ImmutableArray.Create<object>( RequestedType, Arguments ) );
+			code = StructuralEqualityComparer<object[]>.Instance.GetHashCode( new object[] { RequestedType, Arguments } );
 		}
 
 		public object[] Arguments { get; }

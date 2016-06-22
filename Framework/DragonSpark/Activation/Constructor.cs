@@ -1,10 +1,11 @@
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -18,7 +19,7 @@ namespace DragonSpark.Activation
 
 		public static Constructor Instance { get; } = new Constructor();
 
-		Constructor() : this( Locator.Instance.ToDelegate(), ObjectActivatorFactory.Instance.ToDelegate() ) {}
+		Constructor() : this( ArgumentCache.Instance.Get, ObjectActivatorFactory.Instance.ToDelegate() ) {}
 
 		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, ObjectActivator> activatorSource ) : base( Specification.Instance )
 		{
@@ -48,40 +49,39 @@ namespace DragonSpark.Activation
 		{
 			public static Specification Instance { get; } = new Specification();
 
-			readonly Func<ConstructTypeRequest, ConstructorInfo> source;
+			readonly ArgumentCache cache;
 
-			Specification() : this( Locator.Instance.ToDelegate() ) {}
-			Specification( Func<ConstructTypeRequest, ConstructorInfo> source ) : base( Coercer.Instance.ToDelegate() )
+			Specification() : this( ArgumentCache.Instance ) {}
+			Specification( ArgumentCache cache ) : base( Coercer.Instance.ToDelegate() )
 			{
-				this.source = source;
+				this.cache = cache;
 			}
 
-			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || source( parameter ) != null;
+			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || cache.Get( parameter ) != null;
 		}
 
-		internal class Locator  : ConcurrentEqualityCache<ConstructTypeRequest, ConstructorInfo>
+		internal class ArgumentCache : SelectedCache<ConstructTypeRequest, ConstructorInfo>
 		{
-			public static Locator Instance { get; } = new Locator();
-			Locator() : base( Determine ) {}
+			public static ArgumentCache Instance { get; } = new ArgumentCache();
+			ArgumentCache() : base( Determine ) {}
 
 			static ConstructorInfo Determine( ConstructTypeRequest parameter )
 			{
-				var candidates = ImmutableArray.Create( parameter.Arguments, parameter.Arguments.WhereAssigned().Fixed(), Items<object>.Default );
+				var candidates = new[] { parameter.Arguments, parameter.Arguments.WhereAssigned().Fixed(), Items<object>.Default };
 				var adapter = parameter.RequestedType.Adapt();
 				var result = candidates
-					.Select( adapter.FindConstructor )
+					.Introduce( adapter )
+					.Select( tuple => tuple.Item2.FindConstructor( tuple.Item1 )  )
 					.FirstOrDefault();
 				return result;
 			}
 		}
 
-		// [AutoValidation( false )]
 		class ObjectActivatorFactory : Cache<ConstructorInfo, ObjectActivator>
 		{
 			public static ObjectActivatorFactory Instance { get; } = new ObjectActivatorFactory();
 			ObjectActivatorFactory() : base( Create ) {}
 
-			// [Freeze]
 			static ObjectActivator Create( ConstructorInfo parameter )
 			{
 				var parameters = parameter.GetParameters();
