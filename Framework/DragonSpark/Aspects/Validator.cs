@@ -73,7 +73,7 @@ namespace DragonSpark.Aspects
 		public override IGenericParameterValidator Create( object parameter )
 		{
 			var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = adapter.Invoke<IGenericParameterValidator>( methodName, arguments, parameter.ToItem() );
+			var result = adapter.GenericMethods.Invoke<IGenericParameterValidator>( methodName, arguments, parameter.ToItem() );
 			return result;
 		}
 	}

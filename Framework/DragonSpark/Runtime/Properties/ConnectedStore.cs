@@ -93,7 +93,7 @@ namespace DragonSpark.Runtime.Properties
 
 	public static class AmbientStack
 	{
-		public static object GetCurrentItem( [Required]Type type ) => typeof(AmbientStack).Adapt().Invoke( nameof(GetCurrentItem), type.ToItem() );
+		public static object GetCurrentItem( [Required]Type type ) => typeof(AmbientStack).Adapt().GenericMethods.Invoke( nameof(GetCurrentItem), type.ToItem() );
 
 		public static T GetCurrentItem<T>() => AmbientStack<T>.Default.GetCurrentItem();
 

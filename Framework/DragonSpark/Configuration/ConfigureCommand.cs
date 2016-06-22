@@ -15,7 +15,7 @@ namespace DragonSpark.Configuration
 		{
 			foreach ( var store in parameter )
 			{
-				GetType().Adapt().Invoke( nameof(Add), store.GetType().ToItem(), store.ToItem() ); 
+				GetType().Adapt().GenericMethods.Invoke( nameof(Add), store.GetType().ToItem(), store.ToItem() ); 
 			}
 		}
 

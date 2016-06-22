@@ -54,7 +54,7 @@ namespace DragonSpark.TypeSystem
 		public override object Create( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
-			var result = type != null ? typeof(Enumerable).Adapt().Invoke( nameof(Enumerable.Empty), type.ToItem() ) : GetType().Adapt().Invoke( nameof(Default), parameter.ToItem() );
+			var result = type != null ? typeof(Enumerable).Adapt().GenericMethods.Invoke( nameof(Enumerable.Empty), type.ToItem() ) : GetType().Adapt().GenericMethods.Invoke( nameof(Default), parameter.ToItem() );
 			return result;
 		}
 

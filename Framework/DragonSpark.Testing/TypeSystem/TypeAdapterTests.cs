@@ -27,6 +27,8 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Throws<ArgumentNullException>( () => { new TypeAdapter( null, null ); } );
 		}
 
+
+
 		class Casted
 		{
 			public Casted( int item )

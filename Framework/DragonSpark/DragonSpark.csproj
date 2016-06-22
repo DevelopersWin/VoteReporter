@@ -221,6 +221,7 @@
     <Compile Include="Diagnostics\ProfilerFactory.cs" />
     <Compile Include="Diagnostics\TimerEvents.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
+    <Compile Include="Runtime\ArrayBuilder.cs" />
     <Compile Include="Runtime\DisposableAction.cs" />
     <Compile Include="Runtime\DisposableExtensions.cs" />
     <Compile Include="Runtime\EnabledState.cs" />
@@ -288,6 +289,7 @@
     <Compile Include="TypeSystem\Default.cs" />
     <Compile Include="TypeSystem\DefaultValueFactory.cs" />
     <Compile Include="TypeSystem\DerivedMethodSpecification.cs" />
+    <Compile Include="TypeSystem\GenericMethodInvoker.cs" />
     <Compile Include="TypeSystem\HostingAttribute.cs" />
     <Compile Include="TypeSystem\IAttributeProvider.cs" />
     <Compile Include="TypeSystem\IAttributeProviderLocator.cs" />

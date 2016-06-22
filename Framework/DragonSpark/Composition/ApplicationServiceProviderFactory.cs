@@ -27,7 +27,7 @@ namespace DragonSpark.Composition
 			public new static Specification Instance { get; } = new Specification();
 
 			[Freeze]
-			public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.IsSatisfiedBy( parameter ) && ResultTypeLocator.Instance.Get( parameter ) != typeof(object) && parameter.Adapt().IsDefined<ExportAttribute>();
+			public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.IsSatisfiedBy( parameter ) && ResultTypeLocator.Instance.Get( parameter ) != typeof(object) && parameter.Has<ExportAttribute>();
 		}
 
 		public override FactoryTypeRequest Create( Type parameter )

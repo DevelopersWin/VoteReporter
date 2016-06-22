@@ -25,6 +25,16 @@ namespace DragonSpark.Testing.Runtime.Properties
 			Assert.Same( one, sut.Create( two ) );
 		}
 
+		/*[Fact]
+		public void HashCodeCheck()
+		{
+			var one = new TypeAdapter.MethodDescriptor( "SomeMethod", new[] { typeof(int), typeof(bool) }, 123, false );
+			var two = new TypeAdapter.MethodDescriptor( "SomeMethod", new[] { typeof(int), typeof(bool) }, 123, false );
+
+			Assert.Equal( one, two );
+			Assert.True( one.Equals( two ) );
+		}*/
+
 		/*[Theory, AutoData]
 		public void EqualityCheck( string name, int[] numbers, DateTime[] dates )
 		{

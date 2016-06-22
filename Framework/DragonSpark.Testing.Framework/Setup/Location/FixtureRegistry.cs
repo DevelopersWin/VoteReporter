@@ -30,7 +30,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		public void Register( [Required]InstanceRegistrationParameter parameter ) => Invoke( parameter.RequestedType, nameof(RegisterInstance), parameter.Instance );
 
-		void Invoke( Type type, string name, object parameter ) => GetType().Adapt().Invoke( this, name, type.ToItem(), parameter );
+		void Invoke( Type type, string name, object parameter ) => GetType().Adapt().GenericMethods.Invoke( this, name, type.ToItem(), parameter );
 
 		void RegisterInstance<T>( [Required]T instance )
 		{
