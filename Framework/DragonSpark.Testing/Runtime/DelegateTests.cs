@@ -110,6 +110,37 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( first, second );
 		}
 
+		/*[Theory, AutoData]
+		void Performance( string message )
+		{
+			using ( new ProfilerFactory( Output.WriteLine ).Create( MethodBase.GetCurrentMethod() ) )
+			{
+				var item = new BasicClass();
+				for ( int i = 0; i < 10000; i++ )
+				{
+					var source = new Action( item.Empty );
+					DelegateContext<string>.Instance.Create( source, "Hello World!" );
+					
+				}
+			}
+
+			using ( new ProfilerFactory( Output.WriteLine ).Create( MethodBase.GetCurrentMethod() ) )
+			{
+				for ( int i = 0; i < 10000; i++ )
+				{
+					var source = new Action( new BasicClass().Empty );
+					
+				}
+			}
+		}
+
+		class BasicClass
+		{
+			public void Empty() {}
+
+			public string HelloWorld( int number ) => $"Hello World: {number}. Message: {DelegateContext<string>.Instance.Current()}";
+		}*/
+
 		/*[Fact]
 		public void BasicInvocation()
 		{
@@ -232,32 +263,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Contains( message, result );
 		}
 
-		[Theory, AutoData]
-		void Performance( string message )
-		{
-			/*using ( new ProfilerFactory( Output.WriteLine ).Create( MethodBase.GetCurrentMethod() ) )
-			{
-				var item = new BasicClass();
-				for ( int i = 0; i < 10000; i++ )
-				{
-					var source = new Action( item.Empty );
-					Property<Action>.Instance.GetDirect( source );
-				}
-			}#1#
-
-			/*using ( new ProfilerFactory( Output.WriteLine ).Create( MethodBase.GetCurrentMethod() ) )
-			{
-				for ( int i = 0; i < 10000; i++ )
-				{
-					var source = new Action( new BasicClass().Empty );
-					
-				}
-			}#1#
-			
-			/*var result = item( number );
-			Assert.Contains( number.ToString(), result );
-			Assert.Contains( message, result );#1#
-		}
+		
 
 		class Property<T> : ContextAwareDelegateProperty<T> where T : class
 		{
@@ -284,12 +290,7 @@ namespace DragonSpark.Testing.Runtime
 			}
 		}
 
-		class BasicClass
-		{
-			public void Empty() {}
-
-			public string HelloWorld( int number ) => $"Hello World: {number}. Message: {CurrentDelegate.Get<string>()}";
-		}
+		
 
 		[Theory, AutoData]
 		void PropertyContext( Factory factory, Parameter parameter, string name )

@@ -252,6 +252,43 @@ namespace DragonSpark.Runtime
 		DelegateType() : base( info => Expression.GetDelegateType( info.GetParameterTypes().Append( info.ReturnType ).Fixed() ) ) {}
 	}
 
+	class DelegateStack : AmbientStack<IDelegateInvoker>
+	{
+		public new static DelegateStack Default { get; } = new DelegateStack();
+	}
+
+	class DelegateContext<T> : Cache<IDelegateInvoker, T> where T : class
+	{
+		public static DelegateContext<T> Instance { get; } = new DelegateContext<T>();
+
+		public T Current() => Get( DelegateStack.Default.GetCurrentItem() );
+
+		public IDelegateInvoker Create( Delegate target, T context )
+		{
+			var core = Invoker.Default.Get( target );
+			Set( core, context );
+			var result = new ContextDelegateInvoker( core );
+			return result;
+		}
+	}
+
+	class ContextDelegateInvoker : IDelegateInvoker
+	{
+		readonly IDelegateInvoker invoker;
+		public ContextDelegateInvoker( IDelegateInvoker invoker )
+		{
+			this.invoker = invoker;
+		}
+
+		public object Invoke( object[] arguments )
+		{
+			using ( new DelegateStack.Assignment( invoker ) )
+			{
+				return invoker.Invoke( arguments );
+			}
+		}
+	}
+
 	/*public static class Invocation
 	{
 		public static Delegate GetCurrent() => AmbientStack.GetCurrentItem<Delegate>();
@@ -331,11 +368,6 @@ namespace DragonSpark.Runtime
 				return result;
 			}
 		}
-	}
-
-	class DelegateStack : AmbientStack<DelegateWithParameterCache>
-	{
-		public new static DelegateStack Default { get; } = new DelegateStack();
 	}
 
 	interface IDelegateStore : IStore<DelegateWithParameterCache> {}
