@@ -1,10 +1,6 @@
-﻿using DragonSpark.Runtime;
-using Ploeh.AutoFixture.Xunit2;
-using Xunit;
-
-namespace DragonSpark.Testing.Runtime
+﻿namespace DragonSpark.Testing.Runtime
 {
-	public class EnabledStateTests
+	/*public class EnabledStateTests
 	{
 		[Theory, AutoData]
 		public void BasicValues( EnabledState sut )
@@ -40,5 +36,5 @@ namespace DragonSpark.Testing.Runtime
 			Assert.False( sut.IsEnabled( 456 ) );
 			Assert.False( sut.IsEnabled( o ) );
 		}
-	}
+	}*/
 }

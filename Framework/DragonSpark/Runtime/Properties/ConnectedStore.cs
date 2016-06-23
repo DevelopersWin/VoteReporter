@@ -209,7 +209,9 @@ namespace DragonSpark.Runtime.Properties
 	{
 		readonly ThreadLocal<T> local;
 
-		public ThreadLocalStore( [Required]Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
+		public ThreadLocalStore() : this( () => default(T) ) {}
+
+		public ThreadLocalStore( Func<T> create ) : this( new ThreadLocal<T>( create ) ) {}
 
 		public ThreadLocalStore( ThreadLocal<T> local )
 		{
@@ -227,15 +229,6 @@ namespace DragonSpark.Runtime.Properties
 			base.OnDispose();
 		}
 	}
-
-	/*public class EqualityReference<T> : ExecutionCachedStoreBase<ConcurrentDictionary<int, T>> where T : class
-	{
-		public T From( T instance ) => Value.GetOrAdd( instance.GetHashCode(), instance.ToFactory<int, T>().ToDelegate() );
-
-		public EqualityReference() : base( new ActivatedCache<ConcurrentDictionary<int, T>>() ) {}
-
-		// public EqualityReference( Func<object> instance, IAttachedProperty<object, ConcurrentDictionary<int, T>> cache, ICoercer<ConcurrentDictionary<int, T>> coercer ) : base( instance, cache, coercer ) {}
-	}*/
 
 	public class EqualityReference<T> : TransformerBase<T> where T : class
 	{

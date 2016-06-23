@@ -59,7 +59,7 @@ namespace DragonSpark.Activation
 			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || cache.Get( parameter ) != null;
 		}
 
-		internal class ArgumentCache : SelectedCache<ConstructTypeRequest, ConstructorInfo>
+		internal class ArgumentCache : ProjectedCache<ConstructTypeRequest, ConstructorInfo>
 		{
 			public static ArgumentCache Instance { get; } = new ArgumentCache();
 			ArgumentCache() : base( Determine ) {}

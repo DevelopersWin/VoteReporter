@@ -17,17 +17,22 @@ namespace DragonSpark.Testing.Runtime
 		[Fact]
 		public void DelegateType()
 		{
+			var sut = new TypeSubject();
 			var cache = DragonSpark.Runtime.DelegateType.Default;
-			Assert.Equal( typeof(Action), cache.Get( new Action( Command ).Method ) );
-			Assert.Equal( typeof(Action<int>), cache.Get( new Action<int>( Command ).Method ) );
-			Assert.Equal( typeof(Func<string, DateTime>), cache.Get( new Func<string, DateTime>( Factory ).Method ) );
+			Assert.Equal( typeof(Action), cache.Get( new Action( sut.Command ).Method ) );
+			Assert.Equal( typeof(Action<int>), cache.Get( new Action<int>( sut.Command ).Method ) );
+			Assert.Equal( typeof(Func<string, DateTime>), cache.Get( new Func<string, DateTime>( sut.Factory ).Method ) );
 		}
 
-		void Command( int number ) {}
 
-		void Command() {}
+		class TypeSubject
+		{
+			public void Command( int number ) {}
 
-		DateTime Factory( string message ) => DateTime.Now;
+			public void Command() {}
+
+			public DateTime Factory( string message ) => DateTime.Now;
+		}
 
 		[Theory, AutoData]
 		void Action( Mock<Subject> sut )

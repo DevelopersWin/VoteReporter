@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
@@ -18,86 +17,10 @@ using System.Windows.Input;
 
 namespace DragonSpark.Aspects
 {
-	public interface IParameterValidationController
-	{
-		bool IsValid( object parameter );
-
-		void MarkValid( object parameter, bool valid );
-
-		object Execute( RelayParameter parameter );
-	}
-
-	public class ParameterValidationController : IParameterValidationController
-	{
-		readonly protected static object Null = new object();
-
-		readonly IParameterValidator validator;
-		readonly IWritableStore<object> validated = new ThreadLocalStore<object>( () => null );
-		
-		public ParameterValidationController( IParameterValidator validator )
-		{
-			this.validator = validator;
-		}
-
-		public bool IsValid( object parameter ) => Equals( validated.Value, parameter ?? Null );
-
-		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? Null : null );
-
-		protected virtual bool PerformValidation( object parameter ) => validator.IsValid( parameter );
-
-		public virtual object Execute( RelayParameter parameter ) => IsValid( parameter.Parameter ) || PerformValidation( parameter.Parameter ) ? Proceed( parameter ) : null;
-
-		protected object Proceed( RelayParameter parameter )
-		{
-			var result = parameter.Proceed<object>();
-			validated.Assign( null );
-			return result;
-		}
-	}
-
-	public interface IGenericParameterValidator : IParameterValidator
-	{
-		bool Handles( object parameter );
-
-		object Execute( object parameter );
-	}
-
-	public sealed class GenericParameterValidationController : ParameterValidationController, IGenericParameterValidationController
-	{
-		readonly IGenericParameterValidator generic;
-
-		readonly IWritableStore<object> active = new ThreadLocalStore<object>( () => null );
-
-		public GenericParameterValidationController( IGenericParameterValidator generic, IParameterValidator validator ) : base( validator )
-		{
-			this.generic = generic;
-		}
-
-		protected override bool PerformValidation( object parameter ) => generic.Handles( parameter ) ? generic.IsValid( parameter ) : base.PerformValidation( parameter );
-
-		public override object Execute( RelayParameter parameter )
-		{
-			var key = parameter.Parameter ?? Null;
-			var handle = generic.Handles( parameter.Parameter ) && !Equals( active.Value, key );
-			if ( handle )
-			{
-				using ( active.Assignment( key ) )
-				{
-					var result = generic.Execute( parameter.Parameter );
-					return result;
-				}
-			}
-			
-			return base.Execute( parameter );
-		}
-
-		public object ExecuteGeneric( RelayParameter parameter ) => base.Execute( parameter );
-	}
-
 	[PSerializable]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class ParameterValidatorAspectBase : MethodInterceptionAspect
+	public abstract class ParameterValidatorAspectBase : MethodInterceptionAspect // , IInstanceScopedAspect
 	{
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
@@ -112,9 +35,22 @@ namespace DragonSpark.Aspects
 			{
 				throw new InvalidOperationException( $"Controller not set for {args.Instance} - {args.Instance.GetHashCode()}" );
 			}
+/*
+			if ( !PostSharpEnvironment.IsPostSharpRunning )
+			{
+				
+			}
+			else
+			{
+				base.OnInvoke( args );
+			}
+*/
 		}
 
 		protected abstract object Execute( IParameterValidationController controller, RelayParameter parameter );
+		/*public object CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
+
+		public void RuntimeInitializeInstance() {}*/
 	}
 
 	[PSerializable]
@@ -125,7 +61,7 @@ namespace DragonSpark.Aspects
 		protected override object Execute( IParameterValidationController controller, RelayParameter parameter ) => controller.Execute( parameter );
 	}
 
-	[PSerializable]
+	/*[PSerializable]
 	public sealed class GenericExecutionAspect : ExecutionAspect
 	{
 		public new static GenericExecutionAspect Instance { get; } = new GenericExecutionAspect();
@@ -140,7 +76,7 @@ namespace DragonSpark.Aspects
 			}
 			throw new InvalidOperationException( "Expecting a generic controller." );
 		}
-	}
+	}*/
 
 	[PSerializable]
 	public class ValidatorAspect : ParameterValidatorAspectBase
@@ -231,7 +167,7 @@ namespace DragonSpark.Aspects
 
 				foreach ( var check in types )
 				{
-					var isGeneric = check.GetTypeInfo().IsGenericTypeDefinition;
+					// var isGeneric = check.GetTypeInfo().IsGenericTypeDefinition;
 					
 					var mappedMethods = type.Adapt().GetMappedMethods( check );
 
@@ -240,7 +176,7 @@ namespace DragonSpark.Aspects
 						if ( pair.Item2.DeclaringType == type && !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
 						{
 							var aspect = pair.Item1.Name == profile.IsValid ? ValidatorAspect.Instance :
-										 pair.Item1.Name == profile.Execute ? isGeneric ? GenericExecutionAspect.Instance : ExecutionAspect.Instance
+										 pair.Item1.Name == profile.Execute ? /*isGeneric ? GenericExecutionAspect.Instance : */ExecutionAspect.Instance
 										 : default(IAspect);
 
 							if ( aspect != null )
@@ -297,8 +233,8 @@ namespace DragonSpark.Aspects
 		public override IParameterValidationController Create( object instance ) => new GenericParameterValidationController( generic( instance ), store( instance ) );
 	}
 
-	public interface IGenericParameterValidationController : IParameterValidationController
+	/*public interface IGenericParameterValidationController : IParameterValidationController
 	{
-		object ExecuteGeneric( RelayParameter parameter );
-	}
+		// object ExecuteGeneric( RelayParameter parameter );
+	}*/
 }

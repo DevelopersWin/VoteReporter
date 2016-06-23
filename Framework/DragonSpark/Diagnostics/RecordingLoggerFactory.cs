@@ -40,7 +40,7 @@ namespace DragonSpark.Diagnostics
 
 		public override void Execute( Action<LogEvent> parameter ) => base.Execute( new Migrater( parameter ).Execute );
 
-		struct Migrater
+		class Migrater
 		{
 			readonly Action<LogEvent> action;
 

@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace DragonSpark.Runtime
+﻿namespace DragonSpark.Runtime
 {
-	public class EnabledState
+	/*public class EnabledState
 	{
 		readonly static object Null = new object();
 
@@ -29,5 +27,5 @@ namespace DragonSpark.Runtime
 	{
 		public static Assignment<object, bool> Assignment( this EnabledState @this, object first, bool second = true ) =>
 			new Assignment<object, bool>( new EnabledStateAssign( @this ), Assignments.From( first ), new Value<bool>( second ) );
-	}
+	}*/
 }
