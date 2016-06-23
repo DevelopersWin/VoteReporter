@@ -35,16 +35,6 @@ namespace DragonSpark.Aspects
 			{
 				throw new InvalidOperationException( $"Controller not set for {args.Instance} - {args.Instance.GetHashCode()}" );
 			}
-/*
-			if ( !PostSharpEnvironment.IsPostSharpRunning )
-			{
-				
-			}
-			else
-			{
-				base.OnInvoke( args );
-			}
-*/
 		}
 
 		protected abstract object Execute( IParameterValidationController controller, RelayParameter parameter );
@@ -60,23 +50,6 @@ namespace DragonSpark.Aspects
 
 		protected override object Execute( IParameterValidationController controller, RelayParameter parameter ) => controller.Execute( parameter );
 	}
-
-	/*[PSerializable]
-	public sealed class GenericExecutionAspect : ExecutionAspect
-	{
-		public new static GenericExecutionAspect Instance { get; } = new GenericExecutionAspect();
-		GenericExecutionAspect() {}
-
-		protected override object Execute( IParameterValidationController controller, RelayParameter parameter )
-		{
-			var generic = controller as IGenericParameterValidationController;
-			if ( generic != null )
-			{
-				return generic.ExecuteGeneric( parameter );
-			}
-			throw new InvalidOperationException( "Expecting a generic controller." );
-		}
-	}*/
 
 	[PSerializable]
 	public class ValidatorAspect : ParameterValidatorAspectBase
@@ -167,8 +140,6 @@ namespace DragonSpark.Aspects
 
 				foreach ( var check in types )
 				{
-					// var isGeneric = check.GetTypeInfo().IsGenericTypeDefinition;
-					
 					var mappedMethods = type.Adapt().GetMappedMethods( check );
 
 					foreach ( var pair in mappedMethods )
@@ -176,7 +147,7 @@ namespace DragonSpark.Aspects
 						if ( pair.Item2.DeclaringType == type && !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
 						{
 							var aspect = pair.Item1.Name == profile.IsValid ? ValidatorAspect.Instance :
-										 pair.Item1.Name == profile.Execute ? /*isGeneric ? GenericExecutionAspect.Instance : */ExecutionAspect.Instance
+										 pair.Item1.Name == profile.Execute ? ExecutionAspect.Instance
 										 : default(IAspect);
 
 							if ( aspect != null )
@@ -209,32 +180,13 @@ namespace DragonSpark.Aspects
 
 	class ParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
 	{
-		readonly Func<object, IParameterAwareAdapter> create;
+		readonly Func<object, IParameterValidator> create;
 
-		public ParameterValidationControllerFactory( Func<object, IParameterAwareAdapter> create )
+		public ParameterValidationControllerFactory( Func<object, IParameterValidator> create )
 		{
 			this.create = create;
 		}
 
 		public override IParameterValidationController Create( object instance ) => new ParameterValidationController( create( instance ) );
 	}
-
-	/*class GenericParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
-	{
-		readonly Func<object, IGenericParameterValidator> generic;
-		readonly Func<object, IParameterAwareAdapter> store;
-
-		public GenericParameterValidationControllerFactory( Func<object, IGenericParameterValidator> generic, Func<object, IParameterAwareAdapter> store )
-		{
-			this.generic = generic;
-			this.store = store;
-		}
-
-		public override IParameterValidationController Create( object instance ) => new GenericParameterValidationController( generic( instance ), store( instance ) );
-	}*/
-
-	/*public interface IGenericParameterValidationController : IParameterValidationController
-	{
-		// object ExecuteGeneric( RelayParameter parameter );
-	}*/
 }

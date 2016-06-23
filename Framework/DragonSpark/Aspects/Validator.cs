@@ -52,12 +52,12 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}
 
-	abstract class ParameterAdapterFactoryBase<T> : ProjectedFactory<T, IParameterAwareAdapter> where T : class
+	abstract class ParameterAdapterFactoryBase<T> : ProjectedFactory<T, IParameterValidator> where T : class
 	{
-		protected ParameterAdapterFactoryBase( Func<T, IParameterAwareAdapter> create ) : base( create ) {}
+		protected ParameterAdapterFactoryBase( Func<T, IParameterValidator> create ) : base( create ) {}
 	}
 
-	abstract class GenericParameterAdapterFactoryBase : FactoryBase<object, IParameterAwareAdapter>
+	abstract class GenericParameterAdapterFactoryBase : FactoryBase<object, IParameterValidator>
 	{
 		readonly Type genericType;
 		readonly string methodName;
@@ -70,10 +70,10 @@ namespace DragonSpark.Aspects
 			invoker = parentType.Adapt().GenericMethods;
 		}
 
-		public override IParameterAwareAdapter Create( object parameter )
+		public override IParameterValidator Create( object parameter )
 		{
 			var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = invoker.Invoke<IParameterAwareAdapter>( methodName, arguments, parameter.ToItem() );
+			var result = invoker.Invoke<IParameterValidator>( methodName, arguments, parameter.ToItem() );
 			return result;
 		}
 	}
@@ -84,7 +84,7 @@ namespace DragonSpark.Aspects
 
 		GenericFactoryParameterAdapterFactory() : base( typeof(GenericFactoryParameterAdapterFactory), typeof(IFactory<,>) ) {}
 
-		static IParameterAwareAdapter Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
+		static IParameterValidator Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
 	class GenericCommandParameterAdapterFactory : GenericParameterAdapterFactoryBase
 	{
@@ -92,7 +92,7 @@ namespace DragonSpark.Aspects
 
 		GenericCommandParameterAdapterFactory() : base( typeof(GenericCommandParameterAdapterFactory), typeof(ICommand<>) ) {}
 
-		static IParameterAwareAdapter Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
+		static IParameterValidator Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
 	class CommandParameterAdapterFactory : ParameterAdapterFactoryBase<ICommand>
@@ -117,17 +117,13 @@ namespace DragonSpark.Aspects
 			Parameter = parameter;
 		}
 
-		// public void Assign<T>( T result ) => args.ReturnValue = result;
-
 		public T Proceed<T>() => args.GetReturnValue<T>();
 		public object Parameter { get; }
 	}
 
-	public interface IParameterAwareAdapter
+	public interface IParameterValidator
 	{
 		bool IsValid( object parameter );
-
-		// object Execute( object parameter );
 	}
 
 	public class FactoryAdapter<TParameter, TResult> : FactoryAdapter
@@ -139,11 +135,9 @@ namespace DragonSpark.Aspects
 		}
 
 		public override bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : base.IsValid( parameter );
-
-		// public override object Execute( object parameter ) => parameter is TParameter ? inner.Create( (TParameter)parameter ) : base.Execute( parameter );
 	}
 
-	public class FactoryAdapter : IParameterAwareAdapter
+	public class FactoryAdapter : IParameterValidator
 	{
 		readonly IFactoryWithParameter factory;
 
@@ -153,11 +147,9 @@ namespace DragonSpark.Aspects
 		}
 
 		public virtual bool IsValid( object parameter ) => factory.CanCreate( parameter );
-
-		// public virtual object Execute( object parameter ) => factory.Create( parameter );
 	}
 
-	public class CommandAdapter : IParameterAwareAdapter
+	public class CommandAdapter : IParameterValidator
 	{
 		readonly ICommand inner;
 		public CommandAdapter( ICommand inner )
@@ -166,11 +158,6 @@ namespace DragonSpark.Aspects
 		}
 
 		public virtual bool IsValid( object parameter ) => inner.CanExecute( parameter );
-		/*public virtual object Execute( object parameter )
-		{
-			inner.Execute( parameter );
-			return null;
-		}*/
 	}
 
 	public class CommandAdapter<T> : CommandAdapter
@@ -182,20 +169,10 @@ namespace DragonSpark.Aspects
 		}
 
 		public override bool IsValid( object parameter ) => parameter is T ? inner.CanExecute( (T)parameter ) : base.IsValid( parameter );
-
-		// public override object Execute( object parameter ) => parameter is T ? Execute( (T)parameter ) : base.Execute( parameter );
-
-		object Execute( T parameter )
-		{
-			inner.Execute( parameter );
-			return null;
-		}
 	}
 
 	public interface IParameterValidationController
 	{
-		bool IsValid( object parameter );
-
 		void MarkValid( object parameter, bool valid );
 
 		object Execute( RelayParameter parameter );
@@ -203,67 +180,24 @@ namespace DragonSpark.Aspects
 
 	public class ParameterValidationController : IParameterValidationController
 	{
-		readonly protected static object Null = new object();
+		readonly static object Null = new object();
 
-		readonly IParameterAwareAdapter adapter;
 		readonly IWritableStore<object> validated = new ThreadLocalStore<object>();
-		
-		public ParameterValidationController( IParameterAwareAdapter adapter )
+		readonly IParameterValidator adapter;
+
+		public ParameterValidationController( IParameterValidator adapter )
 		{
 			this.adapter = adapter;
 		}
 
-		public bool IsValid( object parameter ) => Equals( validated.Value, parameter ?? Null );
-
 		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? Null : null );
 
-		protected virtual bool PerformValidation( object parameter ) => adapter.IsValid( parameter );
-
-		public virtual object Execute( RelayParameter parameter ) => IsValid( parameter.Parameter ) || PerformValidation( parameter.Parameter ) ? Proceed( parameter ) : null;
-
-		protected object Proceed( RelayParameter parameter )
+		public object Execute( RelayParameter parameter )
 		{
-			var result = parameter.Proceed<object>();
+			var proceed = Equals( validated.Value, parameter.Parameter ?? Null ) || adapter.IsValid( parameter.Parameter );
+			var result = proceed ? parameter.Proceed<object>() : null;
 			validated.Assign( null );
 			return result;
 		}
 	}
-
-	/*public interface IGenericParameterValidator : IParameterValidator
-	{
-		bool Handles( object parameter );
-
-		object Execute( object parameter );
-	}*/
-
-	/*public sealed class GenericParameterValidationController : ParameterValidationController
-	{
-		readonly IGenericParameterValidator generic;
-
-		readonly IWritableStore<object> active = new ThreadLocalStore<object>();
-
-		public GenericParameterValidationController( IGenericParameterValidator generic, IParameterAwareAdapter adapter ) : base( adapter )
-		{
-			this.generic = generic;
-		}
-
-		protected override bool PerformValidation( object parameter ) => generic.Handles( parameter ) ? generic.IsValid( parameter ) : base.PerformValidation( parameter );
-
-		public override object Execute( RelayParameter parameter )
-		{
-			var key = parameter.Parameter ?? Null;
-			var handle = generic.Handles( parameter.Parameter ) && active.Value == null;
-			if ( handle )
-			{
-				using ( active.Assignment( key ).Configured( false ) )
-				{
-					var result = generic.Execute( parameter.Parameter );
-					return result;
-				}
-			}
-			
-			return base.Execute( parameter );
-		}
-	}*/
-	
 }

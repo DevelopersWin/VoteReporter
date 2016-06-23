@@ -100,8 +100,6 @@ namespace DragonSpark.Testing.Runtime
 				CreateCalled++;
 				return 6776;
 			}
-
-			public bool ShouldValidate() => true;
 		}
 
 		[ValidatedGenericFactory, ValidatedGenericFactory.Aspects]
@@ -138,8 +136,6 @@ namespace DragonSpark.Testing.Runtime
 				CreateGenericCalled++;
 				return parameter + 123;
 			}
-
-			public bool ShouldValidate() => true;
 		}
 
 		/*class Command : CommandBase<int>
