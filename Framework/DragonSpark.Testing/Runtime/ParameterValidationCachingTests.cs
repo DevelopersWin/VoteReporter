@@ -53,7 +53,7 @@ namespace DragonSpark.Testing.Runtime
 			var created = sut.Create( (object)6776 );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 2, sut.CanCreateGenericCalled );
-			Assert.Equal( 0, sut.CreateCalled );
+			Assert.Equal( 1, sut.CreateCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, created );
 			}

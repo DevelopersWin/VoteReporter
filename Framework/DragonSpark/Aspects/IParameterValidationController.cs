@@ -110,7 +110,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedGenericCommand : ValidatedParameterAspectBase
 	{
-		readonly static Func<object, IParameterValidationController> Factory = new GenericParameterValidationControllerFactory( GenericCommandParameterAdapterFactory.Instance.ToDelegate(), CommandParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
+		readonly static Func<object, IParameterValidationController> Factory = new ParameterValidationControllerFactory( GenericCommandParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
 
 		public ValidatedGenericCommand() : base( Factory ) {}
 
@@ -134,7 +134,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedGenericFactory : ValidatedParameterAspectBase
 	{
-		readonly static Func<object, IParameterValidationController> Factory = new GenericParameterValidationControllerFactory( GenericFactoryParameterAdapterFactory.Instance.ToDelegate(), FactoryParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
+		readonly static Func<object, IParameterValidationController> Factory = new ParameterValidationControllerFactory( GenericFactoryParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
 		
 		public ValidatedGenericFactory() : base( Factory ) {}
 
@@ -209,9 +209,9 @@ namespace DragonSpark.Aspects
 
 	class ParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
 	{
-		readonly Func<object, IParameterValidator> create;
+		readonly Func<object, IParameterAwareAdapter> create;
 
-		public ParameterValidationControllerFactory( Func<object, IParameterValidator> create )
+		public ParameterValidationControllerFactory( Func<object, IParameterAwareAdapter> create )
 		{
 			this.create = create;
 		}
@@ -219,19 +219,19 @@ namespace DragonSpark.Aspects
 		public override IParameterValidationController Create( object instance ) => new ParameterValidationController( create( instance ) );
 	}
 
-	class GenericParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
+	/*class GenericParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
 	{
 		readonly Func<object, IGenericParameterValidator> generic;
-		readonly Func<object, IParameterValidator> store;
+		readonly Func<object, IParameterAwareAdapter> store;
 
-		public GenericParameterValidationControllerFactory( Func<object, IGenericParameterValidator> generic, Func<object, IParameterValidator> store )
+		public GenericParameterValidationControllerFactory( Func<object, IGenericParameterValidator> generic, Func<object, IParameterAwareAdapter> store )
 		{
 			this.generic = generic;
 			this.store = store;
 		}
 
 		public override IParameterValidationController Create( object instance ) => new GenericParameterValidationController( generic( instance ), store( instance ) );
-	}
+	}*/
 
 	/*public interface IGenericParameterValidationController : IParameterValidationController
 	{
