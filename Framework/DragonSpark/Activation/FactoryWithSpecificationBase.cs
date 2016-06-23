@@ -127,7 +127,7 @@ namespace DragonSpark.Activation
 		// public static ISpecification<T> Specification { get; } = AssignedSpecification<T>.Instance;
 	}
 
-	[ValidatedGenericFactory, ValidatedGenericFactory.Aspects]
+	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
 	public abstract class FactoryWithSpecificationBase<TParameter, TResult> : IFactory<TParameter, TResult>
 	{
 		readonly Coerce<TParameter> coercer;

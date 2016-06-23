@@ -132,7 +132,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( valid, command.LastResult.GetValueOrDefault() );*/
 		}
 
-		[ValidatedCommand, ValidatedCommand.Aspects]
+		[ValidatedCommand, ValidatedCommand.Commands]
 		class Command : ICommand
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
@@ -156,7 +156,7 @@ namespace DragonSpark.Testing.Aspects
 			}
 		}
 
-		[ValidatedGenericCommand, ValidatedGenericCommand.Aspects]
+		[ValidatedGenericCommand, ValidatedGenericCommand.Commands]
 		class GenericCommand : ICommand<GenericCommand.Parameter>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};

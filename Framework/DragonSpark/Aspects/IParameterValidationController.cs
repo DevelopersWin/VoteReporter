@@ -20,12 +20,13 @@ namespace DragonSpark.Aspects
 	[PSerializable]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class ParameterValidatorAspectBase : MethodInterceptionAspect // , IInstanceScopedAspect
+	public abstract class ParameterValidatorAspectBase : MethodInterceptionAspect
 	{
+		readonly static Func<object, IParameterValidationController> Get = ParameterValidation.Controller.Get;
+
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var property = ParameterValidation.Controller;
-			var controller = property.Get( args.Instance );
+			var controller = Get( args.Instance );
 			if ( controller != null )
 			{
 				var parameter = new RelayParameter( args, args.Arguments.GetArgument( 0 ) );
@@ -38,9 +39,6 @@ namespace DragonSpark.Aspects
 		}
 
 		protected abstract object Execute( IParameterValidationController controller, RelayParameter parameter );
-		/*public object CreateInstance( AdviceArgs adviceArgs ) => MemberwiseClone();
-
-		public void RuntimeInitializeInstance() {}*/
 	}
 
 	[PSerializable]
@@ -71,49 +69,56 @@ namespace DragonSpark.Aspects
 
 	public sealed class ValidatedCommand : ValidatedParameterAspectBase
 	{
-		readonly static Func<object, IParameterValidationController> Factory = new ParameterValidationControllerFactory( CommandParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
+		readonly static Func<object, IParameterValidator> Factory = CommandParameterAdapterFactory.Instance.ToDelegate();
 
 		public ValidatedCommand() : base( Factory ) {}
 
-		public class Aspects : SupplementalAspect
+		public class Commands : ParameterWorkflowCommandsAspectBase
 		{
-			public Aspects() : base( new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
+			readonly static Profile Profile = new Profile( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) );
+
+			public Commands() : base( Profile ) {}
 		}
 	}
 
 	public sealed class ValidatedGenericCommand : ValidatedParameterAspectBase
 	{
-		readonly static Func<object, IParameterValidationController> Factory = new ParameterValidationControllerFactory( GenericCommandParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
+		readonly static Func<object, IParameterValidator> Factory = GenericCommandParameterAdapterFactory.Instance.ToDelegate();
 
 		public ValidatedGenericCommand() : base( Factory ) {}
 
-		public class Aspects : SupplementalAspect
+		public class Commands : ParameterWorkflowCommandsAspectBase
 		{
-			public Aspects() : base( new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) ) ) {}
+			readonly static Profile Profile = new Profile( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) );
+
+			public Commands() : base( Profile ) {}
 		}
 	}
 
 	public sealed class ValidatedFactory : ValidatedParameterAspectBase
 	{
-		readonly static Func<object, IParameterValidationController> Factory = new ParameterValidationControllerFactory( FactoryParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
+		readonly static Func<object, IParameterValidator> Factory = FactoryParameterAdapterFactory.Instance.ToDelegate();
 
 		public ValidatedFactory() : base( Factory ) {}
 
-		public class Aspects : SupplementalAspect
+		public class Commands : ParameterWorkflowCommandsAspectBase
 		{
-			public Aspects() : base( new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
+			readonly static Profile Profile = new Profile( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) );
+
+			public Commands() : base( Profile ) {}
 		}
 	}
 
 	public sealed class ValidatedGenericFactory : ValidatedParameterAspectBase
 	{
-		readonly static Func<object, IParameterValidationController> Factory = new ParameterValidationControllerFactory( GenericFactoryParameterAdapterFactory.Instance.ToDelegate() ).ToDelegate();
+		readonly static Func<object, IParameterValidator> Factory = GenericFactoryParameterAdapterFactory.Instance.ToDelegate();
 		
 		public ValidatedGenericFactory() : base( Factory ) {}
 
-		public class Aspects : SupplementalAspect
+		public class Commands : ParameterWorkflowCommandsAspectBase
 		{
-			public Aspects() : base( new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) ) ) {}
+			readonly static Profile Profile = new Profile( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) );
+			public Commands() : base( Profile ) {}
 		}
 	}
 
@@ -121,11 +126,11 @@ namespace DragonSpark.Aspects
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict, TargetMemberAttributes = MulticastAttributes.NonAbstract | MulticastAttributes.Instance )]
-	public class SupplementalAspect : TypeLevelAspect, IAspectProvider
+	public abstract class ParameterWorkflowCommandsAspectBase : TypeLevelAspect, IAspectProvider
 	{
 		readonly Profile profile;
 
-		public SupplementalAspect( Profile profile )
+		protected ParameterWorkflowCommandsAspectBase( Profile profile )
 		{
 			this.profile = profile;
 		}
@@ -166,27 +171,13 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public abstract class ValidatedParameterAspectBase : InstanceLevelAspect
 	{
-		readonly Func<object, IParameterValidationController> factory;
+		readonly Func<object, IParameterValidator> factory;
 		
-		protected ValidatedParameterAspectBase( Func<object, IParameterValidationController> factory )
+		protected ValidatedParameterAspectBase( Func<object, IParameterValidator> factory )
 		{
 			this.factory = factory;
 		}
 
-		public override void RuntimeInitializeInstance() => ParameterValidation.Controller.Set( Instance, factory( Instance ) );
-	}
-
-	public interface IParameterValidationControllerFactory : IFactory<object, IParameterValidationController> {}
-
-	class ParameterValidationControllerFactory : FactoryBase<object, IParameterValidationController>, IParameterValidationControllerFactory
-	{
-		readonly Func<object, IParameterValidator> create;
-
-		public ParameterValidationControllerFactory( Func<object, IParameterValidator> create )
-		{
-			this.create = create;
-		}
-
-		public override IParameterValidationController Create( object instance ) => new ParameterValidationController( create( instance ) );
+		public override void RuntimeInitializeInstance() => ParameterValidation.Controller.Set( Instance, new ParameterValidationController( factory( Instance ) ) );
 	}
 }
