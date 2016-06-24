@@ -1,3 +1,4 @@
+using System;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using Ploeh.AutoFixture.Kernel;
@@ -9,7 +10,14 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public abstract class EnginePartFactory<T> : FactoryWithSpecificationBase<T, ISpecimenBuilder>, ISpecimenBuilderTransformation where T : ISpecimenBuilder
 	{
-		public ISpecimenBuilder Transform( ISpecimenBuilder builder ) => builder.AsTo( this.ToDelegate() );
+		readonly Func<T, ISpecimenBuilder> toDelegate;
+
+		protected EnginePartFactory()
+		{
+			toDelegate = this.ToDelegate();
+		}
+
+		public ISpecimenBuilder Transform( ISpecimenBuilder builder ) => builder.AsTo( toDelegate );
 	}
 
 	public class OptionalParameterTransformer : EnginePartFactory<Ploeh.AutoFixture.Kernel.ParameterRequestRelay>

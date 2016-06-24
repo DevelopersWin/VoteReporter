@@ -6,7 +6,6 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace DragonSpark.Extensions
@@ -92,8 +91,8 @@ namespace DragonSpark.Extensions
 
 		public static T Only<T>( this IEnumerable<T> @this, Func<T, bool> where )
 		{
-			var enumerable = @this.Where( where ).ToImmutableArray();
-			var result = enumerable.Length == 1 ? enumerable.Single() : default(T);
+			var enumerable = @this.Where( where ).ToArray();
+			var result = enumerable.Length == 1 ? enumerable[0] : default(T);
 			return result;
 		}
 

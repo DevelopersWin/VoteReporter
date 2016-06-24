@@ -14,6 +14,8 @@ namespace DragonSpark.Setup.Registration
 
 	public class MetadataRegistrationCommand : CommandBase<Type[]>
 	{
+		readonly static Func<object, IRegistration[]> CollectionSelector = HostedValueLocator<IRegistration>.Instance.ToDelegate();
+
 		readonly IServiceRegistry registry;
 
 		public MetadataRegistrationCommand( [Required]PersistentServiceRegistry registry )
@@ -23,10 +25,10 @@ namespace DragonSpark.Setup.Registration
 
 		public override void Execute( Type[] parameter )
 		{
-			var types = MetadataRegistrationTypeFactory.Instance.Create( parameter );
-			types
-				.SelectMany( HostedValueLocator<IRegistration>.Instance.Create )
-				.Each( registration => registration.Register( registry ) );
+			foreach ( var result in MetadataRegistrationTypeFactory.Instance.Create( parameter ).SelectMany( CollectionSelector ).ToArray() )
+			{
+				result.Register( registry );
+			}
 		}
 	}
 
@@ -34,8 +36,6 @@ namespace DragonSpark.Setup.Registration
 	{
 		public static MetadataRegistrationTypeFactory Instance { get; } = new MetadataRegistrationTypeFactory();
 
-		public override Type[] Create( Type[] parameter ) => parameter
-			.WhereDecorated<RegistrationBaseAttribute>()
-			.Select( item => item.Item2 ).Fixed();
+		public override Type[] Create( Type[] parameter ) => parameter.WhereDecorated<RegistrationBaseAttribute>().Select( item => item.Item2 ).Fixed();
 	}
 }

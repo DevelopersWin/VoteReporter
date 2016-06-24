@@ -24,8 +24,21 @@ namespace DragonSpark.Testing.Framework.Setup
 			var enumerator = base.GetEnumerator();
 			while ( enumerator.MoveNext() )
 			{
-				yield return transformers.Introduce( enumerator, transformation => transformation.Item1.Transform( transformation.Item2.Current ) ).WhereAssigned().Only() ?? enumerator.Current;
+				yield return Transform( enumerator.Current );
 			}
+		}
+
+		ISpecimenBuilder Transform( ISpecimenBuilder current )
+		{
+			foreach ( var transformer in transformers )
+			{
+				var transformed = transformer.Transform( current );
+				if ( transformed != null )
+				{
+					return transformed;
+				}
+			}
+			return current;
 		}
 	}
 }

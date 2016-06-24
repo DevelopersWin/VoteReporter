@@ -134,12 +134,12 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.applicationSource = applicationSource;
 		}
 
-		[Profile]
+		// [Profile]
 		public override ICommand<AutoData> Create()
 		{
-			var primary = new DragonSpark.Setup.ServiceProviderFactory( provider.ToFactory() ).Create().Emit( "Created Provider" );
+			var primary = new DragonSpark.Setup.ServiceProviderFactory( provider.ToFactory() ).Create()/*.Emit( "Created Provider" )*/;
 			var composite = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), primary );
-			var application = applicationSource( composite ).Emit( "Created Application" );
+			var application = applicationSource( composite )/*.Emit( "Created Application" )*/;
 			var result = new ExecuteApplicationCommand( application );
 			return result;
 		}
