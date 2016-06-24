@@ -2,7 +2,6 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
 
@@ -22,7 +21,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class LifetimeManagerFactory<T> : LifetimeManagerFactory where T : LifetimeManager
 	{
-		public LifetimeManagerFactory( IUnityContainer container ) : base( container, AttributedLifetimeFactory.Instance.Create ) {}
+		public LifetimeManagerFactory( IUnityContainer container ) : base( container, AttributedLifetimeFactory.Instance.ToDelegate() ) {}
 
 		class AttributedLifetimeFactory : IoC.AttributedLifetimeFactory
 		{
@@ -47,21 +46,24 @@ namespace DragonSpark.Activation.IoC
 	[Persistent]
 	public class LifetimeManagerFactory : FactoryWithSpecificationBase<Type, LifetimeManager>
 	{
-		readonly IUnityContainer container;
+		readonly Func<Type, LifetimeManager> lifetimeResolver;
 		readonly Func<Type, Type> lifetimeTypeFactory;
 
-		public LifetimeManagerFactory( [Required]IUnityContainer container ) : this( container, AttributedLifetimeFactory.Instance.Create ) {}
+		public LifetimeManagerFactory( IUnityContainer container ) : this( container, AttributedLifetimeFactory.Instance.ToDelegate() ) {}
 
-		protected LifetimeManagerFactory( [Required]IUnityContainer container, Func<Type, Type> lifetimeTypeFactory )
+		protected LifetimeManagerFactory( IUnityContainer container, Func<Type, Type> lifetimeTypeFactory ) : this( container.Resolve<LifetimeManager>, lifetimeTypeFactory ) {}
+
+		LifetimeManagerFactory( Func<Type, LifetimeManager> lifetimeResolver, Func<Type, Type> lifetimeTypeFactory )
 		{
-			this.container = container;
+			this.lifetimeResolver = lifetimeResolver;
 			this.lifetimeTypeFactory = lifetimeTypeFactory;
 		}
 
 		public override LifetimeManager Create( Type parameter )
 		{
 			var type = lifetimeTypeFactory( parameter );
-			var result = type.With( container.Resolve<LifetimeManager> );
+			
+			var result = type.With( lifetimeResolver );
 			return result;
 		}
 	}

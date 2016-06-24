@@ -185,14 +185,10 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	/*public class AdditionalTypesStrategyConfiguration : ConfigurationBase<TypeSelectionStrategyBase>
-	{
-		public AdditionalTypesStrategyConfiguration() : base( NoTypesStrategy.Instance ) {}
-	}*/
-
+	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
 	public class BuildableTypeFromConventionLocator : FactoryWithSpecificationBase<Type, Type>
 	{
-		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator();
+		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator( Items<Type>.Default );
 
 		readonly Type[] types;
 		readonly Func<Type, ITypeCandidateWeightProvider> weight;

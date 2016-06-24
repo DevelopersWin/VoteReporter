@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using System;
@@ -24,6 +25,7 @@ namespace DragonSpark.Windows.Markup
 			;
 	}
 
+	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
 	public abstract class MarkupPropertyFactoryBase : FactoryWithSpecificationBase<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
 	{
 		protected MarkupPropertyFactoryBase( ISpecification<IServiceProvider> specification ) : base( specification ) {}
@@ -33,10 +35,12 @@ namespace DragonSpark.Windows.Markup
 	{
 		protected MarkupPropertyFactoryBase() : base( Specification<TTarget, TProperty>.Instance ) {}
 
-		// protected MarkupPropertyFactoryBase( ISpecification<IServiceProvider> specification ) : base( specification ) {}
-
-		public sealed override IMarkupProperty Create( IServiceProvider parameter ) => 
-			parameter.Get<IProvideValueTarget>().With( target => Create( (TTarget)target.TargetObject, (TProperty)target.TargetProperty ) );
+		public sealed override IMarkupProperty Create( IServiceProvider parameter )
+		{
+			var target = parameter.Get<IProvideValueTarget>();
+			var result = target != null ? Create( (TTarget)target.TargetObject, (TProperty)target.TargetProperty ) : null;
+			return result;
+		}
 
 		protected abstract IMarkupProperty Create( TTarget targetObject, TProperty targetProperty );
 	}

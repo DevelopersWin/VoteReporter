@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
-using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -200,6 +199,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
+	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
 	sealed class FixtureServiceProvider : FactoryWithSpecificationBase<Type, object>, IServiceProvider
 	{
 		readonly IFixture fixture;
@@ -218,7 +218,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly IServiceRegistry registry;
 
-		public Specification( [Required] IFixture fixture ) : this( AssociatedRegistry.Property.Get( fixture ) ) {}
+		public Specification( [Required] IFixture fixture ) : this( AssociatedRegistry.Default.Get( fixture ) ) {}
 
 		Specification( [Required] IServiceRegistry registry )
 		{

@@ -19,6 +19,7 @@ namespace DragonSpark.Composition
 			: base( locator, FactoryDelegateTransformer.InstanceWithParameter, ActivatorWithParameterDelegateFactory.Instance.ToDelegate() ) {}
 	}
 
+	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
 	public class FactoryDelegateTransformer : TransformerBase<CompositionContract>
 	{
 		public static FactoryDelegateTransformer Instance { get; } = new FactoryDelegateTransformer( typeof(Func<>) );

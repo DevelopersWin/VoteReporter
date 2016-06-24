@@ -19,10 +19,6 @@ namespace DragonSpark.TypeSystem
 		}
 
 		[Freeze]
-		public override System.Type[] Create( System.Type parameter ) =>
-			types.AsTypeInfos()
-				 .Where( z => parameter.Adapt().IsAssignableFrom( z ) )
-				 .AsTypes()
-				 .Fixed();
+		public override System.Type[] Create( System.Type parameter ) => types.Where( parameter.Adapt().IsAssignableFrom ).Fixed();
 	}
 }

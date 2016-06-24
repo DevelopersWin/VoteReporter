@@ -1,14 +1,5 @@
-using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
-using JetBrains.dotMemoryUnit;
-using System;
 using System.Diagnostics;
-using System.Reflection;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Setup
@@ -17,7 +8,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public StressTestingTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Fact]
+		/*[Fact]
 		[DotMemoryUnit( SavingStrategy = SavingStrategy.OnCheckFail, Directory = @"C:\dotMemory", CollectAllocations = true, FailIfRunWithoutSupport = false )]
 		[AssertTraffic( AllocatedObjectsCount = 0 )]
 		public void GetAllTypesWith()
@@ -44,7 +35,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			}
 		}
 
-		void Host( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut ) {}
+		void Host( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut ) {}*/
 
 		/*[Fact]
 		public void GetAllTypesWith2()

@@ -107,7 +107,7 @@ namespace DragonSpark.Testing.Aspects
 			}
 		}
 
-		[Fact]
+		/*[Fact]
 		[DotMemoryUnit( SavingStrategy = SavingStrategy.OnCheckFail, Directory = @"C:\dotMemory", CollectAllocations = true, FailIfRunWithoutSupport = false )]
 		public void MemoryTest()
 		{
@@ -145,6 +145,6 @@ namespace DragonSpark.Testing.Aspects
 
 			[Freeze]
 			public override Result Create( Parameter parameter ) => new Result( parameter );
-		}
+		}*/
 	}
 }

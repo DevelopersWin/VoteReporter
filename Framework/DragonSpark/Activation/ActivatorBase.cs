@@ -1,8 +1,10 @@
+using DragonSpark.Aspects;
 using DragonSpark.Runtime.Specifications;
 using System;
 
 namespace DragonSpark.Activation
 {
+	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
 	public abstract class ActivatorBase<TRequest> : FactoryWithSpecificationBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
 		protected ActivatorBase( Coerce<TRequest> coercer ) : this( coercer, Specification.Instance ) {}
@@ -20,13 +22,6 @@ namespace DragonSpark.Activation
 			public override bool IsSatisfiedBy( object parameter ) => base.IsSatisfiedBy( parameter ) || IsInstanceOfSpecification<Type>.Instance.IsSatisfiedBy( parameter );
 		}
 	}
-
-	/*public abstract class LocatorBase : LocatorBase<object>
-	{
-		protected LocatorBase() {}
-
-		protected LocatorBase( ISpecification<LocateTypeRequest> specification ) : base( specification ) {}
-	}*/
 
 	public abstract class LocatorBase : ActivatorBase<LocateTypeRequest>
 	{

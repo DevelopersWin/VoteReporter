@@ -25,7 +25,8 @@ namespace DragonSpark.Setup.Registration
 
 		public override void Execute( Type[] parameter )
 		{
-			foreach ( var result in MetadataRegistrationTypeFactory.Instance.Create( parameter ).SelectMany( CollectionSelector ).ToArray() )
+			var registrations = MetadataRegistrationTypeFactory.Instance.Create( parameter ).SelectMany( CollectionSelector ).ToArray();
+			foreach ( var result in registrations )
 			{
 				result.Register( registry );
 			}

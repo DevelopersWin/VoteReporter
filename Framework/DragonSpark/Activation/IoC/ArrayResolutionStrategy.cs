@@ -21,7 +21,11 @@ namespace DragonSpark.Activation.IoC
 
 				if ( context.BuildComplete )
 				{
-					context.Existing.As<Array>( array => context.Complete( array.Length > 0 ? array : provider.GetService( context.BuildKey.Type ) ?? array ) );
+					var array = context.Existing as Array;
+					if ( array != null )
+					{
+						context.Complete( array.Length > 0 ? array : provider.GetService( context.BuildKey.Type ) ?? array );
+					}
 				}
 			}
 		}

@@ -231,16 +231,16 @@ namespace DragonSpark.Setup
 
 	public class RecursionAwareServiceProvider : DecoratedServiceProvider
 	{
-		readonly IsActive property = new IsActive();
+		readonly IsActive cache = new IsActive();
 
 		public RecursionAwareServiceProvider( IServiceProvider inner ) : base( inner ) {}
 
 		public override object GetService( Type serviceType )
 		{
-			var active = property.Get( serviceType );
+			var active = cache.Get( serviceType );
 			if ( !active )
 			{
-				using ( property.Assignment( serviceType, true ) )
+				using ( cache.Assignment( serviceType, true ) )
 				{
 					return base.GetService( serviceType );
 				}

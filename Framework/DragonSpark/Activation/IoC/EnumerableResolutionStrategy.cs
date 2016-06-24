@@ -84,9 +84,10 @@ namespace DragonSpark.Activation.IoC
 
 	public class EnumerableResolutionStrategy : BuilderStrategy
 	{
-		delegate object Resolver( IBuilderContext context );
-
 		readonly static MethodInfo GenericResolveArrayMethod = typeof(EnumerableResolutionStrategy).GetTypeInfo().DeclaredMethods.First( m => m.Name == nameof(Resolve) && !m.IsPublic );
+		readonly static string[] DefaultName = new string[] { null };
+
+		delegate object Resolver( IBuilderContext context );
 
 		readonly IUnityContainer container;
 		readonly IServiceProvider provider;
@@ -105,11 +106,12 @@ namespace DragonSpark.Activation.IoC
 
 				if ( context.BuildComplete )
 				{
-					context.Existing.As<Array>( array =>
+					var array = context.Existing as Array;
+					if ( array != null )
 					{
 						var result = array.Length > 0 ? array : provider.GetService( context.BuildKey.Type ) ?? array;
 						context.Complete( result );
-					} );
+					}
 				}
 			}
 		}
@@ -117,28 +119,29 @@ namespace DragonSpark.Activation.IoC
 		void BuildUp( IBuilderContext context )
 		{
 			var adapt = context.BuildKey.Type.Adapt();
-			if ( adapt.IsGenericOf<IEnumerable<object>>( false ) )
+			var isGenericOf = adapt.IsGenericOf<IEnumerable<object>>( false );
+			if ( isGenericOf )
 			{
-				adapt.GetEnumerableType().With( type =>
+				var enumerableType = adapt.GetEnumerableType();
+				if ( enumerableType != null )
 				{
-					var resolver = (Resolver)GenericResolveArrayMethod.MakeGenericMethod( type ).CreateDelegate( typeof(Resolver), this );
-
+					var resolver = (Resolver)GenericResolveArrayMethod.MakeGenericMethod( enumerableType.ToItem() ).CreateDelegate( typeof(Resolver), this );
 					var result = resolver( context );
 					context.Complete( result );
-				} );
+				}
 			}
 		}
 
 		object Resolve<T>( IBuilderContext context )
 		{
-			var defaultName = container.IsRegistered<T>() ? new string[] { null } : Items<string>.Default;
-			var result = context.Policies.Get<IRegisteredNamesPolicy>( null )
-				.With( policy => policy.GetRegisteredNames( typeof(T) )
+			var defaultName = container.IsRegistered<T>() ? DefaultName : Items<string>.Default;
+			var policy = context.Policies.Get<IRegisteredNamesPolicy>( null );
+			var result = policy != null ? 
+				policy.GetRegisteredNames( typeof(T) )
 					.Concat( defaultName ).Concat( typeof(T).GetTypeInfo().IsGenericType ? policy.GetRegisteredNames( typeof(T).GetGenericTypeDefinition() ) : Enumerable.Empty<string>() )
 					.Distinct()
 					.Select( context.NewBuildUp<T> )
-					.ToArray() 
-				) ?? Items<T>.Default;
+					.ToArray() : Items<T>.Default;
 			return result;
 		}
 	}

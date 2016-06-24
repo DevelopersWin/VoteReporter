@@ -127,7 +127,6 @@ namespace DragonSpark.Activation
 		// public static ISpecification<T> Specification { get; } = AssignedSpecification<T>.Instance;
 	}
 
-	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
 	public abstract class FactoryWithSpecificationBase<TParameter, TResult> : IFactory<TParameter, TResult>
 	{
 		readonly Coerce<TParameter> coercer;
@@ -184,6 +183,7 @@ namespace DragonSpark.Activation
 		public abstract TResult Create( TParameter parameter );
 	}
 
+ 	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
 	public class DelegatedFactory<TParameter, TResult> : FactoryWithSpecificationBase<TParameter, TResult>
 	{
 		readonly Func<TParameter, TResult> inner;
