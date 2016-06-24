@@ -169,7 +169,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		
 		public override void Execute( AutoData parameter )
 		{
-			parameter.Method.Set( AssociatedContext.Default, this );
+			AssociatedContext.Default.Set( parameter.Method, this );
 			base.Execute( parameter );
 		}
 	}

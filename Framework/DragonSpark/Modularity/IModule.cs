@@ -24,10 +24,13 @@ namespace DragonSpark.Modularity
 			this.activator = activator;
 		}
 
-		public override void Execute( IMonitoredModule parameter ) => 
-			activator
-				.ActivateMany<IModuleCommand>( parameter.GetType().Assembly().ExportedTypes )
-				.ExecuteMany( parameter );
+		public override void Execute( IMonitoredModule parameter )
+		{
+			foreach ( var item in activator.ActivateMany<IModuleCommand>( parameter.GetType().Assembly().ExportedTypes ) )
+			{
+				item.Execute( parameter );
+			}
+		}
 	}
 
 	public interface IModuleCommand : ICommand<IMonitoredModule> {}

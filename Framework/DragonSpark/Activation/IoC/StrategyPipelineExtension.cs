@@ -12,6 +12,7 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Delegate = System.Delegate;
@@ -63,7 +64,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class CachingBuildPlanExtension : UnityContainerExtension
 	{
-		readonly static ICache<IBuildPlanCreatorPolicy[]> Policies = new Cache<IBuildPlanCreatorPolicy[]>();
+		readonly static ICache<IBuildPlanCreatorPolicy> Policies = new Cache<IBuildPlanCreatorPolicy>();
 
 		readonly IBuildPlanRepository repository;
 		readonly ISpecification<LocateTypeRequest> specification;
@@ -78,24 +79,35 @@ namespace DragonSpark.Activation.IoC
 		{
 			var policies = repository.List();
 			var creator = Container.Get( Creator.Default )?.GetType() ?? Execution.GetCurrent();
-			var creators = Policies.GetOrSet( creator, Create );
-			var policy = new BuildPlanCreatorPolicy( TryContextProperty.Verbose.Get( Container ).Invoke, specification, policies, creators );
+			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies, specification );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
 		}
 
-		IBuildPlanCreatorPolicy[] Create( object instance ) => new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) ).ToItem();
+		IBuildPlanCreatorPolicy Create( object instance ) => new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) );
 
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{
 			readonly IBuildPlanCreatorPolicy inner;
+
+			readonly ICache<NamedTypeBuildKey, IBuildPlanPolicy> cache = new Cache<NamedTypeBuildKey, IBuildPlanPolicy>();
 
 			public CachedCreatorPolicy( IBuildPlanCreatorPolicy inner )
 			{
 				this.inner = inner;
 			}
 
-			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => inner.CreatePlan( context, buildKey );
+			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
+			{
+				var key = References.Keys.Create( buildKey );
+				var result = cache.Contains( key ) ? cache.Get( key ) : cache.SetValue( key, inner.CreatePlan( context, buildKey ) );
+				return result;
+			}
 		}
+	}
+
+	public static class References
+	{
+		public static EqualityReference<NamedTypeBuildKey> Keys { get; } = new EqualityReference<NamedTypeBuildKey>();
 	}
 
 	public class StrategyPipelineExtension : UnityContainerExtension
@@ -133,7 +145,7 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Clear();
 
-			foreach ( var entry in strategyRepository.List().Cast<StrategyEntry>() )
+			foreach ( var entry in strategyRepository.List().Cast<StrategyEntry>().ToImmutableArray() )
 			{
 				Context.Strategies.Add( entry.Value, entry.Stage );
 			}
@@ -141,8 +153,6 @@ namespace DragonSpark.Activation.IoC
 
 		public class MetadataLifetimeStrategy : BuilderStrategy
 		{
-			readonly EqualityReference<NamedTypeBuildKey> references = new EqualityReference<NamedTypeBuildKey>();
-
 			readonly ILogger logger;
 			readonly LifetimeManagerFactory factory;
 			readonly Condition condition = new Condition();
@@ -156,7 +166,7 @@ namespace DragonSpark.Activation.IoC
 
 			public override void PreBuildUp( IBuilderContext context )
 			{
-				var reference = references.Create( context.BuildKey );
+				var reference = References.Keys.Create( context.BuildKey );
 				if ( reference.Get( condition ).Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
@@ -393,7 +403,6 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionStrategy : BuilderStrategy
 	{
-		readonly EqualityReference<NamedTypeBuildKey> references = new EqualityReference<NamedTypeBuildKey>();
 		readonly Condition condition = new Condition();
 
 		readonly ConventionCandidateLocator locator;
@@ -414,7 +423,7 @@ namespace DragonSpark.Activation.IoC
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var reference = references.Create( context.BuildKey );
+			var reference = References.Keys.Create( context.BuildKey );
 			if ( condition.Get( reference ).Apply() )
 			{
 				var from = context.BuildKey.Type;

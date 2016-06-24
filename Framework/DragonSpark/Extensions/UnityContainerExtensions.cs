@@ -1,67 +1,27 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logger;
-using DragonSpark.Runtime.Properties;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
-using Serilog;
 using System;
 
 namespace DragonSpark.Extensions
 {
-	public class TryContextProperty : Cache<IUnityContainer, TryContext>
-	{
-		public static TryContextProperty Debug { get; } = new TryContextProperty( Container.Debug );
-
-		public static TryContextProperty Verbose { get; } = new TryContextProperty( Container.Verbose );
-
-		TryContextProperty( Container container ) : base( container.Create ) {}
-
-		class Container : FactoryWithSpecificationBase<IUnityContainer, TryContext>
-		{
-			public static Container Debug { get; } = new Container( logger => logger.Debug );
-
-			public static Container Verbose { get; } = new Container( logger => logger.Verbose );
-
-			readonly Func<ILogger, LogException> create;
-
-			Container( Func<ILogger, LogException> create )
-			{
-				this.create = create;
-			}
-
-			public override TryContext Create( IUnityContainer container )
-			{
-				var logger = container.Resolve<ILogger>( Items<ResolverOverride>.Default );
-				var @delegate = create( logger );
-				var result = new TryContext( @delegate );
-				return result;
-			}
-		}
-	}
-
 	public static class UnityContainerExtensions
 	{
 		public static T Resolve<T>( this IUnityContainer container, Type type ) => (T)container.Resolve( type, Items<ResolverOverride>.Default );
 
 		public static T TryResolve<T>(this IUnityContainer container) => (T)TryResolve( container, typeof(T) );
 
-		public static object TryResolve(this IUnityContainer container, Type typeToResolve, string name = null ) => TryContextProperty.Debug.Get( container ).Invoke( new Context( container, typeToResolve, name ).Create ).Instance;
-
-		struct Context
+		public static object TryResolve( this IUnityContainer container, Type typeToResolve, string name = null )
 		{
-			readonly IUnityContainer container;
-			readonly Type typeToResolve;
-			readonly string name;
-
-			public Context( IUnityContainer container, Type typeToResolve, string name = null )
+			try
 			{
-				this.container = container;
-				this.typeToResolve = typeToResolve;
-				this.name = name;
+				return container.Resolve( typeToResolve, name, Items<ResolverOverride>.Default );
 			}
-
-			public object Create() => container.Resolve( typeToResolve, name, Items<ResolverOverride>.Default );
+			catch ( Exception exception )
+			{
+				DiagnosticProperties.Logger.Get( container ).Debug( exception, "Could not resolve {Type} and {Name}", typeToResolve, name );
+				return null;
+			}
 		}
 
 		public static IUnityContainer Extend<TExtension>( this IUnityContainer @this ) where TExtension : UnityContainerExtension => @this.Extension<TExtension>().Container;
@@ -76,8 +36,8 @@ namespace DragonSpark.Extensions
 
 		static UnityContainerExtension Create( IUnityContainer container, Type extensionType )
 		{
-			var extension = container.Resolve<UnityContainerExtension>( extensionType );
-			var result = extension.WithSelf( container.AddExtension );
+			var result = container.Resolve<UnityContainerExtension>( extensionType );
+			container.AddExtension( result );
 			return result;
 		}
 	}

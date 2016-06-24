@@ -14,6 +14,7 @@ using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
@@ -341,9 +342,10 @@ namespace DragonSpark.Setup
 			var exports = Host.GetExports<T>( ContractName ).Fixed();
 			watching.AddRange( exports );
 
-			exports
-				.Prioritize()
-				.ExecuteMany( parameter );
+			foreach ( var export in exports.Prioritize().ToImmutableArray() )
+			{
+				export.Execute( parameter );
+			}
 		}
 
 		protected override void OnDispose()

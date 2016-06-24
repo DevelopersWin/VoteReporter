@@ -3,6 +3,8 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using System;
 using System.Linq;
+using System.Reflection;
+using Activator = System.Activator;
 
 namespace DragonSpark.TypeSystem
 {
@@ -54,10 +56,8 @@ namespace DragonSpark.TypeSystem
 		public override object Create( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
-			var result = type != null ? typeof(Enumerable).Adapt().GenericMethods.Invoke( nameof(Enumerable.Empty), type.ToItem() ) : GetType().Adapt().GenericMethods.Invoke( nameof(Default), parameter.ToItem() );
+			var result = type != null ? typeof(Enumerable).Adapt().GenericMethods.Invoke( nameof(Enumerable.Empty), type.ToItem() ) : parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : null;
 			return result;
 		}
-
-		static object Default<T>() => default(T);
 	}
 }

@@ -269,7 +269,6 @@
     <Compile Include="Diagnostics\IMessageRecorder.cs" />
     <Compile Include="Diagnostics\Message.cs" />
     <Compile Include="Diagnostics\LoggerHistorySink.cs" />
-    <Compile Include="Diagnostics\TryContext.cs" />
     <Compile Include="Extensions\BuilderContextExtensions.cs" />
     <Compile Include="Extensions\ObjectMappingParameter.cs" />
     <Compile Include="Runtime\Specifications\AllSpecification.cs" />

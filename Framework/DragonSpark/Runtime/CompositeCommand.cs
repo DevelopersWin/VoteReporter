@@ -2,6 +2,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Windows.Input;
@@ -41,7 +42,13 @@ namespace DragonSpark.Runtime
 
 		public CommandCollection Commands { get; }
 
-		public override void Execute( T parameter ) => Commands.ExecuteMany( parameter );
+		public override void Execute( T parameter )
+		{
+			foreach ( var command in Commands.ToImmutableArray() )
+			{
+				command.Execute( parameter );
+			}
+		}
 
 		protected override void OnDispose() => Commands.Purge().OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
 	}

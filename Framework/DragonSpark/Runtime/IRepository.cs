@@ -1,10 +1,9 @@
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Runtime
 {
@@ -64,7 +63,7 @@ namespace DragonSpark.Runtime
 		public IEnumerable<TItem> Items()
 		{
 			var enumerable = Query();
-			var result = enumerable.Select( entry => entry.Value ).ToImmutableList();
+			var result = enumerable.Select( entry => entry.Value ).ToArray();
 			return result;
 		}
 	}
@@ -86,7 +85,7 @@ namespace DragonSpark.Runtime
 
 		protected virtual void OnAdd( T entry ) => Store.Add( entry );
 
-		public virtual IEnumerable<T> List() => Query().ToImmutableArray();
+		public virtual IEnumerable<T> List() => Query().ToArray();
 
 		protected virtual IEnumerable<T> Query() => Store.Prioritize();
 	}

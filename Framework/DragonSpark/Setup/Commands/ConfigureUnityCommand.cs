@@ -17,10 +17,12 @@ namespace DragonSpark.Setup.Commands
 
 		public override void Execute( object parameter )
 		{
-			Extensions.Each( x => Container.AddExtension( x ) );
+			Extensions.Each( Container.AddExtension );
 
-			var commands = Instances.Cast<UnityCommand>().Concat( Types ).ToArray();
-			commands.ExecuteMany<UnityCommand>( parameter );
+			foreach ( var source in Instances.Cast<UnityCommand>().Concat( Types ).ToArray() )
+			{
+				source.Execute( parameter );
+			}
 		}
 	}
 

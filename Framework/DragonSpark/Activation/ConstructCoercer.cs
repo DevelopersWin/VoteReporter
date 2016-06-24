@@ -48,7 +48,6 @@ namespace DragonSpark.Activation
 		public override T Create( object parameter )
 		{
 			var request = new ConstructTypeRequest( type, parameter.ToItem() );
-			var temp = activator.CanCreate( request );
 			var activate = activator.Create( request );
 			var store = activate as IStore<T>;
 			if ( store != null )

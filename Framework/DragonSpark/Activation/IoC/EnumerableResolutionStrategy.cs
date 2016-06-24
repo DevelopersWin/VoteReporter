@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
@@ -7,54 +8,52 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Activation.IoC
 {
 	public class BuildPlanCreatorPolicy : IBuildPlanCreatorPolicy
 	{
-		readonly Func<Action, Exception> tryDelegate;
 		readonly ISpecification<LocateTypeRequest> specification;
 		readonly IEnumerable<IBuildPlanPolicy> policies;
-		readonly IBuildPlanCreatorPolicy[] creators;
+		readonly IBuildPlanCreatorPolicy creator;
 
-		public BuildPlanCreatorPolicy( [Required] Func<Action, Exception> tryDelegate, ISpecification<LocateTypeRequest> specification, [Required] IEnumerable<IBuildPlanPolicy> policies, [Required] params IBuildPlanCreatorPolicy[] creators )
+		public BuildPlanCreatorPolicy( IBuildPlanCreatorPolicy creator, IEnumerable<IBuildPlanPolicy> policies, ISpecification<LocateTypeRequest> specification )
 		{
-			this.tryDelegate = tryDelegate;
-			this.specification = specification;
+			this.creator = creator;
 			this.policies = policies;
-			this.creators = creators;
+			this.specification = specification;
 		}
 
-		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
-		{
-			var plans = specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) ) ? creators.Select( policy => policy.CreatePlan( context, buildKey ) ) : Items<IBuildPlanPolicy>.Default;
-			var result = new CompositeBuildPlanPolicy( tryDelegate, plans.Concat( policies ).ToArray() );
-			return result;
-		}
+		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
+			new CompositeBuildPlanPolicy( specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) ) ? policies.StartWith( creator.CreatePlan( context, buildKey ) ).ToArray() : Items<IBuildPlanPolicy>.Default );
 	}
 
 	public class CompositeBuildPlanPolicy : IBuildPlanPolicy
 	{
-		readonly Func<Action, Exception> tryDelegate;
 		readonly IBuildPlanPolicy[] policies;
 
-		public CompositeBuildPlanPolicy( [Required]Func<Action, Exception> tryDelegate, params IBuildPlanPolicy[] policies )
+		public CompositeBuildPlanPolicy( IBuildPlanPolicy[] policies )
 		{
-			this.tryDelegate = tryDelegate;
 			this.policies = policies;
 		}
 
 		public void BuildUp( IBuilderContext context )
 		{
 			Exception first = null;
-			foreach ( var exception in policies.Select( policy => tryDelegate( () => policy.BuildUp( context ) ) ) )
+			foreach ( var policy in policies )
 			{
-				if ( exception == null && context.Existing != null )
+				try
 				{
-					return;
+					policy.BuildUp( context );
+					if ( context.Existing != null )
+					{
+						return;
+					}
 				}
-				first = first ?? exception;
+				catch ( Exception exception )
+				{
+					first = first ?? exception;
+				}
 			}
 			throw first;
 		}

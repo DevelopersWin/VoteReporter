@@ -1,8 +1,10 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
+using JetBrains.dotMemoryUnit;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -15,14 +17,14 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public StressTestingTests( ITestOutputHelper output ) : base( output ) {}
 
-		/*[Fact]
+		[Fact]
 		[DotMemoryUnit( SavingStrategy = SavingStrategy.OnCheckFail, Directory = @"C:\dotMemory", CollectAllocations = true, FailIfRunWithoutSupport = false )]
 		[AssertTraffic( AllocatedObjectsCount = 0 )]
 		public void GetAllTypesWith()
 		{
 			First();
 			Second();
-		}*/
+		}
 
 		void Second() => First();
 
@@ -52,8 +54,8 @@ namespace DragonSpark.Windows.Testing.Setup
 			var mock = new Mock();
 			var result = Parallel.For( 0, 10000, i =>
 									{
-										/*var items = sut.GetAllTypesWith<PriorityAttribute>();
-										Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );#1#
+										var items = sut.GetAllTypesWith<PriorityAttribute>();
+										Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );
 
 										Action action = mock.Hello;
 										AssociatedContext.Default.Set( action.Method, new DisposableAction( () => {} ) );

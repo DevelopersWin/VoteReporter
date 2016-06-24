@@ -310,13 +310,13 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( "This is a relayed class attribute.", attribute.PropertyName );
 		}
 
-		[Theory, LocationSetup.AutoData]
+		/*[Theory, LocationSetup.AutoData]
 		[Map(typeof(IExceptionFormatter), typeof(ExceptionFormatter) )]
 		public void Try()
 		{
 			var exception = ExceptionSupport.Try( Delegates.Empty );
 			Assert.Null( exception );
-		}
+		}*/
 
 		[Theory, LocationSetup.AutoData]
 		public void GetAllTypesWith( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut )

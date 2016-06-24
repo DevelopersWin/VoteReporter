@@ -2,8 +2,6 @@
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using ICommand = System.Windows.Input.ICommand;
 
 namespace DragonSpark.Extensions
@@ -12,8 +10,6 @@ namespace DragonSpark.Extensions
 	{
 		public static ICommand<T> Cast<T>( this ICommand @this, Func<T, object> projection ) => new ProjectedCommand<T>( @this, projection );
 
-		public static IEnumerable<T> ExecuteMany<T>( this IEnumerable<T> @this, object parameter ) where T : ICommand => @this.Introduce( parameter, tuple => tuple.Item1.AsExecuted( tuple.Item2 ) ).WhereAssigned().ToArray();
-		
 		public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );
 
 		public static T AsExecuted<T>( this T @this, object parameter ) where T : ICommand

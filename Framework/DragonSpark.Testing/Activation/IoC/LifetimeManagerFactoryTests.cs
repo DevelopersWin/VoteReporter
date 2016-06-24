@@ -1,5 +1,4 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Testing.Framework;
+﻿using DragonSpark.Testing.Framework;
 using Microsoft.Practices.Unity;
 using Xunit;
 using LifetimeManagerFactory = DragonSpark.Activation.IoC.LifetimeManagerFactory;
@@ -17,7 +16,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.NotNull( type );
 			Assert.IsType<ContainerControlledLifetimeManager>( type );
 
-			Assert.IsType<ContainerControlledLifetimeManager>( sut.Create( typeof(TryContext) ) );
+			// Assert.IsType<ContainerControlledLifetimeManager>( sut.Create( typeof(TryContext) ) );
 
 			// Assert.IsType<ContainerControlledLifetimeManager>( sut.Create( typeof(TryContextElevated) ) );
 		} 

@@ -1,5 +1,6 @@
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using Microsoft.Practices.ObjectBuilder2;
@@ -8,7 +9,6 @@ using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
-using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -66,7 +66,7 @@ namespace DragonSpark.Activation.IoC
 		readonly Func<object, bool> isActivated;
 		readonly Condition condition = new Condition();
 
-		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, registry, ActivationProperties.IsActivatedInstanceSpecification.Default.IsSatisfiedBy ) {}
+		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, registry, ActivationProperties.IsActivatedInstanceSpecification.Default.ToDelegate() ) {}
 
 		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, Func<object, bool> isActivated ) : this( provider, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry ), isActivated ) {}
 
@@ -80,13 +80,14 @@ namespace DragonSpark.Activation.IoC
 		public void BuildUp( IBuilderContext context )
 		{
 			var existing = provider.GetService( context.BuildKey.Type );
-			existing.With( o =>
+			if ( existing != null )
 			{
-				if ( o.Get( condition ).Apply() && isActivated( o ) )
+				if ( existing.Get( condition ).Apply() && isActivated( existing ) )
 				{
-					registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, o ) );
+					registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing ) );
 				}
-			} );
+			}
+			
 			context.Complete( existing );
 		}
 	}

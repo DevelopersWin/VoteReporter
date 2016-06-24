@@ -13,18 +13,14 @@ namespace DragonSpark.ComponentModel
 
 		readonly Func<MemberInfo, IDefaultValueProvider[]> factory;
 
-		public DefaultPropertyValueFactory() : this( HostedValueLocator<IDefaultValueProvider>.Instance.Create ) {}
+		public DefaultPropertyValueFactory() : this( HostedValueLocator<IDefaultValueProvider>.Instance.ToDelegate() ) {}
 
 		public DefaultPropertyValueFactory( [Required]Func<MemberInfo, IDefaultValueProvider[]> factory )
 		{
 			this.factory = factory;
 		}
 
-		public override object Create( DefaultValueParameter parameter )
-		{
-			var result = factory( parameter.Metadata ).FirstAssigned( p => p.GetValue( parameter ) ) ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
-			return result;
-		}
+		public override object Create( DefaultValueParameter parameter ) => factory( parameter.Metadata ).Introduce( parameter, tuple => tuple.Item1.GetValue( tuple.Item2 ) ).FirstAssigned() ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
 	}
 
 	public struct DefaultValueParameter

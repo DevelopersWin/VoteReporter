@@ -11,10 +11,10 @@ namespace DragonSpark.Runtime.Properties
 	{
 		public static TValue Get<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> cache ) where TInstance : class => cache.Get( @this );
 
-		public static TInstance Set<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> cache, TValue value ) where TInstance : class
+		public static TValue SetValue<TInstance, TValue>( this ICache<TInstance, TValue> @this, TInstance instance, TValue value ) where TInstance : class
 		{
-			cache.Set( @this, value );
-			return @this;
+			@this.Set( instance, value );
+			return value;
 		}
 
 		public static TValue GetOrSet<TInstance, TValue>( this ICache<TInstance, TValue> @this, TInstance instance, Func<TInstance, TValue> create )
@@ -89,9 +89,9 @@ namespace DragonSpark.Runtime.Properties
 
 	public struct AttachedPropertyChangedEvent<TInstance, TValue> where TInstance : class
 	{
-		public AttachedPropertyChangedEvent( IAttachedProperty<TInstance, TValue> cache, TInstance instance, TValue value = default(TValue), AttachedPropertyChangedEventType type = AttachedPropertyChangedEventType.Clear )
+		public AttachedPropertyChangedEvent( IAttachedProperty<TInstance, TValue> instance, TInstance instance, TValue value = default(TValue), AttachedPropertyChangedEventType type = AttachedPropertyChangedEventType.Clear )
 		{
-			Property = cache;
+			Property = instance;
 			Instance = instance;
 			Value = value;
 			Type = type;

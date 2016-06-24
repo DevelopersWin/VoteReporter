@@ -32,7 +32,7 @@ namespace DragonSpark.Testing.Runtime
 		public void ExtendedCheck()
 		{
 			// Parallel.For( 0, 10000, i =>
-			for ( int i = 0; i < 10000; i++ )
+			// for ( int i = 0; i < 10000; i++ )
 			{
 				var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );
