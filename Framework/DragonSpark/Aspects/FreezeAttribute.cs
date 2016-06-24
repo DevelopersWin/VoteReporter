@@ -12,13 +12,13 @@ namespace DragonSpark.Aspects
 {
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
-	public sealed class Freeze : MethodInterceptionAspect, IInstanceScopedAspect
+	public sealed class FreezeAttribute : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		readonly ArgumentCache cache = new ArgumentCache();
 
 		public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = cache.Get( args );
 
-		public object CreateInstance( AdviceArgs adviceArgs ) => new Freeze();
+		public object CreateInstance( AdviceArgs adviceArgs ) => new FreezeAttribute();
 
 		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 

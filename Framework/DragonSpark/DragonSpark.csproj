@@ -184,7 +184,7 @@
     <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
     <Compile Include="Aspects\IParameterValidationController.cs" />
     <Compile Include="Aspects\ThreadCache.cs" />
-    <Compile Include="Aspects\Freeze.cs" />
+    <Compile Include="Aspects\FreezeAttribute.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />
     <Compile Include="Aspects\InterceptionArgsExtensions.cs" />
     <Compile Include="Aspects\KeyFactory.cs" />

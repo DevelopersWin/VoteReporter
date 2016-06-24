@@ -1,14 +1,20 @@
-﻿using DragonSpark.Aspects;
+﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
+using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
+using JetBrains.dotMemoryUnit;
 using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Reflection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Aspects
 {
-	public class FreezeAttributeTests
+	public class FreezeAttributeTests : TestCollectionBase
 	{
+		public FreezeAttributeTests( ITestOutputHelper output ) : base( output ) {}
+
 		[Fact]
 		public void ProviderCached()
 		{
@@ -99,6 +105,46 @@ namespace DragonSpark.Testing.Aspects
 			{
 				Count += i;
 			}
+		}
+
+		[Fact]
+		[DotMemoryUnit( SavingStrategy = SavingStrategy.OnCheckFail, Directory = @"C:\dotMemory", CollectAllocations = true, FailIfRunWithoutSupport = false )]
+		public void MemoryTest()
+		{
+			Test();
+
+			dotMemory.Check( memory =>
+							 {
+								 Assert.Equal( 0, memory.GetObjects( where => where.Type.Is<MemoryTestFactory.Result>() ).ObjectsCount );
+							 } );
+		}
+
+		static void Test()
+		{
+			var factory = new MemoryTestFactory();
+			var parameter = new MemoryTestFactory.Parameter();
+			var first = factory.Create( parameter );
+			var second = factory.Create( parameter );
+			Assert.Same( parameter, first.Parameter );
+			Assert.Same( parameter, second.Parameter );
+		}
+
+		public class MemoryTestFactory : FactoryBase<MemoryTestFactory.Parameter, MemoryTestFactory.Result>
+		{
+			public class Parameter {}
+
+			public class Result
+			{
+				public Result( Parameter parameter )
+				{
+					Parameter = parameter;
+				}
+
+				public Parameter Parameter { get; }
+			}
+
+			[Freeze]
+			public override Result Create( Parameter parameter ) => new Result( parameter );
 		}
 	}
 }
