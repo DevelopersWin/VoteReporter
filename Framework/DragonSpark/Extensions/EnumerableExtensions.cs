@@ -12,12 +12,6 @@ namespace DragonSpark.Extensions
 {
 	public static class EnumerableExtensions
 	{
-		public static IEnumerable<T> WhereNot<T>( [Required] this IEnumerable<T> @this, [Required] Func<T, bool> where ) => @this.Where( where.Inverse() );
-
-		// public static IEnumerable<T> OrItem<T>( this IEnumerable<T> @this, Func<T> defaultFunction ) where T : class => AnyOr( @this, defaultFunction().ToItem );
-
-		// public static IEnumerable<T> AnyOr<T>( this IEnumerable<T> @this, [Required]Func<IEnumerable<T>> defaultFunction ) => @this.With( x => x.Any() ) ? @this : defaultFunction();
-		
 		public static T[] Fixed<T>( this IEnumerable<T> @this )
 		{
 			var array = @this as T[] ?? @this.ToArray();
@@ -56,31 +50,6 @@ namespace DragonSpark.Extensions
 			return true;
 		}
 
-
-		/*public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T value) => source.ConcatWorker(value);
-
-		static IEnumerable<T> ConcatWorker<T>(this IEnumerable<T> source, T value)
-		{
-			foreach (var v in source)
-			{
-				yield return v;
-			}
-
-			yield return value;
-		}
-
-		public static bool SetEquals<T>(this IEnumerable<T> source1, IEnumerable<T> source2, IEqualityComparer<T> comparer) => source1.ToSet(comparer).SetEquals(source2);
-
-		public static bool SetEquals<T>(this IEnumerable<T> source1, IEnumerable<T> source2) => source1.ToSet().SetEquals(source2);
-
-		public static ISet<T> ToSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer) => ImmutableHashSet.CreateRange( comparer, source );
-
-		public static ISet<T> ToSet<T>(this IEnumerable<T> source) => source as ISet<T> ?? ImmutableHashSet.CreateRange( source );*/
-
-		// public static IEnumerable<T> NullIfEmpty<T>( this IEnumerable<T> @this ) => @this.With( x => x.Any() ) ? @this : null;
-
-		// public static IEnumerable<T> Prioritize<T>( this IEnumerable<T> @this, Func<T, IPriorityAware> determine ) => @this.Prioritize( x => determine( x ).Priority );
-
 		public static IEnumerable<T> Prioritize<T>( [Required]this IEnumerable<T> @this ) => @this.OrderBy( PriorityAwareLocator<T>.Instance.ToDelegate(), PriorityComparer.Instance );
 
 		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, U> with, Func<U> defaultFunction = null ) => WithFirst( @this, Where<T>.Always, with, defaultFunction );
@@ -102,39 +71,49 @@ namespace DragonSpark.Extensions
 
 		public class Array<T> : Cache<T, T[]> where T : class
 		{
-			public static Array<T> Property { get; } = new Array<T>();
+			public static Array<T> Default { get; } = new Array<T>();
 
 			Array() : base( arg => new[] { arg } ) {}
 		}
 
-		public static TItem[] ToItem<TItem>( this TItem target ) where TItem : class => Array<TItem>.Property.Get( target );
+		public static TItem[] ToItem<TItem>( this TItem target ) where TItem : class => Array<TItem>.Default.Get( target );
 
-		public static IEnumerable<TSource> Append<TSource>( this IEnumerable<TSource> collection, TSource element )
+		public static IEnumerable<T> Append<T>( this T @this, params T[] second ) => @this.Append_( second );
+		public static IEnumerable<T> Append<T>( this T @this, IEnumerable<T> second ) => @this.Append_( second );
+		static IEnumerable<T> Append_<T>( this T @this, IEnumerable<T> second )
+		{
+			yield return @this;
+			foreach ( var element1 in second )
+				yield return element1;
+		}
+
+		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, params T[] items ) => @this.Concat( items );
+
+		public static IEnumerable<T> Append<T>( this IEnumerable<T> collection, T element )
 		{
 			foreach ( var element1 in collection )
 				yield return element1;
 			yield return element;
 		}
 
-		public static IEnumerable<TItem> Append<TItem>( this TItem target, IEnumerable<TItem> second ) where TItem : class => target.Append( second.Fixed() );
-		public static IEnumerable<TItem> Append<TItem>( this TItem target, params TItem[] second ) where TItem : class => target.ToItem().Concat( second );
+		public static IEnumerable<T> Prepend<T>( this T @this, params T[] second ) => @this.Prepend_( second );
+		public static IEnumerable<T> Prepend<T>( this T @this, IEnumerable<T> second ) => @this.Prepend_( second );
+		public static IEnumerable<T> Prepend_<T>( this T @this, IEnumerable<T> second )
+		{
+			foreach ( var item in second )
+				yield return item;
+			yield return @this;
+		}
 
-		public static IEnumerable<TItem> Prepend<TItem>( this TItem target, IEnumerable<TItem> second ) where TItem : class=> target.Prepend( second.Fixed() );
-		public static IEnumerable<TItem> Prepend<TItem>( this TItem target, params TItem[] second ) where TItem : class => second.Concat( target.ToItem() );
-
-		public static IEnumerable<TItem> Append<TItem>( this IEnumerable<TItem> target, params TItem[] items ) => target.Concat( items );
-
-		public static IEnumerable<TItem> Prepend<TItem>( this IEnumerable<TItem> target, params TItem[] items ) => items.Concat( target );
+		public static IEnumerable<T> Prepend<T>( this IEnumerable<T> @this, params T[] items ) => items.Concat( @this );
 
 		public static IEnumerable<Tuple<T1, T2>> Tuple<T1, T2>( this IEnumerable<T1> target, IEnumerable<T2> other ) => target.Zip( other, System.Tuple.Create ).ToArray();
 
 		public static T FirstAssigned<T>( this IEnumerable<T> @this ) => @this.WhereAssigned().FirstOrDefault();
 
-		public static U FirstAssigned<T, U>( this IEnumerable<T> @this, Func<T, U> projection ) => @this.WhereAssigned().Select( projection ).FirstAssigned();
+		public static TTo FirstAssigned<TFrom, TTo>( this IEnumerable<TFrom> @this, Func<TFrom, TTo> projection ) => @this.WhereAssigned().Select( projection ).FirstAssigned();
 
 		public static IEnumerable<T> WhereAssigned<T>( this IEnumerable<T> target ) => target.Where( Where<T>.Assigned );
-
-		//public static IEnumerable<TItem> WhereAssigned<TItem, TProject>( this IEnumerable<TItem> target, Func<TItem, TProject> project ) => target.Where(  );
 
 		public static T FirstOrDefaultOfType<T>(this IEnumerable enumerable) => enumerable.OfType<T>().FirstOrDefault();
 
