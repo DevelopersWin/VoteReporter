@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
@@ -176,7 +175,6 @@ namespace DragonSpark.Runtime
 		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer ) : base( inner.ToDelegate(), coercer, inner.ToSpecification() ) {}
 	}
 
-	[AutoValidation.GenericCommand]
 	public abstract class CommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate { };

@@ -5,6 +5,7 @@ using PostSharp.Extensibility;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Markup;
+using DragonSpark.Aspects;
 using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Configuration
@@ -30,6 +31,7 @@ namespace DragonSpark.Configuration
 	}
 
 	[ContentProperty( nameof(Configurations) )]
+	[AutoValidation.GenericCommand]
 	public class InitializeConfigurationCommand : ServicedCommand<ConfigureCommand, IList<IWritableStore>>
 	{
 		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification() ) {}

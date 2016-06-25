@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Threading;
@@ -32,15 +32,17 @@ namespace DragonSpark.Windows.TypeSystem
 	}
 
 	[Synchronized]
+	[AutoValidation.GenericCommand]
 	public class AssemblyInitializer : CommandBase<Assembly>
 	{
+		readonly static Action<ModuleHandle> Initialize = System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor;
 		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();
 
 		AssemblyInitializer() : base( Specification.Instance ) {}
 
 		public override void Execute( Assembly parameter )
 		{
-			parameter.GetModules().Select( module => module.ModuleHandle ).ToList().ForEach( System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor );
+			parameter.GetModules().Select( module => module.ModuleHandle ).ForEach( Initialize );
 			if ( !Activated( parameter ) )
 			{
 				DragonSpark.TypeSystem.Activated.Property.Set( parameter, true );

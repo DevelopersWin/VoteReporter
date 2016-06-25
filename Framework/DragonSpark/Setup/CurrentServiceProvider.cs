@@ -8,6 +8,7 @@ using Serilog;
 using Serilog.Events;
 using System;
 using System.Linq;
+using DragonSpark.Aspects;
 
 namespace DragonSpark.Setup
 {
@@ -110,6 +111,7 @@ namespace DragonSpark.Setup
 		public override void Execute( MigrationParameter<ILoggerHistory> parameter ) => parameter.From.Events.Except( parameter.To.Events ).Each( parameter.To.Emit );
 	}
 
+	[AutoValidation.GenericCommand]
 	public abstract class MigrationCommandBase<T> : CommandBase<MigrationParameter<T>>
 	{
 		protected MigrationCommandBase() : base( Specifications<MigrationParameter<T>>.IsInstanceOf.And( new OnlyOnceSpecification() ) ) {}

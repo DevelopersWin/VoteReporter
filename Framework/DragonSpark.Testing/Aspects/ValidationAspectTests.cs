@@ -2,6 +2,7 @@
 using DragonSpark.Runtime.Specifications;
 using Ploeh.AutoFixture.Xunit2;
 using System.Windows.Input;
+using DragonSpark.Aspects;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects
@@ -100,6 +101,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.False( command.Executed );
 		}
 
+		[AutoValidation.GenericCommand]
 		class ValidatedCommand : CommandBase<object>
 		{
 			public ValidatedCommand() : base( new OnlyOnceSpecification() ) {}
