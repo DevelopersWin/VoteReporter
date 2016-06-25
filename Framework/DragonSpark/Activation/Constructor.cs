@@ -1,3 +1,4 @@
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -11,6 +12,7 @@ using System.Reflection;
 
 namespace DragonSpark.Activation
 {
+	[AutoValidation.GenericFactory]
 	public class Constructor : ConstructorBase
 	{
 		readonly Func<ConstructTypeRequest, ConstructorInfo> constructorSource;

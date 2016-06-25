@@ -64,62 +64,7 @@ namespace DragonSpark.Aspects
 	{
 		public static ICache<IParameterValidationController> Controller { get; } = new Cache<IParameterValidationController>();
 	}
-
-	/*public sealed class ValidatedCommand : ValidatedParameterAspectBase
-	{
-		readonly static Func<object, IParameterValidator> Factory = CommandAdapterFactory.Instance.ToDelegate();
-
-		public ValidatedCommand() : base( Factory ) {}
-
-		public class Commands : AutoValidationAttributeBase
-		{
-			readonly static ProfileTypeDescriptor Profile = new ProfileTypeDescriptor( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) );
-
-			public Commands() : base( Profile ) {}
-		}
-	}
-
-	public sealed class ValidatedGenericCommand : ValidatedParameterAspectBase
-	{
-		readonly static Func<object, IParameterValidator> Factory = GenericCommandAdapterFactory.Instance.ToDelegate();
-
-		public ValidatedGenericCommand() : base( Factory ) {}
-
-		public class Commands : AutoValidationAttributeBase
-		{
-			readonly static ProfileTypeDescriptor Profile = new ProfileTypeDescriptor( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) );
-
-			public Commands() : base( Profile ) {}
-		}
-	}*/
-
-	/*public sealed class ValidatedFactory : ValidatedParameterAspectBase
-	{
-		readonly static Func<object, IParameterValidator> Factory = FactoryAdapterFactory.Instance.ToDelegate();
-
-		public ValidatedFactory() : base( Factory ) {}
-
-		public class Commands : AutoValidationAttributeBase
-		{
-			readonly static ProfileTypeDescriptor Profile = new ProfileTypeDescriptor( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) );
-
-			public Commands() : base( Profile ) {}
-		}
-	}*/
-
-	/*public sealed class ValidatedGenericFactory : ValidatedParameterAspectBase
-	{
-		readonly static Func<object, IParameterValidator> Factory = GenericFactoryAdapterFactory.Instance.ToDelegate();
-		
-		public ValidatedGenericFactory() : base( Factory ) {}
-
-		public class Commands : AutoValidationAttributeBase
-		{
-			readonly static ProfileTypeDescriptor Profile = new ProfileTypeDescriptor( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) );
-			public Commands() : base( Profile ) {}
-		}
-	}*/
-
+	
 	public static class AutoValidation
 	{
 		public sealed class Factory : AutoValidationAttributeBase

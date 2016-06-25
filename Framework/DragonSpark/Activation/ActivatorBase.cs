@@ -1,19 +1,17 @@
-using DragonSpark.Aspects;
 using DragonSpark.Runtime.Specifications;
 using System;
 
 namespace DragonSpark.Activation
 {
-	[AutoValidation.GenericFactory]
 	public abstract class ActivatorBase<TRequest> : FactoryWithSpecificationBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
 		protected ActivatorBase( Coerce<TRequest> coercer ) : this( coercer, Specification.Instance ) {}
 
 		protected ActivatorBase( Coerce<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification ) {}
 
-		bool IFactory<TypeRequest, object>.CanCreate( TypeRequest parameter ) => base.CanCreate( (TRequest)parameter );
+		bool IFactory<TypeRequest, object>.CanCreate( TypeRequest parameter ) => CanCreate( (TRequest)parameter );
 
-		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => this.CreateUsing<object>( parameter );
+		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => Create( (TRequest)parameter );
 
 		class Specification : IsInstanceOfSpecification<TRequest>
 		{

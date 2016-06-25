@@ -211,6 +211,7 @@ namespace DragonSpark.Activation
 			new Factory<IFactoryWithParameter>( factoryWithParameter )
 		) {}
 
+		[AutoValidation.GenericFactory]
 		class Factory<T> : DelegatedFactory<Type, Func<object>>
 		{
 			public Factory( IFactory<Type, Func<object>> inner ) : base( inner.ToDelegate(), TypeAssignableSpecification<T>.Instance ) {}
