@@ -4,7 +4,7 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
+	[AutoValidation.GenericFactory]
 	public abstract class ActivatorBase<TRequest> : FactoryWithSpecificationBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
 		protected ActivatorBase( Coerce<TRequest> coercer ) : this( coercer, Specification.Instance ) {}

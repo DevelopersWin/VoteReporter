@@ -9,6 +9,7 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
+using System.Collections.Immutable;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects
@@ -38,9 +39,21 @@ namespace DragonSpark.Aspects
 		public static ICache<InstanceServiceProvider> Services = new ActivatedCache<InstanceServiceProvider>();
 	}
 
-	public struct Profile
+	public struct AutoValidationProfile
 	{
-		public Profile( Type type, string isValid, string execute )
+		public AutoValidationProfile( Func<object, IParameterValidator> factory, ImmutableArray<ProfileTypeDescriptor> descriptors )
+		{
+			Factory = factory;
+			Descriptors = descriptors;
+		}
+
+		public Func<object, IParameterValidator> Factory { get; }
+		public ImmutableArray<ProfileTypeDescriptor> Descriptors { get; }
+	}
+
+	public struct ProfileTypeDescriptor
+	{
+		public ProfileTypeDescriptor( Type type, string isValid, string execute )
 		{
 			Type = type;
 			IsValid = isValid;
@@ -78,33 +91,33 @@ namespace DragonSpark.Aspects
 		}
 	}
 	
-	class GenericFactoryParameterAdapterFactory : GenericParameterAdapterFactoryBase
+	class GenericFactoryAdapterFactory : GenericParameterAdapterFactoryBase
 	{
-		public static GenericFactoryParameterAdapterFactory Instance { get; } = new GenericFactoryParameterAdapterFactory();
+		public static GenericFactoryAdapterFactory Instance { get; } = new GenericFactoryAdapterFactory();
 
-		GenericFactoryParameterAdapterFactory() : base( typeof(GenericFactoryParameterAdapterFactory), typeof(IFactory<,>) ) {}
+		GenericFactoryAdapterFactory() : base( typeof(GenericFactoryAdapterFactory), typeof(IFactory<,>) ) {}
 
 		static IParameterValidator Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
-	class GenericCommandParameterAdapterFactory : GenericParameterAdapterFactoryBase
+	class GenericCommandAdapterFactory : GenericParameterAdapterFactoryBase
 	{
-		public static GenericCommandParameterAdapterFactory Instance { get; } = new GenericCommandParameterAdapterFactory();
+		public static GenericCommandAdapterFactory Instance { get; } = new GenericCommandAdapterFactory();
 
-		GenericCommandParameterAdapterFactory() : base( typeof(GenericCommandParameterAdapterFactory), typeof(ICommand<>) ) {}
+		GenericCommandAdapterFactory() : base( typeof(GenericCommandAdapterFactory), typeof(ICommand<>) ) {}
 
 		static IParameterValidator Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
-	class CommandParameterAdapterFactory : ParameterAdapterFactoryBase<ICommand>
+	class CommandAdapterFactory : ParameterAdapterFactoryBase<ICommand>
 	{
-		public static CommandParameterAdapterFactory Instance { get; } = new CommandParameterAdapterFactory();
-		CommandParameterAdapterFactory() : base( command => new CommandAdapter( command ) ) {}
+		public static CommandAdapterFactory Instance { get; } = new CommandAdapterFactory();
+		CommandAdapterFactory() : base( command => new CommandAdapter( command ) ) {}
 	}
 
-	class FactoryParameterAdapterFactory : ParameterAdapterFactoryBase<IFactoryWithParameter>
+	class FactoryAdapterFactory : ParameterAdapterFactoryBase<IFactoryWithParameter>
 	{
-		public static FactoryParameterAdapterFactory Instance { get; } = new FactoryParameterAdapterFactory();
-		FactoryParameterAdapterFactory() : base( parameter => new FactoryAdapter( parameter ) ) {}
+		public static FactoryAdapterFactory Instance { get; } = new FactoryAdapterFactory();
+		FactoryAdapterFactory() : base( parameter => new FactoryAdapter( parameter ) ) {}
 	}
 
 	public struct RelayParameter

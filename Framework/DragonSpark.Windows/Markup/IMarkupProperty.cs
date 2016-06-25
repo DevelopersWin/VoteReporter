@@ -25,7 +25,7 @@ namespace DragonSpark.Windows.Markup
 			;
 	}
 
-	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
+	[AutoValidation.GenericFactory]
 	public abstract class MarkupPropertyFactoryBase : FactoryWithSpecificationBase<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
 	{
 		protected MarkupPropertyFactoryBase( ISpecification<IServiceProvider> specification ) : base( specification ) {}

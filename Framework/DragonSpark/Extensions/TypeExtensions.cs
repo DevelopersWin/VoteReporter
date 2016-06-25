@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -22,15 +21,15 @@ namespace DragonSpark.Extensions
 		  return null;
 		}
 
-		public static Assembly[] Assemblies( [Required] this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToArray();
+		public static Assembly[] Assemblies( this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToArray();
 
-		public static TypeAdapter Adapt( [Required]this Type @this ) => TypeAdapterCache.Default.Get( @this );
+		public static TypeAdapter Adapt( this Type @this ) => TypeAdapterCache.Default.Get( @this );
 
 		public static TypeAdapter Adapt( this object @this ) => @this.GetType().Adapt();
 
-		public static TypeAdapter Adapt( [Required]this TypeInfo @this ) => Adapt( @this.AsType() );
+		public static TypeAdapter Adapt( this TypeInfo @this ) => Adapt( @this.AsType() );
 
-		public static Assembly Assembly( [Required]this Type @this ) => Adapt( @this ).Assembly;
+		public static Assembly Assembly( this Type @this ) => Adapt( @this ).Assembly;
 
 		public static bool IsAssignableFrom( this ImmutableArray<TypeAdapter> @this, Type type )
 		{

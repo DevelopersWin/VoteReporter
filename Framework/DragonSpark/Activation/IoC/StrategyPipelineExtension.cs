@@ -185,7 +185,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
+	[AutoValidation.GenericFactory]
 	public class BuildableTypeFromConventionLocator : FactoryWithSpecificationBase<Type, Type>
 	{
 		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator( Items<Type>.Default );

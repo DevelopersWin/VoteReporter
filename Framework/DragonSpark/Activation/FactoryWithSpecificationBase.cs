@@ -183,7 +183,7 @@ namespace DragonSpark.Activation
 		public abstract TResult Create( TParameter parameter );
 	}
 
- 	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
+	[AutoValidation.GenericFactory]
 	public class DelegatedFactory<TParameter, TResult> : FactoryWithSpecificationBase<TParameter, TResult>
 	{
 		readonly Func<TParameter, TResult> inner;

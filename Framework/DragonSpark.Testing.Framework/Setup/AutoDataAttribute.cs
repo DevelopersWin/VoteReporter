@@ -199,7 +199,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	[ValidatedGenericFactory, ValidatedGenericFactory.Commands]
+	[AutoValidation.GenericFactory]
 	sealed class FixtureServiceProvider : FactoryWithSpecificationBase<Type, object>, IServiceProvider
 	{
 		readonly IFixture fixture;

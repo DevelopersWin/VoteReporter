@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Activator = System.Activator;
@@ -28,7 +29,15 @@ namespace DragonSpark.TypeSystem
 
 	public static class Items<T>
 	{
-		public static T[] Default { get; } = (T[])Enumerable.Empty<T>();
+		static Items()
+		{
+			Default = (T[])Enumerable.Empty<T>();
+			Immutable = Default.ToImmutableArray();
+		}
+
+		public static T[] Default { get; }
+
+		public static ImmutableArray<T> Immutable { get; }
 	}
 
 	public class DefaultValueFactory<T> : FactoryBase<T>
