@@ -18,9 +18,9 @@ namespace DragonSpark.Aspects
 	[PSerializable]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class ParameterValidatorAspectBase : MethodInterceptionAspect
+	public abstract class AutoValidationCommandBase : MethodInterceptionAspect //, IInstanceScopedAspect
 	{
-		readonly static Func<object, IParameterValidationController> Get = ParameterValidation.Controller.Get;
+		readonly static Func<object, IParameterValidationController> Get = AutoValidation.Controller.Get;
 
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
@@ -36,11 +36,25 @@ namespace DragonSpark.Aspects
 			}
 		}
 
+		bool Enabled { get; set; }
+
 		protected abstract object Execute( IParameterValidationController controller, RelayParameter parameter );
+		public object CreateInstance( AdviceArgs adviceArgs )
+		{
+			/*var result = MemberwiseClone() as AutoValidationCommandBase;
+			// result.Enabled = adviceArgs.Instance.Has<AutoValidationAttributeBase>();
+			if ( result.Enabled )
+			{
+			//	throw new InvalidOperationException( "WOOHOO!!!");
+			}*/
+			return MemberwiseClone();
+		}
+
+		// void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 	}
 
 	[PSerializable]
-	public class ExecutionAspect : ParameterValidatorAspectBase
+	public class ExecutionAspect : AutoValidationCommandBase
 	{
 		public static ExecutionAspect Instance { get; } = new ExecutionAspect();
 
@@ -48,7 +62,7 @@ namespace DragonSpark.Aspects
 	}
 
 	[PSerializable]
-	public class ValidatorAspect : ParameterValidatorAspectBase
+	public class ValidatorAspect : AutoValidationCommandBase
 	{
 		public static ValidatorAspect Instance { get; } = new ValidatorAspect();
 
@@ -60,13 +74,10 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	public static class ParameterValidation
-	{
-		public static ICache<IParameterValidationController> Controller { get; } = new Cache<IParameterValidationController>();
-	}
-	
 	public static class AutoValidation
 	{
+		public static ICache<IParameterValidationController> Controller { get; } = new Cache<IParameterValidationController>();
+
 		public sealed class Factory : AutoValidationAttributeBase
 		{
 			public static ProfileTypeDescriptor Descriptor { get; } = new ProfileTypeDescriptor( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) );
@@ -111,7 +122,7 @@ namespace DragonSpark.Aspects
 			this.profile = profile;
 		}
 
-		public override void RuntimeInitializeInstance() => ParameterValidation.Controller.Set( Instance, new ParameterValidationController( profile.Factory( Instance ) ) );
+		public override void RuntimeInitializeInstance() => AutoValidation.Controller.Set( Instance, new ParameterValidationController( profile.Factory( Instance ) ) );
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{
@@ -142,19 +153,4 @@ namespace DragonSpark.Aspects
 			}
 		}
 	}
-
-	/*[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
-	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class ValidatedParameterAspectBase : InstanceLevelAspect
-	{
-		readonly Func<object, IParameterValidator> factory;
-		
-		protected ValidatedParameterAspectBase( Func<object, IParameterValidator> factory )
-		{
-			this.factory = factory;
-		}
-
-		
-	}*/
 }
