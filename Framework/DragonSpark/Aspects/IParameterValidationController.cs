@@ -11,6 +11,7 @@ using PostSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects
@@ -106,6 +107,16 @@ namespace DragonSpark.Aspects
 		protected AutoValidationAttributeBase( AutoValidationProfile profile )
 		{
 			this.profile = profile;
+		}
+
+		public override bool CompileTimeValidate( Type type )
+		{
+			var types = profile.Descriptors.Select( descriptor => descriptor.Type.Adapt() ).ToImmutableArray();
+			if ( !types.IsAssignableFrom( type ) )
+			{
+				throw new InvalidOperationException( $"{type} does not implement any of the types defined in {GetType()}, which are: {string.Join( ",", types.Select( t => t.Type.FullName ) )}" );
+			}
+			return true;
 		}
 
 		public override void RuntimeInitializeInstance() => AutoValidation.Controller.Set( Instance, new ParameterValidationController( profile.Factory( Instance ) ) );

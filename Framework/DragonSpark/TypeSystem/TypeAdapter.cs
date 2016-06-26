@@ -42,7 +42,8 @@ namespace DragonSpark.TypeSystem
 
 		public bool IsAssignableFrom( TypeInfo other ) => IsAssignableFrom( other.AsType() );
 
-		public bool IsAssignableFrom( Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() ) /*|| GetCaster( other ) != null*/;
+		[Freeze]
+		public bool IsAssignableFrom( Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() )/* || IsGenericOf( other )*/;
 
 		public bool IsInstanceOfType( object context ) => IsAssignableFrom( context.GetType() );
 
