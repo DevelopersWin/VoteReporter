@@ -41,19 +41,19 @@ namespace DragonSpark.Aspects
 
 	public struct AutoValidationProfile
 	{
-		public AutoValidationProfile( Func<object, IParameterValidator> factory, ImmutableArray<ProfileTypeDescriptor> descriptors )
+		public AutoValidationProfile( Func<object, IParameterValidator> factory, ImmutableArray<AutoValidationTypeDescriptor> descriptors )
 		{
 			Factory = factory;
 			Descriptors = descriptors;
 		}
 
 		public Func<object, IParameterValidator> Factory { get; }
-		public ImmutableArray<ProfileTypeDescriptor> Descriptors { get; }
+		public ImmutableArray<AutoValidationTypeDescriptor> Descriptors { get; }
 	}
 
-	public struct ProfileTypeDescriptor
+	public struct AutoValidationTypeDescriptor
 	{
-		public ProfileTypeDescriptor( Type type, string isValid, string execute )
+		public AutoValidationTypeDescriptor( Type type, string isValid, string execute )
 		{
 			Type = type;
 			IsValid = isValid;
