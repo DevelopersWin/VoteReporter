@@ -18,7 +18,7 @@ namespace DragonSpark.Aspects
 	[PSerializable]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class AutoValidationCommandBase : MethodInterceptionAspect //, IInstanceScopedAspect
+	public abstract class AutoValidationCommandBase : MethodInterceptionAspect
 	{
 		readonly static Func<object, IParameterValidationController> Get = AutoValidation.Controller.Get;
 
@@ -36,21 +36,7 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		bool Enabled { get; set; }
-
 		protected abstract object Execute( IParameterValidationController controller, RelayParameter parameter );
-		public object CreateInstance( AdviceArgs adviceArgs )
-		{
-			/*var result = MemberwiseClone() as AutoValidationCommandBase;
-			// result.Enabled = adviceArgs.Instance.Has<AutoValidationAttributeBase>();
-			if ( result.Enabled )
-			{
-			//	throw new InvalidOperationException( "WOOHOO!!!");
-			}*/
-			return MemberwiseClone();
-		}
-
-		// void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 	}
 
 	[PSerializable]
