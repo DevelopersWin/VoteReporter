@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Generic;
@@ -152,7 +153,7 @@ namespace DragonSpark.Runtime.Properties
 
 			Store() : this( () => default(TResult) ) {}
 
-			public Store( Func<TResult> create )
+			public Store( Func<TResult> create ) : base( Specifications<TInstance>.Always )
 			{
 				this.create = create;
 			}

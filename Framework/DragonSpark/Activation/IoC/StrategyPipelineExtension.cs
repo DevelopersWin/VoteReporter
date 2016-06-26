@@ -186,7 +186,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[AutoValidation.GenericFactory]
-	public class BuildableTypeFromConventionLocator : FactoryWithSpecificationBase<Type, Type>
+	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
 		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator( Items<Type>.Default );
 
@@ -242,7 +242,7 @@ namespace DragonSpark.Activation.IoC
 		public override bool IsSatisfiedBy( Type parameter ) => parameter.Name.Equals( type );
 	}
 
-	class ConventionCandidateNameFactory : FactoryWithSpecificationBase<Type, string>
+	class ConventionCandidateNameFactory : FactoryBase<Type, string>
 	{
 		public static ConventionCandidateNameFactory Instance { get; } = new ConventionCandidateNameFactory();
 
@@ -254,7 +254,7 @@ namespace DragonSpark.Activation.IoC
 		int GetWeight( Type candidate );
 	}
 
-	public class TypeCandidateWeightProvider : FactoryWithSpecificationBase<Type, int>, ITypeCandidateWeightProvider
+	public class TypeCandidateWeightProvider : FactoryBase<Type, int>, ITypeCandidateWeightProvider
 	{
 		readonly Type subject;
 
@@ -268,7 +268,7 @@ namespace DragonSpark.Activation.IoC
 		public int GetWeight( Type candidate ) => Create( candidate );
 	}
 
-	public abstract class TypeSelectionStrategyBase : FactoryWithSpecificationBase<Type, Type[]>
+	public abstract class TypeSelectionStrategyBase : FactoryBase<Type, Type[]>
 	{
 		protected TypeSelectionStrategyBase() {}
 
@@ -305,7 +305,7 @@ namespace DragonSpark.Activation.IoC
 	}*/
 
 	[Persistent]
-	public class ImplementedInterfaceFromConventionLocator : FactoryWithSpecificationBase<Type, Type>
+	public class ImplementedInterfaceFromConventionLocator : FactoryBase<Type, Type>
 	{
 		readonly Type[] ignore;
 		public static ImplementedInterfaceFromConventionLocator Instance { get; } = new ImplementedInterfaceFromConventionLocator( typeof(IFactory), typeof(IFactoryWithParameter) );

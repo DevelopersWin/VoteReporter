@@ -124,7 +124,7 @@ namespace DragonSpark.Activation
 			
 			Casted() : base( result => new CastedFactory( result ) ) {}
 
-			class CastedFactory : FactoryWithSpecificationBase<TParameter, TResult>
+			class CastedFactory : FactoryBase<TParameter, TResult>
 			{
 				readonly IFactoryWithParameter inner;
 				public CastedFactory( IFactoryWithParameter inner ) : base( inner.ToSpecification().Cast<TParameter>() )

@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.Framework
 		public const string JetbrainsResharperTaskrunner = "JetBrains.ReSharper.TaskRunner";
 	}
 
-	public class JetBrainsApplicationDomainFactory : FactoryWithSpecificationBase<AppDomain>
+	public class JetBrainsApplicationDomainFactory : FactoryBase<AppDomain>
 	{
 		public static JetBrainsApplicationDomainFactory Instance { get; } = new JetBrainsApplicationDomainFactory();
 
@@ -44,7 +44,7 @@ namespace DragonSpark.Testing.Framework
 		protected override AppDomain CreateItem() => source().Except( AppDomain.CurrentDomain.ToItem() ).FirstOrDefault( JetBrainsAppDomainSpecification.Instance.IsSatisfiedBy );
 	}
 
-	public class AppDomainFactory : FactoryWithSpecificationBase<ImmutableArray<AppDomain>>
+	public class AppDomainFactory : FactoryBase<ImmutableArray<AppDomain>>
 	{
 		public static AppDomainFactory Instance { get; } = new AppDomainFactory();
 
@@ -84,7 +84,7 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class JetBrainsAssemblyLoaderFactory : FactoryWithSpecificationBase<string, AssemblyLoader>
+	public class JetBrainsAssemblyLoaderFactory : FactoryBase<string, AssemblyLoader>
 	{
 		public static JetBrainsAssemblyLoaderFactory Instance { get; } = new JetBrainsAssemblyLoaderFactory();
 

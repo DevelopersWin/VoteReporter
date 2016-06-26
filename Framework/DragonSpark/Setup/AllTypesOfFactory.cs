@@ -8,7 +8,7 @@ using Type = System.Type;
 namespace DragonSpark.Setup
 {
 	[Persistent]
-	public class AllTypesOfFactory : FactoryWithSpecificationBase<Type, Array>
+	public class AllTypesOfFactory : FactoryBase<Type, Array>
 	{
 		readonly Type[] types;
 		readonly IActivator activator;

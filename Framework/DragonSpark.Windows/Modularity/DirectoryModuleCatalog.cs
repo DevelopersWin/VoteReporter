@@ -32,7 +32,7 @@ namespace DragonSpark.Windows.Modularity
 		}
 	}
 
-	public class LoadRemoteModuleInfoFactory : FactoryWithSpecificationBase<LoadRemoteModuleInfoParameter, ModuleInfo[]>
+	public class LoadRemoteModuleInfoFactory : FactoryBase<LoadRemoteModuleInfoParameter, ModuleInfo[]>
 	{
 		public static LoadRemoteModuleInfoFactory Instance { get; } = new LoadRemoteModuleInfoFactory();
 
@@ -68,7 +68,7 @@ namespace DragonSpark.Windows.Modularity
 		public string Path { get; }
 	}
 
-	public class RemoteModuleInfoProviderFactory : FactoryWithSpecificationBase<LoadRemoteModuleInfoParameter, IModuleInfoProvider>
+	public class RemoteModuleInfoProviderFactory : FactoryBase<LoadRemoteModuleInfoParameter, IModuleInfoProvider>
 	{
 		public static RemoteModuleInfoProviderFactory Instance { get; } = new RemoteModuleInfoProviderFactory();
 
@@ -93,7 +93,7 @@ namespace DragonSpark.Windows.Modularity
 		}
 	}
 
-	public class ChildDomainFactory : FactoryWithSpecificationBase<AppDomain, AppDomain>
+	public class ChildDomainFactory : FactoryBase<AppDomain, AppDomain>
 	{
 		public static ChildDomainFactory Instance { get; } = new ChildDomainFactory();
 

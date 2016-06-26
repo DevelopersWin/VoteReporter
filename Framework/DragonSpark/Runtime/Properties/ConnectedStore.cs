@@ -148,7 +148,7 @@ namespace DragonSpark.Runtime.Properties
 			registry.Register( factory, this );
 		}
 
-		public class Store : FactoryWithSpecificationBase<object, IWritableStore<IStack<T>>>
+		public class Store : FactoryBase<object, IWritableStore<IStack<T>>>
 		{
 			readonly Action<Store, object> callback;
 

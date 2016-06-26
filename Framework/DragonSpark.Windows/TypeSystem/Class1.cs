@@ -19,7 +19,7 @@ namespace DragonSpark.Windows.TypeSystem
 		LoadPartAssemblyCommand() : base( AssemblyLoader.Instance ) {}
 	}
 
-	public class AssemblyPathLoader : FactoryWithSpecificationBase<string, Assembly[]>
+	public class AssemblyPathLoader : FactoryBase<string, Assembly[]>
 	{
 		public static AssemblyPathLoader Instance { get; } = new AssemblyPathLoader();
 

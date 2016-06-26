@@ -26,7 +26,6 @@ namespace DragonSpark.Activation.IoC
 			{
 				this.property = property;
 			}
-
 		
 			public override object Create( Type parameter )
 			{

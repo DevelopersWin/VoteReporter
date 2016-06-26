@@ -1,32 +1,11 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using System;
 
 namespace DragonSpark.Activation
 {
-	/*public class FixedCoercer<TParameter> : ICoercer<TParameter>
-	{
-		public static FixedCoercer<TParameter> Null { get; } = new FixedCoercer<TParameter>();
-
-		readonly TParameter item;
-
-		public FixedCoercer() : this( default(TParameter) ) {}
-
-		public FixedCoercer( TParameter item )
-		{
-			this.item = item;
-		}
-
-		public TParameter Coerce( object parameter ) => item;
-	}*/
-
-	/*public class ConstructFromParameterFactory : ConstructFromParameterFactory<object>
-	{
-		public ConstructFromParameterFactory( Type type ) : base( type ) {}
-		public ConstructFromParameterFactory( IActivator activator, Type type ) : base( activator, type ) {}
-	}*/
-
 	public class ConstructFromParameterFactory<T> : FactoryBase<object, T>
 	{
 		public static ICache<Type, Func<object, T>> Cache { get; } = new Cache<Type, Func<object, T>>( t => new ConstructFromParameterFactory<T>( t ).ToDelegate() );
@@ -39,7 +18,7 @@ namespace DragonSpark.Activation
 		ConstructFromParameterFactory() : this( typeof(T) ) {}
 		ConstructFromParameterFactory( Type type ) : this( Constructor.Instance, type ) {}
 
-		public ConstructFromParameterFactory( IActivator activator, Type type )
+		public ConstructFromParameterFactory( IActivator activator, Type type ) : base( Specifications.Always )
 		{
 			this.activator = activator;
 			this.type = type;

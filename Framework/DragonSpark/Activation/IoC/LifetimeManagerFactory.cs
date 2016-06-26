@@ -31,7 +31,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	class AttributedLifetimeFactory : FactoryWithSpecificationBase<Type, Type>
+	class AttributedLifetimeFactory : FactoryBase<Type, Type>
 	{
 		public static AttributedLifetimeFactory Instance { get; } = new AttributedLifetimeFactory();
 			
@@ -44,7 +44,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	public class LifetimeManagerFactory : FactoryWithSpecificationBase<Type, LifetimeManager>
+	public class LifetimeManagerFactory : FactoryBase<Type, LifetimeManager>
 	{
 		readonly Func<Type, LifetimeManager> lifetimeResolver;
 		readonly Func<Type, Type> lifetimeTypeFactory;

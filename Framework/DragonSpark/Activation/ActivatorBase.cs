@@ -3,7 +3,7 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	public abstract class ActivatorBase<TRequest> : FactoryWithSpecificationBase<TRequest, object>, IActivator where TRequest : TypeRequest
+	public abstract class ActivatorBase<TRequest> : FactoryBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
 		protected ActivatorBase( Coerce<TRequest> coercer ) : this( coercer, Specification.Instance ) {}
 

@@ -39,7 +39,7 @@ namespace DragonSpark.Setup.Registration
 		public static void Register<T>( this IServiceRegistry @this, Func<T> factory, string name = null ) => @this.RegisterFactory( new FactoryRegistrationParameter( typeof(T), factory.Convert(), name ) );
 	}
 
-	public class FactoryDelegateFactory : FactoryWithSpecificationBase<Type, Func<object>>
+	public class FactoryDelegateFactory : FactoryBase<Type, Func<object>>
 	{
 		readonly Func<Type, IFactory> createFactory;
 
@@ -55,7 +55,7 @@ namespace DragonSpark.Setup.Registration
 		public override Func<object> Create( Type parameter ) => createFactory( parameter ).ToDelegate();
 	}
 
-	public class FactoryWithParameterDelegateFactory : FactoryWithSpecificationBase<Type, Func<object, object>>
+	public class FactoryWithParameterDelegateFactory : FactoryBase<Type, Func<object, object>>
 	{
 		public static FactoryWithParameterDelegateFactory Instance { get; } = new FactoryWithParameterDelegateFactory();
 
@@ -71,7 +71,7 @@ namespace DragonSpark.Setup.Registration
 		public override Func<object, object> Create( Type parameter ) => createFactory( parameter ).ToDelegate();
 	}
 
-	public class FactoryWithActivatedParameterDelegateFactory : FactoryWithSpecificationBase<Type, Func<object>>
+	public class FactoryWithActivatedParameterDelegateFactory : FactoryBase<Type, Func<object>>
 	{
 		public static FactoryWithActivatedParameterDelegateFactory Instance { get; } = new FactoryWithActivatedParameterDelegateFactory();
 
@@ -99,7 +99,7 @@ namespace DragonSpark.Setup.Registration
 		}
 	}
 
-	public class FuncFactory<T, U> : FactoryWithSpecificationBase<Func<object, object>, Func<T, U>>
+	public class FuncFactory<T, U> : FactoryBase<Func<object, object>, Func<T, U>>
 	{
 		public static FuncFactory<T, U> Instance { get; } = new FuncFactory<T, U>();
 
@@ -108,7 +108,7 @@ namespace DragonSpark.Setup.Registration
 		public override Func<T, U> Create( Func<object, object> parameter ) => parameter.Convert<T, U>();
 	}
 
-	public class FuncFactory<T> : FactoryWithSpecificationBase<Func<object>, Func<T>>
+	public class FuncFactory<T> : FactoryBase<Func<object>, Func<T>>
 	{
 		public static FuncFactory<T> Instance { get; } = new FuncFactory<T>();
 

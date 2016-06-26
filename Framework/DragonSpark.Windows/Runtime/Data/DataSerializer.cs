@@ -18,7 +18,7 @@ namespace DragonSpark.Windows.Runtime.Data
 		public string Save( object item ) => XamlServices.Save( item );
 	}
 
-	public abstract class DataTransformerBase<T> : FactoryWithSpecificationBase<DataTransformParameter, T> {}
+	public abstract class DataTransformerBase<T> : FactoryBase<DataTransformParameter, T> {}
 
 	public abstract class DataTransformer<T> : DataTransformerBase<T>
 	{

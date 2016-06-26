@@ -57,7 +57,7 @@ namespace DragonSpark.Windows.Markup
 		}
 	}*/
 
-	public class MemberInfoKeyFactory : FactoryWithSpecificationBase<PropertyReference, string>
+	public class MemberInfoKeyFactory : FactoryBase<PropertyReference, string>
 	{
 		public static MemberInfoKeyFactory Instance { get; } = new MemberInfoKeyFactory();
 

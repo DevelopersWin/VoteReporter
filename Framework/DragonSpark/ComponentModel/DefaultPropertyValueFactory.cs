@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class DefaultPropertyValueFactory : FactoryWithSpecificationBase<DefaultValueParameter, object>
+	public class DefaultPropertyValueFactory : FactoryBase<DefaultValueParameter, object>
 	{
 		public static DefaultPropertyValueFactory Instance { get; } = new DefaultPropertyValueFactory();
 

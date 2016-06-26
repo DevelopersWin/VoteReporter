@@ -48,7 +48,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		// public TracingAssignment( IAssign<TraceListener, CollectionAction> assign, Value<TraceListener> first, Value<CollectionAction> second ) : base( assign, first, second ) {}
 	}
 
-	/*public class TraceAwareProfilerFactory : FactoryWithSpecificationBase<ILogger, IDisposable>
+	/*public class TraceAwareProfilerFactory : FactoryBase<ILogger, IDisposable>
 	{
 		public override IDisposable Create( ILogger parameter )
 		{
@@ -58,7 +58,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		}
 	}*/
 	
-	/*public class LoggingTraceListenerFactory : FactoryWithSpecificationBase<ILogger, TraceListener>
+	/*public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>
 	{
 		public static LoggingTraceListenerFactory Instance { get; } = new LoggingTraceListenerFactory();
 

@@ -12,7 +12,7 @@ using System;
 
 namespace DragonSpark.Activation.IoC
 {
-	public class ServiceProviderSpecificationFactory : FactoryWithSpecificationBase<IServiceProvider, ISpecification<LocateTypeRequest>>
+	public class ServiceProviderSpecificationFactory : FactoryBase<IServiceProvider, ISpecification<LocateTypeRequest>>
 	{
 		public static ServiceProviderSpecificationFactory Instance { get; } = new ServiceProviderSpecificationFactory();
 		

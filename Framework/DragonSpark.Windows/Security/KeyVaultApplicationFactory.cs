@@ -14,7 +14,7 @@
 		public Uri Location { get; }
 	}*/
 
-	/*public class KeyVaultApplicationFactory : FactoryWithSpecificationBase<X509Certificate2, KeyVaultApplication>
+	/*public class KeyVaultApplicationFactory : FactoryBase<X509Certificate2, KeyVaultApplication>
 	{
 		public static KeyVaultApplicationFactory Instance { get; } = new KeyVaultApplicationFactory();
 

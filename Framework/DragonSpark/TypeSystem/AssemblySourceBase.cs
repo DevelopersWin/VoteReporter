@@ -32,7 +32,7 @@ namespace DragonSpark.TypeSystem
 		public override void Execute( Assembly parameter ) => provider.Load( parameter, searchQuery );
 	}
 
-	public class AssemblyHintProvider : FactoryWithSpecificationBase<Assembly, string>
+	public class AssemblyHintProvider : FactoryBase<Assembly, string>
 	{
 		public static AssemblyHintProvider Instance { get; } = new AssemblyHintProvider();
 
@@ -90,7 +90,7 @@ namespace DragonSpark.TypeSystem
 		public Type ResultType { get; }
 	}
 
-	public class AssembliesFactory : FactoryWithSpecificationBase<Type[], Assembly[]>
+	public class AssembliesFactory : FactoryBase<Type[], Assembly[]>
 	{
 		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
 
@@ -105,7 +105,7 @@ namespace DragonSpark.TypeSystem
 		public static AssemblyTypesFactory Public { get; } = new AssemblyTypesFactory( assembly => assembly.ExportedTypes );
 	}
 
-	public class AssemblyTypesFactory : FactoryWithSpecificationBase<Assembly, Type[]>
+	public class AssemblyTypesFactory : FactoryBase<Assembly, Type[]>
 	{
 		readonly Func<Assembly, IEnumerable<Type>> types;
 
@@ -118,7 +118,7 @@ namespace DragonSpark.TypeSystem
 		public override Type[] Create( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.ToDelegate() ).Fixed();
 	}
 
-	public class TypesFactory : FactoryWithSpecificationBase<Assembly[], Type[]>
+	public class TypesFactory : FactoryBase<Assembly[], Type[]>
 	{
 		public static TypesFactory Instance { get; } = new TypesFactory();
 

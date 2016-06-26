@@ -15,7 +15,7 @@ namespace DragonSpark.ComponentModel
 		protected TypeDefinitionProvider( params ITypeDefinitionProvider[] others ) : base( others.Concat( new IFactory<TypeInfo, TypeInfo>[] { ConventionTypeDefinitionProvider.Instance, SelfTransformer<TypeInfo>.Instance } ).Fixed() ) {}
 	}
 
-	public class ConventionTypeDefinitionProvider : FactoryWithSpecificationBase<TypeInfo, TypeInfo>, ITypeDefinitionProvider
+	public class ConventionTypeDefinitionProvider : FactoryBase<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
 		public static ConventionTypeDefinitionProvider Instance { get; } = new ConventionTypeDefinitionProvider();
 

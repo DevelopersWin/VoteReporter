@@ -155,7 +155,7 @@ namespace DragonSpark.Windows.Entity
 			}
 		}*/
 
-		public class DefaultAssociationPropertyFactory : FactoryWithSpecificationBase<Type, string[]>
+		public class DefaultAssociationPropertyFactory : FactoryBase<Type, string[]>
 		{
 			readonly IObjectContextAdapter adapter;
 
@@ -275,7 +275,7 @@ namespace DragonSpark.Windows.Entity
 			return result;
 		}*/
 
-		class KeyFactory<TEntity> : FactoryWithSpecificationBase<object, IDictionary<string, object>>
+		class KeyFactory<TEntity> : FactoryBase<object, IDictionary<string, object>>
 		{
 			readonly IObjectContextAdapter context;
 

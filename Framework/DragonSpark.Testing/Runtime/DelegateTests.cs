@@ -308,7 +308,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( parameter, result.Context );
 		}
 
-		class Factory : FactoryWithSpecificationBase<Parameter, Get>
+		class Factory : FactoryBase<Parameter, Get>
 		{
 			readonly IAttachedProperty<Get, Parameter> property = new AttachedProperty<Get, Parameter>();
 

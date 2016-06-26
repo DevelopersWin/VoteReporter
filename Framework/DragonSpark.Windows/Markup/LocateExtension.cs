@@ -50,7 +50,7 @@ namespace DragonSpark.Windows.Markup
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Instance.Create();
 	}
 
-	public class MockFactory : FactoryWithSpecificationBase<Type, object>
+	public class MockFactory : FactoryBase<Type, object>
 	{
 		public static MockFactory Instance { get; } = new MockFactory();
 
@@ -71,7 +71,7 @@ namespace DragonSpark.Windows.Markup
 		}
 	}
 
-	public class StringDesignerValueFactory : FactoryWithSpecificationBase<Type, object>
+	public class StringDesignerValueFactory : FactoryBase<Type, object>
 	{
 		public static StringDesignerValueFactory Instance { get; } = new StringDesignerValueFactory();
 

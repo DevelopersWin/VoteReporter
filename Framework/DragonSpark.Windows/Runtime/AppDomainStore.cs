@@ -27,7 +27,7 @@ namespace DragonSpark.Windows.Runtime
 		protected override T Get() => domain.GetData( key ).As<T>();
 	}
 
-	public class ApplicationDomainProxyFactory<T> : FactoryWithSpecificationBase<object[], T>
+	public class ApplicationDomainProxyFactory<T> : FactoryBase<object[], T>
 	{
 		readonly AppDomain domain;
 

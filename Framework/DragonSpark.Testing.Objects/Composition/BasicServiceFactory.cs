@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Objects.Composition
 	}
 
 	[Export]
-	public class ParameterServiceFactory : FactoryWithSpecificationBase<Parameter, IParameterService>
+	public class ParameterServiceFactory : FactoryBase<Parameter, IParameterService>
 	{
 		public ParameterServiceFactory() {}
 

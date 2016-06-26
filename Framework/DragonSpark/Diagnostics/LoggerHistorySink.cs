@@ -20,7 +20,7 @@ namespace DragonSpark.Diagnostics
 		public virtual void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
 	}
 
-	public class LogEventTextFactory : FactoryWithSpecificationBase<LogEvent, string>
+	public class LogEventTextFactory : FactoryBase<LogEvent, string>
 	{
 		public static LogEventTextFactory Instance { get; } = new LogEventTextFactory();
 
@@ -42,7 +42,7 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public class LogEventMessageFactory : FactoryWithSpecificationBase<IEnumerable<LogEvent>, string[]>
+	public class LogEventMessageFactory : FactoryBase<IEnumerable<LogEvent>, string[]>
 	{
 		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
 

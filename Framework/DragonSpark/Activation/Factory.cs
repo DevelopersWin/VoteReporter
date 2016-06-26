@@ -48,7 +48,7 @@ namespace DragonSpark.Activation
 	}
 
 	// [AutoValidation( false )]
-	public class FactoryInterfaceLocator : FactoryWithSpecificationBase<Type, Type>
+	public class FactoryInterfaceLocator : FactoryBase<Type, Type>
 	{
 		public static FactoryInterfaceLocator Instance { get; } = new FactoryInterfaceLocator();
 
@@ -74,7 +74,7 @@ namespace DragonSpark.Activation
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
 
-	public abstract class TypeLocatorCacheBase : FactoryWithSpecificationBase<Type, Type>
+	public abstract class TypeLocatorCacheBase : FactoryBase<Type, Type>
 	{
 		readonly ImmutableArray<TypeAdapter> adapters;
 		readonly Func<TypeInfo, bool> isAssignable;
@@ -135,7 +135,7 @@ namespace DragonSpark.Activation
 		}
 	}*/
 
-	/*public class Converter<TFrom, TTo> : FactoryWithSpecificationBase<TFrom, TTo>
+	/*public class Converter<TFrom, TTo> : FactoryBase<TFrom, TTo>
 	{
 		public Converter( Func<TFrom, TTo> convert ) : base( convert ) {}
 
@@ -175,19 +175,19 @@ namespace DragonSpark.Activation
 
 	public class ProjectedFactory<TBase, TFrom, TTo> : FactoryBase<TBase, TTo>/*, IConverter<TFrom, TTo>*/ where TFrom : TBase
 	{
+		readonly static ISpecification<TBase> Specification = new DelegatedSpecification<TBase>( parameter => parameter is TFrom );
+
 		readonly Func<TFrom, TTo> convert;
 
-		public ProjectedFactory( Func<TFrom, TTo> convert )
+		public ProjectedFactory( Func<TFrom, TTo> convert ) : base( Specification )
 		{
 			this.convert = convert;
 		}
 
-		public override bool CanCreate( TBase parameter ) => parameter is TFrom;
-
-		public override TTo Create( TBase parameter ) => parameter is TFrom ? convert( (TFrom)parameter ) : default(TTo);
+		public override TTo Create( TBase parameter ) => convert( (TFrom)parameter );
 	}
 
-	public class InstanceFromFactoryTypeFactory : FactoryWithSpecificationBase<Type, object>
+	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>
 	{
 		readonly FactoryDelegateLocatorFactory factory;
 
@@ -233,7 +233,7 @@ namespace DragonSpark.Activation
 	}
 
 	[Persistent]
-	public class FactoryTypeLocator : FactoryWithSpecificationBase<LocateTypeRequest, Type>
+	public class FactoryTypeLocator : FactoryBase<LocateTypeRequest, Type>
 	{
 		readonly FactoryTypeRequest[] types;
 

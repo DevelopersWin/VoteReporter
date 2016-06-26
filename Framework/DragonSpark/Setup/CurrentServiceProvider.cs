@@ -32,7 +32,7 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class ServiceProviderMigrationCommandFactory : FactoryWithSpecificationBase<IServiceProvider, ICommand<MigrationParameter<IServiceProvider>>>, IServiceProviderMigrationCommandSource
+	public class ServiceProviderMigrationCommandFactory : FactoryBase<IServiceProvider, ICommand<MigrationParameter<IServiceProvider>>>, IServiceProviderMigrationCommandSource
 	{
 		public static ServiceProviderMigrationCommandFactory Instance { get; } = new ServiceProviderMigrationCommandFactory();
 

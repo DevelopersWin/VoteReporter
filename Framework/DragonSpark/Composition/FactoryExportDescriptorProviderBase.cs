@@ -54,7 +54,7 @@ namespace DragonSpark.Composition
 			Promise( CompositionDependency dependency, string origin, CompositeActivator activator ) : this( dependency, origin, new Context( dependency, activator ) ) {}
 			Promise( CompositionDependency dependency, string origin, Context context ) : base( dependency.Contract, origin, dependency.Target.IsShared, NoDependencies, context.Create ) {}
 
-			class Context : FactoryWithSpecificationBase<Context.Parameter, object>
+			class Context : FactoryBase<Context.Parameter, object>
 			{
 				readonly CacheContext<LifetimeContext, Parameter, object> cache;
 
@@ -115,7 +115,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class ActivatorFactory : FactoryWithSpecificationBase<ActivatorFactory.Parameter, CompositeActivator>
+	public class ActivatorFactory : FactoryBase<ActivatorFactory.Parameter, CompositeActivator>
 	{
 		readonly ActivatorRegistryFactory registryFactory;
 		readonly Func<Activator.Parameter, object> activatorFactory;
@@ -169,7 +169,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		public class ActivatorRegistryFactory : FactoryWithSpecificationBase<Parameter, ActivatorRegistry>
+		public class ActivatorRegistryFactory : FactoryBase<Parameter, ActivatorRegistry>
 		{
 			public static ActivatorRegistryFactory Instance { get; } = new ActivatorRegistryFactory();
 
@@ -182,7 +182,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class ActivatorDelegateWithConversionFactory : FactoryWithSpecificationBase<Activator.Parameter, Delegate>
+	public class ActivatorDelegateWithConversionFactory : FactoryBase<Activator.Parameter, Delegate>
 	{
 		public static ActivatorDelegateWithConversionFactory Instance { get; } = new ActivatorDelegateWithConversionFactory();
 
@@ -190,7 +190,7 @@ namespace DragonSpark.Composition
 			ActivatorDelegateFactory.Instance.Create( parameter ).Convert( ResultTypeLocator.Instance.Get( parameter.FactoryType ) );
 	}
 
-	public class ActivatorDelegateFactory : FactoryWithSpecificationBase<Activator.Parameter, Func<object>>
+	public class ActivatorDelegateFactory : FactoryBase<Activator.Parameter, Func<object>>
 	{
 		public static ActivatorDelegateFactory Instance { get; } = new ActivatorDelegateFactory();
 
@@ -205,7 +205,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class ActivatorWithParameterDelegateFactory : FactoryWithSpecificationBase<Activator.Parameter, Delegate>
+	public class ActivatorWithParameterDelegateFactory : FactoryBase<Activator.Parameter, Delegate>
 	{
 		public static ActivatorWithParameterDelegateFactory Instance { get; } = new ActivatorWithParameterDelegateFactory();
 
@@ -217,7 +217,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class ActivatorResultFactory : FactoryWithSpecificationBase<Activator.Parameter, object>
+	public class ActivatorResultFactory : FactoryBase<Activator.Parameter, object>
 	{
 		public static ActivatorResultFactory Instance { get; } = new ActivatorResultFactory();
 

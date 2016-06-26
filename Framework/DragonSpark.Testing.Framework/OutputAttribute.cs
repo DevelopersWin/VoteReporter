@@ -50,7 +50,7 @@ namespace DragonSpark.Testing.Framework
 			public Action Continue { get; }
 		}
 
-		class Factory : FactoryWithSpecificationBase<Parameter, IProfiler>
+		class Factory : FactoryBase<Parameter, IProfiler>
 		{
 			readonly ILoggerHistory history;
 

@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class MetadataCustomizationFactory : FactoryWithSpecificationBase<MethodBase, ICustomization[]>
+	public class MetadataCustomizationFactory : FactoryBase<MethodBase, ICustomization[]>
 	{
 		public static MetadataCustomizationFactory Instance { get; } = new MetadataCustomizationFactory();
 

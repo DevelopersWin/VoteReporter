@@ -423,7 +423,7 @@ namespace DragonSpark.Runtime
 	{
 		public EmptyDelegateProperty( Func<MethodInfo, DelegateWithParameterCache> factory ) : base( factory ) {}
 
-		public class Factory : FactoryWithSpecificationBase<MethodInfo, DelegateWithParameterCache>
+		public class Factory : FactoryBase<MethodInfo, DelegateWithParameterCache>
 		{
 			readonly Type compiledType;
 
@@ -522,7 +522,7 @@ namespace DragonSpark.Runtime
 	{
 		public RelayDelegateProperty( Func<MethodInfo, DelegateWithParameterCache> factory ) : base( factory ) {}
 
-		public class Factory : FactoryWithSpecificationBase<MethodInfo, DelegateWithParameterCache>
+		public class Factory : FactoryBase<MethodInfo, DelegateWithParameterCache>
 		{
 			readonly Func<MethodInfo, DelegateWithParameterCache> emptySource;
 			readonly Func<CallDelegateExpressionFactory.Parameter, Expression> callSource;
@@ -559,7 +559,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class CallDelegateExpressionFactory : FactoryWithSpecificationBase<CallDelegateExpressionFactory.Parameter, Expression>
+	public class CallDelegateExpressionFactory : FactoryBase<CallDelegateExpressionFactory.Parameter, Expression>
 	{
 		public static CallDelegateExpressionFactory Instance { get; } = new CallDelegateExpressionFactory();
 

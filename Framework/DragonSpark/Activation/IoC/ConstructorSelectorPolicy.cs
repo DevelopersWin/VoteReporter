@@ -25,7 +25,7 @@ namespace DragonSpark.Activation.IoC
 		protected override IDependencyResolverPolicy CreateResolver( ParameterInfo parameter ) => resolver( parameter );
 	}
 
-	class ResolverFactory : FactoryWithSpecificationBase<ParameterInfo, IDependencyResolverPolicy>
+	class ResolverFactory : FactoryBase<ParameterInfo, IDependencyResolverPolicy>
 	{
 		public static ResolverFactory Instance { get; } = new ResolverFactory();
 
