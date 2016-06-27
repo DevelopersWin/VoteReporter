@@ -9,6 +9,7 @@ using Moq;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
@@ -127,10 +128,12 @@ namespace DragonSpark.Windows.Markup
 
 	public abstract class MarkupExtensionBase : MarkupExtension
 	{
+		readonly static ThreadLocal<DependencyObject> DependencyObject = new ThreadLocal<DependencyObject>( () => new DependencyObject() );
+
 		readonly Func<IServiceProvider, IMarkupProperty> factory;
 		readonly Func<Type, object> designTimeFactory;
 
-		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Instance.Create, DesignTimeValueProvider.Instance.Create ) {}
+		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Instance.ToDelegate(), DesignTimeValueProvider.Instance.ToDelegate() ) {}
 
 		protected MarkupExtensionBase( [Required]Func<IServiceProvider, IMarkupProperty> factory, [Required]Func<Type, object> designTimeFactory )
 		{
@@ -140,7 +143,7 @@ namespace DragonSpark.Windows.Markup
 
 		public override object ProvideValue( IServiceProvider serviceProvider )
 		{
-			var designMode = DesignerProperties.GetIsInDesignMode( new DependencyObject() );
+			var designMode = DesignerProperties.GetIsInDesignMode( DependencyObject.Value );
 			try
 			{
 				// Retrieve target information
@@ -154,12 +157,14 @@ namespace DragonSpark.Windows.Markup
 						case "System.Windows.SharedDp":
 							return this;
 						default:
-							return factory( serviceProvider ).With( property =>
+							var property = factory( serviceProvider );
+							if ( property != null )
 							{
 								var value = designMode ? designTimeFactory( property.Reference.PropertyType ) : GetValue( new MarkupServiceProvider( serviceProvider, service.TargetObject, property ) );
 								var result = service.TargetProperty == null ? property.SetValue( value ) : value;
 								return result;
-							} );
+							}
+							break;
 					}
 				}
 				return null;

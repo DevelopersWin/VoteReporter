@@ -15,7 +15,7 @@ using System.Reflection;
 
 namespace DragonSpark.Runtime
 {
-	public class AssociatedDisposables : CollectionCache<IDisposable, IDisposable>
+	public class AssociatedDisposables : ListCache<IDisposable, IDisposable>
 	{
 		public static AssociatedDisposables Instance { get; } = new AssociatedDisposables();
 
@@ -52,7 +52,7 @@ namespace DragonSpark.Runtime
 
 		readonly AssociatedDisposables cache;
 
-		DisposeAssociatedCommand( AssociatedDisposables cache ) : base( new CacheContains<IDisposable, ICollection<IDisposable>>( cache ) )
+		DisposeAssociatedCommand( AssociatedDisposables cache ) : base( new CacheContains<IDisposable, IList<IDisposable>>( cache ) )
 		{
 			this.cache = cache;
 		}
@@ -94,7 +94,7 @@ namespace DragonSpark.Runtime
 				GetMappedMethods( parameter ).Introduce( parameter ).Any( tuple => tuple.Item1.Item1.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item1.Item2, tuple.Item2 ) );
 
 			[Freeze]
-			static IEnumerable<Tuple<MethodInfo, MethodInfo>> GetMappedMethods( MemberInfo parameter ) => parameter.DeclaringType.Adapt().GetMappedMethods( typeof(IDisposable) );
+			static IEnumerable<ValueTuple<MethodInfo, MethodInfo>> GetMappedMethods( MemberInfo parameter ) => parameter.DeclaringType.Adapt().GetMappedMethods( typeof(IDisposable) );
 		}
 
 		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );

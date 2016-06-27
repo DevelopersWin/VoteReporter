@@ -54,7 +54,6 @@ namespace DragonSpark.TypeSystem
 		public override T Create() => (T)source( typeof(T) );
 	}
 
-	// [AutoValidation( false )]
 	public class DefaultValueFactory : FactoryBase<Type, object>
 	{
 		public static DefaultValueFactory Instance { get; } = new DefaultValueFactory();

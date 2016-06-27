@@ -17,18 +17,18 @@ using System.Windows.Input;
 namespace DragonSpark.Aspects
 {
 	[PSerializable]
-	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
+	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public abstract class AutoValidationCommandBase : MethodInterceptionAspect
 	{
-		readonly static Func<object, IParameterValidationController> Get = AutoValidation.Controller.Get;
+		readonly static Func<object, IAutoValidationController> Get = AutoValidation.Controller.Get;
 
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
 			var controller = Get( args.Instance );
 			if ( controller != null )
 			{
-				var parameter = new RelayParameter( args, args.Arguments.GetArgument( 0 ) );
+				var parameter = new AutoValidationParameter( args, args.Arguments.GetArgument( 0 ) );
 				args.ReturnValue = Execute( controller, parameter ) ?? args.ReturnValue;
 			}
 			else
@@ -37,7 +37,7 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		protected abstract object Execute( IParameterValidationController controller, RelayParameter parameter );
+		protected abstract object Execute( IAutoValidationController controller, AutoValidationParameter parameter );
 	}
 
 	[PSerializable]
@@ -45,7 +45,7 @@ namespace DragonSpark.Aspects
 	{
 		public static ExecutionAspect Instance { get; } = new ExecutionAspect();
 
-		protected override object Execute( IParameterValidationController controller, RelayParameter parameter ) => controller.Execute( parameter );
+		protected override object Execute( IAutoValidationController controller, AutoValidationParameter parameter ) => controller.Execute( parameter );
 	}
 
 	[PSerializable]
@@ -53,7 +53,7 @@ namespace DragonSpark.Aspects
 	{
 		public static ValidatorAspect Instance { get; } = new ValidatorAspect();
 
-		protected override object Execute( IParameterValidationController controller, RelayParameter parameter )
+		protected override object Execute( IAutoValidationController controller, AutoValidationParameter parameter )
 		{
 			var result = parameter.Proceed<bool>();
 			controller.MarkValid( parameter.Parameter, result );
@@ -63,7 +63,8 @@ namespace DragonSpark.Aspects
 
 	public static class AutoValidation
 	{
-		public static ICache<IParameterValidationController> Controller { get; } = new Cache<IParameterValidationController>();
+		public static ICache<IAutoValidationController> Controller { get; } = new Cache<IAutoValidationController>();
+		public static ICache<IParameterValidationAdapter> Adapter { get; } = new Cache<IParameterValidationAdapter>();
 
 		public sealed class Factory : AutoValidationAttributeBase
 		{
@@ -99,7 +100,7 @@ namespace DragonSpark.Aspects
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict, TargetMemberAttributes = MulticastAttributes.NonAbstract | MulticastAttributes.Instance, PersistMetaData = true )]
+	[MulticastAttributeUsage( TargetMemberAttributes = MulticastAttributes.NonAbstract | MulticastAttributes.Instance )]
 	public abstract class AutoValidationAttributeBase : InstanceLevelAspect, IAspectProvider
 	{
 		readonly AutoValidationProfile profile;
@@ -119,7 +120,7 @@ namespace DragonSpark.Aspects
 			return true;
 		}
 
-		public override void RuntimeInitializeInstance() => AutoValidation.Controller.Set( Instance, new ParameterValidationController( profile.Factory( Instance ) ) );
+		public override void RuntimeInitializeInstance() => AutoValidation.Controller.Set( Instance, new AutoValidationController( profile.Factory( Instance ) ) );
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{
@@ -139,7 +140,7 @@ namespace DragonSpark.Aspects
 							var aspect = pair.Item1.Name == descriptor.IsValid ? ValidatorAspect.Instance :
 											pair.Item1.Name == descriptor.Execute ? ExecutionAspect.Instance
 											: default(IAspect);
-							var method = pair.Item2.FromGenericDefinition();
+							var method = pair.Item2.AccountForGenericDefinition();
 							if ( aspect != null && !repository.HasAspect( method, aspect.GetType() ) )
 							{
 								yield return new AspectInstance( method, aspect );

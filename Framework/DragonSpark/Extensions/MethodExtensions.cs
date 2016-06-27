@@ -9,7 +9,7 @@ namespace DragonSpark.Extensions
 {
 	public static class MethodExtensions
 	{
-		public static MethodInfo FromGenericDefinition( this MethodInfo @this )
+		public static MethodInfo AccountForGenericDefinition( this MethodInfo @this )
 		{
 			var result = @this.DeclaringType.IsConstructedGenericType ? @this.DeclaringType.GetGenericTypeDefinition().GetRuntimeMethods().SingleOrDefault( MethodEqualitySpecification.Default.Get( @this ).ToDelegate() )
 				:

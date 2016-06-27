@@ -1,10 +1,10 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -43,15 +43,22 @@ namespace DragonSpark.TypeSystem
 		public bool IsAssignableFrom( TypeInfo other ) => IsAssignableFrom( other.AsType() );
 
 		[Freeze]
-		public bool IsAssignableFrom( Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() )/* || IsGenericOf( other )*/;
+		public bool IsAssignableFrom( Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() );
 
-		public bool IsInstanceOfType( object context ) => IsAssignableFrom( context.GetType() );
+		public bool IsInstanceOfType( object instance ) => IsAssignableFrom( instance.GetType() );
+
+		public bool IsInstanceOfTypeOrDefinition( object instance )
+		{
+			var type = instance.GetType();
+			var result = IsAssignableFrom( type ) || type.Adapt().IsGenericOf( Type );
+			return result;
+		}
 
 		public Assembly Assembly => Info.Assembly;
 
 		public Type[] GetHierarchy( bool includeRoot = true )
 		{
-			var builder = ImmutableArray.CreateBuilder<Type>();
+			var builder = ArrayBuilder<Type>.GetInstance();
 			builder.Add( Type );
 			var current = Info.BaseType;
 			while ( current != null )
@@ -62,13 +69,11 @@ namespace DragonSpark.TypeSystem
 				}
 				current = current.GetTypeInfo().BaseType;
 			}
-			var result = builder.ToArray();
+			var result = builder.ToArrayAndFree();
 			return result;
 		}
 
 		public Type GetEnumerableType() => InnerType( Type, types => types.FirstOrDefault(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
-
-		// public Type GetResultType() => type.Append( ExpandInterfaces( type ) ).FirstWhere( t => InnerType( t, types => types.LastOrDefault() ) );
 
 		public Type GetInnerType() => InnerType( Type, types => types.Only() );
 
@@ -84,13 +89,22 @@ namespace DragonSpark.TypeSystem
 		public Type[] GetTypeArgumentsFor( Type implementationType, bool includeInterfaces = true ) => GetImplementations( implementationType, includeInterfaces ).First().GenericTypeArguments;
 
 		[Freeze]
-		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true ) =>
-			Type.Append( includeInterfaces ? ExpandInterfaces( Type ) : Items<Type>.Default )
-				.Introduce( genericDefinition, tuple => tuple.Item1.GetTypeInfo().IsGenericType && tuple.Item2.GetTypeInfo().IsGenericType && tuple.Item1.GetGenericTypeDefinition() == tuple.Item2.GetGenericTypeDefinition() )
-				.Fixed();
+		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true )
+		{
+			var result = Type.Append( includeInterfaces ? ExpandInterfaces( Type ) : Items<Type>.Default )
+									  .Introduce( genericDefinition, tuple =>
+																	 {
+																		 var first = tuple.Item1.GetTypeInfo();
+																		 var second = tuple.Item2.GetTypeInfo();
+																		 var match = first.IsGenericType && second.IsGenericType && tuple.Item1.GetGenericTypeDefinition() == tuple.Item2.GetGenericTypeDefinition();
+																		 return match;
+																	 } )
+									  .Fixed();
+			return result;
+		}
 
 		[Freeze]
-		public Tuple<MethodInfo, MethodInfo>[] GetMappedMethods( Type implementedType )
+		public ValueTuple<MethodInfo, MethodInfo>[] GetMappedMethods( Type implementedType )
 		{
 			var implementation = CheckGeneric( implementedType ) ?? ( implementedType.Adapt().IsAssignableFrom( Type ) ? implementedType : null );
 			if ( implementation != null )
@@ -99,7 +113,7 @@ namespace DragonSpark.TypeSystem
 				var result = map.InterfaceMethods.Tuple( map.TargetMethods ).Fixed();
 				return result;
 			}
-			return Items<Tuple<MethodInfo, MethodInfo>>.Default;
+			return Items<ValueTuple<MethodInfo, MethodInfo>>.Default;
 		}
 
 		Type CheckGeneric( Type type ) => type.GetTypeInfo().IsGenericTypeDefinition ? GetImplementations( type ).FirstOrDefault() : null;

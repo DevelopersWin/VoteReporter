@@ -1,7 +1,9 @@
 using System.Windows;
+using DragonSpark.Aspects;
 
 namespace DragonSpark.Windows.Markup
 {
+	[AutoValidation.GenericFactory]
 	public class DependencyPropertyMarkupPropertyFactory : MarkupPropertyFactoryBase<DependencyObject, DependencyProperty>
 	{
 		public static DependencyPropertyMarkupPropertyFactory Instance { get; } = new DependencyPropertyMarkupPropertyFactory();

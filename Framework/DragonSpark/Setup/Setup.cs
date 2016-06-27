@@ -177,7 +177,7 @@ namespace DragonSpark.Setup
 		[Freeze]
 		public object GetService( Type serviceType )
 		{
-			var result = List().Introduce( serviceType.Adapt(), tuple => tuple.Item2.IsAssignableFrom( tuple.Item1.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault();
+			var result = List().ToArray().Introduce( serviceType.Adapt(), tuple => tuple.Item2.IsAssignableFrom( tuple.Item1.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault();
 			if ( result != null )
 			{
 				ActivationProperties.Instance.Set( result, true );

@@ -6,6 +6,7 @@ using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -14,10 +15,10 @@ namespace DragonSpark.Activation.IoC
 	public class BuildPlanCreatorPolicy : IBuildPlanCreatorPolicy
 	{
 		readonly ISpecification<LocateTypeRequest> specification;
-		readonly IEnumerable<IBuildPlanPolicy> policies;
+		readonly ImmutableArray<IBuildPlanPolicy> policies;
 		readonly IBuildPlanCreatorPolicy creator;
 
-		public BuildPlanCreatorPolicy( IBuildPlanCreatorPolicy creator, IEnumerable<IBuildPlanPolicy> policies, ISpecification<LocateTypeRequest> specification )
+		public BuildPlanCreatorPolicy( IBuildPlanCreatorPolicy creator, ImmutableArray<IBuildPlanPolicy> policies, ISpecification<LocateTypeRequest> specification )
 		{
 			this.creator = creator;
 			this.policies = policies;
@@ -25,7 +26,7 @@ namespace DragonSpark.Activation.IoC
 		}
 
 		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
-			new CompositeBuildPlanPolicy( specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) ) ? policies.StartWith( creator.CreatePlan( context, buildKey ) ).ToArray() : Items<IBuildPlanPolicy>.Default );
+			new CompositeBuildPlanPolicy( specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) ) ? policies.ToArray().StartWith( creator.CreatePlan( context, buildKey ) ).ToArray() : Items<IBuildPlanPolicy>.Default );
 	}
 
 	public class CompositeBuildPlanPolicy : IBuildPlanPolicy

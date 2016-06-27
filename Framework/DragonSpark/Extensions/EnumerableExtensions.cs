@@ -98,7 +98,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Prepend<T>( this T @this, params T[] second ) => @this.Prepend_( second );
 		public static IEnumerable<T> Prepend<T>( this T @this, IEnumerable<T> second ) => @this.Prepend_( second );
-		public static IEnumerable<T> Prepend_<T>( this T @this, IEnumerable<T> second )
+		static IEnumerable<T> Prepend_<T>( this T @this, IEnumerable<T> second )
 		{
 			foreach ( var item in second )
 				yield return item;
@@ -107,7 +107,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Prepend<T>( this IEnumerable<T> @this, params T[] items ) => items.Concat( @this );
 
-		public static IEnumerable<Tuple<T1, T2>> Tuple<T1, T2>( this IEnumerable<T1> target, IEnumerable<T2> other ) => target.Zip( other, System.Tuple.Create ).ToArray();
+		public static IEnumerable<ValueTuple<T1, T2>> Tuple<T1, T2>( this IEnumerable<T1> target, IEnumerable<T2> other ) => target.Zip( other, ValueTuple.Create ).ToArray();
 
 		public static T FirstAssigned<T>( this IEnumerable<T> @this ) => @this.WhereAssigned().FirstOrDefault();
 

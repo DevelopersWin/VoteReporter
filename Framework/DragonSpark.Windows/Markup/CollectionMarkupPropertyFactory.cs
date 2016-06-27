@@ -10,25 +10,31 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
+using DragonSpark.Aspects;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
 {
+	[AutoValidation.GenericFactory]
 	public class CollectionMarkupPropertyFactory : MarkupPropertyFactoryBase
 	{
 		public static CollectionMarkupPropertyFactory Instance { get; } = new CollectionMarkupPropertyFactory();
 
 		readonly Func<IServiceProvider, PropertyReference> propertyFactory;
 
-		public CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Instance.Create ) {}
+		public CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Instance.ToDelegate() ) {}
 
 		public CollectionMarkupPropertyFactory( [Required]Func<IServiceProvider, PropertyReference> propertyFactory ) : base( CollectionSpecification.Instance )
 		{
 			this.propertyFactory = propertyFactory;
 		}
 
-		public override IMarkupProperty Create( IServiceProvider parameter ) => 
-			propertyFactory( parameter ).With( reference => new CollectionMarkupProperty( (IList)parameter.Get<IProvideValueTarget>().TargetObject, reference ) );
+		public override IMarkupProperty Create( IServiceProvider parameter )
+		{
+			var reference = propertyFactory( parameter );
+			var result = reference.IsAssigned() ? new CollectionMarkupProperty( (IList)parameter.Get<IProvideValueTarget>().TargetObject, reference ) : null;
+			return result;
+		}
 	}
 
 	public class CollectionSpecification : GuardedSpecificationBase<IServiceProvider>
@@ -44,16 +50,17 @@ namespace DragonSpark.Windows.Markup
 		public static PropertyReferenceFactory Instance { get; } = new PropertyReferenceFactory();
 
 		readonly IExpressionEvaluator evaluator;
+		readonly Func<object, PropertyReference> create;
 
 		public PropertyReferenceFactory() : this( ExpressionEvaluator.Instance ) {}
 
 		public PropertyReferenceFactory( [Required]IExpressionEvaluator evaluator )
 		{
 			this.evaluator = evaluator;
+			create = Create;
 		}
 
-		public override PropertyReference Create( IServiceProvider parameter ) => 
-			parameter.Get<IXamlNameResolver>().With( resolver => resolver.GetFixupToken( Items<string>.Default ).With( Create ) );
+		public override PropertyReference Create( IServiceProvider parameter ) => parameter.Get<IXamlNameResolver>()?.GetFixupToken( Items<string>.Default ).With( create ) ?? default(PropertyReference);
 
 		PropertyReference Create( object token )
 		{
@@ -65,7 +72,7 @@ namespace DragonSpark.Windows.Markup
 		}
 	}
 
-	public class PropertyReference
+	public struct PropertyReference
 	{
 		public static PropertyReference New( [Required]MemberInfo member ) => new PropertyReference( member.DeclaringType, member.GetMemberType(), member.Name );
 		public static PropertyReference New( [Required]DependencyProperty property ) => new PropertyReference( property.OwnerType, property.PropertyType, property.Name );

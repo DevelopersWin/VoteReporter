@@ -1,8 +1,10 @@
-﻿using DragonSpark.Runtime;
+﻿using DragonSpark.Activation;
+using DragonSpark.Aspects;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using Ploeh.AutoFixture.Xunit2;
 using System.Windows.Input;
-using DragonSpark.Aspects;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects
@@ -11,8 +13,37 @@ namespace DragonSpark.Testing.Aspects
 	{
 		[Fact]
 		public void Validation()
-		{}
+		{
+			var sut = new TestFactory();
+			var factory = sut.To<IFactoryWithParameter>();
+			factory.CanCreate( new object() );
 
+			Assert.False( sut.Called );
+			Assert.True( sut.GenericCalled );
+		}
+
+		[ApplyAutoValidation]
+		public class TestFactory : IFactory<object, object>
+		{
+			public bool Called { get; set; }
+			public bool GenericCalled { get; set; }
+
+			bool IFactoryWithParameter.CanCreate( object parameter )
+			{
+				Called = true;
+				return CanCreate( parameter );
+			}
+
+			public virtual bool CanCreate( object parameter )
+			{
+				GenericCalled = true;
+				return parameter.IsAssigned();
+			}
+
+			object IFactoryWithParameter.Create( object parameter ) => Create( parameter );
+
+			public object Create( object parameter ) => null;
+		}
 		
 		[Theory, AutoData]
 		void CanExecuteAsExpected( ValidatedCommand sut )

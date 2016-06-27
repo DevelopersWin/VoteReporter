@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Extensions
 		public void BasicFactory()
 		{
 			var method = new Func<object, object>( new Factory().To<IFactoryWithParameter>().Create ).Method;
-			var found = method.FromGenericDefinition();
+			var found = MethodExtensions.AccountForGenericDefinition( method );
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
 			Assert.True( found.DeclaringType.IsGenericTypeDefinition );
@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Extensions
 		public void GenericFactory()
 		{
 			var method = new Func<object, bool>( new Factory().CanCreate ).Method;
-			var found = method.FromGenericDefinition();
+			var found = MethodExtensions.AccountForGenericDefinition( method );
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
 			Assert.True( found.DeclaringType.IsGenericTypeDefinition );
@@ -35,7 +35,7 @@ namespace DragonSpark.Testing.Extensions
 		public void BasicCommand()
 		{
 			var method = new Action<object>( new Command().To<ICommand>().Execute ).Method;
-			var found = method.FromGenericDefinition();
+			var found = MethodExtensions.AccountForGenericDefinition( method );
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
 			Assert.True( found.DeclaringType.IsGenericTypeDefinition );
@@ -45,7 +45,7 @@ namespace DragonSpark.Testing.Extensions
 		public void GenericCommand()
 		{
 			var method = new Action<object>( new Command().Execute ).Method;
-			var found = method.FromGenericDefinition();
+			var found = MethodExtensions.AccountForGenericDefinition( method );
 			Assert.NotNull( found );
 			Assert.Same( method, found );
 			Assert.False( found.DeclaringType.IsGenericTypeDefinition );
@@ -55,7 +55,7 @@ namespace DragonSpark.Testing.Extensions
 		public void BreakingBuildTest()
 		{
 			var method = new Action<Action<string>>( new PurgeLoggerMessageHistoryCommand( new LoggerHistorySink() ).Execute ).Method;
-			var found = method.FromGenericDefinition();
+			var found = MethodExtensions.AccountForGenericDefinition( method );
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
 			Assert.True( found.DeclaringType.IsGenericTypeDefinition );

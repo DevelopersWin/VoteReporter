@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
-using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
@@ -34,20 +33,15 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	public static class Properties
-	{
-		public static ICache<InstanceServiceProvider> Services = new ActivatedCache<InstanceServiceProvider>();
-	}
-
 	public struct AutoValidationProfile
 	{
-		public AutoValidationProfile( Func<object, IParameterValidator> factory, ImmutableArray<AutoValidationTypeDescriptor> descriptors )
+		public AutoValidationProfile( Func<object, IParameterValidationAdapter> factory, ImmutableArray<AutoValidationTypeDescriptor> descriptors )
 		{
 			Factory = factory;
 			Descriptors = descriptors;
 		}
 
-		public Func<object, IParameterValidator> Factory { get; }
+		public Func<object, IParameterValidationAdapter> Factory { get; }
 		public ImmutableArray<AutoValidationTypeDescriptor> Descriptors { get; }
 	}
 
@@ -65,12 +59,12 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}
 
-	abstract class ParameterAdapterFactoryBase<T> : ProjectedFactory<T, IParameterValidator> where T : class
+	abstract class ParameterAdapterFactoryBase<T> : ProjectedFactory<T, IParameterValidationAdapter> where T : class
 	{
-		protected ParameterAdapterFactoryBase( Func<T, IParameterValidator> create ) : base( create ) {}
+		protected ParameterAdapterFactoryBase( Func<T, IParameterValidationAdapter> create ) : base( create ) {}
 	}
 
-	abstract class GenericParameterAdapterFactoryBase : FactoryBase<object, IParameterValidator>
+	abstract class GenericParameterAdapterFactoryBase : FactoryBase<object, IParameterValidationAdapter>
 	{
 		readonly Type genericType;
 		readonly string methodName;
@@ -83,10 +77,10 @@ namespace DragonSpark.Aspects
 			invoker = parentType.Adapt().GenericMethods;
 		}
 
-		public override IParameterValidator Create( object parameter )
+		public override IParameterValidationAdapter Create( object parameter )
 		{
 			var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = invoker.Invoke<IParameterValidator>( methodName, arguments, parameter.ToItem() );
+			var result = invoker.Invoke<IParameterValidationAdapter>( methodName, arguments, parameter.ToItem() );
 			return result;
 		}
 	}
@@ -97,7 +91,7 @@ namespace DragonSpark.Aspects
 
 		GenericFactoryAdapterFactory() : base( typeof(GenericFactoryAdapterFactory), typeof(IFactory<,>) ) {}
 
-		static IParameterValidator Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
+		static IParameterValidationAdapter Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
 	class GenericCommandAdapterFactory : GenericParameterAdapterFactoryBase
 	{
@@ -105,7 +99,7 @@ namespace DragonSpark.Aspects
 
 		GenericCommandAdapterFactory() : base( typeof(GenericCommandAdapterFactory), typeof(ICommand<>) ) {}
 
-		static IParameterValidator Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
+		static IParameterValidationAdapter Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
 	class CommandAdapterFactory : ParameterAdapterFactoryBase<ICommand>
@@ -120,11 +114,11 @@ namespace DragonSpark.Aspects
 		FactoryAdapterFactory() : base( parameter => new FactoryAdapter( parameter ) ) {}
 	}
 
-	public struct RelayParameter
+	public struct AutoValidationParameter
 	{
 		readonly MethodInterceptionArgs args;
 
-		public RelayParameter( MethodInterceptionArgs args, object parameter )
+		public AutoValidationParameter( MethodInterceptionArgs args, object parameter )
 		{
 			this.args = args;
 			Parameter = parameter;
@@ -134,23 +128,16 @@ namespace DragonSpark.Aspects
 		public object Parameter { get; }
 	}
 
-	public interface IParameterValidator
+	public interface IParameterValidationAdapter
 	{
 		bool IsValid( object parameter );
+
+		bool Handles( object parameter );
+
+		object Execute( object parameter );
 	}
 
-	public class FactoryAdapter<TParameter, TResult> : FactoryAdapter
-	{
-		readonly IFactory<TParameter, TResult> inner;
-		public FactoryAdapter( IFactory<TParameter, TResult> inner ) : base( inner )
-		{
-			this.inner = inner;
-		}
-
-		public override bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : base.IsValid( parameter );
-	}
-
-	public class FactoryAdapter : IParameterValidator
+	public class FactoryAdapter : IParameterValidationAdapter
 	{
 		readonly IFactoryWithParameter factory;
 
@@ -160,9 +147,29 @@ namespace DragonSpark.Aspects
 		}
 
 		public virtual bool IsValid( object parameter ) => factory.CanCreate( parameter );
+
+		public virtual bool Handles( object parameter ) => false;
+
+		public virtual object Execute( object parameter ) => factory.Create( parameter );
 	}
 
-	public class CommandAdapter : IParameterValidator
+	public class FactoryAdapter<TParameter, TResult> : FactoryAdapter
+	{
+		readonly IFactory<TParameter, TResult> inner;
+
+		public FactoryAdapter( IFactory<TParameter, TResult> inner ) : base( inner )
+		{
+			this.inner = inner;
+		}
+
+		public override bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : base.IsValid( parameter );
+
+		public override bool Handles( object parameter ) => parameter is TParameter;
+
+		public override object Execute( object parameter ) => inner.Create( (TParameter)parameter );
+	}
+
+	public class CommandAdapter : IParameterValidationAdapter
 	{
 		readonly ICommand inner;
 		public CommandAdapter( ICommand inner )
@@ -171,6 +178,14 @@ namespace DragonSpark.Aspects
 		}
 
 		public virtual bool IsValid( object parameter ) => inner.CanExecute( parameter );
+
+		public virtual bool Handles( object parameter ) => false;
+
+		public virtual object Execute( object parameter )
+		{
+			inner.Execute( parameter );
+			return null;
+		}
 	}
 
 	public class CommandAdapter<T> : CommandAdapter
@@ -182,32 +197,39 @@ namespace DragonSpark.Aspects
 		}
 
 		public override bool IsValid( object parameter ) => parameter is T ? inner.CanExecute( (T)parameter ) : base.IsValid( parameter );
+
+		public override bool Handles( object parameter ) => parameter is T;
+
+		public override object Execute( object parameter )
+		{
+			inner.Execute( (T)parameter );
+			return null;
+		}
 	}
 
-	public interface IParameterValidationController
+	public interface IAutoValidationController
 	{
 		void MarkValid( object parameter, bool valid );
 
-		object Execute( RelayParameter parameter );
+		object Execute( AutoValidationParameter parameter );
 	}
 
-	public class ParameterValidationController : IParameterValidationController
+	public class AutoValidationController : IAutoValidationController
 	{
-		readonly static object Null = new object();
-
+	
 		readonly IWritableStore<object> validated = new ThreadLocalStore<object>();
-		readonly IParameterValidator adapter;
+		readonly IParameterValidationAdapter adapter;
 
-		public ParameterValidationController( IParameterValidator adapter )
+		public AutoValidationController( IParameterValidationAdapter adapter )
 		{
 			this.adapter = adapter;
 		}
 
-		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? Null : null );
+		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? Placeholders.Null : null );
 
-		public object Execute( RelayParameter parameter )
+		public object Execute( AutoValidationParameter parameter )
 		{
-			var proceed = Equals( validated.Value, parameter.Parameter ?? Null ) || adapter.IsValid( parameter.Parameter );
+			var proceed = Equals( validated.Value, parameter.Parameter ?? Placeholders.Null ) || adapter.IsValid( parameter.Parameter );
 			var result = proceed ? parameter.Proceed<object>() : null;
 			validated.Assign( null );
 			return result;

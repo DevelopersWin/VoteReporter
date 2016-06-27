@@ -12,6 +12,11 @@ using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Runtime
 {
+	public static class Placeholders
+	{
+		public static object Null { get; } = new object();
+	}
+
 	public interface IDelegateInvoker
 	{
 		object Invoke( object[] arguments );

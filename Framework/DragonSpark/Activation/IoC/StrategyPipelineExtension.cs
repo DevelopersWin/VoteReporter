@@ -77,8 +77,8 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
-			var policies = repository.List();
 			var creator = Container.Get( Creator.Default )?.GetType() ?? Execution.GetCurrent();
+			var policies = repository.List();
 			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies, specification );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
 		}
@@ -145,7 +145,7 @@ namespace DragonSpark.Activation.IoC
 
 			Context.Strategies.Clear();
 
-			foreach ( var entry in strategyRepository.List().Cast<StrategyEntry>().ToImmutableArray() )
+			foreach ( var entry in strategyRepository.List().CastArray<StrategyEntry>() )
 			{
 				Context.Strategies.Add( entry.Value, entry.Stage );
 			}

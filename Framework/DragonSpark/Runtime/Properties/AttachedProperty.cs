@@ -174,28 +174,28 @@ namespace DragonSpark.Runtime.Properties
 		public SetCache( Func<TInstance, ISet<TItem>> create ) : base( create ) {}
 	}
 
-	public class CollectionCache : CollectionCache<object>
+	public class ListCache : ListCache<object>
 	{
-		public new static CollectionCache Default { get; } = new CollectionCache();
+		public new static ListCache Default { get; } = new ListCache();
 
-		public CollectionCache() {}
-		public CollectionCache( Func<object, ICollection<object>> create ) : base( create ) {}
+		public ListCache() {}
+		public ListCache( Func<object, IList<object>> create ) : base( create ) {}
 	}
 
-	public class CollectionCache<T> : CollectionCache<object, T>, ICache<ICollection<T>>
+	public class ListCache<T> : ListCache<object, T>, ICache<IList<T>>
 	{
-		public new static CollectionCache Default { get; } = new CollectionCache();
+		public new static ListCache Default { get; } = new ListCache();
 
-		public CollectionCache() {}
-		public CollectionCache( Func<object, ICollection<T>> create ) : base( create ) {}
+		public ListCache() {}
+		public ListCache( Func<object, IList<T>> create ) : base( create ) {}
 	}
 	
-	public class CollectionCache<TInstance, TItem> : Cache<TInstance, ICollection<TItem>> where TInstance : class
+	public class ListCache<TInstance, TItem> : Cache<TInstance, IList<TItem>> where TInstance : class
 	{
-		public static CollectionCache Default { get; } = new CollectionCache();
+		public static ListCache Default { get; } = new ListCache();
 
-		public CollectionCache() : base( key => new System.Collections.ObjectModel.Collection<TItem>() ) {}
-		public CollectionCache( Func<TInstance, ICollection<TItem>> create ) : base( create ) {}
+		public ListCache() : base( key => new List<TItem>() ) {}
+		public ListCache( Func<TInstance, IList<TItem>> create ) : base( create ) {}
 	}
 
 	/*public abstract class AttachedPropertyBase<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue, TValue> where TInstance : class where TValue : class
