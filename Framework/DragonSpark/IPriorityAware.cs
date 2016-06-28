@@ -22,7 +22,7 @@ namespace DragonSpark
 	{
 		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>();
 
-		public override IPriorityAware Create( T parameter ) => parameter as IPriorityAware ?? (IPriorityAware)parameter.GetAttribute<PriorityAttribute>() ?? PriorityAware.Default;
+		public override IPriorityAware Create( T parameter ) => parameter as IPriorityAware ?? (IPriorityAware)parameter.GetType().GetAttribute<PriorityAttribute>() ?? PriorityAware.Default;
 	}
 
 	public class PriorityComparer : IComparer<IPriorityAware>

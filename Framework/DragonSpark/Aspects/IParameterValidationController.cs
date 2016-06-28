@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -63,6 +64,8 @@ namespace DragonSpark.Aspects
 
 	public static class AutoValidation
 	{
+		public static ImmutableArray<IProfile> DefaultProfiles { get; } = new IProfile[] { GenericFactoryProfile.Instance, FactoryProfile.Instance, GenericCommandProfile.Instance, CommandProfile.Instance }.ToImmutableArray();
+
 		public static ICache<IAutoValidationController> Controller { get; } = new Cache<IAutoValidationController>();
 		public static ICache<IParameterValidationAdapter> Adapter { get; } = new Cache<IParameterValidationAdapter>();
 

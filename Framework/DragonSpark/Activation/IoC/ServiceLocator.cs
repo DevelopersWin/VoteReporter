@@ -98,7 +98,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			var repository = new StrategyRepository( Context.Strategies );
 			repository.Add( new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.PreCreation, Priority.High ) );
-			Container.RegisterInstance<IBuildPlanRepository>( new BuildPlanRepository( SingletonBuildPlanPolicy.Instance ) );
+			Container.RegisterInstance<IBuildPlanRepository>( new BuildPlanRepository( SingletonBuildPlanPolicy.Instance.ToItem() ) );
 			Container.RegisterInstance<IStrategyRepository>( repository );
 		}
 	}
@@ -117,7 +117,7 @@ namespace DragonSpark.Activation.IoC
 
 	public interface IBuildPlanRepository : IRepository<IBuildPlanPolicy> {}
 
-	class BuildPlanRepository : RepositoryBase<IBuildPlanPolicy>, IBuildPlanRepository
+	class BuildPlanRepository : PurgingRepositoryBase<IBuildPlanPolicy>, IBuildPlanRepository
 	{
 		public BuildPlanRepository( params IBuildPlanPolicy[] items ) : base( new List<IBuildPlanPolicy>( items ) ) {}
 	}
@@ -139,7 +139,7 @@ namespace DragonSpark.Activation.IoC
 			this.strategies = strategies;
 		}
 
-		protected override IEnumerable<StrategyEntry> Query() => Store./*Purge().*/OrderBy( entry => entry.Stage ).ThenBy( entry => entry.Priority );
+		protected override IEnumerable<StrategyEntry> Query() => Store.Purge().OrderBy( entry => entry.Stage ).ThenBy( entry => entry.Priority );
 
 		protected override void OnAdd( StrategyEntry entry )
 		{

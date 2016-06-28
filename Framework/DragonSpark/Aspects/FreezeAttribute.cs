@@ -9,7 +9,7 @@ namespace DragonSpark.Aspects
 {
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
-	public sealed class FreezeAttribute : MethodInterceptionAspect, PostSharp.Aspects.IInstanceScopedAspect
+	public sealed class FreezeAttribute : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		readonly ArgumentCache cache = new ArgumentCache();
 

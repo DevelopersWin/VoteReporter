@@ -1,5 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
+using DragonSpark.Extensions;
 using Xunit;
 
 namespace DragonSpark.Testing.Runtime
@@ -32,12 +34,19 @@ namespace DragonSpark.Testing.Runtime
 		public void ExtendedCheck()
 		{
 			// Parallel.For( 0, 10000, i =>
-			// for ( int i = 0; i < 10000; i++ )
+			for ( int i = 0; i < 10000; i++ )
 			{
-				var sut = new ExtendedFactory();
+			var sut = new ExtendedFactory();
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
-			var cannot = sut.CanCreate( (object)456 );
+
+			var factory = sut.To<IFactoryWithParameter>();
+			var invalid = factory.CanCreate( "Message" );
+			Assert.False( invalid );
+			Assert.Equal( 1, sut.CanCreateCalled );
+			Assert.Equal( 0, sut.CanCreateGenericCalled );
+			
+			var cannot = factory.CanCreate( 456 );
 			Assert.False( cannot );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
@@ -50,10 +59,10 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 0, sut.CreateGenericCalled );
 
-			var created = sut.Create( (object)6776 );
+			var created = factory.Create( 6776 );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 2, sut.CanCreateGenericCalled );
-			Assert.Equal( 1, sut.CreateCalled );
+			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, created );
 			}
@@ -102,7 +111,7 @@ namespace DragonSpark.Testing.Runtime
 			}
 		}
 
-		[AutoValidation.GenericFactory]
+		[ApplyAutoValidation]
 		class ExtendedFactory : IFactory<int, float>
 		{
 			public int CanCreateCalled { get; private set; }

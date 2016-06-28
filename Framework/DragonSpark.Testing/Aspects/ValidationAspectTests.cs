@@ -1,8 +1,7 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
+using DragonSpark.Aspects.Validation.TemporaryTesting;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
 using Ploeh.AutoFixture.Xunit2;
 using System.Windows.Input;
 using Xunit;
@@ -90,18 +89,6 @@ namespace DragonSpark.Testing.Aspects
 			sut.Execute( null );
 
 			Assert.False( command.Executed );
-		}
-
-		[AutoValidation.GenericCommand]
-		class ValidatedCommand : CommandBase<object>
-		{
-			public ValidatedCommand() : base( new OnlyOnceSpecification() ) {}
-
-			public bool Executed { get; private set; }
-
-			public void Reset() => Executed = false;
-
-			public override void Execute( object parameter ) => Executed = true;
 		}
 	}
 }

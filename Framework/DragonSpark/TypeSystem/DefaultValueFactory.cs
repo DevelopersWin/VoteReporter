@@ -32,7 +32,7 @@ namespace DragonSpark.TypeSystem
 		static Items()
 		{
 			Default = (T[])Enumerable.Empty<T>();
-			Immutable = Default.ToImmutableArray();
+			Immutable = ImmutableArray<T>.Empty;
 		}
 
 		public static T[] Default { get; }

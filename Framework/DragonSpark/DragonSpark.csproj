@@ -182,7 +182,8 @@
     <Compile Include="Activation\IoC\IsRegisteredSpecification.cs" />
     <Compile Include="Activation\IoC\LifetimeManagerFactory.cs" />
     <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
-    <Compile Include="Aspects\IInstanceScopedAspect.cs" />
+    <Compile Include="Aspects\Validation\IConnectionOwner.cs" />
+    <Compile Include="Aspects\Validation\IInstanceScopedAspect.cs" />
     <Compile Include="Aspects\IParameterValidationController.cs" />
     <Compile Include="Aspects\ThreadCache.cs" />
     <Compile Include="Aspects\FreezeAttribute.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Aspects\ProfileAttribute.cs" />
     <Compile Include="Aspects\RecursionGuardAttribute.cs" />
     <Compile Include="Aspects\Runtime.cs" />
+    <Compile Include="Aspects\Validation\TemporaryTesting\Class1.cs" />
     <Compile Include="Aspects\Validator.cs" />
     <Compile Include="ComponentModel\DefaultValuePropertySpecification.cs" />
     <Compile Include="ComponentModel\DefaultPropertyValueFactory.cs" />

@@ -13,14 +13,11 @@ namespace DragonSpark.Windows.Testing.Configuration
 		public void FromConfiguration( Values sut )
 		{
 			var settings = Settings.Default;
-			lock ( settings )
-			{
-				var primary = sut.Get( "PrimaryKey" );
-				Assert.Equal( settings.HelloWorld, primary );
+			var primary = sut.Get( "PrimaryKey" );
+			Assert.Equal( settings.HelloWorld, primary );
 
-				var alias = sut.Get( "Some Key" );
-				Assert.Equal( settings.HelloWorld, alias );
-			}
+			var alias = sut.Get( "Some Key" );
+			Assert.Equal( settings.HelloWorld, alias );
 		}
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
