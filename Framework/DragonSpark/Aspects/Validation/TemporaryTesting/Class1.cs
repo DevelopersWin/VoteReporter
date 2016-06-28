@@ -35,15 +35,16 @@ namespace DragonSpark.Aspects.Validation.TemporaryTesting
 
 		public abstract void Execute( T parameter );
 	}
+
 	[ApplyAutoValidation]
-		class ValidatedCommand : CommandBase<object>
-		{
-			public ValidatedCommand() : base( new OnlyOnceSpecification() ) {}
+	class ValidatedCommand : CommandBase<object>
+	{
+		public ValidatedCommand() : base( new OnlyOnceSpecification() ) {}
 
-			public bool Executed { get; private set; }
+		public bool Executed { get; private set; }
 
-			public void Reset() => Executed = false;
+		public void Reset() => Executed = false;
 
-			public override void Execute( object parameter ) => Executed = true;
-		}
+		public override void Execute( object parameter ) => Executed = true;
+	}
 }

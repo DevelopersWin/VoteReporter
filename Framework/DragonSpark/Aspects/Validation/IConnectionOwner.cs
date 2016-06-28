@@ -1,6 +1,5 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
@@ -12,9 +11,9 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
 {
-	static class Connections
+	public interface IParameterHandlerAware : IParameterHandler
 	{
-		public static ICache<IConnectionOwner> Owner { get; } = new Cache<IConnectionOwner>();
+		void Register( IParameterHandler handler );
 	}
 
 	public interface IConnectionOwner : IConnectionAware
@@ -27,23 +26,58 @@ namespace DragonSpark.Aspects.Validation
 		void Initialize();
 	}
 
-	abstract class ConnectionOwnerBase<T> : IConnectionOwner where T : class, IConnectionWorker
+	public abstract class ConnectionAwareBase : IConnectionAware
 	{
-		readonly IList<IConnectionWorker> workers = new List<IConnectionWorker>();
-		readonly Lazy<ImmutableArray<T>> cached;
+		public void Initialize() => OnInitialize();
 
-		protected ConnectionOwnerBase()
+		protected virtual void OnInitialize() {}
+	}
+
+	public class CompositeParameterHandler : List<IParameterHandler>, IParameterHandler
+	{
+		public bool Handles( object parameter )
 		{
-			cached = new Lazy<ImmutableArray<T>>( Create );
+			foreach ( var handler in this )
+			{
+				if ( handler.Handles( parameter ) )
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
-		ImmutableArray<T> Create() => workers.Purge().Prioritize().ToImmutableArray().CastArray<T>();
-
-		public ImmutableArray<T> Workers => cached.Value;
-
-		public void Initialize()
+		public object Handle( object parameter )
 		{
-			foreach ( var worker in Workers )
+			foreach ( var handler in this )
+			{
+				if ( handler.Handles( parameter ) )
+				{
+					return handler.Handle( parameter );
+				}
+			}
+			return Placeholders.Null;
+		}
+	}
+
+	public abstract class ConnectionOwnerBase : ConnectionAwareBase, IConnectionOwner
+	{
+		readonly IList<IConnectionWorker> workers = new List<IConnectionWorker>();
+		readonly Lazy<ImmutableArray<IConnectionWorker>> cached;
+		
+		protected ConnectionOwnerBase()
+		{
+			cached = new Lazy<ImmutableArray<IConnectionWorker>>( Create );
+		}
+
+		ImmutableArray<IConnectionWorker> Create() => workers.Purge().Prioritize().ToImmutableArray();
+
+		public ImmutableArray<IConnectionWorker> Workers => cached.Value;
+
+		protected override void OnInitialize()
+		{
+			var immutableArray = Workers;
+			foreach ( var worker in immutableArray )
 			{
 				worker.Initialize();
 			}
@@ -52,48 +86,24 @@ namespace DragonSpark.Aspects.Validation
 		public void Connect( IConnectionWorker worker ) => workers.Add( worker );
 	}
 
-	class ConnectionOwner : ConnectionOwnerBase<ConnectionWorker>
-	{
-		readonly object instance;
-		public ConnectionOwner( object instance )
-		{
-			this.instance = instance;
-		}
-	}
-
-	public class ConnectionOwnerFactory : FactoryBase<object, IConnectionOwner>
-	{
-		public static Func<object, IConnectionOwner> Instance { get; } = new ConnectionOwnerFactory().Cached().ToDelegate();
-
-		public override IConnectionOwner Create( object parameter ) => new ConnectionOwner( parameter );
-	}
-
 	public interface IConnectionWorker : IConnectionAware, IPriorityAware
-	{
-		object Work( MethodInvocationParameter parameter );
-	}
+	{}
 
-	abstract class ConnectionWorkerBase<T> : IConnectionWorker where T : IConnectionOwner
+	public abstract class ConnectionAwareBase<T> : ConnectionAwareBase where T : IConnectionOwner
 	{
-		protected ConnectionWorkerBase( T owner )
+		protected ConnectionAwareBase( T owner )
 		{
 			Owner = owner;
 		}
 
 		protected T Owner { get; }
 
-		public abstract object Work( MethodInvocationParameter parameter );
-
 		public virtual Priority Priority => Priority.Normal;
-
-		public virtual void Initialize() {}
 	}
 
-	class ConnectionWorker : ConnectionWorkerBase<ConnectionOwner>
+	public abstract class ConnectionWorkerBase<T> : ConnectionAwareBase<T>, IConnectionWorker where T : IConnectionOwner
 	{
-		public ConnectionWorker( ConnectionOwner owner ) : base( owner ) {}
-
-		public override object Work( MethodInvocationParameter parameter ) => $"Hello World: {parameter.Proceed<object>()}";
+		protected ConnectionWorkerBase( T owner ) : base( owner ) {}
 	}
 
 	public struct MethodInvocationParameter
@@ -116,7 +126,7 @@ namespace DragonSpark.Aspects.Validation
 		public T Proceed<T>() => args.GetReturnValue<T>();
 	}
 
-	public interface IConnectionWorkerAware : IWritableStore<IConnectionWorker> {}
+	public interface IConnectionWorkerHost : IWritableStore<IConnectionWorker> {}
 
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	public abstract class ConnectionOwnerHostBase : InstanceLevelAspect
@@ -131,13 +141,8 @@ namespace DragonSpark.Aspects.Validation
 		public override void RuntimeInitializeInstance() => factory( Instance ).Initialize();
 	}
 
-	class ConnectionOwnerHost : ConnectionOwnerHostBase
-	{
-		public ConnectionOwnerHost() : base( ConnectionOwnerFactory.Instance ) {}
-	}
-
-	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	public abstract class ConnectionWorkerHostBase : MethodInterceptionAspect, PostSharp.Aspects.IInstanceScopedAspect, IConnectionWorkerAware
+	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	public abstract class ConnectionWorkerHostBase : MethodInterceptionAspect, IInstanceScopedAspect, IConnectionWorkerHost
 	{
 		readonly Func<object, IConnectionWorker> worker;
 		
@@ -146,27 +151,15 @@ namespace DragonSpark.Aspects.Validation
 			this.worker = worker;
 		}
 
-		public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			if ( Value != null )
-			{
-				args.ReturnValue = Value.Work( new MethodInvocationParameter( args ) ) ?? args.ReturnValue;
-			}
-			else
-			{
-				base.OnInvoke( args );
-			}
-		}
-
 		public object CreateInstance( AdviceArgs adviceArgs )
 		{
-			var result = (IConnectionWorkerAware)MemberwiseClone();
+			var result = (IConnectionWorkerHost)MemberwiseClone();
 			var instance = worker( adviceArgs.Instance );
 			result.Assign( instance );
 			return result;
 		}
 
-		void PostSharp.Aspects.IInstanceScopedAspect.RuntimeInitializeInstance() {}
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 		public void Assign( IConnectionWorker item ) => Value = item;
 
 		public IConnectionWorker Value { get; private set; }
@@ -174,32 +167,5 @@ namespace DragonSpark.Aspects.Validation
 		object IStore.Value => Value;
 
 		void IWritableStore.Assign( object item ) => Value = (IConnectionWorker)item;
-	}
-
-	public class ConnectionWorkerHost : ConnectionWorkerHostBase
-	{
-		public ConnectionWorkerHost() : base( ConnectionWorkerFactory.Instance ) {}
-	}
-
-	class ConnectionWorkerFactory : FactoryBase<object, IConnectionWorker>
-	{
-		public static Func<object, IConnectionWorker> Instance { get; } = new ConnectionWorkerFactory().Cached().ToDelegate();
-
-		readonly Func<object, IConnectionOwner> factory;
-
-		public ConnectionWorkerFactory() : this( ConnectionOwnerFactory.Instance ) {}
-
-		public ConnectionWorkerFactory( Func<object, IConnectionOwner> factory )
-		{
-			this.factory = factory;
-		}
-
-		public override IConnectionWorker Create( object parameter )
-		{
-			var owner = factory( parameter );
-			var result = new ConnectionWorker( (ConnectionOwner)owner );
-			owner.Connect( result );
-			return result;
-		}
 	}
 }

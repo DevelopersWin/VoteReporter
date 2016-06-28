@@ -4,11 +4,10 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
-using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
-using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
 using PostSharp.Reflection;
 using System;
@@ -23,17 +22,20 @@ namespace DragonSpark.Aspects.Validation
 {
 	public static class Services
 	{
-		public static ICache<IList<IParameterHandler>> Handlers { get; } = new ListCache<IParameterHandler>();
-		public static ICache<InstanceAwareRepository> Instances { get; } = new ActivatedCache<InstanceAwareRepository>();
+		public static ICache<IAutoValidationController> Controller { get; } = new Cache<IAutoValidationController>( o => new AutoValidationController( Adapter.Get( o ) ) );
+		public static ICache<IParameterValidationAdapter> Adapter { get; } = new Cache<IParameterValidationAdapter>( AdapterLocator.Instance.ToDelegate() );
+
+		/*public static ICache<IList<IParameterHandler>> Handlers { get; } = new ListCache<IParameterHandler>();
+		public static ICache<InstanceAwareRepository> Instances { get; } = new ActivatedCache<InstanceAwareRepository>();*/
 	}
 
-	public interface IInstanceScopedAspect : PostSharp.Aspects.IInstanceScopedAspect
+	/*public interface IInstanceScopedAspect : PostSharp.Aspects.IInstanceScopedAspect
 	{
 		void RuntimeInitializeInstance( object instance );
-	}
+	}*/
 	
 
-	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	/*[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	public abstract class InstanceAwareParentAspectBase : InstanceLevelAspect
 	{
 		public override void RuntimeInitializeInstance()
@@ -63,212 +65,276 @@ namespace DragonSpark.Aspects.Validation
 
 		public virtual void RuntimeInitializeInstance() {}
 		public virtual void RuntimeInitializeInstance( object instance ) {}
-	}
+	}*/
 
-	public interface IAutoValidationAspect : IInstanceScopedAspect
+	public interface IAutoValidationWorker : IConnectionWorker
 	{
 		Type InterfaceType { get; }
+
+		object Invoke( MethodInvocationParameter parameter );
+	}
+
+	public interface IAutoValidationController : IConnectionOwner, IParameterHandlerAware
+	{
+		void MarkValid( object parameter, bool valid );
+
+		object Execute( MethodInvocationParameter parameter );
+
+		void Register( IRegistrationProvider provider );
+	}
+
+	public class AutoValidationController : ConnectionOwnerBase, IAutoValidationController
+	{
+		readonly CompositeParameterHandler handlers = new CompositeParameterHandler();
+		readonly IWritableStore<object> validated = new ThreadLocalStore<object>();
+		readonly IParameterValidationAdapter adapter;
+
+		public AutoValidationController( IParameterValidationAdapter adapter )
+		{
+			this.adapter = adapter;
+		}
+
+		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? Placeholders.Null : null );
+
+		public object Execute( MethodInvocationParameter parameter )
+		{
+			var argument = parameter.Arguments[0];
+			var proceed = Equals( validated.Value, argument ?? Placeholders.Null ) || adapter.IsValid( argument );
+			var result = proceed ? parameter.Proceed<object>() : null;
+			validated.Assign( null );
+			return result;
+		}
+
+		public void Register( IRegistrationProvider provider )
+		{
+			foreach ( var worker in Workers.OfType<IParameterHandlerAware>() )
+			{
+				if ( provider.IsSatisfiedBy( worker ) )
+				{
+					var handler = provider.Create( adapter );
+					worker.Register( handler );
+					break;
+				}
+			}
+		}
+
+		public void Register( IParameterHandler handler ) => handlers.Add( handler );
+		public bool Handles( object parameter ) => handlers.Handles( parameter );
+
+		public object Handle( object parameter ) => handlers.Handle( parameter );
+	}
+
+	public interface IRegistrationProvider : ISpecification<IAutoValidationWorker>
+	{
+		IParameterHandler Create( IParameterValidationAdapter adapter );
 	}
 
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class AutoValidationAspectBase : HandlerAwareAspectBase, IAutoValidationAspect
+	public abstract class AutoValidationWorkerHostBase : ConnectionWorkerHostBase
 	{
-		readonly static Func<object, IAutoValidationController> Get = AutoValidation.Controller.Get;
+		protected AutoValidationWorkerHostBase( IFactory<object, IConnectionWorker> worker ) : base( worker.Cached().ToDelegate() ) {}
 
-		protected AutoValidationAspectBase( Type interfaceType )
+		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			InterfaceType = interfaceType;
-		}
-
-		public Type InterfaceType { get; }
-
-		public override void RuntimeInitializeInstance( object instance )
-		{
-			Controller = Get( instance );
-			base.RuntimeInitializeInstance( instance );
-		}
-
-		protected IAutoValidationController Controller { get; private set; }
-
-		public sealed override void OnInvoke( MethodInterceptionArgs args )
-		{
-			if ( Controller != null )
+			if ( Value != null )
 			{
-				var parameter = args.Arguments[0];
-				var handled = Handle( parameter );
-				var returnValue = handled == Placeholders.Null ? Execute( new AutoValidationParameter( args, parameter ) ) : handled;
-				args.ReturnValue = returnValue ?? args.ReturnValue;
+				args.ReturnValue = ((IAutoValidationWorker)Value).Invoke( new MethodInvocationParameter( args ) ) ?? args.ReturnValue;
 			}
 			else
 			{
 				base.OnInvoke( args );
 			}
 		}
-
-		protected abstract object Execute( AutoValidationParameter parameter );
 	}
 
-	class RegisterValidationHandlerCommand<T> : RegisterHandlerCommand
+	class WorkerFactory : FactoryBase<object, IConnectionWorker>
 	{
-		readonly static ICache<IParameterHandler> Cache = new Cache<IParameterHandler>( o => new Handler( AutoValidation.Adapter.Get( o ) ) );
+		readonly Type interfaceType;
+		readonly Func<IAutoValidationController, Type, IConnectionWorker> factory;
 
-		public static RegisterValidationHandlerCommand<T> Instance { get; } = new RegisterValidationHandlerCommand<T>();
-
-		RegisterValidationHandlerCommand() : base( Cache, new Specification<AutoValidationValidateAspect>( typeof(T) ).ToDelegate() ) {}
-
-		class Handler : IParameterHandler
+		public WorkerFactory( Type interfaceType, Func<IAutoValidationController, Type, IConnectionWorker> factory )
 		{
-			readonly IParameterValidationAdapter adapter;
-
-			public Handler( IParameterValidationAdapter adapter )
-			{
-				this.adapter = adapter;
-			}
-
-			public bool Handles( object parameter ) => adapter.Handles( parameter );
-
-			public object Handle( object parameter ) => adapter.IsValid( parameter );
+			this.interfaceType = interfaceType;
+			this.factory = factory;
 		}
-	}
 
-	class RegisterExecutionHandlerCommand<T> : RegisterHandlerCommand
-	{
-		readonly static ICache<IParameterHandler> Cache = new Cache<IParameterHandler>( o => new Handler( AutoValidation.Adapter.Get( o ) ) );
-
-		public static RegisterExecutionHandlerCommand<T> Instance { get; } = new RegisterExecutionHandlerCommand<T>();
-
-		RegisterExecutionHandlerCommand() : base( Cache, new Specification<AutoValidationExecuteAspect>( typeof(T) ).ToDelegate() ) {}
-
-		class Handler : IParameterHandler
+		public override IConnectionWorker Create( object parameter )
 		{
-			readonly IParameterValidationAdapter adapter;
-
-			public Handler( IParameterValidationAdapter adapter )
-			{
-				this.adapter = adapter;
-			}
-
-			public bool Handles( object parameter ) => adapter.Handles( parameter );
-
-			public object Handle( object parameter ) => adapter.Execute( parameter );
-		}
-	}
-
-	class Specification<T> : SpecificationWithContextBase<IAutoValidationAspect, Type> where T : class, IAutoValidationAspect
-	{
-		public Specification( Type context ) : base( context ) {}
-
-		public override bool IsSatisfiedBy( IAutoValidationAspect parameter )
-		{
-			var aspect = parameter as T;
-			var result = aspect?.InterfaceType == Context;
+			var controller = Services.Controller.Get( parameter );
+			var result = factory( controller, interfaceType );
+			controller.Connect( result );
 			return result;
 		}
 	}
 
-	public class RegisterHandlerCommand : CommandBase<object>
+	class GenericWorkerFactory : FactoryBase<object, IConnectionWorker>
 	{
-		readonly ICache<IParameterHandler> handler;
-		readonly Func<IAutoValidationAspect, bool> specification;
+		readonly Type interfaceType;
+		readonly Type registrationType;
+		readonly Func<IAutoValidationController, Type, Type, IConnectionWorker> factory;
 
-		public RegisterHandlerCommand( ICache<IParameterHandler> handler, Func<IAutoValidationAspect, bool> specification )
+		public GenericWorkerFactory( Type interfaceType, Type registrationType, Func<IAutoValidationController, Type, Type, IConnectionWorker> factory )
 		{
-			this.handler = handler;
-			this.specification = specification;
+			this.interfaceType = interfaceType;
+			this.registrationType = registrationType;
+			this.factory = factory;
 		}
 
-		public override void Execute( object parameter )
+		public override IConnectionWorker Create( object parameter )
 		{
-			foreach ( var aspect in Services.Instances.Get( parameter ).List() )
-			{
-				var instance = aspect as IAutoValidationAspect;
-				if ( instance != null && specification( instance ) )
-				{
-					Services.Handlers.Get( aspect ).Add( handler.Get( parameter ) );
-				}
-			}
+			var controller = Services.Controller.Get( parameter );
+			var result = factory( controller, interfaceType, registrationType );
+			controller.Connect( result );
+			return result;
 		}
 	}
 
-	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
-	public class RegisterHandlerAspect : InstanceAwareChildAspectBase, IPriorityAware
+	public abstract class AutoValidationWorkerBase : ConnectionWorkerBase<IAutoValidationController>, IAutoValidationWorker
 	{
-		readonly RegisterHandlerCommand command;
-
-		public RegisterHandlerAspect( Type registerHandlerCommandType ) : this( (RegisterHandlerCommand)SingletonLocator.Instance.Locate( registerHandlerCommandType ) ) {}
-
-		RegisterHandlerAspect( RegisterHandlerCommand command )
+		protected AutoValidationWorkerBase( IAutoValidationController owner, Type interfaceType ) : base( owner )
 		{
-			this.command = command;
+			InterfaceType = interfaceType;
 		}
 
-		public override void RuntimeInitializeInstance( object instance ) => command.Execute( instance );
+		public Type InterfaceType { get; }
 
-		public Priority Priority => Priority.High;
+		public abstract object Invoke( MethodInvocationParameter parameter );
 	}
 
-	public class AutoValidationValidateAspect : AutoValidationAspectBase
+	public class AutoValidationValidationAspect : AutoValidationWorkerHostBase
 	{
-		public AutoValidationValidateAspect( Type interfaceType ) : base( interfaceType ) {}
+		public AutoValidationValidationAspect( Type interfaceType ) : base( new WorkerFactory( interfaceType, ( controller, type ) => new AutoValidationValidateWorker( controller, type ) ) ) {}
+	}
 
-		protected override object Execute( AutoValidationParameter parameter )
+	public class GenericAutoValidationValidationAspect : AutoValidationWorkerHostBase
+	{
+		public GenericAutoValidationValidationAspect( Type interfaceType, Type registrationType ) 
+			: base( new GenericWorkerFactory( interfaceType, registrationType, ( controller, type, registration ) => new GenericAutoValidationValidateWorker( controller, type, registration ) ) ) {}
+	}
+
+	public abstract class AutoValidationValidateWorkerBase : AutoValidationWorkerBase
+	{
+		protected AutoValidationValidateWorkerBase( IAutoValidationController owner, Type interfaceType ) : base( owner, interfaceType ) {}
+
+		public override object Invoke( MethodInvocationParameter parameter )
 		{
 			var result = parameter.Proceed<bool>();
-			Controller.MarkValid( parameter.Parameter, result );
+			Owner.MarkValid( parameter.Arguments[0], result );
 			return null;
 		}
 	}
 
-	public class AutoValidationExecuteAspect : AutoValidationAspectBase
+	class AutoValidationValidateWorker : AutoValidationValidateWorkerBase, IParameterHandlerAware
 	{
-		public AutoValidationExecuteAspect( Type interfaceType ) : base( interfaceType ) {}
+		readonly CompositeParameterHandler handlers = new CompositeParameterHandler();
 
-		protected override object Execute( AutoValidationParameter parameter ) => Controller.Execute( parameter );
-	}
+		public AutoValidationValidateWorker( IAutoValidationController owner, Type interfaceType ) : base( owner, interfaceType ) {}
 
-	public abstract class HandlerAwareAspectBase : InstanceAwareChildAspectBase
-	{
-		ImmutableArray<IParameterHandler> Handlers { get; set; }
+		public void Register( IParameterHandler handler ) => handlers.Add( handler );
+		public bool Handles( object parameter ) => handlers.Handles( parameter );
 
-		public override void RuntimeInitializeInstance( object instance ) => Handlers = Services.Handlers.Get( instance ).Concat( Services.Handlers.Get( this ) ).ToImmutableArray();
+		public object Handle( object parameter ) => handlers.Handle( parameter );
 
-		protected object Handle( object parameter )
+		public override object Invoke( MethodInvocationParameter parameter )
 		{
-			foreach ( var handler in Handlers )
-			{
-				if ( handler.Handles( parameter ) )
-				{
-					return handler.Handle( parameter );
-				}
-			}
-			return Placeholders.Null;
+			var handled = handlers.Count > 0 ? handlers.Handle( parameter.Arguments[0] ) : Placeholders.Null;
+			var result = handled == Placeholders.Null ? base.Invoke( parameter ) : handled;
+			return result;
 		}
 	}
 
-	public class InstanceAwareRepository : RepositoryBase<IInstanceScopedAspect>, IDisposable
+	class GenericAutoValidationValidateWorker : AutoValidationValidateWorkerBase
 	{
-		~InstanceAwareRepository()
+		readonly IRegistrationProvider provider;
+
+		public GenericAutoValidationValidateWorker( IAutoValidationController owner, Type interfaceType, Type registrationType ) 
+			: this( owner, interfaceType, (IRegistrationProvider)SingletonLocator.Instance.Locate( registrationType ) ) {}
+
+		GenericAutoValidationValidateWorker( IAutoValidationController owner, Type interfaceType, IRegistrationProvider provider ) : base( owner, interfaceType )
 		{
-			Store.Clear();
+			this.provider = provider;
 		}
 
-		[Freeze]
-		public override ImmutableArray<IInstanceScopedAspect> List() => base.List();
+		protected override void OnInitialize() => Owner.Register( provider );
 
-		public void Dispose()
+		public override Priority Priority => Priority.High;
+	}
+
+	public class AutoValidationExecuteAspect : AutoValidationWorkerHostBase
+	{
+		public AutoValidationExecuteAspect( Type interfaceType ) : base( new WorkerFactory( interfaceType, ( controller, type ) => new AutoValidationExecuteWorker( controller, type ) ) ) {}
+	}
+
+	public class GenericAutoValidationExecuteAspect : AutoValidationWorkerHostBase
+	{
+		public GenericAutoValidationExecuteAspect( Type interfaceType, Type registrationType ) : base( new GenericWorkerFactory( interfaceType, registrationType, ( controller, type, registration ) => new GenericAutoValidationExecuteWorker( controller, type, registration ) ) ) {}
+	}
+
+	public class AutoValidationExecuteWorkerBase : AutoValidationWorkerBase
+	{
+		public AutoValidationExecuteWorkerBase( IAutoValidationController owner, Type interfaceType ) : base( owner, interfaceType ) {}
+
+		public override object Invoke( MethodInvocationParameter parameter ) => Owner.Execute( parameter );
+	}
+
+	class AutoValidationExecuteWorker : AutoValidationExecuteWorkerBase, IParameterHandlerAware
+	{
+		readonly CompositeParameterHandler handlers = new CompositeParameterHandler();
+
+		public AutoValidationExecuteWorker( IAutoValidationController owner, Type interfaceType ) : base( owner, interfaceType ) {}
+
+		public void Register( IParameterHandler handler ) => handlers.Add( handler );
+		public bool Handles( object parameter ) => handlers.Handles( parameter );
+
+		public object Handle( object parameter ) => handlers.Handle( parameter );
+
+		public override object Invoke( MethodInvocationParameter parameter )
 		{
-			Store.Clear();
-			GC.SuppressFinalize( this );
+			var handled = handlers.Count > 0 ? handlers.Handle( parameter.Arguments[0] ) : Placeholders.Null;
+			var result = handled == Placeholders.Null ? base.Invoke( parameter ) : handled;
+			return result;
 		}
 	}
 
-	public interface IParameterHandler
+	class GenericAutoValidationExecuteWorker : AutoValidationExecuteWorkerBase
 	{
-		bool Handles( object parameter );
+		readonly IRegistrationProvider provider;
 
-		object Handle( object parameter );
+		public GenericAutoValidationExecuteWorker( IAutoValidationController owner, Type interfaceType, Type registrationType ) 
+			: this( owner, interfaceType, (IRegistrationProvider)SingletonLocator.Instance.Locate( registrationType ) ) {}
+
+		GenericAutoValidationExecuteWorker( IAutoValidationController owner, Type interfaceType, IRegistrationProvider provider ) : base( owner, interfaceType )
+		{
+			this.provider = provider;
+		}
+
+		protected override void OnInitialize() => Owner.Register( provider );
+
+		public override Priority Priority => Priority.High;
 	}
+
+	/*[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
+	public class RegisterHandlerAspect : ConnectionWorkerHostBase
+	{
+		public RegisterHandlerAspect( Type providerType ) : base( new WorkerFactory( providerType, ( controller, type ) => new RegisterHandlerWorker( controller, type ) ).Cached().ToDelegate() ) {}
+	}
+
+	class RegisterHandlerWorker : ConnectionWorkerBase<IAutoValidationController>
+	{
+		readonly IRegistrationProvider provider;
+
+		public RegisterHandlerWorker( IAutoValidationController owner, Type registrationType ) : this( owner, (IRegistrationProvider)SingletonLocator.Instance.Locate( registrationType ) ) {}
+
+		public RegisterHandlerWorker( IAutoValidationController owner, IRegistrationProvider provider ) : base( owner )
+		{
+			this.provider = provider;
+		}
+
+		protected override void OnInitialize() => Owner.Register( provider );
+
+		public override Priority Priority => Priority.High;
+	}*/
 
 	class AdapterLocator : FactoryBase<object, IParameterValidationAdapter>
 	{
@@ -292,6 +358,196 @@ namespace DragonSpark.Aspects.Validation
 				}
 			}
 			return null;
+		}
+	}
+
+	public interface IProfile : IEnumerable<Func<Type, AspectInstance>>
+	{
+		Type InterfaceType { get; }
+
+		Func<object, IParameterValidationAdapter> AdapterFactory { get; }
+	}
+
+	class Profile : IProfile
+	{
+		readonly Func<Type, AspectInstance> validate;
+		readonly Func<Type, AspectInstance> execute;
+		protected Profile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> factory ) : this( interfaceType, new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).ToDelegate(), new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).ToDelegate(), factory.ToDelegate() ) {}
+
+		protected Profile( Type interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> adapterFactory )
+		{
+			InterfaceType = interfaceType;
+			AdapterFactory = adapterFactory;
+			this.validate = validate;
+			this.execute = execute;
+		}
+
+		public Type InterfaceType { get; }
+		public Func<object, IParameterValidationAdapter> AdapterFactory { get; }
+
+		public IEnumerator<Func<Type, AspectInstance>> GetEnumerator()
+		{
+			yield return validate;
+			yield return execute;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+	}
+
+	class GenericProfile<T> : Profile
+	{
+		protected GenericProfile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> adapterFactory )
+			: base( interfaceType,
+					new GenericAspectInstanceMethodFactory<GenericAutoValidationValidationAspect, ValidationRegisterProvider<T>>( interfaceType, valid ).ToDelegate(),
+					new GenericAspectInstanceMethodFactory<GenericAutoValidationExecuteAspect, ExecutionRegisterProvider<T>>( interfaceType, execute ).ToDelegate(),
+					adapterFactory.ToDelegate()
+				) {}
+	}
+
+	class AspectInstanceMethodFactory<T> : AspectInstanceFactoryBase where T : AutoValidationWorkerHostBase
+	{
+		public AspectInstanceMethodFactory( Type implementingType, string methodName ) : base( implementingType, methodName, Construct.Instance<T>( implementingType ) ) {}
+	}
+
+	class GenericAspectInstanceMethodFactory<TAspect, TRegistry> : AspectInstanceFactoryBase where TAspect : AutoValidationWorkerHostBase where TRegistry : RegisterProvider
+	{
+		public GenericAspectInstanceMethodFactory( Type implementingType, string methodName ) : base( implementingType, methodName, Construct.Instance<TAspect>( implementingType, typeof(TRegistry) ) ) {}
+	}
+
+	static class Construct
+	{
+		public static ObjectConstruction New<T>( params object[] arguments ) => new ObjectConstruction( typeof(T), arguments );
+
+		// public static Func<MethodInfo, AspectInstance> Factory<T>() => HandlerFactory<T>.Instance.ToDelegate();
+
+		public static Func<MethodInfo, AspectInstance> Instance<T>( params object[] arguments ) => new ConstructAspectInstanceFactory<T>( arguments ).ToDelegate();
+
+		/*static class HandlerFactory<T>
+		{
+			public static ConstructAspectInstanceFactory<RegisterHandlerAspect> Instance { get; } = new ConstructAspectInstanceFactory<RegisterHandlerAspect>( typeof(T) );
+		}*/
+	}
+
+	class ConstructAspectInstanceFactory<T> : FactoryBase<MethodInfo, AspectInstance>
+	{
+		readonly ObjectConstruction construction;
+
+		public ConstructAspectInstanceFactory( params object[] arguments ) : this( Construct.New<T>( arguments ) ) {}
+
+		ConstructAspectInstanceFactory( ObjectConstruction construction )
+		{
+			this.construction = construction;
+		}
+
+		public override AspectInstance Create( MethodInfo parameter ) => new AspectInstance( parameter, construction, null );
+	}
+
+	abstract class AspectInstanceFactoryBase : FactoryBase<Type, AspectInstance>
+	{
+		readonly Type implementingType;
+		readonly string methodName;
+		readonly Func<MethodInfo, AspectInstance> factory;
+
+		protected AspectInstanceFactoryBase( Type implementingType, string methodName, Func<MethodInfo, AspectInstance> factory )
+		{
+			this.implementingType = implementingType;
+			this.methodName = methodName;
+			this.factory = factory;
+		}
+
+		public override AspectInstance Create( Type parameter )
+		{
+			var mappings = parameter.Adapt().GetMappedMethods( implementingType );
+			var mapping = mappings.Introduce( methodName, pair => pair.Item1.Item1.Name == pair.Item2 && ( pair.Item1.Item2.IsFinal || pair.Item1.Item2.IsVirtual ) && !pair.Item1.Item2.IsAbstract ).SingleOrDefault();
+			if ( mapping.IsAssigned() )
+			{
+				var method = mapping.Item2.AccountForGenericDefinition();
+				var result = FromMethod( method );
+				return result;
+			}
+			return null;
+		}
+
+		AspectInstance FromMethod( MethodInfo method )
+		{
+			var repository = PostSharpEnvironment.CurrentProject.GetService<IAspectRepositoryService>();
+			var instance = factory( method );
+			var type = instance.Aspect != null ? instance.Aspect.GetType() : Type.GetType( instance.AspectConstruction.TypeName );
+			var result = !repository.HasAspect( method, type ) ? instance : null;
+			return result;
+		}
+	}
+
+	public interface IParameterHandler
+	{
+		bool Handles( object parameter );
+
+		object Handle( object parameter );
+	}
+
+	class Specification<T> : SpecificationWithContextBase<IAutoValidationWorker, Type> where T : class, IAutoValidationWorker
+	{
+		public Specification( Type context ) : base( context ) {}
+
+		public override bool IsSatisfiedBy( IAutoValidationWorker parameter )
+		{
+			var aspect = parameter as T;
+			var result = aspect?.InterfaceType == Context;
+			return result;
+		}
+	}
+
+	public class RegisterProvider : DelegatedSpecification<IAutoValidationWorker>, IRegistrationProvider
+	{
+		readonly Func<IParameterValidationAdapter, IParameterHandler> create;
+
+		public RegisterProvider( Func<IAutoValidationWorker, bool> specification, Func<IParameterValidationAdapter, IParameterHandler> create ) : base( specification )
+		{
+			this.create = create;
+		}
+
+		public IParameterHandler Create( IParameterValidationAdapter adapter ) => create( adapter );
+	}
+
+	class ValidationRegisterProvider<T> : RegisterProvider
+	{
+		public static ValidationRegisterProvider<T> Instance { get; } = new ValidationRegisterProvider<T>();
+
+		ValidationRegisterProvider() : base( new Specification<AutoValidationValidateWorker>( typeof(T) ).ToDelegate(), adapter => new Handler( adapter ) ) {}
+
+		class Handler : IParameterHandler
+		{
+			readonly IParameterValidationAdapter adapter;
+
+			public Handler( IParameterValidationAdapter adapter )
+			{
+				this.adapter = adapter;
+			}
+
+			public bool Handles( object parameter ) => adapter.Handles( parameter );
+
+			public object Handle( object parameter ) => adapter.IsValid( parameter );
+		}
+	}
+
+	class ExecutionRegisterProvider<T> : RegisterProvider
+	{
+		public static ExecutionRegisterProvider<T> Instance { get; } = new ExecutionRegisterProvider<T>();
+
+		ExecutionRegisterProvider() : base( new Specification<AutoValidationExecuteWorker>( typeof(T) ).ToDelegate(), adapter => new Handler( adapter ) ) {}
+
+		class Handler : IParameterHandler
+		{
+			readonly IParameterValidationAdapter adapter;
+
+			public Handler( IParameterValidationAdapter adapter )
+			{
+				this.adapter = adapter;
+			}
+
+			public bool Handles( object parameter ) => adapter.Handles( parameter );
+
+			public object Handle( object parameter ) => adapter.Execute( parameter );
 		}
 	}
 
@@ -325,58 +581,17 @@ namespace DragonSpark.Aspects.Validation
 		CommandProfile() : base( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute), CommandAdapterFactory.Instance ) {}
 	}
 
-	public interface IProfile : IEnumerable<Func<Type, ImmutableArray<AspectInstance>>>
-	{
-		Type InterfaceType { get; }
-
-		Func<object, IParameterValidationAdapter> AdapterFactory { get; }
-	}
-
-	class Profile : IProfile
-	{
-		readonly Func<Type, ImmutableArray<AspectInstance>> validate;
-		readonly Func<Type, ImmutableArray<AspectInstance>> execute;
-		protected Profile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> factory ) : this( interfaceType, new AspectInstanceMethodFactory<AutoValidationValidateAspect>( interfaceType, valid ).ToDelegate(), new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).ToDelegate(), factory.ToDelegate() ) {}
-
-		protected Profile( Type interfaceType, Func<Type, ImmutableArray<AspectInstance>> validate, Func<Type, ImmutableArray<AspectInstance>> execute, Func<object, IParameterValidationAdapter> adapterFactory )
-		{
-			InterfaceType = interfaceType;
-			AdapterFactory = adapterFactory;
-			this.validate = validate;
-			this.execute = execute;
-		}
-
-		public Type InterfaceType { get; }
-		public Func<object, IParameterValidationAdapter> AdapterFactory { get; }
-
-		public IEnumerator<Func<Type, ImmutableArray<AspectInstance>>> GetEnumerator()
-		{
-			yield return validate;
-			yield return execute;
-		}
-
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-	}
-
-	class GenericProfile<T> : Profile
-	{
-		protected GenericProfile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> adapterFactory )
-			: base( interfaceType,
-					new GenericAspectInstanceMethodFactory<AutoValidationValidateAspect, RegisterValidationHandlerCommand<T>>( interfaceType, valid ).ToDelegate(),
-					new GenericAspectInstanceMethodFactory<AutoValidationExecuteAspect, RegisterExecutionHandlerCommand<T>>( interfaceType, execute ).ToDelegate(),
-					adapterFactory.ToDelegate()
-				) {}
-	}
+	
 
 	public class AspectInstanceFactory : FactoryBase<Type, IEnumerable<AspectInstance>>
 	{
-		readonly ImmutableArray<Func<Type, ImmutableArray<AspectInstance>>> factories;
+		readonly ImmutableArray<Func<Type, AspectInstance>> factories;
 
 		public AspectInstanceFactory( ImmutableArray<IProfile> profiles ) : this( profiles.Select( profile => profile.InterfaceType ).ToImmutableArray(), profiles.ToArray().Concat().ToImmutableArray() ) {}
 
-		AspectInstanceFactory( ImmutableArray<Type> knownTypes, ImmutableArray<Func<Type, ImmutableArray<AspectInstance>>> factories ) : this( new Specification( knownTypes ), factories ) {}
+		AspectInstanceFactory( ImmutableArray<Type> knownTypes, ImmutableArray<Func<Type, AspectInstance>> factories ) : this( new Specification( knownTypes ), factories ) {}
 
-		AspectInstanceFactory( ISpecification<Type> specification, ImmutableArray<Func<Type, ImmutableArray<AspectInstance>>> factories ) : base( specification )
+		AspectInstanceFactory( ISpecification<Type> specification, ImmutableArray<Func<Type, AspectInstance>> factories ) : base( specification )
 		{
 			this.factories = factories;
 		}
@@ -385,7 +600,8 @@ namespace DragonSpark.Aspects.Validation
 		{
 			foreach ( var factory in factories )
 			{
-				foreach ( var instance in factory( parameter ) )
+				var instance = factory( parameter );
+				if ( instance != null )
 				{
 					yield return instance;
 				}
@@ -405,112 +621,23 @@ namespace DragonSpark.Aspects.Validation
 				return true;
 			}
 		}
-	}
+	}	
 
-	static class Construct
-	{
-		public static ObjectConstruction New<T>( params object[] arguments ) => new ObjectConstruction( typeof(T), arguments );
-
-		public static Func<MethodInfo, AspectInstance> Factory<T>() => HandlerFactory<T>.Instance.ToDelegate();
-
-		public static Func<MethodInfo, AspectInstance> Instance<T>( Type interfaceType ) => new ConstructAspectInstanceFactory<T>( interfaceType ).ToDelegate();
-
-		static class HandlerFactory<T>
-		{
-			public static ConstructAspectInstanceFactory<RegisterHandlerAspect> Instance { get; } = new ConstructAspectInstanceFactory<RegisterHandlerAspect>( typeof(T) );
-		}
-	}
-
-	class ConstructAspectInstanceFactory<T> : FactoryBase<MethodInfo, AspectInstance>
-	{
-		readonly ObjectConstruction construction;
-
-		public ConstructAspectInstanceFactory( Type interfaceType ) : this( Construct.New<T>( interfaceType ) ) {}
-
-		ConstructAspectInstanceFactory( ObjectConstruction construction )
-		{
-			this.construction = construction;
-		}
-
-		public override AspectInstance Create( MethodInfo parameter ) => new AspectInstance( parameter, construction, null );
-	}
-
-	class AspectInstanceMethodFactory<T> : AspectInstanceFactoryBase where T : IAutoValidationAspect
-	{
-		public AspectInstanceMethodFactory( Type implementingType, string methodName ) : base( implementingType, methodName, Construct.Instance<T>( implementingType ) ) {}
-	}
-
-	class GenericAspectInstanceMethodFactory<TAspect, TCommand> : AspectInstanceFactoryBase where TAspect : IAutoValidationAspect where TCommand : RegisterHandlerCommand
-	{
-		public GenericAspectInstanceMethodFactory( Type implementingType, string methodName ) : base( implementingType, methodName, Construct.Factory<TCommand>(), Construct.Instance<TAspect>( implementingType ) ) {}
-	}
-
-	abstract class AspectInstanceFactoryBase : FactoryBase<Type, ImmutableArray<AspectInstance>>
-	{
-		readonly Type implementingType;
-		readonly string methodName;
-		readonly ImmutableArray<Func<MethodInfo, AspectInstance>> factories;
-
-		protected AspectInstanceFactoryBase( Type implementingType, string methodName, params Func<MethodInfo, AspectInstance>[] factories )
-		{
-			this.implementingType = implementingType;
-			this.methodName = methodName;
-			this.factories = factories.ToImmutableArray();
-		}
-
-		public override ImmutableArray<AspectInstance> Create( Type parameter )
-		{
-			var mappings = parameter.Adapt().GetMappedMethods( implementingType );
-			var mapping = mappings.Introduce( methodName, pair => pair.Item1.Item1.Name == pair.Item2 && ( pair.Item1.Item2.IsFinal || pair.Item1.Item2.IsVirtual ) && !pair.Item1.Item2.IsAbstract ).SingleOrDefault();
-			if ( mapping.IsAssigned() )
-			{
-				var method = mapping.Item2.AccountForGenericDefinition();
-				var result = FromMethod( method ).ToImmutableArray();
-				return result;
-			}
-			return ImmutableArray<AspectInstance>.Empty;
-		}
-
-		IEnumerable<AspectInstance> FromMethod( MethodInfo method )
-		{
-			var repository = PostSharpEnvironment.CurrentProject.GetService<IAspectRepositoryService>();
-			foreach ( var factory in factories )
-			{
-				var instance = factory( method );
-				var type = instance.Aspect != null ? instance.Aspect.GetType() : Type.GetType( instance.AspectConstruction.TypeName );
-				if ( !repository.HasAspect( method, type ) )
-				{
-					yield return instance;
-				}
-			}
-		}
-	}
-
-	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Class )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	// [MulticastAttributeUsage( TargetMemberAttributes = MulticastAttributes.NonAbstract | MulticastAttributes.Instance )]
-	public class ApplyAutoValidationAttribute : InstanceAwareParentAspectBase, IAspectProvider
+	public class ApplyAutoValidationAttribute : ConnectionOwnerHostBase, IAspectProvider
 	{
-		readonly Func<object, IParameterValidationAdapter> factory;
 		readonly IFactory<Type, IEnumerable<AspectInstance>> provider;
 
-		public ApplyAutoValidationAttribute() : this( AdapterLocator.Instance.ToDelegate(), DefaultAspectInstanceFactory.Instance ) {}
+		public ApplyAutoValidationAttribute() : this( Services.Controller.ToDelegate(), DefaultAspectInstanceFactory.Instance ) {}
 
-		protected ApplyAutoValidationAttribute( Func<object, IParameterValidationAdapter> factory, IFactory<Type, IEnumerable<AspectInstance>> provider )
+		protected ApplyAutoValidationAttribute( Func<object, IAutoValidationController> factory, IFactory<Type, IEnumerable<AspectInstance>> provider ) : base( factory )
 		{
-			this.factory = factory;
 			this.provider = provider;
 		}
 
 		public override bool CompileTimeValidate( Type type ) => provider.CanCreate( type );
-
-		public override void RuntimeInitializeInstance()
-		{
-			var adapter = AutoValidation.Adapter.SetValue( Instance, factory( Instance ) );
-			AutoValidation.Controller.Set( Instance, new AutoValidationController( adapter ) );
-			base.RuntimeInitializeInstance();
-		}
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{
