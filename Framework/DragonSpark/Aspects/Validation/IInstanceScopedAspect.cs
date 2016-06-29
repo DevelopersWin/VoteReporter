@@ -107,15 +107,15 @@ namespace DragonSpark.Aspects.Validation
 
 		public void Register( IRegistrationProvider provider )
 		{
-			foreach ( var worker in Workers.OfType<IParameterHandlerAware>() )
+			/*foreach ( var worker in Workers )
 			{
 				if ( provider.IsSatisfiedBy( worker ) )
 				{
 					var handler = provider.Create( adapter );
-					worker.Register( handler );
+					((IParameterHandlerAware)worker).Register( handler );
 					break;
 				}
-			}
+			}*/
 		}
 
 		public void Register( IParameterHandler handler ) => handlers.Add( handler );
@@ -163,7 +163,6 @@ namespace DragonSpark.Aspects.Validation
 		{
 			var controller = Services.Controller.Get( parameter );
 			var result = factory( controller, interfaceType );
-			controller.Connect( result );
 			return result;
 		}
 	}
@@ -185,7 +184,6 @@ namespace DragonSpark.Aspects.Validation
 		{
 			var controller = Services.Controller.Get( parameter );
 			var result = factory( controller, interfaceType, registrationType );
-			controller.Connect( result );
 			return result;
 		}
 	}
@@ -236,12 +234,12 @@ namespace DragonSpark.Aspects.Validation
 
 		public object Handle( object parameter ) => handlers.Handle( parameter );
 
-		public override object Invoke( MethodInvocationParameter parameter )
+		/*public override object Invoke( MethodInvocationParameter parameter )
 		{
 			var handled = handlers.Count > 0 ? handlers.Handle( parameter.Arguments[0] ) : Placeholders.Null;
 			var result = handled == Placeholders.Null ? base.Invoke( parameter ) : handled;
 			return result;
-		}
+		}*/
 	}
 
 	class GenericAutoValidationValidateWorker : AutoValidationValidateWorkerBase
@@ -289,12 +287,12 @@ namespace DragonSpark.Aspects.Validation
 
 		public object Handle( object parameter ) => handlers.Handle( parameter );
 
-		public override object Invoke( MethodInvocationParameter parameter )
+		/*public override object Invoke( MethodInvocationParameter parameter )
 		{
 			var handled = handlers.Count > 0 ? handlers.Handle( parameter.Arguments[0] ) : Placeholders.Null;
 			var result = handled == Placeholders.Null ? base.Invoke( parameter ) : handled;
 			return result;
-		}
+		}*/
 	}
 
 	class GenericAutoValidationExecuteWorker : AutoValidationExecuteWorkerBase

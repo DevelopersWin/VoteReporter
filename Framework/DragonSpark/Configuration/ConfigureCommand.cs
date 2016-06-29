@@ -1,12 +1,15 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.TypeSystem;
 using System.Collections.Generic;
 
 namespace DragonSpark.Configuration
 {
 	public class ConfigureCommand : CommandBase<IEnumerable<IWritableStore>>
 	{
+		readonly static IGenericMethodContext Context = typeof(ConfigureCommand).Adapt().GenericMethods[nameof(Add)];
+
 		public static ConfigureCommand Instance { get; } = new ConfigureCommand();
 
 		ConfigureCommand() {}
@@ -15,7 +18,7 @@ namespace DragonSpark.Configuration
 		{
 			foreach ( var store in parameter )
 			{
-				GetType().Adapt().GenericMethods.Invoke( nameof(Add), store.GetType().ToItem(), store.ToItem() ); 
+				Context.Make( store.GetType() ).StaticCall( store ); 
 			}
 		}
 

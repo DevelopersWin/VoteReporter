@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
@@ -14,10 +15,12 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 		readonly IFixture fixture;
 
 		readonly ICollection<Type> registered = new List<Type>();
+		readonly GenericMethodInvoker invoker;
 
 		public FixtureRegistry( [Required]IFixture fixture )
 		{
 			this.fixture = fixture;
+			invoker = GetType().Adapt().GenericMethods;
 		}
 
 		public bool IsRegistered( Type type ) => registered.Contains( type );
@@ -30,7 +33,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		public void Register( [Required]InstanceRegistrationParameter parameter ) => Invoke( parameter.RequestedType, nameof(RegisterInstance), parameter.Instance );
 
-		void Invoke( Type type, string name, object parameter ) => GetType().Adapt().GenericMethods.Invoke( this, name, type.ToItem(), parameter );
+		void Invoke( Type type, string name, object parameter ) => invoker[name].Make( type ).Call( this, parameter );
 
 		void RegisterInstance<T>( [Required]T instance )
 		{

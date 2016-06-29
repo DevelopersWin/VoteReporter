@@ -48,6 +48,44 @@ namespace DragonSpark.Testing.Runtime
 			
 			var cannot = factory.CanCreate( 456 );
 			Assert.False( cannot );
+			Assert.Equal( 2, sut.CanCreateCalled );
+			Assert.Equal( 1, sut.CanCreateGenericCalled );
+
+			var can = sut.CanCreate( 6776 );
+			Assert.True( can );
+			Assert.Equal( 2, sut.CanCreateCalled );
+			Assert.Equal( 2, sut.CanCreateGenericCalled );
+
+			Assert.Equal( 0, sut.CreateCalled );
+			Assert.Equal( 0, sut.CreateGenericCalled );
+
+			var created = factory.Create( 6776 );
+			Assert.Equal( 2, sut.CanCreateCalled );
+			Assert.Equal( 2, sut.CanCreateGenericCalled );
+			Assert.Equal( 1, sut.CreateCalled );
+			Assert.Equal( 1, sut.CreateGenericCalled );
+			Assert.Equal( 6776 + 123f, created );
+			}
+			// );
+		}
+
+		/*[Fact]
+		public void ExtendedCheckFullFeature()
+		{
+			for ( int i = 0; i < 10000; i++ )
+			{
+			var sut = new ExtendedFactory();
+			Assert.Equal( 0, sut.CanCreateCalled );
+			Assert.Equal( 0, sut.CanCreateGenericCalled );
+
+			var factory = sut.To<IFactoryWithParameter>();
+			var invalid = factory.CanCreate( "Message" );
+			Assert.False( invalid );
+			Assert.Equal( 1, sut.CanCreateCalled );
+			Assert.Equal( 0, sut.CanCreateGenericCalled );
+			
+			var cannot = factory.CanCreate( 456 );
+			Assert.False( cannot );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 
@@ -66,8 +104,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, created );
 			}
-			// );
-		}
+		}*/
 
 		/*[Fact]
 		public void VerifyCommand()

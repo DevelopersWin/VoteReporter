@@ -56,6 +56,8 @@ namespace DragonSpark.TypeSystem
 
 	public class DefaultValueFactory : FactoryBase<Type, object>
 	{
+		readonly static IGenericMethodContext Method = typeof(Enumerable).Adapt().GenericMethods[nameof(Enumerable.Empty)];
+
 		public static DefaultValueFactory Instance { get; } = new DefaultValueFactory();
 
 		DefaultValueFactory() {}
@@ -64,7 +66,7 @@ namespace DragonSpark.TypeSystem
 		public override object Create( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
-			var result = type != null ? typeof(Enumerable).Adapt().GenericMethods.Invoke( nameof(Enumerable.Empty), type.ToItem() ) : parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : null;
+			var result = type != null ? Method.Make( type.ToItem() ).StaticInvoke<Array>() : parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : null;
 			return result;
 		}
 	}

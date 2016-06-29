@@ -67,20 +67,20 @@ namespace DragonSpark.Aspects
 	abstract class GenericParameterAdapterFactoryBase : FactoryBase<object, IParameterValidationAdapter>
 	{
 		readonly Type genericType;
-		readonly string methodName;
-		readonly GenericMethodInvoker invoker;
+		readonly IGenericMethodContext context;
+		
+		protected GenericParameterAdapterFactoryBase( Type genericType, Type parentType, string methodName = nameof(Create) ) : this( parentType.Adapt().GenericMethods[ methodName ], genericType ) {}
 
-		protected GenericParameterAdapterFactoryBase( Type parentType, Type genericType, string methodName = nameof(Create) )
+		GenericParameterAdapterFactoryBase( IGenericMethodContext context, Type genericType )
 		{
 			this.genericType = genericType;
-			this.methodName = methodName;
-			invoker = parentType.Adapt().GenericMethods;
+			this.context = context;
 		}
 
 		public override IParameterValidationAdapter Create( object parameter )
 		{
 			var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = invoker.Invoke<IParameterValidationAdapter>( methodName, arguments, parameter.ToItem() );
+			var result = context.Make( arguments ).StaticInvoke<IParameterValidationAdapter>( parameter );
 			return result;
 		}
 	}
@@ -89,7 +89,7 @@ namespace DragonSpark.Aspects
 	{
 		public static GenericFactoryAdapterFactory Instance { get; } = new GenericFactoryAdapterFactory();
 
-		GenericFactoryAdapterFactory() : base( typeof(GenericFactoryAdapterFactory), typeof(IFactory<,>) ) {}
+		GenericFactoryAdapterFactory() : base( typeof(IFactory<,>), typeof(GenericFactoryAdapterFactory) ) {}
 
 		static IParameterValidationAdapter Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
@@ -97,7 +97,7 @@ namespace DragonSpark.Aspects
 	{
 		public static GenericCommandAdapterFactory Instance { get; } = new GenericCommandAdapterFactory();
 
-		GenericCommandAdapterFactory() : base( typeof(GenericCommandAdapterFactory), typeof(ICommand<>) ) {}
+		GenericCommandAdapterFactory() : base( typeof(ICommand<>), typeof(GenericCommandAdapterFactory) ) {}
 
 		static IParameterValidationAdapter Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}

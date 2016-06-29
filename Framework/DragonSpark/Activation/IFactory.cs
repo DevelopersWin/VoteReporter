@@ -31,6 +31,7 @@ namespace DragonSpark.Activation
 
 	public static class FactoryExtensions
 	{
+		readonly static IGenericMethodContext Methods = typeof(FactoryExtensions).Adapt().GenericMethods[nameof(Convert)];
 		public static T CreateUsing<T>( this IFactoryWithParameter @this, object parameter ) => (T)@this.Create( parameter );
 
 		public static IFactory<object, T> Wrap<T>( this T @this ) where T : class => @this.Wrap<object, T>();
@@ -51,9 +52,9 @@ namespace DragonSpark.Activation
 
 		public static T Self<T>( [Required] this T @this ) => @this;
 
-		public static Delegate Convert( [Required]this Func<object> @this, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().GenericMethods.Invoke<Delegate>( nameof(Convert), resultType.ToItem(), @this.ToItem() );
+		public static Delegate Convert( this Func<object> @this, Type resultType ) => Methods.Get( resultType.ToItem() ).StaticInvoke<Delegate>( @this );
 
-		public static Delegate Convert( [Required]this Func<object, object> @this, [Required]Type parameterType, [Required]Type resultType ) => typeof(FactoryExtensions).Adapt().GenericMethods.Invoke<Delegate>( nameof(Convert), parameterType.Append( resultType ).ToArray(), @this.ToItem() );
+		public static Delegate Convert( this Func<object, object> @this, Type parameterType, [Required]Type resultType ) => Methods.Make( parameterType, resultType ).StaticInvoke<Delegate>( @this );
 
 		public static Func<T> Convert<T>( this Func<object> @this ) => @this.Convert<object, T>();
 

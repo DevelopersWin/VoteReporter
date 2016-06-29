@@ -1,4 +1,3 @@
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
 using PostSharp.Aspects;
@@ -6,7 +5,6 @@ using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
@@ -62,32 +60,29 @@ namespace DragonSpark.Aspects.Validation
 
 	public abstract class ConnectionOwnerBase : ConnectionAwareBase, IConnectionOwner
 	{
-		readonly IList<IConnectionWorker> workers = new List<IConnectionWorker>();
-		readonly Lazy<ImmutableArray<IConnectionWorker>> cached;
-		
+		readonly List<IConnectionWorker> workers = new List<IConnectionWorker>();
+
 		protected ConnectionOwnerBase()
 		{
-			cached = new Lazy<ImmutableArray<IConnectionWorker>>( Create );
+			Workers = workers;
 		}
 
-		ImmutableArray<IConnectionWorker> Create() => workers.Purge().Prioritize().ToImmutableArray();
-
-		public ImmutableArray<IConnectionWorker> Workers => cached.Value;
+		public IEnumerable<IConnectionWorker> Workers { get; } // TODO: Address this.
 
 		protected override void OnInitialize()
 		{
-			var immutableArray = Workers;
-			foreach ( var worker in immutableArray )
+			// workers.Sort( PriorityComparer.Instance );
+			foreach ( var worker in workers )
 			{
 				worker.Initialize();
 			}
+			// workers.Clear();
 		}
 
 		public void Connect( IConnectionWorker worker ) => workers.Add( worker );
 	}
 
-	public interface IConnectionWorker : IConnectionAware, IPriorityAware
-	{}
+	public interface IConnectionWorker : IConnectionAware, IPriorityAware {}
 
 	public abstract class ConnectionAwareBase<T> : ConnectionAwareBase where T : IConnectionOwner
 	{
@@ -103,7 +98,10 @@ namespace DragonSpark.Aspects.Validation
 
 	public abstract class ConnectionWorkerBase<T> : ConnectionAwareBase<T>, IConnectionWorker where T : IConnectionOwner
 	{
-		protected ConnectionWorkerBase( T owner ) : base( owner ) {}
+		protected ConnectionWorkerBase( T owner ) : base( owner )
+		{
+			owner.Connect( this );
+		}
 	}
 
 	public struct MethodInvocationParameter

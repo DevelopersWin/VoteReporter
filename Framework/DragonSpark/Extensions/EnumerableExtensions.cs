@@ -37,6 +37,50 @@ namespace DragonSpark.Extensions
 			}
 		}
 
+		/*public struct Enumerator<T>
+		{
+			readonly IList<T> pool;
+			int index;
+
+			public Enumerator( IList<T> pool )
+			{
+				this.pool = pool;
+				index = 0;
+			}
+
+			public T Current
+			{
+				get
+				{
+					if ( pool == null || index == 0 )
+						throw new InvalidOperationException();
+
+					return pool[index - 1];
+				}
+			}
+
+			public bool MoveNext()
+			{
+				index++;
+				return pool != null && pool.Count >= index;
+			}
+
+			public void Reset() => index = 0;
+		}
+
+		public struct Enumerable<T>
+		{
+			readonly IList<T> pool;
+
+			public Enumerable( IList<T> pool )
+			{
+				this.pool = pool;
+			}
+
+			public Enumerator<T> GetEnumerator() => new Enumerator<T>( pool );
+		}*/
+
+
 		public static bool All(this IEnumerable<bool> source)
 		{
 			foreach (var b in source)

@@ -305,13 +305,18 @@ namespace DragonSpark.Runtime.Properties
 		public ArgumentCache( Func<TContext, object[]> keySelector, Func<TContext, TValue> resultSelector, IEqualityComparer<object[]> comparer ) : base( keySelector, resultSelector, comparer ) {}
 	}
 
-	class ProjectedCache<TKey, TValue> : ProjectedCache<TKey, TKey, TValue>
+	public class ProjectedCache<TKey, TValue> : ProjectedCache<TKey, TKey, TValue>
 	{
 		public ProjectedCache( Func<TKey, TValue> resultSelector ) : this( resultSelector, EqualityComparer<TKey>.Default ) {}
 		public ProjectedCache( Func<TKey, TValue> resultSelector, IEqualityComparer<TKey> comparer ) : base( Delegates<TKey>.Self, resultSelector, comparer ) {}
 	}
 
-	class ProjectedCache<TContext, TKey, TValue> : ConcurrentDictionary<TKey, TValue>
+	public interface IProjectedCache<in TContext, out TValue>
+	{
+		TValue Get( TContext context );
+	}
+
+	public class ProjectedCache<TContext, TKey, TValue> : ConcurrentDictionary<TKey, TValue>, IProjectedCache<TContext, TValue>
 	{
 		readonly Func<TContext, TKey> keySelector;
 		readonly Func<TContext, TValue> resultSelector;
