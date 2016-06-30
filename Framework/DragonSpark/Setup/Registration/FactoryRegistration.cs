@@ -91,7 +91,7 @@ namespace DragonSpark.Setup.Registration
 			var @delegate = factory( parameter );
 			if ( @delegate != null )
 			{
-				var createdParameter = createParameter( ParameterTypeLocator.Instance.Get( parameter ) );
+				var createdParameter = createParameter( ParameterTypeLocator.Instance( parameter ) );
 				var result = new FixedFactory<object, object>( @delegate, createdParameter ).ToDelegate();
 				return result;
 			}
@@ -122,7 +122,7 @@ namespace DragonSpark.Setup.Registration
 		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes )
 		{
 			FactoryType = factoryType;
-			RegisterTypes = registrationTypes.WhereAssigned().Append( ResultTypeLocator.Instance.Get( factoryType ) ).Distinct().ToArray();
+			RegisterTypes = registrationTypes.WhereAssigned().Append( ResultTypeLocator.Instance( factoryType ) ).Distinct().ToArray();
 		}
 		
 		public Type FactoryType { get; }
@@ -191,6 +191,6 @@ namespace DragonSpark.Setup.Registration
 
 		public RegisterFactoryWithParameterCommand( IServiceRegistry registry, ISingletonLocator locator, [Required]FactoryWithParameterDelegateFactory delegateFactory ) : base( registry, locator, FactoryWithActivatedParameterDelegateFactory.Instance.Create, delegateFactory.Create ) {}
 
-		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<,>).MakeGenericType( ParameterTypeLocator.Instance.Get( parameter ), itemType );
+		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<,>).MakeGenericType( ParameterTypeLocator.Instance( parameter ), itemType );
 	}
 }

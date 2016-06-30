@@ -4,8 +4,10 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -15,6 +17,19 @@ namespace DragonSpark.Diagnostics
 	public static class DiagnosticProperties
 	{
 		public static ICache<ILogger> Logger { get; } = new Cache<ILogger>( o => GlobalServiceProvider.Instance.Get<ILogger>().ForSource( o ) );
+	}
+
+	public static class Diagnostics
+	{
+		public static ICache<LogEventLevel> Default { get; } = new StoreCache<LogEventLevel>();
+
+		public static ICache<LoggingLevelSwitch> Controller { get; } = new Cache<LoggingLevelSwitch>( o => new LoggingLevelSwitch( Default.Get( o ) ) );
+
+		public static ICache<ILoggerHistory> History { get; } = new Cache<ILoggerHistory>( o => new LoggerHistorySink() );
+
+		public static ICache<ImmutableArray<ITransformer<LoggerConfiguration>>> Transformers { get; } = new StoreCache<ImmutableArray<ITransformer<LoggerConfiguration>>>( o => ImmutableArray.Create<ITransformer<LoggerConfiguration>>() );
+
+		public static ICache<ILogger> Logger { get; } = new Cache<ILogger>( o => new RecordingLoggerFactory( History.Get( o ), Controller.Get( o ), Transformers.Get( o ).ToArray() ).Create().ForSource( o ) );
 	}
 
 	public delegate void EmitProfileEvent( string name );

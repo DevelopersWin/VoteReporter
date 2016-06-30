@@ -1,30 +1,31 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Aspects.Validation;
-using DragonSpark.Extensions;
+using DragonSpark.Testing.Framework;
+using System.Reflection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Runtime
 {
-	public class ParameterValidationCachingTests // : TestCollectionBase
+	public class ParameterValidationCachingTests : TestCollectionBase
 	{
-		// public ParameterInvocationTests( ITestOutputHelper output ) : base( output ) {}
+		public ParameterValidationCachingTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Fact]
 		public void BasicCondition()
 		{
 			var sut = new Factory();
-			var cannot = sut.CanCreate( 456 );
+			var factory = sut.WithAutoValidation();
+			var cannot = factory.CanCreate( 456 );
 			Assert.False( cannot );
 			Assert.Equal( 1, sut.CanCreateCalled );
 
-			var can = sut.CanCreate( 123 );
+			var can = factory.CanCreate( 123 );
 			Assert.True( can );
 			Assert.Equal( 2, sut.CanCreateCalled );
 
 			Assert.Equal( 0, sut.CreateCalled );
 
-			var created = sut.Create( 123 );
+			var created = factory.Create( 123 );
 			Assert.Equal( 2, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CreateCalled );
 			Assert.Equal( 6776, created );
@@ -33,42 +34,119 @@ namespace DragonSpark.Testing.Runtime
 		[Fact]
 		public void ExtendedCheck()
 		{
-			// Parallel.For( 0, 10000, i =>
-			for ( int i = 0; i < 10000; i++ )
-			{
 			var sut = new ExtendedFactory();
+			var factory = sut.WithAutoValidation();
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
 
-			var factory = sut.To<IFactoryWithParameter>();
 			var invalid = factory.CanCreate( "Message" );
 			Assert.False( invalid );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
-			
+
 			var cannot = factory.CanCreate( 456 );
 			Assert.False( cannot );
-			Assert.Equal( 2, sut.CanCreateCalled );
+			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 
-			var can = sut.CanCreate( 6776 );
+			var can = factory.CanCreate( 6776 );
 			Assert.True( can );
-			Assert.Equal( 2, sut.CanCreateCalled );
+			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 2, sut.CanCreateGenericCalled );
 
 			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 0, sut.CreateGenericCalled );
 
 			var created = factory.Create( 6776 );
-			Assert.Equal( 2, sut.CanCreateCalled );
+			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 2, sut.CanCreateGenericCalled );
-			Assert.Equal( 1, sut.CreateCalled );
+			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, created );
-			}
-			// );
 		}
 
+		[Fact]
+		public void ExtendedCheckPerformance()
+		{
+			var method = MethodBase.GetCurrentMethod();
+			using ( method.Profile( Output.WriteLine ) ) {}
+
+			using ( method.Profile( Output.WriteLine ) )
+			{
+				for ( int i = 0; i < 10000; i++ )
+				{
+					ExtendedCheck();
+				}
+			}
+		}
+
+		/*[Fact]
+		public void AssignPerformance()
+		{
+			//var parameter = new MethodInvocationSingleParameter();
+			var method = MethodBase.GetCurrentMethod();
+			var proceed = new Func<object>( () => null );
+			using ( method.Profile( Output.WriteLine ) ) {}
+
+			/*using ( method.Profile( Output.WriteLine ) )
+			{
+				for ( int i = 0; i < 80000; i++ )
+				{
+					parameter.Apply( this, method, argument, proceed );
+				}
+			}
+
+			using ( method.Profile( Output.WriteLine ) )
+			{
+				for ( int i = 0; i < 80000; i++ )
+				{
+					var p = new MethodInvocationSingleParameter();
+					p.Apply( this, method, argument, proceed );
+				}
+			}
+
+			GC.Collect();
+			GC.WaitForPendingFinalizers();#1#
+
+
+			PooledPerformance( method, proceed );
+
+
+			/*using ( method.Profile( Output.WriteLine ) )
+			{
+				for ( int i = 0; i < 80000; i++ )
+				{
+					Instance = this;
+					Method = method;
+					Argument = argument;
+					Proceed = proceed;
+				}
+			}
+
+			using ( method.Profile( Output.WriteLine ) )
+			{
+				for ( int i = 0; i < 80000; i++ )
+				{
+					InstanceField = this;
+					MethodField = method;
+					ArgumentField = argument;
+					ProceedField = proceed;
+				}
+			}#1#
+		}*/
+
+		/*void PooledPerformance( MethodBase method, Func<object> proceed )
+		{
+			using ( method.Profile( Output.WriteLine ) )
+			{
+				for ( int i = 0; i < 80000; i++ )
+				{
+					// using ( MethodInvocationSingleParameterPool.Instance.From( this, method, null, proceed ) ) {}
+				}
+			}
+		}*/
+
+		
 		/*[Fact]
 		public void ExtendedCheckFullFeature()
 		{
@@ -128,7 +206,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( 1212, sut.LastResult.GetValueOrDefault() );
 		}*/
 
-		[AutoValidation.Factory]
+		// [AutoValidation.Factory]
 		public class Factory : IFactoryWithParameter
 		{
 			public int CanCreateCalled { get; private set; }
@@ -148,7 +226,8 @@ namespace DragonSpark.Testing.Runtime
 			}
 		}
 
-		[ApplyAutoValidation]
+		// [AutoValidation.GenericFactory]
+		// [ApplyAutoValidation]
 		class ExtendedFactory : IFactory<int, float>
 		{
 			public int CanCreateCalled { get; private set; }

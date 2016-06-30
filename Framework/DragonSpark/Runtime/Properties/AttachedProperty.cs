@@ -271,6 +271,8 @@ namespace DragonSpark.Runtime.Properties
 	public class StoreCache<TValue> : StoreCache<object, TValue>, ICache<TValue>
 	{
 		public StoreCache() : this( new CacheStore<object, TValue>() ) {}
+		public StoreCache( Func<object, TValue> create ) : this( new CacheStore<object, TValue>( create ) ) {}
+
 		public StoreCache( ICache<object, IWritableStore<TValue>> inner ) : base( inner ) {}
 	}
 

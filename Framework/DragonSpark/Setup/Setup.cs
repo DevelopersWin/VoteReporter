@@ -193,7 +193,7 @@ namespace DragonSpark.Setup
 
 	class FactoryStore : DeferredStore<object>, IInstanceRegistration
 	{
-		public FactoryStore( IFactory factory ) : this( factory.ToDelegate(), ResultTypeLocator.Instance.Get( factory.GetType() ) ) {}
+		public FactoryStore( IFactory factory ) : this( factory.ToDelegate(), ResultTypeLocator.Instance( factory.GetType() ) ) {}
 
 		public FactoryStore( Func<object> factory, Type registeredType ) : base( factory )
 		{

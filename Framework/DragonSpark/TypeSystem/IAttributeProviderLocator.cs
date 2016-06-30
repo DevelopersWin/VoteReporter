@@ -38,7 +38,7 @@ namespace DragonSpark.TypeSystem
 
 	public class MemberInfoProviderFactory : Cache<object, IAttributeProvider>
 	{
-		public static ICache<object, IAttributeProvider> Instance { get; } = new MemberInfoProviderFactory( TypeDefinitionProvider.Instance.ToDelegate() );
+		public static ICache<object, IAttributeProvider> Instance { get; } = new MemberInfoProviderFactory( TypeDefinitionProvider.Instance );
 
 		protected MemberInfoProviderFactory( Func<TypeInfo, TypeInfo> transformer ) : base( new Factory( transformer ).ToDelegate() ) {}
 
@@ -49,7 +49,7 @@ namespace DragonSpark.TypeSystem
 			readonly Func<TypeInfo, Func<object, MemberInfo>> factorySource;
 			readonly Func<object, IAttributeProvider> providerSource;
 
-			public Factory( Func<TypeInfo, TypeInfo> transformer ) : this( TypeDefinitionLocator.Instance.ToDelegate(), transformer, MemberInfoDefinitionLocator.Instance.ToDelegate(), AttributeProvider.Default.ToDelegate() ) {}
+			public Factory( Func<TypeInfo, TypeInfo> transformer ) : this( TypeDefinitionLocator.Instance, transformer, MemberInfoDefinitionLocator.Instance, AttributeProvider.Default.ToDelegate() ) {}
 
 			Factory( Func<object, TypeInfo> typeSource, Func<TypeInfo, TypeInfo> transformer, Func<TypeInfo, Func<object, MemberInfo>> factorySource, Func<object, IAttributeProvider> providerSource )
 			{
@@ -74,7 +74,7 @@ namespace DragonSpark.TypeSystem
 	// [AutoValidation( false )]
 	public class TypeDefinitionLocator : FirstFromParameterFactory<object, TypeInfo>
 	{
-		public static ICache<object, TypeInfo> Instance { get; } = new TypeDefinitionLocator().Cached();
+		public static Func<object, TypeInfo> Instance { get; } = new TypeDefinitionLocator().Cached();
 
 		TypeDefinitionLocator() : base( new IFactoryWithParameter[] { TypeInfoDefinitionProvider.Instance, MemberInfoDefinitionProvider.Instance, GeneralDefinitionProvider.Instance }.Select( parameter => new Func<object, TypeInfo>( parameter.CreateUsing<TypeInfo> ) ).Fixed() ) {}
 
@@ -106,7 +106,7 @@ namespace DragonSpark.TypeSystem
 	// [AutoValidation( false )]
 	public class MemberInfoDefinitionLocator : FirstConstructedFromParameterFactory<object, MemberInfo>
 	{
-		public static ICache<object, Func<object, MemberInfo>> Instance { get; } = new MemberInfoDefinitionLocator().Cached();
+		public static Func<object, Func<object, MemberInfo>> Instance { get; } = new MemberInfoDefinitionLocator().Cached();
 
 		MemberInfoDefinitionLocator() : base( typeof(PropertyInfoDefinitionLocator), typeof(ConstructorInfoDefinitionLocator), typeof(MethodInfoDefinitionLocator), typeof(TypeInfoDefinitionLocator) ) {}
 

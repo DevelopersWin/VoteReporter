@@ -28,6 +28,6 @@ namespace DragonSpark.Composition
 
 		public FactoryDelegateTransformer( [OfFactoryType]Type factoryDelegateType ) : base( new GenericTypeAssignableSpecification( factoryDelegateType ).Cast<CompositionContract>( contract => contract.ContractType ) ) {}
 
-		public override CompositionContract Create( CompositionContract parameter ) => ResultTypeLocator.Instance.Get( parameter.ContractType ).With( parameter.ChangeType );
+		public override CompositionContract Create( CompositionContract parameter ) => ResultTypeLocator.Instance( parameter.ContractType ).With( parameter.ChangeType );
 	}
 }

@@ -436,7 +436,7 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	internal class ObjectPool<T> where T : class
+	public class ObjectPool<T> where T : class
 	{
 		[DebuggerDisplay( "{Value,nq}" )]
 		private struct Element

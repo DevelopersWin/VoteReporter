@@ -7,7 +7,6 @@ using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Linq.Expressions;
@@ -35,28 +34,28 @@ namespace DragonSpark.TypeSystem
 
 		IGenericMethodContext Get( string name )
 		{
-			var immutableArray = methods.Introduce( name, tuple => tuple.Item1.Name == tuple.Item2, tuple => new GenericMethodFactory.Descriptor( tuple.Item1 ) ).ToImmutableArray();
+			var immutableArray = methods.Introduce( name, tuple => tuple.Item1.Name == tuple.Item2, tuple => new GenericMethodInvocationContextFactory.Descriptor( tuple.Item1 ) ).ToImmutableArray();
 			var result = new ContextCache( immutableArray );	
 			return result;
 		}
 	}
 
-	public interface IGenericMethodContext : IDictionary<Type[], GenericMethodInvocationContext>, IProjectedCache<Type[], GenericMethodInvocationContext>
+	public interface IGenericMethodContext : /*IDictionary<Type[], GenericMethodInvocationContext>,*/ ICache<Type[], GenericMethodInvocationContext>
 	{
 		GenericMethodInvocationContext Make( params Type[] types );
 	}
 
-	class ContextCache : ProjectedCache<Type[], GenericMethodInvocationContext>, IGenericMethodContext
+	class ContextCache : ArgumentCache<Type[], GenericMethodInvocationContext>, IGenericMethodContext
 	{
-		public ContextCache( ImmutableArray<GenericMethodFactory.Descriptor> descriptors ) : this( new GenericMethodFactory( descriptors ).Create ) {}
-		ContextCache( Func<Type[], GenericMethodInvocationContext> resultSelector ) : base( resultSelector, StructuralEqualityComparer<Type[]>.Instance ) {}
+		public ContextCache( ImmutableArray<GenericMethodInvocationContextFactory.Descriptor> descriptors ) : this( new GenericMethodInvocationContextFactory( descriptors ).Create ) {}
+		ContextCache( Func<Type[], GenericMethodInvocationContext> resultSelector ) : base( resultSelector ) {}
 		public GenericMethodInvocationContext Make( params Type[] types ) => Get( types );
 	}
 
-	public class GenericMethodInvocationContext : ProjectedCache<Type[], DelegateContext>
+	public class GenericMethodInvocationContext : ArgumentCache<Type[], Delegate>
 	{
 		public GenericMethodInvocationContext( ImmutableArray<GenericMethodCandidate> candidates ) : this( new Factory( candidates ).Create ) {}
-		GenericMethodInvocationContext( Func<Type[], DelegateContext> resultSelector ) : base( resultSelector, StructuralEqualityComparer<Type[]>.Instance ) {}
+		GenericMethodInvocationContext( Func<Type[], Delegate> resultSelector ) : base( resultSelector ) {}
 
 		public T StaticInvoke<T>() => StaticInvoke<T>( Items<object>.Default );
 
@@ -66,9 +65,15 @@ namespace DragonSpark.TypeSystem
 
 		public T Invoke<T>( object instance, params object[] arguments ) => InvokeCore<T>( instance, arguments );
 
-		T InvokeCore<T>( [Optional]object instance, object[] arguments ) => GetContext( arguments ).Invoke<T>( instance, arguments );
+		T InvokeCore<T>( [Optional]object instance, object[] arguments )
+		{
+			var @delegate = GetContext( arguments );
+			var factory = (Func<object, object[], object>)@delegate;
+			var result = (T)factory( instance, arguments );
+			return result;
+		}
 
-		DelegateContext GetContext( object[] arguments ) => Get( ObjectTypeFactory.Instance.Create( arguments ) );
+		Delegate GetContext( object[] arguments ) => Get( ObjectTypeFactory.Instance.Create( arguments ) );
 
 		public void StaticCall() => StaticCall( Items<object>.Default );
 
@@ -78,9 +83,14 @@ namespace DragonSpark.TypeSystem
 
 		public void Call( object instance, params object[] arguments ) => CallCore( instance, arguments );
 
-		void CallCore( object instance, object[] arguments ) => GetContext( arguments ).Call( instance, arguments );
+		void CallCore( object instance, object[] arguments )
+		{
+			var @delegate = GetContext( arguments );
+			var action = (Action<object, object[]>)@delegate;
+			action( instance, arguments );
+		}
 
-		class Factory : FactoryBase<Type[], DelegateContext>
+		class Factory : FactoryBase<Type[], Delegate>
 		{
 			readonly GenericMethodCandidate[] candidates;
 
@@ -89,44 +99,17 @@ namespace DragonSpark.TypeSystem
 				this.candidates = candidates.ToArray();
 			}
 
-			public override DelegateContext Create( Type[] parameter ) => candidates.Introduce( parameter, tuple => tuple.Item1.Specification( tuple.Item2 ), tuple => new DelegateContext( DelegateCache.Instance.Get( tuple.Item1.Method ) ) ).Single();
+			public override Delegate Create( Type[] parameter ) => candidates.Introduce( parameter, tuple => tuple.Item1.Specification( tuple.Item2 ), tuple => DelegateCache.Instance.Get( tuple.Item1.Method ) ).Single();
 		}
 	}
 
-	public class DelegateContext
-	{
-		readonly Delegate @delegate;
-
-		public DelegateContext( Delegate @delegate )
-		{
-			this.@delegate = @delegate;
-		}
-
-		public T Invoke<T>( params object[] arguments ) => Invoke<T>( null, arguments );
-
-		public T Invoke<T>( [Optional] object instance, params object[] arguments )
-		{
-			var factory = (Func<object, object[], object>)@delegate;
-			var result = (T)factory( instance, arguments );
-			return result;
-		}
-
-		public void Call( params object[] arguments ) => Call( null, arguments );
-
-		public void Call( [Optional] object instance, params object[] arguments )
-		{
-			var action = (Action<object, object[]>)@delegate;
-			action( instance, arguments );
-		}
-	}
-
-	class GenericMethodFactory : FactoryBase<Type[], GenericMethodInvocationContext>
+	class GenericMethodInvocationContextFactory : FactoryBase<Type[], GenericMethodInvocationContext>
 	{
 		readonly static Func<ValueTuple<Descriptor, Type[]>, GenericMethodCandidate> Selector = CreateSelector;
 
 		readonly Descriptor[] descriptors;
 
-		public GenericMethodFactory( ImmutableArray<Descriptor> descriptors )
+		public GenericMethodInvocationContextFactory( ImmutableArray<Descriptor> descriptors )
 		{
 			this.descriptors = descriptors.ToArray();
 		}

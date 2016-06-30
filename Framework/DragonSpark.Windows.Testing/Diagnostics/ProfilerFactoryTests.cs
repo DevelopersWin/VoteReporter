@@ -1,9 +1,7 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
-using Serilog.Core;
 using Serilog.Events;
 using Serilog.Parsing;
 using System;
@@ -23,21 +21,25 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		[Fact]
 		public void TracerFactoryWorksAsExpected()
 		{
-			var history = new LoggerHistorySink();
+			var currentMethod = MethodBase.GetCurrentMethod();
+
+			var history = DragonSpark.Diagnostics.Diagnostics.History.Get( currentMethod );
 			var message = "Hello World";
 			var logEvent = new LogEvent( DateTimeOffset.Now, LogEventLevel.Information, null, new MessageTemplateParser().Parse( message ), new LogEventProperty[0] );
 			history.Emit( logEvent );
 
 			Assert.Contains( logEvent, history.Events );
 			var lines = new List<string>();
-			var logger = new RecordingLoggerFactory( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ).Create();
+			DragonSpark.Diagnostics.Diagnostics.Default.Set( currentMethod, LogEventLevel.Debug );
+			var logger = DragonSpark.Diagnostics.Diagnostics.Logger.Get( currentMethod );
 
-			var listener = logger.Get( Tracing.Listener );
+			var listener = Tracing.Listener.Get( logger );
 			Assert.NotNull( listener );
-			Assert.Same( listener, logger.Get( Tracing.Listener ) );
+			Assert.Same( listener, Tracing.Listener.Get( logger ) );
 
 			Assert.DoesNotContain( listener, Trace.Listeners.Cast<TraceListener>() );
-			using ( MethodBase.GetCurrentMethod().Profile( lines.Add, history, logger ) )
+			
+			using ( currentMethod.Trace( lines.Add ) )
 			{
 				Assert.Contains( listener, Trace.Listeners.Cast<TraceListener>() );
 

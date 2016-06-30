@@ -4,7 +4,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
@@ -12,6 +11,7 @@ using PostSharp.Extensibility;
 using PostSharp.Reflection;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -22,8 +22,8 @@ namespace DragonSpark.Aspects.Validation
 {
 	public static class Services
 	{
-		public static ICache<IAutoValidationController> Controller { get; } = new Cache<IAutoValidationController>( o => new AutoValidationController( Adapter.Get( o ) ) );
-		public static ICache<IParameterValidationAdapter> Adapter { get; } = new Cache<IParameterValidationAdapter>( AdapterLocator.Instance.ToDelegate() );
+		public static ICache<IAutoValidationController> Controller { get; } = new Cache<IAutoValidationController>( o => new AutoValidationController( AdapterLocator.Instance.Create( o ) ) );
+		// public static ICache<IParameterValidationAdapter> Adapter { get; } = AdapterLocator.Instance.Cached().ToDelegate();
 
 		/*public static ICache<IList<IParameterHandler>> Handlers { get; } = new ListCache<IParameterHandler>();
 		public static ICache<InstanceAwareRepository> Instances { get; } = new ActivatedCache<InstanceAwareRepository>();*/
@@ -71,22 +71,24 @@ namespace DragonSpark.Aspects.Validation
 	{
 		Type InterfaceType { get; }
 
-		object Invoke( MethodInvocationParameter parameter );
+		object Invoke( MethodInvocationSingleArgumentParameter parameter );
 	}
 
 	public interface IAutoValidationController : IConnectionOwner, IParameterHandlerAware
 	{
+		bool IsValid( object parameter );
+
 		void MarkValid( object parameter, bool valid );
 
-		object Execute( MethodInvocationParameter parameter );
+		object Execute( object parameter );
 
-		void Register( IRegistrationProvider provider );
+		// void Register( IRegistrationProvider provider );
 	}
 
 	public class AutoValidationController : ConnectionOwnerBase, IAutoValidationController
 	{
 		readonly CompositeParameterHandler handlers = new CompositeParameterHandler();
-		readonly IWritableStore<object> validated = new ThreadLocalStore<object>();
+		readonly ConcurrentDictionary<int, object> validated = new ConcurrentDictionary<int, object>();
 		readonly IParameterValidationAdapter adapter;
 
 		public AutoValidationController( IParameterValidationAdapter adapter )
@@ -94,14 +96,38 @@ namespace DragonSpark.Aspects.Validation
 			this.adapter = adapter;
 		}
 
-		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? Placeholders.Null : null );
+		public bool IsValid( object parameter ) => CheckValid( parameter ) || AssignValid( parameter );
 
-		public object Execute( MethodInvocationParameter parameter )
+		bool AssignValid( object parameter )
 		{
-			var argument = parameter.Arguments[0];
-			var proceed = Equals( validated.Value, argument ?? Placeholders.Null ) || adapter.IsValid( argument );
-			var result = proceed ? parameter.Proceed<object>() : null;
-			validated.Assign( null );
+			var result = adapter.IsValid( parameter );
+			MarkValid( parameter, result );
+			return result;
+		}
+
+		bool CheckValid( object parameter )
+		{
+			object stored;
+			return validated.TryGetValue( Environment.CurrentManagedThreadId, out stored ) && Equals( stored, parameter ?? Placeholders.Null );
+		}
+
+		public void MarkValid( object parameter, bool valid )
+		{
+			if ( valid )
+			{
+				validated[Environment.CurrentManagedThreadId] = parameter ?? Placeholders.Null;
+			}
+			else
+			{
+				object stored;
+				validated.TryRemove( Environment.CurrentManagedThreadId, out stored );
+			}
+		}
+
+		public object Execute( object parameter )
+		{
+			var result = IsValid( parameter ) ? adapter.Execute( parameter ) : null;
+			MarkValid( parameter, false );
 			return result;
 		}
 
@@ -133,13 +159,13 @@ namespace DragonSpark.Aspects.Validation
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public abstract class AutoValidationWorkerHostBase : ConnectionWorkerHostBase
 	{
-		protected AutoValidationWorkerHostBase( IFactory<object, IConnectionWorker> worker ) : base( worker.Cached().ToDelegate() ) {}
+		protected AutoValidationWorkerHostBase( IFactory<object, IConnectionWorker> worker ) : base( worker.Cached() ) {}
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			if ( Value != null )
 			{
-				args.ReturnValue = ((IAutoValidationWorker)Value).Invoke( new MethodInvocationParameter( args ) ) ?? args.ReturnValue;
+				args.ReturnValue = ((IAutoValidationWorker)Value).Invoke( new MethodInvocationSingleArgumentParameter( args.Instance, args.Method, args.Arguments[0], args.GetReturnValue ) ) ?? args.ReturnValue;
 			}
 			else
 			{
@@ -197,7 +223,7 @@ namespace DragonSpark.Aspects.Validation
 
 		public Type InterfaceType { get; }
 
-		public abstract object Invoke( MethodInvocationParameter parameter );
+		public abstract object Invoke( MethodInvocationSingleArgumentParameter parameter );
 	}
 
 	public class AutoValidationValidationAspect : AutoValidationWorkerHostBase
@@ -215,10 +241,10 @@ namespace DragonSpark.Aspects.Validation
 	{
 		protected AutoValidationValidateWorkerBase( IAutoValidationController owner, Type interfaceType ) : base( owner, interfaceType ) {}
 
-		public override object Invoke( MethodInvocationParameter parameter )
+		public override object Invoke( MethodInvocationSingleArgumentParameter parameter )
 		{
-			var result = parameter.Proceed<bool>();
-			Owner.MarkValid( parameter.Arguments[0], result );
+			var result = parameter.Proceed();
+			Owner.MarkValid( parameter.Argument, (bool)result );
 			return null;
 		}
 	}
@@ -254,7 +280,7 @@ namespace DragonSpark.Aspects.Validation
 			this.provider = provider;
 		}
 
-		protected override void OnInitialize() => Owner.Register( provider );
+		// protected override void OnInitialize() => Owner.Register( provider );
 
 		public override Priority Priority => Priority.High;
 	}
@@ -273,7 +299,7 @@ namespace DragonSpark.Aspects.Validation
 	{
 		public AutoValidationExecuteWorkerBase( IAutoValidationController owner, Type interfaceType ) : base( owner, interfaceType ) {}
 
-		public override object Invoke( MethodInvocationParameter parameter ) => Owner.Execute( parameter );
+		public override object Invoke( MethodInvocationSingleArgumentParameter parameter ) => Owner.Execute( parameter );
 	}
 
 	class AutoValidationExecuteWorker : AutoValidationExecuteWorkerBase, IParameterHandlerAware
@@ -307,7 +333,7 @@ namespace DragonSpark.Aspects.Validation
 			this.provider = provider;
 		}
 
-		protected override void OnInitialize() => Owner.Register( provider );
+		// protected override void OnInitialize() => Owner.Register( provider );
 
 		public override Priority Priority => Priority.High;
 	}
@@ -350,7 +376,7 @@ namespace DragonSpark.Aspects.Validation
 		{
 			foreach ( var profile in profiles )
 			{
-				if ( profile.InterfaceType.Adapt().IsInstanceOfTypeOrDefinition( parameter ) )
+				if ( profile.InterfaceType.IsInstanceOfTypeOrDefinition( parameter.GetType() ) )
 				{
 					return profile.AdapterFactory( parameter );
 				}
@@ -361,7 +387,7 @@ namespace DragonSpark.Aspects.Validation
 
 	public interface IProfile : IEnumerable<Func<Type, AspectInstance>>
 	{
-		Type InterfaceType { get; }
+		TypeAdapter InterfaceType { get; }
 
 		Func<object, IParameterValidationAdapter> AdapterFactory { get; }
 	}
@@ -370,9 +396,9 @@ namespace DragonSpark.Aspects.Validation
 	{
 		readonly Func<Type, AspectInstance> validate;
 		readonly Func<Type, AspectInstance> execute;
-		protected Profile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> factory ) : this( interfaceType, new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).ToDelegate(), new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).ToDelegate(), factory.ToDelegate() ) {}
+		protected Profile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).ToDelegate(), new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).ToDelegate(), factory.ToDelegate() ) {}
 
-		protected Profile( Type interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> adapterFactory )
+		protected Profile( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> adapterFactory )
 		{
 			InterfaceType = interfaceType;
 			AdapterFactory = adapterFactory;
@@ -380,7 +406,7 @@ namespace DragonSpark.Aspects.Validation
 			this.execute = execute;
 		}
 
-		public Type InterfaceType { get; }
+		public TypeAdapter InterfaceType { get; }
 		public Func<object, IParameterValidationAdapter> AdapterFactory { get; }
 
 		public IEnumerator<Func<Type, AspectInstance>> GetEnumerator()
@@ -395,7 +421,7 @@ namespace DragonSpark.Aspects.Validation
 	class GenericProfile<T> : Profile
 	{
 		protected GenericProfile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> adapterFactory )
-			: base( interfaceType,
+			: base( interfaceType.Adapt(),
 					new GenericAspectInstanceMethodFactory<GenericAutoValidationValidationAspect, ValidationRegisterProvider<T>>( interfaceType, valid ).ToDelegate(),
 					new GenericAspectInstanceMethodFactory<GenericAutoValidationExecuteAspect, ExecutionRegisterProvider<T>>( interfaceType, execute ).ToDelegate(),
 					adapterFactory.ToDelegate()
@@ -587,7 +613,7 @@ namespace DragonSpark.Aspects.Validation
 
 		public AspectInstanceFactory( ImmutableArray<IProfile> profiles ) : this( profiles.Select( profile => profile.InterfaceType ).ToImmutableArray(), profiles.ToArray().Concat().ToImmutableArray() ) {}
 
-		AspectInstanceFactory( ImmutableArray<Type> knownTypes, ImmutableArray<Func<Type, AspectInstance>> factories ) : this( new Specification( knownTypes ), factories ) {}
+		AspectInstanceFactory( ImmutableArray<TypeAdapter> knownTypes, ImmutableArray<Func<Type, AspectInstance>> factories ) : this( new Specification( knownTypes ), factories ) {}
 
 		AspectInstanceFactory( ISpecification<Type> specification, ImmutableArray<Func<Type, AspectInstance>> factories ) : base( specification )
 		{
@@ -608,7 +634,7 @@ namespace DragonSpark.Aspects.Validation
 
 		class Specification : SpecificationWithContextBase<Type, ImmutableArray<TypeAdapter>>
 		{
-			public Specification( ImmutableArray<Type> context ) : base( context.Select( type => type.Adapt() ).ToImmutableArray() ) {}
+			public Specification( ImmutableArray<TypeAdapter> context ) : base( context ) {}
 
 			public override bool IsSatisfiedBy( Type parameter )
 			{

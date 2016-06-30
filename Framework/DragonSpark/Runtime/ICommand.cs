@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
@@ -8,6 +9,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Input;
+using AutoValidationController = DragonSpark.Aspects.Validation.AutoValidationController;
+using IAutoValidationController = DragonSpark.Aspects.Validation.IAutoValidationController;
 
 namespace DragonSpark.Runtime
 {
@@ -173,6 +176,35 @@ namespace DragonSpark.Runtime
 	{
 		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Parameter<T>.Coercer ) {}
 		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer ) : base( inner.ToDelegate(), coercer, inner.ToSpecification() ) {}
+	}
+
+	public class AutoValidatingCommand<T> : ICommand<T>
+	{
+		readonly IAutoValidationController controller;
+		readonly ICommand<T> inner;
+
+		public AutoValidatingCommand( ICommand<T> inner ) : this( new AutoValidationController( new CommandAdapter<T>( inner ) ), inner ) {}
+
+		public AutoValidatingCommand( IAutoValidationController controller, ICommand<T> inner )
+		{
+			this.controller = controller;
+			this.inner = inner;
+		}
+
+		event EventHandler ICommand.CanExecuteChanged
+		{
+			add { inner.CanExecuteChanged += value; }
+			remove { inner.CanExecuteChanged -= value; }
+		}
+
+		public bool CanExecute( object parameter ) => controller.IsValid( parameter );
+
+		public void Execute( object parameter ) => controller.Execute( parameter );
+
+		public bool CanExecute( T parameter ) => controller.IsValid( parameter );
+
+		public void Execute( T parameter ) => controller.Execute( parameter );
+		public void Update() => inner.Update();
 	}
 
 	public abstract class CommandBase<T> : ICommand<T>

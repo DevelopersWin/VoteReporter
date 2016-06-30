@@ -40,6 +40,14 @@ namespace DragonSpark.Extensions
 			DelegateCache() : base( command => command.Execute ) {}
 		}
 
+		public static ICommand<T> WithAutoValidation<T>( this ICommand<T> @this ) => AutoValidationCache<T>.Default.Get( @this );
+		class AutoValidationCache<T> : Cache<ICommand<T>, ICommand<T>>
+		{
+			public static AutoValidationCache<T> Default { get; } = new AutoValidationCache<T>();
+
+			AutoValidationCache() : base( command => new AutoValidatingCommand<T>( command ) ) {}
+		}
+
 		public static Action<object> ToDelegate( this ICommand @this ) => DelegateCache.Default.Get( @this );
 		class DelegateCache : Cache<ICommand, Action<object>>
 		{

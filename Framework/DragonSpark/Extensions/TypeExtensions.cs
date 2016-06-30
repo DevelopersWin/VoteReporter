@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -31,6 +32,10 @@ namespace DragonSpark.Extensions
 
 		public static Assembly Assembly( this Type @this ) => Adapt( @this ).Assembly;
 
+		readonly static TypeInfo Structural = typeof(IStructuralEquatable).GetTypeInfo();
+
+		public static bool IsStructural( this Type @this ) => Structural.IsAssignableFrom( @this.GetTypeInfo() );
+		
 		public static bool IsAssignableFrom( this ImmutableArray<TypeAdapter> @this, Type type )
 		{
 			foreach ( var adapter in @this )

@@ -71,12 +71,15 @@ namespace DragonSpark.Testing.Framework
 			return result;
 		}
 
-		public static IProfiler Profile( this MethodBase method, Action<string> output, ILoggerHistory history, ILogger logger ) => Profile( method, output, history, logger.Wrap().ToDelegate() );
+		readonly static Func<object, ILogger> LoggerSource = DragonSpark.Diagnostics.Diagnostics.Logger.ToDelegate();
 
-		public static IProfiler Profile( this MethodBase method, Action<string> output, ILoggerHistory history, Func<MethodBase, ILogger> loggerSource )
+		public static IProfiler Profile( this MethodBase method, Action<string> output ) => 
+			new ProfilerFactory( output, DragonSpark.Diagnostics.Diagnostics.History.Get( method ), LoggerSource ).Create( method );
+
+		public static IProfiler Trace( this MethodBase method, Action<string> output )
 		{
-			var profiler = new ProfilerFactory( output, history, loggerSource ).Create( method );
-			var result = profiler.AssociateForDispose( DiagnosticProperties.Logger.Get( profiler ).WithTracing() );
+			var profiler = method.Profile( output );
+			var result = profiler.AssociateForDispose( LoggerSource( method ).WithTracing() );
 			return result;
 		}
 	}

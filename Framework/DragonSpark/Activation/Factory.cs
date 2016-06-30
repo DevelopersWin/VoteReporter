@@ -58,7 +58,7 @@ namespace DragonSpark.Activation
 
 	public class ParameterTypeLocator : TypeLocatorCacheBase
 	{
-		public static ICache<Type, Type> Instance { get; } = new ParameterTypeLocator( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) ).Cached();
+		public static Func<Type, Type> Instance { get; } = new ParameterTypeLocator( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) ).Cached();
 
 		public ParameterTypeLocator( ImmutableArray<Type> types ) : base( types ) {}
 
@@ -67,7 +67,7 @@ namespace DragonSpark.Activation
 
 	public class ResultTypeLocator : TypeLocatorCacheBase
 	{
-		public static ICache<Type, Type> Instance { get; } = new ResultTypeLocator( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) ).Cached();
+		public static Func<Type, Type> Instance { get; } = new ResultTypeLocator( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) ).Cached();
 
 		public ResultTypeLocator( ImmutableArray<Type> types ) : base( types ) {}
 

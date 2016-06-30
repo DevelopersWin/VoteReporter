@@ -289,47 +289,63 @@ namespace DragonSpark.Runtime.Properties
 		//  internal WeakReference<T>[] TestOnly_UnderlyingArray { get { return _items; } }
 	}
 
-	class ArgumentCache : ArgumentCache<object[]>
+	/*class ArgumentCache : ArgumentCache<object[]>
 	{
 		public ArgumentCache( Func<object[], object> resultSelector ) : base( Delegates<object[]>.Self, resultSelector ) {}
-	}
+	}*/
 
-	class ArgumentCache<T> : ArgumentCache<T, object>
+	/*class ArgumentCache<T> : ArgumentCache<T, object>
 	{
 		public ArgumentCache( Func<T, object[]> keySelector, Func<T, object> resultSelector ) : base( keySelector, resultSelector ) {}
-	}
+	}*/
 
-	class ArgumentCache<TContext, TValue> : ProjectedCache<TContext, object[], TValue>
+	/*class ArgumentCache<TContext, TValue> : ProjectedCache<TContext, object[], TValue>
 	{
 		public ArgumentCache( Func<TContext, object[]> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, StructuralEqualityComparer<object[]>.Instance ) {}
 		public ArgumentCache( Func<TContext, object[]> keySelector, Func<TContext, TValue> resultSelector, IEqualityComparer<object[]> comparer ) : base( keySelector, resultSelector, comparer ) {}
-	}
+	}*/
 
-	public class ProjectedCache<TKey, TValue> : ProjectedCache<TKey, TKey, TValue>
+	/*public class ProjectedCache<TKey, TValue> : ProjectedCache<TKey, TKey, TValue>
 	{
-		public ProjectedCache( Func<TKey, TValue> resultSelector ) : this( resultSelector, EqualityComparer<TKey>.Default ) {}
-		public ProjectedCache( Func<TKey, TValue> resultSelector, IEqualityComparer<TKey> comparer ) : base( Delegates<TKey>.Self, resultSelector, comparer ) {}
-	}
+		public ProjectedCache( Func<TKey, TValue> resultSelector ) : base( Delegates<TKey>.Self, resultSelector ) {}
+	}*/
 
-	public interface IProjectedCache<in TContext, out TValue>
-	{
-		TValue Get( TContext context );
-	}
-
-	public class ProjectedCache<TContext, TKey, TValue> : ConcurrentDictionary<TKey, TValue>, IProjectedCache<TContext, TValue>
+	/*public class ProjectedCache<TContext, TKey, TValue> : ConcurrentDictionary<TKey, TValue>, IArgumentCache<TContext, TValue>
 	{
 		readonly Func<TContext, TKey> keySelector;
 		readonly Func<TContext, TValue> resultSelector;
 
-		public ProjectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, EqualityComparer<TKey>.Default ) {}
+		// public ProjectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, EqualityComparer<TKey>.Default ) {}
 
-		public ProjectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector, IEqualityComparer<TKey> comparer ) : base( comparer )
+		public ProjectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, typeof(TKey) ) {}
+
+		public ProjectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector, Type structuralTypeCheck ) : base( structuralTypeCheck.IsStructural() ? (IEqualityComparer<TKey>)StructuralEqualityComparer<TKey>.Instance : EqualityComparer<TKey>.Default )
 		{
 			this.keySelector = keySelector;
 			this.resultSelector = resultSelector;
 		}
 
 		public TValue Get( TContext context ) => GetOrAdd( keySelector( context ), key => resultSelector( context ) );
+	}*/
+
+	public class ArgumentCache<TArgument, TValue> : ConcurrentDictionary<TArgument, TValue>, ICache<TArgument, TValue>
+	{
+		readonly Func<TArgument, TValue> body;
+		public ArgumentCache( Func<TArgument, TValue> body ) : base( typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Instance : EqualityComparer<TArgument>.Default )
+		{
+			this.body = body;
+		}
+
+		public bool Contains( TArgument instance ) => ContainsKey( instance );
+
+		public bool Remove( TArgument instance )
+		{
+			TValue item;
+			return TryRemove( instance, out item );
+		}
+
+		public void Set( TArgument instance, TValue value ) => AddOrUpdate( instance, value, ( a, v ) => value );
+		public TValue Get( TArgument key ) => GetOrAdd( key, body );
 	}
 
 	/*class ReferenceMonitor : IObservable<object>

@@ -10,7 +10,7 @@ namespace DragonSpark.ComponentModel
 {
 	public class TypeDefinitionProvider : FirstFromParameterFactory<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
-		public static ICache<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitionProvider( Items<ITypeDefinitionProvider>.Default ).Cached();
+		public static Func<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitionProvider( Items<ITypeDefinitionProvider>.Default ).Cached();
 
 		protected TypeDefinitionProvider( params ITypeDefinitionProvider[] others ) : base( others.Concat( new IFactory<TypeInfo, TypeInfo>[] { ConventionTypeDefinitionProvider.Instance, SelfTransformer<TypeInfo>.Instance } ).Fixed() ) {}
 	}

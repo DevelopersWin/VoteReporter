@@ -220,13 +220,13 @@ namespace DragonSpark.Runtime
 				this.instance = instance;
 			}
 
-			public override IDelegateInvoker Create( MethodInfo parameter ) => Invoker.Default.Get( Delegates.Default.Get( instance ).Get( parameter ) );
+			public override IDelegateInvoker Create( MethodInfo parameter ) => Invoker.Default( Delegates.Default.Get( instance ).Get( parameter ) );
 		}
 	}
 
 	class Invoker : FactoryBase<Delegate, IDelegateInvoker>
 	{
-		public static ICache<Delegate, IDelegateInvoker> Default { get; } = new Invoker().Cached();
+		public static Func<Delegate, IDelegateInvoker> Default { get; } = new Invoker().Cached();
 
 		readonly static IDictionary<Type, Type> Mappings = new Dictionary<Type, Type>
 														   {
@@ -270,7 +270,7 @@ namespace DragonSpark.Runtime
 
 		public IDelegateInvoker Create( Delegate target, T context )
 		{
-			var core = Invoker.Default.Get( target );
+			var core = Invoker.Default( target );
 			Set( core, context );
 			var result = new ContextDelegateInvoker( core );
 			return result;

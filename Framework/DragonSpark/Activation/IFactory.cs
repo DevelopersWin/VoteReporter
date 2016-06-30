@@ -91,7 +91,11 @@ namespace DragonSpark.Activation
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.Assigned ).Fixed();
 
-		public static ICache<TParameter, TResult> Cached<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) where TParameter : class where TResult : class => FactoryCache<TParameter, TResult>.Default.Get( @this );
+		public static Func<TParameter, TResult> Cached<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => FactoryCache<TParameter, TResult>.Default.Get( @this );
+
+		public static IFactory<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => AutoValidationFactoryCache<TParameter, TResult>.Default.Get( @this );
+
+		public static IFactoryWithParameter WithAutoValidation( this IFactoryWithParameter @this ) => AutoValidationFactoryCache.Default.Get( @this );
 
 		public static Func<T, bool> Inverse<T>( this Func<T, bool> @this ) => InverseCache<T>.Default.Get( @this );
 
@@ -112,11 +116,25 @@ namespace DragonSpark.Activation
 			}
 		}
 
-		class FactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ICache<TParameter, TResult>> where TParameter : class where TResult : class
+		class AutoValidationFactoryCache : Cache<IFactoryWithParameter, IFactoryWithParameter>
+		{
+			public static AutoValidationFactoryCache Default { get; } = new AutoValidationFactoryCache();
+
+			AutoValidationFactoryCache() : base( factory => new AutoValidatingFactory( factory ) ) {}
+		}
+
+		class AutoValidationFactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, IFactory<TParameter, TResult>>
+		{
+			public static AutoValidationFactoryCache<TParameter, TResult> Default { get; } = new AutoValidationFactoryCache<TParameter, TResult>();
+
+			AutoValidationFactoryCache() : base( factory => new AutoValidatingFactory<TParameter,TResult>( factory ) ) {}
+		}
+
+		class FactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
 		{
 			public static FactoryCache<TParameter, TResult> Default { get; } = new FactoryCache<TParameter, TResult>();
 
-			FactoryCache() : base( factory => new Cache<TParameter, TResult>( factory.ToDelegate() ) ) {}
+			FactoryCache() : base( factory => factory.ToDelegate() ) {}
 		}
 
 		class Casted<TParameter, TResult> : Cache<IFactoryWithParameter, IFactory<TParameter, TResult>>
