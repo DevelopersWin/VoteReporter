@@ -239,6 +239,9 @@
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="Aspects\ThreadCacheTests.cs" />
     <Compile Include="Aspects\ValidationAspectTests.cs" />
+    <Compile Include="Aspects\Validation\AutoValidationTests.cs" />
+    <Compile Include="Aspects\Validation\GenericAutoValidationTests.cs" />
+    <Compile Include="Aspects\Validation\IFactory.cs" />
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
     <Compile Include="Runtime\CacheTests.cs" />

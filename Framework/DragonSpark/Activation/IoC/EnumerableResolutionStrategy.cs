@@ -120,7 +120,7 @@ namespace DragonSpark.Activation.IoC
 		void BuildUp( IBuilderContext context )
 		{
 			var adapt = context.BuildKey.Type.Adapt();
-			var isGenericOf = adapt.IsGenericOf<IEnumerable<object>>( false );
+			var isGenericOf = adapt.IsGenericOf( typeof(IEnumerable<>), false );
 			if ( isGenericOf )
 			{
 				var enumerableType = adapt.GetEnumerableType();

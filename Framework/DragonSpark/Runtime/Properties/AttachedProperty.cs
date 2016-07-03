@@ -198,13 +198,6 @@ namespace DragonSpark.Runtime.Properties
 		public ListCache( Func<TInstance, IList<TItem>> create ) : base( create ) {}
 	}
 
-	/*public abstract class AttachedPropertyBase<TInstance, TValue> : AttachedPropertyBase<TInstance, TValue, TValue> where TInstance : class where TValue : class
-	{
-		protected AttachedPropertyBase() : this( key => default(TValue) ) {}
-		protected AttachedPropertyBase( ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create ) : base( create, SelfConverter<TValue>.Instance ) {}
-	}*/
-
-	
 	
 	public interface ICache<TValue> : ICache<object, TValue> {}
 	public interface ICache<in TInstance, TValue>
@@ -256,7 +249,7 @@ namespace DragonSpark.Runtime.Properties
 		}
 
 		public override TValue Get( TInstance instance ) => items.GetValue( instance, create );
-
+		
 		public override bool Remove( TInstance instance ) => items.Remove( instance );
 	}
 

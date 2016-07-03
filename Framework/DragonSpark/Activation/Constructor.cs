@@ -30,7 +30,7 @@ namespace DragonSpark.Activation
 
 		public T Create<T>( ConstructTypeRequest parameter ) => (T)Create( parameter );
 
-		public override object Create( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? DefaultValueFactory.Instance.Create( parameter.RequestedType );
+		public override object Create( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? SpecialValues.DefaultOrEmpty( parameter.RequestedType );
 
 		object LocateAndCreate( ConstructTypeRequest parameter )
 		{

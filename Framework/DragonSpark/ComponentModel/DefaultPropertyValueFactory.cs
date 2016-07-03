@@ -13,7 +13,7 @@ namespace DragonSpark.ComponentModel
 
 		readonly Func<MemberInfo, IDefaultValueProvider[]> factory;
 
-		public DefaultPropertyValueFactory() : this( HostedValueLocator<IDefaultValueProvider>.Instance.ToDelegate() ) {}
+		DefaultPropertyValueFactory() : this( HostedValueLocator<IDefaultValueProvider>.Instance.ToDelegate() ) {}
 
 		public DefaultPropertyValueFactory( [Required]Func<MemberInfo, IDefaultValueProvider[]> factory )
 		{

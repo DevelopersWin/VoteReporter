@@ -11,7 +11,15 @@ namespace DragonSpark.Extensions
 	{
 		public static MethodInfo AccountForGenericDefinition( this MethodInfo @this )
 		{
-			var result = @this.DeclaringType.IsConstructedGenericType ? @this.DeclaringType.GetGenericTypeDefinition().GetRuntimeMethods().SingleOrDefault( MethodEqualitySpecification.Default.Get( @this ).ToDelegate() )
+			var result = @this.DeclaringType.IsConstructedGenericType ? @this.DeclaringType.GetGenericTypeDefinition().GetRuntimeMethods().SingleOrDefault( MethodEqualitySpecification.For( @this ) )
+				:
+				@this;
+			return result;
+		}
+
+		public static MethodInfo AccountForClosedDefinition( this MethodInfo @this, Type closedType )
+		{
+			var result = @this.ContainsGenericParameters ? closedType.GetRuntimeMethods().Introduce( @this, tuple => MethodEqualitySpecification.For( tuple.Item1 )( tuple.Item2 ) ).SingleOrDefault()
 				:
 				@this;
 			return result;
@@ -20,7 +28,7 @@ namespace DragonSpark.Extensions
 
 	class MethodEqualitySpecification : SpecificationWithContextBase<MethodInfo>
 	{
-		public static ICache<MethodInfo, ISpecification<MethodInfo>> Default { get; } = new Cache<MethodInfo, ISpecification<MethodInfo>>( info => new MethodEqualitySpecification( info ) );
+		public static Func<MethodInfo, Func<MethodInfo, bool>> For { get; } = new Cache<MethodInfo, Func<MethodInfo, bool>>( info => new MethodEqualitySpecification( info ).ToDelegate() ).ToDelegate();
 
 		readonly Func<Type, Type> @select;
 

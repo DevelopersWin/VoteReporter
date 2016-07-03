@@ -251,6 +251,8 @@ namespace DragonSpark.Diagnostics
 			Pause();
 			base.OnDispose();
 		}
+
+		public override TimeSpan Elapsed => timer.Elapsed;
 	}
 	
 	public class StartProcessCommand : CommandBase<IProcess>

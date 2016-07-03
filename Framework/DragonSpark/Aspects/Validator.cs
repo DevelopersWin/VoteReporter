@@ -132,8 +132,6 @@ namespace DragonSpark.Aspects
 	{
 		bool IsValid( object parameter );
 
-		bool Handles( object parameter );
-
 		object Execute( object parameter );
 	}
 
@@ -147,8 +145,6 @@ namespace DragonSpark.Aspects
 		}
 
 		public virtual bool IsValid( object parameter ) => factory.CanCreate( parameter );
-
-		public virtual bool Handles( object parameter ) => false;
 
 		public virtual object Execute( object parameter ) => factory.Create( parameter );
 	}
@@ -164,8 +160,6 @@ namespace DragonSpark.Aspects
 
 		public override bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : base.IsValid( parameter );
 
-		public override bool Handles( object parameter ) => parameter is TParameter;
-
 		public override object Execute( object parameter ) => inner.Create( (TParameter)parameter );
 	}
 
@@ -178,8 +172,6 @@ namespace DragonSpark.Aspects
 		}
 
 		public virtual bool IsValid( object parameter ) => inner.CanExecute( parameter );
-
-		public virtual bool Handles( object parameter ) => false;
 
 		public virtual object Execute( object parameter )
 		{
@@ -197,8 +189,6 @@ namespace DragonSpark.Aspects
 		}
 
 		public override bool IsValid( object parameter ) => parameter is T ? inner.CanExecute( (T)parameter ) : base.IsValid( parameter );
-
-		public override bool Handles( object parameter ) => parameter is T;
 
 		public override object Execute( object parameter )
 		{
@@ -225,11 +215,11 @@ namespace DragonSpark.Aspects
 			this.adapter = adapter;
 		}
 
-		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? Placeholders.Null : null );
+		public void MarkValid( object parameter, bool valid ) => validated.Assign( valid ? parameter ?? SpecialValues.Null : null );
 
 		public object Execute( AutoValidationParameter parameter )
 		{
-			var proceed = Equals( validated.Value, parameter.Parameter ?? Placeholders.Null ) || adapter.IsValid( parameter.Parameter );
+			var proceed = Equals( validated.Value, parameter.Parameter ?? SpecialValues.Null ) || adapter.IsValid( parameter.Parameter );
 			var result = proceed ? parameter.Proceed<object>() : null;
 			validated.Assign( null );
 			return result;

@@ -51,7 +51,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	{
 		public InstanceSpecification( IPolicyList policies ) : base( policies ) {}
 
-		public override bool IsSatisfiedBy( TypeRequest parameter ) => Policies.Get<ILifetimePolicy>( parameter.RequestedType ).With( policy => policy.GetValue() ) != null;
+		public override bool IsSatisfiedBy( TypeRequest parameter ) => Policies.Get<ILifetimePolicy>( parameter.RequestedType )?.GetValue() != null;
 	}
 
 	public class HasRegisteredBuildPolicySpecification : RegistrationSpecificationBase
@@ -126,7 +126,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	{
 		public static EnumerableStrategyValidator Instance { get; } = new EnumerableStrategyValidator();
 
-		protected override bool Check( TypeRequest key ) => key.RequestedType.Adapt().IsGenericOf<IEnumerable<object>>();
+		protected override bool Check( TypeRequest key ) => key.RequestedType.Adapt().IsGenericOf( typeof(IEnumerable<>) );
 	}
 
 	public class StrategyValidatorParameter
@@ -167,7 +167,11 @@ namespace DragonSpark.Activation.IoC.Specifications
 		}
 
 		[Freeze]
-		public override ConstructorInfo Create( ConstructTypeRequest parameter ) => query.Create( parameter ).FirstOrDefault();
+		public override ConstructorInfo Create( ConstructTypeRequest parameter )
+		{
+			var firstOrDefault = query.Create( parameter ).FirstOrDefault();
+			return firstOrDefault;
+		}
 	}
 
 	/*public class HasValidConstructorSpecification : TypeRequestSpecification
@@ -246,7 +250,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 			public Context Create( ConstructorInfo constructor )
 			{
-				var parameters = constructor.GetParameters().Introduce( arguments, tuple => new ConstructTypeRequest( tuple.Item1.ParameterType, tuple.Item2 ) ).ToArray();
+				var parameters = constructor.GetParameterTypes().Introduce( arguments, tuple => new ConstructTypeRequest( tuple.Item1, tuple.Item2 ) ).ToArray();
 				var result = new Context( constructor, parameters );
 				return result;
 			}

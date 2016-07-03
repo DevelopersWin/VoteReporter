@@ -1,5 +1,8 @@
+using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -9,7 +12,6 @@ using PostSharp.Reflection;
 using PostSharp.Serialization;
 using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace DragonSpark.Aspects
 {
@@ -20,12 +22,15 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect
 	{
-		readonly static ICache<ConditionalWeakTable<object, ConditionMonitor>> Property = new Cache<ConditionalWeakTable<object, ConditionMonitor>>( o => new ConditionalWeakTable<object, ConditionMonitor>() );
+		readonly static ICache<Delegate, ConditionMonitor> Property = new ActivatedCache<Delegate, ConditionMonitor>();
+
+		readonly static Func<PropertyInfo, bool> DefaultSpecification = DefaultValuePropertySpecification.Instance.ToDelegate();
+		readonly static Func<DefaultValueParameter, object> DefaultFactory = DefaultPropertyValueFactory.Instance.ToDelegate();
 
 		readonly Func<PropertyInfo, bool> specification;
 		readonly Func<DefaultValueParameter, object> source;
-		
-		public ApplyDefaultValues() : this( DefaultValuePropertySpecification.Instance.IsSatisfiedBy, DefaultPropertyValueFactory.Instance.Create ) {}
+
+		public ApplyDefaultValues() : this( DefaultSpecification, DefaultFactory ) {}
 
 		ApplyDefaultValues( Func<PropertyInfo, bool> specification, Func<DefaultValueParameter, object> source )
 		{
@@ -33,7 +38,7 @@ namespace DragonSpark.Aspects
 			this.source = source;
 		}
 
-		static bool Apply( object instance, PropertyInfo info ) => Property.Get( instance ).GetValue( info, key => new ConditionMonitor() ).Apply();
+		static bool Apply( object instance, PropertyInfo info ) => Property.Get( Delegates.Default.Get( instance ).Get( info.GetMethod ) ).Apply();
 
 		public override bool CompileTimeValidate( LocationInfo locationInfo ) => specification( locationInfo.PropertyInfo );
 

@@ -132,11 +132,11 @@ namespace DragonSpark.Testing.Framework
 
 	public static class Traits
 	{
-		public const string Category = "Category";
+		public const string Category = nameof(Category);
 
 		public static class Categories
 		{
-			public const string FileSystem = "FileSystem", IoC = "IoC", ServiceLocation = "ServiceLocation";
+			public const string FileSystem = nameof(FileSystem), IoC = nameof(IoC), ServiceLocation = nameof(ServiceLocation), Performance = nameof(Performance), Memory = nameof(Memory);
 		}
 	}
 }

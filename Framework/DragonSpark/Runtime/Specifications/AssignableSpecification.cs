@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
 
@@ -35,10 +34,6 @@ namespace DragonSpark.Runtime.Specifications
 		}
 
 		[Freeze]
-		public override bool IsSatisfiedBy( TParameter parameter )
-		{
-			var result = !Equals( creator( parameter ), DefaultValueFactory<TResult>.Instance.Create() );
-			return result;
-		}
+		public override bool IsSatisfiedBy( TParameter parameter ) => creator( parameter ).IsAssignedOrContains();
 	}
 }

@@ -12,8 +12,15 @@ namespace DragonSpark.TypeSystem
 	public static class Delegates
 	{
 		public static Action Empty { get; } = () => {};
+	}
 
-		// public static Func<object, object> Self { get; } = t => t;
+	public static class SpecialValues
+	{
+		public static object Null { get; } = new object();
+
+		public static T DefaultOrEmpty<T>() => DefaultValueFactory<T>.Instance();
+
+		public static object DefaultOrEmpty( Type type ) => DefaultValueFactory.Instance( type );
 	}
 
 	public static class Delegates<T>
@@ -40,11 +47,11 @@ namespace DragonSpark.TypeSystem
 		public static ImmutableArray<T> Immutable { get; }
 	}
 
-	public class DefaultValueFactory<T> : FactoryBase<T>
+	class DefaultValueFactory<T> : FactoryBase<T>
 	{
 		readonly Func<Type, object> source;
 
-		public static DefaultValueFactory<T> Instance { get; } = new DefaultValueFactory<T>( DefaultValueFactory.Instance.ToDelegate() );
+		public static Func<T> Instance { get; } = new DefaultValueFactory<T>( DefaultValueFactory.Instance ).ToDelegate();
 
 		DefaultValueFactory( Func<Type, object> source )
 		{
@@ -54,11 +61,11 @@ namespace DragonSpark.TypeSystem
 		public override T Create() => (T)source( typeof(T) );
 	}
 
-	public class DefaultValueFactory : FactoryBase<Type, object>
+	class DefaultValueFactory : FactoryBase<Type, object>
 	{
 		readonly static IGenericMethodContext Method = typeof(Enumerable).Adapt().GenericMethods[nameof(Enumerable.Empty)];
 
-		public static DefaultValueFactory Instance { get; } = new DefaultValueFactory();
+		public static Func<Type, object> Instance { get; } = new DefaultValueFactory().ToDelegate();
 
 		DefaultValueFactory() {}
 

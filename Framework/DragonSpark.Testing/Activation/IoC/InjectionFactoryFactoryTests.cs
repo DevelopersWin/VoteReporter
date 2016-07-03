@@ -11,8 +11,6 @@ namespace DragonSpark.Testing.Activation.IoC
 {
 	public class InjectionFactoryFactoryTests : TestCollectionBase
 	{
-		const string HelloWorld = "Hello World";
-
 		public InjectionFactoryFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
 		[LifetimeManager( typeof(ContainerControlledLifetimeManager) )]

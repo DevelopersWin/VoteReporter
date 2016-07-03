@@ -2,7 +2,6 @@ using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -328,25 +327,7 @@ namespace DragonSpark.Runtime.Properties
 		public TValue Get( TContext context ) => GetOrAdd( keySelector( context ), key => resultSelector( context ) );
 	}*/
 
-	public class ArgumentCache<TArgument, TValue> : ConcurrentDictionary<TArgument, TValue>, ICache<TArgument, TValue>
-	{
-		readonly Func<TArgument, TValue> body;
-		public ArgumentCache( Func<TArgument, TValue> body ) : base( typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Instance : EqualityComparer<TArgument>.Default )
-		{
-			this.body = body;
-		}
-
-		public bool Contains( TArgument instance ) => ContainsKey( instance );
-
-		public bool Remove( TArgument instance )
-		{
-			TValue item;
-			return TryRemove( instance, out item );
-		}
-
-		public void Set( TArgument instance, TValue value ) => AddOrUpdate( instance, value, ( a, v ) => value );
-		public TValue Get( TArgument key ) => GetOrAdd( key, body );
-	}
+	
 
 	/*class ReferenceMonitor : IObservable<object>
 	{

@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -124,9 +125,6 @@ namespace DragonSpark.TypeSystem
 		}
 
 		Type CheckGeneric( Type type ) => type.GetTypeInfo().IsGenericTypeDefinition ? GetImplementations( type ).FirstOrDefault() : null;
-
-		[Freeze]
-		public bool IsGenericOf<T>( bool includeInterfaces = true ) => IsGenericOf( typeof(T).GetGenericTypeDefinition(), includeInterfaces );
 
 		[Freeze]
 		public bool IsGenericOf( Type genericDefinition ) => IsGenericOf( genericDefinition, true );

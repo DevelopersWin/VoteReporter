@@ -9,8 +9,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Input;
-using AutoValidationController = DragonSpark.Aspects.Validation.AutoValidationController;
-using IAutoValidationController = DragonSpark.Aspects.Validation.IAutoValidationController;
 
 namespace DragonSpark.Runtime
 {
@@ -178,7 +176,7 @@ namespace DragonSpark.Runtime
 		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer ) : base( inner.ToDelegate(), coercer, inner.ToSpecification() ) {}
 	}
 
-	public class AutoValidatingCommand<T> : ICommand<T>
+	/*public class AutoValidatingCommand<T> : ICommand<T>
 	{
 		readonly IAutoValidationController controller;
 		readonly ICommand<T> inner;
@@ -205,7 +203,7 @@ namespace DragonSpark.Runtime
 
 		public void Execute( T parameter ) => controller.Execute( parameter );
 		public void Update() => inner.Update();
-	}
+	}*/
 
 	public abstract class CommandBase<T> : ICommand<T>
 	{

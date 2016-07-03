@@ -175,6 +175,8 @@
     <Compile Include="Activation\FactoryTypeLocatorBase.cs" />
     <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />
     <Compile Include="Activation\IoC\UnityContainerFactory.cs" />
+    <Compile Include="Activation\IParameterValidationMonitor.cs" />
+    <Compile Include="Activation\ParameterAware.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Activation\Factory.cs" />
     <Compile Include="Activation\IExecutionContext.cs" />
@@ -183,9 +185,9 @@
     <Compile Include="Activation\IoC\IsRegisteredSpecification.cs" />
     <Compile Include="Activation\IoC\LifetimeManagerFactory.cs" />
     <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
-    <Compile Include="Aspects\Validation\IConnectionOwner.cs" />
-    <Compile Include="Aspects\Validation\IInstanceScopedAspect.cs" />
-    <Compile Include="Aspects\IParameterValidationController.cs" />
+    <Compile Include="Aspects\Validation\AutoValidation.cs" />
+    <Compile Include="Aspects\Validation\AutoValidationRewrite.Archive.cs" />
+    <Compile Include="Aspects\AutoValidation.cs" />
     <Compile Include="Aspects\ThreadCache.cs" />
     <Compile Include="Aspects\FreezeAttribute.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />
@@ -195,6 +197,7 @@
     <Compile Include="Aspects\ProfileAttribute.cs" />
     <Compile Include="Aspects\RecursionGuardAttribute.cs" />
     <Compile Include="Aspects\Runtime.cs" />
+    <Compile Include="Aspects\Validation\Construction.cs" />
     <Compile Include="Aspects\Validator.cs" />
     <Compile Include="ComponentModel\DefaultValuePropertySpecification.cs" />
     <Compile Include="ComponentModel\DefaultPropertyValueFactory.cs" />

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -30,6 +29,8 @@ namespace DragonSpark.Extensions
 		// public static bool IsAssigned<T>( this T @this ) => Equals( @this, null );
 
 		public static bool IsAssigned<T>( this T @this ) => !Equals( @this, default(T) );
+
+		public static bool IsAssignedOrContains<T>( this T @this ) => !Equals( @this, SpecialValues.DefaultOrEmpty<T>() );
 
 		/*public static IEnumerable<TItem> Enumerate<TItem>( this IEnumerator<TItem> target )
 		{
@@ -75,18 +76,18 @@ namespace DragonSpark.Extensions
 			return item.With( function, defaultFunction );
 		}*/
 
-		public static T OrDefault<T>( this T @this, [Required]Func<T> defaultFunction ) => @this.With( Delegates<T>.Self, defaultFunction );
+		// public static T OrDefault<T>( this T @this, [Required]Func<T> defaultFunction ) => @this.With( Delegates<T>.Self, defaultFunction );
 
 		public static TResult With<TItem, TResult>( this TItem target, Func<TItem, TResult> function, Func<TResult> defaultFunction = null )
 		{
-			var getDefault = defaultFunction ?? Defaults<TResult>.Default;
+			var getDefault = defaultFunction ?? Implementations<TResult>.Default;
 			var result = target != null ? function( target ) : getDefault();
 			return result;
 		}
 
-		struct Defaults<T>
+		static class Implementations<T>
 		{
-			public static Func<T> Default { get; } = DefaultValueFactory<T>.Instance.ToDelegate();
+			public static Func<T> Default { get; } = SpecialValues.DefaultOrEmpty<T>;
 		}
 
 		public static TItem With<TItem>( this TItem @this, Action<TItem> action )

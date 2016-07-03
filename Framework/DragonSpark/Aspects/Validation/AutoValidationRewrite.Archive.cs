@@ -1,39 +1,304 @@
-using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.TypeSystem;
-using PostSharp.Aspects;
-using PostSharp.Aspects.Dependencies;
-using PostSharp.Extensibility;
-using PostSharp.Reflection;
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Input;
-
 namespace DragonSpark.Aspects.Validation
 {
-	public static class Services
+	/*public interface IParameterHandlerAware : IParameterHandler
+	{
+		void Register( IParameterHandler handler );
+	}
+
+	public interface IConnectionOwner : IConnectionAware
+	{
+		void Connect( IConnectionWorker worker );
+	}
+
+	public interface IConnectionAware
+	{
+		void Initialize();
+	}
+
+	public abstract class ConnectionAwareBase : IConnectionAware
+	{
+		public void Initialize() => OnInitialize();
+
+		protected virtual void OnInitialize() {}
+	}
+
+	public class CompositeParameterHandler : List<IParameterHandler>, IParameterHandler
+	{
+		public bool Handles( object parameter )
+		{
+			foreach ( var handler in this )
+			{
+				if ( handler.Handles( parameter ) )
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public object Handle( object parameter )
+		{
+			foreach ( var handler in this )
+			{
+				if ( handler.Handles( parameter ) )
+				{
+					return handler.Handle( parameter );
+				}
+			}
+			return Placeholders.Null;
+		}
+	}
+
+	public abstract class ConnectionOwnerBase : ConnectionAwareBase, IConnectionOwner
+	{
+		readonly List<IConnectionWorker> workers = new List<IConnectionWorker>();
+
+		protected ConnectionOwnerBase()
+		{
+			Workers = workers;
+		}
+
+		public IEnumerable<IConnectionWorker> Workers { get; } // TODO: Address this.
+
+		protected override void OnInitialize()
+		{
+			// workers.Sort( PriorityComparer.Instance );
+			foreach ( var worker in workers )
+			{
+				worker.Initialize();
+			}
+			// workers.Clear();
+		}
+
+		public void Connect( IConnectionWorker worker ) => workers.Add( worker );
+	}
+
+	public interface IConnectionWorker : IConnectionAware, IPriorityAware {}
+
+	public abstract class ConnectionAwareBase<T> : ConnectionAwareBase where T : IConnectionOwner
+	{
+		protected ConnectionAwareBase( T owner )
+		{
+			Owner = owner;
+		}
+
+		protected T Owner { get; }
+
+		public virtual Priority Priority => Priority.Normal;
+	}
+
+	public abstract class ConnectionWorkerBase<T> : ConnectionAwareBase<T>, IConnectionWorker where T : IConnectionOwner
+	{
+		protected ConnectionWorkerBase( T owner ) : base( owner )
+		{
+			owner.Connect( this );
+		}
+	}*/
+
+	/*public class MethodInvocationParameterPool : PoolableBuilderBase<MethodInvocationParameter>
+	{
+		public static MethodInvocationParameterPool Instance { get; } = new MethodInvocationParameterPool();
+
+		protected override void Apply( MethodInvocationParameter parameter, object instance, MethodBase method, Arguments arguments, Func<object> proceed ) 
+			=> parameter.Apply( instance, method, arguments.ToArray(), proceed );
+	}
+
+	public class MethodInvocationSingleParameterPool : PoolableBuilderBase<MethodInvocationSingleParameter>
+	{
+		public static MethodInvocationSingleParameterPool Instance { get; } = new MethodInvocationSingleParameterPool();
+
+		protected override void Apply( MethodInvocationSingleParameter parameter, object instance, MethodBase method, Arguments arguments, Func<object> proceed ) 
+			=> parameter.Apply( instance, method, arguments?[0], proceed );
+	}
+
+	public abstract class PoolableBuilderBase<T> where T : class, IMethodInvocationParameter, new()
+	{
+		readonly ObjectPool<T> pool;
+
+		protected PoolableBuilderBase() : this( new PoolStore().Value ) {}
+
+		protected PoolableBuilderBase( ObjectPool<T> pool )
+		{
+			this.pool = pool;
+		}
+
+		protected class PoolStore : FixedStore<ObjectPool<T>>
+		{
+			public PoolStore( int size = 128 )
+			{
+				Assign( new ObjectPool<T>( Create, size ) );
+			}
+
+			protected virtual T Create() => new T();
+		}
+
+		public PooledContext From( object instance, MethodBase method, Arguments arguments, Func<object> proceed )
+		{
+			var item = pool.Allocate();
+			Apply( item, instance, method, arguments, proceed );
+			var result = new PooledContext( this, item );
+			return result;
+		}
+
+		protected abstract void Apply( T parameter, object instance, MethodBase method, Arguments arguments, Func<object> proceed );
+
+		public virtual void Free( T item )
+		{
+			// item.Clear();
+			pool.Free( item );
+		}
+
+
+		public struct PooledContext : IDisposable
+		{
+			readonly PoolableBuilderBase<T> owner;
+
+			public PooledContext( PoolableBuilderBase<T> owner, T item )
+			{
+				this.owner = owner;
+				Item = item;
+			}
+
+			public T Item { get; }
+
+			public void Dispose() => owner.Free( Item );
+		}
+	}*/
+
+	/*public struct MethodInvocationSingleArgumentParameter
+	{
+		public MethodInvocationSingleArgumentParameter( object instance, MethodBase method, object argument, Func<object> proceed )
+		{
+			Instance = instance;
+			Method = method;
+			Argument = argument;
+			Proceed = proceed;
+		}
+
+		public object Instance { get; }
+		public MethodBase Method { get; }
+		public object Argument { get; }
+		public Func<object> Proceed { get; }
+	}
+
+	public struct MethodInvocationParameter
+	{
+		public MethodInvocationParameter( object instance, MethodBase method, object[] arguments, Func<object> proceed )
+		{
+			Instance = instance;
+			Method = method;
+			Arguments = arguments;
+			Proceed = proceed;
+		}
+
+		public object Instance { get; }
+		public MethodBase Method { get; }
+		public object[] Arguments { get; }
+		public Func<object> Proceed { get; }
+	}*/
+
+	/*public class MethodInvocationSingleParameter : MethodInvocationParameterBase<object> {}
+
+	public class MethodInvocationParameter : MethodInvocationParameterBase<object[]>
+	{
+		public MethodInvocationParameter() {}
+	}*/
+
+	/*public interface IMethodInvocationParameter
+	{
+		object Instance { get; }
+		MethodBase Method { get; }
+		object Argument { get; }
+		Func<object> Proceed {get; }
+
+		void Clear();
+	}*/
+
+	/*public abstract class MethodInvocationParameterBase<T> : IMethodInvocationParameter
+	{
+		public void Apply( object instance, MethodBase method, T argument, Func<object> proceed )
+		{
+			Instance = instance;
+			Method = method;
+			Argument = argument;
+			Proceed = proceed;
+		}
+		
+
+		public object Instance { get; private set; }
+		public MethodBase Method { get; private set; }
+		public T Argument { get; private set; }
+		public Func<object> Proceed {get; private set; }
+
+		public void Clear()
+		{
+			Instance = null;
+			Method = null;
+			Argument = default(T);
+			Proceed = null;
+		}
+
+		object IMethodInvocationParameter.Argument => Argument;
+	}*/
+
+	/*public interface IConnectionWorkerHost : IWritableStore<IConnectionWorker> {}
+
+	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	public abstract class ConnectionOwnerHostBase : InstanceLevelAspect
+	{
+		readonly Func<object, IConnectionOwner> factory;
+
+		protected ConnectionOwnerHostBase( Func<object, IConnectionOwner> factory )
+		{
+			this.factory = factory;
+		}
+
+		public override void RuntimeInitializeInstance() => factory( Instance ).Initialize();
+	}
+
+	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	public abstract class ConnectionWorkerHostBase : MethodInterceptionAspect, IInstanceScopedAspect, IConnectionWorkerHost
+	{
+		readonly Func<object, IConnectionWorker> worker;
+		
+		protected ConnectionWorkerHostBase( Func<object, IConnectionWorker> worker )
+		{
+			this.worker = worker;
+		}
+
+		public object CreateInstance( AdviceArgs adviceArgs )
+		{
+			var result = (IConnectionWorkerHost)MemberwiseClone();
+			var instance = worker( adviceArgs.Instance );
+			result.Assign( instance );
+			return result;
+		}
+
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
+		public void Assign( IConnectionWorker item ) => Value = item;
+
+		public IConnectionWorker Value { get; private set; }
+
+		object IStore.Value => Value;
+
+		void IWritableStore.Assign( object item ) => Value = (IConnectionWorker)item;
+	}*/
+
+
+	/*public static class Services
 	{
 		public static ICache<IAutoValidationController> Controller { get; } = new Cache<IAutoValidationController>( o => new AutoValidationController( AdapterLocator.Instance.Create( o ) ) );
 		// public static ICache<IParameterValidationAdapter> Adapter { get; } = AdapterLocator.Instance.Cached().ToDelegate();
 
 		/*public static ICache<IList<IParameterHandler>> Handlers { get; } = new ListCache<IParameterHandler>();
-		public static ICache<InstanceAwareRepository> Instances { get; } = new ActivatedCache<InstanceAwareRepository>();*/
-	}
+		public static ICache<InstanceAwareRepository> Instances { get; } = new ActivatedCache<InstanceAwareRepository>();#1#
+	}*/
 
 	/*public interface IInstanceScopedAspect : PostSharp.Aspects.IInstanceScopedAspect
 	{
 		void RuntimeInitializeInstance( object instance );
 	}*/
-	
+
 
 	/*[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	public abstract class InstanceAwareParentAspectBase : InstanceLevelAspect
@@ -67,14 +332,14 @@ namespace DragonSpark.Aspects.Validation
 		public virtual void RuntimeInitializeInstance( object instance ) {}
 	}*/
 
-	public interface IAutoValidationWorker : IConnectionWorker
+	/*public interface IAutoValidationWorker : IConnectionWorker
 	{
 		Type InterfaceType { get; }
 
 		object Invoke( MethodInvocationSingleArgumentParameter parameter );
-	}
+	}*/
 
-	public interface IAutoValidationController : IConnectionOwner, IParameterHandlerAware
+	/*public interface IAutoValidationController //: IConnectionOwner, IParameterHandlerAware
 	{
 		bool IsValid( object parameter );
 
@@ -85,9 +350,9 @@ namespace DragonSpark.Aspects.Validation
 		// void Register( IRegistrationProvider provider );
 	}
 
-	public class AutoValidationController : ConnectionOwnerBase, IAutoValidationController
+	public class AutoValidationController : /*ConnectionOwnerBase,#1# IAutoValidationController
 	{
-		readonly CompositeParameterHandler handlers = new CompositeParameterHandler();
+		// readonly CompositeParameterHandler handlers = new CompositeParameterHandler();
 		readonly ConcurrentDictionary<int, object> validated = new ConcurrentDictionary<int, object>();
 		readonly IParameterValidationAdapter adapter;
 
@@ -131,7 +396,7 @@ namespace DragonSpark.Aspects.Validation
 			return result;
 		}
 
-		public void Register( IRegistrationProvider provider )
+		/*public void Register( IRegistrationProvider provider )
 		{
 			/*foreach ( var worker in Workers )
 			{
@@ -141,16 +406,16 @@ namespace DragonSpark.Aspects.Validation
 					((IParameterHandlerAware)worker).Register( handler );
 					break;
 				}
-			}*/
-		}
+			}#2#
+		}#1#
 
-		public void Register( IParameterHandler handler ) => handlers.Add( handler );
+		/*public void Register( IParameterHandler handler ) => handlers.Add( handler );
 		public bool Handles( object parameter ) => handlers.Handles( parameter );
 
-		public object Handle( object parameter ) => handlers.Handle( parameter );
-	}
+		public object Handle( object parameter ) => handlers.Handle( parameter );#1#
+	}*/
 
-	public interface IRegistrationProvider : ISpecification<IAutoValidationWorker>
+	/*public interface IRegistrationProvider : ISpecification<IAutoValidationWorker>
 	{
 		IParameterHandler Create( IParameterValidationAdapter adapter );
 	}
@@ -265,7 +530,7 @@ namespace DragonSpark.Aspects.Validation
 			var handled = handlers.Count > 0 ? handlers.Handle( parameter.Arguments[0] ) : Placeholders.Null;
 			var result = handled == Placeholders.Null ? base.Invoke( parameter ) : handled;
 			return result;
-		}*/
+		}#1#
 	}
 
 	class GenericAutoValidationValidateWorker : AutoValidationValidateWorkerBase
@@ -318,7 +583,7 @@ namespace DragonSpark.Aspects.Validation
 			var handled = handlers.Count > 0 ? handlers.Handle( parameter.Arguments[0] ) : Placeholders.Null;
 			var result = handled == Placeholders.Null ? base.Invoke( parameter ) : handled;
 			return result;
-		}*/
+		}#1#
 	}
 
 	class GenericAutoValidationExecuteWorker : AutoValidationExecuteWorkerBase
@@ -358,7 +623,7 @@ namespace DragonSpark.Aspects.Validation
 		protected override void OnInitialize() => Owner.Register( provider );
 
 		public override Priority Priority => Priority.High;
-	}*/
+	}#1#
 
 	class AdapterLocator : FactoryBase<object, IParameterValidationAdapter>
 	{
@@ -385,122 +650,7 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	public interface IProfile : IEnumerable<Func<Type, AspectInstance>>
-	{
-		TypeAdapter InterfaceType { get; }
-
-		Func<object, IParameterValidationAdapter> AdapterFactory { get; }
-	}
-
-	class Profile : IProfile
-	{
-		readonly Func<Type, AspectInstance> validate;
-		readonly Func<Type, AspectInstance> execute;
-		protected Profile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).ToDelegate(), new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).ToDelegate(), factory.ToDelegate() ) {}
-
-		protected Profile( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> adapterFactory )
-		{
-			InterfaceType = interfaceType;
-			AdapterFactory = adapterFactory;
-			this.validate = validate;
-			this.execute = execute;
-		}
-
-		public TypeAdapter InterfaceType { get; }
-		public Func<object, IParameterValidationAdapter> AdapterFactory { get; }
-
-		public IEnumerator<Func<Type, AspectInstance>> GetEnumerator()
-		{
-			yield return validate;
-			yield return execute;
-		}
-
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-	}
-
-	class GenericProfile<T> : Profile
-	{
-		protected GenericProfile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> adapterFactory )
-			: base( interfaceType.Adapt(),
-					new GenericAspectInstanceMethodFactory<GenericAutoValidationValidationAspect, ValidationRegisterProvider<T>>( interfaceType, valid ).ToDelegate(),
-					new GenericAspectInstanceMethodFactory<GenericAutoValidationExecuteAspect, ExecutionRegisterProvider<T>>( interfaceType, execute ).ToDelegate(),
-					adapterFactory.ToDelegate()
-				) {}
-	}
-
-	class AspectInstanceMethodFactory<T> : AspectInstanceFactoryBase where T : AutoValidationWorkerHostBase
-	{
-		public AspectInstanceMethodFactory( Type implementingType, string methodName ) : base( implementingType, methodName, Construct.Instance<T>( implementingType ) ) {}
-	}
-
-	class GenericAspectInstanceMethodFactory<TAspect, TRegistry> : AspectInstanceFactoryBase where TAspect : AutoValidationWorkerHostBase where TRegistry : RegisterProvider
-	{
-		public GenericAspectInstanceMethodFactory( Type implementingType, string methodName ) : base( implementingType, methodName, Construct.Instance<TAspect>( implementingType, typeof(TRegistry) ) ) {}
-	}
-
-	static class Construct
-	{
-		public static ObjectConstruction New<T>( params object[] arguments ) => new ObjectConstruction( typeof(T), arguments );
-
-		// public static Func<MethodInfo, AspectInstance> Factory<T>() => HandlerFactory<T>.Instance.ToDelegate();
-
-		public static Func<MethodInfo, AspectInstance> Instance<T>( params object[] arguments ) => new ConstructAspectInstanceFactory<T>( arguments ).ToDelegate();
-
-		/*static class HandlerFactory<T>
-		{
-			public static ConstructAspectInstanceFactory<RegisterHandlerAspect> Instance { get; } = new ConstructAspectInstanceFactory<RegisterHandlerAspect>( typeof(T) );
-		}*/
-	}
-
-	class ConstructAspectInstanceFactory<T> : FactoryBase<MethodInfo, AspectInstance>
-	{
-		readonly ObjectConstruction construction;
-
-		public ConstructAspectInstanceFactory( params object[] arguments ) : this( Construct.New<T>( arguments ) ) {}
-
-		ConstructAspectInstanceFactory( ObjectConstruction construction )
-		{
-			this.construction = construction;
-		}
-
-		public override AspectInstance Create( MethodInfo parameter ) => new AspectInstance( parameter, construction, null );
-	}
-
-	abstract class AspectInstanceFactoryBase : FactoryBase<Type, AspectInstance>
-	{
-		readonly Type implementingType;
-		readonly string methodName;
-		readonly Func<MethodInfo, AspectInstance> factory;
-
-		protected AspectInstanceFactoryBase( Type implementingType, string methodName, Func<MethodInfo, AspectInstance> factory )
-		{
-			this.implementingType = implementingType;
-			this.methodName = methodName;
-			this.factory = factory;
-		}
-
-		public override AspectInstance Create( Type parameter )
-		{
-			var mappings = parameter.Adapt().GetMappedMethods( implementingType );
-			var mapping = mappings.Introduce( methodName, pair => pair.Item1.Item1.Name == pair.Item2 && ( pair.Item1.Item2.IsFinal || pair.Item1.Item2.IsVirtual ) && !pair.Item1.Item2.IsAbstract ).SingleOrDefault();
-			if ( mapping.IsAssigned() )
-			{
-				var method = mapping.Item2.AccountForGenericDefinition();
-				var result = FromMethod( method );
-				return result;
-			}
-			return null;
-		}
-
-		AspectInstance FromMethod( MethodInfo method )
-		{
-			var repository = PostSharpEnvironment.CurrentProject.GetService<IAspectRepositoryService>();
-			var instance = factory( method );
-			var type = instance.Aspect != null ? instance.Aspect.GetType() : Type.GetType( instance.AspectConstruction.TypeName );
-			var result = !repository.HasAspect( method, type ) ? instance : null;
-			return result;
-		}
-	}
+	
 
 	public interface IParameterHandler
 	{
@@ -669,5 +819,5 @@ namespace DragonSpark.Aspects.Validation
 			var result = type != null ? provider.Create( type ) : Items<AspectInstance>.Default;
 			return result;
 		}
-	}
+	}*/
 }

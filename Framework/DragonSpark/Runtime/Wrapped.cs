@@ -12,11 +12,6 @@ using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Runtime
 {
-	public static class Placeholders
-	{
-		public static object Null { get; } = new object();
-	}
-
 	public interface IDelegateInvoker
 	{
 		object Invoke( object[] arguments );
@@ -192,6 +187,7 @@ namespace DragonSpark.Runtime
 		class Factory : FactoryBase<MethodInfo, Delegate>
 		{
 			readonly object instance;
+
 			public Factory( object instance )
 			{
 				this.instance = instance;
@@ -199,8 +195,9 @@ namespace DragonSpark.Runtime
 
 			public override Delegate Create( MethodInfo parameter )
 			{
-				var delegateType = DelegateType.Default.Get( parameter );
-				var result = parameter.CreateDelegate( delegateType, parameter.IsStatic ? null : instance );
+				var info = parameter.AccountForClosedDefinition( instance.GetType() );
+				var delegateType = DelegateType.Default.Get( info );
+				var result = info.CreateDelegate( delegateType, parameter.IsStatic ? null : instance );
 				return result;
 			}
 		}
