@@ -184,6 +184,19 @@ namespace DragonSpark.Runtime
 
 		Delegates() : base( o => new Cache<MethodInfo, Delegate>( new Factory( o ).Create ) ) {}
 
+		public T From<T>( T source ) where T : class
+		{
+			var @delegate = source as Delegate;
+			if ( @delegate != null )
+			{
+				var inner = Get( @delegate );
+				var methodInfo = @delegate.GetMethodInfo();
+				var result = inner.Contains( methodInfo ) ? inner.Get( methodInfo ) : inner.SetValue( methodInfo, @delegate );
+				return result as T;
+			}
+			return default(T);
+		}
+
 		class Factory : FactoryBase<MethodInfo, Delegate>
 		{
 			readonly object instance;

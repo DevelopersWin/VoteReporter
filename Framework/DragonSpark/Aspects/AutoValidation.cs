@@ -137,12 +137,12 @@ namespace DragonSpark.Aspects
 
 					foreach ( var pair in mappedMethods )
 					{
-						if ( !pair.Item2.IsAbstract && ( pair.Item2.IsFinal || pair.Item2.IsVirtual ) )
+						if ( !pair.MappedMethod.IsAbstract && ( pair.MappedMethod.IsFinal || pair.MappedMethod.IsVirtual ) )
 						{
-							var aspect = pair.Item1.Name == descriptor.IsValid ? ValidatorAspect.Instance :
-											pair.Item1.Name == descriptor.Execute ? ExecutionAspect.Instance
+							var aspect = pair.InterfaceMethod.Name == descriptor.IsValid ? ValidatorAspect.Instance :
+											pair.InterfaceMethod.Name == descriptor.Execute ? ExecutionAspect.Instance
 											: default(IAspect);
-							var method = pair.Item2.AccountForGenericDefinition();
+							var method = pair.MappedMethod.AccountForGenericDefinition();
 							if ( aspect != null && !repository.HasAspect( method, aspect.GetType() ) )
 							{
 								yield return new AspectInstance( method, aspect );

@@ -216,6 +216,26 @@ namespace DragonSpark.Runtime.Properties
 		public Cache() {}
 		public Cache( Func<object, T> create ) : base( create ) {}
 	}
+
+	/*public class StructureCache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class
+	{
+		readonly ICache<TInstance, object> inner;
+
+		public StructureCache() : this( new Cache<TInstance, object>() ) {}
+		public StructureCache( Func<TInstance, object> create ) : this( new Cache<TInstance, object>( create ) ) {}
+
+		public StructureCache( ICache<TInstance, object> inner )
+		{
+			this.inner = inner;
+		}
+
+		public override bool Contains( TInstance instance ) => inner.Contains( instance );
+
+		public override bool Remove( TInstance instance ) => inner.Remove( instance );
+
+		public override void Set( TInstance instance, TValue value ) => inner.Set( instance, value );
+		public override TValue Get( TInstance instance ) => (TValue)inner.Get( instance );
+	}*/
 	
 
 	public class Cache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class where TValue : class

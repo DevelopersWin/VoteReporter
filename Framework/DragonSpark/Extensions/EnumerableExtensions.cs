@@ -6,6 +6,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace DragonSpark.Extensions
@@ -17,6 +18,25 @@ namespace DragonSpark.Extensions
 			var array = @this as T[] ?? @this.ToArray();
 			var result = array.Length > 0 ? array : (T[])Enumerable.Empty<T>();
 			return result;
+		}
+
+
+		public static IEnumerable<ValueTuple<T1, T2>> Introduce<T1, T2>( this ImmutableArray<T1> @this, T2 instance ) => Introduce( @this, instance, Where<ValueTuple<T1, T2>>.Always, Delegates<ValueTuple<T1, T2>>.Self );
+
+		public static IEnumerable<T1> Introduce<T1, T2>( this ImmutableArray<T1> @this, T2 instance, Func<ValueTuple<T1, T2>, bool> where ) => Introduce( @this, instance, @where, tuple => tuple.Item1 );
+
+		public static IEnumerable<TResult> Introduce<T1, T2, TResult>( this ImmutableArray<T1> @this, T2 instance, Func<ValueTuple<T1, T2>, TResult> select ) => Introduce( @this, instance, Where<ValueTuple<T1, T2>>.Always, @select );
+
+		public static IEnumerable<TResult> Introduce<T1, T2, TResult>( this ImmutableArray<T1> @this, T2 instance, Func<ValueTuple<T1, T2>, bool> where, Func<ValueTuple<T1, T2>, TResult> select )
+		{
+			foreach ( var item in @this )
+			{
+				var tuple = ValueTuple.Create( item, instance );
+				if ( where( tuple ) )
+				{
+					yield return select( tuple );
+				}
+			}
 		}
 
 		public static IEnumerable<ValueTuple<T1, T2>> Introduce<T1, T2>( this IEnumerable<T1> @this, T2 instance ) => Introduce( @this, instance, Where<ValueTuple<T1, T2>>.Always, Delegates<ValueTuple<T1, T2>>.Self );

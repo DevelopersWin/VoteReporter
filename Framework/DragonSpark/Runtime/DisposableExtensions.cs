@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -91,10 +90,7 @@ namespace DragonSpark.Runtime
 			public static Specification Instance { get; } = new Specification();
 
 			public override bool IsSatisfiedBy( MethodBase parameter ) => parameter.DeclaringType.GetTypeInfo().IsClass && !parameter.IsSpecialName &&
-				GetMappedMethods( parameter ).Introduce( parameter ).Any( tuple => tuple.Item1.Item1.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item1.Item2, tuple.Item2 ) );
-
-			[Freeze]
-			static IEnumerable<ValueTuple<MethodInfo, MethodInfo>> GetMappedMethods( MemberInfo parameter ) => parameter.DeclaringType.Adapt().GetMappedMethods( typeof(IDisposable) );
+				parameter.DeclaringType.Adapt().GetMappedMethods<IDisposable>().Introduce( parameter ).Any( tuple => tuple.Item1.InterfaceMethod.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item1.MappedMethod, tuple.Item2 ) );
 		}
 
 		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );

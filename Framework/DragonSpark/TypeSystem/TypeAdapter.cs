@@ -7,6 +7,7 @@ using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -17,6 +18,7 @@ namespace DragonSpark.TypeSystem
 		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToDelegate();
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
 
+		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
 		public TypeAdapter( [Required]Type type ) : this( type, type.GetTypeInfo() ) {}
 
 		public TypeAdapter( [Required]TypeInfo info ) : this( info.AsType(), info ) {}
@@ -25,6 +27,7 @@ namespace DragonSpark.TypeSystem
 		{
 			Type = type;
 			Info = info;
+			methodMapper = new MethodMapper( this ).Cached();
 			GenericMethods = new GenericMethodInvoker( Type );
 			cache = new IsInstanceOfTypeOrDefinitionCache( this );
 		}
@@ -111,20 +114,9 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}
 
-		[Freeze]
-		public ValueTuple<MethodInfo, MethodInfo>[] GetMappedMethods( Type implementedType )
-		{
-			var implementation = CheckGeneric( implementedType ) ?? ( implementedType.Adapt().IsAssignableFrom( Type ) ? implementedType : null );
-			if ( implementation != null )
-			{
-				var map = Info.GetRuntimeInterfaceMap( implementation );
-				var result = map.InterfaceMethods.Tuple( map.TargetMethods ).Fixed();
-				return result;
-			}
-			return Items<ValueTuple<MethodInfo, MethodInfo>>.Default;
-		}
-
-		Type CheckGeneric( Type type ) => type.GetTypeInfo().IsGenericTypeDefinition ? GetImplementations( type ).FirstOrDefault() : null;
+		public ImmutableArray<MethodMapping> GetMappedMethods<T>() => GetMappedMethods( typeof(T) );
+		public ImmutableArray<MethodMapping> GetMappedMethods( Type interfaceType ) => methodMapper( interfaceType );
+		
 
 		[Freeze]
 		public bool IsGenericOf( Type genericDefinition ) => IsGenericOf( genericDefinition, true );
@@ -139,5 +131,42 @@ namespace DragonSpark.TypeSystem
 
 		[Freeze]
 		public Type[] GetEntireHierarchy() => Expand( Type ).Union( GetHierarchy( false ) ).Distinct().ToArray();
+	}
+
+	class MethodMapper : FactoryBase<Type, ImmutableArray<MethodMapping>>
+	{
+		readonly TypeAdapter adapter;
+
+		public MethodMapper( TypeAdapter adapter )
+		{
+			this.adapter = adapter;
+		}
+
+		public override ImmutableArray<MethodMapping> Create( Type parameter )
+		{
+			var generic = parameter.GetTypeInfo().IsGenericTypeDefinition ? adapter.GetImplementations( parameter ).FirstOrDefault() : null;
+			var implementation = generic ?? ( parameter.Adapt().IsAssignableFrom( adapter.Type ) ? parameter : null );
+			if ( implementation != null )
+			{
+				var map = adapter.Info.GetRuntimeInterfaceMap( implementation );
+				var result = map.InterfaceMethods.Tuple( map.TargetMethods ).Introduce( adapter.Type, tuple => new MethodMapping( tuple.Item1.Item1, tuple.Item1.Item2/*, tuple.Item1.Item2.LocateInDerivedType( tuple.Item2 )*/ ) ).ToImmutableArray();
+				return result;
+			}
+			return Items<MethodMapping>.Immutable;
+		}
+	}
+
+	public struct MethodMapping
+	{
+		public MethodMapping( MethodInfo interfaceMethod, MethodInfo mappedMethod/*, MethodInfo locatedMethod*/ )
+		{
+			InterfaceMethod = interfaceMethod;
+			MappedMethod = mappedMethod;
+			// LocatedMethod = locatedMethod;
+		}
+
+		public MethodInfo InterfaceMethod { get; }
+		public MethodInfo MappedMethod { get; }
+		// public MethodInfo LocatedMethod { get; }
 	}
 }

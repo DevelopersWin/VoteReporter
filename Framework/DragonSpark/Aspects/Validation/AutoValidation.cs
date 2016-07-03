@@ -324,6 +324,14 @@ namespace DragonSpark.Aspects.Validation
 		bool Execute( object parameter );
 	}
 
+	public class ParameterHandlerLocator : FactoryBase<IParameterValidationAdapter, IParameterAwareHandler>
+	{
+		public override IParameterAwareHandler Create( IParameterValidationAdapter parameter )
+		{
+			return null;
+		}
+	}
+
 	public class AutoValidationController : IAutoValidationController
 	{
 		readonly IParameterValidationAdapter validator;

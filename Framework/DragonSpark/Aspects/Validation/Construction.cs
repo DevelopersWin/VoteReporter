@@ -40,13 +40,70 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	
+
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class AutoValidationAspectBase : MethodInterceptionAspect {}
+	public abstract class AutoValidationAspectBase : MethodInterceptionAspect, IInstanceScopedAspect
+	{
+		// TODO: http://support.sharpcrafters.com/discussions/questions/1561-iaspectprovider-and-explicit-interface-methods
+		readonly static Func<Type, Attribute> Applies = new Cache<Type, Attribute>( type => type.GetTypeInfo().GetCustomAttribute( typeof(ApplyAutoValidationAttribute), true ) ).ToDelegate();
 
-	public sealed class AutoValidationValidationAspect : AutoValidationAspectBase
+		readonly Func<IAutoValidationController, IAspect> factory;
+		protected AutoValidationAspectBase( Func<IAutoValidationController, IAspect> factory )
+		{
+			this.factory = factory;
+		}
+
+		public object CreateInstance( AdviceArgs adviceArgs ) => Applies( adviceArgs.Instance.GetType() ) != null ? factory( AutoValidation.Controller( adviceArgs.Instance ) ) : this;
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
+	}
+
+	public class AutoValidationValidationAspect : AutoValidationAspectBase
+	{
+		public AutoValidationValidationAspect() : base( controller => new Implementation( controller ) ) {}
+
+		sealed class Implementation : AutoValidationValidationAspect
+		{
+			readonly IAutoValidationController controller;
+			public Implementation( IAutoValidationController controller )
+			{
+				this.controller = controller;
+			}
+
+			public override void OnInvoke( MethodInterceptionArgs args )
+			{
+				var parameter = args.Arguments[0];
+				var valid = controller.IsValid( parameter );
+				if ( !valid.HasValue )
+				{
+					controller.MarkValid( parameter, args.GetReturnValue<bool>() );
+				}
+				else
+				{
+					args.ReturnValue = valid.Value;
+				}
+			}
+		}
+	}
+
+	public class AutoValidationExecuteAspect : AutoValidationAspectBase
+	{
+		public AutoValidationExecuteAspect() : base( controller => new Implementation( controller ) ) {}
+
+		sealed class Implementation : AutoValidationExecuteAspect
+		{
+			readonly IAutoValidationController controller;
+			public Implementation( IAutoValidationController controller )
+			{
+				this.controller = controller;
+			}
+
+			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = controller.Execute( args.Arguments[0] ) ? args.GetReturnValue() : args.ReturnValue;
+		}
+	}
+
+/*public sealed class AutoValidationValidationAspect : AutoValidationAspectBase
 	{
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
@@ -86,6 +143,7 @@ namespace DragonSpark.Aspects.Validation
 			}
 		}
 	}
+*/
 
 	public interface IProfile : IEnumerable<Func<Type, AspectInstance>>
 	{
@@ -196,10 +254,10 @@ namespace DragonSpark.Aspects.Validation
 		public override AspectInstance Create( Type parameter )
 		{
 			var mappings = parameter.Adapt().GetMappedMethods( implementingType );
-			var mapping = mappings.Introduce( methodName, pair => pair.Item1.Item1.Name == pair.Item2 && ( pair.Item1.Item2.IsFinal || pair.Item1.Item2.IsVirtual ) && !pair.Item1.Item2.IsAbstract ).SingleOrDefault();
+			var mapping = mappings.ToArray().Introduce( methodName, pair => pair.Item1.InterfaceMethod.Name == pair.Item2 && ( pair.Item1.MappedMethod.IsFinal || pair.Item1.MappedMethod.IsVirtual ) && !pair.Item1.MappedMethod.IsAbstract ).SingleOrDefault();
 			if ( mapping.IsAssigned() )
 			{
-				var method = mapping.Item2.AccountForGenericDefinition();
+				var method = mapping.MappedMethod.AccountForGenericDefinition();
 				var result = FromMethod( method );
 				return result;
 			}

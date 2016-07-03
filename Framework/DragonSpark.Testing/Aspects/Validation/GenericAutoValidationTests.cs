@@ -82,6 +82,8 @@ namespace DragonSpark.Testing.Aspects.Validation
 			sut.Reset();
 		}
 
+		
+
 		interface IExtendedFactory : IFactory<int, float>
 		{
 			int CanCreateCalled { get; }
@@ -113,7 +115,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return parameter is int && CanCreate( (int)parameter );
 			}
 
-			public object Create( object parameter )
+			object IFactoryWithParameter.Create( object parameter )
 			{
 				CreateCalled++;
 				return Create( (int)parameter );

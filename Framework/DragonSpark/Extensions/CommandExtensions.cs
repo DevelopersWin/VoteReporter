@@ -37,7 +37,7 @@ namespace DragonSpark.Extensions
 		{
 			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
 
-			DelegateCache() : base( command => command.Execute ) {}
+			DelegateCache() : base( command => Delegates.Default.From<Action<T>>( command.Execute ) ) {}
 		}
 
 		/*public static ICommand<T> WithAutoValidation<T>( this ICommand<T> @this ) => AutoValidationCache<T>.Default.Get( @this );
@@ -53,7 +53,7 @@ namespace DragonSpark.Extensions
 		{
 			public static DelegateCache Default { get; } = new DelegateCache();
 
-			DelegateCache() : base( command => command.Execute ) {}
+			DelegateCache() : base( command => Delegates.Default.From<Action<object>>( command.Execute ) ) {}
 		}
 
 		public static ISpecification<object> ToSpecification( this ICommand @this ) => SpecificationCache.Default.Get( @this );
