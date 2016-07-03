@@ -116,11 +116,14 @@ namespace DragonSpark.Testing.Framework
 		protected TestCollectionBase( ITestOutputHelper output )
 		{
 			Output = output;
-			DotMemoryUnitTestOutput.SetOutputMethod( Output.WriteLine );
+			WriteLine = Output.WriteLine;
+			DotMemoryUnitTestOutput.SetOutputMethod( WriteLine );
 		}
 
 		[Reference]
 		public ITestOutputHelper Output { get; }
+
+		protected Action<string> WriteLine { get; }
 
 		protected virtual void Dispose( bool disposing ) {}
 	}

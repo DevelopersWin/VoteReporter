@@ -13,19 +13,24 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Reference]
 		readonly Factory factory = new Factory();
 		[Reference]
+		readonly AutoValidatingFactory validating;
+		[Reference]
 		readonly AppliedFactory applied = new AppliedFactory();
 
-		public AutoValidationTests( ITestOutputHelper output ) : base( output ) {}
+		public AutoValidationTests( ITestOutputHelper output ) : base( output )
+		{
+			validating = new AutoValidatingFactory( factory );
+		}
 
 		[Fact]
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		public void Performance()
 		{
-			new PerformanceSupport( BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run( Output.WriteLine );
+			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();
 		}
 
 		[Fact]
-		public void BasicAutoValidation() => BasicAutoValidationWith( new AutoValidatingFactory( factory ), factory );
+		public void BasicAutoValidation() => BasicAutoValidationWith( validating, factory );
 
 		[Fact]
 		public void BasicAutoValidationApplied() => BasicAutoValidationWith( applied, applied );

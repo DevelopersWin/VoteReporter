@@ -17,9 +17,19 @@ namespace DragonSpark.Activation
 
 		protected IAutoValidationController Controller { get; }
 
-		public bool CanCreate( object parameter ) => Controller.Validate( parameter, () => inner.CanCreate( parameter ) );
+		public bool CanCreate( object parameter )
+		{
+			var valid = Controller.IsValid( parameter );
+			if ( !valid.HasValue )
+			{
+				var result = inner.CanCreate( parameter );
+				Controller.MarkValid( parameter, result );
+				return result;
+			}
+			return valid.Value;
+		}
 
-		public object Create( object parameter ) => Controller.Execute( parameter, () => inner.Create( parameter ) );
+		public object Create( object parameter ) => Controller.Execute( parameter ) ? inner.Create( parameter ) : null;
 	}
 
 	class AutoValidatingFactory<TParameter, TResult> : AutoValidatingFactory, IFactory<TParameter, TResult>
@@ -30,8 +40,18 @@ namespace DragonSpark.Activation
 			this.inner = inner;
 		}
 
-		public bool CanCreate( TParameter parameter ) => Controller.Validate( parameter, () => inner.CanCreate( parameter ) );
+		public bool CanCreate( TParameter parameter )
+		{
+			var valid = Controller.IsValid( parameter );
+			if ( !valid.HasValue )
+			{
+				var result = inner.CanCreate( parameter );
+				Controller.MarkValid( parameter, result );
+				return result;
+			}
+			return valid.Value;
+		}
 
-		public TResult Create( TParameter parameter ) => (TResult)Controller.Execute( parameter, () => inner.Create( parameter ) );
+		public TResult Create( TParameter parameter ) => Controller.Execute( parameter ) ? inner.Create( parameter ) : default(TResult);
 	}
 }

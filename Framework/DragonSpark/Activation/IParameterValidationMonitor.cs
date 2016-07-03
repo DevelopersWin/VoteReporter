@@ -1,5 +1,4 @@
 using DragonSpark.Runtime.Properties;
-using DragonSpark.TypeSystem;
 using System;
 
 namespace DragonSpark.Activation
@@ -8,9 +7,9 @@ namespace DragonSpark.Activation
 	{
 		bool IsValid( object parameter );
 
-		void MarkValid( object parameter, bool valid );
+		bool IsWatching( object parameter );
 
-		void Clear( object parameter );
+		void MarkValid( object parameter, bool valid );
 	}
 
 	class ParameterValidationMonitor : IParameterValidationMonitor
@@ -24,18 +23,25 @@ namespace DragonSpark.Activation
 			this.cache = cache;
 		}
 
-		public bool IsValid( object parameter ) => Equals( cache.Get( Environment.CurrentManagedThreadId ), parameter ?? SpecialValues.Null );
+		public bool IsValid( object parameter ) => IsWatching( parameter ) && Equals( cache.Get( Environment.CurrentManagedThreadId ), parameter );
+		public bool IsWatching( object parameter ) => cache.Contains( Environment.CurrentManagedThreadId );
 
-		public void MarkValid( object parameter, bool valid ) => cache.Set( Environment.CurrentManagedThreadId, valid ? ( parameter ?? SpecialValues.Null ) : null );
-
-		public void Clear( object parameter ) => cache.Remove( Environment.CurrentManagedThreadId );
+		public void MarkValid( object parameter, bool valid )
+		{
+			if ( valid )
+			{
+				cache.Set( Environment.CurrentManagedThreadId, parameter );
+			}
+			else
+			{
+				cache.Remove( Environment.CurrentManagedThreadId );
+			}
+		}
 	}
 
 	public static class ParameterValidationMonitorExtensions
 	{
 		public static bool Update( this IParameterValidationMonitor @this, object parameter, Func<bool> source ) => @this.IsValid( parameter ) || @this.MarkAsValid( parameter, source() );
-
-		public static bool Update( this IParameterValidationMonitor @this, object parameter, Func<object, bool> source ) => @this.IsValid( parameter ) || @this.MarkAsValid( parameter, source( parameter ) );
 
 		public static bool MarkAsValid( this IParameterValidationMonitor @this, object parameter, bool valid )
 		{

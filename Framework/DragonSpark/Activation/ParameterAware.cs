@@ -36,7 +36,7 @@ namespace DragonSpark.Activation
 			return items.TryRemove( instance, out item );
 		}
 
-		public override void Set( TArgument instance, TValue value ) => items.AddOrUpdate( instance, value, ( a, v ) => value );
+		public override void Set( TArgument instance, TValue value ) => items[instance] = value;
 		public override TValue Get( TArgument key ) => items.GetOrAdd( key, body );
 
 		public TValue GetOrSet( TArgument key, Func<TValue> factory )
@@ -96,7 +96,7 @@ namespace DragonSpark.Activation
 		bool Handle( object parameter, out object handled );
 	}
 
-	public class ParameterHandlerAwareParameterValidationMonitor : IParameterValidationMonitor
+	/*public class ParameterHandlerAwareParameterValidationMonitor : IParameterValidationMonitor
 	{
 		readonly IParameterAwareHandler handler;
 		readonly IParameterValidationMonitor inner;
@@ -113,7 +113,7 @@ namespace DragonSpark.Activation
 
 		public void MarkValid( object parameter, bool valid ) {}
 		public void Clear( object parameter ) {}
-	}
+	}*/
 
 	class CompositeParameterAwareHandler : IParameterAwareHandler
 	{

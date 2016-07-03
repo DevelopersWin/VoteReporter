@@ -15,16 +15,17 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using Delegates = DragonSpark.Runtime.Delegates;
 
 namespace DragonSpark.Aspects.Validation
 {
 	[LinesOfCodeAvoided( 10 )]
 	public class ApplyAutoValidationAttribute : Attribute, IAspectProvider
 	{
+		readonly static Func<Type, IEnumerable<AspectInstance>> Default = AspectInstanceFactory.Instance.ToDelegate();
+
 		readonly Func<Type, IEnumerable<AspectInstance>> provider;
 
-		public ApplyAutoValidationAttribute() : this( DefaultAspectInstanceFactory.Instance ) {}
+		public ApplyAutoValidationAttribute() : this( Default ) {}
 
 		protected ApplyAutoValidationAttribute( Func<Type, IEnumerable<AspectInstance>> provider )
 		{
@@ -39,103 +40,50 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	class DefaultAspectInstanceFactory : AspectInstanceFactory
-	{
-		public static Func<Type, IEnumerable<AspectInstance>> Instance { get; } = new DefaultAspectInstanceFactory().WithAutoValidation().ToDelegate();
-		DefaultAspectInstanceFactory() : base( AutoValidation.DefaultProfiles ) {}
-	}
-
-
+	
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public abstract class AutoValidationAspectBase : MethodInterceptionAspect, IInstanceScopedAspect
-	{
-		protected MethodInfo Method { get; private set; }
-
-		public override void RuntimeInitialize( MethodBase method ) => Method = (MethodInfo)method;
-
-		/*readonly IAspectCommand command;
-
-		protected AutoValidationAspectBase() : this( null ) {}
-
-		protected AutoValidationAspectBase( IAspectCommand command = null )
-		{
-			this.command = command;
-		}
-
-		public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			if ( command != null )
-			{
-				args.ReturnValue = command.Validate( args.Arguments[0], args.GetReturnValue<bool> );
-			}
-			else
-			{
-				base.OnInvoke( args );
-			}
-		}*/
-
-		public abstract object CreateInstance( AdviceArgs adviceArgs );
-
-		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
-	}
+	public abstract class AutoValidationAspectBase : MethodInterceptionAspect {}
 
 	public sealed class AutoValidationValidationAspect : AutoValidationAspectBase
 	{
-		readonly IAspectCommand<bool> command;
-		public AutoValidationValidationAspect() {}
-		AutoValidationValidationAspect( IAspectCommand<bool> command )
-		{
-			this.command = command;
-		}
-
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( command != null )
+			var controller = AutoValidation.Controller( args.Instance );
+			if ( controller != null )
 			{
-				args.ReturnValue = command.Execute( args.Arguments[0], args.GetReturnValue<bool> );
+				var parameter = args.Arguments[0];
+				var valid = controller.IsValid( parameter );
+				if ( !valid.HasValue )
+				{
+					controller.MarkValid( parameter, args.GetReturnValue<bool>() );
+				}
+				else
+				{
+					args.ReturnValue = valid.Value;
+				}
 			}
 			else
 			{
 				base.OnInvoke( args );
 			}
-		}
-
-		public override object CreateInstance( AdviceArgs adviceArgs )
-		{
-			var @delegate = Delegates.Default.Get( adviceArgs.Instance ).Get( Method );
-			var result = new AutoValidationValidationAspect( AutoValidationCommandFactory.Instance( @delegate ) );
-			return result;
 		}
 	}
 
 	public sealed class AutoValidationExecuteAspect : AutoValidationAspectBase
 	{
-		readonly IAspectCommand<object> command;
-		public AutoValidationExecuteAspect() {}
-		AutoValidationExecuteAspect( IAspectCommand<object> command )
-		{
-			this.command = command;
-		}
-
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( command != null )
+			var controller = AutoValidation.Controller( args.Instance );
+			if ( controller != null )
 			{
-				args.ReturnValue = command.Execute( args.Arguments[0], args.GetReturnValue<object> );
+				args.ReturnValue = controller.Execute( args.Arguments[0] ) ? args.GetReturnValue() : args.ReturnValue;
 			}
 			else
 			{
 				base.OnInvoke( args );
 			}
-		}
-
-		public override object CreateInstance( AdviceArgs adviceArgs )
-		{
-			var @delegate = Delegates.Default.Get( adviceArgs.Instance ).Get( Method );
-			var result = new AutoValidationExecuteAspect( AutoValidationExecutionCommandFactory.Instance( @delegate ) );
-			return result;
 		}
 	}
 
@@ -270,7 +218,11 @@ namespace DragonSpark.Aspects.Validation
 
 	public class AspectInstanceFactory : FactoryBase<Type, IEnumerable<AspectInstance>>
 	{
+		public static AspectInstanceFactory Instance { get; } = new AspectInstanceFactory();
+
 		readonly ImmutableArray<Func<Type, AspectInstance>> factories;
+
+		AspectInstanceFactory() : this( AutoValidation.DefaultProfiles ) {}
 
 		public AspectInstanceFactory( ImmutableArray<IProfile> profiles ) : this( profiles.Select( profile => profile.InterfaceType ).ToImmutableArray(), profiles.ToArray().Concat().ToImmutableArray() ) {}
 

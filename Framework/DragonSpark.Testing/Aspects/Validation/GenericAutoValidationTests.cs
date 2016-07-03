@@ -1,37 +1,47 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Diagnostics;
+using PostSharp.Patterns.Model;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Aspects.Validation
 {
-	public class GenericAutoValidationTests // : TestCollectionBase
+	public class GenericAutoValidationTests : TestCollectionBase
 	{
-		/*[Reference]
+		[Reference]
 		readonly ExtendedFactory factory = new ExtendedFactory();
+
+		[Reference]
+		readonly IFactory<int, float> validating;
 		[Reference]
 		readonly AppliedExtendedFactory applied = new AppliedExtendedFactory();
 
-		public GenericAutoValidationTests( ITestOutputHelper output ) : base( output ) {}*/
-
-		/*[Fact]
-		[Trait( Traits.Category, Traits.Categories.Performance )]
-		public void Performance()
+		public GenericAutoValidationTests( ITestOutputHelper output ) : base( output )
 		{
-			new PerformanceSupport( BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run( Output.WriteLine );
+			validating = new AutoValidatingFactory<int, float>( factory );
 		}
 
 		[Fact]
-		public void BasicAutoValidation() => BasicAutoValidationWith( new AutoValidatingFactory<int, float>( factory ), factory );
+		[Trait( Traits.Category, Traits.Categories.Performance )]
+		public void Performance()
+		{
+			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();
+		}
 
 		[Fact]
-		public void BasicAutoValidationApplied() => BasicAutoValidationWith( applied, applied );
+		public void BasicAutoValidation() => BasicAutoValidationWith( validating, factory );
 
 		[Fact]
 		public void BasicAutoValidationInline()
 		{
 			var sut = new ExtendedFactory();
 			BasicAutoValidationWith( new AutoValidatingFactory<int, float>( sut ), sut );
-		}*/
+		}
+
+		[Fact]
+		public void BasicAutoValidationApplied() => BasicAutoValidationWith( applied, applied );
 
 		[Fact]
 		public void BasicAutoValidationAppliedInline()
