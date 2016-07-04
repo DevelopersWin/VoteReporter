@@ -2,6 +2,7 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
@@ -18,24 +19,22 @@ namespace DragonSpark.Composition
 {
 	public class FactoryTypeFactory : FactoryBase<Type, FactoryTypeRequest>
 	{
-		public static FactoryTypeFactory Instance { get; } = new FactoryTypeFactory( Specification.Instance );
+		readonly static Func<Type, Type> ResultLocator = ResultTypeLocator.Instance.ToDelegate();
 
-		public FactoryTypeFactory( ISpecification<Type> specification ) : base( specification ) {}
+		public static FactoryTypeFactory Instance { get; } = new FactoryTypeFactory();
+
+		FactoryTypeFactory() : base( Specification.Instance ) {}
 
 		public class Specification : CanInstantiateSpecification
 		{
 			public new static Specification Instance { get; } = new Specification();
 
 			[Freeze]
-			public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.IsSatisfiedBy( parameter ) && ResultTypeLocator.Instance( parameter ) != typeof(object) && parameter.Has<ExportAttribute>();
+			public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.IsSatisfiedBy( parameter ) && ResultLocator( parameter ) != typeof(object) && parameter.Has<ExportAttribute>();
 		}
 
-		public override FactoryTypeRequest Create( Type parameter )
-		{
-			var resultType = ResultTypeLocator.Instance( parameter );
-			var request = new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), resultType );
-			return request;
-		}
+		public override FactoryTypeRequest Create( Type parameter ) => 
+			new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
 	}
 
 	public class TypeBasedServiceProviderFactory : ServiceProviderFactory

@@ -13,7 +13,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		{
 			var expected = typeof(FactoryOfYAC);
 			var types = FactoryTypeFactory.Instance.CreateMany( AssemblyTypes.All.Create( expected.Assembly ) );
-			var type = new FactoryTypeLocator( types ).Create( new LocateTypeRequest( typeof(YetAnotherClass) ) );
+			var type = new FactoryTypeLocator( types ).Get( new LocateTypeRequest( typeof(YetAnotherClass) ) );
 			Assert.Equal( expected, type );
 		} 
 	}

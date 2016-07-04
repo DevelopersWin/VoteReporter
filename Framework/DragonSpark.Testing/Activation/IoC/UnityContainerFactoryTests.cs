@@ -9,6 +9,7 @@ using Microsoft.Practices.Unity;
 using System;
 using Xunit;
 using Xunit.Abstractions;
+using ConstructorLocator = DragonSpark.Activation.IoC.Specifications.ConstructorLocator;
 
 namespace DragonSpark.Testing.Activation.IoC
 {

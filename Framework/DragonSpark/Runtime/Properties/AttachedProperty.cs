@@ -237,6 +237,31 @@ namespace DragonSpark.Runtime.Properties
 		public override TValue Get( TInstance instance ) => (TValue)inner.Get( instance );
 	}*/
 	
+	public class EqualityCache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class where TValue : class
+	{
+		readonly static Func<TInstance, TInstance> DefaultSource = EqualityReference<TInstance>.Instance.ToDelegate();
+
+		readonly ICache<TInstance, TValue> inner;
+		readonly Func<TInstance, TInstance> equalitySource;
+
+		public EqualityCache() : this( instance => default(TValue) ) {}
+		public EqualityCache( Func<TInstance, TValue> create ) : this( create, DefaultSource ) {}
+		public EqualityCache( Func<TInstance, TValue> create , Func<TInstance, TInstance> equalitySource ) : this( new Cache<TInstance, TValue>( create ), equalitySource ) {}
+
+		public EqualityCache( ICache<TInstance, TValue> inner, Func<TInstance, TInstance> equalitySource )
+		{
+			this.inner = inner;
+			this.equalitySource = equalitySource;
+		}
+
+		public override bool Contains( TInstance instance ) => inner.Contains( equalitySource( instance ) );
+
+		public override bool Remove( TInstance instance ) => inner.Remove( equalitySource( instance ) );
+
+		public override void Set( TInstance instance, [Optional]TValue value ) => inner.Set( equalitySource( instance ), value );
+
+		public override TValue Get( TInstance instance ) => inner.Get( equalitySource( instance )  );
+	}
 
 	public class Cache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class where TValue : class
 	{

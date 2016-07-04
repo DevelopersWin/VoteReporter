@@ -2,7 +2,6 @@ using DragonSpark.Aspects;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -15,7 +14,7 @@ namespace DragonSpark.Activation
 		readonly Func<T, Type> type;
 		readonly Func<T, Type> context;
 
-		protected FactoryTypeLocatorBase( [Required]FactoryTypeLocator locator, [Required]Func<T, Type> type, [Required]Func<T, Type> context )
+		protected FactoryTypeLocatorBase( FactoryTypeLocator locator, Func<T, Type> type, Func<T, Type> context )
 		{
 			this.locator = locator;
 			this.type = type;
@@ -27,11 +26,11 @@ namespace DragonSpark.Activation
 		{
 			var info = context( parameter ).GetTypeInfo();
 			var nestedTypes = info.DeclaredNestedTypes.AsTypes().ToArray();
-			var all = nestedTypes.Union( AssemblyTypes.All.Create( info.Assembly ) ).Where( ApplicationTypeSpecification.Instance.IsSatisfiedBy ).ToArray();
+			var all = nestedTypes.Union( AssemblyTypes.All.Create( info.Assembly ) ).Where( Defaults.ApplicationType ).ToArray();
 			var requests = FactoryTypeFactory.Instance.CreateMany( all );
 			var candidates = new[] { new FactoryTypeLocator( requests ), locator };
 			var mapped = new LocateTypeRequest( type( parameter ) );
-			var result = candidates.FirstAssigned( typeLocator => typeLocator.Create( mapped ) );
+			var result = candidates.Introduce( mapped, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 			return result;
 		}
 	}

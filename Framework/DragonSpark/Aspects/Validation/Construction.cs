@@ -1,8 +1,10 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
+using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -15,27 +17,52 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using Message = PostSharp.Extensibility.Message;
 
 namespace DragonSpark.Aspects.Validation
 {
 	[LinesOfCodeAvoided( 10 )]
 	public class ApplyAutoValidationAttribute : Attribute, IAspectProvider
 	{
-		readonly static Func<Type, IEnumerable<AspectInstance>> Default = AspectInstanceFactory.Instance.ToDelegate();
+		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstanceFactory.Instance.ToDelegate();
 
-		readonly Func<Type, IEnumerable<AspectInstance>> provider;
+		readonly Func<Type, IEnumerable<AspectInstance>> source;
 
-		public ApplyAutoValidationAttribute() : this( Default ) {}
+		public ApplyAutoValidationAttribute() : this( DefaultSource ) {}
 
-		protected ApplyAutoValidationAttribute( Func<Type, IEnumerable<AspectInstance>> provider )
+		protected ApplyAutoValidationAttribute( Func<Type, IEnumerable<AspectInstance>> source )
 		{
-			this.provider = provider;
+			this.source = source;
 		}
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{
 			var type = targetElement as Type;
-			var result = type != null ? provider( type ) : Items<AspectInstance>.Default;
+			var result = type != null ? source( type ) : Items<AspectInstance>.Default;
+			return result;
+		}
+	}
+
+	class AspectFactory<T> : FactoryBase<object, T> where T : IAspect
+	{
+		public static AspectFactory<T> Instance { get; } = new AspectFactory<T>();
+
+		readonly Func<object, IParameterValidationAdapter> adapterSource;
+		readonly Func<IAutoValidationController, T> resultSource;
+
+		public AspectFactory() : this( AutoValidation.DefaultAdapterSource, Delegates.From<IAutoValidationController, T>() ) {}
+
+		public AspectFactory( Func<object, IParameterValidationAdapter> adapterSource, Func<IAutoValidationController, T> resultSource )
+		{
+			this.adapterSource = adapterSource;
+			this.resultSource = resultSource;
+		}
+
+		public override T Create( object parameter )
+		{
+			var adapter = adapterSource( parameter );
+			var controller = new AutoValidationController( adapter );
+			var result = resultSource( controller );
 			return result;
 		}
 	}
@@ -49,19 +76,20 @@ namespace DragonSpark.Aspects.Validation
 		// TODO: http://support.sharpcrafters.com/discussions/questions/1561-iaspectprovider-and-explicit-interface-methods
 		readonly static Func<Type, Attribute> Applies = new Cache<Type, Attribute>( type => type.GetTypeInfo().GetCustomAttribute( typeof(ApplyAutoValidationAttribute), true ) ).ToDelegate();
 
-		readonly Func<IAutoValidationController, IAspect> factory;
-		protected AutoValidationAspectBase( Func<IAutoValidationController, IAspect> factory )
+		readonly Func<object, IAspect> factory;
+		protected AutoValidationAspectBase( Func<object, IAspect> factory )
 		{
 			this.factory = factory;
 		}
 
-		public object CreateInstance( AdviceArgs adviceArgs ) => Applies( adviceArgs.Instance.GetType() ) != null ? factory( AutoValidation.Controller( adviceArgs.Instance ) ) : this;
+		public object CreateInstance( AdviceArgs adviceArgs ) => Applies( adviceArgs.Instance.GetType() ) != null ? factory( adviceArgs.Instance ) : this;
 		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 	}
 
 	public class AutoValidationValidationAspect : AutoValidationAspectBase
 	{
-		public AutoValidationValidationAspect() : base( controller => new Implementation( controller ) ) {}
+		readonly static Func<object, Implementation> Factory = AspectFactory<Implementation>.Instance.ToDelegate();
+		public AutoValidationValidationAspect() : base( Factory ) {}
 
 		sealed class Implementation : AutoValidationValidationAspect
 		{
@@ -89,7 +117,8 @@ namespace DragonSpark.Aspects.Validation
 
 	public class AutoValidationExecuteAspect : AutoValidationAspectBase
 	{
-		public AutoValidationExecuteAspect() : base( controller => new Implementation( controller ) ) {}
+		readonly static Func<object, Implementation> Factory = AspectFactory<Implementation>.Instance.ToDelegate();
+		public AutoValidationExecuteAspect() : base( Factory ) {}
 
 		sealed class Implementation : AutoValidationExecuteAspect
 		{
@@ -99,7 +128,19 @@ namespace DragonSpark.Aspects.Validation
 				this.controller = controller;
 			}
 
-			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = controller.Execute( args.Arguments[0] ) ? args.GetReturnValue() : args.ReturnValue;
+			public override void OnInvoke( MethodInterceptionArgs args )
+			{
+				object result;
+				switch ( controller.Execute( args.Arguments[0], out result ) )
+				{
+					case AutoValidationControllerResult.ResultFound:
+						args.ReturnValue = result;
+						break;
+					case AutoValidationControllerResult.Proceed:
+						args.Proceed();
+						break;
+				}
+			}
 		}
 	}
 
@@ -149,7 +190,7 @@ namespace DragonSpark.Aspects.Validation
 	{
 		TypeAdapter InterfaceType { get; }
 
-		Func<object, IParameterValidationAdapter> AdapterFactory { get; }
+		Func<object, IParameterValidationAdapter> CreateAdapter { get; }
 	}
 
 	class Profile : IProfile
@@ -161,16 +202,16 @@ namespace DragonSpark.Aspects.Validation
 			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).ToDelegate(), factory.ToDelegate() )
 		{}
 
-		protected Profile( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> adapterFactory )
+		protected Profile( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> createAdapter )
 		{
 			InterfaceType = interfaceType;
-			AdapterFactory = adapterFactory;
+			CreateAdapter = createAdapter;
 			this.validate = validate;
 			this.execute = execute;
 		}
 
 		public TypeAdapter InterfaceType { get; }
-		public Func<object, IParameterValidationAdapter> AdapterFactory { get; }
+		public Func<object, IParameterValidationAdapter> CreateAdapter { get; }
 
 		public IEnumerator<Func<Type, AspectInstance>> GetEnumerator()
 		{
@@ -181,54 +222,20 @@ namespace DragonSpark.Aspects.Validation
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
-	/*class GenericProfile<T> : Profile
-	{
-		protected GenericProfile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> adapterFactory )
-			: base( interfaceType.Adapt(),
-					new GenericAspectInstanceMethodFactory<GenericAutoValidationValidationAspect, ValidationRegisterProvider<T>>( interfaceType, valid ).ToDelegate(),
-					new GenericAspectInstanceMethodFactory<GenericAutoValidationExecuteAspect, ExecutionRegisterProvider<T>>( interfaceType, execute ).ToDelegate(),
-					adapterFactory.ToDelegate()
-				) {}
-	}*/
-
 	class AspectInstanceMethodFactory<T> : AspectInstanceFactoryBase where T : IAspect
 	{
 		public AspectInstanceMethodFactory( Type implementingType, string methodName ) : this( implementingType, methodName, Items<object>.Default ) {}
 		public AspectInstanceMethodFactory( Type implementingType, string methodName, params object[] arguments ) : base( implementingType, methodName, Construct.New<T>( arguments ) ) {}
 	}
 
-	/*class AspectInstanceMethodFactory : AspectInstanceFactoryBase
-	{
-		public AspectInstanceMethodFactory( Type implementingType, string methodName, IAspect aspect ) : base( implementingType, methodName, new AspectInstanceFromAspectFactory( aspect ).Create ) {}
-	}*/
-
-	/*class GenericAspectInstanceMethodFactory<TAspect, TRegistry> : AspectInstanceFactoryBase where TAspect : IAspect where TRegistry : RegisterProvider
-	{
-		public GenericAspectInstanceMethodFactory( Type implementingType, string methodName ) : base( implementingType, methodName, Construct.Instance<TAspect>( implementingType, typeof(TRegistry) ) ) {}
-	}*/
-
 	static class Construct
 	{
 		public static Func<MethodInfo, AspectInstance> New<T>( params object[] arguments ) => new ConstructAspectInstanceFactory( new ObjectConstruction( typeof(T), arguments ) ).ToDelegate();
 	}
 
-/*	class AspectInstanceFromAspectFactory : FactoryBase<MethodInfo, AspectInstance>
-	{
-		readonly IAspect aspect;
-
-		public AspectInstanceFromAspectFactory( IAspect aspect )
-		{
-			this.aspect = aspect;
-		}
-
-		public override AspectInstance Create( MethodInfo parameter ) => new AspectInstance( parameter, aspect, null );
-	}*/
-
 	class ConstructAspectInstanceFactory : FactoryBase<MethodInfo, AspectInstance>
 	{
 		readonly ObjectConstruction construction;
-
-		// public ConstructAspectInstanceFactory( params object[] arguments ) : this( Construct.New<T>( arguments ) ) {}
 
 		public ConstructAspectInstanceFactory( ObjectConstruction construction )
 		{
@@ -298,7 +305,7 @@ namespace DragonSpark.Aspects.Validation
 				var instance = factory( parameter );
 				if ( instance != null )
 				{
-					// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"YO: {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));
+					MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"YO: {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));
 					yield return instance;
 				}
 			}

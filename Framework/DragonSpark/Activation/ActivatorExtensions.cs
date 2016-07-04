@@ -9,15 +9,16 @@ namespace DragonSpark.Activation
 {
 	public static class ActivatorExtensions
 	{
-		public static TResult Activate<TResult>( this IActivator @this ) => Activate<TResult>( @this, typeof(TResult) );
+		public static T Activate<T>( this IActivator @this ) => Activate<T>( @this, typeof(T) );
 
-		public static TResult Activate<TResult>( this IActivator @this, [Required] Type requestedType ) => (TResult)@this.Create( requestedType );
+		public static T Activate<T>( this IActivator @this, [Required] Type requestedType ) => (T)@this.Create( requestedType );
 
-		public static TResult Activate<TResult>( this IActivator @this, TypeRequest request ) => (TResult)@this.Create( request );
+		public static T Activate<T>( this IActivator @this, TypeRequest request ) => (T)@this.Create( request );
 
-		public static TResult Construct<TResult>( this IActivator @this, params object[] parameters ) => Construct<TResult>( @this, typeof(TResult), parameters );
+		
+		public static T Construct<T>( this IActivator @this, params object[] parameters ) => Construct<T>( @this, typeof(T), parameters );
 
-		public static TResult Construct<TResult>( this IActivator @this, Type type, params object[] parameters ) => (TResult)@this.Create( new ConstructTypeRequest( type, parameters ) );
+		public static T Construct<T>( this IActivator @this, Type type, params object[] parameters ) => (T)@this.Create( new ConstructTypeRequest( type, parameters ) );
 
 		public static T[] ActivateMany<T>( this IActivator @this, IEnumerable<Type> types ) => @this.ActivateMany<T>( typeof(T), types );
 
@@ -35,7 +36,7 @@ namespace DragonSpark.Activation
 			readonly Func<Type, Type> convention;
 			readonly ISingletonLocator singleton;
 
-			public SingletonLocator( [Required] BuildableTypeFromConventionLocator convention ) : this( convention.Create, IoC.SingletonLocator.Instance ) {}
+			public SingletonLocator( [Required] BuildableTypeFromConventionLocator convention ) : this( convention.ToDelegate(), IoC.SingletonLocator.Instance ) {}
 
 			SingletonLocator( [Required] Func<Type, Type> convention, [Required]ISingletonLocator singleton )
 			{

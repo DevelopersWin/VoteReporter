@@ -171,12 +171,19 @@ namespace DragonSpark.Composition
 
 		public class ActivatorRegistryFactory : FactoryBase<Parameter, ActivatorRegistry>
 		{
-			public static ActivatorRegistryFactory Instance { get; } = new ActivatorRegistryFactory();
+			public static ActivatorRegistryFactory Instance { get; } = new ActivatorRegistryFactory( ParameterTypeLocator.Instance.ToDelegate() );
+
+			readonly Func<Type, Type> locator;
+
+			ActivatorRegistryFactory( Func<Type, Type> locator )
+			{
+				this.locator = locator;
+			}
 
 			public override ActivatorRegistry Create( Parameter parameter )
 			{
 				var result = new ActivatorRegistry( parameter.Accessor, parameter.FactoryContract );
-				new[] { parameter.FactoryContract.ContractType, ParameterTypeLocator.Instance( parameter.FactoryContract.ContractType ) }.WhereAssigned().Each( result.Register );
+				new[] { parameter.FactoryContract.ContractType, locator( parameter.FactoryContract.ContractType ) }.WhereAssigned().Each( result.Register );
 				return result;
 			}
 		}
@@ -184,15 +191,23 @@ namespace DragonSpark.Composition
 
 	public class ActivatorDelegateWithConversionFactory : FactoryBase<Activator.Parameter, Delegate>
 	{
-		public static ActivatorDelegateWithConversionFactory Instance { get; } = new ActivatorDelegateWithConversionFactory();
+		public static ActivatorDelegateWithConversionFactory Instance { get; } = new ActivatorDelegateWithConversionFactory( ResultTypeLocator.Instance.ToDelegate() );
+
+		readonly Func<Type, Type> locator;
+
+		ActivatorDelegateWithConversionFactory( Func<Type, Type> locator )
+		{
+			this.locator = locator;
+		}
 
 		public override Delegate Create( Activator.Parameter parameter ) => 
-			ActivatorDelegateFactory.Instance.Create( parameter ).Convert( ResultTypeLocator.Instance( parameter.FactoryType ) );
+			ActivatorDelegateFactory.Instance.Create( parameter ).Convert( locator( parameter.FactoryType ) );
 	}
 
 	public class ActivatorDelegateFactory : FactoryBase<Activator.Parameter, Func<object>>
 	{
 		public static ActivatorDelegateFactory Instance { get; } = new ActivatorDelegateFactory();
+		ActivatorDelegateFactory() {}
 
 		public override Func<object> Create( Activator.Parameter parameter )
 		{
@@ -207,12 +222,21 @@ namespace DragonSpark.Composition
 
 	public class ActivatorWithParameterDelegateFactory : FactoryBase<Activator.Parameter, Delegate>
 	{
-		public static ActivatorWithParameterDelegateFactory Instance { get; } = new ActivatorWithParameterDelegateFactory();
+		public static ActivatorWithParameterDelegateFactory Instance { get; } = new ActivatorWithParameterDelegateFactory( ParameterTypeLocator.Instance.ToDelegate(), ResultTypeLocator.Instance.ToDelegate() );
+
+		readonly Func<Type, Type> parameterLocator;
+		readonly Func<Type, Type> resultLocator;
+
+		ActivatorWithParameterDelegateFactory( Func<Type, Type> parameterLocator, Func<Type, Type> resultLocator )
+		{
+			this.parameterLocator = parameterLocator;
+			this.resultLocator = resultLocator;
+		}
 
 		public override Delegate Create( Activator.Parameter parameter )
 		{
 			var @delegate = new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create( parameter.FactoryType );
-			var result = @delegate.Convert( ParameterTypeLocator.Instance( parameter.FactoryType ), ResultTypeLocator.Instance( parameter.FactoryType ) );
+			var result = @delegate.Convert( parameterLocator( parameter.FactoryType ), resultLocator( parameter.FactoryType ) );
 			return result;
 		}
 	}

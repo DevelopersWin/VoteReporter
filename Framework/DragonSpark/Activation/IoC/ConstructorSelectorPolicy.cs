@@ -12,10 +12,9 @@ namespace DragonSpark.Activation.IoC
 	public class DefaultUnityConstructorSelectorPolicy : Microsoft.Practices.Unity.ObjectBuilder.DefaultUnityConstructorSelectorPolicy
 	{
 		public static DefaultUnityConstructorSelectorPolicy Instance { get; } = new DefaultUnityConstructorSelectorPolicy();
+		DefaultUnityConstructorSelectorPolicy() : this( ResolverFactory.Instance.ToDelegate() ) {}
 
 		readonly Func<ParameterInfo, IDependencyResolverPolicy> resolver;
-
-		public DefaultUnityConstructorSelectorPolicy() : this( ResolverFactory.Instance.ToDelegate() ) {}
 
 		public DefaultUnityConstructorSelectorPolicy( Func<ParameterInfo, IDependencyResolverPolicy> resolver )
 		{
@@ -28,6 +27,7 @@ namespace DragonSpark.Activation.IoC
 	class ResolverFactory : FactoryBase<ParameterInfo, IDependencyResolverPolicy>
 	{
 		public static ResolverFactory Instance { get; } = new ResolverFactory();
+		ResolverFactory() {}
 
 		public override IDependencyResolverPolicy Create( ParameterInfo parameter )
 		{

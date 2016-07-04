@@ -184,18 +184,33 @@ namespace DragonSpark.Runtime
 
 		Delegates() : base( o => new Cache<MethodInfo, Delegate>( new Factory( o ).Create ) ) {}
 
-		public T From<T>( T source ) where T : class
+		public Delegate Lookup( Delegate source )
+		{
+			if ( Contains( source.Target ) )
+			{
+				var inner = Get( source.Target );
+				var method = source.GetMethodInfo();
+				if ( inner.Contains( method ) )
+				{
+					return inner.Get( method );
+				}
+			}
+			return null;
+		}
+
+		/*public T From<T>( T source ) where T : class
 		{
 			var @delegate = source as Delegate;
 			if ( @delegate != null )
 			{
-				var inner = Get( @delegate );
+				var inner = Get( @delegate.Target );
 				var methodInfo = @delegate.GetMethodInfo();
-				var result = inner.Contains( methodInfo ) ? inner.Get( methodInfo ) : inner.SetValue( methodInfo, @delegate );
+				var contains = inner.Contains( methodInfo );
+				var result = contains ? inner.Get( methodInfo ) : inner.SetValue( methodInfo, @delegate );
 				return result as T;
 			}
 			return default(T);
-		}
+		}*/
 
 		class Factory : FactoryBase<MethodInfo, Delegate>
 		{
@@ -230,13 +245,13 @@ namespace DragonSpark.Runtime
 				this.instance = instance;
 			}
 
-			public override IDelegateInvoker Create( MethodInfo parameter ) => Invoker.Default( Delegates.Default.Get( instance ).Get( parameter ) );
+			public override IDelegateInvoker Create( MethodInfo parameter ) => Invoker.Default.Get( Delegates.Default.Get( instance ).Get( parameter ) );
 		}
 	}
 
 	class Invoker : FactoryBase<Delegate, IDelegateInvoker>
 	{
-		public static Func<Delegate, IDelegateInvoker> Default { get; } = new Invoker().Cached();
+		public static ICache<Delegate, IDelegateInvoker> Default { get; } = new Invoker().Cached();
 
 		readonly static IDictionary<Type, Type> Mappings = new Dictionary<Type, Type>
 														   {
@@ -280,7 +295,7 @@ namespace DragonSpark.Runtime
 
 		public IDelegateInvoker Create( Delegate target, T context )
 		{
-			var core = Invoker.Default( target );
+			var core = Invoker.Default.Get( target );
 			Set( core, context );
 			var result = new ContextDelegateInvoker( core );
 			return result;

@@ -6,7 +6,6 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Delegates = DragonSpark.Runtime.Delegates;
 
 namespace DragonSpark.Activation
 {
@@ -92,7 +91,9 @@ namespace DragonSpark.Activation
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.Assigned ).Fixed();
 
-		public static Func<TParameter, TResult> Cached<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => FactoryCache<TParameter, TResult>.Default.Get( @this );
+		public static ICache<TParameter, TResult> Cached<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) where TParameter : class where TResult : class => FactoryCache<TParameter, TResult>.Default.Get( @this );
+
+		public static ICache<TParameter, TResult> CachedForStructure<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) where TParameter : class => FactoryStructureCache<TParameter, TResult>.Default.Get( @this );
 
 		public static IFactory<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => AutoValidationFactoryCache<TParameter, TResult>.Default.Get( @this );
 
@@ -131,11 +132,18 @@ namespace DragonSpark.Activation
 			AutoValidationFactoryCache() : base( factory => new AutoValidatingFactory<TParameter,TResult>( factory ) ) {}
 		}
 
-		class FactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
+		class FactoryStructureCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ICache<TParameter, TResult>> where TParameter : class
+		{
+			public static FactoryStructureCache<TParameter, TResult> Default { get; } = new FactoryStructureCache<TParameter, TResult>();
+
+			FactoryStructureCache() : base( factory => new StoreCache<TParameter, TResult>( factory.ToDelegate() ) ) {}
+		}
+
+		class FactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ICache<TParameter, TResult>> where TParameter : class where TResult : class
 		{
 			public static FactoryCache<TParameter, TResult> Default { get; } = new FactoryCache<TParameter, TResult>();
 
-			FactoryCache() : base( factory => factory.ToDelegate() ) {}
+			FactoryCache() : base( factory => new Cache<TParameter, TResult>( factory.ToDelegate() ) ) {}
 		}
 
 		class Casted<TParameter, TResult> : Cache<IFactoryWithParameter, IFactory<TParameter, TResult>>
@@ -160,21 +168,21 @@ namespace DragonSpark.Activation
 		{
 			public static FactoryDelegateCache Default { get; } = new FactoryDelegateCache();
 
-			FactoryDelegateCache() : base( factory => Delegates.Default.From<Func<object>>( factory.Create ) ) {}
+			FactoryDelegateCache() : base( factory => factory.Create ) {}
 		}
 
 		class FactoryWithParameterDelegateCache : Cache<IFactoryWithParameter, Func<object, object>>
 		{
 			public static FactoryWithParameterDelegateCache Default { get; } = new FactoryWithParameterDelegateCache();
 
-			FactoryWithParameterDelegateCache() : base( factory => Delegates.Default.From<Func<object, object>>( factory.Create ) ) {}
+			FactoryWithParameterDelegateCache() : base( factory => factory.Create ) {}
 		}
 
 		class FactoryDelegateCache<T> : Cache<IFactory<T>, Func<T>>
 		{
 			public static FactoryDelegateCache<T> Default { get; } = new FactoryDelegateCache<T>();
 
-			FactoryDelegateCache() : base( factory => Delegates.Default.From<Func<T>>( factory.Create ) ) {}
+			FactoryDelegateCache() : base( factory => factory.Create ) {}
 		}
 
 		class FactorySpecificationCache : Cache<IFactoryWithParameter, ISpecification<object>>
@@ -195,7 +203,7 @@ namespace DragonSpark.Activation
 		{
 			public static FactoryDelegateCache<TParameter, TResult> Default { get; } = new FactoryDelegateCache<TParameter, TResult>();
 
-			FactoryDelegateCache() : base( factory => Delegates.Default.From<Func<TParameter, TResult>>( factory.Create ) ) {}
+			FactoryDelegateCache() : base( factory => factory.Create ) {}
 		}
 
 		class FixedFactoryCache<T> : Cache<T, IFactory<T>> where T : class

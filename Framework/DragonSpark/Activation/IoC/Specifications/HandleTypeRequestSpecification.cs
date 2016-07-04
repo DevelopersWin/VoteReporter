@@ -1,5 +1,6 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
@@ -100,7 +101,8 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	public class HasFactorySpecification : CanCreateSpecification<LocateTypeRequest>
 	{
-		public HasFactorySpecification( [Required] FactoryTypeLocator locator ) : base( locator.ToDelegate(), TypeRequestCoercer<LocateTypeRequest>.Instance.ToDelegate() ) {}
+		readonly static Coerce<LocateTypeRequest> DefaultCoercer = TypeRequestCoercer<LocateTypeRequest>.Instance.ToDelegate();
+		public HasFactorySpecification( [Required] FactoryTypeLocator locator ) : base( locator.ToDelegate(), DefaultCoercer ) {}
 	}
 
 	public abstract class StrategyValidator<TStrategy> : GuardedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
@@ -167,11 +169,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 		}
 
 		[Freeze]
-		public override ConstructorInfo Create( ConstructTypeRequest parameter )
-		{
-			var firstOrDefault = query.Create( parameter ).FirstOrDefault();
-			return firstOrDefault;
-		}
+		public override ConstructorInfo Create( ConstructTypeRequest parameter ) => query.Create( parameter ).FirstOrDefault();
 	}
 
 	/*public class HasValidConstructorSpecification : TypeRequestSpecification

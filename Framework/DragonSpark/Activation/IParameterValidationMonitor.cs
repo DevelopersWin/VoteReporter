@@ -38,15 +38,4 @@ namespace DragonSpark.Activation
 			}
 		}
 	}
-
-	public static class ParameterValidationMonitorExtensions
-	{
-		public static bool Update( this IParameterValidationMonitor @this, object parameter, Func<bool> source ) => @this.IsValid( parameter ) || @this.MarkAsValid( parameter, source() );
-
-		public static bool MarkAsValid( this IParameterValidationMonitor @this, object parameter, bool valid )
-		{
-			@this.MarkValid( parameter, valid );
-			return valid;
-		}
-	}
 }

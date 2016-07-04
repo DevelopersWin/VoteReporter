@@ -21,7 +21,7 @@ namespace DragonSpark.Activation.IoC
 			registry.Register<IStagedStrategyChain>( Context.BuildPlanStrategies );
 
 			registry.Register<IServiceRegistry, ServiceRegistry>();
-			/*registry.Register<ConstructorLocator, ConstructorLocator>();
+			/*registry.Register<ConstructorStore, ConstructorStore>();
 			registry.Register<ConstructorQueryProvider, ConstructorQueryProvider>();
 			registry.Register<CanConstructSpecification, CanConstructSpecification>();*/
 			registry.Register<IActivator, Activator>();

@@ -159,6 +159,8 @@ namespace DragonSpark.Activation
 	public interface IDelegateParameterHandlerRegistry
 	{
 		void Register( Delegate @delegate, IParameterAwareHandler handler );
+
+		ImmutableArray<IParameterAwareHandler> Get( Delegate @delegate );
 	}
 
 	class DelegateParameterHandlerRegistry : IDelegateParameterHandlerRegistry
@@ -175,6 +177,8 @@ namespace DragonSpark.Activation
 				list.Add( handler );
 			}
 		}
+
+		public ImmutableArray<IParameterAwareHandler> Get( Delegate @delegate ) => handlers.Get( @delegate ).ToImmutableArray();
 	}
 
 	class CacheParameterHandler<TKey, TValue> : IParameterAwareHandler

@@ -10,6 +10,7 @@ using PostSharp.Serialization;
 using System;
 using System.Collections.Immutable;
 using System.Windows.Input;
+using Delegates = DragonSpark.Runtime.Delegates;
 
 namespace DragonSpark.Aspects
 {
@@ -149,7 +150,7 @@ namespace DragonSpark.Aspects
 		public virtual bool IsValid( object parameter ) => factory.CanCreate( parameter );
 
 		public virtual object Execute( object parameter ) => factory.Create( parameter );
-		public virtual Delegate GetFactory() => factory.ToDelegate();
+		public virtual Delegate GetFactory() => Delegates.Default.Lookup( factory.ToDelegate() );
 	}
 
 	public class FactoryAdapter<TParameter, TResult> : FactoryAdapter
@@ -165,7 +166,7 @@ namespace DragonSpark.Aspects
 
 		public override object Execute( object parameter ) => inner.Create( (TParameter)parameter );
 
-		public override Delegate GetFactory() => inner.ToDelegate();
+		public override Delegate GetFactory() => Delegates.Default.Lookup( inner.ToDelegate() );
 	}
 
 	public class CommandAdapter : IParameterValidationAdapter
@@ -184,7 +185,7 @@ namespace DragonSpark.Aspects
 			return null;
 		}
 
-		public virtual Delegate GetFactory() => inner.ToDelegate();
+		public virtual Delegate GetFactory() => Delegates.Default.Lookup( inner.ToDelegate() );
 	}
 
 	public class CommandAdapter<T> : CommandAdapter
@@ -203,7 +204,7 @@ namespace DragonSpark.Aspects
 			return null;
 		}
 
-		public override Delegate GetFactory() => inner.ToDelegate();
+		public override Delegate GetFactory() => Delegates.Default.Lookup( inner.ToDelegate() );
 	}
 
 	public interface IAutoValidationController

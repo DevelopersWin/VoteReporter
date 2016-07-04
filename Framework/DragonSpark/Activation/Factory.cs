@@ -58,7 +58,7 @@ namespace DragonSpark.Activation
 
 	public class ParameterTypeLocator : TypeLocatorCacheBase
 	{
-		public static Func<Type, Type> Instance { get; } = new ParameterTypeLocator( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) ).Cached();
+		public static ICache<Type, Type> Instance { get; } = new ParameterTypeLocator( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) ).Cached();
 
 		public ParameterTypeLocator( ImmutableArray<Type> types ) : base( types ) {}
 
@@ -67,7 +67,7 @@ namespace DragonSpark.Activation
 
 	public class ResultTypeLocator : TypeLocatorCacheBase
 	{
-		public static Func<Type, Type> Instance { get; } = new ResultTypeLocator( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) ).Cached();
+		public static ICache<Type, Type> Instance { get; } = new ResultTypeLocator( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) ).Cached();
 
 		public ResultTypeLocator( ImmutableArray<Type> types ) : base( types ) {}
 
@@ -218,43 +218,43 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	// [Export]
 	public sealed class MemberInfoFactoryTypeLocator : FactoryTypeLocatorBase<MemberInfo>
 	{
-		// [ImportingConstructor]
 		public MemberInfoFactoryTypeLocator( FactoryTypeLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
 	}
 
-	// [Export]
 	public sealed class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
 	{
-		// [ImportingConstructor]
 		public ParameterInfoFactoryTypeLocator( FactoryTypeLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
 	}
 
 	[Persistent]
-	public class FactoryTypeLocator : FactoryBase<LocateTypeRequest, Type>
+	public class FactoryTypeLocator : EqualityCache<LocateTypeRequest, Type>
 	{
-		readonly FactoryTypeRequest[] types;
+		public FactoryTypeLocator( FactoryTypeRequest[] factoryTypes ) : base( new Factory( factoryTypes ).Create ) {}
 
-		public FactoryTypeLocator( [Required] FactoryTypeRequest[] types )
+		class Factory :  FactoryBase<LocateTypeRequest, Type>
 		{
-			this.types = types;
-		}
+			readonly FactoryTypeRequest[] types;
 
-		[Freeze]
-		public override Type Create( LocateTypeRequest parameter )
-		{
-			var candidates = types.Introduce( parameter, tuple => tuple.Item1.Name == tuple.Item2.Name && tuple.Item1.ResultType.Adapt().IsAssignableFrom( tuple.Item2.RequestedType ) ).ToArray();
-			var item = 
-				candidates.Introduce( $"{parameter.RequestedType.Name}Factory", info => info.Item1.RequestedType.Name == info.Item2 ).Only(  )
-				??
-				candidates.Introduce( parameter, arg => arg.Item1.ResultType == arg.Item2.RequestedType ).FirstOrDefault()
-				??
-				candidates.FirstOrDefault();
+			public Factory( FactoryTypeRequest[] types )
+			{
+				this.types = types;
+			}
 
-			var result = item?.RequestedType;
-			return result;
+			public override Type Create( LocateTypeRequest parameter )
+			{
+				var candidates = types.Introduce( parameter, tuple => tuple.Item1.Name == tuple.Item2.Name && tuple.Item1.ResultType.Adapt().IsAssignableFrom( tuple.Item2.RequestedType ) ).ToArray();
+				var item = 
+					candidates.Introduce( $"{parameter.RequestedType.Name}Factory", info => info.Item1.RequestedType.Name == info.Item2 ).Only()
+					??
+					candidates.Introduce( parameter, arg => arg.Item1.ResultType == arg.Item2.RequestedType ).FirstOrDefault()
+					??
+					candidates.FirstOrDefault();
+
+				var result = item?.RequestedType;
+				return result;
+			}
 		}
 	}
 }

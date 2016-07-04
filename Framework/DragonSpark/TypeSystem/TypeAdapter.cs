@@ -17,6 +17,7 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToDelegate();
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
+		readonly Func<Type, bool> isAssignableFrom;
 
 		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
 		public TypeAdapter( [Required]Type type ) : this( type, type.GetTypeInfo() ) {}
@@ -27,9 +28,9 @@ namespace DragonSpark.TypeSystem
 		{
 			Type = type;
 			Info = info;
-			methodMapper = new MethodMapper( this ).Cached();
+			methodMapper = new MethodMapper( this ).CachedForStructure().ToDelegate();
 			GenericMethods = new GenericMethodInvoker( Type );
-			cache = new IsInstanceOfTypeOrDefinitionCache( this );
+			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).ToDelegate();
 		}
 
 		public Type Type { get; }
@@ -40,31 +41,24 @@ namespace DragonSpark.TypeSystem
 
 		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( Specification ).ToArray();
 
+		//[Freeze]
 		// public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
 
-		public ConstructorInfo FindConstructor( params object[] parameters ) => FindConstructor( ObjectTypeFactory.Instance.Create( parameters ) );
-
-		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
-			Info.DeclaredConstructors
-				.Introduce( parameterTypes, tuple => tuple.Item1.IsPublic && !tuple.Item1.IsStatic && CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
-				.SingleOrDefault();
-
-		// public bool IsAssignableFrom( TypeInfo other ) => IsAssignableFrom( other.AsType() );
-
-		// [Freeze]
-		public bool IsAssignableFrom( Type other ) => Info.IsAssignableFrom( other.GetTypeInfo() );
-
-		public bool IsInstanceOfType( object instance ) => IsAssignableFrom( instance.GetType() );
-
-		readonly ICache<Type, bool> cache;
 		
-		public bool IsInstanceOfTypeOrDefinition( Type type ) => cache.Get( type );
-		bool IsInstanceOfTypeOrDefinitionBody( Type parameter ) => Info.IsGenericTypeDefinition && Info.IsAssignableFrom( parameter.GetTypeInfo() ) || IsAssignableFrom( parameter );
+		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
+				Info.DeclaredConstructors
+					.Introduce( parameterTypes, tuple => tuple.Item1.IsPublic && !tuple.Item1.IsStatic && CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
+					.SingleOrDefault();
+
+		public bool IsAssignableFrom( Type other ) => isAssignableFrom( other );
+		bool IsAssignableFromBody( Type parameter ) => Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( Type ) || Info.IsAssignableFrom( parameter.GetTypeInfo() );
 		class IsInstanceOfTypeOrDefinitionCache : ArgumentCache<Type, bool>
 		{
-			public IsInstanceOfTypeOrDefinitionCache( TypeAdapter owner ) : base( owner.IsInstanceOfTypeOrDefinitionBody ) {}
+			public IsInstanceOfTypeOrDefinitionCache( TypeAdapter owner ) : base( owner.IsAssignableFromBody ) {}
 		}
 
+		public bool IsInstanceOfType( object instance ) => IsAssignableFrom( instance.GetType() );
+		
 		public Assembly Assembly => Info.Assembly;
 
 		public Type[] GetHierarchy( bool includeRoot = true )

@@ -123,25 +123,30 @@ namespace DragonSpark.Composition
 	public class PartsContainerConfigurator : ContainerConfigurator
 	{
 		readonly Assembly[] assemblies;
-		readonly Type[] types;
-		readonly Type[] core;
+		readonly Type[] types, core, all;
+		readonly FactoryTypeRequest[] factoryTypes;
+		readonly FactoryTypeLocator locator;
+		readonly BuildableTypeFromConventionLocator conventionLocator;
+		readonly Activation.Activator activator;
 
-		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
+		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
 
-		public PartsContainerConfigurator( [Required] Assembly[] assemblies, [Required]Type[] types, [Required] Type[] core )
+		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types, Type[] core )
 		{
 			this.assemblies = assemblies;
 			this.types = types;
 			this.core = core;
+
+			// TODO: Fix this mess:
+			factoryTypes = FactoryTypeFactory.Instance.CreateMany( types );
+			locator = new FactoryTypeLocator( factoryTypes );
+			conventionLocator = new BuildableTypeFromConventionLocator( types );
+			activator = new Activation.Activator( conventionLocator );
+			all = types.Union( core ).Fixed();
 		}
 
 		public override ContainerConfiguration Create( ContainerConfiguration configuration )
 		{
-			var factoryTypes = FactoryTypeFactory.Instance.CreateMany( types );
-			var locator = new FactoryTypeLocator( factoryTypes );
-			var conventionLocator = new BuildableTypeFromConventionLocator( types );
-			var activator = new Activation.Activator( conventionLocator );
-			var all = types.Union( core ).Fixed();
 			var result = configuration
 				.WithInstance( assemblies )
 				.WithInstance( all )

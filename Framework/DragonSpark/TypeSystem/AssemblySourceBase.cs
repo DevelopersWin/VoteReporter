@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.TypeSystem
 {
@@ -82,7 +83,7 @@ namespace DragonSpark.TypeSystem
 
 	public class FactoryTypeRequest : LocateTypeRequest
 	{
-		public FactoryTypeRequest( [Required]Type runtimeType, string name, [Required]Type resultType ) :  base( runtimeType, name )
+		public FactoryTypeRequest( Type runtimeType, [Optional]string name, Type resultType ) :  base( runtimeType, name )
 		{
 			ResultType = resultType;
 		}

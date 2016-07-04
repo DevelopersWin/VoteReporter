@@ -16,13 +16,13 @@ namespace DragonSpark.Activation
 	public class Constructor : ConstructorBase
 	{
 		readonly Func<ConstructTypeRequest, ConstructorInfo> constructorSource;
-		readonly Func<ConstructorInfo, ObjectActivator> activatorSource;
+		readonly Func<ConstructorInfo, Invocation> activatorSource;
 
 		public static Constructor Instance { get; } = new Constructor();
 
-		Constructor() : this( ArgumentCache.Instance.Get, ObjectActivatorFactory.Instance.ToDelegate() ) {}
+		Constructor() : this( ConstructorStore.Instance.ToDelegate(), InvocationStore.Instance.ToDelegate() ) {}
 
-		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, ObjectActivator> activatorSource ) : base( Specification.Instance )
+		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, Invocation> activatorSource ) : base( Specification.Instance )
 		{
 			this.constructorSource = constructorSource;
 			this.activatorSource = activatorSource;
@@ -50,58 +50,92 @@ namespace DragonSpark.Activation
 		{
 			public static Specification Instance { get; } = new Specification();
 
-			readonly ArgumentCache cache;
+			readonly ConstructorStore cache;
 
-			Specification() : this( ArgumentCache.Instance ) {}
-			Specification( ArgumentCache cache ) : base( Coercer.Instance.ToDelegate() )
+			Specification() : this( ConstructorStore.Instance ) {}
+			Specification( ConstructorStore cache ) : base( Coercer.Instance.ToDelegate() )
 			{
 				this.cache = cache;
 			}
 
 			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || cache.Get( parameter ) != null;
 		}
-
-		internal class ArgumentCache : ArgumentCache<ConstructTypeRequest, ConstructorInfo>
-		{
-			public static ArgumentCache Instance { get; } = new ArgumentCache();
-			ArgumentCache() : base( Determine ) {}
-
-			static ConstructorInfo Determine( ConstructTypeRequest parameter )
-			{
-				var candidates = new[] { parameter.Arguments, parameter.Arguments.WhereAssigned().Fixed(), Items<object>.Default };
-				var adapter = parameter.RequestedType.Adapt();
-				var result = candidates
-					.Introduce( adapter )
-					.Select( tuple => tuple.Item2.FindConstructor( tuple.Item1 )  )
-					.FirstOrDefault();
-				return result;
-			}
-		}
-
-		class ObjectActivatorFactory : Cache<ConstructorInfo, ObjectActivator>
-		{
-			public static ObjectActivatorFactory Instance { get; } = new ObjectActivatorFactory();
-			ObjectActivatorFactory() : base( Create ) {}
-
-			static ObjectActivator Create( ConstructorInfo parameter )
-			{
-				var parameters = parameter.GetParameterTypes();
-				var param = Expression.Parameter( typeof(object[]), "args" );
-
-				var array = new Expression[parameters.Length];
-				for ( var i = 0; i < parameters.Length; i++ )
-				{
-					var index = Expression.ArrayIndex( param, Expression.Constant( i ) );
-					array[i] = Expression.Convert( index, parameters[i] );
-				}
-
-				var create = Expression.New( parameter, array );
-
-				var result = Expression.Lambda<ObjectActivator>( create, param ).Compile();
-				return result;
-			}
-		}
-
-		delegate object ObjectActivator( params object[] args );
 	}
+
+	public class ConstructorStore : EqualityCache<ConstructTypeRequest, ConstructorInfo>
+	{
+		public static ConstructorStore Instance { get; } = new ConstructorStore();
+
+		ConstructorStore() : base( Create ) {}
+
+		static ConstructorInfo Create( ConstructTypeRequest parameter )
+		{
+			var types = ObjectTypeFactory.Instance.Create( parameter.Arguments );
+			var candidates = new [] { types, types.WhereAssigned().Fixed(), Items<Type>.Default };
+			var adapter = parameter.RequestedType.Adapt();
+			var result = candidates.Distinct( StructuralEqualityComparer<Type[]>.Instance )
+				.Introduce( adapter )
+				.Select( tuple => tuple.Item2.FindConstructor( tuple.Item1 )  )
+				.FirstOrDefault();
+			return result;
+		}
+	}
+
+	class InvocationStore : Cache<ConstructorInfo, Invocation>
+	{
+		public static InvocationStore Instance { get; } = new InvocationStore();
+		InvocationStore() : base( ConstructorDelegateFactory<Invocation>.Instance.ToDelegate() ) {}
+	}
+
+	class InvocationFactory : InvocationFactoryBase<MethodInfo>
+	{
+		public static InvocationFactory Instance { get; } = new InvocationFactory();
+		InvocationFactory() : base( Expression.Call ) {}
+	}
+
+	class ConstructorDelegateFactory<T> :  InvocationFactoryBase<ConstructorInfo>
+	{
+		public static ConstructorDelegateFactory<T> Instance { get; } = new ConstructorDelegateFactory<T>();
+		ConstructorDelegateFactory() : base( Expression.New ) {}
+	}
+
+	abstract class InvocationFactoryBase<T> : CompiledDelegateFactoryBase<T, object[], Invocation> where T : MethodBase
+	{
+		readonly Func<T, Expression[], Expression> factory;
+
+		protected InvocationFactoryBase( Func<T, Expression[], Expression> factory )
+		{
+			this.factory = factory;
+		}
+
+		protected override Expression CreateBody( T parameter, ParameterExpression definition )
+		{
+			var types = parameter.GetParameterTypes();
+
+			var array = new Expression[types.Length];
+			for ( var i = 0; i < types.Length; i++ )
+			{
+				var index = Expression.ArrayIndex( definition, Expression.Constant( i ) );
+				array[i] = Expression.Convert( index, types[i] );
+			}
+
+			var result = factory( parameter, array );
+			return result;
+		}
+	}
+
+	abstract class CompiledDelegateFactoryBase<TSource, TParameter, TResult> : FactoryBase<TSource, TResult>
+	{
+		public override TResult Create( TSource parameter )
+		{
+			var definition = Expression.Parameter( typeof(TParameter), nameof(parameter) );
+			var body = CreateBody( parameter, definition );
+			var result = Expression.Lambda<TResult>( body, definition ).Compile();
+			return result;
+		}
+
+		protected abstract Expression CreateBody( TSource parameter, ParameterExpression definition );
+	}
+
+	delegate object Invocation( params object[] args );
 }

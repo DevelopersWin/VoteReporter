@@ -13,7 +13,7 @@ namespace DragonSpark.ComponentModel
 
 		public LocateAttribute( string name ) : this( null, name ) { }
 
-		public LocateAttribute( Type locatedType, string name = null ) : base( t => new LocationValueProvider( new Converter( locatedType, name ).Create, Factory.Instance.Create ) ) { }
+		public LocateAttribute( Type locatedType, string name = null ) : base( t => new LocationValueProvider( new Converter( locatedType, name ).Create, Factory.Instance.ToDelegate() ) ) { }
 		
 		public class LocationValueProvider : ValueProvider<LocateTypeRequest>
 		{

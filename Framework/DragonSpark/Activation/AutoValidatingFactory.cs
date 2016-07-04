@@ -1,4 +1,5 @@
 using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 using AutoValidationController = DragonSpark.Aspects.Validation.AutoValidationController;
 using IAutoValidationController = DragonSpark.Aspects.Validation.IAutoValidationController;
 
@@ -29,7 +30,18 @@ namespace DragonSpark.Activation
 			return valid.Value;
 		}
 
-		public object Create( object parameter ) => Controller.Execute( parameter ) ? inner.Create( parameter ) : null;
+		public object Create( object parameter )
+		{
+			object result;
+			switch ( Controller.Execute( parameter, out result ) )
+			{
+				case AutoValidationControllerResult.ResultFound:
+					return result;
+				case AutoValidationControllerResult.Proceed:
+					return inner.Create( parameter );
+			}
+			return null;
+		}
 	}
 
 	class AutoValidatingFactory<TParameter, TResult> : AutoValidatingFactory, IFactory<TParameter, TResult>
@@ -52,6 +64,17 @@ namespace DragonSpark.Activation
 			return valid.Value;
 		}
 
-		public TResult Create( TParameter parameter ) => Controller.Execute( parameter ) ? inner.Create( parameter ) : default(TResult);
+		public TResult Create( TParameter parameter )
+		{
+			object result;
+			switch ( Controller.Execute( parameter, out result ) )
+			{
+				case AutoValidationControllerResult.ResultFound:
+					return (TResult)result;
+				case AutoValidationControllerResult.Proceed:
+					return inner.Create( parameter );
+			}
+			return default(TResult);
+		}
 	}
 }

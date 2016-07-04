@@ -217,6 +217,7 @@ namespace DragonSpark.Activation
 	struct Defaults
 	{
 		public static Func<Type, Func<object, IFactoryWithParameter>> ConstructFromParameterFactory { get; } = ConstructFromParameterFactory<IFactoryWithParameter>.Cache.ToDelegate();
+		public static Func<Type, bool> ApplicationType { get; }= ApplicationTypeSpecification.Instance.ToDelegate();
 	}
 
 	public class FirstConstructedFromParameterFactory<TParameter, TResult> : FactoryBase<object, Func<TParameter, TResult>>

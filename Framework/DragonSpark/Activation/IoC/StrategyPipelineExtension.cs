@@ -52,14 +52,14 @@ namespace DragonSpark.Activation.IoC
 
 	public class DefaultConstructorPolicyExtension : UnityContainerExtension
 	{
-		readonly ConstructorLocator locator;
+		readonly ConstructorLocator store;
 
-		public DefaultConstructorPolicyExtension( ConstructorLocator locator )
+		public DefaultConstructorPolicyExtension( ConstructorLocator store )
 		{
-			this.locator = locator;
+			this.store = store;
 		}
 
-		protected override void Initialize() => Context.Policies.SetDefault<IConstructorSelectorPolicy>( new ConstructorSelectorPolicy( locator ) );
+		protected override void Initialize() => Context.Policies.SetDefault<IConstructorSelectorPolicy>( new ConstructorSelectorPolicy( store ) );
 	}
 
 	public class CachingBuildPlanExtension : UnityContainerExtension
@@ -107,7 +107,7 @@ namespace DragonSpark.Activation.IoC
 
 	public static class References
 	{
-		public static EqualityReference<NamedTypeBuildKey> Keys { get; } = new EqualityReference<NamedTypeBuildKey>();
+		public static EqualityReference<NamedTypeBuildKey> Keys { get; } = EqualityReference<NamedTypeBuildKey>.Instance;
 	}
 
 	public class StrategyPipelineExtension : UnityContainerExtension
@@ -307,18 +307,18 @@ namespace DragonSpark.Activation.IoC
 	[Persistent]
 	public class ImplementedInterfaceFromConventionLocator : FactoryBase<Type, Type>
 	{
-		readonly Type[] ignore;
+		readonly ImmutableArray<Type> ignore;
 		public static ImplementedInterfaceFromConventionLocator Instance { get; } = new ImplementedInterfaceFromConventionLocator( typeof(IFactory), typeof(IFactoryWithParameter) );
 
 		public ImplementedInterfaceFromConventionLocator( [Required]params Type[] ignore )
 		{
-			this.ignore = ignore;
+			this.ignore = ignore.ToImmutableArray();
 		}
 
 		[Freeze]
 		public override Type Create( Type parameter )
 		{
-			var types = parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore ).ToArray();
+			var types = parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore.ToArray() ).ToArray();
 			foreach ( var type in types )
 			{
 				if ( parameter.Name.Contains( type.Name.TrimStartOf( 'I' ) ) )
@@ -334,11 +334,13 @@ namespace DragonSpark.Activation.IoC
 	{
 		public static CanInstantiateSpecification Instance { get; } = new CanInstantiateSpecification();
 
+		protected CanInstantiateSpecification() {}
+
 		[Freeze]
 		public override bool IsSatisfiedBy( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();
-			var result = !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
+			var result = !info.IsGenericTypeDefinition && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
 			return result;
 		}
 	}
@@ -346,24 +348,21 @@ namespace DragonSpark.Activation.IoC
 	public class InstantiableTypeSpecification : GuardedSpecificationBase<Type>
 	{
 		public static InstantiableTypeSpecification Instance { get; } = new InstantiableTypeSpecification();
+		InstantiableTypeSpecification() : this( new[] { typeof(Delegate), typeof(Array) }.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
-		readonly TypeAdapter[] exempt;
+		readonly ImmutableArray<TypeAdapter> exempt;
 
-		public InstantiableTypeSpecification() : this( new[] { typeof(Delegate), typeof(Array) }.Select( type => type.Adapt() ).ToArray() ) {}
-
-		public InstantiableTypeSpecification( TypeAdapter[] exempt )
+		public InstantiableTypeSpecification( ImmutableArray<TypeAdapter> exempt )
 		{
 			this.exempt = exempt;
 		}
 
-		// readonly ICache<Type, >
-
 		public override bool IsSatisfiedBy( Type parameter )
 		{
-			// return parameter != typeof(object) && exempt.All( adapter => !adapter.IsAssignableFrom( parameter ) );
-
-			if ( parameter != typeof(object) )
+			return parameter != typeof(object) && !exempt.IsAssignableFrom( parameter );
+			/*if ( parameter != typeof(object) )
 			{
+				exempt.IsAssignableFrom( parameter )
 				foreach ( var adapter in exempt )
 				{
 					if ( adapter.IsAssignableFrom( parameter ) )
@@ -373,7 +372,7 @@ namespace DragonSpark.Activation.IoC
 				}
 				return true;
 			}
-			return false;
+			return false;*/
 		}
 	}
 

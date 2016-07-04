@@ -233,6 +233,9 @@ namespace DragonSpark.Runtime.Properties
 
 	public class EqualityReference<T> : TransformerBase<T> where T : class
 	{
+		public static EqualityReference<T> Instance { get; } = new EqualityReference<T>();
+		EqualityReference() {}
+
 		readonly WeakList<T> list = new WeakList<T>();
 
 		T GetOrAdd( T item )
