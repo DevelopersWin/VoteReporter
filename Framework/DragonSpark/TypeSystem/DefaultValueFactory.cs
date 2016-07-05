@@ -1,11 +1,9 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using Microsoft.Practices.Unity.Utility;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using Activator = System.Activator;
 
@@ -15,7 +13,7 @@ namespace DragonSpark.TypeSystem
 	{
 		public static Action Empty { get; } = () => {};
 
-		public static Func<TParameter, TResult> From<TParameter, TResult>() => Cache<TParameter, TResult>.Instance.Get( typeof(TResult).GetConstructor( typeof(TParameter) ) );
+		/*public static Func<TParameter, TResult> From<TParameter, TResult>() => Cache<TParameter, TResult>.Instance.Get( typeof(TResult).GetConstructor( typeof(TParameter) ) );
 
 		public static TResult From<TParameter, TResult>( TParameter parameter ) => From<TParameter, TResult>()( parameter );
 
@@ -34,8 +32,8 @@ namespace DragonSpark.TypeSystem
 			/*class ConstructorCache : Runtime.Properties.Cache<Type, ConstructorInfo>
 			{
 				ConstructorCache() : base( type => typeof(TResult).GetConstructor( type ) ) {}
-			}*/
-		}
+			}#1#
+		}*/
 	}
 
 	public static class SpecialValues

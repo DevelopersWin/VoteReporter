@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	public class ParameterConstructor<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
+	public class ParameterConstructor<TParameter, TResult> : DelegatedFactory<TParameter, TResult> where TResult : class
 	{
 		public static Func<TParameter, TResult> Default { get; } = new ParameterConstructor<TParameter, TResult>().ToDelegate();
 		ParameterConstructor() : base( ParameterConstructorDelegateFactory<TParameter, TResult>.Make() ) {}

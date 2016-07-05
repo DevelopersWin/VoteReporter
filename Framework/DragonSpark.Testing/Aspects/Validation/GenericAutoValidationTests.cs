@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Diagnostics;
 using PostSharp.Patterns.Model;
 using Xunit;
 using Xunit.Abstractions;
@@ -26,9 +27,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		public void Performance()
 		{
-			BasicAutoValidationApplied();
-			BasicAutoValidationApplied();
-			// new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();
+			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied,*/ BasicAutoValidationAppliedInline ).Run( 25 );
 		}
 
 		[Fact]

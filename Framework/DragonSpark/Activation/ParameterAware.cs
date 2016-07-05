@@ -96,6 +96,19 @@ namespace DragonSpark.Activation
 		bool Handle( object parameter, out object handled );
 	}
 
+	class ParameterAwareHandler : IParameterAwareHandler
+	{
+		public static ParameterAwareHandler Instance { get; } = new ParameterAwareHandler();
+
+		public bool Handles( object parameter ) => false;
+
+		public bool Handle( object parameter, out object handled )
+		{
+			handled = null;
+			return false;
+		}
+	}
+
 	/*public class ParameterHandlerAwareParameterValidationMonitor : IParameterValidationMonitor
 	{
 		readonly IParameterAwareHandler handler;
@@ -178,7 +191,7 @@ namespace DragonSpark.Activation
 			}
 		}
 
-		public ImmutableArray<IParameterAwareHandler> Get( Delegate @delegate ) => handlers.Get( @delegate ).ToImmutableArray();
+		public ImmutableArray<IParameterAwareHandler> Get( Delegate @delegate ) => handlers.Get( @delegate )?.ToImmutableArray() ?? ImmutableArray<IParameterAwareHandler>.Empty;
 	}
 
 	class CacheParameterHandler<TKey, TValue> : IParameterAwareHandler

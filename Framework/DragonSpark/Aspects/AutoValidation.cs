@@ -71,7 +71,7 @@ namespace DragonSpark.Aspects
 		public sealed class Factory : AutoValidationAttributeBase
 		{
 			public static AutoValidationTypeDescriptor Descriptor { get; } = new AutoValidationTypeDescriptor( typeof(IFactoryWithParameter), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) );
-			readonly static AutoValidationProfile Profile = new AutoValidationProfile( FactoryAdapterFactory.Instance.ToDelegate(), ImmutableArray.Create( Descriptor ) );
+			readonly static AutoValidationProfile Profile = new AutoValidationProfile( FactoryProfileFactory.Instance.ToDelegate(), ImmutableArray.Create( Descriptor ) );
 
 			public Factory() : base( Profile ) {}
 		}
@@ -79,14 +79,14 @@ namespace DragonSpark.Aspects
 		public sealed class GenericFactory : AutoValidationAttributeBase
 		{
 			public static AutoValidationTypeDescriptor Descriptor { get; } = new AutoValidationTypeDescriptor( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create) );
-			readonly static AutoValidationProfile Profile = new AutoValidationProfile( GenericFactoryAdapterFactory.Instance.ToDelegate(), ImmutableArray.Create( Descriptor, Factory.Descriptor ) );
+			readonly static AutoValidationProfile Profile = new AutoValidationProfile( GenericFactoryProfileFactory.Instance.ToDelegate(), ImmutableArray.Create( Descriptor, Factory.Descriptor ) );
 			public GenericFactory() : base( Profile ) {}
 		}
 
 		public sealed class Command : AutoValidationAttributeBase
 		{
 			public static AutoValidationTypeDescriptor Descriptor { get; } = new AutoValidationTypeDescriptor( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute) );
-			readonly static AutoValidationProfile Profile = new AutoValidationProfile( CommandAdapterFactory.Instance.ToDelegate(), ImmutableArray.Create( Descriptor ) );
+			readonly static AutoValidationProfile Profile = new AutoValidationProfile( CommandProfileFactory.Instance.ToDelegate(), ImmutableArray.Create( Descriptor ) );
 
 			public Command() : base( Profile ) {}
 		}
@@ -94,7 +94,7 @@ namespace DragonSpark.Aspects
 		public sealed class GenericCommand : AutoValidationAttributeBase
 		{
 			public static AutoValidationTypeDescriptor Descriptor { get; } = new AutoValidationTypeDescriptor( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute) );
-			readonly static AutoValidationProfile Profile = new AutoValidationProfile( GenericCommandAdapterFactory.Instance.ToDelegate(), ImmutableArray.Create( Descriptor, Command.Descriptor ) );
+			readonly static AutoValidationProfile Profile = new AutoValidationProfile( GenericCommandProfileFactory.Instance.ToDelegate(), ImmutableArray.Create( Descriptor, Command.Descriptor ) );
 			public GenericCommand() : base( Profile ) {}
 		}
 	}
@@ -122,10 +122,14 @@ namespace DragonSpark.Aspects
 			return true;
 		}
 
-		public override void RuntimeInitializeInstance() => AutoValidation.Controller.Set( Instance, new AutoValidationController( profile.Factory( Instance ) ) );
+		public override void RuntimeInitializeInstance()
+		{
+			// AutoValidation.Controller.Set( Instance, new AutoValidationController( profile.Factory( Instance ).Adapter ) );
+		}
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{
+			yield break;
 			var type = targetElement as Type;
 			if ( type != null )
 			{

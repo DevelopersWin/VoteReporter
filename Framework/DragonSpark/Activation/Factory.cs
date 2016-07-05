@@ -47,12 +47,10 @@ namespace DragonSpark.Activation
 		protected ImmutableArray<TypeAdapter> Adapters { get; }
 	}
 
-	// [AutoValidation( false )]
 	public class FactoryInterfaceLocator : FactoryBase<Type, Type>
 	{
-		public static FactoryInterfaceLocator Instance { get; } = new FactoryInterfaceLocator();
+		public static ICache<Type, Type> Instance { get; } = new FactoryInterfaceLocator().Cached();
 
-		[Freeze]
 		public override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().With( types => types.FirstOrDefault( IsGenericFactorySpecification.Instance.ToDelegate() ) ?? types.FirstOrDefault( IsFactorySpecification.Instance.ToDelegate() ) );
 	}
 

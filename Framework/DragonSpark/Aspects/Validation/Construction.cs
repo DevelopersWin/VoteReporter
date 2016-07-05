@@ -43,24 +43,47 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	class AspectFactory<T> : FactoryBase<object, T> where T : IAspect
+	class AutoValidationControllerFactory : FactoryBase<object, IAutoValidationController>
+	{
+		public static ICache<object, IAutoValidationController> Instance { get; } = new AutoValidationControllerFactory().Cached();
+		AutoValidationControllerFactory() : this( AdapterLocator.Instance.ToDelegate() ) {}
+
+		readonly Func<object, ParameterInstanceProfile?> profileSource;
+		readonly Func<Delegate, IParameterAwareHandler> handlerSource;
+
+		protected AutoValidationControllerFactory( Func<object, ParameterInstanceProfile?> profileSource ) : this( profileSource, ParameterHandlerLocator.Instance.ToDelegate() ) {}
+
+		protected AutoValidationControllerFactory( Func<object, ParameterInstanceProfile?> profileSource, Func<Delegate, IParameterAwareHandler> handlerSource )
+		{
+			this.profileSource = profileSource;
+			this.handlerSource = handlerSource;
+		}
+
+		public override IAutoValidationController Create( object parameter )
+		{
+			var profile = profileSource( parameter );
+			var result = profile != null ? new AutoValidationController( profile.Value.Adapter, handlerSource( profile.Value.Key ) ) : null;
+			return result;
+		}
+	}
+
+	class AspectFactory<T> : FactoryBase<object, T> where T : class, IAspect
 	{
 		public static AspectFactory<T> Instance { get; } = new AspectFactory<T>();
-		AspectFactory() : this( AutoValidation.DefaultAdapterSource, Delegates.From<IAutoValidationController, T>() ) {}
+		AspectFactory() : this( AutoValidationControllerFactory.Instance.ToDelegate(), ParameterConstructor<IAutoValidationController, T>.Default ) {}
 
-		readonly Func<object, IParameterValidationAdapter> adapterSource;
+		readonly Func<object, IAutoValidationController> controllerSource;
 		readonly Func<IAutoValidationController, T> resultSource;
 
-		public AspectFactory( Func<object, IParameterValidationAdapter> adapterSource, Func<IAutoValidationController, T> resultSource )
+		public AspectFactory( Func<object, IAutoValidationController> controllerSource, Func<IAutoValidationController, T> resultSource )
 		{
-			this.adapterSource = adapterSource;
+			this.controllerSource = controllerSource;
 			this.resultSource = resultSource;
 		}
 
 		public override T Create( object parameter )
 		{
-			var adapter = adapterSource( parameter );
-			var controller = new AutoValidationController( adapter );
+			var controller = controllerSource( parameter );
 			var result = resultSource( controller );
 			return result;
 		}
@@ -189,28 +212,28 @@ namespace DragonSpark.Aspects.Validation
 	{
 		TypeAdapter InterfaceType { get; }
 
-		Func<object, IParameterValidationAdapter> CreateAdapter { get; }
+		Func<object, ParameterInstanceProfile> ProfileSource { get; }
 	}
 
 	class Profile : IProfile
 	{
 		readonly Func<Type, AspectInstance> validate;
 		readonly Func<Type, AspectInstance> execute;
-		protected Profile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), 
+		protected Profile( Type interfaceType, string valid, string execute, IFactory<object, ParameterInstanceProfile> factory ) : this( interfaceType.Adapt(), 
 			new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).ToDelegate(), 
 			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).ToDelegate(), factory.ToDelegate() )
 		{}
 
-		protected Profile( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> createAdapter )
+		protected Profile( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, ParameterInstanceProfile> profileSource )
 		{
 			InterfaceType = interfaceType;
-			CreateAdapter = createAdapter;
+			ProfileSource = profileSource;
 			this.validate = validate;
 			this.execute = execute;
 		}
 
 		public TypeAdapter InterfaceType { get; }
-		public Func<object, IParameterValidationAdapter> CreateAdapter { get; }
+		public Func<object, ParameterInstanceProfile> ProfileSource { get; }
 
 		public IEnumerator<Func<Type, AspectInstance>> GetEnumerator()
 		{

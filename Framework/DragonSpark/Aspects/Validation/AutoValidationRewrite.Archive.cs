@@ -734,7 +734,7 @@ namespace DragonSpark.Aspects.Validation
 	class GenericFactoryProfile : GenericProfile<IFactoryWithParameter>
 	{
 		public static GenericFactoryProfile Instance { get; } = new GenericFactoryProfile();
-		GenericFactoryProfile() : base( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create), GenericFactoryAdapterFactory.Instance ) {}
+		GenericFactoryProfile() : base( typeof(IFactory<,>), nameof(IFactoryWithParameter.CanCreate), nameof(IFactoryWithParameter.Create), GenericFactoryProfileFactory.Instance ) {}
 	}
 
 	class FactoryProfile : Profile
@@ -746,7 +746,7 @@ namespace DragonSpark.Aspects.Validation
 	class GenericCommandProfile : GenericProfile<ICommand>
 	{
 		public static GenericCommandProfile Instance { get; } = new GenericCommandProfile();
-		GenericCommandProfile() : base( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute), GenericCommandAdapterFactory.Instance ) {}
+		GenericCommandProfile() : base( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute), GenericCommandProfileFactory.Instance ) {}
 	}
 
 	class CommandProfile : Profile

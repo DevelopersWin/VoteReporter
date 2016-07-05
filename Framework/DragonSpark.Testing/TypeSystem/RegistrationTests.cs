@@ -30,7 +30,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void IsFactory()
 		{
-			var result = FactoryInterfaceLocator.Instance.Create( typeof(UnityContainerFactory) );
+			var result = FactoryInterfaceLocator.Instance.Get( typeof(UnityContainerFactory) );
 			Assert.Equal( typeof(IFactory<IUnityContainer>), result );
 
 			var implemented = ImplementedInterfaceFromConventionLocator.Instance.Create( typeof(UnityContainerFactory) );

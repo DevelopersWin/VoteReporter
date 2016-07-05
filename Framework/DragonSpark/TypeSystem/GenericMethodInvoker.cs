@@ -68,7 +68,7 @@ namespace DragonSpark.TypeSystem
 		T InvokeCore<T>( [Optional]object instance, object[] arguments )
 		{
 			var @delegate = GetContext( arguments );
-			var factory = (Func<object, object[], object>)@delegate;
+			var factory = (Func<object, object[], T>)@delegate;
 			var result = (T)factory( instance, arguments );
 			return result;
 		}
