@@ -81,14 +81,14 @@ namespace DragonSpark.Windows.Markup
 		public override object Create( Type parameter ) => parameter.AssemblyQualifiedName;
 	}
 
-	public class DesignTimeValueProvider : FirstFromParameterFactory<Type, object>
+	public class DesignTimeValueProvider : CompositeFactory<Type, object>
 	{
 		public static DesignTimeValueProvider Instance { get; } = new DesignTimeValueProvider();
 
 		DesignTimeValueProvider() : base( SpecialValues.DefaultOrEmpty, MockFactory.Instance.ToDelegate(), StringDesignerValueFactory.Instance.ToDelegate() ) {}
 	}
 
-	public class MarkupValueSetterFactory : FirstFromParameterFactory<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
+	public class MarkupValueSetterFactory : CompositeFactory<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
 	{
 		public static MarkupValueSetterFactory Instance { get; } = new MarkupValueSetterFactory();
 

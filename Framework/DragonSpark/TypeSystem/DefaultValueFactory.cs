@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using Microsoft.Practices.Unity.Utility;
 using System;
 using System.Collections.Immutable;

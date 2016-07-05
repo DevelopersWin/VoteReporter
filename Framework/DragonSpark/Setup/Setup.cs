@@ -215,7 +215,7 @@ namespace DragonSpark.Setup
 		public Type RegisteredType { get; }
 	}
 
-	public class CompositeServiceProvider : FirstFromParameterFactory<Type, object>, IServiceProvider
+	public class CompositeServiceProvider : CompositeFactory<Type, object>, IServiceProvider
 	{
 		public CompositeServiceProvider( params IServiceProvider[] providers ) : base( /*IsServiceTypeSpecification.Instance,*/ providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
 

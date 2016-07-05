@@ -109,22 +109,13 @@ namespace DragonSpark.Activation
 
 		DecoratedFactory( IFactoryWithParameter inner ) : this( inner.Cast<TParameter, TResult>() ) {}
 
-		public DecoratedFactory( IFactory<TParameter, TResult> inner ) : this( inner, Parameter<TParameter>.Coercer ) {}
+		public DecoratedFactory( IFactory<TParameter, TResult> inner ) : this( inner, Defaults<TParameter>.Coercer ) {}
 
 		public DecoratedFactory( IFactory<TParameter, TResult> inner, Coerce<TParameter> coercer  ) : this( inner, coercer, inner.ToSpecification() ) {}
 
-		public DecoratedFactory( IFactory<TParameter, TResult> inner, ISpecification<TParameter> specification  ) : this( inner, Parameter<TParameter>.Coercer, specification ) {}
+		public DecoratedFactory( IFactory<TParameter, TResult> inner, ISpecification<TParameter> specification  ) : this( inner, Defaults<TParameter>.Coercer, specification ) {}
 
 		public DecoratedFactory( IFactory<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification  ) : base( inner.ToDelegate(), coercer, specification ) {}
-	}
-
-	public static class Parameter<T>
-	{
-		public static Coerce<T> Coercer { get; } = Coercer<T>.Instance.ToDelegate();
-
-		// public static ISpecification<T> Specification { get; } = Specifications<T>.Assigned;
-
-		// public static ISpecification<T> Specification { get; } = AssignedSpecification<T>.Instance;
 	}
 
 	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>
@@ -132,11 +123,11 @@ namespace DragonSpark.Activation
 		readonly Coerce<TParameter> coercer;
 		readonly ISpecification<TParameter> specification;
 
-		protected FactoryBase() : this( Parameter<TParameter>.Coercer ) {}
+		protected FactoryBase() : this( Defaults<TParameter>.Coercer ) {}
 
 		protected FactoryBase( Coerce<TParameter> coercer ) : this( coercer, Specifications<TParameter>.Assigned ) {}
 
-		protected FactoryBase( ISpecification<TParameter> specification ) : this( Parameter<TParameter>.Coercer, specification ) {}
+		protected FactoryBase( ISpecification<TParameter> specification ) : this( Defaults<TParameter>.Coercer, specification ) {}
 
 		protected FactoryBase( Coerce<TParameter> coercer, ISpecification<TParameter> specification )
 		{
@@ -164,7 +155,7 @@ namespace DragonSpark.Activation
 
 		public DelegatedFactory( Func<TParameter, TResult> inner ) : this( inner, Specifications<TParameter>.Always ) {}
 
-		public DelegatedFactory( Func<TParameter, TResult> inner, ISpecification<TParameter> specification ) : this( inner, Parameter<TParameter>.Coercer, specification ) {}
+		public DelegatedFactory( Func<TParameter, TResult> inner, ISpecification<TParameter> specification ) : this( inner, Defaults<TParameter>.Coercer, specification ) {}
 
 		public DelegatedFactory( Func<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification ) : base( coercer, specification )
 		{
@@ -205,7 +196,7 @@ namespace DragonSpark.Activation
 		public override T Create() => inner();
 	}
 
-	public class FromKnownFactory<T> : FirstConstructedFromParameterFactory<object>
+	public class FromKnownFactory<T> : ParameterConstructedCompositeFactory<object>
 	{
 		public static FromKnownFactory<T> Instance { get; } = new FromKnownFactory<T>( KnownTypeFactory.Instance );
 
@@ -214,18 +205,26 @@ namespace DragonSpark.Activation
 		public T CreateUsing( object parameter ) => (T)Create( parameter );
 	}
 
-	struct Defaults
+	public static class Defaults
 	{
-		public static Func<Type, Func<object, IFactoryWithParameter>> ConstructFromParameterFactory { get; } = ConstructFromParameterFactory<IFactoryWithParameter>.Cache.ToDelegate();
-		public static Func<Type, bool> ApplicationType { get; }= ApplicationTypeSpecification.Instance.ToDelegate();
+		public static Func<Type, Func<object, IFactoryWithParameter>> ParameterConstructedFactory { get; } = Defaults<IFactoryWithParameter>.Constructor.ToDelegate();
+		public static Func<Type, bool> ApplicationType { get; } = ApplicationTypeSpecification.Instance.ToDelegate();
+	}
+
+	public static class Defaults<T>
+	{
+		public static Coerce<T> Coercer { get; } = Coercer<T>.Instance.ToDelegate();
+
+		public static ICache<Type, Func<object, T>> Constructor { get; } = new Cache<Type, Func<object, T>>( type => new ParameterActivator<T>( type ).Create );
 	}
 
 	public class FirstConstructedFromParameterFactory<TParameter, TResult> : FactoryBase<object, Func<TParameter, TResult>>
 	{
-		readonly Func<object, IFactoryWithParameter>[] factories;
-		readonly static Func<IFactoryWithParameter, Func<TParameter, TResult>> ToDelegate = DecoratedFactory<TParameter, TResult>.Cache.ToDelegate();
+		readonly static Func<IFactoryWithParameter, Func<TParameter, TResult>> CachedDelegate = DecoratedFactory<TParameter, TResult>.Cache.ToDelegate();
 
-		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( Defaults.ConstructFromParameterFactory ).Fixed() ) {}
+		readonly Func<object, IFactoryWithParameter>[] factories;
+
+		public FirstConstructedFromParameterFactory( params Type[] types ) : this( types.Select( Defaults.ParameterConstructedFactory ).Fixed() ) {}
 
 		FirstConstructedFromParameterFactory( Func<object, IFactoryWithParameter>[] factories  ) : base( Specifications.Always )
 		{
@@ -236,32 +235,34 @@ namespace DragonSpark.Activation
 		{
 			var items = factories.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) )
 				.WhereAssigned()
-				.Select( ToDelegate )
+				.Select( CachedDelegate )
 				.ToArray();
-			var result = new FirstFromParameterFactory<TParameter, TResult>( items ).ToDelegate();
+			var result = new CompositeFactory<TParameter, TResult>( items ).ToDelegate();
 			return result;
 		}
 	}
 
+
 	
-	public class FirstConstructedFromParameterFactory<T> : FirstFromParameterFactory<object, T>
+	public class ParameterConstructedCompositeFactory<T> : CompositeFactory<object, T>
 	{
-		readonly static Func<Type, Func<object, T>> ToDelegate = ConstructFromParameterFactory<T>.Cache.ToDelegate();
-		public FirstConstructedFromParameterFactory( params Type[] types ) : base( types.Select( ToDelegate ).Fixed() ) {}
+		readonly static Func<Type, Func<object, T>> FromParameter = Defaults<T>.Constructor.ToDelegate();
+		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( FromParameter ).Fixed() ) {}
 	}
 
-	public class FirstFromParameterFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	public class CompositeFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
 		readonly IEnumerable<Func<TParameter, TResult>> inner;
 
-		public FirstFromParameterFactory( params IFactory<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
+		public CompositeFactory( params IFactory<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
-		public FirstFromParameterFactory( params Func<TParameter, TResult>[] inner ) : this( Specifications<TParameter>.Always, inner ) {}
-		public FirstFromParameterFactory( ISpecification<TParameter> specification, params Func<TParameter, TResult>[] inner ) : this( Parameter<TParameter>.Coercer, specification, inner ) {}
+		public CompositeFactory( params Func<TParameter, TResult>[] inner ) : this( Specifications<TParameter>.Always, inner ) {}
 
-		public FirstFromParameterFactory( Coerce<TParameter> coercer, params Func<TParameter, TResult>[] inner ) : this( coercer, Specifications<TParameter>.Always, inner ) {}
+		public CompositeFactory( ISpecification<TParameter> specification, params Func<TParameter, TResult>[] inner ) : this( Defaults<TParameter>.Coercer, specification, inner ) {}
 
-		public FirstFromParameterFactory( Coerce<TParameter> coercer, ISpecification<TParameter> specification, params Func<TParameter, TResult>[] inner ) : base( coercer, specification )
+		// public FirstFromParameterFactory( Coerce<TParameter> coercer, params Func<TParameter, TResult>[] inner ) : this( coercer, Specifications<TParameter>.Always, inner ) {}
+
+		public CompositeFactory( Coerce<TParameter> coercer, ISpecification<TParameter> specification, params Func<TParameter, TResult>[] inner ) : base( coercer, specification )
 		{
 			this.inner = inner;
 		}
@@ -275,7 +276,7 @@ namespace DragonSpark.Activation
 
 		public FirstFactory( params IFactory<T>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) { }
 
-		public FirstFactory( [Required]params Func<T>[] inner )
+		public FirstFactory( params Func<T>[] inner )
 		{
 			this.inner = inner;
 		}

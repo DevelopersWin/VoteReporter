@@ -1,9 +1,6 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
-using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Diagnostics;
 using PostSharp.Patterns.Model;
 using Xunit;
 using Xunit.Abstractions;
@@ -29,7 +26,9 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		public void Performance()
 		{
-			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();
+			BasicAutoValidationApplied();
+			BasicAutoValidationApplied();
+			// new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();
 		}
 
 		[Fact]
@@ -55,7 +54,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Fact]
 		public void ParameterHandler()
 		{
-			var mapped = typeof(CachedAppliedExtendedFactory).Adapt().GetMappedMethods<IFactory<int, float>>();
+			// var mapped = typeof(CachedAppliedExtendedFactory).Adapt().GetMappedMethods<IFactory<int, float>>();
 
 			/*var sut = new CachedAppliedExtendedFactory();
 			var first = sut.Create( 6776 );
@@ -125,11 +124,11 @@ namespace DragonSpark.Testing.Aspects.Validation
 			void Reset();
 		}
 
-		class CachedAppliedExtendedFactory : AppliedExtendedFactory
+		/*class CachedAppliedExtendedFactory : AppliedExtendedFactory
 		{
 			[Freeze]
 			public override float Create( int parameter ) => base.Create( parameter );
-		}
+		}*/
 		
 		[ApplyAutoValidation]
 		class AppliedExtendedFactory : IExtendedFactory

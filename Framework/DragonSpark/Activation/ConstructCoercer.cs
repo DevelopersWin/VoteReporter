@@ -1,46 +1,81 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
+using Microsoft.Practices.Unity.Utility;
 using System;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	public class ConstructFromParameterFactory<T> : FactoryBase<object, T>
+	public class ParameterConstructor<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
-		public static ICache<Type, Func<object, T>> Cache { get; } = new Cache<Type, Func<object, T>>( t => new ConstructFromParameterFactory<T>( t ).ToDelegate() );
+		public static Func<TParameter, TResult> Default { get; } = new ParameterConstructor<TParameter, TResult>().ToDelegate();
+		ParameterConstructor() : base( ParameterConstructorDelegateFactory<TParameter, TResult>.Make() ) {}
+	}
 
-		public static ConstructFromParameterFactory<T> Instance { get; } = new ConstructFromParameterFactory<T>();
+	// class ParameterConstructorCache<T> : Cache<Type, ConstructorInfo>
+
+	class ParameterConstructorDelegateFactory<TParameter, TResult> : CompiledDelegateFactoryBase<ConstructorInfo, TParameter, Func<TParameter, TResult>>
+	{
+		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cached { get; } = new ParameterConstructorDelegateFactory<TParameter, TResult>().Cached();
+		ParameterConstructorDelegateFactory() {}
+
+		public static Func<TParameter, TResult> Make() => Make( typeof(TParameter) );
+
+		public static Func<TParameter, TResult> Make( Type parameterType ) => Make( parameterType, typeof(TResult) );
+
+		public static Func<TParameter, TResult> Make( Type parameterType, Type resultType ) => Cached.Get( resultType.GetConstructor( parameterType ) );
+
+		protected override Expression CreateBody( ConstructorInfo parameter, ParameterExpression definition ) => Expression.New( parameter, definition );
+	}
+
+	class ParameterActivator<T> : FactoryBase<object, T>
+	{
+		public static ParameterActivator<T> Instance { get; } = new ParameterActivator<T>();
+		ParameterActivator() : this( typeof(T) ) {}
 
 		readonly IActivator activator;
-		readonly Type type;
+		readonly Type resultType;
+		readonly Coerce<T> coercer;
 
-		ConstructFromParameterFactory() : this( typeof(T) ) {}
-		ConstructFromParameterFactory( Type type ) : this( Constructor.Instance, type ) {}
+		public ParameterActivator( Type resultType ) : this( Constructor.Instance, resultType, ValueAwareCoercer<T>.Instance.ToDelegate() ) {}
 
-		public ConstructFromParameterFactory( IActivator activator, Type type ) : base( Specifications.Always )
+		protected ParameterActivator( IActivator activator, Type resultType, Coerce<T> coercer )
 		{
 			this.activator = activator;
-			this.type = type;
+			this.resultType = resultType;
+			this.coercer = coercer;
 		}
 
 		public override T Create( object parameter )
 		{
-			var request = new ConstructTypeRequest( type, parameter.ToItem() );
-			var activate = activator.Create( request );
-			var store = activate as IStore<T>;
-			if ( store != null )
-			{
-				return store.Value;
-			}
+			var constructed = activator.Construct<object>( resultType, parameter );
+			var result = coercer( constructed );
+			return result;
+		}
+	}
 
-			var factory = activate as IFactory<T>;
+	class ValueAwareCoercer<T> : Coercer<T>
+	{
+		public new static ValueAwareCoercer<T> Instance { get; } = new ValueAwareCoercer<T>();
+		ValueAwareCoercer() {}
+
+		protected override T PerformCoercion( object parameter )
+		{
+			var factory = parameter as IFactory<T>;
 			if ( factory != null )
 			{
 				return factory.Create();
 			}
 
-			var result = activate.As<T>();
+			var store = parameter as IStore<T>;
+			if ( store != null )
+			{
+				return store.Value;
+			}
+
+			var result = parameter.As<T>();
 			return result;
 		}
 	}
@@ -51,7 +86,6 @@ namespace DragonSpark.Activation
 		class DelegateCache<T> : Cache<ICoercer<T>, Coerce<T>>
 		{
 			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
-
 			DelegateCache() : base( command => command.Coerce ) {}
 		}
 	}
@@ -65,11 +99,9 @@ namespace DragonSpark.Activation
 
 	public class ConstructCoercer<T> : CoercerBase<T>
 	{
-		public static ConstructCoercer<T> Instance { get; } = new ConstructCoercer<T>();
-
+		public static ConstructCoercer<T> Instance { get; } = new ConstructCoercer<T>( ParameterActivator<T>.Instance.ToDelegate() );
+		
 		readonly Func<object, T> projector;
-
-		ConstructCoercer() : this( ConstructFromParameterFactory<T>.Instance.ToDelegate() ) {}
 
 		protected ConstructCoercer( Func<object, T> projector )
 		{

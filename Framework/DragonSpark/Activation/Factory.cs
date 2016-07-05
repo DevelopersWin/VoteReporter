@@ -204,7 +204,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class FactoryDelegateLocatorFactory : FirstFromParameterFactory<Type, Func<object>>
+	public class FactoryDelegateLocatorFactory : CompositeFactory<Type, Func<object>>
 	{
 		public FactoryDelegateLocatorFactory( FactoryDelegateFactory factory, FactoryWithActivatedParameterDelegateFactory factoryWithParameter ) : base( 
 			new Factory<IFactory>( factory ),

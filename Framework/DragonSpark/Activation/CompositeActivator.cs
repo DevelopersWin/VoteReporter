@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace DragonSpark.Activation
 {
-	public class CompositeActivator : FirstFromParameterFactory<object, object>, IActivator
+	public class CompositeActivator : CompositeFactory<object, object>, IActivator
 	{
 		public CompositeActivator( params IActivator[] activators ) 
 			: this( new AnySpecification( activators.Cast<IFactoryWithParameter>().Select( activator => activator.ToSpecification() ).ToArray() ).Cast<object>(), activators ) {}

@@ -23,7 +23,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		
-		public Constructor( [Required]IUnityContainer container, [Required]ICanResolveSpecification support ) : base( new DecoratedSpecification<ConstructTypeRequest>( support, Coerce ) )
+		public Constructor( [Required]IUnityContainer container, [Required]ICanResolveSpecification support ) : base( new DecoratedSpecification<ConstructTypeRequest>( support, DefaultCoerce ) )
 		{
 			this.container = container;
 		}

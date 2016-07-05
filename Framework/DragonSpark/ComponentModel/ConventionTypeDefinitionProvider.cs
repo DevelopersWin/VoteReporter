@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class TypeDefinitionProvider : FirstFromParameterFactory<TypeInfo, TypeInfo>, ITypeDefinitionProvider
+	public class TypeDefinitionProvider : CompositeFactory<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
 		public static ICache<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitionProvider( Items<ITypeDefinitionProvider>.Default ).Cached();
 

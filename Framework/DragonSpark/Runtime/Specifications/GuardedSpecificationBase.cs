@@ -34,7 +34,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly Coerce<T> coercer;
 
-		protected SpecificationBase() : this( Parameter<T>.Coercer ) {}
+		protected SpecificationBase() : this( Defaults<T>.Coercer ) {}
 
 		protected SpecificationBase( Coerce<T> coercer )
 		{

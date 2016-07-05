@@ -27,7 +27,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly Func<TParameter, TResult> creator;
 
-		public CanCreateSpecification( Func<TParameter, TResult> creator ) : this( creator, Parameter<TParameter>.Coercer ) {}
+		public CanCreateSpecification( Func<TParameter, TResult> creator ) : this( creator, Defaults<TParameter>.Coercer ) {}
 		public CanCreateSpecification( Func<TParameter, TResult> creator, Coerce<TParameter> coercer ) : base( coercer )
 		{
 			this.creator = creator;

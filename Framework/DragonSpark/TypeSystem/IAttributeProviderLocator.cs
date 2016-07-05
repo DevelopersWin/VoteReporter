@@ -16,7 +16,7 @@ namespace DragonSpark.TypeSystem
 
 		AttributeProviderLocator() : this( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
 
-		protected AttributeProviderLocator( params Type[] types ) : base( new FirstConstructedFromParameterFactory<IAttributeProvider>( types ).ToDelegate() ) {}
+		protected AttributeProviderLocator( params Type[] types ) : base( new ParameterConstructedCompositeFactory<IAttributeProvider>( types ).Create ) {}
 	}
 
 	public class AttributeProviderConfiguration : ConfigurationBase<ICache<object, IAttributeProvider>>
@@ -33,14 +33,14 @@ namespace DragonSpark.TypeSystem
 	{
 		public static ICache<object, IAttributeProvider> Default { get; } = new AttributeProvider();
 
-		AttributeProvider() : base( new FirstConstructedFromParameterFactory<IAttributeProvider>( typeof(TypeInfoAttributeProvider), typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).ToDelegate() ) {}
+		AttributeProvider() : base( new ParameterConstructedCompositeFactory<IAttributeProvider>( typeof(TypeInfoAttributeProvider), typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).ToDelegate() ) {}
 	}
 
 	public class MemberInfoProviderFactory : Cache<object, IAttributeProvider>
 	{
 		public static ICache<object, IAttributeProvider> Instance { get; } = new MemberInfoProviderFactory( TypeDefinitionProvider.Instance.ToDelegate() );
 
-		protected MemberInfoProviderFactory( Func<TypeInfo, TypeInfo> transformer ) : base( new Factory( transformer ).ToDelegate() ) {}
+		protected MemberInfoProviderFactory( Func<TypeInfo, TypeInfo> transformer ) : base( new Factory( transformer ).Create ) {}
 
 		class Factory : FactoryBase<object, IAttributeProvider>
 		{
@@ -72,7 +72,7 @@ namespace DragonSpark.TypeSystem
 	}
 
 	// [AutoValidation( false )]
-	public class TypeDefinitionLocator : FirstFromParameterFactory<object, TypeInfo>
+	public class TypeDefinitionLocator : CompositeFactory<object, TypeInfo>
 	{
 		public static ICache<object, TypeInfo> Instance { get; } = new TypeDefinitionLocator().Cached();
 

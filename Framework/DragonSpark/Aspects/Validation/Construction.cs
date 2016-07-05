@@ -46,11 +46,10 @@ namespace DragonSpark.Aspects.Validation
 	class AspectFactory<T> : FactoryBase<object, T> where T : IAspect
 	{
 		public static AspectFactory<T> Instance { get; } = new AspectFactory<T>();
+		AspectFactory() : this( AutoValidation.DefaultAdapterSource, Delegates.From<IAutoValidationController, T>() ) {}
 
 		readonly Func<object, IParameterValidationAdapter> adapterSource;
 		readonly Func<IAutoValidationController, T> resultSource;
-
-		public AspectFactory() : this( AutoValidation.DefaultAdapterSource, Delegates.From<IAutoValidationController, T>() ) {}
 
 		public AspectFactory( Func<object, IParameterValidationAdapter> adapterSource, Func<IAutoValidationController, T> resultSource )
 		{

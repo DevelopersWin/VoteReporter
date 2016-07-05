@@ -142,7 +142,7 @@ namespace DragonSpark.Runtime
 
 		public DelegatedCommand( Action<T> command ) : this( command, Specifications<T>.Always ) {}
 
-		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : this( command, Parameter<T>.Coercer, specification ) {}
+		public DelegatedCommand( Action<T> command, ISpecification<T> specification ) : this( command, Defaults<T>.Coercer, specification ) {}
 
 		public DelegatedCommand( Action<T> command, Coerce<T> coercer ) : this( command, coercer, Specifications<T>.Always ) {}
 
@@ -172,7 +172,7 @@ namespace DragonSpark.Runtime
 
 	public class DecoratedCommand<T> : DelegatedCommand<T>
 	{
-		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Parameter<T>.Coercer ) {}
+		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Defaults<T>.Coercer ) {}
 		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer ) : base( inner.ToDelegate(), coercer, inner.ToSpecification() ) {}
 	}
 
@@ -211,11 +211,11 @@ namespace DragonSpark.Runtime
 		readonly Coerce<T> coercer;
 		readonly ISpecification<T> specification;
 
-		protected CommandBase() : this( Parameter<T>.Coercer ) {}
+		protected CommandBase() : this( Defaults<T>.Coercer ) {}
 
 		protected CommandBase( [Required] Coerce<T> coercer ) : this( coercer, Specifications<T>.Assigned ) {}
 
-		protected CommandBase( [Required] ISpecification<T> specification ) : this( Parameter<T>.Coercer, specification ) {}
+		protected CommandBase( [Required] ISpecification<T> specification ) : this( Defaults<T>.Coercer, specification ) {}
 
 		protected CommandBase( [Required] Coerce<T> coercer, [Required] ISpecification<T> specification )
 		{
