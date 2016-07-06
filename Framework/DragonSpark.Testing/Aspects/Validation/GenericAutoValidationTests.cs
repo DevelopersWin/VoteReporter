@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		public void Performance()
 		{
-			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied,*/ BasicAutoValidationAppliedInline ).Run( 25 );
+			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied,*/ BasicAutoValidationAppliedInline ).Run( 2 );
 		}
 
 		[Fact]

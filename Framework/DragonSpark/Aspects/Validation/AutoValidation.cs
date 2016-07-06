@@ -37,29 +37,51 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 	
-	class AdapterLocator : FactoryBase<object, ParameterInstanceProfile?>
+	class AdapterLocator : FactoryBase<object, ParameterInstanceProfile>
 	{
-		readonly ImmutableArray<IProfile> profiles;
-
 		public static AdapterLocator Instance { get; } = new AdapterLocator();
+		readonly Func<Type, Func<object, ParameterInstanceProfile>> factorySource;
+		
 		AdapterLocator() : this( AutoValidation.DefaultProfiles ) {}
 
-		public AdapterLocator( ImmutableArray<IProfile> profiles )
+		public AdapterLocator( ImmutableArray<IProfile> profiles ) : this( new Factory( profiles ).Cached().Get ) {}
+
+		AdapterLocator( Func<Type, Func<object, ParameterInstanceProfile>> factorySource )
 		{
-			this.profiles = profiles;
+			this.factorySource = factorySource;
 		}
 
-		public override ParameterInstanceProfile? Create( object parameter )
+		class Factory : FactoryBase<Type, Func<object, ParameterInstanceProfile>>
+		{
+			readonly ImmutableArray<IProfile> profiles;
+			public Factory( ImmutableArray<IProfile> profiles )
+			{
+				this.profiles = profiles;
+			}
+
+			public override Func<object, ParameterInstanceProfile> Create( Type parameter )
+			{
+				foreach ( var profile in profiles )
+				{
+					if ( profile.InterfaceType.IsAssignableFrom( parameter ) )
+					{
+						return profile.ProfileSource;
+					}
+				}
+				return null;
+			}
+		}
+
+		public override ParameterInstanceProfile Create( object parameter )
 		{
 			var other = parameter.GetType();
-			foreach ( var profile in profiles )
+			var factory = factorySource( other );
+			if ( factory != null )
 			{
-				if ( profile.InterfaceType.IsAssignableFrom( other ) )
-				{
-					return profile.ProfileSource( parameter );
-				}
+				return factory( parameter );
 			}
-			return null;
+
+			throw new InvalidOperationException( $"Profile not found for {other}." );
 		}
 	}
 
@@ -99,32 +121,43 @@ namespace DragonSpark.Aspects.Validation
 
 	public enum AutoValidationControllerResult { None, ResultFound, Proceed }
 
-	public class AutoValidationController : IAutoValidationController
+	class AutoValidationController : ArgumentCache<int, object>, IAutoValidationController
 	{
 		readonly IParameterValidationAdapter validator;
-		readonly IParameterValidationMonitor monitor;
-		readonly IParameterAwareHandler handler;
-
-		public AutoValidationController( IParameterValidationAdapter adapter, IParameterAwareHandler handler ) : this( adapter, handler, new ParameterValidationMonitor() ) {}
-
-		public AutoValidationController( IParameterValidationAdapter validator, IParameterAwareHandler handler, IParameterValidationMonitor monitor )
+		
+		public AutoValidationController( IParameterValidationAdapter validator/*, IParameterAwareHandler handler*/ )
 		{
 			this.validator = validator;
-			this.handler = handler;
-			this.monitor = monitor;
 		}
 
-		public bool? IsValid( object parameter ) => handler.Handles( parameter ) ? true : ( monitor.IsWatching( parameter ) ? monitor.IsValid( parameter ) : (bool?)null );
+		// public new bool? IsValid( object parameter ) => /*handler.Handles( parameter ) ? true :*/ base.IsValid( parameter );
+		public bool? IsValid( object parameter )
+		{
+			object current;
+			return TryGetValue( Environment.CurrentManagedThreadId, out current ) ? (bool?)Equals( current, parameter ) : null;
+		}
 
-		public void MarkValid( object parameter, bool valid ) => monitor.MarkValid( parameter, valid );
+		public void MarkValid( object parameter, bool valid )
+		{
+			if ( valid )
+			{
+				this[Environment.CurrentManagedThreadId] = parameter;
+			}
+			else
+			{
+				object removed;
+				TryRemove( Environment.CurrentManagedThreadId, out removed );
+			}
+		}
 
 		public AutoValidationControllerResult Execute( object parameter, out object result )
 		{
+			result = null;
 			var status = 
-				handler.Handle( parameter, out result ) ? AutoValidationControllerResult.ResultFound 
-				: 
-				monitor.IsValid( parameter ) || validator.IsValid( parameter ) ? AutoValidationControllerResult.Proceed : AutoValidationControllerResult.None;
-			monitor.MarkValid( parameter, false );
+				/*handler.Handle( parameter, out result ) ? AutoValidationControllerResult.ResultFound 
+				: */
+				IsValid( parameter ).GetValueOrDefault() || validator.IsValid( parameter ) ? AutoValidationControllerResult.Proceed : AutoValidationControllerResult.None;
+			MarkValid( parameter, false );
 			return status;
 		}
 	}

@@ -175,7 +175,6 @@
     <Compile Include="Activation\FactoryTypeLocatorBase.cs" />
     <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />
     <Compile Include="Activation\IoC\UnityContainerFactory.cs" />
-    <Compile Include="Activation\IParameterValidationMonitor.cs" />
     <Compile Include="Activation\ParameterAware.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Activation\Factory.cs" />

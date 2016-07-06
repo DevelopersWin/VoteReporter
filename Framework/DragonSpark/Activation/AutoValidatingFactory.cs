@@ -8,12 +8,12 @@ namespace DragonSpark.Activation
 	class AutoValidatingFactory : IFactoryWithParameter
 	{
 		readonly IFactoryWithParameter inner;
-		public AutoValidatingFactory( IFactoryWithParameter inner ) : this( new AutoValidationController( new FactoryAdapter( inner ), ParameterHandlerLocator.Instance.Create( inner.ToDelegate() ) ), inner ) {}
+		public AutoValidatingFactory( IFactoryWithParameter inner ) : this( new AutoValidationController( new FactoryAdapter( inner )/*, ParameterHandlerLocator.Instance.Create( new Func<object, object>( inner.Create ) )*/ ), inner ) {}
 
 		protected AutoValidatingFactory( IAutoValidationController controller, IFactoryWithParameter inner )
 		{
-			this.inner = inner;
 			Controller = controller;
+			this.inner = inner;
 		}
 
 		protected IAutoValidationController Controller { get; }
@@ -47,7 +47,7 @@ namespace DragonSpark.Activation
 	class AutoValidatingFactory<TParameter, TResult> : AutoValidatingFactory, IFactory<TParameter, TResult>
 	{
 		readonly IFactory<TParameter, TResult> inner;
-		public AutoValidatingFactory( IFactory<TParameter, TResult> inner ) : base( new AutoValidationController( new FactoryAdapter<TParameter, TResult>( inner ), ParameterHandlerLocator.Instance.Create( inner.ToDelegate() ) ), inner )
+		public AutoValidatingFactory( IFactory<TParameter, TResult> inner ) : base( new AutoValidationController( new FactoryAdapter<TParameter, TResult>( inner )/*, ParameterHandlerLocator.Instance.Create( new Func<TParameter, TResult>( inner.Create ) )*/ ), inner )
 		{
 			this.inner = inner;
 		}

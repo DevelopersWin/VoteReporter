@@ -13,39 +13,37 @@ namespace DragonSpark.Activation
 		TValue GetOrSet( TArgument key, Func<TValue> factory );
 	}
 
-	public class ArgumentCache<TArgument, TValue> : CacheBase<TArgument, TValue>, IArgumentCache<TArgument, TValue>
+	public class ArgumentCache<TArgument, TValue> : ConcurrentDictionary<TArgument, TValue>, IArgumentCache<TArgument, TValue>
 	{
-		readonly ConcurrentDictionary<TArgument, TValue> items;
+		readonly static IEqualityComparer<TArgument> EqualityComparer = typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Instance : EqualityComparer<TArgument>.Default;
+
 		readonly Func<TArgument, TValue> body;
 
 		public ArgumentCache() : this( argument => default(TValue) ) {}
 
-		public ArgumentCache( Func<TArgument, TValue> body ) : this( body, new ConcurrentDictionary<TArgument, TValue>( typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Instance : EqualityComparer<TArgument>.Default ) ) {}
-
-		public ArgumentCache( Func<TArgument, TValue> body, ConcurrentDictionary<TArgument, TValue> items )
+		public ArgumentCache( Func<TArgument, TValue> body ) : base( EqualityComparer )
 		{
 			this.body = body;
-			this.items = items;
 		}
 
-		public override bool Contains( TArgument instance ) => items.ContainsKey( instance );
+		public virtual bool Contains( TArgument instance ) => ContainsKey( instance );
 
-		public override bool Remove( TArgument instance )
+		public virtual bool Remove( TArgument instance )
 		{
 			TValue item;
-			return items.TryRemove( instance, out item );
+			return TryRemove( instance, out item );
 		}
 
-		public override void Set( TArgument instance, TValue value ) => items[instance] = value;
-		public override TValue Get( TArgument key ) => items.GetOrAdd( key, body );
+		public virtual void Set( TArgument instance, TValue value ) => this[instance] = value;
+		public virtual TValue Get( TArgument key ) => GetOrAdd( key, body );
 
-		public TValue GetOrSet( TArgument key, Func<TValue> factory )
+		public virtual TValue GetOrSet( TArgument key, Func<TValue> factory )
 		{
 			TValue result;
-			return items.TryGetValue( key, out result ) ? result : items.GetOrAdd( key, factory() );
+			return TryGetValue( key, out result ) ? result : GetOrAdd( key, factory() );
 		}
 	}
-
+	
 	abstract class FromArgumentCacheFactoryBase<TKey, T> : FactoryBase<Delegate, T>
 	{
 		readonly static Func<Delegate, IArgumentCache<TKey, object>> DefaultCacheSource = DelegateReferenceCacheFactory<TKey, object>.Instance.Create;

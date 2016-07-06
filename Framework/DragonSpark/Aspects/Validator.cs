@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
@@ -64,66 +63,50 @@ namespace DragonSpark.Aspects
 		protected ParameterProfileFactoryBase( Func<T, ParameterInstanceProfile> create ) : base( create ) {}
 	}
 
-	abstract class GenericParameterProfileFactoryBase : FactoryBase<object, ParameterInstanceProfile>
+	abstract class GenericParameterProfileFactoryBase : GenericInvocationFactory<object, ParameterInstanceProfile>
 	{
-		readonly Type genericType;
-		readonly IGenericMethodContext<Invoke> context;
-		
-		protected GenericParameterProfileFactoryBase( Type genericType, Type parentType, string methodName = nameof(Create) ) : this( parentType.Adapt().GenericFactoryMethods[ methodName ], genericType ) {}
-
-		GenericParameterProfileFactoryBase( IGenericMethodContext<Invoke> context, Type genericType )
-		{
-			this.genericType = genericType;
-			this.context = context;
-		}
-
-		public override ParameterInstanceProfile Create( object parameter )
-		{
-			var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = context.Make( arguments ).Invoke<ParameterInstanceProfile>( parameter );
-			return result;
-		}
+		protected GenericParameterProfileFactoryBase( Type genericTypeDefinition, Type owningType, string methodName ) : base( genericTypeDefinition, owningType, methodName ) {}
 	}
 
 	public struct ParameterInstanceProfile
 	{
-		public ParameterInstanceProfile( IParameterValidationAdapter adapter, Delegate key )
+		public ParameterInstanceProfile( IParameterValidationAdapter adapter/*, Delegate key*/ )
 		{
 			Adapter = adapter;
-			Key = key;
+			// Key = key;
 		}
 
 		public IParameterValidationAdapter Adapter { get; }
-		public Delegate Key { get; }
+		/*public Delegate Key { get; }*/
 	}
 	
-	class GenericFactoryProfileFactory : GenericParameterProfileFactoryBase
+	sealed class GenericFactoryProfileFactory : GenericParameterProfileFactoryBase
 	{
 		public static GenericFactoryProfileFactory Instance { get; } = new GenericFactoryProfileFactory();
 
-		GenericFactoryProfileFactory() : base( typeof(IFactory<,>), typeof(GenericFactoryProfileFactory) ) {}
+		GenericFactoryProfileFactory() : base( typeof(IFactory<,>), typeof(GenericFactoryProfileFactory), nameof(Create) ) {}
 
-		static ParameterInstanceProfile Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new ParameterInstanceProfile( new FactoryAdapter<TParameter, TResult>( instance ), new Func<TParameter, TResult>( instance.Create ) );
+		static ParameterInstanceProfile Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new ParameterInstanceProfile( new FactoryAdapter<TParameter, TResult>( instance )/*, new Func<TParameter, TResult>( instance.Create )*/ );
 	}
-	class GenericCommandProfileFactory : GenericParameterProfileFactoryBase
+	sealed class GenericCommandProfileFactory : GenericParameterProfileFactoryBase
 	{
 		public static GenericCommandProfileFactory Instance { get; } = new GenericCommandProfileFactory();
 
-		GenericCommandProfileFactory() : base( typeof(ICommand<>), typeof(GenericCommandProfileFactory) ) {}
+		GenericCommandProfileFactory() : base( typeof(ICommand<>), typeof(GenericCommandProfileFactory), nameof(Create) ) {}
 
-		static ParameterInstanceProfile Create<T>( ICommand<T> instance ) => new ParameterInstanceProfile( new CommandAdapter<T>( instance ), new Action<T>( instance.Execute ) );
+		static ParameterInstanceProfile Create<T>( ICommand<T> instance ) => new ParameterInstanceProfile( new CommandAdapter<T>( instance )/*, new Action<T>( instance.Execute )*/ );
 	}
 
 	class CommandProfileFactory : ParameterProfileFactoryBase<ICommand>
 	{
 		public static CommandProfileFactory Instance { get; } = new CommandProfileFactory();
-		CommandProfileFactory() : base( command => new ParameterInstanceProfile( new CommandAdapter( command ), new Action<object>( command.Execute ) ) ) {}
+		CommandProfileFactory() : base( command => new ParameterInstanceProfile( new CommandAdapter( command )/*, new Action<object>( command.Execute )*/ ) ) {}
 	}
 
 	class FactoryProfileFactory : ParameterProfileFactoryBase<IFactoryWithParameter>
 	{
 		public static FactoryProfileFactory Instance { get; } = new FactoryProfileFactory();
-		FactoryProfileFactory() : base( parameter => new ParameterInstanceProfile( new FactoryAdapter( parameter ), new Func<object, object>( parameter.Create ) ) ) {}
+		FactoryProfileFactory() : base( parameter => new ParameterInstanceProfile( new FactoryAdapter( parameter )/*, new Func<object, object>( parameter.Create )*/ ) ) {}
 	}
 
 	public struct AutoValidationParameter
@@ -154,26 +137,19 @@ namespace DragonSpark.Aspects
 			this.inner = inner;
 		}
 
-		public virtual bool IsValid( object parameter ) => inner.CanCreate( parameter );
-
-		/*public virtual object Execute( object parameter ) => inner.Create( parameter );
-		public virtual Delegate GetFactory() => Delegates.Default.Lookup( new Func<object, object>( inner.Create ) );*/
+		public bool IsValid( object parameter ) => inner.CanCreate( parameter );
 	}
 
-	public class FactoryAdapter<TParameter, TResult> : FactoryAdapter
+	public class FactoryAdapter<TParameter, TResult> : IParameterValidationAdapter
 	{
 		readonly IFactory<TParameter, TResult> inner;
 
-		public FactoryAdapter( IFactory<TParameter, TResult> inner ) : base( inner )
+		public FactoryAdapter( IFactory<TParameter, TResult> inner )
 		{
 			this.inner = inner;
 		}
 
-		public override bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : base.IsValid( parameter );
-
-		/*public override object Execute( object parameter ) => inner.Create( (TParameter)parameter );
-
-		public override Delegate GetFactory() => Delegates.Default.Lookup( new Func<TParameter, TResult>( inner.Create ) );*/
+		public bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : inner.CanCreate( parameter );
 	}
 
 	public class CommandAdapter : IParameterValidationAdapter
@@ -184,34 +160,18 @@ namespace DragonSpark.Aspects
 			this.inner = inner;
 		}
 
-		public virtual bool IsValid( object parameter ) => inner.CanExecute( parameter );
-
-		/*public virtual object Execute( object parameter )
-		{
-			inner.Execute( parameter );
-			return null;
-		}
-
-		public virtual Delegate GetFactory() => Delegates.Default.Lookup( new Action<object>( inner.Execute ) );*/
+		public bool IsValid( object parameter ) => inner.CanExecute( parameter );
 	}
 
-	public class CommandAdapter<T> : CommandAdapter
+	public class CommandAdapter<T> : IParameterValidationAdapter
 	{
 		readonly ICommand<T> inner;
-		public CommandAdapter( ICommand<T> inner ) : base( inner )
+		public CommandAdapter( ICommand<T> inner )
 		{
 			this.inner = inner;
 		}
 
-		public override bool IsValid( object parameter ) => parameter is T ? inner.CanExecute( (T)parameter ) : base.IsValid( parameter );
-
-		/*public override object Execute( object parameter )
-		{
-			inner.Execute( (T)parameter );
-			return null;
-		}
-
-		public override Delegate GetFactory() => Delegates.Default.Lookup( new Action<T>( inner.Execute ) );*/
+		public bool IsValid( object parameter ) => parameter is T ? inner.CanExecute( (T)parameter ) : inner.CanExecute( parameter );
 	}
 
 	public interface IAutoValidationController

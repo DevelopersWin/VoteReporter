@@ -36,6 +36,26 @@ namespace DragonSpark.Runtime
 		}
 	}
 
+	/*public class TypeArrayEqualityComparer : IEqualityComparer<Type[]>
+	{
+		public static TypeArrayEqualityComparer Instance { get; } = new TypeArrayEqualityComparer();
+
+		public bool Equals( Type[] x, Type[] y )
+		{
+			if (x.Length != y.Length)
+				return false;
+
+			for (int i = 0; i < x.Length; i++)
+				if (x[i] != y[i])
+					return false;
+
+			return true;
+
+		}
+
+		public int GetHashCode( Type[] obj ) => StructuralEqualityComparer<Type[]>.Instance.GetHashCode( obj );
+	}*/
+
 	public class StructuralEqualityComparer<T> : IEqualityComparer<T>
 	{
 		readonly IEqualityComparer comparer;

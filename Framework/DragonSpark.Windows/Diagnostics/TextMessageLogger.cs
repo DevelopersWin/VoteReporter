@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
@@ -9,7 +10,6 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
-using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Windows.Diagnostics
 {
@@ -23,11 +23,13 @@ namespace DragonSpark.Windows.Diagnostics
 	public class Timer : DragonSpark.Diagnostics.Timer
 	{
 		readonly FixedStore<CpuTime> threadTime = new FixedStore<CpuTime>();
+		readonly ThreadTimer[] all;
 
 		public Timer()
 		{
 			KernelTime = new ThreadTimer( () => threadTime.Value.Kernel );
 			UserTime = new ThreadTimer( () => threadTime.Value.User );
+			all = new[] { KernelTime, UserTime };
 		}
 
 		ThreadTimer KernelTime { get; }
@@ -51,7 +53,7 @@ namespace DragonSpark.Windows.Diagnostics
 		void Update( Action<ThreadTimer> action )
 		{
 			threadTime.Assign( ThreadTimeFactory.Instance.Create() );
-			new[] { KernelTime, UserTime }.Each( action );
+			all.Each( action );
 		}
 	}
 

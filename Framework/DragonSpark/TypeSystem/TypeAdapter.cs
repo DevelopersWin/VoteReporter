@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class TypeAdapter
+	public sealed class TypeAdapter
 	{
 		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToDelegate();
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
@@ -95,7 +95,7 @@ namespace DragonSpark.TypeSystem
 
 		public Type[] GetTypeArgumentsFor( Type implementationType ) => getTypeArguments( implementationType );
 		Type[] GetTypeArgumentsForBody( Type implementationType ) => GetImplementations( implementationType ).First().GenericTypeArguments;
-		class GetTypeArgumentsForCache : ArgumentCache<Type, Type[]>
+		class GetTypeArgumentsForCache : Cache<Type, Type[]>
 		{
 			public GetTypeArgumentsForCache( TypeAdapter owner ) : base( owner.GetTypeArgumentsForBody ) {}
 		}
