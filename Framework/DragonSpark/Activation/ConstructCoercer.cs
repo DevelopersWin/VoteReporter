@@ -14,20 +14,16 @@ namespace DragonSpark.Activation
 		ParameterConstructor() : base( ParameterConstructorDelegateFactory<TParameter, TResult>.Make() ) {}
 	}
 
-	// class ParameterConstructorCache<T> : Cache<Type, ConstructorInfo>
-
-	class ParameterConstructorDelegateFactory<TParameter, TResult> : CompiledDelegateFactoryBase<ConstructorInfo, TParameter, Func<TParameter, TResult>>
+	class ParameterConstructorDelegateFactory<TParameter, TResult> : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
 	{
 		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cached { get; } = new ParameterConstructorDelegateFactory<TParameter, TResult>().Cached();
-		ParameterConstructorDelegateFactory() {}
+		ParameterConstructorDelegateFactory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, parameter.Parameter ) ) {}
 
 		public static Func<TParameter, TResult> Make() => Make( typeof(TParameter) );
 
 		public static Func<TParameter, TResult> Make( Type parameterType ) => Make( parameterType, typeof(TResult) );
 
 		public static Func<TParameter, TResult> Make( Type parameterType, Type resultType ) => Cached.Get( resultType.GetConstructor( parameterType ) );
-
-		protected override Expression CreateBody( ConstructorInfo parameter, ParameterExpression definition ) => Expression.New( parameter, definition );
 	}
 
 	class ParameterActivator<T> : FactoryBase<object, T>

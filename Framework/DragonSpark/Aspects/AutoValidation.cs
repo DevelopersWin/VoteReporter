@@ -124,12 +124,13 @@ namespace DragonSpark.Aspects
 
 		public override void RuntimeInitializeInstance()
 		{
-			// AutoValidation.Controller.Set( Instance, new AutoValidationController( profile.Factory( Instance ).Adapter ) );
+			// TODO: Undo.
+			AutoValidation.Controller.Set( Instance, new AutoValidationController( profile.Factory( Instance ).Adapter ) );
 		}
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{
-			yield break;
+			// yield break; // TODO: Undo.
 			var type = targetElement as Type;
 			if ( type != null )
 			{

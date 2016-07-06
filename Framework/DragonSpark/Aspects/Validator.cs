@@ -67,11 +67,11 @@ namespace DragonSpark.Aspects
 	abstract class GenericParameterProfileFactoryBase : FactoryBase<object, ParameterInstanceProfile>
 	{
 		readonly Type genericType;
-		readonly IGenericMethodContext context;
+		readonly IGenericMethodContext<Invoke> context;
 		
-		protected GenericParameterProfileFactoryBase( Type genericType, Type parentType, string methodName = nameof(Create) ) : this( parentType.Adapt().GenericMethods[ methodName ], genericType ) {}
+		protected GenericParameterProfileFactoryBase( Type genericType, Type parentType, string methodName = nameof(Create) ) : this( parentType.Adapt().GenericFactoryMethods[ methodName ], genericType ) {}
 
-		GenericParameterProfileFactoryBase( IGenericMethodContext context, Type genericType )
+		GenericParameterProfileFactoryBase( IGenericMethodContext<Invoke> context, Type genericType )
 		{
 			this.genericType = genericType;
 			this.context = context;
@@ -80,7 +80,7 @@ namespace DragonSpark.Aspects
 		public override ParameterInstanceProfile Create( object parameter )
 		{
 			var arguments = parameter.GetType().Adapt().GetTypeArgumentsFor( genericType );
-			var result = context.Make( arguments ).StaticInvoke<ParameterInstanceProfile>( parameter );
+			var result = context.Make( arguments ).Invoke<ParameterInstanceProfile>( parameter );
 			return result;
 		}
 	}

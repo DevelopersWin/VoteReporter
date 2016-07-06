@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
@@ -8,7 +9,7 @@ namespace DragonSpark.Configuration
 {
 	public class ConfigureCommand : CommandBase<IEnumerable<IWritableStore>>
 	{
-		readonly static IGenericMethodContext Context = typeof(ConfigureCommand).Adapt().GenericMethods[nameof(Add)];
+		readonly static IGenericMethodContext<Execute> Context = typeof(ConfigureCommand).Adapt().GenericCommandMethods[nameof(Add)];
 
 		public static ConfigureCommand Instance { get; } = new ConfigureCommand();
 
@@ -18,7 +19,7 @@ namespace DragonSpark.Configuration
 		{
 			foreach ( var store in parameter )
 			{
-				Context.Make( store.GetType() ).StaticCall( store ); 
+				Context.Make( store.GetType() ).Invoke( store ); 
 			}
 		}
 

@@ -20,6 +20,7 @@ namespace DragonSpark.TypeSystem
 		readonly Func<Type, bool> isAssignableFrom;
 
 		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
+		readonly Func<Type, Type[]> getTypeArguments;
 		public TypeAdapter( [Required]Type type ) : this( type, type.GetTypeInfo() ) {}
 
 		public TypeAdapter( [Required]TypeInfo info ) : this( info.AsType(), info ) {}
@@ -29,21 +30,23 @@ namespace DragonSpark.TypeSystem
 			Type = type;
 			Info = info;
 			methodMapper = new MethodMapper( this ).CachedForStructure().ToDelegate();
-			GenericMethods = new GenericMethodInvoker( Type );
+			GenericFactoryMethods = new GenericStaticMethodFactories( Type );
+			GenericCommandMethods = new GenericStaticMethodCommands( Type );
 			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).ToDelegate();
+			getTypeArguments = new GetTypeArgumentsForCache( this ).ToDelegate();
 		}
 
 		public Type Type { get; }
 
 		public TypeInfo Info { get; }
 
-		public GenericMethodInvoker GenericMethods { get; }
+		public GenericStaticMethodFactories GenericFactoryMethods { get; }
+		public GenericStaticMethodCommands GenericCommandMethods { get; }
 
 		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( Specification ).ToArray();
 
 		//[Freeze]
 		// public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
-
 		
 		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
 				Info.DeclaredConstructors
@@ -90,8 +93,12 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}
 
-		[Freeze]
-		public Type[] GetTypeArgumentsFor( Type implementationType, bool includeInterfaces = true ) => GetImplementations( implementationType, includeInterfaces ).First().GenericTypeArguments;
+		public Type[] GetTypeArgumentsFor( Type implementationType ) => getTypeArguments( implementationType );
+		Type[] GetTypeArgumentsForBody( Type implementationType ) => GetImplementations( implementationType ).First().GenericTypeArguments;
+		class GetTypeArgumentsForCache : ArgumentCache<Type, Type[]>
+		{
+			public GetTypeArgumentsForCache( TypeAdapter owner ) : base( owner.GetTypeArgumentsForBody ) {}
+		}
 
 		[Freeze]
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true )

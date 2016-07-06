@@ -15,12 +15,12 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 		readonly IFixture fixture;
 
 		readonly ICollection<Type> registered = new List<Type>();
-		readonly GenericMethodInvoker invoker;
+		readonly GenericMethodCommands commands;
 
 		public FixtureRegistry( [Required]IFixture fixture )
 		{
 			this.fixture = fixture;
-			invoker = GetType().Adapt().GenericMethods;
+			commands = new GenericMethodCommands( this );
 		}
 
 		public bool IsRegistered( Type type ) => registered.Contains( type );
@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		public void Register( [Required]InstanceRegistrationParameter parameter ) => Invoke( parameter.RequestedType, nameof(RegisterInstance), parameter.Instance );
 
-		void Invoke( Type type, string name, object parameter ) => invoker[name].Make( type ).Call( this, parameter );
+		void Invoke( Type type, string name, object parameter ) => commands[name].Make( type ).Invoke( parameter );
 
 		void RegisterInstance<T>( [Required]T instance )
 		{
