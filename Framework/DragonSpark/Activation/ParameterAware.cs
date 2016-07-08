@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Reflection;
 
 namespace DragonSpark.Activation
 {
@@ -44,42 +45,19 @@ namespace DragonSpark.Activation
 		}
 	}
 	
-	abstract class FromArgumentCacheFactoryBase<TKey, T> : FactoryBase<Delegate, T>
+	class RegisteredCacheFactory<TKey, TValue> : FactoryBase<InstanceMethod, IArgumentCache<TKey, TValue>>
 	{
-		readonly static Func<Delegate, IArgumentCache<TKey, object>> DefaultCacheSource = DelegateReferenceCacheFactory<TKey, object>.Instance.Create;
+		public static RegisteredCacheFactory<TKey, TValue> Instance { get; } = new RegisteredCacheFactory<TKey, TValue>();
+		RegisteredCacheFactory() : this( ParameterHandlerRegistry.Instance ) {}
 
-		readonly Func<Delegate, IArgumentCache<TKey, object>> cacheSource;
-		readonly Func<IArgumentCache<TKey, object>, T> factory;
+		readonly IParameterHandlerRegistry registry;
 
-		protected FromArgumentCacheFactoryBase( Func<IArgumentCache<TKey, object>, T> factory ) : this( DefaultCacheSource, factory ) {}
-
-		protected FromArgumentCacheFactoryBase( Func<Delegate, IArgumentCache<TKey, object>> cacheSource, Func<IArgumentCache<TKey, object>, T> factory )
-		{
-			this.cacheSource = cacheSource;
-			this.factory = factory;
-		}
-
-		public override T Create( Delegate parameter )
-		{
-			var cache = cacheSource( parameter );
-			var result = factory( cache );
-			return result;
-		}
-	}
-
-	class DelegateReferenceCacheFactory<TKey, TValue> : FactoryBase<Delegate, IArgumentCache<TKey, TValue>>
-	{
-		public static DelegateReferenceCacheFactory<TKey, TValue> Instance { get; } = new DelegateReferenceCacheFactory<TKey, TValue>();
-		DelegateReferenceCacheFactory() : this( DelegateParameterHandlerRegistry.Instance ) {}
-
-		readonly IDelegateParameterHandlerRegistry registry;
-
-		public DelegateReferenceCacheFactory( IDelegateParameterHandlerRegistry registry )
+		public RegisteredCacheFactory( IParameterHandlerRegistry registry )
 		{
 			this.registry = registry;
 		}
 
-		public override IArgumentCache<TKey, TValue> Create( Delegate parameter )
+		public override IArgumentCache<TKey, TValue> Create( InstanceMethod parameter )
 		{
 			var result = new ArgumentCache<TKey, TValue>();
 			registry.Register( parameter, new CacheParameterHandler<TKey, TValue>( result ) );
@@ -94,7 +72,7 @@ namespace DragonSpark.Activation
 		bool Handle( object parameter, out object handled );
 	}
 
-	class ParameterAwareHandler : IParameterAwareHandler
+	/*class ParameterAwareHandler : IParameterAwareHandler
 	{
 		public static ParameterAwareHandler Instance { get; } = new ParameterAwareHandler();
 
@@ -105,31 +83,10 @@ namespace DragonSpark.Activation
 			handled = null;
 			return false;
 		}
-	}
-
-	/*public class ParameterHandlerAwareParameterValidationMonitor : IParameterValidationMonitor
-	{
-		readonly IParameterAwareHandler handler;
-		readonly IParameterValidationMonitor inner;
-		public ParameterHandlerAwareParameterValidationMonitor( IParameterAwareHandler handler, IParameterValidationMonitor inner )
-		{
-			this.handler = handler;
-			this.inner = inner;
-		}
-
-		public bool IsValid( object parameter )
-		{
-			return handler.Handles( parameter ) || inner.IsValid( parameter );
-		}
-
-		public void MarkValid( object parameter, bool valid ) {}
-		public void Clear( object parameter ) {}
 	}*/
 
-	class CompositeParameterAwareHandler : IParameterAwareHandler
+	class CompositeParameterAwareHandler : ConcurrentDictionary<object, IParameterAwareHandler>, IParameterAwareHandler
 	{
-		readonly ICache<object, IParameterAwareHandler> store = new ArgumentCache<object, IParameterAwareHandler>();
-
 		readonly ImmutableArray<IParameterAwareHandler> handlers;
 
 		public CompositeParameterAwareHandler( ImmutableArray<IParameterAwareHandler> handlers )
@@ -137,14 +94,16 @@ namespace DragonSpark.Activation
 			this.handlers = handlers;
 		}
 
-		public bool Handles( object parameter ) => Get( parameter ) != null;
+		public bool Handles( object parameter ) => GetHandler( parameter ) != null;
 		public bool Handle( object parameter, out object handled )
 		{
-			var handler = Get( parameter );
+			var handler = GetHandler( parameter );
 			if ( handler != null )
 			{
 				var result = handler.Handle( parameter, out handled );
-				store.Remove( parameter );
+
+				IParameterAwareHandler removed;
+				TryRemove( parameter, out removed );
 				return result;
 			}
 			
@@ -152,7 +111,11 @@ namespace DragonSpark.Activation
 			return false;
 		}
 
-		IParameterAwareHandler Get( object parameter ) => store.Get( parameter ) ?? Store( parameter );
+		IParameterAwareHandler GetHandler( object parameter )
+		{
+			IParameterAwareHandler found;
+			return TryGetValue( parameter, out found ) ? found : Store( parameter );
+		}
 
 		IParameterAwareHandler Store( object parameter )
 		{
@@ -160,36 +123,68 @@ namespace DragonSpark.Activation
 			{
 				if ( handler.Handles( parameter ) )
 				{
-					return store.SetValue( parameter, handler );
+					TryAdd( parameter, handler );
+					return handler;
 				}
 			}
 			return null;
 		}
 	}
 
-	public interface IDelegateParameterHandlerRegistry
+	public interface IParameterHandlerRegistry
 	{
-		void Register( Delegate @delegate, IParameterAwareHandler handler );
+		void Register( InstanceMethod instance, IParameterAwareHandler handler );
 
-		ImmutableArray<IParameterAwareHandler> Get( Delegate @delegate );
+		IParameterAwareHandler For( InstanceMethod instance );
 	}
 
-	class DelegateParameterHandlerRegistry : IDelegateParameterHandlerRegistry
+	public struct InstanceMethod
 	{
-		public static IDelegateParameterHandlerRegistry Instance { get; } = new DelegateParameterHandlerRegistry();
-
-		readonly ICache<Delegate, IList<IParameterAwareHandler>> handlers = new ListCache<Delegate, IParameterAwareHandler>();
-
-		public void Register( Delegate @delegate, IParameterAwareHandler handler )
+		public InstanceMethod( object instance, MethodBase method )
 		{
-			var list = handlers.Get( @delegate );
-			lock ( @delegate )
+			Instance = instance;
+			Method = method;
+		}
+
+		public object Instance { get; }
+		public MethodBase Method { get; }
+	}
+
+	class ParameterAwareHandler : IParameterAwareHandler
+	{
+		public static ParameterAwareHandler Instance { get; } = new ParameterAwareHandler();
+
+		public bool Handles( object parameter )
+		{
+			return false;
+		}
+
+		public bool Handle( object parameter, out object handled )
+		{
+			handled = null;
+			return false;
+		}
+	}
+
+	class ParameterHandlerRegistry : ActivatedCache<ParameterHandlerRegistry.Inner>, IParameterHandlerRegistry
+	{
+		public new static IParameterHandlerRegistry Instance { get; } = new ParameterHandlerRegistry();
+
+		public void Register( InstanceMethod instance, IParameterAwareHandler handler )
+		{
+			var list = Get( instance.Instance ).Get( instance.Method );
+			lock ( list )
 			{
 				list.Add( handler );
 			}
 		}
 
-		public ImmutableArray<IParameterAwareHandler> Get( Delegate @delegate ) => handlers.Get( @delegate )?.ToImmutableArray() ?? ImmutableArray<IParameterAwareHandler>.Empty;
+		internal class Inner : ArgumentCache<MethodBase, ISet<IParameterAwareHandler>>
+		{
+			public Inner() : base( _ => new HashSet<IParameterAwareHandler>() ) {}
+		}
+
+		public IParameterAwareHandler For( InstanceMethod instance ) => new CompositeParameterAwareHandler( Get( instance.Instance ).Get( instance.Method ).ToImmutableArray() );
 	}
 
 	class CacheParameterHandler<TKey, TValue> : IParameterAwareHandler

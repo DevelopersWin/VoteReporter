@@ -8,6 +8,7 @@ using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
 using System.Collections.Immutable;
+using System.Reflection;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects
@@ -70,14 +71,14 @@ namespace DragonSpark.Aspects
 
 	public struct ParameterInstanceProfile
 	{
-		public ParameterInstanceProfile( IParameterValidationAdapter adapter/*, Delegate key*/ )
+		public ParameterInstanceProfile( IParameterValidationAdapter adapter, InstanceMethod key )
 		{
 			Adapter = adapter;
-			// Key = key;
+			Key = key;
 		}
 
 		public IParameterValidationAdapter Adapter { get; }
-		/*public Delegate Key { get; }*/
+		public InstanceMethod Key { get; }
 	}
 	
 	sealed class GenericFactoryProfileFactory : GenericParameterProfileFactoryBase
@@ -86,7 +87,12 @@ namespace DragonSpark.Aspects
 
 		GenericFactoryProfileFactory() : base( typeof(IFactory<,>), typeof(GenericFactoryProfileFactory), nameof(Create) ) {}
 
-		static ParameterInstanceProfile Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new ParameterInstanceProfile( new FactoryAdapter<TParameter, TResult>( instance )/*, new Func<TParameter, TResult>( instance.Create )*/ );
+		static ParameterInstanceProfile Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new ParameterInstanceProfile( new FactoryAdapter<TParameter, TResult>( instance ), new InstanceMethod( instance, Method<TParameter, TResult>.Default ) );
+
+		public static class Method<TParameter, TResult>
+		{
+			public static MethodBase Default { get; } = typeof(IFactory<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IFactory<TParameter, TResult>.Create) );
+		}
 	}
 	sealed class GenericCommandProfileFactory : GenericParameterProfileFactoryBase
 	{
@@ -94,19 +100,28 @@ namespace DragonSpark.Aspects
 
 		GenericCommandProfileFactory() : base( typeof(ICommand<>), typeof(GenericCommandProfileFactory), nameof(Create) ) {}
 
-		static ParameterInstanceProfile Create<T>( ICommand<T> instance ) => new ParameterInstanceProfile( new CommandAdapter<T>( instance )/*, new Action<T>( instance.Execute )*/ );
+		static ParameterInstanceProfile Create<T>( ICommand<T> instance ) => new ParameterInstanceProfile( new CommandAdapter<T>( instance ), new InstanceMethod( instance, Cache<T>.Method ) );
+
+		static class Cache<T>
+		{
+			public static MethodBase Method { get; } = typeof(ICommand<T>).GetTypeInfo().GetDeclaredMethod( nameof(ICommand<T>.Execute) );
+		}
 	}
 
 	class CommandProfileFactory : ParameterProfileFactoryBase<ICommand>
 	{
+		readonly static MethodBase Method = typeof(ICommand).GetTypeInfo().GetDeclaredMethod( nameof(ICommand.Execute) );
+
 		public static CommandProfileFactory Instance { get; } = new CommandProfileFactory();
-		CommandProfileFactory() : base( command => new ParameterInstanceProfile( new CommandAdapter( command )/*, new Action<object>( command.Execute )*/ ) ) {}
+		CommandProfileFactory() : base( instance => new ParameterInstanceProfile( new CommandAdapter( instance ), new InstanceMethod( instance, Method ) ) ) {}
 	}
 
 	class FactoryProfileFactory : ParameterProfileFactoryBase<IFactoryWithParameter>
 	{
+		public static MethodBase Method { get; } = typeof(IFactoryWithParameter).GetTypeInfo().GetDeclaredMethod( nameof(IFactoryWithParameter.Create) );
+
 		public static FactoryProfileFactory Instance { get; } = new FactoryProfileFactory();
-		FactoryProfileFactory() : base( parameter => new ParameterInstanceProfile( new FactoryAdapter( parameter )/*, new Func<object, object>( parameter.Create )*/ ) ) {}
+		FactoryProfileFactory() : base( instance => new ParameterInstanceProfile( new FactoryAdapter( instance ), new InstanceMethod( instance, Method ) ) ) {}
 	}
 
 	public struct AutoValidationParameter

@@ -227,7 +227,7 @@ namespace DragonSpark.Activation
 	}
 
 	[Persistent]
-	public class FactoryTypeLocator : EqualityCache<LocateTypeRequest, Type>
+	public class FactoryTypeLocator : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
 		public FactoryTypeLocator( FactoryTypeRequest[] factoryTypes ) : base( new Factory( factoryTypes ).Create ) {}
 

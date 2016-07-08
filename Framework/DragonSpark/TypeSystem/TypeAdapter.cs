@@ -150,7 +150,7 @@ namespace DragonSpark.TypeSystem
 			if ( implementation != null )
 			{
 				var map = adapter.Info.GetRuntimeInterfaceMap( implementation );
-				var result = map.InterfaceMethods.Tuple( map.TargetMethods ).Introduce( adapter.Type, tuple => new MethodMapping( tuple.Item1.Item1, tuple.Item1.Item2/*, tuple.Item1.Item2.LocateInDerivedType( tuple.Item2 )*/ ) ).ToImmutableArray();
+				var result = map.InterfaceMethods.Tuple( map.TargetMethods ).Select( tuple => new MethodMapping( tuple.Item1, tuple.Item2 ) ).ToImmutableArray();
 				return result;
 			}
 			return Items<MethodMapping>.Immutable;
@@ -159,15 +159,13 @@ namespace DragonSpark.TypeSystem
 
 	public struct MethodMapping
 	{
-		public MethodMapping( MethodInfo interfaceMethod, MethodInfo mappedMethod/*, MethodInfo locatedMethod*/ )
+		public MethodMapping( MethodInfo interfaceMethod, MethodInfo mappedMethod )
 		{
 			InterfaceMethod = interfaceMethod;
 			MappedMethod = mappedMethod;
-			// LocatedMethod = locatedMethod;
 		}
 
 		public MethodInfo InterfaceMethod { get; }
 		public MethodInfo MappedMethod { get; }
-		// public MethodInfo LocatedMethod { get; }
 	}
 }

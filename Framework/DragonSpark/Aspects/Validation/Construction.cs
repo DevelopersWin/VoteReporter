@@ -18,8 +18,10 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
 {
-	[LinesOfCodeAvoided( 10 )]
-	public class ApplyAutoValidationAttribute : Attribute, IAspectProvider
+	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 10 ), AttributeUsage( AttributeTargets.Class )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict, PersistMetaData =  true )]
+	public class ApplyAutoValidationAttribute : TypeLevelAspect, IAspectProvider
 	{
 		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstanceFactory.Instance.ToDelegate();
 
@@ -46,11 +48,11 @@ namespace DragonSpark.Aspects.Validation
 		AutoValidationControllerFactory() : this( AdapterLocator.Instance.ToDelegate() ) {}
 
 		readonly Func<object, ParameterInstanceProfile> profileSource;
-		readonly Func<Delegate, IParameterAwareHandler> handlerSource;
+		readonly Func<InstanceMethod, IParameterAwareHandler> handlerSource;
 
-		protected AutoValidationControllerFactory( Func<object, ParameterInstanceProfile> profileSource ) : this( profileSource, ParameterHandlerLocator.Instance.ToDelegate() ) {}
+		protected AutoValidationControllerFactory( Func<object, ParameterInstanceProfile> profileSource ) : this( profileSource, ParameterHandlerRegistry.Instance.For ) {}
 
-		protected AutoValidationControllerFactory( Func<object, ParameterInstanceProfile> profileSource, Func<Delegate, IParameterAwareHandler> handlerSource )
+		protected AutoValidationControllerFactory( Func<object, ParameterInstanceProfile> profileSource, Func<InstanceMethod, IParameterAwareHandler> handlerSource )
 		{
 			this.profileSource = profileSource;
 			this.handlerSource = handlerSource;
@@ -59,7 +61,7 @@ namespace DragonSpark.Aspects.Validation
 		public override IAutoValidationController Create( object parameter )
 		{
 			var profile = profileSource( parameter );
-			var result = new AutoValidationController( profile.Adapter/*, handlerSource( profile.Value.Key )*/ );
+			var result = new AutoValidationController( profile.Adapter, handlerSource( profile.Key ) );
 			return result;
 		}
 	}
@@ -162,48 +164,6 @@ namespace DragonSpark.Aspects.Validation
 			}
 		}
 	}
-
-/*public sealed class AutoValidationValidationAspect : AutoValidationAspectBase
-	{
-		public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			var controller = AutoValidation.Controller( args.Instance );
-			if ( controller != null )
-			{
-				var parameter = args.Arguments[0];
-				var valid = controller.IsValid( parameter );
-				if ( !valid.HasValue )
-				{
-					controller.MarkValid( parameter, args.GetReturnValue<bool>() );
-				}
-				else
-				{
-					args.ReturnValue = valid.Value;
-				}
-			}
-			else
-			{
-				base.OnInvoke( args );
-			}
-		}
-	}
-
-	public sealed class AutoValidationExecuteAspect : AutoValidationAspectBase
-	{
-		public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			var controller = AutoValidation.Controller( args.Instance );
-			if ( controller != null )
-			{
-				args.ReturnValue = controller.Execute( args.Arguments[0] ) ? args.GetReturnValue() : args.ReturnValue;
-			}
-			else
-			{
-				base.OnInvoke( args );
-			}
-		}
-	}
-*/
 
 	public interface IProfile : IEnumerable<Func<Type, AspectInstance>>
 	{
@@ -324,7 +284,7 @@ namespace DragonSpark.Aspects.Validation
 				var instance = factory( parameter );
 				if ( instance != null )
 				{
-					// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"YO: {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));
+					// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));
 					yield return instance;
 				}
 			}

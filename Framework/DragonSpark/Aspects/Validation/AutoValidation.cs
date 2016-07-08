@@ -1,16 +1,18 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
+using PostSharp.Aspects;
 
 namespace DragonSpark.Aspects.Validation
 {
 	public static class AutoValidation
 	{
-		public static ImmutableArray<IProfile> DefaultProfiles { get; } = new IProfile[] { GenericFactoryProfile.Instance, FactoryProfile.Instance, GenericCommandProfile.Instance, CommandProfile.Instance }.ToImmutableArray();
+		public static ImmutableArray<IProfile> DefaultProfiles { get; } = new IProfile[] { GenericFactoryProfile.Instance, GenericCommandProfile.Instance, FactoryProfile.Instance, CommandProfile.Instance }.ToImmutableArray();
 
 		class GenericFactoryProfile : Profile
 		{
@@ -94,44 +96,32 @@ namespace DragonSpark.Aspects.Validation
 		AutoValidationControllerResult Execute( object parameter, out object result );
 	}
 
-	public class ParameterHandlerLocator : FactoryBase<Delegate, IParameterAwareHandler>
-	{
-		public static ParameterHandlerLocator Instance { get; } = new ParameterHandlerLocator();
-
-		readonly IDelegateParameterHandlerRegistry registry;
-		readonly Func<Delegate, Delegate> lookup;
-
-		ParameterHandlerLocator() : this( DelegateParameterHandlerRegistry.Instance, Delegates.Default.Lookup ) {}
-
-		public ParameterHandlerLocator( IDelegateParameterHandlerRegistry registry, Func<Delegate, Delegate> lookup )
-		{
-			this.registry = registry;
-			this.lookup = lookup;
-		}
-
-		public override IParameterAwareHandler Create( Delegate parameter )
-		{
-			var key = lookup( parameter );
-			var result = key != null ? From( registry.Get( key ) ) : ParameterAwareHandler.Instance;
-			return result;
-		}
-
-		static IParameterAwareHandler From( ImmutableArray<IParameterAwareHandler> handlers ) => handlers.ToArray().Only() ?? new CompositeParameterAwareHandler( handlers );
-	}
-
 	public enum AutoValidationControllerResult { None, ResultFound, Proceed }
 
-	class AutoValidationController : ArgumentCache<int, object>, IAutoValidationController
+	public interface IMethodAwareAspect
+	{
+		MethodBase Method { get; }
+	}
+
+	public interface IAspectHub
+	{
+		void Register( IAspect aspect );
+	}
+
+	class AutoValidationController : ConcurrentDictionary<int, object>, IAutoValidationController, IAspectHub
 	{
 		readonly IParameterValidationAdapter validator;
-		
-		public AutoValidationController( IParameterValidationAdapter validator/*, IParameterAwareHandler handler*/ )
+		readonly IParameterAwareHandler handler;
+
+		public AutoValidationController( IParameterValidationAdapter validator, IParameterAwareHandler handler )
 		{
 			this.validator = validator;
+			this.handler = handler;
 		}
 
-		// public new bool? IsValid( object parameter ) => /*handler.Handles( parameter ) ? true :*/ base.IsValid( parameter );
-		public bool? IsValid( object parameter )
+		public bool? IsValid( object parameter ) => handler.Handles( parameter ) ? true : CheckValid( parameter );
+
+		bool? CheckValid( object parameter )
 		{
 			object current;
 			return TryGetValue( Environment.CurrentManagedThreadId, out current ) ? (bool?)Equals( current, parameter ) : null;
@@ -152,13 +142,19 @@ namespace DragonSpark.Aspects.Validation
 
 		public AutoValidationControllerResult Execute( object parameter, out object result )
 		{
-			result = null;
 			var status = 
-				/*handler.Handle( parameter, out result ) ? AutoValidationControllerResult.ResultFound 
-				: */
-				IsValid( parameter ).GetValueOrDefault() || validator.IsValid( parameter ) ? AutoValidationControllerResult.Proceed : AutoValidationControllerResult.None;
+				handler.Handle( parameter, out result ) ? AutoValidationControllerResult.ResultFound 
+				: 
+				CheckValid( parameter ).GetValueOrDefault() || validator.IsValid( parameter ) ? AutoValidationControllerResult.Proceed : AutoValidationControllerResult.None;
 			MarkValid( parameter, false );
 			return status;
+		}
+
+		// readonly ISet<>
+
+		public void Register( IAspect aspect )
+		{
+			
 		}
 	}
 }

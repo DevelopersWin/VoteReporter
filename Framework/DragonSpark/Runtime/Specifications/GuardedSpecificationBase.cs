@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
+using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -13,7 +13,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly ISpecification inner;
 
-		public InverseSpecification( [Required]ISpecification inner )
+		public InverseSpecification( ISpecification inner )
 		{
 			this.inner = inner;
 		}
@@ -50,9 +50,14 @@ namespace DragonSpark.Runtime.Specifications
 
 	public abstract class GuardedSpecificationBase<T> : SpecificationBase<T>
 	{
-		protected GuardedSpecificationBase() {}
-		protected GuardedSpecificationBase( Coerce<T> coercer ) : base( coercer ) {}
-		
-		protected override bool IsSatisfiedByCoerced( T parameter ) => parameter.With( this.ToDelegate() );
+		readonly Func<T, bool> isSatisfiedBy;
+
+		protected GuardedSpecificationBase() : this( Defaults<T>.Coercer ) {}
+		protected GuardedSpecificationBase( Coerce<T> coercer ) : base( coercer )
+		{
+			isSatisfiedBy = IsSatisfiedBy;
+		}
+
+		protected override bool IsSatisfiedByCoerced( T parameter ) => parameter.With( isSatisfiedBy );
 	}
 }

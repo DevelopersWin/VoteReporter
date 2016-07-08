@@ -62,7 +62,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class ConstructorStore : EqualityCache<ConstructTypeRequest, ConstructorInfo>
+	public class ConstructorStore : EqualityReferenceCache<ConstructTypeRequest, ConstructorInfo>
 	{
 		public static ConstructorStore Instance { get; } = new ConstructorStore();
 

@@ -8,7 +8,12 @@ namespace DragonSpark.Activation
 	class AutoValidatingFactory : IFactoryWithParameter
 	{
 		readonly IFactoryWithParameter inner;
-		public AutoValidatingFactory( IFactoryWithParameter inner ) : this( new AutoValidationController( new FactoryAdapter( inner )/*, ParameterHandlerLocator.Instance.Create( new Func<object, object>( inner.Create ) )*/ ), inner ) {}
+		public AutoValidatingFactory( IFactoryWithParameter inner ) : this( new AutoValidationController( new FactoryAdapter( inner ), 
+			
+			// new FixedFactory<InstanceMethod, IParameterAwareHandler>( ParameterHandlerRegistry.Instance.For, new InstanceMethod( inner, FactoryProfileFactory.Method ) ).Create
+			ParameterHandlerRegistry.Instance.For( new InstanceMethod( inner, FactoryProfileFactory.Method ) )
+			
+			), inner ) {}
 
 		protected AutoValidatingFactory( IAutoValidationController controller, IFactoryWithParameter inner )
 		{
@@ -47,7 +52,12 @@ namespace DragonSpark.Activation
 	class AutoValidatingFactory<TParameter, TResult> : AutoValidatingFactory, IFactory<TParameter, TResult>
 	{
 		readonly IFactory<TParameter, TResult> inner;
-		public AutoValidatingFactory( IFactory<TParameter, TResult> inner ) : base( new AutoValidationController( new FactoryAdapter<TParameter, TResult>( inner )/*, ParameterHandlerLocator.Instance.Create( new Func<TParameter, TResult>( inner.Create ) )*/ ), inner )
+		public AutoValidatingFactory( IFactory<TParameter, TResult> inner ) : base( new AutoValidationController( new FactoryAdapter<TParameter, TResult>( inner ), 
+			
+			// new FixedFactory<InstanceMethod, IParameterAwareHandler>( ParameterHandlerRegistry.Instance.For, new InstanceMethod( inner, GenericFactoryProfileFactory.Method<TParameter, TResult>.Default ) ).Create
+			ParameterHandlerRegistry.Instance.For( new InstanceMethod( inner, GenericFactoryProfileFactory.Method<TParameter, TResult>.Default ) ) 
+			
+			), inner )
 		{
 			this.inner = inner;
 		}

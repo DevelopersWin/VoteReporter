@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
@@ -27,7 +28,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		public void Performance()
 		{
-			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied,*/ BasicAutoValidationAppliedInline ).Run( 2 );
+			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied,*/ BasicAutoValidationAppliedInline ).Run();
 		}
 
 		[Fact]
@@ -55,7 +56,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		{
 			// var mapped = typeof(CachedAppliedExtendedFactory).Adapt().GetMappedMethods<IFactory<int, float>>();
 
-			/*var sut = new CachedAppliedExtendedFactory();
+			var sut = new CachedAppliedExtendedFactory();
 			var first = sut.Create( 6776 );
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CreateCalled );
@@ -73,7 +74,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
-			Assert.Equal( first, second );*/
+			Assert.Equal( first, second );
 		}
 
 		static void BasicAutoValidationWith( IFactory<int, float> factory, IExtendedFactory sut )
@@ -123,11 +124,11 @@ namespace DragonSpark.Testing.Aspects.Validation
 			void Reset();
 		}
 
-		/*class CachedAppliedExtendedFactory : AppliedExtendedFactory
+		class CachedAppliedExtendedFactory : AppliedExtendedFactory
 		{
 			[Freeze]
 			public override float Create( int parameter ) => base.Create( parameter );
-		}*/
+		}
 		
 		[ApplyAutoValidation]
 		class AppliedExtendedFactory : IExtendedFactory

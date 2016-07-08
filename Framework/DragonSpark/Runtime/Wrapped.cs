@@ -204,7 +204,7 @@ namespace DragonSpark.Runtime
 
 		Delegates() : base( o => new Cache<MethodInfo, Delegate>( new Factory( o ).Create ) ) {}
 
-		public Delegate Lookup( Delegate source )
+		/*public Delegate Lookup( Delegate source )
 		{
 			if ( Contains( source.Target ) )
 			{
@@ -216,7 +216,7 @@ namespace DragonSpark.Runtime
 				}
 			}
 			return null;
-		}
+		}*/
 
 		/*public T From<T>( T source ) where T : class
 		{
