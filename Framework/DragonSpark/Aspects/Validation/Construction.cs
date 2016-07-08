@@ -129,11 +129,14 @@ namespace DragonSpark.Aspects.Validation
 			public override void OnInvoke( MethodInterceptionArgs args )
 			{
 				var parameter = args.Arguments[0];
-				var valid = controller.IsValid( parameter, args.GetReturnValue<bool> );
-				if ( valid.HasValue )
+				var valid = controller.IsValid( parameter );
+				if ( !valid.HasValue )
+				{
+					controller.MarkValid( parameter, args.GetReturnValue<bool>() );
+				}
+				else
 				{
 					args.ReturnValue = valid.Value;
-					// controller.MarkValid( parameter, args.GetReturnValue<bool>() );
 				}
 			}
 		}
@@ -154,12 +157,7 @@ namespace DragonSpark.Aspects.Validation
 
 			public override void OnInvoke( MethodInterceptionArgs args )
 			{
-				// object result;
 				args.ReturnValue = controller.Execute( args.Arguments[0], args.GetReturnValue );
-				/*if ( execute )
-				{
-					
-				}*/
 
 				/*object result;
 				switch ( controller.Execute( args.Arguments[0], out result ) )

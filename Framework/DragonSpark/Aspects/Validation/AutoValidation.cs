@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Aspects;
 using System;
@@ -88,18 +89,18 @@ namespace DragonSpark.Aspects.Validation
 
 	public interface IAutoValidationController
 	{
-		bool? IsValid( object parameter, Func<bool> proceed );
+		bool? IsValid( object parameter );
 
-		// void MarkValid( object parameter, bool valid );
+		void MarkValid( object parameter, bool valid );
 
 		object Execute( object parameter, Func<object> proceed );
 	}
 
-	// public enum AutoValidationControllerResult { None, ResultFound, Proceed }
+	public enum AutoValidationControllerResult { None, ResultFound, Proceed }
 
 	public interface IMethodAware
 	{
-		MethodBase Method { get; }
+		MethodInfo Method { get; }
 	}
 
 	public interface IAspectHub
@@ -131,31 +132,25 @@ namespace DragonSpark.Aspects.Validation
 	class AutoValidationController : ConcurrentDictionary<int, object>, IAutoValidationController, IAspectHub
 	{
 		readonly IParameterValidationAdapter validator;
-		
-		public AutoValidationController( IParameterValidationAdapter validator )
+		readonly Func<MethodInfo, bool> specification;
+
+		public AutoValidationController( IParameterValidationAdapter validator ) : this( validator, MethodEqualitySpecification.For( validator.Method ) ) {}
+
+		public AutoValidationController( IParameterValidationAdapter validator, Func<MethodInfo, bool> specification )
 		{
 			this.validator = validator;
+			this.specification = specification;
 		}
 
 		IParameterAwareHandler Handler { get; set; }
 
-		public bool? IsValid( object parameter, Func<bool> proceed )
-		{
-			var result = CheckValid( parameter );
-			if ( !result.HasValue )
-			{
-				MarkValid( parameter, (bool)( result = proceed() ) );
-			}
-			return result;
-		}
-
-		bool? CheckValid( object parameter )
+		public bool? IsValid( object parameter )
 		{
 			object current;
-			return TryGetValue( Environment.CurrentManagedThreadId, out current ) ? (bool?)Equals( current, parameter ) : null;
+			return Handler != null && Handler.Handles( parameter ) ? true : TryGetValue( Environment.CurrentManagedThreadId, out current ) ? (bool?)Equals( current, parameter ) : null;
 		}
 
-		void MarkValid( object parameter, bool valid )
+		public void MarkValid( object parameter, bool valid )
 		{
 			if ( valid )
 			{
@@ -170,33 +165,44 @@ namespace DragonSpark.Aspects.Validation
 
 		public object Execute( object parameter, Func<object> proceed )
 		{
-			var valid = CheckValid( parameter ).GetValueOrDefault() || validator.IsValid( parameter );
-			var result = valid ? proceed() : null;
-			MarkValid( parameter, false );
-			return result;
+			object handled;
+			if ( Handler != null && Handler.Handle( parameter, out handled ) )
+			{
+				MarkValid( parameter, false );
+				return handled;
+			}
 
-			/*result = null;
-			var status = 
-				/*( Handler != null && Handler.Handle( parameter, out result ) ) ? AutoValidationControllerResult.ResultFound 
-				: #1#
-				CheckValid( parameter ).GetValueOrDefault() || validator.IsValid( parameter ) ? AutoValidationControllerResult.Proceed : AutoValidationControllerResult.None;
-			MarkValid( parameter, false );
-			return status;*/
+			var valid = IsValid( parameter ).GetValueOrDefault() || CheckAndMark( parameter );
+			if ( valid )
+			{
+				var result = proceed();
+				MarkValid( parameter, false );
+				return result;
+			}
+			return null;
 		}
 
-		// readonly ISet<>
+		bool CheckAndMark( object parameter )
+		{
+			var result = validator.IsValid( parameter );
+			if ( result )
+			{
+				MarkValid( parameter, true );
+			}
+			return result;
+		}
 
 		public void Register( IAspect aspect )
 		{
-			/*var methodAware = aspect as IMethodAware;
-			if ( methodAware != null && Equals( methodAware.Method, validator.Method ) )
+			var methodAware = aspect as IMethodAware;
+			if ( methodAware != null && specification( methodAware.Method ) )
 			{
 				var handler = aspect as IParameterAwareHandler;
 				if ( handler != null )
 				{
 					Handler = Handler != null ? new LinkedParameterAwareHandler( handler, Handler ) : handler;
 				}
-			}*/
+			}
 		}
 	}
 }

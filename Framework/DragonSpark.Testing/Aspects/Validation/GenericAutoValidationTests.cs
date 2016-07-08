@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		public void Performance()
 		{
-			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied,*/ BasicAutoValidationAppliedInline ).Run();
+			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();
 		}
 
 		[Fact]
@@ -54,8 +54,6 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Fact]
 		public void ParameterHandler()
 		{
-			// var mapped = typeof(CachedAppliedExtendedFactory).Adapt().GetMappedMethods<IFactory<int, float>>();
-
 			var sut = new CachedAppliedExtendedFactory();
 			var first = sut.Create( 6776 );
 			Assert.Equal( 0, sut.CanCreateCalled );

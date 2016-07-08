@@ -39,7 +39,7 @@ namespace DragonSpark.Aspects
 			this.hubSource = hubSource;
 		}
 
-		public override void RuntimeInitialize( MethodBase method ) => Profile = new MethodProfile( method );
+		public override void RuntimeInitialize( MethodBase method ) => Profile = new MethodProfile( (MethodInfo)method );
 
 		MethodProfile Profile { get; set; }
 
@@ -50,13 +50,6 @@ namespace DragonSpark.Aspects
 			hubSource( adviceArgs.Instance )?.Register( result );
 
 			return result;
-			
-
-			// Profile.Create(  )
-
-			/*var instance = new InstanceMethod( adviceArgs.Instance, Profile.Method );
-			var attribute = Profile.Create( instance );
-			return attribute;*/
 		}
 
 		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
@@ -65,9 +58,9 @@ namespace DragonSpark.Aspects
 		{
 			readonly IArgumentCache<object, object> cache;
 
-			public SingleParameterFreeze( MethodBase method ) : this( new ArgumentCache<object, object>(), method ) {}
+			public SingleParameterFreeze( MethodInfo method ) : this( new ArgumentCache<object, object>(), method ) {}
 
-			SingleParameterFreeze( IArgumentCache<object, object> cache, MethodBase method ) : base( new CacheParameterHandler<object, object>( cache ), method  )
+			SingleParameterFreeze( IArgumentCache<object, object> cache, MethodInfo method ) : base( new CacheParameterHandler<object, object>( cache ), method  )
 			{
 				this.cache = cache;
 			}
@@ -77,22 +70,22 @@ namespace DragonSpark.Aspects
 
 		struct MethodProfile
 		{
-			public MethodProfile( MethodBase method ) : this( method, method.GetParameters().Length == 1 ? (Func<MethodBase, FreezeAttribute>)ParameterConstructor<MethodBase, SingleParameterFreeze>.Default : ParameterConstructor<MethodBase, Freeze>.Default ) {}
+			public MethodProfile( MethodInfo method ) : this( method, method.GetParameters().Length == 1 ? (Func<MethodInfo, FreezeAttribute>)ParameterConstructor<MethodInfo, SingleParameterFreeze>.Default : ParameterConstructor<MethodInfo, Freeze>.Default ) {}
 
-			MethodProfile( MethodBase method, Func<MethodBase, FreezeAttribute> create )
+			MethodProfile( MethodInfo method, Func<MethodInfo, FreezeAttribute> create )
 			{
 				Method = method;
 				Create = create;
 			}
 
-			public MethodBase Method { get; }
-			public Func<MethodBase, FreezeAttribute> Create { get; }
+			public MethodInfo Method { get; }
+			public Func<MethodInfo, FreezeAttribute> Create { get; }
 		}
 
 		abstract class InstanceFreezeBase : FreezeAttribute, IParameterAwareHandler, IMethodAware
 		{
 			readonly IParameterAwareHandler handler;
-			protected InstanceFreezeBase( IParameterAwareHandler handler, MethodBase method )
+			protected InstanceFreezeBase( IParameterAwareHandler handler, MethodInfo method )
 			{
 				this.handler = handler;
 				Method = method;
@@ -102,16 +95,16 @@ namespace DragonSpark.Aspects
 
 			public bool Handle( object parameter, out object handled ) => handler.Handle( parameter, out handled );
 
-			public MethodBase Method { get; }
+			public MethodInfo Method { get; }
 		}
 
 		sealed class Freeze : InstanceFreezeBase
 		{
 			readonly IArgumentCache<object[], object> cache;
 
-			public Freeze( MethodBase method ) : this( new ArgumentCache<object[], object>(), method ) {}
+			public Freeze( MethodInfo method ) : this( new ArgumentCache<object[], object>(), method ) {}
 
-			Freeze( IArgumentCache<object[], object> cache, MethodBase method ) : base( new CacheParameterHandler<object[], object>( cache ), method  )
+			Freeze( IArgumentCache<object[], object> cache, MethodInfo method ) : base( new CacheParameterHandler<object[], object>( cache ), method  )
 			{
 				this.cache = cache;
 			}

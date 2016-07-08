@@ -22,10 +22,6 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			foreach ( var action in actions )
 			{
 				action();
-				/*using ( action.Method.Profile( Ignore ) )
-				{
-					action();
-				}*/
 			}
 		}
 
@@ -102,8 +98,8 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 				public override Result Create()
 				{
-					GC.Collect();
-					GC.WaitForPendingFinalizers();
+					/*GC.Collect();
+					GC.WaitForPendingFinalizers();*/
 					
 					var data = EnumerableEx.Generate( 0, Continue, i => i + 1, Measure ).Select( span => span.Ticks ).ToArray();
 					var average = data.Average( span => span );

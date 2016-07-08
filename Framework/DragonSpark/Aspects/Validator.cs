@@ -133,7 +133,7 @@ namespace DragonSpark.Aspects
 
 	public class FactoryAdapter : IParameterValidationAdapter
 	{
-		readonly static MethodBase Method = typeof(IFactoryWithParameter).GetTypeInfo().GetDeclaredMethod( nameof(IFactoryWithParameter.Create) );
+		readonly static MethodInfo Method = typeof(IFactoryWithParameter).GetTypeInfo().GetDeclaredMethod( nameof(IFactoryWithParameter.Create) );
 
 		readonly IFactoryWithParameter inner;
 
@@ -144,12 +144,12 @@ namespace DragonSpark.Aspects
 
 		public bool IsValid( object parameter ) => inner.CanCreate( parameter );
 
-		MethodBase IMethodAware.Method => Method;
+		MethodInfo IMethodAware.Method => Method;
 	}
 
 	public class FactoryAdapter<TParameter, TResult> : IParameterValidationAdapter
 	{
-		readonly static MethodBase Method = typeof(IFactory<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IFactory<TParameter, TResult>.Create) );
+		readonly static MethodInfo Method = typeof(IFactory<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IFactory<TParameter, TResult>.Create) );
 		
 		readonly IFactory<TParameter, TResult> inner;
 
@@ -160,12 +160,12 @@ namespace DragonSpark.Aspects
 
 		public bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : inner.CanCreate( parameter );
 
-		MethodBase IMethodAware.Method => Method;
+		MethodInfo IMethodAware.Method => Method;
 	}
 
 	public class CommandAdapter : IParameterValidationAdapter
 	{
-		readonly static MethodBase Method = typeof(ICommand).GetTypeInfo().GetDeclaredMethod( nameof(ICommand.Execute) );
+		readonly static MethodInfo Method = typeof(ICommand).GetTypeInfo().GetDeclaredMethod( nameof(ICommand.Execute) );
 
 		readonly ICommand inner;
 		public CommandAdapter( ICommand inner )
@@ -175,12 +175,12 @@ namespace DragonSpark.Aspects
 
 		public bool IsValid( object parameter ) => inner.CanExecute( parameter );
 
-		MethodBase IMethodAware.Method => Method;
+		MethodInfo IMethodAware.Method => Method;
 	}
 
 	public class CommandAdapter<T> : IParameterValidationAdapter
 	{
-		readonly static MethodBase Method = typeof(ICommand<T>).GetTypeInfo().GetDeclaredMethod( nameof(ICommand<T>.Execute) );
+		readonly static MethodInfo Method = typeof(ICommand<T>).GetTypeInfo().GetDeclaredMethod( nameof(ICommand<T>.Execute) );
 
 		readonly ICommand<T> inner;
 		public CommandAdapter( ICommand<T> inner )
@@ -190,7 +190,7 @@ namespace DragonSpark.Aspects
 
 		public bool IsValid( object parameter ) => parameter is T ? inner.CanExecute( (T)parameter ) : inner.CanExecute( parameter );
 
-		MethodBase IMethodAware.Method => Method;
+		MethodInfo IMethodAware.Method => Method;
 	}
 
 	public interface IAutoValidationController

@@ -22,9 +22,31 @@ namespace DragonSpark.Activation
 
 		protected IAutoValidationController Controller { get; }
 
-		public bool CanCreate( object parameter ) => Controller.IsValid( parameter, () => inner.CanCreate( parameter ) ).GetValueOrDefault();
+		public bool CanCreate( object parameter )
+		{
+			var valid = Controller.IsValid( parameter );
+			if ( !valid.HasValue )
+			{
+				var result = inner.CanCreate( parameter );
+				Controller.MarkValid( parameter, result );
+				return result;
+			}
+			return valid.Value;
+		}
 
-		public object Create( object parameter ) => Controller.Execute( parameter, () => inner.Create( parameter ) );
+		public object Create( object parameter )
+		{
+			return Controller.Execute( parameter, () => inner.Create( parameter ) );
+			/*object result;
+			switch ( Controller.Execute( parameter, out result ) )
+			{
+				case AutoValidationControllerResult.ResultFound:
+					return result;
+				case AutoValidationControllerResult.Proceed:
+					return inner.Create( parameter );
+			}
+			return null;*/
+		}
 	}
 
 	class AutoValidatingFactory<TParameter, TResult> : AutoValidatingFactory, IFactory<TParameter, TResult>
@@ -40,8 +62,30 @@ namespace DragonSpark.Activation
 			this.inner = inner;
 		}
 
-		public bool CanCreate( TParameter parameter ) => Controller.IsValid( parameter, () => inner.CanCreate( parameter ) ).GetValueOrDefault();
+		public bool CanCreate( TParameter parameter )
+		{
+			var valid = Controller.IsValid( parameter );
+			if ( !valid.HasValue )
+			{
+				var result = inner.CanCreate( parameter );
+				Controller.MarkValid( parameter, result );
+				return result;
+			}
+			return valid.Value;
+		}
 
-		public TResult Create( TParameter parameter ) => (TResult)Controller.Execute( parameter, () => inner.Create( parameter ) );
+		public TResult Create( TParameter parameter )
+		{
+			return (TResult)Controller.Execute( parameter, () => inner.Create( parameter ) );
+			/*object result;
+			switch ( Controller.Execute( parameter, out result ) )
+			{
+				case AutoValidationControllerResult.ResultFound:
+					return (TResult)result;
+				case AutoValidationControllerResult.Proceed:
+					return inner.Create( parameter );
+			}
+			return default(TResult);*/
+		}
 	}
 }
