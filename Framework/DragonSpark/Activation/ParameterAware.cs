@@ -4,8 +4,6 @@ using DragonSpark.Runtime.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Reflection;
 
 namespace DragonSpark.Activation
 {
@@ -45,7 +43,7 @@ namespace DragonSpark.Activation
 		}
 	}
 	
-	class RegisteredCacheFactory<TKey, TValue> : FactoryBase<InstanceMethod, IArgumentCache<TKey, TValue>>
+	/*class RegisteredCacheFactory<TKey, TValue> : FactoryBase<InstanceMethod, IArgumentCache<TKey, TValue>>
 	{
 		public static RegisteredCacheFactory<TKey, TValue> Instance { get; } = new RegisteredCacheFactory<TKey, TValue>();
 		RegisteredCacheFactory() : this( ParameterHandlerRegistry.Instance ) {}
@@ -63,7 +61,9 @@ namespace DragonSpark.Activation
 			registry.Register( parameter, new CacheParameterHandler<TKey, TValue>( result ) );
 			return result;
 		}
-	}
+	}*/
+
+	// public interface I
 
 	public interface IParameterAwareHandler
 	{
@@ -85,7 +85,7 @@ namespace DragonSpark.Activation
 		}
 	}*/
 
-	class CompositeParameterAwareHandler : ConcurrentDictionary<object, IParameterAwareHandler>, IParameterAwareHandler
+	/*class CompositeParameterAwareHandler : ConcurrentDictionary<object, IParameterAwareHandler>, IParameterAwareHandler
 	{
 		readonly ImmutableArray<IParameterAwareHandler> handlers;
 
@@ -129,9 +129,9 @@ namespace DragonSpark.Activation
 			}
 			return null;
 		}
-	}
+	}*/
 
-	public interface IParameterHandlerRegistry
+	/*public interface IParameterHandlerRegistry
 	{
 		void Register( InstanceMethod instance, IParameterAwareHandler handler );
 
@@ -148,9 +148,9 @@ namespace DragonSpark.Activation
 
 		public object Instance { get; }
 		public MethodBase Method { get; }
-	}
+	}*/
 
-	class ParameterAwareHandler : IParameterAwareHandler
+	/*class ParameterAwareHandler : IParameterAwareHandler
 	{
 		public static ParameterAwareHandler Instance { get; } = new ParameterAwareHandler();
 
@@ -164,9 +164,9 @@ namespace DragonSpark.Activation
 			handled = null;
 			return false;
 		}
-	}
+	}*/
 
-	class ParameterHandlerRegistry : ActivatedCache<ParameterHandlerRegistry.Inner>, IParameterHandlerRegistry
+	/*class ParameterHandlerRegistry : ActivatedCache<ParameterHandlerRegistry.Inner>, IParameterHandlerRegistry
 	{
 		public new static IParameterHandlerRegistry Instance { get; } = new ParameterHandlerRegistry();
 
@@ -185,7 +185,7 @@ namespace DragonSpark.Activation
 		}
 
 		public IParameterAwareHandler For( InstanceMethod instance ) => new CompositeParameterAwareHandler( Get( instance.Instance ).Get( instance.Method ).ToImmutableArray() );
-	}
+	}*/
 
 	class CacheParameterHandler<TKey, TValue> : IParameterAwareHandler
 	{

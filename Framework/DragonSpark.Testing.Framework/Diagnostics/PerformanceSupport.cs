@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using System;
 using System.Collections.Immutable;
@@ -9,7 +8,6 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 {
 	public class PerformanceSupport
 	{
-		readonly static Action<string> Ignore = IgnoredOutputCommand.Instance.ToDelegate();
 		readonly static string[] Titles = { "Test", "Average", "Median", "Mode" };
 		const string TimeFormat = "ss'.'ffff";
 
@@ -23,10 +21,11 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 			foreach ( var action in actions )
 			{
-				using ( action.Method.Profile( Ignore ) )
+				action();
+				/*using ( action.Method.Profile( Ignore ) )
 				{
 					action();
-				}
+				}*/
 			}
 		}
 
@@ -91,18 +90,21 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			class Run : FactoryBase<Result>
 			{
 				readonly Action action;
-				readonly int numberOfRuns;
-				readonly int perRun;
+				readonly int numberOfSamples;
+				readonly int perSample;
 				
-				public Run( Action action, int numberOfRuns, int perRun )
+				public Run( Action action, int numberOfSamples, int perSample )
 				{
 					this.action = action;
-					this.numberOfRuns = numberOfRuns;
-					this.perRun = perRun;
+					this.numberOfSamples = numberOfSamples;
+					this.perSample = perSample;
 				}
 
 				public override Result Create()
 				{
+					GC.Collect();
+					GC.WaitForPendingFinalizers();
+					
 					var data = EnumerableEx.Generate( 0, Continue, i => i + 1, Measure ).Select( span => span.Ticks ).ToArray();
 					var average = data.Average( span => span );
 					var median = MedianFactory.Instance.Create( data.ToImmutableArray() );
@@ -111,20 +113,17 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 					return result;
 				}
 
-				bool Continue( int i ) => i < numberOfRuns;
+				bool Continue( int i ) => i < numberOfSamples;
 
 				TimeSpan Measure<T>( T _ )
 				{
-					var timer = new Timer();
-					using ( timer )
+					var watch = System.Diagnostics.Stopwatch.StartNew();
+					for ( var i = 0; i < perSample; i++ )
 					{
-						timer.Start();
-						for ( var i = 0; i < perRun; i++ )
-						{
-							action();
-						}
+						action();
 					}
-					var result = timer.Elapsed;
+					watch.Stop();
+					var result = watch.Elapsed;
 					return result;
 				}
 			}

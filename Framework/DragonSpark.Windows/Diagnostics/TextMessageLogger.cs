@@ -15,9 +15,11 @@ namespace DragonSpark.Windows.Diagnostics
 {
 	public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
-		public ProfilerFactory() : base( TimerEventConverter.Instance.Create ) {}
+		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Instance.ToDelegate();
 
-		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource ) : base( loggerSource, TimerEventConverter.Instance.Create ) {}
+		public ProfilerFactory() : base( TemplateSource ) {}
+
+		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource ) : base( loggerSource, TemplateSource ) {}
 	}
 
 	public class Timer : DragonSpark.Diagnostics.Timer

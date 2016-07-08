@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
@@ -35,13 +36,13 @@ namespace DragonSpark.Aspects
 
 	public struct AutoValidationProfile
 	{
-		public AutoValidationProfile( Func<object, ParameterInstanceProfile> factory, ImmutableArray<AutoValidationTypeDescriptor> descriptors )
+		public AutoValidationProfile( Func<object, IParameterValidationAdapter> factory, ImmutableArray<AutoValidationTypeDescriptor> descriptors )
 		{
 			Factory = factory;
 			Descriptors = descriptors;
 		}
 
-		public Func<object, ParameterInstanceProfile> Factory { get; }
+		public Func<object, IParameterValidationAdapter> Factory { get; }
 		public ImmutableArray<AutoValidationTypeDescriptor> Descriptors { get; }
 	}
 
@@ -59,17 +60,17 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}
 
-	abstract class ParameterProfileFactoryBase<T> : ProjectedFactory<T, ParameterInstanceProfile> where T : class
+	abstract class AdapterFactoryBase<T> : ProjectedFactory<T, IParameterValidationAdapter> where T : class
 	{
-		protected ParameterProfileFactoryBase( Func<T, ParameterInstanceProfile> create ) : base( create ) {}
+		protected AdapterFactoryBase( Func<T, IParameterValidationAdapter> create ) : base( create ) {}
 	}
 
-	abstract class GenericParameterProfileFactoryBase : GenericInvocationFactory<object, ParameterInstanceProfile>
+	abstract class GenericParameterProfileFactoryBase : GenericInvocationFactory<object, IParameterValidationAdapter>
 	{
 		protected GenericParameterProfileFactoryBase( Type genericTypeDefinition, Type owningType, string methodName ) : base( genericTypeDefinition, owningType, methodName ) {}
 	}
 
-	public struct ParameterInstanceProfile
+	/*public struct ParameterInstanceProfile
 	{
 		public ParameterInstanceProfile( IParameterValidationAdapter adapter, InstanceMethod key )
 		{
@@ -79,7 +80,7 @@ namespace DragonSpark.Aspects
 
 		public IParameterValidationAdapter Adapter { get; }
 		public InstanceMethod Key { get; }
-	}
+	}*/
 	
 	sealed class GenericFactoryProfileFactory : GenericParameterProfileFactoryBase
 	{
@@ -87,41 +88,28 @@ namespace DragonSpark.Aspects
 
 		GenericFactoryProfileFactory() : base( typeof(IFactory<,>), typeof(GenericFactoryProfileFactory), nameof(Create) ) {}
 
-		static ParameterInstanceProfile Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new ParameterInstanceProfile( new FactoryAdapter<TParameter, TResult>( instance ), new InstanceMethod( instance, Method<TParameter, TResult>.Default ) );
-
-		public static class Method<TParameter, TResult>
-		{
-			public static MethodBase Default { get; } = typeof(IFactory<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IFactory<TParameter, TResult>.Create) );
-		}
+		static IParameterValidationAdapter Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
+
 	sealed class GenericCommandProfileFactory : GenericParameterProfileFactoryBase
 	{
 		public static GenericCommandProfileFactory Instance { get; } = new GenericCommandProfileFactory();
 
 		GenericCommandProfileFactory() : base( typeof(ICommand<>), typeof(GenericCommandProfileFactory), nameof(Create) ) {}
 
-		static ParameterInstanceProfile Create<T>( ICommand<T> instance ) => new ParameterInstanceProfile( new CommandAdapter<T>( instance ), new InstanceMethod( instance, Cache<T>.Method ) );
-
-		static class Cache<T>
-		{
-			public static MethodBase Method { get; } = typeof(ICommand<T>).GetTypeInfo().GetDeclaredMethod( nameof(ICommand<T>.Execute) );
-		}
+		static IParameterValidationAdapter Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
-	class CommandProfileFactory : ParameterProfileFactoryBase<ICommand>
+	class CommandProfileFactory : AdapterFactoryBase<ICommand>
 	{
-		readonly static MethodBase Method = typeof(ICommand).GetTypeInfo().GetDeclaredMethod( nameof(ICommand.Execute) );
-
 		public static CommandProfileFactory Instance { get; } = new CommandProfileFactory();
-		CommandProfileFactory() : base( instance => new ParameterInstanceProfile( new CommandAdapter( instance ), new InstanceMethod( instance, Method ) ) ) {}
+		CommandProfileFactory() : base( instance => new CommandAdapter( instance ) ) {}
 	}
 
-	class FactoryProfileFactory : ParameterProfileFactoryBase<IFactoryWithParameter>
+	class FactoryProfileFactory : AdapterFactoryBase<IFactoryWithParameter>
 	{
-		public static MethodBase Method { get; } = typeof(IFactoryWithParameter).GetTypeInfo().GetDeclaredMethod( nameof(IFactoryWithParameter.Create) );
-
 		public static FactoryProfileFactory Instance { get; } = new FactoryProfileFactory();
-		FactoryProfileFactory() : base( instance => new ParameterInstanceProfile( new FactoryAdapter( instance ), new InstanceMethod( instance, Method ) ) ) {}
+		FactoryProfileFactory() : base( instance => new FactoryAdapter( instance ) ) {}
 	}
 
 	public struct AutoValidationParameter
@@ -138,13 +126,15 @@ namespace DragonSpark.Aspects
 		public object Parameter { get; }
 	}
 
-	public interface IParameterValidationAdapter
+	public interface IParameterValidationAdapter : IMethodAware
 	{
 		bool IsValid( object parameter );
 	}
 
 	public class FactoryAdapter : IParameterValidationAdapter
 	{
+		readonly static MethodBase Method = typeof(IFactoryWithParameter).GetTypeInfo().GetDeclaredMethod( nameof(IFactoryWithParameter.Create) );
+
 		readonly IFactoryWithParameter inner;
 
 		public FactoryAdapter( IFactoryWithParameter inner )
@@ -153,10 +143,14 @@ namespace DragonSpark.Aspects
 		}
 
 		public bool IsValid( object parameter ) => inner.CanCreate( parameter );
+
+		MethodBase IMethodAware.Method => Method;
 	}
 
 	public class FactoryAdapter<TParameter, TResult> : IParameterValidationAdapter
 	{
+		readonly static MethodBase Method = typeof(IFactory<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IFactory<TParameter, TResult>.Create) );
+		
 		readonly IFactory<TParameter, TResult> inner;
 
 		public FactoryAdapter( IFactory<TParameter, TResult> inner )
@@ -165,10 +159,14 @@ namespace DragonSpark.Aspects
 		}
 
 		public bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : inner.CanCreate( parameter );
+
+		MethodBase IMethodAware.Method => Method;
 	}
 
 	public class CommandAdapter : IParameterValidationAdapter
 	{
+		readonly static MethodBase Method = typeof(ICommand).GetTypeInfo().GetDeclaredMethod( nameof(ICommand.Execute) );
+
 		readonly ICommand inner;
 		public CommandAdapter( ICommand inner )
 		{
@@ -176,10 +174,14 @@ namespace DragonSpark.Aspects
 		}
 
 		public bool IsValid( object parameter ) => inner.CanExecute( parameter );
+
+		MethodBase IMethodAware.Method => Method;
 	}
 
 	public class CommandAdapter<T> : IParameterValidationAdapter
 	{
+		readonly static MethodBase Method = typeof(ICommand<T>).GetTypeInfo().GetDeclaredMethod( nameof(ICommand<T>.Execute) );
+
 		readonly ICommand<T> inner;
 		public CommandAdapter( ICommand<T> inner )
 		{
@@ -187,6 +189,8 @@ namespace DragonSpark.Aspects
 		}
 
 		public bool IsValid( object parameter ) => parameter is T ? inner.CanExecute( (T)parameter ) : inner.CanExecute( parameter );
+
+		MethodBase IMethodAware.Method => Method;
 	}
 
 	public interface IAutoValidationController
