@@ -24,7 +24,7 @@ namespace DragonSpark.Activation
 		{
 			var info = context( parameter ).GetTypeInfo();
 			var nestedTypes = info.DeclaredNestedTypes.AsTypes().ToArray();
-			var all = nestedTypes.Union( AssemblyTypes.All.Create( info.Assembly ) ).Where( Defaults.ApplicationType ).ToArray();
+			var all = nestedTypes.Union( AssemblyTypes.All.Get( info.Assembly ) ).Where( Defaults.ApplicationType ).ToArray();
 			var requests = Composition.FactoryTypeLocator.Instance.GetMany( all );
 			var candidates = new[] { new FactoryTypeLocator( requests ), locator };
 			var mapped = new LocateTypeRequest( type( parameter ) );

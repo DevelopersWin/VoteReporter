@@ -1,7 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using PostSharp.Aspects.Internals;
@@ -35,11 +35,9 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationTypeSpecification : GuardedSpecificationBase<Type>
 	{
-		public static ApplicationTypeSpecification Instance { get; } = new ApplicationTypeSpecification();
-
+		public static ICache<Type, bool> Instance { get; } = new ApplicationTypeSpecification().Cached();
 		ApplicationTypeSpecification() {}
 
-		[Freeze]
 		public override bool IsSatisfiedBy( Type parameter ) => CanInstantiateSpecification.Instance.IsSatisfiedBy( parameter ) && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Has<CompilerGeneratedAttribute>();
 	}
 

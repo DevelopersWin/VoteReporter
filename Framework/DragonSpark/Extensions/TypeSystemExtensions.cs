@@ -1,10 +1,11 @@
+using DragonSpark.Activation;
+using DragonSpark.Aspects;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using Type = System.Type;
 
 namespace DragonSpark.Extensions

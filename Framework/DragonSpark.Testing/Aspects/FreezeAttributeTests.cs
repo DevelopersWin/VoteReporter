@@ -92,7 +92,7 @@ namespace DragonSpark.Testing.Aspects
 			[Freeze]
 			public int Cached => ++Count;
 
-			public override Assembly[] Create()
+			protected override Assembly[] Cache()
 			{
 				Count++;
 				return new Assembly[0];

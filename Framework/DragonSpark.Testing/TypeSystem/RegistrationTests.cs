@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.TypeSystem
 		{
 			readonly internal static Assembly[] Result = new Assembly[0];
 
-			public override Assembly[] Create() => Result;
+			protected override Assembly[] Cache() => Result;
 		}
 
 		[Fact]

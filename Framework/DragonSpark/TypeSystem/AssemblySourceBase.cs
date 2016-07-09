@@ -3,8 +3,6 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
-using PostSharp.Extensibility;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -101,22 +99,28 @@ namespace DragonSpark.TypeSystem
 
 	public static class AssemblyTypes
 	{
-		public static AssemblyTypesFactory All { get; } = new AssemblyTypesFactory( assembly => assembly.DefinedTypes.AsTypes() );
+		public static AssemblyTypesStore All { get; } = new AssemblyTypesStore( assembly => assembly.DefinedTypes.AsTypes() );
 
-		public static AssemblyTypesFactory Public { get; } = new AssemblyTypesFactory( assembly => assembly.ExportedTypes );
+		public static AssemblyTypesStore Public { get; } = new AssemblyTypesStore( assembly => assembly.ExportedTypes );
 	}
 
-	public class AssemblyTypesFactory : FactoryBase<Assembly, Type[]>
+	public class AssemblyTypesStore : Cache<Assembly, Type[]>
 	{
-		readonly Func<Assembly, IEnumerable<Type>> types;
+		public AssemblyTypesStore( Func<Assembly, IEnumerable<Type>> types ) : base( new Factory( types ).Create ) {}
 
-		public AssemblyTypesFactory( [Required] Func<Assembly, IEnumerable<Type>> types )
+		sealed class Factory : FactoryBase<Assembly, Type[]>
 		{
-			this.types = types;
-		}
+			readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToDelegate();
 
-		[Freeze]
-		public override Type[] Create( Assembly parameter ) => types( parameter ).Where( ApplicationTypeSpecification.Instance.ToDelegate() ).Fixed();
+			readonly Func<Assembly, IEnumerable<Type>> types;
+
+			public Factory( Func<Assembly, IEnumerable<Type>> types )
+			{
+				this.types = types;
+			}
+
+			public override Type[] Create( Assembly parameter ) => types( parameter ).Where( Specification ).Fixed();
+		}
 	}
 
 	public class TypesFactory : FactoryBase<Assembly[], Type[]>
@@ -127,11 +131,7 @@ namespace DragonSpark.TypeSystem
 		public override Type[] Create( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.ToDelegate() ).ToArray();
 	}
 
-	public abstract class AssemblySourceBase : FactoryBase<Assembly[]>
-	{
-		[Freeze( AttributeInheritance = MulticastInheritance.Strict, AttributeTargetMemberAttributes = MulticastAttributes.Instance )]
-		public abstract override Assembly[] Create();
-	}
+	public abstract class AssemblySourceBase : CachedFactoryBase<Assembly[]> {}
 
 	public abstract class AssemblyProviderBase : AssemblySourceBase, IAssemblyProvider
 	{
@@ -146,13 +146,11 @@ namespace DragonSpark.TypeSystem
 			this.assemblies = assemblies;
 		}
 
-		public override Assembly[] Create() => assemblies.WhereAssigned().Distinct().Prioritize().Fixed();
+		protected override Assembly[] Cache() => assemblies.WhereAssigned().Distinct().Prioritize().Fixed();
 	}
 
 	public class AggregateAssemblyFactory : AggregateFactory<Assembly[]>, IAssemblyProvider
 	{
-		// public AggregateAssemblyFactory( IFactory<Assembly[]> primary, params ITransformer<Assembly[]>[] transformers ) : base( primary, transformers ) {}
-
 		public AggregateAssemblyFactory( Func<Assembly[]> primary, params Func<Assembly[], Assembly[]>[] transformers ) : base( primary, transformers ) {}
 	}
 }
