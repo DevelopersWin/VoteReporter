@@ -2,12 +2,14 @@ using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
@@ -123,26 +125,27 @@ namespace DragonSpark.Composition
 	public class PartsContainerConfigurator : ContainerConfigurator
 	{
 		readonly Assembly[] assemblies;
-		readonly Type[] types, core, all;
+		readonly ImmutableArray<Type> core;
+		readonly Type[] types, all;
 		readonly FactoryTypeRequest[] factoryTypes;
-		readonly FactoryTypeLocator locator;
+		readonly Activation.FactoryTypeLocator locator;
 		readonly BuildableTypeFromConventionLocator conventionLocator;
 		readonly Activation.Activator activator;
 
 		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
 
-		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types, Type[] core )
+		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types, ImmutableArray<Type> core )
 		{
 			this.assemblies = assemblies;
 			this.types = types;
 			this.core = core;
 
 			// TODO: Fix this mess:
-			factoryTypes = FactoryTypeFactory.Instance.CreateMany( types );
-			locator = new FactoryTypeLocator( factoryTypes );
+			factoryTypes = FactoryTypeLocator.Instance.GetMany( types );
+			locator = new Activation.FactoryTypeLocator( factoryTypes );
 			conventionLocator = new BuildableTypeFromConventionLocator( types );
 			activator = new Activation.Activator( conventionLocator );
-			all = types.Union( core ).Fixed();
+			all = types.Union( core.ToArray() ).Fixed();
 		}
 
 		public override ContainerConfiguration Create( ContainerConfiguration configuration )

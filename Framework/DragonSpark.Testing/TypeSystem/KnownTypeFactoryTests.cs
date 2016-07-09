@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.TypeSystem
 		{
 			var parameter = typeof(Class);
 
-			var items = sut.Create( parameter );
+			var items = sut.Get( parameter );
 
 			Assert.NotEmpty( items );
 

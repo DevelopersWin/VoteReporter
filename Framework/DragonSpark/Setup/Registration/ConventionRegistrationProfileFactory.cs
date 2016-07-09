@@ -1,9 +1,9 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
@@ -12,57 +12,56 @@ using Type = System.Type;
 namespace DragonSpark.Setup.Registration
 {
 	[Persistent]
-	public class IgnorableTypesLocator : FactoryBase<Type[]>
+	public class IgnorableTypesLocator : CachedFactoryBase<ImmutableArray<Type>>
 	{
-		readonly Assembly[] assemblies;
+		readonly ImmutableArray<Assembly> assemblies;
+		
 
-		public IgnorableTypesLocator( [Required]Assembly[] assemblies )
+		public IgnorableTypesLocator( Assembly[] assemblies )
 		{
-			this.assemblies = assemblies;
+			this.assemblies = assemblies.ToImmutableArray();
 		}
 
-		[Freeze]
-		public override Type[] Create() => assemblies.SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToArray();
+		protected override ImmutableArray<Type> Cache() => assemblies.ToArray().SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToImmutableArray();
+		
 	}
 
-	public class ConventionTypesFactory : FactoryBase<Type[]>
+	public class ConventionTypesFactory : CachedFactoryBase<ImmutableArray<Type>>
 	{
 		readonly IgnorableTypesLocator ignorable;
-		readonly TypeInfo[] types;
+		readonly ImmutableArray<TypeInfo> types;
 
-		public ConventionTypesFactory( [Required] IgnorableTypesLocator ignorable, [Required]TypeInfo[] types )
+		public ConventionTypesFactory( IgnorableTypesLocator ignorable, TypeInfo[] types )
 		{
 			this.ignorable = ignorable;
-			this.types = types;
+			this.types = types.ToImmutableArray();
 		}
 
-		[Freeze]
-		public override Type[] Create()
+		protected override ImmutableArray<Type> Cache()
 		{
 			var result = types
 						.Where( info => !info.IsAbstract && ( !info.IsNested || info.IsNestedPublic ) )
 						.AsTypes()
-						.Except( ignorable.Create() )
+						.Except( ignorable.Create().ToArray() )
 						.Prioritize()
-						.ToArray();
+						.ToImmutableArray();
 			return result;
 		}
 	}
 
 	[Export, Shared]
-	public class ConventionRegistrationProfileFactory : FactoryBase<ConventionTypeContainer>
+	public class ConventionRegistrationProfileFactory : CachedFactoryBase<ConventionTypeContainer>
 	{
-		readonly Func<Type[]> types;
+		readonly Func<ImmutableArray<Type>> types;
 
 		[ImportingConstructor]
 		public ConventionRegistrationProfileFactory( [Required] ConventionTypesFactory factory ) : this( factory.Create ) {}
 
-		public ConventionRegistrationProfileFactory( Func<Type[]> types )
+		public ConventionRegistrationProfileFactory( Func<ImmutableArray<Type>> types )
 		{
 			this.types = types;
 		}
 
-		[Freeze]
-		public override ConventionTypeContainer Create() => new ConventionTypeContainer( types() );
+		protected override ConventionTypeContainer Cache() => new ConventionTypeContainer( types() );
 	}
 }

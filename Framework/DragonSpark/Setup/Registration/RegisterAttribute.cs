@@ -21,7 +21,7 @@ namespace DragonSpark.Setup.Registration
 
 			public MappedAttribute( string name ) : this( ImplementedInterfaceFromConventionLocator.Instance, null, name ) { }
 
-			MappedAttribute( [Required]ImplementedInterfaceFromConventionLocator locator, Type @as, string name ) : base( t => new TypeRegistration( @as ?? locator.Create( t ) ?? t.GetTypeInfo().ImplementedInterfaces.Only() ?? t, t, name ) ) { }
+			MappedAttribute( [Required]ImplementedInterfaceFromConventionLocator locator, Type @as, string name ) : base( t => new TypeRegistration( @as ?? locator.Get( t ) ?? t.GetTypeInfo().ImplementedInterfaces.Only() ?? t, t, name ) ) { }
 		}
 
 		public class FactoryAttribute : RegistrationBaseAttribute

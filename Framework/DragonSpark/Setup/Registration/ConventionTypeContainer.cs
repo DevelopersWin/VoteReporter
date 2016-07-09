@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Setup.Registration
 {
 	public class ConventionTypeContainer
 	{
-		public ConventionTypeContainer( Type[] candidates )
+		public ConventionTypeContainer( ImmutableArray<Type> candidates )
 		{
 			Candidates = candidates;
 		}
 
-		public Type[] Candidates { get; }
+		public ImmutableArray<Type> Candidates { get; }
 	}
 }

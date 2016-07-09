@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.TypeSystem
 			var result = FactoryInterfaceLocator.Instance.Get( typeof(UnityContainerFactory) );
 			Assert.Equal( typeof(IFactory<IUnityContainer>), result );
 
-			var implemented = ImplementedInterfaceFromConventionLocator.Instance.Create( typeof(UnityContainerFactory) );
+			var implemented = ImplementedInterfaceFromConventionLocator.Instance.Get( typeof(UnityContainerFactory) );
 			Assert.Null( implemented );
 		}
 	}

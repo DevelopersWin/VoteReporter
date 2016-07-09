@@ -1,9 +1,8 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
@@ -17,24 +16,27 @@ using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
-	public class FactoryTypeFactory : FactoryBase<Type, FactoryTypeRequest>
+	public sealed class FactoryTypeLocator : Cache<Type, FactoryTypeRequest>
 	{
-		readonly static Func<Type, Type> ResultLocator = ResultTypeLocator.Instance.ToDelegate();
+		public static FactoryTypeLocator Instance { get; } = new FactoryTypeLocator();
+		FactoryTypeLocator() : base( new Factory().Create ) {}
 
-		public static FactoryTypeFactory Instance { get; } = new FactoryTypeFactory();
-
-		FactoryTypeFactory() : base( Specification.Instance ) {}
-
-		public class Specification : CanInstantiateSpecification
+		[ApplyAutoValidation]
+		sealed class Factory : FactoryBase<Type, FactoryTypeRequest>
 		{
-			public new static Specification Instance { get; } = new Specification();
+			readonly static Func<Type, Type> ResultLocator = ResultTypeLocator.Instance.ToDelegate();
 
-			[Freeze]
-			public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.Get( parameter ) && ResultLocator( parameter ) != typeof(object) && parameter.Has<ExportAttribute>();
+			public Factory() : base( Specification.Instance ) {}
+
+			class Specification : CanInstantiateSpecification
+			{
+				public new static Specification Instance { get; } = new Specification();
+
+				public override bool IsSatisfiedBy( Type parameter ) => base.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.Get( parameter ) && ResultLocator( parameter ) != typeof(object) && parameter.Has<ExportAttribute>();
+			}
+
+			public override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
 		}
-
-		public override FactoryTypeRequest Create( Type parameter ) => 
-			new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
 	}
 
 	public class TypeBasedServiceProviderFactory : ServiceProviderFactory

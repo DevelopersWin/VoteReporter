@@ -153,13 +153,18 @@ namespace DragonSpark.Setup
 
 	public class InstanceServiceProvider : RepositoryBase<IInstanceRegistration>, IServiceProvider, IServiceRegistry
 	{
+		readonly ICache<Type, object> cache;
+
 		public InstanceServiceProvider() {}
 
 		public InstanceServiceProvider( IEnumerable<IFactory> factories, params object[] instances ) : this( factories.Select( factory => new FactoryStore( factory ) ).Concat( Instances( instances ) ) ) {}
 
 		public InstanceServiceProvider( params object[] instances ) : this( Instances( instances ) ) {}
 
-		InstanceServiceProvider( IEnumerable<IInstanceRegistration> stores ) : base( stores ) {}
+		InstanceServiceProvider( IEnumerable<IInstanceRegistration> stores ) : base( stores )
+		{
+			cache = new Cache<Type, object>( GetServiceBody );
+		}
 
 		static IEnumerable<IInstanceRegistration> Instances( IEnumerable<object> instances ) => instances.Select( o => new InstanceStore( o ) );
 
@@ -174,10 +179,11 @@ namespace DragonSpark.Setup
 
 		public void RegisterFactory( FactoryRegistrationParameter parameter ) => Add( new FactoryStore( parameter.Factory, parameter.RequestedType ) );
 
-		[Freeze]
-		public object GetService( Type serviceType )
+		public object GetService( Type serviceType ) => cache.Get( serviceType );
+
+		object GetServiceBody( Type serviceType )
 		{
-			var result = List().ToArray().Introduce( serviceType.Adapt(), tuple => tuple.Item2.IsAssignableFrom( tuple.Item1.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault();
+			var result = List().Introduce( serviceType.Adapt(), tuple => tuple.Item2.IsAssignableFrom( tuple.Item1.RegisteredType ) ).Select( store => store.Value ).FirstOrDefault();
 			if ( result != null )
 			{
 				ActivationProperties.Instance.Set( result, true );
@@ -303,12 +309,12 @@ namespace DragonSpark.Setup
 		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand) };
 	}*/
 
-	public class FrameworkTypes : FactoryBase<Type[]>
+	public class FrameworkTypes : CachedFactoryBase<ImmutableArray<Type>>
 	{
 		public static FrameworkTypes Instance { get; } = new FrameworkTypes();
+		FrameworkTypes() {}
 
-		[Freeze]
-		public override Type[] Create() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) };
+		protected override ImmutableArray<Type> Cache() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) }.ToImmutableArray();
 	}
 
 	public abstract class Application<T> : CompositeCommand<T>, IApplication<T>

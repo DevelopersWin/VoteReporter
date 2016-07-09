@@ -13,7 +13,7 @@ namespace DragonSpark.Composition
 	{
 		readonly static Func<Activator.Parameter, Delegate> DelegateSource = ActivatorDelegateWithConversionFactory.Instance.ToDelegate();
 
-		public FactoryDelegateExportDescriptorProvider( FactoryTypeLocator locator ) 
+		public FactoryDelegateExportDescriptorProvider( Activation.FactoryTypeLocator locator ) 
 			: base( locator, FactoryDelegateTransformer.Instance, DelegateSource ) {}
 	}
 
@@ -21,7 +21,7 @@ namespace DragonSpark.Composition
 	{
 		readonly static Func<Activator.Parameter, Delegate> DelegateSource = ActivatorWithParameterDelegateFactory.Instance.ToDelegate();
 
-		public FactoryWithParameterDelegateExportDescriptorProvider( FactoryTypeLocator locator ) 
+		public FactoryWithParameterDelegateExportDescriptorProvider( Activation.FactoryTypeLocator locator ) 
 			: base( locator, FactoryDelegateTransformer.InstanceWithParameter, DelegateSource ) {}
 	}
 

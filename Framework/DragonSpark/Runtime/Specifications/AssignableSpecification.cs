@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using System;
 using System.Linq;
@@ -19,7 +18,7 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class CanCreateSpecification<T> : CanCreateSpecification<T, object>
 	{
-		public CanCreateSpecification( Func<T, object> creator ) : base( creator ) {}
+		// public CanCreateSpecification( Func<T, object> creator ) : base( creator ) {}
 		public CanCreateSpecification( Func<T, object> creator, Coerce<T> coercer ) : base( creator, coercer ) {}
 	}
 
@@ -33,7 +32,6 @@ namespace DragonSpark.Runtime.Specifications
 			this.creator = creator;
 		}
 
-		[Freeze]
 		public override bool IsSatisfiedBy( TParameter parameter ) => creator( parameter ).IsAssignedOrContains();
 	}
 }

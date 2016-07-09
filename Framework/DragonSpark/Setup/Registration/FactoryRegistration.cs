@@ -164,7 +164,7 @@ namespace DragonSpark.Setup.Registration
 				registry.Register( new InstanceRegistrationParameter( typed.GetType(), typed ) );
 			}
 			
-			new[] { ImplementedInterfaceFromConventionLocator.Instance.Create( parameter.FactoryType ), FactoryInterfaceLocator.Instance.Get( parameter.FactoryType ) }
+			new[] { ImplementedInterfaceFromConventionLocator.Instance.Get( parameter.FactoryType ), FactoryInterfaceLocator.Instance.Get( parameter.FactoryType ) }
 				.WhereAssigned()
 				.Distinct()
 				.Introduce( parameter.FactoryType, tuple => new MappingRegistrationParameter( tuple.Item1, tuple.Item2 ) )

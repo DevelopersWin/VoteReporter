@@ -200,7 +200,7 @@ namespace DragonSpark.Activation
 	{
 		public static FromKnownFactory<T> Instance { get; } = new FromKnownFactory<T>( KnownTypeFactory.Instance );
 
-		public FromKnownFactory( KnownTypeFactory factory ) : base( factory.Create( typeof(T) ) ) {}
+		public FromKnownFactory( KnownTypeFactory factory ) : base( factory.Get( typeof(T) ).ToArray() ) {}
 
 		public T CreateUsing( object parameter ) => (T)Create( parameter );
 	}
@@ -304,6 +304,20 @@ namespace DragonSpark.Activation
 			}
 			return result;
 		}
+	}
+
+	public abstract class CachedFactoryBase<T> : FactoryBase<T>
+	{
+		readonly Lazy<T> cached;
+
+		protected CachedFactoryBase()
+		{
+			cached = new Lazy<T>( Cache );
+		}
+
+		protected abstract T Cache();
+
+		public sealed override T Create() => cached.Value;
 	}
 
 	public abstract class FactoryBase<T> : IFactory<T>

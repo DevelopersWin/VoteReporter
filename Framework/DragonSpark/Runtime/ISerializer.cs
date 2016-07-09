@@ -1,12 +1,5 @@
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
-using System;
 using System.IO;
-using System.Runtime.Serialization;
-using Type = System.Type;
 
 namespace DragonSpark.Runtime
 {
@@ -17,7 +10,7 @@ namespace DragonSpark.Runtime
 		string Save( object item );
 	}
 
-	public class DataContractSerializerFactory<T> : FactoryBase<DataContractSerializer>
+	/*public class DataContractSerializerFactory<T> : FactoryBase<DataContractSerializer>
 	{
 		readonly Func<Type, Type[]> knownTypes;
 
@@ -29,9 +22,8 @@ namespace DragonSpark.Runtime
 			this.knownTypes = knownTypes;
 		}
 
-		[Freeze]
 		public override DataContractSerializer Create() => typeof(T).With( type => new DataContractSerializer( type, knownTypes( type ) ) );
-	}
+	}*/
 
 	/*public class Serializer<T> : ISerializer
 	{

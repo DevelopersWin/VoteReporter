@@ -1,5 +1,5 @@
-using DragonSpark.Composition;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace DragonSpark.Activation
 			var info = context( parameter ).GetTypeInfo();
 			var nestedTypes = info.DeclaredNestedTypes.AsTypes().ToArray();
 			var all = nestedTypes.Union( AssemblyTypes.All.Create( info.Assembly ) ).Where( Defaults.ApplicationType ).ToArray();
-			var requests = FactoryTypeFactory.Instance.CreateMany( all );
+			var requests = Composition.FactoryTypeLocator.Instance.GetMany( all );
 			var candidates = new[] { new FactoryTypeLocator( requests ), locator };
 			var mapped = new LocateTypeRequest( type( parameter ) );
 			var result = candidates.Introduce( mapped, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();

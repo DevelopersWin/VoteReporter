@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation.IoC.Specifications;
-using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
@@ -275,30 +274,23 @@ namespace DragonSpark.Activation.IoC
 		public int GetWeight( Type candidate ) => Create( candidate );
 	}
 
-	public abstract class TypeSelectionStrategyBase : FactoryBase<Type, Type[]>
+	/*public abstract class TypeSelectionStrategyBase : FactoryBase<Type, Type[]>
 	{
 		protected TypeSelectionStrategyBase() {}
 
 		protected TypeSelectionStrategyBase( ISpecification<Type> specification ) : base( specification ) {}
-	}
+	}*/
 
-	public class SelfStrategy : TypeSelectionStrategyBase
+	public class SelfStrategy : Cache<Type, Type[]>
 	{
 		public static SelfStrategy Instance { get; } = new SelfStrategy();
-
-		SelfStrategy() {}
-
-		public override Type[] Create( Type parameter ) => parameter.ToItem();
+		SelfStrategy() : base( type => type.ToItem() ) {}
 	}
 
-	public class SelfAndNestedStrategy : TypeSelectionStrategyBase
+	public sealed class SelfAndNestedStrategy : Cache<Type, Type[]>
 	{
 		public static SelfAndNestedStrategy Instance { get; } = new SelfAndNestedStrategy();
-
-		SelfAndNestedStrategy() {}
-
-		[Freeze]
-		public override Type[] Create( Type parameter ) => parameter.Adapt().WithNested();
+		SelfAndNestedStrategy() : base( type => type.Adapt().WithNested() ) {}
 	}
 
 	/*public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
@@ -312,38 +304,42 @@ namespace DragonSpark.Activation.IoC
 	}*/
 
 	[Persistent]
-	public class ImplementedInterfaceFromConventionLocator : FactoryBase<Type, Type>
+	public class ImplementedInterfaceFromConventionLocator : Cache<Type, Type>
 	{
-		readonly ImmutableArray<Type> ignore;
 		public static ImplementedInterfaceFromConventionLocator Instance { get; } = new ImplementedInterfaceFromConventionLocator( typeof(IFactory), typeof(IFactoryWithParameter) );
 
-		public ImplementedInterfaceFromConventionLocator( [Required]params Type[] ignore )
-		{
-			this.ignore = ignore.ToImmutableArray();
-		}
+		public ImplementedInterfaceFromConventionLocator( params Type[] ignore ) : base( new Factory( ignore ).Create ) {}
 
-		[Freeze]
-		public override Type Create( Type parameter )
+		protected class Factory : FactoryBase<Type, Type>
 		{
-			var types = parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore.ToArray() ).ToArray();
-			foreach ( var type in types )
+			readonly ImmutableArray<Type> ignore;
+
+			public Factory( params Type[] ignore )
 			{
-				if ( parameter.Name.Contains( type.Name.TrimStartOf( 'I' ) ) )
-				{
-					return type;
-				}
+				this.ignore = ignore.ToImmutableArray();
 			}
-			return null;
+
+			public override Type Create( Type parameter )
+			{
+				var types = parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore.ToArray() ).ToArray();
+				foreach ( var type in types )
+				{
+					if ( parameter.Name.Contains( type.Name.TrimStartOf( 'I' ) ) )
+					{
+						return type;
+					}
+				}
+				return null;
+			}
 		}
 	}
 
 	public class CanInstantiateSpecification : GuardedSpecificationBase<Type>
 	{
-		public static CanInstantiateSpecification Instance { get; } = new CanInstantiateSpecification();
+		public static ISpecification<Type> Instance { get; } = new DelegatedSpecification<Type>( new CanInstantiateSpecification().Cached().Get );
 
 		protected CanInstantiateSpecification() {}
 
-		[Freeze]
 		public override bool IsSatisfiedBy( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();
@@ -354,7 +350,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class InstantiableTypeSpecification : GuardedSpecificationBase<Type>
 	{
-		public static InstantiableTypeSpecification Instance { get; } = new InstantiableTypeSpecification();
+		public static ISpecification<Type> Instance { get; } = new DelegatedSpecification<Type>( new InstantiableTypeSpecification().Cached().Get );
 		InstantiableTypeSpecification() : this( new[] { typeof(Delegate), typeof(Array) }.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
 		readonly ImmutableArray<TypeAdapter> exempt;
@@ -364,23 +360,7 @@ namespace DragonSpark.Activation.IoC
 			this.exempt = exempt;
 		}
 
-		public override bool IsSatisfiedBy( Type parameter )
-		{
-			return parameter != typeof(object) && !exempt.IsAssignableFrom( parameter );
-			/*if ( parameter != typeof(object) )
-			{
-				exempt.IsAssignableFrom( parameter )
-				foreach ( var adapter in exempt )
-				{
-					if ( adapter.IsAssignableFrom( parameter ) )
-					{
-						return false;
-					}
-				}
-				return true;
-			}
-			return false;*/
-		}
+		public override bool IsSatisfiedBy( Type parameter ) => parameter != typeof(object) && !exempt.IsAssignableFrom( parameter );
 	}
 
 	/*public class ValidConstructorSpecification : GuardedSpecificationBase<IBuilderContext>

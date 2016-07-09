@@ -46,10 +46,14 @@ namespace DragonSpark.Activation
 			this.locator = locator;
 		}
 
-		public override void Execute( InstanceRegistrationParameter parameter ) => locator.Create( parameter.Instance.GetType() ).With( type =>
+		public override void Execute( InstanceRegistrationParameter parameter )
 		{
-			base.Execute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
-		} );
+			var located = locator.Get( parameter.Instance.GetType() );
+			if ( located != null )
+			{
+				base.Execute( new InstanceRegistrationParameter( located, parameter.Instance, parameter.Name ) );
+			}
+		}
 	}
 
 	public class RegisterEntireHierarchyCommand : RegisterEntireHierarchyCommand<IsATypeSpecification>

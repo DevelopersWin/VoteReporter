@@ -19,9 +19,9 @@ namespace DragonSpark.Composition
 		readonly ITransformer<CompositionContract> resolver;
 		readonly Func<Activator.Parameter, object> delegateSource;
 		
-		protected FactoryExportDescriptorProviderBase( FactoryTypeLocator locator, Func<Activator.Parameter, object> delegateSource ) : this( locator, SelfTransformer<CompositionContract>.Instance, delegateSource ) {}
+		protected FactoryExportDescriptorProviderBase( Activation.FactoryTypeLocator locator, Func<Activator.Parameter, object> delegateSource ) : this( locator, SelfTransformer<CompositionContract>.Instance, delegateSource ) {}
 
-		protected FactoryExportDescriptorProviderBase( FactoryTypeLocator locator, ITransformer<CompositionContract> resolver, Func<Activator.Parameter, object> delegateSource ) : this( locator.ToDelegate(), resolver, delegateSource ) {}
+		protected FactoryExportDescriptorProviderBase( Activation.FactoryTypeLocator locator, ITransformer<CompositionContract> resolver, Func<Activator.Parameter, object> delegateSource ) : this( locator.ToDelegate(), resolver, delegateSource ) {}
 
 		FactoryExportDescriptorProviderBase( Func<LocateTypeRequest, Type> locator, ITransformer<CompositionContract> resolver, Func<Activator.Parameter, object> delegateSource )
 		{
