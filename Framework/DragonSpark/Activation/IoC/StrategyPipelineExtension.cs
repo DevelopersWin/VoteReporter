@@ -281,13 +281,13 @@ namespace DragonSpark.Activation.IoC
 		protected TypeSelectionStrategyBase( ISpecification<Type> specification ) : base( specification ) {}
 	}*/
 
-	public class SelfStrategy : Cache<Type, Type[]>
+	public class SelfStrategy : StoreCache<Type, IEnumerable<Type>>
 	{
 		public static SelfStrategy Instance { get; } = new SelfStrategy();
-		SelfStrategy() : base( type => type.ToItem() ) {}
+		SelfStrategy() : base( EnumerableEx.Return ) {}
 	}
 
-	public sealed class SelfAndNestedStrategy : Cache<Type, Type[]>
+	public sealed class SelfAndNestedStrategy : StoreCache<Type, IEnumerable<Type>>
 	{
 		public static SelfAndNestedStrategy Instance { get; } = new SelfAndNestedStrategy();
 		SelfAndNestedStrategy() : base( type => type.Adapt().WithNested() ) {}

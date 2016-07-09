@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC.Specifications;
-using DragonSpark.Aspects;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
@@ -69,12 +68,11 @@ namespace DragonSpark.Testing.Activation.IoC
 			}
 		}*/
 
-		class ClassFactory : FactoryBase<Class>
+		class ClassFactory : CachedFactoryBase<Class>
 		{
 			public static ClassFactory Instance { get; } = new ClassFactory();
 
-			[Freeze]
-			public override Class Create() => new Class();
+			protected override Class Cache() => new Class();
 		}
 
 		class Target

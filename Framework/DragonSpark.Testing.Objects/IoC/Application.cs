@@ -1,12 +1,14 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Composition;
+using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Testing.Objects.IoC
@@ -25,50 +27,43 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		readonly static Func<IServiceProvider, IApplication> ApplicationSource = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) ).ToDelegate();
+		readonly static Func<IServiceProvider, IApplication> ApplicationSource = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) ).Create;
+		readonly static Func<Assembly[]> AssemblySource = AssemblyProvider.Instance.ToDelegate();
 
 		public AutoDataAttribute() : this( ApplicationSource ) {}
 
-		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblyProvider.Instance.ToDelegate(), applicationSource ) {}
+		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblySource, applicationSource ) {}
 
-		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) : base( new Context( assemblySource, applicationSource ).ToDelegate() ) {}
+		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) : base( new Factory( assemblySource ), applicationSource ) {}
 
-		class Context : FactoryBase<AutoData, IDisposable>
+		class Factory : FactoryBase<AutoData, IServiceProvider>
 		{
 			readonly Func<Assembly[]> assemblySource;
-			readonly Func<IServiceProvider, IApplication> applicationSource;
 
-			public Context( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource )
+			public Factory( Func<Assembly[]> assemblySource )
 			{
 				this.assemblySource = assemblySource;
-				this.applicationSource = applicationSource;
 			}
 
-			public override IDisposable Create( AutoData parameter )
+			public override IServiceProvider Create( AutoData parameter ) => new ServiceProviderFactory( Cache.Instance.Get( parameter.Method.DeclaringType ).Get( assemblySource().ToImmutableArray() ) ).Create();
+
+			sealed class Cache : ActivatedCache<Cache.ProviderCache>
 			{
-				var cached = new Cache( assemblySource() ).Create( parameter );
-				var provider = new Activation.IoC.ServiceProviderFactory( cached.ToFactory() ).Create();
-				var result = new AutoDataExecutionContextFactory( provider.Wrap<AutoData, IServiceProvider>().ToDelegate(), applicationSource ).Create( parameter );
-				return result;
-			}
-		}
+				public new static Cache Instance { get; } = new Cache();
 
-		class Cache : CacheFactoryBase
-		{
-			readonly Assembly[] assemblies;
-			public Cache( Assembly[] assemblies ) : base( new AssemblyBasedServiceProviderFactory( assemblies ).Wrap<AutoData, IServiceProvider>() )
-			{
-				this.assemblies = assemblies;
+				public class ProviderCache : ArgumentCache<ImmutableArray<Assembly>, Func<IServiceProvider>>
+				{
+					public ProviderCache() : base( assemblies => new AssemblyBasedServiceProviderFactory( assemblies.ToArray() ).Create ) {}
+				}
 			}
-
-			protected override ImmutableArray<object> GetKeyItems( AutoData parameter ) => assemblies.ToImmutableArray<object>();
 		}
 	}
 
 	public class AssemblyProvider : AssemblyProviderBase
 	{
-		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
+		readonly static Assembly ApplicationAssembly = DomainApplicationAssemblyLocator.Instance.Create();
 
-		public AssemblyProvider( params Type[] others ) : base( others.Append( typeof(AssemblySourceBase) ).Fixed(), DomainApplicationAssemblyLocator.Instance.Create() ) {}
+		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
+		public AssemblyProvider( params Type[] others ) : base( others.Append( typeof(AssemblySourceBase) ).Fixed(), ApplicationAssembly ) {}
 	}
 }

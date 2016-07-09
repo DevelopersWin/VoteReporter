@@ -1,5 +1,4 @@
 using DragonSpark.Activation.IoC;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -21,11 +20,11 @@ namespace DragonSpark.TypeSystem
 	{
 		public static InitializeTypeCommand Instance { get; } = new InitializeTypeCommand();
 
-		public InitializeTypeCommand() : this( CanInstantiateSpecification.Instance.And( InstantiableTypeSpecification.Instance ) ) {}
+		public InitializeTypeCommand() : this( CanInstantiateSpecification.Instance.And( InstantiableTypeSpecification.Instance, new OncePerParameterSpecification<Type>() ) ) {}
 
 		public InitializeTypeCommand( ISpecification<Type> specification ) : base( specification ) {}
 
-		[Freeze]
+		// [Freeze]
 		public override void Execute( Type parameter ) => parameter.GetTypeInfo().DeclaredConstructors.Each( info => info.GetParameters() );
 	}
 

@@ -1,9 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
@@ -26,23 +24,29 @@ namespace DragonSpark.Testing.Framework.Setup
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
+		readonly IFactory<AutoData, IServiceProvider> providerSource;
+		readonly Func<IServiceProvider, IApplication> applicationSource;
+		readonly static Func<IServiceProvider, IApplication> DefaultApplicationFactory = ParameterConstructor<IServiceProvider, Application>.Default;
 		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.ToDelegate();
 
-		readonly Func<AutoData, IDisposable> factory;
+		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new Factory( includeFromParameters, additionalTypes ) ) {}
 
-		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new AutoDataExecutionContextFactory( new Cache( includeFromParameters, additionalTypes ).ToDelegate() ).ToDelegate() ) {}
+		// protected AutoDataAttribute( Func<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
 
-		protected AutoDataAttribute( [Required] Func<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
+		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationFactory ) {}
+		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : this( DefaultFixtureFactory, providerSource, applicationSource ) {}
 
-		protected AutoDataAttribute( [Required]Func<IFixture> fixture, [Required] Func<AutoData, IDisposable> factory ) : base( fixture() )
+		protected AutoDataAttribute( Func<IFixture> fixture, IFactory<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : base( fixture() )
 		{
-			this.factory = factory;
+			this.providerSource = providerSource;
+			this.applicationSource = applicationSource;
 		}
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
 			var autoData = new AutoData( Fixture, methodUnderTest );
-			using ( factory( autoData ) )
+			var context = new AutoDataExecutionContextFactory( providerSource.Create, applicationSource ).Create( autoData );
+			using ( context )
 			{
 				var result = base.GetData( methodUnderTest );
 				return result;
@@ -51,52 +55,72 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance[]>( info => new AspectInstance( info, ExecuteMethodAspect.Instance ).ToItem() );
 
-		class Cache : CacheFactoryBase
+		class Factory : FactoryBase<AutoData, IServiceProvider>
 		{
-			readonly bool includeFromParameters;
-			readonly Type[] others;
+			readonly Func<MethodBase, ImmutableArray<Type>> typeSource;
 
-			public Cache( bool includeFromParameters, Type[] others ) : base( new Factory( new ServiceProviderTypeFactory( others, includeFromParameters ) ) )
+			public Factory( bool includeFromParameters, params Type[] additional ) : this( new TypeFactory( includeFromParameters, additional ).Create ) {}
+
+			Factory( Func<MethodBase, ImmutableArray<Type>> typeSource )
 			{
-				this.includeFromParameters = includeFromParameters;
-				this.others = others;
+				this.typeSource = typeSource;
 			}
 
-			protected override ImmutableArray<object> GetKeyItems( AutoData parameter ) => ImmutableArray.Create<object>( includeFromParameters, others, parameter.Method.DeclaringType );
+			public override IServiceProvider Create( AutoData parameter ) => Cache.Instance.Get( parameter.Method.DeclaringType ).Get( typeSource( parameter.Method ) );
 
-			class Factory : FactoryBase<AutoData, IServiceProvider>
+			sealed class TypeFactory : FactoryBase<MethodBase, ImmutableArray<Type>>
 			{
-				readonly IFactory<MethodBase, Type[]> types;
+				readonly static Func<Type, IEnumerable<Type>> PrimaryStrategy = SelfAndNestedStrategy.Instance.ToDelegate();
+				readonly static Func<Type, IEnumerable<Type>> OtherStrategy = SelfStrategy.Instance.ToDelegate();
 
-				public Factory( IFactory<MethodBase, Type[]> types )
+				readonly ImmutableArray<Type> additional;
+				readonly bool includeFromParameters;
+				readonly Func<Type, IEnumerable<Type>> primaryStrategy;
+				readonly Func<Type, IEnumerable<Type>> otherStrategy;
+
+				public TypeFactory( bool includeFromParameters, params Type[] additional ) : this( includeFromParameters, additional.ToImmutableArray(), PrimaryStrategy, OtherStrategy ) {}
+
+				TypeFactory( bool includeFromParameters, ImmutableArray<Type> additional, Func<Type, IEnumerable<Type>> primaryStrategy, Func<Type, IEnumerable<Type>> otherStrategy )
 				{
-					this.types = types;
+					this.additional = additional;
+					this.includeFromParameters = includeFromParameters;
+					this.primaryStrategy = primaryStrategy;
+					this.otherStrategy = otherStrategy;
 				}
 
-				public override IServiceProvider Create( AutoData parameter ) => new TypeBasedServiceProviderFactory( types.Create( parameter.Method ) ).Create();
+				public override ImmutableArray<Type> Create( MethodBase parameter )
+				{
+					var types = additional.ToArray().Concat( includeFromParameters ? parameter.GetParameterTypes() : Items<Type>.Default );
+					var result = primaryStrategy( parameter.DeclaringType ).ToArray().Union( types.SelectMany( otherStrategy ) ).Distinct().ToImmutableArray();
+					return result;
+				}
+			}
+
+			sealed class Cache : ActivatedCache<Cache.ProviderCache>
+			{
+				public new static Cache Instance { get; } = new Cache();
+
+				public class ProviderCache : ArgumentCache<ImmutableArray<Type>, IServiceProvider>
+				{
+					public ProviderCache() : base( types => new TypeBasedServiceProviderFactory( types.ToArray() ).Create() ) {}
+				}
 			}
 		}
 	}
 
-	public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
+	/*public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
 	{
-		/*protected CacheFactoryBase( ImmutableArray<object> keySource, Func<IServiceProvider> inner ) : this( new WrappedFactory<AutoData, ImmutableArray<object>>( keySource ).ToDelegate(), inner.Wrap<AutoData, IServiceProvider>() ) {}
+		protected CacheFactoryBase( Func<AutoData, IServiceProvider> inner ) : base( inner ) {}
 
-		protected CacheFactoryBase( Func<AutoData, ImmutableArray<object>> keySource, IFactory<AutoData, IServiceProvider> inner ) : base( keySource, data => data.Method.DeclaringType, inner ) {}*/
-
-		protected CacheFactoryBase( IFactory<AutoData, IServiceProvider> inner ) : base( inner ) {}
-
-		protected override object GetInstance( AutoData parameter ) => parameter.Method.DeclaringType;
-	}
+		protected override object GetHost( AutoData parameter ) => parameter.Method.DeclaringType;
+	}*/
 
 	public class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
 	{
-		readonly static Func<IServiceProvider, IApplication> DefaultApplicationFactory = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) ).ToDelegate();
-
 		readonly Func<AutoData, IServiceProvider> providerSource;
 		readonly Func<IServiceProvider, IApplication> applicationSource;
 
-		public AutoDataExecutionContextFactory( Func<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationFactory ) {}
+		// public AutoDataExecutionContextFactory( Func<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationFactory ) {}
 
 		public AutoDataExecutionContextFactory( Func<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource )
 		{
@@ -108,9 +132,11 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			var result = new InitializeMethodCommand().AsExecuted( parameter.Method );
 
-			new AutoDataConfiguringCommandFactory( parameter, providerSource( parameter ), applicationSource )
-				.Create()
-				.Execute( parameter );
+			var primary = new DragonSpark.Setup.ServiceProviderFactory( providerSource( parameter ).Self ).Create()/*.Emit( "Created Provider" )*/;
+			var composite = new CompositeServiceProvider( new InstanceServiceProvider( parameter, parameter.Fixture, parameter.Method ), new FixtureServiceProvider( parameter.Fixture ), primary );
+			var application = applicationSource( composite )/*.Emit( "Created Application" )*/;
+			var command = new ExecuteApplicationCommand( application );
+			command.Execute( parameter );
 
 			return result;
 		}
@@ -121,30 +147,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		public static AssociatedContext Default { get; } = new AssociatedContext();
 	}
 
-	public class AutoDataConfiguringCommandFactory : FactoryBase<ICommand<AutoData>>
-	{
-		readonly AutoData autoData;
-		readonly IServiceProvider provider;
-		readonly Func<IServiceProvider, IApplication> applicationSource;
-
-		public AutoDataConfiguringCommandFactory( [Required] AutoData autoData, [Required] IServiceProvider provider, [Required]Func<IServiceProvider, IApplication> applicationSource ) 
-		{
-			this.autoData = autoData;
-			this.provider = provider;
-			this.applicationSource = applicationSource;
-		}
-
-		// [Profile]
-		public override ICommand<AutoData> Create()
-		{
-			var primary = new DragonSpark.Setup.ServiceProviderFactory( provider.ToFactory() ).Create()/*.Emit( "Created Provider" )*/;
-			var composite = new CompositeServiceProvider( new InstanceServiceProvider( autoData, autoData.Fixture, autoData.Method ), new FixtureServiceProvider( autoData.Fixture ), primary );
-			var application = applicationSource( composite )/*.Emit( "Created Application" )*/;
-			var result = new ExecuteApplicationCommand( application );
-			return result;
-		}
-	}
-	
 	public class MinimumLevel : BeforeAfterTestAttribute
 	{
 		readonly LogEventLevel level;
@@ -171,32 +173,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			AssociatedContext.Default.Set( parameter.Method, this );
 			base.Execute( parameter );
-		}
-	}
-
-	public class ServiceProviderTypeFactory : FactoryBase<MethodBase, Type[]>
-	{
-		readonly Type[] additional;
-		readonly bool includeFromParameters;
-		readonly Func<Type, Type[]> primaryStrategy;
-		readonly Func<Type, Type[]> otherStrategy;
-
-		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters ) : this( additional, includeFromParameters, SelfAndNestedStrategy.Instance.ToDelegate(), SelfStrategy.Instance.ToDelegate() ) {}
-
-		public ServiceProviderTypeFactory( [Required] Type[] additional, bool includeFromParameters, [Required] Func<Type, Type[]> primaryStrategy, [Required] Func<Type, Type[]> otherStrategy )
-		{
-			this.additional = additional;
-			this.includeFromParameters = includeFromParameters;
-			this.primaryStrategy = primaryStrategy;
-			this.otherStrategy = otherStrategy;
-		}
-
-		[Freeze]
-		public override Type[] Create( MethodBase parameter )
-		{
-			var types = additional.Concat( includeFromParameters ? parameter.GetParameterTypes() : Items<Type>.Default );
-			var result = primaryStrategy( parameter.DeclaringType ).Union( types.SelectMany( otherStrategy ) ).Distinct().Fixed();
-			return result;
 		}
 	}
 

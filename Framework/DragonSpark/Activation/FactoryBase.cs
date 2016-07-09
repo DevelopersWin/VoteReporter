@@ -1,5 +1,4 @@
-﻿using DragonSpark.Aspects;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -7,7 +6,6 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace DragonSpark.Activation
@@ -42,11 +40,11 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class ConfiguringFactory<T> : DecoratedFactory<T>
+	public class ConfiguringFactory<T> : DelegatedFactory<T>
 	{
-		readonly ICommand<T> configure;
+		readonly Action<T> configure;
 
-		public ConfiguringFactory( [Required]IFactory<T> provider, [Required]ICommand<T> configure ) : base( provider )
+		public ConfiguringFactory( Func<T> provider, Action<T> configure ) : base( provider )
 		{
 			this.configure = configure;
 		}
@@ -54,7 +52,7 @@ namespace DragonSpark.Activation
 		public override T Create()
 		{
 			var result = base.Create();
-			configure.Execute( result );
+			configure( result );
 			return result;
 		}
 	}
@@ -76,32 +74,24 @@ namespace DragonSpark.Activation
 		}
 	}*/
 
-	public abstract class CachedDecoratedFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult> where TResult : class
+	/*public abstract class CachedDecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
-		static ICache<Dictionary<int, TResult>> Items { get; } = new ActivatedCache<Dictionary<int, TResult>>();
+		readonly static ICache<ArgumentCache<ImmutableArray<object>, TResult>> Caches = new ActivatedCache<ArgumentCache<ImmutableArray<object>, TResult>>();
 
-		protected CachedDecoratedFactory( IFactory<TParameter, TResult> inner ) : base( inner ) {}
-
-		protected abstract ImmutableArray<object> GetKeyItems( TParameter parameter );
-
-		protected abstract object GetInstance( TParameter parameter );
+		protected CachedDecoratedFactory( Func<TParameter, TResult> inner ) : base( inner ) {}
 
 		public override TResult Create( TParameter parameter )
 		{
-			var instance = GetInstance( parameter );
-
-			var items = Items.Get( instance );
-			var key = KeyFactory.Create( GetKeyItems( parameter ) );
-			
-			if ( !items.ContainsKey( key ) )
-			{
-				items.Add( key, base.Create( parameter ) );
-			}
-
-			var result = items[key];
+			var instance = GetHost( parameter );
+			var items = Caches.Get( instance );
+			var result = items.GetOrSet( GetKeyItems( parameter ), () => base.Create( parameter ) );
 			return result;
 		}
-	}
+
+		protected abstract ImmutableArray<object> GetKeyItems( TParameter parameter );
+
+		protected abstract object GetHost( TParameter parameter );
+	}*/
 
 	public class DecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{

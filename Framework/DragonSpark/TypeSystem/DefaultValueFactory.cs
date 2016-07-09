@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -69,7 +69,7 @@ namespace DragonSpark.TypeSystem
 		public static ImmutableArray<T> Immutable { get; }
 	}
 
-	class DefaultValueFactory<T> : FactoryBase<T>
+	class DefaultValueFactory<T> : CachedFactoryBase<T>
 	{
 		readonly Func<Type, object> source;
 
@@ -80,19 +80,17 @@ namespace DragonSpark.TypeSystem
 			this.source = source;
 		}
 
-		public override T Create() => (T)source( typeof(T) );
+		protected override T Cache() => (T)source( typeof(T) );
 	}
 
-	class DefaultValueFactory : FactoryBase<Type, object>
+	class DefaultValueFactory : Cache<Type, object>
 	{
 		readonly static IGenericMethodContext<Invoke> Method = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
 
 		public static Func<Type, object> Instance { get; } = new DefaultValueFactory().ToDelegate();
+		DefaultValueFactory() : base( Create ) {}
 
-		DefaultValueFactory() {}
-
-		[Freeze]
-		public override object Create( Type parameter )
+		static object Create( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
 			var result = type != null ? Method.Make( type.ToItem() ).Invoke<Array>() : parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : null;

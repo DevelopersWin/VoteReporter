@@ -17,7 +17,7 @@ namespace DragonSpark.Windows.Runtime
 		public ApplicationAssemblyLocator( [Required]DomainApplicationAssemblyLocator domain, [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( domain, system ) {}
 	}
 
-	public class DomainApplicationAssemblyLocator : FactoryBase<Assembly>
+	public class DomainApplicationAssemblyLocator : CachedFactoryBase<Assembly>
 	{
 		public static DomainApplicationAssemblyLocator Instance { get; } = new DomainApplicationAssemblyLocator();
 
@@ -31,7 +31,7 @@ namespace DragonSpark.Windows.Runtime
 			this.primary = primary;
 		}
 
-		public override Assembly Create()
+		protected override Assembly Cache()
 		{
 			try
 			{

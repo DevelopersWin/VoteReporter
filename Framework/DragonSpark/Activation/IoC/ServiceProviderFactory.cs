@@ -7,26 +7,26 @@ namespace DragonSpark.Activation.IoC
 {
 	public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
 	{
-		public AssemblyBasedServiceProviderFactory( Assembly[] assemblies ) : base( new Composition.AssemblyBasedServiceProviderFactory( assemblies ) ) {}
+		public AssemblyBasedServiceProviderFactory( Assembly[] assemblies ) : base( new Composition.AssemblyBasedServiceProviderFactory( assemblies ).Create ) {}
 	}
 
 	public class TypeBasedServiceProviderFactory : ServiceProviderFactory
 	{
-		public TypeBasedServiceProviderFactory( Type[] types ) : base( new Composition.TypeBasedServiceProviderFactory( types ) ) {}
+		public TypeBasedServiceProviderFactory( Type[] types ) : base( new Composition.TypeBasedServiceProviderFactory( types ).Create ) {}
 	}
 
 	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
-		readonly IFactory<IServiceProvider> factory;
+		readonly Func<IServiceProvider> factory;
 
-		public ServiceProviderFactory( IFactory<IServiceProvider> factory )
+		public ServiceProviderFactory( Func<IServiceProvider> factory )
 		{
 			this.factory = factory;
 		}
 
 		public override IServiceProvider Create()
 		{
-			var provider = factory.Create();
+			var provider = factory();
 			var containerFactory = new UnityContainerFactory( provider );
 			var container = containerFactory.Create();
 			var primary = new ServiceLocator( container );

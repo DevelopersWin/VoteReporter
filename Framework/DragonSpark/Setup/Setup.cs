@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.ComponentModel;
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
@@ -25,12 +24,12 @@ namespace DragonSpark.Setup
 {
 	public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
 	{
-		public AssemblyBasedServiceProviderFactory( Assembly[] assemblies ) : base( new Composition.AssemblyBasedServiceProviderFactory( assemblies ) ) {}
+		public AssemblyBasedServiceProviderFactory( Assembly[] assemblies ) : base( new Composition.AssemblyBasedServiceProviderFactory( assemblies ).Create ) {}
 	}
 
 	public class TypeBasedServiceProviderFactory : ServiceProviderFactory
 	{
-		public TypeBasedServiceProviderFactory( Type[] types ) : base( new Composition.TypeBasedServiceProviderFactory( types ) ) {}
+		public TypeBasedServiceProviderFactory( Type[] types ) : base( new Composition.TypeBasedServiceProviderFactory( types ).Create ) {}
 	}
 
 	public class ServiceProviderFactory : ConfiguredServiceProviderFactory<ConfigureProviderCommand>
@@ -41,7 +40,7 @@ namespace DragonSpark.Setup
 
 		// public ServiceProviderFactory( IFactory<ContainerConfiguration> source ) : this( new Composition.ServiceProviderFactory( source ) ) {}
 
-		public ServiceProviderFactory( IFactory<IServiceProvider> provider ) : base( provider ) {}
+		public ServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
 	}
 
 	public sealed class ConfigureProviderCommand : CommandBase<IServiceProvider>
@@ -284,7 +283,7 @@ namespace DragonSpark.Setup
 
 	public class ConfiguredServiceProviderFactory<TCommand> : ConfiguringFactory<IServiceProvider> where TCommand : class, ICommand<IServiceProvider>
 	{
-		public ConfiguredServiceProviderFactory( [Required] IFactory<IServiceProvider> provider ) : base( provider, Configure<TCommand>.Instance ) {}
+		public ConfiguredServiceProviderFactory( [Required] Func<IServiceProvider> provider ) : base( provider, Configure<TCommand>.Instance.ToDelegate() ) {}
 	}
 
 	class Configure<T> : CommandBase<IServiceProvider> where T : class, ICommand<IServiceProvider>
