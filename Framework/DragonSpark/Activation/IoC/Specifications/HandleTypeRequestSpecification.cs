@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -100,7 +99,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 			this.locator = locator;
 		}
 
-		public override bool IsSatisfiedBy( Type parameter ) => locator.Create( parameter ) != null;
+		public override bool IsSatisfiedBy( Type parameter ) => locator.Get( parameter ) != null;
 	}
 
 	[Persistent]
@@ -233,7 +232,6 @@ namespace DragonSpark.Activation.IoC.Specifications
 				predicate = Check;
 			}
 
-			[Freeze]
 			public override IEnumerable<ConstructorInfo> Create( ConstructTypeRequest parameter )
 			{
 				var result = new ReflectionHelper( parameter.RequestedType )

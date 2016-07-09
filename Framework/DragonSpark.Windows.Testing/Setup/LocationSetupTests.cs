@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
-using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
@@ -27,7 +26,6 @@ using ApplicationAssemblyLocator = DragonSpark.TypeSystem.ApplicationAssemblyLoc
 using AssemblyBasedServiceProviderFactory = DragonSpark.Activation.IoC.AssemblyBasedServiceProviderFactory;
 using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
-using ExceptionFormatter = DragonSpark.Diagnostics.ExceptionFormatter;
 using Locator = DragonSpark.Windows.Testing.TestObjects.Locator;
 using Object = DragonSpark.Testing.Objects.Object;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
@@ -399,7 +397,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void ConventionLocator( BuildableTypeFromConventionLocator locator )
 		{
-			var type = locator.Create( typeof(Assembly) );
+			var type = locator.Get( typeof(Assembly) );
 			Assert.Null( type );
 		}
 

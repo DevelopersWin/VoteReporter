@@ -29,7 +29,7 @@ namespace DragonSpark.ComponentModel
 		public object GetValue( DefaultValueParameter parameter )
 		{
 			var targetType = hostType ?? parameter.Metadata.PropertyType;
-			var type = locator.Create( targetType ) ?? targetType;
+			var type = locator.Get( targetType ) ?? targetType;
 			var result = new SingletonLocator( propertyName ).Locate( type );
 			return result;
 		}

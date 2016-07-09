@@ -186,46 +186,52 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	[ApplyAutoValidation]
-	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
+	public class BuildableTypeFromConventionLocator : Cache<Type, Type>
 	{
-		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator( Items<Type>.Default );
+		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator();
 
-		readonly Type[] types;
-		readonly Func<Type, ITypeCandidateWeightProvider> weight;
-		readonly ISpecification<Type> specification;
+		BuildableTypeFromConventionLocator() : this( Items<Type>.Default ) {}
 
-		public BuildableTypeFromConventionLocator( [Required]params Type[] types ) : this( types, type => new TypeCandidateWeightProvider( type ), CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ), CanInstantiateSpecification.Instance.Inverse() ) {}
+		public BuildableTypeFromConventionLocator( params Type[] types ) : base( new Factory( types ).Create ) {}
 
-		protected BuildableTypeFromConventionLocator( [Required]Type[] types, Func<Type, ITypeCandidateWeightProvider> weight, [Required]ISpecification<Type> specification, [Required]ISpecification<Type> unbuildable ) : base( unbuildable )
+		[ApplyAutoValidation]
+		protected class Factory : FactoryBase<Type, Type>
 		{
-			this.types = types;
-			this.weight = weight;
-			this.specification = specification;
-		}
+			readonly Type[] types;
+			readonly Func<Type, ITypeCandidateWeightProvider> weight;
+			readonly ISpecification<Type> specification;
 
-		[Freeze]
-		public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
+			public Factory( params Type[] types ) : this( types, type => new TypeCandidateWeightProvider( type ), CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ), CanInstantiateSpecification.Instance.Inverse() ) {}
 
-		static Type Map( Type parameter )
-		{
-			var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
-			var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
-			return result;
-		}
+			protected Factory( Type[] types, Func<Type, ITypeCandidateWeightProvider> weight, ISpecification<Type> specification, ISpecification<Type> unbuildable ) : base( unbuildable )
+			{
+				this.types = types;
+				this.weight = weight;
+				this.specification = specification;
+			}
 
-		Type Search( Type parameter )
-		{
-			var adapter = parameter.Adapt();
-			var order = weight( parameter );
-			var convention = new IsConventionCandidateSpecification( parameter );
-			var result =
-				types
-					.Where( adapter.IsAssignableFrom )
-					.Where( specification.IsSatisfiedBy )
-					.OrderByDescending( order.GetWeight )
-					.FirstOrDefault( convention.IsSatisfiedBy );
-			return result;
+			public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
+
+			static Type Map( Type parameter )
+			{
+				var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
+				var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
+				return result;
+			}
+
+			Type Search( Type parameter )
+			{
+				var adapter = parameter.Adapt();
+				var order = weight( parameter );
+				var convention = new IsConventionCandidateSpecification( parameter );
+				var result =
+					types
+						.Where( adapter.IsAssignableFrom )
+						.Where( specification.IsSatisfiedBy )
+						.OrderByDescending( order.GetWeight )
+						.FirstOrDefault( convention.IsSatisfiedBy );
+				return result;
+			}
 		}
 	}
 
@@ -408,7 +414,7 @@ namespace DragonSpark.Activation.IoC
 		{
 			static ISpecification<Type> Specification { get; } = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
 
-			public ConventionCandidateLocator( BuildableTypeFromConventionLocator factory ) : base( new DecoratedFactory<Type, Type>( factory, Specification ).ToDelegate() ) {}
+			public ConventionCandidateLocator( BuildableTypeFromConventionLocator factory ) : base( new DelegatedFactory<Type, Type>( factory.ToDelegate(), Specification ).Create ) {}
 		}
 
 		public ConventionStrategy( ConventionCandidateLocator locator, IServiceRegistry registry )

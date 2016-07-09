@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -29,16 +30,16 @@ namespace DragonSpark.Activation
 	{
 		public static Activator Instance { get; } = new Activator( BuildableTypeFromConventionLocator.Instance );
 
-		public Activator( [Required] BuildableTypeFromConventionLocator locator ) : base( new SingletonLocator( locator ), Constructor.Instance ) {}
+		public Activator( BuildableTypeFromConventionLocator locator ) : base( new SingletonLocator( locator ), Constructor.Instance ) {}
 
 		class SingletonLocator : LocatorBase
 		{
 			readonly Func<Type, Type> convention;
 			readonly ISingletonLocator singleton;
 
-			public SingletonLocator( [Required] BuildableTypeFromConventionLocator convention ) : this( convention.ToDelegate(), IoC.SingletonLocator.Instance ) {}
+			public SingletonLocator( BuildableTypeFromConventionLocator convention ) : this( convention.ToDelegate(), IoC.SingletonLocator.Instance ) {}
 
-			SingletonLocator( [Required] Func<Type, Type> convention, [Required]ISingletonLocator singleton )
+			SingletonLocator( Func<Type, Type> convention, ISingletonLocator singleton )
 			{
 				this.convention = convention;
 				this.singleton = singleton;
