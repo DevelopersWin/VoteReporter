@@ -1,5 +1,5 @@
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
 using System;
@@ -33,9 +33,8 @@ namespace DragonSpark.Activation.IoC
 
 	class AttributedLifetimeFactory : FactoryBase<Type, Type>
 	{
-		public static AttributedLifetimeFactory Instance { get; } = new AttributedLifetimeFactory();
+		public static ICache<Type, Type> Instance { get; } = new AttributedLifetimeFactory().Cached();
 			
-		[Freeze]
 		public override Type Create( Type parameter ) => 
 			parameter
 				.GetTypeInfo()
@@ -46,10 +45,12 @@ namespace DragonSpark.Activation.IoC
 	[Persistent]
 	public class LifetimeManagerFactory : FactoryBase<Type, LifetimeManager>
 	{
+		readonly static Func<Type, Type> LifetimeTypeFactory = AttributedLifetimeFactory.Instance.Get;
+
 		readonly Func<Type, LifetimeManager> lifetimeResolver;
 		readonly Func<Type, Type> lifetimeTypeFactory;
 
-		public LifetimeManagerFactory( IUnityContainer container ) : this( container, AttributedLifetimeFactory.Instance.ToDelegate() ) {}
+		public LifetimeManagerFactory( IUnityContainer container ) : this( container, LifetimeTypeFactory ) {}
 
 		protected LifetimeManagerFactory( IUnityContainer container, Func<Type, Type> lifetimeTypeFactory ) : this( container.Resolve<LifetimeManager>, lifetimeTypeFactory ) {}
 

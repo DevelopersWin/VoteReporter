@@ -16,15 +16,6 @@ namespace DragonSpark.Aspects
 		AspectHub() {}
 	}
 
-	/*public abstract class GeneralFactory<T> : Cache<Func<object, T>> where T : class
-	{
-		protected GeneralFactory() : this( new Cache<Func<object, T>>() ) {}
-
-		protected GeneralFactory( ICache<object, Func<object, T>> inner ) : base( inner.Get ) {}
-
-		public T For( object instance ) => Get( instance )?.Invoke( instance );
-	}*/
-
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
 	public class FreezeAttribute : MethodInterceptionAspect, IInstanceScopedAspect
@@ -34,7 +25,7 @@ namespace DragonSpark.Aspects
 
 		public FreezeAttribute() : this( HubSource ) {}
 
-		public FreezeAttribute( Func<object, IAspectHub> hubSource )
+		protected FreezeAttribute( Func<object, IAspectHub> hubSource )
 		{
 			this.hubSource = hubSource;
 		}

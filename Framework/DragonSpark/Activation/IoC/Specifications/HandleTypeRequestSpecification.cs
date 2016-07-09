@@ -2,6 +2,7 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
@@ -19,10 +20,14 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	class CanResolveSpecification : AnySpecification<TypeRequest>, ICanResolveSpecification
 	{
-		public CanResolveSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor ) {}
+		readonly EqualityReferenceCache<TypeRequest, IWritableStore<bool>> cache;
 
-		[Freeze]
-		public override bool IsSatisfiedBy( TypeRequest parameter ) => base.IsSatisfiedBy( parameter );
+		public CanResolveSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor )
+		{
+			cache = new EqualityReferenceCache<TypeRequest, IWritableStore<bool>>( new CacheStore<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
+		}
+
+		public override bool IsSatisfiedBy( TypeRequest parameter ) => cache.Get( parameter ).Value;
 	}
 
 	public abstract class RegistrationSpecificationBase : GuardedSpecificationBase<TypeRequest>
@@ -159,23 +164,21 @@ namespace DragonSpark.Activation.IoC.Specifications
 	}
 
 	[Persistent]
-	public class ConstructorLocator : FactoryBase<ConstructTypeRequest, ConstructorInfo>
+	public class ConstructorLocator : EqualityReferenceCache<ConstructTypeRequest, ConstructorInfo>
 	{
-		readonly ConstructorQueryProvider query;
+		public ConstructorLocator( ConstructorQueryProvider query ) : base( new Factory( query ).Create ) {}
 
-		public ConstructorLocator( ConstructorQueryProvider query )
+		class Factory
 		{
-			this.query = query;
+			readonly ConstructorQueryProvider query;
+			public Factory( ConstructorQueryProvider query )
+			{
+				this.query = query;
+			}
+
+			public ConstructorInfo Create( ConstructTypeRequest parameter ) => query.Get( parameter ).FirstOrDefault();
 		}
-
-		[Freeze]
-		public override ConstructorInfo Create( ConstructTypeRequest parameter ) => query.Create( parameter ).FirstOrDefault();
 	}
-
-	/*public class HasValidConstructorSpecification : TypeRequestSpecification
-	{
-		public HasValidConstructorSpecification( CanLocateSpecification locate, HasLocatableConstructorSpecification construct ) : base( locate.Or( construct.Cast<TypeRequest>( request => new ConstructTypeRequest( request.RequestedType ) ) ) ) {}
-	}*/
 
 	public abstract class TypeRequestSpecificationBase<T> : GuardedSpecificationBase<TypeRequest> where T : TypeRequest
 	{
@@ -213,65 +216,70 @@ namespace DragonSpark.Activation.IoC.Specifications
 	}*/
 
 	[Persistent]
-	public class ConstructorQueryProvider : FactoryBase<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
+	public class ConstructorQueryProvider : EqualityReferenceCache<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
 	{
-		readonly CanLocateSpecification locate;
-		readonly ISpecification<ConstructTypeRequest> create;
-		readonly Func<ConstructTypeRequest, bool> predicate;
+		public ConstructorQueryProvider( CanLocateSpecification locate ) : base( new Factory( locate ).Create ) {}
 
-		public ConstructorQueryProvider( CanLocateSpecification locate )
+		class Factory : FactoryBase<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
 		{
-			this.locate = locate;
-			create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( this.ToDelegate() );
-			predicate = Check;
-		}
+			readonly CanLocateSpecification locate;
+			readonly ISpecification<ConstructTypeRequest> create;
+			readonly Func<ConstructTypeRequest, bool> predicate;
 
-		[Freeze]
-		public override IEnumerable<ConstructorInfo> Create( ConstructTypeRequest parameter )
-		{
-			var result = new ReflectionHelper( parameter.RequestedType )
-				.InstanceConstructors
-				.Introduce( new ContextFactory( parameter.Arguments ), tuple => tuple.Item2.Create( tuple.Item1 ) )
-				.OrderByDescending( item => item.Parameters.Length )
-				.Introduce( predicate, context => context.Item1.Parameters.All( context.Item2 ) )
-				.Select( item => item.Constructor ).Fixed();
-			return result;
-		}
-
-		struct ContextFactory
-		{
-			readonly object[] arguments;
-			public ContextFactory( object[] arguments )
+			public Factory( CanLocateSpecification locate )
 			{
-				this.arguments = arguments;
+				this.locate = locate;
+				create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( this.ToDelegate() );
+				predicate = Check;
 			}
 
-			public Context Create( ConstructorInfo constructor )
+			[Freeze]
+			public override IEnumerable<ConstructorInfo> Create( ConstructTypeRequest parameter )
 			{
-				var parameters = constructor.GetParameterTypes().Introduce( arguments, tuple => new ConstructTypeRequest( tuple.Item1, tuple.Item2 ) ).ToArray();
-				var result = new Context( constructor, parameters );
+				var result = new ReflectionHelper( parameter.RequestedType )
+					.InstanceConstructors
+					.Introduce( new ContextFactory( parameter.Arguments ), tuple => tuple.Item2.Create( tuple.Item1 ) )
+					.OrderByDescending( item => item.Parameters.Length )
+					.Introduce( predicate, context => context.Item1.Parameters.All( context.Item2 ) )
+					.Select( item => item.Constructor ).Fixed();
 				return result;
 			}
-		}
 
-		struct Context
-		{
-			public Context( ConstructorInfo constructor, ConstructTypeRequest[] parameters )
+			struct ContextFactory
 			{
-				Constructor = constructor;
-				Parameters = parameters;
+				readonly object[] arguments;
+				public ContextFactory( object[] arguments )
+				{
+					this.arguments = arguments;
+				}
+
+				public Context Create( ConstructorInfo constructor )
+				{
+					var parameters = constructor.GetParameterTypes().Introduce( arguments, tuple => new ConstructTypeRequest( tuple.Item1, tuple.Item2 ) ).ToArray();
+					var result = new Context( constructor, parameters );
+					return result;
+				}
 			}
 
-			public ConstructorInfo Constructor { get; }
-			public ConstructTypeRequest[] Parameters { get; }
-		}
+			struct Context
+			{
+				public Context( ConstructorInfo constructor, ConstructTypeRequest[] parameters )
+				{
+					Constructor = constructor;
+					Parameters = parameters;
+				}
 
-		bool Check( ConstructTypeRequest parameter )
-		{
-			var one = new AssignableSpecification( parameter.Arguments ).Cast<TypeRequest>( request => request.RequestedType );
-			// var results = new ISpecification[] { one, locate, create }.Select( s => s.IsSatisfiedBy( parameter ) ).Fixed();
-			var result = one.Or( locate, create ).IsSatisfiedBy( parameter );
-			return result;
+				public ConstructorInfo Constructor { get; }
+				public ConstructTypeRequest[] Parameters { get; }
+			}
+
+			bool Check( ConstructTypeRequest parameter )
+			{
+				var one = new AssignableSpecification( parameter.Arguments ).Cast<TypeRequest>( request => request.RequestedType );
+				// var results = new ISpecification[] { one, locate, create }.Select( s => s.IsSatisfiedBy( parameter ) ).Fixed();
+				var result = one.Or( locate, create ).IsSatisfiedBy( parameter );
+				return result;
+			}
 		}
 	}
 
@@ -292,7 +300,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 			var key = new NamedTypeBuildKey( parameter.RequestedType );
 			var buildKey = context.Policies.Get<IBuildKeyMappingPolicy>( key )?.Map( key, null );
 			var mapped = buildKey != null ? new ConstructTypeRequest( buildKey.Type, parameter.Arguments ) : parameter;
-			var result = query.Create( mapped ).Any();
+			var result = query.Get( mapped ).Any();
 			return result;
 		}
 	}

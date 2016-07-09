@@ -29,11 +29,11 @@ namespace DragonSpark.TypeSystem
 		{
 			Type = type;
 			Info = info;
-			methodMapper = new StoreCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Create ).ToDelegate();
+			methodMapper = new StoreCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Create ).Get;
 			GenericFactoryMethods = new GenericStaticMethodFactories( Type );
 			GenericCommandMethods = new GenericStaticMethodCommands( Type );
-			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).ToDelegate();
-			getTypeArguments = new GetTypeArgumentsForCache( this ).ToDelegate();
+			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).Get;
+			getTypeArguments = new GetTypeArgumentsForCache( this ).Get;
 		}
 
 		public Type Type { get; }
@@ -95,7 +95,7 @@ namespace DragonSpark.TypeSystem
 
 		public Type[] GetTypeArgumentsFor( Type implementationType ) => getTypeArguments( implementationType );
 		Type[] GetTypeArgumentsForBody( Type implementationType ) => GetImplementations( implementationType ).First().GenericTypeArguments;
-		class GetTypeArgumentsForCache : Cache<Type, Type[]>
+		class GetTypeArgumentsForCache : ArgumentCache<Type, Type[]>
 		{
 			public GetTypeArgumentsForCache( TypeAdapter owner ) : base( owner.GetTypeArgumentsForBody ) {}
 		}

@@ -9,7 +9,7 @@ namespace DragonSpark.Testing.Framework.Parameters
 
 		public FreezeAttribute( Type registrationType, Type mappedTo ) : base( t => new FreezeRegistration( registrationType, mappedTo ) ) {}
 
-		public class FreezeRegistration : ICustomization
+		class FreezeRegistration : ICustomization
 		{
 			readonly Type mappedTo;
 			readonly private Type registrationType;

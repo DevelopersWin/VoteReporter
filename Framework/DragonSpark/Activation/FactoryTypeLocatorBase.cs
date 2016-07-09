@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
@@ -21,7 +20,6 @@ namespace DragonSpark.Activation
 			this.context = context;
 		}
 
-		[Freeze]
 		public override Type Create( T parameter )
 		{
 			var info = context( parameter ).GetTypeInfo();

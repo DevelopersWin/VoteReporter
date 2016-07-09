@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			// var builder = new BuilderContext( context.BuildPlanStrategies.MakeStrategyChain(), context.Lifetime, context.Policies, new NamedTypeBuildKey<Target>(), null );
 
 			var parameter = new ConstructTypeRequest( typeof(Target), new object() );
-			var constructorInfo = sut.Create( parameter );
+			var constructorInfo = sut.Get( parameter );
 			Assert.Null( constructorInfo );
 
 			container.RegisterInstance( Output );
@@ -42,7 +42,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var condition = specification.IsSatisfiedBy( LocatorBase.Coercer.Instance.Coerce( typeof(ITestOutputHelper) ) );
 			Assert.True( condition );
 
-			var constructor = sut.Create( new ConstructTypeRequest( typeof(Target), new object() ) );
+			var constructor = sut.Get( new ConstructTypeRequest( typeof(Target), new object() ) );
 			Assert.Equal( 1, constructor.GetParameters().Length );
 
 			var resolved = container.Resolve<Target>();

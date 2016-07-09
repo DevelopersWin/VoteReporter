@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -18,27 +17,24 @@ namespace DragonSpark.Activation
 {
 	public class IsFactorySpecification : AdapterSpecificationBase
 	{
-		public static IsFactorySpecification Instance { get; } = new IsFactorySpecification( ImmutableArray.Create( typeof(IFactory), typeof(IFactoryWithParameter) ) );
+		public static ICache<Type, bool> Instance { get; } = new IsFactorySpecification( typeof(IFactory), typeof(IFactoryWithParameter) ).Cached();
+		protected IsFactorySpecification( params Type[] types ) : base( types ) {}
 
-		public IsFactorySpecification( ImmutableArray<Type> types ) : base( types ) {}
-
-		[Freeze]
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
 	}
 
 	public class IsGenericFactorySpecification : AdapterSpecificationBase
 	{
-		public static IsGenericFactorySpecification Instance { get; } = new IsGenericFactorySpecification( ImmutableArray.Create( typeof(IFactory<>), typeof(IFactory<,>) ) );
+		public static ICache<Type, bool> Instance { get; } = new IsGenericFactorySpecification( typeof(IFactory<>), typeof(IFactory<,>) ).Cached();
 
-		public IsGenericFactorySpecification( ImmutableArray<Type> types ) : base( types ) {}
+		protected IsGenericFactorySpecification( params Type[] types ) : base( types ) {}
 
-		[Freeze]
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );
 	}
 
 	public abstract class AdapterSpecificationBase : SpecificationBase<Type>
 	{
-		protected AdapterSpecificationBase( ImmutableArray<Type> types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
+		protected AdapterSpecificationBase( params Type[] types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
 		protected AdapterSpecificationBase( ImmutableArray<TypeAdapter> adapters )
 		{
@@ -211,20 +207,30 @@ namespace DragonSpark.Activation
 		) {}
 
 		[ApplyAutoValidation]
-		class Factory<T> : DelegatedFactory<Type, Func<object>>
+		sealed class Factory<T> : DelegatedFactory<Type, Func<object>>
 		{
 			public Factory( IFactory<Type, Func<object>> inner ) : base( inner.ToDelegate(), TypeAssignableSpecification<T>.Instance ) {}
 		}
 	}
 
-	public sealed class MemberInfoFactoryTypeLocator : FactoryTypeLocatorBase<MemberInfo>
+	public sealed class MemberInfoFactoryTypeLocator : Cache<MemberInfo, Type>
 	{
-		public MemberInfoFactoryTypeLocator( FactoryTypeLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
+		public MemberInfoFactoryTypeLocator( FactoryTypeLocator locator ) : base( new Factory( locator ).Create ) {}
+
+		sealed class Factory : FactoryTypeLocatorBase<MemberInfo>
+		{
+			public Factory( FactoryTypeLocator locator ) : base( locator, member => member.GetMemberType(), member => member.DeclaringType ) {}
+		}
 	}
 
-	public sealed class ParameterInfoFactoryTypeLocator : FactoryTypeLocatorBase<ParameterInfo>
+	public sealed class ParameterInfoFactoryTypeLocator : Cache<ParameterInfo, Type>
 	{
-		public ParameterInfoFactoryTypeLocator( FactoryTypeLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
+		public ParameterInfoFactoryTypeLocator( FactoryTypeLocator locator ) : base( new Factory( locator ).Create ) {}
+
+		class Factory : FactoryTypeLocatorBase<ParameterInfo>
+		{
+			public Factory( FactoryTypeLocator locator ) : base( locator, parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ) {}
+		}
 	}
 
 	[Persistent]

@@ -69,7 +69,7 @@ namespace DragonSpark.Aspects.Validation
 
 	static class Defaults
 	{
-		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Instance.ToDelegate();
+		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Instance.Get;
 	}
 
 	class AspectFactory<T> /*: FactoryBase<object, T>*/ where T : class, IAspect

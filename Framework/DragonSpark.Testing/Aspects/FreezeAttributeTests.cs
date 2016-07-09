@@ -1,8 +1,6 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
+﻿using DragonSpark.Aspects;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
-using JetBrains.dotMemoryUnit;
 using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Reflection;
@@ -28,6 +26,36 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( 2, sut.Cached );
 			Assert.Equal( 2, sut.Cached );
 		}
+
+		/*[Fact]
+		public void Performance()
+		{
+			new PerformanceSupport( WriteLine, Cached, Raw ).Run();
+		}
+
+		class IsFactorySpecification : DragonSpark.Activation.IsFactorySpecification
+		{
+			public new static IsFactorySpecification Instance { get; } = new IsFactorySpecification();
+
+			IsFactorySpecification() : base( typeof(IFactory), typeof(IFactoryWithParameter) ) {}
+		}
+
+		[Fact]
+		public void Raw()
+		{
+			IsFactorySpecification.Instance.IsSatisfiedBy( typeof(Factory) );
+		}
+
+		[Fact]
+		public void Cached()
+		{
+			DragonSpark.Activation.IsFactorySpecification.Instance.Get( typeof(Factory) );
+		}
+
+		class Factory : FactoryBase<string, DateTime>
+		{
+			public override DateTime Create( string parameter ) => DateTime.Now;
+		}*/
 
 		[Fact]
 		public void CheckFreeze()

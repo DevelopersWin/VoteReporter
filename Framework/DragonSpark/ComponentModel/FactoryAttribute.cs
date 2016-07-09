@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using System;
-using System.Composition;
 
 namespace DragonSpark.ComponentModel
 {
@@ -12,7 +11,7 @@ namespace DragonSpark.ComponentModel
 		public ServiceAttribute( Type serviceType = null ) : base( new ServicesValueProvider.Converter( serviceType ) ) {}
 	}
 
-	public sealed class ComposeAttribute : ServicesValueBase
+	/*public sealed class ComposeAttribute : ServicesValueBase
 	{
 		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Compose );
 
@@ -28,10 +27,12 @@ namespace DragonSpark.ComponentModel
 		static object Compose( Type arg ) => GlobalServiceProvider.Instance.Get<CompositionContext>().GetExports( arg );
 
 		public ComposeManyAttribute( Type composedType = null ) : base( new ServicesValueProvider.Converter( composedType ), Compose ) {}
-	}
+	}*/
 
 	public sealed class FactoryAttribute : ServicesValueBase
 	{
+		readonly static Func<Type, object> FactoryMethod = Factory;
+		readonly static Func<MemberInfoFactoryTypeLocator> DefaultLocator = GlobalServiceProvider.Instance.Get<MemberInfoFactoryTypeLocator>;
 		// static DelegatedCreator Creator { get; } = new DelegatedCreator( Category );
 
 		static object Factory( Type arg )
@@ -41,9 +42,9 @@ namespace DragonSpark.ComponentModel
 			return o;
 		}
 
-		public FactoryAttribute( Type factoryType = null ) : this( GlobalServiceProvider.Instance.Get<MemberInfoFactoryTypeLocator>, factoryType ) {}
+		public FactoryAttribute( Type factoryType = null ) : this( DefaultLocator, factoryType ) {}
 
-		public FactoryAttribute( Func<MemberInfoFactoryTypeLocator> locator, Type factoryType = null ) : base( new ServicesValueProvider.Converter( p => factoryType ?? locator().Create( p ) ), Factory ) {}
+		public FactoryAttribute( Func<MemberInfoFactoryTypeLocator> locator, Type factoryType = null ) : base( new ServicesValueProvider.Converter( p => factoryType ?? locator().Get( p ) ), FactoryMethod ) {}
 	}
 
 	/*public class DelegatedCreator : ServicesValueProvider.Category

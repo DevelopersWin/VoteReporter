@@ -28,5 +28,12 @@ namespace DragonSpark.Runtime.Specifications
 
 			DelegateCache() : base( specification => specification.IsSatisfiedBy ) {}
 		}
+
+		public static ICache<T, bool> Cached<T>( this ISpecification<T> @this ) where T : class => Cache<T>.Default.Get( @this );
+		class Cache<T> : Cache<ISpecification<T>, ICache<T, bool>> where T : class
+		{
+			public static Cache<T> Default { get; } = new Cache<T>();
+			Cache() : base( specification => new StoreCache<T, bool>( specification.IsSatisfiedBy ) ) {}
+		}
 	}
 }
