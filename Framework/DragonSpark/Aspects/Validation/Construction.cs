@@ -42,10 +42,10 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	class AutoValidationControllerFactory : FactoryBase<object, IAutoValidationController>
+	class AutoValidationControllerFactory // : FactoryBase<object, IAutoValidationController>
 	{
-		public static ICache<object, IAutoValidationController> Instance { get; } = new AutoValidationControllerFactory().Cached();
-		AutoValidationControllerFactory() : this( AdapterLocator.Instance.ToDelegate() ) {}
+		public static ICache<object, IAutoValidationController> Instance { get; } = new Cache<IAutoValidationController>( new AutoValidationControllerFactory().Create );
+		AutoValidationControllerFactory() : this( AdapterLocator.Instance.Create ) {}
 
 		readonly Func<object, IParameterValidationAdapter> adapterSource;
 		readonly Action<object, IAspectHub> set;
@@ -58,7 +58,7 @@ namespace DragonSpark.Aspects.Validation
 			this.set = set;
 		}
 
-		public override IAutoValidationController Create( object parameter )
+		IAutoValidationController Create( object parameter )
 		{
 			var adapter = adapterSource( parameter );
 			var result = new AutoValidationController( adapter );
@@ -72,13 +72,15 @@ namespace DragonSpark.Aspects.Validation
 		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Instance.ToDelegate();
 	}
 
-	class AspectFactory<T> : FactoryBase<object, T> where T : class, IAspect
+	class AspectFactory<T> /*: FactoryBase<object, T>*/ where T : class, IAspect
 	{
-		public static AspectFactory<T> Instance { get; } = new AspectFactory<T>();
-		AspectFactory() : this( Defaults.ControllerSource, ParameterConstructor<IAutoValidationController, T>.Default ) {}
+		/*public static AspectFactory<T> Instance { get; } = new AspectFactory<T>();
+		AspectFactory() : this( Defaults.ControllerSource, ParameterConstructor<IAutoValidationController, T>.Default ) {}*/
 
 		readonly Func<object, IAutoValidationController> controllerSource;
 		readonly Func<IAutoValidationController, T> resultSource;
+
+		public AspectFactory( Func<IAutoValidationController, T> resultSource ) : this( Defaults.ControllerSource, resultSource ) {}
 
 		public AspectFactory( Func<object, IAutoValidationController> controllerSource, Func<IAutoValidationController, T> resultSource )
 		{
@@ -86,7 +88,7 @@ namespace DragonSpark.Aspects.Validation
 			this.resultSource = resultSource;
 		}
 
-		public override T Create( object parameter )
+		public T Create( object parameter )
 		{
 			var controller = controllerSource( parameter );
 			var result = resultSource( controller );
@@ -115,7 +117,7 @@ namespace DragonSpark.Aspects.Validation
 
 	public class AutoValidationValidationAspect : AutoValidationAspectBase
 	{
-		readonly static Func<object, Implementation> Factory = AspectFactory<Implementation>.Instance.ToDelegate();
+		readonly static Func<object, Implementation> Factory = new AspectFactory<Implementation>( controller => new Implementation( controller ) ).Create;
 		public AutoValidationValidationAspect() : base( Factory ) {}
 
 		sealed class Implementation : AutoValidationValidationAspect
@@ -144,7 +146,8 @@ namespace DragonSpark.Aspects.Validation
 
 	public class AutoValidationExecuteAspect : AutoValidationAspectBase
 	{
-		readonly static Func<object, Implementation> Factory = AspectFactory<Implementation>.Instance.ToDelegate();
+		readonly static Func<object, Implementation> Factory = new AspectFactory<Implementation>( controller => new Implementation( controller ) ).Create;
+
 		public AutoValidationExecuteAspect() : base( Factory ) {}
 
 		sealed class Implementation : AutoValidationExecuteAspect
@@ -180,16 +183,16 @@ namespace DragonSpark.Aspects.Validation
 		Func<object, IParameterValidationAdapter> ProfileSource { get; }
 	}
 
-	class Profile : IProfile
+	abstract class ProfileBase : IProfile
 	{
 		readonly Func<Type, AspectInstance> validate;
 		readonly Func<Type, AspectInstance> execute;
-		protected Profile( Type interfaceType, string valid, string execute, IFactory<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), 
-			new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).ToDelegate(), 
-			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).ToDelegate(), factory.ToDelegate() )
+		protected ProfileBase( Type interfaceType, string valid, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), 
+			new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).Create, 
+			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).Create, factory )
 		{}
 
-		protected Profile( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> profileSource )
+		protected ProfileBase( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> profileSource )
 		{
 			InterfaceType = interfaceType;
 			ProfileSource = profileSource;
@@ -217,10 +220,10 @@ namespace DragonSpark.Aspects.Validation
 
 	static class Construct
 	{
-		public static Func<MethodInfo, AspectInstance> New<T>( params object[] arguments ) => new ConstructAspectInstanceFactory( new ObjectConstruction( typeof(T), arguments ) ).ToDelegate();
+		public static Func<MethodInfo, AspectInstance> New<T>( params object[] arguments ) => new ConstructAspectInstanceFactory( new ObjectConstruction( typeof(T), arguments ) ).Create;
 	}
 
-	sealed class ConstructAspectInstanceFactory : FactoryBase<MethodInfo, AspectInstance>
+	sealed class ConstructAspectInstanceFactory// : FactoryBase<MethodInfo, AspectInstance>
 	{
 		readonly ObjectConstruction construction;
 
@@ -229,10 +232,10 @@ namespace DragonSpark.Aspects.Validation
 			this.construction = construction;
 		}
 
-		public override AspectInstance Create( MethodInfo parameter ) => new AspectInstance( parameter, construction, null );
+		public AspectInstance Create( MethodInfo parameter ) => new AspectInstance( parameter, construction, null );
 	}
 
-	abstract class AspectInstanceFactoryBase : FactoryBase<Type, AspectInstance>
+	abstract class AspectInstanceFactoryBase// : FactoryBase<Type, AspectInstance>
 	{
 		readonly Type implementingType;
 		readonly string methodName;
@@ -245,7 +248,7 @@ namespace DragonSpark.Aspects.Validation
 			this.factory = factory;
 		}
 
-		public override AspectInstance Create( Type parameter )
+		public AspectInstance Create( Type parameter )
 		{
 			var mappings = parameter.Adapt().GetMappedMethods( implementingType );
 			var mapping = mappings.ToArray().Introduce( methodName, pair => pair.Item1.InterfaceMethod.Name == pair.Item2 && ( pair.Item1.MappedMethod.IsFinal || pair.Item1.MappedMethod.IsVirtual ) && !pair.Item1.MappedMethod.IsAbstract ).SingleOrDefault();

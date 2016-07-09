@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -185,7 +186,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	[AutoValidation.GenericFactory]
+	[ApplyAutoValidation]
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
 		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator( Items<Type>.Default );

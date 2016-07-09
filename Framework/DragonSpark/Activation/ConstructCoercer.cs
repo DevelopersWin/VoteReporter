@@ -16,7 +16,7 @@ namespace DragonSpark.Activation
 
 	class ParameterConstructorDelegateFactory<TParameter, TResult> : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
 	{
-		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cached { get; } = new ParameterConstructorDelegateFactory<TParameter, TResult>().Cached();
+		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cached { get; } = new Cache<ConstructorInfo, Func<TParameter, TResult>>( new ParameterConstructorDelegateFactory<TParameter, TResult>().Create );
 		ParameterConstructorDelegateFactory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, parameter.Parameter ) ) {}
 
 		public static Func<TParameter, TResult> Make() => Make( typeof(TParameter) );

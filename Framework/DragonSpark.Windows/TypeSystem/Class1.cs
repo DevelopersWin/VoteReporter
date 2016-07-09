@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -32,7 +32,7 @@ namespace DragonSpark.Windows.TypeSystem
 	}
 
 	[Synchronized]
-	[AutoValidation.GenericCommand]
+	[ApplyAutoValidation]
 	public class AssemblyInitializer : CommandBase<Assembly>
 	{
 		readonly static Action<ModuleHandle> Initialize = System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor;

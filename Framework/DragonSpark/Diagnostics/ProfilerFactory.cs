@@ -13,7 +13,9 @@ namespace DragonSpark.Diagnostics
 {
 	public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
-		public ProfilerFactory() : base( TimerEventConverter.Instance.ToDelegate() ) {}
+		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Instance.Create;
+
+		public ProfilerFactory() : base( TemplateSource ) {}
 	}
 
 	public abstract class ProfilerFactoryBase<TTimer> : FactoryBase<MethodBase, IProfiler> where TTimer : ITimer, new()

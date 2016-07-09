@@ -29,7 +29,7 @@ namespace DragonSpark.TypeSystem
 		{
 			Type = type;
 			Info = info;
-			methodMapper = new MethodMapper( this ).CachedForStructure().ToDelegate();
+			methodMapper = new StoreCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Create ).ToDelegate();
 			GenericFactoryMethods = new GenericStaticMethodFactories( Type );
 			GenericCommandMethods = new GenericStaticMethodCommands( Type );
 			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).ToDelegate();
@@ -134,7 +134,7 @@ namespace DragonSpark.TypeSystem
 		public Type[] GetEntireHierarchy() => Expand( Type ).Union( GetHierarchy( false ) ).Distinct().ToArray();
 	}
 
-	class MethodMapper : FactoryBase<Type, ImmutableArray<MethodMapping>>
+	class MethodMapper//  : FactoryBase<Type, ImmutableArray<MethodMapping>>
 	{
 		readonly TypeAdapter adapter;
 
@@ -143,7 +143,7 @@ namespace DragonSpark.TypeSystem
 			this.adapter = adapter;
 		}
 
-		public override ImmutableArray<MethodMapping> Create( Type parameter )
+		public ImmutableArray<MethodMapping> Create( Type parameter )
 		{
 			var generic = parameter.GetTypeInfo().IsGenericTypeDefinition ? adapter.GetImplementations( parameter ).FirstOrDefault() : null;
 			var implementation = generic ?? ( parameter.Adapt().IsAssignableFrom( adapter.Type ) ? parameter : null );

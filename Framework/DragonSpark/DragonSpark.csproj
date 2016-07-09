@@ -185,8 +185,6 @@
     <Compile Include="Activation\IoC\LifetimeManagerFactory.cs" />
     <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
     <Compile Include="Aspects\Validation\AutoValidation.cs" />
-    <Compile Include="Aspects\Validation\AutoValidationRewrite.Archive.cs" />
-    <Compile Include="Aspects\AutoValidation.cs" />
     <Compile Include="Aspects\ThreadCache.cs" />
     <Compile Include="Aspects\FreezeAttribute.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />

@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
@@ -11,7 +12,6 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using DragonSpark.Aspects;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -52,7 +52,7 @@ namespace DragonSpark.Windows.Setup
 		}
 	}
 
-	[AutoValidation.GenericCommand]
+	[ApplyAutoValidation]
 	public class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
 		readonly LogCommand log;

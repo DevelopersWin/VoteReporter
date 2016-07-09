@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -199,7 +200,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	[AutoValidation.GenericFactory]
+	[ApplyAutoValidation]
 	sealed class FixtureServiceProvider : FactoryBase<Type, object>, IServiceProvider
 	{
 		readonly IFixture fixture;

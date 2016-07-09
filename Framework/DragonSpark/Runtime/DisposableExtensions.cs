@@ -59,25 +59,19 @@ namespace DragonSpark.Runtime
 		public override void Execute( IDisposable parameter ) => cache.Get( parameter ).Purge().Each( disposable => disposable.Dispose() );
 	}
 
-	/*class Associated : AssociatedStore<IDisposable, ICollection<IDisposable>>
-	{
-		public Associated( IDisposable instance ) : base( instance, typeof(Associated), () =>  ) {}
-	}*/
-
-	/*public class AssociatedDisposeAttribute : AspectAttributeBase
-	{
-		public AssociatedDisposeAttribute( bool enabled ) : base( enabled ) {}
-	}*/
-
+	
 	[ProvideAspectRole( "Dispose Associated Disposables" ), LinesOfCodeAvoided( 1 )]
 	[OnMethodBoundaryAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[MulticastAttributeUsage( MulticastTargets.Method, PersistMetaData = false, TargetMemberAttributes = MulticastAttributes.Instance ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public sealed class DisposeAssociatedAspect : OnMethodBoundaryAspect
 	{
+		readonly static Func<IDisposable, bool> Configure = ConfigureAssociatedDisposables.Instance.Get;
+		readonly static Action<IDisposable> Command = DisposeAssociatedCommand.Instance.Execute;
+
 		readonly Func<IDisposable, bool> property;
 		readonly Action<IDisposable> command;
 
-		public DisposeAssociatedAspect() : this( ConfigureAssociatedDisposables.Instance.ToDelegate(), DisposeAssociatedCommand.Instance.ToDelegate() ) {}
+		public DisposeAssociatedAspect() : this( Configure, Command ) {}
 
 		public DisposeAssociatedAspect( Func<IDisposable, bool> property, Action<IDisposable> command )
 		{
@@ -106,5 +100,6 @@ namespace DragonSpark.Runtime
 				}
 			}
 		}
+		// public override bool CompileTimeValidate( MethodBase method ) => false;
 	}
 }

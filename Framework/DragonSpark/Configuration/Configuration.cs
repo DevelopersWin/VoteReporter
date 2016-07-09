@@ -1,4 +1,4 @@
-﻿using DragonSpark.Aspects;
+﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
@@ -31,7 +31,7 @@ namespace DragonSpark.Configuration
 	}
 
 	[ContentProperty( nameof(Configurations) )]
-	[AutoValidation.GenericCommand]
+	[ApplyAutoValidation]
 	public class InitializeConfigurationCommand : ServicedCommand<ConfigureCommand, IList<IWritableStore>>
 	{
 		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification() ) {}

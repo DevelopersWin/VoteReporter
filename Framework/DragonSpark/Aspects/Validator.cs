@@ -1,8 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
@@ -112,7 +110,7 @@ namespace DragonSpark.Aspects
 		FactoryProfileFactory() : base( instance => new FactoryAdapter( instance ) ) {}
 	}
 
-	public struct AutoValidationParameter
+	/*public struct AutoValidationParameter
 	{
 		readonly MethodInterceptionArgs args;
 
@@ -124,7 +122,7 @@ namespace DragonSpark.Aspects
 
 		public T Proceed<T>() => args.GetReturnValue<T>();
 		public object Parameter { get; }
-	}
+	}*/
 
 	public interface IParameterValidationAdapter : IMethodAware
 	{
@@ -193,7 +191,7 @@ namespace DragonSpark.Aspects
 		MethodInfo IMethodAware.Method => Method;
 	}
 
-	public interface IAutoValidationController
+	/*public interface IAutoValidationController
 	{
 		void MarkValid( object parameter, bool valid );
 
@@ -220,5 +218,5 @@ namespace DragonSpark.Aspects
 			validated.Assign( null );
 			return result;
 		}
-	}
+	}*/
 }

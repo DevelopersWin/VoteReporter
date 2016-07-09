@@ -1,4 +1,4 @@
-using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	[AutoValidation.GenericFactory]
+	[ApplyAutoValidation]
 	public class Constructor : ConstructorBase
 	{
 		readonly Func<ConstructTypeRequest, ConstructorInfo> constructorSource;
@@ -83,19 +83,19 @@ namespace DragonSpark.Activation
 
 	class InvokeMethodDelegate<T> : InvocationFactoryBase<MethodInfo, T> where T : class
 	{
-		public static ICache<MethodInfo, T> Instance { get; } = new InvokeMethodDelegate<T>().Cached();
-		InvokeMethodDelegate() : base( InvokeMethodExpressionFactory.Instance.ToDelegate() ) {}
+		public static ICache<MethodInfo, T> Instance { get; } = new Cache<MethodInfo, T>( new InvokeMethodDelegate<T>().Create );
+		InvokeMethodDelegate() : base( InvokeMethodExpressionFactory.Instance.Create ) {}
 	}
 
 	class InvokeInstanceMethodDelegate<T> : InvocationFactoryBase<MethodInfo, T> where T : class
 	{
-		public InvokeInstanceMethodDelegate( object instance ) : base( new InvokeInstanceMethodExpressionFactory( instance ).ToDelegate() ) {}
+		public InvokeInstanceMethodDelegate( object instance ) : base( new InvokeInstanceMethodExpressionFactory( instance ).Create ) {}
 	}
 
 	class ConstructorDelegateFactory<T> :  InvocationFactoryBase<ConstructorInfo, T> where T : class
 	{
-		public static ICache<ConstructorInfo, T> Default { get; } = new ConstructorDelegateFactory<T>().Cached();
-		ConstructorDelegateFactory() : base( ActivateFromArrayExpression.Instance.ToDelegate() ) {}
+		public static ICache<ConstructorInfo, T> Default { get; } = new Cache<ConstructorInfo, T>( new ConstructorDelegateFactory<T>().Create );
+		ConstructorDelegateFactory() : base( ActivateFromArrayExpression.Instance.Create ) {}
 	}
 
 	abstract class InvocationFactoryBase<TParameter, TDelegate> : CompiledDelegateFactoryBase<TParameter, TDelegate> where TParameter : MethodBase
@@ -131,9 +131,9 @@ namespace DragonSpark.Activation
 		protected override Expression Apply( ExpressionBodyParameter<MethodInfo> parameter, Expression[] arguments ) => Expression.Call( Expression.Constant( instance ), parameter.Input, arguments );
 	}
 
-	abstract class InvokeArrayFactoryBase<T> : FactoryBase<ExpressionBodyParameter<T>, Expression> where T : MethodBase
+	abstract class InvokeArrayFactoryBase<T> /*: FactoryBase<ExpressionBodyParameter<T>, Expression>*/ where T : MethodBase
 	{
-		public override Expression Create( ExpressionBodyParameter<T> parameter )
+		public virtual Expression Create( ExpressionBodyParameter<T> parameter )
 		{
 			var array = ArgumentsArrayExpressionFactory.Instance.Create( new ArgumentsArrayParameter( parameter.Input, parameter.Parameter ) );
 			var result = Apply( parameter, array );
@@ -241,7 +241,7 @@ namespace DragonSpark.Activation
 		protected override ParameterExpression Get() => expression;
 	}*/
 
-	abstract class CompiledDelegateFactoryBase<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	abstract class CompiledDelegateFactoryBase<TParameter, TResult> // : FactoryBase<TParameter, TResult>
 	{
 		readonly ParameterExpression parameterExpression;
 		readonly Func<ExpressionBodyParameter<TParameter>, Expression> bodySource;
@@ -254,7 +254,7 @@ namespace DragonSpark.Activation
 			this.bodySource = bodySource;
 		}
 
-		public override TResult Create( TParameter parameter )
+		public virtual TResult Create( TParameter parameter )
 		{
 			var body = bodySource( new ExpressionBodyParameter<TParameter>( parameter, parameterExpression ) );
 			var type = typeof(TResult).GetTypeInfo().GetDeclaredMethod( nameof(Invoke) ).ReturnType;

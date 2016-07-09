@@ -73,7 +73,7 @@ namespace DragonSpark.TypeSystem
 
 	public class InstanceActionContext : ActionContextBase
 	{
-		public InstanceActionContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Execute>( instance ).ToDelegate(), methods ) {}
+		public InstanceActionContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Execute>( instance ).Create, methods ) {}
 	}
 
 	public abstract class ActionContextBase : DelegateCreationContextBase<Execute>
@@ -94,7 +94,7 @@ namespace DragonSpark.TypeSystem
 
 	public class InstanceFactoryContext : FactoryContextBase
 	{
-		public InstanceFactoryContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Invoke>( instance ).ToDelegate(), methods ) {}
+		public InstanceFactoryContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Invoke>( instance ).Create, methods ) {}
 	}
 
 	public interface IGenericMethodContext<T> where T : class
@@ -107,7 +107,7 @@ namespace DragonSpark.TypeSystem
 		TResult Invoke( TParameter parameter );
 	}*/
 
-	public class GenericInvocationFactory<TParameter, TResult> : FactoryBase<TParameter, TResult> where TParameter : class
+	public class GenericInvocationFactory<TParameter, TResult> // : FactoryBase<TParameter, TResult> where TParameter : class
 	{
 		readonly private Func<Type, Func<TParameter, TResult>> get;
 
@@ -122,7 +122,7 @@ namespace DragonSpark.TypeSystem
 		{
 			public DelegateCache( IGenericMethodContext<Invoke> context, Type genericType ) : base( new Factory( context, genericType ).Create ) {}
 
-			class Factory : FactoryBase<Type, Func<TParameter, TResult>>
+			class Factory // : FactoryBase<Type, Func<TParameter, TResult>>
 			{
 				readonly IGenericMethodContext<Invoke> context;
 				readonly Type genericType;
@@ -133,11 +133,11 @@ namespace DragonSpark.TypeSystem
 					this.genericType = genericType;
 				}
 
-				public override Func<TParameter, TResult> Create( Type parameter ) => context.Make( parameter.Adapt().GetTypeArgumentsFor( genericType ) ).Get( new[] { parameter } ).Invoke<TParameter, TResult>;
+				public Func<TParameter, TResult> Create( Type parameter ) => context.Make( parameter.Adapt().GetTypeArgumentsFor( genericType ) ).Get( new[] { parameter } ).Invoke<TParameter, TResult>;
 			}
 		}
 
-		public override TResult Create( TParameter parameter ) => get( parameter.GetType() )( parameter );
+		public TResult Create( TParameter parameter ) => get( parameter.GetType() )( parameter );
 	}
 
 	public static class MethodContextExtensions
@@ -185,7 +185,7 @@ namespace DragonSpark.TypeSystem
 
 		public MethodContext<T> Make( params Type[] types ) => Get( types );
 
-		class Factory : FactoryBase<Type[], MethodContext<T>>
+		class Factory // : FactoryBase<Type[], MethodContext<T>>
 		{
 			readonly Func<MethodInfo, T> create;
 			readonly Func<ValueTuple<Descriptor, Type[]>, GenericMethodCandidate<T>> selector;
@@ -216,7 +216,7 @@ namespace DragonSpark.TypeSystem
 				}
 			}
 
-			public override MethodContext<T> Create( Type[] parameter )
+			public MethodContext<T> Create( Type[] parameter )
 			{
 				var candidates = descriptors.Introduce( parameter, tuple => tuple.Item1.Specification( tuple.Item2 ), selector ).WhereAssigned().ToImmutableArray();
 				var result = new MethodContext<T>( candidates );

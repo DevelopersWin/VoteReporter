@@ -1,4 +1,5 @@
 using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -171,18 +172,18 @@ namespace DragonSpark.Activation
 		public ProjectedFactory( Func<TFrom, TTo> convert ) : base( convert ) {}
 	}
 
-	public class ProjectedFactory<TBase, TFrom, TTo> : FactoryBase<TBase, TTo>/*, IConverter<TFrom, TTo>*/ where TFrom : TBase
+	public class ProjectedFactory<TBase, TFrom, TTo> /*: FactoryBase<TBase, TTo>*//*, IConverter<TFrom, TTo>*/ where TFrom : TBase
 	{
-		readonly static ISpecification<TBase> Specification = new DelegatedSpecification<TBase>( parameter => parameter is TFrom );
+		// readonly static ISpecification<TBase> Specification = new DelegatedSpecification<TBase>( parameter => parameter is TFrom );
 
 		readonly Func<TFrom, TTo> convert;
 
-		public ProjectedFactory( Func<TFrom, TTo> convert ) : base( Specification )
+		public ProjectedFactory( Func<TFrom, TTo> convert ) /*: base( Specification )*/
 		{
 			this.convert = convert;
 		}
 
-		public override TTo Create( TBase parameter ) => convert( (TFrom)parameter );
+		public virtual TTo Create( TBase parameter ) => parameter is TFrom ? convert( (TFrom)parameter ) : default(TTo);
 	}
 
 	public class InstanceFromFactoryTypeFactory : FactoryBase<Type, object>
@@ -209,7 +210,7 @@ namespace DragonSpark.Activation
 			new Factory<IFactoryWithParameter>( factoryWithParameter )
 		) {}
 
-		[AutoValidation.GenericFactory]
+		[ApplyAutoValidation]
 		class Factory<T> : DelegatedFactory<Type, Func<object>>
 		{
 			public Factory( IFactory<Type, Func<object>> inner ) : base( inner.ToDelegate(), TypeAssignableSpecification<T>.Instance ) {}

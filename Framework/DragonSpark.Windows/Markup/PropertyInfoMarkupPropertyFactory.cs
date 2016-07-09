@@ -1,9 +1,9 @@
-using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 using System.Reflection;
 
 namespace DragonSpark.Windows.Markup
 {
-	[AutoValidation.GenericFactory]
+	[ApplyAutoValidation]
 	public class PropertyInfoMarkupPropertyFactory : MarkupPropertyFactory<PropertyInfo>
 	{
 		public static PropertyInfoMarkupPropertyFactory Instance { get; } = new PropertyInfoMarkupPropertyFactory();

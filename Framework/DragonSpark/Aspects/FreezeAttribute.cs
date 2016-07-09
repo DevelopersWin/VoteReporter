@@ -70,7 +70,7 @@ namespace DragonSpark.Aspects
 
 		struct MethodProfile
 		{
-			public MethodProfile( MethodInfo method ) : this( method, method.GetParameters().Length == 1 ? (Func<MethodInfo, FreezeAttribute>)ParameterConstructor<MethodInfo, SingleParameterFreeze>.Default : ParameterConstructor<MethodInfo, Freeze>.Default ) {}
+			public MethodProfile( MethodInfo method ) : this( method, method.GetParameters().Length == 1 ? new Func<MethodInfo, FreezeAttribute>( info => new SingleParameterFreeze( info ) ) : ( info => new Freeze( info ) ) ) {}
 
 			MethodProfile( MethodInfo method, Func<MethodInfo, FreezeAttribute> create )
 			{
