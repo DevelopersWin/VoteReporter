@@ -136,12 +136,12 @@ namespace DragonSpark.TypeSystem
 		protected AssemblySourceBase( Func<Assembly[]> item ) : base( item ) {}
 	}*/
 
-	public abstract class AssemblyStoreBase : Store<Assembly[]>
+	public abstract class AssemblySourceBase : FixedFactory<Assembly[]>
 	{
-		protected AssemblyStoreBase( Assembly[] item ) : base( item ) {}
+		protected AssemblySourceBase( Assembly[] item ) : base( item ) {}
 	}
 
-	public abstract class AssemblyProviderBase : AssemblyStoreBase, IAssemblyProvider
+	public abstract class AssemblyProviderBase : AssemblySourceBase, IAssemblyProvider
 	{
 		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( AssembliesFactory.Instance.Create( types.Fixed() ).Union( assemblies ).ToArray() ) {}
 
@@ -150,7 +150,7 @@ namespace DragonSpark.TypeSystem
 		AssemblyProviderBase( IEnumerable<Assembly> assemblies ) : base( assemblies.WhereAssigned().Distinct().Prioritize().Fixed() ) {}
 	}
 
-	public class AggregateAssemblyFactory : AssemblyStoreBase, IAssemblyProvider
+	public class AggregateAssemblyFactory : AssemblySourceBase, IAssemblyProvider
 	{
 		public AggregateAssemblyFactory( Func<Assembly[]> primary, params Func<Assembly[], Assembly[]>[] transformers ) : base( new AggregateFactory<Assembly[]>( primary, transformers ).Create() ) {}
 	}

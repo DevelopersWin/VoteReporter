@@ -332,7 +332,6 @@
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
-    <Compile Include="TypeSystem\IApplicationAssemblyLocator.cs" />
     <Compile Include="Runtime\ICurrentTime.cs" />
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
     <Compile Include="Runtime\Stores\IStore.cs" />

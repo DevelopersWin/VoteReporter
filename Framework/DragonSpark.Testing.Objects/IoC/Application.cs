@@ -30,11 +30,11 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		readonly static Assembly[] AssemblySource = AssemblyProvider.Instance.Value;
+		readonly static Assembly[] Assemblies = AssemblyProvider.Instance.Create();
 
 		public AutoDataAttribute() : this( DefaultApplicationSource ) {}
 
-		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblySource, applicationSource ) {}
+		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( Assemblies, applicationSource ) {}
 
 		protected AutoDataAttribute( IEnumerable<Assembly> assemblies, Func<IServiceProvider, IApplication> applicationSource ) : base( new Factory( assemblies ), applicationSource ) {}
 
@@ -63,9 +63,9 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AssemblyProvider : AssemblyProviderBase
 	{
-		readonly static Assembly ApplicationAssembly = DomainApplicationAssemblyLocator.Instance.Value;
+		readonly static Assembly ApplicationAssembly = DomainApplicationAssemblyLocator.Instance.Get( AppDomain.CurrentDomain );
 
 		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
-		public AssemblyProvider( params Type[] others ) : base( others.Append( typeof(AssemblyStoreBase) ).Fixed(), ApplicationAssembly ) {}
+		public AssemblyProvider( params Type[] others ) : base( others.Append( typeof(AssemblySourceBase) ).Fixed(), ApplicationAssembly ) {}
 	}
 }

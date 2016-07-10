@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -43,7 +42,7 @@ namespace DragonSpark.TypeSystem
 
 		public static T DefaultOrEmpty<T>() => DefaultValueFactory<T>.Instance;
 
-		public static object DefaultOrEmpty( Type type ) => DefaultValueFactory.Instance( type );
+		public static object DefaultOrEmpty( Type type ) => DefaultValueFactory.Instance.Get( type );
 	}
 
 	public static class Delegates<T>
@@ -70,18 +69,18 @@ namespace DragonSpark.TypeSystem
 		public static ImmutableArray<T> Immutable { get; }
 	}
 
-	class DefaultValueFactory<T> : Store<T>
+	class DefaultValueFactory<T> : FixedFactory<T>
 	{
-		public static T Instance { get; } = new DefaultValueFactory<T>( DefaultValueFactory.Instance ).Value;
+		public static T Instance { get; } = new DefaultValueFactory<T>(  ).Create();
 
-		DefaultValueFactory( Func<Type, object> source ) : base( (T)source( typeof(T) ) ) {}
+		DefaultValueFactory() : base( (T)DefaultValueFactory.Instance.Get( typeof(T) ) ) {}
 	}
 
 	class DefaultValueFactory : Cache<Type, object>
 	{
 		readonly static IGenericMethodContext<Invoke> Method = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
 
-		public static Func<Type, object> Instance { get; } = new DefaultValueFactory().ToDelegate();
+		public static ICache<Type, object> Instance { get; } = new DefaultValueFactory();
 		DefaultValueFactory() : base( Create ) {}
 
 		static object Create( Type parameter )

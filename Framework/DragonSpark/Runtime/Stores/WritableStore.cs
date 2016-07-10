@@ -132,7 +132,7 @@ namespace DragonSpark.Runtime.Stores
 		protected override T Get() => lazy.Value;
 	}
 
-	public abstract class DeferredMethodStore<T> : StoreBase<T>
+	/*public abstract class DeferredMethodStore<T> : StoreBase<T>
 	{
 		readonly Lazy<T> defer;
 
@@ -144,7 +144,7 @@ namespace DragonSpark.Runtime.Stores
 		protected abstract T Body();
 
 		protected sealed override T Get() => defer.Value;
-	}
+	}*/
 
 	public class DeferredTargetCachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{

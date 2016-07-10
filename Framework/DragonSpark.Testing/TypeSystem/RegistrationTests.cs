@@ -19,7 +19,7 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Same( AssemblySource.Result, sut );
 		}
 
-		class AssemblySource : AssemblyStoreBase
+		class AssemblySource : AssemblySourceBase
 		{
 			readonly internal static Assembly[] Result = new Assembly[0];
 

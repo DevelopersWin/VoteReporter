@@ -1,7 +1,5 @@
 using DragonSpark.Activation;
-using DragonSpark.Runtime.Stores;
-using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Runtime.Properties;
 using System;
 using System.Composition;
 using System.IO;
@@ -10,38 +8,31 @@ using System.Reflection;
 namespace DragonSpark.Windows.Runtime
 {
 	[Export, Shared]
-	public class ApplicationAssemblyLocator : FirstFactory<Assembly>, IApplicationAssemblyLocator
+	public class ApplicationAssemblyLocator : FixedFactory<Assembly>
 	{
-		readonly static IFactory<Assembly> Default = DomainApplicationAssemblyLocator.Instance.Value.ToFactory();
+		readonly static Assembly Default = DomainApplicationAssemblyLocator.Instance.Get( AppDomain.CurrentDomain );
 
 		[ImportingConstructor]
-		public ApplicationAssemblyLocator( [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( Default, system ) {}
+		public ApplicationAssemblyLocator( Assembly[] assemblies ) : this( assemblies, AppDomain.CurrentDomain ) {}
 
-		public ApplicationAssemblyLocator( [Required]DomainApplicationAssemblyLocator domain, [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( domain.ToDelegate(), system.ToDelegate() ) {}
+		public ApplicationAssemblyLocator( Assembly[] assemblies, AppDomain domain ) : base( DragonSpark.TypeSystem.ApplicationAssemblyLocator.Instance.Create( assemblies ) ?? DomainApplicationAssemblyLocator.Instance.Get( domain ) ) {}
 	}
 
-	public class DomainApplicationAssemblyLocator : Store<Assembly>
+	public class DomainApplicationAssemblyLocator : Cache<AppDomain, Assembly>
 	{
 		public static DomainApplicationAssemblyLocator Instance { get; } = new DomainApplicationAssemblyLocator();
-		DomainApplicationAssemblyLocator() : this( AppDomain.CurrentDomain ) {}
-		public DomainApplicationAssemblyLocator( AppDomain domain ) : base( Factory.Instance.Create( domain ) ) {}
+		DomainApplicationAssemblyLocator() : base( Create ) {}
 
-		class Factory : FactoryBase<AppDomain, Assembly>
+		static Assembly Create( AppDomain parameter )
 		{
-			public static Factory Instance { get; } = new Factory();
-			Factory() {}
-
-			public override Assembly Create( AppDomain parameter )
+			try
 			{
-				try
-				{
-					return Assembly.Load( parameter.FriendlyName );
-				}
-				catch ( FileNotFoundException )
-				{
-					var result = Assembly.GetEntryAssembly();
-					return result;
-				}
+				return Assembly.Load( parameter.FriendlyName );
+			}
+			catch ( FileNotFoundException )
+			{
+				var result = Assembly.GetEntryAssembly();
+				return result;
 			}
 		}
 	}

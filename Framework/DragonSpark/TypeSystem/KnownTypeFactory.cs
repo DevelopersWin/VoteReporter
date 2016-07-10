@@ -10,7 +10,7 @@ namespace DragonSpark.TypeSystem
 {
 	public class KnownTypeFactory : StoreCache<Type, ImmutableArray<Type>>
 	{
-		public static KnownTypeFactory Instance { get; } = new KnownTypeFactory( FrameworkTypes.Instance.Value );
+		public static KnownTypeFactory Instance { get; } = new KnownTypeFactory( FrameworkTypes.Instance.Create() );
 
 		public KnownTypeFactory( Type[] types ) : this( types.ToImmutableArray() ) {}
 

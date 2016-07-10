@@ -80,7 +80,7 @@ namespace DragonSpark.Testing.Aspects
 			protected virtual void Dispose( bool disposing ) => Count++;
 		}
 
-		public class Source : AssemblyStoreBase
+		public class Source : AssemblySourceBase
 		{
 			public int Count { get; private set; }
 

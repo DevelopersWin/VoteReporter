@@ -1,7 +1,7 @@
-using DragonSpark.Runtime.Stores;
+using DragonSpark.Activation;
 using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public interface IAssemblyProvider : IStore<Assembly[]> {}
+	public interface IAssemblyProvider : IFactory<Assembly[]> {}
 }

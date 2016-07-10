@@ -367,9 +367,9 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void Locate( [DragonSpark.Testing.Framework.Parameters.Service]ApplicationAssemblyLocator sut )
+		public void Locate( [DragonSpark.Testing.Framework.Parameters.Service]Assembly[] assemblies,  [DragonSpark.Testing.Framework.Parameters.Service]ApplicationAssemblyLocator sut )
 		{
-			Assert.Same( GetType().Assembly, sut.Create() );
+			Assert.Same( GetType().Assembly, sut.Create( assemblies ) );
 		}
 
 		[Theory, LocationSetup.AutoData]
@@ -388,7 +388,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( registered );
 
 			var fromContainer = container.Resolve<Assembly[]>();
-			var fromProvider = provider.Value;
+			var fromProvider = provider.Create();
 			Assert.Equal( fromContainer, fromProvider );
 
 			Assert.Equal( fromContainer, sut );
@@ -402,7 +402,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void CreateAssemblySimple( IUnityContainer container, IApplicationAssemblyLocator locator, [DragonSpark.Testing.Framework.Parameters.Service]Assembly sut )
+		public void CreateAssemblySimple( IUnityContainer container, Windows.Runtime.ApplicationAssemblyLocator locator, [DragonSpark.Testing.Framework.Parameters.Service]Assembly sut )
 		{
 			Assert.True( container.IsRegistered<Assembly>() );
 		}
@@ -427,7 +427,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void CreateAssembly( [DragonSpark.Testing.Framework.Parameters.Service]AssemblyInformationFactory factory, IUnityContainer container, IApplicationAssemblyLocator locator, [DragonSpark.Testing.Framework.Parameters.Service]Assembly sut )
+		public void CreateAssembly( [DragonSpark.Testing.Framework.Parameters.Service]AssemblyInformationFactory factory, IUnityContainer container, Windows.Runtime.ApplicationAssemblyLocator locator, [DragonSpark.Testing.Framework.Parameters.Service]Assembly sut )
 		{
 			var fromFactory = locator.Create();
 			var fromContainer = container.Resolve<Assembly>();

@@ -6,6 +6,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Activation
 {
@@ -159,7 +160,7 @@ namespace DragonSpark.Activation
 		readonly Func<TParameter, TResult> inner;
 		readonly TParameter parameter;
 
-		public FixedFactory( Func<TParameter, TResult> inner, TParameter parameter )
+		public FixedFactory( Func<TParameter, TResult> inner, [Optional]TParameter parameter )
 		{
 			this.inner = inner;
 			this.parameter = parameter;

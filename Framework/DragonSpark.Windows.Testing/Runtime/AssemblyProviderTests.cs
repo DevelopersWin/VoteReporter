@@ -14,7 +14,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		public void Assemblies( AssemblyProvider sut )
 		{
 			Assert.NotEqual( sut, AssemblyProvider.Instance );
-			var assemblies = sut.Value;
+			var assemblies = sut.Create();
 			var specification = new ApplicationAssemblySpecification( typeof(IFactory).Assembly.GetRootNamespace() );
 
 			Assert.True( assemblies.All( specification.IsSatisfiedBy ) );

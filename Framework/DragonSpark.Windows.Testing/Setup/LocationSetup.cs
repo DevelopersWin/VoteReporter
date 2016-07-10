@@ -12,7 +12,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			public static Func<IServiceProvider, IApplication> ApplicationSource { get; } = serviceProvider => new Application<LocationSetup>( serviceProvider );
 
-			public AutoDataAttribute() : base( AssemblyProvider.Instance.Value, ApplicationSource ) {}
+			public AutoDataAttribute() : base( AssemblyProvider.Instance.Create(), ApplicationSource ) {}
 		}
 
 		public LocationSetup()

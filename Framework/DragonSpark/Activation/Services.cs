@@ -29,7 +29,7 @@ namespace DragonSpark.Activation
 
 	class DefaultInstances : InstanceServiceProvider
 	{
-		public DefaultInstances( RecordingLoggerFactory factory ) : base( new IFactory[] { factory }, FrameworkTypes.Instance, factory.History, factory.LevelSwitch, Activator.Instance, new DisposableRepository() ) {}
+		public DefaultInstances( RecordingLoggerFactory factory ) : base( new IFactory[] { factory, FrameworkTypes.Instance }, factory.History, factory.LevelSwitch, Activator.Instance, new DisposableRepository() ) {}
 	}
 
 	class ActivatedServiceProvider : IServiceProvider

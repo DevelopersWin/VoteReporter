@@ -167,12 +167,13 @@ namespace DragonSpark.Setup
 
 		static IEnumerable<IInstanceRegistration> Instances( IEnumerable<object> instances )
 		{
-			var all = instances.ToArray();
+			return instances.Select( o => new InstanceStore( o ) );
+			/*var all = instances.ToArray();
 
 			var stores = all.OfType<IStore>().ToArray();
 			var references = all.Except( stores ).Select( o => new InstanceStore( o ) );
 			var result = stores.Select( store => new InstanceStore( store ) ).Concat( references );
-			return result;
+			return result;*/
 		}
 
 		public bool IsRegistered( Type type ) => List().Select( registration => registration.RegisteredType ).Any( type.Adapt().IsAssignableFrom );
@@ -218,7 +219,7 @@ namespace DragonSpark.Setup
 
 	class InstanceStore : FixedStore<object>, IInstanceRegistration
 	{
-		public InstanceStore( IStore store ) : this( store.Value ) {}
+		// public InstanceStore( IStore store ) : this( store.Value ) {}
 
 		public InstanceStore( object reference ) : this( reference, reference.GetType() ) {}
 
@@ -318,7 +319,7 @@ namespace DragonSpark.Setup
 		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand) };
 	}*/
 
-	public class FrameworkTypes : Store<ImmutableArray<Type>>
+	public class FrameworkTypes : FixedFactory<ImmutableArray<Type>>
 	{
 		public static FrameworkTypes Instance { get; } = new FrameworkTypes( typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) );
 		protected FrameworkTypes( params Type[] types ) : base( types.ToImmutableArray() ) {}
@@ -326,9 +327,9 @@ namespace DragonSpark.Setup
 
 	public abstract class Application<T> : CompositeCommand<T>, IApplication<T>
 	{
-		protected Application( [Required]IServiceProvider provider ) : this( provider, Items<ICommand>.Default ) {}
+		protected Application( IServiceProvider provider ) : this( provider, Items<ICommand>.Default ) {}
 
-		protected Application( [Required]IServiceProvider provider, IEnumerable<ICommand> commands ) : this( commands )
+		protected Application( IServiceProvider provider, IEnumerable<ICommand> commands ) : this( commands )
 		{
 			Services = provider;
 		}
