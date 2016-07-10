@@ -22,7 +22,7 @@ namespace DragonSpark.Extensions
 		  return null;
 		}
 
-		public static Assembly[] Assemblies( this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToArray();
+		public static ImmutableArray<Assembly> Assemblies( this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToImmutableArray();
 
 		public static TypeAdapter Adapt( this Type @this ) => TypeAdapterCache.Default.Get( @this );
 

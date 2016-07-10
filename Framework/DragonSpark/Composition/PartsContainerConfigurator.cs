@@ -33,19 +33,21 @@ namespace DragonSpark.Composition
 
 	public class AssemblyBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
 	{
-		public AssemblyBasedConfigurationContainerFactory( [Required] Assembly[] assemblies )
+		public AssemblyBasedConfigurationContainerFactory( IEnumerable<Assembly> assemblies ) : this( assemblies.ToImmutableArray() ) { }
+
+		AssemblyBasedConfigurationContainerFactory( ImmutableArray<Assembly> assemblies )
 			: base( assemblies, TypesFactory.Instance.Create( assemblies ) ) {}
 	}
 
 	public class TypeBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
 	{
-		public TypeBasedConfigurationContainerFactory( Type[] types )  : base( Items<Assembly>.Default, types ) {}
+		public TypeBasedConfigurationContainerFactory( IEnumerable<Type> types )  : base( Items<Assembly>.Immutable, types.ToImmutableArray() ) {}
 	}
 
 	public class ContainerConfigurationFromPartsFactory : AggregateFactory<ContainerConfiguration>
 	{
-		public ContainerConfigurationFromPartsFactory( [Required] Assembly[] assemblies, [Required] Type[] types )
-			: base( ContainerConfigurationFactory.Instance.ToDelegate(), ContainerServicesConfigurator.Instance.ToDelegate(), new PartsContainerConfigurator( assemblies, types ).ToDelegate() ) {}
+		public ContainerConfigurationFromPartsFactory( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types )
+			: base( ContainerConfigurationFactory.Instance.Create, ContainerServicesConfigurator.Instance.ToDelegate(), new PartsContainerConfigurator( assemblies, types ).ToDelegate() ) {}
 	}
 
 	public class ContainerConfigurationFactory : FactoryBase<ContainerConfiguration>
@@ -124,28 +126,28 @@ namespace DragonSpark.Composition
 
 	public class PartsContainerConfigurator : ContainerConfigurator
 	{
-		readonly Assembly[] assemblies;
-		readonly ImmutableArray<Type> core;
-		readonly Type[] types, all;
+		readonly ImmutableArray<Assembly> assemblies;
+		readonly ImmutableArray<Type> core, types, all;
 		readonly FactoryTypeRequest[] factoryTypes;
 		readonly Activation.FactoryTypeLocator locator;
 		readonly BuildableTypeFromConventionLocator conventionLocator;
 		readonly Activation.Activator activator;
 
-		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
+		public PartsContainerConfigurator( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
 
-		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types, ImmutableArray<Type> core )
+		public PartsContainerConfigurator( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types, ImmutableArray<Type> core )
 		{
 			this.assemblies = assemblies;
 			this.types = types;
 			this.core = core;
 
 			// TODO: Fix this mess:
-			factoryTypes = FactoryTypeLocator.Instance.GetMany( types );
+			var array = types.ToArray();
+			factoryTypes = FactoryTypeLocator.Instance.GetMany( array );
 			locator = new Activation.FactoryTypeLocator( factoryTypes );
-			conventionLocator = new BuildableTypeFromConventionLocator( types );
+			conventionLocator = new BuildableTypeFromConventionLocator( array );
 			activator = new Activation.Activator( conventionLocator );
-			all = types.Union( core.ToArray() ).Fixed();
+			all = array.Union( core.ToArray() ).ToImmutableArray();
 		}
 
 		public override ContainerConfiguration Create( ContainerConfiguration configuration )
@@ -153,13 +155,15 @@ namespace DragonSpark.Composition
 			var result = configuration
 				.WithInstance( assemblies )
 				.WithInstance( all )
+				.WithInstance( assemblies.ToArray() )
+				.WithInstance( all.ToArray() )
 				.WithInstance( conventionLocator )
 				.WithInstance( factoryTypes )
 				.WithInstance( locator )
 				.WithInstance<IActivator>( activator )
 				// .WithParts( shared, SharedFrameworkConventionBuilder.Instance.Create() )
-				.WithParts( core, FrameworkConventionBuilder.Instance.Create() )
-				.WithParts( types, AttributeProvider.Instance )
+				.WithParts( core.ToArray(), FrameworkConventionBuilder.Instance.Create() )
+				.WithParts( types.ToArray(), AttributeProvider.Instance )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider( locator ) )
 				.WithProvider( new FactoryExportDescriptorProvider( locator ) )

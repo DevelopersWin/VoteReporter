@@ -7,19 +7,18 @@ using DragonSpark.Setup.Registration;
 using PostSharp.Aspects.Internals;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace DragonSpark.TypeSystem
 {
-	public class ApplicationAssemblyFilter : TransformerBase<Assembly[]>
+	public class ApplicationAssemblyFilter : TransformerBase<IEnumerable<Assembly>>
 	{
-		// public static ApplicationAssemblyFilter Instance { get; } = new ApplicationAssemblyFilter( Items<string>.Default );
+		static string[] Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.WhereAssigned().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToArray();
 
 		readonly ISpecification<Assembly> specification;
-		
-		static string[] Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.WhereAssigned().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToArray();
 
 		public ApplicationAssemblyFilter( params Assembly[] coreAssemblies ) : this( Determine( coreAssemblies ) ) {}
 
@@ -30,7 +29,7 @@ namespace DragonSpark.TypeSystem
 			this.specification = specification;
 		}
 
-		public override Assembly[] Create( Assembly[] parameter ) => parameter.Where( specification.ToDelegate() ).Prioritize().ToArray();
+		public override IEnumerable<Assembly> Create( IEnumerable<Assembly> parameter ) => parameter.Where( specification.ToDelegate() ).Prioritize();
 	}
 
 	public class ApplicationTypeSpecification : GuardedSpecificationBase<Type>
@@ -43,13 +42,13 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationAssemblySpecification : GuardedSpecificationBase<Assembly>
 	{
-		public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification( Items<string>.Default );
+		// public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification( Items<string>.Default );
 
-		readonly string[] rootNamespaces;
+		readonly ImmutableArray<string> rootNamespaces;
 
-		public ApplicationAssemblySpecification( [PostSharp.Patterns.Contracts.Required] params string[] rootNamespaces )
+		public ApplicationAssemblySpecification( params string[] rootNamespaces )
 		{
-			this.rootNamespaces = rootNamespaces;
+			this.rootNamespaces = rootNamespaces.ToImmutableArray();
 		}
 
 		public override bool IsSatisfiedBy( Assembly parameter ) => parameter.Has<RegistrationAttribute>() || rootNamespaces.Any( parameter.GetName().Name.StartsWith );

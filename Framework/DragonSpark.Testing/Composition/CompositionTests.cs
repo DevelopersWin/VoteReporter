@@ -7,6 +7,7 @@ using DragonSpark.Testing.Objects.Composition;
 using Serilog;
 using Serilog.Events;
 using System;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
@@ -132,9 +133,9 @@ namespace DragonSpark.Testing.Composition
 		}
 
 		[Theory, CompositionTests.AutoData]
-		public void VerifyInstanceExport( CompositionContext host, [Service]Assembly[] assemblies )
+		public void VerifyInstanceExport( CompositionContext host, [Service]ImmutableArray<Assembly> assemblies )
 		{
-			var composed = host.GetExport<Assembly[]>();
+			var composed = host.GetExport<ImmutableArray<Assembly>>();
 			Assert.Equal( assemblies, composed );
 		}
 

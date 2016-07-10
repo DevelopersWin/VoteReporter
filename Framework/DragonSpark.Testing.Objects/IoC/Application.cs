@@ -7,7 +7,6 @@ using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -30,21 +29,21 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		readonly static Assembly[] Assemblies = AssemblyProvider.Instance.Create();
+		readonly static ImmutableArray<Assembly> Assemblies = AssemblyProvider.Instance.Create();
 
 		public AutoDataAttribute() : this( DefaultApplicationSource ) {}
 
 		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( Assemblies, applicationSource ) {}
 
-		protected AutoDataAttribute( IEnumerable<Assembly> assemblies, Func<IServiceProvider, IApplication> applicationSource ) : base( new Factory( assemblies ), applicationSource ) {}
+		protected AutoDataAttribute( ImmutableArray<Assembly> assemblies, Func<IServiceProvider, IApplication> applicationSource ) : base( new Factory( assemblies ), applicationSource ) {}
 
 		class Factory : FactoryBase<AutoData, IServiceProvider>
 		{
 			readonly ImmutableArray<Assembly> assemblySource;
 
-			public Factory( IEnumerable<Assembly> assemblySource )
+			public Factory( ImmutableArray<Assembly> assemblySource )
 			{
-				this.assemblySource = assemblySource.ToImmutableArray();
+				this.assemblySource = assemblySource;
 			}
 
 			public override IServiceProvider Create( AutoData parameter ) => new Activation.IoC.ServiceProviderFactory( Cache.Instance.Get( parameter.Method.DeclaringType ).Get( assemblySource ) ).Create();

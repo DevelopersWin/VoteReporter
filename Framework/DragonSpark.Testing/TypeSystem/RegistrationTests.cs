@@ -3,6 +3,8 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
@@ -14,14 +16,14 @@ namespace DragonSpark.Testing.TypeSystem
 		[RegisterFactory( typeof(AssemblySource) )]
 		[Theory, Framework.Setup.AutoData]
 		[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
-		public void Testing( Assembly[] sut )
+		public void Testing( ImmutableArray<Assembly> sut )
 		{
-			Assert.Same( AssemblySource.Result, sut );
+			Assert.Equal( AssemblySource.Result, sut );
 		}
 
 		class AssemblySource : AssemblySourceBase
 		{
-			readonly internal static Assembly[] Result = new Assembly[0];
+			readonly internal static ImmutableArray<Assembly> Result = EnumerableEx.Return( typeof(AssemblySource).Assembly ).ToImmutableArray();
 
 			public AssemblySource() : base( Result ) {}
 		}

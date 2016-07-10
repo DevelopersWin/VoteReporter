@@ -7,6 +7,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Composition.Convention;
 using System.Composition.Hosting;
@@ -45,7 +46,7 @@ namespace DragonSpark.Testing.Composition
 		// [RegisterService( typeof(Assembly[]) )]
 
 		[Theory, AutoData( false )]
-		public void LocalData( [Service]Type[] sut, [Service]Assembly[] assemblies )
+		public void LocalData( [Service]ImmutableArray<Type> sut, [Service]ImmutableArray<Assembly> assemblies )
 		{
 			var items = sut.Fixed();
 

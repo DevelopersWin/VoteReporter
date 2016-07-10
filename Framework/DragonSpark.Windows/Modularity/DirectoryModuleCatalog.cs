@@ -4,6 +4,7 @@ using DragonSpark.Modularity;
 using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
@@ -16,7 +17,7 @@ namespace DragonSpark.Windows.Modularity
 
 		public DirectoryModuleCatalog() : this( AssemblyProvider.Instance.Create(), ModuleInfoBuilder.Instance, LoadRemoteModuleInfoFactory.Instance ) {}
 
-		public DirectoryModuleCatalog( Assembly[] assemblies, IModuleInfoBuilder builder, IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory ) : base( assemblies, builder )
+		public DirectoryModuleCatalog( ImmutableArray<Assembly> assemblies, IModuleInfoBuilder builder, IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory ) : base( assemblies, builder )
 		{
 			this.factory = factory;
 			ModulePath = ".";
@@ -24,7 +25,7 @@ namespace DragonSpark.Windows.Modularity
 
 		public string ModulePath { get; set; }
 
-		protected override IEnumerable<ModuleInfo> GetModuleInfos( IEnumerable<Assembly> assemblies )
+		protected override IEnumerable<ModuleInfo> GetModuleInfos( ImmutableArray<Assembly> assemblies )
 		{
 			var parameter = new LoadRemoteModuleInfoParameter( assemblies.Select( assembly => assembly.Location ), ModulePath );
 			var result = factory.Create( parameter );

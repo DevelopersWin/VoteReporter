@@ -9,6 +9,7 @@ using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using Serilog.Events;
 using System;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
@@ -45,7 +46,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Same( provider.Get<LoggingLevelSwitch>(), provider.Get<LoggingLevelSwitch>() );
 			Assert.Same( sut.Resolve<ISingletonLocator>(), sut.Resolve<ISingletonLocator>() );
 			Assert.Same( sink, provider.Get<LoggerHistorySink>() );
-			Assert.Same( Items<Assembly>.Default, sut.Resolve<Assembly[]>() );
+			Assert.Equal( Items<Assembly>.Immutable, sut.Resolve<ImmutableArray<Assembly>>() );
 		}
 
 		[Export]

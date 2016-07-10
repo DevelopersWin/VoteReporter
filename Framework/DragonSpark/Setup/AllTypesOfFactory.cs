@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Setup.Registration;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using Type = System.Type;
@@ -13,7 +12,7 @@ namespace DragonSpark.Setup
 		readonly Type[] types;
 		readonly IActivator activator;
 
-		public AllTypesOfFactory( [Required]Type[] types, [Required]IActivator activator )
+		public AllTypesOfFactory( Type[] types, IActivator activator )
 		{
 			this.types = types;
 			this.activator = activator;

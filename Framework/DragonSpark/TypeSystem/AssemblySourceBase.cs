@@ -3,9 +3,9 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -89,12 +89,12 @@ namespace DragonSpark.TypeSystem
 		public Type ResultType { get; }
 	}
 
-	public class AssembliesFactory : FactoryBase<Type[], Assembly[]>
+	public class AssembliesFactory : FactoryBase<IEnumerable<Type>, ImmutableArray<Assembly>>
 	{
 		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
 
 		[Freeze]
-		public override Assembly[] Create( Type[] parameter ) => parameter.Assemblies();
+		public override ImmutableArray<Assembly> Create( IEnumerable<Type> parameter ) => parameter.Assemblies();
 	}
 
 	public static class AssemblyTypes
@@ -123,12 +123,13 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
-	public class TypesFactory : FactoryBase<Assembly[], Type[]>
+	public class TypesFactory : FactoryBase<IEnumerable<Assembly>, ImmutableArray<Type>>
 	{
+		readonly static Func<Assembly, Type[]> All = AssemblyTypes.All.ToDelegate();
 		public static TypesFactory Instance { get; } = new TypesFactory();
 
 		[Freeze]
-		public override Type[] Create( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.ToDelegate() ).ToArray();
+		public override ImmutableArray<Type> Create( IEnumerable<Assembly> parameter ) => parameter.SelectMany( All ).ToImmutableArray();
 	}
 
 	/*public abstract class AssemblySourceBase : DeferredStore<Assembly[]>
@@ -136,22 +137,22 @@ namespace DragonSpark.TypeSystem
 		protected AssemblySourceBase( Func<Assembly[]> item ) : base( item ) {}
 	}*/
 
-	public abstract class AssemblySourceBase : FixedFactory<Assembly[]>
+	public abstract class AssemblySourceBase : FixedFactory<ImmutableArray<Assembly>>
 	{
-		protected AssemblySourceBase( Assembly[] item ) : base( item ) {}
+		protected AssemblySourceBase( IEnumerable<Assembly> item ) : base( item.ToImmutableArray() ) {}
 	}
 
 	public abstract class AssemblyProviderBase : AssemblySourceBase, IAssemblyProvider
 	{
-		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( AssembliesFactory.Instance.Create( types.Fixed() ).Union( assemblies ).ToArray() ) {}
+		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( AssembliesFactory.Instance.Create( types ).ToArray().Union( assemblies ) ) {}
 
-		protected AssemblyProviderBase( params Type[] types ) : this( AssembliesFactory.Instance.Create( types ) ) {}
+		protected AssemblyProviderBase( params Type[] types ) : this( AssembliesFactory.Instance.Create( types ).ToArray() ) {}
 
-		AssemblyProviderBase( IEnumerable<Assembly> assemblies ) : base( assemblies.WhereAssigned().Distinct().Prioritize().Fixed() ) {}
+		AssemblyProviderBase( IEnumerable<Assembly> assemblies ) : base( assemblies.WhereAssigned().Distinct().Prioritize() ) {}
 	}
 
 	public class AggregateAssemblyFactory : AssemblySourceBase, IAssemblyProvider
 	{
-		public AggregateAssemblyFactory( Func<Assembly[]> primary, params Func<Assembly[], Assembly[]>[] transformers ) : base( new AggregateFactory<Assembly[]>( primary, transformers ).Create() ) {}
+		public AggregateAssemblyFactory( Func<IEnumerable<Assembly>> primary, params Func<IEnumerable<Assembly>, IEnumerable<Assembly>>[] transformers ) : base( new AggregateFactory<IEnumerable<Assembly>>( primary, transformers ).Create() ) {}
 	}
 }

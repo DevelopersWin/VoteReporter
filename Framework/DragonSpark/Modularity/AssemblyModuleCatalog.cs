@@ -1,5 +1,6 @@
 using DragonSpark.Extensions;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -8,9 +9,9 @@ namespace DragonSpark.Modularity
 {
 	public abstract class AssemblyModuleCatalog : ModuleCatalog
 	{
-		readonly Assembly[] assemblies;
+		readonly ImmutableArray<Assembly> assemblies;
 
-		protected AssemblyModuleCatalog( Assembly[] assemblies, IModuleInfoBuilder builder )
+		protected AssemblyModuleCatalog( ImmutableArray<Assembly> assemblies, IModuleInfoBuilder builder )
 		{
 			this.assemblies = assemblies;
 			Builder = builder;
@@ -32,7 +33,7 @@ namespace DragonSpark.Modularity
 			return result;
 		}
 
-		protected virtual IEnumerable<ModuleInfo> GetModuleInfos( IEnumerable<Assembly> candidates )
+		protected virtual IEnumerable<ModuleInfo> GetModuleInfos( ImmutableArray<Assembly> candidates )
 		{
 			var selectMany = candidates.Except( typeof(IModule).Assembly().ToItem() ).SelectMany( assembly => assembly.ExportedTypes.Where( CanLocate<IModule> ) ).ToArray();
 			var result = selectMany

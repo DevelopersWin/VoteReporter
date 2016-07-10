@@ -221,7 +221,7 @@
     <Compile Include="Activation\ActivatorExtensionsTests.cs" />
     <Compile Include="Activation\ActivatorTests.cs" />
     <Compile Include="Activation\LocatorTests.cs" />
-    <Compile Include="Activation\ArgumentCachectorTests.cs" />
+    <Compile Include="Activation\ArgumentCacheTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryReflectionSupportTests.cs" />

@@ -1,10 +1,10 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
 using PostSharp.Reflection;
 using System;
 using System.Linq;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Aspects
 {
@@ -29,7 +29,17 @@ namespace DragonSpark.Aspects
 		}
 
 		public Exception ValidateValue( Type value, string locationName, LocationKind locationKind )
-			=> value.With( v => types.Any( type => type.Adapt().IsAssignableFrom( v ) ) ) ? null : CreateException( value, locationName, locationKind, LocationValidationContext.SuccessPostcondition );
+		{
+			foreach ( var type in types )
+			{
+				if ( type.Adapt().IsAssignableFrom( value ) )
+				{
+					return null;
+				}
+			}
+
+			return CreateException( value, locationName, locationKind, LocationValidationContext.SuccessPostcondition );
+		}
 
 		Exception CreateException( object value, string locationName, LocationKind locationKind, LocationValidationContext context )
 		{

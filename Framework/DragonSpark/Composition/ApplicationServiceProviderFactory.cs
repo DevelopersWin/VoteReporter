@@ -41,12 +41,12 @@ namespace DragonSpark.Composition
 
 	public class TypeBasedServiceProviderFactory : ServiceProviderFactory
 	{
-		public TypeBasedServiceProviderFactory( Type[] types ) : base( new TypeBasedConfigurationContainerFactory( types ) ) {}
+		public TypeBasedServiceProviderFactory( IEnumerable<Type> types ) : base( new TypeBasedConfigurationContainerFactory( types ) ) {}
 	}
 
 	public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
 	{
-		public AssemblyBasedServiceProviderFactory( Assembly[] assemblies ) : base( new AssemblyBasedConfigurationContainerFactory( assemblies ) ) {}
+		public AssemblyBasedServiceProviderFactory( IEnumerable<Assembly> assemblies ) : base( new AssemblyBasedConfigurationContainerFactory( assemblies ) ) {}
 	}
 
 	public abstract class ServiceProviderFactory : FactoryBase<IServiceProvider>

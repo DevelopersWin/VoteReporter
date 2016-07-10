@@ -81,7 +81,7 @@ namespace DragonSpark.Diagnostics
 	public class RecordingLoggerConfigurationFactory : LoggerConfigurationFactory
 	{
 		public RecordingLoggerConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
-			: base( new LoggerConfigurationSource( controller ).ToDelegate(), transformers.Append( new CreatorFilterTransformer(), new LoggerHistoryConfigurationTransformer( sink ) ).Select( transformer => transformer.ToDelegate() ).ToArray() ) {}
+			: base( new LoggerConfigurationSource( controller ).Create, transformers.Append( new CreatorFilterTransformer(), new LoggerHistoryConfigurationTransformer( sink ) ).Select( transformer => transformer.ToDelegate() ).ToArray() ) {}
 	}
 
 	public class MethodFormatter : IFormattable

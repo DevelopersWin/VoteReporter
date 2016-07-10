@@ -13,7 +13,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData, Trait( Traits.Category, Traits.Categories.FileSystem )]
 		public void Assemblies( AssemblyProvider sut )
 		{
-			Assert.NotEqual( sut, AssemblyProvider.Instance );
+			Assert.Same( sut, AssemblyProvider.Instance );
 			var assemblies = sut.Create();
 			var specification = new ApplicationAssemblySpecification( typeof(IFactory).Assembly.GetRootNamespace() );
 

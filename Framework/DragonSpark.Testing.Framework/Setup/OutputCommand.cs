@@ -4,7 +4,6 @@ using DragonSpark.Testing.Framework.Setup.Location;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -46,12 +45,11 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class ServiceRelay : ISpecimenBuilder
 	{
 		public static ServiceRelay Instance { get; } = new ServiceRelay();
+		ServiceRelay() : this( GlobalServiceProvider.Instance.GetService ) {}
 
 		readonly Func<Type, object> provider;
 
-		public ServiceRelay() : this( GlobalServiceProvider.Instance.GetService ) {}
-
-		public ServiceRelay( [Required]Func<Type, object> provider )
+		public ServiceRelay( Func<Type, object> provider )
 		{
 			this.provider = provider;
 		}

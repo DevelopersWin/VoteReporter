@@ -1,16 +1,12 @@
 using DragonSpark.TypeSystem;
-using System;
-using System.Reflection;
+using System.Linq;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Windows.Runtime
 {
 	public class AssemblyProvider : AggregateAssemblyFactory
 	{
-		readonly static Func<Assembly[], Assembly[]> Filter = ApplicationAssemblyFilter.Instance.Create;
-
 		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
-		AssemblyProvider() : this( FileSystemAssemblySource.Instance.Create ) {}
-
-		public AssemblyProvider( Func<Assembly[]> source ) : base( source, Filter ) {}
+		AssemblyProvider() : base( FileSystemAssemblySource.Instance.Create().ToArray().Self, ApplicationAssemblyFilter.Instance.Create ) {}
 	}
 }

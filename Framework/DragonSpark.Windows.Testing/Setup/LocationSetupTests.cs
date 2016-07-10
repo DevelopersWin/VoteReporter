@@ -14,6 +14,7 @@ using Ploeh.AutoFixture.Xunit2;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Diagnostics;
@@ -317,7 +318,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}*/
 
 		[Theory, LocationSetup.AutoData]
-		public void GetAllTypesWith( [DragonSpark.Testing.Framework.Parameters.Service] Assembly[] sut )
+		public void GetAllTypesWith( [DragonSpark.Testing.Framework.Parameters.Service] ImmutableArray<Assembly> sut )
 		{
 			var items = sut.GetAllTypesWith<PriorityAttribute>();
 			Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );

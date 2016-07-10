@@ -343,7 +343,7 @@ namespace DragonSpark.Activation.IoC
 		public override bool IsSatisfiedBy( Type parameter )
 		{
 			var info = parameter.GetTypeInfo();
-			var result = !info.IsGenericTypeDefinition && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
+			var result = !info.IsGenericTypeDefinition && !info.ContainsGenericParameters && !info.IsInterface && !info.IsAbstract && info.DeclaredConstructors.Any( constructorInfo => constructorInfo.IsPublic ) && ( info.IsPublic || info.Assembly.Has<RegistrationAttribute>() );
 			return result;
 		}
 	}
