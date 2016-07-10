@@ -24,16 +24,17 @@ namespace DragonSpark.Testing.Framework.Setup
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
+		readonly protected static Func<IServiceProvider, IApplication> DefaultApplicationSource = provider => new Application( provider );
+		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.ToDelegate();
+
 		readonly IFactory<AutoData, IServiceProvider> providerSource;
 		readonly Func<IServiceProvider, IApplication> applicationSource;
-		readonly static Func<IServiceProvider, IApplication> DefaultApplicationFactory = ParameterConstructor<IServiceProvider, Application>.Default;
-		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.ToDelegate();
 
 		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new Factory( includeFromParameters, additionalTypes ) ) {}
 
 		// protected AutoDataAttribute( Func<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
 
-		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationFactory ) {}
+		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationSource ) {}
 		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : this( DefaultFixtureFactory, providerSource, applicationSource ) {}
 
 		protected AutoDataAttribute( Func<IFixture> fixture, IFactory<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : base( fixture() )
@@ -108,12 +109,12 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	/*public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
+	public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
 	{
 		protected CacheFactoryBase( Func<AutoData, IServiceProvider> inner ) : base( inner ) {}
 
 		protected override object GetHost( AutoData parameter ) => parameter.Method.DeclaringType;
-	}*/
+	}
 
 	public class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
 	{

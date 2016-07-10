@@ -11,7 +11,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public class AutoDataAttribute : Setup.AutoDataAttribute
 		{
-			public static Func<IServiceProvider, IApplication> ApplicationSource { get; } = new DelegatedFactory<IServiceProvider, IApplication>( serviceProvider => new Application<LocationSetup>( serviceProvider ) ).ToDelegate();
+			public static Func<IServiceProvider, IApplication> ApplicationSource { get; } = serviceProvider => new Application<LocationSetup>( serviceProvider );
 
 			public AutoDataAttribute() : base( AssemblyProvider.Instance.ToDelegate(), ApplicationSource ) {}
 		}

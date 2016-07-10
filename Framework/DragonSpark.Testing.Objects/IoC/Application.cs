@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
@@ -27,10 +27,9 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		readonly static Func<IServiceProvider, IApplication> ApplicationSource = new DelegatedFactory<IServiceProvider, IApplication>( provider => new Application( provider ) ).Create;
 		readonly static Func<Assembly[]> AssemblySource = AssemblyProvider.Instance.ToDelegate();
 
-		public AutoDataAttribute() : this( ApplicationSource ) {}
+		public AutoDataAttribute() : this( DefaultApplicationSource ) {}
 
 		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblySource, applicationSource ) {}
 
@@ -45,15 +44,15 @@ namespace DragonSpark.Testing.Objects.IoC
 				this.assemblySource = assemblySource;
 			}
 
-			public override IServiceProvider Create( AutoData parameter ) => new ServiceProviderFactory( Cache.Instance.Get( parameter.Method.DeclaringType ).Get( assemblySource().ToImmutableArray() ) ).Create();
+			public override IServiceProvider Create( AutoData parameter ) => new Activation.IoC.ServiceProviderFactory( Cache.Instance.Get( parameter.Method.DeclaringType ).Get( assemblySource().ToImmutableArray() ) ).Create();
 
 			sealed class Cache : ActivatedCache<Cache.ProviderCache>
 			{
 				public new static Cache Instance { get; } = new Cache();
 
-				public class ProviderCache : ArgumentCache<ImmutableArray<Assembly>, Func<IServiceProvider>>
+				public class ProviderCache : ArgumentCache<ImmutableArray<Assembly>, IServiceProvider>
 				{
-					public ProviderCache() : base( assemblies => new AssemblyBasedServiceProviderFactory( assemblies.ToArray() ).Create ) {}
+					public ProviderCache() : base( assemblies => new AssemblyBasedServiceProviderFactory( assemblies.ToArray() ).Create() ) {}
 				}
 			}
 		}

@@ -249,7 +249,6 @@
     <Compile Include="Runtime\Properties\EqualityCacheTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
-    <Compile Include="Runtime\ParameterValidationCachingTests.cs" />
     <Compile Include="Runtime\DelegateTests.cs" />
     <Compile Include="TypeSystem\AttributesTests.cs">
       <SubType>Code</SubType>

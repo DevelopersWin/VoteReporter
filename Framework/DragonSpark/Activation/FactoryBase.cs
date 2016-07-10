@@ -6,6 +6,7 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace DragonSpark.Activation
@@ -74,7 +75,7 @@ namespace DragonSpark.Activation
 		}
 	}*/
 
-	/*public abstract class CachedDecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
+	public abstract class CachedDecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
 		readonly static ICache<ArgumentCache<ImmutableArray<object>, TResult>> Caches = new ActivatedCache<ArgumentCache<ImmutableArray<object>, TResult>>();
 
@@ -91,7 +92,7 @@ namespace DragonSpark.Activation
 		protected abstract ImmutableArray<object> GetKeyItems( TParameter parameter );
 
 		protected abstract object GetHost( TParameter parameter );
-	}*/
+	}
 
 	public class DecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
