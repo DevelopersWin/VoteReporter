@@ -15,14 +15,16 @@ namespace DragonSpark.Testing.Objects.IoC
 {
 	public class UnityContainerFactory : Activation.IoC.UnityContainerFactory
 	{
+		readonly static Func<IServiceProvider> Factory = new DragonSpark.Setup.AssemblyBasedServiceProviderFactory( Items<Assembly>.Default ).Create;
+
+		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
+
+		UnityContainerFactory() : base( Factory() ) {}
+
 		public class Register : RegisterFactoryAttribute
 		{
 			public Register() : base( typeof(UnityContainerFactory) ) {}
 		}
-
-		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-
-		public UnityContainerFactory() : base( new DragonSpark.Setup.AssemblyBasedServiceProviderFactory( Items<Assembly>.Default ).Create() ) {}
 	}
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute

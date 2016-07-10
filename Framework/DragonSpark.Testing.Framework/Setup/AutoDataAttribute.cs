@@ -109,12 +109,12 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
+	/*public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
 	{
 		protected CacheFactoryBase( Func<AutoData, IServiceProvider> inner ) : base( inner ) {}
 
 		protected override object GetHost( AutoData parameter ) => parameter.Method.DeclaringType;
-	}
+	}*/
 
 	public class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
 	{
