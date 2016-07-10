@@ -1,5 +1,17 @@
 namespace DragonSpark.Runtime.Stores
 {
+	public class Store<T> : StoreBase<T>
+	{
+		readonly T item;
+
+		public Store( T item )
+		{
+			this.item = item;
+		}
+
+		protected override T Get() => item;
+	}
+
 	public abstract class StoreBase<T> : IStore<T>
 	{
 		public T Value => Get();

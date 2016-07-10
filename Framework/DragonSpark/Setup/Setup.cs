@@ -156,7 +156,7 @@ namespace DragonSpark.Setup
 
 		public InstanceServiceProvider() {}
 
-		public InstanceServiceProvider( IEnumerable<IFactory> factories, params object[] instances ) : this( factories.Select( factory => new FactoryStore( factory ) ).Concat( Instances( instances ) ) ) {}
+		public InstanceServiceProvider( IEnumerable<IFactory> factories, params object[] instances ) : this( factories.Select( factory => new DeferredStore( factory ) ).Concat( Instances( instances ) ) ) {}
 
 		public InstanceServiceProvider( params object[] instances ) : this( Instances( instances ) ) {}
 
@@ -165,7 +165,15 @@ namespace DragonSpark.Setup
 			cache = new Cache<Type, object>( GetServiceBody );
 		}
 
-		static IEnumerable<IInstanceRegistration> Instances( IEnumerable<object> instances ) => instances.Select( o => new InstanceStore( o ) );
+		static IEnumerable<IInstanceRegistration> Instances( IEnumerable<object> instances )
+		{
+			var all = instances.ToArray();
+
+			var stores = all.OfType<IStore>().ToArray();
+			var references = all.Except( stores ).Select( o => new InstanceStore( o ) );
+			var result = stores.Select( store => new InstanceStore( store ) ).Concat( references );
+			return result;
+		}
 
 		public bool IsRegistered( Type type ) => List().Select( registration => registration.RegisteredType ).Any( type.Adapt().IsAssignableFrom );
 
@@ -176,7 +184,7 @@ namespace DragonSpark.Setup
 
 		public void Register( InstanceRegistrationParameter parameter ) => Add( new InstanceStore( parameter.Instance, parameter.RequestedType ) );
 
-		public void RegisterFactory( FactoryRegistrationParameter parameter ) => Add( new FactoryStore( parameter.Factory, parameter.RequestedType ) );
+		public void RegisterFactory( FactoryRegistrationParameter parameter ) => Add( new DeferredStore( parameter.Factory, parameter.RequestedType ) );
 
 		public object GetService( Type serviceType ) => cache.Get( serviceType );
 
@@ -196,11 +204,11 @@ namespace DragonSpark.Setup
 		Type RegisteredType { get; }
 	}
 
-	class FactoryStore : DeferredStore<object>, IInstanceRegistration
+	class DeferredStore : DeferredStore<object>, IInstanceRegistration
 	{
-		public FactoryStore( IFactory factory ) : this( factory.ToDelegate(), ResultTypeLocator.Instance.Get( factory.GetType() ) ) {}
+		public DeferredStore( IFactory factory ) : this( factory.ToDelegate(), ResultTypeLocator.Instance.Get( factory.GetType() ) ) {}
 
-		public FactoryStore( Func<object> factory, Type registeredType ) : base( factory )
+		public DeferredStore( Func<object> factory, Type registeredType ) : base( factory )
 		{
 			RegisteredType = registeredType;
 		}
@@ -210,6 +218,8 @@ namespace DragonSpark.Setup
 
 	class InstanceStore : FixedStore<object>, IInstanceRegistration
 	{
+		public InstanceStore( IStore store ) : this( store.Value ) {}
+
 		public InstanceStore( object reference ) : this( reference, reference.GetType() ) {}
 
 		public InstanceStore( object reference, Type registeredType ) : base( reference )
@@ -308,12 +318,10 @@ namespace DragonSpark.Setup
 		protected override Type[] CreateItem() => new[] { typeof(ConfigureProviderCommand) };
 	}*/
 
-	public class FrameworkTypes : CachedFactoryBase<ImmutableArray<Type>>
+	public class FrameworkTypes : Store<ImmutableArray<Type>>
 	{
-		public static FrameworkTypes Instance { get; } = new FrameworkTypes();
-		FrameworkTypes() {}
-
-		protected override ImmutableArray<Type> Cache() => new[] { typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) }.ToImmutableArray();
+		public static FrameworkTypes Instance { get; } = new FrameworkTypes( typeof(ConfigureProviderCommand), typeof(ParameterInfoFactoryTypeLocator), typeof(MemberInfoFactoryTypeLocator), typeof(ApplicationAssemblyLocator), typeof(MethodFormatter) );
+		protected FrameworkTypes( params Type[] types ) : base( types.ToImmutableArray() ) {}
 	}
 
 	public abstract class Application<T> : CompositeCommand<T>, IApplication<T>

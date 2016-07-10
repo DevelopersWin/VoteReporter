@@ -49,7 +49,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var items = sut.Fixed();
 
-			var nested = FrameworkTypes.Instance.Create().Union( GetType().Adapt().WithNested() ).Fixed();
+			var nested = FrameworkTypes.Instance.Value.ToArray().Union( GetType().Adapt().WithNested() ).Fixed();
 			Assert.Equal( nested.Length, items.Length );
 			Assert.Equal( nested.OrderBy( type => type.FullName ), items.OrderBy( type => type.FullName ) );
 

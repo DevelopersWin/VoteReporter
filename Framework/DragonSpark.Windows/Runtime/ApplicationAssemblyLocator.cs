@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -11,36 +12,36 @@ namespace DragonSpark.Windows.Runtime
 	[Export, Shared]
 	public class ApplicationAssemblyLocator : FirstFactory<Assembly>, IApplicationAssemblyLocator
 	{
-		[ImportingConstructor]
-		public ApplicationAssemblyLocator( [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( DomainApplicationAssemblyLocator.Instance, system ) {}
+		readonly static IFactory<Assembly> Default = DomainApplicationAssemblyLocator.Instance.Value.ToFactory();
 
-		public ApplicationAssemblyLocator( [Required]DomainApplicationAssemblyLocator domain, [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( domain, system ) {}
+		[ImportingConstructor]
+		public ApplicationAssemblyLocator( [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( Default, system ) {}
+
+		public ApplicationAssemblyLocator( [Required]DomainApplicationAssemblyLocator domain, [Required]DragonSpark.TypeSystem.ApplicationAssemblyLocator system ) : base( domain.ToDelegate(), system.ToDelegate() ) {}
 	}
 
-	public class DomainApplicationAssemblyLocator : CachedFactoryBase<Assembly>
+	public class DomainApplicationAssemblyLocator : Store<Assembly>
 	{
 		public static DomainApplicationAssemblyLocator Instance { get; } = new DomainApplicationAssemblyLocator();
+		DomainApplicationAssemblyLocator() : this( AppDomain.CurrentDomain ) {}
+		public DomainApplicationAssemblyLocator( AppDomain domain ) : base( Factory.Instance.Create( domain ) ) {}
 
-		readonly AppDomain primary;
-
-		// [InjectionConstructor]
-		public DomainApplicationAssemblyLocator() : this( AppDomain.CurrentDomain ) {}
-
-		public DomainApplicationAssemblyLocator( [Required]AppDomain primary ) 
+		class Factory : FactoryBase<AppDomain, Assembly>
 		{
-			this.primary = primary;
-		}
+			public static Factory Instance { get; } = new Factory();
+			Factory() {}
 
-		protected override Assembly Cache()
-		{
-			try
+			public override Assembly Create( AppDomain parameter )
 			{
-				return Assembly.Load( primary.FriendlyName );
-			}
-			catch ( FileNotFoundException )
-			{
-				var result = Assembly.GetEntryAssembly();
-				return result;
+				try
+				{
+					return Assembly.Load( parameter.FriendlyName );
+				}
+				catch ( FileNotFoundException )
+				{
+					var result = Assembly.GetEntryAssembly();
+					return result;
+				}
 			}
 		}
 	}

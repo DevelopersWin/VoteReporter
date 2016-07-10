@@ -1,7 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Contracts;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
@@ -12,21 +12,19 @@ using Type = System.Type;
 namespace DragonSpark.Setup.Registration
 {
 	[Persistent]
-	public class IgnorableTypesLocator : CachedFactoryBase<ImmutableArray<Type>>
+	public class IgnorableTypesLocator : StoreBase<ImmutableArray<Type>>
 	{
 		readonly ImmutableArray<Assembly> assemblies;
 		
-
-		public IgnorableTypesLocator( Assembly[] assemblies )
+		public IgnorableTypesLocator( IEnumerable<Assembly> assemblies )
 		{
 			this.assemblies = assemblies.ToImmutableArray();
 		}
 
-		protected override ImmutableArray<Type> Cache() => assemblies.ToArray().SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToImmutableArray();
-		
+		protected override ImmutableArray<Type> Get() => assemblies.ToArray().SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToImmutableArray();
 	}
 
-	public class ConventionTypesFactory : CachedFactoryBase<ImmutableArray<Type>>
+	public class ConventionTypesFactory : StoreBase<ImmutableArray<Type>>
 	{
 		readonly IgnorableTypesLocator ignorable;
 		readonly ImmutableArray<TypeInfo> types;
@@ -37,12 +35,12 @@ namespace DragonSpark.Setup.Registration
 			this.types = types.ToImmutableArray();
 		}
 
-		protected override ImmutableArray<Type> Cache()
+		protected override ImmutableArray<Type> Get()
 		{
 			var result = types
 						.Where( info => !info.IsAbstract && ( !info.IsNested || info.IsNestedPublic ) )
 						.AsTypes()
-						.Except( ignorable.Create().ToArray() )
+						.Except( ignorable.Value.ToArray() )
 						.Prioritize()
 						.ToImmutableArray();
 			return result;
@@ -50,18 +48,18 @@ namespace DragonSpark.Setup.Registration
 	}
 
 	[Export, Shared]
-	public class ConventionRegistrationProfileFactory : CachedFactoryBase<ConventionTypeContainer>
+	public class ConventionRegistrationProfileFactory : FactoryBase<ConventionTypeContainer>
 	{
-		readonly Func<ImmutableArray<Type>> types;
+		readonly ConventionTypeContainer container;
 
 		[ImportingConstructor]
-		public ConventionRegistrationProfileFactory( [Required] ConventionTypesFactory factory ) : this( factory.Create ) {}
+		public ConventionRegistrationProfileFactory( [Required] ConventionTypesFactory factory ) : this( new ConventionTypeContainer( factory.Value ) ) {}
 
-		public ConventionRegistrationProfileFactory( Func<ImmutableArray<Type>> types )
+		ConventionRegistrationProfileFactory( ConventionTypeContainer container )
 		{
-			this.types = types;
+			this.container = container;
 		}
 
-		protected override ConventionTypeContainer Cache() => new ConventionTypeContainer( types() );
+		public override ConventionTypeContainer Create() => container;
 	}
 }

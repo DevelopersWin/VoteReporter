@@ -295,7 +295,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public abstract class CachedFactoryBase<T> : FactoryBase<T>
+	/*public abstract class CachedFactoryBase<T> : FactoryBase<T>
 	{
 		readonly Lazy<T> cached;
 
@@ -307,7 +307,7 @@ namespace DragonSpark.Activation
 		protected abstract T Cache();
 
 		public sealed override T Create() => cached.Value;
-	}
+	}*/
 
 	public abstract class FactoryBase<T> : IFactory<T>
 	{

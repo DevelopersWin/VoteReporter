@@ -14,12 +14,12 @@ namespace DragonSpark.Testing.TypeSystem
 		[Theory, Framework.Setup.AutoData]
 		public void Basic( Mock<IAssemblyProvider> provider, ApplicationAssemblyFilter sut )
 		{
-			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.Assemblies() );
+			provider.Setup( p => p.Value ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.Assemblies() );
 
-			var assemblies = sut.Create( provider.Object.Create() );
+			var assemblies = sut.Create( provider.Object.Value );
 			
-			provider.Verify( assemblyProvider => assemblyProvider.Create() );
-			Assert.NotEqual( assemblies, provider.Object.Create() );
+			provider.Verify( assemblyProvider => assemblyProvider.Value );
+			Assert.NotEqual( assemblies, provider.Object.Value );
 		}
 
 		[AssemblyProvider.Register]

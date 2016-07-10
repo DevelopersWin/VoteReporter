@@ -13,6 +13,6 @@ namespace DragonSpark.Testing.Objects
 			public Register() : base( typeof(AssemblyProvider) ) {}
 		}
 
-		AssemblyProvider() : base( new[] { typeof(AssemblySourceBase), typeof(Class), typeof(TestCollectionBase), typeof(BindingOptions) }, DomainApplicationAssemblyLocator.Instance.Create() ) {}
+		AssemblyProvider() : base( new[] { typeof(AssemblyStoreBase), typeof(Class), typeof(TestCollectionBase), typeof(BindingOptions) }, DomainApplicationAssemblyLocator.Instance.Value ) {}
 	}
 }

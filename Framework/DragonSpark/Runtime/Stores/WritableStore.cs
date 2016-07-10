@@ -20,6 +20,14 @@ namespace DragonSpark.Runtime.Stores
 		{
 			public static ICache<IWritableStore<T>, StoreAssign<T>> Cache { get; } = new Cache<IWritableStore<T>, StoreAssign<T>>( c => new StoreAssign<T>( c ) );
 		}
+
+		public static Func<T> ToDelegate<T>( this IStore<T> @this ) where T : class => FixedFactoryCache<T>.Default.Get( @this );
+		class FixedFactoryCache<T> : Cache<IStore<T>, Func<T>> where T : class
+		{
+			public static FixedFactoryCache<T> Default { get; } = new FixedFactoryCache<T>();
+			
+			FixedFactoryCache() : base( store => new FixedFactory<T>( store.Value ).Create ) {}
+		}
 	}
 
 	public abstract class CacheSpecificationBase<TInstance, TValue> : SpecificationBase<TInstance> where TInstance : class
@@ -124,6 +132,20 @@ namespace DragonSpark.Runtime.Stores
 		protected override T Get() => lazy.Value;
 	}
 
+	public abstract class DeferredMethodStore<T> : StoreBase<T>
+	{
+		readonly Lazy<T> defer;
+
+		protected DeferredMethodStore()
+		{
+			defer = new Lazy<T>( Body );
+		}
+
+		protected abstract T Body();
+
+		protected sealed override T Get() => defer.Value;
+	}
+
 	public class DeferredTargetCachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{
 		readonly Func<TInstance> instance;
@@ -141,7 +163,7 @@ namespace DragonSpark.Runtime.Stores
 		public override void Assign( TResult item ) => cache.Set( instance(), item );
 	}
 
-	public class CachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
+	/*public class CachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{
 		readonly TInstance instance;
 		readonly ICache<TInstance, TResult> property;
@@ -156,7 +178,7 @@ namespace DragonSpark.Runtime.Stores
 		protected override TResult Get() => property.Get( instance );
 
 		public override void Assign( TResult item ) => property.Set( instance, item );
-	}
+	}*/
 
 	/*public class DeferredStore<T> : WritableStore<T>
 	{

@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Testing.Framework.Setup;
+﻿using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using System;
 using System.Composition;
@@ -13,7 +12,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			public static Func<IServiceProvider, IApplication> ApplicationSource { get; } = serviceProvider => new Application<LocationSetup>( serviceProvider );
 
-			public AutoDataAttribute() : base( AssemblyProvider.Instance.ToDelegate(), ApplicationSource ) {}
+			public AutoDataAttribute() : base( AssemblyProvider.Instance.Value, ApplicationSource ) {}
 		}
 
 		public LocationSetup()

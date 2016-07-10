@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System.Linq;
@@ -5,18 +6,25 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class FileSystemAssemblySource : AssemblySourceBase
+	public class FileSystemAssemblySource : AssemblyStoreBase
 	{
 		public static FileSystemAssemblySource Instance { get; } = new FileSystemAssemblySource();
+		FileSystemAssemblySource() : base( Factory.Instance.Create() ) {}
 
-		protected override Assembly[] Cache()
+		class Factory : FactoryBase<Assembly[]>
 		{
-			var fromAssembliesInBasePath = AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true );
-			var result = fromAssembliesInBasePath
-				.Where( x => x.Namespace != null )
-				.GroupBy( type => type.Assembly )
-				.Select( types => types.Key ).ToArray();
-			return result;
+			public static Factory Instance { get; } = new Factory();
+			Factory() {}
+
+			public override Assembly[] Create()
+			{
+				var types = AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true );
+				var result = types
+					.Where( x => x.Namespace != null )
+					.GroupBy( t => t.Assembly )
+					.Select( g => g.Key ).ToArray();
+				return result;
+			}
 		}
 	}
 }

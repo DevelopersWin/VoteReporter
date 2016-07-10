@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
@@ -47,7 +48,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var resolved = container.Resolve<Target>();
 			Assert.NotNull( resolved );
 			Assert.Same( Output, resolved.Second() );
-			Assert.Same( ClassFactory.Instance.Create(), resolved.First );
+			Assert.Same( ClassFactory.Instance.Value, resolved.First );
 		}
 
 		/*[Fact]
@@ -68,16 +69,15 @@ namespace DragonSpark.Testing.Activation.IoC
 			}
 		}*/
 
-		class ClassFactory : CachedFactoryBase<Class>
+		class ClassFactory : Store<Class>
 		{
 			public static ClassFactory Instance { get; } = new ClassFactory();
-
-			protected override Class Cache() => new Class();
+			ClassFactory() : base( new Class() ) {}
 		}
 
 		class Target
 		{
-			public Target( ITestOutputHelper output ) : this( ClassFactory.Instance.Create(), () => output ) { }
+			public Target( ITestOutputHelper output ) : this( ClassFactory.Instance.Value, () => output ) { }
 
 			public Target( IInterface first, Func<ITestOutputHelper> second )
 			{

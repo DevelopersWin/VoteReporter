@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace DragonSpark.TypeSystem
 	{
 		public static object Null { get; } = new object();
 
-		public static T DefaultOrEmpty<T>() => DefaultValueFactory<T>.Instance();
+		public static T DefaultOrEmpty<T>() => DefaultValueFactory<T>.Instance;
 
 		public static object DefaultOrEmpty( Type type ) => DefaultValueFactory.Instance( type );
 	}
@@ -69,18 +70,11 @@ namespace DragonSpark.TypeSystem
 		public static ImmutableArray<T> Immutable { get; }
 	}
 
-	class DefaultValueFactory<T> : CachedFactoryBase<T>
+	class DefaultValueFactory<T> : Store<T>
 	{
-		readonly Func<Type, object> source;
+		public static T Instance { get; } = new DefaultValueFactory<T>( DefaultValueFactory.Instance ).Value;
 
-		public static Func<T> Instance { get; } = new DefaultValueFactory<T>( DefaultValueFactory.Instance ).ToDelegate();
-
-		DefaultValueFactory( Func<Type, object> source )
-		{
-			this.source = source;
-		}
-
-		protected override T Cache() => (T)source( typeof(T) );
+		DefaultValueFactory( Func<Type, object> source ) : base( (T)source( typeof(T) ) ) {}
 	}
 
 	class DefaultValueFactory : Cache<Type, object>

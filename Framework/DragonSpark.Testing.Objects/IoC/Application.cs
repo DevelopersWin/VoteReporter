@@ -7,6 +7,7 @@ using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace DragonSpark.Testing.Objects.IoC
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
-		UnityContainerFactory() : base( Factory() ) {}
+		protected UnityContainerFactory() : base( Factory() ) {}
 
 		public class Register : RegisterFactoryAttribute
 		{
@@ -29,24 +30,24 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		readonly static Func<Assembly[]> AssemblySource = AssemblyProvider.Instance.ToDelegate();
+		readonly static Assembly[] AssemblySource = AssemblyProvider.Instance.Value;
 
 		public AutoDataAttribute() : this( DefaultApplicationSource ) {}
 
 		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( AssemblySource, applicationSource ) {}
 
-		protected AutoDataAttribute( Func<Assembly[]> assemblySource, Func<IServiceProvider, IApplication> applicationSource ) : base( new Factory( assemblySource ), applicationSource ) {}
+		protected AutoDataAttribute( IEnumerable<Assembly> assemblies, Func<IServiceProvider, IApplication> applicationSource ) : base( new Factory( assemblies ), applicationSource ) {}
 
 		class Factory : FactoryBase<AutoData, IServiceProvider>
 		{
-			readonly Func<Assembly[]> assemblySource;
+			readonly ImmutableArray<Assembly> assemblySource;
 
-			public Factory( Func<Assembly[]> assemblySource )
+			public Factory( IEnumerable<Assembly> assemblySource )
 			{
-				this.assemblySource = assemblySource;
+				this.assemblySource = assemblySource.ToImmutableArray();
 			}
 
-			public override IServiceProvider Create( AutoData parameter ) => new Activation.IoC.ServiceProviderFactory( Cache.Instance.Get( parameter.Method.DeclaringType ).Get( assemblySource().ToImmutableArray() ) ).Create();
+			public override IServiceProvider Create( AutoData parameter ) => new Activation.IoC.ServiceProviderFactory( Cache.Instance.Get( parameter.Method.DeclaringType ).Get( assemblySource ) ).Create();
 
 			sealed class Cache : ActivatedCache<Cache.ProviderCache>
 			{
@@ -62,9 +63,9 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AssemblyProvider : AssemblyProviderBase
 	{
-		readonly static Assembly ApplicationAssembly = DomainApplicationAssemblyLocator.Instance.Create();
+		readonly static Assembly ApplicationAssembly = DomainApplicationAssemblyLocator.Instance.Value;
 
 		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
-		public AssemblyProvider( params Type[] others ) : base( others.Append( typeof(AssemblySourceBase) ).Fixed(), ApplicationAssembly ) {}
+		public AssemblyProvider( params Type[] others ) : base( others.Append( typeof(AssemblyStoreBase) ).Fixed(), ApplicationAssembly ) {}
 	}
 }

@@ -3,7 +3,7 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,26 +131,27 @@ namespace DragonSpark.TypeSystem
 		public override Type[] Create( Assembly[] parameter ) => parameter.SelectMany( AssemblyTypes.All.ToDelegate() ).ToArray();
 	}
 
-	public abstract class AssemblySourceBase : CachedFactoryBase<Assembly[]> {}
-
-	public abstract class AssemblyProviderBase : AssemblySourceBase, IAssemblyProvider
+	/*public abstract class AssemblySourceBase : DeferredStore<Assembly[]>
 	{
-		readonly IEnumerable<Assembly> assemblies;
+		protected AssemblySourceBase( Func<Assembly[]> item ) : base( item ) {}
+	}*/
 
+	public abstract class AssemblyStoreBase : Store<Assembly[]>
+	{
+		protected AssemblyStoreBase( Assembly[] item ) : base( item ) {}
+	}
+
+	public abstract class AssemblyProviderBase : AssemblyStoreBase, IAssemblyProvider
+	{
 		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( AssembliesFactory.Instance.Create( types.Fixed() ).Union( assemblies ).ToArray() ) {}
 
 		protected AssemblyProviderBase( params Type[] types ) : this( AssembliesFactory.Instance.Create( types ) ) {}
 
-		AssemblyProviderBase( [Required] IEnumerable<Assembly> assemblies )
-		{
-			this.assemblies = assemblies;
-		}
-
-		protected override Assembly[] Cache() => assemblies.WhereAssigned().Distinct().Prioritize().Fixed();
+		AssemblyProviderBase( IEnumerable<Assembly> assemblies ) : base( assemblies.WhereAssigned().Distinct().Prioritize().Fixed() ) {}
 	}
 
-	public class AggregateAssemblyFactory : AggregateFactory<Assembly[]>, IAssemblyProvider
+	public class AggregateAssemblyFactory : AssemblyStoreBase, IAssemblyProvider
 	{
-		public AggregateAssemblyFactory( Func<Assembly[]> primary, params Func<Assembly[], Assembly[]>[] transformers ) : base( primary, transformers ) {}
+		public AggregateAssemblyFactory( Func<Assembly[]> primary, params Func<Assembly[], Assembly[]>[] transformers ) : base( new AggregateFactory<Assembly[]>( primary, transformers ).Create() ) {}
 	}
 }

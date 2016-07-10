@@ -132,7 +132,7 @@ namespace DragonSpark.Composition
 		readonly BuildableTypeFromConventionLocator conventionLocator;
 		readonly Activation.Activator activator;
 
-		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
+		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types ) : this( assemblies, types, FrameworkTypes.Instance.Value ) {}
 
 		public PartsContainerConfigurator( Assembly[] assemblies, Type[] types, ImmutableArray<Type> core )
 		{

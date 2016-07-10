@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace DragonSpark.Setup.Registration
 {
-	public class ConventionTypeContainer
+	public struct ConventionTypeContainer
 	{
 		public ConventionTypeContainer( ImmutableArray<Type> candidates )
 		{

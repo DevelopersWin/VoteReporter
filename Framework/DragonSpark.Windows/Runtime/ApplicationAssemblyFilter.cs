@@ -6,8 +6,7 @@ namespace DragonSpark.Windows.Runtime
 	public class ApplicationAssemblyFilter : DragonSpark.TypeSystem.ApplicationAssemblyFilter
 	{
 		public static ApplicationAssemblyFilter Instance { get; } = new ApplicationAssemblyFilter();
-
-		public ApplicationAssemblyFilter() : base( DetermineCoreAssemblies() ) {}
+		ApplicationAssemblyFilter() : base( DetermineCoreAssemblies() ) {}
 
 		static Assembly[] DetermineCoreAssemblies()
 		{

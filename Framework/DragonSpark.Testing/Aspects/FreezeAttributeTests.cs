@@ -18,13 +18,8 @@ namespace DragonSpark.Testing.Aspects
 		{
 			var sut = new Source();
 
-			sut.Create();
-			Assert.Equal( 1, sut.Count );
-			sut.Create();
-			Assert.Equal( 1, sut.Count );
-
-			Assert.Equal( 2, sut.Cached );
-			Assert.Equal( 2, sut.Cached );
+			Assert.Equal( 1, sut.Cached );
+			Assert.Equal( 1, sut.Cached );
 		}
 
 		/*[Fact]
@@ -85,18 +80,14 @@ namespace DragonSpark.Testing.Aspects
 			protected virtual void Dispose( bool disposing ) => Count++;
 		}
 
-		public class Source : AssemblySourceBase
+		public class Source : AssemblyStoreBase
 		{
 			public int Count { get; private set; }
 
 			[Freeze]
 			public int Cached => ++Count;
 
-			protected override Assembly[] Cache()
-			{
-				Count++;
-				return new Assembly[0];
-			}
+			public Source() : base( Items<Assembly>.Default ) {}
 		}
 
 		[Theory, AutoData]

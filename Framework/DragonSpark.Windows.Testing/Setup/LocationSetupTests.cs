@@ -388,7 +388,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( registered );
 
 			var fromContainer = container.Resolve<Assembly[]>();
-			var fromProvider = provider.Create();
+			var fromProvider = provider.Value;
 			Assert.Equal( fromContainer, fromProvider );
 
 			Assert.Equal( fromContainer, sut );
