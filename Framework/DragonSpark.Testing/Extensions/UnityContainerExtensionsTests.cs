@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
@@ -24,7 +23,7 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
-			var creator = sut.Get( Creator.Default );
+			var creator = Creator.Default.Get( sut );
 			Assert.IsType<UnityContainerCoreFactory>( creator );
 
 			var provider = sut.Resolve<IServiceProvider>();

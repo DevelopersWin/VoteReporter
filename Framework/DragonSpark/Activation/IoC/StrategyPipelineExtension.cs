@@ -77,7 +77,7 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
-			var creator = Container.Get( Creator.Default )?.GetType() ?? Execution.GetCurrent();
+			var creator = Creator.Default.Get( Container )?.GetType() ?? Execution.GetCurrent();
 			var policies = repository.List();
 			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies, specification );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
@@ -167,7 +167,7 @@ namespace DragonSpark.Activation.IoC
 			public override void PreBuildUp( IBuilderContext context )
 			{
 				var reference = References.Keys.Create( context.BuildKey );
-				if ( reference.Get( condition ).Apply() )
+				if ( condition.Get( reference ).Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
 					if ( lifetimePolicy == null )

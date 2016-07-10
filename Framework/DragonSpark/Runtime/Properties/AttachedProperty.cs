@@ -13,7 +13,7 @@ namespace DragonSpark.Runtime.Properties
 {
 	public static class CacheExtensions
 	{
-		public static TValue Get<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> cache ) where TInstance : class => cache.Get( @this );
+		/*public static TValue Get<TInstance, TValue>( this TInstance @this, ICache<TInstance, TValue> cache ) where TInstance : class => cache.Get( @this );*/
 
 		public static TValue SetValue<TInstance, TValue>( this ICache<TInstance, TValue> @this, TInstance instance, TValue value ) where TInstance : class
 		{

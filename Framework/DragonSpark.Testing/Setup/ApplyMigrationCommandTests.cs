@@ -69,10 +69,10 @@ namespace DragonSpark.Testing.Setup
 				Assert.NotNull( destination.Get<IServiceProviderMigrationCommandSource>() );
 
 				var destinationHistory = destination.Get<ILoggerHistory>();
-				Assert.False( factory.History.Get( Source.Property ).IsApplied );
+				Assert.False( Source.Property.Get( factory.History ).IsApplied );
 				Assert.Empty( destinationHistory.Events );
 				ApplyMigrationCommand.Instance.Execute( new MigrationParameter<IServiceProvider>( current, destination ) );
-				Assert.True( factory.History.Get( Source.Property ).IsApplied );
+				Assert.True( Source.Property.Get( factory.History ).IsApplied );
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace DragonSpark.Testing.Setup
 
 			public override ICommand<MigrationParameter<IServiceProvider>> Create( IServiceProvider parameter )
 			{
-				parameter.Get<ILoggerHistory>().Get( Property ).Apply();
+				Property.Get( parameter.Get<ILoggerHistory>() ).Apply();
 				return base.Create( parameter );
 			}
 		}
