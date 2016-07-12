@@ -4,20 +4,16 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
-using DragonSpark.Setup;
 using DragonSpark.Testing.Framework.Diagnostics;
 using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.TypeSystem;
 using JetBrains.dotMemoryUnit;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using Serilog;
-using Serilog.Core;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
-using Delegates = DragonSpark.TypeSystem.Delegates;
 using ProfilerFactory = DragonSpark.Testing.Framework.Diagnostics.ProfilerFactory;
 
 namespace DragonSpark.Testing.Framework
@@ -47,20 +43,20 @@ namespace DragonSpark.Testing.Framework
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
+			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 
 			args.ReturnValue = Defer.Run( ExecutionContextStore.Instance.Value.Dispose, args.ReturnValue );
 		}
 	}
 
-	public class ApplicationOutputCommand : OutputCommand
+	/*public class ApplicationOutputCommand : OutputCommand
 	{
 		public ApplicationOutputCommand() : base( method => new InitializeMethodCommand( AssociatedContext.Default.Get( method ).Dispose ) ) {}
-	}
+	}*/
 
 	public static class MethodBaseExtensions
 	{
-		public static InitializeMethodCommand AsCurrentContext( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => AsCurrentContext( @this, new RecordingLoggerFactory( history, level ) );
+		/*public static InitializeMethodCommand AsCurrentContext( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => AsCurrentContext( @this, new RecordingLoggerFactory( history, level ) );
 
 		public static InitializeMethodCommand AsCurrentContext( this MethodBase @this ) => AsCurrentContext( @this, new RecordingLoggerFactory() );
 
@@ -69,7 +65,7 @@ namespace DragonSpark.Testing.Framework
 			var result = new InitializeMethodCommand().AsExecuted( @this );
 			DefaultServiceProvider.Instance.Assign( new ServiceProvider( factory ) );
 			return result;
-		}
+		}*/
 
 		readonly static Func<object, ILogger> LoggerSource = DragonSpark.Diagnostics.Diagnostics.Logger.ToDelegate();
 
@@ -84,7 +80,7 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class InitializeMethodCommand : AssignValueCommand<MethodBase>
+	/*public class InitializeMethodCommand : AssignValueCommand<MethodBase>
 	{
 		readonly Action complete;
 		readonly Action<Assembly> initialize;
@@ -108,7 +104,7 @@ namespace DragonSpark.Testing.Framework
 		}
 
 		protected override void OnDispose() => complete();
-	}
+	}*/
 
 	[Disposable]
 	public abstract class TestCollectionBase : ITestOutputAware

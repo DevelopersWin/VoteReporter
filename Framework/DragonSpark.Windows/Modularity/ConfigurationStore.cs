@@ -1,5 +1,4 @@
 using DragonSpark.Windows.Setup;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
 
@@ -9,7 +8,6 @@ namespace DragonSpark.Windows.Modularity
 	public class ModulesConfigurationSectionFactory : ConfigurationSectionFactory<ModulesConfigurationSection>
 	{
 		public static ModulesConfigurationSectionFactory Instance { get; } = new ModulesConfigurationSectionFactory();
-
 		ModulesConfigurationSectionFactory() {}
 
 		public ModulesConfigurationSectionFactory( Func<string, object> factory ) : base( factory ) {}
@@ -22,10 +20,9 @@ namespace DragonSpark.Windows.Modularity
 	{
 		readonly ModulesConfigurationSection section;
 
-		public ConfigurationStore() : this( ModulesConfigurationSectionFactory.Instance.Create() )
-		{}
+		public ConfigurationStore() : this( ModulesConfigurationSectionFactory.Instance.Create() ) {}
 
-		public ConfigurationStore( [Required]ModulesConfigurationSection section )
+		public ConfigurationStore( ModulesConfigurationSection section )
 		{
 			this.section = section;
 		}

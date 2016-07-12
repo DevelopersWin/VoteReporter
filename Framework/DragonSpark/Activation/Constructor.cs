@@ -15,12 +15,11 @@ namespace DragonSpark.Activation
 	[ApplyAutoValidation]
 	public class Constructor : ConstructorBase
 	{
+		public static Constructor Instance { get; } = new Constructor();
+		Constructor() : this( ConstructorStore.Instance.Get, ConstructorDelegateFactory<Invoke>.Default.Get ) {}
+
 		readonly Func<ConstructTypeRequest, ConstructorInfo> constructorSource;
 		readonly Func<ConstructorInfo, Invoke> activatorSource;
-
-		public static Constructor Instance { get; } = new Constructor();
-
-		Constructor() : this( ConstructorStore.Instance.ToDelegate(), ConstructorDelegateFactory<Invoke>.Default.ToDelegate() ) {}
 
 		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, Invoke> activatorSource ) : base( Specification.Instance )
 		{

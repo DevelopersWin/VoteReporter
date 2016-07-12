@@ -64,7 +64,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class CachingBuildPlanExtension : UnityContainerExtension
 	{
-		readonly static ICache<IBuildPlanCreatorPolicy> Policies = new Cache<IBuildPlanCreatorPolicy>();
+		readonly static IAtomicCache<object, IBuildPlanCreatorPolicy> Policies = new Cache<IBuildPlanCreatorPolicy>();
 
 		readonly IBuildPlanRepository repository;
 		readonly ISpecification<LocateTypeRequest> specification;

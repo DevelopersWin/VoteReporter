@@ -9,7 +9,6 @@ using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
-using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
@@ -131,22 +130,19 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IDisposable Create( AutoData parameter )
 		{
-			var result = new InitializeMethodCommand().AsExecuted( parameter.Method );
-
 			var primary = new DragonSpark.Setup.ServiceProviderFactory( providerSource( parameter ).Self ).Create()/*.Emit( "Created Provider" )*/;
 			var composite = new CompositeServiceProvider( new InstanceServiceProvider( parameter, parameter.Fixture, parameter.Method ), new FixtureServiceProvider( parameter.Fixture ), primary );
 			var application = applicationSource( composite )/*.Emit( "Created Application" )*/;
-			var command = new ExecuteApplicationCommand( application );
-			command.Execute( parameter );
-
+			var result = new ExecuteApplicationCommand( application );
+			result.Execute( parameter );
 			return result;
 		}
 	}
 
-	public class AssociatedContext : Cache<MethodBase, IDisposable>
+	/*public class AssociatedContext : Cache<MethodBase, IDisposable>
 	{
 		public static AssociatedContext Default { get; } = new AssociatedContext();
-	}
+	}*/
 
 	public class MinimumLevel : BeforeAfterTestAttribute
 	{
@@ -159,10 +155,10 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override void Before( MethodInfo methodUnderTest )
 		{
-			using ( new InitializeMethodCommand().AsExecuted( methodUnderTest ) )
+			/*using ( new InitializeMethodCommand().AsExecuted( methodUnderTest ) )
 			{
 				GlobalServiceProvider.Instance.Get<LoggingLevelSwitch>().MinimumLevel = level;
-			}
+			}*/
 		}
 	}
 
@@ -170,11 +166,11 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		public ExecuteApplicationCommand( IApplication<AutoData> application ) : base( application ) {}
 		
-		public override void Execute( AutoData parameter )
+		/*public override void Execute( AutoData parameter )
 		{
 			AssociatedContext.Default.Set( parameter.Method, this );
 			base.Execute( parameter );
-		}
+		}*/
 	}
 
 	[ApplyAutoValidation]

@@ -14,18 +14,16 @@ using System.Reflection;
 
 namespace DragonSpark.Runtime
 {
-	public class AssociatedDisposables : ListCache<IDisposable, IDisposable>
+	public sealed class AssociatedDisposables : ListCache<IDisposable, IDisposable>
 	{
 		public static AssociatedDisposables Instance { get; } = new AssociatedDisposables();
-
 		AssociatedDisposables() {}
 	}
 
-	public class ConfigureAssociatedDisposables : StoreCache<IDisposable, bool>
+	public sealed class ConfigureAssociatedDisposables : StoreCache<IDisposable, bool>
 	{
 		public static ConfigureAssociatedDisposables Instance { get; } = new ConfigureAssociatedDisposables();
-
-		ConfigureAssociatedDisposables() : base( new Cache<IDisposable, IWritableStore<bool>>( disposable => new FixedStore<bool>( true ) ) ) {}
+		ConfigureAssociatedDisposables() {}
 	}
 
 	public static class DisposableExtensions
@@ -40,12 +38,13 @@ namespace DragonSpark.Runtime
 
 		public static T AssociateForDispose<T>( this T @this, params IDisposable[] associated ) where T : IDisposable
 		{
+			@this.Configured( true );
 			AssociatedDisposables.Instance.Get( @this ).AddRange( associated );
 			return @this;
 		}
 	}
 
-	public class DisposeAssociatedCommand : CommandBase<IDisposable>
+	public sealed class DisposeAssociatedCommand : CommandBase<IDisposable>
 	{
 		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand( AssociatedDisposables.Instance );
 
@@ -60,22 +59,23 @@ namespace DragonSpark.Runtime
 	}
 
 	
-	[ProvideAspectRole( "Dispose Associated Disposables" ), LinesOfCodeAvoided( 1 )]
 	[OnMethodBoundaryAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[MulticastAttributeUsage( MulticastTargets.Method, PersistMetaData = false, TargetMemberAttributes = MulticastAttributes.Instance ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[ProvideAspectRole( "Dispose Associated Disposables" ), LinesOfCodeAvoided( 1 )]
+	[MulticastAttributeUsage( MulticastTargets.Method, TargetMemberAttributes = MulticastAttributes.Instance | MulticastAttributes.NonAbstract ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public sealed class DisposeAssociatedAspect : OnMethodBoundaryAspect
 	{
 		readonly static Func<IDisposable, bool> Configure = ConfigureAssociatedDisposables.Instance.Get;
 		readonly static Action<IDisposable> Command = DisposeAssociatedCommand.Instance.Execute;
+		readonly static Func<MethodBase, bool> Compile = Specification.Instance.IsSatisfiedBy;
 
-		readonly Func<IDisposable, bool> property;
+		readonly Func<IDisposable, bool> configured;
 		readonly Action<IDisposable> command;
 
 		public DisposeAssociatedAspect() : this( Configure, Command ) {}
 
-		public DisposeAssociatedAspect( Func<IDisposable, bool> property, Action<IDisposable> command )
+		DisposeAssociatedAspect( Func<IDisposable, bool> configured, Action<IDisposable> command )
 		{
-			this.property = property;
+			this.configured = configured;
 			this.command = command;
 		}
 
@@ -83,23 +83,23 @@ namespace DragonSpark.Runtime
 		{
 			public static Specification Instance { get; } = new Specification();
 
-			public override bool IsSatisfiedBy( MethodBase parameter ) => parameter.DeclaringType.GetTypeInfo().IsClass && !parameter.IsSpecialName &&
-				parameter.DeclaringType.Adapt().GetMappedMethods<IDisposable>().Introduce( parameter ).Any( tuple => tuple.Item1.InterfaceMethod.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item1.MappedMethod, tuple.Item2 ) );
+			public override bool IsSatisfiedBy( MethodBase parameter )
+			{
+				var adapter = parameter.DeclaringType.Adapt();
+				return !parameter.IsSpecialName && adapter.Info.IsClass &&
+					   adapter.GetMappedMethods<IDisposable>().Introduce( parameter ).Any( tuple => tuple.Item1.InterfaceMethod.Name == nameof(IDisposable.Dispose) && Equals( tuple.Item1.MappedMethod, tuple.Item2 ) );
+			}
 		}
 
-		public override bool CompileTimeValidate( MethodBase method ) => Specification.Instance.IsSatisfiedBy( method );
+		public override bool CompileTimeValidate( MethodBase method ) => Compile( method );
 
 		public override void OnSuccess( MethodExecutionArgs args )
 		{
 			var disposable = args.Instance as IDisposable;
-			if ( disposable != null )
+			if ( disposable != null && configured( disposable ) )
 			{
-				if ( property( disposable ) )
-				{
-					command( disposable );
-				}
+				command( disposable );
 			}
 		}
-		// public override bool CompileTimeValidate( MethodBase method ) => false;
 	}
 }

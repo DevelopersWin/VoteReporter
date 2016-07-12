@@ -1,15 +1,13 @@
-﻿using DragonSpark.Aspects;
-using DragonSpark.Extensions;
-using PostSharp.Aspects;
-
-namespace DragonSpark.Windows
+﻿namespace DragonSpark.Windows
 {
 	public partial class Configure
 	{
-		[ModuleInitializer( 0 ), Aspects.Runtime, AssemblyInitialize]
-		public static void Initialize() => new Configure().Run();
+		public static Configure Instance { get; } = new Configure();
 
-		public Configure()
+		/*[ModuleInitializer( 0 ), Aspects.Runtime, AssemblyInitialize]
+		public static void Initialize() => new Configure().Run();*/
+
+		Configure()
 		{
 			InitializeComponent();
 		}

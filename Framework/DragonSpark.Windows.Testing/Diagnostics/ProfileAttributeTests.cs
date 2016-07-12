@@ -1,18 +1,8 @@
-﻿using DragonSpark.Aspects;
-using DragonSpark.Diagnostics;
-using DragonSpark.Testing.Framework;
-using Serilog.Events;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using Serilog.Core;
-using Xunit;
-
-namespace DragonSpark.Windows.Testing.Diagnostics
+﻿namespace DragonSpark.Windows.Testing.Diagnostics
 {
 	public class ProfileAttributeTests
 	{
-		[Fact]
+		/*[Fact]
 		public void Logger()
 		{
 			var history = new LoggerHistorySink();
@@ -51,6 +41,6 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		{
 			[Profile]
 			public void PlatformSpecific() => Thread.Sleep( 1 );
-		}
+		}*/
 	}
 }

@@ -2,7 +2,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Windows.Input;
@@ -16,11 +15,17 @@ namespace DragonSpark.Runtime
 
 		public FirstCommand( ISpecification<T> specification, params ICommand[] commands ) : base( specification, commands ) {}
 
-		public override void Execute( T parameter ) => Commands.FirstAssigned( command =>
-																				 {
-																					 var asExecuted = command.AsExecuted( (object)parameter );
-																					 return asExecuted;
-																				 } );
+		public override void Execute( T parameter )
+		{
+			foreach ( var command in Commands.ToArray() )
+			{
+				if ( command.CanExecute( parameter ) )
+				{
+					command.Execute( parameter );
+					return;
+				}
+			}
+		}
 	}
 
 	public class CompositeCommand : CompositeCommand<object>
@@ -44,7 +49,7 @@ namespace DragonSpark.Runtime
 
 		public override void Execute( T parameter )
 		{
-			foreach ( var command in Commands.ToImmutableArray() )
+			foreach ( var command in Commands.ToArray() )
 			{
 				command.Execute( parameter );
 			}

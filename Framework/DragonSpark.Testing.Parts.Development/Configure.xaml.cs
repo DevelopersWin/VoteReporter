@@ -1,13 +1,11 @@
-﻿using DragonSpark.Aspects;
-using DragonSpark.Extensions;
-using PostSharp.Aspects;
-
-namespace DragonSpark.Testing.Parts.Development
+﻿namespace DragonSpark.Testing.Parts.Development
 {
 	public partial class Configure
 	{
-		[ModuleInitializer( 0 ), Aspects.Runtime, AssemblyInitialize]
-		public static void Initialize() => new Configure().Run();
+		public static Configure Instance { get; } = new Configure();
+
+		/*[ModuleInitializer( 0 ), Aspects.Runtime, AssemblyInitialize]
+		public static void Initialize() => new Configure().Run();*/
 
 		Configure()
 		{

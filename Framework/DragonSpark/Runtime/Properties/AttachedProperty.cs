@@ -21,14 +21,14 @@ namespace DragonSpark.Runtime.Properties
 			return value;
 		}
 
-		public static TValue GetOrSet<TInstance, TValue>( this ICache<TInstance, TValue> @this, TInstance instance, Func<TInstance, TValue> create )
+		/*public static TValue GetOrSet<TInstance, TValue>( this ICache<TInstance, TValue> @this, TInstance instance, Func<TInstance, TValue> create )
 		{
 			if ( !@this.Contains( instance ) )
 			{
 				@this.Set( instance, create( instance ) );
 			}
 			return @this.Get( instance );
-		}
+		}*/
 
 		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 first, T2 second )  => new Assignment<T1, T2>( new CacheAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
 
@@ -264,7 +264,13 @@ namespace DragonSpark.Runtime.Properties
 		public override TValue Get( TInstance instance ) => inner.Get( equalitySource( instance )  );
 	}
 
-	public class Cache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class where TValue : class
+
+	public interface IAtomicCache<TArgument, TValue> : ICache<TArgument, TValue>
+	{
+		TValue GetOrSet( TArgument key, Func<TArgument, TValue> factory );
+	}
+
+	public class Cache<TInstance, TValue> : CacheBase<TInstance, TValue>, IAtomicCache<TInstance, TValue> where TInstance : class where TValue : class
 	{
 		readonly ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create;
 
@@ -297,6 +303,8 @@ namespace DragonSpark.Runtime.Properties
 		public override TValue Get( TInstance instance ) => items.GetValue( instance, create );
 		
 		public override bool Remove( TInstance instance ) => items.Remove( instance );
+
+		public TValue GetOrSet( TInstance instance, Func<TInstance, TValue> factory ) => items.GetValue( instance, new ConditionalWeakTable<TInstance, TValue>.CreateValueCallback( factory ) );
 	}
 
 	public abstract class CacheBase<TInstance, TValue> : ICache<TInstance, TValue>

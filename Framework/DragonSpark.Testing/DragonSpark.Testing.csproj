@@ -220,6 +220,7 @@
   <ItemGroup>
     <Compile Include="Activation\ActivatorExtensionsTests.cs" />
     <Compile Include="Activation\ActivatorTests.cs" />
+    <Compile Include="Activation\ApplicationContextTests.cs" />
     <Compile Include="Activation\LocatorTests.cs" />
     <Compile Include="Activation\ArgumentCacheTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />

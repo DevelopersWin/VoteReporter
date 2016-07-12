@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Activation
 {
-	public interface IArgumentCache<in TArgument, TValue> : ICache<TArgument, TValue>
+	public interface IArgumentCache<TArgument, TValue> : IAtomicCache<TArgument, TValue>
 	{
 		TValue GetOrSet( TArgument key, Func<TValue> factory );
 	}
@@ -41,6 +41,8 @@ namespace DragonSpark.Activation
 			TValue result;
 			return TryGetValue( key, out result ) ? result : GetOrAdd( key, factory() );
 		}
+
+		public TValue GetOrSet( TArgument key, Func<TArgument, TValue> factory ) => GetOrAdd( key, factory );
 	}
 	
 	/*class RegisteredCacheFactory<TKey, TValue> : FactoryBase<InstanceMethod, IArgumentCache<TKey, TValue>>

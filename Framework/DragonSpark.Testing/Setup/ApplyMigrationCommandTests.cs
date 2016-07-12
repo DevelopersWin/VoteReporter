@@ -1,23 +1,8 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Setup;
-using DragonSpark.Testing.Framework;
-using Ploeh.AutoFixture.Xunit2;
-using Serilog;
-using Serilog.Core;
-using System;
-using System.Linq;
-using System.Reflection;
-using Xunit;
-
-namespace DragonSpark.Testing.Setup
+﻿namespace DragonSpark.Testing.Setup
 {
 	public class ApplyMigrationCommandTests
 	{
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		public void EnsureMigrationPerformsAsExpected( RecordingLoggerFactory source, ServiceProvider destination, string message )
 		{
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( source ) )
@@ -85,6 +70,6 @@ namespace DragonSpark.Testing.Setup
 				Property.Get( parameter.Get<ILoggerHistory>() ).Apply();
 				return base.Create( parameter );
 			}
-		}
+		}*/
 	}
 }

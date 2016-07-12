@@ -171,6 +171,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activation\ApplicationContext.cs" />
     <Compile Include="Activation\AutoValidatingFactory.cs" />
     <Compile Include="Activation\FactoryTypeLocatorBase.cs" />
     <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />

@@ -1,13 +1,6 @@
-using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using System;
-using System.Reflection;
-
 namespace DragonSpark.Testing.Framework
 {
-	public class OutputCommand : CommandBase<OutputCommand.Parameter>
+	/*public class OutputCommand : CommandBase<OutputCommand.Parameter>
 	{
 		readonly Func<MethodBase, DisposingCommand<MethodBase>> commandSource;
 		readonly Func<Parameter, IProfiler> profilerSource;
@@ -70,5 +63,5 @@ namespace DragonSpark.Testing.Framework
 				return result;
 			}
 		}
-	}
+	}*/
 }

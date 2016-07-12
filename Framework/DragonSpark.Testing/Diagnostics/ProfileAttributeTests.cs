@@ -1,23 +1,12 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Testing.Framework;
-using Serilog.Core;
-using Serilog.Events;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using Xunit;
+﻿using DragonSpark.Testing.Framework;
 using Xunit.Abstractions;
-using Profile = DragonSpark.Diagnostics.Profile;
 
 namespace DragonSpark.Testing.Diagnostics
 {
 	public class ProfileAttributeTests : TestCollectionBase
 	{
-		[Fact]
+		public ProfileAttributeTests( ITestOutputHelper output ) : base( output ) {}
+		/*[Fact]
 		public void Logger()
 		{
 			var history = new LoggerHistorySink();
@@ -111,8 +100,6 @@ namespace DragonSpark.Testing.Diagnostics
 			}
 
 			static void Second() => Profile.Event( "Inside Second" );
-		}
-
-		public ProfileAttributeTests( ITestOutputHelper output ) : base( output ) {}
+		}*/
 	}
 }

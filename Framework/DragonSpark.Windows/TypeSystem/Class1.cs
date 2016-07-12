@@ -1,18 +1,6 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects.Validation;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Threading;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-
-namespace DragonSpark.Windows.TypeSystem
+﻿namespace DragonSpark.Windows.TypeSystem
 {
-	public class LoadPartAssemblyCommand : DragonSpark.TypeSystem.LoadPartAssemblyCommand
+	/*public class LoadPartAssemblyCommand : DragonSpark.TypeSystem.LoadPartAssemblyCommand
 	{
 		public static LoadPartAssemblyCommand Instance { get; } = new LoadPartAssemblyCommand();
 
@@ -23,15 +11,17 @@ namespace DragonSpark.Windows.TypeSystem
 	{
 		public static AssemblyPathLoader Instance { get; } = new AssemblyPathLoader();
 
+		readonly static Func<string, Assembly> LoadFile = Assembly.LoadFile;
+
 		public override Assembly[] Create( string parameter )
 		{
 			var directoryInfo = new DirectoryInfo( "." );
-			var result = directoryInfo.GetFileSystemInfos( parameter ).Where( info => info.Extension == ".dll" ).Select( info => info.FullName ).Select( Assembly.LoadFile ).Fixed();
+			var result = directoryInfo.GetFileSystemInfos( parameter ).Where( info => info.Extension == ".dll" ).Select( info => info.FullName ).Select( LoadFile ).Fixed();
 			return result;
 		}
-	}
+	}*/
 
-	[Synchronized]
+	/*[Synchronized]
 	[ApplyAutoValidation]
 	public class AssemblyInitializer : CommandBase<Assembly>
 	{
@@ -57,14 +47,14 @@ namespace DragonSpark.Windows.TypeSystem
 
 			public override bool IsSatisfiedBy( Assembly parameter ) => !Activated( parameter ) && base.IsSatisfiedBy( parameter );
 		}
-	}
+	}*/
 
-	public class AssemblyLoader : DragonSpark.TypeSystem.AssemblyLoader
+	/*public class AssemblyLoader : DragonSpark.TypeSystem.AssemblyLoader
 	{
 		public static AssemblyLoader Instance { get; } = new AssemblyLoader();
 
 		AssemblyLoader() : this( AssemblyHintProvider.Instance.Create ) {}
 
-		public AssemblyLoader( Func<Assembly, string> hintSource ) : base( hintSource, AssemblyPathLoader.Instance.Create, AssemblyInitializer.Instance.Execute ) {}
-	}
+		public AssemblyLoader( Func<Assembly, string> hintSource ) : base( hintSource, AssemblyPathLoader.Instance.Create, Delegates<Assembly>.Empty ) {}
+	}*/
 }
