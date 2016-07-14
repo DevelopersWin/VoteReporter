@@ -12,12 +12,12 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.TypeSystem
 {
-	public interface IAssemblyLoader
+	/*public interface IAssemblyLoader
 	{
 		void Load( Assembly reference, string search );
-	}
+	}*/
 
-	public class LoadPartAssemblyCommand : CommandBase<Assembly>
+	/*public class LoadPartAssemblyCommand : CommandBase<Assembly>
 	{
 		readonly IAssemblyLoader provider;
 		readonly string searchQuery;
@@ -29,6 +29,42 @@ namespace DragonSpark.TypeSystem
 		}
 
 		public override void Execute( Assembly parameter ) => provider.Load( parameter, searchQuery );
+	}*/
+
+	public class AssemblyPartLocator : FactoryBase<Assembly, ImmutableArray<Assembly>>
+	{
+		readonly static Func<Assembly, string> DefaultHint = AssemblyHintProvider.Instance.ToDelegate();
+
+		readonly Func<string, ImmutableArray<Assembly>> assemblySource;
+		readonly Func<Assembly, string> hintSource;
+		readonly string searchQuery;
+
+		public AssemblyPartLocator( Func<string, ImmutableArray<Assembly>> assemblySource ) : this( assemblySource, DefaultHint ) {}
+
+		public AssemblyPartLocator( Func<string, ImmutableArray<Assembly>> assemblySource, Func<Assembly, string> hintSource, string searchQuery = "{0}.Parts.*" )
+		{
+			this.assemblySource = assemblySource;
+			this.hintSource = hintSource;
+			this.searchQuery = searchQuery;
+		}
+
+		public override ImmutableArray<Assembly> Create( Assembly parameter )
+		{
+			var hint = hintSource( parameter );
+			var stack = new System.Collections.Generic.Stack<string>( hint.Split( '.' ) );
+			while ( stack.Any() )
+			{
+				var name = string.Join( ".", stack.Reverse() );
+				var path = string.Format( searchQuery, name.ToItem() );
+				var items = assemblySource( path );
+				if ( items.Any() )
+				{
+					return items;
+				}
+				stack.Pop();
+			}
+			return ImmutableArray<Assembly>.Empty;
+		}
 	}
 
 	public class AssemblyHintProvider : FactoryBase<Assembly, string>
@@ -44,7 +80,7 @@ namespace DragonSpark.TypeSystem
 		Activated() {}
 	}
 
-	public class AssemblyLoader : IAssemblyLoader
+	/*public class AssemblyLoader : IAssemblyLoader
 	{
 		readonly Func<Assembly, string> hintSource;
 		readonly Func<string, IEnumerable<Assembly>> assemblySource;
@@ -77,7 +113,7 @@ namespace DragonSpark.TypeSystem
 				}
 			}
 		}
-	}
+	}*/
 
 	public class FactoryTypeRequest : LocateTypeRequest
 	{

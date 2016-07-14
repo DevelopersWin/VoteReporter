@@ -4,8 +4,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Commands;
 using PostSharp.Extensibility;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Immutable;
 using System.Windows.Markup;
 
 namespace DragonSpark.Configuration
@@ -32,12 +31,12 @@ namespace DragonSpark.Configuration
 
 	[ContentProperty( nameof(Configurations) )]
 	[ApplyAutoValidation]
-	public class InitializeConfigurationCommand : ServicedCommand<ConfigureCommand, IList<IWritableStore>>
+	public class InitializeConfigurationCommand : ServicedCommand<ConfigureCommand, ImmutableArray<IWritableStore>>
 	{
 		public InitializeConfigurationCommand() : base( new OnlyOnceSpecification() ) {}
 
 		public Collection<IWritableStore> Configurations { get; } = new Collection<IWritableStore>();
 
-		public override object GetParameter() => Configurations.ToArray();
+		public override ImmutableArray<IWritableStore> GetParameter() => Configurations.ToImmutableArray();
 	}
 }

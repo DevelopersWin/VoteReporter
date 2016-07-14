@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 		public override IProfiler Create( MethodBase parameter )
 		{
-			var purge = new FixedCommand( new PurgeLoggerMessageHistoryCommand( history ), output );
+			var purge = new FixedCommand<Action<string>>( new PurgeLoggerMessageHistoryCommand( history ), output );
 			var start = new CompositeCommand( purge, StartProcessCommand.Instance );
 			var result = base.Create( parameter ).With( start.Execute ).AssociateForDispose( new DisposableAction( purge.Run ) );
 			return result;

@@ -62,7 +62,7 @@ namespace DragonSpark.Aspects
 	{
 		readonly IStack<ThreadCache> stack;
 		
-		public ThreadCacheContext() : this( () => new ThreadCache().Configured( false ) ) {}
+		public ThreadCacheContext() : this( () => new ThreadCache() ) {}
 
 		public ThreadCacheContext( Func<ThreadCache> create ) : this( create, AmbientStack<ThreadCache>.Default ) {}
 

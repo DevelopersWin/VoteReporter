@@ -12,7 +12,7 @@ namespace DragonSpark.Extensions
 
 		public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );
 
-		public static T AsExecuted<T>( this T @this, object parameter ) where T : ICommand
+		/*public static T AsExecuted<T>( this T @this, object parameter ) where T : ICommand
 		{
 			var result = @this.CanExecute( parameter ) ? @this : default(T);
 			if ( result != null )
@@ -20,11 +20,11 @@ namespace DragonSpark.Extensions
 				result.Execute( parameter );
 			}
 			return result;
-		}
+		}*/
 
-		public static T AsExecuted<T, U>( this T @this, U parameter ) where T : ICommand<U>
+		public static TCommand AsExecuted<TCommand, TParameter>( this TCommand @this, TParameter parameter ) where TCommand : ICommand<TParameter>
 		{
-			var result = @this.CanExecute( parameter ) ? @this : default(T);
+			var result = @this.CanExecute( parameter ) ? @this : default(TCommand);
 			if ( result != null )
 			{
 				result.Execute( parameter );
@@ -32,6 +32,8 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
+		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, T parameter ) => new FixedCommand<T>( @this, parameter );
+		
 		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => DelegateCache<T>.Default.Get( @this );
 		class DelegateCache<T> : Cache<ICommand<T>, Action<T>>
 		{

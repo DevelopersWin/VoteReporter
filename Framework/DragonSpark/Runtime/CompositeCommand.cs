@@ -32,13 +32,14 @@ namespace DragonSpark.Runtime
 	{
 		public CompositeCommand() : this( Items<ICommand>.Default ) {}
 
-		public CompositeCommand( [Required]params ICommand[] commands ) : base( commands ) {}
+		public CompositeCommand( params ICommand[] commands ) : this( Specifications.Specifications.Always, commands ) {}
+		public CompositeCommand( ISpecification<object> specification, params ICommand[] commands ) : base( specification, commands ) {}
 	}
 
 	[ContentProperty( nameof(Commands) )]
 	public class CompositeCommand<T> : DisposingCommand<T>
 	{
-		public CompositeCommand( [Required]params ICommand[] commands ) : this( Specifications<T>.Always, commands ) {}
+		public CompositeCommand( params ICommand[] commands ) : this( Specifications<T>.Always, commands ) {}
 
 		public CompositeCommand( ISpecification<T> specification, [Required]params ICommand[] commands ) : base( specification )
 		{

@@ -176,7 +176,7 @@ namespace DragonSpark.Runtime.Properties
 					this.instance = instance;
 
 					local = new ThreadLocal<IStack<T>>( New, true );
-					store = new ThreadLocalStore<IStack<T>>( local ).Configured( false );
+					store = new ThreadLocalStore<IStack<T>>( local );
 					onEmpty = OnEmpty;
 					isEmpty = IsEmpty;
 				}

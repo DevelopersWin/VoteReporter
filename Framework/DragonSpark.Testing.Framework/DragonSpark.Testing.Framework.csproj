@@ -223,7 +223,6 @@
     <Compile Include="Setup\ResourceConfigurationFactory.cs" />
     <Compile Include="Setup\CanLocateSpecification.cs" />
     <Compile Include="Setup\ConfigureLocationCustomization.cs" />
-    <Compile Include="Setup\CustomizeFixtureCommand.cs" />
     <Compile Include="Setup\GreedyMethodBuilderFactory.cs" />
     <Compile Include="Setup\LocateTypeSpecification.cs" />
     <Compile Include="Setup\MetadataCommand.cs" />

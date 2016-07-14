@@ -1,24 +1,38 @@
-﻿namespace DragonSpark.Windows.TypeSystem
+﻿using DragonSpark.Activation;
+using System;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
+namespace DragonSpark.Windows.TypeSystem
 {
 	/*public class LoadPartAssemblyCommand : DragonSpark.TypeSystem.LoadPartAssemblyCommand
 	{
 		public static LoadPartAssemblyCommand Instance { get; } = new LoadPartAssemblyCommand();
-
 		LoadPartAssemblyCommand() : base( AssemblyLoader.Instance ) {}
-	}
+	}*/
 
-	public class AssemblyPathLoader : FactoryBase<string, Assembly[]>
+	public class AssemblyPathLoader : FactoryBase<string, ImmutableArray<Assembly>>
 	{
 		public static AssemblyPathLoader Instance { get; } = new AssemblyPathLoader();
 
 		readonly static Func<string, Assembly> LoadFile = Assembly.LoadFile;
 
-		public override Assembly[] Create( string parameter )
-		{
-			var directoryInfo = new DirectoryInfo( "." );
-			var result = directoryInfo.GetFileSystemInfos( parameter ).Where( info => info.Extension == ".dll" ).Select( info => info.FullName ).Select( LoadFile ).Fixed();
-			return result;
-		}
+		public override ImmutableArray<Assembly> Create( string parameter ) => 
+			new DirectoryInfo( "." ).GetFileSystemInfos( parameter ).Where( info => info.Extension == ".dll" ).Select( info => info.FullName ).Select( LoadFile ).ToImmutableArray();
+	}
+
+	public class AssemblyPartLocator : DragonSpark.TypeSystem.AssemblyPartLocator
+	{
+		public static AssemblyPartLocator Instance { get; } = new AssemblyPartLocator();
+		AssemblyPartLocator() : base( AssemblyPathLoader.Instance.Create ) {}
+	}
+
+	/*public class AssemblyLoader : DragonSpark.TypeSystem.AssemblyLoader
+	{
+		public static AssemblyLoader Instance { get; } = new AssemblyLoader();
+		AssemblyLoader() : base( AssemblyHintProvider.Instance.Create, AssemblyPathLoader.Instance.Create, Delegates<Assembly>.Empty ) {}
 	}*/
 
 	/*[Synchronized]
@@ -49,12 +63,5 @@
 		}
 	}*/
 
-	/*public class AssemblyLoader : DragonSpark.TypeSystem.AssemblyLoader
-	{
-		public static AssemblyLoader Instance { get; } = new AssemblyLoader();
-
-		AssemblyLoader() : this( AssemblyHintProvider.Instance.Create ) {}
-
-		public AssemblyLoader( Func<Assembly, string> hintSource ) : base( hintSource, AssemblyPathLoader.Instance.Create, Delegates<Assembly>.Empty ) {}
-	}*/
+	/**/
 }

@@ -1,10 +1,12 @@
-using DragonSpark.Runtime;
-using System.Windows.Input;
-
 namespace DragonSpark.Activation
 {
-	public class ApplicationContext : CompositeCommand
+	/*public class ApplicationContext : CompositeCommand
 	{
-		public ApplicationContext( params ICommand[] commands ) : base( commands ) {}
-	}
+		public ApplicationContext( IExecutionContext context, params ICommand[] commands ) : base( commands )
+		{
+			Context = context;
+		}
+
+		public IExecutionContext Context { get; }
+	}*/
 }

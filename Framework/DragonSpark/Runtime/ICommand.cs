@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
@@ -8,6 +7,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 
 namespace DragonSpark.Runtime
@@ -26,9 +26,9 @@ namespace DragonSpark.Runtime
 		readonly IWritableStore<T> store;
 		readonly T current;
 
-		public AssignValueCommand( [Required] IWritableStore<T> store ) : this( store, store.Value ) {}
+		public AssignValueCommand( IWritableStore<T> store ) : this( store, store.Value ) {}
 
-		public AssignValueCommand( [Required] IWritableStore<T> store, T current )
+		public AssignValueCommand( IWritableStore<T> store, [Optional]T current )
 		{
 			this.store = store;
 			this.current = current;
@@ -44,27 +44,37 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	// [AutoValidation( false )]
-	public class FixedCommand : DisposingCommand<object>
+	public class FixedCommand : FixedCommand<object>
 	{
-		readonly Lazy<ICommand> command;
-		readonly Lazy<object> parameter;
+		public FixedCommand( ICommand<object> command, object parameter ) : base( command, parameter ) {}
+		// public FixedCommand( Func<ICommand<object>> command, Func<object> parameter ) : base( command, parameter ) {}
+	}
 
-		public FixedCommand( [Required] ICommand command, [Required] object parameter ) : this( command.Self, parameter.Self ) {}
 
-		public FixedCommand( [Required] Func<ICommand> command, [Required] Func<object> parameter ) : base( Specifications.Specifications.Always )
+	public class FixedCommand<T> : DisposingCommand<object>
+	{
+		readonly ICommand<T> command;
+		readonly T parameter;
+		/*readonly Lazy<ICommand<T>> command;
+		readonly Lazy<T> parameter;
+
+		public FixedCommand( ICommand<T> command, T parameter ) : this( command.Self, parameter.Self ) {}
+
+		public FixedCommand( Func<ICommand<T>> command, Func<T> parameter ) : base( Specifications.Specifications.Always )
 		{
-			this.command = new Lazy<ICommand>( command );
-			this.parameter = new Lazy<object>( parameter );
+			this.command = new Lazy<ICommand<T>>( command );
+			this.parameter = new Lazy<T>( parameter );
+		}*/
+
+		public FixedCommand( ICommand<T> command, T parameter )
+		{
+			this.command = command;
+			this.parameter = parameter;
 		}
 
-		public override void Execute( object p ) => command.Value.Execute( parameter.Value );
+		public override void Execute( object p ) => command.Execute( parameter );
 
-		protected override void OnDispose()
-		{
-			base.OnDispose();
-			command.Value.TryDispose();
-		}
+		protected override void OnDispose() => command.TryDispose();
 	}
 
 	public class AddItemCommand<T> : CommandBase<T>
