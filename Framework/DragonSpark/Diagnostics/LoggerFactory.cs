@@ -25,7 +25,7 @@ namespace DragonSpark.Diagnostics
 		readonly Func<LoggerConfiguration> configurationSource;
 		readonly Func<object> contextSource;
 
-		public LoggerFactory( [Required] Func<LoggerConfiguration> configurationSource ) : this( configurationSource, Execution.GetCurrent ) {}
+		public LoggerFactory( [Required] Func<LoggerConfiguration> configurationSource ) : this( configurationSource, Defaults.ExecutionContext ) {}
 
 		public LoggerFactory( [Required] Func<LoggerConfiguration> configurationSource, Func<object> contextSource )
 		{

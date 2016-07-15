@@ -1,26 +1,33 @@
 ﻿using DragonSpark.Configuration;
 using Serilog.Events;
-using System;
 
 namespace DragonSpark.Diagnostics
 {
-	public class MinimumLevelConfiguration : ConfigurationBase<LogEventLevel>
+	public class MinimumLevelConfiguration : WritableStructureConfiguration<LogEventLevel>
+	{
+		public static MinimumLevelConfiguration Instance { get; } = new MinimumLevelConfiguration();
+		MinimumLevelConfiguration() : base( o => LogEventLevel.Information ) {}
+	}
+
+	/*public class MinimumLevelConfiguration : DeclarativeConfigurationStoreBase<LogEventLevel>
 	{
 		public MinimumLevelConfiguration() : base( LogEventLevel.Information ) {}
-	}
+	}*/
 
-	public class ProfilerFactoryConfiguration : ConfigurationBase<Type>
+	/*public class ProfilerFactoryConfiguration : ConfigurationSource<MethodBase, IProfiler>
 	{
-		public ProfilerFactoryConfiguration() : base( typeof(ProfilerFactory) ) {}
-	}
+		public static IConfiguration<MethodBase, IProfiler> Instance { get; } = new ProfilerFactoryConfiguration();
+		ProfilerFactoryConfiguration() : base( m => new ProfilerFactory().Create( m ) ) {}
+	}*/
 
-	public class ProfilerLevelConfiguration : ConfigurationBase<LogEventLevel>
+	public class ProfilerLevelConfiguration : WritableStructureConfiguration<LogEventLevel>
 	{
-		public ProfilerLevelConfiguration() : base( LogEventLevel.Debug ) {}
+		public static ProfilerLevelConfiguration Instance { get; } = new ProfilerLevelConfiguration();
+		ProfilerLevelConfiguration() : base( o => LogEventLevel.Debug ) {}
 	}
 
 	/*[ContentProperty( nameof(Profiler) )]
-	public class Configuration : ConfigurationBase
+	public class Configuration : ExecutionContextConfigurationBase
 	{
 		public ProfilerConfiguration Profiler { get; set; } = new ProfilerConfiguration();
 

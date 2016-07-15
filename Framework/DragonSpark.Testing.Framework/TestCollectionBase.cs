@@ -1,20 +1,16 @@
 using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
-using DragonSpark.Testing.Framework.Diagnostics;
 using DragonSpark.Testing.Framework.Setup;
 using JetBrains.dotMemoryUnit;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using Serilog;
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
-using ProfilerFactory = DragonSpark.Testing.Framework.Diagnostics.ProfilerFactory;
 
 namespace DragonSpark.Testing.Framework
 {
@@ -69,15 +65,15 @@ namespace DragonSpark.Testing.Framework
 
 		readonly static Func<object, ILogger> LoggerSource = DragonSpark.Diagnostics.Diagnostics.Logger.ToDelegate();
 
-		public static IProfiler Profile( this MethodBase method, Action<string> output ) => 
-			new ProfilerFactory( output, DragonSpark.Diagnostics.Diagnostics.History.Get( method ), LoggerSource ).Create( method );
+		/*public static IProfiler Profile( this MethodBase method, Action<string> output ) => 
+			new ProfilerFactory( output, DragonSpark.Diagnostics.Diagnostics.History.Get( method ), LoggerSource ).Create( method );*/
 
-		public static IProfiler Trace( this MethodBase method, Action<string> output )
+		/*public static IProfiler Trace( this MethodBase method, Action<string> output )
 		{
 			var profiler = method.Profile( output );
 			var result = profiler.AssociateForDispose( LoggerSource( method ).WithTracing() );
 			return result;
-		}
+		}*/
 	}
 
 	/*public class InitializeMethodCommand : AssignValueCommand<MethodBase>

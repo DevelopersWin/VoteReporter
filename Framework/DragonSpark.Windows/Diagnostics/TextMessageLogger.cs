@@ -7,20 +7,19 @@ using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public class ProfilerFactory : ProfilerFactoryBase<Timer>
+	/*public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
 		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Instance.Create;
 
 		public ProfilerFactory() : base( TemplateSource ) {}
 
 		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource ) : base( loggerSource, TemplateSource ) {}
-	}
+	}*/
 
 	public class Timer : DragonSpark.Diagnostics.Timer
 	{

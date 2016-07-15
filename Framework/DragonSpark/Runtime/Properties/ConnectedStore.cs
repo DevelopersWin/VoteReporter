@@ -12,11 +12,11 @@ using System.Threading;
 
 namespace DragonSpark.Runtime.Properties
 {
-	public abstract class ExecutionCachedStoreBase<T> : DeferredTargetCachedStore<object, T> where T : class
+	public abstract class ExecutionCachedStoreBase<T> : DeferredTargetCachedStore<object, T> where T : class // TODO: Remove
 	{
 		protected ExecutionCachedStoreBase() : this( Delegates<T>.Default ) {}
 		protected ExecutionCachedStoreBase( Func<T> create ) : this( new Cache<T>( create.Wrap().ToDelegate() ) ) {}
-		protected ExecutionCachedStoreBase( ICache<object, T> cache ) : this( Execution.GetCurrent, cache ) {}
+		protected ExecutionCachedStoreBase( ICache<object, T> cache ) : this( Defaults.ExecutionContext, cache ) {}
 		protected ExecutionCachedStoreBase( Func<object> instance, ICache<object, T> cache ) : this( instance, cache, Coercer<T>.Instance ) {}
 		protected ExecutionCachedStoreBase( Func<object> instance, ICache<object, T> cache, ICoercer<T> coercer ) : base( instance, cache, coercer ) {}
 
@@ -114,7 +114,7 @@ namespace DragonSpark.Runtime.Properties
 	{
 		public static AmbientStack<T> Default { get; } = new AmbientStack<T>();
 
-		public AmbientStack() : this( Execution.GetCurrent ) {}
+		public AmbientStack() : this( Defaults.ExecutionContext ) {}
 		public AmbientStack( Func<object> host ) : this( host, AmbientStackCache<T>.Default ) {}
 		public AmbientStack( Func<object> host, ICache<object, IStack<T>> cache ) : base( host, cache ) {}
 

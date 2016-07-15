@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Configure = DragonSpark.Configuration.Configure;
+using DragonSpark.Configuration;
 
 namespace DragonSpark.Diagnostics
 {
@@ -196,16 +196,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public static LoggingLevelSwitchFactory Instance { get; } = new LoggingLevelSwitchFactory();
 
-		readonly Func<LogEventLevel> source;
-
-		public LoggingLevelSwitchFactory() : this( Configure.Get<MinimumLevelConfiguration, LogEventLevel> ) {}
-
-		public LoggingLevelSwitchFactory( Func<LogEventLevel> source )
-		{
-			this.source = source;
-		}
-
-		public override LoggingLevelSwitch Create() => new LoggingLevelSwitch { MinimumLevel = source() };
+		public override LoggingLevelSwitch Create() => new LoggingLevelSwitch { MinimumLevel = MinimumLevelConfiguration.Instance.Default() };
 	}
 
 	public class RecordingLoggerFactory : LoggerFactory

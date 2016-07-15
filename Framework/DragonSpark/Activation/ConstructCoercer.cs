@@ -1,14 +1,13 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
-using Microsoft.Practices.Unity.Utility;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	public class ParameterConstructor<TParameter, TResult> : DelegatedFactory<TParameter, TResult> where TResult : class
+	public class ParameterConstructor<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
 		public static Func<TParameter, TResult> Default { get; } = new ParameterConstructor<TParameter, TResult>().ToDelegate();
 		ParameterConstructor() : base( ParameterConstructorDelegateFactory<TParameter, TResult>.Make() ) {}
@@ -23,7 +22,7 @@ namespace DragonSpark.Activation
 
 		public static Func<TParameter, TResult> Make( Type parameterType ) => Make( parameterType, typeof(TResult) );
 
-		public static Func<TParameter, TResult> Make( Type parameterType, Type resultType ) => Cached.Get( resultType.GetConstructor( parameterType ) );
+		public static Func<TParameter, TResult> Make( Type parameterType, Type resultType ) => Cached.Get( resultType.Adapt().FindConstructor( parameterType ) );
 	}
 
 	class ParameterActivator<T> : FactoryBase<object, T>

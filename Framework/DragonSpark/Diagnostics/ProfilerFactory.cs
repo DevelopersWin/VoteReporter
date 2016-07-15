@@ -1,17 +1,6 @@
-using DragonSpark.Activation;
-using DragonSpark.Diagnostics.Logger;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Stores;
-using Serilog;
-using Serilog.Events;
-using System;
-using System.Reflection;
-using Configure = DragonSpark.Configuration.Configure;
-
 namespace DragonSpark.Diagnostics
 {
-	public class ProfilerFactory : ProfilerFactoryBase<Timer>
+	/*public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
 		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Instance.Create;
 
@@ -20,14 +9,14 @@ namespace DragonSpark.Diagnostics
 
 	public abstract class ProfilerFactoryBase<TTimer> : FactoryBase<MethodBase, IProfiler> where TTimer : ITimer, new()
 	{
-		static LogEventLevel Level() => Configure.Load<ProfilerLevelConfiguration>().Value;
+		// static LogEventLevel Level() => Configure.Load<ProfilerLevelConfiguration>().Value;
 
 		readonly Func<MethodBase, ILogger> loggerSource;
 		readonly Func<ILogger, Action<TimerEvent>> handlerSource;
 		readonly ISessionTimer timer;
 		readonly Func<MethodBase, CreateProfilerEvent> createSource;
 
-		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( Level(), templateSource ) {}
+		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( ProfilerLevelConfiguration.Instance.Get, templateSource ) {}
 
 		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( DiagnosticProperties.Logger.Get, level, templateSource ) {}
 
@@ -63,5 +52,5 @@ namespace DragonSpark.Diagnostics
 			DiagnosticProperties.Logger.Set( result, logger );
 			return result;
 		}
-	}
+	}*/
 }

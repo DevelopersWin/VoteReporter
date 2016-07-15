@@ -1,15 +1,11 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using DragonSpark.Diagnostics;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using Ploeh.AutoFixture.Xunit2;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Xunit;
 
@@ -20,11 +16,10 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void BasicContext()
 		{
-			var store = new ConfigurationStore();
-			RecordingLoggerConfigurationCommand.Instance.Execute( store );
+			ConfigureLoggerConfigurationsCommand.Instance.Execute( RecordingLoggerConfigurationsFactory.Instance.Create );
 
-			var level = store.Get<DefaultLevel>();
-			var controller = store.Get<LoggingLevelSwitchSource>();
+			var level = MinimumLevelConfiguration.Instance;
+			var controller = LoggingLevelSwitchConfiguration.Instance;
 
 			var one = new object();
 			var first = controller.Get( one );
@@ -33,7 +28,7 @@ namespace DragonSpark.Testing.Activation
 			Assert.Equal( LogEventLevel.Information, first.MinimumLevel );
 
 			const LogEventLevel assigned = LogEventLevel.Debug;
-			level.Assign( assigned );
+			level.Assign( o => assigned );
 
 			var two = new object();
 			var second = controller.Get( two );
@@ -44,24 +39,22 @@ namespace DragonSpark.Testing.Activation
 		}
 
 		[Theory, AutoData]
-		void VerifyHistory( ConfigurationStore store, object context, string message )
+		void VerifyHistory( object context, string message )
 		{
-			RecordingLoggerConfigurationCommand.Instance.Execute( store );
+			ConfigureLoggerConfigurationsCommand.Instance.Execute( RecordingLoggerConfigurationsFactory.Instance.Create );
 
-			Assert.Same( store.Get<LoggerHistorySource>(), store.Get<LoggerHistorySource>() );
-
-			var history = store.Get<LoggerHistorySource>().Get( context );
+			var history = LoggerHistoryConfiguration.Instance.Get( context );
 			Assert.Empty( history.Events );
-			Assert.Same( history, store.Get<LoggerHistorySource>().Get( context ) );
+			Assert.Same( history, LoggerHistoryConfiguration.Instance.Get( context ) );
 
-			var logger = store.Get<LoggerSource>().Get( context );
+			var logger = LoggerCongfiguration.Instance.Get( context );
 			Assert.Empty( history.Events );
 			logger.Information( "Hello World! {Message}", message );
 			Assert.Single( history.Events, item => item.RenderMessage().Contains( message ) );
 
-			var level = store.Get<LoggingLevelSwitchSource>().Get( context );
 			logger.Debug( "Hello World! {Message}", message );
 			Assert.Single( history.Events );
+			var level = LoggingLevelSwitchConfiguration.Instance.Get( context );
 			level.MinimumLevel = LogEventLevel.Debug;
 
 			logger.Debug( "Hello World! {Message}", message );
@@ -69,225 +62,116 @@ namespace DragonSpark.Testing.Activation
 		}
 	}
 
-	class RecordingLoggerConfigurationCommand : LoggerConfigurationCommand
+	class ConfigureLoggerConfigurationsCommand : AssignConfigurationCommand<ITransformer<LoggerConfiguration>[]>
 	{
-		public static RecordingLoggerConfigurationCommand Instance { get; } = new RecordingLoggerConfigurationCommand();
-		RecordingLoggerConfigurationCommand() : base( Factory.Instance.Create ) {}
+		public static ConfigureLoggerConfigurationsCommand Instance { get; } = new ConfigureLoggerConfigurationsCommand();
+		ConfigureLoggerConfigurationsCommand() : base( LoggerConfigurationsConfiguration.Instance ) {}
+	}
 
-		class Factory : FactoryBase<ConfigurationStore, Configurations>
+	class RecordingLoggerConfigurationsFactory : LoggerConfigurationsFactory
+	{
+		public new static RecordingLoggerConfigurationsFactory Instance { get; } = new RecordingLoggerConfigurationsFactory();
+
+		protected override IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
 		{
-			public static Factory Instance { get; } = new Factory();
+			foreach ( var transformer in base.From( parameter ) )
+			{
+				yield return transformer;
+			}
 
-			public override Configurations Create( ConfigurationStore parameter ) => 
-				new ConfigurationsFactory( parameter.Get<LoggerHistorySource>().Get, parameter.Get<LoggingLevelSwitchSource>().Get ).Create;
+			yield return new HistoryTransform( LoggerHistoryConfiguration.Instance.Get( parameter ) );
 		}
 
-		new class ConfigurationsFactory : LoggerConfigurationCommand.ConfigurationsFactory
+		class HistoryTransform : TransformerBase<LoggerConfiguration>
 		{
-			readonly Func<object, ILoggerHistory> history;
-			
-			public ConfigurationsFactory( Func<object, ILoggerHistory> history, Func<object, LoggingLevelSwitch> controller ) : base( controller )
+			readonly ILoggerHistory history;
+
+			public HistoryTransform( ILoggerHistory history )
 			{
 				this.history = history;
 			}
 
-			protected override IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
-			{
-				foreach ( var transformer in base.From( parameter ) )
-				{
-					yield return transformer;
-				}
+			public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
+		}
+	}
+	
+	class LoggerHistoryConfiguration : WritableConfiguration<ILoggerHistory>
+	{
+		public static LoggerHistoryConfiguration Instance { get; } = new LoggerHistoryConfiguration();
+		LoggerHistoryConfiguration() : base( o => new LoggerHistorySink() ) {}
+	}
 
-				yield return new HistoryTransform( history( parameter ) );
-			}
+	class LoggingLevelSwitchConfiguration : WritableConfiguration<LoggingLevelSwitch>
+	{
+		public static LoggingLevelSwitchConfiguration Instance { get; } = new LoggingLevelSwitchConfiguration();
+		LoggingLevelSwitchConfiguration() : base( Factory.Instance.Create ) {}
 
-			class HistoryTransform : TransformerBase<LoggerConfiguration>
-			{
-				readonly ILoggerHistory history;
+		class Factory : FactoryBase<object, LoggingLevelSwitch>
+		{
+			public static Factory Instance { get; } = new Factory();
+			Factory() {}
 
-				public HistoryTransform( ILoggerHistory history )
-				{
-					this.history = history;
-				}
-
-				public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
-			}
+			public override LoggingLevelSwitch Create( object parameter ) => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get( parameter ) );
 		}
 	}
 
-	abstract class LoggerConfigurationCommand : ConfigureConfigurationStoreCommand
+	class LoggerConfigurationConfiguration : WritableConfiguration<LoggerConfiguration>
 	{
-		public delegate ImmutableArray<ITransformer<LoggerConfiguration>> Configurations( object instance );
+		public static LoggerConfigurationConfiguration Instance { get; } = new LoggerConfigurationConfiguration();
+		LoggerConfigurationConfiguration() : base( LoggerConfigurationFactory.Instance.Create ) {}
 
-		readonly Func<ConfigurationStore, Configurations> configurationsSource;
-		protected LoggerConfigurationCommand( Func<ConfigurationStore, Configurations> configurationsSource )
+		class LoggerConfigurationFactory : FactoryBase<object, LoggerConfiguration>
 		{
-			this.configurationsSource = configurationsSource;
+			public static LoggerConfigurationFactory Instance { get; } = new LoggerConfigurationFactory();
+			LoggerConfigurationFactory() {}
+
+			public override LoggerConfiguration Create( object parameter ) => 
+				LoggerConfigurationsConfiguration.Instance.Get( parameter ).Aggregate( new LoggerConfiguration(), ( configuration, transformer ) => transformer.Create( configuration ) );
+		}
+	}
+
+	class LoggerCongfiguration : WritableConfiguration<ILogger>
+	{
+		public static LoggerCongfiguration Instance { get; } = new LoggerCongfiguration();
+		LoggerCongfiguration() : base( Factory.Instance.Create ) {}
+
+		class Factory : FactoryBase<object, ILogger>
+		{
+			public static Factory Instance { get; } = new Factory();
+			Factory() {}
+
+			public override ILogger Create( object parameter ) => LoggerConfigurationConfiguration.Instance.Get( parameter ).CreateLogger().ForSource( parameter );
+		}
+	}
+
+	class LoggerConfigurationsConfiguration : WritableConfiguration<ITransformer<LoggerConfiguration>[]>
+	{
+		public static LoggerConfigurationsConfiguration Instance { get; } = new LoggerConfigurationsConfiguration();
+		LoggerConfigurationsConfiguration() : base( LoggerConfigurationsFactory.Instance.Create ) {}
+	}
+
+	public class LoggerConfigurationsFactory : FactoryBase<object, ITransformer<LoggerConfiguration>[]>
+	{
+		public static LoggerConfigurationsFactory Instance { get; } = new LoggerConfigurationsFactory();
+		protected LoggerConfigurationsFactory() {}
+
+		public override ITransformer<LoggerConfiguration>[] Create( object parameter ) => From( parameter ).ToArray();
+
+		protected virtual IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
+		{
+			yield return new ControllerTransform( LoggingLevelSwitchConfiguration.Instance.Get( parameter ) );
+			yield return new CreatorFilterTransformer();
 		}
 
-		public override void Execute( ConfigurationStore parameter )
+		class ControllerTransform : TransformerBase<LoggerConfiguration>
 		{
-			var level = parameter.Get<DefaultLevel>();
-			parameter.Get<LoggingLevelSwitchSource>().Assigned( new LoggingLevelSwitchFactory( level ).ToDelegate() );
-
-			var value = new Func<object, ImmutableArray<ITransformer<LoggerConfiguration>>>( configurationsSource( parameter ) );
-			var configurations = parameter.Get<LoggerConfigurationsSource>().Assigned( value );
-			var configuration = parameter.Get<LoggerConfigurationSource>().Assigned( new LoggerConfigurationFactory( configurations.Get ).ToDelegate() );
-			parameter.Get<LoggerSource>().Assigned( new LoggerFactory( configuration.Get ).ToDelegate() );
-		}
-
-		public class LoggingLevelSwitchFactory : FactoryBase<object, LoggingLevelSwitch>
-		{
-			readonly IStore<LogEventLevel> levelSource;
-
-			public LoggingLevelSwitchFactory( IStore<LogEventLevel> levelSource )
-			{
-				this.levelSource = levelSource;
-			}
-
-			public override LoggingLevelSwitch Create( object parameter ) => new LoggingLevelSwitch( levelSource.Value );
-		}
-
-		public class ConfigurationsFactory : FactoryBase<object, ImmutableArray<ITransformer<LoggerConfiguration>>>
-		{
-			readonly Func<object, LoggingLevelSwitch> controller;
-		
-			public ConfigurationsFactory( Func<object, LoggingLevelSwitch> controller )
+			readonly LoggingLevelSwitch controller;
+			public ControllerTransform( LoggingLevelSwitch controller )
 			{
 				this.controller = controller;
 			}
 
-			public override ImmutableArray<ITransformer<LoggerConfiguration>> Create( object parameter ) => From( parameter ).ToImmutableArray();
-
-			protected virtual IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
-			{
-				yield return new ControllerTransform( controller( parameter ) );
-				yield return new CreatorFilterTransformer();
-			}
-
-			class ControllerTransform : TransformerBase<LoggerConfiguration>
-			{
-				readonly LoggingLevelSwitch controller;
-				public ControllerTransform( LoggingLevelSwitch controller )
-				{
-					this.controller = controller;
-				}
-
-				public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller );
-			}
+			public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller );
 		}
-
-		class LoggerConfigurationFactory : FactoryBase<object, LoggerConfiguration>
-		{
-			readonly Configurations configurations;
-
-			public LoggerConfigurationFactory( Configurations configurations )
-			{
-				this.configurations = configurations;
-			}
-
-			public override LoggerConfiguration Create( object parameter ) => 
-				configurations( parameter ).Aggregate( new LoggerConfiguration(), ( configuration, transformer ) => transformer.Create( configuration ) );
-		}
-
-		class LoggerFactory : FactoryBase<object, ILogger>
-		{
-			readonly Func<object, LoggerConfiguration> configurationSource;
-			public LoggerFactory( Func<object, LoggerConfiguration> configurationSource )
-			{
-				this.configurationSource = configurationSource;
-			}
-
-			public override ILogger Create( object parameter ) => configurationSource( parameter ).CreateLogger().ForSource( parameter );
-		}
-	}
-
-	abstract class ConfigureConfigurationStoreCommand : CommandBase<ConfigurationStore> {}
-
-	class ConfigurationStore : Cache<Type, IWritableStore>
-	{
-		readonly static Func<Type, IWritableStore> Create = Constructor.Instance.CreateUsing<IWritableStore>;
-
-		public ConfigurationStore() : base( Create ) {}
-
-		public T Get<T>() where T : IWritableStore, new() => (T)Get( typeof(T) );
-	}
-
-	public interface IConfigurationStore<T> : IConfigurationStore<object, T> {}
-
-	public interface IConfigurationStore<TKey, TValue> : IWritableStore<Func<TKey, TValue>>
-	{
-		TValue Get( TKey key );
-	}
-
-	class CachedConfigurationSource<T> : CachedConfigurationSource<object, T> where T : class
-	{
-		public CachedConfigurationSource( Func<object, T> reference ) : base( reference ) {}
-	}
-
-	class CachedConfigurationSource<TKey, TValue> : CachedConfigurationSourceBase<Cache<TKey, TValue>, TKey, TValue> where TKey : class where TValue : class
-	{
-		public CachedConfigurationSource( Func<TKey, TValue> reference ) : base( reference ) {}
-	}
-
-	abstract class CachedConfigurationSourceBase<TCache, TValue> : CachedConfigurationSourceBase<TCache, object, TValue>, IConfigurationStore<TValue> where TCache : class, ICache<object, TValue>
-	{
-		protected CachedConfigurationSourceBase( Func<object, TValue> reference ) : base( reference ) {}
-	}
-
-	abstract class CachedConfigurationSourceBase<TCache, TKey, TValue> : ConfigurationSource<TKey, TValue> where TCache : class, ICache<TKey, TValue>
-	{
-		protected CachedConfigurationSourceBase( Func<TKey, TValue> reference ) : base( reference ) {}
-
-		protected override void OnAssign( Func<TKey, TValue> item ) => base.OnAssign( ParameterConstructor<Func<TKey, TValue>, TCache>.Default( item ).Get );
-	}
-
-	/*class ConfigurationSource<T> : ConfigurationSource<object, T>
-	{
-		public ConfigurationSource( Func<object, T> reference ) : base( reference ) {}
-	}*/
-
-	class ConfigurationSource<TKey, TValue> : FixedStore<Func<TKey, TValue>>, IConfigurationStore<TKey, TValue>
-	{
-		public ConfigurationSource( Func<TKey, TValue> reference ) : base( reference ) {}
-
-		public TValue Get( TKey key ) => Value( key );
-	}
-
-	class DefaultLevel : FixedStore<LogEventLevel>
-	{
-		public DefaultLevel() : this( LogEventLevel.Information ) {}
-
-		public DefaultLevel( LogEventLevel reference ) : base( reference ) {}
-	}
-
-	class LoggerHistorySource : CachedConfigurationSource<ILoggerHistory>
-	{
-		public LoggerHistorySource() : base( o => new LoggerHistorySink() ) {}
-	}
-
-	class LoggingLevelSwitchSource : CachedConfigurationSource<LoggingLevelSwitch>
-	{
-		public LoggingLevelSwitchSource() : this( o => new LoggingLevelSwitch() ) {}
-
-		public LoggingLevelSwitchSource( Func<object, LoggingLevelSwitch> reference ) : base( reference ) {}
-	}
-
-	class LoggerConfigurationSource : CachedConfigurationSource<LoggerConfiguration>
-	{
-		public LoggerConfigurationSource() : this( o => new LoggerConfiguration() ) {}
-		public LoggerConfigurationSource( Func<object, LoggerConfiguration> create ) : base( create ) {}
-	}
-
-	class LoggerSource : CachedConfigurationSource<ILogger>
-	{
-		public LoggerSource() : this( o => new LoggerConfiguration().CreateLogger() ) {}
-		public LoggerSource( Func<object, ILogger> reference ) : base( reference ) {}
-	}
-
-	class LoggerConfigurationsSource : CachedConfigurationSourceBase<StoreCache<ImmutableArray<ITransformer<LoggerConfiguration>>>, ImmutableArray<ITransformer<LoggerConfiguration>>>
-	{
-		public LoggerConfigurationsSource() : this( o => ImmutableArray<ITransformer<LoggerConfiguration>>.Empty ) {}
-		public LoggerConfigurationsSource( Func<object, ImmutableArray<ITransformer<LoggerConfiguration>>> factory ) : base( factory ) {}
 	}
 }

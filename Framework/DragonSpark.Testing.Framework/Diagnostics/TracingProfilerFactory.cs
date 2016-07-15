@@ -1,16 +1,12 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using Serilog;
 using System;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	public class ProfilerFactory : Windows.Diagnostics.ProfilerFactory
+	/*public class ProfilerFactory : Windows.Diagnostics.ProfilerFactory
 	{
 		readonly Action<string> output;
 		readonly ILoggerHistory history;
@@ -31,7 +27,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			var result = base.Create( parameter ).With( start.Execute ).AssociateForDispose( new DisposableAction( purge.Run ) );
 			return result;
 		}
-	}
+	}*/
 
 	public static class Tracing
 	{

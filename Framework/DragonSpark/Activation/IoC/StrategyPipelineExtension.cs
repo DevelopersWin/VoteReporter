@@ -77,7 +77,7 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
-			var creator = Creator.Default.Get( Container )?.GetType() ?? Execution.GetCurrent();
+			var creator = Creator.Default.Get( Container )?.GetType() ?? Defaults.ExecutionContext();
 			var policies = repository.List();
 			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies, specification );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );

@@ -10,30 +10,36 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class AttributeProviderLocator : Cache<IAttributeProvider>
+	public class AttributeProviderHost : WritableConfiguration<IAttributeProvider>
 	{
-		public static ICache<object, IAttributeProvider> Default { get; } = new AttributeProviderLocator();
-
-		AttributeProviderLocator() : this( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
-
-		protected AttributeProviderLocator( params Type[] types ) : base( new ParameterConstructedCompositeFactory<IAttributeProvider>( types ).Create ) {}
+		public static AttributeProviderHost Instance { get; } = new AttributeProviderHost();
+		AttributeProviderHost() : base( AttributeProviderConfiguration.Default.Value.Create ) {}
 	}
 
-	public class AttributeProviderConfiguration : ConfigurationBase<ICache<object, IAttributeProvider>>
+	public class AttributeProviderConfiguration : DeclarativeFactoryConfigurationBase<IAttributeProvider>
 	{
-		public AttributeProviderConfiguration() : base( AttributeProviderLocator.Default ) {}
+		public static AttributeProviderConfiguration Default { get; } = new AttributeProviderConfiguration();
+
+		public AttributeProviderConfiguration() : base( Factory.Instance ) {}
+
+		class Factory : ParameterConstructedCompositeFactory<IAttributeProvider>
+		{
+			public static Factory Instance { get; } = new Factory();
+			Factory() : base( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
+		}
 	}
 
 	class ObjectAttributeProvider : FixedFactory<object, IAttributeProvider>
 	{
-		public ObjectAttributeProvider( object item ) : base( MemberInfoProviderFactory.Instance.ToDelegate(), item ) {}
+		readonly static Func<object, IAttributeProvider> DefaultProvider = MemberInfoProviderFactory.Instance.ToDelegate();
+
+		public ObjectAttributeProvider( object item ) : base( DefaultProvider, item ) {}
 	}
 
 	public class AttributeProvider : Cache<IAttributeProvider>
 	{
 		public static ICache<object, IAttributeProvider> Default { get; } = new AttributeProvider();
-
-		AttributeProvider() : base( new ParameterConstructedCompositeFactory<IAttributeProvider>( typeof(TypeInfoAttributeProvider), typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).ToDelegate() ) {}
+		AttributeProvider() : base( new ParameterConstructedCompositeFactory<IAttributeProvider>( typeof(TypeInfoAttributeProvider), typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ).Create ) {}
 	}
 
 	public class MemberInfoProviderFactory : Cache<object, IAttributeProvider>

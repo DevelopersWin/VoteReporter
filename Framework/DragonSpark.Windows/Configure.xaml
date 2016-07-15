@@ -1,14 +1,14 @@
-﻿<configuration:InitializeConfigurationCommand x:Class="DragonSpark.Windows.Configure"
+﻿<configuration:ApplyConfiguration x:Class="DragonSpark.Windows.Configure"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
-	xmlns:diagnosticsCore="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
-	xmlns:diagnostics="clr-namespace:DragonSpark.Windows.Diagnostics"
 	xmlns:typeSystem="clr-namespace:DragonSpark.TypeSystem;assembly=DragonSpark"
 	xmlns:windows="clr-namespace:DragonSpark.Windows"
 	mc:Ignorable="d">
-	<diagnosticsCore:ProfilerFactoryConfiguration Value="{x:Type diagnostics:ProfilerFactory}" />
-	<typeSystem:AttributeProviderConfiguration Value="{x:Static windows:AttributeProviderLocator.Instance}" />
-</configuration:InitializeConfigurationCommand>
+	<configuration:ConfigurationValues>
+		<!--<diagnosticsCore:ProfilerFactoryConfiguration Value="{x:Type diagnostics:ProfilerFactory}" />-->
+		<typeSystem:AttributeProviderConfiguration x:Key="{x:Static typeSystem:AttributeProviderHost.Instance}" Value="{x:Static windows:AttributeProviderLocator.Instance}" />
+	</configuration:ConfigurationValues>
+</configuration:ApplyConfiguration>

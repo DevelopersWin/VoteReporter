@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
 using Serilog.Events;
@@ -39,7 +38,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 
 			Assert.DoesNotContain( listener, Trace.Listeners.Cast<TraceListener>() );
 			
-			using ( currentMethod.Trace( lines.Add ) )
+			/*using ( currentMethod.Trace( lines.Add ) )
 			{
 				Assert.Contains( listener, Trace.Listeners.Cast<TraceListener>() );
 
@@ -47,7 +46,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 				Assert.NotEmpty( lines );
 				Assert.Contains( message, lines.Only() );
 				Assert.NotEmpty( history.Events );
-			}
+			}*/
 
 			Assert.DoesNotContain( listener, Trace.Listeners.Cast<TraceListener>() );
 

@@ -44,28 +44,17 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class FixedCommand : FixedCommand<object>
+	/*public class FixedCommand : FixedCommand<object>
 	{
 		public FixedCommand( ICommand<object> command, object parameter ) : base( command, parameter ) {}
-		// public FixedCommand( Func<ICommand<object>> command, Func<object> parameter ) : base( command, parameter ) {}
-	}
+	}*/
 
 
 	public class FixedCommand<T> : DisposingCommand<object>
 	{
 		readonly ICommand<T> command;
 		readonly T parameter;
-		/*readonly Lazy<ICommand<T>> command;
-		readonly Lazy<T> parameter;
-
-		public FixedCommand( ICommand<T> command, T parameter ) : this( command.Self, parameter.Self ) {}
-
-		public FixedCommand( Func<ICommand<T>> command, Func<T> parameter ) : base( Specifications.Specifications.Always )
-		{
-			this.command = new Lazy<ICommand<T>>( command );
-			this.parameter = new Lazy<T>( parameter );
-		}*/
-
+		
 		public FixedCommand( ICommand<T> command, T parameter )
 		{
 			this.command = command;

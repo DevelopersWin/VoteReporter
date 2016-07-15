@@ -1,13 +1,12 @@
-﻿namespace DragonSpark.Testing.Parts.Development
+﻿using DragonSpark.Configuration;
+using System.Composition;
+
+namespace DragonSpark.Testing.Parts.Development
 {
+	[Export( typeof(IInitializationCommand) )]
 	public partial class Configure
 	{
-		public static Configure Instance { get; } = new Configure();
-
-		/*[ModuleInitializer( 0 ), Aspects.Runtime, AssemblyInitialize]
-		public static void Initialize() => new Configure().Run();*/
-
-		Configure()
+		public Configure()
 		{
 			InitializeComponent();
 		}
