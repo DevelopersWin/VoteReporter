@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class AttributeProviderHost : WritableParameterizedConfiguration<IAttributeProvider>
+	public class AttributeProviderHost : ParameterizedConfiguration<IAttributeProvider>
 	{
 		public static AttributeProviderHost Instance { get; } = new AttributeProviderHost();
 		AttributeProviderHost() : base( AttributeProviderConfiguration.Default.Value.Create ) {}

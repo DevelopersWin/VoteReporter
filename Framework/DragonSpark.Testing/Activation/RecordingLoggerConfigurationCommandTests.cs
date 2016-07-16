@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void BasicContext()
 		{
-			ConfigureLoggerConfigurationsCommand.Instance.Execute( RecordingLoggerConfigurationsFactory.Instance.Create );
+			LoggerConfigurationsConfiguration.Instance.Assign( RecordingLoggerConfigurationsFactory.Instance.Create );
 
 			var level = MinimumLevelConfiguration.Instance;
 			var controller = LoggingLevelSwitchConfiguration.Instance;
@@ -41,7 +41,7 @@ namespace DragonSpark.Testing.Activation
 		[Theory, AutoData]
 		void VerifyHistory( object context, string message )
 		{
-			ConfigureLoggerConfigurationsCommand.Instance.Execute( RecordingLoggerConfigurationsFactory.Instance.Create );
+			LoggerConfigurationsConfiguration.Instance.Assign( RecordingLoggerConfigurationsFactory.Instance.Create );
 
 			var history = LoggerHistoryConfiguration.Instance.Get( context );
 			Assert.Empty( history.Events );
@@ -60,12 +60,6 @@ namespace DragonSpark.Testing.Activation
 			logger.Debug( "Hello World! {Message}", message );
 			Assert.Equal( 2, history.Events.Count() );
 		}
-	}
-
-	class ConfigureLoggerConfigurationsCommand : AssignConfigurationCommand<ITransformer<LoggerConfiguration>[]>
-	{
-		public static ConfigureLoggerConfigurationsCommand Instance { get; } = new ConfigureLoggerConfigurationsCommand();
-		ConfigureLoggerConfigurationsCommand() : base( LoggerConfigurationsConfiguration.Instance ) {}
 	}
 
 	class RecordingLoggerConfigurationsFactory : LoggerConfigurationsFactory
@@ -95,56 +89,31 @@ namespace DragonSpark.Testing.Activation
 		}
 	}
 	
-	class LoggerHistoryConfiguration : WritableParameterizedConfiguration<ILoggerHistory>
+	class LoggerHistoryConfiguration : ParameterizedConfiguration<ILoggerHistory>
 	{
 		public static LoggerHistoryConfiguration Instance { get; } = new LoggerHistoryConfiguration();
 		LoggerHistoryConfiguration() : base( o => new LoggerHistorySink() ) {}
 	}
 
-	class LoggingLevelSwitchConfiguration : WritableParameterizedConfiguration<LoggingLevelSwitch>
+	class LoggingLevelSwitchConfiguration : ParameterizedConfiguration<LoggingLevelSwitch>
 	{
 		public static LoggingLevelSwitchConfiguration Instance { get; } = new LoggingLevelSwitchConfiguration();
-		LoggingLevelSwitchConfiguration() : base( Factory.Instance.Create ) {}
-
-		class Factory : FactoryBase<object, LoggingLevelSwitch>
-		{
-			public static Factory Instance { get; } = new Factory();
-			Factory() {}
-
-			public override LoggingLevelSwitch Create( object parameter ) => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get( parameter ) );
-		}
+		LoggingLevelSwitchConfiguration() : base( o => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get( o ) ) ) {}
 	}
 
-	class LoggerConfigurationConfiguration : WritableParameterizedConfiguration<LoggerConfiguration>
+	class LoggerConfigurationConfiguration : ParameterizedConfiguration<LoggerConfiguration>
 	{
 		public static LoggerConfigurationConfiguration Instance { get; } = new LoggerConfigurationConfiguration();
-		LoggerConfigurationConfiguration() : base( LoggerConfigurationFactory.Instance.Create ) {}
-
-		class LoggerConfigurationFactory : FactoryBase<object, LoggerConfiguration>
-		{
-			public static LoggerConfigurationFactory Instance { get; } = new LoggerConfigurationFactory();
-			LoggerConfigurationFactory() {}
-
-			public override LoggerConfiguration Create( object parameter ) => 
-				LoggerConfigurationsConfiguration.Instance.Get( parameter ).Aggregate( new LoggerConfiguration(), ( configuration, transformer ) => transformer.Create( configuration ) );
-		}
+		LoggerConfigurationConfiguration() : base( o => LoggerConfigurationsConfiguration.Instance.Get( o ).Aggregate( new LoggerConfiguration(), ( configuration, transformer ) => transformer.Create( configuration ) ) ) {}
 	}
 
-	class LoggerCongfiguration : WritableParameterizedConfiguration<ILogger>
+	class LoggerCongfiguration : ParameterizedConfiguration<ILogger>
 	{
 		public static LoggerCongfiguration Instance { get; } = new LoggerCongfiguration();
-		LoggerCongfiguration() : base( Factory.Instance.Create ) {}
-
-		class Factory : FactoryBase<object, ILogger>
-		{
-			public static Factory Instance { get; } = new Factory();
-			Factory() {}
-
-			public override ILogger Create( object parameter ) => LoggerConfigurationConfiguration.Instance.Get( parameter ).CreateLogger().ForSource( parameter );
-		}
+		LoggerCongfiguration() : base( o => LoggerConfigurationConfiguration.Instance.Get( o ).CreateLogger().ForSource( o ) ) {}
 	}
 
-	class LoggerConfigurationsConfiguration : WritableParameterizedConfiguration<ITransformer<LoggerConfiguration>[]>
+	class LoggerConfigurationsConfiguration : ParameterizedConfiguration<ITransformer<LoggerConfiguration>[]>
 	{
 		public static LoggerConfigurationsConfiguration Instance { get; } = new LoggerConfigurationsConfiguration();
 		LoggerConfigurationsConfiguration() : base( LoggerConfigurationsFactory.Instance.Create ) {}

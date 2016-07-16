@@ -1,19 +1,17 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Commands;
 using System;
-using System.Collections.Generic;
 using System.Windows.Input;
 using System.Windows.Markup;
 using Defaults = DragonSpark.Activation.Defaults;
 
 namespace DragonSpark.Configuration
 {
-	/*	public class EnableMethodCaching : WritableParameterizedStructureConfiguration<bool>
+	/*	public class EnableMethodCaching : StructuredParameterizedConfiguration<bool>
 		{
 			public static EnableMethodCaching Instance { get; } = new EnableMethodCaching();
 			EnableMethodCaching() : base( EnableMethodCachingConfiguration.Instance.Get ) {}
@@ -34,7 +32,7 @@ namespace DragonSpark.Configuration
 		protected InitializationCommandBase( params ICommand[] commands ) : base( new OnlyOnceSpecification(), commands ) {}
 	}
 
-	public class ConfigurationValues : Dictionary<IWritableStore, IStore> {}
+	/*public class ConfigurationValues : Dictionary<IWritableStore, IStore> {}
 
 	public class ApplyConfiguration : ServicedCommand<ApplyConfigurationCommand, ConfigurationValues>, IInitializationCommand
 	{
@@ -50,7 +48,7 @@ namespace DragonSpark.Configuration
 				key.Assign( parameter[key].Value );
 			}
 		}
-	}
+	}*/
 
 	/*public class ApplyConfiguration : DeclarativeCommandBase<>*/
 
@@ -139,13 +137,15 @@ namespace DragonSpark.Configuration
 		void Assign( Func<T> factory );
 	}
 
-	public abstract class WritableConfigurationBase<T> : IWritableConfiguration<T>
+	public abstract class ConfigurationBase<T> : IWritableConfiguration<T>
 	{
-		readonly IWritableStore<Func<T>> store = new FixedStore<Func<T>>();
+		readonly IWritableStore<Func<T>> store;
 
-		protected WritableConfigurationBase( Func<T> factory )
+		protected ConfigurationBase( Func<T> factory ) : this( new FixedStore<Func<T>>( factory ) ) {}
+
+		protected ConfigurationBase( IWritableStore<Func<T>> store )
 		{
-			Assign( factory );
+			this.store = store;
 		}
 
 		public void Assign( Func<T> item ) => store.Assign( item );
@@ -158,7 +158,7 @@ namespace DragonSpark.Configuration
 		public static T Default<T>( this IParameterizedConfiguration<object, T> @this ) => @this.Get( Defaults.ExecutionContext() );
 	}
 
-	public abstract class ParameterizedConfigurationBase<T> : ParameterizedConfigurationBase<object, T>, IParameterizedConfiguration<T>
+	/*public abstract class ParameterizedConfigurationBase<T> : ParameterizedConfigurationBase<object, T>, IParameterizedConfiguration<T>
 	{
 		protected ParameterizedConfigurationBase( Func<object, T> factory ) : base( factory ) {}
 	}
@@ -174,5 +174,5 @@ namespace DragonSpark.Configuration
 
 		public TValue Get( TKey key ) => store.Value( key );
 		public void Assign( Func<TKey, TValue> factory ) => store.Assign( factory );
-	}
+	}*/
 }

@@ -12,7 +12,7 @@ namespace DragonSpark.Activation
 		protected override IExecutionContext Get() => this;
 	}
 
-	public class ExecutionContextLocator : WritableConfigurationBase<IExecutionContext>
+	public class ExecutionContextLocator : ConfigurationBase<IExecutionContext>
 	{
 		public static ExecutionContextLocator Instance { get; } = new ExecutionContextLocator();
 		ExecutionContextLocator() : base( () => ExecutionContext.Instance ) {}
@@ -54,9 +54,12 @@ namespace DragonSpark.Activation
 
 	public interface IExecutionContext : IStore {}
 
-	public abstract class ExecutionContextCachedBase<T> : ExecutionContextStoreBase<T> where T : class
+	public class ExecutionContextStore<T> : ExecutionContextStoreBase<T> where T : class
 	{
-		protected ExecutionContextCachedBase() : base( new Cache<T>() ) {}
+		public ExecutionContextStore( T reference ) : base( new Cache<T>() )
+		{
+			Assign( reference );
+		}
 	}
 
 	public abstract class ExecutionContextStoreBase<T> : WritableStore<T>
@@ -65,6 +68,7 @@ namespace DragonSpark.Activation
 		readonly ICache<object, T> cache;
 
 		protected ExecutionContextStoreBase( ICache<T> cache ) : this( Defaults.ExecutionContext, cache ) {}
+
 		protected ExecutionContextStoreBase( Func<object> contextSource, ICache<object, T> cache )
 		{
 			this.contextSource = contextSource;
@@ -73,7 +77,9 @@ namespace DragonSpark.Activation
 
 		protected override T Get() => cache.Get( contextSource() );
 
-		public override void Assign( T item ) => cache.Set( contextSource(), item );
+		public sealed override void Assign( T item ) => OnAssign( item );
+
+		protected virtual void OnAssign( T item ) => cache.Set( contextSource(), item );
 	}
 
 	/*public class AssignExecutionContextCommand : DelegatedCommand<IExecutionContext>
