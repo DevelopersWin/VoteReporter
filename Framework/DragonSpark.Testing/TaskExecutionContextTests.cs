@@ -1,10 +1,12 @@
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using ExecutionContext = DragonSpark.Testing.Framework.ExecutionContext;
 
 namespace DragonSpark.Testing
 {
@@ -15,33 +17,28 @@ namespace DragonSpark.Testing
 
 		public static void Verify( MethodBase method )
 		{
-			/*var current = TaskContext.Current();
-			if ( ExecutionContext.Instance.Value.Id != current )
+			var current = ExecutionContext.Instance.Value;
+			if ( method != null && current != method )
 			{
-				throw new System.InvalidOperationException( $@"'{ExecutionContext.Instance.Value}' does not contain '{current}'" );
-			}*/
-
-			if ( method != null && ExecutionContextStore.Instance.Value.Value != method )
-			{
-				throw new System.InvalidOperationException( $"Assigned Method is different from expected.  Expected: {method}.  Actual: {ExecutionContextStore.Instance.Value.Value}" );
+				throw new InvalidOperationException( $"Assigned Method is different from expected.  Expected: {method}.  Actual: {current}" );
 			}
 		}
 
 		[Fact]
 		public void Fact()
 		{
-			Assert.Equal( ExecutionContextStore.Instance.Value.Id, TaskContext.Current() );
-			Assert.Null( ExecutionContextStore.Instance.Value.Value );
+			Assert.Equal( ExecutionContextHost.Instance.Value, TaskContext.Current() );
+			Assert.Null( ExecutionContext.Instance.Value );
 		}
 
 		[Theory, ExecutionContextAutoData]
 		public void Theory()
 		{
-			var method = GetType().GetMethod( nameof(Theory) );
+			var method = new Action( Theory ).Method;
 			Verify( method );
-			Assert.Equal( ExecutionContextStore.Instance.Value.Id, TaskContext.Current() );
-			Assert.NotNull( ExecutionContextStore.Instance.Value.Value );
-			Assert.Equal( method, ExecutionContextStore.Instance.Value.Value );
+			Assert.Equal( ExecutionContextHost.Instance.Value, TaskContext.Current() );
+			Assert.NotNull( ExecutionContext.Instance.Value );
+			Assert.Equal( method, ExecutionContext.Instance.Value );
 		}
 /*
 		[Fact, Wrapper]
@@ -71,31 +68,31 @@ namespace DragonSpark.Testing
 		[Fact]
 		public Task Fact()
 		{
-			var current = ExecutionContextStore.Instance.Value;
-			Assert.Equal( ExecutionContextStore.Instance.Value.Id, TaskContext.Current() );
-			Assert.Null( ExecutionContextStore.Instance.Value.Value );
+			var current = ExecutionContext.Instance.Value;
+			Assert.Equal( ExecutionContextHost.Instance.Value, TaskContext.Current() );
+			Assert.Null( current );
 			return Task.Run( () =>
 							 {
-								 Assert.Same( current, ExecutionContextStore.Instance.Value );
-								 Assert.NotEqual( ExecutionContextStore.Instance.Value.Id, TaskContext.Current() );
-								 Assert.Null( ExecutionContextStore.Instance.Value.Value );
+								 Assert.Same( current, ExecutionContext.Instance.Value );
+								 Assert.NotEqual( ExecutionContextHost.Instance.Value, TaskContext.Current() );
+								 Assert.Null( ExecutionContext.Instance.Value );
 							 } );
 		}
 
 		[Theory, ExecutionContextAutoData]
 		public Task Theory()
 		{
-			var current = ExecutionContextStore.Instance.Value;
-			Assert.Equal( ExecutionContextStore.Instance.Value.Id, TaskContext.Current() );
-			var method = GetType().GetMethod( nameof(Theory) );
-			Assert.Equal( method, ExecutionContextStore.Instance.Value.Value );
+			var current = ExecutionContext.Instance.Value;
+			Assert.Equal( ExecutionContextHost.Instance.Value, TaskContext.Current() );
+			var method = new Func<Task>( Theory ).Method;
+			Assert.Equal( method, ExecutionContext.Instance.Value );
 			return Task.Run( () =>
 							 {
-								Assert.Same( current, ExecutionContextStore.Instance.Value );
+								Assert.Same( current, ExecutionContext.Instance.Value );
 								TaskExecutionContextTests.Verify( method );
-								Assert.NotEqual( ExecutionContextStore.Instance.Value.Id, TaskContext.Current() );
-								Assert.NotNull( ExecutionContextStore.Instance.Value.Value );
-								Assert.Equal( method, ExecutionContextStore.Instance.Value.Value );
+								Assert.NotEqual( ExecutionContextHost.Instance.Value, TaskContext.Current() );
+								Assert.NotNull( ExecutionContext.Instance.Value );
+								Assert.Equal( method, ExecutionContext.Instance.Value );
 							 } );
 		}
 /*

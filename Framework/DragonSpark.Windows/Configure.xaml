@@ -1,14 +1,13 @@
-﻿<configuration:ApplyConfiguration x:Class="DragonSpark.Windows.Configure"
+﻿<runtime:CompositeCommand x:Class="DragonSpark.Windows.Configure"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
-	xmlns:typeSystem="clr-namespace:DragonSpark.TypeSystem;assembly=DragonSpark"
-	xmlns:windows="clr-namespace:DragonSpark.Windows"
+	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
 	mc:Ignorable="d">
-	<configuration:ConfigurationValues>
-		<!--<diagnosticsCore:ProfilerFactoryConfiguration Value="{x:Type diagnostics:ProfilerFactory}" />-->
-		<typeSystem:AttributeProviderConfiguration x:Key="{x:Static typeSystem:AttributeProviderHost.Instance}" Value="{x:Static windows:AttributeProviderLocator.Instance}" />
-	</configuration:ConfigurationValues>
-</configuration:ApplyConfiguration>
+	<!--<configuration:ConfigurationValues>
+		~1~<windows:ExecutionContextLocatorConfiguration x:Key="{x:Static activation:ExecutionContextLocator.Instance}" />@1@
+		~1~<diagnosticsCore:ProfilerFactoryConfiguration Value="{x:Type diagnostics:ProfilerFactory}" />@1@
+		~1~<typeSystem:AttributeProviderConfiguration x:Key="{x:Static typeSystem:AttributeProviderHost.Instance}" Value="{x:Static windows:AttributeProviderLocator.Instance}" />@1@
+	</configuration:ConfigurationValues>-->
+</runtime:CompositeCommand>

@@ -21,12 +21,12 @@ namespace DragonSpark.Runtime.Stores
 		protected abstract T Get();
 	}
 
-	public class PropertyStore<T> : WritableStore<T>
+	/*public class PropertyStore<T> : WritableStore<T>
 	{
 		public new T Value { get; set; }
 
 		protected override T Get() => Value;
 
 		public override void Assign( T item ) => Value = item;
-	}
+	}*/
 }

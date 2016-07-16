@@ -10,13 +10,13 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class AttributeProviderHost : WritableConfiguration<IAttributeProvider>
+	public class AttributeProviderHost : WritableParameterizedConfiguration<IAttributeProvider>
 	{
 		public static AttributeProviderHost Instance { get; } = new AttributeProviderHost();
 		AttributeProviderHost() : base( AttributeProviderConfiguration.Default.Value.Create ) {}
 	}
 
-	public class AttributeProviderConfiguration : DeclarativeFactoryConfigurationBase<IAttributeProvider>
+	public class AttributeProviderConfiguration : ApplyFactoryConfigurationCommandBase<IAttributeProvider>
 	{
 		public static AttributeProviderConfiguration Default { get; } = new AttributeProviderConfiguration();
 

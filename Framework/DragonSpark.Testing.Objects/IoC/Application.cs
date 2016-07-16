@@ -6,6 +6,8 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
+using PostSharp;
+using PostSharp.Extensibility;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -29,7 +31,22 @@ namespace DragonSpark.Testing.Objects.IoC
 
 	public class AutoDataAttribute : Framework.Setup.AutoDataAttribute
 	{
-		readonly static ImmutableArray<Assembly> Assemblies = AssemblyProvider.Instance.Create();
+		readonly static ImmutableArray<Assembly> Assemblies = asdf();
+
+		static ImmutableArray<Assembly> asdf()
+		{
+			try
+{
+				return AssemblyProvider.Instance.Create();
+}
+catch ( Exception e )
+{
+	MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
+	throw;
+}
+
+			
+		}
 
 		public AutoDataAttribute() : this( DefaultApplicationSource ) {}
 

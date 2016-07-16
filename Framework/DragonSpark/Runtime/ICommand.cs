@@ -54,8 +54,10 @@ namespace DragonSpark.Runtime
 	{
 		readonly ICommand<T> command;
 		readonly T parameter;
-		
-		public FixedCommand( ICommand<T> command, T parameter )
+
+		public FixedCommand( ICommand<T> command, T parameter ) : this( command, parameter, Specifications.Specifications.Always ) {}
+
+		public FixedCommand( ICommand<T> command, T parameter, ISpecification<object> specification ) : base( specification )
 		{
 			this.command = command;
 			this.parameter = parameter;
@@ -172,7 +174,9 @@ namespace DragonSpark.Runtime
 	public class DecoratedCommand<T> : DelegatedCommand<T>
 	{
 		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Defaults<T>.Coercer ) {}
-		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer ) : base( inner.ToDelegate(), coercer, inner.ToSpecification() ) {}
+		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer ) : this( inner, coercer, inner.ToSpecification() ) {}
+		public DecoratedCommand( [Required] ICommand<T> inner, ISpecification<T> specification ) : this( inner, Defaults<T>.Coercer, specification ) {}
+		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer, ISpecification<T> specification ) : base( inner.ToDelegate(), coercer, specification ) {}
 	}
 
 	/*public class AutoValidatingCommand<T> : ICommand<T>

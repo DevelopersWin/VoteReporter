@@ -18,38 +18,31 @@ namespace DragonSpark.Configuration
 	}
 
 	
-	public class WritableConfiguration<T> : WritableConfiguration<object, T>, IWritableConfiguration<T> where T : class
+	public class WritableParameterizedConfiguration<T> : WritableParameterizedConfiguration<object, T>, IWritableParameterizedConfiguration<T> where T : class
 	{
-		public WritableConfiguration( Func<object, T> reference ) : base( reference ) {}
+		public WritableParameterizedConfiguration( Func<object, T> reference ) : base( reference ) {}
 	}
 
-	public class WritableConfiguration<TKey, TValue> : WritableConfigurationBase<TKey, TValue> where TKey : class where TValue : class
+	public class WritableParameterizedConfiguration<TKey, TValue> : WritableParameterizedConfigurationBase<TKey, TValue> where TKey : class where TValue : class
 	{
-		public WritableConfiguration( Func<TKey, TValue> reference ) : base( new ConfigurableCache<TKey,TValue>( reference ) ) {}
+		public WritableParameterizedConfiguration( Func<TKey, TValue> reference ) : base( new ConfigurableCache<TKey,TValue>( reference ) ) {}
 	}
 
-	public class WritableStructureConfiguration<T> : WritableStructureConfiguration<object, T>, IWritableConfiguration<T>
+	public class WritableParameterizedStructureConfiguration<T> : WritableParameterizedStructureConfiguration<object, T>, IWritableParameterizedConfiguration<T>
 	{
-		public WritableStructureConfiguration( Func<object, T> reference ) : base( reference ) {}
+		public WritableParameterizedStructureConfiguration( Func<object, T> reference ) : base( reference ) {}
 	}
 
-	public class WritableStructureConfiguration<TKey, TValue> : WritableConfigurationBase<TKey, TValue> where TKey : class
+	public class WritableParameterizedStructureConfiguration<TKey, TValue> : WritableParameterizedConfigurationBase<TKey, TValue> where TKey : class
 	{
-		public WritableStructureConfiguration( Func<TKey, TValue> reference ) : base( new ConfigurableCache<StoreCache<TKey, TValue>, TKey, TValue>( reference ) ) {}
+		public WritableParameterizedStructureConfiguration( Func<TKey, TValue> reference ) : base( new ConfigurableCache<StoreCache<TKey, TValue>, TKey, TValue>( reference ) ) {}
 	}
 
-	public abstract class WritableConfigurationBase<TKey, TValue> : ExecutionContextStoreBase<Func<TKey, TValue>>, IWritableConfiguration<TKey, TValue>
+	public abstract class WritableParameterizedConfigurationBase<TKey, TValue> : ExecutionContextStoreBase<Func<TKey, TValue>>, IWritableParameterizedConfiguration<TKey, TValue>
 	{
-		protected WritableConfigurationBase( ICache<Func<TKey, TValue>> cache ) : base( cache ) {}
+		protected WritableParameterizedConfigurationBase( ICache<Func<TKey, TValue>> cache ) : base( cache ) {}
 
 		public TValue Get( TKey key ) => Value( key );
-	}
-
-	public interface IWritableConfiguration<T> : IWritableConfiguration<object, T> {}
-
-	public interface IWritableConfiguration<TKey, TValue> : IConfiguration<TKey, TValue>
-	{
-		void Assign( Func<TKey, TValue> factory );
 	}
 
 	class ConfigurableCache<TKey, TValue> : ConfigurableCache<Cache<TKey, TValue>, TKey, TValue> where TKey : class where TValue : class
@@ -61,7 +54,7 @@ namespace DragonSpark.Configuration
 	{
 		readonly static Func<Func<TKey, TValue>, TCache> Constructor = ParameterConstructor<Func<TKey, TValue>, TCache>.Default;
 
-		public ConfigurableCache( Func<TKey, TValue> factory ) : base( new Func<TKey, TValue>( Constructor( factory ).Get ).Wrap().ToDelegate() ) {}
+		public ConfigurableCache( Func<TKey, TValue> factory ) : base( new Func<TKey, TValue>( Constructor( factory ).Get ).Wrap().Create ) {}
 
 		public override void Set( object instance, [Required]Func<TKey, TValue> value ) => base.Set( instance, Constructor( value ).Get );
 	}

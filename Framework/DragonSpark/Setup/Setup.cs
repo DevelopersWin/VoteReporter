@@ -58,7 +58,7 @@ namespace DragonSpark.Setup
 		{
 			logger.Information( Resources.ConfiguringServiceLocatorSingleton, Items<object>.Default );
 
-			var assign = new AssignValueCommand<IServiceProvider>( host ).AsExecuted( parameter );
+			var assign = new AssignValueCommand<IServiceProvider>( host ).Run( parameter );
 			parameter.Get<IDisposableRepository>()?.Add( assign );
 		}
 	}

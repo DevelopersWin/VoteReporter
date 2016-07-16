@@ -12,17 +12,7 @@ namespace DragonSpark.Extensions
 
 		public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );
 
-		/*public static T AsExecuted<T>( this T @this, object parameter ) where T : ICommand
-		{
-			var result = @this.CanExecute( parameter ) ? @this : default(T);
-			if ( result != null )
-			{
-				result.Execute( parameter );
-			}
-			return result;
-		}*/
-
-		public static TCommand AsExecuted<TCommand, TParameter>( this TCommand @this, TParameter parameter ) where TCommand : ICommand<TParameter>
+		public static TCommand Run<TCommand, TParameter>( this TCommand @this, TParameter parameter ) where TCommand : ICommand<TParameter>
 		{
 			var result = @this.CanExecute( parameter ) ? @this : default(TCommand);
 			if ( result != null )

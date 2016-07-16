@@ -15,7 +15,6 @@ namespace DragonSpark.Setup
 	public class CurrentServiceProvider : ExecutionCachedStoreBase<IServiceProvider>
 	{
 		public static CurrentServiceProvider Instance { get; } = new CurrentServiceProvider();
-
 		CurrentServiceProvider() {}
 
 		protected override IServiceProvider Get() => base.Get() ?? DefaultServiceProvider.Instance.Value;

@@ -95,13 +95,13 @@ namespace DragonSpark.Testing.Activation
 		}
 	}
 	
-	class LoggerHistoryConfiguration : WritableConfiguration<ILoggerHistory>
+	class LoggerHistoryConfiguration : WritableParameterizedConfiguration<ILoggerHistory>
 	{
 		public static LoggerHistoryConfiguration Instance { get; } = new LoggerHistoryConfiguration();
 		LoggerHistoryConfiguration() : base( o => new LoggerHistorySink() ) {}
 	}
 
-	class LoggingLevelSwitchConfiguration : WritableConfiguration<LoggingLevelSwitch>
+	class LoggingLevelSwitchConfiguration : WritableParameterizedConfiguration<LoggingLevelSwitch>
 	{
 		public static LoggingLevelSwitchConfiguration Instance { get; } = new LoggingLevelSwitchConfiguration();
 		LoggingLevelSwitchConfiguration() : base( Factory.Instance.Create ) {}
@@ -115,7 +115,7 @@ namespace DragonSpark.Testing.Activation
 		}
 	}
 
-	class LoggerConfigurationConfiguration : WritableConfiguration<LoggerConfiguration>
+	class LoggerConfigurationConfiguration : WritableParameterizedConfiguration<LoggerConfiguration>
 	{
 		public static LoggerConfigurationConfiguration Instance { get; } = new LoggerConfigurationConfiguration();
 		LoggerConfigurationConfiguration() : base( LoggerConfigurationFactory.Instance.Create ) {}
@@ -130,7 +130,7 @@ namespace DragonSpark.Testing.Activation
 		}
 	}
 
-	class LoggerCongfiguration : WritableConfiguration<ILogger>
+	class LoggerCongfiguration : WritableParameterizedConfiguration<ILogger>
 	{
 		public static LoggerCongfiguration Instance { get; } = new LoggerCongfiguration();
 		LoggerCongfiguration() : base( Factory.Instance.Create ) {}
@@ -144,7 +144,7 @@ namespace DragonSpark.Testing.Activation
 		}
 	}
 
-	class LoggerConfigurationsConfiguration : WritableConfiguration<ITransformer<LoggerConfiguration>[]>
+	class LoggerConfigurationsConfiguration : WritableParameterizedConfiguration<ITransformer<LoggerConfiguration>[]>
 	{
 		public static LoggerConfigurationsConfiguration Instance { get; } = new LoggerConfigurationsConfiguration();
 		LoggerConfigurationsConfiguration() : base( LoggerConfigurationsFactory.Instance.Create ) {}

@@ -197,7 +197,7 @@ namespace DragonSpark.Activation
 
 	public static class Defaults
 	{
-		public static Func<object> ExecutionContext { get; } = ExecutionContextRepository.Instance.Current;
+		public static Func<object> ExecutionContext { get; } = ExecutionContextLocator.Instance.Get;
 
 		public static Func<Type, Func<object, IFactoryWithParameter>> ParameterConstructedFactory { get; } = Defaults<IFactoryWithParameter>.Constructor.ToDelegate();
 		public static Func<Type, bool> ApplicationType { get; } = ApplicationTypeSpecification.Instance.ToDelegate();

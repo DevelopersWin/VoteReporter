@@ -1,11 +1,28 @@
 using DragonSpark.ComponentModel;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
+using System.Windows.Markup;
 
 namespace DragonSpark.Setup.Commands
 {
-	// [AutoValidation( false )]
+	public class DeclarativeFixedCommand<T> : DeclarativeCommandBase<T>
+	{
+		[Required]
+		public ICommand<T> Command { [return: Required]get; set; }
+
+		public override void Execute( object parameter ) => Command.Run( Parameter );
+	}
+
+	public abstract class DeclarativeCommandBase<T> : CommandBase<object>
+	{
+		protected DeclarativeCommandBase() : base( Specifications.Always ) {}
+
+		[Required]
+		public T Parameter { [return: Required]get; set; }
+	}
+
 	public abstract class DelegatedFixedCommand<T> : CommandBase<object>
 	{
 		protected DelegatedFixedCommand() : base( Specifications.Always ) {}
@@ -19,6 +36,7 @@ namespace DragonSpark.Setup.Commands
 		public abstract T GetParameter();
 	}
 
+	[ContentProperty( nameof(Parameter) )]
 	public class ServicedCommand<TCommand, TParameter> : DelegatedFixedCommand<TParameter> where TCommand : ICommand<TParameter>
 	{
 		public ServicedCommand() : base( Specifications.Always ) {}

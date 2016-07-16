@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace DragonSpark.Diagnostics
 {
-	public class MinimumLevelConfiguration : WritableStructureConfiguration<LogEventLevel>
+	public class MinimumLevelConfiguration : WritableParameterizedStructureConfiguration<LogEventLevel>
 	{
 		public static MinimumLevelConfiguration Instance { get; } = new MinimumLevelConfiguration();
 		MinimumLevelConfiguration() : base( o => LogEventLevel.Information ) {}
@@ -16,11 +16,11 @@ namespace DragonSpark.Diagnostics
 
 	/*public class ProfilerFactoryConfiguration : ConfigurationSource<MethodBase, IProfiler>
 	{
-		public static IConfiguration<MethodBase, IProfiler> Instance { get; } = new ProfilerFactoryConfiguration();
+		public static IParameterizedConfiguration<MethodBase, IProfiler> Instance { get; } = new ProfilerFactoryConfiguration();
 		ProfilerFactoryConfiguration() : base( m => new ProfilerFactory().Create( m ) ) {}
 	}*/
 
-	public class ProfilerLevelConfiguration : WritableStructureConfiguration<LogEventLevel>
+	public class ProfilerLevelConfiguration : WritableParameterizedStructureConfiguration<LogEventLevel>
 	{
 		public static ProfilerLevelConfiguration Instance { get; } = new ProfilerLevelConfiguration();
 		ProfilerLevelConfiguration() : base( o => LogEventLevel.Debug ) {}
