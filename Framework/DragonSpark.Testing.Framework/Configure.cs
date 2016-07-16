@@ -5,6 +5,7 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Windows.Runtime;
 using DragonSpark.Windows.TypeSystem;
+using PostSharp.Aspects;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -15,6 +16,12 @@ using System.Threading.Tasks;
 
 namespace DragonSpark.Testing.Framework
 {
+	public static class Configure
+	{
+		[ModuleInitializer( 0 )]
+		public static void Initialize() => ExecutionContextRepository.Instance.Add( ExecutionContext.Instance );
+	}
+
 	public class ExecutionContextHost : TaskLocalStore<TaskContext>
 	{
 		public static ExecutionContextHost Instance { get; } = new ExecutionContextHost();

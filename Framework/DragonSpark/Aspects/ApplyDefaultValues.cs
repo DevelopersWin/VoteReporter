@@ -23,9 +23,39 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect
 	{
-		readonly static ICache<Delegate, ConditionMonitor> Property = new ActivatedCache<Delegate, ConditionMonitor>();
+		readonly static ICache<Delegate, ConditionMonitor> Property = dfs();
 
-		readonly static Func<PropertyInfo, bool> DefaultSpecification = DefaultValuePropertySpecification.Instance.ToDelegate();
+		static ActivatedCache<Delegate, ConditionMonitor> dfs()
+		{
+			try
+{
+				return new ActivatedCache<Delegate, ConditionMonitor>();
+}
+catch ( Exception e )
+{
+	MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
+	throw;
+}
+
+			
+		}
+
+		readonly static Func<PropertyInfo, bool> DefaultSpecification = asdfasdf();
+
+		static Func<PropertyInfo, bool> asdfasdf()
+		{
+			try
+{
+				return DefaultValuePropertySpecification.Instance.ToDelegate();
+}
+catch ( Exception e )
+{
+	MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
+	throw;
+}
+
+			
+		}
 
 		readonly static Func<DefaultValueParameter, object> DefaultFactory = asdf2();
 

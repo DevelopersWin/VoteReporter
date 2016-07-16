@@ -94,15 +94,10 @@ namespace DragonSpark.Runtime.Properties
 	public static class AmbientStack
 	{
 		readonly static IGenericMethodContext<Invoke> Method = typeof(AmbientStack).Adapt().GenericFactoryMethods[nameof(GetCurrentItem)];
+
 		public static object GetCurrentItem( [Required]Type type ) => Method.Make( type ).Invoke<object>();
 
 		public static T GetCurrentItem<T>() => AmbientStack<T>.Default.GetCurrentItem();
-
-		// public static object GetCurrent( [Required]Type type ) => typeof(AmbientStack).Adapt().Invoke( nameof(GetCurrent), type.ToItem() );
-
-		// static ImmutableArray<T> List<T>() => GetCurrent<T>().All();
-
-		/*public static IStack<T> GetCurrent<T>() => AmbientStackProperty<T>.Default.Get( Execution.Current );*/
 	}
 
 	public interface IStackStore<T> : IWritableStore<IStack<T>>

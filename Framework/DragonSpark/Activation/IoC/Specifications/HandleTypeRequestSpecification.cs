@@ -23,7 +23,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 		public CanResolveSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor )
 		{
-			cache = new EqualityReferenceCache<TypeRequest, IWritableStore<bool>>( new CacheStore<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
+			cache = new EqualityReferenceCache<TypeRequest, IWritableStore<bool>>( new WritableStoreCache<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
 		}
 
 		public override bool IsSatisfiedBy( TypeRequest parameter ) => cache.Get( parameter ).Value;

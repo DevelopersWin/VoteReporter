@@ -138,7 +138,7 @@ namespace DragonSpark.Runtime.Properties
 		// protected ThreadLocalAttachedProperty( Func<object, IWritableStore<T>> store ) : base( store ) {}
 	}
 
-	public class ThreadLocalStoreCache<TInstance, TResult> : CacheStore<TInstance, TResult> where TInstance : class
+	public class ThreadLocalStoreCache<TInstance, TResult> : WritableStoreCache<TInstance, TResult> where TInstance : class
 	{
 		public ThreadLocalStoreCache() : this( Store.Instance.ToDelegate() ) {}
 
@@ -315,12 +315,12 @@ namespace DragonSpark.Runtime.Properties
 		public abstract bool Remove( TInstance instance );
 	}
 
-	public class StoreCache<TValue> : StoreCache<object, TValue>, ICache<TValue>
+	public class StoreCache<T> : StoreCache<object, T>, ICache<T>
 	{
-		public StoreCache() : this( new CacheStore<object, TValue>() ) {}
-		public StoreCache( Func<object, TValue> create ) : this( new CacheStore<object, TValue>( create ) ) {}
+		public StoreCache() : this( new WritableStoreCache<object, T>() ) {}
+		public StoreCache( Func<object, T> create ) : this( new WritableStoreCache<object, T>( create ) ) {}
 
-		public StoreCache( ICache<object, IWritableStore<TValue>> inner ) : base( inner ) {}
+		public StoreCache( ICache<object, IWritableStore<T>> inner ) : base( inner ) {}
 	}
 
 	public class StoreCache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class
@@ -328,7 +328,7 @@ namespace DragonSpark.Runtime.Properties
 		readonly ICache<TInstance, IWritableStore<TValue>> inner;
 
 		public StoreCache() : this( instance => default(TValue) ) {}
-		public StoreCache( Func<TInstance, TValue> create ) : this( new CacheStore<TInstance, TValue>( create ) ) {}
+		public StoreCache( Func<TInstance, TValue> create ) : this( new WritableStoreCache<TInstance, TValue>( create ) ) {}
 
 		public StoreCache( ICache<TInstance, IWritableStore<TValue>> inner )
 		{
@@ -344,13 +344,13 @@ namespace DragonSpark.Runtime.Properties
 		public override bool Remove( TInstance instance ) => inner.Remove( instance );
 	}
 
-	public class CacheStore<TInstance, TValue> : Cache<TInstance, IWritableStore<TValue>> where TInstance : class
+	public class WritableStoreCache<TInstance, TValue> : Cache<TInstance, IWritableStore<TValue>> where TInstance : class
 	{
-		public CacheStore() : this( instance => new FixedStore<TValue>() ) {}
+		public WritableStoreCache() : this( instance => new FixedStore<TValue>() ) {}
 
-		public CacheStore( Func<TInstance, TValue> create ) : this( new Func<TInstance, IWritableStore<TValue>>( new Context( create ).Create ) ) {}
+		public WritableStoreCache( Func<TInstance, TValue> create ) : this( new Func<TInstance, IWritableStore<TValue>>( new Context( create ).Create ) ) {}
 
-		public CacheStore( Func<TInstance, IWritableStore<TValue>> create ) : base( create ) {}
+		public WritableStoreCache( Func<TInstance, IWritableStore<TValue>> create ) : base( create ) {}
 
 		class Context
 		{

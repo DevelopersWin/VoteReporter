@@ -1,12 +1,16 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Runtime.Stores;
+using PostSharp.Aspects;
 using System;
 
 namespace DragonSpark.Windows
 {
 	public partial class Configure
 	{
+		[ModuleInitializer( 0 )]
+		public static void Initialize() => ExecutionContextRepository.Instance.Add( ExecutionContext.Instance );
+
 		public Configure()
 		{
 			InitializeComponent();
@@ -30,6 +34,7 @@ namespace DragonSpark.Windows
 		ConfigureExecutionLocator() : base( /*new AssignValueCommand( Activation.ExecutionContextLocatorConfiguration.Instance ).Fixed( ExecutionContextLocatorConfiguration.Instance ), new OnlyOnceSpecification()#1# ) {}
 	}*/
 
+	[Priority( Priority.AfterNormal )]
 	class ExecutionContext : Store<AppDomain>, IExecutionContext
 	{
 		public static ExecutionContext Instance { get; } = new ExecutionContext();

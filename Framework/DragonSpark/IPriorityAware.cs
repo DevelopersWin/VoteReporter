@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -20,9 +21,14 @@ namespace DragonSpark
 
 	public class PriorityAwareLocator<T> : FactoryBase<T, IPriorityAware>
 	{
-		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>();
+		readonly Func<Type, IPriorityAware> get;
+		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>( AttributeSupport<PriorityAttribute>.Local.Get );
+		PriorityAwareLocator( Func<Type, IPriorityAware> get )
+		{
+			this.get = get;
+		}
 
-		public override IPriorityAware Create( T parameter ) => parameter as IPriorityAware ?? (IPriorityAware)parameter.GetType().GetAttribute<PriorityAttribute>() ?? PriorityAware.Default;
+		public override IPriorityAware Create( T parameter ) => parameter as IPriorityAware ?? get( parameter.GetType() ) ?? PriorityAware.Default;
 	}
 
 	public class PriorityComparer : IComparer<IPriorityAware>

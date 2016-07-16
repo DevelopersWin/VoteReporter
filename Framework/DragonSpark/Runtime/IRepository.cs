@@ -99,7 +99,7 @@ namespace DragonSpark.Runtime
 			Store = store;
 		}
 
-		protected IList<T> Store { get; }
+		public IList<T> Store { get; }
 
 		public void Insert( T entry ) => OnInsert( entry );
 		protected virtual void OnInsert( T entry ) => Store.Insert( 0, entry );

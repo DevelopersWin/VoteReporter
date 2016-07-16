@@ -13,6 +13,11 @@ namespace DragonSpark.Extensions
 {
 	public static class EnumerableExtensions
 	{
+		static class Defaults<T>
+		{
+			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Instance.ToDelegate();
+		}
+
 		public static T[] Fixed<T>( this IEnumerable<T> @this )
 		{
 			var array = @this as T[] ?? @this.ToArray();
@@ -114,7 +119,7 @@ namespace DragonSpark.Extensions
 			return true;
 		}
 
-		public static IEnumerable<T> Prioritize<T>( [Required]this IEnumerable<T> @this ) => @this.OrderBy( PriorityAwareLocator<T>.Instance.ToDelegate(), PriorityComparer.Instance );
+		public static IEnumerable<T> Prioritize<T>( [Required]this IEnumerable<T> @this ) => @this.OrderBy( Defaults<T>.PriorityLocator, PriorityComparer.Instance );
 
 		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, U> with, Func<U> defaultFunction = null ) => WithFirst( @this, Where<T>.Always, with, defaultFunction );
 

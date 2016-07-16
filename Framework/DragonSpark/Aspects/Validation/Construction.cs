@@ -102,8 +102,7 @@ namespace DragonSpark.Aspects.Validation
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public abstract class AutoValidationAspectBase : MethodInterceptionAspect, IInstanceScopedAspect
 	{
-		// TODO: http://support.sharpcrafters.com/discussions/questions/1561-iaspectprovider-and-explicit-interface-methods
-		readonly static Func<Type, Attribute> Applies = new Cache<Type, Attribute>( type => type.GetTypeInfo().GetCustomAttribute( typeof(ApplyAutoValidationAttribute), true ) ).ToDelegate();
+		readonly static Func<Type, ApplyAutoValidationAttribute> Applies = AttributeSupport<ApplyAutoValidationAttribute>.All.Get;
 
 		readonly Func<object, IAspect> factory;
 		protected AutoValidationAspectBase( Func<object, IAspect> factory )
