@@ -1,4 +1,5 @@
-﻿using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation;
+using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using System.Linq;
 using System.Reflection;

@@ -4,16 +4,12 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
-using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using DragonSpark.Configuration;
 
 namespace DragonSpark.Diagnostics
 {
@@ -26,7 +22,9 @@ namespace DragonSpark.Diagnostics
 	
 	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommand<string>
 	{
-		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, LogEventMessageFactory.Instance.ToDelegate() ) {}
+		readonly static Func<IEnumerable<LogEvent>, string[]> MessageFactory = LogEventMessageFactory.Instance.ToDelegate();
+
+		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, MessageFactory ) {}
 	}
 
 	public static class MigrationProperties
@@ -34,7 +32,7 @@ namespace DragonSpark.Diagnostics
 		public static ICache<LogEvent, bool> IsMigrating { get; } = new StoreCache<LogEvent, bool>();
 	}
 
-	public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
+	/*public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
 	{
 		public PurgeLoggerHistoryCommand( ILoggerHistory history ) : base( history, events => events.Fixed() ) {}
 
@@ -57,7 +55,7 @@ namespace DragonSpark.Diagnostics
 				}
 			}
 		}
-	}
+	}*/
 
 	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
 	{
@@ -78,11 +76,11 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public class RecordingLoggerConfigurationFactory : LoggerConfigurationFactory
+	/*public class RecordingLoggerConfigurationFactory : LoggerConfigurationFactory
 	{
 		public RecordingLoggerConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
 			: base( new LoggerConfigurationSource( controller ).Create, transformers.Append( new CreatorFilterTransformer(), new LoggerHistoryConfigurationTransformer( sink ) ).Select( transformer => transformer.ToDelegate() ).ToArray() ) {}
-	}
+	}*/
 
 	public class MethodFormatter : IFormattable
 	{
@@ -96,7 +94,7 @@ namespace DragonSpark.Diagnostics
 		public string ToString( string format, IFormatProvider formatProvider ) => $"{method.DeclaringType.Name}.{method.Name}";
 	}
 
-	public class LoggerConfigurationFactory : AggregateFactory<LoggerConfiguration>
+	/*public class LoggerConfigurationFactory : AggregateFactory<LoggerConfiguration>
 	{
 		public LoggerConfigurationFactory( Func<LoggerConfiguration> primary, params Func<LoggerConfiguration, LoggerConfiguration>[] transformers ) : base( primary, transformers ) {}
 	}
@@ -127,72 +125,11 @@ namespace DragonSpark.Diagnostics
 		}
 
 		public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
-	}
+	}*/
 
-	public class CreatorFilterTransformer : TransformerBase<LoggerConfiguration>
-	{
-		readonly CreatorFilter filter;
+		
 
-		public CreatorFilterTransformer() : this( new CreatorFilter() ) {}
-
-		public CreatorFilterTransformer( CreatorFilter filter )
-		{
-			this.filter = filter;
-		}
-
-		public override LoggerConfiguration Create( LoggerConfiguration parameter )
-		{
-			var item = filter.ToItem();
-			return parameter.Filter.With( item ).Enrich.With( item );
-		}
-
-		public class CreatorFilter : DecoratedSpecification<LogEvent>, ILogEventEnricher, ILogEventFilter
-		{
-			const string CreatorId = "CreatorId";
-			readonly Guid id;
-
-			public CreatorFilter() : this( Guid.NewGuid() ) {}
-
-			public CreatorFilter( Guid id ) : base( MigratingSpecification.Instance.Or( new CreatorSpecification( id ) ) )
-			{
-				this.id = id;
-			}
-			
-			public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( CreatorId, id ) );
-
-			class MigratingSpecification : CacheValueSpecification<LogEvent, bool>
-			{
-				public static MigratingSpecification Instance { get; } = new MigratingSpecification();
-
-				MigratingSpecification() : base( MigrationProperties.IsMigrating, () => true ) {}
-			}
-
-			class CreatorSpecification : SpecificationBase<LogEvent>
-			{
-				readonly Guid id;
-				public CreatorSpecification( Guid id )
-				{
-					this.id = id;
-				}
-
-				public override bool IsSatisfiedBy( LogEvent parameter )
-				{
-					if ( parameter.Properties.ContainsKey( CreatorId ) )
-					{
-						var property = parameter.Properties[CreatorId] as ScalarValue;
-						var result = property != null && (Guid)property.Value == id;
-						return result;
-					}
-
-					return false;
-				}
-			}
-
-			public bool IsEnabled( LogEvent logEvent ) => IsSatisfiedBy( logEvent );
-		}
-	}
-
-	public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>
+	/*public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>
 	{
 		public static LoggingLevelSwitchFactory Instance { get; } = new LoggingLevelSwitchFactory();
 
@@ -217,5 +154,5 @@ namespace DragonSpark.Diagnostics
 
 		public ILoggerHistory History { get; }
 		public LoggingLevelSwitch LevelSwitch { get; }
-	}
+	}*/
 }

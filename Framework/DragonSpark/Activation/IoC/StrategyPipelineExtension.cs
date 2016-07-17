@@ -1,8 +1,10 @@
 ﻿using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
@@ -185,28 +187,26 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class BuildableTypeFromConventionLocator : Cache<Type, Type>
+	public sealed class BuildableTypeFromConventionLocator : Cache<Type, Type>
 	{
-		public static BuildableTypeFromConventionLocator Instance { get; } = new BuildableTypeFromConventionLocator();
-
-		BuildableTypeFromConventionLocator() : this( Items<Type>.Default ) {}
-
+		public static IConfiguration<Func<Type, Type>> Instance { get; } = new Configuration<Func<Type, Type>>( () =>  new BuildableTypeFromConventionLocator( DefaultTypeSystem.Instance.Get().Types.ToArray() ).Get );
+		
 		public BuildableTypeFromConventionLocator( params Type[] types ) : base( new Factory( types ).Create ) {}
 
 		[ApplyAutoValidation]
-		protected class Factory : FactoryBase<Type, Type>
+		class Factory : FactoryBase<Type, Type>
 		{
 			readonly Type[] types;
 			readonly Func<Type, ITypeCandidateWeightProvider> weight;
-			readonly ISpecification<Type> specification;
+			readonly Func<Type, bool> specification;
 
 			public Factory( params Type[] types ) : this( types, type => new TypeCandidateWeightProvider( type ), CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ), CanInstantiateSpecification.Instance.Inverse() ) {}
 
-			protected Factory( Type[] types, Func<Type, ITypeCandidateWeightProvider> weight, ISpecification<Type> specification, ISpecification<Type> unbuildable ) : base( unbuildable )
+			Factory( Type[] types, Func<Type, ITypeCandidateWeightProvider> weight, ISpecification<Type> specification, ISpecification<Type> unbuildable ) : base( unbuildable )
 			{
 				this.types = types;
 				this.weight = weight;
-				this.specification = specification;
+				this.specification = specification.ToDelegate();
 			}
 
 			public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
@@ -226,11 +226,12 @@ namespace DragonSpark.Activation.IoC
 				var result =
 					types
 						.Where( adapter.IsAssignableFrom )
-						.Where( specification.IsSatisfiedBy )
+						.Where( specification )
 						.OrderByDescending( order.GetWeight )
 						.FirstOrDefault( convention.IsSatisfiedBy );
 				return result;
 			}
+			
 		}
 	}
 
@@ -303,14 +304,12 @@ namespace DragonSpark.Activation.IoC
 		protected override Type[] CreateItem( Type parameter ) => TypesFactory.Instance.Create( parameter.Assembly().ToItem() );
 	}*/
 
-	[Persistent]
 	public class ImplementedInterfaceFromConventionLocator : Cache<Type, Type>
 	{
 		public static ImplementedInterfaceFromConventionLocator Instance { get; } = new ImplementedInterfaceFromConventionLocator( typeof(IFactory), typeof(IFactoryWithParameter) );
+		ImplementedInterfaceFromConventionLocator( params Type[] ignore ) : base( new Factory( ignore ).Create ) {}
 
-		public ImplementedInterfaceFromConventionLocator( params Type[] ignore ) : base( new Factory( ignore ).Create ) {}
-
-		protected class Factory : FactoryBase<Type, Type>
+		class Factory : FactoryBase<Type, Type>
 		{
 			readonly ImmutableArray<Type> ignore;
 
@@ -337,8 +336,7 @@ namespace DragonSpark.Activation.IoC
 	public class CanInstantiateSpecification : GuardedSpecificationBase<Type>
 	{
 		public static ISpecification<Type> Instance { get; } = new DelegatedSpecification<Type>( new CanInstantiateSpecification().Cached().Get );
-
-		protected CanInstantiateSpecification() {}
+		CanInstantiateSpecification() {}
 
 		public override bool IsSatisfiedBy( Type parameter )
 		{
@@ -390,13 +388,6 @@ namespace DragonSpark.Activation.IoC
 		readonly ConventionCandidateLocator locator;
 		readonly IServiceRegistry registry;
 
-		public class ConventionCandidateLocator : Cache<Type, Type>
-		{
-			static ISpecification<Type> Specification { get; } = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
-
-			public ConventionCandidateLocator( BuildableTypeFromConventionLocator factory ) : base( new DelegatedFactory<Type, Type>( factory.ToDelegate(), Specification ).Create ) {}
-		}
-
 		public ConventionStrategy( ConventionCandidateLocator locator, IServiceRegistry registry )
 		{
 			this.locator = locator;
@@ -417,6 +408,13 @@ namespace DragonSpark.Activation.IoC
 					registry.Register( new MappingRegistrationParameter( from, context.BuildKey.Type, context.BuildKey.Name ) );
 				}
 			}
+		}
+
+		public class ConventionCandidateLocator : Cache<Type, Type>
+		{
+			static ISpecification<Type> Specification { get; } = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
+
+			public ConventionCandidateLocator() : base( new DelegatedFactory<Type, Type>( BuildableTypeFromConventionLocator.Instance.Get(), Specification ).Create ) {}
 		}
 	}
 }

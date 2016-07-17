@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using System.Data.Entity;
 
 namespace DragonSpark.Windows.Entity
@@ -8,6 +7,6 @@ namespace DragonSpark.Windows.Entity
 	{
 		public MigrateDatabaseToLatestVersion() : this( false ) {}
 
-		public MigrateDatabaseToLatestVersion( bool useSuppliedContext ) : base( useSuppliedContext, GlobalServiceProvider.Instance.Get<TConfiguration>() ) {}
+		public MigrateDatabaseToLatestVersion( bool useSuppliedContext ) : base( useSuppliedContext, GlobalServiceProvider.Instance.GetService<TConfiguration>() ) {}
 	}
 }

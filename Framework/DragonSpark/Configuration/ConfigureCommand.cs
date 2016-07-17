@@ -40,7 +40,7 @@ namespace DragonSpark.Configuration
 	{
 		readonly IWritableStore<Func<TKey, TValue>> store;
 
-		protected ParameterizedConfigurationBase( Func<TKey, TValue> factory ) : this( new ExecutionContextStore<Func<TKey, TValue>>( factory ) ) {}
+		// protected ParameterizedConfigurationBase( Func<TKey, TValue> factory ) : this( new ExecutionContextStore<Func<TKey, TValue>>( factory ) ) {}
 
 		protected ParameterizedConfigurationBase( IWritableStore<Func<TKey, TValue>> store )
 		{
@@ -62,7 +62,7 @@ namespace DragonSpark.Configuration
 	{
 		readonly static Func<Func<TKey, TValue>, TCache> Constructor = ParameterConstructor<Func<TKey, TValue>, TCache>.Default;
 
-		public CacheStore( Func<TKey, TValue> factory ) : base( Constructor( factory ).Get ) {}
+		public CacheStore( Func<TKey, TValue> factory ) : base( factory ) {}
 
 		protected override void OnAssign( Func<TKey, TValue> value ) => base.OnAssign( Constructor( value ).Get );
 	}

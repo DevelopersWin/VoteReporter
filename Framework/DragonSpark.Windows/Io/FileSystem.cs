@@ -1,4 +1,4 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using System;
@@ -11,10 +11,7 @@ namespace DragonSpark.Windows.Io
 	{
 		public const string ValidPathTimeFormat = "yyyy-MM-dd--HH-mm-ss";
 
-		public static string GetValidPath()
-		{
-			return GetValidPath( CurrentTime.Instance );
-		}
+		public static string GetValidPath() => GetValidPath( CurrentTimeConfiguration.Instance.Get() );
 
 		public static string GetValidPath( ICurrentTime @this )
 		{
@@ -76,7 +73,7 @@ namespace DragonSpark.Windows.Io
 					}
 					catch ( Exception exception )
 					{
-						DiagnosticProperties.Logger.Get( file ).Error( exception, "Could not delete {File}.", file.FullName );
+						Logger.Instance.Get( file ).Error( exception, "Could not delete {File}.", file.FullName );
 					}
 				}
 			}

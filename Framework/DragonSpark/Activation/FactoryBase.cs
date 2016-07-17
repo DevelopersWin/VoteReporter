@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Configuration;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
@@ -188,10 +189,9 @@ namespace DragonSpark.Activation
 
 	public class FromKnownFactory<T> : ParameterConstructedCompositeFactory<object>
 	{
-		public static FromKnownFactory<T> Instance { get; } = new FromKnownFactory<T>( KnownTypeFactory.Instance );
-
-		public FromKnownFactory( KnownTypeFactory factory ) : base( factory.Get( typeof(T) ).ToArray() ) {}
-
+		public static IWritableConfiguration<FromKnownFactory<T>> Instance { get; } = new Configuration<FromKnownFactory<T>>( () => new FromKnownFactory<T>( KnownTypes.Instance.Get( typeof(T) ).ToArray() ) );
+		FromKnownFactory( params Type[] types ) : base( types ) {}
+		
 		public T CreateUsing( object parameter ) => (T)Create( parameter );
 	}
 

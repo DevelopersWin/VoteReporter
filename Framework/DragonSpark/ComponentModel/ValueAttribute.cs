@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using System;
@@ -9,14 +8,16 @@ namespace DragonSpark.ComponentModel
 {
 	public class AmbientValueAttribute : ServicesValueBase
 	{
-		public AmbientValueAttribute( Type valueType = null ) : base( new ServicesValueProvider.Converter( valueType ), AmbientStack.GetCurrentItem ) {}
+		readonly static Func<Type, object> GetCurrentItem = AmbientStack.GetCurrentItem;
+		public AmbientValueAttribute( Type valueType = null ) : base( new ServicesValueProvider.Converter( valueType ), GetCurrentItem ) {}
 	}
 
 	public class ValueAttribute : ServicesValueBase
 	{
-		public ValueAttribute( [OfType( typeof(IStore) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Create ) {}
+		readonly static Func<Type, object> Creator = Create;
+		public ValueAttribute( [OfType( typeof(IStore) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Creator ) {}
 
-		static object Create( Type type ) => GlobalServiceProvider.Instance.Get<IStore>( type ).Value;
+		static object Create( Type type ) => GlobalServiceProvider.Instance.GetService<IStore>( type ).Value;
 
 		/*public class Creator : ServicesValueProvider.Category
 		{

@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using Xunit;
@@ -14,7 +13,7 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void Default()
 		{
-			var activator = GlobalServiceProvider.Instance.Get<IActivator>();
+			var activator = GlobalServiceProvider.Instance.GetService<IActivator>();
 			Assert.Same( Activator.Instance, activator );
 			var instance = activator.Activate<IInterface>( typeof(Class) );
 			Assert.IsType<Class>( instance );
@@ -23,7 +22,7 @@ namespace DragonSpark.Testing.Activation
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void DefaultCreate( string parameter )
 		{
-			var activator = GlobalServiceProvider.Instance.Get<IActivator>();
+			var activator = GlobalServiceProvider.Instance.GetService<IActivator>();
 			Assert.Same( Activator.Instance, activator );
 			
 			var instance = activator.Construct<ClassWithParameter>( parameter );

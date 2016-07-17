@@ -1,9 +1,5 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
-using Serilog;
+﻿using Serilog;
 using Serilog.Core;
-using System;
 
 namespace DragonSpark.Diagnostics
 {
@@ -11,17 +7,15 @@ namespace DragonSpark.Diagnostics
 	{
 		public static ILogger ForSource( this ILogger @this, object context )
 		{
-			var factory = GlobalServiceProvider.Instance.Get<FormatterFactory>();
-			var formatted = factory.From( context );
+			var formatted = FormatterFactory.Instance.Get().From( context );
 			var result = @this.ForContext( Constants.SourceContextPropertyName, formatted, true );
 			return result;
 		}
 	}
 
 
-	public class LoggerFactory : FactoryBase<ILogger>
+	/*public class LoggerFactory : FactoryBase<ILogger>
 	{
-		
 		readonly Func<LoggerConfiguration> configurationSource;
 		readonly Func<object> contextSource;
 
@@ -41,5 +35,5 @@ namespace DragonSpark.Diagnostics
 			var forContext = logger.ForSource( context );
 			return forContext;
 		}
-	}
+	}*/
 }

@@ -14,7 +14,7 @@ namespace DragonSpark.Runtime
 	{
 		readonly Func<Type, Type[]> knownTypes;
 
-		public DataContractSerializerFactory( KnownTypeFactory factory ) : this( factory.Create )
+		public DataContractSerializerFactory( KnownTypes factory ) : this( factory.Create )
 		{}
 
 		public DataContractSerializerFactory( [Required]Func<Type, Type[]> knownTypes )

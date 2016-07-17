@@ -1,12 +1,7 @@
-using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using JetBrains.dotMemoryUnit;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
-using Serilog;
 using System;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
@@ -62,7 +57,7 @@ namespace DragonSpark.Testing.Framework
 			return result;
 		}*/
 
-		readonly static Func<object, ILogger> LoggerSource = DragonSpark.Diagnostics.Diagnostics.Logger.ToDelegate();
+		// readonly static Func<object, ILogger> LoggerSource = DragonSpark.Diagnostics.Diagnostics.Logger.ToDelegate();
 
 		/*public static IProfiler Profile( this MethodBase method, Action<string> output ) => 
 			new ProfilerFactory( output, DragonSpark.Diagnostics.Diagnostics.History.Get( method ), LoggerSource ).Create( method );*/

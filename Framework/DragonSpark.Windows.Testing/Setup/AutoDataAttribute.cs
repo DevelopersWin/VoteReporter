@@ -10,8 +10,8 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		static ImmutableArray<Assembly> Assemblies { get; } = new DragonSpark.Testing.Objects.IoC.AssemblyProvider( typeof(AssemblyModuleCatalog) ).Create();
 
-		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( Assemblies, applicationSource ) {}
+		protected AutoDataAttribute( Func<IApplication> applicationSource ) : this( Assemblies, applicationSource ) {}
 
-		protected AutoDataAttribute( ImmutableArray<Assembly> assemblies, Func<IServiceProvider, IApplication> applicationSource ) : base( assemblies, applicationSource ) {}
+		protected AutoDataAttribute( ImmutableArray<Assembly> assemblies, Func<IApplication> applicationSource ) : base( assemblies, applicationSource ) {}
 	}
 }

@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
@@ -12,12 +13,10 @@ namespace DragonSpark.Windows.Entity
 	[Persistent]
 	class ActivationSource : IActivationSource
 	{
-		public static ActivationSource Default { get; } = new ActivationSource( Activator.Instance );
+		public static IWritableConfiguration<IActivationSource> Default { get; } = new Configuration<IActivationSource>( () => new ActivationSource( Activator.Instance.Get() ) );
 
-		// [Reference]
 		readonly IActivator activator;
 
-		// [Reference]
 		readonly Collection<Type> watching = new Collection<Type>();
 
 		public ActivationSource( [Required]IActivator activator )
@@ -54,10 +53,7 @@ namespace DragonSpark.Windows.Entity
 				items.Add( item );
 			}
 
-			public void Dispose()
-			{
-				items.Remove( item );
-			}
+			public void Dispose() => items.Remove( item );
 		}
 	}
 }

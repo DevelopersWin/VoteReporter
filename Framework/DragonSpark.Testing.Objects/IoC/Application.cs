@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
@@ -12,12 +12,13 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using IApplication = DragonSpark.Testing.Framework.Setup.IApplication;
 
 namespace DragonSpark.Testing.Objects.IoC
 {
 	public class UnityContainerFactory : Activation.IoC.UnityContainerFactory
 	{
-		readonly static Func<IServiceProvider> Factory = new DragonSpark.Setup.AssemblyBasedServiceProviderFactory( Items<Assembly>.Default ).Create;
+		readonly static Func<IServiceProvider> Factory = () => ServiceProvider.From( Items<Assembly>.Default );
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 
@@ -50,9 +51,9 @@ catch ( Exception e )
 
 		public AutoDataAttribute() : this( DefaultApplicationSource ) {}
 
-		protected AutoDataAttribute( Func<IServiceProvider, IApplication> applicationSource ) : this( Assemblies, applicationSource ) {}
+		protected AutoDataAttribute( Func<IApplication> applicationSource ) : this( Assemblies, applicationSource ) {}
 
-		protected AutoDataAttribute( ImmutableArray<Assembly> assemblies, Func<IServiceProvider, IApplication> applicationSource ) : base( new Factory( assemblies ), applicationSource ) {}
+		protected AutoDataAttribute( ImmutableArray<Assembly> assemblies, Func<IApplication> applicationSource ) : base( new Factory( assemblies ), applicationSource ) {}
 
 		class Factory : FactoryBase<AutoData, IServiceProvider>
 		{
@@ -71,7 +72,7 @@ catch ( Exception e )
 
 				public class ProviderCache : ArgumentCache<ImmutableArray<Assembly>, IServiceProvider>
 				{
-					public ProviderCache() : base( assemblies => new AssemblyBasedServiceProviderFactory( assemblies.ToArray() ).Create() ) {}
+					public ProviderCache() : base( assemblies => ServiceProvider.From( assemblies.ToArray() ) ) {}
 				}
 			}
 		}

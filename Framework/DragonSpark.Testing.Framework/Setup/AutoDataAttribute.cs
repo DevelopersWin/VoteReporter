@@ -16,33 +16,30 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Xunit.Sdk;
-using TypeBasedServiceProviderFactory = DragonSpark.Composition.TypeBasedServiceProviderFactory;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
-		readonly protected static Func<IServiceProvider, IApplication> DefaultApplicationSource = provider => new Application( provider );
+		readonly protected static Func<IApplication> DefaultApplicationSource = () => new Application();
 		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.ToDelegate();
 
 		readonly IFactory<AutoData, IServiceProvider> providerSource;
-		readonly Func<IServiceProvider, IApplication> applicationSource;
+		readonly Func<IApplication> applicationSource;
 
 		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new Factory( includeFromParameters, additionalTypes ) ) {}
 
-		// protected AutoDataAttribute( Func<AutoData, IDisposable> context ) : this( DefaultFixtureFactory, context ) {}
-
 		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationSource ) {}
-		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : this( DefaultFixtureFactory, providerSource, applicationSource ) {}
+		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource, Func<IApplication> applicationSource ) : this( DefaultFixtureFactory, providerSource, applicationSource ) {}
 
-		protected AutoDataAttribute( Func<IFixture> fixture, IFactory<AutoData, IServiceProvider> providerSource, Func<IServiceProvider, IApplication> applicationSource ) : base( fixture() )
+		protected AutoDataAttribute( Func<IFixture> fixture, IFactory<AutoData, IServiceProvider> providerSource, Func<IApplication> applicationSource ) : base( fixture() )
 		{
 			this.providerSource = providerSource;
 			this.applicationSource = applicationSource;
 		}
 
-		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
+		/*public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
 			var autoData = new AutoData( Fixture, methodUnderTest );
 			var context = new AutoDataExecutionContextFactory( providerSource.Create, applicationSource ).Create( autoData );
@@ -51,7 +48,7 @@ namespace DragonSpark.Testing.Framework.Setup
 				var result = base.GetData( methodUnderTest );
 				return result;
 			}
-		}
+		}*/
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance[]>( info => new AspectInstance( info, ExecuteMethodAspect.Instance ).ToItem() );
 
@@ -99,10 +96,11 @@ namespace DragonSpark.Testing.Framework.Setup
 			sealed class Cache : ActivatedCache<Cache.ProviderCache>
 			{
 				public new static Cache Instance { get; } = new Cache();
+				Cache() {}
 
-				public class ProviderCache : ArgumentCache<ImmutableArray<Type>, IServiceProvider>
+				public sealed class ProviderCache : ArgumentCache<ImmutableArray<Type>, IServiceProvider>
 				{
-					public ProviderCache() : base( types => new TypeBasedServiceProviderFactory( types.ToArray() ).Create() ) {}
+					public ProviderCache() : base( types => ServiceProvider.From( types.ToArray() ) ) {}
 				}
 			}
 		}
@@ -115,7 +113,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected override object GetHost( AutoData parameter ) => parameter.Method.DeclaringType;
 	}*/
 
-	public class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
+	/*public class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
 	{
 		readonly Func<AutoData, IServiceProvider> providerSource;
 		readonly Func<IServiceProvider, IApplication> applicationSource;
@@ -130,14 +128,14 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IDisposable Create( AutoData parameter )
 		{
-			var primary = new DragonSpark.Setup.ServiceProviderFactory( providerSource( parameter ).Self ).Create()/*.Emit( "Created Provider" )*/;
+			var primary = new DragonSpark.Setup.ServiceProviderFactory( providerSource( parameter ).Self ).Create()/*.Emit( "Created Provider" )#1#;
 			var composite = new CompositeServiceProvider( new InstanceServiceProvider( parameter, parameter.Fixture, parameter.Method ), new FixtureServiceProvider( parameter.Fixture ), primary );
-			var application = applicationSource( composite )/*.Emit( "Created Application" )*/;
-			var result = new ExecuteApplicationCommand( application );
-			result.Execute( parameter );
+			var result = applicationSource( composite )/*.Emit( "Created Application" )#1#;
+			/*var result = new ExecuteApplicationCommand( application );
+			result.Execute( parameter );#1#
 			return result;
 		}
-	}
+	}*/
 
 	/*public class AssociatedContext : Cache<MethodBase, IDisposable>
 	{
@@ -162,7 +160,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public class ExecuteApplicationCommand : ExecuteApplicationCommand<AutoData>
+	/*public class ExecuteApplicationCommand : ExecuteApplicationCommand<AutoData>
 	{
 		public ExecuteApplicationCommand( IApplication<AutoData> application ) : base( application ) {}
 		
@@ -170,8 +168,8 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			AssociatedContext.Default.Set( parameter.Method, this );
 			base.Execute( parameter );
-		}*/
-	}
+		}#1#
+	}*/
 
 	[ApplyAutoValidation]
 	sealed class FixtureServiceProvider : FactoryBase<Type, object>, IServiceProvider

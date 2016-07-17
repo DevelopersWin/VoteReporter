@@ -1,5 +1,3 @@
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -32,10 +30,10 @@ namespace DragonSpark.Aspects
 
 		// public override void OnEntry( MethodExecutionArgs args ) => args.MethodExecutionTag = ProfilerFactoryConfiguration.Instance.Get( args.Method ).With( profiler => profiler.Start() );
 
-		public override void OnYield( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( profiler => profiler.Pause() );
+		/*public override void OnYield( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( profiler => profiler.Pause() );
 
 		public override void OnResume( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( profiler => profiler.Resume() );
 
-		public override void OnExit( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( profiler => profiler.Dispose() );
+		public override void OnExit( MethodExecutionArgs args ) => args.MethodExecutionTag.As<IProfiler>( profiler => profiler.Dispose() );*/
 	}
 }

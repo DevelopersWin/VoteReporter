@@ -1,30 +1,17 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using System;
-using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
-	[Shared, Export]
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
 	{
-		public static FormatterFactory Instance { get; } = new FormatterFactory( FromKnownFactory<IFormattable>.Instance );
-		/*
-
-		public static string Format( object item ) 
-		{
-			var formatter = Instance; // TODO: Make configurable: Services.Get
-			var result = formatter.Create( new Parameter( item ) );
-			return result;
-		}*/
+		public static IConfiguration<FormatterFactory> Instance { get; } = new Configuration<FormatterFactory>( () => new FormatterFactory( FromKnownFactory<IFormattable>.Instance.Get().CreateUsing ) );
 
 		readonly Func<object, IFormattable> factory;
 
-		[ImportingConstructor]
-		public FormatterFactory( FromKnownFactory<IFormattable> factory ) : this( factory.CreateUsing ) {}
-
-		public FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance.ToDelegate() )
+		FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance.ToDelegate() )
 		{
 			this.factory = factory;
 		}

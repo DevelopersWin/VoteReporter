@@ -4,6 +4,6 @@ namespace DragonSpark.Composition
 {
 	public class FactoryExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
-		public FactoryExportDescriptorProvider( Activation.FactoryTypeLocator locator ) : base( locator, ActivatorResultFactory.Instance.ToDelegate() ) {}
+		public FactoryExportDescriptorProvider() : base( FactoryTypes.Instance.Get(), ActivatorResultFactory.Instance.ToDelegate() ) {}
 	}
 }

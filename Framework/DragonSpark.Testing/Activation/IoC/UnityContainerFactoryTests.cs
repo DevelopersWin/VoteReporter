@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC.Specifications;
-using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using DragonSpark.Testing.Objects.Setup;
@@ -21,15 +20,13 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Theory, Framework.Setup.AutoData]
 		public void ConstructorSelection( IUnityContainer container )
 		{
-			var provider = container.Resolve<IServiceProvider>();
+			/*var provider = container.Resolve<IServiceProvider>();
 			Assert.NotSame( CurrentServiceProvider.Instance.Value, provider );
-			Assert.Same( DefaultStoreServiceProvider.Instance, provider );
+			Assert.Same( DefaultStoreServiceProvider.Instance, provider );*/
 
 			Assert.NotNull( container );
 
 			var sut = container.Resolve<ConstructorLocator>();
-
-			// var builder = new BuilderContext( context.BuildPlanStrategies.MakeStrategyChain(), context.Lifetime, context.Policies, new NamedTypeBuildKey<Target>(), null );
 
 			var parameter = new ConstructTypeRequest( typeof(Target), new object() );
 			var constructorInfo = sut.Get( parameter );
@@ -49,24 +46,6 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.Same( Output, resolved.Second() );
 			Assert.Same( ClassFactory.Instance.Create(), resolved.First );
 		}
-
-		/*[Fact]
-		public void Caching()
-		{
-			var container = DefaultUnityContainerFactory.Instance.Create();
-			var first = container.Resolve<Item>();
-			var second = container.Resolve<Item>();
-			Debugger.Break();
-		}
-
-		class Item
-		{
-			readonly ClassFactory factory;
-			public Item( ClassFactory factory )
-			{
-				this.factory = factory;
-			}
-		}*/
 
 		class ClassFactory : FixedFactory<Class>
 		{

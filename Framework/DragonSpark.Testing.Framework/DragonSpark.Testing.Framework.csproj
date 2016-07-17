@@ -225,7 +225,6 @@
     <Compile Include="Setup\GreedyMethodBuilderFactory.cs" />
     <Compile Include="Setup\LocateTypeSpecification.cs" />
     <Compile Include="Setup\MetadataCommand.cs" />
-    <Compile Include="Parameters\FromCustomization.cs" />
     <Compile Include="Setup\SetupEngineParts.cs" />
     <Compile Include="Setup\OutputCommand.cs" />
     <Compile Include="RegisteredAttribute.cs" />

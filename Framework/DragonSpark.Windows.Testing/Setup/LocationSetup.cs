@@ -10,7 +10,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public class AutoDataAttribute : Setup.AutoDataAttribute
 		{
-			public static Func<IServiceProvider, IApplication> ApplicationSource { get; } = serviceProvider => new Application<LocationSetup>( serviceProvider );
+			public static Func<IApplication> ApplicationSource { get; } = () => new Application<LocationSetup>();
 
 			public AutoDataAttribute() : base( AssemblyProvider.Instance.Create(), ApplicationSource ) {}
 		}

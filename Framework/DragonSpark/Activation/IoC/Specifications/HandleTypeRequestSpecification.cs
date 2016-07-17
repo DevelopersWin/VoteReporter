@@ -92,21 +92,23 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 	public class HasConventionSpecification : GuardedSpecificationBase<Type>
 	{
-		readonly BuildableTypeFromConventionLocator locator;
+		readonly Func<Type, Type> locator;
 
-		public HasConventionSpecification( BuildableTypeFromConventionLocator locator )
+		public HasConventionSpecification() : this( BuildableTypeFromConventionLocator.Instance.Get() ) {}
+
+		HasConventionSpecification( Func<Type, Type> locator )
 		{
 			this.locator = locator;
 		}
 
-		public override bool IsSatisfiedBy( Type parameter ) => locator.Get( parameter ) != null;
+		public override bool IsSatisfiedBy( Type parameter ) => locator( parameter ) != null;
 	}
 
 	[Persistent]
 	public class HasFactorySpecification : CanCreateSpecification<LocateTypeRequest>
 	{
 		readonly static Coerce<LocateTypeRequest> DefaultCoercer = TypeRequestCoercer<LocateTypeRequest>.Instance.ToDelegate();
-		public HasFactorySpecification( FactoryTypeLocator locator ) : base( locator.ToDelegate(), DefaultCoercer ) {}
+		public HasFactorySpecification( FactoryTypes locator ) : base( locator.ToDelegate(), DefaultCoercer ) {}
 	}
 
 	public abstract class StrategyValidator<TStrategy> : GuardedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy

@@ -1,18 +1,6 @@
-using DragonSpark.Activation;
-using DragonSpark.Aspects.Validation;
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
-using Serilog;
-using Serilog.Events;
-using System;
-using System.Linq;
-
 namespace DragonSpark.Setup
 {
-	public class CurrentServiceProvider : ExecutionCachedStoreBase<IServiceProvider>
+	/*public class CurrentServiceProvider : ExecutionCachedStoreBase<IServiceProvider>
 	{
 		public static CurrentServiceProvider Instance { get; } = new CurrentServiceProvider();
 		CurrentServiceProvider() {}
@@ -29,9 +17,9 @@ namespace DragonSpark.Setup
 
 			base.Assign( item );
 		}
-	}
+	}*/
 
-	public class ServiceProviderMigrationCommandFactory : FactoryBase<IServiceProvider, ICommand<MigrationParameter<IServiceProvider>>>, IServiceProviderMigrationCommandSource
+	/*public class ServiceProviderMigrationCommandFactory : FactoryBase<IServiceProvider, ICommand<MigrationParameter<IServiceProvider>>>, IServiceProviderMigrationCommandSource
 	{
 		public static ServiceProviderMigrationCommandFactory Instance { get; } = new ServiceProviderMigrationCommandFactory();
 
@@ -114,5 +102,5 @@ namespace DragonSpark.Setup
 	public abstract class MigrationCommandBase<T> : CommandBase<MigrationParameter<T>>
 	{
 		protected MigrationCommandBase() : base( Specifications<MigrationParameter<T>>.IsInstanceOf.And( new OnlyOnceSpecification() ) ) {}
-	}
+	}*/
 }

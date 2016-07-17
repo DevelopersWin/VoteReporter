@@ -1,10 +1,6 @@
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using System;
-
 namespace DragonSpark.Setup
 {
-	public class ApplyMigrationCommand : CommandBase<MigrationParameter<IServiceProvider>>
+	/*public class ApplyMigrationCommand : CommandBase<MigrationParameter<IServiceProvider>>
 	{
 		public static ApplyMigrationCommand Instance { get; } = new ApplyMigrationCommand();
 
@@ -14,5 +10,5 @@ namespace DragonSpark.Setup
 			var command = source.Create( parameter.From );
 			command.Execute( parameter );
 		}
-	}
+	}*/
 }

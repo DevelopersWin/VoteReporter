@@ -1,4 +1,4 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics.Logger;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System;
@@ -19,7 +19,7 @@ namespace DragonSpark.Extensions
 			}
 			catch ( Exception exception )
 			{
-				DiagnosticProperties.Logger.Get( container ).Debug( exception, "Could not resolve {Type} and {Name}", typeToResolve, name );
+				Logger.Instance.Get( container ).Debug( exception, "Could not resolve {Type} and {Name}", typeToResolve, name );
 				return null;
 			}
 		}

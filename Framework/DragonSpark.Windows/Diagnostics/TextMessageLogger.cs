@@ -1,14 +1,9 @@
-using DragonSpark.Activation;
 using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 using System;
-using System.Runtime.InteropServices;
-using System.Security;
 
 namespace DragonSpark.Windows.Diagnostics
 {
@@ -21,7 +16,7 @@ namespace DragonSpark.Windows.Diagnostics
 		public ProfilerFactory( Func<MethodBase, ILogger> loggerSource ) : base( loggerSource, TemplateSource ) {}
 	}*/
 
-	public class Timer : DragonSpark.Diagnostics.Timer
+	/*public class Timer : DragonSpark.Diagnostics.Timer
 	{
 		readonly FixedStore<CpuTime> threadTime = new FixedStore<CpuTime>();
 		readonly ThreadTimer[] all;
@@ -61,9 +56,9 @@ namespace DragonSpark.Windows.Diagnostics
 	public class ThreadTimer : TimerBase
 	{
 		public ThreadTimer( Func<ulong> current ) : base( current, total => TimeSpan.FromMilliseconds( total * 0.0001 ) ) {}
-	}
+	}*/
 
-	public class TimerEventConverter : ProjectedFactory<TimerEvent, TimerEvent<Timer>, LoggerTemplate>
+	/*public class TimerEventConverter : ProjectedFactory<TimerEvent, TimerEvent<Timer>, LoggerTemplate>
 	{
 		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
 
@@ -77,8 +72,8 @@ namespace DragonSpark.Windows.Diagnostics
 	{
 		public TimerEventTemplate( TimerEvent<Timer> timerEvent ) : base( "CPU time: {CpuTime:ss':'fff}", timerEvent.Tracker.CpuElapsed ) {}
 	}
-
-	public class CpuTime
+*/
+	/*public class CpuTime
 	{
 		public CpuTime( ulong kernel, ulong user )
 		{
@@ -109,7 +104,7 @@ namespace DragonSpark.Windows.Diagnostics
 			var result = new CpuTime( kernel, user );
 			return result;
 		}
-	}
+	}*/
 
 	public class AddSeqSinkCommand : AddSinkCommand
 	{

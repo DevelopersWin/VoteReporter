@@ -5,6 +5,7 @@ using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -20,15 +21,14 @@ namespace DragonSpark.Testing.Framework.Setup
 			fixture.ResidueCollectors.Add( ServiceRelay.Instance );
 		}
 
-		public class FrameworkSpecimenBuilder : ISpecimenBuilder
+		class FrameworkSpecimenBuilder : ISpecimenBuilder
 		{
 			public static FrameworkSpecimenBuilder Instance { get; } = new FrameworkSpecimenBuilder();
+			FrameworkSpecimenBuilder() : this( new[] { typeof(Type[]), typeof(Assembly[]), typeof(ImmutableArray<Type>), typeof(ImmutableArray<Assembly>) } ) {}
 
 			readonly Type[] types;
 
-			FrameworkSpecimenBuilder() : this( new[] { typeof(Type[]), typeof(Assembly[]) } ) {}
-
-			public FrameworkSpecimenBuilder( Type[] types )
+			FrameworkSpecimenBuilder( Type[] types )
 			{
 				this.types = types;
 			}
@@ -36,7 +36,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			public object Create( object request, ISpecimenContext context )
 			{
 				var type = TypeSupport.From( request );
-				var result = type != null && types.Contains( type ) ? GlobalServiceProvider.Instance.GetService( type ) : new NoSpecimen();
+				var result = type != null && types.Contains( type ) ? GlobalServiceProvider.Instance.GetService<object>( type ) : new NoSpecimen();
 				return result;
 			}
 		}
@@ -45,7 +45,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class ServiceRelay : ISpecimenBuilder
 	{
 		public static ServiceRelay Instance { get; } = new ServiceRelay();
-		ServiceRelay() : this( GlobalServiceProvider.Instance.GetService ) {}
+		ServiceRelay() : this( GlobalServiceProvider.Instance.GetService<object> ) {}
 
 		readonly Func<Type, object> provider;
 

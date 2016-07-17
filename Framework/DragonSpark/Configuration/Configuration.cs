@@ -1,20 +1,19 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Commands;
 using System;
 using System.Windows.Input;
-using DragonSpark.Extensions;
-using Defaults = DragonSpark.Activation.Defaults;
 
 namespace DragonSpark.Configuration
 {
-	public class EnableMethodCaching : StructuredParameterizedConfiguration<bool>
+	public class EnableMethodCaching : Configuration<bool>
 	{
 		public static EnableMethodCaching Instance { get; } = new EnableMethodCaching();
-		EnableMethodCaching() : base( o => true ) {}
+		EnableMethodCaching() : base( () => true ) {}
 	}
 
 	public interface IInitializationCommand : ICommand, IDisposable {}
@@ -191,13 +190,13 @@ namespace DragonSpark.Configuration
 		void Assign( Func<T> factory );
 	}
 
-	public abstract class ConfigurationBase<T> : IWritableConfiguration<T>, IStoreAware<Func<T>>
+	public class Configuration<T> : IWritableConfiguration<T>, IStoreAware<Func<T>>
 	{
 		readonly IWritableStore<Func<T>> store;
 
-		protected ConfigurationBase( Func<T> factory ) : this( new FixedStore<Func<T>>( factory ) ) {}
+		public Configuration( Func<T> factory ) : this( new CacheStore<T>( factory ) ) {}
 
-		protected ConfigurationBase( IWritableStore<Func<T>> store )
+		protected Configuration( IWritableStore<Func<T>> store )
 		{
 			this.store = store;
 		}
@@ -209,10 +208,17 @@ namespace DragonSpark.Configuration
 		Func<T> IStoreAware<Func<T>>.Value => store.Value;
 	}
 
-	public static class ConfigurationExtensions
+	class CacheStore<T> : ExecutionContextStore<Func<T>>
+	{
+		public CacheStore( Func<T> factory ) : base( factory ) {}
+
+		protected override void OnAssign( Func<T> value ) => base.OnAssign( new DeferredStore<T>( value ).Get );
+	}
+
+	/*public static class ConfigurationExtensions
 	{
 		public static T Default<T>( this IParameterizedConfiguration<object, T> @this ) => @this.Get( Defaults.ExecutionContext() );
-	}
+	}*/
 
 	/*public abstract class ParameterizedConfigurationBase<T> : ParameterizedConfigurationBase<object, T>, IParameterizedConfiguration<T>
 	{

@@ -1,40 +1,15 @@
-using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
-using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using System;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.Diagnostics
 {
-	public static class DiagnosticProperties
-	{
-		public static ICache<ILogger> Logger { get; } = new Cache<ILogger>( o => GlobalServiceProvider.Instance.Get<ILogger>().ForSource( o ) );
-	}
+	// public delegate void EmitProfileEvent( string name );
 
-	public static class Diagnostics
-	{
-		public static ICache<LogEventLevel> Default { get; } = new StoreCache<LogEventLevel>();
-
-		public static ICache<LoggingLevelSwitch> Controller { get; } = new Cache<LoggingLevelSwitch>( o => new LoggingLevelSwitch( Default.Get( o ) ) );
-
-		public static ICache<ILoggerHistory> History { get; } = new Cache<ILoggerHistory>( o => new LoggerHistorySink() );
-
-		public static ICache<ImmutableArray<ITransformer<LoggerConfiguration>>> Transformers { get; } = new StoreCache<ImmutableArray<ITransformer<LoggerConfiguration>>>( o => ImmutableArray.Create<ITransformer<LoggerConfiguration>>() );
-
-		public static ICache<ILogger> Logger { get; } = new Cache<ILogger>( o => new RecordingLoggerFactory( History.Get( o ), Controller.Get( o ), Transformers.Get( o ).ToArray() ).Create().ForSource( o ) );
-	}
-
-	public delegate void EmitProfileEvent( string name );
-
-	public static class Profile
+	/*public static class Profile
 	{
 		public static void Event( string name ) => AmbientStack.GetCurrentItem<EmitProfileEvent>()( name );
 
@@ -101,15 +76,15 @@ namespace DragonSpark.Diagnostics
 		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
 
 		TimerEventConverter() : base( @event => new TimerEventTemplate( @event ) ) {}
-	}
+	}*/
 
-	public class TimerEventTemplate : LoggerTemplate
+	/*public class TimerEventTemplate : LoggerTemplate
 	{
 		new const string Template = "[{Event:l}] - Wall time {WallTime:ss':'fff}; Synchronous time {SynchronousTime:ss':'fff}";
 
 		public TimerEventTemplate( TimerEvent<Timer> profilerEvent ) 
 			: base(	Template, profilerEvent.EventName, profilerEvent.Timer.Elapsed, profilerEvent.Tracker.Elapsed ) {}
-	}
+	}*/
 
 	public interface ILoggerExceptionTemplate : ILoggerTemplate
 	{
@@ -161,7 +136,7 @@ namespace DragonSpark.Diagnostics
 		public object[] Parameters { get; }
 	}
 
-	public class TimerEvent<T> : TimerEvent where T : ITimer
+	/*public class TimerEvent<T> : TimerEvent where T : ITimer
 	{
 		public TimerEvent( string eventName, MethodBase method, ITimer timer, T tracker ) : base( eventName, method, timer )
 		{
@@ -169,7 +144,7 @@ namespace DragonSpark.Diagnostics
 		}
 
 		public T Tracker { get; }
-	}
+	}*/
 
 	public class Timer : TimerBase
 	{
@@ -220,12 +195,12 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public class TimerEventHandler : ProjectedCommand<string>
+	/*public class TimerEventHandler : ProjectedCommand<string>
 	{
 		public TimerEventHandler( Action<TimerEvent> inner, CreateProfilerEvent projection ) : base( new DelegatedCommand<TimerEvent>( inner, new Projector<string, TimerEvent>( new Func<string, TimerEvent>( projection ) ).ToDelegate() ) ) {}
-	}
+	}*/
 
-	public interface ISessionTimer : ITimer, IContinuation {}
+	/*public interface ISessionTimer : ITimer, IContinuation {}
 
 	public class SessionTimer : Timer, ISessionTimer
 	{
@@ -260,5 +235,5 @@ namespace DragonSpark.Diagnostics
 		public static StartProcessCommand Instance { get; } = new StartProcessCommand();
 
 		public override void Execute( IProcess parameter ) => parameter.Start();
-	}
+	}*/
 }

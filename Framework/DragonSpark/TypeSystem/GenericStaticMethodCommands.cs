@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -211,7 +211,7 @@ namespace DragonSpark.TypeSystem
 				}
 				catch ( ArgumentException e )
 				{
-					DiagnosticProperties.Logger.Get( typeof(TypeAdapter) ).Verbose( e, "Could not create a generic method for {Method} with types {Types}", item.Item1.Method, item.Item2 );
+					Logger.Instance.Get( this ).Verbose( e, "Could not create a generic method for {Method} with types {Types}", item.Item1.Method, item.Item2 );
 					return default(GenericMethodCandidate<T>);
 				}
 			}

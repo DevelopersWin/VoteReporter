@@ -1,8 +1,8 @@
-using System;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -45,6 +45,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 
 		static bool ShouldDefault( ParameterInfo info ) => 
-			info.IsOptional && !GlobalServiceProvider.Instance.Get<AutoData>().Method.GetParameterTypes().Any( info.ParameterType.Adapt().IsAssignableFrom );
+			info.IsOptional && !MethodContext.Instance.Value.GetParameterTypes().Any( info.ParameterType.Adapt().IsAssignableFrom );
 	}
 }

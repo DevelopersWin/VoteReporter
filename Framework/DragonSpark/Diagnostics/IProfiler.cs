@@ -1,14 +1,11 @@
-using DragonSpark.Runtime;
-using System;
-
 namespace DragonSpark.Diagnostics
 {
-	public interface IProfiler : IProcess, IContinuation
+	/*public interface IProfiler : IProcess, IContinuation
 	{
 		TimeSpan Elapsed { get; }
-	}
+	}*/
 
-	public class Profiler : IProfiler
+	/*public class Profiler : IProfiler
 	{
 		readonly ISessionTimer inner;
 		readonly EmitProfileEvent handler;
@@ -48,5 +45,5 @@ namespace DragonSpark.Diagnostics
 		}
 
 		public TimeSpan Elapsed => inner.Elapsed;
-	}
+	}*/
 }

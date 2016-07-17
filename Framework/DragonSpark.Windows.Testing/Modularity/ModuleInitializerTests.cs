@@ -1,5 +1,5 @@
 using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Testing.Framework;
@@ -65,7 +65,8 @@ namespace DragonSpark.Windows.Testing.Modularity
 		public void ShouldLogModuleInitializationError()
 		{
 			var sink = new MockLoggerHistorySink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			LoggerHistory.Instance.Assign( o => sink );
+			var logger = Logger.Instance.Get( this );
 			var service = new ModuleInitializer(Constructor.Instance, logger);
 			ExceptionThrowingModule.wasInitializedOnce = false;
 			var exceptionModule = CreateModuleInfo(typeof(ExceptionThrowingModule));

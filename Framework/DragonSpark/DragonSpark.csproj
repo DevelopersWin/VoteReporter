@@ -173,7 +173,7 @@
   <ItemGroup>
     <Compile Include="Activation\ApplicationContext.cs" />
     <Compile Include="Activation\AutoValidatingFactory.cs" />
-    <Compile Include="Activation\FactoryTypeLocatorBase.cs" />
+    <Compile Include="Activation\FactoryTypeLocator.cs" />
     <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />
     <Compile Include="Activation\IoC\UnityContainerFactory.cs" />
     <Compile Include="Activation\ParameterAware.cs" />
@@ -211,7 +211,6 @@
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
     <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Configuration\ConfigureCommand.cs" />
-    <Compile Include="Configuration\PrototypeStore.cs" />
     <Compile Include="Configuration\Store.cs" />
     <Compile Include="Diagnostics\Configuration.cs" />
     <Compile Include="Configuration\Registration.cs" />
@@ -297,7 +296,7 @@
     <Compile Include="TypeSystem\HostingAttribute.cs" />
     <Compile Include="TypeSystem\IAttributeProvider.cs" />
     <Compile Include="TypeSystem\IAttributeProviderLocator.cs" />
-    <Compile Include="TypeSystem\KnownTypeFactory.cs" />
+    <Compile Include="TypeSystem\KnownTypes.cs" />
     <Compile Include="TypeSystem\TypeAdapter.cs" />
     <Compile Include="ComponentModel\CollectionAttribute.cs" />
     <Compile Include="ComponentModel\IExpressionEvaluator.cs" />
@@ -386,7 +385,6 @@
     <Compile Include="Activation\IoC\InjectionMemberFactory.cs" />
     <Compile Include="Runtime\IProgram.cs" />
     <Compile Include="Setup\Registration\IRegistrationTypeContext.cs" />
-    <Compile Include="Activation\IoC\ISingletonLocator.cs" />
     <Compile Include="Runtime\Program.cs" />
     <Compile Include="Setup\Registration\RegisterAttribute.cs" />
     <Compile Include="Setup\Registration\RegisterFrameworkExceptionTypesCommand.cs" />
@@ -400,7 +398,6 @@
     <Compile Include="Setup\Commands\SetupUnityCommand.cs" />
     <Compile Include="Setup\Commands\ConfigureUnityCommand.cs" />
     <Compile Include="Activation\IoC\SingletonAttribute.cs" />
-    <Compile Include="Activation\IoC\SingletonLocator.cs" />
     <Compile Include="Setup\Commands\UnityCommand.cs" />
     <Compile Include="Setup\Registration\MetadataRegistrationCommand.cs" />
     <Compile Include="Setup\Commands\UnityInstance.cs" />

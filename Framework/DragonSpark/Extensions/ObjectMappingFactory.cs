@@ -1,16 +1,15 @@
 using AutoMapper;
 using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Extensions
 {
 	public class ObjectMappingFactory<T> : FactoryBase<ObjectMappingParameter<T>, T> where T : class
 	{
-		public static ObjectMappingFactory<T> Default { get; } = new ObjectMappingFactory<T>( Activator.Instance );
+		public static IConfiguration<ObjectMappingFactory<T>> Default { get; } = new Configuration<ObjectMappingFactory<T>>( () => new ObjectMappingFactory<T>( Activator.Instance.Get() ) );
 
 		readonly IActivator locator;
-
-		// public ObjectMappingFactory() : this( Activator.GetCurrent ) {}
 
 		public ObjectMappingFactory( [Required]IActivator locator )
 		{
@@ -26,7 +25,7 @@ namespace DragonSpark.Extensions
 			{
 				var map = mapper.CreateMap( sourceType, destinationType ).IgnoreUnassignable();
 				map.TypeMap.DestinationCtor = x => parameter.Existing ?? locator.Activate<object>( x.DestinationType );
-				parameter.Configuration.With( x => x( map ) );
+				parameter.Configuration?.Invoke( map );
 			} );
 
 			configuration.To<IProfileExpression>().CreateMissingTypeMaps = true;

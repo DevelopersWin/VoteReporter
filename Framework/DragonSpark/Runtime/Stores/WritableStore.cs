@@ -15,11 +15,12 @@ namespace DragonSpark.Runtime.Stores
 		}
 
 		public static Assignment<T> Assignment<T>( this IWritableStore<T> @this, T first )  => new Assignment<T>( new StoreAssign<T>( @this ), new Value<T>( first ) );
-
 		static class Assign<T>
 		{
 			public static ICache<IWritableStore<T>, StoreAssign<T>> Cache { get; } = new Cache<IWritableStore<T>, StoreAssign<T>>( c => new StoreAssign<T>( c ) );
 		}
+
+		public static T Get<T>( this IStore<T> @this ) => @this.Value;
 
 		public static Func<T> ToDelegate<T>( this IStore<T> @this ) where T : class => FixedFactoryCache<T>.Default.Get( @this );
 		class FixedFactoryCache<T> : Cache<IStore<T>, Func<T>> where T : class

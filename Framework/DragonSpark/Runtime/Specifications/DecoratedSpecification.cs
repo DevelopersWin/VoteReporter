@@ -43,15 +43,15 @@ namespace DragonSpark.Runtime.Specifications
 		public override bool IsSatisfiedBy( T parameter ) => cache.Get( parameter ).Apply();
 	}
 
-	public class OnlyOnceSpecification : ConditionMonitorSpecification<object> {}
+	public class OnlyOnceSpecification : OnlyOnceSpecification<object> {}
 
-	public class ConditionMonitorSpecification<T> : SpecificationBase<T>
+	public class OnlyOnceSpecification<T> : SpecificationBase<T>
 	{
 		readonly ConditionMonitor monitor;
 
-		public ConditionMonitorSpecification() : this( new ConditionMonitor() ) {}
+		public OnlyOnceSpecification() : this( new ConditionMonitor() ) {}
 
-		public ConditionMonitorSpecification( ConditionMonitor monitor )
+		public OnlyOnceSpecification( ConditionMonitor monitor )
 		{
 			this.monitor = monitor;
 		}

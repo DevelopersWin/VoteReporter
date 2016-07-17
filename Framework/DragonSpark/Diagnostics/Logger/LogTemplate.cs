@@ -1,9 +1,14 @@
 using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -47,7 +52,7 @@ namespace DragonSpark.Diagnostics.Logger
 
 		readonly Func<FormatterFactory> source;
 
-		protected LoggerTemplateParameterFactoryBase() : this( GlobalServiceProvider.Instance.Get<FormatterFactory> ) {}
+		protected LoggerTemplateParameterFactoryBase() : this( GlobalServiceProvider.Instance.GetService<FormatterFactory> ) {}
 
 		protected LoggerTemplateParameterFactoryBase( Func<FormatterFactory> source )
 		{
@@ -94,5 +99,150 @@ namespace DragonSpark.Diagnostics.Logger
 	public class Handler<T> : DecoratedCommand<T>
 	{
 		public Handler( ILogger logger, LogEventLevel level, Func<T, ILoggerTemplate> projection ) : base( new LogTemplateCommand( logger, level ).Cast( projection ) ) {}
+	}
+
+	public sealed class LoggerHistory : ParameterizedConfiguration<ILoggerHistory>
+	{
+		public static LoggerHistory Instance { get; } = new LoggerHistory();
+		LoggerHistory() : base( o => new LoggerHistorySink() ) {}
+	}
+
+	public sealed class LoggingLevelSwitch : ParameterizedConfiguration<Serilog.Core.LoggingLevelSwitch>
+	{
+		public static LoggingLevelSwitch Instance { get; } = new LoggingLevelSwitch();
+		LoggingLevelSwitch() : base( o => new Serilog.Core.LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get( o ) ) ) {}
+	}
+
+	public sealed class LoggerConfiguration : ParameterizedConfiguration<Serilog.LoggerConfiguration>
+	{
+		public static LoggerConfiguration Instance { get; } = new LoggerConfiguration();
+		LoggerConfiguration() : base( o => LoggerConfigurations.Instance.Get( o ).Aggregate( new Serilog.LoggerConfiguration(), ( configuration, transformer ) => transformer.Create( configuration ) ) ) {}
+	}
+
+	public sealed class Logger : ParameterizedConfiguration<ILogger>
+	{
+		public static Logger Instance { get; } = new Logger();
+		Logger() : base( o => LoggerConfiguration.Instance.Get( o ).CreateLogger().ForSource( o ) ) {}
+	}
+
+	public sealed class LoggerConfigurations : ParameterizedConfiguration<ITransformer<Serilog.LoggerConfiguration>[]>
+	{
+		public static LoggerConfigurations Instance { get; } = new LoggerConfigurations();
+		LoggerConfigurations() : base( RecordingLoggerConfigurationsFactory.Instance.Create ) {}
+	}
+
+	class RecordingLoggerConfigurationsFactory : LoggerConfigurationsFactory
+	{
+		public new static RecordingLoggerConfigurationsFactory Instance { get; } = new RecordingLoggerConfigurationsFactory();
+
+		protected override IEnumerable<ITransformer<Serilog.LoggerConfiguration>> From( object parameter )
+		{
+			foreach ( var transformer in base.From( parameter ) )
+			{
+				yield return transformer;
+			}
+
+			yield return new HistoryTransform( LoggerHistory.Instance.Get( parameter ) );
+		}
+
+		class HistoryTransform : TransformerBase<Serilog.LoggerConfiguration>
+		{
+			readonly ILoggerHistory history;
+
+			public HistoryTransform( ILoggerHistory history )
+			{
+				this.history = history;
+			}
+
+			public override Serilog.LoggerConfiguration Create( Serilog.LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
+		}
+	}
+
+	public class LoggerConfigurationsFactory : FactoryBase<object, ITransformer<Serilog.LoggerConfiguration>[]>
+	{
+		public static LoggerConfigurationsFactory Instance { get; } = new LoggerConfigurationsFactory();
+		protected LoggerConfigurationsFactory() {}
+
+		public override ITransformer<Serilog.LoggerConfiguration>[] Create( object parameter ) => From( parameter ).ToArray();
+
+		protected virtual IEnumerable<ITransformer<Serilog.LoggerConfiguration>> From( object parameter )
+		{
+			yield return new ControllerTransform( LoggingLevelSwitch.Instance.Get( parameter ) );
+			yield return new CreatorFilterTransformer();
+		}
+
+		class ControllerTransform : TransformerBase<Serilog.LoggerConfiguration>
+		{
+			readonly Serilog.Core.LoggingLevelSwitch controller;
+			public ControllerTransform( Serilog.Core.LoggingLevelSwitch controller )
+			{
+				this.controller = controller;
+			}
+
+			public override Serilog.LoggerConfiguration Create( Serilog.LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller );
+		}
+	}
+
+	public class CreatorFilterTransformer : TransformerBase<Serilog.LoggerConfiguration>
+	{
+		readonly CreatorFilter filter;
+
+		public CreatorFilterTransformer() : this( new CreatorFilter() ) {}
+
+		public CreatorFilterTransformer( CreatorFilter filter )
+		{
+			this.filter = filter;
+		}
+
+		public override Serilog.LoggerConfiguration Create( Serilog.LoggerConfiguration parameter )
+		{
+			var item = filter.ToItem();
+			return parameter.Filter.With( item ).Enrich.With( item );
+		}
+
+		public class CreatorFilter : DecoratedSpecification<LogEvent>, ILogEventEnricher, ILogEventFilter
+		{
+			const string CreatorId = "CreatorId";
+			readonly Guid id;
+
+			public CreatorFilter() : this( Guid.NewGuid() ) {}
+
+			public CreatorFilter( Guid id ) : base( MigratingSpecification.Instance.Or( new CreatorSpecification( id ) ) )
+			{
+				this.id = id;
+			}
+			
+			public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( CreatorId, id ) );
+
+			class MigratingSpecification : CacheValueSpecification<LogEvent, bool>
+			{
+				public static MigratingSpecification Instance { get; } = new MigratingSpecification();
+
+				MigratingSpecification() : base( MigrationProperties.IsMigrating, () => true ) {}
+			}
+
+			class CreatorSpecification : SpecificationBase<LogEvent>
+			{
+				readonly Guid id;
+				public CreatorSpecification( Guid id )
+				{
+					this.id = id;
+				}
+
+				public override bool IsSatisfiedBy( LogEvent parameter )
+				{
+					if ( parameter.Properties.ContainsKey( CreatorId ) )
+					{
+						var property = parameter.Properties[CreatorId] as ScalarValue;
+						var result = property != null && (Guid)property.Value == id;
+						return result;
+					}
+
+					return false;
+				}
+			}
+
+			public bool IsEnabled( LogEvent logEvent ) => IsSatisfiedBy( logEvent );
+		}
 	}
 }

@@ -27,7 +27,7 @@ namespace DragonSpark.Runtime
 		ImmutableArray<T> List();
 	}
 
-	public interface IDisposableRepository : IRepository<IDisposable>, IDisposable {}
+	/*public interface IDisposableRepository : IRepository<IDisposable>, IDisposable {}
 
 	public class DisposableRepository : RepositoryBase<IDisposable>, IDisposableRepository
 	{
@@ -36,7 +36,7 @@ namespace DragonSpark.Runtime
 			var entries = Store.Purge();
 			entries.Each( entry => entry.Dispose() );
 		}
-	}
+	}*/
 
 	public abstract class EntryRepositoryBase<TItem> : EntryRepositoryBase<Entry<TItem>, TItem>
 	{

@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Diagnostics.Logger;
+using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
 using Serilog.Events;
@@ -22,15 +23,15 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		{
 			var currentMethod = MethodBase.GetCurrentMethod();
 
-			var history = DragonSpark.Diagnostics.Diagnostics.History.Get( currentMethod );
+			var history = LoggerHistory.Instance.Get( currentMethod );
 			var message = "Hello World";
 			var logEvent = new LogEvent( DateTimeOffset.Now, LogEventLevel.Information, null, new MessageTemplateParser().Parse( message ), new LogEventProperty[0] );
 			history.Emit( logEvent );
 
 			Assert.Contains( logEvent, history.Events );
 			var lines = new List<string>();
-			DragonSpark.Diagnostics.Diagnostics.Default.Set( currentMethod, LogEventLevel.Debug );
-			var logger = DragonSpark.Diagnostics.Diagnostics.Logger.Get( currentMethod );
+			LoggingLevelSwitch.Instance.Get( currentMethod ).MinimumLevel = LogEventLevel.Debug;
+			var logger = Logger.Instance.Get( currentMethod );
 
 			var listener = Tracing.Listener.Get( logger );
 			Assert.NotNull( listener );

@@ -1,12 +1,9 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
-using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -19,19 +16,25 @@ using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
 {
-	public class CompositionFactory : FactoryBase<CompositionHost>
+	public sealed class CompositionSource : Configuration<CompositionHost>
 	{
-		readonly IFactory<ContainerConfiguration> configuration;
-		
-		public CompositionFactory( [Required] IFactory<ContainerConfiguration> configuration )
-		{
-			this.configuration = configuration;
-		}
-
-		public override CompositionHost Create() => configuration.Create().CreateContainer();
+		public static CompositionSource Instance { get; } = new CompositionSource();
+		CompositionSource() : base( () => ConfigurationSource.Instance.Get().CreateContainer() ) {}
 	}
 
-	public class AssemblyBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
+	public sealed class ConfigurationSource : Configuration<ContainerConfiguration>
+	{
+		public static ConfigurationSource Instance { get; } = new ConfigurationSource();
+		ConfigurationSource() : base( () => Configurations.Instance.Get().Aggregate( new ContainerConfiguration(), ( configuration, transformer ) => transformer.Create( configuration ) ) ) {}
+	}
+
+	public sealed class Configurations : Configuration<ImmutableArray<ContainerConfigurator>>
+	{
+		public static Configurations Instance { get; } = new Configurations();
+		Configurations() : base( () => ImmutableArray.Create<ContainerConfigurator>( ContainerServicesConfigurator.Instance, new PartsContainerConfigurator( DefaultTypeSystem.Instance.Get() ) ) ) {}
+	}
+
+	/*public class AssemblyBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
 	{
 		public AssemblyBasedConfigurationContainerFactory( IEnumerable<Assembly> assemblies ) : this( assemblies.ToImmutableArray() ) { }
 
@@ -48,15 +51,7 @@ namespace DragonSpark.Composition
 	{
 		public ContainerConfigurationFromPartsFactory( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types )
 			: base( ContainerConfigurationFactory.Instance.Create, ContainerServicesConfigurator.Instance.ToDelegate(), new PartsContainerConfigurator( assemblies, types ).ToDelegate() ) {}
-	}
-
-	public class ContainerConfigurationFactory : FactoryBase<ContainerConfiguration>
-	{
-		public static ContainerConfigurationFactory Instance { get; } = new ContainerConfigurationFactory();
-		ContainerConfigurationFactory() {}
-
-		public override ContainerConfiguration Create() => new ContainerConfiguration();
-	}
+	}*/
 
 	public class ContainerServicesConfigurator : ContainerConfigurator
 	{
@@ -74,7 +69,7 @@ namespace DragonSpark.Composition
 	{
 		public ServiceProviderHost()
 		{
-			Assign( DefaultServiceProvider.Instance.Value );
+			Assign( DefaultServiceProvider.Instance );
 		}
 	}
 
@@ -126,63 +121,47 @@ namespace DragonSpark.Composition
 
 	public class PartsContainerConfigurator : ContainerConfigurator
 	{
-		readonly ImmutableArray<Assembly> assemblies;
-		readonly ImmutableArray<Type> core, types, all;
-		readonly FactoryTypeRequest[] factoryTypes;
-		readonly Activation.FactoryTypeLocator locator;
-		readonly BuildableTypeFromConventionLocator conventionLocator;
-		readonly Activation.Activator activator;
+		readonly static ConventionBuilder ConventionBuilder = FrameworkConventionBuilder.Instance.Create();
+		readonly Setup.TypeSystem system;
+		readonly ImmutableArray<Type> core, all;
 
-		public PartsContainerConfigurator( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types ) : this( assemblies, types, FrameworkTypes.Instance.Create() ) {}
+		public PartsContainerConfigurator( Setup.TypeSystem system ) : this( system, FrameworkTypes.Instance.Get(), AllTypes.Instance.Get() ) {}
 
-		public PartsContainerConfigurator( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types, ImmutableArray<Type> core )
+		PartsContainerConfigurator( Setup.TypeSystem system, ImmutableArray<Type> core, ImmutableArray<Type> all )
 		{
-			this.assemblies = assemblies;
-			this.types = types;
+			this.system = system;
 			this.core = core;
-
-			// TODO: Fix this mess:
-			var array = types.ToArray();
-			factoryTypes = FactoryTypeLocator.Instance.GetMany( array );
-			locator = new Activation.FactoryTypeLocator( factoryTypes );
-			conventionLocator = new BuildableTypeFromConventionLocator( array );
-			activator = new Activation.Activator( conventionLocator );
-			all = array.Union( core.ToArray() ).ToImmutableArray();
+			this.all = all;
 		}
 
 		public override ContainerConfiguration Create( ContainerConfiguration configuration )
 		{
 			var result = configuration
-				.WithInstance( assemblies )
+				.WithInstance( system.Assemblies )
+				.WithInstance( system.Assemblies.ToArray() )
 				.WithInstance( all )
-				.WithInstance( assemblies.ToArray() )
 				.WithInstance( all.ToArray() )
-				.WithInstance( conventionLocator )
-				.WithInstance( factoryTypes )
-				.WithInstance( locator )
-				.WithInstance<IActivator>( activator )
-				// .WithParts( shared, SharedFrameworkConventionBuilder.Instance.Create() )
-				.WithParts( core.ToArray(), FrameworkConventionBuilder.Instance.Create() )
-				.WithParts( types.ToArray(), AttributeProvider.Instance )
-				.WithProvider( new FactoryDelegateExportDescriptorProvider( locator ) )
-				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider( locator ) )
-				.WithProvider( new FactoryExportDescriptorProvider( locator ) )
-				.WithProvider( new TypeInitializingExportDescriptorProvider( conventionLocator ) );
+				.WithInstance( Activation.Activator.Instance.Get() )
+				.WithParts( core.ToArray(), ConventionBuilder )
+				.WithParts( system.Types.ToArray(), AttributeProvider.Instance )
+				.WithProvider( new FactoryDelegateExportDescriptorProvider() )
+				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider() )
+				.WithProvider( new FactoryExportDescriptorProvider() )
+				.WithProvider( new TypeInitializingExportDescriptorProvider() );
 			return result;
 		}
 
-		/*class SharedFrameworkConventionBuilder : FrameworkConventionBuilder
-		{
-			public new static SharedFrameworkConventionBuilder Instance { get; } = new SharedFrameworkConventionBuilder();
-
-			protected override PartConventionBuilder Configure( ConventionBuilder builder ) => base.Configure( builder ).Shared();
-		}*/
-
 		public class FrameworkConventionBuilder : FactoryBase<ConventionBuilder>
 		{
-			public static FrameworkConventionBuilder Instance { get; } = new FrameworkConventionBuilder();
+			readonly Func<ConventionBuilder, object> configure;
 
-			public override ConventionBuilder Create() => new ConventionBuilder().WithSelf( Configure );
+			public static FrameworkConventionBuilder Instance { get; } = new FrameworkConventionBuilder();
+			FrameworkConventionBuilder()
+			{
+				configure = Configure;
+			}
+
+			public override ConventionBuilder Create() => new ConventionBuilder().WithSelf( configure );
 
 			protected virtual PartConventionBuilder Configure( ConventionBuilder builder ) => builder.ForTypesMatching( type => true ).Export().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) );
 		}

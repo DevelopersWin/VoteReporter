@@ -2,8 +2,8 @@
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
+using System.Collections.Immutable;
 using Xunit;
-using FactoryTypeLocator = DragonSpark.Composition.FactoryTypeLocator;
 
 namespace DragonSpark.Testing.Activation.FactoryModel
 {
@@ -13,8 +13,8 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		public void GetResultType()
 		{
 			var expected = typeof(FactoryOfYAC);
-			var types = FactoryTypeLocator.Instance.GetMany( AssemblyTypes.All.Get( expected.Assembly ) );
-			var type = new DragonSpark.Activation.FactoryTypeLocator( types ).Get( new LocateTypeRequest( typeof(YetAnotherClass) ) );
+			var types = FactoryTypeRequests.Instance.GetMany( AssemblyTypes.All.Get( expected.Assembly ).ToImmutableArray() );
+			var type = new FactoryTypes( types ).Get( new LocateTypeRequest( typeof(YetAnotherClass) ) );
 			Assert.Equal( expected, type );
 		} 
 	}

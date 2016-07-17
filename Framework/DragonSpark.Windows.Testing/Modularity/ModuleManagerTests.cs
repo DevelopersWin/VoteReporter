@@ -1,4 +1,4 @@
-using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Testing.Framework;
@@ -292,7 +292,8 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			LoggerHistory.Instance.Assign( o => sink );
+			var logger = Logger.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			ModuleManager manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -319,7 +320,8 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			LoggerHistory.Instance.Assign( o => sink );
+			var logger = Logger.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManagerExtended(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -362,7 +364,8 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			var logger = new RecordingLoggerFactory( sink ).Create();
+			LoggerHistory.Instance.Assign( o => sink );
+			var logger = Logger.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			manager.LoadModuleCompleted += ( sender, args ) => args.IsErrorHandled = true;

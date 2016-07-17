@@ -55,19 +55,19 @@ namespace DragonSpark.Windows.Markup
 	{
 		public static MockFactory Instance { get; } = new MockFactory();
 
-		public class Specification : GuardedSpecificationBase<Type>
+		MockFactory() : base( Specification.Instance ) {}
+
+		class Specification : GuardedSpecificationBase<Type>
 		{
 			public static Specification Instance { get; } = new Specification();
 
 			public override bool IsSatisfiedBy( Type parameter ) => parameter.IsInterface || !parameter.IsSealed;
 		}
 
-		public MockFactory() : base( Specification.Instance ) {}
-
 		public override object Create( Type parameter )
 		{
 			var type = typeof(Mock<>).MakeGenericType( parameter );
-			var result = GlobalServiceProvider.Instance.Get<Mock>( type ).Object;
+			var result = GlobalServiceProvider.Instance.GetService<Mock>( type ).Object;
 			return result;
 		}
 	}

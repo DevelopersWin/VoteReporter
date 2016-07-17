@@ -58,7 +58,7 @@ namespace DragonSpark.Testing.Framework
 
 		public void Register( IServiceRegistry registry )
 		{
-			var instance = GlobalServiceProvider.Instance.GetService( serviceType );
+			var instance = GlobalServiceProvider.Instance.GetService<object>( serviceType );
 			if ( instance != null )
 			{
 				var parameter = new InstanceRegistrationParameter( serviceType, instance );

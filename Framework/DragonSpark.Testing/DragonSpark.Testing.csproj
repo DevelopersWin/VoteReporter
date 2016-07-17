@@ -318,7 +318,7 @@
     <Compile Include="TypeSystem\InverseCacheValueFactoryTests.cs" />
     <Compile Include="TypeSystem\DerivedMethodSpecificationTests.cs" />
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
-    <Compile Include="TypeSystem\KnownTypeFactoryTests.cs" />
+    <Compile Include="TypeSystem\KnownTypesTests.cs" />
     <Compile Include="TypeSystem\RegistrationTests.cs" />
     <Compile Include="TypeSystem\TypeAdapterTests.cs" />
   </ItemGroup>

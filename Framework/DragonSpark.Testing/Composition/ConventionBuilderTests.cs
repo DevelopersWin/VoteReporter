@@ -1,4 +1,4 @@
-﻿using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
@@ -7,6 +7,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
+using System;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Composition.Convention;
@@ -15,8 +16,6 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
-using SingletonLocator = DragonSpark.Activation.IoC.SingletonLocator;
-using Type = System.Type;
 
 namespace DragonSpark.Testing.Composition
 {
@@ -50,7 +49,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var items = sut.Fixed();
 
-			var nested = FrameworkTypes.Instance.Create().ToArray().Union( GetType().Adapt().WithNested() ).Fixed();
+			var nested = FrameworkTypes.Instance.Get().ToArray().Union( GetType().Adapt().WithNested() ).Fixed();
 			Assert.Equal( nested.Length, items.Length );
 			Assert.Equal( nested.OrderBy( type => type.FullName ), items.OrderBy( type => type.FullName ) );
 

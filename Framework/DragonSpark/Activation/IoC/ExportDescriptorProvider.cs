@@ -17,7 +17,7 @@ namespace DragonSpark.Activation.IoC
 		public static ServiceProviderSpecificationFactory Instance { get; } = new ServiceProviderSpecificationFactory();
 		
 		public override ISpecification<LocateTypeRequest> Create( IServiceProvider parameter ) => 
-			parameter.Get<FactoryTypeLocator>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? Runtime.Specifications.Specifications.Always;
+			parameter.Get<FactoryTypes>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? Runtime.Specifications.Specifications.Always;
 	}
 
 	public class ServicesIntegrationExtension : UnityContainerExtension
@@ -61,12 +61,14 @@ namespace DragonSpark.Activation.IoC
 
 	public class ServicesBuildPlanPolicy : IBuildPlanPolicy
 	{
+		readonly static Func<object, bool> DefaultActivated = ActivationProperties.IsActivatedInstanceSpecification.Default.ToDelegate();
+
 		readonly IServiceProvider provider;
 		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
 		readonly Func<object, bool> isActivated;
 		readonly Condition condition = new Condition();
 
-		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, registry, ActivationProperties.IsActivatedInstanceSpecification.Default.ToDelegate() ) {}
+		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, registry, DefaultActivated ) {}
 
 		public ServicesBuildPlanPolicy( IServiceProvider provider, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, Func<object, bool> isActivated ) : this( provider, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry ), isActivated ) {}
 

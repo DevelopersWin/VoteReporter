@@ -5,6 +5,7 @@ using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -32,10 +33,10 @@ namespace DragonSpark.Runtime.Properties
 
 		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 first, T2 second )  => new Assignment<T1, T2>( new CacheAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
 
-		public static TResult[] GetMany<TParameter, TResult>( this ICache<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
+		public static ImmutableArray<TResult> GetMany<TParameter, TResult>( this ICache<TParameter, TResult> @this, ImmutableArray<TParameter> parameters, Func<TResult, bool> where = null ) =>
 			parameters
 				.Select( @this.ToDelegate() )
-				.Where( @where ?? Where<TResult>.Assigned ).Fixed();
+				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 		
 
 		public static Func<TInstance, TValue> ToDelegate<TInstance, TValue>( this ICache<TInstance, TValue> @this ) => DelegateCache<TInstance, TValue>.Default.Get( @this );

@@ -1,12 +1,10 @@
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
-	public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
+	/*public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
 	{
 		public AssemblyBasedServiceProviderFactory( IEnumerable<Assembly> assemblies ) : base( new Composition.AssemblyBasedServiceProviderFactory( assemblies ).Create() ) {}
 	}
@@ -14,7 +12,7 @@ namespace DragonSpark.Activation.IoC
 	public class TypeBasedServiceProviderFactory : ServiceProviderFactory
 	{
 		public TypeBasedServiceProviderFactory( IEnumerable<Type> types ) : base( new Composition.TypeBasedServiceProviderFactory( types ).Create() ) {}
-	}
+	}*/
 
 	public class ServiceProviderFactory : FactoryBase<IServiceProvider>
 	{

@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Activation
 			Assert.Same( ExecutionContextStore.Instance.Value, current );
 			Assert.Equal( TaskContextStore.Instance.Value, current.Origin );
 			Assert.Null( MethodContext.Instance.Value );
-			Assert.True( EnableMethodCaching.Instance.Default() );
+			Assert.True( EnableMethodCaching.Instance.Get() );
 
 			var method = MethodBase.GetCurrentMethod();
 			using ( var command = new TestingApplicationInitializationCommand( method ).Run( default(object) ) )
@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Activation
 				Assert.NotNull( MethodContext.Instance.Value );
 				Assert.Same( method, MethodContext.Instance.Value );
 				Assert.Same( current, Defaults.ExecutionContext() );
-				Assert.False( EnableMethodCaching.Instance.Default() );
+				Assert.False( EnableMethodCaching.Instance.Get() );
 			}
 
 			var context = Defaults.ExecutionContext();
@@ -35,7 +35,7 @@ namespace DragonSpark.Testing.Activation
 
 			Assert.Null( MethodContext.Instance.Value );
 
-			Assert.True( EnableMethodCaching.Instance.Default() );
+			Assert.True( EnableMethodCaching.Instance.Get() );
 		}
 	}
 }

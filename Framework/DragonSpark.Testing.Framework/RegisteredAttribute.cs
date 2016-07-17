@@ -17,20 +17,16 @@ namespace DragonSpark.Testing.Framework
 {
 	public class FactoryAttribute : CustomizeAttribute
 	{
-		readonly Func<ParameterInfoFactoryTypeLocator> factorySource;
 		readonly Type factoryType;
 
-		public FactoryAttribute( Type factoryType = null ) : this( GlobalServiceProvider.Instance.Get<ParameterInfoFactoryTypeLocator>, factoryType ) {}
-
-		public FactoryAttribute( [Required]Func<ParameterInfoFactoryTypeLocator> factorySource, Type factoryType = null )
+		public FactoryAttribute( Type factoryType = null )
 		{
-			this.factorySource = factorySource;
 			this.factoryType = factoryType;
 		}
 
 		public override ICustomization GetCustomization( ParameterInfo parameter )
 		{
-			var type = factoryType ?? factorySource().Get( parameter );
+			var type = factoryType ?? ParameterInfoFactoryTypeLocator.Instance.Get( parameter );
 			var registration = new FactoryRegistration( type, parameter.ParameterType );
 			var result = new RegistrationCustomization( registration );
 			return result;
