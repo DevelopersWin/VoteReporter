@@ -6,23 +6,16 @@ using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Commands;
 using System;
 using System.Windows.Input;
-using System.Windows.Markup;
+using DragonSpark.Extensions;
 using Defaults = DragonSpark.Activation.Defaults;
 
 namespace DragonSpark.Configuration
 {
-	/*	public class EnableMethodCaching : StructuredParameterizedConfiguration<bool>
-		{
-			public static EnableMethodCaching Instance { get; } = new EnableMethodCaching();
-			EnableMethodCaching() : base( EnableMethodCachingConfiguration.Instance.Get ) {}
-		}
-
-		public class EnableMethodCachingConfiguration : DeclarativeParameterizedConfigurationBase<bool>
-		{
-			public static EnableMethodCachingConfiguration Instance { get; } = new EnableMethodCachingConfiguration();
-
-			public EnableMethodCachingConfiguration() : base( !PostSharpEnvironment.IsPostSharpRunning ) {}
-		}*/
+	public class EnableMethodCaching : StructuredParameterizedConfiguration<bool>
+	{
+		public static EnableMethodCaching Instance { get; } = new EnableMethodCaching();
+		EnableMethodCaching() : base( o => true ) {}
+	}
 
 	public interface IInitializationCommand : ICommand, IDisposable {}
 
@@ -52,7 +45,7 @@ namespace DragonSpark.Configuration
 
 	/*public class ApplyConfiguration : DeclarativeCommandBase<>*/
 
-	public class AssignValueCommand : CommandBase<IStore>
+	/*public class AssignValueCommand : CommandBase<IStore>
 	{
 		readonly IWritableStore writable;
 		public AssignValueCommand( IWritableStore writable )
@@ -61,29 +54,69 @@ namespace DragonSpark.Configuration
 		}
 
 		public override void Execute( IStore parameter ) => writable.Assign( parameter.Value );
+	}*/
+
+	/*public class ApplyConfigurationCommand : DeclarativeCommandBase<object>
+	{
+		public static GenericInvocationFactory<object, ICommand> Factory { get; } = new GenericInvocationFactory<object, ICommand>( typeof(IWritableParameterizedConfiguration<,>), typeof(ApplyConfigurationCommand), nameof(Create) );
+
+		public object Value { get; set; }
+
+		public override void Execute( object parameter ) => Factory.Create( Value ).Execute( parameter );
+
+		static ICommand Create<TKey, TValue>( object value ) => new ApplyConfigurationCommand<TKey, TValue>( value );
 	}
 
-	public abstract class ApplyFactoryConfigurationCommandBase<T> : ApplyFactoryConfigurationCommandBase<object, T>
+	public class ApplyConfigurationCommand<TKey, TValue> : CommandBase<IWritableParameterizedConfiguration<TKey, TValue>>
 	{
-		protected ApplyFactoryConfigurationCommandBase( IFactory<object, T> factory ) : base( factory ) {}
-	}
+		readonly static ImmutableArray<TypeAdapter> DefaultTypes = new[] { typeof(ApplyFactoryConfigurationCommand<TKey, TValue>), typeof(ApplyValueConfigurationCommand<TKey, TValue>) }.Select( type => type.Adapt() ).ToImmutableArray();
 
-	[ContentProperty( nameof(Value) )]
-	public abstract class ApplyFactoryConfigurationCommandBase<TKey, TValue> : ApplyConfigurationCommandBase<TKey, TValue>
-	{
-		protected ApplyFactoryConfigurationCommandBase( IFactory<TKey, TValue> factory )
+		readonly object value;
+		readonly ImmutableArray<TypeAdapter> commandTypes;
+
+		public ApplyConfigurationCommand( object value ) : this( value, DefaultTypes ) {}
+
+		public ApplyConfigurationCommand( object value, ImmutableArray<TypeAdapter> commandTypes )
 		{
-			Value = factory;
+			this.value = value;
+			this.commandTypes = commandTypes;
 		}
 
-		public IFactory<TKey, TValue> Value { get; set; }
+		public override void Execute( IWritableParameterizedConfiguration<TKey, TValue> parameter )
+		{
+			var constructor = commandTypes.Introduce( value.GetType().ToItem(), tuple => tuple.Item1.FindConstructor( tuple.Item2 ) ).FirstAssigned();
+			var activator = ParameterConstructorDelegateFactory<object, ICommand<IWritableParameterizedConfiguration<TKey, TValue>>>.Make( constructor );
+			var command = activator( value );
+			command.Execute( parameter );
+		}
+	}*/
 
-		protected override TValue Get( TKey key ) => Value.Create( key );
+	public class ApplyFactoryConfigurationCommand<T> : ApplyFactoryConfigurationCommand<object, T>
+	{
+		public ApplyFactoryConfigurationCommand() {}
+
+		public ApplyFactoryConfigurationCommand( IFactory<object, T> factory ) : base( factory ) {}
+	}
+
+	public class ApplyFactoryConfigurationCommand<TKey, TValue> : ApplyConfigurationCommandBase<TKey, TValue>
+	{
+		public ApplyFactoryConfigurationCommand() {}
+
+		public ApplyFactoryConfigurationCommand( IFactory<TKey, TValue> factory )
+		{
+			Factory = factory;
+		}
+
+		public IFactory<TKey, TValue> Factory { get; set; }
+
+		protected override TValue Get( TKey key ) => Factory.Create( key );
 	}
 
 	public abstract class ApplyConfigurationCommandBase<TKey, TValue> : DeclarativeCommandBase<IWritableParameterizedConfiguration<TKey, TValue>>
 	{
 		readonly Func<TKey, TValue> get;
+		
+		readonly FixedStore<Func<TKey, TValue>> store = new FixedStore<Func<TKey, TValue>>();
 
 		protected ApplyConfigurationCommandBase()
 		{
@@ -92,15 +125,34 @@ namespace DragonSpark.Configuration
 
 		protected abstract TValue Get( TKey key );
 
-		public override void Execute( object parameter ) => Parameter.Assign( get );
+		public override void Execute( object _ )
+		{
+			var aware = Parameter as IStoreAware<Func<TKey, TValue>>;
+			if ( aware != null )
+			{
+				store.Assign( aware.Value );
+			}
+
+			Parameter.Assign( get );
+		}
+
+		protected override void OnDispose()
+		{
+			if ( store.Value != null )
+			{
+				Parameter.Assign( store.Value );
+				store.Dispose();
+			}
+		}
 	}
 
-	[ContentProperty( nameof(Value) )]
-	public abstract class ApplyValueConfigurationCommandBase<TKey, TValue> : ApplyConfigurationCommandBase<TKey, TValue>
+	public class ApplyValueConfigurationCommand<TKey, TValue> : ApplyConfigurationCommandBase<TKey, TValue>
 	{
-		protected ApplyValueConfigurationCommandBase( TValue defaultValue )
+		public ApplyValueConfigurationCommand() {}
+
+		public ApplyValueConfigurationCommand( TValue value )
 		{
-			Value = defaultValue;
+			Value = value;
 		}
 
 		public TValue Value { get; set; }
@@ -108,9 +160,11 @@ namespace DragonSpark.Configuration
 		protected override TValue Get( TKey key ) => Value;
 	}
 
-	public abstract class DeclarativeParameterizedConfigurationBase<T> : ApplyValueConfigurationCommandBase<object, T>
+	public class ApplyValueConfigurationCommand<T> : ApplyValueConfigurationCommand<object, T>
 	{
-		protected DeclarativeParameterizedConfigurationBase( T defaultValue ) : base( defaultValue ) {}
+		public ApplyValueConfigurationCommand() {}
+
+		public ApplyValueConfigurationCommand( T value ) : base( value ) {}
 	}
 
 	public interface IParameterizedConfiguration<out T> : IParameterizedConfiguration<object, T> {}
@@ -137,7 +191,7 @@ namespace DragonSpark.Configuration
 		void Assign( Func<T> factory );
 	}
 
-	public abstract class ConfigurationBase<T> : IWritableConfiguration<T>
+	public abstract class ConfigurationBase<T> : IWritableConfiguration<T>, IStoreAware<Func<T>>
 	{
 		readonly IWritableStore<Func<T>> store;
 
@@ -151,6 +205,8 @@ namespace DragonSpark.Configuration
 		public void Assign( Func<T> item ) => store.Assign( item );
 
 		public T Get() => store.Value();
+
+		Func<T> IStoreAware<Func<T>>.Value => store.Value;
 	}
 
 	public static class ConfigurationExtensions

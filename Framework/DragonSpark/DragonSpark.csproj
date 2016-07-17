@@ -179,7 +179,7 @@
     <Compile Include="Activation\ParameterAware.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Activation\Factory.cs" />
-    <Compile Include="Activation\IExecutionContext.cs" />
+    <Compile Include="Activation\IExecutionContextStore.cs" />
     <Compile Include="Activation\IoC\DefaultRegistrationsExtension.cs" />
     <Compile Include="Activation\IoC\ExportDescriptorProvider.cs" />
     <Compile Include="Activation\IoC\IsRegisteredSpecification.cs" />

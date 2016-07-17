@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using ExecutionContext = DragonSpark.Testing.Framework.ExecutionContext;
 
 namespace DragonSpark.Testing
 {
@@ -17,7 +16,7 @@ namespace DragonSpark.Testing
 
 		public static void Verify( MethodBase method )
 		{
-			var current = ExecutionContext.Instance.Value;
+			var current = MethodContext.Instance.Value;
 			if ( method != null && current != method )
 			{
 				throw new InvalidOperationException( $"Assigned Method is different from expected.  Expected: {method}.  Actual: {current}" );
@@ -27,8 +26,8 @@ namespace DragonSpark.Testing
 		[Fact]
 		public void Fact()
 		{
-			Assert.Equal( ExecutionContextHost.Instance.Value, TaskContext.Current() );
-			Assert.Null( ExecutionContext.Instance.Value );
+			Assert.Equal( TaskContextStore.Instance.Value, TaskContext.Current() );
+			Assert.Null( MethodContext.Instance.Value );
 		}
 
 		[Theory, ExecutionContextAutoData]
@@ -36,9 +35,8 @@ namespace DragonSpark.Testing
 		{
 			var method = new Action( Theory ).Method;
 			Verify( method );
-			Assert.Equal( ExecutionContextHost.Instance.Value, TaskContext.Current() );
-			Assert.NotNull( ExecutionContext.Instance.Value );
-			Assert.Equal( method, ExecutionContext.Instance.Value );
+			Assert.Equal( ExecutionContextStore.Instance.Value.Origin, TaskContext.Current() );
+			Assert.Equal( method, MethodContext.Instance.Value );
 		}
 /*
 		[Fact, Wrapper]
@@ -68,31 +66,31 @@ namespace DragonSpark.Testing
 		[Fact]
 		public Task Fact()
 		{
-			var current = ExecutionContext.Instance.Value;
-			Assert.Equal( ExecutionContextHost.Instance.Value, TaskContext.Current() );
+			var current = ExecutionContextStore.Instance.Value;
+			Assert.Equal( ExecutionContextStore.Instance.Value.Origin, TaskContext.Current() );
 			Assert.Null( current );
 			return Task.Run( () =>
 							 {
-								 Assert.Same( current, ExecutionContext.Instance.Value );
-								 Assert.NotEqual( ExecutionContextHost.Instance.Value, TaskContext.Current() );
-								 Assert.Null( ExecutionContext.Instance.Value );
+								 Assert.Same( current, ExecutionContextStore.Instance.Value );
+								 Assert.NotEqual( ExecutionContextStore.Instance.Value.Origin, TaskContext.Current() );
+								 Assert.Null( MethodContext.Instance.Value );
 							 } );
 		}
 
 		[Theory, ExecutionContextAutoData]
 		public Task Theory()
 		{
-			var current = ExecutionContext.Instance.Value;
-			Assert.Equal( ExecutionContextHost.Instance.Value, TaskContext.Current() );
+			var current = ExecutionContextStore.Instance.Value;
+			Assert.Equal( TaskContextStore.Instance.Value, TaskContext.Current() );
 			var method = new Func<Task>( Theory ).Method;
-			Assert.Equal( method, ExecutionContext.Instance.Value );
+			Assert.Equal( method, MethodContext.Instance.Value );
 			return Task.Run( () =>
 							 {
-								Assert.Same( current, ExecutionContext.Instance.Value );
+								Assert.Same( current, ExecutionContextStore.Instance.Value );
 								TaskExecutionContextTests.Verify( method );
-								Assert.NotEqual( ExecutionContextHost.Instance.Value, TaskContext.Current() );
-								Assert.NotNull( ExecutionContext.Instance.Value );
-								Assert.Equal( method, ExecutionContext.Instance.Value );
+								Assert.NotEqual( ExecutionContextStore.Instance.Value.Origin, TaskContext.Current() );
+								Assert.NotNull( MethodContext.Instance.Value );
+								Assert.Equal( method, MethodContext.Instance.Value );
 							 } );
 		}
 /*

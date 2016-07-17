@@ -19,13 +19,13 @@ namespace DragonSpark.Testing.Framework
 	public static class Configure
 	{
 		[ModuleInitializer( 0 )]
-		public static void Initialize() => ExecutionContextRepository.Instance.Add( ExecutionContext.Instance );
+		public static void Initialize() => ExecutionContextRepository.Instance.Add( ExecutionContextStore.Instance );
 	}
 
-	public class ExecutionContextHost : TaskLocalStore<TaskContext>
+	public class TaskContextStore : TaskLocalStore<TaskContext>
 	{
-		public static ExecutionContextHost Instance { get; } = new ExecutionContextHost();
-		ExecutionContextHost() {}
+		public static TaskContextStore Instance { get; } = new TaskContextStore();
+		TaskContextStore() {}
 
 		protected override TaskContext Get()
 		{
@@ -42,36 +42,49 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class ExecutionContext : WritableStore<MethodBase>, IExecutionContext
+	public class ExecutionContextStore : StoreBase<ExecutionContext>, IExecutionContextStore
 	{
-		public static ExecutionContext Instance { get; } = new ExecutionContext( ExecutionContextHost.Instance );
+		public static ExecutionContextStore Instance { get; } = new ExecutionContextStore( TaskContextStore.Instance );
 
-		readonly ConcurrentDictionary<TaskContext, MethodBase> entries = new ConcurrentDictionary<TaskContext, MethodBase>();
+		readonly ConcurrentDictionary<TaskContext, ExecutionContext> entries = new ConcurrentDictionary<TaskContext, ExecutionContext>();
 		readonly IStore<TaskContext> store;
+		readonly Func<TaskContext, ExecutionContext> create;
+		readonly Action<TaskContext> remove;
 
-		ExecutionContext( IStore<TaskContext> store )
+		ExecutionContextStore( IStore<TaskContext> store )
 		{
 			this.store = store;
+			create = Create;
+			remove = Remove;
 		}
 
-		protected override MethodBase Get()
+		protected override ExecutionContext Get() => entries.GetOrAdd( store.Value, create );
+
+		ExecutionContext Create( TaskContext context ) => new ExecutionContext( context, remove );
+
+		void Remove( TaskContext obj )
 		{
-			MethodBase method;
-			var result = entries.TryGetValue( store.Value, out method ) ? method : null;
-			return result;
+			ExecutionContext removed;
+			entries.TryRemove( obj, out removed );
 		}
-		
-		public override void Assign( MethodBase item )
+	}
+
+	public class ExecutionContext : Disposable
+	{
+		readonly Action<TaskContext> complete;
+
+		internal ExecutionContext( TaskContext origin, Action<TaskContext> complete )
 		{
-			var key = store.Value;
-			if ( item != null )
-			{
-				entries.TryAdd( key, item );
-			}
-			else
-			{
-				entries.TryRemove( key, out item );
-			}
+			this.complete = complete;
+			Origin = origin;
+		}
+
+		public TaskContext Origin { get; }
+
+		protected override void OnDispose( bool disposing )
+		{
+			base.OnDispose( disposing );
+			complete( Origin );
 		}
 	}
 
@@ -107,9 +120,15 @@ namespace DragonSpark.Testing.Framework
 		public static bool operator !=( TaskContext left, TaskContext right ) => !left.Equals( right );
 	}
 
+	public class MethodContext : ExecutionContextStore<MethodBase>
+	{
+		public static MethodContext Instance { get; } = new MethodContext();
+		MethodContext() {}
+	}
+
 	public class TestingFrameworkInitializationCommand : InitializationCommandBase
 	{
-		public TestingFrameworkInitializationCommand( MethodBase method ) : base( /*AssignExecutionContextCommand.Instance.Fixed( ExecutionContext.Instance ),*/ new AssignValueCommand<MethodBase>( ExecutionContext.Instance ).Fixed( method ) ) {}
+		public TestingFrameworkInitializationCommand( MethodBase method ) : base( new AssignValueCommand<MethodBase>( MethodContext.Instance ).Fixed( method ) ) {}
 	}
 
 	public class LoadPartsCommand : DisposingCommand<Assembly>

@@ -13,13 +13,7 @@ namespace DragonSpark.TypeSystem
 	public class AttributeProviderHost : ParameterizedConfiguration<IAttributeProvider>
 	{
 		public static AttributeProviderHost Instance { get; } = new AttributeProviderHost();
-		AttributeProviderHost() : base( Factory.Instance.Create ) {}
-
-		class Factory : ParameterConstructedCompositeFactory<IAttributeProvider>
-		{
-			public static Factory Instance { get; } = new Factory();
-			Factory() : base( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ) {}
-		}
+		AttributeProviderHost() : base( new ParameterConstructedCompositeFactory<IAttributeProvider>( typeof(ParameterInfoAttributeProvider), typeof(AssemblyAttributeProvider), typeof(ObjectAttributeProvider) ).Create ) {}
 	}
 	
 	class ObjectAttributeProvider : FixedFactory<object, IAttributeProvider>

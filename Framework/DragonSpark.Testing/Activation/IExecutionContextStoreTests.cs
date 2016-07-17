@@ -2,7 +2,7 @@
 
 namespace DragonSpark.Testing.Activation
 {
-	public class IExecutionContextTests
+	public class IExecutionContextStoreTests
 	{
 		[Fact]
 		public void Item()

@@ -4,11 +4,13 @@ using System.Composition;
 namespace DragonSpark.Testing.Parts.Development
 {
 	[Export( typeof(IInitializationCommand) )]
-	public partial class Configure
+	public partial class InitializationCommand
 	{
-		public Configure()
+		public InitializationCommand()
 		{
 			InitializeComponent();
 		}
 	}
+
+	public class ApplyEnableMethodCachingConfiguration : ApplyValueConfigurationCommand<bool> {}
 }

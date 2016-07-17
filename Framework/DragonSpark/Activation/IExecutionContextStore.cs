@@ -9,28 +9,28 @@ using System.Linq;
 namespace DragonSpark.Activation
 {
 	[Priority( Priority.Low )]
-	class ExecutionContext : StoreBase<IExecutionContext>, IExecutionContext
+	class ExecutionContextStore : StoreBase<IExecutionContextStore>, IExecutionContextStore
 	{
-		public static ExecutionContext Instance { get; } = new ExecutionContext();
-		ExecutionContext() {}
+		public static ExecutionContextStore Instance { get; } = new ExecutionContextStore();
+		ExecutionContextStore() {}
 
-		protected override IExecutionContext Get() => this;
+		protected override IExecutionContextStore Get() => this;
 	}
 
-	public class ExecutionContextLocator : DeferredStore<IExecutionContext>
+	public class ExecutionContextLocator : DeferredStore<IExecutionContextStore>
 	{
 		public static ExecutionContextLocator Instance { get; } = new ExecutionContextLocator();
 		ExecutionContextLocator() : base( () => ExecutionContextRepository.Instance.List().First() ) {}
 	}
 	
 	[ReaderWriterSynchronized]
-	public sealed class ExecutionContextRepository : RepositoryBase<IExecutionContext>
+	public sealed class ExecutionContextRepository : RepositoryBase<IExecutionContextStore>
 	{
 		public static ExecutionContextRepository Instance { get; } = new ExecutionContextRepository();
-		ExecutionContextRepository() : base( EnumerableEx.Return( ExecutionContext.Instance ) ) {}
+		ExecutionContextRepository() : base( EnumerableEx.Return( ExecutionContextStore.Instance ) ) {}
 
 		[Writer]
-		protected override void OnAdd( IExecutionContext entry ) => Store.Ensure( entry );
+		protected override void OnAdd( IExecutionContextStore entry ) => Store.Ensure( entry );
 
 		/*[Writer]
 		protected override void OnInsert( IExecutionContext entry )
@@ -51,16 +51,12 @@ namespace DragonSpark.Activation
 		protected override IEnumerable<IExecutionContext> Query() => Store;*/
 	}
 
-	/*public class MethodContext : ExecutionContextCachedBase<MethodBase>
-	{
-		public static MethodContext Instance { get; } = new MethodContext();
-		MethodContext() {}
-	}*/
-
-	public interface IExecutionContext : IStore {}
+	public interface IExecutionContextStore : IStore {}
 
 	public class ExecutionContextStore<T> : ExecutionContextStoreBase<T> where T : class
 	{
+		public ExecutionContextStore() : base( new Cache<T>() ) {}
+
 		public ExecutionContextStore( T reference ) : base( new Cache<T>() )
 		{
 			Assign( reference );

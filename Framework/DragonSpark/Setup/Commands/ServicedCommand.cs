@@ -15,7 +15,7 @@ namespace DragonSpark.Setup.Commands
 		public override void Execute( object parameter ) => Command.Run( Parameter );
 	}
 
-	public abstract class DeclarativeCommandBase<T> : CommandBase<object>
+	public abstract class DeclarativeCommandBase<T> : DisposingCommand<object>
 	{
 		protected DeclarativeCommandBase() : base( Specifications.Always ) {}
 

@@ -16,9 +16,6 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void BasicContext()
 		{
-			Assert.IsType<Framework.ExecutionContext>( ExecutionContextLocator.Instance.Value );
-			Assert.Null( Defaults.ExecutionContext() );
-
 			LoggerConfigurationsConfiguration.Instance.Assign( RecordingLoggerConfigurationsFactory.Instance.Create );
 
 			var level = MinimumLevelConfiguration.Instance;

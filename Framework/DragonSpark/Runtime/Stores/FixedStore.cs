@@ -16,6 +16,8 @@ namespace DragonSpark.Runtime.Stores
 		protected virtual void OnAssign( T item ) => reference = item;
 
 		protected override T Get() => reference;
+
+		protected override void OnDispose() => reference = default(T);
 	}
 
 	// public class DictionaryStore<T>

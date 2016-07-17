@@ -1,8 +1,10 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using System.Reflection;
 using Xunit;
+using ExecutionContextStore = DragonSpark.Testing.Framework.ExecutionContextStore;
 
 namespace DragonSpark.Testing.Activation
 {
@@ -11,14 +13,25 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void Assignment()
 		{
-			Assert.IsType<object>( Defaults.ExecutionContext() );
+			Assert.IsType<ExecutionContextStore>( ExecutionContextLocator.Instance.Value );
+			var current = Assert.IsType<ExecutionContext>( Defaults.ExecutionContext() );
+			Assert.Same( ExecutionContextStore.Instance.Value, current );
+			Assert.Equal( TaskContextStore.Instance.Value, current.Origin );
+			Assert.Null( MethodContext.Instance.Value );
+			Assert.True( EnableMethodCaching.Instance.Default() );
 
-			using ( var command = new TestingApplicationInitializationCommand( MethodBase.GetCurrentMethod() ).Run( default(object) ) )
+			var method = MethodBase.GetCurrentMethod();
+			using ( var command = new TestingApplicationInitializationCommand( method ).Run( default(object) ) )
 			{
-				Assert.IsType<MethodBase>( Defaults.ExecutionContext() );
+				Assert.NotNull( MethodContext.Instance.Value );
+				Assert.Same( method, MethodContext.Instance.Value );
+
+				Assert.False( EnableMethodCaching.Instance.Default() );
 			}
 
-			Assert.IsType<object>( Defaults.ExecutionContext() );
+			Assert.Null( MethodContext.Instance.Value );
+
+			Assert.True( EnableMethodCaching.Instance.Default() );
 		}
 	}
 }

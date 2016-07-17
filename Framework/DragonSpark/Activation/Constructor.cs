@@ -172,7 +172,7 @@ namespace DragonSpark.Activation
 		public ParameterExpression Parameter { get; }
 	}
 
-	struct ExpressionBodyParameter<T>
+	public struct ExpressionBodyParameter<T>
 	{
 		public ExpressionBodyParameter( T input, ParameterExpression parameter )
 		{
@@ -240,7 +240,7 @@ namespace DragonSpark.Activation
 		protected override ParameterExpression Get() => expression;
 	}*/
 
-	abstract class CompiledDelegateFactoryBase<TParameter, TResult> // : FactoryBase<TParameter, TResult>
+	public abstract class CompiledDelegateFactoryBase<TParameter, TResult> // : FactoryBase<TParameter, TResult>
 	{
 		readonly ParameterExpression parameterExpression;
 		readonly Func<ExpressionBodyParameter<TParameter>, Expression> bodySource;
