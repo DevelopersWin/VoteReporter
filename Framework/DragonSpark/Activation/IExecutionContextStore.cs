@@ -31,35 +31,32 @@ namespace DragonSpark.Activation
 
 		[Writer]
 		protected override void OnAdd( IExecutionContextStore entry ) => Store.Ensure( entry );
-
-		/*[Writer]
-		protected override void OnInsert( IExecutionContext entry )
-		{
-			if ( !Store.Contains( entry ) )
-			{
-				base.OnInsert( entry );
-			}
-		}*/
-
-		/*[Reader]
-		public object Current() => Get<object>();
-
-		[Reader]
-		public T Get<T>() => Query().Select( context => context.Value ).OfType<T>().FirstAssigned();*/
-
-		/*[Reader]
-		protected override IEnumerable<IExecutionContext> Query() => Store;*/
 	}
 
 	public interface IExecutionContextStore : IStore {}
 
 	public class ExecutionContextStore<T> : ExecutionContextStoreBase<T> where T : class
 	{
+		readonly IWritableStore<T> reference = new FixedStore<T>();
 		public ExecutionContextStore() : base( new Cache<T>() ) {}
 
 		public ExecutionContextStore( T reference ) : base( new Cache<T>() )
 		{
 			Assign( reference );
+		}
+
+		protected override T Get() => base.Get() ?? Reassign();
+
+		T Reassign()
+		{
+			Assign( reference.Value );
+			return base.Get();
+		}
+
+		protected override void OnAssign( T item )
+		{
+			reference.Assign( item );
+			base.OnAssign( item );
 		}
 	}
 

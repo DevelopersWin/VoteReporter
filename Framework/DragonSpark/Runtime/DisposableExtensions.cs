@@ -44,6 +44,19 @@ namespace DragonSpark.Runtime
 		}
 	}
 
+	public sealed class DisposeDisposableCommand : DisposingCommand<object>
+	{
+		readonly IDisposable disposable;
+		public DisposeDisposableCommand( IDisposable disposable )
+		{
+			this.disposable = disposable;
+		}
+
+		public override void Execute( object parameter ) {}
+
+		protected override void OnDispose() => disposable.Dispose();
+	}
+
 	public sealed class DisposeAssociatedCommand : CommandBase<IDisposable>
 	{
 		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand( AssociatedDisposables.Instance );

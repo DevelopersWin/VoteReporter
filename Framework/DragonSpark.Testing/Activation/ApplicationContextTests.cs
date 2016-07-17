@@ -25,9 +25,13 @@ namespace DragonSpark.Testing.Activation
 			{
 				Assert.NotNull( MethodContext.Instance.Value );
 				Assert.Same( method, MethodContext.Instance.Value );
-
+				Assert.Same( current, Defaults.ExecutionContext() );
 				Assert.False( EnableMethodCaching.Instance.Default() );
 			}
+
+			var context = Defaults.ExecutionContext();
+			Assert.NotNull( context );
+			Assert.NotSame( current, context );
 
 			Assert.Null( MethodContext.Instance.Value );
 

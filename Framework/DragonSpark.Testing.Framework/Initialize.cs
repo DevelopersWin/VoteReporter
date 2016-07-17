@@ -1,120 +1,165 @@
+using DragonSpark.Activation;
+using DragonSpark.Configuration;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Stores;
+using DragonSpark.Windows.Runtime;
+using DragonSpark.Windows.TypeSystem;
+using PostSharp.Aspects;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.Composition.Hosting;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+
 namespace DragonSpark.Testing.Framework
 {
-	/*public sealed class Runtime : SpecificationBasedAspect
+	public static class Initialize
 	{
-		readonly static ISpecification Specification = JetBrainsAppDomainSpecification.Instance.Inverse().And( RuntimeSpecification.Instance );
+		[ModuleInitializer( 0 )]
+		public static void Execute() => ExecutionContextRepository.Instance.Add( ExecutionContextStore.Instance );
+	}
 
-		public Runtime() : base( Specification ) {}
-	}*/
-
-	/*class JetBrainsAppDomainSpecification : SpecificationBase<object>
+	public class TaskContextStore : TaskLocalStore<TaskContext>
 	{
-		readonly AppDomain domain;
-		public static JetBrainsAppDomainSpecification Instance { get; } = new JetBrainsAppDomainSpecification();
+		public static TaskContextStore Instance { get; } = new TaskContextStore();
+		TaskContextStore() {}
 
-		public JetBrainsAppDomainSpecification() : this( AppDomain.CurrentDomain ) {}
-
-		public JetBrainsAppDomainSpecification( AppDomain domain )
+		protected override TaskContext Get()
 		{
-			this.domain = domain;
+			var current = base.Get();
+			var result = current == default(TaskContext) ? Create() : current;
+			return result;
 		}
 
-		public override bool IsSatisfiedBy( object parameter ) => domain.FriendlyName.Contains( JetBrainsEnvironment.JetbrainsResharperTaskrunner );
-	}
-
-	public static class JetBrainsEnvironment
-	{
-		public const string JetbrainsResharperTaskrunner = "JetBrains.ReSharper.TaskRunner";
-	}
-
-	public class JetBrainsApplicationDomainFactory : FactoryBase<AppDomain>
-	{
-		public static JetBrainsApplicationDomainFactory Instance { get; } = new JetBrainsApplicationDomainFactory();
-
-		readonly Func<ImmutableArray<AppDomain>> source;
-
-		JetBrainsApplicationDomainFactory() : this( AppDomainFactory.Instance.Create ) {}
-
-		public JetBrainsApplicationDomainFactory( [Required] Func<ImmutableArray<AppDomain>> source )
+		TaskContext Create()
 		{
-			this.source = source;
-		}
-
-		[Freeze]
-		protected override AppDomain CreateItem() => source().Except( AppDomain.CurrentDomain.ToItem() ).FirstOrDefault( JetBrainsAppDomainSpecification.Instance.IsSatisfiedBy );
-	}
-
-	public class AppDomainFactory : FactoryBase<ImmutableArray<AppDomain>>
-	{
-		public static AppDomainFactory Instance { get; } = new AppDomainFactory();
-
-		// #pragma warning disable 3305
-		[Freeze]
-		protected override ImmutableArray<AppDomain> CreateItem()
-		{
-			var enumHandle = IntPtr.Zero;
-			var host = new CorRuntimeHostClass();
-
-			var items = new List<AppDomain>();
-
-			try
-			{
-				host.EnumDomains( out enumHandle );
-
-				object domain;
-				host.NextDomain( enumHandle, out domain );
-				while ( domain != null )
-				{
-					items.Add( (AppDomain)domain );
-					host.NextDomain( enumHandle, out domain );
-				}
-			}
-			catch ( InvalidCastException ) {}
-			finally
-			{
-				if ( enumHandle != IntPtr.Zero )
-				{
-					host.CloseEnum( enumHandle );
-				}
-
-				Marshal.ReleaseComObject( host );	
-			}
-			var result = items.ToImmutableArray();
+			var result = TaskContext.Current();
+			Assign( result );
 			return result;
 		}
 	}
 
-	public class JetBrainsAssemblyLoaderFactory : FactoryBase<string, AssemblyLoader>
+	public class ExecutionContextStore : StoreBase<ExecutionContext>, IExecutionContextStore
 	{
-		public static JetBrainsAssemblyLoaderFactory Instance { get; } = new JetBrainsAssemblyLoaderFactory();
+		public static ExecutionContextStore Instance { get; } = new ExecutionContextStore( TaskContextStore.Instance );
 
-		readonly Func<AppDomain> source;
+		readonly ConcurrentDictionary<TaskContext, ExecutionContext> entries = new ConcurrentDictionary<TaskContext, ExecutionContext>();
+		readonly IStore<TaskContext> store;
+		readonly Func<TaskContext, ExecutionContext> create;
+		readonly Action<TaskContext> remove;
 
-		public JetBrainsAssemblyLoaderFactory() : this( JetBrainsApplicationDomainFactory.Instance.Create ) {}
-
-		public JetBrainsAssemblyLoaderFactory( [Required] Func<AppDomain> source )
+		ExecutionContextStore( IStore<TaskContext> store )
 		{
-			this.source = source;
+			this.store = store;
+			create = Create;
+			remove = Remove;
 		}
 
-		protected override AssemblyLoader CreateItem( string parameter ) => source.Use( domain => new ApplicationDomainProxyFactory<AssemblyLoader>( domain ).CreateUsing( parameter ) );
+		protected override ExecutionContext Get() => entries.GetOrAdd( store.Value, create );
+
+		ExecutionContext Create( TaskContext context ) => new ExecutionContext( context, remove );
+
+		void Remove( TaskContext obj )
+		{
+			ExecutionContext removed;
+			entries.TryRemove( obj, out removed );
+		}
 	}
 
-	public class InitializeJetBrainsTaskRunnerCommand : CommandBase<AppDomainSetup>
+	public class ExecutionContext : Disposable
 	{
-		public static InitializeJetBrainsTaskRunnerCommand Instance { get; } = new InitializeJetBrainsTaskRunnerCommand();
+		readonly Action<TaskContext> complete;
 
-		readonly Func<string, AssemblyLoader> source;
+		internal ExecutionContext( TaskContext origin, Action<TaskContext> complete )
+		{
+			this.complete = complete;
+			Origin = origin;
+		}
 
-		public InitializeJetBrainsTaskRunnerCommand() : this( JetBrainsAssemblyLoaderFactory.Instance.Create ) {}
+		public TaskContext Origin { get; }
 
-		public InitializeJetBrainsTaskRunnerCommand( [Required] Func<string, AssemblyLoader> source )
+		protected override void OnDispose( bool disposing )
+		{
+			base.OnDispose( disposing );
+			complete( Origin );
+		}
+	}
+
+	public struct TaskContext : IEquatable<TaskContext>
+	{
+		public static TaskContext Current() => new TaskContext( Environment.CurrentManagedThreadId, Task.CurrentId );
+
+		readonly int threadId;
+		readonly int? taskId;
+
+		public TaskContext( int threadId, int? taskId = null )
+		{
+			this.threadId = threadId;
+			this.taskId = taskId;
+		}
+
+		public override string ToString() => $"Task {taskId} on thread {threadId}";
+
+		public bool Equals( TaskContext other ) => taskId == other.taskId && threadId == other.threadId;
+
+		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && obj is TaskContext && Equals( (TaskContext)obj );
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return taskId.GetHashCode() * 397 ^ threadId;
+			}
+		}
+
+		public static bool operator ==( TaskContext left, TaskContext right ) => left.Equals( right );
+
+		public static bool operator !=( TaskContext left, TaskContext right ) => !left.Equals( right );
+	}
+
+	public class MethodContext : ExecutionContextStore<MethodBase>
+	{
+		public static MethodContext Instance { get; } = new MethodContext();
+		MethodContext() {}
+	}
+
+	public class TestingFrameworkInitializationCommand : InitializationCommandBase
+	{
+		public TestingFrameworkInitializationCommand( MethodBase method ) : base( new AssignValueCommand<MethodBase>( MethodContext.Instance ).Fixed( method ), new DisposeDisposableCommand( ExecutionContextStore.Instance.Value ) ) {}
+	}
+
+	public class LoadPartsCommand : DisposingCommand<Assembly>
+	{
+		public static LoadPartsCommand Instance { get; } = new LoadPartsCommand();
+		LoadPartsCommand() : this( AssemblyPartLocator.Instance.Create ) {}
+
+		readonly Func<Assembly, ImmutableArray<Assembly>> source;
+
+		public LoadPartsCommand( Func<Assembly, ImmutableArray<Assembly>> source )
 		{
 			this.source = source;
 		}
 
-		public override void Execute( AppDomainSetup parameter ) => source( parameter.ApplicationBase ).With( loader => loader.Initialize() );
-	}*/
+		public override void Execute( Assembly parameter ) => LoadCommand( parameter ).Run();
 
+		CompositeCommand LoadCommand( Assembly parameter )
+		{
+			var parts = source( parameter ).ToArray();
+			var commands = new ContainerConfiguration().WithAssemblies( parts ).CreateContainer().GetExports<IInitializationCommand>().Fixed();
+			var result = new CompositeCommand( commands );
+			this.AssociateForDispose( result );
+			return result;
+		}
+	}
 
+	public class TestingApplicationInitializationCommand : InitializationCommandBase
+	{
+		public TestingApplicationInitializationCommand( MethodBase method ) 
+			: base( new Windows.InitializationCommand(), new TestingFrameworkInitializationCommand( method ), LoadPartsCommand.Instance.Fixed( method.DeclaringType.Assembly ) ) {}
+	}
+
+	class WindowsTestingApplicationInitializationCommand {}
 }
