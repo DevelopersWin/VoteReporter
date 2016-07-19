@@ -6,12 +6,10 @@ using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
 {
-	/*[AssemblyProvider.Register]*/
-	/*[AssemblyProvider.Types]*/
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class KnownTypesTests
 	{
-		[Theory, AutoData( false, typeof(Class), typeof(ClassWithProperty), typeof(Derived) )]
+		[Theory, AutoData, AdditionalTypes( false, typeof(Class), typeof(ClassWithProperty), typeof(Derived) )]
 		public void Testing( KnownTypes sut )
 		{
 			var parameter = typeof(Class);

@@ -1,9 +1,9 @@
 namespace DragonSpark.Runtime.Stores
 {
-	public interface IStoreAware<out T>
+	/*public interface IStoreAware<out T>
 	{
 		T Value { get; }
-	}
+	}*/
 
 	public interface IStore
 	{

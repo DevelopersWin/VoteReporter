@@ -214,6 +214,7 @@
     <Compile Include="Initialize.cs" />
     <Compile Include="Diagnostics\PerformanceSupport.cs" />
     <Compile Include="Diagnostics\TracingProfilerFactory.cs" />
+    <Compile Include="IoC\AutoDataAttribute.cs" />
     <Compile Include="OutputAttribute.cs" />
     <Compile Include="Setup\Execution.cs" />
     <Compile Include="Setup\AutoDataMoqConfiguredAttribute.cs" />

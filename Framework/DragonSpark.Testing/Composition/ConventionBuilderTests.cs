@@ -44,7 +44,7 @@ namespace DragonSpark.Testing.Composition
 
 		// [RegisterService( typeof(Assembly[]) )]
 
-		[Theory, AutoData( false )]
+		[Theory, AutoData, AdditionalTypes( false )]
 		public void LocalData( [Service]ImmutableArray<Type> sut, [Service]ImmutableArray<Assembly> assemblies )
 		{
 			var items = sut.Fixed();

@@ -1,9 +1,11 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Testing.TestObjects;
@@ -12,11 +14,8 @@ using Microsoft.Practices.Unity;
 using Moq;
 using Ploeh.AutoFixture.Xunit2;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Composition;
-using System.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -410,15 +409,15 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void EnsureActivatorResolvesAsExpected( IActivator activator )
 		{
-			var locator = activator.Activate<Assembly>();
-			Assert.NotNull( locator );
+			var assembly = activator.Activate<Assembly>();
+			Assert.NotNull( assembly );
+			Assert.Equal( GetType().Assembly, assembly );
 		}
 
-		[Theory, LocationSetup.AutoData]
-		public void BasicComposition( [DragonSpark.Testing.Framework.Parameters.Service]Assembly[] assemblies, IUnityContainer container )
+		[Theory, LocationSetup.AutoData, AdditionalTypes( false, typeof(Windows.Runtime.ApplicationAssemblyLocator) )]
+		public void BasicComposition( IUnityContainer container )
 		{
-			var provider = new AssemblyBasedServiceProviderFactory( assemblies ).Create();
-			using ( var host = provider.Get<CompositionHost>() )
+			using ( var host = CompositionHostFactory.Instance.Create() )
 			{
 				var assembly = host.GetExport<Assembly>();
 				Assert.NotNull( assembly );
@@ -495,7 +494,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{ }
 	}
 
-	[Export]
+	/*[Export]
 	public class ServiceLocatorFactory : FactoryBase<IServiceLocator>
 	{
 		readonly Func<IServiceProvider> source;
@@ -514,5 +513,5 @@ namespace DragonSpark.Windows.Testing.Setup
 			var result = provider.Get<IServiceLocator>();
 			return result;
 		}
-	}
+	}*/
 }

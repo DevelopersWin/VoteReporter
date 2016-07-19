@@ -8,24 +8,6 @@ using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
-	/*public class TypeBasedServiceProviderFactory : ServiceProviderFactory
-	{
-		public TypeBasedServiceProviderFactory( IEnumerable<Type> types ) : base( new TypeBasedConfigurationContainerFactory( types ) ) {}
-	}*/
-
-	/*public class AssemblyBasedServiceProviderFactory : ServiceProviderFactoryBase<IEnumerable<Assembly>>
-	{
-		public static AssemblyBasedServiceProviderFactory Instance { get; } = new AssemblyBasedServiceProviderFactory();
-		AssemblyBasedServiceProviderFactory() {}
-
-		public override IServiceProvider Create( IEnumerable<Assembly> parameter )
-		{
-			var assemblies = parameter.Fixed();
-			var result = base.Create( assemblies );
-			return result;
-		}
-	}*/
-
 	public sealed class ServiceProviderFactory : FactoryBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();

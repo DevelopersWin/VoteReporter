@@ -7,7 +7,6 @@ using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using PostSharp.Patterns.Contracts;
-using Serilog;
 using System;
 
 namespace DragonSpark.Activation.IoC
@@ -22,18 +21,14 @@ namespace DragonSpark.Activation.IoC
 
 	public class ServicesIntegrationExtension : UnityContainerExtension
 	{
-		readonly IServiceProvider provider;
-		readonly ILogger logger;
 		readonly Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
 		readonly ISpecification<LocateTypeRequest> specification;
 		readonly IStrategyRepository strategies;
 
-		public ServicesIntegrationExtension( IServiceProvider provider, IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( provider, provider.Get<ILogger>(), strategies, registry, ServiceProviderSpecificationFactory.Instance.Create( provider ) ) {}
+		public ServicesIntegrationExtension( IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( strategies, registry, ServiceProviderSpecificationFactory.Instance.Create( provider ) ) {}
 
-		ServicesIntegrationExtension( IServiceProvider provider, ILogger logger, IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
+		ServicesIntegrationExtension( IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
 		{
-			this.provider = provider;
-			this.logger = logger;
 			this.registry = registry;
 			this.specification = specification;
 			this.strategies = strategies;
@@ -41,7 +36,6 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
-			Container.RegisterInstance( logger );
 			Container.RegisterInstance( specification );
 
 			var policy = new ServicesBuildPlanPolicy( provider, registry );
@@ -53,9 +47,6 @@ namespace DragonSpark.Activation.IoC
 				new StrategyEntry( new ArrayResolutionStrategy( provider ), UnityBuildStage.Creation, Priority.BeforeNormal )
 			};
 			entries.Each( strategies.Add );
-
-			
-			// repository.Add( policy );
 		}
 	}
 

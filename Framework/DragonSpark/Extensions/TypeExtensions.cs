@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -22,7 +21,7 @@ namespace DragonSpark.Extensions
 		  return null;
 		}
 
-		public static ImmutableArray<Assembly> Assemblies( this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToImmutableArray();
+		public static ImmutableArray<Assembly> Assemblies( this ImmutableArray<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct().ToImmutableArray();
 
 		public static TypeAdapter Adapt( this Type @this ) => TypeAdapterCache.Default.Get( @this );
 

@@ -111,7 +111,7 @@ namespace DragonSpark.Runtime.Stores
 
 		protected virtual void OnDispose() {}
 
-		void IWritableStore.Assign( object item ) => Assign( coercer.Coerce( item ) );
+		void IAssignable.Assign( object item ) => Assign( coercer.Coerce( item ) );
 	}
 
 	/*public class ExecutionAssociatedStore<T> : AssociatedStore<T>

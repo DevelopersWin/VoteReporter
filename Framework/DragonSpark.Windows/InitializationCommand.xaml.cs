@@ -18,7 +18,7 @@ namespace DragonSpark.Windows
 		}
 	}
 
-	public class ApplyAttributeProviderConfiguration : ApplyFactoryConfigurationCommand<IAttributeProvider> {}
+	public class ApplyAttributeProviderConfiguration : ApplyParameterizedFactoryConfigurationCommand<IAttributeProvider> {}
 
 	[Priority( Priority.AfterNormal )]
 	class ExecutionContextStore : Store<AppDomain>, IExecutionContextStore

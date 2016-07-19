@@ -23,23 +23,25 @@ namespace DragonSpark.Runtime
 
 	public class AssignValueCommand<T> : DisposingCommand<T>
 	{
-		readonly IWritableStore<T> store;
+		readonly IAssignable<T> assignable;
 		readonly T current;
 
-		public AssignValueCommand( IWritableStore<T> store ) : this( store, store.Value ) {}
+		public AssignValueCommand( IWritableStore<T> store ) : this( store, store ) {}
 
-		public AssignValueCommand( IWritableStore<T> store, [Optional]T current )
+		public AssignValueCommand( IAssignable<T> assignable, IStore<T> store ) : this( assignable, store.Value ) {}
+
+		public AssignValueCommand( IAssignable<T> assignable, [Optional]T current )
 		{
-			this.store = store;
+			this.assignable = assignable;
 			this.current = current;
 		}
 
-		public override void Execute( T parameter ) => store.Assign( parameter );
+		public override void Execute( T parameter ) => assignable.Assign( parameter );
 
 		protected override void OnDispose()
 		{
-			store.TryDispose();
-			store.Assign( current );
+			assignable.TryDispose();
+			assignable.Assign( current );
 			base.OnDispose();
 		}
 	}

@@ -13,7 +13,7 @@ namespace DragonSpark.Windows.Entity
 	[Persistent]
 	class ActivationSource : IActivationSource
 	{
-		public static IWritableConfiguration<IActivationSource> Default { get; } = new Configuration<IActivationSource>( () => new ActivationSource( Activator.Instance.Get() ) );
+		public static IConfiguration<IActivationSource> Default { get; } = new Configuration<IActivationSource>( () => new ActivationSource( Activator.Instance.Get() ) );
 
 		readonly IActivator activator;
 

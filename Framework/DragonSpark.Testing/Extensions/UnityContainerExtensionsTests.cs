@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
@@ -7,6 +6,7 @@ using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
+using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Immutable;
@@ -14,7 +14,6 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using Xunit;
-using LoggingLevelSwitch = Serilog.Core.LoggingLevelSwitch;
 
 namespace DragonSpark.Testing.Extensions
 {
@@ -25,7 +24,7 @@ namespace DragonSpark.Testing.Extensions
 		public void TryResolve( [Factory]UnityContainer sut )
 		{
 			var creator = Creator.Default.Get( sut );
-			Assert.IsType<UnityContainerCoreFactory>( creator );
+			Assert.IsType<DragonSpark.Activation.IoC.UnityContainerFactory>( creator );
 
 			var provider = sut.Resolve<IServiceProvider>();
 			var sink = provider.Get<LoggerHistorySink>();

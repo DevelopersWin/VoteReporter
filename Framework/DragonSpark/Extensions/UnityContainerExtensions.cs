@@ -19,7 +19,7 @@ namespace DragonSpark.Extensions
 			}
 			catch ( Exception exception )
 			{
-				Logger.Instance.Get( container ).Debug( exception, "Could not resolve {Type} and {Name}", typeToResolve, name );
+				Logging.Instance.Get( container ).Debug( exception, "Could not resolve {Type} and {Name}", typeToResolve, name );
 				return null;
 			}
 		}

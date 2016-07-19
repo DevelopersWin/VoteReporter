@@ -1,6 +1,8 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Configuration;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -16,6 +18,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Xunit.Sdk;
+using ServiceProviderFactory = DragonSpark.Composition.ServiceProviderFactory;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -23,12 +26,12 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
 	{
 		readonly protected static Func<IApplication> DefaultApplicationSource = () => new Application();
-		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.ToDelegate();
+		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Create;
 
 		readonly IFactory<AutoData, IServiceProvider> providerSource;
 		readonly Func<IApplication> applicationSource;
 
-		public AutoDataAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : this( new Factory( includeFromParameters, additionalTypes ) ) {}
+		public AutoDataAttribute() : this( CachedServiceProviderFactory.Instance ) {}
 
 		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource ) : this( providerSource, DefaultApplicationSource ) {}
 		protected AutoDataAttribute( IFactory<AutoData, IServiceProvider> providerSource, Func<IApplication> applicationSource ) : this( DefaultFixtureFactory, providerSource, applicationSource ) {}
@@ -52,66 +55,95 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance[]>( info => new AspectInstance( info, ExecuteMethodAspect.Instance ).ToItem() );
 
-		class Factory : FactoryBase<AutoData, IServiceProvider>
+		/*class CachedServiceProviderFactory : CachedServiceProviderFactoryBase
 		{
-			readonly Func<MethodBase, ImmutableArray<Type>> typeSource;
+			public static CachedServiceProviderFactory Instance { get; } = new CachedServiceProviderFactory();
+			CachedServiceProviderFactory() : base( DefaultCache ) {}
+		}*/
+	}
 
-			public Factory( bool includeFromParameters, params Type[] additional ) : this( new TypeFactory( includeFromParameters, additional ).Create ) {}
+	sealed class MethodTypeFactory : FactoryBase<MethodBase, ImmutableArray<Type>>
+	{
+		public static IConfiguration<Func<Type, IEnumerable<Type>>> PrimaryStrategy { get; } = new Configuration<Func<Type, IEnumerable<Type>>>( () => SelfAndNestedStrategy.Instance.ToDelegate() );
+		public static IConfiguration<Func<Type, IEnumerable<Type>>> OtherStrategy { get; } = new Configuration<Func<Type, IEnumerable<Type>>>( () => SelfStrategy.Instance.ToDelegate() );
+				
+		readonly static StoreCache<Assembly, ImmutableArray<Type>> Assemblies = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => assembly.GetCustomAttributes<ApplicationTypesAttribute>().SelectMany( attribute => attribute.AdditionalTypes.ToArray() ).ToImmutableArray() );
+		readonly static StoreCache<Type, ImmutableArray<Type>> Types = new StoreCache<Type, ImmutableArray<Type>>( type => type.GetTypeInfo().GetCustomAttributes<ApplicationTypesAttribute>().SelectMany( attribute => attribute.AdditionalTypes.ToArray() ).ToImmutableArray() );
 
-			Factory( Func<MethodBase, ImmutableArray<Type>> typeSource )
-			{
-				this.typeSource = typeSource;
-			}
+		public static MethodTypeFactory Instance { get; } = new MethodTypeFactory();
+		MethodTypeFactory() {}
 
-			public override IServiceProvider Create( AutoData parameter ) => Cache.Instance.Get( parameter.Method.DeclaringType ).Get( typeSource( parameter.Method ) );
-
-			sealed class TypeFactory : FactoryBase<MethodBase, ImmutableArray<Type>>
-			{
-				readonly static Func<Type, IEnumerable<Type>> PrimaryStrategy = SelfAndNestedStrategy.Instance.ToDelegate();
-				readonly static Func<Type, IEnumerable<Type>> OtherStrategy = SelfStrategy.Instance.ToDelegate();
-
-				readonly ImmutableArray<Type> additional;
-				readonly bool includeFromParameters;
-				readonly Func<Type, IEnumerable<Type>> primaryStrategy;
-				readonly Func<Type, IEnumerable<Type>> otherStrategy;
-
-				public TypeFactory( bool includeFromParameters, params Type[] additional ) : this( includeFromParameters, additional.ToImmutableArray(), PrimaryStrategy, OtherStrategy ) {}
-
-				TypeFactory( bool includeFromParameters, ImmutableArray<Type> additional, Func<Type, IEnumerable<Type>> primaryStrategy, Func<Type, IEnumerable<Type>> otherStrategy )
-				{
-					this.additional = additional;
-					this.includeFromParameters = includeFromParameters;
-					this.primaryStrategy = primaryStrategy;
-					this.otherStrategy = otherStrategy;
-				}
-
-				public override ImmutableArray<Type> Create( MethodBase parameter )
-				{
-					var types = additional.ToArray().Concat( includeFromParameters ? parameter.GetParameterTypes() : Items<Type>.Default );
-					var result = primaryStrategy( parameter.DeclaringType ).ToArray().Union( types.SelectMany( otherStrategy ) ).Distinct().ToImmutableArray();
-					return result;
-				}
-			}
-
-			sealed class Cache : ActivatedCache<Cache.ProviderCache>
-			{
-				public new static Cache Instance { get; } = new Cache();
-				Cache() {}
-
-				public sealed class ProviderCache : ArgumentCache<ImmutableArray<Type>, IServiceProvider>
-				{
-					public ProviderCache() : base( types => ServiceProvider.From( types.ToArray() ) ) {}
-				}
-			}
+		public override ImmutableArray<Type> Create( MethodBase parameter )
+		{
+			var attribute = parameter.GetCustomAttribute<AdditionalTypesAttribute>();
+			var includeFromParameters = attribute?.IncludeFromParameters;
+			var additional = attribute?.AdditionalTypes;
+			var method = additional.GetValueOrDefault().ToArray().Concat( includeFromParameters.GetValueOrDefault( true ) ? parameter.GetParameterTypes() : Items<Type>.Default );
+			var primary = PrimaryStrategy.Get();
+			var other = OtherStrategy.Get();
+			var result = primary( parameter.DeclaringType ).ToArray()
+							.Union( method.SelectMany( other( parameter.DeclaringType ) ) )
+							.Union( Types.Get( parameter.DeclaringType ).ToArray() )
+							.Union( Assemblies.Get( parameter.DeclaringType.Assembly ).ToArray() )
+							.ToImmutableArray();
+			return result;
 		}
 	}
 
-	/*public abstract class CacheFactoryBase : CachedDecoratedFactory<AutoData, IServiceProvider>
+	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Assembly )]
+	public class ApplicationTypesAttribute : Attribute
 	{
-		protected CacheFactoryBase( Func<AutoData, IServiceProvider> inner ) : base( inner ) {}
+		public ApplicationTypesAttribute( params Type[] additionalTypes )
+		{
+			AdditionalTypes = additionalTypes.ToImmutableArray();
+		}
 
-		protected override object GetHost( AutoData parameter ) => parameter.Method.DeclaringType;
-	}*/
+		public ImmutableArray<Type> AdditionalTypes { get; }
+	}
+
+	[AttributeUsage( AttributeTargets.Method )]
+	public class AdditionalTypesAttribute : ApplicationTypesAttribute
+	{
+		public AdditionalTypesAttribute( params Type[] additionalTypes ) : this( false, additionalTypes ) {}
+
+		public AdditionalTypesAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : base( additionalTypes )
+		{
+			IncludeFromParameters = includeFromParameters;
+		}
+
+		public bool IncludeFromParameters { get; }
+	}
+
+	public class CachedServiceProviderFactory : FactoryBase<AutoData, IServiceProvider>
+	{
+		readonly static ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> DefaultCache = 
+				new Cache<Type, ICache<ImmutableArray<Type>, IServiceProvider>>( o => new ArgumentCache<ImmutableArray<Type>, IServiceProvider>( types => ServiceProviderFactory.Instance.Create() ) );
+
+		readonly static Func<MethodBase, ImmutableArray<Type>> DefaultSource = MethodTypeFactory.Instance.Create;
+		readonly Func<MethodBase, ImmutableArray<Type>> typeSource;
+		readonly ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> cacheSource;
+
+		public static CachedServiceProviderFactory Instance { get; } = new CachedServiceProviderFactory();
+		protected CachedServiceProviderFactory() : this( DefaultCache ) {}
+
+		protected CachedServiceProviderFactory( ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> cacheSource ) : this( DefaultSource, cacheSource ) {}
+
+		protected CachedServiceProviderFactory( Func<MethodBase, ImmutableArray<Type>> typeSource, ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> cacheSource )
+		{
+			this.typeSource = typeSource;
+			this.cacheSource = cacheSource;
+		}
+
+		public sealed override IServiceProvider Create( AutoData parameter )
+		{
+			var types = typeSource( parameter.Method );
+			var result = GetProvider( parameter.Method.DeclaringType, types );
+			new InitializeCommand( types, result.Self ).Run();
+			return result;
+		}
+
+		protected virtual IServiceProvider GetProvider( Type declaringType, ImmutableArray<Type> types ) => cacheSource.Get( declaringType ).Get( types );
+	}
 
 	/*public class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>
 	{
@@ -151,13 +183,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.level = level;
 		}
 
-		public override void Before( MethodInfo methodUnderTest )
-		{
-			/*using ( new InitializeMethodCommand().AsExecuted( methodUnderTest ) )
-			{
-				GlobalServiceProvider.Instance.Get<LoggingLevelSwitch>().MinimumLevel = level;
-			}*/
-		}
+		public override void Before( MethodInfo methodUnderTest ) => LoggingController.Instance.Get( methodUnderTest ).MinimumLevel = level;
 	}
 
 	/*public class ExecuteApplicationCommand : ExecuteApplicationCommand<AutoData>

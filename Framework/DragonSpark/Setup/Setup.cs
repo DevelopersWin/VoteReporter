@@ -20,70 +20,37 @@ using System.Windows.Input;
 
 namespace DragonSpark.Setup
 {
-	public static class ServiceProvider
+	public sealed class InitializeCommand : CompositeCommand
 	{
-		public static IServiceProvider From( params Assembly[] assemblies )
-		{
-			DefaultTypeSystem.Store.Instance.Assign( new TypeSystem( assemblies ) );
-			GlobalServiceProvider.Instance.Assign( ServiceProviderFactory.Instance.Create );
-			var result = GlobalServiceProvider.Instance.Get();
-			return result;
-		}
+		readonly static AssignValueCommand<TypeSystem> Types = new AssignValueCommand<TypeSystem>( ApplicationTypes.Instance );
+		readonly static AssignValueCommand<Func<IServiceProvider>> Provider = new AssignValueCommand<Func<IServiceProvider>>( GlobalServiceProvider.Instance );
+		readonly static Func<IServiceProvider> Default = ServiceProviderFactory.Instance.Create;
 
-		public static IServiceProvider From( params Type[] types )
-		{
-			DefaultTypeSystem.Store.Instance.Assign( new TypeSystem( types ) );
-			GlobalServiceProvider.Instance.Assign( ServiceProviderFactory.Instance.Create );
-			var result = GlobalServiceProvider.Instance.Get();
-			return result;
-		}
-	}
-	/*public class AssemblyBasedServiceProviderFactory : ServiceProviderFactory
-	{
-		public AssemblyBasedServiceProviderFactory( IEnumerable<Assembly> assemblies ) : base( new Composition.AssemblyBasedServiceProviderFactory( assemblies ).Create ) {}
+		public static InitializeCommand Instance { get; } = new InitializeCommand();
+		InitializeCommand() : this( Items<Type>.Default ) {}
+
+		public InitializeCommand( IEnumerable<Assembly> assemblies ) : this( assemblies, Default ) {}
+		public InitializeCommand( IEnumerable<Assembly> assemblies, Func<IServiceProvider> provider ) : this( assemblies.ToImmutableArray(), provider ) {}
+		public InitializeCommand( ImmutableArray<Assembly> assemblies ) : this( assemblies, Default ) {}
+		public InitializeCommand( ImmutableArray<Assembly> assemblies, Func<IServiceProvider> provider ) : this( new TypeSystem( assemblies ), provider ) {}
+
+		public InitializeCommand( IEnumerable<Type> types ) : this( types, Default ) {}
+		public InitializeCommand( IEnumerable<Type> types, Func<IServiceProvider> provider ) : this( types.ToImmutableArray(), provider ) {}
+		public InitializeCommand( ImmutableArray<Type> types ) : this( types, Default ) {}
+		public InitializeCommand( ImmutableArray<Type> types, Func<IServiceProvider> provider ) : this( new TypeSystem( types ), provider ) {}
+		public InitializeCommand( TypeSystem typeSystem, Func<IServiceProvider> provider ) : base( Types.Fixed( typeSystem ), Provider.Fixed( provider ) ) {}
 	}
 
-	public class TypeBasedServiceProviderFactory : ServiceProviderFactory
+	/*public sealed class ConfiguredServiceProviderFactory : ConfiguringFactory<TypeSystem, IServiceProvider>
 	{
-		public TypeBasedServiceProviderFactory( IEnumerable<Type> types ) : base( new Composition.TypeBasedServiceProviderFactory( types ).Create ) {}
-	}
+		public static ConfiguredServiceProviderFactory Instance { get; } = new ConfiguredServiceProviderFactory();
+		ConfiguredServiceProviderFactory() : base( new Func<IServiceProvider>( GlobalServiceProvider.Instance.Get ).Wrap<TypeSystem, IServiceProvider>().ToDelegate(), InitializeServicesCommand.Instance.Execute ) {}
 
-	public class ServiceProviderFactory : ConfiguredServiceProviderFactory<ConfigureProviderCommand>
-	{
-		/*public ServiceProviderFactory( Type[] types ) : this( new TypeBasedServiceProviderFactory( types ) ) {}
+		public IServiceProvider Create( ImmutableArray<Type> types ) => Create( types.ToArray() );
+		public IServiceProvider Create( params Type[] types ) => Create( new TypeSystem( types ) );
 
-		public ServiceProviderFactory( Assembly[] assemblies ) : this( new AssemblyBasedServiceProviderFactory( assemblies ) ) {}#1#
-
-		// public ServiceProviderFactory( IFactory<ContainerConfiguration> source ) : this( new Composition.ServiceProviderFactory( source ) ) {}
-
-		public ServiceProviderFactory( Func<IServiceProvider> provider ) : base( provider ) {}
-	}*/
-
-	/*public sealed class ConfigureProviderCommand : CommandBase<IServiceProvider>
-	{
-		readonly ILogger logger;
-		readonly IServiceProviderHost host;
-
-		public ConfigureProviderCommand( [Required]ILogger logger, [Required]IServiceProviderHost host )
-		{
-			this.logger = logger;
-			this.host = host;
-		}
-
-		public override void Execute( IServiceProvider parameter )
-		{
-			logger.Information( Resources.ConfiguringServiceLocatorSingleton, Items<object>.Default );
-
-			var assign = new AssignValueCommand<IServiceProvider>( host ).Run( parameter );
-			parameter.Get<IDisposableRepository>()?.Add( assign );
-		}
-	}*/
-
-	/*public class AssignServiceProvider : AssignValueCommand<IServiceProvider>
-	{
-		public AssignServiceProvider( IServiceProvider current ) : this( CurrentServiceProvider.Instance, current ) {}
-
-		public AssignServiceProvider( IWritableStore<IServiceProvider> store, IServiceProvider current ) : base( store, current ) {}
+		public IServiceProvider Create( ImmutableArray<Assembly> assemblies ) => Create( assemblies.ToArray() );
+		public IServiceProvider Create( params Assembly[] assemblies ) => Create( new TypeSystem( assemblies ) );
 	}*/
 
 	/*public static class ApplicationExtensions
@@ -129,36 +96,19 @@ namespace DragonSpark.Setup
 		}
 	}*/
 
-	/**/
-
-	/*public class DefaultStoreServiceProvider : StoreServiceProvider
-	{
-		public static DefaultStoreServiceProvider Instance { get; } = new DefaultStoreServiceProvider();
-		DefaultStoreServiceProvider() : base( DefaultServiceProvider.Instance ) {}
-	}*/
-
 	public static class ActivationProperties
 	{
 		public static ICache<bool> Instance { get; } = new StoreCache<bool>();
 
 		public static ICache<Type> Factory { get; } = new Cache<Type>();
 
-		public class IsActivatedInstanceSpecification : GuardedSpecificationBase<object>
+		public sealed class IsActivatedInstanceSpecification : GuardedSpecificationBase<object>
 		{
 			public static IsActivatedInstanceSpecification Default { get; } = new IsActivatedInstanceSpecification();
+			IsActivatedInstanceSpecification() {}
 
 			public override bool IsSatisfiedBy( object parameter ) => Instance.Get( parameter ) || new[] { parameter, Factory.Get( parameter ) }.WhereAssigned().Any( o => o.Has<SharedAttribute>() );
 		}
-
-		/*public class Instance : AssociatedStore<bool>
-		{
-			public Instance( object instance ) : base( instance ) {}
-		}
-
-		public class Factory : AssociatedStore<Type>
-		{
-			public Factory( object instance ) : base( instance ) {}
-		}*/
 	}
 
 	public class InstanceServiceProvider : RepositoryBase<object>, IServiceProvider/*, IServiceRegistry*/
@@ -209,12 +159,12 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public interface IInstanceRegistration : IStore
+	/*public interface IInstanceRegistration : IStore
 	{
 		Type RegisteredType { get; }
-	}
+	}*/
 
-	class DeferredStore : DeferredStore<object>, IInstanceRegistration
+	/*class DeferredStore : DeferredStore<object>, IInstanceRegistration
 	{
 		public DeferredStore( IFactory factory ) : this( factory.ToDelegate(), ResultTypeLocator.Instance.Get( factory.GetType() ) ) {}
 
@@ -238,7 +188,7 @@ namespace DragonSpark.Setup
 		}
 
 		public Type RegisteredType { get; }
-	}
+	}*/
 
 	public class CompositeServiceProvider : CompositeFactory<Type, object>, IServiceProvider
 	{
@@ -256,16 +206,16 @@ namespace DragonSpark.Setup
 
 	public class RecursionAwareServiceProvider : DecoratedServiceProvider
 	{
-		readonly IsActive cache = new IsActive();
+		readonly IsActive active = new IsActive();
 
 		public RecursionAwareServiceProvider( IServiceProvider inner ) : base( inner ) {}
 
 		public override object GetService( Type serviceType )
 		{
-			var active = cache.Get( serviceType );
+			var active = this.active.Get( serviceType );
 			if ( !active )
 			{
-				using ( cache.Assignment( serviceType, true ) )
+				using ( this.active.Assignment( serviceType, true ) )
 				{
 					return base.GetService( serviceType );
 				}
@@ -319,9 +269,11 @@ namespace DragonSpark.Setup
 
 	public struct TypeSystem
 	{
-		public TypeSystem( params Assembly[] assemblies ) : this( assemblies.ToImmutableArray(), TypesFactory.Instance.Create( assemblies ) ) {}
+		// public TypeSystem( params Assembly[] assemblies ) : this( assemblies.ToImmutableArray() ) {}
+		public TypeSystem( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Instance.Create( assemblies.ToArray() ) ) {}
 
-		public TypeSystem( params Type[] types ) : this( types.Assemblies(), types.ToImmutableArray() ) {}
+		// public TypeSystem( params Type[] types ) : this( types.ToImmutableArray() ) {}
+		public TypeSystem( ImmutableArray<Type> types ) : this( types.Assemblies(), types ) {}
 
 		TypeSystem( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types )
 		{
@@ -333,22 +285,16 @@ namespace DragonSpark.Setup
 		public ImmutableArray<Type> Types { get; }
 	}
 
-	public class DefaultTypeSystem : Configuration<TypeSystem>
+	public sealed class ApplicationTypes : ExecutionContextStructureStore<TypeSystem>
 	{
-		public static DefaultTypeSystem Instance { get; } = new DefaultTypeSystem();
-		DefaultTypeSystem() : base( Store.Instance.Get ) {}
-
-		public class Store : ExecutionContextStoreBase<TypeSystem>
-		{
-			public static Store Instance { get; } = new Store();
-			Store() : base( new StoreCache<TypeSystem>() ) {}
-		}
+		public static ApplicationTypes Instance { get; } = new ApplicationTypes();
+		ApplicationTypes() {}
 	}
 
 	public class AllTypes : Configuration<ImmutableArray<Type>>
 	{
 		public static AllTypes Instance { get; } = new AllTypes();
-		AllTypes() : base( () => DefaultTypeSystem.Instance.Get().Types.ToArray().Union( FrameworkTypes.Instance.Get().ToArray() ).ToImmutableArray() ) {}
+		AllTypes() : base( () => ApplicationTypes.Instance.Get().Types.ToArray().Union( FrameworkTypes.Instance.Get().ToArray() ).ToImmutableArray() ) {}
 	}
 
 	public class FrameworkTypes : Configuration<ImmutableArray<Type>>

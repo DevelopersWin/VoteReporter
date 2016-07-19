@@ -2,7 +2,7 @@
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
-using DragonSpark.Testing.Objects.Setup;
+using DragonSpark.Testing.Objects.IoC;
 using Microsoft.Practices.Unity;
 using System;
 using Xunit;

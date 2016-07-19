@@ -13,7 +13,7 @@ namespace DragonSpark.Testing.Activation
 		public void BasicContext()
 		{
 			var level = MinimumLevelConfiguration.Instance;
-			var controller = LoggingLevelSwitch.Instance;
+			var controller = LoggingController.Instance;
 
 			var one = new object();
 			var first = controller.Get( one );
@@ -35,18 +35,18 @@ namespace DragonSpark.Testing.Activation
 		[Theory, AutoData]
 		void VerifyHistory( object context, string message )
 		{
-			var history = LoggerHistory.Instance.Get( context );
+			var history = LoggingHistory.Instance.Get( context );
 			Assert.Empty( history.Events );
-			Assert.Same( history, LoggerHistory.Instance.Get( context ) );
+			Assert.Same( history, LoggingHistory.Instance.Get( context ) );
 
-			var logger = Logger.Instance.Get( context );
+			var logger = Logging.Instance.Get( context );
 			Assert.Empty( history.Events );
 			logger.Information( "Hello World! {Message}", message );
 			Assert.Single( history.Events, item => item.RenderMessage().Contains( message ) );
 
 			logger.Debug( "Hello World! {Message}", message );
 			Assert.Single( history.Events );
-			var level = LoggingLevelSwitch.Instance.Get( context );
+			var level = LoggingController.Instance.Get( context );
 			level.MinimumLevel = LogEventLevel.Debug;
 
 			logger.Debug( "Hello World! {Message}", message );

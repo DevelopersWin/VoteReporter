@@ -130,7 +130,7 @@ namespace DragonSpark.TypeSystem
 		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
 
 		[Freeze]
-		public override ImmutableArray<Assembly> Create( IEnumerable<Type> parameter ) => parameter.Assemblies();
+		public override ImmutableArray<Assembly> Create( IEnumerable<Type> parameter ) => parameter.ToImmutableArray().Assemblies();
 	}
 
 	public static class AssemblyTypes

@@ -19,7 +19,15 @@ namespace DragonSpark.Composition
 	public sealed class CompositionSource : Configuration<CompositionHost>
 	{
 		public static CompositionSource Instance { get; } = new CompositionSource();
-		CompositionSource() : base( () => ConfigurationSource.Instance.Get().CreateContainer() ) {}
+		CompositionSource() : base( CompositionHostFactory.Instance.Create ) {}
+	}
+
+	public sealed class CompositionHostFactory : FactoryBase<CompositionHost>
+	{
+		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
+		CompositionHostFactory() {}
+
+		public override CompositionHost Create() => ConfigurationSource.Instance.Get().CreateContainer();
 	}
 
 	public sealed class ConfigurationSource : Configuration<ContainerConfiguration>
@@ -30,28 +38,10 @@ namespace DragonSpark.Composition
 
 	public sealed class Configurations : Configuration<ImmutableArray<ContainerConfigurator>>
 	{
+		readonly static ImmutableArray<ContainerConfigurator> Default = ImmutableArray.Create<ContainerConfigurator>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
 		public static Configurations Instance { get; } = new Configurations();
-		Configurations() : base( () => ImmutableArray.Create<ContainerConfigurator>( ContainerServicesConfigurator.Instance, new PartsContainerConfigurator( DefaultTypeSystem.Instance.Get() ) ) ) {}
+		Configurations() : base( () => Default ) {}
 	}
-
-	/*public class AssemblyBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
-	{
-		public AssemblyBasedConfigurationContainerFactory( IEnumerable<Assembly> assemblies ) : this( assemblies.ToImmutableArray() ) { }
-
-		AssemblyBasedConfigurationContainerFactory( ImmutableArray<Assembly> assemblies )
-			: base( assemblies, TypesFactory.Instance.Create( assemblies ) ) {}
-	}
-
-	public class TypeBasedConfigurationContainerFactory : ContainerConfigurationFromPartsFactory
-	{
-		public TypeBasedConfigurationContainerFactory( IEnumerable<Type> types )  : base( Items<Assembly>.Immutable, types.ToImmutableArray() ) {}
-	}
-
-	public class ContainerConfigurationFromPartsFactory : AggregateFactory<ContainerConfiguration>
-	{
-		public ContainerConfigurationFromPartsFactory( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types )
-			: base( ContainerConfigurationFactory.Instance.Create, ContainerServicesConfigurator.Instance.ToDelegate(), new PartsContainerConfigurator( assemblies, types ).ToDelegate() ) {}
-	}*/
 
 	public class ContainerServicesConfigurator : ContainerConfigurator
 	{
@@ -63,26 +53,28 @@ namespace DragonSpark.Composition
 
 	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}
 
-	public interface IServiceProviderHost : IWritableStore<IServiceProvider> {}
-
-	class ServiceProviderHost : FixedStore<IServiceProvider>, IServiceProviderHost
+	public interface IDependencyLocator
 	{
-		public ServiceProviderHost()
+		IServiceProvider For( IServiceProvider provider );
+	}
+
+	class DependencyLocator : IDependencyLocator {
+		public IServiceProvider For( IServiceProvider provider )
 		{
-			Assign( DefaultServiceProvider.Instance );
+			return null;
 		}
 	}
 
-	public class ServicesExportDescriptorProvider : InstanceExportDescriptorProvider<IServiceProviderHost>
+	public class ServicesExportDescriptorProvider : InstanceExportDescriptorProvider<IDependencyLocator>
 	{
-		readonly IServiceProviderHost host;
+		readonly IDependencyLocator locator;
 		readonly Func<Type, object> get;
 
-		public ServicesExportDescriptorProvider() : this( new ServiceProviderHost() ) {}
+		// public ServicesExportDescriptorProvider() : this( new ServiceProviderHost() ) {}
 
-		public ServicesExportDescriptorProvider( IServiceProviderHost host ) : base( host )
+		public ServicesExportDescriptorProvider( IDependencyLocator locator ) : base( locator )
 		{
-			this.host = host;
+			this.locator = locator;
 			get = Get;
 		}
 
@@ -102,7 +94,10 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		object Get( Type type ) => host.Value.GetService( type );
+		object Get( Type type )
+		{
+			return locator.For( this )?.GetService( type );
+		}
 
 		class Factory : FixedFactory<Type, object>
 		{
@@ -119,23 +114,19 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class PartsContainerConfigurator : ContainerConfigurator
+	public sealed class PartsContainerConfigurator : ContainerConfigurator
 	{
 		readonly static ConventionBuilder ConventionBuilder = FrameworkConventionBuilder.Instance.Create();
-		readonly Setup.TypeSystem system;
-		readonly ImmutableArray<Type> core, all;
 
-		public PartsContainerConfigurator( Setup.TypeSystem system ) : this( system, FrameworkTypes.Instance.Get(), AllTypes.Instance.Get() ) {}
-
-		PartsContainerConfigurator( Setup.TypeSystem system, ImmutableArray<Type> core, ImmutableArray<Type> all )
-		{
-			this.system = system;
-			this.core = core;
-			this.all = all;
-		}
+		public static PartsContainerConfigurator Instance { get; } = new PartsContainerConfigurator();
+		PartsContainerConfigurator() {}
 
 		public override ContainerConfiguration Create( ContainerConfiguration configuration )
 		{
+			var system = ApplicationTypes.Instance.Get();
+			var core = FrameworkTypes.Instance.Get();
+			var all = AllTypes.Instance.Get();
+
 			var result = configuration
 				.WithInstance( system.Assemblies )
 				.WithInstance( system.Assemblies.ToArray() )
@@ -151,7 +142,7 @@ namespace DragonSpark.Composition
 			return result;
 		}
 
-		public class FrameworkConventionBuilder : FactoryBase<ConventionBuilder>
+		class FrameworkConventionBuilder : FactoryBase<ConventionBuilder>
 		{
 			readonly Func<ConventionBuilder, object> configure;
 
@@ -163,7 +154,7 @@ namespace DragonSpark.Composition
 
 			public override ConventionBuilder Create() => new ConventionBuilder().WithSelf( configure );
 
-			protected virtual PartConventionBuilder Configure( ConventionBuilder builder ) => builder.ForTypesMatching( type => true ).Export().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) );
+			static PartConventionBuilder Configure( ConventionBuilder builder ) => builder.ForTypesMatching( type => true ).Export().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) );
 		}
 
 		class AttributeProvider : AttributedModelProvider

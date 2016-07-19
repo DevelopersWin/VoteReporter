@@ -292,8 +292,8 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			LoggerHistory.Instance.Assign( o => sink );
-			var logger = Logger.Instance.Get( this );
+			LoggingHistory.Instance.Assign( o => sink );
+			var logger = Logging.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			ModuleManager manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -320,8 +320,8 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			LoggerHistory.Instance.Assign( o => sink );
-			var logger = Logger.Instance.Get( this );
+			LoggingHistory.Instance.Assign( o => sink );
+			var logger = Logging.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManagerExtended(loader, catalog, logger, moduleTypeLoader);
 			moduleTypeLoader.LoadCompletedError = new Exception();
@@ -364,8 +364,8 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			LoggerHistory.Instance.Assign( o => sink );
-			var logger = Logger.Instance.Get( this );
+			LoggingHistory.Instance.Assign( o => sink );
+			var logger = Logging.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
 			manager.LoadModuleCompleted += ( sender, args ) => args.IsErrorHandled = true;

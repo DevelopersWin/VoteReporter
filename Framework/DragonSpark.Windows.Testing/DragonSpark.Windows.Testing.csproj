@@ -255,7 +255,6 @@
     <Compile Include="Runtime\ApplicationAssemblyLocatorTests.cs" />
     <Compile Include="Runtime\ExceptionFormatterTests.cs" />
     <Compile Include="Runtime\ThreadDataStoreTests.cs" />
-    <Compile Include="Setup\AutoDataAttribute.cs" />
     <Compile Include="Setup\LocationSetup.cs">
       <DependentUpon>LocationSetup.xaml</DependentUpon>
     </Compile>

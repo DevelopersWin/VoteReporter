@@ -21,7 +21,7 @@ namespace DragonSpark.Testing.Composition
 	{
 		public CompositionTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Theory, CompositionTests.AutoData, MinimumLevel( LogEventLevel.Debug )]
+		[Theory, AutoData, Types, MinimumLevel( LogEventLevel.Debug )]
 		public void BasicCompose( CompositionContext host )
 		{
 			var sinkOne = host.GetExport<ILoggerHistory>();
@@ -39,7 +39,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( sinkOne.Events.Count() > current );
 		}
 
-		[Theory, Framework.Setup.AutoData, MinimumLevel( LogEventLevel.Debug )]
+		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void BasicComposeAgain( CompositionContext host )
 		{
 			var sinkOne = host.GetExport<ILoggerHistory>();
@@ -64,7 +64,7 @@ namespace DragonSpark.Testing.Composition
 			Debugger.Break();
 		}*/
 
-		[Theory, CompositionTests.AutoData]
+		[Theory, AutoData, Types]
 		public void BasicComposition( [Service]CompositionContext host, string text, ILogger logger )
 		{
 			var test = host.GetExport<IBasicService>();
@@ -74,7 +74,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.Same( logger, export );
 		}
 
-		[Theory, CompositionTests.AutoData]
+		[Theory, AutoData, Types]
 		public void BasicCompositionWithParameter( CompositionContext host, string text )
 		{
 			var test = host.GetExport<IParameterService>();
@@ -82,7 +82,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.Equal( "Assigned by ParameterService", parameter.Message );
 		}
 
-		[Theory, CompositionTests.AutoData]
+		[Theory, AutoData, Types]
 		public void FactoryWithParameterDelegate( CompositionContext host, string message )
 		{
 			var factory = host.GetExport<Func<Parameter, IParameterService>>();
@@ -100,7 +100,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.NotSame( parameter, p );
 		}
 
-		[Theory, CompositionTests.AutoData]
+		[Theory, AutoData, Types]
 		public void ExportWhenAlreadyRegistered( CompositionContext host )
 		{
 			var item = host.GetExport<ExportedItem>();
@@ -108,7 +108,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.False( Condition.Default.Get( item ).IsApplied );
 		}
 
-		[Theory, CompositionTests.AutoData]
+		[Theory, AutoData, Types]
 		public void FactoryInstance( CompositionContext host )
 		{
 			var service = host.GetExport<IBasicService>();
@@ -124,7 +124,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( Condition.Default.Get( created ).IsApplied );
 		}
 
-		[Theory, CompositionTests.AutoData]
+		[Theory, AutoData, Types]
 		public void Composition( CompositionContext host )
 		{
 			var item = host.GetExport<ExportedItem>();
@@ -132,14 +132,14 @@ namespace DragonSpark.Testing.Composition
 			Assert.False( Condition.Default.Get( item ).IsApplied );
 		}
 
-		[Theory, CompositionTests.AutoData]
+		[Theory, AutoData, Types]
 		public void VerifyInstanceExport( CompositionContext host, [Service]ImmutableArray<Assembly> assemblies )
 		{
 			var composed = host.GetExport<ImmutableArray<Assembly>>();
 			Assert.Equal( assemblies, composed );
 		}
 
-		[Theory, CompositionTests.AutoData]
+		[Theory, AutoData, Types]
 		public void SharedComposition( CompositionContext host )
 		{
 			var service = host.GetExport<ISharedService>();
@@ -148,11 +148,11 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( Condition.Default.Get( service ).IsApplied );
 		}
 
-		internal class AutoData : AutoDataAttribute
+		internal class Types : AdditionalTypesAttribute
 		{
-			readonly static Type[] Types = { typeof(ParameterServiceFactory), typeof(BasicServiceFactory), typeof(ExportedItem), typeof(ExportedItemFactory), typeof(SharedServiceFactory) };
+			readonly static Type[] Items = { typeof(ParameterServiceFactory), typeof(BasicServiceFactory), typeof(ExportedItem), typeof(ExportedItemFactory), typeof(SharedServiceFactory) };
 
-			public AutoData() : base( additionalTypes: Types ) {}
+			public Types() : base( Items ) {}
 		}
 	}
 }

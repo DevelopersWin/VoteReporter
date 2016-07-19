@@ -73,7 +73,7 @@ namespace DragonSpark.Windows.Io
 					}
 					catch ( Exception exception )
 					{
-						Logger.Instance.Get( file ).Error( exception, "Could not delete {File}.", file.FullName );
+						Logging.Instance.Get( file ).Error( exception, "Could not delete {File}.", file.FullName );
 					}
 				}
 			}

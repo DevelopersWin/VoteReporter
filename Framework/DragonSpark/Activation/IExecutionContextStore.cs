@@ -35,21 +35,37 @@ namespace DragonSpark.Activation
 
 	public interface IExecutionContextStore : IStore {}
 
-	public class ExecutionContextStore<T> : ExecutionContextStoreBase<T> where T : class
+	public class ExecutionContextStore<T> : ExecutionContextReferenceStoreBase<T> where T : class
 	{
-		readonly IWritableStore<T> reference = new FixedStore<T>();
 		public ExecutionContextStore() : base( new Cache<T>() ) {}
 
-		public ExecutionContextStore( T reference ) : base( new Cache<T>() )
+		public ExecutionContextStore( T reference ) : base( reference, new Cache<T>() ) {}
+	}
+
+	public class ExecutionContextStructureStore<T> : ExecutionContextReferenceStoreBase<T>
+	{
+		public ExecutionContextStructureStore() : base( new StoreCache<T>() ) {}
+		public ExecutionContextStructureStore( T reference ) : base( reference, new StoreCache<T>() ) {}
+	}
+
+	public abstract class ExecutionContextReferenceStoreBase<T> : ExecutionContextStoreBase<T>
+	{
+		readonly IWritableStore<T> reference = new FixedStore<T>();
+
+		protected ExecutionContextReferenceStoreBase( ICache<T> cache ) : base( cache ) {}
+
+		protected ExecutionContextReferenceStoreBase( T reference, ICache<T> cache ) : base( cache )
 		{
 			Assign( reference );
 		}
 
-		protected override T Get() => base.Get() ?? Reassign();
-
-		T Reassign()
+		protected override T Get()
 		{
-			Assign( reference.Value );
+			if ( !Contains() )
+			{
+				Assign( reference.Value );
+			}
+
 			return base.Get();
 		}
 
@@ -73,16 +89,12 @@ namespace DragonSpark.Activation
 			this.cache = cache;
 		}
 
+		protected bool Contains() => cache.Contains( contextSource() );
+
 		protected override T Get() => cache.Get( contextSource() );
 
 		public sealed override void Assign( T item ) => OnAssign( item );
 
 		protected virtual void OnAssign( T item ) => cache.Set( contextSource(), item );
 	}
-
-	/*public class AssignExecutionContextCommand : DelegatedCommand<IExecutionContext>
-	{
-		public static AssignExecutionContextCommand Instance { get; } = new AssignExecutionContextCommand();
-		AssignExecutionContextCommand() : base( ExecutionContextRepository.Instance.Insert ) {}
-	}*/
 }

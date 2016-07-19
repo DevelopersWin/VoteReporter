@@ -7,7 +7,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	[Export]
 	public partial class ProgramSetup
 	{
-		public class AutoDataAttribute : Setup.AutoDataAttribute
+		public class AutoDataAttribute : DragonSpark.Testing.Framework.IoC.AutoDataAttribute
 		{
 			readonly static Func<IApplication> ApplicationSource = () => new Application<ProgramSetup>();
 

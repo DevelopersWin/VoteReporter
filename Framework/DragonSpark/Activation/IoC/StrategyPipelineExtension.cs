@@ -189,7 +189,7 @@ namespace DragonSpark.Activation.IoC
 
 	public sealed class BuildableTypeFromConventionLocator : Cache<Type, Type>
 	{
-		public static IConfiguration<Func<Type, Type>> Instance { get; } = new Configuration<Func<Type, Type>>( () =>  new BuildableTypeFromConventionLocator( DefaultTypeSystem.Instance.Get().Types.ToArray() ).Get );
+		public static IConfiguration<Func<Type, Type>> Instance { get; } = new Configuration<Func<Type, Type>>( () =>  new BuildableTypeFromConventionLocator( ApplicationTypes.Instance.Value.Types.ToArray() ).Get );
 		
 		public BuildableTypeFromConventionLocator( params Type[] types ) : base( new Factory( types ).Create ) {}
 

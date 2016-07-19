@@ -40,7 +40,7 @@ namespace DragonSpark.Activation
 
 	public class FactoryTypeRequests : Cache<Type, FactoryTypeRequest>
 	{
-		public static IConfiguration<ImmutableArray<FactoryTypeRequest>> Requests { get; } = new Configuration<ImmutableArray<FactoryTypeRequest>>( () => Instance.GetMany( DefaultTypeSystem.Instance.Get().Types ) );
+		public static IConfiguration<ImmutableArray<FactoryTypeRequest>> Requests { get; } = new Configuration<ImmutableArray<FactoryTypeRequest>>( () => Instance.GetMany( ApplicationTypes.Instance.Value.Types ) );
 
 		public static FactoryTypeRequests Instance { get; } = new FactoryTypeRequests();
 		FactoryTypeRequests() : base( Factory.Instance.Create ) {}

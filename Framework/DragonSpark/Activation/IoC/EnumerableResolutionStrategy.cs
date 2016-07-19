@@ -63,10 +63,9 @@ namespace DragonSpark.Activation.IoC
 	class SingletonBuildPlanPolicy : IBuildPlanPolicy
 	{
 		public static SingletonBuildPlanPolicy Instance { get; } = new SingletonBuildPlanPolicy();
+		SingletonBuildPlanPolicy() : this( SingletonLocator.Instance ) {}
 
 		readonly ISingletonLocator locator;
-
-		public SingletonBuildPlanPolicy() : this( SingletonLocator.Instance ) {}
 
 		public SingletonBuildPlanPolicy( [Required] ISingletonLocator locator )
 		{
@@ -86,7 +85,7 @@ namespace DragonSpark.Activation.IoC
 	public class EnumerableResolutionStrategy : BuilderStrategy
 	{
 		readonly static MethodInfo GenericResolveArrayMethod = typeof(EnumerableResolutionStrategy).GetTypeInfo().DeclaredMethods.First( m => m.Name == nameof(Resolve) && !m.IsPublic );
-		readonly static string[] DefaultName = new string[] { null };
+		readonly static string[] DefaultName = { null };
 
 		delegate object Resolver( IBuilderContext context );
 

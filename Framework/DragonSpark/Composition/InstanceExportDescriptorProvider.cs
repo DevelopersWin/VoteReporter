@@ -1,6 +1,5 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -66,6 +65,7 @@ namespace DragonSpark.Composition
 	public class TypeInitializingExportDescriptorProvider : ExportDescriptorProvider
 	{
 		readonly Func<Type, Type> locator;
+		readonly static Action<Type> Initializer = InitializeTypeCommand.Instance.ToDelegate();
 
 		public TypeInitializingExportDescriptorProvider() : this( BuildableTypeFromConventionLocator.Instance.Get() ) {}
 
@@ -79,7 +79,7 @@ namespace DragonSpark.Composition
 			new[] { contract.ContractType, locator( contract.ContractType ) }
 				.WhereAssigned()
 				.Distinct()
-				.Each( InitializeTypeCommand.Instance.ToDelegate() );
+				.Each( Initializer );
 			yield break;
 		}
 	}

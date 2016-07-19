@@ -1,4 +1,6 @@
 ﻿using DragonSpark.Aspects;
+using DragonSpark.Configuration;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
@@ -11,20 +13,22 @@ using PostSharp.Patterns.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using Type = System.Type;
 
 namespace DragonSpark.Activation.IoC
 {
 	[Disposable( ThrowObjectDisposedException = true )]
 	public class ServiceLocator : ServiceLocatorImplBase
 	{
-		public ServiceLocator( [Required]IUnityContainer container ) : this( container, container.Resolve<ILogger>() ) {}
+		readonly ILogger logger;
 
-		public ServiceLocator( [Required]IUnityContainer container, [Required]ILogger logger )
+		public ServiceLocator( IUnityContainer container ) : this( container, container.TryResolve<ILogger>() ?? Logging.Instance.Get( container ) ) {}
+
+		public ServiceLocator( IUnityContainer container, ILogger logger )
 		{
 			Container = container;
-			Logger = logger;
+			this.logger = logger;
 		}
 
 		public override IEnumerable<TService> GetAllInstances<TService>()
@@ -41,23 +45,50 @@ namespace DragonSpark.Activation.IoC
 			var result = Container.TryResolve( serviceType, key );
 			if ( result == null && !Container.IsRegistered( serviceType, key ) )
 			{
-				Logger.Debug( Resources.ServiceLocator_NotRegistered, serviceType, key ?? Resources.Activator_None );
+				logger.Debug( Resources.ServiceLocator_NotRegistered, serviceType, key ?? Resources.Activator_None );
 			}
 			return result;
 		}
 
 		[Reference]
 		public IUnityContainer Container { get; }
-		
-		[Reference]
-		public ILogger Logger { get; }
+	}
+
+	public sealed class UnityContainerFactory : FactoryBase<IUnityContainer>
+	{
+		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
+		UnityContainerFactory() {}
+
+		[Creator]
+		public override IUnityContainer Create() => 
+			ContainerConfigurations.Instance.Get().Aggregate( new UnityContainer().Extend<DefaultBehaviorExtension>(), ( configuration, transformer ) => transformer.Create( configuration ) );
+	}
+
+	public class DefaultBehaviorExtension : UnityContainerExtension
+	{
+		protected override void Initialize()
+		{
+			var repository = new StrategyRepository( Context.Strategies );
+			repository.Add( new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.PreCreation, Priority.High ) );
+			Container.RegisterInstance( Logging.Instance.Get( Container ) );
+			Container.RegisterInstance<IBuildPlanRepository>( new BuildPlanRepository( SingletonBuildPlanPolicy.Instance.ToItem() ) );
+			Container.RegisterInstance<IStrategyRepository>( repository );
+		}
 	}
 
 	public abstract class UnityConfigurator : TransformerBase<IUnityContainer> {}
 
-	public class DefaultUnityExtensions : UnityConfigurator
+	public sealed class ContainerConfigurations : Configuration<ImmutableArray<UnityConfigurator>>
+	{
+		readonly static ImmutableArray<UnityConfigurator> Default = new UnityConfigurator[] { ServicesConfigurator.Instance, DefaultUnityExtensions.Instance }.ToImmutableArray();
+		public static ContainerConfigurations Instance { get; } = new ContainerConfigurations();
+		ContainerConfigurations() : base( () => Default ) {}
+	}
+
+	public sealed class DefaultUnityExtensions : UnityConfigurator
 	{
 		public static DefaultUnityExtensions Instance { get; } = new DefaultUnityExtensions();
+		DefaultUnityExtensions() {}
 
 		public override IUnityContainer Create( IUnityContainer parameter ) => 
 			parameter
@@ -69,38 +100,12 @@ namespace DragonSpark.Activation.IoC
 				;
 	}
 
-	public class ServicesConfigurator : UnityConfigurator
+	public sealed class ServicesConfigurator : UnityConfigurator
 	{
-		readonly IServiceProvider provider;
+		public static ServicesConfigurator Instance { get; } = new ServicesConfigurator();
+		ServicesConfigurator() {}
 
-		public ServicesConfigurator( [Required] IServiceProvider provider )
-		{
-			this.provider = provider;
-		}
-
-		public override IUnityContainer Create( IUnityContainer parameter ) => 
-			parameter
-				.RegisterInstance( provider )
-				.Extend<ServicesIntegrationExtension>();
-	}
-
-	public class UnityContainerCoreFactory : FactoryBase<IUnityContainer>
-	{
-		public static UnityContainerCoreFactory Instance { get; } = new UnityContainerCoreFactory();
-
-		[Creator]
-		public override IUnityContainer Create() => new UnityContainer().Extend<DefaultBehaviorExtension>();
-	}
-
-	public class DefaultBehaviorExtension : UnityContainerExtension
-	{
-		protected override void Initialize()
-		{
-			var repository = new StrategyRepository( Context.Strategies );
-			repository.Add( new StrategyEntry( new BuildKeyMonitorExtension(), UnityBuildStage.PreCreation, Priority.High ) );
-			Container.RegisterInstance<IBuildPlanRepository>( new BuildPlanRepository( SingletonBuildPlanPolicy.Instance.ToItem() ) );
-			Container.RegisterInstance<IStrategyRepository>( repository );
-		}
+		public override IUnityContainer Create( IUnityContainer parameter ) => parameter.Extend<ServicesIntegrationExtension>();
 	}
 
 	public class StrategyEntry : Entry<IBuilderStrategy>

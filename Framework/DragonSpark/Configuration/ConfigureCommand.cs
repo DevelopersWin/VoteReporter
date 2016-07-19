@@ -5,18 +5,7 @@ using System;
 
 namespace DragonSpark.Configuration
 {
-	/*class AssignConfigurationCommand<T> : AssignConfigurationCommand<object, T>
-	{
-		public AssignConfigurationCommand( IWritableStore<Func<object, T>> store ) : base( store ) {}
-	}
-	
-	class AssignConfigurationCommand<TKey, TValue> : AssignValueCommand<Func<TKey, TValue>>
-	{
-		public AssignConfigurationCommand( IWritableStore<Func<TKey, TValue>> store ) : base( store ) {}
-	}*/
-
-
-	public class ParameterizedConfiguration<T> : ParameterizedConfiguration<object, T>, IWritableParameterizedConfiguration<T> where T : class
+	public class ParameterizedConfiguration<T> : ParameterizedConfiguration<object, T>, IParameterizedConfiguration<T> where T : class
 	{
 		public ParameterizedConfiguration( Func<object, T> reference ) : base( reference ) {}
 	}
@@ -26,7 +15,7 @@ namespace DragonSpark.Configuration
 		public ParameterizedConfiguration( Func<TKey, TValue> reference ) : base( new CacheStore<TKey,TValue>( reference ) ) {}
 	}
 
-	public class StructuredParameterizedConfiguration<T> : StructuredParameterizedConfiguration<object, T>, IWritableParameterizedConfiguration<T>
+	public class StructuredParameterizedConfiguration<T> : StructuredParameterizedConfiguration<object, T>, IParameterizedConfiguration<T>
 	{
 		public StructuredParameterizedConfiguration( Func<object, T> reference ) : base( reference ) {}
 	}
@@ -36,11 +25,9 @@ namespace DragonSpark.Configuration
 		public StructuredParameterizedConfiguration( Func<TKey, TValue> reference ) : base( new CacheStore<StoreCache<TKey, TValue>, TKey, TValue>( reference ) ) {}
 	}
 
-	public abstract class ParameterizedConfigurationBase<TKey, TValue> : IWritableParameterizedConfiguration<TKey, TValue>, IStoreAware<Func<TKey, TValue>>
+	public abstract class ParameterizedConfigurationBase<TKey, TValue> : IParameterizedConfiguration<TKey, TValue>
 	{
 		readonly IWritableStore<Func<TKey, TValue>> store;
-
-		// protected ParameterizedConfigurationBase( Func<TKey, TValue> factory ) : this( new ExecutionContextStore<Func<TKey, TValue>>( factory ) ) {}
 
 		protected ParameterizedConfigurationBase( IWritableStore<Func<TKey, TValue>> store )
 		{
@@ -48,9 +35,9 @@ namespace DragonSpark.Configuration
 		}
 
 		public TValue Get( TKey key ) => store.Value( key );
-		public void Assign( Func<TKey, TValue> factory ) => store.Assign( factory );
 
-		Func<TKey, TValue> IStoreAware<Func<TKey, TValue>>.Value => store.Value;
+		public void Assign( Func<TKey, TValue> factory ) => store.Assign( factory );
+		void IAssignable.Assign( object item ) => store.Assign( item );
 	}
 
 	class CacheStore<TKey, TValue> : CacheStore<Cache<TKey, TValue>, TKey, TValue> where TKey : class where TValue : class

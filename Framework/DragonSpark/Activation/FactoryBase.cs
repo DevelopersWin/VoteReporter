@@ -41,39 +41,53 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class ConfiguringFactory<T> : DelegatedFactory<T>
+	public class ConfiguringFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
-		readonly Action<T> configure;
-
-		public ConfiguringFactory( Func<T> provider, Action<T> configure ) : base( provider )
-		{
-			this.configure = configure;
-		}
-
-		public override T Create()
-		{
-			var result = base.Create();
-			configure( result );
-			return result;
-		}
-	}
-
-	/*public class ConfiguringFactory<TParameter, TResult> : DecoratedFactory<TParameter, TResult>
-	{
+		readonly Action<TParameter> initialize;
 		readonly Action<TResult> configure;
 
-		public ConfiguringFactory( [Required]Func<TParameter, TResult> inner, [Required]Action<TResult> configure ) : base( inner )
+		public ConfiguringFactory( Func<TParameter, TResult> factory, Action<TResult> configure ) : this( factory, Delegates<TParameter>.Empty, configure ) {}
+
+		public ConfiguringFactory( Func<TParameter, TResult> factory, Action<TParameter> initialize ) : this( factory, initialize, Delegates<TResult>.Empty ) {}
+
+		public ConfiguringFactory( Func<TParameter, TResult> factory, Action<TParameter> initialize, Action<TResult> configure ) : base( factory )
 		{
+			this.initialize = initialize;
 			this.configure = configure;
 		}
 
 		public override TResult Create( TParameter parameter )
 		{
+			initialize( parameter );
 			var result = base.Create( parameter );
 			configure( result );
 			return result;
 		}
-	}*/
+	}
+
+	public class ConfiguringFactory<T> : DelegatedFactory<T>
+	{
+		readonly Action initialize;
+		readonly Action<T> configure;
+
+		public ConfiguringFactory( Func<T> inner, Action<T> configure ) : this( inner, Delegates.Empty, configure ) {}
+
+		public ConfiguringFactory( Func<T> inner, Action initialize ) : this( inner, initialize, Delegates<T>.Empty ) {}
+
+		public ConfiguringFactory( Func<T> inner, Action initialize, Action<T> configure ) : base( inner )
+		{
+			this.initialize = initialize;
+			this.configure = configure;
+		}
+
+		public override T Create()
+		{
+			initialize();
+			var result = base.Create();
+			configure( result );
+			return result;
+		}
+	}
 
 	/*public abstract class CachedDecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
@@ -189,7 +203,7 @@ namespace DragonSpark.Activation
 
 	public class FromKnownFactory<T> : ParameterConstructedCompositeFactory<object>
 	{
-		public static IWritableConfiguration<FromKnownFactory<T>> Instance { get; } = new Configuration<FromKnownFactory<T>>( () => new FromKnownFactory<T>( KnownTypes.Instance.Get( typeof(T) ).ToArray() ) );
+		public static IConfiguration<FromKnownFactory<T>> Instance { get; } = new Configuration<FromKnownFactory<T>>( () => new FromKnownFactory<T>( KnownTypes.Instance.Get( typeof(T) ).ToArray() ) );
 		FromKnownFactory( params Type[] types ) : base( types ) {}
 		
 		public T CreateUsing( object parameter ) => (T)Create( parameter );

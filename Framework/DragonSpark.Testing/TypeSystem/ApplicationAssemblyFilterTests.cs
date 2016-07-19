@@ -3,6 +3,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Moq;
+using System.Collections.Immutable;
 using Xunit;
 using AutoDataAttribute = Ploeh.AutoFixture.Xunit2.AutoDataAttribute;
 
@@ -14,7 +15,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Theory, Framework.Setup.AutoData]
 		public void Basic( Mock<IAssemblyProvider> provider, ApplicationAssemblyFilter sut )
 		{
-			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.Assemblies() );
+			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.ToImmutableArray().Assemblies() );
 
 			var assemblies = sut.Create( provider.Object.Create() );
 			

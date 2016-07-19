@@ -211,7 +211,7 @@ namespace DragonSpark.TypeSystem
 				}
 				catch ( ArgumentException e )
 				{
-					Logger.Instance.Get( this ).Verbose( e, "Could not create a generic method for {Method} with types {Types}", item.Item1.Method, item.Item2 );
+					Logging.Instance.Get( this ).Verbose( e, "Could not create a generic method for {Method} with types {Types}", item.Item1.Method, item.Item2 );
 					return default(GenericMethodCandidate<T>);
 				}
 			}
