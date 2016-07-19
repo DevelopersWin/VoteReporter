@@ -11,21 +11,13 @@ using System;
 
 namespace DragonSpark.Activation.IoC
 {
-	public class ServiceProviderSpecificationFactory : FactoryBase<IServiceProvider, ISpecification<LocateTypeRequest>>
-	{
-		public static ServiceProviderSpecificationFactory Instance { get; } = new ServiceProviderSpecificationFactory();
-		
-		public override ISpecification<LocateTypeRequest> Create( IServiceProvider parameter ) => 
-			parameter.Get<FactoryTypes>().With( locator => new HasFactorySpecification( locator ).Inverse() ) ?? Runtime.Specifications.Specifications.Always;
-	}
-
 	public class ServicesIntegrationExtension : UnityContainerExtension
 	{
 		readonly Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
 		readonly ISpecification<LocateTypeRequest> specification;
 		readonly IStrategyRepository strategies;
 
-		public ServicesIntegrationExtension( IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( strategies, registry, ServiceProviderSpecificationFactory.Instance.Create( provider ) ) {}
+		public ServicesIntegrationExtension( IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( strategies, registry, new HasFactorySpecification().Inverse() ) {}
 
 		ServicesIntegrationExtension( IStrategyRepository strategies, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
 		{

@@ -58,7 +58,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var expected = GlobalServiceProvider.Instance.GetService<IActivator>();
 			Assert.Same( expected, locator );
-			Assert.NotSame( Activator.Instance.Get(), locator );
+			Assert.NotSame( Activator.Instance.Value, locator );
 			Assert.IsType<Locator>( locator );
 			var instance = locator.Activate<IObject>( typeof(Object) );
 			Assert.IsType<Object>( instance );
@@ -71,7 +71,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void CreateNamedInstance( [Registered]IActivator activator, string name )
 		{
 			Assert.Same( GlobalServiceProvider.Instance.GetService<IActivator>(), activator );
-			Assert.NotSame( Activator.Instance.Get(), activator );
+			Assert.NotSame( Activator.Instance.Value, activator );
 
 			var instance = activator.Activate<IObject>( new LocateTypeRequest( typeof(Object), name ) );
 			Assert.IsType<Object>( instance );
@@ -85,7 +85,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
 			Assert.Same( GlobalServiceProvider.Instance.GetService<IActivator>(), activator );
-			Assert.NotSame( Activator.Instance.Get(), activator );
+			Assert.NotSame( Activator.Instance.Value, activator );
 			var instance = activator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
 			Assert.NotNull( instance );
 
@@ -396,7 +396,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void ConventionLocator( BuildableTypeFromConventionLocator locator )
 		{
-			var type = locator.Get( typeof(Assembly) );
+			var type = locator.Create( typeof(Assembly) );
 			Assert.Null( type );
 		}
 

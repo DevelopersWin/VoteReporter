@@ -39,7 +39,7 @@ namespace DragonSpark.Composition
 		readonly CompositeActivator activate;
 		readonly Func<IEnumerable<CompositionDependency>, ExportDescriptor> get;
 
-		public InstanceExportDescriptorProvider( [Required]T instance, string name = null )
+		public InstanceExportDescriptorProvider( T instance, string name = null )
 		{
 			this.instance = instance;
 			contracts = new [] { typeof(T), instance.GetType() }.Distinct().Introduce( name, tuple => new CompositionContract( tuple.Item1, tuple.Item2 ) ).ToArray();
@@ -67,7 +67,7 @@ namespace DragonSpark.Composition
 		readonly Func<Type, Type> locator;
 		readonly static Action<Type> Initializer = InitializeTypeCommand.Instance.ToDelegate();
 
-		public TypeInitializingExportDescriptorProvider() : this( BuildableTypeFromConventionLocator.Instance.Get() ) {}
+		public TypeInitializingExportDescriptorProvider() : this( BuildableTypeFromConventionLocator.Instance.Value ) {}
 
 		TypeInitializingExportDescriptorProvider( Func<Type, Type> locator )
 		{

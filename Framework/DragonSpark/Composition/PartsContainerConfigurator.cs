@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
@@ -16,32 +15,15 @@ using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
 {
-	public sealed class CompositionSource : Configuration<CompositionHost>
+	public sealed class CompositionHostFactory : AggregateFactoryBase<ContainerConfiguration, CompositionHost>
 	{
-		public static CompositionSource Instance { get; } = new CompositionSource();
-		CompositionSource() : base( CompositionHostFactory.Instance.Create ) {}
-	}
+		readonly static ImmutableArray<ITransformer<ContainerConfiguration>> Default = ImmutableArray.Create<ITransformer<ContainerConfiguration>>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
 
-	public sealed class CompositionHostFactory : FactoryBase<CompositionHost>
-	{
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
-		CompositionHostFactory() {}
-
-		public override CompositionHost Create() => ConfigurationSource.Instance.Get().CreateContainer();
+		CompositionHostFactory() : base( () => new ContainerConfiguration(), () => Default, parameter => parameter.CreateContainer()) {}
 	}
 
-	public sealed class ConfigurationSource : Configuration<ContainerConfiguration>
-	{
-		public static ConfigurationSource Instance { get; } = new ConfigurationSource();
-		ConfigurationSource() : base( () => Configurations.Instance.Get().Aggregate( new ContainerConfiguration(), ( configuration, transformer ) => transformer.Create( configuration ) ) ) {}
-	}
-
-	public sealed class Configurations : Configuration<ImmutableArray<ContainerConfigurator>>
-	{
-		readonly static ImmutableArray<ContainerConfigurator> Default = ImmutableArray.Create<ContainerConfigurator>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
-		public static Configurations Instance { get; } = new Configurations();
-		Configurations() : base( () => Default ) {}
-	}
+	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}
 
 	public class ContainerServicesConfigurator : ContainerConfigurator
 	{
@@ -50,8 +32,6 @@ namespace DragonSpark.Composition
 
 		public override ContainerConfiguration Create( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
 	}
-
-	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}
 
 	public interface IDependencyLocator
 	{
@@ -65,27 +45,16 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class ServicesExportDescriptorProvider : InstanceExportDescriptorProvider<IDependencyLocator>
+	public class ServicesExportDescriptorProvider : ExportDescriptorProvider
 	{
-		readonly IDependencyLocator locator;
 		readonly Func<Type, object> get;
 
-		// public ServicesExportDescriptorProvider() : this( new ServiceProviderHost() ) {}
-
-		public ServicesExportDescriptorProvider( IDependencyLocator locator ) : base( locator )
+		public ServicesExportDescriptorProvider()
 		{
-			this.locator = locator;
 			get = Get;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
-		{
-			var promises = base.GetExportDescriptors( contract, descriptorAccessor ).Fixed();
-			var result = promises.Any() ? promises : DeterminePromise( contract, descriptorAccessor );
-			return result;
-		}
-
-		IEnumerable<ExportDescriptorPromise> DeterminePromise( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
 			CompositionDependency dependency;
 			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
@@ -99,7 +68,7 @@ namespace DragonSpark.Composition
 			return locator.For( this )?.GetService( type );
 		}
 
-		class Factory : FixedFactory<Type, object>
+		sealed class Factory : FixedFactory<Type, object>
 		{
 			readonly CompositeActivator activate;
 

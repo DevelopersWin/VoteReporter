@@ -35,63 +35,42 @@ namespace DragonSpark.Activation
 
 	public interface IExecutionContextStore : IStore {}
 
-	public class ExecutionContextStore<T> : ExecutionContextReferenceStoreBase<T> where T : class
+	public class ExecutionContextStore<T> : ExecutionContextStoreBase<T> where T : class
 	{
-		public ExecutionContextStore() : base( new Cache<T>() ) {}
-
-		public ExecutionContextStore( T reference ) : base( reference, new Cache<T>() ) {}
+		public ExecutionContextStore( Func<T> defaultFactory = null ) : base( new Cache<T>(), defaultFactory ) {}
 	}
 
-	public class ExecutionContextStructureStore<T> : ExecutionContextReferenceStoreBase<T>
+	public class ExecutionContextStructureStore<T> : ExecutionContextStoreBase<T>
 	{
-		public ExecutionContextStructureStore() : base( new StoreCache<T>() ) {}
-		public ExecutionContextStructureStore( T reference ) : base( reference, new StoreCache<T>() ) {}
-	}
-
-	public abstract class ExecutionContextReferenceStoreBase<T> : ExecutionContextStoreBase<T>
-	{
-		readonly IWritableStore<T> reference = new FixedStore<T>();
-
-		protected ExecutionContextReferenceStoreBase( ICache<T> cache ) : base( cache ) {}
-
-		protected ExecutionContextReferenceStoreBase( T reference, ICache<T> cache ) : base( cache )
-		{
-			Assign( reference );
-		}
-
-		protected override T Get()
-		{
-			if ( !Contains() )
-			{
-				Assign( reference.Value );
-			}
-
-			return base.Get();
-		}
-
-		protected override void OnAssign( T item )
-		{
-			reference.Assign( item );
-			base.OnAssign( item );
-		}
+		public ExecutionContextStructureStore( Func<T> defaultFactory = null ) : base( new StoreCache<T>(), defaultFactory ) {}
 	}
 
 	public abstract class ExecutionContextStoreBase<T> : WritableStore<T>
 	{
 		readonly Func<object> contextSource;
 		readonly ICache<object, T> cache;
+		readonly Func<T> defaultFactory;
 
-		protected ExecutionContextStoreBase( ICache<T> cache ) : this( Defaults.ExecutionContext, cache ) {}
+		protected ExecutionContextStoreBase( ICache<T> cache, Func<T> defaultFactory = null ) : this( Defaults.ExecutionContext, cache, defaultFactory ) {}
 
-		protected ExecutionContextStoreBase( Func<object> contextSource, ICache<object, T> cache )
+		protected ExecutionContextStoreBase( Func<object> contextSource, ICache<object, T> cache, Func<T> defaultFactory = null )
 		{
 			this.contextSource = contextSource;
 			this.cache = cache;
+			this.defaultFactory = defaultFactory;
 		}
 
-		protected bool Contains() => cache.Contains( contextSource() );
-
-		protected override T Get() => cache.Get( contextSource() );
+		protected override T Get()
+		{
+			var context = contextSource();
+			if ( defaultFactory != null && !cache.Contains( context ) )
+			{
+				var result = defaultFactory();
+				cache.Set( contextSource(), result );
+				return result;
+			}
+			return cache.Get( context );
+		}
 
 		public sealed override void Assign( T item ) => OnAssign( item );
 

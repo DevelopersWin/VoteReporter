@@ -2,10 +2,12 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -276,7 +278,7 @@ namespace DragonSpark.Activation
 		public override TResult Create( TParameter parameter ) => inner.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) ).FirstAssigned();
 	}
 
-	public class FirstFactory<T> : FactoryBase<T>
+	/*public class FirstFactory<T> : FactoryBase<T>
 	{
 		readonly IEnumerable<Func<T>> inner;
 
@@ -288,9 +290,9 @@ namespace DragonSpark.Activation
 		}
 
 		public override T Create() => inner.FirstAssigned( factory => factory() );
-	}
+	}*/
 
-	public class AggregateFactory<T> : FactoryBase<T>
+	/*public class AggregateFactory<T> : FactoryBase<T>
 	{
 		readonly Func<T> primary;
 		readonly Func<T, T>[] transformers;
@@ -310,7 +312,7 @@ namespace DragonSpark.Activation
 			}
 			return result;
 		}
-	}
+	}*/
 
 	/*public abstract class CachedFactoryBase<T> : FactoryBase<T>
 	{
@@ -325,6 +327,64 @@ namespace DragonSpark.Activation
 
 		public sealed override T Create() => cached.Value;
 	}*/
+
+	public abstract class AggregateParameterizedFactoryBase<TConfiguration, TResult> : AggregateParameterizedFactoryBase<TConfiguration, object, TResult> where TConfiguration : class
+	{
+		protected AggregateParameterizedFactoryBase( Func<object, TConfiguration> seed, Func<object, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, object, TResult> factory ) : base( seed, configurators, factory ) {}
+		protected AggregateParameterizedFactoryBase( IParameterizedConfiguration<object, TConfiguration> seed, IParameterizedConfiguration<object, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, object, TResult> factory ) : base( seed, configurators, factory ) {}
+	}
+
+	public abstract class AggregateParameterizedFactoryBase<TConfiguration, TParameter, TResult> : FactoryBase<TParameter, TResult> where TParameter : class where TConfiguration : class
+	{
+		readonly Func<TConfiguration, TParameter, TResult> factory;
+
+		protected AggregateParameterizedFactoryBase( Func<TParameter, TConfiguration> seed, Func<TParameter, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TParameter, TResult> factory ) : 
+			this( new CachedParameterizedConfiguration<TParameter, TConfiguration>( seed ), new StructuredParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>>( configurators ), factory ) {}
+
+		protected AggregateParameterizedFactoryBase( IParameterizedConfiguration<TParameter, TConfiguration> seed, IParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TParameter, TResult> factory )
+		{
+			Seed = seed;
+			Configurators = configurators;
+			this.factory = factory;
+		}
+
+		public IParameterizedConfiguration<TParameter, TConfiguration> Seed { get; }
+
+		public IParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>> Configurators { get; }
+
+		public override TResult Create( TParameter parameter )
+		{
+			var configured = Configurators.Get( parameter ).Aggregate( Seed.Get( parameter ), ( configuration, transformer ) => transformer.Create( configuration ) );
+			var result = factory( configured, parameter );
+			return result;
+		}
+	}
+
+	public abstract class AggregateFactoryBase<TConfiguration, TResult> : FactoryBase<TResult>
+	{
+		readonly Func<TConfiguration, TResult> factory;
+
+		protected AggregateFactoryBase( Func<TConfiguration> seed, Func<ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TResult> factory ) : 
+			this( new Configuration<TConfiguration>( new FixedStore<Func<TConfiguration>>( seed ) ), new Configuration<ImmutableArray<ITransformer<TConfiguration>>>( configurators ), factory ) {}
+
+		protected AggregateFactoryBase( IConfiguration<TConfiguration> seed, IConfiguration<ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TResult> factory )
+		{
+			Seed = seed;
+			Configurators = configurators;
+			this.factory = factory;
+		}
+
+		public IConfiguration<TConfiguration> Seed { get; }
+
+		public IConfiguration<ImmutableArray<ITransformer<TConfiguration>>> Configurators { get; }
+
+		public override TResult Create()
+		{
+			var configured = Configurators.Get().Aggregate( Seed.Get(), ( configuration, transformer ) => transformer.Create( configuration ) );
+			var result = factory( configured );
+			return result;
+		}
+	}
 
 	public abstract class FactoryBase<T> : IFactory<T>
 	{

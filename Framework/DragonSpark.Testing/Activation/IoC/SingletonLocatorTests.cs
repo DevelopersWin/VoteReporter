@@ -41,9 +41,8 @@ namespace DragonSpark.Testing.Activation.IoC
 		public void SingletonFromConvention()
 		{
 			var nestedTypes = GetType().GetTypeInfo().DeclaredNestedTypes.AsTypes().ToArray();
-			var conventionLocator = new BuildableTypeFromConventionLocator( nestedTypes );
 			var sut = SingletonLocator.Instance;
-			var type = conventionLocator.Get( typeof(ISingleton) ) ?? typeof(ISingleton);
+			var type = new BuildableTypeFromConventionLocator( nestedTypes ).Create( typeof(ISingleton) ) ?? typeof(ISingleton);
 			Assert.Same( Singleton.Instance, sut.Locate( type ) );
 		}
 

@@ -189,6 +189,6 @@ namespace DragonSpark.TypeSystem
 
 	public class AggregateAssemblyFactory : AssemblySourceBase, IAssemblyProvider
 	{
-		public AggregateAssemblyFactory( Func<IEnumerable<Assembly>> primary, params Func<IEnumerable<Assembly>, IEnumerable<Assembly>>[] transformers ) : base( new AggregateFactory<IEnumerable<Assembly>>( primary, transformers ).Create() ) {}
+		public AggregateAssemblyFactory( Func<IEnumerable<Assembly>> primary, params Func<IEnumerable<Assembly>, IEnumerable<Assembly>>[] transformers ) : base( transformers.Aggregate( primary(), ( assemblies, func ) => func( assemblies ) ) ) {}
 	}
 }

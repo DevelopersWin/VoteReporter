@@ -1,7 +1,7 @@
 using DragonSpark.Activation;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using Serilog;
 using Serilog.Core;
@@ -101,37 +101,25 @@ namespace DragonSpark.Diagnostics.Logger
 		public Handler( ILogger logger, LogEventLevel level, Func<T, ILoggerTemplate> projection ) : base( new LogTemplateCommand( logger, level ).Cast( projection ) ) {}
 	}*/
 
-	public sealed class LoggingHistory : ParameterizedConfiguration<ILoggerHistory>
+	public sealed class Logging : AggregateParameterizedFactoryBase<LoggerConfiguration, ILogger>
 	{
-		public static LoggingHistory Instance { get; } = new LoggingHistory();
-		LoggingHistory() : base( o => new LoggerHistorySink() ) {}
+		public static ICache<object, ILogger> Instance { get; } = new Logging().Cached();
+		Logging() : base( o => new LoggerConfiguration(), LoggerConfigurationsFactory.Instance.Create, ( configuration, parameter ) => configuration.CreateLogger().ForSource( parameter ) ) {}
 	}
 
-	public sealed class LoggingController : ParameterizedConfiguration<LoggingLevelSwitch>
+	public sealed class LoggingHistory : ActivatedCache<LoggerHistorySink>
+	{
+		public new static LoggingHistory Instance { get; } = new LoggingHistory();
+		LoggingHistory() {}
+	}
+
+	public sealed class LoggingController : Cache<LoggingLevelSwitch>
 	{
 		public static LoggingController Instance { get; } = new LoggingController();
 		LoggingController() : base( o => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get( o ) ) ) {}
 	}
 
-	public sealed class LoggingConfigurator : ParameterizedConfiguration<LoggerConfiguration>
-	{
-		public static LoggingConfigurator Instance { get; } = new LoggingConfigurator();
-		LoggingConfigurator() : base( o => LoggingConfigurations.Instance.Get( o ).Aggregate( new LoggerConfiguration(), ( configuration, transformer ) => transformer.Create( configuration ) ) ) {}
-	}
-
-	public sealed class Logging : ParameterizedConfiguration<ILogger>
-	{
-		public static Logging Instance { get; } = new Logging();
-		Logging() : base( o => LoggingConfigurator.Instance.Get( o ).CreateLogger().ForSource( o ) ) {}
-	}
-
-	public sealed class LoggingConfigurations : StructuredParameterizedConfiguration<ImmutableArray<ITransformer<LoggerConfiguration>>>
-	{
-		public static LoggingConfigurations Instance { get; } = new LoggingConfigurations();
-		LoggingConfigurations() : base( LoggerConfigurationsFactory.Instance.Create ) {}
-	}
-
-	class LoggerConfigurationsFactory : LoggerConfigurationsFactoryBase
+	sealed class LoggerConfigurationsFactory : LoggerConfigurationsFactoryBase
 	{
 		public static LoggerConfigurationsFactory Instance { get; } = new LoggerConfigurationsFactory();
 
@@ -145,7 +133,7 @@ namespace DragonSpark.Diagnostics.Logger
 			yield return new HistoryTransform( LoggingHistory.Instance.Get( parameter ) );
 		}
 
-		class HistoryTransform : TransformerBase<Serilog.LoggerConfiguration>
+		class HistoryTransform : TransformerBase<LoggerConfiguration>
 		{
 			readonly ILoggerHistory history;
 
@@ -154,7 +142,7 @@ namespace DragonSpark.Diagnostics.Logger
 				this.history = history;
 			}
 
-			public override Serilog.LoggerConfiguration Create( Serilog.LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
+			public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
 		}
 	}
 

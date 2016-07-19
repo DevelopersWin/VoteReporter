@@ -4,6 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using System;
@@ -149,13 +150,13 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public sealed class MemberInfoFactoryTypeLocator : ParameterizedConfiguration<MemberInfo, Type>
+	public sealed class MemberInfoFactoryTypeLocator : CachedParameterizedConfiguration<MemberInfo, Type>
 	{
 		public static MemberInfoFactoryTypeLocator Instance { get; } = new MemberInfoFactoryTypeLocator();
 		MemberInfoFactoryTypeLocator() : base( new FactoryTypeLocator<MemberInfo>( member => member.GetMemberType(), member => member.DeclaringType ).Create ) {}
 	}
 
-	public sealed class ParameterInfoFactoryTypeLocator : ParameterizedConfiguration<ParameterInfo, Type>
+	public sealed class ParameterInfoFactoryTypeLocator : CachedParameterizedConfiguration<ParameterInfo, Type>
 	{
 		public static ParameterInfoFactoryTypeLocator Instance { get; } = new ParameterInfoFactoryTypeLocator();
 		ParameterInfoFactoryTypeLocator() : base( new FactoryTypeLocator<ParameterInfo>( parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ).Create ) {}
@@ -164,11 +165,11 @@ namespace DragonSpark.Activation
 	[Persistent]
 	public class FactoryTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
-		public static IConfiguration<FactoryTypes> Instance { get; } = new Configuration<FactoryTypes>( () => new FactoryTypes( FactoryTypeRequests.Requests.Get() ) );
+		public static IStore<FactoryTypes> Instance { get; } = new ExecutionContextStore<FactoryTypes>( () => new FactoryTypes( FactoryTypeRequests.Requests.Get() ) );
 
 		public FactoryTypes( ImmutableArray<FactoryTypeRequest> requests ) : base( new Factory( requests ).Create ) {}
 
-		class Factory :  FactoryBase<LocateTypeRequest, Type>
+		sealed class Factory :  FactoryBase<LocateTypeRequest, Type>
 		{
 			readonly ImmutableArray<FactoryTypeRequest> types;
 

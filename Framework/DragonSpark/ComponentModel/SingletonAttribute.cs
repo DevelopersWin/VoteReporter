@@ -17,7 +17,7 @@ namespace DragonSpark.ComponentModel
 		readonly Type hostType;
 		readonly string propertyName;
 
-		public SingletonDefaultValueProvider( Type hostType, string propertyName ) : this( BuildableTypeFromConventionLocator.Instance.Get(), hostType, propertyName ) {}
+		public SingletonDefaultValueProvider( Type hostType, string propertyName ) : this( BuildableTypeFromConventionLocator.Instance.Value, hostType, propertyName ) {}
 
 		public SingletonDefaultValueProvider( Func<Type, Type> locator, Type hostType, string propertyName )
 		{

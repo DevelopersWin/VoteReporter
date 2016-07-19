@@ -7,7 +7,7 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Setup.Commands
 {
-	public class DeclarativeFixedCommand<T> : DeclarativeCommandBase<T>
+	public class DeclaredFixedCommand<T> : DeclaredCommandBase<T>
 	{
 		[Required]
 		public ICommand<T> Command { [return: Required]get; set; }
@@ -15,9 +15,9 @@ namespace DragonSpark.Setup.Commands
 		public override void Execute( object parameter ) => Command.Run( Parameter );
 	}
 
-	public abstract class DeclarativeCommandBase<T> : CommandBase<object>
+	public abstract class DeclaredCommandBase<T> : CommandBase<object>
 	{
-		protected DeclarativeCommandBase() : base( Specifications.Always ) {}
+		protected DeclaredCommandBase() : base( Specifications.Always ) {}
 
 		[Required]
 		public T Parameter { [return: Required]get; set; }

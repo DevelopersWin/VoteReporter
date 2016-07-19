@@ -58,7 +58,7 @@ namespace DragonSpark.Configuration
 		protected override TValue Get( TKey key ) => Factory.Create( key );
 	}
 
-	public abstract class ApplyConfigurationCommandBase<T> : DeclarativeCommandBase<IConfiguration<T>>
+	public abstract class ApplyConfigurationCommandBase<T> : DeclaredCommandBase<IAssignable<Func<T>>>
 	{
 		readonly Func<T> get;
 		
@@ -72,7 +72,7 @@ namespace DragonSpark.Configuration
 		public override void Execute( object _ ) => Parameter.Assign( get );
 	}
 
-	public abstract class ApplyParameterizedConfigurationCommandBase<TKey, TValue> : DeclarativeCommandBase<IParameterizedConfiguration<TKey, TValue>>
+	public abstract class ApplyParameterizedConfigurationCommandBase<TKey, TValue> : DeclaredCommandBase<IAssignable<Func<TKey, TValue>>>
 	{
 		readonly Func<TKey, TValue> get;
 		
@@ -121,25 +121,25 @@ namespace DragonSpark.Configuration
 		public ApplyParameterizedValueConfigurationCommand( T value ) : base( value ) {}
 	}
 
-	public interface IParameterizedConfiguration<T> : IParameterizedConfiguration<object, T> {}
+	public interface IParameterizedConfiguration<out T> : IParameterizedConfiguration<object, T> {}
 
-	public interface IParameterizedConfiguration<TKey, TValue> : IAssignable<Func<TKey, TValue>>
+	public interface IParameterizedConfiguration<in TKey, out TValue>
 	{
 		TValue Get( TKey key );
 	}
 
-	public interface IConfiguration<T> : IAssignable<Func<T>>
+	public interface IConfiguration<out T>
 	{
 		T Get();
 	}
 
-	public class Configuration<T> : IConfiguration<T>
+	public class Configuration<T> : IConfiguration<T>, IAssignable<Func<T>>
 	{
 		readonly IWritableStore<Func<T>> store;
 
 		public Configuration( Func<T> factory ) : this( new CacheStore<T>( factory ) ) {}
 
-		protected Configuration( IWritableStore<Func<T>> store )
+		public Configuration( IWritableStore<Func<T>> store )
 		{
 			this.store = store;
 		}
@@ -152,7 +152,7 @@ namespace DragonSpark.Configuration
 
 	class CacheStore<T> : ExecutionContextStore<Func<T>>
 	{
-		public CacheStore( Func<T> factory ) : base( factory ) {}
+		public CacheStore( Func<T> factory ) : base( factory.Self ) {}
 
 		protected override void OnAssign( Func<T> value ) => base.OnAssign( new DeferredStore<T>( value ).Get );
 	}

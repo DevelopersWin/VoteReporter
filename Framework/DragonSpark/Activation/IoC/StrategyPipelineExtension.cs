@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Aspects.Validation;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
@@ -187,51 +187,42 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public sealed class BuildableTypeFromConventionLocator : Cache<Type, Type>
+	[ApplyAutoValidation]
+	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
-		public static IConfiguration<Func<Type, Type>> Instance { get; } = new Configuration<Func<Type, Type>>( () =>  new BuildableTypeFromConventionLocator( ApplicationTypes.Instance.Value.Types.ToArray() ).Get );
+		public static IStore<Func<Type, Type>> Instance { get; } = new ExecutionContextStore<Func<Type, Type>>( () => new BuildableTypeFromConventionLocator( ApplicationTypes.Instance.Value.Types.ToArray() ).Cached().Get );
+
+		readonly static Func<Type, bool> Specification = CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).IsSatisfiedBy;
+		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
+		readonly static ISpecification<Type> Unbuildable = CanInstantiateSpecification.Instance.Inverse();
+
+		readonly ImmutableArray<Type> types;
 		
-		public BuildableTypeFromConventionLocator( params Type[] types ) : base( new Factory( types ).Create ) {}
-
-		[ApplyAutoValidation]
-		class Factory : FactoryBase<Type, Type>
+		public BuildableTypeFromConventionLocator( params Type[] types ) : base( Unbuildable )
 		{
-			readonly Type[] types;
-			readonly Func<Type, ITypeCandidateWeightProvider> weight;
-			readonly Func<Type, bool> specification;
+			this.types = types.Where( Specification ).ToImmutableArray();
+		}
 
-			public Factory( params Type[] types ) : this( types, type => new TypeCandidateWeightProvider( type ), CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ), CanInstantiateSpecification.Instance.Inverse() ) {}
+		public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
 
-			Factory( Type[] types, Func<Type, ITypeCandidateWeightProvider> weight, ISpecification<Type> specification, ISpecification<Type> unbuildable ) : base( unbuildable )
-			{
-				this.types = types;
-				this.weight = weight;
-				this.specification = specification.ToDelegate();
-			}
+		static Type Map( Type parameter )
+		{
+			var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
+			var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
+			return result;
+		}
 
-			public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
-
-			static Type Map( Type parameter )
-			{
-				var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
-				var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
-				return result;
-			}
-
-			Type Search( Type parameter )
-			{
-				var adapter = parameter.Adapt();
-				var order = weight( parameter );
-				var convention = new IsConventionCandidateSpecification( parameter );
-				var result =
-					types
-						.Where( adapter.IsAssignableFrom )
-						.Where( specification )
-						.OrderByDescending( order.GetWeight )
-						.FirstOrDefault( convention.IsSatisfiedBy );
-				return result;
-			}
-			
+		Type Search( Type parameter )
+		{
+			var adapter = parameter.Adapt();
+			var order = Weight( parameter );
+			var convention = new IsConventionCandidateSpecification( parameter );
+			var result =
+				types
+					.Where( adapter.IsAssignableFrom )
+					.OrderByDescending( order.GetWeight )
+					.FirstOrDefault( convention.IsSatisfiedBy );
+			return result;
 		}
 	}
 

@@ -1,9 +1,9 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using System;
@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	public class FactoryTypeLocator<T> : FactoryBase<T, Type>
+	public sealed class FactoryTypeLocator<T> : FactoryBase<T, Type>
 	{
 		readonly Func<T, Type> type;
 		readonly Func<T, Type> context;
@@ -31,16 +31,16 @@ namespace DragonSpark.Activation
 			var nestedTypes = info.DeclaredNestedTypes.AsTypes().ToArray();
 			var all = nestedTypes.Union( AssemblyTypes.All.Get( info.Assembly ) ).Where( Defaults.ApplicationType ).ToImmutableArray();
 			var requests = FactoryTypeRequests.Instance.GetMany( all );
-			var candidates = new[] { new FactoryTypes( requests ), FactoryTypes.Instance.Get() };
+			var candidates = new[] { new FactoryTypes( requests ), FactoryTypes.Instance.Value };
 			var mapped = new LocateTypeRequest( type( parameter ) );
 			var result = candidates.Introduce( mapped, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 			return result;
 		}
 	}
 
-	public class FactoryTypeRequests : Cache<Type, FactoryTypeRequest>
+	public sealed class FactoryTypeRequests : Cache<Type, FactoryTypeRequest>
 	{
-		public static IConfiguration<ImmutableArray<FactoryTypeRequest>> Requests { get; } = new Configuration<ImmutableArray<FactoryTypeRequest>>( () => Instance.GetMany( ApplicationTypes.Instance.Value.Types ) );
+		public static IStore<ImmutableArray<FactoryTypeRequest>> Requests { get; } = new ExecutionContextStructureStore<ImmutableArray<FactoryTypeRequest>>( () => Instance.GetMany( ApplicationTypes.Instance.Value.Types ) );
 
 		public static FactoryTypeRequests Instance { get; } = new FactoryTypeRequests();
 		FactoryTypeRequests() : base( Factory.Instance.Create ) {}

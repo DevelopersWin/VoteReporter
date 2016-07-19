@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -13,7 +13,7 @@ namespace DragonSpark.Windows.Entity
 	[Persistent]
 	class ActivationSource : IActivationSource
 	{
-		public static IConfiguration<IActivationSource> Default { get; } = new Configuration<IActivationSource>( () => new ActivationSource( Activator.Instance.Get() ) );
+		public static IStore<IActivationSource> Default { get; } = new ExecutionContextStore<IActivationSource>( () => new ActivationSource( Activator.Instance.Value ) );
 
 		readonly IActivator activator;
 

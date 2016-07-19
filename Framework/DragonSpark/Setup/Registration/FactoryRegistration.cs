@@ -8,6 +8,7 @@ using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
+using Activator = DragonSpark.Activation.Activator;
 using Delegate = System.Delegate;
 
 namespace DragonSpark.Setup.Registration
@@ -45,8 +46,7 @@ namespace DragonSpark.Setup.Registration
 		readonly Func<Type, IFactory> createFactory;
 
 		public static FactoryDelegateFactory Instance { get; } = new FactoryDelegateFactory();
-
-		FactoryDelegateFactory() : this( GlobalServiceProvider.Instance.GetService<IFactory> ) {}
+		FactoryDelegateFactory() : this( Activator.Activate<IFactory> ) {}
 
 		public FactoryDelegateFactory( [Required]Func<Type, IFactory> createFactory )
 		{
@@ -62,7 +62,7 @@ namespace DragonSpark.Setup.Registration
 
 		readonly Func<Type, IFactoryWithParameter> createFactory;
 
-		FactoryWithParameterDelegateFactory() : this( GlobalServiceProvider.Instance.GetService<IFactoryWithParameter> ) {}
+		FactoryWithParameterDelegateFactory() : this( Activator.Activate<IFactoryWithParameter> ) {}
 
 		public FactoryWithParameterDelegateFactory( [Required]Func<Type, IFactoryWithParameter> createFactory )
 		{
@@ -75,12 +75,11 @@ namespace DragonSpark.Setup.Registration
 	public class FactoryWithActivatedParameterDelegateFactory : FactoryBase<Type, Func<object>>
 	{
 		public static FactoryWithActivatedParameterDelegateFactory Instance { get; } = new FactoryWithActivatedParameterDelegateFactory();
+		FactoryWithActivatedParameterDelegateFactory() : this( FactoryWithParameterDelegateFactory.Instance.Create, Activator.Activate<object> ) {}
 
 		readonly Func<Type, Func<object, object>> factory;
 		readonly Func<Type, object> createParameter;
 		readonly Func<Type, Type> parameterLocator;
-
-		FactoryWithActivatedParameterDelegateFactory() : this( FactoryWithParameterDelegateFactory.Instance.ToDelegate(), GlobalServiceProvider.Instance.GetService<object> ) {}
 
 		public FactoryWithActivatedParameterDelegateFactory( Func<Type, Func<object, object>> factory, Func<Type, object> createParameter ) : this( factory, createParameter, ParameterTypeLocator.Instance.ToDelegate() ) {}
 
@@ -104,18 +103,18 @@ namespace DragonSpark.Setup.Registration
 		}
 	}
 
-	public class FuncFactory<T, U> : FactoryBase<Func<object, object>, Func<T, U>>
+	public class FactoryDelegateFactory<TParameter, TResult> : FactoryBase<Func<object, object>, Func<TParameter, TResult>>
 	{
-		public static FuncFactory<T, U> Instance { get; } = new FuncFactory<T, U>();
-		FuncFactory() {}
+		public static FactoryDelegateFactory<TParameter, TResult> Instance { get; } = new FactoryDelegateFactory<TParameter, TResult>();
+		FactoryDelegateFactory() {}
 
-		public override Func<T, U> Create( Func<object, object> parameter ) => parameter.Convert<T, U>();
+		public override Func<TParameter, TResult> Create( Func<object, object> parameter ) => parameter.Convert<TParameter, TResult>();
 	}
 
-	public class FuncFactory<T> : FactoryBase<Func<object>, Func<T>>
+	public class FactoryDelegateFactory<T> : FactoryBase<Func<object>, Func<T>>
 	{
-		public static FuncFactory<T> Instance { get; } = new FuncFactory<T>();
-		FuncFactory() {}
+		public static FactoryDelegateFactory<T> Instance { get; } = new FactoryDelegateFactory<T>();
+		FactoryDelegateFactory() {}
 
 		public override Func<T> Create( Func<object> parameter ) => parameter.Convert<T>();
 	}
@@ -185,7 +184,7 @@ namespace DragonSpark.Setup.Registration
 	{
 		public RegisterFactoryCommand( IServiceRegistry registry ) : base( registry, SingletonLocator.Instance, FactoryDelegateFactory.Instance.ToDelegate() ) {}
 
-		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<>).MakeGenericType( itemType.ToItem() );
+		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FactoryDelegateFactory<>).MakeGenericType( itemType.ToItem() );
 	}
 
 	public class RegisterFactoryWithParameterCommand : RegisterFactoryCommandBase<IFactoryWithParameter>
@@ -200,6 +199,6 @@ namespace DragonSpark.Setup.Registration
 			this.parameterLocator = parameterLocator;
 		}
 
-		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FuncFactory<,>).MakeGenericType( parameterLocator( parameter ), itemType );
+		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(FactoryDelegateFactory<,>).MakeGenericType( parameterLocator( parameter ), itemType );
 	}
 }

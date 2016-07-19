@@ -13,14 +13,14 @@ namespace DragonSpark.Composition
 	{
 		readonly static Func<Activator.Parameter, Delegate> DelegateSource = ActivatorDelegateWithConversionFactory.Instance.ToDelegate();
 
-		public FactoryDelegateExportDescriptorProvider() : base( FactoryTypes.Instance.Get(), FactoryDelegateTransformer.Instance, DelegateSource ) {}
+		public FactoryDelegateExportDescriptorProvider() : base( FactoryTypes.Instance.Value, FactoryDelegateTransformer.Instance, DelegateSource ) {}
 	}
 
 	public class FactoryWithParameterDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
 		readonly static Func<Activator.Parameter, Delegate> DelegateSource = ActivatorWithParameterDelegateFactory.Instance.ToDelegate();
 
-		public FactoryWithParameterDelegateExportDescriptorProvider() : base( FactoryTypes.Instance.Get(), FactoryDelegateTransformer.InstanceWithParameter, DelegateSource ) {}
+		public FactoryWithParameterDelegateExportDescriptorProvider() : base( FactoryTypes.Instance.Value, FactoryDelegateTransformer.InstanceWithParameter, DelegateSource ) {}
 	}
 
 	[ApplyAutoValidation]

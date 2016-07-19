@@ -292,7 +292,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			LoggingHistory.Instance.Assign( o => sink );
+			LoggingHistory.Instance.Set( this, sink );
 			var logger = Logging.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			ModuleManager manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);
@@ -320,7 +320,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			LoggingHistory.Instance.Assign( o => sink );
+			LoggingHistory.Instance.Set( this, sink );
 			var logger = Logging.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManagerExtended(loader, catalog, logger, moduleTypeLoader);
@@ -364,7 +364,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var moduleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable);
 			var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
 			var sink = new MockLoggerHistorySink();
-			LoggingHistory.Instance.Assign( o => sink );
+			LoggingHistory.Instance.Set( this, sink );
 			var logger = Logging.Instance.Get( this );
 			var moduleTypeLoader = new MockModuleTypeLoader();
 			var manager = new ModuleManager(loader, catalog, logger, moduleTypeLoader);

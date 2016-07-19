@@ -15,7 +15,7 @@ namespace DragonSpark.Composition
 
 		public override IServiceProvider Create()
 		{
-			var context = CompositionSource.Instance.Get();
+			var context = CompositionHostFactory.Instance.Create();
 			var primary = new ServiceLocator( context );
 			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), new RecursionAwareServiceProvider( primary ), DefaultServiceProvider.Instance );
 			return result;

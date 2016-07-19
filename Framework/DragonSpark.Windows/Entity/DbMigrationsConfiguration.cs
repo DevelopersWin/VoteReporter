@@ -6,7 +6,7 @@ namespace DragonSpark.Windows.Entity
 {
 	public class DbMigrationsConfiguration<TContext> : System.Data.Entity.Migrations.DbMigrationsConfiguration<TContext> where TContext : DbContext
 	{
-		public DbMigrationsConfiguration() : this( GlobalServiceProvider.Instance.GetService<ActivationSource>() ?? ActivationSource.Default.Get() ) {}
+		public DbMigrationsConfiguration() : this( GlobalServiceProvider.Instance.GetService<ActivationSource>() ?? ActivationSource.Default.Value ) {}
 
 		public DbMigrationsConfiguration( [Required]IActivationSource source )
 		{
