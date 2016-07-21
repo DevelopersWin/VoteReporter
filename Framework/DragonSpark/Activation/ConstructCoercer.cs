@@ -1,3 +1,4 @@
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
@@ -32,11 +33,13 @@ namespace DragonSpark.Activation
 		public static ParameterActivator<T> Instance { get; } = new ParameterActivator<T>();
 		ParameterActivator() : this( typeof(T) ) {}
 
+		readonly static Coerce<T> Coerce = ValueAwareCoercer<T>.Instance.ToDelegate();
+
 		readonly IActivator activator;
 		readonly Type resultType;
 		readonly Coerce<T> coercer;
 
-		public ParameterActivator( Type resultType ) : this( Constructor.Instance, resultType, ValueAwareCoercer<T>.Instance.ToDelegate() ) {}
+		public ParameterActivator( Type resultType ) : this( Constructor.Instance, resultType, Coerce ) {}
 
 		protected ParameterActivator( IActivator activator, Type resultType, Coerce<T> coercer )
 		{
@@ -72,7 +75,8 @@ namespace DragonSpark.Activation
 				return store.Value;
 			}
 
-			var result = parameter.As<T>();
+			var configuration = parameter as IConfiguration<T>;
+			var result = configuration != null ? configuration.Get() : base.PerformCoercion( parameter );
 			return result;
 		}
 	}

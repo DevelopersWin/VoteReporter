@@ -27,10 +27,10 @@ namespace DragonSpark.Diagnostics
 		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, MessageFactory ) {}
 	}
 
-	public static class MigrationProperties
+	/*public static class MigrationProperties
 	{
 		public static ICache<LogEvent, bool> IsMigrating { get; } = new StoreCache<LogEvent, bool>();
-	}
+	}*/
 
 	/*public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>
 	{

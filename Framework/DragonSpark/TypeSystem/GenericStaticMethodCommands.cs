@@ -146,6 +146,8 @@ namespace DragonSpark.TypeSystem
 
 		public static TResult Invoke<TParameter, TResult>( this Invoke @this, TParameter argument ) => (TResult)@this.Invoke( argument );
 
+		public static T Invoke<T>( this MethodContext<Invoke> @this ) => Invoke<T>( @this, Items<object>.Default );
+
 		public static T Invoke<T>( this MethodContext<Invoke> @this, params object[] arguments ) => (T)@this.Get( ToType( arguments ) ).Invoke( arguments );
 
 		public static void Invoke( this MethodContext<Execute> @this, params object[] arguments ) => @this.Get( ToType( arguments ) ).Invoke( arguments );

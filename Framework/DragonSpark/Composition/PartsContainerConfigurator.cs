@@ -35,13 +35,13 @@ namespace DragonSpark.Composition
 
 	public class ServicesExportDescriptorProvider : ExportDescriptorProvider, IDependencyLocatorKey
 	{
-		readonly Func<IDependencyLocatorKey, Setup.ServiceLocator> locator;
+		readonly Func<IDependencyLocatorKey, ServiceSource> locator;
 		readonly InstanceExportDescriptorProvider<IDependencyLocatorKey> key;
 		readonly Func<Type, object> get;
 
 		public ServicesExportDescriptorProvider() : this( DependencyLocator.Instance.For ) {}
 
-		protected ServicesExportDescriptorProvider( Func<IDependencyLocatorKey, Setup.ServiceLocator> locator )
+		protected ServicesExportDescriptorProvider( Func<IDependencyLocatorKey, ServiceSource> locator )
 		{
 			this.locator = locator;
 			key = new InstanceExportDescriptorProvider<IDependencyLocatorKey>( this );
@@ -90,7 +90,7 @@ namespace DragonSpark.Composition
 
 		public override ContainerConfiguration Create( ContainerConfiguration configuration )
 		{
-			var system = ApplicationTypes.Instance.Get();
+			var system = ApplicationParts.Instance.Get();
 			var core = FrameworkTypes.Instance.Get();
 			var all = system.Types.ToArray().Union( FrameworkTypes.Instance.Get().ToArray() ).ToImmutableArray();
 

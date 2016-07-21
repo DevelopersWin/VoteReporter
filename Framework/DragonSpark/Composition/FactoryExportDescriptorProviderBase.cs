@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -92,7 +91,7 @@ namespace DragonSpark.Composition
 					if ( result != null )
 					{
 						parameter.Context.Checked( result );
-						ActivationProperties.Factory.Set( result, dependency.Target.Contract.ContractType );
+						// ActivationProperties.Factory.Set( result, dependency.Target.Contract.ContractType );
 					}
 					return result;
 				}

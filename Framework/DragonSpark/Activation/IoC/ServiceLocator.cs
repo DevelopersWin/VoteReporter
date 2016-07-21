@@ -20,6 +20,7 @@ namespace DragonSpark.Activation.IoC
 	[Disposable( ThrowObjectDisposedException = true )]
 	public class ServiceLocator : ServiceLocatorImplBase
 	{
+		[Reference]
 		readonly ILogger logger;
 
 		public ServiceLocator( IUnityContainer container ) : this( container, container.TryResolve<ILogger>() ?? Logging.Instance.Get( container ) ) {}

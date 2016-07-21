@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -9,7 +10,6 @@ using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -147,14 +147,9 @@ namespace DragonSpark.Diagnostics.Logger
 		}
 	}
 
-	public abstract class LoggerConfigurationsFactoryBase : FactoryBase<object, ImmutableArray<ITransformer<LoggerConfiguration>>>
+	public abstract class LoggerConfigurationsFactoryBase : ConfigurationsFactoryBase<object, LoggerConfiguration>
 	{
-		// public static LoggerConfigurationsFactoryBase Instance { get; } = new LoggerConfigurationsFactoryBase();
-		// protected LoggerConfigurationsFactoryBase() {}
-
-		public override ImmutableArray<ITransformer<LoggerConfiguration>> Create( object parameter ) => From( parameter ).ToImmutableArray();
-
-		protected virtual IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
+		protected override IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
 		{
 			yield return new ControllerTransform( LoggingController.Instance.Get( parameter ) );
 			yield return new CreatorFilterTransformer();

@@ -47,6 +47,13 @@ namespace DragonSpark.Runtime.Properties
 			DelegateCache() : base( command => command.Get ) {}
 		}
 
+		public static IStore<T> ToStore<T>( this ICache<object, T> @this ) => StoreCache<T>.Default.Get( @this );
+		class StoreCache<T> : Cache<ICache<object, T>, IStore<T>>
+		{
+			public static StoreCache<T> Default { get; } = new StoreCache<T>();
+			StoreCache() : base( cache => new DefaultExecutionContextFactoryStore<T>( cache.Get ) ) {}
+		}
+
 		/*public static TDelegate Apply<TContext, TDelegate>( this ICache<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class
 		{
 			@this.Set( source, context );

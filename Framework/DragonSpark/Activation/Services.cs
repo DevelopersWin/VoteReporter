@@ -1,6 +1,9 @@
 using DragonSpark.Configuration;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using System;
 
@@ -10,7 +13,7 @@ namespace DragonSpark.Activation
 	{
 		public static GlobalServiceProvider Instance { get; } = new GlobalServiceProvider();
 
-		GlobalServiceProvider() : base( () => DefaultServiceProvider.Instance )
+		GlobalServiceProvider() : base( () => DefaultServiceProvider.Instance.Value )
 		{
 			ServiceLocator.SetLocatorProvider( GetService<IServiceLocator> );
 		}
@@ -20,18 +23,25 @@ namespace DragonSpark.Activation
 		public T GetService<T>( Type type ) => Get().Get<T>( type );
 	}
 
-	public sealed class DefaultServiceProvider : IServiceProvider
+	public sealed class DefaultServiceProvider : CompositeServiceProvider
 	{
-		public static DefaultServiceProvider Instance { get; } = new DefaultServiceProvider();
-		DefaultServiceProvider() : this( Activator.Instance.Get ) {}
+		public static IStore<IServiceProvider> Instance { get; } = new ExecutionContextStore<IServiceProvider>( () => new DefaultServiceProvider() );
+		DefaultServiceProvider() : base( new InstanceServiceProvider( ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToStore(), LoggingController.Instance.ToStore(), Logging.Instance.ToStore() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
+	}
 
-		readonly Func<IActivator> activator;
+	public delegate object ServiceSource( Type serviceType );
 
-		DefaultServiceProvider( Func<IActivator> activator )
+	public class DecoratedServiceProvider : IServiceProvider
+	{
+		readonly ServiceSource inner;
+
+		public DecoratedServiceProvider( IServiceProvider provider ) : this( provider.GetService ) {}
+
+		public DecoratedServiceProvider( ServiceSource inner )
 		{
-			this.activator = activator;
+			this.inner = inner;
 		}
 
-		public object GetService( Type serviceType ) => activator().Activate<object>( serviceType );
+		public virtual object GetService( Type serviceType ) => inner( serviceType );
 	}
 }

@@ -2,7 +2,6 @@
 using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Runtime;
@@ -21,10 +20,8 @@ namespace DragonSpark.Testing.Diagnostics
 		public void EnsureComposition( CompositionContext context, string text )
 		{
 			var logger = context.GetExport<ILogger>();
-			var actual = ActivationProperties.Factory.Get( logger );
-			// Assert.Equal( typeof(LoggerFactory), actual );
-
-			Assert.NotSame( DefaultServiceProvider.Instance.Get<ILogger>(), logger );
+			
+			Assert.NotSame( DefaultServiceProvider.Instance.Value.Get<ILogger>(), logger );
 
 			var method = GetType().GetMethod( nameof(AnotherMethod), BindingOptions.AllMembers );
 			var command = new LogCommand( logger );
@@ -32,7 +29,7 @@ namespace DragonSpark.Testing.Diagnostics
 			command.Execute( new HelloWorld( text, method ) );
 			
 			var history = context.GetExport<ILoggerHistory>();
-			Assert.Same( DefaultServiceProvider.Instance.Get<ILoggerHistory>(), history );
+			Assert.Same( DefaultServiceProvider.Instance.Value.Get<ILoggerHistory>(), history );
 			var message = LogEventMessageFactory.Instance.Create( history.Events ).Last();
 			Assert.Contains( text, message );
 			

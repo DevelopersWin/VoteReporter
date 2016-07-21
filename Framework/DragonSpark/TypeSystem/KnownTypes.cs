@@ -10,6 +10,6 @@ namespace DragonSpark.TypeSystem
 	public class KnownTypes : StructuredParameterizedConfiguration<Type, ImmutableArray<Type>>
 	{
 		public static IParameterizedConfiguration<Type, ImmutableArray<Type>> Instance { get; } = new KnownTypes();
-		KnownTypes() : base( type => ApplicationTypes.Instance.Value.Types.Where( type.Adapt().IsAssignableFrom ).ToImmutableArray() ) {}
+		KnownTypes() : base( type => ApplicationParts.Instance.Value.Types.Where( type.Adapt().IsAssignableFrom ).ToImmutableArray() ) {}
 	}
 }

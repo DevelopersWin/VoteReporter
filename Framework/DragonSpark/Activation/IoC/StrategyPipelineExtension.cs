@@ -188,7 +188,7 @@ namespace DragonSpark.Activation.IoC
 	[ApplyAutoValidation]
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
-		public static IStore<Func<Type, Type>> Instance { get; } = new ExecutionContextStore<Func<Type, Type>>( () => new BuildableTypeFromConventionLocator( ApplicationTypes.Instance.Value.Types.ToArray() ).Cached().Get );
+		public static IStore<Func<Type, Type>> Instance { get; } = new ExecutionContextStore<Func<Type, Type>>( () => new BuildableTypeFromConventionLocator( ApplicationParts.Instance.Value.Types.ToArray() ).Cached().Get );
 
 		readonly static Func<Type, bool> Specification = CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).IsSatisfiedBy;
 		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;

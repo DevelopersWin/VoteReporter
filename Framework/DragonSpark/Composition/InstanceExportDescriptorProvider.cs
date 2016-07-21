@@ -1,6 +1,5 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -49,7 +48,7 @@ namespace DragonSpark.Composition
 		{
 			if ( contracts.Contains( contract ) )
 			{
-				ActivationProperties.Instance.Set( instance, true );
+				// ActivationProperties.Instance.Set( instance, true );
 				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, GetDescriptor );
 			}
 		}

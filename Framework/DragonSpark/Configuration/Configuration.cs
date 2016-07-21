@@ -1,12 +1,15 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Commands;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Windows.Input;
+using Defaults = DragonSpark.Activation.Defaults;
 
 namespace DragonSpark.Configuration
 {
@@ -134,6 +137,20 @@ namespace DragonSpark.Configuration
 		TValue Get( TKey key );
 	}
 
+	public abstract class ConfigurationsFactoryBase<T> : FactoryBase<ImmutableArray<ITransformer<T>>>
+	{
+		public override ImmutableArray<ITransformer<T>> Create() => From().ToImmutableArray();
+
+		protected abstract IEnumerable<ITransformer<T>> From();
+	}
+
+	public abstract class ConfigurationsFactoryBase<TParameter, TConfiguration> : FactoryBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>
+	{
+		public override ImmutableArray<ITransformer<TConfiguration>> Create( TParameter parameter ) => From( parameter ).ToImmutableArray();
+
+		protected abstract IEnumerable<ITransformer<TConfiguration>> From( object parameter );
+	}
+
 	public interface IConfigurable<T> : IConfiguration<T>, IAssignable<Func<T>> {}
 
 	public interface IConfiguration<out T>
@@ -165,14 +182,21 @@ namespace DragonSpark.Configuration
 		protected override void OnAssign( Func<T> value ) => base.OnAssign( new DeferredStore<T>( value ).Get );
 	}
 
-	/*public static class ConfigurationExtensions
+	public static class ConfigurationExtensions
 	{
-		public static T Apply<T>( this IConfiguration<T> @this, Func<T> factory )
+		/*public static T Apply<T>( this IConfiguration<T> @this, Func<T> factory )
 		{
 			@this.Assign( factory );
 			return @this.Get();
-		}
+		}*/
 
-		/*public static T Default<T>( this IParameterizedConfiguration<object, T> @this ) => @this.Get( Defaults.ExecutionContext() );#1#
-	}*/
+		public static T Default<T>( this IParameterizedConfiguration<object, T> @this ) => @this.Get( Defaults.ExecutionContext() );
+
+		public static IStore<T> ToStore<T>( this IParameterizedConfiguration<object, T> @this ) => StoreCache<T>.Default.Get( @this );
+		class StoreCache<T> : Cache<IParameterizedConfiguration<object, T>, IStore<T>>
+		{
+			public static StoreCache<T> Default { get; } = new StoreCache<T>();
+			StoreCache() : base( configuration => new DefaultExecutionContextFactoryStore<T>( configuration.Get ) ) {}
+		}
+	}
 }

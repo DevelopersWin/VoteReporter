@@ -6,7 +6,6 @@ using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -216,12 +215,15 @@ namespace DragonSpark.Activation
 		public static Func<object> ExecutionContext { get; } = () => ExecutionContextLocator.Instance.Value.Value;
 
 		public static Func<Type, Func<object, IFactoryWithParameter>> ParameterConstructedFactory { get; } = Defaults<IFactoryWithParameter>.Constructor.ToDelegate();
+
 		public static Func<Type, bool> ApplicationType { get; } = ApplicationTypeSpecification.Instance.ToDelegate();
 	}
 
 	public static class Defaults<T>
 	{
-		public static Coerce<T> Coercer { get; } = Coercer<T>.Instance.ToDelegate();
+		public static Coerce<T> Coercer { get; } = Coercer<T>.Instance.Coerce;
+
+		public static Func<object, T> ValueCoercer { get; } = ValueAwareCoercer<T>.Instance.Coerce;
 
 		public static ICache<Type, Func<object, T>> Constructor { get; } = new Cache<Type, Func<object, T>>( type => new ParameterActivator<T>( type ).Create );
 	}
@@ -245,7 +247,7 @@ namespace DragonSpark.Activation
 				.WhereAssigned()
 				.Select( CachedDelegate )
 				.ToArray();
-			var result = new CompositeFactory<TParameter, TResult>( items ).ToDelegate();
+			var result = new Func<TParameter, TResult>( new CompositeFactory<TParameter, TResult>( items ).Create );
 			return result;
 		}
 	}
@@ -260,7 +262,7 @@ namespace DragonSpark.Activation
 
 	public class CompositeFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
 	{
-		readonly IEnumerable<Func<TParameter, TResult>> inner;
+		readonly ImmutableArray<Func<TParameter, TResult>> inner;
 
 		public CompositeFactory( params IFactory<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
@@ -272,7 +274,7 @@ namespace DragonSpark.Activation
 
 		public CompositeFactory( Coerce<TParameter> coercer, ISpecification<TParameter> specification, params Func<TParameter, TResult>[] inner ) : base( coercer, specification )
 		{
-			this.inner = inner;
+			this.inner = inner.ToImmutableArray();
 		}
 
 		public override TResult Create( TParameter parameter ) => inner.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) ).FirstAssigned();
@@ -432,7 +434,6 @@ namespace DragonSpark.Activation
 	public class Creator : Cache<ICreator>
 	{
 		public static Creator Default { get; } = new Creator();
-
 		Creator() {}
 	}
 }

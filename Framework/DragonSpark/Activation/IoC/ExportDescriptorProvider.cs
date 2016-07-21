@@ -1,5 +1,4 @@
 using DragonSpark.Activation.IoC.Specifications;
-using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
@@ -48,35 +47,32 @@ namespace DragonSpark.Activation.IoC
 
 	public class ServicesBuildPlanPolicy : IBuildPlanPolicy
 	{
-		readonly static Func<object, bool> DefaultActivated = ActivationProperties.IsActivatedInstanceSpecification.Default.ToDelegate();
+		// readonly static Func<object, bool> DefaultActivated = ActivationProperties.IsActivatedInstanceSpecification.Default.ToDelegate();
 
 		readonly IDependencyLocatorKey locatorKey;
 		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
-		readonly Func<object, bool> isActivated;
+		// readonly Func<object, bool> isActivated;
 		readonly Condition condition = new Condition();
 
-		public ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( locatorKey, registry, DefaultActivated ) {}
+		// public ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( locatorKey, registry/*, DefaultActivated*/ ) {}
 
-		public ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, Func<object, bool> isActivated ) : this( locatorKey, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry ), isActivated ) {}
+		public ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry/*, Func<object, bool> isActivated*/ ) : this( locatorKey, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry )/*, isActivated */) {}
 
-		ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, Func<object, bool> isActivated )
+		ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry/*, Func<object, bool> isActivated*/ )
 		{
 			this.locatorKey = locatorKey;
 			this.registry = registry;
-			this.isActivated = isActivated;
+			// this.isActivated = isActivated;
 		}
 
 		public void BuildUp( IBuilderContext context )
 		{
 			var existing = DependencyLocator.Instance.For( locatorKey )?.Invoke( context.BuildKey.Type );
-			if ( existing != null )
+			if ( existing != null && condition.Get( existing ).Apply() )
 			{
-				if ( condition.Get( existing ).Apply() && isActivated( existing ) )
-				{
-					registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing ) );
-				}
+				registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing ) );
 			}
-			
+
 			context.Complete( existing );
 		}
 	}
