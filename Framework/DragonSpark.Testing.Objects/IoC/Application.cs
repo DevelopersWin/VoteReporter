@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Objects.IoC
 	public class UnityContainerFactory : ConfiguringFactory<IUnityContainer>
 	{
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-		protected UnityContainerFactory() : base( DefaultUnityContainerFactory.Instance.Create, new Action( InitializeCommand.Instance.Run ) ) {}
+		protected UnityContainerFactory() : base( DefaultUnityContainerFactory.Instance.Create, new Action( InitializeSetupCommand.Instance.Run ) ) {}
 
 		public class Register : RegisterFactoryAttribute
 		{

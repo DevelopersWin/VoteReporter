@@ -10,7 +10,6 @@ using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
-using PostSharp.Patterns.Contracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -117,25 +116,7 @@ namespace DragonSpark.Activation.IoC
 		readonly IStrategyRepository strategyRepository;
 		readonly StrategyEntryFactory factory;
 
-		public class StrategyEntryFactory : FactoryBase<IEnumerable<StrategyEntry>>
-		{
-			readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
-			readonly ConventionStrategy conventionStrategy;
-
-			public StrategyEntryFactory( [Required] MetadataLifetimeStrategy metadataLifetimeStrategy, [Required] ConventionStrategy conventionStrategy )
-			{
-				this.metadataLifetimeStrategy = metadataLifetimeStrategy;
-				this.conventionStrategy = conventionStrategy;
-			}
-
-			public override IEnumerable<StrategyEntry> Create() => new[]
-			{
-				new StrategyEntry( metadataLifetimeStrategy, UnityBuildStage.Lifetime, Priority.Higher ),
-				new StrategyEntry( conventionStrategy, UnityBuildStage.PreCreation )
-			};
-		}
-		
-		public StrategyPipelineExtension( [Required]IStrategyRepository strategyRepository, [Required] StrategyEntryFactory factory )
+		public StrategyPipelineExtension( IStrategyRepository strategyRepository, StrategyEntryFactory factory )
 		{
 			this.strategyRepository = strategyRepository;
 			this.factory = factory;
@@ -153,14 +134,31 @@ namespace DragonSpark.Activation.IoC
 			}
 		}
 
+		public class StrategyEntryFactory : FactoryBase<IEnumerable<StrategyEntry>>
+		{
+			readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
+			readonly ConventionStrategy conventionStrategy;
+
+			public StrategyEntryFactory( MetadataLifetimeStrategy metadataLifetimeStrategy, ConventionStrategy conventionStrategy )
+			{
+				this.metadataLifetimeStrategy = metadataLifetimeStrategy;
+				this.conventionStrategy = conventionStrategy;
+			}
+
+			public override IEnumerable<StrategyEntry> Create() => new[]
+			{
+				new StrategyEntry( metadataLifetimeStrategy, UnityBuildStage.Lifetime, Priority.Higher ),
+				new StrategyEntry( conventionStrategy, UnityBuildStage.PreCreation )
+			};
+		}
+
 		public class MetadataLifetimeStrategy : BuilderStrategy
 		{
 			readonly ILogger logger;
 			readonly LifetimeManagerFactory factory;
 			readonly Condition condition = new Condition();
 
-
-			public MetadataLifetimeStrategy( [Required]ILogger logger, [Required]LifetimeManagerFactory factory )
+			public MetadataLifetimeStrategy( ILogger logger, LifetimeManagerFactory factory )
 			{
 				this.logger = logger;
 				this.factory = factory;

@@ -5,11 +5,9 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:ds="http://framework.dragonspark.us"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
-	xmlns:startup="clr-namespace:DevelopersWin.VoteReporter.Application.Startup"
-	xmlns:composition="clr-namespace:DragonSpark.Composition;assembly=DragonSpark"
 	mc:Ignorable="d" 
-	Services="{ds:Factory {x:Static composition:ServiceProviderFactory.Instance}}"
 >
+	<!--Services="{ds:Factory {x:Static composition:ServiceProviderFactory.Instance}}"-->
 	<setup:ApplyTaskMonitorCommand />
 	<setup:ApplySetup />
 </ds:ConsoleApplication>

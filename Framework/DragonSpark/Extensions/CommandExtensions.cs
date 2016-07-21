@@ -1,4 +1,5 @@
-﻿using DragonSpark.Runtime;
+﻿using DragonSpark.Activation;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
@@ -22,6 +23,7 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
+		public static FixedCommand<Func<T>> Fixed<T>( this ICommand<Func<T>> @this, T parameter ) => new FixedCommand<Func<T>>( @this, new FixedFactory<T>( parameter ).Create );
 		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, T parameter ) => new FixedCommand<T>( @this, parameter );
 		
 		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => DelegateCache<T>.Default.Get( @this );

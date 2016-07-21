@@ -7,7 +7,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public static ILogger ForSource( this ILogger @this, object context )
 		{
-			var formatted = FormatterFactory.Instance.Get().From( context );
+			var formatted = FormatterFactory.Instance.Value.From( context );
 			var result = @this.ForContext( Constants.SourceContextPropertyName, formatted, true );
 			return result;
 		}

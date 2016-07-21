@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
@@ -54,14 +53,15 @@ namespace DragonSpark.Activation.IoC
 		public IUnityContainer Container { get; }
 	}
 
-	public sealed class UnityContainerFactory : FactoryBase<IUnityContainer>
+	public sealed class UnityContainerFactory : AggregateFactoryBase<IUnityContainer>
 	{
+		readonly static ImmutableArray<ITransformer<IUnityContainer>> Default = new ITransformer<IUnityContainer>[] { DefaultUnityExtensions.Instance }.ToImmutableArray();
+
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-		UnityContainerFactory() {}
+		UnityContainerFactory() : base( () => new UnityContainer().Extend<DefaultBehaviorExtension>(), () => Default ) {}
 
 		[Creator]
-		public override IUnityContainer Create() => 
-			ContainerConfigurations.Instance.Get().Aggregate( new UnityContainer().Extend<DefaultBehaviorExtension>(), ( configuration, transformer ) => transformer.Create( configuration ) );
+		public override IUnityContainer Create() => base.Create();
 	}
 
 	public class DefaultBehaviorExtension : UnityContainerExtension
@@ -78,13 +78,6 @@ namespace DragonSpark.Activation.IoC
 
 	public abstract class UnityConfigurator : TransformerBase<IUnityContainer> {}
 
-	public sealed class ContainerConfigurations : Configuration<ImmutableArray<UnityConfigurator>>
-	{
-		readonly static ImmutableArray<UnityConfigurator> Default = new UnityConfigurator[] { ServicesConfigurator.Instance, DefaultUnityExtensions.Instance }.ToImmutableArray();
-		public static ContainerConfigurations Instance { get; } = new ContainerConfigurations();
-		ContainerConfigurations() : base( () => Default ) {}
-	}
-
 	public sealed class DefaultUnityExtensions : UnityConfigurator
 	{
 		public static DefaultUnityExtensions Instance { get; } = new DefaultUnityExtensions();
@@ -93,20 +86,21 @@ namespace DragonSpark.Activation.IoC
 		public override IUnityContainer Create( IUnityContainer parameter ) => 
 			parameter
 				.Extend<InstanceTypeRegistrationMonitorExtension>()
-				.Extend<CachingBuildPlanExtension>()
 				.Extend<DefaultRegistrationsExtension>()
+				.Extend<ServicesIntegrationExtension>()
 				.Extend<StrategyPipelineExtension>()	
+				.Extend<CachingBuildPlanExtension>()
 				.Extend<DefaultConstructorPolicyExtension>()
 				;
 	}
 
-	public sealed class ServicesConfigurator : UnityConfigurator
+	/*public sealed class ServicesConfigurator : UnityConfigurator
 	{
 		public static ServicesConfigurator Instance { get; } = new ServicesConfigurator();
 		ServicesConfigurator() {}
 
 		public override IUnityContainer Create( IUnityContainer parameter ) => parameter.Extend<ServicesIntegrationExtension>();
-	}
+	}*/
 
 	public class StrategyEntry : Entry<IBuilderStrategy>
 	{

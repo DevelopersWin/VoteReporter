@@ -6,9 +6,7 @@ namespace DragonSpark.Extensions
 {
 	public static class StringExtensions
 	{
-		public static string AsString( this object @this ) => @this.With( o => o as string ?? o.ToString() );
-
-		public static string Capitalized( this string target ) => string.IsNullOrEmpty( target ) ? string.Empty : char.ToUpper( target[ 0 ] ) + target.Substring( 1 );
+		public static string Capitalized( this string target ) => string.IsNullOrEmpty( target ) ? string.Empty : $"{char.ToUpper( target[0] )}{target.Substring( 1 )}";
 
 		public static string NullIfEmpty( this string target ) => string.IsNullOrEmpty( target ) ? null : target;
 

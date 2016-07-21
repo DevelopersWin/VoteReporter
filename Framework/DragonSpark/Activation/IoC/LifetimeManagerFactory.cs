@@ -7,18 +7,6 @@ using System.Reflection;
 
 namespace DragonSpark.Activation.IoC
 {
-	/*public class ContainerControlledLifetimeManager : Microsoft.Practices.Unity.ContainerControlledLifetimeManager
-	{
-		protected override void Dispose( bool disposing )
-		{
-			var activated = GetValue().With( ActivationProperties.IsActivatedInstanceSpecification.Instance.IsSatisfiedBy );
-			if ( !activated )
-			{
-				base.Dispose( disposing );
-			}
-		}
-	}*/
-
 	public class LifetimeManagerFactory<T> : LifetimeManagerFactory where T : LifetimeManager
 	{
 		public LifetimeManagerFactory( IUnityContainer container ) : base( container, AttributedLifetimeFactory.Instance.ToDelegate() ) {}

@@ -5,6 +5,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Commands;
 using System;
+using System.Collections.Immutable;
 using System.Windows.Input;
 
 namespace DragonSpark.Configuration
@@ -21,6 +22,11 @@ namespace DragonSpark.Configuration
 	public abstract class InitializationCommandBase : CompositeCommand, IInitializationCommand
 	{
 		protected InitializationCommandBase( params ICommand[] commands ) : base( new OnlyOnceSpecification(), commands ) {}
+	}
+
+	public class AssignConfigurationsCommand<T> : AssignValueCommand<Func<ImmutableArray<ITransformer<T>>>>
+	{
+		public AssignConfigurationsCommand( IAssignable<Func<ImmutableArray<ITransformer<T>>>> assignable ) : base( assignable ) {}
 	}
 
 	public class ApplyParameterizedFactoryConfigurationCommand<T> : ApplyParameterizedFactoryConfigurationCommand<object, T>
@@ -128,12 +134,14 @@ namespace DragonSpark.Configuration
 		TValue Get( TKey key );
 	}
 
+	public interface IConfigurable<T> : IConfiguration<T>, IAssignable<Func<T>> {}
+
 	public interface IConfiguration<out T>
 	{
 		T Get();
 	}
 
-	public class Configuration<T> : IConfiguration<T>, IAssignable<Func<T>>
+	public class Configuration<T> : IConfigurable<T>
 	{
 		readonly IWritableStore<Func<T>> store;
 

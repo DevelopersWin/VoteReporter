@@ -31,7 +31,7 @@
 	}
 
 	[Initialize]
-	public class InitializeCommand : CompositeCommand
+	public class InitializeSetupCommand : CompositeCommand
 	{
 		public Priority Order { get; set; }
 	}*/

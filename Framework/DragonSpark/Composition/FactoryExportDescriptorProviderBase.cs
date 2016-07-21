@@ -15,17 +15,14 @@ namespace DragonSpark.Composition
 {
 	public abstract class FactoryExportDescriptorProviderBase : ExportDescriptorProvider
 	{
-		readonly Func<LocateTypeRequest, Type> locator;
+		readonly Func<LocateTypeRequest, Type> locator = FactoryTypes.Instance.Value.ToDelegate();
 		readonly ITransformer<CompositionContract> resolver;
 		readonly Func<Activator.Parameter, object> delegateSource;
 		
-		protected FactoryExportDescriptorProviderBase( FactoryTypes locator, Func<Activator.Parameter, object> delegateSource ) : this( locator, SelfTransformer<CompositionContract>.Instance, delegateSource ) {}
+		protected FactoryExportDescriptorProviderBase( Func<Activator.Parameter, object> delegateSource ) : this( SelfTransformer<CompositionContract>.Instance, delegateSource ) {}
 
-		protected FactoryExportDescriptorProviderBase( FactoryTypes locator, ITransformer<CompositionContract> resolver, Func<Activator.Parameter, object> delegateSource ) : this( locator.ToDelegate(), resolver, delegateSource ) {}
-
-		FactoryExportDescriptorProviderBase( Func<LocateTypeRequest, Type> locator, ITransformer<CompositionContract> resolver, Func<Activator.Parameter, object> delegateSource )
+		protected FactoryExportDescriptorProviderBase( ITransformer<CompositionContract> resolver, Func<Activator.Parameter, object> delegateSource )
 		{
-			this.locator = locator;
 			this.resolver = resolver;
 			this.delegateSource = delegateSource;
 		}
@@ -48,7 +45,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		class Promise : ExportDescriptorPromise
+		sealed class Promise : ExportDescriptorPromise
 		{
 			public Promise( CompositionDependency dependency, string origin, CompositionContract resultContract, DependencyAccessor descriptorAccessor, Func<Activator.Parameter, object> delegateSource ) : this( dependency, origin, new ActivatorFactory( ActivatorFactory.ActivatorRegistryFactory.Instance, delegateSource ).Create( new ActivatorFactory.Parameter( descriptorAccessor, resultContract, dependency.Contract ) ) ) {}
 			Promise( CompositionDependency dependency, string origin, CompositeActivator activator ) : this( dependency, origin, new Context( dependency, activator ) ) {}
@@ -87,7 +84,7 @@ namespace DragonSpark.Composition
 					return result;
 				}
 
-				Func<LifetimeContext, object> Factory( Parameter parameter ) => new FixedFactory<Parameter, object>( @new, parameter ).Wrap<object>().ToDelegate();
+				Func<LifetimeContext, object> Factory( Parameter parameter ) => new FixedFactory<Parameter, object>( @new, parameter ).Wrap<object>().Create;
 
 				object New( Parameter parameter )
 				{

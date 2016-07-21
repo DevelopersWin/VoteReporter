@@ -1,7 +1,6 @@
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -9,7 +8,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly PersistentServiceRegistry registry;
 
-		public DefaultRegistrationsExtension( [Required]PersistentServiceRegistry registry )
+		public DefaultRegistrationsExtension( PersistentServiceRegistry registry )
 		{
 			this.registry = registry;
 		}
@@ -21,15 +20,12 @@ namespace DragonSpark.Activation.IoC
 			registry.Register<IStagedStrategyChain>( Context.BuildPlanStrategies );
 
 			registry.Register<IServiceRegistry, ServiceRegistry>();
-			/*registry.Register<ConstructorStore, ConstructorStore>();
-			registry.Register<ConstructorQueryProvider, ConstructorQueryProvider>();
-			registry.Register<CanConstructSpecification, CanConstructSpecification>();*/
 			registry.Register<IActivator, Activator>();
 		}
 
 		class Activator : CompositeActivator
 		{
-			public Activator( [Required]Locator activator, [Required]Constructor constructor ) : base( activator, constructor, Activation.Constructor.Instance ) {}
+			public Activator( Locator activator, Constructor constructor ) : base( activator, constructor, Activation.Constructor.Instance ) {}
 		}
 	}
 }

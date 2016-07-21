@@ -13,6 +13,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
+using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
@@ -67,7 +68,7 @@ namespace DragonSpark.Windows.Markup
 		public override object Create( Type parameter )
 		{
 			var type = typeof(Mock<>).MakeGenericType( parameter );
-			var result = GlobalServiceProvider.Instance.GetService<Mock>( type ).Object;
+			var result = Activator.Activate<Mock>( type ).Object;
 			return result;
 		}
 	}

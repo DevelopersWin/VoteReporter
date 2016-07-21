@@ -3,7 +3,7 @@ using System;
 
 namespace DragonSpark.Activation.IoC
 {
-	public sealed class ServiceProviderFactory : FactoryBase<IServiceProvider, IServiceProvider>
+	public sealed class ServiceProviderFactory : TransformerBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() {}
@@ -11,7 +11,8 @@ namespace DragonSpark.Activation.IoC
 		public override IServiceProvider Create( IServiceProvider parameter )
 		{
 			var primary = new ServiceLocator( UnityContainerFactory.Instance.Create() );
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary ), new RecursionAwareServiceProvider( primary ), parameter );
+			RegisterServiceProviderCommand.Instance.Execute( primary );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( primary ), primary, parameter );
 			return result;
 		}
 	}

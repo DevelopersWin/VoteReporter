@@ -33,28 +33,29 @@ namespace DragonSpark.Composition
 		public override ContainerConfiguration Create( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
 	}
 
-	public interface IDependencyLocator
+	public class ServicesExportDescriptorProvider : ExportDescriptorProvider, IDependencyLocatorKey
 	{
-		IServiceProvider For( IServiceProvider provider );
-	}
-
-	class DependencyLocator : IDependencyLocator {
-		public IServiceProvider For( IServiceProvider provider )
-		{
-			return null;
-		}
-	}
-
-	public class ServicesExportDescriptorProvider : ExportDescriptorProvider
-	{
+		readonly Func<IDependencyLocatorKey, Setup.ServiceLocator> locator;
+		readonly InstanceExportDescriptorProvider<IDependencyLocatorKey> key;
 		readonly Func<Type, object> get;
 
-		public ServicesExportDescriptorProvider()
+		public ServicesExportDescriptorProvider() : this( DependencyLocator.Instance.For ) {}
+
+		protected ServicesExportDescriptorProvider( Func<IDependencyLocatorKey, Setup.ServiceLocator> locator )
 		{
+			this.locator = locator;
+			key = new InstanceExportDescriptorProvider<IDependencyLocatorKey>( this );
 			get = Get;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
+		{
+			var instance = key.GetExportDescriptors( contract, descriptorAccessor ).Fixed();
+			var result = instance.Any() ? instance : GetDependency( contract, descriptorAccessor );
+			return result;
+		}
+
+		IEnumerable<ExportDescriptorPromise> GetDependency( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
 			CompositionDependency dependency;
 			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
@@ -63,10 +64,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		object Get( Type type )
-		{
-			return locator.For( this )?.GetService( type );
-		}
+		object Get( Type type ) => locator( this )?.Invoke( type );
 
 		sealed class Factory : FixedFactory<Type, object>
 		{
@@ -94,9 +92,10 @@ namespace DragonSpark.Composition
 		{
 			var system = ApplicationTypes.Instance.Get();
 			var core = FrameworkTypes.Instance.Get();
-			var all = AllTypes.Instance.Get();
+			var all = system.Types.ToArray().Union( FrameworkTypes.Instance.Get().ToArray() ).ToImmutableArray();
 
 			var result = configuration
+				.WithInstance( system )
 				.WithInstance( system.Assemblies )
 				.WithInstance( system.Assemblies.ToArray() )
 				.WithInstance( all )

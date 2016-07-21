@@ -1,8 +1,8 @@
-using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using System;
+using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.ComponentModel
 {
@@ -17,7 +17,7 @@ namespace DragonSpark.ComponentModel
 		readonly static Func<Type, object> Creator = Create;
 		public ValueAttribute( [OfType( typeof(IStore) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Creator ) {}
 
-		static object Create( Type type ) => GlobalServiceProvider.Instance.GetService<IStore>( type ).Value;
+		static object Create( Type type ) => Activator.Activate<IStore>( type ).Value;
 
 		/*public class Creator : ServicesValueProvider.Category
 		{

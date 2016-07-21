@@ -117,32 +117,25 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class CachedServiceProviderFactory : FactoryBase<AutoData, IServiceProvider>
 	{
 		readonly static ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> DefaultCache = 
-				new Cache<Type, ICache<ImmutableArray<Type>, IServiceProvider>>( o => new ArgumentCache<ImmutableArray<Type>, IServiceProvider>( types => ServiceProviderFactory.Instance.Create() ) );
+				new Cache<Type, ICache<ImmutableArray<Type>, IServiceProvider>>( o => new ArgumentCache<ImmutableArray<Type>, IServiceProvider>( types => ServiceProviderFactory.Instance.Create( GlobalServiceProvider.Instance.Get() ) ) );
 
 		readonly static Func<MethodBase, ImmutableArray<Type>> DefaultSource = MethodTypeFactory.Instance.Create;
-		readonly Func<MethodBase, ImmutableArray<Type>> typeSource;
-		readonly ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> cacheSource;
+
+		readonly ITransformer<IServiceProvider>[] configurations;
 
 		public static CachedServiceProviderFactory Instance { get; } = new CachedServiceProviderFactory();
-		protected CachedServiceProviderFactory() : this( DefaultCache ) {}
-
-		protected CachedServiceProviderFactory( ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> cacheSource ) : this( DefaultSource, cacheSource ) {}
-
-		protected CachedServiceProviderFactory( Func<MethodBase, ImmutableArray<Type>> typeSource, ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> cacheSource )
+		protected CachedServiceProviderFactory( params ITransformer<IServiceProvider>[] configurations )
 		{
-			this.typeSource = typeSource;
-			this.cacheSource = cacheSource;
+			this.configurations = configurations;
 		}
 
 		public sealed override IServiceProvider Create( AutoData parameter )
 		{
-			var types = typeSource( parameter.Method );
-			var result = GetProvider( parameter.Method.DeclaringType, types );
-			new InitializeCommand( types, result.Self ).Run();
+			var types = DefaultSource( parameter.Method );
+			var result = DefaultCache.Get( parameter.Method.DeclaringType ).Get( types );
+			new InitializeSetupCommand( types, result, configurations ).Run();
 			return result;
 		}
-
-		protected virtual IServiceProvider GetProvider( Type declaringType, ImmutableArray<Type> types ) => cacheSource.Get( declaringType ).Get( types );
 	}
 
 	/*public class AutoDataExecutionContextFactory : FactoryBase<AutoData, IDisposable>

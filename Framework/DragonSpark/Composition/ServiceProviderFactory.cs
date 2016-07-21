@@ -8,16 +8,17 @@ using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ServiceProviderFactory : FactoryBase<IServiceProvider>
+	public sealed class ServiceProviderFactory : TransformerBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() {}
 
-		public override IServiceProvider Create()
+		public override IServiceProvider Create( IServiceProvider parameter )
 		{
 			var context = CompositionHostFactory.Instance.Create();
 			var primary = new ServiceLocator( context );
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), new RecursionAwareServiceProvider( primary ), DefaultServiceProvider.Instance );
+			RegisterServiceProviderCommand.Instance.Execute( primary );
+			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, parameter );
 			return result;
 		}
 	}

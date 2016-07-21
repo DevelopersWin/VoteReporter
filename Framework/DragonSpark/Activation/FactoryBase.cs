@@ -205,7 +205,7 @@ namespace DragonSpark.Activation
 
 	public class FromKnownFactory<T> : ParameterConstructedCompositeFactory<object>
 	{
-		public static IConfiguration<FromKnownFactory<T>> Instance { get; } = new Configuration<FromKnownFactory<T>>( () => new FromKnownFactory<T>( KnownTypes.Instance.Get( typeof(T) ).ToArray() ) );
+		public static IStore<FromKnownFactory<T>> Instance { get; } = new ExecutionContextStore<FromKnownFactory<T>>( () => new FromKnownFactory<T>( KnownTypes.Instance.Get( typeof(T) ).ToArray() ) );
 		FromKnownFactory( params Type[] types ) : base( types ) {}
 		
 		public T CreateUsing( object parameter ) => (T)Create( parameter );
@@ -360,6 +360,13 @@ namespace DragonSpark.Activation
 		}
 	}
 
+	public abstract class AggregateFactoryBase<T> : AggregateFactoryBase<T, T>
+	{
+		protected AggregateFactoryBase( Func<T> seed, Func<ImmutableArray<ITransformer<T>>> configurators ) : this( seed, configurators, Delegates<T>.Self ) {}
+		protected AggregateFactoryBase( Func<T> seed, Func<ImmutableArray<ITransformer<T>>> configurators, Func<T, T> factory ) : base( seed, configurators, factory ) {}
+		protected AggregateFactoryBase( IConfigurable<T> seed, IConfigurable<ImmutableArray<ITransformer<T>>> configurators, Func<T, T> factory ) : base( seed, configurators, factory ) {}
+	}
+
 	public abstract class AggregateFactoryBase<TConfiguration, TResult> : FactoryBase<TResult>
 	{
 		readonly Func<TConfiguration, TResult> factory;
@@ -367,16 +374,16 @@ namespace DragonSpark.Activation
 		protected AggregateFactoryBase( Func<TConfiguration> seed, Func<ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TResult> factory ) : 
 			this( new Configuration<TConfiguration>( new FixedStore<Func<TConfiguration>>( seed ) ), new Configuration<ImmutableArray<ITransformer<TConfiguration>>>( configurators ), factory ) {}
 
-		protected AggregateFactoryBase( IConfiguration<TConfiguration> seed, IConfiguration<ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TResult> factory )
+		protected AggregateFactoryBase( IConfigurable<TConfiguration> seed, IConfigurable<ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TResult> factory )
 		{
 			Seed = seed;
 			Configurators = configurators;
 			this.factory = factory;
 		}
 
-		public IConfiguration<TConfiguration> Seed { get; }
+		public IConfigurable<TConfiguration> Seed { get; }
 
-		public IConfiguration<ImmutableArray<ITransformer<TConfiguration>>> Configurators { get; }
+		public IConfigurable<ImmutableArray<ITransformer<TConfiguration>>> Configurators { get; }
 
 		public override TResult Create()
 		{

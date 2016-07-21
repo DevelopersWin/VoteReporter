@@ -1,4 +1,5 @@
 using DragonSpark.Extensions;
+using DragonSpark.Setup;
 using Microsoft.Practices.ObjectBuilder2;
 using System;
 
@@ -6,11 +7,11 @@ namespace DragonSpark.Activation.IoC
 {
 	public class ArrayResolutionStrategy : Microsoft.Practices.Unity.ArrayResolutionStrategy
 	{
-		readonly IServiceProvider provider;
+		readonly IDependencyLocatorKey key;
 
-		public ArrayResolutionStrategy( IServiceProvider provider )
+		public ArrayResolutionStrategy( IDependencyLocatorKey key )
 		{
-			this.provider = provider;
+			this.key = key;
 		}
 
 		public override void PreBuildUp( IBuilderContext context )
@@ -24,7 +25,7 @@ namespace DragonSpark.Activation.IoC
 					var array = context.Existing as Array;
 					if ( array != null )
 					{
-						context.Complete( array.Length > 0 ? array : provider.GetService( context.BuildKey.Type ) ?? array );
+						context.Complete( array.Length > 0 ? array : DependencyLocator.Instance.For( key )?.Invoke( context.BuildKey.Type ) ?? array );
 					}
 				}
 			}

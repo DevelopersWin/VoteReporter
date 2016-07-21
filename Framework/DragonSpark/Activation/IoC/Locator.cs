@@ -11,7 +11,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		
-		public Locator( [Required]IUnityContainer container, ICanResolveSpecification support ) : base( new DecoratedSpecification<LocateTypeRequest>( support, Coerce ) )
+		public Locator( IUnityContainer container, IResolutionSpecification support ) : base( new DecoratedSpecification<LocateTypeRequest>( support, Coerce ) )
 		{
 			this.container = container;
 		}
@@ -23,7 +23,7 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly IUnityContainer container;
 		
-		public Constructor( [Required]IUnityContainer container, [Required]ICanResolveSpecification support ) : base( new DecoratedSpecification<ConstructTypeRequest>( support, DefaultCoerce ) )
+		public Constructor( [Required]IUnityContainer container, [Required]IResolutionSpecification support ) : base( new DecoratedSpecification<ConstructTypeRequest>( support, DefaultCoerce ) )
 		{
 			this.container = container;
 		}

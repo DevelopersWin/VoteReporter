@@ -1,13 +1,15 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Configuration;
-using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Stores;
 using System;
 
 namespace DragonSpark.Diagnostics
 {
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
 	{
-		public static IConfiguration<FormatterFactory> Instance { get; } = new Configuration<FormatterFactory>( () => new FormatterFactory( FromKnownFactory<IFormattable>.Instance.Get().CreateUsing ) );
+		public static IStore<FormatterFactory> Instance { get; } = new ExecutionContextStore<FormatterFactory>( () => new FormatterFactory( FromKnownFactory<IFormattable>.Instance.Get().CreateUsing ) );
+
+		readonly static Func<Parameter, object> Coerce = p => StringCoercer.Instance.Coerce( p.Instance );
 
 		readonly Func<object, IFormattable> factory;
 
@@ -16,7 +18,7 @@ namespace DragonSpark.Diagnostics
 			this.factory = factory;
 		}
 
-		public override string Create( Parameter parameter ) => (string)CreateFrom( parameter, p => p.Instance.AsString() );
+		public override string Create( Parameter parameter ) => (string)CreateFrom( parameter, p => StringCoercer.Instance.Coerce( p.Instance ) );
 
 		object CreateFrom( Parameter parameter, Func<Parameter, object> @default )
 		{
@@ -25,7 +27,7 @@ namespace DragonSpark.Diagnostics
 			return result;
 		}
 
-		public object From( object item ) => CreateFrom( new Parameter( item ), p => p.Instance.AsString() );
+		public object From( object item ) => CreateFrom( new Parameter( item ), Coerce );
 
 		public struct Parameter
 		{

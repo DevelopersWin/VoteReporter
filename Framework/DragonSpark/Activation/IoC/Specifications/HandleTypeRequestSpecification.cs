@@ -14,14 +14,14 @@ using System.Reflection;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {
-	public interface ICanResolveSpecification : ISpecification<TypeRequest> {}
+	public interface IResolutionSpecification : ISpecification<TypeRequest> {}
 
 	[Persistent]
-	class CanResolveSpecification : AnySpecification<TypeRequest>, ICanResolveSpecification
+	class ResolutionSpecification : AnySpecification<TypeRequest>, IResolutionSpecification
 	{
 		readonly EqualityReferenceCache<TypeRequest, IWritableStore<bool>> cache;
 
-		public CanResolveSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor )
+		public ResolutionSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor )
 		{
 			cache = new EqualityReferenceCache<TypeRequest, IWritableStore<bool>>( new WritableStoreCache<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
 		}

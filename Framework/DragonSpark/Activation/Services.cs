@@ -1,8 +1,8 @@
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using Microsoft.Practices.ServiceLocation;
 using System;
-using DragonSpark.Runtime.Stores;
 
 namespace DragonSpark.Activation
 {
