@@ -223,7 +223,7 @@ namespace DragonSpark.Activation
 	{
 		public static Coerce<T> Coercer { get; } = Coercer<T>.Instance.Coerce;
 
-		public static Func<object, T> ValueCoercer { get; } = ValueAwareCoercer<T>.Instance.Coerce;
+		public static Func<object, T> InstanceCoercer { get; } = InstanceCoercer<T>.Instance.Coerce;
 
 		public static ICache<Type, Func<object, T>> Constructor { get; } = new Cache<Type, Func<object, T>>( type => new ParameterActivator<T>( type ).Create );
 	}

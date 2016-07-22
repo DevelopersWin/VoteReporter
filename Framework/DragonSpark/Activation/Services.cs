@@ -26,7 +26,7 @@ namespace DragonSpark.Activation
 	public sealed class DefaultServiceProvider : CompositeServiceProvider
 	{
 		public static IStore<IServiceProvider> Instance { get; } = new ExecutionContextStore<IServiceProvider>( () => new DefaultServiceProvider() );
-		DefaultServiceProvider() : base( new InstanceServiceProvider( ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToStore(), LoggingController.Instance.ToStore(), Logging.Instance.ToStore() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
+		DefaultServiceProvider() : base( new InstanceContainerServiceProvider( ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToStore(), LoggingController.Instance.ToStore(), Logging.Instance.ToStore() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
 	}
 
 	public delegate object ServiceSource( Type serviceType );

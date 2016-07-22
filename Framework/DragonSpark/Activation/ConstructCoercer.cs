@@ -33,7 +33,7 @@ namespace DragonSpark.Activation
 		public static ParameterActivator<T> Instance { get; } = new ParameterActivator<T>();
 		ParameterActivator() : this( typeof(T) ) {}
 
-		readonly static Coerce<T> Coerce = ValueAwareCoercer<T>.Instance.ToDelegate();
+		readonly static Coerce<T> Coerce = InstanceCoercer<T>.Instance.ToDelegate();
 
 		readonly IActivator activator;
 		readonly Type resultType;
@@ -56,10 +56,10 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	class ValueAwareCoercer<T> : Coercer<T>
+	class InstanceCoercer<T> : Coercer<T>
 	{
-		public new static ValueAwareCoercer<T> Instance { get; } = new ValueAwareCoercer<T>();
-		ValueAwareCoercer() {}
+		public new static InstanceCoercer<T> Instance { get; } = new InstanceCoercer<T>();
+		InstanceCoercer() {}
 
 		protected override T PerformCoercion( object parameter )
 		{

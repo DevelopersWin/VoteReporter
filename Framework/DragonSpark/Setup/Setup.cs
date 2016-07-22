@@ -127,22 +127,38 @@ namespace DragonSpark.Setup
 		}
 	}*/
 
-	public class InstanceServiceProvider : RepositoryBase<object>, IServiceProvider
+	public class InstanceContainerServiceProvider : InstanceServiceProviderBase
+	{
+		public InstanceContainerServiceProvider( params object[] instances ) : base( instances ) {}
+
+		protected override T GetService<T>() => Query().FirstAssigned( Defaults<T>.InstanceCoercer );
+	}
+
+	public abstract class InstanceServiceProviderBase : RepositoryBase<object>, IServiceProvider
+	{
+		readonly IGenericMethodContext<Invoke> method;
+
+		protected InstanceServiceProviderBase( params object[] instances ) : base( instances )
+		{
+			method = new GenericMethodFactories( this )[ nameof(GetService) ];
+		}
+
+		public virtual object GetService( Type serviceType ) => method.Make( serviceType ).Invoke<object>();
+
+		protected abstract T GetService<T>();
+	}
+
+	public class InstanceServiceProvider : InstanceServiceProviderBase
 	{
 		readonly ICache<Type, object> cache;
-		readonly IGenericMethodContext<Invoke> method;
 
 		public InstanceServiceProvider( params object[] instances ) : base( instances )
 		{
-			cache = new Cache<Type, object>( GetServiceBody );
-			method = new GenericMethodFactories( this )[ nameof(GetServiceBody) ];
+			cache = new Cache<Type, object>( base.GetService );
 		}
 
-		public object GetService( Type serviceType ) => /*cache.Get( serviceType )*/ GetServiceBody( serviceType );
-
-		object GetServiceBody( Type serviceType ) => method.Make( serviceType ).Invoke<object>();
-
-		T GetServiceBody<T>() => List().Select( Defaults<T>.ValueCoercer ).FirstAssigned();
+		public override object GetService( Type serviceType ) => cache.Get( serviceType );
+		protected override T GetService<T>() => Query().FirstOrDefaultOfType<T>();
 	}
 
 	public class CompositeServiceProvider : CompositeFactory<Type, object>, IServiceProvider
