@@ -15,8 +15,8 @@ namespace DragonSpark.Windows.Entity
 			Attach.Each( context.ApplyChanges );
 		}
 
-		public Collection Attach { get; } = new Collection();
+		public DeclarativeCollection Attach { get; } = new DeclarativeCollection();
 		
-		public Collection Remove { get; } = new Collection();
+		public DeclarativeCollection Remove { get; } = new DeclarativeCollection();
 	}
 }

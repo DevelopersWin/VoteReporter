@@ -4,6 +4,7 @@ using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Threading;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DragonSpark.Activation
@@ -27,10 +28,15 @@ namespace DragonSpark.Activation
 	public sealed class ExecutionContextRepository : RepositoryBase<IExecutionContextStore>
 	{
 		public static ExecutionContextRepository Instance { get; } = new ExecutionContextRepository();
-		ExecutionContextRepository() : base( EnumerableEx.Return( ExecutionContextStore.Instance ) ) {}
+		ExecutionContextRepository() : base( new ExecutionContextStoreCollection( EnumerableEx.Return( ExecutionContextStore.Instance ) ) ) {}
 
 		[Writer]
-		protected override void OnAdd( IExecutionContextStore entry ) => Store.Ensure( entry );
+		protected override void OnAdd( IExecutionContextStore entry ) => Source.Ensure( entry );
+
+		class ExecutionContextStoreCollection : PrioritizedCollection<IExecutionContextStore>
+		{
+			public ExecutionContextStoreCollection( IEnumerable<IExecutionContextStore> items ) : base( items ) {}
+		}
 	}
 
 	public class DefaultExecutionContextFactoryStore<T> : StoreBase<T>

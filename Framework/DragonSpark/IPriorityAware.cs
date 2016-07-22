@@ -1,8 +1,11 @@
 using DragonSpark.Activation;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace DragonSpark
 {
@@ -36,5 +39,24 @@ namespace DragonSpark
 		public static PriorityComparer Instance { get; } = new PriorityComparer();
 
 		public int Compare( IPriorityAware x, IPriorityAware y ) => Comparer<Priority>.Default.Compare( x.Priority, y.Priority );
+	}
+
+	public class PrioritizedCollection<T> : CollectionBase<T>
+	{
+		public PrioritizedCollection() {}
+		public PrioritizedCollection( IEnumerable<T> items ) : base( items ) {}
+		public PrioritizedCollection( ICollection<T> source ) : base( source ) {}
+
+		protected override IEnumerable<T> Query => base.Query.Prioritize();
+	}
+		
+
+	public class PriorityAwareCollection<T> : CollectionBase<T> where T : IPriorityAware
+	{
+		public PriorityAwareCollection() {}
+		public PriorityAwareCollection( IEnumerable<T> items ) : base( items ) {}
+		public PriorityAwareCollection( ICollection<T> source ) : base( source ) {}
+
+		protected override IEnumerable<T> Query => base.Query.OrderBy( arg => arg, PriorityComparer.Instance );
 	}
 }

@@ -221,6 +221,7 @@
     <Compile Include="Activation\ActivatorExtensionsTests.cs" />
     <Compile Include="Activation\ActivatorTests.cs" />
     <Compile Include="Activation\ApplicationContextTests.cs" />
+    <Compile Include="Activation\IoC\StrategyEntryCollectionTests.cs" />
     <Compile Include="Activation\LocatorTests.cs" />
     <Compile Include="Activation\ArgumentCacheTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
@@ -249,6 +250,7 @@
     <Compile Include="Runtime\CacheTests.cs" />
     <Compile Include="Runtime\EnabledStateTests.cs" />
     <Compile Include="Runtime\Properties\EqualityCacheTests.cs" />
+    <Compile Include="Runtime\PurgingCollectionTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
     <Compile Include="Runtime\DelegateTests.cs" />
@@ -285,7 +287,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Runtime\CollectionTests.cs" />
+    <Compile Include="Runtime\DeclarativeCollectionTests.cs" />
     <Compile Include="Runtime\CompositeCommandTests.cs" />
     <Compile Include="Runtime\SerializerTests.cs" />
     <Compile Include="Runtime\ListDictionaryTests.cs" />

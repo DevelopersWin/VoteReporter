@@ -11,7 +11,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Runtime
 {
-	public class CollectionTests
+	public class DeclarativeCollectionTests
 	{
 		[Theory, AutoData]
 		public void Equality( System.Collections.ObjectModel.Collection<Tuple<object>> sut )
@@ -65,13 +65,13 @@ namespace DragonSpark.Testing.Runtime
 		}
 
 		[Theory, AutoData]
-		void Add( Collection<Class> sut )
+		void Add( DeclarativeCollection<Class> sut )
 		{
 			Assert.Equal( -1, sut.To<IList>().Add( new object() ) );
 		}
 
 		[Theory, AutoData]
-		public void Cover( ModuleInfo one, ModuleInfo two, Collection<ModuleInfo> sut )
+		public void Cover( ModuleInfo one, ModuleInfo two, DeclarativeCollection<ModuleInfo> sut )
 		{
 			( (IList)sut ).Insert( 0, one );
 			Assert.Same( sut.First(), one );

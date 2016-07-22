@@ -14,12 +14,12 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
 		readonly ISpecification<LocateTypeRequest> specification;
-		readonly IStrategyRepository strategies;
+		readonly StrategyRepository strategies;
 		readonly IBuildPlanRepository buildPlans;
 
-		public ServicesIntegrationExtension( IStrategyRepository strategies, IBuildPlanRepository buildPlans, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( strategies, buildPlans, registry, new HasFactorySpecification().Inverse() ) {}
+		public ServicesIntegrationExtension( StrategyRepository strategies, IBuildPlanRepository buildPlans, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( strategies, buildPlans, registry, new HasFactorySpecification().Inverse() ) {}
 
-		ServicesIntegrationExtension( IStrategyRepository strategies, IBuildPlanRepository buildPlans, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
+		ServicesIntegrationExtension( StrategyRepository strategies, IBuildPlanRepository buildPlans, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
 		{
 			this.registry = registry;
 			this.specification = specification;
@@ -34,8 +34,6 @@ namespace DragonSpark.Activation.IoC
 
 			var entries = new[]
 			{
-				// new StrategyEntry( new ServicesStrategy( policy ), UnityBuildStage.PreCreation, Priority.Higher ), 
-
 				new StrategyEntry( new EnumerableResolutionStrategy( Container, this ), UnityBuildStage.Creation, Priority.Higher ),
 				new StrategyEntry( new ArrayResolutionStrategy( this ), UnityBuildStage.Creation, Priority.BeforeNormal )
 			};

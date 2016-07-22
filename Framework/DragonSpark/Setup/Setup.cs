@@ -143,6 +143,8 @@ namespace DragonSpark.Setup
 			method = new GenericMethodFactories( this )[ nameof(GetService) ];
 		}
 
+		protected override IEnumerable<object> Query() => Source;
+
 		public virtual object GetService( Type serviceType ) => method.Make( serviceType ).Invoke<object>();
 
 		protected abstract T GetService<T>();
@@ -345,6 +347,6 @@ namespace DragonSpark.Setup
 
 		public Setup( params ICommand[] commands ) : base( commands ) {}
 
-		public Collection<object> Items { get; } = new Collection<object>();
+		public DeclarativeCollection<object> Items { get; } = new DeclarativeCollection<object>();
 	}
 }

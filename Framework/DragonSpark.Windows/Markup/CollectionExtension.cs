@@ -9,7 +9,7 @@ namespace DragonSpark.Windows.Markup
 	[ContentProperty( nameof(Items) )]
 	public class CollectionExtension : MarkupExtensionBase
 	{
-		public Collection Items { get; } = new Collection();
+		public DeclarativeCollection Items { get; } = new DeclarativeCollection();
 
 		protected virtual IList DetermineCollection( MarkupServiceProvider serviceProvider )
 		{

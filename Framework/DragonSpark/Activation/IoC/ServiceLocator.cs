@@ -3,6 +3,7 @@ using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Stores;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
@@ -113,33 +114,46 @@ namespace DragonSpark.Activation.IoC
 		public UnityBuildStage Stage { get; }
 	}
 
-	public interface IStrategyRepository : IEntryRepository<IBuilderStrategy> {}
+	public interface IStrategyRepository : IRepository<IBuilderStrategy>, IComposable<StrategyEntry> {}
 
 	public interface IBuildPlanRepository : IRepository<IBuildPlanPolicy> {}
 
-	class BuildPlanRepository : PurgingRepositoryBase<IBuildPlanPolicy>, IBuildPlanRepository
+	class BuildPlanRepository : RepositoryBase<IBuildPlanPolicy>, IBuildPlanRepository
 	{
-		public BuildPlanRepository( params IBuildPlanPolicy[] items ) : base( new List<IBuildPlanPolicy>( items ) ) {}
+		public BuildPlanRepository( params IBuildPlanPolicy[] items ) : base( new PurgingCollection<IBuildPlanPolicy>( items ) ) {}
 	}
 
-	class StrategyRepository : EntryRepositoryBase<StrategyEntry, IBuilderStrategy>, IStrategyRepository
+	public class StoreCollection<TStore, TInstance> : CollectionBase<TStore> where TStore : IStore<TInstance>
 	{
+		public StoreCollection() {}
+		public StoreCollection( IEnumerable<TStore> items ) : base( items ) {}
+		public StoreCollection( ICollection<TStore> source ) : base( source ) {}
+
+		public ImmutableArray<TInstance> Instances() => Query.Select( entry => entry.Value ).ToImmutableArray();
+	}
+
+	public class StrategyRepository : RepositoryBase<StrategyEntry>, IStrategyRepository
+	{
+		readonly static StrategyEntry[] DefaultEntries = {
+															 new StrategyEntry( new BuildKeyMappingStrategy(), UnityBuildStage.TypeMapping ),
+															 new StrategyEntry( new HierarchicalLifetimeStrategy(), UnityBuildStage.Lifetime ),
+															 new StrategyEntry( new LifetimeStrategy(), UnityBuildStage.Lifetime ),
+															 new StrategyEntry( new BuildPlanStrategy(), UnityBuildStage.Creation ),
+														 };
+
 		readonly StagedStrategyChain<UnityBuildStage> strategies;
 
-		public StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies ) : this( strategies, new[]
-			{
-				new StrategyEntry( new BuildKeyMappingStrategy(), UnityBuildStage.TypeMapping ),
-				new StrategyEntry( new HierarchicalLifetimeStrategy(), UnityBuildStage.Lifetime ),
-				new StrategyEntry( new LifetimeStrategy(), UnityBuildStage.Lifetime ),
-				new StrategyEntry( new BuildPlanStrategy(), UnityBuildStage.Creation ),
-			} ) {}
+		readonly StrategyEntryCollection collection;
 
-		StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies, IEnumerable<StrategyEntry> entry ) : base( entry.ToList() )
+		public StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies ) : this( strategies, DefaultEntries ) {}
+
+		StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies, IEnumerable<StrategyEntry> entries ) : this( strategies, new StrategyEntryCollection( entries ) ) {}
+
+		StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies, StrategyEntryCollection collection ) : base( collection )
 		{
 			this.strategies = strategies;
+			this.collection = collection;
 		}
-
-		protected override IEnumerable<StrategyEntry> Query() => Store.Purge().OrderBy( entry => entry.Stage ).ThenBy( entry => entry.Priority );
 
 		protected override void OnAdd( StrategyEntry entry )
 		{
@@ -147,6 +161,8 @@ namespace DragonSpark.Activation.IoC
 			strategies.Add( entry.Value, entry.Stage );
 		}
 
-		protected override StrategyEntry Create( IBuilderStrategy item ) => new StrategyEntry( item, UnityBuildStage.PreCreation );
+		public void Add( IBuilderStrategy instance ) => Add( new StrategyEntry( instance, UnityBuildStage.PreCreation ) );
+
+		ImmutableArray<IBuilderStrategy> IRepository<IBuilderStrategy>.List() => collection.Instances();
 	}
 }

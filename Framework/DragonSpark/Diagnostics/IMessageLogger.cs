@@ -18,7 +18,7 @@ namespace DragonSpark.Diagnostics
 	[ContentProperty( nameof(Commands) )]
 	public class ConfiguringLoggerConfigurationFactory : TransformerBase<LoggerConfiguration>
 	{
-		public Collection<CommandBase<LoggerConfiguration>> Commands { get; } = new Collection<CommandBase<LoggerConfiguration>>();
+		public DeclarativeCollection<CommandBase<LoggerConfiguration>> Commands { get; } = new DeclarativeCollection<CommandBase<LoggerConfiguration>>();
 
 		public override LoggerConfiguration Create( LoggerConfiguration configuration ) => Commands.Aggregate( configuration, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Execute ) );
 	}
@@ -136,7 +136,7 @@ namespace DragonSpark.Diagnostics
 	[ContentProperty( nameof(Policies) )]
 	public class DestructureCommand : DestructureCommandBase
 	{
-		public Collection<IDestructuringPolicy> Policies { get; } = new Collection<IDestructuringPolicy>();
+		public DeclarativeCollection<IDestructuringPolicy> Policies { get; } = new DeclarativeCollection<IDestructuringPolicy>();
 
 		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Policies ) );
 	}
@@ -178,7 +178,7 @@ namespace DragonSpark.Diagnostics
 	[ContentProperty( nameof(Items) )]
 	public class FilterCommand : FilterCommandBase
 	{
-		public Collection<ILogEventFilter> Items { get; } = new Collection<ILogEventFilter>();
+		public DeclarativeCollection<ILogEventFilter> Items { get; } = new DeclarativeCollection<ILogEventFilter>();
 
 		protected override void Configure( LoggerFilterConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Items ) );
 	}
@@ -202,7 +202,7 @@ namespace DragonSpark.Diagnostics
 	[ContentProperty( nameof(Items) )]
 	public class EnrichCommand : EnrichCommandBase
 	{
-		public Collection<ILogEventEnricher> Items { get; } = new Collection<ILogEventEnricher>();
+		public DeclarativeCollection<ILogEventEnricher> Items { get; } = new DeclarativeCollection<ILogEventEnricher>();
 		
 		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Items ) );
 	}

@@ -11,7 +11,7 @@ namespace DragonSpark.Runtime
 		{}
 	}
 
-	public class CommandCollection<T> : Collection<T> where T : System.Windows.Input.ICommand
+	public class CommandCollection<T> : DeclarativeCollection<T> where T : System.Windows.Input.ICommand
 	{
 		public CommandCollection()
 		{}

@@ -24,7 +24,7 @@ namespace DragonSpark.Windows.Markup
 		protected virtual object DetermineContext( IServiceProvider serviceProvider )
 		{
 			var xamlSchemaContext = serviceProvider.Get<IXamlSchemaContextProvider>().SchemaContext;
-			var types = new[] { typeof(DragonSpark.Runtime.Collection) }; // TODO: More general/generic implementation.
+			var types = new[] { typeof(DragonSpark.Runtime.DeclarativeCollection) }; // TODO: More general/generic implementation.
 			var context = serviceProvider.Get<IAmbientProvider>().GetFirstAmbientValue( types.Select( xamlSchemaContext.GetXamlType ).ToArray() );
 			return context;
 		}

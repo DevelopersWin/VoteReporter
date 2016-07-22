@@ -1,8 +1,8 @@
 
 
-using System.Collections.Generic;
-using System.Linq;
 using PostSharp.Patterns.Contracts;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Extensions
 {
@@ -29,9 +29,9 @@ namespace DragonSpark.Extensions
 			return collection;
 		}
 
-		public static T[] Purge<T>( this ICollection<T> @this )
+		public static ImmutableArray<T> Purge<T>( this ICollection<T> @this )
 		{
-			var result = @this.ToArray();
+			var result = @this.ToImmutableArray();
 			@this.Clear();
 			return result;
 		}

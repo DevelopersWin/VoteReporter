@@ -18,11 +18,11 @@ namespace DragonSpark.Configuration
 		public Registration( [NotEmpty]string key, [Required]object value, [Required]params string[] aliases )
 		{
 			Key = key;
-			Aliases = new Collection<string>( aliases );
+			Aliases = new DeclarativeCollection<string>( aliases );
 			Value = value;
 		}
 
-		public Collection<string> Aliases { get; } = new Collection<string>();
+		public DeclarativeCollection<string> Aliases { get; } = new DeclarativeCollection<string>();
 
 		[NotEmpty]
 		public string Key { [return: NotEmpty]get; set; }

@@ -1,30 +1,25 @@
-using DragonSpark.Extensions;
 using DragonSpark.Runtime.Stores;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace DragonSpark.Runtime
 {
-	public interface IEntryRepository<T> : IRepository<Entry<T>>
+	/*public interface IStoreRepository<T> : IRepository<IStore<T>>
 	{
-		void Insert( T entry );
+		void Add( T instance );
 
-		void Add( T entry );
+		ImmutableArray<T> Instances();
+	}*/
 
-		ImmutableArray<T> Items();
+	public interface IRepository<T> : IComposable<T>
+	{
+		ImmutableArray<T> List();
 	}
 
-	public interface IRepository<T>
+	public interface IComposable<in T>
 	{
-		void Insert( T entry );
-
-		void Add( T entry );
-
-		ImmutableArray<T> List();
+		void Add( T instance );
 	}
 
 	/*public interface IDisposableRepository : IRepository<IDisposable>, IDisposable {}
@@ -38,55 +33,55 @@ namespace DragonSpark.Runtime
 		}
 	}*/
 
-	public abstract class EntryRepositoryBase<TItem> : EntryRepositoryBase<Entry<TItem>, TItem>
+	/*public abstract class StoreRepositoryBase<TItem> : StoreRepositoryBase<Entry<TItem>, TItem>
 	{
-		protected EntryRepositoryBase() {}
+		protected StoreRepositoryBase() {}
 
-		protected EntryRepositoryBase( IEnumerable<TItem> items ) : base( items ) {}
-		protected EntryRepositoryBase( IList<Entry<TItem>> store ) : base( store ) {}
+		protected StoreRepositoryBase( IEnumerable<TItem> items ) : base( items ) {}
+		protected StoreRepositoryBase( IList<Entry<TItem>> store ) : base( store ) {}
 
 		protected override Entry<TItem> Create( TItem item ) => new Entry<TItem>( item );
-	}
+	}*/
 
-	public abstract class EntryRepositoryBase<TEntry, TItem> : RepositoryBase<TEntry>, IEntryRepository<TItem> where TEntry : Entry<TItem>
+	/*public abstract class StoreRepositoryBase<T> : RepositoryBase<IStore<T>>, IStoreRepository<T>
 	{
-		readonly Action<TEntry> insert;
-		readonly Action<TEntry> add;
+		// readonly Action<IStore<T>> insert;
+		readonly Action<IStore<T>> add;
 
-		protected EntryRepositoryBase() : this( Items<TItem>.Default ) {}
+		protected StoreRepositoryBase() : this( Items<T>.Default ) {}
 
-		protected EntryRepositoryBase( IEnumerable<TItem> items ) : this( items, new List<TEntry>() ) {}
+		protected StoreRepositoryBase( IEnumerable<T> items ) : this( items, new List<IStore<T>>() ) {}
 
-		protected EntryRepositoryBase( IList<TEntry> store ) : this( Items<TItem>.Default, store ) {}
+		protected StoreRepositoryBase( IList<IStore<T>> store ) : this( Items<T>.Default, store ) {}
 
-		EntryRepositoryBase( IEnumerable<TItem> items, IList<TEntry> store ) : base( store )
+		StoreRepositoryBase( IEnumerable<T> items, IList<IStore<T>> store ) : base( store )
 		{
 			items.Each( Add );
-			insert = Insert;
+			// insert = Insert;
 			add = Add;
 		}
 
-		public void Add( TItem entry ) => add( Create( entry ) );
-		void IRepository<Entry<TItem>>.Add( Entry<TItem> entry ) => entry.As( add );
+		public void Add( T entry ) => add( Create( entry ) );
+		// void IRepository<Entry<TItem>>.Add( Entry<TItem> entry ) => entry.As( add );
 
-		public void Insert( TItem entry ) => insert( Create( entry ) );
-		void IRepository<Entry<TItem>>.Insert( Entry<TItem> entry ) => entry.As( insert );
+		// public void Insert( T instance ) => insert( Create( instance ) );
+		// void IRepository<Entry<TItem>>.Insert( Entry<TItem> entry ) => entry.As( insert );
 
-		ImmutableArray<Entry<TItem>> IRepository<Entry<TItem>>.List() => base.List().CastArray<Entry<TItem>>();
+		// ImmutableArray<Entry<TItem>> IRepository<Entry<TItem>>.List() => base.List().CastArray<Entry<TItem>>();
 		
-		protected abstract TEntry Create( TItem item );
+		protected abstract IStore<T> Create( T instance );
 
-		public ImmutableArray<TItem> Items() => Query().Select( entry => entry.Value ).ToImmutableArray();
-	}
+		public ImmutableArray<T> Instances() => Query().Select( entry => entry.Value ).ToImmutableArray();
+	}*/
 
-	public abstract class PurgingRepositoryBase<T> : RepositoryBase<T>
+	/*public abstract class PurgingRepositoryBase<T> : RepositoryBase<T>
 	{
 		protected PurgingRepositoryBase() {}
 		protected PurgingRepositoryBase( IEnumerable<T> items ) : base( items ) {}
 		protected PurgingRepositoryBase( IList<T> store ) : base( store ) {}
 
 		protected override IEnumerable<T> Query() => Store.Purge().Prioritize();
-	}
+	}*/
 
 	public abstract class RepositoryBase<T> : IRepository<T>
 	{
@@ -94,23 +89,23 @@ namespace DragonSpark.Runtime
 
 		protected RepositoryBase( IEnumerable<T> items ) : this( new List<T>( items ) ) {}
 
-		protected RepositoryBase( [Required] IList<T> store )
+		protected RepositoryBase( ICollection<T> source )
 		{
-			Store = store;
+			Source = source;
 		}
 
-		public IList<T> Store { get; }
+		protected ICollection<T> Source { get; }
 
-		public void Insert( T entry ) => OnInsert( entry );
-		protected virtual void OnInsert( T entry ) => Store.Insert( 0, entry );
+		/*public void Insert( T entry ) => OnInsert( entry );
+		protected virtual void OnInsert( T entry ) => Store.Insert( 0, entry );*/
 
-		public void Add( T entry ) => OnAdd( entry );
+		public void Add( T instance ) => OnAdd( instance );
 
-		protected virtual void OnAdd( T entry ) => Store.Add( entry );
+		protected virtual void OnAdd( T entry ) => Source.Add( entry );
 
 		public virtual ImmutableArray<T> List() => Query().ToImmutableArray();
 
-		protected virtual IEnumerable<T> Query() => Store.Prioritize();
+		protected virtual IEnumerable<T> Query() => Source;
 	}
 
 	/*public abstract class RepositoryBase<T> : RepositoryBase<Entry<T>, T>, IRepository<T>

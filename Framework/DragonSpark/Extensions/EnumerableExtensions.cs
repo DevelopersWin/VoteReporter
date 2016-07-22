@@ -138,7 +138,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<TResult> Each<T, TResult>( this IEnumerable<T> enumerable, Func<T, TResult> action ) => enumerable.Select( action ).ToArray();
 
-		public class Array<T> : Cache<T, T[]> where T : class
+		class Array<T> : Cache<T, T[]> where T : class
 		{
 			public static Array<T> Default { get; } = new Array<T>();
 
