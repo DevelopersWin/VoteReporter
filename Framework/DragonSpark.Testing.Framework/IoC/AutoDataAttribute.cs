@@ -1,18 +1,25 @@
-﻿using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Setup;
+using DragonSpark.Testing.Framework.Setup;
 using System;
+using System.Reflection;
+using System.Windows.Input;
+using IApplication = DragonSpark.Testing.Framework.Setup.IApplication;
+using ServiceProviderFactory = DragonSpark.Activation.IoC.ServiceProviderFactory;
 
 namespace DragonSpark.Testing.Framework.IoC
 {
 	public class AutoDataAttribute : Setup.AutoDataAttribute
 	{
-		public AutoDataAttribute() : this( DefaultApplicationSource ) {}
+		readonly static Func<MethodBase, IApplication> Source = new ApplicationFactory( ServiceProviderFactory.Instance ).Create;
 
-		protected AutoDataAttribute( Func<Framework.Setup.IApplication> applicationSource ) : base( CachedServiceProviderFactory.Instance, applicationSource ) {}
+		public AutoDataAttribute() : base( Source ) {}
 
-		class CachedServiceProviderFactory : Framework.Setup.CachedServiceProviderFactory
+		protected AutoDataAttribute( Func<MethodBase, IApplication> applicationSource ) : base( applicationSource ) {}
+
+		public sealed class ApplicationFactory<T> : ApplicationFactory where T : class, ICommand
 		{
-			public new static CachedServiceProviderFactory Instance { get; } = new CachedServiceProviderFactory();
-			CachedServiceProviderFactory() : base( ServiceProviderFactory.Instance ) {}
+			public new static ApplicationFactory<T> Instance { get; } = new ApplicationFactory<T>();
+			ApplicationFactory() : base( new ApplicationCommandFactory( new ApplyExportedCommandsCommand<T>() ).Create, ServiceProviderFactory.Instance ) {}
 		}
 	}
 }

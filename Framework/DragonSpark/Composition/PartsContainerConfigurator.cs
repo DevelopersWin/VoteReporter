@@ -64,7 +64,11 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		object Get( Type type ) => locator( this )?.Invoke( type );
+		object Get( Type type )
+		{
+			var invoke = locator( this )?.Invoke( type );
+			return invoke;
+		}
 
 		sealed class Factory : FixedFactory<Type, object>
 		{
@@ -83,7 +87,7 @@ namespace DragonSpark.Composition
 
 	public sealed class PartsContainerConfigurator : ContainerConfigurator
 	{
-		readonly static ConventionBuilder ConventionBuilder = FrameworkConventionBuilder.Instance.Create();
+		// readonly static ConventionBuilder ConventionBuilder = FrameworkConventionBuilder.Instance.Create();
 
 		public static PartsContainerConfigurator Instance { get; } = new PartsContainerConfigurator();
 		PartsContainerConfigurator() {}
@@ -91,18 +95,18 @@ namespace DragonSpark.Composition
 		public override ContainerConfiguration Create( ContainerConfiguration configuration )
 		{
 			var system = ApplicationParts.Instance.Get();
-			var core = FrameworkTypes.Instance.Get();
-			var all = system.Types.ToArray().Union( FrameworkTypes.Instance.Get().ToArray() ).ToImmutableArray();
+			// var core = FrameworkTypes.Instance.Get().ToArray();
+			var types = system.Types.ToArray()/*.ToArray().Union( core ).ToImmutableArray()*/;
 
 			var result = configuration
 				.WithInstance( system )
 				.WithInstance( system.Assemblies )
 				.WithInstance( system.Assemblies.ToArray() )
-				.WithInstance( all )
-				.WithInstance( all.ToArray() )
+				.WithInstance( system.Types )
+				.WithInstance( types )
 				.WithInstance( Activation.Activator.Instance.Get() )
-				.WithParts( core.ToArray(), ConventionBuilder )
-				.WithParts( system.Types.ToArray(), AttributeProvider.Instance )
+				// .WithParts( core, ConventionBuilder )
+				.WithParts( types, AttributeProvider.Instance )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider() )
 				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider() )
 				.WithProvider( new FactoryExportDescriptorProvider() )
@@ -110,7 +114,7 @@ namespace DragonSpark.Composition
 			return result;
 		}
 
-		class FrameworkConventionBuilder : FactoryBase<ConventionBuilder>
+		/*class FrameworkConventionBuilder : FactoryBase<ConventionBuilder>
 		{
 			readonly Func<ConventionBuilder, object> configure;
 
@@ -123,7 +127,7 @@ namespace DragonSpark.Composition
 			public override ConventionBuilder Create() => new ConventionBuilder().WithSelf( configure );
 
 			static PartConventionBuilder Configure( ConventionBuilder builder ) => builder.ForTypesMatching( type => true ).Export().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) );
-		}
+		}*/
 
 		class AttributeProvider : AttributedModelProvider
 		{

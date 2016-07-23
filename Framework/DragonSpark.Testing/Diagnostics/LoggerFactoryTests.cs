@@ -3,9 +3,10 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Runtime;
 using Serilog;
+using System;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
@@ -16,20 +17,20 @@ namespace DragonSpark.Testing.Diagnostics
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class LoggerFactoryTests
 	{
-		[Theory, AutoData, AdditionalTypes( typeof(FormatterFactory) )]
-		public void EnsureComposition( CompositionContext context, string text )
+		[Theory, AutoData, AdditionalTypes( typeof(MethodFormatter) )]
+		public void EnsureComposition( [Service]CompositionContext context, string text )
 		{
 			var logger = context.GetExport<ILogger>();
 			
-			Assert.NotSame( DefaultServiceProvider.Instance.Value.Get<ILogger>(), logger );
+			Assert.Same( DefaultServiceProvider.Instance.Get<ILogger>(), logger );
 
-			var method = GetType().GetMethod( nameof(AnotherMethod), BindingOptions.AllMembers );
+			var method = new Action( AnotherMethod ).Method;
 			var command = new LogCommand( logger );
 
 			command.Execute( new HelloWorld( text, method ) );
 			
 			var history = context.GetExport<ILoggerHistory>();
-			Assert.Same( DefaultServiceProvider.Instance.Value.Get<ILoggerHistory>(), history );
+			Assert.Same( DefaultServiceProvider.Instance.Get<ILoggerHistory>(), history );
 			var message = LogEventMessageFactory.Instance.Create( history.Events ).Last();
 			Assert.Contains( text, message );
 			

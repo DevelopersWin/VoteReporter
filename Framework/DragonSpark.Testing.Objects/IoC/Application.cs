@@ -1,9 +1,6 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using Microsoft.Practices.Unity;
-using System;
 
 namespace DragonSpark.Testing.Objects.IoC
 {
@@ -23,7 +20,7 @@ namespace DragonSpark.Testing.Objects.IoC
 	public class UnityContainerFactory : ConfiguringFactory<IUnityContainer>
 	{
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-		protected UnityContainerFactory() : base( DefaultUnityContainerFactory.Instance.Create, new Action( InitializeSetupCommand.Instance.Run ) ) {}
+		protected UnityContainerFactory() : base( DefaultUnityContainerFactory.Instance.Create, /*InitializeSystemCommand.Instance.Initialize*/ () => {} ) {}
 
 		public class Register : RegisterFactoryAttribute
 		{

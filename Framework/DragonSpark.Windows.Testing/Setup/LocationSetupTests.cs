@@ -56,7 +56,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void CreateInstance( [Registered]IActivator locator )
 		{
-			var expected = GlobalServiceProvider.Instance.GetService<IActivator>();
+			var expected = GlobalServiceProvider.Instance.Get<IActivator>();
 			Assert.Same( expected, locator );
 			Assert.NotSame( Activator.Instance.Value, locator );
 			Assert.IsType<Locator>( locator );
@@ -70,7 +70,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void CreateNamedInstance( [Registered]IActivator activator, string name )
 		{
-			Assert.Same( GlobalServiceProvider.Instance.GetService<IActivator>(), activator );
+			Assert.Same( GlobalServiceProvider.Instance.Get<IActivator>(), activator );
 			Assert.NotSame( Activator.Instance.Value, activator );
 
 			var instance = activator.Activate<IObject>( new LocateTypeRequest( typeof(Object), name ) );
@@ -84,7 +84,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void CreateItem( [Registered]IActivator activator )
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
-			Assert.Same( GlobalServiceProvider.Instance.GetService<IActivator>(), activator );
+			Assert.Same( GlobalServiceProvider.Instance.Get<IActivator>(), activator );
 			Assert.NotSame( Activator.Instance.Value, activator );
 			var instance = activator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
 			Assert.NotNull( instance );
@@ -97,7 +97,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			registry.Register<IInterface>( instance );
 
-			var located = GlobalServiceProvider.Instance.GetService<IInterface>();
+			var located = GlobalServiceProvider.Instance.Get<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
 		}
@@ -105,30 +105,30 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void RegisterGeneric()
 		{
-			var registry = GlobalServiceProvider.Instance.GetService<IServiceRegistry>();
+			var registry = GlobalServiceProvider.Instance.Get<IServiceRegistry>();
 			registry.Register<IInterface, Class>();
 
-			var located = GlobalServiceProvider.Instance.GetService<IInterface>();
+			var located = GlobalServiceProvider.Instance.Get<IInterface>();
 			Assert.IsType<Class>( located );
 		}
 
 		[Theory, LocationSetup.AutoData]
 		public void RegisterLocation()
 		{
-			var registry = GlobalServiceProvider.Instance.GetService<IServiceRegistry>();
+			var registry = GlobalServiceProvider.Instance.Get<IServiceRegistry>();
 			registry.Register<IInterface, Class>();
 
-			var located = GlobalServiceProvider.Instance.GetService<IInterface>();
+			var located = GlobalServiceProvider.Instance.Get<IInterface>();
 			Assert.IsType<Class>( located );
 		}
 
 		[Theory, LocationSetup.AutoData]
 		void RegisterInstanceClass( Class instance )
 		{
-			var registry = GlobalServiceProvider.Instance.GetService<IServiceRegistry>();
+			var registry = GlobalServiceProvider.Instance.Get<IServiceRegistry>();
 			registry.Register<IInterface>( instance );
 
-			var located = GlobalServiceProvider.Instance.GetService<IInterface>();
+			var located = GlobalServiceProvider.Instance.Get<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
 		}
@@ -136,10 +136,10 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		void RegisterFactoryClass( Class instance )
 		{
-			var registry = GlobalServiceProvider.Instance.GetService<IServiceRegistry>();
+			var registry = GlobalServiceProvider.Instance.Get<IServiceRegistry>();
 			registry.Register<IInterface>( () => instance );
 
-			var located = GlobalServiceProvider.Instance.GetService<IInterface>();
+			var located = GlobalServiceProvider.Instance.Get<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
 		}
@@ -156,17 +156,17 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void WithDefault()
 		{
-			var item = GlobalServiceProvider.Instance.GetService<ClassWithParameter>().With( x => x.Parameter != null );
+			var item = GlobalServiceProvider.Instance.Get<ClassWithParameter>().With( x => x.Parameter != null );
 			Assert.True( item );
 		}
 
 		[Theory, LocationSetup.AutoData]
 		public void RegisterWithRegistry( Mock<IServiceRegistry> sut )
 		{
-			var registry = GlobalServiceProvider.Instance.GetService<IServiceRegistry>();
+			var registry = GlobalServiceProvider.Instance.Get<IServiceRegistry>();
 			registry.Register( sut.Object );
 
-			var registered = GlobalServiceProvider.Instance.GetService<IServiceRegistry>();
+			var registered = GlobalServiceProvider.Instance.Get<IServiceRegistry>();
 			Assert.Same( sut.Object, registered );
 			registered.Register<IInterface, Class>();
 

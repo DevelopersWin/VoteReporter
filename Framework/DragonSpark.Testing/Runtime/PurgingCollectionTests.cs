@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Runtime
 		public void Array()
 		{
 			var items = new[] { 1, 2, 3, 5 };
-			var sut = new PurgingCollection<int>( items );
+			var sut = new PurgingCollection<int>( items.ToList() );
 			Assert.Equal( sut.ToArray(), items );
 			Assert.Empty( sut );
 		}
@@ -20,7 +20,7 @@ namespace DragonSpark.Testing.Runtime
 		public void Enumerable()
 		{
 			var items = new[] { 1, 2, 3, 5 };
-			var sut = new PurgingCollection<int>( items );
+			var sut = new PurgingCollection<int>( items.ToList() );
 			Assert.Equal( sut.ToImmutableArray(), items );
 			Assert.Empty( sut );
 		}

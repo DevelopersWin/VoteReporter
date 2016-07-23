@@ -1,14 +1,13 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Contracts;
 using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Diagnostics
@@ -22,7 +21,7 @@ namespace DragonSpark.Diagnostics
 	
 	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommand<string>
 	{
-		readonly static Func<IEnumerable<LogEvent>, string[]> MessageFactory = LogEventMessageFactory.Instance.ToDelegate();
+		readonly static Func<IEnumerable<LogEvent>, ImmutableArray<string>> MessageFactory = LogEventMessageFactory.Instance.ToDelegate();
 
 		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, MessageFactory ) {}
 	}
@@ -60,9 +59,9 @@ namespace DragonSpark.Diagnostics
 	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
 	{
 		readonly ILoggerHistory history;
-		readonly Func<IEnumerable<LogEvent>, T[]> factory;
+		readonly Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory;
 
-		protected PurgeLoggerHistoryCommand( [Required] ILoggerHistory history, [Required] Func<IEnumerable<LogEvent>, T[]> factory )
+		protected PurgeLoggerHistoryCommand( [Required] ILoggerHistory history, [Required] Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory )
 		{
 			this.history = history;
 			this.factory = factory;
@@ -70,7 +69,7 @@ namespace DragonSpark.Diagnostics
 
 		public override void Execute( Action<T> parameter )
 		{
-			var messages = factory( history.Events );
+			var messages = factory( history.Events ).ToArray();
 			messages.Each( parameter );
 			history.Clear();
 		}

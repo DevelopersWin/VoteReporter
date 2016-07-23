@@ -2,6 +2,7 @@
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using Serilog;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void Logger()
 		{
-			var result = DefaultServiceProvider.Instance.Value.Get<ILogger>();
+			var result = DefaultServiceProvider.Instance.Get<ILogger>();
 			Assert.NotNull( result );
 			Assert.Same( Logging.Instance.Get( Defaults.ExecutionContext() ), result );
 		}
@@ -38,17 +39,20 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void SystemParts()
 		{
-			var system = DefaultServiceProvider.Instance.Value.Get<SystemParts>();
+			var system = DefaultServiceProvider.Instance.Get<SystemParts>();
 			Assert.Empty( system.Assemblies );
 			Assert.Empty( system.Types );
 
 			var types = new[] { typeof(ClassFactory), typeof(Class) };
-			new InitializeSetupCommand( types ).Run();
+			var application = ApplicationConfigurator<Application>.Instance.Create( types );
 
-			var after = DefaultServiceProvider.Instance.Value.Get<SystemParts>();
+			Assert.Same( application, DefaultServiceProvider.Instance.Get<DragonSpark.Setup.IApplication>() );
+
+			var after = DefaultServiceProvider.Instance.Get<SystemParts>();
 			Assert.NotEmpty( after.Assemblies );
 			Assert.NotEmpty( after.Types );
 			Assert.Equal( types, after.Types.ToArray() );
+
 		}
 
 		class ClassFactory : FactoryBase<Class>

@@ -84,7 +84,10 @@ namespace DragonSpark.Testing.Framework
 		protected override void OnDispose( bool disposing )
 		{
 			base.OnDispose( disposing );
-			complete( Origin );
+			if ( disposing )
+			{
+				complete( Origin );
+			}
 		}
 	}
 
@@ -122,7 +125,7 @@ namespace DragonSpark.Testing.Framework
 
 	public class MethodContext : ExecutionContextStore<MethodBase>
 	{
-		public static MethodContext Instance { get; } = new MethodContext();
+		public static IWritableStore<MethodBase> Instance { get; } = new MethodContext();
 		MethodContext() {}
 	}
 
@@ -158,7 +161,7 @@ namespace DragonSpark.Testing.Framework
 	public class TestingApplicationInitializationCommand : InitializationCommandBase
 	{
 		public TestingApplicationInitializationCommand( MethodBase method ) 
-			: base( new Windows.InitializationCommand(), new TestingFrameworkInitializationCommand( method ), LoadPartsCommand.Instance.Fixed( method.DeclaringType.Assembly ) ) {}
+			: base( Windows.InitializationCommand.Instance, new TestingFrameworkInitializationCommand( method ), LoadPartsCommand.Instance.Fixed( method.DeclaringType.Assembly ) ) {}
 	}
 
 	class WindowsTestingApplicationInitializationCommand {}

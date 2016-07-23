@@ -2,8 +2,10 @@ using DragonSpark.Activation;
 using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using Serilog.Formatting.Display;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 
@@ -42,13 +44,15 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public class LogEventMessageFactory : FactoryBase<IEnumerable<LogEvent>, string[]>
+	public sealed class LogEventMessageFactory : FactoryBase<IEnumerable<LogEvent>, ImmutableArray<string>>
 	{
+		readonly static Func<LogEvent, string> Text = LogEventTextFactory.Instance.ToDelegate();
 		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
+		LogEventMessageFactory() {}
 
-		public override string[] Create( IEnumerable<LogEvent> parameter ) => parameter
-			// .OrderBy( line => line.Timestamp )
-			.Select( LogEventTextFactory.Instance.ToDelegate() )
-			.ToArray();
+		public override ImmutableArray<string> Create( IEnumerable<LogEvent> parameter ) => parameter
+			.OrderBy( line => line.Timestamp )
+			.Select( Text )
+			.ToImmutableArray();
 	}
 }

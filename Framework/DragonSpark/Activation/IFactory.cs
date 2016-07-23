@@ -83,6 +83,8 @@ namespace DragonSpark.Activation
 			FixedFactoryCache() : base( result => new FixedFactory<T>( result ) ) {}
 		}
 
+		// public static ImmutableArray<T> Self<T>( this T[] @this ) => @this.ToImmutableArray();
+
 		public static T Self<T>( this T @this ) => @this;
 
 		public static Delegate Convert( this Func<object> @this, Type resultType ) => ConvertSupport.Methods.Make( resultType ).Invoke<Delegate>( @this );

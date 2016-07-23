@@ -362,14 +362,23 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public abstract class AggregateFactoryBase<T> : AggregateFactoryBase<T, T>
+	public abstract class AggregateFactoryBase<T> : AggregateFactoryBase<T, T>, IConfigurableFactory<T>
 	{
 		protected AggregateFactoryBase( Func<T> seed, Func<ImmutableArray<ITransformer<T>>> configurators ) : this( seed, configurators, Delegates<T>.Self ) {}
 		protected AggregateFactoryBase( Func<T> seed, Func<ImmutableArray<ITransformer<T>>> configurators, Func<T, T> factory ) : base( seed, configurators, factory ) {}
 		protected AggregateFactoryBase( IConfigurable<T> seed, IConfigurable<ImmutableArray<ITransformer<T>>> configurators, Func<T, T> factory ) : base( seed, configurators, factory ) {}
 	}
 
-	public abstract class AggregateFactoryBase<TConfiguration, TResult> : FactoryBase<TResult>
+	public interface IConfigurableFactory<T> : IConfigurableFactory<T, T> {}
+
+	public interface IConfigurableFactory<TConfiguration, out TResult> : IFactory<TResult>
+	{
+		IConfigurable<TConfiguration> Seed { get; }
+
+		IConfigurable<ImmutableArray<ITransformer<TConfiguration>>> Configurators { get; }
+	}
+
+	public abstract class AggregateFactoryBase<TConfiguration, TResult> : FactoryBase<TResult>, IConfigurableFactory<TConfiguration, TResult>
 	{
 		readonly Func<TConfiguration, TResult> factory;
 

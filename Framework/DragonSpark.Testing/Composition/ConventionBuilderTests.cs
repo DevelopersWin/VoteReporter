@@ -2,9 +2,7 @@
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using System;
@@ -42,21 +40,17 @@ namespace DragonSpark.Testing.Composition
 			Assert.Same( shared, container.GetExport<SharedExport>() );
 		}
 
-		// [RegisterService( typeof(Assembly[]) )]
-
 		[Theory, AutoData, AdditionalTypes( false )]
-		public void LocalData( [Service]ImmutableArray<Type> sut, [Service]ImmutableArray<Assembly> assemblies )
+		public void LocalData( ImmutableArray<Type> sut, ImmutableArray<Assembly> assemblies )
 		{
 			var items = sut.Fixed();
 
-			var nested = FrameworkTypes.Instance.Value.Union( GetType().Adapt().WithNested() ).Fixed();
+			var nested = GetType().Adapt().WithNested();
 			Assert.Equal( nested.Length, items.Length );
 			Assert.Equal( nested.OrderBy( type => type.FullName ), items.OrderBy( type => type.FullName ) );
 
-			Assert.Empty( assemblies );
-
-			/*Assert.Equal( 1, assemblies.Length );
-			Assert.Equal( GetType().Assembly, assemblies.Only() );*/
+			Assert.Single( assemblies );
+			Assert.Equal( GetType().Assembly, assemblies.Only() );
 		}
 
 		[Theory, AutoData]

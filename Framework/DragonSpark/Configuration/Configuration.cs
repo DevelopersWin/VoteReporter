@@ -5,9 +5,11 @@ using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Commands;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Windows.Input;
 using Defaults = DragonSpark.Activation.Defaults;
 
@@ -142,6 +144,20 @@ namespace DragonSpark.Configuration
 		public override ImmutableArray<ITransformer<T>> Create() => From().ToImmutableArray();
 
 		protected abstract IEnumerable<ITransformer<T>> From();
+	}
+
+	public class ConfigurationsFactory<T> : ConfigurationsFactoryBase<T>
+	{
+		public static ConfigurationsFactory<T> Instance { get; } = new ConfigurationsFactory<T>( Items<ITransformer<T>>.Default );
+
+		readonly ImmutableArray<ITransformer<T>> instances;
+
+		public ConfigurationsFactory( params ITransformer<T>[] instances )
+		{
+			this.instances = instances.ToImmutableArray();
+		}
+
+		protected override IEnumerable<ITransformer<T>> From() => instances.ToArray();
 	}
 
 	public abstract class ConfigurationsFactoryBase<TParameter, TConfiguration> : FactoryBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>

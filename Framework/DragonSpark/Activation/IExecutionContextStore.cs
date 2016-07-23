@@ -83,7 +83,10 @@ namespace DragonSpark.Activation
 			if ( defaultFactory != null && !cache.Contains( context ) )
 			{
 				var result = defaultFactory();
-				cache.Set( contextSource(), result );
+				if ( result.IsAssigned() )
+				{
+					cache.Set( context, result );
+				}
 				return result;
 			}
 			return cache.Get( context );

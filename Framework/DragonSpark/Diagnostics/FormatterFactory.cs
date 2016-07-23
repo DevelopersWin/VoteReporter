@@ -7,13 +7,18 @@ namespace DragonSpark.Diagnostics
 {
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
 	{
-		public static IStore<FormatterFactory> Instance { get; } = new ExecutionContextStore<FormatterFactory>( () => new FormatterFactory( FromKnownFactory<IFormattable>.Instance.Get().CreateUsing ) );
+		public static IStore<FormatterFactory> Instance { get; } = new ExecutionContextStore<FormatterFactory>( () =>
+																												{
+																													var fromKnownFactory = FromKnownFactory<IFormattable>.Instance.Get();
+																													return new FormatterFactory( fromKnownFactory.CreateUsing );
+																												} );
 
 		readonly static Func<Parameter, object> Coerce = p => StringCoercer.Instance.Coerce( p.Instance );
+		readonly static Coerce<Parameter> Coercer = ConstructCoercer<Parameter>.Instance.Coerce;
 
 		readonly Func<object, IFormattable> factory;
 
-		FormatterFactory( Func<object, IFormattable> factory ) : base( ConstructCoercer<Parameter>.Instance.ToDelegate() )
+		FormatterFactory( Func<object, IFormattable> factory ) : base( Coercer )
 		{
 			this.factory = factory;
 		}

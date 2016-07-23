@@ -1,4 +1,5 @@
 using DragonSpark.Runtime;
+using DragonSpark.Setup;
 using JetBrains.dotMemoryUnit;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
@@ -31,12 +32,16 @@ namespace DragonSpark.Testing.Framework
 
 		ExecuteMethodAspect() {}
 
-		/*public override void OnInvoke( MethodInterceptionArgs args )
+		public override void OnInvoke( MethodInterceptionArgs args )
 		{
+			base.OnInvoke( args );
+
+			ApplicationConfiguration.Instance.Value.Dispose();
+
 			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 
-			args.ReturnValue = Defer.Run( ExecutionContextStore.Instance.Value.Dispose, args.ReturnValue );
-		}*/
+			// args.ReturnValue = Defer.Run( ExecutionContextStore.Instance.Value.Dispose, args.ReturnValue );
+		}
 	}
 
 	/*public class ApplicationOutputCommand : OutputCommand

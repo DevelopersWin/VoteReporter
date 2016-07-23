@@ -8,7 +8,7 @@ namespace DragonSpark.Runtime
 	{
 		public PurgingCollection() {}
 		public PurgingCollection( IEnumerable<T> collection ) : base( collection ) {}
-		public PurgingCollection( IList<T> source ) : base( source ) {}
+		public PurgingCollection( ICollection<T> source ) : base( source ) {}
 
 		protected override IEnumerable<T> Query => Source.Purge().ToArray();
 	}

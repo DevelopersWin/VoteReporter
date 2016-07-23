@@ -75,8 +75,7 @@ namespace DragonSpark.TypeSystem
 
 	class DefaultValueFactory<T> : FixedFactory<T>
 	{
-		public static T Instance { get; } = new DefaultValueFactory<T>(  ).Create();
-
+		public static T Instance { get; } = new DefaultValueFactory<T>().Create();
 		DefaultValueFactory() : base( (T)DefaultValueFactory.Instance.Get( typeof(T) ) ) {}
 	}
 
@@ -87,10 +86,12 @@ namespace DragonSpark.TypeSystem
 		public static ICache<Type, object> Instance { get; } = new DefaultValueFactory();
 		DefaultValueFactory() : base( Create ) {}
 
-		static object Create( Type parameter )
+		static object Create( Type parameter ) => parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : Empty( parameter );
+
+		static object Empty( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
-			var result = type != null ? Method.Make( type.ToItem() ).Invoke<Array>() : parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : null;
+			var result = type != null ? Method.Make( type.ToItem() ).Invoke<Array>() : null;
 			return result;
 		}
 	}

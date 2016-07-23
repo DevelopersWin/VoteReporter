@@ -11,8 +11,6 @@ namespace DragonSpark.Extensions
 {
 	public static class ObjectExtensions
 	{
-		// public static T Attached<T>( this object @this, ConditionalWeakTable<object,object>.CreateValueCallback create ) => (T)Pairs.GetValue( @this, create );
-
 		public static TResult Clone<TResult>( this TResult @this, Action<IMappingExpression> configure = null ) where TResult : class => @this.MapInto<TResult>( configure: configure );
 
 		public static MemberInfo GetMemberInfo( this Expression expression )
@@ -24,11 +22,13 @@ namespace DragonSpark.Extensions
 
 		public static void TryDispose( this object target ) => target.As<IDisposable>( x => x.Dispose() );
 
-		// public static void Null<TItem>( this TItem target, Action action ) => target.IsAssigned().IsTrue( action );
-
-		// public static bool IsAssigned<T>( this T @this ) => Equals( @this, null );
-
-		public static bool IsAssigned<T>( this T @this ) => !Equals( @this, default(T) );
+		public static bool IsAssigned<T>( this T @this )
+		{
+			var type = @this?.GetType() ?? typeof(T);
+			var defaultOrEmpty = SpecialValues.DefaultOrEmpty( type );
+			var result = type.GetTypeInfo().IsValueType ? !defaultOrEmpty.Equals( @this ) : !Equals( @this, defaultOrEmpty );
+			return result;
+		}
 
 		public static bool IsAssignedOrContains<T>( this T @this ) => !Equals( @this, SpecialValues.DefaultOrEmpty<T>() );
 

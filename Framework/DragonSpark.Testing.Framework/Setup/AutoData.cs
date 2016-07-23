@@ -1,5 +1,4 @@
 using Ploeh.AutoFixture;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
 
@@ -7,7 +6,7 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public struct AutoData : IEquatable<AutoData>
 	{
-		public AutoData( [Required]IFixture fixture, [Required]MethodBase method )
+		public AutoData( IFixture fixture, MethodBase method )
 		{
 			Fixture = fixture;
 			Method = method;

@@ -12,7 +12,8 @@ namespace DragonSpark.Windows
 		[ModuleInitializer( 0 )]
 		public static void Initialize() => ExecutionContextRepository.Instance.Add( ExecutionContextStore.Instance );
 
-		public InitializationCommand()
+		public static InitializationCommand Instance { get; } = new InitializationCommand();
+		InitializationCommand()
 		{
 			InitializeComponent();
 		}

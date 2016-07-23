@@ -60,34 +60,6 @@ namespace DragonSpark.Runtime.Stores
 		public override bool IsSatisfiedBy( TInstance parameter ) => Cache.Contains( parameter );
 	}
 
-	/*public class DelegatedWritableStore<T> : WritableStore<T>
-	{
-		readonly Func<T> get;
-		readonly Action<T> set;
-		public DelegatedWritableStore( Func<T> get, Action<T> set ) : this( get, set, Coercer<T>.Instance ) {}
-		public DelegatedWritableStore( Func<T> get, Action<T> set, ICoercer<T> coercer ) : base( coercer )
-		{
-			this.get = get;
-			this.set = set;
-		}
-
-		protected override T Get() => get();
-
-		public override void Assign( T item ) => set( item );
-	}*/
-
-	public class DelegatedStore<T> : StoreBase<T>
-	{
-		readonly Func<T> get;
-
-		public DelegatedStore( Func<T> get )
-		{
-			this.get = get;
-		}
-
-		protected override T Get() => get();
-	}
-
 	public abstract class WritableStore<T> : StoreBase<T>, IWritableStore<T>, IDisposable
 	{
 		readonly ICoercer<T> coercer;
@@ -133,21 +105,19 @@ namespace DragonSpark.Runtime.Stores
 		protected override T Get() => lazy.Value;
 	}
 
-	/*public abstract class DeferredMethodStore<T> : StoreBase<T>
+	public class DelegatedStore<T> : StoreBase<T>
 	{
-		readonly Lazy<T> defer;
+		readonly Func<T> get;
 
-		protected DeferredMethodStore()
+		public DelegatedStore( Func<T> get )
 		{
-			defer = new Lazy<T>( Body );
+			this.get = get;
 		}
 
-		protected abstract T Body();
+		protected override T Get() => get();
+	}
 
-		protected sealed override T Get() => defer.Value;
-	}*/
-
-	public class DeferredTargetCachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
+	/*public class DeferredTargetCachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{
 		readonly Func<TInstance> instance;
 		readonly ICache<TInstance, TResult> cache;
@@ -162,7 +132,7 @@ namespace DragonSpark.Runtime.Stores
 		protected override TResult Get() => cache.Get( instance() );
 
 		public override void Assign( TResult item ) => cache.Set( instance(), item );
-	}
+	}*/
 
 	/*public class CachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{

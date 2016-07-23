@@ -1,4 +1,3 @@
-using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
@@ -9,11 +8,12 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	public class GlobalServiceProvider : Configuration<IServiceProvider>
+	public class GlobalServiceProvider : DelegatedStore<IServiceProvider>
 	{
-		public static GlobalServiceProvider Instance { get; } = new GlobalServiceProvider();
+		readonly static GlobalServiceProvider Store = new GlobalServiceProvider();
+		public static IServiceProvider Instance => Store.Value;
 
-		GlobalServiceProvider() : base( () => DefaultServiceProvider.Instance.Value )
+		GlobalServiceProvider() : base( () => ApplicationConfiguration.Instance.Value?.Services ?? DefaultServiceProvider.Instance )
 		{
 			ServiceLocator.SetLocatorProvider( GetService<IServiceLocator> );
 		}
@@ -25,8 +25,9 @@ namespace DragonSpark.Activation
 
 	public sealed class DefaultServiceProvider : CompositeServiceProvider
 	{
-		public static IStore<IServiceProvider> Instance { get; } = new ExecutionContextStore<IServiceProvider>( () => new DefaultServiceProvider() );
-		DefaultServiceProvider() : base( new InstanceContainerServiceProvider( ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToStore(), LoggingController.Instance.ToStore(), Logging.Instance.ToStore() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
+		readonly static IStore<IServiceProvider> Store = new ExecutionContextStore<IServiceProvider>( () => new DefaultServiceProvider() );
+		public static IServiceProvider Instance => Store.Value;
+		DefaultServiceProvider() : base( new InstanceContainerServiceProvider( ApplicationConfiguration.Instance, ApplicationConfiguration.Instance.Services, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToStore(), LoggingController.Instance.ToStore(), Logging.Instance.ToStore() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
 	}
 
 	public delegate object ServiceSource( Type serviceType );
