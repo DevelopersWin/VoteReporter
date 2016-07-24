@@ -6,7 +6,7 @@
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
 	xmlns:development="clr-namespace:DragonSpark.Testing.Parts.Development"
 	mc:Ignorable="d">
-	<development:ApplyEnableMethodCachingConfiguration Parameter="{x:Static configuration:EnableMethodCaching.Instance}" Value="False" />
+	<!--<development:ApplyEnableMethodCachingConfiguration Parameter="{x:Static configuration:EnableMethodCaching.Instance}" Value="False" />-->
 	<!--<diagnosticsCore:MinimumLevelConfiguration Value="Debug" />-->
 	
 </configuration:InitializationCommandBase>

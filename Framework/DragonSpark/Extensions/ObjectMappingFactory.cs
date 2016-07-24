@@ -1,13 +1,13 @@
 using AutoMapper;
 using DragonSpark.Activation;
-using DragonSpark.Runtime.Stores;
+using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Extensions
 {
 	public class ObjectMappingFactory<T> : FactoryBase<ObjectMappingParameter<T>, T> where T : class
 	{
-		public static IStore<ObjectMappingFactory<T>> Default { get; } = new ExecutionContextStore<ObjectMappingFactory<T>>( () => new ObjectMappingFactory<T>( Activator.Instance.Value ) );
+		public static ISource<ObjectMappingFactory<T>> Default { get; } = new ExecutionScope<ObjectMappingFactory<T>>( () => new ObjectMappingFactory<T>( Activator.Instance.Get() ) );
 
 		readonly IActivator locator;
 

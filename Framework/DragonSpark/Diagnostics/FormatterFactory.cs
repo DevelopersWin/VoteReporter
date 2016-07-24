@@ -1,17 +1,12 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Stores;
 using System;
 
 namespace DragonSpark.Diagnostics
 {
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
 	{
-		public static IStore<FormatterFactory> Instance { get; } = new ExecutionContextStore<FormatterFactory>( () =>
-																												{
-																													var fromKnownFactory = FromKnownFactory<IFormattable>.Instance.Get();
-																													return new FormatterFactory( fromKnownFactory.CreateUsing );
-																												} );
+		public static ISource<FormatterFactory> Instance { get; } = new ExecutionScope<FormatterFactory>( () => new FormatterFactory( ConstructFromKnownTypes<IFormattable>.Instance.Get().CreateUsing ) );
 
 		readonly static Func<Parameter, object> Coerce = p => StringCoercer.Instance.Coerce( p.Instance );
 		readonly static Coerce<Parameter> Coercer = ConstructCoercer<Parameter>.Instance.Coerce;

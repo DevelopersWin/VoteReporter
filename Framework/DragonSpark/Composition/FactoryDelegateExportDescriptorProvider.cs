@@ -12,18 +12,20 @@ namespace DragonSpark.Composition
 	public class FactoryDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
 		readonly static Func<Activator.Parameter, Delegate> DelegateSource = ActivatorDelegateWithConversionFactory.Instance.ToDelegate();
-		public FactoryDelegateExportDescriptorProvider() : base( FactoryDelegateTransformer.Instance, DelegateSource ) {}
+		readonly static Func<CompositionContract, CompositionContract> Default = FactoryDelegateTransformer.Instance.ToDelegate();
+		public FactoryDelegateExportDescriptorProvider() : base( Default, DelegateSource ) {}
 	}
 
 	public sealed class FactoryWithParameterDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
 		readonly static Func<Activator.Parameter, Delegate> DelegateSource = ActivatorWithParameterDelegateFactory.Instance.ToDelegate();
+		readonly static Func<CompositionContract, CompositionContract> Default = FactoryDelegateTransformer.InstanceWithParameter.ToDelegate();
 
-		public FactoryWithParameterDelegateExportDescriptorProvider() : base( FactoryDelegateTransformer.InstanceWithParameter, DelegateSource ) {}
+		public FactoryWithParameterDelegateExportDescriptorProvider() : base( Default, DelegateSource ) {}
 	}
 
 	[ApplyAutoValidation]
-	public sealed class FactoryDelegateTransformer : TransformerBase<CompositionContract>
+	public sealed class FactoryDelegateTransformer : FactoryBase<CompositionContract, CompositionContract>
 	{
 		readonly static Func<Type, Type> ResultTypeLocator = Activation.ResultTypeLocator.Instance.ToDelegate();
 

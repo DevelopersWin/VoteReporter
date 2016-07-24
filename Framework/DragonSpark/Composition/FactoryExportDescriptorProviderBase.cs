@@ -14,13 +14,13 @@ namespace DragonSpark.Composition
 {
 	public abstract class FactoryExportDescriptorProviderBase : ExportDescriptorProvider
 	{
-		readonly Func<LocateTypeRequest, Type> locator = FactoryTypes.Instance.Value.ToDelegate();
-		readonly ITransformer<CompositionContract> resolver;
+		readonly Func<LocateTypeRequest, Type> locator = FactoryTypes.Instance.Get().ToDelegate();
+		readonly Func<CompositionContract, CompositionContract> resolver;
 		readonly Func<Activator.Parameter, object> delegateSource;
 		
-		protected FactoryExportDescriptorProviderBase( Func<Activator.Parameter, object> delegateSource ) : this( SelfTransformer<CompositionContract>.Instance, delegateSource ) {}
+		protected FactoryExportDescriptorProviderBase( Func<Activator.Parameter, object> delegateSource ) : this( SelfTransformer<CompositionContract>.Instance.Get, delegateSource ) {}
 
-		protected FactoryExportDescriptorProviderBase( ITransformer<CompositionContract> resolver, Func<Activator.Parameter, object> delegateSource )
+		protected FactoryExportDescriptorProviderBase( Func<CompositionContract, CompositionContract> resolver, Func<Activator.Parameter, object> delegateSource )
 		{
 			this.resolver = resolver;
 			this.delegateSource = delegateSource;
@@ -32,7 +32,7 @@ namespace DragonSpark.Composition
 			var exists = descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency );
 			if ( !exists )
 			{
-				var resultContract = resolver.Create( contract );
+				var resultContract = resolver( contract );
 				var type = resultContract
 					.With( compositionContract => new LocateTypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
 					.With( locator );

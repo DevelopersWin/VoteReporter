@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Aspects;
+using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
@@ -57,10 +58,10 @@ namespace DragonSpark.Activation.IoC
 
 	public sealed class UnityContainerFactory : AggregateFactoryBase<IUnityContainer>
 	{
-		readonly static ImmutableArray<ITransformer<IUnityContainer>> Default = new ITransformer<IUnityContainer>[] { DefaultUnityExtensions.Instance }.ToImmutableArray();
+		readonly static IConfigurations<IUnityContainer> Default = new Configurations<IUnityContainer>( DefaultUnityExtensions.Instance );
 
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-		UnityContainerFactory() : base( () => new UnityContainer().Extend<DefaultBehaviorExtension>(), () => Default ) {}
+		UnityContainerFactory() : base( () => new UnityContainer().Extend<DefaultBehaviorExtension>(), Default ) {}
 
 		[Creator]
 		public override IUnityContainer Create() => base.Create();
@@ -85,7 +86,7 @@ namespace DragonSpark.Activation.IoC
 		public static DefaultUnityExtensions Instance { get; } = new DefaultUnityExtensions();
 		DefaultUnityExtensions() {}
 
-		public override IUnityContainer Create( IUnityContainer parameter ) => 
+		public override IUnityContainer Get( IUnityContainer parameter ) => 
 			parameter
 				.Extend<InstanceTypeRegistrationMonitorExtension>()
 				.Extend<DefaultRegistrationsExtension>()

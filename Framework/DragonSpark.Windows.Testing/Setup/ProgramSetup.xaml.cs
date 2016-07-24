@@ -1,7 +1,4 @@
-﻿using DragonSpark.Testing.Framework.Setup;
-using System;
-using System.Composition;
-using System.Reflection;
+﻿using System.Composition;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -10,8 +7,8 @@ namespace DragonSpark.Windows.Testing.Setup
 	{
 		public class AutoDataAttribute : DragonSpark.Testing.Framework.IoC.AutoDataAttribute
 		{
-			readonly static Func<MethodBase, IApplication> Source = ApplicationFactory<ProgramSetup>.Instance.Create;
-			public AutoDataAttribute() : base( Source ) {}
+			/*readonly static Func<MethodBase, IApplication> Source = ApplicationFactory<ProgramSetup>.Instance.Create;
+			public AutoDataAttribute() : base( Source ) {}*/
 		}
 
 		public ProgramSetup()

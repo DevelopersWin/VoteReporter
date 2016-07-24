@@ -1,5 +1,5 @@
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
 
@@ -7,7 +7,8 @@ namespace DragonSpark.TypeSystem
 {
 	public static class Attributes
 	{
-		public static IAttributeProvider Get( [Required]object target ) => target as IAttributeProvider ?? AttributeProviderHost.Instance.Get( target );
+		readonly static Func<object, IAttributeProvider> Source = AttributeProviders.Instance.Delegate();
+		public static IAttributeProvider Get( object target ) => target as IAttributeProvider ?? Source( target );
 	}
 
 	static class AttributeSupport<T> where T : Attribute

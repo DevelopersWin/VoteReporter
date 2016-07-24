@@ -1,11 +1,11 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
@@ -17,10 +17,10 @@ namespace DragonSpark.Composition
 {
 	public sealed class CompositionHostFactory : AggregateFactoryBase<ContainerConfiguration, CompositionHost>
 	{
-		readonly static ImmutableArray<ITransformer<ContainerConfiguration>> Default = ImmutableArray.Create<ITransformer<ContainerConfiguration>>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
+		readonly static IConfigurations<ContainerConfiguration> Default = new Configurations<ContainerConfiguration>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
 
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
-		CompositionHostFactory() : base( () => new ContainerConfiguration(), () => Default, parameter => parameter.CreateContainer()) {}
+		CompositionHostFactory() : base( () => new ContainerConfiguration(), Default, parameter => parameter.CreateContainer()) {}
 	}
 
 	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}
@@ -30,7 +30,7 @@ namespace DragonSpark.Composition
 		public static ContainerServicesConfigurator Instance { get; } = new ContainerServicesConfigurator();
 		ContainerServicesConfigurator() {}
 
-		public override ContainerConfiguration Create( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
+		public override ContainerConfiguration Get( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
 	}
 
 	public class ServicesExportDescriptorProvider : ExportDescriptorProvider, IDependencyLocatorKey
@@ -92,7 +92,7 @@ namespace DragonSpark.Composition
 		public static PartsContainerConfigurator Instance { get; } = new PartsContainerConfigurator();
 		PartsContainerConfigurator() {}
 
-		public override ContainerConfiguration Create( ContainerConfiguration configuration )
+		public override ContainerConfiguration Get( ContainerConfiguration configuration )
 		{
 			var system = ApplicationParts.Instance.Get();
 			// var core = FrameworkTypes.Instance.Get().ToArray();

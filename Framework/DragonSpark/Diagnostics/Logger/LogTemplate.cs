@@ -4,7 +4,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -143,7 +142,7 @@ namespace DragonSpark.Diagnostics.Logger
 				this.history = history;
 			}
 
-			public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
+			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
 		}
 	}
 
@@ -163,7 +162,7 @@ namespace DragonSpark.Diagnostics.Logger
 				this.controller = controller;
 			}
 
-			public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller );
+			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller );
 		}
 	}
 
@@ -178,7 +177,7 @@ namespace DragonSpark.Diagnostics.Logger
 			this.filter = filter;
 		}
 
-		public override LoggerConfiguration Create( LoggerConfiguration parameter )
+		public override LoggerConfiguration Get( LoggerConfiguration parameter )
 		{
 			var item = filter.ToItem();
 			var result = parameter.Filter.With( item ).Enrich.With( item );

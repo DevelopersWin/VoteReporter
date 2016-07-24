@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
@@ -78,7 +79,7 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
-			var creator = Creator.Default.Get( Container )?.GetType() ?? Defaults.ExecutionContext();
+			var creator = Creator.Default.Get( Container )?.GetType() ?? Execution.Current();
 			var policies = repository.List();
 			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies, specification );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
@@ -99,7 +100,7 @@ namespace DragonSpark.Activation.IoC
 
 			public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
 			{
-				var key = References.Keys.Create( buildKey );
+				var key = References.Keys.Get( buildKey );
 				var result = cache.Contains( key ) ? cache.Get( key ) : cache.SetValue( key, inner.CreatePlan( context, buildKey ) );
 				return result;
 			}
@@ -166,7 +167,7 @@ namespace DragonSpark.Activation.IoC
 
 			public override void PreBuildUp( IBuilderContext context )
 			{
-				var reference = References.Keys.Create( context.BuildKey );
+				var reference = References.Keys.Get( context.BuildKey );
 				if ( condition.Get( reference ).Apply() )
 				{
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
@@ -188,7 +189,7 @@ namespace DragonSpark.Activation.IoC
 	[ApplyAutoValidation]
 	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
 	{
-		public static IStore<Func<Type, Type>> Instance { get; } = new ExecutionContextStore<Func<Type, Type>>( () => new BuildableTypeFromConventionLocator( ApplicationParts.Instance.Value.Types.ToArray() ).Cached().Get );
+		public static ISource<Func<Type, Type>> Instance { get; } = new ExecutionScope<Func<Type, Type>>( () => new BuildableTypeFromConventionLocator( ApplicationTypes.Instance.Get().ToArray() ).Cached().Get );
 
 		readonly static Func<Type, bool> Specification = CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).IsSatisfiedBy;
 		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
@@ -271,13 +272,13 @@ namespace DragonSpark.Activation.IoC
 		protected TypeSelectionStrategyBase( ISpecification<Type> specification ) : base( specification ) {}
 	}*/
 
-	public class SelfStrategy : StoreCache<Type, IEnumerable<Type>>
+	public class SelfStrategy : Cache<Type, IEnumerable<Type>>
 	{
 		public static SelfStrategy Instance { get; } = new SelfStrategy();
 		SelfStrategy() : base( EnumerableEx.Return ) {}
 	}
 
-	public sealed class SelfAndNestedStrategy : StoreCache<Type, IEnumerable<Type>>
+	public sealed class SelfAndNestedStrategy : Cache<Type, IEnumerable<Type>>
 	{
 		public static SelfAndNestedStrategy Instance { get; } = new SelfAndNestedStrategy();
 		SelfAndNestedStrategy() : base( type => type.Adapt().WithNested() ) {}
@@ -385,7 +386,7 @@ namespace DragonSpark.Activation.IoC
 
 		public override void PreBuildUp( IBuilderContext context )
 		{
-			var reference = References.Keys.Create( context.BuildKey );
+			var reference = References.Keys.Get( context.BuildKey );
 			if ( condition.Get( reference ).Apply() )
 			{
 				var from = context.BuildKey.Type;

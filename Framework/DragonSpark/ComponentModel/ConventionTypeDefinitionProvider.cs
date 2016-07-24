@@ -1,25 +1,27 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class TypeDefinitionProvider : CompositeFactory<TypeInfo, TypeInfo>, ITypeDefinitionProvider
+	public sealed class TypeDefinitionProvider : Cache<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
-		public static ICache<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitionProvider( Items<ITypeDefinitionProvider>.Default ).Cached();
-
-		protected TypeDefinitionProvider( params ITypeDefinitionProvider[] others ) : base( others.Concat( new IFactory<TypeInfo, TypeInfo>[] { ConventionTypeDefinitionProvider.Instance, SelfTransformer<TypeInfo>.Instance } ).Fixed() ) {}
+		public static ISource<ITypeDefinitionProvider> Instance { get; } = new ExecutionScope<ITypeDefinitionProvider>( () => new TypeDefinitionProvider( AttributeConfigurations.TypeDefinitionProviders.Get() ) );
+		TypeDefinitionProvider( ImmutableArray<ITypeDefinitionProvider> providers ) : base( new CompositeFactory<TypeInfo, TypeInfo>( providers.Select( provider => new Func<TypeInfo, TypeInfo>( provider.Get ) ).ToArray() ).Create ) {}
 	}
 
-	public class ConventionTypeDefinitionProvider : FactoryBase<TypeInfo, TypeInfo>, ITypeDefinitionProvider
+	public sealed class ConventionTypeDefinitionProvider : TransformerBase<TypeInfo>, ITypeDefinitionProvider
 	{
 		public static ConventionTypeDefinitionProvider Instance { get; } = new ConventionTypeDefinitionProvider();
+		ConventionTypeDefinitionProvider() {}
 
-		public override TypeInfo Create( TypeInfo parameter )
+		public override TypeInfo Get( TypeInfo parameter )
 		{
 			var context = new Context( parameter );
 			var result = context.Loop( 

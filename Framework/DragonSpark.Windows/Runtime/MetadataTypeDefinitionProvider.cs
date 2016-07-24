@@ -9,9 +9,8 @@ namespace DragonSpark.Windows.Runtime
 	public class MetadataTypeDefinitionProvider : TransformerBase<TypeInfo>, ITypeDefinitionProvider
 	{
 		public static MetadataTypeDefinitionProvider Instance { get; } = new MetadataTypeDefinitionProvider();
-
 		MetadataTypeDefinitionProvider() {}
 
-		public override TypeInfo Create( TypeInfo parameter ) => parameter.GetCustomAttribute<MetadataTypeAttribute>().With( item => item.MetadataClassType.GetTypeInfo() );
+		public override TypeInfo Get( TypeInfo parameter ) => parameter.GetCustomAttribute<MetadataTypeAttribute>().With( item => item.MetadataClassType.GetTypeInfo() );
 	}
 }

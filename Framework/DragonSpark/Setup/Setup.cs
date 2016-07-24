@@ -89,30 +89,31 @@ namespace DragonSpark.Setup
 		}
 	}*/
 
-	public sealed class ApplicationConfigurator<T> : FactoryBase<ApplicationConfigurationParameter<T>, T> where T : IApplication, new()
+	/*public sealed class ApplicationConfigurator<T> : FactoryBase<ApplicationConfigurationParameter<T>, T> where T : IApplication, new()
 	{
 		public static ApplicationConfigurator<T> Instance { get; } = new ApplicationConfigurator<T>();
-		ApplicationConfigurator() : this( ApplicationConfiguration.Instance ) {}
+		ApplicationConfigurator() : this( ApplicationConfiguration.Instance, ActiveApplication.Instance ) {}
 
 		readonly IApplicationConfiguration configuration;
+		readonly IAssignable<IApplication> active;
 
-		public ApplicationConfigurator( IApplicationConfiguration configuration )
+		public ApplicationConfigurator( IApplicationConfiguration configuration, IAssignable<IApplication> active )
 		{
 			this.configuration = configuration;
+			this.active = active;
 		}
 
-
-		public T Create( IEnumerable<Assembly> assemblies ) => Create( assemblies.ToImmutableArray() );
+		/*public T Create( IEnumerable<Assembly> assemblies ) => Create( assemblies.ToImmutableArray() );
 		public T Create( ImmutableArray<Assembly> assemblies ) => Create( new SystemParts( assemblies ) );
 
 		public T Create( IEnumerable<Type> types ) => Create( types.ToImmutableArray() );
 		public T Create( ImmutableArray<Type> types ) => Create( new SystemParts( types ) );
 
-		static T Create( SystemParts parts ) => Instance.Create( new ApplicationConfigurationParameter<T>( parts ) );
+		static T Create( SystemParts parts ) => Instance.Create( new ApplicationConfigurationParameter<T>( parts ) );#1#
 
 		public override T Create( ApplicationConfigurationParameter<T> parameter )
 		{
-			if ( parameter.Parts.IsAssigned() )
+			/*if ( parameter.Parts.IsAssigned() )
 			{
 				configuration.Parts.Assign( new FixedFactory<SystemParts>( parameter.Parts ).Create );
 			}
@@ -126,10 +127,9 @@ namespace DragonSpark.Setup
 			if ( commands.Any() )
 			{
 				configuration.Commands.Assign( commands.ToImmutableArray );
-			}
-
+			}#1#
 			var result = new T();
-			configuration.Assign( result );
+			active.Assign( result );
 			return result;
 		}
 	}
@@ -148,7 +148,7 @@ namespace DragonSpark.Setup
 		public SystemParts Parts { get; }
 		public IServiceProvider Services { get; }
 		public IEnumerable<ICommand> Commands { get; }
-	}
+	}*/
 
 	/*public class ConfigurationParameter<T>
 	{
@@ -182,11 +182,21 @@ namespace DragonSpark.Setup
 		public Func<ImmutableArray<ITransformer<T>>> Configurators { get; }
 	}*/
 
-	/*public sealed class ServiceProviderFactory : AggregateFactoryBase<IServiceProvider>
+	public sealed class ServiceProviderFactory : AggregateFactoryBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
-		ServiceProviderFactory() : base( DefaultServiceProvider.Instance.Get, new ConfigurationsFactory<IServiceProvider>( Composition.ServiceProviderFactory.Instance ).Create ) {}
-	}*/
+		ServiceProviderFactory() : base( () => DefaultServiceProvider.Instance, ServiceProviderConfigurations.Instance ) {}
+	}
+
+	public class ServiceProviderConfigurations : Configurations<IServiceProvider>
+	{
+		public static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
+
+		protected override IEnumerable<ITransformer<IServiceProvider>> From()
+		{
+			yield return Composition.ServiceProviderFactory.Instance;
+		}
+	}
 
 	/*public static class ApplicationExtensions
 	{
@@ -250,7 +260,7 @@ namespace DragonSpark.Setup
 	{
 		public InstanceContainerServiceProvider( params object[] instances ) : base( instances ) {}
 
-		protected override T GetService<T>() => Query().FirstAssigned( Defaults<T>.InstanceCoercer );
+		protected override T GetService<T>() => Query().FirstAssigned( Activation.Defaults<T>.InstanceCoercer );
 	}
 
 	public abstract class InstanceServiceProviderBase : RepositoryBase<object>, IServiceProvider
@@ -291,7 +301,7 @@ namespace DragonSpark.Setup
 
 	public class ServiceProviderRegistry : RepositoryBase<IServiceProvider>
 	{
-		public static IStore<IRepository<IServiceProvider>> Instance { get; } = new ExecutionContextStore<IRepository<IServiceProvider>>( () => new ServiceProviderRegistry() );
+		public static ISource<IRepository<IServiceProvider>> Instance { get; } = new ExecutionScope<IRepository<IServiceProvider>>( () => new ServiceProviderRegistry() );
 		ServiceProviderRegistry() : base( EnumerableEx.Return( DefaultServiceProvider.Instance ) ) {}
 	}
 
@@ -349,7 +359,7 @@ namespace DragonSpark.Setup
 			{
 				using ( active.Assignment( serviceType, true ) )
 				{
-					var stores = ServiceProviderRegistry.Instance.Value.List().Select( Stores.Get );
+					var stores = ServiceProviderRegistry.Instance.Get().List().Select( Stores.Get );
 					var result = stores.Introduce( serviceType, tuple => tuple.Item1.CanProvide( tuple.Item2 ), tuple => tuple.Item1.Value.GetService( tuple.Item2 ) ).FirstAssigned();
 					return result;
 				}
@@ -395,20 +405,20 @@ namespace DragonSpark.Setup
 
 	public sealed class ApplicationParts : DelegatedStore<SystemParts>
 	{
-		public static IStore<SystemParts> Instance { get; } = new ApplicationParts();
-		ApplicationParts() : base( () => ApplicationConfiguration.Instance.Value?.Parts ?? ApplicationConfiguration.Instance.Parts.Get() ) {}
+		public static ISource<SystemParts> Instance { get; } = new ApplicationParts();
+		ApplicationParts() : base( () => ActiveApplication.Instance.Value?.Parts ?? ApplicationConfiguration.Instance.Get().Parts ) {}
 	}
 
 	public class ApplicationAssemblies : DelegatedStore<ImmutableArray<Assembly>>
 	{
-		public static IStore<ImmutableArray<Assembly>> Instance { get; } = new ApplicationAssemblies();
-		ApplicationAssemblies() : base( () => ApplicationParts.Instance.Value.Assemblies ) {}
+		public static ISource<ImmutableArray<Assembly>> Instance { get; } = new ApplicationAssemblies();
+		ApplicationAssemblies() : base( () => ApplicationParts.Instance.Get().Assemblies ) {}
 	}
 
 	public class ApplicationTypes : DelegatedStore<ImmutableArray<Type>>
 	{
-		public static IStore<ImmutableArray<Type>> Instance { get; } = new ApplicationTypes();
-		ApplicationTypes() : base( () => ApplicationParts.Instance.Value.Types ) {}
+		public static ISource<ImmutableArray<Type>> Instance { get; } = new ApplicationTypes();
+		ApplicationTypes() : base( () => ApplicationParts.Instance.Get().Types ) {}
 	}
 
 	/*public class FrameworkTypes : ExecutionContextStructureStore<ImmutableArray<Type>>
@@ -419,28 +429,41 @@ namespace DragonSpark.Setup
 		readonly static ImmutableArray<Type> Default = ImmutableArray.Create( typeof(MethodFormatter) );
 	}*/
 
-	public interface IApplicationConfiguration : IWritableStore<IApplication>
+	public sealed class ActiveApplication : ExecutionScope<IApplication>
 	{
-		IConfigurable<ImmutableArray<ICommand>> Commands { get; }
-		IConfigurable<IServiceProvider> Services { get; }
-		IConfigurable<SystemParts> Parts { get; }
+		public static ActiveApplication Instance { get; } = new ActiveApplication();
+		ActiveApplication() {}
+
+		public T Create<T>() where T : class, IApplication, new()
+		{
+			var result = new T();
+			Assign( result );
+			return result;
+		}
 	}
 
-	public class ApplicationConfiguration : ExecutionContextStore<IApplication>, IApplicationConfiguration
+	public interface IApplicationConfiguration
 	{
-		public static IApplicationConfiguration Instance { get; } = new ApplicationConfiguration();
+		ImmutableArray<ICommand> Commands { get; }
+		IServiceProvider Services { get; }
+		SystemParts Parts { get; }
+	}
+
+	public class ApplicationConfiguration : /*ConfigurableExecutionScope<IApplication>,*/ IApplicationConfiguration
+	{
+		public static IConfiguration<IApplicationConfiguration> Instance { get; } = new Configuration<IApplicationConfiguration>( () => new ApplicationConfiguration() );
 		ApplicationConfiguration()  {}
 		
-		public IConfigurable<ImmutableArray<ICommand>> Commands { get; } = new Configuration<ImmutableArray<ICommand>>( () => Items<ICommand>.Immutable );
-		public IConfigurable<IServiceProvider> Services { get; } = new Configuration<IServiceProvider>( () => DefaultServiceProvider.Instance );
-		public IConfigurable<SystemParts> Parts { get; } = new Configuration<SystemParts>( () => SystemParts.Default );
+		public ImmutableArray<ICommand> Commands { get; } = Items<ICommand>.Immutable;
+		public IServiceProvider Services { get; } = DefaultServiceProvider.Instance;
+		public SystemParts Parts { get; } = SystemParts.Default;
 	}
 
 	public abstract class Application<T> : CompositeCommand<T>, IApplication<T>
 	{
-		protected Application() : this( ApplicationConfiguration.Instance.Parts.Get() ) {}
-		protected Application( SystemParts parts ) : this( parts, ApplicationConfiguration.Instance.Services.Get() ) {}
-		protected Application( SystemParts parts, IServiceProvider services ) : this( parts, services, ApplicationConfiguration.Instance.Commands.Get().ToArray() ) {}
+		protected Application() : this( ApplicationConfiguration.Instance.Get() ) {}
+
+		protected Application( IApplicationConfiguration configuration ) : this( configuration.Parts, configuration.Services, configuration.Commands.ToArray() ) {}
 
 		protected Application( SystemParts parts, IServiceProvider services, IEnumerable<ICommand> commands ) : base( new OnlyOnceSpecification<T>(), commands.Fixed() )
 		{

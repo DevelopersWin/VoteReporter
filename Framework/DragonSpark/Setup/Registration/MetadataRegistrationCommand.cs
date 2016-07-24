@@ -25,7 +25,7 @@ namespace DragonSpark.Setup.Registration
 
 		public override void Execute( Type[] parameter )
 		{
-			var registrations = MetadataRegistrationTypeFactory.Instance.Create( parameter ).SelectMany( CollectionSelector ).ToArray();
+			var registrations = MetadataRegistrationTypeFactory.Instance.Get( parameter ).SelectMany( CollectionSelector ).ToArray();
 			foreach ( var result in registrations )
 			{
 				result.Register( registry );
@@ -37,6 +37,6 @@ namespace DragonSpark.Setup.Registration
 	{
 		public static MetadataRegistrationTypeFactory Instance { get; } = new MetadataRegistrationTypeFactory();
 
-		public override Type[] Create( Type[] parameter ) => parameter.WhereDecorated<RegistrationBaseAttribute>().Select( item => item.Item2 ).Fixed();
+		public override Type[] Get( Type[] parameter ) => parameter.WhereDecorated<RegistrationBaseAttribute>().Select( item => item.Item2 ).Fixed();
 	}
 }

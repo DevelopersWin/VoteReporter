@@ -1,5 +1,5 @@
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Immutable;
@@ -7,13 +7,11 @@ using System.Linq;
 
 namespace DragonSpark.TypeSystem
 {
-	public class KnownTypes : StructuredParameterizedConfiguration<Type, ImmutableArray<Type>>
+	public class KnownTypes : ParameterizedSource<Type, ImmutableArray<Type>>
 	{
-		public static IParameterizedConfiguration<Type, ImmutableArray<Type>> Instance { get; } = new KnownTypes();
-		KnownTypes() : base( type =>
-							 {
-								 var temp = ApplicationTypes.Instance.Value;
-								 return temp.Where( type.Adapt().IsAssignableFrom ).ToImmutableArray();
-							 } ) {}
+		public static KnownTypes Instance { get; } = new KnownTypes();
+		KnownTypes() : base( type => ApplicationTypes.Instance.Get().Where( type.Adapt().IsAssignableFrom ).ToImmutableArray() ) {}
+
+		public ImmutableArray<Type> Get<T>() => Get( typeof(T) );
 	}
 }

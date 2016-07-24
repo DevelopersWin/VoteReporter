@@ -123,7 +123,7 @@ namespace DragonSpark.Testing.Framework
 		public static bool operator !=( TaskContext left, TaskContext right ) => !left.Equals( right );
 	}
 
-	public class MethodContext : ExecutionContextStore<MethodBase>
+	public class MethodContext : Configuration<MethodBase>
 	{
 		public static IWritableStore<MethodBase> Instance { get; } = new MethodContext();
 		MethodContext() {}

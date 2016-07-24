@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -32,17 +32,17 @@ namespace DragonSpark.Activation
 
 	public sealed class Activator : CompositeActivator
 	{
-		public static IStore<IActivator> Instance { get; } = new ExecutionContextStore<IActivator>( () => new Activator() );
+		public static ISource<IActivator> Instance { get; } = new ExecutionScope<IActivator>( () => new Activator() );
 		Activator() : base( new Locator(), Constructor.Instance ) {}
 
-		public static T Activate<T>( Type type ) => Instance.Value.CreateUsing<T>( type );
+		public static T Activate<T>( Type type ) => Instance.Get().Create<T>( type );
 
 		sealed class Locator : LocatorBase
 		{
 			readonly Func<Type, Type> convention;
 			readonly ISingletonLocator singleton;
 
-			public Locator() : this( BuildableTypeFromConventionLocator.Instance.Value, SingletonLocator.Instance ) {}
+			public Locator() : this( BuildableTypeFromConventionLocator.Instance.Get(), SingletonLocator.Instance ) {}
 
 			Locator( Func<Type, Type> convention, ISingletonLocator singleton )
 			{

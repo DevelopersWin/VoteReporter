@@ -10,9 +10,7 @@ namespace DragonSpark.Testing.Aspects
 {
 	public class ThreadCacheTests
 	{
-		readonly static object Context = new object();
-
-		static AmbientStack<ThreadCache> Stack { get; } = new AmbientStack<ThreadCache>( Context.Self );
+		static AmbientStack<ThreadCache> Stack { get; } = new AmbientStack<ThreadCache>();
 
 		[Theory, AutoData]
 		void SinglePoint( CachedClass sut )

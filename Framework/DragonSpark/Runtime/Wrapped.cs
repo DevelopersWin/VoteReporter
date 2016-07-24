@@ -201,7 +201,6 @@ namespace DragonSpark.Runtime
 	public class Delegates : Cache<object, ICache<MethodInfo, Delegate>>
 	{
 		public static Delegates Default { get; } = new Delegates();
-
 		Delegates() : base( o => new Cache<MethodInfo, Delegate>( new Factory( o ).Create ) ) {}
 
 		/*public Delegate Lookup( Delegate source )
@@ -232,7 +231,7 @@ namespace DragonSpark.Runtime
 			return default(T);
 		}*/
 
-		class Factory : FactoryBase<MethodInfo, Delegate>
+		sealed class Factory : FactoryBase<MethodInfo, Delegate>
 		{
 			readonly object instance;
 
@@ -254,10 +253,9 @@ namespace DragonSpark.Runtime
 	public class Invokers : Cache<object, ICache<MethodInfo, IDelegateInvoker>>
 	{
 		public static Invokers Default { get; } = new Invokers();
-
 		Invokers() : base( o => new Cache<MethodInfo, IDelegateInvoker>( new Factory( o ).Create ) ) {}
 
-		class Factory : FactoryBase<MethodInfo, IDelegateInvoker>
+		sealed class Factory : FactoryBase<MethodInfo, IDelegateInvoker>
 		{
 			readonly object instance;
 			public Factory( object instance )

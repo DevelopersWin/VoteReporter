@@ -12,26 +12,6 @@ using System.Threading;
 
 namespace DragonSpark.Runtime.Properties
 {
-	/*public abstract class ExecutionCachedStoreBase<T> : DeferredTargetCachedStore<object, T> where T : class // TODO: Remove
-	{
-		protected ExecutionCachedStoreBase() : this( Delegates<T>.Default ) {}
-		protected ExecutionCachedStoreBase( Func<T> create ) : this( new Cache<T>( create.Wrap().ToDelegate() ) ) {}
-		protected ExecutionCachedStoreBase( ICache<object, T> cache ) : this( Defaults.ExecutionContext, cache ) {}
-		protected ExecutionCachedStoreBase( Func<object> instance, ICache<object, T> cache ) : this( instance, cache, Coercer<T>.Instance ) {}
-		protected ExecutionCachedStoreBase( Func<object> instance, ICache<object, T> cache, ICoercer<T> coercer ) : base( instance, cache, coercer ) {}
-
-		/*struct Context
-		{
-			readonly Func<T> create;
-			public Context( Func<T> create )
-			{
-				this.create = create;
-			}
-
-			public T Create( object instance ) => create();
-		}#1#
-	}*/
-
 	public class Stack<T> : IStack<T>
 	{
 		readonly System.Collections.Generic.Stack<T> store;
@@ -100,18 +80,17 @@ namespace DragonSpark.Runtime.Properties
 		public static T GetCurrentItem<T>() => AmbientStack<T>.Default.GetCurrentItem();
 	}
 
-	public interface IStackStore<T> : IWritableStore<IStack<T>>
+	public interface IStackStore<T> : IStore<IStack<T>>
 	{
 		T GetCurrentItem();
 	}
 
-	public class AmbientStack<T> : ExecutionContextStoreBase<IStack<T>>, IStackStore<T>
+	public class AmbientStack<T> : ExecutionScope<IStack<T>>, IStackStore<T>
 	{
 		public static AmbientStack<T> Default { get; } = new AmbientStack<T>();
 
-		public AmbientStack() : this( Defaults.ExecutionContext ) {}
-		public AmbientStack( Func<object> host ) : this( host, AmbientStackCache<T>.Default ) {}
-		public AmbientStack( Func<object> host, ICache<object, IStack<T>> cache ) : base( host, cache ) {}
+		public AmbientStack() : this( AmbientStackCache<T>.Default ) {}
+		public AmbientStack( ICache<IStack<T>> cache ) : base( cache ) {}
 
 		public T GetCurrentItem() => Value.Peek();
 
@@ -139,12 +118,12 @@ namespace DragonSpark.Runtime.Properties
 
 		protected AmbientStackCache( IPropertyRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
 
-		protected AmbientStackCache( IPropertyRegistry<IStack<T>> registry, IFactory<object, IWritableStore<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.ToDelegate() ) )
+		protected AmbientStackCache( IPropertyRegistry<IStack<T>> registry, IParameterizedSource<object, IWritableStore<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.Get ) )
 		{
 			registry.Register( factory, this );
 		}
 
-		public class Store : FactoryBase<object, IWritableStore<IStack<T>>>
+		sealed class Store : FactoryBase<object, IWritableStore<IStack<T>>>
 		{
 			readonly Action<Store, object> callback;
 
@@ -155,7 +134,7 @@ namespace DragonSpark.Runtime.Properties
 
 			public override IWritableStore<IStack<T>> Create( object instance ) => new Factory( this, instance ).Create();
 
-			class Factory
+			sealed class Factory
 			{
 				readonly Store owner;
 				readonly object instance;
@@ -247,7 +226,7 @@ namespace DragonSpark.Runtime.Properties
 			}
 		}
 
-		public override T Create( T parameter ) => GetOrAdd( parameter );
+		public override T Get( T parameter ) => GetOrAdd( parameter );
 	}
 
 	public class Condition : Condition<object>

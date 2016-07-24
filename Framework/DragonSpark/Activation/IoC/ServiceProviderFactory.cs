@@ -8,7 +8,7 @@ namespace DragonSpark.Activation.IoC
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() {}
 
-		public override IServiceProvider Create( IServiceProvider parameter )
+		public override IServiceProvider Get( IServiceProvider parameter )
 		{
 			var primary = new ServiceLocator( UnityContainerFactory.Instance.Create() );
 			RegisterServiceProviderCommand.Instance.Execute( primary );

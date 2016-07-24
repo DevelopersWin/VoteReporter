@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Testing.Framework;
 using System.Reflection;
 using Xunit;
@@ -13,8 +14,8 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void Assignment()
 		{
-			Assert.IsType<ExecutionContextStore>( ExecutionContextLocator.Instance.Value );
-			var current = Assert.IsType<ExecutionContext>( Defaults.ExecutionContext() );
+			// Assert.IsType<ExecutionContextStore>( ExecutionContextLocator.Instance.Value );
+			var current = Assert.IsType<ExecutionContext>( Execution.Current() );
 			Assert.Same( ExecutionContextStore.Instance.Value, current );
 			Assert.Equal( TaskContextStore.Instance.Value, current.Origin );
 			Assert.Null( MethodContext.Instance.Value );
@@ -25,11 +26,11 @@ namespace DragonSpark.Testing.Activation
 			{
 				Assert.NotNull( MethodContext.Instance.Value );
 				Assert.Same( method, MethodContext.Instance.Value );
-				Assert.Same( current, Defaults.ExecutionContext() );
+				Assert.Same( current, Execution.Current() );
 				Assert.False( EnableMethodCaching.Instance.Get() );
 			}
 
-			var context = Defaults.ExecutionContext();
+			var context = Execution.Current();
 			Assert.NotNull( context );
 			Assert.NotSame( current, context );
 

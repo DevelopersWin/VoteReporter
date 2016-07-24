@@ -4,8 +4,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:windows="clr-namespace:DragonSpark.Windows"
-	xmlns:typeSystem="clr-namespace:DragonSpark.TypeSystem;assembly=DragonSpark"
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
+	xmlns:runtime="clr-namespace:DragonSpark.Windows.Runtime"
 	mc:Ignorable="d">
-	<windows:ApplyAttributeProviderConfiguration Parameter="{x:Static typeSystem:AttributeProviderHost.Instance}" Factory="{x:Static windows:AttributeProviderLocator.Instance}" />
+	<!--<windows:ApplyAttributeProviderConfiguration Source="{x:Static runtime:TypeDefinitionProviderStore.Instance}" />-->
 </configuration:InitializationCommandBase>

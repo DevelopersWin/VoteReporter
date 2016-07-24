@@ -10,7 +10,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		public DecoratedSpecification( ISpecification inner ) : this( inner, Delegates<T>.Object ) {}
 
-		public DecoratedSpecification( ISpecification inner, Func<T, object> projection ) : this( inner, projection, Defaults<T>.Coercer ) {}
+		public DecoratedSpecification( ISpecification inner, Func<T, object> projection ) : this( inner, projection, Activation.Defaults<T>.Coercer ) {}
 		public DecoratedSpecification( ISpecification inner, Coerce<T> coercer ) : this( inner, Delegates<T>.Object, coercer ) {}
 		public DecoratedSpecification( ISpecification inner, Func<T, object> projection, Coerce<T> coercer ) : base( arg => inner.IsSatisfiedBy( arg.With( projection ) ), coercer ) {}
 	}
@@ -19,7 +19,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly Func<T, bool> @delegate;
 
-		public DelegatedSpecification( Func<T, bool> @delegate ) : this( @delegate, Defaults<T>.Coercer ) {}
+		public DelegatedSpecification( Func<T, bool> @delegate ) : this( @delegate, Activation.Defaults<T>.Coercer ) {}
 
 		public DelegatedSpecification( Func<T, bool> @delegate, Coerce<T> coercer ) : base( coercer )
 		{

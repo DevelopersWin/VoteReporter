@@ -1,14 +1,21 @@
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Threading;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace DragonSpark.Activation
 {
+	public static class Execution
+	{
+		readonly static ISource<IExecutionContextStore> Store = new DeferredStore<IExecutionContextStore>( () => ExecutionContextRepository.Instance.List().First() );
+
+		public static object Current() => Store.Get().Value;
+	}
+
 	[Priority( Priority.Low )]
 	class ExecutionContextStore : StoreBase<IExecutionContextStore>, IExecutionContextStore
 	{
@@ -18,25 +25,14 @@ namespace DragonSpark.Activation
 		protected override IExecutionContextStore Get() => this;
 	}
 
-	public class ExecutionContextLocator : DeferredStore<IExecutionContextStore>
-	{
-		public static ExecutionContextLocator Instance { get; } = new ExecutionContextLocator();
-		ExecutionContextLocator() : base( () => ExecutionContextRepository.Instance.List().First() ) {}
-	}
-	
 	[ReaderWriterSynchronized]
 	public sealed class ExecutionContextRepository : RepositoryBase<IExecutionContextStore>
 	{
 		public static ExecutionContextRepository Instance { get; } = new ExecutionContextRepository();
-		ExecutionContextRepository() : base( new ExecutionContextStoreCollection( EnumerableEx.Return( ExecutionContextStore.Instance ) ) ) {}
+		ExecutionContextRepository() : base( new PrioritizedCollection<IExecutionContextStore>( EnumerableEx.Return( ExecutionContextStore.Instance ) ) ) {}
 
 		[Writer]
 		protected override void OnAdd( IExecutionContextStore entry ) => Source.Ensure( entry );
-
-		class ExecutionContextStoreCollection : PrioritizedCollection<IExecutionContextStore>
-		{
-			public ExecutionContextStoreCollection( IEnumerable<IExecutionContextStore> items ) : base( items ) {}
-		}
 	}
 
 	public class DefaultExecutionContextFactoryStore<T> : StoreBase<T>
@@ -47,53 +43,42 @@ namespace DragonSpark.Activation
 			this.factory = factory;
 		}
 
-		protected override T Get() => factory( Defaults.ExecutionContext() );
+		protected override T Get() => factory( Execution.Current() );
 	}
 
 	public interface IExecutionContextStore : IStore {}
 
-	public class ExecutionContextStore<T> : ExecutionContextStoreBase<T> where T : class
+	public class ExecutionScope<T> : WritableStore<T>
 	{
-		public ExecutionContextStore( Func<T> defaultFactory = null ) : base( new Cache<T>(), defaultFactory ) {}
-	}
+		readonly ICache<T> cache;
 
-	public class ExecutionContextStructureStore<T> : ExecutionContextStoreBase<T>
-	{
-		public ExecutionContextStructureStore( Func<T> defaultFactory = null ) : base( new StoreCache<T>(), defaultFactory ) {}
-	}
+		public ExecutionScope() : this( () => default(T) ) {}
 
-	public abstract class ExecutionContextStoreBase<T> : WritableStore<T>
-	{
-		readonly Func<object> contextSource;
-		readonly ICache<object, T> cache;
-		readonly Func<T> defaultFactory;
+		public ExecutionScope( Func<T> defaultFactory ) : this( Runtime.Properties.Defaults<T>.Factory( defaultFactory.Wrap().Create ) ) {}
 
-		protected ExecutionContextStoreBase( ICache<T> cache, Func<T> defaultFactory = null ) : this( Defaults.ExecutionContext, cache, defaultFactory ) {}
-
-		protected ExecutionContextStoreBase( Func<object> contextSource, ICache<object, T> cache, Func<T> defaultFactory = null )
+		public ExecutionScope( ICache<T> cache )
 		{
-			this.contextSource = contextSource;
 			this.cache = cache;
-			this.defaultFactory = defaultFactory;
 		}
 
-		protected override T Get()
+		protected override T Get() => cache.Get( Execution.Current() );
+
+		public override void Assign( T item ) => cache.Set( Execution.Current(), item );
+	}
+
+	public class Configuration<T> : ExecutionScope<T>, IConfiguration<T>, IAssignable<Func<object, T>>
+	{
+		readonly IConfigurableCache<T> cache;
+
+		public Configuration() : this( () => default(T) ) {}
+		public Configuration( Func<T> defaultFactory ) : this( new ConfigurableCache<T>( defaultFactory.Wrap().Create ) ) {}
+
+		public Configuration( IConfigurableCache<T> cache ) : base( cache )
 		{
-			var context = contextSource();
-			if ( defaultFactory != null && !cache.Contains( context ) )
-			{
-				var result = defaultFactory();
-				if ( result.IsAssigned() )
-				{
-					cache.Set( context, result );
-				}
-				return result;
-			}
-			return cache.Get( context );
+			this.cache = cache;
 		}
 
-		public sealed override void Assign( T item ) => OnAssign( item );
-
-		protected virtual void OnAssign( T item ) => cache.Set( contextSource(), item );
+		public void Assign( Func<object, T> item ) => cache.Assign( item );
+		public void Assign( Func<T> item ) => Assign( item.Wrap().ToDelegate() );
 	}
 }

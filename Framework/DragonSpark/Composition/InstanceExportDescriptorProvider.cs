@@ -64,7 +64,7 @@ namespace DragonSpark.Composition
 		readonly Func<Type, Type> locator;
 		readonly static Action<Type> Initializer = InitializeTypeCommand.Instance.ToDelegate();
 
-		public TypeInitializingExportDescriptorProvider() : this( BuildableTypeFromConventionLocator.Instance.Value ) {}
+		public TypeInitializingExportDescriptorProvider() : this( BuildableTypeFromConventionLocator.Instance.Get() ) {}
 
 		TypeInitializingExportDescriptorProvider( Func<Type, Type> locator )
 		{

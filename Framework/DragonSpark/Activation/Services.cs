@@ -1,5 +1,6 @@
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
@@ -13,7 +14,7 @@ namespace DragonSpark.Activation
 		readonly static GlobalServiceProvider Store = new GlobalServiceProvider();
 		public static IServiceProvider Instance => Store.Value;
 
-		GlobalServiceProvider() : base( () => ApplicationConfiguration.Instance.Value?.Services ?? DefaultServiceProvider.Instance )
+		GlobalServiceProvider() : base( () => ActiveApplication.Instance.Value?.Services ?? ApplicationConfiguration.Instance.Get().Services ?? DefaultServiceProvider.Instance )
 		{
 			ServiceLocator.SetLocatorProvider( GetService<IServiceLocator> );
 		}
@@ -25,9 +26,9 @@ namespace DragonSpark.Activation
 
 	public sealed class DefaultServiceProvider : CompositeServiceProvider
 	{
-		readonly static IStore<IServiceProvider> Store = new ExecutionContextStore<IServiceProvider>( () => new DefaultServiceProvider() );
-		public static IServiceProvider Instance => Store.Value;
-		DefaultServiceProvider() : base( new InstanceContainerServiceProvider( ApplicationConfiguration.Instance, ApplicationConfiguration.Instance.Services, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToStore(), LoggingController.Instance.ToStore(), Logging.Instance.ToStore() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
+		readonly static ISource<IServiceProvider> Store = new ExecutionScope<IServiceProvider>( () => new DefaultServiceProvider() );	
+		public static IServiceProvider Instance => Store.Get();
+		DefaultServiceProvider() : base( new InstanceContainerServiceProvider( ApplicationConfiguration.Instance, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToStore(), LoggingController.Instance.ToStore(), Logging.Instance.ToStore() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
 	}
 
 	public delegate object ServiceSource( Type serviceType );

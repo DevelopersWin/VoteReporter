@@ -7,7 +7,7 @@ namespace DragonSpark.Runtime.Stores
 		void Assign( object item );
 	}
 
-	public interface IAssignable<in T> : IAssignable
+	public interface IAssignable<in T> /*: IAssignable*/
 	{
 		void Assign( T item );
 	}

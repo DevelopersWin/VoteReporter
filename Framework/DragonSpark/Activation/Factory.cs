@@ -150,13 +150,13 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public sealed class MemberInfoFactoryTypeLocator : CachedParameterizedConfiguration<MemberInfo, Type>
+	public sealed class MemberInfoFactoryTypeLocator : ParameterizedConfiguration<MemberInfo, Type>
 	{
 		public static MemberInfoFactoryTypeLocator Instance { get; } = new MemberInfoFactoryTypeLocator();
 		MemberInfoFactoryTypeLocator() : base( new FactoryTypeLocator<MemberInfo>( member => member.GetMemberType(), member => member.DeclaringType ).Create ) {}
 	}
 
-	public sealed class ParameterInfoFactoryTypeLocator : CachedParameterizedConfiguration<ParameterInfo, Type>
+	public sealed class ParameterInfoFactoryTypeLocator : ParameterizedConfiguration<ParameterInfo, Type>
 	{
 		public static ParameterInfoFactoryTypeLocator Instance { get; } = new ParameterInfoFactoryTypeLocator();
 		ParameterInfoFactoryTypeLocator() : base( new FactoryTypeLocator<ParameterInfo>( parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ).Create ) {}
@@ -165,7 +165,7 @@ namespace DragonSpark.Activation
 	[Persistent]
 	public class FactoryTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
-		public static IStore<FactoryTypes> Instance { get; } = new ExecutionContextStore<FactoryTypes>( () => new FactoryTypes( FactoryTypeRequests.Requests.Get() ) );
+		public static ISource<FactoryTypes> Instance { get; } = new ExecutionScope<FactoryTypes>( () => new FactoryTypes( FactoryTypeRequests.Requests.Get() ) );
 
 		public FactoryTypes( ImmutableArray<FactoryTypeRequest> requests ) : base( new Factory( requests ).Create ) {}
 

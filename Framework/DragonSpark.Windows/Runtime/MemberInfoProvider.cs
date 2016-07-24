@@ -1,13 +1,8 @@
-using DragonSpark.Activation;
-using DragonSpark.Runtime.Properties;
-using System.Reflection;
-
 namespace DragonSpark.Windows.Runtime
 {
-	public class TypeDefinitionProvider : ComponentModel.TypeDefinitionProvider
+	public class TypeDefinitionProviderStore : DragonSpark.TypeSystem.TypeDefinitionProviderStore
 	{
-		public new static ICache<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitionProvider().Cached();
-
-		TypeDefinitionProvider() : base( MetadataTypeDefinitionProvider.Instance ) {}
+		public new static TypeDefinitionProviderStore Instance { get; } = new TypeDefinitionProviderStore();
+		TypeDefinitionProviderStore() : base( MetadataTypeDefinitionProvider.Instance ) {}
 	}
 }

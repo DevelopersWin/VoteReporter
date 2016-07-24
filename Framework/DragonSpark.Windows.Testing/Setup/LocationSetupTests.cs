@@ -58,7 +58,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var expected = GlobalServiceProvider.Instance.Get<IActivator>();
 			Assert.Same( expected, locator );
-			Assert.NotSame( Activator.Instance.Value, locator );
+			Assert.NotSame( Activator.Instance.Get(), locator );
 			Assert.IsType<Locator>( locator );
 			var instance = locator.Activate<IObject>( typeof(Object) );
 			Assert.IsType<Object>( instance );
@@ -71,7 +71,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void CreateNamedInstance( [Registered]IActivator activator, string name )
 		{
 			Assert.Same( GlobalServiceProvider.Instance.Get<IActivator>(), activator );
-			Assert.NotSame( Activator.Instance.Value, activator );
+			Assert.NotSame( Activator.Instance.Get(), activator );
 
 			var instance = activator.Activate<IObject>( new LocateTypeRequest( typeof(Object), name ) );
 			Assert.IsType<Object>( instance );
@@ -85,7 +85,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
 			Assert.Same( GlobalServiceProvider.Instance.Get<IActivator>(), activator );
-			Assert.NotSame( Activator.Instance.Value, activator );
+			Assert.NotSame( Activator.Instance.Get(), activator );
 			var instance = activator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
 			Assert.NotNull( instance );
 

@@ -1,4 +1,4 @@
-using DragonSpark.Configuration;
+using DragonSpark.Activation;
 using System;
 
 namespace DragonSpark.Runtime
@@ -14,6 +14,6 @@ namespace DragonSpark.Runtime
 	public sealed class CurrentTimeConfiguration : Configuration<ICurrentTime>
 	{
 		public static CurrentTimeConfiguration Instance { get; } = new CurrentTimeConfiguration();
-		public CurrentTimeConfiguration() : base( () => CurrentTime.Default ) {}
+		CurrentTimeConfiguration() : base( () => CurrentTime.Default ) {}
 	}
 }

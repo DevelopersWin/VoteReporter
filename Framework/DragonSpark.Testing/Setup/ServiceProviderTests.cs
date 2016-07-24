@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.Setup
 		{
 			var result = DefaultServiceProvider.Instance.Get<ILogger>();
 			Assert.NotNull( result );
-			Assert.Same( Logging.Instance.Get( Defaults.ExecutionContext() ), result );
+			Assert.Same( Logging.Instance.Get( Execution.Current() ), result );
 		}
 
 		[Fact]

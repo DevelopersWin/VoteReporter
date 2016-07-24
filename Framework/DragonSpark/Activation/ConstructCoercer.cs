@@ -1,83 +1,94 @@
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace DragonSpark.Activation
 {
+	public class ParameterConstructor<T> : ParameterConstructor<object, T>
+	{
+		
+	}
+
 	public class ParameterConstructor<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
+		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cache { get; } = new Cache<ConstructorInfo, Func<TParameter, TResult>>( new Factory().Create );
+
 		public static Func<TParameter, TResult> Default { get; } = new ParameterConstructor<TParameter, TResult>().ToDelegate();
-		ParameterConstructor() : base( ParameterConstructorDelegateFactory<TParameter, TResult>.Make() ) {}
+		protected ParameterConstructor() : base( Make() ) {}
+
+		public static TResult From( TParameter parameter = default(TParameter) ) => Make( parameter?.GetType() )( parameter );
+
+		public static Func<TParameter, TResult> Make( Type parameterType = null ) => Make( parameterType ?? typeof(TParameter), typeof(TResult) );
+
+		public static Func<TParameter, TResult> Make( Type parameterType, Type resultType )
+		{
+			var constructor = resultType.Adapt().FindConstructor( parameterType );
+			var result = constructor != null ? Make( constructor ) : ( parameter => default(TResult) );
+			return result;
+		}
+
+		public static Func<TParameter, TResult> Make( ConstructorInfo constructor ) => Cache.Get( constructor );
+
+		sealed class Factory : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
+		{
+			public Factory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, parameter.Parameter ) ) {}
+		}
 	}
 
-	public class ParameterConstructorDelegateFactory<TParameter, TResult> : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
+	/*class ParameterConstructor<T> : FactoryBase<object, T>
 	{
-		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cached { get; } = new Cache<ConstructorInfo, Func<TParameter, TResult>>( new ParameterConstructorDelegateFactory<TParameter, TResult>().Create );
-		ParameterConstructorDelegateFactory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, parameter.Parameter ) ) {}
+		public static ParameterConstructor<T> Instance { get; } = new ParameterConstructor<T>();
+		ParameterConstructor() : this( typeof(T) ) {}
 
-		public static Func<TParameter, TResult> Make() => Make( typeof(TParameter) );
+		// readonly static Coerce<T> Coerce = InstanceCoercer<T>.Instance.ToDelegate();
 
-		public static Func<TParameter, TResult> Make( Type parameterType ) => Make( parameterType, typeof(TResult) );
-
-		public static Func<TParameter, TResult> Make( Type parameterType, Type resultType ) => Make( resultType.Adapt().FindConstructor( parameterType ) );
-
-		public static Func<TParameter, TResult> Make( ConstructorInfo constructor ) => Cached.Get( constructor );
-	}
-
-	class ParameterActivator<T> : FactoryBase<object, T>
-	{
-		public static ParameterActivator<T> Instance { get; } = new ParameterActivator<T>();
-		ParameterActivator() : this( typeof(T) ) {}
-
-		readonly static Coerce<T> Coerce = InstanceCoercer<T>.Instance.ToDelegate();
-
-		readonly IActivator activator;
+		// readonly IActivator activator;
 		readonly Type resultType;
-		readonly Coerce<T> coercer;
+		// readonly Coerce<T> coercer;
 
-		public ParameterActivator( Type resultType ) : this( Constructor.Instance, resultType, Coerce ) {}
+		public ParameterConstructor( Type resultType ) /*: this( Constructor.Instance, resultType, Coerce )#1#
+		{
+			this.resultType = resultType;
+		}
 
-		protected ParameterActivator( IActivator activator, Type resultType, Coerce<T> coercer )
+		/*protected ParameterConstructor( IActivator activator, Type resultType, Coerce<T> coercer )
 		{
 			this.activator = activator;
 			this.resultType = resultType;
-			this.coercer = coercer;
-		}
+			// this.coercer = coercer;
+		}#1#
 
 		public override T Create( object parameter )
 		{
-			var constructed = activator.Construct<object>( resultType, parameter );
+			
+			/*var constructed = activator.Construct<object>( resultType, parameter );
 			var result = coercer( constructed );
-			return result;
+			return result;#1#
 		}
-	}
+	}*/
 
-	class InstanceCoercer<T> : Coercer<T>
+	class SourceCoercer<T> : Coercer<T>
 	{
-		public new static InstanceCoercer<T> Instance { get; } = new InstanceCoercer<T>();
-		InstanceCoercer() {}
+		public static SourceCoercer<T> Source { get; } = new SourceCoercer<T>();
+		SourceCoercer() {}
 
 		protected override T PerformCoercion( object parameter )
 		{
-			var factory = parameter as IFactory<T>;
-			if ( factory != null )
+			/*var source = parameter as ISource<T>;
+			if ( source != null )
 			{
-				return factory.Create();
-			}
+				return source.Get();
+			}*/
 
-			var store = parameter as IStore<T>;
-			if ( store != null )
-			{
-				return store.Value;
-			}
-
-			var configuration = parameter as IConfiguration<T>;
-			var result = configuration != null ? configuration.Get() : base.PerformCoercion( parameter );
+			var store = parameter as ISource<T>;
+			var result = store != null ? store.Get() : base.PerformCoercion( parameter );
 			return result;
+
+			/*var configuration = parameter as IConfiguration<T>;
+			var result = configuration != null ? configuration.Get() : ;*/
 		}
 	}
 
@@ -100,7 +111,7 @@ namespace DragonSpark.Activation
 
 	public class ConstructCoercer<T> : CoercerBase<T>
 	{
-		public static ConstructCoercer<T> Instance { get; } = new ConstructCoercer<T>( ParameterActivator<T>.Instance.ToDelegate() );
+		public static ConstructCoercer<T> Instance { get; } = new ConstructCoercer<T>( ParameterConstructor<T>.From );
 		
 		readonly Func<object, T> projector;
 

@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.TypeSystem
 		{
 			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.ToImmutableArray().Assemblies() );
 
-			var assemblies = sut.Create( provider.Object.Create() );
+			var assemblies = sut.Get( provider.Object.Create() );
 			
 			provider.Verify( assemblyProvider => assemblyProvider.Create() );
 			Assert.NotEqual( assemblies, provider.Object.Create() );

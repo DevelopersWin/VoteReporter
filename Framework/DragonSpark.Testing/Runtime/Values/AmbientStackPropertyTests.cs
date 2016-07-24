@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Testing.Objects;
@@ -22,7 +21,7 @@ namespace DragonSpark.Testing.Runtime.Values
 		[Fact]
 		public void ContextAsExpected()
 		{
-			var stack = new AmbientStack<Class>( this.Self, cache );
+			var stack = new AmbientStack<Class>( cache );
 
 			var expected = stack.Value;
 			Assert.Same( expected, stack.Value );

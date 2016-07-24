@@ -7,17 +7,23 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Setup.Commands
 {
-	public class DeclaredFixedCommand<T> : DeclaredCommandBase<T>
+	/*public class DeclaredFixedCommand<T> : DeclaredCommandBase<T>
 	{
 		[Required]
 		public ICommand<T> Command { [return: Required]get; set; }
 
 		public override void Execute( object parameter ) => Command.Run( Parameter );
-	}
+	}*/
 
 	public abstract class DeclaredCommandBase<T> : CommandBase<object>
 	{
-		protected DeclaredCommandBase() : base( Specifications.Always ) {}
+		protected DeclaredCommandBase( T parameter = default(T) ) : base( Specifications.Always )
+		{
+			if ( parameter.IsAssigned() )
+			{
+				Parameter = parameter;
+			}
+		}
 
 		[Required]
 		public T Parameter { [return: Required]get; set; }

@@ -1,6 +1,7 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
@@ -31,7 +32,7 @@ namespace DragonSpark.Activation
 			var nestedTypes = info.DeclaredNestedTypes.AsTypes().ToArray();
 			var all = nestedTypes.Union( AssemblyTypes.All.Get( info.Assembly ) ).Where( Defaults.ApplicationType ).ToImmutableArray();
 			var requests = FactoryTypeRequests.Instance.GetMany( all );
-			var candidates = new[] { new FactoryTypes( requests ), FactoryTypes.Instance.Value };
+			var candidates = new[] { new FactoryTypes( requests ), FactoryTypes.Instance.Get() };
 			var mapped = new LocateTypeRequest( type( parameter ) );
 			var result = candidates.Introduce( mapped, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 			return result;
@@ -40,7 +41,7 @@ namespace DragonSpark.Activation
 
 	public sealed class FactoryTypeRequests : Cache<Type, FactoryTypeRequest>
 	{
-		public static IStore<ImmutableArray<FactoryTypeRequest>> Requests { get; } = new ExecutionContextStructureStore<ImmutableArray<FactoryTypeRequest>>( () => Instance.GetMany( ApplicationParts.Instance.Value.Types ) );
+		public static ISource<ImmutableArray<FactoryTypeRequest>> Requests { get; } = new ExecutionScope<ImmutableArray<FactoryTypeRequest>>( () => Instance.GetMany( ApplicationParts.Instance.Get().Types ) );
 
 		public static FactoryTypeRequests Instance { get; } = new FactoryTypeRequests();
 		FactoryTypeRequests() : base( Factory.Instance.Create ) {}

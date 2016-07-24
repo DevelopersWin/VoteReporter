@@ -13,7 +13,7 @@ namespace DragonSpark.Composition
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() {}
 
-		public override IServiceProvider Create( IServiceProvider parameter )
+		public override IServiceProvider Get( IServiceProvider parameter )
 		{
 			var context = CompositionHostFactory.Instance.Create();
 			var primary = new ServiceLocator( context );

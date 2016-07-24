@@ -17,7 +17,7 @@ namespace DragonSpark.ComponentModel
 
 		public class Collection<T> : System.Collections.ObjectModel.Collection<T> {}
 
-		class Transformer : TransformerBase<Type>
+		class Transformer : FactoryBase<Type, Type>
 		{
 			public static Transformer Instance { get; } = new Transformer();
 

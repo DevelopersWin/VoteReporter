@@ -6,11 +6,11 @@ namespace DragonSpark.Testing.Parts.Development
 	[Export( typeof(IInitializationCommand) )]
 	public partial class InitializationCommand
 	{
-		public InitializationCommand()
+		public InitializationCommand() : base( EnableMethodCaching.Instance.From( false ) )
 		{
-			InitializeComponent();
+			// InitializeComponent();
 		}
 	}
 
-	public class ApplyEnableMethodCachingConfiguration : ApplyValueConfigurationCommand<bool> {}
+	/*public class ApplyEnableMethodCachingConfiguration : ApplyConfigurationCommand<bool> {}*/
 }
