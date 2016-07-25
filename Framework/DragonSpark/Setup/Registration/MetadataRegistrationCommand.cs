@@ -6,16 +6,15 @@ using DragonSpark.Runtime;
 using DragonSpark.Setup.Commands;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace DragonSpark.Setup.Registration
 {
-	public class RegisterFromMetadataCommand : ServicedCommand<MetadataRegistrationCommand, Type[]> {}
+	public class RegisterFromMetadataCommand : ServicedCommand<MetadataRegistrationCommand, ImmutableArray<Type>> {}
 
-	public class MetadataRegistrationCommand : CommandBase<Type[]>
+	public class MetadataRegistrationCommand : CommandBase<ImmutableArray<Type>>
 	{
-		readonly static Func<object, IRegistration[]> CollectionSelector = HostedValueLocator<IRegistration>.Instance.ToDelegate();
-
 		readonly IServiceRegistry registry;
 
 		public MetadataRegistrationCommand( [Required]PersistentServiceRegistry registry )
@@ -23,20 +22,23 @@ namespace DragonSpark.Setup.Registration
 			this.registry = registry;
 		}
 
-		public override void Execute( Type[] parameter )
+		public override void Execute( ImmutableArray<Type> parameter )
 		{
-			var registrations = MetadataRegistrationTypeFactory.Instance.Get( parameter ).SelectMany( CollectionSelector ).ToArray();
-			foreach ( var result in registrations )
+			foreach ( var type in MetadataRegistrationTypeFactory.Instance.Get( parameter ) )
 			{
-				result.Register( registry );
+				foreach ( var registration in HostedValueLocator<IRegistration>.Instance.Create( type ) )
+				{
+					registration.Register( registry );
+				}
 			}
 		}
 	}
 
-	public class MetadataRegistrationTypeFactory : TransformerBase<Type[]>
+	public sealed class MetadataRegistrationTypeFactory : TransformerBase<ImmutableArray<Type>>
 	{
 		public static MetadataRegistrationTypeFactory Instance { get; } = new MetadataRegistrationTypeFactory();
+		MetadataRegistrationTypeFactory() {}
 
-		public override Type[] Get( Type[] parameter ) => parameter.WhereDecorated<RegistrationBaseAttribute>().Select( item => item.Item2 ).Fixed();
+		public override ImmutableArray<Type> Get( ImmutableArray<Type> parameter ) => parameter.ToArray().WhereDecorated<RegistrationBaseAttribute>().Select( item => item.Item2 ).ToImmutableArray();
 	}
 }

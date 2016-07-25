@@ -1,21 +1,20 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class DefaultPropertyValueFactory : FactoryBase<DefaultValueParameter, object>
+	public sealed class DefaultPropertyValueFactory : FactoryBase<DefaultValueParameter, object>
 	{
 		public static DefaultPropertyValueFactory Instance { get; } = new DefaultPropertyValueFactory();
-
-		readonly Func<MemberInfo, IDefaultValueProvider[]> factory;
-
 		DefaultPropertyValueFactory() : this( HostedValueLocator<IDefaultValueProvider>.Instance.ToDelegate() ) {}
 
-		public DefaultPropertyValueFactory( [Required]Func<MemberInfo, IDefaultValueProvider[]> factory )
+		readonly Func<MemberInfo, ImmutableArray<IDefaultValueProvider>> factory;
+
+		public DefaultPropertyValueFactory( Func<MemberInfo, ImmutableArray<IDefaultValueProvider>> factory )
 		{
 			this.factory = factory;
 		}
@@ -25,7 +24,7 @@ namespace DragonSpark.ComponentModel
 
 	public struct DefaultValueParameter
 	{
-		public DefaultValueParameter( [Required]object instance, [Required]PropertyInfo metadata )
+		public DefaultValueParameter( object instance, PropertyInfo metadata )
 		{
 			Instance = instance;
 			Metadata = metadata;
@@ -34,12 +33,5 @@ namespace DragonSpark.ComponentModel
 		public object Instance { get; }
 
 		public PropertyInfo Metadata { get; }
-
-		/*public DefaultValueParameter Assign( object value )
-		{
-			Metadata.SetValue( Instance, value );
-			return this;
-		}*/
 	}
-
 }

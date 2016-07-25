@@ -19,11 +19,6 @@ namespace DragonSpark.Windows
 		}
 	}
 
-	/*public class ApplyAttributeProviderConfiguration : ApplySourceConfigurationCommand<ImmutableArray<ITypeDefinitionProvider>>
-	{
-		public ApplyAttributeProviderConfiguration() : base( AttributeConfigurations.TypeDefinitionProviders ) {}
-	}*/
-
 	[Priority( Priority.AfterNormal )]
 	class ExecutionContextStore : Store<AppDomain>, IExecutionContextStore
 	{

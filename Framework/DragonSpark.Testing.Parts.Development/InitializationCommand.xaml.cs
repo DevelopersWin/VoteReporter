@@ -1,9 +1,10 @@
 ﻿using DragonSpark.Configuration;
+using DragonSpark.Setup;
 using System.Composition;
 
 namespace DragonSpark.Testing.Parts.Development
 {
-	[Export( typeof(IInitializationCommand) )]
+	[Export( typeof(ISetup) )]
 	public partial class InitializationCommand
 	{
 		public InitializationCommand() : base( EnableMethodCaching.Instance.From( false ) )

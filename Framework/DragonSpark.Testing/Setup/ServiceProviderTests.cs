@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void Factory()
 		{
-			var result = new InstanceContainerServiceProvider( new ClassFactory() ).Get<Class>();
+			var result = new SourceInstanceServiceProvider( new ClassFactory() ).Get<Class>();
 			Assert.IsType<ClassFactory.ClassFromFactory>( result );
 		}
 
@@ -44,9 +44,7 @@ namespace DragonSpark.Testing.Setup
 			Assert.Empty( system.Types );
 
 			var types = new[] { typeof(ClassFactory), typeof(Class) };
-			var application = ApplicationConfigurator<Application>.Instance.Create( types );
-
-			Assert.Same( application, DefaultServiceProvider.Instance.Get<DragonSpark.Setup.IApplication>() );
+			new ApplySystemPartsConfiguration( types ).Run();
 
 			var after = DefaultServiceProvider.Instance.Get<SystemParts>();
 			Assert.NotEmpty( after.Assemblies );

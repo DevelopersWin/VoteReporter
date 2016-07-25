@@ -48,8 +48,8 @@ namespace DragonSpark.Runtime.Properties
 			DelegateCache() : base( command => command.Get ) {}
 		}
 
-		public static IStore<T> ToStore<T>( this ICache<object, T> @this ) => StoreCache<T>.Default.Get( @this );
-		class StoreCache<T> : Cache<ICache<object, T>, IStore<T>>
+		public static ISource<T> ToSource<T>( this ICache<object, T> @this ) => StoreCache<T>.Default.Get( @this );
+		class StoreCache<T> : Cache<ICache<object, T>, ISource<T>>
 		{
 			public static StoreCache<T> Default { get; } = new StoreCache<T>();
 			StoreCache() : base( cache => new DefaultExecutionContextFactoryStore<T>( cache.Get ) ) {}
@@ -447,16 +447,16 @@ namespace DragonSpark.Runtime.Properties
 				this.create = create;
 			}
 
-			public IWritableStore<TValue> Create( TInstance instance ) => new FixedStore<TValue>().Assigned( create( instance ) );
+			public IWritableStore<TValue> Create( TInstance instance ) => new FixedStore<TValue>( create( instance ) );
 		}
 
 		// public void Assign( Func<TInstance, TValue> item ) => base.Assign( new Context( item ).Create );
 	}
 
-	class ParameterConstructedCache<TInstance, TResult> : Cache<TInstance, TResult> where TResult : class where TInstance : class
+	/*class ParameterConstructedCache<TInstance, TResult> : Cache<TInstance, TResult> where TResult : class where TInstance : class
 	{
 		public ParameterConstructedCache() : base( ParameterConstructor<TInstance, TResult>.Default ) {}
-	}
+	}*/
 
 	public class ActivatedCache<T> : ActivatedCache<object, T>, ICache<T> where T : class, new()
 	{

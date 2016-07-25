@@ -227,7 +227,7 @@ namespace DragonSpark.Activation
 	{
 		public static Coerce<T> Coercer { get; } = Coercer<T>.Instance.Coerce;
 
-		public static Func<object, T> InstanceCoercer { get; } = SourceCoercer<T>.Source.Coerce;
+		// public static Func<object, T> InstanceCoercer { get; } = SourceCoercer<T>.Source.Coerce;
 
 		public static Func<Type, Func<object, T>> Constructor { get; } = new Cache<Type, Func<object, T>>( ParameterConstructor<T>.Make ).Get;
 	}
@@ -309,18 +309,18 @@ namespace DragonSpark.Activation
 
 	public abstract class AggregateParameterizedFactoryBase<TConfiguration, TResult> : AggregateParameterizedFactoryBase<TConfiguration, object, TResult> where TConfiguration : class
 	{
-		protected AggregateParameterizedFactoryBase( Func<object, TConfiguration> seed, Func<object, IConfigurations<TConfiguration>> configurators, Func<TConfiguration, object, TResult> factory ) : base( seed, configurators, factory ) {}
-		protected AggregateParameterizedFactoryBase( IParameterizedConfiguration<object, TConfiguration> seed, IParameterizedConfiguration<object, IConfigurations<TConfiguration>> configurators, Func<TConfiguration, object, TResult> factory ) : base( seed, configurators, factory ) {}
+		protected AggregateParameterizedFactoryBase( Func<object, TConfiguration> seed, Func<object, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, object, TResult> factory ) : base( seed, configurators, factory ) {}
+		protected AggregateParameterizedFactoryBase( IParameterizedConfiguration<object, TConfiguration> seed, IParameterizedConfiguration<object, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, object, TResult> factory ) : base( seed, configurators, factory ) {}
 	}
 
 	public abstract class AggregateParameterizedFactoryBase<TConfiguration, TParameter, TResult> : FactoryBase<TParameter, TResult> where TParameter : class where TConfiguration : class
 	{
 		readonly Func<TConfiguration, TParameter, TResult> factory;
 
-		protected AggregateParameterizedFactoryBase( Func<TParameter, TConfiguration> seed, Func<TParameter, IConfigurations<TConfiguration>> configurators, Func<TConfiguration, TParameter, TResult> factory ) : 
-			this( new ParameterizedConfiguration<TParameter, TConfiguration>( seed ), new ParameterizedConfiguration<TParameter, IConfigurations<TConfiguration>>( configurators ), factory ) {}
+		protected AggregateParameterizedFactoryBase( Func<TParameter, TConfiguration> seed, Func<TParameter, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TParameter, TResult> factory ) : 
+			this( new ParameterizedConfiguration<TParameter, TConfiguration>( seed ), new ParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>>( configurators ), factory ) {}
 
-		protected AggregateParameterizedFactoryBase( IParameterizedConfiguration<TParameter, TConfiguration> seed, IParameterizedConfiguration<TParameter, IConfigurations<TConfiguration>> configurators, Func<TConfiguration, TParameter, TResult> factory )
+		protected AggregateParameterizedFactoryBase( IParameterizedConfiguration<TParameter, TConfiguration> seed, IParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TParameter, TResult> factory )
 		{
 			Seed = seed;
 			Configurators = configurators;
@@ -329,21 +329,14 @@ namespace DragonSpark.Activation
 
 		public IParameterizedConfiguration<TParameter, TConfiguration> Seed { get; }
 
-		public IParameterizedConfiguration<TParameter, IConfigurations<TConfiguration>> Configurators { get; }
+		public IParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>> Configurators { get; }
 
 		public override TResult Create( TParameter parameter )
 		{
-			var configured = Configurators.Get( parameter ).Value.Aggregate( Seed.Get( parameter ), ( configuration, transformer ) => transformer.Get( configuration ) );
+			var configured = Configurators.Get( parameter ).Aggregate( Seed.Get( parameter ), ( configuration, transformer ) => transformer.Get( configuration ) );
 			var result = factory( configured, parameter );
 			return result;
 		}
-	}
-
-	public abstract class AggregateFactoryBase<T> : AggregateFactoryBase<T, T>, IConfigurableFactory<T> where T : class
-	{
-		protected AggregateFactoryBase( Func<T> seed, IConfigurations<T> configurators ) : this( seed, configurators, Delegates<T>.Self ) {}
-		protected AggregateFactoryBase( Func<T> seed, IConfigurations<T> configurators, Func<T, T> factory ) : base( seed, configurators, factory ) {}
-		protected AggregateFactoryBase( IConfiguration<T> seed, IConfigurations<T> configurators, Func<T, T> factory ) : base( seed, configurators, factory ) {}
 	}
 
 	public interface IConfigurableFactory<T> : IConfigurableFactory<T, T> {}
@@ -352,30 +345,37 @@ namespace DragonSpark.Activation
 	{
 		IConfiguration<TConfiguration> Seed { get; }
 
-		IConfigurations<TConfiguration> Configurators { get; }
+		IConfigurations<TConfiguration> Configurations { get; }
+	}
+
+	public abstract class AggregateFactoryBase<T> : AggregateFactoryBase<T, T>, IConfigurableFactory<T> where T : class
+	{
+		protected AggregateFactoryBase( Func<T> seed, params ITransformer<T>[] configurations ) : this( seed, new Configurations<T>( configurations ), Delegates<T>.Self ) {}
+		protected AggregateFactoryBase( Func<T> seed, IConfigurations<T> configurations, Func<T, T> factory ) : base( seed, configurations, factory ) {}
+		protected AggregateFactoryBase( IConfiguration<T> seed, IConfigurations<T> configurations, Func<T, T> factory ) : base( seed, configurations, factory ) {}
 	}
 
 	public abstract class AggregateFactoryBase<TConfiguration, TResult> : FactoryBase<TResult>, IConfigurableFactory<TConfiguration, TResult> where TConfiguration : class
 	{
 		readonly Func<TConfiguration, TResult> factory;
 
-		protected AggregateFactoryBase( Func<TConfiguration> seed, IConfigurations<TConfiguration> configurators, Func<TConfiguration, TResult> factory ) : 
-			this( new Configuration<TConfiguration>( seed ), configurators, factory ) {}
+		protected AggregateFactoryBase( Func<TConfiguration> seed, IConfigurations<TConfiguration> configurations, Func<TConfiguration, TResult> factory ) : 
+			this( new Configuration<TConfiguration>( seed ), configurations, factory ) {}
 
-		protected AggregateFactoryBase( IConfiguration<TConfiguration> seed, IConfigurations<TConfiguration> configurators, Func<TConfiguration, TResult> factory )
+		protected AggregateFactoryBase( IConfiguration<TConfiguration> seed, IConfigurations<TConfiguration> configurations, Func<TConfiguration, TResult> factory )
 		{
 			Seed = seed;
-			Configurators = configurators;
+			Configurations = configurations;
 			this.factory = factory;
 		}
 
 		public IConfiguration<TConfiguration> Seed { get; }
 
-		public IConfigurations<TConfiguration> Configurators { get; }
+		public IConfigurations<TConfiguration> Configurations { get; }
 
 		public override TResult Create()
 		{
-			var configured = Configurators.Get().Aggregate( Seed.Get(), ( configuration, transformer ) => transformer.Get( configuration ) );
+			var configured = Configurations.Get().Aggregate( Seed.Get(), ( configuration, transformer ) => transformer.Get( configuration ) );
 			var result = factory( configured );
 			return result;
 		}
@@ -386,7 +386,9 @@ namespace DragonSpark.Activation
 		public abstract T Create();
 
 		object IFactory.Create() => Create();
-		public T Get() => Create();
+
+		T ISource<T>.Get() => Create();
+		object ISource.Get() => Create();
 	}
 
 	public class WrappedFactory<TParameter, TResult> : IFactory<TParameter, TResult>

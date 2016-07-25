@@ -1,4 +1,6 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Runtime.Properties;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
 using System.IO;
@@ -7,12 +9,6 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.TypeSystem
 {
-	/*public class LoadPartAssemblyCommand : DragonSpark.TypeSystem.LoadPartAssemblyCommand
-	{
-		public static LoadPartAssemblyCommand Instance { get; } = new LoadPartAssemblyCommand();
-		LoadPartAssemblyCommand() : base( AssemblyLoader.Instance ) {}
-	}*/
-
 	public class AssemblyPathLoader : FactoryBase<string, ImmutableArray<Assembly>>
 	{
 		public static AssemblyPathLoader Instance { get; } = new AssemblyPathLoader();
@@ -27,41 +23,8 @@ namespace DragonSpark.Windows.TypeSystem
 	{
 		public static AssemblyPartLocator Instance { get; } = new AssemblyPartLocator();
 		AssemblyPartLocator() : base( AssemblyPathLoader.Instance.Create ) {}
+
+		public static ICache<Assembly, ImmutableArray<Type>> All { get; } = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => Instance.Create( assembly ).Select( AssemblyTypes.All.Get ).Concat().ToImmutableArray() );
+		public static ICache<Assembly, ImmutableArray<Type>> Public { get; } = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => Instance.Create( assembly ).Select( AssemblyTypes.Public.Get ).Concat().ToImmutableArray() );
 	}
-
-	/*public class AssemblyLoader : DragonSpark.TypeSystem.AssemblyLoader
-	{
-		public static AssemblyLoader Instance { get; } = new AssemblyLoader();
-		AssemblyLoader() : base( AssemblyHintProvider.Instance.Create, AssemblyPathLoader.Instance.Create, Delegates<Assembly>.Empty ) {}
-	}*/
-
-	/*[Synchronized]
-	[ApplyAutoValidation]
-	public class AssemblyInitializer : CommandBase<Assembly>
-	{
-		readonly static Action<ModuleHandle> Initialize = System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor;
-		public static AssemblyInitializer Instance { get; } = new AssemblyInitializer();
-
-		AssemblyInitializer() : base( Specification.Instance ) {}
-
-		public override void Execute( Assembly parameter )
-		{
-			parameter.GetModules().Select( module => module.ModuleHandle ).ForEach( Initialize );
-			if ( !Activated( parameter ) )
-			{
-				DragonSpark.TypeSystem.Activated.Property.Set( parameter, true );
-			}
-		}
-
-		static bool Activated( Assembly parameter ) => DragonSpark.TypeSystem.Activated.Property.Get( parameter );
-
-		class Specification : OncePerParameterSpecification<Assembly>
-		{
-			public static Specification Instance { get; } = new Specification();
-
-			public override bool IsSatisfiedBy( Assembly parameter ) => !Activated( parameter ) && base.IsSatisfiedBy( parameter );
-		}
-	}*/
-
-	/**/
 }

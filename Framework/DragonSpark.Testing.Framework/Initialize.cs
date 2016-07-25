@@ -1,16 +1,13 @@
 using DragonSpark.Activation;
 using DragonSpark.Configuration;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.Setup;
 using DragonSpark.Windows.Runtime;
-using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Immutable;
-using System.Composition.Hosting;
-using System.Linq;
+using System.Composition;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -125,16 +122,11 @@ namespace DragonSpark.Testing.Framework
 
 	public class MethodContext : Configuration<MethodBase>
 	{
-		public static IWritableStore<MethodBase> Instance { get; } = new MethodContext();
+		public static IConfiguration<MethodBase> Instance { get; } = new MethodContext();
 		MethodContext() {}
 	}
 
-	public class TestingFrameworkInitializationCommand : InitializationCommandBase
-	{
-		public TestingFrameworkInitializationCommand( MethodBase method ) : base( new AssignValueCommand<MethodBase>( MethodContext.Instance ).Fixed( method ), new DisposeDisposableCommand( ExecutionContextStore.Instance.Value ) ) {}
-	}
-
-	public class LoadPartsCommand : DisposingCommand<Assembly>
+	/*public class LoadPartsCommand : DisposingCommand<Assembly>
 	{
 		public static LoadPartsCommand Instance { get; } = new LoadPartsCommand();
 		LoadPartsCommand() : this( AssemblyPartLocator.Instance.Create ) {}
@@ -156,13 +148,14 @@ namespace DragonSpark.Testing.Framework
 			this.AssociateForDispose( result );
 			return result;
 		}
-	}
+	}*/
 
-	public class TestingApplicationInitializationCommand : InitializationCommandBase
+	[Export( typeof(ISetup) )]
+	public class TestingApplicationInitializationCommand : DragonSpark.Setup.Setup
 	{
-		public TestingApplicationInitializationCommand( MethodBase method ) 
-			: base( Windows.InitializationCommand.Instance, new TestingFrameworkInitializationCommand( method ), LoadPartsCommand.Instance.Fixed( method.DeclaringType.Assembly ) ) {}
+		public TestingApplicationInitializationCommand() 
+			: base( Windows.InitializationCommand.Instance, new DisposeDisposableCommand( ExecutionContextStore.Instance.Value )/*, LoadPartsCommand.Instance.Fixed( MethodContext.Instance.Get().DeclaringType.Assembly )*/ ) {}
 	}
 
-	class WindowsTestingApplicationInitializationCommand {}
+	// class WindowsTestingApplicationInitializationCommand {}
 }

@@ -64,7 +64,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var history = new LoggerHistorySink();
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( history, new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Debug } ) )
 			{
-				var loggerHistory = GlobalServiceProvider.Instance.Get<ILoggerHistory>();
+				var loggerHistory = GlobalServiceProvider.GetService<ILoggerHistory>();
 				Assert.Same( history, loggerHistory );
 
 				Assert.Empty( history.Events );

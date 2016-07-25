@@ -216,7 +216,7 @@
     <Compile Include="Diagnostics\TracingProfilerFactory.cs" />
     <Compile Include="IoC\AutoDataAttribute.cs" />
     <Compile Include="OutputAttribute.cs" />
-    <Compile Include="Setup\ApplicationCommandFactory.cs" />
+    <Compile Include="Setup\ApplicationCommandsSource.cs" />
     <Compile Include="Setup\Execution.cs" />
     <Compile Include="Setup\AutoDataMoqConfiguredAttribute.cs" />
     <Compile Include="Setup\Location\FixtureRegistry.cs" />

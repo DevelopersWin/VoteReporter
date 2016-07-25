@@ -4,9 +4,14 @@ using System;
 
 namespace DragonSpark.Runtime
 {
-	public interface ISource<out T>
+	public interface ISource<out T> : ISource
 	{
-		T Get();
+		new T Get();
+	}
+
+	public interface ISource
+	{
+		object Get();
 	}
 
 	public static class SourceExtensions
@@ -72,26 +77,4 @@ namespace DragonSpark.Runtime
 			public override ICache<TParameter, TResult> Create() => Defaults<TParameter, TResult>.Factory( factory );
 		}
 	}
-
-	/*public abstract class ParameterizedSourceBase<T> : ParameterizedSourceBase<object, T>, IParameterizedSource<T>
-	{
-		protected ParameterizedSourceBase() {}
-		protected ParameterizedSourceBase( ISpecification<object> specification ) : base( specification ) {}
-	}
-
-	public abstract class ParameterizedSourceBase<TParameter, TResult> : IParameterizedSource<TParameter, TResult>
-	{
-		readonly ISpecification<TParameter> specification;
-
-		protected ParameterizedSourceBase() : this( Specifications<TParameter>.Assigned ) {}
-
-		protected ParameterizedSourceBase( ISpecification<TParameter> specification )
-		{
-			this.specification = specification;
-		}
-	
-		public TResult Get( TParameter parameter ) => specification.IsSatisfiedBy( parameter ) ? Execute( parameter ) : default(TResult);
-
-		protected abstract TResult Execute( TParameter parameter );
-	}*/
 }

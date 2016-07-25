@@ -18,14 +18,14 @@ namespace DragonSpark.Testing.Activation
 			var current = Assert.IsType<ExecutionContext>( Execution.Current() );
 			Assert.Same( ExecutionContextStore.Instance.Value, current );
 			Assert.Equal( TaskContextStore.Instance.Value, current.Origin );
-			Assert.Null( MethodContext.Instance.Value );
+			Assert.Null( MethodContext.Instance.Get() );
 			Assert.True( EnableMethodCaching.Instance.Get() );
 
 			var method = MethodBase.GetCurrentMethod();
-			using ( var command = new TestingApplicationInitializationCommand( method ).Run( default(object) ) )
+			using ( var command = new TestingApplicationInitializationCommand().Run( default(object) ) )
 			{
-				Assert.NotNull( MethodContext.Instance.Value );
-				Assert.Same( method, MethodContext.Instance.Value );
+				Assert.NotNull( MethodContext.Instance.Get() );
+				Assert.Same( method, MethodContext.Instance.Get() );
 				Assert.Same( current, Execution.Current() );
 				Assert.False( EnableMethodCaching.Instance.Get() );
 			}
@@ -34,7 +34,7 @@ namespace DragonSpark.Testing.Activation
 			Assert.NotNull( context );
 			Assert.NotSame( current, context );
 
-			Assert.Null( MethodContext.Instance.Value );
+			Assert.Null( MethodContext.Instance.Get() );
 
 			Assert.True( EnableMethodCaching.Instance.Get() );
 		}

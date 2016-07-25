@@ -26,25 +26,21 @@ namespace DragonSpark.Runtime.Stores
 
 		protected abstract T Get();
 
+		object ISource.Get() => Get();
 		T ISource<T>.Get() => Get();
 	}
 
-	public abstract class ItemsStoreBase<T> : StoreBase<ImmutableArray<T>>
+	public abstract class ItemsStoreBase<T> : FixedStore<ImmutableArray<T>>
 	{
-		readonly ImmutableArray<T> items;
-
 		protected ItemsStoreBase( IEnumerable<T> items ) : this( items.Fixed() ) { }
 
 		protected ItemsStoreBase() : this( Items<T>.Default ) {}
 
-		protected ItemsStoreBase( params T[] items )
-		{
-			this.items = items.ToImmutableArray();
-		}
+		protected ItemsStoreBase( params T[] items ) : base( items.ToImmutableArray() ) {}
 
-		protected override ImmutableArray<T> Get() => From().ToImmutableArray();
+		protected override ImmutableArray<T> Get() => Yield().ToImmutableArray();
 
-		protected virtual IEnumerable<T> From() => items.ToArray();
+		protected virtual IEnumerable<T> Yield() => Value.ToArray();
 	}
 
 	/*public class PropertyStore<T> : WritableStore<T>

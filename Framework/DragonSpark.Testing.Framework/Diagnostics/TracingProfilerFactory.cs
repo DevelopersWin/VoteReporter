@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		readonly Action<string> output;
 		readonly ILoggerHistory history;
 
-		public ProfilerFactory( Action<string> output ) : this( output, GlobalServiceProvider.Instance.Get<ILoggerHistory>() ) {}
+		public ProfilerFactory( Action<string> output ) : this( output, GlobalServiceProvider.GetService<ILoggerHistory>() ) {}
 
 		public ProfilerFactory( Action<string> output, ILoggerHistory history ) : this( output, history, DiagnosticProperties.Logger.Get ) {}
 		public ProfilerFactory( Action<string> output, ILoggerHistory history, Func<MethodBase, ILogger> loggerSource ) : base( loggerSource )

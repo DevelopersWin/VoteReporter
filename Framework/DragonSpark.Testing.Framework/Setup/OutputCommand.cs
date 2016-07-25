@@ -36,7 +36,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			public object Create( object request, ISpecimenContext context )
 			{
 				var type = TypeSupport.From( request );
-				var result = type != null && types.Contains( type ) ? GlobalServiceProvider.Instance.Get<object>( type ) : new NoSpecimen();
+				var result = type != null && types.Contains( type ) ? GlobalServiceProvider.GetService<object>( type ) : new NoSpecimen();
 				return result;
 			}
 		}
@@ -45,7 +45,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class ServiceRelay : ISpecimenBuilder
 	{
 		public static ServiceRelay Instance { get; } = new ServiceRelay();
-		ServiceRelay() : this( GlobalServiceProvider.Instance.Get<object> ) {}
+		ServiceRelay() : this( GlobalServiceProvider.GetService<object> ) {}
 
 		readonly Func<Type, object> provider;
 

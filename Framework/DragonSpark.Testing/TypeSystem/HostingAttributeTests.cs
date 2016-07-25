@@ -10,7 +10,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Theory, AutoData]
 		public void Field( object item, int number )
 		{
-			var parameter = new FieldHostedAttribute( item, number ).Create( null );
+			var parameter = new FieldHostedAttribute( item, number ).Get( null );
 			var target = Assert.IsType<Target>( parameter );
 			Assert.Equal( item, target.Item );
 			Assert.Equal( number, target.Number );

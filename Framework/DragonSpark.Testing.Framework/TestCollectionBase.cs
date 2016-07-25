@@ -36,7 +36,7 @@ namespace DragonSpark.Testing.Framework
 		{
 			base.OnInvoke( args );
 
-			ActiveApplication.Instance.Value.Dispose();
+			ApplicationServices.Instance.Value.Dispose();
 
 			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 

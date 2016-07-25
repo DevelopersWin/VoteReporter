@@ -1,8 +1,6 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects.Validation;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Commands;
 using System;
@@ -18,32 +16,27 @@ namespace DragonSpark.Configuration
 		EnableMethodCaching() : base( () => true ) {}
 	}
 
-	public interface IInitializationCommand : ICommand, IDisposable {}
+	// public interface IInitializationCommand : ICommand, IDisposable {}
 
-	[ApplyAutoValidation]
+	/*[ApplyAutoValidation]
 	public abstract class InitializationCommandBase : CompositeCommand, IInitializationCommand
 	{
 		protected InitializationCommandBase( params ICommand[] commands ) : base( new OnlyOnceSpecification(), commands ) {}
-	}
+	}*/
 
 	public class AssignConfigurationsCommand<T> : ApplyConfigurationCommand<ImmutableArray<ITransformer<T>>>
 	{
-		public AssignConfigurationsCommand( ImmutableArray<ITransformer<T>> assignable ) : base( assignable ) {}
-
-		public AssignConfigurationsCommand( ImmutableArray<ITransformer<T>> value, IAssignable<Func<ImmutableArray<ITransformer<T>>>> assignable = null ) : base( value, assignable ) {}
+		public AssignConfigurationsCommand( ImmutableArray<ITransformer<T>> value, IConfigurations<T> assignable = null ) : base( value, assignable ) {}
 	}
 
 	public static class Extensions
 	{
-		public static ICommand From<T>( this IAssignable<Func<ImmutableArray<T>>> @this, params T[] items ) => new ApplyDelegateConfigurationCommand<ImmutableArray<T>>( items.ToImmutableArray, @this );
-		public static ICommand From<T>( this IAssignable<Func<ImmutableArray<T>>> @this, IEnumerable<T> items ) => @this.From( items.Fixed() );
-
 		public static ICommand From<T>( this IAssignable<Func<T>> @this, T value ) => new ApplyConfigurationCommand<T>( value, @this );
 		public static ICommand From<T>( this IAssignable<Func<T>> @this, ISource<T> value ) => new ApplySourceConfigurationCommand<T>( value, @this );
 
-		public static ICommand From<T>( this IAssignable<Func<ImmutableArray<ITransformer<T>>>> @this, IEnumerable<ITransformer<T>> configurations ) => @this.From( configurations.ToImmutableArray() );
-		public static ICommand From<T>( this IAssignable<Func<ImmutableArray<ITransformer<T>>>> @this, params ITransformer<T>[] configurations ) => @this.From( configurations.ToImmutableArray() );
-		public static ICommand From<T>( this IAssignable<Func<ImmutableArray<ITransformer<T>>>> @this, ImmutableArray<ITransformer<T>> configurations ) => new AssignConfigurationsCommand<T>( configurations, @this );
+		public static ICommand From<T>( this IConfigurations<T> @this, IEnumerable<ITransformer<T>> configurations ) => @this.From( configurations.ToImmutableArray() );
+		public static ICommand From<T>( this IConfigurations<T> @this, params ITransformer<T>[] configurations ) => @this.From( configurations.ToImmutableArray() );
+		public static ICommand From<T>( this IConfigurations<T> @this, ImmutableArray<ITransformer<T>> configurations ) => new AssignConfigurationsCommand<T>( configurations, @this );
 	}
 
 	public class ApplySourceConfigurationCommand<T> : ApplyConfigurationCommandBase<T>
@@ -135,13 +128,15 @@ namespace DragonSpark.Configuration
 		protected override T Get() => Value;
 	}
 
-	public interface IConfiguration<T> : ISource<T>, IAssignable<Func<T>> { }
+	public interface IConfiguration<T> : ISource<T>, IAssignable<T>, IAssignable<Func<T>> { }
 
 	public interface IParameterizedConfiguration<T> : IParameterizedConfiguration<object, T> {}
 
 	public interface IParameterizedConfiguration<TKey, TValue> : IParameterizedSource<TKey, TValue>, IAssignable<Func<TKey, TValue>> {}
 
-	public interface IConfigurations<T> : IStore<ImmutableArray<ITransformer<T>>>, IPriorityAware {}
+	public interface IConfigurations<T> : IConfiguration<ImmutableArray<ITransformer<T>>> {}
+
+	// public interface IConfigurators<T> : IConfigurations<ITransformer<T>> {}
 
 	/*public abstract class ConfigurationsStoreBase<T> : StoreBase<ImmutableArray<ITransformer<T>>>
 	{
@@ -152,28 +147,34 @@ namespace DragonSpark.Configuration
 		public virtual Priority Priority => Priority.Normal;
 	}*/
 
-	public class Configurations<T> : ItemsStoreBase<ITransformer<T>>, IConfigurations<T>
+	public class Configurations<T> : Configuration<ImmutableArray<ITransformer<T>>>, IConfigurations<T>
 	{
 		public Configurations() {}
-		public Configurations( IEnumerable<ITransformer<T>> items ) : base( items ) {}
-		public Configurations( params ITransformer<T>[] items ) : base( items ) {}
-
-		public virtual Priority Priority => Priority.Normal;
+		public Configurations( params ITransformer<T>[] configurators ) : this( new Configurator<T>( configurators ).Get ) {}
+		public Configurations( Func<ImmutableArray<ITransformer<T>>> defaultFactory ) : base( defaultFactory ) {}
+		public Configurations( IConfigurableCache<ImmutableArray<ITransformer<T>>> cache ) : base( cache ) {}
 	}
 
-	public abstract class ConfigurationsFactoryBase<TParameter, TConfiguration> : FactoryBase<TParameter, IConfigurations<TConfiguration>>
+	public class Configurator<T> : ItemsStoreBase<ITransformer<T>>
 	{
-		public override IConfigurations<TConfiguration> Create( TParameter parameter ) => new Configurations<TConfiguration>( From( parameter ) );
+		public Configurator() {}
+		public Configurator( IEnumerable<ITransformer<T>> items ) : base( items ) {}
+		public Configurator( params ITransformer<T>[] items ) : base( items ) {}
+	}
+
+	public abstract class ConfiguratorsBase<TParameter, TConfiguration> : FactoryBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>
+	{
+		public override ImmutableArray<ITransformer<TConfiguration>> Create( TParameter parameter ) => From( parameter ).ToImmutableArray();
 
 		protected abstract IEnumerable<ITransformer<TConfiguration>> From( TParameter parameter );
 	}
 
-	/*public abstract class ConfigurationsFactoryBase<T> : FactoryBase<ImmutableArray<ITransformer<T>>>
+	/*public abstract class ConfigurationsBase<T> : FactoryBase<ImmutableArray<ITransformer<T>>>
 	{
 		
 	}
 
-	public class ConfigurationsFactory<T> : ConfigurationsFactoryBase<T>
+	public class ConfigurationsFactory<T> : ConfigurationsBase<T>
 	{
 		public static ConfigurationsFactory<T> Instance { get; } = new ConfigurationsFactory<T>( Items<ITransformer<T>>.Default );
 

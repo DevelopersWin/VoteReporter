@@ -1,10 +1,10 @@
-using DragonSpark.Activation;
+using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
 using System;
 
 namespace DragonSpark.TypeSystem
 {
-	public abstract class HostingAttribute : Attribute, IFactoryWithParameter
+	public abstract class HostingAttribute : Attribute, IParameterizedSource<object, object>
 	{
 		readonly Func<object, object> inner;
 
@@ -13,10 +13,6 @@ namespace DragonSpark.TypeSystem
 			this.inner = inner;
 		}
 
-		public bool CanCreate( object parameter ) => true;
-
-		public object Create( object parameter ) => inner( parameter );
-
-		// bool IValidationAware.ShouldValidate() => false;
+		public object Get( object parameter ) => inner( parameter );
 	}
 }

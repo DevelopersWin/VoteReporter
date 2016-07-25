@@ -8,10 +8,10 @@ namespace DragonSpark.Runtime.Stores
 {
 	public static class StoreExtensions
 	{
-		public static T Assigned<T, U>( this T @this, U value ) where T : IWritableStore<U>
+		public static TValue Assigned<TSource, TValue>( this TSource @this, TValue value ) where TSource : IAssignable<TValue>
 		{
 			@this.Assign( value );
-			return @this;
+			return value;
 		}
 
 		public static Assignment<T> Assignment<T>( this IWritableStore<T> @this, T first )  => new Assignment<T>( new StoreAssign<T>( @this ), new Value<T>( first ) );

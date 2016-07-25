@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Diagnostics
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class LoggerFactoryTests
 	{
-		[Theory, AutoData, AdditionalTypes( typeof(MethodFormatter) )]
+		[Theory, AutoData, AdditionalTypes( typeof(MethodFormatter) ), FrameworkTypes, ApplicationPublicParts]
 		public void EnsureComposition( [Service]CompositionContext context, string text )
 		{
 			var logger = context.GetExport<ILogger>();

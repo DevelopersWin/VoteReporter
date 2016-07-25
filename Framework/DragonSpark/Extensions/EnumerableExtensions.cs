@@ -28,6 +28,10 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<ValueTuple<T1, T2>> Introduce<T1, T2>( this ImmutableArray<T1> @this, T2 instance ) => Introduce( @this, instance, Where<ValueTuple<T1, T2>>.Always, Delegates<ValueTuple<T1, T2>>.Self );
 
+		public static IEnumerable<T1> Introduce<T1, T2>( this IEnumerable<Func<T2, T1>> @this, T2 instance ) => Introduce( @this, instance, tuple => tuple.Item1( tuple.Item2 ) );
+
+		public static IEnumerable<T1> Introduce<T1, T2>( this ImmutableArray<Func<T2, T1>> @this, T2 instance ) => Introduce( @this, instance, tuple => tuple.Item1( tuple.Item2 ) );
+
 		public static IEnumerable<T1> Introduce<T1, T2>( this ImmutableArray<T1> @this, T2 instance, Func<ValueTuple<T1, T2>, bool> where ) => Introduce( @this, instance, @where, tuple => tuple.Item1 );
 
 		public static IEnumerable<TResult> Introduce<T1, T2, TResult>( this ImmutableArray<T1> @this, T2 instance, Func<ValueTuple<T1, T2>, TResult> select ) => Introduce( @this, instance, Where<ValueTuple<T1, T2>>.Always, @select );

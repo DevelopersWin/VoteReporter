@@ -1,12 +1,11 @@
-﻿<configuration:InitializationCommandBase x:Class="DragonSpark.Testing.Parts.Development.InitializationCommand"
+﻿<setup:Setup x:Class="DragonSpark.Testing.Parts.Development.InitializationCommand"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
-	xmlns:development="clr-namespace:DragonSpark.Testing.Parts.Development"
+	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d">
 	<!--<development:ApplyEnableMethodCachingConfiguration Parameter="{x:Static configuration:EnableMethodCaching.Instance}" Value="False" />-->
 	<!--<diagnosticsCore:MinimumLevelConfiguration Value="Debug" />-->
 	
-</configuration:InitializationCommandBase>
+</setup:Setup>

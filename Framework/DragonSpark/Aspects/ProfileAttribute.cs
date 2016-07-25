@@ -24,7 +24,7 @@ namespace DragonSpark.Aspects
 		/*IProfiler Create( MethodBase method )
 		{
 			var type = factoryType ?? ProfilerFactoryConfiguration.Instance.Get( method );
-			var result = GlobalServiceProvider.Instance.Get<IFactory<MethodBase, IProfiler>>( type ).Create( method );
+			var result = GlobalServiceProvider.GetService<IFactory<MethodBase, IProfiler>>( type ).Create( method );
 			return result;
 		}*/
 
