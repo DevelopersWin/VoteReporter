@@ -325,7 +325,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class CanInstantiateSpecification : GuardedSpecificationBase<Type>
 	{
-		public static ISpecification<Type> Instance { get; } = new DelegatedSpecification<Type>( new CanInstantiateSpecification().Cached().Get );
+		public static ISpecification<Type> Instance { get; } = new CanInstantiateSpecification().Cached();
 		CanInstantiateSpecification() {}
 
 		public override bool IsSatisfiedBy( Type parameter )
@@ -338,7 +338,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class InstantiableTypeSpecification : GuardedSpecificationBase<Type>
 	{
-		public static ISpecification<Type> Instance { get; } = new DelegatedSpecification<Type>( new InstantiableTypeSpecification().Cached().Get );
+		public static ISpecification<Type> Instance { get; } = new InstantiableTypeSpecification().Cached();
 		InstantiableTypeSpecification() : this( new[] { typeof(Delegate), typeof(Array) }.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
 		readonly ImmutableArray<TypeAdapter> exempt;

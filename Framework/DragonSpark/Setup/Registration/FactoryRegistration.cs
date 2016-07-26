@@ -157,7 +157,7 @@ namespace DragonSpark.Setup.Registration
 			foreach ( var type in parameter.RegisterTypes )
 			{
 				registry.RegisterFactory( new FactoryRegistrationParameter( type, created ) );
-				var factory = locator.Locate( MakeGenericType( parameter.FactoryType, type ) ).AsValid<IFactoryWithParameter>();
+				var factory = locator.Get( MakeGenericType( parameter.FactoryType, type ) ).AsValid<IFactoryWithParameter>();
 				var @delegate = determineDelegate( parameter.FactoryType ) ?? created;
 				var typed = factory.Create( @delegate );
 				registry.Register( new InstanceRegistrationParameter( typed.GetType(), typed ) );

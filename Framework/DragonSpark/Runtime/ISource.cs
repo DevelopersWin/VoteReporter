@@ -74,7 +74,7 @@ namespace DragonSpark.Runtime
 				this.factory = factory;
 			}
 
-			public override ICache<TParameter, TResult> Create() => Defaults<TParameter, TResult>.Factory( factory );
+			public override ICache<TParameter, TResult> Create() => CacheFactory.Create( factory );
 		}
 	}
 }

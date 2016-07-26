@@ -187,7 +187,7 @@ namespace DragonSpark.Runtime.Properties
 
 	public class ListCache : ListCache<object>
 	{
-		public new static ListCache Default { get; } = new ListCache();
+		public static ListCache Default { get; } = new ListCache();
 
 		public ListCache() {}
 		public ListCache( Func<object, IList<object>> create ) : base( create ) {}
@@ -195,7 +195,7 @@ namespace DragonSpark.Runtime.Properties
 
 	public class ListCache<T> : ListCache<object, T>, ICache<IList<T>>
 	{
-		public new static ListCache Default { get; } = new ListCache();
+		// public static ListCache Default { get; } = new ListCache();
 
 		public ListCache() {}
 		public ListCache( Func<object, IList<T>> create ) : base( create ) {}
@@ -233,56 +233,41 @@ namespace DragonSpark.Runtime.Properties
 		public TValue Get( TInstance parameter ) => Value( parameter );
 	}
 
-	/*public class ConfigurableCache<TInstance, TValue> : ConfigurableCacheBase<TInstance, TValue> where TInstance : class where TValue : class
+	public static class CacheFactory
 	{
-		public ConfigurableCache( Func<TInstance, TValue> factory ) : base( factory, ParameterConstructor<Func<TInstance, TValue>, Cache<TInstance, TValue>>.Default ) {}
-	}
+		public static ICache<T> Create<T>( Func<T> parameter ) => Create( parameter.Wrap().Create );
 
-	public class ConfigurableStructureCache<TInstance, TValue> : ConfigurableCacheBase<TInstance, TValue> where TInstance : class
-	{
-		public ConfigurableStructureCache( Func<TInstance, TValue> factory ) : base( factory, ParameterConstructor<Func<TInstance, TValue>, StoreCache<TInstance, TValue>>.Default ) {}
-		/*public ConfigurableStructureCache( IParameterizedConfiguration<TInstance, TValue> configuration, Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> factory ) : base( configuration, factory ) {}
-		public ConfigurableStructureCache( IParameterizedConfiguration<TInstance, TValue> configuration, ICache<TInstance, TValue> cache ) : base( configuration, cache ) {}#1#
-	}*/
+		public static ICache<T> Create<T>( Func<object, T> parameter ) => Implementations<T>.Factory( parameter );
 
-	public sealed class CacheTypeFactory<T> : FactoryBase<Func<Func<object, T>, ICache<T>>>
-	{
-		public static CacheTypeFactory<T> Instance { get; } = new CacheTypeFactory<T>();
-		CacheTypeFactory() {}
+		public static ICache<TInstance, TValue> Create<TInstance, TValue>( Func<TInstance, TValue> parameter ) => Implementations<TInstance, TValue>.Factory( parameter );
 
-		public override Func<Func<object, T>, ICache<T>> Create()
+		static class Implementations<T>
 		{
-			var definition = typeof(T).GetTypeInfo().IsValueType ? typeof(StoreCache<>) : typeof(Cache<>);
-			var generic = definition.MakeGenericType( typeof(T) );
-			var result = ParameterConstructor<Func<object, T>, ICache<T>>.Make( typeof(Func<object, T>), generic );
-			return result;
+			public static Func<Func<object, T>, ICache<T>> Factory { get; } = Create();
+
+			static Func<Func<object, T>, ICache<T>> Create()
+			{
+				var definition = typeof(T).GetTypeInfo().IsValueType ? typeof(StoreCache<>) : typeof(Cache<>);
+				var generic = definition.MakeGenericType( typeof(T) );
+				var result = ParameterConstructor<Func<object, T>, ICache<T>>.Make( typeof(Func<object, T>), generic );
+				return result;
+			}
+		}
+
+		static class Implementations<TInstance, TValue>
+		{
+			public static Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> Factory { get; } = Create();
+
+			static Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> Create()
+			{
+				var definition = typeof(TValue).GetTypeInfo().IsValueType ? typeof(StoreCache<,>) : typeof(Cache<,>);
+				var generic = definition.MakeGenericType( typeof(TInstance), typeof(TValue) );
+				var result = ParameterConstructor<Func<TInstance, TValue>, ICache<TInstance, TValue>>.Make( typeof(Func<TInstance, TValue>), generic );
+				return result;
+			}
 		}
 	}
-
-	public sealed class CacheTypeFactory<TInstance, TValue> : FactoryBase<Func<Func<TInstance, TValue>, ICache<TInstance, TValue>>>
-	{
-		public static CacheTypeFactory<TInstance, TValue> Instance { get; } = new CacheTypeFactory<TInstance, TValue>();
-		CacheTypeFactory() {}
-
-		public override Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> Create()
-		{
-			var definition = typeof(TValue).GetTypeInfo().IsValueType ? typeof(StoreCache<,>) : typeof(Cache<,>);
-			var generic = definition.MakeGenericType( typeof(TInstance), typeof(TValue) );
-			var result = ParameterConstructor<Func<TInstance, TValue>, ICache<TInstance, TValue>>.Make( typeof(Func<TInstance, TValue>), generic );
-			return result;
-		}
-	}
-
-	public static class Defaults<T>
-	{
-		public static Func<Func<object, T>, ICache<T>> Factory { get; } = CacheTypeFactory<T>.Instance.Create();
-	}
-
-	public static class Defaults<TInstance, TValue>
-	{
-		public static Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> Factory { get; } = CacheTypeFactory<TInstance, TValue>.Instance.Create();
-	}
-
+	
 	public class ConfigurableCache<T> : ConfigurableCache<object, T>, IConfigurableCache<T>
 	{
 		public ConfigurableCache( Func<object, T> factory ) : base( factory ) {}
@@ -290,12 +275,24 @@ namespace DragonSpark.Runtime.Properties
 		public ConfigurableCache( IParameterizedConfiguration<object, T> configuration, ICache<object, T> cache ) : base( configuration, cache ) {}
 	}
 
+	public abstract class FactoryCache<TInstance, TValue> : ConfigurableCache<TInstance, TValue>
+	{
+		protected FactoryCache() : this( new ConfigurableStore<TInstance, TValue>( instance => default(TValue) ) ) {}
+
+		protected FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : base( configuration, CacheFactory.Create )
+		{
+			configuration.Assign( Create );
+		}
+
+		protected abstract TValue Create( TInstance parameter );
+	}
+
 	public class ConfigurableCache<TInstance, TValue> : IConfigurableCache<TInstance, TValue>
 	{
 		readonly IParameterizedConfiguration<TInstance, TValue> configuration;
 		readonly ICache<TInstance, TValue> cache;
 
-		public ConfigurableCache( Func<TInstance, TValue> factory ) : this( new ConfigurableStore<TInstance, TValue>( factory ), Defaults<TInstance, TValue>.Factory ) {}
+		public ConfigurableCache( Func<TInstance, TValue> factory ) : this( new ConfigurableStore<TInstance, TValue>( factory ), CacheFactory.Create ) {}
 
 		protected ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration, Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> factory ) : this( configuration, factory( configuration.Get ) ) {}
 

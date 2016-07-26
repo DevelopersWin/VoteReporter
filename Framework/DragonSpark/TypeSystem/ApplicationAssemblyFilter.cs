@@ -34,7 +34,7 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationTypeSpecification : GuardedSpecificationBase<Type>
 	{
-		public static ICache<Type, bool> Instance { get; } = new ApplicationTypeSpecification().Cached();
+		public static ISpecification<Type> Instance { get; } = new ApplicationTypeSpecification().Cached();
 		ApplicationTypeSpecification() {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => CanInstantiateSpecification.Instance.IsSatisfiedBy( parameter ) && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Has<CompilerGeneratedAttribute>();

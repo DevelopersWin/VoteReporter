@@ -1,5 +1,6 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -44,24 +45,21 @@ namespace DragonSpark.Activation
 		public static ISource<ImmutableArray<FactoryTypeRequest>> Requests { get; } = new ExecutionScope<ImmutableArray<FactoryTypeRequest>>( () => Instance.GetMany( ApplicationParts.Instance.Get().Types ) );
 
 		public static FactoryTypeRequests Instance { get; } = new FactoryTypeRequests();
-		FactoryTypeRequests() : base( Factory.Instance.Create ) {}
+		FactoryTypeRequests() : base( new Factory().Create ) {}
 
 		[ApplyAutoValidation]
 		sealed class Factory : FactoryBase<Type, FactoryTypeRequest>
 		{
+			public Factory() : base( CanInstantiateSpecification.Instance.And( IsFactorySpecification.Instance, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new Specification() ) ) {}
+
 			readonly static Func<Type, Type> ResultLocator = ResultTypeLocator.Instance.ToDelegate();
 
-			public static Factory Instance { get; } = new Factory();
-			Factory() : base( Specification.Instance ) {}
+			public override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
 
 			class Specification : GuardedSpecificationBase<Type>
 			{
-				public static Specification Instance { get; } = new Specification();
-
-				public override bool IsSatisfiedBy( Type parameter ) => CanInstantiateSpecification.Instance.IsSatisfiedBy( parameter ) && IsFactorySpecification.Instance.Get( parameter ) && ResultLocator( parameter ) != typeof(object) && parameter.Has<ExportAttribute>();
+				public override bool IsSatisfiedBy( Type parameter ) => ResultLocator( parameter ) != typeof(object);
 			}
-
-			public override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
 		}
 	}
 }

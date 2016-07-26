@@ -157,21 +157,7 @@ namespace DragonSpark.Aspects.Validation
 				this.controller = controller;
 			}
 
-			public override void OnInvoke( MethodInterceptionArgs args )
-			{
-				args.ReturnValue = controller.Execute( args.Arguments[0], args.GetReturnValue );
-
-				/*object result;
-				switch ( controller.Execute( args.Arguments[0], out result ) )
-				{
-					case AutoValidationControllerResult.ResultFound:
-						args.ReturnValue = result;
-						break;
-					case AutoValidationControllerResult.Proceed:
-						args.Proceed();
-						break;
-				}*/
-			}
+			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = controller.Execute( args.Arguments[0], args.GetReturnValue );
 		}
 	}
 

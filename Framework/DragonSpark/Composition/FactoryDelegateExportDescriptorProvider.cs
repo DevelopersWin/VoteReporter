@@ -5,7 +5,11 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
+using System.Collections.Immutable;
+using System.Composition;
 using System.Composition.Hosting.Core;
+using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Composition
 {
@@ -43,5 +47,48 @@ namespace DragonSpark.Composition
 		}
 
 		public override CompositionContract Create( CompositionContract parameter ) => resultTypeLocator( parameter.ContractType ).With( parameter.ChangeType );
+	}
+
+	sealed class IsExportSpecification : GuardedSpecificationBase<MemberInfo>
+	{
+		public static IsExportSpecification Instance { get; } = new IsExportSpecification();
+		IsExportSpecification() {}
+
+		public override bool IsSatisfiedBy( MemberInfo parameter ) => parameter.IsDefined( typeof(ExportAttribute) );
+	}
+
+	public struct SingletonExport
+	{
+		public SingletonExport( ImmutableArray<CompositionContract> contracts, Func<object> factory )
+		{
+			Contracts = contracts;
+			Factory = factory;
+		}
+
+		public ImmutableArray<CompositionContract> Contracts { get; }
+		public Func<object> Factory { get; }
+	}
+
+	sealed class SingletonExports : SingletonDelegates<SingletonExport>
+	{
+		public static SingletonExports Instance { get; } = new SingletonExports();
+		SingletonExports() : base( SingletonSpecification.Instance.And( IsExportSpecification.Instance.Cast<SingletonRequest>( request => request.Candidate ) ), new Factory().Create ) {}
+
+		sealed class Factory : FactoryBase<PropertyInfo, SingletonExport>
+		{
+			public override SingletonExport Create( PropertyInfo parameter )
+			{
+				var instance = SingletonDelegateCache.Instance.Get( parameter );
+				if ( instance != null )
+				{
+					var contractType = instance.GetMethodInfo().ReturnType;
+					var types = parameter.GetCustomAttributes<ExportAttribute>().Select( x => new CompositionContract( x.ContractType ?? contractType, x.ContractName ) ).Append( new CompositionContract( contractType ) ).Distinct().ToImmutableArray();
+					var result = new SingletonExport( types, instance );
+					return result;
+
+				}
+				return default(SingletonExport);
+			}
+		}
 	}
 }

@@ -9,6 +9,8 @@ namespace DragonSpark.Extensions
 {
 	public static class MethodExtensions
 	{
+		public static T CreateDelegate<T>( this MethodInfo @this ) => @this.CreateDelegate( typeof(T) ).To<T>();
+
 		public static MethodInfo AccountForGenericDefinition( this MethodInfo @this )
 		{
 			var result = @this.DeclaringType.IsConstructedGenericType ? @this.DeclaringType.GetGenericTypeDefinition().GetRuntimeMethods().SingleOrDefault( MethodEqualitySpecification.For( @this ) )
@@ -27,8 +29,7 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static MethodInfo AccountForClosedDefinition( this MethodInfo @this, Type closedType )
-			=> @this.ContainsGenericParameters ? @this.LocateInDerivedType( closedType ) : @this;
+		public static MethodInfo AccountForClosedDefinition( this MethodInfo @this, Type closedType )=> @this.ContainsGenericParameters ? @this.LocateInDerivedType( closedType ) : @this;
 	}
 
 	class MethodEqualitySpecification : SpecificationWithContextBase<MethodInfo>

@@ -40,7 +40,7 @@ namespace DragonSpark.Runtime.Stores
 
 		protected override ImmutableArray<T> Get() => Yield().ToImmutableArray();
 
-		protected virtual IEnumerable<T> Yield() => Value.ToArray();
+		protected virtual IEnumerable<T> Yield() => base.Get().ToArray();
 	}
 
 	/*public class PropertyStore<T> : WritableStore<T>

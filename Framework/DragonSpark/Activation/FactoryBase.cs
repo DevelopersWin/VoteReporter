@@ -229,12 +229,24 @@ namespace DragonSpark.Activation
 
 		// public static Func<object, T> InstanceCoercer { get; } = SourceCoercer<T>.Source.Coerce;
 
-		public static Func<Type, Func<object, T>> Constructor { get; } = new Cache<Type, Func<object, T>>( ParameterConstructor<T>.Make ).Get;
+		// public static Func<Type, Func<object, T>> Constructor { get; } = new Cache<Type, Func<object, T>>( ParameterConstructor<T>.Make ).Get;
 	}
 
 	public class ParameterConstructedCompositeFactory<T> : CompositeFactory<object, T>
 	{
-		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( Defaults<T>.Constructor ).Fixed() ) {}
+		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ).ToDelegate() ).Fixed() ) {}
+
+		sealed class Factory : FactoryBase<object, T>
+		{
+			readonly Type type;
+
+			public Factory( Type type )
+			{
+				this.type = type;
+			}
+
+			public override T Create( object parameter ) => ParameterConstructor<T>.Make( parameter.GetType(), type )( parameter );
+		}
 	}
 
 	public class CompositeFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
@@ -254,7 +266,12 @@ namespace DragonSpark.Activation
 			this.inner = inner.ToImmutableArray();
 		}
 
-		public override TResult Create( TParameter parameter ) => inner.Introduce( parameter, tuple => tuple.Item1( tuple.Item2 ) ).FirstAssigned();
+		public override TResult Create( TParameter parameter )
+		{
+			var enumerable = inner.Introduce( parameter );
+			var firstAssigned = enumerable.FirstAssigned();
+			return firstAssigned;
+		}
 	}
 
 	/*public class FirstFactory<T> : FactoryBase<T>

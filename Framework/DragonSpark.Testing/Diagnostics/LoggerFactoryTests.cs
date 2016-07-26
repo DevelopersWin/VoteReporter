@@ -14,7 +14,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested]
 	public class LoggerFactoryTests
 	{
 		[Theory, AutoData, AdditionalTypes( typeof(MethodFormatter) ), FrameworkTypes, ApplicationPublicParts]

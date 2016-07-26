@@ -10,7 +10,7 @@ namespace DragonSpark.Activation
 {
 	public sealed class GlobalServiceProvider : Configuration<IServiceProvider>
 	{
-		public static IConfiguration<IServiceProvider> Instance => new GlobalServiceProvider();
+		public static IConfiguration<IServiceProvider> Instance { get; } = new GlobalServiceProvider();
 
 		GlobalServiceProvider() : base( () => DefaultServiceProvider.Instance )
 		{
@@ -24,8 +24,8 @@ namespace DragonSpark.Activation
 
 	public sealed class DefaultServiceProvider : CompositeServiceProvider
 	{
-		public static IServiceProvider Instance => new DefaultServiceProvider();
-		DefaultServiceProvider() : base( new SourceInstanceServiceProvider( GlobalServiceProvider.Instance, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToSource(), LoggingController.Instance.ToSource(), Logging.Instance.ToSource() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
+		public static IServiceProvider Instance { get; } = new DefaultServiceProvider();
+		DefaultServiceProvider() : base( new SourceInstanceServiceProvider( /*GlobalServiceProvider.Instance,*/ ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToSource(), LoggingController.Instance.ToSource(), Logging.Instance.ToSource() ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
 	}
 
 	public delegate object ServiceSource( Type serviceType );

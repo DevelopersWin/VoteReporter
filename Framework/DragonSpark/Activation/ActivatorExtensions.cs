@@ -1,12 +1,13 @@
 ﻿using DragonSpark.Activation.IoC;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Setup.Registration;
+using DragonSpark.Runtime.Specifications;
+using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
@@ -53,43 +54,150 @@ namespace DragonSpark.Activation
 			public override object Create( LocateTypeRequest parameter )
 			{
 				var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;
-				var result = singleton.Locate( type );
+				var result = singleton.Get( type );
 				return result;
 			}
 		}
 	}
 
-	public interface ISingletonLocator
+	public interface ISingletonLocator : IParameterizedSource<Type, object> {}
+
+	public class SingletonSpecification : GuardedSpecificationBase<SingletonRequest>
 	{
-		object Locate( Type type );
+		public static SingletonSpecification Instance { get; } = new SingletonSpecification();
+		SingletonSpecification() : this( "Instance", "Default" ) {}
+
+		readonly ImmutableArray<string> candidates;
+
+		public SingletonSpecification( params string[] candidates ) : this( candidates.ToImmutableArray() ) {}
+
+		public SingletonSpecification( ImmutableArray<string> candidates )
+		{
+			this.candidates = candidates;
+		}
+
+		public override bool IsSatisfiedBy( SingletonRequest parameter )
+		{
+			var result =
+				TypeAssignableSpecification.Instance.IsSatisfiedBy( new TypeAssignableSpecification.Parameter( parameter.RequestedType, parameter.Candidate.PropertyType ) )
+				&& 
+				parameter.Candidate.GetMethod.IsStatic && !parameter.Candidate.GetMethod.ContainsGenericParameters 
+				&& 
+				( candidates.Contains( parameter.Candidate.Name ) || parameter.Candidate.Has<SingletonAttribute>() );
+			return result;
+		}
 	}
 
-	[Persistent]
-	public sealed class SingletonLocator : Cache<Type, object>, ISingletonLocator
+	public struct SingletonRequest
+	{
+		public SingletonRequest( Type requestedType, PropertyInfo candidate )
+		{
+			RequestedType = requestedType;
+			Candidate = candidate;
+		}
+
+		public Type RequestedType { get; }
+		public PropertyInfo Candidate { get; }
+	}
+
+	public sealed class TypeAssignableSpecification : GuardedSpecificationBase<TypeAssignableSpecification.Parameter>
+	{
+		public static TypeAssignableSpecification Instance { get; } = new TypeAssignableSpecification();
+		TypeAssignableSpecification() {}
+
+		public override bool IsSatisfiedBy( Parameter parameter )
+		{
+			var candidate = SourceTypeAssignableSpecification.Instance.IsSatisfiedBy( parameter.Candidate ) ? parameter.Candidate.Adapt().GetInnerType() : parameter.Candidate;
+			var result = candidate.Adapt().IsAssignableFrom( parameter.TargetType );
+			return result;
+		}
+
+		public struct Parameter
+		{
+			public Parameter( Type targetType, Type candidate )
+			{
+				TargetType = targetType;
+				Candidate = candidate;
+			}
+
+			public Type TargetType { get; }
+			public Type Candidate { get; }
+		}
+	}
+
+	public sealed class SourceTypeAssignableSpecification : GuardedSpecificationBase<Type>
+	{
+		public static ISpecification<Type> Instance { get; } = new SourceTypeAssignableSpecification().Cached();
+		SourceTypeAssignableSpecification() {}
+
+		readonly static TypeAdapter Source = typeof(ISource).Adapt();
+
+		public override bool IsSatisfiedBy( Type parameter ) => Source.IsAssignableFrom( parameter );
+	}
+
+	sealed class SingletonDelegateCache : FactoryCache<PropertyInfo, Func<object>>
+	{
+		public static SingletonDelegateCache Instance { get; } = new SingletonDelegateCache();
+		SingletonDelegateCache() {}
+
+		protected override Func<object> Create( PropertyInfo parameter )
+		{
+			var isSatisfiedBy = SourceTypeAssignableSpecification.Instance.IsSatisfiedBy( parameter.PropertyType );
+			var result = isSatisfiedBy ? parameter.GetMethod.CreateDelegate<Func<ISource>>().Invoke().Get : parameter.GetMethod.CreateDelegate<Func<object>>();
+			return result;
+		}
+	}
+
+	public class SingletonDelegates : SingletonDelegates<Func<object>>
+	{
+		public static SingletonDelegates Instance { get; } = new SingletonDelegates();
+		SingletonDelegates() : this( SingletonSpecification.Instance ) {}
+		public SingletonDelegates( ISpecification<SingletonRequest> specification ) : this( specification, SingletonDelegateCache.Instance.Get ) {}
+		public SingletonDelegates( ISpecification<SingletonRequest> specification, Func<PropertyInfo, Func<object>> source ) : base( specification, source ) {}
+	}
+
+	public class SingletonDelegates<T> : FactoryCache<Type, T>
+	{
+		readonly ISpecification<SingletonRequest> specification;
+		readonly Func<PropertyInfo, T> source;
+
+		public SingletonDelegates( ISpecification<SingletonRequest> specification, Func<PropertyInfo, T> source )
+		{
+			this.specification = specification;
+			this.source = source;
+		}
+
+		protected override T Create( Type parameter )
+		{
+			foreach ( var property in parameter.GetTypeInfo().DeclaredProperties.Fixed() )
+			{
+				if ( specification.IsSatisfiedBy( new SingletonRequest( parameter, property ) ) )
+				{
+					var result = source( property );
+					return result;
+				}
+			}
+			return default(T);
+		}
+	}
+
+	public class SingletonLocator : FactoryCache<Type, object>, ISingletonLocator
 	{
 		[Export( typeof(ISingletonLocator) )]
-		public static SingletonLocator Instance { get; } = new SingletonLocator( nameof(Instance) );
+		public static SingletonLocator Instance { get; } = new SingletonLocator();
+		SingletonLocator() : this( SingletonDelegates.Instance.Get ) {}
 
-		public SingletonLocator( [NotEmpty]string property ) : base( new Factory( property ).ToDelegate() ) {}
+		readonly Func<Type, Func<object>> provider;
 
-		class Factory : FactoryBase<Type, object>
+		public SingletonLocator( Func<Type, Func<object>> provider )
 		{
-			readonly string property;
-		
-			public Factory( [NotEmpty]string property )
-			{
-				this.property = property;
-			}
-		
-			public override object Create( Type parameter )
-			{
-				var context = ValueTuple.Create( parameter.Adapt(), property );
-				var declared = parameter.GetTypeInfo().DeclaredProperties.Introduce( context, tuple => tuple.Item2.Item1.IsAssignableFrom( tuple.Item1.PropertyType ) && tuple.Item1.GetMethod.IsStatic && !tuple.Item1.GetMethod.ContainsGenericParameters && ( tuple.Item1.Name == tuple.Item2.Item2 || tuple.Item1.Has<SingletonAttribute>() ) ).FirstOrDefault();
-				var result = declared?.GetValue( null );
-				return result;
-			}
+			this.provider = provider;
 		}
 
-		public object Locate( Type type ) => Get( type );
+		protected override object Create( Type parameter )
+		{
+			var func = provider( parameter );
+			return func?.Invoke();
+		}
 	}
 }

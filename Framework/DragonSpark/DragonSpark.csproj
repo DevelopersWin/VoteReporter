@@ -210,6 +210,7 @@
     <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />
     <Compile Include="Composition\FactoryExportDescriptorProviderBase.cs" />
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
+    <Compile Include="Composition\SingletonExportDescriptorProvider.cs" />
     <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Configuration\ConfigureCommand.cs" />
     <Compile Include="Configuration\Store.cs" />

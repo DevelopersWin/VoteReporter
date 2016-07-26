@@ -4,7 +4,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using System;
@@ -16,17 +15,17 @@ using Type = System.Type;
 
 namespace DragonSpark.Activation
 {
-	public class IsFactorySpecification : AdapterSpecificationBase
+	public sealed class IsFactorySpecification : AdapterSpecificationBase
 	{
-		public static ICache<Type, bool> Instance { get; } = new IsFactorySpecification( typeof(IFactory), typeof(IFactoryWithParameter) ).Cached();
-		protected IsFactorySpecification( params Type[] types ) : base( types ) {}
+		public static ISpecification<Type> Instance { get; } = new IsFactorySpecification( typeof(IFactory), typeof(IFactoryWithParameter) ).Cached();
+		IsFactorySpecification( params Type[] types ) : base( types ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
 	}
 
 	public class IsGenericFactorySpecification : AdapterSpecificationBase
 	{
-		public static ICache<Type, bool> Instance { get; } = new IsGenericFactorySpecification( typeof(IFactory<>), typeof(IFactory<,>) ).Cached();
+		public static ISpecification<Type> Instance { get; } = new IsGenericFactorySpecification( typeof(IFactory<>), typeof(IFactory<,>) ).Cached();
 
 		protected IsGenericFactorySpecification( params Type[] types ) : base( types ) {}
 

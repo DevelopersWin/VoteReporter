@@ -73,14 +73,7 @@ namespace DragonSpark.Activation.IoC
 			this.locator = locator;
 		}
 
-		public void BuildUp( IBuilderContext context )
-		{
-			var singleton = locator.Locate( context.BuildKey.Type );
-			if ( singleton != null )
-			{
-				context.Existing = singleton;
-			}
-		}
+		public void BuildUp( IBuilderContext context ) => context.Existing = locator.Get( context.BuildKey.Type ) ?? context.Existing;
 	}
 
 	public class EnumerableResolutionStrategy : BuilderStrategy

@@ -73,8 +73,7 @@ namespace DragonSpark.Activation
 			var candidates = new [] { types, types.WhereAssigned().Fixed(), Items<Type>.Default };
 			var adapter = parameter.RequestedType.Adapt();
 			var result = candidates.Distinct( StructuralEqualityComparer<Type[]>.Instance )
-				.Introduce( adapter )
-				.Select( tuple => tuple.Item2.FindConstructor( tuple.Item1 )  )
+				.Introduce( adapter , tuple => tuple.Item2.FindConstructor( tuple.Item1 )  )
 				.FirstOrDefault();
 			return result;
 		}

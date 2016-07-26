@@ -87,7 +87,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 			this.locator = locator;
 		}
 
-		public override bool IsSatisfiedBy( Type parameter ) => locator.Locate( parameter ) != null;
+		public override bool IsSatisfiedBy( Type parameter ) => locator.Get( parameter ) != null;
 	}
 
 	public class HasConventionSpecification : GuardedSpecificationBase<Type>

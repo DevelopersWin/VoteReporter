@@ -28,29 +28,43 @@ namespace DragonSpark.Testing.Framework.Setup
 		ServiceProviderConfigurations() : this( MethodContext.Instance.Get ) {}
 
 		readonly Func<MethodBase> methodSource;
+		readonly Func<IServiceProvider> provider;
+		readonly Func<ImmutableArray<ITransformer<IServiceProvider>>> configurations;
 
 		public ServiceProviderConfigurations( Func<MethodBase> methodSource )
 		{
 			this.methodSource = methodSource;
+			provider = GetProvider;
+			configurations = GetConfigurations;
 		}
 
 		protected override IEnumerable<ICommand> Yield()
 		{
-			var method = methodSource();
-			var serviceProvider = Cache.Get( method.DeclaringType ).Get( ApplicationTypes.Instance.Get() );
-			yield return new ConfigureSeedingServiceProvider( serviceProvider );
-
-			var exports = serviceProvider.Get<CompositionHost>()?.GetExports<ITransformer<IServiceProvider>>() ?? Items<ITransformer<IServiceProvider>>.Default;
-			yield return ServiceProviderFactory.Instance.Configurations.From( exports );
+			yield return new ConfigureSeedingServiceProvider( provider );
+			yield return new ConfigureServiceProviderConfigurations( configurations );
 			yield return GlobalServiceProvider.Instance.From( ServiceProviderFactory.Instance );
 		}
+
+		ImmutableArray<ITransformer<IServiceProvider>> GetConfigurations()
+		{
+			var serviceProvider = provider();
+			var compositionHost = serviceProvider.Get<CompositionHost>();
+			var temp = compositionHost.GetExport( typeof(ITransformer<IServiceProvider>) );
+
+
+			var result = compositionHost?.GetExports<ITransformer<IServiceProvider>>().ToImmutableArray() ?? Items<ITransformer<IServiceProvider>>.Immutable;
+			return result;
+		}
+
+		IServiceProvider GetProvider() => Cache.Get( methodSource().DeclaringType ).Get( ApplicationTypes.Instance.Get() );
 	}
 
-	sealed class Configure : TransformerBase<IServiceProvider>
+	public sealed class Configure : TransformerBase<IServiceProvider>
 	{
 		[Export( typeof(ITransformer<IServiceProvider>) )]
 		public static Configure Instance { get; } = new Configure();
-		Configure() {}
+
+		public Configure() {}
 
 		public override IServiceProvider Get( IServiceProvider parameter ) => 
 			new CompositeServiceProvider( new SourceInstanceServiceProvider( FixtureContext.Instance, MethodContext.Instance ), new FixtureServiceProvider( FixtureContext.Instance.Value ), parameter );
@@ -86,9 +100,14 @@ namespace DragonSpark.Testing.Framework.Setup
 		public ApplySystemPartsConfiguration( SystemParts value ) : base( value, ApplicationParts.Instance ) {}
 	}
 
-	public sealed class ConfigureSeedingServiceProvider : ApplyConfigurationCommand<IServiceProvider>
+	public sealed class ConfigureSeedingServiceProvider : ApplyDelegateConfigurationCommand<IServiceProvider>
 	{
-		public ConfigureSeedingServiceProvider( IServiceProvider provider ) : base( provider, ServiceProviderFactory.Instance.Seed ) {}
+		public ConfigureSeedingServiceProvider( Func<IServiceProvider> provider ) : base( provider, ServiceProviderFactory.Instance.Seed ) {}
+	}
+
+	public sealed class ConfigureServiceProviderConfigurations : ApplyDelegateConfigurationCommand<ImmutableArray<ITransformer<IServiceProvider>>>
+	{
+		public ConfigureServiceProviderConfigurations( Func<ImmutableArray<ITransformer<IServiceProvider>>> factory ) : base( factory, ServiceProviderFactory.Instance.Configurations ) {}
 	}
 
 	sealed class MethodTypes : ISource<ImmutableArray<Type>>

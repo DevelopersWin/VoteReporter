@@ -54,7 +54,7 @@ namespace DragonSpark.Activation
 
 		public ExecutionScope() : this( () => default(T) ) {}
 
-		public ExecutionScope( Func<T> defaultFactory ) : this( Runtime.Properties.Defaults<T>.Factory( defaultFactory.Wrap().Create ) ) {}
+		public ExecutionScope( Func<T> defaultFactory ) : this( CacheFactory.Create( defaultFactory ) ) {}
 
 		public ExecutionScope( ICache<T> cache )
 		{
@@ -79,6 +79,7 @@ namespace DragonSpark.Activation
 		}
 
 		public void Assign( Func<object, T> item ) => cache.Assign( item );
+
 		public void Assign( Func<T> item ) => Assign( item.Wrap().ToDelegate() );
 	}
 }

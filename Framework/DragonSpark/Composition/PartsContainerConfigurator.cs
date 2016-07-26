@@ -63,11 +63,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		object Get( Type type )
-		{
-			var invoke = locator( this )?.Invoke( type );
-			return invoke;
-		}
+		object Get( Type type ) => locator( this )?.Invoke( type );
 
 		sealed class Factory : FixedFactory<Type, object>
 		{

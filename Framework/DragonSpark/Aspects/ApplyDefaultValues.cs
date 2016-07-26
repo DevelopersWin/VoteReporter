@@ -1,9 +1,6 @@
-using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -23,54 +20,9 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect
 	{
-		readonly static ICache<Delegate, ConditionMonitor> Property = dfs();
-
-		static ActivatedCache<Delegate, ConditionMonitor> dfs()
-		{
-			try
-{
-				return new ActivatedCache<Delegate, ConditionMonitor>();
-}
-catch ( Exception e )
-{
-	MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-	throw;
-}
-
-			
-		}
-
-		readonly static Func<PropertyInfo, bool> DefaultSpecification = asdfasdf();
-
-		static Func<PropertyInfo, bool> asdfasdf()
-		{
-			try
-{
-				return DefaultValuePropertySpecification.Instance.ToDelegate();
-}
-catch ( Exception e )
-{
-	MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-	throw;
-}
-
-			
-		}
-
-		readonly static Func<DefaultValueParameter, object> DefaultFactory = asdf2();
-
-		static Func<DefaultValueParameter, object> asdf2()
-		{
-			try
-{
-			return DefaultPropertyValueFactory.Instance.ToDelegate();
-}
-catch ( Exception e )
-{
-	MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-	throw;
-}
-		}
+		readonly static ICache<Delegate, ConditionMonitor> Property = new ActivatedCache<Delegate, ConditionMonitor>();
+		readonly static Func<PropertyInfo, bool> DefaultSpecification = DefaultValuePropertySpecification.Instance.IsSatisfiedBy;
+		readonly static Func<DefaultValueParameter, object> DefaultFactory = DefaultPropertyValueFactory.Instance.Create;
 
 		readonly Func<PropertyInfo, bool> specification;
 		readonly Func<DefaultValueParameter, object> source;

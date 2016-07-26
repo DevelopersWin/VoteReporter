@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Runtime;
 using System;
 
 namespace DragonSpark.ComponentModel
@@ -8,29 +9,31 @@ namespace DragonSpark.ComponentModel
 	{
 		public SingletonAttribute() : this( null ) {}
 
-		public SingletonAttribute( Type hostType, string propertyName = nameof(SingletonLocator.Instance) ) : base( t => new SingletonDefaultValueProvider( hostType, propertyName ) ) {}
+		public SingletonAttribute( Type hostType, string propertyName = nameof(SingletonLocator.Instance) ) : base( new SingletonDefaultValueProvider( hostType, propertyName ).Wrap().ToDelegate() ) {}
 	}
 
 	public class SingletonDefaultValueProvider : IDefaultValueProvider
 	{
-		readonly Func<Type, Type> locator;
+		readonly static Func<Func<Type, Type>> Locator = BuildableTypeFromConventionLocator.Instance.Get;
+
+		readonly Func<Func<Type, Type>> locator;
 		readonly Type hostType;
-		readonly string propertyName;
+		readonly IParameterizedSource<Type, object> provider;
+		
+		public SingletonDefaultValueProvider( Type hostType, string propertyName ) : this( Locator, hostType, new SingletonLocator( new SingletonDelegates( new SingletonSpecification( propertyName ) ).Get ) ) {}
 
-		public SingletonDefaultValueProvider( Type hostType, string propertyName ) : this( BuildableTypeFromConventionLocator.Instance.Get(), hostType, propertyName ) {}
-
-		public SingletonDefaultValueProvider( Func<Type, Type> locator, Type hostType, string propertyName )
+		public SingletonDefaultValueProvider( Func<Func<Type, Type>> locator, Type hostType, IParameterizedSource<Type, object> provider )
 		{
 			this.locator = locator;
 			this.hostType = hostType;
-			this.propertyName = propertyName;
+			this.provider = provider;
 		}
 
 		public object GetValue( DefaultValueParameter parameter )
 		{
 			var targetType = hostType ?? parameter.Metadata.PropertyType;
-			var type = locator( targetType ) ?? targetType;
-			var result = new SingletonLocator( propertyName ).Locate( type );
+			var type = locator()( targetType ) ?? targetType;
+			var result = provider.Get( type );
 			return result;
 		}
 	}

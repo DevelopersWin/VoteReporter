@@ -272,7 +272,7 @@ namespace DragonSpark.Setup
 		protected InstanceServiceProviderBase( params T[] instances ) : base( instances )
 		{
 			method = new GenericMethodFactories( this )[ nameof(GetService) ];
-			cache = new Cache<Type, object>( GetService );
+			cache = new Cache<Type, object>( GetServiceBody );
 		}
 
 		public object GetService( Type serviceType ) => cache.Get( serviceType );
@@ -340,7 +340,7 @@ namespace DragonSpark.Setup
 
 		public ServiceSource For( IDependencyLocatorKey locatorKey ) => Contains( locatorKey ) ? sources.Get( Get( locatorKey ) ) : null;
 
-		interface IServiceProviderStore : IStore<IServiceProvider>, IServiceProvider
+		interface IServiceProviderStore : IServiceProvider, IParameterizedSource<Type, object>
 		{
 			bool CanProvide( Type serviceType );
 		}
@@ -348,6 +348,7 @@ namespace DragonSpark.Setup
 		class ActivatedServiceProvider : FixedStore<IServiceProvider>, IServiceProviderStore
 		{
 			public static ICache<IServiceProvider, IServiceProviderStore> Stores { get; } = new Cache<IServiceProvider, IServiceProviderStore>( provider => new ActivatedServiceProvider( provider ) );
+			readonly static Func<IServiceProvider, IServiceProviderStore> Selector = Stores.Get;
 			ActivatedServiceProvider( IServiceProvider provider ) : base( provider ) {}
 
 			readonly IsActive active = new IsActive();
@@ -356,13 +357,21 @@ namespace DragonSpark.Setup
 			{
 				using ( active.Assignment( serviceType, true ) )
 				{
-					var stores = ServiceProviderRegistry.Instance.Get().List().Select( Stores.Get );
-					var result = stores.Introduce( serviceType, tuple => tuple.Item1.CanProvide( tuple.Item2 ), tuple => tuple.Item1.Value.GetService( tuple.Item2 ) ).FirstAssigned();
+					var stores = ServiceProviderRegistry.Instance.Get().List().Select( Selector );
+					var result = stores.Introduce( serviceType, tuple => tuple.Item1.CanProvide( tuple.Item2 ), tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 					return result;
 				}
 			}
-
+			
 			public bool CanProvide( Type serviceType ) => !active.Get( serviceType );
+
+			public object Get( Type serviceType )
+			{
+				using ( active.Assignment( serviceType, true ) )
+				{
+					return Value.GetService( serviceType );
+				}
+			}
 
 			class IsActive : StoreCache<Type, bool>
 			{

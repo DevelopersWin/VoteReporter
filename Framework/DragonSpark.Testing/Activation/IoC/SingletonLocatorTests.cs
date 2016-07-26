@@ -1,6 +1,8 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Stores;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -13,28 +15,28 @@ namespace DragonSpark.Testing.Activation.IoC
 		public void SingletonFromItem()
 		{
 			var sut = SingletonLocator.Instance;
-			Assert.Same( SingletonItem.Instance, sut.Locate( typeof(SingletonItem) ) );
+			Assert.Same( SingletonItem.Instance, sut.Get( typeof(SingletonItem) ) );
 		}
 
 		[Fact]
 		public void SingletonFromMetadata()
 		{
 			var sut = SingletonLocator.Instance;
-			Assert.Same( SingletonMetadata.AnotherNameFromDefault, sut.Locate( typeof(SingletonMetadata) ) );
+			Assert.Same( SingletonMetadata.AnotherNameFromDefault, sut.Get( typeof(SingletonMetadata) ) );
 		}
 
 		[Fact]
 		public void SingletonFromDifferentType()
 		{
 			var sut = SingletonLocator.Instance;
-			Assert.Null( sut.Locate( typeof(SingletonDifferentType) ) );
+			Assert.Null( sut.Get( typeof(SingletonDifferentType) ) );
 		}
 
 		[Fact]
 		public void SingletonFromOther()
 		{
-			var sut = new SingletonLocator( nameof(SingletonOther.Other) );
-			Assert.Same( SingletonOther.Other, sut.Locate( typeof(SingletonOther) ) );
+			var sut = new SingletonLocator( new SingletonDelegates( new SingletonSpecification( nameof(SingletonOther.Other) ) ).Get );
+			Assert.Same( SingletonOther.Other, sut.Get( typeof(SingletonOther) ) );
 		}
 
 		[Fact]
@@ -43,7 +45,15 @@ namespace DragonSpark.Testing.Activation.IoC
 			var nestedTypes = GetType().GetTypeInfo().DeclaredNestedTypes.AsTypes().ToArray();
 			var sut = SingletonLocator.Instance;
 			var type = new BuildableTypeFromConventionLocator( nestedTypes ).Create( typeof(ISingleton) ) ?? typeof(ISingleton);
-			Assert.Same( Singleton.Instance, sut.Locate( type ) );
+			Assert.Same( Singleton.Instance, sut.Get( type ) );
+		}
+
+		[Fact]
+		public void SingletonFromSource()
+		{
+			var item = SingletonLocator.Instance.Get( typeof(SourceSingleton) );
+			Assert.NotNull( item );
+			Assert.Same( item, SourceSingleton.Instance.Get() );
 		}
 
 		class SingletonItem
@@ -74,5 +84,10 @@ namespace DragonSpark.Testing.Activation.IoC
 
 		interface ISingleton
 		{}
+
+		class SourceSingleton
+		{
+			public static ISource<SourceSingleton> Instance { get; } = new FixedStore<SourceSingleton>( new SourceSingleton() );
+		}
 	}
 }

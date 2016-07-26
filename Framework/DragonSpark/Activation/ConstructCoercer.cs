@@ -2,22 +2,29 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	public class ParameterConstructor<T> : ParameterConstructor<object, T>
-	{
-		
-	}
+	public class ParameterConstructor<T> : ParameterConstructor<object, T> {}
 
-	public class ParameterConstructor<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
+	public class ParameterConstructor<TParameter, TResult> : IParameterizedSource<TParameter, TResult>
 	{
 		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cache { get; } = new Cache<ConstructorInfo, Func<TParameter, TResult>>( new Factory().Create );
 
-		public static Func<TParameter, TResult> Default { get; } = new ParameterConstructor<TParameter, TResult>().ToDelegate();
-		protected ParameterConstructor() : base( Make() ) {}
+		public static Func<TParameter, TResult> Default { get; } = new ParameterConstructor<TParameter, TResult>().Get;
+
+		readonly Func<TParameter, TResult> factory;
+
+		protected ParameterConstructor() : this( Make() ) {}
+
+		ParameterConstructor( Func<TParameter, TResult> factory )
+		{
+			this.factory = factory;
+		}
 
 		public static TResult From( TParameter parameter = default(TParameter) ) => Make( parameter?.GetType() )( parameter );
 
@@ -34,8 +41,22 @@ namespace DragonSpark.Activation
 
 		sealed class Factory : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
 		{
-			public Factory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, parameter.Parameter ) ) {}
+			public Factory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, CreateParameter( parameter ) ) ) {}
+
+			static IEnumerable<Expression> CreateParameter( ExpressionBodyParameter<ConstructorInfo> parameter )
+			{
+				var parameters = parameter.Input.GetParameters();
+				var type = parameters.First().ParameterType;
+				yield return parameter.Parameter.Type == type ? (Expression)parameter.Parameter : Expression.Convert( parameter.Parameter, type );
+
+				foreach ( var source in parameters.Skip( 1 ) )
+				{
+					yield return Expression.Constant( source.DefaultValue );
+				}
+			}
 		}
+
+		public TResult Get( TParameter parameter ) => factory( parameter );
 	}
 
 	/*class ParameterConstructor<T> : FactoryBase<object, T>

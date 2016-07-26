@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
