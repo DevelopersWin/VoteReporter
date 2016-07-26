@@ -140,12 +140,8 @@ namespace DragonSpark.Activation
 		public static SingletonDelegateCache Instance { get; } = new SingletonDelegateCache();
 		SingletonDelegateCache() {}
 
-		protected override Func<object> Create( PropertyInfo parameter )
-		{
-			var isSatisfiedBy = SourceTypeAssignableSpecification.Instance.IsSatisfiedBy( parameter.PropertyType );
-			var result = isSatisfiedBy ? parameter.GetMethod.CreateDelegate<Func<ISource>>().Invoke().Get : parameter.GetMethod.CreateDelegate<Func<object>>();
-			return result;
-		}
+		protected override Func<object> Create( PropertyInfo parameter ) => 
+			SourceTypeAssignableSpecification.Instance.IsSatisfiedBy( parameter.PropertyType ) ? parameter.GetMethod.CreateDelegate<Func<ISource>>().Invoke().Get : parameter.GetMethod.CreateDelegate<Func<object>>();
 	}
 
 	public class SingletonDelegates : SingletonDelegates<Func<object>>
@@ -194,10 +190,6 @@ namespace DragonSpark.Activation
 			this.provider = provider;
 		}
 
-		protected override object Create( Type parameter )
-		{
-			var func = provider( parameter );
-			return func?.Invoke();
-		}
+		protected override object Create( Type parameter ) => provider( parameter )?.Invoke();
 	}
 }

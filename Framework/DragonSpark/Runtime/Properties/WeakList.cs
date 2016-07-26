@@ -223,7 +223,7 @@ namespace DragonSpark.Runtime.Properties
 			items[size++] = new WeakReference<T>( item );
 		}
 
-		public void Clear() => items.ForEach( reference => reference.SetTarget( null ) );
+		public void Clear() => items.WhereAssigned().ForEach( reference => reference.SetTarget( null ) );
 		public bool Contains( T item ) => Items().Contains( item );
 
 		public void CopyTo( T[] array, int arrayIndex ) => Array.Copy( Items().ToArray(), arrayIndex, array, arrayIndex, array.Length );

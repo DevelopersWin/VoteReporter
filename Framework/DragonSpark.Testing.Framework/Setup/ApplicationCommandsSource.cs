@@ -49,9 +49,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			var serviceProvider = provider();
 			var compositionHost = serviceProvider.Get<CompositionHost>();
-			var temp = compositionHost.GetExport( typeof(ITransformer<IServiceProvider>) );
-
-
 			var result = compositionHost?.GetExports<ITransformer<IServiceProvider>>().ToImmutableArray() ?? Items<ITransformer<IServiceProvider>>.Immutable;
 			return result;
 		}
@@ -63,8 +60,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		[Export( typeof(ITransformer<IServiceProvider>) )]
 		public static Configure Instance { get; } = new Configure();
-
-		public Configure() {}
+		Configure() {}
 
 		public override IServiceProvider Get( IServiceProvider parameter ) => 
 			new CompositeServiceProvider( new SourceInstanceServiceProvider( FixtureContext.Instance, MethodContext.Instance ), new FixtureServiceProvider( FixtureContext.Instance.Value ), parameter );

@@ -516,7 +516,7 @@ namespace DragonSpark.Setup
 
 	public class ApplySetup : ApplyExportedCommandsCommand<ISetup> {}
 
-	public interface ISetup : ICommand<object>, IDisposable {}
+	public interface ISetup : ICommand<object>, IDisposable, IPriorityAware {}
 
 	[ApplyAutoValidation]
 	public class Setup : CompositeCommand, ISetup
@@ -526,5 +526,7 @@ namespace DragonSpark.Setup
 		public Setup( params ICommand[] commands ) : base( new OnlyOnceSpecification(), commands ) {}
 
 		public DeclarativeCollection<object> Items { get; } = new DeclarativeCollection<object>();
+
+		public Priority Priority { get; set; } = Priority.Normal;
 	}
 }

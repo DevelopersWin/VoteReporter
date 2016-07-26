@@ -102,6 +102,7 @@ namespace DragonSpark.Composition
 				.WithInstance( Activation.Activator.Instance.Get() )
 				// .WithParts( core, ConventionBuilder )
 				.WithParts( types, AttributeProvider.Instance )
+				.WithProvider( new SingletonExportDescriptorProvider( types ) )
 				.WithProvider( new FactoryDelegateExportDescriptorProvider() )
 				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider() )
 				.WithProvider( new FactoryExportDescriptorProvider() )
