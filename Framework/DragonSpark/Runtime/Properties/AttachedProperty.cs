@@ -275,6 +275,12 @@ namespace DragonSpark.Runtime.Properties
 		public ConfigurableCache( IParameterizedConfiguration<object, T> configuration, ICache<object, T> cache ) : base( configuration, cache ) {}
 	}
 
+	public abstract class FactoryCache<T> : FactoryCache<object, T>, IConfigurableCache<T>
+	{
+		protected FactoryCache() {}
+		protected FactoryCache( IParameterizedConfiguration<object, T> configuration ) : base( configuration ) {}
+	}
+
 	public abstract class FactoryCache<TInstance, TValue> : ConfigurableCache<TInstance, TValue>
 	{
 		protected FactoryCache() : this( new ConfigurableStore<TInstance, TValue>( instance => default(TValue) ) ) {}

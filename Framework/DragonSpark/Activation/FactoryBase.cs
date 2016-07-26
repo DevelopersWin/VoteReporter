@@ -367,6 +367,7 @@ namespace DragonSpark.Activation
 
 	public abstract class AggregateFactoryBase<T> : AggregateFactoryBase<T, T>, IConfigurableFactory<T> where T : class
 	{
+		protected AggregateFactoryBase( Func<T> seed ) : this( seed, Items<ITransformer<T>>.Default ) {}
 		protected AggregateFactoryBase( Func<T> seed, params ITransformer<T>[] configurations ) : this( seed, new Configurations<T>( configurations ), Delegates<T>.Self ) {}
 		protected AggregateFactoryBase( Func<T> seed, IConfigurations<T> configurations, Func<T, T> factory ) : base( seed, configurations, factory ) {}
 		protected AggregateFactoryBase( IConfiguration<T> seed, IConfigurations<T> configurations, Func<T, T> factory ) : base( seed, configurations, factory ) {}

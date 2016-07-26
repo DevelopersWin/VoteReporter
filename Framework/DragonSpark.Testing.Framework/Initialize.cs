@@ -126,35 +126,14 @@ namespace DragonSpark.Testing.Framework
 		MethodContext() {}
 	}
 
-	/*public class LoadPartsCommand : DisposingCommand<Assembly>
-	{
-		public static LoadPartsCommand Instance { get; } = new LoadPartsCommand();
-		LoadPartsCommand() : this( AssemblyPartLocator.Instance.Create ) {}
-
-		readonly Func<Assembly, ImmutableArray<Assembly>> source;
-
-		public LoadPartsCommand( Func<Assembly, ImmutableArray<Assembly>> source )
-		{
-			this.source = source;
-		}
-
-		public override void Execute( Assembly parameter ) => LoadCommand( parameter ).Run();
-
-		CompositeCommand LoadCommand( Assembly parameter )
-		{
-			var parts = source( parameter ).ToArray();
-			var commands = new ContainerConfiguration().WithAssemblies( parts ).CreateContainer().GetExports<IInitializationCommand>().Fixed();
-			var result = new CompositeCommand( commands );
-			this.AssociateForDispose( result );
-			return result;
-		}
-	}*/
-
 	[Export( typeof(ISetup) )]
 	public class TestingApplicationInitializationCommand : DragonSpark.Setup.Setup
 	{
-		public TestingApplicationInitializationCommand() 
-			: base( Windows.InitializationCommand.Instance, new DisposeDisposableCommand( ExecutionContextStore.Instance.Value )/*, LoadPartsCommand.Instance.Fixed( MethodContext.Instance.Get().DeclaringType.Assembly )*/ ) {}
+		public TestingApplicationInitializationCommand()
+			: base( Windows.InitializationCommand.Instance, new DisposeDisposableCommand( ExecutionContextStore.Instance.Value ) )
+		{
+			Priority = Priority.High;
+		}
 	}
 
 	// class WindowsTestingApplicationInitializationCommand {}

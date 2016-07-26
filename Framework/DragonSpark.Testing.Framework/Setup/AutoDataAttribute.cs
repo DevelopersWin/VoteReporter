@@ -15,9 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
-using System.Windows.Input;
 using Xunit.Sdk;
-using ApplicationCommands = DragonSpark.Setup.ApplicationCommands;
 using AssemblyPartLocator = DragonSpark.Windows.TypeSystem.AssemblyPartLocator;
 
 namespace DragonSpark.Testing.Framework.Setup
@@ -48,30 +46,21 @@ namespace DragonSpark.Testing.Framework.Setup
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance[]>( info => new AspectInstance( info, ExecuteMethodAspect.Instance ).ToItem() );
 	}
 
-	public sealed class ApplicationFactory : FactoryBase<MethodBase, IApplication>
+	public sealed class ApplicationFactory : ConfiguringFactory<MethodBase, IApplication>
 	{
 		public static ApplicationFactory Instance { get; } = new ApplicationFactory();
-		ApplicationFactory() : this( ApplicationCommandsSource.Instance.Get ) {}
+		ApplicationFactory() : base( n => ApplicationConfiguration.Instance.Get(), MethodContext.Instance.Assign ) {}
+	}
 
-		readonly Func<ImmutableArray<ICommand>> commandSource;
-
-		public ApplicationFactory( Func<ImmutableArray<ICommand>> commandSource )
-		{
-			this.commandSource = commandSource;
-		}
-
-		public override IApplication Create( MethodBase parameter )
-		{
-			MethodContext.Instance.Assign( parameter );
-			ApplicationCommands.Instance.Assign( commandSource() );
-			var result = ApplicationServices.Instance.Create<Application>();
-			return result;
-		}
+	public sealed class ApplicationConfiguration : Configuration<IApplication>
+	{
+		public static ApplicationConfiguration Instance { get; } = new ApplicationConfiguration();
+		ApplicationConfiguration() : base( () => ApplicationFactory<Application>.Instance.Create( MethodTypes.Instance, ApplicationCommandsSource.Instance ) ) {}
 	}
 
 	public class FrameworkTypesAttribute : TypeProviderAttributeBase
 	{
-		public FrameworkTypesAttribute() : base( typeof(TestingApplicationInitializationCommand), typeof(Configure) ) {}
+		public FrameworkTypesAttribute() : base( typeof(TestingApplicationInitializationCommand), typeof(Configure), typeof(MetadataCommand) ) {}
 	}
 
 	public sealed class FixtureContext : Configuration<IFixture>

@@ -8,8 +8,10 @@ using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
+
 	public sealed class ServiceProviderFactory : TransformerBase<IServiceProvider>
 	{
+		[Export( typeof(ITransformer<IServiceProvider>) )]
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() {}
 
@@ -17,10 +19,23 @@ namespace DragonSpark.Composition
 		{
 			var context = CompositionHostFactory.Instance.Create();
 			var primary = new ServiceLocator( context );
+			Exports.Instance.Assign( new ExportProvider( context ) );
 			RegisterServiceProviderCommand.Instance.Execute( primary );
+			
 			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, parameter );
 			return result;
 		}
+	}
+
+	public class ExportProvider : IExportProvider
+	{
+		readonly CompositionContext context;
+		public ExportProvider( CompositionContext context )
+		{
+			this.context = context;
+		}
+
+		public IEnumerable<T> GetExports<T>() => context.GetExports<T>();
 	}
 
 	public sealed class ServiceLocator : ServiceLocatorImplBase

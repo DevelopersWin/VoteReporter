@@ -22,6 +22,7 @@ namespace DragonSpark.Testing.Diagnostics
 		{
 			var logger = context.GetExport<ILogger>();
 			
+			Assert.Same( Logging.Instance.Get( Execution.Current() ), DefaultServiceProvider.Instance.Get<ILogger>() );
 			Assert.Same( DefaultServiceProvider.Instance.Get<ILogger>(), logger );
 
 			var method = new Action( AnotherMethod ).Method;

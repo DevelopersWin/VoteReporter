@@ -58,7 +58,7 @@ namespace DragonSpark.Activation.IoC
 	public sealed class UnityContainerFactory : AggregateFactoryBase<IUnityContainer>
 	{
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-		UnityContainerFactory() : base( () => new UnityContainer().Extend<DefaultBehaviorExtension>(), DefaultUnityExtensions.Instance ) {}
+		UnityContainerFactory() : base( () => new UnityContainer().Extend<DefaultBehaviorExtension>() ) {}
 
 		[Creator]
 		public override IUnityContainer Create() => base.Create();

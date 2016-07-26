@@ -2,10 +2,12 @@
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.Setup;
 using DragonSpark.Setup.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Windows.Input;
 
 namespace DragonSpark.Configuration
@@ -160,6 +162,8 @@ namespace DragonSpark.Configuration
 		public Configurator() {}
 		public Configurator( IEnumerable<ITransformer<T>> items ) : base( items ) {}
 		public Configurator( params ITransformer<T>[] items ) : base( items ) {}
+
+		protected override IEnumerable<ITransformer<T>> Yield() => base.Yield().Concat( Exports.Instance.Value.GetExports<ITransformer<T>>() );
 	}
 
 	public abstract class ConfiguratorsBase<TParameter, TConfiguration> : FactoryBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>

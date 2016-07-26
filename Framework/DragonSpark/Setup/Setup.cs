@@ -183,10 +183,35 @@ namespace DragonSpark.Setup
 		public Func<ImmutableArray<ITransformer<T>>> configurations { get; }
 	}*/
 
+	public interface IExportProvider
+	{
+		IEnumerable<T> GetExports<T>();
+	}
+
+	public class Exports : Configuration<IExportProvider>
+	{
+		public static Exports Instance { get; } = new Exports();
+		Exports() : base( () => ExportProvider.Instance ) {}
+	}
+
+	class ExportProvider : IExportProvider
+	{
+		public static ExportProvider Instance { get; } = new ExportProvider();
+		ExportProvider() {}
+
+		public IEnumerable<T> GetExports<T>()
+		{
+			yield break;
+		}
+	}
+
+	public interface ICommandSource : ISource<ImmutableArray<ICommand>> {}
+	public interface ITypeSource : ISource<ImmutableArray<Type>> {}
+
 	public sealed class ServiceProviderFactory : AggregateFactoryBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
-		ServiceProviderFactory() : base( () => DefaultServiceProvider.Instance, Composition.ServiceProviderFactory.Instance ) {}
+		ServiceProviderFactory() : base( () => DefaultServiceProvider.Instance ) {}
 	}
 
 	/*public class ServiceProviderConfigurator : Configurator<IServiceProvider>
@@ -449,12 +474,92 @@ namespace DragonSpark.Setup
 		public static ApplicationServices Instance { get; } = new ApplicationServices();
 		ApplicationServices() {}
 
-		public T Create<T>() where T : class, IApplication, new()
+		public T Create<T>( ImmutableArray<ICommand> commands ) where T : class, IApplication, new()
 		{
+			ApplicationCommands.Instance.Assign( commands );
+
 			var result = new T();
 			Assign( result );
 			return result;
 		}
+	}
+
+	public class ApplicationFactory<T> : ConfiguringFactory<ImmutableArray<ICommand>, IApplication> where T : IApplication, new()
+	{
+		public static ApplicationFactory<T> Instance { get; } = new ApplicationFactory<T>();
+		ApplicationFactory() : this( array => new T() ) {}
+
+		public ApplicationFactory( Func<ImmutableArray<ICommand>, IApplication> factory ) : this( factory, ApplicationCommands.Instance.Assign ) {}
+		public ApplicationFactory( Func<ImmutableArray<ICommand>, IApplication> factory, Action<ImmutableArray<ICommand>> initialize ) : this( factory, initialize, ApplicationServices.Instance.Assign ) {}
+		public ApplicationFactory( Func<ImmutableArray<ICommand>, IApplication> factory, Action<ImmutableArray<ICommand>> initialize, Action<IApplication> configure ) : base( factory, initialize, configure ) {}
+
+		public T Create() => (T)Create( Items<ICommand>.Immutable );
+
+		public T Create( ITypeSource types ) => Create( types, Items<ICommand>.Default );
+
+		public T Create( ITypeSource types, params ICommandSource[] sources ) => Create( types, sources.Select( source => source.Get() ).Concat().ToImmutableArray() );
+
+		public T Create( ITypeSource types, params ICommand[] commands ) => Create( types, commands.ToImmutableArray() );
+		
+		public T Create( ITypeSource types, ImmutableArray<ICommand> commands ) => (T)Create( commands.Insert( 0, new ApplySystemPartsConfiguration( types ) ) );
+	}
+
+	public sealed class ConfigureSeedingServiceProvider : ApplyDelegateConfigurationCommand<IServiceProvider>
+	{
+		public ConfigureSeedingServiceProvider( Func<IServiceProvider> provider ) : base( provider, ServiceProviderFactory.Instance.Seed ) {}
+	}
+
+	public abstract class CommandsSource : ItemsStoreBase<ICommand>, ICommandSource
+	{
+		protected CommandsSource( params ICommandSource[] sources ) : this( sources.Select( source => source.Get() ).Concat() ) {}
+
+		protected CommandsSource( IEnumerable<ICommand> items ) : base( items ) {}
+		protected CommandsSource() {}
+		protected CommandsSource( params ICommand[] items ) : base( items ) {}
+	}
+
+	public class ServiceProviderConfigurations : CommandsSource
+	{
+		public static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
+		protected ServiceProviderConfigurations() {}
+
+		protected override IEnumerable<ICommand> Yield()
+		{
+			yield return new ConfigureSeedingServiceProvider( GetProvider );
+			yield return GlobalServiceProvider.Instance.From( ServiceProviderFactory.Instance );
+		}
+
+		protected virtual IServiceProvider GetProvider() => ServiceProviderFactory.Instance.Seed.Get();
+	}
+
+	public class ApplicationCommandsSource : CommandsSource
+	{
+		public ApplicationCommandsSource() : this( ServiceProviderConfigurations.Instance ) {}
+		public ApplicationCommandsSource( params ICommandSource[] sources ) : base( sources ) {}
+		public ApplicationCommandsSource( IEnumerable<ICommand> items ) : base( items ) {}
+		public ApplicationCommandsSource( params ICommand[] items ) : base( items ) {}
+
+		protected override IEnumerable<ICommand> Yield()
+		{
+			foreach ( var command in base.Yield() )
+			{
+				yield return command;
+			}
+
+			yield return new ApplySetup();
+		}
+	}
+
+	public class ApplySystemPartsConfiguration : ApplyConfigurationCommand<SystemParts>
+	{
+		/*public ApplySystemPartsConfiguration( ImmutableArray<Assembly> assemblies ) : this( new SystemParts( assemblies ) ) {}
+		public ApplySystemPartsConfiguration( IEnumerable<Assembly> assemblies ) : this( assemblies.ToImmutableArray() ) {}
+		public ApplySystemPartsConfiguration( params Assembly[] assemblies ) : this( assemblies.ToImmutableArray() ) {}*/
+		public ApplySystemPartsConfiguration( ITypeSource types ) : this( new SystemParts( types.Get() ) ) {}
+		public ApplySystemPartsConfiguration( ImmutableArray<Type> types ) : this( new SystemParts( types ) ) {}
+		public ApplySystemPartsConfiguration( IEnumerable<Type> types ) : this( types.ToImmutableArray() ) {}
+		public ApplySystemPartsConfiguration( params Type[] types ) : this( types.ToImmutableArray() ) {}
+		public ApplySystemPartsConfiguration( SystemParts value ) : base( value, ApplicationParts.Instance ) {}
 	}
 
 	public sealed class ApplicationCommands : Configuration<ImmutableArray<ICommand>>
