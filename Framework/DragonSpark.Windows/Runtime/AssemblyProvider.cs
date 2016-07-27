@@ -1,12 +1,10 @@
-using DragonSpark.Activation;
 using DragonSpark.TypeSystem;
-using System.Linq;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class AssemblyProvider : AggregateAssemblyFactory
+	public class AssemblyProvider : AssemblySourceBase
 	{
 		public static AssemblyProvider Instance { get; } = new AssemblyProvider();
-		AssemblyProvider() : base( FileSystemAssemblySource.Instance.Create().ToArray().Self, ApplicationAssemblyFilter.Instance.Get ) {}
+		AssemblyProvider() : base( ApplicationAssemblyFilter.Instance.Get( FileSystemAssemblySource.Instance.Get() ) ) {}
 	}
 }

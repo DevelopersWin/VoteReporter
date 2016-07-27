@@ -409,18 +409,13 @@ namespace DragonSpark.Setup
 
 	public interface IApplication<in T> : ICommand<T>, IApplication {}
 
-	public interface IApplication : ICommand, IDisposable
-	{
-		/*SystemParts Parts { get; }
-
-		IServiceProvider Services { get; }*/
-	}
+	public interface IApplication : ICommand, IDisposable {}
 
 	public struct SystemParts
 	{
 		public static SystemParts Default { get; } = new SystemParts( ImmutableArray<Assembly>.Empty );
 
-		public SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Instance.Create( assemblies.ToArray() ) ) {}
+		public SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Instance.Get( assemblies ) ) {}
 
 		public SystemParts( ImmutableArray<Type> types ) : this( types.Assemblies(), types ) {}
 

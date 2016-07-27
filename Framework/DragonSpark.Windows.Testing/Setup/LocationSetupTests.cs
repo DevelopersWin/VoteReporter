@@ -23,7 +23,6 @@ using Xunit;
 using Xunit.Abstractions;
 using Activator = DragonSpark.Activation.Activator;
 using ApplicationAssemblyLocator = DragonSpark.TypeSystem.ApplicationAssemblyLocator;
-using AssemblyProvider = DragonSpark.Testing.Objects.AssemblyProvider;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 using Locator = DragonSpark.Windows.Testing.TestObjects.Locator;
 using Object = DragonSpark.Testing.Objects.Object;
@@ -356,8 +355,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotSame( once, twice );
 		}
 
-		[AssemblyProvider.Register]
-		[Theory, LocationSetup.AutoData]
+		[Theory, LocationSetup.AutoData, AdditionalTypes( typeof(YetAnotherClass) )]
 		public void Factory( AllTypesOfFactory sut )
 		{
 			var items = sut.Create<IInterface>();
@@ -381,14 +379,14 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void CreateAssemblies( IUnityContainer container, IAssemblyProvider provider, [DragonSpark.Testing.Framework.Parameters.Service]Assembly[] sut )
+		public void CreateAssemblies( IUnityContainer container, ITypeSource provider, [DragonSpark.Testing.Framework.Parameters.Service]Assembly[] sut )
 		{
 			var registered = container.IsRegistered<Assembly[]>();
 			Assert.True( registered );
 
 			var fromContainer = container.Resolve<Assembly[]>();
-			var fromProvider = provider.Create();
-			Assert.Equal( fromContainer, fromProvider );
+			var fromProvider = provider.Get();
+			Assert.Equal( fromContainer, fromProvider.Assemblies() );
 
 			Assert.Equal( fromContainer, sut );
 		}

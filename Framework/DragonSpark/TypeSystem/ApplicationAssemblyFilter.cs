@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using PostSharp.Aspects.Internals;
@@ -16,20 +15,16 @@ namespace DragonSpark.TypeSystem
 {
 	public class ApplicationAssemblyFilter : TransformerBase<IEnumerable<Assembly>>
 	{
-		static string[] Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.WhereAssigned().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToArray();
+		readonly Func<Assembly, bool> specification;
 
-		readonly ISpecification<Assembly> specification;
+		public ApplicationAssemblyFilter( params Assembly[] assemblies ) : this( new ApplicationAssemblySpecification( assemblies ).IsSatisfiedBy ) {}
 
-		public ApplicationAssemblyFilter( params Assembly[] coreAssemblies ) : this( Determine( coreAssemblies ) ) {}
-
-		public ApplicationAssemblyFilter( string[] namespaces ) : this( new ApplicationAssemblySpecification( namespaces ) ) {}
-
-		public ApplicationAssemblyFilter( ISpecification<Assembly> specification )
+		ApplicationAssemblyFilter( Func<Assembly, bool> specification )
 		{
 			this.specification = specification;
 		}
 
-		public override IEnumerable<Assembly> Get( IEnumerable<Assembly> parameter ) => parameter.Where( specification.ToDelegate() ).Prioritize();
+		public override IEnumerable<Assembly> Get( IEnumerable<Assembly> parameter ) => parameter.Where( specification );
 	}
 
 	public class ApplicationTypeSpecification : GuardedSpecificationBase<Type>
@@ -42,14 +37,16 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationAssemblySpecification : GuardedSpecificationBase<Assembly>
 	{
-		// public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification( Items<string>.Default );
-
 		readonly ImmutableArray<string> rootNamespaces;
 
-		public ApplicationAssemblySpecification( params string[] rootNamespaces )
+		public ApplicationAssemblySpecification( IEnumerable<Assembly> assemblies ) : this( Determine( assemblies ) ) {}
+
+		ApplicationAssemblySpecification( ImmutableArray<string> rootNamespaces )
 		{
-			this.rootNamespaces = rootNamespaces.ToImmutableArray();
+			this.rootNamespaces = rootNamespaces;
 		}
+
+		static ImmutableArray<string> Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.WhereAssigned().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToImmutableArray();
 
 		public override bool IsSatisfiedBy( Assembly parameter ) => parameter.Has<RegistrationAttribute>() || rootNamespaces.Any( parameter.GetName().Name.StartsWith );
 	}

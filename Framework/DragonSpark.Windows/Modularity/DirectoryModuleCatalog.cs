@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Modularity
 	{
 		readonly IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory;
 
-		public DirectoryModuleCatalog() : this( AssemblyProvider.Instance.Create(), ModuleInfoBuilder.Instance, LoadRemoteModuleInfoFactory.Instance ) {}
+		public DirectoryModuleCatalog() : this( AssemblyProvider.Instance.Value.Assemblies(), ModuleInfoBuilder.Instance, LoadRemoteModuleInfoFactory.Instance ) {}
 
 		public DirectoryModuleCatalog( ImmutableArray<Assembly> assemblies, IModuleInfoBuilder builder, IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory ) : base( assemblies, builder )
 		{

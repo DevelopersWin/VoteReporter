@@ -24,7 +24,7 @@ namespace DragonSpark.Windows.TypeSystem
 		public static AssemblyPartLocator Instance { get; } = new AssemblyPartLocator();
 		AssemblyPartLocator() : base( AssemblyPathLoader.Instance.Create ) {}
 
-		public static ICache<Assembly, ImmutableArray<Type>> All { get; } = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => Instance.Create( assembly ).Select( AssemblyTypes.All.Get ).Concat().ToImmutableArray() );
-		public static ICache<Assembly, ImmutableArray<Type>> Public { get; } = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => Instance.Create( assembly ).Select( AssemblyTypes.Public.Get ).Concat().ToImmutableArray() );
+		public static ICache<Assembly, ImmutableArray<Type>> All { get; } = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => Instance.Create( assembly ).Select( a => AssemblyTypes.All.Get( a ) ).Concat().ToImmutableArray() );
+		public static ICache<Assembly, ImmutableArray<Type>> Public { get; } = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => Instance.Create( assembly ).Select( a => AssemblyTypes.Public.Get( a ) ).Concat().ToImmutableArray() );
 	}
 }

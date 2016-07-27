@@ -1,4 +1,5 @@
-using DragonSpark.TypeSystem;
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Stores;
 using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,19 +7,16 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class FileSystemAssemblySource : AssemblySourceBase
+	public class FileSystemAssemblySource : DeferredStore<IEnumerable<Assembly>>
 	{
-		public static FileSystemAssemblySource Instance { get; } = new FileSystemAssemblySource();
-		FileSystemAssemblySource() : base( Create() ) {}
+		public static ISource<IEnumerable<Assembly>> Instance { get; } = new FileSystemAssemblySource();
+		FileSystemAssemblySource() : base( Create ) {}
 
-		new static IEnumerable<Assembly> Create()
-		{
-			var types = AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true );
-			var result = types
-				.Where( x => x.Namespace != null )
-				.GroupBy( t => t.Assembly )
-				.Select( g => g.Key );
-			return result;
-		}
+		static IEnumerable<Assembly> Create() =>
+			AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true )
+					  .Where( x => x.Namespace != null )
+					  .GroupBy( t => t.Assembly )
+					  .Select( g => g.Key )
+					  .ToArray();
 	}
 }

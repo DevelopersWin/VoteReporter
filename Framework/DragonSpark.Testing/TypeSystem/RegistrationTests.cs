@@ -3,6 +3,7 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -23,7 +24,7 @@ namespace DragonSpark.Testing.TypeSystem
 
 		class AssemblySource : AssemblySourceBase
 		{
-			readonly internal static ImmutableArray<Assembly> Result = EnumerableEx.Return( typeof(AssemblySource).Assembly ).ToImmutableArray();
+			readonly internal static IEnumerable<Assembly> Result = EnumerableEx.Return( typeof(AssemblySource).Assembly );
 
 			public AssemblySource() : base( Result ) {}
 		}

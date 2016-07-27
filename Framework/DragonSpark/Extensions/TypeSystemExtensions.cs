@@ -12,7 +12,7 @@ namespace DragonSpark.Extensions
 {
 	public static class TypeSystemExtensions
 	{
-		readonly static Func<Assembly, Type[]> CollectionSelector = AssemblyTypes.Public.ToDelegate();
+		readonly static Func<Assembly, IEnumerable<Type>> CollectionSelector = AssemblyTypes.Public.ToDelegate();
 
 		public static ValueTuple<TAttribute, Type>[] GetAllTypesWith<TAttribute>( this IEnumerable<Assembly> target ) where TAttribute : Attribute
 			=> target.SelectMany( CollectionSelector ).WhereDecorated<TAttribute>();

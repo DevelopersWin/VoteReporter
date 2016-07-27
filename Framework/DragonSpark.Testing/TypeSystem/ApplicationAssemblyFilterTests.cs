@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Moq;
 using System.Collections.Immutable;
@@ -13,32 +13,33 @@ namespace DragonSpark.Testing.TypeSystem
 	public class ApplicationAssemblyFilterTests
 	{
 		[Theory, Framework.Setup.AutoData]
-		public void Basic( Mock<IAssemblyProvider> provider, ApplicationAssemblyFilter sut )
+		public void Basic( Mock<ITypeSource> provider, ApplicationAssemblyFilter sut )
 		{
-			provider.Setup( p => p.Create() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.ToImmutableArray().Assemblies() );
+			provider.Setup( p => p.Get() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.ToImmutableArray() );
 
-			var assemblies = sut.Get( provider.Object.Create() );
+			var enumerable = provider.Object.Get().Assemblies();
+			var assemblies = sut.Get( enumerable );
 			
-			provider.Verify( assemblyProvider => assemblyProvider.Create() );
-			Assert.NotEqual( assemblies, provider.Object.Create() );
+			provider.Verify( assemblyProvider => assemblyProvider.Get() );
+			Assert.NotEqual( assemblies, enumerable );
 		}
 
-		[AssemblyProvider.Register]
+		/*[AssemblyProvider.Register]
 		[Theory, Framework.Setup.AutoData]
-		public void DefaultProvider( IAssemblyProvider sut )
+		public void DefaultProvider( ITypeSource sut )
 		{
 			Assert.NotNull( sut );
 			Assert.Same( AssemblyProvider.Instance, sut );
-		}
+		}*/
 
 		[Theory, Framework.Setup.AutoData, DeclaredAssemblyProvider.Register]
-		public void DeclaredProvider( IAssemblyProvider sut )
+		public void DeclaredProvider( ITypeSource sut )
 		{
 			Assert.NotNull( sut );
 			Assert.Same( DeclaredAssemblyProvider.Instance, sut );
 		}
 
-		class DeclaredAssemblyProvider : AssemblyProviderBase
+		class DeclaredAssemblyProvider : AssemblySourceBase
 		{
 			public static DeclaredAssemblyProvider Instance { get; } = new DeclaredAssemblyProvider();
 

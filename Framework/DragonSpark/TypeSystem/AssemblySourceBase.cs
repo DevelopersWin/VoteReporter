@@ -1,8 +1,9 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
+using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -125,13 +126,13 @@ namespace DragonSpark.TypeSystem
 		public Type ResultType { get; }
 	}
 
-	public class AssembliesFactory : FactoryBase<IEnumerable<Type>, ImmutableArray<Assembly>>
+	/*public class AssembliesFactory : FactoryBase<IEnumerable<Type>, ImmutableArray<Assembly>>
 	{
 		public static AssembliesFactory Instance { get; } = new AssembliesFactory();
 
 		[Freeze]
 		public override ImmutableArray<Assembly> Create( IEnumerable<Type> parameter ) => parameter.ToImmutableArray().Assemblies();
-	}
+	}*/
 
 	public static class AssemblyTypes
 	{
@@ -140,55 +141,38 @@ namespace DragonSpark.TypeSystem
 		public static AssemblyTypesStore Public { get; } = new AssemblyTypesStore( assembly => assembly.ExportedTypes );
 	}
 
-	public class AssemblyTypesStore : Cache<Assembly, Type[]>
+	public class AssemblyTypesStore : FactoryCache<Assembly, IEnumerable<Type>>
 	{
-		public AssemblyTypesStore( Func<Assembly, IEnumerable<Type>> types ) : base( new Factory( types ).Create ) {}
+		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToDelegate();
 
-		sealed class Factory : FactoryBase<Assembly, Type[]>
+		readonly Func<Assembly, IEnumerable<Type>> types;
+		public AssemblyTypesStore( Func<Assembly, IEnumerable<Type>> types )
 		{
-			readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToDelegate();
-
-			readonly Func<Assembly, IEnumerable<Type>> types;
-
-			public Factory( Func<Assembly, IEnumerable<Type>> types )
-			{
-				this.types = types;
-			}
-
-			public override Type[] Create( Assembly parameter ) => types( parameter ).Where( Specification ).Fixed();
+			this.types = types;
 		}
+
+		protected override IEnumerable<Type> Create( Assembly parameter ) => types( parameter ).Where( Specification ).ToArray().AsEnumerable();
 	}
 
-	public class TypesFactory : FactoryBase<IEnumerable<Assembly>, ImmutableArray<Type>>
+	public class TypesFactory : ArgumentCache<ImmutableArray<Assembly>, ImmutableArray<Type>>
 	{
-		readonly static Func<Assembly, Type[]> All = AssemblyTypes.All.ToDelegate();
+		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
+
 		public static TypesFactory Instance { get; } = new TypesFactory();
 
-		[Freeze]
-		public override ImmutableArray<Type> Create( IEnumerable<Assembly> parameter ) => parameter.SelectMany( All ).ToImmutableArray();
+		public TypesFactory() : base( array => array.ToArray().SelectMany( All ).ToImmutableArray() ) {}
 	}
 
-	/*public abstract class AssemblySourceBase : DeferredStore<Assembly[]>
+	public abstract class AssemblySourceBase : DeferredStore<ImmutableArray<Type>>, ITypeSource
 	{
-		protected AssemblySourceBase( Func<Assembly[]> item ) : base( item ) {}
-	}*/
+		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
 
-	public abstract class AssemblySourceBase : FixedFactory<ImmutableArray<Assembly>>
-	{
-		protected AssemblySourceBase( IEnumerable<Assembly> item ) : base( item.ToImmutableArray() ) {}
-	}
+		protected AssemblySourceBase( params Type[] types ) : this( types, Items<Assembly>.Default ) {}
 
-	public abstract class AssemblyProviderBase : AssemblySourceBase, IAssemblyProvider
-	{
-		protected AssemblyProviderBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( AssembliesFactory.Instance.Create( types ).ToArray().Union( assemblies ) ) {}
+		protected AssemblySourceBase( IEnumerable<Type> types, params Assembly[] assemblies ) : this( types.ToImmutableArray().Assemblies().Union( assemblies ) ) {}
 
-		protected AssemblyProviderBase( params Type[] types ) : this( AssembliesFactory.Instance.Create( types ).ToArray() ) {}
+		protected AssemblySourceBase( IEnumerable<Assembly> assemblies ) : this( assemblies.Distinct().Prioritize().SelectMany( All ).ToImmutableArray ) {}
 
-		AssemblyProviderBase( IEnumerable<Assembly> assemblies ) : base( assemblies.WhereAssigned().Distinct().Prioritize() ) {}
-	}
-
-	public class AggregateAssemblyFactory : AssemblySourceBase, IAssemblyProvider
-	{
-		public AggregateAssemblyFactory( Func<IEnumerable<Assembly>> primary, params Func<IEnumerable<Assembly>, IEnumerable<Assembly>>[] transformers ) : base( transformers.Aggregate( primary(), ( assemblies, func ) => func( assemblies ) ) ) {}
+		protected AssemblySourceBase( Func<ImmutableArray<Type>> factory ) : base( factory ) {}
 	}
 }

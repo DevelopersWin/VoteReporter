@@ -3,7 +3,6 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Xunit2;
 using System;
-using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -87,7 +86,7 @@ namespace DragonSpark.Testing.Aspects
 			[Freeze]
 			public int Cached => ++Count;
 
-			public Source() : base( Items<Assembly>.Default ) {}
+			public Source() : base( Items<Type>.Default ) {}
 		}
 
 		[Theory, AutoData]

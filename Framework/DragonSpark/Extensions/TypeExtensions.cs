@@ -11,6 +11,8 @@ namespace DragonSpark.Extensions
 {
 	public static class ImmutableArrayExtensions
 	{
+		public static IEnumerable<TSource> Union<TSource>( this ImmutableArray<TSource> first, IEnumerable<TSource> second ) => first.ToArray().Union( second );
+
 		public static IEnumerable<T> Concat<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Concat( second );
 
 		public static IEnumerable<T> Concat<T>( this IEnumerable<ImmutableArray<T>> sources ) => sources.Select( array => array.ToArray() ).Concat();

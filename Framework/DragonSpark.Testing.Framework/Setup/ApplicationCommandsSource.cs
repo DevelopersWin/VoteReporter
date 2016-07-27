@@ -51,11 +51,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	/*public sealed class ConfigureServiceProviderConfigurations : ApplyDelegateConfigurationCommand<ImmutableArray<ITransformer<IServiceProvider>>>
-	{
-		public ConfigureServiceProviderConfigurations( Func<ImmutableArray<ITransformer<IServiceProvider>>> factory ) : base( factory, ServiceProviderFactory.Instance.Configurations ) {}
-	}*/
-
 	sealed class MethodTypes : FactoryCache<ImmutableArray<Type>>, ITypeSource
 	{
 		readonly static Func<object, ImmutableArray<Func<MethodBase, ImmutableArray<Type>>>> Creator = HostedValueLocator<Func<MethodBase, ImmutableArray<Type>>>.Instance.Create;
