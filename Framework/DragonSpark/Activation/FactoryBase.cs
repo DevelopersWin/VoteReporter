@@ -424,7 +424,7 @@ namespace DragonSpark.Activation
 		public TResult Create( TParameter parameter ) => item();
 	}
 
-	public class FixedFactory<T> : IFactory<T>
+	/*public class FixedFactory<T> : IFactory<T>
 	{
 		readonly T instance;
 
@@ -436,7 +436,7 @@ namespace DragonSpark.Activation
 		public T Create() => instance;
 
 		object IFactory.Create() => Create();
-	}
+	}*/
 
 	public class Creator : Cache<ICreator>
 	{

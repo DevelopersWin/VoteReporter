@@ -1,42 +1,26 @@
-using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Composition;
-using System.Linq;
-using System.Reflection;
-using Type = System.Type;
-
 namespace DragonSpark.Setup.Registration
 {
-	[Persistent]
-	public class IgnorableTypesLocator : FixedFactory<ImmutableArray<Type>>
+	/*[Persistent]
+	public class IgnorableTypes : DeferredStore<ImmutableArray<Type>>
 	{
-		public IgnorableTypesLocator( Assembly[] assemblies ) : 
-			base( assemblies.ToArray().SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToImmutableArray() ) {}
+		public IgnorableTypes( ImmutableArray<Assembly> assemblies ) : 
+			base( assemblies.ToArray().SelectMany( assembly => assembly.From<RegistrationAttribute, IEnumerable<Type>>( attribute => attribute.IgnoreForRegistration ) ).ToImmutableArray ) {}
 	}
 
-	public class ConventionTypesFactory : FixedFactory<ImmutableArray<Type>>
+	[Persistent]
+	public class ConventionTypes : DeferredStore<ImmutableArray<Type>>, ITypeSource
 	{
-		public ConventionTypesFactory( IgnorableTypesLocator ignorable, TypeInfo[] types ) : base( Create( ignorable, types ) ) {}
+		public ConventionTypes( IgnorableTypes ignorable, ImmutableArray<Type> types ) : base( Create( ignorable, types.AsEnumerable().AsTypeInfos() ).ToImmutableArray ) {}
 
-		static ImmutableArray<Type> Create( IgnorableTypesLocator ignorable, TypeInfo[] types )
+		static IEnumerable<Type> Create( IgnorableTypes ignorable, IEnumerable<TypeInfo> types )
 		{
 			var result = types
 						.Where( info => !info.IsAbstract && ( !info.IsNested || info.IsNestedPublic ) )
 						.AsTypes()
-						.Except( ignorable.Create().ToArray() )
+						.Except( ignorable.Get().AsEnumerable() )
 						.Prioritize()
-						.ToImmutableArray();
+						;
 			return result;
 		}
-	}
-
-	[Export, Shared]
-	public class ConventionRegistrationProfileFactory : FixedFactory<ConventionTypeContainer>
-	{
-		[ImportingConstructor]
-		public ConventionRegistrationProfileFactory( [Required] ConventionTypesFactory factory ) : base( new ConventionTypeContainer( factory.Create() ) ) {}
-	}
+	}*/
 }

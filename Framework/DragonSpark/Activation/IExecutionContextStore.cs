@@ -71,7 +71,7 @@ namespace DragonSpark.Activation
 		readonly IConfigurableCache<T> cache;
 
 		public Configuration() : this( () => default(T) ) {}
-		public Configuration( Func<T> defaultFactory ) : this( new ConfigurableCache<T>( defaultFactory.Wrap().Create ) ) {}
+		public Configuration( Func<T> defaultFactory ) : this( new ConfigurableCache<T>( defaultFactory.Wrap() ) ) {}
 
 		public Configuration( IConfigurableCache<T> cache ) : base( cache )
 		{
@@ -80,6 +80,6 @@ namespace DragonSpark.Activation
 
 		public void Assign( Func<object, T> item ) => cache.Assign( item );
 
-		public void Assign( Func<T> item ) => Assign( item.Wrap().ToDelegate() );
+		public void Assign( Func<T> item ) => Assign( item.Wrap() );
 	}
 }

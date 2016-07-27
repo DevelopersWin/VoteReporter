@@ -9,7 +9,7 @@ namespace DragonSpark.ComponentModel
 	{
 		public SingletonAttribute() : this( null ) {}
 
-		public SingletonAttribute( Type hostType, string propertyName = nameof(SingletonLocator.Instance) ) : base( new SingletonDefaultValueProvider( hostType, propertyName ).Wrap().ToDelegate() ) {}
+		public SingletonAttribute( Type hostType, string propertyName = nameof(SingletonLocator.Instance) ) : base( new SingletonDefaultValueProvider( hostType, propertyName ).Wrap() ) {}
 	}
 
 	public class SingletonDefaultValueProvider : IDefaultValueProvider

@@ -294,7 +294,7 @@
     <Compile Include="TypeSystem\Attributes.cs" />
     <Compile Include="TypeSystem\CodeContainer.cs" />
     <Compile Include="TypeSystem\Default.cs" />
-    <Compile Include="TypeSystem\DefaultValueFactory.cs" />
+    <Compile Include="TypeSystem\DefaultValues.cs" />
     <Compile Include="TypeSystem\DerivedMethodSpecification.cs" />
     <Compile Include="TypeSystem\GenericStaticMethodCommands.cs" />
     <Compile Include="TypeSystem\HostingAttribute.cs" />

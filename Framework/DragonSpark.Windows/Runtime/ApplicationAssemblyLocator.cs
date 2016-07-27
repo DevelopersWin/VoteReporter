@@ -1,5 +1,5 @@
-using DragonSpark.Activation;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Stores;
 using System;
 using System.Composition;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Reflection;
 namespace DragonSpark.Windows.Runtime
 {
 	[Export, Shared]
-	public class ApplicationAssemblyLocator : FixedFactory<Assembly>
+	public class ApplicationAssemblyLocator : FixedStore<Assembly>
 	{
 		readonly static Assembly Default = DomainApplicationAssemblyLocator.Instance.Get( AppDomain.CurrentDomain );
 

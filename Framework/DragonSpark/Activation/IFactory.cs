@@ -2,6 +2,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -46,43 +47,43 @@ namespace DragonSpark.Activation
 
 		public static T Create<T>( this IFactoryWithParameter @this, object parameter ) => (T)@this.Create( parameter );
 
-		public static IFactory<object, T> Wrap<T>( this T @this ) where T : class => @this.Wrap<object, T>();
+		public static Func<object, T> Wrap<T>( this T @this ) where T : class => @this.Wrap<object, T>();
 
-		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) where TResult : class => WrappedInstanceCache<TParameter, TResult>.Default.Get( @this );
-		class WrappedInstanceCache<TParameter, TResult> : Cache<TResult, IFactory<TParameter, TResult>> where TResult : class
+		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) where TResult : class => WrappedInstanceCache<TParameter, TResult>.Default.Get( @this );
+		class WrappedInstanceCache<TParameter, TResult> : Cache<TResult, Func<TParameter, TResult>> where TResult : class
 		{
 			public static WrappedInstanceCache<TParameter, TResult> Default { get; } = new WrappedInstanceCache<TParameter, TResult>();
 			
-			WrappedInstanceCache() : base( result => new InstanceFactory( result ) ) {}
+			WrappedInstanceCache() : base( result => new InstanceFactory( result ).Create ) {}
 
 			class InstanceFactory : WrappedFactory<TParameter, TResult>
 			{
-				public InstanceFactory( TResult instance ) : base( instance.ToFactory().ToDelegate() ) {}
+				public InstanceFactory( TResult instance ) : base( new FixedStore<TResult>( instance ).Get ) {}
 			}
 		}
 
-		public static IFactory<object, T> Wrap<T>( this IFactory<T> @this ) => @this.Wrap<object, T>();
+		public static Func<object, T> Wrap<T>( this IFactory<T> @this ) => @this.Wrap<object, T>();
 
-		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this IFactory<TResult> @this ) => @this.ToDelegate().Wrap<TParameter, TResult>();
+		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this IFactory<TResult> @this ) => @this.ToDelegate().Wrap<TParameter, TResult>();
 
-		public static IFactory<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
+		public static Func<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
 
-		public static IFactory<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => WrappedDelegateCache<TParameter, TResult>.Default.Get( @this );
-		class WrappedDelegateCache<TParameter, TResult> : Cache<Func<TResult>, WrappedFactory<TParameter, TResult>>
+		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => WrappedDelegateCache<TParameter, TResult>.Default.Get( @this );
+		class WrappedDelegateCache<TParameter, TResult> : Cache<Func<TResult>, Func<TParameter, TResult>>
 		{
 			public static WrappedDelegateCache<TParameter, TResult> Default { get; } = new WrappedDelegateCache<TParameter, TResult>();
 			
-			WrappedDelegateCache() : base( result => new WrappedFactory<TParameter, TResult>( result ) ) {}
+			WrappedDelegateCache() : base( result => new WrappedFactory<TParameter, TResult>( result ).Create ) {}
 		}
 
-		public static IFactory<T> ToFactory<T>( this T @this ) where T : class => FixedFactoryCache<T>.Default.Get( @this );
+		/*public static IFactory<T> ToFactory<T>( this T @this ) where T : class => FixedFactoryCache<T>.Default.Get( @this );
 		public static IFactory<TParameter, TResult> ToFactory<TParameter, TResult>( this TResult @this ) where TResult : class => FixedFactoryCache<TResult>.Default.Get( @this ).Wrap<TParameter, TResult>();
 		class FixedFactoryCache<T> : Cache<T, IFactory<T>> where T : class
 		{
 			public static FixedFactoryCache<T> Default { get; } = new FixedFactoryCache<T>();
 			
 			FixedFactoryCache() : base( result => new FixedFactory<T>( result ) ) {}
-		}
+		}*/
 
 		// public static ImmutableArray<T> Self<T>( this T[] @this ) => @this.ToImmutableArray();
 

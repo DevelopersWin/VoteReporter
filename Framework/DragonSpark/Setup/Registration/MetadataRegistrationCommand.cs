@@ -39,6 +39,6 @@ namespace DragonSpark.Setup.Registration
 		public static MetadataRegistrationTypeFactory Instance { get; } = new MetadataRegistrationTypeFactory();
 		MetadataRegistrationTypeFactory() {}
 
-		public override ImmutableArray<Type> Get( ImmutableArray<Type> parameter ) => parameter.ToArray().WhereDecorated<RegistrationBaseAttribute>().Select( item => item.Item2 ).ToImmutableArray();
+		public override ImmutableArray<Type> Get( ImmutableArray<Type> parameter ) => parameter.ToArray().Decorated<RegistrationBaseAttribute>().ToImmutableArray();
 	}
 }

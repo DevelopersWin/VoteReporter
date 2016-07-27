@@ -2,6 +2,7 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
@@ -315,10 +316,9 @@ namespace DragonSpark.Windows.Testing.Setup
 		}*/
 
 		[Theory, LocationSetup.AutoData]
-		public void GetAllTypesWith( [DragonSpark.Testing.Framework.Parameters.Service] ImmutableArray<Assembly> sut )
+		public void GetAllTypesWith( [DragonSpark.Testing.Framework.Parameters.Service] ImmutableArray<System.Type> sut )
 		{
-			var items = sut.GetAllTypesWith<PriorityAttribute>();
-			Assert.True( items.Select( tuple => tuple.Item2 ).Contains( typeof(NormalPriority) ) );
+			Assert.True( sut.Decorated<PriorityAttribute>().Contains( typeof(NormalPriority) ) );
 		}
 
 		[Theory, LocationSetup.AutoData]
@@ -426,7 +426,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, LocationSetup.AutoData]
 		public void CreateAssembly( [DragonSpark.Testing.Framework.Parameters.Service]AssemblyInformationFactory factory, IUnityContainer container, Windows.Runtime.ApplicationAssemblyLocator locator, [DragonSpark.Testing.Framework.Parameters.Service]Assembly sut )
 		{
-			var fromFactory = locator.Create();
+			var fromFactory = locator.Get();
 			var fromContainer = container.Resolve<Assembly>();
 			Assert.Same( fromFactory, fromContainer );
 			

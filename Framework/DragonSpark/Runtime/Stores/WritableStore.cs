@@ -22,13 +22,13 @@ namespace DragonSpark.Runtime.Stores
 
 		public static T Get<T>( this IStore<T> @this ) => @this.Value;
 
-		public static Func<T> ToDelegate<T>( this IStore<T> @this ) where T : class => FixedFactoryCache<T>.Default.Get( @this );
+		/*public static Func<T> ToDelegate<T>( this IStore<T> @this ) where T : class => FixedFactoryCache<T>.Default.Get( @this );
 		class FixedFactoryCache<T> : Cache<IStore<T>, Func<T>> where T : class
 		{
 			public static FixedFactoryCache<T> Default { get; } = new FixedFactoryCache<T>();
 			
-			FixedFactoryCache() : base( store => new FixedFactory<T>( store.Value ).Create ) {}
-		}
+			FixedFactoryCache() : base( store => new FixedFactory<T>( store.Value ) ) {}
+		}*/
 	}
 
 	public abstract class CacheSpecificationBase<TInstance, TValue> : SpecificationBase<TInstance> where TInstance : class

@@ -235,7 +235,7 @@ namespace DragonSpark.Runtime.Properties
 
 	public static class CacheFactory
 	{
-		public static ICache<T> Create<T>( Func<T> parameter ) => Create( parameter.Wrap().Create );
+		public static ICache<T> Create<T>( Func<T> parameter ) => Create( parameter.Wrap() );
 
 		public static ICache<T> Create<T>( Func<object, T> parameter ) => Implementations<T>.Factory( parameter );
 

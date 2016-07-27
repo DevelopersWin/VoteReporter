@@ -5,7 +5,10 @@ namespace DragonSpark.Setup.Registration
 	[AttributeUsage( AttributeTargets.Assembly )]
 	public class RegistrationAttribute : PriorityAttribute
 	{
-		public RegistrationAttribute( params Type[] ignoreForRegistration ) : this( Priority.Normal, ignoreForRegistration )
+		public RegistrationAttribute() : this( Priority.Normal ) {}
+		public RegistrationAttribute( Priority priority ) : base( priority ) {}
+
+		/*public RegistrationAttribute( params Type[] ignoreForRegistration ) : this( Priority.Normal, ignoreForRegistration )
 		{}
 
 		public RegistrationAttribute( Priority priority, params Type[] ignoreForRegistration ) : base( priority )
@@ -15,6 +18,6 @@ namespace DragonSpark.Setup.Registration
 
 		public string Namespaces { get; set; }
 
-		public Type[] IgnoreForRegistration { get; }
+		public Type[] IgnoreForRegistration { get; }*/
 	}
 }

@@ -1,4 +1,5 @@
-﻿using DragonSpark.Windows.Runtime;
+﻿using DragonSpark.Runtime.Stores;
+using DragonSpark.Windows.Runtime;
 using System;
 using System.Reflection;
 using Xunit;
@@ -10,7 +11,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Create( ApplicationAssemblyLocator sut )
 		{
-			var assembly = sut.Create();
+			var assembly = sut.Get();
 			Assert.Equal( GetType().Assembly, assembly );
 		}
 
@@ -18,7 +19,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		public void Other( Assembly[] assemblies )
 		{
 			var sut = new ApplicationAssemblyLocator( assemblies, AppDomain.CreateDomain( "NotAnAssembly" ) );
-			var assembly = sut.Create();
+			var assembly = sut.Get();
 			Assert.Null( assembly );
 		}
 	}

@@ -74,7 +74,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected TypeProviderAttributeBase( params Type[] types ) : this( types.ToImmutableArray() ) {}
 		protected TypeProviderAttributeBase( ImmutableArray<Type> additionalTypes ) : this( new Factory( additionalTypes ).Create ) {}
 
-		protected TypeProviderAttributeBase( Func<MethodBase, ImmutableArray<Type>> factory ) : this( factory.Wrap().ToDelegate() ) {}
+		protected TypeProviderAttributeBase( Func<MethodBase, ImmutableArray<Type>> factory ) : this( factory.Wrap() ) {}
 		protected TypeProviderAttributeBase( Func<object, Func<MethodBase, ImmutableArray<Type>>> provider ) : base( provider ) {}
 
 		sealed class Factory : FactoryBase<MethodBase, ImmutableArray<Type>>

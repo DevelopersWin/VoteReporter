@@ -83,7 +83,7 @@ namespace DragonSpark.Composition
 					return result;
 				}
 
-				Func<LifetimeContext, object> Factory( Parameter parameter ) => new FixedFactory<Parameter, object>( @new, parameter ).Wrap<object>().Create;
+				Func<LifetimeContext, object> Factory( Parameter parameter ) => new FixedFactory<Parameter, object>( @new, parameter ).Wrap<object>();
 
 				object New( Parameter parameter )
 				{

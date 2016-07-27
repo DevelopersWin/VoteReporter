@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Immutable;
-
 namespace DragonSpark.Setup.Registration
 {
-	public struct ConventionTypeContainer
+	/*public struct ConventionTypeContainer
 	{
 		public ConventionTypeContainer( ImmutableArray<Type> candidates )
 		{
@@ -11,5 +8,5 @@ namespace DragonSpark.Setup.Registration
 		}
 
 		public ImmutableArray<Type> Candidates { get; }
-	}
+	}*/
 }
