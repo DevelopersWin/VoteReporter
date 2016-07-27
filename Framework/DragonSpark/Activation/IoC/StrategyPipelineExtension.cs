@@ -1,10 +1,8 @@
 ﻿using DragonSpark.Activation.IoC.Specifications;
-using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
@@ -186,23 +184,25 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	[ApplyAutoValidation]
-	public class BuildableTypeFromConventionLocator : FactoryBase<Type, Type>
+	public sealed class ConventionTypes : FactoryCache<Type, Type>
 	{
-		public static ISource<Func<Type, Type>> Instance { get; } = new ExecutionScope<Func<Type, Type>>( () => new BuildableTypeFromConventionLocator( ApplicationTypes.Instance.Get().ToArray() ).Cached().Get );
-
-		readonly static Func<Type, bool> Specification = CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).IsSatisfiedBy;
 		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
-		readonly static ISpecification<Type> Unbuildable = CanInstantiateSpecification.Instance.Inverse();
+		readonly static Func<Type, bool> 
+			Specification = CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).IsSatisfiedBy;
+		
+		public static ISource<ICache<Type, Type>> Instance { get; } = new ExecutionScope<ICache<Type, Type>>( () => new ConventionTypes() );
+		ConventionTypes() : this( ApplicationTypes.Instance ) {}
 
 		readonly ImmutableArray<Type> types;
-		
-		public BuildableTypeFromConventionLocator( params Type[] types ) : base( Unbuildable )
+
+		public ConventionTypes( ITypeSource source ) : this( source.Get().Where( Specification ).ToImmutableArray() ) {}
+
+		ConventionTypes( ImmutableArray<Type> types ) : base( CanInstantiateSpecification.Instance.Inverse() )
 		{
-			this.types = types.Where( Specification ).ToImmutableArray();
+			this.types = types;
 		}
 
-		public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
+		protected override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
 
 		static Type Map( Type parameter )
 		{
@@ -227,9 +227,11 @@ namespace DragonSpark.Activation.IoC
 
 	class IsConventionCandidateSpecification : GuardedSpecificationBase<Type>
 	{
+		readonly static Func<Type, string> Sanitizer = ConventionCandidateNameFactory.Instance.ToDelegate();
+
 		readonly string type;
 
-		public IsConventionCandidateSpecification( Type type ) : this( type, ConventionCandidateNameFactory.Instance.ToDelegate() ) {}
+		public IsConventionCandidateSpecification( Type type ) : this( type, Sanitizer ) {}
 		public IsConventionCandidateSpecification( Type type, Func<Type, string> sanitizer ) : this( sanitizer( type ) ) {}
 		IsConventionCandidateSpecification( string type )
 		{
@@ -242,6 +244,7 @@ namespace DragonSpark.Activation.IoC
 	class ConventionCandidateNameFactory : FactoryBase<Type, string>
 	{
 		public static ConventionCandidateNameFactory Instance { get; } = new ConventionCandidateNameFactory();
+		ConventionCandidateNameFactory() {}
 
 		public override string Create( Type parameter ) => parameter.Name.TrimStartOf( 'I' );
 	}
@@ -265,61 +268,35 @@ namespace DragonSpark.Activation.IoC
 		public int GetWeight( Type candidate ) => Create( candidate );
 	}
 
-	/*public abstract class TypeSelectionStrategyBase : FactoryBase<Type, Type[]>
+	public sealed class SelfAndNestedTypes : Cache<Type, IEnumerable<Type>>
 	{
-		protected TypeSelectionStrategyBase() {}
-
-		protected TypeSelectionStrategyBase( ISpecification<Type> specification ) : base( specification ) {}
-	}*/
-
-	/*public class SelfStrategy : Cache<Type, IEnumerable<Type>>
-	{
-		public static SelfStrategy Instance { get; } = new SelfStrategy();
-		SelfStrategy() : base( EnumerableEx.Return ) {}
-	}*/
-
-	public sealed class SelfAndNestedStrategy : Cache<Type, IEnumerable<Type>>
-	{
-		public static SelfAndNestedStrategy Instance { get; } = new SelfAndNestedStrategy();
-		SelfAndNestedStrategy() : base( type => type.Adapt().WithNested() ) {}
+		public static SelfAndNestedTypes Instance { get; } = new SelfAndNestedTypes();
+		SelfAndNestedTypes() : base( type => type.Adapt().WithNested() ) {}
 	}
 
-	/*public class AllTypesInCandidateAssemblyStrategy : TypeSelectionStrategyBase
+	public class ConventionImplementedInterfaces : FactoryCache<Type, Type>
 	{
-		public static AllTypesInCandidateAssemblyStrategy Instance { get; } = new AllTypesInCandidateAssemblyStrategy();
+		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces( typeof(IFactory), typeof(IFactoryWithParameter) );
+		ConventionImplementedInterfaces( params Type[] ignore ) : this( ignore.ToImmutableArray() ) {}
 
-		AllTypesInCandidateAssemblyStrategy() : base( ApplicationAssemblySpecification.Instance.Cast<Type>( type => type.Assembly() ) ) {}
+		readonly ImmutableArray<Type> ignore;
 
-		[Freeze]
-		protected override Type[] CreateItem( Type parameter ) => TypesFactory.Instance.Create( parameter.Assembly().ToItem() );
-	}*/
-
-	public class ImplementedInterfaceFromConventionLocator : Cache<Type, Type>
-	{
-		public static ImplementedInterfaceFromConventionLocator Instance { get; } = new ImplementedInterfaceFromConventionLocator( typeof(IFactory), typeof(IFactoryWithParameter) );
-		ImplementedInterfaceFromConventionLocator( params Type[] ignore ) : base( new Factory( ignore ).Create ) {}
-
-		class Factory : FactoryBase<Type, Type>
+		public ConventionImplementedInterfaces( ImmutableArray<Type> ignore )
 		{
-			readonly ImmutableArray<Type> ignore;
+			this.ignore = ignore;
+		}
 
-			public Factory( params Type[] ignore )
+		protected override Type Create( Type parameter )
+		{
+			var types = parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore.ToArray() ).ToArray();
+			foreach ( var type in types )
 			{
-				this.ignore = ignore.ToImmutableArray();
-			}
-
-			public override Type Create( Type parameter )
-			{
-				var types = parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore.ToArray() ).ToArray();
-				foreach ( var type in types )
+				if ( parameter.Name.Contains( type.Name.TrimStartOf( 'I' ) ) )
 				{
-					if ( parameter.Name.Contains( type.Name.TrimStartOf( 'I' ) ) )
-					{
-						return type;
-					}
+					return type;
 				}
-				return null;
 			}
+			return null;
 		}
 	}
 
@@ -351,34 +328,14 @@ namespace DragonSpark.Activation.IoC
 		public override bool IsSatisfiedBy( Type parameter ) => parameter != typeof(object) && !exempt.IsAssignableFrom( parameter );
 	}
 
-	/*public class ValidConstructorSpecification : GuardedSpecificationBase<IBuilderContext>
-	{
-		public static ValidConstructorSpecification Instance { get; } = new ValidConstructorSpecification();
-
-		public override bool IsSatisfiedBy( IBuilderContext parameter )
-		{
-			IPolicyList containingPolicyList;
-			var constructor = parameter.Policies.Get<IConstructorSelectorPolicy>( parameter.BuildKey, out containingPolicyList ).SelectConstructor( parameter, containingPolicyList );
-			var result = constructor.With( IsValidConstructor );
-			return result;
-		}
-
-		static bool IsValidConstructor( SelectedConstructor selectedConstructor ) => selectedConstructor.Constructor.GetParameters().All( pi => !pi.ParameterType.IsByRef );
-	}*/
-
-	/*class KeyReference : Reference<NamedTypeBuildKey>
-	{
-		public KeyReference( object instance, NamedTypeBuildKey key ) : base( instance, key ) { }
-	}*/
-
 	public class ConventionStrategy : BuilderStrategy
 	{
 		readonly Condition condition = new Condition();
 
-		readonly ConventionCandidateLocator locator;
+		readonly ConventionCandidates locator;
 		readonly IServiceRegistry registry;
 
-		public ConventionStrategy( ConventionCandidateLocator locator, IServiceRegistry registry )
+		public ConventionStrategy( ConventionCandidates locator, IServiceRegistry registry )
 		{
 			this.locator = locator;
 			this.registry = registry;
@@ -400,11 +357,11 @@ namespace DragonSpark.Activation.IoC
 			}
 		}
 
-		public class ConventionCandidateLocator : Cache<Type, Type>
+		public class ConventionCandidates : Cache<Type, Type>
 		{
 			static ISpecification<Type> Specification { get; } = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
 
-			public ConventionCandidateLocator() : base( new DelegatedFactory<Type, Type>( BuildableTypeFromConventionLocator.Instance.Get(), Specification ).Create ) {}
+			public ConventionCandidates() : base( new DelegatedFactory<Type, Type>( ConventionTypes.Instance.Get().Get, Specification ).Create ) {}
 		}
 	}
 }

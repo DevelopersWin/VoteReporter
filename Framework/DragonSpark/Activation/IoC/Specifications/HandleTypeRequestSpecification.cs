@@ -92,16 +92,16 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 	public class HasConventionSpecification : GuardedSpecificationBase<Type>
 	{
-		readonly Func<Type, Type> locator;
+		readonly ICache<Type, Type> locator;
 
-		public HasConventionSpecification() : this( BuildableTypeFromConventionLocator.Instance.Get() ) {}
+		public HasConventionSpecification() : this( ConventionTypes.Instance.Get() ) {}
 
-		HasConventionSpecification( Func<Type, Type> locator )
+		HasConventionSpecification( ICache<Type, Type> locator )
 		{
 			this.locator = locator;
 		}
 
-		public override bool IsSatisfiedBy( Type parameter ) => locator( parameter ) != null;
+		public override bool IsSatisfiedBy( Type parameter ) => locator.Get( parameter ) != null;
 	}
 
 	[Persistent]

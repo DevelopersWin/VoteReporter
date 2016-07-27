@@ -59,10 +59,9 @@ namespace DragonSpark.Setup.Registration
 	public class FactoryWithParameterDelegateFactory : FactoryBase<Type, Func<object, object>>
 	{
 		public static FactoryWithParameterDelegateFactory Instance { get; } = new FactoryWithParameterDelegateFactory();
+		FactoryWithParameterDelegateFactory() : this( Activator.Activate<IFactoryWithParameter> ) {}
 
 		readonly Func<Type, IFactoryWithParameter> createFactory;
-
-		FactoryWithParameterDelegateFactory() : this( Activator.Activate<IFactoryWithParameter> ) {}
 
 		public FactoryWithParameterDelegateFactory( [Required]Func<Type, IFactoryWithParameter> createFactory )
 		{
@@ -74,6 +73,8 @@ namespace DragonSpark.Setup.Registration
 
 	public class FactoryWithActivatedParameterDelegateFactory : FactoryBase<Type, Func<object>>
 	{
+		readonly static Func<Type, Type> ParameterLocator = ParameterTypes.Instance.ToDelegate();
+
 		public static FactoryWithActivatedParameterDelegateFactory Instance { get; } = new FactoryWithActivatedParameterDelegateFactory();
 		FactoryWithActivatedParameterDelegateFactory() : this( FactoryWithParameterDelegateFactory.Instance.Create, Activator.Activate<object> ) {}
 
@@ -81,7 +82,7 @@ namespace DragonSpark.Setup.Registration
 		readonly Func<Type, object> createParameter;
 		readonly Func<Type, Type> parameterLocator;
 
-		public FactoryWithActivatedParameterDelegateFactory( Func<Type, Func<object, object>> factory, Func<Type, object> createParameter ) : this( factory, createParameter, ParameterTypeLocator.Instance.ToDelegate() ) {}
+		public FactoryWithActivatedParameterDelegateFactory( Func<Type, Func<object, object>> factory, Func<Type, object> createParameter ) : this( factory, createParameter, ParameterLocator ) {}
 
 		public FactoryWithActivatedParameterDelegateFactory( Func<Type, Func<object, object>> factory, Func<Type, object> createParameter, Func<Type, Type> parameterLocator )
 		{
@@ -124,7 +125,7 @@ namespace DragonSpark.Setup.Registration
 		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes )
 		{
 			FactoryType = factoryType;
-			RegisterTypes = registrationTypes.WhereAssigned().Append( ResultTypeLocator.Instance.Get( factoryType ) ).Distinct().ToArray();
+			RegisterTypes = registrationTypes.WhereAssigned().Append( ResultTypes.Instance.Get( factoryType ) ).Distinct().ToArray();
 		}
 		
 		public Type FactoryType { get; }
@@ -134,6 +135,8 @@ namespace DragonSpark.Setup.Registration
 
 	public abstract class RegisterFactoryCommandBase<TFactory> : CommandBase<RegisterFactoryParameter>
 	{
+		readonly static ISpecification<RegisterFactoryParameter> Specification = new DelegatedSpecification<RegisterFactoryParameter>( parameter => typeof(TFactory).Adapt().IsAssignableFrom( parameter.FactoryType ) );
+
 		readonly IServiceRegistry registry;
 		readonly ISingletonLocator locator;
 		readonly Func<Type, Func<object>> create;
@@ -141,7 +144,7 @@ namespace DragonSpark.Setup.Registration
 
 		protected RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]ISingletonLocator locator, [Required]Func<Type, Func<object>> create ) : this( registry, locator, create, type => null ) {}
 
-		protected RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]ISingletonLocator locator, [Required]Func<Type, Func<object>> create, [Required]Func<Type, Delegate> determineDelegate ) : base( Specification.Instance )
+		protected RegisterFactoryCommandBase( [Required]IServiceRegistry registry, [Required]ISingletonLocator locator, [Required]Func<Type, Func<object>> create, [Required]Func<Type, Delegate> determineDelegate ) : base( Specification )
 		{
 			this.registry = registry;
 			this.locator = locator;
@@ -163,7 +166,7 @@ namespace DragonSpark.Setup.Registration
 				registry.Register( new InstanceRegistrationParameter( typed.GetType(), typed ) );
 			}
 			
-			new[] { ImplementedInterfaceFromConventionLocator.Instance.Get( parameter.FactoryType ), FactoryInterfaceLocator.Instance.Get( parameter.FactoryType ) }
+			new[] { ConventionImplementedInterfaces.Instance.Get( parameter.FactoryType ), FactoryInterfaces.Instance.Get( parameter.FactoryType ) }
 				.WhereAssigned()
 				.Distinct()
 				.Introduce( parameter.FactoryType, tuple => new MappingRegistrationParameter( tuple.Item1, tuple.Item2 ) )
@@ -171,13 +174,6 @@ namespace DragonSpark.Setup.Registration
 		}
 
 		protected abstract Type MakeGenericType( Type parameter, Type itemType );
-
-		class Specification : DelegatedSpecification<RegisterFactoryParameter>
-		{
-			public static Specification Instance { get; } = new Specification();
-
-			Specification() : base( parameter => typeof(TFactory).Adapt().IsAssignableFrom( parameter.FactoryType ) ) {}
-		}
 	}
 
 	public class RegisterFactoryCommand : RegisterFactoryCommandBase<IFactory>
@@ -189,7 +185,7 @@ namespace DragonSpark.Setup.Registration
 
 	public class RegisterFactoryWithParameterCommand : RegisterFactoryCommandBase<IFactoryWithParameter>
 	{
-		readonly static Func<Type, Type> ParameterLocator = ParameterTypeLocator.Instance.ToDelegate();
+		readonly static Func<Type, Type> ParameterLocator = ParameterTypes.Instance.ToDelegate();
 
 		readonly Func<Type, Type> parameterLocator;
 		public RegisterFactoryWithParameterCommand( IServiceRegistry registry ) : this( registry, SingletonLocator.Instance, FactoryWithParameterDelegateFactory.Instance, ParameterLocator ) {}

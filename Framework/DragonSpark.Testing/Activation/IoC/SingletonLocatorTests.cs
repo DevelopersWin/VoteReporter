@@ -3,6 +3,7 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.Setup;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -44,7 +45,7 @@ namespace DragonSpark.Testing.Activation.IoC
 		{
 			var nestedTypes = GetType().GetTypeInfo().DeclaredNestedTypes.AsTypes().ToArray();
 			var sut = SingletonLocator.Instance;
-			var type = new BuildableTypeFromConventionLocator( nestedTypes ).Create( typeof(ISingleton) ) ?? typeof(ISingleton);
+			var type = new ConventionTypes( new TypeSource( nestedTypes ) ).Get( typeof(ISingleton) ) ?? typeof(ISingleton);
 			Assert.Same( Singleton.Instance, sut.Get( type ) );
 		}
 

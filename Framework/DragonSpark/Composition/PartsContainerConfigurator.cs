@@ -82,16 +82,13 @@ namespace DragonSpark.Composition
 
 	public sealed class PartsContainerConfigurator : ContainerConfigurator
 	{
-		// readonly static ConventionBuilder ConventionBuilder = FrameworkConventionBuilder.Instance.Create();
-
 		public static PartsContainerConfigurator Instance { get; } = new PartsContainerConfigurator();
 		PartsContainerConfigurator() {}
 
 		public override ContainerConfiguration Get( ContainerConfiguration configuration )
 		{
 			var system = ApplicationParts.Instance.Get();
-			// var core = FrameworkTypes.Instance.Get().ToArray();
-			var types = system.Types.ToArray()/*.ToArray().Union( core ).ToImmutableArray()*/;
+			var types = system.Types.ToArray();
 
 			var result = configuration
 				.WithInstance( system )

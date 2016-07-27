@@ -1,9 +1,8 @@
-using DragonSpark.Aspects.Validation;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using System;
@@ -26,8 +25,7 @@ namespace DragonSpark.Activation
 	public class IsGenericFactorySpecification : AdapterSpecificationBase
 	{
 		public static ISpecification<Type> Instance { get; } = new IsGenericFactorySpecification( typeof(IFactory<>), typeof(IFactory<,>) ).Cached();
-
-		protected IsGenericFactorySpecification( params Type[] types ) : base( types ) {}
+		IsGenericFactorySpecification( params Type[] types ) : base( types ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );
 	}
@@ -36,7 +34,7 @@ namespace DragonSpark.Activation
 	{
 		protected AdapterSpecificationBase( params Type[] types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
-		protected AdapterSpecificationBase( ImmutableArray<TypeAdapter> adapters )
+		AdapterSpecificationBase( ImmutableArray<TypeAdapter> adapters )
 		{
 			Adapters = adapters;
 		}
@@ -44,47 +42,48 @@ namespace DragonSpark.Activation
 		protected ImmutableArray<TypeAdapter> Adapters { get; }
 	}
 
-	public class FactoryInterfaceLocator : FactoryBase<Type, Type>
+	public class FactoryInterfaces : FactoryCache<Type, Type>
 	{
-		public static ICache<Type, Type> Instance { get; } = new FactoryInterfaceLocator().Cached();
+		readonly static Func<Type, bool> GenericFactory = IsGenericFactorySpecification.Instance.ToDelegate();
+		readonly static Func<Type, bool> Factory = IsFactorySpecification.Instance.ToDelegate();
 
-		public override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().With( types => types.FirstOrDefault( IsGenericFactorySpecification.Instance.ToDelegate() ) ?? types.FirstOrDefault( IsFactorySpecification.Instance.ToDelegate() ) );
+		public static ICache<Type, Type> Instance { get; } = new FactoryInterfaces();
+
+		protected override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().With( types => types.FirstOrDefault( GenericFactory ) ?? types.FirstOrDefault( Factory ) );
 	}
 
-	public class ParameterTypeLocator : TypeLocatorCacheBase
+	public class ParameterTypes : TypeLocatorBase
 	{
-		public static ICache<Type, Type> Instance { get; } = new ParameterTypeLocator( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) ).Cached();
-
-		public ParameterTypeLocator( ImmutableArray<Type> types ) : base( types ) {}
+		public static ICache<Type, Type> Instance { get; } = new ParameterTypes( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) );
+		ParameterTypes( ImmutableArray<Type> types ) : base( types ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.First();
 	}
 
-	public class ResultTypeLocator : TypeLocatorCacheBase
+	public class ResultTypes : TypeLocatorBase
 	{
-		public static ICache<Type, Type> Instance { get; } = new ResultTypeLocator( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) ).Cached();
-
-		public ResultTypeLocator( ImmutableArray<Type> types ) : base( types ) {}
+		public static ICache<Type, Type> Instance { get; } = new ResultTypes( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) );
+		ResultTypes( ImmutableArray<Type> types ) : base( types ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
 
-	public abstract class TypeLocatorCacheBase : FactoryBase<Type, Type>
+	public abstract class TypeLocatorBase : FactoryCache<Type, Type>
 	{
 		readonly ImmutableArray<TypeAdapter> adapters;
 		readonly Func<TypeInfo, bool> isAssignable;
 		readonly Func<Type[], Type> selector;
 
-		protected TypeLocatorCacheBase( ImmutableArray<Type> types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
+		protected TypeLocatorBase( ImmutableArray<Type> types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
-		TypeLocatorCacheBase( ImmutableArray<TypeAdapter> adapters )
+		TypeLocatorBase( ImmutableArray<TypeAdapter> adapters )
 		{
 			this.adapters = adapters;
 			isAssignable = IsAssignable;
 			selector = Select;
 		}
 
-		public override Type Create( Type parameter )
+		protected override Type Create( Type parameter )
 		{
 			var result = parameter.Append( parameter.Adapt().GetAllInterfaces() )
 				.AsTypeInfos()
@@ -134,37 +133,24 @@ namespace DragonSpark.Activation
 
 	public class FactoryDelegateLocatorFactory : CompositeFactory<Type, Func<object>>
 	{
+		readonly static Func<Type, bool> FactorySpecification = TypeAssignableSpecification<IFactory>.Instance.ToDelegate();
+		readonly static Func<Type, bool> FactoryWithParameterSpecification = TypeAssignableSpecification<IFactoryWithParameter>.Instance.ToDelegate();
+
 		public static FactoryDelegateLocatorFactory Instance { get; } = new FactoryDelegateLocatorFactory();
 		FactoryDelegateLocatorFactory() : base( FactoryDelegateFactory.Instance, FactoryWithActivatedParameterDelegateFactory.Instance ) {}
 
-		public FactoryDelegateLocatorFactory( FactoryDelegateFactory factory, FactoryWithActivatedParameterDelegateFactory factoryWithParameter ) : base( 
-			new Factory<IFactory>( factory ),
-			new Factory<IFactoryWithParameter>( factoryWithParameter )
-		) {}
-
-		[ApplyAutoValidation]
-		sealed class Factory<T> : DelegatedFactory<Type, Func<object>>
-		{
-			public Factory( IFactory<Type, Func<object>> inner ) : base( inner.ToDelegate(), TypeAssignableSpecification<T>.Instance ) {}
-		}
+		public FactoryDelegateLocatorFactory( FactoryDelegateFactory factory, FactoryWithActivatedParameterDelegateFactory factoryWithParameter ) 
+			: base( new AutoValidatingFactory<Type, Func<object>>( factory, FactorySpecification ), new AutoValidatingFactory<Type, Func<object>>( factoryWithParameter, FactoryWithParameterSpecification ) ) {}
 	}
 
-	public sealed class MemberInfoFactoryTypeLocator : ParameterizedConfiguration<MemberInfo, Type>
-	{
-		public static MemberInfoFactoryTypeLocator Instance { get; } = new MemberInfoFactoryTypeLocator();
-		MemberInfoFactoryTypeLocator() : base( new FactoryTypeLocator<MemberInfo>( member => member.GetMemberType(), member => member.DeclaringType ).Create ) {}
-	}
-
-	public sealed class ParameterInfoFactoryTypeLocator : ParameterizedConfiguration<ParameterInfo, Type>
-	{
-		public static ParameterInfoFactoryTypeLocator Instance { get; } = new ParameterInfoFactoryTypeLocator();
-		ParameterInfoFactoryTypeLocator() : base( new FactoryTypeLocator<ParameterInfo>( parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ).Create ) {}
-	}
-
-	[Persistent]
 	public class FactoryTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
-		public static ISource<FactoryTypes> Instance { get; } = new ExecutionScope<FactoryTypes>( () => new FactoryTypes( FactoryTypeRequests.Requests.Get() ) );
+		public static ISource<FactoryTypes> Instance { get; } = new ExecutionScope<FactoryTypes>( () => new FactoryTypes() );
+		FactoryTypes() : this( FactoryTypeRequests.Instance.GetMany( ApplicationParts.Instance.Get().Types ) ) {}
+
+		public static IParameterizedSource<MemberInfo, Type> Members { get; } = new ParameterizedSource<MemberInfo, Type>( new FactoryTypeLocator<MemberInfo>( member => member.GetMemberType(), member => member.DeclaringType ).Create );
+
+		public static IParameterizedSource<ParameterInfo, Type> Parameters { get; } = new ParameterizedSource<ParameterInfo, Type>( new FactoryTypeLocator<ParameterInfo>( parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ).Create );
 
 		public FactoryTypes( ImmutableArray<FactoryTypeRequest> requests ) : base( new Factory( requests ).Create ) {}
 

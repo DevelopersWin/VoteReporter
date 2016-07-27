@@ -15,13 +15,13 @@ namespace DragonSpark.Setup.Registration
 
 		public sealed class MappedAttribute : RegistrationBaseAttribute
 		{
-			public MappedAttribute() : this( ImplementedInterfaceFromConventionLocator.Instance, null, null ) {}
+			public MappedAttribute() : this( ConventionImplementedInterfaces.Instance, null, null ) {}
 
-			public MappedAttribute( Type @as ) : this( ImplementedInterfaceFromConventionLocator.Instance, @as, null ) { }
+			public MappedAttribute( Type @as ) : this( ConventionImplementedInterfaces.Instance, @as, null ) { }
 
-			public MappedAttribute( string name ) : this( ImplementedInterfaceFromConventionLocator.Instance, null, name ) { }
+			public MappedAttribute( string name ) : this( ConventionImplementedInterfaces.Instance, null, name ) { }
 
-			MappedAttribute( [Required]ImplementedInterfaceFromConventionLocator locator, Type @as, string name ) : base( t => new TypeRegistration( @as ?? locator.Get( t ) ?? t.GetTypeInfo().ImplementedInterfaces.Only() ?? t, t, name ) ) { }
+			MappedAttribute( [Required]ConventionImplementedInterfaces locator, Type @as, string name ) : base( t => new TypeRegistration( @as ?? locator.Get( t ) ?? t.GetTypeInfo().ImplementedInterfaces.Only() ?? t, t, name ) ) { }
 		}
 
 		public class FactoryAttribute : RegistrationBaseAttribute

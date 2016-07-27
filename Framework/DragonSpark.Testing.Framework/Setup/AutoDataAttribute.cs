@@ -9,7 +9,6 @@ using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
-using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
@@ -140,7 +139,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			public static Factory Instance { get; } = new Factory();
 			Factory() {}
 
-			public override ImmutableArray<Type> Create( MethodBase parameter ) => SelfAndNestedStrategy.Instance.Get( parameter.DeclaringType ).ToImmutableArray();
+			public override ImmutableArray<Type> Create( MethodBase parameter ) => SelfAndNestedTypes.Instance.Get( parameter.DeclaringType ).ToImmutableArray();
 		}
 	}
 
@@ -163,7 +162,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly IFixture fixture;
 
-		public FixtureServiceProvider( [Required]IFixture fixture ) : base( new Specification( fixture ) )
+		public FixtureServiceProvider( IFixture fixture ) : base( new Specification( fixture ) )
 		{
 			this.fixture = fixture;
 		}
@@ -176,9 +175,9 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			readonly IServiceRegistry registry;
 
-			public Specification( [Required] IFixture fixture ) : this( AssociatedRegistry.Default.Get( fixture ) ) {}
+			public Specification( IFixture fixture ) : this( AssociatedRegistry.Default.Get( fixture ) ) {}
 
-			Specification( [Required] IServiceRegistry registry )
+			Specification( IServiceRegistry registry )
 			{
 				this.registry = registry;
 			}

@@ -50,9 +50,9 @@ namespace DragonSpark.Composition
 			Promise( CompositionDependency dependency, string origin, CompositeActivator activator ) : this( dependency, origin, new Context( dependency, activator ) ) {}
 			Promise( CompositionDependency dependency, string origin, Context context ) : base( dependency.Contract, origin, dependency.Target.IsShared, NoDependencies, context.Create ) {}
 
-			class Context : FactoryBase<Context.Parameter, object>
+			sealed class Context : FactoryBase<Context.Parameter, object>
 			{
-				readonly CacheContext<LifetimeContext, Parameter, object> cache;
+				readonly Cache<LifetimeContext, object> cache = new Cache<LifetimeContext, object>();
 
 				readonly CompositionDependency dependency;
 				readonly CompositeActivator activator;
@@ -64,7 +64,6 @@ namespace DragonSpark.Composition
 					this.dependency = dependency;
 					this.activator = activator;
 
-					cache = new CacheContext<LifetimeContext, Parameter, object>( Factory );
 					create = Create;
 					@new = New;
 				}
@@ -79,22 +78,11 @@ namespace DragonSpark.Composition
 				{
 					var boundary = ContractSupport.Default.Get( dependency.Contract );
 					var context = parameter.Context.FindContextWithin( boundary );
-					var result = cache.GetOrSet( context, parameter );
+					var result = cache.Get( context ) ?? cache.SetValue( context, @new( parameter ) );
 					return result;
 				}
 
-				Func<LifetimeContext, object> Factory( Parameter parameter ) => new FixedFactory<Parameter, object>( @new, parameter ).Wrap<object>();
-
-				object New( Parameter parameter )
-				{
-					var result = activator( parameter.Context, parameter.Operation );
-					if ( result != null )
-					{
-						parameter.Context.Checked( result );
-						// ActivationProperties.Factory.Set( result, dependency.Target.Contract.ContractType );
-					}
-					return result;
-				}
+				object New( Parameter parameter ) => parameter.Context.Registered( activator( parameter.Context, parameter.Operation ) );
 
 				public struct Parameter
 				{
@@ -116,7 +104,7 @@ namespace DragonSpark.Composition
 		readonly ActivatorRegistryFactory registryFactory;
 		readonly Func<Activator.Parameter, object> activatorFactory;
 
-		public ActivatorFactory( [Required]ActivatorRegistryFactory registryFactory, Func<Activator.Parameter, object> activatorFactory )
+		public ActivatorFactory( ActivatorRegistryFactory registryFactory, Func<Activator.Parameter, object> activatorFactory )
 		{
 			this.registryFactory = registryFactory;
 			this.activatorFactory = activatorFactory;
@@ -167,7 +155,7 @@ namespace DragonSpark.Composition
 
 		public class ActivatorRegistryFactory : FactoryBase<Parameter, ActivatorRegistry>
 		{
-			public static ActivatorRegistryFactory Instance { get; } = new ActivatorRegistryFactory( ParameterTypeLocator.Instance.ToDelegate() );
+			public static ActivatorRegistryFactory Instance { get; } = new ActivatorRegistryFactory( ParameterTypes.Instance.ToDelegate() );
 
 			readonly Func<Type, Type> locator;
 
@@ -187,7 +175,7 @@ namespace DragonSpark.Composition
 
 	public class ActivatorDelegateWithConversionFactory : FactoryBase<Activator.Parameter, Delegate>
 	{
-		public static ActivatorDelegateWithConversionFactory Instance { get; } = new ActivatorDelegateWithConversionFactory( ResultTypeLocator.Instance.ToDelegate() );
+		public static ActivatorDelegateWithConversionFactory Instance { get; } = new ActivatorDelegateWithConversionFactory( ResultTypes.Instance.ToDelegate() );
 
 		readonly Func<Type, Type> locator;
 
@@ -218,7 +206,7 @@ namespace DragonSpark.Composition
 
 	public class ActivatorWithParameterDelegateFactory : FactoryBase<Activator.Parameter, Delegate>
 	{
-		public static ActivatorWithParameterDelegateFactory Instance { get; } = new ActivatorWithParameterDelegateFactory( ParameterTypeLocator.Instance.ToDelegate(), ResultTypeLocator.Instance.ToDelegate() );
+		public static ActivatorWithParameterDelegateFactory Instance { get; } = new ActivatorWithParameterDelegateFactory( ParameterTypes.Instance.ToDelegate(), ResultTypes.Instance.ToDelegate() );
 
 		readonly Func<Type, Type> parameterLocator;
 		readonly Func<Type, Type> resultLocator;

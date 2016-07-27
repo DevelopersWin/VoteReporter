@@ -87,8 +87,6 @@ namespace DragonSpark.Activation
 
 		// public static ImmutableArray<T> Self<T>( this T[] @this ) => @this.ToImmutableArray();
 
-		public static T Self<T>( this T @this ) => @this;
-
 		public static Delegate Convert( this Func<object> @this, Type resultType ) => ConvertSupport.Methods.Make( resultType ).Invoke<Delegate>( @this );
 
 		public static Delegate Convert( this Func<object, object> @this, Type parameterType, [Required]Type resultType ) => ConvertSupport.Methods.Make( parameterType, resultType ).Invoke<Delegate>( @this );

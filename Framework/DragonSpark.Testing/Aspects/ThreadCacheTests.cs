@@ -1,5 +1,5 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
+﻿using DragonSpark.Aspects;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using Ploeh.AutoFixture.Xunit2;
 using System.Collections.Generic;

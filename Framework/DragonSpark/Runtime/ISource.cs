@@ -14,6 +14,29 @@ namespace DragonSpark.Runtime
 		object Get();
 	}
 
+	public static class Source
+	{
+		// public static Func<T> From<T>() where T : ISource<T> => SingletonDelegates
+
+		public static Func<T> For<T>( this T @this ) where T : struct => new Source<T>( @this ).Get;
+
+		public static T Self<T>( this T @this ) => @this;
+	}
+
+	public class Source<T> : ISource<T>
+	{
+		readonly T instance;
+
+		public Source( T instance )
+		{
+			this.instance = instance;
+		}
+
+		public T Get() => default(T);
+
+		object ISource.Get() => Get();
+	}
+
 	public static class SourceExtensions
 	{
 		public static Func<TParameter, TResult> Delegate<TParameter, TResult>( this ISource<IParameterizedSource<TParameter, TResult>> @this ) => SourceDelegateCache<TParameter, TResult>.Default.Get( @this );
@@ -33,6 +56,8 @@ namespace DragonSpark.Runtime
 				public override TResult Create( TParameter parameter ) => source.Get().Get( parameter );
 			}
 		}
+
+		// public static T Self<T>( this T @this ) => @this;
 
 		public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => SourceDelegateCache<T>.Default.Get( @this );
 		class SourceDelegateCache<T> : Cache<ISource<ISource<T>>, Func<T>>

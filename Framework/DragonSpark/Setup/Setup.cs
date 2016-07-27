@@ -208,6 +208,13 @@ namespace DragonSpark.Setup
 	public interface ICommandSource : ISource<ImmutableArray<ICommand>> {}
 	public interface ITypeSource : ISource<ImmutableArray<Type>> {}
 
+	public class TypeSource : ItemsStoreBase<Type>, ITypeSource
+	{
+		public TypeSource( IEnumerable<Type> items ) : base( items ) {}
+		public TypeSource() {}
+		public TypeSource( params Type[] items ) : base( items ) {}
+	}
+
 	public sealed class ServiceProviderFactory : AggregateFactoryBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
@@ -435,15 +442,15 @@ namespace DragonSpark.Setup
 		ApplicationParts() : base( () => SystemParts.Default ) {}
 	}
 
-	public class ApplicationAssemblies : DelegatedStore<ImmutableArray<Assembly>>
+	public sealed class ApplicationAssemblies : DelegatedStore<ImmutableArray<Assembly>>
 	{
 		public static ISource<ImmutableArray<Assembly>> Instance { get; } = new ApplicationAssemblies();
 		ApplicationAssemblies() : base( () => ApplicationParts.Instance.Get().Assemblies ) {}
 	}
 
-	public class ApplicationTypes : DelegatedStore<ImmutableArray<Type>>
+	public sealed class ApplicationTypes : DelegatedStore<ImmutableArray<Type>>, ITypeSource
 	{
-		public static ISource<ImmutableArray<Type>> Instance { get; } = new ApplicationTypes();
+		public static ITypeSource Instance { get; } = new ApplicationTypes();
 		ApplicationTypes() : base( () => ApplicationParts.Instance.Get().Types ) {}
 	}
 

@@ -18,14 +18,6 @@ namespace DragonSpark.Configuration
 		EnableMethodCaching() : base( () => true ) {}
 	}
 
-	// public interface IInitializationCommand : ICommand, IDisposable {}
-
-	/*[ApplyAutoValidation]
-	public abstract class InitializationCommandBase : CompositeCommand, IInitializationCommand
-	{
-		protected InitializationCommandBase( params ICommand[] commands ) : base( new OnlyOnceSpecification(), commands ) {}
-	}*/
-
 	public class AssignConfigurationsCommand<T> : ApplyConfigurationCommand<ImmutableArray<ITransformer<T>>>
 	{
 		public AssignConfigurationsCommand( ImmutableArray<ITransformer<T>> value, IConfigurations<T> assignable = null ) : base( value, assignable ) {}

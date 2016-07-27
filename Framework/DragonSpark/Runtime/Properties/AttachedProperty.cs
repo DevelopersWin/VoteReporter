@@ -70,29 +70,6 @@ namespace DragonSpark.Runtime.Properties
 		}*/
 	}
 
-	public class CacheContext<TInstance, TKey, TResult> where TResult : class where TInstance : class
-	{
-		readonly Func<TKey, Func<TInstance, TResult>> creator;
-		readonly ICache<TInstance, TResult> cache;
-
-		public CacheContext( Func<TKey, Func<TInstance, TResult>> creator ) : this( new Cache<TInstance, TResult>(), creator ) {}
-
-		public CacheContext( ICache<TInstance, TResult> cache, Func<TKey, Func<TInstance, TResult>> creator )
-		{
-			this.cache = cache;
-			this.creator = creator;
-		}
-
-		public TResult GetOrSet( TInstance instance, TKey key ) => cache.Contains( instance ) ? cache.Get( instance ) : Set( instance, key );
-
-		TResult Set( TInstance instance, TKey key )
-		{
-			var result = creator( key )( instance );
-			cache.Set( instance, result );
-			return result;
-		}
-	}
-
 	/*public enum AttachedPropertyChangedEventType
 	{
 		Set, Clear
@@ -277,17 +254,25 @@ namespace DragonSpark.Runtime.Properties
 
 	public abstract class FactoryCache<T> : FactoryCache<object, T>, IConfigurableCache<T>
 	{
-		protected FactoryCache() {}
+		protected FactoryCache() : this( DefaultSpecification ) {}
+		protected FactoryCache( ISpecification<object> specification ) : base( specification ) {}
 		protected FactoryCache( IParameterizedConfiguration<object, T> configuration ) : base( configuration ) {}
 	}
 
 	public abstract class FactoryCache<TInstance, TValue> : ConfigurableCache<TInstance, TValue>
 	{
-		protected FactoryCache() : this( new ConfigurableStore<TInstance, TValue>( instance => default(TValue) ) ) {}
+		readonly protected static ISpecification<TInstance> DefaultSpecification = Specifications<TInstance>.Always;
 
-		protected FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : base( configuration, CacheFactory.Create )
+		protected FactoryCache() : this( DefaultSpecification ) {}
+		protected FactoryCache( ISpecification<TInstance> specification ) : this( new ConfigurableStore<TInstance, TValue>( instance => default(TValue) ) ) {}
+
+		protected FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : this( configuration, DefaultSpecification ) {}
+
+		protected FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration, ISpecification<TInstance> specification ) : base( configuration, CacheFactory.Create )
 		{
-			configuration.Assign( Create );
+			var factory = new DelegatedFactory<TInstance, TValue>( Create, specification );
+			var host = specification == DefaultSpecification ? factory : factory.WithAutoValidation();
+			configuration.Assign( host.Create );
 		}
 
 		protected abstract TValue Create( TInstance parameter );

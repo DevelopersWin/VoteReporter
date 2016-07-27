@@ -392,9 +392,9 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		public void ConventionLocator( BuildableTypeFromConventionLocator locator )
+		public void ConventionLocator( ConventionTypes locator )
 		{
-			var type = locator.Create( typeof(Assembly) );
+			var type = locator.Get( typeof(Assembly) );
 			Assert.Null( type );
 		}
 

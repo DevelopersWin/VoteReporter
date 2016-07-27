@@ -1,12 +1,9 @@
 using DragonSpark.Activation.IoC;
-using DragonSpark.Aspects.Validation;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
-using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
@@ -40,26 +37,18 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public sealed class FactoryTypeRequests : Cache<Type, FactoryTypeRequest>
+	public sealed class FactoryTypeRequests : FactoryCache<Type, FactoryTypeRequest>
 	{
-		public static ISource<ImmutableArray<FactoryTypeRequest>> Requests { get; } = new ExecutionScope<ImmutableArray<FactoryTypeRequest>>( () => Instance.GetMany( ApplicationParts.Instance.Get().Types ) );
+		readonly static Func<Type, Type> ResultLocator = ResultTypes.Instance.ToDelegate();
 
 		public static FactoryTypeRequests Instance { get; } = new FactoryTypeRequests();
-		FactoryTypeRequests() : base( new Factory().Create ) {}
+		FactoryTypeRequests() : base( CanInstantiateSpecification.Instance.And( IsFactorySpecification.Instance, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new Specification() ) ) {}
 
-		[ApplyAutoValidation]
-		sealed class Factory : FactoryBase<Type, FactoryTypeRequest>
+		protected override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
+
+		class Specification : GuardedSpecificationBase<Type>
 		{
-			public Factory() : base( CanInstantiateSpecification.Instance.And( IsFactorySpecification.Instance, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new Specification() ) ) {}
-
-			readonly static Func<Type, Type> ResultLocator = ResultTypeLocator.Instance.ToDelegate();
-
-			public override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
-
-			class Specification : GuardedSpecificationBase<Type>
-			{
-				public override bool IsSatisfiedBy( Type parameter ) => ResultLocator( parameter ) != typeof(object);
-			}
+			public override bool IsSatisfiedBy( Type parameter ) => ResultLocator( parameter ) != typeof(object);
 		}
 	}
 }

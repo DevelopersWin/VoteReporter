@@ -8,6 +8,7 @@ using System.Composition;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Runtime.Properties;
 
 namespace DragonSpark.Composition
 {
@@ -24,7 +25,7 @@ namespace DragonSpark.Composition
 
 		public static ContainerConfiguration WithInstance<T>( [Required] this ContainerConfiguration @this, T instance, string name = null ) => @this.WithProvider( new InstanceExportDescriptorProvider<T>( instance, name ) );
 
-		public static object Checked( this LifetimeContext @this, object instance )
+		public static object Registered( this LifetimeContext @this, object instance )
 		{
 			instance.As<IDisposable>( @this.AddBoundInstance );
 			return instance;
@@ -61,19 +62,19 @@ namespace DragonSpark.Composition
 	// https://github.com/dotnet/corefx/issues/6857
 	public class TypeInitializingExportDescriptorProvider : ExportDescriptorProvider
 	{
-		readonly Func<Type, Type> locator;
+		readonly ICache<Type, Type> types;
 		readonly static Action<Type> Initializer = InitializeTypeCommand.Instance.ToDelegate();
 
-		public TypeInitializingExportDescriptorProvider() : this( BuildableTypeFromConventionLocator.Instance.Get() ) {}
+		public TypeInitializingExportDescriptorProvider() : this( ConventionTypes.Instance.Get() ) {}
 
-		TypeInitializingExportDescriptorProvider( Func<Type, Type> locator )
+		TypeInitializingExportDescriptorProvider( ICache<Type, Type> types )
 		{
-			this.locator = locator;
+			this.types = types;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
-			new[] { contract.ContractType, locator( contract.ContractType ) }
+			new[] { contract.ContractType, types.Get( contract.ContractType ) }
 				.WhereAssigned()
 				.Distinct()
 				.Each( Initializer );

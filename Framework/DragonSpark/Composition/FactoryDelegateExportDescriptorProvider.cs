@@ -31,7 +31,7 @@ namespace DragonSpark.Composition
 	[ApplyAutoValidation]
 	public sealed class FactoryDelegateTransformer : FactoryBase<CompositionContract, CompositionContract>
 	{
-		readonly static Func<Type, Type> ResultTypeLocator = Activation.ResultTypeLocator.Instance.ToDelegate();
+		readonly static Func<Type, Type> ResultTypeLocator = Activation.ResultTypes.Instance.ToDelegate();
 
 		public static FactoryDelegateTransformer Instance { get; } = new FactoryDelegateTransformer( typeof(Func<>) );
 

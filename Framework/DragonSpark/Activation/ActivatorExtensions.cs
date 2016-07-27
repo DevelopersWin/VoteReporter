@@ -40,12 +40,12 @@ namespace DragonSpark.Activation
 
 		sealed class Locator : LocatorBase
 		{
-			readonly Func<Type, Type> convention;
+			readonly ICache<Type, Type> convention;
 			readonly ISingletonLocator singleton;
 
-			public Locator() : this( BuildableTypeFromConventionLocator.Instance.Get(), SingletonLocator.Instance ) {}
+			public Locator() : this( ConventionTypes.Instance.Get(), SingletonLocator.Instance ) {}
 
-			Locator( Func<Type, Type> convention, ISingletonLocator singleton )
+			Locator( ICache<Type, Type> convention, ISingletonLocator singleton )
 			{
 				this.convention = convention;
 				this.singleton = singleton;
@@ -53,7 +53,7 @@ namespace DragonSpark.Activation
 
 			public override object Create( LocateTypeRequest parameter )
 			{
-				var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;
+				var type = convention.Get( parameter.RequestedType ) ?? parameter.RequestedType;
 				var result = singleton.Get( type );
 				return result;
 			}
