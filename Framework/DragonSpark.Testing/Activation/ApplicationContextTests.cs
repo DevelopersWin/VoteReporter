@@ -3,6 +3,8 @@ using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
+using Ploeh.AutoFixture;
 using System.Reflection;
 using Xunit;
 using ExecutionContextStore = DragonSpark.Testing.Framework.ExecutionContextStore;
@@ -22,7 +24,7 @@ namespace DragonSpark.Testing.Activation
 			Assert.True( EnableMethodCaching.Instance.Get() );
 
 			var method = MethodBase.GetCurrentMethod();
-			using ( var command = new TestingApplicationInitializationCommand().Run( default(object) ) )
+			using ( var command = ApplicationFactory.Instance.Create( method ).Run( new AutoData( FixtureContext.Instance.Assigned( FixtureFactory<AutoDataCustomization>.Instance.Create() ), method ) ) )
 			{
 				Assert.NotNull( MethodContext.Instance.Get() );
 				Assert.Same( method, MethodContext.Instance.Get() );

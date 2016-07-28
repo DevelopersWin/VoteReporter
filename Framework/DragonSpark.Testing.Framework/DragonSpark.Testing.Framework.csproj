@@ -249,6 +249,7 @@
     <Compile Include="Setup\AutoDataCommandBase.cs" />
     <Compile Include="Setup\AutoData.cs" />
     <Compile Include="TestCollectionBase.cs" />
+    <Compile Include="TestingMethodAspect.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonSpark.Windows\DragonSpark.Windows.csproj">

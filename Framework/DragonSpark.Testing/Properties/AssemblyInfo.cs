@@ -4,6 +4,7 @@
 
 using DragonSpark.Aspects;
 using DragonSpark.Runtime;
+using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -27,5 +28,6 @@ using System.Runtime.InteropServices;
 
 [assembly: ApplyDefaultValues]
 [assembly: DisposeAssociatedAspect]
+[assembly: TestingMethodAspect]
 
 // [assembly: InternalsVisibleTo( "DynamicProxyGenAssembly2" )]

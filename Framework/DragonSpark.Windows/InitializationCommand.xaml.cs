@@ -1,12 +1,15 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using System;
+using System.Composition;
 
 namespace DragonSpark.Windows
 {
+	[Export( typeof(ISetup) )]
 	public partial class InitializationCommand
 	{
 		[ModuleInitializer( 0 )]
@@ -15,6 +18,7 @@ namespace DragonSpark.Windows
 		public static InitializationCommand Instance { get; } = new InitializationCommand();
 		InitializationCommand() : base( AttributeConfigurations.TypeDefinitionProviders.From( Runtime.TypeDefinitionProviderStore.Instance ) )
 		{
+			Priority = Priority.BeforeNormal;
 			// InitializeComponent();
 		}
 	}

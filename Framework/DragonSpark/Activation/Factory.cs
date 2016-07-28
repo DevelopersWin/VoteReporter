@@ -1,3 +1,5 @@
+using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -8,6 +10,7 @@ using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Linq;
 using System.Reflection;
 using Type = System.Type;
@@ -16,16 +19,16 @@ namespace DragonSpark.Activation
 {
 	public sealed class IsFactorySpecification : AdapterSpecificationBase
 	{
-		public static ISpecification<Type> Instance { get; } = new IsFactorySpecification( typeof(IFactory), typeof(IFactoryWithParameter) ).Cached();
-		IsFactorySpecification( params Type[] types ) : base( types ) {}
+		public static ISpecification<Type> Instance { get; } = new IsFactorySpecification().Cached();
+		IsFactorySpecification() : base( typeof(IFactory), typeof(IFactoryWithParameter) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
 	}
 
-	public class IsGenericFactorySpecification : AdapterSpecificationBase
+	public sealed class IsGenericFactorySpecification : AdapterSpecificationBase
 	{
-		public static ISpecification<Type> Instance { get; } = new IsGenericFactorySpecification( typeof(IFactory<>), typeof(IFactory<,>) ).Cached();
-		IsGenericFactorySpecification( params Type[] types ) : base( types ) {}
+		public static ISpecification<Type> Instance { get; } = new IsGenericFactorySpecification().Cached();
+		IsGenericFactorySpecification() : base( typeof(IFactory<>), typeof(IFactory<,>) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );
 	}
@@ -42,28 +45,29 @@ namespace DragonSpark.Activation
 		protected ImmutableArray<TypeAdapter> Adapters { get; }
 	}
 
-	public class FactoryInterfaces : FactoryCache<Type, Type>
+	public sealed class FactoryInterfaces : FactoryCache<Type, Type>
 	{
 		readonly static Func<Type, bool> GenericFactory = IsGenericFactorySpecification.Instance.ToDelegate();
 		readonly static Func<Type, bool> Factory = IsFactorySpecification.Instance.ToDelegate();
 
 		public static ICache<Type, Type> Instance { get; } = new FactoryInterfaces();
+		FactoryInterfaces() {}
 
 		protected override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().With( types => types.FirstOrDefault( GenericFactory ) ?? types.FirstOrDefault( Factory ) );
 	}
 
-	public class ParameterTypes : TypeLocatorBase
+	public sealed class ParameterTypes : TypeLocatorBase
 	{
-		public static ICache<Type, Type> Instance { get; } = new ParameterTypes( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) );
-		ParameterTypes( ImmutableArray<Type> types ) : base( types ) {}
+		public static ICache<Type, Type> Instance { get; } = new ParameterTypes();
+		ParameterTypes() : base( ImmutableArray.Create( typeof(Func<,>), typeof(IFactory<,>), typeof(ICommand<>) ) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.First();
 	}
 
-	public class ResultTypes : TypeLocatorBase
+	public sealed class ResultTypes : TypeLocatorBase
 	{
-		public static ICache<Type, Type> Instance { get; } = new ResultTypes( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) );
-		ResultTypes( ImmutableArray<Type> types ) : base( types ) {}
+		public static ICache<Type, Type> Instance { get; } = new ResultTypes();
+		ResultTypes() : base( ImmutableArray.Create( typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
@@ -143,22 +147,18 @@ namespace DragonSpark.Activation
 			: base( new AutoValidatingFactory<Type, Func<object>>( factory, FactorySpecification ), new AutoValidatingFactory<Type, Func<object>>( factoryWithParameter, FactoryWithParameterSpecification ) ) {}
 	}
 
-	public class FactoryTypes : EqualityReferenceCache<LocateTypeRequest, Type>
+	public sealed class FactoryTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
 		public static ISource<FactoryTypes> Instance { get; } = new ExecutionScope<FactoryTypes>( () => new FactoryTypes() );
-		FactoryTypes() : this( FactoryTypeRequests.Instance.GetMany( ApplicationParts.Instance.Get().Types ) ) {}
-
-		public static IParameterizedSource<MemberInfo, Type> Members { get; } = new ParameterizedSource<MemberInfo, Type>( new FactoryTypeLocator<MemberInfo>( member => member.GetMemberType(), member => member.DeclaringType ).Create );
-
-		public static IParameterizedSource<ParameterInfo, Type> Parameters { get; } = new ParameterizedSource<ParameterInfo, Type>( new FactoryTypeLocator<ParameterInfo>( parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ).Create );
-
-		public FactoryTypes( ImmutableArray<FactoryTypeRequest> requests ) : base( new Factory( requests ).Create ) {}
-
+		FactoryTypes() : base( new Factory().Create ) {}
+		
 		sealed class Factory :  FactoryBase<LocateTypeRequest, Type>
 		{
 			readonly ImmutableArray<FactoryTypeRequest> types;
 
-			public Factory( ImmutableArray<FactoryTypeRequest> types )
+			public Factory() : this( Requests.Instance.GetMany( ApplicationParts.Instance.Get().Types ) ) {}
+
+			Factory( ImmutableArray<FactoryTypeRequest> types )
 			{
 				this.types = types;
 			}
@@ -175,6 +175,16 @@ namespace DragonSpark.Activation
 
 				var result = item?.RequestedType;
 				return result;
+			}
+
+			sealed class Requests : FactoryCache<Type, FactoryTypeRequest>
+			{
+				readonly static Func<Type, Type> ResultLocator = ResultTypes.Instance.ToDelegate();
+
+				public static Requests Instance { get; } = new Requests();
+				Requests() : base( CanInstantiateSpecification.Instance.And( IsFactorySpecification.Instance, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new DelegatedSpecification<Type>( type => ResultLocator( type ) != typeof(object) ) ) ) {}
+
+				protected override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
 			}
 		}
 	}

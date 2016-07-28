@@ -1,15 +1,11 @@
-using DragonSpark.Runtime;
-using DragonSpark.Setup;
 using JetBrains.dotMemoryUnit;
-using PostSharp.Aspects;
 using PostSharp.Patterns.Model;
 using System;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework
 {
-	public static class Defer
+	/*public static class Defer
 	{
 		public static Task Run( Action<Task> action, object context )
 		{
@@ -23,26 +19,7 @@ namespace DragonSpark.Testing.Framework
 		}
 
 		public static void Dispose<T>( this IDisposable @this, T item ) => @this.Dispose(); // TODO: Make more generalized.
-	}
-
-	[Serializable, LinesOfCodeAvoided( 8 )]
-	public sealed class ExecuteMethodAspect : MethodInterceptionAspect
-	{
-		public static ExecuteMethodAspect Instance { get; } = new ExecuteMethodAspect();
-
-		ExecuteMethodAspect() {}
-
-		public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			base.OnInvoke( args );
-
-			ApplicationServices.Instance.Value.Dispose();
-
-			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
-
-			// args.ReturnValue = Defer.Run( ExecutionContextStore.Instance.Value.Dispose, args.ReturnValue );
-		}
-	}
+	}*/
 
 	/*public class ApplicationOutputCommand : OutputCommand
 	{

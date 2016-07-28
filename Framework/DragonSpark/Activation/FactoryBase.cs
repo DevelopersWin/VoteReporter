@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;

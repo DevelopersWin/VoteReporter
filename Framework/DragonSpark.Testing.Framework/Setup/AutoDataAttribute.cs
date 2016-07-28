@@ -7,6 +7,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
+using DragonSpark.Windows;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
 using Serilog.Events;
@@ -20,7 +21,7 @@ using AssemblyPartLocator = DragonSpark.Windows.TypeSystem.AssemblyPartLocator;
 namespace DragonSpark.Testing.Framework.Setup
 {
 	[LinesOfCodeAvoided( 5 )]
-	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute, IAspectProvider
+	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute//, IAspectProvider
 	{
 		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Create;
 		readonly static Func<MethodBase, IApplication> DefaultSource = ApplicationFactory.Instance.Create;
@@ -42,7 +43,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			return result;
 		}
 
-		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance[]>( info => new AspectInstance( info, ExecuteMethodAspect.Instance ).ToItem() );
+		// IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance[]>( info => new AspectInstance( info, TestingMethodAspect.Instance ).ToItem() );
 	}
 
 	public sealed class ApplicationFactory : ConfiguringFactory<MethodBase, IApplication>
@@ -59,7 +60,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class FrameworkTypesAttribute : TypeProviderAttributeBase
 	{
-		public FrameworkTypesAttribute() : base( typeof(TestingApplicationInitializationCommand), typeof(Configure), typeof(MetadataCommand) ) {}
+		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(MetadataCommand) ) {}
 	}
 
 	public sealed class FixtureContext : Configuration<IFixture>

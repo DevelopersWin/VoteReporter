@@ -38,6 +38,7 @@ namespace DragonSpark.Activation
 				.Where( @this.CanCreate )
 				.Select( @this.Create )
 				.Where( @where ?? Where<TResult>.Assigned ).Fixed();
+
 		public static TResult[] CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
 			parameters
 				.Where( @this.CanCreate )

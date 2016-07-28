@@ -2,12 +2,10 @@ using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
-using DragonSpark.Setup;
 using DragonSpark.Windows.Runtime;
 using PostSharp.Aspects;
 using System;
 using System.Collections.Concurrent;
-using System.Composition;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -126,15 +124,15 @@ namespace DragonSpark.Testing.Framework
 		MethodContext() {}
 	}
 
-	[Export( typeof(ISetup) )]
-	public class TestingApplicationInitializationCommand : DragonSpark.Setup.Setup
+	
+	/*public class TestingApplicationInitializationCommand : DragonSpark.Setup.Setup
 	{
 		public TestingApplicationInitializationCommand()
 			: base( Windows.InitializationCommand.Instance, new DisposeDisposableCommand( ExecutionContextStore.Instance.Value ) )
 		{
 			Priority = Priority.High;
 		}
-	}
+	}*/
 
 	// class WindowsTestingApplicationInitializationCommand {}
 }

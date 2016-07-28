@@ -1,54 +1,53 @@
-using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Immutable;
-using System.Composition;
-using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	public sealed class FactoryTypeLocator<T> : FactoryBase<T, Type>
+	public sealed class FactoryTypeLocator : TransformerBase<Type>
 	{
-		readonly Func<T, Type> type;
-		readonly Func<T, Type> context;
+		readonly static Func<LocateTypeRequest, Type> Types = FactoryTypes.Instance.Delegate();
 
-		public FactoryTypeLocator( Func<T, Type> type, Func<T, Type> context )
+		public static FactoryTypeLocator Instance { get; } = new FactoryTypeLocator();
+		FactoryTypeLocator( /*Func<Type, Type> typeSource, Func<Type, Type> contextSource*/ ) : this( Types ) {}
+
+		readonly Func<LocateTypeRequest, Type> @delegate;
+		// readonly Func<FactoryTypeRequest> requestSource;
+		/*readonly Func<T, Type> typeSource;
+		readonly Func<T, Type> contextSource;*/
+
+		/*public FactoryTypeLocator( /*Func<Type, Type> typeSource, Func<Type, Type> contextSource#1# Func<FactoryTypeRequest> requestSource )
 		{
-			this.type = type;
-			this.context = context;
+			this.requestSource = requestSource;
+			this.typeSource = typeSource;
+			this.contextSource = contextSource;
+		}*/
+
+		FactoryTypeLocator( Func<LocateTypeRequest, Type> @delegate )
+		{
+			this.@delegate = @delegate;
 		}
 
-		public override Type Create( T parameter )
+		/*public override Type Create( Type parameter )
 		{
-			var info = context( parameter ).GetTypeInfo();
-			var nestedTypes = info.DeclaredNestedTypes.AsTypes().ToArray();
-			var all = nestedTypes.Union( AssemblyTypes.All.Get( info.Assembly ) ).Where( Defaults.ApplicationType ).ToImmutableArray();
-			var requests = FactoryTypeRequests.Instance.GetMany( all );
-			var candidates = new[] { new FactoryTypes( requests ), FactoryTypes.Instance.Get() };
-			var mapped = new LocateTypeRequest( type( parameter ) );
-			var result = candidates.Introduce( mapped, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
-			return result;
+
+			/*var context = contextSource( parameter );
+			var all = SelfAndNestedTypes
+						.Instance.Get( context )
+						.Union( AssemblyTypes.All.Get( context.Assembly() ).Where( Defaults.ApplicationType ) )
+						.ToImmutableArray();#1#
+
+			/*var local = new FactoryTypes( FactoryTypeRequests.Instance.GetMany( all ) );
+			var result = new[] { local, FactoryTypes.Instance.Get() }
+				.Select( types => types.ToDelegate() )
+				.Introduce( new LocateTypeRequest( typeSource( parameter ) ) )
+				.FirstAssigned();
+			return result;#1#
 		}
-	}
 
-	public sealed class FactoryTypeRequests : FactoryCache<Type, FactoryTypeRequest>
-	{
-		readonly static Func<Type, Type> ResultLocator = ResultTypes.Instance.ToDelegate();
-
-		public static FactoryTypeRequests Instance { get; } = new FactoryTypeRequests();
-		FactoryTypeRequests() : base( CanInstantiateSpecification.Instance.And( IsFactorySpecification.Instance, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new Specification() ) ) {}
-
-		protected override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), ResultLocator( parameter ) );
-
-		class Specification : GuardedSpecificationBase<Type>
+		public struct Parameter
 		{
-			public override bool IsSatisfiedBy( Type parameter ) => ResultLocator( parameter ) != typeof(object);
-		}
+			public Parameter() {}
+		}*/
+		public override Type Get( Type parameter ) => @delegate( new LocateTypeRequest( parameter ) );
 	}
 }

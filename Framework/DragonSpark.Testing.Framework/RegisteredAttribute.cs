@@ -17,6 +17,8 @@ namespace DragonSpark.Testing.Framework
 {
 	public class FactoryAttribute : CustomizeAttribute
 	{
+		// readonly static IParameterizedSource<ParameterInfo, Type> Types = new ParameterizedSource<ParameterInfo, Type>( new FactoryTypeLocator<ParameterInfo>( parameter => parameter.ParameterType, parameter => parameter.Member.DeclaringType ).Create );
+
 		readonly Type factoryType;
 
 		public FactoryAttribute( Type factoryType = null )
@@ -26,7 +28,7 @@ namespace DragonSpark.Testing.Framework
 
 		public override ICustomization GetCustomization( ParameterInfo parameter )
 		{
-			var type = factoryType ?? FactoryTypes.Parameters.Get( parameter );
+			var type = factoryType ?? FactoryTypeLocator.Instance.Get( parameter.ParameterType );
 			var registration = new FactoryRegistration( type, parameter.ParameterType );
 			var result = new RegistrationCustomization( registration );
 			return result;
