@@ -108,7 +108,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	public class HasFactorySpecification : CanCreateSpecification<LocateTypeRequest>
 	{
 		readonly static Coerce<LocateTypeRequest> DefaultCoercer = TypeRequestCoercer<LocateTypeRequest>.Instance.ToDelegate();
-		public HasFactorySpecification() : base( FactoryTypes.Instance.Get().Get, DefaultCoercer ) {}
+		public HasFactorySpecification() : base( SourceTypes.Instance.Get().Get, DefaultCoercer ) {}
 	}
 
 	public abstract class StrategyValidator<TStrategy> : GuardedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy

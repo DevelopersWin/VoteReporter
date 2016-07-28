@@ -63,9 +63,9 @@ namespace DragonSpark.Activation
 			}
 		}
 
-		public static Func<object, T> Wrap<T>( this IFactory<T> @this ) => @this.Wrap<object, T>();
+		public static Func<object, T> Wrap<T>( this ISource<T> @this ) => @this.Wrap<object, T>();
 
-		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this IFactory<TResult> @this ) => @this.ToDelegate().Wrap<TParameter, TResult>();
+		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this ISource<TResult> @this ) => @this.ToDelegate().Wrap<TParameter, TResult>();
 
 		public static Func<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
 
@@ -176,36 +176,36 @@ namespace DragonSpark.Activation
 			}
 		}
 
-		public static Func<object> ToDelegate( this IFactory @this ) => FactoryDelegateCache.Default.Get( @this );
-		class FactoryDelegateCache : Cache<IFactory, Func<object>>
+		public static Func<object> ToDelegate( this ISource @this ) => SourceDelegates.Default.Get( @this );
+		class SourceDelegates : Cache<ISource, Func<object>>
 		{
-			public static FactoryDelegateCache Default { get; } = new FactoryDelegateCache();
+			public static SourceDelegates Default { get; } = new SourceDelegates();
 
-			FactoryDelegateCache() : base( factory => factory.Create ) {}
+			SourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		public static Func<T> ToDelegate<T>( this IFactory<T> @this ) => FactoryDelegateCache<T>.Default.Get( @this );
-		class FactoryDelegateCache<T> : Cache<IFactory<T>, Func<T>>
+		public static Func<T> ToDelegate<T>( this ISource<T> @this ) => ParameterizedSourceDelegates<T>.Default.Get( @this );
+		class ParameterizedSourceDelegates<T> : Cache<ISource<T>, Func<T>>
 		{
-			public static FactoryDelegateCache<T> Default { get; } = new FactoryDelegateCache<T>();
+			public static ParameterizedSourceDelegates<T> Default { get; } = new ParameterizedSourceDelegates<T>();
 
-			FactoryDelegateCache() : base( factory => factory.Create ) {}
+			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		public static Func<object, object> ToDelegate( this IFactoryWithParameter @this ) => FactoryWithParameterDelegateCache.Default.Get( @this );
-		class FactoryWithParameterDelegateCache : Cache<IFactoryWithParameter, Func<object, object>>
+		public static Func<object, object> ToDelegate( this IParameterizedSource @this ) => ParameterizedSourceDelegates.Default.Get( @this );
+		class ParameterizedSourceDelegates : Cache<IParameterizedSource, Func<object, object>>
 		{
-			public static FactoryWithParameterDelegateCache Default { get; } = new FactoryWithParameterDelegateCache();
+			public static ParameterizedSourceDelegates Default { get; } = new ParameterizedSourceDelegates();
 
-			FactoryWithParameterDelegateCache() : base( factory => factory.Create ) {}
+			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		public static Func<TParameter, TResult> ToDelegate<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => FactoryDelegateCache<TParameter, TResult>.Default.Get( @this );
-		class FactoryDelegateCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, Func<TParameter, TResult>>
+		public static Func<TParameter, TResult> ToDelegate<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) => ParameterizedSourceDelegates<TParameter, TResult>.Default.Get( @this );
+		class ParameterizedSourceDelegates<TParameter, TResult> : Cache<IParameterizedSource<TParameter, TResult>, Func<TParameter, TResult>>
 		{
-			public static FactoryDelegateCache<TParameter, TResult> Default { get; } = new FactoryDelegateCache<TParameter, TResult>();
+			public static ParameterizedSourceDelegates<TParameter, TResult> Default { get; } = new ParameterizedSourceDelegates<TParameter, TResult>();
 
-			FactoryDelegateCache() : base( factory => factory.Create ) {}
+			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
 		public static ISpecification<object> ToSpecification( this IFactoryWithParameter @this ) => FactorySpecificationCache.Default.Get( @this );
@@ -224,26 +224,26 @@ namespace DragonSpark.Activation
 			FactorySpecificationCache() : base( factory => new DelegatedSpecification<TParameter>( factory.CanCreate ) ) {}
 		}
 
-		public static ICache<T> Cached<T>( this IFactory<object, T> @this ) where T : class => FactoryCache<T>.Default.Get( @this );
-		class FactoryCache<T> : Cache<IFactory<object, T>, ICache<T>> where T : class
+		public static ICache<T> Cached<T>( this IParameterizedSource<object, T> @this ) where T : class => ParameterizedSourceCache<T>.Default.Get( @this );
+		class ParameterizedSourceCache<T> : Cache<IParameterizedSource<object, T>, ICache<T>> where T : class
 		{
-			public static FactoryCache<T> Default { get; } = new FactoryCache<T>();
-			FactoryCache() : base( factory => new Cache<T>( factory.ToDelegate() ) ) {}
+			public static ParameterizedSourceCache<T> Default { get; } = new ParameterizedSourceCache<T>();
+			ParameterizedSourceCache() : base( factory => new Cache<T>( factory.ToDelegate() ) ) {}
 		}
 
-		public static ICache<TParameter, TResult> Cached<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) where TParameter : class where TResult : class => FactoryCache<TParameter, TResult>.Default.Get( @this );
-		class FactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ICache<TParameter, TResult>> where TParameter : class where TResult : class
+		public static ICache<TParameter, TResult> Cached<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) where TParameter : class where TResult : class => ParameterizedSources<TParameter, TResult>.Default.Get( @this );
+		class ParameterizedSources<TParameter, TResult> : Cache<IParameterizedSource<TParameter, TResult>, ICache<TParameter, TResult>> where TParameter : class where TResult : class
 		{
-			public static FactoryCache<TParameter, TResult> Default { get; } = new FactoryCache<TParameter, TResult>();
-			FactoryCache() : base( factory => new Cache<TParameter, TResult>( factory.ToDelegate() ) ) {}
+			public static ParameterizedSources<TParameter, TResult> Default { get; } = new ParameterizedSources<TParameter, TResult>();
+			ParameterizedSources() : base( factory => CacheFactory.Create( factory.ToDelegate() ) ) {}
 		}
 
-		public static ICache<TParameter, TResult> CachedForStructure<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) where TParameter : class => FactoryStructureCache<TParameter, TResult>.Default.Get( @this );
+		/*public static ICache<TParameter, TResult> CachedForStructure<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) where TParameter : class => FactoryStructureCache<TParameter, TResult>.Default.Get( @this );
 		class FactoryStructureCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ICache<TParameter, TResult>> where TParameter : class
 		{
 			public static FactoryStructureCache<TParameter, TResult> Default { get; } = new FactoryStructureCache<TParameter, TResult>();
 			FactoryStructureCache() : base( factory => new StoreCache<TParameter, TResult>( factory.ToDelegate() ) ) {}
-		}
+		}*/
 
 		public static IFactory<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => AutoValidationFactoryCache<TParameter, TResult>.Default.Get( @this );
 		class AutoValidationFactoryCache<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, IFactory<TParameter, TResult>>
@@ -263,7 +263,7 @@ namespace DragonSpark.Activation
 		class InverseCache<T> : Cache<Func<T, bool>, Func<T, bool>>
 		{
 			public static InverseCache<T> Default { get; } = new InverseCache<T>();
-			InverseCache() : base( factory => new Converter( factory ).ToDelegate() ) {}
+			InverseCache() : base( factory => new Converter( factory ).Create ) {}
 
 			class Converter : FactoryBase<T, bool>
 			{

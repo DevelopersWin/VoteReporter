@@ -35,6 +35,7 @@ namespace DragonSpark.Activation
 
 		public virtual void Set( TArgument instance, TValue value ) => this[instance] = value;
 		public virtual TValue Get( TArgument key ) => GetOrAdd( key, body );
+		object IParameterizedSource.Get( object parameter ) => parameter is TArgument ? Get( (TArgument)parameter ) : default(TValue);
 
 		public virtual TValue GetOrSet( TArgument key, Func<TValue> factory )
 		{

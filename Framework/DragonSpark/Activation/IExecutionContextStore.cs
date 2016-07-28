@@ -48,7 +48,7 @@ namespace DragonSpark.Activation
 
 	public interface IExecutionContextStore : IStore {}
 
-	public class ExecutionScope<T> : WritableStore<T>
+	public class ExecutionScope<T> : WritableStore<T>, IParameterizedSource
 	{
 		readonly ICache<T> cache;
 
@@ -64,6 +64,7 @@ namespace DragonSpark.Activation
 		protected override T Get() => cache.Get( Execution.Current() );
 
 		public override void Assign( T item ) => cache.Set( Execution.Current(), item );
+		public object Get( object parameter ) => cache.Get( parameter  );
 	}
 
 	public class Configuration<T> : ExecutionScope<T>, IConfiguration<T>, IAssignable<Func<object, T>>

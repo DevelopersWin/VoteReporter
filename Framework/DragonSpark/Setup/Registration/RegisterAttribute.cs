@@ -1,6 +1,5 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
 
@@ -15,18 +14,18 @@ namespace DragonSpark.Setup.Registration
 
 		public sealed class MappedAttribute : RegistrationBaseAttribute
 		{
-			public MappedAttribute() : this( ConventionImplementedInterfaces.Instance, null, null ) {}
+			public MappedAttribute() : this( null, null ) {}
 
-			public MappedAttribute( Type @as ) : this( ConventionImplementedInterfaces.Instance, @as, null ) { }
+			public MappedAttribute( Type @as ) : this( @as, null ) { }
 
-			public MappedAttribute( string name ) : this( ConventionImplementedInterfaces.Instance, null, name ) { }
+			public MappedAttribute( string name ) : this( null, name ) { }
 
-			MappedAttribute( [Required]ConventionImplementedInterfaces locator, Type @as, string name ) : base( t => new TypeRegistration( @as ?? locator.Get( t ) ?? t.GetTypeInfo().ImplementedInterfaces.Only() ?? t, t, name ) ) { }
+			MappedAttribute( Type @as, string name ) : base( t => new TypeRegistration( @as ?? ConventionImplementedInterfaces.Instance.Get( t ) ?? t.GetTypeInfo().ImplementedInterfaces.Only() ?? t, t, name ) ) { }
 		}
 
-		public class FactoryAttribute : RegistrationBaseAttribute
+		/*public class FactoryAttribute : RegistrationBaseAttribute
 		{
 			public FactoryAttribute() : base( t => new FactoryRegistration( t ) ) { }
-		}
+		}*/
 	}
 }

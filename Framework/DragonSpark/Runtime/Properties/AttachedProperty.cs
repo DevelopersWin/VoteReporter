@@ -208,6 +208,7 @@ namespace DragonSpark.Runtime.Properties
 		public ConfigurableStore( Func<TInstance, TValue> reference ) : base( reference ) {}
 
 		public TValue Get( TInstance parameter ) => Value( parameter );
+		object IParameterizedSource.Get( object parameter ) => parameter is TInstance ? Get( (TInstance)parameter ) : default(TValue);
 	}
 
 	public static class CacheFactory
@@ -302,6 +303,8 @@ namespace DragonSpark.Runtime.Properties
 		public void Set( TInstance instance, TValue value ) => cache.Set( instance, value );
 
 		public void Assign( Func<TInstance, TValue> item ) => configuration.Assign( item );
+
+		object IParameterizedSource.Get( object parameter ) => parameter is TInstance ? Get( (TInstance)parameter ) : default(TValue);
 	}
 
 	public class Cache<T> : Cache<object, T>, ICache<T>/*, IConfigurableCache<T>*/ where T : class
@@ -385,6 +388,8 @@ namespace DragonSpark.Runtime.Properties
 		public abstract void Set( TInstance instance, TValue value );
 		public abstract TValue Get( TInstance instance );
 		public abstract bool Remove( TInstance instance );
+
+		object IParameterizedSource.Get( object parameter ) => parameter is TInstance ? Get( (TInstance)parameter ) : default(TValue);
 	}
 
 	public class StoreCache<T> : StoreCache<object, T>, /*IConfigurableCache<T>, */ICache<T>

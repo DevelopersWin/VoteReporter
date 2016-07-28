@@ -5,7 +5,7 @@ namespace DragonSpark.Activation
 {
 	public sealed class FactoryTypeLocator : TransformerBase<Type>
 	{
-		readonly static Func<LocateTypeRequest, Type> Types = FactoryTypes.Instance.Delegate();
+		readonly static Func<LocateTypeRequest, Type> Types = SourceTypes.Instance.Delegate();
 
 		public static FactoryTypeLocator Instance { get; } = new FactoryTypeLocator();
 		FactoryTypeLocator( /*Func<Type, Type> typeSource, Func<Type, Type> contextSource*/ ) : this( Types ) {}
@@ -36,8 +36,8 @@ namespace DragonSpark.Activation
 						.Union( AssemblyTypes.All.Get( context.Assembly() ).Where( Defaults.ApplicationType ) )
 						.ToImmutableArray();#1#
 
-			/*var local = new FactoryTypes( FactoryTypeRequests.Instance.GetMany( all ) );
-			var result = new[] { local, FactoryTypes.Instance.Get() }
+			/*var local = new SourceTypes( FactoryTypeRequests.Instance.GetMany( all ) );
+			var result = new[] { local, SourceTypes.Instance.Get() }
 				.Select( types => types.ToDelegate() )
 				.Introduce( new LocateTypeRequest( typeSource( parameter ) ) )
 				.FirstAssigned();

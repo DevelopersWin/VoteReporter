@@ -27,6 +27,8 @@ namespace DragonSpark.Activation
 		// protected TransformerBase( [Required]ISpecification<T> specification  ) : base( specification ) {}
 
 		public abstract T Get( T parameter );
+
+		object IParameterizedSource.Get( object parameter ) => parameter is T ? Get( (T)parameter ) : default(T);
 	}
 
 	public class ConfiguringTransformer<T> : TransformerBase<T>
@@ -112,7 +114,7 @@ namespace DragonSpark.Activation
 		protected abstract object GetHost( TParameter parameter );
 	}*/
 
-	public class DecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
+	/*public class DecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
 		public static ICache<IFactoryWithParameter, Func<TParameter, TResult>> Cache { get; } = new Cache<IFactoryWithParameter, Func<TParameter, TResult>>( parameter => new DecoratedFactory<TParameter, TResult>( parameter ).ToDelegate() );
 
@@ -125,9 +127,9 @@ namespace DragonSpark.Activation
 		public DecoratedFactory( IFactory<TParameter, TResult> inner, ISpecification<TParameter> specification  ) : this( inner, Defaults<TParameter>.Coercer, specification ) {}
 
 		public DecoratedFactory( IFactory<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification  ) : base( inner.ToDelegate(), coercer, specification ) {}
-	}
+	}*/
 
-	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>, IParameterizedSource<TParameter, TResult>
+	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>, IParameterizedSource<TParameter, TResult>, IParameterizedSource
 	{
 		readonly Coerce<TParameter> coercer;
 		readonly ISpecification<TParameter> specification;
@@ -146,7 +148,9 @@ namespace DragonSpark.Activation
 	
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		object IFactoryWithParameter.Create( object parameter )
+		object IFactoryWithParameter.Create( object parameter ) => CreateFromParameter( parameter );
+
+		object CreateFromParameter( object parameter )
 		{
 			var coerced = coercer( parameter );
 			var result = coerced.IsAssigned() ? Create( coerced ) : default(TResult);
@@ -158,6 +162,8 @@ namespace DragonSpark.Activation
 		public abstract TResult Create( [Required]TParameter parameter );
 
 		TResult IParameterizedSource<TParameter, TResult>.Get( TParameter parameter ) => Create( parameter );
+
+		object IParameterizedSource.Get( object parameter ) => CreateFromParameter( parameter );
 	}
 
 	public class DelegatedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
@@ -192,7 +198,7 @@ namespace DragonSpark.Activation
 
 	public class DecoratedFactory<T> : DelegatedFactory<T>
 	{
-		public DecoratedFactory( IFactory<T> inner ) : base( inner.ToDelegate() ) {}
+		public DecoratedFactory( ISource<T> inner ) : base( inner.ToDelegate() ) {}
 	}
 
 	public class DelegatedFactory<T> : FactoryBase<T>
@@ -252,7 +258,7 @@ namespace DragonSpark.Activation
 	{
 		readonly ImmutableArray<Func<TParameter, TResult>> inner;
 
-		public CompositeFactory( params IFactory<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
+		public CompositeFactory( params IParameterizedSource<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
 
 		public CompositeFactory( params Func<TParameter, TResult>[] inner ) : this( Specifications<TParameter>.Always, inner ) {}
 
@@ -334,7 +340,7 @@ namespace DragonSpark.Activation
 		readonly Func<TConfiguration, TParameter, TResult> factory;
 
 		protected AggregateParameterizedFactoryBase( Func<TParameter, TConfiguration> seed, Func<TParameter, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TParameter, TResult> factory ) : 
-			this( new ParameterizedConfiguration<TParameter, TConfiguration>( seed ), new ParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>>( configurators ), factory ) {}
+			this( new Configuration.ParameterizedConfiguration<TParameter, TConfiguration>( seed ), new Configuration.ParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>>( configurators ), factory ) {}
 
 		protected AggregateParameterizedFactoryBase( IParameterizedConfiguration<TParameter, TConfiguration> seed, IParameterizedConfiguration<TParameter, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TParameter, TResult> factory )
 		{

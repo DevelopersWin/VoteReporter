@@ -80,26 +80,22 @@ namespace DragonSpark.Runtime
 
 	public interface IParameterizedSource<out T> : IParameterizedSource<object, T> {}
 
-	public interface IParameterizedSource<in TParameter, out TResult>
+	public interface IParameterizedSource<in TParameter, out TResult> : IParameterizedSource
 	{
 		TResult Get( TParameter parameter );
 	}
 
-	public class ParameterizedSource<TParameter, TResult> : ExecutionScope<ICache<TParameter, TResult>>, IParameterizedSource<TParameter, TResult>
+	public interface IParameterizedSource
 	{
-		public ParameterizedSource( Func<TParameter, TResult> factory ) : base( new Factory( factory ).Create ) {}
+		object Get( object parameter );
+	}
+
+	public class ParameterizedConfiguration<TParameter, TResult> : ExecutionScope<ICache<TParameter, TResult>>, IParameterizedSource<TParameter, TResult>
+	{
+		public ParameterizedConfiguration( Func<TParameter, TResult> factory ) : base( new FixedFactory<Func<TParameter, TResult>, ICache<TParameter, TResult>>( CacheFactory.Create, factory ).Create ) {}
 
 		public TResult Get( TParameter key ) => Value.Get( key );
 
-		sealed class Factory : FactoryBase<ICache<TParameter, TResult>>
-		{
-			readonly Func<TParameter, TResult> factory;
-			public Factory( Func<TParameter, TResult> factory )
-			{
-				this.factory = factory;
-			}
-
-			public override ICache<TParameter, TResult> Create() => CacheFactory.Create( factory );
-		}
+		object IParameterizedSource.Get( object parameter ) => parameter is TParameter ? Get( (TParameter)parameter ) : default(TResult);
 	}
 }

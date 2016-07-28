@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup.Registration;
 using System;
@@ -15,7 +16,7 @@ namespace DragonSpark.Composition
 	{
 		readonly static Func<Type, Type> Parameters = ParameterTypes.Instance.ToDelegate();
 
-		readonly Func<LocateTypeRequest, Type> locator = FactoryTypes.Instance.Get().ToDelegate();
+		readonly Func<LocateTypeRequest, Type> locator = SourceTypes.Instance.Get().ToDelegate();
 		readonly Func<CompositionContract, CompositionContract> resolver;
 		readonly Func<Activator.Parameter, object> delegateSource;
 
@@ -147,13 +148,14 @@ namespace DragonSpark.Composition
 
 		public override Func<object> Create( Activator.Parameter parameter )
 		{
-			var factory = new FactoryDelegateLocatorFactory(
-								new FactoryDelegateFactory( parameter.Activate<IFactory> ),
+			return () => null;
+			/*var factory = new FactoryDelegateLocatorFactory(
+								new SourceDelegates( parameter.Activate<IFactory> ),
 								new FactoryWithActivatedParameterDelegateFactory( new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create, parameter.Activate<object> ) 
 								);
 
 			var result = factory.Create( parameter.FactoryType );
-			return result;
+			return result;*/
 		}
 	}
 
@@ -172,7 +174,7 @@ namespace DragonSpark.Composition
 
 		public override Delegate Create( Activator.Parameter parameter )
 		{
-			var @delegate = new FactoryWithParameterDelegateFactory( parameter.Activate<IFactoryWithParameter> ).Create( parameter.FactoryType );
+			var @delegate = new ParameterizedSourceDelegates( parameter.Activate<IParameterizedSource> ).Get( parameter.FactoryType );
 			var result = @delegate.Convert( parameterLocator( parameter.FactoryType ), resultLocator( parameter.FactoryType ) );
 			return result;
 		}

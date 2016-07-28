@@ -123,12 +123,12 @@ namespace DragonSpark.Diagnostics
 
 	public abstract class DestructureByFactoryCommand<TParameter> : DestructureCommandBase
 	{
-		protected DestructureByFactoryCommand( IFactory<TParameter, object> factory )
+		protected DestructureByFactoryCommand( IParameterizedSource<TParameter, object> factory )
 		{
 			Factory = factory;
 		}
 
-		public IFactory<TParameter, object> Factory { get; set; }
+		public IParameterizedSource<TParameter, object> Factory { get; set; }
 
 		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming( Factory.ToDelegate() );
 	}
@@ -138,7 +138,7 @@ namespace DragonSpark.Diagnostics
 	{
 		public DeclarativeCollection<IDestructuringPolicy> Policies { get; } = new DeclarativeCollection<IDestructuringPolicy>();
 
-		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Policies ) );
+		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.With( Policies.Fixed() );
 	}
 
 	public class DestructureTypeCommand : DestructureCommandBase

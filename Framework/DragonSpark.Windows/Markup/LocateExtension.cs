@@ -202,9 +202,9 @@ namespace DragonSpark.Windows.Markup
 		public Type FactoryType { get; set; }
 
 		[Required, Service]
-		InstanceFromFactoryTypeFactory Factory { [return: Required]get; set; }
+		InstanceFromSourceTypeFactory SourceTypeFactory { [return: Required]get; set; }
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Factory.Create( FactoryType );
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => SourceTypeFactory.Create( FactoryType );
 	}
 
 	[ContentProperty( nameof(Properties) )]

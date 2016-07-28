@@ -409,6 +409,8 @@ namespace DragonSpark.Setup
 			{
 				public IsActive() : base( new ThreadLocalStoreCache<Type, bool>() ) {}
 			}
+
+			object IParameterizedSource.Get( object parameter ) => parameter is Type ? Get( (Type)parameter ) : null;
 		}
 	}
 

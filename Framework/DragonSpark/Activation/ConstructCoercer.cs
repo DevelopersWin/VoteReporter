@@ -57,6 +57,8 @@ namespace DragonSpark.Activation
 		}
 
 		public TResult Get( TParameter parameter ) => factory( parameter );
+
+		object IParameterizedSource.Get( object parameter ) => parameter is TParameter ? Get( (TParameter)parameter ) : default(TResult);
 	}
 
 	/*class ParameterConstructor<T> : FactoryBase<object, T>

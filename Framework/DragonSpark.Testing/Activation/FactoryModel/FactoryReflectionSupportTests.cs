@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 
 			new ApplySystemPartsConfiguration( expected ).Run();
 
-			var type = FactoryTypes.Instance.Get().Get( new LocateTypeRequest( typeof(YetAnotherClass) ) );
+			var type = SourceTypes.Instance.Get().Get( new LocateTypeRequest( typeof(YetAnotherClass) ) );
 			Assert.Equal( expected, type );
 		}
 

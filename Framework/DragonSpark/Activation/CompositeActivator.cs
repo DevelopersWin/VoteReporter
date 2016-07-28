@@ -1,3 +1,4 @@
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace DragonSpark.Activation
 			: this( new AnySpecification( activators.Cast<IFactoryWithParameter>().Select( activator => activator.ToSpecification() ).ToArray() ).Cast<object>(), activators ) {}
 
 		public CompositeActivator( ISpecification<object> specification, params IActivator[] activators ) 
-			: base( specification, activators.Cast<IFactoryWithParameter>().Select( activator => activator.ToDelegate() ).ToArray() ) {}
+			: base( specification, activators.Cast<IParameterizedSource>().Select( activator => activator.ToDelegate() ).ToArray() ) {}
 
 		bool IFactory<TypeRequest, object>.CanCreate( TypeRequest parameter ) => CanCreate( parameter );
 
