@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Commands;
@@ -146,7 +145,7 @@ namespace DragonSpark.Configuration
 		public Configurations() {}
 		public Configurations( params ITransformer<T>[] configurators ) : this( new Configurator<T>( configurators ).Get ) {}
 		public Configurations( Func<ImmutableArray<ITransformer<T>>> defaultFactory ) : base( defaultFactory ) {}
-		public Configurations( IConfigurableCache<ImmutableArray<ITransformer<T>>> cache ) : base( cache ) {}
+		// public Configurations( IConfigurableCache<ImmutableArray<ITransformer<T>>> cache ) : base( cache ) {}
 	}
 
 	public class Configurator<T> : ItemsStoreBase<ITransformer<T>>

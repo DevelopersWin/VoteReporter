@@ -205,7 +205,7 @@ namespace DragonSpark.Runtime.Properties
 
 	public class ConfigurableStore<TInstance, TValue> : DecoratedStore<Func<TInstance, TValue>>, IParameterizedConfiguration<TInstance, TValue>
 	{
-		public ConfigurableStore( Func<TInstance, TValue> factory ) : this( new ExecutionScope<Func<TInstance, TValue>>( factory.Self ) ) {}
+		public ConfigurableStore( Func<TInstance, TValue> factory ) : this( new FixedStore<Func<TInstance, TValue>>( factory ) ) {}
 		public ConfigurableStore( IWritableStore<Func<TInstance, TValue>> store ) : base( store ) {}
 
 		public TValue Get( TInstance parameter ) => Value( parameter );
@@ -247,18 +247,10 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 	
-	public class ConfigurableCache<T> : ConfigurableCache<object, T>, IConfigurableCache<T>
-	{
-		public ConfigurableCache( Func<object, T> factory ) : base( factory ) {}
-		// protected ConfigurableCache( IParameterizedConfiguration<object, T> configuration, Func<Func<object, T>, ICache<object, T>> factory ) : base( configuration, factory ) {}
-		// public ConfigurableCache( IParameterizedConfiguration<object, T> configuration, ICache<object, T> cache ) : base( configuration, cache ) {}
-	}
-
 	public abstract class FactoryCache<T> : FactoryCache<object, T>, IConfigurableCache<T>
 	{
 		protected FactoryCache() : this( DefaultSpecification ) {}
 		protected FactoryCache( ISpecification<object> specification ) : base( specification ) {}
-		// protected FactoryCache( IParameterizedConfiguration<object, T> configuration ) : base( configuration ) {}
 	}
 
 	public abstract class FactoryCache<TInstance, TValue> : ConfigurableCache<TInstance, TValue>
@@ -266,9 +258,7 @@ namespace DragonSpark.Runtime.Properties
 		readonly protected static ISpecification<TInstance> DefaultSpecification = Specifications<TInstance>.Always;
 
 		protected FactoryCache() : this( DefaultSpecification ) {}
-		protected FactoryCache( ISpecification<TInstance> specification ) : this( new ConfigurableStore<TInstance, TValue>( new FixedStore<Func<TInstance, TValue>>( instance => default(TValue) ) ), specification ) {}
-
-		// protected FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : this( configuration, DefaultSpecification ) {}
+		protected FactoryCache( ISpecification<TInstance> specification ) : this( new ConfigurableStore<TInstance, TValue>( instance => default(TValue) ), specification ) {}
 
 		FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration, ISpecification<TInstance> specification ) : base( configuration )
 		{
@@ -307,13 +297,19 @@ namespace DragonSpark.Runtime.Properties
 		public override void Set( TInstance instance, TValue value ) => cache.Set( instance, value );
 	}
 
+	public class ConfigurableCache<T> : ConfigurableCache<object, T>, IConfigurableCache<T>
+	{
+		public ConfigurableCache( Func<object, T> factory ) : base( factory ) {}
+		public ConfigurableCache( IParameterizedConfiguration<object, T> configuration ) : base( configuration ) {}
+	}
+
 	public class ConfigurableCache<TInstance, TValue> : DecoratedCache<TInstance, TValue>, IConfigurableCache<TInstance, TValue>
 	{
 		readonly IParameterizedConfiguration<TInstance, TValue> configuration;
 
 		public ConfigurableCache( Func<TInstance, TValue> factory ) : this( new ConfigurableStore<TInstance, TValue>( factory ) ) {}
 
-		protected ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : base( CacheFactory.Create<TInstance, TValue>( configuration.Get ) )
+		public ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : base( CacheFactory.Create<TInstance, TValue>( configuration.Get ) )
 		{
 			this.configuration = configuration;
 		}
@@ -404,7 +400,7 @@ namespace DragonSpark.Runtime.Properties
 		object IParameterizedSource.Get( object parameter ) => parameter is TInstance ? Get( (TInstance)parameter ) : default(TValue);
 	}
 
-	public class StoreCache<T> : StoreCache<object, T>, /*IConfigurableCache<T>, */ICache<T>
+	public class StoreCache<T> : StoreCache<object, T>, ICache<T>
 	{
 		public StoreCache() : this( new WritableStoreCache<object, T>() ) {}
 		public StoreCache( Func<object, T> create ) : this( new WritableStoreCache<object, T>( create ) ) {}
@@ -412,7 +408,7 @@ namespace DragonSpark.Runtime.Properties
 		public StoreCache( IStoreCache<object, T> inner ) : base( inner ) {}
 	}
 
-	public class StoreCache<TInstance, TValue> : CacheBase<TInstance, TValue>/*, IConfigurableCache<TInstance, TValue>*/ where TInstance : class
+	public class StoreCache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class
 	{
 		readonly IStoreCache<TInstance, TValue> inner;
 
@@ -431,10 +427,9 @@ namespace DragonSpark.Runtime.Properties
 		public override TValue Get( TInstance instance ) => inner.Get( instance ).Value;
 
 		public override bool Remove( TInstance instance ) => inner.Remove( instance );
-		/*public void Assign( Func<TInstance, TValue> factory ) => inner.Assign( factory );*/
 	}
 
-	public interface IStoreCache<in TInstance, TValue> : ICache<TInstance, IWritableStore<TValue>>/*, IAssignable<Func<TInstance, TValue>>*/ {}
+	public interface IStoreCache<in TInstance, TValue> : ICache<TInstance, IWritableStore<TValue>> {}
 
 	public class WritableStoreCache<TInstance, TValue> : Cache<TInstance, IWritableStore<TValue>>, IStoreCache<TInstance, TValue> where TInstance : class
 	{
@@ -454,14 +449,7 @@ namespace DragonSpark.Runtime.Properties
 
 			public IWritableStore<TValue> Create( TInstance instance ) => new FixedStore<TValue>( create( instance ) );
 		}
-
-		// public void Assign( Func<TInstance, TValue> item ) => base.Assign( new Context( item ).Create );
 	}
-
-	/*class ParameterConstructedCache<TInstance, TResult> : Cache<TInstance, TResult> where TResult : class where TInstance : class
-	{
-		public ParameterConstructedCache() : base( ParameterConstructor<TInstance, TResult>.Default ) {}
-	}*/
 
 	public class ActivatedCache<T> : ActivatedCache<object, T>, ICache<T> where T : class, new()
 	{

@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using System;
 
@@ -25,7 +26,7 @@ namespace DragonSpark.Configuration
 				this.factory = factory;
 			}
 
-			public override IConfigurableCache<TKey, TValue> Create() => new ConfigurableCache<TKey, TValue>( factory );
+			public override IConfigurableCache<TKey, TValue> Create() => new ConfigurableCache<TKey, TValue>( new ConfigurableStore<TKey, TValue>( new ExecutionScope<Func<TKey, TValue>>( factory.Self ) ) );
 		}
 	}
 }

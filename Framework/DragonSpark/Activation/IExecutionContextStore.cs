@@ -82,7 +82,7 @@ namespace DragonSpark.Activation
 		readonly IConfigurableCache<T> cache;
 
 		public Configuration() : this( () => default(T) ) {}
-		public Configuration( Func<T> defaultFactory ) : this( new ConfigurableCache<T>( defaultFactory.Wrap() ) ) {}
+		public Configuration( Func<T> defaultFactory ) : this( new ConfigurableCache<T>( new ConfigurableStore<object, T>( new ExecutionScope<Func<object, T>>( defaultFactory.Wrap().Self ) ) ) ) {}
 
 		public Configuration( IConfigurableCache<T> cache ) : base( cache )
 		{
