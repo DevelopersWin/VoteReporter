@@ -18,13 +18,13 @@ namespace DragonSpark.Composition
 	public class SourceDelegateExporter : SourceDelegateExporterBase
 	{
 		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.Instance.ToDelegate();
-		readonly static Func<ActivatorParameter, object> DelegateSource = SourceFactory.Instance.Create;
+		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Instance.Create;
 		public SourceDelegateExporter() : base( DelegateSource, Default ) {}
 
-		sealed class SourceFactory : FactoryBase<ActivatorParameter, object>
+		sealed class Factory : FactoryBase<ActivatorParameter, object>
 		{
-			public static SourceFactory Instance { get; } = new SourceFactory();
-			SourceFactory() {}
+			public static Factory Instance { get; } = new Factory();
+			Factory() {}
 
 			public override object Create( ActivatorParameter parameter ) => DelegateFactory.Instance.Create( parameter ).Convert( ResultTypes.Instance.Get( parameter.FactoryType ) );
 		}
@@ -33,19 +33,19 @@ namespace DragonSpark.Composition
 	public sealed class ParameterizedSourceDelegateExporter : SourceDelegateExporterBase
 	{
 		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.InstanceWithParameter.ToDelegate();
-		readonly static Func<ActivatorParameter, object> DelegateSource = SourceFactory.Instance.Create;
+		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Instance.Create;
 
 		public ParameterizedSourceDelegateExporter() : base( DelegateSource, Default ) {}
 
-		sealed class SourceFactory : FactoryBase<ActivatorParameter, object>
+		sealed class Factory : FactoryBase<ActivatorParameter, object>
 		{
-			public static SourceFactory Instance { get; } = new SourceFactory();
-			SourceFactory() : this( ParameterTypes.Instance.ToDelegate(), ResultTypes.Instance.ToDelegate() ) {}
+			public static Factory Instance { get; } = new Factory();
+			Factory() : this( ParameterTypes.Instance.ToDelegate(), ResultTypes.Instance.ToDelegate() ) {}
 
 			readonly Func<Type, Type> parameterLocator;
 			readonly Func<Type, Type> resultLocator;
 
-			SourceFactory( Func<Type, Type> parameterLocator, Func<Type, Type> resultLocator )
+			Factory( Func<Type, Type> parameterLocator, Func<Type, Type> resultLocator )
 			{
 				this.parameterLocator = parameterLocator;
 				this.resultLocator = resultLocator;

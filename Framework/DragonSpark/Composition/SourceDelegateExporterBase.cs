@@ -20,7 +20,6 @@ namespace DragonSpark.Composition
 		readonly static Func<LocateTypeRequest, Type> Locator = SourceTypes.Instance.Delegate();
 		readonly static Func<Type, Type> Parameters = ParameterTypes.Instance.ToDelegate();
 
-
 		readonly ICache<LifetimeContext, object> cache = new Cache<LifetimeContext, object>();
 		readonly IDictionary<CompositionContract, CompositeActivator> registry = new ConcurrentDictionary<CompositionContract, CompositeActivator>();
 		readonly Func<ActivatorParameter, object> resultSource;
@@ -41,16 +40,18 @@ namespace DragonSpark.Composition
 			if ( !exists )
 			{
 				var resolved = resolver( contract );
-				var type = resolved
+				var factoryType = resolved
 					.With( compositionContract => new LocateTypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
 					.With( Locator );
-				var success = type != null && descriptorAccessor.TryResolveOptionalDependency( "Category Request", contract.ChangeType( type ), true, out dependency );
+				var success = factoryType != null && descriptorAccessor.TryResolveOptionalDependency( "Category Request", contract.ChangeType( factoryType ), true, out dependency );
 				if ( success )
 				{
-					Register( descriptorAccessor, new[] { resolved.ContractType, Parameters( resolved.ContractType ) }.WhereAssigned().Select( resolved.ChangeType ).ToArray() );
+					var types = new[] { factoryType, Parameters( factoryType ) };
+					var compositionContracts = types.WhereAssigned().Select( resolved.ChangeType ).ToArray();
+					Register( descriptorAccessor, compositionContracts );
 					var provider = new ServiceProvider( Stack, registry.TryGet, resolved );
 					
-					var container = new ActivatorFactory( Stack, resultSource, new ActivatorParameter( provider, resolved.ContractType ) );
+					var container = new ActivatorFactory( Stack, resultSource, new ActivatorParameter( provider, factoryType ) );
 					var factory = dependency.Target.IsShared ? new SharedFactory( container.Create, cache, Contracts.Default.Get( dependency.Contract ) ) : new Factory( container.Create );
 					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, dependency.Target.IsShared, NoDependencies, factory.Create );
 				}
@@ -161,8 +162,7 @@ namespace DragonSpark.Composition
 		public static DelegateFactory Instance { get; } = new DelegateFactory();
 		DelegateFactory() {}
 
-		public override Func<object> Create( ActivatorParameter parameter ) => 
-			new FixedFactory<Type, Func<object>>( new SourceDelegates( parameter.Services.Self ).Get, parameter.FactoryType ).ToDelegate();
+		public override Func<object> Create( ActivatorParameter parameter ) => new SourceDelegates( parameter.Services.Self ).Get( parameter.FactoryType );
 	}
 
 	public struct CompositeActivatorParameters

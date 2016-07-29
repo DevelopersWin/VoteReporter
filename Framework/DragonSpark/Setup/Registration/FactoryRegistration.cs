@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using System;
 using Activator = DragonSpark.Activation.Activator;
 
@@ -35,7 +36,7 @@ namespace DragonSpark.Setup.Registration
 
 	/*public class SourceDelegatesFactory : 
 	{
-		/*readonly static Func<Type, bool> SourceSpecification = TypeAssignableSpecification<ISource>.Instance.ToDelegate();
+		/*
 		readonly static Func<Type, bool> FactoryWithParameterSpecification = TypeAssignableSpecification<IFactoryWithParameter>.Instance.ToDelegate();#1#
 
 		public static SourceDelegatesFactory Instance { get; } = new SourceDelegatesFactory();
@@ -54,12 +55,12 @@ namespace DragonSpark.Setup.Registration
 
 		public SourceDelegates( Func<IServiceProvider> source ) : this( source.Delegate<ISource>() ) {}
 
-		SourceDelegates( Func<Type, ISource> source )
+		SourceDelegates( Func<Type, ISource> source ) : base( TypeAssignableSpecification<ISource>.Instance )
 		{
 			this.source = source;
 		}
 
-		protected override Func<object> Create( Type parameter ) => source( parameter ).Get;
+		protected override Func<object> Create( Type parameter ) => source( parameter ).ToDelegate();
 	}
 
 	public class ParameterizedSourceDelegates : FactoryCache<Type, Func<object, object>>
@@ -71,12 +72,12 @@ namespace DragonSpark.Setup.Registration
 
 		public ParameterizedSourceDelegates( Func<IServiceProvider> source ) : this( source.Delegate<IParameterizedSource>() ) {}
 
-		ParameterizedSourceDelegates( Func<Type, IParameterizedSource> source )
+		ParameterizedSourceDelegates( Func<Type, IParameterizedSource> source ) : base( TypeAssignableSpecification<IParameterizedSource>.Instance )
 		{
 			this.source = source;
 		}
 
-		protected override Func<object, object> Create( Type parameter ) => source( parameter ).Get;
+		protected override Func<object, object> Create( Type parameter ) => source( parameter ).ToDelegate();
 	}
 
 	public class ServiceProvidedParameterizedSourceDelegates : FactoryCache<Type, Func<object>>
