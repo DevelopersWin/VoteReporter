@@ -7,6 +7,7 @@ using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace DragonSpark.Activation
@@ -33,11 +34,11 @@ namespace DragonSpark.Activation
 
 	public static class FactoryExtensions
 	{
-		public static TResult[] CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
+		public static ImmutableArray<TResult> CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
 			parameters
 				.Where( @this.CanCreate )
 				.Select( @this.Create )
-				.Where( @where ?? Where<TResult>.Assigned ).Fixed();
+				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
 		public static TResult[] CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
 			parameters

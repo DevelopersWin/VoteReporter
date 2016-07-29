@@ -157,7 +157,11 @@ namespace DragonSpark.Activation
 			return result;
 		}
 
-		public bool CanCreate( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		public bool CanCreate( TParameter parameter )
+		{
+			var isSatisfiedBy = specification.IsSatisfiedBy( parameter );
+			return isSatisfiedBy;
+		}
 
 		public abstract TResult Create( [Required]TParameter parameter );
 

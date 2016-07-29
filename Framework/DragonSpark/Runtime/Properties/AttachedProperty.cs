@@ -203,9 +203,10 @@ namespace DragonSpark.Runtime.Properties
 
 	public interface IConfigurableCache<TInstance, TValue> : ICache<TInstance, TValue>, IParameterizedConfiguration<TInstance, TValue> {}
 
-	public class ConfigurableStore<TInstance, TValue> : FixedStore<Func<TInstance, TValue>>, IParameterizedConfiguration<TInstance, TValue>
+	public class ConfigurableStore<TInstance, TValue> : DecoratedStore<Func<TInstance, TValue>>, IParameterizedConfiguration<TInstance, TValue>
 	{
-		public ConfigurableStore( Func<TInstance, TValue> reference ) : base( reference ) {}
+		public ConfigurableStore( Func<TInstance, TValue> factory ) : this( new ExecutionScope<Func<TInstance, TValue>>( factory.Self ) ) {}
+		public ConfigurableStore( IWritableStore<Func<TInstance, TValue>> store ) : base( store ) {}
 
 		public TValue Get( TInstance parameter ) => Value( parameter );
 		object IParameterizedSource.Get( object parameter ) => parameter is TInstance ? Get( (TInstance)parameter ) : default(TValue);
@@ -249,15 +250,15 @@ namespace DragonSpark.Runtime.Properties
 	public class ConfigurableCache<T> : ConfigurableCache<object, T>, IConfigurableCache<T>
 	{
 		public ConfigurableCache( Func<object, T> factory ) : base( factory ) {}
-		public ConfigurableCache( IParameterizedConfiguration<object, T> configuration, Func<Func<object, T>, ICache<object, T>> factory ) : base( configuration, factory ) {}
-		public ConfigurableCache( IParameterizedConfiguration<object, T> configuration, ICache<object, T> cache ) : base( configuration, cache ) {}
+		// protected ConfigurableCache( IParameterizedConfiguration<object, T> configuration, Func<Func<object, T>, ICache<object, T>> factory ) : base( configuration, factory ) {}
+		// public ConfigurableCache( IParameterizedConfiguration<object, T> configuration, ICache<object, T> cache ) : base( configuration, cache ) {}
 	}
 
 	public abstract class FactoryCache<T> : FactoryCache<object, T>, IConfigurableCache<T>
 	{
 		protected FactoryCache() : this( DefaultSpecification ) {}
 		protected FactoryCache( ISpecification<object> specification ) : base( specification ) {}
-		protected FactoryCache( IParameterizedConfiguration<object, T> configuration ) : base( configuration ) {}
+		// protected FactoryCache( IParameterizedConfiguration<object, T> configuration ) : base( configuration ) {}
 	}
 
 	public abstract class FactoryCache<TInstance, TValue> : ConfigurableCache<TInstance, TValue>
@@ -265,15 +266,15 @@ namespace DragonSpark.Runtime.Properties
 		readonly protected static ISpecification<TInstance> DefaultSpecification = Specifications<TInstance>.Always;
 
 		protected FactoryCache() : this( DefaultSpecification ) {}
-		protected FactoryCache( ISpecification<TInstance> specification ) : this( new ConfigurableStore<TInstance, TValue>( instance => default(TValue) ) ) {}
+		protected FactoryCache( ISpecification<TInstance> specification ) : this( new ConfigurableStore<TInstance, TValue>( new FixedStore<Func<TInstance, TValue>>( instance => default(TValue) ) ), specification ) {}
 
-		protected FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : this( configuration, DefaultSpecification ) {}
+		// protected FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : this( configuration, DefaultSpecification ) {}
 
-		protected FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration, ISpecification<TInstance> specification ) : base( configuration, CacheFactory.Create )
+		FactoryCache( IParameterizedConfiguration<TInstance, TValue> configuration, ISpecification<TInstance> specification ) : base( configuration )
 		{
 			var factory = new DelegatedFactory<TInstance, TValue>( Create, specification );
 			var host = specification == DefaultSpecification ? factory : factory.WithAutoValidation();
-			configuration.Assign( host.Create );
+			Assign( host.Create );
 		}
 
 		protected abstract TValue Create( TInstance parameter );
@@ -287,35 +288,32 @@ namespace DragonSpark.Runtime.Properties
 
 	public class DecoratedCache<TInstance, TValue> : CacheBase<TInstance, TValue>
 	{
+		readonly ICache<TInstance, TValue> cache;
 		public DecoratedCache() : this( ParameterConstructor<TInstance, TValue>.Default ) {}
 
 		public DecoratedCache( Func<TInstance, TValue> factory ) : this( CacheFactory.Create( factory ) ) {}
 
 		public DecoratedCache( ICache<TInstance, TValue> cache )
 		{
-			Cache = cache;
+			this.cache = cache;
 		}
 
-		protected ICache<TInstance, TValue> Cache { get; }
+		public override TValue Get( TInstance parameter ) => cache.Get( parameter );
 
-		public override TValue Get( TInstance parameter ) => Cache.Get( parameter );
+		public override bool Contains( TInstance instance ) => cache.Contains( instance );
 
-		public override bool Contains( TInstance instance ) => Cache.Contains( instance );
+		public override bool Remove( TInstance instance ) => cache.Remove( instance );
 
-		public override bool Remove( TInstance instance ) => Cache.Remove( instance );
-
-		public override void Set( TInstance instance, TValue value ) => Cache.Set( instance, value );
+		public override void Set( TInstance instance, TValue value ) => cache.Set( instance, value );
 	}
 
 	public class ConfigurableCache<TInstance, TValue> : DecoratedCache<TInstance, TValue>, IConfigurableCache<TInstance, TValue>
 	{
 		readonly IParameterizedConfiguration<TInstance, TValue> configuration;
 
-		public ConfigurableCache( Func<TInstance, TValue> factory ) : this( new ConfigurableStore<TInstance, TValue>( factory ), CacheFactory.Create ) {}
+		public ConfigurableCache( Func<TInstance, TValue> factory ) : this( new ConfigurableStore<TInstance, TValue>( factory ) ) {}
 
-		protected ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration, Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> factory ) : this( configuration, factory( configuration.Get ) ) {}
-
-		protected ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration, ICache<TInstance, TValue> cache ) : base( cache )
+		protected ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration ) : base( CacheFactory.Create<TInstance, TValue>( configuration.Get ) )
 		{
 			this.configuration = configuration;
 		}

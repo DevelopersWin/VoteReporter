@@ -245,7 +245,9 @@
     <Compile Include="Aspects\Validation\AutoValidationTests.cs" />
     <Compile Include="Aspects\Validation\GenericAutoValidationTests.cs" />
     <Compile Include="Aspects\Validation\IFactory.cs" />
+    <Compile Include="Composition\ParameterizedSourceDelegateExporterTests.cs" />
     <Compile Include="Composition\SingletonExportDescriptorProviderTests.cs" />
+    <Compile Include="Composition\SourceDelegateExporterTests.cs" />
     <Compile Include="Composition\SourceExporterTests.cs" />
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />

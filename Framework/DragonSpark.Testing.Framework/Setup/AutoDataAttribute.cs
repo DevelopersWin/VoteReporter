@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute//, IAspectProvider
 	{
 		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Create;
-		readonly static Func<MethodBase, IApplication> DefaultSource = ApplicationFactory.Instance.Create;
+		readonly static Func<MethodBase, IApplication> DefaultSource = m => ApplicationFactory.Instance.Create( m );
 
 		readonly Func<MethodBase, IApplication> applicationSource;
 

@@ -2,10 +2,8 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Setup.Registration;
 using System;
 using System.Collections.Immutable;
 using System.Composition;
@@ -30,36 +28,6 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public sealed class ParameterizedSourceDelegateExporter : SourceDelegateExporterBase
-	{
-		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.InstanceWithParameter.ToDelegate();
-		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Instance.Create;
-
-		public ParameterizedSourceDelegateExporter() : base( DelegateSource, Default ) {}
-
-		sealed class Factory : FactoryBase<ActivatorParameter, object>
-		{
-			public static Factory Instance { get; } = new Factory();
-			Factory() : this( ParameterTypes.Instance.ToDelegate(), ResultTypes.Instance.ToDelegate() ) {}
-
-			readonly Func<Type, Type> parameterLocator;
-			readonly Func<Type, Type> resultLocator;
-
-			Factory( Func<Type, Type> parameterLocator, Func<Type, Type> resultLocator )
-			{
-				this.parameterLocator = parameterLocator;
-				this.resultLocator = resultLocator;
-			}
-
-			public override object Create( ActivatorParameter parameter )
-			{
-				var factory = new ParameterizedSourceDelegates( parameter.Services.Self ).Get( parameter.FactoryType );
-				var result = factory.Convert( parameterLocator( parameter.FactoryType ), resultLocator( parameter.FactoryType ) );
-				return result;
-			}
-		}
-	}
-
 	[ApplyAutoValidation]
 	public sealed class SourceDelegateContractResolver : FactoryBase<CompositionContract, CompositionContract>
 	{
@@ -78,7 +46,12 @@ namespace DragonSpark.Composition
 			this.resultTypeLocator = resultTypeLocator;
 		}
 
-		public override CompositionContract Create( CompositionContract parameter ) => resultTypeLocator( parameter.ContractType ).With( parameter.ChangeType );
+		public override CompositionContract Create( CompositionContract parameter )
+		{
+			var typeLocator = resultTypeLocator( parameter.ContractType );
+			var compositionContract = typeLocator.With( parameter.ChangeType );
+			return compositionContract;
+		}
 	}
 
 	public sealed class IsExportSpecification : GuardedSpecificationBase<MemberInfo>

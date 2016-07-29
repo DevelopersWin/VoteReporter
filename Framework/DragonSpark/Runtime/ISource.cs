@@ -29,7 +29,7 @@ namespace DragonSpark.Runtime
 		public static T Self<T>( this T @this ) => @this;
 
 		public static ISource<T> Sourced<T>( this T @this ) => Sources<T>.Default.Get( @this );
-		class Sources<T> : DecoratedCache<T, ISource<T>>
+		class Sources<T> : DecoratedCache<T, Source<T>>
 		{
 			public static Sources<T> Default { get; } = new Sources<T>();
 			Sources() {}
@@ -169,6 +169,13 @@ namespace DragonSpark.Runtime
 	public interface IParameterizedSource<in TParameter, out TResult> : IParameterizedSource
 	{
 		TResult Get( TParameter parameter );
+	}
+
+	public abstract class ParameterizedSourceBase<TParameter, TResult> : IParameterizedSource<TParameter, TResult>
+	{
+		public abstract TResult Get( TParameter parameter );
+
+		object IParameterizedSource.Get( object parameter ) => parameter is TParameter ? Get( (TParameter)parameter ) : default(TResult);
 	}
 
 	public interface IParameterizedSource

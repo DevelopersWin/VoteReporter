@@ -6,6 +6,7 @@ using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using System.Composition;
 using System.Composition.Hosting;
+using System.Linq;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition
@@ -21,6 +22,39 @@ namespace DragonSpark.Testing.Composition
 			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
 			var number = container.GetExport<int>();
 			Assert.Equal( 6776, number );
+		}
+
+		[Fact]
+		public void Parameterized()
+		{
+			var parts = typeof(Source).Append( typeof(ParameterizedSource), typeof(Result) ).ToArray();
+			new ApplySystemPartsConfiguration( parts ).Run();
+
+			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var dependency = container.GetExport<Result>();
+			Assert.Equal( 6776 + 123, dependency.Number );
+		}
+
+		[Fact]
+		public void Dependency()
+		{
+			var parts = typeof(Source).Append( typeof(WithDependency) ).ToArray();
+			new ApplySystemPartsConfiguration( parts ).Run();
+
+			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var dependency = container.GetExport<WithDependency>();
+			Assert.Equal( 6776, dependency.Number );
+		}
+
+		[Fact]
+		public void ParameterizedDependency()
+		{
+			var parts = typeof(Source).Append( typeof(WithDependency) ).ToArray();
+			new ApplySystemPartsConfiguration( parts ).Run();
+
+			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var dependency = container.GetExport<WithDependency>();
+			Assert.Equal( 6776, dependency.Number );
 		}
 
 		[Fact]
@@ -58,6 +92,22 @@ namespace DragonSpark.Testing.Composition
 		}
 
 		[Export]
+		class ParameterizedSource : ParameterizedSourceBase<Source, Result>
+		{
+			public override Result Get( Source parameter ) => new Result( parameter.Get() + 123 );
+		}
+
+		struct Result
+		{
+			public Result( int number )
+			{
+				Number = number;
+			}
+
+			public int Number { get; }
+		}
+
+		[Export]
 		class Counter : SourceBase<int>
 		{
 			public override int Get() => Count.Instance.Assigned( Count.Instance.Value + 1 );
@@ -67,6 +117,18 @@ namespace DragonSpark.Testing.Composition
 		class SharedCounter : SourceBase<int>
 		{
 			public override int Get() => Count.Instance.Assigned( Count.Instance.Value + 1 );
+		}
+
+		[Export]
+		class WithDependency
+		{
+			[ImportingConstructor]
+			public WithDependency( int number )
+			{
+				Number = number;
+			}
+
+			public int Number { get; }
 		}
 	}
 }

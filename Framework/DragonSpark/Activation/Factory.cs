@@ -128,7 +128,7 @@ namespace DragonSpark.Activation
 		{
 			readonly ImmutableArray<FactoryTypeRequest> types;
 
-			public Factory() : this( Requests.Instance.GetMany( ApplicationParts.Instance.Get().Types ) ) {}
+			public Factory() : this( Requests.Instance.CreateMany( ApplicationParts.Instance.Get().Types.AsEnumerable() ) ) {}
 
 			Factory( ImmutableArray<FactoryTypeRequest> types )
 			{
@@ -151,14 +151,15 @@ namespace DragonSpark.Activation
 				return result;
 			}
 
-			sealed class Requests : FactoryCache<Type, FactoryTypeRequest>
+			sealed class Requests : FactoryBase<Type, FactoryTypeRequest>
 			{
 				readonly static Func<Type, Type> Results = ResultTypes.Instance.ToDelegate();
 
 				public static Requests Instance { get; } = new Requests();
 				Requests() : base( CanInstantiateSpecification.Instance.And( IsFactorySpecification.Instance, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
-				protected override FactoryTypeRequest Create( Type parameter ) => new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );
+				public override FactoryTypeRequest Create( Type parameter ) => 
+					new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );
 			}
 		}
 	}

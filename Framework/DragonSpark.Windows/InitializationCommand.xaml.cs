@@ -9,12 +9,15 @@ using System.Composition;
 
 namespace DragonSpark.Windows
 {
-	[Export( typeof(ISetup) )]
-	public partial class InitializationCommand
+	public static class Initialization
 	{
 		[ModuleInitializer( 0 )]
 		public static void Initialize() => ExecutionContextRepository.Instance.Add( ExecutionContextStore.Instance );
+	}
 
+	public partial class InitializationCommand
+	{
+		[Export( typeof(ISetup) )]
 		public static InitializationCommand Instance { get; } = new InitializationCommand();
 		InitializationCommand() : base( AttributeConfigurations.TypeDefinitionProviders.From( Runtime.TypeDefinitionProviderStore.Instance ) )
 		{

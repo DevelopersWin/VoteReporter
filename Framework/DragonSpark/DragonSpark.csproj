@@ -204,6 +204,7 @@
     <Compile Include="ComponentModel\DefaultValueProvider.cs" />
     <Compile Include="ComponentModel\HostedValueLocator.cs" />
     <Compile Include="ComponentModel\IDefaultValueProvider.cs" />
+    <Compile Include="Composition\ParameterizedSourceDelegateExporter.cs" />
     <Compile Include="Composition\ServiceProviderFactory.cs" />
     <Compile Include="Composition\PartsContainerConfigurator.cs" />
     <Compile Include="Composition\SourceDelegateExporter.cs" />
