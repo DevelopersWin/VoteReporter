@@ -1,3 +1,6 @@
+using DragonSpark.Activation;
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Properties;
 using System;
 
 namespace DragonSpark.Extensions
@@ -8,10 +11,23 @@ namespace DragonSpark.Extensions
 
 		public static T Get<T>( this IServiceProvider serviceProvider, Type type ) => (T)serviceProvider.GetService( type );
 
-		/*public static TService Get<TService>( this object @this )
+		public static Func<Type, T> Delegate<T>( this ISource<IServiceProvider> @this ) => @this.ToDelegate().Delegate<T>();
+		public static Func<Type, T> Delegate<T>( this Func<IServiceProvider> @this ) => Delegates<T>.Default.Get( @this );
+		class Delegates<T> : Cache<Func<IServiceProvider>, Func<Type, T>>
 		{
-			var result = @this.AsTo<IServiceProvider, TService>( x => x.Get<TService>() );
-			return result;
-		}*/
+			public static Delegates<T> Default { get; } = new Delegates<T>();
+			Delegates() : base( source => new Factory( source ).Create ) {}
+
+			class Factory : FactoryBase<Type, T>
+			{
+				readonly Func<IServiceProvider> source;
+				public Factory( Func<IServiceProvider> source )
+				{
+					this.source = source;
+				}
+
+				public override T Create( Type parameter ) => source().Get<T>( parameter );
+			}
+		}
 	}
 }

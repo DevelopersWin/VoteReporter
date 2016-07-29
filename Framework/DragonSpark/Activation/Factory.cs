@@ -5,7 +5,6 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
-using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
@@ -118,33 +117,6 @@ namespace DragonSpark.Activation
 		}
 
 		public virtual TTo Create( TBase parameter ) => parameter is TFrom ? convert( (TFrom)parameter ) : default(TTo);
-	}
-
-	public class InstanceFromSourceTypeFactory : FactoryBase<Type, object>
-	{
-		public static InstanceFromSourceTypeFactory Instance { get; } = new InstanceFromSourceTypeFactory();
-		InstanceFromSourceTypeFactory() : this( SourceDelegatesFactory.Instance.Create ) {}
-
-		readonly Func<Type, Func<object>> factory;
-
-		InstanceFromSourceTypeFactory( Func<Type, Func<object>> factory )
-		{
-			this.factory = factory;
-		}
-
-		public override object Create( Type parameter ) => factory( parameter )?.Invoke();
-	}
-
-	public class SourceDelegatesFactory : CompositeFactory<Type, Func<object>>
-	{
-		/*readonly static Func<Type, bool> SourceSpecification = TypeAssignableSpecification<ISource>.Instance.ToDelegate();
-		readonly static Func<Type, bool> FactoryWithParameterSpecification = TypeAssignableSpecification<IFactoryWithParameter>.Instance.ToDelegate();*/
-
-		public static SourceDelegatesFactory Instance { get; } = new SourceDelegatesFactory();
-		SourceDelegatesFactory() : base( SourceDelegates.Instance, ParameterizedSourceWithServicedParameters.Instance ) {}
-
-		/*public FactoryDelegateLocatorFactory( SourceDelegates factory, FactoryWithActivatedParameterDelegateFactory factoryWithParameter ) 
-			: base( new AutoValidatingFactory<Type, Func<object>>( factory, SourceSpecification ), new AutoValidatingFactory<Type, Func<object>>( factoryWithParameter, FactoryWithParameterSpecification ) ) {}*/
 	}
 
 	public sealed class SourceTypes : EqualityReferenceCache<LocateTypeRequest, Type>

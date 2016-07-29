@@ -14,10 +14,10 @@ namespace DragonSpark.Runtime.Stores
 			return value;
 		}
 
-		public static Assignment<T> Assignment<T>( this IWritableStore<T> @this, T first )  => new Assignment<T>( new StoreAssign<T>( @this ), new Value<T>( first ) );
+		public static Assignment<T> Assignment<T>( this IAssignable<T> @this, T first )  => new Assignment<T>( Assign<T>.Cache.Get( @this ), new Value<T>( first ) );
 		static class Assign<T>
 		{
-			public static ICache<IWritableStore<T>, StoreAssign<T>> Cache { get; } = new Cache<IWritableStore<T>, StoreAssign<T>>( c => new StoreAssign<T>( c ) );
+			public static ICache<IAssignable<T>, SourceAssignment<T>> Cache { get; } = new Cache<IAssignable<T>, SourceAssignment<T>>( c => new SourceAssignment<T>( c ) );
 		}
 
 		public static T Get<T>( this IStore<T> @this ) => @this.Value;

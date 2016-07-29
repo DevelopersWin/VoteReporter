@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
@@ -16,16 +17,16 @@ namespace DragonSpark.Composition
 	public class FactoryDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
 		readonly static Func<CompositionContract, CompositionContract> Default = FactoryDelegateContractResolver.Instance.ToDelegate();
-		readonly static Func<Activator.Parameter, Delegate> DelegateSource = ActivatorDelegateWithConversionFactory.Instance.ToDelegate();
-		public FactoryDelegateExportDescriptorProvider() : base( Default, DelegateSource ) {}
+		readonly static Func<ActivatorParameter, ISource> DelegateSource = ActivatorDelegateWithConversionFactory.Instance.ToDelegate();
+		public FactoryDelegateExportDescriptorProvider() : base( DelegateSource, Default ) {}
 	}
 
 	public sealed class FactoryWithParameterDelegateExportDescriptorProvider : FactoryExportDescriptorProviderBase
 	{
 		readonly static Func<CompositionContract, CompositionContract> Default = FactoryDelegateContractResolver.InstanceWithParameter.ToDelegate();
-		readonly static Func<Activator.Parameter, Delegate> DelegateSource = ActivatorWithParameterDelegateFactory.Instance.ToDelegate();
+		readonly static Func<ActivatorParameter, ISource> DelegateSource = ActivatorWithParameterDelegateFactory.Instance.ToDelegate();
 
-		public FactoryWithParameterDelegateExportDescriptorProvider() : base( Default, DelegateSource ) {}
+		public FactoryWithParameterDelegateExportDescriptorProvider() : base( DelegateSource, Default ) {}
 	}
 
 	[ApplyAutoValidation]
@@ -49,7 +50,7 @@ namespace DragonSpark.Composition
 		public override CompositionContract Create( CompositionContract parameter ) => resultTypeLocator( parameter.ContractType ).With( parameter.ChangeType );
 	}
 
-	sealed class IsExportSpecification : GuardedSpecificationBase<MemberInfo>
+	public sealed class IsExportSpecification : GuardedSpecificationBase<MemberInfo>
 	{
 		public static IsExportSpecification Instance { get; } = new IsExportSpecification();
 		IsExportSpecification() {}

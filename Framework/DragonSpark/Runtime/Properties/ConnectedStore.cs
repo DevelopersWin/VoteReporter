@@ -78,36 +78,39 @@ namespace DragonSpark.Runtime.Properties
 		public static object GetCurrentItem( [Required]Type type ) => Method.Make( type ).Invoke<object>();
 
 		public static T GetCurrentItem<T>() => AmbientStack<T>.Default.GetCurrentItem();
+
+		public static StackAssignment<T> Assignment<T>( this IStackSource<T> @this, T item )  => new StackAssignment<T>( @this, item );
+
+		public struct StackAssignment<T> : IDisposable
+		{
+			readonly IStackSource<T> source;
+
+			// public StackAssignment( T item ) : this( AmbientStack<T>.Default, item ) {}
+
+			public StackAssignment( IStackSource<T> source, T item )
+			{
+				this.source = source;
+				source.Get().Push( item );
+			}
+
+			public void Dispose() => source.Get().Pop();
+		}
 	}
 
-	public interface IStackStore<T> : IStore<IStack<T>>
+	public interface IStackSource<T> : ISource<IStack<T>>
 	{
 		T GetCurrentItem();
 	}
 
-	public class AmbientStack<T> : ExecutionScope<IStack<T>>, IStackStore<T>
+	public class AmbientStack<T> : ExecutionScope<IStack<T>>, IStackSource<T>
 	{
 		public static AmbientStack<T> Default { get; } = new AmbientStack<T>();
+		/*readonly static Func<IStack<T>> Store = Default.Get;*/
 
 		public AmbientStack() : this( AmbientStackCache<T>.Default ) {}
 		public AmbientStack( ICache<IStack<T>> cache ) : base( cache ) {}
 
 		public T GetCurrentItem() => Value.Peek();
-
-		public struct Assignment : IDisposable
-		{
-			readonly IStackStore<T> store;
-
-			public Assignment( T item ) : this( Default, item ) {}
-
-			public Assignment( IStackStore<T> store, T item )
-			{
-				this.store = store;
-				store.Value.Push( item );
-			}
-
-			public void Dispose() => store.Value.Pop();
-		}
 	}
 
 	public class AmbientStackCache<T> : StoreCache<IStack<T>>

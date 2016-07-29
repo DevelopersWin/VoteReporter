@@ -1,18 +1,12 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
-using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework.Setup.Location;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Collections.Immutable;
-using System.Linq;
 
 
 namespace DragonSpark.Testing.Framework
@@ -42,7 +36,7 @@ namespace DragonSpark.Testing.Framework
 		AssociatedRegistry() : base( instance => new FixtureRegistry( instance ) ) {}
 	}
 
-	public class RegisterFactoryAttribute : RegistrationBaseAttribute
+	/*public class RegisterFactoryAttribute : RegistrationBaseAttribute
 	{
 		public RegisterFactoryAttribute( [Required, OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( factoryType ) ) ) {}
 	}
@@ -126,7 +120,7 @@ namespace DragonSpark.Testing.Framework
 		protected abstract Type MakeGenericType( Type parameter, Type itemType );
 	}
 
-	public class RegisterFactoryCommand : RegisterFactoryCommandBase<IFactory>
+	public class RegisterFactoryCommand : RegisterFactoryCommandBase<ISource>
 	{
 		public RegisterFactoryCommand( IServiceRegistry registry ) : base( registry, SingletonLocator.Instance, SourceDelegates.Instance.ToDelegate() ) {}
 
@@ -141,13 +135,13 @@ namespace DragonSpark.Testing.Framework
 		public RegisterParameterizedSourceCommand( IServiceRegistry registry ) : this( registry, SingletonLocator.Instance, ParameterizedSourceDelegates.Instance, ParameterLocator ) {}
 
 		RegisterParameterizedSourceCommand( IServiceRegistry registry, ISingletonLocator locator, ParameterizedSourceDelegates delegates, Func<Type, Type> parameterLocator ) 
-			: base( registry, locator, ParameterizedSourceWithServicedParameters.Instance.Get, delegates.Get )
+			: base( registry, locator, ServiceProvidedParameterizedSourceDelegates.Instance.Get, delegates.Get )
 		{
 			this.parameterLocator = parameterLocator;
 		}
 
 		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(SourceDelegates<,>).MakeGenericType( parameterLocator( parameter ), itemType );
-	}
+	}*/
 
 	/*public class RegisterServiceAttribute : RegistrationBaseAttribute
 	{

@@ -1,15 +1,17 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using Moq;
 using System.Collections.Immutable;
+using System.Composition;
 using Xunit;
 using AutoDataAttribute = Ploeh.AutoFixture.Xunit2.AutoDataAttribute;
 
 namespace DragonSpark.Testing.TypeSystem
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested]
 	public class ApplicationAssemblyFilterTests
 	{
 		[Theory, Framework.Setup.AutoData]
@@ -32,7 +34,7 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Same( AssemblyProvider.Instance, sut );
 		}*/
 
-		[Theory, Framework.Setup.AutoData, DeclaredAssemblyProvider.Register]
+		[Theory, Framework.Setup.AutoData]
 		public void DeclaredProvider( ITypeSource sut )
 		{
 			Assert.NotNull( sut );
@@ -41,12 +43,13 @@ namespace DragonSpark.Testing.TypeSystem
 
 		class DeclaredAssemblyProvider : AssemblySourceBase
 		{
+			[Export]
 			public static DeclaredAssemblyProvider Instance { get; } = new DeclaredAssemblyProvider();
 
-			public class Register : RegisterFactoryAttribute
+			/*public class Register : RegisterFactoryAttribute
 			{
 				public Register() : base( typeof(DeclaredAssemblyProvider) ) {}
-			}
+			}*/
 
 			DeclaredAssemblyProvider() : base( typeof(DeclaredAssemblyProvider) ) {}
 		}

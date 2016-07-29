@@ -17,11 +17,14 @@ using Xunit;
 
 namespace DragonSpark.Testing.Extensions
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested]
 	public class UnityContainerExtensionsTests
 	{
+		[Export]
+		public IUnityContainer Container { get; } = DragonSpark.Activation.IoC.UnityContainerFactory.Instance.Create();
+
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
-		public void TryResolve( [Factory]UnityContainer sut )
+		public void TryResolve( UnityContainer sut )
 		{
 			var creator = Creator.Default.Get( sut );
 			Assert.IsType<DragonSpark.Activation.IoC.UnityContainerFactory>( creator );
@@ -48,7 +51,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( Items<Assembly>.Immutable, sut.Resolve<ImmutableArray<Assembly>>() );
 		}
 
-		[Export]
-		class UnityContainerFactory : Objects.IoC.UnityContainerFactory {}
+		/*[Export]
+		class UnityContainerFactory : Objects.IoC.UnityContainerFactory {}*/
 	}
 }

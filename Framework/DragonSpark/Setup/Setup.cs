@@ -342,7 +342,7 @@ namespace DragonSpark.Setup
 	public class RegisterServiceProviderCommand : CommandBase<IServiceProvider>
 	{
 		public static RegisterServiceProviderCommand Instance { get; } = new RegisterServiceProviderCommand();
-		RegisterServiceProviderCommand() : this( DependencyLocator.Instance, ServiceProviderRegistry.Instance.Get ) {}
+		RegisterServiceProviderCommand() : this( DependencyLocators.Instance, ServiceProviderRegistry.Instance.Get ) {}
 
 		readonly IDependencyLocator locator;
 		readonly Func<IRepository<IServiceProvider>> repositorySource;
@@ -363,10 +363,10 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	class DependencyLocator : Cache<IDependencyLocatorKey, IServiceProvider>, IDependencyLocator
+	class DependencyLocators : Cache<IDependencyLocatorKey, IServiceProvider>, IDependencyLocator
 	{
-		public static IDependencyLocator Instance { get; } = new DependencyLocator();
-		DependencyLocator() {}
+		public static IDependencyLocator Instance { get; } = new DependencyLocators();
+		DependencyLocators() {}
 
 		readonly ICache<IServiceProvider, ServiceSource> sources = new Cache<IServiceProvider, ServiceSource>( provider => ActivatedServiceProvider.Stores.Get( provider ).GetService );
 

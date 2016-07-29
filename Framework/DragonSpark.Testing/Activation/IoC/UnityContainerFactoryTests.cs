@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Activation.IoC;
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
-using DragonSpark.Testing.Objects.IoC;
 using Microsoft.Practices.Unity;
 using System;
 using Xunit;
@@ -13,17 +13,19 @@ using ConstructorLocator = DragonSpark.Activation.IoC.Specifications.Constructor
 namespace DragonSpark.Testing.Activation.IoC
 {
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
-	[DefaultUnityContainerFactory.Register]
+	//[DefaultUnityContainerFactory.Register]
 	public class UnityContainerFactoryTests : TestCollectionBase
 	{
 		public UnityContainerFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Theory, Framework.Setup.AutoData]
-		public void ConstructorSelection( IUnityContainer container )
+		public void ConstructorSelection()
 		{
 			/*var provider = container.Resolve<IServiceProvider>();
 			Assert.NotSame( CurrentServiceProvider.Instance.Value, provider );
 			Assert.Same( DefaultStoreServiceProvider.Instance, provider );*/
+
+			var container = UnityContainerFactory.Instance.Create();
 
 			Assert.NotNull( container );
 

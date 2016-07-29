@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework.Setup.Location;
 using Microsoft.Practices.ServiceLocation;
 using Moq;
@@ -15,7 +14,7 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework
 {
-	public class FactoryAttribute : CustomizeAttribute
+	/*public class FactoryAttribute : CustomizeAttribute
 	{
 		readonly Type factoryType;
 
@@ -26,7 +25,7 @@ namespace DragonSpark.Testing.Framework
 
 		public override ICustomization GetCustomization( ParameterInfo parameter ) => 
 			new RegistrationCustomization( new FactoryRegistration( factoryType ?? FactoryTypeLocator.Instance.Get( parameter.ParameterType ), parameter.ParameterType ) );
-	}
+	}*/
 
 	public static class FixtureExtensions
 	{

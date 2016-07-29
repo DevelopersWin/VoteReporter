@@ -2,7 +2,6 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Objects.IoC;
 using Microsoft.Practices.Unity;
 using Xunit;
 using Xunit.Abstractions;
@@ -22,7 +21,7 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void Create()
 		{
-			var container = DefaultUnityContainerFactory.Instance.Create();
+			var container = UnityContainerFactory.Instance.Create();
 			var sut = new InjectionFactoryFactory( typeof(Factory) );
 			container.RegisterType<IItem, Item>( new ContainerControlledLifetimeManager() );
 			var expected = container.Resolve<IItem>();

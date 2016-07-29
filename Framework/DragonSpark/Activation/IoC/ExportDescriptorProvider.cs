@@ -65,7 +65,7 @@ namespace DragonSpark.Activation.IoC
 
 		public void BuildUp( IBuilderContext context )
 		{
-			var existing = DependencyLocator.Instance.For( locatorKey )?.Invoke( context.BuildKey.Type );
+			var existing = DependencyLocators.Instance.For( locatorKey )?.Invoke( context.BuildKey.Type );
 			if ( existing != null && condition.Get( existing ).Apply() )
 			{
 				registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing ) );

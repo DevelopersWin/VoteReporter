@@ -6,6 +6,7 @@ using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
@@ -34,7 +35,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	/// <summary>
 	/// This file can be seen as a bucket for all the testing done around setup.  It also can be seen as a huge learning bucket for xUnit and AutoFixture.  This does not contain best practices.  Always be learning. :)
 	/// </summary>
-	[Trait( Traits.Category, Traits.Categories.IoC )]
+	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested]
 	public class LocationSetupTests : TestCollectionBase
 	{
 		public LocationSetupTests( ITestOutputHelper output ) : base( output ) {}
@@ -174,7 +175,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void Resolve( [DragonSpark.Testing.Framework.Parameters.Service]Interfaces sut )
+		void Resolve( [Service]Interfaces sut )
 		{
 			Assert.NotNull( sut.Items.FirstOrDefaultOfType<Item>() );
 			Assert.NotNull( sut.Items.FirstOrDefaultOfType<AnotherItem>() );
@@ -182,7 +183,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void GetInstance( [DragonSpark.Testing.Framework.Factory, Frozen( Matching.ExactType )]ServiceLocator sut, [Frozen, Registered]Mock<ILogger> logger )
+		void GetInstance( [Frozen( Matching.ExactType ), Service]ServiceLocator sut, [Frozen, Registered]Mock<ILogger> logger )
 		{
 			Assert.Same( sut.Get<ILogger>(), logger.Object );
 
@@ -200,7 +201,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, LocationSetup.AutoData]
-		void GetAllInstancesLocator( [Modest, DragonSpark.Testing.Framework.Factory] ServiceLocator sut )
+		void GetAllInstancesLocator( [Modest, Service] ServiceLocator sut )
 		{
 			var registry = sut.GetInstance<IServiceRegistry>();
 			registry.Register<IInterface, Class>( "First" );

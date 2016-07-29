@@ -3,6 +3,7 @@ using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Moq;
@@ -201,10 +202,10 @@ namespace DragonSpark.Windows.Markup
 
 		public Type FactoryType { get; set; }
 
-		[Required, Service]
-		InstanceFromSourceTypeFactory SourceTypeFactory { [return: Required]get; set; }
+		/*[Required, Service]
+		SourceFactory SourceTypeFactory { [return: Required]get; set; }*/
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => SourceTypeFactory.Create( FactoryType );
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => SourceFactory.Instance.Create( FactoryType );
 	}
 
 	[ContentProperty( nameof(Properties) )]

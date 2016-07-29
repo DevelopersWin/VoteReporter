@@ -279,32 +279,48 @@ namespace DragonSpark.Runtime.Properties
 		protected abstract TValue Create( TInstance parameter );
 	}
 
-	public class ConfigurableCache<TInstance, TValue> : IConfigurableCache<TInstance, TValue>
+	public class DecoratedCache<T> : DecoratedCache<object, T>
+	{
+		public DecoratedCache( Func<object, T> factory ) : base( factory ) {}
+		public DecoratedCache( ICache<object, T> cache ) : base( cache ) {}
+	}
+
+	public class DecoratedCache<TInstance, TValue> : CacheBase<TInstance, TValue>
+	{
+		public DecoratedCache() : this( ParameterConstructor<TInstance, TValue>.Default ) {}
+
+		public DecoratedCache( Func<TInstance, TValue> factory ) : this( CacheFactory.Create( factory ) ) {}
+
+		public DecoratedCache( ICache<TInstance, TValue> cache )
+		{
+			Cache = cache;
+		}
+
+		protected ICache<TInstance, TValue> Cache { get; }
+
+		public override TValue Get( TInstance parameter ) => Cache.Get( parameter );
+
+		public override bool Contains( TInstance instance ) => Cache.Contains( instance );
+
+		public override bool Remove( TInstance instance ) => Cache.Remove( instance );
+
+		public override void Set( TInstance instance, TValue value ) => Cache.Set( instance, value );
+	}
+
+	public class ConfigurableCache<TInstance, TValue> : DecoratedCache<TInstance, TValue>, IConfigurableCache<TInstance, TValue>
 	{
 		readonly IParameterizedConfiguration<TInstance, TValue> configuration;
-		readonly ICache<TInstance, TValue> cache;
 
 		public ConfigurableCache( Func<TInstance, TValue> factory ) : this( new ConfigurableStore<TInstance, TValue>( factory ), CacheFactory.Create ) {}
 
 		protected ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration, Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> factory ) : this( configuration, factory( configuration.Get ) ) {}
 
-		protected ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration, ICache<TInstance, TValue> cache )
+		protected ConfigurableCache( IParameterizedConfiguration<TInstance, TValue> configuration, ICache<TInstance, TValue> cache ) : base( cache )
 		{
 			this.configuration = configuration;
-			this.cache = cache;
 		}
 
-		public TValue Get( TInstance parameter ) => cache.Get( parameter );
-
-		public bool Contains( TInstance instance ) => cache.Contains( instance );
-
-		public bool Remove( TInstance instance ) => cache.Remove( instance );
-
-		public void Set( TInstance instance, TValue value ) => cache.Set( instance, value );
-
 		public void Assign( Func<TInstance, TValue> item ) => configuration.Assign( item );
-
-		object IParameterizedSource.Get( object parameter ) => parameter is TInstance ? Get( (TInstance)parameter ) : default(TValue);
 	}
 
 	public class Cache<T> : Cache<object, T>, ICache<T>/*, IConfigurableCache<T>*/ where T : class
@@ -313,30 +329,28 @@ namespace DragonSpark.Runtime.Properties
 		public Cache( Func<object, T> create ) : base( create ) {}
 	}
 
-	public class EqualityReferenceCache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class where TValue : class
+	public class EqualityReferenceCache<TInstance, TValue> : DecoratedCache<TInstance, TValue> where TInstance : class
 	{
 		readonly static Func<TInstance, TInstance> DefaultSource = EqualityReference<TInstance>.Instance.Get;
 
-		readonly ICache<TInstance, TValue> inner;
 		readonly Func<TInstance, TInstance> equalitySource;
 
 		public EqualityReferenceCache() : this( instance => default(TValue) ) {}
 		public EqualityReferenceCache( Func<TInstance, TValue> create ) : this( create, DefaultSource ) {}
-		public EqualityReferenceCache( Func<TInstance, TValue> create , Func<TInstance, TInstance> equalitySource ) : this( new Cache<TInstance, TValue>( create ), equalitySource ) {}
+		public EqualityReferenceCache( Func<TInstance, TValue> create , Func<TInstance, TInstance> equalitySource ) : this( CacheFactory.Create( create ), equalitySource ) {}
 
-		public EqualityReferenceCache( ICache<TInstance, TValue> inner, Func<TInstance, TInstance> equalitySource )
+		public EqualityReferenceCache( ICache<TInstance, TValue> inner, Func<TInstance, TInstance> equalitySource ) : base( inner )
 		{
-			this.inner = inner;
 			this.equalitySource = equalitySource;
 		}
 
-		public override bool Contains( TInstance instance ) => inner.Contains( equalitySource( instance ) );
+		public override bool Contains( TInstance instance ) => base.Contains( equalitySource( instance ) );
 
-		public override bool Remove( TInstance instance ) => inner.Remove( equalitySource( instance ) );
+		public override bool Remove( TInstance instance ) => base.Remove( equalitySource( instance ) );
 
-		public override void Set( TInstance instance, [Optional]TValue value ) => inner.Set( equalitySource( instance ), value );
+		public override void Set( TInstance instance, [Optional]TValue value ) => base.Set( equalitySource( instance ), value );
 
-		public override TValue Get( TInstance instance ) => inner.Get( equalitySource( instance )  );
+		public override TValue Get( TInstance instance ) => base.Get( equalitySource( instance )  );
 	}
 
 

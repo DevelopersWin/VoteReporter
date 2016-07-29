@@ -25,7 +25,7 @@ namespace DragonSpark.Activation.IoC
 					var array = context.Existing as Array;
 					if ( array != null )
 					{
-						context.Complete( array.Length > 0 ? array : DependencyLocator.Instance.For( key )?.Invoke( context.BuildKey.Type ) ?? array );
+						context.Complete( array.Length > 0 ? array : DependencyLocators.Instance.For( key )?.Invoke( context.BuildKey.Type ) ?? array );
 					}
 				}
 			}

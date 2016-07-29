@@ -38,7 +38,7 @@ namespace DragonSpark.Composition
 		readonly InstanceExportDescriptorProvider<IDependencyLocatorKey> key;
 		readonly Func<Type, object> get;
 
-		public ServicesExportDescriptorProvider() : this( DependencyLocator.Instance.For ) {}
+		public ServicesExportDescriptorProvider() : this( DependencyLocators.Instance.For ) {}
 
 		protected ServicesExportDescriptorProvider( Func<IDependencyLocatorKey, ServiceSource> locator )
 		{

@@ -16,6 +16,59 @@ namespace DragonSpark.Activation
 {
 	public static class ActivatorExtensions
 	{
+		public static Func<Type, T> Delegate<T>( this ISource<IActivator> @this ) => @this.ToDelegate().Delegate<T>();
+		public static Func<Type, T> Delegate<T>( this Func<IActivator> @this ) => Delegates<T>.Default.Get( @this );
+		class Delegates<T> : Cache<Func<IActivator>, Func<Type, T>>
+		{
+			public static Delegates<T> Default { get; } = new Delegates<T>();
+			Delegates() : base( source => new Factory( source ).Create ) {}
+
+			class Factory : FactoryBase<Type, T>
+			{
+				readonly Func<IActivator> source;
+				public Factory( Func<IActivator> source )
+				{
+					this.source = source;
+				}
+
+				public override T Create( Type parameter ) => source().Activate<T>( parameter );
+			}
+		}
+
+		public static Func<IServiceProvider> Provider( this ISource<IActivator> @this ) => @this.ToDelegate().Provider();
+		public static Func<IServiceProvider> Provider( this Func<IActivator> @this ) => Providers.Default.Get( @this );
+
+		class Providers : FactoryCache<Func<IActivator>, Func<IServiceProvider>>
+		{
+			public static Providers Default { get; } = new Providers();
+			Providers() /*: base( source => new Factory( source ).Create )*/ {}
+
+			class Factory : FactoryBase<IServiceProvider>
+			{
+				readonly Func<IActivator> source;
+				public Factory( Func<IActivator> source )
+				{
+					this.source = source;
+				}
+
+				
+				public override IServiceProvider Create() => new DecoratedServiceProvider( source().Create );
+			}
+
+			protected override Func<IServiceProvider> Create( Func<IActivator> parameter ) => new ServiceProvider( parameter ).Self;
+
+			sealed class ServiceProvider : IServiceProvider
+			{
+				readonly Func<IActivator> parameter;
+				public ServiceProvider( Func<IActivator> parameter )
+				{
+					this.parameter = parameter;
+				}
+
+				public object GetService( Type serviceType ) => parameter().Activate<object>( serviceType );
+			}
+		}
+
 		public static T Activate<T>( this IActivator @this ) => Activate<T>( @this, typeof(T) );
 
 		public static T Activate<T>( this IActivator @this, [Required] Type requestedType ) => (T)@this.Create( requestedType );

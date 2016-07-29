@@ -330,7 +330,7 @@ namespace DragonSpark.Runtime
 
 		public object Invoke( object[] arguments )
 		{
-			using ( new DelegateStack.Assignment( invoker ) )
+			using ( DelegateStack.Default.Assignment( invoker ) )
 			{
 				return invoker.Invoke( arguments );
 			}
@@ -426,7 +426,7 @@ namespace DragonSpark.Runtime
 
 		public DelegateStore() : this( DelegateStack.Default ) {}
 
-		public DelegateStore( IStackStore<DelegateWithParameterCache> store ) : base( store.GetCurrentItem ) {}
+		public DelegateStore( IStackSource<DelegateWithParameterCache> store ) : base( store.GetCurrentItem ) {}
 	}*/
 
 	/*public static class CurrentDelegate
@@ -712,7 +712,7 @@ namespace DragonSpark.Runtime
 
 		public DelegateStore() : this( DelegateStack.Default ) {}
 
-		public DelegateStore( IStackStore<DelegateWithParameterCache> store ) : base( store.GetCurrentItem ) {}
+		public DelegateStore( IStackSource<DelegateWithParameterCache> store ) : base( store.GetCurrentItem ) {}
 	}
 
 	class ContextAwareDelegateInvoker : IDelegateInvoker
@@ -720,13 +720,13 @@ namespace DragonSpark.Runtime
 		public static ContextAwareDelegateInvoker Instance { get; } = new ContextAwareDelegateInvoker();
 
 		readonly IDelegateInvoker invoker;
-		readonly IStackStore<DelegateWithParameterCache> store;
+		readonly IStackSource<DelegateWithParameterCache> store;
 
 		ContextAwareDelegateInvoker() : this( DelegateInvoker.Instance ) {}
 
 		public ContextAwareDelegateInvoker( IDelegateInvoker invoker ) : this( invoker, DelegateStack.Default ) {}
 
-		public ContextAwareDelegateInvoker( IDelegateInvoker invoker, IStackStore<DelegateWithParameterCache> store )
+		public ContextAwareDelegateInvoker( IDelegateInvoker invoker, IStackSource<DelegateWithParameterCache> store )
 		{
 			this.invoker = invoker;
 			this.store = store;

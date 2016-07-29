@@ -1,10 +1,12 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -12,9 +14,10 @@ using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
 
 namespace DragonSpark.Testing.TypeSystem
 {
+	[ContainingTypeAndNested]
 	public class RegistrationTests
 	{
-		[RegisterFactory( typeof(AssemblySource) )]
+		// [RegisterFactory( typeof(AssemblySource) )]
 		[Theory, Framework.Setup.AutoData]
 		[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 		public void Testing( ImmutableArray<Assembly> sut )
@@ -22,6 +25,7 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Equal( AssemblySource.Result, sut );
 		}
 
+		[Export]
 		class AssemblySource : AssemblySourceBase
 		{
 			readonly internal static IEnumerable<Assembly> Result = EnumerableEx.Return( typeof(AssemblySource).Assembly );

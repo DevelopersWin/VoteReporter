@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Runtime;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
 using Ploeh.AutoFixture.Xunit2;
@@ -11,11 +12,11 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested]
 	public class ExceptionHandlerTests
 	{
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
-		public void Handle( [Factory, Frozen]ExceptionManager manager, ExceptionHandler sut, Exception plain, InvalidOperationException invalid, ArgumentException argument, ArgumentOutOfRangeException outOfRange, ArgumentNullException argumentNull )
+		public void Handle( [Frozen]ExceptionManager manager, ExceptionHandler sut, Exception plain, InvalidOperationException invalid, ArgumentException argument, ArgumentOutOfRangeException outOfRange, ArgumentNullException argumentNull )
 		{
 			var first = sut.Handle( plain );
 			Assert.Same( plain, first.Exception );

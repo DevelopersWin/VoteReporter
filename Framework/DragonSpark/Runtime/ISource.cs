@@ -16,11 +16,17 @@ namespace DragonSpark.Runtime
 
 	public static class Source
 	{
-		// public static Func<T> From<T>() where T : ISource<T> => SingletonDelegates
-
-		public static Func<T> For<T>( this T @this ) where T : struct => new Source<T>( @this ).Get;
+		public static Func<T> For<T>( this T @this ) where T : struct => @this.Sourced().Get;
 
 		public static T Self<T>( this T @this ) => @this;
+
+		public static ISource<T> Sourced<T>( this T @this ) => Sources<T>.Default.Get( @this );
+
+		class Sources<T> : DecoratedCache<T, ISource<T>>
+		{
+			public static Sources<T> Default { get; } = new Sources<T>();
+			Sources() {}
+		}
 	}
 
 	public class Source<T> : ISource<T>
@@ -32,18 +38,18 @@ namespace DragonSpark.Runtime
 			this.instance = instance;
 		}
 
-		public T Get() => default(T);
+		public T Get() => instance;
 
 		object ISource.Get() => Get();
 	}
 
 	public static class SourceExtensions
 	{
-		public static Func<TParameter, TResult> Delegate<TParameter, TResult>( this ISource<IParameterizedSource<TParameter, TResult>> @this ) => SourceDelegateCache<TParameter, TResult>.Default.Get( @this );
-		class SourceDelegateCache<TParameter, TResult> : Cache<ISource<IParameterizedSource<TParameter, TResult>>, Func<TParameter, TResult>>
+		public static Func<TParameter, TResult> Delegate<TParameter, TResult>( this ISource<IParameterizedSource<TParameter, TResult>> @this ) => SourceDelegates<TParameter, TResult>.Default.Get( @this );
+		class SourceDelegates<TParameter, TResult> : Cache<ISource<IParameterizedSource<TParameter, TResult>>, Func<TParameter, TResult>>
 		{
-			public static SourceDelegateCache<TParameter, TResult> Default { get; } = new SourceDelegateCache<TParameter, TResult>();
-			SourceDelegateCache() : base( source => new Factory( source ).Create ) {}
+			public static SourceDelegates<TParameter, TResult> Default { get; } = new SourceDelegates<TParameter, TResult>();
+			SourceDelegates() : base( source => new Factory( source ).Create ) {}
 
 			class Factory : FactoryBase<TParameter, TResult>
 			{
@@ -59,11 +65,29 @@ namespace DragonSpark.Runtime
 
 		// public static T Self<T>( this T @this ) => @this;
 
-		public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => SourceDelegateCache<T>.Default.Get( @this );
-		class SourceDelegateCache<T> : Cache<ISource<ISource<T>>, Func<T>>
+		public static Func<T> Delegate<T>( this Func<ISource<T>> @this ) => Delegates<T>.Default.Get( @this );
+		class Delegates<T> : Cache<Func<ISource<T>>, Func<T>>
 		{
-			public static SourceDelegateCache<T> Default { get; } = new SourceDelegateCache<T>();
-			SourceDelegateCache() : base( source => new Factory( source ).Create ) {}
+			public static Delegates<T> Default { get; } = new Delegates<T>();
+			Delegates() : base( source => new Factory( source ).Create ) {}
+
+			class Factory : FactoryBase<T>
+			{
+				readonly Func<ISource<T>> source;
+				public Factory( Func<ISource<T>> source )
+				{
+					this.source = source;
+				}
+
+				public override T Create() => source().Get();
+			}
+		}
+
+		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
+		class SourceDelegates<T> : Cache<ISource<ISource<T>>, Func<T>>
+		{
+			public static Delegates<T> Default { get; } = new Delegates<T>();
+			SourceDelegates() : base( source => new Factory( source ).Create ) {}
 
 			class Factory : FactoryBase<T>
 			{
@@ -75,7 +99,7 @@ namespace DragonSpark.Runtime
 
 				public override T Create() => source.Get().Get();
 			}
-		}
+		}*/
 	}
 
 	public interface IParameterizedSource<out T> : IParameterizedSource<object, T> {}

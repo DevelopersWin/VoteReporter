@@ -60,10 +60,10 @@ namespace DragonSpark.Runtime
 		public void Assign( T1 first, T2 second ) => cache.Set( first, second );
 	}
 
-	public class StoreAssign<T> : IAssign<T>
+	public class SourceAssignment<T> : IAssign<T>
 	{
-		readonly IWritableStore<T> store;
-		public StoreAssign( IWritableStore<T> store )
+		readonly IAssignable<T> store;
+		public SourceAssignment( IAssignable<T> store )
 		{
 			this.store = store;
 		}
