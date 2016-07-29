@@ -14,7 +14,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		public void Assemblies( AssemblyProvider sut )
 		{
 			Assert.Same( sut, AssemblyProvider.Instance );
-			var assemblies = sut.Value.Assemblies();
+			var assemblies = sut.Get().Assemblies();
 			var specification = new ApplicationAssemblySpecification( typeof(IFactory).Assembly.ToItem() );
 
 			Assert.True( assemblies.All( specification.IsSatisfiedBy ) );

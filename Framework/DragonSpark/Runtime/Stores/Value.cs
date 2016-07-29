@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace DragonSpark.Runtime.Stores
 {
-	public class Store<T> : StoreBase<T>
+	/*public class Store<T> : StoreBase<T>
 	{
 		readonly T item;
 
@@ -16,7 +16,7 @@ namespace DragonSpark.Runtime.Stores
 		}
 
 		protected override T Get() => item;
-	}
+	}*/
 
 	public abstract class StoreBase<T> : IStore<T>, ISource<T>
 	{

@@ -1,5 +1,7 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.TypeSystem;
 using System;
 
 namespace DragonSpark.Runtime
@@ -16,12 +18,17 @@ namespace DragonSpark.Runtime
 
 	public static class Source
 	{
+		static IGenericMethodContext<Invoke> Methods { get; } = typeof(Source).Adapt().GenericFactoryMethods[nameof(Empty)];
+
+		public static ISource Empty( Type type ) => Methods.Make( type ).Invoke<ISource>();
+
+		public static ISource<T> Empty<T>() => EmptySource<T>.Instance;
+
 		public static Func<T> For<T>( this T @this ) where T : struct => @this.Sourced().Get;
 
 		public static T Self<T>( this T @this ) => @this;
 
 		public static ISource<T> Sourced<T>( this T @this ) => Sources<T>.Default.Get( @this );
-
 		class Sources<T> : DecoratedCache<T, ISource<T>>
 		{
 			public static Sources<T> Default { get; } = new Sources<T>();
@@ -29,7 +36,46 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class Source<T> : ISource<T>
+	public class DelegatedCachedSource<T> : SourceBase<T>
+	{
+		readonly Lazy<T> lazy;
+
+		public DelegatedCachedSource( Func<T> factory ) : this( new Lazy<T>( factory ) ) {}
+
+		public DelegatedCachedSource( Lazy<T> lazy )
+		{
+			this.lazy = lazy;
+		}
+
+		public override T Get() => lazy.Value;
+	}
+
+	public abstract class SourceBase<T> : ISource<T>
+	{
+		public abstract T Get();
+
+		object ISource.Get() => Get();
+	}
+
+	public class DelegatedSource<T> : SourceBase<T>
+	{
+		readonly Func<T> get;
+
+		public DelegatedSource( Func<T> get )
+		{
+			this.get = get;
+		}
+
+		public override T Get() => get();
+	}
+
+	public class EmptySource<T> : Source<T>
+	{
+		public static EmptySource<T> Instance { get; } = new EmptySource<T>();
+		EmptySource() : base( default(T) ) {}
+	}
+
+	public class Source<T> : SourceBase<T>
 	{
 		readonly T instance;
 
@@ -38,9 +84,7 @@ namespace DragonSpark.Runtime
 			this.instance = instance;
 		}
 
-		public T Get() => instance;
-
-		object ISource.Get() => Get();
+		public override T Get() => instance;
 	}
 
 	public static class SourceExtensions
@@ -63,8 +107,26 @@ namespace DragonSpark.Runtime
 			}
 		}
 
-		// public static T Self<T>( this T @this ) => @this;
+		public static Func<object> Delegate( this ISource<ISource> @this ) => @this.ToDelegate().Delegate();
+		public static Func<object> Delegate( this Func<ISource> @this ) => Delegates.Default.Get( @this );
+		class Delegates : Cache<Func<ISource>, Func<object>>
+		{
+			public static Delegates Default { get; } = new Delegates();
+			Delegates() : base( source => new Factory( source ).Create ) {}
 
+			class Factory : FactoryBase<object>
+			{
+				readonly Func<ISource> source;
+				public Factory( Func<ISource> source )
+				{
+					this.source = source;
+				}
+
+				public override object Create() => source().Get();
+			}
+		}
+
+		public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
 		public static Func<T> Delegate<T>( this Func<ISource<T>> @this ) => Delegates<T>.Default.Get( @this );
 		class Delegates<T> : Cache<Func<ISource<T>>, Func<T>>
 		{

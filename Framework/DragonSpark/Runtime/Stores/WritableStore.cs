@@ -91,32 +91,6 @@ namespace DragonSpark.Runtime.Stores
 		public ExecutionAssociatedStore( object instance, Func<T> create = null ) : base( instance, create ) {}
 	}*/
 
-	public class DeferredStore<T> : StoreBase<T>
-	{
-		readonly Lazy<T> lazy;
-
-		public DeferredStore( Func<T> factory ) : this( new Lazy<T>( factory ) ) {}
-
-		public DeferredStore( Lazy<T> lazy )
-		{
-			this.lazy = lazy;
-		}
-
-		protected override T Get() => lazy.Value;
-	}
-
-	public class DelegatedStore<T> : StoreBase<T>
-	{
-		readonly Func<T> get;
-
-		public DelegatedStore( Func<T> get )
-		{
-			this.get = get;
-		}
-
-		protected override T Get() => get();
-	}
-
 	/*public class DeferredTargetCachedStore<TInstance, TResult> : WritableStore<TResult> where TInstance : class
 	{
 		readonly Func<TInstance> instance;

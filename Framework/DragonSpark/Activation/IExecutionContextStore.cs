@@ -11,9 +11,9 @@ namespace DragonSpark.Activation
 {
 	public static class Execution
 	{
-		readonly static ISource<IExecutionContextStore> Store = new DeferredStore<IExecutionContextStore>( () => ExecutionContextRepository.Instance.List().First() );
+		readonly static Func<object> Store = new DelegatedCachedSource<IExecutionContextStore>( () => ExecutionContextRepository.Instance.List().First() ).Delegate();
 
-		public static object Current() => Store.Get().Value;
+		public static object Current() => Store();
 	}
 
 	[Priority( Priority.Low )]
@@ -46,7 +46,7 @@ namespace DragonSpark.Activation
 		protected override T Get() => factory( Execution.Current() );
 	}
 
-	public interface IExecutionContextStore : IStore {}
+	public interface IExecutionContextStore : ISource {}
 
 	public class ExecutionScope<T> : WritableStore<T>, IParameterizedSource
 	{

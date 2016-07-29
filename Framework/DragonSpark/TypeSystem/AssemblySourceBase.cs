@@ -1,8 +1,8 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;
@@ -163,7 +163,7 @@ namespace DragonSpark.TypeSystem
 		public TypesFactory() : base( array => array.ToArray().SelectMany( All ).ToImmutableArray() ) {}
 	}
 
-	public abstract class AssemblySourceBase : DeferredStore<ImmutableArray<Type>>, ITypeSource
+	public abstract class AssemblySourceBase : DelegatedCachedSource<ImmutableArray<Type>>, ITypeSource
 	{
 		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
 

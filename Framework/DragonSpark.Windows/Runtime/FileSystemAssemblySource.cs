@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class FileSystemAssemblySource : DeferredStore<IEnumerable<Assembly>>
+	public class FileSystemAssemblySource : DelegatedCachedSource<IEnumerable<Assembly>>
 	{
 		public static ISource<IEnumerable<Assembly>> Instance { get; } = new FileSystemAssemblySource();
 		FileSystemAssemblySource() : base( Create ) {}

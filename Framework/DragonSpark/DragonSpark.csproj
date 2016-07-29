@@ -206,9 +206,9 @@
     <Compile Include="ComponentModel\IDefaultValueProvider.cs" />
     <Compile Include="Composition\ServiceProviderFactory.cs" />
     <Compile Include="Composition\PartsContainerConfigurator.cs" />
-    <Compile Include="Composition\FactoryDelegateExportDescriptorProvider.cs" />
-    <Compile Include="Composition\FactoryExportDescriptorProvider.cs" />
-    <Compile Include="Composition\FactoryExportDescriptorProviderBase.cs" />
+    <Compile Include="Composition\SourceDelegateExporter.cs" />
+    <Compile Include="Composition\SourceExporter.cs" />
+    <Compile Include="Composition\SourceDelegateExporterBase.cs" />
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
     <Compile Include="Composition\SingletonExportDescriptorProvider.cs" />
     <Compile Include="Configuration\Configuration.cs" />

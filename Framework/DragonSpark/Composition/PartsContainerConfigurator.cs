@@ -100,9 +100,9 @@ namespace DragonSpark.Composition
 				// .WithParts( core, ConventionBuilder )
 				.WithParts( types, AttributeProvider.Instance )
 				.WithProvider( new SingletonExportDescriptorProvider( types ) )
-				.WithProvider( new FactoryDelegateExportDescriptorProvider() )
-				.WithProvider( new FactoryWithParameterDelegateExportDescriptorProvider() )
-				.WithProvider( new FactoryExportDescriptorProvider() )
+				.WithProvider( new SourceDelegateExporter() )
+				.WithProvider( new ParameterizedSourceDelegateExporter() )
+				.WithProvider( new SourceExporter() )
 				.WithProvider( new TypeInitializingExportDescriptorProvider() );
 			return result;
 		}

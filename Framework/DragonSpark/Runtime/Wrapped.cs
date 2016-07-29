@@ -420,7 +420,7 @@ namespace DragonSpark.Runtime
 
 	interface IDelegateStore : IStore<DelegateWithParameterCache> {}
 
-	class DelegateStore : DelegatedStore<DelegateWithParameterCache>, IDelegateStore
+	class DelegateStore : DelegatedSource<DelegateWithParameterCache>, IDelegateStore
 	{
 		public static DelegateStore Instance { get; } = new DelegateStore();
 
@@ -706,7 +706,7 @@ namespace DragonSpark.Runtime
 
 	interface IDelegateStore : IStore<DelegateWithParameterCache> {}
 
-	class DelegateStore : DelegatedStore<DelegateWithParameterCache>, IDelegateStore
+	class DelegateStore : DelegatedSource<DelegateWithParameterCache>, IDelegateStore
 	{
 		public static DelegateStore Instance { get; } = new DelegateStore();
 

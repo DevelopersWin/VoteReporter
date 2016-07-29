@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Configuration;
-using DragonSpark.Runtime.Stores;
+using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
@@ -24,7 +24,7 @@ namespace DragonSpark.Windows
 	}
 
 	[Priority( Priority.AfterNormal )]
-	class ExecutionContextStore : Store<AppDomain>, IExecutionContextStore
+	class ExecutionContextStore : Source<AppDomain>, IExecutionContextStore
 	{
 		public static ExecutionContextStore Instance { get; } = new ExecutionContextStore();
 		ExecutionContextStore() : base( AppDomain.CurrentDomain ) {}

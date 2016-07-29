@@ -444,13 +444,13 @@ namespace DragonSpark.Setup
 		ApplicationParts() : base( () => SystemParts.Default ) {}
 	}
 
-	public sealed class ApplicationAssemblies : DelegatedStore<ImmutableArray<Assembly>>
+	public sealed class ApplicationAssemblies : DelegatedSource<ImmutableArray<Assembly>>
 	{
 		public static ISource<ImmutableArray<Assembly>> Instance { get; } = new ApplicationAssemblies();
 		ApplicationAssemblies() : base( () => ApplicationParts.Instance.Get().Assemblies ) {}
 	}
 
-	public sealed class ApplicationTypes : DelegatedStore<ImmutableArray<Type>>, ITypeSource
+	public sealed class ApplicationTypes : DelegatedSource<ImmutableArray<Type>>, ITypeSource
 	{
 		public static ITypeSource Instance { get; } = new ApplicationTypes();
 		ApplicationTypes() : base( () => ApplicationParts.Instance.Get().Types ) {}

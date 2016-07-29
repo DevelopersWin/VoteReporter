@@ -5,11 +5,11 @@
 	public class DefaultUnityInstancesTests
 	{
 		[Theory, Framework.Setup.AutoData]
-		void Container( [Modest, Frozen] ServiceLocator sut )
+		void ActivatorFactory( [Modest, Frozen] ServiceLocator sut )
 		{
 			sut.QueryInterface<IDisposable>().Dispose();
 
-			Assert.Throws<ObjectDisposedException>( () => sut.Container );
+			Assert.Throws<ObjectDisposedException>( () => sut.ActivatorFactory );
 		}
 	}*/
 }
