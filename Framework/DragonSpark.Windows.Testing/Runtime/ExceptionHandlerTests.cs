@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Runtime;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
@@ -16,7 +17,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 	public class ExceptionHandlerTests
 	{
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
-		public void Handle( [Frozen]ExceptionManager manager, ExceptionHandler sut, Exception plain, InvalidOperationException invalid, ArgumentException argument, ArgumentOutOfRangeException outOfRange, ArgumentNullException argumentNull )
+		public void Handle( [Service, Frozen]ExceptionManager manager, ExceptionHandler sut, Exception plain, InvalidOperationException invalid, ArgumentException argument, ArgumentOutOfRangeException outOfRange, ArgumentNullException argumentNull )
 		{
 			var first = sut.Handle( plain );
 			Assert.Same( plain, first.Exception );

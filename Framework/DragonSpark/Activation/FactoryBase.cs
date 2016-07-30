@@ -1,8 +1,12 @@
-﻿using DragonSpark.Configuration;
+﻿using DragonSpark.Activation.IoC;
+using DragonSpark.Activation.IoC.Specifications;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
+using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -227,9 +231,13 @@ namespace DragonSpark.Activation
 
 	public static class Defaults
 	{
+		public static ISpecification<Type> ActivateSpecification { get; } = CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance );
+
+		// public static Func<IExportProvider> DefaultExports { get; } = Setup.Exports.Instance.Get;
+
 		// public static Func<Type, Func<object, IFactoryWithParameter>> ParameterConstructedFactory { get; } = Defaults<IFactoryWithParameter>.Constructor.ToDelegate();
 
-		public static Func<Type, bool> ApplicationType { get; } = ApplicationTypeSpecification.Instance.ToDelegate();
+		// public static Func<Type, bool> ApplicationType { get; } = ApplicationTypeSpecification.Instance.ToDelegate();
 	}
 
 	public static class Defaults<T>
@@ -385,7 +393,7 @@ namespace DragonSpark.Activation
 	public abstract class AggregateFactoryBase<TConfiguration, TResult> : FactoryBase<TResult>, IConfigurableFactory<TConfiguration, TResult> where TConfiguration : class
 	{
 		readonly Func<TConfiguration, TResult> factory;
-
+		
 		protected AggregateFactoryBase( Func<TConfiguration> seed, IConfigurations<TConfiguration> configurations, Func<TConfiguration, TResult> factory ) : 
 			this( new Configuration<TConfiguration>( seed ), configurations, factory ) {}
 
@@ -402,7 +410,9 @@ namespace DragonSpark.Activation
 
 		public override TResult Create()
 		{
-			var configured = Configurations.Get().Aggregate( Seed.Get(), ( configuration, transformer ) => transformer.Get( configuration ) );
+			var seed = Seed.Get();
+			var immutableArray = Configurations.Get();
+			var configured = immutableArray.Aggregate( seed, ( configuration, transformer ) => transformer.Get( configuration ) );
 			var result = factory( configured );
 			return result;
 		}

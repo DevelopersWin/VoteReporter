@@ -26,8 +26,12 @@ namespace DragonSpark.Activation.IoC
 			this.specification = specification;
 		}
 
-		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey ) => 
-			new CompositeBuildPlanPolicy( specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) ) ? policies.ToArray().StartWith( creator.CreatePlan( context, buildKey ) ).ToArray() : Items<IBuildPlanPolicy>.Default );
+		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
+		{
+			var isSatisfiedBy = specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) );
+			var buildPlanPolicies = policies.ToArray().StartWith( creator.CreatePlan( context, buildKey ) ).ToArray();
+			return new CompositeBuildPlanPolicy( isSatisfiedBy ? buildPlanPolicies : Items<IBuildPlanPolicy>.Default );
+		}
 	}
 
 	public class CompositeBuildPlanPolicy : IBuildPlanPolicy

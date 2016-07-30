@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -132,7 +131,7 @@ namespace DragonSpark.Activation
 		public override bool IsSatisfiedBy( SingletonRequest parameter )
 		{
 			var result =
-				TypeAssignableSpecification.Instance.IsSatisfiedBy( new TypeAssignableSpecification.Parameter( parameter.RequestedType, parameter.Candidate.PropertyType ) )
+				SourceTypeAssignableSpecification.Instance.IsSatisfiedBy( new SourceTypeAssignableSpecification.Parameter( parameter.RequestedType, parameter.Candidate.PropertyType ) )
 				&& 
 				parameter.Candidate.GetMethod.IsStatic && !parameter.Candidate.GetMethod.ContainsGenericParameters 
 				&& 
@@ -153,16 +152,31 @@ namespace DragonSpark.Activation
 		public PropertyInfo Candidate { get; }
 	}
 
-	public sealed class TypeAssignableSpecification : GuardedSpecificationBase<TypeAssignableSpecification.Parameter>
+	public sealed class SourceTypeAssignableSpecification : GuardedSpecificationBase<SourceTypeAssignableSpecification.Parameter>
 	{
-		public static TypeAssignableSpecification Instance { get; } = new TypeAssignableSpecification();
-		TypeAssignableSpecification() {}
+		public static SourceTypeAssignableSpecification Instance { get; } = new SourceTypeAssignableSpecification();
+		SourceTypeAssignableSpecification() {}
 
 		public override bool IsSatisfiedBy( Parameter parameter )
 		{
-			var candidate = SourceTypeAssignableSpecification.Instance.IsSatisfiedBy( parameter.Candidate ) ? parameter.Candidate.Adapt().GetInnerType() : parameter.Candidate;
-			var result = candidate.Adapt().IsAssignableFrom( parameter.TargetType );
-			return result;
+			foreach ( var candidate in Candidates( parameter.Candidate ) )
+			{
+				if ( candidate.Adapt().IsAssignableFrom( parameter.TargetType ) )
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		static IEnumerable<Type> Candidates( Type type )
+		{
+			yield return type;
+			var implementations = type.Adapt().GetImplementations( typeof(ISource<>) );
+			if ( implementations.Any() )
+			{
+				yield return implementations.First().Adapt().GetInnerType();
+			}
 		}
 
 		public struct Parameter
@@ -178,7 +192,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public sealed class SourceTypeAssignableSpecification : GuardedSpecificationBase<Type>
+	/*public sealed class SourceTypeAssignableSpecification : GuardedSpecificationBase<Type>
 	{
 		public static ISpecification<Type> Instance { get; } = new SourceTypeAssignableSpecification().Cached();
 		SourceTypeAssignableSpecification() {}
@@ -186,7 +200,7 @@ namespace DragonSpark.Activation
 		readonly static TypeAdapter Source = typeof(ISource).Adapt();
 
 		public override bool IsSatisfiedBy( Type parameter ) => Source.IsAssignableFrom( parameter );
-	}
+	}*/
 
 	sealed class SingletonDelegateCache : FactoryCache<PropertyInfo, Func<object>>
 	{
@@ -194,7 +208,7 @@ namespace DragonSpark.Activation
 		SingletonDelegateCache() {}
 
 		protected override Func<object> Create( PropertyInfo parameter ) => 
-			SourceTypeAssignableSpecification.Instance.IsSatisfiedBy( parameter.PropertyType ) ? parameter.GetMethod.CreateDelegate<Func<ISource>>().Invoke().Get : parameter.GetMethod.CreateDelegate<Func<object>>();
+			parameter.PropertyType.Adapt().IsGenericOf( typeof(ISource<>), false ) ? parameter.GetMethod.CreateDelegate<Func<ISource>>().Invoke().Get : parameter.GetMethod.CreateDelegate<Func<object>>();
 	}
 
 	public class SingletonDelegates : SingletonDelegates<Func<object>>

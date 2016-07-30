@@ -41,9 +41,9 @@ namespace DragonSpark.Activation
 
 		sealed class Factory : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
 		{
-			public Factory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, CreateParameter( parameter ) ) ) {}
+			public Factory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, CreateParameters( parameter ) ) ) {}
 
-			static IEnumerable<Expression> CreateParameter( ExpressionBodyParameter<ConstructorInfo> parameter )
+			static IEnumerable<Expression> CreateParameters( ExpressionBodyParameter<ConstructorInfo> parameter )
 			{
 				var parameters = parameter.Input.GetParameters();
 				var type = parameters.First().ParameterType;
@@ -51,7 +51,8 @@ namespace DragonSpark.Activation
 
 				foreach ( var source in parameters.Skip( 1 ) )
 				{
-					yield return Expression.Constant( source.DefaultValue );
+					Expression constant = Expression.Constant( source.DefaultValue, source.ParameterType );
+					yield return constant; // source.ParameterType == typeof(object) ? constant : Expression.Convert( constant, source.ParameterType );
 				}
 			}
 		}

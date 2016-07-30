@@ -12,7 +12,6 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
@@ -21,24 +20,21 @@ namespace DragonSpark.Setup
 {
 	public interface IExportProvider
 	{
-		IEnumerable<T> GetExports<T>();
+		ImmutableArray<T> GetExports<T>( string name );
 	}
 
 	public class Exports : Configuration<IExportProvider>
 	{
 		public static Exports Instance { get; } = new Exports();
-		Exports() : base( () => ExportProvider.Instance ) {}
+		Exports() : base( () => DefaultExportProvider.Instance ) {}
 	}
 
-	class ExportProvider : IExportProvider
+	class DefaultExportProvider : IExportProvider
 	{
-		public static ExportProvider Instance { get; } = new ExportProvider();
-		ExportProvider() {}
+		public static DefaultExportProvider Instance { get; } = new DefaultExportProvider();
+		DefaultExportProvider() {}
 
-		public IEnumerable<T> GetExports<T>()
-		{
-			yield break;
-		}
+		public ImmutableArray<T> GetExports<T>( string name ) => Items<T>.Immutable;
 	}
 
 	public interface ICommandSource : ISource<ImmutableArray<ICommand>> {}
@@ -295,23 +291,6 @@ namespace DragonSpark.Setup
 		ApplicationTypes() : base( () => ApplicationParts.Instance.Get().Types ) {}
 	}
 
-	/*public interface IApplicationConfiguration
-	{
-		ImmutableArray<ICommand> Commands { get; }
-		IServiceProvider Services { get; }
-		SystemParts Parts { get; }
-	}
-
-	public class ApplicationConfiguration : IApplicationConfiguration
-	{
-		public static IConfiguration<IApplicationConfiguration> Instance { get; } = new Configuration<IApplicationConfiguration>( () => new ApplicationConfiguration() );
-		ApplicationConfiguration() {}
-		
-		public ImmutableArray<ICommand> Commands { get; } = Items<ICommand>.Immutable;
-		public IServiceProvider Services { get; } = DefaultServiceProvider.Instance;
-		public SystemParts Parts { get; } = SystemParts.Default;
-	}*/
-
 	public sealed class ApplicationServices : ExecutionScope<IApplication>
 	{
 		public static ApplicationServices Instance { get; } = new ApplicationServices();
@@ -366,13 +345,13 @@ namespace DragonSpark.Setup
 		public ConfigureSeedingServiceProvider( Func<IServiceProvider> provider ) : base( provider, ServiceProviderFactory.Instance.Seed ) {}
 	}
 
-	public abstract class CommandsSource : ItemsStoreBase<ICommand>, ICommandSource
+	public class CommandsSource : ItemsStoreBase<ICommand>, ICommandSource
 	{
-		protected CommandsSource( params ICommandSource[] sources ) : this( sources.Select( source => source.Get() ).Concat() ) {}
-
-		protected CommandsSource( IEnumerable<ICommand> items ) : base( items ) {}
 		protected CommandsSource() {}
-		protected CommandsSource( params ICommand[] items ) : base( items ) {}
+
+		public CommandsSource( params ICommandSource[] sources ) : this( sources.Select( source => source.Get() ).Concat() ) {}
+		public CommandsSource( IEnumerable<ICommand> items ) : base( items ) {}
+		public CommandsSource( params ICommand[] items ) : base( items ) {}
 	}
 
 	public class ServiceProviderConfigurations : CommandsSource
@@ -435,7 +414,7 @@ namespace DragonSpark.Setup
 	public class ApplyExportedCommandsCommand<T> : DisposingCommand<object> where T : class, ICommand
 	{
 		[Required, Service]
-		public CompositionContext Host { [return: Required]get; set; }
+		public IExportProvider Exports { [return: Required]get; set; }
 
 		public string ContractName { get; set; }
 
@@ -443,8 +422,8 @@ namespace DragonSpark.Setup
 
 		public override void Execute( object parameter )
 		{
-			var exports = Host.GetExports<T>( ContractName ).WhereAssigned().Prioritize().Fixed();
-			watching.AddRange( exports );
+			var exports = Exports.GetExports<T>( ContractName );
+			watching.AddRange( exports.AsEnumerable() );
 
 			foreach ( var export in exports )
 			{

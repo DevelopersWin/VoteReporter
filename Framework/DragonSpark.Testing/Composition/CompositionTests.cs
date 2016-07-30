@@ -1,4 +1,6 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Activation;
+using DragonSpark.Diagnostics;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
@@ -13,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
+using Parameter = DragonSpark.Testing.Objects.Composition.Parameter;
 
 namespace DragonSpark.Testing.Composition
 {
@@ -21,18 +24,20 @@ namespace DragonSpark.Testing.Composition
 	{
 		public CompositionTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Theory, AutoData, Types, MinimumLevel( LogEventLevel.Debug )]
+		[Theory, AutoData, Types]
 		public void BasicCompose( CompositionContext host )
 		{
 			var sinkOne = host.GetExport<ILoggerHistory>();
 			var sinkTwo = host.GetExport<ILoggerHistory>();
 			Assert.Same( sinkOne, sinkTwo );
+			Assert.Same( DefaultServiceProvider.Instance.Get<ILoggerHistory>(), sinkOne );
 
 			var first = host.GetExport<ILogger>();
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
+			Assert.Same( DefaultServiceProvider.Instance.Get<ILogger>(), first );
 
-			Assert.Single( sinkOne.Events );
+			Assert.Empty( sinkOne.Events );
 			var current = sinkOne.Events.Count();
 			first.Information( "Testing this out." );
 			Assert.NotEmpty( sinkOne.Events );
@@ -45,14 +50,16 @@ namespace DragonSpark.Testing.Composition
 			var sinkOne = host.GetExport<ILoggerHistory>();
 			var sinkTwo = host.GetExport<ILoggerHistory>();
 			Assert.Same( sinkOne, sinkTwo );
+			Assert.Same( DefaultServiceProvider.Instance.Get<ILoggerHistory>(), sinkOne );
 
 			var first = host.GetExport<ILogger>();
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
+			Assert.Same( DefaultServiceProvider.Instance.Get<ILogger>(), first );
 
-			Assert.Single( sinkOne.Events );
+			Assert.Empty( sinkOne.Events );
 			var current = sinkOne.Events.Count();
-			first.Information( "Testing this out." );
+			first.Debug( "Testing this out." );
 			Assert.NotEmpty( sinkOne.Events );
 			Assert.True( sinkOne.Events.Count() > current );
 		}

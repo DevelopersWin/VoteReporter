@@ -2,7 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Configuration;
-using DragonSpark.Diagnostics.Logger;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -17,59 +17,52 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
-using Xunit.Sdk;
+using System.Windows.Input;
 using AssemblyPartLocator = DragonSpark.Windows.TypeSystem.AssemblyPartLocator;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
 	[LinesOfCodeAvoided( 5 )]
-	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute//, IAspectProvider
+	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute
 	{
 		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Create;
-		readonly static Func<MethodBase, IApplication> DefaultSource = m => ApplicationFactory.Instance.Create( m );
+		
+		public AutoDataAttribute() : this( DefaultFixtureFactory ) {}
 
-		readonly Func<MethodBase, IApplication> applicationSource;
+		protected AutoDataAttribute( Func<IFixture> fixture ) : base( FixtureContext.Instance.Assigned( fixture() ) ) {}
 
-		public AutoDataAttribute() : this( DefaultFixtureFactory, DefaultSource ) {}
-
-		protected AutoDataAttribute( Func<IFixture> fixture, Func<MethodBase, IApplication> applicationSource  ) : base( FixtureContext.Instance.Assigned( fixture() ) )
-		{
-			this.applicationSource = applicationSource;
-		}
+		protected virtual IApplication ApplicationSource( MethodBase method ) => ApplicationFactory.Instance.Create( method );
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
-			applicationSource( methodUnderTest ).Run( new AutoData( Fixture, methodUnderTest ) );
+			ApplicationSource( methodUnderTest ).Run( new AutoData( Fixture, methodUnderTest ) );
 
 			var result = base.GetData( methodUnderTest );
 			return result;
 		}
-
-		// IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => targetElement.AsTo<MethodInfo, AspectInstance[]>( info => new AspectInstance( info, TestingMethodAspect.Instance ).ToItem() );
 	}
 
 	public sealed class ApplicationFactory : ConfiguringFactory<MethodBase, IApplication>
 	{
 		public static ApplicationFactory Instance { get; } = new ApplicationFactory();
-		ApplicationFactory() : base( m => ApplicationCreation.Instance.Get(), m => ApplicationConfiguration.Instance.Get().Execute( m ) ) {}
+		ApplicationFactory() : base( DefaultCreate, Initialize ) {}
+
+		static void Initialize( MethodBase method ) => ApplicationInitializer.Instance.Get().Execute( method );
+
+		static IApplication DefaultCreate( MethodBase _ ) => 
+			ApplicationFactory<Application>.Instance.Create( MethodTypes.Instance, ApplicationCommandsSource.Instance );
 	}
 
-	public sealed class ApplicationConfiguration : CommandBase<MethodBase>
+	public sealed class ApplicationInitializer : CommandBase<MethodBase>
 	{
-		public static IConfiguration<ApplicationConfiguration> Instance { get; } = new Configuration<ApplicationConfiguration>( () => new ApplicationConfiguration() );
-		ApplicationConfiguration() {}
+		public static IConfiguration<ApplicationInitializer> Instance { get; } = new Configuration<ApplicationInitializer>( () => new ApplicationInitializer() );
+		ApplicationInitializer() {}
 
 		public override void Execute( MethodBase parameter )
 		{
 			MethodContext.Instance.Assign( parameter );
 			Disposables.Instance.Value.Add( ExecutionContextStore.Instance.Value );
 		}
-	}
-
-	public sealed class ApplicationCreation : Configuration<IApplication>
-	{
-		public static ApplicationCreation Instance { get; } = new ApplicationCreation();
-		ApplicationCreation() : base( () => ApplicationFactory<Application>.Instance.Create( MethodTypes.Instance, ApplicationCommandsSource.Instance ) ) {}
 	}
 
 	public class FrameworkTypesAttribute : TypeProviderAttributeBase
@@ -158,18 +151,15 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	
-
-	public class MinimumLevel : BeforeAfterTestAttribute
+	public abstract class CommandAttributeBase : HostingAttribute
 	{
-		readonly LogEventLevel level;
+		protected CommandAttributeBase( ICommand command ) : this( command.Cast<AutoData>() ) {}
+		protected CommandAttributeBase( ICommand<AutoData> command ) : base( command.Wrap() ) {}
+	}
 
-		public MinimumLevel( LogEventLevel level )
-		{
-			this.level = level;
-		}
-
-		public override void Before( MethodInfo methodUnderTest ) => LoggingController.Instance.Get( methodUnderTest ).MinimumLevel = level;
+	public class MinimumLevel : CommandAttributeBase
+	{
+		public MinimumLevel( LogEventLevel level ) : base( MinimumLevelConfiguration.Instance.From( level ).Cast<AutoData>().WithPriority( Priority.BeforeNormal ) ) {}
 	}
 
 	[ApplyAutoValidation]

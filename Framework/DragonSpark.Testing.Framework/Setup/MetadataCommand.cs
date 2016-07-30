@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public class MetadataCommand : AutoDataCommandBase
 	{
-		readonly static Func<MethodBase, ImmutableArray<ICustomization>> Factory = MetadataCustomizationFactory.Instance.Create;
+		readonly static Func<MethodBase, ImmutableArray<ICustomization>> Factory = MetadataCustomizationFactory<ICustomization>.Instance.Create;
 
 		public static MetadataCommand Instance { get; } = new MetadataCommand();
 		MetadataCommand() : this( Factory ) {}

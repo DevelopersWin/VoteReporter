@@ -14,6 +14,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Linq;
 
 namespace DragonSpark.Activation.IoC
@@ -76,10 +77,11 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public abstract class UnityConfigurator : TransformerBase<IUnityContainer> {}
+	// public abstract class UnityConfigurator : TransformerBase<IUnityContainer> {}
 
-	public sealed class DefaultUnityExtensions : UnityConfigurator
+	public sealed class DefaultUnityExtensions : TransformerBase<IUnityContainer>
 	{
+		[Export( typeof(ITransformer<IUnityContainer>) )]
 		public static DefaultUnityExtensions Instance { get; } = new DefaultUnityExtensions();
 		DefaultUnityExtensions() {}
 
@@ -112,13 +114,13 @@ namespace DragonSpark.Activation.IoC
 		public UnityBuildStage Stage { get; }
 	}
 
-	public interface IStrategyRepository : IRepository<IBuilderStrategy>, IComposable<StrategyEntry> {}
+	public interface IStrategyRepository : IRepository<StrategyEntry>, IComposable<IBuilderStrategy> {}
 
 	public interface IBuildPlanRepository : IRepository<IBuildPlanPolicy> {}
 
 	class BuildPlanRepository : RepositoryBase<IBuildPlanPolicy>, IBuildPlanRepository
 	{
-		public BuildPlanRepository( params IBuildPlanPolicy[] items ) : base( new PurgingCollection<IBuildPlanPolicy>( items ) ) {}
+		public BuildPlanRepository( params IBuildPlanPolicy[] items ) : base( new PurgingCollection<IBuildPlanPolicy>( items.AsEnumerable() ) ) {}
 	}
 
 	public class StoreCollection<TStore, TInstance> : CollectionBase<TStore> where TStore : IStore<TInstance>
@@ -141,8 +143,6 @@ namespace DragonSpark.Activation.IoC
 
 		readonly StagedStrategyChain<UnityBuildStage> strategies;
 
-		readonly StrategyEntryCollection collection;
-
 		public StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies ) : this( strategies, DefaultEntries ) {}
 
 		StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies, IEnumerable<StrategyEntry> entries ) : this( strategies, new StrategyEntryCollection( entries ) ) {}
@@ -150,7 +150,6 @@ namespace DragonSpark.Activation.IoC
 		StrategyRepository( StagedStrategyChain<UnityBuildStage> strategies, StrategyEntryCollection collection ) : base( collection )
 		{
 			this.strategies = strategies;
-			this.collection = collection;
 		}
 
 		protected override void OnAdd( StrategyEntry entry )
@@ -161,6 +160,6 @@ namespace DragonSpark.Activation.IoC
 
 		public void Add( IBuilderStrategy instance ) => Add( new StrategyEntry( instance, UnityBuildStage.PreCreation ) );
 
-		ImmutableArray<IBuilderStrategy> IRepository<IBuilderStrategy>.List() => collection.Instances();
+		//ImmutableArray<IBuilderStrategy> IRepository<IBuilderStrategy>.List() => collection.Instances();
 	}
 }

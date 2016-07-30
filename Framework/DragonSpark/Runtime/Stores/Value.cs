@@ -38,9 +38,9 @@ namespace DragonSpark.Runtime.Stores
 
 		protected ItemsStoreBase( params T[] items ) : base( items.ToImmutableArray() ) {}
 
-		protected override ImmutableArray<T> Get() => Yield().ToImmutableArray();
+		protected override ImmutableArray<T> Get() => Yield().Prioritize().ToImmutableArray();
 
-		protected virtual IEnumerable<T> Yield() => base.Get().ToArray();
+		protected virtual IEnumerable<T> Yield() => base.Get().AsEnumerable();
 	}
 
 	/*public class PropertyStore<T> : WritableStore<T>

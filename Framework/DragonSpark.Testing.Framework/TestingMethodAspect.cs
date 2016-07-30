@@ -14,8 +14,7 @@ namespace DragonSpark.Testing.Framework
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var disposable1 = (IDisposable)ApplicationServices.Instance.Value ?? ExecutionContextStore.Instance.Value;
-			using ( var disposable = disposable1 )
+			using ( (IDisposable)ApplicationServices.Instance.Value ?? ExecutionContextStore.Instance.Value )
 			{
 				base.OnInvoke( args );
 			}

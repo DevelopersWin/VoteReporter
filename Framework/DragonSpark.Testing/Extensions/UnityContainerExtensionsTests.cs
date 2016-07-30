@@ -1,39 +1,47 @@
 using DragonSpark.Activation;
+using DragonSpark.Activation.IoC;
 using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.IoC;
+using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
+using DragonSpark.Windows.Runtime;
 using Microsoft.Practices.Unity;
-using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Immutable;
-using System.Composition;
 using System.Linq;
 using System.Reflection;
 using Xunit;
 
 namespace DragonSpark.Testing.Extensions
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes, IoCTypes]
 	public class UnityContainerExtensionsTests
 	{
-		[Export]
-		public IUnityContainer Container { get; } = DragonSpark.Activation.IoC.UnityContainerFactory.Instance.Create();
-
-		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
-		public void TryResolve( UnityContainer sut )
+		[Theory, Framework.Setup.AutoData, MinimumLevel( LogEventLevel.Debug )]
+		public void TryResolve( [Service]IUnityContainer sut )
 		{
+			var level = MinimumLevelConfiguration.Instance.Get( this );
+			Assert.Equal( LogEventLevel.Debug, level );
+
 			var creator = Creator.Default.Get( sut );
-			Assert.IsType<DragonSpark.Activation.IoC.UnityContainerFactory>( creator );
+			Assert.IsType<UnityContainerFactory>( creator );
 
 			var provider = sut.Resolve<IServiceProvider>();
-			var sink = provider.Get<LoggerHistorySink>();
+			Assert.NotNull( provider );
+			Assert.Same( GlobalServiceProvider.Instance.Get(), provider );
+			Assert.Same( GlobalServiceProvider.Instance.Get(), DefaultServiceProvider.Instance.Get<IServiceProvider>() );
+
+			var sink = LoggingHistory.Instance.Get( sut );
 			
 			var initial = sink.Events.Count();
-			Assert.Single( sink.Events );
+			Assert.NotEmpty( sink.Events );
 
 			var item = sut.TryResolve<IInterface>();
 			Assert.Null( item );
@@ -42,13 +50,14 @@ namespace DragonSpark.Testing.Extensions
 			var count = sink.Events.Count();
 			Assert.True( count > initial );
 
-			/*Assert.Equal( TryContextProperty.Debug.Get( sut ), TryContextProperty.Debug.Get( sut ) );
-			Assert.NotEqual( TryContextProperty.Debug.Get( sut ), TryContextProperty.Verbose.Get( sut ) );*/
+			Assert.Contains( MetadataTypeDefinitionProvider.Instance, AttributeConfigurations.TypeDefinitionProviders.Get() );
 
-			Assert.Same( provider.Get<LoggingLevelSwitch>(), provider.Get<LoggingLevelSwitch>() );
+			/*var levelSwitch = provider.Get<LoggingLevelSwitch>();
+			Assert.Same( levelSwitch, provider.Get<LoggingLevelSwitch>() );*/
 			Assert.Same( sut.Resolve<ISingletonLocator>(), sut.Resolve<ISingletonLocator>() );
-			Assert.Same( sink, provider.Get<LoggerHistorySink>() );
-			Assert.Equal( Items<Assembly>.Immutable, sut.Resolve<ImmutableArray<Assembly>>() );
+			Assert.Same( SingletonLocator.Instance, sut.Resolve<ISingletonLocator>() );
+			// Assert.Same( sink, provider.Get<LoggerHistorySink>() );
+			Assert.Equal( ApplicationAssemblies.Instance.Get(), sut.Resolve<ImmutableArray<Assembly>>() );
 		}
 
 		/*[Export]

@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Configuration;
+using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using System.Composition;
 
@@ -13,5 +14,5 @@ namespace DragonSpark.Testing.Parts.Development
 		}
 	}
 
-	/*public class ApplyEnableMethodCachingConfiguration : ApplyConfigurationCommand<bool> {}*/
+	/*public class ApplyEnableMethodCachingConfiguration : ApplyParameterizedConfigurationCommand<bool> {}*/
 }

@@ -1,4 +1,7 @@
-﻿namespace DragonSpark.Testing.Framework.IoC
+﻿using DragonSpark.Activation.IoC;
+using DragonSpark.Testing.Framework.Setup;
+
+namespace DragonSpark.Testing.Framework.IoC
 {
 	public class AutoDataAttribute : Setup.AutoDataAttribute
 	{
@@ -15,5 +18,10 @@
 			public new static ApplicationFactory<T> Instance { get; } = new ApplicationFactory<T>();
 			ApplicationFactory() : base( new ApplicationCommandFactory( new ApplyExportedCommandsCommand<T>() ).Create, ServiceProviderFactory.Instance ) {}
 		}*/
+	}
+
+	public class IoCTypesAttribute : TypeProviderAttributeBase
+	{
+		public IoCTypesAttribute() : base( typeof(ServiceProviderFactory), typeof(DefaultUnityExtensions) ) {}
 	}
 }

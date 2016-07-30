@@ -104,14 +104,15 @@ namespace DragonSpark.TypeSystem
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true )
 		{
 			var result = Type.Append( includeInterfaces ? Expand( Type ) : Items<Type>.Default )
-									  .Introduce( genericDefinition, tuple =>
-																	 {
-																		 var first = tuple.Item1.GetTypeInfo();
-																		 var second = tuple.Item2.GetTypeInfo();
-																		 var match = first.IsGenericType && second.IsGenericType && tuple.Item1.GetGenericTypeDefinition() == tuple.Item2.GetGenericTypeDefinition();
-																		 return match;
-																	 } )
-									  .Fixed();
+							 .Distinct()
+							 .Introduce( genericDefinition, tuple =>
+															{
+																var first = tuple.Item1.GetTypeInfo();
+																var second = tuple.Item2.GetTypeInfo();
+																var match = first.IsGenericType && second.IsGenericType && tuple.Item1.GetGenericTypeDefinition() == tuple.Item2.GetGenericTypeDefinition();
+																return match;
+															} )
+							 .Fixed();
 			return result;
 		}
 

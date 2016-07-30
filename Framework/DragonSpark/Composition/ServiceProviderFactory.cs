@@ -3,7 +3,9 @@ using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
+using DragonSpark.Extensions;
 using Type = System.Type;
 
 namespace DragonSpark.Composition
@@ -35,7 +37,7 @@ namespace DragonSpark.Composition
 			this.context = context;
 		}
 
-		public IEnumerable<T> GetExports<T>() => context.GetExports<T>();
+		public ImmutableArray<T> GetExports<T>( string name ) => context.GetExports<T>( name ).WhereAssigned().Prioritize().ToImmutableArray();
 	}
 
 	public sealed class ServiceLocator : ServiceLocatorImplBase

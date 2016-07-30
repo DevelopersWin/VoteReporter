@@ -13,8 +13,7 @@ namespace DragonSpark.Runtime.Specifications
 	public class TypeAssignableSpecification<T> : TypeAssignableSpecification
 	{
 		public static TypeAssignableSpecification<T> Instance { get; } = new TypeAssignableSpecification<T>();
-
-		public TypeAssignableSpecification() : base( typeof(T) ) {}
+		TypeAssignableSpecification() : base( typeof(T) ) {}
 	}
 
 	public class TypeAssignableSpecification : SpecificationWithContextBase<Type>

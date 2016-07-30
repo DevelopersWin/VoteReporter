@@ -187,9 +187,8 @@ namespace DragonSpark.Activation.IoC
 	public sealed class ConventionTypes : FactoryCache<Type, Type>
 	{
 		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
-		readonly static Func<Type, bool> 
-			Specification = CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance ).IsSatisfiedBy;
-		
+		readonly static Func<Type, bool> Specification = Defaults.ActivateSpecification.ToDelegate();
+
 		public static ISource<ICache<Type, Type>> Instance { get; } = new ExecutionScope<ICache<Type, Type>>( () => new ConventionTypes() );
 		ConventionTypes() : this( ApplicationTypes.Instance ) {}
 
@@ -276,7 +275,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionImplementedInterfaces : FactoryCache<Type, Type>
 	{
-		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces( typeof(IFactory), typeof(IFactoryWithParameter) );
+		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces( typeof(ISource), typeof(IParameterizedSource), typeof(IFactory), typeof(IFactoryWithParameter) );
 		ConventionImplementedInterfaces( params Type[] ignore ) : this( ignore.ToImmutableArray() ) {}
 
 		readonly ImmutableArray<Type> ignore;

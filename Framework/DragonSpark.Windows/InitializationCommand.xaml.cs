@@ -15,11 +15,13 @@ namespace DragonSpark.Windows
 		public static void Initialize() => ExecutionContextRepository.Instance.Add( ExecutionContextStore.Instance );
 	}
 
+	[Export( typeof(ISetup) )]
 	public partial class InitializationCommand
 	{
-		[Export( typeof(ISetup) )]
-		public static InitializationCommand Instance { get; } = new InitializationCommand();
-		InitializationCommand() : base( AttributeConfigurations.TypeDefinitionProviders.From( Runtime.TypeDefinitionProviderStore.Instance ) )
+		/*
+		public static InitializationCommand Instance { get; } = new InitializationCommand();*/
+
+		public InitializationCommand() : base( AttributeConfigurations.TypeDefinitionProviders.From( Runtime.TypeDefinitionProviderStore.Instance ) )
 		{
 			Priority = Priority.BeforeNormal;
 			// InitializeComponent();

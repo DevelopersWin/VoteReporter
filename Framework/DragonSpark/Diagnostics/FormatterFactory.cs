@@ -1,11 +1,13 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Runtime;
 using System;
+using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
 	{
+		[Export]
 		public static ISource<FormatterFactory> Instance { get; } = new ExecutionScope<FormatterFactory>( () => new FormatterFactory( ConstructFromKnownTypes<IFormattable>.Instance.Get().CreateUsing ) );
 
 		readonly static Func<Parameter, object> Coerce = p => StringCoercer.Instance.Coerce( p.Instance );

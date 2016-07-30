@@ -3,6 +3,7 @@ using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using System;
@@ -40,7 +41,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.Same( shared, container.GetExport<SharedExport>() );
 		}
 
-		[Theory, AutoData, AdditionalTypes( false )]
+		[Theory, AutoData, ContainingTypeAndNested]
 		public void LocalData( ImmutableArray<Type> sut, ImmutableArray<Assembly> assemblies )
 		{
 			var items = sut.Fixed();

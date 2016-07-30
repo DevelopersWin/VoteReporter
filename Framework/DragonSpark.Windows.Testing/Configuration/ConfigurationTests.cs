@@ -1,12 +1,13 @@
 ﻿using DragonSpark.Configuration;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Testing.Properties;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Configuration
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes]
 	public class ConfigurationTests
 	{
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]

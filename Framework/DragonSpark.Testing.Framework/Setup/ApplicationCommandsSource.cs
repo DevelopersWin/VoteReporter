@@ -37,18 +37,13 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class ApplicationCommandsSource : DragonSpark.Setup.ApplicationCommandsSource
 	{
+		readonly static Func<MethodBase, ImmutableArray<ICommand<AutoData>>> Factory = MetadataCustomizationFactory<ICommand<AutoData>>.Instance.Create;
+
 		public static ApplicationCommandsSource Instance { get; } = new ApplicationCommandsSource();
 		ApplicationCommandsSource() : base( ServiceProviderConfigurations.Instance ) {}
 
-		protected override IEnumerable<ICommand> Yield()
-		{
-			foreach ( var command in base.Yield() )
-			{
-				yield return command;
-			}
-
-			yield return MetadataCommand.Instance;
-		}
+		protected override IEnumerable<ICommand> Yield() => 
+			base.Yield().Append( MetadataCommand.Instance ).Concat( Factory( MethodContext.Instance.Get() ).CastArray<ICommand>().AsEnumerable() );
 	}
 
 	sealed class MethodTypes : FactoryCache<ImmutableArray<Type>>, ITypeSource
@@ -76,7 +71,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		public ImmutableArray<Type> Get()
 		{
 			var method = methodSource();
-			var result = new object[] { method, method.DeclaringType, method.DeclaringType.Assembly }.Select( selector ).Concat().ToImmutableArray();
+			var result = new object[] { method, method.DeclaringType, method.DeclaringType.Assembly }.Select( selector ).Concat().Distinct().ToImmutableArray();
 			return result;
 		}
 

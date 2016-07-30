@@ -9,7 +9,11 @@ namespace DragonSpark.Extensions
 	{
 		public static T Resolve<T>( this IUnityContainer container, Type type ) => (T)container.Resolve( type, Items<ResolverOverride>.Default );
 
-		public static T TryResolve<T>(this IUnityContainer container) => (T)TryResolve( container, typeof(T) );
+		public static T TryResolve<T>(this IUnityContainer container)
+		{
+			var tryResolve = TryResolve( container, typeof(T) );
+			return (T)tryResolve;
+		}
 
 		public static object TryResolve( this IUnityContainer container, Type typeToResolve, string name = null )
 		{

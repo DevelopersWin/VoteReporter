@@ -8,6 +8,8 @@ namespace DragonSpark.Extensions
 {
 	public static class CommandExtensions
 	{
+		public static ICommand<T> Cast<T>( this ICommand @this ) => Cast<T>( @this, arg => arg );
+
 		public static ICommand<T> Cast<T>( this ICommand @this, Func<T, object> projection ) => new ProjectedCommand<T>( @this, projection );
 
 		public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );

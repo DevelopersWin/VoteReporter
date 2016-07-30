@@ -8,12 +8,13 @@ using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using System;
 using System.Composition;
+using DragonSpark.Testing.Framework.Setup;
 using Xunit;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
 namespace DragonSpark.Testing.ComponentModel
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), IoCTypes, ContainingTypeAndNested]
 	// [UnityContainerFactory.Register]
 	[Freeze( typeof(IServiceLocator), typeof(ServiceLocator) )]
 	[Freeze( typeof(IActivator), typeof(Activator) )]
@@ -34,7 +35,7 @@ namespace DragonSpark.Testing.ComponentModel
 			public override object Create( LocateTypeRequest parameter ) => locator.GetInstance( parameter.RequestedType, parameter.Name );
 		}
 
-		[Theory, AutoData]
+		[Theory, Framework.Setup.AutoData]
 		void Apply()
 		{
 			var current = DateTime.Now;

@@ -68,7 +68,7 @@ namespace DragonSpark.Testing
 		{
 			var current = ExecutionContextStore.Instance.Value;
 			Assert.Equal( ExecutionContextStore.Instance.Value.Origin, TaskContext.Current() );
-			Assert.Null( current );
+			Assert.Null( MethodContext.Instance.Get() );
 			return Task.Run( () =>
 							 {
 								 Assert.Same( current, ExecutionContextStore.Instance.Value );

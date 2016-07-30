@@ -43,7 +43,7 @@ namespace DragonSpark.Testing.TypeSystem
 
 		class DeclaredAssemblyProvider : AssemblySourceBase
 		{
-			[Export]
+			[Export( typeof(ITypeSource) )]
 			public static DeclaredAssemblyProvider Instance { get; } = new DeclaredAssemblyProvider();
 
 			/*public class Register : RegisterFactoryAttribute

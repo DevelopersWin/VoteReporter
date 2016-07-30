@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
@@ -24,6 +25,8 @@ namespace DragonSpark.Configuration
 
 	public static class Extensions
 	{
+		public static ICommand From<T>( this IParameterizedConfiguration<object, T> @this, T value ) => new ApplyParameterizedConfigurationCommand<T>( value, @this );
+
 		public static ICommand From<T>( this IAssignable<Func<T>> @this, T value ) => new ApplyConfigurationCommand<T>( value, @this );
 		public static ICommand From<T>( this IAssignable<Func<T>> @this, ISource<T> value ) => new ApplySourceConfigurationCommand<T>( value, @this );
 
@@ -121,6 +124,21 @@ namespace DragonSpark.Configuration
 		protected override T Get() => Value;
 	}
 
+	public class ApplyParameterizedConfigurationCommand<T> : ApplyConfigurationCommandBase<object, T>
+	{
+		public ApplyParameterizedConfigurationCommand() {}
+
+		public ApplyParameterizedConfigurationCommand( T value, IAssignable<Func<object, T>> assignable = null )
+		{
+			Parameter = assignable;
+			Value = value;
+		}
+
+		public T Value { get; set; }
+
+		protected override T Get( object key ) => Value;
+	}
+
 	public interface IConfiguration<T> : ISource<T>, IAssignable<T>, IAssignable<Func<T>> { }
 
 	public interface IParameterizedConfiguration<T> : IParameterizedConfiguration<object, T> {}
@@ -138,11 +156,19 @@ namespace DragonSpark.Configuration
 
 	public class Configurator<T> : ItemsStoreBase<ITransformer<T>>
 	{
+		readonly string name;
 		public Configurator() {}
 		public Configurator( IEnumerable<ITransformer<T>> items ) : base( items ) {}
-		public Configurator( params ITransformer<T>[] items ) : base( items ) {}
 
-		protected override IEnumerable<ITransformer<T>> Yield() => base.Yield().Concat( Exports.Instance.Value.GetExports<ITransformer<T>>() );
+		public Configurator( string name = null, params ITransformer<T>[] items ) : base( items )
+		{
+			this.name = name;
+		}
+
+		protected override IEnumerable<ITransformer<T>> Yield()
+		{
+			return base.Yield().Concat( Exports.Instance.Value.GetExports<ITransformer<T>>( name ).AsEnumerable() );
+		}
 	}
 
 	public abstract class ConfiguratorsBase<TParameter, TConfiguration> : FactoryBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>
