@@ -183,9 +183,9 @@ namespace DragonSpark.Runtime
 		object Get( object parameter );
 	}
 
-	public class ParameterizedConfiguration<TParameter, TResult> : ExecutionScope<ICache<TParameter, TResult>>, IParameterizedSource<TParameter, TResult>
+	public class ParameterizedSource<TParameter, TResult> : ExecutionScope<ICache<TParameter, TResult>>, IParameterizedSource<TParameter, TResult>
 	{
-		public ParameterizedConfiguration( Func<TParameter, TResult> factory ) : base( new FixedFactory<Func<TParameter, TResult>, ICache<TParameter, TResult>>( CacheFactory.Create, factory ).Create ) {}
+		public ParameterizedSource( Func<TParameter, TResult> factory ) : base( new FixedFactory<Func<TParameter, TResult>, ICache<TParameter, TResult>>( CacheFactory.Create, factory ).Create ) {}
 
 		public TResult Get( TParameter key ) => Value.Get( key );
 

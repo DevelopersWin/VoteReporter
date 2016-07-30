@@ -210,6 +210,21 @@ namespace DragonSpark.Runtime
 		public void Update() => inner.Update();
 	}*/
 
+	public class ServiceCoercer<T> : CoercerBase<T>
+	{
+		public static ServiceCoercer<T> Instance { get; } = new ServiceCoercer<T>();
+		ServiceCoercer() : this( GlobalServiceProvider.GetService<object> ) {}
+
+		readonly ServiceSource source;
+
+		public ServiceCoercer( ServiceSource source )
+		{
+			this.source = source;
+		}
+
+		protected override T PerformCoercion( object parameter ) => (T)source( typeof(T) );
+	}
+
 	public abstract class CommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate { };

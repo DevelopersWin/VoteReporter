@@ -377,6 +377,8 @@ namespace DragonSpark.Setup
 
 		protected override IEnumerable<ICommand> Yield()
 		{
+			// yield return new DisposeDisposableCommand( Disposables.Instance.Value );
+
 			foreach ( var command in base.Yield() )
 			{
 				yield return command;
@@ -452,7 +454,7 @@ namespace DragonSpark.Setup
 	{
 		public Setup() : this( Items<ICommand>.Default ) {}
 
-		public Setup( params ICommand[] commands ) : base( new OnlyOnceSpecification(), commands ) {}
+		public Setup( params ICommand[] commands ) : base( new OncePerScopeSpecification<object>(), commands ) {}
 
 		public DeclarativeCollection<object> Items { get; } = new DeclarativeCollection<object>();
 

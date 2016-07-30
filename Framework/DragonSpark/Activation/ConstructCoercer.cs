@@ -101,18 +101,9 @@ namespace DragonSpark.Activation
 
 		protected override T PerformCoercion( object parameter )
 		{
-			/*var source = parameter as ISource<T>;
-			if ( source != null )
-			{
-				return source.Get();
-			}*/
-
 			var store = parameter as ISource<T>;
 			var result = store != null ? store.Get() : base.PerformCoercion( parameter );
 			return result;
-
-			/*var configuration = parameter as IConfiguration<T>;
-			var result = configuration != null ? configuration.Get() : ;*/
 		}
 	}
 

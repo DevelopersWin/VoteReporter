@@ -29,33 +29,39 @@ namespace DragonSpark.Runtime.Specifications
 		public override bool IsSatisfiedBy( T parameter ) => @delegate( parameter );
 	}
 
-	public class OncePerParameterSpecification<T> : SpecificationBase<T> where T : class
+	public class OncePerParameterSpecification<T> : ConditionMonitorSpecificationBase<T> where T : class
 	{
-		readonly ICache<T, ConditionMonitor> cache;
-		
 		public OncePerParameterSpecification() : this( new Condition<T>() ) {}
 
-		public OncePerParameterSpecification( ICache<T, ConditionMonitor> cache )
+		public OncePerParameterSpecification( ICache<T, ConditionMonitor> cache ) : base( cache.ToDelegate() ) {}
+	}
+
+	public class OncePerScopeSpecification<T> : ConditionMonitorSpecificationBase<T>
+	{
+		public OncePerScopeSpecification() : this( new ExecutionScope<ConditionMonitor>( () => new ConditionMonitor() ) ) {}
+
+		public OncePerScopeSpecification( ISource<ConditionMonitor> source ) : base( source.Wrap<T, ConditionMonitor>() ) {}
+	}
+
+	public abstract class ConditionMonitorSpecificationBase<T> : SpecificationBase<T>
+	{
+		readonly Func<T, ConditionMonitor> source;
+		protected ConditionMonitorSpecificationBase( Func<T, ConditionMonitor> source )
 		{
-			this.cache = cache;
+			this.source = source;
 		}
 
-		public override bool IsSatisfiedBy( T parameter ) => cache.Get( parameter ).Apply();
+		public override bool IsSatisfiedBy( T parameter ) => source( parameter ).Apply();
 	}
 
 	public class OnlyOnceSpecification : OnlyOnceSpecification<object> {}
 
-	public class OnlyOnceSpecification<T> : SpecificationBase<T>
+	public class OnlyOnceSpecification<T> : ConditionMonitorSpecificationBase<T>
 	{
-		readonly ConditionMonitor monitor;
-
 		public OnlyOnceSpecification() : this( new ConditionMonitor() ) {}
 
-		public OnlyOnceSpecification( ConditionMonitor monitor )
-		{
-			this.monitor = monitor;
-		}
+		public OnlyOnceSpecification( ConditionMonitor monitor ) : base( monitor.Wrap<T, ConditionMonitor>() ) {}
 
-		public override bool IsSatisfiedBy( T parameter ) => monitor.Apply();
+		
 	}
 }

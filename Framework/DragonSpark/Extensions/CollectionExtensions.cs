@@ -31,7 +31,7 @@ namespace DragonSpark.Extensions
 
 		public static ImmutableArray<T> Purge<T>( this ICollection<T> @this )
 		{
-			var result = @this.ToImmutableArray();
+			var result = @this.WhereAssigned().ToImmutableArray();
 			@this.Clear();
 			return result;
 		}

@@ -46,7 +46,8 @@ namespace DragonSpark.Aspects
 			if ( apply )
 			{
 				var parameter = new DefaultValueParameter( instance, args.Location.PropertyInfo );
-				args.SetNewValue( args.Value = source( parameter ) );
+				var value = source( parameter );
+				args.SetNewValue( args.Value = value );
 			}
 			else
 			{

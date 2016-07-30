@@ -3,6 +3,7 @@ using DragonSpark.Setup;
 using PostSharp.Aspects;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DragonSpark.Testing.Framework
@@ -14,16 +15,30 @@ namespace DragonSpark.Testing.Framework
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			using ( (IDisposable)ApplicationServices.Instance.Value ?? ExecutionContextStore.Instance.Value )
-			{
-				base.OnInvoke( args );
-			}
+			base.OnInvoke( args );
 
 			//ApplicationServices.Instance.Close();
 
 			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 
-			// args.ReturnValue = Defer.Run( ExecutionContextStore.Instance.Value.Dispose, args.ReturnValue );
+			var disposable = (IDisposable)ApplicationServices.Instance.Value ?? ExecutionContextStore.Instance.Value;
+			 args.ReturnValue = Defer.Run( disposable.Dispose, args.ReturnValue );
 		}
+	}
+
+	public static class Defer
+	{
+		public static Task Run( Action<Task> action, object context )
+		{
+			var task = context as Task;
+			if ( task != null )
+			{
+				return task.ContinueWith( action );
+			}
+			action( Task.CompletedTask );
+			return null;
+		}
+
+		public static void Dispose<T>( this IDisposable @this, T item ) => @this.Dispose(); // TODO: Make more generalized.
 	}
 }

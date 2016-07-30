@@ -1,5 +1,7 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -11,18 +13,45 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using ServiceLocator = DragonSpark.Composition.ServiceLocator;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
 	public class ServiceProviderConfigurations : DragonSpark.Setup.ServiceProviderConfigurations
 	{
+		readonly Action<ServiceLocator> configure;
+
 		readonly static ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> Cache = 
 			new Cache<Type, ICache<ImmutableArray<Type>, IServiceProvider>>( o => new ArgumentCache<ImmutableArray<Type>, IServiceProvider>( types => Composition.ServiceProviderFactory.Instance.Get( DefaultServiceProvider.Instance ) ) );
 
 		public new static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
-		ServiceProviderConfigurations() {}
 
-		protected override IServiceProvider GetProvider() => Cache.Get( MethodContext.Instance.Get().DeclaringType ).Get( ApplicationTypes.Instance.Get() );
+		ServiceProviderConfigurations() : this( InitializeLocatorCommand.Instance.Execute ) {}
+
+		ServiceProviderConfigurations( Action<ServiceLocator> configure )
+		{
+			this.configure = configure;
+		}
+
+		protected override IServiceProvider GetProvider()
+		{
+			var result = Cache.Get( MethodContext.Instance.Get().DeclaringType ).Get( ApplicationTypes.Instance.Get() );
+			configure( result.Get<ServiceLocator>() );
+			return result;
+		}
+	}
+
+	[ApplyAutoValidation]
+	public class InitializeLocatorCommand : CommandBase<ServiceLocator>
+	{
+		public static InitializeLocatorCommand Instance { get; } = new InitializeLocatorCommand();
+		InitializeLocatorCommand()/* : base( ServiceCoercer<ServiceLocator>.Instance.Coerce )*/ {}
+
+		public override void Execute( ServiceLocator parameter )
+		{
+			Exports.Instance.Assign( new ExportProvider( parameter.Host ) );
+			RegisterServiceProviderCommand.Instance.Execute( parameter );
+		}
 	}
 
 	public sealed class Configure : TransformerBase<IServiceProvider>
