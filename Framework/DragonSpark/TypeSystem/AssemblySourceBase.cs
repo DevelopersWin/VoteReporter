@@ -151,7 +151,7 @@ namespace DragonSpark.TypeSystem
 			this.types = types;
 		}
 
-		protected override IEnumerable<Type> Create( Assembly parameter ) => types( parameter ).Where( Specification ).ToArray().AsEnumerable();
+		protected override IEnumerable<Type> Create( Assembly parameter ) => types( parameter ).Where( Specification ).ToImmutableArray().AsEnumerable();
 	}
 
 	public class TypesFactory : ArgumentCache<ImmutableArray<Assembly>, ImmutableArray<Type>>
@@ -159,8 +159,7 @@ namespace DragonSpark.TypeSystem
 		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
 
 		public static TypesFactory Instance { get; } = new TypesFactory();
-
-		public TypesFactory() : base( array => array.ToArray().SelectMany( All ).ToImmutableArray() ) {}
+		TypesFactory() : base( array => array.ToArray().SelectMany( All ).ToImmutableArray() ) {}
 	}
 
 	public abstract class AssemblySourceBase : DelegatedCachedSource<ImmutableArray<Type>>, ITypeSource

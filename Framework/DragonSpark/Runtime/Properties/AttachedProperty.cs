@@ -314,7 +314,7 @@ namespace DragonSpark.Runtime.Properties
 			this.configuration = configuration;
 		}
 
-		public void Assign( Func<TInstance, TValue> item ) => configuration.Assign( item );
+		public virtual void Assign( Func<TInstance, TValue> item ) => configuration.Assign( item );
 	}
 
 	public class Cache<T> : Cache<object, T>, ICache<T>/*, IConfigurableCache<T>*/ where T : class

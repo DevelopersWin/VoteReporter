@@ -1,8 +1,10 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
@@ -49,13 +51,25 @@ namespace DragonSpark.Testing.Framework.Setup
 	public sealed class ApplicationFactory : ConfiguringFactory<MethodBase, IApplication>
 	{
 		public static ApplicationFactory Instance { get; } = new ApplicationFactory();
-		ApplicationFactory() : base( n => ApplicationConfiguration.Instance.Get(), MethodContext.Instance.Assign ) {}
+		ApplicationFactory() : base( m => ApplicationCreation.Instance.Get(), m => ApplicationConfiguration.Instance.Get().Execute( m ) ) {}
 	}
 
-	public sealed class ApplicationConfiguration : Configuration<IApplication>
+	public sealed class ApplicationConfiguration : CommandBase<MethodBase>
 	{
-		public static ApplicationConfiguration Instance { get; } = new ApplicationConfiguration();
-		ApplicationConfiguration() : base( () => ApplicationFactory<Application>.Instance.Create( MethodTypes.Instance, ApplicationCommandsSource.Instance ) ) {}
+		public static IConfiguration<ApplicationConfiguration> Instance { get; } = new Configuration<ApplicationConfiguration>( () => new ApplicationConfiguration() );
+		ApplicationConfiguration() {}
+
+		public override void Execute( MethodBase parameter )
+		{
+			MethodContext.Instance.Assign( parameter );
+			Disposables.Instance.Value.Add( ExecutionContextStore.Instance.Value );
+		}
+	}
+
+	public sealed class ApplicationCreation : Configuration<IApplication>
+	{
+		public static ApplicationCreation Instance { get; } = new ApplicationCreation();
+		ApplicationCreation() : base( () => ApplicationFactory<Application>.Instance.Create( MethodTypes.Instance, ApplicationCommandsSource.Instance ) ) {}
 	}
 
 	public class FrameworkTypesAttribute : TypeProviderAttributeBase

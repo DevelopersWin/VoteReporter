@@ -1,15 +1,4 @@
-﻿using DragonSpark.Diagnostics.Logger;
-using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Diagnostics;
-using Serilog.Events;
-using Serilog.Parsing;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using Xunit;
+﻿using DragonSpark.Testing.Framework;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Diagnostics
@@ -18,7 +7,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 	{
 		public ProfilerFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Fact]
+		/*[Fact]
 		public void TracerFactoryWorksAsExpected()
 		{
 			var currentMethod = MethodBase.GetCurrentMethod();
@@ -47,12 +36,12 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 				Assert.NotEmpty( lines );
 				Assert.Contains( message, lines.Only() );
 				Assert.NotEmpty( history.Events );
-			}*/
+			}#1#
 
 			Assert.DoesNotContain( listener, Trace.Listeners.Cast<TraceListener>() );
 
 			Assert.Empty( history.Events );
 			Assert.Equal( 3, lines.Count );
-		}
+		}*/
 	}
 }

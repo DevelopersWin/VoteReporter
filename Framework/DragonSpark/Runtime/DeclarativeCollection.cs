@@ -15,7 +15,7 @@ namespace DragonSpark.Runtime
 		readonly Func<object, int> indexOf;
 		readonly IList list;
 
-		protected CollectionBase() : this( Items<T>.List ) {}
+		protected CollectionBase() : this( new List<T>( Items<T>.Default ) ) {}
 
 		protected CollectionBase( IEnumerable<T> items ) : this( new List<T>( items ) ) {}
 

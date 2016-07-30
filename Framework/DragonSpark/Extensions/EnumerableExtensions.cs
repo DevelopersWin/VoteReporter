@@ -138,6 +138,7 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
+		public static void Each<T>( this ImmutableArray<T> @this, Action<T> action ) => @this.AsEnumerable().ForEach( action );
 		public static void Each<T>( this IEnumerable<T> @this, Action<T> action ) => @this.ForEach( action );
 
 		public static IEnumerable<TResult> Each<T, TResult>( this IEnumerable<T> enumerable, Func<T, TResult> action ) => enumerable.Select( action ).ToArray();

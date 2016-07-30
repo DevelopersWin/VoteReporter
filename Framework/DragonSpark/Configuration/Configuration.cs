@@ -129,23 +129,11 @@ namespace DragonSpark.Configuration
 
 	public interface IConfigurations<T> : IConfiguration<ImmutableArray<ITransformer<T>>> {}
 
-	// public interface IConfigurators<T> : IConfigurations<ITransformer<T>> {}
-
-	/*public abstract class ConfigurationsStoreBase<T> : StoreBase<ImmutableArray<ITransformer<T>>>
-	{
-		protected override ImmutableArray<ITransformer<T>> Get() => From().ToImmutableArray();
-
-		protected abstract IEnumerable<ITransformer<T>> From();
-
-		public virtual Priority Priority => Priority.Normal;
-	}*/
-
 	public class Configurations<T> : Configuration<ImmutableArray<ITransformer<T>>>, IConfigurations<T>
 	{
 		public Configurations() {}
 		public Configurations( params ITransformer<T>[] configurators ) : this( new Configurator<T>( configurators ).Get ) {}
 		public Configurations( Func<ImmutableArray<ITransformer<T>>> defaultFactory ) : base( defaultFactory ) {}
-		// public Configurations( IConfigurableCache<ImmutableArray<ITransformer<T>>> cache ) : base( cache ) {}
 	}
 
 	public class Configurator<T> : ItemsStoreBase<ITransformer<T>>
@@ -164,34 +152,13 @@ namespace DragonSpark.Configuration
 		protected abstract IEnumerable<ITransformer<TConfiguration>> From( TParameter parameter );
 	}
 
-	/*public abstract class ConfigurationsBase<T> : FactoryBase<ImmutableArray<ITransformer<T>>>
-	{
-		
-	}
-
-	public class ConfigurationsFactory<T> : ConfigurationsBase<T>
-	{
-		public static ConfigurationsFactory<T> Instance { get; } = new ConfigurationsFactory<T>( Items<ITransformer<T>>.Default );
-
-		readonly ImmutableArray<ITransformer<T>> instances;
-
-		public ConfigurationsFactory( params ITransformer<T>[] instances )
-		{
-			this.instances = instances.ToImmutableArray();
-		}
-
-		protected override IEnumerable<ITransformer<T>> From() => instances.ToArray();
-	}
-
-	*/
-
-	public static class ConfigurationExtensions
+	/*public static class ConfigurationExtensions
 	{
 		/*public static T Apply<T>( this IConfiguration<T> @this, Func<T> factory )
 		{
 			@this.Assign( factory );
 			return @this.Get();
-		}*/
+		}#1#
 
 		public static T Default<T>( this IParameterizedConfiguration<object, T> @this ) => @this.Get( Execution.Current() );
 
@@ -200,6 +167,6 @@ namespace DragonSpark.Configuration
 		{
 			public static StoreCache<T> Default { get; } = new StoreCache<T>();
 			StoreCache() : base( configuration => new DefaultExecutionContextFactoryStore<T>( configuration.Get ) ) {}
-		}*/
-	}
+		}#1#
+	}*/
 }

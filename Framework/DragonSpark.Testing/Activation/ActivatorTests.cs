@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using Xunit;
@@ -15,7 +14,7 @@ namespace DragonSpark.Testing.Activation
 		public void Default()
 		{
 			var activator = GlobalServiceProvider.GetService<IActivator>();
-			Assert.Same( Activator.Instance, activator );
+			Assert.Same( Activator.Instance.Get(), activator );
 			var instance = activator.Activate<IInterface>( typeof(Class) );
 			Assert.IsType<Class>( instance );
 		}
@@ -24,7 +23,7 @@ namespace DragonSpark.Testing.Activation
 		public void DefaultCreate( string parameter )
 		{
 			var activator = GlobalServiceProvider.GetService<IActivator>();
-			Assert.Same( Activator.Instance, activator );
+			Assert.Same( Activator.Instance.Get(), activator );
 			
 			var instance = activator.Construct<ClassWithParameter>( parameter );
 			Assert.NotNull( instance );

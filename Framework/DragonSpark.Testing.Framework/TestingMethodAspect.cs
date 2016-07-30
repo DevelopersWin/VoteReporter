@@ -14,12 +14,13 @@ namespace DragonSpark.Testing.Framework
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			base.OnInvoke( args );
-
-			foreach ( var disposable in new IDisposable[] { ExecutionContextStore.Instance.Value, ApplicationServices.Instance.Value }.WhereAssigned() )
+			var disposable1 = (IDisposable)ApplicationServices.Instance.Value ?? ExecutionContextStore.Instance.Value;
+			using ( var disposable = disposable1 )
 			{
-				disposable.Dispose();
+				base.OnInvoke( args );
 			}
+
+			//ApplicationServices.Instance.Close();
 
 			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 
