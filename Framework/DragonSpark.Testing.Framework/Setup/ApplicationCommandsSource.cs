@@ -35,7 +35,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		protected override IServiceProvider GetProvider()
 		{
-			var result = Cache.Get( MethodContext.Instance.Get().DeclaringType ).Get( ApplicationTypes.Instance.Get() );
+			var result = /*Cache.Get( MethodContext.Instance.Get().DeclaringType ).Get( ApplicationTypes.Instance.Get() )*/ Composition.ServiceProviderFactory.Instance.Get( DefaultServiceProvider.Instance );
 			configure( result.Get<ServiceLocator>() );
 			return result;
 		}

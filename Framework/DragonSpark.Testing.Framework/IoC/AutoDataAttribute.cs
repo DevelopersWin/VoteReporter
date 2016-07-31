@@ -3,7 +3,7 @@ using DragonSpark.Testing.Framework.Setup;
 
 namespace DragonSpark.Testing.Framework.IoC
 {
-	public class AutoDataAttribute : Setup.AutoDataAttribute
+	/*public class AutoDataAttribute : Setup.AutoDataAttribute
 	{
 		// public AutoDataAttribute() {}
 
@@ -11,14 +11,14 @@ namespace DragonSpark.Testing.Framework.IoC
 
 		public AutoDataAttribute() : base( Source ) {}
 
-		protected AutoDataAttribute( Func<MethodBase, IApplication> applicationSource ) : base( applicationSource ) {}*/
+		protected AutoDataAttribute( Func<MethodBase, IApplication> applicationSource ) : base( applicationSource ) {}#1#
 
 		/*public sealed class ApplicationFactory<T> : ApplicationFactory where T : class, ICommand
 		{
 			public new static ApplicationFactory<T> Instance { get; } = new ApplicationFactory<T>();
 			ApplicationFactory() : base( new ApplicationCommandFactory( new ApplyExportedCommandsCommand<T>() ).Create, ServiceProviderFactory.Instance ) {}
-		}*/
-	}
+		}#1#
+	}*/
 
 	public class IoCTypesAttribute : TypeProviderAttributeBase
 	{

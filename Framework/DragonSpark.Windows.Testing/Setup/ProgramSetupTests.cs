@@ -1,31 +1,32 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.IoC;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System;
-using System.Composition;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
+using AssemblyModuleCatalog = DragonSpark.Windows.Modularity.AssemblyModuleCatalog;
 using Constructor = DragonSpark.Activation.IoC.Constructor;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested]
+	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, IoCTypes, ApplicationTypes( typeof(ProgramSetup), typeof(Program) )]
 	public class ProgramSetupTests
 	{
-		[Export]
-		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Create();
+		/*[Export]
+		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Create();*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void TypeCheck( IUnityContainer container )
 		{
 			var constructor = container.Resolve<Constructor>().To<IFactoryWithParameter>();
@@ -45,7 +46,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( valid );*/
 		}
 
-		[Theory, ProgramSetup.AutoData]
+		[Theory, AutoData, AdditionalTypes( typeof(ModuleInitializer), typeof(AssemblyModuleCatalog), typeof(ModuleManager), typeof(ModuleMonitor), typeof(MonitoredModule), typeof(TaskMonitor), typeof(MonitoredModule.Command) )]
 		public void Extension( IModuleMonitor sut )
 		{
 			var collection = ListCache.Default.Get( sut );
@@ -58,7 +59,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotNull( command );
 		}
 
-		[Theory, ProgramSetup.AutoData]
+		[Theory, AutoData, AdditionalTypes( false, typeof(AssemblyInformationFactory), typeof(Windows.Runtime.ApplicationAssemblyLocator) )]
 		public void Create( [EnsureValues, Service]ApplicationInformation sut, [Service]AssemblyInformation temp )
 		{
 			Assert.NotNull( sut.AssemblyInformation );
@@ -74,21 +75,21 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( assembly.GetName().Version, sut.AssemblyInformation.Version );
 		}
 
-		[Theory, ProgramSetup.AutoData]
+		[Theory, AutoData]
 		public void Type( IUnityContainer sut )
 		{
 			var resolve = sut.Resolve<ITyper>();
 			Assert.IsType<SomeTypeist>( resolve );
 		}
 
-		[Theory, ProgramSetup.AutoData]
+		[Theory, AutoData]
 		public void Run( [Service]Program sut )
 		{
 			Assert.True( sut.Ran, "Didn't Run" );
 			Assert.Equal( GetType().GetMethod( nameof(Run) ), sut.Arguments.Method );
 		}
 
-		[Theory, ProgramSetup.AutoData]
+		[Theory, AutoData]
 		public void SetupModuleCommand( SetupModuleCommand sut, MonitoredModule module )
 		{
 			var added = ListCache.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>();

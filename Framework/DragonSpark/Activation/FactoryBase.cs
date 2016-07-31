@@ -387,6 +387,7 @@ namespace DragonSpark.Activation
 		protected AggregateFactoryBase( Func<T> seed ) : this( seed, Items<ITransformer<T>>.Default ) {}
 		protected AggregateFactoryBase( Func<T> seed, params ITransformer<T>[] configurations ) : this( seed, new Configurations<T>( configurations ), Delegates<T>.Self ) {}
 		protected AggregateFactoryBase( Func<T> seed, IConfigurations<T> configurations, Func<T, T> factory ) : base( seed, configurations, factory ) {}
+		protected AggregateFactoryBase( IConfiguration<T> seed ) : this( seed, new Configurations<T>( Items<ITransformer<T>>.Default ), Delegates<T>.Self ) {}
 		protected AggregateFactoryBase( IConfiguration<T> seed, IConfigurations<T> configurations, Func<T, T> factory ) : base( seed, configurations, factory ) {}
 	}
 
@@ -395,7 +396,7 @@ namespace DragonSpark.Activation
 		readonly Func<TConfiguration, TResult> factory;
 		
 		protected AggregateFactoryBase( Func<TConfiguration> seed, IConfigurations<TConfiguration> configurations, Func<TConfiguration, TResult> factory ) : 
-			this( new Configuration<TConfiguration>( seed ), configurations, factory ) {}
+			this( new Configuration<TConfiguration>( new FactoryScopeCache<TConfiguration>( seed ) ), configurations, factory ) {}
 
 		protected AggregateFactoryBase( IConfiguration<TConfiguration> seed, IConfigurations<TConfiguration> configurations, Func<TConfiguration, TResult> factory )
 		{

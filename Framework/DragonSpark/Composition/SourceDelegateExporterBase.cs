@@ -16,9 +16,9 @@ namespace DragonSpark.Composition
 {
 	public abstract class SourceDelegateExporterBase : ExportDescriptorProvider
 	{
-		readonly IStackSource<CompositeActivatorParameters> Stack = new AmbientStack<CompositeActivatorParameters>();
-		readonly Func<LocateTypeRequest, Type> Locator = SourceTypes.Instance.Delegate();
-		readonly Func<Type, Type> Parameters = ParameterTypes.Instance.ToDelegate();
+		readonly static IStackSource<CompositeActivatorParameters> Stack = new AmbientStack<CompositeActivatorParameters>();
+		readonly static Func<LocateTypeRequest, Type> Locator = SourceTypes.Instance.Delegate();
+		readonly static Func<Type, Type> Parameters = ParameterTypes.Instance.ToDelegate();
 
 		readonly ICache<LifetimeContext, object> cache = new Cache<LifetimeContext, object>();
 		readonly IDictionary<CompositionContract, CompositeActivator> registry = new ConcurrentDictionary<CompositionContract, CompositeActivator>();
@@ -43,7 +43,7 @@ namespace DragonSpark.Composition
 				var factoryType = resolved
 					.With( compositionContract => new LocateTypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
 					.With( Locator );
-				var success = factoryType != null && descriptorAccessor.TryResolveOptionalDependency( "Category Request", contract.ChangeType( factoryType ), true, out dependency );
+				var success = factoryType != null && descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( factoryType ), true, out dependency );
 				if ( success )
 				{
 					var types = new[] { factoryType, Parameters( factoryType ) };

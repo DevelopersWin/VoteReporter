@@ -17,8 +17,6 @@ namespace DragonSpark.Testing.Framework
 		{
 			base.OnInvoke( args );
 
-			//ApplicationServices.Instance.Close();
-
 			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 
 			var disposable = (IDisposable)ApplicationServices.Instance.Value ?? ExecutionContextStore.Instance.Value;

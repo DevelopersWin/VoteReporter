@@ -1,7 +1,5 @@
-using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
@@ -13,16 +11,16 @@ namespace DragonSpark.Activation.IoC
 	public class ServicesIntegrationExtension : UnityContainerExtension, IDependencyLocatorKey
 	{
 		readonly Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
-		readonly ISpecification<LocateTypeRequest> specification;
-		readonly StrategyRepository strategies;
+		// readonly ISpecification<LocateTypeRequest> specification;
+		readonly IStrategyRepository strategies;
 		readonly IBuildPlanRepository buildPlans;
 
-		public ServicesIntegrationExtension( StrategyRepository strategies, IBuildPlanRepository buildPlans, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( strategies, buildPlans, registry, new HasFactorySpecification().Inverse() ) {}
+		public ServicesIntegrationExtension( IStrategyRepository strategies, IBuildPlanRepository buildPlans, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) /*: this( strategies, buildPlans, registry, new HasFactorySpecification().Inverse() ) {}
 
-		ServicesIntegrationExtension( StrategyRepository strategies, IBuildPlanRepository buildPlans, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )
+		ServicesIntegrationExtension( IStrategyRepository strategies, IBuildPlanRepository buildPlans, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry, ISpecification<LocateTypeRequest> specification )*/
 		{
 			this.registry = registry;
-			this.specification = specification;
+			// this.specification = specification;
 			this.strategies = strategies;
 			this.buildPlans = buildPlans;
 		}
@@ -30,49 +28,55 @@ namespace DragonSpark.Activation.IoC
 		protected override void Initialize()
 		{
 			Container.RegisterInstance<IDependencyLocatorKey>( this );
-			Container.RegisterInstance( specification );
+			// Container.RegisterInstance( specification );
 
+			var provider = new DependencyFactory( this, registry ).ToDelegate();
 			var entries = new[]
 			{
-				new StrategyEntry( new EnumerableResolutionStrategy( Container, this ), UnityBuildStage.Creation, Priority.Higher ),
-				new StrategyEntry( new ArrayResolutionStrategy( this ), UnityBuildStage.Creation, Priority.BeforeNormal )
+				new StrategyEntry( new EnumerableResolutionStrategy( Container, provider ), UnityBuildStage.Creation, Priority.Higher ),
+				new StrategyEntry( new ArrayResolutionStrategy( provider ), UnityBuildStage.Creation, Priority.BeforeNormal )
 			};
 			entries.Each( strategies.Add );
 
-			buildPlans.Add( new ServicesBuildPlanPolicy( this, registry ) );
+			buildPlans.Add( new ServicesBuildPlanPolicy( provider ) );
+		}
+	}
+
+	public class DependencyFactory : FactoryBase<Type, object>
+	{
+		readonly IDependencyLocatorKey locatorKey;
+		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
+		readonly Condition condition = new Condition();
+
+		public DependencyFactory( IDependencyLocatorKey locatorKey, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( locatorKey, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry )/*, isActivated */) {}
+
+		DependencyFactory( IDependencyLocatorKey locatorKey, Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry )
+		{
+			this.locatorKey = locatorKey;
+			this.registry = registry;
+		}
+
+		public override object Create( Type parameter )
+		{
+			var serviceSource = DependencyLocators.Instance.For( locatorKey );
+			var result = serviceSource?.Invoke( parameter );
+			if ( result != null && condition.Get( result ).Apply() )
+			{
+				registry.Value.Register( new InstanceRegistrationParameter( parameter, result ) );
+			}
+			return result;
 		}
 	}
 
 	public class ServicesBuildPlanPolicy : IBuildPlanPolicy
 	{
-		// readonly static Func<object, bool> DefaultActivated = ActivationProperties.IsActivatedInstanceSpecification.Default.ToDelegate();
-
-		readonly IDependencyLocatorKey locatorKey;
-		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
-		// readonly Func<object, bool> isActivated;
-		readonly Condition condition = new Condition();
-
-		// public ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry ) : this( locatorKey, registry/*, DefaultActivated*/ ) {}
-
-		public ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Func<ServiceRegistry<ExternallyControlledLifetimeManager>> registry/*, Func<object, bool> isActivated*/ ) : this( locatorKey, new Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>>( registry )/*, isActivated */) {}
-
-		ServicesBuildPlanPolicy( IDependencyLocatorKey locatorKey, Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry/*, Func<object, bool> isActivated*/ )
+		readonly Func<Type, object> provider;
+		public ServicesBuildPlanPolicy( Func<Type, object> provider )
 		{
-			this.locatorKey = locatorKey;
-			this.registry = registry;
-			// this.isActivated = isActivated;
+			this.provider = provider;
 		}
 
-		public void BuildUp( IBuilderContext context )
-		{
-			var existing = DependencyLocators.Instance.For( locatorKey )?.Invoke( context.BuildKey.Type );
-			if ( existing != null && condition.Get( existing ).Apply() )
-			{
-				registry.Value.Register( new InstanceRegistrationParameter( context.BuildKey.Type, existing ) );
-			}
-
-			context.Complete( existing );
-		}
+		public void BuildUp( IBuilderContext context ) => context.Complete( provider( context.BuildKey.Type ) );
 	}
 
 	/*public class ServicesStrategy : BuilderStrategy

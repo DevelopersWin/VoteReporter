@@ -50,7 +50,7 @@ namespace DragonSpark.Setup
 	public sealed class ServiceProviderFactory : AggregateFactoryBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
-		ServiceProviderFactory() : base( () => DefaultServiceProvider.Instance ) {}
+		ServiceProviderFactory() : base( new Configuration<IServiceProvider>( () => DefaultServiceProvider.Instance ) ) {}
 	}
 
 	/*public class ServiceProviderConfigurator : Configurator<IServiceProvider>
@@ -167,6 +167,8 @@ namespace DragonSpark.Setup
 	{
 		public static ISource<IRepository<IServiceProvider>> Instance { get; } = new ExecutionScope<IRepository<IServiceProvider>>( () => new ServiceProviderRegistry() );
 		ServiceProviderRegistry() : base( EnumerableEx.Return( DefaultServiceProvider.Instance ) ) {}
+
+		protected override IEnumerable<IServiceProvider> Query() => base.Query().Reverse();
 	}
 
 	public interface IDependencyLocator : ICache<IDependencyLocatorKey, IServiceProvider>

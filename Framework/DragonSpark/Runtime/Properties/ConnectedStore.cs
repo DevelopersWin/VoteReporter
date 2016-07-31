@@ -108,7 +108,7 @@ namespace DragonSpark.Runtime.Properties
 		/*readonly static Func<IStack<T>> Store = Default.Get;*/
 
 		public AmbientStack() : this( AmbientStackCache<T>.Default ) {}
-		public AmbientStack( ICache<IStack<T>> cache ) : base( cache ) {}
+		public AmbientStack( ICache<IStack<T>> source ) : base( source ) {}
 
 		public T GetCurrentItem() => Value.Peek();
 	}

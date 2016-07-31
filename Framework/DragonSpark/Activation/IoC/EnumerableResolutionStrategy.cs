@@ -1,6 +1,6 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation.IoC.Specifications;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
@@ -19,6 +19,8 @@ namespace DragonSpark.Activation.IoC
 		readonly ImmutableArray<IBuildPlanPolicy> policies;
 		readonly IBuildPlanCreatorPolicy creator;
 
+		public BuildPlanCreatorPolicy( IBuildPlanCreatorPolicy creator, ImmutableArray<IBuildPlanPolicy> policies ) : this( creator, policies, HasFactorySpecification.Instance.Inverse() ) {}
+
 		public BuildPlanCreatorPolicy( IBuildPlanCreatorPolicy creator, ImmutableArray<IBuildPlanPolicy> policies, ISpecification<LocateTypeRequest> specification )
 		{
 			this.creator = creator;
@@ -28,19 +30,21 @@ namespace DragonSpark.Activation.IoC
 
 		public IBuildPlanPolicy CreatePlan( IBuilderContext context, NamedTypeBuildKey buildKey )
 		{
+			var planPolicies = policies.AsEnumerable();
 			var isSatisfiedBy = specification.IsSatisfiedBy( new LocateTypeRequest( buildKey.Type, buildKey.Name ) );
-			var buildPlanPolicies = policies.ToArray().StartWith( creator.CreatePlan( context, buildKey ) ).ToArray();
-			return new CompositeBuildPlanPolicy( isSatisfiedBy ? buildPlanPolicies : Items<IBuildPlanPolicy>.Default );
+			var buildPlanPolicies = isSatisfiedBy ? planPolicies.StartWith( creator.CreatePlan( context, buildKey ) ) : planPolicies;
+			var result = new CompositeBuildPlanPolicy( buildPlanPolicies );
+			return result;
 		}
 	}
 
 	public class CompositeBuildPlanPolicy : IBuildPlanPolicy
 	{
-		readonly IBuildPlanPolicy[] policies;
+		readonly ImmutableArray<IBuildPlanPolicy> policies;
 
-		public CompositeBuildPlanPolicy( IBuildPlanPolicy[] policies )
+		public CompositeBuildPlanPolicy( IEnumerable<IBuildPlanPolicy> policies )
 		{
-			this.policies = policies;
+			this.policies = policies.ToImmutableArray();
 		}
 
 		public void BuildUp( IBuilderContext context )
@@ -88,12 +92,12 @@ namespace DragonSpark.Activation.IoC
 		delegate object Resolver( IBuilderContext context );
 
 		readonly IUnityContainer container;
-		readonly IDependencyLocatorKey key;
+		readonly Func<Type, object> provider;
 
-		public EnumerableResolutionStrategy( IUnityContainer container, IDependencyLocatorKey key )
+		public EnumerableResolutionStrategy( IUnityContainer container, Func<Type, object> provider )
 		{
 			this.container = container;
-			this.key = key;
+			this.provider = provider;
 		}
 
 		public override void PreBuildUp( [Required]IBuilderContext context )
@@ -107,7 +111,7 @@ namespace DragonSpark.Activation.IoC
 					var array = context.Existing as Array;
 					if ( array != null )
 					{
-						var result = array.Length > 0 ? array : DependencyLocators.Instance.For( key )?.Invoke( context.BuildKey.Type ) ?? array;
+						var result = array.Length > 0 ? array : provider( context.BuildKey.Type ) ?? array;
 						context.Complete( result );
 					}
 				}

@@ -67,23 +67,25 @@ namespace DragonSpark.Activation.IoC
 		readonly static IAtomicCache<object, IBuildPlanCreatorPolicy> Policies = new Cache<IBuildPlanCreatorPolicy>();
 
 		readonly IBuildPlanRepository repository;
-		readonly ISpecification<LocateTypeRequest> specification;
-
-		public CachingBuildPlanExtension( IBuildPlanRepository repository, ISpecification<LocateTypeRequest> specification )
+		
+		public CachingBuildPlanExtension( IBuildPlanRepository repository )
 		{
 			this.repository = repository;
-			this.specification = specification;
 		}
 
 		protected override void Initialize()
 		{
 			var creator = Creator.Default.Get( Container )?.GetType() ?? Execution.Current();
 			var policies = repository.List();
-			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies, specification );
+			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
 		}
 
-		IBuildPlanCreatorPolicy Create( object instance ) => new CachedCreatorPolicy( Context.Policies.Get<IBuildPlanCreatorPolicy>( null ) );
+		IBuildPlanCreatorPolicy Create( object instance )
+		{
+			var buildPlanCreatorPolicy = Context.Policies.Get<IBuildPlanCreatorPolicy>( null );
+			return new CachedCreatorPolicy( buildPlanCreatorPolicy );
+		}
 
 		class CachedCreatorPolicy : IBuildPlanCreatorPolicy
 		{

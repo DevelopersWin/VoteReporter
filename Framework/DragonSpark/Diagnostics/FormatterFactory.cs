@@ -8,7 +8,8 @@ namespace DragonSpark.Diagnostics
 	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
 	{
 		[Export]
-		public static ISource<FormatterFactory> Instance { get; } = new ExecutionScope<FormatterFactory>( () => new FormatterFactory( ConstructFromKnownTypes<IFormattable>.Instance.Get().CreateUsing ) );
+		public static FormatterFactory Instance { get; } = new FormatterFactory();
+		FormatterFactory() : this( o => ConstructFromKnownTypes<IFormattable>.Instance.Get().CreateUsing( o ) ) {}
 
 		readonly static Func<Parameter, object> Coerce = p => StringCoercer.Instance.Coerce( p.Instance );
 		readonly static Coerce<Parameter> Coercer = ConstructCoercer<Parameter>.Instance.Coerce;

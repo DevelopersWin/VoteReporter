@@ -1,5 +1,6 @@
-using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.IoC;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using Microsoft.Practices.Unity;
 using Xunit;
@@ -7,13 +8,13 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	[Trait( Traits.Category, Traits.Categories.IoC )]
+	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, IoCTypes, ApplicationTypes( typeof(UnitySetup) )]
 	public class UnitySetupTests : TestCollectionBase
 	{
 		public UnitySetupTests( ITestOutputHelper output ) : base( output )
 		{}
 
-		[Theory, UnitySetup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void Extension( IUnityContainer sut )
 		{
 			Assert.NotNull( sut.Configure<TestExtension>() );
@@ -48,7 +49,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			}#1#
 		}*/
 
-		[Theory, UnitySetup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void RegisteredName( IUnityContainer sut )
 		{
 			Assert.NotNull( sut.Resolve<Singleton>( "SomeName" ) );

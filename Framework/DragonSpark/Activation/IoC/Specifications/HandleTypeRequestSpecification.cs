@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {
@@ -107,8 +108,8 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	public class HasFactorySpecification : CanCreateSpecification<LocateTypeRequest>
 	{
-		readonly static Coerce<LocateTypeRequest> DefaultCoercer = TypeRequestCoercer<LocateTypeRequest>.Instance.ToDelegate();
-		public HasFactorySpecification() : base( SourceTypes.Instance.Get().Get, DefaultCoercer ) {}
+		public static HasFactorySpecification Instance { get; } = new HasFactorySpecification();
+		HasFactorySpecification() : base( SourceTypes.Instance.Delegate(), TypeRequestCoercer<LocateTypeRequest>.Instance.ToDelegate() ) {}
 	}
 
 	public abstract class StrategyValidator<TStrategy> : GuardedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy

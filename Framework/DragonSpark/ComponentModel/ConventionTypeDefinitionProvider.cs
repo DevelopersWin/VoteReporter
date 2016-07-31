@@ -10,10 +10,22 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class TypeDefinitionProvider : Cache<TypeInfo, TypeInfo>, ITypeDefinitionProvider
+	public sealed class TypeDefinitionProvider : FactoryCache<TypeInfo, TypeInfo>, ITypeDefinitionProvider
 	{
-		public static ISource<ITypeDefinitionProvider> Instance { get; } = new ExecutionScope<ITypeDefinitionProvider>( () => new TypeDefinitionProvider( AttributeConfigurations.TypeDefinitionProviders.Get() ) );
-		TypeDefinitionProvider( ImmutableArray<ITypeDefinitionProvider> providers ) : base( new CompositeFactory<TypeInfo, TypeInfo>( providers.Select( provider => new Func<TypeInfo, TypeInfo>( provider.Get ) ).ToArray() ).Create ) {}
+		public static ISource<ITypeDefinitionProvider> Instance { get; } = new ExecutionScope<ITypeDefinitionProvider>( () => new TypeDefinitionProvider() );
+		TypeDefinitionProvider() {}
+		protected override TypeInfo Create( TypeInfo parameter )
+		{
+			foreach ( var provider in AttributeConfigurations.TypeDefinitionProviders.Get() )
+			{
+				var info = provider.Get( parameter );
+				if ( info != null )
+				{
+					return info;
+				}
+			}
+			return null;
+		}
 	}
 
 	public sealed class ConventionTypeDefinitionProvider : TransformerBase<TypeInfo>, ITypeDefinitionProvider

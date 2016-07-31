@@ -10,6 +10,6 @@ namespace DragonSpark.TypeSystem
 		public static ApplicationAssemblyLocator Instance { get; } = new ApplicationAssemblyLocator();
 		ApplicationAssemblyLocator() {}
 
-		public override Assembly Create( IEnumerable<Assembly> assemblies ) => assemblies.SingleOrDefault( assembly => assembly.IsDefined( typeof( ApplicationAttribute) ) );
+		public override Assembly Create( IEnumerable<Assembly> assemblies ) => assemblies.SingleOrDefault( assembly => assembly.IsDefined( typeof(ApplicationAttribute) ) );
 	}
 }

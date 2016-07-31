@@ -50,21 +50,16 @@ namespace DragonSpark.Diagnostics.Logger
 	{
 		// public static TemplateParameterFactoryBase Instance { get; } = new TemplateParameterFactoryBase<T>();
 
-		readonly Func<FormatterFactory> source;
+		readonly FormatterFactory source;
 
-		protected LoggerTemplateParameterFactoryBase() : this( FormatterFactory.Instance.Get ) {}
+		protected LoggerTemplateParameterFactoryBase() : this( FormatterFactory.Instance ) {}
 
-		protected LoggerTemplateParameterFactoryBase( Func<FormatterFactory> source )
+		protected LoggerTemplateParameterFactoryBase( FormatterFactory source )
 		{
 			this.source = source;
 		}
 
-		protected object[] Parameters( T parameter )
-		{
-			var formatter = source();
-			var result =  parameter.Parameters.Select( formatter.From ).ToArray();
-			return result;
-		}
+		protected object[] Parameters( T parameter ) => parameter.Parameters.Select( source.From ).ToArray();
 	}
 
 	class LoggerTemplateParameterFactory : LoggerTemplateParameterFactoryBase<ILoggerTemplate>

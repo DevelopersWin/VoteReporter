@@ -187,14 +187,12 @@ namespace DragonSpark.Runtime.Properties
 	}
 
 	
-	public interface ICache<TValue> : ICache<object, TValue> {}
-	public interface ICache<in TInstance, TValue> : IParameterizedSource<TInstance, TValue>
+	public interface ICache<T> : ICache<object, T>, IAssignableParameterizedSource<T> {}
+	public interface ICache<in TInstance, TValue> : IAssignableParameterizedSource<TInstance, TValue>
 	{
 		bool Contains( TInstance instance );
 		
 		bool Remove( TInstance instance );
-
-		void Set( TInstance instance, TValue value );
 
 		// TValue Get( TInstance instance );
 	}
@@ -264,7 +262,7 @@ namespace DragonSpark.Runtime.Properties
 		{
 			var factory = new DelegatedFactory<TInstance, TValue>( Create, specification );
 			var host = specification == DefaultSpecification ? factory : factory.WithAutoValidation();
-			Assign( host.Create );
+			base.Assign( host.Create );
 		}
 
 		protected abstract TValue Create( TInstance parameter );
@@ -295,6 +293,28 @@ namespace DragonSpark.Runtime.Properties
 		public override bool Remove( TInstance instance ) => cache.Remove( instance );
 
 		public override void Set( TInstance instance, TValue value ) => cache.Set( instance, value );
+	}
+
+	public class FactoryScopeCache<T> : ConfigurableScopedCache<T>
+	{
+		readonly Func<T> defaultFactory;
+		public FactoryScopeCache( Func<T> defaultFactory ) : base( defaultFactory )
+		{
+			this.defaultFactory = defaultFactory;
+		}
+
+		public override T Get( object parameter ) => Contains( parameter ) ? Get( parameter ) : defaultFactory();
+	}
+
+	public class ConfigurableScopedCache<T> : ConfigurableCache<T>
+	{
+		public ConfigurableScopedCache( Func<T> defaultFactory ) : base( new ConfigurableStore<object, T>( new ExecutionScope<Func<object, T>>( defaultFactory.Wrap().Self ) ) ) {}
+
+		public override void Assign( Func<object, T> item )
+		{
+			Remove( Execution.Current() );
+			base.Assign( item );
+		}
 	}
 
 	public class ConfigurableCache<T> : ConfigurableCache<object, T>, IConfigurableCache<T>

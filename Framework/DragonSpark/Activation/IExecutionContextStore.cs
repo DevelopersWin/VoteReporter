@@ -11,19 +11,9 @@ namespace DragonSpark.Activation
 {
 	public static class Execution
 	{
-		readonly static ISource<IExecutionContextStore> Store = new DelegatedCachedSource<IExecutionContextStore>( () =>
-																												   {
-																													   var executionContextStores = ExecutionContextRepository.Instance.List();
-																													   var executionContextStore = executionContextStores.First();
-																													   return executionContextStore;
-																												   } );
+		readonly static Func<object> Store = new DelegatedCachedSource<IExecutionContextStore>( () => ExecutionContextRepository.Instance.List().First() ).Delegate();
 
-		public static object Current()
-		{
-			var executionContextStore = Store.Get();
-			var current = executionContextStore.Get();
-			return current;
-		}
+		public static object Current() => Store();
 	}
 
 	[Priority( Priority.Low )]
@@ -56,52 +46,62 @@ namespace DragonSpark.Activation
 		protected override T Get() => factory( Execution.Current() );
 	}
 
+	/*public class ActivatedParameterizedSource<T> : DecoratedCache<T>, IAssignableParameterizedSource<T>
+	{
+		readonly Func<object, T> factory;
+
+		public ActivatedParameterizedSource( Func<T> factory ) : this( factory.Wrap() ) {}
+
+		public ActivatedParameterizedSource( Func<object, T> factory ) : base( factory )
+		{
+			this.factory = factory;
+		}
+
+		public override T Get( object parameter ) => Contains( parameter ) ? Get( parameter ) : factory( parameter );
+	}*/
+
 	public interface IExecutionContextStore : ISource {}
 
 	public class ExecutionScope<T> : WritableStore<T>, IParameterizedSource
 	{
-		readonly ICache<T> cache;
+		readonly IAssignableParameterizedSource<T> source;
 
 		public ExecutionScope() : this( () => default(T) ) {}
 
 		public ExecutionScope( Func<T> defaultFactory ) : this( CacheFactory.Create( defaultFactory ) ) {}
 
-		public ExecutionScope( ICache<T> cache )
+		public ExecutionScope( IAssignableParameterizedSource<T> source )
 		{
-			this.cache = cache;
+			this.source = source;
 		}
 
-		protected override T Get() => cache.Get( Execution.Current() );
+		protected override T Get() => source.Get( Execution.Current() );
 
-		public override void Assign( T item ) => cache.Set( Execution.Current(), item );
-		public object Get( object parameter ) => cache.Get( parameter  );
+		public override void Assign( T item ) => source.Set( Execution.Current(), item );
+		public object Get( object parameter ) => source.Get( parameter  );
 	}
 
 	public class Configuration<T> : ExecutionScope<T>, IConfiguration<T>, IAssignable<Func<object, T>>
 	{
-		readonly IConfigurableCache<T> cache;
+		readonly IConfigurableCache<T> source;
 
 		public Configuration() : this( () => default(T) ) {}
 		public Configuration( Func<T> defaultFactory ) : this( new Cache( defaultFactory ) ) {}
 
-		public Configuration( IConfigurableCache<T> cache ) : base( cache )
+		public Configuration( IConfigurableCache<T> source ) : base( source )
 		{
-			this.cache = cache;
+			this.source = source;
 		}
 
-		public void Assign( Func<object, T> item ) => cache.Assign( item );
+		public void Assign( Func<object, T> item ) => source.Assign( item );
 
 		public void Assign( Func<T> item ) => Assign( item.Wrap() );
 
-		sealed class Cache : ConfigurableCache<T>
+		sealed class Cache : ConfigurableScopedCache<T>
 		{
-			public Cache( Func<T> defaultFactory ) : base( new ConfigurableStore<object, T>( new ExecutionScope<Func<object, T>>( defaultFactory.Wrap().Self ) ) ) {}
+			public Cache( Func<T> defaultFactory ) : base( defaultFactory ) {}
 
-			public override void Assign( Func<object, T> item )
-			{
-				Remove( Execution.Current() );
-				base.Assign( item );
-			}
+			
 		}
 	}
 }

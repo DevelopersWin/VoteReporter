@@ -24,7 +24,8 @@ namespace DragonSpark.Setup.Registration
 
 		public override void Execute( ImmutableArray<Type> parameter )
 		{
-			foreach ( var type in MetadataRegistrationTypeFactory.Instance.Get( parameter ) )
+			var immutableArray = MetadataRegistrationTypeFactory.Instance.Get( parameter );
+			foreach ( var type in immutableArray )
 			{
 				foreach ( var registration in HostedValueLocator<IRegistration>.Instance.Create( type ) )
 				{
@@ -39,6 +40,6 @@ namespace DragonSpark.Setup.Registration
 		public static MetadataRegistrationTypeFactory Instance { get; } = new MetadataRegistrationTypeFactory();
 		MetadataRegistrationTypeFactory() {}
 
-		public override ImmutableArray<Type> Get( ImmutableArray<Type> parameter ) => parameter.ToArray().Decorated<RegistrationBaseAttribute>().ToImmutableArray();
+		public override ImmutableArray<Type> Get( ImmutableArray<Type> parameter ) => parameter.AsEnumerable().Decorated<RegistrationBaseAttribute>().ToImmutableArray();
 	}
 }
