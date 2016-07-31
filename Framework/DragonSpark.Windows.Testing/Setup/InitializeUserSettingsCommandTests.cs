@@ -4,7 +4,6 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Setup;
 using DragonSpark.Windows.Testing.Properties;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -25,20 +24,26 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void Create( InitializeUserSettingsCommand sut, ILoggerHistory history, UserSettingsPathFactory factory )
 		{
-			var path = factory.Create();
-			Assert.False( File.Exists( path ) );
+			var path = factory.Create( ConfigurationUserLevel.PerUserRoamingAndLocal );
+			Assert.False( path.Exists );
 			var before = history.Events.Fixed();
 			sut.Execute( Settings.Default );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
 			Assert.Contains( Resources.LoggerTemplates_Created, items );
 			Assert.Equal( before.Length + 2, items.Length );
-			Assert.True( File.Exists( path ) );
+
+			path.Refresh();
+			Assert.True( path.Exists );
 
 			Clear();
-			Assert.False( File.Exists( path ) );
+
+			path.Refresh();
+			Assert.False( path.Exists );
 			sut.Execute( Settings.Default );
-			Assert.False( File.Exists( path ) );
+
+			path.Refresh();
+			Assert.False( path.Exists );
 			Assert.Equal( before.Length + 2, history.Events.Count() );
 		}
 

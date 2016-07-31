@@ -27,6 +27,8 @@ namespace DragonSpark.Windows.Io
 			return result;
 		}
 
+
+
 		public static bool IsLocked( this FileInfo @this )
 		{
 			FileStream stream = null;

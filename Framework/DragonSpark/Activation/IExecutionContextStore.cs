@@ -35,10 +35,10 @@ namespace DragonSpark.Activation
 		protected override void OnAdd( IExecutionContextStore entry ) => Source.Ensure( entry );
 	}
 
-	public class DefaultExecutionContextFactoryStore<T> : StoreBase<T>
+	public class ExecutionScopedStore<T> : StoreBase<T>
 	{
 		readonly Func<object, T> factory;
-		public DefaultExecutionContextFactoryStore( Func<object, T> factory )
+		public ExecutionScopedStore( Func<object, T> factory )
 		{
 			this.factory = factory;
 		}

@@ -189,7 +189,7 @@ namespace DragonSpark.Configuration
 		class StoreCache<T> : Cache<IConfiguration<object, T>, IStore<T>>
 		{
 			public static StoreCache<T> Default { get; } = new StoreCache<T>();
-			StoreCache() : base( configuration => new DefaultExecutionContextFactoryStore<T>( configuration.Get ) ) {}
+			StoreCache() : base( configuration => new ExecutionScopedStore<T>( configuration.Get ) ) {}
 		}#1#
 	}*/
 }

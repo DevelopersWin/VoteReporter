@@ -64,6 +64,8 @@ namespace DragonSpark.Activation
 			}
 		}
 
+		public static IFactory<TResult> Fixed<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, TParameter parameter ) => new FixedFactory<TParameter, TResult>( @this.ToDelegate(), parameter );
+
 		public static Func<object, T> Wrap<T>( this ISource<T> @this ) => @this.Wrap<object, T>();
 
 		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this ISource<TResult> @this ) => @this.ToDelegate().Wrap<TParameter, TResult>();

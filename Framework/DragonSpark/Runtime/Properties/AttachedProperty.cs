@@ -52,7 +52,7 @@ namespace DragonSpark.Runtime.Properties
 		class StoreCache<T> : Cache<ICache<object, T>, ISource<T>>
 		{
 			public static StoreCache<T> Default { get; } = new StoreCache<T>();
-			StoreCache() : base( cache => new DefaultExecutionContextFactoryStore<T>( cache.Get ) ) {}
+			StoreCache() : base( cache => new ExecutionScopedStore<T>( cache.Get ) ) {}
 		}
 
 		/*public static TDelegate Apply<TContext, TDelegate>( this ICache<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class

@@ -5,6 +5,7 @@ using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup.Commands;
 using DragonSpark.Windows.Properties;
 using Serilog;
 using Serilog.Events;
@@ -15,97 +16,100 @@ using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class UserSettingsPathFactory : FactoryBase<string>
+	public class UserSettingsPathFactory : FactoryBase<ConfigurationUserLevel, FileInfo>
 	{
 		public static UserSettingsPathFactory Instance { get; } = new UserSettingsPathFactory();
+		UserSettingsPathFactory() {}
 
-		readonly ConfigurationUserLevel level;
-
-		public UserSettingsPathFactory( ConfigurationUserLevel level = ConfigurationUserLevel.PerUserRoamingAndLocal )
-		{
-			this.level = level;
-		}
-
-		public override string Create() => ConfigurationManager.OpenExeConfiguration( level ).FilePath;
+		public override FileInfo Create( ConfigurationUserLevel parameter ) => new FileInfo( ConfigurationManager.OpenExeConfiguration( parameter ).FilePath );
 	}
 
-	public class ClearUserSettingCommand : CommandBase<ApplicationSettingsBase>
+	public static class Defaults
+	{
+		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Instance.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).Create().Sourced().Get;
+	}
+
+	public class ClearUserSettingCommand : DelegatedFixedCommand<FileInfo>
 	{
 		public static ClearUserSettingCommand Instance { get; } = new ClearUserSettingCommand();
+		ClearUserSettingCommand() : base( DeleteFileCommand.Instance.Self, Defaults.UserSettingsPath ) {}
+	}
 
-		readonly Func<string> pathSource;
+	[ApplyAutoValidation]
+	public class DeleteFileCommand : CommandBase<FileInfo>
+	{
+		public static DeleteFileCommand Instance { get; } = new DeleteFileCommand();
+		DeleteFileCommand() : this( RetryCommand.Instance ) {}
 
-		public ClearUserSettingCommand() : this( UserSettingsPathFactory.Instance.Create ) {}
+		readonly RetryCommand retry;
 
-		public ClearUserSettingCommand( Func<string> pathSource )
+		public DeleteFileCommand( RetryCommand retry )
 		{
-			this.pathSource = pathSource;
+			this.retry = retry;
 		}
 
-		public override void Execute( ApplicationSettingsBase parameter )
-		{
-			var path = pathSource();
-			if ( File.Exists( path ) )
-			{
-				File.Delete( path );
-			}
-		}
+		public override void Execute( FileInfo parameter ) => retry.Execute( parameter.Delete );
 	}
 
 	[ApplyAutoValidation]
 	public class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
 		readonly LogCommand log;
-		readonly Func<string> pathSource;
+		readonly Func<FileInfo> fileSource;
 
-		public InitializeUserSettingsCommand( ILogger logger ) : this( new LogCommand( logger ), UserSettingsPathFactory.Instance.Create ) {}
+		public InitializeUserSettingsCommand( ILogger logger ) : this( new LogCommand( logger ), Defaults.UserSettingsPath ) {}
 
-		public InitializeUserSettingsCommand( LogCommand log, Func<string> pathSource ) : base( new OnlyOnceSpecification() )
+		public InitializeUserSettingsCommand( LogCommand log, Func<FileInfo> fileSource ) : base( new OnlyOnceSpecification() )
 		{
 			this.log = log;
-			this.pathSource = pathSource;
+			this.fileSource = fileSource;
 		}
 
 		public override void Execute( ApplicationSettingsBase parameter )
 		{
-			var path = pathSource();
-			var exists = !File.Exists( path );
-
+			var file = fileSource();
+			file.Refresh();
+			
 			var templates = new[]
 			{
-				exists ? (ILoggerTemplate)new NotFound( path ) : new Upgrading( path ),
-				Run( parameter, path, exists )
+				!file.Exists ? (ILoggerTemplate)new NotFound( file.FullName ) : new Upgrading( file.FullName ),
+				Run( parameter, file )
 			};
 
 			templates.Each( log.Execute );
 		}
 
-		static ILoggerTemplate Run( ApplicationSettingsBase parameter, string path, bool exists )
+		static ILoggerTemplate Run( ApplicationSettingsBase parameter, FileInfo file )
 		{
-			if ( exists )
+			if ( !file.Exists )
 			{
 				var properties = parameter.Providers
 										  .Cast<SettingsProvider>()
-										  .SelectMany( provider => provider.GetPropertyValues( parameter.Context, parameter.Properties ).Cast<SettingsPropertyValue>() )
-										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed<SettingsPropertyValue>();
+										  .Introduce( parameter, tuple => tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ).Cast<SettingsPropertyValue>() )
+										  .Concat()
+										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed();
 				var any = properties.Any();
 				if ( any )
 				{
-					properties.Each( property => parameter[property.Name] = property.PropertyValue );
+					foreach ( var property in properties )
+					{
+						parameter[property.Name] = property.PropertyValue;
+					}
+					
 					try
 					{
 						parameter.Save();
 					}
 					catch ( ConfigurationErrorsException e )
 					{
-						return new ErrorSaving( e, path );
+						return new ErrorSaving( e, file.FullName );
 					}
 				}
-				return any ? (ILoggerTemplate)new Created( path ) : new NotSaved( parameter.GetType() );
+				return any ? (ILoggerTemplate)new Created( file.FullName ) : new NotSaved( parameter.GetType() );
 			}
 
 			parameter.Upgrade();
-			return new Complete( path );
+			return new Complete( file.FullName );
 		}
 
 		class ErrorSaving : ExceptionLoggerTemplate

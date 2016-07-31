@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
+using System;
 using System.Windows.Markup;
 
 namespace DragonSpark.Setup.Commands
@@ -29,11 +30,28 @@ namespace DragonSpark.Setup.Commands
 		public T Parameter { [return: Required]get; set; }
 	}
 
-	public abstract class DelegatedFixedCommand<T> : CommandBase<object>
+	public class DelegatedFixedCommand<T> : DelegatedFixedCommandBase<T>
 	{
-		protected DelegatedFixedCommand() : base( Specifications.Always ) {}
+		readonly Func<ICommand<T>> command;
+		readonly Func<T> parameter;
 
-		protected DelegatedFixedCommand( ISpecification<object> specification ) : base( specification ) {}
+		public DelegatedFixedCommand( Func<ICommand<T>> command, Func<T> parameter ) : this( command, parameter, Specifications.Always ) {}
+		public DelegatedFixedCommand( Func<ICommand<T>> command, Func<T> parameter, ISpecification<object> specification ) : base( specification )
+		{
+			this.command = command;
+			this.parameter = parameter;
+		}
+
+		public override ICommand<T> GetCommand() => command();
+
+		public override T GetParameter() => parameter();
+	}
+
+	public abstract class DelegatedFixedCommandBase<T> : CommandBase<object>
+	{
+		protected DelegatedFixedCommandBase() : base( Specifications.Always ) {}
+
+		protected DelegatedFixedCommandBase( ISpecification<object> specification ) : base( specification ) {}
 
 		public override void Execute( object parameter ) => GetCommand().Execute( GetParameter() );
 
@@ -43,7 +61,7 @@ namespace DragonSpark.Setup.Commands
 	}
 
 	[ContentProperty( nameof(Parameter) )]
-	public class ServicedCommand<TCommand, TParameter> : DelegatedFixedCommand<TParameter> where TCommand : ICommand<TParameter>
+	public class ServicedCommand<TCommand, TParameter> : DelegatedFixedCommandBase<TParameter> where TCommand : ICommand<TParameter>
 	{
 		public ServicedCommand() : base( Specifications.Always ) {}
 
