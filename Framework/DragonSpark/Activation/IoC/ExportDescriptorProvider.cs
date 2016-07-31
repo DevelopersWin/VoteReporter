@@ -58,7 +58,7 @@ namespace DragonSpark.Activation.IoC
 
 		public override object Create( Type parameter )
 		{
-			var serviceSource = DependencyLocators.Instance.For( locatorKey );
+			var serviceSource = DependencyLocators.Instance.Get().For( locatorKey );
 			var result = serviceSource?.Invoke( parameter );
 			if ( result != null && condition.Get( result ).Apply() )
 			{

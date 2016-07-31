@@ -176,33 +176,38 @@ namespace DragonSpark.Setup
 		ServiceSource For( IDependencyLocatorKey locatorKey );
 	}
 
+	[ApplyAutoValidation]
 	public class RegisterServiceProviderCommand : CommandBase<IServiceProvider>
 	{
 		public static RegisterServiceProviderCommand Instance { get; } = new RegisterServiceProviderCommand();
-		RegisterServiceProviderCommand() : this( DependencyLocators.Instance, ServiceProviderRegistry.Instance.Get ) {}
+		RegisterServiceProviderCommand() : this( DependencyLocators.Instance.Get, ServiceProviderRegistry.Instance.Get ) {}
 
-		readonly IDependencyLocator locator;
+		readonly Func<IDependencyLocator> locatorSource;
 		readonly Func<IRepository<IServiceProvider>> repositorySource;
 
-		public RegisterServiceProviderCommand( IDependencyLocator locator, Func<IRepository<IServiceProvider>> repositorySource )
+		public RegisterServiceProviderCommand( Func<IDependencyLocator> locatorSource, Func<IRepository<IServiceProvider>> repositorySource )
 		{
-			this.locator = locator;
+			this.locatorSource = locatorSource;
 			this.repositorySource = repositorySource;
 		}
 
 		public override void Execute( IServiceProvider parameter )
 		{
 			var key = parameter.Get<IDependencyLocatorKey>();
-			if ( key != null && !locator.Contains( key ) )
+			if ( key != null )
 			{
-				repositorySource().Add( locator.SetValue( key, parameter ) );
+				var locator = locatorSource();
+				if ( !locator.Contains( key ) )
+				{
+					repositorySource().Add( locator.SetValue( key, parameter ) );
+				}
 			}
 		}
 	}
 
 	class DependencyLocators : Cache<IDependencyLocatorKey, IServiceProvider>, IDependencyLocator
 	{
-		public static IDependencyLocator Instance { get; } = new DependencyLocators();
+		public static ISource<IDependencyLocator> Instance { get; } = new ExecutionScope<IDependencyLocator>( () =>	new DependencyLocators() );
 		DependencyLocators() {}
 
 		readonly ICache<IServiceProvider, ServiceSource> sources = new Cache<IServiceProvider, ServiceSource>( provider => ActivatedServiceProvider.Stores.Get( provider ).GetService );
