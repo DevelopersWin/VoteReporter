@@ -2,7 +2,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Markup;
@@ -41,7 +40,7 @@ namespace DragonSpark.Runtime
 	{
 		public CompositeCommand( params ICommand[] commands ) : this( Specifications<T>.Always, commands ) {}
 
-		public CompositeCommand( ISpecification<T> specification, [Required]params ICommand[] commands ) : base( specification )
+		public CompositeCommand( ISpecification<T> specification, params ICommand[] commands ) : base( specification )
 		{
 			Commands = new CommandCollection( commands );
 		}

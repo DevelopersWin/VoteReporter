@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Application", "DevelopersWin.VoteReporter.Application\DevelopersWin.VoteReporter.Application.csproj", "{5A90A124-22CF-4A87-BC4D-DACD189FE06E}"
 EndProject
@@ -38,8 +38,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Testing.Objects", "Framework\DragonSpark.Testing.Objects\DragonSpark.Testing.Objects.csproj", "{65CCD995-C347-48B1-B017-D09E917BD252}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Windows.Testing", "Framework\DragonSpark.Windows.Testing\DragonSpark.Windows.Testing.csproj", "{B21E892A-BE56-4024-BD63-AA332279E7C5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Client", "..\Framework\DragonSpark.Client\DragonSpark.Client.csproj", "{37CB4B8E-4D06-47D1-989F-67091821F96C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8CBA4E29-EB72-478D-B6FC-8C72876B60EC}"
 	ProjectSection(SolutionItems) = preProject
@@ -103,10 +101,6 @@ Global
 		{B21E892A-BE56-4024-BD63-AA332279E7C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B21E892A-BE56-4024-BD63-AA332279E7C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B21E892A-BE56-4024-BD63-AA332279E7C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{37CB4B8E-4D06-47D1-989F-67091821F96C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{37CB4B8E-4D06-47D1-989F-67091821F96C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{37CB4B8E-4D06-47D1-989F-67091821F96C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{37CB4B8E-4D06-47D1-989F-67091821F96C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5F01891D-FFB9-485B-BD5F-C072EF00DE59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F01891D-FFB9-485B-BD5F-C072EF00DE59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F01891D-FFB9-485B-BD5F-C072EF00DE59}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -128,7 +122,6 @@ Global
 		{33E76200-26E0-48A5-81B8-72AD12978C3F} = {20BC8DE8-EFFE-42C2-A22B-A68D7C6B2CB2}
 		{65CCD995-C347-48B1-B017-D09E917BD252} = {ED0845D6-3B85-4AD6-A909-EF328B4A40CC}
 		{B21E892A-BE56-4024-BD63-AA332279E7C5} = {ED0845D6-3B85-4AD6-A909-EF328B4A40CC}
-		{37CB4B8E-4D06-47D1-989F-67091821F96C} = {20BC8DE8-EFFE-42C2-A22B-A68D7C6B2CB2}
 		{5F01891D-FFB9-485B-BD5F-C072EF00DE59} = {ED0845D6-3B85-4AD6-A909-EF328B4A40CC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

@@ -1,7 +1,6 @@
 using AutoMapper;
 using DragonSpark.Activation;
 using DragonSpark.Runtime;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Extensions
 {
@@ -11,7 +10,7 @@ namespace DragonSpark.Extensions
 
 		readonly IActivator locator;
 
-		public ObjectMappingFactory( [Required]IActivator locator )
+		public ObjectMappingFactory( IActivator locator )
 		{
 			this.locator = locator;
 		}
@@ -21,14 +20,20 @@ namespace DragonSpark.Extensions
 			var sourceType = parameter.Source.GetType();
 			var destinationType = parameter.Existing?.GetType() ?? ( typeof(T) == typeof(object) ? sourceType : typeof(T) );
 				
-			var configuration = new MapperConfiguration( mapper =>
+			var configuration = new MapperConfiguration( configure =>
 			{
-				var map = mapper.CreateMap( sourceType, destinationType ).IgnoreUnassignable();
-				map.TypeMap.DestinationCtor = x => parameter.Existing ?? locator.Activate<object>( x.DestinationType );
+				configure.CreateMissingTypeMaps = true;
+				var map = configure
+					.IgnoreUnassignable()
+					.CreateMap( sourceType, destinationType ).IgnoreAllPropertiesWithAnInaccessibleSetter()
+					.ConstructUsing( ( o, context ) => parameter.Existing ?? locator.Activate<object>( destinationType ) );
+				
 				parameter.Configuration?.Invoke( map );
+				
 			} );
+			// configuration.FindTypeMapFor( sourceType, destinationType ).DestinationCtor = x => 
 
-			configuration.To<IProfileExpression>().CreateMissingTypeMaps = true;
+			// configuration.To<IProfileExpression>().CreateMissingTypeMaps = true;
 
 			var result = configuration.CreateMapper().Map( parameter.Source, sourceType, destinationType );
 			return (T)result;

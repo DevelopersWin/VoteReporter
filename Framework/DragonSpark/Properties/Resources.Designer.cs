@@ -134,7 +134,7 @@ namespace DragonSpark.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A duplicated module with name {0} has been found by the loader..
+        ///   Looks up a localized string similar to A duplicated module with name {0} has been found by the resolver..
         /// </summary>
         public static string DuplicatedModule {
             get {
@@ -155,7 +155,7 @@ namespace DragonSpark.Properties {
         ///   Looks up a localized string similar to An exception occurred while initializing module &apos;{0}&apos;. 
         ///    - The exception message was: {2}
         ///    - The Assembly that the module was trying to be loaded from was:{1}
-        ///    Check the InnerException property of the exception for more information. If the exception occurred while creating an object in a DI container, you can exception.GetRootException() to help locate the root cause of the problem. 
+        ///    Check the InnerException @this of the exception for more information. If the exception occurred while creating an object in a DI container, you can exception.GetRootException() to help locate the root cause of the problem. 
         ///  .
         /// </summary>
         public static string FailedToLoadModule {

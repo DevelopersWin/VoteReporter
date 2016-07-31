@@ -5,7 +5,9 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:diagnostics="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
 	xmlns:diagnosticsPlatform="clr-namespace:DragonSpark.Windows.Diagnostics;assembly=DragonSpark.Windows"
-	xmlns:enrichers="clr-namespace:Serilog.Enrichers;assembly=Serilog.FullNetFx"
+	xmlns:environment="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Environment"
+	xmlns:thread="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Thread"
+	xmlns:process="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Process"
 	mc:Ignorable="d" 
 >
 	<diagnostics:MinimumLevelIsCommand />
@@ -15,9 +17,9 @@
 	<diagnosticsPlatform:AddSeqSinkCommand Endpoint="http://localhost:5341" ApiKey="FHDZFBUt1z34o0j6L1iE" />
 	
 	<diagnostics:EnrichCommand>
-		<enrichers:ProcessIdEnricher />
-		<enrichers:ThreadIdEnricher />
-		<enrichers:MachineNameEnricher />
-		<enrichers:EnvironmentUserNameEnricher />
+		<process:ProcessIdEnricher />
+		<thread:ThreadIdEnricher />
+		<environment:MachineNameEnricher />
+		<environment:EnvironmentUserNameEnricher />
 	</diagnostics:EnrichCommand>
 </diagnostics:ConfiguringLoggerConfigurationFactory>

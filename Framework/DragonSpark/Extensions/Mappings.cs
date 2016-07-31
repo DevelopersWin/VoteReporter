@@ -1,23 +1,24 @@
 using AutoMapper;
 using DragonSpark.Activation;
 using System;
-using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Extensions
 {
 	public static class Mappings
 	{
-		public static Action<IMappingExpression> OnlyProvidedValues() => x => x.ForAllMembers( options => options.Condition( condition => !condition.IsSourceValueNull ) );
+		public static Action<IMappingExpression> OnlyProvidedValues() => x => x.ForAllMembers( expression => expression.Condition( o => o.IsAssigned() ) );
 
-		public static IMappingExpression IgnoreUnassignable( this IMappingExpression @this )
+		public static IMapperConfigurationExpression IgnoreUnassignable( this IMapperConfigurationExpression @this )
 		{
-			foreach ( var source in @this.TypeMap
+			@this.ForAllPropertyMaps( map => !map.DestinationPropertyType.Adapt().IsAssignableFrom( map.SourceMember.To<PropertyInfo>().PropertyType ), ( map, expression ) =>  map.Ignored = true );
+
+			/*foreach ( var source in @this.TypeMap
 											  .GetPropertyMaps()
-											  .Where( map => !map.DestinationPropertyType.Adapt().IsAssignableFrom( map.SourceMember.To<PropertyInfo>().PropertyType ) ) )
+											  .Where( map =>  ) )
 			{
 				@this.ForMember( source.SourceMember.Name, opt => opt.Ignore() );
-			}
+			}*/
 				
 			return @this;
 		}
