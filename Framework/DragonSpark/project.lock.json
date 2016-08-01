@@ -142,22 +142,7 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NReco.LambdaParser/1.0.2": {
-        "frameworkAssemblies": [
-          "System",
-          "System.Collections",
-          "System.Core",
-          "System.Globalization",
-          "System.IO",
-          "System.Linq",
-          "System.Linq.Expressions",
-          "System.Reflection",
-          "System.Reflection.Extensions",
-          "System.Resources.ResourceManager",
-          "System.Runtime",
-          "System.Runtime.Extensions",
-          "System.Threading"
-        ],
+      "NReco.LambdaParser/1.0.3": {
         "compile": {
           "lib/portable45-net45+win8+wp8+wpa81/NReco.LambdaParser.dll": {}
         },
@@ -827,7 +812,7 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NReco.LambdaParser/1.0.2": {
+      "NReco.LambdaParser/1.0.3": {
         "compile": {
           "lib/portable45-net45+win8+wp8+wpa81/NReco.LambdaParser.dll": {}
         },
@@ -1826,12 +1811,12 @@
         "dotnet_library_license.txt"
       ]
     },
-    "NReco.LambdaParser/1.0.2": {
-      "sha512": "wcqV1y3SHAd/RMKmqXHmZQ70O9EQ8gsoN94DIqJ/G4loLZ8030FQ/kqkOqh7vYltQz2TjlQ7VTrg8EMqZ7sXvA==",
+    "NReco.LambdaParser/1.0.3": {
+      "sha512": "OVsIyQfhGbXTUl9emUny/DeayxCDnOrSc58WRhUnoE4GtHWay1AoG/n0egGq1bsTCYyNJRHmxoWZUJCtLkEh/w==",
       "type": "package",
-      "path": "NReco.LambdaParser/1.0.2",
+      "path": "NReco.LambdaParser/1.0.3",
       "files": [
-        "NReco.LambdaParser.1.0.2.nupkg.sha512",
+        "NReco.LambdaParser.1.0.3.nupkg.sha512",
         "NReco.LambdaParser.nuspec",
         "lib/netstandard1.3/NReco.LambdaParser.dll",
         "lib/netstandard1.3/NReco.LambdaParser.xml",
@@ -4580,7 +4565,7 @@
       "Microsoft.Composition >= 1.0.30",
       "Microsoft.NETCore.Portable.Compatibility >= 1.0.1",
       "NETStandard.Library >= 1.6.0",
-      "NReco.LambdaParser >= 1.0.2",
+      "NReco.LambdaParser >= 1.0.3",
       "PostSharp >= 4.2.29",
       "PostSharp.Patterns.Common >= 4.2.29",
       "PostSharp.Patterns.Model >= 4.2.29",

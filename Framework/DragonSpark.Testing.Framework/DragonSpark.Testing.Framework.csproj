@@ -86,10 +86,6 @@
       <HintPath>$(SolutionDir)packages\Moq.4.5.16\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NReco.LambdaParser, Version=1.0.2.0, Culture=neutral, PublicKeyToken=50b5ad72a1d364c6, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NReco.LambdaParser.1.0.2\lib\netstandard1.3\NReco.LambdaParser.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Ploeh.Albedo, Version=1.0.2.0, Culture=neutral, PublicKeyToken=179ef6dd03497bbd, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Albedo.1.0.2\lib\net35\Ploeh.Albedo.dll</HintPath>
       <Private>True</Private>
