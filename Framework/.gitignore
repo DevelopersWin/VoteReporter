@@ -36,3 +36,5 @@ Packages/
 -Archive/
 /Pull.bat
 *.lock.json
+*.nuget.props
+*.nuget.targets

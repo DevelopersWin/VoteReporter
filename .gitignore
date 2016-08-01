@@ -36,3 +36,5 @@ Publish.bat
 -Archive/
 /.vs/config/applicationhost.config
 *.lock.json
+*nuget.props
+*nuget.targets
