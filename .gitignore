@@ -35,3 +35,4 @@ Publish.bat
 /TestResults
 -Archive/
 /.vs/config/applicationhost.config
+*.lock.json
