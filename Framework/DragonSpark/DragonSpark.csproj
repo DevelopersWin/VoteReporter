@@ -359,12 +359,14 @@
 		<Error Condition="Exists('$(SolutionDir)packages\PostSharp.4.2.29\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
 	</Target>-->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
   
-  <Import Project="$(UserProfile)\.nuget\packages\PostSharp\4.3.14\tools\PostSharp.targets" Condition="Exists('$(UserProfile)\.nuget\packages\PostSharp\4.3.14\tools\PostSharp.targets')" />
+    <Target Name="BeforeBuild">
+	
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	   Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
+
   <Target Name="AfterBuild">
   </Target>
   -->
