@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PostSharpHostConfigurationFile>App.config</PostSharpHostConfigurationFile>
-	  <DontImportPostSharp>True</DontImportPostSharp>
+    <DontImportPostSharp>True</DontImportPostSharp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-	  <PostSharpProperties>NuGetPackageRoot=$(NuGetPackageRoot);PostSharpTargetVersion=$(PostSharpTargetVersion);$(PostSharpProperties)</PostSharpProperties>
+    <PostSharpProperties>NuGetPackageRoot=$(NuGetPackageRoot);PostSharpTargetVersion=$(PostSharpTargetVersion);$(PostSharpProperties)</PostSharpProperties>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,7 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-	  <PostSharpProperties>NuGetPackageRoot=$(NuGetPackageRoot);PostSharpTargetVersion=$(PostSharpTargetVersion);$(PostSharpProperties)</PostSharpProperties>
+    <PostSharpProperties>NuGetPackageRoot=$(NuGetPackageRoot);PostSharpTargetVersion=$(PostSharpTargetVersion);$(PostSharpProperties)</PostSharpProperties>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -157,6 +157,9 @@
     <Content Include="Modularity\Invalid\NotAValidDotNetDll.txt.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />

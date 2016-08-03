@@ -1,0 +1,11 @@
+﻿{
+	"dependencies": {
+		"SlowCheetah" : "2.5.15"
+	},
+	"frameworks": {
+		"net461": {}
+	},
+	"runtimes": {
+		"win": {}
+	}
+}
