@@ -7,4 +7,5 @@
   <ImportGroup>
     <Import Project="$(NuGetPackageRoot)PostSharp\$(PostSharpTargetVersion)\tools\PostSharp.targets" Condition="Exists('$(NuGetPackageRoot)PostSharp\$(PostSharpTargetVersion)\tools\PostSharp.targets')" />
   </ImportGroup>
+  
 </Project>

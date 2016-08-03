@@ -1,7 +1,7 @@
-﻿using DragonSpark.Setup;
-using System.Composition;
+﻿using System.Composition;
+using DragonSpark.Setup;
 
-namespace DragonSpark.Windows.Testing.Setup
+namespace DragonSpark.Testing.Objects.Setup
 {
 	[Export( typeof(ISetup) )]
 	public partial class ProgramSetup

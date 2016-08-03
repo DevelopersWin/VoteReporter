@@ -9,6 +9,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.IoC;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.Unity;
 using System;
@@ -20,7 +21,7 @@ using Constructor = DragonSpark.Activation.IoC.Constructor;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, IoCTypes, ApplicationTypes( typeof(ProgramSetup), typeof(Program) )]
+	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, IoCTypes, ApplicationTypes( typeof(DragonSpark.Testing.Objects.Setup.ProgramSetup), typeof(Program) )]
 	public class ProgramSetupTests
 	{
 		/*[Export]
@@ -114,10 +115,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 	}
 
-	public class SomeTypeist : ITyper
-	{ }
-	public interface ITyper
-	{}
+	
 
 	public class SomeCommand : ModuleCommand
 	{

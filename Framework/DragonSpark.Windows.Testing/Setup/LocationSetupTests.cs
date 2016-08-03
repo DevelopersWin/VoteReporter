@@ -10,6 +10,7 @@ using DragonSpark.Testing.Framework.IoC;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
+using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Testing.TestObjects;
 using Microsoft.Practices.ServiceLocation;

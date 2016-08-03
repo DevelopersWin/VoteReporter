@@ -4,16 +4,16 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
-	xmlns:localSetup="clr-namespace:DragonSpark.Windows.Testing.Setup"
 	xmlns:testObjects="clr-namespace:DragonSpark.Testing.Objects;assembly=DragonSpark.Testing.Objects"
 	xmlns:registration="clr-namespace:DragonSpark.Setup.Registration;assembly=DragonSpark"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
+	xmlns:local="clr-namespace:DragonSpark.Testing.Objects.Setup"
 	mc:Ignorable="d"
 >
 	<commands:SetupUnityCommand>
 		<commands:UnityInstance Instance="{x:Static testObjects:Singleton.Instance}" BuildName="SomeName" />
 		<commands:SetupUnityCommand.Extensions>
-			<localSetup:TestExtension />
+			<local:TestExtension />
 		</commands:SetupUnityCommand.Extensions>
 	</commands:SetupUnityCommand>
 

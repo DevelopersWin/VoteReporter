@@ -1,11 +1,10 @@
 ﻿using DragonSpark;
-using DragonSpark.ComponentModel;
+using DragonSpark.Aspects;
+using DragonSpark.Runtime;
 using DragonSpark.Setup.Registration;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Markup;
-using DragonSpark.Aspects;
-using DragonSpark.Runtime;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -39,7 +38,6 @@ using DragonSpark.Runtime;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion( "2016.2.1.1" )]
 [assembly: AssemblyFileVersion( "2016.2.1.1" )]
-
 [assembly: XmlnsDefinition( "http://framework.dragonspark.us", "DragonSpark.Testing.Framework" )]
 [assembly: Registration( Priority.Lower )]
 [assembly: ApplyDefaultValues]

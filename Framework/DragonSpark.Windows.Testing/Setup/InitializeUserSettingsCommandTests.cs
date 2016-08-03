@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Objects.Properties;
 using DragonSpark.Windows.Setup;
-using DragonSpark.Windows.Testing.Properties;
 using System.Configuration;
 using System.Linq;
 using Xunit;

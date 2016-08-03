@@ -5,9 +5,9 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
 	xmlns:system="clr-namespace:System;assembly=mscorlib"
-	xmlns:properties="clr-namespace:DragonSpark.Windows.Testing.Properties"
 	xmlns:ds="http://framework.dragonspark.us"
-	xmlns:local="clr-namespace:DragonSpark.Windows.Testing.Configuration"
+	xmlns:local="clr-namespace:DragonSpark.Testing.Objects.Configuration"
+	xmlns:properties="clr-namespace:DragonSpark.Testing.Objects.Properties"
 	mc:Ignorable="d" 
 >
 	<configuration:Registration Key="PrimaryKey" Value="{ds:Eval {x:Static properties:Settings.Default}, 'HelloWorld'}">

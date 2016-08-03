@@ -59,15 +59,5 @@ namespace DragonSpark.Windows.Testing.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Certificate {
-            get {
-                object obj = ResourceManager.GetObject("Certificate", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

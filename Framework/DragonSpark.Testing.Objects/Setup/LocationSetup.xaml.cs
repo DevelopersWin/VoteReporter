@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Setup;
 using System.Composition;
 
-namespace DragonSpark.Windows.Testing.Setup
+namespace DragonSpark.Testing.Objects.Setup
 {
 	[Export( typeof(ISetup) )]
 	public partial class LocationSetup

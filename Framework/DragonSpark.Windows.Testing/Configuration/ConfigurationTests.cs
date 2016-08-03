@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Configuration;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Testing.Properties;
+using DragonSpark.Testing.Objects.Properties;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
@@ -27,10 +27,5 @@ namespace DragonSpark.Windows.Testing.Configuration
 		{
 			Assert.Equal( "This is a value from a MemberInfoKey", sut.SomeTestingProperty );
 		}
-	}
-
-	public class TestItem
-	{
-		public string SomeTestingProperty { get; set; }
 	}
 }
