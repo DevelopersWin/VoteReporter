@@ -35,7 +35,7 @@ namespace DragonSpark.Testing.ComponentModel
 			public override object Create( LocateTypeRequest parameter ) => locator.GetInstance( parameter.RequestedType, parameter.Name );
 		}
 
-		[Theory, Framework.Setup.AutoData]
+		[Theory, AutoData]
 		void Apply()
 		{
 			var current = DateTime.Now;

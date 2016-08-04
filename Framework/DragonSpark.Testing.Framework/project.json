@@ -2,6 +2,7 @@
 	"dependencies": {
 		"AutoFixture.AutoMoq": "3.49.0",
 		"AutoFixture.Xunit2": "3.49.0",
+		"xunit.core": "2.1.0",
 		"SerilogTraceListener": "2.0.10025",
 		"JetBrains.dotMemoryUnit": "2.3.20160517.113140"
 	},

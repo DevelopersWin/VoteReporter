@@ -3,7 +3,7 @@
   "dependencies": {
 	"AutoMapper": "5.0.2",
 	"Microsoft.Composition": "1.0.30",
-	"NReco.LambdaParser": "1.0.3",
+			"NReco.LambdaParser": "1.0.3",
 	"PostSharp.Patterns.Model": "4.2.29",
 	"PostSharp.Patterns.Threading": "4.2.29",
 	"Serilog.Sinks.Seq": "2.0.0",

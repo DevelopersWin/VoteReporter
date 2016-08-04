@@ -9,7 +9,7 @@ using Xunit;
 namespace DragonSpark.Testing.Framework
 {
 	[Serializable, LinesOfCodeAvoided( 8 )]
-	public class TestingMethodAspect : MethodInterceptionAspect
+	public sealed class TestingMethodAspect : MethodInterceptionAspect
 	{
 		public override bool CompileTimeValidate( MethodBase method ) => method.Has<FactAttribute>();
 

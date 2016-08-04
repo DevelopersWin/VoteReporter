@@ -13,7 +13,7 @@ namespace DragonSpark.Testing.Framework
 {
 	public static class Initialize
 	{
-		[ModuleInitializer( 0 )]
+		[ModuleInitializer( 0 )] 
 		public static void Execute() => ExecutionContextRepository.Instance.Add( ExecutionContextStore.Instance );
 	}
 

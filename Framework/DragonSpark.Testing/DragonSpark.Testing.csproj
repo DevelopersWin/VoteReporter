@@ -11,8 +11,6 @@
     <AssemblyName>DragonSpark.Testing</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <PostSharpHostConfigurationFile>App.config</PostSharpHostConfigurationFile>
-    <DontImportPostSharp>True</DontImportPostSharp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,7 +23,6 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
-    <PostSharpProperties>SolutionDir=$(SolutionDir);$(PostSharpProperties)</PostSharpProperties>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,7 +33,6 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
-    <PostSharpProperties>SolutionDir=$(SolutionDir);$(PostSharpProperties)</PostSharpProperties>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -72,6 +68,7 @@
     <Compile Include="Aspects\Validation\AutoValidationTests.cs" />
     <Compile Include="Aspects\Validation\GenericAutoValidationTests.cs" />
     <Compile Include="Aspects\Validation\IFactory.cs" />
+    <Compile Include="ComponentModel\ClassWithDefaultProperties.cs" />
     <Compile Include="Composition\ParameterizedSourceDelegateExporterTests.cs" />
     <Compile Include="Composition\SingletonExportDescriptorProviderTests.cs" />
     <Compile Include="Composition\SourceDelegateExporterTests.cs" />
@@ -113,11 +110,6 @@
     <Compile Include="Extensions\UnityContainerExtensionsTests.cs" />
     <Compile Include="Configure.cs" />
     <Compile Include="Properties\ResourcesTests.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="Runtime\DeclarativeCollectionTests.cs" />
     <Compile Include="Runtime\CompositeCommandTests.cs" />
     <Compile Include="Runtime\SerializerTests.cs" />
@@ -168,10 +160,6 @@
     </None>
     <None Include="DragonSpark.Testing.psproj" />
     <None Include="project.json" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonSpark.Testing.Framework\DragonSpark.Testing.Framework.csproj">

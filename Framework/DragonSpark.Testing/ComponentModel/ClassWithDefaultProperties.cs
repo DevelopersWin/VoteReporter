@@ -1,10 +1,11 @@
-using DragonSpark.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using DragonSpark.ComponentModel;
 using DragonSpark.Runtime.Stores;
+using DragonSpark.Testing.Objects;
 
-namespace DragonSpark.Testing.Objects
+namespace DragonSpark.Testing.ComponentModel
 {
 	public class ClassWithDefaultProperties
 	{
