@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Setup;
-using DragonSpark.Windows.Setup;
+using DragonSpark.Windows.Runtime;
 
 namespace DevelopersWin.VoteReporter.Application
 {
@@ -9,12 +9,10 @@ namespace DevelopersWin.VoteReporter.Application
 	/// </summary>
 	public partial class Program
 	{
-		static void Main( string[] args )
-		{
-			var program = ApplicationFactory<Program>.Instance.Create();
-			program.Run<ConsoleApplication, string[]>( args );
-			// new Program().AsExecuted( args );
-		}
+		static void Main( string[] args ) =>
+			ApplicationFactory<Program>.Instance
+									   .Create( FileSystemTypes.Instance )
+									   .Run( args );
 
 		public Program() 
 		{
