@@ -1,21 +1,23 @@
+using DragonSpark.Activation;
 using DragonSpark.Runtime;
-using Microsoft.Practices.Unity;
-using System.Collections.Generic;
-using System.Linq;
+using System;
+using System.Collections.Immutable;
 using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class FileSystemAssemblySource : CachedDelegatedSource<IEnumerable<Assembly>>
+	public class FileSystemAssemblySource : CachedDelegatedSource<ImmutableArray<Assembly>>
 	{
-		public static ISource<IEnumerable<Assembly>> Instance { get; } = new FileSystemAssemblySource();
-		FileSystemAssemblySource() : base( Create ) {}
+		public static ISource<ImmutableArray<Assembly>> Instance { get; } = new FileSystemAssemblySource();
+		FileSystemAssemblySource() : this( AppDomain.CurrentDomain ) {}
 
-		static IEnumerable<Assembly> Create() =>
-			AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true )
+		public FileSystemAssemblySource( AppDomain domain ) : base( new FixedFactory<AppDomain, ImmutableArray<Assembly>>( DomainAssemblySource.Instance.Get, domain ).Create ) {}
+
+		//static IEnumerable<Assembly> Create( AppDomain domain ) => DomainApplicationAssemblies.Instance.Get( domain );
+			/*AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true )
 					  .Where( x => x.Namespace != null )
 					  .GroupBy( t => t.Assembly )
 					  .Select( g => g.Key )
-					  .ToArray();
+					  .ToArray();*/
 	}
 }

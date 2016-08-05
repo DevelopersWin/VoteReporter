@@ -1,7 +1,9 @@
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Windows.Modularity;
+using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,8 +12,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Security.Policy;
 using System.Threading;
-using DragonSpark.Setup;
-using DragonSpark.Windows.Runtime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -133,7 +133,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			Assert.Contains("DragonSpark.Windows.Testing.TestObjects.Modules.MockModuleA", info.ModuleType);
 		}
 
-		[Fact]
+		/*[Fact]
 		public void ShouldNotThrowWithLoadFromByteAssemblies()
 		{
 			CompilerHelper.CleanUpDirectory(@".\CompileOutput\");
@@ -168,7 +168,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 				if (testDomain != null)
 					AppDomain.Unload(testDomain);
 			}
-		}
+		}*/
 
 		[Fact]
 		public void ShouldGetModuleNameFromAttribute()
@@ -331,7 +331,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		}
 #pragma warning restore 0618
 
-		[Fact]
+		/*[Fact]
 		public void ShouldLoadFilesEvenIfDynamicAssemblyExists()
 		{
 			CompilerHelper.CleanUpDirectory(@".\CompileOutput\");
@@ -360,7 +360,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 				if (testDomain != null)
 					AppDomain.Unload(testDomain);
 			}
-		}
+		}*/
 
 		[Fact]
 		public void ShouldLoadAssemblyEvenIfIsExposingTypesFromAnAssemblyInTheGac()

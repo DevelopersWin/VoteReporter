@@ -92,7 +92,7 @@
     <Compile Include="TestObjects\Modules\MockModuleTypeLoader.cs" />
     <Compile Include="TestObjects\Modules\MyDummyClass.cs" />
     <Compile Include="TestObjects\Relayed.cs" />
-    <Compile Include="TypeSystem\PublicPartsTests.cs" />
+    <Compile Include="TypeSystem\PartsTests.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

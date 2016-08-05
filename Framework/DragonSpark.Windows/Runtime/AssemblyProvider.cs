@@ -23,13 +23,13 @@ namespace DragonSpark.Windows.Runtime
 
 	public abstract class ApplicationTypesBase : TypeSource
 	{
-		readonly Func<IEnumerable<Assembly>> assemblySource;
+		readonly Func<ImmutableArray<Assembly>> assemblySource;
 		readonly Transform<IEnumerable<Assembly>> filter;
 		readonly Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource;
 
-		protected ApplicationTypesBase( Func<IEnumerable<Assembly>> assemblySource ) : this( assemblySource, ApplicationAssemblyFilter.Instance.Get, PublicParts.Instance.Create ) {}
+		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource ) : this( assemblySource, ApplicationAssemblyFilter.Instance.Get, PublicParts.Instance.Create ) {}
 
-		protected ApplicationTypesBase( Func<IEnumerable<Assembly>> assemblySource, Transform<IEnumerable<Assembly>> filter, Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource )
+		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource, Transform<IEnumerable<Assembly>> filter, Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource )
 		{
 			this.assemblySource = assemblySource;
 			this.filter = filter;
@@ -38,7 +38,7 @@ namespace DragonSpark.Windows.Runtime
 
 		protected override IEnumerable<Type> Yield()
 		{
-			var filtered = filter( assemblySource() ).Fixed();
+			var filtered = filter( assemblySource().AsEnumerable() ).Fixed();
 			var result = new AssemblyBasedTypeSource( filtered ).Get().Union( partsSource( filtered ) );
 			return result;
 		}

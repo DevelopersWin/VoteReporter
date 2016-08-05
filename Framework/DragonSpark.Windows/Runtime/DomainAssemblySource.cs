@@ -1,28 +1,32 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Specifications;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class DomainAssemblySource : Cache<AppDomain, Assembly[]>
+	public class DomainAssemblySource : FactoryCache<AppDomain, ImmutableArray<Assembly>>
 	{
 		public static DomainAssemblySource Instance { get; } = new DomainAssemblySource();
-		DomainAssemblySource() : base( Create ) {}
+		DomainAssemblySource() : this( Specification.Instance.IsSatisfiedBy ) {}
+
+		readonly Func<Assembly, bool> specification;
+
+		DomainAssemblySource( Func<Assembly, bool> specification )
+		{
+			this.specification = specification;
+		}
+
+		/*DomainAssemblySource() : base( Create ) {}
 
 		static Assembly[] Create( AppDomain parameter )
 		{
-			var query = from assembly in parameter.GetAssemblies()
-						where assembly.Not<AssemblyBuilder>()
-								&& assembly.GetType().FullName != "System.Reflection.Emit.InternalAssemblyBuilder"
-								&& !string.IsNullOrEmpty( assembly.Location )
-				orderby assembly.GetName().Name
-				select assembly;
-				var result = query.ToArray();
-				return result;
-		}
+			
+		}*/
 
 		/*DomainAssemblySource() : this( AppDomain.CurrentDomain ) {}
 
@@ -38,5 +42,18 @@ namespace DragonSpark.Windows.Runtime
 				
 			}
 		}*/
+		protected override ImmutableArray<Assembly> Create( AppDomain parameter ) => 
+			parameter.GetAssemblies().Where( specification ).OrderBy( a => a.GetName().Name ).ToImmutableArray();
+
+		class Specification : GuardedSpecificationBase<Assembly>
+		{
+			public static Specification Instance { get; } = new Specification();
+			Specification() {}
+
+			public override bool IsSatisfiedBy( Assembly parameter ) => 
+				parameter.Not<AssemblyBuilder>()
+				&& parameter.GetType().FullName != "System.Reflection.Emit.InternalAssemblyBuilder"
+				&& !string.IsNullOrEmpty( parameter.Location );
+		}
 	}
 }
