@@ -9,7 +9,6 @@ using DragonSpark.Testing.Framework.IoC;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
-using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using Microsoft.Practices.Unity;
 using Serilog.Events;
@@ -24,7 +23,7 @@ namespace DragonSpark.Testing.Extensions
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes, IoCTypes]
 	public class UnityContainerExtensionsTests
 	{
-		[Theory, Framework.Setup.AutoData, MinimumLevel( LogEventLevel.Debug )]
+		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void TryResolve( [Service]IUnityContainer sut )
 		{
 			var level = MinimumLevelConfiguration.Instance.Get( this );
@@ -50,7 +49,7 @@ namespace DragonSpark.Testing.Extensions
 			var count = sink.Events.Count();
 			Assert.True( count > initial );
 
-			Assert.Contains( MetadataTypeDefinitionProvider.Instance, AttributeConfigurations.TypeDefinitionProviders.Get() );
+			Assert.Contains( MetadataTypeDefinitionProvider.Instance, DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Get() );
 
 			/*var levelSwitch = provider.Get<LoggingLevelSwitch>();
 			Assert.Same( levelSwitch, provider.Get<LoggingLevelSwitch>() );*/

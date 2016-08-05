@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
@@ -46,12 +47,7 @@ namespace DragonSpark.Composition
 			this.resultTypeLocator = resultTypeLocator;
 		}
 
-		public override CompositionContract Create( CompositionContract parameter )
-		{
-			var typeLocator = resultTypeLocator( parameter.ContractType );
-			var compositionContract = typeLocator.With( parameter.ChangeType );
-			return compositionContract;
-		}
+		public override CompositionContract Create( CompositionContract parameter ) => resultTypeLocator( parameter.ContractType ).With( parameter.ChangeType );
 	}
 
 	public sealed class IsExportSpecification : GuardedSpecificationBase<MemberInfo>
@@ -86,8 +82,8 @@ namespace DragonSpark.Composition
 				var instance = SingletonDelegateCache.Instance.Get( parameter );
 				if ( instance != null )
 				{
-					var contractType = instance.GetMethodInfo().ReturnType;
-					var types = parameter.GetCustomAttributes<ExportAttribute>().Select( x => new CompositionContract( x.ContractType ?? contractType, x.ContractName ) ).Append( new CompositionContract( contractType ) ).Distinct().ToImmutableArray();
+					var contractType = parameter.PropertyType.Adapt().IsGenericOf( typeof(ISource<>), false ) ? ResultTypes.Instance.Get( parameter.PropertyType ) : instance.GetMethodInfo().ReturnType;
+					var types = parameter.GetCustomAttributes<ExportAttribute>().Introduce( contractType, x => new CompositionContract( x.Item1.ContractType ?? x.Item2, x.Item1.ContractName ) ).Append( new CompositionContract( contractType ) ).Distinct().ToImmutableArray();
 					var result = new SingletonExport( types, instance );
 					return result;
 

@@ -11,7 +11,7 @@ namespace DragonSpark.Activation
 {
 	public static class Execution
 	{
-		readonly static Func<object> Store = new DelegatedCachedSource<IExecutionContextStore>( () => ExecutionContextRepository.Instance.List().First() ).Delegate();
+		readonly static Func<object> Store = new CachedDelegatedSource<IExecutionContextStore>( () => ExecutionContextRepository.Instance.List().First() ).Delegate();
 
 		public static object Current() => Store();
 	}

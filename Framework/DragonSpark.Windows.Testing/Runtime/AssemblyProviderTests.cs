@@ -1,19 +1,20 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
+using DragonSpark.Windows.Runtime;
 using System.Linq;
 using Xunit;
-using AssemblyProvider = DragonSpark.Windows.Runtime.AssemblyProvider;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
 	public class AssemblyProviderTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData, Trait( Traits.Category, Traits.Categories.FileSystem )]
-		public void Assemblies( AssemblyProvider sut )
+		public void Assemblies( FileSystemTypes sut )
 		{
-			Assert.Same( sut, AssemblyProvider.Instance );
+			Assert.Same( sut, FileSystemTypes.Instance );
 			var assemblies = sut.Get().Assemblies();
 			var specification = new ApplicationAssemblySpecification( typeof(IFactory).Assembly.ToItem() );
 

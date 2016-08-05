@@ -1,13 +1,12 @@
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
+using DragonSpark.Windows.Io;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Windows.Modularity
 {
@@ -55,7 +54,7 @@ namespace DragonSpark.Windows.Modularity
 		static Assembly Load( ResolveEventArgs args, DirectoryInfo directory )
 		{
 			var assemblyName = new AssemblyName( args.Name );
-			var filename = Path.Combine( directory.FullName, $"{assemblyName.Name}.dll" );
+			var filename = Path.Combine( directory.FullName, $"{assemblyName.Name}{FileSystem.AssemblyExtension}" );
 			var result = File.Exists( filename ) ? Assembly.ReflectionOnlyLoadFrom( filename ) : ReflectionOnlyLoad( args.Name );
 			return result;
 		}
@@ -69,7 +68,7 @@ namespace DragonSpark.Windows.Modularity
 			catch ( FileNotFoundException )
 			{
 				var dllName = assemblyName.Contains(',') ? assemblyName.Substring(0, assemblyName.IndexOf(',')) : assemblyName;
-				var name = dllName.Replace(".dll", string.Empty);
+				var name = dllName.Replace( FileSystem.AssemblyExtension, string.Empty );
 				return FromLoaded( name, assembly => assembly.GetName().Name );
 			}
 		}
@@ -94,7 +93,7 @@ namespace DragonSpark.Windows.Modularity
 		{
 			var loaded = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies().Select( assembly => Path.GetFileName(assembly.Location) ).ToArray();
 
-			var names = directory.GetFiles("*.dll")
+			var names = directory.GetFiles($"*{FileSystem.AssemblyExtension}")
 				.Introduce( loaded, tuple => !tuple.Item2.Introduce( tuple.Item1.Name ).Any( t => string.Equals( t.Item1, t.Item2, StringComparison.OrdinalIgnoreCase) ) )
 				.Select( info => info.FullName );
 

@@ -45,7 +45,7 @@ namespace DragonSpark.TypeSystem
 			this.rootNamespaces = rootNamespaces;
 		}
 
-		static ImmutableArray<string> Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.WhereAssigned().Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToImmutableArray();
+		static ImmutableArray<string> Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToImmutableArray();
 
 		public override bool IsSatisfiedBy( Assembly parameter ) => parameter.Has<RegistrationAttribute>() || rootNamespaces.Any( parameter.GetName().Name.StartsWith );
 	}

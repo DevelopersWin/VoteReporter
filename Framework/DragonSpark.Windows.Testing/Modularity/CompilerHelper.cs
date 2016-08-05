@@ -1,13 +1,14 @@
+using DragonSpark.Extensions;
+using DragonSpark.Modularity;
+using DragonSpark.Windows.Io;
+using DragonSpark.Windows.Modularity;
+using Microsoft.CSharp;
 using System;
 using System.CodeDom.Compiler;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using DragonSpark.Extensions;
-using DragonSpark.Modularity;
-using DragonSpark.Windows.Modularity;
-using Microsoft.CSharp;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Modularity
@@ -118,13 +119,8 @@ namespace DragonSpark.Windows.Testing.Modularity
 			return outpath;
 		}
 
-		public static string GenerateDynamicModule(string assemblyName, string moduleName, params string[] dependencies)
-		{
-			string assemblyFile = assemblyName + ".dll";
-			string outpath = Path.Combine(assemblyName, assemblyFile);
-
-			return GenerateDynamicModule(assemblyName, moduleName, outpath, dependencies);
-		}
+		public static string GenerateDynamicModule(string assemblyName, string moduleName, params string[] dependencies) => 
+			GenerateDynamicModule( assemblyName, moduleName, Path.Combine( assemblyName, $"{assemblyName}{FileSystem.AssemblyExtension}" ), dependencies );
 
 		static void ThrowIfCompilerError(CompilerResults results)
 		{

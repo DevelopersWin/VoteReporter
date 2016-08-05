@@ -165,7 +165,11 @@ namespace DragonSpark.Configuration
 			this.name = name;
 		}
 
-		protected override IEnumerable<ITransformer<T>> Yield() => base.Yield().Concat( Exports.Instance.Value.GetExports<ITransformer<T>>( name ).AsEnumerable() );
+		protected override IEnumerable<ITransformer<T>> Yield()
+		{
+			var transformers = base.Yield().Concat( Exports.Instance.Value.GetExports<ITransformer<T>>( name ).AsEnumerable() );
+			return transformers;
+		}
 	}
 
 	public abstract class ConfiguratorsBase<TParameter, TConfiguration> : FactoryBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>

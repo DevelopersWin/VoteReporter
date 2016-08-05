@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.TypeSystem
 		}
 
 		[Export]
-		class AssemblySource : AssemblySourceBase
+		class AssemblySource : AssemblyBasedTypeSource
 		{
 			readonly internal static IEnumerable<Assembly> Result = EnumerableEx.Return( typeof(AssemblySource).Assembly );
 

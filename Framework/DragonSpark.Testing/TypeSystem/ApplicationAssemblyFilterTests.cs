@@ -41,16 +41,10 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Same( DeclaredAssemblyProvider.Instance, sut );
 		}
 
-		class DeclaredAssemblyProvider : AssemblySourceBase
+		class DeclaredAssemblyProvider : AssemblyBasedTypeSource
 		{
 			[Export( typeof(ITypeSource) )]
 			public static DeclaredAssemblyProvider Instance { get; } = new DeclaredAssemblyProvider();
-
-			/*public class Register : RegisterFactoryAttribute
-			{
-				public Register() : base( typeof(DeclaredAssemblyProvider) ) {}
-			}*/
-
 			DeclaredAssemblyProvider() : base( typeof(DeclaredAssemblyProvider) ) {}
 		}
 	}

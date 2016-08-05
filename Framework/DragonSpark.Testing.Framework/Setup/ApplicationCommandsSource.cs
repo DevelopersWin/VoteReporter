@@ -72,8 +72,11 @@ namespace DragonSpark.Testing.Framework.Setup
 		public static ApplicationCommandsSource Instance { get; } = new ApplicationCommandsSource();
 		ApplicationCommandsSource() : base( ServiceProviderConfigurations.Instance ) {}
 
-		protected override IEnumerable<ICommand> Yield() => 
-			base.Yield().Append( MetadataCommand.Instance ).Concat( Factory( MethodContext.Instance.Get() ).CastArray<ICommand>().AsEnumerable() );
+		protected override IEnumerable<ICommand> Yield()
+		{
+			var enumerable = base.Yield().Append( MetadataCommand.Instance ).Concat( Factory( MethodContext.Instance.Get() ).CastArray<ICommand>().AsEnumerable() ).ToArray();
+			return enumerable;
+		}
 	}
 
 	sealed class MethodTypes : FactoryCache<ImmutableArray<Type>>, ITypeSource

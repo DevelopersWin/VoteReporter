@@ -1,13 +1,14 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
-using DragonSpark.Windows.Runtime;
+using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
+using DragonSpark.Windows.Runtime;
 
 namespace DragonSpark.Windows.Modularity
 {
@@ -15,7 +16,7 @@ namespace DragonSpark.Windows.Modularity
 	{
 		readonly IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory;
 
-		public DirectoryModuleCatalog() : this( AssemblyProvider.Instance.Get().Assemblies(), ModuleInfoBuilder.Instance, LoadRemoteModuleInfoFactory.Instance ) {}
+		public DirectoryModuleCatalog() : this( FileSystemAssemblySource.Instance.Get().ToImmutableArray(), ModuleInfoBuilder.Instance, LoadRemoteModuleInfoFactory.Instance ) {}
 
 		public DirectoryModuleCatalog( ImmutableArray<Assembly> assemblies, IModuleInfoBuilder builder, IFactory<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory ) : base( assemblies, builder )
 		{

@@ -1,30 +1,29 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.TypeSystem;
+using DragonSpark.Windows.Io;
 using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.Windows.TypeSystem
 {
-	public class AssemblyPathLoader : FactoryBase<string, ImmutableArray<Assembly>>
+	public sealed class AssemblyLocator : QueryableResourceLocator
 	{
-		public static AssemblyPathLoader Instance { get; } = new AssemblyPathLoader();
-
-		readonly static Func<string, Assembly> LoadFile = Assembly.LoadFile;
-
-		public override ImmutableArray<Assembly> Create( string parameter ) => 
-			new DirectoryInfo( "." ).GetFileSystemInfos( parameter ).Where( info => info.Extension == ".dll" ).Select( info => info.FullName ).Select( LoadFile ).ToImmutableArray();
+		public static ICache<string, ImmutableArray<string>> Instance { get; } = new AssemblyLocator().CachedForEquality();
+		AssemblyLocator() : base( IsAssemblySpecification.Instance.IsSatisfiedBy ) {}
 	}
 
-	public class AssemblyPartLocator : DragonSpark.TypeSystem.AssemblyPartLocator
+	public class QueryableResourceLocator : ParameterizedSourceBase<string, ImmutableArray<string>>
 	{
-		public static AssemblyPartLocator Instance { get; } = new AssemblyPartLocator();
-		AssemblyPartLocator() : base( AssemblyPathLoader.Instance.Create ) {}
+		readonly Func<FileSystemInfo, bool> specification;
+		public QueryableResourceLocator( Func<FileSystemInfo, bool> specification )
+		{
+			this.specification = specification;
+		}
 
-		public static ICache<Assembly, ImmutableArray<Type>> All { get; } = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => Instance.Create( assembly ).Select( a => AssemblyTypes.All.Get( a ) ).Concat().ToImmutableArray() );
-		public static ICache<Assembly, ImmutableArray<Type>> Public { get; } = new StoreCache<Assembly, ImmutableArray<Type>>( assembly => Instance.Create( assembly ).Select( a => AssemblyTypes.Public.Get( a ) ).Concat().ToImmutableArray() );
+		public override ImmutableArray<string> Get( string parameter ) => 
+			new DirectoryInfo( "." ).GetFileSystemInfos( parameter ).Where( specification ).Select( info => info.FullName ).ToImmutableArray();
 	}
 }

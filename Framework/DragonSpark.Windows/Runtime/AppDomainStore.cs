@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.IO;
 using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
@@ -46,7 +45,7 @@ namespace DragonSpark.Windows.Runtime
 		}
 	}
 
-	[Serializable]
+	/*[Serializable]
 	public class AssemblyLoader : MarshalByRefObject, IDisposable
 	{
 		readonly string basePath;
@@ -61,10 +60,10 @@ namespace DragonSpark.Windows.Runtime
 		Assembly Resolve( object sender, ResolveEventArgs args )
 		{
 			var assemblyName = new AssemblyName( args.Name ).Name;
-			var result = Assembly.LoadFile( Path.Combine( basePath, $"{assemblyName}.dll" ) );
+			var result = Assembly.LoadFile( Path.Combine( basePath, $"{assemblyName}{FileSystem.AssemblyExtension}" ) );
 			return result;
 		}
 
 		public void Dispose() => AppDomain.CurrentDomain.AssemblyResolve -= Resolve;
-	}
+	}*/
 }

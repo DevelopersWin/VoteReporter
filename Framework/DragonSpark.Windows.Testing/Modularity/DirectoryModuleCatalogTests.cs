@@ -10,6 +10,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Security.Policy;
 using System.Threading;
+using DragonSpark.Setup;
+using DragonSpark.Windows.Runtime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -25,16 +27,15 @@ namespace DragonSpark.Windows.Testing.Modularity
 			ModulesDirectory5 = @".\DynamicModules\ModulesMainDomain\",
 			InvalidModulesDirectory = @".\Modularity\Invalid";
 
+		static string[] All = { ModulesDirectory1, ModulesDirectory2, ModulesDirectory3, ModulesDirectory4, ModulesDirectory5, InvalidModulesDirectory };
+
 		public DirectoryModuleCatalogTests( ITestOutputHelper output ) : base( output )
 		{
 			CleanUp();
+			new ApplySystemPartsConfiguration( FileSystemTypes.Instance ).Run();
 		}
 
-		static void CleanUp()
-		{
-			var items = new[] { ModulesDirectory1, ModulesDirectory2, ModulesDirectory3, ModulesDirectory4, ModulesDirectory5, InvalidModulesDirectory };
-			items.Each( CompilerHelper.CleanUpDirectory );
-		}
+		static void CleanUp() => All.Each( CompilerHelper.CleanUpDirectory );
 
 		protected override void Dispose( bool disposing )
 		{
@@ -217,8 +218,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			CompilerHelper.CompileFile(@"DragonSpark.Windows.Testing.TestObjects.Modules.MockModuleA.cs",
 									   ModulesDirectory1 + @"\MockModuleA.dll");
 
-			DirectoryModuleCatalog catalog = new DirectoryModuleCatalog();
-			catalog.ModulePath = ModulesDirectory1;
+			DirectoryModuleCatalog catalog = new DirectoryModuleCatalog { ModulePath = ModulesDirectory1 };
 			catalog.Load();
 
 			ModuleInfo[] modules = catalog.Modules.ToArray();

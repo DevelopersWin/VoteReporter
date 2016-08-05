@@ -21,7 +21,7 @@ using Constructor = DragonSpark.Activation.IoC.Constructor;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, IoCTypes, ApplicationTypes( typeof(DragonSpark.Testing.Objects.Setup.ProgramSetup), typeof(Program) )]
+	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, IoCTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
 	public class ProgramSetupTests
 	{
 		/*[Export]
@@ -47,7 +47,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( valid );*/
 		}
 
-		[Theory, AutoData, AdditionalTypes( typeof(ModuleInitializer), typeof(AssemblyModuleCatalog), typeof(ModuleManager), typeof(ModuleMonitor), typeof(MonitoredModule), typeof(TaskMonitor), typeof(MonitoredModule.Command) )]
+		[Theory, AutoData, IncludeParameterTypes( typeof(ModuleInitializer), typeof(AssemblyModuleCatalog), typeof(ModuleManager), typeof(ModuleMonitor), typeof(MonitoredModule), typeof(TaskMonitor), typeof(MonitoredModule.Command) )]
 		public void Extension( IModuleMonitor sut )
 		{
 			var collection = ListCache.Default.Get( sut );
@@ -60,7 +60,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotNull( command );
 		}
 
-		[Theory, AutoData, AdditionalTypes( false, typeof(AssemblyInformationFactory), typeof(Windows.Runtime.ApplicationAssemblyLocator) )]
+		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationFactory), typeof(Windows.Runtime.ApplicationAssembly) )]
 		public void Create( [EnsureValues, Service]ApplicationInformation sut, [Service]AssemblyInformation temp )
 		{
 			Assert.NotNull( sut.AssemblyInformation );

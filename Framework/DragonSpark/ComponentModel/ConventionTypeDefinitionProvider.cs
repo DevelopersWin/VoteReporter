@@ -2,10 +2,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Immutable;
-using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.ComponentModel
@@ -16,7 +13,7 @@ namespace DragonSpark.ComponentModel
 		TypeDefinitionProvider() {}
 		protected override TypeInfo Create( TypeInfo parameter )
 		{
-			foreach ( var provider in AttributeConfigurations.TypeDefinitionProviders.Get() )
+			foreach ( var provider in TypeSystem.Configuration.TypeDefinitionProviders.Get() )
 			{
 				var info = provider.Get( parameter );
 				if ( info != null )
@@ -44,12 +41,12 @@ namespace DragonSpark.ComponentModel
 			return result;
 		}
 
-		class Context
+		struct Context
 		{
+			readonly static ICache<TypeInfo, TypeInfo> Cache = new Cache<TypeInfo, TypeInfo>( info => Type.GetType( $"{info.FullName}Metadata, {info.Assembly.FullName}", false )?.GetTypeInfo() );
+
 			readonly TypeInfo current;
 
-			readonly static ICache<TypeInfo, TypeInfo> Cache = new Cache<TypeInfo, TypeInfo>( info => Type.GetType( $"{info.FullName}Metadata, {info.Assembly.FullName}", false )?.GetTypeInfo() );
-			
 			public Context( TypeInfo current ) : this( current, Cache.Get( current ) ) {}
 
 			Context( TypeInfo current, TypeInfo metadata )

@@ -49,7 +49,7 @@ namespace DragonSpark.Activation.IoC
 
 		public void BuildUp( IBuilderContext context )
 		{
-			Exception first = null;
+			Exception thrown = null;
 			foreach ( var policy in policies )
 			{
 				try
@@ -62,10 +62,10 @@ namespace DragonSpark.Activation.IoC
 				}
 				catch ( Exception exception )
 				{
-					first = first ?? exception;
+					thrown = exception;
 				}
 			}
-			throw first;
+			throw thrown;
 		}
 	}
 

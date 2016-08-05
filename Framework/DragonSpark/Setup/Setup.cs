@@ -42,10 +42,18 @@ namespace DragonSpark.Setup
 
 	public class TypeSource : ItemsStoreBase<Type>, ITypeSource
 	{
-		public TypeSource( IEnumerable<Type> items ) : base( items ) {}
-		public TypeSource() {}
-		public TypeSource( params Type[] items ) : base( items ) {}
+		public TypeSource( IEnumerable<Type> items ) : base( items.Fixed() ) {}
+		public TypeSource() : this( Items<Type>.Default ) {}
+		public TypeSource( params Type[] items ) : this( items.Distinct() ) {}
 	}
+
+	/*public class CompositeTypeSource : TypeSource
+	{
+		public CompositeTypeSource( IEnumerable<Type> items ) : base( items.Fixed() ) {}
+		public CompositeTypeSource() : this( Items<ITypeSource>.Default ) {}
+
+		public CompositeTypeSource( params ITypeSource[] sources ) : base( sources.Select( source => source.Get() ).Concat() ) {}
+	}*/
 
 	public sealed class ServiceProviderFactory : AggregateFactoryBase<IServiceProvider>
 	{

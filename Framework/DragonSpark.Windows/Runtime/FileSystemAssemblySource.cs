@@ -1,5 +1,4 @@
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Stores;
 using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class FileSystemAssemblySource : DelegatedCachedSource<IEnumerable<Assembly>>
+	public class FileSystemAssemblySource : CachedDelegatedSource<IEnumerable<Assembly>>
 	{
 		public static ISource<IEnumerable<Assembly>> Instance { get; } = new FileSystemAssemblySource();
 		FileSystemAssemblySource() : base( Create ) {}

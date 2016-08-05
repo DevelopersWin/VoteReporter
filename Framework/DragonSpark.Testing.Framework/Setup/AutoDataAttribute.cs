@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
-using AssemblyPartLocator = DragonSpark.Windows.TypeSystem.AssemblyPartLocator;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -35,7 +34,8 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
-			ApplicationSource( methodUnderTest ).Run( new AutoData( Fixture, methodUnderTest ) );
+			var applicationSource = ApplicationSource( methodUnderTest );
+			applicationSource.Run( new AutoData( Fixture, methodUnderTest ) );
 
 			var result = base.GetData( methodUnderTest );
 			return result;
@@ -65,17 +65,18 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public class FrameworkTypesAttribute : TypeProviderAttributeBase
-	{
-		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(MetadataCommand) ) {}
-	}
-
 	public sealed class FixtureContext : Configuration<IFixture>
 	{
 		public static FixtureContext Instance { get; } = new FixtureContext();
 		FixtureContext() {}
 	}
 
+	public class FrameworkTypesAttribute : TypeProviderAttributeBase
+	{
+		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(MetadataCommand) ) {}
+	}
+
+	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Method )]
 	public abstract class TypeProviderAttributeBase : HostingAttribute
 	{
 		protected TypeProviderAttributeBase( params Type[] types ) : this( types.ToImmutableArray() ) {}
@@ -84,7 +85,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected TypeProviderAttributeBase( Func<MethodBase, ImmutableArray<Type>> factory ) : this( factory.Wrap() ) {}
 		protected TypeProviderAttributeBase( Func<object, Func<MethodBase, ImmutableArray<Type>>> provider ) : base( provider ) {}
 
-		sealed class Factory : FactoryBase<MethodBase, ImmutableArray<Type>>
+		protected class Factory : FactoryBase<MethodBase, ImmutableArray<Type>>
 		{
 			readonly ImmutableArray<Type> additionalTypes;
 			public Factory( ImmutableArray<Type> additionalTypes )
@@ -96,53 +97,40 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true )]
-	public class ApplicationTypesAttribute : TypeProviderAttributeBase
-	{
-		public ApplicationTypesAttribute( params Type[] additionalTypes ) : base( additionalTypes.ToImmutableArray() ) {}
-	}
-
-	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Assembly | AttributeTargets.Method )]
-	public class ApplicationPartsAttribute : TypeProviderAttributeBase
-	{
-		public ApplicationPartsAttribute() : base( m => AssemblyPartLocator.All.Get( m.DeclaringType.Assembly ) ) {}
-	}
-
-	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Assembly | AttributeTargets.Method )]
-	public class ApplicationPublicPartsAttribute : TypeProviderAttributeBase
-	{
-		public ApplicationPublicPartsAttribute() : base( m => AssemblyPartLocator.Public.Get( m.DeclaringType.Assembly ) ) {}
-	}
-
-	[AttributeUsage( AttributeTargets.Method, AllowMultiple = true )]
 	public class AdditionalTypesAttribute : TypeProviderAttributeBase
 	{
-		public AdditionalTypesAttribute( params Type[] additionalTypes ) : this( true, additionalTypes ) {}
+		public AdditionalTypesAttribute( params Type[] additionalTypes ) : base( additionalTypes.ToImmutableArray() ) {}
+	}
 
-		public AdditionalTypesAttribute( bool includeFromParameters = true, params Type[] additionalTypes ) : base( new Factory( includeFromParameters, additionalTypes ).Create ) {}
+	public sealed class ApplicationPartsAttribute : TypeProviderAttributeBase
+	{
+		public ApplicationPartsAttribute() : base( m => AllParts.Instance.Get( m.DeclaringType.Assembly ) ) {}
+	}
 
-		sealed class Factory : FactoryBase<MethodBase, ImmutableArray<Type>>
+	public sealed class ApplicationPublicPartsAttribute : TypeProviderAttributeBase
+	{
+		public ApplicationPublicPartsAttribute() : base( m => PublicParts.Instance.Get( m.DeclaringType.Assembly ) ) {}
+	}
+
+	[AttributeUsage( AttributeTargets.Method )]
+	public class IncludeParameterTypesAttribute : TypeProviderAttributeBase
+	{
+		public IncludeParameterTypesAttribute( params Type[] additionalTypes ) : base( new Factory( additionalTypes ).Create ) {}
+
+		new sealed class Factory : TypeProviderAttributeBase.Factory
 		{
-			readonly bool includeFromParameters;
-			readonly ImmutableArray<Type> additionalTypes;
+			public Factory( params Type[] additionalTypes ) : base( additionalTypes.ToImmutableArray() ) {}
 
-			public Factory( bool includeFromParameters, params Type[] additionalTypes )
-			{
-				this.includeFromParameters = includeFromParameters;
-				this.additionalTypes = additionalTypes.ToImmutableArray();
-			}
-
-			public override ImmutableArray<Type> Create( MethodBase parameter ) => additionalTypes.Concat( includeFromParameters ? parameter.GetParameterTypes() : Items<Type>.Default ).ToImmutableArray();
+			public override ImmutableArray<Type> Create( MethodBase parameter ) => base.Create( parameter ).Union( parameter.GetParameterTypes() ).ToImmutableArray();
 		}
 	}
 
-	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Assembly | AttributeTargets.Method )]
 	public class ContainingTypeAndNestedAttribute : TypeProviderAttributeBase
 	{
 		readonly static Func<MethodBase, ImmutableArray<Type>> Delegate = Factory.Instance.Create;
 		public ContainingTypeAndNestedAttribute() : base( Delegate ) {}
 
-		sealed class Factory : FactoryBase<MethodBase, ImmutableArray<Type>>
+		new sealed class Factory : FactoryBase<MethodBase, ImmutableArray<Type>>
 		{
 			public static Factory Instance { get; } = new Factory();
 			Factory() {}

@@ -144,6 +144,7 @@
     <Compile Include="TypeSystem\DerivedMethodSpecificationTests.cs" />
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
     <Compile Include="TypeSystem\KnownTypesTests.cs" />
+    <Compile Include="TypeSystem\PublicPartsTests.cs" />
     <Compile Include="TypeSystem\RegistrationTests.cs" />
     <Compile Include="TypeSystem\TypeAdapterTests.cs" />
   </ItemGroup>
@@ -170,10 +171,6 @@
       <Project>{65ccd995-c347-48b1-b017-d09e917bd252}</Project>
       <Name>DragonSpark.Testing.Objects</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DragonSpark.Testing.Parts.Development\DragonSpark.Testing.Parts.Development.csproj" Condition=" '$(Configuration)' == 'Debug' ">
-      <Project>{5f01891d-ffb9-485b-bd5f-c072ef00de59}</Project>
-      <Name>DragonSpark.Testing.Parts.Development</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DragonSpark.Types.Windows\DragonSpark.Types.Windows.csproj">
       <Project>{82e56091-dd33-4f8d-a9d9-8948f3d6f820}</Project>
       <Name>DragonSpark.Types.Windows</Name>
@@ -189,6 +186,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y /d  "$(ProjectDir)..\Parts\$(Configuration)\*.*" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

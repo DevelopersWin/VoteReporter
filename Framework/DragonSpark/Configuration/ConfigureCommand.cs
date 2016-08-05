@@ -5,7 +5,7 @@ using System;
 
 namespace DragonSpark.Configuration
 {
-	public class ParameterizedConfiguration<T> : ParameterizedConfiguration<object, T>
+	public class ParameterizedConfiguration<T> : ParameterizedConfiguration<object, T>, IParameterizedConfiguration<T>
 	{
 		public ParameterizedConfiguration( Func<object, T> factory ) : base( factory ) {}
 	}

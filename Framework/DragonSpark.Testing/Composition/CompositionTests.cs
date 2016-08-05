@@ -155,7 +155,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( Condition.Default.Get( service ).IsApplied );
 		}
 
-		internal class Types : AdditionalTypesAttribute
+		internal class Types : IncludeParameterTypesAttribute
 		{
 			readonly static Type[] Items = { typeof(ParameterServiceFactory), typeof(BasicServiceFactory), typeof(ExportedItem), typeof(ExportedItemFactory), typeof(SharedServiceFactory) };
 

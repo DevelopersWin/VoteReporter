@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using System;
 using System.Globalization;
@@ -8,9 +9,26 @@ using System.IO;
 
 namespace DragonSpark.Windows.Io
 {
+	public class IsAssemblySpecification : FileExtensionSpecificationBase
+	{
+		public static IsAssemblySpecification Instance { get; } = new IsAssemblySpecification();
+		IsAssemblySpecification() : base( FileSystem.AssemblyExtension ) {}
+	}
+
+	public abstract class FileExtensionSpecificationBase : GuardedSpecificationBase<FileSystemInfo>
+	{
+		readonly string extension;
+		protected FileExtensionSpecificationBase( string extension )
+		{
+			this.extension = extension;
+		}
+
+		public override bool IsSatisfiedBy( FileSystemInfo parameter ) => parameter.Extension == extension;
+	}
+
 	public static class FileSystem
 	{
-		public const string ValidPathTimeFormat = "yyyy-MM-dd--HH-mm-ss";
+		public const string AssemblyExtension = ".dll", ValidPathTimeFormat = "yyyy-MM-dd--HH-mm-ss";
 
 		public static string GetValidPath() => GetValidPath( CurrentTimeConfiguration.Instance.Get() );
 

@@ -117,7 +117,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Runtime\AppDomainStore.cs" />
-    <Compile Include="Runtime\ApplicationAssemblyLocator.cs" />
+    <Compile Include="Runtime\ApplicationAssembly.cs" />
     <Compile Include="Runtime\FileSystemAssemblySource.cs" />
     <Compile Include="Runtime\DomainAssemblySource.cs" />
     <Compile Include="Modularity\AssemblyResolver.cs" />
@@ -177,7 +177,7 @@
     <Compile Include="TypeSystem\Class1.cs" />
   </ItemGroup>
   <ItemGroup>
-	  <None Include="App.config" />
+    <None Include="App.config" />
     <None Include="DragonSpark.Windows.psproj" />
   </ItemGroup>
   <ItemGroup>

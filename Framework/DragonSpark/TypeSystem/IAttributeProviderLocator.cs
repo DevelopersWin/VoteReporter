@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -13,18 +12,14 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public static class AttributeConfigurations
-	{
-		public static IConfiguration<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = 
-			new Configuration<ImmutableArray<ITypeDefinitionProvider>>( () => TypeDefinitionProviderStore.Instance.Value );
-	}
-
 	public class TypeDefinitionProviderStore : ItemsStoreBase<ITypeDefinitionProvider>
 	{
 		public static TypeDefinitionProviderStore Instance { get; } = new TypeDefinitionProviderStore();
 		TypeDefinitionProviderStore() : this( Items<ITypeDefinitionProvider>.Default ) {}
 
-		public TypeDefinitionProviderStore( params ITypeDefinitionProvider[] items ) : base( items.Append( ConventionTypeDefinitionProvider.Instance, Self.Instance ) ) {}
+		protected TypeDefinitionProviderStore( params ITypeDefinitionProvider[] items ) : base( items ) {}
+
+		protected override IEnumerable<ITypeDefinitionProvider> Yield() => base.Yield().Append( ConventionTypeDefinitionProvider.Instance, Self.Instance );
 
 		class Self : SelfTransformer<TypeInfo>, ITypeDefinitionProvider
 		{

@@ -53,7 +53,7 @@ namespace DragonSpark.Extensions
 				}
 				current = resolveParent( current );
 			}
-			while ( current != null );
+			while ( current.IsAssigned() );
 			return defaultValue;
 		}
 
