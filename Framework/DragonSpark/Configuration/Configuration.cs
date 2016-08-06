@@ -25,6 +25,8 @@ namespace DragonSpark.Configuration
 
 	public static class Extensions
 	{
+		public static ICommand From<T>( this IAssignable<T> @this, T value ) => new AssignValueCommand<T>( @this ).Fixed( value );
+
 		public static ICommand From<T>( this IConfiguration<T> @this, T value ) => new ApplyConfigurationCommand<T>( value, @this );
 
 		public static ICommand From<T>( this IParameterizedConfiguration<object, T> @this, T value ) => new ApplyParameterizedConfigurationCommand<T>( value, @this );

@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Configuration;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Windows.Runtime;
@@ -13,14 +14,22 @@ namespace DragonSpark.Testing.Framework
 {
 	public static class Initialize
 	{
-		[ModuleInitializer( 0 )] 
-		public static void Execute() => Execution.Context.Assign( ExecutionContext.Instance );
+		[ModuleInitializer( 0 )]
+		public static void Execution() => Command.Instance.Run();
+
+		class Command : DragonSpark.Setup.Setup
+		{
+			public static Command Instance { get; } = new Command();
+			Command() : base( 
+				Activation.Execution.Context.From( ExecutionContext.Instance )
+			) {}
+		}
 	}
 
-	public class IdentificationStore : TaskLocalStore<Identifier>
+	public class Identification : TaskLocalStore<Identifier>
 	{
-		public static IdentificationStore Instance { get; } = new IdentificationStore();
-		IdentificationStore() {}
+		public static Identification Instance { get; } = new Identification();
+		Identification() {}
 
 		protected override Identifier Get()
 		{
@@ -39,7 +48,7 @@ namespace DragonSpark.Testing.Framework
 
 	public class ExecutionContext : StoreBase<TaskContext>
 	{
-		public static ISource<TaskContext> Instance { get; } = new ExecutionContext( IdentificationStore.Instance );
+		public static ISource<TaskContext> Instance { get; } = new ExecutionContext( Identification.Instance );
 
 		readonly ConcurrentDictionary<Identifier, TaskContext> entries = new ConcurrentDictionary<Identifier, TaskContext>();
 		readonly IStore<Identifier> store;

@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="AttributeProviderLocator.cs" />
     <Compile Include="Diagnostics\EnrichFromLogContextCommand.cs" />
+    <Compile Include="Initialize.cs" />
     <Compile Include="InitializationCommand.xaml.cs">
       <DependentUpon>InitializationCommand.xaml</DependentUpon>
     </Compile>

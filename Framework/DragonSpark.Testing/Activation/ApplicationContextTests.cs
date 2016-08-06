@@ -20,7 +20,7 @@ namespace DragonSpark.Testing.Activation
 		{
 			var current = Assert.IsType<TaskContext>( Execution.Current() );
 			Assert.Same( ExecutionContext.Instance.Get(), current );
-			Assert.Equal( IdentificationStore.Instance.Value, current.Origin );
+			Assert.Equal( Identification.Instance.Value, current.Origin );
 			Assert.Null( MethodContext.Instance.Get() );
 			Assert.True( EnableMethodCaching.Instance.Get() );
 
