@@ -25,6 +25,8 @@ namespace DragonSpark.Configuration
 
 	public static class Extensions
 	{
+		public static ICommand From<T>( this IConfiguration<T> @this, T value ) => new ApplyConfigurationCommand<T>( value, @this );
+
 		public static ICommand From<T>( this IParameterizedConfiguration<object, T> @this, T value ) => new ApplyParameterizedConfigurationCommand<T>( value, @this );
 
 		public static ICommand From<T>( this IAssignable<Func<T>> @this, T value ) => new ApplyConfigurationCommand<T>( value, @this );
@@ -193,7 +195,7 @@ namespace DragonSpark.Configuration
 		class StoreCache<T> : Cache<IConfiguration<object, T>, IStore<T>>
 		{
 			public static StoreCache<T> Default { get; } = new StoreCache<T>();
-			StoreCache() : base( configuration => new ExecutionScopedStore<T>( configuration.Get ) ) {}
+			StoreCache() : base( configuration => new ScopedStore<T>( configuration.Get ) ) {}
 		}#1#
 	}*/
 }

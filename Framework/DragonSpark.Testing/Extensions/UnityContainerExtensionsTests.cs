@@ -6,7 +6,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.IoC;
-using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.Windows.Runtime;
@@ -24,7 +23,7 @@ namespace DragonSpark.Testing.Extensions
 	public class UnityContainerExtensionsTests
 	{
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
-		public void TryResolve( [Service]IUnityContainer sut )
+		public void TryResolve( IUnityContainer sut )
 		{
 			var level = MinimumLevelConfiguration.Instance.Get( this );
 			Assert.Equal( LogEventLevel.Debug, level );

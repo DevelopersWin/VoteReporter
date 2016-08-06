@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
@@ -75,7 +76,7 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
-			var creator = Creator.Default.Get( Container )?.GetType() ?? Execution.Current();
+			var creator = (object)Creator.Default.Get( Container )?.GetType() ?? Execution.Current();
 			var policies = repository.List();
 			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );

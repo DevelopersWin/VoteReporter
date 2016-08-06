@@ -61,7 +61,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		public override void Execute( MethodBase parameter )
 		{
 			MethodContext.Instance.Assign( parameter );
-			Disposables.Instance.Value.Add( ExecutionContextStore.Instance.Value );
+			Disposables.Instance.Value.Add( ExecutionContext.Instance.Get() );
 		}
 	}
 

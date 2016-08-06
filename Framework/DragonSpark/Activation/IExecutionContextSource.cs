@@ -1,66 +1,49 @@
 using DragonSpark.Configuration;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Stores;
-using PostSharp.Patterns.Threading;
 using System;
-using System.Linq;
 
 namespace DragonSpark.Activation
 {
 	public static class Execution
 	{
-		readonly static Func<object> Store = new CachedDelegatedSource<IExecutionContextStore>( () => ExecutionContextRepository.Instance.List().First() ).Delegate();
+		readonly static FixedStore<ISource> Store = new FixedStore<ISource>( ExecutionContext.Instance );
+		readonly static Func<object> Source = Store.Delegate();
+		public static IAssignable<ISource> Context { get; } = Store;
 
-		public static object Current() => Store();
+		public static object Current() => Source();
 	}
 
 	[Priority( Priority.Low )]
-	class ExecutionContextStore : StoreBase<IExecutionContextStore>, IExecutionContextStore
+	class ExecutionContext : StoreBase<object>
 	{
-		public static ExecutionContextStore Instance { get; } = new ExecutionContextStore();
-		ExecutionContextStore() {}
+		public static ExecutionContext Instance { get; } = new ExecutionContext();
+		ExecutionContext() {}
 
-		protected override IExecutionContextStore Get() => this;
+		protected override object Get() => this;
 	}
 
-	[ReaderWriterSynchronized]
-	public sealed class ExecutionContextRepository : RepositoryBase<IExecutionContextStore>
+	/*[ReaderWriterSynchronized]
+	public sealed class ExecutionContextRepository : RepositoryBase<IExecutionContextSource>
 	{
 		public static ExecutionContextRepository Instance { get; } = new ExecutionContextRepository();
-		ExecutionContextRepository() : base( new PrioritizedCollection<IExecutionContextStore>( EnumerableEx.Return( ExecutionContextStore.Instance ) ) ) {}
+		ExecutionContextRepository() : base( new PrioritizedCollection<IExecutionContextSource>( EnumerableEx.Return( ExecutionContext.Instance ) ) ) {}
 
 		[Writer]
-		protected override void OnAdd( IExecutionContextStore entry ) => Source.Ensure( entry );
-	}
+		protected override void OnAdd( IExecutionContextSource entry ) => Source.Ensure( entry );
+	}*/
 
-	public class ExecutionScopedStore<T> : StoreBase<T>
+	public class ScopedStore<T> : StoreBase<T>
 	{
 		readonly Func<object, T> factory;
-		public ExecutionScopedStore( Func<object, T> factory )
+		public ScopedStore( Func<object, T> factory )
 		{
 			this.factory = factory;
 		}
 
 		protected override T Get() => factory( Execution.Current() );
 	}
-
-	/*public class ActivatedParameterizedSource<T> : DecoratedCache<T>, IAssignableParameterizedSource<T>
-	{
-		readonly Func<object, T> factory;
-
-		public ActivatedParameterizedSource( Func<T> factory ) : this( factory.Wrap() ) {}
-
-		public ActivatedParameterizedSource( Func<object, T> factory ) : base( factory )
-		{
-			this.factory = factory;
-		}
-
-		public override T Get( object parameter ) => Contains( parameter ) ? Get( parameter ) : factory( parameter );
-	}*/
-
-	public interface IExecutionContextStore : ISource {}
 
 	public class ExecutionScope<T> : WritableStore<T>, IParameterizedSource
 	{

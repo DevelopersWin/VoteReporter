@@ -39,7 +39,7 @@ namespace DragonSpark.Windows.Markup
 				}
 				else
 				{
-					HandleImageAvailbable( decoder, completedCallback, failedCallback );
+					HandleImageAvailable( decoder, completedCallback, failedCallback );
 				}
 			}
 		}
@@ -54,7 +54,7 @@ namespace DragonSpark.Windows.Markup
 				if ( senderAsDecoder != null )
 				{
 					senderAsDecoder.DownloadCompleted -= result;
-					HandleImageAvailbable( senderAsDecoder, callback, failedCallback );
+					HandleImageAvailable( senderAsDecoder, callback, failedCallback );
 				}
 			};
 
@@ -78,7 +78,7 @@ namespace DragonSpark.Windows.Markup
 			decoder.DownloadFailed += result;
 		}
 
-		static void HandleImageAvailbable( BitmapDecoder decoder, Action<ImageSource> completedCallback, Action<Exception> failedCallback )
+		static void HandleImageAvailable( BitmapDecoder decoder, Action<ImageSource> completedCallback, Action<Exception> failedCallback )
 		{
 			if ( decoder != null && decoder.Frames.Count > 0 )
 			{

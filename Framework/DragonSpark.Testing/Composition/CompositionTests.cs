@@ -67,7 +67,7 @@ namespace DragonSpark.Testing.Composition
 		/*[Fact, MinimumLevel( LogEventLevel.Debug )]
 		public void BasicComposeAgainFact()
 		{
-			ExecutionContext.Instance.Value.Verify();
+			TaskContext.Instance.Value.Verify();
 			Debugger.Break();
 		}*/
 

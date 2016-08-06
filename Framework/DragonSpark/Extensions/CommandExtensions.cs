@@ -12,6 +12,8 @@ namespace DragonSpark.Extensions
 
 		public static ICommand<T> Cast<T>( this ICommand @this, Func<T, object> projection ) => new ProjectedCommand<T>( @this, projection );
 
+		public static void Run( this ICommand @this ) => @this.Execute( default(object) );
+
 		public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );
 
 		public static TCommand Run<TCommand, TParameter>( this TCommand @this, TParameter parameter ) where TCommand : ICommand<TParameter>

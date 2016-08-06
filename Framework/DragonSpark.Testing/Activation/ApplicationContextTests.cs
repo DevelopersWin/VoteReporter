@@ -8,7 +8,7 @@ using DragonSpark.Testing.Framework.Setup;
 using System.Composition;
 using System.Reflection;
 using Xunit;
-using ExecutionContextStore = DragonSpark.Testing.Framework.ExecutionContextStore;
+using ExecutionContext = DragonSpark.Testing.Framework.ExecutionContext;
 
 namespace DragonSpark.Testing.Activation
 {
@@ -18,9 +18,9 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void Assignment()
 		{
-			var current = Assert.IsType<ExecutionContext>( Execution.Current() );
-			Assert.Same( ExecutionContextStore.Instance.Value, current );
-			Assert.Equal( TaskContextStore.Instance.Value, current.Origin );
+			var current = Assert.IsType<TaskContext>( Execution.Current() );
+			Assert.Same( ExecutionContext.Instance.Get(), current );
+			Assert.Equal( IdentificationStore.Instance.Value, current.Origin );
 			Assert.Null( MethodContext.Instance.Get() );
 			Assert.True( EnableMethodCaching.Instance.Get() );
 

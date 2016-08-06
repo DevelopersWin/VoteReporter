@@ -65,8 +65,8 @@ namespace DragonSpark.Windows.Testing.Setup
 										var methodInfo = typeof(Mock).GetMethod( nameof<>(Mock.Hello) );
 										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
 										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
-										Framework.Setup.ExecutionContext.Instance.Verify(); // TODO: Remove.
-										Framework.Setup.ExecutionContext.Instance.Value.Dispose();#1#
+										Framework.Setup.TaskContext.Instance.Verify(); // TODO: Remove.
+										Framework.Setup.TaskContext.Instance.Value.Dispose();#1#
 									} );
 			Assert.True( result.IsCompleted );
 		}*/

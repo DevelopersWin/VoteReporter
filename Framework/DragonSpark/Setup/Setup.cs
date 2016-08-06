@@ -469,7 +469,8 @@ namespace DragonSpark.Setup
 	{
 		public Setup() : this( Items<ICommand>.Default ) {}
 
-		public Setup( params ICommand[] commands ) : base( new OncePerScopeSpecification<object>(), commands ) {}
+		public Setup( params ICommand[] commands ) : this( new OncePerScopeSpecification<object>(), commands ) {}
+		public Setup( ISpecification<object> specification, params ICommand[] commands ) : base( specification, commands ) {}
 
 		public DeclarativeCollection<object> Items { get; } = new DeclarativeCollection<object>();
 

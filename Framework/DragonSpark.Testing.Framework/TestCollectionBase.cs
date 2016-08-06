@@ -47,7 +47,7 @@ namespace DragonSpark.Testing.Framework
 
 		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Instance.ToDelegate(), complete ) {}
 
-		public InitializeMethodCommand( Action<Assembly> initialize, Action complete ) : this( ExecutionContextStore.Instance.Value, initialize, complete ) {}
+		public InitializeMethodCommand( Action<Assembly> initialize, Action complete ) : this( ExecutionContext.Instance.Value, initialize, complete ) {}
 
 		InitializeMethodCommand( IWritableStore<MethodBase> store, Action<Assembly> initialize, Action complete ) : base( store )
 		{

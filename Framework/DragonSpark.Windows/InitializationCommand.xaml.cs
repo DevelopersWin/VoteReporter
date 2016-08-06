@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Configuration;
+﻿using DragonSpark.Configuration;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.Windows.TypeSystem;
@@ -13,7 +12,7 @@ namespace DragonSpark.Windows
 	public static class Initialization
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => ExecutionContextRepository.Instance.Add( ExecutionContextStore.Instance );
+		public static void Execution() => Activation.Execution.Context.Assign( ExecutionContext.Instance );
 
 		[ModuleInitializer( 1 )]
 		public static void Configuration()
@@ -26,9 +25,6 @@ namespace DragonSpark.Windows
 	[Export( typeof(ISetup) )]
 	public partial class InitializationCommand
 	{
-		/*
-		public static InitializationCommand Instance { get; } = new InitializationCommand();*/
-
 		public InitializationCommand() : base( DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.From( Runtime.TypeDefinitionProviderStore.Instance ) )
 		{
 			Priority = Priority.BeforeNormal;
@@ -37,9 +33,9 @@ namespace DragonSpark.Windows
 	}
 
 	[Priority( Priority.AfterNormal )]
-	class ExecutionContextStore : Source<AppDomain>, IExecutionContextStore
+	class ExecutionContext : Source<AppDomain>
 	{
-		public static ExecutionContextStore Instance { get; } = new ExecutionContextStore();
-		ExecutionContextStore() : base( AppDomain.CurrentDomain ) {}
+		public static ISource Instance { get; } = new ExecutionContext();
+		ExecutionContext() : base( AppDomain.CurrentDomain ) {}
 	}
 }

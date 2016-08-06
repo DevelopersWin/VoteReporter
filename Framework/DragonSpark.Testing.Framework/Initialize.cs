@@ -14,67 +14,67 @@ namespace DragonSpark.Testing.Framework
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )] 
-		public static void Execute() => ExecutionContextRepository.Instance.Add( ExecutionContextStore.Instance );
+		public static void Execute() => Execution.Context.Assign( ExecutionContext.Instance );
 	}
 
-	public class TaskContextStore : TaskLocalStore<TaskContext>
+	public class IdentificationStore : TaskLocalStore<Identifier>
 	{
-		public static TaskContextStore Instance { get; } = new TaskContextStore();
-		TaskContextStore() {}
+		public static IdentificationStore Instance { get; } = new IdentificationStore();
+		IdentificationStore() {}
 
-		protected override TaskContext Get()
+		protected override Identifier Get()
 		{
 			var current = base.Get();
-			var result = current == default(TaskContext) ? Create() : current;
+			var result = current == default(Identifier) ? Create() : current;
 			return result;
 		}
 
-		TaskContext Create()
+		Identifier Create()
 		{
-			var result = TaskContext.Current();
+			var result = Identifier.Current();
 			Assign( result );
 			return result;
 		}
 	}
 
-	public class ExecutionContextStore : StoreBase<ExecutionContext>, IExecutionContextStore
+	public class ExecutionContext : StoreBase<TaskContext>
 	{
-		public static ExecutionContextStore Instance { get; } = new ExecutionContextStore( TaskContextStore.Instance );
+		public static ISource<TaskContext> Instance { get; } = new ExecutionContext( IdentificationStore.Instance );
 
-		readonly ConcurrentDictionary<TaskContext, ExecutionContext> entries = new ConcurrentDictionary<TaskContext, ExecutionContext>();
-		readonly IStore<TaskContext> store;
-		readonly Func<TaskContext, ExecutionContext> create;
-		readonly Action<TaskContext> remove;
+		readonly ConcurrentDictionary<Identifier, TaskContext> entries = new ConcurrentDictionary<Identifier, TaskContext>();
+		readonly IStore<Identifier> store;
+		readonly Func<Identifier, TaskContext> create;
+		readonly Action<Identifier> remove;
 
-		ExecutionContextStore( IStore<TaskContext> store )
+		ExecutionContext( IStore<Identifier> store )
 		{
 			this.store = store;
 			create = Create;
 			remove = Remove;
 		}
 
-		protected override ExecutionContext Get() => entries.GetOrAdd( store.Value, create );
+		protected override TaskContext Get() => entries.GetOrAdd( store.Value, create );
 
-		ExecutionContext Create( TaskContext context ) => new ExecutionContext( context, remove );
+		TaskContext Create( Identifier context ) => new TaskContext( context, remove );
 
-		void Remove( TaskContext obj )
+		void Remove( Identifier obj )
 		{
-			ExecutionContext removed;
+			TaskContext removed;
 			entries.TryRemove( obj, out removed );
 		}
 	}
 
-	public class ExecutionContext : Disposable
+	public class TaskContext : Disposable
 	{
-		readonly Action<TaskContext> complete;
+		readonly Action<Identifier> complete;
 
-		internal ExecutionContext( TaskContext origin, Action<TaskContext> complete )
+		internal TaskContext( Identifier origin, Action<Identifier> complete )
 		{
 			this.complete = complete;
 			Origin = origin;
 		}
 
-		public TaskContext Origin { get; }
+		public Identifier Origin { get; }
 
 		protected override void OnDispose( bool disposing )
 		{
@@ -86,14 +86,14 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public struct TaskContext : IEquatable<TaskContext>
+	public struct Identifier : IEquatable<Identifier>
 	{
-		public static TaskContext Current() => new TaskContext( Environment.CurrentManagedThreadId, Task.CurrentId );
+		public static Identifier Current() => new Identifier( Environment.CurrentManagedThreadId, Task.CurrentId );
 
 		readonly int threadId;
 		readonly int? taskId;
 
-		public TaskContext( int threadId, int? taskId = null )
+		public Identifier( int threadId, int? taskId = null )
 		{
 			this.threadId = threadId;
 			this.taskId = taskId;
@@ -101,9 +101,9 @@ namespace DragonSpark.Testing.Framework
 
 		public override string ToString() => $"Task {taskId} on thread {threadId}";
 
-		public bool Equals( TaskContext other ) => taskId == other.taskId && threadId == other.threadId;
+		public bool Equals( Identifier other ) => taskId == other.taskId && threadId == other.threadId;
 
-		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && obj is TaskContext && Equals( (TaskContext)obj );
+		public override bool Equals( object obj ) => !ReferenceEquals( null, obj ) && obj is Identifier && Equals( (Identifier)obj );
 
 		public override int GetHashCode()
 		{
@@ -113,9 +113,9 @@ namespace DragonSpark.Testing.Framework
 			}
 		}
 
-		public static bool operator ==( TaskContext left, TaskContext right ) => left.Equals( right );
+		public static bool operator ==( Identifier left, Identifier right ) => left.Equals( right );
 
-		public static bool operator !=( TaskContext left, TaskContext right ) => !left.Equals( right );
+		public static bool operator !=( Identifier left, Identifier right ) => !left.Equals( right );
 	}
 
 	public class MethodContext : Configuration<MethodBase>
@@ -128,7 +128,7 @@ namespace DragonSpark.Testing.Framework
 	/*public class TestingApplicationInitializationCommand : DragonSpark.Setup.Setup
 	{
 		public TestingApplicationInitializationCommand()
-			: base( Windows.InitializationCommand.Instance, new DisposeDisposableCommand( ExecutionContextStore.Instance.Value ) )
+			: base( Windows.InitializationCommand.Instance, new DisposeDisposableCommand( ExecutionContext.Instance.Value ) )
 		{
 			Priority = Priority.High;
 		}
