@@ -193,13 +193,11 @@ namespace DragonSpark.Runtime.Properties
 		bool Contains( TInstance instance );
 		
 		bool Remove( TInstance instance );
-
-		// TValue Get( TInstance instance );
 	}
 
 	public interface IConfigurableCache<T> : IConfigurableCache<object, T>, ICache<T> {}
 
-	public interface IConfigurableCache<TInstance, TValue> : ICache<TInstance, TValue>, IParameterizedConfiguration<TInstance, TValue> {}
+	public interface IConfigurableCache<TInstance, TValue> : ICache<TInstance, TValue>, IAssignable<Func<TInstance, TValue>> {}
 
 	public class ConfigurableStore<TInstance, TValue> : DecoratedStore<Func<TInstance, TValue>>, IParameterizedConfiguration<TInstance, TValue>
 	{

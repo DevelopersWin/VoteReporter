@@ -1,25 +1,28 @@
 using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
-using Type = System.Type;
 
 namespace DragonSpark.Setup
 {
 	[Persistent]
 	public class AllTypesOfFactory : FactoryBase<Type, Array>
 	{
-		readonly Type[] types;
+		readonly Func<ImmutableArray<Type>> typeSource;
 		readonly IActivator activator;
 
-		public AllTypesOfFactory( Type[] types, IActivator activator )
+		public AllTypesOfFactory( IActivator activator ) : this( ApplicationTypes.Instance.Get, activator ) {}
+
+		public AllTypesOfFactory( Func<ImmutableArray<Type>> typeSource, IActivator activator )
 		{
-			this.types = types;
+			this.typeSource = typeSource;
 			this.activator = activator;
 		}
 
 		public T[] Create<T>() => Create( typeof(T) ).Cast<T>().ToArray();
 
-		public override Array Create( Type parameter ) => activator.ActivateMany<object>( parameter, types );
+		public override Array Create( Type parameter ) => activator.ActivateMany<object>( parameter, typeSource().AsEnumerable() );
 	}
 }

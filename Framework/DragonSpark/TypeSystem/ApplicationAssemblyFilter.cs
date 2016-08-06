@@ -9,12 +9,15 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using DragonSpark.Setup;
 
 namespace DragonSpark.TypeSystem
 {
 	public class ApplicationAssemblyFilter : TransformerBase<IEnumerable<Assembly>>
 	{
 		readonly Func<Assembly, bool> specification;
+
+		public ApplicationAssemblyFilter() : this( ApplicationAssemblies.Instance.Get().ToArray() ) {}
 
 		public ApplicationAssemblyFilter( params Assembly[] assemblies ) : this( new ApplicationAssemblySpecification( assemblies ).IsSatisfiedBy ) {}
 

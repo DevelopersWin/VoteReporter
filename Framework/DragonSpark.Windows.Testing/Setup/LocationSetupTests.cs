@@ -383,12 +383,12 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
-		public void CreateAssemblies( IUnityContainer container, ApplicationTypes provider, [Service]Assembly[] sut )
+		public void CreateAssemblies( IUnityContainer container, ApplicationTypes provider, [Service]ImmutableArray<Assembly> sut )
 		{
-			var registered = container.IsRegistered<Assembly[]>();
+			var registered = container.IsRegistered<ImmutableArray<Assembly>>();
 			Assert.True( registered );
 
-			var fromContainer = container.Resolve<Assembly[]>();
+			var fromContainer = container.Resolve<IEnumerable<Assembly>>().Fixed();
 			var fromProvider = provider.Get();
 			var assemblies = fromProvider.Assemblies().ToArray();
 			Assert.Equal( fromContainer, assemblies );

@@ -6,6 +6,7 @@ using DragonSpark.TypeSystem;
 using Moq;
 using System.Collections.Immutable;
 using System.Composition;
+using DragonSpark.Testing.Framework.Parameters;
 using Xunit;
 using AutoDataAttribute = Ploeh.AutoFixture.Xunit2.AutoDataAttribute;
 
