@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using PostSharp.Aspects.Internals;
 using System;
@@ -9,7 +10,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using DragonSpark.Setup;
 
 namespace DragonSpark.TypeSystem
 {
@@ -17,9 +17,9 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly Func<Assembly, bool> specification;
 
-		public ApplicationAssemblyFilter() : this( ApplicationAssemblies.Instance.Get().ToArray() ) {}
+		public ApplicationAssemblyFilter() : this( ApplicationAssemblies.Instance.Get() ) {}
 
-		public ApplicationAssemblyFilter( params Assembly[] assemblies ) : this( new ApplicationAssemblySpecification( assemblies ).IsSatisfiedBy ) {}
+		public ApplicationAssemblyFilter( ImmutableArray<Assembly> assemblies ) : this( new ApplicationAssemblySpecification( assemblies.ToArray() ).IsSatisfiedBy ) {}
 
 		ApplicationAssemblyFilter( Func<Assembly, bool> specification )
 		{

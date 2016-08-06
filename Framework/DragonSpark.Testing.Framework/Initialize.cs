@@ -15,7 +15,10 @@ namespace DragonSpark.Testing.Framework
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Command.Instance.Run();
+		public static void Execution()
+		{
+			Activation.Execution.Context.Assign( ExecutionContext.Instance );
+		}
 
 		class Command : DragonSpark.Setup.Setup
 		{

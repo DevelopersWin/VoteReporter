@@ -382,7 +382,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.IsType<MappedWithNameClass>( located );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void CreateAssemblies( IUnityContainer container, ApplicationTypes provider, [Service]ImmutableArray<Assembly> sut )
 		{
 			var registered = container.IsRegistered<ImmutableArray<Assembly>>();
@@ -392,6 +392,19 @@ namespace DragonSpark.Windows.Testing.Setup
 			var fromProvider = provider.Get();
 			var assemblies = fromProvider.Assemblies().ToArray();
 			Assert.Equal( fromContainer, assemblies );
+
+			Assert.Equal( fromContainer, sut );
+		}*/
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		public void CreateAssemblies( IUnityContainer container, ApplicationTypes provider, ImmutableArray<Assembly> sut )
+		{
+			var registered = container.IsRegistered<ImmutableArray<Assembly>>();
+			Assert.True( registered );
+
+			var fromContainer = container.Resolve<ImmutableArray<Assembly>>();
+			var fromProvider = provider.Get();
+			var assemblies = fromProvider.Assemblies().ToArray();
+			Assert.Equal( fromContainer.ToArray(), assemblies );
 
 			Assert.Equal( fromContainer, sut );
 		}

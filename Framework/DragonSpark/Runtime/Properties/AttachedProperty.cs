@@ -199,10 +199,15 @@ namespace DragonSpark.Runtime.Properties
 
 	public interface IConfigurableCache<TInstance, TValue> : ICache<TInstance, TValue>, IAssignable<Func<TInstance, TValue>> {}
 
+	public class ConfigurableScopedStore<TInstance, TValue> : ConfigurableStore<TInstance, TValue>
+	{
+		public ConfigurableScopedStore( Func<TInstance, TValue> factory ) : base( new ExecutionScope<Func<TInstance, TValue>>( factory.Self ) ) {}
+	}
+
 	public class ConfigurableStore<TInstance, TValue> : DecoratedStore<Func<TInstance, TValue>>, IParameterizedConfiguration<TInstance, TValue>
 	{
 		public ConfigurableStore( Func<TInstance, TValue> factory ) : this( new FixedStore<Func<TInstance, TValue>>( factory ) ) {}
-		public ConfigurableStore( IWritableStore<Func<TInstance, TValue>> store ) : base( store ) {}
+		protected ConfigurableStore( IWritableStore<Func<TInstance, TValue>> store ) : base( store ) {}
 
 		public TValue Get( TInstance parameter ) => Value( parameter );
 		object IParameterizedSource.Get( object parameter ) => parameter is TInstance ? Get( (TInstance)parameter ) : default(TValue);
@@ -306,7 +311,7 @@ namespace DragonSpark.Runtime.Properties
 
 	public class ConfigurableScopedCache<T> : ConfigurableCache<T>
 	{
-		public ConfigurableScopedCache( Func<T> defaultFactory ) : base( new ConfigurableStore<object, T>( new ExecutionScope<Func<object, T>>( defaultFactory.Wrap().Self ) ) ) {}
+		public ConfigurableScopedCache( Func<T> defaultFactory ) : base( new ConfigurableScopedStore<object, T>( defaultFactory.Wrap() ) ) {}
 
 		public override void Assign( Func<object, T> item )
 		{

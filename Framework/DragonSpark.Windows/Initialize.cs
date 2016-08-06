@@ -9,7 +9,13 @@ namespace DragonSpark.Windows
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Command.Instance.Run();
+		public static void Execution()
+		{
+			Activation.Execution.Context.Assign( ExecutionContext.Instance );
+				DragonSpark.TypeSystem.Configuration.AssemblyLoader.Assign( Assembly.LoadFile );
+				DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Assign( AssemblyLocator.Instance.Get );
+			// Command.Instance.Run();
+		}
 
 		class Command : DragonSpark.Setup.Setup
 		{

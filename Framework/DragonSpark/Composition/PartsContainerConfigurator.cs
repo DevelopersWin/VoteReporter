@@ -91,14 +91,13 @@ namespace DragonSpark.Composition
 			var types = system.Types.ToArray();
 
 			var result = configuration
-				/*.WithInstance( system )
+				.WithInstance( system )
 				.WithInstance( system.Assemblies )
 				.WithInstance( system.Assemblies.ToArray() )
 				.WithInstance( system.Types )
 				.WithInstance( types )
-				.WithInstance( Activation.Activator.Instance.Get() )*/
-				// .WithParts( core, ConventionBuilder )
-				.WithParts( types, AttributeProvider.Instance )
+				.WithInstance( Activation.Activator.Instance.Get() )
+				.WithParts( types/*, AttributeProvider.Instance*/ )
 				.WithProvider( new SingletonExportDescriptorProvider( types ) )
 				.WithProvider( new SourceDelegateExporter() )
 				.WithProvider( new ParameterizedSourceDelegateExporter() )
