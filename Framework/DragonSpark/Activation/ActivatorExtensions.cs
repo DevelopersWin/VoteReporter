@@ -2,6 +2,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -42,7 +43,7 @@ namespace DragonSpark.Activation
 			public static Providers Default { get; } = new Providers();
 			Providers() /*: base( source => new Factory( source ).Create )*/ {}
 
-			class Factory : FactoryBase<IServiceProvider>
+			/*class Factory : FactoryBase<IServiceProvider>
 			{
 				readonly Func<IActivator> source;
 				public Factory( Func<IActivator> source )
@@ -52,7 +53,7 @@ namespace DragonSpark.Activation
 
 				
 				public override IServiceProvider Create() => new DecoratedServiceProvider( source().Create );
-			}
+			}*/
 
 			protected override Func<IServiceProvider> Create( Func<IActivator> parameter ) => new ServiceProvider( parameter ).Self;
 
@@ -78,26 +79,26 @@ namespace DragonSpark.Activation
 
 		public static T Construct<T>( this IActivator @this, Type type, params object[] parameters ) => (T)@this.Create( new ConstructTypeRequest( type, parameters ) );
 
-		public static T[] ActivateMany<T>( this IActivator @this, IEnumerable<Type> types ) => @this.ActivateMany<T>( typeof(T), types );
+		public static ImmutableArray<T> ActivateMany<T>( this IActivator @this, IEnumerable<Type> types ) => @this.ActivateMany<T>( typeof(T), types );
 
-		public static T[] ActivateMany<T>( this IActivator @this, Type objectType, IEnumerable<Type> types ) => @this.CreateMany<T>( types.Where( objectType.Adapt().IsAssignableFrom ) );
+		public static ImmutableArray<T> ActivateMany<T>( this IActivator @this, Type objectType, IEnumerable<Type> types ) => @this.CreateMany<T>( types.Where( objectType.Adapt().IsAssignableFrom ) );
 	}
 
 	public sealed class Activator : CompositeActivator
 	{
-		public static ISource<IActivator> Instance { get; } = new ExecutionScope<IActivator>( () => new Activator() );
+		public static ISource<IActivator> Instance { get; } = new CachedScope<IActivator>( () => new Activator() );
 		Activator() : base( new Locator(), Constructor.Instance ) {}
 
 		public static T Activate<T>( Type type ) => Instance.Get().Create<T>( type );
 
 		sealed class Locator : LocatorBase
 		{
-			readonly ICache<Type, Type> convention;
+			readonly Func<Type, Type> convention;
 			readonly ISingletonLocator singleton;
 
-			public Locator() : this( ConventionTypes.Instance.Get(), SingletonLocator.Instance ) {}
+			public Locator() : this( ConventionTypes.Instance.Get, SingletonLocator.Instance ) {}
 
-			Locator( ICache<Type, Type> convention, ISingletonLocator singleton )
+			Locator( Func<Type, Type> convention, ISingletonLocator singleton )
 			{
 				this.convention = convention;
 				this.singleton = singleton;
@@ -105,7 +106,7 @@ namespace DragonSpark.Activation
 
 			public override object Create( LocateTypeRequest parameter )
 			{
-				var type = convention.Get( parameter.RequestedType ) ?? parameter.RequestedType;
+				var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;
 				var result = singleton.Get( type );
 				return result;
 			}
@@ -194,7 +195,7 @@ namespace DragonSpark.Activation
 
 	/*public sealed class SourceTypeAssignableSpecification : GuardedSpecificationBase<Type>
 	{
-		public static ISpecification<Type> Instance { get; } = new SourceTypeAssignableSpecification().Cached();
+		public static ISpecification<Type> Instance { get; } = new SourceTypeAssignableSpecification().ToCache();
 		SourceTypeAssignableSpecification() {}
 
 		readonly static TypeAdapter Source = typeof(ISource).Adapt();

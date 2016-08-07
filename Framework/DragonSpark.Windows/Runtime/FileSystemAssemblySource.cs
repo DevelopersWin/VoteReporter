@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class FileSystemAssemblySource : CachedDelegatedSource<ImmutableArray<Assembly>>
+	public class FileSystemAssemblySource : FixedDeferedSource<ImmutableArray<Assembly>>
 	{
 		public static ISource<ImmutableArray<Assembly>> Instance { get; } = new FileSystemAssemblySource();
 		FileSystemAssemblySource() : this( AppDomain.CurrentDomain ) {}

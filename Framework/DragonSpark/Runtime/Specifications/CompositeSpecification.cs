@@ -1,8 +1,6 @@
-using System;
-
 namespace DragonSpark.Runtime.Specifications
 {
-	public abstract class CompositeSpecification<T> : SpecificationBase<T>
+	/*public abstract class CompositeSpecification<T> : SpecificationBase<T>
 	{
 		readonly Func<Func<ISpecification, bool>, bool> where;
 		
@@ -12,5 +10,5 @@ namespace DragonSpark.Runtime.Specifications
 		}
 
 		public override bool IsSatisfiedBy( T parameter ) => where( condition => condition.IsSatisfiedBy( parameter ) );
-	}
+	}*/
 }

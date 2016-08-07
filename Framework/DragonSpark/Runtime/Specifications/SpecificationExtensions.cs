@@ -3,6 +3,7 @@ using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
+using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -12,10 +13,10 @@ namespace DragonSpark.Runtime.Specifications
 		
 
 		public static ISpecification<T> Or<T>( this ISpecification<T> @this, params ISpecification[] others ) 
-			=> new AnySpecification<T>( @this.Append( others.Select( specification =>  specification.Cast<T>() ) ).Fixed() );
+			=> new AnySpecification<T>( @this.Append( others.Select( specification => specification.Cast<T>() ) ).Fixed() );
 
 		public static ISpecification<T> And<T>( this ISpecification<T> @this, params ISpecification[] others ) 
-			=> new AllSpecification<T>( @this.Append( others.Select( specification =>  specification.Cast<T>() ) ).Fixed() );
+			=> new AllSpecification<T>( @this.Append( others.Select( specification => specification.Cast<T>() ) ).Fixed() );
 
 		public static ISpecification<T> Cast<T>( this ISpecification @this ) => @this.Cast( Delegates<T>.Object );
 
@@ -33,7 +34,7 @@ namespace DragonSpark.Runtime.Specifications
 		class Cache<T> : Cache<ISpecification<T>, ISpecification<T>>
 		{
 			public static Cache<T> Default { get; } = new Cache<T>();
-			Cache() : base( specification => new DelegatedSpecification<T>( CacheFactory.Create<T, bool>( specification.IsSatisfiedBy ).Get ) ) {}
+			Cache() : base( specification => new DelegatedSpecification<T>( specification.ToDelegate().Fix() ) ) {}
 		}
 	}
 }

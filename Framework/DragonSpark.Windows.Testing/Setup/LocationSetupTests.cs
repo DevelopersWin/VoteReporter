@@ -455,12 +455,12 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotNull( fromProvider );
 
 			var assembly = GetType().Assembly;
-			Assert.Equal( assembly.From<AssemblyTitleAttribute, string>( attribute => attribute.Title ), fromProvider.Title );
-			Assert.Equal( assembly.From<AssemblyCompanyAttribute, string>( attribute => attribute.Company ), fromProvider.Company );
-			Assert.Equal( assembly.From<AssemblyCopyrightAttribute, string>( attribute => attribute.Copyright ), fromProvider.Copyright );
-			Assert.Equal( assembly.From<DebuggableAttribute, string>( attribute => "DEBUG" ), fromProvider.Configuration );
-			Assert.Equal( assembly.From<AssemblyDescriptionAttribute, string>( attribute => attribute.Description ), fromProvider.Description );
-			Assert.Equal( assembly.From<AssemblyProductAttribute, string>( attribute => attribute.Product ), fromProvider.Product );
+			Assert.Equal( AttributeProviderExtensions.From<AssemblyTitleAttribute, string>( assembly, attribute => attribute.Title ), fromProvider.Title );
+			Assert.Equal( AttributeProviderExtensions.From<AssemblyCompanyAttribute, string>( assembly, attribute => attribute.Company ), fromProvider.Company );
+			Assert.Equal( AttributeProviderExtensions.From<AssemblyCopyrightAttribute, string>( assembly, attribute => attribute.Copyright ), fromProvider.Copyright );
+			Assert.Equal( AttributeProviderExtensions.From<DebuggableAttribute, string>( assembly, attribute => "DEBUG" ), fromProvider.Configuration );
+			Assert.Equal( AttributeProviderExtensions.From<AssemblyDescriptionAttribute, string>( assembly, attribute => attribute.Description ), fromProvider.Description );
+			Assert.Equal( AttributeProviderExtensions.From<AssemblyProductAttribute, string>( assembly, attribute => attribute.Product ), fromProvider.Product );
 			Assert.Equal( assembly.GetName().Version, fromProvider.Version );
 		}
 

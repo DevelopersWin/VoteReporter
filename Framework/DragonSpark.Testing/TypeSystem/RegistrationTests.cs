@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Extensions;
 using Xunit;
 using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
 
@@ -28,7 +29,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Export]
 		class AssemblySource : AssemblyBasedTypeSource
 		{
-			readonly internal static IEnumerable<Assembly> Result = EnumerableEx.Return( typeof(AssemblySource).Assembly );
+			readonly internal static IEnumerable<Assembly> Result = typeof(AssemblySource).Assembly.Yield();
 
 			public AssemblySource() : base( Result ) {}
 		}

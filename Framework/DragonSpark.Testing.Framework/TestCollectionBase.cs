@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.Framework
 		}*/
 	}
 
-	/*public class InitializeMethodCommand : AssignValueCommand<MethodBase>
+	/*public class InitializeMethodCommand : AssignCommand<MethodBase>
 	{
 		readonly Action complete;
 		readonly Action<Assembly> initialize;

@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -102,26 +103,26 @@ namespace DragonSpark.Runtime.Properties
 		T GetCurrentItem();
 	}
 
-	public class AmbientStack<T> : ExecutionScope<IStack<T>>, IStackSource<T>
+	public class AmbientStack<T> : Scope<IStack<T>>, IStackSource<T>
 	{
 		public static AmbientStack<T> Default { get; } = new AmbientStack<T>();
 		/*readonly static Func<IStack<T>> Store = Default.Get;*/
 
-		public AmbientStack() : this( AmbientStackCache<T>.Default ) {}
-		public AmbientStack( ICache<IStack<T>> source ) : base( source ) {}
+		public AmbientStack() : this( Stacks<T>.Default ) {}
+		public AmbientStack( IParameterizedSource<object, IStack<T>> source ) : base( source.Get ) {}
 
-		public T GetCurrentItem() => Value.Peek();
+		public T GetCurrentItem() => Get().Peek();
 	}
 
-	public class AmbientStackCache<T> : StoreCache<IStack<T>>
+	public class Stacks<T> : StoreCache<IStack<T>>
 	{
-		public static AmbientStackCache<T> Default { get; } = new AmbientStackCache<T>();
+		public static Stacks<T> Default { get; } = new Stacks<T>();
 
-		public AmbientStackCache() : this( PropertyRegistry<IStack<T>>.Instance ) {}
+		public Stacks() : this( PropertyRegistry<IStack<T>>.Instance ) {}
 
-		protected AmbientStackCache( IPropertyRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
+		protected Stacks( IPropertyRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
 
-		protected AmbientStackCache( IPropertyRegistry<IStack<T>> registry, IParameterizedSource<object, IWritableStore<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.Get ) )
+		protected Stacks( IPropertyRegistry<IStack<T>> registry, IParameterizedSource<object, IWritableStore<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.Get ) )
 		{
 			registry.Register( factory, this );
 		}

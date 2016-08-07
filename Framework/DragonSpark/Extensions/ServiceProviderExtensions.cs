@@ -11,7 +11,7 @@ namespace DragonSpark.Extensions
 
 		public static T Get<T>( this IServiceProvider serviceProvider, Type type ) => (T)serviceProvider.GetService( type );
 
-		public static Func<Type, T> Delegate<T>( this ISource<IServiceProvider> @this ) => @this.ToDelegate().Delegate<T>();
+		// public static Func<Type, T> Delegate<T>( this ISource<IServiceProvider> @this ) => @this.ToDelegate().Delegate<T>();
 		public static Func<Type, T> Delegate<T>( this Func<IServiceProvider> @this ) => Delegates<T>.Default.Get( @this );
 		class Delegates<T> : Cache<Func<IServiceProvider>, Func<Type, T>>
 		{

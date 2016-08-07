@@ -55,6 +55,7 @@
     <Compile Include="Setup\AutoDataMoqConfiguredAttribute.cs" />
     <Compile Include="Setup\Location\FixtureRegistry.cs" />
     <Compile Include="Setup\MetadataCustomizationFactory.cs" />
+    <Compile Include="Setup\MinimumLevel.cs" />
     <Compile Include="Setup\ResourceConfigurationFactory.cs" />
     <Compile Include="Setup\CanLocateSpecification.cs" />
     <Compile Include="Setup\ConfigureLocationCustomization.cs" />

@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		{
 			var expected = typeof(FactoryOfYAC);
 
-			new ApplySystemPartsConfiguration( expected ).Run();
+			new AssignSystemPartsCommand( expected ).Run();
 
 			var type = SourceTypes.Instance.Get().Get( new LocateTypeRequest( typeof(YetAnotherClass) ) );
 			Assert.Equal( expected, type );
@@ -29,7 +29,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		[Fact]
 		public void PropertyFromApplicationTypes()
 		{
-			new ApplySystemPartsConfiguration( typeof(FactoryOfYAC) ).Run();
+			new AssignSystemPartsCommand( typeof(FactoryOfYAC) ).Run();
 			Assert.IsType<YetAnotherClass>( ClassPropertyFromApplicationTypes );
 		}
 

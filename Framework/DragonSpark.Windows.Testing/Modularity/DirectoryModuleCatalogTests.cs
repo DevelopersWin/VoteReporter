@@ -32,7 +32,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		public DirectoryModuleCatalogTests( ITestOutputHelper output ) : base( output )
 		{
 			CleanUp();
-			new ApplySystemPartsConfiguration( FileSystemTypes.Instance ).Run();
+			new AssignSystemPartsCommand( FileSystemTypes.Instance ).Run();
 		}
 
 		static void CleanUp() => All.Each( CompilerHelper.CleanUpDirectory );

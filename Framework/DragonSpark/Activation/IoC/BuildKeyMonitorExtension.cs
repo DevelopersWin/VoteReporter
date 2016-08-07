@@ -6,7 +6,7 @@ namespace DragonSpark.Activation.IoC
 {
 	public class BuildKeyMonitorExtension : BuilderStrategy, IRequiresRecovery
 	{
-		static IStack<NamedTypeBuildKey> Stack => AmbientStack<NamedTypeBuildKey>.Default.Value;
+		static IStack<NamedTypeBuildKey> Stack => AmbientStack<NamedTypeBuildKey>.Default.Get();
 
 		public override void PreBuildUp( IBuilderContext context )
 		{

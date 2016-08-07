@@ -1,16 +1,17 @@
-using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using System;
 
 namespace DragonSpark.Activation
 {
-	public sealed class GlobalServiceProvider : Configuration<IServiceProvider>
+	public sealed class GlobalServiceProvider : CachedScope<IServiceProvider>
 	{
-		public static IConfiguration<IServiceProvider> Instance { get; } = new GlobalServiceProvider();
+		public static IScope<IServiceProvider> Instance { get; } = new GlobalServiceProvider();
 
 		GlobalServiceProvider() : base( () => DefaultServiceProvider.Instance )
 		{
@@ -25,7 +26,7 @@ namespace DragonSpark.Activation
 	public sealed class DefaultServiceProvider : CompositeServiceProvider
 	{
 		public static IServiceProvider Instance { get; } = new DefaultServiceProvider();
-		DefaultServiceProvider() : base( new SourceInstanceServiceProvider( GlobalServiceProvider.Instance, Activator.Instance, Exports.Instance, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToSource(), LoggingController.Instance.ToSource(), Logging.Instance.ToSource() ), new InstanceServiceProvider( SingletonLocator.Instance ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
+		DefaultServiceProvider() : base( new SourceInstanceServiceProvider( GlobalServiceProvider.Instance, Activator.Instance, Exports.Instance, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.Scoped(), LoggingController.Instance.Scoped(), Logging.Instance.Scoped() ), new InstanceServiceProvider( SingletonLocator.Instance ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
 	}
 
 	public delegate object ServiceSource( Type serviceType );

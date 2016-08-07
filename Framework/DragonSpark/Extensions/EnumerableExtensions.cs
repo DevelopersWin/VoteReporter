@@ -150,6 +150,8 @@ namespace DragonSpark.Extensions
 			Array() : base( arg => new[] { arg } ) {}
 		}
 
+		public static IEnumerable<T> Yield<T>( this T @this ) => EnumerableEx.Return( @this );
+
 		public static TItem[] ToItem<TItem>( this TItem target ) where TItem : class => Array<TItem>.Default.Get( target );
 
 		public static IEnumerable<T> Append<T>( this T @this, params T[] second ) => @this.Append_( second );

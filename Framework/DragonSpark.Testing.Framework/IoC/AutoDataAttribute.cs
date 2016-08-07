@@ -22,6 +22,6 @@ namespace DragonSpark.Testing.Framework.IoC
 
 	public class IoCTypesAttribute : TypeProviderAttributeBase
 	{
-		public IoCTypesAttribute() : base( typeof(ServiceProviderFactory), typeof(DefaultUnityExtensions) ) {}
+		public IoCTypesAttribute() : base( typeof(ServiceProviderFactory), typeof(InitializeLocationCommand), typeof(DefaultUnityExtensions) ) {}
 	}
 }

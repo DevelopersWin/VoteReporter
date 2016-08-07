@@ -7,11 +7,12 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class TypeDefinitionProvider : FactoryCache<TypeInfo, TypeInfo>, ITypeDefinitionProvider
+	public sealed class TypeDefinitions : CachedParameterizedScope<TypeInfo, TypeInfo>
 	{
-		public static ISource<ITypeDefinitionProvider> Instance { get; } = new ExecutionScope<ITypeDefinitionProvider>( () => new TypeDefinitionProvider() );
-		TypeDefinitionProvider() {}
-		protected override TypeInfo Create( TypeInfo parameter )
+		public static IParameterizedSource<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitions();
+		TypeDefinitions() : base( Create ) {}
+
+		static TypeInfo Create( TypeInfo parameter )
 		{
 			foreach ( var provider in TypeSystem.Configuration.TypeDefinitionProviders.Get() )
 			{

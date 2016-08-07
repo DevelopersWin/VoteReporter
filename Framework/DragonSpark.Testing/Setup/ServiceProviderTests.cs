@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Objects;
 using Serilog;
@@ -44,7 +43,7 @@ namespace DragonSpark.Testing.Setup
 			Assert.Empty( system.Types );
 
 			var types = new[] { typeof(ClassFactory), typeof(Class) };
-			new ApplySystemPartsConfiguration( types ).Run();
+			new AssignSystemPartsCommand( types ).Run();
 
 			var after = DefaultServiceProvider.Instance.Get<SystemParts>();
 			Assert.NotEmpty( after.Assemblies );

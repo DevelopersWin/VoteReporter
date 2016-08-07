@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
@@ -13,46 +12,16 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using ServiceLocator = DragonSpark.Composition.ServiceLocator;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class ServiceProviderConfigurations : DragonSpark.Setup.ServiceProviderConfigurations
+	public class ServiceProviderConfigurations : Composition.ServiceProviderConfigurations
 	{
-		readonly Action<ServiceLocator> configure;
-
 		readonly static ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> Cache = 
-			new Cache<Type, ICache<ImmutableArray<Type>, IServiceProvider>>( o => new ArgumentCache<ImmutableArray<Type>, IServiceProvider>( types => Composition.ServiceProviderFactory.Instance.Get( DefaultServiceProvider.Instance ) ) );
+			new Cache<Type, ICache<ImmutableArray<Type>, IServiceProvider>>( o => new ArgumentCache<ImmutableArray<Type>, IServiceProvider>( types => DefaultServiceProviderSource.Instance.Create() ) );
 
 		public new static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
-
-		ServiceProviderConfigurations() : this( InitializeLocatorCommand.Instance.Execute ) {}
-
-		ServiceProviderConfigurations( Action<ServiceLocator> configure )
-		{
-			this.configure = configure;
-		}
-
-		protected override IServiceProvider GetProvider()
-		{
-			var result = Cache.Get( MethodContext.Instance.Get().DeclaringType ).Get( ApplicationTypes.Instance.Get() ) /*Composition.ServiceProviderFactory.Instance.Get( DefaultServiceProvider.Instance )*/;
-			var serviceLocator = result.Get<ServiceLocator>();
-			configure( serviceLocator );
-			return result;
-		}
-	}
-
-	[ApplyAutoValidation]
-	public class InitializeLocatorCommand : CommandBase<ServiceLocator>
-	{
-		public static InitializeLocatorCommand Instance { get; } = new InitializeLocatorCommand();
-		InitializeLocatorCommand()/* : base( ServiceCoercer<ServiceLocator>.Instance.Coerce )*/ {}
-
-		public override void Execute( ServiceLocator parameter )
-		{
-			Exports.Instance.Assign( new ExportProvider( parameter.Host ) );
-			RegisterServiceProviderCommand.Instance.Execute( parameter );
-		}
+		ServiceProviderConfigurations() : base( /*() => Cache.Get( MethodContext.Instance.Get().DeclaringType ).Get( ApplicationTypes.Instance.Get() )*/DefaultServiceProviderSource.Instance.Create ) {}
 	}
 
 	public sealed class Configure : TransformerBase<IServiceProvider>
@@ -62,7 +31,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		Configure() {}
 
 		public override IServiceProvider Get( IServiceProvider parameter ) => 
-			new CompositeServiceProvider( new SourceInstanceServiceProvider( FixtureContext.Instance, MethodContext.Instance ), new FixtureServiceProvider( FixtureContext.Instance.Value ), parameter );
+			new CompositeServiceProvider( new SourceInstanceServiceProvider( FixtureContext.Instance, MethodContext.Instance ), new FixtureServiceProvider( FixtureContext.Instance.Get() ), parameter );
 	}
 
 	public class ApplicationCommandsSource : DragonSpark.Setup.ApplicationCommandsSource
@@ -72,11 +41,8 @@ namespace DragonSpark.Testing.Framework.Setup
 		public static ApplicationCommandsSource Instance { get; } = new ApplicationCommandsSource();
 		ApplicationCommandsSource() : base( ServiceProviderConfigurations.Instance ) {}
 
-		protected override IEnumerable<ICommand> Yield()
-		{
-			var enumerable = base.Yield().Append( MetadataCommand.Instance ).Concat( Factory( MethodContext.Instance.Get() ).CastArray<ICommand>().AsEnumerable() ).ToArray();
-			return enumerable;
-		}
+		protected override IEnumerable<ICommand> Yield() => 
+			base.Yield().Append( MetadataCommand.Instance ).Concat( Factory( MethodContext.Instance.Get() ).CastArray<ICommand>().AsEnumerable() );
 	}
 
 	sealed class MethodTypes : FactoryCache<ImmutableArray<Type>>, ITypeSource

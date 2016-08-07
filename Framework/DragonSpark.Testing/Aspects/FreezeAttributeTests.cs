@@ -24,26 +24,26 @@ namespace DragonSpark.Testing.Aspects
 		/*[Fact]
 		public void Performance()
 		{
-			new PerformanceSupport( WriteLine, Cached, Raw ).Run();
+			new PerformanceSupport( WriteLine, ToCache, Raw ).Run();
 		}
 
-		class IsFactorySpecification : DragonSpark.Activation.IsFactorySpecification
+		class IsSourceSpecification : DragonSpark.Activation.IsSourceSpecification
 		{
-			public new static IsFactorySpecification Instance { get; } = new IsFactorySpecification();
+			public new static IsSourceSpecification Instance { get; } = new IsSourceSpecification();
 
-			IsFactorySpecification() : base( typeof(IFactory), typeof(IFactoryWithParameter) ) {}
+			IsSourceSpecification() : base( typeof(IFactory), typeof(IFactoryWithParameter) ) {}
 		}
 
 		[Fact]
 		public void Raw()
 		{
-			IsFactorySpecification.Instance.IsSatisfiedBy( typeof(Factory) );
+			IsSourceSpecification.Instance.IsSatisfiedBy( typeof(Factory) );
 		}
 
 		[Fact]
-		public void Cached()
+		public void ToCache()
 		{
-			DragonSpark.Activation.IsFactorySpecification.Instance.Get( typeof(Factory) );
+			DragonSpark.Activation.IsSourceSpecification.Instance.Get( typeof(Factory) );
 		}
 
 		class Factory : FactoryBase<string, DateTime>

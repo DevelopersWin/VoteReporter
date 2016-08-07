@@ -10,7 +10,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		public DecoratedSpecification( ISpecification inner ) : this( inner, Delegates<T>.Object ) {}
 
-		public DecoratedSpecification( ISpecification inner, Func<T, object> projection ) : this( inner, projection, Activation.Defaults<T>.Coercer ) {}
+		public DecoratedSpecification( ISpecification inner, Func<T, object> projection ) : this( inner, projection, Defaults<T>.Coercer ) {}
 		public DecoratedSpecification( ISpecification inner, Coerce<T> coercer ) : this( inner, Delegates<T>.Object, coercer ) {}
 		public DecoratedSpecification( ISpecification inner, Func<T, object> projection, Coerce<T> coercer ) : base( arg => inner.IsSatisfiedBy( arg.With( projection ) ), coercer ) {}
 	}
@@ -19,7 +19,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly Func<T, bool> @delegate;
 
-		public DelegatedSpecification( Func<T, bool> @delegate ) : this( @delegate, Activation.Defaults<T>.Coercer ) {}
+		public DelegatedSpecification( Func<T, bool> @delegate ) : this( @delegate, Defaults<T>.Coercer ) {}
 
 		public DelegatedSpecification( Func<T, bool> @delegate, Coerce<T> coercer ) : base( coercer )
 		{
@@ -38,7 +38,7 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class OncePerScopeSpecification<T> : ConditionMonitorSpecificationBase<T>
 	{
-		public OncePerScopeSpecification() : this( new ExecutionScope<ConditionMonitor>( () => new ConditionMonitor() ) ) {}
+		public OncePerScopeSpecification() : this( new CachedScope<ConditionMonitor>( () => new ConditionMonitor() ) ) {}
 
 		public OncePerScopeSpecification( ISource<ConditionMonitor> source ) : base( source.Wrap<T, ConditionMonitor>() ) {}
 	}
@@ -51,7 +51,11 @@ namespace DragonSpark.Runtime.Specifications
 			this.source = source;
 		}
 
-		public override bool IsSatisfiedBy( T parameter ) => source( parameter ).Apply();
+		public override bool IsSatisfiedBy( T parameter )
+		{
+			var conditionMonitor = source( parameter );
+			return conditionMonitor.Apply();
+		}
 	}
 
 	public class OnlyOnceSpecification : OnlyOnceSpecification<object> {}

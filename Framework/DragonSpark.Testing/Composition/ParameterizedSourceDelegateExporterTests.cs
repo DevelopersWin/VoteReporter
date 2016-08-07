@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Composition
 		public void Delegate()
 		{
 			var parts = typeof(Source);
-			new ApplySystemPartsConfiguration( parts ).Run();
+			new AssignSystemPartsCommand( parts ).Run();
 			var temp = ApplicationParts.Instance.Get().Types;
 			var container = new ContainerConfiguration().WithProvider( new ParameterizedSourceDelegateExporter() ).WithParts( parts ).CreateContainer();
 			var number = container.GetExport<Func<bool, int>>();
@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.Composition
 		public void Dependency()
 		{
 			var parts = typeof(Source).Append( typeof(WithDependency) ).ToArray();
-			new ApplySystemPartsConfiguration( parts ).Run();
+			new AssignSystemPartsCommand( parts ).Run();
 
 			var container = new ContainerConfiguration().WithProvider( new ParameterizedSourceDelegateExporter() ).WithParts( parts ).CreateContainer();
 			var dependency = container.GetExport<WithDependency>();

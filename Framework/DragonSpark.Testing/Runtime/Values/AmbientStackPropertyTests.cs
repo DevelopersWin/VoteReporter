@@ -10,7 +10,7 @@ namespace DragonSpark.Testing.Runtime.Values
 {
 	public class AmbientStackPropertyTests
 	{
-		readonly AmbientStackCache<Class> cache = new AmbientStackCache<Class>();
+		readonly Stacks<Class> cache = new Stacks<Class>();
 
 		/*IStack<Class> GetStack() => property.Get( Execution.Current );
 
@@ -23,8 +23,8 @@ namespace DragonSpark.Testing.Runtime.Values
 		{
 			var stack = new AmbientStack<Class>( cache );
 
-			var expected = stack.Value;
-			Assert.Same( expected, stack.Value );
+			var expected = stack.Get();
+			Assert.Same( expected, stack.Get() );
 
 			Assert.Null( stack.GetCurrentItem() );
 
@@ -43,43 +43,43 @@ namespace DragonSpark.Testing.Runtime.Values
 					{
 						Assert.Same( third, stack.GetCurrentItem() );
 
-						var chain = stack.Value.All();
+						var chain = stack.Get().All();
 						Assert.Equal( 3, chain.Length );
 						Assert.Same( chain.First(), third );
 						Assert.Same( chain.Last(), first );
 
 						var inside = new Class();
-						var appended = inside.Append( stack.Value.All().ToArray() ).ToArray();
+						var appended = inside.Append( stack.Get().All().ToArray() ).ToArray();
 						Assert.Equal( 4, appended.Length );
 						Assert.Same( appended.First(), inside );
 						Assert.Same( appended.Last(), first );
 
 						Task.Run( () =>
 						{
-							var thread = stack.Value;
-							Assert.Same( thread, stack.Value );
+							var thread = stack.Get();
+							Assert.Same( thread, stack.Get() );
 							Assert.NotSame( expected, thread );
-							Assert.Empty( stack.Value.All().ToArray() );
+							Assert.Empty( stack.Get().All().ToArray() );
 							var other = new Class();
 							using ( new AmbientStackCommand<Class>( stack ).Run( other ) )
 							{
 								Assert.Same( other, stack.GetCurrentItem() );
-								Assert.Single( stack.Value.All().ToArray(), other );
+								Assert.Single( stack.Get().All().ToArray(), other );
 							}
-							Assert.Same( thread, stack.Value );
+							Assert.Same( thread, stack.Get() );
 						} ).Wait();
 					}
 
 					Assert.Same( second, stack.GetCurrentItem() );
 				}
 
-				Assert.Single( stack.Value.All().ToArray(), first );
+				Assert.Single( stack.Get().All().ToArray(), first );
 				Assert.Same( first, stack.GetCurrentItem() );
 			}
 
 			Assert.Null( stack.GetCurrentItem() );
 
-			Assert.NotSame( expected, stack.Value );
+			Assert.NotSame( expected, stack.Get() );
 		} 
 	}
 }

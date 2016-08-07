@@ -48,7 +48,8 @@ namespace DragonSpark.Testing.Extensions
 			var count = sink.Events.Count();
 			Assert.True( count > initial );
 
-			Assert.Contains( MetadataTypeDefinitionProvider.Instance, DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Get() );
+			var typeDefinitionProviders = DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Get();
+			Assert.Contains( MetadataTypeDefinitionProvider.Instance, typeDefinitionProviders );
 
 			/*var levelSwitch = provider.Get<LoggingLevelSwitch>();
 			Assert.Same( levelSwitch, provider.Get<LoggingLevelSwitch>() );*/

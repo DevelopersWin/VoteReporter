@@ -19,9 +19,9 @@ namespace DragonSpark.Setup
 			this.activator = activator;
 		}
 
-		public T[] Create<T>() => Create( typeof(T) ).Cast<T>().ToArray();
+		public ImmutableArray<T> Create<T>() => ImmutableArray.CreateRange( Create( typeof(T) ).Cast<T>() );
 
-		public override Array Create( Type parameter ) => activator.ActivateMany<object>( parameter, types.ToArray() );
+		public override Array Create( Type parameter ) => activator.ActivateMany<object>( parameter, types.ToArray() ).ToArray();
 	}
 
 	/*[Persistent]

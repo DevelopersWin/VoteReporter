@@ -61,12 +61,12 @@ namespace DragonSpark.Testing.Aspects.Validation
 				Assert.True( can );
 			}
 
-			Assert.Equal( 2, sut.CanCreateCalled );
+			Assert.Equal( 11, sut.CanCreateCalled );
 
 			Assert.Equal( 0, sut.CreateCalled );
 
 			var created = factory.Create( 123 );
-			Assert.Equal( 2, sut.CanCreateCalled );
+			Assert.Equal( 11, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CreateCalled );
 			Assert.Equal( 6776, created );
 			sut.Reset();

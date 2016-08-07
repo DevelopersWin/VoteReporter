@@ -1,4 +1,5 @@
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
@@ -11,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {
@@ -93,16 +93,16 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 	public class HasConventionSpecification : GuardedSpecificationBase<Type>
 	{
-		readonly ICache<Type, Type> locator;
+		readonly Func<Type, Type> locator;
 
-		public HasConventionSpecification() : this( ConventionTypes.Instance.Get() ) {}
+		public HasConventionSpecification() : this( ConventionTypes.Instance.Get ) {}
 
-		HasConventionSpecification( ICache<Type, Type> locator )
+		HasConventionSpecification( Func<Type, Type> locator )
 		{
 			this.locator = locator;
 		}
 
-		public override bool IsSatisfiedBy( Type parameter ) => locator.Get( parameter ) != null;
+		public override bool IsSatisfiedBy( Type parameter ) => locator( parameter ) != null;
 	}
 
 	[Persistent]
@@ -184,9 +184,15 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 	public abstract class TypeRequestSpecificationBase<T> : GuardedSpecificationBase<TypeRequest> where T : TypeRequest
 	{
-		protected TypeRequestSpecificationBase() : base( TypeRequestCoercer<T>.Instance.ToDelegate() ) {}
+		readonly static Coerce<T> Coerce = TypeRequestCoercer<T>.Instance.ToDelegate();
+		protected TypeRequestSpecificationBase() : base( Coerce ) {}
 
-		public sealed override bool IsSatisfiedBy( TypeRequest parameter ) => parameter is T && IsSatisfiedBy( (T)parameter );
+		public sealed override bool IsSatisfiedBy( TypeRequest parameter )
+		{
+			var coerced = Coerce( parameter );
+			var result = coerced != null && IsSatisfiedBy( coerced );
+			return result;
+		}
 
 		public abstract bool IsSatisfiedBy( T parameter );
 	}

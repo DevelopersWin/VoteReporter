@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -21,16 +20,16 @@ namespace DragonSpark.Runtime
 		void Update();
 	}
 
-	public class AssignValueCommand<T> : DisposingCommand<T>
+	public class AssignCommand<T> : DisposingCommand<T>
 	{
 		readonly IAssignable<T> assignable;
 		readonly T current;
 
-		public AssignValueCommand( IWritableStore<T> store ) : this( store, store ) {}
+		public AssignCommand( IAssignableSource<T> store ) : this( store, store ) {}
 
-		public AssignValueCommand( IAssignable<T> assignable, IStore<T> store ) : this( assignable, store.Value ) {}
+		public AssignCommand( IAssignable<T> assignable, ISource<T> store ) : this( assignable, store.Get() ) {}
 
-		public AssignValueCommand( IAssignable<T> assignable, [Optional]T current )
+		public AssignCommand( IAssignable<T> assignable, [Optional]T current )
 		{
 			this.assignable = assignable;
 			this.current = current;
@@ -173,12 +172,20 @@ namespace DragonSpark.Runtime
 		public override void Execute( T parameter ) => command.Execute( projection( parameter ) );
 	}
 
+	public class DecoratedCommand : DecoratedCommand<object>
+	{
+		public DecoratedCommand( ICommand<object> inner ) : base( inner ) {}
+		public DecoratedCommand( ICommand<object> inner, Coerce<object> coercer ) : base( inner, coercer ) {}
+		public DecoratedCommand( ICommand<object> inner, ISpecification<object> specification ) : base( inner, specification ) {}
+		public DecoratedCommand( ICommand<object> inner, Coerce<object> coercer, ISpecification<object> specification ) : base( inner, coercer, specification ) {}
+	}
+
 	public class DecoratedCommand<T> : DelegatedCommand<T>
 	{
-		public DecoratedCommand( [Required] ICommand<T> inner ) : this( inner, Defaults<T>.Coercer ) {}
-		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer ) : this( inner, coercer, inner.ToSpecification() ) {}
-		public DecoratedCommand( [Required] ICommand<T> inner, ISpecification<T> specification ) : this( inner, Defaults<T>.Coercer, specification ) {}
-		public DecoratedCommand( [Required] ICommand<T> inner, Coerce<T> coercer, ISpecification<T> specification ) : base( inner.ToDelegate(), coercer, specification ) {}
+		public DecoratedCommand( ICommand<T> inner ) : this( inner, Defaults<T>.Coercer ) {}
+		public DecoratedCommand( ICommand<T> inner, Coerce<T> coercer ) : this( inner, coercer, inner.ToSpecification() ) {}
+		public DecoratedCommand( ICommand<T> inner, ISpecification<T> specification ) : this( inner, Defaults<T>.Coercer, specification ) {}
+		public DecoratedCommand( ICommand<T> inner, Coerce<T> coercer, ISpecification<T> specification ) : base( inner.ToDelegate(), coercer, specification ) {}
 	}
 
 	/*public class AutoValidatingCommand<T> : ICommand<T>
@@ -245,7 +252,7 @@ namespace DragonSpark.Runtime
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
-		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( parameter );
+		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
 
 		void ICommand.Execute( object parameter ) => Execute( coercer( parameter ) );
 

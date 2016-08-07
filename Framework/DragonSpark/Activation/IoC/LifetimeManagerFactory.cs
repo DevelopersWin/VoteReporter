@@ -21,7 +21,7 @@ namespace DragonSpark.Activation.IoC
 
 	class AttributedLifetimeFactory : FactoryBase<Type, Type>
 	{
-		public static ICache<Type, Type> Instance { get; } = new AttributedLifetimeFactory().Cached();
+		public static ICache<Type, Type> Instance { get; } = new AttributedLifetimeFactory().ToCache();
 			
 		public override Type Create( Type parameter ) => 
 			parameter

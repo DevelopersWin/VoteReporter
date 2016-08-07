@@ -29,5 +29,3 @@ using System.Runtime.InteropServices;
 [assembly: ApplyDefaultValues]
 [assembly: DisposeAssociatedAspect]
 [assembly: TestingMethodAspect]
-
-// [assembly: InternalsVisibleTo( "DynamicProxyGenAssembly2" )]

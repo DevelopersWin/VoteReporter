@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	/*public sealed class Assemblies : ExecutionScope<ITypeSource>
+	/*public sealed class Assemblies : CurrentExecutionScope<ITypeSource>
 	{
 		public static Assemblies Instance { get; } = new Assemblies();
 		Assemblies() : base( ApplicationTypesBase.Instance.Get() ) {}

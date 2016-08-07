@@ -1,23 +1,21 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
-using DragonSpark.Configuration;
-using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
-using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
+using InitializeLocationCommand = DragonSpark.Composition.InitializeLocationCommand;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -55,17 +53,17 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public sealed class ApplicationInitializer : CommandBase<MethodBase>
 	{
-		public static IConfiguration<ApplicationInitializer> Instance { get; } = new Configuration<ApplicationInitializer>( () => new ApplicationInitializer() );
+		public static IScope<ApplicationInitializer> Instance { get; } = new CachedScope<ApplicationInitializer>( () => new ApplicationInitializer() );
 		ApplicationInitializer() {}
 
 		public override void Execute( MethodBase parameter )
 		{
 			MethodContext.Instance.Assign( parameter );
-			Disposables.Instance.Value.Add( ExecutionContext.Instance.Get() );
+			Disposables.Instance.Get().Add( ExecutionContext.Instance.Get() );
 		}
 	}
 
-	public sealed class FixtureContext : Configuration<IFixture>
+	public sealed class FixtureContext : CachedScope<IFixture>
 	{
 		public static FixtureContext Instance { get; } = new FixtureContext();
 		FixtureContext() {}
@@ -73,7 +71,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class FrameworkTypesAttribute : TypeProviderAttributeBase
 	{
-		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(MetadataCommand) ) {}
+		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(InitializeLocationCommand), typeof(MetadataCommand) ) {}
 	}
 
 	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Method )]
@@ -143,11 +141,6 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		protected CommandAttributeBase( ICommand command ) : this( command.Cast<AutoData>() ) {}
 		protected CommandAttributeBase( ICommand<AutoData> command ) : base( command.Wrap() ) {}
-	}
-
-	public class MinimumLevel : CommandAttributeBase
-	{
-		public MinimumLevel( LogEventLevel level ) : base( MinimumLevelConfiguration.Instance.From( level ).Cast<AutoData>().WithPriority( Priority.BeforeNormal ) ) {}
 	}
 
 	[ApplyAutoValidation]
