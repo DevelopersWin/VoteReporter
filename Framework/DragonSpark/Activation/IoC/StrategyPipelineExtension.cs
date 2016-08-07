@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation.IoC.Specifications;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -187,43 +188,48 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public sealed class ConventionTypes : FactoryCache<Type, Type>
+	public sealed class ConventionTypes : CachedParameterizedScope<Type, Type>
 	{
 		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
-		readonly static Func<Type, bool> Specification = Defaults.ActivateSpecification.ToDelegate();
+		readonly static Func<Type, bool> Specification = Defaults.ActivateSpecification.IsSatisfiedBy;
 
-		public static ISource<ICache<Type, Type>> Instance { get; } = new ExecutionScope<ICache<Type, Type>>( () => new ConventionTypes() );
+		public static IParameterizedSource<Type, Type> Instance { get; } = new ConventionTypes();
 		ConventionTypes() : this( ApplicationTypes.Instance ) {}
 
-		readonly ImmutableArray<Type> types;
+		public ConventionTypes( ITypeSource source ) : base( new Locator( source ).Create ) {}
 
-		public ConventionTypes( ITypeSource source ) : this( source.Get().Where( Specification ).ToImmutableArray() ) {}
-
-		ConventionTypes( ImmutableArray<Type> types ) : base( CanInstantiateSpecification.Instance.Inverse() )
+		[ApplyAutoValidation]
+		sealed class Locator : FactoryBase<Type, Type>
 		{
-			this.types = types;
-		}
+			readonly ITypeSource source;
 
-		protected override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
+			public Locator( ITypeSource source ) : base( CanInstantiateSpecification.Instance.Inverse() )
+			{
+				this.source = source;
+			}
 
-		static Type Map( Type parameter )
-		{
-			var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
-			var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
-			return result;
-		}
+			static Type Map( Type parameter )
+			{
+				var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
+				var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
+				return result;
+			}
 
-		Type Search( Type parameter )
-		{
-			var adapter = parameter.Adapt();
-			var order = Weight( parameter );
-			var convention = new IsConventionCandidateSpecification( parameter );
-			var result =
-				types
-					.Where( adapter.IsAssignableFrom )
-					.OrderByDescending( order.GetWeight )
-					.FirstOrDefault( convention.IsSatisfiedBy );
-			return result;
+			Type Search( Type parameter )
+			{
+				var adapter = parameter.Adapt();
+				var order = Weight( parameter );
+				var convention = IsConventionCandidateSpecification.Default.Get( parameter );
+				var result =
+						source.Get()
+						.Where( adapter.IsAssignableFrom )
+						.Where( Specification )
+						.OrderByDescending( order.GetWeight )
+						.FirstOrDefault( convention );
+				return result;
+			}
+
+			public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
 		}
 	}
 
@@ -231,9 +237,11 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly static Func<Type, string> Sanitizer = ConventionCandidateNameFactory.Instance.ToDelegate();
 
+		public static IParameterizedSource<Type, Func<Type, bool>> Default { get; } = new Cache<Type, Func<Type, bool>>( t => new IsConventionCandidateSpecification( t ).IsSatisfiedBy );
+		IsConventionCandidateSpecification( Type type ) : this( type, Sanitizer ) {}
+
 		readonly string type;
 
-		public IsConventionCandidateSpecification( Type type ) : this( type, Sanitizer ) {}
 		public IsConventionCandidateSpecification( Type type, Func<Type, string> sanitizer ) : this( sanitizer( type ) ) {}
 		IsConventionCandidateSpecification( string type )
 		{
@@ -359,11 +367,12 @@ namespace DragonSpark.Activation.IoC
 			}
 		}
 
-		public class ConventionCandidates : Cache<Type, Type>
+		public class ConventionCandidates : FactoryCache<Type, Type>
 		{
-			static ISpecification<Type> Specification { get; } = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
+			readonly static ISpecification<Type> Specification = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
 
-			public ConventionCandidates() : base( new DelegatedFactory<Type, Type>( ConventionTypes.Instance.Get().Get, Specification ).Create ) {}
+			public ConventionCandidates() : base( Specification ) {}
+			protected override Type Create( Type parameter ) => ConventionTypes.Instance.Get( parameter );
 		}
 	}
 }

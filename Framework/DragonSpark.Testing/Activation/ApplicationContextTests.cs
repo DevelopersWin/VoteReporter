@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
@@ -18,24 +19,28 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void Assignment()
 		{
-			var current = Assert.IsType<TaskContext>( Execution.Current() );
+			var before = Execution.Current();
+			var current = Assert.IsType<TaskContext>( before );
 			Assert.Same( ExecutionContext.Instance.Get(), current );
 			Assert.Equal( Identification.Instance.Value, current.Origin );
 			Assert.Null( MethodContext.Instance.Get() );
 			Assert.True( EnableMethodCaching.Instance.Get() );
 
 			var method = MethodBase.GetCurrentMethod();
-			using ( ApplicationFactory.Instance.Create( method ).Run( new AutoData( FixtureContext.Instance.Assigned( FixtureFactory<AutoDataCustomization>.Instance.Create() ), method ) ) )
+			object inner;
+			using ( ApplicationFactory.Instance.Create( method ).Run( new AutoData( FixtureContext.Instance.Assigned( FixtureFactory<AutoDataCustomization>.Instance.Create ), method ) ) )
 			{
 				Assert.NotNull( MethodContext.Instance.Get() );
 				Assert.Same( method, MethodContext.Instance.Get() );
-				Assert.Same( current, Execution.Current() );
+				inner = Execution.Current();
+				Assert.Same( current, inner );
 				Assert.False( EnableMethodCaching.Instance.Get() );
 			}
 
-			var context = Execution.Current();
-			Assert.NotNull( context );
-			Assert.NotSame( current, context );
+			var after = Execution.Current();
+			Assert.NotNull( after );
+			Assert.NotSame( inner, after );
+			Assert.NotSame( current, after );
 
 			Assert.Null( MethodContext.Instance.Get() );
 
@@ -45,7 +50,7 @@ namespace DragonSpark.Testing.Activation
 		[Export( typeof(ISetup) )]
 		class Setup : DragonSpark.Setup.Setup
 		{
-			public Setup() : base( EnableMethodCaching.Instance.From( false ) ) {}
+			public Setup() : base( EnableMethodCaching.Instance.Configured( false ) ) {}
 		}
 	}
 }

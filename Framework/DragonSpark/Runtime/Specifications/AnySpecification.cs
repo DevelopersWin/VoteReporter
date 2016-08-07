@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -7,8 +7,25 @@ namespace DragonSpark.Runtime.Specifications
 		public AnySpecification( params ISpecification<object>[] specifications ) : base( specifications ) {}
 	}
 
-	public class AnySpecification<T> : CompositeSpecification<T>
+	public class AnySpecification<T> : GuardedSpecificationBase<T>
 	{
-		public AnySpecification( params ISpecification<T>[] specifications ) : base( specifications.Any ) {}
+		readonly ImmutableArray<ISpecification<T>> specifications;
+
+		public AnySpecification( params ISpecification<T>[] specifications )
+		{
+			this.specifications = specifications.ToImmutableArray();
+		}
+
+		public override bool IsSatisfiedBy( T parameter )
+		{
+			foreach ( var specification in specifications )
+			{
+				if ( specification.IsSatisfiedBy( parameter ) )
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }

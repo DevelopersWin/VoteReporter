@@ -21,7 +21,7 @@ namespace DragonSpark.Diagnostics
 
 		public RetryCommand( int maximumRetryAttempts ) : this( TimeSpan.FromSeconds( 1 ), maximumRetryAttempts ) {}
 
-		public RetryCommand( TimeSpan wait, int maximumRetryAttempts ) : this( Logging.Instance.ToSource().Get(), wait, maximumRetryAttempts ) {}
+		public RetryCommand( TimeSpan wait, int maximumRetryAttempts ) : this( Logging.Instance.Scoped().Get(), wait, maximumRetryAttempts ) {}
 
 		public RetryCommand( ILogger logger, TimeSpan wait, int maximumRetryAttempts )
 		{

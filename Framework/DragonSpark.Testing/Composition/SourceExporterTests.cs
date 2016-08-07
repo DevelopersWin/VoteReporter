@@ -2,7 +2,7 @@
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Stores;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using System.Composition;
 using System.Composition.Hosting;
@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Composition
 		public void BasicExport()
 		{
 			var parts = typeof(Source);
-			new ApplySystemPartsConfiguration( parts ).Run();
+			new AssignSystemPartsCommand( parts ).Run();
 
 			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
 			var number = container.GetExport<int>();
@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Composition
 		public void Parameterized()
 		{
 			var parts = typeof(Source).Append( typeof(ParameterizedSource), typeof(Result) ).ToArray();
-			new ApplySystemPartsConfiguration( parts ).Run();
+			new AssignSystemPartsCommand( parts ).Run();
 
 			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
 			var dependency = container.GetExport<Result>();
@@ -39,7 +39,7 @@ namespace DragonSpark.Testing.Composition
 		public void Dependency()
 		{
 			var parts = typeof(Source).Append( typeof(WithDependency) ).ToArray();
-			new ApplySystemPartsConfiguration( parts ).Run();
+			new AssignSystemPartsCommand( parts ).Run();
 
 			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
 			var dependency = container.GetExport<WithDependency>();
@@ -50,7 +50,7 @@ namespace DragonSpark.Testing.Composition
 		public void ParameterizedDependency()
 		{
 			var parts = typeof(Source).Append( typeof(WithDependency) ).ToArray();
-			new ApplySystemPartsConfiguration( parts ).Run();
+			new AssignSystemPartsCommand( parts ).Run();
 
 			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
 			var dependency = container.GetExport<WithDependency>();
@@ -61,7 +61,7 @@ namespace DragonSpark.Testing.Composition
 		public void Shared()
 		{
 			var parts = typeof(SharedCounter);
-			new ApplySystemPartsConfiguration( parts ).Run();
+			new AssignSystemPartsCommand( parts ).Run();
 
 			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
 			Assert.Equal( 1, container.GetExport<int>() );
@@ -72,14 +72,32 @@ namespace DragonSpark.Testing.Composition
 		public void PerRequest()
 		{
 			var parts = typeof(Counter);
-			new ApplySystemPartsConfiguration( parts ).Run();
+			new AssignSystemPartsCommand( parts ).Run();
 
 			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
 			Assert.Equal( 1, container.GetExport<int>() );
 			Assert.Equal( 2, container.GetExport<int>() );
 		}
 
-		class Count : Configuration<int>
+		[Fact]
+		public void One()
+		{
+			var parts = typeof(Counter);
+			new AssignSystemPartsCommand( parts ).Run();
+			var type = ResultTypes.Instance.Get( parts );
+			Assert.Equal( typeof(int), type );
+		}
+
+		[Fact]
+		public void Two()
+		{
+			var parts = typeof(SharedCounter);
+			new AssignSystemPartsCommand( parts ).Run();
+			var type = ResultTypes.Instance.Get( parts );
+			Assert.Equal( typeof(int), type );
+		}
+
+		class Count : CachedScope<int>
 		{
 			public static Count Instance { get; } = new Count();
 			Count() {}
@@ -110,13 +128,13 @@ namespace DragonSpark.Testing.Composition
 		[Export]
 		class Counter : SourceBase<int>
 		{
-			public override int Get() => Count.Instance.Assigned( Count.Instance.Value + 1 );
+			public override int Get() => Count.Instance.Assigned( Count.Instance.Get() + 1 );
 		}
 
 		[Export, Shared]
 		class SharedCounter : SourceBase<int>
 		{
-			public override int Get() => Count.Instance.Assigned( Count.Instance.Value + 1 );
+			public override int Get() => Count.Instance.Assigned( Count.Instance.Get() + 1 );
 		}
 
 		[Export]

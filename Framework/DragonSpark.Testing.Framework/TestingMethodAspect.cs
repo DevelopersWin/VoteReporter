@@ -19,8 +19,8 @@ namespace DragonSpark.Testing.Framework
 
 			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
 
-			var disposable = (IDisposable)ApplicationServices.Instance.Value ?? ExecutionContext.Instance.Get();
-			 args.ReturnValue = Defer.Run( disposable.Dispose, args.ReturnValue );
+			var disposable = (IDisposable)ApplicationServices.Instance.Get() ?? ExecutionContext.Instance.Get();
+			args.ReturnValue = Defer.Run( disposable.Dispose, args.ReturnValue );
 		}
 	}
 

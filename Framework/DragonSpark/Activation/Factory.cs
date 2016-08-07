@@ -16,18 +16,20 @@ using Type = System.Type;
 
 namespace DragonSpark.Activation
 {
-	public sealed class IsFactorySpecification : AdapterSpecificationBase
+	public sealed class IsSourceSpecification : AdapterSpecificationBase
 	{
-		public static ISpecification<Type> Instance { get; } = new IsFactorySpecification().Cached();
-		IsFactorySpecification() : base( typeof(ISource), typeof(IParameterizedSource), typeof(IFactory), typeof(IFactoryWithParameter) ) {}
+		public static ISpecification<Type> Instance { get; } = new IsSourceSpecification().Cached();
+		IsSourceSpecification() : base( typeof(ISource<>), typeof(ISource), typeof(IFactory<>), typeof(IFactory) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
 	}
 
-	public sealed class IsGenericSourceSpecification : AdapterSpecificationBase
+	//public sealed class AllKnownSources
+
+	public sealed class IsParameterizedSourceSpecification : AdapterSpecificationBase
 	{
-		public static ISpecification<Type> Instance { get; } = new IsGenericSourceSpecification().Cached();
-		IsGenericSourceSpecification() : base( typeof(ISource<>), typeof(IParameterizedSource<>), typeof(IFactory<>), typeof(IFactory<,>) ) {}
+		public static ISpecification<Type> Instance { get; } = new IsParameterizedSourceSpecification().Cached();
+		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>), typeof(IParameterizedSource), typeof(IFactory<,>), typeof(IFactoryWithParameter) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );
 	}
@@ -46,19 +48,18 @@ namespace DragonSpark.Activation
 
 	public sealed class SourceInterfaces : FactoryCache<Type, Type>
 	{
-		readonly static Func<Type, bool> GenericFactory = IsGenericSourceSpecification.Instance.ToDelegate();
-		readonly static Func<Type, bool> Factory = IsFactorySpecification.Instance.ToDelegate();
+		readonly static Func<Type, bool> Specification = Defaults.KnownSourcesSpecification.IsSatisfiedBy;
 
 		public static ICache<Type, Type> Instance { get; } = new SourceInterfaces();
 		SourceInterfaces() {}
 
-		protected override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().With( types => types.FirstOrDefault( GenericFactory ) ?? types.FirstOrDefault( Factory ) );
+		protected override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().FirstOrDefault( Specification );
 	}
 
 	public sealed class ParameterTypes : TypeLocatorBase
 	{
 		public static ICache<Type, Type> Instance { get; } = new ParameterTypes();
-		ParameterTypes() : base( ImmutableArray.Create( typeof(Func<,>), typeof(IParameterizedSource<,>), typeof(IFactory<,>), typeof(ICommand<>) ) ) {}
+		ParameterTypes() : base( typeof(Func<,>), typeof(IParameterizedSource<,>), typeof(IFactory<,>), typeof(ICommand<>) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.First();
 	}
@@ -66,7 +67,7 @@ namespace DragonSpark.Activation
 	public sealed class ResultTypes : TypeLocatorBase
 	{
 		public static ICache<Type, Type> Instance { get; } = new ResultTypes();
-		ResultTypes() : base( ImmutableArray.Create( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) ) {}
+		ResultTypes() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
@@ -77,7 +78,7 @@ namespace DragonSpark.Activation
 		readonly Func<TypeInfo, bool> isAssignable;
 		readonly Func<Type[], Type> selector;
 
-		protected TypeLocatorBase( ImmutableArray<Type> types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
+		protected TypeLocatorBase( params Type[] types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
 		TypeLocatorBase( ImmutableArray<TypeAdapter> adapters )
 		{
@@ -121,7 +122,7 @@ namespace DragonSpark.Activation
 
 	public sealed class SourceTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
-		public static ISource<SourceTypes> Instance { get; } = new ExecutionScope<SourceTypes>( () => new SourceTypes() );
+		public static ISource<SourceTypes> Instance { get; } = new CachedScope<SourceTypes>( () => new SourceTypes() );
 		SourceTypes() : base( new Factory().Create ) {}
 		
 		sealed class Factory :  FactoryBase<LocateTypeRequest, Type>
@@ -156,7 +157,7 @@ namespace DragonSpark.Activation
 				readonly static Func<Type, Type> Results = ResultTypes.Instance.ToDelegate();
 
 				public static Requests Instance { get; } = new Requests();
-				Requests() : base( CanInstantiateSpecification.Instance.And( IsFactorySpecification.Instance, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
+				Requests() : base( CanInstantiateSpecification.Instance.And( Defaults.KnownSourcesSpecification, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
 				public override FactoryTypeRequest Create( Type parameter ) => 
 					new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );

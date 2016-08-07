@@ -66,12 +66,12 @@ namespace DragonSpark.Aspects
 
 		public ThreadCacheContext( Func<ThreadCache> create ) : this( create, AmbientStack<ThreadCache>.Default ) {}
 
-		public ThreadCacheContext( Func<ThreadCache> create, AmbientStack<ThreadCache> stack  )
+		public ThreadCacheContext( Func<ThreadCache> create, IStackSource<ThreadCache> stack  )
 		{
 			var item = stack.GetCurrentItem() == null ? create() : null;
 			if ( item != null )
 			{
-				this.stack = stack.Value;
+				this.stack = stack.Get();
 				this.stack.Push( item );
 			}
 		}

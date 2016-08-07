@@ -90,7 +90,7 @@ namespace DragonSpark.Aspects.Validation
 
 	public interface IAutoValidationController
 	{
-		bool? IsValid( object parameter );
+		bool IsValid( object parameter );
 
 		void MarkValid( object parameter, bool valid );
 
@@ -140,14 +140,15 @@ namespace DragonSpark.Aspects.Validation
 
 		IParameterAwareHandler Handler { get; set; }
 
-		public bool? IsValid( object parameter )
+		public bool IsValid( object parameter )
 		{
-			if ( Handler != null && Handler.Handles( parameter ) )
+			return Handler?.Handles( parameter ) ?? false;
+			/*if ( Handler != null && Handler.Handles( parameter ) )
 			{
 				return true;
-			}
+			}*/
 
-			return Current( parameter );
+			// return Current( parameter );
 		}
 
 		bool? Current( object parameter )

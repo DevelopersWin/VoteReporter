@@ -1,10 +1,10 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using System;
@@ -18,12 +18,12 @@ namespace DragonSpark.TypeSystem
 {
 	public static class Configuration
 	{
-		public static IParameterizedConfiguration<string, ImmutableArray<string>> AssemblyPathLocator { get; } = new ConfigurableStore<string, ImmutableArray<string>>( path => Items<string>.Immutable );
+		public static IParameterizedScope<string, ImmutableArray<string>> AssemblyPathLocator { get; } = new CachedParameterizedScope<string, ImmutableArray<string>>( path => Items<string>.Immutable ).ScopedWithDefault();
 
-		public static IParameterizedConfiguration<string, Assembly> AssemblyLoader { get; } = new ConfigurableStore<string, Assembly>( path => default(Assembly) );
+		public static IParameterizedScope<string, Assembly> AssemblyLoader { get; } = new CachedParameterizedScope<string, Assembly>( path => default(Assembly) ).ScopedWithDefault();
 
-		public static IConfiguration<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = 
-			new Configuration<ImmutableArray<ITypeDefinitionProvider>>( () => TypeDefinitionProviderStore.Instance.Value );
+		public static IScope<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = 
+			new CachedScope<ImmutableArray<ITypeDefinitionProvider>>( () => TypeDefinitionProviderStore.Instance.Get() );
 	}
 
 	public abstract class PartsBase : FactoryCache<Assembly, ImmutableArray<Type>>
@@ -39,7 +39,8 @@ namespace DragonSpark.TypeSystem
 			this.locator = locator;
 		}
 
-		protected override ImmutableArray<Type> Create( Assembly parameter ) => locator( parameter ).Select( source ).Concat().ToImmutableArray();
+		protected override ImmutableArray<Type> Create( Assembly parameter ) => 
+			locator( parameter ).Select( source ).Concat().ToImmutableArray();
 	}
 
 	public class AssemblyLoader : ParameterizedSourceBase<string, ImmutableArray<Assembly>>
@@ -171,7 +172,7 @@ namespace DragonSpark.TypeSystem
 		TypesFactory() : base( array => array.ToArray().SelectMany( All ).ToImmutableArray() ) {}
 	}
 
-	public class AssemblyBasedTypeSource : CachedDelegatedSource<ImmutableArray<Type>>, ITypeSource
+	public class AssemblyBasedTypeSource : FixedDeferedSource<ImmutableArray<Type>>, ITypeSource
 	{
 		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
 

@@ -11,7 +11,7 @@ namespace DragonSpark.Runtime
 		public DateTimeOffset Now => DateTimeOffset.Now;
 	}
 
-	public sealed class CurrentTimeConfiguration : Configuration<ICurrentTime>
+	public sealed class CurrentTimeConfiguration : CachedScope<ICurrentTime>
 	{
 		public static CurrentTimeConfiguration Instance { get; } = new CurrentTimeConfiguration();
 		CurrentTimeConfiguration() : base( () => CurrentTime.Default ) {}

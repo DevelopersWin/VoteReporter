@@ -269,7 +269,7 @@ namespace DragonSpark.Runtime
 
 	class Invoker : FactoryBase<Delegate, IDelegateInvoker>
 	{
-		public static ICache<Delegate, IDelegateInvoker> Default { get; } = new Invoker().Cached();
+		public static ICache<Delegate, IDelegateInvoker> Default { get; } = new Invoker().ToCache();
 
 		readonly static IDictionary<Type, Type> Mappings = new Dictionary<Type, Type>
 														   {

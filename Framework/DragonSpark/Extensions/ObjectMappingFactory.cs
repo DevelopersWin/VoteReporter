@@ -6,7 +6,7 @@ namespace DragonSpark.Extensions
 {
 	public class ObjectMappingFactory<T> : FactoryBase<ObjectMappingParameter<T>, T> where T : class
 	{
-		public static ISource<ObjectMappingFactory<T>> Default { get; } = new ExecutionScope<ObjectMappingFactory<T>>( () => new ObjectMappingFactory<T>( Activator.Instance.Get() ) );
+		public static ISource<ObjectMappingFactory<T>> Default { get; } = new CachedScope<ObjectMappingFactory<T>>( () => new ObjectMappingFactory<T>( Activator.Instance.Get() ) );
 
 		readonly IActivator locator;
 
@@ -31,9 +31,6 @@ namespace DragonSpark.Extensions
 				parameter.Configuration?.Invoke( map );
 				
 			} );
-			// configuration.FindTypeMapFor( sourceType, destinationType ).DestinationCtor = x => 
-
-			// configuration.To<IProfileExpression>().CreateMissingTypeMaps = true;
 
 			var result = configuration.CreateMapper().Map( parameter.Source, sourceType, destinationType );
 			return (T)result;

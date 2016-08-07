@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Setup;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -131,15 +130,18 @@ namespace DragonSpark.Aspects.Validation
 			public override void OnInvoke( MethodInterceptionArgs args )
 			{
 				var parameter = args.Arguments[0];
-				var valid = controller.IsValid( parameter );
-				if ( !valid.HasValue )
+				//var valid = controller.IsValid( parameter );
+				var valid = controller.IsValid( parameter ) || args.GetReturnValue<bool>();
+				controller.MarkValid( parameter, valid );
+				args.ReturnValue = valid;
+				/*if ( !valid.HasValue )
 				{
 					controller.MarkValid( parameter, args.GetReturnValue<bool>() );
 				}
 				else
 				{
 					args.ReturnValue = valid.Value;
-				}
+				}*/
 			}
 		}
 	}

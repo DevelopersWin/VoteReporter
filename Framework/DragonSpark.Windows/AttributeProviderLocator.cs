@@ -16,6 +16,6 @@
 	/*class MemberInfoProviderFactory : DragonSpark.TypeSystem.MemberInfoProviderFactory
 	{
 		public new static ICache<object, IAttributeProvider> Instance { get; } = new MemberInfoProviderFactory();
-		MemberInfoProviderFactory() : base( TypeDefinitionProvider.Instance.ToDelegate() ) {}
+		MemberInfoProviderFactory() : base( TypeDefinitions.Instance.ToDelegate() ) {}
 	}*/
 }

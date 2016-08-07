@@ -295,7 +295,7 @@ namespace DragonSpark.Windows.Entity
 				var result = names.Select( name =>
 				{
 					var info = container.GetType().GetProperty( name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy );
-					var value = typeof(TEntity).GetProperty( name ).From<ForeignKeyAttribute, object>( y =>
+					var value = AttributeProviderExtensions.From<ForeignKeyAttribute, object>( typeof(TEntity).GetProperty( name ), y =>
 					{
 						var propertyInfo = container.GetType().GetProperty( y.Name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy );
 						var o = propertyInfo.GetValue( container );

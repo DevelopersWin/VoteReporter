@@ -40,6 +40,7 @@
     <Compile Include="Activation\IoC\StrategyEntryCollection.cs" />
     <Compile Include="Activation\IoC\UnityContainerFactory.cs" />
     <Compile Include="Activation\ParameterAware.cs" />
+    <Compile Include="Activation\ScopeBase.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Activation\Factory.cs" />
     <Compile Include="Activation\IExecutionContextSource.cs" />
@@ -75,7 +76,8 @@
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
     <Compile Include="Composition\SingletonExportDescriptorProvider.cs" />
     <Compile Include="Configuration\Configuration.cs" />
-    <Compile Include="Configuration\ConfigureCommand.cs" />
+    <Compile Include="Configuration\IConfiguration.cs" />
+    <Compile Include="Configuration\IParameterizedConfiguration.cs" />
     <Compile Include="Configuration\Store.cs" />
     <Compile Include="Diagnostics\Configuration.cs" />
     <Compile Include="Configuration\Registration.cs" />
@@ -105,6 +107,8 @@
     <Compile Include="Runtime\ISource.cs" />
     <Compile Include="Runtime\Properties\WeakList.cs" />
     <Compile Include="Runtime\PurgingCollection.cs" />
+    <Compile Include="Runtime\Sources\ScopeExtensions.cs" />
+    <Compile Include="Runtime\Sources\Scoping.cs" />
     <Compile Include="Runtime\Wrapped.cs" />
     <Compile Include="Runtime\IRepository.cs" />
     <Compile Include="Runtime\ISerializer.cs" />

@@ -50,12 +50,9 @@ namespace DragonSpark.Setup.Registration
 	{
 		readonly Func<Type, ISource> source;
 
-		/*public static SourceDelegates Instance { get; } = new SourceDelegates();
-		SourceDelegates() : this( Activator.Instance.Delegate<ISource>() ) {}*/
-
 		public SourceDelegates( Func<IServiceProvider> source ) : this( source.Delegate<ISource>() ) {}
 
-		SourceDelegates( Func<Type, ISource> source ) : base( TypeAssignableSpecification<ISource>.Instance )
+		SourceDelegates( Func<Type, ISource> source ) : base( IsSourceSpecification.Instance )
 		{
 			this.source = source;
 		}
@@ -65,19 +62,16 @@ namespace DragonSpark.Setup.Registration
 
 	public class ParameterizedSourceDelegates : FactoryCache<Type, Func<object, object>>
 	{
-		/*public static ParameterizedSourceDelegates Instance { get; } = new ParameterizedSourceDelegates();
-		ParameterizedSourceDelegates() : this( GlobalServiceProvider.GetService<IParameterizedSource> ) {}*/
-
 		readonly Func<Type, IParameterizedSource> source;
 
 		public ParameterizedSourceDelegates( Func<IServiceProvider> source ) : this( source.Delegate<IParameterizedSource>() ) {}
 
-		ParameterizedSourceDelegates( Func<Type, IParameterizedSource> source ) : base( TypeAssignableSpecification<IParameterizedSource>.Instance )
+		ParameterizedSourceDelegates( Func<Type, IParameterizedSource> source ) : base( IsParameterizedSourceSpecification.Instance )
 		{
 			this.source = source;
 		}
 
-		protected override Func<object, object> Create( Type parameter ) => source( parameter ).ToDelegate();
+		protected override Func<object, object> Create( Type parameter ) => source( parameter ).Get;
 	}
 
 	public class ServiceProvidedParameterizedSourceDelegates : FactoryCache<Type, Func<object>>
@@ -96,7 +90,7 @@ namespace DragonSpark.Setup.Registration
 		protected override Func<object> Create( Type parameter )
 		{
 			var factory = factorySource( parameter );
-			var result = factory != null ? new Factory( factory, new FixedFactory<Type, object>( parameterSource, ParameterTypes.Instance.Get( parameter ) ).Create ).ToDelegate() : null;
+			var result = factory != null ? new Factory( factory, new FixedFactory<Type, object>( parameterSource, ParameterTypes.Instance.Get( parameter ) ).Create ).Create : (Func<object>)null;
 			return result;
 		}
 

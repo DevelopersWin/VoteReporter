@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
@@ -19,7 +20,7 @@ using Parameter = DragonSpark.Testing.Objects.Composition.Parameter;
 
 namespace DragonSpark.Testing.Composition
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes]
 	public class CompositionTests : TestCollectionBase
 	{
 		public CompositionTests( ITestOutputHelper output ) : base( output ) {}

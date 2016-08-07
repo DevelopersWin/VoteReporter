@@ -1,9 +1,12 @@
 ﻿using DragonSpark.Aspects;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using Ploeh.AutoFixture.Xunit2;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using DragonSpark.Runtime.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects
@@ -22,7 +25,7 @@ namespace DragonSpark.Testing.Aspects
 
 			var cache = new ThreadCache( dictionary );
 
-			Assert.Empty( Stack.Value.All() );
+			Assert.Empty( Stack.Get().All().AsEnumerable() );
 
 			using ( new ThreadCacheContext( cache.Self, Stack ) )
 			{
@@ -49,23 +52,23 @@ namespace DragonSpark.Testing.Aspects
 
 				} ).Wait();
 
-				Assert.Single( Stack.Value.All() );
+				Assert.Single( Stack.Get().All().AsEnumerable() );
 
 				using ( new ThreadCacheContext( cache.Self, Stack ) )
 				{
 					Assert.Equal( 3, sut.Call() );
 					Assert.Equal( 3, sut.Call() );
-					Assert.Single( Stack.Value.All() );
+					Assert.Single( Stack.Get().All().AsEnumerable() );
 				}
 
-				Assert.Single( Stack.Value.All() );
+				Assert.Single( Stack.Get().All().AsEnumerable() );
 
 				Assert.Equal( 3, sut.Call() );
 				Assert.Equal( 3, sut.Call() );
 				Assert.NotEmpty( dictionary );
 			}
 
-			Assert.Empty( Stack.Value.All() );
+			Assert.Empty( Stack.Get().All().AsEnumerable() );
 			Assert.Empty( dictionary );
 
 			Assert.Equal( 9, sut.Call() );

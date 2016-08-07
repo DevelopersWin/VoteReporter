@@ -1,7 +1,7 @@
-using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Windows.Runtime;
 using PostSharp.Aspects;
@@ -130,9 +130,9 @@ namespace DragonSpark.Testing.Framework
 		public static bool operator !=( Identifier left, Identifier right ) => !left.Equals( right );
 	}
 
-	public class MethodContext : Configuration<MethodBase>
+	public class MethodContext : Scope<MethodBase>
 	{
-		public static IConfiguration<MethodBase> Instance { get; } = new MethodContext();
+		public static IScope<MethodBase> Instance { get; } = new MethodContext();
 		MethodContext() {}
 	}
 

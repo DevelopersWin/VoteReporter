@@ -1,56 +1,55 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Stores;
-using DragonSpark.Setup;
-using DragonSpark.Setup.Commands;
-using System;
+using DragonSpark.Runtime.Sources;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Windows.Input;
 
 namespace DragonSpark.Configuration
 {
-	public class EnableMethodCaching : Configuration<bool>
+	public class EnableMethodCaching : Scope<bool>
 	{
 		public static EnableMethodCaching Instance { get; } = new EnableMethodCaching();
 		EnableMethodCaching() : base( () => true ) {}
 	}
 
-	public class AssignConfigurationsCommand<T> : ApplyConfigurationCommand<ImmutableArray<ITransformer<T>>>
+	/*public class AssignConfigurationsCommand<T> : ConfigureGlobalScopeCommand<ImmutableArray<ITransformer<T>>>
 	{
 		public AssignConfigurationsCommand( ImmutableArray<ITransformer<T>> value, IConfigurations<T> assignable = null ) : base( value, assignable ) {}
-	}
+	}*/
 
 	public static class Extensions
 	{
-		public static ICommand From<T>( this IAssignable<T> @this, T value ) => new AssignValueCommand<T>( @this ).Fixed( value );
-
-		public static ICommand From<T>( this IConfiguration<T> @this, T value ) => new ApplyConfigurationCommand<T>( value, @this );
-
-		public static ICommand From<T>( this IParameterizedConfiguration<object, T> @this, T value ) => new ApplyParameterizedConfigurationCommand<T>( value, @this );
-
-		public static ICommand From<T>( this IAssignable<Func<T>> @this, T value ) => new ApplyConfigurationCommand<T>( value, @this );
-		public static ICommand From<T>( this IAssignable<Func<T>> @this, ISource<T> value ) => new ApplySourceConfigurationCommand<T>( value, @this );
-
-		public static ICommand From<T>( this IConfigurations<T> @this, IEnumerable<ITransformer<T>> configurations ) => @this.From( configurations.ToImmutableArray() );
-		public static ICommand From<T>( this IConfigurations<T> @this, params ITransformer<T>[] configurations ) => @this.From( configurations.ToImmutableArray() );
-		public static ICommand From<T>( this IConfigurations<T> @this, ImmutableArray<ITransformer<T>> configurations ) => new AssignConfigurationsCommand<T>( configurations, @this );
+		public static ICommand From<T>( this IConfigurations<T> @this, IEnumerable<ITransformer<T>> configurations ) => @this.Configured( configurations.ToImmutableArray() );
+		public static ICommand From<T>( this IConfigurations<T> @this, params ITransformer<T>[] configurations ) => @this.Configured( configurations.ToImmutableArray() );
+		// public static ICommand Configure<T>( this IConfigurations<T> @this, ImmutableArray<ITransformer<T>> configurations ) => @this.Configured( configurations );
 	}
 
-	public class ApplySourceConfigurationCommand<T> : ApplyConfigurationCommandBase<T>
+	/*public class GlobalAssignmentCommand<T> : AssignCommand<Func<object, T>>
+	{
+		readonly Func<object, T> get;
+		
+		protected GlobalAssignmentCommand( IAssignable<Func<object, T>> parameter ) : base( parameter )
+		{
+			get = Get;
+		}
+
+		protected abstract T Get( object parameter );
+
+		public override void Execute( object _ ) => Parameter.Assign( get );
+	}*/
+
+	/*public class ApplySourceConfigurationCommand<T> : GlobalAssignmentCommand<T>
 	{
 		public ApplySourceConfigurationCommand() {}
 
-		public ApplySourceConfigurationCommand( ISource<T> source, IAssignable<Func<T>> parameter = null ) : base( parameter )
+		public ApplySourceConfigurationCommand( ISource<T> source, IAssignable<Func<object, T>> parameter = null ) : base( parameter )
 		{
 			Source = source;
 		}
 
 		public ISource<T> Source { get; set; }
 
-		protected override T Get() => Source.Get();
+		protected override T Get( object parameter ) => Source.Get();
 	}
 
 	public class ApplyParameterizedSourceConfigurationCommand<T> : ApplyParameterizedSourceConfigurationCommand<object, T>
@@ -73,16 +72,26 @@ namespace DragonSpark.Configuration
 		protected override TValue Get( TKey key ) => Source.Get( key );
 	}
 
-	public abstract class ApplyConfigurationCommandBase<T> : DeclaredCommandBase<IAssignable<Func<T>>>
+	public abstract class AssignmentCommandBase<T> : DeclaredCommandBase<IAssignable<T>>
 	{
-		readonly Func<T> get;
+		protected AssignmentCommandBase( IAssignable<T> parameter = null ) : base( parameter ) {}
+	}
+
+	/*public abstract class GlobalAssignmentCommandBase<T> : DeclaredCommandBase<Func<object, T>>
+	{
 		
-		protected ApplyConfigurationCommandBase( IAssignable<Func<T>> parameter = null ) : base( parameter )
+	}#1#
+
+	public abstract class GlobalAssignmentCommand<T> : AssignmentCommandBase<Func<object, T>>
+	{
+		readonly Func<object, T> get;
+		
+		protected GlobalAssignmentCommand( IAssignable<Func<object, T>> parameter = null ) : base( parameter )
 		{
 			get = Get;
 		}
 
-		protected abstract T Get();
+		protected abstract T Get( object parameter );
 
 		public override void Execute( object _ ) => Parameter.Assign( get );
 	}
@@ -101,23 +110,23 @@ namespace DragonSpark.Configuration
 		public override void Execute( object _ ) => Parameter.Assign( get );
 	}
 
-	public class ApplyDelegateConfigurationCommand<T> : ApplyConfigurationCommandBase<T>
+	public class ApplyDelegateConfigurationCommand<T> : GlobalAssignmentCommand<T>
 	{
 		readonly Func<T> factory;
 
-		public ApplyDelegateConfigurationCommand( Func<T> factory, IAssignable<Func<T>> parameter = null ) : base( parameter )
+		public ApplyDelegateConfigurationCommand( Func<T> factory, IAssignable<Func<object, T>> parameter = null ) : base( parameter )
 		{
 			this.factory = factory;
 		}
 
-		protected override T Get() => factory();
+		protected override T Get( object parameter ) => factory();
 	}
 
-	public class ApplyConfigurationCommand<T> : ApplyConfigurationCommandBase<T>
+	public class ConfigureGlobalScopeCommand<T> : GlobalAssignmentCommand<T>
 	{
-		public ApplyConfigurationCommand() {}
+		public ConfigureGlobalScopeCommand() {}
 
-		public ApplyConfigurationCommand( T value, IAssignable<Func<T>> assignable = null )
+		public ConfigureGlobalScopeCommand( T value, IAssignable<Func<object, T>> assignable = null )
 		{
 			Parameter = assignable;
 			Value = value;
@@ -125,14 +134,14 @@ namespace DragonSpark.Configuration
 
 		public T Value { get; set; }
 
-		protected override T Get() => Value;
+		protected override T Get( object parameter ) => Value;
 	}
 
-	public class ApplyParameterizedConfigurationCommand<T> : ApplyConfigurationCommandBase<object, T>
+	public class ConfigureParameterizedScopeCommand<T> : ApplyConfigurationCommandBase<object, T>
 	{
-		public ApplyParameterizedConfigurationCommand() {}
+		public ConfigureParameterizedScopeCommand() {}
 
-		public ApplyParameterizedConfigurationCommand( T value, IAssignable<Func<object, T>> assignable = null )
+		public ConfigureParameterizedScopeCommand( T value, IAssignable<Func<object, T>> assignable = null )
 		{
 			Parameter = assignable;
 			Value = value;
@@ -141,63 +150,7 @@ namespace DragonSpark.Configuration
 		public T Value { get; set; }
 
 		protected override T Get( object key ) => Value;
-	}
-
-	public interface IConfiguration<T> : ISource<T>, IAssignable<T>, IAssignable<Func<T>> { }
-
-	public interface IParameterizedConfiguration<T> : IParameterizedConfiguration<object, T> {}
-
-	public interface IParameterizedConfiguration<TKey, TValue> : IParameterizedSource<TKey, TValue>, IAssignable<Func<TKey, TValue>> {}
-
-	public interface IConfigurations<T> : IConfiguration<ImmutableArray<ITransformer<T>>> {}
-
-	public class Configurations<T> : Configuration<ImmutableArray<ITransformer<T>>>, IConfigurations<T>
-	{
-		public Configurations() {}
-		public Configurations( params ITransformer<T>[] configurators ) : this( new Configurator<T>( configurators ).Get ) {}
-		public Configurations( Func<ImmutableArray<ITransformer<T>>> defaultFactory ) : base( defaultFactory ) {}
-	}
-
-	public class Configurator<T> : ItemsStoreBase<ITransformer<T>>
-	{
-		readonly string name;
-		public Configurator() {}
-		public Configurator( IEnumerable<ITransformer<T>> items ) : base( items ) {}
-
-		public Configurator( string name = null, params ITransformer<T>[] items ) : base( items )
-		{
-			this.name = name;
-		}
-
-		protected override IEnumerable<ITransformer<T>> Yield()
-		{
-			var transformers = base.Yield().Concat( Exports.Instance.Value.GetExports<ITransformer<T>>( name ).AsEnumerable() );
-			return transformers;
-		}
-	}
-
-	public abstract class ConfiguratorsBase<TParameter, TConfiguration> : FactoryBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>
-	{
-		public override ImmutableArray<ITransformer<TConfiguration>> Create( TParameter parameter ) => From( parameter ).ToImmutableArray();
-
-		protected abstract IEnumerable<ITransformer<TConfiguration>> From( TParameter parameter );
-	}
-
-	/*public static class ConfigurationExtensions
-	{
-		/*public static T Apply<T>( this IConfiguration<T> @this, Func<T> factory )
-		{
-			@this.Assign( factory );
-			return @this.Get();
-		}#1#
-
-		public static T Default<T>( this IParameterizedConfiguration<object, T> @this ) => @this.Get( Execution.Current() );
-
-		/*public static IStore<T> ToStore<T>( this IConfiguration<object, T> @this ) => StoreCache<T>.Default.Get( @this );
-		class StoreCache<T> : Cache<IConfiguration<object, T>, IStore<T>>
-		{
-			public static StoreCache<T> Default { get; } = new StoreCache<T>();
-			StoreCache() : base( configuration => new ScopedStore<T>( configuration.Get ) ) {}
-		}#1#
 	}*/
+
+	
 }

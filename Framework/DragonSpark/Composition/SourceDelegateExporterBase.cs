@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using System;
@@ -119,11 +120,11 @@ namespace DragonSpark.Composition
 
 			public object GetService( Type serviceType )
 			{
-				var found = provider( source.ChangeType( serviceType ) );
-				if ( found != null )
+				var activator = provider( source.ChangeType( serviceType ) );
+				if ( activator != null )
 				{
 					var current = stack.GetCurrentItem();
-					var result = found.Invoke( current.Context, current.Operation );
+					var result = activator( current.Context, current.Operation );
 					return result;
 				}
 				return null;

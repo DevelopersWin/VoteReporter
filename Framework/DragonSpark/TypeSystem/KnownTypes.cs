@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DragonSpark.TypeSystem
 {
-	public class KnownTypes : ParameterizedScope<Type, ImmutableArray<Type>>
+	public class KnownTypes : CachedParameterizedScope<Type, ImmutableArray<Type>>
 	{
 		public static KnownTypes Instance { get; } = new KnownTypes();
 		KnownTypes() : base( type => ApplicationTypes.Instance.Get().Where( type.Adapt().IsAssignableFrom ).ToImmutableArray() ) {}

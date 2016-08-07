@@ -21,13 +21,9 @@ namespace DragonSpark.Testing.Activation.IoC
 	{
 		public UnityContainerFactoryTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Theory, Framework.Setup.AutoData, IoCTypes, FrameworkTypes]
+		[Theory, AutoData, IoCTypes, FrameworkTypes]
 		public void ConstructorSelection()
 		{
-			/*var provider = container.Resolve<IServiceProvider>();
-			Assert.NotSame( CurrentServiceProvider.Instance.Value, provider );
-			Assert.Same( DefaultStoreServiceProvider.Instance, provider );*/
-
 			var container = UnityContainerFactory.Instance.Create();
 
 			Assert.NotNull( container );

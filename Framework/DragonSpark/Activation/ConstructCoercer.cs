@@ -11,7 +11,7 @@ namespace DragonSpark.Activation
 {
 	public class ParameterConstructor<T> : ParameterConstructor<object, T> {}
 
-	public class ParameterConstructor<TParameter, TResult> : IParameterizedSource<TParameter, TResult>
+	public class ParameterConstructor<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
 	{
 		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cache { get; } = new Cache<ConstructorInfo, Func<TParameter, TResult>>( new Factory().Create );
 
@@ -39,6 +39,8 @@ namespace DragonSpark.Activation
 
 		public static Func<TParameter, TResult> Make( ConstructorInfo constructor ) => Cache.Get( constructor );
 
+		public override TResult Get( TParameter parameter ) => factory( parameter );
+
 		sealed class Factory : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
 		{
 			public Factory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, CreateParameters( parameter ) ) ) {}
@@ -56,10 +58,6 @@ namespace DragonSpark.Activation
 				}
 			}
 		}
-
-		public TResult Get( TParameter parameter ) => factory( parameter );
-
-		object IParameterizedSource.Get( object parameter ) => parameter is TParameter ? Get( (TParameter)parameter ) : default(TResult);
 	}
 
 	/*class ParameterConstructor<T> : FactoryBase<object, T>
@@ -94,15 +92,15 @@ namespace DragonSpark.Activation
 		}
 	}*/
 
-	class SourceCoercer<T> : Coercer<T>
+	public class SourceCoercer<T> : ICoercer<T>
 	{
-		public static SourceCoercer<T> Source { get; } = new SourceCoercer<T>();
+		public static SourceCoercer<T> Instance { get; } = new SourceCoercer<T>();
 		SourceCoercer() {}
 
-		protected override T PerformCoercion( object parameter )
+		public T Coerce( object parameter )
 		{
 			var store = parameter as ISource<T>;
-			var result = store != null ? store.Get() : base.PerformCoercion( parameter );
+			var result = store != null ? store.Get() : parameter.As<T>();
 			return result;
 		}
 	}

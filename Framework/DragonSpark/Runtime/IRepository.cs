@@ -23,7 +23,7 @@ namespace DragonSpark.Runtime
 	{
 		readonly IDisposable disposable;
 
-		public static IStore<Disposables> Instance { get; } = new ExecutionScope<Disposables>( () => new Disposables() );
+		public static ISource<Disposables> Instance { get; } = new CachedScope<Disposables>( () => new Disposables() );
 		Disposables() : base( new PurgingCollection<IDisposable>() )
 		{
 			disposable = new DelegatedDisposable( OnDispose );

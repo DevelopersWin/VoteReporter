@@ -13,6 +13,7 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -43,12 +44,24 @@ namespace DragonSpark.Windows.Setup
 
 		readonly RetryCommand retry;
 
-		public DeleteFileCommand( RetryCommand retry )
+		public DeleteFileCommand( RetryCommand retry ) : base( FileSystemInfoExistsSpecification.Instance )
 		{
 			this.retry = retry;
 		}
 
 		public override void Execute( FileInfo parameter ) => retry.Execute( parameter.Delete );
+	}
+
+	public sealed class FileSystemInfoExistsSpecification : GuardedSpecificationBase<FileSystemInfo>
+	{
+		public static FileSystemInfoExistsSpecification Instance { get; } = new FileSystemInfoExistsSpecification();
+		FileSystemInfoExistsSpecification() {}
+
+		public override bool IsSatisfiedBy( FileSystemInfo parameter )
+		{
+			parameter.Refresh();
+			return parameter.Exists;
+		}
 	}
 
 	[ApplyAutoValidation]
@@ -83,11 +96,11 @@ namespace DragonSpark.Windows.Setup
 		{
 			if ( !file.Exists )
 			{
-				var properties = parameter.Providers
-										  .Cast<SettingsProvider>()
-										  .Introduce( parameter, tuple => tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ).Cast<SettingsPropertyValue>() )
-										  .Concat()
-										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed();
+				var properties = EnumerableExtensions.Fixed<SettingsPropertyValue>( parameter.Providers
+																																																	  .Cast<SettingsProvider>()
+																																																	  .Introduce( parameter, tuple => tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ).Cast<SettingsPropertyValue>() )
+																																																	  .Concat()
+																																																	  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ) );
 				var any = properties.Any();
 				if ( any )
 				{

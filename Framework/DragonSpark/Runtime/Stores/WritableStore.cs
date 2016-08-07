@@ -3,11 +3,14 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
+using System.Windows.Input;
 
 namespace DragonSpark.Runtime.Stores
 {
 	public static class StoreExtensions
 	{
+		public static ICommand From<T>( this IAssignable<T> @this, T value ) => new AssignCommand<T>( @this ).Fixed( value );
+
 		public static TValue Assigned<TSource, TValue>( this TSource @this, TValue value ) where TSource : IAssignable<TValue>
 		{
 			@this.Assign( value );

@@ -6,7 +6,6 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
-using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
 
@@ -32,7 +31,7 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	public struct AutoValidationProfile
+	/*public struct AutoValidationProfile
 	{
 		public AutoValidationProfile( Func<object, IParameterValidationAdapter> factory, ImmutableArray<AutoValidationTypeDescriptor> descriptors )
 		{
@@ -56,7 +55,7 @@ namespace DragonSpark.Aspects
 		public Type Type { get; }
 		public string IsValid { get; }
 		public string Execute { get; }
-	}
+	}*/
 
 	abstract class AdapterFactoryBase<T> : ProjectedFactory<T, IParameterValidationAdapter> where T : class
 	{

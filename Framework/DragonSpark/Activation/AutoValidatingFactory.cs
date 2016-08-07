@@ -22,14 +22,16 @@ namespace DragonSpark.Activation
 
 		public bool CanCreate( object parameter )
 		{
-			var valid = Controller.IsValid( parameter );
-			if ( !valid.HasValue )
+			var result = Controller.IsValid( parameter ) || inner.CanCreate( parameter );
+			Controller.MarkValid( parameter, result );
+			return result;
+			/*if ( !valid.HasValue )
 			{
-				var result = inner.CanCreate( parameter );
-				Controller.MarkValid( parameter, result );
+				var result = ;
+				
 				return result;
 			}
-			return valid.Value;
+			return valid.Value;*/
 		}
 
 		public object Create( object parameter ) => Controller.Execute( parameter, () => inner.Create( parameter ) );
@@ -50,14 +52,17 @@ namespace DragonSpark.Activation
 
 		public bool CanCreate( TParameter parameter )
 		{
-			var valid = Controller.IsValid( parameter );
+			var result = Controller.IsValid( parameter ) || specification( parameter );
+			Controller.MarkValid( parameter, result );
+			return result;
+			/*var valid = Controller.IsValid( parameter );
 			if ( !valid.HasValue )
 			{
 				var result = specification( parameter );
 				Controller.MarkValid( parameter, result );
 				return result;
 			}
-			return valid.Value;
+			return valid.Value;*/
 		}
 
 		public TResult Create( TParameter parameter ) => (TResult)Controller.Execute( parameter, () => inner.Create( parameter ) );

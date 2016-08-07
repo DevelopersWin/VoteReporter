@@ -46,7 +46,8 @@ namespace DragonSpark.Testing.Activation.IoC
 			var nestedTypes = GetType().GetTypeInfo().DeclaredNestedTypes.AsTypes().ToArray();
 			var sut = SingletonLocator.Instance;
 			var type = new ConventionTypes( new TypeSource( nestedTypes ) ).Get( typeof(ISingleton) ) ?? typeof(ISingleton);
-			Assert.Same( Singleton.Instance, sut.Get( type ) );
+			var actual = sut.Get( type );
+			Assert.Same( Singleton.Instance, actual );
 		}
 
 		[Fact]
