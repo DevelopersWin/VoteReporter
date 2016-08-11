@@ -257,7 +257,6 @@ namespace DragonSpark.Runtime.Properties
 			var delegated = new DelegatedFactory<TInstance, TValue>( Create, specification );
 			var factory = specification == DefaultSpecification ? delegated : delegated.WithAutoValidation();
 			configuration.Assign( new Func<TInstance, TValue>( factory.Create ).Wrap() );
-			// configuration.Assigned( factory.Create );
 		}
 
 		protected abstract TValue Create( TInstance parameter );

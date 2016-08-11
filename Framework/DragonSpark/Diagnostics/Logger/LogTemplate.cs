@@ -106,16 +106,16 @@ namespace DragonSpark.Diagnostics.Logger
 	public sealed class LoggingController : Cache<LoggingLevelSwitch>
 	{
 		public static LoggingController Instance { get; } = new LoggingController();
-		LoggingController() : base( o => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get( o ) ) ) {}
+		LoggingController() : base( o => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get() ) ) {}
 	}
 
 	sealed class LoggerConfigurationSource : LoggerConfigurationSourceBase
 	{
 		public static LoggerConfigurationSource Instance { get; } = new LoggerConfigurationSource();
 
-		protected override IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
+		protected override IEnumerable<ITransformer<LoggerConfiguration>> Yield( object parameter )
 		{
-			foreach ( var transformer in base.From( parameter ) )
+			foreach ( var transformer in base.Yield( parameter ) )
 			{
 				yield return transformer;
 			}
@@ -138,7 +138,7 @@ namespace DragonSpark.Diagnostics.Logger
 
 	public abstract class LoggerConfigurationSourceBase : ConfigurationSourceBase<object, LoggerConfiguration>
 	{
-		protected override IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
+		protected override IEnumerable<ITransformer<LoggerConfiguration>> Yield( object parameter )
 		{
 			yield return new ControllerTransform( LoggingController.Instance.Get( parameter ) );
 			yield return new CreatorFilterTransformer();

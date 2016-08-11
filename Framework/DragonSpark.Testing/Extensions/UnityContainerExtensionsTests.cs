@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void TryResolve( IUnityContainer sut )
 		{
-			var level = MinimumLevelConfiguration.Instance.Get( this );
+			var level = MinimumLevelConfiguration.Instance.Get();
 			Assert.Equal( LogEventLevel.Debug, level );
 
 			var creator = Creator.Default.Get( sut );

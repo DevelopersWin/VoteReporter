@@ -56,9 +56,9 @@ namespace DragonSpark.Configuration
 
 	public abstract class ConfigurationSourceBase<TParameter, TConfiguration> : ParameterizedSourceBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>
 	{
-		public override ImmutableArray<ITransformer<TConfiguration>> Get( TParameter parameter ) => From( parameter ).ToImmutableArray();
+		public override ImmutableArray<ITransformer<TConfiguration>> Get( TParameter parameter ) => Yield( parameter ).ToImmutableArray();
 
-		protected abstract IEnumerable<ITransformer<TConfiguration>> From( TParameter parameter );
+		protected abstract IEnumerable<ITransformer<TConfiguration>> Yield( TParameter parameter );
 	}
 
 	/*public static class ConfigurationExtensions

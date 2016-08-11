@@ -9,6 +9,8 @@ namespace DragonSpark.Runtime.Sources
 	{
 		// public static void Assign<T>( this IScope<T> @this, T factory ) => @this.Assign( Source.For( factory ) );
 
+		public static void Assign<TParameter, TResult>( this IParameterizedScope<TParameter, TResult> @this, Func<TParameter, TResult> instance ) => @this.Assign( instance.Self );
+
 		public static void Assign<T>( this IScopeAware<T> @this, T instance ) => @this.Assign( Factory.For( instance ) );
 
 		//public static void Assign<T>( this IScope<T> @this, Func<T> factory ) => @this.Assign( factory.Wrap() );

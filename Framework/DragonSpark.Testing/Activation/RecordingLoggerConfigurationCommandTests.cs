@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Activation
 			Assert.Equal( LogEventLevel.Information, first.MinimumLevel );
 
 			const LogEventLevel assigned = LogEventLevel.Debug;
-			level.Assign( o => assigned );
+			level.Assign( assigned );
 
 			var two = new object();
 			var second = controller.Get( two );

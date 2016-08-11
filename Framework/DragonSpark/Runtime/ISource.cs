@@ -306,21 +306,28 @@ namespace DragonSpark.Runtime
 
 	public class CachedParameterizedScope<TParameter, TResult> : ParameterizedScope<TParameter, TResult>
 	{
-		static Func<TParameter, TResult> Create( Func<TParameter, TResult> parameter ) => CacheFactory.Create( parameter ).Get;
+		public CachedParameterizedScope( Func<TParameter, TResult> source ) : base( source.Scope() ) {}
 
-		public CachedParameterizedScope( Func<TParameter, TResult> source ) : base( new Scope<Func<TParameter, TResult>>( new FixedFactory<Func<TParameter, TResult>, Func<TParameter, TResult>>( Create, source ).Create ) ) {}
-
-		public override void Assign( Func<Func<TParameter, TResult>> item ) => base.Assign( new FixedFactory<Func<TParameter, TResult>, Func<TParameter, TResult>>( Create, item() ).Create );
+		public override void Assign( Func<Func<TParameter, TResult>> item ) => base.Assign( item().Scope() );
 	}
 
 	public interface IParameterizedScope<T> : IParameterizedScope<object, T>, IParameterizedSource<T> {}
 	public interface IParameterizedScope<TParameter, TResult> : IParameterizedSource<TParameter, TResult>, IScopeAware<Func<TParameter, TResult>> {}
 
+	/*public class ParameterizedScope<T> : ParameterizedScope<object, T>
+	{
+		public ParameterizedScope( Func<object, T> source ) : base( source ) {}
+		public ParameterizedScope( Func<object, Func<object, T>> source ) : base( source ) {}
+		public ParameterizedScope( IScope<Func<object, T>> scope ) : base( scope ) {}
+	}*/
+
 	public class ParameterizedScope<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>, IParameterizedScope<TParameter, TResult>
 	{
 		readonly IScope<Func<TParameter, TResult>> scope;
 
-		public ParameterizedScope( Func<TParameter, TResult> source ) : this( new Scope<Func<TParameter, TResult>>( source.Wrap() ) ) {}
+		public ParameterizedScope( Func<TParameter, TResult> source ) : this( source.Wrap() ) {}
+
+		public ParameterizedScope( Func<object, Func<TParameter, TResult>> source ) : this( new Scope<Func<TParameter, TResult>>( source ) ) {}
 
 		protected ParameterizedScope( IScope<Func<TParameter, TResult>> scope )
 		{

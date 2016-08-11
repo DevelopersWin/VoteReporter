@@ -1,17 +1,17 @@
-﻿using DragonSpark.Runtime;
+﻿using DragonSpark.Runtime.Sources;
 using Serilog.Events;
 
 namespace DragonSpark.Diagnostics
 {
-	public class MinimumLevelConfiguration : CachedParameterizedScope<LogEventLevel>
+	public class MinimumLevelConfiguration : Scope<LogEventLevel>
 	{
 		public static MinimumLevelConfiguration Instance { get; } = new MinimumLevelConfiguration();
-		MinimumLevelConfiguration() : base( o => LogEventLevel.Information ) {}
+		MinimumLevelConfiguration() : base( () => LogEventLevel.Information ) {}
 	}
 
-	public class ProfilerLevelConfiguration : CachedParameterizedScope<LogEventLevel>
+	public class ProfilerLevelConfiguration : Scope<LogEventLevel>
 	{
 		public static ProfilerLevelConfiguration Instance { get; } = new ProfilerLevelConfiguration();
-		ProfilerLevelConfiguration() : base( o => LogEventLevel.Debug ) {}
+		ProfilerLevelConfiguration() : base( () => LogEventLevel.Debug ) {}
 	}
 }
