@@ -65,11 +65,11 @@ namespace DragonSpark.Activation
 		public static Func<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
 
 		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => new Wrapper<TParameter, TResult>( @this ).Get;
-		sealed class WrappedDelegates<TParameter, TResult> : Cache<Func<TResult>, Func<TParameter, TResult>>
+		/*sealed class WrappedDelegates<TParameter, TResult> : Cache<Func<TResult>, Func<TParameter, TResult>>
 		{
 			public static WrappedDelegates<TParameter, TResult> Default { get; } = new WrappedDelegates<TParameter, TResult>();
 			WrappedDelegates() : base( result => new Wrapper<TParameter, TResult>( result ).Get ) {}
-		}
+		}*/
 
 		public static Delegate Convert( this Func<object> @this, Type resultType ) => ConvertSupport.Methods.Make( resultType ).Invoke<Delegate>( @this );
 

@@ -31,8 +31,8 @@ namespace DragonSpark.Composition
 
 	public class ServiceProviderConfigurations : Setup.ServiceProviderConfigurations
 	{
-		/*public new static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
-		ServiceProviderConfigurations() : this( DefaultServiceProvider.Instance.Create ) {}*/
+		public new static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
+		ServiceProviderConfigurations() : this( DefaultServiceProviderSource.Instance.Create ) {}
 
 		readonly Func<IServiceProvider> provider;
 

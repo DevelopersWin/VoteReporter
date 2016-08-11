@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
-using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
@@ -12,17 +11,18 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using ServiceProviderConfigurations = DragonSpark.Composition.ServiceProviderConfigurations;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public class ServiceProviderConfigurations : Composition.ServiceProviderConfigurations
+	/*public class ServiceProviderConfigurations : Composition.ServiceProviderConfigurations
 	{
 		readonly static ICache<Type, ICache<ImmutableArray<Type>, IServiceProvider>> Cache = 
 			new Cache<Type, ICache<ImmutableArray<Type>, IServiceProvider>>( o => new ArgumentCache<ImmutableArray<Type>, IServiceProvider>( types => DefaultServiceProviderSource.Instance.Create() ) );
 
 		public new static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
-		ServiceProviderConfigurations() : base( /*() => Cache.Get( MethodContext.Instance.Get().DeclaringType ).Get( ApplicationTypes.Instance.Get() )*/DefaultServiceProviderSource.Instance.Create ) {}
-	}
+		ServiceProviderConfigurations() : base( /*() => Cache.Get( MethodContext.Instance.Get().DeclaringType ).Get( ApplicationTypes.Instance.Get() )#1#DefaultServiceProviderSource.Instance.Create ) {}
+	}*/
 
 	public sealed class Configure : TransformerBase<IServiceProvider>
 	{

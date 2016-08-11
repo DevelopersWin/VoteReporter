@@ -9,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace DragonSpark.Testing.Framework
 {
@@ -17,12 +18,13 @@ namespace DragonSpark.Testing.Framework
 		[ModuleInitializer( 0 )]
 		public static void Execution()
 		{
-			Activation.Execution.Context.Assign( ExecutionContext.Instance );
+			// Activation.Execution.Context.Assign( ExecutionContext.Instance );
+			Command.Instance.Run();
 		}
 
 		class Command : DragonSpark.Setup.Setup
 		{
-			public static Command Instance { get; } = new Command();
+			public static ICommand Instance { get; } = new Command();
 			Command() : base( 
 				Activation.Execution.Context.From( ExecutionContext.Instance )
 			) {}
