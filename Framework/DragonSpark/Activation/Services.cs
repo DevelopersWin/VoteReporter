@@ -1,6 +1,5 @@
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
@@ -9,7 +8,7 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	public sealed class GlobalServiceProvider : CachedScope<IServiceProvider>
+	public sealed class GlobalServiceProvider : Scope<IServiceProvider>
 	{
 		public static IScope<IServiceProvider> Instance { get; } = new GlobalServiceProvider();
 

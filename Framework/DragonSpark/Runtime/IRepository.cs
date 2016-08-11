@@ -1,5 +1,5 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Stores;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -23,7 +23,7 @@ namespace DragonSpark.Runtime
 	{
 		readonly IDisposable disposable;
 
-		public static ISource<Disposables> Instance { get; } = new CachedScope<Disposables>( () => new Disposables() );
+		public static ISource<Disposables> Instance { get; } = new Scope<Disposables>( Factory.Scope( () => new Disposables() ) );
 		Disposables() : base( new PurgingCollection<IDisposable>() )
 		{
 			disposable = new DelegatedDisposable( OnDispose );

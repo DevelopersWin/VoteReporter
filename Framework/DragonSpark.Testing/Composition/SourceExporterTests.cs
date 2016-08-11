@@ -97,7 +97,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.Equal( typeof(int), type );
 		}
 
-		class Count : CachedScope<int>
+		class Count : Scope<int>
 		{
 			public static Count Instance { get; } = new Count();
 			Count() {}

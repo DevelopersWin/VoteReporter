@@ -14,14 +14,14 @@ namespace DragonSpark.Configuration
 
 	/*public class AssignConfigurationsCommand<T> : ConfigureGlobalScopeCommand<ImmutableArray<ITransformer<T>>>
 	{
-		public AssignConfigurationsCommand( ImmutableArray<ITransformer<T>> value, IConfigurations<T> assignable = null ) : base( value, assignable ) {}
+		public AssignConfigurationsCommand( ImmutableArray<ITransformer<T>> value, IConfigurationScope<T> assignable = null ) : base( value, assignable ) {}
 	}*/
 
 	public static class Extensions
 	{
-		public static ICommand From<T>( this IConfigurations<T> @this, IEnumerable<ITransformer<T>> configurations ) => @this.Configured( configurations.ToImmutableArray() );
-		public static ICommand From<T>( this IConfigurations<T> @this, params ITransformer<T>[] configurations ) => @this.Configured( configurations.ToImmutableArray() );
-		// public static ICommand Configure<T>( this IConfigurations<T> @this, ImmutableArray<ITransformer<T>> configurations ) => @this.Configured( configurations );
+		public static ICommand From<T>( this IConfigurationScope<T> @this, IEnumerable<ITransformer<T>> configurations ) => @this.Configured( configurations.ToImmutableArray() );
+		public static ICommand From<T>( this IConfigurationScope<T> @this, params ITransformer<T>[] configurations ) => @this.Configured( configurations.ToImmutableArray() );
+		// public static ICommand Configure<T>( this IConfigurationScope<T> @this, ImmutableArray<ITransformer<T>> ConfigurationScope ) => @this.Configured( ConfigurationScope );
 	}
 
 	/*public class GlobalAssignmentCommand<T> : AssignCommand<Func<object, T>>

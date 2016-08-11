@@ -222,7 +222,7 @@ namespace DragonSpark.Activation
 
 	public class ConstructFromKnownTypes<T> : ParameterConstructedCompositeFactory<object>
 	{
-		public static ISource<ConstructFromKnownTypes<T>> Instance { get; } = new CachedScope<ConstructFromKnownTypes<T>>( () => new ConstructFromKnownTypes<T>( KnownTypes.Instance.Get<T>().ToArray() ) );
+		public static ISource<ConstructFromKnownTypes<T>> Instance { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.Scope( () => new ConstructFromKnownTypes<T>( KnownTypes.Instance.Get<T>().ToArray() ) ) );
 		ConstructFromKnownTypes( params Type[] types ) : base( types ) {}
 		
 		public T CreateUsing( object parameter ) => (T)Create( parameter );
@@ -380,24 +380,24 @@ namespace DragonSpark.Activation
 	{
 		IScope<TConfiguration> Seed { get; }
 
-		IConfigurations<TConfiguration> Configurations { get; }
+		IConfigurationScope<TConfiguration> ConfigurationScope { get; }
 	}
 
 	public abstract class AggregateFactoryBase<T> : AggregateFactoryBase<T, T>, IConfigurableFactory<T> where T : class
 	{
 		protected AggregateFactoryBase( Func<T> seed ) : this( seed, Items<ITransformer<T>>.Default ) {}
-		protected AggregateFactoryBase( Func<T> seed, params ITransformer<T>[] configurations ) : this( seed, new Configurations<T>( configurations ), Delegates<T>.Self ) {}
-		protected AggregateFactoryBase( Func<T> seed, IConfigurations<T> configurations, Func<T, T> factory ) : base( seed, configurations, factory ) {}
-		protected AggregateFactoryBase( IScope<T> seed ) : this( seed, new Configurations<T>( Items<ITransformer<T>>.Default ), Delegates<T>.Self ) {}
-		protected AggregateFactoryBase( IScope<T> seed, IConfigurations<T> configurations, Func<T, T> factory ) : base( seed, configurations, factory ) {}
+		protected AggregateFactoryBase( Func<T> seed, params ITransformer<T>[] configurations ) : this( seed, new ConfigurationScope<T>( configurations ), Delegates<T>.Self ) {}
+		protected AggregateFactoryBase( Func<T> seed, IConfigurationScope<T> scope, Func<T, T> factory ) : base( seed, scope, factory ) {}
+		protected AggregateFactoryBase( IScope<T> seed ) : this( seed, new ConfigurationScope<T>( Items<ITransformer<T>>.Default ), Delegates<T>.Self ) {}
+		protected AggregateFactoryBase( IScope<T> seed, IConfigurationScope<T> scope, Func<T, T> factory ) : base( seed, scope, factory ) {}
 	}
 
 	public abstract class AggregateFactoryBase<TConfiguration, TResult> : FactoryBase<TResult>, IConfigurableFactory<TConfiguration, TResult> where TConfiguration : class
 	{
 		readonly Func<TConfiguration, TResult> factory;
 		
-		protected AggregateFactoryBase( Func<TConfiguration> seed, IConfigurations<TConfiguration> configurations, Func<TConfiguration, TResult> factory ) : 
-			this( new Scope<TConfiguration>( seed ), configurations, factory ) {}
+		protected AggregateFactoryBase( Func<TConfiguration> seed, IConfigurationScope<TConfiguration> scope, Func<TConfiguration, TResult> factory ) : 
+			this( new Scope<TConfiguration>( seed ), scope, factory ) {}
 
 		/*static IConfiguration<TConfiguration> From( Func<TConfiguration> seed )
 		{
@@ -406,21 +406,21 @@ namespace DragonSpark.Activation
 			return result;
 		}*/
 
-		protected AggregateFactoryBase( IScope<TConfiguration> seed, IConfigurations<TConfiguration> configurations, Func<TConfiguration, TResult> factory )
+		protected AggregateFactoryBase( IScope<TConfiguration> seed, IConfigurationScope<TConfiguration> scope, Func<TConfiguration, TResult> factory )
 		{
 			Seed = seed;
-			Configurations = configurations;
+			ConfigurationScope = scope;
 			this.factory = factory;
 		}
 
 		public IScope<TConfiguration> Seed { get; }
 
-		public IConfigurations<TConfiguration> Configurations { get; }
+		public IConfigurationScope<TConfiguration> ConfigurationScope { get; }
 
 		public override TResult Create()
 		{
 			var seed = Seed.Get();
-			var configurations = Configurations.Get();
+			var configurations = ConfigurationScope.Get();
 			var configured = configurations.Aggregate( seed, ( curent, transformer ) => transformer.Get( curent ) );
 			var result = factory( configured );
 			return result;

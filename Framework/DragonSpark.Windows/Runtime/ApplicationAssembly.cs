@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace DragonSpark.Windows.Runtime
 	public sealed class ApplicationAssembly : FixedFactory<IEnumerable<Assembly>, Assembly>
 	{
 		[Export]
-		public static ISource<Assembly> Instance { get; } = new CachedScope<Assembly>( new ApplicationAssembly().Create );
+		public static ISource<Assembly> Instance { get; } = new Scope<Assembly>( Factory.Scope( new ApplicationAssembly().Create ) );
 		ApplicationAssembly() : base( ApplicationAssemblyLocator.Instance.Get, ApplicationAssemblies.Instance.Get().AsEnumerable() ) {}
 	}
 

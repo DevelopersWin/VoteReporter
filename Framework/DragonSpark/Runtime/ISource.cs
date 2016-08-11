@@ -345,7 +345,7 @@ namespace DragonSpark.Runtime
 		// public new T Get() => base.Get().Invoke();
 	}*/
 
-	public class CachedScope<T> : Scope<T>
+	/*public class CachedScope<T> : Scope<T>
 	{
 		public CachedScope() : this( () => default(T) ) {}
 
@@ -354,5 +354,5 @@ namespace DragonSpark.Runtime
 		public CachedScope( Func<object, T> defaultFactory ) : base( defaultFactory.Fix() ) {}
 
 		public override void Assign( Func<object, T> item ) => base.Assign( item.Fix() );
-	}
+	}*/
 }

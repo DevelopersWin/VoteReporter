@@ -16,7 +16,7 @@ namespace DragonSpark.Composition
 {
 	public sealed class CompositionHostFactory : AggregateFactoryBase<ContainerConfiguration, CompositionHost>
 	{
-		readonly static IConfigurations<ContainerConfiguration> Default = new Configurations<ContainerConfiguration>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
+		readonly static IConfigurationScope<ContainerConfiguration> Default = new ConfigurationScope<ContainerConfiguration>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
 
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
 		CompositionHostFactory() : base( () => new ContainerConfiguration(), Default, parameter => parameter.CreateContainer()) {}

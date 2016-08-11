@@ -12,6 +12,7 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Sources;
 using Type = System.Type;
 
 namespace DragonSpark.Activation
@@ -122,7 +123,7 @@ namespace DragonSpark.Activation
 
 	public sealed class SourceTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
-		public static ISource<SourceTypes> Instance { get; } = new CachedScope<SourceTypes>( () => new SourceTypes() );
+		public static ISource<SourceTypes> Instance { get; } = new Scope<SourceTypes>( Runtime.Sources.Factory.Scope( () => new SourceTypes() ) );
 		SourceTypes() : base( new Factory().Create ) {}
 		
 		sealed class Factory :  FactoryBase<LocateTypeRequest, Type>

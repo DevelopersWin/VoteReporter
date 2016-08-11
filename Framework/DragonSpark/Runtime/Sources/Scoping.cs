@@ -15,6 +15,8 @@ namespace DragonSpark.Runtime.Sources
 		public static Func<T> Fix<T>( this ISource<T> @this ) => new Func<T>( @this.Get ).Fix();
 		public static Func<T> Fix<T>( this Func<T> @this ) => FixedDelegateBuilder<T>.Instance.Get( @this );
 
+		public static Func<object, T> Scope<T>( this Func<T> @this ) => @this.Wrap().Fix();
+
 		public static Func<TParameter, TResult> Fix<TParameter, TResult>( this Func<TParameter, TResult> @this ) => CacheFactory.Create( @this ).Get;
 	}
 

@@ -57,7 +57,7 @@ namespace DragonSpark.Runtime.Properties
 		class Scopes<T> : Cache<Func<object, T>, IScope<T>>
 		{
 			public static Scopes<T> Default { get; } = new Scopes<T>();
-			Scopes() : base( cache => new CachedScope<T>( cache ) ) {}
+			Scopes() : base( cache => new Scope<T>( cache.Fix() ) ) {}
 		}
 
 		/*public static TDelegate Apply<TContext, TDelegate>( this ICache<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class

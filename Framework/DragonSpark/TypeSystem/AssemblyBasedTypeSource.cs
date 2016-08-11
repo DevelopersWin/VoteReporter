@@ -23,7 +23,7 @@ namespace DragonSpark.TypeSystem
 		public static IParameterizedScope<string, Assembly> AssemblyLoader { get; } = new CachedParameterizedScope<string, Assembly>( path => default(Assembly) ).ScopedWithDefault();
 
 		public static IScope<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = 
-			new CachedScope<ImmutableArray<ITypeDefinitionProvider>>( () => TypeDefinitionProviderStore.Instance.Get() );
+			new Scope<ImmutableArray<ITypeDefinitionProvider>>( TypeDefinitionProviderStore.Instance.Get );
 	}
 
 	public abstract class PartsBase : FactoryCache<Assembly, ImmutableArray<Type>>

@@ -53,7 +53,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public sealed class ApplicationInitializer : CommandBase<MethodBase>
 	{
-		public static IScope<ApplicationInitializer> Instance { get; } = new CachedScope<ApplicationInitializer>( () => new ApplicationInitializer() );
+		public static IScope<ApplicationInitializer> Instance { get; } = new Scope<ApplicationInitializer>( Factory.Scope( () => new ApplicationInitializer() ) );
 		ApplicationInitializer() {}
 
 		public override void Execute( MethodBase parameter )
@@ -63,7 +63,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public sealed class FixtureContext : CachedScope<IFixture>
+	public sealed class FixtureContext : Scope<IFixture>
 	{
 		public static FixtureContext Instance { get; } = new FixtureContext();
 		FixtureContext() {}

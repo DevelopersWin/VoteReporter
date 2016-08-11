@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.TypeSystem;
 using System;
 
@@ -38,7 +39,7 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class OncePerScopeSpecification<T> : ConditionMonitorSpecificationBase<T>
 	{
-		public OncePerScopeSpecification() : this( new CachedScope<ConditionMonitor>( () => new ConditionMonitor() ) ) {}
+		public OncePerScopeSpecification() : this( new Scope<ConditionMonitor>( Factory.Scope( () => new ConditionMonitor() ) ) ) {}
 
 		public OncePerScopeSpecification( ISource<ConditionMonitor> source ) : base( source.Wrap<T, ConditionMonitor>() ) {}
 	}

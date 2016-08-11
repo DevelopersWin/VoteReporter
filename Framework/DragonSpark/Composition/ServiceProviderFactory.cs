@@ -57,7 +57,7 @@ namespace DragonSpark.Composition
 	public class DefaultServiceProviderSource : FixedFactory<IServiceProvider, IServiceProvider>
 	{
 		public static DefaultServiceProviderSource Instance { get; } = new DefaultServiceProviderSource();
-		DefaultServiceProviderSource() : base( ServiceProviderFactory.Instance.Get, Activation.DefaultServiceProvider.Instance ) {}
+		DefaultServiceProviderSource() : base( ServiceProviderFactory.Instance.Get, DefaultServiceProvider.Instance ) {}
 	}
 
 	[ApplyAutoValidation]

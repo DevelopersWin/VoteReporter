@@ -94,7 +94,7 @@ namespace DragonSpark.Diagnostics.Logger
 	public sealed class Logging : AggregateParameterizedFactoryBase<LoggerConfiguration, ILogger>
 	{
 		public static IParameterizedSource<ILogger> Instance { get; } = new Logging().ToCache();
-		Logging() : base( o => new LoggerConfiguration(), LoggerConfigurators.Instance.Create, ( configuration, parameter ) => configuration.CreateLogger().ForSource( parameter ) ) {}
+		Logging() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Instance.Get, ( configuration, parameter ) => configuration.CreateLogger().ForSource( parameter ) ) {}
 	}
 
 	public sealed class LoggingHistory : ActivatedCache<LoggerHistorySink>
@@ -109,9 +109,9 @@ namespace DragonSpark.Diagnostics.Logger
 		LoggingController() : base( o => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get( o ) ) ) {}
 	}
 
-	sealed class LoggerConfigurators : LoggerConfiguratorsBase
+	sealed class LoggerConfigurationSource : LoggerConfigurationSourceBase
 	{
-		public static LoggerConfigurators Instance { get; } = new LoggerConfigurators();
+		public static LoggerConfigurationSource Instance { get; } = new LoggerConfigurationSource();
 
 		protected override IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
 		{
@@ -136,7 +136,7 @@ namespace DragonSpark.Diagnostics.Logger
 		}
 	}
 
-	public abstract class LoggerConfiguratorsBase : ConfiguratorsBase<object, LoggerConfiguration>
+	public abstract class LoggerConfigurationSourceBase : ConfigurationSourceBase<object, LoggerConfiguration>
 	{
 		protected override IEnumerable<ITransformer<LoggerConfiguration>> From( object parameter )
 		{

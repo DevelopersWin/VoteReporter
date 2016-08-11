@@ -23,7 +23,7 @@ namespace DragonSpark.Setup
 		ImmutableArray<T> GetExports<T>( string name );
 	}
 
-	public class Exports : CachedScope<IExportProvider>
+	public class Exports : Scope<IExportProvider>
 	{
 		public static IScope<IExportProvider> Instance { get; } = new Exports();
 		Exports() : base( () => DefaultExportProvider.Instance ) {}
@@ -61,7 +61,7 @@ namespace DragonSpark.Setup
 		ServiceProviderFactory() : base( () => DefaultServiceProvider.Instance ) {}
 	}
 
-	/*public class ServiceProviderConfigurator : Configurator<IServiceProvider>
+	/*public class ServiceProviderConfigurator : ConfigurationSource<IServiceProvider>
 	{
 		public static ServiceProviderConfigurator Instance { get; } = new ServiceProviderConfigurator();
 
@@ -173,7 +173,7 @@ namespace DragonSpark.Setup
 
 	public class ServiceProviderRegistry : RepositoryBase<IServiceProvider>
 	{
-		public static ISource<IRepository<IServiceProvider>> Instance { get; } = new CachedScope<IRepository<IServiceProvider>>( () => new ServiceProviderRegistry() );
+		public static ISource<IRepository<IServiceProvider>> Instance { get; } = new Scope<IRepository<IServiceProvider>>( Factory.Scope( () => new ServiceProviderRegistry() ) );
 		ServiceProviderRegistry() : base( DefaultServiceProvider.Instance.Yield() ) {}
 
 		protected override IEnumerable<IServiceProvider> Query() => base.Query().Reverse();
@@ -220,7 +220,7 @@ namespace DragonSpark.Setup
 
 	class DependencyLocators : Cache<IDependencyLocatorKey, IServiceProvider>, IDependencyLocator
 	{
-		public static ISource<IDependencyLocator> Instance { get; } = new CachedScope<IDependencyLocator>( () => new DependencyLocators() );
+		public static ISource<IDependencyLocator> Instance { get; } = new Scope<IDependencyLocator>( Factory.Scope( () => new DependencyLocators() ) );
 		DependencyLocators() {}
 
 		public ServiceSource For( IDependencyLocatorKey locatorKey ) => Contains( locatorKey ) ? ActivatedServiceProvider.Sources.Get( Get( locatorKey ) ) : null;
@@ -314,7 +314,7 @@ namespace DragonSpark.Setup
 		public ImmutableArray<Type> Types { get; }
 	}
 
-	public sealed class ApplicationParts : CachedScope<SystemParts>
+	public sealed class ApplicationParts : Scope<SystemParts>
 	{
 		public static IScope<SystemParts> Instance { get; } = new ApplicationParts();
 		ApplicationParts() : base( () => SystemParts.Default ) {}
@@ -410,7 +410,7 @@ namespace DragonSpark.Setup
 		public AssignSystemPartsCommand( SystemParts value ) : base( ApplicationParts.Instance.Configured( value ).Cast<object>() ) {}
 	}
 
-	public sealed class ApplicationCommands : CachedScope<ImmutableArray<ICommand>>
+	public sealed class ApplicationCommands : Scope<ImmutableArray<ICommand>>
 	{
 		public static IScope<ImmutableArray<ICommand>> Instance { get; } = new ApplicationCommands();
 		ApplicationCommands() : base( () => Items<ICommand>.Immutable ) {}
