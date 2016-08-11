@@ -353,7 +353,7 @@ namespace DragonSpark.Activation
 		readonly Func<TConfiguration, TParameter, TResult> factory;
 
 		protected AggregateParameterizedFactoryBase( Func<TParameter, TConfiguration> seed, Func<TParameter, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TParameter, TResult> factory ) : 
-			this( new ParameterizedScope<TParameter, TConfiguration>( seed ), new CachedParameterizedScope<TParameter, ImmutableArray<ITransformer<TConfiguration>>>( configurators ), factory ) {}
+			this( new ParameterizedScope<TParameter, TConfiguration>( seed ), new ParameterizedScope<TParameter, ImmutableArray<ITransformer<TConfiguration>>>( configurators ), factory ) {}
 
 		protected AggregateParameterizedFactoryBase( IParameterizedScope<TParameter, TConfiguration> seed, IParameterizedScope<TParameter, ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, TParameter, TResult> factory )
 		{

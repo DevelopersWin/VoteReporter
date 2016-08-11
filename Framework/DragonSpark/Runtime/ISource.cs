@@ -289,37 +289,15 @@ namespace DragonSpark.Runtime
 		object Get( object parameter );
 	}
 
-	/*public class FactoryParameterizedScope<T> : FactoryParameterizedScope<object, T>, IParameterizedScope<T>
-	{
-		public FactoryParameterizedScope( Func<object, T> source ) : base( source ) {}
-	}
-
-	public class FactoryParameterizedScope<TParameter, TResult> : ParameterizedScopeBase<TParameter, TResult>
-	{
-		public FactoryParameterizedScope( Func<TParameter, TResult> source ) : base( source ) {}
-	}*/
-
-	public class CachedParameterizedScope<T> : CachedParameterizedScope<object, T>, IParameterizedScope<T>
-	{
-		public CachedParameterizedScope( Func<object, T> source ) : base( source ) {}
-	}
-
-	public class CachedParameterizedScope<TParameter, TResult> : ParameterizedScope<TParameter, TResult>
-	{
-		public CachedParameterizedScope( Func<TParameter, TResult> source ) : base( source.Scope() ) {}
-
-		public override void Assign( Func<Func<TParameter, TResult>> item ) => base.Assign( item().Scope() );
-	}
-
 	public interface IParameterizedScope<T> : IParameterizedScope<object, T>, IParameterizedSource<T> {}
 	public interface IParameterizedScope<TParameter, TResult> : IParameterizedSource<TParameter, TResult>, IScopeAware<Func<TParameter, TResult>> {}
 
-	/*public class ParameterizedScope<T> : ParameterizedScope<object, T>
+	public class ParameterizedScope<T> : ParameterizedScope<object, T>, IParameterizedScope<T>
 	{
 		public ParameterizedScope( Func<object, T> source ) : base( source ) {}
 		public ParameterizedScope( Func<object, Func<object, T>> source ) : base( source ) {}
-		public ParameterizedScope( IScope<Func<object, T>> scope ) : base( scope ) {}
-	}*/
+		protected ParameterizedScope( IScope<Func<object, T>> scope ) : base( scope ) {}
+	}
 
 	public class ParameterizedScope<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>, IParameterizedScope<TParameter, TResult>
 	{
@@ -342,24 +320,4 @@ namespace DragonSpark.Runtime
 		public virtual void Assign( Func<object, Func<TParameter, TResult>> item ) => scope.Assign( item );
 		public virtual void Assign( Func<Func<TParameter, TResult>> item ) => scope.Assign( item );
 	}
-
-	// public interface IDelegateScope<T> : IScope<Func<T>>, IAssignable<Func<T>>/*, ISource<T>*/ {}
-	/*public class DelegateScope<T> : Scope<Func<T>>, IDelegateScope<T>
-	{
-		public DelegateScope( Func<T> source ) : base( source.Self ) {}
-		public DelegateScope( Func<Func<T>> source ) : base( source ) {}
-
-		// public new T Get() => base.Get().Invoke();
-	}*/
-
-	/*public class CachedScope<T> : Scope<T>
-	{
-		public CachedScope() : this( () => default(T) ) {}
-
-		public CachedScope( Func<T> source ) : this( source.Wrap() ) {}
-
-		public CachedScope( Func<object, T> defaultFactory ) : base( defaultFactory.Fix() ) {}
-
-		public override void Assign( Func<object, T> item ) => base.Assign( item.Fix() );
-	}*/
 }

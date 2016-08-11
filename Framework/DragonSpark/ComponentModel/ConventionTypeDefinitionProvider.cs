@@ -2,15 +2,16 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using System;
 using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class TypeDefinitions : CachedParameterizedScope<TypeInfo, TypeInfo>
+	public sealed class TypeDefinitions : ParameterizedScope<TypeInfo, TypeInfo>
 	{
 		public static IParameterizedSource<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitions();
-		TypeDefinitions() : base( Create ) {}
+		TypeDefinitions() : base( Factory.CachedPerScope<TypeInfo, TypeInfo>( Create ) ) {}
 
 		static TypeInfo Create( TypeInfo parameter )
 		{

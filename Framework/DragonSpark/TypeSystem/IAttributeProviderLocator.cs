@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Stores;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,10 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
-	public sealed class AttributeProviders : CachedParameterizedScope<IAttributeProvider>
+	public sealed class AttributeProviders : ParameterizedScope<IAttributeProvider>
 	{
 		public static IParameterizedSource<IAttributeProvider> Instance { get; } = new AttributeProviders();
-		AttributeProviders() : base( new Factory().Create ) {}
+		AttributeProviders() : base( new Factory().ToDelegate().CachedPerScope() ) {}
 
 		sealed class Factory : ParameterConstructedCompositeFactory<IAttributeProvider>
 		{
@@ -55,10 +56,10 @@ namespace DragonSpark.TypeSystem
 		ReflectionElementAttributeProvider() : base( typeof(TypeInfoAttributeProvider), typeof(PropertyInfoAttributeProvider), typeof(MethodInfoAttributeProvider), typeof(MemberInfoAttributeProvider) ) {}
 	}
 
-	sealed class TypeDefinitions : CachedParameterizedScope<TypeInfo>
+	sealed class TypeDefinitions : ParameterizedScope<TypeInfo>
 	{
 		public static TypeDefinitions Instance { get; } = new TypeDefinitions();
-		TypeDefinitions() : base( new Factory().Create ) {}
+		TypeDefinitions() : base( new Factory().ToDelegate().CachedPerScope() ) {}
 
 		sealed class Factory : CompositeFactory<object, TypeInfo>
 		{
@@ -100,10 +101,10 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
-	sealed class MemberInfoDefinitions : CachedParameterizedScope<MemberInfo>
+	sealed class MemberInfoDefinitions : ParameterizedScope<MemberInfo>
 	{
 		public static IParameterizedSource<MemberInfo> Instance { get; } = new MemberInfoDefinitions();
-		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).Create ) {}
+		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).ToDelegate().CachedPerScope() ) {}
 
 		sealed class Factory : FactoryBase<object, MemberInfo>
 		{

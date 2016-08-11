@@ -18,9 +18,9 @@ namespace DragonSpark.TypeSystem
 {
 	public static class Configuration
 	{
-		public static IParameterizedScope<string, ImmutableArray<string>> AssemblyPathLocator { get; } = new CachedParameterizedScope<string, ImmutableArray<string>>( path => Items<string>.Immutable ).ScopedWithDefault();
+		public static IParameterizedScope<string, ImmutableArray<string>> AssemblyPathLocator { get; } = new ParameterizedScope<string, ImmutableArray<string>>( path => Items<string>.Immutable ).ScopedWithDefault();
 
-		public static IParameterizedScope<string, Assembly> AssemblyLoader { get; } = new CachedParameterizedScope<string, Assembly>( path => default(Assembly) ).ScopedWithDefault();
+		public static IParameterizedScope<string, Assembly> AssemblyLoader { get; } = new ParameterizedScope<string, Assembly>( path => default(Assembly) ).ScopedWithDefault();
 
 		public static IScope<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = 
 			new Scope<ImmutableArray<ITypeDefinitionProvider>>( TypeDefinitionProviderStore.Instance.Get );

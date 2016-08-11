@@ -47,7 +47,7 @@ namespace DragonSpark.Runtime.Sources
 		public static ICommand Configured<T>( this IAssignable<Func<T>> @this, ISource<T> source ) => @this.Configured( source.ToDelegate() );
 		public static ICommand Configured<T>( this IAssignable<Func<T>> @this, T instance ) => @this.Configured( Factory.For( instance ) );
 		public static ICommand Configured<T>( this IAssignable<Func<T>> @this, Func<T> factory ) => new AssignCommand<Func<T>>( @this ).Fixed( factory );
-		//public static ICommand ConfigureGlobal<T>( this IAssignable<Func<object, T>> @this, T instance ) => new AssignCommand<Func<object, T>>( @this ).Fixed( Factory.For( instance ).Wrap() );
+		public static ICommand Configured<T>( this IAssignable<Func<object, T>> @this, Func<object, T> factory ) => new AssignCommand<Func<object, T>>( @this ).Fixed( factory );
 		// public static ICommand ToGlobalConfiguration<T>( this IAssignable<Func<object, T>> @this, ISource<T> value ) => new ApplySourceConfigurationCommand<T>( value, @this );
 	}
 }

@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
@@ -13,21 +14,15 @@ namespace DragonSpark.Windows
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution()
-		{
-			/*Activation.Execution.Context.Assign( ExecutionContext.Instance );
-			DragonSpark.TypeSystem.Configuration.AssemblyLoader.Assign( Assembly.LoadFile );
-			DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Assign( AssemblyLocator.Instance.ToDelegate() );*/
-			Command.Instance.Run();
-		}
+		public static void Execution() => Command.Instance.Run();
 
 		class Command : DragonSpark.Setup.Setup
 		{
 			public static ICommand Instance { get; } = new Command();
 			Command() : base( 
 				Activation.Execution.Context.From( ExecutionContext.Instance ), 
-				DragonSpark.TypeSystem.Configuration.AssemblyLoader.Configured( new Func<string, Assembly>( Assembly.LoadFile ) ),
-				DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Configured( AssemblyLocator.Instance.ToDelegate() )
+				DragonSpark.TypeSystem.Configuration.AssemblyLoader.Configured( new Func<string, Assembly>( Assembly.LoadFile ).Wrap() ),
+				DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Configured( AssemblyLocator.Instance.ToDelegate().Wrap() )
 				) {}
 		}
 	}

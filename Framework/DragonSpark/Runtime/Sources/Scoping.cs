@@ -18,7 +18,7 @@ namespace DragonSpark.Runtime.Sources
 
 		public static Func<object, T> Scope<T>( this Func<T> @this ) => @this.Wrap().Fix();
 
-		public static Func<object, Func<TParameter, TResult>> Scope<TParameter, TResult>( this Func<TParameter, TResult> @this ) => new Cache<TParameter, TResult>( @this ).Get;
+		public static Func<object, Func<TParameter, TResult>> CachedPerScope<TParameter, TResult>( this Func<TParameter, TResult> @this ) => new Cache<TParameter, TResult>( @this ).Get;
 		class Cache<TParameter, TResult> : FactoryCache<Func<TParameter, TResult>>
 		{
 			readonly Func<TParameter, TResult> factory;

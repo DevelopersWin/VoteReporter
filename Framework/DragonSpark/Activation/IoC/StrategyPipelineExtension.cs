@@ -3,6 +3,7 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
@@ -188,7 +189,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public sealed class ConventionTypes : CachedParameterizedScope<Type, Type>
+	public sealed class ConventionTypes : ParameterizedScope<Type, Type>
 	{
 		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
 		readonly static Func<Type, bool> Specification = Defaults.ActivateSpecification.IsSatisfiedBy;
@@ -196,7 +197,7 @@ namespace DragonSpark.Activation.IoC
 		public static IParameterizedSource<Type, Type> Instance { get; } = new ConventionTypes();
 		ConventionTypes() : this( ApplicationTypes.Instance ) {}
 
-		public ConventionTypes( ITypeSource source ) : base( new Locator( source ).Create ) {}
+		public ConventionTypes( ITypeSource source ) : base( new Locator( source ).ToDelegate().CachedPerScope() ) {}
 
 		[ApplyAutoValidation]
 		sealed class Locator : FactoryBase<Type, Type>

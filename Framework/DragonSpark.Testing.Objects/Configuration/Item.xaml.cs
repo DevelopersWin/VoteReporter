@@ -1,4 +1,6 @@
-﻿namespace DragonSpark.Windows.Testing.Configuration
+﻿using DragonSpark.Diagnostics;
+
+namespace DragonSpark.Testing.Objects.Configuration
 {
 	/// <summary>
 	/// Interaction logic for Item.xaml
@@ -7,7 +9,7 @@
 	{
 		public Item()
 		{
-			InitializeComponent();
+			RetryCommand.Instance.Execute( InitializeComponent );
 		}
 	}
 }
