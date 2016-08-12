@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Security
 {

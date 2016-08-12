@@ -2,7 +2,8 @@ using DragonSpark.Activation;
 using System;
 using System.Collections.Immutable;
 using System.Reflection;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime
 {

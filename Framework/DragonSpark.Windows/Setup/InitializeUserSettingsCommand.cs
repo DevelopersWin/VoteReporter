@@ -13,7 +13,8 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Setup
 {

@@ -3,7 +3,7 @@ using Serilog.Events;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Diagnostics
 {
@@ -71,7 +71,7 @@ namespace DragonSpark.Diagnostics
 		public ITimer Timer { get; }
 	}
 
-	public class TimerEventConverter : ProjectedFactory<TimerEvent, TimerEvent<Timer>, TimerEventTemplate>
+	public class TimerEventConverter : ProjectedSource<TimerEvent, TimerEvent<Timer>, TimerEventTemplate>
 	{
 		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
 

@@ -2,6 +2,7 @@
 using DragonSpark.Runtime;
 using System;
 using System.Composition;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Diagnostics
 {

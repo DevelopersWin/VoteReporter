@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using System.Configuration;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Setup
 {

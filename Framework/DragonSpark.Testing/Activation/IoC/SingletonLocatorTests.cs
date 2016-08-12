@@ -4,7 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Activation.IoC

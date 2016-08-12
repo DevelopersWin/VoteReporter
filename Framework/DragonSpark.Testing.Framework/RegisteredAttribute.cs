@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Framework
 		}
 
 		public override ICustomization GetCustomization( ParameterInfo parameter ) => 
-			new RegistrationCustomization( new FactoryRegistration( factoryType ?? FactoryTypeLocator.Instance.Get( parameter.ParameterType ), parameter.ParameterType ) );
+			new RegistrationCustomization( new FactoryRegistration( factoryType ?? SourceTypeLocator.Instance.Get( parameter.ParameterType ), parameter.ParameterType ) );
 	}*/
 
 	public static class FixtureExtensions

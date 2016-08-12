@@ -10,8 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation.Sources;
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {

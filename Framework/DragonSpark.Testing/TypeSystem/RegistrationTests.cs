@@ -9,7 +9,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Reflection;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using Xunit;
 using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
 

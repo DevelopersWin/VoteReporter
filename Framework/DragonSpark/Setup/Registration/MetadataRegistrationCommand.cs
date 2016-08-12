@@ -8,6 +8,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Setup.Registration
 {

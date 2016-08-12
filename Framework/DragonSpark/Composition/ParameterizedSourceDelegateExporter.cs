@@ -1,10 +1,11 @@
 using System;
 using System.Composition.Hosting.Core;
 using DragonSpark.Activation;
-using DragonSpark.Activation.Sources;
-using DragonSpark.Activation.Sources.Caching;
 using DragonSpark.Runtime;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Composition
 {

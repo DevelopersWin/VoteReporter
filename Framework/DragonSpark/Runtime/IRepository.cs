@@ -3,7 +3,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Runtime
 {

@@ -6,7 +6,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Windows.Entity

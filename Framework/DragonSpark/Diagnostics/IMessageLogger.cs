@@ -12,7 +12,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Markup;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Diagnostics
 {

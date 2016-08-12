@@ -8,7 +8,7 @@ using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Composition;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime

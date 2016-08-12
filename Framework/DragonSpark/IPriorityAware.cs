@@ -6,7 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark
 {

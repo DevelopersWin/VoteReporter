@@ -3,7 +3,8 @@ using DragonSpark.Extensions;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {

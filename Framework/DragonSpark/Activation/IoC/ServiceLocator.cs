@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation.IoC
 {

@@ -3,7 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Windows.Entity;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 
 namespace DevelopersWin.VoteReporter
 {

@@ -1,5 +1,5 @@
-using DragonSpark.Activation.Sources;
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Caching;
 using Microsoft.Practices.ObjectBuilder2;
 
 namespace DragonSpark.Activation.IoC

@@ -4,6 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Windows.Markup;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Markup
 {

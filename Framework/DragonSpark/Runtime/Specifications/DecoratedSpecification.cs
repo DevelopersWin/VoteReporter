@@ -2,8 +2,9 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
-using DragonSpark.Activation.Sources;
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Runtime.Specifications
 {

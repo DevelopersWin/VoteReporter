@@ -3,7 +3,8 @@ using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
 using System;
 using System.Reflection;
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation.IoC
 {

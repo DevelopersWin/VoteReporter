@@ -3,7 +3,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime

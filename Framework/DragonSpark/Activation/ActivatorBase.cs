@@ -1,4 +1,5 @@
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
 using System;
 
 namespace DragonSpark.Activation

@@ -14,7 +14,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 

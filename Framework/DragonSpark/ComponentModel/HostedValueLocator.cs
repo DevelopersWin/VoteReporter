@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.ComponentModel
 {

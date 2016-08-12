@@ -6,7 +6,8 @@ using DragonSpark.Setup;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition

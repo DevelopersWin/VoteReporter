@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources.Caching;
 
 namespace DragonSpark.Windows.Runtime
 {

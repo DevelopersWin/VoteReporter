@@ -4,7 +4,7 @@ using DragonSpark.Setup;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 
 namespace DragonSpark.TypeSystem
 {

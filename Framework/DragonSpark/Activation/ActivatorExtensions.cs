@@ -1,7 +1,9 @@
 ﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -9,8 +11,6 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation.Sources;
-using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Activation
 {

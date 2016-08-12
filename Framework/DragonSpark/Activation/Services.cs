@@ -3,7 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using System;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Activation
 {

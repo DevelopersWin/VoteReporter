@@ -1,4 +1,4 @@
-﻿using DragonSpark.Activation.Sources;
+﻿using DragonSpark.Sources;
 using Serilog.Events;
 
 namespace DragonSpark.Diagnostics

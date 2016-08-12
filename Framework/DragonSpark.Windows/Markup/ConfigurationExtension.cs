@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Markup
 {

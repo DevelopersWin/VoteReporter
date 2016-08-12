@@ -3,6 +3,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Xml;
 using System.Xml.XPath;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime.Data
 {

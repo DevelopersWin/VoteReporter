@@ -3,11 +3,12 @@ using DragonSpark.Aspects;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.TypeSystem
 {

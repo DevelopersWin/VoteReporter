@@ -4,7 +4,7 @@ using DragonSpark.Testing.Objects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Testing.ComponentModel
 {

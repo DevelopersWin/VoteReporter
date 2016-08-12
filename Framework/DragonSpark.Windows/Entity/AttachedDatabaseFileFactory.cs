@@ -3,7 +3,7 @@ using System.Data.Entity;
 using System.Data.Entity.Core.Common;
 using System.Data.SqlClient;
 using System.IO;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Windows.Entity
 {

@@ -8,7 +8,7 @@ using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using Microsoft.Practices.Unity;
 using System;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 using Xunit;
 using Xunit.Abstractions;
 using ConstructorLocator = DragonSpark.Activation.IoC.Specifications.ConstructorLocator;

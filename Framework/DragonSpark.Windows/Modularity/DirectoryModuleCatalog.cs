@@ -8,6 +8,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Windows.Runtime;
 
 namespace DragonSpark.Windows.Modularity

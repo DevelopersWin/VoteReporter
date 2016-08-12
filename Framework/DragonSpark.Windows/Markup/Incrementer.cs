@@ -1,4 +1,4 @@
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources.Caching;
 
 namespace DragonSpark.Windows.Markup
 {

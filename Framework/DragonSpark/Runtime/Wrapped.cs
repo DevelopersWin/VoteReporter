@@ -1,5 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -7,7 +9,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using System.Reflection;
-using DragonSpark.Activation.Sources.Caching;
 using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Runtime
@@ -201,7 +202,7 @@ namespace DragonSpark.Runtime
 	public class Delegates : Cache<object, ICache<MethodInfo, Delegate>>
 	{
 		public static Delegates Default { get; } = new Delegates();
-		Delegates() : base( o => new Cache<MethodInfo, Delegate>( new Factory( o ).Create ) ) {}
+		Delegates() : base( o => new Factory( o ).ToCache() ) {}
 
 		/*public Delegate Lookup( Delegate source )
 		{

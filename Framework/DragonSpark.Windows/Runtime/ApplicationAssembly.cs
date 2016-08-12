@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Composition;
 using System.IO;
 using System.Reflection;
-using DragonSpark.Activation.Sources;
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime
 {

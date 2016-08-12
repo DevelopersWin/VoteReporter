@@ -14,6 +14,7 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using DragonSpark.Sources.Parameterized;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Entity

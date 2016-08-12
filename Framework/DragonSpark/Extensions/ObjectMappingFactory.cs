@@ -1,7 +1,8 @@
 using AutoMapper;
 using DragonSpark.Activation;
-using DragonSpark.Activation.Sources;
 using DragonSpark.Runtime;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Extensions
 {

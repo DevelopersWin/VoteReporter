@@ -4,6 +4,7 @@ using System;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Reflection;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.ComponentModel
 {

@@ -6,7 +6,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using System.Composition;
 using System.Reflection;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 using Xunit;
 using ExecutionContext = DragonSpark.Testing.Framework.ExecutionContext;
 

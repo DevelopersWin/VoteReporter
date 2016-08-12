@@ -2,7 +2,7 @@
 using DragonSpark.Extensions;
 using System.Composition;
 using System.Composition.Hosting;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition

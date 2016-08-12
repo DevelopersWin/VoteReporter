@@ -2,6 +2,7 @@
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Objects;
 using Xunit;
 

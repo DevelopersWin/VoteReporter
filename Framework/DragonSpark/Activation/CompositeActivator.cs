@@ -1,6 +1,7 @@
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using System.Linq;
-using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Activation
 {

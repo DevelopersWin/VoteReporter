@@ -2,6 +2,7 @@
 using DragonSpark.Extensions;
 using System;
 using System.Linq;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Runtime.Specifications
 {

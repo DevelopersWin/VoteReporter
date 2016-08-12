@@ -3,6 +3,7 @@ using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime
 {

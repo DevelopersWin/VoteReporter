@@ -1,6 +1,7 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Runtime;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
@@ -8,7 +9,6 @@ using PostSharp.Serialization;
 using System;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Aspects
 {
@@ -58,9 +58,9 @@ namespace DragonSpark.Aspects
 		public string Execute { get; }
 	}*/
 
-	abstract class AdapterFactoryBase<T> : ProjectedFactory<T, IParameterValidationAdapter> where T : class
+	abstract class AdapterSourceBase<T> : ProjectedSource<T, IParameterValidationAdapter> where T : class
 	{
-		protected AdapterFactoryBase( Func<T, IParameterValidationAdapter> create ) : base( create ) {}
+		protected AdapterSourceBase( Func<T, IParameterValidationAdapter> create ) : base( create ) {}
 	}
 
 	abstract class GenericParameterProfileFactoryBase : GenericInvocationFactory<object, IParameterValidationAdapter>
@@ -98,16 +98,16 @@ namespace DragonSpark.Aspects
 		static IParameterValidationAdapter Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
-	class CommandProfileFactory : AdapterFactoryBase<ICommand>
+	class CommandProfileSource : AdapterSourceBase<ICommand>
 	{
-		public static CommandProfileFactory Instance { get; } = new CommandProfileFactory();
-		CommandProfileFactory() : base( instance => new CommandAdapter( instance ) ) {}
+		public static CommandProfileSource Instance { get; } = new CommandProfileSource();
+		CommandProfileSource() : base( instance => new CommandAdapter( instance ) ) {}
 	}
 
-	class FactoryProfileFactory : AdapterFactoryBase<IFactoryWithParameter>
+	class SourceProfileSource : AdapterSourceBase<IFactoryWithParameter>
 	{
-		public static FactoryProfileFactory Instance { get; } = new FactoryProfileFactory();
-		FactoryProfileFactory() : base( instance => new FactoryAdapter( instance ) ) {}
+		public static SourceProfileSource Instance { get; } = new SourceProfileSource();
+		SourceProfileSource() : base( instance => new FactoryAdapter( instance ) ) {}
 	}
 
 	/*public struct AutoValidationParameter

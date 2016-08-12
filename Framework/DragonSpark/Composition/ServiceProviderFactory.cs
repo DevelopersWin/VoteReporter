@@ -9,7 +9,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Windows.Input;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using Type = System.Type;
 
 namespace DragonSpark.Composition

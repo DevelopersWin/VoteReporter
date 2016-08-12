@@ -13,6 +13,6 @@ namespace DragonSpark.ComponentModel
 	{
 		readonly static Func<Type, object> FactoryMethod = SourceFactory.Instance.Create;
 		
-		public FactoryAttribute( Type factoryType = null ) : base( new ServicesValueProvider.Converter( p => factoryType ?? FactoryTypeLocator.Instance.Get( p.GetMethod.ReturnType ) ), FactoryMethod ) {}
+		public FactoryAttribute( Type factoryType = null ) : base( new ServicesValueProvider.Converter( p => factoryType ?? SourceTypeLocator.Instance.Get( p.GetMethod.ReturnType ) ), FactoryMethod ) {}
 	}
 }

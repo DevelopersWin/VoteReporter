@@ -4,6 +4,7 @@ using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.ComponentModel
 {

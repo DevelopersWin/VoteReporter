@@ -7,6 +7,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Framework.Setup.Location
 {

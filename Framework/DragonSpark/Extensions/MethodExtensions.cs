@@ -3,7 +3,7 @@ using DragonSpark.Runtime.Specifications;
 using System;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation.Sources.Caching;
+using DragonSpark.Sources.Caching;
 
 namespace DragonSpark.Extensions
 {

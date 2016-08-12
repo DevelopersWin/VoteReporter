@@ -5,7 +5,7 @@ using System;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition

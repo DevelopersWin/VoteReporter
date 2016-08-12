@@ -2,6 +2,7 @@ using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation
 {

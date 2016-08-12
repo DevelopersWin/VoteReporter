@@ -3,6 +3,7 @@ using DragonSpark.Setup.Registration;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Sources.Parameterized;
 using Type = System.Type;
 
 namespace DragonSpark.Setup

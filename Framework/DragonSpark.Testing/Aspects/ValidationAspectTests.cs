@@ -4,6 +4,7 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using Ploeh.AutoFixture.Xunit2;
 using System.Windows.Input;
+using DragonSpark.Sources.Parameterized;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects

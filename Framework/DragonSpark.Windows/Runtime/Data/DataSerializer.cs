@@ -6,6 +6,7 @@ using System.IO;
 using System.Xaml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime.Data
 {

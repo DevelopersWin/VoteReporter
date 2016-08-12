@@ -2,6 +2,7 @@ using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using System;
 using System.Composition;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation.IoC
 {

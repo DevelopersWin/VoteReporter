@@ -5,6 +5,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Framework.Setup
 {

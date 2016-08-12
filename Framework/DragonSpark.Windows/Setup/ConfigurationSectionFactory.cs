@@ -3,7 +3,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Configuration;
 using System.Linq;
-using DragonSpark.Activation.Sources;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Windows.Setup
 {
