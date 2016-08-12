@@ -50,15 +50,15 @@ namespace DragonSpark.Testing.Aspects.Validation
 			BasicAutoValidationWith( sut, sut );
 		}
 
-		static void BasicAutoValidationWith( IFactoryWithParameter factory, IFactory sut )
+		static void BasicAutoValidationWith( IValidatedParameterizedSource factory, IFactory sut )
 		{
-			var cannot = factory.CanCreate( 456 );
+			var cannot = factory.IsValid( 456 );
 			Assert.False( cannot );
 			Assert.Equal( 1, sut.CanCreateCalled );
 
 			for ( int i = 0; i < 10; i++ )
 			{
-				var can = factory.CanCreate( 123 );
+				var can = factory.IsValid( 123 );
 				Assert.True( can );
 			}
 
@@ -80,7 +80,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			public int CreateCalled { get; private set; }
 
-			public bool CanCreate( object parameter )
+			public bool IsValid( object parameter )
 			{
 				CanCreateCalled++;
 				return (int)parameter == 123;
@@ -104,7 +104,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			public int CreateCalled { get; private set; }
 
-			public bool CanCreate( object parameter )
+			public bool IsValid( object parameter )
 			{
 				CanCreateCalled++;
 				return (int)parameter == 123;

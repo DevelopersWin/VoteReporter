@@ -63,7 +63,7 @@ namespace DragonSpark.TypeSystem
 
 		sealed class Factory : CompositeFactory<object, TypeInfo>
 		{
-			readonly static Func<object, TypeInfo>[] Factories = new IFactoryWithParameter[] { TypeInfoDefinitionProvider.Instance, MemberInfoDefinitionProvider.Instance, GeneralDefinitionProvider.Instance }.Select( parameter => new Func<object, TypeInfo>( parameter.Create<TypeInfo> ) ).Fixed();
+			readonly static Func<object, TypeInfo>[] Factories = new IValidatedParameterizedSource[] { TypeInfoDefinitionProvider.Instance, MemberInfoDefinitionProvider.Instance, GeneralDefinitionProvider.Instance }.Select( parameter => new Func<object, TypeInfo>( parameter.Create<TypeInfo> ) ).Fixed();
 
 			public Factory() : this( ComponentModel.TypeDefinitions.Instance.Get ) { }
 
@@ -108,7 +108,7 @@ namespace DragonSpark.TypeSystem
 
 		sealed class Factory : FactoryBase<object, MemberInfo>
 		{
-			readonly static ImmutableArray<Func<object, IFactoryWithParameter>> Delegates = new[] { typeof(PropertyInfoDefinitionLocator), typeof(ConstructorInfoDefinitionLocator), typeof(MethodInfoDefinitionLocator), typeof(TypeInfoDefinitionLocator) }.Select( type => ParameterConstructor<IFactoryWithParameter>.Make( typeof(TypeInfo), type ) ).ToImmutableArray();
+			readonly static ImmutableArray<Func<object, IValidatedParameterizedSource>> Delegates = new[] { typeof(PropertyInfoDefinitionLocator), typeof(ConstructorInfoDefinitionLocator), typeof(MethodInfoDefinitionLocator), typeof(TypeInfoDefinitionLocator) }.Select( type => ParameterConstructor<IValidatedParameterizedSource>.Make( typeof(TypeInfo), type ) ).ToImmutableArray();
 		
 			readonly Func<object, TypeInfo> typeSource;
 
@@ -186,7 +186,7 @@ namespace DragonSpark.TypeSystem
 				foreach ( var @delegate in Delegates )
 				{
 					var factory = @delegate( definition );
-					if ( factory?.CanCreate( parameter ) ?? false )
+					if ( factory?.IsValid( parameter ) ?? false )
 					{
 						return factory.Create<MemberInfo>( parameter );
 					}

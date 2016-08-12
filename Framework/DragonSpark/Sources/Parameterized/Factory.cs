@@ -30,7 +30,7 @@ namespace DragonSpark.Sources.Parameterized
 	public sealed class IsParameterizedSourceSpecification : AdapterSpecificationBase
 	{
 		public static ISpecification<Type> Instance { get; } = new IsParameterizedSourceSpecification().Cached();
-		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>), typeof(IParameterizedSource), typeof(IFactory<,>), typeof(IFactoryWithParameter) ) {}
+		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>), typeof(IParameterizedSource), typeof(IFactory<,>), typeof(IValidatedParameterizedSource) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );
 	}

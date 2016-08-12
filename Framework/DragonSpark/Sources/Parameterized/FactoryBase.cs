@@ -117,9 +117,9 @@ namespace DragonSpark.Sources.Parameterized
 
 	/*public class DecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
 	{
-		public static ICache<IFactoryWithParameter, Func<TParameter, TResult>> Cache { get; } = new Cache<IFactoryWithParameter, Func<TParameter, TResult>>( parameter => new DecoratedFactory<TParameter, TResult>( parameter ).ToDelegate() );
+		public static ICache<IValidatedParameterizedSource, Func<TParameter, TResult>> Cache { get; } = new Cache<IValidatedParameterizedSource, Func<TParameter, TResult>>( parameter => new DecoratedFactory<TParameter, TResult>( parameter ).ToDelegate() );
 
-		DecoratedFactory( IFactoryWithParameter inner ) : this( inner.Cast<TParameter, TResult>() ) {}
+		DecoratedFactory( IValidatedParameterizedSource inner ) : this( inner.Cast<TParameter, TResult>() ) {}
 
 		public DecoratedFactory( IFactory<TParameter, TResult> inner ) : this( inner, Defaults<TParameter>.Coercer ) {}
 
@@ -147,7 +147,7 @@ namespace DragonSpark.Sources.Parameterized
 			this.specification = specification;
 		}
 	
-		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
+		bool IValidatedParameterizedSource.IsValid( object parameter ) => specification.IsSatisfiedBy( parameter );
 
 		object CreateFromParameter( object parameter )
 		{
@@ -234,7 +234,7 @@ namespace DragonSpark.Sources.Parameterized
 
 		// public static Func<IExportProvider> DefaultExports { get; } = Setup.Exports.Instance.Get;
 
-		// public static Func<Type, Func<object, IFactoryWithParameter>> ParameterConstructedFactory { get; } = Defaults<IFactoryWithParameter>.Constructor.ToDelegate();
+		// public static Func<Type, Func<object, IValidatedParameterizedSource>> ParameterConstructedFactory { get; } = Defaults<IValidatedParameterizedSource>.Constructor.ToDelegate();
 
 		// public static Func<Type, bool> ApplicationType { get; } = ApplicationTypeSpecification.Instance.ToDelegate();
 	}

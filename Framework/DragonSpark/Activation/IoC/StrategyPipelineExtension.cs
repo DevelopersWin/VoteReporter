@@ -288,7 +288,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionImplementedInterfaces : FactoryCache<Type, Type>
 	{
-		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces( typeof(ISource), typeof(IParameterizedSource), typeof(IFactoryWithParameter) );
+		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces( typeof(ISource), typeof(IParameterizedSource), typeof(IValidatedParameterizedSource) );
 		ConventionImplementedInterfaces( params Type[] ignore ) : this( ignore.ToImmutableArray() ) {}
 
 		readonly ImmutableArray<Type> ignore;

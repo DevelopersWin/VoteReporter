@@ -12,8 +12,8 @@ namespace DragonSpark.Testing.Aspects
 		public void Validation()
 		{
 			var sut = new TestFactory();
-			var factory = sut.WithAutoValidation().To<IFactoryWithParameter>();
-			factory.CanCreate( new object() );
+			var factory = sut.WithAutoValidation().To<IValidatedParameterizedSource>();
+			factory.IsValid( new object() );
 
 			Assert.False( sut.Called );
 			Assert.True( sut.GenericCalled );
@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Aspects
 			public bool Called { get; set; }
 			public bool GenericCalled { get; set; }
 
-			bool IFactoryWithParameter.CanCreate( object parameter )
+			bool IValidatedParameterizedSource.IsValid( object parameter )
 			{
 				Called = true;
 				return CanCreate( parameter );

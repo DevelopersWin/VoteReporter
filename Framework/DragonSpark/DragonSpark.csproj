@@ -180,7 +180,7 @@
     <Compile Include="Activation\ConstructorBase.cs" />
     <Compile Include="Activation\ConstructCoercer.cs" />
     <Compile Include="Activation\ICoercer.cs" />
-    <Compile Include="Sources\Parameterized\IFactoryWithParameter.cs" />
+    <Compile Include="Sources\Parameterized\IValidatedParameterizedSource.cs" />
     <Compile Include="Activation\IoC\ArrayResolutionStrategy.cs" />
     <Compile Include="Activation\IoC\ConstructorSelectorPolicy.cs" />
     <Compile Include="Activation\IoC\EnumerableResolutionStrategy.cs" />

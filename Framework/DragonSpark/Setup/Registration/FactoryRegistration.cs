@@ -39,7 +39,7 @@ namespace DragonSpark.Setup.Registration
 	/*public class SourceDelegatesFactory : 
 	{
 		/*
-		readonly static Func<Type, bool> FactoryWithParameterSpecification = TypeAssignableSpecification<IFactoryWithParameter>.Instance.ToDelegate();#1#
+		readonly static Func<Type, bool> FactoryWithParameterSpecification = TypeAssignableSpecification<IValidatedParameterizedSource>.Instance.ToDelegate();#1#
 
 		public static SourceDelegatesFactory Instance { get; } = new SourceDelegatesFactory();
 		SourceDelegatesFactory() : base(  ) {}

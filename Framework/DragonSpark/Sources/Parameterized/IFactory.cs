@@ -25,7 +25,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public delegate T Transform<T>( T parameter );
 
-	public interface IFactory<in TParameter, out TResult> : IFactoryWithParameter
+	public interface IFactory<in TParameter, out TResult> : IValidatedParameterizedSource
 	{
 		bool CanCreate( TParameter parameter );
 
@@ -42,14 +42,14 @@ namespace DragonSpark.Sources.Parameterized
 				.Select( @this.Create )
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
-		public static ImmutableArray<TResult> CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
+		public static ImmutableArray<TResult> CreateMany<TResult>( this IValidatedParameterizedSource @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
 			parameters
-				.Where( @this.CanCreate )
+				.Where( @this.IsValid )
 				.Select( @this.Get )
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
-		public static T Create<T>( this IFactoryWithParameter @this, object parameter ) => (T)@this.Get( parameter );
+		public static T Create<T>( this IValidatedParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );
 
 		public static Func<object, T> Wrap<T>( this T @this ) => @this.Wrap<object, T>();
 
@@ -140,16 +140,16 @@ namespace DragonSpark.Sources.Parameterized
 			}
 		}
 
-		public static IFactory<TParameter, TResult> Cast<TParameter, TResult>( this IFactoryWithParameter @this ) => @this as IFactory<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
-		sealed class Casted<TParameter, TResult> : Cache<IFactoryWithParameter, IFactory<TParameter, TResult>>
+		public static IFactory<TParameter, TResult> Cast<TParameter, TResult>( this IValidatedParameterizedSource @this ) => @this as IFactory<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
+		sealed class Casted<TParameter, TResult> : Cache<IValidatedParameterizedSource, IFactory<TParameter, TResult>>
 		{
 			public static Casted<TParameter, TResult> Default { get; } = new Casted<TParameter, TResult>();
 			Casted() : base( result => new CastedFactory( result ) ) {}
 
 			class CastedFactory : FactoryBase<TParameter, TResult>
 			{
-				readonly IFactoryWithParameter inner;
-				public CastedFactory( IFactoryWithParameter inner ) : base( inner.ToSpecification().Cast<TParameter>() )
+				readonly IValidatedParameterizedSource inner;
+				public CastedFactory( IValidatedParameterizedSource inner ) : base( inner.ToSpecification().Cast<TParameter>() )
 				{
 					this.inner = inner;
 				}
@@ -186,11 +186,11 @@ namespace DragonSpark.Sources.Parameterized
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		public static ISpecification<object> ToSpecification( this IFactoryWithParameter @this ) => FactorySpecifications.Default.Get( @this );
-		sealed class FactorySpecifications : Cache<IFactoryWithParameter, ISpecification<object>>
+		public static ISpecification<object> ToSpecification( this IValidatedParameterizedSource @this ) => FactorySpecifications.Default.Get( @this );
+		sealed class FactorySpecifications : Cache<IValidatedParameterizedSource, ISpecification<object>>
 		{
 			public static FactorySpecifications Default { get; } = new FactorySpecifications();
-			FactorySpecifications() : base( factory => new DelegatedSpecification<object>( factory.CanCreate ) ) {}
+			FactorySpecifications() : base( factory => new DelegatedSpecification<object>( factory.IsValid ) ) {}
 		}
 
 		public static ISpecification<TParameter> ToSpecification<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => FactorySpecifications<TParameter, TResult>.Default.Get( @this );
@@ -225,8 +225,8 @@ namespace DragonSpark.Sources.Parameterized
 			AutoValidationFactories() : base( factory => new AutoValidatingFactory<TParameter,TResult>( factory ) ) {}
 		}
 
-		public static IFactoryWithParameter WithAutoValidation( this IFactoryWithParameter @this ) => AutoValidationFactories.Default.Get( @this );
-		sealed class AutoValidationFactories : Cache<IFactoryWithParameter, IFactoryWithParameter>
+		public static IValidatedParameterizedSource WithAutoValidation( this IValidatedParameterizedSource @this ) => AutoValidationFactories.Default.Get( @this );
+		sealed class AutoValidationFactories : Cache<IValidatedParameterizedSource, IValidatedParameterizedSource>
 		{
 			public static AutoValidationFactories Default { get; } = new AutoValidationFactories();
 			AutoValidationFactories() : base( factory => new AutoValidatingFactory( factory ) ) {}

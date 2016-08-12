@@ -81,7 +81,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
 
-			var invalid = factory.CanCreate( "Message" );
+			var invalid = factory.IsValid( "Message" );
 			Assert.False( invalid );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
@@ -141,7 +141,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			public int CreateGenericCalled { get; private set; }
 			public void Reset() => CanCreateCalled = CreateCalled = CanCreateGenericCalled = CreateGenericCalled = 0;
 
-			public bool CanCreate( object parameter )
+			public bool IsValid( object parameter )
 			{
 				CanCreateCalled++;
 				return parameter is int && CanCreate( (int)parameter );
@@ -177,7 +177,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			public int CreateGenericCalled { get; private set; }
 			public void Reset() => CanCreateCalled = CreateCalled = CanCreateGenericCalled = CreateGenericCalled = 0;
 
-			public bool CanCreate( object parameter )
+			public bool IsValid( object parameter )
 			{
 				CanCreateCalled++;
 				return parameter is int && CanCreate( (int)parameter );

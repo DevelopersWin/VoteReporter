@@ -11,7 +11,7 @@ namespace DragonSpark.Aspects
 {
 	public class OfSourceType : OfTypeAttribute
 	{
-		public OfSourceType() : base( typeof(IFactoryWithParameter), typeof(Func<>), typeof(Func<,>) ) {}
+		public OfSourceType() : base( typeof(IValidatedParameterizedSource), typeof(Func<>), typeof(Func<,>) ) {}
 	}
 
 	public class OfTypeAttribute : LocationContractAttribute, ILocationValidationAspect<Type>

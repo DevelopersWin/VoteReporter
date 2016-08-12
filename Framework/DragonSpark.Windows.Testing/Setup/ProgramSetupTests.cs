@@ -43,12 +43,12 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, AutoData]
 		public void TypeCheck( IUnityContainer container )
 		{
-			var constructor = container.Resolve<Constructor>().To<IFactoryWithParameter>();
-			var cancan = constructor.CanCreate( typeof(MonitoredModule) );
+			var constructor = container.Resolve<Constructor>().To<IValidatedParameterizedSource>();
+			var cancan = constructor.IsValid( typeof(MonitoredModule) );
 			Assert.True( cancan );
 
 			var activator = container.Resolve<IActivator>();
-			var can = activator.CanCreate( typeof(MonitoredModule) );
+			var can = activator.IsValid( typeof(MonitoredModule) );
 			Assert.True( can );
 
 			/*var created = activator.Create( typeof(MonitoredModule) );

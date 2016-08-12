@@ -3,7 +3,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Aspects.Validation
 {
-	public interface IFactory : IFactoryWithParameter
+	public interface IFactory : IValidatedParameterizedSource
 	{
 		int CanCreateCalled { get; }
 

@@ -31,7 +31,7 @@ namespace DragonSpark.Testing.Aspects
 		{
 			public new static IsSourceSpecification Instance { get; } = new IsSourceSpecification();
 
-			IsSourceSpecification() : base( typeof(IFactory), typeof(IFactoryWithParameter) ) {}
+			IsSourceSpecification() : base( typeof(IFactory), typeof(IValidatedParameterizedSource) ) {}
 		}
 
 		[Fact]

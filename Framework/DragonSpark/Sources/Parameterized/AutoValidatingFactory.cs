@@ -4,14 +4,14 @@ using System;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	class AutoValidatingFactory : IFactoryWithParameter
+	class AutoValidatingFactory : IValidatedParameterizedSource
 	{
-		readonly IFactoryWithParameter inner;
-		public AutoValidatingFactory( IFactoryWithParameter inner ) : this( new AutoValidationController( new FactoryAdapter( inner ) ), inner ) {}
+		readonly IValidatedParameterizedSource inner;
+		public AutoValidatingFactory( IValidatedParameterizedSource inner ) : this( new AutoValidationController( new FactoryAdapter( inner ) ), inner ) {}
 
-		protected AutoValidatingFactory( IAutoValidationController controller, IFactoryWithParameter inner ) : this( controller, inner, inner.CanCreate ) {}
+		protected AutoValidatingFactory( IAutoValidationController controller, IValidatedParameterizedSource inner ) : this( controller, inner, inner.IsValid ) {}
 
-		protected AutoValidatingFactory( IAutoValidationController controller, IFactoryWithParameter inner, Func<object, bool> specification )
+		protected AutoValidatingFactory( IAutoValidationController controller, IValidatedParameterizedSource inner, Func<object, bool> specification )
 		{
 			Controller = controller;
 			this.inner = inner;
@@ -19,9 +19,9 @@ namespace DragonSpark.Sources.Parameterized
 
 		protected IAutoValidationController Controller { get; }
 
-		public bool CanCreate( object parameter )
+		public bool IsValid( object parameter )
 		{
-			var result = Controller.IsValid( parameter ) || inner.CanCreate( parameter );
+			var result = Controller.IsValid( parameter ) || inner.IsValid( parameter );
 			Controller.MarkValid( parameter, result );
 			return result;
 		}

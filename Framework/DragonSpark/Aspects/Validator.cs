@@ -104,7 +104,7 @@ namespace DragonSpark.Aspects
 		CommandProfileSource() : base( instance => new CommandAdapter( instance ) ) {}
 	}
 
-	class SourceAdapterSource : AdapterSourceBase<IFactoryWithParameter>
+	class SourceAdapterSource : AdapterSourceBase<IValidatedParameterizedSource>
 	{
 		public static SourceAdapterSource Instance { get; } = new SourceAdapterSource();
 		SourceAdapterSource() : base( instance => new FactoryAdapter( instance ) ) {}
@@ -133,14 +133,14 @@ namespace DragonSpark.Aspects
 	{
 		readonly static MethodInfo Method = typeof(IParameterizedSource).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource.Get) );
 
-		readonly IFactoryWithParameter inner;
+		readonly IValidatedParameterizedSource inner;
 
-		public FactoryAdapter( IFactoryWithParameter inner )
+		public FactoryAdapter( IValidatedParameterizedSource inner )
 		{
 			this.inner = inner;
 		}
 
-		public bool IsValid( object parameter ) => inner.CanCreate( parameter );
+		public bool IsValid( object parameter ) => inner.IsValid( parameter );
 
 		MethodInfo IMethodAware.Method => Method;
 	}
@@ -156,7 +156,7 @@ namespace DragonSpark.Aspects
 			this.inner = inner;
 		}
 
-		public bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : inner.CanCreate( parameter );
+		public bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : inner.IsValid( parameter );
 
 		MethodInfo IMethodAware.Method => Method;
 	}
