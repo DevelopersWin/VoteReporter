@@ -245,9 +245,6 @@
     <Compile Include="TypeSystem\ApplicationAssemblyFilter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Sources\Parameterized\IFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Activation\IoC\Locator.cs" />
     <Compile Include="ComponentModel\ServicesValueBase.cs" />
     <Compile Include="ComponentModel\DefaultAttribute.cs" />
