@@ -13,16 +13,6 @@ namespace DragonSpark.Runtime.Sources
 		object Get();
 	}
 
-	/*[ReaderWriterSynchronized]
-	public class SynchronizedFixedSource<T> : FixedSource<T>
-	{
-		[Reader]
-		public override T Get() => base.Get();
-
-		[Writer]
-		protected override void OnAssign( T item ) => base.OnAssign( item );
-	}*/
-
 	public class Source<T> : SourceBase<T>
 	{
 		readonly T instance;
@@ -74,7 +64,6 @@ namespace DragonSpark.Runtime.Sources
 
 		public override TResult Get( TParameter key ) => scope.Get().Invoke( key );
 
-		//public virtual void Assign( Func<TParameter, TResult> item ) => scope.Assign( item );
 		public void Assign( ISource item ) => scope.Assign( item );
 
 		public virtual void Assign( Func<object, Func<TParameter, TResult>> item ) => scope.Assign( item );
