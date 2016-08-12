@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 

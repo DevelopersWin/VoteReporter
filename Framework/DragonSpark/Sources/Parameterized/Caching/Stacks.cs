@@ -2,9 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
-using DragonSpark.Sources.Parameterized;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class Stacks<T> : SourceCache<IStack<T>>
 	{

@@ -2,7 +2,7 @@
 using Serilog;
 using System;
 using System.Diagnostics;
-using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {

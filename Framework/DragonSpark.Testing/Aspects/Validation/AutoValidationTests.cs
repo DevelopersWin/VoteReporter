@@ -66,7 +66,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			Assert.Equal( 0, sut.CreateCalled );
 
-			var created = factory.Create( 123 );
+			var created = factory.Get( 123 );
 			Assert.Equal( 11, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CreateCalled );
 			Assert.Equal( 6776, created );
@@ -86,7 +86,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return (int)parameter == 123;
 			}
 
-			public object Create( object parameter )
+			public object Get( object parameter )
 			{
 				CreateCalled++;
 				return 6776;
@@ -110,7 +110,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return (int)parameter == 123;
 			}
 
-			public object Create( object parameter )
+			public object Get( object parameter )
 			{
 				CreateCalled++;
 				return 6776;

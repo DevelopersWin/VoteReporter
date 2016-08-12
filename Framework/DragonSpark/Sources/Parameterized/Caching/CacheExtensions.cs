@@ -5,7 +5,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public static class CacheExtensions
 	{

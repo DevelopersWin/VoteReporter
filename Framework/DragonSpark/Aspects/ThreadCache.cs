@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Aspects
 {

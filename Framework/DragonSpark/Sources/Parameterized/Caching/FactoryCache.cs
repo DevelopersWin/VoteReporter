@@ -1,6 +1,6 @@
 using DragonSpark.Runtime.Specifications;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public abstract class FactoryCache<T> : FactoryCache<object, T>, ICache<T>
 	{

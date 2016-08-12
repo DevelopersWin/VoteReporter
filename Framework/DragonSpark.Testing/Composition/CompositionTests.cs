@@ -13,7 +13,7 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized.Caching;
 using Xunit;
 using Xunit.Abstractions;
 using Parameter = DragonSpark.Testing.Objects.Composition.Parameter;

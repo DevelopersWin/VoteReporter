@@ -5,8 +5,8 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Windows.TypeSystem
 {

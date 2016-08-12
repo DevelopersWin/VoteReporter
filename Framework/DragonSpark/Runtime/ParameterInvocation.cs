@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Runtime
 {

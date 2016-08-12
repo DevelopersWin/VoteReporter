@@ -5,7 +5,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
-using DragonSpark.Sources.Caching;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
@@ -13,6 +12,7 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Sources.Parameterized.Caching;
 using Type = System.Type;
 
 namespace DragonSpark.Sources.Parameterized

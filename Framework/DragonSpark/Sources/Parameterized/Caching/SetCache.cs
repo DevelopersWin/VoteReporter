@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class SetCache<T> : SetCache<object, T>, ICache<ISet<T>>
 	{

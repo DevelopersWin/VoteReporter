@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Sources
 {

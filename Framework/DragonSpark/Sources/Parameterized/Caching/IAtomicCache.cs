@@ -1,6 +1,6 @@
 using System;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public interface IAtomicCache<TArgument, TValue> : ICache<TArgument, TValue>
 	{

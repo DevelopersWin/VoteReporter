@@ -104,10 +104,10 @@ namespace DragonSpark.Aspects
 		CommandProfileSource() : base( instance => new CommandAdapter( instance ) ) {}
 	}
 
-	class SourceProfileSource : AdapterSourceBase<IFactoryWithParameter>
+	class SourceAdapterSource : AdapterSourceBase<IFactoryWithParameter>
 	{
-		public static SourceProfileSource Instance { get; } = new SourceProfileSource();
-		SourceProfileSource() : base( instance => new FactoryAdapter( instance ) ) {}
+		public static SourceAdapterSource Instance { get; } = new SourceAdapterSource();
+		SourceAdapterSource() : base( instance => new FactoryAdapter( instance ) ) {}
 	}
 
 	/*public struct AutoValidationParameter
@@ -131,7 +131,7 @@ namespace DragonSpark.Aspects
 
 	public class FactoryAdapter : IParameterValidationAdapter
 	{
-		readonly static MethodInfo Method = typeof(IFactoryWithParameter).GetTypeInfo().GetDeclaredMethod( nameof(IFactoryWithParameter.Create) );
+		readonly static MethodInfo Method = typeof(IParameterizedSource).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource.Get) );
 
 		readonly IFactoryWithParameter inner;
 

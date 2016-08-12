@@ -7,8 +7,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Extensions
 {

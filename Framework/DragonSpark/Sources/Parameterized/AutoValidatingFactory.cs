@@ -26,7 +26,7 @@ namespace DragonSpark.Sources.Parameterized
 			return result;
 		}
 
-		public object Create( object parameter ) => Controller.Execute( parameter, () => inner.Create( parameter ) );
+		public object Get( object parameter ) => Controller.Execute( parameter, () => inner.Get( parameter ) );
 	}
 
 	class AutoValidatingFactory<TParameter, TResult> : AutoValidatingFactory, IFactory<TParameter, TResult>

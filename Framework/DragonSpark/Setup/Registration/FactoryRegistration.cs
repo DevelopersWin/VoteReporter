@@ -4,8 +4,8 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using System;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Setup.Registration

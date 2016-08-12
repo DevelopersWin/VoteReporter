@@ -4,8 +4,8 @@ using DragonSpark.Activation;
 using DragonSpark.Runtime;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Composition
 {

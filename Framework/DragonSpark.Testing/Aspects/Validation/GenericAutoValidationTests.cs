@@ -1,6 +1,6 @@
-using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
@@ -147,7 +147,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return parameter is int && CanCreate( (int)parameter );
 			}
 
-			object IFactoryWithParameter.Create( object parameter )
+			object IParameterizedSource.Get( object parameter )
 			{
 				CreateCalled++;
 				return Create( (int)parameter );
@@ -183,7 +183,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return parameter is int && CanCreate( (int)parameter );
 			}
 
-			public object Create( object parameter )
+			public object Get( object parameter )
 			{
 				CreateCalled++;
 				return Create( (int)parameter );

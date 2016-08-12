@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	class CacheRegistry<T> : ICacheRegistry<T>
 	{

@@ -1,9 +1,8 @@
 using System;
 using System.Reflection;
 using DragonSpark.Activation;
-using DragonSpark.Sources.Parameterized;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public static class CacheFactory
 	{

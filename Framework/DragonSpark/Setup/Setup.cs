@@ -5,6 +5,8 @@ using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -13,9 +15,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
-using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Setup
 {
@@ -232,14 +232,12 @@ namespace DragonSpark.Setup
 		readonly static Func<IServiceProvider, IFactory<Type, object>> Selector = ActivatedFactory.Default.Get;
 
 		public static IParameterizedSource<IServiceProvider, ServiceSource> Sources { get; } = new Cache<IServiceProvider, ServiceSource>( provider => new ActivatedServiceProvider( provider ).GetService );
-		ActivatedServiceProvider( IServiceProvider provider ) : this( provider, IsActive.Default.Get( provider ) ) {}
+		ActivatedServiceProvider( IServiceProvider provider ) : this( IsActive.Default.Get( provider ) ) {}
 
-		readonly IServiceProvider provider;
 		readonly IsActive active;
 
-		ActivatedServiceProvider( IServiceProvider provider, IsActive active )
+		ActivatedServiceProvider( IsActive active )
 		{
-			this.provider = provider;
 			this.active = active;
 		}
 
@@ -248,11 +246,7 @@ namespace DragonSpark.Setup
 			using ( active.Assignment( serviceType, true ) )
 			{
 				var stores = ServiceProviderRegistry.Instance.Get().List().Select( Selector );
-				var result = stores.Introduce( serviceType, tuple =>
-															{
-																var canCreate = tuple.Item1.CanCreate( tuple.Item2 );
-																return canCreate;
-															}, tuple => tuple.Item1.Create( tuple.Item2 ) ).FirstAssigned();
+				var result = stores.Introduce( serviceType, tuple => tuple.Item1.CanCreate( tuple.Item2 ), tuple => tuple.Item1.Create( tuple.Item2 ) ).FirstAssigned();
 				return result;
 			}
 		}
@@ -435,8 +429,6 @@ namespace DragonSpark.Setup
 
 		public override void Execute( object parameter )
 		{
-			// var temp = ServiceProviderRegistry.Instance.Get().List();
-
 			var exports = Exports.GetExports<T>( ContractName );
 			watching.AddRange( exports.AsEnumerable() );
 

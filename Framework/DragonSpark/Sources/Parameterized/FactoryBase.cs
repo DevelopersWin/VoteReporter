@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Runtime.InteropServices;
-using DragonSpark.Activation;
+﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources.Caching;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Runtime.InteropServices;
+using DragonSpark.Sources.Parameterized.Caching;
 using Delegates = DragonSpark.TypeSystem.Delegates;
 
 namespace DragonSpark.Sources.Parameterized
@@ -130,7 +130,7 @@ namespace DragonSpark.Sources.Parameterized
 		public DecoratedFactory( IFactory<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification  ) : base( inner.ToDelegate(), coercer, specification ) {}
 	}*/
 
-	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>, IParameterizedSource<TParameter, TResult>, IParameterizedSource
+	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>, IParameterizedSource<TParameter, TResult>
 	{
 		readonly Coerce<TParameter> coercer;
 		readonly ISpecification<TParameter> specification;
@@ -148,8 +148,6 @@ namespace DragonSpark.Sources.Parameterized
 		}
 	
 		bool IFactoryWithParameter.CanCreate( object parameter ) => specification.IsSatisfiedBy( parameter );
-
-		object IFactoryWithParameter.Create( object parameter ) => CreateFromParameter( parameter );
 
 		object CreateFromParameter( object parameter )
 		{

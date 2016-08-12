@@ -1,4 +1,4 @@
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class ActivatedCache<T> : ActivatedCache<object, T>, ICache<T> where T : class, new()
 	{

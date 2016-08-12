@@ -1,12 +1,11 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources.Parameterized;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using DragonSpark.Activation;
+using DragonSpark.Runtime.Specifications;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	/*public enum AttachedPropertyChangedEventType
 	{

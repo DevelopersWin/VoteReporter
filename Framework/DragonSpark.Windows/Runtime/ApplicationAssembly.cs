@@ -7,8 +7,8 @@ using System.Composition;
 using System.IO;
 using System.Reflection;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Windows.Runtime
 {

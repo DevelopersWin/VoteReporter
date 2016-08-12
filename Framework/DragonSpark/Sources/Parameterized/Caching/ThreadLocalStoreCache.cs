@@ -1,6 +1,6 @@
 using System;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class ThreadLocalStoreCache<T> : ThreadLocalStoreCache<object, T>
 	{

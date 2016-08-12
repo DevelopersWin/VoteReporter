@@ -1,11 +1,8 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using Ploeh.AutoFixture.Xunit2;
-using System.Windows.Input;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using Xunit;
 
 namespace DragonSpark.Testing.Aspects
 {
@@ -39,7 +36,7 @@ namespace DragonSpark.Testing.Aspects
 				return parameter.IsAssigned();
 			}
 
-			object IFactoryWithParameter.Create( object parameter ) => Create( parameter );
+			object IParameterizedSource.Get( object parameter ) => Create( parameter );
 
 			public object Create( object parameter ) => null;
 		}

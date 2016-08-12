@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Sources.Caching;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Sources.Parameterized
 {

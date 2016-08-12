@@ -1,13 +1,13 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources.Caching;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -45,11 +45,11 @@ namespace DragonSpark.Sources.Parameterized
 		public static ImmutableArray<TResult> CreateMany<TResult>( this IFactoryWithParameter @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
 			parameters
 				.Where( @this.CanCreate )
-				.Select( @this.Create )
+				.Select( @this.Get )
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
-		public static T Create<T>( this IFactoryWithParameter @this, object parameter ) => (T)@this.Create( parameter );
+		public static T Create<T>( this IFactoryWithParameter @this, object parameter ) => (T)@this.Get( parameter );
 
 		public static Func<object, T> Wrap<T>( this T @this ) => @this.Wrap<object, T>();
 
@@ -154,7 +154,7 @@ namespace DragonSpark.Sources.Parameterized
 					this.inner = inner;
 				}
 
-				public override TResult Create( TParameter parameter ) => (TResult)inner.Create( parameter );
+				public override TResult Create( TParameter parameter ) => (TResult)inner.Get( parameter );
 			}
 		}
 

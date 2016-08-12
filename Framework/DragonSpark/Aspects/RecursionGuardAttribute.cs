@@ -6,7 +6,7 @@ using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Generic;
-using DragonSpark.Sources.Caching;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Aspects
 {

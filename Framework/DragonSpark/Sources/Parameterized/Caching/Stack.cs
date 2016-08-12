@@ -4,7 +4,7 @@ using System.Linq;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class Stack<T> : IStack<T>
 	{

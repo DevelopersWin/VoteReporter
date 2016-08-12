@@ -11,8 +11,8 @@ using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Composition
 {

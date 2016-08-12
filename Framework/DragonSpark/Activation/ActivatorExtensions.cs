@@ -2,7 +2,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -11,6 +10,7 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Activation
 {
@@ -71,7 +71,7 @@ namespace DragonSpark.Activation
 
 		public static T Activate<T>( this IActivator @this ) => Activate<T>( @this, typeof(T) );
 
-		public static T Activate<T>( this IActivator @this, [Required] Type requestedType ) => (T)@this.Create( requestedType );
+		public static T Activate<T>( this IActivator @this, [Required] Type requestedType ) => (T)@this.Get( requestedType );
 
 		public static T Activate<T>( this IActivator @this, TypeRequest request ) => (T)@this.Create( request );
 		

@@ -1,6 +1,6 @@
 using System;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class WritableStoreCache<TInstance, TValue> : Cache<TInstance, IAssignableSource<TValue>>, IStoreCache<TInstance, TValue> where TInstance : class
 	{

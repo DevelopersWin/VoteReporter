@@ -1,4 +1,4 @@
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public interface IStackSource<T> : ISource<IStack<T>>
 	{

@@ -1,9 +1,8 @@
 using System.Linq;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Sources.Parameterized;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class EqualityReference<T> : TransformerBase<T> where T : class
 	{

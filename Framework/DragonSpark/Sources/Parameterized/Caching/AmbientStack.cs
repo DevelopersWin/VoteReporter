@@ -4,7 +4,7 @@ using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 
-namespace DragonSpark.Sources.Caching
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public static class AmbientStack
 	{

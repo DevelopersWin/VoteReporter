@@ -11,8 +11,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Caching;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using ServiceProviderConfigurations = DragonSpark.Composition.ServiceProviderConfigurations;
 
 namespace DragonSpark.Testing.Framework.Setup

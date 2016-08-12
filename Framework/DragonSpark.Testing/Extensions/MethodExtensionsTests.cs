@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		public void BasicFactory()
 		{
-			var method = new Func<object, object>( new Factory().To<IFactoryWithParameter>().Create ).Method;
+			var method = new Func<object, object>( new Factory().To<IFactoryWithParameter>().Get ).Method;
 			var found = MethodExtensions.AccountForGenericDefinition( method );
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
