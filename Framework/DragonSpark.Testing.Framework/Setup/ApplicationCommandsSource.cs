@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class ApplicationCommandsSource : DragonSpark.Setup.ApplicationCommandsSource
 	{
-		readonly static Func<MethodBase, ImmutableArray<ICommand<AutoData>>> Factory = MetadataCustomizationFactory<ICommand<AutoData>>.Instance.Create;
+		readonly static Func<MethodBase, ImmutableArray<ICommand<AutoData>>> Factory = MetadataCustomizationFactory<ICommand<AutoData>>.Instance.Get;
 
 		public static ApplicationCommandsSource Instance { get; } = new ApplicationCommandsSource();
 		ApplicationCommandsSource() : base( ServiceProviderConfigurations.Instance ) {}
@@ -49,7 +49,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	sealed class MethodTypes : FactoryCache<ImmutableArray<Type>>, ITypeSource
 	{
-		readonly static Func<object, ImmutableArray<Func<MethodBase, ImmutableArray<Type>>>> Creator = HostedValueLocator<Func<MethodBase, ImmutableArray<Type>>>.Instance.Create;
+		readonly static Func<object, ImmutableArray<Func<MethodBase, ImmutableArray<Type>>>> Creator = HostedValueLocator<Func<MethodBase, ImmutableArray<Type>>>.Instance.Get;
 
 		public static MethodTypes Instance { get; } = new MethodTypes();
 		MethodTypes() : this( MethodContext.Instance.Get ) {}

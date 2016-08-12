@@ -11,7 +11,7 @@ namespace DragonSpark.ComponentModel
 
 	public sealed class FactoryAttribute : ServicesValueBase
 	{
-		readonly static Func<Type, object> FactoryMethod = SourceFactory.Instance.Create;
+		readonly static Func<Type, object> FactoryMethod = SourceFactory.Instance.Get;
 		
 		public FactoryAttribute( Type factoryType = null ) : base( new ServicesValueProvider.Converter( p => factoryType ?? SourceTypeLocator.Instance.Get( p.GetMethod.ReturnType ) ), FactoryMethod ) {}
 	}

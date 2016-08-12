@@ -161,15 +161,15 @@ namespace DragonSpark.Diagnostics
 
 	public abstract class DestructureByTranformingCommandBase<T> : DestructureCommandBase
 	{
-		protected DestructureByTranformingCommandBase( [Required]IFactory<T, object> factory )
+		protected DestructureByTranformingCommandBase( [Required]IValidatedParameterizedSource<T, object> factory )
 		{
 			Factory = factory;
 		}
 
 		[Required]
-		public IFactory<T, object> Factory { [return: Required]get; set; }
+		public IValidatedParameterizedSource<T, object> Factory { [return: Required]get; set; }
 
-		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming<T>( Factory.Create );
+		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming<T>( Factory.Get );
 	}
 
 	public abstract class FilterCommandBase : LoggerConfigurationCommandBase<LoggerFilterConfiguration>

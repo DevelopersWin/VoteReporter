@@ -31,7 +31,7 @@ namespace DragonSpark.Activation.IoC
 
 		public ServiceRegistry( IUnityContainer container, LifetimeManager lifetimeManager ) : this( container, container.Resolve<ILogger>(), type => lifetimeManager ) { }
 
-		public ServiceRegistry( IUnityContainer container, ILogger logger, LifetimeManagerFactory factory ) : this( container, logger, factory.Create ) { }
+		public ServiceRegistry( IUnityContainer container, ILogger logger, LifetimeManagerFactory factory ) : this( container, logger, factory.Get ) { }
 
 		protected ServiceRegistry( IUnityContainer container, ILogger logger, Func<Type, LifetimeManager> lifetimeFactory )
 		{

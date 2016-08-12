@@ -28,7 +28,7 @@ namespace DragonSpark.Windows.Runtime
 		readonly Transform<IEnumerable<Assembly>> filter;
 		readonly Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource;
 
-		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource ) : this( assemblySource, ApplicationAssemblyFilter.Instance.Get, PublicParts.Instance.Create ) {}
+		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource ) : this( assemblySource, ApplicationAssemblyFilter.Instance.Get, PublicParts.Instance.Get ) {}
 
 		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource, Transform<IEnumerable<Assembly>> filter, Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource )
 		{
@@ -57,7 +57,7 @@ namespace DragonSpark.Windows.Runtime
 		AllParts() : base( DragonSpark.TypeSystem.AllParts.Instance.Get ) {}
 	}
 
-	public abstract class PartTypesBase : FactoryBase<IEnumerable<Assembly>, IEnumerable<Type>>
+	public abstract class PartTypesBase : ValidatedParameterizedSourceBase<IEnumerable<Assembly>, IEnumerable<Type>>
 	{
 		readonly Func<Assembly, ImmutableArray<Type>> typeSource;
 		readonly Func<IEnumerable<Assembly>, Assembly> assemblySource;
@@ -70,6 +70,6 @@ namespace DragonSpark.Windows.Runtime
 			this.assemblySource = assemblySource;
 		}
 
-		public override IEnumerable<Type> Create( IEnumerable<Assembly> parameter ) => typeSource( assemblySource( parameter ) ).AsEnumerable();
+		public override IEnumerable<Type> Get( IEnumerable<Assembly> parameter ) => typeSource( assemblySource( parameter ) ).AsEnumerable();
 	}
 }

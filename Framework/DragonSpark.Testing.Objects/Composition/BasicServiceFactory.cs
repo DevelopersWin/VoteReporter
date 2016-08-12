@@ -20,10 +20,10 @@ namespace DragonSpark.Testing.Objects.Composition
 	}
 
 	[Export]
-	public class ParameterServiceFactory : FactoryBase<Parameter, IParameterService>
+	public class ParameterServiceFactory : ValidatedParameterizedSourceBase<Parameter, IParameterService>
 	{
 		public ParameterServiceFactory() {}
 
-		public override IParameterService Create( Parameter parameter ) => new ParameterService( parameter );
+		public override IParameterService Get( Parameter parameter ) => new ParameterService( parameter );
 	}
 }

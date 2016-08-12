@@ -1,6 +1,5 @@
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
@@ -16,7 +15,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		readonly ExtendedFactory factory = new ExtendedFactory();
 
 		[Reference]
-		readonly IFactory<int, float> validating;
+		readonly IValidatedParameterizedSource<int, float> validating;
 		[Reference]
 		readonly AppliedExtendedFactory applied = new AppliedExtendedFactory();
 
@@ -56,19 +55,19 @@ namespace DragonSpark.Testing.Aspects.Validation
 		public void ParameterHandler()
 		{
 			var sut = new CachedAppliedExtendedFactory();
-			var first = sut.Create( 6776 );
+			var first = sut.Get( 6776 );
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, first );
 
-			var can = sut.CanCreate( 6776 );
+			var can = sut.IsValid( 6776 );
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 			Assert.True( can );
 
-			var second = sut.Create( 6776 );
+			var second = sut.Get( 6776 );
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
@@ -76,7 +75,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( first, second );
 		}
 
-		static void BasicAutoValidationWith( IFactory<int, float> factory, IExtendedFactory sut )
+		static void BasicAutoValidationWith( IValidatedParameterizedSource<int, float> factory, IExtendedFactory sut )
 		{
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
@@ -86,12 +85,12 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
 			
-			var cannot = factory.CanCreate( 456 );
+			var cannot = factory.IsValid( 456 );
 			Assert.False( cannot );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 
-			var can = factory.CanCreate( 6776 );
+			var can = factory.IsValid( 6776 );
 			Assert.True( can );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 2, sut.CanCreateGenericCalled );
@@ -99,7 +98,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 0, sut.CreateGenericCalled );
 
-			var created = factory.Create( 6776 );
+			var created = factory.Get( 6776 );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 2, sut.CanCreateGenericCalled );
 			Assert.Equal( 0, sut.CreateCalled );
@@ -110,7 +109,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 		
 
-		interface IExtendedFactory : IFactory<int, float>
+		interface IExtendedFactory : IValidatedParameterizedSource<int, float>
 		{
 			int CanCreateCalled { get; }
 
@@ -126,7 +125,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		class CachedAppliedExtendedFactory : AppliedExtendedFactory
 		{
 			[Freeze]
-			public override float Create( int parameter ) => base.Create( parameter );
+			public override float Get( int parameter ) => base.Get( parameter );
 		}
 		
 		[ApplyAutoValidation]
@@ -144,22 +143,22 @@ namespace DragonSpark.Testing.Aspects.Validation
 			public bool IsValid( object parameter )
 			{
 				CanCreateCalled++;
-				return parameter is int && CanCreate( (int)parameter );
+				return parameter is int && IsValid( (int)parameter );
 			}
 
 			object IParameterizedSource.Get( object parameter )
 			{
 				CreateCalled++;
-				return Create( (int)parameter );
+				return Get( (int)parameter );
 			}
 
-			public bool CanCreate( int parameter )
+			public bool IsValid( int parameter )
 			{
 				CanCreateGenericCalled++;
 				return parameter == 6776;
 			}
 
-			public virtual float Create( int parameter )
+			public virtual float Get( int parameter )
 			{
 				CreateGenericCalled++;
 				return parameter + 123;
@@ -180,22 +179,22 @@ namespace DragonSpark.Testing.Aspects.Validation
 			public bool IsValid( object parameter )
 			{
 				CanCreateCalled++;
-				return parameter is int && CanCreate( (int)parameter );
+				return parameter is int && IsValid( (int)parameter );
 			}
 
 			public object Get( object parameter )
 			{
 				CreateCalled++;
-				return Create( (int)parameter );
+				return Get( (int)parameter );
 			}
 
-			public bool CanCreate( int parameter )
+			public bool IsValid( int parameter )
 			{
 				CanCreateGenericCalled++;
 				return parameter == 6776;
 			}
 
-			public float Create( int parameter )
+			public float Get( int parameter )
 			{
 				CreateGenericCalled++;
 				return parameter + 123;

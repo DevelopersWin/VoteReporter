@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		public void GenericFactory()
 		{
-			var method = new Func<object, bool>( new Factory().CanCreate ).Method;
+			var method = new Func<object, bool>( new Factory().IsValid ).Method;
 			var found = MethodExtensions.AccountForGenericDefinition( method );
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
@@ -68,9 +68,9 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( memberInfo.GetGenericTypeDefinition() , typeof(Action<>) );
 		}
 
-		class Factory : FactoryBase<object, object>
+		class Factory : ValidatedParameterizedSourceBase<object, object>
 		{
-			public override object Create( object parameter ) => null;
+			public override object Get( object parameter ) => null;
 		}
 
 		class Command : CommandBase<object>

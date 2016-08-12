@@ -22,7 +22,7 @@ namespace DragonSpark.Aspects
 	{
 		readonly static ICache<Delegate, ConditionMonitor> Property = new ActivatedCache<Delegate, ConditionMonitor>();
 		readonly static Func<PropertyInfo, bool> DefaultSpecification = DefaultValuePropertySpecification.Instance.IsSatisfiedBy;
-		readonly static Func<DefaultValueParameter, object> DefaultFactory = DefaultPropertyValueFactory.Instance.Create;
+		readonly static Func<DefaultValueParameter, object> DefaultFactory = DefaultPropertyValueFactory.Instance.Get;
 
 		readonly Func<PropertyInfo, bool> specification;
 		readonly Func<DefaultValueParameter, object> source;

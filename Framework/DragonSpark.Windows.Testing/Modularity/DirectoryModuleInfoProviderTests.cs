@@ -22,7 +22,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void NotExist( RemoteModuleInfoProviderFactory sut )
 		{
-			using ( var provider = sut.Create( new LoadRemoteModuleInfoParameter( new[] { typeof( IModule ).Assembly.Location }, DirectoryModuleCatalogTests.InvalidModulesDirectory ) ) )
+			using ( var provider = sut.Get( new LoadRemoteModuleInfoParameter( new[] { typeof( IModule ).Assembly.Location }, DirectoryModuleCatalogTests.InvalidModulesDirectory ) ) )
 			{
 				Assert.Empty( provider.GetModuleInfos() );
 			}

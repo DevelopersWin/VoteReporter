@@ -158,7 +158,7 @@ namespace DragonSpark.TypeSystem
 	{
 		// readonly T only;
 
-		public MethodContext( ImmutableArray<GenericMethodCandidate<T>> candidates ) : this( new Factory( candidates ).Create )
+		public MethodContext( ImmutableArray<GenericMethodCandidate<T>> candidates ) : this( new Factory( candidates ).Get )
 		{
 			/*var candidate = candidates.ToArray();
 			only = candidate.Length == 1 ? candidate[0].Delegate : null;*/
@@ -168,7 +168,7 @@ namespace DragonSpark.TypeSystem
 
 		// public override T Get( Type[] key ) => only ?? base.Get( key );
 
-		class Factory : FactoryBase<Type[], T>
+		class Factory : ValidatedParameterizedSourceBase<Type[], T>
 		{
 			readonly ImmutableArray<GenericMethodCandidate<T>> candidates;
 
@@ -177,7 +177,7 @@ namespace DragonSpark.TypeSystem
 				this.candidates = candidates;
 			}
 
-			public override T Create( Type[] parameter ) => candidates.Introduce( parameter, tuple => tuple.Item1.Specification( tuple.Item2 ), tuple => tuple.Item1.Delegate ).Single();
+			public override T Get( Type[] parameter ) => candidates.Introduce( parameter, tuple => tuple.Item1.Specification( tuple.Item2 ), tuple => tuple.Item1.Delegate ).Single();
 		}
 	}
 
@@ -263,11 +263,11 @@ namespace DragonSpark.TypeSystem
 		public override bool IsSatisfiedBy( Type[] parameter ) => Context.GetGenericArguments().Length == parameter.Length;
 	}
 
-	sealed class ObjectTypeFactory : FactoryBase<object[], Type[]>
+	sealed class ObjectTypeFactory : ValidatedParameterizedSourceBase<object[], Type[]>
 	{
 		public static ObjectTypeFactory Instance { get; } = new ObjectTypeFactory();
 
-		public override Type[] Create( object[] parameter )
+		public override Type[] Get( object[] parameter )
 		{
 			var result = new Type[parameter.Length];
 			for ( var i = 0; i < parameter.Length; i++ )

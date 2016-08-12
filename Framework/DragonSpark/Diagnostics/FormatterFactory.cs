@@ -6,7 +6,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Diagnostics
 {
-	public class FormatterFactory : FactoryBase<FormatterFactory.Parameter, string>
+	public class FormatterFactory : ValidatedParameterizedSourceBase<FormatterFactory.Parameter, string>
 	{
 		[Export]
 		public static FormatterFactory Instance { get; } = new FormatterFactory();
@@ -22,7 +22,7 @@ namespace DragonSpark.Diagnostics
 			this.factory = factory;
 		}
 
-		public override string Create( Parameter parameter ) => (string)CreateFrom( parameter, p => StringCoercer.Instance.Coerce( p.Instance ) );
+		public override string Get( Parameter parameter ) => (string)CreateFrom( parameter, p => StringCoercer.Instance.Coerce( p.Instance ) );
 
 		object CreateFrom( Parameter parameter, Func<Parameter, object> @default )
 		{

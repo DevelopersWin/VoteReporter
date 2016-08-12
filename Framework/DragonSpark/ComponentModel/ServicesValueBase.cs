@@ -14,14 +14,14 @@ namespace DragonSpark.ComponentModel
 
 		public LocateAttribute( string name = null ) : this( null, name ) { }
 
-		public LocateAttribute( Type locatedType, string name = null ) : base( t => new LocationValueProvider( new Converter( locatedType, name ).Create, Factory.Instance.ToDelegate() ) ) { }
+		public LocateAttribute( Type locatedType, string name = null ) : base( t => new LocationValueProvider( new Converter( locatedType, name ).Get, Factory.Instance.ToDelegate() ) ) { }
 		
 		public class LocationValueProvider : ValueProvider<LocateTypeRequest>
 		{
 			public LocationValueProvider( Func<PropertyInfo, LocateTypeRequest> convert, Func<LocateTypeRequest, object> create ) : base( convert, create ) {}
 		}
 
-		public class Factory : FactoryBase<LocateTypeRequest, object>
+		public class Factory : ValidatedParameterizedSourceBase<LocateTypeRequest, object>
 		{
 			public static Factory Instance { get; } = new Factory();
 
@@ -34,7 +34,7 @@ namespace DragonSpark.ComponentModel
 				this.locator = locator;
 			}
 
-			public override object Create( LocateTypeRequest parameter )
+			public override object Get( LocateTypeRequest parameter )
 			{
 				var serviceLocator = locator();
 				var instance = serviceLocator?.GetInstance( parameter.RequestedType, parameter.Name );
@@ -43,7 +43,7 @@ namespace DragonSpark.ComponentModel
 			}
 		}
 
-		public class Converter : FactoryBase<PropertyInfo, LocateTypeRequest>
+		public class Converter : ValidatedParameterizedSourceBase<PropertyInfo, LocateTypeRequest>
 		{
 			readonly Func<PropertyInfo, Type> type;
 			readonly string name;
@@ -56,7 +56,7 @@ namespace DragonSpark.ComponentModel
 				this.name = name;
 			}
 
-			public override LocateTypeRequest Create( PropertyInfo parameter ) => new LocateTypeRequest( type( parameter ), name );
+			public override LocateTypeRequest Get( PropertyInfo parameter ) => new LocateTypeRequest( type( parameter ), name );
 		}
 	}
 
@@ -64,7 +64,7 @@ namespace DragonSpark.ComponentModel
 	{
 		protected ServicesValueBase( ServicesValueProvider.Converter converter ) : this( converter, GlobalServiceProvider.GetService<object> ) {}
 
-		protected ServicesValueBase( ServicesValueProvider.Converter converter, Func<Type, object> creator ) : base( t => new ServicesValueProvider( converter.Create, creator ) ) {}
+		protected ServicesValueBase( ServicesValueProvider.Converter converter, Func<Type, object> creator ) : base( t => new ServicesValueProvider( converter.Get, creator ) ) {}
 
 		protected ServicesValueBase( Func<object, IDefaultValueProvider> provider ) : base( provider ) {}
 	}
@@ -75,7 +75,7 @@ namespace DragonSpark.ComponentModel
 
 		public ServicesValueProvider( Func<PropertyInfo, Type> convert, Func<Type, object> create ) : base( convert, create ) {}
 
-		public class Converter : FactoryBase<PropertyInfo, Type>
+		public class Converter : ValidatedParameterizedSourceBase<PropertyInfo, Type>
 		{
 			readonly Func<PropertyInfo, Type> type;
 
@@ -86,7 +86,7 @@ namespace DragonSpark.ComponentModel
 				this.type = type;
 			}
 
-			public override Type Create( PropertyInfo parameter ) => type( parameter );
+			public override Type Get( PropertyInfo parameter ) => type( parameter );
 		}
 	}
 

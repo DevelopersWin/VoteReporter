@@ -43,7 +43,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class DependencyFactory : FactoryBase<Type, object>
+	public class DependencyFactory : ValidatedParameterizedSourceBase<Type, object>
 	{
 		readonly IDependencyLocatorKey locatorKey;
 		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;
@@ -57,7 +57,7 @@ namespace DragonSpark.Activation.IoC
 			this.registry = registry;
 		}
 
-		public override object Create( Type parameter )
+		public override object Get( Type parameter )
 		{
 			var serviceSource = DependencyLocators.Instance.Get().For( locatorKey );
 			var result = serviceSource?.Invoke( parameter );

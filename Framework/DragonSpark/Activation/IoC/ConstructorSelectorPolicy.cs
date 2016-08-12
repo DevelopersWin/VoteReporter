@@ -25,12 +25,12 @@ namespace DragonSpark.Activation.IoC
 		protected override IDependencyResolverPolicy CreateResolver( ParameterInfo parameter ) => resolver( parameter );
 	}
 
-	class ResolverFactory : FactoryBase<ParameterInfo, IDependencyResolverPolicy>
+	class ResolverFactory : ValidatedParameterizedSourceBase<ParameterInfo, IDependencyResolverPolicy>
 	{
 		public static ResolverFactory Instance { get; } = new ResolverFactory();
 		ResolverFactory() {}
 
-		public override IDependencyResolverPolicy Create( ParameterInfo parameter )
+		public override IDependencyResolverPolicy Get( ParameterInfo parameter )
 		{
 			var isOptional = parameter.IsOptional && !parameter.IsDefined( typeof(OptionalDependencyAttribute) );
 			var result = isOptional ? 

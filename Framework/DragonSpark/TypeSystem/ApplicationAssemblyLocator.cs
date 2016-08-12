@@ -1,7 +1,7 @@
+using DragonSpark.Sources.Parameterized;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources;
 
 namespace DragonSpark.TypeSystem
 {

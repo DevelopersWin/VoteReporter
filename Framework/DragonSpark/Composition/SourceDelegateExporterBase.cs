@@ -55,7 +55,7 @@ namespace DragonSpark.Composition
 					
 					var activator = new ActivatorFactory( Stack, resultSource, new ActivatorParameter( provider, factoryType ) );
 					var factory = dependency.Target.IsShared ? new SharedFactory( activator.Create, cache, Contracts.Default.Get( dependency.Contract ) ) : new Factory( activator.Create );
-					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, dependency.Target.IsShared, NoDependencies, factory.Create );
+					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, dependency.Target.IsShared, NoDependencies, factory.Get );
 				}
 			}
 		}
@@ -72,7 +72,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		class Factory : FactoryBase<IEnumerable<CompositionDependency>, ExportDescriptor>
+		class Factory : ValidatedParameterizedSourceBase<IEnumerable<CompositionDependency>, ExportDescriptor>
 		{
 			readonly CompositeActivator activator, create;
 
@@ -82,7 +82,7 @@ namespace DragonSpark.Composition
 				create = Create;
 			}
 
-			public override ExportDescriptor Create( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( create, NoMetadata );
+			public override ExportDescriptor Get( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( create, NoMetadata );
 
 			protected virtual object Create( LifetimeContext context, CompositionOperation operation ) => context.Registered( activator( context, operation ) );
 		}
@@ -151,20 +151,20 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class DelegateResultFactory : FactoryBase<ActivatorParameter, object>
+	public class DelegateResultFactory : ValidatedParameterizedSourceBase<ActivatorParameter, object>
 	{
 		public static DelegateResultFactory Instance { get; } = new DelegateResultFactory();
 		DelegateResultFactory() {}
 
-		public override object Create( ActivatorParameter parameter ) => new SourceFactory( parameter.Services.Self ).Create( parameter.FactoryType );
+		public override object Get( ActivatorParameter parameter ) => new SourceFactory( parameter.Services.Self ).Get( parameter.FactoryType );
 	}
 
-	public sealed class DelegateFactory : FactoryBase<ActivatorParameter, Func<object>>
+	public sealed class DelegateFactory : ValidatedParameterizedSourceBase<ActivatorParameter, Func<object>>
 	{
 		public static DelegateFactory Instance { get; } = new DelegateFactory();
 		DelegateFactory() {}
 
-		public override Func<object> Create( ActivatorParameter parameter ) => new SourceDelegates( parameter.Services.Self ).Get( parameter.FactoryType );
+		public override Func<object> Get( ActivatorParameter parameter ) => new SourceDelegates( parameter.Services.Self ).Get( parameter.FactoryType );
 	}
 
 	public struct CompositeActivatorParameters

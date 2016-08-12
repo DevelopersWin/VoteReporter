@@ -28,9 +28,9 @@ namespace DragonSpark.Activation
 			this.activatorSource = activatorSource;
 		}
 
-		public T Create<T>( ConstructTypeRequest parameter ) => (T)Create( parameter );
+		public T Create<T>( ConstructTypeRequest parameter ) => (T)Get( parameter );
 
-		public override object Create( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? SpecialValues.DefaultOrEmpty( parameter.RequestedType );
+		public override object Get( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? SpecialValues.DefaultOrEmpty( parameter.RequestedType );
 
 		object LocateAndCreate( ConstructTypeRequest parameter )
 		{
@@ -70,7 +70,7 @@ namespace DragonSpark.Activation
 
 		static ConstructorInfo Create( ConstructTypeRequest parameter )
 		{
-			var types = ObjectTypeFactory.Instance.Create( parameter.Arguments );
+			var types = ObjectTypeFactory.Instance.Get( parameter.Arguments );
 			var candidates = new [] { types, types.WhereAssigned().Fixed(), Items<Type>.Default };
 			var adapter = parameter.RequestedType.Adapt();
 			var result = candidates.Distinct( StructuralEqualityComparer<Type[]>.Instance )
@@ -134,7 +134,7 @@ namespace DragonSpark.Activation
 	{
 		public virtual Expression Create( ExpressionBodyParameter<T> parameter )
 		{
-			var array = ArgumentsArrayExpressionFactory.Instance.Create( new ArgumentsArrayParameter( parameter.Input, parameter.Parameter ) );
+			var array = ArgumentsArrayExpressionFactory.Instance.Get( new ArgumentsArrayParameter( parameter.Input, parameter.Parameter ) );
 			var result = Apply( parameter, array );
 			return result;
 		}
@@ -142,12 +142,12 @@ namespace DragonSpark.Activation
 		protected abstract Expression Apply( ExpressionBodyParameter<T> parameter, Expression[] arguments );
 	}
 
-	class ArgumentsArrayExpressionFactory : FactoryBase<ArgumentsArrayParameter, Expression[]>
+	class ArgumentsArrayExpressionFactory : ValidatedParameterizedSourceBase<ArgumentsArrayParameter, Expression[]>
 	{
 		public static ArgumentsArrayExpressionFactory Instance { get; } = new ArgumentsArrayExpressionFactory();
 		ArgumentsArrayExpressionFactory() {}
 
-		public override Expression[] Create( ArgumentsArrayParameter parameter )
+		public override Expression[] Get( ArgumentsArrayParameter parameter )
 		{
 			var types = parameter.Method.GetParameterTypes();
 			var result = new Expression[types.Length];

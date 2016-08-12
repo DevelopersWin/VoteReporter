@@ -16,7 +16,7 @@ namespace DragonSpark.Activation.IoC
 			this.container = container;
 		}
 
-		public override object Create( LocateTypeRequest parameter ) => container.TryResolve( parameter.RequestedType, parameter.Name );
+		public override object Get( LocateTypeRequest parameter ) => container.TryResolve( parameter.RequestedType, parameter.Name );
 	}
 
 	public class Constructor : ConstructorBase
@@ -28,7 +28,7 @@ namespace DragonSpark.Activation.IoC
 			this.container = container;
 		}
 
-		public override object Create( ConstructTypeRequest parameter )
+		public override object Get( ConstructTypeRequest parameter )
 		{
 			using ( var child = container.CreateChildContainer().Extend<DefaultRegistrationsExtension>() )
 			{

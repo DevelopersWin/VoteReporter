@@ -104,7 +104,7 @@ namespace DragonSpark.Windows.Entity
 
 		public static TItem Get<TItem>( this DbContext target, object container, int levels = 1 ) where TItem : class
 		{
-			var key = new KeyFactory<TItem>( target ).Create( container );
+			var key = new KeyFactory<TItem>( target ).Get( container );
 
 			var current = target.Set<TItem>().Find( key.Values.ToArray() );
 
@@ -156,7 +156,7 @@ namespace DragonSpark.Windows.Entity
 			}
 		}*/
 
-		public class DefaultAssociationPropertyFactory : FactoryBase<Type, string[]>
+		public class DefaultAssociationPropertyFactory : ValidatedParameterizedSourceBase<Type, string[]>
 		{
 			readonly IObjectContextAdapter adapter;
 
@@ -165,7 +165,7 @@ namespace DragonSpark.Windows.Entity
 				this.adapter = adapter;
 			}
 
-			public override string[] Create( Type parameter )
+			public override string[] Get( Type parameter )
 			{
 				var names = GetAssociationPropertyNames( adapter, parameter );
 				var decorated = parameter.GetProperties().Where( x => AttributeProviderExtensions.Has<DefaultIncludeAttribute>( x ) ).Select( x => x.Name );
@@ -276,7 +276,7 @@ namespace DragonSpark.Windows.Entity
 			return result;
 		}*/
 
-		class KeyFactory<TEntity> : FactoryBase<object, IDictionary<string, object>>
+		class KeyFactory<TEntity> : ValidatedParameterizedSourceBase<object, IDictionary<string, object>>
 		{
 			readonly IObjectContextAdapter context;
 
@@ -285,7 +285,7 @@ namespace DragonSpark.Windows.Entity
 				this.context = context;
 			}
 
-			public override IDictionary<string, object> Create( object parameter )
+			public override IDictionary<string, object> Get( object parameter )
 			{
 				var names = context.ObjectContext.DetermineEntitySet( typeof(TEntity) ).With( x => x.ElementType.KeyMembers.Select( y => y.Name ).ToArray() );
 				return parameter.GetType().IsPrimitive ? new Dictionary<string, object> { { names.First(), parameter } } : DetermineKeyComplex( context, parameter, names );
@@ -329,7 +329,7 @@ namespace DragonSpark.Windows.Entity
 		public static TEntity Include<TEntity>( this DbContext target, TEntity entity, string[] associationNames, int levels = 1 ) where TEntity : class
 		{
 			var associations = associationNames ?? Enumerable.Empty<string>();
-			var names = associations.Union( new DefaultAssociationPropertyFactory( target ).Create( typeof(TEntity) ) ).ToArray();
+			var names = associations.Union( new DefaultAssociationPropertyFactory( target ).Get( typeof(TEntity) ) ).ToArray();
 			var result = Load( target, entity, names, levels );
 			return result;
 		}
@@ -350,7 +350,7 @@ namespace DragonSpark.Windows.Entity
 			{
 				list.Add( entity );
 				var type = entity.GetType();
-				var names = properties ?? ( loadAllProperties ? target.GetEntityProperties( type ).Select( x => x.Name ) : new DefaultAssociationPropertyFactory( target ).Create( type ) );
+				var names = properties ?? ( loadAllProperties ? target.GetEntityProperties( type ).Select( x => x.Name ) : new DefaultAssociationPropertyFactory( target ).Get( type ) );
 				var associationNames = names.ToArray();
 				LoadEntity( target, entity, associationNames );
 

@@ -12,11 +12,11 @@ namespace DragonSpark.Composition
 	public sealed class ParameterizedSourceDelegateExporter : SourceDelegateExporterBase
 	{
 		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.InstanceWithParameter.ToDelegate();
-		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Instance.Create;
+		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Instance.Get;
 
 		public ParameterizedSourceDelegateExporter() : base( DelegateSource, Default ) {}
 
-		sealed class Factory : FactoryBase<ActivatorParameter, object>
+		sealed class Factory : ValidatedParameterizedSourceBase<ActivatorParameter, object>
 		{
 			public static Factory Instance { get; } = new Factory();
 			Factory() : this( ParameterTypes.Instance.ToDelegate(), ResultTypes.Instance.ToDelegate() ) {}
@@ -30,7 +30,7 @@ namespace DragonSpark.Composition
 				this.resultLocator = resultLocator;
 			}
 
-			public override object Create( ActivatorParameter parameter )
+			public override object Get( ActivatorParameter parameter )
 			{
 				var factory = new ParameterizedSourceDelegates( parameter.Services.Self ).Get( parameter.FactoryType );
 				var result = factory.Convert( parameterLocator( parameter.FactoryType ), resultLocator( parameter.FactoryType ) );

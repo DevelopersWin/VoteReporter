@@ -49,14 +49,14 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 	public class ThreadLocalStoreCache<TInstance, TResult> : WritableStoreCache<TInstance, TResult> where TInstance : class
 	{
-		readonly static Func<TInstance, IAssignableSource<TResult>> Create = Store.Instance.Create;
+		readonly static Func<TInstance, IAssignableSource<TResult>> Create = Store.Instance.Get;
 		public ThreadLocalStoreCache() : this( Create ) {}
 
-		public ThreadLocalStoreCache( Func<TResult> create ) : this( new Store( create ).Create ) {}
+		public ThreadLocalStoreCache( Func<TResult> create ) : this( new Store( create ).Get ) {}
 
 		public ThreadLocalStoreCache( Func<TInstance, IAssignableSource<TResult>> create ) : base( create ) {}
 
-		class Store : FactoryBase<TInstance, IAssignableSource<TResult>>
+		class Store : ValidatedParameterizedSourceBase<TInstance, IAssignableSource<TResult>>
 		{
 			public static Store Instance { get; } = new Store();
 
@@ -69,7 +69,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 				this.create = create;
 			}
 
-			public override IAssignableSource<TResult> Create( TInstance instance ) => new ThreadLocalStore<TResult>( create );
+			public override IAssignableSource<TResult> Get( TInstance instance ) => new ThreadLocalStore<TResult>( create );
 		}
 	}
 
@@ -117,7 +117,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 		{
 			var delegated = new DelegatedFactory<TInstance, TValue>( Create, specification );
 			var factory = specification == DefaultSpecification ? delegated : delegated.WithAutoValidation();
-			configuration.Assign( new Func<TInstance, TValue>( factory.Create ).Wrap() );
+			configuration.Assign( new Func<TInstance, TValue>( factory.Get ).Wrap() );
 		}
 
 		protected abstract TValue Create( TInstance parameter );

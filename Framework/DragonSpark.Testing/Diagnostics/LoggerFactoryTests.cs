@@ -32,7 +32,7 @@ namespace DragonSpark.Testing.Diagnostics
 			
 			var history = context.GetExport<ILoggerHistory>();
 			Assert.Same( DefaultServiceProvider.Instance.Get<ILoggerHistory>(), history );
-			var message = LogEventMessageFactory.Instance.Create( history.Events ).Last();
+			var message = LogEventMessageFactory.Instance.Get( history.Events ).Last();
 			Assert.Contains( text, message );
 			
 			Assert.Contains( new MethodFormatter( method ).ToString( null, null ), message );

@@ -19,7 +19,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.True( sut.GenericCalled );
 		}*/
 
-		public class TestFactory : IFactory<object, object>
+		public class TestFactory : IValidatedParameterizedSource<object, object>
 		{
 			public bool Called { get; set; }
 			public bool GenericCalled { get; set; }
@@ -27,18 +27,18 @@ namespace DragonSpark.Testing.Aspects
 			bool IValidatedParameterizedSource.IsValid( object parameter )
 			{
 				Called = true;
-				return CanCreate( parameter );
+				return IsValid( parameter );
 			}
 
-			public virtual bool CanCreate( object parameter )
+			public virtual bool IsValid( object parameter )
 			{
 				GenericCalled = true;
 				return parameter.IsAssigned();
 			}
 
-			object IParameterizedSource.Get( object parameter ) => Create( parameter );
+			object IParameterizedSource.Get( object parameter ) => Get( parameter );
 
-			public object Create( object parameter ) => null;
+			public object Get( object parameter ) => null;
 		}
 		
 		/*[Theory, AutoData]

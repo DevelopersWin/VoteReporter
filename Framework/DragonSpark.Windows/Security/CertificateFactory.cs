@@ -7,7 +7,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Security
 {
-	public class CertificateFactory : FactoryBase<string, X509Certificate2>
+	public class CertificateFactory : ValidatedParameterizedSourceBase<string, X509Certificate2>
 	{
 		public static CertificateFactory Instance { get; } = new CertificateFactory();
 
@@ -20,7 +20,7 @@ namespace DragonSpark.Windows.Security
 			this.store = store;
 		}
 
-		public override X509Certificate2 Create( string parameter )
+		public override X509Certificate2 Get( string parameter )
 		{
 			try
 			{

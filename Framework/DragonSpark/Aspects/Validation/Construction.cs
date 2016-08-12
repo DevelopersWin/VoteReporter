@@ -1,7 +1,10 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
+using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -14,8 +17,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -176,9 +177,12 @@ namespace DragonSpark.Aspects.Validation
 	{
 		readonly Func<Type, AspectInstance> validate;
 		readonly Func<Type, AspectInstance> execute;
-		protected ProfileBase( Type interfaceType, string valid, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), 
+
+		protected ProfileBase( Type interfaceType, string valid, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType, valid, interfaceType, execute, factory ) {}
+
+		protected ProfileBase( Type interfaceType, string valid, Type executionType, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), 
 			new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).Create, 
-			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( interfaceType, execute ).Create, factory )
+			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( executionType, execute ).Create, factory )
 		{}
 
 		protected ProfileBase( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> profileSource )
@@ -240,7 +244,17 @@ namespace DragonSpark.Aspects.Validation
 		public AspectInstance Create( Type parameter )
 		{
 			var mappings = parameter.Adapt().GetMappedMethods( implementingType );
-			var mapping = mappings.ToArray().Introduce( methodName, pair => pair.Item1.InterfaceMethod.Name == pair.Item2 && ( pair.Item1.MappedMethod.IsFinal || pair.Item1.MappedMethod.IsVirtual ) && !pair.Item1.MappedMethod.IsAbstract ).SingleOrDefault();
+
+			/*if ( implementingType == typeof(IFactory<,>) )
+			{
+				foreach ( var methodMapping in mappings )
+				{
+					MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {methodMapping.InterfaceMethod} ({methodMapping.InterfaceMethod.DeclaringType.IsConstructedGenericType}) => {methodMapping.MappedMethod} ({methodMapping.MappedMethod.DeclaringType.IsConstructedGenericType})", null, null, null ));
+				}	
+				throw new InvalidOperationException( "SUUUUUUUUUUUUP!!!" );
+			}*/
+
+			var mapping = mappings.Introduce( methodName, pair => pair.Item1.InterfaceMethod.Name == pair.Item2 && ( pair.Item1.MappedMethod.IsFinal || pair.Item1.MappedMethod.IsVirtual ) && !pair.Item1.MappedMethod.IsAbstract ).SingleOrDefault();
 			if ( mapping.IsAssigned() )
 			{
 				var method = mapping.MappedMethod.AccountForGenericDefinition();
@@ -260,7 +274,7 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	public sealed class AspectInstanceFactory : FactoryBase<Type, IEnumerable<AspectInstance>>
+	public sealed class AspectInstanceFactory : ValidatedParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
 	{
 		public static AspectInstanceFactory Instance { get; } = new AspectInstanceFactory();
 
@@ -277,7 +291,7 @@ namespace DragonSpark.Aspects.Validation
 			this.factories = factories;
 		}
 
-		public override IEnumerable<AspectInstance> Create( Type parameter )
+		public override IEnumerable<AspectInstance> Get( Type parameter )
 		{
 			foreach ( var factory in factories )
 			{

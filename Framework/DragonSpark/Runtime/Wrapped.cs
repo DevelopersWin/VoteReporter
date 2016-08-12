@@ -232,7 +232,7 @@ namespace DragonSpark.Runtime
 			return default(T);
 		}*/
 
-		sealed class Factory : FactoryBase<MethodInfo, Delegate>
+		sealed class Factory : ValidatedParameterizedSourceBase<MethodInfo, Delegate>
 		{
 			readonly object instance;
 
@@ -241,7 +241,7 @@ namespace DragonSpark.Runtime
 				this.instance = instance;
 			}
 
-			public override Delegate Create( MethodInfo parameter )
+			public override Delegate Get( MethodInfo parameter )
 			{
 				var info = parameter.AccountForClosedDefinition( instance.GetType() );
 				var delegateType = DelegateType.Default.Get( info );
@@ -254,9 +254,9 @@ namespace DragonSpark.Runtime
 	public class Invokers : Cache<object, ICache<MethodInfo, IDelegateInvoker>>
 	{
 		public static Invokers Default { get; } = new Invokers();
-		Invokers() : base( o => new Cache<MethodInfo, IDelegateInvoker>( new Factory( o ).Create ) ) {}
+		Invokers() : base( o => new Cache<MethodInfo, IDelegateInvoker>( new Factory( o ).Get ) ) {}
 
-		sealed class Factory : FactoryBase<MethodInfo, IDelegateInvoker>
+		sealed class Factory : ValidatedParameterizedSourceBase<MethodInfo, IDelegateInvoker>
 		{
 			readonly object instance;
 			public Factory( object instance )
@@ -264,11 +264,11 @@ namespace DragonSpark.Runtime
 				this.instance = instance;
 			}
 
-			public override IDelegateInvoker Create( MethodInfo parameter ) => Invoker.Default.Get( Delegates.Default.Get( instance ).Get( parameter ) );
+			public override IDelegateInvoker Get( MethodInfo parameter ) => Invoker.Default.Get( Delegates.Default.Get( instance ).Get( parameter ) );
 		}
 	}
 
-	class Invoker : FactoryBase<Delegate, IDelegateInvoker>
+	class Invoker : ValidatedParameterizedSourceBase<Delegate, IDelegateInvoker>
 	{
 		public static ICache<Delegate, IDelegateInvoker> Default { get; } = new Invoker().ToCache();
 
@@ -284,7 +284,7 @@ namespace DragonSpark.Runtime
 															   { typeof(FactoryInvoker<,,,>), typeof(FactoryInvoker<,,,>) }
 														   }.ToImmutableDictionary();
 
-		public override IDelegateInvoker Create( Delegate parameter )
+		public override IDelegateInvoker Get( Delegate parameter )
 		{
 			var delegateType = parameter.GetType();
 			var mapped = Mappings[delegateType.IsConstructedGenericType ? delegateType.GetGenericTypeDefinition() : delegateType];

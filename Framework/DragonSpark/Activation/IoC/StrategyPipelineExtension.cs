@@ -177,7 +177,7 @@ namespace DragonSpark.Activation.IoC
 					var lifetimePolicy = context.Policies.GetNoDefault<ILifetimePolicy>( context.BuildKey, false );
 					if ( lifetimePolicy == null )
 					{
-						var manager = factory.Create( reference.Type );
+						var manager = factory.Get( reference.Type );
 						if ( manager != null )
 						{
 							logger.Debug( "'{TypeName}' is assigning a lifetime manager of '{LifetimeManager}' for type '{Reference}'.", GetType().Name, manager.GetType(), reference.Type );
@@ -201,7 +201,7 @@ namespace DragonSpark.Activation.IoC
 		public ConventionTypes( ITypeSource source ) : base( new Locator( source ).ToDelegate().CachedPerScope() ) {}
 
 		[ApplyAutoValidation]
-		sealed class Locator : FactoryBase<Type, Type>
+		sealed class Locator : ValidatedParameterizedSourceBase<Type, Type>
 		{
 			readonly ITypeSource source;
 
@@ -212,7 +212,7 @@ namespace DragonSpark.Activation.IoC
 
 			static Type Map( Type parameter )
 			{
-				var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Create( parameter )}";
+				var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Get( parameter )}";
 				var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
 				return result;
 			}
@@ -231,7 +231,7 @@ namespace DragonSpark.Activation.IoC
 				return result;
 			}
 
-			public override Type Create( Type parameter ) => Map( parameter ) ?? Search( parameter );
+			public override Type Get( Type parameter ) => Map( parameter ) ?? Search( parameter );
 		}
 	}
 
@@ -253,12 +253,12 @@ namespace DragonSpark.Activation.IoC
 		public override bool IsSatisfiedBy( Type parameter ) => parameter.Name.Equals( type );
 	}
 
-	class ConventionCandidateNameFactory : FactoryBase<Type, string>
+	class ConventionCandidateNameFactory : ValidatedParameterizedSourceBase<Type, string>
 	{
 		public static ConventionCandidateNameFactory Instance { get; } = new ConventionCandidateNameFactory();
 		ConventionCandidateNameFactory() {}
 
-		public override string Create( Type parameter ) => parameter.Name.TrimStartOf( 'I' );
+		public override string Get( Type parameter ) => parameter.Name.TrimStartOf( 'I' );
 	}
 
 	public interface ITypeCandidateWeightProvider
@@ -266,7 +266,7 @@ namespace DragonSpark.Activation.IoC
 		int GetWeight( Type candidate );
 	}
 
-	public class TypeCandidateWeightProvider : FactoryBase<Type, int>, ITypeCandidateWeightProvider
+	public class TypeCandidateWeightProvider : ValidatedParameterizedSourceBase<Type, int>, ITypeCandidateWeightProvider
 	{
 		readonly Type subject;
 
@@ -275,9 +275,9 @@ namespace DragonSpark.Activation.IoC
 			this.subject = subject;
 		}
 
-		public override int Create( Type parameter ) => parameter.IsNested ? subject.GetTypeInfo().DeclaredNestedTypes.Contains( parameter.GetTypeInfo() ) ? 2 : -1 : 0;
+		public override int Get( Type parameter ) => parameter.IsNested ? subject.GetTypeInfo().DeclaredNestedTypes.Contains( parameter.GetTypeInfo() ) ? 2 : -1 : 0;
 
-		public int GetWeight( Type candidate ) => Create( candidate );
+		public int GetWeight( Type candidate ) => Get( candidate );
 	}
 
 	public sealed class SelfAndNestedTypes : Cache<Type, IEnumerable<Type>>

@@ -17,7 +17,7 @@ namespace DevelopersWin.VoteReporter
 		readonly ISerializer serializer;
 		readonly DocumentFactory factory;
 
-		public VoteReportContentGenerator( DataTransformer transformer, ISerializer serializer ) : this( transformer.Create, serializer, DocumentFactory.Instance ) {}
+		public VoteReportContentGenerator( DataTransformer transformer, ISerializer serializer ) : this( transformer.Get, serializer, DocumentFactory.Instance ) {}
 
 		protected VoteReportContentGenerator( [Required]Transformer transformer, [Required]ISerializer serializer, [Required]DocumentFactory factory )
 		{
@@ -28,9 +28,9 @@ namespace DevelopersWin.VoteReporter
 
 		public string Generate( VoteReport report )
 		{
-			var stylesheet = factory.Create( Resources.Report );
+			var stylesheet = factory.Get( Resources.Report );
 			var data = serializer.Save( report );
-			var source = factory.Create( data );
+			var source = factory.Get( data );
 			var result = transformer( new DataTransformParameter( stylesheet, source ) );
 			return result;
 		}

@@ -9,7 +9,7 @@ using Type = System.Type;
 namespace DragonSpark.Setup
 {
 	[Persistent]
-	public class AllTypesOfFactory : FactoryBase<Type, Array>
+	public class AllTypesOfFactory : ValidatedParameterizedSourceBase<Type, Array>
 	{
 		readonly ImmutableArray<Type> types;
 		readonly IActivator activator;
@@ -20,9 +20,9 @@ namespace DragonSpark.Setup
 			this.activator = activator;
 		}
 
-		public ImmutableArray<T> Create<T>() => ImmutableArray.CreateRange( Create( typeof(T) ).Cast<T>() );
+		public ImmutableArray<T> Create<T>() => ImmutableArray.CreateRange( Get( typeof(T) ).Cast<T>() );
 
-		public override Array Create( Type parameter ) => activator.ActivateMany<object>( parameter, types.ToArray() ).ToArray();
+		public override Array Get( Type parameter ) => activator.ActivateMany<object>( parameter, types.ToArray() ).ToArray();
 	}
 
 	/*[Persistent]

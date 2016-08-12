@@ -29,7 +29,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		protected AutoDataAttribute( Func<IFixture> fixture ) : base( FixtureContext.Instance.WithInstance( fixture() ) ) {}
 
-		protected virtual IApplication ApplicationSource( MethodBase method ) => ApplicationFactory.Instance.Create( method );
+		protected virtual IApplication ApplicationSource( MethodBase method ) => ApplicationFactory.Instance.Get( method );
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
@@ -79,12 +79,12 @@ namespace DragonSpark.Testing.Framework.Setup
 	public abstract class TypeProviderAttributeBase : HostingAttribute
 	{
 		protected TypeProviderAttributeBase( params Type[] types ) : this( types.ToImmutableArray() ) {}
-		protected TypeProviderAttributeBase( ImmutableArray<Type> additionalTypes ) : this( new Factory( additionalTypes ).Create ) {}
+		protected TypeProviderAttributeBase( ImmutableArray<Type> additionalTypes ) : this( new Factory( additionalTypes ).Get ) {}
 
 		protected TypeProviderAttributeBase( Func<MethodBase, ImmutableArray<Type>> factory ) : this( factory.Wrap() ) {}
 		protected TypeProviderAttributeBase( Func<object, Func<MethodBase, ImmutableArray<Type>>> provider ) : base( provider ) {}
 
-		protected class Factory : FactoryBase<MethodBase, ImmutableArray<Type>>
+		protected class Factory : ValidatedParameterizedSourceBase<MethodBase, ImmutableArray<Type>>
 		{
 			readonly ImmutableArray<Type> additionalTypes;
 			public Factory( ImmutableArray<Type> additionalTypes )
@@ -92,7 +92,7 @@ namespace DragonSpark.Testing.Framework.Setup
 				this.additionalTypes = additionalTypes;
 			}
 
-			public override ImmutableArray<Type> Create( MethodBase parameter ) => additionalTypes;
+			public override ImmutableArray<Type> Get( MethodBase parameter ) => additionalTypes;
 		}
 	}
 
@@ -114,27 +114,27 @@ namespace DragonSpark.Testing.Framework.Setup
 	[AttributeUsage( AttributeTargets.Method )]
 	public class IncludeParameterTypesAttribute : TypeProviderAttributeBase
 	{
-		public IncludeParameterTypesAttribute( params Type[] additionalTypes ) : base( new Factory( additionalTypes ).Create ) {}
+		public IncludeParameterTypesAttribute( params Type[] additionalTypes ) : base( new Factory( additionalTypes ).Get ) {}
 
 		new sealed class Factory : TypeProviderAttributeBase.Factory
 		{
 			public Factory( params Type[] additionalTypes ) : base( additionalTypes.ToImmutableArray() ) {}
 
-			public override ImmutableArray<Type> Create( MethodBase parameter ) => base.Create( parameter ).Union( parameter.GetParameterTypes() ).ToImmutableArray();
+			public override ImmutableArray<Type> Get( MethodBase parameter ) => base.Get( parameter ).Union( parameter.GetParameterTypes() ).ToImmutableArray();
 		}
 	}
 
 	public class ContainingTypeAndNestedAttribute : TypeProviderAttributeBase
 	{
-		readonly static Func<MethodBase, ImmutableArray<Type>> Delegate = Factory.Instance.Create;
+		readonly static Func<MethodBase, ImmutableArray<Type>> Delegate = Factory.Instance.Get;
 		public ContainingTypeAndNestedAttribute() : base( Delegate ) {}
 
-		new sealed class Factory : FactoryBase<MethodBase, ImmutableArray<Type>>
+		new sealed class Factory : ValidatedParameterizedSourceBase<MethodBase, ImmutableArray<Type>>
 		{
 			public static Factory Instance { get; } = new Factory();
 			Factory() {}
 
-			public override ImmutableArray<Type> Create( MethodBase parameter ) => SelfAndNestedTypes.Instance.Get( parameter.DeclaringType ).ToImmutableArray();
+			public override ImmutableArray<Type> Get( MethodBase parameter ) => SelfAndNestedTypes.Instance.Get( parameter.DeclaringType ).ToImmutableArray();
 		}
 	}
 
@@ -145,7 +145,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	}
 
 	[ApplyAutoValidation]
-	sealed class FixtureServiceProvider : FactoryBase<Type, object>, IServiceProvider
+	sealed class FixtureServiceProvider : ValidatedParameterizedSourceBase<Type, object>, IServiceProvider
 	{
 		readonly IFixture fixture;
 
@@ -154,9 +154,9 @@ namespace DragonSpark.Testing.Framework.Setup
 			this.fixture = fixture;
 		}
 
-		public override object Create( Type parameter ) => fixture.Create<object>( parameter );
+		public override object Get( Type parameter ) => fixture.Create<object>( parameter );
 
-		public object GetService( Type serviceType ) => Create( serviceType );
+		public object GetService( Type serviceType ) => Get( serviceType );
 
 		sealed class Specification : GuardedSpecificationBase<Type>
 		{

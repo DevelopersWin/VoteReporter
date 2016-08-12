@@ -12,7 +12,7 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Theory, Framework.Setup.AutoData]
 		public void LocateOnFactory( LifetimeManagerFactory sut )
 		{
-			var type = sut.Create( typeof(LifetimeManagerFactory) );
+			var type = sut.Get( typeof(LifetimeManagerFactory) );
 			Assert.NotNull( type );
 			Assert.IsType<ContainerControlledLifetimeManager>( type );
 

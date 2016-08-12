@@ -19,14 +19,14 @@ namespace DragonSpark.Windows.Runtime.Data
 		public string Save( object item ) => XamlServices.Save( item );
 	}
 
-	public abstract class DataTransformerBase<T> : FactoryBase<DataTransformParameter, T> {}
+	public abstract class DataTransformerBase<T> : ValidatedParameterizedSourceBase<DataTransformParameter, T> {}
 
 	public abstract class DataTransformer<T> : DataTransformerBase<T>
 	{
 		readonly Func<DataTransformParameter, MemoryStream> factory;
 		readonly Func<MemoryStream, T> transformer;
 
-		protected DataTransformer( Func<MemoryStream, T> transformer ) : this( DataStreamFactory.Instance.Create, transformer ) {}
+		protected DataTransformer( Func<MemoryStream, T> transformer ) : this( DataStreamFactory.Instance.Get, transformer ) {}
 
 		protected DataTransformer( [Required]Func<DataTransformParameter, MemoryStream> factory, [Required]Func<MemoryStream, T> transformer )
 		{
@@ -34,7 +34,7 @@ namespace DragonSpark.Windows.Runtime.Data
 			this.transformer = transformer;
 		}
 
-		public override T Create( DataTransformParameter parameter )
+		public override T Get( DataTransformParameter parameter )
 		{
 			var stream = factory( parameter );
 			var result = transformer( stream );
@@ -68,7 +68,7 @@ namespace DragonSpark.Windows.Runtime.Data
 	{
 		public static DataStreamFactory Instance { get; } = new DataStreamFactory();
 
-		public override MemoryStream Create( DataTransformParameter parameter )
+		public override MemoryStream Get( DataTransformParameter parameter )
 		{
 			var transform = new XslCompiledTransform();
 			transform.Load( parameter.Stylesheet );

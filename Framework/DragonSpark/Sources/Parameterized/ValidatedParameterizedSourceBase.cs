@@ -3,13 +3,13 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
-using DragonSpark.Sources.Parameterized.Caching;
 using Delegates = DragonSpark.TypeSystem.Delegates;
 
 namespace DragonSpark.Sources.Parameterized
@@ -63,10 +63,10 @@ namespace DragonSpark.Sources.Parameterized
 			this.configure = configure;
 		}
 
-		public override TResult Create( TParameter parameter )
+		public override TResult Get( TParameter parameter )
 		{
 			initialize( parameter );
-			var result = base.Create( parameter );
+			var result = base.Get( parameter );
 			configure( result );
 			return result;
 		}
@@ -130,18 +130,18 @@ namespace DragonSpark.Sources.Parameterized
 		public DecoratedFactory( IFactory<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification  ) : base( inner.ToDelegate(), coercer, specification ) {}
 	}*/
 
-	public abstract class FactoryBase<TParameter, TResult> : IFactory<TParameter, TResult>, IParameterizedSource<TParameter, TResult>
+	public abstract class ValidatedParameterizedSourceBase<TParameter, TResult> : IValidatedParameterizedSource<TParameter, TResult>
 	{
 		readonly Coerce<TParameter> coercer;
 		readonly ISpecification<TParameter> specification;
 
-		protected FactoryBase() : this( Defaults<TParameter>.Coercer ) {}
+		protected ValidatedParameterizedSourceBase() : this( Defaults<TParameter>.Coercer ) {}
 
-		protected FactoryBase( Coerce<TParameter> coercer ) : this( coercer, Specifications<TParameter>.Assigned ) {}
+		protected ValidatedParameterizedSourceBase( Coerce<TParameter> coercer ) : this( coercer, Specifications<TParameter>.Assigned ) {}
 
-		protected FactoryBase( ISpecification<TParameter> specification ) : this( Defaults<TParameter>.Coercer, specification ) {}
+		protected ValidatedParameterizedSourceBase( ISpecification<TParameter> specification ) : this( Defaults<TParameter>.Coercer, specification ) {}
 
-		protected FactoryBase( Coerce<TParameter> coercer, ISpecification<TParameter> specification )
+		protected ValidatedParameterizedSourceBase( Coerce<TParameter> coercer, ISpecification<TParameter> specification )
 		{
 			this.coercer = coercer;
 			this.specification = specification;
@@ -152,24 +152,18 @@ namespace DragonSpark.Sources.Parameterized
 		object CreateFromParameter( object parameter )
 		{
 			var coerced = coercer( parameter );
-			var result = coerced.IsAssigned() ? Create( coerced ) : default(TResult);
+			var result = coerced.IsAssigned() ? Get( coerced ) : default(TResult);
 			return result;
 		}
 
-		public bool CanCreate( TParameter parameter )
-		{
-			var isSatisfiedBy = specification.IsSatisfiedBy( parameter );
-			return isSatisfiedBy;
-		}
+		public bool IsValid( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 
-		public abstract TResult Create( [Required]TParameter parameter );
-
-		TResult IParameterizedSource<TParameter, TResult>.Get( TParameter parameter ) => Create( parameter );
+		public abstract TResult Get( [Required]TParameter parameter );
 
 		object IParameterizedSource.Get( object parameter ) => CreateFromParameter( parameter );
 	}
 
-	public class DelegatedFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	public class DelegatedFactory<TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
 	{
 		readonly Func<TParameter, TResult> inner;
 
@@ -182,7 +176,7 @@ namespace DragonSpark.Sources.Parameterized
 			this.inner = inner;
 		}
 
-		public override TResult Create( TParameter parameter ) => inner( parameter );
+		public override TResult Get( TParameter parameter ) => inner( parameter );
 	}
 
 	public class FixedFactory<TParameter, TResult> : SourceBase<TResult>
@@ -223,7 +217,7 @@ namespace DragonSpark.Sources.Parameterized
 		public static ISource<ConstructFromKnownTypes<T>> Instance { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.Scope( () => new ConstructFromKnownTypes<T>( KnownTypes.Instance.Get<T>().ToArray() ) ) );
 		ConstructFromKnownTypes( params Type[] types ) : base( types ) {}
 		
-		public T CreateUsing( object parameter ) => (T)Create( parameter );
+		public T CreateUsing( object parameter ) => (T)Get( parameter );
 	}
 
 	public static class Defaults
@@ -252,7 +246,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ).ToDelegate() ).Fixed() ) {}
 
-		sealed class Factory : FactoryBase<object, T>
+		sealed class Factory : ValidatedParameterizedSourceBase<object, T>
 		{
 			readonly Type type;
 
@@ -261,11 +255,11 @@ namespace DragonSpark.Sources.Parameterized
 				this.type = type;
 			}
 
-			public override T Create( object parameter ) => ParameterConstructor<T>.Make( parameter.GetType(), type )( parameter );
+			public override T Get( object parameter ) => ParameterConstructor<T>.Make( parameter.GetType(), type )( parameter );
 		}
 	}
 
-	public class CompositeFactory<TParameter, TResult> : FactoryBase<TParameter, TResult>
+	public class CompositeFactory<TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
 	{
 		readonly ImmutableArray<Func<TParameter, TResult>> inner;
 
@@ -282,7 +276,7 @@ namespace DragonSpark.Sources.Parameterized
 			this.inner = inner.ToImmutableArray();
 		}
 
-		public override TResult Create( TParameter parameter )
+		public override TResult Get( TParameter parameter )
 		{
 			var enumerable = inner.Introduce( parameter );
 			var firstAssigned = enumerable.FirstAssigned();

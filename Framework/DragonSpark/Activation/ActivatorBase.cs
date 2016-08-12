@@ -4,15 +4,15 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	public abstract class ActivatorBase<TRequest> : FactoryBase<TRequest, object>, IActivator where TRequest : TypeRequest
+	public abstract class ActivatorBase<TRequest> : ValidatedParameterizedSourceBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
 		protected ActivatorBase( Coerce<TRequest> coercer ) : this( coercer, Specification.Instance ) {}
 
 		protected ActivatorBase( Coerce<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification ) {}
 
-		bool IFactory<TypeRequest, object>.CanCreate( TypeRequest parameter ) => CanCreate( (TRequest)parameter );
+		bool IValidatedParameterizedSource<TypeRequest, object>.IsValid( TypeRequest parameter ) => IsValid( (TRequest)parameter );
 
-		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => Create( (TRequest)parameter );
+		object IParameterizedSource<TypeRequest, object>.Get( TypeRequest parameter ) => Get( (TRequest)parameter );
 
 		class Specification : IsInstanceOfSpecification<TRequest>
 		{

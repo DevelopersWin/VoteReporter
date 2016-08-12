@@ -227,9 +227,9 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	public class ConstructorQueryProvider : EqualityReferenceCache<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
 	{
-		public ConstructorQueryProvider( CanLocateSpecification locate ) : base( new Factory( locate ).Create ) {}
+		public ConstructorQueryProvider( CanLocateSpecification locate ) : base( new Factory( locate ).Get ) {}
 
-		class Factory : FactoryBase<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
+		class Factory : ValidatedParameterizedSourceBase<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
 		{
 			readonly CanLocateSpecification locate;
 			readonly ISpecification<ConstructTypeRequest> create;
@@ -242,7 +242,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 				predicate = Check;
 			}
 
-			public override IEnumerable<ConstructorInfo> Create( ConstructTypeRequest parameter )
+			public override IEnumerable<ConstructorInfo> Get( ConstructTypeRequest parameter )
 			{
 				var result = new ReflectionHelper( parameter.RequestedType )
 					.InstanceConstructors

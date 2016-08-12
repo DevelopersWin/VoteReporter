@@ -1,22 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized
 {
 	public static class Extensions
 	{
-		public static ImmutableArray<TResult> CreateMany<TParameter, TResult>( this IFactory<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
+		public static ImmutableArray<TResult> CreateMany<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
 			parameters
-				.Where( @this.CanCreate )
-				.Select( @this.Create )
+				.Where( @this.IsValid )
+				.Select( @this.Get )
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
 		public static ImmutableArray<TResult> CreateMany<TResult>( this IValidatedParameterizedSource @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
@@ -117,13 +117,13 @@ namespace DragonSpark.Sources.Parameterized
 			}
 		}
 
-		public static IFactory<TParameter, TResult> Cast<TParameter, TResult>( this IValidatedParameterizedSource @this ) => @this as IFactory<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
-		sealed class Casted<TParameter, TResult> : Cache<IValidatedParameterizedSource, IFactory<TParameter, TResult>>
+		public static IValidatedParameterizedSource<TParameter, TResult> Cast<TParameter, TResult>( this IValidatedParameterizedSource @this ) => @this as IValidatedParameterizedSource<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
+		sealed class Casted<TParameter, TResult> : Cache<IValidatedParameterizedSource, IValidatedParameterizedSource<TParameter, TResult>>
 		{
 			public static Casted<TParameter, TResult> Default { get; } = new Casted<TParameter, TResult>();
 			Casted() : base( result => new CastedFactory( result ) ) {}
 
-			class CastedFactory : FactoryBase<TParameter, TResult>
+			class CastedFactory : ValidatedParameterizedSourceBase<TParameter, TResult>
 			{
 				readonly IValidatedParameterizedSource inner;
 				public CastedFactory( IValidatedParameterizedSource inner ) : base( inner.ToSpecification().Cast<TParameter>() )
@@ -131,7 +131,7 @@ namespace DragonSpark.Sources.Parameterized
 					this.inner = inner;
 				}
 
-				public override TResult Create( TParameter parameter ) => (TResult)inner.Get( parameter );
+				public override TResult Get( TParameter parameter ) => (TResult)inner.Get( parameter );
 			}
 		}
 
@@ -170,11 +170,11 @@ namespace DragonSpark.Sources.Parameterized
 			FactorySpecifications() : base( factory => new DelegatedSpecification<object>( factory.IsValid ) ) {}
 		}
 
-		public static ISpecification<TParameter> ToSpecification<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => FactorySpecifications<TParameter, TResult>.Default.Get( @this );
-		sealed class FactorySpecifications<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, ISpecification<TParameter>>
+		public static ISpecification<TParameter> ToSpecification<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => FactorySpecifications<TParameter, TResult>.Default.Get( @this );
+		sealed class FactorySpecifications<TParameter, TResult> : Cache<IValidatedParameterizedSource<TParameter, TResult>, ISpecification<TParameter>>
 		{
 			public static FactorySpecifications<TParameter, TResult> Default { get; } = new FactorySpecifications<TParameter, TResult>();
-			FactorySpecifications() : base( factory => new DelegatedSpecification<TParameter>( factory.CanCreate ) ) {}
+			FactorySpecifications() : base( factory => new DelegatedSpecification<TParameter>( factory.IsValid ) ) {}
 		}
 
 		public static ICache<T> ToCache<T>( this IParameterizedSource<object, T> @this ) => @this.ToDelegate().ToCache();
@@ -195,8 +195,8 @@ namespace DragonSpark.Sources.Parameterized
 
 		public static ICache<TParameter, TResult> CachedForEquality<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) where TParameter : class => new EqualityReferenceCache<TParameter, TResult>( @this.Get ).ToCache();
 		
-		public static IFactory<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IFactory<TParameter, TResult> @this ) => AutoValidationFactories<TParameter, TResult>.Default.Get( @this );
-		sealed class AutoValidationFactories<TParameter, TResult> : Cache<IFactory<TParameter, TResult>, IFactory<TParameter, TResult>>
+		public static IValidatedParameterizedSource<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => AutoValidationFactories<TParameter, TResult>.Default.Get( @this );
+		sealed class AutoValidationFactories<TParameter, TResult> : Cache<IValidatedParameterizedSource<TParameter, TResult>, IValidatedParameterizedSource<TParameter, TResult>>
 		{
 			public static AutoValidationFactories<TParameter, TResult> Default { get; } = new AutoValidationFactories<TParameter, TResult>();
 			AutoValidationFactories() : base( factory => new AutoValidatingFactory<TParameter,TResult>( factory ) ) {}

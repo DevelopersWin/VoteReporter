@@ -2,18 +2,17 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.TypeSystem
 {
@@ -64,7 +63,7 @@ namespace DragonSpark.TypeSystem
 	public sealed class AssemblyPartLocator : ParameterizedSourceBase<Assembly, ImmutableArray<Assembly>>
 	{
 		public static AssemblyPartLocator Instance { get; } = new AssemblyPartLocator();
-		AssemblyPartLocator() : this( AssemblyLoader.Instance.Get, AssemblyHintProvider.Instance.Create, AssemblyPartQueryProvider.Instance.Create ) {}
+		AssemblyPartLocator() : this( AssemblyLoader.Instance.Get, AssemblyHintProvider.Instance.Get, AssemblyPartQueryProvider.Instance.Get ) {}
 
 		readonly Func<string, ImmutableArray<Assembly>> assemblySource;
 		readonly Func<Assembly, string> hintSource;
@@ -86,21 +85,21 @@ namespace DragonSpark.TypeSystem
 	}
 
 	[ApplyAutoValidation]
-	public sealed class AssemblyHintProvider : FactoryBase<Assembly, string>
+	public sealed class AssemblyHintProvider : ValidatedParameterizedSourceBase<Assembly, string>
 	{
 		public static AssemblyHintProvider Instance { get; } = new AssemblyHintProvider();
 		AssemblyHintProvider() {}
 
-		public override string Create( Assembly parameter ) => parameter.From<AssemblyHintAttribute, string>( attribute => attribute.Hint ) ?? parameter.GetName().Name;
+		public override string Get( Assembly parameter ) => parameter.From<AssemblyHintAttribute, string>( attribute => attribute.Hint ) ?? parameter.GetName().Name;
 	}
 
 	[ApplyAutoValidation]
-	public sealed class AssemblyPartQueryProvider : FactoryBase<Assembly, string>
+	public sealed class AssemblyPartQueryProvider : ValidatedParameterizedSourceBase<Assembly, string>
 	{
 		public static AssemblyPartQueryProvider Instance { get; } = new AssemblyPartQueryProvider();
 		AssemblyPartQueryProvider() {}
 
-		public override string Create( Assembly parameter ) => parameter.From<AssemblyPartsAttribute, string>( attribute => attribute.Query ) ?? AssemblyPartsAttribute.Default;
+		public override string Get( Assembly parameter ) => parameter.From<AssemblyPartsAttribute, string>( attribute => attribute.Query ) ?? AssemblyPartsAttribute.Default;
 	}
 
 	[AttributeUsage( AttributeTargets.Assembly )]

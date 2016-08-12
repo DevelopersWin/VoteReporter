@@ -46,9 +46,9 @@ namespace DragonSpark.Sources
 		class SourceDelegates<TParameter, TResult> : Cache<ISource<IParameterizedSource<TParameter, TResult>>, Func<TParameter, TResult>>
 		{
 			public static SourceDelegates<TParameter, TResult> Default { get; } = new SourceDelegates<TParameter, TResult>();
-			SourceDelegates() : base( source => new Factory( source ).Create ) {}
+			SourceDelegates() : base( source => new Factory( source ).Get ) {}
 
-			class Factory : FactoryBase<TParameter, TResult>
+			class Factory : ValidatedParameterizedSourceBase<TParameter, TResult>
 			{
 				readonly ISource<IParameterizedSource<TParameter, TResult>> source;
 				public Factory( ISource<IParameterizedSource<TParameter, TResult>> source )
@@ -56,7 +56,7 @@ namespace DragonSpark.Sources
 					this.source = source;
 				}
 
-				public override TResult Create( TParameter parameter ) => source.Get().Get( parameter );
+				public override TResult Get( TParameter parameter ) => source.Get().Get( parameter );
 			}
 		}
 

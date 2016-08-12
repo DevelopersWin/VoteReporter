@@ -1,10 +1,10 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources;
 
 namespace DragonSpark.TypeSystem
 {

@@ -29,26 +29,26 @@ namespace DragonSpark.Sources.Parameterized
 		public object Get( object parameter ) => Controller.Execute( parameter, () => inner.Get( parameter ) );
 	}
 
-	class AutoValidatingFactory<TParameter, TResult> : AutoValidatingFactory, IFactory<TParameter, TResult>
+	class AutoValidatingFactory<TParameter, TResult> : AutoValidatingFactory, IValidatedParameterizedSource<TParameter, TResult>
 	{
-		readonly IFactory<TParameter, TResult> inner;
+		readonly IValidatedParameterizedSource<TParameter, TResult> inner;
 		readonly Func<TParameter, bool> specification;
 
-		public AutoValidatingFactory( IFactory<TParameter, TResult> inner ) : this( inner, inner.CanCreate ) {}
+		public AutoValidatingFactory( IValidatedParameterizedSource<TParameter, TResult> inner ) : this( inner, inner.IsValid ) {}
 
-		public AutoValidatingFactory( IFactory<TParameter, TResult> inner, Func<TParameter, bool> specification ) : base( new AutoValidationController( new FactoryAdapter<TParameter, TResult>( inner ) ), inner )
+		public AutoValidatingFactory( IValidatedParameterizedSource<TParameter, TResult> inner, Func<TParameter, bool> specification ) : base( new AutoValidationController( new FactoryAdapter<TParameter, TResult>( inner ) ), inner )
 		{
 			this.inner = inner;
 			this.specification = specification;
 		}
 
-		public bool CanCreate( TParameter parameter )
+		public bool IsValid( TParameter parameter )
 		{
 			var result = Controller.IsValid( parameter ) || specification( parameter );
 			Controller.MarkValid( parameter, result );
 			return result;
 		}
 
-		public TResult Create( TParameter parameter ) => (TResult)Controller.Execute( parameter, () => inner.Create( parameter ) );
+		public TResult Get( TParameter parameter ) => (TResult)Controller.Execute( parameter, () => inner.Get( parameter ) );
 	}
 }

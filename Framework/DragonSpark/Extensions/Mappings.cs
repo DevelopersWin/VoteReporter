@@ -27,7 +27,7 @@ namespace DragonSpark.Extensions
 		{
 			var context = new ObjectMappingParameter<TResult>( source, existing, configure );
 			var factory = GlobalServiceProvider.GetService<ObjectMappingFactory<TResult>>() ?? ObjectMappingFactory<TResult>.Default.Get();
-			var result = factory.Create( context );
+			var result = factory.Get( context );
 			return result;
 		}
 	}

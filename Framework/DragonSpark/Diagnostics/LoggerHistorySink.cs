@@ -23,7 +23,7 @@ namespace DragonSpark.Diagnostics
 		public virtual void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
 	}
 
-	public class LogEventTextFactory : FactoryBase<LogEvent, string>
+	public class LogEventTextFactory : ValidatedParameterizedSourceBase<LogEvent, string>
 	{
 		public static LogEventTextFactory Instance { get; } = new LogEventTextFactory();
 
@@ -36,7 +36,7 @@ namespace DragonSpark.Diagnostics
 			this.formatter = formatter;
 		}
 
-		public override string Create( LogEvent parameter )
+		public override string Get( LogEvent parameter )
 		{
 			var writer = new StringWriter();
 			formatter.Format( parameter, writer );
@@ -45,13 +45,13 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public sealed class LogEventMessageFactory : FactoryBase<IEnumerable<LogEvent>, ImmutableArray<string>>
+	public sealed class LogEventMessageFactory : ValidatedParameterizedSourceBase<IEnumerable<LogEvent>, ImmutableArray<string>>
 	{
 		readonly static Func<LogEvent, string> Text = LogEventTextFactory.Instance.ToDelegate();
 		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
 		LogEventMessageFactory() {}
 
-		public override ImmutableArray<string> Create( IEnumerable<LogEvent> parameter ) => parameter
+		public override ImmutableArray<string> Get( IEnumerable<LogEvent> parameter ) => parameter
 			.OrderBy( line => line.Timestamp )
 			.Select( Text )
 			.ToImmutableArray();

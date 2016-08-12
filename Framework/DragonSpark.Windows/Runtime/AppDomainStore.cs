@@ -25,7 +25,7 @@ namespace DragonSpark.Windows.Runtime
 		public override T Get() => (T)domain.GetData( key );
 	}
 
-	public class ApplicationDomainProxyFactory<T> : FactoryBase<object[], T>
+	public class ApplicationDomainProxyFactory<T> : ValidatedParameterizedSourceBase<object[], T>
 	{
 		readonly AppDomain domain;
 
@@ -34,9 +34,9 @@ namespace DragonSpark.Windows.Runtime
 			this.domain = domain;
 		}
 
-		public T CreateUsing( params object[] arguments ) => Create( arguments );
+		public T CreateUsing( params object[] arguments ) => Get( arguments );
 
-		public override T Create( object[] parameter )
+		public override T Get( object[] parameter )
 		{
 			var assemblyPath = new Uri( typeof(T).Assembly.CodeBase).LocalPath;
 			var result = (T)domain.CreateInstanceFromAndUnwrap(assemblyPath, typeof(T).FullName, false

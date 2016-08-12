@@ -240,7 +240,7 @@
     <Compile Include="Modularity\ModuleInfoExtensions.cs" />
     <Compile Include="Modularity\ModuleMonitor.cs" />
     <Compile Include="TypeSystem\AssemblyBasedTypeSource.cs" />
-    <Compile Include="Sources\Parameterized\FactoryBase.cs" />
+    <Compile Include="Sources\Parameterized\ValidatedParameterizedSourceBase.cs" />
     <Compile Include="Runtime\DeclarativeCollection.cs" />
     <Compile Include="TypeSystem\ApplicationAssemblyFilter.cs">
       <SubType>Code</SubType>

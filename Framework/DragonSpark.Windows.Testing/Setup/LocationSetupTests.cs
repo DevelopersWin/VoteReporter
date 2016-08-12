@@ -450,7 +450,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			Assert.Same( fromContainer, sut );
 
-			var fromProvider = factory.Create( fromFactory );
+			var fromProvider = factory.Get( fromFactory );
 			Assert.NotNull( fromProvider );
 
 			var assembly = GetType().Assembly;

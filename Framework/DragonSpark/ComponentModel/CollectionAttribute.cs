@@ -12,17 +12,17 @@ namespace DragonSpark.ComponentModel
 		static ServicesValueProvider Create( Type type ) => new ServicesValueProvider( p =>
 		{
 			var elementType = type ?? p.PropertyType.Adapt().GetEnumerableType();
-			var result = elementType.With( Transformer.Instance.Create );
+			var result = elementType.With( Transformer.Instance.Get );
 			return result;
 		} );
 
 		public class Collection<T> : System.Collections.ObjectModel.Collection<T> {}
 
-		class Transformer : FactoryBase<Type, Type>
+		class Transformer : ValidatedParameterizedSourceBase<Type, Type>
 		{
 			public static Transformer Instance { get; } = new Transformer();
 
-			public override Type Create( Type parameter ) => typeof(Collection<>).MakeGenericType( parameter );
+			public override Type Get( Type parameter ) => typeof(Collection<>).MakeGenericType( parameter );
 		}
 	}
 }

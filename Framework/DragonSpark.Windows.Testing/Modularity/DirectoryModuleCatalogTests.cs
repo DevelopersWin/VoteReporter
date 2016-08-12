@@ -322,7 +322,7 @@ namespace DragonSpark.Windows.Testing.Modularity
 			var parentEvidence = new Evidence();
 			var parentSetup = new AppDomainSetup { ApplicationName = "Test Parent" };
 			var parentAppDomain = AppDomain.CreateDomain( "Parent", parentEvidence, parentSetup );
-			var childDomain = ChildDomainFactory.Instance.Create( parentAppDomain );
+			var childDomain = ChildDomainFactory.Instance.Get( parentAppDomain );
 
 			Assert.Equal(parentEvidence.Count, childDomain.Evidence.Count);
 			Assert.Equal("Test Parent", childDomain.SetupInformation.ApplicationName);

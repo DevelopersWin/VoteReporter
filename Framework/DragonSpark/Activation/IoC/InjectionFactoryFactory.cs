@@ -16,7 +16,7 @@ namespace DragonSpark.Activation.IoC
 			this.factoryType = factoryType;
 		}
 
-		public override InjectionFactory Create( InjectionMemberParameter parameter )
+		public override InjectionFactory Get( InjectionMemberParameter parameter )
 		{
 			var previous = parameter.Container.Registrations.Introduce( parameter, x => x.Item1.RegisteredType == x.Item2.TargetType && x.Item1.MappedToType != x.Item1.RegisteredType ).FirstOrDefault()?.MappedToType;
 			var result = new InjectionFactory( new Context( factoryType, previous ).Create );
@@ -33,7 +33,7 @@ namespace DragonSpark.Activation.IoC
 				this.previous = previous;
 			}
 
-			public object Create( IUnityContainer unityContainer, Type type, string buildName ) => SourceFactory.Instance.Create( factoryType ) ?? ( previous != null ? unityContainer.Resolve( previous, Items<ResolverOverride>.Default ) : null );
+			public object Create( IUnityContainer unityContainer, Type type, string buildName ) => SourceFactory.Instance.Get( factoryType ) ?? ( previous != null ? unityContainer.Resolve( previous, Items<ResolverOverride>.Default ) : null );
 		}
 	}
 }

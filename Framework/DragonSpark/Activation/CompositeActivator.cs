@@ -1,5 +1,4 @@
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System.Linq;
 
@@ -13,8 +12,8 @@ namespace DragonSpark.Activation
 		public CompositeActivator( ISpecification<object> specification, params IActivator[] activators ) 
 			: base( specification, activators.Cast<IParameterizedSource>().Select( activator => activator.ToSourceDelegate() ).ToArray() ) {}
 
-		bool IFactory<TypeRequest, object>.CanCreate( TypeRequest parameter ) => CanCreate( parameter );
+		bool IValidatedParameterizedSource<TypeRequest, object>.IsValid( TypeRequest parameter ) => IsValid( parameter );
 
-		object IFactory<TypeRequest, object>.Create( TypeRequest parameter ) => Create( parameter );
+		object IParameterizedSource<TypeRequest, object>.Get( TypeRequest parameter ) => Get( parameter );
 	}
 }

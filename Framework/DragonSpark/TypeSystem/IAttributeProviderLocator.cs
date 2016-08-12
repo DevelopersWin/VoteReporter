@@ -46,7 +46,7 @@ namespace DragonSpark.TypeSystem
 				this.providerSource = providerSource;
 			}
 
-			public override IAttributeProvider Create( object parameter ) => base.Create( parameter ) ?? providerSource( memberSource( parameter ) );
+			public override IAttributeProvider Get( object parameter ) => base.Get( parameter ) ?? providerSource( memberSource( parameter ) );
 		}
 	}
 
@@ -78,26 +78,26 @@ namespace DragonSpark.TypeSystem
 			{
 				public static TypeInfoDefinitionProvider Instance { get; } = new TypeInfoDefinitionProvider();
 
-				public override TypeInfo Create( TypeInfo parameter ) => parameter;
+				public override TypeInfo Get( TypeInfo parameter ) => parameter;
 			}
 
 			class MemberInfoDefinitionProvider : TypeDefinitionProviderBase<MemberInfo>
 			{
 				public static MemberInfoDefinitionProvider Instance { get; } = new MemberInfoDefinitionProvider();
 
-				public override TypeInfo Create( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();
+				public override TypeInfo Get( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();
 			}
 
 			class GeneralDefinitionProvider : TypeDefinitionProviderBase<object>
 			{
 				public static GeneralDefinitionProvider Instance { get; } = new GeneralDefinitionProvider();
 
-				public override TypeInfo Create( object parameter ) => parameter.GetType().GetTypeInfo();
+				public override TypeInfo Get( object parameter ) => parameter.GetType().GetTypeInfo();
 			}
 
-			abstract class TypeDefinitionProviderBase<T> : FactoryBase<T, TypeInfo> {}
+			abstract class TypeDefinitionProviderBase<T> : ValidatedParameterizedSourceBase<T, TypeInfo> {}
 
-			public override TypeInfo Create( object parameter ) => source( base.Create( parameter ) );
+			public override TypeInfo Get( object parameter ) => source( base.Get( parameter ) );
 		}
 	}
 
@@ -106,7 +106,7 @@ namespace DragonSpark.TypeSystem
 		public static IParameterizedSource<MemberInfo> Instance { get; } = new MemberInfoDefinitions();
 		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).ToDelegate().CachedPerScope() ) {}
 
-		sealed class Factory : FactoryBase<object, MemberInfo>
+		sealed class Factory : ValidatedParameterizedSourceBase<object, MemberInfo>
 		{
 			readonly static ImmutableArray<Func<object, IValidatedParameterizedSource>> Delegates = new[] { typeof(PropertyInfoDefinitionLocator), typeof(ConstructorInfoDefinitionLocator), typeof(MethodInfoDefinitionLocator), typeof(TypeInfoDefinitionLocator) }.Select( type => ParameterConstructor<IValidatedParameterizedSource>.Make( typeof(TypeInfo), type ) ).ToImmutableArray();
 		
@@ -166,21 +166,21 @@ namespace DragonSpark.TypeSystem
 				}
 			}
 
-			abstract class MemberInfoDefinitionLocatorBase<T> : FactoryBase<T, MemberInfo>
+			abstract class MemberInfoDefinitionLocatorBase<T> : ValidatedParameterizedSourceBase<T, MemberInfo>
 			{
 				protected MemberInfoDefinitionLocatorBase( TypeInfo definition )
 				{
 					Definition = definition;
 				}
 
-				public override MemberInfo Create( T parameter ) => From( parameter ) ?? parameter as MemberInfo ?? Definition;
+				public override MemberInfo Get( T parameter ) => From( parameter ) ?? parameter as MemberInfo ?? Definition;
 
 				protected abstract MemberInfo From( T parameter );
 
 				protected TypeInfo Definition { get; }
 			}
 
-			public override MemberInfo Create( object parameter )
+			public override MemberInfo Get( object parameter )
 			{
 				var definition = typeSource( parameter );
 				foreach ( var @delegate in Delegates )

@@ -30,7 +30,7 @@ namespace DragonSpark.Windows.Markup
 			this.propertyFactory = propertyFactory;
 		}
 
-		public override IMarkupProperty Create( IServiceProvider parameter )
+		public override IMarkupProperty Get( IServiceProvider parameter )
 		{
 			var reference = propertyFactory( parameter );
 			var result = reference.IsAssigned() ? new CollectionMarkupProperty( (IList)parameter.Get<IProvideValueTarget>().TargetObject, reference ) : null;
@@ -46,7 +46,7 @@ namespace DragonSpark.Windows.Markup
 			parameter.Get<IProvideValueTarget>().TargetObject.With( o => o is IList && o.Adapt().GetEnumerableType() != null );
 	}
 
-	public class PropertyReferenceFactory : FactoryBase<IServiceProvider, PropertyReference>
+	public class PropertyReferenceFactory : ValidatedParameterizedSourceBase<IServiceProvider, PropertyReference>
 	{
 		public static PropertyReferenceFactory Instance { get; } = new PropertyReferenceFactory();
 
@@ -61,7 +61,7 @@ namespace DragonSpark.Windows.Markup
 			create = Create;
 		}
 
-		public override PropertyReference Create( IServiceProvider parameter ) => parameter.Get<IXamlNameResolver>()?.GetFixupToken( Items<string>.Default ).With( create ) ?? default(PropertyReference);
+		public override PropertyReference Get( IServiceProvider parameter ) => parameter.Get<IXamlNameResolver>()?.GetFixupToken( Items<string>.Default ).With( create ) ?? default(PropertyReference);
 
 		PropertyReference Create( object token )
 		{

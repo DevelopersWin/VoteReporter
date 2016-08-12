@@ -17,7 +17,7 @@ namespace DragonSpark.Configuration
 		protected ConfigurableParameterizedFactoryBase( IParameterizedScope<TConfiguration> seed, IParameterizedScope<ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, object, TResult> factory ) : base( seed, configurators, factory ) {}
 	}
 
-	public abstract class ConfigurableParameterizedFactoryBase<TConfiguration, TParameter, TResult> : FactoryBase<TParameter, TResult>
+	public abstract class ConfigurableParameterizedFactoryBase<TConfiguration, TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
 	{
 		readonly Func<TConfiguration, TParameter, TResult> factory;
 
@@ -35,7 +35,7 @@ namespace DragonSpark.Configuration
 
 		public IParameterizedScope<TParameter, ImmutableArray<ITransformer<TConfiguration>>> Configurators { get; }
 
-		public override TResult Create( TParameter parameter )
+		public override TResult Get( TParameter parameter )
 		{
 			var configured = Configurators.Get( parameter ).Aggregate( Seed.Get( parameter ), ( configuration, transformer ) => transformer.Get( configuration ) );
 			var result = factory( configured, parameter );

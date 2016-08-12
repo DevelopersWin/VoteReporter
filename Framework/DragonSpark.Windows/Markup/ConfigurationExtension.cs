@@ -26,7 +26,7 @@ namespace DragonSpark.Windows.Markup
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
-			var name = key ?? MemberInfoKeyFactory.Instance.Create( serviceProvider.Property.Reference );
+			var name = key ?? MemberInfoKeyFactory.Instance.Get( serviceProvider.Property.Reference );
 			var result = Registry.Get( name ) ?? FromTarget( serviceProvider );
 			return result;
 		}
@@ -34,7 +34,7 @@ namespace DragonSpark.Windows.Markup
 		object FromTarget( MarkupServiceProvider serviceProvider )
 		{
 			var adjusted = new PropertyReference( serviceProvider.TargetObject.GetType(), serviceProvider.Property.Reference.PropertyType, serviceProvider.Property.Reference.PropertyName );
-			var name = MemberInfoKeyFactory.Instance.Create( adjusted );
+			var name = MemberInfoKeyFactory.Instance.Get( adjusted );
 			var result = Registry.Get( name );
 			return result;
 		}
@@ -54,11 +54,11 @@ namespace DragonSpark.Windows.Markup
 		}
 	}*/
 
-	public class MemberInfoKeyFactory : FactoryBase<PropertyReference, string>
+	public class MemberInfoKeyFactory : ValidatedParameterizedSourceBase<PropertyReference, string>
 	{
 		public static MemberInfoKeyFactory Instance { get; } = new MemberInfoKeyFactory();
 
-		public override string Create( PropertyReference parameter ) => $"{parameter.DeclaringType.FullName}::{parameter.PropertyName}";
+		public override string Get( PropertyReference parameter ) => $"{parameter.DeclaringType.FullName}::{parameter.PropertyName}";
 	}
 
 	[MarkupExtensionReturnType( typeof(string) )]
@@ -79,6 +79,6 @@ namespace DragonSpark.Windows.Markup
 	{
 		public MemberInfoKeyExtension( [Required]Type type, string member ) : this( type.GetMember( member ).First() ) {}
 
-		public MemberInfoKeyExtension( [Required]MemberInfo member ) : base( MemberInfoKeyFactory.Instance.Create( PropertyReference.New( member ) ) ) {}
+		public MemberInfoKeyExtension( [Required]MemberInfo member ) : base( MemberInfoKeyFactory.Instance.Get( PropertyReference.New( member ) ) ) {}
 	}
 }

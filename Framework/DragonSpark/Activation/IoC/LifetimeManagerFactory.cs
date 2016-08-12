@@ -16,15 +16,15 @@ namespace DragonSpark.Activation.IoC
 		{
 			public new static AttributedLifetimeFactory Instance { get; } = new AttributedLifetimeFactory();
 
-			public override Type Create( Type parameter ) => base.Create( parameter ) ?? typeof(T);
+			public override Type Get( Type parameter ) => base.Get( parameter ) ?? typeof(T);
 		}
 	}
 
-	class AttributedLifetimeFactory : FactoryBase<Type, Type>
+	class AttributedLifetimeFactory : ValidatedParameterizedSourceBase<Type, Type>
 	{
 		public static ICache<Type, Type> Instance { get; } = new AttributedLifetimeFactory().ToCache();
 			
-		public override Type Create( Type parameter ) => 
+		public override Type Get( Type parameter ) => 
 			parameter
 				.GetTypeInfo()
 				.GetCustomAttribute<LifetimeManagerAttribute>()
@@ -32,7 +32,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	public class LifetimeManagerFactory : FactoryBase<Type, LifetimeManager>
+	public class LifetimeManagerFactory : ValidatedParameterizedSourceBase<Type, LifetimeManager>
 	{
 		readonly static Func<Type, Type> LifetimeTypeFactory = AttributedLifetimeFactory.Instance.Get;
 
@@ -49,7 +49,7 @@ namespace DragonSpark.Activation.IoC
 			this.lifetimeTypeFactory = lifetimeTypeFactory;
 		}
 
-		public override LifetimeManager Create( Type parameter )
+		public override LifetimeManager Get( Type parameter )
 		{
 			var type = lifetimeTypeFactory( parameter );
 			

@@ -9,7 +9,7 @@ using DragonSpark.Sources.Parameterized;
 namespace DragonSpark.TypeSystem
 {
 	[Export, Shared]
-	public class AssemblyInformationFactory : FactoryBase<Assembly, AssemblyInformation>
+	public class AssemblyInformationFactory : ValidatedParameterizedSourceBase<Assembly, AssemblyInformation>
 	{
 		readonly static System.Type[] Attributes =
 		{
@@ -21,7 +21,7 @@ namespace DragonSpark.TypeSystem
 			typeof(AssemblyCopyrightAttribute)
 		};
 
-		public override AssemblyInformation Create( Assembly parameter )
+		public override AssemblyInformation Get( Assembly parameter )
 		{
 			var result = new AssemblyInformation { Version = parameter.GetName().Version };
 			foreach ( var item in Attributes.Select( parameter.GetCustomAttribute ).WhereAssigned() )

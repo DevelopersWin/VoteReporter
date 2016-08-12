@@ -47,7 +47,7 @@ namespace DragonSpark
 		AssociatedPriority() {}
 	}
 
-	public class PriorityAwareLocator<T> : FactoryBase<T, IPriorityAware>
+	public class PriorityAwareLocator<T> : ValidatedParameterizedSourceBase<T, IPriorityAware>
 	{
 		readonly Func<Type, IPriorityAware> get;
 		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>( AttributeSupport<PriorityAttribute>.Local.Get );
@@ -56,7 +56,7 @@ namespace DragonSpark
 			this.get = get;
 		}
 
-		public override IPriorityAware Create( T parameter ) => parameter as IPriorityAware ?? get( parameter.GetType() ) ?? AssociatedPriority.Instance.Get( parameter ) ?? PriorityAware.Default;
+		public override IPriorityAware Get( T parameter ) => parameter as IPriorityAware ?? get( parameter.GetType() ) ?? AssociatedPriority.Instance.Get( parameter ) ?? PriorityAware.Default;
 	}
 
 	public class PriorityComparer : IComparer<IPriorityAware>

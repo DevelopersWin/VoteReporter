@@ -19,21 +19,21 @@ namespace DragonSpark.Setup.Registration
 		public static void Register<T>( this IServiceRegistry @this, Func<T> factory, string name = null ) => @this.RegisterFactory( new FactoryRegistrationParameter( typeof(T), factory.Convert(), name ) );
 	}
 
-	public sealed class SourceFactory : FactoryBase<Type, object>
+	public sealed class SourceFactory : ValidatedParameterizedSourceBase<Type, object>
 	{
 		public static SourceFactory Instance { get; } = new SourceFactory();
 		SourceFactory() : this( Activator.Instance.Provider() ) {}
 
 		readonly Func<Type, Func<object>> factory;
 
-		public SourceFactory( Func<IServiceProvider> provider ) : this( new CompositeFactory<Type, Func<object>>( new SourceDelegates( provider ), new ServiceProvidedParameterizedSourceDelegates( provider ) ).Create ) {}
+		public SourceFactory( Func<IServiceProvider> provider ) : this( new CompositeFactory<Type, Func<object>>( new SourceDelegates( provider ), new ServiceProvidedParameterizedSourceDelegates( provider ) ).Get ) {}
 
 		SourceFactory( Func<Type, Func<object>> factory )
 		{
 			this.factory = factory;
 		}
 
-		public override object Create( Type parameter ) => factory( parameter )?.Invoke();
+		public override object Get( Type parameter ) => factory( parameter )?.Invoke();
 	}
 
 	/*public class SourceDelegatesFactory : 

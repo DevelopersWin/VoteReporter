@@ -169,7 +169,7 @@ namespace DragonSpark.Setup
 	{
 		public CompositeServiceProvider( params IServiceProvider[] providers ) : base( providers.Select( provider => new Func<Type, object>( provider.GetService ) ).ToArray() ) {}
 
-		public object GetService( Type serviceType ) => Create( serviceType );
+		public object GetService( Type serviceType ) => Get( serviceType );
 	}
 
 	public class ServiceProviderRegistry : RepositoryBase<IServiceProvider>
@@ -229,7 +229,7 @@ namespace DragonSpark.Setup
 
 	class ActivatedServiceProvider : IServiceProvider
 	{
-		readonly static Func<IServiceProvider, IFactory<Type, object>> Selector = ActivatedFactory.Default.Get;
+		readonly static Func<IServiceProvider, IValidatedParameterizedSource<Type, object>> Selector = ActivatedFactory.Default.Get;
 
 		public static IParameterizedSource<IServiceProvider, ServiceSource> Sources { get; } = new Cache<IServiceProvider, ServiceSource>( provider => new ActivatedServiceProvider( provider ).GetService );
 		ActivatedServiceProvider( IServiceProvider provider ) : this( IsActive.Default.Get( provider ) ) {}
@@ -246,7 +246,7 @@ namespace DragonSpark.Setup
 			using ( active.Assignment( serviceType, true ) )
 			{
 				var stores = ServiceProviderRegistry.Instance.Get().List().Select( Selector );
-				var result = stores.Introduce( serviceType, tuple => tuple.Item1.CanCreate( tuple.Item2 ), tuple => tuple.Item1.Create( tuple.Item2 ) ).FirstAssigned();
+				var result = stores.Introduce( serviceType, tuple => tuple.Item1.IsValid( tuple.Item2 ), tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 				return result;
 			}
 		}
@@ -255,9 +255,9 @@ namespace DragonSpark.Setup
 	}
 
 	[ApplyAutoValidation]
-	public class ActivatedFactory : FactoryBase<Type, object>
+	public class ActivatedFactory : ValidatedParameterizedSourceBase<Type, object>
 	{
-		public static IParameterizedSource<IServiceProvider, IFactory<Type, object>> Default { get; } = new Cache<IServiceProvider, IFactory<Type, object>>( provider => new ActivatedFactory( provider ) );
+		public static IParameterizedSource<IServiceProvider, IValidatedParameterizedSource<Type, object>> Default { get; } = new Cache<IServiceProvider, IValidatedParameterizedSource<Type, object>>( provider => new ActivatedFactory( provider ) );
 
 		readonly IServiceProvider provider;
 		readonly IsActive active;
@@ -270,7 +270,7 @@ namespace DragonSpark.Setup
 			this.active = active;
 		}
 
-		public override object Create( Type parameter )
+		public override object Get( Type parameter )
 		{
 			using ( active.Assignment( parameter, true ) )
 			{
@@ -342,7 +342,7 @@ namespace DragonSpark.Setup
 		public ApplicationFactory( Func<ImmutableArray<ICommand>, IApplication> factory, Action<ImmutableArray<ICommand>> initialize ) : this( factory, initialize, ApplicationServices.Instance.Assign ) {}
 		public ApplicationFactory( Func<ImmutableArray<ICommand>, IApplication> factory, Action<ImmutableArray<ICommand>> initialize, Action<IApplication> configure ) : base( factory, initialize, configure ) {}
 
-		public T Create() => (T)Create( Items<ICommand>.Immutable );
+		public T Create() => (T)Get( Items<ICommand>.Immutable );
 
 		public T Create( ITypeSource types ) => Create( types, Items<ICommand>.Default );
 
@@ -350,7 +350,7 @@ namespace DragonSpark.Setup
 
 		public T Create( ITypeSource types, params ICommand[] commands ) => Create( types, commands.ToImmutableArray() );
 		
-		public T Create( ITypeSource types, ImmutableArray<ICommand> commands ) => (T)Create( commands.Insert( 0, new AssignSystemPartsCommand( types ) ).Add( new DisposeDisposableCommand( Disposables.Instance.Get() ) ) );
+		public T Create( ITypeSource types, ImmutableArray<ICommand> commands ) => (T)Get( commands.Insert( 0, new AssignSystemPartsCommand( types ) ).Add( new DisposeDisposableCommand( Disposables.Instance.Get() ) ) );
 	}
 
 	/*public sealed class ConfigureSeedingServiceProvider : ApplyDelegateConfigurationCommand<IServiceProvider>

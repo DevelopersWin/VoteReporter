@@ -4,7 +4,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class FileConfigurationFactory : FactoryBase<string, object>
+	public class FileConfigurationFactory : ValidatedParameterizedSourceBase<string, object>
 	{
 		readonly ConfigurationFileMap map;
 
@@ -16,6 +16,6 @@ namespace DragonSpark.Windows.Setup
 			this.map = map;
 		}
 
-		public override object Create( string parameter ) => ConfigurationManager.OpenMappedMachineConfiguration( map ).GetSection( parameter );
+		public override object Get( string parameter ) => ConfigurationManager.OpenMappedMachineConfiguration( map ).GetSection( parameter );
 	}
 }

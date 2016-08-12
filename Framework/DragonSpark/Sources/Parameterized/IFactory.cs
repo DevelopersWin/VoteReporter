@@ -1,9 +1,7 @@
 namespace DragonSpark.Sources.Parameterized
 {
-	public interface IFactory<in TParameter, out TResult> : IValidatedParameterizedSource
+	public interface IValidatedParameterizedSource<in TParameter, out TResult> : IParameterizedSource<TParameter, TResult>, IValidatedParameterizedSource
 	{
-		bool CanCreate( TParameter parameter );
-
-		TResult Create( TParameter parameter );
+		bool IsValid( TParameter parameter );
 	}
 }

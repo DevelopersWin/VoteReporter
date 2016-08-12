@@ -84,9 +84,9 @@ namespace DragonSpark.Aspects
 	{
 		public static GenericFactoryProfileFactory Instance { get; } = new GenericFactoryProfileFactory();
 
-		GenericFactoryProfileFactory() : base( typeof(IFactory<,>), typeof(GenericFactoryProfileFactory), nameof(Create) ) {}
+		GenericFactoryProfileFactory() : base( typeof(IValidatedParameterizedSource<,>), typeof(GenericFactoryProfileFactory), nameof(Create) ) {}
 
-		static IParameterValidationAdapter Create<TParameter, TResult>( IFactory<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
+		static IParameterValidationAdapter Create<TParameter, TResult>( IValidatedParameterizedSource<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
 
 	sealed class GenericCommandProfileFactory : GenericParameterProfileFactoryBase
@@ -147,16 +147,16 @@ namespace DragonSpark.Aspects
 
 	public class FactoryAdapter<TParameter, TResult> : IParameterValidationAdapter
 	{
-		readonly static MethodInfo Method = typeof(IFactory<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IFactory<TParameter, TResult>.Create) );
+		readonly static MethodInfo Method = typeof(IParameterizedSource<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource<TParameter, TResult>.Get) );
 		
-		readonly IFactory<TParameter, TResult> inner;
+		readonly IValidatedParameterizedSource<TParameter, TResult> inner;
 
-		public FactoryAdapter( IFactory<TParameter, TResult> inner )
+		public FactoryAdapter( IValidatedParameterizedSource<TParameter, TResult> inner )
 		{
 			this.inner = inner;
 		}
 
-		public bool IsValid( object parameter ) => parameter is TParameter ? inner.CanCreate( (TParameter)parameter ) : inner.IsValid( parameter );
+		public bool IsValid( object parameter ) => parameter is TParameter ? inner.IsValid( (TParameter)parameter ) : inner.IsValid( parameter );
 
 		MethodInfo IMethodAware.Method => Method;
 	}

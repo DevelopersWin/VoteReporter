@@ -1,13 +1,13 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Aspects;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -18,13 +18,13 @@ namespace DragonSpark.Aspects.Validation
 		class GenericFactoryProfile : ProfileBase
 		{
 			public static GenericFactoryProfile Instance { get; } = new GenericFactoryProfile();
-			GenericFactoryProfile() : base( typeof(IFactory<,>), "CanCreate", nameof(GenericFactoryProfileFactory.Instance.Create), GenericFactoryProfileFactory.Instance.Create ) {}
+			GenericFactoryProfile() : base( typeof(IValidatedParameterizedSource<,>), nameof(IValidatedParameterizedSource.IsValid), typeof(IParameterizedSource<,>), nameof(IParameterizedSource.Get), GenericFactoryProfileFactory.Instance.Create ) {}
 		}
 
 		class FactoryProfile : ProfileBase
 		{
 			public static FactoryProfile Instance { get; } = new FactoryProfile();
-			FactoryProfile() : base( typeof(IValidatedParameterizedSource), nameof(IValidatedParameterizedSource.IsValid), nameof(IValidatedParameterizedSource.Get), SourceAdapterSource.Instance.Get ) {}
+			FactoryProfile() : base( typeof(IValidatedParameterizedSource), nameof(IValidatedParameterizedSource.IsValid), typeof(IParameterizedSource), nameof(IValidatedParameterizedSource.Get), SourceAdapterSource.Instance.Get ) {}
 		}
 
 		class GenericCommandProfile : ProfileBase

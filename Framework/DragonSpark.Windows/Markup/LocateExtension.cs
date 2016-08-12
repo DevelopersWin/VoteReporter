@@ -55,7 +55,7 @@ namespace DragonSpark.Windows.Markup
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Instance.Get();
 	}
 
-	public class MockFactory : FactoryBase<Type, object>
+	public class MockFactory : ValidatedParameterizedSourceBase<Type, object>
 	{
 		public static MockFactory Instance { get; } = new MockFactory();
 
@@ -68,7 +68,7 @@ namespace DragonSpark.Windows.Markup
 			public override bool IsSatisfiedBy( Type parameter ) => parameter.IsInterface || !parameter.IsSealed;
 		}
 
-		public override object Create( Type parameter )
+		public override object Get( Type parameter )
 		{
 			var type = typeof(Mock<>).MakeGenericType( parameter );
 			var result = Activator.Activate<Mock>( type ).Object;
@@ -76,13 +76,13 @@ namespace DragonSpark.Windows.Markup
 		}
 	}
 
-	public class StringDesignerValueFactory : FactoryBase<Type, object>
+	public class StringDesignerValueFactory : ValidatedParameterizedSourceBase<Type, object>
 	{
 		public static StringDesignerValueFactory Instance { get; } = new StringDesignerValueFactory();
 
 		public StringDesignerValueFactory() : base( TypeAssignableSpecification<string>.Instance ) {}
 
-		public override object Create( Type parameter ) => parameter.AssemblyQualifiedName;
+		public override object Get( Type parameter ) => parameter.AssemblyQualifiedName;
 	}
 
 	public class DesignTimeValueProvider : CompositeFactory<Type, object>
@@ -207,7 +207,7 @@ namespace DragonSpark.Windows.Markup
 		/*[Required, Service]
 		SourceFactory SourceTypeFactory { [return: Required]get; set; }*/
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => SourceFactory.Instance.Create( FactoryType );
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => SourceFactory.Instance.Get( FactoryType );
 	}
 
 	[ContentProperty( nameof(Properties) )]

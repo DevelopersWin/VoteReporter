@@ -6,7 +6,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Extensions
 {
-	public class ObjectMappingFactory<T> : FactoryBase<ObjectMappingParameter<T>, T> where T : class
+	public class ObjectMappingFactory<T> : ValidatedParameterizedSourceBase<ObjectMappingParameter<T>, T> where T : class
 	{
 		public static ISource<ObjectMappingFactory<T>> Default { get; } = new Scope<ObjectMappingFactory<T>>( Factory.Scope( () => new ObjectMappingFactory<T>( Activator.Instance.Get() ) ) );
 
@@ -17,7 +17,7 @@ namespace DragonSpark.Extensions
 			this.locator = locator;
 		}
 
-		public override T Create( ObjectMappingParameter<T> parameter )
+		public override T Get( ObjectMappingParameter<T> parameter )
 		{
 			var sourceType = parameter.Source.GetType();
 			var destinationType = parameter.Existing?.GetType() ?? ( typeof(T) == typeof(object) ? sourceType : typeof(T) );

@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var sut = new InjectionFactoryFactory( typeof(Factory) );
 			container.RegisterType<IItem, Item>( new ContainerControlledLifetimeManager() );
 			var expected = container.Resolve<IItem>();
-			var create = sut.Create( new InjectionMemberParameter( container, typeof(IItem) ) );
+			var create = sut.Get( new InjectionMemberParameter( container, typeof(IItem) ) );
 			container.RegisterType( typeof(IItem), create );
 			Assert.Equal( expected, container.Resolve<IItem>() );
 		}

@@ -21,9 +21,9 @@ namespace DragonSpark.Activation
 		class Delegates<T> : Cache<Func<IActivator>, Func<Type, T>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( source => new Factory( source ).Create ) {}
+			Delegates() : base( source => new Factory( source ).Get ) {}
 
-			class Factory : FactoryBase<Type, T>
+			class Factory : ValidatedParameterizedSourceBase<Type, T>
 			{
 				readonly Func<IActivator> source;
 				public Factory( Func<IActivator> source )
@@ -31,7 +31,7 @@ namespace DragonSpark.Activation
 					this.source = source;
 				}
 
-				public override T Create( Type parameter ) => source().Activate<T>( parameter );
+				public override T Get( Type parameter ) => source().Activate<T>( parameter );
 			}
 		}
 
@@ -73,11 +73,11 @@ namespace DragonSpark.Activation
 
 		public static T Activate<T>( this IActivator @this, [Required] Type requestedType ) => (T)@this.Get( requestedType );
 
-		public static T Activate<T>( this IActivator @this, TypeRequest request ) => (T)@this.Create( request );
+		public static T Activate<T>( this IActivator @this, TypeRequest request ) => (T)@this.Get( request );
 		
 		public static T Construct<T>( this IActivator @this, params object[] parameters ) => Construct<T>( @this, typeof(T), parameters );
 
-		public static T Construct<T>( this IActivator @this, Type type, params object[] parameters ) => (T)@this.Create( new ConstructTypeRequest( type, parameters ) );
+		public static T Construct<T>( this IActivator @this, Type type, params object[] parameters ) => (T)@this.Get( new ConstructTypeRequest( type, parameters ) );
 
 		public static ImmutableArray<T> ActivateMany<T>( this IActivator @this, IEnumerable<Type> types ) => @this.ActivateMany<T>( typeof(T), types );
 
@@ -104,7 +104,7 @@ namespace DragonSpark.Activation
 				this.singleton = singleton;
 			}
 
-			public override object Create( LocateTypeRequest parameter )
+			public override object Get( LocateTypeRequest parameter )
 			{
 				var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;
 				var result = singleton.Get( type );

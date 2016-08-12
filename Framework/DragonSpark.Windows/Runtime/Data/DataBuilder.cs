@@ -7,7 +7,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
-	public abstract class DocumentFactory<TParameter> : FactoryBase<TParameter, IXPathNavigable>
+	public abstract class DocumentFactory<TParameter> : ValidatedParameterizedSourceBase<TParameter, IXPathNavigable>
 	{
 		readonly Action<XmlDocument, TParameter> load;
 
@@ -16,7 +16,7 @@ namespace DragonSpark.Windows.Runtime.Data
 			this.load = load;
 		}
 
-		public override IXPathNavigable Create( TParameter parameter )
+		public override IXPathNavigable Get( TParameter parameter )
 		{
 			var result = new XmlDocument();
 			load( result, parameter );

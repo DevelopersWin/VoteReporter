@@ -8,7 +8,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class DefaultPropertyValueFactory : FactoryBase<DefaultValueParameter, object>
+	public sealed class DefaultPropertyValueFactory : ValidatedParameterizedSourceBase<DefaultValueParameter, object>
 	{
 		public static DefaultPropertyValueFactory Instance { get; } = new DefaultPropertyValueFactory();
 		DefaultPropertyValueFactory() : this( HostedValueLocator<IDefaultValueProvider>.Instance.ToDelegate() ) {}
@@ -20,7 +20,7 @@ namespace DragonSpark.ComponentModel
 			this.factory = factory;
 		}
 
-		public override object Create( DefaultValueParameter parameter ) => factory( parameter.Metadata ).Introduce( parameter, tuple => tuple.Item1.GetValue( tuple.Item2 ) ).FirstAssigned() ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
+		public override object Get( DefaultValueParameter parameter ) => factory( parameter.Metadata ).Introduce( parameter, tuple => tuple.Item1.GetValue( tuple.Item2 ) ).FirstAssigned() ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
 	}
 
 	public struct DefaultValueParameter

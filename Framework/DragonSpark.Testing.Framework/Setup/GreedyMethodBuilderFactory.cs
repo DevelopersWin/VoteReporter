@@ -9,7 +9,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public abstract class EnginePartFactory<T> : FactoryBase<T, ISpecimenBuilder>, ISpecimenBuilderTransformation where T : ISpecimenBuilder
+	public abstract class EnginePartFactory<T> : ValidatedParameterizedSourceBase<T, ISpecimenBuilder>, ISpecimenBuilderTransformation where T : ISpecimenBuilder
 	{
 		readonly Func<T, ISpecimenBuilder> toDelegate;
 
@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		public static OptionalParameterTransformer Instance { get; } = new OptionalParameterTransformer();
 
-		public override ISpecimenBuilder Create( Ploeh.AutoFixture.Kernel.ParameterRequestRelay parameter ) => new ParameterRequestRelay( parameter );
+		public override ISpecimenBuilder Get( Ploeh.AutoFixture.Kernel.ParameterRequestRelay parameter ) => new ParameterRequestRelay( parameter );
 	}
 
 	public class ParameterRequestRelay : ISpecimenBuilder

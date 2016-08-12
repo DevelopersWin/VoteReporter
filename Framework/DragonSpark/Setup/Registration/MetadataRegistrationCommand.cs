@@ -28,7 +28,7 @@ namespace DragonSpark.Setup.Registration
 			var immutableArray = MetadataRegistrationTypeFactory.Instance.Get( parameter );
 			foreach ( var type in immutableArray )
 			{
-				foreach ( var registration in HostedValueLocator<IRegistration>.Instance.Create( type ) )
+				foreach ( var registration in HostedValueLocator<IRegistration>.Instance.Get( type ) )
 				{
 					registration.Register( registry );
 				}

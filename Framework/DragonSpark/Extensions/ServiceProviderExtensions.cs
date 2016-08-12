@@ -17,9 +17,9 @@ namespace DragonSpark.Extensions
 		class Delegates<T> : Cache<Func<IServiceProvider>, Func<Type, T>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( source => new Factory( source ).Create ) {}
+			Delegates() : base( source => new Factory( source ).Get ) {}
 
-			class Factory : FactoryBase<Type, T>
+			class Factory : ValidatedParameterizedSourceBase<Type, T>
 			{
 				readonly Func<IServiceProvider> source;
 				public Factory( Func<IServiceProvider> source )
@@ -27,7 +27,7 @@ namespace DragonSpark.Extensions
 					this.source = source;
 				}
 
-				public override T Create( Type parameter ) => source().Get<T>( parameter );
+				public override T Get( Type parameter ) => source().Get<T>( parameter );
 			}
 		}
 	}

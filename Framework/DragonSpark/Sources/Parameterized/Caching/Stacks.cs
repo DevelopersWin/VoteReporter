@@ -18,7 +18,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 			registry.Register( factory, this );
 		}
 
-		sealed class Store : FactoryBase<object, IAssignableSource<IStack<T>>>
+		sealed class Store : ValidatedParameterizedSourceBase<object, IAssignableSource<IStack<T>>>
 		{
 			readonly Action<Store, object> callback;
 
@@ -27,7 +27,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 				this.callback = callback;
 			}
 
-			public override IAssignableSource<IStack<T>> Create( object instance ) => new Factory( this, instance ).Get();
+			public override IAssignableSource<IStack<T>> Get( object instance ) => new Factory( this, instance ).Get();
 
 			sealed class Factory
 			{

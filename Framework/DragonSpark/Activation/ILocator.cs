@@ -6,7 +6,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation
 {
-	public interface IActivator : IFactory<TypeRequest, object> {}
+	public interface IActivator : IValidatedParameterizedSource<TypeRequest, object> {}
 
 	public class LocateTypeRequest : TypeRequest, IEquatable<LocateTypeRequest> /*, IEquatable<LocateTypeRequest>*/
 	{

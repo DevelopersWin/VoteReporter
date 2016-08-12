@@ -24,7 +24,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void Create( InitializeUserSettingsCommand sut, ILoggerHistory history, UserSettingsPathFactory factory )
 		{
-			var path = factory.Create( ConfigurationUserLevel.PerUserRoamingAndLocal );
+			var path = factory.Get( ConfigurationUserLevel.PerUserRoamingAndLocal );
 			Assert.False( path.Exists );
 			var before = history.Events.Fixed();
 			sut.Execute( Settings.Default );

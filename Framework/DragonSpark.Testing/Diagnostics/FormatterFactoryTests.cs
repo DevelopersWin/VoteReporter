@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Diagnostics
 		public void MethodFormatsAsExpected( [Service]FormatterFactory sut )
 		{
 			var method = MethodBase.GetCurrentMethod();
-			var formatted = sut.Create( new FormatterFactory.Parameter( method ) );
+			var formatted = sut.Get( new FormatterFactory.Parameter( method ) );
 			Assert.IsType<string>( formatted );
 			Assert.Equal( new MethodFormatter( method ).ToString( null, null ), formatted );
 		}

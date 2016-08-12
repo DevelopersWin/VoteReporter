@@ -18,12 +18,12 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class UserSettingsPathFactory : FactoryBase<ConfigurationUserLevel, FileInfo>
+	public class UserSettingsPathFactory : ValidatedParameterizedSourceBase<ConfigurationUserLevel, FileInfo>
 	{
 		public static UserSettingsPathFactory Instance { get; } = new UserSettingsPathFactory();
 		UserSettingsPathFactory() {}
 
-		public override FileInfo Create( ConfigurationUserLevel parameter ) => new FileInfo( ConfigurationManager.OpenExeConfiguration( parameter ).FilePath );
+		public override FileInfo Get( ConfigurationUserLevel parameter ) => new FileInfo( ConfigurationManager.OpenExeConfiguration( parameter ).FilePath );
 	}
 	
 	public static class Defaults
