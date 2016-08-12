@@ -1,25 +1,23 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
-using DragonSpark.Setup;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Windows.Runtime;
 
 namespace DragonSpark.Windows.Modularity
 {
 	public class DirectoryModuleCatalog : AssemblyModuleCatalog
 	{
-		readonly IValidatedParameterizedSource<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory;
+		readonly IParameterizedSource<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory;
 
 		public DirectoryModuleCatalog() : this( DomainAssemblySource.Instance.Get( AppDomain.CurrentDomain ).ToImmutableArray(), ModuleInfoBuilder.Instance, LoadRemoteModuleInfoFactory.Instance ) {}
 
-		public DirectoryModuleCatalog( ImmutableArray<Assembly> assemblies, IModuleInfoBuilder builder, IValidatedParameterizedSource<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory ) : base( assemblies, builder )
+		public DirectoryModuleCatalog( ImmutableArray<Assembly> assemblies, IModuleInfoBuilder builder, IParameterizedSource<LoadRemoteModuleInfoParameter, ModuleInfo[]> factory ) : base( assemblies, builder )
 		{
 			this.factory = factory;
 			ModulePath = ".";
@@ -35,16 +33,16 @@ namespace DragonSpark.Windows.Modularity
 		}
 	}
 
-	public class LoadRemoteModuleInfoFactory : ValidatedParameterizedSourceBase<LoadRemoteModuleInfoParameter, ModuleInfo[]>
+	public class LoadRemoteModuleInfoFactory : ParameterizedSourceBase<LoadRemoteModuleInfoParameter, ModuleInfo[]>
 	{
 		public static LoadRemoteModuleInfoFactory Instance { get; } = new LoadRemoteModuleInfoFactory();
 
-		readonly IValidatedParameterizedSource<LoadRemoteModuleInfoParameter, IModuleInfoProvider> factory;
+		readonly IParameterizedSource<LoadRemoteModuleInfoParameter, IModuleInfoProvider> factory;
 
 		public LoadRemoteModuleInfoFactory() : this( RemoteModuleInfoProviderFactory.Instance )
 		{}
 
-		public LoadRemoteModuleInfoFactory( IValidatedParameterizedSource<LoadRemoteModuleInfoParameter, IModuleInfoProvider> factory )
+		public LoadRemoteModuleInfoFactory( IParameterizedSource<LoadRemoteModuleInfoParameter, IModuleInfoProvider> factory )
 		{
 			this.factory = factory;
 		}
@@ -71,17 +69,16 @@ namespace DragonSpark.Windows.Modularity
 		public string Path { get; }
 	}
 
-	public class RemoteModuleInfoProviderFactory : ValidatedParameterizedSourceBase<LoadRemoteModuleInfoParameter, IModuleInfoProvider>
+	public class RemoteModuleInfoProviderFactory : ParameterizedSourceBase<LoadRemoteModuleInfoParameter, IModuleInfoProvider>
 	{
 		public static RemoteModuleInfoProviderFactory Instance { get; } = new RemoteModuleInfoProviderFactory();
 
 		readonly IModuleInfoBuilder builder;
-		readonly IValidatedParameterizedSource<AppDomain, AppDomain> factory;
+		readonly IParameterizedSource<AppDomain, AppDomain> factory;
 
-		public RemoteModuleInfoProviderFactory() : this( ModuleInfoBuilder.Instance, ChildDomainFactory.Instance )
-		{}
+		public RemoteModuleInfoProviderFactory() : this( ModuleInfoBuilder.Instance, ChildDomainFactory.Instance ) {}
 
-		public RemoteModuleInfoProviderFactory( IModuleInfoBuilder builder, IValidatedParameterizedSource<AppDomain, AppDomain> factory )
+		public RemoteModuleInfoProviderFactory( IModuleInfoBuilder builder, IParameterizedSource<AppDomain, AppDomain> factory )
 		{
 			this.builder = builder;
 			this.factory = factory;
@@ -96,7 +93,7 @@ namespace DragonSpark.Windows.Modularity
 		}
 	}
 
-	public class ChildDomainFactory : ValidatedParameterizedSourceBase<AppDomain, AppDomain>
+	public class ChildDomainFactory : ParameterizedSourceBase<AppDomain, AppDomain>
 	{
 		public static ChildDomainFactory Instance { get; } = new ChildDomainFactory();
 

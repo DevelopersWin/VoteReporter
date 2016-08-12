@@ -5,6 +5,9 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
@@ -15,9 +18,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using Defaults = DragonSpark.Sources.Parameterized.Defaults;
 using Delegate = System.Delegate;
 using Type = System.Type;
@@ -253,7 +253,7 @@ namespace DragonSpark.Activation.IoC
 		public override bool IsSatisfiedBy( Type parameter ) => parameter.Name.Equals( type );
 	}
 
-	class ConventionCandidateNameFactory : ValidatedParameterizedSourceBase<Type, string>
+	class ConventionCandidateNameFactory : ParameterizedSourceBase<Type, string>
 	{
 		public static ConventionCandidateNameFactory Instance { get; } = new ConventionCandidateNameFactory();
 		ConventionCandidateNameFactory() {}
@@ -266,7 +266,7 @@ namespace DragonSpark.Activation.IoC
 		int GetWeight( Type candidate );
 	}
 
-	public class TypeCandidateWeightProvider : ValidatedParameterizedSourceBase<Type, int>, ITypeCandidateWeightProvider
+	public class TypeCandidateWeightProvider : ParameterizedSourceBase<Type, int>, ITypeCandidateWeightProvider
 	{
 		readonly Type subject;
 

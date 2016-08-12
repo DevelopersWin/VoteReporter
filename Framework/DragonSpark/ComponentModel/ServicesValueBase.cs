@@ -1,10 +1,10 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.ComponentModel
 {
@@ -21,7 +21,7 @@ namespace DragonSpark.ComponentModel
 			public LocationValueProvider( Func<PropertyInfo, LocateTypeRequest> convert, Func<LocateTypeRequest, object> create ) : base( convert, create ) {}
 		}
 
-		public class Factory : ValidatedParameterizedSourceBase<LocateTypeRequest, object>
+		public class Factory : ParameterizedSourceBase<LocateTypeRequest, object>
 		{
 			public static Factory Instance { get; } = new Factory();
 
@@ -43,7 +43,7 @@ namespace DragonSpark.ComponentModel
 			}
 		}
 
-		public class Converter : ValidatedParameterizedSourceBase<PropertyInfo, LocateTypeRequest>
+		public class Converter : ParameterizedSourceBase<PropertyInfo, LocateTypeRequest>
 		{
 			readonly Func<PropertyInfo, Type> type;
 			readonly string name;
@@ -75,7 +75,7 @@ namespace DragonSpark.ComponentModel
 
 		public ServicesValueProvider( Func<PropertyInfo, Type> convert, Func<Type, object> create ) : base( convert, create ) {}
 
-		public class Converter : ValidatedParameterizedSourceBase<PropertyInfo, Type>
+		public class Converter : ParameterizedSourceBase<PropertyInfo, Type>
 		{
 			readonly Func<PropertyInfo, Type> type;
 

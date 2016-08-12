@@ -4,7 +4,6 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -298,7 +297,8 @@ namespace DragonSpark.Aspects.Validation
 				var instance = factory( parameter );
 				if ( instance != null )
 				{
-					// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));
+					/*var method = instance.TargetElement as MethodBase;
+					MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {method.DeclaringType} {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));*/
 					yield return instance;
 				}
 			}

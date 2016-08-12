@@ -1,10 +1,10 @@
-using System;
-using System.Windows.Input;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
+using System.Windows.Input;
 
 namespace DragonSpark.Sources
 {
@@ -48,7 +48,7 @@ namespace DragonSpark.Sources
 			public static SourceDelegates<TParameter, TResult> Default { get; } = new SourceDelegates<TParameter, TResult>();
 			SourceDelegates() : base( source => new Factory( source ).Get ) {}
 
-			class Factory : ValidatedParameterizedSourceBase<TParameter, TResult>
+			class Factory : ParameterizedSourceBase<TParameter, TResult>
 			{
 				readonly ISource<IParameterizedSource<TParameter, TResult>> source;
 				public Factory( ISource<IParameterizedSource<TParameter, TResult>> source )

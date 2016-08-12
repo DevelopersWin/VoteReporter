@@ -1,12 +1,11 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime
 {
@@ -57,7 +56,7 @@ namespace DragonSpark.Windows.Runtime
 		AllParts() : base( DragonSpark.TypeSystem.AllParts.Instance.Get ) {}
 	}
 
-	public abstract class PartTypesBase : ValidatedParameterizedSourceBase<IEnumerable<Assembly>, IEnumerable<Type>>
+	public abstract class PartTypesBase : ParameterizedSourceBase<IEnumerable<Assembly>, IEnumerable<Type>>
 	{
 		readonly Func<Assembly, ImmutableArray<Type>> typeSource;
 		readonly Func<IEnumerable<Assembly>, Assembly> assemblySource;

@@ -1,12 +1,12 @@
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using System;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -25,7 +25,7 @@ namespace DragonSpark.Activation.IoC
 		protected override IDependencyResolverPolicy CreateResolver( ParameterInfo parameter ) => resolver( parameter );
 	}
 
-	class ResolverFactory : ValidatedParameterizedSourceBase<ParameterInfo, IDependencyResolverPolicy>
+	class ResolverFactory : ParameterizedSourceBase<ParameterInfo, IDependencyResolverPolicy>
 	{
 		public static ResolverFactory Instance { get; } = new ResolverFactory();
 		ResolverFactory() {}

@@ -1,8 +1,9 @@
-using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -10,8 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Diagnostics.Logger
 {
@@ -47,7 +46,7 @@ namespace DragonSpark.Diagnostics.Logger
 		public LogCommand( ILogger logger ) : base( new LogExceptionCommand( logger ), new LogTemplateCommand( logger ) ) {}
 	}
 
-	abstract class LoggerTemplateParameterFactoryBase<T> : ValidatedParameterizedSourceBase<T, object[]> where T : ILoggerTemplate
+	abstract class LoggerTemplateParameterFactoryBase<T> : ParameterizedSourceBase<T, object[]> where T : ILoggerTemplate
 	{
 		// public static TemplateParameterFactoryBase Instance { get; } = new TemplateParameterFactoryBase<T>();
 

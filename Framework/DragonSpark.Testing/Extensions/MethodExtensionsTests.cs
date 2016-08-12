@@ -1,11 +1,11 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Linq;
 using System.Windows.Input;
-using DragonSpark.Sources.Parameterized;
 using Xunit;
 
 namespace DragonSpark.Testing.Extensions
@@ -15,8 +15,8 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		public void BasicFactory()
 		{
-			var method = new Func<object, object>( new Factory().To<IValidatedParameterizedSource>().Get ).Method;
-			var found = MethodExtensions.AccountForGenericDefinition( method );
+			var method = new Func<object, object>( new Factory().To<IParameterizedSource>().Get ).Method;
+			var found = method.AccountForGenericDefinition();
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
 			Assert.True( found.DeclaringType.IsGenericTypeDefinition );
@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Extensions
 		public void GenericFactory()
 		{
 			var method = new Func<object, bool>( new Factory().IsValid ).Method;
-			var found = MethodExtensions.AccountForGenericDefinition( method );
+			var found = method.AccountForGenericDefinition();
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
 			Assert.True( found.DeclaringType.IsGenericTypeDefinition );
@@ -36,7 +36,7 @@ namespace DragonSpark.Testing.Extensions
 		public void BasicCommand()
 		{
 			var method = new Action<object>( new Command().To<ICommand>().Execute ).Method;
-			var found = MethodExtensions.AccountForGenericDefinition( method );
+			var found = method.AccountForGenericDefinition();
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
 			Assert.True( found.DeclaringType.IsGenericTypeDefinition );
@@ -46,7 +46,7 @@ namespace DragonSpark.Testing.Extensions
 		public void GenericCommand()
 		{
 			var method = new Action<object>( new Command().Execute ).Method;
-			var found = MethodExtensions.AccountForGenericDefinition( method );
+			var found = method.AccountForGenericDefinition();
 			Assert.NotNull( found );
 			Assert.Same( method, found );
 			Assert.False( found.DeclaringType.IsGenericTypeDefinition );
@@ -56,7 +56,7 @@ namespace DragonSpark.Testing.Extensions
 		public void BreakingBuildTest()
 		{
 			var method = new Action<Action<string>>( new PurgeLoggerMessageHistoryCommand( new LoggerHistorySink() ).Execute ).Method;
-			var found = MethodExtensions.AccountForGenericDefinition( method );
+			var found = method.AccountForGenericDefinition();
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );
 			Assert.True( found.DeclaringType.IsGenericTypeDefinition );
@@ -70,6 +70,8 @@ namespace DragonSpark.Testing.Extensions
 
 		class Factory : ValidatedParameterizedSourceBase<object, object>
 		{
+			public Factory() : base( Specifications.Assigned ) {}
+
 			public override object Get( object parameter ) => null;
 		}
 

@@ -1,11 +1,11 @@
-using System;
-using System.Composition.Hosting.Core;
 using DragonSpark.Activation;
 using DragonSpark.Runtime;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
+using System.Composition.Hosting.Core;
 
 namespace DragonSpark.Composition
 {
@@ -16,7 +16,7 @@ namespace DragonSpark.Composition
 
 		public ParameterizedSourceDelegateExporter() : base( DelegateSource, Default ) {}
 
-		sealed class Factory : ValidatedParameterizedSourceBase<ActivatorParameter, object>
+		sealed class Factory : ParameterizedSourceBase<ActivatorParameter, object>
 		{
 			public static Factory Instance { get; } = new Factory();
 			Factory() : this( ParameterTypes.Instance.ToDelegate(), ResultTypes.Instance.ToDelegate() ) {}

@@ -1,12 +1,11 @@
-using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -54,7 +53,7 @@ namespace DragonSpark.Windows.Markup
 		}
 	}*/
 
-	public class MemberInfoKeyFactory : ValidatedParameterizedSourceBase<PropertyReference, string>
+	public class MemberInfoKeyFactory : ParameterizedSourceBase<PropertyReference, string>
 	{
 		public static MemberInfoKeyFactory Instance { get; } = new MemberInfoKeyFactory();
 

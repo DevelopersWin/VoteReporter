@@ -1,6 +1,5 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +13,6 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Entity
@@ -156,7 +154,7 @@ namespace DragonSpark.Windows.Entity
 			}
 		}*/
 
-		public class DefaultAssociationPropertyFactory : ValidatedParameterizedSourceBase<Type, string[]>
+		public class DefaultAssociationPropertyFactory : ParameterizedSourceBase<Type, string[]>
 		{
 			readonly IObjectContextAdapter adapter;
 
@@ -276,11 +274,11 @@ namespace DragonSpark.Windows.Entity
 			return result;
 		}*/
 
-		class KeyFactory<TEntity> : ValidatedParameterizedSourceBase<object, IDictionary<string, object>>
+		class KeyFactory<TEntity> : ParameterizedSourceBase<IDictionary<string, object>>
 		{
 			readonly IObjectContextAdapter context;
 
-			public KeyFactory( [Required] IObjectContextAdapter context )
+			public KeyFactory( IObjectContextAdapter context )
 			{
 				this.context = context;
 			}
@@ -291,7 +289,7 @@ namespace DragonSpark.Windows.Entity
 				return parameter.GetType().IsPrimitive ? new Dictionary<string, object> { { names.First(), parameter } } : DetermineKeyComplex( context, parameter, names );
 			}
 
-			IDictionary<string, object> DetermineKeyComplex( IObjectContextAdapter target, object container, string[] names )
+			static IDictionary<string, object> DetermineKeyComplex( IObjectContextAdapter target, object container, string[] names )
 			{
 				var result = names.Select( name =>
 				{

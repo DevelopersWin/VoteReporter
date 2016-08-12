@@ -13,12 +13,12 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		protected Stacks( ICacheRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
 
-		protected Stacks( ICacheRegistry<IStack<T>> registry, IParameterizedSource<object, IAssignableSource<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.Get ) )
+		protected Stacks( ICacheRegistry<IStack<T>> registry, IParameterizedSource<IAssignableSource<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.Get ) )
 		{
 			registry.Register( factory, this );
 		}
 
-		sealed class Store : ValidatedParameterizedSourceBase<object, IAssignableSource<IStack<T>>>
+		sealed class Store : ParameterizedSourceBase<IAssignableSource<IStack<T>>>
 		{
 			readonly Action<Store, object> callback;
 

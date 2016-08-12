@@ -4,15 +4,15 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Composition
 {
@@ -22,7 +22,7 @@ namespace DragonSpark.Composition
 		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Instance.Get;
 		public SourceDelegateExporter() : base( DelegateSource, Default ) {}
 
-		sealed class Factory : ValidatedParameterizedSourceBase<ActivatorParameter, object>
+		sealed class Factory : ParameterizedSourceBase<ActivatorParameter, object>
 		{
 			public static Factory Instance { get; } = new Factory();
 			Factory() {}
@@ -77,7 +77,7 @@ namespace DragonSpark.Composition
 		public static SingletonExports Instance { get; } = new SingletonExports();
 		SingletonExports() : base( SingletonSpecification.Instance.And( IsExportSpecification.Instance.Cast<SingletonRequest>( request => request.Candidate ) ), new Factory().Get ) {}
 
-		sealed class Factory : ValidatedParameterizedSourceBase<PropertyInfo, SingletonExport>
+		sealed class Factory : ParameterizedSourceBase<PropertyInfo, SingletonExport>
 		{
 			public override SingletonExport Get( PropertyInfo parameter )
 			{

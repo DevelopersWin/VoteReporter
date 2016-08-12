@@ -1,13 +1,11 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Security
 {
-	public class CertificateFactory : ValidatedParameterizedSourceBase<string, X509Certificate2>
+	public class CertificateFactory : ParameterizedSourceBase<string, X509Certificate2>
 	{
 		public static CertificateFactory Instance { get; } = new CertificateFactory();
 
@@ -15,7 +13,7 @@ namespace DragonSpark.Windows.Security
 
 		public CertificateFactory() : this( new X509Store( StoreName.My, StoreLocation.LocalMachine ) ) {}
 
-		public CertificateFactory( [Required]X509Store store )
+		public CertificateFactory( X509Store store )
 		{
 			this.store = store;
 		}

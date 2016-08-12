@@ -1,13 +1,12 @@
-using DragonSpark.Activation;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Xml;
 using System.Xml.XPath;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
-	public abstract class DocumentFactory<TParameter> : ValidatedParameterizedSourceBase<TParameter, IXPathNavigable>
+	public abstract class DocumentFactory<TParameter> : ParameterizedSourceBase<TParameter, IXPathNavigable>
 	{
 		readonly Action<XmlDocument, TParameter> load;
 

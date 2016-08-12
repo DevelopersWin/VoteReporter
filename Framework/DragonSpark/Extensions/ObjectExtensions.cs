@@ -22,11 +22,15 @@ namespace DragonSpark.Extensions
 
 		public static void TryDispose( this object target ) => target.As<IDisposable>( x => x.Dispose() );
 
-		public static bool IsAssigned<T>( this T @this )
+		public static bool IsAssignedOrValue<T>( this T @this ) => IsAssigned( @this, true );
+
+		public static bool IsAssigned<T>( this T @this ) => IsAssigned( @this, false );
+
+		static bool IsAssigned<T>( this T @this, bool value )
 		{
 			var type = @this?.GetType() ?? typeof(T);
 			var defaultOrEmpty = SpecialValues.DefaultOrEmpty( type );
-			var result = type.GetTypeInfo().IsValueType ? !defaultOrEmpty.Equals( @this ) : !Equals( @this, defaultOrEmpty );
+			var result = type.GetTypeInfo().IsValueType ? value || !defaultOrEmpty.Equals( @this ) : !Equals( @this, defaultOrEmpty );
 			return result;
 		}
 

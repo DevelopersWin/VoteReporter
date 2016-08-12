@@ -1,9 +1,8 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using System.Composition;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System.Composition;
 
 namespace DragonSpark.Testing.Objects.Composition
 {
@@ -20,7 +19,7 @@ namespace DragonSpark.Testing.Objects.Composition
 	}
 
 	[Export]
-	public class ParameterServiceFactory : ValidatedParameterizedSourceBase<Parameter, IParameterService>
+	public class ParameterServiceFactory : ParameterizedSourceBase<Parameter, IParameterService>
 	{
 		public ParameterServiceFactory() {}
 

@@ -2,10 +2,10 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using System;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Setup.Registration
@@ -19,7 +19,7 @@ namespace DragonSpark.Setup.Registration
 		public static void Register<T>( this IServiceRegistry @this, Func<T> factory, string name = null ) => @this.RegisterFactory( new FactoryRegistrationParameter( typeof(T), factory.Convert(), name ) );
 	}
 
-	public sealed class SourceFactory : ValidatedParameterizedSourceBase<Type, object>
+	public sealed class SourceFactory : ParameterizedSourceBase<Type, object>
 	{
 		public static SourceFactory Instance { get; } = new SourceFactory();
 		SourceFactory() : this( Activator.Instance.Provider() ) {}

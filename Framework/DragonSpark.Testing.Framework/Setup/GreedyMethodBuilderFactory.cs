@@ -1,15 +1,15 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using Ploeh.AutoFixture.Kernel;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public abstract class EnginePartFactory<T> : ValidatedParameterizedSourceBase<T, ISpecimenBuilder>, ISpecimenBuilderTransformation where T : ISpecimenBuilder
+	public abstract class EnginePartFactory<T> : ParameterizedSourceBase<T, ISpecimenBuilder>, ISpecimenBuilderTransformation where T : ISpecimenBuilder
 	{
 		readonly Func<T, ISpecimenBuilder> toDelegate;
 

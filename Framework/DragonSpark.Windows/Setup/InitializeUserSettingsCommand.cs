@@ -1,11 +1,12 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Commands;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Windows.Properties;
 using Serilog;
 using Serilog.Events;
@@ -13,12 +14,10 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class UserSettingsPathFactory : ValidatedParameterizedSourceBase<ConfigurationUserLevel, FileInfo>
+	public class UserSettingsPathFactory : ParameterizedSourceBase<ConfigurationUserLevel, FileInfo>
 	{
 		public static UserSettingsPathFactory Instance { get; } = new UserSettingsPathFactory();
 		UserSettingsPathFactory() {}

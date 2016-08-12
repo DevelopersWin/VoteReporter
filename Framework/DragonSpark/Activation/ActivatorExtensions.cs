@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,6 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Activation
 {
@@ -18,21 +18,12 @@ namespace DragonSpark.Activation
 	{
 		public static Func<Type, T> Delegate<T>( this ISource<IActivator> @this ) => @this.ToDelegate().Delegate<T>();
 		public static Func<Type, T> Delegate<T>( this Func<IActivator> @this ) => Delegates<T>.Default.Get( @this );
-		class Delegates<T> : Cache<Func<IActivator>, Func<Type, T>>
+		class Delegates<T> : FactoryCache<Func<IActivator>, Func<Type, T>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( source => new Factory( source ).Get ) {}
+			Delegates() {}
 
-			class Factory : ValidatedParameterizedSourceBase<Type, T>
-			{
-				readonly Func<IActivator> source;
-				public Factory( Func<IActivator> source )
-				{
-					this.source = source;
-				}
-
-				public override T Get( Type parameter ) => source().Activate<T>( parameter );
-			}
+			protected override Func<Type, T> Create( Func<IActivator> parameter ) => parameter().Activate<T>;
 		}
 
 		public static Func<IServiceProvider> Provider( this ISource<IActivator> @this ) => @this.ToDelegate().Provider();
@@ -89,7 +80,7 @@ namespace DragonSpark.Activation
 		public static ISource<IActivator> Instance { get; } = new Scope<IActivator>( Factory.Scope( () => new Activator() ) );
 		Activator() : base( new Locator(), Constructor.Instance ) {}
 
-		public static T Activate<T>( Type type ) => Instance.Get().Create<T>( type );
+		public static T Activate<T>( Type type ) => Instance.Get().Get<T>( type );
 
 		sealed class Locator : LocatorBase
 		{

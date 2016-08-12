@@ -4,11 +4,11 @@ using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.TypeSystem
 {
@@ -168,7 +168,7 @@ namespace DragonSpark.TypeSystem
 
 		// public override T Get( Type[] key ) => only ?? base.Get( key );
 
-		class Factory : ValidatedParameterizedSourceBase<Type[], T>
+		class Factory : ParameterizedSourceBase<Type[], T>
 		{
 			readonly ImmutableArray<GenericMethodCandidate<T>> candidates;
 
@@ -263,7 +263,7 @@ namespace DragonSpark.TypeSystem
 		public override bool IsSatisfiedBy( Type[] parameter ) => Context.GetGenericArguments().Length == parameter.Length;
 	}
 
-	sealed class ObjectTypeFactory : ValidatedParameterizedSourceBase<object[], Type[]>
+	sealed class ObjectTypeFactory : ParameterizedSourceBase<object[], Type[]>
 	{
 		public static ObjectTypeFactory Instance { get; } = new ObjectTypeFactory();
 

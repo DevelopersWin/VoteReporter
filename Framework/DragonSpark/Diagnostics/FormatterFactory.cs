@@ -1,12 +1,12 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Composition;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Diagnostics
 {
-	public class FormatterFactory : ValidatedParameterizedSourceBase<FormatterFactory.Parameter, string>
+	public class FormatterFactory : ParameterizedSourceBase<FormatterFactory.Parameter, string>
 	{
 		[Export]
 		public static FormatterFactory Instance { get; } = new FormatterFactory();

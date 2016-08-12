@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using Serilog.Formatting.Display;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Diagnostics
 {
@@ -23,7 +23,7 @@ namespace DragonSpark.Diagnostics
 		public virtual void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
 	}
 
-	public class LogEventTextFactory : ValidatedParameterizedSourceBase<LogEvent, string>
+	public class LogEventTextFactory : ParameterizedSourceBase<LogEvent, string>
 	{
 		public static LogEventTextFactory Instance { get; } = new LogEventTextFactory();
 
@@ -45,7 +45,7 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
-	public sealed class LogEventMessageFactory : ValidatedParameterizedSourceBase<IEnumerable<LogEvent>, ImmutableArray<string>>
+	public sealed class LogEventMessageFactory : ParameterizedSourceBase<IEnumerable<LogEvent>, ImmutableArray<string>>
 	{
 		readonly static Func<LogEvent, string> Text = LogEventTextFactory.Instance.ToDelegate();
 		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();

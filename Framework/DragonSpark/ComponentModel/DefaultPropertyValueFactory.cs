@@ -1,14 +1,14 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class DefaultPropertyValueFactory : ValidatedParameterizedSourceBase<DefaultValueParameter, object>
+	public sealed class DefaultPropertyValueFactory : ParameterizedSourceBase<DefaultValueParameter, object>
 	{
 		public static DefaultPropertyValueFactory Instance { get; } = new DefaultPropertyValueFactory();
 		DefaultPropertyValueFactory() : this( HostedValueLocator<IDefaultValueProvider>.Instance.ToDelegate() ) {}

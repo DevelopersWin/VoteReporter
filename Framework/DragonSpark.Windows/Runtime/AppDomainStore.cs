@@ -1,9 +1,7 @@
-using DragonSpark.Activation;
-using PostSharp.Patterns.Contracts;
-using System;
-using System.Reflection;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
@@ -25,16 +23,16 @@ namespace DragonSpark.Windows.Runtime
 		public override T Get() => (T)domain.GetData( key );
 	}
 
-	public class ApplicationDomainProxyFactory<T> : ValidatedParameterizedSourceBase<object[], T>
+	public class ApplicationDomainProxyFactory<T> : ParameterizedSourceBase<object[], T>
 	{
 		readonly AppDomain domain;
 
-		public ApplicationDomainProxyFactory( [Required] AppDomain domain )
+		public ApplicationDomainProxyFactory( AppDomain domain )
 		{
 			this.domain = domain;
 		}
 
-		public T CreateUsing( params object[] arguments ) => Get( arguments );
+		// public T CreateUsing( params object[] arguments ) => Get( arguments );
 
 		public override T Get( object[] parameter )
 		{

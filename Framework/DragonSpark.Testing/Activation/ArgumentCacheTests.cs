@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Activation
 		public void CreateDefault( Constructor sut )
 		{
 			var type = typeof(bool);
-			var result = sut.Create<object>( type );
+			var result = sut.Get<object>( type );
 			Assert.Equal( false, result );
 		}
 	}

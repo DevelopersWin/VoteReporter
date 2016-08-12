@@ -1,9 +1,9 @@
-﻿using System;
+﻿using DragonSpark.Activation;
+using DragonSpark.Runtime.Specifications;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using DragonSpark.Activation;
-using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
@@ -56,7 +56,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		public ThreadLocalStoreCache( Func<TInstance, IAssignableSource<TResult>> create ) : base( create ) {}
 
-		class Store : ValidatedParameterizedSourceBase<TInstance, IAssignableSource<TResult>>
+		class Store : ParameterizedSourceBase<TInstance, IAssignableSource<TResult>>
 		{
 			public static Store Instance { get; } = new Store();
 
@@ -64,7 +64,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 			Store() : this( () => default(TResult) ) {}
 
-			public Store( Func<TResult> create ) : base( Specifications<TInstance>.Always )
+			public Store( Func<TResult> create )
 			{
 				this.create = create;
 			}

@@ -96,49 +96,18 @@ namespace DragonSpark.Sources.Parameterized
 		}
 	}
 
-	/*public abstract class CachedDecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
-	{
-		readonly static ICache<ArgumentCache<ImmutableArray<object>, TResult>> Caches = new ActivatedCache<ArgumentCache<ImmutableArray<object>, TResult>>();
-
-		protected CachedDecoratedFactory( Func<TParameter, TResult> inner ) : base( inner ) {}
-
-		public override TResult Create( TParameter parameter )
-		{
-			var instance = GetHost( parameter );
-			var items = Caches.Get( instance );
-			var result = items.GetOrSet( GetKeyItems( parameter ), () => base.Create( parameter ) );
-			return result;
-		}
-
-		protected abstract ImmutableArray<object> GetKeyItems( TParameter parameter );
-
-		protected abstract object GetHost( TParameter parameter );
-	}*/
-
-	/*public class DecoratedFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
-	{
-		public static ICache<IValidatedParameterizedSource, Func<TParameter, TResult>> Cache { get; } = new Cache<IValidatedParameterizedSource, Func<TParameter, TResult>>( parameter => new DecoratedFactory<TParameter, TResult>( parameter ).ToDelegate() );
-
-		DecoratedFactory( IValidatedParameterizedSource inner ) : this( inner.Cast<TParameter, TResult>() ) {}
-
-		public DecoratedFactory( IFactory<TParameter, TResult> inner ) : this( inner, Defaults<TParameter>.Coercer ) {}
-
-		public DecoratedFactory( IFactory<TParameter, TResult> inner, Coerce<TParameter> coercer  ) : this( inner, coercer, inner.ToSpecification() ) {}
-
-		public DecoratedFactory( IFactory<TParameter, TResult> inner, ISpecification<TParameter> specification  ) : this( inner, Defaults<TParameter>.Coercer, specification ) {}
-
-		public DecoratedFactory( IFactory<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification  ) : base( inner.ToDelegate(), coercer, specification ) {}
-	}*/
+	
 
 	public abstract class ValidatedParameterizedSourceBase<TParameter, TResult> : IValidatedParameterizedSource<TParameter, TResult>
 	{
 		readonly Coerce<TParameter> coercer;
 		readonly ISpecification<TParameter> specification;
 
-		protected ValidatedParameterizedSourceBase() : this( Defaults<TParameter>.Coercer ) {}
+		/*protected ValidatedParameterizedSourceBase() : this( Defaults<TParameter>.Coercer ) {}
 
-		protected ValidatedParameterizedSourceBase( Coerce<TParameter> coercer ) : this( coercer, Specifications<TParameter>.Assigned ) {}
+		protected ValidatedParameterizedSourceBase( Coerce<TParameter> coercer ) : this( coercer, Specifications<TParameter>.Assigned ) {}*/
 
+		protected ValidatedParameterizedSourceBase() : this( Specifications<TParameter>.Assigned ) {}
 		protected ValidatedParameterizedSourceBase( ISpecification<TParameter> specification ) : this( Defaults<TParameter>.Coercer, specification ) {}
 
 		protected ValidatedParameterizedSourceBase( Coerce<TParameter> coercer, ISpecification<TParameter> specification )
@@ -146,21 +115,19 @@ namespace DragonSpark.Sources.Parameterized
 			this.coercer = coercer;
 			this.specification = specification;
 		}
-	
+
 		bool IValidatedParameterizedSource.IsValid( object parameter ) => specification.IsSatisfiedBy( parameter );
 
-		object CreateFromParameter( object parameter )
+		public bool IsValid( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+
+		public abstract TResult Get( TParameter parameter );
+
+		object IParameterizedSource.Get( object parameter )
 		{
 			var coerced = coercer( parameter );
 			var result = coerced.IsAssigned() ? Get( coerced ) : default(TResult);
 			return result;
 		}
-
-		public bool IsValid( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
-
-		public abstract TResult Get( [Required]TParameter parameter );
-
-		object IParameterizedSource.Get( object parameter ) => CreateFromParameter( parameter );
 	}
 
 	public class DelegatedFactory<TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
@@ -246,7 +213,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ).ToDelegate() ).Fixed() ) {}
 
-		sealed class Factory : ValidatedParameterizedSourceBase<object, T>
+		sealed class Factory : ParameterizedSourceBase<T>
 		{
 			readonly Type type;
 

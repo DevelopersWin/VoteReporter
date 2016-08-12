@@ -5,6 +5,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,6 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 using Type = System.Type;
 
 namespace DragonSpark.Sources.Parameterized
@@ -30,7 +30,7 @@ namespace DragonSpark.Sources.Parameterized
 	public sealed class IsParameterizedSourceSpecification : AdapterSpecificationBase
 	{
 		public static ISpecification<Type> Instance { get; } = new IsParameterizedSourceSpecification().Cached();
-		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>), typeof(IParameterizedSource), typeof(IValidatedParameterizedSource<,>), typeof(IValidatedParameterizedSource) ) {}
+		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>), typeof(IParameterizedSource) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );
 	}
@@ -60,7 +60,7 @@ namespace DragonSpark.Sources.Parameterized
 	public sealed class ParameterTypes : TypeLocatorBase
 	{
 		public static ICache<Type, Type> Instance { get; } = new ParameterTypes();
-		ParameterTypes() : base( typeof(Func<,>), typeof(IParameterizedSource<,>), typeof(IValidatedParameterizedSource<,>), typeof(ICommand<>) ) {}
+		ParameterTypes() : base( typeof(Func<,>), typeof(IParameterizedSource<,>), typeof(ICommand<>) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.First();
 	}
@@ -68,7 +68,7 @@ namespace DragonSpark.Sources.Parameterized
 	public sealed class ResultTypes : TypeLocatorBase
 	{
 		public static ICache<Type, Type> Instance { get; } = new ResultTypes();
-		ResultTypes() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(IValidatedParameterizedSource<,>), typeof(Func<>), typeof(Func<,>) ) {}
+		ResultTypes() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(Func<>), typeof(Func<,>) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
@@ -126,7 +126,7 @@ namespace DragonSpark.Sources.Parameterized
 		public static ISource<SourceTypes> Instance { get; } = new Scope<SourceTypes>( Sources.Factory.Scope( () => new SourceTypes() ) );
 		SourceTypes() : base( new Factory().Get ) {}
 		
-		sealed class Factory :  ValidatedParameterizedSourceBase<LocateTypeRequest, Type>
+		sealed class Factory : ParameterizedSourceBase<LocateTypeRequest, Type>
 		{
 			readonly ImmutableArray<FactoryTypeRequest> types;
 

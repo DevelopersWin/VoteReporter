@@ -1,13 +1,12 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark
 {
@@ -47,7 +46,7 @@ namespace DragonSpark
 		AssociatedPriority() {}
 	}
 
-	public class PriorityAwareLocator<T> : ValidatedParameterizedSourceBase<T, IPriorityAware>
+	public class PriorityAwareLocator<T> : ParameterizedSourceBase<T, IPriorityAware>
 	{
 		readonly Func<Type, IPriorityAware> get;
 		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>( AttributeSupport<PriorityAttribute>.Local.Get );

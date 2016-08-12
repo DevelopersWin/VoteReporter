@@ -1,12 +1,11 @@
 using AutoMapper;
 using DragonSpark.Activation;
-using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Extensions
 {
-	public class ObjectMappingFactory<T> : ValidatedParameterizedSourceBase<ObjectMappingParameter<T>, T> where T : class
+	public class ObjectMappingFactory<T> : ParameterizedSourceBase<ObjectMappingParameter<T>, T> where T : class
 	{
 		public static ISource<ObjectMappingFactory<T>> Default { get; } = new Scope<ObjectMappingFactory<T>>( Factory.Scope( () => new ObjectMappingFactory<T>( Activator.Instance.Get() ) ) );
 

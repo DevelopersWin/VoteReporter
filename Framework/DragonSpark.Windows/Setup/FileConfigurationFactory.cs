@@ -1,10 +1,9 @@
-using DragonSpark.Activation;
-using System.Configuration;
 using DragonSpark.Sources.Parameterized;
+using System.Configuration;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class FileConfigurationFactory : ValidatedParameterizedSourceBase<string, object>
+	public class FileConfigurationFactory : ParameterizedSourceBase<string, object>
 	{
 		readonly ConfigurationFileMap map;
 

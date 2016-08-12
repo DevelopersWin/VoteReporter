@@ -3,6 +3,5 @@ using Microsoft.Practices.Unity;
 
 namespace DragonSpark.Activation.IoC
 {
-	public abstract class InjectionMemberFactory<TMember> : ValidatedParameterizedSourceBase<InjectionMemberParameter, TMember> where TMember : InjectionMember
-	{}
+	public abstract class InjectionMemberFactory<TMember> : ParameterizedSourceBase<InjectionMemberParameter, TMember> where TMember : InjectionMember {}
 }

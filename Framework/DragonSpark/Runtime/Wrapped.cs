@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Runtime
@@ -232,7 +232,7 @@ namespace DragonSpark.Runtime
 			return default(T);
 		}*/
 
-		sealed class Factory : ValidatedParameterizedSourceBase<MethodInfo, Delegate>
+		sealed class Factory : ParameterizedSourceBase<MethodInfo, Delegate>
 		{
 			readonly object instance;
 
@@ -251,12 +251,12 @@ namespace DragonSpark.Runtime
 		}
 	}
 
-	public class Invokers : Cache<object, ICache<MethodInfo, IDelegateInvoker>>
+	public class Invokers : FactoryCache<object, ICache<MethodInfo, IDelegateInvoker>>
 	{
 		public static Invokers Default { get; } = new Invokers();
-		Invokers() : base( o => new Cache<MethodInfo, IDelegateInvoker>( new Factory( o ).Get ) ) {}
+		Invokers() {}
 
-		sealed class Factory : ValidatedParameterizedSourceBase<MethodInfo, IDelegateInvoker>
+		sealed class Factory : ParameterizedSourceBase<MethodInfo, IDelegateInvoker>
 		{
 			readonly object instance;
 			public Factory( object instance )
@@ -266,9 +266,11 @@ namespace DragonSpark.Runtime
 
 			public override IDelegateInvoker Get( MethodInfo parameter ) => Invoker.Default.Get( Delegates.Default.Get( instance ).Get( parameter ) );
 		}
+
+		protected override ICache<MethodInfo, IDelegateInvoker> Create( object parameter ) => new Factory( parameter ).ToCache();
 	}
 
-	class Invoker : ValidatedParameterizedSourceBase<Delegate, IDelegateInvoker>
+	class Invoker : ParameterizedSourceBase<Delegate, IDelegateInvoker>
 	{
 		public static ICache<Delegate, IDelegateInvoker> Default { get; } = new Invoker().ToCache();
 

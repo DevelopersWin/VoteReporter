@@ -2,6 +2,9 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.Utility;
@@ -10,9 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {
@@ -229,7 +229,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 	{
 		public ConstructorQueryProvider( CanLocateSpecification locate ) : base( new Factory( locate ).Get ) {}
 
-		class Factory : ValidatedParameterizedSourceBase<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
+		class Factory : ParameterizedSourceBase<ConstructTypeRequest, IEnumerable<ConstructorInfo>>
 		{
 			readonly CanLocateSpecification locate;
 			readonly ISpecification<ConstructTypeRequest> create;

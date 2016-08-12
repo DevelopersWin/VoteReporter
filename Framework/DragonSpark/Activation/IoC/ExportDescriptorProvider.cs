@@ -1,11 +1,11 @@
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using System;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -43,7 +43,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class DependencyFactory : ValidatedParameterizedSourceBase<Type, object>
+	public class DependencyFactory : ParameterizedSourceBase<Type, object>
 	{
 		readonly IDependencyLocatorKey locatorKey;
 		readonly Lazy<ServiceRegistry<ExternallyControlledLifetimeManager>> registry;

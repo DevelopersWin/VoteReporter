@@ -1,13 +1,12 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class HostedValueLocator<T> : ValidatedParameterizedSourceBase<object, ImmutableArray<T>> where T : class
+	public sealed class HostedValueLocator<T> : ParameterizedSourceBase<ImmutableArray<T>> where T : class
 	{
 		public static HostedValueLocator<T> Instance { get; } = new HostedValueLocator<T>();
 		HostedValueLocator() {}

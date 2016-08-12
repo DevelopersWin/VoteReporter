@@ -5,6 +5,8 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows;
 using Ploeh.AutoFixture;
@@ -14,8 +16,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using InitializeLocationCommand = DragonSpark.Composition.InitializeLocationCommand;
 
 namespace DragonSpark.Testing.Framework.Setup
@@ -84,7 +84,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		protected TypeProviderAttributeBase( Func<MethodBase, ImmutableArray<Type>> factory ) : this( factory.Wrap() ) {}
 		protected TypeProviderAttributeBase( Func<object, Func<MethodBase, ImmutableArray<Type>>> provider ) : base( provider ) {}
 
-		protected class Factory : ValidatedParameterizedSourceBase<MethodBase, ImmutableArray<Type>>
+		protected class Factory : ParameterizedSourceBase<MethodBase, ImmutableArray<Type>>
 		{
 			readonly ImmutableArray<Type> additionalTypes;
 			public Factory( ImmutableArray<Type> additionalTypes )
@@ -129,7 +129,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		readonly static Func<MethodBase, ImmutableArray<Type>> Delegate = Factory.Instance.Get;
 		public ContainingTypeAndNestedAttribute() : base( Delegate ) {}
 
-		new sealed class Factory : ValidatedParameterizedSourceBase<MethodBase, ImmutableArray<Type>>
+		new sealed class Factory : ParameterizedSourceBase<MethodBase, ImmutableArray<Type>>
 		{
 			public static Factory Instance { get; } = new Factory();
 			Factory() {}

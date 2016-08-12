@@ -2,13 +2,13 @@ using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.TypeSystem
 {
@@ -63,7 +63,7 @@ namespace DragonSpark.TypeSystem
 
 		sealed class Factory : CompositeFactory<object, TypeInfo>
 		{
-			readonly static Func<object, TypeInfo>[] Factories = new IValidatedParameterizedSource[] { TypeInfoDefinitionProvider.Instance, MemberInfoDefinitionProvider.Instance, GeneralDefinitionProvider.Instance }.Select( parameter => new Func<object, TypeInfo>( parameter.Create<TypeInfo> ) ).Fixed();
+			readonly static Func<object, TypeInfo>[] Factories = new IParameterizedSource[] { TypeInfoDefinitionProvider.Instance, MemberInfoDefinitionProvider.Instance, GeneralDefinitionProvider.Instance }.Select( parameter => new Func<object, TypeInfo>( parameter.Get<TypeInfo> ) ).Fixed();
 
 			public Factory() : this( ComponentModel.TypeDefinitions.Instance.Get ) { }
 
@@ -95,7 +95,7 @@ namespace DragonSpark.TypeSystem
 				public override TypeInfo Get( object parameter ) => parameter.GetType().GetTypeInfo();
 			}
 
-			abstract class TypeDefinitionProviderBase<T> : ValidatedParameterizedSourceBase<T, TypeInfo> {}
+			abstract class TypeDefinitionProviderBase<T> : ParameterizedSourceBase<T, TypeInfo> {}
 
 			public override TypeInfo Get( object parameter ) => source( base.Get( parameter ) );
 		}
@@ -106,7 +106,7 @@ namespace DragonSpark.TypeSystem
 		public static IParameterizedSource<MemberInfo> Instance { get; } = new MemberInfoDefinitions();
 		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).ToDelegate().CachedPerScope() ) {}
 
-		sealed class Factory : ValidatedParameterizedSourceBase<object, MemberInfo>
+		sealed class Factory : ParameterizedSourceBase<MemberInfo>
 		{
 			readonly static ImmutableArray<Func<object, IValidatedParameterizedSource>> Delegates = new[] { typeof(PropertyInfoDefinitionLocator), typeof(ConstructorInfoDefinitionLocator), typeof(MethodInfoDefinitionLocator), typeof(TypeInfoDefinitionLocator) }.Select( type => ParameterConstructor<IValidatedParameterizedSource>.Make( typeof(TypeInfo), type ) ).ToImmutableArray();
 		
@@ -188,7 +188,7 @@ namespace DragonSpark.TypeSystem
 					var factory = @delegate( definition );
 					if ( factory?.IsValid( parameter ) ?? false )
 					{
-						return factory.Create<MemberInfo>( parameter );
+						return factory.Get<MemberInfo>( parameter );
 					}
 				}
 				return null;

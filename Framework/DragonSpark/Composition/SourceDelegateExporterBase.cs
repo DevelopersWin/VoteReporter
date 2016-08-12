@@ -2,15 +2,15 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 
@@ -72,7 +72,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		class Factory : ValidatedParameterizedSourceBase<IEnumerable<CompositionDependency>, ExportDescriptor>
+		class Factory : ParameterizedSourceBase<IEnumerable<CompositionDependency>, ExportDescriptor>
 		{
 			readonly CompositeActivator activator, create;
 
@@ -151,7 +151,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class DelegateResultFactory : ValidatedParameterizedSourceBase<ActivatorParameter, object>
+	public class DelegateResultFactory : ParameterizedSourceBase<ActivatorParameter, object>
 	{
 		public static DelegateResultFactory Instance { get; } = new DelegateResultFactory();
 		DelegateResultFactory() {}
@@ -159,7 +159,7 @@ namespace DragonSpark.Composition
 		public override object Get( ActivatorParameter parameter ) => new SourceFactory( parameter.Services.Self ).Get( parameter.FactoryType );
 	}
 
-	public sealed class DelegateFactory : ValidatedParameterizedSourceBase<ActivatorParameter, Func<object>>
+	public sealed class DelegateFactory : ParameterizedSourceBase<ActivatorParameter, Func<object>>
 	{
 		public static DelegateFactory Instance { get; } = new DelegateFactory();
 		DelegateFactory() {}

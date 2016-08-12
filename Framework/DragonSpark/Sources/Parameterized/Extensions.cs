@@ -26,7 +26,7 @@ namespace DragonSpark.Sources.Parameterized
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
-		public static T Create<T>( this IValidatedParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );
+		public static T Get<T>( this IParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );
 
 		public static Func<object, T> Wrap<T>( this T @this ) => @this.Wrap<object, T>();
 
@@ -117,7 +117,7 @@ namespace DragonSpark.Sources.Parameterized
 			}
 		}
 
-		public static IValidatedParameterizedSource<TParameter, TResult> Cast<TParameter, TResult>( this IValidatedParameterizedSource @this ) => @this as IValidatedParameterizedSource<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
+		/*public static IValidatedParameterizedSource<TParameter, TResult> Cast<TParameter, TResult>( this IValidatedParameterizedSource @this ) => @this as IValidatedParameterizedSource<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
 		sealed class Casted<TParameter, TResult> : Cache<IValidatedParameterizedSource, IValidatedParameterizedSource<TParameter, TResult>>
 		{
 			public static Casted<TParameter, TResult> Default { get; } = new Casted<TParameter, TResult>();
@@ -133,7 +133,7 @@ namespace DragonSpark.Sources.Parameterized
 
 				public override TResult Get( TParameter parameter ) => (TResult)inner.Get( parameter );
 			}
-		}
+		}*/
 
 		public static Func<object> ToDelegate( this ISource @this ) => SourceDelegates.Default.Get( @this );
 		sealed class SourceDelegates : Cache<ISource, Func<object>>

@@ -1,10 +1,9 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
@@ -27,7 +26,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			}
 		}
 
-		class ReportFactory : ValidatedParameterizedSourceBase<ReportFactory.Parameter, ImmutableArray<ReportFactory.Result>>
+		class ReportFactory : ParameterizedSourceBase<ReportFactory.Parameter, ImmutableArray<ReportFactory.Result>>
 		{
 			public static ReportFactory Instance { get; } = new ReportFactory();
 
@@ -61,7 +60,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 				public TimeSpan Mode { get; }
 			}
 
-			class MedianFactory : ValidatedParameterizedSourceBase<ImmutableArray<long>, long>
+			class MedianFactory : ParameterizedSourceBase<ImmutableArray<long>, long>
 			{
 				public static MedianFactory Instance { get; } = new MedianFactory();
 
@@ -76,7 +75,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 				}
 			}
 
-			class ModeFactory<T> : ValidatedParameterizedSourceBase<ImmutableArray<T>, T>
+			class ModeFactory<T> : ParameterizedSourceBase<ImmutableArray<T>, T>
 			{
 				public static ModeFactory<T> Instance { get; } = new ModeFactory<T>();
 				public override T Get( ImmutableArray<T> parameter ) => parameter.ToArray().GroupBy( n => n ).OrderByDescending( g => g.Count() ).Select( g => g.Key ).FirstOrDefault();

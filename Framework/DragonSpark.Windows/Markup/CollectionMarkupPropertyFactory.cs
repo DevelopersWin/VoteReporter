@@ -3,6 +3,7 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -11,7 +12,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using DragonSpark.Sources.Parameterized;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
@@ -46,7 +46,7 @@ namespace DragonSpark.Windows.Markup
 			parameter.Get<IProvideValueTarget>().TargetObject.With( o => o is IList && o.Adapt().GetEnumerableType() != null );
 	}
 
-	public class PropertyReferenceFactory : ValidatedParameterizedSourceBase<IServiceProvider, PropertyReference>
+	public class PropertyReferenceFactory : ParameterizedSourceBase<IServiceProvider, PropertyReference>
 	{
 		public static PropertyReferenceFactory Instance { get; } = new PropertyReferenceFactory();
 
@@ -55,7 +55,7 @@ namespace DragonSpark.Windows.Markup
 
 		public PropertyReferenceFactory() : this( ExpressionEvaluator.Instance ) {}
 
-		public PropertyReferenceFactory( [Required]IExpressionEvaluator evaluator )
+		public PropertyReferenceFactory( IExpressionEvaluator evaluator )
 		{
 			this.evaluator = evaluator;
 			create = Create;

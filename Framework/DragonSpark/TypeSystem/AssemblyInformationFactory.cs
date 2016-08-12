@@ -1,15 +1,14 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.TypeSystem
 {
 	[Export, Shared]
-	public class AssemblyInformationFactory : ValidatedParameterizedSourceBase<Assembly, AssemblyInformation>
+	public class AssemblyInformationFactory : ParameterizedSourceBase<Assembly, AssemblyInformation>
 	{
 		readonly static System.Type[] Attributes =
 		{

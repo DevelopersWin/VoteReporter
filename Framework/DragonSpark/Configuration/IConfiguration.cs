@@ -1,13 +1,12 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Configuration
 {
@@ -17,7 +16,7 @@ namespace DragonSpark.Configuration
 		protected ConfigurableParameterizedFactoryBase( IParameterizedScope<TConfiguration> seed, IParameterizedScope<ImmutableArray<ITransformer<TConfiguration>>> configurators, Func<TConfiguration, object, TResult> factory ) : base( seed, configurators, factory ) {}
 	}
 
-	public abstract class ConfigurableParameterizedFactoryBase<TConfiguration, TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
+	public abstract class ConfigurableParameterizedFactoryBase<TConfiguration, TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
 	{
 		readonly Func<TConfiguration, TParameter, TResult> factory;
 

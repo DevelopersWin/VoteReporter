@@ -1,10 +1,10 @@
 using DragonSpark.Extensions;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using Microsoft.Practices.Unity;
 using System;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -20,7 +20,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	class AttributedLifetimeFactory : ValidatedParameterizedSourceBase<Type, Type>
+	class AttributedLifetimeFactory : ParameterizedSourceBase<Type, Type>
 	{
 		public static ICache<Type, Type> Instance { get; } = new AttributedLifetimeFactory().ToCache();
 			
@@ -32,7 +32,7 @@ namespace DragonSpark.Activation.IoC
 	}
 
 	[Persistent]
-	public class LifetimeManagerFactory : ValidatedParameterizedSourceBase<Type, LifetimeManager>
+	public class LifetimeManagerFactory : ParameterizedSourceBase<Type, LifetimeManager>
 	{
 		readonly static Func<Type, Type> LifetimeTypeFactory = AttributedLifetimeFactory.Instance.Get;
 

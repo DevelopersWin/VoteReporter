@@ -1,14 +1,13 @@
-using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
-	public sealed class MetadataCustomizationFactory<T> : ValidatedParameterizedSourceBase<MethodBase, ImmutableArray<T>> where T : class
+	public sealed class MetadataCustomizationFactory<T> : ParameterizedSourceBase<MethodBase, ImmutableArray<T>> where T : class
 	{
 		public static MetadataCustomizationFactory<T> Instance { get; } = new MetadataCustomizationFactory<T>();
 		MetadataCustomizationFactory() {}

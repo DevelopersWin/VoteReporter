@@ -1,12 +1,11 @@
-using DragonSpark.Activation;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.IO;
 using System.Xaml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
@@ -19,7 +18,7 @@ namespace DragonSpark.Windows.Runtime.Data
 		public string Save( object item ) => XamlServices.Save( item );
 	}
 
-	public abstract class DataTransformerBase<T> : ValidatedParameterizedSourceBase<DataTransformParameter, T> {}
+	public abstract class DataTransformerBase<T> : ParameterizedSourceBase<DataTransformParameter, T> {}
 
 	public abstract class DataTransformer<T> : DataTransformerBase<T>
 	{
