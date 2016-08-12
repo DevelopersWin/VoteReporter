@@ -23,7 +23,7 @@ namespace DevelopersWin.VoteReporter
 
 		public Uri Generate()
 		{
-			var report = factory.Create();
+			var report = factory.Get();
 			var content = generator.Generate( report );
 			var result = storage.Save( content );
 			return result;

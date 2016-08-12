@@ -3,12 +3,12 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.IoC;
 using DragonSpark.Testing.Framework.Parameters;
+using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using System;
 using System.Composition;
-using DragonSpark.Testing.Framework.Setup;
 using Xunit;
 using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
@@ -21,7 +21,7 @@ namespace DragonSpark.Testing.ComponentModel
 	public class DefaultValueProviderTests
 	{
 		[Export]
-		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Create();
+		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Get();
 
 		public class Activator : LocatorBase
 		{

@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Objects;
 using Serilog;
@@ -52,9 +53,9 @@ namespace DragonSpark.Testing.Setup
 
 		}
 
-		class ClassFactory : FactoryBase<Class>
+		class ClassFactory : SourceBase<Class>
 		{
-			public override Class Create() => new ClassFromFactory();
+			public override Class Get() => new ClassFromFactory();
 
 			public class ClassFromFactory : Class {}
 		}

@@ -4,6 +4,7 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Commands;
 using DragonSpark.Windows.Properties;
@@ -13,7 +14,6 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -24,10 +24,10 @@ namespace DragonSpark.Windows.Setup
 
 		public override FileInfo Create( ConfigurationUserLevel parameter ) => new FileInfo( ConfigurationManager.OpenExeConfiguration( parameter ).FilePath );
 	}
-
+	
 	public static class Defaults
 	{
-		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Instance.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).Create().Sourced().Get;
+		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Instance.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).Fix();
 	}
 
 	public class ClearUserSettingCommand : DelegatedFixedCommand<FileInfo>

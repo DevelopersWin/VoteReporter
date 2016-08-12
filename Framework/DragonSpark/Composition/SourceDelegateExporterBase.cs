@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using System;
@@ -9,7 +10,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using DragonSpark.Runtime.Sources.Caching;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 
@@ -145,7 +145,7 @@ namespace DragonSpark.Composition
 		{
 			using ( stack.Assignment( new CompositeActivatorParameters( context, operation ) ) )
 			{
-				return Create();
+				return Get();
 			}
 		}
 	}

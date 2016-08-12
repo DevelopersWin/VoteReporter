@@ -1,13 +1,13 @@
 using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Windows.Entity;
 using PostSharp.Patterns.Contracts;
 using System.Linq;
-using DragonSpark.Activation;
 
 namespace DevelopersWin.VoteReporter
 {
-	public class RecordingFactory : FactoryBase<Recording>
+	public class RecordingFactory : SourceBase<Recording>
 	{
 		readonly VotingContext context;
 		readonly IVoteProvider provider;
@@ -20,7 +20,7 @@ namespace DevelopersWin.VoteReporter
 			this.updater = updater;
 		}
 
-		public override Recording Create()
+		public override Recording Get()
 		{
 			var result = context.Create<Recording>();
 			var votes = provider.Retrieve( result ).ToArray();

@@ -63,9 +63,9 @@ namespace DragonSpark.Runtime.Sources
 		class Delegates : Cache<Func<ISource>, Func<object>>
 		{
 			public static Delegates Default { get; } = new Delegates();
-			Delegates() : base( source => new Factory( source ).Create ) {}
+			Delegates() : base( source => new Factory( source ).Get ) {}
 
-			class Factory : FactoryBase<object>
+			class Factory : SourceBase<object>
 			{
 				readonly Func<ISource> source;
 				public Factory( Func<ISource> source )
@@ -73,7 +73,7 @@ namespace DragonSpark.Runtime.Sources
 					this.source = source;
 				}
 
-				public override object Create() => source().Get();
+				public override object Get() => source().Get();
 			}
 		}
 
@@ -82,9 +82,9 @@ namespace DragonSpark.Runtime.Sources
 		class Delegates<T> : Cache<Func<ISource<T>>, Func<T>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( source => new Factory( source ).Create ) {}
+			Delegates() : base( source => new Factory( source ).Get ) {}
 
-			class Factory : FactoryBase<T>
+			class Factory : SourceBase<T>
 			{
 				readonly Func<ISource<T>> source;
 				public Factory( Func<ISource<T>> source )
@@ -92,7 +92,7 @@ namespace DragonSpark.Runtime.Sources
 					this.source = source;
 				}
 
-				public override T Create() => source().Get();
+				public override T Get() => source().Get();
 			}
 		}
 

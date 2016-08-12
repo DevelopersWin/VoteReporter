@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Extensions
 			var level = MinimumLevelConfiguration.Instance.Get();
 			Assert.Equal( LogEventLevel.Debug, level );
 
-			var creator = Creator.Default.Get( sut );
+			var creator = Origin.Default.Get( sut );
 			Assert.IsType<UnityContainerFactory>( creator );
 
 			var provider = sut.Resolve<IServiceProvider>();

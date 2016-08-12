@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute
 	{
-		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Create;
+		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Get;
 		
 		public AutoDataAttribute() : this( DefaultFixtureFactory ) {}
 

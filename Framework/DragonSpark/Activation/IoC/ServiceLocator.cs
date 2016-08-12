@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Aspects;
+using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
@@ -54,13 +55,13 @@ namespace DragonSpark.Activation.IoC
 		public IUnityContainer Container { get; }
 	}
 
-	public sealed class UnityContainerFactory : AggregateFactoryBase<IUnityContainer>
+	public sealed class UnityContainerFactory : ConfigurableFactoryBase<IUnityContainer>
 	{
 		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
 		UnityContainerFactory() : base( () => new UnityContainer().Extend<DefaultBehaviorExtension>() ) {}
 
-		[Creator]
-		public override IUnityContainer Create() => base.Create();
+		[Origin]
+		public override IUnityContainer Get() => base.Get();
 	}
 
 	public class DefaultBehaviorExtension : UnityContainerExtension

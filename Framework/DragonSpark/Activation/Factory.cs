@@ -2,6 +2,8 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
@@ -11,8 +13,6 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
 using Type = System.Type;
 
 namespace DragonSpark.Activation
@@ -20,7 +20,7 @@ namespace DragonSpark.Activation
 	public sealed class IsSourceSpecification : AdapterSpecificationBase
 	{
 		public static ISpecification<Type> Instance { get; } = new IsSourceSpecification().Cached();
-		IsSourceSpecification() : base( typeof(ISource<>), typeof(ISource), typeof(IFactory<>), typeof(IFactory) ) {}
+		IsSourceSpecification() : base( typeof(ISource<>), typeof(ISource) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
 	}
@@ -68,7 +68,7 @@ namespace DragonSpark.Activation
 	public sealed class ResultTypes : TypeLocatorBase
 	{
 		public static ICache<Type, Type> Instance { get; } = new ResultTypes();
-		ResultTypes() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(IFactory<,>), typeof(IFactory<>), typeof(Func<>), typeof(Func<,>) ) {}
+		ResultTypes() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(IFactory<,>), typeof(Func<>), typeof(Func<,>) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}

@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Theory, AutoData, IoCTypes, FrameworkTypes]
 		public void ConstructorSelection()
 		{
-			var container = UnityContainerFactory.Instance.Create();
+			var container = UnityContainerFactory.Instance.Get();
 
 			Assert.NotNull( container );
 

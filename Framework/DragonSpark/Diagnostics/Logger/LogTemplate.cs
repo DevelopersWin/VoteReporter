@@ -92,7 +92,7 @@ namespace DragonSpark.Diagnostics.Logger
 		public LogExceptionCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerExceptionTemplateParameterFactory.Instance.Create ) {}
 	}
 
-	public sealed class Logging : AggregateParameterizedFactoryBase<LoggerConfiguration, ILogger>
+	public sealed class Logging : ConfigurableParameterizedFactoryBase<LoggerConfiguration, ILogger>
 	{
 		public static IParameterizedSource<ILogger> Instance { get; } = new Logging().ToCache();
 		Logging() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Instance.Get, ( configuration, parameter ) => configuration.CreateLogger().ForSource( parameter ) ) {}

@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Activation.IoC
 	public class RegistrationSupportTests
 	{
 		[Export]
-		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Create();
+		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Get();
 
 		[Theory, Framework.Setup.AutoData]
 		public void Mapping( [Frozen]IUnityContainer sut, TransientServiceRegistry registry )

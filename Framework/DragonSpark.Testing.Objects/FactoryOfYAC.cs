@@ -1,4 +1,4 @@
-using DragonSpark.Activation;
+using DragonSpark.Runtime.Sources;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
@@ -6,7 +6,7 @@ using System.Composition;
 namespace DragonSpark.Testing.Objects
 {
 	[Export]
-	public class FactoryOfYAC : FactoryBase<YetAnotherClass>
+	public class FactoryOfYAC : SourceBase<YetAnotherClass>
 	{
 		readonly Func<YetAnotherClass> inner;
 
@@ -17,6 +17,6 @@ namespace DragonSpark.Testing.Objects
 			this.inner = inner;
 		}
 
-		public override YetAnotherClass Create() => inner();
+		public override YetAnotherClass Get() => inner();
 	}
 }

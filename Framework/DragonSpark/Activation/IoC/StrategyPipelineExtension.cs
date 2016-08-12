@@ -3,6 +3,7 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
@@ -16,7 +17,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Sources.Caching;
 using Delegate = System.Delegate;
 using Type = System.Type;
 
@@ -77,7 +77,7 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
-			var creator = (object)Creator.Default.Get( Container )?.GetType() ?? Execution.Current();
+			var creator = (object)Origin.Default.Get( Container )?.GetType() ?? Execution.Current();
 			var policies = repository.List();
 			var policy = new BuildPlanCreatorPolicy( Policies.GetOrSet( creator, Create ), policies );
 			Context.Policies.SetDefault<IBuildPlanCreatorPolicy>( policy );
@@ -117,9 +117,9 @@ namespace DragonSpark.Activation.IoC
 	public class StrategyPipelineExtension : UnityContainerExtension
 	{
 		readonly IStrategyRepository strategyRepository;
-		readonly StrategyEntryFactory factory;
+		readonly DefaultStrategyEntries factory;
 
-		public StrategyPipelineExtension( IStrategyRepository strategyRepository, StrategyEntryFactory factory )
+		public StrategyPipelineExtension( IStrategyRepository strategyRepository, DefaultStrategyEntries factory )
 		{
 			this.strategyRepository = strategyRepository;
 			this.factory = factory;
@@ -127,7 +127,7 @@ namespace DragonSpark.Activation.IoC
 
 		protected override void Initialize()
 		{
-			factory.Create().Each( strategyRepository.Add );
+			factory.Get().Each( strategyRepository.Add );
 
 			Context.Strategies.Clear();
 
@@ -137,18 +137,18 @@ namespace DragonSpark.Activation.IoC
 			}
 		}
 
-		public class StrategyEntryFactory : FactoryBase<IEnumerable<StrategyEntry>>
+		public class DefaultStrategyEntries : SourceBase<IEnumerable<StrategyEntry>>
 		{
 			readonly MetadataLifetimeStrategy metadataLifetimeStrategy;
 			readonly ConventionStrategy conventionStrategy;
 
-			public StrategyEntryFactory( MetadataLifetimeStrategy metadataLifetimeStrategy, ConventionStrategy conventionStrategy )
+			public DefaultStrategyEntries( MetadataLifetimeStrategy metadataLifetimeStrategy, ConventionStrategy conventionStrategy )
 			{
 				this.metadataLifetimeStrategy = metadataLifetimeStrategy;
 				this.conventionStrategy = conventionStrategy;
 			}
 
-			public override IEnumerable<StrategyEntry> Create() => new[]
+			public override IEnumerable<StrategyEntry> Get() => new[]
 			{
 				new StrategyEntry( metadataLifetimeStrategy, UnityBuildStage.Lifetime, Priority.Higher ),
 				new StrategyEntry( conventionStrategy, UnityBuildStage.PreCreation )
@@ -286,7 +286,7 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConventionImplementedInterfaces : FactoryCache<Type, Type>
 	{
-		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces( typeof(ISource), typeof(IParameterizedSource), typeof(IFactory), typeof(IFactoryWithParameter) );
+		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces( typeof(ISource), typeof(IParameterizedSource), typeof(IFactoryWithParameter) );
 		ConventionImplementedInterfaces( params Type[] ignore ) : this( ignore.ToImmutableArray() ) {}
 
 		readonly ImmutableArray<Type> ignore;

@@ -37,7 +37,7 @@ namespace DragonSpark.Testing.Framework
 
 	/*public class RegisterFactoryAttribute : RegistrationBaseAttribute
 	{
-		public RegisterFactoryAttribute( [Required, OfFactoryType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( factoryType ) ) ) {}
+		public RegisterFactoryAttribute( [Required, OfSourceType]Type factoryType ) : base( t => new RegistrationCustomization( new FactoryRegistration( factoryType ) ) ) {}
 	}
 
 	public class FactoryRegistration : IRegistration
@@ -46,7 +46,7 @@ namespace DragonSpark.Testing.Framework
 
 		readonly RegisterFactoryParameter parameter;
 
-		public FactoryRegistration( [OfFactoryType]Type factoryType, params Type[] registrationTypes ) : this( new RegisterFactoryParameter( factoryType, registrationTypes ) ) {}
+		public FactoryRegistration( [OfSourceType]Type factoryType, params Type[] registrationTypes ) : this( new RegisterFactoryParameter( factoryType, registrationTypes ) ) {}
 
 		FactoryRegistration( RegisterFactoryParameter parameter )
 		{
@@ -63,9 +63,9 @@ namespace DragonSpark.Testing.Framework
 
 	public struct RegisterFactoryParameter
 	{
-		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType, params Type[] registrationTypes ) : this( factoryType, registrationTypes.WhereAssigned().Append( ResultTypes.Instance.Get( factoryType ) ).Distinct().ToImmutableArray() ) {}
+		public RegisterFactoryParameter( [Required, OfSourceType]Type factoryType, params Type[] registrationTypes ) : this( factoryType, registrationTypes.WhereAssigned().Append( ResultTypes.Instance.Get( factoryType ) ).Distinct().ToImmutableArray() ) {}
 
-		public RegisterFactoryParameter( [Required, OfFactoryType]Type factoryType, ImmutableArray<Type> registerTypes )
+		public RegisterFactoryParameter( [Required, OfSourceType]Type factoryType, ImmutableArray<Type> registerTypes )
 		{
 			FactoryType = factoryType;
 			RegisterTypes = registerTypes;

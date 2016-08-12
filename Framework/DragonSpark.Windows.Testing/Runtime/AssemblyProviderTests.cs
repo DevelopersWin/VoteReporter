@@ -1,5 +1,5 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		{
 			Assert.Same( sut, FileSystemTypes.Instance );
 			var assemblies = sut.Get().Assemblies();
-			var specification = new ApplicationAssemblySpecification( typeof(IFactory).Assembly.ToItem() );
+			var specification = new ApplicationAssemblySpecification( typeof(ISource).Assembly.ToItem() );
 
 			Assert.True( assemblies.All( specification.IsSatisfiedBy ) );
 		} 

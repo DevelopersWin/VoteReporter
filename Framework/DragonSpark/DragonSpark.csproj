@@ -40,7 +40,6 @@
     <Compile Include="Activation\IoC\StrategyEntryCollection.cs" />
     <Compile Include="Activation\IoC\UnityContainerFactory.cs" />
     <Compile Include="Activation\ParameterAware.cs" />
-    <Compile Include="Activation\ScopeBase.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Activation\Factory.cs" />
     <Compile Include="Activation\IExecutionContextSource.cs" />

@@ -1,5 +1,5 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Activation.IoC;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
 using Microsoft.Practices.Unity;
@@ -21,7 +21,7 @@ namespace DragonSpark.Testing.Activation.IoC
 		[Fact]
 		public void Create()
 		{
-			var container = UnityContainerFactory.Instance.Create();
+			var container = UnityContainerFactory.Instance.Get();
 			var sut = new InjectionFactoryFactory( typeof(Factory) );
 			container.RegisterType<IItem, Item>( new ContainerControlledLifetimeManager() );
 			var expected = container.Resolve<IItem>();
@@ -30,9 +30,9 @@ namespace DragonSpark.Testing.Activation.IoC
 			Assert.Equal( expected, container.Resolve<IItem>() );
 		}
 
-		class Factory : FactoryBase<IItem>
+		class Factory : SourceBase<IItem>
 		{
-			public override IItem Create() => null;
+			public override IItem Get() => null;
 		}
 
 		interface IItem

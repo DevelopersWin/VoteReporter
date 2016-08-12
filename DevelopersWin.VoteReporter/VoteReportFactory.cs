@@ -1,13 +1,13 @@
 using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Activation;
 
 namespace DevelopersWin.VoteReporter
 {
-	public class VoteReportFactory : FactoryBase<VoteReport>
+	public class VoteReportFactory : SourceBase<VoteReport>
 	{
 		readonly VotingContext context;
 
@@ -16,7 +16,7 @@ namespace DevelopersWin.VoteReporter
 			this.context = context;
 		}
 
-		public override VoteReport Create()
+		public override VoteReport Get()
 		{
 			var recordings = context.Recordings.OrderByDescending( recording => recording.Created );
 			var current = recordings.First();

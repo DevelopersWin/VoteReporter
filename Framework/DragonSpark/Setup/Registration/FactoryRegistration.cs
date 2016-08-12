@@ -2,9 +2,9 @@ using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using System;
-using DragonSpark.Runtime.Sources.Caching;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Setup.Registration
@@ -91,11 +91,11 @@ namespace DragonSpark.Setup.Registration
 		protected override Func<object> Create( Type parameter )
 		{
 			var factory = factorySource( parameter );
-			var result = factory != null ? new Factory( factory, new FixedFactory<Type, object>( parameterSource, ParameterTypes.Instance.Get( parameter ) ).Create ).Create : (Func<object>)null;
+			var result = factory != null ? factory.Fixed( parameterSource.Fixed( ParameterTypes.Instance.Get( parameter ) ).Get ).Get : (Func<object>)null;
 			return result;
 		}
 
-		sealed class Factory : FactoryBase<object>
+		/*sealed class Factory : SourceBase<object>
 		{
 			readonly Func<object, object> factory;
 			readonly Func<object> parameter;
@@ -106,8 +106,8 @@ namespace DragonSpark.Setup.Registration
 				this.parameter = parameter;
 			}
 
-			public override object Create() => factory( parameter() );
-		}
+			public override object Get() => factory( parameter() );
+		}*/
 	}
 
 	/*public class SourceDelegates<TParameter, TResult> : FactoryCache<Func<object, object>, Func<TParameter, TResult>>

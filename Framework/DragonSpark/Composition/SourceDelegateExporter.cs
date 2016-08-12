@@ -41,9 +41,9 @@ namespace DragonSpark.Composition
 
 		readonly Func<Type, Type> resultTypeLocator;
 
-		public SourceDelegateContractResolver( [OfFactoryType]Type factoryDelegateType ) : this( factoryDelegateType, ResultTypeLocator ) {}
+		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType ) : this( factoryDelegateType, ResultTypeLocator ) {}
 
-		public SourceDelegateContractResolver( [OfFactoryType]Type factoryDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Instance.And( new GenericTypeAssignableSpecification( factoryDelegateType ) ).Cast<CompositionContract>( contract => contract.ContractType ) )
+		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Instance.And( new GenericTypeAssignableSpecification( factoryDelegateType ) ).Cast<CompositionContract>( contract => contract.ContractType ) )
 		{
 			this.resultTypeLocator = resultTypeLocator;
 		}

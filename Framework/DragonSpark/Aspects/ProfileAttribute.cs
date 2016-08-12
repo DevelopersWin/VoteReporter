@@ -16,7 +16,7 @@ namespace DragonSpark.Aspects
 
 		public ProfileAttribute() {}
 
-		public ProfileAttribute( [OfFactoryType, Optional] Type factoryType )
+		public ProfileAttribute( [OfSourceType, Optional] Type factoryType )
 		{
 			this.factoryType = factoryType;
 		}

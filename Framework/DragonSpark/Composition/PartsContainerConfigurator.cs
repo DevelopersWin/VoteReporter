@@ -14,7 +14,7 @@ using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
 {
-	public sealed class CompositionHostFactory : AggregateFactoryBase<ContainerConfiguration, CompositionHost>
+	public sealed class CompositionHostFactory : ConfigurableFactoryBase<ContainerConfiguration, CompositionHost>
 	{
 		readonly static IConfigurationScope<ContainerConfiguration> Default = new ConfigurationScope<ContainerConfiguration>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
 
@@ -74,7 +74,7 @@ namespace DragonSpark.Composition
 				activate = Activate;
 			}
 
-			object Activate( LifetimeContext context, CompositionOperation operation ) => Create();
+			object Activate( LifetimeContext context, CompositionOperation operation ) => Get();
 
 			public ExportDescriptor Create( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( activate, NoMetadata );
 		}

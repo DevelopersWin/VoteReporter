@@ -1,5 +1,5 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -47,11 +47,11 @@ namespace DragonSpark.Windows.Testing.Runtime
 		}
 
 		[Export]
-		public class ExceptionManagerFactory : FactoryBase<ExceptionManager>
+		public class ExceptionManagerFactory : SourceBase<ExceptionManager>
 		{
 			internal const string ExceptionReplaced = "Exception Replaced", ExceptionWrapped = "Exception Wrapped";
 
-			public override ExceptionManager Create()
+			public override ExceptionManager Get()
 			{
 				var policies = new[]
 				{

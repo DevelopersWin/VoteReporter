@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -81,9 +82,9 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			}
 
 			public override ImmutableArray<Result> Create( Parameter parameter ) => 
-				parameter.Actions.Introduce( parameter, tuple => new Run( tuple.Item1, tuple.Item2.NumberOfRuns, tuple.Item2.PerRun ).Create() ).ToImmutableArray();
+				parameter.Actions.Introduce( parameter, tuple => new Run( tuple.Item1, tuple.Item2.NumberOfRuns, tuple.Item2.PerRun ).Get() ).ToImmutableArray();
 
-			class Run : FactoryBase<Result>
+			class Run : SourceBase<Result>
 			{
 				readonly Action action;
 				readonly int numberOfSamples;
@@ -96,7 +97,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 					this.perSample = perSample;
 				}
 
-				public override Result Create()
+				public override Result Get()
 				{
 					/*GC.Collect();
 					GC.WaitForPendingFinalizers();*/

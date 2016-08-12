@@ -1,6 +1,6 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -8,11 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Activation
 {
-	public interface IFactory : ICreator
+	/*public interface IFactory
 	{
 		object Create();
 	}
@@ -20,7 +19,7 @@ namespace DragonSpark.Activation
 	public interface IFactory<out T> : IFactory
 	{
 		new T Create();
-	}
+	}*/
 
 	public interface ITransformer<T> : IParameterizedSource<T, T> {}
 
@@ -55,8 +54,11 @@ namespace DragonSpark.Activation
 		public static Func<object, T> Wrap<T>( this T @this ) => @this.Wrap<object, T>();
 
 		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) => Factory.For( @this ).Wrap<TParameter, TResult>();
-		
-		public static IFactory<TResult> Fixed<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, TParameter parameter ) => new FixedFactory<TParameter, TResult>( @this.ToDelegate(), parameter );
+
+		public static ISource<TResult> Fixed<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, TParameter parameter ) => @this.ToDelegate().Fixed( parameter );
+		public static ISource<TResult> Fixed<TParameter, TResult>( this Func<TParameter, TResult> @this, TParameter parameter ) => @this.Fixed( Factory.For( parameter ) );
+
+		public static ISource<TResult> Fixed<TParameter, TResult>( this Func<TParameter, TResult> @this, Func<TParameter> parameter ) => new FixedFactory<TParameter, TResult>( @this, parameter );
 
 		public static Func<object, T> Wrap<T>( this ISource<T> @this ) => @this.Wrap<object, T>();
 
@@ -86,9 +88,9 @@ namespace DragonSpark.Activation
 		sealed class Delegates<T> : Cache<Func<T>, Func<object>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( result => new Converter( result ).Create ) {}
+			Delegates() : base( result => new Converter( result ).Get ) {}
 
-			class Converter : FactoryBase<object>
+			class Converter : SourceBase<object>
 			{
 				readonly Func<T> @from;
 				public Converter( Func<T> from )
@@ -96,7 +98,7 @@ namespace DragonSpark.Activation
 					this.@from = @from;
 				}
 
-				public override object Create() => from();
+				public override object Get() => from();
 			}
 		}
 
@@ -104,9 +106,9 @@ namespace DragonSpark.Activation
 		sealed class Delegates<TFrom, TTo> : Cache<Func<TFrom>, Func<TTo>> where TTo : TFrom
 		{
 			public static Delegates<TFrom, TTo> Default { get; } = new Delegates<TFrom, TTo>();
-			Delegates() : base( result => new Converter( result ).Create ) {}
+			Delegates() : base( result => new Converter( result ).Get ) {}
 
-			class Converter : FactoryBase<TTo>
+			class Converter : SourceBase<TTo>
 			{
 				readonly Func<TFrom> @from;
 				public Converter( Func<TFrom> from )
@@ -114,7 +116,7 @@ namespace DragonSpark.Activation
 					this.@from = @from;
 				}
 
-				public override TTo Create() => (TTo)from();
+				public override TTo Get() => (TTo)from();
 			}
 		}
 

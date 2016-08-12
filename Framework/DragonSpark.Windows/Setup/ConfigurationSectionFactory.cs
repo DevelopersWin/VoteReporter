@@ -1,5 +1,5 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Configuration;
@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class ConfigurationSectionFactory<T> : FactoryBase<T> where T : ConfigurationSection
+	public class ConfigurationSectionFactory<T> : SourceBase<T> where T : ConfigurationSection
 	{
 		readonly Func<string, object> factory;
 
@@ -18,7 +18,7 @@ namespace DragonSpark.Windows.Setup
 			this.factory = factory;
 		}
 
-		public override T Create()
+		public override T Get()
 		{
 			var name = typeof(T).Name.SplitCamelCase().First().ToLower();
 			var result = factory( name ) as T;

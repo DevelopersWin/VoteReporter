@@ -19,15 +19,15 @@ namespace DragonSpark.ComponentModel
 
 		static object Create( Type type ) => Activator.Activate<ISource>( type ).Get();
 
-		/*public class Creator : ServicesValueProvider.Category
+		/*public class Origin : ServicesValueProvider.Category
 		{
-			public new static Creator Instance { get; } = new Creator();
+			public new static Origin Instance { get; } = new Origin();
 
 			readonly Func<Type, IValue> factory;
 
-			public Creator() : this( new ServicesValueProvider.Creator<IValue>().Create ) { }
+			public Origin() : this( new ServicesValueProvider.Origin<IValue>().Create ) { }
 
-			protected Creator( [Required]Func<Type, IValue> factory )
+			protected Origin( [Required]Func<Type, IValue> factory )
 			{
 				this.factory = factory;
 			}

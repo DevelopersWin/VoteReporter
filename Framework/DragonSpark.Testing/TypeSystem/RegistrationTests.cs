@@ -1,5 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
@@ -7,9 +9,7 @@ using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
-using System.Linq;
 using System.Reflection;
-using DragonSpark.Extensions;
 using Xunit;
 using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
 
@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.TypeSystem
 		public void IsFactory()
 		{
 			var result = SourceInterfaces.Instance.Get( typeof(UnityContainerFactory) );
-			Assert.Equal( typeof(IFactory<IUnityContainer>), result );
+			Assert.Equal( typeof(ISource<IUnityContainer>), result );
 
 			var implemented = ConventionImplementedInterfaces.Instance.Get( typeof(UnityContainerFactory) );
 			Assert.Null( implemented );

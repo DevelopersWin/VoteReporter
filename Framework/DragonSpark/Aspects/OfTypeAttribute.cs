@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace DragonSpark.Aspects
 {
-	public class OfFactoryType : OfTypeAttribute
+	public class OfSourceType : OfTypeAttribute
 	{
-		public OfFactoryType() : base( typeof(IFactory), typeof(IFactoryWithParameter), typeof(Func<>), typeof(Func<,>) ) {}
+		public OfSourceType() : base( typeof(IFactoryWithParameter), typeof(Func<>), typeof(Func<,>) ) {}
 	}
 
 	public class OfTypeAttribute : LocationContractAttribute, ILocationValidationAspect<Type>

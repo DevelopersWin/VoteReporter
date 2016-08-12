@@ -22,7 +22,7 @@ namespace DragonSpark.Composition
 
 		public override IServiceProvider Get( IServiceProvider parameter )
 		{
-			var context = CompositionHostFactory.Instance.Create();
+			var context = CompositionHostFactory.Instance.Get();
 			var primary = new ServiceLocator( context );
 			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, parameter );
 			return result;
@@ -32,7 +32,7 @@ namespace DragonSpark.Composition
 	public class ServiceProviderConfigurations : Setup.ServiceProviderConfigurations
 	{
 		public new static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
-		ServiceProviderConfigurations() : this( DefaultServiceProviderSource.Instance.Create ) {}
+		ServiceProviderConfigurations() : this( DefaultServiceProviderSource.Instance.Get ) {}
 
 		readonly Func<IServiceProvider> provider;
 
@@ -40,7 +40,7 @@ namespace DragonSpark.Composition
 
 		ServiceProviderConfigurations( Func<IServiceProvider> provider, Action<IServiceProvider> configure )
 		{
-			this.provider = new ConfiguringFactory<IServiceProvider>( provider, configure ).Create;
+			this.provider = new ConfiguringFactory<IServiceProvider>( provider, configure ).Get;
 		}
 
 		protected override IEnumerable<ICommand> Yield()

@@ -21,7 +21,7 @@ namespace DevelopersWin.VoteReporter
 
 		public Recording Record()
 		{
-			var result = factory.Create();
+			var result = factory.Get();
 			context.Save();
 			return result;
 		}

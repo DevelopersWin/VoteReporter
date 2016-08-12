@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
@@ -16,16 +17,16 @@ namespace DragonSpark.Aspects
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Tracing )]
-	public sealed class CreatorAttribute : OnMethodBoundaryAspect
+	public sealed class OriginAttribute : OnMethodBoundaryAspect
 	{
 		public override void OnSuccess( MethodExecutionArgs args )
 		{
 			if ( args.ReturnValue != null )
 			{
-				var creator = args.Instance as ICreator;
+				var creator = args.Instance as ISource;
 				if ( creator != null )
 				{
-					Creator.Default.Set( args.ReturnValue, creator );
+					Origin.Default.Set( args.ReturnValue, creator );
 				}
 			}
 		}

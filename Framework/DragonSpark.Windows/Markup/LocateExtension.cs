@@ -39,19 +39,19 @@ namespace DragonSpark.Windows.Markup
 	}
 
 	[ContentProperty( nameof(Instance) )]
-	public class FactoryExtension : MarkupExtensionBase
+	public class SourceExtension : MarkupExtensionBase
 	{
-		public FactoryExtension() {}
+		public SourceExtension() {}
 
-		public FactoryExtension( [Required]IFactory instance )
+		public SourceExtension( [Required]ISource instance )
 		{
 			Instance = instance;
 		}
 
 		[Required]
-		public IFactory Instance { [return: Required]get; set; }
+		public ISource Instance { [return: Required]get; set; }
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Instance.Create();
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Instance.Get();
 	}
 
 	public class MockFactory : FactoryBase<Type, object>
@@ -182,7 +182,7 @@ namespace DragonSpark.Windows.Markup
 		protected abstract object GetValue( MarkupServiceProvider serviceProvider );
 	}
 
-	public class SourceExtension : MarkupExtensionBase
+	/*public class SourceExtension : MarkupExtensionBase
 	{
 		readonly ISource store;
 
@@ -192,7 +192,7 @@ namespace DragonSpark.Windows.Markup
 		}
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) => store.Get();
-	}
+	}*/
 
 	public class FactoryTypeExtension : MarkupExtensionBase
 	{

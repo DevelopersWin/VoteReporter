@@ -1,4 +1,4 @@
-using DragonSpark.Activation;
+using DragonSpark.Runtime.Sources;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.AutoMoq;
 
@@ -16,17 +16,18 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	/*public class SetupFixtureFactory<T> : FixtureFactory<T> where T : SetupCustomization, new() {}*/
 
-	public class FixtureFactory<TWith> : FixtureFactory where TWith : ICustomization, new()
+	public class FixtureFactory<TWith> : FixtureFactoryBase where TWith : ICustomization, new()
 	{
-		public new static FixtureFactory<TWith> Instance { get; } = new FixtureFactory<TWith>();
+		public static FixtureFactory<TWith> Instance { get; } = new FixtureFactory<TWith>();
+		FixtureFactory() {}
 
-		public override IFixture Create() => base.Create().Customize( new TWith() );
+		public override IFixture Get() => base.Get().Customize( new TWith() );
 	}
 
-	public class FixtureFactory : FactoryBase<IFixture>
+	public abstract class FixtureFactoryBase : SourceBase<IFixture>
 	{
-		public static FixtureFactory Instance { get; } = new FixtureFactory();
+		// public static FixtureFactory Instance { get; } = new FixtureFactory();
 
-		public override IFixture Create() => new Fixture( DefaultEngineParts.Instance );
+		public override IFixture Get() => new Fixture( DefaultEngineParts.Instance );
 	}
 }

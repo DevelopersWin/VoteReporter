@@ -1,5 +1,5 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Sources;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -32,7 +32,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		sealed class Factory : DelegatedFactory<object>
+		sealed class Factory : DelegatedSource<object>
 		{
 			readonly CompositeActivator activate;
 
@@ -41,7 +41,7 @@ namespace DragonSpark.Composition
 				activate = Activate;
 			}
 
-			object Activate( LifetimeContext context, CompositionOperation operation ) => Create();
+			object Activate( LifetimeContext context, CompositionOperation operation ) => Get();
 
 			public ExportDescriptor Create( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( activate, NoMetadata );
 		}

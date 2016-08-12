@@ -1,9 +1,11 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -13,7 +15,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Setup
 {
@@ -54,7 +55,7 @@ namespace DragonSpark.Setup
 		public CompositeTypeSource( params ITypeSource[] sources ) : base( sources.Select( source => source.Get() ).Concat() ) {}
 	}*/
 
-	public sealed class ServiceProviderFactory : AggregateFactoryBase<IServiceProvider>
+	public sealed class ServiceProviderFactory : ConfigurableFactoryBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() : base( () => DefaultServiceProvider.Instance ) {}

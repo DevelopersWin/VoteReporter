@@ -1,21 +1,20 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.IO;
 using System.Reflection;
-using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Windows.Runtime
 {
 	public sealed class ApplicationAssembly : FixedFactory<IEnumerable<Assembly>, Assembly>
 	{
 		[Export]
-		public static ISource<Assembly> Instance { get; } = new Scope<Assembly>( Factory.Scope( new ApplicationAssembly().Create ) );
+		public static ISource<Assembly> Instance { get; } = new Scope<Assembly>( Factory.Scope( new ApplicationAssembly().Get ) );
 		ApplicationAssembly() : base( ApplicationAssemblyLocator.Instance.Get, ApplicationAssemblies.Instance.Get().AsEnumerable() ) {}
 	}
 
@@ -26,7 +25,7 @@ namespace DragonSpark.Windows.Runtime
 		public static ApplicationAssemblyLocator Instance { get; } = new ApplicationAssemblyLocator();
 		ApplicationAssemblyLocator() : this( AppDomain.CurrentDomain ) {}
 
-		public ApplicationAssemblyLocator( AppDomain domain ) : this( new FixedFactory<AppDomain, Assembly>( DomainApplicationAssemblies.Instance.Get, domain ).Create ) {}
+		public ApplicationAssemblyLocator( AppDomain domain ) : this( new FixedFactory<AppDomain, Assembly>( DomainApplicationAssemblies.Instance.Get, domain ).Get ) {}
 
 		public ApplicationAssemblyLocator( Func<Assembly> defaultSource )
 		{

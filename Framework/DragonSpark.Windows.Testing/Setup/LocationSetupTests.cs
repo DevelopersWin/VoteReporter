@@ -432,7 +432,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(ApplicationAssembly) )]
 		public void BasicComposition( IUnityContainer container )
 		{
-			using ( var host = CompositionHostFactory.Instance.Create() )
+			using ( var host = CompositionHostFactory.Instance.Get() )
 			{
 				var assembly = host.GetExport<Assembly>();
 				Assert.NotNull( assembly );

@@ -9,7 +9,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Load( ModulesConfiguration sut )
 		{
-			var section = new ModulesConfigurationSectionFactory( sut.Create ).Create();
+			var section = new ModulesConfigurationSectionFactory( sut.Create ).Get();
 			Assert.True( section.Modules.Count > 0 );
 			Assert.True( section.Modules[0].Dependencies.Count > 0 );
 			Assert.NotNull( section.Modules[0].Dependencies[0]  );

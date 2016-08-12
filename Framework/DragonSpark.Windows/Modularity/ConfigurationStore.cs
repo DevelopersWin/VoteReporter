@@ -20,7 +20,7 @@ namespace DragonSpark.Windows.Modularity
 	{
 		readonly ModulesConfigurationSection section;
 
-		public ConfigurationStore() : this( ModulesConfigurationSectionFactory.Instance.Create() ) {}
+		public ConfigurationStore() : this( ModulesConfigurationSectionFactory.Instance.Get() ) {}
 
 		public ConfigurationStore( ModulesConfigurationSection section )
 		{
