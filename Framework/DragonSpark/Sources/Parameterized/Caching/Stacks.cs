@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
-	public class Stacks<T> : SourceCache<IStack<T>>
+	public class Stacks<T> : DecoratedSourceCache<IStack<T>>
 	{
 		public static Stacks<T> Default { get; } = new Stacks<T>();
 
@@ -13,7 +13,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		protected Stacks( ICacheRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
 
-		protected Stacks( ICacheRegistry<IStack<T>> registry, IParameterizedSource<IAssignableSource<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.Get ) )
+		protected Stacks( ICacheRegistry<IStack<T>> registry, IParameterizedSource<IAssignableSource<IStack<T>>> factory ) : base( new ThreadLocalSourceCache<IStack<T>>( factory.Get ) )
 		{
 			registry.Register( factory, this );
 		}

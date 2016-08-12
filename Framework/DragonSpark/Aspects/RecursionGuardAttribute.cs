@@ -24,7 +24,7 @@ namespace DragonSpark.Aspects
 		readonly int maxCallCount;
 		readonly ICache<IDictionary<int, int>> cache;
 
-		public RecursionGuardAttribute( int maxCallCount = 2 ) : this( new SourceCache<IDictionary<int, int>>( new ThreadLocalStoreCache<IDictionary<int, int>>( () => new Dictionary<int, int>() ) ), maxCallCount ) {}
+		public RecursionGuardAttribute( int maxCallCount = 2 ) : this( new DecoratedSourceCache<IDictionary<int, int>>( new ThreadLocalSourceCache<IDictionary<int, int>>( () => new Dictionary<int, int>() ) ), maxCallCount ) {}
 
 		RecursionGuardAttribute( ICache<IDictionary<int, int>> cache, int maxCallCount = 2 )
 		{

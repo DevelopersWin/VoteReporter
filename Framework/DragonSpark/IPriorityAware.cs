@@ -40,7 +40,7 @@ namespace DragonSpark
 		public Priority Priority { get; }
 	}
 
-	public class AssociatedPriority : SourceCache<IPriorityAware>
+	public class AssociatedPriority : DecoratedSourceCache<IPriorityAware>
 	{
 		public static AssociatedPriority Instance { get; } = new AssociatedPriority();
 		AssociatedPriority() {}

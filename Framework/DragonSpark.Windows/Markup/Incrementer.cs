@@ -4,7 +4,7 @@ namespace DragonSpark.Windows.Markup
 {
 	class Incrementer : IIncrementer
 	{
-		readonly SourceCache<int> count = new SourceCache<int>();
+		readonly DecoratedSourceCache<int> count = new DecoratedSourceCache<int>();
 
 		public int Next( object context )
 		{

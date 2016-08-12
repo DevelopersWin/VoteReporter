@@ -53,18 +53,6 @@ namespace DragonSpark.Setup.Registration
 		}
 	}
 
-	/*public class SourceDelegatesFactory : 
-	{
-		/*
-		readonly static Func<Type, bool> FactoryWithParameterSpecification = TypeAssignableSpecification<IValidatedParameterizedSource>.Instance.ToDelegate();#1#
-
-		public static SourceDelegatesFactory Instance { get; } = new SourceDelegatesFactory();
-		SourceDelegatesFactory() : base(  ) {}
-
-		/*public FactoryDelegateLocatorFactory( SourceDelegates factory, FactoryWithActivatedParameterDelegateFactory factoryWithParameter ) 
-			: base( new AutoValidatingFactory<Type, Func<object>>( factory, SourceSpecification ), new AutoValidatingFactory<Type, Func<object>>( factoryWithParameter, FactoryWithParameterSpecification ) ) {}#1#
-	}*/
-
 	public abstract class DelegatesBase : FactoryCache<Type, Delegate>
 	{
 		protected DelegatesBase( Func<IServiceProvider> source ) : this( source, Specifications.Assigned ) {}

@@ -7,6 +7,7 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -15,7 +16,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Setup
 {
@@ -279,10 +279,10 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class IsActive : StoreCache<Type, bool>
+	public class IsActive : DecoratedSourceCache<Type, bool>
 	{
 		public static IParameterizedSource<IServiceProvider, IsActive> Default { get; } = new Cache<IServiceProvider, IsActive>( provider => new IsActive() );
-		IsActive() : base( new ThreadLocalStoreCache<Type, bool>() ) {}
+		IsActive() : base( new ThreadLocalSourceCache<Type, bool>() ) {}
 	}
 
 	public interface IDependencyLocatorKey {}

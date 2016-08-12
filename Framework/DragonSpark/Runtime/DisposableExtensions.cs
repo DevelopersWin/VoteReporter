@@ -20,7 +20,7 @@ namespace DragonSpark.Runtime
 		AssociatedDisposables() {}
 	}
 
-	public sealed class ConfigureAssociatedDisposables : StoreCache<IDisposable, bool>
+	public sealed class ConfigureAssociatedDisposables : DecoratedSourceCache<IDisposable, bool>
 	{
 		public static ConfigureAssociatedDisposables Instance { get; } = new ConfigureAssociatedDisposables();
 		ConfigureAssociatedDisposables() {}

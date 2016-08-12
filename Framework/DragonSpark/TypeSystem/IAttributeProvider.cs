@@ -19,7 +19,7 @@ namespace DragonSpark.TypeSystem
 
 		protected AttributeProviderBase()
 		{
-			defined = new StoreCache<Type, bool>( new WritableStoreCache<Type, bool>( new Func<Type, bool>( Contains ) ) );
+			defined = new DecoratedSourceCache<Type, bool>( new WritableSourceCache<Type, bool>( new Func<Type, bool>( Contains ) ) );
 			factory = new Cache<Type, IEnumerable<Attribute>>( GetAttributes );
 		}
 

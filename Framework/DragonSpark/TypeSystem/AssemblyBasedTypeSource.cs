@@ -128,7 +128,7 @@ namespace DragonSpark.TypeSystem
 		public string Hint { get; }
 	}
 
-	public class Activated : StoreCache<Assembly, bool>
+	public class Activated : DecoratedSourceCache<Assembly, bool>
 	{
 		public static Activated Property { get; } = new Activated();
 		Activated() {}

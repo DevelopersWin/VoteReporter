@@ -47,14 +47,14 @@ namespace DragonSpark.Sources.Parameterized.Caching
 		TupleConverter() : base( arg => new Tuple<T>( arg ), tuple => tuple.Item1 ) {}
 	}*/
 
-	public class ThreadLocalStoreCache<TInstance, TResult> : WritableStoreCache<TInstance, TResult> where TInstance : class
+	public class ThreadLocalSourceCache<TInstance, TResult> : WritableSourceCache<TInstance, TResult> where TInstance : class
 	{
 		readonly static Func<TInstance, IAssignableSource<TResult>> Create = Store.Instance.Get;
-		public ThreadLocalStoreCache() : this( Create ) {}
+		public ThreadLocalSourceCache() : this( Create ) {}
 
-		public ThreadLocalStoreCache( Func<TResult> create ) : this( new Store( create ).Get ) {}
+		public ThreadLocalSourceCache( Func<TResult> create ) : this( new Store( create ).Get ) {}
 
-		public ThreadLocalStoreCache( Func<TInstance, IAssignableSource<TResult>> create ) : base( create ) {}
+		public ThreadLocalSourceCache( Func<TInstance, IAssignableSource<TResult>> create ) : base( create ) {}
 
 		class Store : ParameterizedSourceBase<TInstance, IAssignableSource<TResult>>
 		{
@@ -181,14 +181,14 @@ namespace DragonSpark.Sources.Parameterized.Caching
 		public TValue GetOrSet( TInstance instance, Func<TInstance, TValue> factory ) => items.GetValue( instance, new ConditionalWeakTable<TInstance, TValue>.CreateValueCallback( factory ) );
 	}
 
-	public class StoreCache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class
+	public class DecoratedSourceCache<TInstance, TValue> : CacheBase<TInstance, TValue> where TInstance : class
 	{
-		readonly IStoreCache<TInstance, TValue> inner;
+		readonly ISourceCache<TInstance, TValue> inner;
 
-		public StoreCache() : this( instance => default(TValue) ) {}
-		public StoreCache( Func<TInstance, TValue> create ) : this( new WritableStoreCache<TInstance, TValue>( create ) ) {}
+		public DecoratedSourceCache() : this( instance => default(TValue) ) {}
+		public DecoratedSourceCache( Func<TInstance, TValue> create ) : this( new WritableSourceCache<TInstance, TValue>( create ) ) {}
 
-		public StoreCache( IStoreCache<TInstance, TValue> inner )
+		public DecoratedSourceCache( ISourceCache<TInstance, TValue> inner )
 		{
 			this.inner = inner;
 		}

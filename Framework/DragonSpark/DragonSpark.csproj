@@ -123,7 +123,7 @@
     <Compile Include="Sources\Parameterized\Caching\ICache.cs" />
     <Compile Include="Sources\Parameterized\Caching\ICacheRegistry.cs" />
     <Compile Include="Sources\Parameterized\Caching\IStackSource.cs" />
-    <Compile Include="Sources\Parameterized\Caching\IStoreCache.cs" />
+    <Compile Include="Sources\Parameterized\Caching\ISourceCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\ListCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\CacheRegistry.cs" />
     <Compile Include="Sources\Parameterized\Caching\SetCache.cs" />
@@ -131,8 +131,8 @@
     <Compile Include="Sources\Parameterized\Caching\Stacks.cs" />
     <Compile Include="Sources\Parameterized\Caching\SourceCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\ThreadLocalStore.cs" />
-    <Compile Include="Sources\Parameterized\Caching\ThreadLocalStoreCache.cs" />
-    <Compile Include="Sources\Parameterized\Caching\WritableStoreCache.cs" />
+    <Compile Include="Sources\Parameterized\Caching\ThreadLocalSourceCache.cs" />
+    <Compile Include="Sources\Parameterized\Caching\WritableSourceCache.cs" />
     <Compile Include="Sources\Parameterized\DecoratedAssignableParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\DecoratedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\DelegatedParameterizedSource.cs" />

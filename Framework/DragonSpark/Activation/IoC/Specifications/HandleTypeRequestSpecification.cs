@@ -25,7 +25,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 		public ResolutionSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor )
 		{
-			cache = new EqualityReferenceCache<TypeRequest, IAssignableSource<bool>>( new WritableStoreCache<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
+			cache = new EqualityReferenceCache<TypeRequest, IAssignableSource<bool>>( new WritableSourceCache<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
 		}
 
 		public override bool IsSatisfiedBy( TypeRequest parameter ) => cache.Get( parameter ).Get();

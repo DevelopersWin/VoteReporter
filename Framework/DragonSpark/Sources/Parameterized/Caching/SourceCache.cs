@@ -2,11 +2,11 @@ using System;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
-	public class SourceCache<T> : StoreCache<object, T>, ICache<T>
+	public class DecoratedSourceCache<T> : DecoratedSourceCache<object, T>, ICache<T>
 	{
-		public SourceCache() : this( new WritableStoreCache<object, T>() ) {}
-		public SourceCache( Func<object, T> create ) : this( new WritableStoreCache<object, T>( create ) ) {}
+		public DecoratedSourceCache() : this( new WritableSourceCache<object, T>() ) {}
+		public DecoratedSourceCache( Func<object, T> create ) : this( new WritableSourceCache<object, T>( create ) ) {}
 
-		public SourceCache( IStoreCache<object, T> inner ) : base( inner ) {}
+		public DecoratedSourceCache( ISourceCache<object, T> inner ) : base( inner ) {}
 	}
 }

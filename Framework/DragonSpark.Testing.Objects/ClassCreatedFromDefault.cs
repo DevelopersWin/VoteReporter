@@ -5,7 +5,7 @@ namespace DragonSpark.Testing.Objects
 {
 	public class ClassCreatedFromDefault
 	{
-		readonly static ICache<Type, int> Property = new StoreCache<Type, int>();
+		readonly static ICache<Type, int> Property = new DecoratedSourceCache<Type, int>();
 
 		public ClassCreatedFromDefault( string message )
 		{
