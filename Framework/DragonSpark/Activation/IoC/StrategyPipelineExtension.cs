@@ -133,7 +133,7 @@ namespace DragonSpark.Activation.IoC
 
 			foreach ( var entry in strategyRepository.List().CastArray<StrategyEntry>() )
 			{
-				Context.Strategies.Add( entry.Value, entry.Stage );
+				Context.Strategies.Add( entry.Get(), entry.Stage );
 			}
 		}
 

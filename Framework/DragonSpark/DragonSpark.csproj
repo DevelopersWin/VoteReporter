@@ -104,10 +104,10 @@
     <Compile Include="Runtime\EnabledState.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
-    <Compile Include="Runtime\ISource.cs" />
+    <Compile Include="Runtime\Sources\ISource.cs" />
     <Compile Include="Runtime\Properties\WeakList.cs" />
     <Compile Include="Runtime\PurgingCollection.cs" />
-    <Compile Include="Runtime\Sources\ScopeExtensions.cs" />
+    <Compile Include="Runtime\Sources\Extensions.cs" />
     <Compile Include="Runtime\Sources\Scoping.cs" />
     <Compile Include="Runtime\Wrapped.cs" />
     <Compile Include="Runtime\IRepository.cs" />
@@ -119,7 +119,6 @@
     <Compile Include="Runtime\Specifications\IsInstanceOfSpecification.cs" />
     <Compile Include="Runtime\Sources\AmbientStackCommand.cs" />
     <Compile Include="Runtime\Properties\AttachedProperty.cs" />
-    <Compile Include="Runtime\Sources\CompositeWritableStore.cs" />
     <Compile Include="Runtime\Properties\ConnectedStore.cs" />
     <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Runtime\Specifications\AlwaysSpecification.cs" />
@@ -145,7 +144,7 @@
     <Compile Include="TypeSystem\AssemblyInformation.cs" />
     <Compile Include="TypeSystem\AssemblyInformationFactory.cs" />
     <Compile Include="ComponentModel\SingletonAttribute.cs" />
-    <Compile Include="ComponentModel\ValueAttribute.cs" />
+    <Compile Include="ComponentModel\SourceAttribute.cs" />
     <Compile Include="Diagnostics\Diagnostics.cs" />
     <Compile Include="Diagnostics\ExceptionFormatter.cs" />
     <Compile Include="Diagnostics\IMessageRecorder.cs" />
@@ -160,7 +159,6 @@
     <Compile Include="Runtime\Specifications\CompositeSpecification.cs" />
     <Compile Include="Runtime\CurrentTime.cs" />
     <Compile Include="Runtime\Specifications\EqualityContextAwareSpecification.cs" />
-    <Compile Include="Runtime\Sources\IWritableStore.cs" />
     <Compile Include="Runtime\Sources\FixedStore.cs" />
     <Compile Include="Runtime\Specifications\ContextAwareSpecification.cs" />
     <Compile Include="Runtime\Specifications\GuardedSpecificationBase.cs" />
@@ -213,7 +211,6 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Runtime\ICurrentTime.cs" />
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
-    <Compile Include="Runtime\Sources\IStore.cs" />
     <Compile Include="Runtime\ListDictionary.cs" />
     <Compile Include="Diagnostics\RecordingLoggerFactory.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
@@ -251,7 +248,7 @@
     <Compile Include="Modularity\ModuleTypeLoadingException.cs" />
     <Compile Include="Runtime\Specifications\TypeAssignableSpecification.cs" />
     <Compile Include="Runtime\Sources\Value.cs" />
-    <Compile Include="Runtime\Sources\WritableStore.cs" />
+    <Compile Include="Runtime\Sources\DisposingSourceBase.cs" />
     <Compile Include="Setup\AllTypesOfFactory.cs" />
     <Compile Include="Runtime\CommandCollection.cs" />
     <Compile Include="Runtime\CompositeCommand.cs" />

@@ -1,18 +1,15 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.TypeSystem;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
-namespace DragonSpark.Runtime
+namespace DragonSpark.Runtime.Sources
 {
-	public interface IAssignable
-	{
-		void Assign( object item );
-	}
-
-	public interface IAssignable<in T> /*: IAssignable*/
+	public interface IAssignable<in T>
 	{
 		void Assign( T item );
 	}
@@ -94,12 +91,31 @@ namespace DragonSpark.Runtime
 
 		public override T Get() => reference;
 
-		// protected override void OnDispose() => reference = default(T);
+		protected override void OnDispose() => reference = default(T);
 	}
 
-	public abstract class AssignableSourceBase<T> : SourceBase<T>, IAssignableSource<T>
+	public class SourceCollection<TStore, TInstance> : CollectionBase<TStore> where TStore : ISource<TInstance>
+	{
+		public SourceCollection() {}
+		public SourceCollection( IEnumerable<TStore> items ) : base( items ) {}
+		public SourceCollection( ICollection<TStore> source ) : base( source ) {}
+
+		public ImmutableArray<TInstance> Instances() => Query.Select( entry => entry.Get() ).ToImmutableArray();
+	}
+
+	public abstract class AssignableSourceBase<T> : SourceBase<T>, IAssignableSource<T>, IDisposable
 	{
 		public abstract void Assign( T item );
+
+		public void Dispose()
+		{
+			Dispose( true );
+			GC.SuppressFinalize( this );
+		}
+
+		void Dispose( bool disposing ) => disposing.IsTrue( OnDispose );
+
+		protected virtual void OnDispose() {}
 	}
 
 	public abstract class SourceBase<T> : ISource<T>
@@ -137,83 +153,6 @@ namespace DragonSpark.Runtime
 		}
 
 		public override T Get() => instance;
-	}
-
-	public static class SourceExtensions
-	{
-		public static Func<TParameter, TResult> Delegate<TParameter, TResult>( this ISource<IParameterizedSource<TParameter, TResult>> @this ) => SourceDelegates<TParameter, TResult>.Default.Get( @this );
-		class SourceDelegates<TParameter, TResult> : Cache<ISource<IParameterizedSource<TParameter, TResult>>, Func<TParameter, TResult>>
-		{
-			public static SourceDelegates<TParameter, TResult> Default { get; } = new SourceDelegates<TParameter, TResult>();
-			SourceDelegates() : base( source => new Factory( source ).Create ) {}
-
-			class Factory : FactoryBase<TParameter, TResult>
-			{
-				readonly ISource<IParameterizedSource<TParameter, TResult>> source;
-				public Factory( ISource<IParameterizedSource<TParameter, TResult>> source )
-				{
-					this.source = source;
-				}
-
-				public override TResult Create( TParameter parameter ) => source.Get().Get( parameter );
-			}
-		}
-
-		public static Func<object> Delegate( this ISource<ISource> @this ) => @this.ToDelegate().Delegate();
-		public static Func<object> Delegate( this Func<ISource> @this ) => Delegates.Default.Get( @this );
-		class Delegates : Cache<Func<ISource>, Func<object>>
-		{
-			public static Delegates Default { get; } = new Delegates();
-			Delegates() : base( source => new Factory( source ).Create ) {}
-
-			class Factory : FactoryBase<object>
-			{
-				readonly Func<ISource> source;
-				public Factory( Func<ISource> source )
-				{
-					this.source = source;
-				}
-
-				public override object Create() => source().Get();
-			}
-		}
-
-		public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
-		public static Func<T> Delegate<T>( this Func<ISource<T>> @this ) => Delegates<T>.Default.Get( @this );
-		class Delegates<T> : Cache<Func<ISource<T>>, Func<T>>
-		{
-			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( source => new Factory( source ).Create ) {}
-
-			class Factory : FactoryBase<T>
-			{
-				readonly Func<ISource<T>> source;
-				public Factory( Func<ISource<T>> source )
-				{
-					this.source = source;
-				}
-
-				public override T Create() => source().Get();
-			}
-		}
-
-		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
-		class SourceDelegates<T> : Cache<ISource<ISource<T>>, Func<T>>
-		{
-			public static Delegates<T> Default { get; } = new Delegates<T>();
-			SourceDelegates() : base( source => new Factory( source ).Create ) {}
-
-			class Factory : FactoryBase<T>
-			{
-				readonly ISource<ISource<T>> source;
-				public Factory( ISource<ISource<T>> source )
-				{
-					this.source = source;
-				}
-
-				public override T Create() => source.Get().Get();
-			}
-		}*/
 	}
 
 	public interface IParameterizedSource<out T> : IParameterizedSource<object, T> {}

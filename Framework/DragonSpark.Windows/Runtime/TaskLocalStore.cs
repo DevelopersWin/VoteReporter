@@ -1,10 +1,10 @@
-using System.Threading;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Sources;
+using System.Threading;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class TaskLocalStore<T> : WritableStore<T>
+	public class TaskLocalStore<T> : AssignableSourceBase<T>
 	{
 		readonly AsyncLocal<T> local;
 
@@ -20,7 +20,7 @@ namespace DragonSpark.Windows.Runtime
 			local.Value = item;
 		}
 
-		protected override T Get() => local.Value;
+		public override T Get() => local.Value;
 
 		protected override void OnDispose()
 		{

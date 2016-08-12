@@ -1,9 +1,10 @@
+using DragonSpark.ComponentModel;
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
+using DragonSpark.Testing.Objects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using DragonSpark.ComponentModel;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Testing.Objects;
 
 namespace DragonSpark.Testing.ComponentModel
 {
@@ -65,15 +66,12 @@ namespace DragonSpark.Testing.ComponentModel
 		[Collection( typeof(Class) )]
 		public IEnumerable<Class> Classes { get; set; }
 		
-		[Value( typeof(Store) )]
+		[Source( typeof(Store) )]
 		public int ValuedInt { get; set; }
 
-		internal class Store : FixedStore<int>
+		internal class Store : FixedSource<int>
 		{
-			public Store()
-			{
-				Assign( 6776 );
-			}
+			public Store() : base( 6776 ) {}
 		}
 
 		[NewGuid( "66570344-BA99-4C90-A7BE-AEC903441F97" )]

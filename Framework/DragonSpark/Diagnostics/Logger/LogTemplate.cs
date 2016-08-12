@@ -3,6 +3,7 @@ using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using Serilog;
 using Serilog.Core;

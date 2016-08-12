@@ -119,7 +119,7 @@ namespace DragonSpark.Runtime.Properties
 		public ThreadLocalStoreCache() {}
 		public ThreadLocalStoreCache( Func<T> create ) : base( create ) {}
 
-		public ThreadLocalStoreCache( Func<object, IWritableStore<T>> create ) : base( create ) {}
+		public ThreadLocalStoreCache( Func<object, IAssignableSource<T>> create ) : base( create ) {}
 		/*public ThreadLocalStoreCache() : this( () => default(T) ) {}
 		public ThreadLocalStoreCache( Func<T> create ) : base( create ) {}
 
@@ -130,14 +130,14 @@ namespace DragonSpark.Runtime.Properties
 
 	public class ThreadLocalStoreCache<TInstance, TResult> : WritableStoreCache<TInstance, TResult> where TInstance : class
 	{
-		readonly static Func<TInstance, IWritableStore<TResult>> Create = Store.Instance.Create;
+		readonly static Func<TInstance, IAssignableSource<TResult>> Create = Store.Instance.Create;
 		public ThreadLocalStoreCache() : this( Create ) {}
 
 		public ThreadLocalStoreCache( Func<TResult> create ) : this( new Store( create ).Create ) {}
 
-		public ThreadLocalStoreCache( Func<TInstance, IWritableStore<TResult>> create ) : base( create ) {}
+		public ThreadLocalStoreCache( Func<TInstance, IAssignableSource<TResult>> create ) : base( create ) {}
 
-		class Store : FactoryBase<TInstance, IWritableStore<TResult>>
+		class Store : FactoryBase<TInstance, IAssignableSource<TResult>>
 		{
 			public static Store Instance { get; } = new Store();
 
@@ -150,7 +150,7 @@ namespace DragonSpark.Runtime.Properties
 				this.create = create;
 			}
 
-			public override IWritableStore<TResult> Create( TInstance instance ) => new ThreadLocalStore<TResult>( create );
+			public override IAssignableSource<TResult> Create( TInstance instance ) => new ThreadLocalStore<TResult>( create );
 		}
 	}
 
@@ -391,20 +391,20 @@ namespace DragonSpark.Runtime.Properties
 
 		public override void Set( TInstance instance, [Optional]TValue value ) => inner.Get( instance ).Assign( value );
 
-		public override TValue Get( TInstance instance ) => inner.Get( instance ).Value;
+		public override TValue Get( TInstance instance ) => inner.Get( instance ).Get();
 
 		public override bool Remove( TInstance instance ) => inner.Remove( instance );
 	}
 
-	public interface IStoreCache<in TInstance, TValue> : ICache<TInstance, IWritableStore<TValue>> {}
+	public interface IStoreCache<in TInstance, TValue> : ICache<TInstance, IAssignableSource<TValue>> {}
 
-	public class WritableStoreCache<TInstance, TValue> : Cache<TInstance, IWritableStore<TValue>>, IStoreCache<TInstance, TValue> where TInstance : class
+	public class WritableStoreCache<TInstance, TValue> : Cache<TInstance, IAssignableSource<TValue>>, IStoreCache<TInstance, TValue> where TInstance : class
 	{
-		public WritableStoreCache() : this( instance => new FixedStore<TValue>() ) {}
+		public WritableStoreCache() : this( instance => new FixedSource<TValue>() ) {}
 
-		public WritableStoreCache( Func<TInstance, TValue> create ) : this( new Func<TInstance, IWritableStore<TValue>>( new Context( create ).Create ) ) {}
+		public WritableStoreCache( Func<TInstance, TValue> create ) : this( new Func<TInstance, IAssignableSource<TValue>>( new Context( create ).Create ) ) {}
 
-		public WritableStoreCache( Func<TInstance, IWritableStore<TValue>> create ) : base( create ) {}
+		public WritableStoreCache( Func<TInstance, IAssignableSource<TValue>> create ) : base( create ) {}
 
 		class Context
 		{
@@ -414,7 +414,7 @@ namespace DragonSpark.Runtime.Properties
 				this.create = create;
 			}
 
-			public IWritableStore<TValue> Create( TInstance instance ) => new FixedStore<TValue>( create( instance ) );
+			public IAssignableSource<TValue> Create( TInstance instance ) => new FixedSource<TValue>( create( instance ) );
 		}
 	}
 

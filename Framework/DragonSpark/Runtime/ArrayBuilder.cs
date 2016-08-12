@@ -1,9 +1,9 @@
-﻿using System;
+﻿using DragonSpark.Runtime.Sources;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading;
-using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Runtime
 {
@@ -209,11 +209,11 @@ namespace DragonSpark.Runtime
 
 		// 2) Expose the pool or the way to create a pool or the way to get an instance.
 		//    for now we will expose both and figure which way works better
-		readonly static ObjectPool<ArrayBuilder<T>> s_poolInstance = new PoolStore().Value;
+		readonly static ObjectPool<ArrayBuilder<T>> Instance = new PoolStore().Get();
 
 		public static ArrayBuilder<T> GetInstance()
 		{
-			var builder = s_poolInstance.Allocate();
+			var builder = Instance.Allocate();
 			Debug.Assert( builder.Count == 0 );
 			return builder;
 		}
@@ -238,16 +238,16 @@ namespace DragonSpark.Runtime
 			return builder;
 		}
 
-		public static ObjectPool<ArrayBuilder<T>> CreatePool( int size ) => new PoolStore( size ).Value;
+		public static ObjectPool<ArrayBuilder<T>> CreatePool( int size ) => new PoolStore( size ).Get();
 
-		class PoolStore : FixedStore<ObjectPool<ArrayBuilder<T>>>
+		class PoolStore : FixedSource<ObjectPool<ArrayBuilder<T>>>
 		{
 			public PoolStore( int size = 128 )
 			{
 				Assign( new ObjectPool<ArrayBuilder<T>>( Create, size ) );
 			}
 
-			ArrayBuilder<T> Create() => new ArrayBuilder<T>( Value );
+			ArrayBuilder<T> Create() => new ArrayBuilder<T>( Get() );
 		}
 		#endregion
 

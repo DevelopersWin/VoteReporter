@@ -1,9 +1,9 @@
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using Serilog.Events;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Diagnostics
 {
@@ -160,7 +160,7 @@ namespace DragonSpark.Diagnostics
 		TimeSpan Elapsed { get; }
 	}
 
-	public abstract class TimerBase : FixedStore<ulong>, ITimer
+	public abstract class TimerBase : FixedSource<ulong>, ITimer
 	{
 		readonly Func<ulong> current;
 		readonly Func<ulong, TimeSpan> time;
@@ -178,7 +178,7 @@ namespace DragonSpark.Diagnostics
 			Assign( current() );
 		}
 
-		public virtual void Update() => Total += current() - Value;
+		public virtual void Update() => Total += current() - Get();
 
 		ulong Total
 		{

@@ -1,6 +1,8 @@
 using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
@@ -13,7 +15,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using DragonSpark.Runtime.Sources;
 using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 
@@ -181,16 +182,16 @@ namespace DragonSpark.Windows.Markup
 		protected abstract object GetValue( MarkupServiceProvider serviceProvider );
 	}
 
-	public class ValueExtension : MarkupExtensionBase
+	public class SourceExtension : MarkupExtensionBase
 	{
-		readonly IStore store;
+		readonly ISource store;
 
-		public ValueExtension( [Required]IStore store )
+		public SourceExtension( ISource store )
 		{
 			this.store = store;
 		}
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => store.Value;
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => store.Get();
 	}
 
 	public class FactoryTypeExtension : MarkupExtensionBase

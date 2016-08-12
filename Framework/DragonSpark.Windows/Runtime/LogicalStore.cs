@@ -1,9 +1,10 @@
-using System.Runtime.Remoting.Messaging;
 using DragonSpark.Runtime.Sources;
+using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class LogicalStore<T> : WritableStore<T>
+	public class LogicalStore<T> : AssignableSourceBase<T>
 	{
 		readonly string slot;
 
@@ -12,7 +13,7 @@ namespace DragonSpark.Windows.Runtime
 			this.slot = slot;
 		}
 
-		public override void Assign( T item )
+		public override void Assign( [Optional]T item )
 		{
 			if ( item == null )
 			{
@@ -24,6 +25,6 @@ namespace DragonSpark.Windows.Runtime
 			}
 		}
 
-		protected override T Get() => (T)CallContext.GetData( slot );
+		public override T Get() => (T)CallContext.GetData( slot );
 	}
 }

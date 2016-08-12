@@ -1,4 +1,3 @@
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Sources;
@@ -35,7 +34,7 @@ namespace DragonSpark.Testing.Framework
 		public static Identification Instance { get; } = new Identification();
 		Identification() {}
 
-		protected override Identifier Get()
+		public override Identifier Get()
 		{
 			var current = base.Get();
 			var result = current == default(Identifier) ? Create() : current;
@@ -50,23 +49,23 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class ExecutionContext : StoreBase<TaskContext>
+	public class ExecutionContext : SourceBase<TaskContext>
 	{
 		public static ISource<TaskContext> Instance { get; } = new ExecutionContext( Identification.Instance );
 
 		readonly ConcurrentDictionary<Identifier, TaskContext> entries = new ConcurrentDictionary<Identifier, TaskContext>();
-		readonly IStore<Identifier> store;
+		readonly ISource<Identifier> store;
 		readonly Func<Identifier, TaskContext> create;
 		readonly Action<Identifier> remove;
 
-		ExecutionContext( IStore<Identifier> store )
+		ExecutionContext( ISource<Identifier> store )
 		{
 			this.store = store;
 			create = Create;
 			remove = Remove;
 		}
 
-		protected override TaskContext Get() => entries.GetOrAdd( store.Value, create );
+		public override TaskContext Get() => entries.GetOrAdd( store.Get(), create );
 
 		TaskContext Create( Identifier context ) => new TaskContext( context, remove );
 

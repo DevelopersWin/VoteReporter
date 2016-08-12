@@ -121,12 +121,12 @@ namespace DragonSpark.Runtime.Properties
 
 		protected Stacks( IPropertyRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
 
-		protected Stacks( IPropertyRegistry<IStack<T>> registry, IParameterizedSource<object, IWritableStore<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.Get ) )
+		protected Stacks( IPropertyRegistry<IStack<T>> registry, IParameterizedSource<object, IAssignableSource<IStack<T>>> factory ) : base( new ThreadLocalStoreCache<IStack<T>>( factory.Get ) )
 		{
 			registry.Register( factory, this );
 		}
 
-		sealed class Store : FactoryBase<object, IWritableStore<IStack<T>>>
+		sealed class Store : FactoryBase<object, IAssignableSource<IStack<T>>>
 		{
 			readonly Action<Store, object> callback;
 
@@ -135,7 +135,7 @@ namespace DragonSpark.Runtime.Properties
 				this.callback = callback;
 			}
 
-			public override IWritableStore<IStack<T>> Create( object instance ) => new Factory( this, instance ).Create();
+			public override IAssignableSource<IStack<T>> Create( object instance ) => new Factory( this, instance ).Get();
 
 			sealed class Factory
 			{
@@ -158,7 +158,7 @@ namespace DragonSpark.Runtime.Properties
 					isEmpty = IsEmpty;
 				}
 
-				public IWritableStore<IStack<T>> Create() => store;
+				public IAssignableSource<IStack<T>> Get() => store;
 
 				IStack<T> New() => new Stack<T>( onEmpty );
 
@@ -183,7 +183,7 @@ namespace DragonSpark.Runtime.Properties
 		}
 	}
 
-	public class ThreadLocalStore<T> : WritableStore<T>
+	public class ThreadLocalStore<T> : AssignableSourceBase<T>
 	{
 		readonly ThreadLocal<T> local;
 
@@ -198,7 +198,7 @@ namespace DragonSpark.Runtime.Properties
 
 		public override void Assign( T item ) => local.Value = item;
 
-		protected override T Get() => local.Value;
+		public override T Get() => local.Value;
 
 		protected override void OnDispose()
 		{

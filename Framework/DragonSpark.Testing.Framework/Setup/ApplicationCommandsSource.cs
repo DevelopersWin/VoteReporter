@@ -3,6 +3,7 @@ using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;

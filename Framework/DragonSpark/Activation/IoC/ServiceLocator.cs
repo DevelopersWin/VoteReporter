@@ -12,10 +12,8 @@ using PostSharp.Patterns.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
-using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Activation.IoC
 {
@@ -123,15 +121,6 @@ namespace DragonSpark.Activation.IoC
 		public BuildPlanRepository( params IBuildPlanPolicy[] items ) : base( new PurgingCollection<IBuildPlanPolicy>( items.AsEnumerable() ) ) {}
 	}
 
-	public class StoreCollection<TStore, TInstance> : CollectionBase<TStore> where TStore : IStore<TInstance>
-	{
-		public StoreCollection() {}
-		public StoreCollection( IEnumerable<TStore> items ) : base( items ) {}
-		public StoreCollection( ICollection<TStore> source ) : base( source ) {}
-
-		public ImmutableArray<TInstance> Instances() => Query.Select( entry => entry.Value ).ToImmutableArray();
-	}
-
 	public class StrategyRepository : RepositoryBase<StrategyEntry>, IStrategyRepository
 	{
 		readonly static StrategyEntry[] DefaultEntries = {
@@ -155,7 +144,7 @@ namespace DragonSpark.Activation.IoC
 		protected override void OnAdd( StrategyEntry entry )
 		{
 			base.OnAdd( entry );
-			strategies.Add( entry.Value, entry.Stage );
+			strategies.Add( entry.Get(), entry.Stage );
 		}
 
 		public void Add( IBuilderStrategy instance ) => Add( new StrategyEntry( instance, UnityBuildStage.PreCreation ) );

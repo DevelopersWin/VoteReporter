@@ -1,6 +1,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
@@ -11,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {
@@ -20,14 +20,14 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	class ResolutionSpecification : AnySpecification<TypeRequest>, IResolutionSpecification
 	{
-		readonly EqualityReferenceCache<TypeRequest, IWritableStore<bool>> cache;
+		readonly EqualityReferenceCache<TypeRequest, IAssignableSource<bool>> cache;
 
 		public ResolutionSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor )
 		{
-			cache = new EqualityReferenceCache<TypeRequest, IWritableStore<bool>>( new WritableStoreCache<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
+			cache = new EqualityReferenceCache<TypeRequest, IAssignableSource<bool>>( new WritableStoreCache<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
 		}
 
-		public override bool IsSatisfiedBy( TypeRequest parameter ) => cache.Get( parameter ).Value;
+		public override bool IsSatisfiedBy( TypeRequest parameter ) => cache.Get( parameter ).Get();
 	}
 
 	public abstract class RegistrationSpecificationBase : GuardedSpecificationBase<TypeRequest>

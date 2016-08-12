@@ -1,6 +1,6 @@
 namespace DragonSpark.Runtime.Sources
 {
-	public class FixedStore<T> : WritableStore<T>
+	/*public class FixedStore<T> : DisposingSourceBase<T>
 	{
 		T reference;
 
@@ -18,7 +18,7 @@ namespace DragonSpark.Runtime.Sources
 		protected override T Get() => reference;
 
 		protected override void OnDispose() => reference = default(T);
-	}
+	}*/
 
 	// public class DictionaryStore<T>
 }

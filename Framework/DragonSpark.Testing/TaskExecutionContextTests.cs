@@ -26,7 +26,7 @@ namespace DragonSpark.Testing
 		[Fact]
 		public void Fact()
 		{
-			Assert.Equal( Identification.Instance.Value, Identifier.Current() );
+			Assert.Equal( Identification.Instance.Get(), Identifier.Current() );
 			Assert.Null( MethodContext.Instance.Get() );
 		}
 
@@ -81,7 +81,7 @@ namespace DragonSpark.Testing
 		public Task Theory()
 		{
 			var current = ExecutionContext.Instance.Get();
-			Assert.Equal( Identification.Instance.Value, Identifier.Current() );
+			Assert.Equal( Identification.Instance.Get(), Identifier.Current() );
 			var method = new Func<Task>( Theory ).Method;
 			Assert.Equal( method, MethodContext.Instance.Get() );
 			return Task.Run( () =>

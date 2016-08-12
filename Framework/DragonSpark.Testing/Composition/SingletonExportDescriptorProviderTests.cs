@@ -1,9 +1,8 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using System.Composition;
 using System.Composition.Hosting;
-using DragonSpark.Runtime.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition
@@ -72,7 +71,7 @@ namespace DragonSpark.Testing.Composition
 		class Sourced  : ISingleton
 		{
 			[Export( typeof(ISingleton) )]
-			public static ISource<ISingleton> Instance { get; } = new FixedStore<ISingleton>( new Sourced() );
+			public static ISource<ISingleton> Instance { get; } = new FixedSource<ISingleton>( new Sourced() );
 			Sourced() {}
 		}
 	}

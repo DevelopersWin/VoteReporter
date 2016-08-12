@@ -1,11 +1,10 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Activation.IoC
@@ -89,7 +88,7 @@ namespace DragonSpark.Testing.Activation.IoC
 
 		class SourceSingleton
 		{
-			public static ISource<SourceSingleton> Instance { get; } = new FixedStore<SourceSingleton>( new SourceSingleton() );
+			public static ISource<SourceSingleton> Instance { get; } = new FixedSource<SourceSingleton>( new SourceSingleton() );
 		}
 	}
 }

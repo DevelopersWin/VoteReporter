@@ -1,10 +1,10 @@
+using DragonSpark.Runtime.Sources;
 using System;
 using System.Threading;
-using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class ThreadDataStore<T> : WritableStore<T>
+	public class ThreadDataStore<T> : AssignableSourceBase<T>
 	{
 		readonly LocalDataStoreSlot slot;
 
@@ -17,6 +17,6 @@ namespace DragonSpark.Windows.Runtime
 
 		public override void Assign( T item ) => Thread.SetData( slot, item );
 
-		protected override T Get() => (T)Thread.GetData( slot );
+		public override T Get() => (T)Thread.GetData( slot );
 	}
 }

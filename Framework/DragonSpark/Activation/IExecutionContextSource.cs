@@ -1,6 +1,6 @@
 using DragonSpark.Runtime;
-using System;
 using DragonSpark.Runtime.Sources;
+using System;
 
 namespace DragonSpark.Activation
 {
@@ -14,11 +14,11 @@ namespace DragonSpark.Activation
 	}
 
 	[Priority( Priority.Low )]
-	class ExecutionContext : StoreBase<object>
+	class ExecutionContext : SourceBase<object>
 	{
 		public static ExecutionContext Instance { get; } = new ExecutionContext();
 		ExecutionContext() {}
 
-		protected override object Get() => this;
+		public override object Get() => this;
 	}
 }

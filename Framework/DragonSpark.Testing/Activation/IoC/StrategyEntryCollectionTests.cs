@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Activation.IoC
 			var sut = new StrategyEntryCollection( DefaultEntries );
 			var instances = sut.Instances();
 			Assert.Empty( sut );
-			Assert.Equal( new [] { DefaultEntries.Last(), DefaultEntries[2], DefaultEntries.First(), DefaultEntries[1] }.Select( entry => entry.Value ).ToArray(), instances.ToArray() );
+			Assert.Equal( new [] { DefaultEntries.Last(), DefaultEntries[2], DefaultEntries.First(), DefaultEntries[1] }.Select( entry => entry.Get() ).ToArray(), instances.ToArray() );
 		}
 	}
 }

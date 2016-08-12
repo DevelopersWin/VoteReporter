@@ -54,11 +54,10 @@ namespace DragonSpark.Runtime
 		protected virtual IEnumerable<T> Query() => Source;
 	}
 
-	public class Entry<T> : FixedStore<T>, IPriorityAware
+	public class Entry<T> : FixedSource<T>, IPriorityAware
 	{
-		public Entry( [Required] T item, Priority priority = Priority.Normal )
+		public Entry( [Required] T item, Priority priority = Priority.Normal ) : base( item )
 		{
-			Assign( item );
 			Priority = priority;
 		}
 

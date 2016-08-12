@@ -9,7 +9,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		public void Assign( int number, TaskLocalStore<int> sut )
 		{
 			sut.Assign( number );
-			Assert.Equal( number, sut.Value );
+			Assert.Equal( number, sut.Get() );
 		}
 	}
 }

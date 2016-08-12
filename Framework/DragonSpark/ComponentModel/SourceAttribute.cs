@@ -1,7 +1,7 @@
 using DragonSpark.Aspects;
 using DragonSpark.Runtime.Properties;
-using System;
 using DragonSpark.Runtime.Sources;
+using System;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.ComponentModel
@@ -12,12 +12,12 @@ namespace DragonSpark.ComponentModel
 		public AmbientValueAttribute( Type valueType = null ) : base( new ServicesValueProvider.Converter( valueType ), GetCurrentItem ) {}
 	}
 
-	public class ValueAttribute : ServicesValueBase
+	public class SourceAttribute : ServicesValueBase
 	{
 		readonly static Func<Type, object> Creator = Create;
-		public ValueAttribute( [OfType( typeof(IStore) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Creator ) {}
+		public SourceAttribute( [OfType( typeof(ISource) )]Type valueType ) : base( new ServicesValueProvider.Converter( valueType ), Creator ) {}
 
-		static object Create( Type type ) => Activator.Activate<IStore>( type ).Value;
+		static object Create( Type type ) => Activator.Activate<ISource>( type ).Get();
 
 		/*public class Creator : ServicesValueProvider.Category
 		{

@@ -1,12 +1,12 @@
 using DragonSpark.Activation;
+using DragonSpark.Runtime.Sources;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
-using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class AppDomainStore<T> : WritableStore<T>
+	public class AppDomainStore<T> : AssignableSourceBase<T>
 	{
 		readonly AppDomain domain;
 		readonly string key;
@@ -21,7 +21,7 @@ namespace DragonSpark.Windows.Runtime
 
 		public override void Assign( T item ) => domain.SetData( key, item );
 
-		protected override T Get() => (T)domain.GetData( key );
+		public override T Get() => (T)domain.GetData( key );
 	}
 
 	public class ApplicationDomainProxyFactory<T> : FactoryBase<object[], T>
