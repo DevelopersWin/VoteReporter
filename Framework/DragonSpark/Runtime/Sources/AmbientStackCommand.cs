@@ -1,9 +1,9 @@
+using System.Collections.Immutable;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using PostSharp.Patterns.Contracts;
-using System.Collections.Immutable;
 
-namespace DragonSpark.Runtime.Stores
+namespace DragonSpark.Runtime.Sources
 {
 	/*public class PropertyContext<T>
 	{

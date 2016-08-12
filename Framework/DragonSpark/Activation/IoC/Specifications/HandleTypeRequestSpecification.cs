@@ -2,7 +2,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
@@ -12,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {

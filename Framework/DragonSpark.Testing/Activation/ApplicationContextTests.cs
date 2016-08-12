@@ -2,7 +2,6 @@
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
@@ -28,7 +27,7 @@ namespace DragonSpark.Testing.Activation
 
 			var method = MethodBase.GetCurrentMethod();
 			object inner;
-			using ( ApplicationFactory.Instance.Create( method ).Run( new AutoData( FixtureContext.Instance.Assigned( FixtureFactory<AutoDataCustomization>.Instance.Create ), method ) ) )
+			using ( ApplicationFactory.Instance.Create( method ).Run( new AutoData( FixtureContext.Instance.WithFactory( FixtureFactory<AutoDataCustomization>.Instance.Create ), method ) ) )
 			{
 				Assert.NotNull( MethodContext.Instance.Get() );
 				Assert.Same( method, MethodContext.Instance.Get() );

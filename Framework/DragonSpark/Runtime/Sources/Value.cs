@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace DragonSpark.Runtime.Stores
+namespace DragonSpark.Runtime.Sources
 {
 	/*public class Store<T> : StoreBase<T>
 	{

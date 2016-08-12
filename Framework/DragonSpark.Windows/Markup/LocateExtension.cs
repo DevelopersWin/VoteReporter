@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
@@ -14,6 +13,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
+using DragonSpark.Runtime.Sources;
 using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 

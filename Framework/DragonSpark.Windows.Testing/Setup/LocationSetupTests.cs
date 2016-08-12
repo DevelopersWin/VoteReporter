@@ -2,7 +2,6 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;

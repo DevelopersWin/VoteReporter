@@ -87,7 +87,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var test = host.GetExport<IParameterService>();
 			var parameter = Assert.IsType<Parameter>( test.Parameter );
-			Assert.Equal( "Assigned by ParameterService", parameter.Message );
+			Assert.Equal( "WithInstance by ParameterService", parameter.Message );
 		}
 
 		[Theory, AutoData, Types]
@@ -100,11 +100,11 @@ namespace DragonSpark.Testing.Composition
 			var created = factory( parameter );
 				
 			Assert.Same( parameter, created.Parameter );
-			Assert.Equal( "Assigned by ParameterService", parameter.Message );
+			Assert.Equal( "WithInstance by ParameterService", parameter.Message );
 
 			var test = host.GetExport<IParameterService>();
 			var p = Assert.IsType<Parameter>( test.Parameter );
-			Assert.Equal( "Assigned by ParameterService", p.Message );
+			Assert.Equal( "WithInstance by ParameterService", p.Message );
 			Assert.NotSame( parameter, p );
 		}
 

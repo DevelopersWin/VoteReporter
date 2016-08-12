@@ -128,13 +128,13 @@ namespace DragonSpark.Testing.Composition
 		[Export]
 		class Counter : SourceBase<int>
 		{
-			public override int Get() => Count.Instance.Assigned( Count.Instance.Get() + 1 );
+			public override int Get() => Count.Instance.WithInstance( Count.Instance.Get() + 1 );
 		}
 
 		[Export, Shared]
 		class SharedCounter : SourceBase<int>
 		{
-			public override int Get() => Count.Instance.Assigned( Count.Instance.Get() + 1 );
+			public override int Get() => Count.Instance.WithInstance( Count.Instance.Get() + 1 );
 		}
 
 		[Export]

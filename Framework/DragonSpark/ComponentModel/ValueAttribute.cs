@@ -1,7 +1,7 @@
 using DragonSpark.Aspects;
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
 using System;
+using DragonSpark.Runtime.Sources;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.ComponentModel

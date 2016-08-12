@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Objects.Composition
 		public ParameterService( Parameter parameter )
 		{
 			Parameter = parameter;
-			parameter.Message = "Assigned by ParameterService";
+			parameter.Message = "WithInstance by ParameterService";
 		}
 
 		public object Parameter { get; }

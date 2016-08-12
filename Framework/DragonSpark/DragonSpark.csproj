@@ -117,9 +117,9 @@
     <Compile Include="Runtime\Specifications\AssignableSpecification.cs" />
     <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsInstanceOfSpecification.cs" />
-    <Compile Include="Runtime\Stores\AmbientStackCommand.cs" />
+    <Compile Include="Runtime\Sources\AmbientStackCommand.cs" />
     <Compile Include="Runtime\Properties\AttachedProperty.cs" />
-    <Compile Include="Runtime\Stores\CompositeWritableStore.cs" />
+    <Compile Include="Runtime\Sources\CompositeWritableStore.cs" />
     <Compile Include="Runtime\Properties\ConnectedStore.cs" />
     <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Runtime\Specifications\AlwaysSpecification.cs" />
@@ -160,8 +160,8 @@
     <Compile Include="Runtime\Specifications\CompositeSpecification.cs" />
     <Compile Include="Runtime\CurrentTime.cs" />
     <Compile Include="Runtime\Specifications\EqualityContextAwareSpecification.cs" />
-    <Compile Include="Runtime\Stores\IWritableStore.cs" />
-    <Compile Include="Runtime\Stores\FixedStore.cs" />
+    <Compile Include="Runtime\Sources\IWritableStore.cs" />
+    <Compile Include="Runtime\Sources\FixedStore.cs" />
     <Compile Include="Runtime\Specifications\ContextAwareSpecification.cs" />
     <Compile Include="Runtime\Specifications\GuardedSpecificationBase.cs" />
     <Compile Include="Runtime\Specifications\SpecificationExtensions.cs" />
@@ -213,7 +213,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Runtime\ICurrentTime.cs" />
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
-    <Compile Include="Runtime\Stores\IStore.cs" />
+    <Compile Include="Runtime\Sources\IStore.cs" />
     <Compile Include="Runtime\ListDictionary.cs" />
     <Compile Include="Diagnostics\RecordingLoggerFactory.cs" />
     <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
@@ -250,8 +250,8 @@
     <Compile Include="Modularity\ModuleTypeLoaderNotFoundException.cs" />
     <Compile Include="Modularity\ModuleTypeLoadingException.cs" />
     <Compile Include="Runtime\Specifications\TypeAssignableSpecification.cs" />
-    <Compile Include="Runtime\Stores\Value.cs" />
-    <Compile Include="Runtime\Stores\WritableStore.cs" />
+    <Compile Include="Runtime\Sources\Value.cs" />
+    <Compile Include="Runtime\Sources\WritableStore.cs" />
     <Compile Include="Setup\AllTypesOfFactory.cs" />
     <Compile Include="Runtime\CommandCollection.cs" />
     <Compile Include="Runtime\CompositeCommand.cs" />
@@ -349,6 +349,9 @@
       <Project>{69750ce1-63f1-4ddf-b22e-f8b40d8f16a8}</Project>
       <Name>DragonSpark.Types</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Runtime\Stores\" />
   </ItemGroup>
   <!--<ItemGroup>
 	<Folder Include="Diagnostics\Logger\Categories\" />

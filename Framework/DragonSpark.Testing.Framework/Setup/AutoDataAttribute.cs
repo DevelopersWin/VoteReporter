@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		
 		public AutoDataAttribute() : this( DefaultFixtureFactory ) {}
 
-		protected AutoDataAttribute( Func<IFixture> fixture ) : base( FixtureContext.Instance.Assigned( fixture() ) ) {}
+		protected AutoDataAttribute( Func<IFixture> fixture ) : base( FixtureContext.Instance.WithInstance( fixture() ) ) {}
 
 		protected virtual IApplication ApplicationSource( MethodBase method ) => ApplicationFactory.Instance.Create( method );
 

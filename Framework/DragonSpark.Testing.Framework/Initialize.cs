@@ -2,7 +2,6 @@ using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Windows.Runtime;
 using PostSharp.Aspects;
 using System;
@@ -26,7 +25,7 @@ namespace DragonSpark.Testing.Framework
 		{
 			public static ICommand Instance { get; } = new Command();
 			Command() : base( 
-				Activation.Execution.Context.From( ExecutionContext.Instance )
+				Activation.Execution.Context.Configured( ExecutionContext.Instance )
 			) {}
 		}
 	}

@@ -3,7 +3,6 @@ using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Properties;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Stores;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
@@ -16,6 +15,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
+using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Activation.IoC
 {

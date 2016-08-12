@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using DragonSpark.ComponentModel;
-using DragonSpark.Runtime.Stores;
+using DragonSpark.Runtime.Sources;
 using DragonSpark.Testing.Objects;
 
 namespace DragonSpark.Testing.ComponentModel

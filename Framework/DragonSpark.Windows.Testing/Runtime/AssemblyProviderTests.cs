@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;

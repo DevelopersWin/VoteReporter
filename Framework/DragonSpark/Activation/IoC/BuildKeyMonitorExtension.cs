@@ -1,5 +1,5 @@
 using DragonSpark.Runtime.Properties;
-using DragonSpark.Runtime.Stores;
+using DragonSpark.Runtime.Sources;
 using Microsoft.Practices.ObjectBuilder2;
 
 namespace DragonSpark.Activation.IoC

@@ -5,7 +5,6 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Runtime.Stores;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;

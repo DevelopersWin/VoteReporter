@@ -3,36 +3,10 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
-using System.Windows.Input;
 
-namespace DragonSpark.Runtime.Stores
+namespace DragonSpark.Runtime.Sources
 {
-	public static class StoreExtensions
-	{
-		public static ICommand From<T>( this IAssignable<T> @this, T value ) => new AssignCommand<T>( @this ).Fixed( value );
 
-		public static TValue Assigned<TSource, TValue>( this TSource @this, TValue value ) where TSource : IAssignable<TValue>
-		{
-			@this.Assign( value );
-			return value;
-		}
-
-		public static Assignment<T> Assignment<T>( this IAssignable<T> @this, T first )  => new Assignment<T>( Assign<T>.Cache.Get( @this ), new Value<T>( first ) );
-		static class Assign<T>
-		{
-			public static ICache<IAssignable<T>, SourceAssignment<T>> Cache { get; } = new Cache<IAssignable<T>, SourceAssignment<T>>( c => new SourceAssignment<T>( c ) );
-		}
-
-		public static T Get<T>( this IStore<T> @this ) => @this.Value;
-
-		/*public static Func<T> ToDelegate<T>( this IStore<T> @this ) where T : class => FixedFactoryCache<T>.Default.Get( @this );
-		class FixedFactoryCache<T> : Cache<IStore<T>, Func<T>> where T : class
-		{
-			public static FixedFactoryCache<T> Default { get; } = new FixedFactoryCache<T>();
-			
-			FixedFactoryCache() : base( store => new FixedFactory<T>( store.Value ) ) {}
-		}*/
-	}
 
 	public abstract class CacheSpecificationBase<TInstance, TValue> : SpecificationBase<TInstance> where TInstance : class
 	{

@@ -1,4 +1,4 @@
-namespace DragonSpark.Runtime.Stores
+namespace DragonSpark.Runtime.Sources
 {
 	public class FixedStore<T> : WritableStore<T>
 	{
