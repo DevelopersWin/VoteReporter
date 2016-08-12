@@ -2,12 +2,12 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.TypeSystem
 {

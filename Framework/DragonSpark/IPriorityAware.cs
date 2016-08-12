@@ -1,12 +1,12 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark
 {
@@ -40,7 +40,7 @@ namespace DragonSpark
 		public Priority Priority { get; }
 	}
 
-	public class AssociatedPriority : StoreCache<IPriorityAware>
+	public class AssociatedPriority : SourceCache<IPriorityAware>
 	{
 		public static AssociatedPriority Instance { get; } = new AssociatedPriority();
 		AssociatedPriority() {}

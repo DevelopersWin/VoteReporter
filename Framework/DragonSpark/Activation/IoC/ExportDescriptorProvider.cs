@@ -1,10 +1,10 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;
 using System;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Activation.IoC
 {

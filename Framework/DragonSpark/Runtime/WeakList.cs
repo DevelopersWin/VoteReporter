@@ -1,12 +1,12 @@
-using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 
-namespace DragonSpark.Runtime.Properties
+namespace DragonSpark.Runtime.Sources.Caching
 {
 	/*public class EqualityCache<TKey, TValue> : CacheBase<TKey, TValue>
 	{

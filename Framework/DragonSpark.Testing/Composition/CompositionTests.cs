@@ -2,7 +2,6 @@
 using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -14,6 +13,7 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 using Xunit;
 using Xunit.Abstractions;
 using Parameter = DragonSpark.Testing.Objects.Composition.Parameter;

@@ -1,5 +1,5 @@
-using DragonSpark.Runtime.Properties;
 using System;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Testing.Objects
 {

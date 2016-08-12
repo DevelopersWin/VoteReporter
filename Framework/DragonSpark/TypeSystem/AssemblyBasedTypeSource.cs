@@ -3,7 +3,6 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
@@ -13,6 +12,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.TypeSystem
 {

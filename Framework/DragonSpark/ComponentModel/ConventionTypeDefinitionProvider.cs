@@ -1,10 +1,10 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using System;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.ComponentModel
 {

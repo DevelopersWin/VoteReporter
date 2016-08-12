@@ -3,7 +3,6 @@ using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using System;
@@ -12,6 +11,7 @@ using System.Composition;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Composition
 {

@@ -3,7 +3,6 @@ using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
@@ -12,6 +11,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
+using DragonSpark.Runtime.Sources.Caching;
 using Delegates = DragonSpark.TypeSystem.Delegates;
 
 namespace DragonSpark.Activation

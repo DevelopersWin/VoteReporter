@@ -1,10 +1,10 @@
-using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Windows.Markup
 {
 	class Incrementer : IIncrementer
 	{
-		readonly StoreCache<int> count = new StoreCache<int>();
+		readonly SourceCache<int> count = new SourceCache<int>();
 
 		public int Next( object context )
 		{

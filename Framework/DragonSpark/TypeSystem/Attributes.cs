@@ -1,6 +1,6 @@
-using DragonSpark.Runtime.Properties;
 using System;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.TypeSystem
 {

@@ -104,11 +104,66 @@
     <Compile Include="Runtime\EnabledState.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
+    <Compile Include="Runtime\Sources\AssignableParameterizedSourceBase.cs" />
+    <Compile Include="Runtime\Sources\AssignableSourceBase.cs" />
+    <Compile Include="Runtime\Sources\CacheContains.cs" />
+    <Compile Include="Runtime\Sources\CacheValueSpecification.cs" />
+    <Compile Include="Runtime\Sources\Caching\ActivatedCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\AmbientStack.cs" />
+    <Compile Include="Runtime\Sources\Caching\Cache.cs" />
+    <Compile Include="Runtime\Sources\Caching\CacheBase.cs" />
+    <Compile Include="Runtime\Sources\Caching\CacheExtensions.cs" />
+    <Compile Include="Runtime\Sources\Caching\CacheFactory.cs" />
+    <Compile Include="Runtime\Sources\Caching\Condition.cs" />
+    <Compile Include="Runtime\Sources\Caching\DecoratedCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\EqualityReference.cs" />
+    <Compile Include="Runtime\Sources\Caching\EqualityReferenceCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\FactoryCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\IAtomicCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\ICache.cs" />
+    <Compile Include="Runtime\Sources\Caching\ICacheRegistry.cs" />
+    <Compile Include="Runtime\Sources\Caching\IStackSource.cs" />
+    <Compile Include="Runtime\Sources\Caching\IStoreCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\ListCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\CacheRegistry.cs" />
+    <Compile Include="Runtime\Sources\Caching\SetCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\Stack.cs" />
+    <Compile Include="Runtime\Sources\Caching\Stacks.cs" />
+    <Compile Include="Runtime\Sources\Caching\SourceCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\ThreadLocalStore.cs" />
+    <Compile Include="Runtime\Sources\Caching\ThreadLocalStoreCache.cs" />
+    <Compile Include="Runtime\Sources\Caching\WritableStoreCache.cs" />
+    <Compile Include="Runtime\Sources\DecoratedAssignableParameterizedSource.cs" />
+    <Compile Include="Runtime\Sources\DecoratedParameterizedSource.cs" />
+    <Compile Include="Runtime\Sources\DelegatedParameterizedSource.cs" />
+    <Compile Include="Runtime\Sources\DelegatedSource.cs" />
+    <Compile Include="Runtime\Sources\EmptySource.cs" />
+    <Compile Include="Runtime\Sources\Factory.cs" />
+    <Compile Include="Runtime\Sources\FixedDeferedSource.cs" />
+    <Compile Include="Runtime\Sources\FixedDelegateBuilder.cs" />
+    <Compile Include="Runtime\Sources\FixedSource.cs" />
+    <Compile Include="Runtime\Sources\IAssignable.cs" />
+    <Compile Include="Runtime\Sources\IAssignableParameterizedSource.cs" />
+    <Compile Include="Runtime\Sources\IAssignableSource.cs" />
+    <Compile Include="Runtime\Sources\IParameterizedScope.cs" />
+    <Compile Include="Runtime\Sources\IParameterizedSource.cs" />
+    <Compile Include="Runtime\Sources\IScope.cs" />
+    <Compile Include="Runtime\Sources\IScopeAware.cs" />
     <Compile Include="Runtime\Sources\ISource.cs" />
-    <Compile Include="Runtime\Properties\WeakList.cs" />
+    <Compile Include="Runtime\WeakList.cs" />
     <Compile Include="Runtime\PurgingCollection.cs" />
     <Compile Include="Runtime\Sources\Extensions.cs" />
+    <Compile Include="Runtime\Sources\IStack.cs" />
+    <Compile Include="Runtime\Sources\ParameterizedScope.cs" />
+    <Compile Include="Runtime\Sources\ParameterizedSourceBase.cs" />
+    <Compile Include="Runtime\Sources\Scope.cs" />
+    <Compile Include="Runtime\Sources\ScopeContext.cs" />
     <Compile Include="Runtime\Sources\Scoping.cs" />
+    <Compile Include="Runtime\Sources\Source.cs" />
+    <Compile Include="Runtime\Sources\SourceBase.cs" />
+    <Compile Include="Runtime\Sources\SourceCollection.cs" />
+    <Compile Include="Runtime\Sources\SourcedParameterizedSource.cs" />
+    <Compile Include="Runtime\Sources\StackCommand.cs" />
     <Compile Include="Runtime\Wrapped.cs" />
     <Compile Include="Runtime\IRepository.cs" />
     <Compile Include="Runtime\ISerializer.cs" />
@@ -118,8 +173,8 @@
     <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsInstanceOfSpecification.cs" />
     <Compile Include="Runtime\Sources\AmbientStackCommand.cs" />
-    <Compile Include="Runtime\Properties\AttachedProperty.cs" />
-    <Compile Include="Runtime\Properties\ConnectedStore.cs" />
+    <Compile Include="Runtime\Sources\Caching\AttachedProperty.cs" />
+    <Compile Include="Runtime\Sources\Caching\ConnectedStore.cs" />
     <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Runtime\Specifications\AlwaysSpecification.cs" />
     <Compile Include="Runtime\Specifications\FixedSpecification.cs" />
@@ -247,8 +302,8 @@
     <Compile Include="Modularity\ModuleTypeLoaderNotFoundException.cs" />
     <Compile Include="Modularity\ModuleTypeLoadingException.cs" />
     <Compile Include="Runtime\Specifications\TypeAssignableSpecification.cs" />
-    <Compile Include="Runtime\Sources\Value.cs" />
-    <Compile Include="Runtime\Sources\DisposingSourceBase.cs" />
+    <Compile Include="Runtime\Sources\ItemsStoreBase.cs" />
+    <Compile Include="Runtime\Sources\CacheSpecificationBase.cs" />
     <Compile Include="Setup\AllTypesOfFactory.cs" />
     <Compile Include="Runtime\CommandCollection.cs" />
     <Compile Include="Runtime\CompositeCommand.cs" />
@@ -347,9 +402,7 @@
       <Name>DragonSpark.Types</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Runtime\Stores\" />
-  </ItemGroup>
+  <ItemGroup />
   <!--<ItemGroup>
 	<Folder Include="Diagnostics\Logger\Categories\" />
   </ItemGroup>-->

@@ -1,6 +1,5 @@
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
-using System;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Runtime.Sources
 {
@@ -14,25 +13,6 @@ namespace DragonSpark.Runtime.Sources
 		}
 
 		protected ICache<TInstance, TValue> Cache { get; }
-	}
-
-	public class CacheValueSpecification<TInstance, TValue> : CacheContains<TInstance, TValue> where TInstance : class
-	{
-		readonly Func<TValue> value;
-
-		public CacheValueSpecification( ICache<TInstance, TValue> cache, Func<TValue> value ) : base( cache )
-		{
-			this.value = value;
-		}
-
-		public override bool IsSatisfiedBy( TInstance parameter ) => base.IsSatisfiedBy( parameter ) && Equals( Cache.Get( parameter ), value() );
-	}
-
-	public class CacheContains<TInstance, TValue> : CacheSpecificationBase<TInstance, TValue> where TInstance : class
-	{
-		public CacheContains( ICache<TInstance, TValue> cache ) : base( cache ) {}
-
-		public override bool IsSatisfiedBy( TInstance parameter ) => Cache.Contains( parameter );
 	}
 
 	/*public abstract class DisposingSourceBase<T> : AssignableSourceBase<T>, IDisposable

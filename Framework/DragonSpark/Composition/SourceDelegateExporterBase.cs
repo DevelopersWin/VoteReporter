@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
@@ -10,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Runtime.Sources.Caching;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 using Type = System.Type;
 

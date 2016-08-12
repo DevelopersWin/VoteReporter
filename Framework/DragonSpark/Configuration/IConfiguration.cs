@@ -70,11 +70,11 @@ namespace DragonSpark.Configuration
 
 		public static T Default<T>( this IParameterizedConfiguration<object, T> @this ) => @this.Get( Execution.Current() );
 
-		/*public static IStore<T> ToStore<T>( this IConfiguration<object, T> @this ) => StoreCache<T>.Default.Get( @this );
-		class StoreCache<T> : Cache<IConfiguration<object, T>, IStore<T>>
+		/*public static IStore<T> ToStore<T>( this IConfiguration<object, T> @this ) => SourceCache<T>.Default.Get( @this );
+		class SourceCache<T> : Cache<IConfiguration<object, T>, IStore<T>>
 		{
-			public static StoreCache<T> Default { get; } = new StoreCache<T>();
-			StoreCache() : base( configuration => new ScopedStore<T>( configuration.Get ) ) {}
+			public static SourceCache<T> Default { get; } = new SourceCache<T>();
+			SourceCache() : base( configuration => new ScopedStore<T>( configuration.Get ) ) {}
 		}#1#
 	}*/
 }

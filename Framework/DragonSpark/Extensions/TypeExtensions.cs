@@ -1,10 +1,10 @@
-﻿using DragonSpark.Runtime.Properties;
-using DragonSpark.TypeSystem;
+﻿using DragonSpark.TypeSystem;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 using Type = System.Type;
 
 namespace DragonSpark.Extensions

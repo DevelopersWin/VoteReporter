@@ -1,6 +1,5 @@
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.ObjectBuilder;

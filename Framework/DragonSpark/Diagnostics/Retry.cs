@@ -1,11 +1,11 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Runtime.Sources;
 
 namespace DragonSpark.Diagnostics
 {
@@ -21,7 +21,7 @@ namespace DragonSpark.Diagnostics
 
 		public RetryCommand( int maximumRetryAttempts ) : this( TimeSpan.FromSeconds( 1 ), maximumRetryAttempts ) {}
 
-		public RetryCommand( TimeSpan wait, int maximumRetryAttempts ) : this( Logging.Instance.Scoped().Get(), wait, maximumRetryAttempts ) {}
+		public RetryCommand( TimeSpan wait, int maximumRetryAttempts ) : this( Logging.Instance.ToScope().Get(), wait, maximumRetryAttempts ) {}
 
 		public RetryCommand( ILogger logger, TimeSpan wait, int maximumRetryAttempts )
 		{

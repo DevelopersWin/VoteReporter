@@ -2,8 +2,8 @@ using System;
 using System.Composition.Hosting.Core;
 using DragonSpark.Activation;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Setup.Registration;
 
 namespace DragonSpark.Composition

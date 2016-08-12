@@ -1,9 +1,9 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.Unity;
 using System;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Activation.IoC
 {

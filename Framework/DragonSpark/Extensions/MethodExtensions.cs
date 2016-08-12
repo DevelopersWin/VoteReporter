@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Extensions
 {

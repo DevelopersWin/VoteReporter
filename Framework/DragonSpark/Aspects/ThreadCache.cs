@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -9,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Aspects
 {

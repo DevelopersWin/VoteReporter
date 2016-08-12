@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
@@ -9,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Activation
 {

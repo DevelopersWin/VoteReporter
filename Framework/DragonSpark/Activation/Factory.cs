@@ -2,7 +2,6 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
@@ -13,6 +12,7 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using Type = System.Type;
 
 namespace DragonSpark.Activation

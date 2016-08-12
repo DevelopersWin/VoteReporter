@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Specifications;
 using System;
+using DragonSpark.Runtime.Sources.Caching;
 using ICommand = System.Windows.Input.ICommand;
 
 namespace DragonSpark.Extensions

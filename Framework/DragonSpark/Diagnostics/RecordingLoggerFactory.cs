@@ -28,7 +28,7 @@ namespace DragonSpark.Diagnostics
 
 	/*public static class MigrationProperties
 	{
-		public static ICache<LogEvent, bool> IsMigrating { get; } = new StoreCache<LogEvent, bool>();
+		public static ICache<LogEvent, bool> IsMigrating { get; } = new SourceCache<LogEvent, bool>();
 	}*/
 
 	/*public class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommand<LogEvent>

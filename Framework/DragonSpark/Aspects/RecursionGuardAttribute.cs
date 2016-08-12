@@ -1,12 +1,12 @@
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Generic;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Aspects
 {
@@ -24,7 +24,7 @@ namespace DragonSpark.Aspects
 		readonly int maxCallCount;
 		readonly ICache<IDictionary<int, int>> cache;
 
-		public RecursionGuardAttribute( int maxCallCount = 2 ) : this( new StoreCache<IDictionary<int, int>>( new ThreadLocalStoreCache<IDictionary<int, int>>( () => new Dictionary<int, int>() ) ), maxCallCount ) {}
+		public RecursionGuardAttribute( int maxCallCount = 2 ) : this( new SourceCache<IDictionary<int, int>>( new ThreadLocalStoreCache<IDictionary<int, int>>( () => new Dictionary<int, int>() ) ), maxCallCount ) {}
 
 		RecursionGuardAttribute( ICache<IDictionary<int, int>> cache, int maxCallCount = 2 )
 		{

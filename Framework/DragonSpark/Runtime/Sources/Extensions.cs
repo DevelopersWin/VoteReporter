@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
+using DragonSpark.Runtime.Sources.Caching;
 using System;
 using System.Windows.Input;
 
@@ -94,6 +94,15 @@ namespace DragonSpark.Runtime.Sources
 
 				public override T Create() => source().Get();
 			}
+		}
+
+		public static IScope<T> ToScope<T>( this IParameterizedSource<object, T> @this ) => @this.ToDelegate().ToScope();
+		public static IScope<T> ToScope<T>( this Func<object, T> @this ) => Scopes<T>.Default.Get( @this );
+
+		class Scopes<T> : Cache<Func<object, T>, IScope<T>>
+		{
+			public static Scopes<T> Default { get; } = new Scopes<T>();
+			Scopes() : base( cache => new Scope<T>( cache.Fix<object, T>() ) ) {}
 		}
 
 		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();

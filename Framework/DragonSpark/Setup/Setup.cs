@@ -3,7 +3,6 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
@@ -14,6 +13,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Setup
 {
@@ -115,7 +115,7 @@ namespace DragonSpark.Setup
 
 	/*public static class ActivationProperties
 	{
-		public static ICache<bool> Instance { get; } = new StoreCache<bool>();
+		public static ICache<bool> Instance { get; } = new SourceCache<bool>();
 
 		public static ICache<Type> Factory { get; } = new Cache<Type>();
 

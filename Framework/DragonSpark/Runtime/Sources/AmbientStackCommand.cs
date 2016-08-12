@@ -1,7 +1,4 @@
-using System.Collections.Immutable;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Runtime.Sources
 {
@@ -26,32 +23,5 @@ namespace DragonSpark.Runtime.Sources
 		public AmbientStackCommand() : this( AmbientStack<T>.Default ) {}
 
 		public AmbientStackCommand( AmbientStack<T> stack ) : base( stack.Get() ) {}
-	}
-
-	public interface IStack<T>
-	{
-		bool Contains( T item );
-
-		ImmutableArray<T> All();
-
-		T Peek();
-
-		void Push( T item );
-
-		T Pop();
-	}
-
-	public class StackCommand<T> : DisposingCommand<T>
-	{
-		public StackCommand( [Required]IStack<T> stack )
-		{
-			Stack = stack;
-		}
-
-		protected IStack<T> Stack { get; }
-
-		public override void Execute( T parameter ) => Stack.Push( parameter );
-
-		protected override void OnDispose() => Stack.Pop().TryDispose();
 	}
 }

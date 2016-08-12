@@ -1,6 +1,5 @@
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;

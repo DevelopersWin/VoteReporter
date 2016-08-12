@@ -1,13 +1,13 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using PostSharp.Aspects;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Aspects.Validation
 {

@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using Serilog;
 using System;
 using System.Diagnostics;
+using DragonSpark.Runtime.Sources.Caching;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {

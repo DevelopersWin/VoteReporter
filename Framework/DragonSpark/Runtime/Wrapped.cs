@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -8,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using System.Reflection;
+using DragonSpark.Runtime.Sources.Caching;
 using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Runtime

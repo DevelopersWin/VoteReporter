@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime.Properties;
 using DragonSpark.Testing.Objects;
 using System.Linq;
 using System.Threading.Tasks;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using Xunit;
 
 namespace DragonSpark.Testing.Runtime.Values

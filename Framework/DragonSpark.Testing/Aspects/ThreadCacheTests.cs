@@ -1,12 +1,12 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Properties;
 using Ploeh.AutoFixture.Xunit2;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DragonSpark.Runtime.Sources;
+using DragonSpark.Runtime.Sources.Caching;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects
