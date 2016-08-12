@@ -38,6 +38,8 @@
     <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />
     <Compile Include="Activation\IoC\StrategyEntryCollection.cs" />
     <Compile Include="Activation\IoC\UnityContainerFactory.cs" />
+    <Compile Include="Sources\Parameterized\Extensions.cs" />
+    <Compile Include="Sources\Parameterized\ITransformer.cs" />
     <Compile Include="Sources\Parameterized\ParameterAware.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Sources\Parameterized\Factory.cs" />

@@ -1,9 +1,10 @@
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -11,7 +12,24 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		public static ISpecification<T> Inverse<T>( this ISpecification<T> @this ) => new InverseSpecification( @this ).Cast<T>();
 		
+		/*public static Func<T, bool> Inverse<T>( this Func<T, bool> @this ) => Inversed<T>.Default.Get( @this );
+		sealed class Inversed<T> : Cache<Func<T, bool>, Func<T, bool>>
+		{
+			public static Inversed<T> Default { get; } = new Inversed<T>();
+			Inversed() : base( factory => new Converter( factory ).Create ) {}
 
+			class Converter : FactoryBase<T, bool>
+			{
+				readonly Func<T, bool> @from;
+				public Converter( Func<T, bool> @from )
+				{
+					this.@from = @from;
+				}
+
+				public override bool Create( T parameter ) => !from( parameter );
+			}
+		}
+*/
 		public static ISpecification<T> Or<T>( this ISpecification<T> @this, params ISpecification[] others ) 
 			=> new AnySpecification<T>( @this.Append( others.Select( specification => specification.Cast<T>() ) ).Fixed() );
 
