@@ -1,19 +1,19 @@
-{
+﻿{
   "supports": {},
   "dependencies": {
-	"AutoMapper": "5.0.2",
-	"Microsoft.Composition": "1.0.30",
-			"NReco.LambdaParser": "1.0.3",
-	"PostSharp.Patterns.Model": "4.2.29",
-	"PostSharp.Patterns.Threading": "4.2.29",
-	"Serilog.Sinks.Seq": "2.0.0",
-	"Serilog.Sinks.TextWriter": "2.0.0",
-	"System.Collections.Immutable": "1.2.0",
-	"System.Interactive": "3.0.0",
-	"System.Reactive": "3.0.0",
-	"Unity": "4.0.1"
+    "AutoMapper": "5.1.1",
+    "Microsoft.Composition": "1.0.30",
+    "NReco.LambdaParser": "1.0.3",
+    "PostSharp.Patterns.Model": "4.2.29",
+    "PostSharp.Patterns.Threading": "4.2.29",
+    "Serilog.Sinks.Seq": "2.0.0",
+    "Serilog.Sinks.TextWriter": "2.0.0",
+    "System.Collections.Immutable": "1.2.0",
+    "System.Interactive": "3.0.0",
+    "System.Reactive": "3.0.0",
+    "Unity": "4.0.1"
   },
-	"frameworks": {
-		".NETPortable,Version=v4.5,Profile=Profile7": {}
-	}
+  "frameworks": {
+    ".NETPortable,Version=v4.5,Profile=Profile7": {}
+  }
 }
