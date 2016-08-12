@@ -5,8 +5,8 @@ using Ploeh.AutoFixture.Xunit2;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects

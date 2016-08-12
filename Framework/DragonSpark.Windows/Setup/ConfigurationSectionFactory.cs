@@ -1,9 +1,9 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Configuration;
 using System.Linq;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Windows.Setup
 {

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using System.Reflection;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources.Caching;
 using Constructor = DragonSpark.Activation.Constructor;
 
 namespace DragonSpark.Runtime

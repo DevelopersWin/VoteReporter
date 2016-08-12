@@ -16,7 +16,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources.Caching;
 using Xunit;
 using AssemblyModuleCatalog = DragonSpark.Windows.Modularity.AssemblyModuleCatalog;
 using Constructor = DragonSpark.Activation.IoC.Constructor;

@@ -1,10 +1,10 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Activation.IoC

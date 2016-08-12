@@ -1,8 +1,6 @@
 ﻿using DragonSpark.Activation.IoC;
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -10,6 +8,8 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 using Delegates = DragonSpark.TypeSystem.Delegates;
 
 namespace DragonSpark.Activation

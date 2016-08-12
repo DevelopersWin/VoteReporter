@@ -1,6 +1,4 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -8,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Activation
 {

@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.TypeSystem;
@@ -15,6 +14,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
+using DragonSpark.Activation.Sources;
 using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 

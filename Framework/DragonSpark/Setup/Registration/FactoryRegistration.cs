@@ -1,10 +1,10 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using System;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Setup.Registration

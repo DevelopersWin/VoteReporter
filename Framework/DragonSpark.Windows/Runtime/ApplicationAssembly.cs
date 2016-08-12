@@ -1,13 +1,13 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.IO;
 using System.Reflection;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Windows.Runtime
 {

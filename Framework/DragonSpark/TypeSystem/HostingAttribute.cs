@@ -1,6 +1,6 @@
-using DragonSpark.Runtime.Sources;
 using PostSharp.Patterns.Contracts;
 using System;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.TypeSystem
 {

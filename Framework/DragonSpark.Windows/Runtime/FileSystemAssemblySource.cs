@@ -1,8 +1,8 @@
 using DragonSpark.Activation;
-using DragonSpark.Runtime.Sources;
 using System;
 using System.Collections.Immutable;
 using System.Reflection;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Windows.Runtime
 {

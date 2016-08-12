@@ -2,7 +2,6 @@
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using System;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Windows.Input;
+using DragonSpark.Activation.Sources;
 using Type = System.Type;
 
 namespace DragonSpark.Composition

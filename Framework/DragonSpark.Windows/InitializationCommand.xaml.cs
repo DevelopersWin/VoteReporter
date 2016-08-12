@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Immutable;
 using System.Composition;
+using DragonSpark.Activation.Sources;
 using DragonSpark.ComponentModel;
 
 namespace DragonSpark.Windows

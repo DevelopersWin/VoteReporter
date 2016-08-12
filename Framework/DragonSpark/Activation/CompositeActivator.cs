@@ -1,6 +1,6 @@
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using System.Linq;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Activation
 {

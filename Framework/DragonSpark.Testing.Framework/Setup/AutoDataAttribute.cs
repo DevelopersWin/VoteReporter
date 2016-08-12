@@ -3,7 +3,6 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
@@ -15,6 +14,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Activation.Sources;
 using InitializeLocationCommand = DragonSpark.Composition.InitializeLocationCommand;
 
 namespace DragonSpark.Testing.Framework.Setup

@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -9,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Runtime
 {

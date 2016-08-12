@@ -1,8 +1,8 @@
 using DragonSpark.Activation;
-using DragonSpark.Runtime.Sources;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Windows.Runtime
 {

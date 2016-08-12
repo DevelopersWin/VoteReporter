@@ -2,8 +2,6 @@ using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
@@ -13,6 +11,8 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 using Type = System.Type;
 
 namespace DragonSpark.Activation
@@ -123,7 +123,7 @@ namespace DragonSpark.Activation
 
 	public sealed class SourceTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
-		public static ISource<SourceTypes> Instance { get; } = new Scope<SourceTypes>( Runtime.Sources.Factory.Scope( () => new SourceTypes() ) );
+		public static ISource<SourceTypes> Instance { get; } = new Scope<SourceTypes>( Sources.Factory.Scope( () => new SourceTypes() ) );
 		SourceTypes() : base( new Factory().Create ) {}
 		
 		sealed class Factory :  FactoryBase<LocateTypeRequest, Type>

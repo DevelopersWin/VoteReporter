@@ -9,7 +9,7 @@ using PostSharp.Reflection;
 using PostSharp.Serialization;
 using System;
 using System.Reflection;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Aspects
 {

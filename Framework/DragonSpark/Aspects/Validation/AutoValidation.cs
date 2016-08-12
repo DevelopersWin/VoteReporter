@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Aspects.Validation
 {

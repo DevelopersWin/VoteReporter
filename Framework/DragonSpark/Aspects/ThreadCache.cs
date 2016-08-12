@@ -7,8 +7,8 @@ using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Aspects
 {

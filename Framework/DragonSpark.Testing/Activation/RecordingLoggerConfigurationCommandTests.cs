@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
-using DragonSpark.Runtime.Sources;
 using Ploeh.AutoFixture.Xunit2;
 using Serilog.Events;
 using System.Linq;
+using DragonSpark.Activation.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Activation

@@ -6,7 +6,7 @@ using System.Linq;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 
-namespace DragonSpark.Runtime.Sources.Caching
+namespace DragonSpark.Runtime
 {
 	/*public class EqualityCache<TKey, TValue> : CacheBase<TKey, TValue>
 	{

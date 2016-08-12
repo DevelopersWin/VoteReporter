@@ -1,9 +1,9 @@
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using Microsoft.Practices.ServiceLocation;
 using System;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Activation
 {

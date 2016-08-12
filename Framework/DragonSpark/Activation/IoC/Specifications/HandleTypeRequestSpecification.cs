@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using Microsoft.Practices.ObjectBuilder2;
@@ -11,7 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Activation.IoC.Specifications
 {

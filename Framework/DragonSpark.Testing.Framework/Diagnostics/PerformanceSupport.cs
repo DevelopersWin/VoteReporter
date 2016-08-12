@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {

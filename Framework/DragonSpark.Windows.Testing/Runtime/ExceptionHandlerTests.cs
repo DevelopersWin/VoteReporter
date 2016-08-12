@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -9,6 +8,7 @@ using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Composition;
 using System.Linq;
+using DragonSpark.Activation.Sources;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime

@@ -1,12 +1,12 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup.Registration;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using DragonSpark.Activation.Sources;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Windows.Entity

@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
 using System.Composition;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Testing.Objects.Composition
 {

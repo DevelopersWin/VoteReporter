@@ -1,7 +1,7 @@
-using DragonSpark.Runtime.Sources;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Testing.Objects
 {

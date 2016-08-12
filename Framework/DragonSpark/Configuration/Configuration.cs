@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Runtime.Sources;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Windows.Input;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Configuration
 {

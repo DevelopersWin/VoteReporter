@@ -6,7 +6,7 @@ using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Patterns.Contracts;
 using System;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Testing.Framework
 {

@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using System;
 using System.Windows.Media.Animation;
+using DragonSpark.Activation.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Runtime.Sources

@@ -2,7 +2,6 @@ using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Setup;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,8 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Runtime.Sources.Caching;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 using ServiceProviderConfigurations = DragonSpark.Composition.ServiceProviderConfigurations;
 
 namespace DragonSpark.Testing.Framework.Setup

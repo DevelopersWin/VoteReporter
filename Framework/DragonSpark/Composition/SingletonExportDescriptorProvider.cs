@@ -1,10 +1,10 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Sources;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Activation.Sources;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition

@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
@@ -9,6 +8,7 @@ using PostSharp.Serialization;
 using System;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Aspects
 {

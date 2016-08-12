@@ -4,7 +4,6 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Commands;
 using DragonSpark.Windows.Properties;
@@ -14,6 +13,7 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Windows.Setup
 {

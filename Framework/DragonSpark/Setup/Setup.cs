@@ -4,8 +4,6 @@ using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
-using DragonSpark.Runtime.Sources.Caching;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
@@ -15,6 +13,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Activation.Sources;
+using DragonSpark.Activation.Sources.Caching;
 
 namespace DragonSpark.Setup
 {

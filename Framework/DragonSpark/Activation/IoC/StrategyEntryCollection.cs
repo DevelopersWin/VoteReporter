@@ -1,8 +1,8 @@
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Sources;
 using Microsoft.Practices.ObjectBuilder2;
 using System.Collections.Generic;
 using System.Linq;
+using DragonSpark.Activation.Sources;
 
 namespace DragonSpark.Activation.IoC
 {
