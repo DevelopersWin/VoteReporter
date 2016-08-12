@@ -4,6 +4,8 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Moq;
@@ -14,8 +16,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 
@@ -207,7 +207,7 @@ namespace DragonSpark.Windows.Markup
 		/*[Required, Service]
 		SourceFactory SourceTypeFactory { [return: Required]get; set; }*/
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => SourceFactory.Instance.Get( FactoryType );
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => SourceFactory.Default.Get( FactoryType );
 	}
 
 	[ContentProperty( nameof(Properties) )]

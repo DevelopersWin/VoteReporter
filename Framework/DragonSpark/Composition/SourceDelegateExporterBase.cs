@@ -1,7 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -42,18 +40,16 @@ namespace DragonSpark.Composition
 			if ( !exists )
 			{
 				var resolved = resolver( contract );
-				var factoryType = resolved
+				var sourceType = resolved
 					.With( compositionContract => new LocateTypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
 					.With( Locator );
-				var success = factoryType != null && descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( factoryType ), true, out dependency );
+				var success = sourceType != null && descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( sourceType ), true, out dependency );
 				if ( success )
 				{
-					var types = new[] { factoryType, Parameters( factoryType ) };
-					var compositionContracts = types.WhereAssigned().Select( resolved.ChangeType ).ToArray();
-					Register( descriptorAccessor, compositionContracts );
+					Register( descriptorAccessor, new[] { sourceType, Parameters( sourceType ) }.WhereAssigned().Select( resolved.ChangeType ).ToArray() );
 					var provider = new ServiceProvider( Stack, registry.TryGet, resolved );
 					
-					var activator = new ActivatorFactory( Stack, resultSource, new ActivatorParameter( provider, factoryType ) );
+					var activator = new ActivatorFactory( Stack, resultSource, new ActivatorParameter( provider, sourceType ) );
 					var factory = dependency.Target.IsShared ? new SharedFactory( activator.Create, cache, Contracts.Default.Get( dependency.Contract ) ) : new Factory( activator.Create );
 					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, dependency.Target.IsShared, NoDependencies, factory.Get );
 				}
@@ -151,22 +147,6 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class DelegateResultFactory : ParameterizedSourceBase<ActivatorParameter, object>
-	{
-		public static DelegateResultFactory Instance { get; } = new DelegateResultFactory();
-		DelegateResultFactory() {}
-
-		public override object Get( ActivatorParameter parameter ) => new SourceFactory( parameter.Services.Self ).Get( parameter.FactoryType );
-	}
-
-	public sealed class DelegateFactory : ParameterizedSourceBase<ActivatorParameter, Func<object>>
-	{
-		public static DelegateFactory Instance { get; } = new DelegateFactory();
-		DelegateFactory() {}
-
-		public override Func<object> Get( ActivatorParameter parameter ) => new SourceDelegates( parameter.Services.Self ).Get( parameter.FactoryType );
-	}
-
 	public struct CompositeActivatorParameters
 	{
 		public CompositeActivatorParameters( LifetimeContext context, CompositionOperation operation )
@@ -181,14 +161,14 @@ namespace DragonSpark.Composition
 
 	public struct ActivatorParameter
 	{
-		public ActivatorParameter( IServiceProvider provider, Type factoryType )
+		public ActivatorParameter( IServiceProvider provider, Type sourceType )
 		{
 			Services = provider;
-			FactoryType = factoryType;
+			SourceType = sourceType;
 		}
 
 		public IServiceProvider Services { get; }
-		public Type FactoryType { get; }
+		public Type SourceType { get; }
 	}
 
 	public sealed class Contracts : FactoryCache<CompositionContract, string>

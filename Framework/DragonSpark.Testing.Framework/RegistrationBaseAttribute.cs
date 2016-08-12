@@ -67,18 +67,18 @@ namespace DragonSpark.Testing.Framework
 
 		public RegisterFactoryParameter( [Required, OfSourceType]Type factoryType, ImmutableArray<Type> registerTypes )
 		{
-			FactoryType = factoryType;
+			SourceType = factoryType;
 			RegisterTypes = registerTypes;
 		}
 		
-		public Type FactoryType { get; }
+		public Type SourceType { get; }
 
 		public ImmutableArray<Type> RegisterTypes { get; }
 	}
 
 	public abstract class RegisterFactoryCommandBase<TFactory> : CommandBase<RegisterFactoryParameter>
 	{
-		readonly static ISpecification<RegisterFactoryParameter> Specification = new DelegatedSpecification<RegisterFactoryParameter>( parameter => typeof(TFactory).Adapt().IsAssignableFrom( parameter.FactoryType ) );
+		readonly static ISpecification<RegisterFactoryParameter> Specification = new DelegatedSpecification<RegisterFactoryParameter>( parameter => typeof(TFactory).Adapt().IsAssignableFrom( parameter.SourceType ) );
 
 		readonly IServiceRegistry registry;
 		readonly ISingletonLocator locator;
@@ -95,24 +95,24 @@ namespace DragonSpark.Testing.Framework
 			this.determineDelegate = determineDelegate;
 		}
 
-		public override bool CanExecute( RegisterFactoryParameter parameter ) => base.CanExecute( parameter ) && typeof(TFactory).Adapt().IsAssignableFrom( parameter.FactoryType );
+		public override bool CanExecute( RegisterFactoryParameter parameter ) => base.CanExecute( parameter ) && typeof(TFactory).Adapt().IsAssignableFrom( parameter.SourceType );
 
 		public override void Execute( RegisterFactoryParameter parameter )
 		{
-			var created = create( parameter.FactoryType );
+			var created = create( parameter.SourceType );
 			foreach ( var type in parameter.RegisterTypes )
 			{
 				registry.RegisterFactory( new FactoryRegistrationParameter( type, created ) );
-				var factory = locator.Get( MakeGenericType( parameter.FactoryType, type ) ).AsValid<IValidatedParameterizedSource>();
-				var @delegate = determineDelegate( parameter.FactoryType ) ?? created;
+				var factory = locator.Get( MakeGenericType( parameter.SourceType, type ) ).AsValid<IValidatedParameterizedSource>();
+				var @delegate = determineDelegate( parameter.SourceType ) ?? created;
 				var typed = factory.Create( @delegate );
 				registry.Register( new InstanceRegistrationParameter( typed.GetType(), typed ) );
 			}
 			
-			new[] { ConventionImplementedInterfaces.Instance.Get( parameter.FactoryType ), SourceInterfaces.Instance.Get( parameter.FactoryType ) }
+			new[] { ConventionImplementedInterfaces.Instance.Get( parameter.SourceType ), SourceInterfaces.Instance.Get( parameter.SourceType ) }
 				.WhereAssigned()
 				.Distinct()
-				.Introduce( parameter.FactoryType, tuple => new MappingRegistrationParameter( tuple.Item1, tuple.Item2 ) )
+				.Introduce( parameter.SourceType, tuple => new MappingRegistrationParameter( tuple.Item1, tuple.Item2 ) )
 				.Each( registry.Register );
 		}
 

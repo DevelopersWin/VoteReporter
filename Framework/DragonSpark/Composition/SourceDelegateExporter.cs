@@ -2,8 +2,8 @@ using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -27,7 +27,11 @@ namespace DragonSpark.Composition
 			public static Factory Instance { get; } = new Factory();
 			Factory() {}
 
-			public override object Get( ActivatorParameter parameter ) => DelegateFactory.Instance.Get( parameter ).Convert( ResultTypes.Instance.Get( parameter.FactoryType ) );
+			public override object Get( ActivatorParameter parameter ) => 
+				SourceDelegates.Instances
+						.Get( parameter.Services.Sourced().ToDelegate() )
+						.Get( parameter.SourceType )
+						;
 		}
 	}
 

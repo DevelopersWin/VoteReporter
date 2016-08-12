@@ -33,7 +33,7 @@ namespace DragonSpark.Activation.IoC
 				this.previous = previous;
 			}
 
-			public object Create( IUnityContainer unityContainer, Type type, string buildName ) => SourceFactory.Instance.Get( factoryType ) ?? ( previous != null ? unityContainer.Resolve( previous, Items<ResolverOverride>.Default ) : null );
+			public object Create( IUnityContainer unityContainer, Type type, string buildName ) => SourceFactory.Default.Get( factoryType ) ?? ( previous != null ? unityContainer.Resolve( previous, Items<ResolverOverride>.Default ) : null );
 		}
 	}
 }

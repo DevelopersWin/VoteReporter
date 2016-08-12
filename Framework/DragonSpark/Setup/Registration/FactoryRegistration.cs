@@ -1,11 +1,13 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.TypeSystem;
 using System;
+using System.Collections.Immutable;
+using System.Linq;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Setup.Registration
@@ -21,19 +23,34 @@ namespace DragonSpark.Setup.Registration
 
 	public sealed class SourceFactory : ParameterizedSourceBase<Type, object>
 	{
-		public static SourceFactory Instance { get; } = new SourceFactory();
-		SourceFactory() : this( Activator.Instance.Provider() ) {}
+		public static IParameterizedSource<Func<IServiceProvider>, SourceFactory> Instances { get; } = new Cache<Func<IServiceProvider>, SourceFactory>( func => new SourceFactory( func ) );
+		public static SourceFactory Default { get; } = Instances.Get( Activator.Instance.Provider() );
 
-		readonly Func<Type, Func<object>> factory;
+		readonly Func<Type, Delegate> factory;
+		readonly IGenericMethodContext<Invoke> methods;
 
-		public SourceFactory( Func<IServiceProvider> provider ) : this( new CompositeFactory<Type, Func<object>>( new SourceDelegates( provider ), new ServiceProvidedParameterizedSourceDelegates( provider ) ).Get ) {}
+		SourceFactory( Func<IServiceProvider> provider ) : this( new Factory( provider ).Get ) {}
 
-		SourceFactory( Func<Type, Func<object>> factory )
+		SourceFactory( Func<Type, Delegate> factory )
 		{
 			this.factory = factory;
+			methods = GetType().Adapt().GenericFactoryMethods[nameof(ToResult)];
 		}
 
-		public override object Get( Type parameter ) => factory( parameter )?.Invoke();
+		public override object Get( Type parameter )
+		{
+			var @delegate = factory( parameter );
+			var result = @delegate != null ? methods.Make( ResultTypes.Instance.Get( parameter ) ).Invoke<object>( @delegate ) : null;
+			return result;
+		}
+
+		static object ToResult<T>( Func<T> source ) => source();
+
+		sealed class Factory : CompositeFactory<Type, Delegate>
+		{
+			readonly static ImmutableArray<Func<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>>> Delegates = SourceDelegates.Instances.Append( ServiceProvidedParameterizedSourceDelegates.Instances ).Select( source => source.ToDelegate() ).ToImmutableArray();
+			public Factory( Func<IServiceProvider> source ) : base( Delegates.Introduce( source ).ToArray() ) {}
+		}
 	}
 
 	/*public class SourceDelegatesFactory : 
@@ -48,51 +65,69 @@ namespace DragonSpark.Setup.Registration
 			: base( new AutoValidatingFactory<Type, Func<object>>( factory, SourceSpecification ), new AutoValidatingFactory<Type, Func<object>>( factoryWithParameter, FactoryWithParameterSpecification ) ) {}#1#
 	}*/
 
-	public class SourceDelegates : FactoryCache<Type, Func<object>>
+	public abstract class DelegatesBase : FactoryCache<Type, Delegate>
 	{
-		readonly Func<Type, ISource> source;
+		protected DelegatesBase( Func<IServiceProvider> source ) : this( source, Specifications.Assigned ) {}
+		protected DelegatesBase( Func<IServiceProvider> source, ISpecification<Type> specification ) : this( source.Delegate<object>(), specification ) {}
 
-		public SourceDelegates( Func<IServiceProvider> source ) : this( source.Delegate<ISource>() ) {}
-
-		SourceDelegates( Func<Type, ISource> source ) : base( IsSourceSpecification.Instance )
+		DelegatesBase( Func<Type, object> locator, ISpecification<Type> specification, string name = "ToDelegate" ) : base( specification )
 		{
-			this.source = source;
+			Locator = locator;
+			Methods = GetType().Adapt().GenericFactoryMethods[ name ];
 		}
 
-		protected override Func<object> Create( Type parameter ) => source( parameter ).ToDelegate();
+		protected Func<Type, object> Locator { get; }
+		protected IGenericMethodContext<Invoke> Methods { get; }
 	}
 
-	public class ParameterizedSourceDelegates : FactoryCache<Type, Func<object, object>>
+	public class SourceDelegates : DelegatesBase
 	{
-		readonly Func<Type, IParameterizedSource> source;
+		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Instances { get; } = new Cache<Func<IServiceProvider>, SourceDelegates>( func => new SourceDelegates( func ) );
+		SourceDelegates( Func<IServiceProvider> source ) : base( source, IsSourceSpecification.Instance ) {}
 
-		public ParameterizedSourceDelegates( Func<IServiceProvider> source ) : this( source.Delegate<IParameterizedSource>() ) {}
+		protected override Delegate Create( Type parameter ) => Methods.Make( ResultTypes.Instance.Get( parameter ) ).Invoke<Delegate>( Locator( parameter ) );
 
-		ParameterizedSourceDelegates( Func<Type, IParameterizedSource> source ) : base( IsParameterizedSourceSpecification.Instance )
-		{
-			this.source = source;
-		}
-
-		protected override Func<object, object> Create( Type parameter ) => source( parameter ).Get;
+		static Delegate ToDelegate<T>( ISource<T> source ) => source.ToDelegate();
 	}
 
-	public class ServiceProvidedParameterizedSourceDelegates : FactoryCache<Type, Func<object>>
+	public class ParameterizedSourceDelegates : DelegatesBase
 	{
-		readonly Func<Type, Func<object, object>> factorySource;
-		readonly Func<Type, object> parameterSource;
+		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Instances { get; } = new Cache<Func<IServiceProvider>, ParameterizedSourceDelegates>( func => new ParameterizedSourceDelegates( func ) );
+		ParameterizedSourceDelegates( Func<IServiceProvider> source ) : base( source, IsParameterizedSourceSpecification.Instance ) {}
 
-		public ServiceProvidedParameterizedSourceDelegates( Func<IServiceProvider> source ) : this( new ParameterizedSourceDelegates( source ).Get, source.Delegate<object>() ) {}
+		protected override Delegate Create( Type parameter ) => 
+			Methods
+				.Make( ParameterTypes.Instance.Get( parameter ), ResultTypes.Instance.Get( parameter ) )
+				.Invoke<Delegate>( Locator( parameter ) );
 
-		ServiceProvidedParameterizedSourceDelegates( Func<Type, Func<object, object>> factorySource, Func<Type, object> parameterSource )
+		static Delegate ToDelegate<TParameter, TResult>( IParameterizedSource<TParameter, TResult> source ) => source.ToDelegate();
+	}
+
+	public class ServiceProvidedParameterizedSourceDelegates : DelegatesBase
+	{
+		public static IParameterizedSource<Func<IServiceProvider>, ServiceProvidedParameterizedSourceDelegates> Instances { get; } = new Cache<Func<IServiceProvider>, ServiceProvidedParameterizedSourceDelegates>( func => new ServiceProvidedParameterizedSourceDelegates( func ) );
+		ServiceProvidedParameterizedSourceDelegates( Func<IServiceProvider> source ) : this( ParameterizedSourceDelegates.Instances.Get( source ).Get, source ) {}
+
+		readonly Func<Type, Delegate> factorySource;
+
+		ServiceProvidedParameterizedSourceDelegates( Func<Type, Delegate> factorySource, Func<IServiceProvider> provider ) : base( provider )
 		{
 			this.factorySource = factorySource;
-			this.parameterSource = parameterSource;
 		}
 
-		protected override Func<object> Create( Type parameter )
+		protected override Delegate Create( Type parameter )
 		{
 			var factory = factorySource( parameter );
-			var result = factory != null ? factory.Fixed( parameterSource.Fixed( ParameterTypes.Instance.Get( parameter ) ).Get ).Get : (Func<object>)null;
+			return factory != null ? 
+				Methods
+				.Make( ParameterTypes.Instance.Get( parameter ), ResultTypes.Instance.Get( parameter ) )
+				.Invoke<Delegate>( parameter, factory, Locator ) : null;
+		}
+
+		static Delegate ToDelegate<TParameter, TResult>( Type parameter, Func<TParameter, TResult> factory, Func<Type, object> locator )
+		{
+			var @delegate = locator.Convert<Type, object, Type, TParameter>().Fixed( ParameterTypes.Instance.Get( parameter ) ).ToDelegate();
+			var result = factory.Fixed( @delegate ).ToDelegate();
 			return result;
 		}
 
