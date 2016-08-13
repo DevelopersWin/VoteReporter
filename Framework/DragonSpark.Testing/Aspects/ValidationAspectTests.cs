@@ -23,13 +23,13 @@ namespace DragonSpark.Testing.Aspects
 			public bool Called { get; set; }
 			public bool GenericCalled { get; set; }
 
-			bool IValidatedParameterizedSource.IsValid( object parameter )
+			bool ISpecification.IsSatisfiedBy( object parameter )
 			{
 				Called = true;
-				return IsValid( parameter );
+				return IsSatisfiedBy( parameter );
 			}
 
-			public virtual bool IsValid( object parameter )
+			public virtual bool IsSatisfiedBy( object parameter )
 			{
 				GenericCalled = true;
 				return parameter.IsAssigned();
@@ -39,8 +39,6 @@ namespace DragonSpark.Testing.Aspects
 
 			public object Get( object parameter ) => null;
 			bool ISpecification<object>.IsSatisfiedBy( object parameter ) => IsSatisfiedBy( parameter );
-
-			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
 		}
 		
 		/*[Theory, AutoData]

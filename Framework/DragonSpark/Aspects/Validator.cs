@@ -1,5 +1,6 @@
-﻿using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
@@ -9,8 +10,6 @@ using PostSharp.Serialization;
 using System;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Aspects
 {
@@ -148,14 +147,14 @@ namespace DragonSpark.Aspects
 	{
 		readonly static MethodInfo Method = typeof(IParameterizedSource).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource.Get) );
 
-		public FactoryAdapter( IValidatedParameterizedSource inner ) : base( new DelegatedSpecification<object>( inner.IsValid ), Method ) {}
+		public FactoryAdapter( ISpecification inner ) : base( new DelegatedSpecification<object>( inner.IsSatisfiedBy ), Method ) {}
 	}
 
 	public class FactoryAdapter<TParameter, TResult> : ParameterValidationAdapterBase<TParameter>
 	{
 		readonly static MethodInfo Method = typeof(IParameterizedSource<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource<TParameter, TResult>.Get) );
 		
-		public FactoryAdapter( IValidatedParameterizedSource<TParameter, TResult> inner ) : base( inner, Method ) {}
+		public FactoryAdapter( ISpecification<TParameter> inner ) : base( inner, Method ) {}
 	}
 
 	public class CommandAdapter : ParameterValidationAdapterBase<object>

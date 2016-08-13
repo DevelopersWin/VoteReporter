@@ -12,10 +12,10 @@ namespace DragonSpark.Activation
 
 		protected ActivatorBase( Coerce<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification ) {}
 
-		bool IValidatedParameterizedSource<TypeRequest, object>.IsValid( TypeRequest parameter ) => IsValid( (TRequest)parameter );
+		bool ISpecification<TypeRequest>.IsSatisfiedBy( TypeRequest parameter ) => base.IsSatisfiedBy( (TRequest)parameter );
 
 		object IParameterizedSource<TypeRequest, object>.Get( TypeRequest parameter ) => Get( (TRequest)parameter );
-		public bool IsSatisfiedBy( TypeRequest parameter ) => IsValid( (TRequest)parameter );
+		//public bool IsSatisfiedBy( TypeRequest parameter ) => base.IsSatisfiedBy( (TRequest)parameter );
 	}
 
 	public abstract class LocatorBase : ActivatorBase<LocateTypeRequest>

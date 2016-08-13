@@ -240,11 +240,11 @@ namespace DragonSpark.Runtime
 
 		protected CommandBase() : this( Defaults<T>.Coercer ) {}
 
-		protected CommandBase( [Required] Coerce<T> coercer ) : this( coercer, Specifications<T>.Assigned ) {}
+		protected CommandBase( Coerce<T> coercer ) : this( coercer, Specifications<T>.Assigned ) {}
 
-		protected CommandBase( [Required] ISpecification<T> specification ) : this( Defaults<T>.Coercer, specification ) {}
+		protected CommandBase( ISpecification<T> specification ) : this( Defaults<T>.Coercer, specification ) {}
 
-		protected CommandBase( [Required] Coerce<T> coercer, [Required] ISpecification<T> specification )
+		protected CommandBase( Coerce<T> coercer, [Required] ISpecification<T> specification )
 		{
 			this.coercer = coercer;
 			this.specification = specification;
@@ -253,15 +253,12 @@ namespace DragonSpark.Runtime
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
 		bool ICommand.CanExecute( object parameter ) => Coerce( parameter );
-
+		bool ISpecification.IsSatisfiedBy( object parameter ) => Coerce( parameter );
 		protected virtual bool Coerce( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
+		public virtual bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
 
 		void ICommand.Execute( object parameter ) => Execute( coercer( parameter ) );
 
-		public virtual bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
-
 		public abstract void Execute( T parameter );
-
-		bool ISpecification.IsSatisfiedBy( object parameter ) => Coerce( parameter );
 	}
 }

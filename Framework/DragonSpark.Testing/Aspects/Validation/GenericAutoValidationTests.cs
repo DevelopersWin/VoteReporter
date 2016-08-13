@@ -62,7 +62,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, first );
 
-			var can = sut.IsValid( 6776 );
+			var can = sut.IsSatisfiedBy( 6776 );
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 			Assert.True( can );
@@ -80,17 +80,17 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
 
-			var invalid = factory.IsValid( "Message" );
+			var invalid = factory.IsSatisfiedBy( "Message" );
 			Assert.False( invalid );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
 			
-			var cannot = factory.IsValid( 456 );
+			var cannot = factory.IsSatisfiedBy( 456 );
 			Assert.False( cannot );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 
-			var can = factory.IsValid( 6776 );
+			var can = factory.IsSatisfiedBy( 6776 );
 			Assert.True( can );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 2, sut.CanCreateGenericCalled );
@@ -140,19 +140,13 @@ namespace DragonSpark.Testing.Aspects.Validation
 			public int CreateGenericCalled { get; private set; }
 			public void Reset() => CanCreateCalled = CreateCalled = CanCreateGenericCalled = CreateGenericCalled = 0;
 
-			public bool IsValid( object parameter )
-			{
-				CanCreateCalled++;
-				return parameter is int && IsValid( (int)parameter );
-			}
-
 			object IParameterizedSource.Get( object parameter )
 			{
 				CreateCalled++;
 				return Get( (int)parameter );
 			}
 
-			public bool IsValid( int parameter )
+			public bool IsSatisfiedBy( int parameter )
 			{
 				CanCreateGenericCalled++;
 				return parameter == 6776;
@@ -164,9 +158,11 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return parameter + 123;
 			}
 
-			public bool IsSatisfiedBy( int parameter ) => IsValid( parameter );
-
-			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
+			public bool IsSatisfiedBy( object parameter )
+			{
+				CanCreateCalled++;
+				return parameter is int && IsSatisfiedBy( (int)parameter );
+			}
 		}
 
 		class ExtendedFactory : IExtendedFactory
@@ -180,19 +176,13 @@ namespace DragonSpark.Testing.Aspects.Validation
 			public int CreateGenericCalled { get; private set; }
 			public void Reset() => CanCreateCalled = CreateCalled = CanCreateGenericCalled = CreateGenericCalled = 0;
 
-			public bool IsValid( object parameter )
-			{
-				CanCreateCalled++;
-				return parameter is int && IsValid( (int)parameter );
-			}
-
 			public object Get( object parameter )
 			{
 				CreateCalled++;
 				return Get( (int)parameter );
 			}
 
-			public bool IsValid( int parameter )
+			public bool IsSatisfiedBy( int parameter )
 			{
 				CanCreateGenericCalled++;
 				return parameter == 6776;
@@ -204,9 +194,11 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return parameter + 123;
 			}
 
-			public bool IsSatisfiedBy( int parameter ) => IsValid( parameter );
-
-			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
+			public bool IsSatisfiedBy( object parameter )
+			{
+				CanCreateCalled++;
+				return parameter is int && IsSatisfiedBy( (int)parameter );
+			}
 		}
 	}
 }

@@ -1,5 +1,5 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Runtime;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Aspects;
@@ -8,62 +8,63 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {
 	public static class AutoValidation
 	{
-		public static ImmutableArray<IProfile> DefaultProfiles { get; } = new IProfile[] { GenericFactoryProfile.Instance, GenericCommandProfile.Instance, FactoryProfile.Instance, CommandProfile.Instance }.ToImmutableArray();
+		public static ImmutableArray<IProfile> DefaultProfiles { get; } = new IProfile[] { GenericSourceProfile.Instance, GenericCommandProfile.Instance, SourceProfile.Instance, CommandProfile.Instance }.ToImmutableArray();
 
-		class GenericFactoryProfile : ProfileBase
+		sealed class GenericSourceProfile : ProfileBase
 		{
-			public static GenericFactoryProfile Instance { get; } = new GenericFactoryProfile();
-			GenericFactoryProfile() : base( typeof(IValidatedParameterizedSource<,>), nameof(IValidatedParameterizedSource.IsValid), typeof(IParameterizedSource<,>), nameof(IParameterizedSource.Get), GenericFactoryProfileFactory.Instance.Create ) {}
+			public static GenericSourceProfile Instance { get; } = new GenericSourceProfile();
+			GenericSourceProfile() : base( typeof(IValidatedParameterizedSource<,>), typeof(ISpecification<>), nameof(ISpecification.IsSatisfiedBy), typeof(IParameterizedSource<,>), nameof(IParameterizedSource.Get), GenericFactoryProfileFactory.Instance.Create ) {}
 		}
 
-		class FactoryProfile : ProfileBase
+		sealed class SourceProfile : ProfileBase
 		{
-			public static FactoryProfile Instance { get; } = new FactoryProfile();
-			FactoryProfile() : base( typeof(IValidatedParameterizedSource), nameof(IValidatedParameterizedSource.IsValid), typeof(IParameterizedSource), nameof(IValidatedParameterizedSource.Get), SourceAdapterSource.Instance.Get ) {}
+			public static SourceProfile Instance { get; } = new SourceProfile();
+			SourceProfile() : base( typeof(IValidatedParameterizedSource), typeof(ISpecification), nameof(ISpecification.IsSatisfiedBy), typeof(IParameterizedSource), nameof(IParameterizedSource.Get), SourceAdapterSource.Instance.Get ) {}
 		}
 
-		class GenericCommandProfile : ProfileBase
+		sealed class GenericCommandProfile : ProfileBase
 		{
 			public static GenericCommandProfile Instance { get; } = new GenericCommandProfile();
-			GenericCommandProfile() : base( typeof(ISpecification<>), nameof(ISpecification.IsSatisfiedBy), typeof(ICommand<>), nameof(ICommand.Execute), GenericCommandProfileFactory.Instance.Create ) {}
+			GenericCommandProfile() : base( typeof(ICommand<>), typeof(ISpecification<>), nameof(ISpecification.IsSatisfiedBy), typeof(ICommand<>), nameof(ICommand.Execute), GenericCommandProfileFactory.Instance.Create ) {}
 		}
 
-		class CommandProfile : ProfileBase
+		sealed class CommandProfile : ProfileBase
 		{
 			public static CommandProfile Instance { get; } = new CommandProfile();
-			CommandProfile() : base( typeof(ICommand), nameof(ICommand.CanExecute), nameof(ICommand.Execute), CommandProfileSource.Instance.Get ) {}
+			CommandProfile() : base( typeof(ICommand), typeof(ICommand), nameof(ICommand.CanExecute), typeof(ICommand), nameof(ICommand.Execute), CommandProfileSource.Instance.Get ) {}
 		}
 	}
 	
-	class AdapterLocator // : FactoryBase<object, IParameterValidationAdapter>
+	class AdapterLocator : ParameterizedSourceBase<object, IParameterValidationAdapter>
 	{
 		public static AdapterLocator Instance { get; } = new AdapterLocator();
-		AdapterLocator() : this( AutoValidation.DefaultProfiles ) {}
+		AdapterLocator() : this( Adapters.Instance.Get ) {}
 
 		readonly Func<Type, Func<object, IParameterValidationAdapter>> factorySource;
-
-		public AdapterLocator( ImmutableArray<IProfile> profiles ) : this( new Cache<Type, Func<object, IParameterValidationAdapter>>( new Factory( profiles ).Create ).Get ) {}
 
 		AdapterLocator( Func<Type, Func<object, IParameterValidationAdapter>> factorySource )
 		{
 			this.factorySource = factorySource;
 		}
 
-		class Factory// : FactoryBase<Type, Func<object, IParameterValidationAdapter>>
+		sealed class Adapters : Cache<Type, Func<object, IParameterValidationAdapter>>
 		{
+			public static Adapters Instance { get; } = new Adapters();
+			Adapters() : this( AutoValidation.DefaultProfiles ) {}
+
 			readonly ImmutableArray<IProfile> profiles;
-			public Factory( ImmutableArray<IProfile> profiles )
+			
+			Adapters( ImmutableArray<IProfile> profiles )
 			{
 				this.profiles = profiles;
 			}
 
-			public Func<object, IParameterValidationAdapter> Create( Type parameter )
+			public override Func<object, IParameterValidationAdapter> Get( Type parameter )
 			{
 				foreach ( var profile in profiles )
 				{
@@ -76,7 +77,7 @@ namespace DragonSpark.Aspects.Validation
 			}
 		}
 
-		public IParameterValidationAdapter Create( object parameter )
+		public override IParameterValidationAdapter Get( object parameter )
 		{
 			var other = parameter.GetType();
 			var factory = factorySource( other );

@@ -153,7 +153,7 @@ namespace DragonSpark.TypeSystem
 
 	public class AssemblyTypesStore : FactoryCache<Assembly, IEnumerable<Type>>
 	{
-		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToDelegate();
+		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToSpecificationDelegate();
 
 		readonly Func<Assembly, IEnumerable<Type>> types;
 		public AssemblyTypesStore( Func<Assembly, IEnumerable<Type>> types )

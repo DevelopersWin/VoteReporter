@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -43,10 +42,10 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	class AutoValidationControllerFactory // : FactoryBase<object, IAutoValidationController>
+	class AutoValidationControllerFactory : ParameterizedSourceBase<IAutoValidationController>
 	{
-		public static IParameterizedSource<IAutoValidationController> Instance { get; } = new Cache<IAutoValidationController>( new AutoValidationControllerFactory().Create );
-		AutoValidationControllerFactory() : this( AdapterLocator.Instance.Create ) {}
+		public static IParameterizedSource<IAutoValidationController> Instance { get; } = new AutoValidationControllerFactory().ToCache();
+		AutoValidationControllerFactory() : this( AdapterLocator.Instance.Get ) {}
 
 		readonly Func<object, IParameterValidationAdapter> adapterSource;
 		readonly Action<object, IAspectHub> set;
@@ -59,7 +58,7 @@ namespace DragonSpark.Aspects.Validation
 			this.set = set;
 		}
 
-		IAutoValidationController Create( object parameter )
+		public override IAutoValidationController Get( object parameter )
 		{
 			var adapter = adapterSource( parameter );
 			var result = new AutoValidationController( adapter );
@@ -73,11 +72,8 @@ namespace DragonSpark.Aspects.Validation
 		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Instance.Get;
 	}
 
-	class AspectFactory<T> /*: FactoryBase<object, T>*/ where T : class, IAspect
+	class AspectFactory<T> : ParameterizedSourceBase<T> where T : class, IAspect
 	{
-		/*public static AspectFactory<T> Instance { get; } = new AspectFactory<T>();
-		AspectFactory() : this( Defaults.ControllerSource, ParameterConstructor<IAutoValidationController, T>.Default ) {}*/
-
 		readonly Func<object, IAutoValidationController> controllerSource;
 		readonly Func<IAutoValidationController, T> resultSource;
 
@@ -89,7 +85,7 @@ namespace DragonSpark.Aspects.Validation
 			this.resultSource = resultSource;
 		}
 
-		public T Create( object parameter )
+		public override T Get( object parameter )
 		{
 			var controller = controllerSource( parameter );
 			var result = resultSource( controller );
@@ -117,7 +113,7 @@ namespace DragonSpark.Aspects.Validation
 
 	public class AutoValidationValidationAspect : AutoValidationAspectBase
 	{
-		readonly static Func<object, Implementation> Factory = new AspectFactory<Implementation>( controller => new Implementation( controller ) ).Create;
+		readonly static Func<object, Implementation> Factory = new AspectFactory<Implementation>( controller => new Implementation( controller ) ).Get;
 		public AutoValidationValidationAspect() : base( Factory ) {}
 
 		sealed class Implementation : AutoValidationValidationAspect
@@ -138,7 +134,7 @@ namespace DragonSpark.Aspects.Validation
 
 	public class AutoValidationExecuteAspect : AutoValidationAspectBase
 	{
-		readonly static Func<object, Implementation> Factory = new AspectFactory<Implementation>( controller => new Implementation( controller ) ).Create;
+		readonly static Func<object, Implementation> Factory = new AspectFactory<Implementation>( controller => new Implementation( controller ) ).Get;
 
 		public AutoValidationExecuteAspect() : base( Factory ) {}
 
@@ -166,10 +162,10 @@ namespace DragonSpark.Aspects.Validation
 		readonly Func<Type, AspectInstance> validate;
 		readonly Func<Type, AspectInstance> execute;
 
-		protected ProfileBase( Type interfaceType, string valid, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType, valid, interfaceType, execute, factory ) {}
+		// protected ProfileBase( Type interfaceType, string valid, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType, valid, interfaceType, execute, factory ) {}
 
-		protected ProfileBase( Type interfaceType, string valid, Type executionType, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), 
-			new AspectInstanceMethodFactory<AutoValidationValidationAspect>( interfaceType, valid ).Create, 
+		protected ProfileBase( Type interfaceType, Type validationType, string valid, Type executionType, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), 
+			new AspectInstanceMethodFactory<AutoValidationValidationAspect>( validationType, valid ).Create, 
 			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( executionType, execute ).Create, factory )
 		{}
 

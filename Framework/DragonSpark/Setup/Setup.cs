@@ -246,7 +246,7 @@ namespace DragonSpark.Setup
 			using ( active.Assignment( serviceType, true ) )
 			{
 				var stores = ServiceProviderRegistry.Instance.Get().List().Select( Selector );
-				var result = stores.Introduce( serviceType, tuple => tuple.Item1.IsValid( tuple.Item2 ), tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
+				var result = stores.Introduce( serviceType, tuple => tuple.Item1.IsSatisfiedBy( tuple.Item2 ), tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 				return result;
 			}
 		}

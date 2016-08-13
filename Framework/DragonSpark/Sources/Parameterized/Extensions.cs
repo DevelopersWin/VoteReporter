@@ -15,13 +15,13 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		public static ImmutableArray<TResult> CreateMany<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this, IEnumerable<TParameter> parameters, Func<TResult, bool> where = null ) =>
 			parameters
-				.Where( @this.IsValid )
+				.Where( @this.IsSatisfiedBy )
 				.Select( @this.Get )
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
 		public static ImmutableArray<TResult> CreateMany<TResult>( this IValidatedParameterizedSource @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
 			parameters
-				.Where( @this.IsValid )
+				.Where( @this.IsSatisfiedBy )
 				.Select( @this.Get )
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
@@ -161,20 +161,6 @@ namespace DragonSpark.Sources.Parameterized
 		{
 			public static ParameterizedSourceDelegates<TParameter, TResult> Default { get; } = new ParameterizedSourceDelegates<TParameter, TResult>();
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
-		}
-
-		public static ISpecification<object> ToSpecification( this IValidatedParameterizedSource @this ) => FactorySpecifications.Default.Get( @this );
-		sealed class FactorySpecifications : Cache<IValidatedParameterizedSource, ISpecification<object>>
-		{
-			public static FactorySpecifications Default { get; } = new FactorySpecifications();
-			FactorySpecifications() : base( factory => new DelegatedSpecification<object>( factory.IsValid ) ) {}
-		}
-
-		public static ISpecification<TParameter> ToSpecification<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => FactorySpecifications<TParameter, TResult>.Default.Get( @this );
-		sealed class FactorySpecifications<TParameter, TResult> : Cache<IValidatedParameterizedSource<TParameter, TResult>, ISpecification<TParameter>>
-		{
-			public static FactorySpecifications<TParameter, TResult> Default { get; } = new FactorySpecifications<TParameter, TResult>();
-			FactorySpecifications() : base( factory => new DelegatedSpecification<TParameter>( factory.IsValid ) ) {}
 		}
 
 		public static ICache<T> ToCache<T>( this IParameterizedSource<object, T> @this ) => @this.ToSourceDelegate().ToCache();

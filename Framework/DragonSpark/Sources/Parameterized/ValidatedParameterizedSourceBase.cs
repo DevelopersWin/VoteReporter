@@ -114,10 +114,8 @@ namespace DragonSpark.Sources.Parameterized
 			this.specification = specification;
 		}
 
-		public bool IsValid( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
-		bool IValidatedParameterizedSource.IsValid( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
-
-		bool ISpecification<TParameter>.IsSatisfiedBy( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		public virtual bool IsSatisfiedBy( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		//bool ISpecification<TParameter>.IsSatisfiedBy( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
 		bool ISpecification.IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
 
 		public abstract TResult Get( TParameter parameter );

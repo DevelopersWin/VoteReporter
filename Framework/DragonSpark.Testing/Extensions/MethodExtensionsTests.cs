@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		public void GenericFactory()
 		{
-			var method = new Func<object, bool>( new Factory().IsValid ).Method;
+			var method = new Func<object, bool>( new Factory().IsSatisfiedBy ).Method;
 			var found = method.AccountForGenericDefinition();
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );

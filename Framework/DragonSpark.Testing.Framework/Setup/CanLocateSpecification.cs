@@ -1,10 +1,10 @@
-using System;
-using System.ComponentModel.DataAnnotations;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using Microsoft.Practices.ServiceLocation;
 using Ploeh.AutoFixture.Kernel;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -22,6 +22,6 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		public bool IsSatisfiedBy( object request ) => TypeSupport.From( request ).With( CanLocate );
 
-		protected virtual bool CanLocate( Type type ) => activator.IsValid( type );
+		protected virtual bool CanLocate( Type type ) => activator.IsSatisfiedBy( type );
 	}
 }

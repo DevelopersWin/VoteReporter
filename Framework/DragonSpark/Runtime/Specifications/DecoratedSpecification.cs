@@ -7,11 +7,23 @@ using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class CastedSpecification<TFrom, TTo> : SpecificationBase<TTo> where TFrom : TTo
+	public class CastingSpecification<T> : SpecificationBase<T>
+	{
+		readonly ISpecification specification;
+
+		public CastingSpecification( ISpecification specification )
+		{
+			this.specification = specification;
+		}
+
+		public override bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
+	}
+
+	public class CastingSpecification<TFrom, TTo> : SpecificationBase<TTo> where TFrom : TTo
 	{
 		readonly ISpecification<TFrom> specification;
 
-		public CastedSpecification( ISpecification<TFrom> specification )
+		public CastingSpecification( ISpecification<TFrom> specification )
 		{
 			this.specification = specification;
 		}

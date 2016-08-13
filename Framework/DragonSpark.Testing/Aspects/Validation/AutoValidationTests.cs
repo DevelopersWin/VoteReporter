@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
@@ -52,13 +51,13 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 		static void BasicAutoValidationWith( IValidatedParameterizedSource factory, IFactory sut )
 		{
-			var cannot = factory.IsValid( 456 );
+			var cannot = factory.IsSatisfiedBy( 456 );
 			Assert.False( cannot );
 			Assert.Equal( 1, sut.CanCreateCalled );
 
 			for ( int i = 0; i < 10; i++ )
 			{
-				var can = factory.IsValid( 123 );
+				var can = factory.IsSatisfiedBy( 123 );
 				Assert.True( can );
 			}
 
@@ -80,12 +79,6 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			public int CreateCalled { get; private set; }
 
-			public bool IsValid( object parameter )
-			{
-				CanCreateCalled++;
-				return (int)parameter == 123;
-			}
-
 			public object Get( object parameter )
 			{
 				CreateCalled++;
@@ -97,7 +90,11 @@ namespace DragonSpark.Testing.Aspects.Validation
 				CanCreateCalled = CreateCalled = 0;
 			}
 
-			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
+			public bool IsSatisfiedBy( object parameter )
+			{
+				CanCreateCalled++;
+				return (int)parameter == 123;
+			}
 		}
 
 		public class Factory : IFactory
@@ -106,12 +103,6 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			public int CreateCalled { get; private set; }
 
-			public bool IsValid( object parameter )
-			{
-				CanCreateCalled++;
-				return (int)parameter == 123;
-			}
-
 			public object Get( object parameter )
 			{
 				CreateCalled++;
@@ -123,7 +114,11 @@ namespace DragonSpark.Testing.Aspects.Validation
 				CanCreateCalled = CreateCalled = 0;
 			}
 
-			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
+			public bool IsSatisfiedBy( object parameter )
+			{
+				CanCreateCalled++;
+				return (int)parameter == 123;
+			}
 		}
 	}
 }

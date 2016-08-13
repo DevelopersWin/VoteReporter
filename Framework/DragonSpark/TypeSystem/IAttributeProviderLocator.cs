@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
@@ -186,7 +185,7 @@ namespace DragonSpark.TypeSystem
 				foreach ( var @delegate in Delegates )
 				{
 					var factory = @delegate( definition );
-					if ( factory?.IsValid( parameter ) ?? false )
+					if ( factory?.IsSatisfiedBy( parameter ) ?? false )
 					{
 						return factory.Get<MemberInfo>( parameter );
 					}

@@ -1,10 +1,11 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using DragonSpark.Modularity;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.IoC;
 using DragonSpark.Testing.Framework.Parameters;
@@ -15,9 +16,6 @@ using Microsoft.Practices.Unity;
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.Threading.Tasks;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using Xunit;
 using AssemblyModuleCatalog = DragonSpark.Windows.Modularity.AssemblyModuleCatalog;
 using Constructor = DragonSpark.Activation.IoC.Constructor;
@@ -48,7 +46,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( cancan );
 
 			var activator = container.Resolve<IActivator>();
-			var can = activator.IsValid( typeof(MonitoredModule) );
+			var can = activator.IsSatisfiedBy( typeof(MonitoredModule) );
 			Assert.True( can );
 
 			/*var created = activator.Create( typeof(MonitoredModule) );

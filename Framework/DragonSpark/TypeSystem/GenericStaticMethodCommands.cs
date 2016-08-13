@@ -207,7 +207,7 @@ namespace DragonSpark.TypeSystem
 				try
 				{
 					var method = item.Item1.Method.MakeGenericMethod( item.Item2 );
-					var specification = CompatibleArgumentsSpecification.Default.Get( method ).ToDelegate();
+					var specification = CompatibleArgumentsSpecification.Default.Get( method ).ToSpecificationDelegate();
 					var @delegate = create( method );
 					var result = new GenericMethodCandidate<T>( @delegate, specification );
 					return result;
@@ -230,7 +230,7 @@ namespace DragonSpark.TypeSystem
 
 	public struct Descriptor
 	{
-		public Descriptor( MethodInfo method ) : this( method, GenericMethodEqualitySpecification.Default.Get( method ).ToDelegate() ) {}
+		public Descriptor( MethodInfo method ) : this( method, GenericMethodEqualitySpecification.Default.Get( method ).ToSpecificationDelegate() ) {}
 
 		public Descriptor( MethodInfo method, Func<Type[], bool> specification )
 		{
