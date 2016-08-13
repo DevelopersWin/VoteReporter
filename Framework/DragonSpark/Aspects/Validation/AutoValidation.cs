@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -88,10 +89,17 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	public interface IAutoValidationController
+	public static class Extensions
 	{
-		bool IsValid( object parameter );
+		public static bool Marked( this IAutoValidationController @this, object parameter, bool valid )
+		{
+			@this.MarkValid( parameter, valid );
+			return valid;
+		}
+	}
 
+	public interface IAutoValidationController : ISpecification
+	{
 		void MarkValid( object parameter, bool valid );
 
 		object Execute( object parameter, Func<object> proceed );
@@ -140,16 +148,7 @@ namespace DragonSpark.Aspects.Validation
 
 		IParameterAwareHandler Handler { get; set; }
 
-		public bool IsValid( object parameter )
-		{
-			return Handler?.Handles( parameter ) ?? false;
-			/*if ( Handler != null && Handler.Handles( parameter ) )
-			{
-				return true;
-			}*/
-
-			// return Current( parameter );
-		}
+		public bool IsSatisfiedBy( object parameter ) => Handler?.Handles( parameter ) ?? false;
 
 		bool? Current( object parameter )
 		{

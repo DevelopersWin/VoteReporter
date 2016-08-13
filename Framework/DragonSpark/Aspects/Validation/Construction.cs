@@ -45,7 +45,7 @@ namespace DragonSpark.Aspects.Validation
 
 	class AutoValidationControllerFactory // : FactoryBase<object, IAutoValidationController>
 	{
-		public static ICache<object, IAutoValidationController> Instance { get; } = new Cache<IAutoValidationController>( new AutoValidationControllerFactory().Create );
+		public static IParameterizedSource<IAutoValidationController> Instance { get; } = new Cache<IAutoValidationController>( new AutoValidationControllerFactory().Create );
 		AutoValidationControllerFactory() : this( AdapterLocator.Instance.Create ) {}
 
 		readonly Func<object, IParameterValidationAdapter> adapterSource;
@@ -131,18 +131,7 @@ namespace DragonSpark.Aspects.Validation
 			public override void OnInvoke( MethodInterceptionArgs args )
 			{
 				var parameter = args.Arguments[0];
-				//var valid = controller.IsValid( parameter );
-				var valid = controller.IsValid( parameter ) || args.GetReturnValue<bool>();
-				controller.MarkValid( parameter, valid );
-				args.ReturnValue = valid;
-				/*if ( !valid.HasValue )
-				{
-					controller.MarkValid( parameter, args.GetReturnValue<bool>() );
-				}
-				else
-				{
-					args.ReturnValue = valid.Value;
-				}*/
+				args.ReturnValue = controller.IsSatisfiedBy( parameter ) ||  controller.Marked( parameter, args.GetReturnValue<bool>() );
 			}
 		}
 	}

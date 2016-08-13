@@ -14,13 +14,13 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Reference]
 		readonly Factory factory = new Factory();
 		[Reference]
-		readonly AutoValidatingFactory validating;
+		readonly AutoValidatingSource validating;
 		[Reference]
 		readonly AppliedFactory applied = new AppliedFactory();
 
 		public AutoValidationTests( ITestOutputHelper output ) : base( output )
 		{
-			validating = new AutoValidatingFactory( factory );
+			validating = new AutoValidatingSource( factory );
 		}
 
 		[Fact]
@@ -40,7 +40,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		public void BasicAutoValidationInline()
 		{
 			var sut = new Factory();
-			BasicAutoValidationWith( new AutoValidatingFactory( sut ), sut );
+			BasicAutoValidationWith( new AutoValidatingSource( sut ), sut );
 		}
 
 		[Fact]

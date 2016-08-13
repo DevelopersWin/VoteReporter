@@ -199,14 +199,14 @@ namespace DragonSpark.Sources.Parameterized
 		sealed class AutoValidationFactories<TParameter, TResult> : Cache<IValidatedParameterizedSource<TParameter, TResult>, IValidatedParameterizedSource<TParameter, TResult>>
 		{
 			public static AutoValidationFactories<TParameter, TResult> Default { get; } = new AutoValidationFactories<TParameter, TResult>();
-			AutoValidationFactories() : base( factory => new AutoValidatingFactory<TParameter,TResult>( factory ) ) {}
+			AutoValidationFactories() : base( factory => new AutoValidatingSource<TParameter,TResult>( factory ) ) {}
 		}
 
 		public static IValidatedParameterizedSource WithAutoValidation( this IValidatedParameterizedSource @this ) => AutoValidationFactories.Default.Get( @this );
 		sealed class AutoValidationFactories : Cache<IValidatedParameterizedSource, IValidatedParameterizedSource>
 		{
 			public static AutoValidationFactories Default { get; } = new AutoValidationFactories();
-			AutoValidationFactories() : base( factory => new AutoValidatingFactory( factory ) ) {}
+			AutoValidationFactories() : base( factory => new AutoValidatingSource( factory ) ) {}
 		}
 	}
 }

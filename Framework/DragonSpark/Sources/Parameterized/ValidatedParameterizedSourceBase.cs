@@ -48,7 +48,7 @@ namespace DragonSpark.Sources.Parameterized
 		}
 	}
 
-	public class ConfiguringFactory<TParameter, TResult> : DelegatedFactory<TParameter, TResult>
+	public class ConfiguringFactory<TParameter, TResult> : DelegatedValidatedSource<TParameter, TResult>
 	{
 		readonly Action<TParameter> initialize;
 		readonly Action<TResult> configure;
@@ -95,9 +95,7 @@ namespace DragonSpark.Sources.Parameterized
 			return result;
 		}
 	}
-
 	
-
 	public abstract class ValidatedParameterizedSourceBase<TParameter, TResult> : IValidatedParameterizedSource<TParameter, TResult>
 	{
 		readonly Coerce<TParameter> coercer;
@@ -125,20 +123,20 @@ namespace DragonSpark.Sources.Parameterized
 		object IParameterizedSource.Get( object parameter )
 		{
 			var coerced = coercer( parameter );
-			var result = coerced.IsAssigned() ? Get( coerced ) : default(TResult);
+			var result = coerced.IsAssignedOrValue() ? Get( coerced ) : default(TResult);
 			return result;
 		}
 	}
 
-	public class DelegatedFactory<TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
+	public class DelegatedValidatedSource<TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
 	{
 		readonly Func<TParameter, TResult> inner;
 
-		public DelegatedFactory( Func<TParameter, TResult> inner ) : this( inner, Specifications<TParameter>.Always ) {}
+		public DelegatedValidatedSource( Func<TParameter, TResult> inner ) : this( inner, Specifications<TParameter>.Always ) {}
 
-		public DelegatedFactory( Func<TParameter, TResult> inner, ISpecification<TParameter> specification ) : this( inner, Defaults<TParameter>.Coercer, specification ) {}
+		public DelegatedValidatedSource( Func<TParameter, TResult> inner, ISpecification<TParameter> specification ) : this( inner, Defaults<TParameter>.Coercer, specification ) {}
 
-		public DelegatedFactory( Func<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification ) : base( coercer, specification )
+		public DelegatedValidatedSource( Func<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification ) : base( coercer, specification )
 		{
 			this.inner = inner;
 		}

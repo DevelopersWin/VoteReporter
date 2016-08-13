@@ -21,7 +21,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 		public GenericAutoValidationTests( ITestOutputHelper output ) : base( output )
 		{
-			validating = new AutoValidatingFactory<int, float>( factory );
+			validating = new AutoValidatingSource<int, float>( factory );
 		}
 
 		[Fact]
@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		public void BasicAutoValidationInline()
 		{
 			var sut = new ExtendedFactory();
-			BasicAutoValidationWith( new AutoValidatingFactory<int, float>( sut ), sut );
+			BasicAutoValidationWith( new AutoValidatingSource<int, float>( sut ), sut );
 		}
 
 		[Fact]
