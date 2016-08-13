@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Reflection;

@@ -204,7 +204,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 	public abstract class TypeRequestSpecificationBase<T> : SpecificationBase<TypeRequest> where T : TypeRequest
 	{
-		readonly static Coerce<T> Coerce = TypeRequestCoercer<T>.Instance.ToDelegate();
+		readonly new static Coerce<T> Coerce = TypeRequestCoercer<T>.Instance.ToDelegate();
 		protected TypeRequestSpecificationBase() : base( Coerce ) {}
 
 		public sealed override bool IsSatisfiedBy( TypeRequest parameter )
