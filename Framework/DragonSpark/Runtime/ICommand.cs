@@ -1,6 +1,8 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -8,15 +10,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Runtime
 {
-	public interface ICommand<in TParameter> : ICommand
+	public interface ICommand<in TParameter> : ISpecification<TParameter>, ICommand
 	{
-		bool CanExecute( TParameter parameter );
-
 		void Execute( TParameter parameter );
 
 		void Update();
@@ -254,12 +252,16 @@ namespace DragonSpark.Runtime
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
-		bool ICommand.CanExecute( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
+		bool ICommand.CanExecute( object parameter ) => Coerce( parameter );
+
+		protected virtual bool Coerce( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
 
 		void ICommand.Execute( object parameter ) => Execute( coercer( parameter ) );
 
-		public virtual bool CanExecute( T parameter ) => specification.IsSatisfiedBy( parameter );
+		public virtual bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
 
 		public abstract void Execute( T parameter );
+
+		bool ISpecification.IsSatisfiedBy( object parameter ) => Coerce( parameter );
 	}
 }

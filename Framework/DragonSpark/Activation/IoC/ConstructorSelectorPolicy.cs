@@ -13,7 +13,7 @@ namespace DragonSpark.Activation.IoC
 	public class DefaultUnityConstructorSelectorPolicy : Microsoft.Practices.Unity.ObjectBuilder.DefaultUnityConstructorSelectorPolicy
 	{
 		public static DefaultUnityConstructorSelectorPolicy Instance { get; } = new DefaultUnityConstructorSelectorPolicy();
-		DefaultUnityConstructorSelectorPolicy() : this( ResolverFactory.Instance.ToDelegate() ) {}
+		DefaultUnityConstructorSelectorPolicy() : this( ResolverFactory.Instance.ToSourceDelegate() ) {}
 
 		readonly Func<ParameterInfo, IDependencyResolverPolicy> resolver;
 
@@ -54,12 +54,12 @@ namespace DragonSpark.Activation.IoC
 
 	public class ConstructorSelectorPolicy : IConstructorSelectorPolicy
 	{
-		readonly static Func<ParameterInfo, IDependencyResolverPolicy> Resolver = ResolverFactory.Instance.ToDelegate();
+		readonly static Func<ParameterInfo, IDependencyResolverPolicy> Resolver = ResolverFactory.Instance.ToSourceDelegate();
 		readonly Func<ConstructTypeRequest, ConstructorInfo> locator;
 		readonly Func<ParameterInfo, IDependencyResolverPolicy> resolver;
 		readonly Func<ConstructorInfo, SelectedConstructor> createDelegate;
 
-		public ConstructorSelectorPolicy( ConstructorLocator locator ) : this( locator.ToDelegate(), Resolver ) {}
+		public ConstructorSelectorPolicy( ConstructorLocator locator ) : this( locator.ToSourceDelegate(), Resolver ) {}
 
 		protected ConstructorSelectorPolicy( Func<ConstructTypeRequest, ConstructorInfo> locator, Func<ParameterInfo, IDependencyResolverPolicy> resolver )
 		{

@@ -132,7 +132,7 @@ namespace DragonSpark.Diagnostics
 
 		public IParameterizedSource<TParameter, object> Factory { get; set; }
 
-		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming( Factory.ToDelegate() );
+		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming( Factory.ToSourceDelegate() );
 	}
 
 	[ContentProperty( nameof(Policies) )]

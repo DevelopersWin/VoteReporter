@@ -9,6 +9,8 @@ using PostSharp.Serialization;
 using System;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 
 namespace DragonSpark.Aspects
 {
@@ -124,71 +126,50 @@ namespace DragonSpark.Aspects
 		public object Parameter { get; }
 	}*/
 
-	public interface IParameterValidationAdapter : IMethodAware
+	public interface IParameterValidationAdapter : ISpecification<MethodInfo> {}
+
+	public abstract class ParameterValidationAdapterBase<T> : DecoratedSpecification<T>, IParameterValidationAdapter
 	{
-		bool IsValid( object parameter );
+		readonly Func<MethodInfo, bool> method;
+
+		protected ParameterValidationAdapterBase( ISpecification<T> inner, MethodInfo method ) : this( inner, MethodEqualitySpecification.For( method ) ) {}
+
+		protected ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method ) : base( inner )
+		{
+			this.method = method;
+		}
+
+		public bool IsSatisfiedBy( MethodInfo parameter ) => method( parameter );
+
+		protected override bool Coerce( object parameter ) => parameter is MethodInfo ? IsSatisfiedBy( (MethodInfo)parameter ) : base.Coerce( parameter );
 	}
 
-	public class FactoryAdapter : IParameterValidationAdapter
+	public class FactoryAdapter : ParameterValidationAdapterBase<object>
 	{
 		readonly static MethodInfo Method = typeof(IParameterizedSource).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource.Get) );
 
-		readonly IValidatedParameterizedSource inner;
-
-		public FactoryAdapter( IValidatedParameterizedSource inner )
-		{
-			this.inner = inner;
-		}
-
-		public bool IsValid( object parameter ) => inner.IsValid( parameter );
-
-		MethodInfo IMethodAware.Method => Method;
+		public FactoryAdapter( IValidatedParameterizedSource inner ) : base( new DelegatedSpecification<object>( inner.IsValid ), Method ) {}
 	}
 
-	public class FactoryAdapter<TParameter, TResult> : IParameterValidationAdapter
+	public class FactoryAdapter<TParameter, TResult> : ParameterValidationAdapterBase<TParameter>
 	{
 		readonly static MethodInfo Method = typeof(IParameterizedSource<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource<TParameter, TResult>.Get) );
 		
-		readonly IValidatedParameterizedSource<TParameter, TResult> inner;
-
-		public FactoryAdapter( IValidatedParameterizedSource<TParameter, TResult> inner )
-		{
-			this.inner = inner;
-		}
-
-		public bool IsValid( object parameter ) => parameter is TParameter ? inner.IsValid( (TParameter)parameter ) : inner.IsValid( parameter );
-
-		MethodInfo IMethodAware.Method => Method;
+		public FactoryAdapter( IValidatedParameterizedSource<TParameter, TResult> inner ) : base( inner, Method ) {}
 	}
 
-	public class CommandAdapter : IParameterValidationAdapter
+	public class CommandAdapter : ParameterValidationAdapterBase<object>
 	{
 		readonly static MethodInfo Method = typeof(ICommand).GetTypeInfo().GetDeclaredMethod( nameof(ICommand.Execute) );
 
-		readonly ICommand inner;
-		public CommandAdapter( ICommand inner )
-		{
-			this.inner = inner;
-		}
-
-		public bool IsValid( object parameter ) => inner.CanExecute( parameter );
-
-		MethodInfo IMethodAware.Method => Method;
+		public CommandAdapter( ICommand inner ) : base( new DelegatedSpecification<object>( inner.CanExecute ), Method ) {}
 	}
 
-	public class CommandAdapter<T> : IParameterValidationAdapter
+	public class CommandAdapter<T> : ParameterValidationAdapterBase<T>
 	{
 		readonly static MethodInfo Method = typeof(ICommand<T>).GetTypeInfo().GetDeclaredMethod( nameof(ICommand<T>.Execute) );
 
-		readonly ICommand<T> inner;
-		public CommandAdapter( ICommand<T> inner )
-		{
-			this.inner = inner;
-		}
-
-		public bool IsValid( object parameter ) => parameter is T ? inner.CanExecute( (T)parameter ) : inner.CanExecute( parameter );
-
-		MethodInfo IMethodAware.Method => Method;
+		public CommandAdapter( ICommand<T> inner ) : base( inner, Method ) {}
 	}
 
 	/*public interface IAutoValidationController

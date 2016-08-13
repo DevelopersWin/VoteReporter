@@ -11,7 +11,7 @@ namespace DragonSpark.Activation
 
 		protected ConstructorBase( ISpecification<ConstructTypeRequest> specification  ) : base( DefaultCoerce, specification ) {}
 
-		public class Coercer : TypeRequestCoercer<ConstructTypeRequest>
+		public sealed class Coercer : TypeRequestCoercer<ConstructTypeRequest>
 		{
 			public static Coercer Instance { get; } = new Coercer();
 

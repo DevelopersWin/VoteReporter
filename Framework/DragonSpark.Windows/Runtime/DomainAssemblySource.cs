@@ -1,11 +1,11 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Windows.Runtime
 {
@@ -45,7 +45,7 @@ namespace DragonSpark.Windows.Runtime
 		protected override ImmutableArray<Assembly> Create( AppDomain parameter ) => 
 			parameter.GetAssemblies().Where( specification ).OrderBy( a => a.GetName().Name ).ToImmutableArray();
 
-		class Specification : GuardedSpecificationBase<Assembly>
+		class Specification : SpecificationBase<Assembly>
 		{
 			public static Specification Instance { get; } = new Specification();
 			Specification() {}

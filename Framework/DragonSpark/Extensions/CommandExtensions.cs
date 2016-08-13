@@ -57,7 +57,6 @@ namespace DragonSpark.Extensions
 		class SpecificationCache : Cache<ICommand, ISpecification<object>>
 		{
 			public static SpecificationCache Default { get; } = new SpecificationCache();
-
 			SpecificationCache() : base( command => new DelegatedSpecification<object>( command.CanExecute ) ) {}
 		}
 
@@ -65,8 +64,7 @@ namespace DragonSpark.Extensions
 		class SpecificationCache<T> : Cache<ICommand<T>, ISpecification<T>>
 		{
 			public static SpecificationCache<T> Default { get; } = new SpecificationCache<T>();
-
-			SpecificationCache() : base( command => new DelegatedSpecification<T>( command.CanExecute ) ) {}
+			SpecificationCache() : base( command => new DelegatedSpecification<T>( command.IsSatisfiedBy ) ) {}
 		}
 	}
 }

@@ -1,8 +1,8 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects.Internals;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.TypeSystem
 {
@@ -30,7 +29,7 @@ namespace DragonSpark.TypeSystem
 		public override IEnumerable<Assembly> Get( IEnumerable<Assembly> parameter ) => parameter.Where( specification );
 	}
 
-	public class ApplicationTypeSpecification : GuardedSpecificationBase<Type>
+	public class ApplicationTypeSpecification : SpecificationBase<Type>
 	{
 		public static ISpecification<Type> Instance { get; } = new ApplicationTypeSpecification().Cached();
 		ApplicationTypeSpecification() {}
@@ -38,7 +37,7 @@ namespace DragonSpark.TypeSystem
 		public override bool IsSatisfiedBy( Type parameter ) => Defaults.ActivateSpecification.IsSatisfiedBy( parameter ) && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Has<CompilerGeneratedAttribute>();
 	}
 
-	public class ApplicationAssemblySpecification : GuardedSpecificationBase<Assembly>
+	public class ApplicationAssemblySpecification : SpecificationBase<Assembly>
 	{
 		readonly ImmutableArray<string> rootNamespaces;
 

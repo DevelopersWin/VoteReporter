@@ -114,9 +114,11 @@ namespace DragonSpark.Sources.Parameterized
 			this.specification = specification;
 		}
 
-		bool IValidatedParameterizedSource.IsValid( object parameter ) => specification.IsSatisfiedBy( parameter );
-
 		public bool IsValid( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		bool IValidatedParameterizedSource.IsValid( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
+
+		bool ISpecification<TParameter>.IsSatisfiedBy( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		bool ISpecification.IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
 
 		public abstract TResult Get( TParameter parameter );
 
@@ -209,7 +211,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public class ParameterConstructedCompositeFactory<T> : CompositeFactory<object, T>
 	{
-		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ).ToDelegate() ).Fixed() ) {}
+		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ).ToSourceDelegate() ).Fixed() ) {}
 
 		sealed class Factory : ParameterizedSourceBase<T>
 		{
@@ -228,7 +230,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		readonly ImmutableArray<Func<TParameter, TResult>> inner;
 
-		public CompositeFactory( params IParameterizedSource<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToDelegate() ).ToArray() ) {}
+		public CompositeFactory( params IParameterizedSource<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToSourceDelegate() ).ToArray() ) {}
 
 		public CompositeFactory( params Func<TParameter, TResult>[] inner ) : this( Specifications<TParameter>.Always, inner ) {}
 

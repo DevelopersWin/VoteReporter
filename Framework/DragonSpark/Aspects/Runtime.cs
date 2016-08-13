@@ -50,6 +50,7 @@ namespace DragonSpark.Aspects
 	public class RuntimeSpecification : SpecificationBase<object>
 	{
 		public static RuntimeSpecification Instance { get; } = new RuntimeSpecification();
+		RuntimeSpecification() : base( Where<object>.Always ) {}
 
 		public override bool IsSatisfiedBy( object parameter ) => !PostSharpEnvironment.IsPostSharpRunning;
 		// public override bool IsSatisfiedBy( object parameter ) => false;

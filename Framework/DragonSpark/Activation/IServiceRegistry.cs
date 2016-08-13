@@ -29,7 +29,7 @@ namespace DragonSpark.Activation
 
 	public class OnlyIfNotRegistered : DecoratedSpecification<Type>
 	{
-		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse().Cast<Type>( LocatorBase.Coercer.Instance.Coerce ) ) { }
+		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse().Project<Type, TypeRequest>( LocatorBase.Coercer.Instance.Coerce ) ) { }
 	}
 
 	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<IsATypeSpecification>
@@ -85,26 +85,19 @@ namespace DragonSpark.Activation
 			this.typeResolver = typeResolver;
 		}
 
-		public override void Execute( InstanceRegistrationParameter parameter ) => typeResolver( parameter ).Each( type =>
+		public override void Execute( InstanceRegistrationParameter parameter )
 		{
-			base.Execute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
-		} );
+			foreach ( var type in typeResolver( parameter ) )
+			{
+				base.Execute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
+			}
+		}
 	}
 
-	public abstract class RegistrationCommandBase<T, U> : CommandBase<T> where T : RegistrationParameter where U : ISpecification<Type>
+	public abstract class RegistrationCommandBase<TParameter, TSpecification> : DelegatedCommand<TParameter> where TParameter : RegistrationParameter where TSpecification : ISpecification<Type>
 	{
-		readonly Action<T> command;
-		readonly U specification;
-
-		protected RegistrationCommandBase( [Required]Action<T> command, [Required]U specification )
-		{
-			this.command = command;
-			this.specification = specification;
-		}
-
-		public override bool CanExecute( T parameter ) => base.CanExecute( parameter ) && specification.IsSatisfiedBy( parameter.RequestedType );
-
-		public override void Execute( T parameter ) => command( parameter );
+		protected RegistrationCommandBase( [Required]Action<TParameter> command, [Required]TSpecification specification ) 
+			: base( command, specification.Project<TypeRequest, Type>( request => request.RequestedType ) ) {}
 	}
 
 	public class RegisterCommand : RegisterCommand<IsATypeSpecification>

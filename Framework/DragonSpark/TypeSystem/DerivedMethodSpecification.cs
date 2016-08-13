@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class DerivedMethodSpecification : GuardedSpecificationBase<MethodInfo>
+	public class DerivedMethodSpecification : SpecificationBase<MethodInfo>
 	{
 		public static DerivedMethodSpecification Instance { get; } = new DerivedMethodSpecification();
 
@@ -17,7 +17,7 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
-	public class DerivedTypeSpecification : GuardedSpecificationBase<TypeInfo>
+	public class DerivedTypeSpecification : SpecificationBase<TypeInfo>
 	{
 		public static DerivedTypeSpecification Instance { get; } = new DerivedTypeSpecification();
 

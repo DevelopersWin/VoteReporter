@@ -1,10 +1,10 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.TypeSystem;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.Utility;
@@ -21,17 +21,17 @@ namespace DragonSpark.Activation.IoC.Specifications
 	[Persistent]
 	class ResolutionSpecification : AnySpecification<TypeRequest>, IResolutionSpecification
 	{
-		readonly EqualityReferenceCache<TypeRequest, IAssignableSource<bool>> cache;
+		readonly ICache<TypeRequest, bool> cache;
 
 		public ResolutionSpecification( CanLocateSpecification locate, CanConstructSpecification constructor ) : base( locate, constructor )
 		{
-			cache = new EqualityReferenceCache<TypeRequest, IAssignableSource<bool>>( new WritableSourceCache<TypeRequest, bool>( new Func<TypeRequest, bool>( base.IsSatisfiedBy ) ).Get );
+			cache = new DelegatedParameterizedSource<TypeRequest, bool>( base.IsSatisfiedBy ).ToEqualityCache();
 		}
 
-		public override bool IsSatisfiedBy( TypeRequest parameter ) => cache.Get( parameter ).Get();
+		public override bool IsSatisfiedBy( TypeRequest parameter ) => cache.Get( parameter );
 	}
 
-	public abstract class RegistrationSpecificationBase : GuardedSpecificationBase<TypeRequest>
+	public abstract class RegistrationSpecificationBase : SpecificationBase<TypeRequest>
 	{
 		protected RegistrationSpecificationBase( [Required] IPolicyList policies )
 		{
@@ -41,11 +41,16 @@ namespace DragonSpark.Activation.IoC.Specifications
 		protected IPolicyList Policies { get; }
 	}
 
-	public abstract class TypeRequestSpecification : DecoratedSpecification<TypeRequest>
+	public abstract class TypeRequestSpecification : TypeRequestSpecification<TypeRequest>
 	{
-		protected TypeRequestSpecification( ISpecification inner, Func<TypeRequest, object> projection ) : base( inner, projection ) {}
+		protected TypeRequestSpecification( ISpecification<TypeRequest> inner ) : base( inner, Delegates<TypeRequest>.Self ) {}
+	}
 
-		protected TypeRequestSpecification( ISpecification<TypeRequest> inner ) : base( inner ) {}
+	public abstract class TypeRequestSpecification<T> : ProjectedSpecification<T, TypeRequest>
+	{
+		protected TypeRequestSpecification( ISpecification<T> inner, Func<TypeRequest, T> projection ) : base( inner, projection ) {}
+
+		// protected TypeRequestSpecification( ISpecification<TypeRequest> inner ) : base( inner ) {}
 	}
 
 	public class RegisteredSpecification : TypeRequestSpecification
@@ -63,7 +68,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 	public class HasRegisteredBuildPolicySpecification : RegistrationSpecificationBase
 	{
-		public HasRegisteredBuildPolicySpecification( [Required] IPolicyList policies ) : base( policies ) {}
+		public HasRegisteredBuildPolicySpecification( IPolicyList policies ) : base( policies ) {}
 
 		public override bool IsSatisfiedBy( TypeRequest parameter ) => !( Policies.GetNoDefault<IBuildPlanPolicy>( parameter, false ) is DynamicMethodBuildPlan );
 	}
@@ -74,11 +79,24 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 		public StrategySpecification( IStagedStrategyChain strategies ) : this( strategies, DefaultValidators ) {}
 
-		protected StrategySpecification( IStagedStrategyChain strategies, [Required] IEnumerable<ISpecification<StrategyValidatorParameter>> validators ) 
-			: base( new AnySpecification<StrategyValidatorParameter>( validators.ToArray() ), request => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request ) ) {}
+		protected StrategySpecification( IStagedStrategyChain strategies, IEnumerable<ISpecification<StrategyValidatorParameter>> validators ) 
+			: base( 
+				  new ProjectedSpecification<StrategyValidatorParameter,TypeRequest>( new AnySpecification<StrategyValidatorParameter>( validators.ToArray() ), new Factory( strategies ).Create )
+				   ) {}
+
+		sealed class Factory
+		{
+			readonly IStagedStrategyChain strategies;
+			public Factory( IStagedStrategyChain strategies )
+			{
+				this.strategies = strategies;
+			}
+
+			public StrategyValidatorParameter Create( TypeRequest request ) => new StrategyValidatorParameter( strategies.MakeStrategyChain(), request );
+		}
 	}
 
-	public class ContainsSingletonSpecification : GuardedSpecificationBase<Type>
+	public class ContainsSingletonSpecification : SpecificationBase<Type>
 	{
 		public static ContainsSingletonSpecification Instance { get; } = new ContainsSingletonSpecification( SingletonLocator.Instance );
 
@@ -92,11 +110,12 @@ namespace DragonSpark.Activation.IoC.Specifications
 		public override bool IsSatisfiedBy( Type parameter ) => locator.Get( parameter ) != null;
 	}
 
-	public class HasConventionSpecification : GuardedSpecificationBase<Type>
+	public class HasConventionSpecification : SpecificationBase<Type>
 	{
-		readonly Func<Type, Type> locator;
+		public static HasConventionSpecification Instance { get; } = new HasConventionSpecification();
+		HasConventionSpecification() : this( ConventionTypes.Instance.Get ) {}
 
-		public HasConventionSpecification() : this( ConventionTypes.Instance.Get ) {}
+		readonly Func<Type, Type> locator;
 
 		HasConventionSpecification( Func<Type, Type> locator )
 		{
@@ -113,7 +132,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 		HasFactorySpecification() : base( SourceTypes.Instance.Delegate(), TypeRequestCoercer<LocateTypeRequest>.Instance.ToDelegate() ) {}
 	}
 
-	public abstract class StrategyValidator<TStrategy> : GuardedSpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
+	public abstract class StrategyValidator<TStrategy> : SpecificationBase<StrategyValidatorParameter> where TStrategy : BuilderStrategy
 	{
 		public override bool IsSatisfiedBy( StrategyValidatorParameter parameter )
 		{
@@ -139,7 +158,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 		protected override bool Check( TypeRequest key ) => key.RequestedType.Adapt().IsGenericOf( typeof(IEnumerable<>) );
 	}
 
-	public class StrategyValidatorParameter
+	public struct StrategyValidatorParameter
 	{
 		public StrategyValidatorParameter( IEnumerable<IBuilderStrategy> strategies, TypeRequest key )
 		{
@@ -162,7 +181,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 			StrategySpecification strategies, 
 			HasFactorySpecification factory )
 				: base( 
-					  new AnySpecification<Type>( convention, singleton ).Cast<TypeRequest>( request => request.RequestedType ).Or( registered, strategies, factory )
+					  new AnySpecification<Type>( convention, singleton ).Project<TypeRequest, Type>( request => request.RequestedType ).Or( registered, strategies, factory.Cast<LocateTypeRequest, TypeRequest>() )
 					   ) {}
 	}
 
@@ -183,7 +202,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 		}
 	}
 
-	public abstract class TypeRequestSpecificationBase<T> : GuardedSpecificationBase<TypeRequest> where T : TypeRequest
+	public abstract class TypeRequestSpecificationBase<T> : SpecificationBase<TypeRequest> where T : TypeRequest
 	{
 		readonly static Coerce<T> Coerce = TypeRequestCoercer<T>.Instance.ToDelegate();
 		protected TypeRequestSpecificationBase() : base( Coerce ) {}
@@ -238,7 +257,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 			public Factory( CanLocateSpecification locate )
 			{
 				this.locate = locate;
-				create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( this.ToDelegate() );
+				create = new CanCreateSpecification<ConstructTypeRequest, IEnumerable<ConstructorInfo>>( this.ToSourceDelegate() );
 				predicate = Check;
 			}
 
@@ -283,7 +302,7 @@ namespace DragonSpark.Activation.IoC.Specifications
 
 			bool Check( ConstructTypeRequest parameter )
 			{
-				var one = new AssignableSpecification( parameter.Arguments ).Cast<TypeRequest>( request => request.RequestedType );
+				var one = new AssignableSpecification( parameter.Arguments ).Project<TypeRequest, Type>( request => request.RequestedType );
 				// var results = new ISpecification[] { one, locate, create }.Select( s => s.IsSatisfiedBy( parameter ) ).Fixed();
 				var result = one.Or( locate, create ).IsSatisfiedBy( parameter );
 				return result;

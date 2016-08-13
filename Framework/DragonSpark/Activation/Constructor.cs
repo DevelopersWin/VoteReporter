@@ -46,7 +46,7 @@ namespace DragonSpark.Activation
 			return result;
 		}
 
-		class Specification : GuardedSpecificationBase<ConstructTypeRequest>
+		sealed class Specification : SpecificationBase<ConstructTypeRequest>
 		{
 			public static Specification Instance { get; } = new Specification();
 
@@ -62,10 +62,9 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public class ConstructorStore : EqualityReferenceCache<ConstructTypeRequest, ConstructorInfo>
+	public sealed class ConstructorStore : EqualityReferenceCache<ConstructTypeRequest, ConstructorInfo>
 	{
 		public static ConstructorStore Instance { get; } = new ConstructorStore();
-
 		ConstructorStore() : base( Create ) {}
 
 		static ConstructorInfo Create( ConstructTypeRequest parameter )

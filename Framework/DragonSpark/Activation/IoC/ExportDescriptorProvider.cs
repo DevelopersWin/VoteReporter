@@ -31,7 +31,7 @@ namespace DragonSpark.Activation.IoC
 			Container.RegisterInstance<IDependencyLocatorKey>( this );
 			// Container.RegisterInstance( specification );
 
-			var provider = new DependencyFactory( this, registry ).ToDelegate();
+			var provider = new DependencyFactory( this, registry ).ToSourceDelegate();
 			var entries = new[]
 			{
 				new StrategyEntry( new EnumerableResolutionStrategy( Container, provider ), UnityBuildStage.Creation, Priority.Higher ),

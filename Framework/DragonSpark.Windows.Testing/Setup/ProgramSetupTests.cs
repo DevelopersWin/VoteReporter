@@ -44,7 +44,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void TypeCheck( IUnityContainer container )
 		{
 			var constructor = container.Resolve<Constructor>().To<IValidatedParameterizedSource>();
-			var cancan = constructor.IsValid( typeof(MonitoredModule) );
+			var cancan = constructor.IsSatisfiedBy( typeof(MonitoredModule) );
 			Assert.True( cancan );
 
 			var activator = container.Resolve<IActivator>();

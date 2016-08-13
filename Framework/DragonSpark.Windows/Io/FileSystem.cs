@@ -14,7 +14,7 @@ namespace DragonSpark.Windows.Io
 		IsAssemblySpecification() : base( FileSystem.AssemblyExtension ) {}
 	}
 
-	public abstract class FileExtensionSpecificationBase : GuardedSpecificationBase<FileSystemInfo>
+	public abstract class FileExtensionSpecificationBase : SpecificationBase<FileSystemInfo>
 	{
 		readonly string extension;
 		protected FileExtensionSpecificationBase( string extension )

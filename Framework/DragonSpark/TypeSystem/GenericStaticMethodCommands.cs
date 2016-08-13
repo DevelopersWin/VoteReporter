@@ -143,7 +143,7 @@ namespace DragonSpark.TypeSystem
 
 	public static class MethodContextExtensions
 	{
-		readonly static Func<object[], Type[]> ToType = ObjectTypeFactory.Instance.ToDelegate();
+		readonly static Func<object[], Type[]> ToType = ObjectTypeFactory.Instance.ToSourceDelegate();
 
 		public static TResult Invoke<TParameter, TResult>( this Invoke @this, TParameter argument ) => (TResult)@this.Invoke( argument );
 

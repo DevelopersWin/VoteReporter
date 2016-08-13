@@ -163,6 +163,10 @@ namespace DragonSpark.Testing.Aspects.Validation
 				CreateGenericCalled++;
 				return parameter + 123;
 			}
+
+			public bool IsSatisfiedBy( int parameter ) => IsValid( parameter );
+
+			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
 		}
 
 		class ExtendedFactory : IExtendedFactory
@@ -199,6 +203,10 @@ namespace DragonSpark.Testing.Aspects.Validation
 				CreateGenericCalled++;
 				return parameter + 123;
 			}
+
+			public bool IsSatisfiedBy( int parameter ) => IsValid( parameter );
+
+			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
 		}
 	}
 }

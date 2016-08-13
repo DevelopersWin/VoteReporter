@@ -10,7 +10,7 @@ namespace DragonSpark.Runtime.Specifications
 
 		public static ISpecification<T> Never { get; } = new FixedSpecification<T>( false );
 
-		public static ISpecification<T> IsInstanceOf { get; } = IsInstanceOfSpecification<T>.Instance.Cast<T>();
+		// public static ISpecification<T> IsInstanceOf { get; } = IsInstanceOfSpecification<T>.Instance.Cast<T>();
 	}
 
 	/*public class AlwaysSpecification<T> : FixedSpecification<T>

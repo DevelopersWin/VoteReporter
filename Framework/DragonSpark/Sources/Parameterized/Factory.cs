@@ -155,10 +155,10 @@ namespace DragonSpark.Sources.Parameterized
 
 			sealed class Requests : ValidatedParameterizedSourceBase<Type, FactoryTypeRequest>
 			{
-				readonly static Func<Type, Type> Results = ResultTypes.Instance.ToDelegate();
+				readonly static Func<Type, Type> Results = ResultTypes.Instance.ToSourceDelegate();
 
 				public static Requests Instance { get; } = new Requests();
-				Requests() : base( CanInstantiateSpecification.Instance.And( Defaults.KnownSourcesSpecification, IsExportSpecification.Instance.Cast<Type>( type => type.GetTypeInfo() ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
+				Requests() : base( CanInstantiateSpecification.Instance.And( Defaults.KnownSourcesSpecification, IsExportSpecification.Instance.Project( Projections.MemberType ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
 				public override FactoryTypeRequest Get( Type parameter ) => 
 					new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );

@@ -18,7 +18,7 @@ namespace DragonSpark.Composition
 {
 	public class SourceDelegateExporter : SourceDelegateExporterBase
 	{
-		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.Instance.ToDelegate();
+		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.Instance.ToSourceDelegate();
 		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Instance.Get;
 		public SourceDelegateExporter() : base( DelegateSource, Default ) {}
 
@@ -48,7 +48,7 @@ namespace DragonSpark.Composition
 
 		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType ) : this( factoryDelegateType, ResultTypeLocator ) {}
 
-		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Instance.And( new GenericTypeAssignableSpecification( factoryDelegateType ) ).Cast<CompositionContract>( contract => contract.ContractType ) )
+		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Instance.And( new GenericTypeAssignableSpecification( factoryDelegateType ) ).Project<CompositionContract, Type>( contract => contract.ContractType ) )
 		{
 			this.resultTypeLocator = resultTypeLocator;
 		}
@@ -56,7 +56,7 @@ namespace DragonSpark.Composition
 		public override CompositionContract Get( CompositionContract parameter ) => resultTypeLocator( parameter.ContractType ).With( parameter.ChangeType );
 	}
 
-	public sealed class IsExportSpecification : GuardedSpecificationBase<MemberInfo>
+	public sealed class IsExportSpecification : SpecificationBase<MemberInfo>
 	{
 		public static IsExportSpecification Instance { get; } = new IsExportSpecification();
 		IsExportSpecification() {}
@@ -79,7 +79,7 @@ namespace DragonSpark.Composition
 	sealed class SingletonExports : SingletonDelegates<SingletonExport>
 	{
 		public static SingletonExports Instance { get; } = new SingletonExports();
-		SingletonExports() : base( SingletonSpecification.Instance.And( IsExportSpecification.Instance.Cast<SingletonRequest>( request => request.Candidate ) ), new Factory().Get ) {}
+		SingletonExports() : base( SingletonSpecification.Instance.And( IsExportSpecification.Instance.Project<SingletonRequest, PropertyInfo>( request => request.Candidate ) ), new Factory().Get ) {}
 
 		sealed class Factory : ParameterizedSourceBase<PropertyInfo, SingletonExport>
 		{

@@ -1,3 +1,5 @@
+using DragonSpark.Activation;
+using DragonSpark.Sources.Parameterized;
 using System.Collections.Immutable;
 
 namespace DragonSpark.Runtime.Specifications
@@ -7,11 +9,13 @@ namespace DragonSpark.Runtime.Specifications
 		public AllSpecification( params ISpecification<object>[] specifications ) : base( specifications ) {}
 	}
 
-	public class AllSpecification<T> : GuardedSpecificationBase<T>
+	public class AllSpecification<T> : SpecificationBase<T>
 	{
 		readonly ImmutableArray<ISpecification<T>> specifications;
 
-		public AllSpecification( params ISpecification<T>[] specifications )
+		public AllSpecification( params ISpecification<T>[] specifications ) : this( Defaults<T>.Coercer, specifications ) {}
+
+		public AllSpecification( Coerce<T> coercer, params ISpecification<T>[] specifications ) : base( coercer )
 		{
 			this.specifications = specifications.ToImmutableArray();
 		}

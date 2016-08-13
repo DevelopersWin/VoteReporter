@@ -40,7 +40,7 @@ namespace DragonSpark.Testing.Runtime
 
 		class Derived : GenericBase<int> {}
 
-		abstract class GenericBase<T> : GuardedSpecificationBase<T>
+		abstract class GenericBase<T> : SpecificationBase<T>
 		{
 			public override bool IsSatisfiedBy( T parameter ) => false;
 		}

@@ -98,7 +98,7 @@ namespace DragonSpark.Sources
 			}
 		}
 
-		public static IScope<T> ToScope<T>( this IParameterizedSource<object, T> @this ) => @this.ToDelegate().ToScope();
+		public static IScope<T> ToScope<T>( this IParameterizedSource<object, T> @this ) => @this.ToSourceDelegate().ToScope();
 		public static IScope<T> ToScope<T>( this Func<object, T> @this ) => Scopes<T>.Default.Get( @this );
 
 		class Scopes<T> : Cache<Func<object, T>, IScope<T>>

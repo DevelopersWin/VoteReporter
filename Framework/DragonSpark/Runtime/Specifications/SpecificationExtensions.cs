@@ -2,15 +2,19 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using DragonSpark.TypeSystem;
 using System;
-using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Runtime.Specifications
 {
+	public static class Projections
+	{
+		public static Func<Type, MemberInfo> MemberType { get; } = info => info.GetTypeInfo();
+	}
+
 	public static class SpecificationExtensions
 	{
-		public static ISpecification<T> Inverse<T>( this ISpecification<T> @this ) => new InverseSpecification( @this ).Cast<T>();
+		public static ISpecification<T> Inverse<T>( this ISpecification<T> @this ) => new InverseSpecification<T>( @this );
 		
 		/*public static Func<T, bool> Inverse<T>( this Func<T, bool> @this ) => Inversed<T>.Default.Get( @this );
 		sealed class Inversed<T> : Cache<Func<T, bool>, Func<T, bool>>
@@ -30,21 +34,22 @@ namespace DragonSpark.Runtime.Specifications
 			}
 		}
 */
-		public static ISpecification<T> Or<T>( this ISpecification<T> @this, params ISpecification[] others ) 
-			=> new AnySpecification<T>( @this.Append( others.Select( specification => specification.Cast<T>() ) ).Fixed() );
+		public static ISpecification<T> Or<T>( this ISpecification<T> @this, params ISpecification<T>[] others ) 
+			=> new AnySpecification<T>( @this.Append( others ).Fixed() );
 
-		public static ISpecification<T> And<T>( this ISpecification<T> @this, params ISpecification[] others ) 
-			=> new AllSpecification<T>( @this.Append( others.Select( specification => specification.Cast<T>() ) ).Fixed() );
+		public static ISpecification<T> And<T>( this ISpecification<T> @this, params ISpecification<T>[] others ) 
+			=> new AllSpecification<T>( @this.Append( others ).Fixed() );
 
-		public static ISpecification<T> Cast<T>( this ISpecification @this ) => @this.Cast( Delegates<T>.Object );
+		// public static ISpecification<T> Cast<T>( this ISpecification @this ) => @this.Cast( Delegates<T>.Object );
 
-		public static ISpecification<T> Cast<T>( this ISpecification @this, Func<T, object> projection ) => @this as ISpecification<T> ?? new DecoratedSpecification<T>( @this, projection );
+		public static ISpecification<TDestination> Project<TDestination, TOrigin>( this ISpecification<TOrigin> @this, Func<TDestination, TOrigin> projection ) => new ProjectedSpecification<TOrigin, TDestination>( @this.IsSatisfiedBy, projection );
+
+		public static ISpecification<TTo> Cast<TFrom, TTo>( this ISpecification<TFrom> @this ) where TFrom : TTo => new CastedSpecification<TFrom, TTo>( @this );
 
 		public static Func<T, bool> ToDelegate<T>( this ISpecification<T> @this ) => DelegateCache<T>.Default.Get( @this );
 		class DelegateCache<T> : Cache<ISpecification<T>, Func<T, bool>>
 		{
 			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
-
 			DelegateCache() : base( specification => specification.IsSatisfiedBy ) {}
 		}
 

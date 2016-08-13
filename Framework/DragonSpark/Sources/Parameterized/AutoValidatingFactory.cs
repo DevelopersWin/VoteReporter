@@ -25,6 +25,7 @@ namespace DragonSpark.Sources.Parameterized
 	class AutoValidatingSource : AutoValidatingSourceBase<object, object>, IValidatedParameterizedSource
 	{
 		public AutoValidatingSource( IValidatedParameterizedSource inner ) : base( new AutoValidationController( new FactoryAdapter( inner ) ), inner.IsValid, inner.Get ) {}
+		public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
 	}
 
 	class AutoValidatingSource<TParameter, TResult> : AutoValidatingSourceBase<TParameter, TResult>, IValidatedParameterizedSource<TParameter, TResult>
@@ -40,5 +41,8 @@ namespace DragonSpark.Sources.Parameterized
 		public object Get( object parameter ) => inner.Get( parameter );
 
 		public bool IsValid( object parameter ) => inner.IsValid( parameter );
+		public bool IsSatisfiedBy( TParameter parameter ) => IsValid( parameter );
+
+		public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
 	}
 }

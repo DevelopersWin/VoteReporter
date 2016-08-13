@@ -1,3 +1,5 @@
+using DragonSpark.TypeSystem;
+
 namespace DragonSpark.Runtime.Specifications
 {
 	public class FixedSpecification : FixedSpecification<object>
@@ -9,7 +11,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly bool satisfied;
 
-		public FixedSpecification( bool satisfied )
+		public FixedSpecification( bool satisfied ) : base( Where<T>.Always )
 		{
 			this.satisfied = satisfied;
 		}

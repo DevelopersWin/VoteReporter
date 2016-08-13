@@ -198,7 +198,7 @@ namespace DragonSpark.Activation.IoC
 		public static IParameterizedSource<Type, Type> Instance { get; } = new ConventionTypes();
 		ConventionTypes() : this( ApplicationTypes.Instance ) {}
 
-		public ConventionTypes( ITypeSource source ) : base( new Locator( source ).ToDelegate().CachedPerScope() ) {}
+		public ConventionTypes( ITypeSource source ) : base( new Locator( source ).ToSourceDelegate().CachedPerScope() ) {}
 
 		[ApplyAutoValidation]
 		sealed class Locator : ValidatedParameterizedSourceBase<Type, Type>
@@ -235,9 +235,9 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	class IsConventionCandidateSpecification : GuardedSpecificationBase<Type>
+	class IsConventionCandidateSpecification : SpecificationBase<Type>
 	{
-		readonly static Func<Type, string> Sanitizer = ConventionCandidateNameFactory.Instance.ToDelegate();
+		readonly static Func<Type, string> Sanitizer = ConventionCandidateNameFactory.Instance.ToSourceDelegate();
 
 		public static IParameterizedSource<Type, Func<Type, bool>> Default { get; } = new Cache<Type, Func<Type, bool>>( t => new IsConventionCandidateSpecification( t ).IsSatisfiedBy );
 		IsConventionCandidateSpecification( Type type ) : this( type, Sanitizer ) {}
@@ -312,7 +312,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class CanInstantiateSpecification : GuardedSpecificationBase<Type>
+	public class CanInstantiateSpecification : SpecificationBase<Type>
 	{
 		public static ISpecification<Type> Instance { get; } = new CanInstantiateSpecification().Cached();
 		CanInstantiateSpecification() {}
@@ -325,7 +325,7 @@ namespace DragonSpark.Activation.IoC
 		}
 	}
 
-	public class InstantiableTypeSpecification : GuardedSpecificationBase<Type>
+	public class InstantiableTypeSpecification : SpecificationBase<Type>
 	{
 		public static ISpecification<Type> Instance { get; } = new InstantiableTypeSpecification().Cached();
 		InstantiableTypeSpecification() : this( new[] { typeof(Delegate), typeof(Array) }.Select( type => type.Adapt() ).ToImmutableArray() ) {}

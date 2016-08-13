@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Aspects
@@ -39,6 +38,9 @@ namespace DragonSpark.Testing.Aspects
 			object IParameterizedSource.Get( object parameter ) => Get( parameter );
 
 			public object Get( object parameter ) => null;
+			bool ISpecification<object>.IsSatisfiedBy( object parameter ) => IsSatisfiedBy( parameter );
+
+			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
 		}
 		
 		/*[Theory, AutoData]

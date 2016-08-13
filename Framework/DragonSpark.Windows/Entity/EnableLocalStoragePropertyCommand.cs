@@ -6,6 +6,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Windows.Input;
 using DragonSpark.Runtime;
 
 namespace DragonSpark.Windows.Entity
@@ -39,7 +40,7 @@ namespace DragonSpark.Windows.Entity
 	{
 		public static DefaultCommands Instance { get; } = new DefaultCommands();
 
-		public DefaultCommands() : base( new EnableLocalStoragePropertyCommand(), new RegisterComplexTypesCommand() ) {}
+		public DefaultCommands() : base( new ICommand[] { new EnableLocalStoragePropertyCommand(), new RegisterComplexTypesCommand() } ) {}
 	}
 
 	public class EnableLocalStoragePropertyCommand : CommandBase<DbContextBuildingParameter>

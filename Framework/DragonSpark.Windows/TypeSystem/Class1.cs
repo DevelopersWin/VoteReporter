@@ -12,7 +12,7 @@ namespace DragonSpark.Windows.TypeSystem
 {
 	public sealed class AssemblyLocator : QueryableResourceLocator
 	{
-		public static ICache<string, ImmutableArray<string>> Instance { get; } = new AssemblyLocator().CachedForEquality();
+		public static ICache<string, ImmutableArray<string>> Instance { get; } = new AssemblyLocator().ToEqualityCache();
 		AssemblyLocator() : base( IsAssemblySpecification.Instance.IsSatisfiedBy ) {}
 	}
 

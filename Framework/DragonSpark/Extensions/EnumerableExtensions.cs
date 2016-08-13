@@ -16,7 +16,7 @@ namespace DragonSpark.Extensions
 	{
 		static class Defaults<T>
 		{
-			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Instance.ToDelegate();
+			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Instance.ToSourceDelegate();
 		}
 
 		public static T[] Fixed<T>( this IEnumerable<T> @this )

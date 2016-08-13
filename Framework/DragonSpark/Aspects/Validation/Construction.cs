@@ -24,7 +24,7 @@ namespace DragonSpark.Aspects.Validation
 	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict, PersistMetaData =  true )]
 	public class ApplyAutoValidationAttribute : TypeLevelAspect, IAspectProvider
 	{
-		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstanceFactory.Instance.ToDelegate();
+		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstanceFactory.Instance.ToSourceDelegate();
 
 		readonly Func<Type, IEnumerable<AspectInstance>> source;
 

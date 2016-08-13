@@ -52,7 +52,7 @@ namespace DragonSpark.Windows.Setup
 		public override void Execute( FileInfo parameter ) => retry.Execute( parameter.Delete );
 	}
 
-	public sealed class FileSystemInfoExistsSpecification : GuardedSpecificationBase<FileSystemInfo>
+	public sealed class FileSystemInfoExistsSpecification : SpecificationBase<FileSystemInfo>
 	{
 		public static FileSystemInfoExistsSpecification Instance { get; } = new FileSystemInfoExistsSpecification();
 		FileSystemInfoExistsSpecification() {}
@@ -96,9 +96,8 @@ namespace DragonSpark.Windows.Setup
 		{
 			if ( !file.Exists )
 			{
-				var properties = EnumerableExtensions.Fixed<SettingsPropertyValue>( parameter.Providers
-																																																	  .Cast<SettingsProvider>()
-																																																	  .Introduce( parameter, tuple => tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ).Cast<SettingsPropertyValue>() )
+				var properties = EnumerableExtensions.Fixed<SettingsPropertyValue>( Enumerable.Cast<SettingsProvider>( parameter.Providers )
+																																																	  .Introduce( parameter, tuple => Enumerable.Cast<SettingsPropertyValue>( tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ) ) )
 																																																	  .Concat()
 																																																	  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ) );
 				var any = properties.Any();

@@ -23,7 +23,7 @@ namespace DragonSpark.Windows.Markup
 
 		readonly Func<IServiceProvider, PropertyReference> propertyFactory;
 
-		public CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Instance.ToDelegate() ) {}
+		public CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Instance.ToSourceDelegate() ) {}
 
 		public CollectionMarkupPropertyFactory( [Required]Func<IServiceProvider, PropertyReference> propertyFactory ) : base( CollectionSpecification.Instance )
 		{
@@ -38,7 +38,7 @@ namespace DragonSpark.Windows.Markup
 		}
 	}
 
-	public class CollectionSpecification : GuardedSpecificationBase<IServiceProvider>
+	public class CollectionSpecification : SpecificationBase<IServiceProvider>
 	{
 		public static CollectionSpecification Instance { get; } = new CollectionSpecification();
 

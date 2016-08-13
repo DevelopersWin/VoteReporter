@@ -48,7 +48,7 @@ namespace DragonSpark.Setup.Registration
 
 		sealed class Factory : CompositeFactory<Type, Delegate>
 		{
-			readonly static ImmutableArray<Func<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>>> Delegates = SourceDelegates.Instances.Append( ServiceProvidedParameterizedSourceDelegates.Instances ).Select( source => source.ToDelegate() ).ToImmutableArray();
+			readonly static ImmutableArray<Func<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>>> Delegates = SourceDelegates.Instances.Append( ServiceProvidedParameterizedSourceDelegates.Instances ).Select( source => source.ToSourceDelegate() ).ToImmutableArray();
 			public Factory( Func<IServiceProvider> source ) : base( Delegates.Introduce( source ).ToArray() ) {}
 		}
 	}
@@ -88,7 +88,7 @@ namespace DragonSpark.Setup.Registration
 				.Make( ParameterTypes.Instance.Get( parameter ), ResultTypes.Instance.Get( parameter ) )
 				.Invoke<Delegate>( Locator( parameter ) );
 
-		static Delegate ToDelegate<TParameter, TResult>( IParameterizedSource<TParameter, TResult> source ) => source.ToDelegate();
+		static Delegate ToDelegate<TParameter, TResult>( IParameterizedSource<TParameter, TResult> source ) => source.ToSourceDelegate();
 	}
 
 	public class ServiceProvidedParameterizedSourceDelegates : DelegatesBase

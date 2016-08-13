@@ -61,7 +61,7 @@ namespace DragonSpark.Windows.Markup
 
 		MockFactory() : base( Specification.Instance ) {}
 
-		class Specification : GuardedSpecificationBase<Type>
+		class Specification : SpecificationBase<Type>
 		{
 			public static Specification Instance { get; } = new Specification();
 
@@ -88,8 +88,7 @@ namespace DragonSpark.Windows.Markup
 	public class DesignTimeValueProvider : CompositeFactory<Type, object>
 	{
 		public static DesignTimeValueProvider Instance { get; } = new DesignTimeValueProvider();
-
-		DesignTimeValueProvider() : base( SpecialValues.DefaultOrEmpty, MockFactory.Instance.ToDelegate(), StringDesignerValueFactory.Instance.ToDelegate() ) {}
+		DesignTimeValueProvider() : base( SpecialValues.DefaultOrEmpty, MockFactory.Instance.ToSourceDelegate(), StringDesignerValueFactory.Instance.ToSourceDelegate() ) {}
 	}
 
 	public class MarkupValueSetterFactory : CompositeFactory<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
@@ -137,7 +136,7 @@ namespace DragonSpark.Windows.Markup
 		readonly Func<IServiceProvider, IMarkupProperty> factory;
 		readonly Func<Type, object> designTimeFactory;
 
-		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Instance.ToDelegate(), DesignTimeValueProvider.Instance.ToDelegate() ) {}
+		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Instance.ToSourceDelegate(), DesignTimeValueProvider.Instance.ToSourceDelegate() ) {}
 
 		protected MarkupExtensionBase( [Required]Func<IServiceProvider, IMarkupProperty> factory, [Required]Func<Type, object> designTimeFactory )
 		{

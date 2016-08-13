@@ -95,7 +95,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( 6776, result.Number );
 
 			var parameter = new GenericCommand.Parameter( 1234 );
-			Assert.False( command.CanExecute( parameter ) );
+			Assert.False( command.IsSatisfiedBy( parameter ) );
 			
 			Assert.Equal( 6, command.CanExecuteCalled );
 			Assert.Equal( 6, command.CanExecuteGenericCalled );
@@ -103,7 +103,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( 1, command.ExecuteGenericCalled );
 
 			var validGeneric = new GenericCommand.Parameter( 6776 );
-			Assert.True( command.CanExecute( validGeneric ) );
+			Assert.True( command.IsSatisfiedBy( validGeneric ) );
 
 			Assert.Equal( 6, command.CanExecuteCalled );
 			Assert.Equal( 7, command.CanExecuteGenericCalled );
@@ -172,7 +172,7 @@ namespace DragonSpark.Testing.Aspects
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
-				return parameter is int && CanExecute( new Parameter( (int)parameter ) );
+				return parameter is int && IsSatisfiedBy( new Parameter( (int)parameter ) );
 			}
 
 			public void Execute( object parameter )
@@ -183,7 +183,7 @@ namespace DragonSpark.Testing.Aspects
 
 			// bool IValidationAware.ShouldValidate() => false;
 
-			public bool CanExecute( Parameter parameter )
+			public bool IsSatisfiedBy( Parameter parameter )
 			{
 				CanExecuteGenericCalled++;
 				return parameter.Number == 6776;
@@ -206,6 +206,8 @@ namespace DragonSpark.Testing.Aspects
 
 				public int Number { get; }
 			}
+
+			public bool IsSatisfiedBy( object parameter ) => CanExecute( parameter );
 		}
 	}
 }

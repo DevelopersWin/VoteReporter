@@ -1,10 +1,8 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Windows.Markup;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -17,7 +15,7 @@ namespace DragonSpark.Windows.Markup
 		object SetValue( object value );
 	}
 
-	public class Specification<TTarget, TProperty> : GuardedSpecificationBase<IServiceProvider>
+	public class Specification<TTarget, TProperty> : SpecificationBase<IServiceProvider>
 	{
 		public static Specification<TTarget, TProperty> Instance { get; } = new Specification<TTarget, TProperty>();
 

@@ -31,7 +31,7 @@ namespace DragonSpark.Aspects.Validation
 		class GenericCommandProfile : ProfileBase
 		{
 			public static GenericCommandProfile Instance { get; } = new GenericCommandProfile();
-			GenericCommandProfile() : base( typeof(ICommand<>), nameof(ICommand.CanExecute), nameof(ICommand.Execute), GenericCommandProfileFactory.Instance.Create ) {}
+			GenericCommandProfile() : base( typeof(ISpecification<>), nameof(ISpecification.IsSatisfiedBy), typeof(ICommand<>), nameof(ICommand.Execute), GenericCommandProfileFactory.Instance.Create ) {}
 		}
 
 		class CommandProfile : ProfileBase
@@ -136,14 +136,10 @@ namespace DragonSpark.Aspects.Validation
 		readonly static object Executing = new object();
 
 		readonly IParameterValidationAdapter validator;
-		readonly Func<MethodInfo, bool> specification;
 		
-		public AutoValidationController( IParameterValidationAdapter validator ) : this( validator, MethodEqualitySpecification.For( validator.Method ) ) {}
-
-		public AutoValidationController( IParameterValidationAdapter validator, Func<MethodInfo, bool> specification )
+		public AutoValidationController( IParameterValidationAdapter validator )
 		{
 			this.validator = validator;
-			this.specification = specification;
 		}
 
 		IParameterAwareHandler Handler { get; set; }
@@ -193,7 +189,7 @@ namespace DragonSpark.Aspects.Validation
 		bool CheckAndMark( object parameter )
 		{
 			MarkValid( Executing, true );
-			var result = validator.IsValid( parameter );
+			var result = validator.IsSatisfiedBy( parameter );
 			MarkValid( parameter, result );
 			return result;
 		}
@@ -201,7 +197,7 @@ namespace DragonSpark.Aspects.Validation
 		public void Register( IAspect aspect )
 		{
 			var methodAware = aspect as IMethodAware;
-			if ( methodAware != null && specification( methodAware.Method ) )
+			if ( methodAware != null && validator.IsSatisfiedBy( methodAware.Method ) )
 			{
 				var handler = aspect as IParameterAwareHandler;
 				if ( handler != null )

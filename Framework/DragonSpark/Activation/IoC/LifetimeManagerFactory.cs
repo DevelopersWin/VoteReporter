@@ -10,7 +10,7 @@ namespace DragonSpark.Activation.IoC
 {
 	public class LifetimeManagerFactory<T> : LifetimeManagerFactory where T : LifetimeManager
 	{
-		public LifetimeManagerFactory( IUnityContainer container ) : base( container, AttributedLifetimeFactory.Instance.ToDelegate() ) {}
+		public LifetimeManagerFactory( IUnityContainer container ) : base( container, AttributedLifetimeFactory.Instance.ToSourceDelegate() ) {}
 
 		class AttributedLifetimeFactory : IoC.AttributedLifetimeFactory
 		{

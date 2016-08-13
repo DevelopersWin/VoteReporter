@@ -96,6 +96,8 @@ namespace DragonSpark.Testing.Aspects.Validation
 			{
 				CanCreateCalled = CreateCalled = 0;
 			}
+
+			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
 		}
 
 		public class Factory : IFactory
@@ -120,6 +122,8 @@ namespace DragonSpark.Testing.Aspects.Validation
 			{
 				CanCreateCalled = CreateCalled = 0;
 			}
+
+			public bool IsSatisfiedBy( object parameter ) => IsValid( parameter );
 		}
 	}
 }

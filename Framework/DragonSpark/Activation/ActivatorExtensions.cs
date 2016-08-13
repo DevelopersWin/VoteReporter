@@ -106,7 +106,7 @@ namespace DragonSpark.Activation
 
 	public interface ISingletonLocator : IParameterizedSource<Type, object> {}
 
-	public class SingletonSpecification : GuardedSpecificationBase<SingletonRequest>
+	public class SingletonSpecification : SpecificationBase<SingletonRequest>
 	{
 		public static SingletonSpecification Instance { get; } = new SingletonSpecification();
 		SingletonSpecification() : this( "Instance", "Default" ) {}
@@ -144,7 +144,7 @@ namespace DragonSpark.Activation
 		public PropertyInfo Candidate { get; }
 	}
 
-	public sealed class SourceTypeAssignableSpecification : GuardedSpecificationBase<SourceTypeAssignableSpecification.Parameter>
+	public sealed class SourceTypeAssignableSpecification : SpecificationBase<SourceTypeAssignableSpecification.Parameter>
 	{
 		public static SourceTypeAssignableSpecification Instance { get; } = new SourceTypeAssignableSpecification();
 		SourceTypeAssignableSpecification() {}

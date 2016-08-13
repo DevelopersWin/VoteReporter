@@ -1,12 +1,12 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class AssignableSpecification : GuardedSpecificationBase<Type>
+	public class AssignableSpecification : SpecificationBase<Type>
 	{
 		readonly object[] arguments;
 		public AssignableSpecification( params object[] arguments )
@@ -23,7 +23,7 @@ namespace DragonSpark.Runtime.Specifications
 		public CanCreateSpecification( Func<T, object> creator, Coerce<T> coercer ) : base( creator, coercer ) {}
 	}
 
-	public class CanCreateSpecification<TParameter, TResult> : GuardedSpecificationBase<TParameter>
+	public class CanCreateSpecification<TParameter, TResult> : SpecificationBase<TParameter>
 	{
 		readonly Func<TParameter, TResult> creator;
 
