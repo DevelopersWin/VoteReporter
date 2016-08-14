@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation.IoC;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
@@ -77,7 +78,7 @@ namespace DragonSpark.Activation
 
 	public sealed class Activator : CompositeActivator
 	{
-		public static ISource<IActivator> Instance { get; } = new Scope<IActivator>( Factory.Scope( () => new Activator() ) );
+		public static ISource<IActivator> Instance { get; } = new Scope<IActivator>( Factory.ForGlobalScope( () => new Activator() ) );
 		Activator() : base( new Locator(), Constructor.Instance ) {}
 
 		public static T Activate<T>( Type type ) => Instance.Get().Get<T>( type );
@@ -95,12 +96,7 @@ namespace DragonSpark.Activation
 				this.singleton = singleton;
 			}
 
-			public override object Get( LocateTypeRequest parameter )
-			{
-				var type = convention( parameter.RequestedType ) ?? parameter.RequestedType;
-				var result = singleton.Get( type );
-				return result;
-			}
+			public override object Get( LocateTypeRequest parameter ) => singleton.Get( convention( parameter.RequestedType ) ?? parameter.RequestedType );
 		}
 	}
 

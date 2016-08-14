@@ -1,8 +1,7 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
-using System;
-using DragonSpark.Sources;
+using DragonSpark.Composition;
 using DragonSpark.Sources.Parameterized;
+using System;
 
 namespace DragonSpark.ComponentModel
 {

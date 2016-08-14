@@ -87,17 +87,10 @@ namespace DragonSpark.Composition
 
 		public override ContainerConfiguration Get( ContainerConfiguration configuration )
 		{
-			var system = ApplicationParts.Instance.Get();
-			var types = system.Types.ToArray();
+			var types = ApplicationTypes.Instance.Get().ToArray();
 
 			var result = configuration
-				.WithInstance( system )
-				.WithInstance( system.Assemblies )
-				.WithInstance( system.Assemblies.ToArray() )
-				.WithInstance( system.Types )
-				.WithInstance( types )
-				.WithInstance( Activation.Activator.Instance.Get() )
-				.WithParts( types/*, AttributeProvider.Instance*/ )
+				.WithParts( types, AttributeProvider.Instance )
 				.WithProvider( new SingletonExportDescriptorProvider( types ) )
 				.WithProvider( new SourceDelegateExporter() )
 				.WithProvider( new ParameterizedSourceDelegateExporter() )

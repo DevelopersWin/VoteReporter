@@ -100,7 +100,7 @@ namespace DragonSpark.Configuration
 	public class ConfigurationScope<T> : Scope<ImmutableArray<ITransformer<T>>>, IConfigurationScope<T>
 	{
 		public ConfigurationScope() : this( Items<ITransformer<T>>.Default ) {}
-		public ConfigurationScope( params ITransformer<T>[] configurators ) : base( Factory.Scope( new ConfigurationSource<T>( configurators ).Get ) ) {}
+		public ConfigurationScope( params ITransformer<T>[] configurators ) : base( Factory.ForGlobalScope( new ConfigurationSource<T>( configurators ).Get ) ) {}
 		// public ConfigurationScope( Func<ImmutableArray<ITransformer<T>>> defaultFactory ) : base( defaultFactory ) {}
 	}
 

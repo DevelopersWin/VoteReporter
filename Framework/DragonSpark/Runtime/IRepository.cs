@@ -22,7 +22,7 @@ namespace DragonSpark.Runtime
 	{
 		readonly IDisposable disposable;
 
-		public static ISource<Disposables> Instance { get; } = new Scope<Disposables>( Factory.Scope( () => new Disposables() ) );
+		public static ISource<Disposables> Instance { get; } = new Scope<Disposables>( Factory.ForGlobalScope( () => new Disposables() ) );
 		Disposables() : base( new PurgingCollection<IDisposable>() )
 		{
 			disposable = new DelegatedDisposable( OnDispose );

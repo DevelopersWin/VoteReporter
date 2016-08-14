@@ -1,6 +1,6 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -54,7 +54,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public sealed class ApplicationInitializer : CommandBase<MethodBase>
 	{
-		public static IScope<ApplicationInitializer> Instance { get; } = new Scope<ApplicationInitializer>( Factory.Scope( () => new ApplicationInitializer() ) );
+		public static IScope<ApplicationInitializer> Instance { get; } = new Scope<ApplicationInitializer>( Factory.ForGlobalScope( () => new ApplicationInitializer() ) );
 		ApplicationInitializer() {}
 
 		public override void Execute( MethodBase parameter )

@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Activation.IoC.Specifications;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -149,7 +149,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public class ConstructFromKnownTypes<T> : ParameterConstructedCompositeFactory<object>
 	{
-		public static ISource<ConstructFromKnownTypes<T>> Instance { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.Scope( () => new ConstructFromKnownTypes<T>( KnownTypes.Instance.Get<T>().ToArray() ) ) );
+		public static ISource<ConstructFromKnownTypes<T>> Instance { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.ForGlobalScope( () => new ConstructFromKnownTypes<T>( KnownTypes.Instance.Get<T>().ToArray() ) ) );
 		ConstructFromKnownTypes( params Type[] types ) : base( types ) {}
 		
 		public T CreateUsing( object parameter ) => (T)Get( parameter );

@@ -1,6 +1,7 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
+﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
@@ -9,8 +10,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Reflection;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using Xunit;
 using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
 

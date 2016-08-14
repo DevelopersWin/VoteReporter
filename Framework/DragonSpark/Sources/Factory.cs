@@ -1,7 +1,7 @@
-using System;
-using System.Reflection;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Sources
 {
@@ -15,9 +15,9 @@ namespace DragonSpark.Sources
 		public static Func<T> Fix<T>( this Func<T> @this ) => FixedDelegateBuilder<T>.Instance.Get( @this );
 		public static Func<TParameter, TResult> Fix<TParameter, TResult>( this Func<TParameter, TResult> @this ) => CacheFactory.Create( @this ).Get;
 
-		public static Func<object, T> Scope<T>( this Func<T> @this ) => @this.Wrap().Fix();
+		public static Func<object, T> ForGlobalScope<T>( this Func<T> @this ) => @this.Wrap().Fix();
 
-		public static Func<object, Func<TParameter, TResult>> CachedPerScope<TParameter, TResult>( this Func<TParameter, TResult> @this ) => new Cache<TParameter, TResult>( @this ).Get;
+		public static Func<object, Func<TParameter, TResult>> ForGlobalScope<TParameter, TResult>( this Func<TParameter, TResult> @this ) => new Cache<TParameter, TResult>( @this ).Get;
 		class Cache<TParameter, TResult> : FactoryCache<Func<TParameter, TResult>>
 		{
 			readonly Func<TParameter, TResult> factory;

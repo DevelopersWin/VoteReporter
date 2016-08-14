@@ -7,7 +7,7 @@ namespace DragonSpark.Extensions
 {
 	public class ObjectMappingFactory<T> : ParameterizedSourceBase<ObjectMappingParameter<T>, T> where T : class
 	{
-		public static ISource<ObjectMappingFactory<T>> Default { get; } = new Scope<ObjectMappingFactory<T>>( Factory.Scope( () => new ObjectMappingFactory<T>( Activator.Instance.Get() ) ) );
+		public static ISource<ObjectMappingFactory<T>> Default { get; } = new Scope<ObjectMappingFactory<T>>( Factory.ForGlobalScope( () => new ObjectMappingFactory<T>( Activator.Instance.Get() ) ) );
 
 		readonly IActivator locator;
 

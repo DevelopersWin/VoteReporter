@@ -169,7 +169,7 @@ namespace DragonSpark.Setup
 
 	public class ServiceProviderRegistry : RepositoryBase<IServiceProvider>
 	{
-		public static ISource<IRepository<IServiceProvider>> Instance { get; } = new Scope<IRepository<IServiceProvider>>( Factory.Scope( () => new ServiceProviderRegistry() ) );
+		public static ISource<IRepository<IServiceProvider>> Instance { get; } = new Scope<IRepository<IServiceProvider>>( Factory.ForGlobalScope( () => new ServiceProviderRegistry() ) );
 		ServiceProviderRegistry() : base( DefaultServiceProvider.Instance.Yield() ) {}
 
 		protected override IEnumerable<IServiceProvider> Query() => base.Query().Reverse();
@@ -216,7 +216,7 @@ namespace DragonSpark.Setup
 
 	class DependencyLocators : Cache<IDependencyLocatorKey, IServiceProvider>, IDependencyLocator
 	{
-		public static ISource<IDependencyLocator> Instance { get; } = new Scope<IDependencyLocator>( Factory.Scope( () => new DependencyLocators() ) );
+		public static ISource<IDependencyLocator> Instance { get; } = new Scope<IDependencyLocator>( Factory.ForGlobalScope( () => new DependencyLocators() ) );
 		DependencyLocators() {}
 
 		public Func<Type, object> For( IDependencyLocatorKey locatorKey ) => Contains( locatorKey ) ? ActivatedServiceProvider.Sources.Get( Get( locatorKey ) ) : null;

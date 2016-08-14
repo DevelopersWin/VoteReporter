@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
+    <Compile Include="Composition\Convention.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Activation\SourceTypeLocator.cs" />
     <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />

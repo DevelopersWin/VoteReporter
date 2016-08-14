@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Runtime
 	public sealed class ApplicationAssembly : FixedFactory<IEnumerable<Assembly>, Assembly>
 	{
 		[Export]
-		public static ISource<Assembly> Instance { get; } = new Scope<Assembly>( Factory.Scope( new ApplicationAssembly().Get ) );
+		public static ISource<Assembly> Instance { get; } = new Scope<Assembly>( Factory.ForGlobalScope( new ApplicationAssembly().Get ) );
 		ApplicationAssembly() : base( ApplicationAssemblyLocator.Instance.Get, ApplicationAssemblies.Instance.Get().AsEnumerable() ) {}
 	}
 

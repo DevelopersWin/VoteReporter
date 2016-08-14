@@ -30,7 +30,7 @@ namespace DragonSpark.TypeSystem
 	public sealed class AttributeProviders : ParameterizedScope<IAttributeProvider>
 	{
 		public static IParameterizedSource<IAttributeProvider> Instance { get; } = new AttributeProviders();
-		AttributeProviders() : base( new Factory().ToSourceDelegate().CachedPerScope() ) {}
+		AttributeProviders() : base( new Factory().ToSourceDelegate().ForGlobalScope() ) {}
 
 		sealed class Factory : ParameterConstructedCompositeFactory<IAttributeProvider>
 		{
@@ -58,7 +58,7 @@ namespace DragonSpark.TypeSystem
 	sealed class TypeDefinitions : ParameterizedScope<TypeInfo>
 	{
 		public static TypeDefinitions Instance { get; } = new TypeDefinitions();
-		TypeDefinitions() : base( new Factory().ToSourceDelegate().CachedPerScope() ) {}
+		TypeDefinitions() : base( new Factory().ToSourceDelegate().ForGlobalScope() ) {}
 
 		sealed class Factory : CompositeFactory<object, TypeInfo>
 		{
@@ -103,7 +103,7 @@ namespace DragonSpark.TypeSystem
 	sealed class MemberInfoDefinitions : ParameterizedScope<MemberInfo>
 	{
 		public static IParameterizedSource<MemberInfo> Instance { get; } = new MemberInfoDefinitions();
-		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).ToSourceDelegate().CachedPerScope() ) {}
+		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).ToSourceDelegate().ForGlobalScope() ) {}
 
 		sealed class Factory : ParameterizedSourceBase<MemberInfo>
 		{

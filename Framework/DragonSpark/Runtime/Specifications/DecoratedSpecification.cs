@@ -82,7 +82,7 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class OncePerScopeSpecification<T> : ConditionMonitorSpecificationBase<T>
 	{
-		public OncePerScopeSpecification() : this( new Scope<ConditionMonitor>( Factory.Scope( () => new ConditionMonitor() ) ) ) {}
+		public OncePerScopeSpecification() : this( new Scope<ConditionMonitor>( Factory.ForGlobalScope( () => new ConditionMonitor() ) ) ) {}
 
 		public OncePerScopeSpecification( ISource<ConditionMonitor> source ) : base( source.Wrap<T, ConditionMonitor>() ) {}
 	}
