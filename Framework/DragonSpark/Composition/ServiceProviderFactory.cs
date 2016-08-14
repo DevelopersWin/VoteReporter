@@ -68,7 +68,7 @@ namespace DragonSpark.Composition
 		public override void Execute( IServiceProvider parameter ) => Exports.Instance.Assign( new ExportProvider( parameter.Get<CompositionContext>() ) );
 	}
 
-	[Export( typeof(ISetup) )]
+	/*[Export( typeof(ISetup) )]
 	public class InitializeLocationCommand : InitializeServiceProviderCommandBase
 	{
 		// public static ISetup Instance { get; } = new InitializeLocationCommand();
@@ -76,7 +76,7 @@ namespace DragonSpark.Composition
 		{
 			Priority = Priority.High;
 		}
-	}
+	}*/
 
 	public class ExportProvider : IExportProvider
 	{

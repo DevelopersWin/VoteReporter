@@ -13,6 +13,7 @@ using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
@@ -167,20 +168,36 @@ namespace DragonSpark.Setup
 		public object GetService( Type serviceType ) => Get( serviceType );
 	}
 
-	public class ServiceProviderRegistry : RepositoryBase<IServiceProvider>
+	/*public class ServiceProviderRegistry : RepositoryBase<IServiceProvider>
 	{
 		public static ISource<IRepository<IServiceProvider>> Instance { get; } = new Scope<IRepository<IServiceProvider>>( Factory.ForGlobalScope( () => new ServiceProviderRegistry() ) );
 		ServiceProviderRegistry() : base( DefaultServiceProvider.Instance.Yield() ) {}
 
 		protected override IEnumerable<IServiceProvider> Query() => base.Query().Reverse();
-	}
+	}*/
 
-	public abstract class InitializeServiceProviderCommandBase : Setup
+	/*public abstract class InitializeServiceProviderCommandBase : Setup
 	{
 		protected InitializeServiceProviderCommandBase( Coerce<IServiceProvider> coercer ) : base( new DelegatedCommand<IServiceProvider>( RegisterServiceProviderCommand.Instance.Execute, coercer ) ) {}
 	}
+*/
 
-	[ApplyAutoValidation]
+	[Export( typeof(ISetup) )]
+	public sealed class EnableServicesCommand : Setup
+	{
+		public EnableServicesCommand() : base( Sources.Extensions.Configured( Services.Instance, true ) )
+		{
+			Priority = Priority.High;
+		}
+	}
+
+	public sealed class Services : Scope<bool>
+	{
+		public static Services Instance { get; } = new Services();
+		Services() {}
+	}
+
+	/*[ApplyAutoValidation]
 	public class RegisterServiceProviderCommand : CommandBase<IServiceProvider>
 	{
 		public static RegisterServiceProviderCommand Instance { get; } = new RegisterServiceProviderCommand();
@@ -222,11 +239,15 @@ namespace DragonSpark.Setup
 		public Func<Type, object> For( IDependencyLocatorKey locatorKey ) => Contains( locatorKey ) ? ActivatedServiceProvider.Sources.Get( Get( locatorKey ) ) : null;
 	}
 
-	class ActivatedServiceProvider : IServiceProvider
+	
+
+	public interface IDependencyLocatorKey {}*/
+
+	/*	class ActivatedServiceProvider : IServiceProvider
 	{
 		readonly static Func<IServiceProvider, IValidatedParameterizedSource<Type, object>> Selector = ActivatedFactory.Default.Get;
 
-		public static IParameterizedSource<IServiceProvider, Func<Type, object>> Sources { get; } = new Cache<IServiceProvider, Func<Type, object>>( provider => new ActivatedServiceProvider( provider ).GetService );
+		// public static IParameterizedSource<IServiceProvider, Func<Type, object>> Sources { get; } = new Cache<IServiceProvider, Func<Type, object>>( provider => new ActivatedServiceProvider( provider ).GetService );
 		ActivatedServiceProvider( IServiceProvider provider ) : this( IsActive.Default.Get( provider ) ) {}
 
 		readonly IsActive active;
@@ -238,28 +259,25 @@ namespace DragonSpark.Setup
 
 		public object GetService( Type serviceType )
 		{
-			using ( active.Assignment( serviceType, true ) )
-			{
-				var stores = ServiceProviderRegistry.Instance.Get().List().Select( Selector );
-				var result = stores.Introduce( serviceType, tuple => tuple.Item1.IsSatisfiedBy( tuple.Item2 ), tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
-				return result;
-			}
+			var stores = ServiceProviderRegistry.Instance.Get().List().Select( Selector );
+			var result = stores.Introduce( serviceType, tuple => tuple.Item1.IsSatisfiedBy( tuple.Item2 ), tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
+			return result;
 		}
 			
 		// public bool CanProvide( Type serviceType ) => !active.Get( serviceType );
 	}
-
+*/
 	[ApplyAutoValidation]
-	public class ActivatedFactory : ValidatedParameterizedSourceBase<Type, object>
+	public class ActivatedServiceSource : ValidatedParameterizedSourceBase<Type, object>
 	{
-		public static IParameterizedSource<IServiceProvider, IValidatedParameterizedSource<Type, object>> Default { get; } = new Cache<IServiceProvider, IValidatedParameterizedSource<Type, object>>( provider => new ActivatedFactory( provider ) );
+		// public static IParameterizedSource<IServiceProvider, IValidatedParameterizedSource<Type, object>> Default { get; } = new Cache<IServiceProvider, IValidatedParameterizedSource<Type, object>>( provider => new ActivatedFactory( provider ) );
 
 		readonly IServiceProvider provider;
 		readonly IsActive active;
 
-		ActivatedFactory( IServiceProvider provider ) : this( provider, IsActive.Default.Get( provider ) ) {}
+		public ActivatedServiceSource( IServiceProvider provider ) : this( provider, IsActive.Default.Get( provider ) ) {}
 
-		ActivatedFactory( IServiceProvider provider, IsActive active ) : base( new DelegatedSpecification<Type>( active.Get ).Inverse() )
+		ActivatedServiceSource( IServiceProvider provider, IsActive active ) : base( new DelegatedSpecification<object>( Services.Instance.ToDelegate().Wrap() ).And( new DelegatedSpecification<Type>( active.Get ).Inverse() ) )
 		{
 			this.provider = provider;
 			this.active = active;
@@ -279,8 +297,6 @@ namespace DragonSpark.Setup
 		public static IParameterizedSource<IServiceProvider, IsActive> Default { get; } = new Cache<IServiceProvider, IsActive>( provider => new IsActive() );
 		IsActive() : base( new ThreadLocalSourceCache<Type, bool>() ) {}
 	}
-
-	public interface IDependencyLocatorKey {}
 
 	public interface IApplication<in T> : ICommand<T>, IApplication {}
 

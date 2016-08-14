@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
@@ -31,38 +32,27 @@ namespace DragonSpark.Composition
 		public override ContainerConfiguration Get( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
 	}
 
-	public class ServicesExportDescriptorProvider : ExportDescriptorProvider, IDependencyLocatorKey
+	public class ServicesExportDescriptorProvider : ExportDescriptorProvider
 	{
-		readonly Func<IDependencyLocatorKey, Func<Type, object>> locator;
-		readonly InstanceExportDescriptorProvider<IDependencyLocatorKey> key;
-		readonly Func<Type, object> get;
+		readonly Func<Type, object> provider;
 
-		public ServicesExportDescriptorProvider() : this( locatorKey => DependencyLocators.Instance.Get().For( locatorKey ) ) {}
+		public ServicesExportDescriptorProvider() : this( DefaultServiceProvider.Instance ) {}
 
-		protected ServicesExportDescriptorProvider( Func<IDependencyLocatorKey, Func<Type, object>> locator )
+		public ServicesExportDescriptorProvider( IServiceProvider provider ) : this( new ActivatedServiceSource( provider ).Get ) {}
+
+		ServicesExportDescriptorProvider( Func<Type, object> provider )
 		{
-			this.locator = locator;
-			key = new InstanceExportDescriptorProvider<IDependencyLocatorKey>( this );
-			get = Get;
+			this.provider = provider;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
-			var instance = key.GetExportDescriptors( contract, descriptorAccessor ).Fixed();
-			var result = instance.Any() ? instance : GetDependency( contract, descriptorAccessor );
-			return result;
-		}
-
-		IEnumerable<ExportDescriptorPromise> GetDependency( CompositionContract contract, DependencyAccessor descriptorAccessor )
-		{
 			CompositionDependency dependency;
 			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
 			{
-				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Factory( get, contract.ContractType ).Create );
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Factory( provider, contract.ContractType ).Create );
 			}
 		}
-
-		object Get( Type type ) => locator( this )?.Invoke( type );
 
 		sealed class Factory : FixedFactory<Type, object>
 		{

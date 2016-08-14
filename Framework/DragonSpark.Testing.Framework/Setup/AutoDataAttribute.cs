@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
-using InitializeLocationCommand = DragonSpark.Composition.InitializeLocationCommand;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -72,7 +71,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class FrameworkTypesAttribute : TypeProviderAttributeBase
 	{
-		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(InitializeLocationCommand), typeof(MetadataCommand) ) {}
+		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(EnableServicesCommand), typeof(MetadataCommand) ) {}
 	}
 
 	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Method )]
