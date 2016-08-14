@@ -1,16 +1,6 @@
-using DragonSpark.Activation;
-using DragonSpark.Aspects;
-using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework.Setup.Location;
-using Microsoft.Practices.ServiceLocation;
-using Moq;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
-using Ploeh.AutoFixture.Xunit2;
-using PostSharp.Patterns.Contracts;
 using System;
-using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.Testing.Framework
 {
@@ -45,7 +35,7 @@ namespace DragonSpark.Testing.Framework
 		}*/
 	}
 
-	public class RegisteredAttribute : CustomizeAttribute
+	/*public class RegisteredAttribute : CustomizeAttribute
 	{
 		class Customization : CustomizationBase
 		{
@@ -77,5 +67,5 @@ namespace DragonSpark.Testing.Framework
 			var result = new Customization( serviceLocatorType, parameter.ParameterType );
 			return result;
 		}
-	}
+	}*/
 }

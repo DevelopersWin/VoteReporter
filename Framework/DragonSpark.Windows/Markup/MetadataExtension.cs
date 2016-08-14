@@ -18,7 +18,7 @@ namespace DragonSpark.Windows.Markup
 			this.expression = expression;
 		}
 
-		[Locate]
+		[Service]
 		IExpressionEvaluator Evaluator { [return: NotNull]get; set; }
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) 

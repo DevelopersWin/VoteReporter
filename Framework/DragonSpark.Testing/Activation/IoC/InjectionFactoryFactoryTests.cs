@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.IoC;
-using DragonSpark.Setup.Registration;
+﻿using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Framework;
 using Microsoft.Practices.Unity;

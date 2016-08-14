@@ -1,6 +1,3 @@
-using Microsoft.Practices.ObjectBuilder2;
-using PostSharp.Patterns.Contracts;
-
 namespace DragonSpark.Extensions
 {
 	public static class BuilderContextExtensions
@@ -18,9 +15,9 @@ namespace DragonSpark.Extensions
 
 		// public static bool HasRegisteredBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ).With( policy => !new DefaultInjection.Applied( policy ).Item.IsApplied );
 
-		public static bool HasBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ) != null;
+		/*public static bool HasBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.GetBuildPlan( key ) != null;
 
-		public static IBuildPlanPolicy GetBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.Policies.GetBuildPlan( key ?? @this.BuildKey );
+		public static IBuildPlanPolicy GetBuildPlan( this IBuilderContext @this, NamedTypeBuildKey key = null ) => @this.Policies.GetBuildPlan( key ?? @this.BuildKey );*/
 		
 		// public static bool IsBuilding<T>( this IBuilderContext @this ) => IsBuilding( @this, NamedTypeBuildKey.Make<T>() );
 
@@ -36,7 +33,7 @@ namespace DragonSpark.Extensions
 			}
 		}*/
 
-		public static void Complete( this IBuilderContext @this, object result )
+		/*public static void Complete( this IBuilderContext @this, object result )
 		{
 			@this.Existing = result;
 			@this.BuildComplete = result != null;
@@ -50,6 +47,6 @@ namespace DragonSpark.Extensions
 		{
 			DependencyResolverTrackerPolicy.RemoveResolvers( @this, key );
 			@this.Clear<IBuildPlanPolicy>( key );
-		}
+		}*/
 	}
 }

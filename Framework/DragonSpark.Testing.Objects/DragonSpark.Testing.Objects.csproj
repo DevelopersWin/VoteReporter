@@ -70,7 +70,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="RegisterAsMany.cs" />
     <Compile Include="RegisterAsSingleton.cs" />
     <Compile Include="Setup\Class1.cs" />
     <Compile Include="Configuration\Item.xaml.cs">
@@ -78,13 +77,6 @@
     </Compile>
     <Compile Include="Setup\ProgramSetup.xaml.cs">
       <DependentUpon>ProgramSetup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Setup\TestExtension.cs" />
-    <Compile Include="Setup\UnitySetup.xaml.cs">
-      <DependentUpon>UnitySetup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Setup\LocationSetup.xaml.cs">
-      <DependentUpon>LocationSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configuration\Values.xaml.cs">
       <DependentUpon>Values.xaml</DependentUpon>
@@ -132,14 +124,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Setup\ProgramSetup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Setup\UnitySetup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Setup\LocationSetup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

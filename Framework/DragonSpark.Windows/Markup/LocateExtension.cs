@@ -1,13 +1,10 @@
-using DragonSpark.Activation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
-using Microsoft.Practices.ServiceLocation;
 using Moq;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -225,14 +222,14 @@ namespace DragonSpark.Windows.Markup
 
 		public string BuildName { get; set; }
 
-		[Locate, Required]
-		IServiceLocator Locator { [return: NotNull]get; set; }
+		[Service, Required]
+		IServiceProvider Locator { [return: NotNull]get; set; }
 
 		// public Collection<PropertySetter> Properties { get; } = new Collection<PropertySetter>();
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
-			var result = Locator.GetInstance( Type, BuildName );
+			var result = Locator.GetService( Type/*, BuildName*/ );
 			/*result.As<ISupportInitialize>( x => x.BeginInit() );
 			result.With( x => Properties.Each( y => x.GetType().GetProperty( y.PropertyName ).With( z => y.Apply( z, x ) ) ) );
 			result.As<ISupportInitialize>( x => x.EndInit() );*/

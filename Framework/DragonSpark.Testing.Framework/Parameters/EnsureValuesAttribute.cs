@@ -1,6 +1,4 @@
 using DragonSpark.ComponentModel;
-using DragonSpark.Extensions;
-using Microsoft.Practices.Unity.Utility;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using Ploeh.AutoFixture.Xunit2;
@@ -46,10 +44,10 @@ namespace DragonSpark.Testing.Framework.Parameters
 				{
 					if ( type.IsInstanceOfType( specimen ) )
 					{
-						specimen.GetType().GetPropertiesHierarchical().Where( DefaultValuePropertySpecification.Instance.IsSatisfiedBy ).Each( info =>
+						foreach ( var source in specimen.GetType().GetRuntimeProperties().Where( DefaultValuePropertySpecification.Instance.IsSatisfiedBy ) )
 						{
-							info.GetValue( specimen );
-						} );
+							source.GetValue( specimen );
+						}
 					}
 				}
 			}

@@ -5,7 +5,6 @@ using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using Microsoft.Practices.ServiceLocation;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -90,7 +89,7 @@ namespace DragonSpark.Composition
 		public ImmutableArray<T> GetExports<T>( string name ) => context.GetExports<T>( name ).WhereAssigned().Prioritize().ToImmutableArray();
 	}
 
-	public sealed class ServiceLocator : ServiceLocatorImplBase
+	public sealed class ServiceLocator : IServiceProvider
 	{
 		public ServiceLocator( CompositionContext host )
 		{
@@ -99,8 +98,9 @@ namespace DragonSpark.Composition
 
 		public CompositionContext Host { get; }
 
-		protected override IEnumerable<object> DoGetAllInstances(Type serviceType) => Host.GetExports( serviceType, null );
+		/*protected override IEnumerable<object> DoGetAllInstances(Type serviceType) => Host.GetExports( serviceType, null );
 
-		protected override object DoGetInstance(Type serviceType, string key) => Host.TryGet<object>( serviceType, key );
+		protected override object DoGetInstance(Type serviceType, string key) => Host.TryGet<object>( serviceType, key );*/
+		public object GetService( Type serviceType ) => Host.TryGet<object>( serviceType, null );
 	}
 }

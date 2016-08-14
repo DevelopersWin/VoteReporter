@@ -1,9 +1,7 @@
-﻿using DragonSpark.Activation.IoC;
-using DragonSpark.Composition;
+﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using Microsoft.Practices.Unity;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
@@ -28,10 +26,10 @@ namespace DragonSpark.Activation
 		public IsATypeSpecification() : base( Specifications<Type>.Assigned ) { }
 	}
 
-	public class OnlyIfNotRegistered : DecoratedSpecification<Type>
+	/*public class OnlyIfNotRegistered : DecoratedSpecification<Type>
 	{
 		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse().Project<Type, TypeRequest>( LocatorBase.Coercer.Instance.Coerce ) ) { }
-	}
+	}*/
 
 	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<IsATypeSpecification>
 	{

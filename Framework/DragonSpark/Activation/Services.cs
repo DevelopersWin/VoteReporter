@@ -2,7 +2,6 @@ using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Sources;
-using Microsoft.Practices.ServiceLocation;
 using System;
 
 namespace DragonSpark.Activation
@@ -11,10 +10,7 @@ namespace DragonSpark.Activation
 	{
 		public static IScope<IServiceProvider> Instance { get; } = new GlobalServiceProvider();
 
-		GlobalServiceProvider() : base( () => DefaultServiceProvider.Instance )
-		{
-			ServiceLocator.SetLocatorProvider( GetService<IServiceLocator> );
-		}
+		GlobalServiceProvider() : base( () => DefaultServiceProvider.Instance ) {}
 
 		public static T GetService<T>() => GetService<T>( typeof(T) );
 

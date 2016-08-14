@@ -10,7 +10,7 @@ namespace DragonSpark.Windows.Entity
 		[Singleton( typeof(EntityFiles), nameof(EntityFiles.DefaultDataDirectory) ), Required]
 		public DirectoryInfo Directory { [return: Required]get; set; }
 
-		[Locate, Required]
+		[Service, Required]
 		public DataDirectoryPath Path { [return: Required]get; set; }
 
 		public override void Execute( object parameter ) => Path.Assign( Directory.FullName );

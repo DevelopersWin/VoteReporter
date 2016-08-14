@@ -1,11 +1,6 @@
-﻿using DragonSpark.Diagnostics.Logger;
-using DragonSpark.TypeSystem;
-using Microsoft.Practices.Unity;
-using System;
-
-namespace DragonSpark.Extensions
+﻿namespace DragonSpark.Extensions
 {
-	public static class UnityContainerExtensions
+	/*public static class UnityContainerExtensions
 	{
 		public static T Resolve<T>( this IUnityContainer container, Type type ) => (T)container.Resolve( type, Items<ResolverOverride>.Default );
 
@@ -44,5 +39,5 @@ namespace DragonSpark.Extensions
 			container.AddExtension( result );
 			return result;
 		}
-	}
+	}*/
 }

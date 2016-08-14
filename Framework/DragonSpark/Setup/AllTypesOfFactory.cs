@@ -1,14 +1,14 @@
 using DragonSpark.Activation;
-using DragonSpark.Setup.Registration;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Linq;
 using Type = System.Type;
 
 namespace DragonSpark.Setup
 {
-	[Persistent]
+	[Shared]
 	public class AllTypesOfFactory : ParameterizedSourceBase<Type, Array>
 	{
 		readonly ImmutableArray<Type> types;

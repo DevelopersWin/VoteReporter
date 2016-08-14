@@ -123,8 +123,6 @@
     <Compile Include="Runtime\LogicalStore.cs" />
     <Compile Include="Runtime\ThreadDataStore.cs" />
     <Compile Include="Setup\FileConfigurationFactory.cs" />
-    <Compile Include="Setup\SetupUnityFromConfigurationCommand.cs" />
-    <Compile Include="Setup\SetupExceptionHandling.cs" />
     <Compile Include="Setup\ExceptionPolicyDefinition.cs" />
     <Compile Include="Setup\ExceptionPolicyEntry.cs" />
     <Compile Include="Markup\AssemblyVersionExtension.cs" />

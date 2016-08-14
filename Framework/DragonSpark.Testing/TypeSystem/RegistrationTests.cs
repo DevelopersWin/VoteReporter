@@ -1,17 +1,12 @@
-﻿using DragonSpark.Composition;
-using DragonSpark.Extensions;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
-using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Reflection;
 using Xunit;
-using UnityContainerFactory = DragonSpark.Activation.IoC.UnityContainerFactory;
 
 namespace DragonSpark.Testing.TypeSystem
 {
@@ -34,7 +29,7 @@ namespace DragonSpark.Testing.TypeSystem
 			public AssemblySource() : base( Result ) {}
 		}
 
-		[Fact]
+		/*[Fact]
 		public void IsFactory()
 		{
 			var result = SourceInterfaces.Instance.Get( typeof(UnityContainerFactory) );
@@ -42,6 +37,6 @@ namespace DragonSpark.Testing.TypeSystem
 
 			var implemented = ConventionImplementedInterfaces.Instance.Get( typeof(UnityContainerFactory) );
 			Assert.Null( implemented );
-		}
+		}*/
 	}
 }

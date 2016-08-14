@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using System;
 
 namespace DragonSpark.Setup.Commands

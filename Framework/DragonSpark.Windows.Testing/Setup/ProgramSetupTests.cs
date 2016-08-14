@@ -1,21 +1,19 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.IoC;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
-using Microsoft.Practices.Unity;
 using System;
+using System.Composition;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, IoCTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
+	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
 	public class ProgramSetupTests
 	{
 		/*[Export]
@@ -80,12 +78,12 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( assembly.GetName().Version, sut.AssemblyInformation.Version );
 		}
 
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		public void Type( IUnityContainer sut )
 		{
 			var resolve = sut.Resolve<ITyper>();
 			Assert.IsType<SomeTypeist>( resolve );
-		}
+		}*/
 
 		[Theory, AutoData]
 		public void Run( [Service]Program sut )
@@ -105,7 +103,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}*/
 	}
 
-	[Persistent]
+	[Shared]
 	public class Program : Program<AutoData>
 	{
 		public bool Ran { get; private set; }

@@ -33,24 +33,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Activation\SingletonAttribute.cs" />
     <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
     <Compile Include="Composition\Convention.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Activation\SourceTypeLocator.cs" />
-    <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />
-    <Compile Include="Activation\IoC\StrategyEntryCollection.cs" />
-    <Compile Include="Activation\IoC\UnityContainerFactory.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\ITransformer.cs" />
     <Compile Include="Sources\Parameterized\ParameterAware.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Sources\Parameterized\Factory.cs" />
     <Compile Include="Activation\Execution.cs" />
-    <Compile Include="Activation\IoC\DefaultRegistrationsExtension.cs" />
-    <Compile Include="Activation\IoC\ExportDescriptorProvider.cs" />
-    <Compile Include="Activation\IoC\IsRegisteredSpecification.cs" />
-    <Compile Include="Activation\IoC\LifetimeManagerFactory.cs" />
-    <Compile Include="Activation\IoC\ServiceProviderFactory.cs" />
     <Compile Include="Aspects\Validation\AutoValidation.cs" />
     <Compile Include="Aspects\ThreadCache.cs" />
     <Compile Include="Aspects\FreezeAttribute.cs" />
@@ -185,11 +178,6 @@
     <Compile Include="Activation\ConstructCoercer.cs" />
     <Compile Include="Activation\ICoercer.cs" />
     <Compile Include="Sources\Parameterized\IValidatedParameterizedSource.cs" />
-    <Compile Include="Activation\IoC\ArrayResolutionStrategy.cs" />
-    <Compile Include="Activation\IoC\ConstructorSelectorPolicy.cs" />
-    <Compile Include="Activation\IoC\EnumerableResolutionStrategy.cs" />
-    <Compile Include="Activation\IoC\Specifications\HandleTypeRequestSpecification.cs" />
-    <Compile Include="Activation\IoC\TransientServiceRegistry.cs" />
     <Compile Include="Setup\ApplyMigrationCommand.cs" />
     <Compile Include="Setup\CurrentServiceProvider.cs" />
     <Compile Include="Setup\InitializeCommand.cs" />
@@ -244,7 +232,6 @@
     <Compile Include="TypeSystem\ApplicationAssemblyFilter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Activation\IoC\Locator.cs" />
     <Compile Include="ComponentModel\ServicesValueBase.cs" />
     <Compile Include="ComponentModel\DefaultAttribute.cs" />
     <Compile Include="Diagnostics\ApplicationExceptionFormatter.cs">
@@ -274,31 +261,17 @@
     <Compile Include="Setup\Registration\ConventionTypeContainer.cs" />
     <Compile Include="Setup\Registration\ConventionRegistrationProfileFactory.cs" />
     <Compile Include="Setup\Registration\IRegistration.cs" />
-    <Compile Include="Activation\IoC\InjectionFactoryFactory.cs" />
-    <Compile Include="Activation\IoC\InjectionMemberParameter.cs" />
-    <Compile Include="Activation\IoC\InjectionMemberFactory.cs" />
     <Compile Include="Runtime\IProgram.cs" />
     <Compile Include="Setup\Registration\IRegistrationTypeContext.cs" />
     <Compile Include="Runtime\Program.cs" />
     <Compile Include="Setup\Registration\RegisterAttribute.cs" />
-    <Compile Include="Setup\Registration\RegisterFrameworkExceptionTypesCommand.cs" />
     <Compile Include="Setup\Registration\RegistrationBaseAttribute.cs" />
     <Compile Include="Setup\Commands\RunProgramCommand.cs" />
     <Compile Include="Setup\Setup.cs" />
     <Compile Include="Setup\SetupParameter.cs" />
     <Compile Include="Setup\Commands\ServicedCommand.cs" />
-    <Compile Include="Setup\Registration\LifetimeManagerAttribute.cs" />
     <Compile Include="Setup\Registration\RegistrationAttribute.cs" />
-    <Compile Include="Setup\Commands\SetupUnityCommand.cs" />
-    <Compile Include="Setup\Commands\ConfigureUnityCommand.cs" />
-    <Compile Include="Activation\IoC\SingletonAttribute.cs" />
-    <Compile Include="Setup\Commands\UnityCommand.cs" />
     <Compile Include="Setup\Registration\MetadataRegistrationCommand.cs" />
-    <Compile Include="Setup\Commands\UnityInstance.cs" />
-    <Compile Include="Setup\Commands\UnityRegistrationCommand.cs" />
-    <Compile Include="Setup\Commands\UnityType.cs" />
-    <Compile Include="Activation\IoC\StrategyPipelineExtension.cs" />
-    <Compile Include="Activation\IoC\ServiceLocator.cs" />
     <Compile Include="Runtime\ApplicationInformation.cs">
       <SubType>Code</SubType>
     </Compile>

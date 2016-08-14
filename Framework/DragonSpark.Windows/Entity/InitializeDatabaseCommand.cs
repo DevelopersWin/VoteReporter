@@ -12,12 +12,12 @@ namespace DragonSpark.Windows.Entity
 	[ContentProperty( nameof(Installers) )]
 	public abstract class InitializeDatabaseCommand<TContext> : CommandBase<object> where TContext : DbContext, IEntityInstallationStorage, new()
 	{
-		[Locate, Required]
+		[Service, Required]
 		public IDatabaseInitializer<TContext> Initializer { [return: Required]get; set; }
 
 		public System.Collections.ObjectModel.Collection<IInstaller> Installers { get; } = new System.Collections.ObjectModel.Collection<IInstaller>();
 
-		[Locate, Required]
+		[Service, Required]
 		public ILogger MessageLogger { [return: Required]get; set; }
 
 		public override void Execute( object parameter )

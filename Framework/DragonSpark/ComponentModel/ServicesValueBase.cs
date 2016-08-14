@@ -1,14 +1,12 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
-using Microsoft.Practices.ServiceLocation;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class LocateAttribute : DefaultValueBase
+	/*public class LocateAttribute : DefaultValueBase
 	{
 		public LocateAttribute() : this( null ) { }
 
@@ -58,7 +56,7 @@ namespace DragonSpark.ComponentModel
 
 			public override LocateTypeRequest Get( PropertyInfo parameter ) => new LocateTypeRequest( type( parameter ), name );
 		}
-	}
+	}*/
 
 	public abstract class ServicesValueBase : DefaultValueBase
 	{

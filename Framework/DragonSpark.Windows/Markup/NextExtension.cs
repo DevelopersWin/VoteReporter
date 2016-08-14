@@ -11,7 +11,7 @@ namespace DragonSpark.Windows.Markup
 	[MarkupExtensionReturnType( typeof(int) )]
 	public class NextExtension : MarkupExtension
 	{
-		[Locate, Required]
+		[Service, Required]
 		public IIncrementer Incrementer { [return: Required]get; set; }
 		
 		public override object ProvideValue( IServiceProvider serviceProvider )

@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;

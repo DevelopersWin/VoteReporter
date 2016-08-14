@@ -1,10 +1,8 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
-using Microsoft.Practices.ServiceLocation;
 using Ploeh.AutoFixture.Kernel;
 using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -12,10 +10,10 @@ namespace DragonSpark.Testing.Framework.Setup
 	{
 		readonly IActivator activator;
 
-		public CanLocateSpecification( IServiceLocator locator ) : this( locator.GetInstance<IActivator>() )
-		{}
+		/*public CanLocateSpecification( IServiceLocator locator ) : this( locator.GetInstance<IActivator>() )
+		{}*/
 
-		public CanLocateSpecification( [Required]IActivator activator )
+		public CanLocateSpecification( IActivator activator )
 		{
 			this.activator = activator;
 		}

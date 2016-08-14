@@ -1,7 +1,4 @@
-﻿using DragonSpark.Activation.IoC;
-using DragonSpark.Testing.Framework.Setup;
-
-namespace DragonSpark.Testing.Framework.IoC
+﻿namespace DragonSpark.Testing.Framework.IoC
 {
 	/*public class AutoDataAttribute : Setup.AutoDataAttribute
 	{
@@ -20,8 +17,8 @@ namespace DragonSpark.Testing.Framework.IoC
 		}#1#
 	}*/
 
-	public class IoCTypesAttribute : TypeProviderAttributeBase
+	/*public class IoCTypesAttribute : TypeProviderAttributeBase
 	{
 		public IoCTypesAttribute() : base( typeof(ServiceProviderFactory), typeof(InitializeLocationCommand), typeof(DefaultUnityExtensions) ) {}
-	}
+	}*/
 }

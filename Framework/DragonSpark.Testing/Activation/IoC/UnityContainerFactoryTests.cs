@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.Activation.IoC.Specifications;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;

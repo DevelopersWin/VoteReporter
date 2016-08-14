@@ -60,7 +60,6 @@
     <Compile Include="Setup\CanLocateSpecification.cs" />
     <Compile Include="Setup\ConfigureLocationCustomization.cs" />
     <Compile Include="Setup\GreedyMethodBuilderFactory.cs" />
-    <Compile Include="Setup\LocateTypeSpecification.cs" />
     <Compile Include="Setup\MetadataCommand.cs" />
     <Compile Include="Setup\SetupEngineParts.cs" />
     <Compile Include="Setup\OutputCommand.cs" />

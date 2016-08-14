@@ -1,4 +1,3 @@
-using DragonSpark.Activation.IoC;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;

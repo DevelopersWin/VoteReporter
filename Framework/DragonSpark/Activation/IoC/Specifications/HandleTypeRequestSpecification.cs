@@ -97,20 +97,6 @@ namespace DragonSpark.Activation.IoC.Specifications
 		}
 	}
 
-	public class ContainsSingletonSpecification : SpecificationBase<Type>
-	{
-		public static ContainsSingletonSpecification Instance { get; } = new ContainsSingletonSpecification( SingletonLocator.Instance );
-
-		readonly ISingletonLocator locator;
-
-		public ContainsSingletonSpecification( ISingletonLocator locator )
-		{
-			this.locator = locator;
-		}
-
-		public override bool IsSatisfiedBy( Type parameter ) => locator.Get( parameter ) != null;
-	}
-
 	public class HasConventionSpecification : SpecificationBase<Type>
 	{
 		public static HasConventionSpecification Instance { get; } = new HasConventionSpecification();

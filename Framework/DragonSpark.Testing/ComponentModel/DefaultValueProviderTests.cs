@@ -1,29 +1,21 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
-using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.IoC;
-using DragonSpark.Testing.Framework.Parameters;
+﻿using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
-using Microsoft.Practices.ServiceLocation;
-using Microsoft.Practices.Unity;
 using System;
-using System.Composition;
 using Xunit;
-using ServiceLocator = DragonSpark.Activation.IoC.ServiceLocator;
 
 namespace DragonSpark.Testing.ComponentModel
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), IoCTypes, ContainingTypeAndNested]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes, ContainingTypeAndNested]
 	// [UnityContainerFactory.Register]
-	[Freeze( typeof(IServiceLocator), typeof(ServiceLocator) )]
-	[Freeze( typeof(IActivator), typeof(Activator) )]
+	/*[Freeze( typeof(IServiceLocator), typeof(ServiceLocator) )]
+	[Freeze( typeof(IActivator), typeof(Activator) )]*/
 	public class DefaultValueProviderTests
 	{
-		[Export]
-		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Get();
+		/*[Export]
+		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Get();*/
 
-		public class Activator : LocatorBase
+		/*public class Activator : LocatorBase
 		{
 			readonly IServiceLocator locator;
 
@@ -33,7 +25,7 @@ namespace DragonSpark.Testing.ComponentModel
 			}
 			
 			public override object Get( LocateTypeRequest parameter ) => locator.GetInstance( parameter.RequestedType, parameter.Name );
-		}
+		}*/
 
 		[Theory, AutoData]
 		void Apply()

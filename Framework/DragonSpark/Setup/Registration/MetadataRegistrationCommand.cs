@@ -1,14 +1,12 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.IoC;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup.Commands;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Immutable;
-using System.Linq;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Setup.Registration
 {
@@ -18,7 +16,7 @@ namespace DragonSpark.Setup.Registration
 	{
 		readonly IServiceRegistry registry;
 
-		public MetadataRegistrationCommand( [Required]PersistentServiceRegistry registry )
+		public MetadataRegistrationCommand( [Required]IServiceRegistry registry )
 		{
 			this.registry = registry;
 		}

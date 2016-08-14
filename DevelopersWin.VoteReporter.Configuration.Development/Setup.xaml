@@ -11,6 +11,6 @@
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" 
 >
-	<commands:UnityType RegistrationType="{markup:GenericType entity:IDatabaseInitializer(voteReporter:VotingContext)}" MapTo="{markup:GenericType entity:DropCreateDatabaseIfModelChanges(voteReporter:VotingContext)}" />
+	<!--<commands:UnityType RegistrationType="{markup:GenericType entity:IDatabaseInitializer(voteReporter:VotingContext)}" MapTo="{markup:GenericType entity:DropCreateDatabaseIfModelChanges(voteReporter:VotingContext)}" />-->
 	<common:Setup />
 </setup:Setup>

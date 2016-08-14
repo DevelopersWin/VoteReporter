@@ -12,12 +12,12 @@
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
-	<registration:RegisterFrameworkExceptionTypesCommand />
+	<!--<registration:RegisterFrameworkExceptionTypesCommand />-->
 	<registration:RegisterFromMetadataCommand />
-	<commands:SetupUnityCommand>
+	<!--<commands:SetupUnityCommand>
 		<commands:UnityInstance Instance="{markup:DirectoryInfo Reports}" />
 		<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
-	</commands:SetupUnityCommand>
+	</commands:SetupUnityCommand>-->
 
 	<!--<commands:InitializeModulesCommand />-->
 	<entity:AssignDataDirectoryCommand />

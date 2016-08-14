@@ -63,7 +63,6 @@
     <Compile Include="Setup\ProgramSetupTests.cs" />
     <Compile Include="Setup\SetupCommandTests.cs" />
     <Compile Include="Setup\StressTestingTests.cs" />
-    <Compile Include="Setup\UnitySetupTests.cs" />
     <Compile Include="TestObjects\Locator.cs" />
     <Compile Include="TestObjects\ClassWithBrokenConstructor.cs" />
     <Compile Include="TestObjects\ModulesConfiguration.cs" />

@@ -8,7 +8,7 @@
 	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
 	mc:Ignorable="d" 
 	>
-	<commands:UnityInstance>
+	<!--<commands:UnityInstance>
 		<entity:Configuration AutomaticMigrationsEnabled="True" />
-	</commands:UnityInstance>
+	</commands:UnityInstance>-->
 </runtime:CompositeCommand>
