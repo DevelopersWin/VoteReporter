@@ -1,4 +1,3 @@
-using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -8,13 +7,14 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Setup.Commands
 {
-	/*public class DeclaredFixedCommand<T> : DeclaredCommandBase<T>
+	[ContentProperty( nameof(Parameter) )]
+	public class DeclaredFixedCommand : DeclaredCommandBase<object>
 	{
 		[Required]
-		public ICommand<T> Command { [return: Required]get; set; }
+		public ICommand<object> Command { [return: Required]get; set; }
 
 		public override void Execute( object parameter ) => Command.Run( Parameter );
-	}*/
+	}
 
 	public abstract class DeclaredCommandBase<T> : CommandBase<object>
 	{
@@ -60,7 +60,7 @@ namespace DragonSpark.Setup.Commands
 		public abstract T GetParameter();
 	}
 
-	[ContentProperty( nameof(Parameter) )]
+	/*[ContentProperty( nameof(Parameter) )]
 	public class ServicedCommand<TCommand, TParameter> : DelegatedFixedCommandBase<TParameter> where TCommand : ICommand<TParameter>
 	{
 		public ServicedCommand() : base( Specifications.Always ) {}
@@ -76,5 +76,5 @@ namespace DragonSpark.Setup.Commands
 
 		[Required, Service]
 		public TParameter Parameter { [return: Required]get; set; }
-	}
+	}*/
 }

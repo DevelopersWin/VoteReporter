@@ -9,6 +9,7 @@ using System;
 using System.Composition;
 using System.Diagnostics;
 using System.Reflection;
+using JetBrains.dotMemoryUnit.Util;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup
@@ -69,12 +70,12 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( DateTimeOffset.Parse( "2/1/2016" ), sut.DeploymentDate.GetValueOrDefault() );
 			Assert.Equal( "http://framework.dragonspark.us/testing", sut.CompanyUri.ToString() );
 			var assembly = GetType().Assembly;
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyTitleAttribute, string>( assembly, attribute => attribute.Title ), sut.AssemblyInformation.Title );
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyCompanyAttribute, string>( assembly, attribute => attribute.Company ), sut.AssemblyInformation.Company );
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyCopyrightAttribute, string>( assembly, attribute => attribute.Copyright ), sut.AssemblyInformation.Copyright );
-			Assert.Equal( AttributeProviderExtensions.From<DebuggableAttribute, string>( assembly, attribute => "DEBUG" ), sut.AssemblyInformation.Configuration );
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyDescriptionAttribute, string>( assembly, attribute => attribute.Description ), sut.AssemblyInformation.Description );
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyProductAttribute, string>( assembly, attribute => attribute.Product ), sut.AssemblyInformation.Product );
+			Assert.Equal( assembly.From<AssemblyTitleAttribute, string>( attribute => attribute.Title ), sut.AssemblyInformation.Title );
+			Assert.Equal( assembly.From<AssemblyCompanyAttribute, string>( attribute => attribute.Company ), sut.AssemblyInformation.Company );
+			Assert.Equal( assembly.From<AssemblyCopyrightAttribute, string>( attribute => attribute.Copyright ), sut.AssemblyInformation.Copyright );
+			Assert.Equal( assembly.From<DebuggableAttribute, string>( attribute => "DEBUG" ), sut.AssemblyInformation.Configuration );
+			Assert.Equal( assembly.From<AssemblyDescriptionAttribute, string>( attribute => attribute.Description ), sut.AssemblyInformation.Description );
+			Assert.Equal( assembly.From<AssemblyProductAttribute, string>( attribute => attribute.Product ), sut.AssemblyInformation.Product );
 			Assert.Equal( assembly.GetName().Version, sut.AssemblyInformation.Version );
 		}
 

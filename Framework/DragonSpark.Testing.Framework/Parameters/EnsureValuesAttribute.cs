@@ -2,7 +2,6 @@ using DragonSpark.ComponentModel;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using Ploeh.AutoFixture.Xunit2;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -22,16 +21,17 @@ namespace DragonSpark.Testing.Framework.Parameters
 		{
 			readonly Type requestType;
 
-			public Customization( [Required]Type requestType )
+			public Customization( Type requestType )
 			{
 				this.requestType = requestType;
 			}
 
 			public void Customize( IFixture fixture ) => fixture.Behaviors.Add( new Builder( requestType ) );
 
-			class Builder : ISpecimenBuilderTransformation, ISpecimenCommand
+			sealed class Builder : ISpecimenBuilderTransformation, ISpecimenCommand
 			{
 				readonly Type type;
+				readonly static Func<PropertyInfo, bool> IsSatisfiedBy = DefaultValuePropertySpecification.Instance.IsSatisfiedBy;
 
 				public Builder( Type type )
 				{
@@ -44,7 +44,7 @@ namespace DragonSpark.Testing.Framework.Parameters
 				{
 					if ( type.IsInstanceOfType( specimen ) )
 					{
-						foreach ( var source in specimen.GetType().GetRuntimeProperties().Where( DefaultValuePropertySpecification.Instance.IsSatisfiedBy ) )
+						foreach ( var source in specimen.GetType().GetRuntimeProperties().Where( IsSatisfiedBy ) )
 						{
 							source.GetValue( specimen );
 						}

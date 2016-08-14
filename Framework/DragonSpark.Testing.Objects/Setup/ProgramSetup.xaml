@@ -5,8 +5,6 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
 	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
-	xmlns:localSetup="clr-namespace:DragonSpark.Testing.Objects.Setup"
-	xmlns:registration="clr-namespace:DragonSpark.Setup.Registration;assembly=DragonSpark"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
@@ -16,10 +14,13 @@
 			<commands:UnityType RegistrationType="{x:Type localSetup:ITyper}" MapTo="{x:Type localSetup:SomeTypeist}" />
 		</commands:ConfigureUnityCommand.Types>
 	</commands:SetupUnityCommand>-->
-
+	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Instance}">
+		<runtime:ApplicationInformation DeploymentDate="2/1/2016" CompanyUri="http://framework.dragonspark.us/testing" />
+	</commands:DeclaredFixedCommand>
+	
 	<!--<registration:RegisterFromMetadataCommand />-->
 	<!--<commands:ConfigureUnityCommand>
-		<runtime:ApplicationInformation DeploymentDate="2/1/2016" CompanyUri="http://framework.dragonspark.us/testing" />
+		
 	</commands:ConfigureUnityCommand>-->
 	<!--<commands:InitializeModulesCommand />-->
 	<commands:RunProgramCommand />

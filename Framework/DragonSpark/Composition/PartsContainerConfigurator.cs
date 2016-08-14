@@ -6,10 +6,12 @@ using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using System.Reflection;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
@@ -100,12 +102,30 @@ namespace DragonSpark.Composition
 		public override ConventionBuilder Get( ConventionBuilder parameter )
 		{
 			var mappings = typesSource()
-							.Select( Selector )
-							.WhereAssigned()
-							.ToDictionary( mapping => mapping.ImplementationType, mapping => mapping.InterfaceType );
-			parameter
-				.ForTypesMatching( mappings.ContainsKey )
-				.ExportInterfaces( mappings.ContainsValue );
+				.Select( Selector )
+				.WhereAssigned()
+				.ToDictionary( mapping => mapping.InterfaceType, mapping => mapping.ImplementationType );
+
+			foreach ( var mapping in mappings )
+			{
+				var configure = parameter.ForType( mapping.Value )
+										 .Export()
+										 .Export( builder => builder.AsContractType( mapping.Key ) );
+
+				var shared = parameter.GetCustomAttributes( mapping.Value, mapping.Value.GetTypeInfo() ).FirstOrDefaultOfType<SharedAttribute>();
+				if ( shared != null )
+				{
+					if ( shared.SharingBoundary != null )
+					{
+						configure.Shared( shared.SharingBoundary );
+					}
+					else
+					{
+						configure.Shared();
+					}
+				}
+			}
+
 			return parameter;
 		}
 	}

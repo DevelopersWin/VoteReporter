@@ -198,12 +198,7 @@ namespace DragonSpark.Sources.Parameterized
 			this.inner = inner.ToImmutableArray();
 		}
 
-		public override TResult Get( TParameter parameter )
-		{
-			var enumerable = inner.Introduce( parameter );
-			var firstAssigned = enumerable.FirstAssigned();
-			return firstAssigned;
-		}
+		public override TResult Get( TParameter parameter ) => inner.Introduce( parameter ).FirstAssigned();
 	}
 
 	public sealed class Wrapper<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>

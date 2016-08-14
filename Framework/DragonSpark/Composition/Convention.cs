@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
@@ -61,7 +60,7 @@ namespace DragonSpark.Composition
 	public sealed class ConventionTypes : ValidatedParameterizedSourceBase<Type, Type>
 	{
 		readonly static ISpecification<Type> Specification = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
-		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
+		// readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
 		readonly static Func<Type, bool> Activate = Defaults.ActivateSpecification.IsSatisfiedBy;
 
 		public static IParameterizedSource<Type, Type> Instance { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().ForGlobalScope() );
@@ -84,13 +83,13 @@ namespace DragonSpark.Composition
 		Type Search( Type parameter )
 		{
 			var adapter = parameter.Adapt();
-			var order = Weight( parameter );
+			// var order = Weight( parameter );
 			var convention = IsConventionCandidateSpecification.Defaults.Get( parameter );
 			var result =
 					source.Get()
 					.Where( adapter.IsAssignableFrom )
 					.Where( Activate )
-					.OrderByDescending( order.GetWeight )
+					// .OrderByDescending( order.GetWeight )
 					.FirstOrDefault( convention );
 			return result;
 		}
@@ -118,7 +117,7 @@ namespace DragonSpark.Composition
 		ConventionCandidateNames() : base( type => type.Name.TrimStartOf( 'I' ) ) {}
 	}
 
-	public interface ITypeCandidateWeightProvider
+	/*public interface ITypeCandidateWeightProvider
 	{
 		int GetWeight( Type candidate );
 	}
@@ -135,7 +134,7 @@ namespace DragonSpark.Composition
 		public override int Get( Type parameter ) => parameter.IsNested ? subject.GetTypeInfo().DeclaredNestedTypes.Contains( parameter.GetTypeInfo() ) ? 2 : -1 : 0;
 
 		public int GetWeight( Type candidate ) => Get( candidate );
-	}
+	}*/
 
 	public sealed class SelfAndNestedTypes : Cache<Type, IEnumerable<Type>>
 	{

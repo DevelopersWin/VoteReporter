@@ -133,6 +133,29 @@ namespace DragonSpark.Setup
 		}
 	}*/
 
+	public sealed class Instances : Scope<IServiceRepository>
+	{
+		public static ISource<IServiceRepository> Instance { get; } = new Instances();
+		Instances() : base( Factory.ForGlobalScope( () => new InstanceServiceProvider( SingletonLocator.Instance ) ) ) {}
+
+		public static T Get<T>( Type type ) => Instance.Get().Get<T>( type );
+	}
+
+	public sealed class RegisterInstanceCommand : CommandBase<object>
+	{
+		public static RegisterInstanceCommand Instance { get; } = new RegisterInstanceCommand();
+		RegisterInstanceCommand() : this( Instances.Instance.Get ) {}
+
+		readonly Func<IServiceRepository> repository;
+
+		public RegisterInstanceCommand( Func<IServiceRepository> repository )
+		{
+			this.repository = repository;
+		}
+
+		public override void Execute( object parameter ) => repository().Add( parameter );
+	}
+
 	public class SourceInstanceServiceProvider : InstanceServiceProviderBase<ISource>
 	{
 		public SourceInstanceServiceProvider( params ISource[] instances ) : base( instances ) {}
@@ -164,6 +187,7 @@ namespace DragonSpark.Setup
 
 	public class InstanceServiceProvider : InstanceServiceProviderBase<object>, IServiceRepository
 	{
+		public InstanceServiceProvider() : this( Items<object>.Default ) {}
 		public InstanceServiceProvider( params object[] instances ) : base( instances ) {}
 
 		protected override T GetService<T>() => Query().FirstOrDefaultOfType<T>();

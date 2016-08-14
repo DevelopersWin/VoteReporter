@@ -20,10 +20,10 @@ namespace DragonSpark.Activation
 	public sealed class DefaultServiceProvider : CompositeServiceProvider
 	{
 		public static IServiceProvider Instance { get; } = new DefaultServiceProvider();
-		DefaultServiceProvider() : base( new SourceInstanceServiceProvider( GlobalServiceProvider.Instance, Activator.Instance, Exports.Instance, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToScope(), LoggingController.Instance.ToScope(), Logging.Instance.ToScope() ), new InstanceServiceProvider( SingletonLocator.Instance ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
+		DefaultServiceProvider() : base( new SourceInstanceServiceProvider( GlobalServiceProvider.Instance, Activator.Instance, Exports.Instance, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToScope(), LoggingController.Instance.ToScope(), Logging.Instance.ToScope() ), new DecoratedServiceProvider( Instances.Get<object> ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
 	}
 
-	// public delegate object ServiceSource( Type serviceType );
+	
 
 	public class DecoratedServiceProvider : IServiceProvider
 	{

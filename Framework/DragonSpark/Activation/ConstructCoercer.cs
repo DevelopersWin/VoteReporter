@@ -150,7 +150,7 @@ namespace DragonSpark.Activation
 
 	public abstract class CoercerBase<T> : ICoercer<T>
 	{
-		public T Coerce( object parameter ) => parameter is T ? (T)parameter : parameter != null ? PerformCoercion( parameter ) : default(T);
+		public T Coerce( object parameter ) => parameter is T ? (T)parameter : parameter.IsAssignedOrValue() ? PerformCoercion( parameter ) : default(T);
 
 		protected abstract T PerformCoercion( object parameter );
 	}
