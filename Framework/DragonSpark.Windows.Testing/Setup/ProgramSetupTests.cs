@@ -1,11 +1,6 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using DragonSpark.Modularity;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.IoC;
 using DragonSpark.Testing.Framework.Parameters;
@@ -17,8 +12,6 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
-using AssemblyModuleCatalog = DragonSpark.Windows.Modularity.AssemblyModuleCatalog;
-using Constructor = DragonSpark.Activation.IoC.Constructor;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -38,7 +31,7 @@ namespace DragonSpark.Windows.Testing.Setup
 								   } );
 		}*/
 
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		public void TypeCheck( IUnityContainer container )
 		{
 			var constructor = container.Resolve<Constructor>().To<IValidatedParameterizedSource>();
@@ -50,15 +43,15 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( can );
 
 			/*var created = activator.Create( typeof(MonitoredModule) );
-			Assert.Exists( created );*/
+			Assert.Exists( created );#1#
 
 			/*var activator = sut.Resolve<IActivator>()
 			var specification = new DecoratedSpecification<TypeRequest>( sut.Resolve<ResolvableConstructorSpecification>(), ConstructorBase.Coercer.Instance ).To<ISpecification>();
 			var valid = specification.IsSatisfiedBy( typeof(MonitoredModule) );
-			Assert.True( valid );*/
-		}
+			Assert.True( valid );#1#
+		}*/
 
-		[Theory, AutoData, IncludeParameterTypes( typeof(ModuleInitializer), typeof(AssemblyModuleCatalog), typeof(ModuleManager), typeof(ModuleMonitor), typeof(MonitoredModule), typeof(TaskMonitor), typeof(MonitoredModule.Command) )]
+		/*[Theory, AutoData, IncludeParameterTypes( typeof(ModuleInitializer), typeof(AssemblyModuleCatalog), typeof(ModuleManager), typeof(ModuleMonitor), typeof(MonitoredModule), typeof(TaskMonitor), typeof(MonitoredModule.Command) )]
 		public void Extension( IModuleMonitor sut )
 		{
 			var collection = ListCache.Default.Get( sut );
@@ -69,7 +62,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			var command = collection.FirstOrDefaultOfType<MonitoredModule.Command>();
 			Assert.NotNull( command );
-		}
+		}*/
 
 		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationFactory), typeof(Windows.Runtime.ApplicationAssembly) )]
 		public void Create( [EnsureValues, Service]ApplicationInformation sut, [Service]AssemblyInformation temp )
@@ -101,7 +94,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( GetType().GetMethod( nameof(Run) ), sut.Arguments.Method );
 		}
 
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		public void SetupModuleCommand( SetupModuleCommand sut, MonitoredModule module )
 		{
 			var added = ListCache.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>();
@@ -109,7 +102,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			sut.Execute( module );
 
 			Assert.NotNull( ListCache.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>() );
-		}
+		}*/
 	}
 
 	[Persistent]
@@ -128,7 +121,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 	
 
-	public class SomeCommand : ModuleCommand
+	/*public class SomeCommand : ModuleCommand
 	{
 		public override void Execute( IMonitoredModule parameter ) => ListCache.Default.Get( parameter ).Add( this );
 	}
@@ -167,5 +160,5 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			public override void Execute( IMonitoredModule parameter ) => ListCache.Default.Get( monitor ).Add( this );
 		}
-	}
+	}*/
 }

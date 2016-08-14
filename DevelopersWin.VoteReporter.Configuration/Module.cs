@@ -1,14 +1,13 @@
 ﻿using DevelopersWin.VoteReporter.Entity;
-using DragonSpark.Modularity;
 using System.Globalization;
 
 namespace DevelopersWin.VoteReporter.Parts
 {
-	public class Module : MonitoredModule<Setup>
+	/*public class Module : MonitoredModule<Setup>
 	{
 		public Module( IModuleMonitor moduleMonitor, Setup command ) : base( moduleMonitor, command )
 		{}
-	}
+	}*/
 
 	class VoteCountLocator : IVoteCountLocator
 	{

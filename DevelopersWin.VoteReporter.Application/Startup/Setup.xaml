@@ -19,7 +19,7 @@
 		<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
 	</commands:SetupUnityCommand>
 
-	<commands:InitializeModulesCommand />
+	<!--<commands:InitializeModulesCommand />-->
 	<entity:AssignDataDirectoryCommand />
 	<entity:InstallDatabaseCommand />
 	<entity:BackupDatabaseCommand />

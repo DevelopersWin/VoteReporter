@@ -42,7 +42,6 @@
     <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
     <Compile Include="Diagnostics\ProfilerFactoryTests.cs" />
     <Compile Include="Io\FileSystemTests.cs" />
-    <Compile Include="Modularity\DirectoryModuleInfoProviderTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -52,26 +51,8 @@
     <Compile Include="Runtime\AssemblyProviderTests.cs" />
     <Compile Include="Runtime\DomainAssemblySourceTests.cs" />
     <Compile Include="Runtime\ExceptionHandlerTests.cs" />
-    <Compile Include="Runtime\ModuleConfigurationTests.cs" />
     <Compile Include="Runtime\TaskLocalStoreTests.cs" />
     <Compile Include="Runtime\ThreadLocalStorageTests.cs" />
-    <Compile Include="Modularity\AssemblyResolverTests.cs" />
-    <Compile Include="Modularity\AttributeDataProviderTests.cs" />
-    <Compile Include="Modularity\CompilerHelper.cs" />
-    <Compile Include="Modularity\ConfigurationModuleCatalogTests.cs" />
-    <Compile Include="Modularity\ConfigurationStoreTests.cs" />
-    <Compile Include="Modularity\DirectoryModuleCatalogTests.cs" />
-    <Compile Include="Modularity\FileModuleTypeLoaderTests.cs" />
-    <Compile Include="Modularity\ModuleAttributeTests.cs" />
-    <Compile Include="Modularity\ModuleCatalogTests.cs" />
-    <Compile Include="Modularity\ModuleDependencySolverTests.cs" />
-    <Compile Include="Modularity\ModuleDownloadProgressChangedEventArgsTests.cs" />
-    <Compile Include="Modularity\ModuleInfoBuilderTests.cs" />
-    <Compile Include="Modularity\ModuleInfoGroupExtensionsTests.cs" />
-    <Compile Include="Modularity\ModuleInfoGroupTests.cs" />
-    <Compile Include="Modularity\ModuleInitializerTests.cs" />
-    <Compile Include="Modularity\ModuleManagerTests.cs" />
-    <Compile Include="Modularity\ModuleTypeLoaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\AppDomainStoreTests.cs" />
     <Compile Include="Runtime\ApplicationAssemblyTests.cs" />
@@ -87,9 +68,7 @@
     <Compile Include="TestObjects\ClassWithBrokenConstructor.cs" />
     <Compile Include="TestObjects\ModulesConfiguration.cs" />
     <Compile Include="TestObjects\Modules\DummyClass.cs" />
-    <Compile Include="TestObjects\Modules\MockConfigurationStore.cs" />
     <Compile Include="TestObjects\Modules\MockLoggerHistorySink.cs" />
-    <Compile Include="TestObjects\Modules\MockModuleTypeLoader.cs" />
     <Compile Include="TestObjects\Modules\MyDummyClass.cs" />
     <Compile Include="TestObjects\Relayed.cs" />
     <Compile Include="TypeSystem\PartsTests.cs" />
@@ -113,9 +92,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="DragonSpark.Windows.Testing.psproj" />
-    <Content Include="Modularity\Invalid\Prism.StructureMap.Wpf.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\Modules.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -140,17 +116,6 @@
       <Project>{167df420-328c-4acc-abd0-42dbe268efdf}</Project>
       <Name>DragonSpark</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Modularity\ModuleCatalogXaml\SimpleModuleCatalog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Modularity\Invalid\NotAValidDotNetDll.txt.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

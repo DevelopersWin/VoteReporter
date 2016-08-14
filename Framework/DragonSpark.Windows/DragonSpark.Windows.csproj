@@ -52,7 +52,6 @@
       <DependentUpon>InitializationCommand.xaml</DependentUpon>
     </Compile>
     <Compile Include="Markup\ConfigurationExtension.cs" />
-    <Compile Include="Modularity\AssemblyModuleCatalog.cs" />
     <Compile Include="Security\CertificateFactory.cs" />
     <Compile Include="Security\KeyVaultApplicationFactory.cs" />
     <Compile Include="Security\KeyVaultClientFactory.cs" />
@@ -111,7 +110,6 @@
     <Compile Include="Markup\PropertyInfoMarkupPropertyFactory.cs" />
     <Compile Include="Markup\ReferenceExtension.cs" />
     <Compile Include="Markup\StaticResourceExtension.cs" />
-    <Compile Include="Modularity\DynamicModuleInfoGroup.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -121,26 +119,6 @@
     <Compile Include="Runtime\ApplicationAssembly.cs" />
     <Compile Include="Runtime\FileSystemAssemblySource.cs" />
     <Compile Include="Runtime\DomainAssemblySource.cs" />
-    <Compile Include="Modularity\AssemblyResolver.cs" />
-    <Compile Include="Modularity\ConfigurationModuleCatalog.cs" />
-    <Compile Include="Modularity\ConfigurationStore.cs" />
-    <Compile Include="Modularity\CustomAttributeDataProvider.cs" />
-    <Compile Include="Modularity\DirectoryModuleCatalog.cs" />
-    <Compile Include="Modularity\DirectoryModuleInfoProvider.cs" />
-    <Compile Include="Modularity\DynamicModuleAttribute.cs" />
-    <Compile Include="Modularity\DynamicModuleInfo.cs" />
-    <Compile Include="Modularity\ModuleInfoBuilder.cs" />
-    <Compile Include="Modularity\ModuleTypeLoader.cs" />
-    <Compile Include="Modularity\IConfigurationStore.cs" />
-    <Compile Include="Modularity\IModuleInfoProvider.cs" />
-    <Compile Include="Modularity\InitializationMode.cs" />
-    <Compile Include="Modularity\ModuleCatalogExtensions.cs" />
-    <Compile Include="Modularity\ModuleConfigurationElement.cs" />
-    <Compile Include="Modularity\ModuleConfigurationElementCollection.cs" />
-    <Compile Include="Modularity\ModuleDependencyCollection.cs" />
-    <Compile Include="Modularity\ModuleDependencyConfigurationElement.cs" />
-    <Compile Include="Modularity\ModulesConfigurationSection.cs" />
-    <Compile Include="Modularity\RemotingModuleInfoProvider.cs" />
     <Compile Include="Runtime\ApplicationAssemblyFilter.cs" />
     <Compile Include="Runtime\LogicalStore.cs" />
     <Compile Include="Runtime\ThreadDataStore.cs" />

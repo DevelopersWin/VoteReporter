@@ -1,12 +1,10 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Modularity;
 using DragonSpark.Runtime;
 using DragonSpark.Testing.Objects;
 using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace DragonSpark.Testing.Runtime
@@ -70,7 +68,7 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( -1, sut.To<IList>().Add( new object() ) );
 		}
 
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		public void Cover( ModuleInfo one, ModuleInfo two, DeclarativeCollection<ModuleInfo> sut )
 		{
 			( (IList)sut ).Insert( 0, one );
@@ -118,6 +116,6 @@ namespace DragonSpark.Testing.Runtime
 			Assert.NotNull( sut.To<IEnumerable>().GetEnumerator() );
 			sut.Clear();
 			Assert.Equal( 0, sut.Count );
-		}
+		}*/
 	}
 }

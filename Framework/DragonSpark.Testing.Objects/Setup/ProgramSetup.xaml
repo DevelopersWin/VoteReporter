@@ -21,6 +21,6 @@
 	<commands:ConfigureUnityCommand>
 		<runtime:ApplicationInformation DeploymentDate="2/1/2016" CompanyUri="http://framework.dragonspark.us/testing" />
 	</commands:ConfigureUnityCommand>
-	<commands:InitializeModulesCommand />
+	<!--<commands:InitializeModulesCommand />-->
 	<commands:RunProgramCommand />
 </setup:Setup>
