@@ -1,14 +1,9 @@
-﻿using DragonSpark.Composition;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
-using PostSharp.Patterns.Contracts;
+﻿using DragonSpark.Runtime.Specifications;
 using System;
-using System.Collections.Generic;
 
 namespace DragonSpark.Activation
 {
-	public interface IServiceRegistry
+	/*public interface IServiceRegistry
 	{
 		bool IsRegistered( Type type );
 
@@ -17,13 +12,12 @@ namespace DragonSpark.Activation
 		void Register( InstanceRegistrationParameter parameter );
 
 		void RegisterFactory( FactoryRegistrationParameter parameter );
-	}
+	}*/
 
 	public class IsATypeSpecification : DecoratedSpecification<Type>
 	{
 		public static IsATypeSpecification Instance { get; } = new IsATypeSpecification();
-
-		public IsATypeSpecification() : base( Specifications<Type>.Assigned ) { }
+		IsATypeSpecification() : base( Specifications<Type>.Assigned ) { }
 	}
 
 	/*public class OnlyIfNotRegistered : DecoratedSpecification<Type>
@@ -31,7 +25,7 @@ namespace DragonSpark.Activation
 		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse().Project<Type, TypeRequest>( LocatorBase.Coercer.Instance.Coerce ) ) { }
 	}*/
 
-	public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<IsATypeSpecification>
+	/*public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<IsATypeSpecification>
 	{
 		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ConventionImplementedInterfaces locator ) : base( registry, locator, IsATypeSpecification.Instance ) {}
 	}
@@ -172,5 +166,5 @@ namespace DragonSpark.Activation
 		}
 
 		public Func<object> Factory { get; }
-	}
+	}*/
 }

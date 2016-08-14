@@ -183,7 +183,6 @@
     <Compile Include="Setup\InitializeCommand.cs" />
     <Compile Include="Setup\Registration\FactoryRegistration.cs" />
     <Compile Include="Setup\Registration\LifetimeFactoryParameterCoercer.cs" />
-    <Compile Include="Setup\Registration\MappingRegistration.cs" />
     <Compile Include="Setup\SetupParameterExtensions.cs" />
     <Compile Include="TypeSystem\AllParts.cs" />
     <Compile Include="TypeSystem\AssemblyInformation.cs" />
@@ -260,18 +259,14 @@
     <Compile Include="Runtime\CompositeCommand.cs" />
     <Compile Include="Setup\Registration\ConventionTypeContainer.cs" />
     <Compile Include="Setup\Registration\ConventionRegistrationProfileFactory.cs" />
-    <Compile Include="Setup\Registration\IRegistration.cs" />
     <Compile Include="Runtime\IProgram.cs" />
     <Compile Include="Setup\Registration\IRegistrationTypeContext.cs" />
     <Compile Include="Runtime\Program.cs" />
-    <Compile Include="Setup\Registration\RegisterAttribute.cs" />
-    <Compile Include="Setup\Registration\RegistrationBaseAttribute.cs" />
     <Compile Include="Setup\Commands\RunProgramCommand.cs" />
     <Compile Include="Setup\Setup.cs" />
     <Compile Include="Setup\SetupParameter.cs" />
     <Compile Include="Setup\Commands\ServicedCommand.cs" />
     <Compile Include="Setup\Registration\RegistrationAttribute.cs" />
-    <Compile Include="Setup\Registration\MetadataRegistrationCommand.cs" />
     <Compile Include="Runtime\ApplicationInformation.cs">
       <SubType>Code</SubType>
     </Compile>

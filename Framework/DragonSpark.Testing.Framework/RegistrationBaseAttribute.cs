@@ -1,22 +1,22 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Registration;
+using DragonSpark.Setup;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework.Setup.Location;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
 using PostSharp.Patterns.Contracts;
 using System;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Testing.Framework
 {
-	[AttributeUsage( AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true )]
+	/*[AttributeUsage( AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true )]
 	public abstract class RegistrationBaseAttribute : HostingAttribute
 	{
 		protected RegistrationBaseAttribute( Func<object, ICustomization> factory ) : base( x => x.AsTo( factory ) ) {}
-	}
+	}*/
 
-	public class RegistrationCustomization : ICustomization
+	/*public class RegistrationCustomization : ICustomization
 	{
 		readonly IRegistration registration;
 
@@ -26,9 +26,9 @@ namespace DragonSpark.Testing.Framework
 		}
 
 		public void Customize( IFixture fixture ) => registration.Register( AssociatedRegistry.Default.Get( fixture ) );
-	}
+	}*/
 
-	public class AssociatedRegistry : Cache<IFixture, IServiceRegistry>
+	public class AssociatedRegistry : Cache<IFixture, IServiceRepository>
 	{
 		public static AssociatedRegistry Default { get; } = new AssociatedRegistry();
 
@@ -147,7 +147,7 @@ namespace DragonSpark.Testing.Framework
 		public RegisterServiceAttribute( [Required] Type serviceType ) : base( t => new RegistrationCustomization( new ServiceRegistration( serviceType ) ) ) {}
 	}*/
 
-	public class ServiceRegistration : IRegistration, ICustomization
+	public class ServiceRegistration : ICustomization
 	{
 		readonly Type serviceType;
 
@@ -156,16 +156,14 @@ namespace DragonSpark.Testing.Framework
 			this.serviceType = serviceType;
 		}
 
-		public void Register( IServiceRegistry registry )
+		public void Customize( IFixture fixture )
 		{
+			var repository = AssociatedRegistry.Default.Get( fixture );
 			var instance = GlobalServiceProvider.GetService<object>( serviceType );
 			if ( instance.IsAssigned() )
 			{
-				var parameter = new InstanceRegistrationParameter( serviceType, instance );
-				registry.Register( parameter );
+				repository.Add( instance );
 			}
 		}
-
-		public void Customize( IFixture fixture ) => Register( AssociatedRegistry.Default.Get( fixture ) );
 	}
 }

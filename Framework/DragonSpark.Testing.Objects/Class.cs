@@ -1,7 +1,9 @@
+using System.Composition;
+
 namespace DragonSpark.Testing.Objects
 {
-	public class Class : IInterface
-	{}
+	[Export( typeof(IInterface) )]
+	public class Class : IInterface {}
 
 	public class ClassWithProperty : Class
 	{

@@ -1,4 +1,3 @@
-using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
@@ -159,16 +158,16 @@ namespace DragonSpark.Testing.Framework.Setup
 
 		sealed class Specification : SpecificationBase<Type>
 		{
-			readonly IServiceRegistry registry;
+			readonly IServiceRepository registry;
 
 			public Specification( IFixture fixture ) : this( AssociatedRegistry.Default.Get( fixture ) ) {}
 
-			Specification( IServiceRegistry registry )
+			Specification( IServiceRepository registry )
 			{
 				this.registry = registry;
 			}
 
-			public override bool IsSatisfiedBy( Type parameter ) => registry.IsRegistered( parameter );
+			public override bool IsSatisfiedBy( Type parameter ) => registry.IsSatisfiedBy( parameter );
 		}
 	}
 }

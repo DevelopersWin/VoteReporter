@@ -140,11 +140,15 @@ namespace DragonSpark.Setup
 		protected override T GetService<T>() => Query().Select( o => o.Get() ).FirstOrDefaultOfType<T>();
 	}
 
-	public abstract class InstanceServiceProviderBase<T> : RepositoryBase<T>, IServiceProvider
+	public interface IServiceRepository : IServiceRepository<object> {}
+
+	public interface IServiceRepository<T> : IServiceProvider, IRepository<T>, ISpecification<Type> {}
+
+	public abstract class InstanceServiceProviderBase<T> : RepositoryBase<T>, IServiceRepository<T>
 	{
 		readonly IGenericMethodContext<Invoke> method;
 
-		protected InstanceServiceProviderBase( params T[] instances ) : base( instances )
+		protected InstanceServiceProviderBase( params T[] instances ) : base( instances.AsEnumerable() )
 		{
 			method = new GenericMethodFactories( this )[ nameof(GetService) ];
 		}
@@ -152,9 +156,13 @@ namespace DragonSpark.Setup
 		public virtual object GetService( Type serviceType ) => method.Make( serviceType ).Invoke<object>();
 
 		protected abstract TService GetService<TService>();
+
+		public bool IsSatisfiedBy( Type parameter ) => Query().Cast<object>().Any( parameter.Adapt().IsInstanceOfType );
+
+		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
 	}
 
-	public class InstanceServiceProvider : InstanceServiceProviderBase<object>
+	public class InstanceServiceProvider : InstanceServiceProviderBase<object>, IServiceRepository
 	{
 		public InstanceServiceProvider( params object[] instances ) : base( instances ) {}
 

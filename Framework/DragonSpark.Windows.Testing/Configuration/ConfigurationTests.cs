@@ -1,5 +1,4 @@
-﻿using DragonSpark.Configuration;
-using DragonSpark.Testing.Framework;
+﻿using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects.Properties;
 using Ploeh.AutoFixture.Xunit2;
@@ -21,8 +20,8 @@ namespace DragonSpark.Windows.Testing.Configuration
 			Assert.Equal( settings.HelloWorld, alias );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
-		[Map( typeof(IValueStore), typeof(DragonSpark.Testing.Objects.Configuration.Values) )]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(DragonSpark.Testing.Objects.Configuration.Values) )]
+		// [Map( typeof(IValueStore), typeof(DragonSpark.Testing.Objects.Configuration.Values) )]
 		public void FromItem( [NoAutoProperties]DragonSpark.Testing.Objects.Configuration.Item sut )
 		{
 			Assert.Equal( "This is a value from a MemberInfoKey", sut.SomeTestingProperty );

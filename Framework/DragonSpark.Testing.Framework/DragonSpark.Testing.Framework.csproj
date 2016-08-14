@@ -72,9 +72,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MapAttribute.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="RegistrationBaseAttribute.cs">
       <SubType>Code</SubType>
     </Compile>

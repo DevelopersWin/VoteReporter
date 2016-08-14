@@ -2,21 +2,18 @@
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
-using DragonSpark.Setup.Registration;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
-using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using DragonSpark.Windows.Testing.TestObjects;
 using Moq;
 using Ploeh.AutoFixture.Xunit2;
-using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -27,7 +24,6 @@ using ApplicationAssemblyLocator = DragonSpark.Windows.Runtime.ApplicationAssemb
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 using Locator = DragonSpark.Windows.Testing.TestObjects.Locator;
 using Object = DragonSpark.Testing.Objects.Object;
-using ServiceLocator = DragonSpark.Composition.ServiceLocator;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -52,8 +48,8 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.IsType<LocationSetup>( sut );
 		}*/
 
-		[Map( typeof(IActivator), typeof(Locator))]
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		// [Map( typeof(IActivator), typeof(Locator))]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(Locator) )]
 		public void CreateInstance( IActivator locator )
 		{
 			var expected = GlobalServiceProvider.GetService<IActivator>();
@@ -66,8 +62,8 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( "DefaultActivation", instance.Name );
 		}
 
-		[Map( typeof(IActivator), typeof(Locator) )]
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		// [Map( typeof(IActivator), typeof(Locator) )]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(Locator) )]
 		public void CreateNamedInstance( IActivator activator, string name )
 		{
 			Assert.Same( GlobalServiceProvider.GetService<IActivator>(), activator );
@@ -79,8 +75,8 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( name, instance.Name );
 		}
 
-		[Map( typeof(IActivator), typeof(TestObjects.Constructor) )]
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		// [Map( typeof(IActivator), typeof(TestObjects.Constructor) )]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(Locator) )]
 		public void CreateItem( IActivator activator )
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
@@ -93,26 +89,28 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
-		void RegisterInstanceGeneric( IServiceRegistry registry, Class instance )
+		void RegisterInstanceGeneric( IServiceRepository registry, Class instance )
 		{
-			registry.Register<IInterface>( instance );
+			Assert.Null( GlobalServiceProvider.GetService<IInterface>() );
+
+			registry.Add( instance );
 
 			var located = GlobalServiceProvider.GetService<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(Class) )]
 		public void RegisterGeneric()
 		{
-			var registry = GlobalServiceProvider.GetService<IServiceRegistry>();
-			registry.Register<IInterface, Class>();
+			/*var registry = GlobalServiceProvider.GetService<IServiceRepository>();
+			registry.Register<IInterface, Class>();*/
 
 			var located = GlobalServiceProvider.GetService<IInterface>();
 			Assert.IsType<Class>( located );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+	/*	[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void RegisterLocation()
 		{
 			var registry = GlobalServiceProvider.GetService<IServiceRegistry>();
@@ -120,9 +118,9 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			var located = GlobalServiceProvider.GetService<IInterface>();
 			Assert.IsType<Class>( located );
-		}
+		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		void RegisterInstanceClass( Class instance )
 		{
 			var registry = GlobalServiceProvider.GetService<IServiceRegistry>();
@@ -131,9 +129,9 @@ namespace DragonSpark.Windows.Testing.Setup
 			var located = GlobalServiceProvider.GetService<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
-		}
+		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		void RegisterFactoryClass( Class instance )
 		{
 			var registry = GlobalServiceProvider.GetService<IServiceRegistry>();
@@ -142,7 +140,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			var located = GlobalServiceProvider.GetService<IInterface>();
 			Assert.IsType<Class>( located );
 			Assert.Equal( instance, located );
-		}
+		}*/
 
 		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void With( IServiceLocator locator, [Frozen, Registered]ClassWithParameter instance )
@@ -176,7 +174,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			sut.Verify( x => x.Register( It.Is<MappingRegistrationParameter>( parameter => parameter.MappedTo == typeof(Class) && parameter.RequestedType == typeof(IInterface) && parameter.Name == null ) ) );
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		void Resolve( [Service]Interfaces sut )
 		{
 			Assert.NotNull( sut.Items.FirstOrDefaultOfType<Item>() );
@@ -200,9 +198,9 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			var broken = sut.Get<ClassWithBrokenConstructor>();
 			Assert.Null( broken );
-		}
+		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		void GetAllInstancesLocator( [Modest, Service] ServiceLocator sut )
 		{
 			var registry = sut.Get<IServiceRegistry>();
@@ -210,10 +208,10 @@ namespace DragonSpark.Windows.Testing.Setup
 			registry.Register<IInterface, Derived>( "Second" );
 
 			/*var count = sut.Container.Registrations.Count( x => x.RegisteredType == typeof(IInterface) );
-			Assert.Equal( 2, count );*/
+			Assert.Equal( 2, count );#1#
 
 			/*var items = sut.GetAllInstances<IInterface>();
-			Assert.Equal( 2, items.Count() );*/
+			Assert.Equal( 2, items.Count() );#1#
 
 			/*var classes = new[]{ new Class() };
 			registry.Register<IEnumerable<IInterface>>( classes );
@@ -221,8 +219,8 @@ namespace DragonSpark.Windows.Testing.Setup
 			var updated = sut.GetAllInstances<IInterface>().Fixed();
 			Assert.Equal( 3, updated.Length );
 
-			Assert.Contains( classes.Single(), updated );*/
-		}
+			Assert.Contains( classes.Single(), updated );#1#
+		}*/
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		void CreateActivator( IActivator sut, string message, int number, Class @item )
@@ -454,12 +452,12 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotNull( fromProvider );
 
 			var assembly = GetType().Assembly;
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyTitleAttribute, string>( assembly, attribute => attribute.Title ), fromProvider.Title );
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyCompanyAttribute, string>( assembly, attribute => attribute.Company ), fromProvider.Company );
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyCopyrightAttribute, string>( assembly, attribute => attribute.Copyright ), fromProvider.Copyright );
-			Assert.Equal( AttributeProviderExtensions.From<DebuggableAttribute, string>( assembly, attribute => "DEBUG" ), fromProvider.Configuration );
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyDescriptionAttribute, string>( assembly, attribute => attribute.Description ), fromProvider.Description );
-			Assert.Equal( AttributeProviderExtensions.From<AssemblyProductAttribute, string>( assembly, attribute => attribute.Product ), fromProvider.Product );
+			Assert.Equal( assembly.From<AssemblyTitleAttribute, string>( attribute => attribute.Title ), fromProvider.Title );
+			Assert.Equal( assembly.From<AssemblyCompanyAttribute, string>( attribute => attribute.Company ), fromProvider.Company );
+			Assert.Equal( assembly.From<AssemblyCopyrightAttribute, string>( attribute => attribute.Copyright ), fromProvider.Copyright );
+			Assert.Equal( assembly.From<DebuggableAttribute, string>( attribute => "DEBUG" ), fromProvider.Configuration );
+			Assert.Equal( assembly.From<AssemblyDescriptionAttribute, string>( attribute => attribute.Description ), fromProvider.Description );
+			Assert.Equal( assembly.From<AssemblyProductAttribute, string>( attribute => attribute.Product ), fromProvider.Product );
 			Assert.Equal( assembly.GetName().Version, fromProvider.Version );
 		}
 
@@ -469,21 +467,20 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.IsType<MultipleInterfaces>( sut );
 		}
 
-		public interface IRegisteredWithName
-		{ }
+		/*public interface IRegisteredWithName
+		{ }*/
 
-		[Register.Mapped( typeof(IAnotherInterface) )]
-		public class MultipleInterfaces : IInterface, IAnotherInterface, IItem
-		{}
+		[Export( typeof(IAnotherInterface) )]
+		public class MultipleInterfaces : IInterface, IAnotherInterface, IItem {}
+		public interface IItem {}
 
-		interface IAnotherInterface
-		{ }
+		interface IAnotherInterface {}
 
-		[Register.Mapped( "Registered" )]
+		/*[Register.Mapped( "Registered" )]
 		public class MappedWithNameClass : IRegisteredWithName
-		{ }
+		{ }*/
 
-		public class Interfaces
+		/*public class Interfaces
 		{
 			public Interfaces( IEnumerable<IItem> items )
 			{
@@ -493,10 +490,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			public IEnumerable<IItem> Items { get; }
 		}
 
-		public interface IItem
-		{ }
-
-		[Register.Mapped]
+				[Register.Mapped]
 		public class Item : IItem
 		{ }
 
@@ -506,7 +500,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 		[Register.Mapped( "YetAnotherItem" )]
 		public class YetAnotherItem : IItem
-		{ }
+		{ }*/
 	}
 
 	/*[Export]

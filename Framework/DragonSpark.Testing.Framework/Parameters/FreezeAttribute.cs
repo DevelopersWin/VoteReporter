@@ -1,9 +1,6 @@
-using Ploeh.AutoFixture;
-using System;
-
 namespace DragonSpark.Testing.Framework.Parameters
 {
-	public class FreezeAttribute : RegistrationBaseAttribute
+	/*public class FreezeAttribute : RegistrationBaseAttribute
 	{
 		public FreezeAttribute( Type registrationType ) : this( registrationType, registrationType ) {}
 
@@ -22,5 +19,5 @@ namespace DragonSpark.Testing.Framework.Parameters
 
 			public void Customize( IFixture fixture ) => fixture.Customize( new FreezingCustomization( mappedTo, registrationType ) );
 		}
-	}
+	}*/
 }

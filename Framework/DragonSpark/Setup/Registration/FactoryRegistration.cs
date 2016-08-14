@@ -12,14 +12,14 @@ using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Setup.Registration
 {
-	public static class ServiceRegistryExtensions
+	/*public static class ServiceRegistryExtensions
 	{
 		public static void Register<TFrom, TTo>( this IServiceRegistry @this, string name = null ) where TTo : TFrom => @this.Register( new MappingRegistrationParameter( typeof(TFrom), typeof(TTo), name ) );
 
 		public static void Register<T>( this IServiceRegistry @this, T instance, string name = null ) => @this.Register( new InstanceRegistrationParameter( typeof(T), instance, name ) );
 
 		public static void Register<T>( this IServiceRegistry @this, Func<T> factory, string name = null ) => @this.RegisterFactory( new FactoryRegistrationParameter( typeof(T), factory.Convert(), name ) );
-	}
+	}*/
 
 	public sealed class SourceFactory : ParameterizedSourceBase<Type, object>
 	{

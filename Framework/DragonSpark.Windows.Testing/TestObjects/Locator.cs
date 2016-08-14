@@ -1,8 +1,10 @@
 using DragonSpark.Activation;
 using DragonSpark.Testing.Objects;
+using System.Composition;
 
 namespace DragonSpark.Windows.Testing.TestObjects
 {
+	[Export( typeof(IActivator) )]
 	public class Locator : LocatorBase
 	{
 		public override object Get( LocateTypeRequest parameter ) => 
