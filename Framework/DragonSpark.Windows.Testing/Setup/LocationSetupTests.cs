@@ -163,18 +163,21 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( item );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
-		public void RegisterWithRegistry( Mock<IServiceRegistry> sut )
+		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		public void RegisterWithRegistry( Mock<IServiceRegistry> sut, IUnityContainer container )
 		{
 			var registry = GlobalServiceProvider.GetService<IServiceRegistry>();
+			Assert.Same( container.Resolve<IServiceRegistry>(), registry );
 			registry.Register( sut.Object );
+
+			Assert.Same( container.Resolve<IServiceRegistry>(), registry );
 
 			var registered = GlobalServiceProvider.GetService<IServiceRegistry>();
 			Assert.Same( sut.Object, registered );
 			registered.Register<IInterface, Class>();
 
 			sut.Verify( x => x.Register( It.Is<MappingRegistrationParameter>( parameter => parameter.MappedTo == typeof(Class) && parameter.RequestedType == typeof(IInterface) && parameter.Name == null ) ) );
-		}
+		}*/
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		void Resolve( [Service]Interfaces sut )

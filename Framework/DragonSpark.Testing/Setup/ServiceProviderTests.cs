@@ -2,10 +2,10 @@
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
 using DragonSpark.Testing.Objects;
 using Serilog;
 using System.Linq;
-using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Setup

@@ -60,6 +60,8 @@ namespace DragonSpark.Setup
 	{
 		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() : base( () => DefaultServiceProvider.Instance ) {}
+
+		public override IServiceProvider Get() => base.Get().Cached();
 	}
 
 	/*public class ServiceProviderConfigurator : ConfigurationSource<IServiceProvider>
@@ -153,16 +155,9 @@ namespace DragonSpark.Setup
 
 	public class InstanceServiceProvider : InstanceServiceProviderBase<object>
 	{
-		readonly ICache<Type, object> cache;
-
-		public InstanceServiceProvider( params object[] instances ) : base( instances )
-		{
-			cache = new Cache<Type, object>( base.GetService );
-		}
+		public InstanceServiceProvider( params object[] instances ) : base( instances ) {}
 
 		protected override T GetService<T>() => Query().FirstOrDefaultOfType<T>();
-
-		public override object GetService( Type serviceType ) => cache.Get( serviceType );
 	}
 
 	public class CompositeServiceProvider : CompositeFactory<Type, object>, IServiceProvider
@@ -216,7 +211,7 @@ namespace DragonSpark.Setup
 
 	public interface IDependencyLocator : ICache<IDependencyLocatorKey, IServiceProvider>
 	{
-		ServiceSource For( IDependencyLocatorKey locatorKey );
+		Func<Type, object> For( IDependencyLocatorKey locatorKey );
 	}
 
 	class DependencyLocators : Cache<IDependencyLocatorKey, IServiceProvider>, IDependencyLocator
@@ -224,14 +219,14 @@ namespace DragonSpark.Setup
 		public static ISource<IDependencyLocator> Instance { get; } = new Scope<IDependencyLocator>( Factory.Scope( () => new DependencyLocators() ) );
 		DependencyLocators() {}
 
-		public ServiceSource For( IDependencyLocatorKey locatorKey ) => Contains( locatorKey ) ? ActivatedServiceProvider.Sources.Get( Get( locatorKey ) ) : null;
+		public Func<Type, object> For( IDependencyLocatorKey locatorKey ) => Contains( locatorKey ) ? ActivatedServiceProvider.Sources.Get( Get( locatorKey ) ) : null;
 	}
 
 	class ActivatedServiceProvider : IServiceProvider
 	{
 		readonly static Func<IServiceProvider, IValidatedParameterizedSource<Type, object>> Selector = ActivatedFactory.Default.Get;
 
-		public static IParameterizedSource<IServiceProvider, ServiceSource> Sources { get; } = new Cache<IServiceProvider, ServiceSource>( provider => new ActivatedServiceProvider( provider ).GetService );
+		public static IParameterizedSource<IServiceProvider, Func<Type, object>> Sources { get; } = new Cache<IServiceProvider, Func<Type, object>>( provider => new ActivatedServiceProvider( provider ).GetService );
 		ActivatedServiceProvider( IServiceProvider provider ) : this( IsActive.Default.Get( provider ) ) {}
 
 		readonly IsActive active;

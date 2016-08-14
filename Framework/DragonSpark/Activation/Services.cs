@@ -1,9 +1,9 @@
 using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
 using Microsoft.Practices.ServiceLocation;
 using System;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Activation
 {
@@ -27,15 +27,15 @@ namespace DragonSpark.Activation
 		DefaultServiceProvider() : base( new SourceInstanceServiceProvider( GlobalServiceProvider.Instance, Activator.Instance, Exports.Instance, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance.ToScope(), LoggingController.Instance.ToScope(), Logging.Instance.ToScope() ), new InstanceServiceProvider( SingletonLocator.Instance ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
 	}
 
-	public delegate object ServiceSource( Type serviceType );
+	// public delegate object ServiceSource( Type serviceType );
 
 	public class DecoratedServiceProvider : IServiceProvider
 	{
-		readonly ServiceSource inner;
+		readonly Func<Type, object> inner;
 
 		public DecoratedServiceProvider( IServiceProvider provider ) : this( provider.GetService ) {}
 
-		public DecoratedServiceProvider( ServiceSource inner )
+		public DecoratedServiceProvider( Func<Type, object> inner )
 		{
 			this.inner = inner;
 		}

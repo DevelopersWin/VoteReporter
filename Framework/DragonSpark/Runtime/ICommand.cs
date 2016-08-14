@@ -222,9 +222,9 @@ namespace DragonSpark.Runtime
 		public static ServiceCoercer<T> Instance { get; } = new ServiceCoercer<T>();
 		ServiceCoercer() : this( GlobalServiceProvider.GetService<object> ) {}
 
-		readonly ServiceSource source;
+		readonly Func<Type, object> source;
 
-		public ServiceCoercer( ServiceSource source )
+		public ServiceCoercer( Func<Type, object> source )
 		{
 			this.source = source;
 		}

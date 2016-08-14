@@ -83,6 +83,7 @@
     <Compile Include="Runtime\Sources\DelegatesTests.cs" />
     <Compile Include="Runtime\Sources\ScopingTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
+    <Compile Include="Setup\SetupTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
     <Compile Include="Runtime\DelegateTests.cs" />
     <Compile Include="TypeSystem\AttributesTests.cs">

@@ -21,9 +21,10 @@ namespace DragonSpark.Testing.Diagnostics
 		public void EnsureComposition( [Service]CompositionContext context, string text )
 		{
 			var logger = context.GetExport<ILogger>();
-			
-			Assert.Same( Logging.Instance.Get( Execution.Current() ), DefaultServiceProvider.Instance.Get<ILogger>() );
-			Assert.Same( DefaultServiceProvider.Instance.Get<ILogger>(), logger );
+
+			var serviceProvider = DefaultServiceProvider.Instance.Cached();
+			Assert.Same( Logging.Instance.Get( Execution.Current() ), serviceProvider.Get<ILogger>() );
+			Assert.Same( serviceProvider.Get<ILogger>(), logger );
 
 			var method = new Action( AnotherMethod ).Method;
 			var command = new LogCommand( logger );
@@ -31,7 +32,7 @@ namespace DragonSpark.Testing.Diagnostics
 			command.Execute( new HelloWorld( text, method ) );
 			
 			var history = context.GetExport<ILoggerHistory>();
-			Assert.Same( DefaultServiceProvider.Instance.Get<ILoggerHistory>(), history );
+			Assert.Same( serviceProvider.Get<ILoggerHistory>(), history );
 			var message = LogEventMessageFactory.Instance.Get( history.Events ).Last();
 			Assert.Contains( text, message );
 			

@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Composition;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -13,7 +13,6 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 using Xunit;
 using Xunit.Abstractions;
 using Parameter = DragonSpark.Testing.Objects.Composition.Parameter;
@@ -28,15 +27,16 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData, Types]
 		public void BasicCompose( CompositionContext host )
 		{
+			var serviceProvider = DefaultServiceProvider.Instance.Cached();
 			var sinkOne = host.GetExport<ILoggerHistory>();
 			var sinkTwo = host.GetExport<ILoggerHistory>();
 			Assert.Same( sinkOne, sinkTwo );
-			Assert.Same( DefaultServiceProvider.Instance.Get<ILoggerHistory>(), sinkOne );
+			Assert.Same( serviceProvider.Get<ILoggerHistory>(), sinkOne );
 
 			var first = host.GetExport<ILogger>();
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
-			Assert.Same( DefaultServiceProvider.Instance.Get<ILogger>(), first );
+			Assert.Same( serviceProvider.Get<ILogger>(), first );
 
 			Assert.Empty( sinkOne.Events );
 			var current = sinkOne.Events.Count();
@@ -48,15 +48,17 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void BasicComposeAgain( CompositionContext host )
 		{
+			var serviceProvider = DefaultServiceProvider.Instance.Cached();
+
 			var sinkOne = host.GetExport<ILoggerHistory>();
 			var sinkTwo = host.GetExport<ILoggerHistory>();
 			Assert.Same( sinkOne, sinkTwo );
-			Assert.Same( DefaultServiceProvider.Instance.Get<ILoggerHistory>(), sinkOne );
+			Assert.Same( serviceProvider.Get<ILoggerHistory>(), sinkOne );
 
 			var first = host.GetExport<ILogger>();
 			var second = host.GetExport<ILogger>();
 			Assert.Same( first, second );
-			Assert.Same( DefaultServiceProvider.Instance.Get<ILogger>(), first );
+			Assert.Same( serviceProvider.Get<ILogger>(), first );
 
 			Assert.Empty( sinkOne.Events );
 			var current = sinkOne.Events.Count();

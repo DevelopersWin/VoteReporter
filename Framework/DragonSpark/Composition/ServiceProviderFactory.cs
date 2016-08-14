@@ -3,14 +3,14 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using Microsoft.Practices.ServiceLocation;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Windows.Input;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using Type = System.Type;
 
 namespace DragonSpark.Composition
@@ -33,32 +33,31 @@ namespace DragonSpark.Composition
 	public class ServiceProviderConfigurations : Setup.ServiceProviderConfigurations
 	{
 		public new static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
-		ServiceProviderConfigurations() : this( DefaultServiceProviderSource.Instance.Get ) {}
+		ServiceProviderConfigurations() : this( ServiceProviderSource.Instance.Get ) {}
 
-		readonly Func<IServiceProvider> provider;
+		readonly Func<IServiceProvider> source;
 
-		protected ServiceProviderConfigurations( Func<IServiceProvider> provider ) : this( provider, InitializeExportsCommand.Instance.Execute ) {}
+		protected ServiceProviderConfigurations( Func<IServiceProvider> source ) : this( source, InitializeExportsCommand.Instance.Execute ) {}
 
-		ServiceProviderConfigurations( Func<IServiceProvider> provider, Action<IServiceProvider> configure )
+		ServiceProviderConfigurations( Func<IServiceProvider> source, Action<IServiceProvider> configure )
 		{
-			this.provider = new ConfiguringFactory<IServiceProvider>( provider, configure ).Get;
+			this.source = new ConfiguringFactory<IServiceProvider>( source, configure ).Get;
 		}
 
 		protected override IEnumerable<ICommand> Yield()
 		{
-			yield return Setup.ServiceProviderFactory.Instance.Seed.Configured( provider );
+			yield return Setup.ServiceProviderFactory.Instance.Seed.Configured( source );
 			foreach ( var command in base.Yield() )
 			{
 				yield return command;
 			}
-			// yield return InitializeLocationCommand.Instance;
 		}
 	}
 
-	public class DefaultServiceProviderSource : FixedFactory<IServiceProvider, IServiceProvider>
+	public class ServiceProviderSource : FixedFactory<IServiceProvider, IServiceProvider>
 	{
-		public static DefaultServiceProviderSource Instance { get; } = new DefaultServiceProviderSource();
-		DefaultServiceProviderSource() : base( ServiceProviderFactory.Instance.Get, DefaultServiceProvider.Instance ) {}
+		public static ServiceProviderSource Instance { get; } = new ServiceProviderSource();
+		ServiceProviderSource() : base( ServiceProviderFactory.Instance.Get, DefaultServiceProvider.Instance ) {}
 	}
 
 	[ApplyAutoValidation]
