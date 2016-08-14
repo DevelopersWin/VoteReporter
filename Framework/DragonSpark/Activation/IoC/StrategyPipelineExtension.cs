@@ -183,12 +183,10 @@ namespace DragonSpark.Activation.IoC
 	{
 		readonly Condition condition = new Condition();
 
-		readonly ConventionCandidates locator;
 		readonly IServiceRegistry registry;
 
-		public ConventionStrategy( ConventionCandidates locator, IServiceRegistry registry )
+		public ConventionStrategy( IServiceRegistry registry )
 		{
-			this.locator = locator;
 			this.registry = registry;
 		}
 
@@ -198,7 +196,7 @@ namespace DragonSpark.Activation.IoC
 			if ( condition.Get( reference ).Apply() )
 			{
 				var from = context.BuildKey.Type;
-				var convention = locator.Get( from );
+				var convention = ConventionTypes.Instance.Get( from );
 				if ( convention != null )
 				{
 					context.BuildKey = new NamedTypeBuildKey( convention, context.BuildKey.Name );

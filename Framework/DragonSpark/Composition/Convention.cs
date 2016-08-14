@@ -11,14 +11,13 @@ using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
 using Defaults = DragonSpark.Sources.Parameterized.Defaults;
 
 namespace DragonSpark.Composition
 {
-	public class ConventionExporter : ExportDescriptorProvider
+	/*public class ConventionExporter : ExportDescriptorProvider
 	{
 		readonly IParameterizedSource<Type, Type> candidates;
 
@@ -32,92 +31,91 @@ namespace DragonSpark.Composition
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
 			CompositionDependency dependency;
-			var exists = descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency );
-			if ( !exists )
+			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
 			{
-				
+				var candidate = candidates.Get( contract.ContractType );
+				if ( candidate != null )
+				{
+					var convention = contract.ChangeType( candidate );
+
+					var result =
+						descriptorAccessor.TryResolveOptionalDependency( "Existing Convention Request", convention, true, out dependency )
+							? dependency.Target
+							: new ExportDescriptorPromise( convention, GetType().FullName, false, NoDependencies );
+
+					yield return result;
+				}
 			}
 			yield break;
 		}
-	}
+	}*/
 
-	public sealed class ConventionCandidates : FactoryCache<Type, Type>
+	/*public sealed class ConventionCandidates : FactoryCache<Type, Type>
+	{
+		public ConventionCandidates() : base( Specification ) {}
+
+		protected override Type Create( Type parameter ) => ConventionTypes.Instance.Get( parameter );
+	}*/
+
+	[ApplyAutoValidation]
+	public sealed class ConventionTypes : ValidatedParameterizedSourceBase<Type, Type>
 	{
 		readonly static ISpecification<Type> Specification = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
-
-		public ConventionCandidates() : base( Specification ) {}
-		protected override Type Create( Type parameter ) => ConventionTypes.Instance.Get( parameter );
-	}
-
-	public sealed class ConventionTypes : ParameterizedScope<Type, Type>
-	{
 		readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
-		readonly static Func<Type, bool> Specification = Defaults.ActivateSpecification.IsSatisfiedBy;
+		readonly static Func<Type, bool> Activate = Defaults.ActivateSpecification.IsSatisfiedBy;
 
-		public static IParameterizedSource<Type, Type> Instance { get; } = new ConventionTypes();
+		public static IParameterizedSource<Type, Type> Instance { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().ForGlobalScope() );
 		ConventionTypes() : this( ApplicationTypes.Instance ) {}
 
-		public ConventionTypes( ITypeSource source ) : base( new Locator( source ).ToSourceDelegate().ForGlobalScope() ) {}
+		readonly ITypeSource source;
 
-		[ApplyAutoValidation]
-		sealed class Locator : ValidatedParameterizedSourceBase<Type, Type>
+		public ConventionTypes( ITypeSource source ) : base( Specification )
 		{
-			readonly ITypeSource source;
-
-			public Locator( ITypeSource source ) : base( CanInstantiateSpecification.Instance.Inverse() )
-			{
-				this.source = source;
-			}
-
-			static Type Map( Type parameter )
-			{
-				var name = $"{parameter.Namespace}.{ConventionCandidateNameFactory.Instance.Get( parameter )}";
-				var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
-				return result;
-			}
-
-			Type Search( Type parameter )
-			{
-				var adapter = parameter.Adapt();
-				var order = Weight( parameter );
-				var convention = IsConventionCandidateSpecification.Default.Get( parameter );
-				var result =
-						source.Get()
-						.Where( adapter.IsAssignableFrom )
-						.Where( Specification )
-						.OrderByDescending( order.GetWeight )
-						.FirstOrDefault( convention );
-				return result;
-			}
-
-			public override Type Get( Type parameter ) => Map( parameter ) ?? Search( parameter );
+			this.source = source;
 		}
+
+		static Type Map( Type parameter )
+		{
+			var name = $"{parameter.Namespace}.{ConventionCandidateNames.Instance.Get( parameter )}";
+			var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
+			return result;
+		}
+
+		Type Search( Type parameter )
+		{
+			var adapter = parameter.Adapt();
+			var order = Weight( parameter );
+			var convention = IsConventionCandidateSpecification.Defaults.Get( parameter );
+			var result =
+					source.Get()
+					.Where( adapter.IsAssignableFrom )
+					.Where( Activate )
+					.OrderByDescending( order.GetWeight )
+					.FirstOrDefault( convention );
+			return result;
+		}
+
+		public override Type Get( Type parameter ) => Map( parameter ) ?? Search( parameter );
 	}
 
 	class IsConventionCandidateSpecification : SpecificationBase<Type>
 	{
-		readonly static Func<Type, string> Sanitizer = ConventionCandidateNameFactory.Instance.ToSourceDelegate();
+		public static IParameterizedSource<Type, Func<Type, bool>> Defaults { get; } = new Cache<Type, Func<Type, bool>>( t => new IsConventionCandidateSpecification( ConventionCandidateNames.Instance.Get( t ) ).IsSatisfiedBy );
+		
+		readonly string name;
 
-		public static IParameterizedSource<Type, Func<Type, bool>> Default { get; } = new Cache<Type, Func<Type, bool>>( t => new IsConventionCandidateSpecification( t ).IsSatisfiedBy );
-		IsConventionCandidateSpecification( Type type ) : this( type, Sanitizer ) {}
-
-		readonly string type;
-
-		public IsConventionCandidateSpecification( Type type, Func<Type, string> sanitizer ) : this( sanitizer( type ) ) {}
-		IsConventionCandidateSpecification( string type )
+		public IsConventionCandidateSpecification( string name )
 		{
-			this.type = type;
+			this.name = name;
 		}
 
-		public override bool IsSatisfiedBy( Type parameter ) => parameter.Name.Equals( type );
+		public override bool IsSatisfiedBy( Type parameter ) => parameter.Name.Equals( name );
 	}
 
-	class ConventionCandidateNameFactory : ParameterizedSourceBase<Type, string>
+	class ConventionCandidateNames : Cache<Type, string>
 	{
-		public static ConventionCandidateNameFactory Instance { get; } = new ConventionCandidateNameFactory();
-		ConventionCandidateNameFactory() {}
-
-		public override string Get( Type parameter ) => parameter.Name.TrimStartOf( 'I' );
+		public static ConventionCandidateNames Instance { get; } = new ConventionCandidateNames();
+		ConventionCandidateNames() : base( type => type.Name.TrimStartOf( 'I' ) ) {}
 	}
 
 	public interface ITypeCandidateWeightProvider
@@ -145,26 +143,51 @@ namespace DragonSpark.Composition
 		SelfAndNestedTypes() : base( type => type.Adapt().WithNested() ) {}
 	}
 
+	public sealed class ConventionMappings : ParameterizedSourceBase<Type, ConventionMapping>
+	{
+		public static IParameterizedSource<Type, ConventionMapping> Instance { get; } = new ConventionMappings().ToCache();
+		ConventionMappings() {}
+
+		public override ConventionMapping Get( Type parameter )
+		{
+			var @interface = ConventionImplementedInterfaces.Instance.Get( parameter );
+			var result = @interface.IsAssigned() ? new ConventionMapping( @interface, parameter ) : default(ConventionMapping);
+			return result;
+		}
+	}
+
+	public struct ConventionMapping
+	{
+		public ConventionMapping( Type interfaceType, Type implementationType )
+		{
+			InterfaceType = interfaceType;
+			ImplementationType = implementationType;
+		}
+
+		public Type InterfaceType { get; set; }
+		public Type ImplementationType { get; set; }
+	}
+
 	public class ConventionImplementedInterfaces : FactoryCache<Type, Type>
 	{
-		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces( typeof(ISource), typeof(IParameterizedSource), typeof(IValidatedParameterizedSource) );
-		ConventionImplementedInterfaces( params Type[] ignore ) : this( ignore.ToImmutableArray() ) {}
+		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces();
+		ConventionImplementedInterfaces() : this( typeof(ISource), typeof(IParameterizedSource), typeof(IValidatedParameterizedSource) ) {}
 
 		readonly ImmutableArray<Type> ignore;
 
-		public ConventionImplementedInterfaces( ImmutableArray<Type> ignore )
+		public ConventionImplementedInterfaces( params Type[] ignore )
 		{
-			this.ignore = ignore;
+			this.ignore = ignore.ToImmutableArray();
 		}
 
 		protected override Type Create( Type parameter )
 		{
-			var types = parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore.ToArray() ).ToArray();
-			foreach ( var type in types )
+			foreach ( var @interface in parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore.ToArray() )/*.Select( IsConventionCandidateSpecification.Defaults.Get )*/.ToArray() )
 			{
-				if ( parameter.Name.Contains( type.Name.TrimStartOf( 'I' ) ) )
+				var specification = IsConventionCandidateSpecification.Defaults.Get( @interface );
+				if ( specification( parameter ) )
 				{
-					return type;
+					return @interface;
 				}
 			}
 			return null;
@@ -187,13 +210,13 @@ namespace DragonSpark.Composition
 	public class InstantiableTypeSpecification : SpecificationBase<Type>
 	{
 		public static ISpecification<Type> Instance { get; } = new InstantiableTypeSpecification().Cached();
-		InstantiableTypeSpecification() : this( new[] { typeof(Delegate), typeof(Array) }.Select( type => type.Adapt() ).ToImmutableArray() ) {}
+		InstantiableTypeSpecification() : this( typeof(Delegate), typeof(Array) ) {}
 
 		readonly ImmutableArray<TypeAdapter> exempt;
 
-		public InstantiableTypeSpecification( ImmutableArray<TypeAdapter> exempt )
+		public InstantiableTypeSpecification( params Type[] exempt )
 		{
-			this.exempt = exempt;
+			this.exempt = exempt.Select( type => type.Adapt() ).ToImmutableArray();
 		}
 
 		public override bool IsSatisfiedBy( Type parameter ) => parameter != typeof(object) && !exempt.IsAssignableFrom( parameter );

@@ -1,15 +1,14 @@
-using DragonSpark.Aspects;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using System.Reflection;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
@@ -80,17 +79,52 @@ namespace DragonSpark.Composition
 		}
 	}
 
+	public class ConventionBuilderFactory : ConfigurableFactoryBase<ConventionBuilder>
+	{
+		public static ConventionBuilderFactory Instance { get; } = new ConventionBuilderFactory();
+		ConventionBuilderFactory() : base( () => new ConventionBuilder(), ConventionTransformer.Instance ) {}
+	}
+
+	public class ConventionTransformer : TransformerBase<ConventionBuilder>
+	{
+		readonly Func<ImmutableArray<Type>> typesSource;
+		public static ConventionTransformer Instance { get; } = new ConventionTransformer();
+		ConventionTransformer() : this( ApplicationTypes.Instance.Get ) {}
+
+		ConventionTransformer( Func<ImmutableArray<Type>> typesSource )
+		{
+			this.typesSource = typesSource;
+		}
+
+		public override ConventionBuilder Get( ConventionBuilder parameter )
+		{
+			var mappings = typesSource().Select( ConventionMappings.Instance.Get ).WhereAssigned().ToArray();
+			parameter
+				.ForTypesMatching( mappings.Select( mapping => mapping.ImplementationType ).Contains )
+				.ExportInterfaces( mappings.Select( mapping => mapping.InterfaceType ).Contains );
+			return parameter;
+		}
+	}
+
 	public sealed class PartsContainerConfigurator : ContainerConfigurator
 	{
+		readonly Func<ImmutableArray<Type>> typesSource;
+		readonly Func<ConventionBuilder> builderSource;
 		public static PartsContainerConfigurator Instance { get; } = new PartsContainerConfigurator();
-		PartsContainerConfigurator() {}
+		PartsContainerConfigurator() : this( ApplicationTypes.Instance.Get, ConventionBuilderFactory.Instance.Get ) {}
+
+		public PartsContainerConfigurator( Func<ImmutableArray<Type>> typesSource, Func<ConventionBuilder> builderSource )
+		{
+			this.typesSource = typesSource;
+			this.builderSource = builderSource;
+		}
 
 		public override ContainerConfiguration Get( ContainerConfiguration configuration )
 		{
-			var types = ApplicationTypes.Instance.Get().ToArray();
+			var types = typesSource().ToArray();
 
 			var result = configuration
-				.WithParts( types, AttributeProvider.Instance )
+				.WithParts( types, builderSource() )
 				.WithProvider( new SingletonExportDescriptorProvider( types ) )
 				.WithProvider( new SourceDelegateExporter() )
 				.WithProvider( new ParameterizedSourceDelegateExporter() )
@@ -114,15 +148,16 @@ namespace DragonSpark.Composition
 			static PartConventionBuilder Configure( ConventionBuilder builder ) => builder.ForTypesMatching( type => true ).Export().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) );
 		}*/
 
-		class AttributeProvider : AttributedModelProvider
+		/*class AttributeProvider : AttributedModelProvider
 		{
 			public static AttributeProvider Instance { get; } = new AttributeProvider();
+			AttributeProvider() {}
 
 			[Freeze]
 			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, MemberInfo member ) => member.GetAttributes<Attribute>();
 
 			[Freeze]
 			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, ParameterInfo parameter ) => parameter.GetAttributes<Attribute>();
-		}
+		}*/
 	}
 }
