@@ -85,11 +85,22 @@ namespace DragonSpark.Composition
 		ConventionBuilderFactory() : base( () => new ConventionBuilder(), ConventionTransformer.Instance ) {}
 	}
 
+	/*public class ConventionBuilder : System.Composition.Convention.ConventionBuilder
+	{
+		[Freeze]
+		public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, MemberInfo member ) => member.GetAttributes<Attribute>();
+
+		[Freeze]
+		public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, ParameterInfo parameter ) => parameter.GetAttributes<Attribute>();
+	}*/
+
 	public class ConventionTransformer : TransformerBase<ConventionBuilder>
 	{
-		readonly Func<ImmutableArray<Type>> typesSource;
+		readonly static Func<Type, ConventionMapping> Selector = ConventionMappings.Instance.Get;
 		public static ConventionTransformer Instance { get; } = new ConventionTransformer();
 		ConventionTransformer() : this( ApplicationTypes.Instance.Get ) {}
+
+		readonly Func<ImmutableArray<Type>> typesSource;
 
 		ConventionTransformer( Func<ImmutableArray<Type>> typesSource )
 		{
@@ -98,10 +109,13 @@ namespace DragonSpark.Composition
 
 		public override ConventionBuilder Get( ConventionBuilder parameter )
 		{
-			var mappings = typesSource().Select( ConventionMappings.Instance.Get ).WhereAssigned().ToArray();
+			var mappings = typesSource()
+							.Select( Selector )
+							.WhereAssigned()
+							.ToDictionary( mapping => mapping.ImplementationType, mapping => mapping.InterfaceType );
 			parameter
-				.ForTypesMatching( mappings.Select( mapping => mapping.ImplementationType ).Contains )
-				.ExportInterfaces( mappings.Select( mapping => mapping.InterfaceType ).Contains );
+				.ForTypesMatching( mappings.ContainsKey )
+				.ExportInterfaces( mappings.ContainsValue );
 			return parameter;
 		}
 	}
