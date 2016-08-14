@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Activation\SourceTypeLocator.cs" />
     <Compile Include="Activation\IoC\BuildKeyMonitorExtension.cs" />

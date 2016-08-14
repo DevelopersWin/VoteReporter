@@ -103,12 +103,7 @@ namespace DragonSpark.TypeSystem
 		MethodContext<T> Make( params Type[] types );
 	}
 
-	/*public interface IGenericDelegate<in TParameter, out TResult>
-	{
-		TResult Invoke( TParameter parameter );
-	}*/
-
-	public class GenericInvocationFactory<TParameter, TResult> // : FactoryBase<TParameter, TResult> where TParameter : class
+	public class GenericInvocationFactory<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult> where TParameter : class
 	{
 		readonly private Func<Type, Func<TParameter, TResult>> get;
 
@@ -121,9 +116,9 @@ namespace DragonSpark.TypeSystem
 
 		sealed class DelegateCache : Cache<Type, Func<TParameter, TResult>>
 		{
-			public DelegateCache( IGenericMethodContext<Invoke> context, Type genericType ) : base( new Factory( context, genericType ).Create ) {}
+			public DelegateCache( IGenericMethodContext<Invoke> context, Type genericType ) : base( new Factory( context, genericType ).Get ) {}
 
-			class Factory // : FactoryBase<Type, Func<TParameter, TResult>>
+			sealed class Factory : ParameterizedSourceBase<Type, Func<TParameter, TResult>>
 			{
 				readonly IGenericMethodContext<Invoke> context;
 				readonly Type genericType;
@@ -134,11 +129,11 @@ namespace DragonSpark.TypeSystem
 					this.genericType = genericType;
 				}
 
-				public Func<TParameter, TResult> Create( Type parameter ) => context.Make( parameter.Adapt().GetTypeArgumentsFor( genericType ) ).Get( new[] { parameter } ).Invoke<TParameter, TResult>;
+				public override Func<TParameter, TResult> Get( Type parameter ) => context.Make( parameter.Adapt().GetTypeArgumentsFor( genericType ) ).Get( new[] { parameter } ).Invoke<TParameter, TResult>;
 			}
 		}
 
-		public TResult Create( TParameter parameter ) => get( parameter.GetType() )( parameter );
+		public override TResult Get( TParameter parameter ) => get( parameter.GetType() )( parameter );
 	}
 
 	public static class MethodContextExtensions
@@ -156,19 +151,10 @@ namespace DragonSpark.TypeSystem
 
 	public sealed class MethodContext<T> : ArgumentCache<Type[], T> where T : class 
 	{
-		// readonly T only;
-
-		public MethodContext( ImmutableArray<GenericMethodCandidate<T>> candidates ) : this( new Factory( candidates ).Get )
-		{
-			/*var candidate = candidates.ToArray();
-			only = candidate.Length == 1 ? candidate[0].Delegate : null;*/
-		}
-
+		public MethodContext( ImmutableArray<GenericMethodCandidate<T>> candidates ) : this( new Factory( candidates ).Get ) {}
 		MethodContext( Func<Type[], T> resultSelector ) : base( resultSelector ) {}
 
-		// public override T Get( Type[] key ) => only ?? base.Get( key );
-
-		class Factory : ParameterizedSourceBase<Type[], T>
+		sealed class Factory : ParameterizedSourceBase<Type[], T>
 		{
 			readonly ImmutableArray<GenericMethodCandidate<T>> candidates;
 
@@ -183,12 +169,12 @@ namespace DragonSpark.TypeSystem
 
 	sealed class GenericMethodContext<T> : ArgumentCache<Type[], MethodContext<T>>, IGenericMethodContext<T> where T : class
 	{
-		public GenericMethodContext( ImmutableArray<Descriptor> descriptors, Func<MethodInfo, T> create ) : this( new Factory( descriptors, create ).Create ) {}
+		public GenericMethodContext( ImmutableArray<Descriptor> descriptors, Func<MethodInfo, T> create ) : this( new Factory( descriptors, create ).Get ) {}
 		GenericMethodContext( Func<Type[], MethodContext<T>> resultSelector ) : base( resultSelector ) {}
 
 		public MethodContext<T> Make( params Type[] types ) => Get( types );
 
-		class Factory // : FactoryBase<Type[], MethodContext<T>>
+		sealed class Factory : ParameterizedSourceBase<Type[], MethodContext<T>>
 		{
 			readonly Func<MethodInfo, T> create;
 			readonly Func<ValueTuple<Descriptor, Type[]>, GenericMethodCandidate<T>> selector;
@@ -219,7 +205,7 @@ namespace DragonSpark.TypeSystem
 				}
 			}
 
-			public MethodContext<T> Create( Type[] parameter )
+			public override MethodContext<T> Get( Type[] parameter )
 			{
 				var candidates = descriptors.Introduce( parameter, tuple => tuple.Item1.Specification( tuple.Item2 ), selector ).WhereAssigned().ToImmutableArray();
 				var result = new MethodContext<T>( candidates );

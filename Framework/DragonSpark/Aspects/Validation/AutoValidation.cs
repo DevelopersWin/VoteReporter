@@ -13,64 +13,47 @@ namespace DragonSpark.Aspects.Validation
 {
 	public static class AutoValidation
 	{
-		public static ImmutableArray<IProfile> DefaultProfiles { get; } = new IProfile[] { GenericSourceProfile.Instance, GenericCommandProfile.Instance, SourceProfile.Instance, CommandProfile.Instance }.ToImmutableArray();
-
-		sealed class GenericSourceProfile : ProfileBase
-		{
-			public static GenericSourceProfile Instance { get; } = new GenericSourceProfile();
-			GenericSourceProfile() : base( typeof(IValidatedParameterizedSource<,>), typeof(ISpecification<>), nameof(ISpecification.IsSatisfiedBy), typeof(IParameterizedSource<,>), nameof(IParameterizedSource.Get), GenericFactoryProfileFactory.Instance.Create ) {}
-		}
-
-		sealed class SourceProfile : ProfileBase
-		{
-			public static SourceProfile Instance { get; } = new SourceProfile();
-			SourceProfile() : base( typeof(IValidatedParameterizedSource), typeof(ISpecification), nameof(ISpecification.IsSatisfiedBy), typeof(IParameterizedSource), nameof(IParameterizedSource.Get), SourceAdapterSource.Instance.Get ) {}
-		}
-
-		sealed class GenericCommandProfile : ProfileBase
-		{
-			public static GenericCommandProfile Instance { get; } = new GenericCommandProfile();
-			GenericCommandProfile() : base( typeof(ICommand<>), typeof(ISpecification<>), nameof(ISpecification.IsSatisfiedBy), typeof(ICommand<>), nameof(ICommand.Execute), GenericCommandProfileFactory.Instance.Create ) {}
-		}
-
-		sealed class CommandProfile : ProfileBase
-		{
-			public static CommandProfile Instance { get; } = new CommandProfile();
-			CommandProfile() : base( typeof(ICommand), typeof(ICommand), nameof(ICommand.CanExecute), typeof(ICommand), nameof(ICommand.Execute), CommandProfileSource.Instance.Get ) {}
-		}
+		public static ImmutableArray<IAdapterSource> DefaultSources { get; } =
+			new IAdapterSource[]
+			{
+				new AdapterSource( typeof(IValidatedParameterizedSource<,>), GenericSourceAdapterFactory.Instance.Get ),
+				new AdapterSource( typeof(IValidatedParameterizedSource), SourceAdapterFactory.Instance.Get ),
+				new AdapterSource( typeof(ICommand<>), GenericCommandAdapterFactory.Instance.Get ),
+				new AdapterSource( typeof(ICommand), CommandAdapterFactory.Instance.Get ),
+			}.ToImmutableArray();
 	}
 	
-	class AdapterLocator : ParameterizedSourceBase<object, IParameterValidationAdapter>
+	sealed class AdapterLocator : ParameterizedSourceBase<IParameterValidationAdapter>
 	{
 		public static AdapterLocator Instance { get; } = new AdapterLocator();
-		AdapterLocator() : this( Adapters.Instance.Get ) {}
+		AdapterLocator() : this( AdapterSources.Instance.Get ) {}
 
-		readonly Func<Type, Func<object, IParameterValidationAdapter>> factorySource;
+		readonly Func<Type, IAdapterSource> factorySource;
 
-		AdapterLocator( Func<Type, Func<object, IParameterValidationAdapter>> factorySource )
+		AdapterLocator( Func<Type, IAdapterSource> factorySource )
 		{
 			this.factorySource = factorySource;
 		}
 
-		sealed class Adapters : Cache<Type, Func<object, IParameterValidationAdapter>>
+		sealed class AdapterSources : Cache<Type, IAdapterSource>
 		{
-			public static Adapters Instance { get; } = new Adapters();
-			Adapters() : this( AutoValidation.DefaultProfiles ) {}
+			public static AdapterSources Instance { get; } = new AdapterSources();
+			AdapterSources() : this( AutoValidation.DefaultSources ) {}
 
-			readonly ImmutableArray<IProfile> profiles;
+			readonly ImmutableArray<IAdapterSource> sources;
 			
-			Adapters( ImmutableArray<IProfile> profiles )
+			AdapterSources( ImmutableArray<IAdapterSource> sources )
 			{
-				this.profiles = profiles;
+				this.sources = sources;
 			}
 
-			public override Func<object, IParameterValidationAdapter> Get( Type parameter )
+			public override IAdapterSource Get( Type parameter )
 			{
-				foreach ( var profile in profiles )
+				foreach ( var source in sources )
 				{
-					if ( profile.InterfaceType.IsAssignableFrom( parameter ) )
+					if ( source.IsSatisfiedBy( parameter ) )
 					{
-						return profile.ProfileSource;
+						return source;
 					}
 				}
 				return null;
@@ -80,13 +63,13 @@ namespace DragonSpark.Aspects.Validation
 		public override IParameterValidationAdapter Get( object parameter )
 		{
 			var other = parameter.GetType();
-			var factory = factorySource( other );
-			if ( factory != null )
+			var adapter = factorySource( other )?.Get( parameter );
+			if ( adapter != null )
 			{
-				return factory( parameter );
+				return adapter;
 			}
 
-			throw new InvalidOperationException( $"Profile not found for {other}." );
+			throw new InvalidOperationException( $"Adapter not found for {other}." );
 		}
 	}
 
@@ -116,7 +99,7 @@ namespace DragonSpark.Aspects.Validation
 		void Register( IAspect aspect );
 	}
 
-	class LinkedParameterAwareHandler : IParameterAwareHandler
+	sealed class LinkedParameterAwareHandler : IParameterAwareHandler
 	{
 		readonly IParameterAwareHandler current;
 		readonly IParameterAwareHandler next;
@@ -132,7 +115,7 @@ namespace DragonSpark.Aspects.Validation
 		public bool Handle( object parameter, out object handled ) => current.Handle( parameter, out handled ) || next.Handle( parameter, out handled );
 	}
 
-	class AutoValidationController : ConcurrentDictionary<int, object>, IAutoValidationController, IAspectHub
+	sealed class AutoValidationController : ConcurrentDictionary<int, object>, IAutoValidationController, IAspectHub
 	{
 		readonly static object Executing = new object();
 
@@ -170,15 +153,14 @@ namespace DragonSpark.Aspects.Validation
 
 		public object Execute( object parameter, Func<object> proceed )
 		{
-			object handled;
-			if ( Handler != null && Handler.Handle( parameter, out handled ) )
+			object handled = null;
+			if ( Handler?.Handle( parameter, out handled ) ?? false )
 			{
 				MarkValid( parameter, false );
 				return handled;
 			}
 
-			var valid = Current( parameter ).GetValueOrDefault() || CheckAndMark( parameter );
-			if ( valid )
+			if ( Current( parameter ).GetValueOrDefault() || CheckAndMark( parameter ) )
 			{
 				var result = proceed();
 				MarkValid( parameter, false );

@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
@@ -10,11 +10,11 @@ using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
 using PostSharp.Reflection;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Input;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -23,7 +23,7 @@ namespace DragonSpark.Aspects.Validation
 	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict, PersistMetaData =  true )]
 	public class ApplyAutoValidationAttribute : TypeLevelAspect, IAspectProvider
 	{
-		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstanceFactory.Instance.ToSourceDelegate();
+		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstances.Instance.ToSourceDelegate();
 
 		readonly Func<Type, IEnumerable<AspectInstance>> source;
 
@@ -70,6 +70,15 @@ namespace DragonSpark.Aspects.Validation
 	static class Defaults
 	{
 		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Instance.Get;
+
+		public static ImmutableArray<IAspectProfile> AspectProfiles { get; } = 
+			new IAspectProfile[]
+			{
+				new AspectProfile( typeof(IValidatedParameterizedSource<,>), nameof(IParameterizedSource.Get) ),
+				new AspectProfile( typeof(IValidatedParameterizedSource), nameof(IParameterizedSource.Get) ),
+				new AspectProfile( typeof(ICommand<>), nameof(ICommand.Execute) ),
+				new AspectProfile( typeof(ICommand), nameof(ICommand.Execute) )
+			}.ToImmutableArray();
 	}
 
 	class AspectFactory<T> : ParameterizedSourceBase<T> where T : class, IAspect
@@ -150,141 +159,171 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	public interface IProfile : IEnumerable<Func<Type, AspectInstance>>
-	{
-		TypeAdapter InterfaceType { get; }
+	public interface IAdapterSource : IParameterizedSource<IParameterValidationAdapter>, ISpecification<Type> {}
 
-		Func<object, IParameterValidationAdapter> ProfileSource { get; }
+	class AdapterSource : DelegatedParameterizedSource<object, IParameterValidationAdapter>, IAdapterSource
+	{
+		readonly TypeAdapter adapter;
+
+		public AdapterSource( Type declaringType, Func<object, IParameterValidationAdapter> source ) : this( declaringType.Adapt(), source ) {}
+
+		public AdapterSource( TypeAdapter adapter, Func<object, IParameterValidationAdapter> source ) : base( source )
+		{
+			this.adapter = adapter;
+		}
+
+		public bool IsSatisfiedBy( Type parameter ) => adapter.IsAssignableFrom( parameter );
+
+		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
 	}
 
-	abstract class ProfileBase : IProfile
+	public interface IAspectProfile : IParameterizedSource<Type, MethodInfo>
 	{
-		readonly Func<Type, AspectInstance> validate;
-		readonly Func<Type, AspectInstance> execute;
+		Type DeclaringType { get; }
+		/*string MethodName { get; }*/
+	}
+
+	class AspectProfile : ParameterizedSourceBase<Type, MethodInfo>, IAspectProfile
+	{
+		readonly string methodName;
+
+		public AspectProfile( Type declaringType, string methodName )
+		{
+			DeclaringType = declaringType;
+			this.methodName = methodName;
+		}
+
+		public Type DeclaringType { get; }
+
+		/*readonly Func<Type, AspectInstance> execute;
 
 		// protected ProfileBase( Type interfaceType, string valid, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType, valid, interfaceType, execute, factory ) {}
 
-		protected ProfileBase( Type interfaceType, Type validationType, string valid, Type executionType, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType.Adapt(), 
-			new AspectInstanceMethodFactory<AutoValidationValidationAspect>( validationType, valid ).Create, 
-			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( executionType, execute ).Create, factory )
+		protected ProfileBase( Type interfaceType, Type executionType, string execute, Func<object, IParameterValidationAdapter> adapterSource ) : this( interfaceType.Adapt(), 
+			// new AspectInstanceMethodFactory<AutoValidationValidationAspect>( validationType, valid ).Get, 
+			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( executionType, execute ).Get, adapterSource )
 		{}
 
-		protected ProfileBase( TypeAdapter interfaceType, Func<Type, AspectInstance> validate, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> profileSource )
+		protected ProfileBase( TypeAdapter interfaceType, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> adapterSource )
 		{
 			InterfaceType = interfaceType;
-			ProfileSource = profileSource;
-			this.validate = validate;
+			AdapterSource = adapterSource;
 			this.execute = execute;
 		}
 
 		public TypeAdapter InterfaceType { get; }
-		public Func<object, IParameterValidationAdapter> ProfileSource { get; }
+		public Func<object, IParameterValidationAdapter> AdapterSource { get; }*/
 
-		public IEnumerator<Func<Type, AspectInstance>> GetEnumerator()
+		public override MethodInfo Get( Type parameter )
 		{
-			yield return validate;
-			yield return execute;
+			var mappings = parameter.Adapt().GetMappedMethods( DeclaringType );
+			var mapping = mappings.Introduce( methodName, pair => pair.Item1.InterfaceMethod.Name == pair.Item2 && ( pair.Item1.MappedMethod.IsFinal || pair.Item1.MappedMethod.IsVirtual ) && !pair.Item1.MappedMethod.IsAbstract ).SingleOrDefault();
+			var result = mapping.IsAssigned() ? mapping.MappedMethod : null;
+			return result;
 		}
-
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
-	sealed class AspectInstanceMethodFactory<T> : AspectInstanceFactoryBase where T : IAspect
+	sealed class AspectInstanceConstructor<T> : ParameterizedSourceBase<MethodInfo, AspectInstance>
 	{
-		public AspectInstanceMethodFactory( Type implementingType, string methodName ) : this( implementingType, methodName, Items<object>.Default ) {}
-		public AspectInstanceMethodFactory( Type implementingType, string methodName, params object[] arguments ) : base( implementingType, methodName, Construct.New<T>( arguments ) ) {}
-	}
+		public static AspectInstanceConstructor<T> Instance { get; } = new AspectInstanceConstructor<T>();
+		AspectInstanceConstructor() : this( new ObjectConstruction( typeof(T), Items<object>.Default ) ) {}
 
-	static class Construct
-	{
-		public static Func<MethodInfo, AspectInstance> New<T>( params object[] arguments ) => new ConstructAspectInstanceFactory( new ObjectConstruction( typeof(T), arguments ) ).Create;
-	}
-
-	sealed class ConstructAspectInstanceFactory// : FactoryBase<MethodInfo, AspectInstance>
-	{
 		readonly ObjectConstruction construction;
 
-		public ConstructAspectInstanceFactory( ObjectConstruction construction )
+		public AspectInstanceConstructor( ObjectConstruction construction )
 		{
 			this.construction = construction;
 		}
 
-		public AspectInstance Create( MethodInfo parameter ) => new AspectInstance( parameter, construction, null );
+		public override AspectInstance Get( MethodInfo parameter ) => new AspectInstance( parameter, construction, null );
 	}
 
-	abstract class AspectInstanceFactoryBase// : FactoryBase<Type, AspectInstance>
+	/*sealed class AspectInstanceMethodFactory<T> : AspectInstanceFactoryBase where T : IAspect
 	{
-		readonly Type implementingType;
-		readonly string methodName;
-		readonly Func<MethodInfo, AspectInstance> factory;
+		public AspectInstanceMethodFactory( Type implementingType, string methodName ) : this( implementingType, methodName, Items<object>.Default ) {}
+		public AspectInstanceMethodFactory( Type implementingType, string methodName, params object[] arguments ) : base( implementingType, methodName, Construct.New<T>( arguments ) ) {}
+	}*/
 
-		protected AspectInstanceFactoryBase( Type implementingType, string methodName, Func<MethodInfo, AspectInstance> factory )
+	public sealed class AspectInstanceFactory<T> : ParameterizedSourceBase<MethodInfo, AspectInstance>
+	{
+		public static AspectInstanceFactory<T> Instance { get; } = new AspectInstanceFactory<T>();
+		AspectInstanceFactory() : this( AspectInstanceConstructor<T>.Instance.Get ) {}
+
+		readonly Func<MethodInfo, AspectInstance> constructorSource;
+
+		public AspectInstanceFactory( Func<MethodInfo, AspectInstance> constructorSource )
 		{
-			this.implementingType = implementingType;
-			this.methodName = methodName;
-			this.factory = factory;
+			this.constructorSource = constructorSource;
 		}
 
-		public AspectInstance Create( Type parameter )
+		public override AspectInstance Get( MethodInfo parameter )
 		{
-			var mappings = parameter.Adapt().GetMappedMethods( implementingType );
-
-			/*if ( implementingType == typeof(IFactory<,>) )
-			{
-				foreach ( var methodMapping in mappings )
-				{
-					MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {methodMapping.InterfaceMethod} ({methodMapping.InterfaceMethod.DeclaringType.IsConstructedGenericType}) => {methodMapping.MappedMethod} ({methodMapping.MappedMethod.DeclaringType.IsConstructedGenericType})", null, null, null ));
-				}	
-				throw new InvalidOperationException( "SUUUUUUUUUUUUP!!!" );
-			}*/
-
-			var mapping = mappings.Introduce( methodName, pair => pair.Item1.InterfaceMethod.Name == pair.Item2 && ( pair.Item1.MappedMethod.IsFinal || pair.Item1.MappedMethod.IsVirtual ) && !pair.Item1.MappedMethod.IsAbstract ).SingleOrDefault();
-			if ( mapping.IsAssigned() )
-			{
-				var method = mapping.MappedMethod.AccountForGenericDefinition();
-				var result = FromMethod( method );
-				return result;
-			}
-			return null;
-		}
-
-		AspectInstance FromMethod( MethodInfo method )
-		{
+			var method = parameter.AccountForGenericDefinition();
 			var repository = PostSharpEnvironment.CurrentProject.GetService<IAspectRepositoryService>();
-			var instance = factory( method );
-			var type = instance.Aspect != null ? instance.Aspect.GetType() : Type.GetType( instance.AspectConstruction.TypeName );
+			var instance = constructorSource( method );
+			var type = instance.Aspect?.GetType() ?? Type.GetType( instance.AspectConstruction.TypeName );
 			var result = !repository.HasAspect( method, type ) ? instance : null;
 			return result;
 		}
 	}
 
-	public sealed class AspectInstanceFactory : ValidatedParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
+	public sealed class ValidationMethodLocator : TransformerBase<MethodInfo>
 	{
-		public static AspectInstanceFactory Instance { get; } = new AspectInstanceFactory();
+		public static ValidationMethodLocator Instance { get; } = new ValidationMethodLocator();
+		ValidationMethodLocator() {}
 
-		readonly ImmutableArray<Func<Type, AspectInstance>> factories;
-
-		AspectInstanceFactory() : this( AutoValidation.DefaultProfiles ) {}
-
-		public AspectInstanceFactory( ImmutableArray<IProfile> profiles ) : this( profiles.Select( profile => profile.InterfaceType ).ToImmutableArray(), profiles.ToArray().Concat().ToImmutableArray() ) {}
-
-		AspectInstanceFactory( ImmutableArray<TypeAdapter> knownTypes, ImmutableArray<Func<Type, AspectInstance>> factories ) : this( new Specification( knownTypes ), factories ) {}
-
-		AspectInstanceFactory( ISpecification<Type> specification, ImmutableArray<Func<Type, AspectInstance>> factories ) : base( specification )
+		public override MethodInfo Get( MethodInfo parameter )
 		{
-			this.factories = factories;
+			return null;
+		}
+	}
+
+	/*public struct AspectInstanceParameter
+	{
+		public AspectInstanceParameter( IAspectProfile profile, Type candidate )
+		{
+			Profile = profile;
+			Candidate = candidate;
+		}
+
+		public IAspectProfile Profile { get; }
+		public Type Candidate { get; }
+	}*/
+
+	public sealed class AspectInstances : ValidatedParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
+	{
+		public static AspectInstances Instance { get; } = new AspectInstances();
+		AspectInstances() : this( Defaults.AspectProfiles ) {}
+
+		readonly ImmutableArray<IAspectProfile> profiles;
+		readonly Func<MethodInfo, MethodInfo> specificationSource;
+		readonly Func<MethodInfo, AspectInstance> validatorSource;
+		readonly Func<MethodInfo, AspectInstance> executionSource;
+
+		public AspectInstances( ImmutableArray<IAspectProfile> profiles ) : this( profiles, ValidationMethodLocator.Instance.Get, AspectInstanceFactory<AutoValidationValidationAspect>.Instance.Get, AspectInstanceFactory<AutoValidationExecuteAspect>.Instance.Get ) {}
+
+		public AspectInstances( ImmutableArray<IAspectProfile> profiles, Func<MethodInfo, MethodInfo> specificationSource, Func<MethodInfo, AspectInstance> validatorSource, Func<MethodInfo, AspectInstance> executionSource ) : base( new Specification( profiles.Select( profile => profile.DeclaringType.Adapt() ).ToImmutableArray() ) )
+		{
+			this.profiles = profiles;
+			this.specificationSource = specificationSource;
+			this.validatorSource = validatorSource;
+			this.executionSource = executionSource;
 		}
 
 		public override IEnumerable<AspectInstance> Get( Type parameter )
 		{
-			foreach ( var factory in factories )
+			// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {method.DeclaringType} {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));
+			foreach ( var profile in profiles )
 			{
-				var instance = factory( parameter );
-				if ( instance != null )
+				var method = profile.Get( parameter );
+				if ( method != null )
 				{
-					/*var method = instance.TargetElement as MethodBase;
-					MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {method.DeclaringType} {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));*/
-					yield return instance;
+					var validator = specificationSource( method );
+					if ( validator != null )
+					{
+						yield return validatorSource( validator );
+						yield return executionSource( method );
+					}
 				}
 			}
 		}

@@ -81,34 +81,34 @@ namespace DragonSpark.Aspects
 		public InstanceMethod Key { get; }
 	}*/
 	
-	sealed class GenericFactoryProfileFactory : GenericParameterProfileFactoryBase
+	sealed class GenericSourceAdapterFactory : GenericParameterProfileFactoryBase
 	{
-		public static GenericFactoryProfileFactory Instance { get; } = new GenericFactoryProfileFactory();
+		public static GenericSourceAdapterFactory Instance { get; } = new GenericSourceAdapterFactory();
 
-		GenericFactoryProfileFactory() : base( typeof(IValidatedParameterizedSource<,>), typeof(GenericFactoryProfileFactory), nameof(Create) ) {}
+		GenericSourceAdapterFactory() : base( typeof(IValidatedParameterizedSource<,>), typeof(GenericSourceAdapterFactory), nameof(Create) ) {}
 
-		static IParameterValidationAdapter Create<TParameter, TResult>( IValidatedParameterizedSource<TParameter, TResult> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
+		static IParameterValidationAdapter Create<TParameter, TResult>( ISpecification<TParameter> instance ) => new FactoryAdapter<TParameter, TResult>( instance );
 	}
 
-	sealed class GenericCommandProfileFactory : GenericParameterProfileFactoryBase
+	class SourceAdapterFactory : AdapterSourceBase<IValidatedParameterizedSource>
 	{
-		public static GenericCommandProfileFactory Instance { get; } = new GenericCommandProfileFactory();
+		public static SourceAdapterFactory Instance { get; } = new SourceAdapterFactory();
+		SourceAdapterFactory() : base( instance => new FactoryAdapter( instance ) ) {}
+	}
 
-		GenericCommandProfileFactory() : base( typeof(ICommand<>), typeof(GenericCommandProfileFactory), nameof(Create) ) {}
+	sealed class GenericCommandAdapterFactory : GenericParameterProfileFactoryBase
+	{
+		public static GenericCommandAdapterFactory Instance { get; } = new GenericCommandAdapterFactory();
+
+		GenericCommandAdapterFactory() : base( typeof(ICommand<>), typeof(GenericCommandAdapterFactory), nameof(Create) ) {}
 
 		static IParameterValidationAdapter Create<T>( ICommand<T> instance ) => new CommandAdapter<T>( instance );
 	}
 
-	class CommandProfileSource : AdapterSourceBase<ICommand>
+	class CommandAdapterFactory : AdapterSourceBase<ICommand>
 	{
-		public static CommandProfileSource Instance { get; } = new CommandProfileSource();
-		CommandProfileSource() : base( instance => new CommandAdapter( instance ) ) {}
-	}
-
-	class SourceAdapterSource : AdapterSourceBase<IValidatedParameterizedSource>
-	{
-		public static SourceAdapterSource Instance { get; } = new SourceAdapterSource();
-		SourceAdapterSource() : base( instance => new FactoryAdapter( instance ) ) {}
+		public static CommandAdapterFactory Instance { get; } = new CommandAdapterFactory();
+		CommandAdapterFactory() : base( instance => new CommandAdapter( instance ) ) {}
 	}
 
 	/*public struct AutoValidationParameter
@@ -133,7 +133,7 @@ namespace DragonSpark.Aspects
 
 		protected ParameterValidationAdapterBase( ISpecification<T> inner, MethodInfo method ) : this( inner, MethodEqualitySpecification.For( method ) ) {}
 
-		protected ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method ) : base( inner )
+		ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method ) : base( inner )
 		{
 			this.method = method;
 		}
@@ -152,7 +152,7 @@ namespace DragonSpark.Aspects
 
 	public class FactoryAdapter<TParameter, TResult> : ParameterValidationAdapterBase<TParameter>
 	{
-		readonly static MethodInfo Method = typeof(IParameterizedSource<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource<TParameter, TResult>.Get) );
+		readonly static MethodInfo Method = typeof(IParameterizedSource<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource.Get) );
 		
 		public FactoryAdapter( ISpecification<TParameter> inner ) : base( inner, Method ) {}
 	}

@@ -36,7 +36,7 @@ namespace DragonSpark.Runtime.Specifications
 		readonly Func<TOrigin, bool> @delegate;
 		readonly Coerce<TOrigin> coerce;
 
-		public ProjectedSpecification( ISpecification<TOrigin> inner, Func<TDestination, TOrigin> projection ) : this( inner.IsSatisfiedBy, projection ) {}
+		public ProjectedSpecification( ISpecification<TOrigin> inner, Func<TDestination, TOrigin> projection ) : this( inner.ToSpecificationDelegate(), projection ) {}
 
 		public ProjectedSpecification( Func<TOrigin, bool> @delegate, Func<TDestination, TOrigin> projection ) : this( @delegate, new Projector<TDestination, TOrigin>( projection ).ToDelegate() ) {}
 
@@ -53,7 +53,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly ISpecification<T> specification;
 
-		public DecoratedSpecification( ISpecification<T> specification ) : base( specification.IsSatisfiedBy )
+		public DecoratedSpecification( ISpecification<T> specification ) : base( specification.ToSpecificationDelegate() )
 		{
 			this.specification = specification;
 		}
@@ -65,9 +65,7 @@ namespace DragonSpark.Runtime.Specifications
 	{
 		readonly Func<T, bool> @delegate;
 
-		public DelegatedSpecification( Func<T, bool> @delegate ) /*: this( @delegate, Defaults<T>.Coercer ) {}
-
-		public DelegatedSpecification( Func<T, bool> @delegate, Coerce<T> coercer )*/ : base( Where<T>.Always )
+		public DelegatedSpecification( Func<T, bool> @delegate ) : base( Where<T>.Always )
 		{
 			this.@delegate = @delegate;
 		}
@@ -97,11 +95,7 @@ namespace DragonSpark.Runtime.Specifications
 			this.source = source;
 		}
 
-		public override bool IsSatisfiedBy( T parameter )
-		{
-			var conditionMonitor = source( parameter );
-			return conditionMonitor.Apply();
-		}
+		public override bool IsSatisfiedBy( T parameter ) => source( parameter ).Apply();
 	}
 
 	public class OnlyOnceSpecification : OnlyOnceSpecification<object> {}
