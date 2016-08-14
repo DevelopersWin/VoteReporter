@@ -9,6 +9,16 @@ namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public static class CacheExtensions
 	{
+		public static TValue GetAssigned<TInstance, TValue>( this ICache<TInstance, TValue> @this, TInstance instance )
+		{
+			var result = @this.Get( instance );
+			if ( !result.IsAssigned() )
+			{
+				@this.Remove( instance );
+			}
+			return result;
+		}
+
 		public static TValue SetValue<TInstance, TValue>( this IAssignableParameterizedSource<TInstance, TValue> @this, TInstance instance, TValue value )
 		{
 			@this.Set( instance, value );

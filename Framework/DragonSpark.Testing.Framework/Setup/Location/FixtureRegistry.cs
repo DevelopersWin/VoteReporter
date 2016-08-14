@@ -27,10 +27,16 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		//public void Register( [Required]InstanceRegistrationParameter parameter ) => Invoke( parameter.RequestedType, nameof(RegisterInstance), parameter.Instance );
 
-		protected override void OnAdd( object entry )
+		/*protected override void OnAdd( object entry )
 		{
-			commands[nameof(RegisterInstance)].Make( entry.GetType() ).Invoke( entry );
+			
 			base.OnAdd( entry );
+		}*/
+
+		public override void Add( InstanceRegistrationRequest request )
+		{
+			commands[nameof(RegisterInstance)].Make( request.RequestedType ).Invoke( request.Instance );
+			base.Add( request );
 		}
 
 		void RegisterInstance<T>( [Required]T instance ) => fixture.Inject( instance );

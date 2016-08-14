@@ -163,7 +163,27 @@ namespace DragonSpark.Setup
 		protected override T GetService<T>() => Query().Select( o => o.Get() ).FirstOrDefaultOfType<T>();
 	}
 
-	public interface IServiceRepository : IServiceRepository<object> {}
+	/*public class InstanceRegistrationRequest<T> : InstanceRegistrationRequest
+	{
+		public InstanceRegistrationRequest( T instance, string name = null ) : base( typeof(T), instance, name ) {}
+	}*/
+
+	public class InstanceRegistrationRequest : LocateTypeRequest
+	{
+		public InstanceRegistrationRequest( [Required]object instance, string name = null ) : this( instance.GetType(), instance, name ) {}
+
+		public InstanceRegistrationRequest( Type type, [Required]object instance, string name = null ) : base( type, name )
+		{
+			Instance = instance;
+		}
+
+		public object Instance { get; }
+	}
+
+	public interface IServiceRepository : IServiceRepository<object>
+	{
+		void Add( InstanceRegistrationRequest request );
+	}
 
 	public interface IServiceRepository<T> : IServiceProvider, IRepository<T>, ISpecification<Type> {}
 
@@ -191,6 +211,7 @@ namespace DragonSpark.Setup
 		public InstanceServiceProvider( params object[] instances ) : base( instances ) {}
 
 		protected override T GetService<T>() => Query().FirstOrDefaultOfType<T>();
+		public virtual void Add( InstanceRegistrationRequest request ) => Add( request.Instance );
 	}
 
 	public class CompositeServiceProvider : CompositeFactory<Type, object>, IServiceProvider

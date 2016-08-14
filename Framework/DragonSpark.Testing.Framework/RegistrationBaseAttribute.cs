@@ -162,7 +162,7 @@ namespace DragonSpark.Testing.Framework
 			var instance = GlobalServiceProvider.GetService<object>( serviceType );
 			if ( instance.IsAssigned() )
 			{
-				repository.Add( instance );
+				repository.Add( new InstanceRegistrationRequest( serviceType, instance ) );
 			}
 		}
 	}
