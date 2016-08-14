@@ -1,6 +1,6 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using Serilog.Core;
 using Serilog.Events;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Diagnostics
 {
@@ -91,7 +91,7 @@ namespace DragonSpark.Diagnostics
 			this.method = method;
 		}
 
-		public string ToString( string format, IFormatProvider formatProvider ) => $"{method.DeclaringType.Name}.{method.Name}";
+		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => $"{method.DeclaringType.Name}.{method.Name}";
 	}
 
 	/*public class LoggerConfigurationFactory : AggregateFactory<LoggerConfiguration>

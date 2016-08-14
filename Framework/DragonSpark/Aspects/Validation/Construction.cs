@@ -37,7 +37,12 @@ namespace DragonSpark.Aspects.Validation
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{
 			var type = targetElement as Type;
-			var result = type != null ? source( type ) : Items<AspectInstance>.Default;
+			var result = type != null ? source( type )/*.Fixed()*/ : Items<AspectInstance>.Default;
+			/*foreach ( var aspectInstance in result )
+			{
+				var method = aspectInstance.TargetElement.To<MethodInfo>();
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {new MethodFormatter( method ).ToString()}: {aspectInstance.AspectTypeName}", null, null, null ) );
+			}*/
 			return result;
 		}
 	}
@@ -69,19 +74,21 @@ namespace DragonSpark.Aspects.Validation
 
 	static class Defaults
 	{
+		public static Func<MethodLocator.Parameter, MethodInfo> Locator { get; } = MethodLocator.Instance.Get;
+
 		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Instance.Get;
 
 		public static ImmutableArray<IAspectProfile> AspectProfiles { get; } = 
 			new IAspectProfile[]
 			{
-				new AspectProfile( typeof(IValidatedParameterizedSource<,>), nameof(IParameterizedSource.Get) ),
-				new AspectProfile( typeof(IValidatedParameterizedSource), nameof(IParameterizedSource.Get) ),
+				new AspectProfile( typeof(IValidatedParameterizedSource<,>), typeof(IParameterizedSource<,>), nameof(IParameterizedSource.Get) ),
+				new AspectProfile( typeof(IValidatedParameterizedSource), typeof(IParameterizedSource), nameof(IParameterizedSource.Get) ),
 				new AspectProfile( typeof(ICommand<>), nameof(ICommand.Execute) ),
 				new AspectProfile( typeof(ICommand), nameof(ICommand.Execute) )
 			}.ToImmutableArray();
 	}
 
-	class AspectFactory<T> : ParameterizedSourceBase<T> where T : class, IAspect
+	sealed class AspectFactory<T> : ParameterizedSourceBase<T> where T : class, IAspect
 	{
 		readonly Func<object, IAutoValidationController> controllerSource;
 		readonly Func<IAutoValidationController, T> resultSource;
@@ -94,14 +101,8 @@ namespace DragonSpark.Aspects.Validation
 			this.resultSource = resultSource;
 		}
 
-		public override T Get( object parameter )
-		{
-			var controller = controllerSource( parameter );
-			var result = resultSource( controller );
-			return result;
-		}
+		public override T Get( object parameter ) => resultSource( controllerSource( parameter ) );
 	}
-
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
@@ -179,47 +180,84 @@ namespace DragonSpark.Aspects.Validation
 
 	public interface IAspectProfile : IParameterizedSource<Type, MethodInfo>
 	{
-		Type DeclaringType { get; }
-		/*string MethodName { get; }*/
+		Type SupportedType { get; }
 	}
 
 	class AspectProfile : ParameterizedSourceBase<Type, MethodInfo>, IAspectProfile
 	{
+		readonly Type declaringType;
 		readonly string methodName;
+		readonly Func<MethodLocator.Parameter, MethodInfo> source;
 
-		public AspectProfile( Type declaringType, string methodName )
+		public AspectProfile( Type supportedType, string methodName ) : this( supportedType, supportedType, methodName ) {}
+		public AspectProfile( Type supportedType, Type declaringType, string methodName ) : this( supportedType, declaringType, methodName, Defaults.Locator ) {}
+		public AspectProfile( Type supportedType, Type declaringType, string methodName, Func<MethodLocator.Parameter, MethodInfo> source )
 		{
-			DeclaringType = declaringType;
+			SupportedType = supportedType;
+			this.declaringType = declaringType;
 			this.methodName = methodName;
+			this.source = source;
 		}
 
-		public Type DeclaringType { get; }
+		public Type SupportedType { get; }
 
-		/*readonly Func<Type, AspectInstance> execute;
+		public override MethodInfo Get( Type parameter ) => source( new MethodLocator.Parameter( declaringType, methodName, parameter ) );
+	}
 
-		// protected ProfileBase( Type interfaceType, string valid, string execute, Func<object, IParameterValidationAdapter> factory ) : this( interfaceType, valid, interfaceType, execute, factory ) {}
+	public sealed class MethodLocator : ParameterizedSourceBase<MethodLocator.Parameter, MethodInfo>
+	{
+		public static MethodLocator Instance { get; } = new MethodLocator();
+		MethodLocator() {}
 
-		protected ProfileBase( Type interfaceType, Type executionType, string execute, Func<object, IParameterValidationAdapter> adapterSource ) : this( interfaceType.Adapt(), 
-			// new AspectInstanceMethodFactory<AutoValidationValidationAspect>( validationType, valid ).Get, 
-			new AspectInstanceMethodFactory<AutoValidationExecuteAspect>( executionType, execute ).Get, adapterSource )
-		{}
-
-		protected ProfileBase( TypeAdapter interfaceType, Func<Type, AspectInstance> execute, Func<object, IParameterValidationAdapter> adapterSource )
+		public override MethodInfo Get( Parameter parameter )
 		{
-			InterfaceType = interfaceType;
-			AdapterSource = adapterSource;
-			this.execute = execute;
-		}
-
-		public TypeAdapter InterfaceType { get; }
-		public Func<object, IParameterValidationAdapter> AdapterSource { get; }*/
-
-		public override MethodInfo Get( Type parameter )
-		{
-			var mappings = parameter.Adapt().GetMappedMethods( DeclaringType );
-			var mapping = mappings.Introduce( methodName, pair => pair.Item1.InterfaceMethod.Name == pair.Item2 && ( pair.Item1.MappedMethod.IsFinal || pair.Item1.MappedMethod.IsVirtual ) && !pair.Item1.MappedMethod.IsAbstract ).SingleOrDefault();
+			var mappings = parameter.Candidate.Adapt().GetMappedMethods( parameter.DeclaringType );
+			var mapping = mappings.Introduce( parameter.MethodName, pair => pair.Item1.InterfaceMethod.Name == pair.Item2 && ( pair.Item1.MappedMethod.IsFinal || pair.Item1.MappedMethod.IsVirtual ) && !pair.Item1.MappedMethod.IsAbstract ).SingleOrDefault();
 			var result = mapping.IsAssigned() ? mapping.MappedMethod : null;
 			return result;
+		}
+
+		public struct Parameter
+		{
+			public Parameter( Type declaringType, string methodName, Type candidate )
+			{
+				DeclaringType = declaringType;
+				MethodName = methodName;
+				Candidate = candidate;
+			}
+
+			public Type DeclaringType { get; }
+			public string MethodName { get; }
+			public Type Candidate { get; }
+		}
+	}
+
+	public sealed class ValidationMethodLocator : TransformerBase<MethodInfo>
+	{
+		const string MethodName = nameof(ISpecification.IsSatisfiedBy);
+
+		readonly Func<MethodLocator.Parameter, MethodInfo> source;
+
+		public static ValidationMethodLocator Instance { get; } = new ValidationMethodLocator();
+		ValidationMethodLocator() : this( Defaults.Locator ) {}
+
+		ValidationMethodLocator( Func<MethodLocator.Parameter, MethodInfo> source )
+		{
+			this.source = source;
+		}
+
+		public override MethodInfo Get( MethodInfo parameter )
+		{
+			var candidates = typeof(ISpecification<>).MakeGenericType( parameter.GetParameterTypes().Single() ).Append( typeof(ISpecification) );
+			foreach ( var candidate in candidates )
+			{
+				var result = source( new MethodLocator.Parameter( candidate, MethodName, parameter.DeclaringType ) );
+				if ( result != null )
+				{
+					return result;
+				}
+			}
+			return null;
 		}
 	}
 
@@ -267,29 +305,6 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	public sealed class ValidationMethodLocator : TransformerBase<MethodInfo>
-	{
-		public static ValidationMethodLocator Instance { get; } = new ValidationMethodLocator();
-		ValidationMethodLocator() {}
-
-		public override MethodInfo Get( MethodInfo parameter )
-		{
-			return null;
-		}
-	}
-
-	/*public struct AspectInstanceParameter
-	{
-		public AspectInstanceParameter( IAspectProfile profile, Type candidate )
-		{
-			Profile = profile;
-			Candidate = candidate;
-		}
-
-		public IAspectProfile Profile { get; }
-		public Type Candidate { get; }
-	}*/
-
 	public sealed class AspectInstances : ValidatedParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
 	{
 		public static AspectInstances Instance { get; } = new AspectInstances();
@@ -302,7 +317,7 @@ namespace DragonSpark.Aspects.Validation
 
 		public AspectInstances( ImmutableArray<IAspectProfile> profiles ) : this( profiles, ValidationMethodLocator.Instance.Get, AspectInstanceFactory<AutoValidationValidationAspect>.Instance.Get, AspectInstanceFactory<AutoValidationExecuteAspect>.Instance.Get ) {}
 
-		public AspectInstances( ImmutableArray<IAspectProfile> profiles, Func<MethodInfo, MethodInfo> specificationSource, Func<MethodInfo, AspectInstance> validatorSource, Func<MethodInfo, AspectInstance> executionSource ) : base( new Specification( profiles.Select( profile => profile.DeclaringType.Adapt() ).ToImmutableArray() ) )
+		public AspectInstances( ImmutableArray<IAspectProfile> profiles, Func<MethodInfo, MethodInfo> specificationSource, Func<MethodInfo, AspectInstance> validatorSource, Func<MethodInfo, AspectInstance> executionSource ) : base( new Specification( profiles.Select( profile => profile.SupportedType.Adapt() ).ToImmutableArray() ) )
 		{
 			this.profiles = profiles;
 			this.specificationSource = specificationSource;
@@ -310,9 +325,10 @@ namespace DragonSpark.Aspects.Validation
 			this.executionSource = executionSource;
 		}
 
-		public override IEnumerable<AspectInstance> Get( Type parameter )
+		public override IEnumerable<AspectInstance> Get( Type parameter ) => Yield( parameter ).WhereAssigned();
+
+		IEnumerable<AspectInstance> Yield( Type parameter )
 		{
-			// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {method.DeclaringType} {FormatterFactory.Instance.From(instance.TargetElement)}: {instance.AspectTypeName}", null, null, null ));
 			foreach ( var profile in profiles )
 			{
 				var method = profile.Get( parameter );

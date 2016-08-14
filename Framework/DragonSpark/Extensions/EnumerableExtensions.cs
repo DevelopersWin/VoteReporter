@@ -1,5 +1,6 @@
-using DragonSpark.Activation;
 using DragonSpark.Aspects;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -7,8 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Extensions
 {
@@ -155,7 +154,7 @@ namespace DragonSpark.Extensions
 
 		public static TItem[] ToItem<TItem>( this TItem target ) where TItem : class => Array<TItem>.Default.Get( target );
 
-		public static IEnumerable<T> Append<T>( this T @this, params T[] second ) => @this.Append_( second );
+		public static IEnumerable<T> Append<T>( this T @this, params T[] second ) => @this.Append( second.AsEnumerable() );
 		public static IEnumerable<T> Append<T>( this T @this, IEnumerable<T> second ) => @this.Append_( second );
 		static IEnumerable<T> Append_<T>( this T @this, IEnumerable<T> second )
 		{
@@ -166,14 +165,14 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, params T[] items ) => @this.Concat( items );
 
-		public static IEnumerable<T> Append<T>( this IEnumerable<T> collection, T element )
+		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, T element )
 		{
-			foreach ( var element1 in collection )
+			foreach ( var element1 in @this )
 				yield return element1;
 			yield return element;
 		}
 
-		public static IEnumerable<T> Prepend<T>( this T @this, params T[] second ) => @this.Prepend_( second );
+		public static IEnumerable<T> Prepend<T>( this T @this, params T[] second ) => @this.Prepend( second.AsEnumerable() );
 		public static IEnumerable<T> Prepend<T>( this T @this, IEnumerable<T> second ) => @this.Prepend_( second );
 		static IEnumerable<T> Prepend_<T>( this T @this, IEnumerable<T> second )
 		{
