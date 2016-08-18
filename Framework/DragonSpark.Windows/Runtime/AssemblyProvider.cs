@@ -5,16 +5,11 @@ using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	/*public sealed class Assemblies : CurrentExecutionScope<ITypeSource>
-	{
-		public static Assemblies Instance { get; } = new Assemblies();
-		Assemblies() : base( ApplicationTypesBase.Instance.Get() ) {}
-	}*/
-
 	public sealed class FileSystemTypes : ApplicationTypesBase
 	{
 		public static FileSystemTypes Instance { get; } = new FileSystemTypes();
@@ -39,7 +34,7 @@ namespace DragonSpark.Windows.Runtime
 		protected override IEnumerable<Type> Yield()
 		{
 			var filtered = filter( assemblySource().AsEnumerable() ).Fixed();
-			var result = new AssemblyBasedTypeSource( filtered ).Get().Union( partsSource( filtered ) );
+			var result = new AssemblyBasedTypeSource( filtered ).Union( partsSource( filtered ) );
 			return result;
 		}
 	}

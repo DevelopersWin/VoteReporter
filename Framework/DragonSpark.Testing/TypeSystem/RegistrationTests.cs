@@ -13,8 +13,7 @@ namespace DragonSpark.Testing.TypeSystem
 	[ContainingTypeAndNested]
 	public class RegistrationTests
 	{
-		// [RegisterFactory( typeof(AssemblySource) )]
-		[Theory, Framework.Setup.AutoData]
+		[Theory, AutoData]
 		[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 		public void Testing( ImmutableArray<Assembly> sut )
 		{

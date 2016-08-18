@@ -7,7 +7,7 @@ using System.Composition;
 
 namespace DragonSpark.Diagnostics
 {
-	public class Formatter : ParameterizedSourceBase<Formatter.Parameter, string>
+	public sealed class Formatter : ParameterizedSourceBase<Formatter.Parameter, string>
 	{
 		readonly static Func<Parameter, string> Coerce = p => StringCoercer.Instance.Coerce( p.Instance );
 		readonly static Coerce<Parameter> Coercer = ConstructCoercer<Parameter>.Instance.Coerce;

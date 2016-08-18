@@ -89,6 +89,7 @@ namespace DragonSpark.Composition
 	public class ConventionTransformer : TransformerBase<ConventionBuilder>
 	{
 		readonly static Func<Type, ConventionMapping> Selector = ConventionMappings.Instance.Get;
+
 		public static ConventionTransformer Instance { get; } = new ConventionTransformer();
 		ConventionTransformer() : this( ApplicationTypes.Instance.Get ) {}
 

@@ -151,7 +151,7 @@ namespace DragonSpark.TypeSystem
 		public static AssemblyTypesStore Public { get; } = new AssemblyTypesStore( assembly => assembly.ExportedTypes );
 	}
 
-	public class AssemblyTypesStore : FactoryCache<Assembly, IEnumerable<Type>>
+	public sealed class AssemblyTypesStore : FactoryCache<Assembly, IEnumerable<Type>>
 	{
 		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToSpecificationDelegate();
 
@@ -164,7 +164,7 @@ namespace DragonSpark.TypeSystem
 		protected override IEnumerable<Type> Create( Assembly parameter ) => types( parameter ).Where( Specification ).ToImmutableArray().AsEnumerable();
 	}
 
-	public class TypesFactory : ArgumentCache<ImmutableArray<Assembly>, ImmutableArray<Type>>
+	public sealed class TypesFactory : ArgumentCache<ImmutableArray<Assembly>, ImmutableArray<Type>>
 	{
 		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
 
@@ -172,16 +172,14 @@ namespace DragonSpark.TypeSystem
 		TypesFactory() : base( array => array.ToArray().SelectMany( All ).ToImmutableArray() ) {}
 	}
 
-	public class AssemblyBasedTypeSource : FixedDeferedSource<ImmutableArray<Type>>, ITypeSource
+	public class AssemblyBasedTypeSource : TypeSource
 	{
 		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
 
 		public AssemblyBasedTypeSource( params Type[] types ) : this( types, Items<Assembly>.Default ) {}
 
-		public AssemblyBasedTypeSource( IEnumerable<Type> types, params Assembly[] assemblies ) : this( types.ToImmutableArray().Assemblies().Union( assemblies ) ) {}
+		public AssemblyBasedTypeSource( IEnumerable<Type> types, params Assembly[] assemblies ) : this( types.Assemblies().Union( assemblies ) ) {}
 
-		public AssemblyBasedTypeSource( IEnumerable<Assembly> assemblies ) : this( assemblies.Distinct().Prioritize().SelectMany( All ).ToImmutableArray ) {}
-
-		protected AssemblyBasedTypeSource( Func<ImmutableArray<Type>> factory ) : base( factory ) {}
+		public AssemblyBasedTypeSource( IEnumerable<Assembly> assemblies ) : base( assemblies.SelectMany( All ) ) {}
 	}
 }

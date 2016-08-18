@@ -66,9 +66,9 @@ namespace DragonSpark.Composition
 		public static IParameterizedSource<Type, Type> Instance { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Global() );
 		ConventionTypes() : this( ApplicationTypes.Instance ) {}
 
-		readonly ITypeSource source;
+		readonly ISource<ImmutableArray<Type>> source;
 
-		public ConventionTypes( ITypeSource source ) : base( Specification )
+		public ConventionTypes( ISource<ImmutableArray<Type>> source ) : base( Specification )
 		{
 			this.source = source;
 		}

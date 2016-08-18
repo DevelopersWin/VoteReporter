@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void Factory()
 		{
-			var result = new SourceInstanceServiceProvider( new ClassFactory() ).Get<Class>();
+			var result = new SourceServiceProvider( new ClassFactory() ).Get<Class>();
 			Assert.IsType<ClassFactory.ClassFromFactory>( result );
 		}
 

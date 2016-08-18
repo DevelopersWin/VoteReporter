@@ -19,7 +19,7 @@ namespace DragonSpark.Testing.TypeSystem
 		{
 			provider.Setup( p => p.Get() ).Returns( () => new[] { typeof(AutoDataAttribute), typeof(Framework.Setup.AutoDataAttribute) }.ToImmutableArray() );
 
-			var enumerable = provider.Object.Get().Assemblies();
+			var enumerable = provider.Object.Get().AsEnumerable().Assemblies();
 			var assemblies = sut.Get( enumerable );
 			
 			provider.Verify( assemblyProvider => assemblyProvider.Get() );

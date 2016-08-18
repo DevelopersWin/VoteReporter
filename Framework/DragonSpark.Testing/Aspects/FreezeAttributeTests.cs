@@ -3,6 +3,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Xunit2;
 using System;
+using DragonSpark.Setup;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -79,14 +80,14 @@ namespace DragonSpark.Testing.Aspects
 			protected virtual void Dispose( bool disposing ) => Count++;
 		}
 
-		public class Source : AssemblyBasedTypeSource
+		public class Source : TypeSource
 		{
 			public int Count { get; private set; }
 
 			[Freeze]
 			public int Cached => ++Count;
 
-			public Source() : base( Items<Type>.Default ) {}
+			
 		}
 
 		[Theory, AutoData]

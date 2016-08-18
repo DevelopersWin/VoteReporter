@@ -39,14 +39,14 @@ namespace DragonSpark.Setup
 		public ImmutableArray<T> GetExports<T>( string name ) => Items<T>.Immutable;
 	}
 
-	public interface ICommandSource : ISource<ImmutableArray<ICommand>> {}
-	public interface ITypeSource : ISource<ImmutableArray<Type>> {}
+	public interface ICommandSource : IItemSource<ICommand> {}
+	public interface ITypeSource : IItemSource<Type> {}
 
 	public class TypeSource : ItemSource<Type>, ITypeSource
 	{
-		public TypeSource() : this( Items<Type>.Default ) {}
+		public TypeSource() {}
+		public TypeSource( params Type[] items ) : base( items ) {}
 		public TypeSource( IEnumerable<Type> items ) : base( items ) {}
-		public TypeSource( params Type[] items ) : this( items.AsEnumerable() ) {}
 	}
 
 	/*public class CompositeTypeSource : TypeSource
@@ -156,9 +156,9 @@ namespace DragonSpark.Setup
 		public override void Execute( object parameter ) => repository().Add( parameter );
 	}
 
-	public class SourceInstanceServiceProvider : InstanceServiceProviderBase<ISource>
+	public class SourceServiceProvider : InstanceServiceProviderBase<ISource>
 	{
-		public SourceInstanceServiceProvider( params ISource[] instances ) : base( instances ) {}
+		public SourceServiceProvider( params ISource[] instances ) : base( instances ) {}
 
 		protected override T GetService<T>() => Query().Select( o => o.Get() ).FirstOrDefaultOfType<T>();
 	}
@@ -333,16 +333,20 @@ namespace DragonSpark.Setup
 
 	public struct SystemParts
 	{
-		public static SystemParts Default { get; } = new SystemParts( Items<Assembly>.Immutable );
+		public static SystemParts Default { get; } = new SystemParts( Items<Assembly>.Default );
 
-		public SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Instance.Get( assemblies ) ) {}
+		public SystemParts( IEnumerable<Assembly> assemblies ) : this( assemblies.ToImmutableArray() ) {}
 
-		public SystemParts( ImmutableArray<Type> types ) : this( types.Assemblies(), types ) {}
+		SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Instance.Get( assemblies ) ) {}
+
+		public SystemParts( IEnumerable<Type> types ) : this( types.ToImmutableArray() ) {}
+
+		SystemParts( ImmutableArray<Type> types ) : this( types.AsEnumerable().Assemblies().ToImmutableArray(), types ) {}
 
 		SystemParts( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types )
 		{
 			Assemblies = assemblies;
-			Types = types.AsEnumerable().Prioritize().ToImmutableArray();
+			Types = types/*.AsEnumerable().Prioritize().ToImmutableArray()*/;
 		}
 
 		public ImmutableArray<Assembly> Assemblies { get; }
@@ -361,9 +365,9 @@ namespace DragonSpark.Setup
 		ApplicationAssemblies() : base( () => ApplicationParts.Instance.Get().Assemblies ) {}
 	}
 
-	public sealed class ApplicationTypes : DelegatedSource<ImmutableArray<Type>>, ITypeSource
+	public sealed class ApplicationTypes : DelegatedSource<ImmutableArray<Type>>
 	{
-		public static ITypeSource Instance { get; } = new ApplicationTypes();
+		public static ISource<ImmutableArray<Type>> Instance { get; } = new ApplicationTypes();
 		ApplicationTypes() : base( () => ApplicationParts.Instance.Get().Types ) {}
 	}
 
@@ -386,23 +390,17 @@ namespace DragonSpark.Setup
 
 		public T Create( ITypeSource types ) => Create( types, Items<ICommand>.Default );
 
-		public T Create( ITypeSource types, params ICommandSource[] sources ) => Create( types, sources.Select( source => source.Get() ).Concat() );
+		// public T Create( ITypeSource types, params ICommandSource[] sources ) => Create( types, sources.Select( source => source.Get() ).Concat() );
 
 		public T Create( ITypeSource types, params ICommand[] commands ) => Create( types, commands.AsEnumerable() );
 		
-		public T Create( ITypeSource types, IEnumerable<ICommand> commands ) => (T)Get( commands.StartWith( new AssignSystemPartsCommand( types ) ).Append( new DisposeDisposableCommand( Disposables.Instance.Get() ) ).ToImmutableArray() );
+		public T Create( ITypeSource types, IEnumerable<ICommand> commands ) => (T)Get( commands.StartWith( new AssignSystemPartsCommand( types ) ).Append( new DisposeDisposableCommand( Disposables.Instance.Get() ) ).Distinct().Prioritize().ToImmutableArray() );
 	}
-
-	/*public sealed class ConfigureSeedingServiceProvider : ApplyDelegateConfigurationCommand<IServiceProvider>
-	{
-		public ConfigureSeedingServiceProvider( Func<IServiceProvider> provider ) : base( provider, ServiceProviderFactory.Instance.Seed ) {}
-	}*/
 
 	public class CommandSource : ItemSource<ICommand>, ICommandSource
 	{
 		protected CommandSource() {}
-
-		public CommandSource( params ICommandSource[] sources ) : this( sources.Select( source => source.Get() ).Concat() ) {}
+		public CommandSource( params ICommandSource[] sources ) : this( sources.Concat() ) {}
 		public CommandSource( IEnumerable<ICommand> items ) : base( items ) {}
 		public CommandSource( params ICommand[] items ) : base( items ) {}
 	}
@@ -420,7 +418,6 @@ namespace DragonSpark.Setup
 
 	public class ApplicationCommandSource : CommandSource
 	{
-		//public ApplicationCommandsSource() : this( ServiceProviderConfigurations.Instance ) {}
 		public ApplicationCommandSource( params ICommandSource[] sources ) : base( sources ) {}
 		public ApplicationCommandSource( IEnumerable<ICommand> items ) : base( items ) {}
 		public ApplicationCommandSource( params ICommand[] items ) : base( items ) {}
@@ -430,11 +427,19 @@ namespace DragonSpark.Setup
 
 	public class AssignSystemPartsCommand : DecoratedCommand
 	{
-		public AssignSystemPartsCommand( IEnumerable<Type> types ) : this( types.ToImmutableArray() ) {}
-		public AssignSystemPartsCommand( params Type[] types ) : this( types.ToImmutableArray() ) {}
-		public AssignSystemPartsCommand( ImmutableArray<Type> types ) : this( new SystemParts( types ) ) {}
-		public AssignSystemPartsCommand( ITypeSource types ) : this( new SystemParts( types.Get() ) ) {}
-		public AssignSystemPartsCommand( SystemParts value ) : base( ApplicationParts.Instance.Configured( value ).Cast<object>() ) {}
+		public AssignSystemPartsCommand( params Type[] types ) : this( types.AsEnumerable() ) {}
+		
+		public AssignSystemPartsCommand( ITypeSource types ) : this( types.AsEnumerable() ) {}
+		public AssignSystemPartsCommand( IEnumerable<Type> types ) : this( SystemPartsFactory.Instance.Get( types ) ) {}
+		AssignSystemPartsCommand( SystemParts value ) : base( ApplicationParts.Instance.Configured( value ).Cast<object>() ) {}
+	}
+
+	public sealed class SystemPartsFactory : ParameterizedSourceBase<IEnumerable<Type>, SystemParts>
+	{
+		public static SystemPartsFactory Instance { get; } = new SystemPartsFactory();
+		SystemPartsFactory() {}
+
+		public override SystemParts Get( IEnumerable<Type> parameter ) => new SystemParts( parameter.Distinct().Prioritize( type => PriorityAwareLocator<Assembly>.Instance.Get( type.Assembly() ) ) );
 	}
 
 	public sealed class ApplicationCommands : Scope<ImmutableArray<ICommand>>
