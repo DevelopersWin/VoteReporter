@@ -3,6 +3,7 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Xunit2;
 using System;
+using DragonSpark.Diagnostics.Exceptions;
 using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics

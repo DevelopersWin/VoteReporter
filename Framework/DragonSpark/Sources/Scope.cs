@@ -1,7 +1,7 @@
-using System;
-using System.Runtime.InteropServices;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources
 {
@@ -13,7 +13,7 @@ namespace DragonSpark.Sources
 
 		public Scope() : this( () => default(T) ) {}
 
-		public Scope( Func<T> defaultFactory ) : this( (Func<object, T>)defaultFactory.Wrap() ) {}
+		public Scope( Func<T> defaultFactory ) : this( defaultFactory.Wrap() ) {}
 
 		public Scope( Func<object, T> defaultFactory ) : this( new ScopeContext(), defaultFactory ) {}
 

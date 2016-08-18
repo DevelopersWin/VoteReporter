@@ -23,7 +23,7 @@ namespace DragonSpark.TypeSystem
 		public static IParameterizedScope<string, Assembly> AssemblyLoader { get; } = new ParameterizedScope<string, Assembly>( path => default(Assembly) ).ScopedWithDefault();
 
 		public static IScope<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = 
-			new Scope<ImmutableArray<ITypeDefinitionProvider>>( TypeDefinitionProviderStore.Instance.Get );
+			new Scope<ImmutableArray<ITypeDefinitionProvider>>( TypeDefinitionProviderSource.Instance.Get );
 	}
 
 	public abstract class PartsBase : FactoryCache<Assembly, ImmutableArray<Type>>
@@ -181,8 +181,6 @@ namespace DragonSpark.TypeSystem
 		public AssemblyBasedTypeSource( IEnumerable<Type> types, params Assembly[] assemblies ) : this( types.ToImmutableArray().Assemblies().Union( assemblies ) ) {}
 
 		public AssemblyBasedTypeSource( IEnumerable<Assembly> assemblies ) : this( assemblies.Distinct().Prioritize().SelectMany( All ).ToImmutableArray ) {}
-
-		// protected AssemblyBasedTypeSource( IEnumerable<ITypeSource> sources ) : this( sources.SelectMany( source => source.Get().AsEnumerable() ).Concat().Distinct().ToIa ) {}
 
 		protected AssemblyBasedTypeSource( Func<ImmutableArray<Type>> factory ) : base( factory ) {}
 	}

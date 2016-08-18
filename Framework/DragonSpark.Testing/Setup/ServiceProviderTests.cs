@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Diagnostics.Logger;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Sources;
@@ -33,7 +32,7 @@ namespace DragonSpark.Testing.Setup
 		{
 			var result = DefaultServiceProvider.Instance.Get<ILogger>();
 			Assert.NotNull( result );
-			Assert.Same( Logging.Instance.Get( Execution.Current() ), result );
+			Assert.Same( DragonSpark.Diagnostics.Logging.Logger.Instance.Get( Execution.Current() ), result );
 		}
 
 		[Fact]

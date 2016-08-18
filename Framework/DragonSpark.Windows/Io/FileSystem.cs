@@ -1,4 +1,4 @@
-﻿using DragonSpark.Diagnostics.Logger;
+﻿using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -93,7 +93,7 @@ namespace DragonSpark.Windows.Io
 					}
 					catch ( Exception exception )
 					{
-						Logging.Instance.Get( file ).Error( exception, "Could not delete {File}.", file.FullName );
+						Logger.Instance.Get( file ).Error( exception, "Could not delete {File}.", file.FullName );
 					}
 				}
 			}

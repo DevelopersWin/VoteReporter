@@ -1,7 +1,7 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
@@ -12,10 +12,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Markup;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 
-namespace DragonSpark.Diagnostics
+namespace DragonSpark.Diagnostics.Logging
 {
 	[ContentProperty( nameof(Commands) )]
 	public class ConfiguringLoggerConfigurationFactory : TransformerBase<LoggerConfiguration>

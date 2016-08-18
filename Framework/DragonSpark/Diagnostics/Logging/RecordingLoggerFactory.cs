@@ -11,7 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace DragonSpark.Diagnostics
+namespace DragonSpark.Diagnostics.Logging
 {
 	public interface ILoggerHistory : ILogEventSink
 	{

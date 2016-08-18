@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -8,13 +9,13 @@ using Xunit;
 namespace DragonSpark.Testing.Diagnostics
 {
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
-	public class FormatterFactoryTests
+	public class FormatterTests
 	{
 		[Theory, AutoData, IncludeParameterTypes( typeof(MethodFormatter) ), FrameworkTypes]
-		public void MethodFormatsAsExpected( [Service]FormatterFactory sut )
+		public void MethodFormatsAsExpected( [Service]Formatter sut )
 		{
 			var method = MethodBase.GetCurrentMethod();
-			var formatted = sut.Get( new FormatterFactory.Parameter( method ) );
+			var formatted = sut.Get( new Formatter.Parameter( method ) );
 			Assert.IsType<string>( formatted );
 			Assert.Equal( new MethodFormatter( method ).ToString( null, null ), formatted );
 		}

@@ -122,7 +122,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public sealed class SourceTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
-		public static ISource<SourceTypes> Instance { get; } = new Scope<SourceTypes>( Sources.Factory.ForGlobalScope( () => new SourceTypes() ) );
+		public static ISource<SourceTypes> Instance { get; } = new Scope<SourceTypes>( Sources.Factory.Global( () => new SourceTypes() ) );
 		SourceTypes() : base( new Factory().Get ) {}
 		
 		sealed class Factory : ParameterizedSourceBase<LocateTypeRequest, Type>

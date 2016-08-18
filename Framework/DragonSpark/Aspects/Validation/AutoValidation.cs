@@ -117,7 +117,7 @@ namespace DragonSpark.Aspects.Validation
 
 	sealed class AutoValidationController : ConcurrentDictionary<int, object>, IAutoValidationController, IAspectHub
 	{
-		readonly static object Executing = new object();
+		// readonly static object Executing = new object();
 
 		readonly IParameterValidationAdapter validator;
 		
@@ -130,11 +130,10 @@ namespace DragonSpark.Aspects.Validation
 
 		public bool IsSatisfiedBy( object parameter ) => Handler?.Handles( parameter ) ?? false;
 
-		bool? Current( object parameter )
+		bool IsMarked( object parameter )
 		{
 			object current;
-			var contains = TryGetValue( Environment.CurrentManagedThreadId, out current );
-			var result = contains && current != Executing ? (bool?)Equals( current, parameter ) : null;
+			var result = TryGetValue( Environment.CurrentManagedThreadId, out current ) && Equals( current, parameter ) && Clear();
 			return result;
 		}
 
@@ -146,9 +145,15 @@ namespace DragonSpark.Aspects.Validation
 			}
 			else
 			{
-				object removed;
-				TryRemove( Environment.CurrentManagedThreadId, out removed );
+				Clear();
 			}
+		}
+
+		new bool Clear()
+		{
+			object removed;
+			TryRemove( Environment.CurrentManagedThreadId, out removed );
+			return true;
 		}
 
 		public object Execute( object parameter, Func<object> proceed )
@@ -156,24 +161,19 @@ namespace DragonSpark.Aspects.Validation
 			object handled = null;
 			if ( Handler?.Handle( parameter, out handled ) ?? false )
 			{
-				MarkValid( parameter, false );
+				Clear();
 				return handled;
 			}
 
-			if ( Current( parameter ).GetValueOrDefault() || CheckAndMark( parameter ) )
-			{
-				var result = proceed();
-				MarkValid( parameter, false );
-				return result;
-			}
-			return null;
+			var result = IsMarked( parameter ) || Validate( parameter ) ? proceed() : null;
+			Clear();
+			return result;
 		}
-
-		bool CheckAndMark( object parameter )
+		
+		bool Validate( object parameter )
 		{
-			MarkValid( Executing, true );
 			var result = validator.IsSatisfiedBy( parameter );
-			MarkValid( parameter, result );
+			//Clear();
 			return result;
 		}
 

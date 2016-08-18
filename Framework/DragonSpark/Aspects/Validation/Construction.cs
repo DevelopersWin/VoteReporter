@@ -3,6 +3,7 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
+using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -23,7 +24,21 @@ namespace DragonSpark.Aspects.Validation
 	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict, PersistMetaData =  true )]
 	public class ApplyAutoValidationAttribute : TypeLevelAspect, IAspectProvider
 	{
-		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstances.Instance.ToSourceDelegate();
+		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = ToSourceDelegate();
+
+		static Func<Type, IEnumerable<AspectInstance>> ToSourceDelegate()
+		{
+			try
+{
+				return AspectInstances.Instance.ToSourceDelegate();
+}
+catch ( Exception e )
+{
+	MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
+	throw;
+}
+			
+		}
 
 		readonly Func<Type, IEnumerable<AspectInstance>> source;
 
@@ -137,7 +152,7 @@ namespace DragonSpark.Aspects.Validation
 			public override void OnInvoke( MethodInterceptionArgs args )
 			{
 				var parameter = args.Arguments[0];
-				args.ReturnValue = controller.IsSatisfiedBy( parameter ) ||  controller.Marked( parameter, args.GetReturnValue<bool>() );
+				args.ReturnValue = controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, args.GetReturnValue<bool>() );
 			}
 		}
 	}

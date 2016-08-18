@@ -11,7 +11,7 @@ namespace DragonSpark.Windows
 	[Export( typeof(ISetup) )]
 	public partial class InitializationCommand
 	{
-		public InitializationCommand() : base( DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured<ImmutableArray<ITypeDefinitionProvider>>( Runtime.TypeDefinitionProviderStore.Instance ) )
+		public InitializationCommand() : base( DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured<ImmutableArray<ITypeDefinitionProvider>>( Runtime.TypeDefinitionProviderSource.Instance ) )
 		{
 			Priority = Priority.BeforeNormal;
 			// InitializeComponent();

@@ -77,7 +77,7 @@ namespace DragonSpark.Activation
 
 	public sealed class Activator : CompositeActivator
 	{
-		public static ISource<IActivator> Instance { get; } = new Scope<IActivator>( Factory.ForGlobalScope( () => new Activator() ) );
+		public static ISource<IActivator> Instance { get; } = new Scope<IActivator>( Factory.Global( () => new Activator() ) );
 		Activator() : base( new Locator(), Constructor.Instance ) {}
 
 		public static T Activate<T>( Type type ) => Instance.Get().Get<T>( type );

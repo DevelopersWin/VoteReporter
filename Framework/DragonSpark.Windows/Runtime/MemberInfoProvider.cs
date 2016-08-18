@@ -1,8 +1,8 @@
 namespace DragonSpark.Windows.Runtime
 {
-	public class TypeDefinitionProviderStore : DragonSpark.TypeSystem.TypeDefinitionProviderStore
+	public class TypeDefinitionProviderSource : DragonSpark.TypeSystem.TypeDefinitionProviderSource
 	{
-		public new static TypeDefinitionProviderStore Instance { get; } = new TypeDefinitionProviderStore();
-		TypeDefinitionProviderStore() : base( MetadataTypeDefinitionProvider.Instance ) {}
+		public new static TypeDefinitionProviderSource Instance { get; } = new TypeDefinitionProviderSource();
+		TypeDefinitionProviderSource() : base( MetadataTypeDefinitionProvider.Instance ) {}
 	}
 }

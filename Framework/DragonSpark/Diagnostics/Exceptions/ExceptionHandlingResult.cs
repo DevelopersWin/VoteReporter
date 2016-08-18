@@ -1,8 +1,8 @@
 using System;
 
-namespace DragonSpark.Diagnostics
+namespace DragonSpark.Diagnostics.Exceptions
 {
-	public class ExceptionHandlingResult
+	public struct ExceptionHandlingResult
 	{
 		public ExceptionHandlingResult( bool rethrowRecommended, Exception exception )
 		{

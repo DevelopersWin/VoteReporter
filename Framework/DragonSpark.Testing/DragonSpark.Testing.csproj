@@ -76,6 +76,7 @@
     <Compile Include="Runtime\PurgingCollectionTests.cs" />
     <Compile Include="Runtime\Sources\DelegatesTests.cs" />
     <Compile Include="Runtime\Sources\ScopingTests.cs" />
+    <Compile Include="Setup\ActivatedServiceSourceTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="Configuration\ValueStoreTests.cs" />
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
-    <Compile Include="Diagnostics\FormatterFactoryTests.cs" />
+    <Compile Include="Diagnostics\FormatterTests.cs" />
     <Compile Include="Diagnostics\LoggerFactoryTests.cs" />
     <Compile Include="Diagnostics\MessageRecorderTests.cs" />
     <Compile Include="Diagnostics\ProfileAttributeTests.cs" />

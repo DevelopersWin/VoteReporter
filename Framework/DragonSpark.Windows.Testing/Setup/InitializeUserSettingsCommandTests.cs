@@ -5,6 +5,7 @@ using DragonSpark.Testing.Objects.Properties;
 using DragonSpark.Windows.Setup;
 using System.Configuration;
 using System.Linq;
+using DragonSpark.Diagnostics.Logging;
 using Xunit;
 using Xunit.Abstractions;
 using Resources = DragonSpark.Windows.Properties.Resources;

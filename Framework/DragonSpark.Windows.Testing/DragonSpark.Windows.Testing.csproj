@@ -66,25 +66,12 @@
     <Compile Include="TestObjects\Locator.cs" />
     <Compile Include="TestObjects\ClassWithBrokenConstructor.cs" />
     <Compile Include="TestObjects\ModulesConfiguration.cs" />
-    <Compile Include="TestObjects\Modules\DummyClass.cs" />
-    <Compile Include="TestObjects\Modules\MockLoggerHistorySink.cs" />
-    <Compile Include="TestObjects\Modules\MyDummyClass.cs" />
     <Compile Include="TestObjects\Relayed.cs" />
     <Compile Include="TypeSystem\PartsTests.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="TestObjects\Modules\MockModuleThrowingException.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockModuleReferencingOtherModule.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockModuleReferencingAssembly.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockModuleReferencedAssembly.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockModuleA.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockExposingTypeFromGacAssemblyModule.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockDependencyModule.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockDependantModule.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockAttributedModule.cs" />
-    <EmbeddedResource Include="TestObjects\Modules\MockAbstractModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

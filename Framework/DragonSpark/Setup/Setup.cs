@@ -42,11 +42,11 @@ namespace DragonSpark.Setup
 	public interface ICommandSource : ISource<ImmutableArray<ICommand>> {}
 	public interface ITypeSource : ISource<ImmutableArray<Type>> {}
 
-	public class TypeSource : ItemsStoreBase<Type>, ITypeSource
+	public class TypeSource : ItemSource<Type>, ITypeSource
 	{
-		public TypeSource( IEnumerable<Type> items ) : base( items.Fixed() ) {}
 		public TypeSource() : this( Items<Type>.Default ) {}
-		public TypeSource( params Type[] items ) : this( items.Distinct() ) {}
+		public TypeSource( IEnumerable<Type> items ) : base( items ) {}
+		public TypeSource( params Type[] items ) : this( items.AsEnumerable() ) {}
 	}
 
 	/*public class CompositeTypeSource : TypeSource
@@ -136,7 +136,7 @@ namespace DragonSpark.Setup
 	public sealed class Instances : Scope<IServiceRepository>
 	{
 		public static ISource<IServiceRepository> Instance { get; } = new Instances();
-		Instances() : base( Factory.ForGlobalScope( () => new InstanceServiceProvider( SingletonLocator.Instance ) ) ) {}
+		Instances() : base( Factory.Global( () => new InstanceServiceProvider( SingletonLocator.Instance ) ) ) {}
 
 		public static T Get<T>( Type type ) => Instance.Get().Get<T>( type );
 	}
@@ -320,30 +320,6 @@ namespace DragonSpark.Setup
 		// public bool CanProvide( Type serviceType ) => !active.Get( serviceType );
 	}
 */
-	[ApplyAutoValidation]
-	public class ActivatedServiceSource : ValidatedParameterizedSourceBase<Type, object>
-	{
-		// public static IParameterizedSource<IServiceProvider, IValidatedParameterizedSource<Type, object>> Default { get; } = new Cache<IServiceProvider, IValidatedParameterizedSource<Type, object>>( provider => new ActivatedFactory( provider ) );
-
-		readonly IServiceProvider provider;
-		readonly IsActive active;
-
-		public ActivatedServiceSource( IServiceProvider provider ) : this( provider, IsActive.Default.Get( provider ) ) {}
-
-		ActivatedServiceSource( IServiceProvider provider, IsActive active ) : base( new DelegatedSpecification<object>( Services.Instance.ToDelegate().Wrap() ).And( new DelegatedSpecification<Type>( active.Get ).Inverse() ) )
-		{
-			this.provider = provider;
-			this.active = active;
-		}
-
-		public override object Get( Type parameter )
-		{
-			using ( active.Assignment( parameter, true ) )
-			{
-				return provider.GetService( parameter );
-			}
-		}
-	}
 
 	public class IsActive : DecoratedSourceCache<Type, bool>
 	{
@@ -357,7 +333,7 @@ namespace DragonSpark.Setup
 
 	public struct SystemParts
 	{
-		public static SystemParts Default { get; } = new SystemParts( ImmutableArray<Assembly>.Empty );
+		public static SystemParts Default { get; } = new SystemParts( Items<Assembly>.Immutable );
 
 		public SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Instance.Get( assemblies ) ) {}
 
@@ -366,7 +342,7 @@ namespace DragonSpark.Setup
 		SystemParts( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types )
 		{
 			Assemblies = assemblies;
-			Types = types;
+			Types = types.AsEnumerable().Prioritize().ToImmutableArray();
 		}
 
 		public ImmutableArray<Assembly> Assemblies { get; }
@@ -410,11 +386,11 @@ namespace DragonSpark.Setup
 
 		public T Create( ITypeSource types ) => Create( types, Items<ICommand>.Default );
 
-		public T Create( ITypeSource types, params ICommandSource[] sources ) => Create( types, sources.Select( source => source.Get() ).Concat().ToImmutableArray() );
+		public T Create( ITypeSource types, params ICommandSource[] sources ) => Create( types, sources.Select( source => source.Get() ).Concat() );
 
-		public T Create( ITypeSource types, params ICommand[] commands ) => Create( types, commands.ToImmutableArray() );
+		public T Create( ITypeSource types, params ICommand[] commands ) => Create( types, commands.AsEnumerable() );
 		
-		public T Create( ITypeSource types, ImmutableArray<ICommand> commands ) => (T)Get( commands.Insert( 0, new AssignSystemPartsCommand( types ) ).Add( new DisposeDisposableCommand( Disposables.Instance.Get() ) ) );
+		public T Create( ITypeSource types, IEnumerable<ICommand> commands ) => (T)Get( commands.StartWith( new AssignSystemPartsCommand( types ) ).Append( new DisposeDisposableCommand( Disposables.Instance.Get() ) ).ToImmutableArray() );
 	}
 
 	/*public sealed class ConfigureSeedingServiceProvider : ApplyDelegateConfigurationCommand<IServiceProvider>
@@ -422,16 +398,16 @@ namespace DragonSpark.Setup
 		public ConfigureSeedingServiceProvider( Func<IServiceProvider> provider ) : base( provider, ServiceProviderFactory.Instance.Seed ) {}
 	}*/
 
-	public class CommandsSource : ItemsStoreBase<ICommand>, ICommandSource
+	public class CommandSource : ItemSource<ICommand>, ICommandSource
 	{
-		protected CommandsSource() {}
+		protected CommandSource() {}
 
-		public CommandsSource( params ICommandSource[] sources ) : this( sources.Select( source => source.Get() ).Concat() ) {}
-		public CommandsSource( IEnumerable<ICommand> items ) : base( items ) {}
-		public CommandsSource( params ICommand[] items ) : base( items ) {}
+		public CommandSource( params ICommandSource[] sources ) : this( sources.Select( source => source.Get() ).Concat() ) {}
+		public CommandSource( IEnumerable<ICommand> items ) : base( items ) {}
+		public CommandSource( params ICommand[] items ) : base( items ) {}
 	}
 
-	public class ServiceProviderConfigurations : CommandsSource
+	public class ServiceProviderConfigurations : CommandSource
 	{
 		public static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
 		protected ServiceProviderConfigurations() {}
@@ -442,22 +418,14 @@ namespace DragonSpark.Setup
 		}
 	}
 
-	public class ApplicationCommandsSource : CommandsSource
+	public class ApplicationCommandSource : CommandSource
 	{
 		//public ApplicationCommandsSource() : this( ServiceProviderConfigurations.Instance ) {}
-		public ApplicationCommandsSource( params ICommandSource[] sources ) : base( sources ) {}
-		public ApplicationCommandsSource( IEnumerable<ICommand> items ) : base( items ) {}
-		public ApplicationCommandsSource( params ICommand[] items ) : base( items ) {}
+		public ApplicationCommandSource( params ICommandSource[] sources ) : base( sources ) {}
+		public ApplicationCommandSource( IEnumerable<ICommand> items ) : base( items ) {}
+		public ApplicationCommandSource( params ICommand[] items ) : base( items ) {}
 
-		protected override IEnumerable<ICommand> Yield()
-		{
-			foreach ( var command in base.Yield() )
-			{
-				yield return command;
-			}
-
-			yield return new ApplySetup();
-		}
+		protected override IEnumerable<ICommand> Yield() => base.Yield().Append( new ApplySetup() );
 	}
 
 	public class AssignSystemPartsCommand : DecoratedCommand

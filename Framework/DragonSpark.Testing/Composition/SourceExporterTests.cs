@@ -1,13 +1,11 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Composition;
+﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition

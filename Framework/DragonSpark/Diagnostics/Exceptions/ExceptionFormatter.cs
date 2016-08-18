@@ -1,6 +1,6 @@
 using System;
 
-namespace DragonSpark.Diagnostics
+namespace DragonSpark.Diagnostics.Exceptions
 {
 	public class ExceptionFormatter : IExceptionFormatter
 	{

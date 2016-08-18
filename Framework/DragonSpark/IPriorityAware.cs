@@ -46,11 +46,17 @@ namespace DragonSpark
 		AssociatedPriority() {}
 	}
 
-	public class PriorityAwareLocator<T> : ParameterizedSourceBase<T, IPriorityAware>
+	public sealed class PriorityAwareLocator<T> : PriorityAwareLocatorBase<T>
+	{
+		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>();
+		PriorityAwareLocator() : base( AttributeSupport<PriorityAttribute>.Local.Get ) {}
+	}
+
+	public abstract class PriorityAwareLocatorBase<T> : ParameterizedSourceBase<T, IPriorityAware>
 	{
 		readonly Func<Type, IPriorityAware> get;
-		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>( AttributeSupport<PriorityAttribute>.Local.Get );
-		PriorityAwareLocator( Func<Type, IPriorityAware> get )
+
+		protected PriorityAwareLocatorBase( Func<Type, IPriorityAware> get )
 		{
 			this.get = get;
 		}

@@ -1,4 +1,4 @@
-﻿<diagnostics:ConfiguringLoggerConfigurationFactory x:Class="DevelopersWin.VoteReporter.Parts.Development.Logger"
+﻿<logging:ConfiguringLoggerConfigurationFactory x:Class="DevelopersWin.VoteReporter.Parts.Development.Logger"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,18 +8,19 @@
 	xmlns:environment="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Environment"
 	xmlns:thread="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Thread"
 	xmlns:process="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Process"
+	xmlns:logging="clr-namespace:DragonSpark.Diagnostics.Logging;assembly=DragonSpark"
 	mc:Ignorable="d" 
 >
-	<diagnostics:MinimumLevelIsCommand />
+	<logging:MinimumLevelIsCommand />
 	<diagnosticsPlatform:AddConsoleSinkCommand />
 	<diagnosticsPlatform:AddTraceSinkCommand />
 
 	<diagnosticsPlatform:AddSeqSinkCommand Endpoint="http://localhost:5341" ApiKey="FHDZFBUt1z34o0j6L1iE" />
 	
-	<diagnostics:EnrichCommand>
+	<logging:EnrichCommand>
 		<process:ProcessIdEnricher />
 		<thread:ThreadIdEnricher />
 		<environment:MachineNameEnricher />
 		<environment:EnvironmentUserNameEnricher />
-	</diagnostics:EnrichCommand>
-</diagnostics:ConfiguringLoggerConfigurationFactory>
+	</logging:EnrichCommand>
+</logging:ConfiguringLoggerConfigurationFactory>

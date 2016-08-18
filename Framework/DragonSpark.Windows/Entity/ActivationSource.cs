@@ -13,7 +13,7 @@ namespace DragonSpark.Windows.Entity
 	[Shared]
 	class ActivationSource : IActivationSource
 	{
-		public static ISource<IActivationSource> Default { get; } = new Scope<IActivationSource>( Factory.ForGlobalScope( () => new ActivationSource( Activator.Instance.Get() ) ) );
+		public static ISource<IActivationSource> Default { get; } = new Scope<IActivationSource>( Factory.Global( () => new ActivationSource( Activator.Instance.Get() ) ) );
 
 		readonly IActivator activator;
 

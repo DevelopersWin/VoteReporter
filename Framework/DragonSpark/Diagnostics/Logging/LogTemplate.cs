@@ -2,17 +2,16 @@ using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace DragonSpark.Diagnostics.Logger
+namespace DragonSpark.Diagnostics.Logging
 {
 	public delegate void LogTemplate( string template, params object[] parameters );
 
@@ -50,16 +49,16 @@ namespace DragonSpark.Diagnostics.Logger
 	{
 		// public static TemplateParameterFactoryBase Instance { get; } = new TemplateParameterFactoryBase<T>();
 
-		readonly FormatterFactory source;
+		readonly Formatter source;
 
-		protected LoggerTemplateParameterFactoryBase() : this( FormatterFactory.Instance ) {}
+		protected LoggerTemplateParameterFactoryBase() : this( Formatter.Instance ) {}
 
-		protected LoggerTemplateParameterFactoryBase( FormatterFactory source )
+		protected LoggerTemplateParameterFactoryBase( Formatter source )
 		{
 			this.source = source;
 		}
 
-		protected object[] Parameters( T parameter ) => parameter.Parameters.Select( source.From ).ToArray();
+		protected object[] Parameters( T parameter ) => parameter.Parameters.Select( source.Format ).ToArray();
 	}
 
 	class LoggerTemplateParameterFactory : LoggerTemplateParameterFactoryBase<ILoggerTemplate>
@@ -91,92 +90,89 @@ namespace DragonSpark.Diagnostics.Logger
 		public LogExceptionCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerExceptionTemplateParameterFactory.Instance.Get ) {}
 	}
 
-	public sealed class Logging : ConfigurableParameterizedFactoryBase<LoggerConfiguration, ILogger>
+	public sealed class Logger : ConfigurableParameterizedFactoryBase<LoggerConfiguration, ILogger>
 	{
-		public static IParameterizedSource<ILogger> Instance { get; } = new Logging().ToCache();
-		Logging() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Instance.Get, ( configuration, parameter ) => configuration.CreateLogger().ForSource( parameter ) ) {}
+		public static IParameterizedSource<ILogger> Instance { get; } = new Logger().ToCache();
+		Logger() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Instance.ToDelegate().Wrap(), ( configuration, parameter ) => configuration.CreateLogger().ForSource( parameter ) ) {}
 	}
 
-	public sealed class LoggingHistory : ActivatedCache<LoggerHistorySink>
+	public sealed class LoggingHistory : Scope<LoggerHistorySink>
 	{
-		public new static LoggingHistory Instance { get; } = new LoggingHistory();
-		LoggingHistory() {}
+		public static LoggingHistory Instance { get; } = new LoggingHistory();
+		LoggingHistory() : base( Factory.Global( () => new LoggerHistorySink() ) ) {}
 	}
 
-	public sealed class LoggingController : Cache<LoggingLevelSwitch>
+	public sealed class LoggingController : Scope<LoggingLevelSwitch>
 	{
 		public static LoggingController Instance { get; } = new LoggingController();
-		LoggingController() : base( o => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get() ) ) {}
+		LoggingController() : base( Factory.Global( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get() ) ) ) {}
 	}
 
 	sealed class LoggerConfigurationSource : LoggerConfigurationSourceBase
 	{
 		public static LoggerConfigurationSource Instance { get; } = new LoggerConfigurationSource();
+		LoggerConfigurationSource() : base( HistoryTransform.Instance ) {}
 
-		protected override IEnumerable<ITransformer<LoggerConfiguration>> Yield( object parameter )
+		sealed class HistoryTransform : TransformerBase<LoggerConfiguration>
 		{
-			foreach ( var transformer in base.Yield( parameter ) )
-			{
-				yield return transformer;
-			}
+			public static HistoryTransform Instance { get; } = new HistoryTransform();
+			HistoryTransform() : this( LoggingHistory.Instance.Get ) {}
 
-			yield return new HistoryTransform( LoggingHistory.Instance.Get( parameter ) );
-		}
+			readonly Func<ILoggerHistory> history;
 
-		class HistoryTransform : TransformerBase<LoggerConfiguration>
-		{
-			readonly ILoggerHistory history;
-
-			public HistoryTransform( ILoggerHistory history )
+			HistoryTransform( Func<ILoggerHistory> history )
 			{
 				this.history = history;
 			}
 
-			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
+			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history() );
 		}
 	}
 
-	public abstract class LoggerConfigurationSourceBase : ConfigurationSourceBase<object, LoggerConfiguration>
+	public abstract class LoggerConfigurationSourceBase : ConfigurationSource<LoggerConfiguration>
 	{
-		protected override IEnumerable<ITransformer<LoggerConfiguration>> Yield( object parameter )
-		{
-			yield return new ControllerTransform( LoggingController.Instance.Get( parameter ) );
-			yield return new CreatorFilterTransformer();
-		}
+		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( ControllerTransform.Instance, CreatorFilterTransformer.Instance ) ) {}
 
 		sealed class ControllerTransform : TransformerBase<LoggerConfiguration>
 		{
-			readonly LoggingLevelSwitch controller;
-			public ControllerTransform( LoggingLevelSwitch controller )
+			public static ControllerTransform Instance { get; } = new ControllerTransform();
+			ControllerTransform() : this( LoggingController.Instance.Get ) {}
+
+			readonly Func<LoggingLevelSwitch> controller;
+
+			ControllerTransform( Func<LoggingLevelSwitch> controller )
 			{
 				this.controller = controller;
 			}
 
-			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller );
+			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller() );
 		}
 	}
 
-	public sealed class CreatorFilterTransformer : TransformerBase<LoggerConfiguration>
+	sealed class CreatorFilterTransformer : TransformerBase<LoggerConfiguration>
 	{
-		readonly CreatorFilter filter;
+		public static CreatorFilterTransformer Instance { get; } = new CreatorFilterTransformer();
+		CreatorFilterTransformer() {}
+
+		/*readonly CreatorFilter filter;
 
 		public CreatorFilterTransformer() : this( new CreatorFilter() ) {}
 
 		public CreatorFilterTransformer( CreatorFilter filter )
 		{
 			this.filter = filter;
-		}
+		}*/
 
 		public override LoggerConfiguration Get( LoggerConfiguration parameter )
 		{
-			var item = filter.ToItem();
+			var item = new CreatorFilter().ToItem();
 			var result = parameter.Filter.With( item ).Enrich.With( item );
 			return result;
 		}
 
 		public sealed class CreatorFilter : DecoratedSpecification<LogEvent>, ILogEventEnricher, ILogEventFilter
 		{
-			const string CreatorId = "CreatorId";
+			const string CreatorId = nameof(CreatorId);
 			readonly Guid id;
 
 			public CreatorFilter() : this( Guid.NewGuid() ) {}
@@ -187,13 +183,6 @@ namespace DragonSpark.Diagnostics.Logger
 			}
 			
 			public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( CreatorId, id ) );
-
-			/*class MigratingSpecification : CacheValueSpecification<LogEvent, bool>
-			{
-				public static MigratingSpecification Instance { get; } = new MigratingSpecification();
-
-				MigratingSpecification() : base( MigrationProperties.IsMigrating, () => true ) {}
-			}*/
 
 			sealed class CreatorSpecification : SpecificationBase<LogEvent>
 			{

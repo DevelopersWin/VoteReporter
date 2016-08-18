@@ -460,7 +460,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( assembly.GetName().Version, fromProvider.Version );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(MultipleInterfaces) )]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		void RegisterInterface( IAnotherInterface sut )
 		{
 			Assert.IsType<MultipleInterfaces>( sut );

@@ -63,7 +63,7 @@ namespace DragonSpark.Composition
 		// readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
 		readonly static Func<Type, bool> Activate = Defaults.ActivateSpecification.IsSatisfiedBy;
 
-		public static IParameterizedSource<Type, Type> Instance { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().ForGlobalScope() );
+		public static IParameterizedSource<Type, Type> Instance { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Global() );
 		ConventionTypes() : this( ApplicationTypes.Instance ) {}
 
 		readonly ITypeSource source;
@@ -150,7 +150,7 @@ namespace DragonSpark.Composition
 		public override ConventionMapping Get( Type parameter )
 		{
 			var @interface = ConventionImplementedInterfaces.Instance.Get( parameter );
-			var result = @interface.IsAssigned() ? new ConventionMapping( @interface, parameter ) : default(ConventionMapping);
+			var result = @interface != null ? new ConventionMapping( @interface, parameter ) : default(ConventionMapping);
 			return result;
 		}
 	}
@@ -163,8 +163,8 @@ namespace DragonSpark.Composition
 			ImplementationType = implementationType;
 		}
 
-		public Type InterfaceType { get; set; }
-		public Type ImplementationType { get; set; }
+		public Type InterfaceType { get; }
+		public Type ImplementationType { get; }
 	}
 
 	public class ConventionImplementedInterfaces : FactoryCache<Type, Type>

@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Diagnostics;
 using System;
+using DragonSpark.Diagnostics.Exceptions;
 using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics

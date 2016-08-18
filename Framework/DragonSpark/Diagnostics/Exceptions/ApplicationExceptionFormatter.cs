@@ -1,7 +1,7 @@
-using DragonSpark.TypeSystem;
 using System;
+using DragonSpark.TypeSystem;
 
-namespace DragonSpark.Diagnostics
+namespace DragonSpark.Diagnostics.Exceptions
 {
 	public class ApplicationExceptionFormatter : IExceptionFormatter
 	{

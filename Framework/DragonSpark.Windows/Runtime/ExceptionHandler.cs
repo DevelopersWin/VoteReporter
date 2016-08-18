@@ -1,11 +1,12 @@
 using DragonSpark.Diagnostics;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
 using System;
-using IExceptionHandler = DragonSpark.Diagnostics.IExceptionHandler;
+using DragonSpark.Diagnostics.Exceptions;
+using IExceptionHandler = DragonSpark.Diagnostics.Exceptions.IExceptionHandler;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class ExceptionHandler : IExceptionHandler
+	public class ExceptionHandler : DragonSpark.Diagnostics.Exceptions.IExceptionHandler
 	{
 		public const string DefaultExceptionPolicy = "Default Exception Policy";
 		readonly ExceptionManager manager;

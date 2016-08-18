@@ -4,6 +4,7 @@ using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 using System;
+using DragonSpark.Diagnostics.Logging;
 
 namespace DragonSpark.Windows.Diagnostics
 {

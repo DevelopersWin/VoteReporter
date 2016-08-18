@@ -4,6 +4,8 @@ using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 
 namespace DragonSpark.Sources
@@ -28,6 +30,7 @@ namespace DragonSpark.Sources
 			return @this.Get();
 		}
 
+		public static IEnumerable<T> Get<T>( this IEnumerable<ISource<T>> @this ) => @this.Select( source => source.Get() );
 
 		public static T ScopedWithDefault<T>( this T @this ) where T : IScopeAware => @this.ScopedWith( ExecutionContext.Instance );
 
@@ -48,7 +51,7 @@ namespace DragonSpark.Sources
 			public static SourceDelegates<TParameter, TResult> Default { get; } = new SourceDelegates<TParameter, TResult>();
 			SourceDelegates() : base( source => new Factory( source ).Get ) {}
 
-			class Factory : ParameterizedSourceBase<TParameter, TResult>
+			sealed class Factory : ParameterizedSourceBase<TParameter, TResult>
 			{
 				readonly ISource<IParameterizedSource<TParameter, TResult>> source;
 				public Factory( ISource<IParameterizedSource<TParameter, TResult>> source )

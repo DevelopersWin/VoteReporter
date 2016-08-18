@@ -1,4 +1,4 @@
-namespace DragonSpark.Diagnostics
+namespace DragonSpark.Diagnostics.Logging
 {
 	/*public interface IProfiler : IProcess, IContinuation
 	{

@@ -1,4 +1,5 @@
 using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logging;
 using Serilog;
 using Serilog.Configuration;
 

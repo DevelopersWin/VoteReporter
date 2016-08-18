@@ -1,4 +1,4 @@
-using DragonSpark.Activation;
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using Serilog.Events;
@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace DragonSpark.Diagnostics
 {
-	public class LoggerHistorySink : ILoggerHistory
+	public sealed class LoggerHistorySink : ILoggerHistory
 	{
 		readonly ConcurrentStack<LogEvent> source = new ConcurrentStack<LogEvent>();
 
@@ -20,16 +20,15 @@ namespace DragonSpark.Diagnostics
 
 		public IEnumerable<LogEvent> Events => source.ToArray().Reverse().ToArray();
 
-		public virtual void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
+		public void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
 	}
 
-	public class LogEventTextFactory : ParameterizedSourceBase<LogEvent, string>
+	public sealed class LogEventTextFactory : ParameterizedSourceBase<LogEvent, string>
 	{
 		public static LogEventTextFactory Instance { get; } = new LogEventTextFactory();
+		LogEventTextFactory( string template = "{Timestamp:HH:mm:ss:fff} [{Level}] ({SourceContext}) {Message}{NewLine}{Exception}" ) : this( new MessageTemplateTextFormatter( template, null ) ) {}
 
 		readonly MessageTemplateTextFormatter formatter;
-
-		public LogEventTextFactory( string template = "{Timestamp:HH:mm:ss:fff} [{Level}] ({SourceContext}) {Message}{NewLine}{Exception}" ) : this( new MessageTemplateTextFormatter( template, null ) ) {}
 
 		public LogEventTextFactory( MessageTemplateTextFormatter formatter )
 		{

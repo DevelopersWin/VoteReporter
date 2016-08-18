@@ -21,7 +21,7 @@ namespace DragonSpark.Composition
 		readonly static IConfigurationScope<ContainerConfiguration> Default = new ConfigurationScope<ContainerConfiguration>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
 
 		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
-		CompositionHostFactory() : base( () => new ContainerConfiguration(), Default, parameter => parameter.CreateContainer()) {}
+		CompositionHostFactory() : base( () => new ContainerConfiguration(), Default, parameter => parameter.CreateContainer() ) {}
 	}
 
 	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}

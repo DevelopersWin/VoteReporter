@@ -36,6 +36,7 @@
     <Compile Include="Activation\SingletonAttribute.cs" />
     <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
     <Compile Include="Composition\Convention.cs" />
+    <Compile Include="Setup\ActivatedServiceSource.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Activation\SourceTypeLocator.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
@@ -74,18 +75,17 @@
     <Compile Include="Configuration\IConfiguration.cs" />
     <Compile Include="Configuration\IParameterizedConfiguration.cs" />
     <Compile Include="Configuration\Store.cs" />
-    <Compile Include="Diagnostics\Configuration.cs" />
+    <Compile Include="Diagnostics\Logging\Configuration.cs" />
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStore.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
-    <Compile Include="Diagnostics\ExceptionSupport.cs" />
-    <Compile Include="Diagnostics\FormatterFactory.cs" />
-    <Compile Include="Diagnostics\IProfiler.cs" />
-    <Compile Include="Diagnostics\LoggerFactory.cs" />
-    <Compile Include="Diagnostics\Logger\LogTemplate.cs" />
+    <Compile Include="Diagnostics\Exceptions\ExceptionSupport.cs" />
+    <Compile Include="Diagnostics\Formatter.cs" />
+    <Compile Include="Diagnostics\Logging\IProfiler.cs" />
+    <Compile Include="Diagnostics\Logging\LoggerFactory.cs" />
+    <Compile Include="Diagnostics\Logging\LogTemplate.cs" />
     <Compile Include="Diagnostics\ProfilerFactory.cs" />
     <Compile Include="Diagnostics\Retry.cs" />
-    <Compile Include="Diagnostics\TimerEvents.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Extensions\MethodExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -190,9 +190,7 @@
     <Compile Include="ComponentModel\SingletonAttribute.cs" />
     <Compile Include="ComponentModel\SourceAttribute.cs" />
     <Compile Include="Diagnostics\Diagnostics.cs" />
-    <Compile Include="Diagnostics\ExceptionFormatter.cs" />
-    <Compile Include="Diagnostics\IMessageRecorder.cs" />
-    <Compile Include="Diagnostics\Message.cs" />
+    <Compile Include="Diagnostics\Exceptions\ExceptionFormatter.cs" />
     <Compile Include="Diagnostics\LoggerHistorySink.cs" />
     <Compile Include="Extensions\BuilderContextExtensions.cs" />
     <Compile Include="Extensions\ObjectMappingParameter.cs" />
@@ -233,7 +231,7 @@
     </Compile>
     <Compile Include="ComponentModel\ServicesValueBase.cs" />
     <Compile Include="ComponentModel\DefaultAttribute.cs" />
-    <Compile Include="Diagnostics\ApplicationExceptionFormatter.cs">
+    <Compile Include="Diagnostics\Exceptions\ApplicationExceptionFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Extensions\AttributeProviderExtensions.cs" />
@@ -249,10 +247,10 @@
     <Compile Include="Runtime\ICurrentTime.cs" />
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
     <Compile Include="Runtime\ListDictionary.cs" />
-    <Compile Include="Diagnostics\RecordingLoggerFactory.cs" />
+    <Compile Include="Diagnostics\Logging\RecordingLoggerFactory.cs" />
     <Compile Include="TypeSystem\IAssemblyProvider.cs" />
     <Compile Include="Runtime\Specifications\TypeAssignableSpecification.cs" />
-    <Compile Include="Sources\ItemsStoreBase.cs" />
+    <Compile Include="Sources\ItemSourceBase.cs" />
     <Compile Include="Sources\CacheSpecificationBase.cs" />
     <Compile Include="Setup\AllTypesOfFactory.cs" />
     <Compile Include="Runtime\CommandCollection.cs" />
@@ -280,14 +278,14 @@
     <Compile Include="ConditionMonitor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Diagnostics\ExceptionHandlingResult.cs" />
-    <Compile Include="Diagnostics\IExceptionFormatter.cs" />
-    <Compile Include="Diagnostics\IExceptionHandler.cs" />
+    <Compile Include="Diagnostics\Exceptions\ExceptionHandlingResult.cs" />
+    <Compile Include="Diagnostics\Exceptions\IExceptionFormatter.cs" />
+    <Compile Include="Diagnostics\Exceptions\IExceptionHandler.cs" />
     <Compile Include="Extensions\AssemblyExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Diagnostics\IMessageLogger.cs" />
+    <Compile Include="Diagnostics\Logging\IMessageLogger.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="Extensions\WeakReferenceListExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />

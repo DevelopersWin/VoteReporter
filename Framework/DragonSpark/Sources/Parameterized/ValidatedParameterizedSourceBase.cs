@@ -146,12 +146,12 @@ namespace DragonSpark.Sources.Parameterized
 		public override TResult Get() => inner( parameter() );
 	}
 
-	public class ConstructFromKnownTypes<T> : ParameterConstructedCompositeFactory<object>
+	public class ConstructFromKnownTypes<T> : ParameterConstructedCompositeFactory<object>, IParameterizedSource<object, T>
 	{
-		public static ISource<ConstructFromKnownTypes<T>> Instance { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.ForGlobalScope( () => new ConstructFromKnownTypes<T>( KnownTypes.Instance.Get<T>().ToArray() ) ) );
+		public static ISource<IParameterizedSource<object, T>> Instance { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.Global( () => new ConstructFromKnownTypes<T>( KnownTypes.Instance.Get<T>().ToArray() ) ) );
 		ConstructFromKnownTypes( params Type[] types ) : base( types ) {}
-		
-		public T CreateUsing( object parameter ) => (T)Get( parameter );
+
+		T IParameterizedSource<object, T>.Get( object parameter ) => (T)Get( parameter );
 	}
 
 	public static class Defaults

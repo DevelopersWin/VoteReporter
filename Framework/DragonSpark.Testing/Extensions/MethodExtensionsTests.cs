@@ -6,6 +6,7 @@ using DragonSpark.Sources.Parameterized;
 using System;
 using System.Linq;
 using System.Windows.Input;
+using DragonSpark.Diagnostics.Logging;
 using Xunit;
 
 namespace DragonSpark.Testing.Extensions

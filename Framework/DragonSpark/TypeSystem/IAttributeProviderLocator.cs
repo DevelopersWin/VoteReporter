@@ -11,14 +11,14 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class TypeDefinitionProviderStore : ItemsStoreBase<ITypeDefinitionProvider>
+	public class TypeDefinitionProviderSource : ItemSource<ITypeDefinitionProvider>
 	{
-		public static TypeDefinitionProviderStore Instance { get; } = new TypeDefinitionProviderStore();
-		TypeDefinitionProviderStore() : this( Items<ITypeDefinitionProvider>.Default ) {}
+		public static TypeDefinitionProviderSource Instance { get; } = new TypeDefinitionProviderSource();
+		TypeDefinitionProviderSource() : this( Items<ITypeDefinitionProvider>.Default ) {}
 
-		protected TypeDefinitionProviderStore( params ITypeDefinitionProvider[] items ) : base( items ) {}
+		protected TypeDefinitionProviderSource( params ITypeDefinitionProvider[] items ) : base( items.Append( ConventionTypeDefinitionProvider.Instance, Self.Instance ) ) {}
 
-		protected override IEnumerable<ITypeDefinitionProvider> Yield() => base.Yield().Append( ConventionTypeDefinitionProvider.Instance, Self.Instance );
+		// protected override IEnumerable<ITypeDefinitionProvider> Yield() => base.Yield().Append(  );
 
 		sealed class Self : SelfTransformer<TypeInfo>, ITypeDefinitionProvider
 		{
@@ -30,7 +30,7 @@ namespace DragonSpark.TypeSystem
 	public sealed class AttributeProviders : ParameterizedScope<IAttributeProvider>
 	{
 		public static IParameterizedSource<IAttributeProvider> Instance { get; } = new AttributeProviders();
-		AttributeProviders() : base( new Factory().ToSourceDelegate().ForGlobalScope() ) {}
+		AttributeProviders() : base( new Factory().ToSourceDelegate().Global() ) {}
 
 		sealed class Factory : ParameterConstructedCompositeFactory<IAttributeProvider>
 		{
@@ -58,7 +58,7 @@ namespace DragonSpark.TypeSystem
 	sealed class TypeDefinitions : ParameterizedScope<TypeInfo>
 	{
 		public static TypeDefinitions Instance { get; } = new TypeDefinitions();
-		TypeDefinitions() : base( new Factory().ToSourceDelegate().ForGlobalScope() ) {}
+		TypeDefinitions() : base( new Factory().ToSourceDelegate().Global() ) {}
 
 		sealed class Factory : CompositeFactory<object, TypeInfo>
 		{
@@ -103,7 +103,7 @@ namespace DragonSpark.TypeSystem
 	sealed class MemberInfoDefinitions : ParameterizedScope<MemberInfo>
 	{
 		public static IParameterizedSource<MemberInfo> Instance { get; } = new MemberInfoDefinitions();
-		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).ToSourceDelegate().ForGlobalScope() ) {}
+		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).ToSourceDelegate().Global() ) {}
 
 		sealed class Factory : ParameterizedSourceBase<MemberInfo>
 		{

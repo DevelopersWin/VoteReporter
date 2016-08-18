@@ -1,6 +1,6 @@
 using System;
 
-namespace DragonSpark.Diagnostics
+namespace DragonSpark.Diagnostics.Exceptions
 {
 	public interface IExceptionHandler
 	{
@@ -10,14 +10,8 @@ namespace DragonSpark.Diagnostics
 	class ExceptionHandler : IExceptionHandler
 	{
 		public static ExceptionHandler Instance { get; } = new ExceptionHandler();
+		ExceptionHandler() {}
 
-		ExceptionHandler()
-		{}
-
-		public ExceptionHandlingResult Handle( Exception exception )
-		{
-			var result = new ExceptionHandlingResult( true, exception );
-			return result;
-		}
+		public ExceptionHandlingResult Handle( Exception exception ) => new ExceptionHandlingResult( true, exception );
 	}
 }

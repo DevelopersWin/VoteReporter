@@ -2,6 +2,7 @@ using DragonSpark.Diagnostics;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
 using System;
 using System.IO;
+using DragonSpark.Diagnostics.Exceptions;
 
 namespace DragonSpark.Windows.Runtime
 {

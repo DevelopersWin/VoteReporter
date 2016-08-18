@@ -47,12 +47,12 @@ namespace DragonSpark.Testing.Framework.Setup
 		static void Initialize( MethodBase method ) => ApplicationInitializer.Instance.Get().Execute( method );
 
 		static IApplication DefaultCreate( MethodBase _ ) => 
-			ApplicationFactory<Application>.Instance.Create( MethodTypes.Instance, ApplicationCommandsSource.Instance );
+			ApplicationFactory<Application>.Instance.Create( MethodTypes.Instance, ApplicationCommandSource.Instance );
 	}
 
 	public sealed class ApplicationInitializer : CommandBase<MethodBase>
 	{
-		public static IScope<ApplicationInitializer> Instance { get; } = new Scope<ApplicationInitializer>( Factory.ForGlobalScope( () => new ApplicationInitializer() ) );
+		public static IScope<ApplicationInitializer> Instance { get; } = new Scope<ApplicationInitializer>( Factory.Global( () => new ApplicationInitializer() ) );
 		ApplicationInitializer() {}
 
 		public override void Execute( MethodBase parameter )

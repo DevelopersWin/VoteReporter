@@ -1,10 +1,7 @@
-using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -60,19 +57,12 @@ namespace DragonSpark.Configuration
 		protected ConfigurableFactoryBase( IScope<T> seed, IConfigurationScope<T> scope, Func<T, T> factory ) : base( seed, scope, factory ) {}
 	}
 
-	public abstract class ConfigurableFactoryBase<TConfiguration, TResult> : SourceBase<TResult>/*, IConfigurableFactory<TConfiguration, TResult>*/ where TConfiguration : class
+	public abstract class ConfigurableFactoryBase<TConfiguration, TResult> : SourceBase<TResult> where TConfiguration : class
 	{
 		readonly Func<TConfiguration, TResult> factory;
 		
 		protected ConfigurableFactoryBase( Func<TConfiguration> seed, IConfigurationScope<TConfiguration> scope, Func<TConfiguration, TResult> factory ) : 
 			this( new Scope<TConfiguration>( seed ), scope, factory ) {}
-
-		/*static IConfiguration<TConfiguration> From( Func<TConfiguration> seed )
-		{
-			var scope = new AssignableDelegatedParameterizedScope<TConfiguration>( seed );
-			var result = new Configuration<TConfiguration>( scope, new DelegatedAssignableParameterizedSource<TConfiguration>( scope.Get ) );
-			return result;
-		}*/
 
 		protected ConfigurableFactoryBase( IScope<TConfiguration> seed, IConfigurationScope<TConfiguration> scope, Func<TConfiguration, TResult> factory )
 		{
@@ -100,30 +90,20 @@ namespace DragonSpark.Configuration
 	public class ConfigurationScope<T> : Scope<ImmutableArray<ITransformer<T>>>, IConfigurationScope<T>
 	{
 		public ConfigurationScope() : this( Items<ITransformer<T>>.Default ) {}
-		public ConfigurationScope( params ITransformer<T>[] configurators ) : base( Factory.ForGlobalScope( new ConfigurationSource<T>( configurators ).Get ) ) {}
-		// public ConfigurationScope( Func<ImmutableArray<ITransformer<T>>> defaultFactory ) : base( defaultFactory ) {}
+		public ConfigurationScope( params ITransformer<T>[] configurators ) : base( new ConfigurationSource<T>( configurators ).Global() ) {}
 	}
 
-	public class ConfigurationSource<T> : ItemsStoreBase<ITransformer<T>>
+	public class ConfigurationSource<T> : CompositeItemSource<ITransformer<T>>
 	{
-		readonly string name;
-		public ConfigurationSource() {}
-		public ConfigurationSource( IEnumerable<ITransformer<T>> items ) : base( items ) {}
-
-		public ConfigurationSource( string name = null, params ITransformer<T>[] items ) : base( items )
-		{
-			this.name = name;
-		}
-
-		protected override IEnumerable<ITransformer<T>> Yield() => base.Yield().Concat( Exports.Instance.Get().GetExports<ITransformer<T>>( name ).AsEnumerable() );
+		public ConfigurationSource( params ITransformer<T>[] configurators ) : base( new ItemSource<ITransformer<T>>( configurators ), ExportSource<ITransformer<T>>.Instance ) {}
 	}
 
-	public abstract class ConfigurationSourceBase<TParameter, TConfiguration> : ParameterizedSourceBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>
+	/*public abstract class ConfigurationSourceBase<TParameter, TConfiguration> : ParameterizedSourceBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>
 	{
 		public override ImmutableArray<ITransformer<TConfiguration>> Get( TParameter parameter ) => Yield( parameter ).ToImmutableArray();
 
 		protected abstract IEnumerable<ITransformer<TConfiguration>> Yield( TParameter parameter );
-	}
+	}*/
 
 	/*public static class ConfigurationExtensions
 	{

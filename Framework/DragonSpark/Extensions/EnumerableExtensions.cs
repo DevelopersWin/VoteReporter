@@ -13,18 +13,12 @@ namespace DragonSpark.Extensions
 {
 	public static class EnumerableExtensions
 	{
-		static class Defaults<T>
-		{
-			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Instance.ToSourceDelegate();
-		}
-
 		public static T[] Fixed<T>( this IEnumerable<T> @this )
 		{
 			var array = @this as T[] ?? @this.ToArray();
 			var result = array.Length > 0 ? array : (T[])Enumerable.Empty<T>();
 			return result;
 		}
-
 
 		public static IEnumerable<ValueTuple<T1, T2>> Introduce<T1, T2>( this ImmutableArray<T1> @this, T2 instance ) => Introduce( @this, instance, Where<ValueTuple<T1, T2>>.Always, Delegates<ValueTuple<T1, T2>>.Self );
 
@@ -109,12 +103,11 @@ namespace DragonSpark.Extensions
 			public Enumerator<T> GetEnumerator() => new Enumerator<T>( pool );
 		}*/
 
-
-		public static bool All(this IEnumerable<bool> source)
+		public static bool All( this IEnumerable<bool> source )
 		{
-			foreach (var b in source)
+			foreach ( var b in source )
 			{
-				if (!b)
+				if ( !b )
 				{
 					return false;
 				}
@@ -123,7 +116,9 @@ namespace DragonSpark.Extensions
 			return true;
 		}
 
-		public static IEnumerable<T> Prioritize<T>( [Required]this IEnumerable<T> @this ) => @this.OrderBy( Defaults<T>.PriorityLocator, PriorityComparer.Instance );
+		public static IEnumerable<T> Prioritize<T>( [Required] this IEnumerable<T> @this ) => Prioritize( @this, Support<T>.PriorityLocator );
+
+		public static IEnumerable<T> Prioritize<T>( [Required] this IEnumerable<T> @this, Func<T, IPriorityAware> locator ) => @this.OrderBy( locator, PriorityComparer.Instance );
 
 		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, U> with, Func<U> defaultFunction = null ) => WithFirst( @this, Where<T>.Always, with, defaultFunction );
 
@@ -143,25 +138,26 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<TResult> Each<T, TResult>( this IEnumerable<T> enumerable, Func<T, TResult> action ) => enumerable.Select( action ).ToArray();
 
-		class Array<T> : Cache<T, T[]> where T : class
-		{
-			public static Array<T> Default { get; } = new Array<T>();
-
-			Array() : base( arg => new[] { arg } ) {}
-		}
-
 		public static IEnumerable<T> Yield<T>( this T @this ) => EnumerableEx.Return( @this );
 
 		public static TItem[] ToItem<TItem>( this TItem target ) where TItem : class => Array<TItem>.Default.Get( target );
+		class Array<T> : Cache<T, T[]> where T : class
+		{
+			public static Array<T> Default { get; } = new Array<T>();
+			Array() : base( arg => new[] { arg } ) {}
+		}
 
 		public static IEnumerable<T> Append<T>( this T @this, params T[] second ) => @this.Append( second.AsEnumerable() );
 		public static IEnumerable<T> Append<T>( this T @this, IEnumerable<T> second ) => @this.Append_( second );
+
 		static IEnumerable<T> Append_<T>( this T @this, IEnumerable<T> second )
 		{
 			yield return @this;
 			foreach ( var element1 in second )
 				yield return element1;
 		}
+
+		public static T[] Fixed<T>( this IEnumerable<T> @this, params T[] items ) => @this.Append( items ).Fixed();
 
 		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, params T[] items ) => @this.Concat( items );
 
@@ -174,6 +170,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Prepend<T>( this T @this, params T[] second ) => @this.Prepend( second.AsEnumerable() );
 		public static IEnumerable<T> Prepend<T>( this T @this, IEnumerable<T> second ) => @this.Prepend_( second );
+
 		static IEnumerable<T> Prepend_<T>( this T @this, IEnumerable<T> second )
 		{
 			foreach ( var item in second )
@@ -194,8 +191,13 @@ namespace DragonSpark.Extensions
 		public static IEnumerable<T> WhereAssigned<T>( this ImmutableArray<T> target ) => target.Where( Where<T>.Assigned );
 		public static IEnumerable<T> WhereAssigned<T>( this IEnumerable<T> target ) => target.Where( Where<T>.Assigned );
 
-		public static T FirstOrDefaultOfType<T>(this IEnumerable enumerable) => enumerable.OfType<T>().FirstOrDefault();
+		public static T FirstOrDefaultOfType<T>( this IEnumerable enumerable ) => enumerable.OfType<T>().FirstOrDefault();
 
 		public static T PeekOrDefault<T>( this System.Collections.Generic.Stack<T> @this ) => @this.Any() ? @this.Peek() : default(T);
+
+		static class Support<T>
+		{
+			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Instance.ToSourceDelegate();
+		}
 	}
 }
