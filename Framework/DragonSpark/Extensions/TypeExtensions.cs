@@ -1,19 +1,21 @@
-﻿using DragonSpark.TypeSystem;
+﻿using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.TypeSystem;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 using Type = System.Type;
 
 namespace DragonSpark.Extensions
 {
 	public static class ImmutableArrayExtensions
 	{
-		public static IEnumerable<TSource> AsEnumerable<TSource>( this ImmutableArray<TSource> source ) => source.ToArray();
+		// public static IEnumerable<T> Except<T>( this IEnumerable<T> first, IEnumerable<T> second ) => @first.Except( second.ToArray() );
 
-		public static IEnumerable<TSource> Union<TSource>( this ImmutableArray<TSource> first, IEnumerable<TSource> second ) => first.ToArray().Union( second );
+		public static IEnumerable<T> AsEnumerable<T>( this ImmutableArray<T> source ) => source.ToArray();
+
+		public static IEnumerable<T> Union<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Union( second );
 
 		public static IEnumerable<T> Concat<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Concat( second );
 

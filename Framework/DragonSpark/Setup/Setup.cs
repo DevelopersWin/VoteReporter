@@ -439,7 +439,7 @@ namespace DragonSpark.Setup
 		public static SystemPartsFactory Instance { get; } = new SystemPartsFactory();
 		SystemPartsFactory() {}
 
-		public override SystemParts Get( IEnumerable<Type> parameter ) => new SystemParts( parameter.Distinct().Prioritize( type => PriorityAwareLocator<Assembly>.Instance.Get( type.Assembly() ) ) );
+		public override SystemParts Get( IEnumerable<Type> parameter ) => new SystemParts( parameter.Distinct().Prioritize( type => AssemblyPriorityLocator.Instance.Get( type.Assembly() ) ) );
 	}
 
 	public sealed class ApplicationCommands : Scope<ImmutableArray<ICommand>>

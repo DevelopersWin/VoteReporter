@@ -105,6 +105,7 @@ namespace DragonSpark.Composition
 			var mappings = typesSource()
 				.Select( Selector )
 				.WhereAssigned()
+				.Distinct( mapping => mapping.InterfaceType )
 				.ToDictionary( mapping => mapping.InterfaceType, mapping => mapping.ImplementationType );
 
 			foreach ( var mapping in mappings )

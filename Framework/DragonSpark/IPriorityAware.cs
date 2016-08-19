@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark
 {
@@ -46,22 +47,36 @@ namespace DragonSpark
 		AssociatedPriority() {}
 	}
 
-	public sealed class PriorityAwareLocator<T> : PriorityAwareLocatorBase<T>
+	/*public sealed class PriorityAwareLocator<T> : PriorityAwareLocator<T, PriorityAttribute>
 	{
-		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>();
-		PriorityAwareLocator() : base( AttributeSupport<PriorityAttribute>.Local.Get ) {}
+		PriorityAwareLocator() {}
+	}*/
+
+	/*public class PriorityAwareLocator<T, TAttribute> : PriorityAwareLocatorBase<T> where TAttribute : PriorityAttribute
+	{
+		public static PriorityAwareLocator<T, TAttribute> Instance { get; } = new PriorityAwareLocator<T, TAttribute>();
+		protected PriorityAwareLocator() : base(  ) {}
+	}*/
+
+	public class AssemblyPriorityLocator : PriorityAwareLocator<Assembly>
+	{
+		public new static AssemblyPriorityLocator Instance { get; } = new AssemblyPriorityLocator();
+		AssemblyPriorityLocator() : base( assembly => assembly.GetAttribute<PriorityAttribute>() ) {}
 	}
 
-	public abstract class PriorityAwareLocatorBase<T> : ParameterizedSourceBase<T, IPriorityAware>
+	public class PriorityAwareLocator<T> : ParameterizedSourceBase<T, IPriorityAware>
 	{
-		readonly Func<Type, IPriorityAware> get;
+		public static PriorityAwareLocator<T> Instance { get; } = new PriorityAwareLocator<T>();
+		PriorityAwareLocator() : this( o => AttributeSupport<PriorityAttribute>.Local.Get( o.GetType() ) ) {}
 
-		protected PriorityAwareLocatorBase( Func<Type, IPriorityAware> get )
+		readonly Func<T, IPriorityAware> get;
+
+		protected PriorityAwareLocator( Func<T, IPriorityAware> get )
 		{
 			this.get = get;
 		}
 
-		public override IPriorityAware Get( T parameter ) => parameter as IPriorityAware ?? get( parameter.GetType() ) ?? AssociatedPriority.Instance.Get( parameter ) ?? PriorityAware.Default;
+		public override IPriorityAware Get( T parameter ) => parameter as IPriorityAware ?? get( parameter ) ?? AssociatedPriority.Instance.Get( parameter ) ?? PriorityAware.Default;
 	}
 
 	public class PriorityComparer : IComparer<IPriorityAware>

@@ -16,51 +16,10 @@ using Defaults = DragonSpark.Sources.Parameterized.Defaults;
 
 namespace DragonSpark.Composition
 {
-	/*public class ConventionExporter : ExportDescriptorProvider
-	{
-		readonly IParameterizedSource<Type, Type> candidates;
-
-		public ConventionExporter() : this( new ConventionCandidates() ) {}
-
-		public ConventionExporter( IParameterizedSource<Type, Type> candidates )
-		{
-			this.candidates = candidates;
-		}
-
-		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
-		{
-			CompositionDependency dependency;
-			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
-			{
-				var candidate = candidates.Get( contract.ContractType );
-				if ( candidate != null )
-				{
-					var convention = contract.ChangeType( candidate );
-
-					var result =
-						descriptorAccessor.TryResolveOptionalDependency( "Existing Convention Request", convention, true, out dependency )
-							? dependency.Target
-							: new ExportDescriptorPromise( convention, GetType().FullName, false, NoDependencies );
-
-					yield return result;
-				}
-			}
-			yield break;
-		}
-	}*/
-
-	/*public sealed class ConventionCandidates : FactoryCache<Type, Type>
-	{
-		public ConventionCandidates() : base( Specification ) {}
-
-		protected override Type Create( Type parameter ) => ConventionTypes.Instance.Get( parameter );
-	}*/
-
 	[ApplyAutoValidation]
 	public sealed class ConventionTypes : ValidatedParameterizedSourceBase<Type, Type>
 	{
 		readonly static ISpecification<Type> Specification = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
-		// readonly static Func<Type, ITypeCandidateWeightProvider> Weight = ParameterConstructor<Type, TypeCandidateWeightProvider>.Default;
 		readonly static Func<Type, bool> Activate = Defaults.ActivateSpecification.IsSatisfiedBy;
 
 		public static IParameterizedSource<Type, Type> Instance { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Global() );
@@ -83,13 +42,11 @@ namespace DragonSpark.Composition
 		Type Search( Type parameter )
 		{
 			var adapter = parameter.Adapt();
-			// var order = Weight( parameter );
 			var convention = IsConventionCandidateSpecification.Defaults.Get( parameter );
 			var result =
 					source.Get()
 					.Where( adapter.IsAssignableFrom )
 					.Where( Activate )
-					// .OrderByDescending( order.GetWeight )
 					.FirstOrDefault( convention );
 			return result;
 		}
@@ -111,30 +68,11 @@ namespace DragonSpark.Composition
 		public override bool IsSatisfiedBy( Type parameter ) => parameter.Name.Equals( name );
 	}
 
-	class ConventionCandidateNames : Cache<Type, string>
+	sealed class ConventionCandidateNames : Cache<Type, string>
 	{
 		public static ConventionCandidateNames Instance { get; } = new ConventionCandidateNames();
 		ConventionCandidateNames() : base( type => type.Name.TrimStartOf( 'I' ) ) {}
 	}
-
-	/*public interface ITypeCandidateWeightProvider
-	{
-		int GetWeight( Type candidate );
-	}
-
-	public class TypeCandidateWeightProvider : ParameterizedSourceBase<Type, int>, ITypeCandidateWeightProvider
-	{
-		readonly Type subject;
-
-		public TypeCandidateWeightProvider( Type subject )
-		{
-			this.subject = subject;
-		}
-
-		public override int Get( Type parameter ) => parameter.IsNested ? subject.GetTypeInfo().DeclaredNestedTypes.Contains( parameter.GetTypeInfo() ) ? 2 : -1 : 0;
-
-		public int GetWeight( Type candidate ) => Get( candidate );
-	}*/
 
 	public sealed class SelfAndNestedTypes : Cache<Type, IEnumerable<Type>>
 	{
@@ -167,21 +105,21 @@ namespace DragonSpark.Composition
 		public Type ImplementationType { get; }
 	}
 
-	public class ConventionImplementedInterfaces : FactoryCache<Type, Type>
+	public sealed class ConventionImplementedInterfaces : FactoryCache<Type, Type>
 	{
 		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces();
 		ConventionImplementedInterfaces() : this( typeof(ISource), typeof(IParameterizedSource), typeof(IValidatedParameterizedSource) ) {}
 
-		readonly ImmutableArray<Type> ignore;
+		readonly ImmutableArray<Type> exempt;
 
-		public ConventionImplementedInterfaces( params Type[] ignore )
+		public ConventionImplementedInterfaces( params Type[] exempt )
 		{
-			this.ignore = ignore.ToImmutableArray();
+			this.exempt = exempt.ToImmutableArray();
 		}
 
 		protected override Type Create( Type parameter )
 		{
-			foreach ( var @interface in parameter.GetTypeInfo().ImplementedInterfaces.Except( ignore.ToArray() )/*.Select( IsConventionCandidateSpecification.Defaults.Get )*/.ToArray() )
+			foreach ( var @interface in parameter.GetTypeInfo().ImplementedInterfaces.Except( exempt.ToArray() ).ToArray() )
 			{
 				var specification = IsConventionCandidateSpecification.Defaults.Get( @interface );
 				if ( specification( parameter ) )
@@ -193,7 +131,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class CanInstantiateSpecification : SpecificationBase<Type>
+	public sealed class CanInstantiateSpecification : SpecificationBase<Type>
 	{
 		public static ISpecification<Type> Instance { get; } = new CanInstantiateSpecification().Cached();
 		CanInstantiateSpecification() {}
