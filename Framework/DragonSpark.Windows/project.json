@@ -1,6 +1,5 @@
 ﻿{
   "dependencies": {
-    "EnterpriseLibrary.ExceptionHandling": "6.0.1304.0",
     "EntityFramework": "6.1.3",
     "Moq": "4.5.21",
     "Serilog.Sinks.ColoredConsole": "2.0.0",

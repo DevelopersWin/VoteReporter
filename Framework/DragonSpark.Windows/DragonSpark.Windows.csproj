@@ -122,8 +122,6 @@
     <Compile Include="Runtime\LogicalStore.cs" />
     <Compile Include="Runtime\ThreadDataStore.cs" />
     <Compile Include="Setup\FileConfigurationFactory.cs" />
-    <Compile Include="Setup\ExceptionPolicyDefinition.cs" />
-    <Compile Include="Setup\ExceptionPolicyEntry.cs" />
     <Compile Include="Markup\AssemblyVersionExtension.cs" />
     <Compile Include="Markup\ClrMemberMarkupProperty.cs" />
     <Compile Include="Markup\DependencyPropertyMarkupProperty.cs" />
@@ -142,15 +140,11 @@
     <Compile Include="Runtime\BindingOptions.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Runtime\ExceptionFormatter.cs" />
-    <Compile Include="Runtime\ApplicationExceptionFormatter.cs" />
-    <Compile Include="Runtime\ExceptionHandler.cs" />
     <Compile Include="Runtime\MetadataTypeDefinitionProvider.cs" />
     <Compile Include="Runtime\MemberInfoProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\ThreadLocalStorage.cs" />
     <Compile Include="Runtime\TaskLocalStore.cs" />
-    <Compile Include="Setup\SetupExceptionHandling.cs" />
     <Compile Include="TypeSystem\Class1.cs" />
   </ItemGroup>
   <ItemGroup>

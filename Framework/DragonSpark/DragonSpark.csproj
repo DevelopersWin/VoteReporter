@@ -36,6 +36,7 @@
     <Compile Include="Activation\SingletonAttribute.cs" />
     <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
     <Compile Include="Composition\Convention.cs" />
+    <Compile Include="Diagnostics\Exceptions\SetupExceptionHandling.cs" />
     <Compile Include="Diagnostics\Logging\AddSinkCommand.cs" />
     <Compile Include="Diagnostics\Logging\EnrichFromLogContextCommand.cs" />
     <Compile Include="Setup\ActivatedServiceSource.cs" />
