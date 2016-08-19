@@ -1,9 +1,6 @@
-using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logging;
-using Serilog;
 using Serilog.Configuration;
 
-namespace DragonSpark.Windows.Diagnostics
+namespace DragonSpark.Diagnostics.Logging
 {
 	public class EnrichFromLogContextCommand : EnrichCommandBase
 	{

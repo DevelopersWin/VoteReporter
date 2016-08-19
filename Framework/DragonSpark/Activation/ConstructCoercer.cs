@@ -2,6 +2,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,37 +62,14 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	/*class ParameterConstructor<T> : FactoryBase<object, T>
+	public sealed class ConstructingParameterLocator : ParameterizedSourceBase<Type, Type>
 	{
-		public static ParameterConstructor<T> Instance { get; } = new ParameterConstructor<T>();
-		ParameterConstructor() : this( typeof(T) ) {}
+		public static ConstructingParameterLocator Instance { get; } = new ConstructingParameterLocator();
+		ConstructingParameterLocator() {}
 
-		// readonly static Coerce<T> Coerce = InstanceCoercer<T>.Instance.ToDelegate();
-
-		// readonly IActivator activator;
-		readonly Type resultType;
-		// readonly Coerce<T> coercer;
-
-		public ParameterConstructor( Type resultType ) /*: this( Constructor.Instance, resultType, Coerce )#1#
-		{
-			this.resultType = resultType;
-		}
-
-		/*protected ParameterConstructor( IActivator activator, Type resultType, Coerce<T> coercer )
-		{
-			this.activator = activator;
-			this.resultType = resultType;
-			// this.coercer = coercer;
-		}#1#
-
-		public override T Create( object parameter )
-		{
-			
-			/*var constructed = activator.Construct<object>( resultType, parameter );
-			var result = coercer( constructed );
-			return result;#1#
-		}
-	}*/
+		public override Type Get( Type parameter ) => 
+			InstanceConstructors.Instance.Get( parameter.GetTypeInfo() ).Select( info => info.GetParameterTypes() ).SingleOrDefault( types => types.Length == 1 )?.Single();
+	}
 
 	public class SourceCoercer<T> : ICoercer<T>
 	{

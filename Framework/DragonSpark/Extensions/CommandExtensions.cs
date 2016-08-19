@@ -1,7 +1,8 @@
 ﻿using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using System;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
 using ICommand = System.Windows.Input.ICommand;
 
 namespace DragonSpark.Extensions
@@ -30,11 +31,19 @@ namespace DragonSpark.Extensions
 		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, T parameter ) => new FixedCommand<T>( @this, parameter );
 		
 		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => DelegateCache<T>.Default.Get( @this );
-		class DelegateCache<T> : Cache<ICommand<T>, Action<T>>
+		sealed class DelegateCache<T> : Cache<ICommand<T>, Action<T>>
 		{
 			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
 
 			DelegateCache() : base( command => command.Execute ) {}
+		}
+
+		public static ITransformer<T> ToTransformer<T>( this ICommand<T> @this ) => Transformers<T>.Default.Get( @this );
+		sealed class Transformers<T> : Cache<ICommand<T>, ITransformer<T>>
+		{
+			public static Transformers<T> Default { get; } = new Transformers<T>();
+
+			Transformers() : base( command => new ConfiguringTransformer<T>( command.ToDelegate() ) ) {}
 		}
 
 		/*public static ICommand<T> WithAutoValidation<T>( this ICommand<T> @this ) => AutoValidationCache<T>.Default.Get( @this );

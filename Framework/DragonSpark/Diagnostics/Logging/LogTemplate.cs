@@ -1,9 +1,11 @@
+using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.TypeSystem;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -93,7 +95,7 @@ namespace DragonSpark.Diagnostics.Logging
 	public sealed class Logger : ConfigurableParameterizedFactoryBase<LoggerConfiguration, ILogger>
 	{
 		public static IParameterizedSource<ILogger> Instance { get; } = new Logger().ToCache();
-		Logger() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Instance.ToDelegate().Wrap(), ( configuration, parameter ) => configuration.CreateLogger().ForSource( parameter ) ) {}
+		Logger() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Instance.ToDelegate().Wrap(), ( configuration, parameter ) => configuration.CreateLogger().ForContext( Constants.SourceContextPropertyName, parameter, true ) ) {}
 	}
 
 	public sealed class LoggingHistory : Scope<LoggerHistorySink>
@@ -129,9 +131,33 @@ namespace DragonSpark.Diagnostics.Logging
 		}
 	}
 
+	sealed class FormatterConfiguration : TransformerBase<LoggerConfiguration>
+	{
+		readonly static Func<object, object> Formatter = DragonSpark.Diagnostics.Formatter.Instance.Format;
+
+		public static FormatterConfiguration Instance { get; } = new FormatterConfiguration();
+		FormatterConfiguration() {}
+
+		public override LoggerConfiguration Get( LoggerConfiguration parameter )
+		{
+			foreach ( var type in KnownTypes.Instance.Get<IFormattable>() )
+			{
+				var located = ConstructingParameterLocator.Instance.Get( type );
+				if ( located != null )
+				{
+					parameter.Destructure.ByTransformingWhere( new TypeAssignableSpecification( located ).IsSatisfiedBy, Formatter );
+				}
+			}
+
+			return parameter;
+		}
+	}
+
 	public abstract class LoggerConfigurationSourceBase : ConfigurationSource<LoggerConfiguration>
 	{
-		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( ControllerTransform.Instance, CreatorFilterTransformer.Instance ) ) {}
+		readonly static ITransformer<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Instance.ToTransformer();
+
+		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Instance, ControllerTransform.Instance, CreatorFilterTransformer.Instance ) ) {}
 
 		sealed class ControllerTransform : TransformerBase<LoggerConfiguration>
 		{

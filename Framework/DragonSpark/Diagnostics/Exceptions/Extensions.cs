@@ -2,7 +2,7 @@ using System;
 
 namespace DragonSpark.Diagnostics.Exceptions
 {
-	public static class ExceptionSupport
+	public static class Extensions
 	{
 		public static void Process( this IExceptionHandler target, Exception exception )
 		{

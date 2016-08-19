@@ -339,14 +339,14 @@ namespace DragonSpark.Setup
 
 		SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Instance.Get( assemblies ) ) {}
 
-		public SystemParts( IEnumerable<Type> types ) : this( types.ToImmutableArray() ) {}
+		public SystemParts( IEnumerable<Type> types ) : this( types.ToArray() ) {}
 
-		SystemParts( ImmutableArray<Type> types ) : this( types.AsEnumerable().Assemblies().ToImmutableArray(), types ) {}
+		SystemParts( Type[] types ) : this( types.Assemblies().ToImmutableArray(), types.ToImmutableArray() ) {}
 
 		SystemParts( ImmutableArray<Assembly> assemblies, ImmutableArray<Type> types )
 		{
 			Assemblies = assemblies;
-			Types = types/*.AsEnumerable().Prioritize().ToImmutableArray()*/;
+			Types = types;
 		}
 
 		public ImmutableArray<Assembly> Assemblies { get; }
@@ -428,8 +428,7 @@ namespace DragonSpark.Setup
 	public class AssignSystemPartsCommand : DecoratedCommand
 	{
 		public AssignSystemPartsCommand( params Type[] types ) : this( types.AsEnumerable() ) {}
-		
-		public AssignSystemPartsCommand( ITypeSource types ) : this( types.AsEnumerable() ) {}
+		//public AssignSystemPartsCommand( ITypeSource types ) : this( types.AsEnumerable() ) {}
 		public AssignSystemPartsCommand( IEnumerable<Type> types ) : this( SystemPartsFactory.Instance.Get( types ) ) {}
 		AssignSystemPartsCommand( SystemParts value ) : base( ApplicationParts.Instance.Configured( value ).Cast<object>() ) {}
 	}

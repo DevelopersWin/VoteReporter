@@ -1,16 +1,15 @@
-using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.TypeSystem
 {
@@ -19,7 +18,7 @@ namespace DragonSpark.TypeSystem
 		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToSpecificationDelegate();
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
 		readonly Func<Type, bool> isAssignableFrom;
-
+		
 		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
 		readonly Func<Type, Type[]> getTypeArguments;
 		public TypeAdapter( [Required]Type type ) : this( type, type.GetTypeInfo() ) {}
@@ -48,11 +47,12 @@ namespace DragonSpark.TypeSystem
 
 		//[Freeze]
 		// public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
+
 		
 		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
-				Info.DeclaredConstructors
-					.Introduce( parameterTypes, tuple => tuple.Item1.IsPublic && !tuple.Item1.IsStatic && CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
-					.SingleOrDefault();
+				InstanceConstructors.Instance.Get( Info )
+				.Introduce( parameterTypes, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
+				.SingleOrDefault();
 
 		public bool IsAssignableFrom( Type other ) => isAssignableFrom( other );
 		bool IsAssignableFromBody( Type parameter ) => Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( Type ) || Info.IsAssignableFrom( parameter.GetTypeInfo() );
@@ -169,5 +169,11 @@ namespace DragonSpark.TypeSystem
 
 		public MethodInfo InterfaceMethod { get; }
 		public MethodInfo MappedMethod { get; }
+	}
+
+	class InstanceConstructors : ArgumentCache<TypeInfo, ImmutableArray<ConstructorInfo>>
+	{
+		public static InstanceConstructors Instance { get; } = new InstanceConstructors();
+		InstanceConstructors() : base( info => info.DeclaredConstructors.Where( constructorInfo => constructorInfo.IsPublic && !constructorInfo.IsStatic ).ToImmutableArray() ) {}
 	}
 }

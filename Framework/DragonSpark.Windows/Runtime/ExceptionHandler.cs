@@ -1,8 +1,6 @@
-using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Exceptions;
 using Microsoft.Practices.EnterpriseLibrary.ExceptionHandling;
 using System;
-using DragonSpark.Diagnostics.Exceptions;
-using IExceptionHandler = DragonSpark.Diagnostics.Exceptions.IExceptionHandler;
 
 namespace DragonSpark.Windows.Runtime
 {

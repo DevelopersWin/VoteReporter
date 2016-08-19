@@ -78,7 +78,7 @@ namespace DragonSpark.Composition
 		}
 	}*/
 
-	public class ExportProvider : IExportProvider
+	public sealed class ExportProvider : IExportProvider
 	{
 		readonly CompositionContext context;
 		public ExportProvider( CompositionContext context )
@@ -98,9 +98,6 @@ namespace DragonSpark.Composition
 
 		public CompositionContext Host { get; }
 
-		/*protected override IEnumerable<object> DoGetAllInstances(Type serviceType) => Host.GetExports( serviceType, null );
-
-		protected override object DoGetInstance(Type serviceType, string key) => Host.TryGet<object>( serviceType, key );*/
-		public object GetService( Type serviceType ) => Host.TryGet<object>( serviceType, null );
+		public object GetService( Type serviceType ) => Host.TryGet<object>( serviceType );
 	}
 }

@@ -40,20 +40,6 @@ namespace DragonSpark.Diagnostics.Logging
 		protected override void Configure( LoggerSinkConfiguration configuration ) => configuration.TextWriter( Writer, RestrictedToMinimumLevel, OutputTemplate, FormatProvider );
 	}
 
-	public abstract class AddSinkCommand : LoggerConfigurationCommandBase<LoggerSinkConfiguration>
-	{
-		protected AddSinkCommand() : this( LogEventLevel.Verbose ) {}
-
-		protected AddSinkCommand( LogEventLevel restrictedToMinimumLevel ) : base( configuration => configuration.WriteTo )
-		{
-			RestrictedToMinimumLevel = restrictedToMinimumLevel;
-		}
-
-		public IFormatProvider FormatProvider { get; set; }
-
-		public LogEventLevel RestrictedToMinimumLevel { get; set; }
-	}
-
 	public abstract class MinimumLevelCommandBase : LoggerConfigurationCommandBase<LoggerMinimumLevelConfiguration>
 	{
 		protected MinimumLevelCommandBase() : base( configuration => configuration.MinimumLevel ) {}
@@ -157,17 +143,17 @@ namespace DragonSpark.Diagnostics.Logging
 		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ToMaximumDepth( MaximumDepth );
 	}
 
-	public abstract class DestructureByTranformingCommandBase<T> : DestructureCommandBase
+	public abstract class DestructureByTransformingCommandBase<T> : DestructureCommandBase
 	{
-		protected DestructureByTranformingCommandBase( [Required]IValidatedParameterizedSource<T, object> factory )
+		protected DestructureByTransformingCommandBase( [Required]IParameterizedSource<T, object> source )
 		{
-			Factory = factory;
+			Source = source;
 		}
 
 		[Required]
-		public IValidatedParameterizedSource<T, object> Factory { [return: Required]get; set; }
+		public IParameterizedSource<T, object> Source { [return: Required]get; set; }
 
-		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming<T>( Factory.Get );
+		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming<T>( /*Factory.IsSatisfiedBy,*/ Source.Get );
 	}
 
 	public abstract class FilterCommandBase : LoggerConfigurationCommandBase<LoggerFilterConfiguration>
@@ -180,7 +166,7 @@ namespace DragonSpark.Diagnostics.Logging
 	{
 		public DeclarativeCollection<ILogEventFilter> Items { get; } = new DeclarativeCollection<ILogEventFilter>();
 
-		protected override void Configure( LoggerFilterConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Items ) );
+		protected override void Configure( LoggerFilterConfiguration configuration ) => configuration.With( Items.Fixed() );
 	}
 
 	public class FilterByIncludingOnlyCommand : FilterBySpecificationCommandBase
@@ -239,18 +225,14 @@ namespace DragonSpark.Diagnostics.Logging
 
 	public abstract class LoggerConfigurationCommandBase<T> : CommandBase<LoggerConfiguration>
 	{
-		readonly Func<LoggerConfiguration, T> transform;
+		readonly Func<LoggerConfiguration, T> projection;
 
-		protected LoggerConfigurationCommandBase( Func<LoggerConfiguration, T> transform )
+		protected LoggerConfigurationCommandBase( Func<LoggerConfiguration, T> projection )
 		{
-			this.transform = transform;
+			this.projection = projection;
 		}
 
-		public sealed override void Execute( LoggerConfiguration parameter )
-		{
-			var transformed = transform( parameter );
-			Configure( transformed );
-		}
+		public sealed override void Execute( LoggerConfiguration parameter ) => Configure( projection( parameter ) );
 
 		protected abstract void Configure( T configuration );
 	}

@@ -4,11 +4,7 @@
     "EntityFramework": "6.1.3",
     "Moq": "4.5.21",
     "Serilog.Sinks.ColoredConsole": "2.0.0",
-    "Serilog.Sinks.File": "2.2.0",
-    "Serilog.Sinks.PeriodicBatching": "2.0.0",
     "Serilog.Sinks.RollingFile": "2.2.0",
-    "Serilog.Sinks.Seq": "2.0.0",
-    "Serilog.Sinks.TextWriter": "2.0.0",
     "Serilog.Sinks.Trace": "2.0.0"
   },
   "frameworks": {

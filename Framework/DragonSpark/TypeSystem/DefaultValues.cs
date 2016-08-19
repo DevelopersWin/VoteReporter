@@ -1,11 +1,11 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 using Activator = System.Activator;
 
 namespace DragonSpark.TypeSystem
@@ -39,7 +39,7 @@ namespace DragonSpark.TypeSystem
 
 	public static class SpecialValues
 	{
-		public static object Null { get; } = new object();
+		// public static object Null { get; } = new object();
 
 		public static T DefaultOrEmpty<T>() => Default<T>.Instance;
 
@@ -55,6 +55,8 @@ namespace DragonSpark.TypeSystem
 		public static Func<T, object> Object { get; } = t => t;
 
 		public static Func<T> Default { get; } = () => default(T);
+
+		// public static Func<object, T> Wrapped { get; } = _ => default(T);
 	}
 
 	public static class Items<T>

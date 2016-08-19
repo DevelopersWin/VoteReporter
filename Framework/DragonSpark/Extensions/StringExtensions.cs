@@ -21,11 +21,7 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static string TrimStartOf( this string @this, params char[] chars )
-		{
-			var result = chars.Select( c => c.ToString() ).Any( @this.StartsWith ) ? @this.Substring( 1 ) : @this;
-			return result;
-		}
+		public static string TrimStartOf( this string @this, params char[] chars ) => chars.Select( c => c.ToString() ).Any( @this.StartsWith ) ? @this.Substring( 1 ) : @this;
 	}
 
 	// ATTRIBUTION: http://stackoverflow.com/questions/773303/splitting-camelcase
@@ -47,7 +43,7 @@ namespace DragonSpark.Extensions
 		public static string[] SplitCamelCase( this string input )
 		{
 			var separated = SplitCamelCaseRegex.Replace( input, @" $1" ).Trim();
-			var source = separated.Cast<char>().FirstOrDefault().With( c => char.IsLower( c ) ? char.ToUpper( c ) + separated.Substring( 1 ) : null ) ?? separated;
+			var source = separated.Cast<char>().FirstOrDefault().With( c => char.IsLower( c ) ? $"{char.ToUpper( c )}{separated.Substring( 1 )}" : null ) ?? separated;
 			var result = source.ToStringArray( ' ' );
 			return result;
 		}

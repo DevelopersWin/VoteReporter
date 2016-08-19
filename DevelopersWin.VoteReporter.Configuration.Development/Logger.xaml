@@ -15,7 +15,7 @@
 	<diagnosticsPlatform:AddConsoleSinkCommand />
 	<diagnosticsPlatform:AddTraceSinkCommand />
 
-	<diagnosticsPlatform:AddSeqSinkCommand Endpoint="http://localhost:5341" ApiKey="FHDZFBUt1z34o0j6L1iE" />
+	<logging:AddSeqSinkCommand Endpoint="http://localhost:5341" ApiKey="FHDZFBUt1z34o0j6L1iE" />
 	
 	<logging:EnrichCommand>
 		<process:ProcessIdEnricher />

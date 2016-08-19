@@ -36,6 +36,8 @@
     <Compile Include="Activation\SingletonAttribute.cs" />
     <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
     <Compile Include="Composition\Convention.cs" />
+    <Compile Include="Diagnostics\Logging\AddSinkCommand.cs" />
+    <Compile Include="Diagnostics\Logging\EnrichFromLogContextCommand.cs" />
     <Compile Include="Setup\ActivatedServiceSource.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Activation\SourceTypeLocator.cs" />
@@ -79,10 +81,9 @@
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStore.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
-    <Compile Include="Diagnostics\Exceptions\ExceptionSupport.cs" />
+    <Compile Include="Diagnostics\Exceptions\Extensions.cs" />
     <Compile Include="Diagnostics\Formatter.cs" />
     <Compile Include="Diagnostics\Logging\IProfiler.cs" />
-    <Compile Include="Diagnostics\Logging\LoggerFactory.cs" />
     <Compile Include="Diagnostics\Logging\LogTemplate.cs" />
     <Compile Include="Diagnostics\ProfilerFactory.cs" />
     <Compile Include="Diagnostics\Retry.cs" />
