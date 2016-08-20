@@ -86,7 +86,7 @@
     <Compile Include="Diagnostics\Formatter.cs" />
     <Compile Include="Diagnostics\Logging\LogTemplate.cs" />
     <Compile Include="Diagnostics\ProfilerFactory.cs" />
-    <Compile Include="Diagnostics\Retry.cs" />
+    <Compile Include="Diagnostics\Policies.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Extensions\MethodExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

@@ -110,6 +110,13 @@ namespace DragonSpark.Sources
 			Scopes() : base( cache => new Scope<T>( cache.Fix() ) ) {}
 		}
 
+		public static ISource<T> Fixed<T>( this ISource<T> @this ) => FixedSources<T>.Instance.Get( @this );
+
+		sealed class FixedSources<T> : Cache<ISource<T>, ISource<T>>
+		{
+			public static FixedSources<T> Instance { get; } = new FixedSources<T>();
+			FixedSources() : base( source => new FixedDeferedSource<T>( source.Get ) ) {}
+		}
 		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
 		class SourceDelegates<T> : Cache<ISource<ISource<T>>, Func<T>>
 		{
@@ -130,7 +137,6 @@ namespace DragonSpark.Sources
 
 
 		public static IEnumerable<T> GetEnumerable<T>( this ISource<ImmutableArray<T>> @this ) => EnumerableSource<T>.Sources.Get( @this )();
-
 		sealed class EnumerableSource<T> : SourceBase<IEnumerable<T>>
 		{
 			public static IParameterizedSource<ISource<ImmutableArray<T>>, Func<IEnumerable<T>>> Sources { get; } = new Cache<ISource<ImmutableArray<T>>, Func<IEnumerable<T>>>( s => new EnumerableSource<T>( s ).Get );

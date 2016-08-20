@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Diagnostics;
+using System.IO;
 
 namespace DragonSpark.Testing.Objects.Configuration
 {
@@ -9,7 +10,7 @@ namespace DragonSpark.Testing.Objects.Configuration
 	{
 		public Item()
 		{
-			RetryCommand.Instance.Execute( InitializeComponent );
+			Policies.Retry<IOException>( InitializeComponent );
 		}
 	}
 }

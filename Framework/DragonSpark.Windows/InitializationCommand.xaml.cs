@@ -12,7 +12,7 @@ namespace DragonSpark.Windows
 	public partial class InitializationCommand
 	{
 		public InitializationCommand() : base( 
-			DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured( TypeDefinitionProviderSource.Instance.Fix() ),
+			DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured( TypeDefinitionProviderSource.Instance.ToFixedDelegate() ),
 			DragonSpark.TypeSystem.Configuration.ApplicationAssemblyLocator.Configured( ApplicationAssemblyLocator.Instance.ToSourceDelegate().Fix() )
 			)
 		{

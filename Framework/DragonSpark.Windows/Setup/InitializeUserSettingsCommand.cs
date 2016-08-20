@@ -27,29 +27,29 @@ namespace DragonSpark.Windows.Setup
 	
 	public static class Defaults
 	{
-		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Instance.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).Fix();
+		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Instance.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).ToFixedDelegate();
 	}
 
 	public class ClearUserSettingCommand : DelegatedFixedCommand<FileInfo>
 	{
 		public static ClearUserSettingCommand Instance { get; } = new ClearUserSettingCommand();
-		ClearUserSettingCommand() : base( DeleteFileCommand.Instance.Self, Defaults.UserSettingsPath ) {}
+		ClearUserSettingCommand() : base( DeleteFileCommand.Instance.Get, Defaults.UserSettingsPath ) {}
 	}
 
 	[ApplyAutoValidation]
 	public class DeleteFileCommand : CommandBase<FileInfo>
 	{
-		public static DeleteFileCommand Instance { get; } = new DeleteFileCommand();
-		DeleteFileCommand() : this( RetryCommand.Instance ) {}
+		public static ISource<ICommand<FileInfo>> Instance { get; } = new Scope<ICommand<FileInfo>>( Factory.Global( () => new DeleteFileCommand() ) );
+		DeleteFileCommand() : this( RetryPolicyFactory<IOException>.Instance.ToCommand() ) {}
 
-		readonly RetryCommand retry;
+		readonly ICommand<Action> applyPolicy;
 
-		public DeleteFileCommand( RetryCommand retry ) : base( FileSystemInfoExistsSpecification.Instance )
+		public DeleteFileCommand( ICommand<Action> applyPolicy ) : base( FileSystemInfoExistsSpecification.Instance )
 		{
-			this.retry = retry;
+			this.applyPolicy = applyPolicy;
 		}
 
-		public override void Execute( FileInfo parameter ) => retry.Execute( parameter.Delete );
+		public override void Execute( FileInfo parameter ) => applyPolicy.Execute( parameter.Delete );
 	}
 
 	public sealed class FileSystemInfoExistsSpecification : SpecificationBase<FileSystemInfo>

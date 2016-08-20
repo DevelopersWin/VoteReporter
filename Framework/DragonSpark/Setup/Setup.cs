@@ -412,7 +412,7 @@ namespace DragonSpark.Setup
 
 		protected override IEnumerable<ICommand> Yield()
 		{
-			yield return GlobalServiceProvider.Instance.Configured( ServiceProviderFactory.Instance.Fix() );
+			yield return GlobalServiceProvider.Instance.Configured( ServiceProviderFactory.Instance.ToFixedDelegate() );
 		}
 	}
 
