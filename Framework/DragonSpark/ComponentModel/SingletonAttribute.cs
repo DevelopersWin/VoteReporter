@@ -20,7 +20,7 @@ namespace DragonSpark.ComponentModel
 		readonly Type hostType;
 		readonly IParameterizedSource<Type, object> provider;
 		
-		public SingletonDefaultValueProvider( Type hostType, string propertyName ) : this( Locator, hostType, new SingletonLocator( new SingletonDelegates( new SingletonSpecification( propertyName ) ).Get ) ) {}
+		public SingletonDefaultValueProvider( Type hostType, string propertyName ) : this( Locator, hostType, new SingletonLocator( new SingletonDelegates( new SingletonProperties( new SingletonSpecification( propertyName ) ) ).Get ) ) {}
 
 		public SingletonDefaultValueProvider( Func<Type, Type> locator, Type hostType, IParameterizedSource<Type, object> provider )
 		{

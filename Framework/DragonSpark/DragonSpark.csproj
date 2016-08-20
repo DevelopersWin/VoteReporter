@@ -84,7 +84,6 @@
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
     <Compile Include="Diagnostics\Exceptions\Extensions.cs" />
     <Compile Include="Diagnostics\Formatter.cs" />
-    <Compile Include="Diagnostics\Logging\IProfiler.cs" />
     <Compile Include="Diagnostics\Logging\LogTemplate.cs" />
     <Compile Include="Diagnostics\ProfilerFactory.cs" />
     <Compile Include="Diagnostics\Retry.cs" />
@@ -192,7 +191,6 @@
     <Compile Include="ComponentModel\SingletonAttribute.cs" />
     <Compile Include="ComponentModel\SourceAttribute.cs" />
     <Compile Include="Diagnostics\Diagnostics.cs" />
-    <Compile Include="Diagnostics\Exceptions\ExceptionFormatter.cs" />
     <Compile Include="Diagnostics\LoggerHistorySink.cs" />
     <Compile Include="Extensions\BuilderContextExtensions.cs" />
     <Compile Include="Extensions\ObjectMappingParameter.cs" />
@@ -233,9 +231,6 @@
     </Compile>
     <Compile Include="ComponentModel\ServicesValueBase.cs" />
     <Compile Include="ComponentModel\DefaultAttribute.cs" />
-    <Compile Include="Diagnostics\Exceptions\ApplicationExceptionFormatter.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Extensions\AttributeProviderExtensions.cs" />
     <Compile Include="Extensions\BooleanExtensions.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
@@ -281,7 +276,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Diagnostics\Exceptions\ExceptionHandlingResult.cs" />
-    <Compile Include="Diagnostics\Exceptions\IExceptionFormatter.cs" />
     <Compile Include="Diagnostics\Exceptions\IExceptionHandler.cs" />
     <Compile Include="Extensions\AssemblyExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs">

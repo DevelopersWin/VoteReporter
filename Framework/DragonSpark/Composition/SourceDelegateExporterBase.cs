@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -25,8 +24,6 @@ namespace DragonSpark.Composition
 		readonly Func<ActivatorParameter, object> resultSource;
 		readonly Func<CompositionContract, CompositionContract> resolver;
 
-		protected SourceDelegateExporterBase( Func<ActivatorParameter, object> resultSource ) : this( resultSource, Delegates<CompositionContract>.Self ) {}
-
 		protected SourceDelegateExporterBase( Func<ActivatorParameter, object> resultSource, Func<CompositionContract, CompositionContract> resolver )
 		{
 			this.resultSource = resultSource;
@@ -43,7 +40,7 @@ namespace DragonSpark.Composition
 				var sourceType = resolved
 					.With( compositionContract => new LocateTypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
 					.With( Locator );
-				var success = sourceType != null && descriptorAccessor.TryResolveOptionalDependency( "Factory Request", contract.ChangeType( sourceType ), true, out dependency );
+				var success = sourceType != null && descriptorAccessor.TryResolveOptionalDependency( "Source Request", contract.ChangeType( sourceType ), true, out dependency );
 				if ( success )
 				{
 					Register( descriptorAccessor, new[] { sourceType, Parameters( sourceType ) }.WhereAssigned().Select( resolved.ChangeType ).ToArray() );
@@ -83,7 +80,7 @@ namespace DragonSpark.Composition
 			protected virtual object Create( LifetimeContext context, CompositionOperation operation ) => context.Registered( activator( context, operation ) );
 		}
 
-		class SharedFactory : Factory
+		sealed class SharedFactory : Factory
 		{
 			readonly ICache<LifetimeContext, object> cache;
 			readonly string boundary;

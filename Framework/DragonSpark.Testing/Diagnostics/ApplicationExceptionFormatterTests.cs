@@ -1,8 +1,4 @@
-﻿using DragonSpark.Diagnostics.Exceptions;
-using DragonSpark.Testing.Framework;
-using DragonSpark.TypeSystem;
-using Ploeh.AutoFixture.Xunit2;
-using System;
+﻿using DragonSpark.Testing.Framework;
 using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
@@ -10,7 +6,7 @@ namespace DragonSpark.Testing.Diagnostics
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class ApplicationExceptionFormatterTests
 	{
-		[Theory, Framework.Setup.AutoData]
+		/*[Theory, Framework.Setup.AutoData]
 		public void Format( [Frozen]AssemblyInformation information, ApplicationExceptionFormatter sut, Exception exception )
 		{
 			var message = sut.Format( exception );
@@ -19,7 +15,7 @@ namespace DragonSpark.Testing.Diagnostics
 			Assert.Contains( information.Version.ToString(), message );
 			Assert.Contains( exception.GetType().ToString(), message );
 			Assert.Contains( exception.Message, message );
-		}
+		}*/
 
 		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void FormatException( [Frozen]AssemblyInformation information, Exception error, ApplicationExceptionFormatter sut )

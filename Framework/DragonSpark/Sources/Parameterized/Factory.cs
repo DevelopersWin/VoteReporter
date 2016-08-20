@@ -138,11 +138,10 @@ namespace DragonSpark.Sources.Parameterized
 
 			public override Type Get( LocateTypeRequest parameter )
 			{
-				var candidates = types.Introduce( parameter, tuple => tuple.Item1.Name == tuple.Item2.Name && tuple.Item1.ResultType.Adapt().IsAssignableFrom( tuple.Item2.RequestedType ) ).ToArray();
+				var candidates = types.Introduce( parameter, tuple => tuple.Item1.Name == tuple.Item2.Name && tuple.Item2.RequestedType.Adapt().IsAssignableFrom( tuple.Item1.ResultType ) ).ToArray();
+				var conventions = $"{parameter.RequestedType.Name}Source".Append( $"{parameter.RequestedType.Name}Factory" ).ToArray();
 				var item = 
-					candidates.Introduce( $"{parameter.RequestedType.Name}Source", info => info.Item1.RequestedType.Name == info.Item2 ).Only()
-					??
-					candidates.Introduce( $"{parameter.RequestedType.Name}Factory", info => info.Item1.RequestedType.Name == info.Item2 ).Only()
+					candidates.Introduce( conventions, info => info.Item2.Contains( info.Item1.RequestedType.Name ) ).Only()
 					??
 					candidates.Introduce( parameter, arg => arg.Item1.ResultType == arg.Item2.RequestedType ).FirstOrDefault()
 					??
@@ -157,7 +156,7 @@ namespace DragonSpark.Sources.Parameterized
 				readonly static Func<Type, Type> Results = ResultTypes.Instance.ToSourceDelegate();
 
 				public static Requests Instance { get; } = new Requests();
-				Requests() : base( CanInstantiateSpecification.Instance.And( Defaults.KnownSourcesSpecification, IsExportSpecification.Instance.Project( Projections.MemberType ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
+				Requests() : base( Defaults.ActivateSpecification.And( Defaults.KnownSourcesSpecification, IsExportSpecification.Instance.Project( Projections.MemberType ).Or( ContainsExportedSingletonSpecification.Instance ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
 				public override FactoryTypeRequest Get( Type parameter ) => 
 					new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );

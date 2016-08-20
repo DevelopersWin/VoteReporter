@@ -7,8 +7,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	[Export, Shared]
-	public class AssemblyInformationFactory : ParameterizedSourceBase<Assembly, AssemblyInformation>
+	public sealed class AssemblyInformationFactory : ParameterizedSourceBase<Assembly, AssemblyInformation>
 	{
 		readonly static System.Type[] Attributes =
 		{
@@ -19,6 +18,10 @@ namespace DragonSpark.TypeSystem
 			typeof(AssemblyConfigurationAttribute),
 			typeof(AssemblyCopyrightAttribute)
 		};
+
+		[Export]
+		public static IParameterizedSource<Assembly, AssemblyInformation> Instance { get; } = new AssemblyInformationFactory();
+		AssemblyInformationFactory() {}
 
 		public override AssemblyInformation Get( Assembly parameter )
 		{

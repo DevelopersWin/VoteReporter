@@ -64,6 +64,19 @@ namespace DragonSpark.Composition
 		public override bool IsSatisfiedBy( MemberInfo parameter ) => parameter.IsDefined( typeof(ExportAttribute) );
 	}
 
+	public sealed class ContainsExportedSingletonSpecification : SpecificationBase<Type>
+	{
+		public static ContainsExportedSingletonSpecification Instance { get; } = new ContainsExportedSingletonSpecification();
+		ContainsExportedSingletonSpecification() {}
+
+		public override bool IsSatisfiedBy( Type parameter )
+		{
+			var propertyInfo = ExportedSingletonProperties.Instance.Get( parameter );
+			var result = propertyInfo != null && IsExportSpecification.Instance.IsSatisfiedBy( propertyInfo )/* && parameter.Adapt().IsAssignableFrom( propertyInfo.PropertyType )*/;
+			return result;
+		}
+	}
+
 	public struct SingletonExport
 	{
 		public SingletonExport( ImmutableArray<CompositionContract> contracts, Func<object> factory )
@@ -76,10 +89,16 @@ namespace DragonSpark.Composition
 		public Func<object> Factory { get; }
 	}
 
+	public sealed class ExportedSingletonProperties : SingletonProperties
+	{
+		public new static ExportedSingletonProperties Instance { get; } = new ExportedSingletonProperties();
+		ExportedSingletonProperties() : base( SingletonSpecification.Instance.And( IsExportSpecification.Instance.Project<SingletonRequest, PropertyInfo>( request => request.Candidate ) ) ) {}
+	}
+
 	sealed class SingletonExports : SingletonDelegates<SingletonExport>
 	{
 		public static SingletonExports Instance { get; } = new SingletonExports();
-		SingletonExports() : base( SingletonSpecification.Instance.And( IsExportSpecification.Instance.Project<SingletonRequest, PropertyInfo>( request => request.Candidate ) ), new Factory().Get ) {}
+		SingletonExports() : base( ExportedSingletonProperties.Instance.Get, new Factory().Get ) {}
 
 		sealed class Factory : ParameterizedSourceBase<PropertyInfo, SingletonExport>
 		{

@@ -201,33 +201,52 @@ namespace DragonSpark.Activation
 	public class SingletonDelegates : SingletonDelegates<Func<object>>
 	{
 		public static SingletonDelegates Instance { get; } = new SingletonDelegates();
-		SingletonDelegates() : this( SingletonSpecification.Instance ) {}
-		public SingletonDelegates( ISpecification<SingletonRequest> specification ) : this( specification, SingletonDelegateCache.Instance.Get ) {}
-		public SingletonDelegates( ISpecification<SingletonRequest> specification, Func<PropertyInfo, Func<object>> source ) : base( specification, source ) {}
+		SingletonDelegates() : this( SingletonProperties.Instance ) {}
+		public SingletonDelegates( IParameterizedSource<Type, PropertyInfo> source ) : base( source.ToSourceDelegate(), SingletonDelegateCache.Instance.Get ) {}
+		// public SingletonDelegates( ISpecification<SingletonRequest> specification, Func<PropertyInfo, Func<object>> source ) : base( specification, source ) {}
 	}
 
 	public class SingletonDelegates<T> : FactoryCache<Type, T>
 	{
-		readonly ISpecification<SingletonRequest> specification;
+		readonly Func<Type, PropertyInfo> propertySource;
 		readonly Func<PropertyInfo, T> source;
 
-		public SingletonDelegates( ISpecification<SingletonRequest> specification, Func<PropertyInfo, T> source )
+		public SingletonDelegates( Func<Type, PropertyInfo> propertySource, Func<PropertyInfo, T> source )
 		{
-			this.specification = specification;
+			this.propertySource = propertySource;
 			this.source = source;
 		}
 
 		protected override T Create( Type parameter )
 		{
+			var property = propertySource( parameter );
+			var result = property != null ? source( property ) : default(T);
+			return result;
+		}
+	}
+
+	public class SingletonProperties : ParameterizedSourceBase<Type, PropertyInfo>
+	{
+		public static IParameterizedSource<Type, PropertyInfo> Instance { get; } = new SingletonProperties().ToCache();
+		SingletonProperties() : this( SingletonSpecification.Instance ) {}
+
+		readonly ISpecification<SingletonRequest> specification;
+
+		public SingletonProperties( ISpecification<SingletonRequest> specification )
+		{
+			this.specification = specification;
+		}
+
+		public override PropertyInfo Get( Type parameter )
+		{
 			foreach ( var property in parameter.GetTypeInfo().DeclaredProperties.Fixed() )
 			{
 				if ( specification.IsSatisfiedBy( new SingletonRequest( parameter, property ) ) )
 				{
-					var result = source( property );
-					return result;
+					return property;
 				}
 			}
-			return default(T);
+			return null;
 		}
 	}
 
