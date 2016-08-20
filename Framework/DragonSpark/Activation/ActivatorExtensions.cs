@@ -84,10 +84,12 @@ namespace DragonSpark.Activation
 
 		sealed class Locator : LocatorBase
 		{
+			readonly static Func<Type, Type> Types = ConventionTypes.Instance.Get;
+
 			readonly Func<Type, Type> convention;
 			readonly ISingletonLocator singleton;
 
-			public Locator() : this( ConventionTypes.Instance.Get, SingletonLocator.Instance ) {}
+			public Locator() : this( Types, SingletonLocator.Instance ) {}
 
 			Locator( Func<Type, Type> convention, ISingletonLocator singleton )
 			{

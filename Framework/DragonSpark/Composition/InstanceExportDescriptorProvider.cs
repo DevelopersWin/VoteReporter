@@ -60,10 +60,12 @@ namespace DragonSpark.Composition
 	// https://github.com/dotnet/corefx/issues/6857
 	public class TypeInitializingExportDescriptorProvider : ExportDescriptorProvider
 	{
-		readonly Func<Type, Type> types;
 		readonly static Action<Type> Initializer = InitializeTypeCommand.Instance.ToDelegate();
+		readonly static Func<Type, Type> Types = ConventionTypes.Instance.Get;
 
-		public TypeInitializingExportDescriptorProvider() : this( ConventionTypes.Instance.Get ) {}
+		readonly Func<Type, Type> types;
+
+		public TypeInitializingExportDescriptorProvider() : this( Types ) {}
 
 		TypeInitializingExportDescriptorProvider( Func<Type, Type> types )
 		{

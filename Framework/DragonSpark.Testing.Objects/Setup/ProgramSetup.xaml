@@ -9,19 +9,8 @@
 	mc:Ignorable="d"
 >
 	<setup:ApplyTaskMonitorCommand />
-	<!--<commands:SetupUnityCommand>
-		<commands:ConfigureUnityCommand.Types>
-			<commands:UnityType RegistrationType="{x:Type localSetup:ITyper}" MapTo="{x:Type localSetup:SomeTypeist}" />
-		</commands:ConfigureUnityCommand.Types>
-	</commands:SetupUnityCommand>-->
 	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Instance}">
 		<runtime:ApplicationInformation DeploymentDate="2/1/2016" CompanyUri="http://framework.dragonspark.us/testing" />
 	</commands:DeclaredFixedCommand>
-	
-	<!--<registration:RegisterFromMetadataCommand />-->
-	<!--<commands:ConfigureUnityCommand>
-		
-	</commands:ConfigureUnityCommand>-->
-	<!--<commands:InitializeModulesCommand />-->
 	<commands:RunProgramCommand />
 </setup:Setup>
