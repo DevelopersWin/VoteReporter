@@ -76,13 +76,6 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( sinkOne.Events.Count() > current );
 		}
 
-		/*[Fact, MinimumLevel( LogEventLevel.Debug )]
-		public void BasicComposeAgainFact()
-		{
-			TaskContext.Instance.Value.Verify();
-			Debugger.Break();
-		}*/
-
 		[Theory, AutoData, Types]
 		public void BasicComposition( [Service]CompositionContext host, string text, ILogger logger )
 		{

@@ -1,9 +1,3 @@
-using DragonSpark.Runtime;
-using DragonSpark.Sources;
-using Serilog;
-using System;
-using System.Diagnostics;
-
 namespace DragonSpark.Diagnostics
 {
 	// public delegate void EmitProfileEvent( string name );
@@ -145,7 +139,7 @@ namespace DragonSpark.Diagnostics
 		public T Tracker { get; }
 	}*/
 
-	public class Timer : TimerBase
+	/*public class Timer : TimerBase
 	{
 		readonly static Stopwatch Stopwatch = Stopwatch.StartNew();
 
@@ -192,7 +186,7 @@ namespace DragonSpark.Diagnostics
 			Update();
 			base.OnDispose();
 		}
-	}
+	}*/
 
 	/*public class TimerEventHandler : ProjectedCommand<string>
 	{

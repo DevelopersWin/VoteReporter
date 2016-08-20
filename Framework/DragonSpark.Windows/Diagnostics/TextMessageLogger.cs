@@ -1,11 +1,25 @@
 using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
+using Serilog.Exceptions;
+using Serilog.Exceptions.Destructurers;
+using System.Composition;
 
 namespace DragonSpark.Windows.Diagnostics
 {
+	public sealed class ApplyExceptionDetails : TransformerBase<LoggerConfiguration>
+	{
+		[Export( typeof(ITransformer<LoggerConfiguration>) )]
+		public static ApplyExceptionDetails Instance { get; } = new ApplyExceptionDetails();
+		ApplyExceptionDetails() {}
+
+		public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.Enrich.WithExceptionDetails( new SuppliedAndExportedItems<IExceptionDestructurer>( ExceptionEnricher.DefaultDestructurers ) );
+	}
+
 	/*public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
 		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Instance.Create;

@@ -93,9 +93,9 @@ namespace DragonSpark.Configuration
 		public ConfigurationScope( params ITransformer<T>[] configurators ) : base( new ConfigurationSource<T>( configurators ).Global() ) {}
 	}
 
-	public class ConfigurationSource<T> : CompositeItemSource<ITransformer<T>>
+	public class ConfigurationSource<T> : SuppliedAndExportedItems<ITransformer<T>>
 	{
-		public ConfigurationSource( params ITransformer<T>[] configurators ) : base( new ItemSource<ITransformer<T>>( configurators ), ExportSource<ITransformer<T>>.Instance ) {}
+		public ConfigurationSource( params ITransformer<T>[] configurators ) : base( configurators ) {}
 	}
 
 	/*public abstract class ConfigurationSourceBase<TParameter, TConfiguration> : ParameterizedSourceBase<TParameter, ImmutableArray<ITransformer<TConfiguration>>>

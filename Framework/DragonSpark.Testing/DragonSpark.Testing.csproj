@@ -70,7 +70,6 @@
     <Compile Include="Composition\SourceExporterTests.cs" />
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
-    <Compile Include="Runtime\CacheTests.cs" />
     <Compile Include="Runtime\EnabledStateTests.cs" />
     <Compile Include="Runtime\Properties\EqualityCacheTests.cs" />
     <Compile Include="Runtime\PurgingCollectionTests.cs" />

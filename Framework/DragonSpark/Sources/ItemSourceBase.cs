@@ -44,6 +44,11 @@ namespace DragonSpark.Sources
 		protected override IEnumerable<T> Yield() => source().GetExports<T>( name ).AsEnumerable();
 	}
 
+	public class SuppliedAndExportedItems<T> : CompositeItemSource<T>
+	{
+		public SuppliedAndExportedItems( params T[] configurators ) : base( new ItemSource<T>( configurators ), ExportSource<T>.Instance ) {}
+	}
+
 	public class CompositeItemSource<T> : ItemSourceBase<T>
 	{
 		readonly ImmutableArray<IItemSource<T>> sources;

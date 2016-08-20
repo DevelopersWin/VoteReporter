@@ -1,0 +1,56 @@
+﻿using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Extensions;
+using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Windows.Diagnostics;
+using Serilog.Events;
+using Serilog.Exceptions.Destructurers;
+using System;
+using System.Collections.Generic;
+using System.Composition;
+using System.Linq;
+using Xunit;
+
+namespace DragonSpark.Windows.Testing.Diagnostics
+{
+	public class ExceptionDetailsTests
+	{
+		[Theory, AutoData, AdditionalTypes( typeof(ApplyExceptionDetails) ), FrameworkTypes, ContainingTypeAndNested]
+		public void DetailsWorkAsExpected( int number, string message )
+		{
+			var logger = Logger.Instance.Get( this );
+			logger.Information( new CustomException( number ), message );
+			var line = LoggingHistory.Instance.Get().Events.Single();
+			Assert.True( line.Properties.ContainsKey( "ExceptionDetail" ) );
+			var elements = line.Properties["ExceptionDetail"].To<DictionaryValue>().Elements;
+			Assert.Equal( 6, elements.Count );
+			Assert.Equal( number, elements[ elements.Keys.Single( value => (string)value.Value == "AwesomeNumber" ) ].To<ScalarValue>().Value );
+		}
+
+		class CustomException : Exception
+		{
+			public CustomException( int number )
+			{
+				Number = number;
+			}
+
+			public int Number { get; }
+		}
+
+		[Export( typeof(IExceptionDestructurer) )]
+		class Destructurer : ExceptionDestructurer
+		{
+			public override Type[] TargetTypes => typeof(CustomException).ToItem();
+
+			public override void Destructure( Exception exception, IDictionary<string, object> data, Func<Exception, IDictionary<string, object>> innerDestructure )
+			{
+				base.Destructure( exception, data, innerDestructure );
+
+				var custom = exception as CustomException;
+				if ( custom != null )
+				{
+					data.Add( "AwesomeNumber", custom.Number );
+				}
+			}
+		}
+	}
+}
