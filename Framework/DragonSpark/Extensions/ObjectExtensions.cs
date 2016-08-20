@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using DragonSpark.ComponentModel;
+﻿using DragonSpark.ComponentModel;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
 using System;
@@ -11,7 +10,7 @@ namespace DragonSpark.Extensions
 {
 	public static class ObjectExtensions
 	{
-		public static TResult Clone<TResult>( this TResult @this, Action<IMappingExpression> configure = null ) where TResult : class => @this.MapInto<TResult>( configure: configure );
+		// public static TResult Clone<TResult>( this TResult @this/*, Action<IMappingExpression> configure = null*/ ) where TResult : class => @this.MapInto<TResult>( /*configure: configure*/ );
 
 		public static MemberInfo GetMemberInfo( this Expression expression )
 		{

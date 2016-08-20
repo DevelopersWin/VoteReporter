@@ -3,7 +3,6 @@ using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Runtime;
 using System.Linq;
-using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
@@ -15,7 +14,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		{
 			Assert.Same( sut, FileSystemTypes.Instance );
 			var assemblies = sut.Get().AsEnumerable().Assemblies();
-			var specification = new ApplicationAssemblySpecification( typeof(ISource).Assembly.ToItem() );
+			var specification = ApplicationAssemblySpecification/*( typeof(ISource).Assembly.ToItem() )*/.Instance;
 
 			Assert.True( assemblies.All( specification.IsSatisfiedBy ) );
 		} 

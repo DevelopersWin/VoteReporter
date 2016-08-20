@@ -1,18 +1,21 @@
 using DragonSpark.Runtime.Specifications;
 using System;
+using System.Reflection;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation
 {
 	[AttributeUsage( AttributeTargets.Property )]
-	public class SingletonAttribute : Attribute {}
+	public sealed class SingletonAttribute : Attribute {}
 
-	public class ContainsSingletonSpecification : SpecificationBase<Type>
+	public sealed class ContainsSingletonSpecification : SpecificationBase<Type>
 	{
-		public static ContainsSingletonSpecification Instance { get; } = new ContainsSingletonSpecification( SingletonLocator.Instance );
+		public static ContainsSingletonSpecification Instance { get; } = new ContainsSingletonSpecification();
+		ContainsSingletonSpecification() : this( SingletonProperties.Instance ) {}
 
-		readonly ISingletonLocator locator;
+		readonly IParameterizedSource<Type, PropertyInfo> locator;
 
-		public ContainsSingletonSpecification( ISingletonLocator locator )
+		public ContainsSingletonSpecification( IParameterizedSource<Type, PropertyInfo> locator )
 		{
 			this.locator = locator;
 		}

@@ -339,7 +339,7 @@ namespace DragonSpark.Setup
 
 		SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Instance.Get( assemblies ) ) {}
 
-		public SystemParts( IEnumerable<Type> types ) : this( types.ToArray() ) {}
+		public SystemParts( IEnumerable<Type> types ) : this( types.Fixed() ) {}
 
 		SystemParts( Type[] types ) : this( types.Assemblies().ToImmutableArray(), types.ToImmutableArray() ) {}
 

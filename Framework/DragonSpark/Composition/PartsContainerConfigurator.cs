@@ -3,6 +3,7 @@ using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -11,7 +12,6 @@ using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using System.Reflection;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
@@ -106,15 +106,15 @@ namespace DragonSpark.Composition
 				.Select( Selector )
 				.WhereAssigned()
 				.Distinct( mapping => mapping.InterfaceType )
-				.ToDictionary( mapping => mapping.InterfaceType, mapping => mapping.ImplementationType );
+				;
 
-			foreach ( var mapping in mappings )
+			foreach ( var mapping in mappings.ToArray() )
 			{
-				var configure = parameter.ForType( mapping.Value )
+				var configure = parameter.ForType( mapping.ImplementationType )
 										 .Export()
-										 .Export( builder => builder.AsContractType( mapping.Key ) );
+										 .Export( builder => builder.AsContractType( mapping.InterfaceType ) );
 
-				var shared = parameter.GetCustomAttributes( mapping.Value, mapping.Value.GetTypeInfo() ).FirstOrDefaultOfType<SharedAttribute>();
+				var shared = AttributeSupport<SharedAttribute>.Local.Get( mapping.ImplementationType );
 				if ( shared != null )
 				{
 					if ( shared.SharingBoundary != null )

@@ -1,13 +1,11 @@
 using AutoMapper;
-using DragonSpark.Activation;
-using System;
 using System.Reflection;
 
 namespace DragonSpark.Extensions
 {
 	public static class Mappings
 	{
-		public static Action<IMappingExpression> OnlyProvidedValues() => x => x.ForAllMembers( expression => expression.Condition( o => o.IsAssigned() ) );
+		// public static Action<IMappingExpression> OnlyProvidedValues() => x => x.ForAllMembers( expression => expression.Condition( o => o.IsAssigned() ) );
 
 		public static IMapperConfigurationExpression IgnoreUnassignable( this IMapperConfigurationExpression @this )
 		{
@@ -23,11 +21,10 @@ namespace DragonSpark.Extensions
 			return @this;
 		}
 		
-		public static TResult MapInto<TResult>( this object source, TResult existing = null, Action<IMappingExpression> configure = null ) where TResult : class 
+		public static TResult MapInto<TResult>( this object source, TResult existing = null/*, Action<IMappingExpression> configure = null*/ ) where TResult : class 
 		{
-			var context = new ObjectMappingParameter<TResult>( source, existing, configure );
-			var factory = GlobalServiceProvider.GetService<ObjectMappingFactory<TResult>>() ?? ObjectMappingFactory<TResult>.Default.Get();
-			var result = factory.Get( context );
+			var context = new ObjectMappingParameter<TResult>( source, existing/*, configure*/ );
+			var result = ObjectMapper<TResult>.Default.Get( context );
 			return result;
 		}
 	}

@@ -1,12 +1,10 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects.Internals;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -17,9 +15,10 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly Func<Assembly, bool> specification;
 
-		public ApplicationAssemblyFilter() : this( ApplicationAssemblies.Instance.Get() ) {}
+		/*public ApplicationAssemblyFilter() : this( ApplicationAssemblies.Instance.Get() ) {}*/
 
-		public ApplicationAssemblyFilter( ImmutableArray<Assembly> assemblies ) : this( new ApplicationAssemblySpecification( assemblies.ToArray() ).IsSatisfiedBy ) {}
+		public static ApplicationAssemblyFilter Instance { get; } = new ApplicationAssemblyFilter();
+		ApplicationAssemblyFilter( /*ImmutableArray<Assembly> assemblies*/ ) : this( ApplicationAssemblySpecification.Instance.IsSatisfiedBy ) {}
 
 		ApplicationAssemblyFilter( Func<Assembly, bool> specification )
 		{
@@ -39,7 +38,10 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationAssemblySpecification : SpecificationBase<Assembly>
 	{
-		readonly ImmutableArray<string> rootNamespaces;
+		public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification();
+		ApplicationAssemblySpecification() {}
+
+		/*readonly ImmutableArray<string> rootNamespaces;
 
 		public ApplicationAssemblySpecification( IEnumerable<Assembly> assemblies ) : this( Determine( assemblies ) ) {}
 
@@ -48,8 +50,8 @@ namespace DragonSpark.TypeSystem
 			this.rootNamespaces = rootNamespaces;
 		}
 
-		static ImmutableArray<string> Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToImmutableArray();
+		static ImmutableArray<string> Determine( IEnumerable<Assembly> coreAssemblies ) => coreAssemblies.Append( typeof(ApplicationAssemblyFilter).Assembly() ).Distinct().Select( assembly => assembly.GetRootNamespace() ).ToImmutableArray();*/
 
-		public override bool IsSatisfiedBy( Assembly parameter ) => parameter.Has<RegistrationAttribute>() || rootNamespaces.Any( parameter.GetName().Name.StartsWith );
+		public override bool IsSatisfiedBy( Assembly parameter ) => parameter.Has<RegistrationAttribute>()/* || rootNamespaces.Any( parameter.GetName().Name.StartsWith )*/;
 	}
 }

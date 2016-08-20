@@ -35,7 +35,7 @@ namespace DragonSpark.Windows.Entity
 					var instance = current.Activate<object>( type );
 					if ( instance != item )
 					{
-						instance.MapInto( item, Mappings.OnlyProvidedValues() );
+						instance.MapInto( item/*, Mappings.OnlyProvidedValues()*/ );
 					}
 				}
 			}

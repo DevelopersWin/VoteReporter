@@ -1,7 +1,9 @@
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using DragonSpark.Activation;
 
 namespace DragonSpark.Sources
 {
@@ -35,9 +37,13 @@ namespace DragonSpark.Sources
 		public override T Get()
 		{
 			var context = scope.Get();
-			var factory = factories.Get( context ) ?? defaultFactory.Get();
-			var result = factory( context );
-			return result;
+			lock ( context )
+			{
+				var factory = factories.Get( context ) ?? defaultFactory.Get();
+				var result = factory( context );
+				var stop = context is ExecutionContext;
+				return result;
+			}
 		}
 
 		public void Assign( ISource item ) => scope.Assign( item );
