@@ -9,7 +9,6 @@ using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Windows.Properties;
 using Serilog;
-using Serilog.Events;
 using System;
 using System.Configuration;
 using System.IO;
@@ -67,14 +66,14 @@ namespace DragonSpark.Windows.Setup
 	[ApplyAutoValidation]
 	public class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
-		readonly LogCommand log;
+		readonly ILogger logger;
 		readonly Func<FileInfo> fileSource;
 
-		public InitializeUserSettingsCommand( ILogger logger ) : this( new LogCommand( logger ), Defaults.UserSettingsPath ) {}
+		public InitializeUserSettingsCommand( ILogger logger ) : this( logger, Defaults.UserSettingsPath ) {}
 
-		public InitializeUserSettingsCommand( LogCommand log, Func<FileInfo> fileSource ) : base( new OnlyOnceSpecification() )
+		public InitializeUserSettingsCommand( ILogger logger, Func<FileInfo> fileSource ) : base( new OnlyOnceSpecification() )
 		{
-			this.log = log;
+			this.logger = logger;
 			this.fileSource = fileSource;
 		}
 
@@ -82,24 +81,21 @@ namespace DragonSpark.Windows.Setup
 		{
 			var file = fileSource();
 			file.Refresh();
-			
-			var templates = new[]
-			{
-				!file.Exists ? (ILoggerTemplate)new NotFound( file.FullName ) : new Upgrading( file.FullName ),
-				Run( parameter, file )
-			};
 
-			templates.Each( log.Execute );
+			var command = file.Exists ? (ICommand<string>)new Upgrading( logger ) : new NotFound( logger );
+			command.Execute( file.FullName  );
+
+			Run( logger, parameter, file );
 		}
 
-		static ILoggerTemplate Run( ApplicationSettingsBase parameter, FileInfo file )
+		static void Run( ILogger logger, ApplicationSettingsBase parameter, FileSystemInfo file )
 		{
 			if ( !file.Exists )
 			{
-				var properties = EnumerableExtensions.Fixed<SettingsPropertyValue>( Enumerable.Cast<SettingsProvider>( parameter.Providers )
-																																																	  .Introduce( parameter, tuple => Enumerable.Cast<SettingsPropertyValue>( tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ) ) )
-																																																	  .Concat()
-																																																	  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ) );
+				var properties = parameter.Providers.Cast<SettingsProvider>()
+										  .Introduce( parameter, tuple => tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ).Cast<SettingsPropertyValue>() )
+										  .Concat()
+										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed();
 				var any = properties.Any();
 				if ( any )
 				{
@@ -114,44 +110,53 @@ namespace DragonSpark.Windows.Setup
 					}
 					catch ( ConfigurationErrorsException e )
 					{
-						return new ErrorSaving( e, file.FullName );
+						new ErrorSaving( logger ).Execute( e, file.FullName );
+						return;
 					}
 				}
-				return any ? (ILoggerTemplate)new Created( file.FullName ) : new NotSaved( parameter.GetType() );
+				if ( any )
+				{
+					new Created( logger ).Execute( file.FullName );
+				}
+				else
+				{
+					new NotSaved( logger ).Execute( parameter.GetType() );
+				}
+				return;
 			}
 
 			parameter.Upgrade();
-			return new Complete( file.FullName );
+			new Complete( logger ).Execute( file.FullName );
 		}
 
-		class ErrorSaving : ExceptionLoggerTemplate
+		class ErrorSaving : LogExceptionCommandBase<string>
 		{
-			public ErrorSaving( Exception exception, string path ) : base( exception, Resources.LoggerTemplates_ErrorSaving, path ) {}
+			public ErrorSaving( ILogger logger ) : base( logger, Resources.LoggerTemplates_ErrorSaving ) {}
 		}
 
-		class NotFound : LoggerTemplate
+		class NotFound : LogCommandBase<string>
 		{
-			public NotFound( string path ) : base( LogEventLevel.Warning, Resources.LoggerTemplates_NotFound, path ) {}
+			public NotFound( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotFound ) {}
 		}
 
-		class Created : LoggerTemplate
+		class Created : LogCommandBase<string>
 		{
-			public Created( string path ) : base( Resources.LoggerTemplates_Created, path ) {}
+			public Created( ILogger logger ) : base( logger, Resources.LoggerTemplates_Created ) {}
 		}
 
-		class NotSaved : LoggerTemplate
+		class NotSaved : LogCommandBase<Type>
 		{
-			public NotSaved( Type type ) : base( LogEventLevel.Warning, Resources.LoggerTemplates_NotSaved, type.AssemblyQualifiedName ) {}
+			public NotSaved( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotSaved ) {}
 		}
 
-		class Upgrading : LoggerTemplate
+		class Upgrading : LogCommandBase<string>
 		{
-			public Upgrading( string path ) : base( Resources.LoggerTemplates_Upgrading, path ) {}
+			public Upgrading( ILogger logger ) : base( logger, Resources.LoggerTemplates_Upgrading ) {}
 		}
 
-		class Complete : LoggerTemplate
+		class Complete : LogCommandBase<string>
 		{
-			public Complete( string path ) : base( Resources.LoggerTemplates_Complete, path ) {}
+			public Complete( ILogger logger ) : base( logger, Resources.LoggerTemplates_Complete ) {}
 		}
 	}
 }

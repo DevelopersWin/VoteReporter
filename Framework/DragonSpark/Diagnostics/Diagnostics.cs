@@ -1,9 +1,8 @@
 using DragonSpark.Runtime;
-using Serilog.Events;
+using DragonSpark.Sources;
+using Serilog;
 using System;
 using System.Diagnostics;
-using System.Linq;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Diagnostics
 {
@@ -86,7 +85,7 @@ namespace DragonSpark.Diagnostics
 			: base(	Template, profilerEvent.EventName, profilerEvent.Timer.Elapsed, profilerEvent.Tracker.Elapsed ) {}
 	}*/
 
-	public interface ILoggerExceptionTemplate : ILoggerTemplate
+	/*public interface ILoggerExceptionTemplate : ILoggerTemplate
 	{
 		Exception Exception { get; }
 	}
@@ -134,7 +133,7 @@ namespace DragonSpark.Diagnostics
 		public string Template { get; }
 
 		public object[] Parameters { get; }
-	}
+	}*/
 
 	/*public class TimerEvent<T> : TimerEvent where T : ITimer
 	{

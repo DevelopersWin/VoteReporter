@@ -29,9 +29,8 @@ namespace DragonSpark.Testing.Diagnostics
 			Assert.Same( serviceProvider.Get<ILogger>(), logger );
 
 			var method = new Action( Subject ).Method;
-			var command = new LogCommand( logger );
 
-			command.Execute( new HelloWorld( text, method ) );
+			new HelloWorld( logger ).Execute( text, method );
 			
 			var history = context.GetExport<ILoggerHistory>();
 			Assert.Same( serviceProvider.Get<ILoggerHistory>(), history );
@@ -57,9 +56,9 @@ namespace DragonSpark.Testing.Diagnostics
 
 		static void Subject() {}
 
-		class HelloWorld : LoggerTemplate
+		class HelloWorld : LogCommandBase<string, MethodBase>
 		{
-			public HelloWorld( string text, MethodBase method ) : base( "Hello World! {Text} - {Method}", text, method ) {}
+			public HelloWorld( ILogger logger ) : base( logger, "Hello World! {Text} - {@Method}" ) {}
 		}
 	}
 }

@@ -21,7 +21,7 @@ namespace DragonSpark.Diagnostics
 		public static ICommand<Action> ToCommand( this ISource<Policy> @this ) => Commands.Get( @this.Get() );
 	}
 
-	public sealed class RetryPolicyFactory<T> : SourceBase<Policy> where T : Exception
+	public class RetryPolicyFactory<T> : SourceBase<Policy> where T : Exception
 	{
 		public static ISource<Policy> Instance { get; } = new Scope<Policy>( Factory.Global( () => new RetryPolicyFactory<T>( new LogRetryException( Logger.Instance.ToScope().Get() ).Execute ).Get() ) );
 		
@@ -37,43 +37,17 @@ namespace DragonSpark.Diagnostics
 
 	public sealed class LogRetryException : LogExceptionCommandBase<TimeSpan>
 	{
-		public LogRetryException( ILogger logger ) : base( logger.Information, "Exception encountered during a retry-aware context.  Waiting {Wait} until next attempt..." ) {}
-	}
+		public LogRetryException( ILogger logger ) : this( logger.Information ) {}
 
-	public abstract class LogExceptionCommandBase<T> : CommandBase<ExceptionParameter<T>>
-	{
-		readonly Action<Exception, string, object[]> action;
-		readonly string messageTemplate;
-
-		protected LogExceptionCommandBase( Action<Exception, string, object[]> action, string messageTemplate )
-		{
-			this.action = action;
-			this.messageTemplate = messageTemplate;
-		}
-
-		public override void Execute( ExceptionParameter<T> parameter ) => action( parameter.Exception, messageTemplate, new object[] { parameter.Argument } );
-
-		public void Execute( Exception exception, T argument ) => Execute( new ExceptionParameter<T>( exception, argument ) );
-	}
-
-	public struct ExceptionParameter<T>
-	{
-		public ExceptionParameter( Exception exception, T argument )
-		{
-			Exception = exception;
-			Argument = argument;
-		}
-
-		public Exception Exception { get; }
-		public T Argument { get; }
+		public LogRetryException( LogException<TimeSpan> action ) : base( action, "Exception encountered during a retry-aware context.  Waiting {Wait} until next attempt..." ) {}
 	}
 
 	[ApplyAutoValidation]
-	public class ApplyPolicyCommand : CommandBase<Action>
+	public sealed class ApplyPolicyCommand : CommandBase<Action>
 	{
 		readonly Policy policy;
 
-		public ApplyPolicyCommand( Policy policy  )
+		public ApplyPolicyCommand( Policy policy )
 		{
 			this.policy = policy;
 		}
