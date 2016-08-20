@@ -45,10 +45,6 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Framework\DragonSpark.Windows\DragonSpark.Windows.csproj">
-      <Project>{B51D28D3-BC96-41EA-885F-F7BE1543D6F4}</Project>
-      <Name>DragonSpark.Windows</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Framework\DragonSpark\DragonSpark.csproj">
       <Project>{167df420-328c-4acc-abd0-42dbe268efdf}</Project>
       <Name>DragonSpark</Name>
