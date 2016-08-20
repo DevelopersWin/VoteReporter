@@ -5,6 +5,7 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Windows.Input;
 
@@ -103,11 +104,10 @@ namespace DragonSpark.Sources
 
 		public static IScope<T> ToScope<T>( this IParameterizedSource<object, T> @this ) => @this.ToSourceDelegate().ToScope();
 		public static IScope<T> ToScope<T>( this Func<object, T> @this ) => Scopes<T>.Default.Get( @this );
-
-		class Scopes<T> : Cache<Func<object, T>, IScope<T>>
+		sealed class Scopes<T> : Cache<Func<object, T>, IScope<T>>
 		{
 			public static Scopes<T> Default { get; } = new Scopes<T>();
-			Scopes() : base( cache => new Scope<T>( cache.Fix<object, T>() ) ) {}
+			Scopes() : base( cache => new Scope<T>( cache.Fix() ) ) {}
 		}
 
 		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
@@ -127,5 +127,22 @@ namespace DragonSpark.Sources
 				public override T Create() => source.Get().Get();
 			}
 		}*/
+
+
+		public static IEnumerable<T> GetEnumerable<T>( this ISource<ImmutableArray<T>> @this ) => EnumerableSource<T>.Sources.Get( @this )();
+
+		sealed class EnumerableSource<T> : SourceBase<IEnumerable<T>>
+		{
+			public static IParameterizedSource<ISource<ImmutableArray<T>>, Func<IEnumerable<T>>> Sources { get; } = new Cache<ISource<ImmutableArray<T>>, Func<IEnumerable<T>>>( s => new EnumerableSource<T>( s ).Get );
+
+			readonly ISource<ImmutableArray<T>> source;
+
+			EnumerableSource( ISource<ImmutableArray<T>> source )
+			{
+				this.source = source;
+			}
+
+			public override IEnumerable<T> Get() => source.Get().AsEnumerable();
+		}
 	}
 }

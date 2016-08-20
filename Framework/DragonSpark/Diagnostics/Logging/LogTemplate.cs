@@ -133,7 +133,7 @@ namespace DragonSpark.Diagnostics.Logging
 
 	sealed class FormatterConfiguration : TransformerBase<LoggerConfiguration>
 	{
-		readonly static Func<object, object> Formatter = DragonSpark.Diagnostics.Formatter.Instance.Format;
+		readonly static Func<object, object> Formatter = Diagnostics.Formatter.Instance.Format;
 
 		public static FormatterConfiguration Instance { get; } = new FormatterConfiguration();
 		FormatterConfiguration() {}
@@ -157,7 +157,7 @@ namespace DragonSpark.Diagnostics.Logging
 	{
 		readonly static ITransformer<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Instance.ToTransformer();
 
-		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Instance, ControllerTransform.Instance, CreatorFilterTransformer.Instance ) ) {}
+		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Instance, ControllerTransform.Instance, ApplicationAssemblyTransform.Instance ) ) {}
 
 		sealed class ControllerTransform : TransformerBase<LoggerConfiguration>
 		{
@@ -175,7 +175,17 @@ namespace DragonSpark.Diagnostics.Logging
 		}
 	}
 
-	sealed class CreatorFilterTransformer : TransformerBase<LoggerConfiguration>
+	sealed class ApplicationAssemblyTransform : TransformerBase<LoggerConfiguration>, ILogEventEnricher
+	{
+		public static ApplicationAssemblyTransform Instance { get; } = new ApplicationAssemblyTransform();
+		ApplicationAssemblyTransform() {}
+
+		public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.Enrich.With( this );
+
+		public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( nameof(AssemblyInformation), DefaultAssemblyInformationSource.Instance.Get(), true ) );
+	}
+
+	/*sealed class CreatorFilterTransformer : TransformerBase<LoggerConfiguration>
 	{
 		public static CreatorFilterTransformer Instance { get; } = new CreatorFilterTransformer();
 		CreatorFilterTransformer() {}
@@ -187,7 +197,7 @@ namespace DragonSpark.Diagnostics.Logging
 		public CreatorFilterTransformer( CreatorFilter filter )
 		{
 			this.filter = filter;
-		}*/
+		}#1#
 
 		public override LoggerConfiguration Get( LoggerConfiguration parameter )
 		{
@@ -196,42 +206,33 @@ namespace DragonSpark.Diagnostics.Logging
 			return result;
 		}
 
-		public sealed class CreatorFilter : DecoratedSpecification<LogEvent>, ILogEventEnricher, ILogEventFilter
+		sealed class CreatorFilter : SpecificationBase<LogEvent>, ILogEventEnricher, ILogEventFilter
 		{
 			const string CreatorId = nameof(CreatorId);
 			readonly Guid id;
 
 			public CreatorFilter() : this( Guid.NewGuid() ) {}
 
-			public CreatorFilter( Guid id ) : base( new CreatorSpecification( id ) )
+			CreatorFilter( Guid id )
 			{
 				this.id = id;
 			}
 			
 			public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( CreatorId, id ) );
 
-			sealed class CreatorSpecification : SpecificationBase<LogEvent>
-			{
-				readonly Guid id;
-				public CreatorSpecification( Guid id )
-				{
-					this.id = id;
-				}
-
-				public override bool IsSatisfiedBy( LogEvent parameter )
-				{
-					if ( parameter.Properties.ContainsKey( CreatorId ) )
-					{
-						var property = parameter.Properties[CreatorId] as ScalarValue;
-						var result = property != null && (Guid)property.Value == id;
-						return result;
-					}
-
-					return false;
-				}
-			}
-
 			public bool IsEnabled( LogEvent logEvent ) => IsSatisfiedBy( logEvent );
+
+			public override bool IsSatisfiedBy( LogEvent parameter )
+			{
+				if ( parameter.Properties.ContainsKey( CreatorId ) )
+				{
+					var property = parameter.Properties[CreatorId] as ScalarValue;
+					var result = property != null && (Guid)property.Value == id;
+					return result;
+				}
+
+				return false;
+			}
 		}
-	}
+	}*/
 }

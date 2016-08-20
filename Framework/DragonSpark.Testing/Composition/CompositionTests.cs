@@ -1,11 +1,13 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects.Composition;
+using DragonSpark.TypeSystem;
 using Serilog;
 using Serilog.Events;
 using System;
@@ -13,7 +15,6 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Diagnostics.Logging;
 using Xunit;
 using Xunit.Abstractions;
 using Parameter = DragonSpark.Testing.Objects.Composition.Parameter;
@@ -44,6 +45,13 @@ namespace DragonSpark.Testing.Composition
 			first.Information( "Testing this out." );
 			Assert.NotEmpty( sinkOne.Events );
 			Assert.True( sinkOne.Events.Count() > current );
+		}
+
+		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationFactory) )]
+		public void InterfaceExport( CompositionContext host )
+		{
+			Assert.Same( AssemblyInformationFactory.Instance, host.GetExport<IParameterizedSource<Assembly, AssemblyInformation>>() );
+			
 		}
 
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]

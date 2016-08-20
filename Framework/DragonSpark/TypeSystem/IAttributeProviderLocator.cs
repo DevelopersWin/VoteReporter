@@ -18,8 +18,6 @@ namespace DragonSpark.TypeSystem
 
 		protected TypeDefinitionProviderSource( params ITypeDefinitionProvider[] items ) : base( items.Append( ConventionTypeDefinitionProvider.Instance, Self.Instance ) ) {}
 
-		// protected override IEnumerable<ITypeDefinitionProvider> Yield() => base.Yield().Append(  );
-
 		sealed class Self : SelfTransformer<TypeInfo>, ITypeDefinitionProvider
 		{
 			public new static Self Instance { get; } = new Self();

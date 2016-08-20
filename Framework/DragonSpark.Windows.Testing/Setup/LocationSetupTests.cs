@@ -2,12 +2,12 @@
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
-using DragonSpark.Windows.Runtime;
 using DragonSpark.Windows.Testing.TestObjects;
 using Moq;
 using Ploeh.AutoFixture.Xunit2;
@@ -437,8 +437,8 @@ namespace DragonSpark.Windows.Testing.Setup
 			}
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly) )]
-		public void CreateAssembly( [Service]AssemblyInformationFactory factory, IServiceProvider container, [Service]Assembly sut )
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly), typeof(AssemblyInformationFactory) )]
+		public void CreateAssembly( [Service]IParameterizedSource<Assembly, AssemblyInformation> factory, IServiceProvider container, [Service]Assembly sut )
 		{
 			var fromFactory = ApplicationAssembly.Instance.Get();
 			var fromContainer = container.Get<Assembly>();

@@ -1,24 +1,12 @@
-using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using DragonSpark.Setup;
-using System;
-using System.Collections.Generic;
-using System.Composition;
-using System.IO;
-using System.Reflection;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public sealed class ApplicationAssembly : FixedFactory<IEnumerable<Assembly>, Assembly>
-	{
-		[Export]
-		public static ISource<Assembly> Instance { get; } = new Scope<Assembly>( Factory.Global( new ApplicationAssembly().Get ) );
-		ApplicationAssembly() : base( ApplicationAssemblyLocator.Instance.Get, ApplicationAssemblies.Instance.Get().AsEnumerable() ) {}
-	}
-
 	public sealed class ApplicationAssemblyLocator : ParameterizedSourceBase<IEnumerable<Assembly>, Assembly>
 	{
 		readonly Func<Assembly> defaultSource;

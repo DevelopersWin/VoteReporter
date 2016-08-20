@@ -62,7 +62,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotNull( command );
 		}*/
 
-		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationFactory), typeof(Windows.Runtime.ApplicationAssembly) )]
+		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationFactory), typeof(ApplicationAssembly) )]
 		public void Create( [EnsureValues, Service]ApplicationInformation sut, [Service]AssemblyInformation temp )
 		{
 			Assert.NotNull( sut.AssemblyInformation );

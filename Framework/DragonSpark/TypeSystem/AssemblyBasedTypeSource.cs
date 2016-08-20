@@ -10,6 +10,7 @@ using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -19,11 +20,17 @@ namespace DragonSpark.TypeSystem
 	public static class Configuration
 	{
 		public static IParameterizedScope<string, ImmutableArray<string>> AssemblyPathLocator { get; } = new ParameterizedScope<string, ImmutableArray<string>>( path => Items<string>.Immutable ).ScopedWithDefault();
-
 		public static IParameterizedScope<string, Assembly> AssemblyLoader { get; } = new ParameterizedScope<string, Assembly>( path => default(Assembly) ).ScopedWithDefault();
 
-		public static IScope<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = 
-			new Scope<ImmutableArray<ITypeDefinitionProvider>>( TypeDefinitionProviderSource.Instance.Get );
+		public static IParameterizedScope<IEnumerable<Assembly>, Assembly> ApplicationAssemblyLocator { get; } = new ParameterizedScope<IEnumerable<Assembly>, Assembly>( TypeSystem.ApplicationAssemblyLocator.Instance.Get );
+		public static IScope<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = new Scope<ImmutableArray<ITypeDefinitionProvider>>( TypeDefinitionProviderSource.Instance.Get );
+	}
+
+	public sealed class ApplicationAssembly : FixedFactory<IEnumerable<Assembly>, Assembly>
+	{
+		[Export]
+		public static ISource<Assembly> Instance { get; } = new Scope<Assembly>( Factory.Global( new ApplicationAssembly().Get ) );
+		ApplicationAssembly() : base( Configuration.ApplicationAssemblyLocator.Get, ApplicationAssemblies.Instance.GetEnumerable ) {}
 	}
 
 	public abstract class PartsBase : FactoryCache<Assembly, ImmutableArray<Type>>

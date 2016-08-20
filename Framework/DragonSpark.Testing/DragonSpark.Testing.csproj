@@ -96,7 +96,7 @@
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
     <Compile Include="Diagnostics\FormatterTests.cs" />
-    <Compile Include="Diagnostics\LoggerFactoryTests.cs" />
+    <Compile Include="Diagnostics\LoggerTests.cs" />
     <Compile Include="Diagnostics\MessageRecorderTests.cs" />
     <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
     <Compile Include="Extensions\AssemblyExtensionsTests.cs" />
