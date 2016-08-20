@@ -2,6 +2,8 @@
 using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;
@@ -30,7 +32,7 @@ namespace DragonSpark.Testing.Diagnostics
 
 			var method = new Action( Subject ).Method;
 
-			new HelloWorld( logger ).Execute( text, method );
+			HelloWorld.Defaults.Get( logger ).Execute( text, method );
 			
 			var history = context.GetExport<ILoggerHistory>();
 			Assert.Same( serviceProvider.Get<ILoggerHistory>(), history );
@@ -56,9 +58,10 @@ namespace DragonSpark.Testing.Diagnostics
 
 		static void Subject() {}
 
-		class HelloWorld : LogCommandBase<string, MethodBase>
+		sealed class HelloWorld : LogCommandBase<string, MethodBase>
 		{
-			public HelloWorld( ILogger logger ) : base( logger, "Hello World! {Text} - {@Method}" ) {}
+			public static IParameterizedSource<ILogger, HelloWorld> Defaults { get; } = new Cache<ILogger, HelloWorld>( logger => new HelloWorld( logger ) );
+			HelloWorld( ILogger logger ) : base( logger, "Hello World! {Text} - {@Method}" ) {}
 		}
 	}
 }

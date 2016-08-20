@@ -7,6 +7,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup.Commands;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Windows.Properties;
 using Serilog;
 using System;
@@ -82,8 +83,8 @@ namespace DragonSpark.Windows.Setup
 			var file = fileSource();
 			file.Refresh();
 
-			var command = file.Exists ? (ICommand<string>)new Upgrading( logger ) : new NotFound( logger );
-			command.Execute( file.FullName  );
+			var command = file.Exists ? (ICommand<string>)Upgrading.Defaults.Get( logger ) : NotFound.Defaults.Get( logger );
+			command.Execute( file.FullName );
 
 			Run( logger, parameter, file );
 		}
@@ -110,53 +111,59 @@ namespace DragonSpark.Windows.Setup
 					}
 					catch ( ConfigurationErrorsException e )
 					{
-						new ErrorSaving( logger ).Execute( e, file.FullName );
+						ErrorSaving.Defaults.Get( logger ).Execute( e, file.FullName );
 						return;
 					}
 				}
 				if ( any )
 				{
-					new Created( logger ).Execute( file.FullName );
+					Created.Defaults.Get( logger ).Execute( file.FullName );
 				}
 				else
 				{
-					new NotSaved( logger ).Execute( parameter.GetType() );
+					NotSaved.Defaults.Get( logger ).Execute( parameter.GetType() );
 				}
 				return;
 			}
 
 			parameter.Upgrade();
-			new Complete( logger ).Execute( file.FullName );
+			Complete.Defaults.Get( logger ).Execute( file.FullName );
 		}
 
-		class ErrorSaving : LogExceptionCommandBase<string>
+		sealed class ErrorSaving : LogExceptionCommandBase<string>
 		{
-			public ErrorSaving( ILogger logger ) : base( logger, Resources.LoggerTemplates_ErrorSaving ) {}
+			public static IParameterizedSource<ILogger, ErrorSaving> Defaults { get; } = new Cache<ILogger, ErrorSaving>( logger => new ErrorSaving( logger ) );
+			ErrorSaving( ILogger logger ) : base( logger, Resources.LoggerTemplates_ErrorSaving ) {}
 		}
 
-		class NotFound : LogCommandBase<string>
+		sealed class NotFound : LogCommandBase<string>
 		{
-			public NotFound( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotFound ) {}
+			public static IParameterizedSource<ILogger, NotFound> Defaults { get; } = new Cache<ILogger, NotFound>( logger => new NotFound( logger ) );
+			NotFound( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotFound ) {}
 		}
 
-		class Created : LogCommandBase<string>
+		sealed class Created : LogCommandBase<string>
 		{
-			public Created( ILogger logger ) : base( logger, Resources.LoggerTemplates_Created ) {}
+			public static IParameterizedSource<ILogger, Created> Defaults { get; } = new Cache<ILogger, Created>( logger => new Created( logger ) );
+			Created( ILogger logger ) : base( logger, Resources.LoggerTemplates_Created ) {}
 		}
 
-		class NotSaved : LogCommandBase<Type>
+		sealed class NotSaved : LogCommandBase<Type>
 		{
-			public NotSaved( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotSaved ) {}
+			public static IParameterizedSource<ILogger, NotSaved> Defaults { get; } = new Cache<ILogger, NotSaved>( logger => new NotSaved( logger ) );
+			NotSaved( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotSaved ) {}
 		}
 
-		class Upgrading : LogCommandBase<string>
+		sealed class Upgrading : LogCommandBase<string>
 		{
-			public Upgrading( ILogger logger ) : base( logger, Resources.LoggerTemplates_Upgrading ) {}
+			public static IParameterizedSource<ILogger, Upgrading> Defaults { get; } = new Cache<ILogger, Upgrading>( logger => new Upgrading( logger ) );
+			Upgrading( ILogger logger ) : base( logger, Resources.LoggerTemplates_Upgrading ) {}
 		}
 
-		class Complete : LogCommandBase<string>
+		sealed class Complete : LogCommandBase<string>
 		{
-			public Complete( ILogger logger ) : base( logger, Resources.LoggerTemplates_Complete ) {}
+			public static IParameterizedSource<ILogger, Complete> Defaults { get; } = new Cache<ILogger, Complete>( logger => new Complete( logger ) );
+			Complete( ILogger logger ) : base( logger, Resources.LoggerTemplates_Complete ) {}
 		}
 	}
 }
