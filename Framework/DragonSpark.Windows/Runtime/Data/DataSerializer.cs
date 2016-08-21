@@ -2,6 +2,7 @@ using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Composition;
 using System.IO;
 using System.Xaml;
 using System.Xml.XPath;
@@ -9,13 +10,15 @@ using System.Xml.Xsl;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
-	public class Serializer : ISerializer
+	public sealed class Serializer : ISerializer
 	{
-		public static Serializer Default { get; } = new Serializer();
+		[Export]
+		public static ISerializer Default { get; } = new Serializer();
+		Serializer() {}
 
-		public object Load( Stream data ) => XamlServices.Load( data );
+		public T Load<T>( Stream data ) => (T)XamlServices.Load( data );
 
-		public string Save( object item ) => XamlServices.Save( item );
+		public string Save<T>( T item ) => XamlServices.Save( item );
 	}
 
 	public abstract class DataTransformerBase<T> : ParameterizedSourceBase<DataTransformParameter, T> {}
@@ -41,24 +44,22 @@ namespace DragonSpark.Windows.Runtime.Data
 		}
 	}
 
-	public class DataTransformer : DataTransformer<string>
+	public sealed class DataTransformer : DataTransformer<string>
 	{
 		public static DataTransformer Default { get; } = new DataTransformer();
-
-		public DataTransformer() : base( stream => new StreamReader( stream ).ReadToEnd() )
-		{}
+		DataTransformer() : base( stream => new StreamReader( stream ).ReadToEnd() ) {}
 	}
 
 	public class DataSerializer : DataSerializer<object>
 	{
 		public new static DataSerializer Default { get; } = new DataSerializer();
+		DataSerializer() {}
 	}
 
 	public class DataSerializer<T> : DataTransformer<T>
 	{
 		public static DataSerializer<T> Default { get; } = new DataSerializer<T>();
-
-		public DataSerializer() : this( Serializer.Default ) {}
+		protected DataSerializer() : this( Serializer.Default ) {}
 
 		public DataSerializer( ISerializer serializer ) : base( serializer.Load<T> ) {}
 	}
@@ -79,7 +80,7 @@ namespace DragonSpark.Windows.Runtime.Data
 		}
 	}
 
-	public class DataTransformParameter
+	public struct DataTransformParameter
 	{
 		public DataTransformParameter( IXPathNavigable stylesheet, IXPathNavigable source )
 		{

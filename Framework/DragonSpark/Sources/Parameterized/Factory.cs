@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -156,7 +155,7 @@ namespace DragonSpark.Sources.Parameterized
 				readonly static Func<Type, Type> Results = ResultTypes.Default.ToSourceDelegate();
 
 				public static Requests Default { get; } = new Requests();
-				Requests() : base( Defaults.ActivateSpecification.And( Defaults.KnownSourcesSpecification, IsExportSpecification.Default.Project( Projections.MemberType ).Or( ContainsExportedSingletonSpecification.Default ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
+				Requests() : base( Defaults.ActivateSpecification.And( Defaults.KnownSourcesSpecification, Defaults.IsExportSpecification, new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
 				public override FactoryTypeRequest Get( Type parameter ) => 
 					new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );

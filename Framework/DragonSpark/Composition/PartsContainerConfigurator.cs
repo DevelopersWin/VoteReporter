@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
@@ -91,13 +92,15 @@ namespace DragonSpark.Composition
 		readonly static Func<Type, ConventionMapping> Selector = ConventionMappings.Default.Get;
 
 		public static ConventionTransformer Default { get; } = new ConventionTransformer();
-		ConventionTransformer() : this( ApplicationTypes.Default.Get ) {}
+		ConventionTransformer() : this( ApplicationTypes.Default.ToDelegate(), Defaults.IsExportSpecification.ToSpecificationDelegate() ) {}
 
 		readonly Func<ImmutableArray<Type>> typesSource;
+		readonly Func<Type, bool> containsExports;
 
-		ConventionTransformer( Func<ImmutableArray<Type>> typesSource )
+		ConventionTransformer( Func<ImmutableArray<Type>> typesSource, Func<Type, bool> containsExports )
 		{
 			this.typesSource = typesSource;
+			this.containsExports = containsExports;
 		}
 
 		public override ConventionBuilder Get( ConventionBuilder parameter )
@@ -110,20 +113,23 @@ namespace DragonSpark.Composition
 
 			foreach ( var mapping in mappings.ToArray() )
 			{
-				var configure = parameter.ForType( mapping.ImplementationType )
+				if ( !containsExports( mapping.ImplementationType ) )
+				{
+					var configure = parameter.ForType( mapping.ImplementationType )
 										 .Export()
 										 .Export( builder => builder.AsContractType( mapping.InterfaceType ) );
 
-				var shared = AttributeSupport<SharedAttribute>.Local.Get( mapping.ImplementationType );
-				if ( shared != null )
-				{
-					if ( shared.SharingBoundary != null )
+					var shared = AttributeSupport<SharedAttribute>.Local.Get( mapping.ImplementationType );
+					if ( shared != null )
 					{
-						configure.Shared( shared.SharingBoundary );
-					}
-					else
-					{
-						configure.Shared();
+						if ( shared.SharingBoundary != null )
+						{
+							configure.Shared( shared.SharingBoundary );
+						}
+						else
+						{
+							configure.Shared();
+						}
 					}
 				}
 			}

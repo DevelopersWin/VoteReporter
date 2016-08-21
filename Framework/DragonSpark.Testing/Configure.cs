@@ -1,7 +1,9 @@
 ﻿namespace DragonSpark.Testing
 {
-	public static class Configure
+	public class Configure
 	{
+
+
 		/*[ModuleInitializer( 0 ), DragonSpark.Aspects.Runtime, AssemblyInitialize]
 		public static void Initialize()
 		{
