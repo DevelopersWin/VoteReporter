@@ -75,5 +75,23 @@ namespace DragonSpark.Extensions
 			public static SpecificationCache<T> Default { get; } = new SpecificationCache<T>();
 			SpecificationCache() : base( command => new DelegatedSpecification<T>( command.IsSatisfiedBy ) ) {}
 		}
+
+		public static Action<T> Wrap<T>( this Action @this ) => Wrappers<T>.Default.Get( @this );
+		sealed class Wrappers<T> : Cache<Action, Action<T>>
+		{
+			public static Wrappers<T> Default { get; } = new Wrappers<T>();
+			Wrappers() : base( result => new Wrapper<T>( result ).Execute ) {}
+		}
+		sealed class Wrapper<T> : CommandBase<T>
+		{
+			readonly Action action;
+
+			public Wrapper( Action action )
+			{
+				this.action = action;
+			}
+
+			public override void Execute( T parameter ) => action();
+		}
 	}
 }

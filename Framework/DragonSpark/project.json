@@ -10,6 +10,7 @@
     "Serilog": "2.1.0",
     "Serilog.Sinks.Seq": "2.0.0",
     "Serilog.Sinks.TextWriter": "2.0.0",
+    "SerilogTimings": "2.1.0",
     "System.Collections.Immutable": "1.2.0",
     "System.Interactive": "3.0.0",
     "System.Reactive": "3.0.0"
