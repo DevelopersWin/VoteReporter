@@ -1,3 +1,4 @@
+using DragonSpark.Sources;
 using JetBrains.dotMemoryUnit;
 using PostSharp.Patterns.Model;
 using System;
@@ -5,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Framework
 {
-	
+
 
 	/*public class ApplicationOutputCommand : OutputCommand
 	{
@@ -64,28 +65,31 @@ namespace DragonSpark.Testing.Framework
 		protected override void OnDispose() => complete();
 	}*/
 
+	public sealed class Output : Scope<Action<string>>
+	{
+		public static Output Instance { get; } = new Output();
+		Output() {}
+	}
+
 	[Disposable]
-	public abstract class TestCollectionBase : ITestOutputAware
+	public abstract class TestCollectionBase
 	{
 		protected TestCollectionBase( ITestOutputHelper output )
 		{
-			Output = output;
-			WriteLine = Output.WriteLine;
+			WriteLine = output.WriteLine;
+			Output.Instance.Assign( WriteLine );
 			DotMemoryUnitTestOutput.SetOutputMethod( WriteLine );
 		}
-
-		[Reference]
-		public ITestOutputHelper Output { get; }
 
 		protected Action<string> WriteLine { get; }
 
 		protected virtual void Dispose( bool disposing ) {}
 	}
 
-	public interface ITestOutputAware
+	/*public interface ITestOutputAware
 	{
 		ITestOutputHelper Output { get; }
-	}
+	}*/
 
 	public static class Traits
 	{

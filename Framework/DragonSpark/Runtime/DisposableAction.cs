@@ -2,7 +2,7 @@ using System;
 
 namespace DragonSpark.Runtime
 {
-	public sealed class DisposableAction : IDisposable
+	public class DisposableAction : Disposable
 	{
 		readonly Action action;
 
@@ -11,6 +11,14 @@ namespace DragonSpark.Runtime
 			this.action = action;
 		}
 
-		public void Dispose() => action();
+		protected override void OnDispose( bool disposing ) => action();
+	}
+
+	public class InitializedDisposableAction : DisposableAction
+	{
+		public InitializedDisposableAction( Action action ) : base( action )
+		{
+			action();
+		}
 	}
 }

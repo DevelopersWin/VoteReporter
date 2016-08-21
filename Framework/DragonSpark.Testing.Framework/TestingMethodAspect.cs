@@ -1,6 +1,9 @@
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using PostSharp.Aspects;
+using SerilogTimings.Extensions;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -15,13 +18,22 @@ namespace DragonSpark.Testing.Framework
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			base.OnInvoke( args );
-
-			// new ApplicationOutputCommand().Execute( new OutputCommand.Parameter( args.Instance, args.Method, args.Proceed ) );
-
+			using ( new PurgingContext() )
+			{
+				using ( Logger.Instance.Get( args.Method ).TimeOperation( "Executing Test Method '{@Method}'", args.Method ) )
+				{
+					base.OnInvoke( args );
+				}
+			}
+			
 			var disposable = (IDisposable)ApplicationServices.Instance.Get() ?? ExecutionContext.Instance.Get();
 			args.ReturnValue = Defer.Run( disposable.Dispose, args.ReturnValue );
 		}
+	}
+
+	public sealed class PurgingContext : InitializedDisposableAction
+	{
+		public PurgingContext() : base( PurgeLoggerMessageHistoryCommand.Defaults.Get().Fixed( Output.Instance.Get() ).Run ) {}
 	}
 
 	public static class Defer
