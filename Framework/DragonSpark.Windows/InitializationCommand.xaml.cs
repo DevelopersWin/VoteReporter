@@ -12,8 +12,8 @@ namespace DragonSpark.Windows
 	public partial class InitializationCommand
 	{
 		public InitializationCommand() : base( 
-			DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured( TypeDefinitionProviderSource.Instance.ToFixedDelegate() ),
-			DragonSpark.TypeSystem.Configuration.ApplicationAssemblyLocator.Configured( ApplicationAssemblyLocator.Instance.ToSourceDelegate().Fix() )
+			DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured( TypeDefinitionProviderSource.Default.ToFixedDelegate() ),
+			DragonSpark.TypeSystem.Configuration.ApplicationAssemblyLocator.Configured( ApplicationAssemblyLocator.Default.ToSourceDelegate().Fix() )
 			)
 		{
 			Priority = Priority.BeforeNormal;
@@ -24,7 +24,7 @@ namespace DragonSpark.Windows
 	[Priority( Priority.AfterNormal )]
 	class ExecutionContext : Source<AppDomain>
 	{
-		public static ISource Instance { get; } = new ExecutionContext();
+		public static ISource Default { get; } = new ExecutionContext();
 		ExecutionContext() : base( AppDomain.CurrentDomain ) {}
 	}
 }

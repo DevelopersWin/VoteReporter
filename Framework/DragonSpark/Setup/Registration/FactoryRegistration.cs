@@ -23,8 +23,8 @@ namespace DragonSpark.Setup.Registration
 
 	public sealed class SourceFactory : ParameterizedSourceBase<Type, object>
 	{
-		public static IParameterizedSource<Func<IServiceProvider>, SourceFactory> Instances { get; } = new Cache<Func<IServiceProvider>, SourceFactory>( func => new SourceFactory( func ) );
-		public static SourceFactory Default { get; } = Instances.Get( Activator.Instance.Provider() );
+		public static IParameterizedSource<Func<IServiceProvider>, SourceFactory> Defaults { get; } = new Cache<Func<IServiceProvider>, SourceFactory>( func => new SourceFactory( func ) );
+		public static SourceFactory Default { get; } = Defaults.Get( Activator.Default.Provider() );
 
 		readonly Func<Type, Delegate> factory;
 		readonly IGenericMethodContext<Invoke> methods;
@@ -40,7 +40,7 @@ namespace DragonSpark.Setup.Registration
 		public override object Get( Type parameter )
 		{
 			var @delegate = factory( parameter );
-			var result = @delegate != null ? methods.Make( ResultTypes.Instance.Get( parameter ) ).Invoke<object>( @delegate ) : null;
+			var result = @delegate != null ? methods.Make( ResultTypes.Default.Get( parameter ) ).Invoke<object>( @delegate ) : null;
 			return result;
 		}
 
@@ -48,7 +48,7 @@ namespace DragonSpark.Setup.Registration
 
 		sealed class Factory : CompositeFactory<Type, Delegate>
 		{
-			readonly static ImmutableArray<Func<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>>> Delegates = SourceDelegates.Instances.Append( ServiceProvidedParameterizedSourceDelegates.Instances ).Select( source => source.ToSourceDelegate() ).ToImmutableArray();
+			readonly static ImmutableArray<Func<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>>> Delegates = SourceDelegates.Sources.Append( ServiceProvidedParameterizedSourceDelegates.Sources ).Select( source => source.ToSourceDelegate() ).ToImmutableArray();
 			public Factory( Func<IServiceProvider> source ) : base( Delegates.Introduce( source ).ToArray() ) {}
 		}
 	}
@@ -70,22 +70,22 @@ namespace DragonSpark.Setup.Registration
 
 	public class SourceDelegates : DelegatesBase
 	{
-		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Instances { get; } = new Cache<Func<IServiceProvider>, SourceDelegates>( func => new SourceDelegates( func ) );
-		SourceDelegates( Func<IServiceProvider> source ) : base( source, IsSourceSpecification.Instance ) {}
+		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Sources { get; } = new Cache<Func<IServiceProvider>, SourceDelegates>( func => new SourceDelegates( func ) );
+		SourceDelegates( Func<IServiceProvider> source ) : base( source, IsSourceSpecification.Default ) {}
 
-		protected override Delegate Create( Type parameter ) => Methods.Make( ResultTypes.Instance.Get( parameter ) ).Invoke<Delegate>( Locator( parameter ) );
+		protected override Delegate Create( Type parameter ) => Methods.Make( ResultTypes.Default.Get( parameter ) ).Invoke<Delegate>( Locator( parameter ) );
 
 		static Delegate ToDelegate<T>( ISource<T> source ) => source.ToDelegate();
 	}
 
 	public class ParameterizedSourceDelegates : DelegatesBase
 	{
-		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Instances { get; } = new Cache<Func<IServiceProvider>, ParameterizedSourceDelegates>( func => new ParameterizedSourceDelegates( func ) );
-		ParameterizedSourceDelegates( Func<IServiceProvider> source ) : base( source, IsParameterizedSourceSpecification.Instance ) {}
+		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Sources { get; } = new Cache<Func<IServiceProvider>, ParameterizedSourceDelegates>( func => new ParameterizedSourceDelegates( func ) );
+		ParameterizedSourceDelegates( Func<IServiceProvider> source ) : base( source, IsParameterizedSourceSpecification.Default ) {}
 
 		protected override Delegate Create( Type parameter ) => 
 			Methods
-				.Make( ParameterTypes.Instance.Get( parameter ), ResultTypes.Instance.Get( parameter ) )
+				.Make( ParameterTypes.Default.Get( parameter ), ResultTypes.Default.Get( parameter ) )
 				.Invoke<Delegate>( Locator( parameter ) );
 
 		static Delegate ToDelegate<TParameter, TResult>( IParameterizedSource<TParameter, TResult> source ) => source.ToSourceDelegate();
@@ -93,8 +93,8 @@ namespace DragonSpark.Setup.Registration
 
 	public class ServiceProvidedParameterizedSourceDelegates : DelegatesBase
 	{
-		public static IParameterizedSource<Func<IServiceProvider>, ServiceProvidedParameterizedSourceDelegates> Instances { get; } = new Cache<Func<IServiceProvider>, ServiceProvidedParameterizedSourceDelegates>( func => new ServiceProvidedParameterizedSourceDelegates( func ) );
-		ServiceProvidedParameterizedSourceDelegates( Func<IServiceProvider> source ) : this( ParameterizedSourceDelegates.Instances.Get( source ).Get, source ) {}
+		public static IParameterizedSource<Func<IServiceProvider>, ServiceProvidedParameterizedSourceDelegates> Sources { get; } = new Cache<Func<IServiceProvider>, ServiceProvidedParameterizedSourceDelegates>( func => new ServiceProvidedParameterizedSourceDelegates( func ) );
+		ServiceProvidedParameterizedSourceDelegates( Func<IServiceProvider> source ) : this( ParameterizedSourceDelegates.Sources.Get( source ).Get, source ) {}
 
 		readonly Func<Type, Delegate> factorySource;
 
@@ -108,13 +108,13 @@ namespace DragonSpark.Setup.Registration
 			var factory = factorySource( parameter );
 			return factory != null ? 
 				Methods
-				.Make( ParameterTypes.Instance.Get( parameter ), ResultTypes.Instance.Get( parameter ) )
+				.Make( ParameterTypes.Default.Get( parameter ), ResultTypes.Default.Get( parameter ) )
 				.Invoke<Delegate>( parameter, factory, Locator ) : null;
 		}
 
 		static Delegate ToDelegate<TParameter, TResult>( Type parameter, Func<TParameter, TResult> factory, Func<Type, object> locator )
 		{
-			var @delegate = locator.Convert<Type, object, Type, TParameter>().Fixed( ParameterTypes.Instance.Get( parameter ) ).ToDelegate();
+			var @delegate = locator.Convert<Type, object, Type, TParameter>().Fixed( ParameterTypes.Default.Get( parameter ) ).ToDelegate();
 			var result = factory.Fixed( @delegate ).ToDelegate();
 			return result;
 		}
@@ -136,7 +136,7 @@ namespace DragonSpark.Setup.Registration
 
 	/*public class SourceDelegates<TParameter, TResult> : FactoryCache<Func<object, object>, Func<TParameter, TResult>>
 	{
-		public static SourceDelegates<TParameter, TResult> Instance { get; } = new SourceDelegates<TParameter, TResult>();
+		public static SourceDelegates<TParameter, TResult> Default { get; } = new SourceDelegates<TParameter, TResult>();
 		SourceDelegates() {}
 
 		protected override Func<TParameter, TResult> Create( Func<object, object> parameter ) => parameter.Convert<TParameter, TResult>();
@@ -144,7 +144,7 @@ namespace DragonSpark.Setup.Registration
 
 	public class SourceDelegates<T> : FactoryCache<Func<object>, Func<T>>
 	{
-		public static SourceDelegates<T> Instance { get; } = new SourceDelegates<T>();
+		public static SourceDelegates<T> Default { get; } = new SourceDelegates<T>();
 		SourceDelegates() {}
 
 		protected override Func<T> Create( Func<object> parameter ) => parameter.Convert<T>();

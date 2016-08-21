@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 		class ReportFactory : ParameterizedSourceBase<ReportFactory.Parameter, ImmutableArray<ReportFactory.Result>>
 		{
-			public static ReportFactory Instance { get; } = new ReportFactory();
+			public static ReportFactory Default { get; } = new ReportFactory();
 
 			public struct Parameter
 			{
@@ -62,7 +62,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 			class MedianFactory : ParameterizedSourceBase<ImmutableArray<long>, long>
 			{
-				public static MedianFactory Instance { get; } = new MedianFactory();
+				public static MedianFactory Default { get; } = new MedianFactory();
 
 				public override long Get( ImmutableArray<long> parameter )
 				{
@@ -77,7 +77,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 			class ModeFactory<T> : ParameterizedSourceBase<ImmutableArray<T>, T>
 			{
-				public static ModeFactory<T> Instance { get; } = new ModeFactory<T>();
+				public static ModeFactory<T> Default { get; } = new ModeFactory<T>();
 				public override T Get( ImmutableArray<T> parameter ) => parameter.ToArray().GroupBy( n => n ).OrderByDescending( g => g.Count() ).Select( g => g.Key ).FirstOrDefault();
 			}
 
@@ -104,8 +104,8 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 					
 					var data = EnumerableEx.Generate( 0, Continue, i => i + 1, Measure ).Select( span => span.Ticks ).ToArray();
 					var average = data.Average( span => span );
-					var median = MedianFactory.Instance.Get( data.ToImmutableArray() );
-					var mode = ModeFactory<long>.Instance.Get( data.ToImmutableArray() );
+					var median = MedianFactory.Default.Get( data.ToImmutableArray() );
+					var mode = ModeFactory<long>.Default.Get( data.ToImmutableArray() );
 					var result = new Result( action.Method.Name, TimeSpan.FromTicks( (long)average ), TimeSpan.FromTicks( median ), TimeSpan.FromTicks( mode ) );
 					return result;
 				}
@@ -131,7 +131,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			GC.Collect();
 			GC.WaitForPendingFinalizers();
 
-			var results = ReportFactory.Instance.Get( new ReportFactory.Parameter( actions, numberOfRuns, perRun ) ).ToArray();
+			var results = ReportFactory.Default.Get( new ReportFactory.Parameter( actions, numberOfRuns, perRun ) ).ToArray();
 
 			var max = results.Max( r => r.Name.Length );
 			var template = $"{{0,-{max}}} | {{1, 7}} | {{2, 7}} | {{3, 7}}";

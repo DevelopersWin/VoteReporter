@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var parts = typeof(Source);
 			new AssignSystemPartsCommand( parts ).Run();
-			var temp = ApplicationParts.Instance.Get().Types;
+			var temp = ApplicationParts.Default.Get().Types;
 			var container = new ContainerConfiguration().WithProvider( new ParameterizedSourceDelegateExporter() ).WithParts( parts ).CreateContainer();
 			var number = container.GetExport<Func<bool, int>>();
 			Assert.Equal( 6777, number( true ) );

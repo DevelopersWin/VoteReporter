@@ -25,14 +25,14 @@ namespace DragonSpark.Testing.Framework
 				base.OnInvoke( args );
 			}
 			
-			var disposable = (IDisposable)ApplicationServices.Instance.Get() ?? ExecutionContext.Instance.Get();
+			var disposable = (IDisposable)ApplicationServices.Default.Get() ?? ExecutionContext.Default.Get();
 			args.ReturnValue = Defer.Run( new Action( disposable.Dispose ).Wrap<Task>(), args.ReturnValue );
 		}
 	}
 
 	public sealed class PurgingContext : InitializedDisposableAction
 	{
-		public PurgingContext() : base( PurgeLoggerMessageHistoryCommand.Defaults.Get().Fixed( Output.Instance.Get() ).Run ) {}
+		public PurgingContext() : base( PurgeLoggerMessageHistoryCommand.Defaults.Get().Fixed( Output.Default.Get() ).Run ) {}
 	}
 
 	public static class Defer

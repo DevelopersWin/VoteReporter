@@ -31,10 +31,10 @@ namespace DragonSpark.Testing.TypeSystem
 		/*[Fact]
 		public void IsFactory()
 		{
-			var result = SourceInterfaces.Instance.Get( typeof(UnityContainerFactory) );
+			var result = SourceInterfaces.Default.Get( typeof(UnityContainerFactory) );
 			Assert.Equal( typeof(ISource<IUnityContainer>), result );
 
-			var implemented = ConventionImplementedInterfaces.Instance.Get( typeof(UnityContainerFactory) );
+			var implemented = ConventionImplementedInterfaces.Default.Get( typeof(UnityContainerFactory) );
 			Assert.Null( implemented );
 		}*/
 	}

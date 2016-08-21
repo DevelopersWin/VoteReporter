@@ -23,9 +23,9 @@ namespace DragonSpark.Diagnostics.Logging
 	[ApplyAutoValidation]
 	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommand<string>
 	{
-		readonly static Func<IEnumerable<LogEvent>, ImmutableArray<string>> MessageFactory = LogEventMessageFactory.Instance.ToSourceDelegate();
+		readonly static Func<IEnumerable<LogEvent>, ImmutableArray<string>> MessageFactory = LogEventMessageFactory.Default.ToSourceDelegate();
 
-		public static ISource<ICommand<Action<string>>> Defaults { get; } = new Scope<ICommand<Action<string>>>( Factory.Global( () => new PurgeLoggerMessageHistoryCommand( LoggingHistory.Instance.Get() ) ) );
+		public static ISource<ICommand<Action<string>>> Defaults { get; } = new Scope<ICommand<Action<string>>>( Factory.Global( () => new PurgeLoggerMessageHistoryCommand( LoggingHistory.Default.Get() ) ) );
 		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, MessageFactory ) {}
 	}
 
@@ -132,9 +132,9 @@ namespace DragonSpark.Diagnostics.Logging
 
 	/*public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>
 	{
-		public static LoggingLevelSwitchFactory Instance { get; } = new LoggingLevelSwitchFactory();
+		public static LoggingLevelSwitchFactory Default { get; } = new LoggingLevelSwitchFactory();
 
-		public override LoggingLevelSwitch Create() => new LoggingLevelSwitch { MinimumLevel = MinimumLevelConfiguration.Instance.Default() };
+		public override LoggingLevelSwitch Create() => new LoggingLevelSwitch { MinimumLevel = MinimumLevelConfiguration.Default.Default() };
 	}
 
 	public class RecordingLoggerFactory : LoggerFactory
@@ -143,7 +143,7 @@ namespace DragonSpark.Diagnostics.Logging
 
 		public RecordingLoggerFactory( params ITransformer<LoggerConfiguration>[] transformers ) : this( new LoggerHistorySink(), transformers ) {}
 
-		public RecordingLoggerFactory( [Required]ILoggerHistory history, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, LoggingLevelSwitchFactory.Instance.Create(), transformers ) {}
+		public RecordingLoggerFactory( [Required]ILoggerHistory history, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, LoggingLevelSwitchFactory.Default.Create(), transformers ) {}
 
 		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, levelSwitch, new RecordingLoggerConfigurationFactory( history, levelSwitch, transformers ).Create ) {}
 

@@ -19,7 +19,7 @@ namespace DragonSpark.Windows.Setup
 {
 	public class UserSettingsPathFactory : ParameterizedSourceBase<ConfigurationUserLevel, FileInfo>
 	{
-		public static UserSettingsPathFactory Instance { get; } = new UserSettingsPathFactory();
+		public static UserSettingsPathFactory Default { get; } = new UserSettingsPathFactory();
 		UserSettingsPathFactory() {}
 
 		public override FileInfo Get( ConfigurationUserLevel parameter ) => new FileInfo( ConfigurationManager.OpenExeConfiguration( parameter ).FilePath );
@@ -27,27 +27,27 @@ namespace DragonSpark.Windows.Setup
 	
 	public static class Defaults
 	{
-		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Instance.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).ToFixedDelegate();
+		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Default.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).ToFixedDelegate();
 	}
 
 	public class ClearUserSettingCommand : DelegatedFixedCommand<FileInfo>
 	{
-		public static ClearUserSettingCommand Instance { get; } = new ClearUserSettingCommand();
-		ClearUserSettingCommand() : base( DeleteFileCommand.Instance.Apply( DragonSpark.Diagnostics.Defaults<IOException>.Retry ).Self, Defaults.UserSettingsPath ) {}
+		public static ClearUserSettingCommand Default { get; } = new ClearUserSettingCommand();
+		ClearUserSettingCommand() : base( DeleteFileCommand.Default.Apply( DragonSpark.Diagnostics.Defaults<IOException>.Retry ).Self, Defaults.UserSettingsPath ) {}
 	}
 
 	[ApplyAutoValidation]
 	public sealed class DeleteFileCommand : CommandBase<FileInfo>
 	{
-		public static DeleteFileCommand Instance { get; } = new DeleteFileCommand();
-		DeleteFileCommand() : base( FileSystemInfoExistsSpecification.Instance ) {}
+		public static DeleteFileCommand Default { get; } = new DeleteFileCommand();
+		DeleteFileCommand() : base( FileSystemInfoExistsSpecification.Default ) {}
 
 		public override void Execute( FileInfo parameter ) => parameter.Delete();
 	}
 
 	public sealed class FileSystemInfoExistsSpecification : SpecificationBase<FileSystemInfo>
 	{
-		public static FileSystemInfoExistsSpecification Instance { get; } = new FileSystemInfoExistsSpecification();
+		public static FileSystemInfoExistsSpecification Default { get; } = new FileSystemInfoExistsSpecification();
 		FileSystemInfoExistsSpecification() {}
 
 		public override bool IsSatisfiedBy( FileSystemInfo parameter )

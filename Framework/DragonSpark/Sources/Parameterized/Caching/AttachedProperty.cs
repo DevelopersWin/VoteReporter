@@ -23,7 +23,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 		}
 
 		public IAttachedProperty<TInstance, TValue> Property { get; }
-		public TInstance Instance { get; }
+		public TInstance Default { get; }
 		public TValue Value { get; }
 		public AttachedPropertyChangedEventType Type { get; }
 	}*/
@@ -35,21 +35,21 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 	/*class SelfConverter<T> : Converter<T, T>
 	{
-		public static SelfConverter<T> Instance { get; } = new SelfConverter<T>();
+		public static SelfConverter<T> Default { get; } = new SelfConverter<T>();
 
 		SelfConverter() : base( Default<T>.Self, Default<T>.Self ) {}
 	}
 
 	class TupleConverter<T> : Converter<T, Tuple<T>>
 	{
-		public static TupleConverter<T> Instance { get; } = new TupleConverter<T>();
+		public static TupleConverter<T> Default { get; } = new TupleConverter<T>();
 
 		TupleConverter() : base( arg => new Tuple<T>( arg ), tuple => tuple.Item1 ) {}
 	}*/
 
 	public class ThreadLocalSourceCache<TInstance, TResult> : WritableSourceCache<TInstance, TResult> where TInstance : class
 	{
-		readonly static Func<TInstance, IAssignableSource<TResult>> Create = Store.Instance.Get;
+		readonly static Func<TInstance, IAssignableSource<TResult>> Create = Store.Default.Get;
 		public ThreadLocalSourceCache() : this( Create ) {}
 
 		public ThreadLocalSourceCache( Func<TResult> create ) : this( new Store( create ).Get ) {}
@@ -58,7 +58,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		class Store : ParameterizedSourceBase<TInstance, IAssignableSource<TResult>>
 		{
-			public static Store Instance { get; } = new Store();
+			public static Store Default { get; } = new Store();
 
 			readonly Func<TResult> create;
 
@@ -204,7 +204,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 	public class ActivatedCache<TInstance, TResult> : Cache<TInstance, TResult> where TInstance : class where TResult : class, new()
 	{
-		public static ActivatedCache<TInstance, TResult> Instance { get; } = new ActivatedCache<TInstance, TResult>();
+		public static ActivatedCache<TInstance, TResult> Default { get; } = new ActivatedCache<TInstance, TResult>();
 		public ActivatedCache() : base( instance => new TResult() ) {}
 	}
 }

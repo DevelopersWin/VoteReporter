@@ -17,7 +17,7 @@ namespace DevelopersWin.VoteReporter
 		readonly ISerializer serializer;
 		readonly DocumentFactory factory;
 
-		public VoteReportContentGenerator( DataTransformer transformer, ISerializer serializer ) : this( transformer.Get, serializer, DocumentFactory.Instance ) {}
+		public VoteReportContentGenerator( DataTransformer transformer, ISerializer serializer ) : this( transformer.Get, serializer, DocumentFactory.Default ) {}
 
 		protected VoteReportContentGenerator( [Required]Transformer transformer, [Required]ISerializer serializer, [Required]DocumentFactory factory )
 		{

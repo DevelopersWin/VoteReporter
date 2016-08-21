@@ -12,7 +12,7 @@ namespace DragonSpark.Sources
 
 		public static ISource Empty( Type type ) => Methods.Make( type ).Invoke<ISource>();
 
-		public static ISource<T> Empty<T>() => EmptySource<T>.Instance;
+		public static ISource<T> Empty<T>() => EmptySource<T>.Default;
 
 		public static ISource<T> Sourced<T>( this T @this ) => Support<T>.Sources.Get( @this );
 

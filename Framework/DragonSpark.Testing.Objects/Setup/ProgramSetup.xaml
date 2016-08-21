@@ -9,7 +9,7 @@
 	mc:Ignorable="d"
 >
 	<setup:ApplyTaskMonitorCommand />
-	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Instance}">
+	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
 		<runtime:ApplicationInformation DeploymentDate="2/1/2016" CompanyUri="http://framework.dragonspark.us/testing" />
 	</commands:DeclaredFixedCommand>
 	<commands:RunProgramCommand />

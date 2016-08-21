@@ -102,9 +102,9 @@ namespace DragonSpark.Diagnostics.Logging
 
 	/*public class DestructureMethodCommand : DestructureByFactoryCommand<MethodInfo>
 	{
-		public static DestructureMethodCommand Instance { get; } = new DestructureMethodCommand();
+		public static DestructureMethodCommand Default { get; } = new DestructureMethodCommand();
 
-		public DestructureMethodCommand() : base( MethodFormatter.Instance ) {}
+		public DestructureMethodCommand() : base( MethodFormatter.Default ) {}
 	}*/
 
 	public abstract class DestructureByFactoryCommand<TParameter> : DestructureCommandBase

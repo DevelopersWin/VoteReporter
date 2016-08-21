@@ -14,7 +14,7 @@ namespace DragonSpark.Windows.Diagnostics
 	public sealed class ApplyExceptionDetails : TransformerBase<LoggerConfiguration>
 	{
 		[Export( typeof(ITransformer<LoggerConfiguration>) )]
-		public static ApplyExceptionDetails Instance { get; } = new ApplyExceptionDetails();
+		public static ApplyExceptionDetails Default { get; } = new ApplyExceptionDetails();
 		ApplyExceptionDetails() {}
 
 		public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.Enrich.WithExceptionDetails( new SuppliedAndExportedItems<IExceptionDestructurer>( ExceptionEnricher.DefaultDestructurers ) );
@@ -22,7 +22,7 @@ namespace DragonSpark.Windows.Diagnostics
 
 	/*public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
-		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Instance.Create;
+		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Default.Create;
 
 		public ProfilerFactory() : base( TemplateSource ) {}
 
@@ -61,7 +61,7 @@ namespace DragonSpark.Windows.Diagnostics
 
 		void Update( Action<ThreadTimer> action )
 		{
-			threadTime.Assign( ThreadTimeFactory.Instance.Create() );
+			threadTime.Assign( ThreadTimeFactory.Default.Create() );
 			all.Each( action );
 		}
 	}
@@ -73,7 +73,7 @@ namespace DragonSpark.Windows.Diagnostics
 
 	/*public class TimerEventConverter : ProjectedSource<TimerEvent, TimerEvent<Timer>, LoggerTemplate>
 	{
-		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
+		public static TimerEventConverter Default { get; } = new TimerEventConverter();
 
 		public TimerEventConverter() : base( @event => new CompositeLoggerTemplate( "; ",
 			new DragonSpark.Diagnostics.TimerEventTemplate( new TimerEvent<DragonSpark.Diagnostics.Timer>( @event.EventName, @event.Method, @event.Timer, @event.Tracker ) ),
@@ -100,7 +100,7 @@ namespace DragonSpark.Windows.Diagnostics
 
 	public class ThreadTimeFactory : FactoryBase<CpuTime>
 	{
-		public static ThreadTimeFactory Instance { get; } = new ThreadTimeFactory();
+		public static ThreadTimeFactory Default { get; } = new ThreadTimeFactory();
 
 		[DllImport( "kernel32.dll", SetLastError = true )]
 		[SuppressUnmanagedCodeSecurity]

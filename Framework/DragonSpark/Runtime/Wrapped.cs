@@ -39,7 +39,7 @@ namespace DragonSpark.Runtime
 
 	/*public class TypeArrayEqualityComparer : IEqualityComparer<Type[]>
 	{
-		public static TypeArrayEqualityComparer Instance { get; } = new TypeArrayEqualityComparer();
+		public static TypeArrayEqualityComparer Default { get; } = new TypeArrayEqualityComparer();
 
 		public bool Equals( Type[] x, Type[] y )
 		{
@@ -54,13 +54,13 @@ namespace DragonSpark.Runtime
 
 		}
 
-		public int GetHashCode( Type[] obj ) => StructuralEqualityComparer<Type[]>.Instance.GetHashCode( obj );
+		public int GetHashCode( Type[] obj ) => StructuralEqualityComparer<Type[]>.Default.GetHashCode( obj );
 	}*/
 
 	public class StructuralEqualityComparer<T> : IEqualityComparer<T>
 	{
 		readonly IEqualityComparer comparer;
-		public static StructuralEqualityComparer<T> Instance { get; } = new StructuralEqualityComparer<T>();
+		public static StructuralEqualityComparer<T> Default { get; } = new StructuralEqualityComparer<T>();
 		StructuralEqualityComparer() : this( StructuralComparisons.StructuralEqualityComparer ) {}
 
 		public StructuralEqualityComparer( IEqualityComparer comparer )
@@ -78,7 +78,7 @@ namespace DragonSpark.Runtime
 		readonly Func<object[], object> inner;
 		readonly ConcurrentDictionary<object[], object> cache;
 
-		public CachedDelegateInvoker( IDelegateInvoker inner ) : this( inner.ToDelegate(), new ConcurrentDictionary<object[], object>( StructuralEqualityComparer<object[]>.Instance ) ) {}
+		public CachedDelegateInvoker( IDelegateInvoker inner ) : this( inner.ToDelegate(), new ConcurrentDictionary<object[], object>( StructuralEqualityComparer<object[]>.Default ) ) {}
 
 		public CachedDelegateInvoker( Func<object[], object> inner, ConcurrentDictionary<object[], object> cache )
 		{
@@ -292,7 +292,7 @@ namespace DragonSpark.Runtime
 			var mapped = Mappings[delegateType.IsConstructedGenericType ? delegateType.GetGenericTypeDefinition() : delegateType];
 			var type = mapped.GetTypeInfo().IsGenericTypeDefinition ? mapped.MakeGenericType( delegateType.GenericTypeArguments ) : mapped;
 
-			var result = Constructor.Instance.Create<IDelegateInvoker>( new ConstructTypeRequest( type, parameter ) );
+			var result = Constructor.Default.Create<IDelegateInvoker>( new ConstructTypeRequest( type, parameter ) );
 			return result;
 		}
 	}
@@ -310,7 +310,7 @@ namespace DragonSpark.Runtime
 
 	class DelegateContext<T> : Cache<IDelegateInvoker, T> where T : class
 	{
-		public static DelegateContext<T> Instance { get; } = new DelegateContext<T>();
+		public static DelegateContext<T> Default { get; } = new DelegateContext<T>();
 
 		public T Current() => Get( DelegateStack.Default.GetCurrentItem() );
 

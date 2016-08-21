@@ -1,19 +1,19 @@
 using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Aspects
 {
 	public class AspectHub : Cache<IAspectHub>
 	{
-		public static AspectHub Instance { get; } = new AspectHub();
+		public static AspectHub Default { get; } = new AspectHub();
 		AspectHub() {}
 	}
 
@@ -22,7 +22,7 @@ namespace DragonSpark.Aspects
 	public class FreezeAttribute : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		readonly Func<object, IAspectHub> hubSource;
-		readonly static Func<object, IAspectHub> HubSource = AspectHub.Instance.ToDelegate();
+		readonly static Func<object, IAspectHub> HubSource = AspectHub.Default.ToDelegate();
 
 		public FreezeAttribute() : this( HubSource ) {}
 
@@ -106,12 +106,12 @@ namespace DragonSpark.Aspects
 
 		/*class CacheParameterConstructor<TKey, T> : FactoryBase<InstanceMethod, T> where T : class
 		{
-			//readonly static Func<InstanceMethod, IArgumentCache<TKey, object>> DefaultCacheSource = RegisteredCacheFactory<TKey, object>.Instance.Create;
+			//readonly static Func<InstanceMethod, IArgumentCache<TKey, object>> DefaultCacheSource = RegisteredCacheFactory<TKey, object>.Default.Create;
 
 			readonly Func<InstanceMethod, IArgumentCache<TKey, object>> cacheSource;
 			readonly Func<IArgumentCache<TKey, object>, T> factory;
 
-			public static CacheParameterConstructor<TKey, T> Instance { get; } = new CacheParameterConstructor<TKey, T>();
+			public static CacheParameterConstructor<TKey, T> Default { get; } = new CacheParameterConstructor<TKey, T>();
 			CacheParameterConstructor() : this( DefaultCacheSource, ParameterConstructor<IArgumentCache<TKey, object>, T>.Default ) {}
 
 			CacheParameterConstructor( Func<InstanceMethod, IArgumentCache<TKey, object>> cacheSource, Func<IArgumentCache<TKey, object>, T> factory )

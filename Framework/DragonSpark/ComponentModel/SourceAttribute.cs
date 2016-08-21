@@ -21,7 +21,7 @@ namespace DragonSpark.ComponentModel
 
 		/*public class Origin : ServicesValueProvider.Category
 		{
-			public new static Origin Instance { get; } = new Origin();
+			public new static Origin Default { get; } = new Origin();
 
 			readonly Func<Type, IValue> factory;
 

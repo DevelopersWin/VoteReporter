@@ -31,7 +31,7 @@ namespace DragonSpark.Testing.Framework.Parameters
 			sealed class Builder : ISpecimenBuilderTransformation, ISpecimenCommand
 			{
 				readonly Type type;
-				readonly static Func<PropertyInfo, bool> IsSatisfiedBy = DefaultValuePropertySpecification.Instance.IsSatisfiedBy;
+				readonly static Func<PropertyInfo, bool> IsSatisfiedBy = DefaultValuePropertySpecification.Default.IsSatisfiedBy;
 
 				public Builder( Type type )
 				{

@@ -9,7 +9,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 	{
 		public static Stacks<T> Default { get; } = new Stacks<T>();
 
-		public Stacks() : this( CacheRegistry<IStack<T>>.Instance ) {}
+		public Stacks() : this( CacheRegistry<IStack<T>>.Default ) {}
 
 		protected Stacks( ICacheRegistry<IStack<T>> registry ) : this( registry, new Store( registry.Clear ) ) {}
 

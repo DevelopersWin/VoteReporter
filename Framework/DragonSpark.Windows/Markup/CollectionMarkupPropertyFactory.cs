@@ -19,13 +19,13 @@ namespace DragonSpark.Windows.Markup
 	[ApplyAutoValidation]
 	public class CollectionMarkupPropertyFactory : MarkupPropertyFactoryBase
 	{
-		public static CollectionMarkupPropertyFactory Instance { get; } = new CollectionMarkupPropertyFactory();
+		public static CollectionMarkupPropertyFactory Default { get; } = new CollectionMarkupPropertyFactory();
 
 		readonly Func<IServiceProvider, PropertyReference> propertyFactory;
 
-		public CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Instance.ToSourceDelegate() ) {}
+		public CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Default.ToSourceDelegate() ) {}
 
-		public CollectionMarkupPropertyFactory( [Required]Func<IServiceProvider, PropertyReference> propertyFactory ) : base( CollectionSpecification.Instance )
+		public CollectionMarkupPropertyFactory( [Required]Func<IServiceProvider, PropertyReference> propertyFactory ) : base( CollectionSpecification.Default )
 		{
 			this.propertyFactory = propertyFactory;
 		}
@@ -40,7 +40,7 @@ namespace DragonSpark.Windows.Markup
 
 	public class CollectionSpecification : SpecificationBase<IServiceProvider>
 	{
-		public static CollectionSpecification Instance { get; } = new CollectionSpecification();
+		public static CollectionSpecification Default { get; } = new CollectionSpecification();
 
 		public override bool IsSatisfiedBy( IServiceProvider parameter ) => 
 			parameter.Get<IProvideValueTarget>().TargetObject.With( o => o is IList && o.Adapt().GetEnumerableType() != null );
@@ -48,12 +48,12 @@ namespace DragonSpark.Windows.Markup
 
 	public class PropertyReferenceFactory : ParameterizedSourceBase<IServiceProvider, PropertyReference>
 	{
-		public static PropertyReferenceFactory Instance { get; } = new PropertyReferenceFactory();
+		public static PropertyReferenceFactory Default { get; } = new PropertyReferenceFactory();
 
 		readonly IExpressionEvaluator evaluator;
 		readonly Func<object, PropertyReference> create;
 
-		public PropertyReferenceFactory() : this( ExpressionEvaluator.Instance ) {}
+		public PropertyReferenceFactory() : this( ExpressionEvaluator.Default ) {}
 
 		public PropertyReferenceFactory( IExpressionEvaluator evaluator )
 		{

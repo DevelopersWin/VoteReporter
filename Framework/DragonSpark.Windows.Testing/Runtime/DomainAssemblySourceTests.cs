@@ -19,7 +19,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		[Fact]
 		public void Instance()
 		{
-			Assert.NotNull( DomainAssemblySource.Instance );
+			Assert.NotNull( DomainAssemblySource.Default );
 		}
 	}
 }

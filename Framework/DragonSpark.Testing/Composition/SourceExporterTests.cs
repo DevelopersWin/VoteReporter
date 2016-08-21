@@ -83,7 +83,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var parts = typeof(Counter);
 			new AssignSystemPartsCommand( parts ).Run();
-			var type = ResultTypes.Instance.Get( parts );
+			var type = ResultTypes.Default.Get( parts );
 			Assert.Equal( typeof(int), type );
 		}
 
@@ -92,13 +92,13 @@ namespace DragonSpark.Testing.Composition
 		{
 			var parts = typeof(SharedCounter);
 			new AssignSystemPartsCommand( parts ).Run();
-			var type = ResultTypes.Instance.Get( parts );
+			var type = ResultTypes.Default.Get( parts );
 			Assert.Equal( typeof(int), type );
 		}
 
 		class Count : Scope<int>
 		{
-			public static Count Instance { get; } = new Count();
+			public static Count Default { get; } = new Count();
 			Count() {}
 		}
 
@@ -127,13 +127,13 @@ namespace DragonSpark.Testing.Composition
 		[Export]
 		class Counter : SourceBase<int>
 		{
-			public override int Get() => Count.Instance.WithInstance( Count.Instance.Get() + 1 );
+			public override int Get() => Count.Default.WithInstance( Count.Default.Get() + 1 );
 		}
 
 		[Export, Shared]
 		class SharedCounter : SourceBase<int>
 		{
-			public override int Get() => Count.Instance.WithInstance( Count.Instance.Get() + 1 );
+			public override int Get() => Count.Default.WithInstance( Count.Default.Get() + 1 );
 		}
 
 		[Export]

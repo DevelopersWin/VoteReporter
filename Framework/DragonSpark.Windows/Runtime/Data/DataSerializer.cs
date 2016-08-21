@@ -11,7 +11,7 @@ namespace DragonSpark.Windows.Runtime.Data
 {
 	public class Serializer : ISerializer
 	{
-		public static Serializer Instance { get; } = new Serializer();
+		public static Serializer Default { get; } = new Serializer();
 
 		public object Load( Stream data ) => XamlServices.Load( data );
 
@@ -25,7 +25,7 @@ namespace DragonSpark.Windows.Runtime.Data
 		readonly Func<DataTransformParameter, MemoryStream> factory;
 		readonly Func<MemoryStream, T> transformer;
 
-		protected DataTransformer( Func<MemoryStream, T> transformer ) : this( DataStreamFactory.Instance.Get, transformer ) {}
+		protected DataTransformer( Func<MemoryStream, T> transformer ) : this( DataStreamFactory.Default.Get, transformer ) {}
 
 		protected DataTransformer( [Required]Func<DataTransformParameter, MemoryStream> factory, [Required]Func<MemoryStream, T> transformer )
 		{
@@ -43,7 +43,7 @@ namespace DragonSpark.Windows.Runtime.Data
 
 	public class DataTransformer : DataTransformer<string>
 	{
-		public static DataTransformer Instance { get; } = new DataTransformer();
+		public static DataTransformer Default { get; } = new DataTransformer();
 
 		public DataTransformer() : base( stream => new StreamReader( stream ).ReadToEnd() )
 		{}
@@ -51,21 +51,21 @@ namespace DragonSpark.Windows.Runtime.Data
 
 	public class DataSerializer : DataSerializer<object>
 	{
-		public new static DataSerializer Instance { get; } = new DataSerializer();
+		public new static DataSerializer Default { get; } = new DataSerializer();
 	}
 
 	public class DataSerializer<T> : DataTransformer<T>
 	{
-		public static DataSerializer<T> Instance { get; } = new DataSerializer<T>();
+		public static DataSerializer<T> Default { get; } = new DataSerializer<T>();
 
-		public DataSerializer() : this( Serializer.Instance ) {}
+		public DataSerializer() : this( Serializer.Default ) {}
 
 		public DataSerializer( ISerializer serializer ) : base( serializer.Load<T> ) {}
 	}
 
 	public class DataStreamFactory : DataTransformerBase<MemoryStream>
 	{
-		public static DataStreamFactory Instance { get; } = new DataStreamFactory();
+		public static DataStreamFactory Default { get; } = new DataStreamFactory();
 
 		public override MemoryStream Get( DataTransformParameter parameter )
 		{

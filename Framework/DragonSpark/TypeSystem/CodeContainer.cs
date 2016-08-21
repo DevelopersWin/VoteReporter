@@ -11,7 +11,7 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly Lazy<int> value;
 
-		public CodeContainer( [Required] params object[] items ) : this( KeyFactory.Instance.Create, items ) {}
+		public CodeContainer( [Required] params object[] items ) : this( KeyFactory.Default.Create, items ) {}
 
 		public CodeContainer( Func<IList, int> factory, [Required] params object[] items )
 		{

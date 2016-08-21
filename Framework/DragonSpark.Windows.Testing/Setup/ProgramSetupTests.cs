@@ -17,14 +17,14 @@ namespace DragonSpark.Windows.Testing.Setup
 	public class ProgramSetupTests
 	{
 		/*[Export]
-		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Create();*/
+		public IUnityContainer Container { get; } = UnityContainerFactory.Default.Create();*/
 
 		/*[Theory, AutoData]
 		public void Temp()
 		{
 			Parallel.For( 0, 1000, i =>
 								   {
-									   var type = ConventionTypes.Instance.Get( typeof(IProgram) );
+									   var type = ConventionTypes.Default.Get( typeof(IProgram) );
 									   Assert.Equal( typeof(Program), type );
 								   } );
 		}*/
@@ -44,7 +44,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Exists( created );#1#
 
 			/*var activator = sut.Resolve<IActivator>()
-			var specification = new DecoratedSpecification<TypeRequest>( sut.Resolve<ResolvableConstructorSpecification>(), ConstructorBase.Coercer.Instance ).To<ISpecification>();
+			var specification = new DecoratedSpecification<TypeRequest>( sut.Resolve<ResolvableConstructorSpecification>(), ConstructorBase.Coercer.Default ).To<ISpecification>();
 			var valid = specification.IsSatisfiedBy( typeof(MonitoredModule) );
 			Assert.True( valid );#1#
 		}*/

@@ -34,7 +34,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.True( second );
 
 			/*var property = typeof(ValueHost).GetProperty( nameof(ValueHost.PropertyName) );
-			var satisfied = DefaultValuePropertySpecification.Instance.IsSatisfiedBy( property );
+			var satisfied = DefaultValuePropertySpecification.Default.IsSatisfiedBy( property );
 			Assert.True( satisfied );*/
 
 			var next = new ValueHost();

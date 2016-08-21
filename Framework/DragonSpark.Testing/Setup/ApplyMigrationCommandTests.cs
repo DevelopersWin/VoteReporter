@@ -7,7 +7,7 @@
 		{
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( source ) )
 			{
-				var current = DefaultServiceProvider.Instance.Value;
+				var current = DefaultServiceProvider.Default.Value;
 				Assert.Same( source.History, current.Get<ILoggerHistory>() );
 				Assert.Same( source.LevelSwitch, current.Get<LoggingLevelSwitch>() );
 
@@ -19,12 +19,12 @@
 				Assert.Single( source.History.Events );
 
 				var only = source.History.Events.Only();
-				var text = LogEventTextFactory.Instance.Create( only );
+				var text = LogEventTextFactory.Default.Create( only );
 				Assert.Contains( message, text );
 
 				var destinationHistory = destination.Get<ILoggerHistory>();
 				Assert.Empty( destinationHistory.Events );
-				ApplyMigrationCommand.Instance.Execute( new MigrationParameter<IServiceProvider>( current, destination ) );
+				ApplyMigrationCommand.Default.Execute( new MigrationParameter<IServiceProvider>( current, destination ) );
 
 				Assert.Empty( source.History.Events );
 
@@ -38,14 +38,14 @@
 		{
 			using ( MethodBase.GetCurrentMethod().AsCurrentContext( factory ) )
 			{
-				var current = DefaultServiceProvider.Instance.Value;
+				var current = DefaultServiceProvider.Default.Value;
 				
 				var logger = current.Get<ILogger>();
 				logger.Information( $"This is from the source logger: {message}" );
 				Assert.Single( factory.History.Events );
 
 				var only = factory.History.Events.Only();
-				var text = LogEventTextFactory.Instance.Create( only );
+				var text = LogEventTextFactory.Default.Create( only );
 				Assert.Contains( message, text );
 
 				var source = new Source();
@@ -56,7 +56,7 @@
 				var destinationHistory = destination.Get<ILoggerHistory>();
 				Assert.False( Source.Property.Get( factory.History ).IsApplied );
 				Assert.Empty( destinationHistory.Events );
-				ApplyMigrationCommand.Instance.Execute( new MigrationParameter<IServiceProvider>( current, destination ) );
+				ApplyMigrationCommand.Default.Execute( new MigrationParameter<IServiceProvider>( current, destination ) );
 				Assert.True( Source.Property.Get( factory.History ).IsApplied );
 			}
 		}

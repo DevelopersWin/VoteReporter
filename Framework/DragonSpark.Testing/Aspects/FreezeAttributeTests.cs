@@ -30,7 +30,7 @@ namespace DragonSpark.Testing.Aspects
 
 		class IsSourceSpecification : DragonSpark.Activation.IsSourceSpecification
 		{
-			public new static IsSourceSpecification Instance { get; } = new IsSourceSpecification();
+			public new static IsSourceSpecification Default { get; } = new IsSourceSpecification();
 
 			IsSourceSpecification() : base( typeof(IFactory), typeof(IValidatedParameterizedSource) ) {}
 		}
@@ -38,13 +38,13 @@ namespace DragonSpark.Testing.Aspects
 		[Fact]
 		public void Raw()
 		{
-			IsSourceSpecification.Instance.IsSatisfiedBy( typeof(Factory) );
+			IsSourceSpecification.Default.IsSatisfiedBy( typeof(Factory) );
 		}
 
 		[Fact]
 		public void ToCache()
 		{
-			DragonSpark.Activation.IsSourceSpecification.Instance.Get( typeof(Factory) );
+			DragonSpark.Activation.IsSourceSpecification.Default.Get( typeof(Factory) );
 		}
 
 		class Factory : FactoryBase<string, DateTime>

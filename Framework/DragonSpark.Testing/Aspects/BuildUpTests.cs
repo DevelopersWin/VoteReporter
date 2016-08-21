@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Null( sut.Value );
 			sut.Call();
 			Assert.False( sut.Boolean );
-			Assert.Same( SkipFirstCallProvider.Instance.Item, sut.Value );
+			Assert.Same( SkipFirstCallProvider.Default.Item, sut.Value );
 		}
 
 		public class BuildTarget
@@ -27,18 +27,18 @@ namespace DragonSpark.Testing.Aspects
 			[SkipFirstCallValue]
 			public object Value { get; set; }
 
-			public void Call() => Value = SkipFirstCallProvider.Instance.Item;
+			public void Call() => Value = SkipFirstCallProvider.Default.Item;
 		}
 
 		public class SkipFirstCallValue : DefaultValueBase
 		{
-			public SkipFirstCallValue() : base( t => SkipFirstCallProvider.Instance )
+			public SkipFirstCallValue() : base( t => SkipFirstCallProvider.Default )
 			{}
 		}
 
 		public class SkipFirstCallProvider : IDefaultValueProvider
 		{
-			public static SkipFirstCallProvider Instance { get; } = new SkipFirstCallProvider();
+			public static SkipFirstCallProvider Default { get; } = new SkipFirstCallProvider();
 
 			readonly public object Item = new object();
 

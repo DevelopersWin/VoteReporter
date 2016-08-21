@@ -1,5 +1,6 @@
 using DragonSpark.ComponentModel;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -9,7 +10,6 @@ using PostSharp.Reflection;
 using PostSharp.Serialization;
 using System;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Aspects
 {
@@ -21,8 +21,8 @@ namespace DragonSpark.Aspects
 	public sealed class ApplyDefaultValues : LocationInterceptionAspect
 	{
 		readonly static ICache<Delegate, ConditionMonitor> Property = new ActivatedCache<Delegate, ConditionMonitor>();
-		readonly static Func<PropertyInfo, bool> DefaultSpecification = DefaultValuePropertySpecification.Instance.IsSatisfiedBy;
-		readonly static Func<DefaultValueParameter, object> DefaultFactory = DefaultPropertyValueFactory.Instance.Get;
+		readonly static Func<PropertyInfo, bool> DefaultSpecification = DefaultValuePropertySpecification.Default.IsSatisfiedBy;
+		readonly static Func<DefaultValueParameter, object> DefaultFactory = DefaultPropertyValueFactory.Default.Get;
 
 		readonly Func<PropertyInfo, bool> specification;
 		readonly Func<DefaultValueParameter, object> source;

@@ -31,20 +31,20 @@ namespace DragonSpark.Testing.TypeSystem
 		public void DefaultProvider( ITypeSource sut )
 		{
 			Assert.NotNull( sut );
-			Assert.Same( AssemblyProvider.Instance, sut );
+			Assert.Same( AssemblyProvider.Default, sut );
 		}*/
 
 		[Theory, Framework.Setup.AutoData]
 		public void DeclaredProvider( ITypeSource sut )
 		{
 			Assert.NotNull( sut );
-			Assert.Same( DeclaredAssemblyProvider.Instance, sut );
+			Assert.Same( DeclaredAssemblyProvider.Default, sut );
 		}
 
 		class DeclaredAssemblyProvider : AssemblyBasedTypeSource
 		{
 			[Export( typeof(ITypeSource) )]
-			public static DeclaredAssemblyProvider Instance { get; } = new DeclaredAssemblyProvider();
+			public static DeclaredAssemblyProvider Default { get; } = new DeclaredAssemblyProvider();
 			DeclaredAssemblyProvider() : base( typeof(DeclaredAssemblyProvider) ) {}
 		}
 	}

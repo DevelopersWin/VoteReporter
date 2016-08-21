@@ -7,8 +7,8 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void Item()
 		{
-			/*Assert.Equal( typeof(TaskContext), TaskContext.Instance.Value.GetType() );
-			Assert.Equal( TaskContext.Instance, TaskContext.Instance.Value );*/
+			/*Assert.Equal( typeof(TaskContext), TaskContext.Default.Value.GetType() );
+			Assert.Equal( TaskContext.Default, TaskContext.Default.Value );*/
 		} 
 	}
 }

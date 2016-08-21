@@ -11,7 +11,7 @@ namespace DragonSpark.ComponentModel
 {
 	public sealed class TypeDefinitions : ParameterizedScope<TypeInfo, TypeInfo>
 	{
-		public static IParameterizedSource<TypeInfo, TypeInfo> Instance { get; } = new TypeDefinitions();
+		public static IParameterizedSource<TypeInfo, TypeInfo> Default { get; } = new TypeDefinitions();
 		TypeDefinitions() : base( Factory.Global<TypeInfo, TypeInfo>( Create ) ) {}
 
 		static TypeInfo Create( TypeInfo parameter )
@@ -30,7 +30,7 @@ namespace DragonSpark.ComponentModel
 
 	public sealed class ConventionTypeDefinitionProvider : TransformerBase<TypeInfo>, ITypeDefinitionProvider
 	{
-		public static ConventionTypeDefinitionProvider Instance { get; } = new ConventionTypeDefinitionProvider();
+		public static ConventionTypeDefinitionProvider Default { get; } = new ConventionTypeDefinitionProvider();
 		ConventionTypeDefinitionProvider() {}
 
 		public override TypeInfo Get( TypeInfo parameter )

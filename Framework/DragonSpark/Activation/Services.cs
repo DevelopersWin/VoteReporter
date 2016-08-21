@@ -8,19 +8,19 @@ namespace DragonSpark.Activation
 {
 	public sealed class GlobalServiceProvider : Scope<IServiceProvider>
 	{
-		public static IScope<IServiceProvider> Instance { get; } = new GlobalServiceProvider();
+		public static IScope<IServiceProvider> Default { get; } = new GlobalServiceProvider();
 
-		GlobalServiceProvider() : base( () => DefaultServiceProvider.Instance ) {}
+		GlobalServiceProvider() : base( () => DefaultServiceProvider.Default ) {}
 
 		public static T GetService<T>() => GetService<T>( typeof(T) );
 
-		public static T GetService<T>( Type type ) => Instance.Get().Get<T>( type );
+		public static T GetService<T>( Type type ) => Default.Get().Get<T>( type );
 	}
 
 	public sealed class DefaultServiceProvider : CompositeServiceProvider
 	{
-		public static IServiceProvider Instance { get; } = new DefaultServiceProvider();
-		DefaultServiceProvider() : base( new SourceServiceProvider( GlobalServiceProvider.Instance, Activator.Instance, Exports.Instance, ApplicationParts.Instance, ApplicationAssemblies.Instance, ApplicationTypes.Instance, LoggingHistory.Instance, LoggingController.Instance, Logger.Instance.ToScope(), Instances.Instance ), new DecoratedServiceProvider( Instances.Get<object> ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
+		public static IServiceProvider Default { get; } = new DefaultServiceProvider();
+		DefaultServiceProvider() : base( new SourceServiceProvider( GlobalServiceProvider.Default, Activator.Default, Exports.Default, ApplicationParts.Default, ApplicationAssemblies.Default, ApplicationTypes.Default, LoggingHistory.Default, LoggingController.Default, Logger.Default.ToScope(), Instances.Default ), new DecoratedServiceProvider( Instances.Get<object> ), new DecoratedServiceProvider( Activator.Activate<object> ) ) {}
 	}
 
 	

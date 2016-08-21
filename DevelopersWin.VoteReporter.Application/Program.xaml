@@ -7,7 +7,7 @@
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" 
 >
-	<!--Services="{ds:Factory {x:Static composition:ServiceProviderFactory.Instance}}"-->
+	<!--Services="{ds:Factory {x:Static composition:ServiceProviderFactory.Default}}"-->
 	<setup:ApplyTaskMonitorCommand />
 	<setup:ApplySetup />
 </ds:ConsoleApplication>

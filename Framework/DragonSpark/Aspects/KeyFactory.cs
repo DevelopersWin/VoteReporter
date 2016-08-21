@@ -8,9 +8,9 @@ namespace DragonSpark.Aspects
 	// [AutoValidation( false )]
 	/*public class MemberInfoTransformer : Factory<MemberInfo, int>
 	{
-		public static MemberInfoTransformer Instance { get; } = new MemberInfoTransformer();
+		public static MemberInfoTransformer Default { get; } = new MemberInfoTransformer();
 
-		public MemberInfoTransformer() : base( IsTypeSpecification<MemberInfo>.Instance ) {}
+		public MemberInfoTransformer() : base( IsTypeSpecification<MemberInfo>.Default ) {}
 
 		protected override int CreateItem( MemberInfo parameter ) => parameter is TypeInfo
 			? 
@@ -20,9 +20,9 @@ namespace DragonSpark.Aspects
 
 	public class ParameterInfoTransformer : Factory<ParameterInfo, int>
 	{
-		public static ParameterInfoTransformer Instance { get; } = new ParameterInfoTransformer();
+		public static ParameterInfoTransformer Default { get; } = new ParameterInfoTransformer();
 
-		public ParameterInfoTransformer() : base( IsTypeSpecification<ParameterInfo>.Instance ) {}
+		public ParameterInfoTransformer() : base( IsTypeSpecification<ParameterInfo>.Default ) {}
 
 		protected override int CreateItem( ParameterInfo parameter ) => 
 			parameter.Member.DeclaringType.GetTypeInfo().GUID.GetHashCode() * 6776 + parameter.ToString().GetHashCode();
@@ -30,7 +30,7 @@ namespace DragonSpark.Aspects
 
 	/*class AssociatedHash : AttachedPropertyBase<object, Tuple<int>>
 	{
-		public static AssociatedHash Instance { get; } = new AssociatedHash();
+		public static AssociatedHash Default { get; } = new AssociatedHash();
 
 		AssociatedHash() : base( key => new Tuple<int>( key.GetHashCode() ) ) {}
 	}*/
@@ -460,7 +460,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class KeyFactory //  : KeyFactory<int>
 	{
-		// public static KeyFactory Instance { get; } = new KeyFactory();
+		// public static KeyFactory Default { get; } = new KeyFactory();
 
 		// public string ToString( params object[] items ) => Create( items ).ToString();
 

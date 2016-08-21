@@ -10,7 +10,7 @@ namespace DragonSpark.Testing.Extensions
 		/*[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void TryResolve( IUnityContainer sut )
 		{
-			var level = MinimumLevelConfiguration.Instance.Get();
+			var level = MinimumLevelConfiguration.Default.Get();
 			Assert.Equal( LogEventLevel.Debug, level );
 
 			var creator = Origin.Default.Get( sut );
@@ -18,10 +18,10 @@ namespace DragonSpark.Testing.Extensions
 
 			var provider = sut.Resolve<IServiceProvider>();
 			Assert.NotNull( provider );
-			Assert.Same( GlobalServiceProvider.Instance.Get(), provider );
-			Assert.Same( GlobalServiceProvider.Instance.Get(), DefaultServiceProvider.Instance.Get<IServiceProvider>() );
+			Assert.Same( GlobalServiceProvider.Default.Get(), provider );
+			Assert.Same( GlobalServiceProvider.Default.Get(), DefaultServiceProvider.Default.Get<IServiceProvider>() );
 
-			var sink = LoggingHistory.Instance.Get( sut );
+			var sink = LoggingHistory.Default.Get( sut );
 			
 			var initial = sink.Events.Count();
 			Assert.NotEmpty( sink.Events );
@@ -34,14 +34,14 @@ namespace DragonSpark.Testing.Extensions
 			Assert.True( count > initial );
 
 			var typeDefinitionProviders = DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Get();
-			Assert.Contains( MetadataTypeDefinitionProvider.Instance, typeDefinitionProviders );
+			Assert.Contains( MetadataTypeDefinitionProvider.Default, typeDefinitionProviders );
 
 			/*var levelSwitch = provider.Get<LoggingLevelSwitch>();
 			Assert.Same( levelSwitch, provider.Get<LoggingLevelSwitch>() );#1#
 			Assert.Same( sut.Resolve<ISingletonLocator>(), sut.Resolve<ISingletonLocator>() );
-			Assert.Same( SingletonLocator.Instance, sut.Resolve<ISingletonLocator>() );
+			Assert.Same( SingletonLocator.Default, sut.Resolve<ISingletonLocator>() );
 			// Assert.Same( sink, provider.Get<LoggerHistorySink>() );
-			Assert.Equal( ApplicationAssemblies.Instance.Get(), sut.Resolve<ImmutableArray<Assembly>>() );
+			Assert.Equal( ApplicationAssemblies.Default.Get(), sut.Resolve<ImmutableArray<Assembly>>() );
 		}*/
 
 		/*[Export]

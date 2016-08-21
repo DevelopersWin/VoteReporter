@@ -20,20 +20,20 @@ namespace DragonSpark.Testing.Activation
 		{
 			var before = Execution.Current();
 			var current = Assert.IsType<TaskContext>( before );
-			Assert.Same( ExecutionContext.Instance.Get(), current );
-			Assert.Equal( Identification.Instance.Get(), current.Origin );
-			Assert.Null( MethodContext.Instance.Get() );
-			Assert.True( EnableMethodCaching.Instance.Get() );
+			Assert.Same( ExecutionContext.Default.Get(), current );
+			Assert.Equal( Identification.Default.Get(), current.Origin );
+			Assert.Null( MethodContext.Default.Get() );
+			Assert.True( EnableMethodCaching.Default.Get() );
 
 			var method = MethodBase.GetCurrentMethod();
 			object inner;
-			using ( ApplicationFactory.Instance.Get( method ).Run( new AutoData( FixtureContext.Instance.WithFactory( FixtureFactory<AutoDataCustomization>.Instance.Get ), method ) ) )
+			using ( ApplicationFactory.Default.Get( method ).Run( new AutoData( FixtureContext.Default.WithFactory( FixtureFactory<AutoDataCustomization>.Default.Get ), method ) ) )
 			{
-				Assert.NotNull( MethodContext.Instance.Get() );
-				Assert.Same( method, MethodContext.Instance.Get() );
+				Assert.NotNull( MethodContext.Default.Get() );
+				Assert.Same( method, MethodContext.Default.Get() );
 				inner = Execution.Current();
 				Assert.Same( current, inner );
-				Assert.False( EnableMethodCaching.Instance.Get() );
+				Assert.False( EnableMethodCaching.Default.Get() );
 			}
 
 			var after = Execution.Current();
@@ -41,15 +41,15 @@ namespace DragonSpark.Testing.Activation
 			Assert.NotSame( inner, after );
 			Assert.NotSame( current, after );
 
-			Assert.Null( MethodContext.Instance.Get() );
+			Assert.Null( MethodContext.Default.Get() );
 
-			Assert.True( EnableMethodCaching.Instance.Get() );
+			Assert.True( EnableMethodCaching.Default.Get() );
 		}
 
 		[Export( typeof(ISetup) )]
 		class Setup : DragonSpark.Setup.Setup
 		{
-			public Setup() : base( EnableMethodCaching.Instance.Configured( false ) ) {}
+			public Setup() : base( EnableMethodCaching.Default.Configured( false ) ) {}
 		}
 	}
 }

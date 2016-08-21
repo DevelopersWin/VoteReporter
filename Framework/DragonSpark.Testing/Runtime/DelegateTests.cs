@@ -145,7 +145,7 @@ namespace DragonSpark.Testing.Runtime
 				for ( int i = 0; i < 10000; i++ )
 				{
 					var source = new Action( item.Empty );
-					DelegateContext<string>.Instance.Create( source, "Hello World!" );
+					DelegateContext<string>.Default.Create( source, "Hello World!" );
 					
 				}
 			}
@@ -164,7 +164,7 @@ namespace DragonSpark.Testing.Runtime
 		{
 			public void Empty() {}
 
-			public string HelloWorld( int number ) => $"Hello World: {number}. Message: {DelegateContext<string>.Instance.Current()}";
+			public string HelloWorld( int number ) => $"Hello World: {number}. Message: {DelegateContext<string>.Default.Current()}";
 		}*/
 
 		/*[Fact]
@@ -283,7 +283,7 @@ namespace DragonSpark.Testing.Runtime
 		{
 			var source = new Func<int, string>( sut.HelloWorld );
 			CurrentDelegate.Set( source, message );
-			var item = Property<Func<int, string>>.Instance.GetDirect( source );
+			var item = Property<Func<int, string>>.Default.GetDirect( source );
 			var result = item( number );
 			Assert.Contains( number.ToString(), result );
 			Assert.Contains( message, result );
@@ -293,14 +293,14 @@ namespace DragonSpark.Testing.Runtime
 
 		class Property<T> : ContextAwareDelegateProperty<T> where T : class
 		{
-			public static Property<T> Instance { get; } = new Property<T>();
+			public static Property<T> Default { get; } = new Property<T>();
 
-			Property() : base( new Factory( DelegateRelay.Instance ).ToDelegate() ) {}
+			Property() : base( new Factory( DelegateRelay.Default ).ToDelegate() ) {}
 		}
 
 		class DelegateRelay : IDelegateRelay
 		{
-			public static DelegateRelay Instance { get; } = new DelegateRelay();
+			public static DelegateRelay Default { get; } = new DelegateRelay();
 
 			public void Relay( DelegateWithParameterCache source, DelegateWithParameterCache destination )
 			{

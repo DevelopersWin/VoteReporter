@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Diagnostics
 		[Fact]
 		public void Verify()
 		{
-			var history = LoggingHistory.Instance.Get();
+			var history = LoggingHistory.Default.Get();
 			Assert.Empty( history.Events );
 			HelloWorld();
 			var item = Assert.Single( history.Events );

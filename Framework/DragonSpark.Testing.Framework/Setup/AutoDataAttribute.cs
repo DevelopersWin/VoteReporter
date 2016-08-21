@@ -22,13 +22,13 @@ namespace DragonSpark.Testing.Framework.Setup
 	[LinesOfCodeAvoided( 5 )]
 	public class AutoDataAttribute : Ploeh.AutoFixture.Xunit2.AutoDataAttribute
 	{
-		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Instance.Get;
+		readonly static Func<IFixture> DefaultFixtureFactory = FixtureFactory<AutoDataCustomization>.Default.Get;
 		
 		public AutoDataAttribute() : this( DefaultFixtureFactory ) {}
 
-		protected AutoDataAttribute( Func<IFixture> fixture ) : base( FixtureContext.Instance.WithInstance( fixture() ) ) {}
+		protected AutoDataAttribute( Func<IFixture> fixture ) : base( FixtureContext.Default.WithInstance( fixture() ) ) {}
 
-		protected virtual IApplication ApplicationSource( MethodBase method ) => ApplicationFactory.Instance.Get( method );
+		protected virtual IApplication ApplicationSource( MethodBase method ) => ApplicationFactory.Default.Get( method );
 
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
@@ -42,30 +42,30 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public sealed class ApplicationFactory : ConfiguringFactory<MethodBase, IApplication>
 	{
-		public static ApplicationFactory Instance { get; } = new ApplicationFactory();
+		public static ApplicationFactory Default { get; } = new ApplicationFactory();
 		ApplicationFactory() : base( DefaultCreate, Initialize ) {}
 
-		static void Initialize( MethodBase method ) => ApplicationInitializer.Instance.Get().Execute( method );
+		static void Initialize( MethodBase method ) => ApplicationInitializer.Default.Get().Execute( method );
 
 		static IApplication DefaultCreate( MethodBase _ ) => 
-			ApplicationFactory<Application>.Instance.Create( MethodTypes.Instance, ApplicationCommandSource.Instance );
+			ApplicationFactory<Application>.Default.Create( MethodTypes.Default, ApplicationCommandSource.Default );
 	}
 
 	public sealed class ApplicationInitializer : CommandBase<MethodBase>
 	{
-		public static IScope<ApplicationInitializer> Instance { get; } = new Scope<ApplicationInitializer>( Factory.Global( () => new ApplicationInitializer() ) );
+		public static IScope<ApplicationInitializer> Default { get; } = new Scope<ApplicationInitializer>( Factory.Global( () => new ApplicationInitializer() ) );
 		ApplicationInitializer() {}
 
 		public override void Execute( MethodBase parameter )
 		{
-			MethodContext.Instance.Assign( parameter );
-			Disposables.Instance.Get().Add( ExecutionContext.Instance.Get() );
+			MethodContext.Default.Assign( parameter );
+			Disposables.Default.Get().Add( ExecutionContext.Default.Get() );
 		}
 	}
 
 	public sealed class FixtureContext : Scope<IFixture>
 	{
-		public static FixtureContext Instance { get; } = new FixtureContext();
+		public static FixtureContext Default { get; } = new FixtureContext();
 		FixtureContext() {}
 	}
 
@@ -102,12 +102,12 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public sealed class ApplicationPartsAttribute : TypeProviderAttributeBase
 	{
-		public ApplicationPartsAttribute() : base( m => AllParts.Instance.Get( m.DeclaringType.Assembly ) ) {}
+		public ApplicationPartsAttribute() : base( m => AllParts.Default.Get( m.DeclaringType.Assembly ) ) {}
 	}
 
 	public sealed class ApplicationPublicPartsAttribute : TypeProviderAttributeBase
 	{
-		public ApplicationPublicPartsAttribute() : base( m => PublicParts.Instance.Get( m.DeclaringType.Assembly ) ) {}
+		public ApplicationPublicPartsAttribute() : base( m => PublicParts.Default.Get( m.DeclaringType.Assembly ) ) {}
 	}
 
 	[AttributeUsage( AttributeTargets.Method )]
@@ -125,15 +125,15 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class ContainingTypeAndNestedAttribute : TypeProviderAttributeBase
 	{
-		readonly static Func<MethodBase, ImmutableArray<Type>> Delegate = Factory.Instance.Get;
+		readonly static Func<MethodBase, ImmutableArray<Type>> Delegate = Factory.Default.Get;
 		public ContainingTypeAndNestedAttribute() : base( Delegate ) {}
 
 		new sealed class Factory : ParameterizedSourceBase<MethodBase, ImmutableArray<Type>>
 		{
-			public static Factory Instance { get; } = new Factory();
+			public static Factory Default { get; } = new Factory();
 			Factory() {}
 
-			public override ImmutableArray<Type> Get( MethodBase parameter ) => SelfAndNestedTypes.Instance.Get( parameter.DeclaringType ).ToImmutableArray();
+			public override ImmutableArray<Type> Get( MethodBase parameter ) => SelfAndNestedTypes.Default.Get( parameter.DeclaringType ).ToImmutableArray();
 		}
 	}
 

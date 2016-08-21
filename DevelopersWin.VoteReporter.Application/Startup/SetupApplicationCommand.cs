@@ -2,7 +2,7 @@
 {
 	/*public class ServiceProviderFactory : DragonSpark.Setup.ServiceProviderFactory
 	{
-		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
-		ServiceProviderFactory() : base( new DragonSpark.Activation.IoC.AssemblyBasedServiceProviderFactory( AssemblyProvider.Instance.Create().ToArray() ).Create ) {}
+		public static ServiceProviderFactory Default { get; } = new ServiceProviderFactory();
+		ServiceProviderFactory() : base( new DragonSpark.Activation.IoC.AssemblyBasedServiceProviderFactory( AssemblyProvider.Default.Create().ToArray() ).Create ) {}
 	}*/
 }

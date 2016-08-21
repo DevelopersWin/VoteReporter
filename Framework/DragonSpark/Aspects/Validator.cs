@@ -83,7 +83,7 @@ namespace DragonSpark.Aspects
 	
 	sealed class GenericSourceAdapterFactory : GenericParameterProfileFactoryBase
 	{
-		public static GenericSourceAdapterFactory Instance { get; } = new GenericSourceAdapterFactory();
+		public static GenericSourceAdapterFactory Default { get; } = new GenericSourceAdapterFactory();
 
 		GenericSourceAdapterFactory() : base( typeof(IValidatedParameterizedSource<,>), typeof(GenericSourceAdapterFactory), nameof(Create) ) {}
 
@@ -92,13 +92,13 @@ namespace DragonSpark.Aspects
 
 	class SourceAdapterFactory : AdapterSourceBase<IValidatedParameterizedSource>
 	{
-		public static SourceAdapterFactory Instance { get; } = new SourceAdapterFactory();
+		public static SourceAdapterFactory Default { get; } = new SourceAdapterFactory();
 		SourceAdapterFactory() : base( instance => new FactoryAdapter( instance ) ) {}
 	}
 
 	sealed class GenericCommandAdapterFactory : GenericParameterProfileFactoryBase
 	{
-		public static GenericCommandAdapterFactory Instance { get; } = new GenericCommandAdapterFactory();
+		public static GenericCommandAdapterFactory Default { get; } = new GenericCommandAdapterFactory();
 
 		GenericCommandAdapterFactory() : base( typeof(ICommand<>), typeof(GenericCommandAdapterFactory), nameof(Create) ) {}
 
@@ -107,7 +107,7 @@ namespace DragonSpark.Aspects
 
 	class CommandAdapterFactory : AdapterSourceBase<ICommand>
 	{
-		public static CommandAdapterFactory Instance { get; } = new CommandAdapterFactory();
+		public static CommandAdapterFactory Default { get; } = new CommandAdapterFactory();
 		CommandAdapterFactory() : base( instance => new CommandAdapter( instance ) ) {}
 	}
 

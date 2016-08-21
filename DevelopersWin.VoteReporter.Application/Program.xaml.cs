@@ -10,8 +10,8 @@ namespace DevelopersWin.VoteReporter.Application
 	public partial class Program
 	{
 		static void Main( string[] args ) =>
-			ApplicationFactory<Program>.Instance
-									   .Create( FileSystemTypes.Instance )
+			ApplicationFactory<Program>.Default
+									   .Create( FileSystemTypes.Default )
 									   .Run( args );
 
 		public Program() 

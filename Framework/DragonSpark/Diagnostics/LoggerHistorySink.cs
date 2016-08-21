@@ -25,7 +25,7 @@ namespace DragonSpark.Diagnostics
 
 	public sealed class LogEventTextFactory : ParameterizedSourceBase<LogEvent, string>
 	{
-		public static LogEventTextFactory Instance { get; } = new LogEventTextFactory();
+		public static LogEventTextFactory Default { get; } = new LogEventTextFactory();
 		LogEventTextFactory( string template = "{Timestamp:HH:mm:ss:fff} [{Level}] ({SourceContext}) {Message}{NewLine}{Exception}" ) : this( new MessageTemplateTextFormatter( template, null ) ) {}
 
 		readonly MessageTemplateTextFormatter formatter;
@@ -46,8 +46,8 @@ namespace DragonSpark.Diagnostics
 
 	public sealed class LogEventMessageFactory : ParameterizedSourceBase<IEnumerable<LogEvent>, ImmutableArray<string>>
 	{
-		readonly static Func<LogEvent, string> Text = LogEventTextFactory.Instance.ToSourceDelegate();
-		public static LogEventMessageFactory Instance { get; } = new LogEventMessageFactory();
+		readonly static Func<LogEvent, string> Text = LogEventTextFactory.Default.ToSourceDelegate();
+		public static LogEventMessageFactory Default { get; } = new LogEventMessageFactory();
 		LogEventMessageFactory() {}
 
 		public override ImmutableArray<string> Get( IEnumerable<LogEvent> parameter ) => parameter

@@ -16,17 +16,17 @@ namespace DragonSpark.Aspects.Validation
 		public static ImmutableArray<IAdapterSource> DefaultSources { get; } =
 			new IAdapterSource[]
 			{
-				new AdapterSource( typeof(IValidatedParameterizedSource<,>), GenericSourceAdapterFactory.Instance.Get ),
-				new AdapterSource( typeof(IValidatedParameterizedSource), SourceAdapterFactory.Instance.Get ),
-				new AdapterSource( typeof(ICommand<>), GenericCommandAdapterFactory.Instance.Get ),
-				new AdapterSource( typeof(ICommand), CommandAdapterFactory.Instance.Get ),
+				new AdapterSource( typeof(IValidatedParameterizedSource<,>), GenericSourceAdapterFactory.Default.Get ),
+				new AdapterSource( typeof(IValidatedParameterizedSource), SourceAdapterFactory.Default.Get ),
+				new AdapterSource( typeof(ICommand<>), GenericCommandAdapterFactory.Default.Get ),
+				new AdapterSource( typeof(ICommand), CommandAdapterFactory.Default.Get ),
 			}.ToImmutableArray();
 	}
 	
 	sealed class AdapterLocator : ParameterizedSourceBase<IParameterValidationAdapter>
 	{
-		public static AdapterLocator Instance { get; } = new AdapterLocator();
-		AdapterLocator() : this( AdapterSources.Instance.Get ) {}
+		public static AdapterLocator Default { get; } = new AdapterLocator();
+		AdapterLocator() : this( AdapterSources.Default.Get ) {}
 
 		readonly Func<Type, IAdapterSource> factorySource;
 
@@ -37,7 +37,7 @@ namespace DragonSpark.Aspects.Validation
 
 		sealed class AdapterSources : Cache<Type, IAdapterSource>
 		{
-			public static AdapterSources Instance { get; } = new AdapterSources();
+			public static AdapterSources Default { get; } = new AdapterSources();
 			AdapterSources() : this( AutoValidation.DefaultSources ) {}
 
 			readonly ImmutableArray<IAdapterSource> sources;

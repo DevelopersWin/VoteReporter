@@ -13,17 +13,17 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public class ServicesCustomization : CustomizationBase
 	{
-		public static ServicesCustomization Instance { get; } = new ServicesCustomization();
+		public static ServicesCustomization Default { get; } = new ServicesCustomization();
 
 		protected override void OnCustomize( IFixture fixture )
 		{
-			fixture.Customizations.Insert( 0, FrameworkSpecimenBuilder.Instance );
-			fixture.ResidueCollectors.Add( ServiceRelay.Instance );
+			fixture.Customizations.Insert( 0, FrameworkSpecimenBuilder.Default );
+			fixture.ResidueCollectors.Add( ServiceRelay.Default );
 		}
 
 		class FrameworkSpecimenBuilder : ISpecimenBuilder
 		{
-			public static FrameworkSpecimenBuilder Instance { get; } = new FrameworkSpecimenBuilder();
+			public static FrameworkSpecimenBuilder Default { get; } = new FrameworkSpecimenBuilder();
 			FrameworkSpecimenBuilder() : this( new[] { typeof(Type[]), typeof(Assembly[]), typeof(ImmutableArray<Type>), typeof(ImmutableArray<Assembly>) } ) {}
 
 			readonly Type[] types;
@@ -44,7 +44,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class ServiceRelay : ISpecimenBuilder
 	{
-		public static ServiceRelay Instance { get; } = new ServiceRelay();
+		public static ServiceRelay Default { get; } = new ServiceRelay();
 		ServiceRelay() : this( GlobalServiceProvider.GetService<object> ) {}
 
 		readonly Func<Type, object> provider;
@@ -72,7 +72,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			var declaringType = parameter.Method.DeclaringType;
 			if ( declaringType.GetConstructors().Where( info => info.IsPublic ).Any( info => info.GetParameters().Any( parameterInfo => parameterInfo.ParameterType == typeof(ITestOutputHelper) ) ) )
 			{
-				var lines = LogEventMessageFactory.Instance.Create( History.Events );
+				var lines = LogEventMessageFactory.Default.Create( History.Events );
 				new OutputValue( declaringType ).Assign( lines );	
 			}
 		}

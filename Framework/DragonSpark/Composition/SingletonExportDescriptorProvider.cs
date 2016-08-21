@@ -12,7 +12,7 @@ namespace DragonSpark.Composition
 	public sealed class SingletonExportDescriptorProvider : ExportDescriptorProvider
 	{
 		readonly ImmutableArray<SingletonExport> singletons;
-		readonly static Func<Type, SingletonExport> Selector = SingletonExports.Instance.Get;
+		readonly static Func<Type, SingletonExport> Selector = SingletonExports.Default.Get;
 
 		public SingletonExportDescriptorProvider( params Type[] types ) : this ( types.Select( Selector ).WhereAssigned().ToImmutableArray() ) {}
 

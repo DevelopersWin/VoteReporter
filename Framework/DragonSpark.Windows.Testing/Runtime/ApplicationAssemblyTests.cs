@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		{
 			new AssignSystemPartsCommand( GetType() ).Run();
 
-			Assert.Equal( GetType().Assembly, ApplicationAssembly.Instance.Get() );
+			Assert.Equal( GetType().Assembly, ApplicationAssembly.Default.Get() );
 		}
 
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]

@@ -11,8 +11,8 @@ namespace DragonSpark.Windows.Runtime
 {
 	public class DomainAssemblySource : FactoryCache<AppDomain, ImmutableArray<Assembly>>
 	{
-		public static DomainAssemblySource Instance { get; } = new DomainAssemblySource();
-		DomainAssemblySource() : this( Specification.Instance.IsSatisfiedBy ) {}
+		public static DomainAssemblySource Default { get; } = new DomainAssemblySource();
+		DomainAssemblySource() : this( Specification.Default.IsSatisfiedBy ) {}
 
 		readonly Func<Assembly, bool> specification;
 
@@ -30,11 +30,11 @@ namespace DragonSpark.Windows.Runtime
 
 		/*DomainAssemblySource() : this( AppDomain.CurrentDomain ) {}
 
-		public DomainAssemblySource( [Required]AppDomain domain ) : base( Factory.Instance.Create( domain ) ) {}
+		public DomainAssemblySource( [Required]AppDomain domain ) : base( Factory.Default.Create( domain ) ) {}
 
 		class Factory : Cache<AppDomain, Assembly[]>
 		{
-			public static Factory Instance { get; } = new Factory();
+			public static Factory Default { get; } = new Factory();
 			Factory() {}
 
 			public override Assembly[] Create( AppDomain parameter )
@@ -47,7 +47,7 @@ namespace DragonSpark.Windows.Runtime
 
 		class Specification : SpecificationBase<Assembly>
 		{
-			public static Specification Instance { get; } = new Specification();
+			public static Specification Default { get; } = new Specification();
 			Specification() {}
 
 			public override bool IsSatisfiedBy( Assembly parameter ) => 

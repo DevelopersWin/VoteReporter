@@ -6,7 +6,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class EqualityReference<T> : TransformerBase<T> where T : class
 	{
-		public static EqualityReference<T> Instance { get; } = new EqualityReference<T>();
+		public static EqualityReference<T> Default { get; } = new EqualityReference<T>();
 		EqualityReference() {}
 
 		readonly WeakList<T> list = new WeakList<T>();

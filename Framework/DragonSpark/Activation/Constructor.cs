@@ -16,13 +16,13 @@ namespace DragonSpark.Activation
 	[ApplyAutoValidation]
 	public class Constructor : ConstructorBase
 	{
-		public static Constructor Instance { get; } = new Constructor();
-		Constructor() : this( ConstructorStore.Instance.Get, ConstructorDelegateFactory<Invoke>.Default.Get ) {}
+		public static Constructor Default { get; } = new Constructor();
+		Constructor() : this( ConstructorStore.Default.Get, ConstructorDelegateFactory<Invoke>.Default.Get ) {}
 
 		readonly Func<ConstructTypeRequest, ConstructorInfo> constructorSource;
 		readonly Func<ConstructorInfo, Invoke> activatorSource;
 
-		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, Invoke> activatorSource ) : base( Specification.Instance )
+		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, Invoke> activatorSource ) : base( Specification.Default )
 		{
 			this.constructorSource = constructorSource;
 			this.activatorSource = activatorSource;
@@ -48,12 +48,12 @@ namespace DragonSpark.Activation
 
 		sealed class Specification : SpecificationBase<ConstructTypeRequest>
 		{
-			public static Specification Instance { get; } = new Specification();
+			public static Specification Default { get; } = new Specification();
 
 			readonly ConstructorStore cache;
 
-			Specification() : this( ConstructorStore.Instance ) {}
-			Specification( ConstructorStore cache ) : base( Coercer.Instance.ToDelegate() )
+			Specification() : this( ConstructorStore.Default ) {}
+			Specification( ConstructorStore cache ) : base( Coercer.Default.ToDelegate() )
 			{
 				this.cache = cache;
 			}
@@ -64,15 +64,15 @@ namespace DragonSpark.Activation
 
 	public sealed class ConstructorStore : EqualityReferenceCache<ConstructTypeRequest, ConstructorInfo>
 	{
-		public static ConstructorStore Instance { get; } = new ConstructorStore();
+		public static ConstructorStore Default { get; } = new ConstructorStore();
 		ConstructorStore() : base( Create ) {}
 
 		static ConstructorInfo Create( ConstructTypeRequest parameter )
 		{
-			var types = ObjectTypeFactory.Instance.Get( parameter.Arguments );
+			var types = ObjectTypeFactory.Default.Get( parameter.Arguments );
 			var candidates = new [] { types, types.WhereAssigned().Fixed(), Items<Type>.Default };
 			var adapter = parameter.RequestedType.Adapt();
-			var result = candidates.Distinct( StructuralEqualityComparer<Type[]>.Instance )
+			var result = candidates.Distinct( StructuralEqualityComparer<Type[]>.Default )
 				.Introduce( adapter , tuple => tuple.Item2.FindConstructor( tuple.Item1 )  )
 				.FirstOrDefault();
 			return result;
@@ -81,8 +81,8 @@ namespace DragonSpark.Activation
 
 	class InvokeMethodDelegate<T> : InvocationFactoryBase<MethodInfo, T> where T : class
 	{
-		public static ICache<MethodInfo, T> Instance { get; } = new Cache<MethodInfo, T>( new InvokeMethodDelegate<T>().Create );
-		InvokeMethodDelegate() : base( InvokeMethodExpressionFactory.Instance.Create ) {}
+		public static ICache<MethodInfo, T> Default { get; } = new Cache<MethodInfo, T>( new InvokeMethodDelegate<T>().Create );
+		InvokeMethodDelegate() : base( InvokeMethodExpressionFactory.Default.Create ) {}
 	}
 
 	class InvokeInstanceMethodDelegate<T> : InvocationFactoryBase<MethodInfo, T> where T : class
@@ -93,7 +93,7 @@ namespace DragonSpark.Activation
 	class ConstructorDelegateFactory<T> :  InvocationFactoryBase<ConstructorInfo, T> where T : class
 	{
 		public static ICache<ConstructorInfo, T> Default { get; } = new Cache<ConstructorInfo, T>( new ConstructorDelegateFactory<T>().Create );
-		ConstructorDelegateFactory() : base( ActivateFromArrayExpression.Instance.Create ) {}
+		ConstructorDelegateFactory() : base( ActivateFromArrayExpression.Default.Create ) {}
 	}
 
 	abstract class InvocationFactoryBase<TParameter, TDelegate> : CompiledDelegateFactoryBase<TParameter, TDelegate> where TParameter : MethodBase
@@ -104,7 +104,7 @@ namespace DragonSpark.Activation
 
 	class ActivateFromArrayExpression : InvokeArrayFactoryBase<ConstructorInfo>
 	{
-		public static ActivateFromArrayExpression Instance { get; } = new ActivateFromArrayExpression();
+		public static ActivateFromArrayExpression Default { get; } = new ActivateFromArrayExpression();
 		ActivateFromArrayExpression() {}
 
 		protected override Expression Apply( ExpressionBodyParameter<ConstructorInfo> parameter, Expression[] arguments ) => Expression.New( parameter.Input, arguments );
@@ -112,7 +112,7 @@ namespace DragonSpark.Activation
 
 	class InvokeMethodExpressionFactory : InvokeArrayFactoryBase<MethodInfo>
 	{
-		public static InvokeMethodExpressionFactory Instance { get; } = new InvokeMethodExpressionFactory();
+		public static InvokeMethodExpressionFactory Default { get; } = new InvokeMethodExpressionFactory();
 		InvokeMethodExpressionFactory() {}
 
 		protected override Expression Apply( ExpressionBodyParameter<MethodInfo> parameter, Expression[] arguments ) => Expression.Call( parameter.Input, arguments );
@@ -133,7 +133,7 @@ namespace DragonSpark.Activation
 	{
 		public virtual Expression Create( ExpressionBodyParameter<T> parameter )
 		{
-			var array = ArgumentsArrayExpressionFactory.Instance.Get( new ArgumentsArrayParameter( parameter.Input, parameter.Parameter ) );
+			var array = ArgumentsArrayExpressionFactory.Default.Get( new ArgumentsArrayParameter( parameter.Input, parameter.Parameter ) );
 			var result = Apply( parameter, array );
 			return result;
 		}
@@ -143,7 +143,7 @@ namespace DragonSpark.Activation
 
 	class ArgumentsArrayExpressionFactory : ParameterizedSourceBase<ArgumentsArrayParameter, Expression[]>
 	{
-		public static ArgumentsArrayExpressionFactory Instance { get; } = new ArgumentsArrayExpressionFactory();
+		public static ArgumentsArrayExpressionFactory Default { get; } = new ArgumentsArrayExpressionFactory();
 		ArgumentsArrayExpressionFactory() {}
 
 		public override Expression[] Get( ArgumentsArrayParameter parameter )
@@ -193,8 +193,8 @@ namespace DragonSpark.Activation
 
 
 
-		/*public static ImmutableArray<ParameterExpression> InstanceArguments { get; } = new ParameterFactory( InstanceParameter.Instance, ArgumentArrayParameter.Instance ).Create();*/
-		// public static ImmutableArray<ParameterExpression> Arguments { get; } = new ParameterFactory( ArgumentArrayParameter.Instance ).Create();
+		/*public static ImmutableArray<ParameterExpression> InstanceArguments { get; } = new ParameterFactory( InstanceParameter.Default, ArgumentArrayParameter.Default ).Create();*/
+		// public static ImmutableArray<ParameterExpression> Arguments { get; } = new ParameterFactory( ArgumentArrayParameter.Default ).Create();
 	}
 
 	/*public class ParameterFactory : FactoryBase<ImmutableArray<ParameterExpression>>
@@ -211,19 +211,19 @@ namespace DragonSpark.Activation
 
 	/*public class InstanceParameter : InstanceParameter<object>
 	{
-		public new static InstanceParameter Instance { get; } = new InstanceParameter();
+		public new static InstanceParameter Default { get; } = new InstanceParameter();
 		InstanceParameter() {}
 	}
 
 	public class InstanceParameter<T> : ExpressionParameterStoreBase<T>
 	{
-		public static InstanceParameter<T> Instance { get; } = new InstanceParameter<T>();
+		public static InstanceParameter<T> Default { get; } = new InstanceParameter<T>();
 		protected InstanceParameter() : base( "instance" ) {}
 	}*/
 
 	/*public class ArgumentArrayParameter : ExpressionParameterStoreBase<object[]>
 	{
-		public static ArgumentArrayParameter Instance { get; } = new ArgumentArrayParameter();
+		public static ArgumentArrayParameter Default { get; } = new ArgumentArrayParameter();
 		ArgumentArrayParameter() : base( "arguments" ) {}
 	}
 

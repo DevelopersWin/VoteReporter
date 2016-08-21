@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 		class AutoValidationRegistry : RepositoryBase<RegistryListing>
 		{
-			public static AutoValidationRegistry Instance { get; } = new AutoValidationRegistry();
+			public static AutoValidationRegistry Default { get; } = new AutoValidationRegistry();
 			AutoValidationRegistry() : base( new []
 			{
 				new RegistryListing( typeof(IParameterizedSource<,>), nameof(IParameterizedSource.Get) ),

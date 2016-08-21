@@ -92,7 +92,7 @@ namespace DragonSpark.Windows.Security
 
 	class RsaKeyPairFactory : FactoryBase<int, AsymmetricCipherKeyPair>
 	{
-		public static RsaKeyPairFactory Instance { get; } = new RsaKeyPairFactory();
+		public static RsaKeyPairFactory Default { get; } = new RsaKeyPairFactory();
 
 		public override AsymmetricCipherKeyPair Create( int parameter )
 		{
@@ -110,7 +110,7 @@ namespace DragonSpark.Windows.Security
 		{
 			public Parameter( string commonName ) : this( 1024, commonName ) {}
 
-			public Parameter( int strength, string commonName ) : this( RsaKeyPairFactory.Instance.Create( strength ), commonName ) {}
+			public Parameter( int strength, string commonName ) : this( RsaKeyPairFactory.Default.Create( strength ), commonName ) {}
 			
 			public Parameter( [Required]AsymmetricCipherKeyPair keyPair, [NotEmpty]string commonName )
 			{

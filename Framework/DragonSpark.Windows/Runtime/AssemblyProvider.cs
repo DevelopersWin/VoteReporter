@@ -12,8 +12,8 @@ namespace DragonSpark.Windows.Runtime
 {
 	public sealed class FileSystemTypes : ApplicationTypesBase
 	{
-		public static FileSystemTypes Instance { get; } = new FileSystemTypes();
-		FileSystemTypes() : base( FileSystemAssemblySource.Instance.Get ) {}
+		public static FileSystemTypes Default { get; } = new FileSystemTypes();
+		FileSystemTypes() : base( FileSystemAssemblySource.Default.Get ) {}
 	}
 
 	public abstract class ApplicationTypesBase : TypeSource
@@ -22,7 +22,7 @@ namespace DragonSpark.Windows.Runtime
 		readonly Transform<IEnumerable<Assembly>> filter;
 		readonly Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource;
 
-		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource ) : this( assemblySource, ApplicationAssemblyFilter.Instance.Get, PublicParts.Instance.Get ) {}
+		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource ) : this( assemblySource, ApplicationAssemblyFilter.Default.Get, PublicParts.Default.Get ) {}
 
 		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource, Transform<IEnumerable<Assembly>> filter, Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource )
 		{
@@ -41,14 +41,14 @@ namespace DragonSpark.Windows.Runtime
 
 	public sealed class PublicParts : PartTypesBase
 	{
-		public static PublicParts Instance { get; } = new PublicParts();
-		PublicParts() : base( DragonSpark.TypeSystem.PublicParts.Instance.Get ) {}
+		public static PublicParts Default { get; } = new PublicParts();
+		PublicParts() : base( DragonSpark.TypeSystem.PublicParts.Default.Get ) {}
 	}
 
 	public sealed class AllParts : PartTypesBase
 	{
-		public static AllParts Instance { get; } = new AllParts();
-		AllParts() : base( DragonSpark.TypeSystem.AllParts.Instance.Get ) {}
+		public static AllParts Default { get; } = new AllParts();
+		AllParts() : base( DragonSpark.TypeSystem.AllParts.Default.Get ) {}
 	}
 
 	public abstract class PartTypesBase : ParameterizedSourceBase<IEnumerable<Assembly>, IEnumerable<Type>>
@@ -56,7 +56,7 @@ namespace DragonSpark.Windows.Runtime
 		readonly Func<Assembly, ImmutableArray<Type>> typeSource;
 		readonly Func<IEnumerable<Assembly>, Assembly> assemblySource;
 
-		protected PartTypesBase( Func<Assembly, ImmutableArray<Type>> typeSource ) : this( typeSource, ApplicationAssemblyLocator.Instance.Get ) {}
+		protected PartTypesBase( Func<Assembly, ImmutableArray<Type>> typeSource ) : this( typeSource, ApplicationAssemblyLocator.Default.Get ) {}
 
 		protected PartTypesBase( Func<Assembly, ImmutableArray<Type>> typeSource, Func<IEnumerable<Assembly>, Assembly> assemblySource )
 		{

@@ -2,17 +2,17 @@ namespace DragonSpark.Setup
 {
 	/*public class CurrentServiceProvider : ExecutionCachedStoreBase<IServiceProvider>
 	{
-		public static CurrentServiceProvider Instance { get; } = new CurrentServiceProvider();
+		public static CurrentServiceProvider Default { get; } = new CurrentServiceProvider();
 		CurrentServiceProvider() {}
 
-		protected override IServiceProvider Get() => base.Get() ?? DefaultServiceProvider.Instance.Value;
+		protected override IServiceProvider Get() => base.Get() ?? DefaultServiceProvider.Default.Value;
 
 		public override void Assign( IServiceProvider item )
 		{
 			if ( item != null && item != Value )
 			{
 				var parameter = new MigrationParameter<IServiceProvider>( Value, item );
-				ApplyMigrationCommand.Instance.Execute( parameter );
+				ApplyMigrationCommand.Default.Execute( parameter );
 			}
 
 			base.Assign( item );
@@ -21,7 +21,7 @@ namespace DragonSpark.Setup
 
 	/*public class ServiceProviderMigrationCommandFactory : FactoryBase<IServiceProvider, ICommand<MigrationParameter<IServiceProvider>>>, IServiceProviderMigrationCommandSource
 	{
-		public static ServiceProviderMigrationCommandFactory Instance { get; } = new ServiceProviderMigrationCommandFactory();
+		public static ServiceProviderMigrationCommandFactory Default { get; } = new ServiceProviderMigrationCommandFactory();
 
 		protected ServiceProviderMigrationCommandFactory() {}
 

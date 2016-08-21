@@ -54,7 +54,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var expected = GlobalServiceProvider.GetService<IActivator>();
 			Assert.Same( expected, locator );
-			Assert.NotSame( Activator.Instance.Get(), locator );
+			Assert.NotSame( Activator.Default.Get(), locator );
 			Assert.IsType<Locator>( locator );
 			var instance = locator.Activate<IObject>( typeof(Object) );
 			Assert.IsType<Object>( instance );
@@ -67,7 +67,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		public void CreateNamedInstance( IActivator activator, string name )
 		{
 			Assert.Same( GlobalServiceProvider.GetService<IActivator>(), activator );
-			Assert.NotSame( Activator.Instance.Get(), activator );
+			Assert.NotSame( Activator.Default.Get(), activator );
 
 			var instance = activator.Activate<IObject>( new LocateTypeRequest( typeof(Object), name ) );
 			Assert.IsType<Object>( instance );
@@ -81,7 +81,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			var parameters = new object[] { typeof(Object), "This is Some Name." };
 			Assert.Same( GlobalServiceProvider.GetService<IActivator>(), activator );
-			Assert.Same( Activator.Instance.Get(), activator );
+			Assert.Same( Activator.Default.Get(), activator );
 			var instance = activator.Construct<DragonSpark.Testing.Objects.Item>( parameters );
 			Assert.NotNull( instance );
 
@@ -429,7 +429,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(ApplicationAssembly) )]
 		public void BasicComposition( IUnityContainer container )
 		{
-			using ( var host = CompositionHostFactory.Instance.Get() )
+			using ( var host = CompositionHostFactory.Default.Get() )
 			{
 				var assembly = host.GetExport<Assembly>();
 				Assert.NotNull( assembly );
@@ -440,7 +440,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly), typeof(AssemblyInformationFactory) )]
 		public void CreateAssembly( [Service]IParameterizedSource<Assembly, AssemblyInformation> factory, IServiceProvider container, [Service]Assembly sut )
 		{
-			var fromFactory = ApplicationAssembly.Instance.Get();
+			var fromFactory = ApplicationAssembly.Default.Get();
 			var fromContainer = container.Get<Assembly>();
 			Assert.Same( fromFactory, fromContainer );
 			

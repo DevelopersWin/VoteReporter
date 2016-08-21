@@ -9,12 +9,12 @@ namespace DragonSpark.Diagnostics
 {
 	public sealed class Formatter : ParameterizedSourceBase<Formatter.Parameter, string>
 	{
-		readonly static Func<Parameter, string> Coerce = p => StringCoercer.Instance.Coerce( p.Instance );
-		readonly static Coerce<Parameter> Coercer = ConstructCoercer<Parameter>.Instance.Coerce;
+		readonly static Func<Parameter, string> Coerce = p => StringCoercer.Default.Coerce( p.Instance );
+		readonly static Coerce<Parameter> Coercer = ConstructCoercer<Parameter>.Default.Coerce;
 
 		[Export]
-		public static Formatter Instance { get; } = new Formatter();
-		Formatter() : this( ConstructFromKnownTypes<IFormattable>.Instance.Delegate() ) {}
+		public static Formatter Default { get; } = new Formatter();
+		Formatter() : this( ConstructFromKnownTypes<IFormattable>.Default.Delegate() ) {}
 
 		readonly Func<object, IFormattable> factory;
 

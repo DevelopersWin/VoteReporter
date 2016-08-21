@@ -15,10 +15,10 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly Func<Assembly, bool> specification;
 
-		/*public ApplicationAssemblyFilter() : this( ApplicationAssemblies.Instance.Get() ) {}*/
+		/*public ApplicationAssemblyFilter() : this( ApplicationAssemblies.Default.Get() ) {}*/
 
-		public static ApplicationAssemblyFilter Instance { get; } = new ApplicationAssemblyFilter();
-		ApplicationAssemblyFilter( /*ImmutableArray<Assembly> assemblies*/ ) : this( ApplicationAssemblySpecification.Instance.IsSatisfiedBy ) {}
+		public static ApplicationAssemblyFilter Default { get; } = new ApplicationAssemblyFilter();
+		ApplicationAssemblyFilter( /*ImmutableArray<Assembly> assemblies*/ ) : this( ApplicationAssemblySpecification.Default.IsSatisfiedBy ) {}
 
 		ApplicationAssemblyFilter( Func<Assembly, bool> specification )
 		{
@@ -30,7 +30,7 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationTypeSpecification : SpecificationBase<Type>
 	{
-		public static ISpecification<Type> Instance { get; } = new ApplicationTypeSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new ApplicationTypeSpecification().Cached();
 		ApplicationTypeSpecification() {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Defaults.ActivateSpecification.IsSatisfiedBy( parameter ) && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Has<CompilerGeneratedAttribute>();
@@ -38,7 +38,7 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationAssemblySpecification : SpecificationBase<Assembly>
 	{
-		public static ApplicationAssemblySpecification Instance { get; } = new ApplicationAssemblySpecification();
+		public static ApplicationAssemblySpecification Default { get; } = new ApplicationAssemblySpecification();
 		ApplicationAssemblySpecification() {}
 
 		/*readonly ImmutableArray<string> rootNamespaces;

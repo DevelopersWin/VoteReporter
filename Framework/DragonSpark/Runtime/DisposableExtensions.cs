@@ -1,5 +1,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -9,20 +11,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Runtime
 {
 	public sealed class AssociatedDisposables : ListCache<IDisposable, IDisposable>
 	{
-		public static AssociatedDisposables Instance { get; } = new AssociatedDisposables();
+		public static AssociatedDisposables Default { get; } = new AssociatedDisposables();
 		AssociatedDisposables() {}
 	}
 
 	public sealed class ConfigureAssociatedDisposables : DecoratedSourceCache<IDisposable, bool>
 	{
-		public static ConfigureAssociatedDisposables Instance { get; } = new ConfigureAssociatedDisposables();
+		public static ConfigureAssociatedDisposables Default { get; } = new ConfigureAssociatedDisposables();
 		ConfigureAssociatedDisposables() {}
 	}
 
@@ -30,7 +30,7 @@ namespace DragonSpark.Runtime
 	{
 		public static T Configured<T>( this T @this, bool on ) where T : IDisposable
 		{
-			ConfigureAssociatedDisposables.Instance.Set( @this, on );
+			ConfigureAssociatedDisposables.Default.Set( @this, on );
 			return @this;
 		}
 
@@ -39,7 +39,7 @@ namespace DragonSpark.Runtime
 		public static T AssociateForDispose<T>( this T @this, params IDisposable[] associated ) where T : IDisposable
 		{
 			@this.Configured( true );
-			AssociatedDisposables.Instance.Get( @this ).AddRange( associated );
+			AssociatedDisposables.Default.Get( @this ).AddRange( associated );
 			return @this;
 		}
 	}
@@ -59,7 +59,7 @@ namespace DragonSpark.Runtime
 
 	public sealed class DisposeAssociatedCommand : CommandBase<IDisposable>
 	{
-		public static DisposeAssociatedCommand Instance { get; } = new DisposeAssociatedCommand( AssociatedDisposables.Instance );
+		public static DisposeAssociatedCommand Default { get; } = new DisposeAssociatedCommand( AssociatedDisposables.Default );
 
 		readonly AssociatedDisposables cache;
 
@@ -74,12 +74,12 @@ namespace DragonSpark.Runtime
 	
 	[OnMethodBoundaryAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( "Dispose Associated Disposables" ), LinesOfCodeAvoided( 1 )]
-	[MulticastAttributeUsage( MulticastTargets.Method, TargetMemberAttributes = MulticastAttributes.Instance | MulticastAttributes.NonAbstract ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[MulticastAttributeUsage( MulticastTargets.Method, TargetMemberAttributes = MulticastAttributes.Default | MulticastAttributes.NonAbstract ), AttributeUsage( AttributeTargets.Assembly ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public sealed class DisposeAssociatedAspect : OnMethodBoundaryAspect
 	{
-		readonly static Func<IDisposable, bool> Configure = ConfigureAssociatedDisposables.Instance.Get;
-		readonly static Action<IDisposable> Command = DisposeAssociatedCommand.Instance.Execute;
-		readonly static Func<MethodBase, bool> Compile = Specification.Instance.IsSatisfiedBy;
+		readonly static Func<IDisposable, bool> Configure = ConfigureAssociatedDisposables.Default.Get;
+		readonly static Action<IDisposable> Command = DisposeAssociatedCommand.Default.Execute;
+		readonly static Func<MethodBase, bool> Compile = Specification.Default.IsSatisfiedBy;
 
 		readonly Func<IDisposable, bool> configured;
 		readonly Action<IDisposable> command;
@@ -94,7 +94,7 @@ namespace DragonSpark.Runtime
 
 		public class Specification : SpecificationBase<MethodBase>
 		{
-			public static Specification Instance { get; } = new Specification();
+			public static Specification Default { get; } = new Specification();
 
 			public override bool IsSatisfiedBy( MethodBase parameter )
 			{

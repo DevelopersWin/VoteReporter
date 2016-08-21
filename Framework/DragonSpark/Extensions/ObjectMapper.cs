@@ -10,11 +10,11 @@ namespace DragonSpark.Extensions
 	public sealed class ObjectMapper<T> : ParameterizedSourceBase<ObjectMappingParameter<T>, T> where T : class
 	{
 		public static ObjectMapper<T> Default { get; } = new ObjectMapper<T>();
-		ObjectMapper() : this( Activator.Instance.Get ) {}
+		ObjectMapper() : this( Activator.Default.Get ) {}
 
 		readonly Func<IActivator> activatorSource;
 
-		readonly IArgumentCache<TypePair, IMapper> mappers = new ArgumentCache<TypePair, IMapper>( Factory.Instance.Get );
+		readonly IArgumentCache<TypePair, IMapper> mappers = new ArgumentCache<TypePair, IMapper>( Factory.Default.Get );
 
 		public ObjectMapper( Func<IActivator> activatorSource )
 		{
@@ -30,7 +30,7 @@ namespace DragonSpark.Extensions
 
 		sealed class Factory : ParameterizedSourceBase<TypePair, IMapper>
 		{
-			public static IParameterizedSource<TypePair, IMapper> Instance { get; } = new Factory();
+			public static IParameterizedSource<TypePair, IMapper> Default { get; } = new Factory();
 			Factory() {}
 
 			public override IMapper Get( TypePair parameter )

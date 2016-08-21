@@ -18,7 +18,7 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public sealed class IsSourceSpecification : AdapterSpecificationBase
 	{
-		public static ISpecification<Type> Instance { get; } = new IsSourceSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new IsSourceSpecification().Cached();
 		IsSourceSpecification() : base( typeof(ISource<>), typeof(ISource) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
@@ -28,7 +28,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public sealed class IsParameterizedSourceSpecification : AdapterSpecificationBase
 	{
-		public static ISpecification<Type> Instance { get; } = new IsParameterizedSourceSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new IsParameterizedSourceSpecification().Cached();
 		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>), typeof(IParameterizedSource) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );
@@ -50,7 +50,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		readonly static Func<Type, bool> Specification = Defaults.KnownSourcesSpecification.IsSatisfiedBy;
 
-		public static ICache<Type, Type> Instance { get; } = new SourceInterfaces();
+		public static ICache<Type, Type> Default { get; } = new SourceInterfaces();
 		SourceInterfaces() {}
 
 		protected override Type Create( Type parameter ) => parameter.Adapt().GetAllInterfaces().FirstOrDefault( Specification );
@@ -58,7 +58,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public sealed class ParameterTypes : TypeLocatorBase
 	{
-		public static ICache<Type, Type> Instance { get; } = new ParameterTypes();
+		public static ICache<Type, Type> Default { get; } = new ParameterTypes();
 		ParameterTypes() : base( typeof(Func<,>), typeof(IParameterizedSource<,>), typeof(ICommand<>) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.First();
@@ -66,7 +66,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public sealed class ResultTypes : TypeLocatorBase
 	{
-		public static ICache<Type, Type> Instance { get; } = new ResultTypes();
+		public static ICache<Type, Type> Default { get; } = new ResultTypes();
 		ResultTypes() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(Func<>), typeof(Func<,>) ) {}
 
 		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
@@ -122,14 +122,14 @@ namespace DragonSpark.Sources.Parameterized
 
 	public sealed class SourceTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
-		public static ISource<SourceTypes> Instance { get; } = new Scope<SourceTypes>( Sources.Factory.Global( () => new SourceTypes() ) );
+		public static ISource<SourceTypes> Default { get; } = new Scope<SourceTypes>( Sources.Factory.Global( () => new SourceTypes() ) );
 		SourceTypes() : base( new Factory().Get ) {}
 		
 		sealed class Factory : ParameterizedSourceBase<LocateTypeRequest, Type>
 		{
 			readonly ImmutableArray<FactoryTypeRequest> types;
 
-			public Factory() : this( Requests.Instance.CreateMany( ApplicationParts.Instance.Get().Types.AsEnumerable() ) ) {}
+			public Factory() : this( Requests.Default.CreateMany( ApplicationParts.Default.Get().Types.AsEnumerable() ) ) {}
 
 			Factory( ImmutableArray<FactoryTypeRequest> types )
 			{
@@ -153,10 +153,10 @@ namespace DragonSpark.Sources.Parameterized
 
 			sealed class Requests : ValidatedParameterizedSourceBase<Type, FactoryTypeRequest>
 			{
-				readonly static Func<Type, Type> Results = ResultTypes.Instance.ToSourceDelegate();
+				readonly static Func<Type, Type> Results = ResultTypes.Default.ToSourceDelegate();
 
-				public static Requests Instance { get; } = new Requests();
-				Requests() : base( Defaults.ActivateSpecification.And( Defaults.KnownSourcesSpecification, IsExportSpecification.Instance.Project( Projections.MemberType ).Or( ContainsExportedSingletonSpecification.Instance ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
+				public static Requests Default { get; } = new Requests();
+				Requests() : base( Defaults.ActivateSpecification.And( Defaults.KnownSourcesSpecification, IsExportSpecification.Default.Project( Projections.MemberType ).Or( ContainsExportedSingletonSpecification.Default ), new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
 				public override FactoryTypeRequest Get( Type parameter ) => 
 					new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );

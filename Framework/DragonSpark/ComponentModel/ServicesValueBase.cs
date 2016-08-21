@@ -12,7 +12,7 @@ namespace DragonSpark.ComponentModel
 
 		public LocateAttribute( string name = null ) : this( null, name ) { }
 
-		public LocateAttribute( Type locatedType, string name = null ) : base( t => new LocationValueProvider( new Converter( locatedType, name ).Get, Factory.Instance.ToSourceDelegate() ) ) { }
+		public LocateAttribute( Type locatedType, string name = null ) : base( t => new LocationValueProvider( new Converter( locatedType, name ).Get, Factory.Default.ToSourceDelegate() ) ) { }
 		
 		public class LocationValueProvider : ValueProvider<LocateTypeRequest>
 		{
@@ -21,7 +21,7 @@ namespace DragonSpark.ComponentModel
 
 		public class Factory : ParameterizedSourceBase<LocateTypeRequest, object>
 		{
-			public static Factory Instance { get; } = new Factory();
+			public static Factory Default { get; } = new Factory();
 
 			readonly ServiceLocatorProvider locator;
 

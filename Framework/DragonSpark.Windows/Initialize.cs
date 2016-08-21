@@ -14,15 +14,15 @@ namespace DragonSpark.Windows
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Command.Instance.Run();
+		public static void Execution() => Command.Default.Run();
 
 		class Command : DragonSpark.Setup.Setup
 		{
-			public static ICommand Instance { get; } = new Command();
+			public static ICommand Default { get; } = new Command();
 			Command() : base( 
-				Activation.Execution.Context.Configured( ExecutionContext.Instance ), 
+				Activation.Execution.Context.Configured( ExecutionContext.Default ), 
 				DragonSpark.TypeSystem.Configuration.AssemblyLoader.Configured( new Func<string, Assembly>( Assembly.LoadFile ).Wrap() ),
-				DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Configured( AssemblyLocator.Instance.ToDelegate().Wrap() )
+				DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Configured( AssemblyLocator.Default.ToDelegate().Wrap() )
 				) {}
 		}
 	}

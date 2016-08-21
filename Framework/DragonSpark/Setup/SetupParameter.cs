@@ -47,14 +47,14 @@ namespace DragonSpark.Setup
 
 	/*public class SetupParameter : SetupParameter<object>
 	{
-		public SetupParameter() : this( LoggingServices.Instance, null ) {}
+		public SetupParameter() : this( LoggingServices.Default, null ) {}
 
 		public SetupParameter( IMessageLogger logger, object arguments ) : base( logger, arguments ) {}
 	}*/
 
 	/*public class MessageLoggerFactory<TLogger> : ActivatorBase<TLogger> where TLogger : class, IMessageLogger
 	{
-		public new static MessageLoggerFactory<TLogger> Instance { get; } = new MessageLoggerFactory<TLogger>();
+		public new static MessageLoggerFactory<TLogger> Default { get; } = new MessageLoggerFactory<TLogger>();
 
 		protected override TLogger Activate( ActivateParameter parameter ) => base.Activate( parameter ).Information( Resources.LoggerCreatedSuccessfully );
 	}*/

@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.Framework
 				Continue = @continue;
 			}
 
-			public object Instance { get; }
+			public object Default { get; }
 			public MethodBase Method { get; }
 			public Action Continue { get; }
 		}
@@ -58,7 +58,7 @@ namespace DragonSpark.Testing.Framework
 
 			public override IProfiler Create( Parameter parameter )
 			{
-				var output = parameter.Instance.AsTo<ITestOutputAware, Action<string>>( value => value.Output.WriteLine ) ?? IgnoredOutputCommand.Instance.Execute;
+				var output = parameter.Default.AsTo<ITestOutputAware, Action<string>>( value => value.Output.WriteLine ) ?? IgnoredOutputCommand.Default.Execute;
 				var result = new Diagnostics.ProfilerFactory( output, history ).Create( parameter.Method );
 				return result;
 			}

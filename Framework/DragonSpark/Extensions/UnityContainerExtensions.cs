@@ -18,7 +18,7 @@
 			}
 			catch ( Exception exception )
 			{
-				Logging.Instance.Get( container ).Debug( exception, "Could not resolve {Type} and {Name}", typeToResolve, name );
+				Logging.Default.Get( container ).Debug( exception, "Could not resolve {Type} and {Name}", typeToResolve, name );
 				return null;
 			}
 		}

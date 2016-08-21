@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		public override IProfiler Create( MethodBase parameter )
 		{
 			var purge = new FixedCommand<Action<string>>( new PurgeLoggerMessageHistoryCommand( history ), output );
-			var start = new CompositeCommand( purge, StartProcessCommand.Instance );
+			var start = new CompositeCommand( purge, StartProcessCommand.Default );
 			var result = base.Create( parameter ).With( start.Execute ).AssociateForDispose( new DisposableAction( purge.Run ) );
 			return result;
 		}
@@ -56,7 +56,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 	
 	/*public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>
 	{
-		public static LoggingTraceListenerFactory Instance { get; } = new LoggingTraceListenerFactory();
+		public static LoggingTraceListenerFactory Default { get; } = new LoggingTraceListenerFactory();
 
 		public override TraceListener Create( ILogger parameter ) => new SerilogTraceListener.SerilogTraceListener( parameter );
 	}*/
@@ -88,7 +88,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 		static class Defaults
 		{
-			public static Func<ILogger, TraceListener> Factory { get; } = LoggingTraceListenerFactory.Instance.Create;
+			public static Func<ILogger, TraceListener> Factory { get; } = LoggingTraceListenerFactory.Default.Create;
 			public static Action<TraceListener> Add { get; } = new AddItemCommand( Trace.Listeners ).Execute;
 			public static Action<TraceListener> Remove { get; } = new RemoveItemCommand( Trace.Listeners ).Execute;
 		}

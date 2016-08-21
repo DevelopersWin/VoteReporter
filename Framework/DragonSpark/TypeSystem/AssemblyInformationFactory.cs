@@ -9,8 +9,8 @@ namespace DragonSpark.TypeSystem
 {
 	public sealed class DefaultAssemblyInformationSource : FixedFactory<Assembly, AssemblyInformation>
 	{
-		public static ISource<AssemblyInformation> Instance { get; } = /*new Scope<AssemblyInformation>( Factory.Global( () => .Get() ) ).ScopedWithDefault()*/new DefaultAssemblyInformationSource();
-		DefaultAssemblyInformationSource() : base( AssemblyInformationFactory.Instance.Get, ApplicationAssembly.Instance.Get ) {}
+		public static ISource<AssemblyInformation> Default { get; } = /*new Scope<AssemblyInformation>( Factory.Global( () => .Get() ) ).ScopedWithDefault()*/new DefaultAssemblyInformationSource();
+		DefaultAssemblyInformationSource() : base( AssemblyInformationFactory.Default.Get, ApplicationAssembly.Default.Get ) {}
 	}
 
 	public sealed class AssemblyInformationFactory : ParameterizedSourceBase<Assembly, AssemblyInformation>
@@ -26,7 +26,7 @@ namespace DragonSpark.TypeSystem
 		};*/
 
 		[Export]
-		public static IParameterizedSource<Assembly, AssemblyInformation> Instance { get; } = new AssemblyInformationFactory().ToCache();
+		public static IParameterizedSource<Assembly, AssemblyInformation> Default { get; } = new AssemblyInformationFactory().ToCache();
 		AssemblyInformationFactory() {}
 
 		public override AssemblyInformation Get( Assembly parameter )

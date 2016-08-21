@@ -205,11 +205,11 @@ namespace DragonSpark.Diagnostics.Logging
 
 	abstract class LoggerTemplateParameterFactoryBase<T> : ParameterizedSourceBase<T, object[]> where T : ILoggerTemplate
 	{
-		// public static TemplateParameterFactoryBase Instance { get; } = new TemplateParameterFactoryBase<T>();
+		// public static TemplateParameterFactoryBase Default { get; } = new TemplateParameterFactoryBase<T>();
 
 		readonly Formatter source;
 
-		protected LoggerTemplateParameterFactoryBase() : this( Formatter.Instance ) {}
+		protected LoggerTemplateParameterFactoryBase() : this( Formatter.Default ) {}
 
 		protected LoggerTemplateParameterFactoryBase( Formatter source )
 		{
@@ -221,14 +221,14 @@ namespace DragonSpark.Diagnostics.Logging
 
 	class LoggerTemplateParameterFactory : LoggerTemplateParameterFactoryBase<ILoggerTemplate>
 	{
-		public static LoggerTemplateParameterFactory Instance { get; } = new LoggerTemplateParameterFactory();
+		public static LoggerTemplateParameterFactory Default { get; } = new LoggerTemplateParameterFactory();
 
 		public override object[] Get( ILoggerTemplate parameter ) => new object[] { parameter.Template, Parameters( parameter ) };
 	}
 
 	class LoggerExceptionTemplateParameterFactory : LoggerTemplateParameterFactoryBase<ILoggerExceptionTemplate>
 	{
-		public static LoggerExceptionTemplateParameterFactory Instance { get; } = new LoggerExceptionTemplateParameterFactory();
+		public static LoggerExceptionTemplateParameterFactory Default { get; } = new LoggerExceptionTemplateParameterFactory();
 
 		public override object[] Get( ILoggerExceptionTemplate parameter ) => new object[] { parameter.Exception, parameter.Template, Parameters( parameter ) };
 	}
@@ -237,7 +237,7 @@ namespace DragonSpark.Diagnostics.Logging
 	{
 		public LogTemplateCommand( ILogger logger ) : this( logger, template => template.IntendedLevel ) {}
 		public LogTemplateCommand( ILogger logger, LogEventLevel level ) : this( logger, template => level ) {}
-		public LogTemplateCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerTemplateParameterFactory.Instance.Get ) {}
+		public LogTemplateCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerTemplateParameterFactory.Default.Get ) {}
 	}
 
 	public class LogExceptionCommand : LogCommandBase<LogException, ILoggerExceptionTemplate>
@@ -245,36 +245,36 @@ namespace DragonSpark.Diagnostics.Logging
 		public LogExceptionCommand( ILogger logger ) : this( logger, template => template.IntendedLevel ) {}
 		public LogExceptionCommand( ILogger logger, LogEventLevel level ) : this( logger, template => level ) {}
 
-		public LogExceptionCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerExceptionTemplateParameterFactory.Instance.Get ) {}
+		public LogExceptionCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerExceptionTemplateParameterFactory.Default.Get ) {}
 	}*/
 
 	public sealed class Logger : ConfigurableParameterizedFactoryBase<LoggerConfiguration, ILogger>
 	{
-		public static IParameterizedSource<ILogger> Instance { get; } = new Logger().ToCache();
-		Logger() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Instance.ToDelegate().Wrap(), ( configuration, parameter ) => configuration.CreateLogger().ForContext( Constants.SourceContextPropertyName, parameter, true ) ) {}
+		public static IParameterizedSource<ILogger> Default { get; } = new Logger().ToCache();
+		Logger() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Default.ToDelegate().Wrap(), ( configuration, parameter ) => configuration.CreateLogger().ForContext( Constants.SourceContextPropertyName, parameter, true ) ) {}
 	}
 
 	public sealed class LoggingHistory : Scope<LoggerHistorySink>
 	{
-		public static LoggingHistory Instance { get; } = new LoggingHistory();
+		public static LoggingHistory Default { get; } = new LoggingHistory();
 		LoggingHistory() : base( Factory.Global( () => new LoggerHistorySink() ) ) {}
 	}
 
 	public sealed class LoggingController : Scope<LoggingLevelSwitch>
 	{
-		public static LoggingController Instance { get; } = new LoggingController();
-		LoggingController() : base( Factory.Global( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get() ) ) ) {}
+		public static LoggingController Default { get; } = new LoggingController();
+		LoggingController() : base( Factory.Global( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) ) ) {}
 	}
 
 	sealed class LoggerConfigurationSource : LoggerConfigurationSourceBase
 	{
-		public static LoggerConfigurationSource Instance { get; } = new LoggerConfigurationSource();
-		LoggerConfigurationSource() : base( HistoryTransform.Instance ) {}
+		public static LoggerConfigurationSource Default { get; } = new LoggerConfigurationSource();
+		LoggerConfigurationSource() : base( HistoryTransform.Default ) {}
 
 		sealed class HistoryTransform : TransformerBase<LoggerConfiguration>
 		{
-			public static HistoryTransform Instance { get; } = new HistoryTransform();
-			HistoryTransform() : this( LoggingHistory.Instance.Get ) {}
+			public static HistoryTransform Default { get; } = new HistoryTransform();
+			HistoryTransform() : this( LoggingHistory.Default.Get ) {}
 
 			readonly Func<ILoggerHistory> history;
 
@@ -289,16 +289,16 @@ namespace DragonSpark.Diagnostics.Logging
 
 	sealed class FormatterConfiguration : TransformerBase<LoggerConfiguration>
 	{
-		readonly static Func<object, object> Formatter = Diagnostics.Formatter.Instance.Format;
+		readonly static Func<object, object> Formatter = Diagnostics.Formatter.Default.Format;
 
-		public static FormatterConfiguration Instance { get; } = new FormatterConfiguration();
+		public static FormatterConfiguration Default { get; } = new FormatterConfiguration();
 		FormatterConfiguration() {}
 
 		public override LoggerConfiguration Get( LoggerConfiguration parameter )
 		{
-			foreach ( var type in KnownTypes.Instance.Get<IFormattable>() )
+			foreach ( var type in KnownTypes.Default.Get<IFormattable>() )
 			{
-				var located = ConstructingParameterLocator.Instance.Get( type );
+				var located = ConstructingParameterLocator.Default.Get( type );
 				if ( located != null )
 				{
 					parameter.Destructure.ByTransformingWhere( new TypeAssignableSpecification( located ).Cached().ToSpecificationDelegate(), Formatter );
@@ -311,14 +311,14 @@ namespace DragonSpark.Diagnostics.Logging
 
 	public abstract class LoggerConfigurationSourceBase : ConfigurationSource<LoggerConfiguration>
 	{
-		readonly static ITransformer<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Instance.ToTransformer();
+		readonly static ITransformer<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Default.ToTransformer();
 
-		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Instance, ControllerTransform.Instance, ApplicationAssemblyTransform.Instance ) ) {}
+		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Default, ControllerTransform.Default, ApplicationAssemblyTransform.Default ) ) {}
 
 		sealed class ControllerTransform : TransformerBase<LoggerConfiguration>
 		{
-			public static ControllerTransform Instance { get; } = new ControllerTransform();
-			ControllerTransform() : this( LoggingController.Instance.Get ) {}
+			public static ControllerTransform Default { get; } = new ControllerTransform();
+			ControllerTransform() : this( LoggingController.Default.Get ) {}
 
 			readonly Func<LoggingLevelSwitch> controller;
 
@@ -333,17 +333,17 @@ namespace DragonSpark.Diagnostics.Logging
 
 	sealed class ApplicationAssemblyTransform : TransformerBase<LoggerConfiguration>, ILogEventEnricher
 	{
-		public static ApplicationAssemblyTransform Instance { get; } = new ApplicationAssemblyTransform();
+		public static ApplicationAssemblyTransform Default { get; } = new ApplicationAssemblyTransform();
 		ApplicationAssemblyTransform() {}
 
 		public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.Enrich.With( this );
 
-		public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( nameof(AssemblyInformation), DefaultAssemblyInformationSource.Instance.Get(), true ) );
+		public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( nameof(AssemblyInformation), DefaultAssemblyInformationSource.Default.Get(), true ) );
 	}
 
 	/*sealed class CreatorFilterTransformer : TransformerBase<LoggerConfiguration>
 	{
-		public static CreatorFilterTransformer Instance { get; } = new CreatorFilterTransformer();
+		public static CreatorFilterTransformer Default { get; } = new CreatorFilterTransformer();
 		CreatorFilterTransformer() {}
 
 		/*readonly CreatorFilter filter;

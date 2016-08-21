@@ -5,7 +5,7 @@ namespace DragonSpark.Activation
 {
 	public abstract class ConstructorBase : ActivatorBase<ConstructTypeRequest>
 	{
-		readonly protected static Coerce<ConstructTypeRequest> DefaultCoerce = Coercer.Instance.ToDelegate();
+		readonly protected static Coerce<ConstructTypeRequest> DefaultCoerce = Coercer.Default.ToDelegate();
 
 		protected ConstructorBase() : base( DefaultCoerce ) {}
 
@@ -13,7 +13,7 @@ namespace DragonSpark.Activation
 
 		public sealed class Coercer : TypeRequestCoercer<ConstructTypeRequest>
 		{
-			public static Coercer Instance { get; } = new Coercer();
+			public static Coercer Default { get; } = new Coercer();
 
 			protected override ConstructTypeRequest Create( Type type ) => new ConstructTypeRequest( type );
 		}

@@ -9,12 +9,12 @@ namespace DragonSpark.ComponentModel
 	{
 		public SingletonAttribute() : this( null ) {}
 
-		public SingletonAttribute( Type hostType, string propertyName = nameof(SingletonLocator.Instance) ) : base( new SingletonDefaultValueProvider( hostType, propertyName ).Wrap() ) {}
+		public SingletonAttribute( Type hostType, string propertyName = nameof(SingletonLocator.Default) ) : base( new SingletonDefaultValueProvider( hostType, propertyName ).Wrap() ) {}
 	}
 
 	public class SingletonDefaultValueProvider : IDefaultValueProvider
 	{
-		readonly static Func<Type, Type> Locator = ConventionTypes.Instance.Get;
+		readonly static Func<Type, Type> Locator = ConventionTypes.Default.Get;
 
 		readonly Func<Type, Type> locator;
 		readonly Type hostType;

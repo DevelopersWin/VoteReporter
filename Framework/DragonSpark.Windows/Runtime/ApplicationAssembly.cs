@@ -11,22 +11,22 @@ namespace DragonSpark.Windows.Runtime
 	{
 		readonly Func<Assembly> defaultSource;
 
-		public static ApplicationAssemblyLocator Instance { get; } = new ApplicationAssemblyLocator();
+		public static ApplicationAssemblyLocator Default { get; } = new ApplicationAssemblyLocator();
 		ApplicationAssemblyLocator() : this( AppDomain.CurrentDomain ) {}
 
-		public ApplicationAssemblyLocator( AppDomain domain ) : this( new FixedFactory<AppDomain, Assembly>( DomainApplicationAssemblies.Instance.Get, domain ).Get ) {}
+		public ApplicationAssemblyLocator( AppDomain domain ) : this( new FixedFactory<AppDomain, Assembly>( DomainApplicationAssemblies.Default.Get, domain ).Get ) {}
 
 		public ApplicationAssemblyLocator( Func<Assembly> defaultSource )
 		{
 			this.defaultSource = defaultSource;
 		}
 
-		public override Assembly Get( IEnumerable<Assembly> parameter ) => DragonSpark.TypeSystem.ApplicationAssemblyLocator.Instance.Get( parameter ) ?? defaultSource();
+		public override Assembly Get( IEnumerable<Assembly> parameter ) => DragonSpark.TypeSystem.ApplicationAssemblyLocator.Default.Get( parameter ) ?? defaultSource();
 	}
 
 	public sealed class DomainApplicationAssemblies : FactoryCache<AppDomain, Assembly>
 	{
-		public static DomainApplicationAssemblies Instance { get; } = new DomainApplicationAssemblies();
+		public static DomainApplicationAssemblies Default { get; } = new DomainApplicationAssemblies();
 		DomainApplicationAssemblies() {}
 
 		protected override Assembly Create( AppDomain parameter )

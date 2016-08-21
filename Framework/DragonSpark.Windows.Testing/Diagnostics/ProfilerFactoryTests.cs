@@ -12,15 +12,15 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		{
 			var currentMethod = MethodBase.GetCurrentMethod();
 
-			var history = LoggingHistory.Instance.Get( currentMethod );
+			var history = LoggingHistory.Default.Get( currentMethod );
 			var message = "Hello World";
 			var logEvent = new LogEvent( DateTimeOffset.Now, LogEventLevel.Information, null, new MessageTemplateParser().Parse( message ), new LogEventProperty[0] );
 			history.Emit( logEvent );
 
 			Assert.Contains( logEvent, history.Events );
 			var lines = new List<string>();
-			LoggingController.Instance.Get( currentMethod ).MinimumLevel = LogEventLevel.Debug;
-			var logger = Logging.Instance.Get( currentMethod );
+			LoggingController.Default.Get( currentMethod ).MinimumLevel = LogEventLevel.Debug;
+			var logger = Logging.Default.Get( currentMethod );
 
 			var listener = Tracing.Listener.Get( logger );
 			Assert.NotNull( listener );

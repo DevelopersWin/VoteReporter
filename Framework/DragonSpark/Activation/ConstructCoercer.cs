@@ -64,16 +64,16 @@ namespace DragonSpark.Activation
 
 	public sealed class ConstructingParameterLocator : ParameterizedSourceBase<Type, Type>
 	{
-		public static ConstructingParameterLocator Instance { get; } = new ConstructingParameterLocator();
+		public static ConstructingParameterLocator Default { get; } = new ConstructingParameterLocator();
 		ConstructingParameterLocator() {}
 
 		public override Type Get( Type parameter ) => 
-			InstanceConstructors.Instance.Get( parameter.GetTypeInfo() ).Select( info => info.GetParameterTypes() ).SingleOrDefault( types => types.Length == 1 )?.Single();
+			InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).Select( info => info.GetParameterTypes() ).SingleOrDefault( types => types.Length == 1 )?.Single();
 	}
 
 	public class SourceCoercer<T> : ICoercer<T>
 	{
-		public static SourceCoercer<T> Instance { get; } = new SourceCoercer<T>();
+		public static SourceCoercer<T> Default { get; } = new SourceCoercer<T>();
 		SourceCoercer() {}
 
 		public T Coerce( object parameter )
@@ -96,14 +96,14 @@ namespace DragonSpark.Activation
 
 	public class Coercer<T> : CoercerBase<T>
 	{
-		public static Coercer<T> Instance { get; } = new Coercer<T>();
+		public static Coercer<T> Default { get; } = new Coercer<T>();
 
 		protected override T PerformCoercion( object parameter ) => default(T);
 	}
 
 	public class ConstructCoercer<T> : CoercerBase<T>
 	{
-		public static ConstructCoercer<T> Instance { get; } = new ConstructCoercer<T>( ParameterConstructor<T>.From );
+		public static ConstructCoercer<T> Default { get; } = new ConstructCoercer<T>( ParameterConstructor<T>.From );
 		
 		readonly Func<object, T> projector;
 

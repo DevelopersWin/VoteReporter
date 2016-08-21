@@ -63,7 +63,7 @@ namespace DragonSpark.Testing.Framework
 
 	public struct RegisterFactoryParameter
 	{
-		public RegisterFactoryParameter( [Required, OfSourceType]Type factoryType, params Type[] registrationTypes ) : this( factoryType, registrationTypes.WhereAssigned().Append( ResultTypes.Instance.Get( factoryType ) ).Distinct().ToImmutableArray() ) {}
+		public RegisterFactoryParameter( [Required, OfSourceType]Type factoryType, params Type[] registrationTypes ) : this( factoryType, registrationTypes.WhereAssigned().Append( ResultTypes.Default.Get( factoryType ) ).Distinct().ToImmutableArray() ) {}
 
 		public RegisterFactoryParameter( [Required, OfSourceType]Type factoryType, ImmutableArray<Type> registerTypes )
 		{
@@ -109,7 +109,7 @@ namespace DragonSpark.Testing.Framework
 				registry.Register( new InstanceRegistrationParameter( typed.GetType(), typed ) );
 			}
 			
-			new[] { ConventionImplementedInterfaces.Instance.Get( parameter.SourceType ), SourceInterfaces.Instance.Get( parameter.SourceType ) }
+			new[] { ConventionImplementedInterfaces.Default.Get( parameter.SourceType ), SourceInterfaces.Default.Get( parameter.SourceType ) }
 				.WhereAssigned()
 				.Distinct()
 				.Introduce( parameter.SourceType, tuple => new MappingRegistrationParameter( tuple.Item1, tuple.Item2 ) )
@@ -121,20 +121,20 @@ namespace DragonSpark.Testing.Framework
 
 	public class RegisterFactoryCommand : RegisterFactoryCommandBase<ISource>
 	{
-		public RegisterFactoryCommand( IServiceRegistry registry ) : base( registry, SingletonLocator.Instance, SourceDelegates.Instance.ToDelegate() ) {}
+		public RegisterFactoryCommand( IServiceRegistry registry ) : base( registry, SingletonLocator.Default, SourceDelegates.Default.ToDelegate() ) {}
 
 		protected override Type MakeGenericType( Type parameter, Type itemType ) => typeof(SourceDelegates<>).MakeGenericType( itemType.ToItem() );
 	}
 
 	public class RegisterParameterizedSourceCommand : RegisterFactoryCommandBase<IParameterizedSource>
 	{
-		readonly static Func<Type, Type> ParameterLocator = ParameterTypes.Instance.ToDelegate();
+		readonly static Func<Type, Type> ParameterLocator = ParameterTypes.Default.ToDelegate();
 
 		readonly Func<Type, Type> parameterLocator;
-		public RegisterParameterizedSourceCommand( IServiceRegistry registry ) : this( registry, SingletonLocator.Instance, ParameterizedSourceDelegates.Instance, ParameterLocator ) {}
+		public RegisterParameterizedSourceCommand( IServiceRegistry registry ) : this( registry, SingletonLocator.Default, ParameterizedSourceDelegates.Default, ParameterLocator ) {}
 
 		RegisterParameterizedSourceCommand( IServiceRegistry registry, ISingletonLocator locator, ParameterizedSourceDelegates delegates, Func<Type, Type> parameterLocator ) 
-			: base( registry, locator, ServiceProvidedParameterizedSourceDelegates.Instance.Get, delegates.Get )
+			: base( registry, locator, ServiceProvidedParameterizedSourceDelegates.Default.Get, delegates.Get )
 		{
 			this.parameterLocator = parameterLocator;
 		}

@@ -16,7 +16,7 @@
 
 	/*public class KeyVaultApplicationFactory : FactoryBase<X509Certificate2, KeyVaultApplication>
 	{
-		public static KeyVaultApplicationFactory Instance { get; } = new KeyVaultApplicationFactory();
+		public static KeyVaultApplicationFactory Default { get; } = new KeyVaultApplicationFactory();
 
 		public override KeyVaultApplication Create( X509Certificate2 parameter )
 		{

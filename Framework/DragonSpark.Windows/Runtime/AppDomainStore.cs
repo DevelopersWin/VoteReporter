@@ -38,7 +38,7 @@ namespace DragonSpark.Windows.Runtime
 		{
 			var assemblyPath = new Uri( typeof(T).Assembly.CodeBase).LocalPath;
 			var result = (T)domain.CreateInstanceFromAndUnwrap(assemblyPath, typeof(T).FullName, false
-				, BindingFlags.CreateInstance | BindingFlags.Public | BindingFlags.Instance
+				, BindingFlags.CreateInstance | BindingFlags.Public | BindingFlags.Default
 				, null, parameter, null, null );
 			return result;
 		}

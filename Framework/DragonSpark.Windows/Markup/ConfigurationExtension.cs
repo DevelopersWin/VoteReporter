@@ -25,7 +25,7 @@ namespace DragonSpark.Windows.Markup
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
-			var name = key ?? MemberInfoKeyFactory.Instance.Get( serviceProvider.Property.Reference );
+			var name = key ?? MemberInfoKeyFactory.Default.Get( serviceProvider.Property.Reference );
 			var result = Registry.Get( name ) ?? FromTarget( serviceProvider );
 			return result;
 		}
@@ -33,7 +33,7 @@ namespace DragonSpark.Windows.Markup
 		object FromTarget( MarkupServiceProvider serviceProvider )
 		{
 			var adjusted = new PropertyReference( serviceProvider.TargetObject.GetType(), serviceProvider.Property.Reference.PropertyType, serviceProvider.Property.Reference.PropertyName );
-			var name = MemberInfoKeyFactory.Instance.Get( adjusted );
+			var name = MemberInfoKeyFactory.Default.Get( adjusted );
 			var result = Registry.Get( name );
 			return result;
 		}
@@ -43,19 +43,19 @@ namespace DragonSpark.Windows.Markup
 	{
 		public class PropertyInfoFactory : Factory<object, MemberInfo>
 		{
-			public static PropertyInfoFactory Instance { get; } = new PropertyInfoFactory();
+			public static PropertyInfoFactory Default { get; } = new PropertyInfoFactory();
 
 			protected override MemberInfo CreateItem( object parameter ) => parameter;
 		}
 
-		public MemberInfoFromPropertyFactory() : base( PropertyInfoFactory.Instance )
+		public MemberInfoFromPropertyFactory() : base( PropertyInfoFactory.Default )
 		{
 		}
 	}*/
 
 	public class MemberInfoKeyFactory : ParameterizedSourceBase<PropertyReference, string>
 	{
-		public static MemberInfoKeyFactory Instance { get; } = new MemberInfoKeyFactory();
+		public static MemberInfoKeyFactory Default { get; } = new MemberInfoKeyFactory();
 
 		public override string Get( PropertyReference parameter ) => $"{parameter.DeclaringType.FullName}::{parameter.PropertyName}";
 	}
@@ -78,6 +78,6 @@ namespace DragonSpark.Windows.Markup
 	{
 		public MemberInfoKeyExtension( [Required]Type type, string member ) : this( type.GetMember( member ).First() ) {}
 
-		public MemberInfoKeyExtension( [Required]MemberInfo member ) : base( MemberInfoKeyFactory.Instance.Get( PropertyReference.New( member ) ) ) {}
+		public MemberInfoKeyExtension( [Required]MemberInfo member ) : base( MemberInfoKeyFactory.Default.Get( PropertyReference.New( member ) ) ) {}
 	}
 }

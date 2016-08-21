@@ -5,7 +5,7 @@
 		/*[ModuleInitializer( 0 ), DragonSpark.Aspects.Runtime, AssemblyInitialize]
 		public static void Initialize()
 		{
-			LoadPartAssemblyCommand.Instance.Execute( typeof(Configure).Assembly );
+			LoadPartAssemblyCommand.Default.Execute( typeof(Configure).Assembly );
 			// Debugger.Launch();
 		}*/
 	}

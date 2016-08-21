@@ -300,7 +300,7 @@ namespace DragonSpark.Runtime
 
 	/*class ArgumentCache<TContext, TValue> : ProjectedCache<TContext, object[], TValue>
 	{
-		public ArgumentCache( Func<TContext, object[]> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, StructuralEqualityComparer<object[]>.Instance ) {}
+		public ArgumentCache( Func<TContext, object[]> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, StructuralEqualityComparer<object[]>.Default ) {}
 		public ArgumentCache( Func<TContext, object[]> keySelector, Func<TContext, TValue> resultSelector, IEqualityComparer<object[]> comparer ) : base( keySelector, resultSelector, comparer ) {}
 	}*/
 
@@ -318,7 +318,7 @@ namespace DragonSpark.Runtime
 
 		public ProjectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector ) : this( keySelector, resultSelector, typeof(TKey) ) {}
 
-		public ProjectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector, Type structuralTypeCheck ) : base( structuralTypeCheck.IsStructural() ? (IEqualityComparer<TKey>)StructuralEqualityComparer<TKey>.Instance : EqualityComparer<TKey>.Default )
+		public ProjectedCache( Func<TContext, TKey> keySelector, Func<TContext, TValue> resultSelector, Type structuralTypeCheck ) : base( structuralTypeCheck.IsStructural() ? (IEqualityComparer<TKey>)StructuralEqualityComparer<TKey>.Default : EqualityComparer<TKey>.Default )
 		{
 			this.keySelector = keySelector;
 			this.resultSelector = resultSelector;

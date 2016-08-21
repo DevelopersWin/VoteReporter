@@ -38,7 +38,7 @@ namespace DragonSpark.Windows.Entity
 
 	public class DefaultCommands : CompositeCommand<DbContextBuildingParameter>
 	{
-		public static DefaultCommands Instance { get; } = new DefaultCommands();
+		public static DefaultCommands Default { get; } = new DefaultCommands();
 
 		public DefaultCommands() : base( new ICommand[] { new EnableLocalStoragePropertyCommand(), new RegisterComplexTypesCommand() } ) {}
 	}

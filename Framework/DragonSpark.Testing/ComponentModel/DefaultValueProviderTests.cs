@@ -13,7 +13,7 @@ namespace DragonSpark.Testing.ComponentModel
 	public class DefaultValueProviderTests
 	{
 		/*[Export]
-		public IUnityContainer Container { get; } = UnityContainerFactory.Instance.Get();*/
+		public IUnityContainer Container { get; } = UnityContainerFactory.Default.Get();*/
 
 		/*public class Activator : LocatorBase
 		{

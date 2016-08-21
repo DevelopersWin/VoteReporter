@@ -54,13 +54,13 @@ namespace DragonSpark.Windows.Markup
 
 	public class MockFactory : ValidatedParameterizedSourceBase<Type, object>
 	{
-		public static MockFactory Instance { get; } = new MockFactory();
+		public static MockFactory Default { get; } = new MockFactory();
 
-		MockFactory() : base( Specification.Instance ) {}
+		MockFactory() : base( Specification.Default ) {}
 
 		class Specification : SpecificationBase<Type>
 		{
-			public static Specification Instance { get; } = new Specification();
+			public static Specification Default { get; } = new Specification();
 
 			public override bool IsSatisfiedBy( Type parameter ) => parameter.IsInterface || !parameter.IsSealed;
 		}
@@ -75,28 +75,28 @@ namespace DragonSpark.Windows.Markup
 
 	public class StringDesignerValueFactory : ValidatedParameterizedSourceBase<Type, object>
 	{
-		public static StringDesignerValueFactory Instance { get; } = new StringDesignerValueFactory();
+		public static StringDesignerValueFactory Default { get; } = new StringDesignerValueFactory();
 
-		public StringDesignerValueFactory() : base( TypeAssignableSpecification<string>.Instance ) {}
+		public StringDesignerValueFactory() : base( TypeAssignableSpecification<string>.Default ) {}
 
 		public override object Get( Type parameter ) => parameter.AssemblyQualifiedName;
 	}
 
 	public class DesignTimeValueProvider : CompositeFactory<Type, object>
 	{
-		public static DesignTimeValueProvider Instance { get; } = new DesignTimeValueProvider();
-		DesignTimeValueProvider() : base( SpecialValues.DefaultOrEmpty, MockFactory.Instance.ToSourceDelegate(), StringDesignerValueFactory.Instance.ToSourceDelegate() ) {}
+		public static DesignTimeValueProvider Default { get; } = new DesignTimeValueProvider();
+		DesignTimeValueProvider() : base( SpecialValues.DefaultOrEmpty, MockFactory.Default.ToSourceDelegate(), StringDesignerValueFactory.Default.ToSourceDelegate() ) {}
 	}
 
 	public class MarkupValueSetterFactory : CompositeFactory<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
 	{
-		public static MarkupValueSetterFactory Instance { get; } = new MarkupValueSetterFactory();
+		public static MarkupValueSetterFactory Default { get; } = new MarkupValueSetterFactory();
 
 		MarkupValueSetterFactory() : base( 
-			DependencyPropertyMarkupPropertyFactory.Instance, 
-			CollectionMarkupPropertyFactory.Instance, 
-			PropertyInfoMarkupPropertyFactory.Instance, 
-			FieldInfoMarkupPropertyFactory.Instance ) {}
+			DependencyPropertyMarkupPropertyFactory.Default, 
+			CollectionMarkupPropertyFactory.Default, 
+			PropertyInfoMarkupPropertyFactory.Default, 
+			FieldInfoMarkupPropertyFactory.Default ) {}
 	}
 
 	/*public class ServiceProviderTransformer : TransformerBase<IServiceProvider>
@@ -133,7 +133,7 @@ namespace DragonSpark.Windows.Markup
 		readonly Func<IServiceProvider, IMarkupProperty> factory;
 		readonly Func<Type, object> designTimeFactory;
 
-		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Instance.ToSourceDelegate(), DesignTimeValueProvider.Instance.ToSourceDelegate() ) {}
+		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Default.ToSourceDelegate(), DesignTimeValueProvider.Default.ToSourceDelegate() ) {}
 
 		protected MarkupExtensionBase( [Required]Func<IServiceProvider, IMarkupProperty> factory, [Required]Func<Type, object> designTimeFactory )
 		{

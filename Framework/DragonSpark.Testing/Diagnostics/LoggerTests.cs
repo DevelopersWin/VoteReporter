@@ -26,8 +26,8 @@ namespace DragonSpark.Testing.Diagnostics
 		{
 			var logger = context.GetExport<ILogger>();
 
-			var serviceProvider = DefaultServiceProvider.Instance.Cached();
-			Assert.Same( Logger.Instance.Get( Execution.Current() ), serviceProvider.Get<ILogger>() );
+			var serviceProvider = DefaultServiceProvider.Default.Cached();
+			Assert.Same( Logger.Default.Get( Execution.Current() ), serviceProvider.Get<ILogger>() );
 			Assert.Same( serviceProvider.Get<ILogger>(), logger );
 
 			var method = new Action( Subject ).Method;
@@ -36,7 +36,7 @@ namespace DragonSpark.Testing.Diagnostics
 			
 			var history = context.GetExport<ILoggerHistory>();
 			Assert.Same( serviceProvider.Get<ILoggerHistory>(), history );
-			var message = LogEventMessageFactory.Instance.Get( history.Events ).Last();
+			var message = LogEventMessageFactory.Default.Get( history.Events ).Last();
 			Assert.Contains( text, message );
 			
 			Assert.Contains( new MethodFormatter( method ).ToString( null, null ), message );
@@ -45,10 +45,10 @@ namespace DragonSpark.Testing.Diagnostics
 		[Theory, AutoData]
 		public void EnsureAssembly()
 		{
-			var logger = Logger.Instance.Get( this );
+			var logger = Logger.Default.Get( this );
 			logger.Information( "Hello World!" );
-			var line = LoggingHistory.Instance.Get().Events.Single();
-			var source = DefaultAssemblyInformationSource.Instance.Get();
+			var line = LoggingHistory.Default.Get().Events.Single();
+			var source = DefaultAssemblyInformationSource.Default.Get();
 			var property = line.Properties[nameof(AssemblyInformation)].To<StructureValue>();
 			Assert.NotNull( property );
 			Assert.Equal( nameof(AssemblyInformation), property.TypeTag );

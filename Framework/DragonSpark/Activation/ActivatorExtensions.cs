@@ -77,19 +77,19 @@ namespace DragonSpark.Activation
 
 	public sealed class Activator : CompositeActivator
 	{
-		public static ISource<IActivator> Instance { get; } = new Scope<IActivator>( Factory.Global( () => new Activator() ) );
-		Activator() : base( new Locator(), Constructor.Instance ) {}
+		public static ISource<IActivator> Default { get; } = new Scope<IActivator>( Factory.Global( () => new Activator() ) );
+		Activator() : base( new Locator(), Constructor.Default ) {}
 
-		public static T Activate<T>( Type type ) => Instance.Get().Get<T>( type );
+		public static T Activate<T>( Type type ) => Default.Get().Get<T>( type );
 
 		sealed class Locator : LocatorBase
 		{
-			readonly static Func<Type, Type> Types = ConventionTypes.Instance.Get;
+			readonly static Func<Type, Type> Types = ConventionTypes.Default.Get;
 
 			readonly Func<Type, Type> convention;
 			readonly ISingletonLocator singleton;
 
-			public Locator() : this( Types, SingletonLocator.Instance ) {}
+			public Locator() : this( Types, SingletonLocator.Default ) {}
 
 			Locator( Func<Type, Type> convention, ISingletonLocator singleton )
 			{
@@ -105,7 +105,7 @@ namespace DragonSpark.Activation
 
 	public class SingletonSpecification : SpecificationBase<SingletonRequest>
 	{
-		public static SingletonSpecification Instance { get; } = new SingletonSpecification();
+		public static SingletonSpecification Default { get; } = new SingletonSpecification();
 		SingletonSpecification() : this( "Instance", "Default" ) {}
 
 		readonly ImmutableArray<string> candidates;
@@ -120,7 +120,7 @@ namespace DragonSpark.Activation
 		public override bool IsSatisfiedBy( SingletonRequest parameter )
 		{
 			var result =
-				SourceTypeAssignableSpecification.Instance.IsSatisfiedBy( new SourceTypeAssignableSpecification.Parameter( parameter.RequestedType, parameter.Candidate.PropertyType ) )
+				SourceTypeAssignableSpecification.Default.IsSatisfiedBy( new SourceTypeAssignableSpecification.Parameter( parameter.RequestedType, parameter.Candidate.PropertyType ) )
 				&& 
 				parameter.Candidate.GetMethod.IsStatic && !parameter.Candidate.GetMethod.ContainsGenericParameters 
 				&& 
@@ -143,7 +143,7 @@ namespace DragonSpark.Activation
 
 	public sealed class SourceTypeAssignableSpecification : SpecificationBase<SourceTypeAssignableSpecification.Parameter>
 	{
-		public static SourceTypeAssignableSpecification Instance { get; } = new SourceTypeAssignableSpecification();
+		public static SourceTypeAssignableSpecification Default { get; } = new SourceTypeAssignableSpecification();
 		SourceTypeAssignableSpecification() {}
 
 		public override bool IsSatisfiedBy( Parameter parameter )
@@ -183,7 +183,7 @@ namespace DragonSpark.Activation
 
 	/*public sealed class SourceTypeAssignableSpecification : GuardedSpecificationBase<Type>
 	{
-		public static ISpecification<Type> Instance { get; } = new SourceTypeAssignableSpecification().ToCache();
+		public static ISpecification<Type> Default { get; } = new SourceTypeAssignableSpecification().ToCache();
 		SourceTypeAssignableSpecification() {}
 
 		readonly static TypeAdapter Source = typeof(ISource).Adapt();
@@ -193,7 +193,7 @@ namespace DragonSpark.Activation
 
 	sealed class SingletonDelegateCache : FactoryCache<PropertyInfo, Func<object>>
 	{
-		public static SingletonDelegateCache Instance { get; } = new SingletonDelegateCache();
+		public static SingletonDelegateCache Default { get; } = new SingletonDelegateCache();
 		SingletonDelegateCache() {}
 
 		protected override Func<object> Create( PropertyInfo parameter ) => 
@@ -202,9 +202,9 @@ namespace DragonSpark.Activation
 
 	public class SingletonDelegates : SingletonDelegates<Func<object>>
 	{
-		public static SingletonDelegates Instance { get; } = new SingletonDelegates();
-		SingletonDelegates() : this( SingletonProperties.Instance ) {}
-		public SingletonDelegates( IParameterizedSource<Type, PropertyInfo> source ) : base( source.ToSourceDelegate(), SingletonDelegateCache.Instance.Get ) {}
+		public static SingletonDelegates Default { get; } = new SingletonDelegates();
+		SingletonDelegates() : this( SingletonProperties.Default ) {}
+		public SingletonDelegates( IParameterizedSource<Type, PropertyInfo> source ) : base( source.ToSourceDelegate(), SingletonDelegateCache.Default.Get ) {}
 		// public SingletonDelegates( ISpecification<SingletonRequest> specification, Func<PropertyInfo, Func<object>> source ) : base( specification, source ) {}
 	}
 
@@ -229,8 +229,8 @@ namespace DragonSpark.Activation
 
 	public class SingletonProperties : ParameterizedSourceBase<Type, PropertyInfo>
 	{
-		public static IParameterizedSource<Type, PropertyInfo> Instance { get; } = new SingletonProperties().ToCache();
-		SingletonProperties() : this( SingletonSpecification.Instance ) {}
+		public static IParameterizedSource<Type, PropertyInfo> Default { get; } = new SingletonProperties().ToCache();
+		SingletonProperties() : this( SingletonSpecification.Default ) {}
 
 		readonly ISpecification<SingletonRequest> specification;
 
@@ -255,8 +255,8 @@ namespace DragonSpark.Activation
 	public class SingletonLocator : FactoryCache<Type, object>, ISingletonLocator
 	{
 		[Export( typeof(ISingletonLocator) )]
-		public static SingletonLocator Instance { get; } = new SingletonLocator();
-		SingletonLocator() : this( SingletonDelegates.Instance.Get ) {}
+		public static SingletonLocator Default { get; } = new SingletonLocator();
+		SingletonLocator() : this( SingletonDelegates.Default.Get ) {}
 
 		readonly Func<Type, Func<object>> provider;
 

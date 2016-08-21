@@ -30,7 +30,7 @@ namespace DragonSpark.Setup
 	{
 		readonly Func<ImmutableArray<Type>> typeSource;
 		readonly IActivator activator;
-		readonly static Func<ImmutableArray<Type>> TypeSource = ApplicationTypes.Instance.Get;
+		readonly static Func<ImmutableArray<Type>> TypeSource = ApplicationTypes.Default.Get;
 
 		public AllTypesOfFactory( IActivator activator ) : this( TypeSource, activator ) {}
 

@@ -3,7 +3,7 @@
 	/*[Export( typeof(ISetup) )]
 	public class InitializationCommand
 	{
-		public InitializationCommand() : base( /*EnableMethodCaching.Instance.From( false )#1# )
+		public InitializationCommand() : base( /*EnableMethodCaching.Default.From( false )#1# )
 		{
 		}
 	}*/

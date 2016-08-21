@@ -10,7 +10,7 @@ namespace DragonSpark.Windows.Io
 {
 	public class IsAssemblySpecification : FileExtensionSpecificationBase
 	{
-		public static IsAssemblySpecification Instance { get; } = new IsAssemblySpecification();
+		public static IsAssemblySpecification Default { get; } = new IsAssemblySpecification();
 		IsAssemblySpecification() : base( FileSystem.AssemblyExtension ) {}
 	}
 
@@ -29,7 +29,7 @@ namespace DragonSpark.Windows.Io
 	{
 		public const string AssemblyExtension = ".dll", ValidPathTimeFormat = "yyyy-MM-dd--HH-mm-ss";
 
-		public static string GetValidPath() => GetValidPath( CurrentTimeConfiguration.Instance.Get() );
+		public static string GetValidPath() => GetValidPath( CurrentTimeConfiguration.Default.Get() );
 
 		public static string GetValidPath( ICurrentTime @this )
 		{
@@ -93,7 +93,7 @@ namespace DragonSpark.Windows.Io
 					}
 					catch ( Exception exception )
 					{
-						Logger.Instance.Get( file ).Error( exception, "Could not delete {File}.", file.FullName );
+						Logger.Default.Get( file ).Error( exception, "Could not delete {File}.", file.FullName );
 					}
 				}
 			}

@@ -17,7 +17,7 @@ namespace DragonSpark.Windows.Entity
 
 		readonly ICommand<DbContextBuildingParameter> command;
 
-		protected EntityContext() : this( DefaultCommands.Instance ) {}
+		protected EntityContext() : this( DefaultCommands.Default ) {}
 
 		protected EntityContext( ICommand<DbContextBuildingParameter> command )
 		{

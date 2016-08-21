@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = new[] { typeof(IHelloWorld), typeof(HelloWorld) };
 			new AssignSystemPartsCommand( parts ).Run();
 
-			var container = new ContainerConfiguration().WithParts( parts, ConventionBuilderFactory.Instance.Get() ).CreateContainer();
+			var container = new ContainerConfiguration().WithParts( parts, ConventionBuilderFactory.Default.Get() ).CreateContainer();
 			var export = container.GetExport<IHelloWorld>();
 			Assert.IsType<HelloWorld>( export );
 			Assert.NotSame( export, container.GetExport<IHelloWorld>() );
@@ -32,9 +32,9 @@ namespace DragonSpark.Testing.Composition
 			var parts = new[] { typeof(IExceptionHandler), typeof(DragonSpark.Diagnostics.Exceptions.ExceptionHandler), typeof(ExceptionHandler) };
 			new AssignSystemPartsCommand( parts ).Run();
 
-			Assert.Equal( typeof(ExceptionHandler), ApplicationTypes.Instance.Get().First() );
+			Assert.Equal( typeof(ExceptionHandler), ApplicationTypes.Default.Get().First() );
 
-			var handler = CompositionHostFactory.Instance.Get().GetExport<IExceptionHandler>();
+			var handler = CompositionHostFactory.Default.Get().GetExport<IExceptionHandler>();
 			Assert.IsType<ExceptionHandler>( handler );
 		}
 
@@ -59,7 +59,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = new[] { typeof(IHelloWorldShared), typeof(HelloWorldShared) };
 			new AssignSystemPartsCommand( parts ).Run();
 
-			var container = new ContainerConfiguration().WithParts( parts, ConventionBuilderFactory.Instance.Get() ).CreateContainer();
+			var container = new ContainerConfiguration().WithParts( parts, ConventionBuilderFactory.Default.Get() ).CreateContainer();
 			var export = container.GetExport<IHelloWorldShared>();
 			Assert.IsType<HelloWorldShared>( export );
 			Assert.Same( export, container.GetExport<IHelloWorldShared>() );

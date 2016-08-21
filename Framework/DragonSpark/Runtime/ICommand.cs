@@ -151,7 +151,7 @@ namespace DragonSpark.Runtime
 
 		public override void Execute( T parameter )
 		{
-			using ( Logger.Instance.Get( method ).TimeOperation( template, method, parameter ) )
+			using ( Logger.Default.Get( method ).TimeOperation( template, method, parameter ) )
 			{
 				base.Execute( parameter );
 			}
@@ -159,7 +159,7 @@ namespace DragonSpark.Runtime
 
 		/*public override TResult Get( TParameter parameter )
 		{
-			using ( Logger.Instance.Get( method ).TimeOperation( template, method, parameter ) )
+			using ( Logger.Default.Get( method ).TimeOperation( template, method, parameter ) )
 			{
 				return base.Get( parameter );
 			}
@@ -248,7 +248,7 @@ namespace DragonSpark.Runtime
 
 	/*public class ServiceCoercer<T> : CoercerBase<T>
 	{
-		public static ServiceCoercer<T> Instance { get; } = new ServiceCoercer<T>();
+		public static ServiceCoercer<T> Default { get; } = new ServiceCoercer<T>();
 		ServiceCoercer() : this( GlobalServiceProvider.GetService<object> ) {}
 
 		readonly Func<Type, object> source;

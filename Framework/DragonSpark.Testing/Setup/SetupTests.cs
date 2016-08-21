@@ -11,20 +11,20 @@ namespace DragonSpark.Testing.Setup
 		public void ServiceProviderCaching()
 		{
 			var count = 0;
-			Exports.Instance.Assign( () =>
+			Exports.Default.Assign( () =>
 									 {
 										++count;
-										return DefaultExportProvider.Instance;
+										return DefaultExportProvider.Default;
 									 }  );
 			Assert.Equal( 0, count );
 
-			var serviceProvider = DefaultServiceProvider.Instance.Cached();
+			var serviceProvider = DefaultServiceProvider.Default.Cached();
 			serviceProvider.Get<IExportProvider>();
 			Assert.Equal( 1, count );
 			serviceProvider.Get<IExportProvider>();
 			Assert.Equal( 1, count );
 
-			var provider = ServiceProviderFactory.Instance.Get();
+			var provider = ServiceProviderFactory.Default.Get();
 			Assert.Equal( 2, count );
 
 			provider.Get<IExportProvider>();

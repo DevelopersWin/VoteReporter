@@ -4,7 +4,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 {
 	class CacheRegistry<T> : ICacheRegistry<T>
 	{
-		public static CacheRegistry<T> Instance { get; } = new CacheRegistry<T>();
+		public static CacheRegistry<T> Default { get; } = new CacheRegistry<T>();
 
 		readonly ConditionalWeakTable<object, ICache<T>> cache = new ConditionalWeakTable<object, ICache<T>>();
 

@@ -22,7 +22,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		void First()
 		{
 			var method = new Action<Assembly[]>( Host ).Method;
-			var autoData = new AutoData( FixtureFactory<AutoDataCustomization>.Instance.Create(), method );
+			var autoData = new AutoData( FixtureFactory<AutoDataCustomization>.Default.Create(), method );
 			var providerFactory = new Composition.TypeBasedServiceProviderFactory( GetType().ToItem() );
 			var provider = new ServiceProviderFactory( providerFactory ).Create();
 			var factory = new AutoDataExecutionContextFactory( provider.Wrap<AutoData, IServiceProvider>().ToDelegate(), LocationSetup.AutoDataAttribute.ApplicationCommandsSource );
@@ -65,8 +65,8 @@ namespace DragonSpark.Windows.Testing.Setup
 										var methodInfo = typeof(Mock).GetMethod( nameof<>(Mock.Hello) );
 										AssociatedContext.Property.Set( methodInfo, new DisposableAction( () => {} ) );
 										new ApplicationOutputCommand().Run( new OutputCommand.Parameter( mock, methodInfo, mock.Hello ) );
-										Framework.Setup.TaskContext.Instance.Verify(); // TODO: Remove.
-										Framework.Setup.TaskContext.Instance.Value.Dispose();#1#
+										Framework.Setup.TaskContext.Default.Verify(); // TODO: Remove.
+										Framework.Setup.TaskContext.Default.Value.Dispose();#1#
 									} );
 			Assert.True( result.IsCompleted );
 		}*/

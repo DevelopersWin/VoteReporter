@@ -13,7 +13,7 @@ namespace DragonSpark.Sources
 	{
 		public static string TimerTemplate { get; } = "Executing Delegate {@Method}.";
 		public static string ParameterizedTimerTemplate { get; } = "Executing Delegate {@Method} with parameter {Parameter}.";
-		public static Func<IExportProvider> DefaultSource { get; } = Exports.Instance.Get;
+		public static Func<IExportProvider> DefaultSource { get; } = Exports.Default.Get;
 	}
 
 	public interface IItemSource<T> : ISource<ImmutableArray<T>>, IEnumerable<T> {}
@@ -30,7 +30,7 @@ namespace DragonSpark.Sources
 
 	public sealed class ExportSource<T> : ItemSourceBase<T>
 	{
-		public static ExportSource<T> Instance { get; } = new ExportSource<T>();
+		public static ExportSource<T> Default { get; } = new ExportSource<T>();
 		
 		readonly Func<IExportProvider> source;
 		readonly string name;
@@ -48,7 +48,7 @@ namespace DragonSpark.Sources
 
 	public class SuppliedAndExportedItems<T> : CompositeItemSource<T>
 	{
-		public SuppliedAndExportedItems( params T[] configurators ) : base( new ItemSource<T>( configurators ), ExportSource<T>.Instance ) {}
+		public SuppliedAndExportedItems( params T[] configurators ) : base( new ItemSource<T>( configurators ), ExportSource<T>.Default ) {}
 	}
 
 	public class CompositeItemSource<T> : ItemSourceBase<T>

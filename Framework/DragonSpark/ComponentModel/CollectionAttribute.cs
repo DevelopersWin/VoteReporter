@@ -11,7 +11,7 @@ namespace DragonSpark.ComponentModel
 		static ServicesValueProvider Create( Type type ) => new ServicesValueProvider( p =>
 		{
 			var elementType = type ?? p.PropertyType.Adapt().GetEnumerableType();
-			var result = elementType.With( Transformer.Instance.Get );
+			var result = elementType.With( Transformer.Default.Get );
 			return result;
 		} );
 
@@ -19,7 +19,7 @@ namespace DragonSpark.ComponentModel
 
 		class Transformer : ParameterizedSourceBase<Type, Type>
 		{
-			public static Transformer Instance { get; } = new Transformer();
+			public static Transformer Default { get; } = new Transformer();
 
 			public override Type Get( Type parameter ) => typeof(Collection<>).MakeGenericType( parameter );
 		}

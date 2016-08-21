@@ -33,7 +33,7 @@ namespace DragonSpark.Sources
 
 		public static IEnumerable<T> Get<T>( this IEnumerable<ISource<T>> @this ) => @this.Select( source => source.Get() );
 
-		public static T ScopedWithDefault<T>( this T @this ) where T : IScopeAware => @this.ScopedWith( ExecutionContext.Instance );
+		public static T ScopedWithDefault<T>( this T @this ) where T : IScopeAware => @this.ScopedWith( ExecutionContext.Default );
 
 		public static T ScopedWith<T>( this T @this, ISource scope ) where T : IScopeAware
 		{
@@ -119,11 +119,11 @@ namespace DragonSpark.Sources
 			Scopes() : base( cache => new Scope<T>( cache.Fix() ) ) {}
 		}
 
-		public static ISource<T> Fixed<T>( this ISource<T> @this ) => FixedSources<T>.Instance.Get( @this );
+		public static ISource<T> Fixed<T>( this ISource<T> @this ) => FixedSources<T>.Default.Get( @this );
 
 		sealed class FixedSources<T> : Cache<ISource<T>, ISource<T>>
 		{
-			public static FixedSources<T> Instance { get; } = new FixedSources<T>();
+			public static FixedSources<T> Default { get; } = new FixedSources<T>();
 			FixedSources() : base( source => new FixedDeferedSource<T>( source.Get ) ) {}
 		}
 		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();

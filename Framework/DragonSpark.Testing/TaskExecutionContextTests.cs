@@ -16,7 +16,7 @@ namespace DragonSpark.Testing
 
 		public static void Verify( MethodBase method )
 		{
-			var current = MethodContext.Instance.Get();
+			var current = MethodContext.Default.Get();
 			if ( method != null && current != method )
 			{
 				throw new InvalidOperationException( $"Assigned Method is different from expected.  Expected: {method}.  Actual: {current}" );
@@ -26,8 +26,8 @@ namespace DragonSpark.Testing
 		[Fact]
 		public void Fact()
 		{
-			Assert.Equal( Identification.Instance.Get(), Identifier.Current() );
-			Assert.Null( MethodContext.Instance.Get() );
+			Assert.Equal( Identification.Default.Get(), Identifier.Current() );
+			Assert.Null( MethodContext.Default.Get() );
 		}
 
 		[Theory, ExecutionContextAutoData]
@@ -35,15 +35,15 @@ namespace DragonSpark.Testing
 		{
 			var method = new Action( Theory ).Method;
 			Verify( method );
-			Assert.Equal( ExecutionContext.Instance.Get().Origin, Identifier.Current() );
-			Assert.Equal( method, MethodContext.Instance.Get() );
+			Assert.Equal( ExecutionContext.Default.Get().Origin, Identifier.Current() );
+			Assert.Equal( method, MethodContext.Default.Get() );
 		}
 /*
 		[Fact, Wrapper]
 		public void FactWrapped()
 		{
-			Assert.Equal( TaskContext.Instance.Value.Id, Identifier.Current() );
-			Assert.Null( TaskContext.Instance.Value.Value );
+			Assert.Equal( TaskContext.Default.Value.Id, Identifier.Current() );
+			Assert.Null( TaskContext.Default.Value.Value );
 		}
 
 		[Theory, ExecutionContextAutoData, Wrapper]
@@ -51,9 +51,9 @@ namespace DragonSpark.Testing
 		{
 			var method = GetType().GetMethod( nameof(TheoryWrapped) );
 			Verify( method );
-			Assert.Equal( TaskContext.Instance.Value.Id, Identifier.Current() );
-			Assert.Exists( TaskContext.Instance.Value.Value );
-			Assert.Equal( method, TaskContext.Instance.Value.Value );
+			Assert.Equal( TaskContext.Default.Value.Id, Identifier.Current() );
+			Assert.Exists( TaskContext.Default.Value.Value );
+			Assert.Equal( method, TaskContext.Default.Value.Value );
 		}*/
 	}
 
@@ -66,62 +66,62 @@ namespace DragonSpark.Testing
 		[Fact]
 		public Task Fact()
 		{
-			var current = ExecutionContext.Instance.Get();
-			Assert.Equal( ExecutionContext.Instance.Get().Origin, Identifier.Current() );
-			Assert.Null( MethodContext.Instance.Get() );
+			var current = ExecutionContext.Default.Get();
+			Assert.Equal( ExecutionContext.Default.Get().Origin, Identifier.Current() );
+			Assert.Null( MethodContext.Default.Get() );
 			return Task.Run( () =>
 							 {
-								 Assert.Same( current, ExecutionContext.Instance.Get() );
-								 Assert.NotEqual( ExecutionContext.Instance.Get().Origin, Identifier.Current() );
-								 Assert.Null( MethodContext.Instance.Get() );
+								 Assert.Same( current, ExecutionContext.Default.Get() );
+								 Assert.NotEqual( ExecutionContext.Default.Get().Origin, Identifier.Current() );
+								 Assert.Null( MethodContext.Default.Get() );
 							 } );
 		}
 
 		[Theory, ExecutionContextAutoData]
 		public Task Theory()
 		{
-			var current = ExecutionContext.Instance.Get();
-			Assert.Equal( Identification.Instance.Get(), Identifier.Current() );
+			var current = ExecutionContext.Default.Get();
+			Assert.Equal( Identification.Default.Get(), Identifier.Current() );
 			var method = new Func<Task>( Theory ).Method;
-			Assert.Equal( method, MethodContext.Instance.Get() );
+			Assert.Equal( method, MethodContext.Default.Get() );
 			return Task.Run( () =>
 							 {
-								Assert.Same( current, ExecutionContext.Instance.Get() );
+								Assert.Same( current, ExecutionContext.Default.Get() );
 								TaskExecutionContextTests.Verify( method );
-								Assert.NotEqual( ExecutionContext.Instance.Get().Origin, Identifier.Current() );
-								Assert.NotNull( MethodContext.Instance.Get() );
-								Assert.Equal( method, MethodContext.Instance.Get() );
+								Assert.NotEqual( ExecutionContext.Default.Get().Origin, Identifier.Current() );
+								Assert.NotNull( MethodContext.Default.Get() );
+								Assert.Equal( method, MethodContext.Default.Get() );
 							 } );
 		}
 /*
 		[Fact, Wrapper]
 		public Task FactWrapped()
 		{
-			var current = TaskContext.Instance.Value;
-			Assert.Equal( TaskContext.Instance.Value.Id, Identifier.Current() );
-			Assert.Null( TaskContext.Instance.Value.Value );
+			var current = TaskContext.Default.Value;
+			Assert.Equal( TaskContext.Default.Value.Id, Identifier.Current() );
+			Assert.Null( TaskContext.Default.Value.Value );
 			return Task.Run( () =>
 							 {
-								Assert.Same( current, TaskContext.Instance.Value );
-								Assert.NotEqual( TaskContext.Instance.Value.Id, Identifier.Current() );
-								Assert.Null( TaskContext.Instance.Value.Value );
+								Assert.Same( current, TaskContext.Default.Value );
+								Assert.NotEqual( TaskContext.Default.Value.Id, Identifier.Current() );
+								Assert.Null( TaskContext.Default.Value.Value );
 							 } );
 		}
 
 		[Theory, ExecutionContextAutoData, Wrapper]
 		public Task TheoryWrapped()
 		{
-			var current = TaskContext.Instance.Value;
-			Assert.Equal( TaskContext.Instance.Value.Id, Identifier.Current() );
+			var current = TaskContext.Default.Value;
+			Assert.Equal( TaskContext.Default.Value.Id, Identifier.Current() );
 			var method = GetType().GetMethod( nameof(TheoryWrapped) );
-			Assert.Equal( method, TaskContext.Instance.Value.Value );
+			Assert.Equal( method, TaskContext.Default.Value.Value );
 			return Task.Run( () =>
 							 {
-								Assert.Same( current, TaskContext.Instance.Value );
+								Assert.Same( current, TaskContext.Default.Value );
 								TaskExecutionContextTests.Verify( method );
-								Assert.NotEqual( TaskContext.Instance.Value.Id, Identifier.Current() );
-								Assert.Exists( TaskContext.Instance.Value.Value );
-								Assert.Equal( method, TaskContext.Instance.Value.Value );
+								Assert.NotEqual( TaskContext.Default.Value.Id, Identifier.Current() );
+								Assert.Exists( TaskContext.Default.Value.Value );
+								Assert.Equal( method, TaskContext.Default.Value.Value );
 							 } );
 		}*/
 	}

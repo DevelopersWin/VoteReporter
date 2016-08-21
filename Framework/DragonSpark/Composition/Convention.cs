@@ -19,11 +19,11 @@ namespace DragonSpark.Composition
 	[ApplyAutoValidation]
 	public sealed class ConventionTypes : ValidatedParameterizedSourceBase<Type, Type>
 	{
-		readonly static ISpecification<Type> Specification = InstantiableTypeSpecification.Instance.And( CanInstantiateSpecification.Instance.Inverse() );
+		readonly static ISpecification<Type> Specification = InstantiableTypeSpecification.Default.And( CanInstantiateSpecification.Default.Inverse() );
 		readonly static Func<Type, bool> Activate = Defaults.ActivateSpecification.IsSatisfiedBy;
 
-		public static IParameterizedSource<Type, Type> Instance { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Global() );
-		ConventionTypes() : this( ApplicationTypes.Instance ) {}
+		public static IParameterizedSource<Type, Type> Default { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Global() );
+		ConventionTypes() : this( ApplicationTypes.Default ) {}
 
 		readonly ISource<ImmutableArray<Type>> source;
 
@@ -34,7 +34,7 @@ namespace DragonSpark.Composition
 
 		static Type Map( Type parameter )
 		{
-			var name = $"{parameter.Namespace}.{ConventionCandidateNames.Instance.Get( parameter )}";
+			var name = $"{parameter.Namespace}.{ConventionCandidateNames.Default.Get( parameter )}";
 			var result = name != parameter.FullName ? parameter.Assembly().GetType( name ) : null;
 			return result;
 		}
@@ -56,7 +56,7 @@ namespace DragonSpark.Composition
 
 	class IsConventionCandidateSpecification : SpecificationBase<Type>
 	{
-		public static IParameterizedSource<Type, Func<Type, bool>> Defaults { get; } = new Cache<Type, Func<Type, bool>>( t => new IsConventionCandidateSpecification( ConventionCandidateNames.Instance.Get( t ) ).IsSatisfiedBy );
+		public static IParameterizedSource<Type, Func<Type, bool>> Defaults { get; } = new Cache<Type, Func<Type, bool>>( t => new IsConventionCandidateSpecification( ConventionCandidateNames.Default.Get( t ) ).IsSatisfiedBy );
 		
 		readonly string name;
 
@@ -70,24 +70,24 @@ namespace DragonSpark.Composition
 
 	sealed class ConventionCandidateNames : Cache<Type, string>
 	{
-		public static ConventionCandidateNames Instance { get; } = new ConventionCandidateNames();
+		public static ConventionCandidateNames Default { get; } = new ConventionCandidateNames();
 		ConventionCandidateNames() : base( type => type.Name.TrimStartOf( 'I' ) ) {}
 	}
 
 	public sealed class SelfAndNestedTypes : Cache<Type, IEnumerable<Type>>
 	{
-		public static SelfAndNestedTypes Instance { get; } = new SelfAndNestedTypes();
+		public static SelfAndNestedTypes Default { get; } = new SelfAndNestedTypes();
 		SelfAndNestedTypes() : base( type => type.Adapt().WithNested() ) {}
 	}
 
 	public sealed class ConventionMappings : ParameterizedSourceBase<Type, ConventionMapping>
 	{
-		public static IParameterizedSource<Type, ConventionMapping> Instance { get; } = new ConventionMappings().ToCache();
+		public static IParameterizedSource<Type, ConventionMapping> Default { get; } = new ConventionMappings().ToCache();
 		ConventionMappings() {}
 
 		public override ConventionMapping Get( Type parameter )
 		{
-			var @interface = ConventionImplementedInterfaces.Instance.Get( parameter );
+			var @interface = ConventionImplementedInterfaces.Default.Get( parameter );
 			var result = @interface != null ? new ConventionMapping( @interface, parameter ) : default(ConventionMapping);
 			return result;
 		}
@@ -107,7 +107,7 @@ namespace DragonSpark.Composition
 
 	public sealed class ConventionImplementedInterfaces : FactoryCache<Type, Type>
 	{
-		public static ConventionImplementedInterfaces Instance { get; } = new ConventionImplementedInterfaces();
+		public static ConventionImplementedInterfaces Default { get; } = new ConventionImplementedInterfaces();
 		ConventionImplementedInterfaces() : this( typeof(ISource), typeof(IParameterizedSource), typeof(IValidatedParameterizedSource) ) {}
 
 		readonly ImmutableArray<Type> exempt;
@@ -133,7 +133,7 @@ namespace DragonSpark.Composition
 
 	public sealed class CanInstantiateSpecification : SpecificationBase<Type>
 	{
-		public static ISpecification<Type> Instance { get; } = new CanInstantiateSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new CanInstantiateSpecification().Cached();
 		CanInstantiateSpecification() {}
 
 		public override bool IsSatisfiedBy( Type parameter )
@@ -146,7 +146,7 @@ namespace DragonSpark.Composition
 
 	public class InstantiableTypeSpecification : SpecificationBase<Type>
 	{
-		public static ISpecification<Type> Instance { get; } = new InstantiableTypeSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new InstantiableTypeSpecification().Cached();
 		InstantiableTypeSpecification() : this( typeof(Delegate), typeof(Array) ) {}
 
 		readonly ImmutableArray<TypeAdapter> exempt;

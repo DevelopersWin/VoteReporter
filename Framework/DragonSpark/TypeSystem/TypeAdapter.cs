@@ -15,7 +15,7 @@ namespace DragonSpark.TypeSystem
 {
 	public sealed class TypeAdapter
 	{
-		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToSpecificationDelegate();
+		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToSpecificationDelegate();
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
 		readonly Func<Type, bool> isAssignableFrom;
 		
@@ -50,7 +50,7 @@ namespace DragonSpark.TypeSystem
 
 		
 		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
-				InstanceConstructors.Instance.Get( Info )
+				InstanceConstructors.Default.Get( Info )
 				.Introduce( parameterTypes, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
 				.SingleOrDefault();
 
@@ -173,7 +173,7 @@ namespace DragonSpark.TypeSystem
 
 	class InstanceConstructors : ArgumentCache<TypeInfo, ImmutableArray<ConstructorInfo>>
 	{
-		public static InstanceConstructors Instance { get; } = new InstanceConstructors();
+		public static InstanceConstructors Default { get; } = new InstanceConstructors();
 		InstanceConstructors() : base( info => info.DeclaredConstructors.Where( constructorInfo => constructorInfo.IsPublic && !constructorInfo.IsStatic ).ToImmutableArray() ) {}
 	}
 }

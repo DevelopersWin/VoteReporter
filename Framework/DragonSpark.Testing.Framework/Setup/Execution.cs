@@ -7,7 +7,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class ExecutionContext : TaskLocalStore<ITaskExecutionContext>, IExecutionContext
 	{
-		public static ExecutionContext Instance { get; } = new ExecutionContext();
+		public static ExecutionContext Default { get; } = new ExecutionContext();
 
 		readonly ConcurrentDictionary<Identifier, ITaskExecutionContext> contexts = new ConcurrentDictionary<Identifier, ITaskExecutionContext>();
 

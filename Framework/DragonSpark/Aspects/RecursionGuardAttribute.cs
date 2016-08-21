@@ -1,13 +1,12 @@
-using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Generic;
-using DragonSpark.Diagnostics.Logging;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Aspects
 {
@@ -15,7 +14,7 @@ namespace DragonSpark.Aspects
 	{
 		public static int For( MethodExecutionArgs args ) => KeyFactory.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments );
 
-		// public static int For( MethodInterceptionArgs args ) => KeyFactory.Instance.CreateUsing( args.Instance ?? args.Method.DeclaringType, args.Method, args.Arguments );
+		// public static int For( MethodInterceptionArgs args ) => KeyFactory.Default.CreateUsing( args.Default ?? args.Method.DeclaringType, args.Method, args.Arguments );
 	}
 
 	[OnMethodBoundaryAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]

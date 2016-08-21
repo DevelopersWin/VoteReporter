@@ -30,22 +30,22 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void Logger()
 		{
-			var result = DefaultServiceProvider.Instance.Get<ILogger>();
+			var result = DefaultServiceProvider.Default.Get<ILogger>();
 			Assert.NotNull( result );
-			Assert.Same( DragonSpark.Diagnostics.Logging.Logger.Instance.Get( Execution.Current() ), result );
+			Assert.Same( DragonSpark.Diagnostics.Logging.Logger.Default.Get( Execution.Current() ), result );
 		}
 
 		[Fact]
 		public void SystemParts()
 		{
-			var system = DefaultServiceProvider.Instance.Get<SystemParts>();
+			var system = DefaultServiceProvider.Default.Get<SystemParts>();
 			Assert.Empty( system.Assemblies );
 			Assert.Empty( system.Types );
 
 			var types = new[] { typeof(ClassFactory), typeof(Class) };
 			new AssignSystemPartsCommand( types ).Run();
 
-			var after = DefaultServiceProvider.Instance.Get<SystemParts>();
+			var after = DefaultServiceProvider.Default.Get<SystemParts>();
 			Assert.NotEmpty( after.Assemblies );
 			Assert.NotEmpty( after.Types );
 			Assert.Equal( types, after.Types.ToArray() );

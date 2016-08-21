@@ -7,14 +7,14 @@ namespace DragonSpark.Diagnostics
 {
 	public class DebugOutputCommand : DelegatedTextCommand
 	{
-		public static DebugOutputCommand Instance { get; } = new DebugOutputCommand();
+		public static DebugOutputCommand Default { get; } = new DebugOutputCommand();
 
 		DebugOutputCommand() : base( s => Debug.WriteLine( s ) ) {}
 	}
 
 	public class IgnoredOutputCommand : DelegatedTextCommand
 	{
-		public static IgnoredOutputCommand Instance { get; } = new IgnoredOutputCommand();
+		public static IgnoredOutputCommand Default { get; } = new IgnoredOutputCommand();
 
 		IgnoredOutputCommand() : base( s => {} ) {}
 	}

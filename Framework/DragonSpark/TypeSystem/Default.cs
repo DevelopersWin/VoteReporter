@@ -18,9 +18,9 @@ namespace DragonSpark.TypeSystem
 	[Synchronized] // http://stackoverflow.com/questions/35976558/is-constructorinfo-getparameters-thread-safe/35976798
 	public class InitializeTypeCommand : CommandBase<Type>
 	{
-		public static InitializeTypeCommand Instance { get; } = new InitializeTypeCommand();
+		public static InitializeTypeCommand Default { get; } = new InitializeTypeCommand();
 
-		public InitializeTypeCommand() : this( CanInstantiateSpecification.Instance.And( InstantiableTypeSpecification.Instance, new OncePerParameterSpecification<Type>() ) ) {}
+		public InitializeTypeCommand() : this( CanInstantiateSpecification.Default.And( InstantiableTypeSpecification.Default, new OncePerParameterSpecification<Type>() ) ) {}
 
 		public InitializeTypeCommand( ISpecification<Type> specification ) : base( specification ) {}
 

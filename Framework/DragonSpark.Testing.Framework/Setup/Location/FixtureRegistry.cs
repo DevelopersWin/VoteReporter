@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 			new[] { parameter.RequestedType, parameter.MappedTo }.Distinct().Each( registered.Ensure );
 		}*/
 
-		//public void Register( [Required]InstanceRegistrationParameter parameter ) => Invoke( parameter.RequestedType, nameof(RegisterInstance), parameter.Instance );
+		//public void Register( [Required]InstanceRegistrationParameter parameter ) => Invoke( parameter.RequestedType, nameof(RegisterInstance), parameter.Default );
 
 		/*protected override void OnAdd( object entry )
 		{

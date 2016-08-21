@@ -26,15 +26,15 @@ namespace DragonSpark.Diagnostics
 	{
 		public const int Retries = 5;
 
-		public static Func<int, TimeSpan> Time { get; } = LinearRetryTime.Instance.ToSourceDelegate();
+		public static Func<int, TimeSpan> Time { get; } = LinearRetryTime.Default.ToSourceDelegate();
 	}
 
 	public static class Retry
 	{
-		public static ISource<Policy> Create<T>( int retries = Defaults.Retries ) where T : Exception => Create( RetryPolicyParameterSource<T>.Instance.Fixed( retries ) );
+		public static ISource<Policy> Create<T>( int retries = Defaults.Retries ) where T : Exception => Create( RetryPolicyParameterSource<T>.Default.Fixed( retries ) );
 
 		public static ISource<Policy> Create( ISource<RetryPolicyParameter> source ) => 
-			new FixedFactory<RetryPolicyParameter, Policy>( RetryPolicyFactory.Instance.Get, source.Get );
+			new FixedFactory<RetryPolicyParameter, Policy>( RetryPolicyFactory.Default.Get, source.Get );
 	}
 
 	public static class Defaults<T> where T : Exception
@@ -44,8 +44,8 @@ namespace DragonSpark.Diagnostics
 
 	public sealed class RetryPolicyParameterSource<T> : ParameterizedSourceBase<int, RetryPolicyParameter> where T : Exception
 	{
-		readonly static Func<PolicyBuilder> Source = PolicyBuilderSource<T>.Instance.Get;
-		public static RetryPolicyParameterSource<T> Instance { get; } = new RetryPolicyParameterSource<T>();
+		readonly static Func<PolicyBuilder> Source = PolicyBuilderSource<T>.Default.Get;
+		public static RetryPolicyParameterSource<T> Default { get; } = new RetryPolicyParameterSource<T>();
 		RetryPolicyParameterSource() : this( Defaults.Time ) {}
 
 		readonly Func<int, TimeSpan> time;
@@ -55,12 +55,12 @@ namespace DragonSpark.Diagnostics
 			this.time = time;
 		}
 
-		public override RetryPolicyParameter Get( int parameter ) => new RetryPolicyParameter( Source, time, LogRetryException.Defaults.Get( Logger.Instance.ToScope().Get() ).Execute, parameter );
+		public override RetryPolicyParameter Get( int parameter ) => new RetryPolicyParameter( Source, time, LogRetryException.Defaults.Get( Logger.Default.ToScope().Get() ).Execute, parameter );
 	}
 
 	public sealed class RetryPolicyFactory : ParameterizedSourceBase<RetryPolicyParameter, Policy>
 	{
-		public static RetryPolicyFactory Instance { get; } = new RetryPolicyFactory();
+		public static RetryPolicyFactory Default { get; } = new RetryPolicyFactory();
 		RetryPolicyFactory() {}
 
 		public override Policy Get( RetryPolicyParameter parameter ) => parameter.Source().WaitAndRetry( parameter.NumberOfRetries, parameter.Time, parameter.OnRetry );
@@ -68,7 +68,7 @@ namespace DragonSpark.Diagnostics
 
 	public class PolicyBuilderSource<T> : SourceBase<PolicyBuilder> where T : Exception
 	{
-		public static PolicyBuilderSource<T> Instance { get; } = new PolicyBuilderSource<T>();
+		public static PolicyBuilderSource<T> Default { get; } = new PolicyBuilderSource<T>();
 		protected PolicyBuilderSource() {}
 
 		public override PolicyBuilder Get() => Policy.Handle<T>();
@@ -92,13 +92,13 @@ namespace DragonSpark.Diagnostics
 
 	public sealed class BackoffRetryTime : RetryTimeBase
 	{
-		public static BackoffRetryTime Instance { get; } = new BackoffRetryTime();
+		public static BackoffRetryTime Default { get; } = new BackoffRetryTime();
 		BackoffRetryTime() : base( parameter => (int)Math.Pow( parameter, 2 ) ) {}
 	}
 
 	public sealed class LinearRetryTime : RetryTimeBase
 	{
-		public static LinearRetryTime Instance { get; } = new LinearRetryTime();
+		public static LinearRetryTime Default { get; } = new LinearRetryTime();
 		LinearRetryTime() : base( parameter => parameter ) {}
 	}
 

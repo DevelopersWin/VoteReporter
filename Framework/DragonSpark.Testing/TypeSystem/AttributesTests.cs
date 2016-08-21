@@ -93,7 +93,7 @@ namespace DragonSpark.Testing.TypeSystem
 		public void SetterDoesApply()
 		{
 			var property = GetType().GetProperty( nameof(Setter) );
-			Assert.False( DefaultValuePropertySpecification.Instance.IsSatisfiedBy( property ) );
+			Assert.False( DefaultValuePropertySpecification.Default.IsSatisfiedBy( property ) );
 		}
 
 		[Fact]
@@ -175,14 +175,14 @@ namespace DragonSpark.Testing.TypeSystem
 		/*[Fact]
 		public void SingletonTest()
 		{
-			var property = typeof(SingletonLocatorTests.Singleton).GetProperty( nameof(SingletonLocatorTests.Singleton.Instance) );
+			var property = typeof(SingletonLocatorTests.Singleton).GetProperty( nameof(SingletonLocatorTests.Singleton.Default) );
 			var provider = Attributes.Get( property );
 			Assert.Exists( provider );
 		}
 
 		class Singleton : ISingleton
 		{
-			public static Singleton Instance { get; } = new Singleton();
+			public static Singleton Default { get; } = new Singleton();
 		}
 
 		interface ISingleton {}*/

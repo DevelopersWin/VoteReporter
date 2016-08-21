@@ -20,7 +20,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Clear();
 		}
 
-		static void Clear() => ClearUserSettingCommand.Instance.Execute( Settings.Default );
+		static void Clear() => ClearUserSettingCommand.Default.Execute( Settings.Default );
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void Create( InitializeUserSettingsCommand sut, ILoggerHistory history, UserSettingsPathFactory factory )

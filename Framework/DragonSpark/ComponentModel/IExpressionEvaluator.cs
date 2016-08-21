@@ -10,7 +10,7 @@ namespace DragonSpark.ComponentModel
 
 	public class ExpressionEvaluator : IExpressionEvaluator
 	{
-		public static ExpressionEvaluator Instance { get; } = new ExpressionEvaluator();
+		public static ExpressionEvaluator Default { get; } = new ExpressionEvaluator();
 
 		const string Context = "context";
 

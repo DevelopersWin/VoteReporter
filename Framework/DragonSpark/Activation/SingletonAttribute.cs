@@ -10,8 +10,8 @@ namespace DragonSpark.Activation
 
 	public sealed class ContainsSingletonSpecification : SpecificationBase<Type>
 	{
-		public static ContainsSingletonSpecification Instance { get; } = new ContainsSingletonSpecification();
-		ContainsSingletonSpecification() : this( SingletonProperties.Instance ) {}
+		public static ContainsSingletonSpecification Default { get; } = new ContainsSingletonSpecification();
+		ContainsSingletonSpecification() : this( SingletonProperties.Default ) {}
 
 		readonly IParameterizedSource<Type, PropertyInfo> locator;
 

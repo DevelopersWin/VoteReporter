@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Framework
 		public static InitializeMethodCommand AsCurrentContext( this MethodBase @this, RecordingLoggerFactory factory )
 		{
 			var result = new InitializeMethodCommand().AsExecuted( @this );
-			DefaultServiceProvider.Instance.Assign( new ServiceProvider( factory ) );
+			DefaultServiceProvider.Default.Assign( new ServiceProvider( factory ) );
 			return result;
 		}*/
 
@@ -46,9 +46,9 @@ namespace DragonSpark.Testing.Framework
 
 		public InitializeMethodCommand() : this( Delegates.Empty ) {}
 
-		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Instance.ToDelegate(), complete ) {}
+		public InitializeMethodCommand( Action complete ) : this( AssemblyInitializer.Default.ToDelegate(), complete ) {}
 
-		public InitializeMethodCommand( Action<Assembly> initialize, Action complete ) : this( ExecutionContext.Instance.Value, initialize, complete ) {}
+		public InitializeMethodCommand( Action<Assembly> initialize, Action complete ) : this( ExecutionContext.Default.Value, initialize, complete ) {}
 
 		InitializeMethodCommand( IWritableStore<MethodBase> store, Action<Assembly> initialize, Action complete ) : base( store )
 		{
@@ -67,7 +67,7 @@ namespace DragonSpark.Testing.Framework
 
 	public sealed class Output : Scope<Action<string>>
 	{
-		public static Output Instance { get; } = new Output();
+		public static Output Default { get; } = new Output();
 		Output() {}
 	}
 
@@ -77,7 +77,7 @@ namespace DragonSpark.Testing.Framework
 		protected TestCollectionBase( ITestOutputHelper output )
 		{
 			WriteLine = output.WriteLine;
-			Output.Instance.Assign( WriteLine );
+			Output.Default.Assign( WriteLine );
 			DotMemoryUnitTestOutput.SetOutputMethod( WriteLine );
 		}
 

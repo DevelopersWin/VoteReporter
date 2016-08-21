@@ -16,18 +16,18 @@ namespace DragonSpark.Activation
 
 	public class IsATypeSpecification : DecoratedSpecification<Type>
 	{
-		public static IsATypeSpecification Instance { get; } = new IsATypeSpecification();
+		public static IsATypeSpecification Default { get; } = new IsATypeSpecification();
 		IsATypeSpecification() : base( Specifications<Type>.Assigned ) { }
 	}
 
 	/*public class OnlyIfNotRegistered : DecoratedSpecification<Type>
 	{
-		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse().Project<Type, TypeRequest>( LocatorBase.Coercer.Instance.Coerce ) ) { }
+		public OnlyIfNotRegistered( IUnityContainer container ) : base( new IsRegisteredSpecification( container ).Inverse().Project<Type, TypeRequest>( LocatorBase.Coercer.Default.Coerce ) ) { }
 	}*/
 
 	/*public class RegisterInstanceByConventionCommand : RegisterInstanceByConventionCommand<IsATypeSpecification>
 	{
-		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ConventionImplementedInterfaces locator ) : base( registry, locator, IsATypeSpecification.Instance ) {}
+		public RegisterInstanceByConventionCommand( IServiceRegistry registry, ConventionImplementedInterfaces locator ) : base( registry, locator, IsATypeSpecification.Default ) {}
 	}
 
 	public class RegisterInstanceByConventionCommand<T> : RegisterInstanceCommand<T> where T : ISpecification<Type>
@@ -41,32 +41,32 @@ namespace DragonSpark.Activation
 
 		public override void Execute( InstanceRegistrationParameter parameter )
 		{
-			var located = locator.Get( parameter.Instance.GetType() );
+			var located = locator.Get( parameter.Default.GetType() );
 			if ( located != null )
 			{
-				base.Execute( new InstanceRegistrationParameter( located, parameter.Instance, parameter.Name ) );
+				base.Execute( new InstanceRegistrationParameter( located, parameter.Default, parameter.Name ) );
 			}
 		}
 	}
 
 	public class RegisterEntireHierarchyCommand : RegisterEntireHierarchyCommand<IsATypeSpecification>
 	{
-		public RegisterEntireHierarchyCommand( IServiceRegistry registry ) : base( registry, IsATypeSpecification.Instance ) {}
+		public RegisterEntireHierarchyCommand( IServiceRegistry registry ) : base( registry, IsATypeSpecification.Default ) {}
 	}
 
 	public class RegisterEntireHierarchyCommand<T> : RegisterHierarchyCommandBase<T> where T : ISpecification<Type>
 	{
-		public RegisterEntireHierarchyCommand( IServiceRegistry registry, T specification ) : base( registry, specification, parameter => parameter.Instance.Adapt().GetEntireHierarchy() ) {}
+		public RegisterEntireHierarchyCommand( IServiceRegistry registry, T specification ) : base( registry, specification, parameter => parameter.Default.Adapt().GetEntireHierarchy() ) {}
 	}
 
 	public class RegisterHierarchyCommand : RegisterHierarchyCommand<IsATypeSpecification>
 	{
-		public RegisterHierarchyCommand( IServiceRegistry registry ) : base( registry, IsATypeSpecification.Instance ) {}
+		public RegisterHierarchyCommand( IServiceRegistry registry ) : base( registry, IsATypeSpecification.Default ) {}
 	}
 
 	public class RegisterHierarchyCommand<T> : RegisterHierarchyCommandBase<T> where T : ISpecification<Type>
 	{
-		public RegisterHierarchyCommand( IServiceRegistry registry, T specification ) : base( registry, specification, parameter => parameter.Instance.Adapt().GetHierarchy( false ) ) {}
+		public RegisterHierarchyCommand( IServiceRegistry registry, T specification ) : base( registry, specification, parameter => parameter.Default.Adapt().GetHierarchy( false ) ) {}
 	}
 
 	public abstract class RegisterHierarchyCommandBase<T> : RegisterInstanceCommand<T> where T : ISpecification<Type>
@@ -82,7 +82,7 @@ namespace DragonSpark.Activation
 		{
 			foreach ( var type in typeResolver( parameter ) )
 			{
-				base.Execute( new InstanceRegistrationParameter( type, parameter.Instance, parameter.Name ) );
+				base.Execute( new InstanceRegistrationParameter( type, parameter.Default, parameter.Name ) );
 			}
 		}
 	}
@@ -155,7 +155,7 @@ namespace DragonSpark.Activation
 			Instance = instance;
 		}
 
-		public object Instance { get; }
+		public object Default { get; }
 	}
 
 	public class FactoryRegistrationParameter : RegistrationParameter

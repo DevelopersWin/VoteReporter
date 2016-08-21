@@ -9,7 +9,7 @@ namespace DragonSpark.Configuration
 {
 	public class EnableMethodCaching : Scope<bool>
 	{
-		public static EnableMethodCaching Instance { get; } = new EnableMethodCaching();
+		public static EnableMethodCaching Default { get; } = new EnableMethodCaching();
 		EnableMethodCaching() : base( () => true ) {}
 	}
 

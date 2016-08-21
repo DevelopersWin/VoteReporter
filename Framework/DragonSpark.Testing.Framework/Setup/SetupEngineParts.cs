@@ -1,30 +1,31 @@
-using DragonSpark.Extensions;
 using Ploeh.AutoFixture.Kernel;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
 	public class DefaultEngineParts : Ploeh.AutoFixture.DefaultEngineParts
 	{
-		readonly ISpecimenBuilderTransformation[] transformers;
+		readonly ImmutableArray<ISpecimenBuilderTransformation> transformers;
 
-		public static ISpecimenBuilderTransformation[] Default { get; } = { OptionalParameterTransformer.Instance };
+		public static ImmutableArray<ISpecimenBuilderTransformation> DefaultTransformations { get; } = ImmutableArray.Create<ISpecimenBuilderTransformation>( OptionalParameterTransformer.Default );
 
-		public static DefaultEngineParts Instance { get; } = new DefaultEngineParts();
+		public static DefaultEngineParts Default { get; } = new DefaultEngineParts();
+		DefaultEngineParts() : this( DefaultTransformations ) {}
 
-		public DefaultEngineParts() : this( Default ) {}
-
-		public DefaultEngineParts( IEnumerable<ISpecimenBuilderTransformation> transformers )
+		public DefaultEngineParts( ImmutableArray<ISpecimenBuilderTransformation> transformers )
 		{
-			this.transformers = transformers.Fixed();
+			this.transformers = transformers;
 		}
 
 		public override IEnumerator<ISpecimenBuilder> GetEnumerator()
 		{
-			var enumerator = base.GetEnumerator();
-			while ( enumerator.MoveNext() )
+			using ( var enumerator = base.GetEnumerator() )
 			{
-				yield return Transform( enumerator.Current );
+				while ( enumerator.MoveNext() )
+				{
+					yield return Transform( enumerator.Current );
+				}
 			}
 		}
 

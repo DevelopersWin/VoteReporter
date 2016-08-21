@@ -13,26 +13,26 @@ namespace DragonSpark.TypeSystem
 {
 	public class TypeDefinitionProviderSource : ItemSource<ITypeDefinitionProvider>
 	{
-		public static TypeDefinitionProviderSource Instance { get; } = new TypeDefinitionProviderSource();
+		public static TypeDefinitionProviderSource Default { get; } = new TypeDefinitionProviderSource();
 		TypeDefinitionProviderSource() : this( Items<ITypeDefinitionProvider>.Default ) {}
 
-		protected TypeDefinitionProviderSource( params ITypeDefinitionProvider[] items ) : base( items.Append( ConventionTypeDefinitionProvider.Instance, Self.Instance ) ) {}
+		protected TypeDefinitionProviderSource( params ITypeDefinitionProvider[] items ) : base( items.Append( ConventionTypeDefinitionProvider.Default, Self.Default ) ) {}
 
 		sealed class Self : SelfTransformer<TypeInfo>, ITypeDefinitionProvider
 		{
-			public new static Self Instance { get; } = new Self();
+			public new static Self Default { get; } = new Self();
 			Self() {}
 		}
 	}
 
 	public sealed class AttributeProviders : ParameterizedScope<IAttributeProvider>
 	{
-		public static IParameterizedSource<IAttributeProvider> Instance { get; } = new AttributeProviders();
+		public static IParameterizedSource<IAttributeProvider> Default { get; } = new AttributeProviders();
 		AttributeProviders() : base( new Factory().ToSourceDelegate().Global() ) {}
 
 		sealed class Factory : ParameterConstructedCompositeFactory<IAttributeProvider>
 		{
-			public Factory() : this( MemberInfoDefinitions.Instance.Get, ReflectionElementAttributeProvider.Default.ToSourceDelegate() ) {}
+			public Factory() : this( MemberInfoDefinitions.Default.Get, ReflectionElementAttributeProvider.Default.ToSourceDelegate() ) {}
 
 			readonly Func<object, MemberInfo> memberSource;
 			readonly Func<object, IAttributeProvider> providerSource;
@@ -55,14 +55,14 @@ namespace DragonSpark.TypeSystem
 
 	sealed class TypeDefinitions : ParameterizedScope<TypeInfo>
 	{
-		public static TypeDefinitions Instance { get; } = new TypeDefinitions();
+		public static TypeDefinitions Default { get; } = new TypeDefinitions();
 		TypeDefinitions() : base( new Factory().ToSourceDelegate().Global() ) {}
 
 		sealed class Factory : CompositeFactory<object, TypeInfo>
 		{
-			readonly static Func<object, TypeInfo>[] Factories = new IParameterizedSource[] { TypeInfoDefinitionProvider.Instance, MemberInfoDefinitionProvider.Instance, GeneralDefinitionProvider.Instance }.Select( parameter => new Func<object, TypeInfo>( parameter.Get<TypeInfo> ) ).Fixed();
+			readonly static Func<object, TypeInfo>[] Factories = new IParameterizedSource[] { TypeInfoDefinitionProvider.Default, MemberInfoDefinitionProvider.Default, GeneralDefinitionProvider.Default }.Select( parameter => new Func<object, TypeInfo>( parameter.Get<TypeInfo> ) ).Fixed();
 
-			public Factory() : this( ComponentModel.TypeDefinitions.Instance.Get ) { }
+			public Factory() : this( ComponentModel.TypeDefinitions.Default.Get ) { }
 
 			readonly Func<TypeInfo, TypeInfo> source;
 		
@@ -73,21 +73,21 @@ namespace DragonSpark.TypeSystem
 
 			class TypeInfoDefinitionProvider : TypeDefinitionProviderBase<TypeInfo>
 			{
-				public static TypeInfoDefinitionProvider Instance { get; } = new TypeInfoDefinitionProvider();
+				public static TypeInfoDefinitionProvider Default { get; } = new TypeInfoDefinitionProvider();
 
 				public override TypeInfo Get( TypeInfo parameter ) => parameter;
 			}
 
 			class MemberInfoDefinitionProvider : TypeDefinitionProviderBase<MemberInfo>
 			{
-				public static MemberInfoDefinitionProvider Instance { get; } = new MemberInfoDefinitionProvider();
+				public static MemberInfoDefinitionProvider Default { get; } = new MemberInfoDefinitionProvider();
 
 				public override TypeInfo Get( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();
 			}
 
 			class GeneralDefinitionProvider : TypeDefinitionProviderBase<object>
 			{
-				public static GeneralDefinitionProvider Instance { get; } = new GeneralDefinitionProvider();
+				public static GeneralDefinitionProvider Default { get; } = new GeneralDefinitionProvider();
 
 				public override TypeInfo Get( object parameter ) => parameter.GetType().GetTypeInfo();
 			}
@@ -100,8 +100,8 @@ namespace DragonSpark.TypeSystem
 
 	sealed class MemberInfoDefinitions : ParameterizedScope<MemberInfo>
 	{
-		public static IParameterizedSource<MemberInfo> Instance { get; } = new MemberInfoDefinitions();
-		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Instance.Get ).ToSourceDelegate().Global() ) {}
+		public static IParameterizedSource<MemberInfo> Default { get; } = new MemberInfoDefinitions();
+		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Default.Get ).ToSourceDelegate().Global() ) {}
 
 		sealed class Factory : ParameterizedSourceBase<MemberInfo>
 		{

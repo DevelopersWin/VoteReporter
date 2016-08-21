@@ -21,7 +21,7 @@ namespace DragonSpark.Aspects
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			using ( Logger.Instance.Get( args.Method ).TimeOperation( template, args.Method ) )
+			using ( Logger.Default.Get( args.Method ).TimeOperation( template, args.Method ) )
 			{
 				base.OnInvoke( args );
 			}

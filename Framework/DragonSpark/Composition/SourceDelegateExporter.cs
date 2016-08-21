@@ -18,17 +18,17 @@ namespace DragonSpark.Composition
 {
 	public class SourceDelegateExporter : SourceDelegateExporterBase
 	{
-		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.Instance.ToSourceDelegate();
-		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Instance.Get;
+		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.Default.ToSourceDelegate();
+		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Default.Get;
 		public SourceDelegateExporter() : base( DelegateSource, Default ) {}
 
 		sealed class Factory : ParameterizedSourceBase<ActivatorParameter, object>
 		{
-			public static Factory Instance { get; } = new Factory();
+			public static Factory Default { get; } = new Factory();
 			Factory() {}
 
 			public override object Get( ActivatorParameter parameter ) => 
-				SourceDelegates.Instances
+				SourceDelegates.Sources
 						.Get( parameter.Services.Sourced().ToDelegate() )
 						.Get( parameter.SourceType )
 						;
@@ -38,17 +38,17 @@ namespace DragonSpark.Composition
 	[ApplyAutoValidation]
 	public sealed class SourceDelegateContractResolver : ValidatedParameterizedSourceBase<CompositionContract, CompositionContract>
 	{
-		readonly static Func<Type, Type> ResultTypeLocator = ResultTypes.Instance.ToDelegate();
+		readonly static Func<Type, Type> ResultTypeLocator = ResultTypes.Default.ToDelegate();
 
-		public static SourceDelegateContractResolver Instance { get; } = new SourceDelegateContractResolver( typeof(Func<>) );
+		public static SourceDelegateContractResolver Default { get; } = new SourceDelegateContractResolver( typeof(Func<>) );
 
-		public static SourceDelegateContractResolver InstanceWithParameter { get; } = new SourceDelegateContractResolver( typeof(Func<,>) );
+		public static SourceDelegateContractResolver Parameterized { get; } = new SourceDelegateContractResolver( typeof(Func<,>) );
 
 		readonly Func<Type, Type> resultTypeLocator;
 
 		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType ) : this( factoryDelegateType, ResultTypeLocator ) {}
 
-		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Instance.And( new GenericTypeAssignableSpecification( factoryDelegateType ) ).Project<CompositionContract, Type>( contract => contract.ContractType ) )
+		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Default.And( new GenericTypeAssignableSpecification( factoryDelegateType ) ).Project<CompositionContract, Type>( contract => contract.ContractType ) )
 		{
 			this.resultTypeLocator = resultTypeLocator;
 		}
@@ -58,7 +58,7 @@ namespace DragonSpark.Composition
 
 	public sealed class IsExportSpecification : SpecificationBase<MemberInfo>
 	{
-		public static IsExportSpecification Instance { get; } = new IsExportSpecification();
+		public static IsExportSpecification Default { get; } = new IsExportSpecification();
 		IsExportSpecification() {}
 
 		public override bool IsSatisfiedBy( MemberInfo parameter ) => parameter.IsDefined( typeof(ExportAttribute) );
@@ -66,13 +66,13 @@ namespace DragonSpark.Composition
 
 	public sealed class ContainsExportedSingletonSpecification : SpecificationBase<Type>
 	{
-		public static ContainsExportedSingletonSpecification Instance { get; } = new ContainsExportedSingletonSpecification();
+		public static ContainsExportedSingletonSpecification Default { get; } = new ContainsExportedSingletonSpecification();
 		ContainsExportedSingletonSpecification() {}
 
 		public override bool IsSatisfiedBy( Type parameter )
 		{
-			var propertyInfo = ExportedSingletonProperties.Instance.Get( parameter );
-			var result = propertyInfo != null && IsExportSpecification.Instance.IsSatisfiedBy( propertyInfo )/* && parameter.Adapt().IsAssignableFrom( propertyInfo.PropertyType )*/;
+			var propertyInfo = ExportedSingletonProperties.Default.Get( parameter );
+			var result = propertyInfo != null && IsExportSpecification.Default.IsSatisfiedBy( propertyInfo )/* && parameter.Adapt().IsAssignableFrom( propertyInfo.PropertyType )*/;
 			return result;
 		}
 	}
@@ -91,23 +91,23 @@ namespace DragonSpark.Composition
 
 	public sealed class ExportedSingletonProperties : SingletonProperties
 	{
-		public new static ExportedSingletonProperties Instance { get; } = new ExportedSingletonProperties();
-		ExportedSingletonProperties() : base( SingletonSpecification.Instance.And( IsExportSpecification.Instance.Project<SingletonRequest, PropertyInfo>( request => request.Candidate ) ) ) {}
+		public new static ExportedSingletonProperties Default { get; } = new ExportedSingletonProperties();
+		ExportedSingletonProperties() : base( SingletonSpecification.Default.And( IsExportSpecification.Default.Project<SingletonRequest, PropertyInfo>( request => request.Candidate ) ) ) {}
 	}
 
 	sealed class SingletonExports : SingletonDelegates<SingletonExport>
 	{
-		public static SingletonExports Instance { get; } = new SingletonExports();
-		SingletonExports() : base( ExportedSingletonProperties.Instance.Get, new Factory().Get ) {}
+		public static SingletonExports Default { get; } = new SingletonExports();
+		SingletonExports() : base( ExportedSingletonProperties.Default.Get, new Factory().Get ) {}
 
 		sealed class Factory : ParameterizedSourceBase<PropertyInfo, SingletonExport>
 		{
 			public override SingletonExport Get( PropertyInfo parameter )
 			{
-				var instance = SingletonDelegateCache.Instance.Get( parameter );
+				var instance = SingletonDelegateCache.Default.Get( parameter );
 				if ( instance != null )
 				{
-					var contractType = parameter.PropertyType.Adapt().IsGenericOf( typeof(ISource<>), false ) ? ResultTypes.Instance.Get( parameter.PropertyType ) : instance.GetMethodInfo().ReturnType;
+					var contractType = parameter.PropertyType.Adapt().IsGenericOf( typeof(ISource<>), false ) ? ResultTypes.Default.Get( parameter.PropertyType ) : instance.GetMethodInfo().ReturnType;
 					var types = parameter.GetCustomAttributes<ExportAttribute>().Introduce( contractType, x => new CompositionContract( x.Item1.ContractType ?? x.Item2, x.Item1.ContractName ) ).Append( new CompositionContract( contractType ) ).Distinct().ToImmutableArray();
 					var result = new SingletonExport( types, instance );
 					return result;

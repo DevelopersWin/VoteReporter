@@ -37,7 +37,7 @@ namespace DragonSpark.Activation
 
 	public class ConstructTypeRequest : TypeRequest, IEquatable<ConstructTypeRequest>
 	{
-		readonly static StructuralEqualityComparer<object[]> Comparer = StructuralEqualityComparer<object[]>.Instance;
+		readonly static StructuralEqualityComparer<object[]> Comparer = StructuralEqualityComparer<object[]>.Default;
 
 		readonly int code;
 

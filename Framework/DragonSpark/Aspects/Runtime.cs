@@ -44,12 +44,12 @@ namespace DragonSpark.Aspects
 
 	public sealed class Runtime : SpecificationBasedAspect
 	{
-		public Runtime() : base( RuntimeSpecification.Instance ) {}
+		public Runtime() : base( RuntimeSpecification.Default ) {}
 	}
 
 	public class RuntimeSpecification : SpecificationBase<object>
 	{
-		public static RuntimeSpecification Instance { get; } = new RuntimeSpecification();
+		public static RuntimeSpecification Default { get; } = new RuntimeSpecification();
 		RuntimeSpecification() : base( Where<object>.Always ) {}
 
 		public override bool IsSatisfiedBy( object parameter ) => !PostSharpEnvironment.IsPostSharpRunning;

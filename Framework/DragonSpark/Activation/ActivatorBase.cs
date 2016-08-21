@@ -6,7 +6,7 @@ namespace DragonSpark.Activation
 {
 	public abstract class ActivatorBase<TRequest> : ValidatedParameterizedSourceBase<TRequest, object>, IActivator where TRequest : TypeRequest
 	{
-		readonly static ISpecification<object> Specification = IsInstanceOfSpecification<TRequest>.Instance.Or( IsInstanceOfSpecification<Type>.Instance );
+		readonly static ISpecification<object> Specification = IsInstanceOfSpecification<TRequest>.Default.Or( IsInstanceOfSpecification<Type>.Default );
 
 		protected ActivatorBase( Coerce<TRequest> coercer ) : this( coercer, Specification ) {}
 
@@ -20,7 +20,7 @@ namespace DragonSpark.Activation
 
 	public abstract class LocatorBase : ActivatorBase<LocateTypeRequest>
 	{
-		readonly protected static Coerce<LocateTypeRequest> DefaultCoerce = Coercer.Instance.ToDelegate();
+		readonly protected static Coerce<LocateTypeRequest> DefaultCoerce = Coercer.Default.ToDelegate();
 
 		protected LocatorBase() : base( DefaultCoerce ) {}
 
@@ -28,7 +28,7 @@ namespace DragonSpark.Activation
 
 		public sealed class Coercer : TypeRequestCoercer<LocateTypeRequest>
 		{
-			public static Coercer Instance { get; } = new Coercer();
+			public static Coercer Default { get; } = new Coercer();
 		
 			protected override LocateTypeRequest Create( Type type ) => new LocateTypeRequest( type );
 		}

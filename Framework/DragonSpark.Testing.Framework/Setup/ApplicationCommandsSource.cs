@@ -19,32 +19,32 @@ namespace DragonSpark.Testing.Framework.Setup
 	public sealed class Configure : TransformerBase<IServiceProvider>
 	{
 		[Export( typeof(ITransformer<IServiceProvider>) )]
-		public static Configure Instance { get; } = new Configure();
+		public static Configure Default { get; } = new Configure();
 		Configure() {}
 
 		public override IServiceProvider Get( IServiceProvider parameter ) => 
-			new CompositeServiceProvider( new SourceServiceProvider( FixtureContext.Instance, MethodContext.Instance ), new FixtureServiceProvider( FixtureContext.Instance.Get() ), parameter );
+			new CompositeServiceProvider( new SourceServiceProvider( FixtureContext.Default, MethodContext.Default ), new FixtureServiceProvider( FixtureContext.Default.Get() ), parameter );
 	}
 
 	public class ApplicationCommandSource : DragonSpark.Setup.ApplicationCommandSource
 	{
-		readonly static Func<MethodBase, ImmutableArray<ICommand<AutoData>>> Factory = MetadataCustomizationFactory<ICommand<AutoData>>.Instance.Get;
+		readonly static Func<MethodBase, ImmutableArray<ICommand<AutoData>>> Factory = MetadataCustomizationFactory<ICommand<AutoData>>.Default.Get;
 
-		public static ApplicationCommandSource Instance { get; } = new ApplicationCommandSource();
-		ApplicationCommandSource() : base( Composition.ServiceProviderConfigurations.Instance ) {}
+		public static ApplicationCommandSource Default { get; } = new ApplicationCommandSource();
+		ApplicationCommandSource() : base( Composition.ServiceProviderConfigurations.Default ) {}
 
 		protected override IEnumerable<ICommand> Yield() => 
 			base.Yield()
-				.Append( MetadataCommand.Instance )
-				.Concat( Factory( MethodContext.Instance.Get() ).AsEnumerable() );
+				.Append( MetadataCommand.Default )
+				.Concat( Factory( MethodContext.Default.Get() ).AsEnumerable() );
 	}
 
 	sealed class MethodTypes : FactoryCache<ImmutableArray<Type>>, ITypeSource
 	{
-		readonly static Func<object, ImmutableArray<Func<MethodBase, ImmutableArray<Type>>>> Locator = HostedValueLocator<Func<MethodBase, ImmutableArray<Type>>>.Instance.Get;
+		readonly static Func<object, ImmutableArray<Func<MethodBase, ImmutableArray<Type>>>> Locator = HostedValueLocator<Func<MethodBase, ImmutableArray<Type>>>.Default.Get;
 
-		public static MethodTypes Instance { get; } = new MethodTypes();
-		MethodTypes() : this( MethodContext.Instance.Get ) {}
+		public static MethodTypes Default { get; } = new MethodTypes();
+		MethodTypes() : this( MethodContext.Default.Get ) {}
 
 		readonly Func<MethodBase> methodSource;
 		readonly Func<object, ImmutableArray<Func<MethodBase, ImmutableArray<Type>>>> locator;

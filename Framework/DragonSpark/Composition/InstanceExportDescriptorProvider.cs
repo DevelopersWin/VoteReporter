@@ -47,7 +47,7 @@ namespace DragonSpark.Composition
 		{
 			if ( contracts.Contains( contract ) )
 			{
-				// ActivationProperties.Instance.Set( instance, true );
+				// ActivationProperties.Default.Set( instance, true );
 				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, GetDescriptor );
 			}
 		}
@@ -60,8 +60,8 @@ namespace DragonSpark.Composition
 	// https://github.com/dotnet/corefx/issues/6857
 	public class TypeInitializingExportDescriptorProvider : ExportDescriptorProvider
 	{
-		readonly static Action<Type> Initializer = InitializeTypeCommand.Instance.ToDelegate();
-		readonly static Func<Type, Type> Types = ConventionTypes.Instance.Get;
+		readonly static Action<Type> Initializer = InitializeTypeCommand.Default.ToDelegate();
+		readonly static Func<Type, Type> Types = ConventionTypes.Default.Get;
 
 		readonly Func<Type, Type> types;
 

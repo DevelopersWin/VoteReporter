@@ -18,17 +18,17 @@ namespace DragonSpark.Composition
 {
 	public sealed class CompositionHostFactory : ConfigurableFactoryBase<ContainerConfiguration, CompositionHost>
 	{
-		readonly static IConfigurationScope<ContainerConfiguration> Default = new ConfigurationScope<ContainerConfiguration>( ContainerServicesConfigurator.Instance, PartsContainerConfigurator.Instance );
+		readonly static IConfigurationScope<ContainerConfiguration> DefaultConfiguration = new ConfigurationScope<ContainerConfiguration>( ContainerServicesConfigurator.Default, PartsContainerConfigurator.Default );
 
-		public static CompositionHostFactory Instance { get; } = new CompositionHostFactory();
-		CompositionHostFactory() : base( () => new ContainerConfiguration(), Default, parameter => parameter.CreateContainer() ) {}
+		public static CompositionHostFactory Default { get; } = new CompositionHostFactory();
+		CompositionHostFactory() : base( () => new ContainerConfiguration(), DefaultConfiguration, parameter => parameter.CreateContainer() ) {}
 	}
 
 	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}
 
 	public class ContainerServicesConfigurator : ContainerConfigurator
 	{
-		public static ContainerServicesConfigurator Instance { get; } = new ContainerServicesConfigurator();
+		public static ContainerServicesConfigurator Default { get; } = new ContainerServicesConfigurator();
 		ContainerServicesConfigurator() {}
 
 		public override ContainerConfiguration Get( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
@@ -38,7 +38,7 @@ namespace DragonSpark.Composition
 	{
 		readonly Func<Type, object> provider;
 
-		public ServicesExportDescriptorProvider() : this( DefaultServiceProvider.Instance ) {}
+		public ServicesExportDescriptorProvider() : this( DefaultServiceProvider.Default ) {}
 
 		public ServicesExportDescriptorProvider( IServiceProvider provider ) : this( new ActivatedServiceSource( provider ).Get ) {}
 
@@ -73,8 +73,8 @@ namespace DragonSpark.Composition
 
 	public class ConventionBuilderFactory : ConfigurableFactoryBase<ConventionBuilder>
 	{
-		public static ConventionBuilderFactory Instance { get; } = new ConventionBuilderFactory();
-		ConventionBuilderFactory() : base( () => new ConventionBuilder(), ConventionTransformer.Instance ) {}
+		public static ConventionBuilderFactory Default { get; } = new ConventionBuilderFactory();
+		ConventionBuilderFactory() : base( () => new ConventionBuilder(), ConventionTransformer.Default ) {}
 	}
 
 	/*public class ConventionBuilder : System.Composition.Convention.ConventionBuilder
@@ -88,10 +88,10 @@ namespace DragonSpark.Composition
 
 	public class ConventionTransformer : TransformerBase<ConventionBuilder>
 	{
-		readonly static Func<Type, ConventionMapping> Selector = ConventionMappings.Instance.Get;
+		readonly static Func<Type, ConventionMapping> Selector = ConventionMappings.Default.Get;
 
-		public static ConventionTransformer Instance { get; } = new ConventionTransformer();
-		ConventionTransformer() : this( ApplicationTypes.Instance.Get ) {}
+		public static ConventionTransformer Default { get; } = new ConventionTransformer();
+		ConventionTransformer() : this( ApplicationTypes.Default.Get ) {}
 
 		readonly Func<ImmutableArray<Type>> typesSource;
 
@@ -136,8 +136,8 @@ namespace DragonSpark.Composition
 	{
 		readonly Func<ImmutableArray<Type>> typesSource;
 		readonly Func<ConventionBuilder> builderSource;
-		public static PartsContainerConfigurator Instance { get; } = new PartsContainerConfigurator();
-		PartsContainerConfigurator() : this( ApplicationTypes.Instance.Get, ConventionBuilderFactory.Instance.Get ) {}
+		public static PartsContainerConfigurator Default { get; } = new PartsContainerConfigurator();
+		PartsContainerConfigurator() : this( ApplicationTypes.Default.Get, ConventionBuilderFactory.Default.Get ) {}
 
 		public PartsContainerConfigurator( Func<ImmutableArray<Type>> typesSource, Func<ConventionBuilder> builderSource )
 		{
@@ -163,7 +163,7 @@ namespace DragonSpark.Composition
 		{
 			readonly Func<ConventionBuilder, object> configure;
 
-			public static FrameworkConventionBuilder Instance { get; } = new FrameworkConventionBuilder();
+			public static FrameworkConventionBuilder Default { get; } = new FrameworkConventionBuilder();
 			FrameworkConventionBuilder()
 			{
 				configure = Configure;
@@ -176,7 +176,7 @@ namespace DragonSpark.Composition
 
 		/*class AttributeProvider : AttributedModelProvider
 		{
-			public static AttributeProvider Instance { get; } = new AttributeProvider();
+			public static AttributeProvider Default { get; } = new AttributeProvider();
 			AttributeProvider() {}
 
 			[Freeze]

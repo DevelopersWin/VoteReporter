@@ -6,9 +6,9 @@ namespace DragonSpark.Activation
 {
 	public sealed class SourceTypeLocator : TransformerBase<Type>
 	{
-		readonly static Func<LocateTypeRequest, Type> Types = SourceTypes.Instance.Delegate();
+		readonly static Func<LocateTypeRequest, Type> Types = SourceTypes.Default.Delegate();
 
-		public static SourceTypeLocator Instance { get; } = new SourceTypeLocator();
+		public static SourceTypeLocator Default { get; } = new SourceTypeLocator();
 		SourceTypeLocator( /*Func<Type, Type> typeSource, Func<Type, Type> contextSource*/ ) : this( Types ) {}
 
 		readonly Func<LocateTypeRequest, Type> @delegate;
@@ -33,12 +33,12 @@ namespace DragonSpark.Activation
 
 			/*var context = contextSource( parameter );
 			var all = SelfAndNestedTypes
-						.Instance.Get( context )
+						.Default.Get( context )
 						.Union( AssemblyTypes.All.Get( context.Assembly() ).Where( Defaults.ApplicationType ) )
 						.ToImmutableArray();#1#
 
-			/*var local = new SourceTypes( FactoryTypeRequests.Instance.GetMany( all ) );
-			var result = new[] { local, SourceTypes.Instance.Get() }
+			/*var local = new SourceTypes( FactoryTypeRequests.Default.GetMany( all ) );
+			var result = new[] { local, SourceTypes.Default.Get() }
 				.Select( types => types.ToDelegate() )
 				.Introduce( new LocateTypeRequest( typeSource( parameter ) ) )
 				.FirstAssigned();

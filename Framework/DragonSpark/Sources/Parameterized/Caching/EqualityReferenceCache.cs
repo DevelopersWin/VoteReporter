@@ -5,7 +5,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class EqualityReferenceCache<TInstance, TValue> : DecoratedCache<TInstance, TValue> where TInstance : class
 	{
-		readonly static Func<TInstance, TInstance> DefaultSource = EqualityReference<TInstance>.Instance.Get;
+		readonly static Func<TInstance, TInstance> DefaultSource = EqualityReference<TInstance>.Default.Get;
 
 		readonly Func<TInstance, TInstance> equalitySource;
 

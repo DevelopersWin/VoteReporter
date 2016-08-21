@@ -5,7 +5,7 @@ namespace DragonSpark.TypeSystem
 {
 	public class DerivedMethodSpecification : SpecificationBase<MethodInfo>
 	{
-		public static DerivedMethodSpecification Instance { get; } = new DerivedMethodSpecification();
+		public static DerivedMethodSpecification Default { get; } = new DerivedMethodSpecification();
 
 		DerivedMethodSpecification() {}
 
@@ -19,7 +19,7 @@ namespace DragonSpark.TypeSystem
 
 	public class DerivedTypeSpecification : SpecificationBase<TypeInfo>
 	{
-		public static DerivedTypeSpecification Instance { get; } = new DerivedTypeSpecification();
+		public static DerivedTypeSpecification Default { get; } = new DerivedTypeSpecification();
 
 		public override bool IsSatisfiedBy( TypeInfo parameter ) => false;// parameter.BaseType != typeof(object);
 	}

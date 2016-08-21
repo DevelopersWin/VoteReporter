@@ -65,12 +65,12 @@ namespace DragonSpark.TypeSystem
 	{
 		public MethodInfoAttributeProvider( MethodInfo method ) : this( method, method ) {}
 
-		public MethodInfoAttributeProvider( MemberInfo member, MethodInfo method ) : base( member, DerivedMethodSpecification.Instance.IsSatisfiedBy( method ) ) {}
+		public MethodInfoAttributeProvider( MemberInfo member, MethodInfo method ) : base( member, DerivedMethodSpecification.Default.IsSatisfiedBy( method ) ) {}
 	}
 
 	public class TypeInfoAttributeProvider : MemberInfoAttributeProvider
 	{
-		public TypeInfoAttributeProvider( TypeInfo info ) : base( info, DerivedTypeSpecification.Instance.IsSatisfiedBy( info ) ) {}
+		public TypeInfoAttributeProvider( TypeInfo info ) : base( info, DerivedTypeSpecification.Default.IsSatisfiedBy( info ) ) {}
 	}
 
 	public class MemberInfoAttributeProvider : AttributeProviderBase

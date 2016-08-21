@@ -27,7 +27,7 @@ namespace DragonSpark.Runtime
 
 	/*public class Serializer<T> : ISerializer
 	{
-		public static Serializer<T> Instance { get; } = new Serializer<T>();
+		public static Serializer<T> Default { get; } = new Serializer<T>();
 
 		readonly DataContractSerializer serializer;
 

@@ -14,7 +14,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public class ArgumentCache<TArgument, TValue> : CacheBase<TArgument, TValue>, IArgumentCache<TArgument, TValue>
 	{
-		readonly static IEqualityComparer<TArgument> EqualityComparer = typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Instance : EqualityComparer<TArgument>.Default;
+		readonly static IEqualityComparer<TArgument> EqualityComparer = typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Default : EqualityComparer<TArgument>.Default;
 
 		readonly Func<TArgument, TValue> body;
 		readonly ConcurrentDictionary<TArgument, TValue> store = new ConcurrentDictionary<TArgument, TValue>( EqualityComparer );
@@ -49,8 +49,8 @@ namespace DragonSpark.Sources.Parameterized
 	
 	/*class RegisteredCacheFactory<TKey, TValue> : FactoryBase<InstanceMethod, IArgumentCache<TKey, TValue>>
 	{
-		public static RegisteredCacheFactory<TKey, TValue> Instance { get; } = new RegisteredCacheFactory<TKey, TValue>();
-		RegisteredCacheFactory() : this( ParameterHandlerRegistry.Instance ) {}
+		public static RegisteredCacheFactory<TKey, TValue> Default { get; } = new RegisteredCacheFactory<TKey, TValue>();
+		RegisteredCacheFactory() : this( ParameterHandlerRegistry.Default ) {}
 
 		readonly IParameterHandlerRegistry registry;
 
@@ -78,7 +78,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	/*class ParameterAwareHandler : IParameterAwareHandler
 	{
-		public static ParameterAwareHandler Instance { get; } = new ParameterAwareHandler();
+		public static ParameterAwareHandler Default { get; } = new ParameterAwareHandler();
 
 		public bool Handles( object parameter ) => false;
 
@@ -150,13 +150,13 @@ namespace DragonSpark.Sources.Parameterized
 			Method = method;
 		}
 
-		public object Instance { get; }
+		public object Default { get; }
 		public MethodBase Method { get; }
 	}*/
 
 	/*class ParameterAwareHandler : IParameterAwareHandler
 	{
-		public static ParameterAwareHandler Instance { get; } = new ParameterAwareHandler();
+		public static ParameterAwareHandler Default { get; } = new ParameterAwareHandler();
 
 		public bool Handles( object parameter )
 		{
@@ -172,11 +172,11 @@ namespace DragonSpark.Sources.Parameterized
 
 	/*class ParameterHandlerRegistry : ActivatedCache<ParameterHandlerRegistry.Inner>, IParameterHandlerRegistry
 	{
-		public new static IParameterHandlerRegistry Instance { get; } = new ParameterHandlerRegistry();
+		public new static IParameterHandlerRegistry Default { get; } = new ParameterHandlerRegistry();
 
 		public void Register( InstanceMethod instance, IParameterAwareHandler handler )
 		{
-			var list = Get( instance.Instance ).Get( instance.Method );
+			var list = Get( instance.Default ).Get( instance.Method );
 			lock ( list )
 			{
 				list.Add( handler );
@@ -188,7 +188,7 @@ namespace DragonSpark.Sources.Parameterized
 			public Inner() : base( _ => new HashSet<IParameterAwareHandler>() ) {}
 		}
 
-		public IParameterAwareHandler For( InstanceMethod instance ) => new CompositeParameterAwareHandler( Get( instance.Instance ).Get( instance.Method ).ToImmutableArray() );
+		public IParameterAwareHandler For( InstanceMethod instance ) => new CompositeParameterAwareHandler( Get( instance.Default ).Get( instance.Method ).ToImmutableArray() );
 	}*/
 
 	class CacheParameterHandler<TKey, TValue> : IParameterAwareHandler

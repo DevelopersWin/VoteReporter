@@ -10,7 +10,7 @@ namespace DragonSpark.ComponentModel
 	{
 		readonly static Type[] Attributes = { typeof(DefaultValueAttribute), typeof(DefaultValueBase) };
 
-		public static DefaultValuePropertySpecification Instance { get; } = new DefaultValuePropertySpecification();
+		public static DefaultValuePropertySpecification Default { get; } = new DefaultValuePropertySpecification();
 
 		public override bool IsSatisfiedBy( PropertyInfo parameter ) => parameter.GetMethod != null && parameter.DeclaringType.GetTypeInfo().IsClass && Attributes.Any( parameter.IsDefined );
 	}

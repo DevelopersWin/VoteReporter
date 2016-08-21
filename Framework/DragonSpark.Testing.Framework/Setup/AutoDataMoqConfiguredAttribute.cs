@@ -6,19 +6,19 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public class AutoDataCustomization : CompositeCustomization
 	{
-		public AutoDataCustomization() : base( ServicesCustomization.Instance, new AutoConfiguredMoqCustomization() ) { }
+		public AutoDataCustomization() : base( ServicesCustomization.Default, new AutoConfiguredMoqCustomization() ) { }
 	}
 
 	/*public class AutoDataMoqAttribute : AutoDataAttribute
 	{
-		public AutoDataMoqAttribute() : base( FixtureFactory<AutoMoqCustomization>.Instance.Create ) {}
+		public AutoDataMoqAttribute() : base( FixtureFactory<AutoMoqCustomization>.Default.Create ) {}
 	}*/
 
 	/*public class SetupFixtureFactory<T> : FixtureFactory<T> where T : SetupCustomization, new() {}*/
 
 	public class FixtureFactory<TWith> : FixtureFactoryBase where TWith : ICustomization, new()
 	{
-		public static FixtureFactory<TWith> Instance { get; } = new FixtureFactory<TWith>();
+		public static FixtureFactory<TWith> Default { get; } = new FixtureFactory<TWith>();
 		FixtureFactory() {}
 
 		public override IFixture Get() => base.Get().Customize( new TWith() );
@@ -26,8 +26,8 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public abstract class FixtureFactoryBase : SourceBase<IFixture>
 	{
-		// public static FixtureFactory Instance { get; } = new FixtureFactory();
+		// public static FixtureFactory Default { get; } = new FixtureFactory();
 
-		public override IFixture Get() => new Fixture( DefaultEngineParts.Instance );
+		public override IFixture Get() => new Fixture( DefaultEngineParts.Default );
 	}
 }

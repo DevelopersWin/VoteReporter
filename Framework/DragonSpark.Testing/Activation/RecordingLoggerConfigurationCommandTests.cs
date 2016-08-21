@@ -14,8 +14,8 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void BasicContext()
 		{
-			var level = MinimumLevelConfiguration.Instance;
-			var controller = LoggingController.Instance;
+			var level = MinimumLevelConfiguration.Default;
+			var controller = LoggingController.Default;
 
 			var first = controller.Get();
 			Assert.Same( first, controller.Get() );
@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Activation
 
 			const LogEventLevel assigned = LogEventLevel.Debug;
 			level.Assign( assigned );
-			controller.Assign( Factory.Global( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Instance.Get() ) ) );
+			controller.Assign( Factory.Global( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) ) );
 
 			var second = controller.Get();
 			Assert.NotSame( first, second );
@@ -36,18 +36,18 @@ namespace DragonSpark.Testing.Activation
 		[Theory, AutoData]
 		void VerifyHistory( object context, string message )
 		{
-			var history = LoggingHistory.Instance.Get();
+			var history = LoggingHistory.Default.Get();
 			Assert.Empty( history.Events );
-			Assert.Same( history, LoggingHistory.Instance.Get() );
+			Assert.Same( history, LoggingHistory.Default.Get() );
 
-			var logger = Logger.Instance.Get( context );
+			var logger = Logger.Default.Get( context );
 			Assert.Empty( history.Events );
 			logger.Information( "Hello World! {Message}", message );
 			Assert.Single( history.Events, item => item.RenderMessage().Contains( message ) );
 
 			logger.Debug( "Hello World! {Message}", message );
 			Assert.Single( history.Events );
-			LoggingController.Instance.Get().MinimumLevel = LogEventLevel.Debug;
+			LoggingController.Default.Get().MinimumLevel = LogEventLevel.Debug;
 
 			logger.Debug( "Hello World! {Message}", message );
 			Assert.Equal( 2, history.Events.Count() );

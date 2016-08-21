@@ -16,8 +16,8 @@ namespace DragonSpark.Composition
 	public abstract class SourceDelegateExporterBase : ExportDescriptorProvider
 	{
 		readonly static IStackSource<CompositeActivatorParameters> Stack = new AmbientStack<CompositeActivatorParameters>();
-		readonly static Func<LocateTypeRequest, Type> Locator = SourceTypes.Instance.Delegate();
-		readonly static Func<Type, Type> Parameters = ParameterTypes.Instance.ToDelegate();
+		readonly static Func<LocateTypeRequest, Type> Locator = SourceTypes.Default.Delegate();
+		readonly static Func<Type, Type> Parameters = ParameterTypes.Default.ToDelegate();
 
 		readonly ICache<LifetimeContext, object> cache = new Cache<LifetimeContext, object>();
 		readonly IDictionary<CompositionContract, CompositeActivator> registry = new ConcurrentDictionary<CompositionContract, CompositeActivator>();

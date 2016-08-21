@@ -8,9 +8,9 @@ namespace DragonSpark.Testing.Framework.Setup
 {
 	public class MetadataCommand : AutoDataCommandBase
 	{
-		readonly static Func<MethodBase, ImmutableArray<ICustomization>> Factory = MetadataCustomizationFactory<ICustomization>.Instance.Get;
+		readonly static Func<MethodBase, ImmutableArray<ICustomization>> Factory = MetadataCustomizationFactory<ICustomization>.Default.Get;
 
-		public static MetadataCommand Instance { get; } = new MetadataCommand();
+		public static MetadataCommand Default { get; } = new MetadataCommand();
 		MetadataCommand() : this( Factory ) {}
 
 		readonly Func<MethodBase, ImmutableArray<ICustomization>> factory;
@@ -31,14 +31,14 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	/*public class Application<T> : Application where T : class, ICommand
 	{
-		public Application( /*IServiceProvider serviceProvider#1# ) : base( /*serviceProvider,#1# ApplicationCommands<T>.Instance.Get() ) {}
+		public Application( /*IServiceProvider serviceProvider#1# ) : base( /*serviceProvider,#1# ApplicationCommands<T>.Default.Get() ) {}
 	}
 
 	public class ApplicationCommands<T> : Configuration<IEnumerable<ICommand>> where T : class, ICommand
 	{
-		public static ApplicationCommands<T> Instance { get; } = new ApplicationCommands<T>();
+		public static ApplicationCommands<T> Default { get; } = new ApplicationCommands<T>();
 
-		ApplicationCommands() : base( () => EnumerableEx.Return( new ApplyExportedCommandsCommand<T>() ).Concat( ApplicationCommands.Instance.Get() ) ) {}
+		ApplicationCommands() : base( () => EnumerableEx.Return( new ApplyExportedCommandsCommand<T>() ).Concat( ApplicationCommands.Default.Get() ) ) {}
 	}*/
 
 	public interface IApplication : IApplication<AutoData> { }

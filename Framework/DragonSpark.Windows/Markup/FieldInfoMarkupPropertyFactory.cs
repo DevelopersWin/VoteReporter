@@ -6,7 +6,7 @@ namespace DragonSpark.Windows.Markup
 	[ApplyAutoValidation]
 	public class FieldInfoMarkupPropertyFactory : MarkupPropertyFactory<FieldInfo>
 	{
-		public static FieldInfoMarkupPropertyFactory Instance { get; } = new FieldInfoMarkupPropertyFactory();
+		public static FieldInfoMarkupPropertyFactory Default { get; } = new FieldInfoMarkupPropertyFactory();
 
 		protected override IMarkupProperty Create( object targetObject, FieldInfo targetProperty ) => new ClrFieldMarkupProperty( targetObject, targetProperty );
 	}

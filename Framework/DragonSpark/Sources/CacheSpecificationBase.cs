@@ -19,7 +19,7 @@ namespace DragonSpark.Sources
 	{
 		/*readonly ICoercer<T> coercer;
 
-		protected DisposingSourceBase() : this( Coercer<T>.Instance ) {}
+		protected DisposingSourceBase() : this( Coercer<T>.Default ) {}
 
 		protected DisposingSourceBase( ICoercer<T> coercer )
 		{

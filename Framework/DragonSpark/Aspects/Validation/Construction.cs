@@ -30,7 +30,7 @@ namespace DragonSpark.Aspects.Validation
 		{
 			try
 {
-				return AspectInstances.Instance.ToSourceDelegate();
+				return AspectInstances.Default.ToSourceDelegate();
 }
 catch ( Exception e )
 {
@@ -64,13 +64,13 @@ catch ( Exception e )
 
 	class AutoValidationControllerFactory : ParameterizedSourceBase<IAutoValidationController>
 	{
-		public static IParameterizedSource<IAutoValidationController> Instance { get; } = new AutoValidationControllerFactory().ToCache();
-		AutoValidationControllerFactory() : this( AdapterLocator.Instance.Get ) {}
+		public static IParameterizedSource<IAutoValidationController> Default { get; } = new AutoValidationControllerFactory().ToCache();
+		AutoValidationControllerFactory() : this( AdapterLocator.Default.Get ) {}
 
 		readonly Func<object, IParameterValidationAdapter> adapterSource;
 		readonly Action<object, IAspectHub> set;
 
-		protected AutoValidationControllerFactory( Func<object, IParameterValidationAdapter> adapterSource ) : this( adapterSource, AspectHub.Instance.Set ) {}
+		protected AutoValidationControllerFactory( Func<object, IParameterValidationAdapter> adapterSource ) : this( adapterSource, AspectHub.Default.Set ) {}
 
 		protected AutoValidationControllerFactory( Func<object, IParameterValidationAdapter> adapterSource, Action<object, IAspectHub> set )
 		{
@@ -89,9 +89,9 @@ catch ( Exception e )
 
 	static class Defaults
 	{
-		public static Func<MethodLocator.Parameter, MethodInfo> Locator { get; } = MethodLocator.Instance.Get;
+		public static Func<MethodLocator.Parameter, MethodInfo> Locator { get; } = MethodLocator.Default.Get;
 
-		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Instance.Get;
+		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Default.Get;
 
 		public static ImmutableArray<IAspectProfile> AspectProfiles { get; } = 
 			new IAspectProfile[]
@@ -221,7 +221,7 @@ catch ( Exception e )
 
 	public sealed class MethodLocator : ParameterizedSourceBase<MethodLocator.Parameter, MethodInfo>
 	{
-		public static MethodLocator Instance { get; } = new MethodLocator();
+		public static MethodLocator Default { get; } = new MethodLocator();
 		MethodLocator() {}
 
 		public override MethodInfo Get( Parameter parameter )
@@ -253,7 +253,7 @@ catch ( Exception e )
 
 		readonly Func<MethodLocator.Parameter, MethodInfo> source;
 
-		public static ValidationMethodLocator Instance { get; } = new ValidationMethodLocator();
+		public static ValidationMethodLocator Default { get; } = new ValidationMethodLocator();
 		ValidationMethodLocator() : this( Defaults.Locator ) {}
 
 		ValidationMethodLocator( Func<MethodLocator.Parameter, MethodInfo> source )
@@ -278,7 +278,7 @@ catch ( Exception e )
 
 	sealed class AspectInstanceConstructor<T> : ParameterizedSourceBase<MethodInfo, AspectInstance>
 	{
-		public static AspectInstanceConstructor<T> Instance { get; } = new AspectInstanceConstructor<T>();
+		public static AspectInstanceConstructor<T> Default { get; } = new AspectInstanceConstructor<T>();
 		AspectInstanceConstructor() : this( new ObjectConstruction( typeof(T), Items<object>.Default ) ) {}
 
 		readonly ObjectConstruction construction;
@@ -299,8 +299,8 @@ catch ( Exception e )
 
 	public sealed class AspectInstanceFactory<T> : ParameterizedSourceBase<MethodInfo, AspectInstance>
 	{
-		public static AspectInstanceFactory<T> Instance { get; } = new AspectInstanceFactory<T>();
-		AspectInstanceFactory() : this( AspectInstanceConstructor<T>.Instance.Get ) {}
+		public static AspectInstanceFactory<T> Default { get; } = new AspectInstanceFactory<T>();
+		AspectInstanceFactory() : this( AspectInstanceConstructor<T>.Default.Get ) {}
 
 		readonly Func<MethodInfo, AspectInstance> constructorSource;
 
@@ -322,7 +322,7 @@ catch ( Exception e )
 
 	public sealed class AspectInstances : ValidatedParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
 	{
-		public static AspectInstances Instance { get; } = new AspectInstances();
+		public static AspectInstances Default { get; } = new AspectInstances();
 		AspectInstances() : this( Defaults.AspectProfiles ) {}
 
 		readonly ImmutableArray<IAspectProfile> profiles;
@@ -330,7 +330,7 @@ catch ( Exception e )
 		readonly Func<MethodInfo, AspectInstance> validatorSource;
 		readonly Func<MethodInfo, AspectInstance> executionSource;
 
-		public AspectInstances( ImmutableArray<IAspectProfile> profiles ) : this( profiles, ValidationMethodLocator.Instance.Get, AspectInstanceFactory<AutoValidationValidationAspect>.Instance.Get, AspectInstanceFactory<AutoValidationExecuteAspect>.Instance.Get ) {}
+		public AspectInstances( ImmutableArray<IAspectProfile> profiles ) : this( profiles, ValidationMethodLocator.Default.Get, AspectInstanceFactory<AutoValidationValidationAspect>.Default.Get, AspectInstanceFactory<AutoValidationExecuteAspect>.Default.Get ) {}
 
 		public AspectInstances( ImmutableArray<IAspectProfile> profiles, Func<MethodInfo, MethodInfo> specificationSource, Func<MethodInfo, AspectInstance> validatorSource, Func<MethodInfo, AspectInstance> executionSource ) : base( new Specification( profiles.Select( profile => profile.SupportedType.Adapt() ).ToImmutableArray() ) )
 		{

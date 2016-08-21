@@ -17,12 +17,12 @@ namespace DragonSpark.Composition
 	public sealed class ServiceProviderFactory : TransformerBase<IServiceProvider>
 	{
 		[Export( typeof(ITransformer<IServiceProvider>) )]
-		public static ServiceProviderFactory Instance { get; } = new ServiceProviderFactory();
+		public static ServiceProviderFactory Default { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() {}
 
 		public override IServiceProvider Get( IServiceProvider parameter )
 		{
-			var context = CompositionHostFactory.Instance.Get();
+			var context = CompositionHostFactory.Default.Get();
 			var primary = new ServiceLocator( context );
 			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, parameter );
 			return result;
@@ -31,12 +31,12 @@ namespace DragonSpark.Composition
 
 	public class ServiceProviderConfigurations : Setup.ServiceProviderConfigurations
 	{
-		public new static ServiceProviderConfigurations Instance { get; } = new ServiceProviderConfigurations();
-		ServiceProviderConfigurations() : this( ServiceProviderSource.Instance.Get ) {}
+		public new static ServiceProviderConfigurations Default { get; } = new ServiceProviderConfigurations();
+		ServiceProviderConfigurations() : this( ServiceProviderSource.Default.Get ) {}
 
 		readonly Func<IServiceProvider> source;
 
-		protected ServiceProviderConfigurations( Func<IServiceProvider> source ) : this( source, InitializeExportsCommand.Instance.Execute ) {}
+		protected ServiceProviderConfigurations( Func<IServiceProvider> source ) : this( source, InitializeExportsCommand.Default.Execute ) {}
 
 		ServiceProviderConfigurations( Func<IServiceProvider> source, Action<IServiceProvider> configure )
 		{
@@ -45,7 +45,7 @@ namespace DragonSpark.Composition
 
 		protected override IEnumerable<ICommand> Yield()
 		{
-			yield return Setup.ServiceProviderFactory.Instance.Seed.Configured( source );
+			yield return Setup.ServiceProviderFactory.Default.Seed.Configured( source );
 			foreach ( var command in base.Yield() )
 			{
 				yield return command;
@@ -55,24 +55,24 @@ namespace DragonSpark.Composition
 
 	public class ServiceProviderSource : FixedFactory<IServiceProvider, IServiceProvider>
 	{
-		public static ServiceProviderSource Instance { get; } = new ServiceProviderSource();
-		ServiceProviderSource() : base( ServiceProviderFactory.Instance.Get, DefaultServiceProvider.Instance ) {}
+		public static ServiceProviderSource Default { get; } = new ServiceProviderSource();
+		ServiceProviderSource() : base( ServiceProviderFactory.Default.Get, DefaultServiceProvider.Default ) {}
 	}
 
 	[ApplyAutoValidation]
 	public class InitializeExportsCommand : CommandBase<IServiceProvider>
 	{
-		public static InitializeExportsCommand Instance { get; } = new InitializeExportsCommand();
+		public static InitializeExportsCommand Default { get; } = new InitializeExportsCommand();
 		InitializeExportsCommand()  {}
 
-		public override void Execute( IServiceProvider parameter ) => Exports.Instance.Assign( new ExportProvider( parameter.Get<CompositionContext>() ) );
+		public override void Execute( IServiceProvider parameter ) => Exports.Default.Assign( new ExportProvider( parameter.Get<CompositionContext>() ) );
 	}
 
 	/*[Export( typeof(ISetup) )]
 	public class InitializeLocationCommand : InitializeServiceProviderCommandBase
 	{
-		// public static ISetup Instance { get; } = new InitializeLocationCommand();
-		public InitializeLocationCommand() : base( ServiceCoercer<ServiceLocator>.Instance.Coerce )
+		// public static ISetup Default { get; } = new InitializeLocationCommand();
+		public InitializeLocationCommand() : base( ServiceCoercer<ServiceLocator>.Default.Coerce )
 		{
 			Priority = Priority.High;
 		}

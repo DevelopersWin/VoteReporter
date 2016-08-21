@@ -120,7 +120,7 @@ namespace DragonSpark.Windows.Entity
 
 		static IQueryable<TItem> WithIncludes<TItem>( IQueryable<TItem> target, IObjectContextAdapter adapter ) where TItem : class
 		{
-			var names = new DefaultAssociationPathsFactory( AttributeProvider.Instance, adapter ).Create( typeof(TItem) );
+			var names = new DefaultAssociationPathsFactory( AttributeProvider.Default, adapter ).Create( typeof(TItem) );
 			var result = names.Aggregate( target, ( current, item ) => current.Include( item ) );
 			return result;
 		}*/
@@ -140,12 +140,12 @@ namespace DragonSpark.Windows.Entity
 			ObjectContext DetermineContext()
 			{
 				var internalQuery = query.GetType()
-					.GetFields( BindingFlags.NonPublic | BindingFlags.Instance )
+					.GetFields( BindingFlags.NonPublic | BindingFlags.Default )
 					.Where( field => field.Name == "_internalQuery" )
 					.Select( field => field.GetValue( query ) )
 					.First();
 				var objectQuery = internalQuery.GetType()
-					.GetFields( BindingFlags.NonPublic | BindingFlags.Instance )
+					.GetFields( BindingFlags.NonPublic | BindingFlags.Default )
 					.Where( field => field.Name == "_objectQuery" )
 					.Select( field => field.GetValue( internalQuery ) )
 					.Cast<ObjectQuery>()
@@ -293,10 +293,10 @@ namespace DragonSpark.Windows.Entity
 			{
 				var result = names.Select( name =>
 				{
-					var info = container.GetType().GetProperty( name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy );
+					var info = container.GetType().GetProperty( name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Default | BindingFlags.FlattenHierarchy );
 					var value = AttributeProviderExtensions.From<ForeignKeyAttribute, object>( typeof(TEntity).GetProperty( name ), y =>
 					{
-						var propertyInfo = container.GetType().GetProperty( y.Name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy );
+						var propertyInfo = container.GetType().GetProperty( y.Name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Default | BindingFlags.FlattenHierarchy );
 						var o = propertyInfo.GetValue( container );
 						return o.With( z =>
 						{

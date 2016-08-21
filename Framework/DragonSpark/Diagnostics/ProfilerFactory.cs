@@ -2,7 +2,7 @@ namespace DragonSpark.Diagnostics
 {
 	/*public class ProfilerFactory : ProfilerFactoryBase<Timer>
 	{
-		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Instance.Create;
+		readonly static Func<TimerEvent, ILoggerTemplate> TemplateSource = TimerEventConverter.Default.Create;
 
 		public ProfilerFactory() : base( TemplateSource ) {}
 	}
@@ -16,7 +16,7 @@ namespace DragonSpark.Diagnostics
 		readonly ISessionTimer timer;
 		readonly Func<MethodBase, CreateProfilerEvent> createSource;
 
-		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( ProfilerLevelConfiguration.Instance.Get, templateSource ) {}
+		protected ProfilerFactoryBase( Func<TimerEvent, ILoggerTemplate> templateSource ) : this( ProfilerLevelConfiguration.Default.Get, templateSource ) {}
 
 		protected ProfilerFactoryBase( LogEventLevel level, Func<TimerEvent, ILoggerTemplate> templateSource ) : this( DiagnosticProperties.Logger.Get, level, templateSource ) {}
 

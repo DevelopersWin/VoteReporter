@@ -26,8 +26,8 @@ namespace DragonSpark.Testing.Aspects
 		/*[Fact]
 		public void MemoryTest()
 		{
-			CacheValueFactory.Instance.Flush();
-			DisposableRepository.Instance.DisposeAll();
+			CacheValueFactory.Default.Flush();
+			DisposableRepository.Default.DisposeAll();
 			GC.Collect();
 			GC.WaitForPendingFinalizers();
 			var temp = PropertyConnector.Default;

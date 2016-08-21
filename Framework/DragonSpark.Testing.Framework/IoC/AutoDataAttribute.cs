@@ -4,7 +4,7 @@
 	{
 		// public AutoDataAttribute() {}
 
-		/*readonly static Func<MethodBase, IApplication> Source = new ApplicationFactory( ServiceProviderFactory.Instance ).Create;
+		/*readonly static Func<MethodBase, IApplication> Source = new ApplicationFactory( ServiceProviderFactory.Default ).Create;
 
 		public AutoDataAttribute() : base( Source ) {}
 
@@ -12,8 +12,8 @@
 
 		/*public sealed class ApplicationFactory<T> : ApplicationFactory where T : class, ICommand
 		{
-			public new static ApplicationFactory<T> Instance { get; } = new ApplicationFactory<T>();
-			ApplicationFactory() : base( new ApplicationCommandFactory( new ApplyExportedCommandsCommand<T>() ).Create, ServiceProviderFactory.Instance ) {}
+			public new static ApplicationFactory<T> Default { get; } = new ApplicationFactory<T>();
+			ApplicationFactory() : base( new ApplicationCommandFactory( new ApplyExportedCommandsCommand<T>() ).Create, ServiceProviderFactory.Default ) {}
 		}#1#
 	}*/
 

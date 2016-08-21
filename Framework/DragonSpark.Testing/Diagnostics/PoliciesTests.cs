@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var policy = Retry.Create( Sources.Parameterized.Extensions.Fixed( new RetryPolicyParameterSource<CustomException>( i => TimeSpan.Zero ), 3 ) );
 			var command = new Command();
 			var applied = command.Apply( policy );
-			var history = LoggingHistory.Instance.Get();
+			var history = LoggingHistory.Default.Get();
 			Assert.Empty( history.Events );
 			Assert.Throws<CustomException>( () => applied.Execute( true ) );
 			Assert.Equal( 4, command.Called );

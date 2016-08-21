@@ -15,7 +15,7 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public class SelfTransformer<T> : TransformerBase<T>
 	{
-		public static SelfTransformer<T> Instance { get; } = new SelfTransformer<T>();
+		public static SelfTransformer<T> Default { get; } = new SelfTransformer<T>();
 
 		public override T Get( T parameter ) => parameter;
 	}
@@ -148,7 +148,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public class ConstructFromKnownTypes<T> : ParameterConstructedCompositeFactory<object>, IParameterizedSource<object, T>
 	{
-		public static ISource<IParameterizedSource<object, T>> Instance { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.Global( () => new ConstructFromKnownTypes<T>( KnownTypes.Instance.Get<T>().ToArray() ) ) );
+		public static ISource<IParameterizedSource<object, T>> Default { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.Global( () => new ConstructFromKnownTypes<T>( KnownTypes.Default.Get<T>().ToArray() ) ) );
 		ConstructFromKnownTypes( params Type[] types ) : base( types ) {}
 
 		T IParameterizedSource<object, T>.Get( object parameter ) => (T)Get( parameter );
@@ -156,14 +156,14 @@ namespace DragonSpark.Sources.Parameterized
 
 	public static class Defaults
 	{
-		public static ISpecification<Type> KnownSourcesSpecification { get; } = IsSourceSpecification.Instance.Or( IsParameterizedSourceSpecification.Instance );
+		public static ISpecification<Type> KnownSourcesSpecification { get; } = IsSourceSpecification.Default.Or( IsParameterizedSourceSpecification.Default );
 		
-		public static ISpecification<Type> ActivateSpecification { get; } = CanInstantiateSpecification.Instance.Or( ContainsSingletonSpecification.Instance );
+		public static ISpecification<Type> ActivateSpecification { get; } = CanInstantiateSpecification.Default.Or( ContainsSingletonSpecification.Default );
 	}
 
 	public static class Defaults<T>
 	{
-		public static Coerce<T> Coercer { get; } = Coercer<T>.Instance.Coerce;
+		public static Coerce<T> Coercer { get; } = Coercer<T>.Default.Coerce;
 	}
 
 	public class ParameterConstructedCompositeFactory<T> : CompositeFactory<object, T>

@@ -66,7 +66,7 @@ namespace DragonSpark.Diagnostics
 
 	public class TimerEventConverter : ProjectedSource<TimerEvent, TimerEvent<Timer>, TimerEventTemplate>
 	{
-		public static TimerEventConverter Instance { get; } = new TimerEventConverter();
+		public static TimerEventConverter Default { get; } = new TimerEventConverter();
 
 		TimerEventConverter() : base( @event => new TimerEventTemplate( @event ) ) {}
 	}*/
@@ -225,7 +225,7 @@ namespace DragonSpark.Diagnostics
 	
 	public class StartProcessCommand : CommandBase<IProcess>
 	{
-		public static StartProcessCommand Instance { get; } = new StartProcessCommand();
+		public static StartProcessCommand Default { get; } = new StartProcessCommand();
 
 		public override void Execute( IProcess parameter ) => parameter.Start();
 	}*/

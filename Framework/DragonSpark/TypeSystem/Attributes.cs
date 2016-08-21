@@ -7,8 +7,8 @@ namespace DragonSpark.TypeSystem
 {
 	public static class Attributes
 	{
-		//readonly static Func<object, IAttributeProvider> Source = AttributeProviders.Instance.Delegate();
-		public static IAttributeProvider Get( object target ) => target as IAttributeProvider ?? AttributeProviders.Instance.Get( target );
+		//readonly static Func<object, IAttributeProvider> Source = AttributeProviders.Default.Delegate();
+		public static IAttributeProvider Get( object target ) => target as IAttributeProvider ?? AttributeProviders.Default.Get( target );
 	}
 
 	static class AttributeSupport<T> where T : Attribute

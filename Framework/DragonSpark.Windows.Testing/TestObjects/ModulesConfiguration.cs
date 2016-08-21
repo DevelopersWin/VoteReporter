@@ -4,7 +4,7 @@ namespace DragonSpark.Windows.Testing.TestObjects
 {
 	public class ModulesConfiguration : ResourceConfigurationFactory
 	{
-		public static ModulesConfiguration Instance { get; } = new ModulesConfiguration();
+		public static ModulesConfiguration Default { get; } = new ModulesConfiguration();
 
 		public ModulesConfiguration() : base( typeof(ModulesConfiguration) )
 		{}

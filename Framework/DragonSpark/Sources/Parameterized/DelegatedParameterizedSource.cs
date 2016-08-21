@@ -32,7 +32,7 @@ namespace DragonSpark.Sources.Parameterized
 
 		public override TResult Get( TParameter parameter )
 		{
-			using ( Logger.Instance.Get( method ).TimeOperation( template, method, parameter ) )
+			using ( Logger.Default.Get( method ).TimeOperation( template, method, parameter ) )
 			{
 				return base.Get( parameter );
 			}

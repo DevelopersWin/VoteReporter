@@ -25,7 +25,7 @@ namespace DragonSpark.Windows.Runtime.Data
 
 	public class DocumentFactory : DocumentFactory<string>
 	{
-		public static DocumentFactory Instance { get; } = new DocumentFactory();
+		public static DocumentFactory Default { get; } = new DocumentFactory();
 
 		public DocumentFactory() : base( ( document, data ) => document.LoadXml( data ) )
 		{}
@@ -33,7 +33,7 @@ namespace DragonSpark.Windows.Runtime.Data
 
 	public class RemoteDocumentFactory : DocumentFactory<Uri>
 	{
-		public static RemoteDocumentFactory Instance { get; } = new RemoteDocumentFactory();
+		public static RemoteDocumentFactory Default { get; } = new RemoteDocumentFactory();
 
 		public RemoteDocumentFactory() : base( ( document, data ) => document.Load( data.ToString() ) )
 		{}

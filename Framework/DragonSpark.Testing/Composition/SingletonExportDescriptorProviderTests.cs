@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Composition
 			var types = new[] { typeof(Singleton) };
 			var container = new ContainerConfiguration().WithParts( types ).WithProvider( new SingletonExportDescriptorProvider( types ) ).CreateContainer();
 			var export = container.GetExport<Singleton>();
-			Assert.Same( Singleton.Instance, export );
+			Assert.Same( Singleton.Default, export );
 		}
 
 		[Fact]
@@ -23,8 +23,8 @@ namespace DragonSpark.Testing.Composition
 		{
 			var types = new[] { typeof(Implemented) };
 			var container = new ContainerConfiguration().WithParts( types ).WithProvider( new SingletonExportDescriptorProvider( types ) ).CreateContainer();
-			Assert.Same( Implemented.Instance, container.GetExport<ISingleton>() );
-			Assert.Same( Implemented.Instance, container.GetExport<Implemented>() );
+			Assert.Same( Implemented.Default, container.GetExport<ISingleton>() );
+			Assert.Same( Implemented.Default, container.GetExport<Implemented>() );
 		}
 
 		[Fact]
@@ -33,8 +33,8 @@ namespace DragonSpark.Testing.Composition
 			var types = new[] { typeof(Implemented), typeof(AnotherImplemented) };
 			var container = new ContainerConfiguration().WithParts( types ).WithProvider( new SingletonExportDescriptorProvider( types ) ).CreateContainer();
 			var exports = container.GetExports<ISingleton>().Fixed();
-			Assert.Contains( Implemented.Instance, exports );
-			Assert.Contains( AnotherImplemented.Instance, exports );
+			Assert.Contains( Implemented.Default, exports );
+			Assert.Contains( AnotherImplemented.Default, exports );
 		}
 
 		[Fact]
@@ -42,13 +42,13 @@ namespace DragonSpark.Testing.Composition
 		{
 			var types = new[] { typeof(Sourced) };
 			var container = new ContainerConfiguration().WithParts( types ).WithProvider( new SingletonExportDescriptorProvider( types ) ).CreateContainer();
-			Assert.Same( Sourced.Instance.Get(), container.GetExport<ISingleton>() );
+			Assert.Same( Sourced.Default.Get(), container.GetExport<ISingleton>() );
 		}
 
 		class Singleton
 		{
 			[Export]
-			public static Singleton Instance { get; } = new Singleton();
+			public static Singleton Default { get; } = new Singleton();
 			Singleton() {}
 		}
 
@@ -57,21 +57,21 @@ namespace DragonSpark.Testing.Composition
 		class Implemented  : ISingleton
 		{
 			[Export( typeof(ISingleton) )]
-			public static Implemented Instance { get; } = new Implemented();
+			public static Implemented Default { get; } = new Implemented();
 			Implemented() {}
 		}
 
 		class AnotherImplemented  : ISingleton
 		{
 			[Export( typeof(ISingleton) )]
-			public static AnotherImplemented Instance { get; } = new AnotherImplemented();
+			public static AnotherImplemented Default { get; } = new AnotherImplemented();
 			AnotherImplemented() {}
 		}
 
 		class Sourced  : ISingleton
 		{
 			[Export( typeof(ISingleton) )]
-			public static ISource<ISingleton> Instance { get; } = new FixedSource<ISingleton>( new Sourced() );
+			public static ISource<ISingleton> Default { get; } = new FixedSource<ISingleton>( new Sourced() );
 			Sourced() {}
 		}
 	}

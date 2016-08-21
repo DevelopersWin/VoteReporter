@@ -7,7 +7,7 @@ namespace DragonSpark.Windows.Security
 {
 	public class CertificateFactory : ParameterizedSourceBase<string, X509Certificate2>
 	{
-		public static CertificateFactory Instance { get; } = new CertificateFactory();
+		public static CertificateFactory Default { get; } = new CertificateFactory();
 
 		readonly X509Store store;
 

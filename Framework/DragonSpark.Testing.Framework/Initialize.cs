@@ -14,20 +14,20 @@ namespace DragonSpark.Testing.Framework
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Command.Instance.Run();
+		public static void Execution() => Command.Default.Run();
 
 		class Command : DragonSpark.Setup.Setup
 		{
-			public static ICommand Instance { get; } = new Command();
+			public static ICommand Default { get; } = new Command();
 			Command() : base( 
-				Activation.Execution.Context.Configured( ExecutionContext.Instance )
+				Activation.Execution.Context.Configured( ExecutionContext.Default )
 			) {}
 		}
 	}
 
 	public sealed class Identification : TaskLocalStore<Identifier>
 	{
-		public static Identification Instance { get; } = new Identification();
+		public static Identification Default { get; } = new Identification();
 		Identification() {}
 
 		public override Identifier Get()
@@ -47,7 +47,7 @@ namespace DragonSpark.Testing.Framework
 
 	public sealed class ExecutionContext : SourceBase<TaskContext>
 	{
-		public static ISource<TaskContext> Instance { get; } = new ExecutionContext( Identification.Instance );
+		public static ISource<TaskContext> Default { get; } = new ExecutionContext( Identification.Default );
 
 		readonly ConcurrentDictionary<Identifier, TaskContext> entries = new ConcurrentDictionary<Identifier, TaskContext>();
 		readonly ISource<Identifier> store;
@@ -139,7 +139,7 @@ namespace DragonSpark.Testing.Framework
 
 	public class MethodContext : Scope<MethodBase>
 	{
-		public static IScope<MethodBase> Instance { get; } = new MethodContext();
+		public static IScope<MethodBase> Default { get; } = new MethodContext();
 		MethodContext() {}
 	}
 
@@ -147,7 +147,7 @@ namespace DragonSpark.Testing.Framework
 	/*public class TestingApplicationInitializationCommand : DragonSpark.Setup.Setup
 	{
 		public TestingApplicationInitializationCommand()
-			: base( Windows.InitializationCommand.Instance, new DisposeDisposableCommand( ExecutionContext.Instance.Value ) )
+			: base( Windows.InitializationCommand.Default, new DisposeDisposableCommand( ExecutionContext.Default.Value ) )
 		{
 			Priority = Priority.High;
 		}

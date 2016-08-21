@@ -16,7 +16,7 @@ namespace DragonSpark.Aspects
 		/*public static void ApplyReturnValue( this MethodInterceptionArgs @this, object result = null ) =>
 			@this.Method.As<MethodInfo>( info =>
 											{
-												@this.ReturnValue = info.ReturnType == typeof(void) ? @this.ReturnValue : result ?? DefaultValueFactory.Instance.Create( info.ReturnType );
+												@this.ReturnValue = info.ReturnType == typeof(void) ? @this.ReturnValue : result ?? DefaultValueFactory.Default.Create( info.ReturnType );
 											} );*/
 
 	}

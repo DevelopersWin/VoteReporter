@@ -2,10 +2,10 @@
 {
 	/*public sealed class DefaultUnityContainerFactory : FactoryBase<IUnityContainer>
 	{
-		public static DefaultUnityContainerFactory Instance { get; } = new DefaultUnityContainerFactory();
+		public static DefaultUnityContainerFactory Default { get; } = new DefaultUnityContainerFactory();
 		DefaultUnityContainerFactory() {}
 
-		public override IUnityContainer Create() => UnityContainerFactory.Instance.Create();
+		public override IUnityContainer Create() => UnityContainerFactory.Default.Create();
 
 		public class Register : RegisterFactoryAttribute
 		{
@@ -15,8 +15,8 @@
 
 	public class UnityContainerFactory : ConfiguringFactory<IUnityContainer>
 	{
-		public static UnityContainerFactory Instance { get; } = new UnityContainerFactory();
-		protected UnityContainerFactory() : base( DefaultUnityContainerFactory.Instance.Create, /*InitializeSystemCommand.Instance.Initialize#1# () => {} ) {}
+		public static UnityContainerFactory Default { get; } = new UnityContainerFactory();
+		protected UnityContainerFactory() : base( DefaultUnityContainerFactory.Default.Create, /*InitializeSystemCommand.Default.Initialize#1# () => {} ) {}
 
 		public class Register : RegisterFactoryAttribute
 		{

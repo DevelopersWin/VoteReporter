@@ -14,18 +14,18 @@ namespace DragonSpark.TypeSystem
 	{
 		public static Action Empty { get; } = () => {};
 
-		/*public static Func<TParameter, TResult> From<TParameter, TResult>() => Cache<TParameter, TResult>.Instance.Get( typeof(TResult).GetConstructor( typeof(TParameter) ) );
+		/*public static Func<TParameter, TResult> From<TParameter, TResult>() => Cache<TParameter, TResult>.Default.Get( typeof(TResult).GetConstructor( typeof(TParameter) ) );
 
 		public static TResult From<TParameter, TResult>( TParameter parameter ) => From<TParameter, TResult>()( parameter );
 
 		class Cache<TParameter, TResult> : Runtime.Properties.Cache<ConstructorInfo, Func<TParameter, TResult>>
 		{
-			public static Cache<TParameter, TResult> Instance { get; } = new Cache<TParameter, TResult>();
-			Cache() : base( Factory.Instance.ToDelegate() ) {}
+			public static Cache<TParameter, TResult> Default { get; } = new Cache<TParameter, TResult>();
+			Cache() : base( Factory.Default.ToDelegate() ) {}
 
 			class Factory : CompiledDelegateFactoryBase<ConstructorInfo, TParameter, Func<TParameter, TResult>>
 			{
-				public static Factory Instance { get; } = new Factory();
+				public static Factory Default { get; } = new Factory();
 
 				protected override Expression CreateBody( ConstructorInfo parameter, ParameterExpression definition ) => Expression.New( parameter, definition );
 			}
@@ -41,9 +41,9 @@ namespace DragonSpark.TypeSystem
 	{
 		// public static object Null { get; } = new object();
 
-		public static T DefaultOrEmpty<T>() => Default<T>.Instance;
+		public static T DefaultOrEmpty<T>() => Default<T>.Value;
 
-		public static object DefaultOrEmpty( Type type ) => DefaultValues.Instance.Get( type );
+		public static object DefaultOrEmpty( Type type ) => DefaultValues.Default.Get( type );
 	}
 
 	public static class Delegates<T>
@@ -77,14 +77,14 @@ namespace DragonSpark.TypeSystem
 
 	static class Default<T>
 	{
-		public static T Instance { get; } = (T)DefaultValues.Instance.Get( typeof(T) );
+		public static T Value { get; } = (T)DefaultValues.Default.Get( typeof(T) );
 	}
 
 	class DefaultValues : Cache<Type, object>
 	{
 		readonly static IGenericMethodContext<Invoke> Method = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
 
-		public static ICache<Type, object> Instance { get; } = new DefaultValues();
+		public static ICache<Type, object> Default { get; } = new DefaultValues();
 		DefaultValues() : base( Create ) {}
 
 		static object Create( Type parameter ) => parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : Empty( parameter );

@@ -13,7 +13,7 @@ namespace DragonSpark.ComponentModel
 	{
 		readonly ICurrentTime currentTime;
 
-		public CurrentTimeValueProvider() : this( CurrentTimeConfiguration.Instance.Get() ) {}
+		public CurrentTimeValueProvider() : this( CurrentTimeConfiguration.Default.Get() ) {}
 
 		public CurrentTimeValueProvider( [Required]ICurrentTime currentTime )
 		{

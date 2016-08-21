@@ -22,15 +22,15 @@ namespace DragonSpark.TypeSystem
 		public static IParameterizedScope<string, ImmutableArray<string>> AssemblyPathLocator { get; } = new ParameterizedScope<string, ImmutableArray<string>>( path => Items<string>.Immutable ).ScopedWithDefault();
 		public static IParameterizedScope<string, Assembly> AssemblyLoader { get; } = new ParameterizedScope<string, Assembly>( path => default(Assembly) ).ScopedWithDefault();
 
-		public static IParameterizedScope<IEnumerable<Assembly>, Assembly> ApplicationAssemblyLocator { get; } = new ParameterizedScope<IEnumerable<Assembly>, Assembly>( TypeSystem.ApplicationAssemblyLocator.Instance.Get );
-		public static IScope<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = new Scope<ImmutableArray<ITypeDefinitionProvider>>( TypeDefinitionProviderSource.Instance.Get );
+		public static IParameterizedScope<IEnumerable<Assembly>, Assembly> ApplicationAssemblyLocator { get; } = new ParameterizedScope<IEnumerable<Assembly>, Assembly>( TypeSystem.ApplicationAssemblyLocator.Default.Get );
+		public static IScope<ImmutableArray<ITypeDefinitionProvider>> TypeDefinitionProviders { get; } = new Scope<ImmutableArray<ITypeDefinitionProvider>>( TypeDefinitionProviderSource.Default.Get );
 	}
 
 	public sealed class ApplicationAssembly : FixedFactory<IEnumerable<Assembly>, Assembly>
 	{
 		[Export]
-		public static ISource<Assembly> Instance { get; } = new Scope<Assembly>( Factory.Global( new ApplicationAssembly().Get ) );
-		ApplicationAssembly() : base( Configuration.ApplicationAssemblyLocator.Get, ApplicationAssemblies.Instance.GetEnumerable ) {}
+		public static ISource<Assembly> Default { get; } = new Scope<Assembly>( Factory.Global( new ApplicationAssembly().Get ) );
+		ApplicationAssembly() : base( Configuration.ApplicationAssemblyLocator.Get, ApplicationAssemblies.Default.GetEnumerable ) {}
 	}
 
 	public abstract class PartsBase : FactoryCache<Assembly, ImmutableArray<Type>>
@@ -38,7 +38,7 @@ namespace DragonSpark.TypeSystem
 		readonly Func<Assembly, IEnumerable<Type>> source;
 		readonly Func<Assembly, ImmutableArray<Assembly>> locator;
 
-		protected PartsBase( Func<Assembly, IEnumerable<Type>> source ) : this( source, AssemblyPartLocator.Instance.Get ) {}
+		protected PartsBase( Func<Assembly, IEnumerable<Type>> source ) : this( source, AssemblyPartLocator.Default.Get ) {}
 
 		protected PartsBase( Func<Assembly, IEnumerable<Type>> source, Func<Assembly, ImmutableArray<Assembly>> locator )
 		{
@@ -52,7 +52,7 @@ namespace DragonSpark.TypeSystem
 
 	public class AssemblyLoader : ParameterizedSourceBase<string, ImmutableArray<Assembly>>
 	{
-		public static AssemblyLoader Instance { get; } = new AssemblyLoader();
+		public static AssemblyLoader Default { get; } = new AssemblyLoader();
 		AssemblyLoader() : this( Configuration.AssemblyPathLocator.Get, Configuration.AssemblyLoader.Get ) {}
 
 		readonly Func<string, ImmutableArray<string>> locator;
@@ -69,8 +69,8 @@ namespace DragonSpark.TypeSystem
 
 	public sealed class AssemblyPartLocator : ParameterizedSourceBase<Assembly, ImmutableArray<Assembly>>
 	{
-		public static AssemblyPartLocator Instance { get; } = new AssemblyPartLocator();
-		AssemblyPartLocator() : this( AssemblyLoader.Instance.Get, AssemblyHintProvider.Instance.Get, AssemblyPartQueryProvider.Instance.Get ) {}
+		public static AssemblyPartLocator Default { get; } = new AssemblyPartLocator();
+		AssemblyPartLocator() : this( AssemblyLoader.Default.Get, AssemblyHintProvider.Default.Get, AssemblyPartQueryProvider.Default.Get ) {}
 
 		readonly Func<string, ImmutableArray<Assembly>> assemblySource;
 		readonly Func<Assembly, string> hintSource;
@@ -94,7 +94,7 @@ namespace DragonSpark.TypeSystem
 	[ApplyAutoValidation]
 	public sealed class AssemblyHintProvider : ValidatedParameterizedSourceBase<Assembly, string>
 	{
-		public static AssemblyHintProvider Instance { get; } = new AssemblyHintProvider();
+		public static AssemblyHintProvider Default { get; } = new AssemblyHintProvider();
 		AssemblyHintProvider() {}
 
 		public override string Get( Assembly parameter ) => parameter.From<AssemblyHintAttribute, string>( attribute => attribute.Hint ) ?? parameter.GetName().Name;
@@ -103,7 +103,7 @@ namespace DragonSpark.TypeSystem
 	[ApplyAutoValidation]
 	public sealed class AssemblyPartQueryProvider : ValidatedParameterizedSourceBase<Assembly, string>
 	{
-		public static AssemblyPartQueryProvider Instance { get; } = new AssemblyPartQueryProvider();
+		public static AssemblyPartQueryProvider Default { get; } = new AssemblyPartQueryProvider();
 		AssemblyPartQueryProvider() {}
 
 		public override string Get( Assembly parameter ) => parameter.From<AssemblyPartsAttribute, string>( attribute => attribute.Query ) ?? AssemblyPartsAttribute.Default;
@@ -160,7 +160,7 @@ namespace DragonSpark.TypeSystem
 
 	public sealed class AssemblyTypesStore : FactoryCache<Assembly, IEnumerable<Type>>
 	{
-		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Instance.ToSpecificationDelegate();
+		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToSpecificationDelegate();
 
 		readonly Func<Assembly, IEnumerable<Type>> types;
 		public AssemblyTypesStore( Func<Assembly, IEnumerable<Type>> types )
@@ -175,7 +175,7 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
 
-		public static TypesFactory Instance { get; } = new TypesFactory();
+		public static TypesFactory Default { get; } = new TypesFactory();
 		TypesFactory() : base( array => array.ToArray().SelectMany( All ).ToImmutableArray() ) {}
 	}
 

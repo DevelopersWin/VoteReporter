@@ -68,7 +68,7 @@ namespace DragonSpark.TypeSystem
 
 	public class StaticActionContext : ActionContextBase
 	{
-		readonly static Func<MethodInfo, Execute> ToDelegate = InvokeMethodDelegate<Execute>.Instance.ToDelegate();
+		readonly static Func<MethodInfo, Execute> ToDelegate = InvokeMethodDelegate<Execute>.Default.ToDelegate();
 		public StaticActionContext( ImmutableArray<MethodInfo> methods ) : base( ToDelegate, methods ) {}
 	}
 
@@ -89,7 +89,7 @@ namespace DragonSpark.TypeSystem
 
 	public class StaticFactoryContext : FactoryContextBase
 	{
-		readonly static Func<MethodInfo, Invoke> ToDelegate = InvokeMethodDelegate<Invoke>.Instance.ToDelegate();
+		readonly static Func<MethodInfo, Invoke> ToDelegate = InvokeMethodDelegate<Invoke>.Default.ToDelegate();
 		public StaticFactoryContext( ImmutableArray<MethodInfo> methods ) : base( ToDelegate, methods ) {}
 	}
 
@@ -138,7 +138,7 @@ namespace DragonSpark.TypeSystem
 
 	public static class MethodContextExtensions
 	{
-		readonly static Func<object[], Type[]> ToType = ObjectTypeFactory.Instance.ToSourceDelegate();
+		readonly static Func<object[], Type[]> ToType = ObjectTypeFactory.Default.ToSourceDelegate();
 
 		public static TResult Invoke<TParameter, TResult>( this Invoke @this, TParameter argument ) => (TResult)@this.Invoke( argument );
 
@@ -200,7 +200,7 @@ namespace DragonSpark.TypeSystem
 				}
 				catch ( ArgumentException e )
 				{
-					Logger.Instance.Get( this ).Verbose( e, "Could not create a generic method for {Method} with types {Types}", item.Item1.Method, item.Item2 );
+					Logger.Default.Get( this ).Verbose( e, "Could not create a generic method for {Method} with types {Types}", item.Item1.Method, item.Item2 );
 					return default(GenericMethodCandidate<T>);
 				}
 			}
@@ -251,7 +251,7 @@ namespace DragonSpark.TypeSystem
 
 	sealed class ObjectTypeFactory : ParameterizedSourceBase<object[], Type[]>
 	{
-		public static ObjectTypeFactory Instance { get; } = new ObjectTypeFactory();
+		public static ObjectTypeFactory Default { get; } = new ObjectTypeFactory();
 
 		public override Type[] Get( object[] parameter )
 		{

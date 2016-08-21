@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.Runtime.Sources
 			var count = 0;
 			var factory = new Func<int>( () => ++count );
 
-			var cached = FixedDelegateBuilder<int>.Instance.Get( factory );
+			var cached = FixedDelegateBuilder<int>.Default.Get( factory );
 			Assert.Equal( 0, count );
 			Assert.Equal( 1, cached() );
 			Assert.Equal( 1, cached() );

@@ -17,7 +17,7 @@ namespace DragonSpark.Windows.Markup
 
 	public class Specification<TTarget, TProperty> : SpecificationBase<IServiceProvider>
 	{
-		public static Specification<TTarget, TProperty> Instance { get; } = new Specification<TTarget, TProperty>();
+		public static Specification<TTarget, TProperty> Default { get; } = new Specification<TTarget, TProperty>();
 
 		public override bool IsSatisfiedBy( IServiceProvider parameter ) => 
 			parameter.Get<IProvideValueTarget>().With( target => target.TargetObject is TTarget && target.TargetProperty is TProperty )
@@ -31,7 +31,7 @@ namespace DragonSpark.Windows.Markup
 
 	public abstract class MarkupPropertyFactoryBase<TTarget, TProperty> : MarkupPropertyFactoryBase
 	{
-		protected MarkupPropertyFactoryBase() : base( Specification<TTarget, TProperty>.Instance ) {}
+		protected MarkupPropertyFactoryBase() : base( Specification<TTarget, TProperty>.Default ) {}
 
 		public sealed override IMarkupProperty Get( IServiceProvider parameter )
 		{

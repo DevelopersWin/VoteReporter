@@ -10,8 +10,8 @@ namespace DragonSpark.TypeSystem
 {
 	public class KnownTypes : ParameterizedScope<Type, ImmutableArray<Type>>
 	{
-		public static KnownTypes Instance { get; } = new KnownTypes();
-		KnownTypes() : base( Factory.Global<Type, ImmutableArray<Type>>( type => ApplicationTypes.Instance.Get().Where( type.Adapt().IsAssignableFrom ).ToImmutableArray() ) ) {}
+		public static KnownTypes Default { get; } = new KnownTypes();
+		KnownTypes() : base( Factory.Global<Type, ImmutableArray<Type>>( type => ApplicationTypes.Default.Get().Where( type.Adapt().IsAssignableFrom ).ToImmutableArray() ) ) {}
 
 		public ImmutableArray<Type> Get<T>() => Get( typeof(T) );
 	}

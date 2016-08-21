@@ -23,7 +23,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class OptionalParameterTransformer : EnginePartFactory<Ploeh.AutoFixture.Kernel.ParameterRequestRelay>
 	{
-		public static OptionalParameterTransformer Instance { get; } = new OptionalParameterTransformer();
+		public static OptionalParameterTransformer Default { get; } = new OptionalParameterTransformer();
 
 		public override ISpecimenBuilder Get( Ploeh.AutoFixture.Kernel.ParameterRequestRelay parameter ) => new ParameterRequestRelay( parameter );
 	}
@@ -46,6 +46,6 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 
 		static bool ShouldDefault( ParameterInfo info ) => 
-			info.IsOptional && !MethodContext.Instance.Get().GetParameterTypes().Any( info.ParameterType.Adapt().IsAssignableFrom );
+			info.IsOptional && !MethodContext.Default.Get().GetParameterTypes().Any( info.ParameterType.Adapt().IsAssignableFrom );
 	}
 }

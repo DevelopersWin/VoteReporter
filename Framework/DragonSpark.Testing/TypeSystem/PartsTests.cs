@@ -10,7 +10,7 @@ namespace DragonSpark.Testing.TypeSystem
 	public class PartsTests
 	{
 		[Fact]
-		public void Public() => PublicAttributed( PublicParts.Instance.Get( GetType().Assembly )  );
+		public void Public() => PublicAttributed( PublicParts.Default.Get( GetType().Assembly )  );
 
 		[Theory, AutoData, ApplicationPublicParts]
 		public void PublicAttributed( ImmutableArray<Type> types )
@@ -20,7 +20,7 @@ namespace DragonSpark.Testing.TypeSystem
 		}
 
 		[Fact]
-		public void All() => AllAttributed( AllParts.Instance.Get( GetType().Assembly ) );
+		public void All() => AllAttributed( AllParts.Default.Get( GetType().Assembly ) );
 
 		[Theory, AutoData, ApplicationParts]
 		public void AllAttributed( ImmutableArray<Type> types )

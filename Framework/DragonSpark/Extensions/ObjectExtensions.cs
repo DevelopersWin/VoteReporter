@@ -119,7 +119,7 @@ namespace DragonSpark.Extensions
 
 		public static TResult With<TItem, TResult>( this TItem? @this, Func<TItem, TResult> action ) where TItem : struct => @this != null ? @this.Value.With( action ) : default( TResult );
 
-		public static TResult Evaluate<TResult>( [Required]this object container, string expression ) => Evaluate<TResult>( ExpressionEvaluator.Instance, container, expression );
+		public static TResult Evaluate<TResult>( [Required]this object container, string expression ) => Evaluate<TResult>( ExpressionEvaluator.Default, container, expression );
 
 		public static TResult Evaluate<TResult>( [Required]this IExpressionEvaluator @this, object container, string expression ) => (TResult)@this.Evaluate( container, expression );
 
@@ -156,7 +156,7 @@ namespace DragonSpark.Extensions
 
 		public static TResult AsTo<TSource, TResult>( this object target, Func<TSource,TResult> transform, Func<TResult> resolve = null )
 		{
-			var @default = resolve ?? /*DefaultValueFactory<TResult>.Instance.Create*/ ( () => default(TResult) );
+			var @default = resolve ?? /*DefaultValueFactory<TResult>.Default.Create*/ ( () => default(TResult) );
 			var result = target is TSource ? transform( (TSource)target ) : @default();
 			return result;
 		}

@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.Aspects
 		public void GenericCommandWorkflow()
 		{
 			var command = new GenericCommand();
-			var controller = AutoValidationControllerFactory.Instance.Get( command );
+			var controller = AutoValidationControllerFactory.Default.Get( command );
 
 			Assert.Equal( 0, command.CanExecuteCalled );
 			var notNumber = command.CanExecute( new object() );

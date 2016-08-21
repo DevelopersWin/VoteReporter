@@ -118,7 +118,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Prioritize<T>( [Required] this IEnumerable<T> @this ) => Prioritize( @this, Support<T>.PriorityLocator );
 
-		public static IEnumerable<T> Prioritize<T>( [Required] this IEnumerable<T> @this, Func<T, IPriorityAware> locator ) => @this.OrderBy( locator, PriorityComparer.Instance );
+		public static IEnumerable<T> Prioritize<T>( [Required] this IEnumerable<T> @this, Func<T, IPriorityAware> locator ) => @this.OrderBy( locator, PriorityComparer.Default );
 
 		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, U> with, Func<U> defaultFunction = null ) => WithFirst( @this, Where<T>.Always, with, defaultFunction );
 
@@ -206,7 +206,7 @@ namespace DragonSpark.Extensions
 
 		static class Support<T>
 		{
-			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Instance.ToSourceDelegate();
+			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Default.ToSourceDelegate();
 		}
 	}
 }

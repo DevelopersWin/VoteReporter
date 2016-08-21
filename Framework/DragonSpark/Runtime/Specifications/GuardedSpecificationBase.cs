@@ -20,7 +20,7 @@ namespace DragonSpark.Runtime.Specifications
 
 	public class AssignedSpecification<T> : SpecificationBase<T>
 	{
-		public static ISpecification<T> Instance { get; } = new AssignedSpecification<T>();
+		public static ISpecification<T> Default { get; } = new AssignedSpecification<T>();
 		AssignedSpecification() : base( Where<T>.Always ) {}
 	
 		public override bool IsSatisfiedBy( T parameter ) => parameter.IsAssigned();
