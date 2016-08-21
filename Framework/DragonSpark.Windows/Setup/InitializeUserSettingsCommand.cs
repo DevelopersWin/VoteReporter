@@ -37,10 +37,10 @@ namespace DragonSpark.Windows.Setup
 	}
 
 	[ApplyAutoValidation]
-	public class DeleteFileCommand : CommandBase<FileInfo>
+	public sealed class DeleteFileCommand : CommandBase<FileInfo>
 	{
 		public static ISource<ICommand<FileInfo>> Instance { get; } = new Scope<ICommand<FileInfo>>( Factory.Global( () => new DeleteFileCommand() ) );
-		DeleteFileCommand() : this( RetryPolicyFactory<IOException>.Instance.ToCommand() ) {}
+		DeleteFileCommand() : this( DragonSpark.Diagnostics.Defaults<IOException>.Retry.ToCommand() ) {}
 
 		readonly ICommand<Action> applyPolicy;
 
