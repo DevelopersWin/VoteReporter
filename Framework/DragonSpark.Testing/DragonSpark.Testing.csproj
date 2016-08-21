@@ -68,6 +68,7 @@
     <Compile Include="Composition\SingletonExportDescriptorProviderTests.cs" />
     <Compile Include="Composition\SourceDelegateExporterTests.cs" />
     <Compile Include="Composition\SourceExporterTests.cs" />
+    <Compile Include="Diagnostics\PoliciesTests.cs" />
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
     <Compile Include="Runtime\EnabledStateTests.cs" />

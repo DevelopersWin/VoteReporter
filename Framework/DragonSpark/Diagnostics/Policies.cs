@@ -16,27 +16,46 @@ namespace DragonSpark.Diagnostics
 
 		public static void Retry<T>( Action action ) where T : Exception => Apply( Defaults<T>.Retry.ToDelegate(), action );
 
-		public static void Apply( Func<Policy> policy, Action action ) => Commands.Get( policy() ).Execute( action );
+		static void Apply( Func<Policy> policy, Action action ) => Commands.Get( policy() ).Execute( action );
 
-		public static ICommand<Action> ToCommand( this ISource<Policy> @this ) => Commands.Get( @this.Get() );
-	}
-
-	public static class Defaults<T> where T : Exception
-	{
-		public static ISource<Policy> Retry { get; } = new Scope<Policy>( new FixedFactory<RetryPolicyParameter, Policy>( RetryPolicyFactory.Instance.Get, RetryPolicyParameterSource<T>.Instance.Get ).Global() );
-	}
-
-	public sealed class RetryPolicyParameterSource<T> : SourceBase<RetryPolicyParameter> where T : Exception
-	{
-		public static RetryPolicyParameterSource<T> Instance { get; } = new RetryPolicyParameterSource<T>();
-		RetryPolicyParameterSource() {}
-
-		public override RetryPolicyParameter Get() => new RetryPolicyParameter( PolicyBuilderSource<T>.Instance.Get, Defaults.Time, LogRetryException.Defaults.Get( Logger.Instance.ToScope().Get() ).Execute );
+		public static ICommand<T> Apply<T>( this ICommand<T> @this, ISource<Policy> source ) => Apply( @this, source.ToDelegate() );
+		public static ICommand<T> Apply<T>( this ICommand<T> @this, Func<Policy> source ) => new PolicyDecoratedCommand<T>( source, @this );
 	}
 
 	public static class Defaults
 	{
+		public const int Retries = 5;
+
 		public static Func<int, TimeSpan> Time { get; } = LinearRetryTime.Instance.ToSourceDelegate();
+	}
+
+	public static class Retry
+	{
+		public static ISource<Policy> Create<T>( int retries = Defaults.Retries ) where T : Exception => Create( RetryPolicyParameterSource<T>.Instance.Fixed( retries ) );
+
+		public static ISource<Policy> Create( ISource<RetryPolicyParameter> source ) => 
+			new FixedFactory<RetryPolicyParameter, Policy>( RetryPolicyFactory.Instance.Get, source.Get );
+	}
+
+	public static class Defaults<T> where T : Exception
+	{
+		public static ISource<Policy> Retry { get; } = new Scope<Policy>( Diagnostics.Retry.Create<T>().Global() );
+	}
+
+	public sealed class RetryPolicyParameterSource<T> : ParameterizedSourceBase<int, RetryPolicyParameter> where T : Exception
+	{
+		readonly static Func<PolicyBuilder> Source = PolicyBuilderSource<T>.Instance.Get;
+		public static RetryPolicyParameterSource<T> Instance { get; } = new RetryPolicyParameterSource<T>();
+		RetryPolicyParameterSource() : this( Defaults.Time ) {}
+
+		readonly Func<int, TimeSpan> time;
+
+		public RetryPolicyParameterSource( Func<int, TimeSpan> time )
+		{
+			this.time = time;
+		}
+
+		public override RetryPolicyParameter Get( int parameter ) => new RetryPolicyParameter( Source, time, LogRetryException.Defaults.Get( Logger.Instance.ToScope().Get() ).Execute, parameter );
 	}
 
 	public sealed class RetryPolicyFactory : ParameterizedSourceBase<RetryPolicyParameter, Policy>
@@ -57,9 +76,7 @@ namespace DragonSpark.Diagnostics
 
 	public struct RetryPolicyParameter
 	{
-		// public RetryPolicyParameter( Func<PolicyBuilder> source, int numberOfRetries = 5 ) : this( source, Defaults.Time, Defaults.Retry.Get(), numberOfRetries ) {}
-
-		public RetryPolicyParameter( Func<PolicyBuilder> source, Func<int, TimeSpan> time, Action<Exception, TimeSpan> onRetry, int numberOfRetries = 5 )
+		public RetryPolicyParameter( Func<PolicyBuilder> source, Func<int, TimeSpan> time, Action<Exception, TimeSpan> onRetry, int numberOfRetries = Defaults.Retries )
 		{
 			Source = source;
 			Time = time;
@@ -116,5 +133,17 @@ namespace DragonSpark.Diagnostics
 		}
 
 		public override void Execute( Action parameter ) => policy.Execute( parameter );
+	}
+
+	public sealed class PolicyDecoratedCommand<T> : DecoratedCommand<T>
+	{
+		readonly Func<Policy> source;
+
+		public PolicyDecoratedCommand( Func<Policy> source, ICommand<T> inner ) : base( inner )
+		{
+			this.source = source;
+		}
+
+		public override void Execute( T parameter ) => source().Execute( () => base.Execute( parameter ) );
 	}
 }

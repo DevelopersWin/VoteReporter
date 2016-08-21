@@ -33,23 +33,16 @@ namespace DragonSpark.Windows.Setup
 	public class ClearUserSettingCommand : DelegatedFixedCommand<FileInfo>
 	{
 		public static ClearUserSettingCommand Instance { get; } = new ClearUserSettingCommand();
-		ClearUserSettingCommand() : base( DeleteFileCommand.Instance.Get, Defaults.UserSettingsPath ) {}
+		ClearUserSettingCommand() : base( DeleteFileCommand.Instance.Apply( DragonSpark.Diagnostics.Defaults<IOException>.Retry ).Self, Defaults.UserSettingsPath ) {}
 	}
 
 	[ApplyAutoValidation]
 	public sealed class DeleteFileCommand : CommandBase<FileInfo>
 	{
-		public static ISource<ICommand<FileInfo>> Instance { get; } = new Scope<ICommand<FileInfo>>( Factory.Global( () => new DeleteFileCommand() ) );
-		DeleteFileCommand() : this( DragonSpark.Diagnostics.Defaults<IOException>.Retry.ToCommand() ) {}
+		public static DeleteFileCommand Instance { get; } = new DeleteFileCommand();
+		DeleteFileCommand() : base( FileSystemInfoExistsSpecification.Instance ) {}
 
-		readonly ICommand<Action> applyPolicy;
-
-		public DeleteFileCommand( ICommand<Action> applyPolicy ) : base( FileSystemInfoExistsSpecification.Instance )
-		{
-			this.applyPolicy = applyPolicy;
-		}
-
-		public override void Execute( FileInfo parameter ) => applyPolicy.Execute( parameter.Delete );
+		public override void Execute( FileInfo parameter ) => parameter.Delete();
 	}
 
 	public sealed class FileSystemInfoExistsSpecification : SpecificationBase<FileSystemInfo>
