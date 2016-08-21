@@ -13,9 +13,9 @@ namespace DragonSpark.Configuration
 	{
 		public Registration() {}
 
-		public Registration( [NotEmpty]string key, [Required]object value ) : this( key, value, Items<string>.Default ) {}
+		public Registration( string key, object value ) : this( key, value, Items<string>.Default ) {}
 
-		public Registration( [NotEmpty]string key, [Required]object value, [Required]params string[] aliases )
+		public Registration( string key, object value, params string[] aliases )
 		{
 			Key = key;
 			Aliases = new DeclarativeCollection<string>( aliases );

@@ -1,8 +1,7 @@
 using DragonSpark.Runtime;
-using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
-using System;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.TypeSystem;
+using System;
 
 namespace DragonSpark.Activation
 {
@@ -12,7 +11,7 @@ namespace DragonSpark.Activation
 	{
 		readonly int code;
 
-		public LocateTypeRequest( [Required] Type type, string name = null ) : base( type )
+		public LocateTypeRequest( Type type, string name = null ) : base( type )
 		{
 			Name = name;
 

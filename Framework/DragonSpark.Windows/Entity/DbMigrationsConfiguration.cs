@@ -1,6 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
 using System.Data.Entity;
 
 namespace DragonSpark.Windows.Entity
@@ -9,7 +7,7 @@ namespace DragonSpark.Windows.Entity
 	{
 		public DbMigrationsConfiguration() : this( GlobalServiceProvider.GetService<ActivationSource>() ?? ActivationSource.Default.Get() ) {}
 
-		public DbMigrationsConfiguration( [Required]IActivationSource source )
+		public DbMigrationsConfiguration( IActivationSource source )
 		{
 			source.Apply( this );
 		}

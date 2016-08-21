@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Activation\SingletonAttribute.cs" />
+    <Compile Include="Aspects\DefaultGuardAspect.cs" />
     <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
     <Compile Include="Composition\Convention.cs" />
     <Compile Include="Diagnostics\Exceptions\SetupExceptionHandling.cs" />
@@ -192,7 +193,6 @@
     <Compile Include="ComponentModel\SourceAttribute.cs" />
     <Compile Include="Diagnostics\Diagnostics.cs" />
     <Compile Include="Diagnostics\LoggerHistorySink.cs" />
-    <Compile Include="Extensions\BuilderContextExtensions.cs" />
     <Compile Include="Extensions\ObjectMappingParameter.cs" />
     <Compile Include="Runtime\Specifications\AllSpecification.cs" />
     <Compile Include="Runtime\Specifications\AnySpecification.cs" />
@@ -206,7 +206,6 @@
     <Compile Include="Runtime\Specifications\GuardedSpecificationBase.cs" />
     <Compile Include="Runtime\Specifications\SpecificationExtensions.cs" />
     <Compile Include="TypeSystem\Attributes.cs" />
-    <Compile Include="TypeSystem\CodeContainer.cs" />
     <Compile Include="TypeSystem\Default.cs" />
     <Compile Include="TypeSystem\DefaultValues.cs" />
     <Compile Include="TypeSystem\DerivedMethodSpecification.cs" />
@@ -236,7 +235,6 @@
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
-    <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -297,7 +295,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Activation\ILocator.cs" />
-    <Compile Include="Activation\IServiceRegistry.cs" />
     <Compile Include="Activation\Services.cs">
       <SubType>Code</SubType>
     </Compile>

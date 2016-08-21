@@ -3,7 +3,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -52,7 +51,7 @@ namespace DragonSpark.Sources.Parameterized
 
 		public static Delegate Convert( this Func<object> @this, Type resultType ) => ConvertSupport.Methods.Make( resultType ).Invoke<Delegate>( @this );
 
-		public static Delegate Convert( this Func<object, object> @this, Type parameterType, [Required]Type resultType ) => ConvertSupport.Methods.Make( parameterType, resultType ).Invoke<Delegate>( @this );
+		public static Delegate Convert( this Func<object, object> @this, Type parameterType, Type resultType ) => ConvertSupport.Methods.Make( parameterType, resultType ).Invoke<Delegate>( @this );
 
 		static class ConvertSupport
 		{

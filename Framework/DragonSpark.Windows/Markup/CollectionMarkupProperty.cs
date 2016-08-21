@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace DragonSpark.Windows.Markup
 	{
 		readonly IList collection;
 		
-		public CollectionMarkupProperty( [Required]IList collection, [Required]PropertyReference reference ) : base( reference )
+		public CollectionMarkupProperty( IList collection, PropertyReference reference ) : base( reference )
 		{
 			this.collection = collection;
 		}

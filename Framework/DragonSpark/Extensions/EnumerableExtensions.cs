@@ -2,12 +2,12 @@ using DragonSpark.Aspects;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Extensions
 {
@@ -116,9 +116,9 @@ namespace DragonSpark.Extensions
 			return true;
 		}
 
-		public static IEnumerable<T> Prioritize<T>( [Required] this IEnumerable<T> @this ) => Prioritize( @this, Support<T>.PriorityLocator );
+		public static IEnumerable<T> Prioritize<T>( this IEnumerable<T> @this ) => Prioritize( @this, Support<T>.PriorityLocator );
 
-		public static IEnumerable<T> Prioritize<T>( [Required] this IEnumerable<T> @this, Func<T, IPriorityAware> locator ) => @this.OrderBy( locator, PriorityComparer.Default );
+		public static IEnumerable<T> Prioritize<T>( this IEnumerable<T> @this, Func<T, IPriorityAware> locator ) => @this.OrderBy( locator, PriorityComparer.Default );
 
 		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, U> with, Func<U> defaultFunction = null ) => WithFirst( @this, Where<T>.Always, with, defaultFunction );
 
@@ -161,7 +161,7 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, params T[] items ) => @this.Concat( items );
 
-		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, T element )
+		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, [Optional]T element )
 		{
 			foreach ( var element1 in @this )
 				yield return element1;

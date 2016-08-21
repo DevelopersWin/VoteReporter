@@ -1,11 +1,9 @@
-using DragonSpark.Activation;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Reflection;
@@ -25,7 +23,7 @@ namespace DragonSpark.Windows.Markup
 
 		public CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Default.ToSourceDelegate() ) {}
 
-		public CollectionMarkupPropertyFactory( [Required]Func<IServiceProvider, PropertyReference> propertyFactory ) : base( CollectionSpecification.Default )
+		public CollectionMarkupPropertyFactory( Func<IServiceProvider, PropertyReference> propertyFactory ) : base( CollectionSpecification.Default )
 		{
 			this.propertyFactory = propertyFactory;
 		}
@@ -75,10 +73,10 @@ namespace DragonSpark.Windows.Markup
 
 	public struct PropertyReference
 	{
-		public static PropertyReference New( [Required]MemberInfo member ) => new PropertyReference( member.DeclaringType, member.GetMemberType(), member.Name );
-		public static PropertyReference New( [Required]DependencyProperty property ) => new PropertyReference( property.OwnerType, property.PropertyType, property.Name );
+		public static PropertyReference New( MemberInfo member ) => new PropertyReference( member.DeclaringType, member.GetMemberType(), member.Name );
+		public static PropertyReference New( DependencyProperty property ) => new PropertyReference( property.OwnerType, property.PropertyType, property.Name );
 
-		public PropertyReference( [Required]Type declaringType, [Required]Type propertyType, [NotEmpty]string propertyName )
+		public PropertyReference( Type declaringType, Type propertyType, string propertyName )
 		{
 			DeclaringType = declaringType;
 			PropertyType = propertyType;

@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Setup;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Testing.Framework.Setup.Location
 {
@@ -11,27 +10,11 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 
 		readonly GenericMethodCommands commands;
 
-		public FixtureRegistry( [Required]IFixture fixture )
+		public FixtureRegistry( IFixture fixture )
 		{
 			this.fixture = fixture;
 			commands = new GenericMethodCommands( this );
 		}
-
-		/*public bool IsRegistered( Type type ) => registered.Contains( type );
-
-		public void Register( [Required]MappingRegistrationParameter parameter )
-		{
-			fixture.Customizations.Insert( 0, new TypeRelay( parameter.RequestedType, parameter.MappedTo ) );
-			new[] { parameter.RequestedType, parameter.MappedTo }.Distinct().Each( registered.Ensure );
-		}*/
-
-		//public void Register( [Required]InstanceRegistrationParameter parameter ) => Invoke( parameter.RequestedType, nameof(RegisterInstance), parameter.Default );
-
-		/*protected override void OnAdd( object entry )
-		{
-			
-			base.OnAdd( entry );
-		}*/
 
 		public override void Add( InstanceRegistrationRequest request )
 		{
@@ -39,15 +22,6 @@ namespace DragonSpark.Testing.Framework.Setup.Location
 			base.Add( request );
 		}
 
-		void RegisterInstance<T>( [Required]T instance ) => fixture.Inject( instance );
-
-		// public void RegisterFactory( [Required]FactoryRegistrationParameter parameter ) => Invoke( parameter.RequestedType, nameof(RegisterFactory), parameter.Factory );
-		
-		/*void RegisterFactory<T>( [Required]Func<object> factory )
-		{
-			var convert = factory.Convert<T>();
-			fixture.Register( convert );
-			registered.Ensure( typeof(T) );
-		}*/
+		void RegisterInstance<T>( T instance ) => fixture.Inject( instance );
 	}
 }

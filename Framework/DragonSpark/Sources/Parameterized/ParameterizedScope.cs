@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -26,7 +27,7 @@ namespace DragonSpark.Sources.Parameterized
 
 		public void Assign( ISource item ) => scope.Assign( item );
 
-		public virtual void Assign( Func<object, Func<TParameter, TResult>> item ) => scope.Assign( item );
-		public virtual void Assign( Func<Func<TParameter, TResult>> item ) => scope.Assign( item );
+		public virtual void Assign( [Optional]Func<object, Func<TParameter, TResult>> item ) => scope.Assign( item );
+		public virtual void Assign( [Optional]Func<Func<TParameter, TResult>> item ) => scope.Assign( item );
 	}
 }

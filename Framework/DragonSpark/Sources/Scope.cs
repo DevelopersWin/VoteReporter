@@ -1,9 +1,8 @@
+using DragonSpark.Activation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Sources
 {
@@ -27,7 +26,7 @@ namespace DragonSpark.Sources
 
 		public virtual void Assign( [Optional]Func<T> item ) => factories.SetOrClear( scope.Get(), item?.Wrap() );
 
-		public virtual void Assign( Func<object, T> item )
+		public virtual void Assign( [Optional]Func<object, T> item )
 		{
 			defaultFactory.Assign( item );
 

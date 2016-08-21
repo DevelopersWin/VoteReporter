@@ -1,9 +1,9 @@
 ﻿using DragonSpark.ComponentModel;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Type = System.Type;
 
 namespace DragonSpark.Extensions
@@ -21,11 +21,11 @@ namespace DragonSpark.Extensions
 
 		public static void TryDispose( this object target ) => target.As<IDisposable>( x => x.Dispose() );
 
-		public static bool IsAssignedOrValue<T>( this T @this ) => IsAssigned( @this, true );
+		public static bool IsAssignedOrValue<T>( [Optional]this T @this ) => IsAssigned( @this, true );
 
-		public static bool IsAssigned<T>( this T @this ) => IsAssigned( @this, false );
+		public static bool IsAssigned<T>( [Optional]this T @this ) => IsAssigned( @this, false );
 
-		static bool IsAssigned<T>( this T @this, bool value )
+		static bool IsAssigned<T>( [Optional]this T @this, bool value )
 		{
 			var type = @this?.GetType() ?? typeof(T);
 			var defaultOrEmpty = SpecialValues.DefaultOrEmpty( type );
@@ -33,7 +33,7 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static bool IsAssignedOrContains<T>( this T @this ) => !Equals( @this, SpecialValues.DefaultOrEmpty<T>() );
+		public static bool IsAssignedOrContains<T>( [Optional]this T @this ) => !Equals( @this, SpecialValues.DefaultOrEmpty<T>() );
 
 		/*public static IEnumerable<TItem> Enumerate<TItem>( this IEnumerator<TItem> target )
 		{
@@ -60,40 +60,19 @@ namespace DragonSpark.Extensions
 			return defaultValue;
 		}
 
-		/*public static IEnumerable<TItem> GetAllPropertyValuesOf<TItem>( this object target ) => target.GetAllPropertyValuesOf( typeof( TItem ) ).Cast<TItem>().ToArray();
-
-		public static IEnumerable GetAllPropertyValuesOf( this object target, Type propertyType ) => target.GetType().GetRuntimeProperties().Where( x => !x.GetIndexParameters().Any() && propertyType.GetTypeInfo().IsAssignableFrom( x.PropertyType.GetTypeInfo() ) ).Select( x => x.GetValue( target, null ) ).ToArray();*/
-
-		/*public static Func<U> Get<T, U>( this T @this, Func<T, U> getter ) => () => getter( @this );*/
-
-		/*public static T Use<T>( this Func<T> @this, Action<T> function )
+		public static TResult With<TItem, TResult>( [Optional]this TItem target, Func<TItem, TResult> function, Func<TResult> defaultFunction = null )
 		{
-			var item = @this();
-			var with = item.With( function );
-			return with;
-		}
-
-		public static TResult Use<TItem, TResult>( this Func<TItem> @this, Func<TItem, TResult> function, Func<TResult> defaultFunction = null )
-		{
-			var item = @this();
-			return item.With( function, defaultFunction );
-		}*/
-
-		// public static T OrDefault<T>( this T @this, [Required]Func<T> defaultFunction ) => @this.With( Delegates<T>.Self, defaultFunction );
-
-		public static TResult With<TItem, TResult>( this TItem target, Func<TItem, TResult> function, Func<TResult> defaultFunction = null )
-		{
-			var getDefault = defaultFunction ?? Implementations<TResult>.Default;
-			var result = target != null ? function( target ) : getDefault();
+			var getDefault = defaultFunction ?? Support<TResult>.Default;
+			var result = target.IsAssigned() ? function( target ) : getDefault();
 			return result;
 		}
 
-		static class Implementations<T>
+		static class Support<T>
 		{
 			public static Func<T> Default { get; } = SpecialValues.DefaultOrEmpty<T>;
 		}
 
-		public static TItem With<TItem>( this TItem @this, Action<TItem> action )
+		public static TItem With<TItem>( [Optional]this TItem @this, Action<TItem> action = null )
 		{
 			if ( @this.IsAssigned() )
 			{
@@ -103,10 +82,10 @@ namespace DragonSpark.Extensions
 			return default(TItem);
 		}
 
-		public static bool Is<T>( [Required] this object @this ) => @this is T;
-		public static bool Not<T>( [Required] this object @this ) => !@this.Is<T>();
+		public static bool Is<T>( this object @this ) => @this is T;
+		public static bool Not<T>( this object @this ) => !@this.Is<T>();
 
-		public static TItem WithSelf<TItem>( this TItem @this, Func<TItem, object> action )
+		public static TItem WithSelf<TItem>( [Optional]this TItem @this, Func<TItem, object> action )
 		{
 			if ( @this.IsAssigned() )
 			{
@@ -115,21 +94,19 @@ namespace DragonSpark.Extensions
 			return @this;
 		}
 
-		public static T With<T>( this T? @this, Action<T> action ) where T : struct => @this?.With( action ) ?? default(T);
+		public static T With<T>( [Optional]this T? @this, Action<T> action ) where T : struct => @this?.With( action ) ?? default(T);
 
-		public static TResult With<TItem, TResult>( this TItem? @this, Func<TItem, TResult> action ) where TItem : struct => @this != null ? @this.Value.With( action ) : default( TResult );
+		public static TResult With<TItem, TResult>( [Optional]this TItem? @this, Func<TItem, TResult> action ) where TItem : struct => @this != null ? @this.Value.With( action ) : default( TResult );
 
-		public static TResult Evaluate<TResult>( [Required]this object container, string expression ) => Evaluate<TResult>( ExpressionEvaluator.Default, container, expression );
+		public static TResult Evaluate<TResult>( this object container, string expression ) => Evaluate<TResult>( ExpressionEvaluator.Default, container, expression );
 
-		public static TResult Evaluate<TResult>( [Required]this IExpressionEvaluator @this, object container, string expression ) => (TResult)@this.Evaluate( container, expression );
+		public static TResult Evaluate<TResult>( this IExpressionEvaluator @this, object container, string expression ) => (TResult)@this.Evaluate( container, expression );
 
 		public static T AsValid<T>( this object @this ) => AsValid( @this, Delegates<T>.Empty );
 
 		//public static T AsValid<T>( this T @this, Action<T> with ) => AsValid( @this, with, null );
 
-		public static T AsValid<T>( this object @this, Action<T> with ) => AsValid( @this, with, null );
-
-		public static T AsValid<T>( this object @this, Action<T> with, string message )
+		public static T AsValid<T>( this object @this, Action<T> with, string message = null )
 		{
 			if ( @this.Not<T>() )
 			{
@@ -139,11 +116,11 @@ namespace DragonSpark.Extensions
 			return @this.As( with );
 		}
 
-		public static T As<T>( this object target ) => As( target, (Action<T>)null );
+		//public static T As<T>( this object target ) => As( target, (Action<T>)null );
 
 		/*public static TResult As<TResult, TReturn>( this object target, Func<TResult, TReturn> action ) => target.As<TResult>( x => { action( x ); } );*/
 
-		public static T As<T>( this object target, Action<T> action )
+		public static T As<T>( [Optional]this object target, Action<T> action = null )
 		{
 			if ( target is T )
 			{

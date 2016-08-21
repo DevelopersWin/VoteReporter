@@ -8,7 +8,7 @@ namespace DragonSpark.ComponentModel
 	{
 		public CollectionAttribute( Type elementType = null ) : base( t => Create( elementType ) ) {}
 
-		static ServicesValueProvider Create( Type type ) => new ServicesValueProvider( p =>
+		static ServicesValueProvider Create( Type type = null ) => new ServicesValueProvider( p =>
 		{
 			var elementType = type ?? p.PropertyType.Adapt().GetEnumerableType();
 			var result = elementType.With( Transformer.Default.Get );

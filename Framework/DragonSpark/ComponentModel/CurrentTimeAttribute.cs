@@ -1,5 +1,4 @@
 using DragonSpark.Runtime;
-using PostSharp.Patterns.Contracts;
 using System;
 
 namespace DragonSpark.ComponentModel
@@ -15,7 +14,7 @@ namespace DragonSpark.ComponentModel
 
 		public CurrentTimeValueProvider() : this( CurrentTimeConfiguration.Default.Get() ) {}
 
-		public CurrentTimeValueProvider( [Required]ICurrentTime currentTime )
+		public CurrentTimeValueProvider( ICurrentTime currentTime )
 		{
 			this.currentTime = currentTime;
 		}

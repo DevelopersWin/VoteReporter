@@ -1,6 +1,5 @@
 using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Composition;
 using System.IO;
@@ -30,7 +29,7 @@ namespace DragonSpark.Windows.Runtime.Data
 
 		protected DataTransformer( Func<MemoryStream, T> transformer ) : this( DataStreamFactory.Default.Get, transformer ) {}
 
-		protected DataTransformer( [Required]Func<DataTransformParameter, MemoryStream> factory, [Required]Func<MemoryStream, T> transformer )
+		protected DataTransformer( Func<DataTransformParameter, MemoryStream> factory, Func<MemoryStream, T> transformer )
 		{
 			this.factory = factory;
 			this.transformer = transformer;

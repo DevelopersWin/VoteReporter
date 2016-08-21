@@ -4,7 +4,6 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -62,7 +61,7 @@ namespace DragonSpark.Activation
 
 		public static T Activate<T>( this IActivator @this ) => Activate<T>( @this, typeof(T) );
 
-		public static T Activate<T>( this IActivator @this, [Required] Type requestedType ) => (T)@this.Get( requestedType );
+		public static T Activate<T>( this IActivator @this, Type requestedType ) => (T)@this.Get( requestedType );
 
 		public static T Activate<T>( this IActivator @this, TypeRequest request ) => (T)@this.Get( request );
 		

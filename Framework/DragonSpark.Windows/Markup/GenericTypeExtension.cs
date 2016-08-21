@@ -24,7 +24,7 @@ namespace DragonSpark.Windows.Markup
 	[MarkupExtensionReturnType( typeof(Type) )]
 	public class GenericTypeExtension : MarkupExtensionBase
 	{
-		public GenericTypeExtension( [NotEmpty]string typeName )
+		public GenericTypeExtension( string typeName )
 		{
 			TypeName = typeName;
 		}

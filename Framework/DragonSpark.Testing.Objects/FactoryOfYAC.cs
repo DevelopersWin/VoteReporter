@@ -1,7 +1,6 @@
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Sources;
 using System;
 using System.Composition;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Testing.Objects
 {
@@ -12,7 +11,7 @@ namespace DragonSpark.Testing.Objects
 
 		public FactoryOfYAC() : this( () => new YetAnotherClass() ) {}
 
-		FactoryOfYAC( [Required] Func<YetAnotherClass> inner )
+		FactoryOfYAC( Func<YetAnotherClass> inner )
 		{
 			this.inner = inner;
 		}

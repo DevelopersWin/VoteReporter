@@ -1,8 +1,6 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using Ploeh.AutoFixture.Kernel;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -33,12 +31,12 @@ namespace DragonSpark.Testing.Framework.Setup
 		readonly Ploeh.AutoFixture.Kernel.ParameterRequestRelay inner;
 		readonly static NoSpecimen NoSpecimen = new NoSpecimen();
 
-		public ParameterRequestRelay( [Required]Ploeh.AutoFixture.Kernel.ParameterRequestRelay inner )
+		public ParameterRequestRelay( Ploeh.AutoFixture.Kernel.ParameterRequestRelay inner )
 		{
 			this.inner = inner;
 		}
 
-		public object Create( object request, [Required]ISpecimenContext context )
+		public object Create( object request, ISpecimenContext context )
 		{
 			var parameter = request as ParameterInfo;
 			var result = parameter != null ? ( ShouldDefault( parameter ) ? parameter.DefaultValue : inner.Create( request, context ) ) : NoSpecimen;

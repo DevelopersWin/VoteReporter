@@ -1,4 +1,5 @@
 using DragonSpark.TypeSystem;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -16,6 +17,6 @@ namespace DragonSpark.Runtime.Specifications
 			this.satisfied = satisfied;
 		}
 
-		public override bool IsSatisfiedBy( T parameter ) => satisfied;
+		public override bool IsSatisfiedBy( [Optional]T parameter ) => satisfied;
 	}
 }

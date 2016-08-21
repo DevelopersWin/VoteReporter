@@ -1,9 +1,8 @@
 using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Sources;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Runtime
 {
@@ -56,7 +55,7 @@ namespace DragonSpark.Runtime
 
 	public class Entry<T> : FixedSource<T>, IPriorityAware
 	{
-		public Entry( [Required] T item, Priority priority = Priority.Normal ) : base( item )
+		public Entry( T item, Priority priority = Priority.Normal ) : base( item )
 		{
 			Priority = priority;
 		}

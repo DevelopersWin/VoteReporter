@@ -77,12 +77,6 @@ namespace DragonSpark.Diagnostics.Logging
 		}
 	}
 
-	/*public class RecordingLoggerConfigurationFactory : LoggerConfigurationFactory
-	{
-		public RecordingLoggerConfigurationFactory( [Required] ILoggerHistory sink, [Required] LoggingLevelSwitch controller, params ITransformer<LoggerConfiguration>[] transformers ) 
-			: base( new LoggerConfigurationSource( controller ).Create, transformers.Append( new CreatorFilterTransformer(), new LoggerHistoryConfigurationTransformer( sink ) ).Select( transformer => transformer.ToDelegate() ).ToArray() ) {}
-	}*/
-
 	public class MethodFormatter : IFormattable
 	{
 		readonly MethodBase method;
@@ -94,66 +88,4 @@ namespace DragonSpark.Diagnostics.Logging
 
 		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => $"{method.DeclaringType.Name}.{method.Name}";
 	}
-
-	/*public class LoggerConfigurationFactory : AggregateFactory<LoggerConfiguration>
-	{
-		public LoggerConfigurationFactory( Func<LoggerConfiguration> primary, params Func<LoggerConfiguration, LoggerConfiguration>[] transformers ) : base( primary, transformers ) {}
-	}
-
-	public class LoggerConfigurationSource : FactoryBase<LoggerConfiguration>
-	{
-		readonly LoggerConfiguration configuration;
-		readonly LoggingLevelSwitch controller;
-
-		public LoggerConfigurationSource( [Required] LoggingLevelSwitch logging ) : this( new LoggerConfiguration(), logging ) {}
-
-		public LoggerConfigurationSource( [Required] LoggerConfiguration configuration, [Required] LoggingLevelSwitch controller )
-		{
-			this.configuration = configuration;
-			this.controller = controller;
-		}
-
-		public override LoggerConfiguration Create() => configuration.MinimumLevel.ControlledBy( controller );
-	}
-
-	public class LoggerHistoryConfigurationTransformer : TransformerBase<LoggerConfiguration>
-	{
-		readonly ILoggerHistory history;
-
-		public LoggerHistoryConfigurationTransformer( [Required] ILoggerHistory history )
-		{
-			this.history = history;
-		}
-
-		public override LoggerConfiguration Create( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
-	}*/
-
-		
-
-	/*public class LoggingLevelSwitchFactory : FactoryBase<LoggingLevelSwitch>
-	{
-		public static LoggingLevelSwitchFactory Default { get; } = new LoggingLevelSwitchFactory();
-
-		public override LoggingLevelSwitch Create() => new LoggingLevelSwitch { MinimumLevel = MinimumLevelConfiguration.Default.Default() };
-	}
-
-	public class RecordingLoggerFactory : LoggerFactory
-	{
-		public RecordingLoggerFactory() : this( Items<ITransformer<LoggerConfiguration>>.Default ) {}
-
-		public RecordingLoggerFactory( params ITransformer<LoggerConfiguration>[] transformers ) : this( new LoggerHistorySink(), transformers ) {}
-
-		public RecordingLoggerFactory( [Required]ILoggerHistory history, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, LoggingLevelSwitchFactory.Default.Create(), transformers ) {}
-
-		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, params ITransformer<LoggerConfiguration>[] transformers ) : this( history, levelSwitch, new RecordingLoggerConfigurationFactory( history, levelSwitch, transformers ).Create ) {}
-
-		public RecordingLoggerFactory( [Required]ILoggerHistory history, [Required]LoggingLevelSwitch levelSwitch, Func<LoggerConfiguration> configuration ) : base( configuration )
-		{
-			History = history;
-			LevelSwitch = levelSwitch;
-		}
-
-		public ILoggerHistory History { get; }
-		public LoggingLevelSwitch LevelSwitch { get; }
-	}*/
 }

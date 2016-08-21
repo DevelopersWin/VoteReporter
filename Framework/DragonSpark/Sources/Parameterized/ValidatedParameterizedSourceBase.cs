@@ -4,7 +4,6 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -26,7 +25,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		readonly Action<T> configure;
 
-		public ConfiguringTransformer( [Required]Action<T> configure )
+		public ConfiguringTransformer( Action<T> configure )
 		{
 			this.configure = configure;
 		}
@@ -200,7 +199,7 @@ namespace DragonSpark.Sources.Parameterized
 			this.inner = inner.ToImmutableArray();
 		}
 
-		public override TResult Get( TParameter parameter ) => inner.Introduce( parameter ).FirstAssigned();
+		public override TResult Get( [Optional]TParameter parameter ) => inner.Introduce( parameter ).FirstAssigned();
 	}
 
 	public sealed class Wrapper<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
@@ -212,7 +211,7 @@ namespace DragonSpark.Sources.Parameterized
 			this.factory = factory;
 		}
 
-		public override TResult Get( TParameter parameter ) => factory();
+		public override TResult Get( [Optional]TParameter parameter ) => factory();
 	}
 
 	public sealed class Origin : Cache<ISource>

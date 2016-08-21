@@ -12,36 +12,22 @@ using System.ComponentModel;
 using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
-using System.Xaml;
 using Activator = DragonSpark.Activation.Activator;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
 {
-	/*[ContentProperty( nameof( Properties ) )]
-	public class AmbientExtension : MarkupExtensionBase
-	{
-		readonly Type type;
-
-		public AmbientExtension( [Required]Type type )
-		{
-			this.type = type;
-		}
-
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => AmbientStack.GetCurrent( type );
-	}*/
-
-	public class RootExtension : MarkupExtensionBase
+	/*public class RootExtension : MarkupExtensionBase
 	{
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) => serviceProvider.Get<IRootObjectProvider>().RootObject;
-	}
+	}*/
 
 	[ContentProperty( nameof(Instance) )]
 	public class SourceExtension : MarkupExtensionBase
 	{
 		public SourceExtension() {}
 
-		public SourceExtension( [Required]ISource instance )
+		public SourceExtension( ISource instance )
 		{
 			Instance = instance;
 		}
@@ -114,7 +100,7 @@ namespace DragonSpark.Windows.Markup
 		readonly object item;
 		readonly string expression;
 		
-		public EvalExtension( [Required]object item, [NotEmpty]string expression )
+		public EvalExtension( object item, string expression )
 		{
 			this.item = item;
 			this.expression = expression;
@@ -135,7 +121,7 @@ namespace DragonSpark.Windows.Markup
 
 		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Default.ToSourceDelegate(), DesignTimeValueProvider.Default.ToSourceDelegate() ) {}
 
-		protected MarkupExtensionBase( [Required]Func<IServiceProvider, IMarkupProperty> factory, [Required]Func<Type, object> designTimeFactory )
+		protected MarkupExtensionBase( Func<IServiceProvider, IMarkupProperty> factory, Func<Type, object> designTimeFactory )
 		{
 			this.factory = factory;
 			this.designTimeFactory = designTimeFactory;
@@ -193,15 +179,12 @@ namespace DragonSpark.Windows.Markup
 
 	public class FactoryTypeExtension : MarkupExtensionBase
 	{
-		public FactoryTypeExtension( [Required]Type factoryType )
+		public FactoryTypeExtension( Type factoryType )
 		{
 			FactoryType = factoryType;
 		}
 
 		public Type FactoryType { get; set; }
-
-		/*[Required, Service]
-		SourceFactory SourceTypeFactory { [return: Required]get; set; }*/
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) => SourceFactory.Default.Get( FactoryType );
 	}

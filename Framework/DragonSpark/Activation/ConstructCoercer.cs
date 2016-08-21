@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Activation
 {
@@ -76,7 +77,7 @@ namespace DragonSpark.Activation
 		public static SourceCoercer<T> Default { get; } = new SourceCoercer<T>();
 		SourceCoercer() {}
 
-		public T Coerce( object parameter )
+		public T Coerce( [Optional]object parameter )
 		{
 			var store = parameter as ISource<T>;
 			var result = store != null ? store.Get() : parameter.As<T>();
@@ -97,8 +98,9 @@ namespace DragonSpark.Activation
 	public class Coercer<T> : CoercerBase<T>
 	{
 		public static Coercer<T> Default { get; } = new Coercer<T>();
+		protected Coercer() {}
 
-		protected override T PerformCoercion( object parameter ) => default(T);
+		protected override T PerformCoercion( [Optional]object parameter ) => default(T);
 	}
 
 	public class ConstructCoercer<T> : CoercerBase<T>
@@ -112,7 +114,7 @@ namespace DragonSpark.Activation
 			this.projector = projector;
 		}
 
-		protected override T PerformCoercion( object parameter ) => projector( parameter );
+		protected override T PerformCoercion( [Optional]object parameter ) => projector( parameter );
 	}
 
 	public class Projector<TFrom, TTo> : CoercerBase<TTo>
@@ -123,12 +125,12 @@ namespace DragonSpark.Activation
 			this.projection = projection;
 		}
 
-		protected override TTo PerformCoercion( object parameter ) => parameter.AsTo( projection );
+		protected override TTo PerformCoercion( [Optional]object parameter ) => parameter.AsTo( projection );
 	}
 
 	public abstract class CoercerBase<T> : ICoercer<T>
 	{
-		public T Coerce( object parameter ) => parameter is T ? (T)parameter : parameter.IsAssignedOrValue() ? PerformCoercion( parameter ) : default(T);
+		public T Coerce( [Optional]object parameter ) => parameter is T ? (T)parameter : parameter.IsAssignedOrValue() ? PerformCoercion( parameter ) : default(T);
 
 		protected abstract T PerformCoercion( object parameter );
 	}

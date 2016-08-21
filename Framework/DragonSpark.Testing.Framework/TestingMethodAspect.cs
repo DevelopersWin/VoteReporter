@@ -6,6 +6,7 @@ using DragonSpark.Setup;
 using PostSharp.Aspects;
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -37,7 +38,7 @@ namespace DragonSpark.Testing.Framework
 
 	public static class Defer
 	{
-		public static Task Run( Action<Task> action, object context )
+		public static Task Run( Action<Task> action, [Optional]object context )
 		{
 			var task = context as Task;
 			if ( task != null )

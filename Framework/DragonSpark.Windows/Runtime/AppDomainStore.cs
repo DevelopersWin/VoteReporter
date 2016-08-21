@@ -32,8 +32,6 @@ namespace DragonSpark.Windows.Runtime
 			this.domain = domain;
 		}
 
-		// public T CreateUsing( params object[] arguments ) => Get( arguments );
-
 		public override T Get( object[] parameter )
 		{
 			var assemblyPath = new Uri( typeof(T).Assembly.CodeBase).LocalPath;
@@ -43,26 +41,4 @@ namespace DragonSpark.Windows.Runtime
 			return result;
 		}
 	}
-
-	/*[Serializable]
-	public class AssemblyLoader : MarshalByRefObject, IDisposable
-	{
-		readonly string basePath;
-
-		public AssemblyLoader( [NotEmpty]string basePath )
-		{
-			this.basePath = basePath;
-		}
-
-		public void Initialize() => AppDomain.CurrentDomain.AssemblyResolve += Resolve;
-
-		Assembly Resolve( object sender, ResolveEventArgs args )
-		{
-			var assemblyName = new AssemblyName( args.Name ).Name;
-			var result = Assembly.LoadFile( Path.Combine( basePath, $"{assemblyName}{FileSystem.AssemblyExtension}" ) );
-			return result;
-		}
-
-		public void Dispose() => AppDomain.CurrentDomain.AssemblyResolve -= Resolve;
-	}*/
 }

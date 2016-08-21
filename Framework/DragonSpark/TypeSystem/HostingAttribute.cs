@@ -1,5 +1,4 @@
 using DragonSpark.Sources.Parameterized;
-using PostSharp.Patterns.Contracts;
 using System;
 
 namespace DragonSpark.TypeSystem
@@ -8,7 +7,7 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly Func<object, object> inner;
 
-		protected HostingAttribute( [Required]Func<object, object> inner )
+		protected HostingAttribute( Func<object, object> inner )
 		{
 			this.inner = inner;
 		}

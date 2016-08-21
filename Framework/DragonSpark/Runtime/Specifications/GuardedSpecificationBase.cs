@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -23,7 +24,7 @@ namespace DragonSpark.Runtime.Specifications
 		public static ISpecification<T> Default { get; } = new AssignedSpecification<T>();
 		AssignedSpecification() : base( Where<T>.Always ) {}
 	
-		public override bool IsSatisfiedBy( T parameter ) => parameter.IsAssigned();
+		public override bool IsSatisfiedBy( [Optional]T parameter ) => parameter.IsAssigned();
 	}
 
 	public abstract class SpecificationBase<T> : ISpecification<T>
@@ -45,9 +46,9 @@ namespace DragonSpark.Runtime.Specifications
 
 		public abstract bool IsSatisfiedBy( T parameter );
 
-		bool ISpecification.IsSatisfiedBy( object parameter ) => Coerce( parameter );
+		bool ISpecification.IsSatisfiedBy( [Optional]object parameter ) => Coerce( parameter );
 
-		protected virtual bool Coerce( object parameter )
+		protected virtual bool Coerce( [Optional]object parameter )
 		{
 			var coerced = coercer( parameter );
 			var result = apply( coerced ) && IsSatisfiedBy( coerced );

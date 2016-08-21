@@ -4,7 +4,7 @@ namespace DragonSpark.Windows.Markup
 {
 	public abstract class MarkupPropertyBase : IMarkupProperty
 	{
-		protected MarkupPropertyBase( [Required]PropertyReference reference )
+		protected MarkupPropertyBase( PropertyReference reference )
 		{
 			Reference = reference;
 		}

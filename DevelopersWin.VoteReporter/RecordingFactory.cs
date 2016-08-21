@@ -1,9 +1,8 @@
 using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Extensions;
-using DragonSpark.Windows.Entity;
-using PostSharp.Patterns.Contracts;
-using System.Linq;
 using DragonSpark.Sources;
+using DragonSpark.Windows.Entity;
+using System.Linq;
 
 namespace DevelopersWin.VoteReporter
 {
@@ -13,7 +12,7 @@ namespace DevelopersWin.VoteReporter
 		readonly IVoteProvider provider;
 		readonly IVoteUpdater updater;
 
-		public RecordingFactory( [Required]VotingContext context, [Required]IVoteProvider provider, [Required]IVoteUpdater updater )
+		public RecordingFactory( VotingContext context, IVoteProvider provider, IVoteUpdater updater )
 		{
 			this.context = context;
 			this.provider = provider;

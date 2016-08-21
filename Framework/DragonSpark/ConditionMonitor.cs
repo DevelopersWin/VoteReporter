@@ -2,7 +2,7 @@
 
 namespace DragonSpark
 {
-	public class ConditionMonitor
+	public sealed class ConditionMonitor
 	{
 		public bool IsApplied => State > ConditionMonitorState.None;
 
@@ -14,9 +14,7 @@ namespace DragonSpark
 
 		public bool Apply( Action action ) => ApplyIf( null, action );
 
-		public bool ApplyIf( bool? condition ) => ApplyIf( condition, null );
-
-		public bool ApplyIf( bool? condition, Action action )
+		public bool ApplyIf( bool? condition, Action action = null )
 		{
 			switch ( State )
 			{

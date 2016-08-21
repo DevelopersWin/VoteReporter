@@ -3,6 +3,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Markup;
 
@@ -47,7 +48,7 @@ namespace DragonSpark.Runtime
 
 		public CommandCollection Commands { get; }
 
-		public override void Execute( T parameter )
+		public override void Execute( [Optional]T parameter )
 		{
 			foreach ( var command in Commands.ToArray() )
 			{

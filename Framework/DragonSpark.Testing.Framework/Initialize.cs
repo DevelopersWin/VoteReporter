@@ -6,6 +6,7 @@ using PostSharp.Aspects;
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -80,7 +81,7 @@ namespace DragonSpark.Testing.Framework
 			this.context = context;
 		}
 
-		public string ToString( string format, IFormatProvider formatProvider ) => context.Origin.ToString();
+		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => context.Origin.ToString();
 	}
 
 	public sealed class TaskContext : Disposable

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Runtime
 {
@@ -19,7 +17,7 @@ namespace DragonSpark.Runtime
 		/// If a list does not already exist, it will be created automatically.
 		/// </summary>
 		/// <param name="key">The key of the list that will hold the value.</param>
-		public void Add([Required]TKey key)
+		public void Add(TKey key)
 		{
 			CreateNewList(key);
 		}
@@ -30,7 +28,7 @@ namespace DragonSpark.Runtime
 		/// </summary>
 		/// <param name="key">The key of the list that will hold the value.</param>
 		/// <param name="value">The value to add to the list under the given key.</param>
-		public void Add([Required]TKey key, [Required]TValue value)
+		public void Add(TKey key, TValue value)
 		{
 			if (innerValues.ContainsKey(key))
 			{
@@ -74,7 +72,7 @@ namespace DragonSpark.Runtime
 		/// </summary>
 		/// <param name="key">The key to locate.</param>
 		/// <returns>true if the dictionary contains the given key; otherwise, false.</returns>
-		public bool ContainsKey([Required]TKey key)
+		public bool ContainsKey(TKey key)
 		{
 			return innerValues.ContainsKey(key);
 		}
@@ -109,7 +107,7 @@ namespace DragonSpark.Runtime
 		/// </summary>
 		/// <param name="key">The key of the list to remove.</param>
 		/// <returns><see langword="true" /> if the element was removed.</returns>
-		public bool Remove([Required]TKey key)
+		public bool Remove(TKey key)
 		{
 			return innerValues.Remove(key);
 		}
@@ -203,7 +201,7 @@ namespace DragonSpark.Runtime
 		/// <summary>
 		/// See <see cref="IDictionary{TKey,TValue}.Add"/> for more information.
 		/// </summary>
-		void IDictionary<TKey, IList<TValue>>.Add([Required]TKey key, [Required]IList<TValue> value)
+		void IDictionary<TKey, IList<TValue>>.Add(TKey key, IList<TValue> value)
 		{
 			innerValues.Add(key, value);
 		}

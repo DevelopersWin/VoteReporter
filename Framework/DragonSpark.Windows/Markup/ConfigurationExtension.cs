@@ -15,7 +15,7 @@ namespace DragonSpark.Windows.Markup
 
 		public ConfigurationExtension() {}
 
-		public ConfigurationExtension( [NotEmpty]string key )
+		public ConfigurationExtension( string key )
 		{
 			this.key = key;
 		}
@@ -65,7 +65,7 @@ namespace DragonSpark.Windows.Markup
 	{
 		readonly string key;
 
-		protected ConfigurationKeyExtension( [NotEmpty]string key )
+		protected ConfigurationKeyExtension( string key )
 		{
 			this.key = key;
 		}
@@ -76,8 +76,8 @@ namespace DragonSpark.Windows.Markup
 	
 	public class MemberInfoKeyExtension : ConfigurationKeyExtension
 	{
-		public MemberInfoKeyExtension( [Required]Type type, string member ) : this( type.GetMember( member ).First() ) {}
+		public MemberInfoKeyExtension( Type type, string member ) : this( type.GetMember( member ).First() ) {}
 
-		public MemberInfoKeyExtension( [Required]MemberInfo member ) : base( MemberInfoKeyFactory.Default.Get( PropertyReference.New( member ) ) ) {}
+		public MemberInfoKeyExtension( MemberInfo member ) : base( MemberInfoKeyFactory.Default.Get( PropertyReference.New( member ) ) ) {}
 	}
 }

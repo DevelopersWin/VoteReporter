@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects.Validation
@@ -75,7 +76,7 @@ namespace DragonSpark.Aspects.Validation
 
 	public static class Extensions
 	{
-		public static bool Marked( this IAutoValidationController @this, object parameter, bool valid )
+		public static bool Marked( this IAutoValidationController @this, [Optional]object parameter, bool valid )
 		{
 			@this.MarkValid( parameter, valid );
 			return valid;
@@ -126,16 +127,16 @@ namespace DragonSpark.Aspects.Validation
 			this.validator = validator;
 		}
 
-		public bool IsSatisfiedBy( object parameter ) => Handler?.Handles( parameter ) ?? false;
+		public bool IsSatisfiedBy( [Optional]object parameter ) => Handler?.Handles( parameter ) ?? false;
 
-		bool IsMarked( object parameter )
+		bool IsMarked( [Optional]object parameter )
 		{
 			object current;
 			var result = TryGetValue( Environment.CurrentManagedThreadId, out current ) && Equals( current, parameter ) && Clear();
 			return result;
 		}
 
-		public void MarkValid( object parameter, bool valid )
+		public void MarkValid( [Optional]object parameter, bool valid )
 		{
 			if ( valid )
 			{
@@ -154,7 +155,7 @@ namespace DragonSpark.Aspects.Validation
 			return true;
 		}
 
-		public object Execute( object parameter, Func<object> proceed )
+		public object Execute( [Optional]object parameter, Func<object> proceed )
 		{
 			object handled = null;
 			if ( Handler?.Handle( parameter, out handled ) ?? false )

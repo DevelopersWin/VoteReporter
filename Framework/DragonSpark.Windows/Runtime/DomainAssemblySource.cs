@@ -9,7 +9,7 @@ using System.Reflection.Emit;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class DomainAssemblySource : FactoryCache<AppDomain, ImmutableArray<Assembly>>
+	public sealed class DomainAssemblySource : FactoryCache<AppDomain, ImmutableArray<Assembly>>
 	{
 		public static DomainAssemblySource Default { get; } = new DomainAssemblySource();
 		DomainAssemblySource() : this( Specification.Default.IsSatisfiedBy ) {}
@@ -21,31 +21,10 @@ namespace DragonSpark.Windows.Runtime
 			this.specification = specification;
 		}
 
-		/*DomainAssemblySource() : base( Create ) {}
-
-		static Assembly[] Create( AppDomain parameter )
-		{
-			
-		}*/
-
-		/*DomainAssemblySource() : this( AppDomain.CurrentDomain ) {}
-
-		public DomainAssemblySource( [Required]AppDomain domain ) : base( Factory.Default.Create( domain ) ) {}
-
-		class Factory : Cache<AppDomain, Assembly[]>
-		{
-			public static Factory Default { get; } = new Factory();
-			Factory() {}
-
-			public override Assembly[] Create( AppDomain parameter )
-			{
-				
-			}
-		}*/
 		protected override ImmutableArray<Assembly> Create( AppDomain parameter ) => 
 			parameter.GetAssemblies().Where( specification ).OrderBy( a => a.GetName().Name ).ToImmutableArray();
 
-		class Specification : SpecificationBase<Assembly>
+		sealed class Specification : SpecificationBase<Assembly>
 		{
 			public static Specification Default { get; } = new Specification();
 			Specification() {}

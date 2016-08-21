@@ -27,7 +27,7 @@ namespace DragonSpark.Diagnostics.Logging
 	{
 		public AddTextWriterCommand() : this( new StringWriter(), "{Timestamp} [{Level}] {Message}{NewLine}{Exception}" ) {}
 
-		public AddTextWriterCommand( [Required]TextWriter writer, string outputTemplate )
+		public AddTextWriterCommand( TextWriter writer, string outputTemplate )
 		{
 			Writer = writer;
 			OutputTemplate = outputTemplate;
@@ -49,9 +49,9 @@ namespace DragonSpark.Diagnostics.Logging
 	{
 		public MinimumLevelSwitchCommand() : this( LogEventLevel.Information ) {}
 
-		public MinimumLevelSwitchCommand( LogEventLevel level ) : this( new Serilog.Core.LoggingLevelSwitch( level ) ) {}
+		public MinimumLevelSwitchCommand( LogEventLevel level ) : this( new LoggingLevelSwitch( level ) ) {}
 
-		public MinimumLevelSwitchCommand( [Required]Serilog.Core.LoggingLevelSwitch controller )
+		public MinimumLevelSwitchCommand( LoggingLevelSwitch controller )
 		{
 			Controller = controller;
 		}
@@ -69,7 +69,7 @@ namespace DragonSpark.Diagnostics.Logging
 
 	public class ReadFromSettingsCommand : ReadFromCommandBase
 	{
-		public ReadFromSettingsCommand( [Required]ILoggerSettings settings )
+		public ReadFromSettingsCommand( ILoggerSettings settings )
 		{
 			Settings = settings;
 		}
@@ -84,7 +84,7 @@ namespace DragonSpark.Diagnostics.Logging
 	{
 		public ReadFromKeyValuePairsCommand() : this( new Dictionary<string, string>() ) {}
 
-		public ReadFromKeyValuePairsCommand( [Required]IDictionary<string, string> dictionary )
+		public ReadFromKeyValuePairsCommand( IDictionary<string, string> dictionary )
 		{
 			Dictionary = dictionary;
 		}
@@ -145,7 +145,7 @@ namespace DragonSpark.Diagnostics.Logging
 
 	public abstract class DestructureByTransformingCommandBase<T> : DestructureCommandBase
 	{
-		protected DestructureByTransformingCommandBase( [Required]IParameterizedSource<T, object> source )
+		protected DestructureByTransformingCommandBase( IParameterizedSource<T, object> source )
 		{
 			Source = source;
 		}

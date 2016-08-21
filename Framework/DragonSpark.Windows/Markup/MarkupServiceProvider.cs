@@ -1,4 +1,3 @@
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Linq;
 using System.Windows.Markup;
@@ -11,7 +10,7 @@ namespace DragonSpark.Windows.Markup
 
 		readonly IServiceProvider inner;
 
-		public MarkupServiceProvider( [Required]IServiceProvider inner, [Required]object targetObject, [Required]IMarkupProperty property )
+		public MarkupServiceProvider( IServiceProvider inner, object targetObject, IMarkupProperty property )
 		{
 			this.inner = inner;
 			TargetObject = targetObject;

@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Composition;
@@ -21,7 +20,7 @@ namespace DragonSpark.Composition
 			return result;
 		}
 
-		public static ContainerConfiguration WithInstance<T>( [Required] this ContainerConfiguration @this, T instance, string name = null ) => @this.WithProvider( new InstanceExportDescriptorProvider<T>( instance, name ) );
+		public static ContainerConfiguration WithInstance<T>( this ContainerConfiguration @this, T instance, string name = null ) => @this.WithProvider( new InstanceExportDescriptorProvider<T>( instance, name ) );
 
 		public static object Registered( this LifetimeContext @this, object instance )
 		{

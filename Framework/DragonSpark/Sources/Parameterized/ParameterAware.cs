@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -191,7 +191,7 @@ namespace DragonSpark.Sources.Parameterized
 		public IParameterAwareHandler For( InstanceMethod instance ) => new CompositeParameterAwareHandler( Get( instance.Default ).Get( instance.Method ).ToImmutableArray() );
 	}*/
 
-	class CacheParameterHandler<TKey, TValue> : IParameterAwareHandler
+	sealed class CacheParameterHandler<TKey, TValue> : IParameterAwareHandler
 	{
 		readonly ICache<TKey, TValue> cache;
 

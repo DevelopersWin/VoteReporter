@@ -9,6 +9,7 @@ using PostSharp.Aspects.Dependencies;
 using PostSharp.Serialization;
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects
@@ -140,7 +141,7 @@ namespace DragonSpark.Aspects
 
 		public bool IsSatisfiedBy( MethodInfo parameter ) => method( parameter );
 
-		protected override bool Coerce( object parameter ) => parameter is MethodInfo ? IsSatisfiedBy( (MethodInfo)parameter ) : base.Coerce( parameter );
+		protected override bool Coerce( [Optional]object parameter ) => parameter is MethodInfo ? IsSatisfiedBy( (MethodInfo)parameter ) : base.Coerce( parameter );
 	}
 
 	public class FactoryAdapter : ParameterValidationAdapterBase<object>

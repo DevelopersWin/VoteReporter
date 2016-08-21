@@ -1,7 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -19,7 +18,7 @@ namespace DragonSpark.Windows.Entity
 
 		readonly Collection<Type> watching = new Collection<Type>();
 
-		public ActivationSource( [Required]IActivator activator )
+		public ActivationSource( IActivator activator )
 		{
 			this.activator = activator;
 		}

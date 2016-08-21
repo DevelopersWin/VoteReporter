@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace DragonSpark.Extensions
@@ -8,7 +9,7 @@ namespace DragonSpark.Extensions
 	{
 		public static string Capitalized( this string target ) => string.IsNullOrEmpty( target ) ? string.Empty : $"{char.ToUpper( target[0] )}{target.Substring( 1 )}";
 
-		public static string NullIfEmpty( this string target ) => string.IsNullOrEmpty( target ) ? null : target;
+		public static string NullIfEmpty( [Optional]this string target ) => string.IsNullOrEmpty( target ) ? null : target;
 
 		public static string[] ToStringArray( this string target ) => ToStringArray( target, ',', ';' );
 

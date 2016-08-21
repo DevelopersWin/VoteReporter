@@ -1,4 +1,3 @@
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Windows.Markup;
 
@@ -8,7 +7,7 @@ namespace DragonSpark.Windows.Markup
 	{
 		readonly Type type;
 
-		public ActivateExtension( [Required]Type type )
+		public ActivateExtension( Type type )
 		{
 			this.type = type;
 		}

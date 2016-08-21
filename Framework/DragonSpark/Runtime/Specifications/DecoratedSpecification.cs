@@ -4,6 +4,7 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Runtime.Specifications
 {
@@ -58,7 +59,7 @@ namespace DragonSpark.Runtime.Specifications
 			this.specification = specification;
 		}
 
-		protected override bool Coerce( object parameter ) => parameter is T ? IsSatisfiedBy( (T)parameter ) : specification.IsSatisfiedBy( parameter );
+		protected override bool Coerce( [Optional]object parameter ) => parameter is T ? IsSatisfiedBy( (T)parameter ) : specification.IsSatisfiedBy( parameter );
 	}
 
 	public class DelegatedSpecification<T> : SpecificationBase<T>
@@ -95,7 +96,7 @@ namespace DragonSpark.Runtime.Specifications
 			this.source = source;
 		}
 
-		public override bool IsSatisfiedBy( T parameter ) => source( parameter ).Apply();
+		public override bool IsSatisfiedBy( [Optional]T parameter ) => source( parameter ).Apply();
 	}
 
 	public class OnlyOnceSpecification : OnlyOnceSpecification<object> {}

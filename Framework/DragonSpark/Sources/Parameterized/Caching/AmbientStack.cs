@@ -1,8 +1,7 @@
-using System;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
+using System;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
@@ -10,7 +9,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 	{
 		readonly static IGenericMethodContext<Invoke> Method = typeof(AmbientStack).Adapt().GenericFactoryMethods[nameof(GetCurrentItem)];
 
-		public static object GetCurrentItem( [Required]Type type ) => Method.Make( type ).Invoke<object>();
+		public static object GetCurrentItem( Type type ) => Method.Make( type ).Invoke<object>();
 
 		public static T GetCurrentItem<T>() => AmbientStack<T>.Default.GetCurrentItem();
 

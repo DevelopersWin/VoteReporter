@@ -5,11 +5,8 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
-using PostSharp.Patterns.Contracts;
 using SerilogTimings.Extensions;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
@@ -59,24 +56,24 @@ namespace DragonSpark.Runtime
 		readonly ICommand<T> command;
 		readonly T parameter;
 
-		public FixedCommand( ICommand<T> command, T parameter ) : this( command, parameter, Specifications.Specifications.Always ) {}
+		public FixedCommand( ICommand<T> command, [Optional]T parameter ) : this( command, Specifications.Specifications.Always, parameter ) {}
 
-		public FixedCommand( ICommand<T> command, T parameter, ISpecification<object> specification ) : base( specification )
+		public FixedCommand( ICommand<T> command, ISpecification<object> specification, [Optional]T parameter ) : base( specification )
 		{
 			this.command = command;
 			this.parameter = parameter;
 		}
 
-		public override void Execute( object p ) => command.Execute( parameter );
+		public override void Execute( [Optional]object _ ) => command.Execute( parameter );
 
 		protected override void OnDispose() => command.TryDispose();
 	}
 
-	public class AddItemCommand<T> : CommandBase<T>
+	/*public class AddItemCommand<T> : CommandBase<T>
 	{
 		readonly IList<T> list;
 
-		public AddItemCommand( [Required] IList<T> list )
+		public AddItemCommand( IList<T> list )
 		{
 			this.list = list;
 		}
@@ -88,7 +85,7 @@ namespace DragonSpark.Runtime
 	{
 		readonly IList list;
 
-		public AddItemCommand( [Required] IList list )
+		public AddItemCommand( IList list )
 		{
 			this.list = list;
 		}
@@ -100,13 +97,13 @@ namespace DragonSpark.Runtime
 	{
 		readonly IList list;
 
-		public RemoveItemCommand( [Required] IList list )
+		public RemoveItemCommand( IList list )
 		{
 			this.list = list;
 		}
 
 		public override void Execute( object parameter ) => list.Remove( parameter );
-	}
+	}*/
 
 	public abstract class DisposingCommand<T> : CommandBase<T>, IDisposable
 	{
@@ -149,7 +146,7 @@ namespace DragonSpark.Runtime
 			this.template = template;
 		}
 
-		public override void Execute( T parameter )
+		public override void Execute( [Optional]T parameter )
 		{
 			using ( Logger.Default.Get( method ).TimeOperation( template, method, parameter ) )
 			{
@@ -182,7 +179,7 @@ namespace DragonSpark.Runtime
 			this.command = command;
 		}
 
-		public override void Execute( T parameter ) => command( parameter );
+		public override void Execute( [Optional]T parameter ) => command( parameter );
 	}
 
 	public class ProjectedCommand<T> : CommandBase<T>
@@ -198,7 +195,7 @@ namespace DragonSpark.Runtime
 			this.projection = projection;
 		}
 
-		public override void Execute( T parameter ) => command.Execute( projection( parameter ) );
+		public override void Execute( [Optional]T parameter ) => command.Execute( projection( parameter ) );
 	}
 
 	public class DecoratedCommand : DecoratedCommand<object>
@@ -217,50 +214,6 @@ namespace DragonSpark.Runtime
 		public DecoratedCommand( ICommand<T> inner, Coerce<T> coercer, ISpecification<T> specification ) : base( inner.ToDelegate(), coercer, specification ) {}
 	}
 
-	/*public class AutoValidatingCommand<T> : ICommand<T>
-	{
-		readonly IAutoValidationController controller;
-		readonly ICommand<T> inner;
-
-		public AutoValidatingCommand( ICommand<T> inner ) : this( new AutoValidationController( new CommandAdapter<T>( inner ) ), inner ) {}
-
-		public AutoValidatingCommand( IAutoValidationController controller, ICommand<T> inner )
-		{
-			this.controller = controller;
-			this.inner = inner;
-		}
-
-		event EventHandler ICommand.CanExecuteChanged
-		{
-			add { inner.CanExecuteChanged += value; }
-			remove { inner.CanExecuteChanged -= value; }
-		}
-
-		public bool CanExecute( object parameter ) => controller.IsValid( parameter );
-
-		public void Execute( object parameter ) => controller.Execute( parameter );
-
-		public bool CanExecute( T parameter ) => controller.IsValid( parameter );
-
-		public void Execute( T parameter ) => controller.Execute( parameter );
-		public void Update() => inner.Update();
-	}*/
-
-	/*public class ServiceCoercer<T> : CoercerBase<T>
-	{
-		public static ServiceCoercer<T> Default { get; } = new ServiceCoercer<T>();
-		ServiceCoercer() : this( GlobalServiceProvider.GetService<object> ) {}
-
-		readonly Func<Type, object> source;
-
-		public ServiceCoercer( Func<Type, object> source )
-		{
-			this.source = source;
-		}
-
-		protected override T PerformCoercion( object parameter ) => (T)source( typeof(T) );
-	}*/
-
 	public abstract class CommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate { };
@@ -273,7 +226,7 @@ namespace DragonSpark.Runtime
 
 		protected CommandBase( ISpecification<T> specification ) : this( Defaults<T>.Coercer, specification ) {}
 
-		protected CommandBase( Coerce<T> coercer, [Required] ISpecification<T> specification )
+		protected CommandBase( Coerce<T> coercer, ISpecification<T> specification )
 		{
 			this.coercer = coercer;
 			this.specification = specification;
@@ -281,12 +234,12 @@ namespace DragonSpark.Runtime
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
-		bool ICommand.CanExecute( object parameter ) => Coerce( parameter );
-		bool ISpecification.IsSatisfiedBy( object parameter ) => Coerce( parameter );
-		protected virtual bool Coerce( object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
+		bool ICommand.CanExecute( [Optional]object parameter ) => Coerce( parameter );
+		bool ISpecification.IsSatisfiedBy( [Optional]object parameter ) => Coerce( parameter );
+		protected virtual bool Coerce( [Optional]object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
 		public virtual bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
 
-		void ICommand.Execute( object parameter ) => Execute( coercer( parameter ) );
+		void ICommand.Execute( [Optional]object parameter ) => Execute( coercer( parameter ) );
 
 		public abstract void Execute( T parameter );
 	}

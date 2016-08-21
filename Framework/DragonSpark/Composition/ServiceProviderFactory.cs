@@ -86,7 +86,7 @@ namespace DragonSpark.Composition
 			this.context = context;
 		}
 
-		public ImmutableArray<T> GetExports<T>( string name ) => context.GetExports<T>( name ).WhereAssigned().Prioritize().ToImmutableArray();
+		public ImmutableArray<T> GetExports<T>( string name = null ) => context.GetExports<T>( name ).WhereAssigned().Prioritize().ToImmutableArray();
 	}
 
 	public sealed class ServiceLocator : IServiceProvider

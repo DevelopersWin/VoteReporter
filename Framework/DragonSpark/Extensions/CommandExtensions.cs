@@ -3,6 +3,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
+using System.Runtime.InteropServices;
 using Defaults = DragonSpark.Sources.Defaults;
 using ICommand = System.Windows.Input.ICommand;
 
@@ -29,7 +30,7 @@ namespace DragonSpark.Extensions
 		}
 
 		// public static FixedCommand<Func<T>> Fixed<T>( this ICommand<Func<T>> @this, T parameter ) => new FixedCommand<Func<T>>( @this, new FixedFactory<T>( parameter ).Create );
-		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, T parameter ) => new FixedCommand<T>( @this, parameter );
+		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, [Optional]T parameter ) => new FixedCommand<T>( @this, parameter );
 		
 		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => DelegateCache<T>.Default.Get( @this );
 		sealed class DelegateCache<T> : Cache<ICommand<T>, Action<T>>

@@ -1,6 +1,5 @@
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Sources.Parameterized;
-using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 using Serilog.Formatting.Display;
 using System;
@@ -20,7 +19,7 @@ namespace DragonSpark.Diagnostics
 
 		public IEnumerable<LogEvent> Events => source.ToArray().Reverse().ToArray();
 
-		public void Emit( [Required]LogEvent logEvent ) => source.Push( logEvent );
+		public void Emit( LogEvent logEvent ) => source.Push( logEvent );
 	}
 
 	public sealed class LogEventTextFactory : ParameterizedSourceBase<LogEvent, string>

@@ -1,12 +1,11 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Sources
 {
 	public class StackCommand<T> : DisposingCommand<T>
 	{
-		public StackCommand( [Required]IStack<T> stack )
+		public StackCommand( IStack<T> stack )
 		{
 			Stack = stack;
 		}

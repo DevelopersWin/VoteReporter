@@ -4,7 +4,6 @@ using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -21,11 +20,11 @@ namespace DragonSpark.TypeSystem
 		
 		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
 		readonly Func<Type, Type[]> getTypeArguments;
-		public TypeAdapter( [Required]Type type ) : this( type, type.GetTypeInfo() ) {}
+		public TypeAdapter( Type type ) : this( type, type.GetTypeInfo() ) {}
 
-		public TypeAdapter( [Required]TypeInfo info ) : this( info.AsType(), info ) {}
+		public TypeAdapter( TypeInfo info ) : this( info.AsType(), info ) {}
 
-		public TypeAdapter( [Required]Type type,  [Required]TypeInfo info )
+		public TypeAdapter( Type type, TypeInfo info )
 		{
 			Type = type;
 			Info = info;
@@ -45,10 +44,6 @@ namespace DragonSpark.TypeSystem
 
 		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( Specification ).ToArray();
 
-		//[Freeze]
-		// public bool IsDefined<T>( [Required] bool inherited = false ) where T : Attribute => Info.IsDefined( typeof(T), inherited );
-
-		
 		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
 				InstanceConstructors.Default.Get( Info )
 				.Introduce( parameterTypes, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )

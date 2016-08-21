@@ -22,7 +22,7 @@ namespace DragonSpark.Setup
 {
 	public interface IExportProvider
 	{
-		ImmutableArray<T> GetExports<T>( string name );
+		ImmutableArray<T> GetExports<T>( string name = null );
 	}
 
 	public class Exports : Scope<IExportProvider>
@@ -36,7 +36,7 @@ namespace DragonSpark.Setup
 		public static DefaultExportProvider Default { get; } = new DefaultExportProvider();
 		DefaultExportProvider() {}
 
-		public ImmutableArray<T> GetExports<T>( string name ) => Items<T>.Immutable;
+		public ImmutableArray<T> GetExports<T>( string name = null ) => Items<T>.Immutable;
 	}
 
 	public interface ICommandSource : IItemSource<ICommand> {}
@@ -49,14 +49,6 @@ namespace DragonSpark.Setup
 		public TypeSource( IEnumerable<Type> items ) : base( items ) {}
 	}
 
-	/*public class CompositeTypeSource : TypeSource
-	{
-		public CompositeTypeSource( IEnumerable<Type> items ) : base( items.Fixed() ) {}
-		public CompositeTypeSource() : this( Items<ITypeSource>.Default ) {}
-
-		public CompositeTypeSource( params ITypeSource[] sources ) : base( sources.Select( source => source.Get() ).Concat() ) {}
-	}*/
-
 	public sealed class ServiceProviderFactory : ConfigurableFactoryBase<IServiceProvider>
 	{
 		public static ServiceProviderFactory Default { get; } = new ServiceProviderFactory();
@@ -64,74 +56,6 @@ namespace DragonSpark.Setup
 
 		public override IServiceProvider Get() => base.Get().Cached();
 	}
-
-	/*public class ServiceProviderConfigurator : ConfigurationSource<IServiceProvider>
-	{
-		public static ServiceProviderConfigurator Default { get; } = new ServiceProviderConfigurator();
-
-		protected override IEnumerable<ITransformer<IServiceProvider>> From()
-		{
-			yield return Composition.ServiceProviderFactory.Default;
-		}
-	}*/
-
-	/*public static class ApplicationExtensions
-	{
-		public static IApplication<T> AsExecuted<T>( this IApplication<T> @this, T arguments )
-		{
-			using ( var command = new ExecuteApplicationCommand<T>( @this ) )
-			{
-				command.Execute( arguments );
-			}
-			return @this;
-		}
-	}*/
-
-	/*public class ExecuteApplicationCommand<T> : DisposingCommand<T>
-	{
-		readonly IApplication<T> application;
-		readonly AssignServiceProvider assign;
-
-		public ExecuteApplicationCommand( [Required]IApplication<T> application, IServiceProvider current = null ) : this( application, new AssignServiceProvider( current ) ) {}
-
-		public ExecuteApplicationCommand( [Required]IApplication<T> application, AssignServiceProvider assign )
-		{
-			this.application = application;
-			this.assign = assign;
-		}
-
-		public override void Execute( T parameter )
-		{
-			assign.Execute( application );
-			application.Execute( parameter );
-			var repository = application.Get<IDisposableRepository>();
-			if ( repository != null )
-			{
-				application.AssociateForDispose( repository );
-			}
-		}
-
-		protected override void OnDispose()
-		{
-			application.Dispose();
-			assign.Dispose();
-		}
-	}*/
-
-	/*public static class ActivationProperties
-	{
-		public static ICache<bool> Default { get; } = new SourceCache<bool>();
-
-		public static ICache<Type> Factory { get; } = new Cache<Type>();
-
-		public sealed class IsActivatedInstanceSpecification : GuardedSpecificationBase<object>
-		{
-			public static IsActivatedInstanceSpecification Default { get; } = new IsActivatedInstanceSpecification();
-			IsActivatedInstanceSpecification() {}
-
-			public override bool IsSatisfiedBy( object parameter ) => Instance.Get( parameter ) || new[] { parameter, Factory.Get( parameter ) }.WhereAssigned().Any( o => o.Has<SharedAttribute>() );
-		}
-	}*/
 
 	public sealed class Instances : Scope<IServiceRepository>
 	{
@@ -170,9 +94,9 @@ namespace DragonSpark.Setup
 
 	public class InstanceRegistrationRequest : LocateTypeRequest
 	{
-		public InstanceRegistrationRequest( [Required]object instance, string name = null ) : this( instance.GetType(), instance, name ) {}
+		public InstanceRegistrationRequest( object instance, string name = null ) : this( instance.GetType(), instance, name ) {}
 
-		public InstanceRegistrationRequest( Type type, [Required]object instance, string name = null ) : base( type, name )
+		public InstanceRegistrationRequest( Type type, object instance, string name = null ) : base( type, name )
 		{
 			Instance = instance;
 		}

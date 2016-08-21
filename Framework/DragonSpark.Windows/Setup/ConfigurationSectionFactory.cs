@@ -1,9 +1,8 @@
 using DragonSpark.Extensions;
-using PostSharp.Patterns.Contracts;
+using DragonSpark.Sources;
 using System;
 using System.Configuration;
 using System.Linq;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -13,7 +12,7 @@ namespace DragonSpark.Windows.Setup
 
 		public ConfigurationSectionFactory() : this( ConfigurationManager.GetSection ) {}
 
-		public ConfigurationSectionFactory( [Required]Func<string, object> factory )
+		public ConfigurationSectionFactory( Func<string, object> factory )
 		{
 			this.factory = factory;
 		}
