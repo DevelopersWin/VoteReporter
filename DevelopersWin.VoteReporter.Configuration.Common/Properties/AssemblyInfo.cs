@@ -1,9 +1,7 @@
 ﻿using DragonSpark;
-using DragonSpark.ComponentModel;
 using DragonSpark.Setup.Registration;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Aspects;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -39,4 +37,4 @@ using DragonSpark.Aspects;
 [assembly: AssemblyFileVersion( "1.0.0.0" )]
 [assembly: Registration( Priority.BeforeNormal )]
 
-[assembly: ApplyDefaultValues]
+// [assembly: ApplyDefaultValues]

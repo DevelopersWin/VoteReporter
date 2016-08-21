@@ -1,5 +1,4 @@
-﻿using DragonSpark.Aspects;
-using DragonSpark.Testing.Framework;
+﻿using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
 using System.Reflection;
@@ -37,11 +36,10 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion( "2016.2.1.1" )]
 [assembly: AssemblyFileVersion( "2016.2.1.1" )]
-[assembly: Application]
 
+[assembly: Application]
 [assembly: AssemblyHint( "DragonSpark.Testing" )]
 
-
-[assembly: ApplyDefaultValues]
+// [assembly: ApplyDefaultValues]
 // [assembly: DisposeAssociatedAspect]
 [assembly: TestingMethodAspect]

@@ -1,5 +1,4 @@
 ﻿using DragonSpark;
-using DragonSpark.Aspects;
 using DragonSpark.Setup.Registration;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -48,5 +47,5 @@ using System.Windows.Markup;
 // [assembly: Include( typeof( Setup ) )]
 
 // [assembly: TypeForwardedTo( typeof(AmbientAttribute) )]
-[assembly: ApplyDefaultValues]
+// [assembly: ApplyDefaultValues]
 // [assembly: DisposeAssociatedAspect]

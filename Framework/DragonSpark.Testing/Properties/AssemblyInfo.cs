@@ -2,7 +2,6 @@
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-using DragonSpark.Aspects;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using System.Reflection;
@@ -25,6 +24,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion( "2016.2.1.1" )]
 [assembly: Application]
 
-[assembly: ApplyDefaultValues]
+// [assembly: ApplyDefaultValues]
 // [assembly: DisposeAssociatedAspect]
 [assembly: TestingMethodAspect]

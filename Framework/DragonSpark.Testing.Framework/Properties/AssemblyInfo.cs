@@ -1,5 +1,4 @@
 ﻿using DragonSpark;
-using DragonSpark.Aspects;
 using DragonSpark.Setup.Registration;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -39,5 +38,5 @@ using System.Windows.Markup;
 [assembly: AssemblyFileVersion( "2016.2.1.1" )]
 [assembly: XmlnsDefinition( "http://framework.dragonspark.us", "DragonSpark.Testing.Framework" )]
 [assembly: Registration( Priority.Lower )]
-[assembly: ApplyDefaultValues]
+// [assembly: ApplyDefaultValues]
 // [assembly: DisposeAssociatedAspect]
