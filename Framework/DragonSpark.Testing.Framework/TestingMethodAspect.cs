@@ -1,9 +1,9 @@
+using DragonSpark.Aspects;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Setup;
 using PostSharp.Aspects;
-using SerilogTimings.Extensions;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -11,19 +11,18 @@ using Xunit;
 
 namespace DragonSpark.Testing.Framework
 {
-	[Serializable, LinesOfCodeAvoided( 8 )]
-	public sealed class TestingMethodAspect : MethodInterceptionAspect
+	[LinesOfCodeAvoided( 8 )]
+	public sealed class TestingMethodAspect : TimeAttributeBase
 	{
+		public TestingMethodAspect() : base( "Executing Test Method '{@Method}'" ) {}
+
 		public override bool CompileTimeValidate( MethodBase method ) => method.Has<FactAttribute>();
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			using ( new PurgingContext() )
 			{
-				using ( Logger.Instance.Get( args.Method ).TimeOperation( "Executing Test Method '{@Method}'", args.Method ) )
-				{
-					base.OnInvoke( args );
-				}
+				base.OnInvoke( args );
 			}
 			
 			var disposable = (IDisposable)ApplicationServices.Instance.Get() ?? ExecutionContext.Instance.Get();

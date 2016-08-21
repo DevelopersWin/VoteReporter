@@ -40,7 +40,6 @@
   <ItemGroup>
     <Compile Include="Configuration\ConfigurationTests.cs" />
     <Compile Include="Diagnostics\ExceptionDetailsTests.cs" />
-    <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
     <Compile Include="Diagnostics\ProfilerFactoryTests.cs" />
     <Compile Include="Io\FileSystemTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
