@@ -102,6 +102,15 @@ namespace DragonSpark.Sources
 			}
 		}
 
+		public static Func<TParameter, TResult> Timed<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) => @this.ToSourceDelegate().Timed();
+		public static Func<TParameter, TResult> Timed<TParameter, TResult>( this Func<TParameter, TResult> @this ) => Timed( @this, Defaults.ParameterizedTimerTemplate );
+		public static Func<TParameter, TResult> Timed<TParameter, TResult>( this Func<TParameter, TResult> @this, string template ) => new TimedDelegatedSource<TParameter, TResult>( @this, template ).Get;
+
+		public static Func<T> Timed<T>( this ISource<T> @this ) => @this.ToDelegate().Timed();
+		public static Func<T> Timed<T>( this Func<T> @this ) => Timed( @this, Defaults.TimerTemplate );
+		public static Func<T> Timed<T>( this Func<T> @this, string template ) => new TimedDelegatedSource<T>( @this, template ).Get;
+		
+
 		public static IScope<T> ToScope<T>( this IParameterizedSource<object, T> @this ) => @this.ToSourceDelegate().ToScope();
 		public static IScope<T> ToScope<T>( this Func<object, T> @this ) => Scopes<T>.Default.Get( @this );
 		sealed class Scopes<T> : Cache<Func<object, T>, IScope<T>>
@@ -135,6 +144,7 @@ namespace DragonSpark.Sources
 			}
 		}*/
 
+		
 
 		public static IEnumerable<T> GetEnumerable<T>( this ISource<ImmutableArray<T>> @this ) => EnumerableSource<T>.Sources.Get( @this )();
 		sealed class EnumerableSource<T> : SourceBase<IEnumerable<T>>

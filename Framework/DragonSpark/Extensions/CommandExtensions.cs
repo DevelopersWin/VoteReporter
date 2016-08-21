@@ -3,6 +3,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
+using Defaults = DragonSpark.Sources.Defaults;
 using ICommand = System.Windows.Input.ICommand;
 
 namespace DragonSpark.Extensions
@@ -93,5 +94,9 @@ namespace DragonSpark.Extensions
 
 			public override void Execute( T parameter ) => action();
 		}
+
+		public static Action<T> Timed<T>( this ICommand<T> @this ) => @this.ToDelegate().Timed();
+		public static Action<T> Timed<T>( this Action<T> @this ) => Timed( @this, Defaults.ParameterizedTimerTemplate );
+		public static Action<T> Timed<T>( this Action<T> @this, string template ) => new TimedDelegatedCommand<T>( @this, template ).Execute;
 	}
 }

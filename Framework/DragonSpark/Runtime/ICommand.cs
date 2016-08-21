@@ -1,13 +1,16 @@
 using DragonSpark.Activation;
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using PostSharp.Patterns.Contracts;
+using SerilogTimings.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 
@@ -132,12 +135,38 @@ namespace DragonSpark.Runtime
 		protected virtual void OnDispose() {}
 	}
 
-	/*public class DelegatedCommand : DelegatedCommand<object>
+	
+	public sealed class TimedDelegatedCommand<T> : DelegatedCommand<T>
 	{
-		public DelegatedCommand( Action action ) : base( o => action(), Specifications.Specifications.Always ) {}
-	}*/
+		readonly MethodBase method;
+		readonly string template;
 
-	// [AutoValidation( false )]
+		public TimedDelegatedCommand( Action<T> action, string template ) : this( action, action.GetMethodInfo(), template ) {}
+
+		public TimedDelegatedCommand( Action<T> action, MethodBase method, string template ) : base( action )
+		{
+			this.method = method;
+			this.template = template;
+		}
+
+		public override void Execute( T parameter )
+		{
+			using ( Logger.Instance.Get( method ).TimeOperation( template, method, parameter ) )
+			{
+				base.Execute( parameter );
+			}
+		}
+
+		/*public override TResult Get( TParameter parameter )
+		{
+			using ( Logger.Instance.Get( method ).TimeOperation( template, method, parameter ) )
+			{
+				return base.Get( parameter );
+			}
+		}*/
+	}
+
+
 	public class DelegatedCommand<T> : CommandBase<T>
 	{
 		readonly Action<T> command;
