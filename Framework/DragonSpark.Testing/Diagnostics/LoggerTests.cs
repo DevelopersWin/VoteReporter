@@ -21,7 +21,7 @@ namespace DragonSpark.Testing.Diagnostics
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested]
 	public class LoggerTests
 	{
-		[Theory, AutoData, IncludeParameterTypes( typeof(MethodFormatter) ), FrameworkTypes]
+		[Theory, AutoData, FrameworkTypes]
 		public void FormattingAsExpected( [Service]CompositionContext context, string text )
 		{
 			var logger = context.GetExport<ILogger>();

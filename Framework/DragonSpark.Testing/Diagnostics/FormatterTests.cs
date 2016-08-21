@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Diagnostics
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class FormatterTests
 	{
-		[Theory, AutoData, IncludeParameterTypes( typeof(MethodFormatter) ), FrameworkTypes]
+		[Theory, AutoData, FrameworkTypes]
 		public void MethodFormatsAsExpected( [Service]Formatter sut )
 		{
 			var method = MethodBase.GetCurrentMethod();

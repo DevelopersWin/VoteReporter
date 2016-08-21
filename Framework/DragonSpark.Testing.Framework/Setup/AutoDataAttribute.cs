@@ -1,5 +1,6 @@
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Composition;
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
@@ -70,7 +71,7 @@ namespace DragonSpark.Testing.Framework.Setup
 
 	public class FrameworkTypesAttribute : TypeProviderAttributeBase
 	{
-		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(EnableServicesCommand), typeof(MetadataCommand) ) {}
+		public FrameworkTypesAttribute() : base( typeof(InitializationCommand), typeof(Configure), typeof(EnableServicesCommand), typeof(MetadataCommand), typeof(MethodFormatter), typeof(TaskContextFormatter) ) {}
 	}
 
 	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Method )]

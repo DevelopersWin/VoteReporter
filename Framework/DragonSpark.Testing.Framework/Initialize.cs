@@ -1,5 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources;
 using DragonSpark.Windows.Runtime;
 using PostSharp.Aspects;
 using System;
@@ -7,18 +8,13 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Testing.Framework
 {
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution()
-		{
-			// Activation.Execution.Context.Assign( ExecutionContext.Instance );
-			Command.Instance.Run();
-		}
+		public static void Execution() => Command.Instance.Run();
 
 		class Command : DragonSpark.Setup.Setup
 		{
@@ -29,7 +25,7 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class Identification : TaskLocalStore<Identifier>
+	public sealed class Identification : TaskLocalStore<Identifier>
 	{
 		public static Identification Instance { get; } = new Identification();
 		Identification() {}
@@ -49,7 +45,7 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class ExecutionContext : SourceBase<TaskContext>
+	public sealed class ExecutionContext : SourceBase<TaskContext>
 	{
 		public static ISource<TaskContext> Instance { get; } = new ExecutionContext( Identification.Instance );
 
@@ -76,7 +72,18 @@ namespace DragonSpark.Testing.Framework
 		}
 	}
 
-	public class TaskContext : Disposable
+	public sealed class TaskContextFormatter : IFormattable
+	{
+		readonly TaskContext context;
+		public TaskContextFormatter( TaskContext context )
+		{
+			this.context = context;
+		}
+
+		public string ToString( string format, IFormatProvider formatProvider ) => context.Origin.ToString();
+	}
+
+	public sealed class TaskContext : Disposable
 	{
 		readonly Action<Identifier> complete;
 
