@@ -1,20 +1,8 @@
-using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized.Caching;
-using PostSharp.Aspects;
-using PostSharp.Aspects.Configuration;
-using PostSharp.Aspects.Dependencies;
-using PostSharp.Aspects.Serialization;
-using PostSharp.Extensibility;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.Runtime
 {
-	public sealed class AssociatedDisposables : ListCache<IDisposable, IDisposable>
+	/*public sealed class AssociatedDisposables : ListCache<IDisposable, IDisposable>
 	{
 		public static AssociatedDisposables Default { get; } = new AssociatedDisposables();
 		AssociatedDisposables() {}
@@ -24,9 +12,9 @@ namespace DragonSpark.Runtime
 	{
 		public static ConfigureAssociatedDisposables Default { get; } = new ConfigureAssociatedDisposables();
 		ConfigureAssociatedDisposables() {}
-	}
+	}*/
 
-	public static class DisposableExtensions
+	/*public static class DisposableExtensions
 	{
 		public static T Configured<T>( this T @this, bool on ) where T : IDisposable
 		{
@@ -42,7 +30,7 @@ namespace DragonSpark.Runtime
 			AssociatedDisposables.Default.Get( @this ).AddRange( associated );
 			return @this;
 		}
-	}
+	}*/
 
 	public sealed class DisposeDisposableCommand : DisposingCommand<object>
 	{
@@ -57,7 +45,7 @@ namespace DragonSpark.Runtime
 		protected override void OnDispose() => disposable.Dispose();
 	}
 
-	public sealed class DisposeAssociatedCommand : CommandBase<IDisposable>
+	/*public sealed class DisposeAssociatedCommand : CommandBase<IDisposable>
 	{
 		public static DisposeAssociatedCommand Default { get; } = new DisposeAssociatedCommand( AssociatedDisposables.Default );
 
@@ -114,5 +102,5 @@ namespace DragonSpark.Runtime
 				command( disposable );
 			}
 		}
-	}
+	}*/
 }

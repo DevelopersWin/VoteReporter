@@ -126,8 +126,6 @@ namespace DragonSpark.Aspects.Validation
 			this.validator = validator;
 		}
 
-		IParameterAwareHandler Handler { get; set; }
-
 		public bool IsSatisfiedBy( object parameter ) => Handler?.Handles( parameter ) ?? false;
 
 		bool IsMarked( object parameter )
@@ -165,18 +163,13 @@ namespace DragonSpark.Aspects.Validation
 				return handled;
 			}
 
-			var result = IsMarked( parameter ) || Validate( parameter ) ? proceed() : null;
+			var result = IsMarked( parameter ) || validator.IsSatisfiedBy( parameter ) ? proceed() : null;
 			Clear();
 			return result;
 		}
-		
-		bool Validate( object parameter )
-		{
-			var result = validator.IsSatisfiedBy( parameter );
-			//Clear();
-			return result;
-		}
 
+		IParameterAwareHandler Handler { get; set; }
+		
 		public void Register( IAspect aspect )
 		{
 			var methodAware = aspect as IMethodAware;

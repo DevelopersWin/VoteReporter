@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized.Caching;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Runtime
 {
@@ -147,7 +147,7 @@ namespace DragonSpark.Runtime
 		public void Assign( object first, bool second ) => value.Enable( first, second );
 	}*/
 
-	public class Assignment<T1, T2> : IDisposable
+	public class Assignment<T1, T2> : Disposable
 	{
 		readonly IAssign<T1, T2> assign;
 		readonly Value<T1> first;
@@ -164,10 +164,10 @@ namespace DragonSpark.Runtime
 			assign.Assign( first.Start, second.Start );
 		}
 
-		public void Dispose() => assign.Assign( first.Finish, second.Finish );
+		protected override void OnDispose( bool disposing ) => assign.Assign( first.Finish, second.Finish );
 	}
 
-	public class Assignment<T> : IDisposable
+	public class Assignment<T> : Disposable
 	{
 		readonly IAssign<T> assign;
 		readonly Value<T> first;
@@ -180,6 +180,6 @@ namespace DragonSpark.Runtime
 			assign.Assign( first.Start );
 		}
 
-		public void Dispose() => assign.Assign( first.Finish );
+		protected override void OnDispose( bool disposing ) => assign.Assign( first.Finish );
 	}
 }

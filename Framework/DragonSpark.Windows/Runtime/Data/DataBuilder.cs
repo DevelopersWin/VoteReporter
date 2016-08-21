@@ -1,21 +1,20 @@
 using DragonSpark.Sources.Parameterized;
-using PostSharp.Patterns.Contracts;
 using System;
 using System.Xml;
 using System.Xml.XPath;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
-	public abstract class DocumentFactory<TParameter> : ParameterizedSourceBase<TParameter, IXPathNavigable>
+	public abstract class DocumentFactory<T> : ParameterizedSourceBase<T, IXPathNavigable>
 	{
-		readonly Action<XmlDocument, TParameter> load;
+		readonly Action<XmlDocument, T> load;
 
-		protected DocumentFactory( [Required]Action<XmlDocument, TParameter> load )
+		protected DocumentFactory( Action<XmlDocument, T> load )
 		{
 			this.load = load;
 		}
 
-		public override IXPathNavigable Get( TParameter parameter )
+		public override IXPathNavigable Get( T parameter )
 		{
 			var result = new XmlDocument();
 			load( result, parameter );
@@ -26,16 +25,12 @@ namespace DragonSpark.Windows.Runtime.Data
 	public class DocumentFactory : DocumentFactory<string>
 	{
 		public static DocumentFactory Default { get; } = new DocumentFactory();
-
-		public DocumentFactory() : base( ( document, data ) => document.LoadXml( data ) )
-		{}
+		DocumentFactory() : base( ( document, data ) => document.LoadXml( data ) ) {}
 	}
 
-	public class RemoteDocumentFactory : DocumentFactory<Uri>
+	public class DocumentResourceFactory : DocumentFactory<Uri>
 	{
-		public static RemoteDocumentFactory Default { get; } = new RemoteDocumentFactory();
-
-		public RemoteDocumentFactory() : base( ( document, data ) => document.Load( data.ToString() ) )
-		{}
+		public static DocumentResourceFactory Default { get; } = new DocumentResourceFactory();
+		DocumentResourceFactory() : base( ( document, data ) => document.Load( data.ToString() ) ) {}
 	}
 }

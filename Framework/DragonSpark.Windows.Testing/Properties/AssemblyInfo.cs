@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;
@@ -44,5 +43,5 @@ using System.Runtime.InteropServices;
 
 
 [assembly: ApplyDefaultValues]
-[assembly: DisposeAssociatedAspect]
+// [assembly: DisposeAssociatedAspect]
 [assembly: TestingMethodAspect]

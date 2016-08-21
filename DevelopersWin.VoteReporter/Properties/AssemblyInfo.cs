@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Runtime;
 using DragonSpark.Setup.Registration;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -38,4 +37,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion( "1.0.0.0" )]
 [assembly: Registration]
 [assembly: ApplyDefaultValues]
-[assembly: DisposeAssociatedAspect]
+// [assembly: DisposeAssociatedAspect]

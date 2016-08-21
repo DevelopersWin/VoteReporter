@@ -58,7 +58,6 @@
     <Compile Include="Aspects\OfTypeAttribute.cs" />
     <Compile Include="Aspects\TimeAttribute.cs" />
     <Compile Include="Aspects\RecursionGuardAttribute.cs" />
-    <Compile Include="Aspects\Runtime.cs" />
     <Compile Include="Aspects\Validation\Construction.cs" />
     <Compile Include="Aspects\Validator.cs" />
     <Compile Include="ComponentModel\DefaultValuePropertySpecification.cs" />

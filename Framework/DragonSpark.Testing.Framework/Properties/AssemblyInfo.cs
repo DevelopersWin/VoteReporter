@@ -1,6 +1,5 @@
 ﻿using DragonSpark;
 using DragonSpark.Aspects;
-using DragonSpark.Runtime;
 using DragonSpark.Setup.Registration;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -41,4 +40,4 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition( "http://framework.dragonspark.us", "DragonSpark.Testing.Framework" )]
 [assembly: Registration( Priority.Lower )]
 [assembly: ApplyDefaultValues]
-[assembly: DisposeAssociatedAspect]
+// [assembly: DisposeAssociatedAspect]

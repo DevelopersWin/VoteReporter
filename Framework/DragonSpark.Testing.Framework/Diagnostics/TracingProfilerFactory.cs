@@ -1,10 +1,4 @@
-﻿using DragonSpark.Runtime;
-using Serilog;
-using System;
-using System.Diagnostics;
-using DragonSpark.Sources.Parameterized.Caching;
-
-namespace DragonSpark.Testing.Framework.Diagnostics
+﻿namespace DragonSpark.Testing.Framework.Diagnostics
 {
 	/*public class ProfilerFactory : Windows.Diagnostics.ProfilerFactory
 	{
@@ -29,7 +23,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		}
 	}*/
 
-	public static class Tracing
+	/*public static class Tracing
 	{
 		// public static IAttachedProperty<ILogger, IList<TraceListener>> Listeners { get; } = new AttachedProperty<ILogger, IList<TraceListener>>( logger => new List<TraceListener>() );
 
@@ -42,7 +36,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 	{
 		public TracingAssignment( TraceListener first ) : base( new CollectionAssign<TraceListener>( Trace.Listeners ), Assignments.From( first ), new Value<CollectionAction>( CollectionAction.Add, CollectionAction.Remove ) ) {}
 		// public TracingAssignment( IAssign<TraceListener, CollectionAction> assign, Value<TraceListener> first, Value<CollectionAction> second ) : base( assign, first, second ) {}
-	}
+	}*/
 
 	/*public class TraceAwareProfilerFactory : FactoryBase<ILogger, IDisposable>
 	{
@@ -53,7 +47,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 			return result;
 		}
 	}*/
-	
+
 	/*public class LoggingTraceListenerFactory : FactoryBase<ILogger, TraceListener>
 	{
 		public static LoggingTraceListenerFactory Default { get; } = new LoggingTraceListenerFactory();
@@ -61,7 +55,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		public override TraceListener Create( ILogger parameter ) => new SerilogTraceListener.SerilogTraceListener( parameter );
 	}*/
 
-	
+
 	/*public class LoggerTraceListenerTrackingCommand : DisposingCommand<ILogger>
 	{
 		readonly Func<ILogger, TraceListener> factory;

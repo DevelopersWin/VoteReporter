@@ -1,6 +1,5 @@
 ﻿using DragonSpark;
 using DragonSpark.Aspects;
-using DragonSpark.Runtime;
 using System;
 using System.Reflection;
 using System.Resources;
@@ -38,4 +37,4 @@ using System.Runtime.InteropServices;
 // [assembly: AddAspect( AttributeTargetAssemblies = "regex:^mscorlib", AttributeTargetTypes = "System.Collections.Collection`1", AttributeTargetMembers = "Add" )]
 
 [assembly: ApplyDefaultValues]
-[assembly: DisposeAssociatedAspect]
+// [assembly: DisposeAssociatedAspect]

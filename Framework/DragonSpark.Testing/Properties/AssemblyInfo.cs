@@ -3,7 +3,6 @@
 // associated with an assembly.
 
 using DragonSpark.Aspects;
-using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
 using DragonSpark.TypeSystem;
 using System.Reflection;
@@ -27,5 +26,5 @@ using System.Runtime.InteropServices;
 [assembly: Application]
 
 [assembly: ApplyDefaultValues]
-[assembly: DisposeAssociatedAspect]
+// [assembly: DisposeAssociatedAspect]
 [assembly: TestingMethodAspect]

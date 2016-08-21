@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Markup;
-using DragonSpark.Runtime;
 
 // using AmbientAttribute = hello::System.Windows.Markup.AmbientAttribute;
 
@@ -50,4 +49,4 @@ using DragonSpark.Runtime;
 
 // [assembly: TypeForwardedTo( typeof(AmbientAttribute) )]
 [assembly: ApplyDefaultValues]
-[assembly: DisposeAssociatedAspect]
+// [assembly: DisposeAssociatedAspect]
