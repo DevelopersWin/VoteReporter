@@ -1,5 +1,4 @@
 using DragonSpark.Activation;
-using DragonSpark.Extensions;
 using System.Data.Entity;
 
 namespace DragonSpark.Windows.Entity

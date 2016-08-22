@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Immutable;
-using System.Linq;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {

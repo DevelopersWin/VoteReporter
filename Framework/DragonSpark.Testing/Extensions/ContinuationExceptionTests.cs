@@ -2,12 +2,14 @@
 using DragonSpark.Testing.Objects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
 using Type = System.Type;
 
 namespace DragonSpark.Testing.Extensions
 {
+	[SuppressMessage( "ReSharper", "PossibleMultipleEnumeration" )]
 	public class ContinuationExceptionTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]

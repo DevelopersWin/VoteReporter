@@ -9,13 +9,13 @@ namespace DragonSpark.Composition
 	public sealed class ParameterizedSourceDelegateExporter : SourceDelegateExporterBase
 	{
 		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.Parameterized.ToSourceDelegate();
-		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.Default.Get;
+		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.DefaultNested.Get;
 
 		public ParameterizedSourceDelegateExporter() : base( DelegateSource, Default ) {}
 
 		sealed class Factory : ParameterizedSourceBase<ActivatorParameter, object>
 		{
-			public static Factory Default { get; } = new Factory();
+			public static Factory DefaultNested { get; } = new Factory();
 			Factory() {}
 
 			public override object Get( ActivatorParameter parameter ) => 

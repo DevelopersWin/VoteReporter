@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.ComponentModel;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Xunit;
+// ReSharper disable ValueParameterNotUsed
 
 namespace DragonSpark.Testing.Extensions
 {
@@ -82,14 +84,15 @@ namespace DragonSpark.Testing.Extensions
 
 		class ClassWithProperties
 		{
-			public string PropertyOne { get; set; }
+			public string PropertyOne { get; [UsedImplicitly] set; }
  
-			public int PropertyTwo { get; set; }
+			public int PropertyTwo { get; [UsedImplicitly] set; }
 
-			public object PropertyThree { get; set; }
+			public object PropertyThree { get; [UsedImplicitly] set; }
 
-			public string PropertyFour { get; set; }
+			public string PropertyFour { get; [UsedImplicitly] set; }
 
+			[UsedImplicitly]
 			public string this[ int index ]
 			{
 				get { return null; }
@@ -100,16 +103,16 @@ namespace DragonSpark.Testing.Extensions
 
 		class ClassWithDifferentProperties
 		{
-			public int PropertyOne { get; set; }
+			public int PropertyOne { get; [UsedImplicitly] set; }
 
-			public string PropertyTwo { get; set; }
+			public string PropertyTwo { get; [UsedImplicitly] set; }
 
-			public object PropertyThree { get; set; }
+			public object PropertyThree { get; [UsedImplicitly] set; }
 
-			public string PropertyFour { get; set; }
+			public string PropertyFour { get; [UsedImplicitly] set; }
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		void TryDispose( Disposable sut )
 		{
 			Assert.False( sut.Disposed );
@@ -143,7 +146,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.True( expected.Length == values.Count() && expected.All( x => values.Contains( x ) ) );
 		}*/
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		void AsValid( Class sut )
 		{
 			var applied = false;
@@ -152,7 +155,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.IsType<Class>( valid );
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		public void AsInvalid( string sut )
 		{
 			Assert.Throws<InvalidOperationException>( () => sut.AsValid<int>( i => Assert.True( false ) ) );
@@ -177,13 +180,13 @@ namespace DragonSpark.Testing.Extensions
 			//Assert.Null( Default<Generic<object>>.Item );
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		void With( ClassWithParameter sut, string message )
 		{
 			Assert.Equal( sut.Parameter, sut.With( x => x.Parameter, () => message ) );
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		void WithNullable( int supplied )
 		{
 			var item = new int?( supplied );
@@ -193,7 +196,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( supplied, value );
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		void WithSelf( int supplied, string message )
 		{
 			string item = null;
@@ -212,14 +215,14 @@ namespace DragonSpark.Testing.Extensions
 			Assert.NotNull( new Class().As<IInterface>() );
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		void AsTo( ClassWithParameter sut, string message )
 		{
 			var value = sut.AsTo<Class, object>( x => x, () => message );
 			Assert.Equal( value, message );
 		}
 
-		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		[Theory, AutoData]
 		void ConvertTo( Class sample )
 		{
 			Assert.Equal( true, "true".ConvertTo<bool>() );

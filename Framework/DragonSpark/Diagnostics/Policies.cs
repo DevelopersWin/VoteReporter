@@ -144,6 +144,6 @@ namespace DragonSpark.Diagnostics
 			this.source = source;
 		}
 
-		public override void Execute( T parameter ) => source().Execute( () => base.Execute( parameter ) );
+		public override void Execute( T parameter = default(T) ) => source().Execute( () => base.Execute( parameter ) );
 	}
 }

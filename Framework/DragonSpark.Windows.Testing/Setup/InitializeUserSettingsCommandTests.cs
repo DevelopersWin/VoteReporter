@@ -1,11 +1,11 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects.Properties;
 using DragonSpark.Windows.Setup;
+using JetBrains.Annotations;
 using System.Configuration;
 using System.Linq;
-using DragonSpark.Diagnostics.Logging;
 using Xunit;
 using Xunit.Abstractions;
 using Resources = DragonSpark.Windows.Properties.Resources;
@@ -92,7 +92,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 		class SettingsWithException : ApplicationSettingsBase
 		{
-			[UserScopedSetting]
+			[UserScopedSetting, UsedImplicitly]
 			public string HelloWorld
 			{
 				get { return (string)this[nameof(HelloWorld)]; }

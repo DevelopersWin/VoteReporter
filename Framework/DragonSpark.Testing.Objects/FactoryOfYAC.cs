@@ -5,13 +5,13 @@ using System.Composition;
 namespace DragonSpark.Testing.Objects
 {
 	[Export]
-	public class FactoryOfYAC : SourceBase<YetAnotherClass>
+	public class FactoryOfYac : SourceBase<YetAnotherClass>
 	{
 		readonly Func<YetAnotherClass> inner;
 
-		public FactoryOfYAC() : this( () => new YetAnotherClass() ) {}
+		public FactoryOfYac() : this( () => new YetAnotherClass() ) {}
 
-		FactoryOfYAC( Func<YetAnotherClass> inner )
+		FactoryOfYac( Func<YetAnotherClass> inner )
 		{
 			this.inner = inner;
 		}

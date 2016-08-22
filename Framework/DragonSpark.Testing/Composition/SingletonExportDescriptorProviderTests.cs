@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using System.Composition;
 using System.Composition.Hosting;
-using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition

@@ -33,13 +33,13 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static T Ensure<T, U>( this T @this, U item ) where T : ICollection<U>
+		/*public static T Ensure<T, U>( this T @this, U item ) where T : ICollection<U>
 		{
 			if ( !@this.Contains( item ) )
 			{
 				@this.Add( item );
 			}
 			return @this;
-		}
+		}*/
 	}
 }

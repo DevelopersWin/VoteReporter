@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.Sources.Parameterized;
+using System;
 
 namespace DragonSpark.Sources
 {

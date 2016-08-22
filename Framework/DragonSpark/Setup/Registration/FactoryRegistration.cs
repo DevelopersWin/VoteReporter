@@ -55,10 +55,8 @@ namespace DragonSpark.Setup.Registration
 
 	public abstract class DelegatesBase : FactoryCache<Type, Delegate>
 	{
-		protected DelegatesBase( Func<IServiceProvider> source ) : this( source, Specifications.Assigned ) {}
-		protected DelegatesBase( Func<IServiceProvider> source, ISpecification<Type> specification ) : this( source.Delegate<object>(), specification ) {}
-
-		DelegatesBase( Func<Type, object> locator, ISpecification<Type> specification, string name = "ToDelegate" ) : base( specification )
+		protected DelegatesBase( Func<IServiceProvider> source, string name ) : this( source.Delegate<object>(), Specifications.Assigned, name ) {}
+		protected DelegatesBase( Func<Type, object> locator, ISpecification<Type> specification, string name ) : base( specification )
 		{
 			Locator = locator;
 			Methods = GetType().Adapt().GenericFactoryMethods[ name ];
@@ -71,7 +69,7 @@ namespace DragonSpark.Setup.Registration
 	public class SourceDelegates : DelegatesBase
 	{
 		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Sources { get; } = new Cache<Func<IServiceProvider>, SourceDelegates>( func => new SourceDelegates( func ) );
-		SourceDelegates( Func<IServiceProvider> source ) : base( source, IsSourceSpecification.Default ) {}
+		SourceDelegates( Func<IServiceProvider> source ) : base( source.Delegate<object>(), IsSourceSpecification.Default, nameof(ToDelegate) ) {}
 
 		protected override Delegate Create( Type parameter ) => Methods.Make( ResultTypes.Default.Get( parameter ) ).Invoke<Delegate>( Locator( parameter ) );
 
@@ -81,7 +79,7 @@ namespace DragonSpark.Setup.Registration
 	public class ParameterizedSourceDelegates : DelegatesBase
 	{
 		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Sources { get; } = new Cache<Func<IServiceProvider>, ParameterizedSourceDelegates>( func => new ParameterizedSourceDelegates( func ) );
-		ParameterizedSourceDelegates( Func<IServiceProvider> source ) : base( source, IsParameterizedSourceSpecification.Default ) {}
+		ParameterizedSourceDelegates( Func<IServiceProvider> source ) : base( source.Delegate<object>(), IsParameterizedSourceSpecification.Default, nameof(ToDelegate) ) {}
 
 		protected override Delegate Create( Type parameter ) => 
 			Methods
@@ -98,7 +96,7 @@ namespace DragonSpark.Setup.Registration
 
 		readonly Func<Type, Delegate> factorySource;
 
-		ServiceProvidedParameterizedSourceDelegates( Func<Type, Delegate> factorySource, Func<IServiceProvider> provider ) : base( provider )
+		ServiceProvidedParameterizedSourceDelegates( Func<Type, Delegate> factorySource, Func<IServiceProvider> provider ) : base( provider, nameof(ToDelegate) )
 		{
 			this.factorySource = factorySource;
 		}

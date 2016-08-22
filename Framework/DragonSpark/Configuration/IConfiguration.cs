@@ -3,6 +3,7 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace DragonSpark.Configuration
@@ -85,14 +86,17 @@ namespace DragonSpark.Configuration
 		}
 	}
 
+	[SuppressMessage( "ReSharper", "PossibleInfiniteInheritance" )]
 	public interface IConfigurationScope<T> : IScope<ImmutableArray<ITransformer<T>>> {}
 
+	[SuppressMessage( "ReSharper", "PossibleInfiniteInheritance" )]
 	public class ConfigurationScope<T> : Scope<ImmutableArray<ITransformer<T>>>, IConfigurationScope<T>
 	{
-		public ConfigurationScope() : this( Items<ITransformer<T>>.Default ) {}
+		// public ConfigurationScope() : this( Items<ITransformer<T>>.Default ) {}
 		public ConfigurationScope( params ITransformer<T>[] configurators ) : base( new ConfigurationSource<T>( configurators ).Global() ) {}
 	}
 
+	[SuppressMessage( "ReSharper", "PossibleInfiniteInheritance" )]
 	public class ConfigurationSource<T> : SuppliedAndExportedItems<ITransformer<T>>
 	{
 		public ConfigurationSource( params ITransformer<T>[] configurators ) : base( configurators ) {}

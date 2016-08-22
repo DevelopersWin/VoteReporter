@@ -1,5 +1,4 @@
 using DragonSpark.Testing.Framework;
-using System.Diagnostics;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Windows.Testing.Setup
@@ -71,12 +70,12 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( result.IsCompleted );
 		}*/
 
-		class Mock
+		/*class Mock
 		{
 			public void Hello()
 			{
 				Debug.WriteLine( "Hello World!" );
 			}
-		}
+		}*/
 	}
 }

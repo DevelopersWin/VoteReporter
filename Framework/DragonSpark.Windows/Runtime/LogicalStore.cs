@@ -1,6 +1,6 @@
+using DragonSpark.Sources;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Windows.Runtime
 {

@@ -2,6 +2,7 @@
   "supports": {},
   "dependencies": {
     "AutoMapper": "5.1.1",
+    "JetBrains.Annotations": "10.1.5",
     "Microsoft.Composition": "1.0.30",
     "NReco.LambdaParser": "1.0.3",
     "Polly": "4.3.0",

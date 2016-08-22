@@ -1,8 +1,8 @@
+using DragonSpark.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using DragonSpark.Runtime;
 
 namespace DragonSpark.Windows.Runtime
 {

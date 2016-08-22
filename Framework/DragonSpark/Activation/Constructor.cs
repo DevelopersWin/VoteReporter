@@ -22,7 +22,7 @@ namespace DragonSpark.Activation
 		readonly Func<ConstructTypeRequest, ConstructorInfo> constructorSource;
 		readonly Func<ConstructorInfo, Invoke> activatorSource;
 
-		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, Invoke> activatorSource ) : base( Specification.Default )
+		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, Invoke> activatorSource ) : base( Specification.DefaultNested )
 		{
 			this.constructorSource = constructorSource;
 			this.activatorSource = activatorSource;
@@ -48,11 +48,11 @@ namespace DragonSpark.Activation
 
 		sealed class Specification : SpecificationBase<ConstructTypeRequest>
 		{
-			public static Specification Default { get; } = new Specification();
+			public static Specification DefaultNested { get; } = new Specification();
+			Specification() : this( ConstructorStore.Default ) {}
 
 			readonly ConstructorStore cache;
 
-			Specification() : this( ConstructorStore.Default ) {}
 			Specification( ConstructorStore cache ) : base( Coercer.Default.ToDelegate() )
 			{
 				this.cache = cache;

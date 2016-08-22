@@ -1,7 +1,7 @@
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Activation
 {

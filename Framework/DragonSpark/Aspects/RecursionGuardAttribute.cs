@@ -54,7 +54,7 @@ namespace DragonSpark.Aspects
 			var current = Current( args, 1 );
 			if ( current >= maxCallCount )
 			{
-				throw new InvalidOperationException( $"Recursion detected in method {new MethodFormatter(args.Method).ToString( null, null )}" );
+				throw new InvalidOperationException( $"Recursion detected in method {new MethodFormatter(args.Method).ToString()}" );
 			}
 
 			base.OnEntry( args );

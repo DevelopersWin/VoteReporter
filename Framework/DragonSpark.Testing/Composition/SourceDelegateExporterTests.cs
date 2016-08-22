@@ -1,11 +1,11 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
 using System;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
-using DragonSpark.Sources;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition
@@ -17,7 +17,6 @@ namespace DragonSpark.Testing.Composition
 		{
 			var parts = typeof(Source);
 			new AssignSystemPartsCommand( parts ).Run();
-			var temp = ApplicationParts.Default.Get().Types;
 			var container = new ContainerConfiguration().WithProvider( new SourceDelegateExporter() ).WithParts( parts ).CreateContainer();
 			var number = container.GetExport<Func<int>>();
 			Assert.Equal( 6776, number() );

@@ -1,6 +1,6 @@
-using System.Linq;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {

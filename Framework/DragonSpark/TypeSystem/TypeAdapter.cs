@@ -1,6 +1,5 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -62,7 +61,7 @@ namespace DragonSpark.TypeSystem
 
 		public Type[] GetHierarchy( bool includeRoot = true )
 		{
-			var builder = ArrayBuilder<Type>.GetInstance();
+			var builder = ImmutableArray.CreateBuilder<Type>();
 			builder.Add( Type );
 			var current = Info.BaseType;
 			while ( current != null )
@@ -73,7 +72,7 @@ namespace DragonSpark.TypeSystem
 				}
 				current = current.GetTypeInfo().BaseType;
 			}
-			var result = builder.ToArrayAndFree();
+			var result = builder.ToArray();
 			return result;
 		}
 

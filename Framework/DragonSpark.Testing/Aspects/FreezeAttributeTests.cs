@@ -1,9 +1,8 @@
 ﻿using DragonSpark.Aspects;
+using DragonSpark.Setup;
 using DragonSpark.Testing.Framework;
-using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Xunit2;
 using System;
-using DragonSpark.Setup;
 using Xunit;
 using Xunit.Abstractions;
 

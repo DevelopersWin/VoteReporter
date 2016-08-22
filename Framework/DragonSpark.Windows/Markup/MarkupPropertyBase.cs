@@ -1,5 +1,3 @@
-using PostSharp.Patterns.Contracts;
-
 namespace DragonSpark.Windows.Markup
 {
 	public abstract class MarkupPropertyBase : IMarkupProperty

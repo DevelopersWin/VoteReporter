@@ -1,10 +1,9 @@
 using DragonSpark.ComponentModel;
-using DragonSpark.Runtime;
+using DragonSpark.Sources;
 using DragonSpark.Testing.Objects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Testing.ComponentModel
 {

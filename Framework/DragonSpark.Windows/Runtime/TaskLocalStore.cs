@@ -1,6 +1,6 @@
 using DragonSpark.Extensions;
-using System.Threading;
 using DragonSpark.Sources;
+using System.Threading;
 
 namespace DragonSpark.Windows.Runtime
 {

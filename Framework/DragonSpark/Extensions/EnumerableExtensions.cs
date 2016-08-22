@@ -120,9 +120,9 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Prioritize<T>( this IEnumerable<T> @this, Func<T, IPriorityAware> locator ) => @this.OrderBy( locator, PriorityComparer.Default );
 
-		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, U> with, Func<U> defaultFunction = null ) => WithFirst( @this, Where<T>.Always, with, defaultFunction );
+		public static TTo WithFirst<TFrom, TTo>( this IEnumerable<TFrom> @this, Func<TFrom, TTo> with, Func<TTo> defaultFunction = null ) => WithFirst( @this, Where<TFrom>.Always, with, defaultFunction );
 
-		public static U WithFirst<T, U>( this IEnumerable<T> @this, Func<T, bool> where, Func<T, U> with, Func<U> defaultFunction = null ) => @this.WhereAssigned().FirstOrDefault( @where ).With( with, defaultFunction );
+		public static TTo WithFirst<TFrom, TTo>( this IEnumerable<TFrom> @this, Func<TFrom, bool> where, Func<TFrom, TTo> with, Func<TTo> defaultFunction = null ) => @this.WhereAssigned().FirstOrDefault( @where ).With( with, defaultFunction );
 
 		public static T Only<T>( this IEnumerable<T> @this ) => Only( @this, Where<T>.Always );
 

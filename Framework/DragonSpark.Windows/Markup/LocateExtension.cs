@@ -42,11 +42,11 @@ namespace DragonSpark.Windows.Markup
 	{
 		public static MockFactory Default { get; } = new MockFactory();
 
-		MockFactory() : base( Specification.Default ) {}
+		MockFactory() : base( Specification.DefaultNested ) {}
 
 		class Specification : SpecificationBase<Type>
 		{
-			public static Specification Default { get; } = new Specification();
+			public static Specification DefaultNested { get; } = new Specification();
 
 			public override bool IsSatisfiedBy( Type parameter ) => parameter.IsInterface || !parameter.IsSealed;
 		}
@@ -107,7 +107,7 @@ namespace DragonSpark.Windows.Markup
 		}
 
 		[Required, Service]
-		IExpressionEvaluator Evaluator { [return: Required]get; set; }
+		public IExpressionEvaluator Evaluator { [return: Required]get; set; }
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Evaluator.Evaluate( item, expression );
 	}
@@ -206,7 +206,7 @@ namespace DragonSpark.Windows.Markup
 		public string BuildName { get; set; }
 
 		[Service, Required]
-		IServiceProvider Locator { [return: NotNull]get; set; }
+		public IServiceProvider Locator { [return: NotNull]get; set; }
 
 		// public Collection<PropertySetter> Properties { get; } = new Collection<PropertySetter>();
 

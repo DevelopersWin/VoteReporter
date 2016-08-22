@@ -3,7 +3,6 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:diagnostics="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
 	xmlns:diagnosticsPlatform="clr-namespace:DragonSpark.Windows.Diagnostics;assembly=DragonSpark.Windows"
 	xmlns:environment="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Environment"
 	xmlns:thread="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Thread"

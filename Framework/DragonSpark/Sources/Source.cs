@@ -1,8 +1,8 @@
-using System;
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
+using System;
 
 namespace DragonSpark.Sources
 {

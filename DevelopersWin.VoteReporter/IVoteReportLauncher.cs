@@ -1,4 +1,3 @@
-using DragonSpark.Windows;
 using System;
 using System.Diagnostics;
 

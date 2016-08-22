@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.ComponentModel;
+using System;
 
 namespace DevelopersWin.VoteReporter
 {

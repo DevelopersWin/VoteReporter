@@ -1,4 +1,3 @@
-using DragonSpark.Activation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
@@ -40,7 +39,6 @@ namespace DragonSpark.Sources
 			{
 				var factory = factories.Get( context ) ?? defaultFactory.Get();
 				var result = factory( context );
-				var stop = context is ExecutionContext;
 				return result;
 			}
 		}

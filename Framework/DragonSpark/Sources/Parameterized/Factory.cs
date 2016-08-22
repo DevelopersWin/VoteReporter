@@ -128,7 +128,7 @@ namespace DragonSpark.Sources.Parameterized
 		{
 			readonly ImmutableArray<FactoryTypeRequest> types;
 
-			public Factory() : this( Requests.Default.CreateMany( ApplicationParts.Default.Get().Types.AsEnumerable() ) ) {}
+			public Factory() : this( Requests.DefaultNested.CreateMany( ApplicationParts.Default.Get().Types.AsEnumerable() ) ) {}
 
 			Factory( ImmutableArray<FactoryTypeRequest> types )
 			{
@@ -154,7 +154,7 @@ namespace DragonSpark.Sources.Parameterized
 			{
 				readonly static Func<Type, Type> Results = ResultTypes.Default.ToSourceDelegate();
 
-				public static Requests Default { get; } = new Requests();
+				public static Requests DefaultNested { get; } = new Requests();
 				Requests() : base( Defaults.ActivateSpecification.And( Defaults.KnownSourcesSpecification, Defaults.IsExportSpecification, new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
 				public override FactoryTypeRequest Get( Type parameter ) => 

@@ -77,11 +77,11 @@ namespace DragonSpark.Windows.Entity
 		{
 			var type = entity.GetType();
 			var items = target.GetEntityProperties( type ).SelectMany( x => type.GetProperty( x.Name ).GetValue( entity ).With( o => o.AsTo<IEnumerable, IEnumerable<object>>( enumerable => enumerable.Cast<object>().Select( target.ApplyChanges ), o.ToItem ) ) );
-			var all = entity.Prepend( items ).Distinct();
-			all.Each( o =>
+			
+			foreach ( var o in entity.Prepend( items ).Distinct() )
 			{
-				ApplyChangesMethod.MakeGenericMethod( o.GetType() ).Invoke( null, new[] { target, o } );
-			} );
+				ApplyChangesMethod.MakeGenericMethod( o.GetType() ).Invoke( null, new[] { target, o } );				
+			}
 			return entity;
 		}
 
@@ -354,12 +354,17 @@ namespace DragonSpark.Windows.Entity
 
 				if ( !levels.HasValue || ++count < levels.Value )
 				{
-					associationNames.Select( y => type.GetProperty( y ).GetValue( entity ) ).WhereAssigned().Each( z =>
+					foreach ( var z in associationNames.Select( y => type.GetProperty( y ).GetValue( entity ) ).WhereAssigned() )
 					{
 						var items = z.Adapt().GetInnerType() != null ? z.AsTo<IEnumerable, object[]>( a => a.Cast<object>().ToArray() ) : z.ToItem();
-						items.Each( a => LoadAll( target, a, list, null, loadAllProperties, levels, count ) );
-					} );
-					count--;
+
+						foreach ( var item in items )
+						{
+							LoadAll( target, item, list, null, loadAllProperties, levels, count );
+						}
+					}
+					
+					// count--;
 				}
 			}
 		}

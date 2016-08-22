@@ -15,7 +15,7 @@ namespace DragonSpark.Runtime
 
 		public FirstCommand( ISpecification<T> specification, params ICommand[] commands ) : base( specification, commands ) {}
 
-		public override void Execute( T parameter )
+		public override void Execute( T parameter = default(T) )
 		{
 			foreach ( var command in Commands.ToArray() )
 			{

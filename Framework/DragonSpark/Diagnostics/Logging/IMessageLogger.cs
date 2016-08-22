@@ -57,7 +57,7 @@ namespace DragonSpark.Diagnostics.Logging
 		}
 
 		[Required]
-		public Serilog.Core.LoggingLevelSwitch Controller { [return: Required]get; set; }
+		public LoggingLevelSwitch Controller { [return: Required]get; set; }
 
 		protected override void Configure( LoggerMinimumLevelConfiguration configuration ) => configuration.ControlledBy( Controller );
 	}

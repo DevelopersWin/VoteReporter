@@ -10,14 +10,14 @@ namespace DragonSpark.Testing.Runtime.Specifications
 		public void All()
 		{
 			var sut = new AllSpecification( new[] { true, true, true }.Select( x => new FixedSpecification( x ) ).ToArray() );
-			Assert.True( sut.IsSatisfiedBy( null ) );
+			Assert.True( sut.IsSatisfiedBy() );
 		}
 
 		[Fact]
 		public void AllNot()
 		{
 			var sut = new AllSpecification( new[] { true, true, false }.Select( x => new FixedSpecification( x ) ).ToArray() );
-			Assert.False( sut.IsSatisfiedBy( null ) );
+			Assert.False( sut.IsSatisfiedBy() );
 		}
 	}
 }

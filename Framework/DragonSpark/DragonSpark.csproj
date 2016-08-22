@@ -57,7 +57,7 @@
     <Compile Include="Aspects\InterceptionArgsExtensions.cs" />
     <Compile Include="Aspects\KeyFactory.cs" />
     <Compile Include="Aspects\OfTypeAttribute.cs" />
-    <Compile Include="Aspects\TimeAttribute.cs" />
+    <Compile Include="Aspects\TimedAttribute.cs" />
     <Compile Include="Aspects\RecursionGuardAttribute.cs" />
     <Compile Include="Aspects\Validation\Construction.cs" />
     <Compile Include="Aspects\Validator.cs" />
@@ -77,8 +77,6 @@
     <Compile Include="Composition\SingletonExportDescriptorProvider.cs" />
     <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Configuration\IConfiguration.cs" />
-    <Compile Include="Configuration\IParameterizedConfiguration.cs" />
-    <Compile Include="Configuration\Store.cs" />
     <Compile Include="Diagnostics\Logging\Configuration.cs" />
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStore.cs" />
@@ -86,7 +84,6 @@
     <Compile Include="Diagnostics\Exceptions\Extensions.cs" />
     <Compile Include="Diagnostics\Formatter.cs" />
     <Compile Include="Diagnostics\Logging\LogTemplate.cs" />
-    <Compile Include="Diagnostics\ProfilerFactory.cs" />
     <Compile Include="Diagnostics\Policies.cs" />
     <Compile Include="Extensions\CommandExtensions.cs" />
     <Compile Include="Extensions\MethodExtensions.cs" />
@@ -95,17 +92,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Runtime\ArrayBuilder.cs" />
     <Compile Include="Runtime\DisposableAction.cs" />
     <Compile Include="Runtime\DisposableExtensions.cs" />
-    <Compile Include="Runtime\EnabledState.cs" />
     <Compile Include="Runtime\FatalApplicationException.cs" />
     <Compile Include="Runtime\ICommand.cs" />
     <Compile Include="Sources\Parameterized\AssignableParameterizedSourceBase.cs" />
     <Compile Include="Sources\AssignableSourceBase.cs" />
     <Compile Include="Sources\CacheContains.cs" />
     <Compile Include="Sources\CacheValueSpecification.cs" />
-    <Compile Include="Sources\Parameterized\Caching\ActivatedCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\AmbientStack.cs" />
     <Compile Include="Sources\Parameterized\Caching\Cache.cs" />
     <Compile Include="Sources\Parameterized\Caching\CacheBase.cs" />
@@ -180,28 +174,21 @@
     <Compile Include="Activation\ConstructCoercer.cs" />
     <Compile Include="Activation\ICoercer.cs" />
     <Compile Include="Sources\Parameterized\IValidatedParameterizedSource.cs" />
-    <Compile Include="Setup\ApplyMigrationCommand.cs" />
-    <Compile Include="Setup\CurrentServiceProvider.cs" />
-    <Compile Include="Setup\InitializeCommand.cs" />
     <Compile Include="Setup\Registration\FactoryRegistration.cs" />
-    <Compile Include="Setup\Registration\LifetimeFactoryParameterCoercer.cs" />
     <Compile Include="Setup\SetupParameterExtensions.cs" />
     <Compile Include="TypeSystem\AllParts.cs" />
     <Compile Include="TypeSystem\AssemblyInformation.cs" />
     <Compile Include="TypeSystem\AssemblyInformationFactory.cs" />
     <Compile Include="ComponentModel\SingletonAttribute.cs" />
     <Compile Include="ComponentModel\SourceAttribute.cs" />
-    <Compile Include="Diagnostics\Diagnostics.cs" />
     <Compile Include="Diagnostics\LoggerHistorySink.cs" />
     <Compile Include="Extensions\ObjectMappingParameter.cs" />
     <Compile Include="Runtime\Specifications\AllSpecification.cs" />
     <Compile Include="Runtime\Specifications\AnySpecification.cs" />
     <Compile Include="TypeSystem\ApplicationAssemblyLocator.cs" />
     <Compile Include="TypeSystem\ApplicationAttribute.cs" />
-    <Compile Include="Runtime\Specifications\CompositeSpecification.cs" />
     <Compile Include="Runtime\CurrentTime.cs" />
     <Compile Include="Runtime\Specifications\EqualityContextAwareSpecification.cs" />
-    <Compile Include="Sources\FixedStore.cs" />
     <Compile Include="Runtime\Specifications\ContextAwareSpecification.cs" />
     <Compile Include="Runtime\Specifications\GuardedSpecificationBase.cs" />
     <Compile Include="Runtime\Specifications\SpecificationExtensions.cs" />
@@ -241,17 +228,13 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Runtime\ICurrentTime.cs" />
     <Compile Include="Runtime\Specifications\ISpecification.cs" />
-    <Compile Include="Runtime\ListDictionary.cs" />
     <Compile Include="Diagnostics\Logging\RecordingLoggerFactory.cs" />
-    <Compile Include="TypeSystem\IAssemblyProvider.cs" />
     <Compile Include="Runtime\Specifications\TypeAssignableSpecification.cs" />
     <Compile Include="Sources\ItemSourceBase.cs" />
     <Compile Include="Sources\CacheSpecificationBase.cs" />
     <Compile Include="Setup\AllTypesOfFactory.cs" />
     <Compile Include="Runtime\CommandCollection.cs" />
     <Compile Include="Runtime\CompositeCommand.cs" />
-    <Compile Include="Setup\Registration\ConventionTypeContainer.cs" />
-    <Compile Include="Setup\Registration\ConventionRegistrationProfileFactory.cs" />
     <Compile Include="Runtime\IProgram.cs" />
     <Compile Include="Setup\Registration\IRegistrationTypeContext.cs" />
     <Compile Include="Runtime\Program.cs" />
@@ -280,7 +263,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Diagnostics\Logging\IMessageLogger.cs" />
-    <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="Extensions\WeakReferenceListExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IPriorityAware.cs" />

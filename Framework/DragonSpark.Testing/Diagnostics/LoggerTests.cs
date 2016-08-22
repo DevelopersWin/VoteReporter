@@ -39,7 +39,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var message = LogEventMessageFactory.Default.Get( history.Events ).Last();
 			Assert.Contains( text, message );
 			
-			Assert.Contains( new MethodFormatter( method ).ToString( null, null ), message );
+			Assert.Contains( new MethodFormatter( method ).ToString(), message );
 		}
 
 		[Theory, AutoData]

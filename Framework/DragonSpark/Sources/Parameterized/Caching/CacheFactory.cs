@@ -1,6 +1,6 @@
+using DragonSpark.Activation;
 using System;
 using System.Reflection;
-using DragonSpark.Activation;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {

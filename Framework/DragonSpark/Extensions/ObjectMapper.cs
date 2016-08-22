@@ -14,7 +14,7 @@ namespace DragonSpark.Extensions
 
 		readonly Func<IActivator> activatorSource;
 
-		readonly IArgumentCache<TypePair, IMapper> mappers = new ArgumentCache<TypePair, IMapper>( Factory.Default.Get );
+		readonly IArgumentCache<TypePair, IMapper> mappers = new ArgumentCache<TypePair, IMapper>( Factory.DefaultNested.Get );
 
 		public ObjectMapper( Func<IActivator> activatorSource )
 		{
@@ -30,7 +30,7 @@ namespace DragonSpark.Extensions
 
 		sealed class Factory : ParameterizedSourceBase<TypePair, IMapper>
 		{
-			public static IParameterizedSource<TypePair, IMapper> Default { get; } = new Factory();
+			public static IParameterizedSource<TypePair, IMapper> DefaultNested { get; } = new Factory();
 			Factory() {}
 
 			public override IMapper Get( TypePair parameter )

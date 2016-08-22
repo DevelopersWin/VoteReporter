@@ -1,11 +1,10 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
 using PostSharp.Reflection;
 using System;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Aspects
 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -7,9 +8,8 @@ using DragonSpark.Sources;
 
 namespace DragonSpark.Runtime
 {
-	[DebuggerDisplay( "Count = {Count,nq}" )]
-	[DebuggerTypeProxy( typeof(ArrayBuilder<>.DebuggerProxy) )]
-	internal sealed partial class ArrayBuilder<T> : IReadOnlyList<T>
+	[DebuggerDisplay( "Count = {Count,nq}" ), DebuggerTypeProxy( typeof(ArrayBuilder<A>.DebuggerProxy) )]
+	sealed class ArrayBuilder<T> : IReadOnlyList<T>
 	{
 		#region DebuggerProxy
 		sealed class DebuggerProxy
@@ -27,10 +27,8 @@ namespace DragonSpark.Runtime
 				get
 				{
 					var result = new T[_builder.Count];
-					for ( int i = 0; i < result.Length; i++ )
-					{
+					for ( var i = 0; i < result.Length; i++ )
 						result[i] = _builder[i];
-					}
 
 					return result;
 				}
@@ -49,13 +47,13 @@ namespace DragonSpark.Runtime
 
 		public ArrayBuilder() : this( 8 ) {}
 
-		private ArrayBuilder( ObjectPool<ArrayBuilder<T>> pool ) : this()
+		ArrayBuilder( ObjectPool<ArrayBuilder<T>> pool ) : this()
 		{
 			_pool = pool;
 		}
 
 		/// <summary>
-		/// Realizes the array.
+		///     Realizes the array.
 		/// </summary>
 		public ImmutableArray<T> ToImmutable() => _builder.ToImmutable();
 
@@ -68,24 +66,18 @@ namespace DragonSpark.Runtime
 		}
 
 		/// <summary>
-		/// Write <paramref name="value"/> to slot <paramref name="index"/>. 
-		/// Fills in unallocated slots preceding the <paramref name="index"/>, if any.
+		///     Write <paramref name="value" /> to slot <paramref name="index" />.
+		///     Fills in unallocated slots preceding the <paramref name="index" />, if any.
 		/// </summary>
 		public void SetItem( int index, T value )
 		{
 			while ( index > _builder.Count )
-			{
 				_builder.Add( default(T) );
-			}
 
 			if ( index == _builder.Count )
-			{
 				_builder.Add( value );
-			}
 			else
-			{
 				_builder[index] = value;
-			}
 		}
 
 		public void Add( T item ) => _builder.Add( item );
@@ -95,9 +87,7 @@ namespace DragonSpark.Runtime
 		public void EnsureCapacity( int capacity )
 		{
 			if ( _builder.Capacity < capacity )
-			{
 				_builder.Capacity = capacity;
-			}
 		}
 
 		public void Clear() => _builder.Clear();
@@ -131,32 +121,28 @@ namespace DragonSpark.Runtime
 		public bool Any() => _builder.Count > 0;
 
 		/// <summary>
-		/// Realizes the array.
+		///     Realizes the array.
 		/// </summary>
 		public ImmutableArray<T> ToImmutableOrNull() => Count == 0 ? default(ImmutableArray<T>) : ToImmutable();
 
 		/// <summary>
-		/// Realizes the array, downcasting each element to a derived type.
+		///     Realizes the array, downcasting each element to a derived type.
 		/// </summary>
 		public ImmutableArray<U> ToDowncastedImmutable<U>()
 			where U : T
 		{
 			if ( Count == 0 )
-			{
 				return ImmutableArray<U>.Empty;
-			}
 
 			var tmp = ArrayBuilder<U>.GetInstance( Count );
 			foreach ( var i in this )
-			{
 				tmp.Add( (U)i );
-			}
 
 			return tmp.ToImmutableAndFree();
 		}
 
 		/// <summary>
-		/// Realizes the array and disposes the builder in one operation.
+		///     Realizes the array and disposes the builder in one operation.
 		/// </summary>
 		public ImmutableArray<T> ToImmutableAndFree()
 		{
@@ -180,31 +166,13 @@ namespace DragonSpark.Runtime
 		{
 			var pool = _pool;
 			if ( pool != null )
-			{
-				// According to the statistics of a C# compiler self-build, the most commonly used builder size is 0.  (808003 uses).
-				// The distant second is the Count == 1 (455619), then 2 (106362) ...
-				// After about 50 (just 67) we have a long tail of infrequently used builder sizes.
-				// However we have builders with size up to 50K   (just one such thing)
-				//
-				// We do not want to retain (potentially indefinitely) very large builders 
-				// while the chance that we will need their size is diminishingly small.
-				// It makes sense to constrain the size to some "not too small" number. 
-				// Overall perf does not seem to be very sensitive to this number, so I picked 128 as a limit.
-				if ( this.Count < 128 )
+				if ( Count < 128 )
 				{
-					if ( this.Count != 0 )
-					{
-						this.Clear();
-					}
+					if ( Count != 0 )
+						Clear();
 
 					pool.Free( this );
-					return;
 				}
-				/*else
-				{
-					pool.ForgetTrackedObject(this);
-				}*/
-			}
 		}
 
 		// 2) Expose the pool or the way to create a pool or the way to get an instance.
@@ -230,10 +198,8 @@ namespace DragonSpark.Runtime
 			var builder = GetInstance();
 			builder.EnsureCapacity( capacity );
 
-			for ( int i = 0; i < capacity; i++ )
-			{
+			for ( var i = 0; i < capacity; i++ )
 				builder.Add( fillWithValue );
-			}
 
 			return builder;
 		}
@@ -255,27 +221,25 @@ namespace DragonSpark.Runtime
 
 		IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		internal Dictionary<K, ImmutableArray<T>> ToDictionary<K>( Func<T, K> keySelector, IEqualityComparer<K> comparer = null )
 		{
-			if ( this.Count == 1 )
+			if ( Count == 1 )
 			{
 				var dictionary1 = new Dictionary<K, ImmutableArray<T>>( 1, comparer );
-				T value = this[0];
+				var value = this[0];
 				dictionary1.Add( keySelector( value ), ImmutableArray.Create( value ) );
 				return dictionary1;
 			}
 
-			if ( this.Count == 0 )
-			{
+			if ( Count == 0 )
 				return new Dictionary<K, ImmutableArray<T>>( comparer );
-			}
 
 			// bucketize
 			// prevent reallocation. it may not have 'count' entries, but it won't have more. 
 			var accumulator = new Dictionary<K, ArrayBuilder<T>>( Count, comparer );
-			for ( int i = 0; i < Count; i++ )
+			for ( var i = 0; i < Count; i++ )
 			{
 				var item = this[i];
 				var key = keySelector( item );
@@ -283,7 +247,7 @@ namespace DragonSpark.Runtime
 				ArrayBuilder<T> bucket;
 				if ( !accumulator.TryGetValue( key, out bucket ) )
 				{
-					bucket = ArrayBuilder<T>.GetInstance();
+					bucket = GetInstance();
 					accumulator.Add( key, bucket );
 				}
 
@@ -294,9 +258,7 @@ namespace DragonSpark.Runtime
 
 			// freeze
 			foreach ( var pair in accumulator )
-			{
 				dictionary.Add( pair.Key, pair.Value.ToImmutableAndFree() );
-			}
 
 			return dictionary;
 		}
@@ -324,9 +286,7 @@ namespace DragonSpark.Runtime
 		public void AddRange( T[] items, int start, int length )
 		{
 			for ( int i = start, end = start + length; i < end; i++ )
-			{
 				Add( items[i] );
-			}
 		}
 
 		public void AddRange( IEnumerable<T> items )
@@ -358,25 +318,21 @@ namespace DragonSpark.Runtime
 
 		public void AddMany( T item, int count )
 		{
-			for ( int i = 0; i < count; i++ )
-			{
+			for ( var i = 0; i < count; i++ )
 				Add( item );
-			}
 		}
 
 		public void RemoveDuplicates()
 		{
 			var set = PooledHashSet<T>.GetInstance();
 
-			int j = 0;
-			for ( int i = 0; i < Count; i++ )
-			{
+			var j = 0;
+			for ( var i = 0; i < Count; i++ )
 				if ( set.Add( this[i] ) )
 				{
 					this[j] = this[i];
 					j++;
 				}
-			}
 
 			Clip( j );
 			set.Free();
@@ -391,9 +347,7 @@ namespace DragonSpark.Runtime
 			{
 				var selected = selector( item );
 				if ( set.Add( selected ) )
-				{
 					result.Add( selected );
-				}
 			}
 
 			set.Free();
@@ -402,8 +356,8 @@ namespace DragonSpark.Runtime
 
 		internal struct Enumerator : IEnumerator<T>
 		{
-			private readonly ArrayBuilder<T> _builder;
-			private int _index;
+			readonly ArrayBuilder<T> _builder;
+			int _index;
 
 			public Enumerator( ArrayBuilder<T> builder )
 			{
@@ -424,9 +378,9 @@ namespace DragonSpark.Runtime
 
 			public void Dispose() {}
 
-			object System.Collections.IEnumerator.Current
+			object IEnumerator.Current
 			{
-				get { return this.Current; }
+				get { return Current; }
 			}
 
 			public void Reset()
@@ -439,26 +393,26 @@ namespace DragonSpark.Runtime
 	public class ObjectPool<T> where T : class
 	{
 		[DebuggerDisplay( "{Value,nq}" )]
-		private struct Element
+		struct Element
 		{
 			internal T Value;
 		}
 
 		/// <remarks>
-		/// Not using System.Func{T} because this file is linked into the (debugger) Formatter,
-		/// which does not have that type (since it compiles against .NET 2.0).
+		///     Not using System.Func{T} because this file is linked into the (debugger) Formatter,
+		///     which does not have that type (since it compiles against .NET 2.0).
 		/// </remarks>
 		internal delegate T Factory();
 
 		// Storage for the pool objects. The first item is stored in a dedicated field because we
 		// expect to be able to satisfy most requests from it.
-		private T _firstItem;
-		private readonly Element[] _items;
+		T _firstItem;
+		readonly Element[] _items;
 
 		// factory is stored for the lifetime of the pool. We will call this only when pool needs to
 		// expand. compared to "new T()", Func gives more flexibility to implementers and faster
 		// than "new T()".
-		private readonly Factory _factory;
+		readonly Factory _factory;
 
 #if DETECT_LEAKS
 		private static readonly ConditionalWeakTable<T, LeakTracker> leakTrackers = new ConditionalWeakTable<T, LeakTracker>();
@@ -510,19 +464,19 @@ namespace DragonSpark.Runtime
 			_items = new Element[size - 1];
 		}
 
-		private T CreateInstance()
+		T CreateInstance()
 		{
 			var inst = _factory();
 			return inst;
 		}
 
 		/// <summary>
-		/// Produces an instance.
+		///     Produces an instance.
 		/// </summary>
 		/// <remarks>
-		/// Search strategy is a simple linear probing which is chosen for it cache-friendliness.
-		/// Note that Free will try to store recycled objects close to the start thus statistically 
-		/// reducing how far we will typically search.
+		///     Search strategy is a simple linear probing which is chosen for it cache-friendliness.
+		///     Note that Free will try to store recycled objects close to the start thus statistically
+		///     reducing how far we will typically search.
 		/// </remarks>
 		internal T Allocate()
 		{
@@ -530,11 +484,9 @@ namespace DragonSpark.Runtime
 			// Note that the initial read is optimistically not synchronized. That is intentional. 
 			// We will interlock only when we have a candidate. in a worst case we may miss some
 			// recently returned objects. Not a big deal.
-			T inst = _firstItem;
+			var inst = _firstItem;
 			if ( inst == null || inst != Interlocked.CompareExchange( ref _firstItem, null, inst ) )
-			{
 				inst = AllocateSlow();
-			}
 
 #if DETECT_LEAKS
 			var tracker = new LeakTracker();
@@ -548,35 +500,31 @@ namespace DragonSpark.Runtime
 			return inst;
 		}
 
-		private T AllocateSlow()
+		T AllocateSlow()
 		{
 			var items = _items;
 
-			for ( int i = 0; i < items.Length; i++ )
+			for ( var i = 0; i < items.Length; i++ )
 			{
 				// Note that the initial read is optimistically not synchronized. That is intentional. 
 				// We will interlock only when we have a candidate. in a worst case we may miss some
 				// recently returned objects. Not a big deal.
-				T inst = items[i].Value;
+				var inst = items[i].Value;
 				if ( inst != null )
-				{
 					if ( inst == Interlocked.CompareExchange( ref items[i].Value, null, inst ) )
-					{
 						return inst;
-					}
-				}
 			}
 
 			return CreateInstance();
 		}
 
 		/// <summary>
-		/// Returns objects to the pool.
+		///     Returns objects to the pool.
 		/// </summary>
 		/// <remarks>
-		/// Search strategy is a simple linear probing which is chosen for it cache-friendliness.
-		/// Note that Free will try to store recycled objects close to the start thus statistically 
-		/// reducing how far we will typically search in Allocate.
+		///     Search strategy is a simple linear probing which is chosen for it cache-friendliness.
+		///     Note that Free will try to store recycled objects close to the start thus statistically
+		///     reducing how far we will typically search in Allocate.
 		/// </remarks>
 		internal void Free( T obj )
 		{
@@ -584,23 +532,15 @@ namespace DragonSpark.Runtime
 			// ForgetTrackedObject(obj);
 
 			if ( _firstItem == null )
-			{
-				// Intentionally not using interlocked here. 
-				// In a worst case scenario two objects may be stored into same slot.
-				// It is very unlikely to happen and will only mean that one of the objects will get collected.
 				_firstItem = obj;
-			}
 			else
-			{
 				FreeSlow( obj );
-			}
 		}
 
-		private void FreeSlow( T obj )
+		void FreeSlow( T obj )
 		{
 			var items = _items;
-			for ( int i = 0; i < items.Length; i++ )
-			{
+			for ( var i = 0; i < items.Length; i++ )
 				if ( items[i].Value == null )
 				{
 					// Intentionally not using interlocked here. 
@@ -609,47 +549,47 @@ namespace DragonSpark.Runtime
 					items[i].Value = obj;
 					break;
 				}
-			}
 		}
+
 /*
-		[Conditional( "DEBUG" )]
-		private void Validate( object obj )
-		{
-			Debug.Assert( obj != null, "freeing null?" );
-
-			Debug.Assert( _firstItem != obj, "freeing twice?" );
-
-			var items = _items;
-			for ( int i = 0; i < items.Length; i++ )
-			{
-				var value = items[i].Value;
-				if ( value == null )
+				[Conditional( "DEBUG" )]
+				private void Validate( object obj )
 				{
-					return;
-				}
-
-				Debug.Assert( value != obj, "freeing twice?" );
-			}
-		}*/
+					Debug.Assert( obj != null, "freeing null?" );
+		
+					Debug.Assert( _firstItem != obj, "freeing twice?" );
+		
+					var items = _items;
+					for ( int i = 0; i < items.Length; i++ )
+					{
+						var value = items[i].Value;
+						if ( value == null )
+						{
+							return;
+						}
+		
+						Debug.Assert( value != obj, "freeing twice?" );
+					}
+				}*/
 	}
 
-	internal class PooledHashSet<T> : HashSet<T>
+	class PooledHashSet<T> : HashSet<T>
 	{
-		private readonly ObjectPool<PooledHashSet<T>> _pool;
+		readonly ObjectPool<PooledHashSet<T>> _pool;
 
-		private PooledHashSet( ObjectPool<PooledHashSet<T>> pool )
+		PooledHashSet( ObjectPool<PooledHashSet<T>> pool )
 		{
 			_pool = pool;
 		}
 
 		public void Free()
 		{
-			this.Clear();
+			Clear();
 			_pool?.Free( this );
 		}
 
 		// global pool
-		private static readonly ObjectPool<PooledHashSet<T>> s_poolInstance = CreatePool();
+		readonly static ObjectPool<PooledHashSet<T>> s_poolInstance = CreatePool();
 
 		// if someone needs to create a pool;
 		public static ObjectPool<PooledHashSet<T>> CreatePool()

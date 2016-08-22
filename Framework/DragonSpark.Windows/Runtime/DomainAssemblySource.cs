@@ -12,7 +12,7 @@ namespace DragonSpark.Windows.Runtime
 	public sealed class DomainAssemblySource : FactoryCache<AppDomain, ImmutableArray<Assembly>>
 	{
 		public static DomainAssemblySource Default { get; } = new DomainAssemblySource();
-		DomainAssemblySource() : this( Specification.Default.IsSatisfiedBy ) {}
+		DomainAssemblySource() : this( Specification.DefaultNested.IsSatisfiedBy ) {}
 
 		readonly Func<Assembly, bool> specification;
 
@@ -26,7 +26,7 @@ namespace DragonSpark.Windows.Runtime
 
 		sealed class Specification : SpecificationBase<Assembly>
 		{
-			public static Specification Default { get; } = new Specification();
+			public static Specification DefaultNested { get; } = new Specification();
 			Specification() {}
 
 			public override bool IsSatisfiedBy( Assembly parameter ) => 

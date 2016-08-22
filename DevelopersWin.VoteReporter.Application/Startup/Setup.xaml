@@ -8,18 +8,14 @@
 	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
 	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
 	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
-	xmlns:registration="clr-namespace:DragonSpark.Setup.Registration;assembly=DragonSpark"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
-	<!--<registration:RegisterFrameworkExceptionTypesCommand />-->
-	<!--<registration:RegisterFromMetadataCommand />-->
-	<!--<commands:SetupUnityCommand>
-		<commands:UnityInstance Instance="{markup:DirectoryInfo Reports}" />
+	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}" Parameter="{markup:DirectoryInfo Reports}" />
+	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
 		<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
-	</commands:SetupUnityCommand>-->
-
-	<!--<commands:InitializeModulesCommand />-->
+	</commands:DeclaredFixedCommand>
+	
 	<entity:AssignDataDirectoryCommand />
 	<entity:InstallDatabaseCommand />
 	<entity:BackupDatabaseCommand />

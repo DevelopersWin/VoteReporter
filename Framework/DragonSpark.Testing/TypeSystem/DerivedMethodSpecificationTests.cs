@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using DragonSpark.TypeSystem;
+﻿using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
@@ -36,13 +35,13 @@ namespace DragonSpark.Testing.TypeSystem
 		{
 			public override void Method()
 			{
-				base.Method();
+				/*base.Method();*/
 			}
 
 			public override string Override
 			{
 				get { return base.Override; }
-				set { base.Override = value; }
+				set { /*base.Override = value;*/ }
 			}
 		}
 	}

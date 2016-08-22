@@ -1,4 +1,5 @@
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Windows.Runtime;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,7 +8,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Runtime;
 
 namespace DragonSpark.Windows.Entity
 {

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using NReco.Linq;
+using System.Collections.Generic;
 
 namespace DragonSpark.ComponentModel
 {

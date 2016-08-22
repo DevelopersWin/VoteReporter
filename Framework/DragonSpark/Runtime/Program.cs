@@ -17,6 +17,6 @@ namespace DragonSpark.Runtime
 		public new static StringCoercer Default { get; } = new StringCoercer();
 		StringCoercer() {}
 
-		protected override string PerformCoercion( object parameter ) => parameter.ToString();
+		protected override string PerformCoercion( object parameter = null ) => parameter?.ToString();
 	}
 }

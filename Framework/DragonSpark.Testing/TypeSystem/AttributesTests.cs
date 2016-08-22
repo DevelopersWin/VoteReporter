@@ -2,7 +2,9 @@
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 
@@ -12,6 +14,7 @@ namespace DragonSpark.Testing.TypeSystem
 	{
 		public string PropertyName { get; set; }
 
+		[SuppressMessage( "ReSharper", "ValueParameterNotUsed" )]
 		public string Setter { set {} }
 
 		[Fact]
@@ -136,20 +139,22 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void Inheritance()
 		{
-			/*var provider = Attributes.Get( typeof(DerivedClass) );
+			var provider = Attributes.Get( typeof(DerivedClass) );
 			var attribute = provider.GetAttribute<Attribute>();
-			Assert.Equal( "This is the base class", attribute.PropertyName );*/
+			Assert.Equal( "This is the base class", attribute.PropertyName );
 		}
 
 		class ClassWithConstructor
 		{
-			[Constructor( "DefaultConstructor" )]
+			[Constructor( "DefaultConstructor" ), UsedImplicitly]
 			public ClassWithConstructor() {}
 
 
+			[UsedImplicitly]
 			public ClassWithConstructor( int number ) {}
 		}
 
+		[UsedImplicitly]
 		class ClassWithConstructorMetadata
 		{
 			[Constructor( "With Number" )]
@@ -164,12 +169,13 @@ namespace DragonSpark.Testing.TypeSystem
 				PropertyName = propertyName;
 			}
 
-			public string PropertyName { get; set; }
+			public string PropertyName { get; }
 		}
 
 		[Attribute( "This is the base class" )]
 		class BaseClass {}
 
+		[UsedImplicitly]
 		class DerivedClass : BaseClass {}
 
 		/*[Fact]

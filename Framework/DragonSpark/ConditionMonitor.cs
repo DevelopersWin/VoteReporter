@@ -10,7 +10,7 @@ namespace DragonSpark
 
 		public void Reset() => State = ConditionMonitorState.None;
 
-		public bool Apply() => ApplyIf( null, null );
+		public bool Apply() => ApplyIf( null );
 
 		public bool Apply( Action action ) => ApplyIf( null, action );
 

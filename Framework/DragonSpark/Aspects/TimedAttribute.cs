@@ -8,13 +8,13 @@ using SerilogTimings.Extensions;
 namespace DragonSpark.Aspects
 {
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	public abstract class TimeAttributeBase : MethodInterceptionAspect
+	public abstract class TimedAttributeBase : MethodInterceptionAspect
 	{
 		readonly string template;
 
-		protected TimeAttributeBase() : this( "Executed Method '{@Method}'" ) {}
+		protected TimedAttributeBase() : this( "Executed Method '{@Method}'" ) {}
 
-		protected TimeAttributeBase( string template )
+		protected TimedAttributeBase( string template )
 		{
 			this.template = template;
 		}
@@ -30,9 +30,9 @@ namespace DragonSpark.Aspects
 
 	[ProvideAspectRole( StandardRoles.Tracing ), LinesOfCodeAvoided( 4 )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
-	public sealed class TimeAttribute : TimeAttributeBase
+	public sealed class TimedAttribute : TimedAttributeBase
 	{
-		public TimeAttribute() {}
-		public TimeAttribute( string template ) : base( template ) {}
+		public TimedAttribute() {}
+		public TimedAttribute( string template ) : base( template ) {}
 	}
 }

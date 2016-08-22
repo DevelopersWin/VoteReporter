@@ -1,9 +1,9 @@
 using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Sources;
 
 namespace DevelopersWin.VoteReporter
 {

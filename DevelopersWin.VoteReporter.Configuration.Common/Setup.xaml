@@ -6,9 +6,10 @@
 	xmlns:entity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
 	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
+	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" 
 	>
-	<!--<commands:UnityInstance>
+	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
 		<entity:Configuration AutomaticMigrationsEnabled="True" />
-	</commands:UnityInstance>-->
+	</commands:DeclaredFixedCommand>
 </runtime:CompositeCommand>

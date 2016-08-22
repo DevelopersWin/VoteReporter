@@ -38,6 +38,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml">
       <Aliases>global</Aliases>
     </Reference>
@@ -45,7 +46,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttributeProviderLocator.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="InitializationCommand.xaml.cs">
       <DependentUpon>InitializationCommand.xaml</DependentUpon>
@@ -95,7 +95,6 @@
     <Compile Include="Markup\FieldInfoMarkupPropertyFactory.cs" />
     <Compile Include="Markup\GenericTypeExtension.cs" />
     <Compile Include="Markup\IIncrementer.cs" />
-    <Compile Include="Markup\ImageSourceOperations.cs" />
     <Compile Include="Markup\IMarkupPropertyFactory.cs" />
     <Compile Include="Markup\Incrementer.cs" />
     <Compile Include="Markup\MarkupPropertyBase.cs" />
@@ -115,16 +114,12 @@
     <Compile Include="Runtime\ApplicationAssembly.cs" />
     <Compile Include="Runtime\FileSystemAssemblySource.cs" />
     <Compile Include="Runtime\DomainAssemblySource.cs" />
-    <Compile Include="Runtime\ApplicationAssemblyFilter.cs" />
     <Compile Include="Runtime\LogicalStore.cs" />
     <Compile Include="Runtime\ThreadDataStore.cs" />
     <Compile Include="Setup\FileConfigurationFactory.cs" />
     <Compile Include="Markup\AssemblyVersionExtension.cs" />
     <Compile Include="Markup\ClrMemberMarkupProperty.cs" />
     <Compile Include="Markup\DependencyPropertyMarkupProperty.cs" />
-    <Compile Include="Markup\ImageSourceExtension.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Markup\IMarkupProperty.cs" />
     <Compile Include="Markup\LocateExtension.cs">
       <SubType>Code</SubType>

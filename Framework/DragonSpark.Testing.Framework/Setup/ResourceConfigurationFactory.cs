@@ -1,8 +1,7 @@
+using DragonSpark.Extensions;
+using DragonSpark.Windows.Setup;
 using System;
 using System.Linq;
-using DragonSpark.Extensions;
-using DragonSpark.Windows;
-using DragonSpark.Windows.Setup;
 
 namespace DragonSpark.Testing.Framework.Setup
 {

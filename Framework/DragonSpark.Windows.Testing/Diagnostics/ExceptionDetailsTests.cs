@@ -2,6 +2,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Diagnostics;
+using JetBrains.Annotations;
 using Serilog.Events;
 using Serilog.Exceptions.Destructurers;
 using System;
@@ -36,7 +37,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 			public int Number { get; }
 		}
 
-		[Export( typeof(IExceptionDestructurer) )]
+		[Export( typeof(IExceptionDestructurer) ), UsedImplicitly]
 		class Destructurer : ExceptionDestructurer
 		{
 			public override Type[] TargetTypes => typeof(CustomException).ToItem();

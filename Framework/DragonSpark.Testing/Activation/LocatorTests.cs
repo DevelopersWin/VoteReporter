@@ -7,11 +7,12 @@ namespace DragonSpark.Testing.Activation
 	public class LocatorTests
 	{
 		[Theory, AutoData]
-		void CachesAsExpected( ConstructorStore constructorStore )
+		void CachesAsExpected( ConstructorStore constructorStore, int number )
 		{
-			var parameter = new ConstructTypeRequest( typeof(ConstructedItem), 6776 );
+			var parameter = new ConstructTypeRequest( typeof(ConstructedItem), number );
 			var first = constructorStore.Get( parameter );
 			Assert.Same( first, constructorStore.Get( parameter ) );
+			Assert.Equal( number, new ConstructedItem( number ).Number );
 		}
 
 		class ConstructedItem
@@ -21,7 +22,7 @@ namespace DragonSpark.Testing.Activation
 				Number = number;
 			}
 
-			public int Number { get; }
+			public int Number { get; set; }
 		}
 	}
 }

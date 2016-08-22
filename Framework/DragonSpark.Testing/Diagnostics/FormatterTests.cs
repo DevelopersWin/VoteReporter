@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var method = MethodBase.GetCurrentMethod();
 			var formatted = sut.Get( new Formatter.Parameter( method ) );
 			Assert.IsType<string>( formatted );
-			Assert.Equal( new MethodFormatter( method ).ToString( null, null ), formatted );
+			Assert.Equal( new MethodFormatter( method ).ToString(), formatted );
 		}
 	}
 }

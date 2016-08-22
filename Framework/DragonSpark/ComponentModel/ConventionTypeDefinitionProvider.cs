@@ -1,11 +1,9 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using System;
-using System.Reflection;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {

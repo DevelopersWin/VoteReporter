@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace DragonSpark.Setup
+﻿namespace DragonSpark.Setup
 {
 	public static class SetupParameterExtensions
 	{

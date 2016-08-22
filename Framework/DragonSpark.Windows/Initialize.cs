@@ -1,13 +1,12 @@
-using DragonSpark.Activation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using System;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Windows
 {

@@ -6,21 +6,17 @@ namespace DragonSpark.TypeSystem
 	public class DerivedMethodSpecification : SpecificationBase<MethodInfo>
 	{
 		public static DerivedMethodSpecification Default { get; } = new DerivedMethodSpecification();
-
 		DerivedMethodSpecification() {}
 
-		public override bool IsSatisfiedBy( MethodInfo parameter )
-		{
-			var methodInfo = parameter.GetRuntimeBaseDefinition();
-			var result = methodInfo.DeclaringType != parameter.DeclaringType;
-			return result;
-		}
+		public override bool IsSatisfiedBy( MethodInfo parameter ) => 
+			parameter.GetRuntimeBaseDefinition().DeclaringType != parameter.DeclaringType;
 	}
 
 	public class DerivedTypeSpecification : SpecificationBase<TypeInfo>
 	{
 		public static DerivedTypeSpecification Default { get; } = new DerivedTypeSpecification();
+		DerivedTypeSpecification() {}
 
-		public override bool IsSatisfiedBy( TypeInfo parameter ) => false;// parameter.BaseType != typeof(object);
+		public override bool IsSatisfiedBy( TypeInfo parameter ) => /*false;//*/ parameter.BaseType != typeof(object);
 	}
 }

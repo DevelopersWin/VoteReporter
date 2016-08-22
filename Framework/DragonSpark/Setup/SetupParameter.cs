@@ -1,6 +1,4 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Properties;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

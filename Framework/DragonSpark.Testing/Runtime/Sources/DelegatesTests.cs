@@ -1,10 +1,9 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Windows.Media.Animation;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using Xunit;
+// ReSharper disable AccessToModifiedClosure
 
 namespace DragonSpark.Testing.Runtime.Sources
 {

@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.Activation;
+using System;
 
 namespace DragonSpark.Sources
 {
@@ -7,7 +7,7 @@ namespace DragonSpark.Sources
 	{
 		readonly Func<object> defaultScope;
 
-		public ScopeContext() : this( (ISource<ISource>)Execution.Context ) {}
+		public ScopeContext() : this( Execution.Context ) {}
 
 		public ScopeContext( ISource<ISource> defaultScope ) : this( defaultScope.Delegate() ) {}
 

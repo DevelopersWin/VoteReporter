@@ -33,18 +33,20 @@ namespace DragonSpark.Windows.Entity
 
 				MessageLogger.Information( "Performing entity installation on {Length} installers.", items.Length );
 
-				items.Each( x =>
+				foreach ( var x in items )
 				{
 					MessageLogger.Information( "Installing Entity Installer with ID of '{Id}' and version '{Version}'.", x.Id, x.Version );
 
-					x.Steps.Each( y =>
+					foreach ( var y in x.Steps )
 					{
 						y.Execute( context );
 						context.Save();
-					} );
+					}
+					
 					context.Create<InstallationEntry>( y => x.MapInto( y ) );
 					context.Save();
-				} );
+				}
+				
 				MessageLogger.Information( "Database Initialized." );
 			}
 		}

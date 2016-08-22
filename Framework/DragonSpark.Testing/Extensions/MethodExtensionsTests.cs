@@ -1,12 +1,13 @@
 ﻿using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Linq;
 using System.Windows.Input;
-using DragonSpark.Diagnostics.Logging;
 using Xunit;
 
 namespace DragonSpark.Testing.Extensions
@@ -56,7 +57,7 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		public void BreakingBuildTest()
 		{
-			var method = new Action<Action<string>>( new PurgeLoggerMessageHistoryCommand( new LoggerHistorySink() ).Execute ).Method;
+			var method = new Action<Action<string>>( new PurgeLoggerMessageHistoryCommand( new LoggerHistorySink().Self ).Execute ).Method;
 			var found = method.AccountForGenericDefinition();
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );

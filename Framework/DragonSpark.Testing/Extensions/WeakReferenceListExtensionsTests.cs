@@ -1,9 +1,3 @@
-using DragonSpark.Extensions;
-using DragonSpark.Testing.Objects;
-using System;
-using System.Collections.Generic;
-using Xunit;
-
 namespace DragonSpark.Testing.Extensions
 {
 	public class WeakReferenceListExtensionsTests

@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using Serilog.Core;
 using Serilog.Events;
@@ -25,8 +24,11 @@ namespace DragonSpark.Diagnostics.Logging
 	{
 		readonly static Func<IEnumerable<LogEvent>, ImmutableArray<string>> MessageFactory = LogEventMessageFactory.Default.ToSourceDelegate();
 
-		public static ISource<ICommand<Action<string>>> Defaults { get; } = new Scope<ICommand<Action<string>>>( Factory.Global( () => new PurgeLoggerMessageHistoryCommand( LoggingHistory.Default.Get() ) ) );
-		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, MessageFactory ) {}
+		public static PurgeLoggerMessageHistoryCommand Default { get; } = new PurgeLoggerMessageHistoryCommand();
+		PurgeLoggerMessageHistoryCommand() : this( LoggingHistory.Default.Get ) {}
+
+		// public static ISource<ICommand<Action<string>>> Defaults { get; } = new Scope<ICommand<Action<string>>>( Factory.Global( () => new PurgeLoggerMessageHistoryCommand( LoggingHistory.Default.Get() ) ) );
+		public PurgeLoggerMessageHistoryCommand( Func<ILoggerHistory> historySource ) : base( historySource, MessageFactory ) {}
 	}
 
 	/*public static class MigrationProperties
@@ -61,17 +63,18 @@ namespace DragonSpark.Diagnostics.Logging
 
 	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
 	{
-		readonly ILoggerHistory history;
+		readonly Func<ILoggerHistory> historySource;
 		readonly Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory;
 
-		protected PurgeLoggerHistoryCommand( ILoggerHistory history, Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory )
+		protected PurgeLoggerHistoryCommand( Func<ILoggerHistory> historySource, Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory )
 		{
-			this.history = history;
+			this.historySource = historySource;
 			this.factory = factory;
 		}
 
 		public override void Execute( Action<T> parameter )
 		{
+			var history = historySource();
 			factory( history.Events ).Each( parameter );
 			history.Clear();
 		}

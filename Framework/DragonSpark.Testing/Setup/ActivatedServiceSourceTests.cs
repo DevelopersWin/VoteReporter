@@ -25,6 +25,7 @@ namespace DragonSpark.Testing.Setup
 																 throw new InvalidOperationException( "Recursion detected" );
 															 }
 
+															 // ReSharper disable once AccessToModifiedClosure
 															 return sut.Get( type );
 														 } );
 

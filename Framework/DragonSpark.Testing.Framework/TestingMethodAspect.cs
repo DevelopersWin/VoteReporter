@@ -13,7 +13,7 @@ using Xunit;
 namespace DragonSpark.Testing.Framework
 {
 	[LinesOfCodeAvoided( 8 )]
-	public sealed class TestingMethodAspect : TimeAttributeBase
+	public sealed class TestingMethodAspect : TimedAttributeBase
 	{
 		public TestingMethodAspect() : base( "Executing Test Method '{@Method}'" ) {}
 
@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.Framework
 
 	public sealed class PurgingContext : InitializedDisposableAction
 	{
-		public PurgingContext() : base( PurgeLoggerMessageHistoryCommand.Defaults.Get().Fixed( Output.Default.Get() ).Run ) {}
+		public PurgingContext() : base( PurgeLoggerMessageHistoryCommand.Default.Fixed( Output.Default.Get() ).Run ) {}
 	}
 
 	public static class Defer

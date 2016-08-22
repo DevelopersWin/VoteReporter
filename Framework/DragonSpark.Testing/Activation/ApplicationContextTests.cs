@@ -2,11 +2,12 @@
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
+using DragonSpark.Sources;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
+using JetBrains.Annotations;
 using System.Composition;
 using System.Reflection;
-using DragonSpark.Sources;
 using Xunit;
 using ExecutionContext = DragonSpark.Testing.Framework.ExecutionContext;
 
@@ -46,7 +47,7 @@ namespace DragonSpark.Testing.Activation
 			Assert.True( EnableMethodCaching.Default.Get() );
 		}
 
-		[Export( typeof(ISetup) )]
+		[Export( typeof(ISetup) ), UsedImplicitly]
 		class Setup : DragonSpark.Setup.Setup
 		{
 			public Setup() : base( EnableMethodCaching.Default.Configured( false ) ) {}

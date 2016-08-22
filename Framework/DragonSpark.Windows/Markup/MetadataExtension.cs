@@ -19,7 +19,7 @@ namespace DragonSpark.Windows.Markup
 		}
 
 		[Service]
-		IExpressionEvaluator Evaluator { [return: NotNull]get; set; }
+		public IExpressionEvaluator Evaluator { [return: NotNull]get; set; }
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) 
 			=> Evaluator.Evaluate( serviceProvider.Get<IRootObjectProvider>().RootObject.GetType().Assembly.GetCustomAttribute( attributeType ), expression );

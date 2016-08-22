@@ -1,7 +1,7 @@
-using System.Data.Entity;
-using System.Windows.Markup;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using System.Data.Entity;
+using System.Windows.Markup;
 
 namespace DragonSpark.Windows.Entity
 {

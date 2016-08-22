@@ -46,18 +46,13 @@
   <ItemGroup>
     <Compile Include="Initialize.cs" />
     <Compile Include="Diagnostics\PerformanceSupport.cs" />
-    <Compile Include="Diagnostics\TracingProfilerFactory.cs" />
-    <Compile Include="IoC\AutoDataAttribute.cs" />
-    <Compile Include="OutputAttribute.cs" />
     <Compile Include="Setup\ApplicationCommandsSource.cs" />
-    <Compile Include="Setup\Execution.cs" />
     <Compile Include="Setup\AutoDataMoqConfiguredAttribute.cs" />
     <Compile Include="Setup\Location\FixtureRegistry.cs" />
     <Compile Include="Setup\MetadataCustomizationFactory.cs" />
     <Compile Include="Setup\MinimumLevel.cs" />
     <Compile Include="Setup\ResourceConfigurationFactory.cs" />
     <Compile Include="Setup\CanLocateSpecification.cs" />
-    <Compile Include="Setup\ConfigureLocationCustomization.cs" />
     <Compile Include="Setup\GreedyMethodBuilderFactory.cs" />
     <Compile Include="Setup\MetadataCommand.cs" />
     <Compile Include="Setup\SetupEngineParts.cs" />
@@ -67,9 +62,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Setup\AutoDataAttribute.cs" />
-    <Compile Include="Parameters\FreezeAttribute.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrationBaseAttribute.cs">
       <SubType>Code</SubType>

@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
 
 namespace DragonSpark.Testing.Objects
 {

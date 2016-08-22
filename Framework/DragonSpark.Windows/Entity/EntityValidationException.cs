@@ -1,10 +1,10 @@
+using DragonSpark.Extensions;
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Windows.Entity
 {
@@ -16,7 +16,7 @@ namespace DragonSpark.Windows.Entity
 		static string DetermineMessage( DbContext context, DbEntityValidationException error )
 		{
 			var result = string.Concat( "Validation Exceptions were encountered while commiting entities to storage.  These are the exceptions:", Environment.NewLine, 
-				string.Join( string.Empty, error.EntityValidationErrors.Select( x => $"-= {x.Entry.Entity.GetType()} [State: {x.Entry.State}] [Key: {DetermineKey( context, x )}] =-{Environment.NewLine}{string.Join( Environment.NewLine, x.ValidationErrors.Select( y => string.Concat( (string)"	- ", (string)y.ErrorMessage ) ).ToArray() )}" ) ) );
+				string.Join( string.Empty, error.EntityValidationErrors.Select( x => $"-= {x.Entry.Entity.GetType()} [State: {x.Entry.State}] [Key: {DetermineKey( context, x )}] =-{Environment.NewLine}{string.Join( Environment.NewLine, x.ValidationErrors.Select( y => string.Concat( "	- ", y.ErrorMessage ) ).ToArray() )}" ) ) );
 			return result;
 		}
 

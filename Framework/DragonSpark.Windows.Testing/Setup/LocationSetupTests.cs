@@ -317,22 +317,13 @@ namespace DragonSpark.Windows.Testing.Setup
 		}*/
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(NormalPriority) )]
-		public void GetAllTypesWith( [Service] ImmutableArray<System.Type> sut )
-		{
-			Assert.True( sut.Decorated<PriorityAttribute>().Contains( typeof(NormalPriority) ) );
-		}
+		public void GetAllTypesWith( [Service] ImmutableArray<Type> sut ) => Assert.True( sut.Decorated<PriorityAttribute>().Contains( typeof(NormalPriority) ) );
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
-		public void Evaluate( ClassWithParameter sut )
-		{
-			Assert.Equal( sut.Parameter, sut.Evaluate<object>( nameof(sut.Parameter) ) );
-		}
+		public void Evaluate( ClassWithParameter sut ) => Assert.Equal( sut.Parameter, sut.Evaluate<object>( nameof(sut.Parameter) ) );
 
 		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
-		public void Mocked( [Frozen]Mock<IInterface> sut, IInterface item )
-		{
-			Assert.Equal( sut.Object, item );
-		}
+		public void Mocked( [Frozen]Mock<IInterface> sut, IInterface item ) => Assert.Equal( sut.Object, item );
 
 		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
 		public void GetAllInstances( IServiceLocator sut )

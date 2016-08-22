@@ -52,14 +52,12 @@
     <Compile Include="Derived.cs" />
     <Compile Include="Disposable.cs" />
     <Compile Include="FactoryOfYAC.cs" />
-    <Compile Include="Generic.cs" />
     <Compile Include="HighPriority.cs" />
     <Compile Include="IAnotherInterface.cs" />
     <Compile Include="IClassWithParameter.cs" />
     <Compile Include="IInterface.cs" />
     <Compile Include="IItem.cs" />
     <Compile Include="IObject.cs" />
-    <Compile Include="IoC\Application.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="LowPriority.cs" />
     <Compile Include="NormalPriority.cs" />

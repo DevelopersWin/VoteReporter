@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data.Entity.Core;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Core.Objects;
@@ -82,16 +81,16 @@ namespace DragonSpark.Windows.Entity
 		/// <summary>
 		/// Creates the key.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="U"></typeparam>
+		/// <typeparam name="TContext"></typeparam>
+		/// <typeparam name="TId"></typeparam>
 		/// <param name="context">The context.</param>
 		/// <param name="id">The identifier.</param>
 		/// <returns>EntityKey.</returns>
-		public static EntityKey CreateKey<T, U>( ObjectContext context, U id ) where T : EntityObject where U : struct
+		public static EntityKey CreateKey<TContext, TId>( ObjectContext context, TId id ) where TContext : EntityObject where TId : struct
 		{
-			var type = GetEntityMetaData<T>( context );
+			var type = GetEntityMetaData<TContext>( context );
 			var list = new List<EntityKeyMember> { new EntityKeyMember( new List<EdmMember>( type.KeyMembers )[ 0 ].Name, id ) };
-			return CreateKey( context, typeof(T), list );
+			return CreateKey( context, typeof(TContext), list );
 		}
 
 		/// <summary>
@@ -123,7 +122,7 @@ namespace DragonSpark.Windows.Entity
 			return result;
 		}
 
-		/// <summary>
+		/*/// <summary>
 		/// Creates the key.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -147,7 +146,7 @@ namespace DragonSpark.Windows.Entity
 				}
 			}
 			return CreateKey( context, typeof(T), items );
-		}
+		}*/
 
 		/// <summary>
 		/// Extracts the key.
@@ -155,10 +154,7 @@ namespace DragonSpark.Windows.Entity
 		/// <param name="context">The context.</param>
 		/// <param name="target">The target.</param>
 		/// <returns>EntityKey.</returns>
-		public static EntityKey ExtractKey( this ObjectContext context, object target )
-		{
-			return ExtractKey( context, target.GetType(), target );
-		}
+		public static EntityKey ExtractKey( this ObjectContext context, object target ) => ExtractKey( context, target.GetType(), target );
 
 		/// <summary>
 		/// Extracts the key.
@@ -198,14 +194,14 @@ namespace DragonSpark.Windows.Entity
 		/// <summary>
 		/// Converts the properties.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="U"></typeparam>
+		/// <typeparam name="TTo"></typeparam>
+		/// <typeparam name="TFrom"></typeparam>
 		/// <param name="members">The members.</param>
 		/// <returns>IEnumerable&lt;T&gt;.</returns>
-		internal static IEnumerable<T> ConvertProperties<T, U>( IEnumerable<U> members ) where T : MetadataItem
-			where U : MetadataItem
+		internal static IEnumerable<TTo> ConvertProperties<TTo, TFrom>( IEnumerable<TFrom> members ) where TTo : MetadataItem
+			where TFrom : MetadataItem
 		{
-			var result = from member in members.OfType<T>()
+			var result = from member in members.OfType<TTo>()
 				select member;
 			return result;
 		}

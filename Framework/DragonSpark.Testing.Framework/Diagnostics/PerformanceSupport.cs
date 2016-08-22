@@ -62,7 +62,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 			class MedianFactory : ParameterizedSourceBase<ImmutableArray<long>, long>
 			{
-				public static MedianFactory Default { get; } = new MedianFactory();
+				public static MedianFactory DefaultNested { get; } = new MedianFactory();
 
 				public override long Get( ImmutableArray<long> parameter )
 				{
@@ -77,7 +77,7 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 
 			class ModeFactory<T> : ParameterizedSourceBase<ImmutableArray<T>, T>
 			{
-				public static ModeFactory<T> Default { get; } = new ModeFactory<T>();
+				public static ModeFactory<T> DefaultNested { get; } = new ModeFactory<T>();
 				public override T Get( ImmutableArray<T> parameter ) => parameter.ToArray().GroupBy( n => n ).OrderByDescending( g => g.Count() ).Select( g => g.Key ).FirstOrDefault();
 			}
 
@@ -104,8 +104,8 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 					
 					var data = EnumerableEx.Generate( 0, Continue, i => i + 1, Measure ).Select( span => span.Ticks ).ToArray();
 					var average = data.Average( span => span );
-					var median = MedianFactory.Default.Get( data.ToImmutableArray() );
-					var mode = ModeFactory<long>.Default.Get( data.ToImmutableArray() );
+					var median = MedianFactory.DefaultNested.Get( data.ToImmutableArray() );
+					var mode = ModeFactory<long>.DefaultNested.Get( data.ToImmutableArray() );
 					var result = new Result( action.Method.Name, TimeSpan.FromTicks( (long)average ), TimeSpan.FromTicks( median ), TimeSpan.FromTicks( mode ) );
 					return result;
 				}

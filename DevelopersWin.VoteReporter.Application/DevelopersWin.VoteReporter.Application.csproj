@@ -62,7 +62,6 @@
     <Compile Include="Startup\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Startup\SetupApplicationCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

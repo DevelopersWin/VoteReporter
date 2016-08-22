@@ -18,16 +18,18 @@ namespace DragonSpark.Testing.TypeSystem
 		public void IsInstanceOfType()
 		{
 			var adapter = new TypeAdapter( typeof(Casted) );
-			Assert.True( adapter.IsInstanceOfType( new Casted( 6776 ) ) );
+			var instance = new Casted( 6776 );
+			Assert.True( adapter.IsInstanceOfType( instance ) );
+			Assert.Equal( 6776, instance.Item );
 		}
 
 		[Fact]
 		public void Throws()
 		{
-			Assert.Throws<ArgumentNullException>( () => { new TypeAdapter( null, null ); } );
+			Assert.Throws<ArgumentNullException>( () => Create() );
 		}
 
-
+		TypeAdapter Create() => new TypeAdapter( null, null );
 
 		class Casted
 		{

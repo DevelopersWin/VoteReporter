@@ -1,3 +1,6 @@
+using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
+using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -8,8 +11,6 @@ using System.Data.Entity.Core.Objects.DataClasses;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Extensions;
-using DragonSpark.Windows.Runtime;
 
 namespace DragonSpark.Windows.Entity
 {
@@ -204,7 +205,7 @@ namespace DragonSpark.Windows.Entity
 
 					case BuiltInTypeKind.EdmProperty: /*scalar field*/
 					{
-						ObjectStateEntry containerStateEntry = null;
+						ObjectStateEntry containerStateEntry;
 						return context.IsScalarPropertyModified( propertyName, entry, out containerStateEntry );
 					}
 				}
@@ -257,7 +258,7 @@ namespace DragonSpark.Windows.Entity
 				case EntityState.Detached:
 				case EntityState.Unchanged:
 				case EntityState.Modified:
-					return (IExtendedDataRecord)entry.CurrentValues;
+					return entry.CurrentValues;
 				case EntityState.Deleted:
 					return (IExtendedDataRecord)entry.OriginalValues;
 				default:
@@ -365,7 +366,7 @@ namespace DragonSpark.Windows.Entity
 
 		public static IEnumerable<ObjectStateEntry> GetRelationships( this ObjectContext context, EntityState state ) {
 			return from e in context.ObjectStateManager.GetObjectStateEntries( state )
-				where e.IsRelationship == true
+				where e.IsRelationship
 				select e;
 		}
 
@@ -443,12 +444,11 @@ namespace DragonSpark.Windows.Entity
 
 		private static bool IsScalarPropertyModified(this ObjectContext context, string scalarPropertyName, ObjectStateEntry entityContainer, out ObjectStateEntry containerStateEntry)
 		{
-			var isModified = false;
 			containerStateEntry = context.ObjectStateManager.GetObjectStateEntry( entityContainer.EntityKey );
 			var modifiedProperties = containerStateEntry.GetModifiedProperties();
 
 			var changedProperty = modifiedProperties.FirstOrDefault( element => ( element == scalarPropertyName ) );
-			isModified = ( null != changedProperty );
+			var isModified = ( null != changedProperty );
 
 			if ( isModified )
 			{
@@ -465,14 +465,13 @@ namespace DragonSpark.Windows.Entity
 
 		static EdmMember GetEdmMember( this ObjectContext context, ObjectStateEntry entry, string propertyName )
 		{
-			EdmMember edmMember = null;
 			var entityType = context.MetadataWorkspace.GetEntityMetaData( entry.Entity.GetType() );
-			var edmMembers = entityType.MetadataProperties.First( p => p.Name == "Members" ).Value as IEnumerable<EdmMember>;
-			edmMember = edmMembers.FirstOrDefault( item => item.Name == propertyName );
+			var edmMembers = entityType.MetadataProperties.First( p => p.Name == "Members" ).Value as IEnumerable<EdmMember> ?? Items<EdmMember>.Default;
+			var edmMember = edmMembers.FirstOrDefault( item => item.Name == propertyName );
 			if ( edmMember == null )
 			{
 				throw new ArgumentException(
-					string.Format( "Cannot find property metadata: property '{0}' in '{1}' entity object", propertyName, entityType.Name ) );
+						  $"Cannot find property metadata: property '{propertyName}' in '{entityType.Name}' entity object" );
 			}
 			return edmMember;
 		}

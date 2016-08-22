@@ -16,11 +16,11 @@ namespace DragonSpark.TypeSystem
 		public static TypeDefinitionProviderSource Default { get; } = new TypeDefinitionProviderSource();
 		TypeDefinitionProviderSource() : this( Items<ITypeDefinitionProvider>.Default ) {}
 
-		protected TypeDefinitionProviderSource( params ITypeDefinitionProvider[] items ) : base( items.Append( ConventionTypeDefinitionProvider.Default, Self.Default ) ) {}
+		protected TypeDefinitionProviderSource( params ITypeDefinitionProvider[] items ) : base( items.Append( ConventionTypeDefinitionProvider.Default, Self.DefaultNested ) ) {}
 
 		sealed class Self : SelfTransformer<TypeInfo>, ITypeDefinitionProvider
 		{
-			public new static Self Default { get; } = new Self();
+			public static Self DefaultNested { get; } = new Self();
 			Self() {}
 		}
 	}
@@ -43,7 +43,7 @@ namespace DragonSpark.TypeSystem
 				this.providerSource = providerSource;
 			}
 
-			public override IAttributeProvider Get( object parameter ) => base.Get( parameter ) ?? providerSource( memberSource( parameter ) );
+			public override IAttributeProvider Get( object parameter = null ) => base.Get( parameter ) ?? providerSource( memberSource( parameter ) );
 		}
 	}
 
@@ -60,7 +60,7 @@ namespace DragonSpark.TypeSystem
 
 		sealed class Factory : CompositeFactory<object, TypeInfo>
 		{
-			readonly static Func<object, TypeInfo>[] Factories = new IParameterizedSource[] { TypeInfoDefinitionProvider.Default, MemberInfoDefinitionProvider.Default, GeneralDefinitionProvider.Default }.Select( parameter => new Func<object, TypeInfo>( parameter.Get<TypeInfo> ) ).Fixed();
+			readonly static Func<object, TypeInfo>[] Factories = new IParameterizedSource[] { TypeInfoDefinitionProvider.DefaultNested, MemberInfoDefinitionProvider.DefaultNested, GeneralDefinitionProvider.DefaultNested }.Select( parameter => new Func<object, TypeInfo>( parameter.Get<TypeInfo> ) ).Fixed();
 
 			public Factory() : this( ComponentModel.TypeDefinitions.Default.Get ) { }
 
@@ -73,28 +73,28 @@ namespace DragonSpark.TypeSystem
 
 			class TypeInfoDefinitionProvider : TypeDefinitionProviderBase<TypeInfo>
 			{
-				public static TypeInfoDefinitionProvider Default { get; } = new TypeInfoDefinitionProvider();
+				public static TypeInfoDefinitionProvider DefaultNested { get; } = new TypeInfoDefinitionProvider();
 
 				public override TypeInfo Get( TypeInfo parameter ) => parameter;
 			}
 
 			class MemberInfoDefinitionProvider : TypeDefinitionProviderBase<MemberInfo>
 			{
-				public static MemberInfoDefinitionProvider Default { get; } = new MemberInfoDefinitionProvider();
+				public static MemberInfoDefinitionProvider DefaultNested { get; } = new MemberInfoDefinitionProvider();
 
 				public override TypeInfo Get( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();
 			}
 
 			class GeneralDefinitionProvider : TypeDefinitionProviderBase<object>
 			{
-				public static GeneralDefinitionProvider Default { get; } = new GeneralDefinitionProvider();
+				public static GeneralDefinitionProvider DefaultNested { get; } = new GeneralDefinitionProvider();
 
 				public override TypeInfo Get( object parameter ) => parameter.GetType().GetTypeInfo();
 			}
 
 			abstract class TypeDefinitionProviderBase<T> : ParameterizedSourceBase<T, TypeInfo> {}
 
-			public override TypeInfo Get( object parameter ) => source( base.Get( parameter ) );
+			public override TypeInfo Get( object parameter = null ) => source( base.Get( parameter ) );
 		}
 	}
 

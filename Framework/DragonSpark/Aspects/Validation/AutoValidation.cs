@@ -27,7 +27,7 @@ namespace DragonSpark.Aspects.Validation
 	sealed class AdapterLocator : ParameterizedSourceBase<IParameterValidationAdapter>
 	{
 		public static AdapterLocator Default { get; } = new AdapterLocator();
-		AdapterLocator() : this( AdapterSources.Default.Get ) {}
+		AdapterLocator() : this( AdapterSources.DefaultNested.Get ) {}
 
 		readonly Func<Type, IAdapterSource> factorySource;
 
@@ -38,7 +38,7 @@ namespace DragonSpark.Aspects.Validation
 
 		sealed class AdapterSources : Cache<Type, IAdapterSource>
 		{
-			public static AdapterSources Default { get; } = new AdapterSources();
+			public static AdapterSources DefaultNested { get; } = new AdapterSources();
 			AdapterSources() : this( AutoValidation.DefaultSources ) {}
 
 			readonly ImmutableArray<IAdapterSource> sources;

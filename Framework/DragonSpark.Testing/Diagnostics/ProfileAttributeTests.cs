@@ -22,7 +22,7 @@ namespace DragonSpark.Testing.Diagnostics
 			Assert.Contains( OverridingMethodTemplate, text );
 		}
 
-		[Time( OverridingMethodTemplate )]
+		[Timed( OverridingMethodTemplate )]
 		static void HelloWorld() {}
 	}
 }

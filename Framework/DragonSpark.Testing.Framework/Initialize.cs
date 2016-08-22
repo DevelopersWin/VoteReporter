@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Framework
 		[ModuleInitializer( 0 )]
 		public static void Execution() => Command.Default.Run();
 
-		class Command : DragonSpark.Setup.Setup
+		sealed class Command : DragonSpark.Setup.Setup
 		{
 			public static ICommand Default { get; } = new Command();
 			Command() : base( 

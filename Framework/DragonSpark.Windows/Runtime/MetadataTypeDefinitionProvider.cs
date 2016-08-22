@@ -1,9 +1,8 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.ComponentModel;
+﻿using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Runtime
 {

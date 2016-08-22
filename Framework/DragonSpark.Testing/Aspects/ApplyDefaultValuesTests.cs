@@ -42,6 +42,8 @@ namespace DragonSpark.Testing.Aspects
 
 			var name = StaticValueHost.PropertyName;
 			Assert.True( name );
+
+			StaticValueHost.PropertyName = StaticValueHost.PropertyName;
 		}
 
 		[Theory, AutoData]
