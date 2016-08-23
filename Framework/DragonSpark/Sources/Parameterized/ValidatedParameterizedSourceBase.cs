@@ -8,6 +8,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
+using DragonSpark.Activation.Location;
 using Delegates = DragonSpark.TypeSystem.Delegates;
 
 namespace DragonSpark.Sources.Parameterized

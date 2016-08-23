@@ -19,7 +19,7 @@ namespace DragonSpark.Windows
 		{
 			public static ICommand Default { get; } = new Command();
 			Command() : base( 
-				Activation.Execution.Context.Configured( ExecutionContext.Default ), 
+				DragonSpark.Runtime.Execution.Context.Configured( ExecutionContext.Default ), 
 				DragonSpark.TypeSystem.Configuration.AssemblyLoader.Configured( new Func<string, Assembly>( Assembly.LoadFile ).Wrap() ),
 				DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Configured( AssemblyLocator.Default.ToDelegate().Wrap() )
 				) {}

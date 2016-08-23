@@ -1,4 +1,4 @@
-using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework.Setup.Location;
 using DragonSpark.TypeSystem;

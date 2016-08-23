@@ -1,4 +1,4 @@
-using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
@@ -85,7 +85,7 @@ namespace DragonSpark.Composition
 			readonly ICache<LifetimeContext, object> cache;
 			readonly string boundary;
 
-			public SharedFactory( CompositeActivator activator, ICache<LifetimeContext, object> cache, string boundary ) : base( activator )
+			public SharedFactory( CompositeActivator activator, ICache<LifetimeContext, object> cache, string boundary = null ) : base( activator )
 			{
 				this.cache = cache;
 				this.boundary = boundary;

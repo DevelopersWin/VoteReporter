@@ -1,4 +1,4 @@
-using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;

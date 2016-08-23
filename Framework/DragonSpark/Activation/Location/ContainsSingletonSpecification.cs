@@ -1,13 +1,10 @@
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources.Parameterized;
 using System;
 using System.Reflection;
+using DragonSpark.Runtime.Specifications;
+using DragonSpark.Sources.Parameterized;
 
-namespace DragonSpark.Activation
+namespace DragonSpark.Activation.Location
 {
-	[AttributeUsage( AttributeTargets.Property )]
-	public sealed class SingletonAttribute : Attribute {}
-
 	public sealed class ContainsSingletonSpecification : SpecificationBase<Type>
 	{
 		public static ContainsSingletonSpecification Default { get; } = new ContainsSingletonSpecification();

@@ -1,6 +1,7 @@
 using DragonSpark.Activation;
 using DragonSpark.Testing.Objects;
 using System.Composition;
+using DragonSpark.Activation.Location;
 
 namespace DragonSpark.Windows.Testing.TestObjects
 {

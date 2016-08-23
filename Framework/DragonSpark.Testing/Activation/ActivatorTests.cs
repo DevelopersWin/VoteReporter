@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using Xunit;

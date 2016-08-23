@@ -4,6 +4,7 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.ComponentModel
 {
@@ -50,7 +51,7 @@ namespace DragonSpark.ComponentModel
 
 			public Context( TypeInfo current ) : this( current, Cache.Get( current ) ) {}
 
-			Context( TypeInfo current, TypeInfo metadata )
+			Context( TypeInfo current, [Optional]TypeInfo metadata )
 			{
 				this.current = current;
 				Metadata = metadata;

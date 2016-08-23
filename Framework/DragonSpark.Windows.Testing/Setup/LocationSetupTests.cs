@@ -17,6 +17,7 @@ using System.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation.Location;
 using Xunit;
 using Xunit.Abstractions;
 using Activator = DragonSpark.Activation.Activator;

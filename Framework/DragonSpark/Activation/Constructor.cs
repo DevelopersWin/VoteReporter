@@ -1,15 +1,12 @@
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
+using DragonSpark.Expressions;
 
 namespace DragonSpark.Activation
 {
@@ -62,140 +59,7 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public sealed class ConstructorStore : EqualityReferenceCache<ConstructTypeRequest, ConstructorInfo>
-	{
-		public static ConstructorStore Default { get; } = new ConstructorStore();
-		ConstructorStore() : base( Create ) {}
-
-		static ConstructorInfo Create( ConstructTypeRequest parameter )
-		{
-			var types = ObjectTypeFactory.Default.Get( parameter.Arguments );
-			var candidates = new [] { types, types.WhereAssigned().Fixed(), Items<Type>.Default };
-			var adapter = parameter.RequestedType.Adapt();
-			var result = candidates.Distinct( StructuralEqualityComparer<Type[]>.Default )
-				.Introduce( adapter , tuple => tuple.Item2.FindConstructor( tuple.Item1 )  )
-				.FirstOrDefault();
-			return result;
-		}
-	}
-
-	class InvokeMethodDelegate<T> : InvocationFactoryBase<MethodInfo, T> where T : class
-	{
-		public static ICache<MethodInfo, T> Default { get; } = new Cache<MethodInfo, T>( new InvokeMethodDelegate<T>().Create );
-		InvokeMethodDelegate() : base( InvokeMethodExpressionFactory.Default.Create ) {}
-	}
-
-	class InvokeInstanceMethodDelegate<T> : InvocationFactoryBase<MethodInfo, T> where T : class
-	{
-		public InvokeInstanceMethodDelegate( object instance ) : base( new InvokeInstanceMethodExpressionFactory( instance ).Create ) {}
-	}
-
-	class ConstructorDelegateFactory<T> :  InvocationFactoryBase<ConstructorInfo, T> where T : class
-	{
-		public static ICache<ConstructorInfo, T> Default { get; } = new Cache<ConstructorInfo, T>( new ConstructorDelegateFactory<T>().Create );
-		ConstructorDelegateFactory() : base( ActivateFromArrayExpression.Default.Create ) {}
-	}
-
-	abstract class InvocationFactoryBase<TParameter, TDelegate> : CompiledDelegateFactoryBase<TParameter, TDelegate> where TParameter : MethodBase
-	{
-		protected InvocationFactoryBase( Func<ExpressionBodyParameter<TParameter>, Expression> bodySource ) : this( Parameter.Default, bodySource ) {}
-		protected InvocationFactoryBase( ParameterExpression expression, Func<ExpressionBodyParameter<TParameter>, Expression> bodySource ) : base( expression, bodySource ) {}
-	}
-
-	class ActivateFromArrayExpression : InvokeArrayFactoryBase<ConstructorInfo>
-	{
-		public static ActivateFromArrayExpression Default { get; } = new ActivateFromArrayExpression();
-		ActivateFromArrayExpression() {}
-
-		protected override Expression Apply( ExpressionBodyParameter<ConstructorInfo> parameter, Expression[] arguments ) => Expression.New( parameter.Input, arguments );
-	}
-
-	class InvokeMethodExpressionFactory : InvokeArrayFactoryBase<MethodInfo>
-	{
-		public static InvokeMethodExpressionFactory Default { get; } = new InvokeMethodExpressionFactory();
-		InvokeMethodExpressionFactory() {}
-
-		protected override Expression Apply( ExpressionBodyParameter<MethodInfo> parameter, Expression[] arguments ) => Expression.Call( parameter.Input, arguments );
-	}
-
-	class InvokeInstanceMethodExpressionFactory : InvokeArrayFactoryBase<MethodInfo>
-	{
-		readonly object instance;
-		public InvokeInstanceMethodExpressionFactory( object instance )
-		{
-			this.instance = instance;
-		}
-
-		protected override Expression Apply( ExpressionBodyParameter<MethodInfo> parameter, Expression[] arguments ) => Expression.Call( Expression.Constant( instance ), parameter.Input, arguments );
-	}
-
-	abstract class InvokeArrayFactoryBase<T> /*: FactoryBase<ExpressionBodyParameter<T>, Expression>*/ where T : MethodBase
-	{
-		public virtual Expression Create( ExpressionBodyParameter<T> parameter )
-		{
-			var array = ArgumentsArrayExpressionFactory.Default.Get( new ArgumentsArrayParameter( parameter.Input, parameter.Parameter ) );
-			var result = Apply( parameter, array );
-			return result;
-		}
-
-		protected abstract Expression Apply( ExpressionBodyParameter<T> parameter, Expression[] arguments );
-	}
-
-	class ArgumentsArrayExpressionFactory : ParameterizedSourceBase<ArgumentsArrayParameter, Expression[]>
-	{
-		public static ArgumentsArrayExpressionFactory Default { get; } = new ArgumentsArrayExpressionFactory();
-		ArgumentsArrayExpressionFactory() {}
-
-		public override Expression[] Get( ArgumentsArrayParameter parameter )
-		{
-			var types = parameter.Method.GetParameterTypes();
-			var result = new Expression[types.Length];
-			for ( var i = 0; i < types.Length; i++ )
-			{
-				var index = Expression.ArrayIndex( parameter.Parameter, Expression.Constant( i ) );
-				result[i] = Expression.Convert( index, types[i] );
-			}
-			return result;
-		}
-	}
-
-	class ArgumentsArrayParameter
-	{
-		public ArgumentsArrayParameter( MethodBase method, ParameterExpression parameter )
-		{
-			Method = method;
-			Parameter = parameter;
-		}
-
-		public MethodBase Method { get; }
-		public ParameterExpression Parameter { get; }
-	}
-
-	public struct ExpressionBodyParameter<T>
-	{
-		public ExpressionBodyParameter( T input, ParameterExpression parameter )
-		{
-			Input = input;
-			Parameter = parameter;
-		}
-
-		public T Input { get; }
-		public ParameterExpression Parameter { get; }
-	}
-
 	/*public interface IParameterExpressionStore : IStore<ParameterExpression> {}*/
-
-	public static class Parameter
-	{
-		public static ParameterExpression Create<T>( string name = "parameter" ) => Expression.Parameter( typeof(T), name );
-
-		public static ParameterExpression Default { get; } = Create<object[]>();
-
-
-
-		/*public static ImmutableArray<ParameterExpression> InstanceArguments { get; } = new ParameterFactory( InstanceParameter.Default, ArgumentArrayParameter.Default ).Create();*/
-		// public static ImmutableArray<ParameterExpression> Arguments { get; } = new ParameterFactory( ArgumentArrayParameter.Default ).Create();
-	}
 
 	/*public class ParameterFactory : FactoryBase<ImmutableArray<ParameterExpression>>
 	{
@@ -241,35 +105,8 @@ namespace DragonSpark.Activation
 		protected override ParameterExpression Get() => expression;
 	}*/
 
-	public abstract class CompiledDelegateFactoryBase<TParameter, TResult> // : FactoryBase<TParameter, TResult>
-	{
-		readonly ParameterExpression parameterExpression;
-		readonly Func<ExpressionBodyParameter<TParameter>, Expression> bodySource;
-
-		protected CompiledDelegateFactoryBase( Func<ExpressionBodyParameter<TParameter>, Expression> bodySource ) : this( Parameter.Default, bodySource ) {}
-
-		protected CompiledDelegateFactoryBase( ParameterExpression parameterExpression, Func<ExpressionBodyParameter<TParameter>, Expression> bodySource )
-		{
-			this.parameterExpression = parameterExpression;
-			this.bodySource = bodySource;
-		}
-
-		public virtual TResult Create( TParameter parameter )
-		{
-			var body = bodySource( new ExpressionBodyParameter<TParameter>( parameter, parameterExpression ) );
-			var type = typeof(TResult).GetTypeInfo().GetDeclaredMethod( nameof(Invoke) ).ReturnType;
-			var converted = type != typeof(void) && type != typeof(TResult) ? Expression.Convert( body, type ) : body;
-			var result = Expression.Lambda<TResult>( converted, parameterExpression ).Compile();
-			return result;
-		}
-	}
-
 	/*public static class InvokeExtensions
 	{
 		public static T Invoke<T>( this Invoke @this, params object[] arguments ) => (T)@this( arguments );
 	}*/
-
-	public delegate object Invoke( params object[] args );
-
-	public delegate void Execute( params object[] args );
 }

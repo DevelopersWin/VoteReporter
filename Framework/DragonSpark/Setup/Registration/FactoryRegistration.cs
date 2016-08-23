@@ -8,6 +8,7 @@ using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Expressions;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Setup.Registration

@@ -21,7 +21,7 @@ namespace DragonSpark.Testing.Framework
 		{
 			public static ICommand Default { get; } = new Command();
 			Command() : base( 
-				Activation.Execution.Context.Configured( ExecutionContext.Default )
+				Runtime.Execution.Context.Configured( ExecutionContext.Default )
 			) {}
 		}
 	}

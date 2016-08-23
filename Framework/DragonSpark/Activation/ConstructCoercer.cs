@@ -1,28 +1,22 @@
 using DragonSpark.Extensions;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using DragonSpark.Expressions;
 
 namespace DragonSpark.Activation
 {
-	public class ParameterConstructor<T> : ParameterConstructor<object, T> {}
-
 	public class ParameterConstructor<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
 	{
-		static ICache<ConstructorInfo, Func<TParameter, TResult>> Cache { get; } = new Cache<ConstructorInfo, Func<TParameter, TResult>>( new Factory().Create );
-
 		public static Func<TParameter, TResult> Default { get; } = new ParameterConstructor<TParameter, TResult>().Get;
+		protected ParameterConstructor() : this( Make() ) {}
 
 		readonly Func<TParameter, TResult> factory;
-
-		protected ParameterConstructor() : this( Make() ) {}
 
 		ParameterConstructor( Func<TParameter, TResult> factory )
 		{
@@ -40,13 +34,14 @@ namespace DragonSpark.Activation
 			return result;
 		}
 
-		public static Func<TParameter, TResult> Make( ConstructorInfo constructor ) => Cache.Get( constructor );
+		public static Func<TParameter, TResult> Make( ConstructorInfo constructor ) => Factories.DefaultNested.Get( constructor );
 
 		public override TResult Get( TParameter parameter ) => factory( parameter );
 
-		sealed class Factory : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
+		sealed class Factories : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
 		{
-			public Factory() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, CreateParameters( parameter ) ) ) {}
+			public static IParameterizedSource<ConstructorInfo, Func<TParameter, TResult>> DefaultNested { get; } = new Cache<ConstructorInfo, Func<TParameter, TResult>>( new Factories().Get );
+			Factories() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, CreateParameters( parameter ) ) ) {}
 
 			static IEnumerable<Expression> CreateParameters( ExpressionBodyParameter<ConstructorInfo> parameter )
 			{
@@ -63,46 +58,6 @@ namespace DragonSpark.Activation
 		}
 	}
 
-	public sealed class ConstructingParameterLocator : ParameterizedSourceBase<Type, Type>
-	{
-		public static ConstructingParameterLocator Default { get; } = new ConstructingParameterLocator();
-		ConstructingParameterLocator() {}
-
-		public override Type Get( Type parameter ) => 
-			InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).Select( info => info.GetParameterTypes() ).SingleOrDefault( types => types.Length == 1 )?.Single();
-	}
-
-	public class SourceCoercer<T> : ICoercer<T>
-	{
-		public static SourceCoercer<T> Default { get; } = new SourceCoercer<T>();
-		SourceCoercer() {}
-
-		public T Coerce( [Optional]object parameter )
-		{
-			var store = parameter as ISource<T>;
-			var result = store != null ? store.Get() : parameter.As<T>();
-			return result;
-		}
-	}
-
-	public static class CoercerExtensions
-	{
-		public static Coerce<T> ToDelegate<T>( this ICoercer<T> @this ) => DelegateCache<T>.Default.Get( @this );
-		class DelegateCache<T> : Cache<ICoercer<T>, Coerce<T>>
-		{
-			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
-			DelegateCache() : base( command => command.Coerce ) {}
-		}
-	}
-
-	public class Coercer<T> : CoercerBase<T>
-	{
-		public static Coercer<T> Default { get; } = new Coercer<T>();
-		protected Coercer() {}
-
-		protected override T PerformCoercion( [Optional]object parameter ) => default(T);
-	}
-
 	public class ConstructCoercer<T> : CoercerBase<T>
 	{
 		public static ConstructCoercer<T> Default { get; } = new ConstructCoercer<T>( ParameterConstructor<T>.From );
@@ -115,23 +70,5 @@ namespace DragonSpark.Activation
 		}
 
 		protected override T PerformCoercion( [Optional]object parameter ) => projector( parameter );
-	}
-
-	public class Projector<TFrom, TTo> : CoercerBase<TTo>
-	{
-		readonly Func<TFrom, TTo> projection;
-		public Projector( Func<TFrom, TTo> projection )
-		{
-			this.projection = projection;
-		}
-
-		protected override TTo PerformCoercion( [Optional]object parameter ) => parameter.AsTo( projection );
-	}
-
-	public abstract class CoercerBase<T> : ICoercer<T>
-	{
-		public T Coerce( [Optional]object parameter ) => parameter is T ? (T)parameter : parameter.IsAssignedOrValue() ? PerformCoercion( parameter ) : default(T);
-
-		protected abstract T PerformCoercion( object parameter );
 	}
 }

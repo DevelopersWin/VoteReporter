@@ -1,5 +1,3 @@
-using DragonSpark.Activation;
-
 namespace DragonSpark.Runtime
 {
 	public abstract class Program<T> : IProgram

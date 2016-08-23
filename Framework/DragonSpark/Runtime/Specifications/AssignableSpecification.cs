@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Linq;

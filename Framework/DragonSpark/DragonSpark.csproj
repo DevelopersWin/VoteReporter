@@ -33,7 +33,48 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Activation\SingletonAttribute.cs" />
+    <Compile Include="Expressions\ActivateFromArrayExpression.cs" />
+    <Compile Include="Activation\Activator.cs" />
+    <Compile Include="Expressions\ArgumentsArrayExpressionFactory.cs" />
+    <Compile Include="Expressions\ArgumentsArrayParameter.cs" />
+    <Compile Include="Coerce.cs" />
+    <Compile Include="Coercer.cs" />
+    <Compile Include="CoercerBase.cs" />
+    <Compile Include="CoercerExtensions.cs" />
+    <Compile Include="Expressions\CompiledDelegateFactoryBase.cs" />
+    <Compile Include="Activation\ConstructingParameterLocator.cs" />
+    <Compile Include="Activation\ConstructorDelegateFactory.cs" />
+    <Compile Include="Activation\ConstructorStore.cs" />
+    <Compile Include="Activation\ConstructTypeRequest.cs" />
+    <Compile Include="Activation\Location\ContainsSingletonSpecification.cs" />
+    <Compile Include="Activation\Location\DecoratedServiceProvider.cs" />
+    <Compile Include="Activation\Location\DefaultServiceProvider.cs" />
+    <Compile Include="Runtime\Execute.cs" />
+    <Compile Include="Runtime\ExecutionContext.cs" />
+    <Compile Include="Expressions\ExpressionBodyParameter.cs" />
+    <Compile Include="Activation\IActivator.cs" />
+    <Compile Include="Expressions\InvocationFactoryBase.cs" />
+    <Compile Include="Expressions\Invoke.cs" />
+    <Compile Include="Expressions\InvokeArrayFactoryBase.cs" />
+    <Compile Include="Expressions\InvokeInstanceMethodDelegate.cs" />
+    <Compile Include="Expressions\InvokeInstanceMethodExpressionFactory.cs" />
+    <Compile Include="Expressions\InvokeMethodDelegate.cs" />
+    <Compile Include="Expressions\InvokeMethodExpressionFactory.cs" />
+    <Compile Include="Activation\Location\ISingletonLocator.cs" />
+    <Compile Include="Activation\Location\LocatorBase.cs" />
+    <Compile Include="Expressions\Parameter.cs" />
+    <Compile Include="Activation\ParameterConstructor.cs" />
+    <Compile Include="Projector.cs" />
+    <Compile Include="Activation\Location\SingletonAttribute.cs" />
+    <Compile Include="Activation\Location\SingletonDelegateCache.cs" />
+    <Compile Include="Activation\Location\SingletonDelegates.cs" />
+    <Compile Include="Activation\Location\SingletonLocator.cs" />
+    <Compile Include="Activation\Location\SingletonProperties.cs" />
+    <Compile Include="Activation\Location\SingletonRequest.cs" />
+    <Compile Include="Activation\Location\SingletonSpecification.cs" />
+    <Compile Include="Sources\SourceCoercer.cs" />
+    <Compile Include="Sources\SourceTypeAssignableSpecification.cs" />
+    <Compile Include="Activation\TypeRequest.cs" />
     <Compile Include="Aspects\DefaultGuardAspect.cs" />
     <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
     <Compile Include="Composition\Convention.cs" />
@@ -43,13 +84,13 @@
     <Compile Include="Diagnostics\TimeAttributeTests.cs" />
     <Compile Include="Setup\ActivatedServiceSource.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
-    <Compile Include="Activation\SourceTypeLocator.cs" />
+    <Compile Include="Sources\SourceTypeLocator.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\ITransformer.cs" />
     <Compile Include="Sources\Parameterized\ParameterAware.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Sources\Parameterized\Factory.cs" />
-    <Compile Include="Activation\Execution.cs" />
+    <Compile Include="Runtime\Execution.cs" />
     <Compile Include="Aspects\Validation\AutoValidation.cs" />
     <Compile Include="Aspects\ThreadCache.cs" />
     <Compile Include="Aspects\FreezeAttribute.cs" />
@@ -172,7 +213,7 @@
     <Compile Include="Activation\CompositeActivator.cs" />
     <Compile Include="Activation\ConstructorBase.cs" />
     <Compile Include="Activation\ConstructCoercer.cs" />
-    <Compile Include="Activation\ICoercer.cs" />
+    <Compile Include="ICoercer.cs" />
     <Compile Include="Sources\Parameterized\IValidatedParameterizedSource.cs" />
     <Compile Include="Setup\Registration\FactoryRegistration.cs" />
     <Compile Include="Setup\SetupParameterExtensions.cs" />
@@ -276,8 +317,8 @@
     <Compile Include="Activation\ActivatorExtensions.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Activation\ILocator.cs" />
-    <Compile Include="Activation\Services.cs">
+    <Compile Include="Activation\Location\LocateTypeRequest.cs" />
+    <Compile Include="Activation\Location\GlobalServiceProvider.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Activation\Constructor.cs" />

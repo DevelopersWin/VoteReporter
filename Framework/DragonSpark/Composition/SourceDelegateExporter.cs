@@ -13,6 +13,7 @@ using System.Composition;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Activation.Location;
 
 namespace DragonSpark.Composition
 {

@@ -1,7 +1,8 @@
-using DragonSpark.Activation;
 using DragonSpark.Aspects;
 using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Expressions;
 using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -68,13 +69,13 @@ namespace DragonSpark.TypeSystem
 
 	public class StaticActionContext : ActionContextBase
 	{
-		readonly static Func<MethodInfo, Execute> ToDelegate = InvokeMethodDelegate<Execute>.Default.ToDelegate();
+		readonly static Func<MethodInfo, Execute> ToDelegate = InvokeMethodDelegate<Execute>.Default.ToSourceDelegate();
 		public StaticActionContext( ImmutableArray<MethodInfo> methods ) : base( ToDelegate, methods ) {}
 	}
 
 	public class InstanceActionContext : ActionContextBase
 	{
-		public InstanceActionContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Execute>( instance ).Create, methods ) {}
+		public InstanceActionContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Execute>( instance ).Get, methods ) {}
 	}
 
 	public abstract class ActionContextBase : DelegateCreationContextBase<Execute>
@@ -89,13 +90,13 @@ namespace DragonSpark.TypeSystem
 
 	public class StaticFactoryContext : FactoryContextBase
 	{
-		readonly static Func<MethodInfo, Invoke> ToDelegate = InvokeMethodDelegate<Invoke>.Default.ToDelegate();
+		readonly static Func<MethodInfo, Invoke> ToDelegate = InvokeMethodDelegate<Invoke>.Default.ToSourceDelegate();
 		public StaticFactoryContext( ImmutableArray<MethodInfo> methods ) : base( ToDelegate, methods ) {}
 	}
 
 	public class InstanceFactoryContext : FactoryContextBase
 	{
-		public InstanceFactoryContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Invoke>( instance ).Create, methods ) {}
+		public InstanceFactoryContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Invoke>( instance ).Get, methods ) {}
 	}
 
 	public interface IGenericMethodContext<T> where T : class

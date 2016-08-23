@@ -1,4 +1,4 @@
-using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using System.Data.Entity;
 
 namespace DragonSpark.Windows.Entity

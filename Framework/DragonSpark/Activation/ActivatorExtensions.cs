@@ -1,13 +1,10 @@
-﻿using DragonSpark.Composition;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Composition;
 using System.Linq;
 using System.Reflection;
 
@@ -74,112 +71,6 @@ namespace DragonSpark.Activation
 		public static ImmutableArray<T> ActivateMany<T>( this IActivator @this, Type objectType, IEnumerable<Type> types ) => @this.CreateMany<T>( types.Where( objectType.Adapt().IsAssignableFrom ) );
 	}
 
-	public sealed class Activator : CompositeActivator
-	{
-		public static ISource<IActivator> Default { get; } = new Scope<IActivator>( Factory.Global( () => new Activator() ) );
-		Activator() : base( new Locator(), Constructor.Default ) {}
-
-		public static T Activate<T>( Type type ) => Default.Get().Get<T>( type );
-
-		sealed class Locator : LocatorBase
-		{
-			readonly static Func<Type, Type> Types = ConventionTypes.Default.Get;
-
-			readonly Func<Type, Type> convention;
-			readonly ISingletonLocator singleton;
-
-			public Locator() : this( Types, SingletonLocator.Default ) {}
-
-			Locator( Func<Type, Type> convention, ISingletonLocator singleton )
-			{
-				this.convention = convention;
-				this.singleton = singleton;
-			}
-
-			public override object Get( LocateTypeRequest parameter ) => singleton.Get( convention( parameter.RequestedType ) ?? parameter.RequestedType );
-		}
-	}
-
-	public interface ISingletonLocator : IParameterizedSource<Type, object> {}
-
-	public class SingletonSpecification : SpecificationBase<SingletonRequest>
-	{
-		public static SingletonSpecification Default { get; } = new SingletonSpecification();
-		SingletonSpecification() : this( "Instance", "Default" ) {}
-
-		readonly ImmutableArray<string> candidates;
-
-		public SingletonSpecification( params string[] candidates ) : this( candidates.ToImmutableArray() ) {}
-
-		public SingletonSpecification( ImmutableArray<string> candidates )
-		{
-			this.candidates = candidates;
-		}
-
-		public override bool IsSatisfiedBy( SingletonRequest parameter )
-		{
-			var result =
-				SourceTypeAssignableSpecification.Default.IsSatisfiedBy( new SourceTypeAssignableSpecification.Parameter( parameter.RequestedType, parameter.Candidate.PropertyType ) )
-				&& 
-				parameter.Candidate.GetMethod.IsStatic && !parameter.Candidate.GetMethod.ContainsGenericParameters 
-				&& 
-				( candidates.Contains( parameter.Candidate.Name ) || parameter.Candidate.Has<SingletonAttribute>() );
-			return result;
-		}
-	}
-
-	public struct SingletonRequest
-	{
-		public SingletonRequest( Type requestedType, PropertyInfo candidate )
-		{
-			RequestedType = requestedType;
-			Candidate = candidate;
-		}
-
-		public Type RequestedType { get; }
-		public PropertyInfo Candidate { get; }
-	}
-
-	public sealed class SourceTypeAssignableSpecification : SpecificationBase<SourceTypeAssignableSpecification.Parameter>
-	{
-		public static SourceTypeAssignableSpecification Default { get; } = new SourceTypeAssignableSpecification();
-		SourceTypeAssignableSpecification() {}
-
-		public override bool IsSatisfiedBy( Parameter parameter )
-		{
-			foreach ( var candidate in Candidates( parameter.Candidate ) )
-			{
-				if ( candidate.Adapt().IsAssignableFrom( parameter.TargetType ) )
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		static IEnumerable<Type> Candidates( Type type )
-		{
-			yield return type;
-			var implementations = type.Adapt().GetImplementations( typeof(ISource<>) );
-			if ( implementations.Any() )
-			{
-				yield return implementations.First().Adapt().GetInnerType();
-			}
-		}
-
-		public struct Parameter
-		{
-			public Parameter( Type targetType, Type candidate )
-			{
-				TargetType = targetType;
-				Candidate = candidate;
-			}
-
-			public Type TargetType { get; }
-			public Type Candidate { get; }
-		}
-	}
-
 	/*public sealed class SourceTypeAssignableSpecification : GuardedSpecificationBase<Type>
 	{
 		public static ISpecification<Type> Default { get; } = new SourceTypeAssignableSpecification().ToCache();
@@ -189,23 +80,6 @@ namespace DragonSpark.Activation
 
 		public override bool IsSatisfiedBy( Type parameter ) => Source.IsAssignableFrom( parameter );
 	}*/
-
-	sealed class SingletonDelegateCache : FactoryCache<PropertyInfo, Func<object>>
-	{
-		public static SingletonDelegateCache Default { get; } = new SingletonDelegateCache();
-		SingletonDelegateCache() {}
-
-		protected override Func<object> Create( PropertyInfo parameter ) => 
-			parameter.PropertyType.Adapt().IsGenericOf( typeof(ISource<>), false ) ? parameter.GetMethod.CreateDelegate<Func<ISource>>().Invoke().Get : parameter.GetMethod.CreateDelegate<Func<object>>();
-	}
-
-	public class SingletonDelegates : SingletonDelegates<Func<object>>
-	{
-		public static SingletonDelegates Default { get; } = new SingletonDelegates();
-		SingletonDelegates() : this( SingletonProperties.Default ) {}
-		public SingletonDelegates( IParameterizedSource<Type, PropertyInfo> source ) : base( source.ToSourceDelegate(), SingletonDelegateCache.Default.Get ) {}
-		// public SingletonDelegates( ISpecification<SingletonRequest> specification, Func<PropertyInfo, Func<object>> source ) : base( specification, source ) {}
-	}
 
 	public class SingletonDelegates<T> : FactoryCache<Type, T>
 	{
@@ -224,46 +98,5 @@ namespace DragonSpark.Activation
 			var result = property != null ? source( property ) : default(T);
 			return result;
 		}
-	}
-
-	public class SingletonProperties : ParameterizedSourceBase<Type, PropertyInfo>
-	{
-		public static IParameterizedSource<Type, PropertyInfo> Default { get; } = new SingletonProperties().ToCache();
-		SingletonProperties() : this( SingletonSpecification.Default ) {}
-
-		readonly ISpecification<SingletonRequest> specification;
-
-		public SingletonProperties( ISpecification<SingletonRequest> specification )
-		{
-			this.specification = specification;
-		}
-
-		public override PropertyInfo Get( Type parameter )
-		{
-			foreach ( var property in parameter.GetTypeInfo().DeclaredProperties.Fixed() )
-			{
-				if ( specification.IsSatisfiedBy( new SingletonRequest( parameter, property ) ) )
-				{
-					return property;
-				}
-			}
-			return null;
-		}
-	}
-
-	public class SingletonLocator : FactoryCache<Type, object>, ISingletonLocator
-	{
-		[Export( typeof(ISingletonLocator) )]
-		public static SingletonLocator Default { get; } = new SingletonLocator();
-		SingletonLocator() : this( SingletonDelegates.Default.Get ) {}
-
-		readonly Func<Type, Func<object>> provider;
-
-		public SingletonLocator( Func<Type, Func<object>> provider )
-		{
-			this.provider = provider;
-		}
-
-		protected override object Create( Type parameter ) => provider( parameter )?.Invoke();
 	}
 }

@@ -13,12 +13,12 @@ namespace DragonSpark.Aspects
 	[PSerializable, AttributeUsage( AttributeTargets.Method ), MulticastAttributeUsage( MulticastTargets.Method | MulticastTargets.InstanceConstructor, TargetMemberAttributes = MulticastAttributes.NonAbstract ), LinesOfCodeAvoided( 1 )]
 	public class DefaultGuardAspect : MethodLevelAspect, IAspectProvider
 	{
-		public override bool CompileTimeValidate( MethodBase method ) => method.GetParameters().Any() && !method.IsSpecialName;
+		public override bool CompileTimeValidate( MethodBase method ) => ( !method.IsSpecialName || method is ConstructorInfo ) && method.GetParameters().Any();
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement )
 		{
-			var info = targetElement as MethodInfo;
-			if ( info != null/* && !info.IsSpecialName*/ )
+			var info = targetElement as MethodBase;
+			if ( info != null )
 			{
 				foreach ( var parameter in info.GetParameters() )
 				{

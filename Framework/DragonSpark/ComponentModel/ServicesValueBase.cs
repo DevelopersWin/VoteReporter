@@ -1,7 +1,8 @@
-using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.ComponentModel
 {
@@ -24,7 +25,7 @@ namespace DragonSpark.ComponentModel
 		{
 			readonly Func<PropertyInfo, Type> type;
 
-			public Converter( Type activatedType ) : this( p => activatedType ?? p.PropertyType ) { }
+			public Converter( [Optional]Type activatedType ) : this( p => activatedType ?? p.PropertyType ) { }
 
 			public Converter( Func<PropertyInfo, Type> type )
 			{
