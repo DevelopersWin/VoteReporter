@@ -1,4 +1,3 @@
-using DragonSpark.Aspects.Validation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Aspects;
@@ -10,12 +9,6 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	public class AspectHub : Cache<IAspectHub>
-	{
-		public static AspectHub Default { get; } = new AspectHub();
-		AspectHub() {}
-	}
-
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
 	public class FreezeAttribute : MethodInterceptionAspect, IInstanceScopedAspect

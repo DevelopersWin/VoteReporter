@@ -11,7 +11,7 @@ using System.Reflection;
 namespace DragonSpark.Aspects
 {
 	[PSerializable, AttributeUsage( AttributeTargets.Method ), MulticastAttributeUsage( MulticastTargets.Method | MulticastTargets.InstanceConstructor, TargetMemberAttributes = MulticastAttributes.NonAbstract ), LinesOfCodeAvoided( 1 )]
-	public class DefaultGuardAspect : MethodLevelAspect, IAspectProvider
+	public class AutoGuardAspect : MethodLevelAspect, IAspectProvider
 	{
 		public override bool CompileTimeValidate( MethodBase method ) => ( !method.IsSpecialName || method is ConstructorInfo ) && method.GetParameters().Any();
 

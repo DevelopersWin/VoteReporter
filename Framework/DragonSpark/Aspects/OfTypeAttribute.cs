@@ -1,5 +1,4 @@
 using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
 using PostSharp.Reflection;
@@ -8,11 +7,6 @@ using System.Linq;
 
 namespace DragonSpark.Aspects
 {
-	public class OfSourceType : OfTypeAttribute
-	{
-		public OfSourceType() : base( typeof(IValidatedParameterizedSource), typeof(Func<>), typeof(Func<,>) ) {}
-	}
-
 	public class OfTypeAttribute : LocationContractAttribute, ILocationValidationAspect<Type>
 	{
 		readonly Type[] types;

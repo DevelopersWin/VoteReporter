@@ -1,4 +1,3 @@
-using DragonSpark.Aspects;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
