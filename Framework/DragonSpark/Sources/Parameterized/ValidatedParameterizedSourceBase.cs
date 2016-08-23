@@ -1,66 +1,10 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Activation.Location;
-using DragonSpark.Composition;
-using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized.Caching;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public class SelfTransformer<T> : TransformerBase<T>
-	{
-		public static SelfTransformer<T> Default { get; } = new SelfTransformer<T>();
-
-		public override T Get( T parameter ) => parameter;
-	}
-
-	public abstract class TransformerBase<T> : ParameterizedSourceBase<T, T>, ITransformer<T> {}
-
-	public class ConfiguringTransformer<T> : TransformerBase<T>
-	{
-		readonly Action<T> configure;
-
-		public ConfiguringTransformer( Action<T> configure )
-		{
-			this.configure = configure;
-		}
-
-		public override T Get( T parameter )
-		{
-			configure( parameter );
-			return parameter;
-		}
-	}
-
-	public class ConfiguringFactory<TParameter, TResult> : DelegatedValidatedSource<TParameter, TResult>
-	{
-		readonly Action<TParameter> initialize;
-		readonly Action<TResult> configure;
-
-		public ConfiguringFactory( Func<TParameter, TResult> factory, Action<TResult> configure ) : this( factory, Delegates<TParameter>.Empty, configure ) {}
-
-		public ConfiguringFactory( Func<TParameter, TResult> factory, Action<TParameter> initialize ) : this( factory, initialize, Delegates<TResult>.Empty ) {}
-
-		public ConfiguringFactory( Func<TParameter, TResult> factory, Action<TParameter> initialize, Action<TResult> configure ) : base( factory )
-		{
-			this.initialize = initialize;
-			this.configure = configure;
-		}
-
-		public override TResult Get( TParameter parameter )
-		{
-			initialize( parameter );
-			var result = base.Get( parameter );
-			configure( result );
-			return result;
-		}
-	}
-
 	public class ConfiguringFactory<T> : DelegatedSource<T>
 	{
 		readonly Action initialize;
@@ -113,110 +57,8 @@ namespace DragonSpark.Sources.Parameterized
 		}
 	}
 
-	public class DelegatedValidatedSource<TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
-	{
-		readonly Func<TParameter, TResult> inner;
-
-		public DelegatedValidatedSource( Func<TParameter, TResult> inner ) : this( inner, Specifications<TParameter>.Always ) {}
-
-		public DelegatedValidatedSource( Func<TParameter, TResult> inner, ISpecification<TParameter> specification ) : this( inner, Defaults<TParameter>.Coercer, specification ) {}
-
-		public DelegatedValidatedSource( Func<TParameter, TResult> inner, Coerce<TParameter> coercer, ISpecification<TParameter> specification ) : base( coercer, specification )
-		{
-			this.inner = inner;
-		}
-
-		public override TResult Get( TParameter parameter ) => inner( parameter );
-	}
-
-	public class FixedFactory<TParameter, TResult> : SourceBase<TResult>
-	{
-		readonly Func<TParameter, TResult> inner;
-		readonly Func<TParameter> parameter;
-
-		public FixedFactory( Func<TParameter, TResult> inner, [Optional]TParameter parameter ) : this( inner, Factory.For( parameter ) ) {}
-
-		public FixedFactory( Func<TParameter, TResult> inner, Func<TParameter> parameter )
-		{
-			this.inner = inner;
-			this.parameter = parameter;
-		}
-
-		public override TResult Get() => inner( parameter() );
-	}
-
-	public class ConstructFromKnownTypes<T> : ParameterConstructedCompositeFactory<object>, IParameterizedSource<object, T>
-	{
-		public static ISource<IParameterizedSource<object, T>> Default { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.Global( () => new ConstructFromKnownTypes<T>( KnownTypes.Default.Get<T>().ToArray() ) ) );
-		ConstructFromKnownTypes( params Type[] types ) : base( types ) {}
-
-		T IParameterizedSource<object, T>.Get( object parameter ) => (T)Get( parameter );
-	}
-
-	public static class Defaults
-	{
-		public static ISpecification<Type> KnownSourcesSpecification { get; } = IsSourceSpecification.Default.Or( IsParameterizedSourceSpecification.Default ).ToCachedSpecification();
-		
-		public static ISpecification<Type> ActivateSpecification { get; } = CanInstantiateSpecification.Default.Or( ContainsSingletonSpecification.Default ).ToCachedSpecification();
-
-		public static ISpecification<Type> IsExportSpecification { get; } = Composition.IsExportSpecification.Default.Project( Projections.MemberType ).Or( ContainsExportedSingletonSpecification.Default ).ToCachedSpecification();
-	}
-
 	public static class Defaults<T>
 	{
 		public static Coerce<T> Coercer { get; } = Coercer<T>.Default.Coerce;
-	}
-
-	public class ParameterConstructedCompositeFactory<T> : CompositeFactory<object, T>
-	{
-		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ).ToSourceDelegate() ).Fixed() ) {}
-
-		sealed class Factory : ParameterizedSourceBase<T>
-		{
-			readonly Type type;
-
-			public Factory( Type type )
-			{
-				this.type = type;
-			}
-
-			public override T Get( object parameter ) => ParameterConstructor<T>.Make( parameter.GetType(), type )( parameter );
-		}
-	}
-
-	public class CompositeFactory<TParameter, TResult> : ValidatedParameterizedSourceBase<TParameter, TResult>
-	{
-		readonly ImmutableArray<Func<TParameter, TResult>> inner;
-
-		public CompositeFactory( params IParameterizedSource<TParameter, TResult>[] factories ) : this( factories.Select( factory => factory.ToSourceDelegate() ).ToArray() ) {}
-
-		public CompositeFactory( params Func<TParameter, TResult>[] inner ) : this( Specifications<TParameter>.Always, inner ) {}
-
-		public CompositeFactory( ISpecification<TParameter> specification, params Func<TParameter, TResult>[] inner ) : this( Defaults<TParameter>.Coercer, specification, inner ) {}
-
-		public CompositeFactory( Coerce<TParameter> coercer, ISpecification<TParameter> specification, params Func<TParameter, TResult>[] inner ) : base( coercer, specification )
-		{
-			this.inner = inner.ToImmutableArray();
-		}
-
-		public override TResult Get( [Optional]TParameter parameter ) => inner.Introduce( parameter ).FirstAssigned();
-	}
-
-	public sealed class Wrapper<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
-	{
-		readonly Func<TResult> factory;
-
-		public Wrapper( Func<TResult> factory )
-		{
-			this.factory = factory;
-		}
-
-		public override TResult Get( [Optional]TParameter parameter ) => factory();
-	}
-
-	public sealed class Origin : Cache<ISource>
-	{
-		public static IAssignableParameterizedSource<ISource> Default { get; } = new Origin();
-		Origin() {}
 	}
 }

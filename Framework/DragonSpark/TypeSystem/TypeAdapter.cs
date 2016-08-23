@@ -1,13 +1,12 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.TypeSystem
 {
@@ -59,7 +58,7 @@ namespace DragonSpark.TypeSystem
 		
 		public Assembly Assembly => Info.Assembly;
 
-		public Type[] GetHierarchy( bool includeRoot = true )
+		public IEnumerable<Type> GetHierarchy( bool includeRoot = true )
 		{
 			var builder = ImmutableArray.CreateBuilder<Type>();
 			builder.Add( Type );

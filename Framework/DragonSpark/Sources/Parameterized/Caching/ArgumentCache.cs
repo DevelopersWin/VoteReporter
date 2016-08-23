@@ -1,17 +1,11 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Sources.Parameterized.Caching;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 
-namespace DragonSpark.Sources.Parameterized
+namespace DragonSpark.Sources.Parameterized.Caching
 {
-	public interface IArgumentCache<TArgument, TValue> : IAtomicCache<TArgument, TValue>
-	{
-		TValue GetOrSet( TArgument key, Func<TValue> factory );
-	}
-
 	public class ArgumentCache<TArgument, TValue> : CacheBase<TArgument, TValue>, IArgumentCache<TArgument, TValue>
 	{
 		readonly static IEqualityComparer<TArgument> EqualityComparer = typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Default : EqualityComparer<TArgument>.Default;
@@ -68,13 +62,6 @@ namespace DragonSpark.Sources.Parameterized
 	}*/
 
 	// public interface I
-
-	public interface IParameterAwareHandler
-	{
-		bool Handles( object parameter );
-
-		bool Handle( object parameter, out object handled );
-	}
 
 	/*class ParameterAwareHandler : IParameterAwareHandler
 	{
@@ -190,22 +177,4 @@ namespace DragonSpark.Sources.Parameterized
 
 		public IParameterAwareHandler For( InstanceMethod instance ) => new CompositeParameterAwareHandler( Get( instance.Default ).Get( instance.Method ).ToImmutableArray() );
 	}*/
-
-	sealed class CacheParameterHandler<TKey, TValue> : IParameterAwareHandler
-	{
-		readonly ICache<TKey, TValue> cache;
-
-		public CacheParameterHandler( ICache<TKey, TValue> cache )
-		{
-			this.cache = cache;
-		}
-
-		public bool Handles( object parameter ) => parameter is TKey && cache.Contains( (TKey)parameter );
-		public bool Handle( object parameter, out object handled )
-		{
-			var result = Handles( parameter );
-			handled = result ? cache.Get( (TKey)parameter ) : default(TValue);
-			return result;
-		}
-	}
 }

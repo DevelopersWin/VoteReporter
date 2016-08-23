@@ -156,6 +156,8 @@
     <Compile Include="Application\ITaskMonitor.cs" />
     <Compile Include="Application\ITypeSource.cs" />
     <Compile Include="Setup\RegisterInstanceCommand.cs" />
+    <Compile Include="Sources\CompositeItemSource.cs" />
+    <Compile Include="Sources\Defaults.cs" />
     <Compile Include="Sources\Delegates\DelegatesBase.cs" />
     <Compile Include="Sources\Delegates\ParameterizedSourceDelegates.cs" />
     <Compile Include="Sources\Delegates\ServiceProvidedParameterizedSourceDelegates.cs" />
@@ -167,6 +169,41 @@
     <Compile Include="Application\SystemParts.cs" />
     <Compile Include="Application\SystemPartsFactory.cs" />
     <Compile Include="Application\TypeSource.cs" />
+    <Compile Include="Sources\ExportSource.cs" />
+    <Compile Include="Sources\IItemSource.cs" />
+    <Compile Include="Sources\ItemSource.cs" />
+    <Compile Include="Specifications\AdapterSpecificationBase.cs" />
+    <Compile Include="Sources\Parameterized\AutoValidatingSource.cs" />
+    <Compile Include="Sources\Parameterized\AutoValidatingSourceBase.cs" />
+    <Compile Include="Sources\Parameterized\CacheParameterHandler.cs" />
+    <Compile Include="Sources\Parameterized\Caching\ActivatedCache.cs" />
+    <Compile Include="Sources\Parameterized\Caching\DecoratedSourceCache.cs" />
+    <Compile Include="Sources\Parameterized\CompositeFactory.cs" />
+    <Compile Include="Sources\Parameterized\ConfiguringFactory.cs" />
+    <Compile Include="Sources\Parameterized\ConfiguringTransformer.cs" />
+    <Compile Include="Sources\Parameterized\ConstructFromKnownTypes.cs" />
+    <Compile Include="Sources\Parameterized\Defaults.cs" />
+    <Compile Include="Sources\Parameterized\DelegatedValidatedSource.cs" />
+    <Compile Include="Sources\Parameterized\FixedFactory.cs" />
+    <Compile Include="Sources\Parameterized\Caching\IArgumentCache.cs" />
+    <Compile Include="Sources\Parameterized\IParameterAwareHandler.cs" />
+    <Compile Include="Sources\Delegates\IsParameterizedSourceSpecification.cs" />
+    <Compile Include="Sources\Delegates\IsSourceSpecification.cs" />
+    <Compile Include="Sources\Parameterized\Origin.cs" />
+    <Compile Include="Sources\Parameterized\ParameterConstructedCompositeFactory.cs" />
+    <Compile Include="Sources\Parameterized\ParameterTypes.cs" />
+    <Compile Include="Sources\Parameterized\ProjectedSource.cs" />
+    <Compile Include="Sources\Parameterized\ResultTypes.cs" />
+    <Compile Include="Sources\Parameterized\SelfTransformer.cs" />
+    <Compile Include="Sources\Parameterized\SourceInterfaces.cs" />
+    <Compile Include="Sources\Parameterized\SourceTypes.cs" />
+    <Compile Include="Sources\Parameterized\TimedDelegatedSource.cs" />
+    <Compile Include="Sources\Parameterized\Transform.cs" />
+    <Compile Include="Sources\Parameterized\TransformerBase.cs" />
+    <Compile Include="Sources\Parameterized\TypeLocatorBase.cs" />
+    <Compile Include="Sources\Parameterized\Wrapper.cs" />
+    <Compile Include="Sources\SuppliedAndExportedItems.cs" />
+    <Compile Include="Sources\TimedDelegatedSource.cs" />
     <Compile Include="TypeSystem\MethodFormatter.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\MinimumLevelCommandBase.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\MinimumLevelIsCommand.cs" />
@@ -289,7 +326,7 @@
     <Compile Include="Sources\SourceTypeLocator.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\ITransformer.cs" />
-    <Compile Include="Sources\Parameterized\ParameterAware.cs" />
+    <Compile Include="Sources\Parameterized\Caching\ArgumentCache.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Sources\Parameterized\Factory.cs" />
     <Compile Include="Application\Execution.cs" />
@@ -542,9 +579,7 @@
       <Name>DragonSpark.Types</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Sources\Parameterized\Validated\" />
-  </ItemGroup>
+  <ItemGroup />
   <!--<ItemGroup>
 	<Folder Include="Diagnostics\Logger\Categories\" />
   </ItemGroup>-->
