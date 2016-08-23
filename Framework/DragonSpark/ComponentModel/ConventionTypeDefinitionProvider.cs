@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
@@ -8,25 +7,6 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class TypeDefinitions : ParameterizedScope<TypeInfo, TypeInfo>
-	{
-		public static IParameterizedSource<TypeInfo, TypeInfo> Default { get; } = new TypeDefinitions();
-		TypeDefinitions() : base( Factory.Global<TypeInfo, TypeInfo>( Create ) ) {}
-
-		static TypeInfo Create( TypeInfo parameter )
-		{
-			foreach ( var provider in TypeSystem.Configuration.TypeDefinitionProviders.Get() )
-			{
-				var info = provider.Get( parameter );
-				if ( info != null )
-				{
-					return info;
-				}
-			}
-			return null;
-		}
-	}
-
 	public sealed class ConventionTypeDefinitionProvider : TransformerBase<TypeInfo>, ITypeDefinitionProvider
 	{
 		public static ConventionTypeDefinitionProvider Default { get; } = new ConventionTypeDefinitionProvider();

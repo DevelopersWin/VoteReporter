@@ -21,17 +21,4 @@ namespace DragonSpark.ComponentModel
 
 		public override object Get( DefaultValueParameter parameter ) => factory( parameter.Metadata ).Introduce( parameter, tuple => tuple.Item1.GetValue( tuple.Item2 ) ).FirstAssigned() ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
 	}
-
-	public struct DefaultValueParameter
-	{
-		public DefaultValueParameter( object instance, PropertyInfo metadata )
-		{
-			Instance = instance;
-			Metadata = metadata;
-		}
-
-		public object Instance { get; }
-
-		public PropertyInfo Metadata { get; }
-	}
 }

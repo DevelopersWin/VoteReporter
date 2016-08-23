@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Extensibility;
@@ -14,21 +13,7 @@ namespace DragonSpark.Aspects.Validation
 	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict, PersistMetaData =  true )]
 	public class ApplyAutoValidationAttribute : TypeLevelAspect, IAspectProvider
 	{
-		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = ToSourceDelegate();
-
-		static Func<Type, IEnumerable<AspectInstance>> ToSourceDelegate()
-		{
-			try
-{
-				return AspectInstances.Default.ToSourceDelegate();
-}
-catch ( Exception e )
-{
-	MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-	throw;
-}
-			
-		}
+		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstances.Default.ToSourceDelegate();
 
 		readonly Func<Type, IEnumerable<AspectInstance>> source;
 
@@ -42,19 +27,8 @@ catch ( Exception e )
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{
 			var type = targetElement as Type;
-			var result = type != null ? source( type )/*.Fixed()*/ : Items<AspectInstance>.Default;
-			/*foreach ( var aspectInstance in result )
-			{
-				var method = aspectInstance.TargetElement.To<MethodInfo>();
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {new MethodFormatter( method ).ToString()}: {aspectInstance.AspectTypeName}", null, null, null ) );
-			}*/
+			var result = type != null ? source( type ) : Items<AspectInstance>.Default;
 			return result;
 		}
 	}
-
-	/*sealed class AspectInstanceMethodFactory<T> : AspectInstanceFactoryBase where T : IAspect
-	{
-		public AspectInstanceMethodFactory( Type implementingType, string methodName ) : this( implementingType, methodName, Items<object>.Default ) {}
-		public AspectInstanceMethodFactory( Type implementingType, string methodName, params object[] arguments ) : base( implementingType, methodName, Construct.New<T>( arguments ) ) {}
-	}*/
 }

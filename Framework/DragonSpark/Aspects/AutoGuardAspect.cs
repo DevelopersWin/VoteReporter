@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
@@ -20,21 +19,8 @@ namespace DragonSpark.Aspects
 	[AttributeUsage( AttributeTargets.Method ), MulticastAttributeUsage( MulticastTargets.Method | MulticastTargets.InstanceConstructor, TargetMemberAttributes = MulticastAttributes.NonAbstract ), LinesOfCodeAvoided( 1 )]
 	public sealed class AutoGuardAspect : MethodLevelAspect, IAspectProvider
 	{
-		readonly static IValidatedParameterizedSource<Type, Type>[] DefaultSources = ASDF();
-
-		static IValidatedParameterizedSource<Type, Type>[] ASDF()
-		{
-			try
-			{
-				return new[] { DefaultSource.Default, ImmutableArraySource.Default };
-			}
-			catch ( Exception e )
-			{
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {e}", null, null, null ));
-				throw;
-			}
-		}
-
+		readonly static IValidatedParameterizedSource<Type, Type>[] DefaultSources = { DefaultSource.Default, ImmutableArraySource.Default };
+		
 		readonly IValidatedParameterizedSource<Type, Type>[] sources;
 
 		public AutoGuardAspect() : this( DefaultSources ) {}

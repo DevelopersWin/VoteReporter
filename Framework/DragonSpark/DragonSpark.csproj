@@ -42,6 +42,14 @@
     <Compile Include="Aspects\Validation\GenericCommandAdapterFactory.cs" />
     <Compile Include="Aspects\Validation\GenericParameterProfileFactoryBase.cs" />
     <Compile Include="Aspects\Validation\GenericSourceAdapterFactory.cs" />
+    <Compile Include="ComponentModel\CurrentTimeValueProvider.cs" />
+    <Compile Include="ComponentModel\DefaultValueParameter.cs" />
+    <Compile Include="ComponentModel\ExpressionEvaluator.cs" />
+    <Compile Include="ComponentModel\ServiceAttribute.cs" />
+    <Compile Include="ComponentModel\ServicesValueProvider.cs" />
+    <Compile Include="ComponentModel\SingletonDefaultValueProvider.cs" />
+    <Compile Include="ComponentModel\TypeDefinitions.cs" />
+    <Compile Include="ComponentModel\ValueProvider.cs" />
     <Compile Include="Runtime\Hash.cs" />
     <Compile Include="Aspects\Validation\IParameterValidationAdapter.cs" />
     <Compile Include="Aspects\Keys.cs" />
