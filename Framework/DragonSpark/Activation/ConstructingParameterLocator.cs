@@ -13,6 +13,6 @@ namespace DragonSpark.Activation
 		ConstructingParameterLocator() {}
 
 		public override Type Get( Type parameter ) => 
-			InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).Select( info => info.GetParameterTypes() ).SingleOrDefault( types => types.Length == 1 )?.Single();
+			InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).Select( info => info.GetParameterTypes().ToArray() ).SingleOrDefault( types => types.Length == 1 )?.Single();
 	}
 }

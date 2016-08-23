@@ -36,9 +36,9 @@ namespace DragonSpark.Testing.Runtime.Specifications
 																	  ++count;
 																	  return true;
 																  } );
-			var cached = specification.Cached();
+			var cached = specification.ToCachedSpecification();
 			Assert.NotSame( specification, cached );
-			Assert.Same( cached, specification.Cached() );
+			Assert.Same( cached, specification.ToCachedSpecification() );
 			Assert.True( cached.IsSatisfiedBy( typeof(int) ) );
 			Assert.Equal( 1, count );
 			Assert.True( cached.IsSatisfiedBy( typeof(int) ) );

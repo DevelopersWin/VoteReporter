@@ -119,7 +119,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		{
 			public Factory( params Type[] additionalTypes ) : base( additionalTypes.ToImmutableArray() ) {}
 
-			public override ImmutableArray<Type> Get( MethodBase parameter ) => base.Get( parameter ).Union( parameter.GetParameterTypes() ).ToImmutableArray();
+			public override ImmutableArray<Type> Get( MethodBase parameter ) => base.Get( parameter ).Union( parameter.GetParameterTypes().AsEnumerable() ).ToImmutableArray();
 		}
 	}
 

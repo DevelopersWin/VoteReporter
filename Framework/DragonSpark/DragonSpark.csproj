@@ -240,7 +240,6 @@
     <Compile Include="Runtime\ISerializer.cs" />
     <Compile Include="Runtime\ParameterInvocation.cs" />
     <Compile Include="Runtime\Process.cs" />
-    <Compile Include="Runtime\Specifications\AssignableSpecification.cs" />
     <Compile Include="Runtime\Specifications\DecoratedSpecification.cs" />
     <Compile Include="Runtime\Specifications\IsInstanceOfSpecification.cs" />
     <Compile Include="Sources\AmbientStackCommand.cs" />

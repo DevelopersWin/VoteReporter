@@ -17,7 +17,7 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public sealed class IsSourceSpecification : AdapterSpecificationBase
 	{
-		public static ISpecification<Type> Default { get; } = new IsSourceSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new IsSourceSpecification().ToCachedSpecification();
 		IsSourceSpecification() : base( typeof(ISource<>), typeof(ISource) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
@@ -27,7 +27,7 @@ namespace DragonSpark.Sources.Parameterized
 
 	public sealed class IsParameterizedSourceSpecification : AdapterSpecificationBase
 	{
-		public static ISpecification<Type> Default { get; } = new IsParameterizedSourceSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new IsParameterizedSourceSpecification().ToCachedSpecification();
 		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>), typeof(IParameterizedSource) ) {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Adapters.Select( adapter => adapter.Type ).Any( parameter.Adapt().IsGenericOf );

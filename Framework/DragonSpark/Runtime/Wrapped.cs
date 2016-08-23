@@ -300,7 +300,7 @@ namespace DragonSpark.Runtime
 	class DelegateType : Cache<MethodInfo, Type>
 	{
 		public static DelegateType Default { get; } = new DelegateType();
-		DelegateType() : base( info => Expression.GetDelegateType( info.GetParameterTypes().Append( info.ReturnType ).Fixed() ) ) {}
+		DelegateType() : base( info => Expression.GetDelegateType( info.GetParameterTypes().AsEnumerable().Append( info.ReturnType ).Fixed() ) ) {}
 	}
 
 	class DelegateStack : AmbientStack<IDelegateInvoker>

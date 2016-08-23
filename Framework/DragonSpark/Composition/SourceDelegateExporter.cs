@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
@@ -13,7 +14,6 @@ using System.Composition;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Activation.Location;
 
 namespace DragonSpark.Composition
 {
@@ -47,9 +47,9 @@ namespace DragonSpark.Composition
 
 		readonly Func<Type, Type> resultTypeLocator;
 
-		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType ) : this( factoryDelegateType, ResultTypeLocator ) {}
+		public SourceDelegateContractResolver( [OfSourceType]Type sourceDelegateType ) : this( sourceDelegateType, ResultTypeLocator ) {}
 
-		public SourceDelegateContractResolver( [OfSourceType]Type factoryDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Default.And( new GenericTypeAssignableSpecification( factoryDelegateType ) ).Project<CompositionContract, Type>( contract => contract.ContractType ) )
+		public SourceDelegateContractResolver( [OfSourceType]Type sourceDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Default.And( new GenericTypeAssignableSpecification( sourceDelegateType ) ).Project<CompositionContract, Type>( contract => contract.ContractType ) )
 		{
 			this.resultTypeLocator = resultTypeLocator;
 		}

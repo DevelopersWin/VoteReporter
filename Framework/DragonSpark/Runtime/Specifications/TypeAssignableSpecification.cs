@@ -3,23 +3,19 @@ using System;
 
 namespace DragonSpark.Runtime.Specifications
 {
-	public class GenericTypeAssignableSpecification : SpecificationWithContextBase<Type>
+	public class GenericTypeAssignableSpecification : DelegatedSpecification<Type>
 	{
-		public GenericTypeAssignableSpecification( Type context ) : base( context ) {}
-
-		public override bool IsSatisfiedBy( Type parameter ) => Context.Adapt().IsGenericOf( parameter );
+		public GenericTypeAssignableSpecification( Type context ) : base( context.Adapt().IsGenericOf ) {}
 	}
 
-	public class TypeAssignableSpecification<T> : TypeAssignableSpecification
+	public sealed class TypeAssignableSpecification<T> : TypeAssignableSpecification
 	{
 		public static TypeAssignableSpecification<T> Default { get; } = new TypeAssignableSpecification<T>();
 		TypeAssignableSpecification() : base( typeof(T) ) {}
 	}
 
-	public class TypeAssignableSpecification : SpecificationWithContextBase<Type>
+	public class TypeAssignableSpecification : DelegatedSpecification<Type>
 	{
-		public TypeAssignableSpecification( Type targetType ) : base( targetType ) {}
-
-		public override bool IsSatisfiedBy( Type parameter ) => Context.Adapt().IsAssignableFrom( parameter );
+		public TypeAssignableSpecification( Type targetType ) : base( targetType.Adapt().IsAssignableFrom ) {}
 	}
 }

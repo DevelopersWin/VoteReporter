@@ -6,6 +6,6 @@
   </d:LoggingProfiles>
 	<Multicast xmlns:ds="clr-namespace:DragonSpark.Aspects;assembly:DragonSpark">
 		<ds:ApplyDefaultValues />
-		<ds:DefaultGuardAspect />
+		<ds:AutoGuardAspect />
 	</Multicast>
 </Project>

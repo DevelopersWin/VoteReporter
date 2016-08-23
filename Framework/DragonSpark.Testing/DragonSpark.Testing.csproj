@@ -53,6 +53,7 @@
     <Compile Include="Activation\ExecutionContextTests.cs" />
     <Compile Include="Activation\RecordingLoggerConfigurationCommandTests.cs" />
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
+    <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
     <Compile Include="Aspects\ParameterValidationControllerTests.cs" />

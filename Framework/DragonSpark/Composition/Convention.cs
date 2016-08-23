@@ -133,7 +133,7 @@ namespace DragonSpark.Composition
 
 	public sealed class CanInstantiateSpecification : SpecificationBase<Type>
 	{
-		public static ISpecification<Type> Default { get; } = new CanInstantiateSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new CanInstantiateSpecification().ToCachedSpecification();
 		CanInstantiateSpecification() {}
 
 		public override bool IsSatisfiedBy( Type parameter )
@@ -146,7 +146,7 @@ namespace DragonSpark.Composition
 
 	public class InstantiableTypeSpecification : SpecificationBase<Type>
 	{
-		public static ISpecification<Type> Default { get; } = new InstantiableTypeSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new InstantiableTypeSpecification().ToCachedSpecification();
 		InstantiableTypeSpecification() : this( typeof(Delegate), typeof(Array) ) {}
 
 		readonly ImmutableArray<TypeAdapter> exempt;

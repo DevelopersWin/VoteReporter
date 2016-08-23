@@ -15,7 +15,7 @@ namespace DragonSpark.Extensions
 	{
 		public static T[] Fixed<T>( this IEnumerable<T> @this )
 		{
-			var array = @this as T[] ?? @this.ToArray();
+			var array = @this is ImmutableArray<T> ? ((ImmutableArray<T>)@this).ToArray() : @this as T[] ?? @this.ToArray();
 			var result = array.Length > 0 ? array : (T[])Enumerable.Empty<T>();
 			return result;
 		}

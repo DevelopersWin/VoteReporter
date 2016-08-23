@@ -30,7 +30,7 @@ namespace DragonSpark.TypeSystem
 
 	public class ApplicationTypeSpecification : SpecificationBase<Type>
 	{
-		public static ISpecification<Type> Default { get; } = new ApplicationTypeSpecification().Cached();
+		public static ISpecification<Type> Default { get; } = new ApplicationTypeSpecification().ToCachedSpecification();
 		ApplicationTypeSpecification() {}
 
 		public override bool IsSatisfiedBy( Type parameter ) => Defaults.ActivateSpecification.IsSatisfiedBy( parameter ) && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Has<CompilerGeneratedAttribute>();

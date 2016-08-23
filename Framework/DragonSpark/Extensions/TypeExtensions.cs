@@ -1,4 +1,5 @@
-﻿using DragonSpark.Sources.Parameterized.Caching;
+﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,8 +12,6 @@ namespace DragonSpark.Extensions
 {
 	public static class ImmutableArrayExtensions
 	{
-		// public static IEnumerable<T> Except<T>( this IEnumerable<T> first, IEnumerable<T> second ) => @first.Except( second.ToArray() );
-
 		public static IEnumerable<T> AsEnumerable<T>( this ImmutableArray<T> source ) => source.ToArray();
 
 		public static IEnumerable<T> Union<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Union( second );
@@ -61,8 +60,8 @@ namespace DragonSpark.Extensions
 			return false;
 		}
 
-		readonly static ICache<MethodBase, Type[]> Parameters = new Cache<MethodBase, Type[]>( method => method.GetParameters().Select( info => info.ParameterType ).ToArray() );
-		public static Type[] GetParameterTypes( this MethodBase @this ) => Parameters.Get( @this );
+		readonly static IParameterizedSource<MethodBase, ImmutableArray<Type>> ParameterTypes = CacheFactory.Create<MethodBase, ImmutableArray<Type>>( method => method.GetParameters().Select( info => info.ParameterType ).ToImmutableArray() );
+		public static ImmutableArray<Type> GetParameterTypes( this MethodBase @this ) => ParameterTypes.Get( @this );
 	}
 
 	public class TypeAdapterCache : Cache<Type, TypeAdapter>

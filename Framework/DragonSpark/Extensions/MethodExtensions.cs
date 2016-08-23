@@ -43,7 +43,7 @@ namespace DragonSpark.Extensions
 		}
 
 		public override bool IsSatisfiedBy( MethodInfo parameter ) =>
-			parameter.Name == Context.Name && Map( parameter.ReturnType ) == Context.ReturnType && parameter.GetParameterTypes().Select( map ).SequenceEqual( Context.GetParameterTypes() );
+			parameter.Name == Context.Name && Map( parameter.ReturnType ) == Context.ReturnType && parameter.GetParameterTypes().Select( map ).SequenceEqual( Context.GetParameterTypes().AsEnumerable() );
 
 		Type Map( Type type )
 		{

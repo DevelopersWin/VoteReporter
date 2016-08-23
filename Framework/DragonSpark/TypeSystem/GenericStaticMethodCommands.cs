@@ -6,6 +6,7 @@ using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -14,28 +15,28 @@ namespace DragonSpark.TypeSystem
 {
 	public sealed class GenericStaticMethodFactories : StaticFactoryContext
 	{
-		public GenericStaticMethodFactories( Type type ) : base( type.GetRuntimeMethods().Where( info => info.IsGenericMethod && info.IsStatic ).ToImmutableArray() ) {}
+		public GenericStaticMethodFactories( Type type ) : base( type.GetRuntimeMethods().Where( info => info.IsGenericMethod && info.IsStatic ) ) {}
 	}
 
 	public sealed class GenericStaticMethodCommands : StaticActionContext
 	{
-		public GenericStaticMethodCommands( Type type ) : base( type.GetRuntimeMethods().Where( info => info.IsGenericMethod && info.IsStatic ).ToImmutableArray() ) {}
+		public GenericStaticMethodCommands( Type type ) : base( type.GetRuntimeMethods().Where( info => info.IsGenericMethod && info.IsStatic ) ) {}
 	}
 
 	public sealed class GenericMethodFactories : InstanceFactoryContext
 	{
-		public GenericMethodFactories( object instance ) : base( instance, instance.GetType().GetRuntimeMethods().Where( info => info.IsGenericMethod && !info.IsStatic ).ToImmutableArray() ) {}
+		public GenericMethodFactories( object instance ) : base( instance, instance.GetType().GetRuntimeMethods().Where( info => info.IsGenericMethod && !info.IsStatic ) ) {}
 	}
 
 	public sealed class GenericMethodCommands : InstanceActionContext
 	{
-		public GenericMethodCommands( object instance ) : base( instance, instance.GetType().GetRuntimeMethods().Where( info => info.IsGenericMethod && !info.IsStatic ).ToImmutableArray() ) {}
+		public GenericMethodCommands( object instance ) : base( instance, instance.GetType().GetRuntimeMethods().Where( info => info.IsGenericMethod && !info.IsStatic ) ) {}
 	}
 
 	
 	public abstract class FilteredMethodContextBase
 	{
-		protected FilteredMethodContextBase( ImmutableArray<MethodInfo> methods, Func<MethodInfo, bool> filter )
+		protected FilteredMethodContextBase( IEnumerable<MethodInfo> methods, Func<MethodInfo, bool> filter )
 		{
 			Methods = methods.Where( filter ).ToImmutableArray();
 		}
@@ -50,7 +51,7 @@ namespace DragonSpark.TypeSystem
 		readonly Func<MethodInfo, T> creator;
 		readonly Func<string, IGenericMethodContext<T>> create;
 
-		protected DelegateCreationContextBase( Func<MethodInfo, T> creator, ImmutableArray<MethodInfo> methods, Func<MethodInfo, bool> filter ) : base( methods, filter )
+		protected DelegateCreationContextBase( Func<MethodInfo, T> creator, IEnumerable<MethodInfo> methods, Func<MethodInfo, bool> filter ) : base( methods, filter )
 		{
 			this.creator = creator;
 			create = Get;
@@ -60,8 +61,8 @@ namespace DragonSpark.TypeSystem
 
 		IGenericMethodContext<T> Get( string name )
 		{
-			var immutableArray = Methods.Introduce( name, tuple => tuple.Item1.Name == tuple.Item2, tuple => new Descriptor( tuple.Item1 ) ).ToImmutableArray();
-			var result = new GenericMethodContext<T>( immutableArray, creator );	
+			var descriptors = Methods.ToArray().Introduce( name, tuple => tuple.Item1.Name == tuple.Item2, tuple => new Descriptor( tuple.Item1 ) );
+			var result = new GenericMethodContext<T>( descriptors, creator );	
 			return result;
 		}
 	}
@@ -69,33 +70,33 @@ namespace DragonSpark.TypeSystem
 	public class StaticActionContext : ActionContextBase
 	{
 		readonly static Func<MethodInfo, Execute> ToDelegate = InvokeMethodDelegate<Execute>.Default.ToSourceDelegate();
-		public StaticActionContext( ImmutableArray<MethodInfo> methods ) : base( ToDelegate, methods ) {}
+		public StaticActionContext( IEnumerable<MethodInfo> methods ) : base( ToDelegate, methods ) {}
 	}
 
 	public class InstanceActionContext : ActionContextBase
 	{
-		public InstanceActionContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Execute>( instance ).Get, methods ) {}
+		public InstanceActionContext( object instance, IEnumerable<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Execute>( instance ).Get, methods ) {}
 	}
 
 	public abstract class ActionContextBase : DelegateCreationContextBase<Execute>
 	{
-		protected ActionContextBase( Func<MethodInfo, Execute> creator, ImmutableArray<MethodInfo> methods ) : base( creator, methods, info => info.ReturnType == typeof(void) ) {}
+		protected ActionContextBase( Func<MethodInfo, Execute> creator, IEnumerable<MethodInfo> methods ) : base( creator, methods, info => info.ReturnType == typeof(void) ) {}
 	}
 
 	public abstract class FactoryContextBase : DelegateCreationContextBase<Invoke>
 	{
-		protected FactoryContextBase( Func<MethodInfo, Invoke> creator, ImmutableArray<MethodInfo> methods ) : base( creator, methods, info => info.ReturnType != typeof(void) ) {}
+		protected FactoryContextBase( Func<MethodInfo, Invoke> creator, IEnumerable<MethodInfo> methods ) : base( creator, methods, info => info.ReturnType != typeof(void) ) {}
 	}
 
 	public class StaticFactoryContext : FactoryContextBase
 	{
 		readonly static Func<MethodInfo, Invoke> ToDelegate = InvokeMethodDelegate<Invoke>.Default.ToSourceDelegate();
-		public StaticFactoryContext( ImmutableArray<MethodInfo> methods ) : base( ToDelegate, methods ) {}
+		public StaticFactoryContext( IEnumerable<MethodInfo> methods ) : base( ToDelegate, methods ) {}
 	}
 
 	public class InstanceFactoryContext : FactoryContextBase
 	{
-		public InstanceFactoryContext( object instance, ImmutableArray<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Invoke>( instance ).Get, methods ) {}
+		public InstanceFactoryContext( object instance, IEnumerable<MethodInfo> methods ) : base( new InvokeInstanceMethodDelegate<Invoke>( instance ).Get, methods ) {}
 	}
 
 	public interface IGenericMethodContext<T> where T : class
@@ -169,7 +170,7 @@ namespace DragonSpark.TypeSystem
 
 	sealed class GenericMethodContext<T> : ArgumentCache<Type[], MethodContext<T>>, IGenericMethodContext<T> where T : class
 	{
-		public GenericMethodContext( ImmutableArray<Descriptor> descriptors, Func<MethodInfo, T> create ) : this( new Factory( descriptors, create ).Get ) {}
+		public GenericMethodContext( IEnumerable<Descriptor> descriptors, Func<MethodInfo, T> create ) : this( new Factory( descriptors, create ).Get ) {}
 		GenericMethodContext( Func<Type[], MethodContext<T>> resultSelector ) : base( resultSelector ) {}
 
 		public MethodContext<T> Make( params Type[] types ) => Get( types );
@@ -181,10 +182,10 @@ namespace DragonSpark.TypeSystem
 
 			readonly ImmutableArray<Descriptor> descriptors;
 
-			public Factory( ImmutableArray<Descriptor> descriptors, Func<MethodInfo, T> create )
+			public Factory( IEnumerable<Descriptor> descriptors, Func<MethodInfo, T> create )
 			{
 				this.create = create;
-				this.descriptors = descriptors;
+				this.descriptors = descriptors.ToImmutableArray();
 				selector = CreateSelector;
 			}
 

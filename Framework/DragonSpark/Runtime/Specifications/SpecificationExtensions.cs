@@ -49,7 +49,7 @@ namespace DragonSpark.Runtime.Specifications
 			Delegates() : base( specification => specification.IsSatisfiedBy ) {}
 		}
 
-		public static ISpecification<T> Cached<T>( this ISpecification<T> @this ) => Cache<T>.Default.Get( @this );
+		public static ISpecification<T> ToCachedSpecification<T>( this ISpecification<T> @this ) => Cache<T>.Default.Get( @this );
 		sealed class Cache<T> : Cache<ISpecification<T>, ISpecification<T>>
 		{
 			public static Cache<T> Default { get; } = new Cache<T>();
