@@ -10,17 +10,6 @@ using Type = System.Type;
 
 namespace DragonSpark.Extensions
 {
-	public static class ImmutableArrayExtensions
-	{
-		public static IEnumerable<T> AsEnumerable<T>( this ImmutableArray<T> source ) => source.ToArray();
-
-		public static IEnumerable<T> Union<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Union( second );
-
-		public static IEnumerable<T> Concat<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Concat( second );
-
-		public static IEnumerable<T> Concat<T>( this IEnumerable<ImmutableArray<T>> sources ) => sources.Select( array => array.ToArray() ).Concat();
-	}
-
 	public static class TypeExtensions
 	{
 		public static Type GetMemberType(this MemberInfo memberInfo)
@@ -62,12 +51,5 @@ namespace DragonSpark.Extensions
 
 		readonly static IParameterizedSource<MethodBase, ImmutableArray<Type>> ParameterTypes = CacheFactory.Create<MethodBase, ImmutableArray<Type>>( method => method.GetParameters().Select( info => info.ParameterType ).ToImmutableArray() );
 		public static ImmutableArray<Type> GetParameterTypes( this MethodBase @this ) => ParameterTypes.Get( @this );
-	}
-
-	public class TypeAdapterCache : Cache<Type, TypeAdapter>
-	{
-		public static TypeAdapterCache Default { get; } = new TypeAdapterCache();
-
-		TypeAdapterCache() : base( t => new TypeAdapter( t ) ) {}
 	}
 }

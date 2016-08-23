@@ -95,6 +95,10 @@
     <Compile Include="Diagnostics\Logging\LoggerConfigurationSourceBase.cs" />
     <Compile Include="Diagnostics\Logging\LoggingController.cs" />
     <Compile Include="Diagnostics\Logging\LoggingHistory.cs" />
+    <Compile Include="Extensions\ConventionBasedFormattingExtensions.cs" />
+    <Compile Include="Extensions\ImmutableArrayExtensions.cs" />
+    <Compile Include="Extensions\MethodEqualitySpecification.cs" />
+    <Compile Include="Extensions\TypeAdapterCache.cs" />
     <Compile Include="Runtime\MethodFormatter.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\MinimumLevelCommandBase.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\MinimumLevelIsCommand.cs" />
