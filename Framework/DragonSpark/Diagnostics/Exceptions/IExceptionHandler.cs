@@ -6,12 +6,4 @@ namespace DragonSpark.Diagnostics.Exceptions
 	{
 		ExceptionHandlingResult Handle( Exception exception );
 	}
-
-	sealed class ExceptionHandler : IExceptionHandler
-	{
-		public static ExceptionHandler Default { get; } = new ExceptionHandler();
-		ExceptionHandler() {}
-
-		public ExceptionHandlingResult Handle( Exception exception ) => new ExceptionHandlingResult( true, exception );
-	}
 }

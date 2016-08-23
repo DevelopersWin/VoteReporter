@@ -1,14 +1,5 @@
-using DragonSpark.Activation;
-using DragonSpark.Configuration;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.TypeSystem;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 using System;
 
 namespace DragonSpark.Diagnostics.Logging
@@ -17,22 +8,6 @@ namespace DragonSpark.Diagnostics.Logging
 	public delegate void LogTemplate<in T1, in T2>( string template, T1 first, T2 second );
 	public delegate void LogTemplate<in T1, in T2, in T3>( string template, T1 first, T2 second, T3 third );
 	public delegate void LogTemplate( string template, params object[] parameters );
-
-	public abstract class LogCommandBase<T> : CommandBase<T>
-	{
-		readonly LogTemplate<T> action;
-		readonly string messageTemplate;
-
-		protected LogCommandBase( ILogger logger, string messageTemplate ) : this( logger.Information, messageTemplate ) {}
-
-		protected LogCommandBase( LogTemplate<T> action, string messageTemplate )
-		{
-			this.action = action;
-			this.messageTemplate = messageTemplate;
-		}
-
-		public override void Execute( T parameter ) => action( messageTemplate, parameter );
-	}
 
 	public abstract class LogCommandBase<T1, T2> : CommandBase<ValueTuple<T1, T2>>
 	{
@@ -86,27 +61,9 @@ namespace DragonSpark.Diagnostics.Logging
 		public void ExecuteUsing( params object[] arguments ) => Execute( arguments );
 	}
 
-	public delegate void LogException<in T>( Exception exception, string template, T parameter );
 	public delegate void LogException<in T1, in T2>( Exception exception, string template, T1 first, T2 second );
 	public delegate void LogException<in T1, in T2, in T3>( Exception exception, string template, T1 first, T2 second, T3 third );
 	public delegate void LogException( Exception exception, string template, params object[] parameters );
-
-	public abstract class LogExceptionCommandBase<T> : CommandBase<ExceptionParameter<T>>
-	{
-		readonly LogException<T> action;
-		readonly string messageTemplate;
-
-		protected LogExceptionCommandBase( ILogger logger, string messageTemplate ) : this( logger.Information, messageTemplate ) {}
-		protected LogExceptionCommandBase( LogException<T> action, string messageTemplate )
-		{
-			this.action = action;
-			this.messageTemplate = messageTemplate;
-		}
-
-		public override void Execute( ExceptionParameter<T> parameter ) => action( parameter.Exception, messageTemplate, parameter.Argument );
-
-		public void Execute( Exception exception, T argument ) => Execute( new ExceptionParameter<T>( exception, argument ) );
-	}
 
 	public abstract class LogExceptionCommandBase<T1, T2> : CommandBase<ExceptionParameter<ValueTuple<T1, T2>>>
 	{
@@ -159,20 +116,6 @@ namespace DragonSpark.Diagnostics.Logging
 
 		public void Execute( Exception exception, params object[] arguments ) => Execute( new ExceptionParameter<object[]>( exception, arguments ) );
 	}
-
-	public struct ExceptionParameter<T>
-	{
-		public ExceptionParameter( Exception exception, T argument )
-		{
-			Exception = exception;
-			Argument = argument;
-		}
-
-		public Exception Exception { get; }
-		public T Argument { get; }
-	}
-
-	
 
 	/*public abstract class LogCommandBase<TDelegate, TTemplate> : CommandBase<TTemplate> where TTemplate : ILoggerTemplate
 	{
@@ -246,99 +189,6 @@ namespace DragonSpark.Diagnostics.Logging
 
 		public LogExceptionCommand( ILogger logger, Func<ILoggerTemplate, LogEventLevel> levelSource ) : base( logger, levelSource, LoggerExceptionTemplateParameterFactory.Default.Get ) {}
 	}*/
-
-	public sealed class Logger : ConfigurableParameterizedFactoryBase<LoggerConfiguration, ILogger>
-	{
-		public static IParameterizedSource<ILogger> Default { get; } = new Logger().ToCache();
-		Logger() : base( o => new LoggerConfiguration(), LoggerConfigurationSource.Default.ToDelegate().Wrap(), ( configuration, parameter ) => configuration.CreateLogger().ForContext( Constants.SourceContextPropertyName, parameter, true ) ) {}
-	}
-
-	public sealed class LoggingHistory : Scope<LoggerHistorySink>
-	{
-		public static LoggingHistory Default { get; } = new LoggingHistory();
-		LoggingHistory() : base( Factory.Global( () => new LoggerHistorySink() ) ) {}
-	}
-
-	public sealed class LoggingController : Scope<LoggingLevelSwitch>
-	{
-		public static LoggingController Default { get; } = new LoggingController();
-		LoggingController() : base( Factory.Global( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) ) ) {}
-	}
-
-	sealed class LoggerConfigurationSource : LoggerConfigurationSourceBase
-	{
-		public static LoggerConfigurationSource Default { get; } = new LoggerConfigurationSource();
-		LoggerConfigurationSource() : base( HistoryTransform.DefaultNested ) {}
-
-		sealed class HistoryTransform : TransformerBase<LoggerConfiguration>
-		{
-			public static HistoryTransform DefaultNested { get; } = new HistoryTransform();
-			HistoryTransform() : this( LoggingHistory.Default.Get ) {}
-
-			readonly Func<ILoggerHistory> history;
-
-			HistoryTransform( Func<ILoggerHistory> history )
-			{
-				this.history = history;
-			}
-
-			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history() );
-		}
-	}
-
-	sealed class FormatterConfiguration : TransformerBase<LoggerConfiguration>
-	{
-		readonly static Func<object, object> Formatter = Diagnostics.Formatter.Default.Format;
-
-		public static FormatterConfiguration Default { get; } = new FormatterConfiguration();
-		FormatterConfiguration() {}
-
-		public override LoggerConfiguration Get( LoggerConfiguration parameter )
-		{
-			foreach ( var type in KnownTypes.Default.Get<IFormattable>() )
-			{
-				var located = ConstructingParameterLocator.Default.Get( type );
-				if ( located != null )
-				{
-					parameter.Destructure.ByTransformingWhere( new TypeAssignableSpecification( located ).ToCachedSpecification().ToSpecificationDelegate(), Formatter );
-				}
-			}
-
-			return parameter;
-		}
-	}
-
-	public abstract class LoggerConfigurationSourceBase : ConfigurationSource<LoggerConfiguration>
-	{
-		readonly static ITransformer<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Default.ToTransformer();
-
-		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Default, ControllerTransform.Default, ApplicationAssemblyTransform.Default ) ) {}
-
-		sealed class ControllerTransform : TransformerBase<LoggerConfiguration>
-		{
-			public static ControllerTransform Default { get; } = new ControllerTransform();
-			ControllerTransform() : this( LoggingController.Default.Get ) {}
-
-			readonly Func<LoggingLevelSwitch> controller;
-
-			ControllerTransform( Func<LoggingLevelSwitch> controller )
-			{
-				this.controller = controller;
-			}
-
-			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller() );
-		}
-	}
-
-	sealed class ApplicationAssemblyTransform : TransformerBase<LoggerConfiguration>, ILogEventEnricher
-	{
-		public static ApplicationAssemblyTransform Default { get; } = new ApplicationAssemblyTransform();
-		ApplicationAssemblyTransform() {}
-
-		public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.Enrich.With( this );
-
-		public void Enrich( LogEvent logEvent, ILogEventPropertyFactory propertyFactory ) => logEvent.AddPropertyIfAbsent( propertyFactory.CreateProperty( nameof(AssemblyInformation), DefaultAssemblyInformationSource.Default.Get(), true ) );
-	}
 
 	/*sealed class CreatorFilterTransformer : TransformerBase<LoggerConfiguration>
 	{

@@ -1,6 +1,6 @@
 using Serilog.Configuration;
 
-namespace DragonSpark.Diagnostics.Logging
+namespace DragonSpark.Diagnostics.Logging.Configurations
 {
 	public class EnrichFromLogContextCommand : EnrichCommandBase
 	{

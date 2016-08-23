@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Aspects.Validation;
-using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Exceptions;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
@@ -33,7 +33,7 @@ namespace DragonSpark.Windows.Setup
 	public class ClearUserSettingCommand : DelegatedFixedCommand<FileInfo>
 	{
 		public static ClearUserSettingCommand Default { get; } = new ClearUserSettingCommand();
-		ClearUserSettingCommand() : base( DeleteFileCommand.Default.Apply( DragonSpark.Diagnostics.Defaults<IOException>.Retry ).Self, Defaults.UserSettingsPath ) {}
+		ClearUserSettingCommand() : base( DeleteFileCommand.Default.Apply( DragonSpark.Diagnostics.Exceptions.Defaults<IOException>.Retry ).Self, Defaults.UserSettingsPath ) {}
 	}
 
 	[ApplyAutoValidation]

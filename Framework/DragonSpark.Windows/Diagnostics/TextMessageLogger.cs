@@ -1,4 +1,4 @@
-using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics.Logging.Configurations;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;

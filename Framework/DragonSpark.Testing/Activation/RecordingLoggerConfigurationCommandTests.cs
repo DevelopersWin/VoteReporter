@@ -4,6 +4,7 @@ using Ploeh.AutoFixture.Xunit2;
 using Serilog.Core;
 using Serilog.Events;
 using System.Linq;
+using DragonSpark.Diagnostics.Logging.Configurations;
 using Xunit;
 using Logger = DragonSpark.Diagnostics.Logging.Logger;
 

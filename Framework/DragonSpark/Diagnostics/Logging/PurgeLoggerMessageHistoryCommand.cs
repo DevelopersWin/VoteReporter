@@ -1,24 +1,12 @@
 ﻿using DragonSpark.Aspects.Validation;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
-using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Diagnostics.Logging
 {
-	public interface ILoggerHistory : ILogEventSink
-	{
-		IEnumerable<LogEvent> Events { get; }
-
-		void Clear();
-	}
-	
 	[ApplyAutoValidation]
 	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommand<string>
 	{
@@ -60,35 +48,4 @@ namespace DragonSpark.Diagnostics.Logging
 			}
 		}
 	}*/
-
-	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
-	{
-		readonly Func<ILoggerHistory> historySource;
-		readonly Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory;
-
-		protected PurgeLoggerHistoryCommand( Func<ILoggerHistory> historySource, Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory )
-		{
-			this.historySource = historySource;
-			this.factory = factory;
-		}
-
-		public override void Execute( Action<T> parameter )
-		{
-			var history = historySource();
-			factory( history.Events ).Each( parameter );
-			history.Clear();
-		}
-	}
-
-	public class MethodFormatter : IFormattable
-	{
-		readonly MethodBase method;
-
-		public MethodFormatter( MethodBase method )
-		{
-			this.method = method;
-		}
-
-		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => $"{method.DeclaringType.Name}.{method.Name}";
-	}
 }

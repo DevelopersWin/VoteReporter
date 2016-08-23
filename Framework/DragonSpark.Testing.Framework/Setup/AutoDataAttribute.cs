@@ -1,6 +1,5 @@
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Composition;
-using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;

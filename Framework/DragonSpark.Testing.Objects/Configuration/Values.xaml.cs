@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Configuration;
-using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Exceptions;
 using System.Composition;
 using System.IO;
 

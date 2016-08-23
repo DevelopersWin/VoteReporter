@@ -1,5 +1,4 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logging;
+﻿using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Runtime.Specifications;

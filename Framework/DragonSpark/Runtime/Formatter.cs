@@ -1,11 +1,11 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Runtime;
+using DragonSpark.Aspects;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Composition;
 
-namespace DragonSpark.Diagnostics
+namespace DragonSpark.Runtime
 {
 	public sealed class Formatter : ParameterizedSourceBase<Formatter.Parameter, string>
 	{
@@ -23,12 +23,7 @@ namespace DragonSpark.Diagnostics
 			this.factory = factory;
 		}
 
-		public override string Get( Parameter parameter )
-		{
-			var formattable = factory( parameter.Instance );
-			var result = formattable != null ? formattable.ToString( parameter.Format, parameter.Provider ) : Coerce( parameter );
-			return result;
-		}
+		public override string Get( [Assigned]Parameter parameter ) => factory( parameter.Instance )?.ToString( parameter.Format, parameter.Provider ) ?? Coerce( parameter );
 
 		public object Format( object item ) => Get( new Parameter( item ) );
 

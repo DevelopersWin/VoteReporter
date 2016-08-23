@@ -1,5 +1,4 @@
-﻿using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Logging;
+﻿using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
 using DragonSpark.Testing.Framework.Setup;

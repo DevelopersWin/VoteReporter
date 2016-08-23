@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using Serilog.Events;
+
+namespace DragonSpark.Diagnostics.Logging
+{
+	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
+	{
+		readonly Func<ILoggerHistory> historySource;
+		readonly Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory;
+
+		protected PurgeLoggerHistoryCommand( Func<ILoggerHistory> historySource, Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory )
+		{
+			this.historySource = historySource;
+			this.factory = factory;
+		}
+
+		public override void Execute( Action<T> parameter )
+		{
+			var history = historySource();
+			factory( history.Events ).Each( parameter );
+			history.Clear();
+		}
+	}
+}

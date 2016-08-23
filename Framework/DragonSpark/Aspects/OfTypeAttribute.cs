@@ -39,6 +39,6 @@ namespace DragonSpark.Aspects
 		protected override string GetErrorMessage() => "The parameter '{0}' must be assigned (non-default value).";
 
 		public Exception ValidateValue( object value, string locationName, LocationKind locationKind ) => 
-			!value.IsAssigned() ? CreateArgumentException( value, locationName, locationKind ) : null;
+			SpecialValues.DefaultOrEmpty( value.GetType() ).Equals( value ) ? CreateArgumentException( value, locationName, locationKind ) : null;
 	}
 }

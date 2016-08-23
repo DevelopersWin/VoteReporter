@@ -1,25 +1,11 @@
+using System;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
-using System;
 
-namespace DragonSpark.Diagnostics.Logging
+namespace DragonSpark.Diagnostics.Logging.Configurations
 {
-	public abstract class AddSinkCommand : LoggerConfigurationCommandBase<LoggerSinkConfiguration>
-	{
-		protected AddSinkCommand() : this( LogEventLevel.Verbose ) {}
-
-		protected AddSinkCommand( LogEventLevel restrictedToMinimumLevel ) : base( configuration => configuration.WriteTo )
-		{
-			RestrictedToMinimumLevel = restrictedToMinimumLevel;
-		}
-
-		public IFormatProvider FormatProvider { get; set; }
-
-		public LogEventLevel RestrictedToMinimumLevel { get; set; }
-	}
-
 	public class AddSeqSinkCommand : AddSinkCommand
 	{
 		public AddSeqSinkCommand() : this( LogEventLevel.Verbose, 1000, null, null, null, null ) {}

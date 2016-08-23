@@ -1,4 +1,4 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Diagnostics.Exceptions;
 using System.IO;
 
 namespace DragonSpark.Testing.Objects.Configuration
