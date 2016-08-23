@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+using DragonSpark.Runtime.Application;
 using Serilog;
 using Serilog.Events;
 using Xunit;

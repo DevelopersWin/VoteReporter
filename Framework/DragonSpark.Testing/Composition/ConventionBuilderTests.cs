@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation.Location;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
@@ -25,7 +24,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void BasicConvention( ContainerConfiguration configuration, ConventionBuilder sut )
 		{
-			sut.ForTypesMatching( Specifications.Always.IsSatisfiedBy ).Export();
+			sut.ForTypesMatching( Specifications.Specifications.Always.IsSatisfiedBy ).Export();
 			var types = this.Adapt().WithNested();
 			var container = configuration.WithParts( types, sut ).CreateContainer();
 			var export = container.GetExport<SomeExport>();

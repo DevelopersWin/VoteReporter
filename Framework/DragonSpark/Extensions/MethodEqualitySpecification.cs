@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Extensions
 {

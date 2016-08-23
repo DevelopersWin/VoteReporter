@@ -1,4 +1,4 @@
-﻿using DragonSpark.Runtime.Specifications;
+﻿using DragonSpark.Specifications;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 

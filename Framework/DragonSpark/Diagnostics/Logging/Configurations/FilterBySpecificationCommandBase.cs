@@ -1,4 +1,4 @@
-using DragonSpark.Runtime.Specifications;
+using DragonSpark.Specifications;
 using PostSharp.Patterns.Contracts;
 using Serilog.Events;
 

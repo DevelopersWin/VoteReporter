@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using DragonSpark.Commands;
+using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
@@ -30,7 +31,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 	public class Command : Command<object> {}
 
-	public class Command<T> : DragonSpark.Runtime.CommandBase<T>
+	public class Command<T> : CommandBase<T>
 	{
 		public bool Executed { get; private set; }
 		

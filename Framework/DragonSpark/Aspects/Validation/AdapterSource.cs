@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {

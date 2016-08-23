@@ -1,6 +1,5 @@
 using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -9,6 +8,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using DragonSpark.Expressions;
+using DragonSpark.Specifications;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Setup.Registration
@@ -56,7 +56,7 @@ namespace DragonSpark.Setup.Registration
 
 	public abstract class DelegatesBase : FactoryCache<Type, Delegate>
 	{
-		protected DelegatesBase( Func<IServiceProvider> source, string name ) : this( source.Delegate<object>(), Specifications.Assigned, name ) {}
+		protected DelegatesBase( Func<IServiceProvider> source, string name ) : this( source.Delegate<object>(), Specifications.Specifications.Assigned, name ) {}
 		protected DelegatesBase( Func<Type, object> locator, ISpecification<Type> specification, string name ) : base( specification )
 		{
 			Locator = locator;

@@ -1,8 +1,8 @@
-using DragonSpark.Runtime.Specifications;
 using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.ComponentModel
 {

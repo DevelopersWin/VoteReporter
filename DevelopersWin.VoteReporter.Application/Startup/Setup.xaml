@@ -7,13 +7,13 @@
 	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
 	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
 	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
-	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
+	xmlns:application="clr-namespace:DragonSpark.Runtime.Application;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
 	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}" Parameter="{markup:DirectoryInfo Reports}" />
 	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
-		<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
+		<application:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
 	</commands:DeclaredFixedCommand>
 	
 	<entity:AssignDataDirectoryCommand />

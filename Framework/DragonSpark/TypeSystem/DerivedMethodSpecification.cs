@@ -1,5 +1,5 @@
-using DragonSpark.Runtime.Specifications;
 using System.Reflection;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.TypeSystem
 {

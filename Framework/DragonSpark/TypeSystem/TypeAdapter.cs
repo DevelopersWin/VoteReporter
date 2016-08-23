@@ -1,6 +1,5 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
@@ -8,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.TypeSystem
 {

@@ -1,6 +1,7 @@
 using DragonSpark.Runtime;
 using Serilog;
 using System;
+using DragonSpark.Commands;
 
 namespace DragonSpark.Diagnostics.Logging
 {

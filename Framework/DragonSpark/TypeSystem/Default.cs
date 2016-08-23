@@ -1,7 +1,7 @@
+using DragonSpark.Commands;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
+using DragonSpark.Specifications;
 using PostSharp.Patterns.Threading;
 using System;
 using System.Reflection;

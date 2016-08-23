@@ -1,6 +1,6 @@
-﻿using System;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Commands;
 using Polly;
+using System;
 
 namespace DragonSpark.Diagnostics.Exceptions
 {

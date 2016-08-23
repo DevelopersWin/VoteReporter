@@ -1,5 +1,5 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Commands;
+using DragonSpark.Extensions;
 using Xunit;
 
 namespace DragonSpark.Testing.Runtime

@@ -2,7 +2,6 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
@@ -15,6 +14,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Commands;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Testing.Framework.Setup
 {

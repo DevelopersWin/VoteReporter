@@ -1,5 +1,5 @@
+using DragonSpark.Runtime.Application;
 using System;
-using DragonSpark.Runtime;
 
 namespace DragonSpark.ComponentModel
 {

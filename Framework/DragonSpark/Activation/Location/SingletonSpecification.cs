@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Activation.Location
 {

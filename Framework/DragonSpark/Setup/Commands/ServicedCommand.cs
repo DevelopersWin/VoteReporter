@@ -1,6 +1,6 @@
+using DragonSpark.Commands;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
+using DragonSpark.Specifications;
 using PostSharp.Patterns.Contracts;
 using System;
 using System.Windows.Markup;
@@ -18,7 +18,7 @@ namespace DragonSpark.Setup.Commands
 
 	public abstract class DeclaredCommandBase<T> : CommandBase<object>
 	{
-		protected DeclaredCommandBase( T parameter = default(T) ) : base( Specifications.Always )
+		protected DeclaredCommandBase( T parameter = default(T) ) : base( Specifications.Specifications.Always )
 		{
 			if ( parameter.IsAssigned() )
 			{
@@ -35,7 +35,7 @@ namespace DragonSpark.Setup.Commands
 		readonly Func<ICommand<T>> command;
 		readonly Func<T> parameter;
 
-		public DelegatedFixedCommand( Func<ICommand<T>> command, Func<T> parameter ) : this( command, parameter, Specifications.Always ) {}
+		public DelegatedFixedCommand( Func<ICommand<T>> command, Func<T> parameter ) : this( command, parameter, Specifications.Specifications.Always ) {}
 		public DelegatedFixedCommand( Func<ICommand<T>> command, Func<T> parameter, ISpecification<object> specification ) : base( specification )
 		{
 			this.command = command;
@@ -49,7 +49,7 @@ namespace DragonSpark.Setup.Commands
 
 	public abstract class DelegatedFixedCommandBase<T> : CommandBase<object>
 	{
-		protected DelegatedFixedCommandBase() : base( Specifications.Always ) {}
+		protected DelegatedFixedCommandBase() : base( Specifications.Specifications.Always ) {}
 
 		protected DelegatedFixedCommandBase( ISpecification<object> specification ) : base( specification ) {}
 

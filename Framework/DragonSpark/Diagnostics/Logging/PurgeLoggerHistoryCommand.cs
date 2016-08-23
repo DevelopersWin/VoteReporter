@@ -1,9 +1,9 @@
-﻿using System;
+﻿using DragonSpark.Commands;
+using DragonSpark.Extensions;
+using Serilog.Events;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using Serilog.Events;
 
 namespace DragonSpark.Diagnostics.Logging
 {

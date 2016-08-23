@@ -1,10 +1,6 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
+using DragonSpark.Specifications;
 using DragonSpark.Testing.Framework;
-using DragonSpark.TypeSystem;
-using Moq;
-using Ploeh.AutoFixture.Xunit2;
 using System;
 using Xunit;
 using Xunit.Abstractions;
@@ -55,7 +51,7 @@ namespace DragonSpark.Testing.Runtime
 			public DateTime Factory( string message ) => DateTime.Now;
 		}
 
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		void Action( Mock<Subject> sut )
 		{
 			var command = new Action( sut.Object.Action );
@@ -111,9 +107,9 @@ namespace DragonSpark.Testing.Runtime
 			sut.Verify( subject => subject.Create( number ), Times.Once() );
 
 			Assert.Throws<ArgumentException>( () => invoker.Invoke( new object[] { "Hello there!" } ) );
-		}
+		}*/
 
-		public class Subject
+		/*public class Subject
 		{
 			int called;
 
@@ -123,9 +119,9 @@ namespace DragonSpark.Testing.Runtime
 			public virtual int Create( int input ) => input + 123;
 
 			public virtual int Called( string message, int number ) => ++called;
-		}
+		}*/
 
-		[Theory, AutoData]
+		/*[Theory, AutoData]
 		public void Cached( Mock<Subject> sut, string message, int number )
 		{
 			var factory = new Func<string, int, int>( sut.Object.Called );
@@ -134,7 +130,7 @@ namespace DragonSpark.Testing.Runtime
 			var second = cached.Invoke( new object[] { message, number } );
 			Assert.Equal( 1, first );
 			Assert.Equal( first, second );
-		}
+		}*/
 
 		/*[Theory, AutoData]
 		void Performance( string message )

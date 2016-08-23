@@ -4,6 +4,7 @@ using DragonSpark.Sources.Parameterized;
 using Serilog;
 using System.Linq;
 using System.Windows.Markup;
+using DragonSpark.Commands;
 
 namespace DragonSpark.Diagnostics.Logging.Configurations
 {

@@ -1,5 +1,5 @@
-﻿using DragonSpark.Runtime.Specifications;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {

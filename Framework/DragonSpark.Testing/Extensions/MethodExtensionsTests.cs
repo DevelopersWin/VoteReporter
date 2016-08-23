@@ -1,7 +1,6 @@
-﻿using DragonSpark.Diagnostics.Logging;
+﻿using DragonSpark.Commands;
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
@@ -71,7 +70,7 @@ namespace DragonSpark.Testing.Extensions
 
 		class Factory : ValidatedParameterizedSourceBase<object, object>
 		{
-			public Factory() : base( Specifications.Assigned ) {}
+			public Factory() : base( Specifications.Specifications.Assigned ) {}
 
 			public override object Get( object parameter ) => null;
 		}

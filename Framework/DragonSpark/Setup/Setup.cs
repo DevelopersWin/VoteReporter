@@ -5,7 +5,6 @@ using DragonSpark.Configuration;
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -18,6 +17,8 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Commands;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Setup
 {

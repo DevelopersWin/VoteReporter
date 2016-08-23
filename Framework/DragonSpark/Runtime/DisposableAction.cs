@@ -13,12 +13,4 @@ namespace DragonSpark.Runtime
 
 		protected override void OnDispose( bool disposing ) => action();
 	}
-
-	public class InitializedDisposableAction : DisposableAction
-	{
-		public InitializedDisposableAction( Action action ) : base( action )
-		{
-			action();
-		}
-	}
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using DragonSpark.Runtime.Specifications;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {

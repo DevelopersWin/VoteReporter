@@ -1,5 +1,6 @@
+using DragonSpark.Commands;
 using DragonSpark.ComponentModel;
-using DragonSpark.Runtime;
+using DragonSpark.Runtime.Application;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Setup.Commands

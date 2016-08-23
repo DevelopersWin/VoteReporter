@@ -2,7 +2,6 @@ using DragonSpark.Activation.Location;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
@@ -14,6 +13,7 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.TypeSystem
 {

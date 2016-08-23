@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
@@ -12,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Specifications;
 using Defaults = DragonSpark.Sources.Parameterized.Defaults;
 
 namespace DragonSpark.Composition

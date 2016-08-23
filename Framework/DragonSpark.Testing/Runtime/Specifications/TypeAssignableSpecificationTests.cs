@@ -1,4 +1,4 @@
-﻿using DragonSpark.Runtime.Specifications;
+﻿using DragonSpark.Specifications;
 using DragonSpark.Testing.Objects;
 using Xunit;
 

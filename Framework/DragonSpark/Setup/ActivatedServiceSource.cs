@@ -1,8 +1,8 @@
 using DragonSpark.Aspects.Validation;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Setup
 {

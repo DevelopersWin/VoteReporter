@@ -1,4 +1,4 @@
-using DragonSpark.Runtime;
+using DragonSpark.Runtime.Application;
 
 namespace DevelopersWin.VoteReporter
 {

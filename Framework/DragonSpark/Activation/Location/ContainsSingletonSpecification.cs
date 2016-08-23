@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Activation.Location
 {

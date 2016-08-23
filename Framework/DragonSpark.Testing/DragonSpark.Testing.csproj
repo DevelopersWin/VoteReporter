@@ -71,6 +71,7 @@
     <Compile Include="Diagnostics\TimedDelegateTests.cs" />
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
+    <Compile Include="Runtime\DelegateTests.cs" />
     <Compile Include="Runtime\Properties\EqualityCacheTests.cs" />
     <Compile Include="Runtime\PurgingCollectionTests.cs" />
     <Compile Include="Runtime\Sources\DelegatesTests.cs" />
@@ -79,7 +80,6 @@
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />
-    <Compile Include="Runtime\DelegateTests.cs" />
     <Compile Include="TypeSystem\AttributesTests.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System;
@@ -9,6 +8,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
 using DragonSpark.Activation.Location;
+using DragonSpark.Specifications;
 using Delegates = DragonSpark.TypeSystem.Delegates;
 
 namespace DragonSpark.Sources.Parameterized

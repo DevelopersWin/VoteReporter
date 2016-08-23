@@ -4,13 +4,13 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
-	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
+	xmlns:application="clr-namespace:DragonSpark.Runtime.Application;assembly=DragonSpark"
 	mc:Ignorable="d"
 >
 	<setup:ApplyTaskMonitorCommand />
 	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
-		<runtime:ApplicationInformation DeploymentDate="2/1/2016" CompanyUri="http://framework.dragonspark.us/testing" />
+		<application:ApplicationInformation DeploymentDate="2/1/2016" CompanyUri="http://framework.dragonspark.us/testing" />
 	</commands:DeclaredFixedCommand>
 	<commands:RunProgramCommand />
 </setup:Setup>

@@ -1,7 +1,6 @@
 using DragonSpark.Activation.Location;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Specifications;
 using DragonSpark.Setup;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
@@ -13,6 +12,7 @@ using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Specifications;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition

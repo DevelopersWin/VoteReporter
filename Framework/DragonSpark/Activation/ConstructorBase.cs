@@ -1,5 +1,5 @@
-using DragonSpark.Runtime.Specifications;
 using System;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Activation
 {
