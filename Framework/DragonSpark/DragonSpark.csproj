@@ -50,6 +50,13 @@
     <Compile Include="ComponentModel\SingletonDefaultValueProvider.cs" />
     <Compile Include="ComponentModel\TypeDefinitions.cs" />
     <Compile Include="ComponentModel\ValueProvider.cs" />
+    <Compile Include="Configuration\ConfigurableFactoryBase.cs" />
+    <Compile Include="Configuration\ConfigurableParameterizedFactoryBase.cs" />
+    <Compile Include="Configuration\ConfigurationScope.cs" />
+    <Compile Include="Configuration\ConfigurationSource.cs" />
+    <Compile Include="Configuration\Extensions.cs" />
+    <Compile Include="Configuration\IConfigurationScope.cs" />
+    <Compile Include="Configuration\IValueStore.cs" />
     <Compile Include="Runtime\Hash.cs" />
     <Compile Include="Aspects\Validation\IParameterValidationAdapter.cs" />
     <Compile Include="Aspects\Keys.cs" />
@@ -163,8 +170,7 @@
     <Compile Include="Composition\SourceDelegateExporterBase.cs" />
     <Compile Include="Composition\InstanceExportDescriptorProvider.cs" />
     <Compile Include="Composition\SingletonExportDescriptorProvider.cs" />
-    <Compile Include="Configuration\Configuration.cs" />
-    <Compile Include="Configuration\IConfiguration.cs" />
+    <Compile Include="Configuration\EnableMethodCaching.cs" />
     <Compile Include="Diagnostics\Logging\Configuration.cs" />
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStore.cs" />
