@@ -1,5 +1,4 @@
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Registration;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects.Internals;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using DragonSpark.Sources.Delegates;
 using DragonSpark.Specifications;
 
 namespace DragonSpark.TypeSystem

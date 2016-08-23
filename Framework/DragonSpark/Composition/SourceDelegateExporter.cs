@@ -3,7 +3,6 @@ using DragonSpark.Activation.Location;
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -13,6 +12,7 @@ using System.Composition;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Sources.Delegates;
 using DragonSpark.Specifications;
 
 namespace DragonSpark.Composition

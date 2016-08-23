@@ -1,5 +1,5 @@
-using DragonSpark.Setup.Registration;
 using System;
+using DragonSpark.Sources.Delegates;
 
 namespace DragonSpark.TypeSystem
 {

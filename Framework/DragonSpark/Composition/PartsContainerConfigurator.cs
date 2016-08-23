@@ -12,6 +12,7 @@ using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
+using DragonSpark.Application;
 using DragonSpark.Specifications;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 

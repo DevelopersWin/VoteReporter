@@ -1,4 +1,4 @@
-using DragonSpark.Setup;
+using DragonSpark.Application;
 using Ploeh.AutoFixture;
 using System;
 using System.Collections.Immutable;

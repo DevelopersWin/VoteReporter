@@ -3,7 +3,6 @@ using DragonSpark.Commands;
 using DragonSpark.Diagnostics.Exceptions;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
-using DragonSpark.Setup.Commands;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;

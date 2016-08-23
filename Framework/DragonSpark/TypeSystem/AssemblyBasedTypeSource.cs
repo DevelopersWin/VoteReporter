@@ -1,11 +1,12 @@
 using DragonSpark.Activation.Location;
+using DragonSpark.Application;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -13,7 +14,6 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.TypeSystem
 {

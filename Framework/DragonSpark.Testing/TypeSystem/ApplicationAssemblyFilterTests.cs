@@ -1,5 +1,5 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Setup;
+﻿using DragonSpark.Application;
+using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.TypeSystem;

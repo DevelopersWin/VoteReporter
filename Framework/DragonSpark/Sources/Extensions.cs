@@ -1,5 +1,4 @@
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Application;
 using DragonSpark.Runtime.Assignments;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -8,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Windows.Input;
+using DragonSpark.Application;
 
 namespace DragonSpark.Sources
 {

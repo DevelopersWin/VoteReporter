@@ -6,10 +6,10 @@
 	xmlns:localEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
 	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
-	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
-	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
-	xmlns:application="clr-namespace:DragonSpark.Runtime.Application;assembly=DragonSpark"
-	mc:Ignorable="d"
+			 xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
+			 xmlns:commands="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
+			 xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
+			 mc:Ignorable="d"
 >
 	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}" Parameter="{markup:DirectoryInfo Reports}" />
 	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
@@ -22,5 +22,5 @@
 	<localEntity:InitializeDatabaseCommand>
 		<markup:Locate Type="{markup:Enumerable {x:Type entity:IInstaller}}" />
 	</localEntity:InitializeDatabaseCommand>
-	<commands:RunProgramCommand />
+	<application:RunProgramCommand />
 </setup:Setup>

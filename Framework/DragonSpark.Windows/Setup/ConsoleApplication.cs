@@ -1,4 +1,4 @@
-using DragonSpark.Setup;
+using DragonSpark.Application;
 using System.Windows.Input;
 
 namespace DragonSpark.Windows.Setup

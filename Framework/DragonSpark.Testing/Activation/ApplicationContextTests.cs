@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Configuration;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Application;
 using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Framework;
@@ -8,6 +7,7 @@ using DragonSpark.Testing.Framework.Setup;
 using JetBrains.Annotations;
 using System.Composition;
 using System.Reflection;
+using DragonSpark.Application;
 using Xunit;
 using ExecutionContext = DragonSpark.Testing.Framework.ExecutionContext;
 

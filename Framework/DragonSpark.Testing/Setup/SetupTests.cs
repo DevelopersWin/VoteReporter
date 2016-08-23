@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation.Location;
+using DragonSpark.Application;
 using DragonSpark.Extensions;
 using DragonSpark.Setup;
 using Xunit;

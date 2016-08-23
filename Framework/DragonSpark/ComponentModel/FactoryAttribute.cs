@@ -1,6 +1,6 @@
-using DragonSpark.Setup.Registration;
 using DragonSpark.Sources;
 using System;
+using DragonSpark.Sources.Delegates;
 
 namespace DragonSpark.ComponentModel
 {

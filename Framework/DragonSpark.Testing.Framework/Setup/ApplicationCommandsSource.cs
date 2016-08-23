@@ -13,6 +13,7 @@ using System.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Application;
 
 namespace DragonSpark.Testing.Framework.Setup
 {
@@ -26,7 +27,7 @@ namespace DragonSpark.Testing.Framework.Setup
 			new CompositeServiceProvider( new SourceServiceProvider( FixtureContext.Default, MethodContext.Default ), new FixtureServiceProvider( FixtureContext.Default.Get() ), parameter );
 	}
 
-	public class ApplicationCommandSource : DragonSpark.Setup.ApplicationCommandSource
+	public class ApplicationCommandSource : DragonSpark.Application.ApplicationCommandSource
 	{
 		readonly static Func<MethodBase, ImmutableArray<ICommand<AutoData>>> Factory = MetadataCustomizationFactory<ICommand<AutoData>>.Default.Get;
 

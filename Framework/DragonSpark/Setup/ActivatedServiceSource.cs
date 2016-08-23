@@ -1,8 +1,8 @@
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using System;
 using DragonSpark.Specifications;
+using System;
 
 namespace DragonSpark.Setup
 {
@@ -14,7 +14,7 @@ namespace DragonSpark.Setup
 
 		public ActivatedServiceSource( IServiceProvider provider ) : this( provider, IsActive.Default.Get( provider ) ) {}
 
-		ActivatedServiceSource( IServiceProvider provider, IsActive active ) : base( new DelegatedSpecification<object>( Services.Default.ToDelegate().Wrap() ).And( new DelegatedSpecification<Type>( active.Get ).Inverse() ) )
+		ActivatedServiceSource( IServiceProvider provider, IsActive active ) : base( new DelegatedSpecification<object>( ServicesEnabled.Default.ToDelegate().Wrap() ).And( new DelegatedSpecification<Type>( active.Get ).Inverse() ) )
 		{
 			this.provider = provider;
 			this.active = active;

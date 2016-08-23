@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation.Location;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime.Application;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework;
@@ -14,6 +13,7 @@ using System;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Application;
 using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics

@@ -32,7 +32,7 @@ namespace DragonSpark.Testing.Setup
 			sut = new ActivatedServiceSource( provider );
 			var first = sut.Get( typeof(int) );
 			Assert.Null( first );
-			Services.Default.Assign( true );
+			ServicesEnabled.Default.Assign( true );
 			Assert.Equal( 0, count );
 			Assert.Equal( 1,  sut.Get( typeof(int) ) );
 			Assert.Equal( 1, count );

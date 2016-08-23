@@ -1,8 +1,8 @@
+using DragonSpark.Application;
 using DragonSpark.Aspects;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Setup;
 using PostSharp.Aspects;
 using System;
 using System.Reflection;

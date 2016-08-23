@@ -5,9 +5,10 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:ds="http://framework.dragonspark.us"
 	xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
+	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
 	mc:Ignorable="d" 
 >
 	<!--Services="{ds:Factory {x:Static composition:ServiceProviderFactory.Default}}"-->
-	<setup:ApplyTaskMonitorCommand />
+	<application:ApplyTaskMonitorCommand />
 	<setup:ApplySetup />
 </ds:ConsoleApplication>

@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation.Location;
+using DragonSpark.Application;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
 using DragonSpark.Extensions;
@@ -31,7 +32,7 @@ namespace DragonSpark.Composition
 
 	public class ServiceProviderConfigurations : Setup.ServiceProviderConfigurations
 	{
-		public new static ServiceProviderConfigurations Default { get; } = new ServiceProviderConfigurations();
+		public static ServiceProviderConfigurations Default { get; } = new ServiceProviderConfigurations();
 		ServiceProviderConfigurations() : this( ServiceProviderSource.Default.Get ) {}
 
 		readonly Func<IServiceProvider> source;

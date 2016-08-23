@@ -1,5 +1,5 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Setup;
+﻿using DragonSpark.Application;
+using DragonSpark.Extensions;
 using DragonSpark.Windows.Runtime;
 
 namespace DevelopersWin.VoteReporter.Application

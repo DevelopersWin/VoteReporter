@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Runtime.Application;
+using DragonSpark.Application;
 using DragonSpark.Specifications;
 
 namespace DragonSpark.TypeSystem

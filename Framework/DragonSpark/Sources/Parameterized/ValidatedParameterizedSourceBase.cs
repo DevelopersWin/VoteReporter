@@ -1,15 +1,14 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
-using DragonSpark.Activation.Location;
-using DragonSpark.Specifications;
-using Delegates = DragonSpark.TypeSystem.Delegates;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -67,7 +66,7 @@ namespace DragonSpark.Sources.Parameterized
 		readonly Action initialize;
 		readonly Action<T> configure;
 
-		public ConfiguringFactory( Func<T> inner, Action<T> configure ) : this( inner, Delegates.Empty, configure ) {}
+		public ConfiguringFactory( Func<T> inner, Action<T> configure ) : this( inner, TypeSystem.Delegates.Empty, configure ) {}
 
 		public ConfiguringFactory( Func<T> inner, Action initialize ) : this( inner, initialize, Delegates<T>.Empty ) {}
 

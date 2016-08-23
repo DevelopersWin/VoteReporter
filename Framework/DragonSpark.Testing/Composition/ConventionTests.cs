@@ -6,6 +6,7 @@ using System;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
+using DragonSpark.Application;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition
