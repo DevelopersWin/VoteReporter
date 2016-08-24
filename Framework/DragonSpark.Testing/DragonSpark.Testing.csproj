@@ -104,7 +104,6 @@
     </Compile>
     <Compile Include="Extensions\StringExtensionsTests.cs" />
     <Compile Include="Extensions\UnityContainerExtensionsTests.cs" />
-    <Compile Include="Configure.cs" />
     <Compile Include="Properties\ResourcesTests.cs" />
     <Compile Include="Runtime\DeclarativeCollectionTests.cs" />
     <Compile Include="Runtime\CompositeCommandTests.cs" />
