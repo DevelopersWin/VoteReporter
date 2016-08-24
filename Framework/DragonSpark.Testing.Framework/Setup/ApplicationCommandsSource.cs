@@ -1,7 +1,6 @@
 using DragonSpark.Commands;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 
 namespace DragonSpark.Testing.Framework.Setup
 {

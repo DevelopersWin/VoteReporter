@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Immutable;
-using System.Composition;
-using System.Linq;
 using DragonSpark.Activation.Location;
 using DragonSpark.Application;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
-using DragonSpark.TypeSystem;
+using System;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -18,11 +17,11 @@ namespace DragonSpark.Sources.Parameterized
 		
 		sealed class Factory : ParameterizedSourceBase<LocateTypeRequest, Type>
 		{
-			readonly ImmutableArray<FactoryTypeRequest> types;
+			readonly ImmutableArray<SourceTypeRequest> types;
 
 			public Factory() : this( Requests.DefaultNested.CreateMany( ApplicationParts.Default.Get().Types.AsEnumerable() ) ) {}
 
-			Factory( ImmutableArray<FactoryTypeRequest> types )
+			Factory( ImmutableArray<SourceTypeRequest> types )
 			{
 				this.types = types;
 			}
@@ -42,15 +41,15 @@ namespace DragonSpark.Sources.Parameterized
 				return result;
 			}
 
-			sealed class Requests : ValidatedParameterizedSourceBase<Type, FactoryTypeRequest>
+			sealed class Requests : ValidatedParameterizedSourceBase<Type, SourceTypeRequest>
 			{
 				readonly static Func<Type, Type> Results = ResultTypes.Default.ToSourceDelegate();
 
 				public static Requests DefaultNested { get; } = new Requests();
 				Requests() : base( Defaults.ActivateSpecification.And( Defaults.KnownSourcesSpecification, Defaults.IsExportSpecification, new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
-				public override FactoryTypeRequest Get( Type parameter ) => 
-					new FactoryTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );
+				public override SourceTypeRequest Get( Type parameter ) => 
+					new SourceTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );
 			}
 		}
 	}

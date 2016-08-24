@@ -2,7 +2,6 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
@@ -15,7 +14,9 @@ using System.Collections.Immutable;
 using System.Reflection;
 using System.Windows.Input;
 using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 using DragonSpark.Commands;
+using DragonSpark.ComponentModel;
 using DragonSpark.Specifications;
 
 namespace DragonSpark.Testing.Framework.Setup
@@ -76,7 +77,7 @@ namespace DragonSpark.Testing.Framework.Setup
 	}
 
 	[AttributeUsage( AttributeTargets.Class | AttributeTargets.Method )]
-	public abstract class TypeProviderAttributeBase : HostingAttribute
+	public abstract class TypeProviderAttributeBase : HostingAttributeBase
 	{
 		protected TypeProviderAttributeBase( params Type[] types ) : this( types.ToImmutableArray() ) {}
 		protected TypeProviderAttributeBase( ImmutableArray<Type> additionalTypes ) : this( new Factory( additionalTypes ).Get ) {}
@@ -138,7 +139,7 @@ namespace DragonSpark.Testing.Framework.Setup
 		}
 	}
 
-	public abstract class CommandAttributeBase : HostingAttribute
+	public abstract class CommandAttributeBase : HostingAttributeBase
 	{
 		protected CommandAttributeBase( ICommand command ) : this( command.Cast<AutoData>() ) {}
 		protected CommandAttributeBase( ICommand<AutoData> command ) : base( command.Wrap() ) {}

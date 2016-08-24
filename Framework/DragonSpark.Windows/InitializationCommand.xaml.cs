@@ -1,9 +1,9 @@
-﻿using DragonSpark.Setup;
-using DragonSpark.Sources;
+﻿using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Windows.Runtime;
 using System;
 using System.Composition;
+using DragonSpark.Application.Setup;
 
 namespace DragonSpark.Windows
 {

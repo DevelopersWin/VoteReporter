@@ -1,6 +1,6 @@
+using DragonSpark.Application.Setup;
 using DragonSpark.Commands;
 using DragonSpark.ComponentModel;
-using DragonSpark.Setup;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Diagnostics.Exceptions

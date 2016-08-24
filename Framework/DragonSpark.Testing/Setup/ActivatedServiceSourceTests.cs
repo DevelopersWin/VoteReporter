@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation.Location;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
+using DragonSpark.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Testing.Setup

@@ -1,86 +1,15 @@
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.TypeSystem.Generics;
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Activator = System.Activator;
 
 namespace DragonSpark.TypeSystem
 {
-	public static class Delegates
-	{
-		public static Action Empty { get; } = () => {};
-
-		/*public static Func<TParameter, TResult> From<TParameter, TResult>() => Cache<TParameter, TResult>.Default.Get( typeof(TResult).GetConstructor( typeof(TParameter) ) );
-
-		public static TResult From<TParameter, TResult>( TParameter parameter ) => From<TParameter, TResult>()( parameter );
-
-		class Cache<TParameter, TResult> : Runtime.Properties.Cache<ConstructorInfo, Func<TParameter, TResult>>
-		{
-			public static Cache<TParameter, TResult> Default { get; } = new Cache<TParameter, TResult>();
-			Cache() : base( Factory.Default.ToDelegate() ) {}
-
-			class Factory : CompiledDelegateFactoryBase<ConstructorInfo, TParameter, Func<TParameter, TResult>>
-			{
-				public static Factory Default { get; } = new Factory();
-
-				protected override Expression CreateBody( ConstructorInfo parameter, ParameterExpression definition ) => Expression.New( parameter, definition );
-			}
-
-			/*class ConstructorCache : Runtime.Properties.Cache<Type, ConstructorInfo>
-			{
-				ConstructorCache() : base( type => typeof(TResult).GetConstructor( type ) ) {}
-			}#1#
-		}*/
-	}
-
-	public static class SpecialValues
-	{
-		// public static object Null { get; } = new object();
-
-		public static T DefaultOrEmpty<T>() => Default<T>.Value;
-
-		public static object DefaultOrEmpty( Type type ) => DefaultValues.Default.Get( type );
-	}
-
-	public static class Delegates<T>
-	{
-		public static Action<T> Empty { get; } = t => {};
-
-		public static Func<T, T> Self { get; } = t => t;
-
-		public static Func<T, object> Object { get; } = t => t;
-
-		public static Func<T> Default { get; } = () => default(T);
-
-		// public static Func<object, T> Wrapped { get; } = _ => default(T);
-	}
-
-	public static class Items<T>
-	{
-		static Items()
-		{
-			Default = (T[])Enumerable.Empty<T>();
-			Immutable = Default.ToImmutableArray();
-			List = Default.ToImmutableList();
-		}
-
-		public static T[] Default { get; }
-
-		public static ImmutableArray<T> Immutable { get; }
-
-		public static IList<T> List { get; }
-	}
-
-	static class Default<T>
-	{
-		public static T Value { get; } = (T)DefaultValues.Default.Get( typeof(T) );
-	}
-
-	class DefaultValues : Cache<Type, object>
+	sealed class DefaultValues : Cache<Type, object>
 	{
 		readonly static IGenericMethodContext<Invoke> Method = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
 

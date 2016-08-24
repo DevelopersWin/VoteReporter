@@ -1,4 +1,4 @@
-﻿using DragonSpark.TypeSystem;
+﻿using DragonSpark.TypeSystem.Metadata;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 

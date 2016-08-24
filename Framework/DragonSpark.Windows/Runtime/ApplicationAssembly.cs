@@ -21,7 +21,7 @@ namespace DragonSpark.Windows.Runtime
 			this.defaultSource = defaultSource;
 		}
 
-		public override Assembly Get( IEnumerable<Assembly> parameter ) => DragonSpark.TypeSystem.ApplicationAssemblyLocator.Default.Get( parameter ) ?? defaultSource();
+		public override Assembly Get( IEnumerable<Assembly> parameter ) => Application.ApplicationAssemblyLocator.Default.Get( parameter ) ?? defaultSource();
 	}
 
 	public sealed class DomainApplicationAssemblies : FactoryCache<AppDomain, Assembly>

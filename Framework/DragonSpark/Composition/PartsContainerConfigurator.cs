@@ -1,9 +1,11 @@
 using DragonSpark.Activation.Location;
+using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 using DragonSpark.Configuration;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.TypeSystem;
+using DragonSpark.Specifications;
+using DragonSpark.TypeSystem.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -12,8 +14,6 @@ using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Composition.Hosting.Core;
 using System.Linq;
-using DragonSpark.Application;
-using DragonSpark.Specifications;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition

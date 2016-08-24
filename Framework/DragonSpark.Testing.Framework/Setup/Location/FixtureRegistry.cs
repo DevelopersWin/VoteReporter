@@ -1,5 +1,5 @@
-﻿using DragonSpark.Setup;
-using DragonSpark.TypeSystem;
+﻿using DragonSpark.Application.Setup;
+using DragonSpark.TypeSystem.Generics;
 using Ploeh.AutoFixture;
 
 namespace DragonSpark.Testing.Framework.Setup.Location

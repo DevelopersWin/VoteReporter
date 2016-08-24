@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Parameters;
@@ -18,6 +17,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using DragonSpark.Activation.Location;
+using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 using Xunit;
 using Xunit.Abstractions;
 using Activator = DragonSpark.Activation.Activator;
@@ -429,7 +430,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			}
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly), typeof(AssemblyInformationFactory) )]
+		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly), typeof(AssemblyInformationSource) )]
 		public void CreateAssembly( [Service]IParameterizedSource<Assembly, AssemblyInformation> factory, IServiceProvider container, [Service]Assembly sut )
 		{
 			var fromFactory = ApplicationAssembly.Default.Get();

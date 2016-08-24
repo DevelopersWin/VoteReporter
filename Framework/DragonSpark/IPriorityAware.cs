@@ -2,7 +2,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using DragonSpark.TypeSystem;
+using DragonSpark.TypeSystem.Metadata;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

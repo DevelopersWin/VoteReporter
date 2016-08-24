@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Application;
+using DragonSpark.TypeSystem.Generics;
 
 namespace DragonSpark.TypeSystem
 {
@@ -127,46 +129,5 @@ namespace DragonSpark.TypeSystem
 
 		[Freeze]
 		public Type[] GetEntireHierarchy() => Expand( Type ).Union( GetHierarchy( false ) ).Distinct().ToArray();
-	}
-
-	class MethodMapper//  : FactoryBase<Type, ImmutableArray<MethodMapping>>
-	{
-		readonly TypeAdapter adapter;
-
-		public MethodMapper( TypeAdapter adapter )
-		{
-			this.adapter = adapter;
-		}
-
-		public ImmutableArray<MethodMapping> Create( Type parameter )
-		{
-			var generic = parameter.GetTypeInfo().IsGenericTypeDefinition ? adapter.GetImplementations( parameter ).FirstOrDefault() : null;
-			var implementation = generic ?? ( parameter.Adapt().IsAssignableFrom( adapter.Type ) ? parameter : null );
-			if ( implementation != null )
-			{
-				var map = adapter.Info.GetRuntimeInterfaceMap( implementation );
-				var result = map.InterfaceMethods.Tuple( map.TargetMethods ).Select( tuple => new MethodMapping( tuple.Item1, tuple.Item2 ) ).ToImmutableArray();
-				return result;
-			}
-			return Items<MethodMapping>.Immutable;
-		}
-	}
-
-	public struct MethodMapping
-	{
-		public MethodMapping( MethodInfo interfaceMethod, MethodInfo mappedMethod )
-		{
-			InterfaceMethod = interfaceMethod;
-			MappedMethod = mappedMethod;
-		}
-
-		public MethodInfo InterfaceMethod { get; }
-		public MethodInfo MappedMethod { get; }
-	}
-
-	class InstanceConstructors : ArgumentCache<TypeInfo, ImmutableArray<ConstructorInfo>>
-	{
-		public static InstanceConstructors Default { get; } = new InstanceConstructors();
-		InstanceConstructors() : base( info => info.DeclaredConstructors.Where( constructorInfo => constructorInfo.IsPublic && !constructorInfo.IsStatic ).ToImmutableArray() ) {}
 	}
 }

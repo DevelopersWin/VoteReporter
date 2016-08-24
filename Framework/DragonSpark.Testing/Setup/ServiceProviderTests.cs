@@ -1,11 +1,11 @@
 ﻿using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Objects;
 using Serilog;
 using System.Linq;
 using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Testing.Setup

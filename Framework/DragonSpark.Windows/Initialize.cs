@@ -15,7 +15,7 @@ namespace DragonSpark.Windows
 		[ModuleInitializer( 0 )]
 		public static void Execution() => Command.Default.Run();
 
-		class Command : DragonSpark.Setup.Setup
+		class Command : Application.Setup.Setup
 		{
 			public static ICommand Default { get; } = new Command();
 			Command() : base( 

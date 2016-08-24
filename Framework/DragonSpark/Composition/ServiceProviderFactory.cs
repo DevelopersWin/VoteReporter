@@ -3,7 +3,6 @@ using DragonSpark.Application;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Windows.Input;
+using DragonSpark.Application.Setup;
 using Type = System.Type;
 
 namespace DragonSpark.Composition
@@ -30,7 +30,7 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	public class ServiceProviderConfigurations : Setup.ServiceProviderConfigurations
+	public class ServiceProviderConfigurations : Application.Setup.ServiceProviderConfigurations
 	{
 		public static ServiceProviderConfigurations Default { get; } = new ServiceProviderConfigurations();
 		ServiceProviderConfigurations() : this( ServiceProviderSource.Default.Get ) {}
@@ -46,7 +46,7 @@ namespace DragonSpark.Composition
 
 		protected override IEnumerable<ICommand> Yield()
 		{
-			yield return Setup.ServiceProviderFactory.Default.Seed.Configured( source );
+			yield return Application.Setup.ServiceProviderFactory.Default.Seed.Configured( source );
 			foreach ( var command in base.Yield() )
 			{
 				yield return command;

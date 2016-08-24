@@ -1,6 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
-using DragonSpark.TypeSystem;
+using DragonSpark.TypeSystem.Generics;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 

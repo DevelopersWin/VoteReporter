@@ -3,9 +3,9 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-			 xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
 			 xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
 			 xmlns:commands="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
+			 xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
 			 mc:Ignorable="d"
 >
 	<application:ApplyTaskMonitorCommand />

@@ -1,6 +1,7 @@
 ﻿using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
+using DragonSpark.TypeSystem.Metadata;
 
 namespace DragonSpark.Extensions
 {

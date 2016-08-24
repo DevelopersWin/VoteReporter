@@ -1,7 +1,7 @@
 using System;
 using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 using DragonSpark.Diagnostics.Logging;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 
 namespace DragonSpark.Activation.Location

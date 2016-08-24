@@ -2,8 +2,8 @@
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
+using DragonSpark.Application;
 using DragonSpark.Testing.Framework;
-using DragonSpark.TypeSystem;
 using System.Reflection;
 using System.Runtime.InteropServices;
 

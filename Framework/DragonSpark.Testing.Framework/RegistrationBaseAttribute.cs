@@ -1,10 +1,10 @@
 using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework.Setup.Location;
 using Ploeh.AutoFixture;
 using System;
+using DragonSpark.Application.Setup;
 
 namespace DragonSpark.Testing.Framework
 {

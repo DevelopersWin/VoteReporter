@@ -15,6 +15,7 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Application;
 using Xunit;
 using Xunit.Abstractions;
 using Parameter = DragonSpark.Testing.Objects.Composition.Parameter;
@@ -47,10 +48,10 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( sinkOne.Events.Count() > current );
 		}
 
-		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationFactory) )]
+		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationSource) )]
 		public void InterfaceExport( CompositionContext host )
 		{
-			Assert.Same( AssemblyInformationFactory.Default, host.GetExport<IParameterizedSource<Assembly, AssemblyInformation>>() );
+			Assert.Same( AssemblyInformationSource.Default, host.GetExport<IParameterizedSource<Assembly, AssemblyInformation>>() );
 			
 		}
 

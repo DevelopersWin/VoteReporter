@@ -1,4 +1,4 @@
-﻿using DragonSpark.TypeSystem;
+﻿using DragonSpark.ComponentModel;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.TypeSystem
 			public int Number { get; }
 		}
 
-		class FieldHostedAttribute : HostingAttribute
+		class FieldHostedAttribute : HostingAttributeBase
 		{
 			public FieldHostedAttribute(object item, int number) : base( p => new Target( item, number ) ) {}
 		}

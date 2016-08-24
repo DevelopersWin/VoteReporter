@@ -1,9 +1,9 @@
-﻿using System;
-using DragonSpark.TypeSystem;
+﻿using DragonSpark.TypeSystem.Metadata;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
+using System;
 
 namespace DragonSpark.Aspects.Validation
 {

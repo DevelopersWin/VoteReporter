@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Input;
+using DragonSpark.Application.Setup;
 using DragonSpark.Commands;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 
 namespace DragonSpark.Application
 {

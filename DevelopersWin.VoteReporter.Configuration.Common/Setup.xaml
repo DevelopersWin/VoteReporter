@@ -4,9 +4,9 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:entity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
-							xmlns:setup="clr-namespace:DragonSpark.Setup;assembly=DragonSpark"
-	xmlns:commands1="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
-	mc:Ignorable="d" 
+							xmlns:commands1="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
+							xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
+							mc:Ignorable="d" 
 	>
 	<commands1:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
 		<entity:Configuration AutomaticMigrationsEnabled="True" />

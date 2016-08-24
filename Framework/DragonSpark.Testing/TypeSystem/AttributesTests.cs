@@ -1,7 +1,7 @@
 ﻿using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
-using DragonSpark.TypeSystem;
+using DragonSpark.TypeSystem.Metadata;
 using JetBrains.Annotations;
 using System;
 using System.Diagnostics.CodeAnalysis;

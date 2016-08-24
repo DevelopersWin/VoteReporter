@@ -1,5 +1,5 @@
-﻿using System;
-using DragonSpark.TypeSystem;
+﻿using DragonSpark.TypeSystem.Generics;
+using System;
 
 namespace DragonSpark.Aspects.Validation
 {

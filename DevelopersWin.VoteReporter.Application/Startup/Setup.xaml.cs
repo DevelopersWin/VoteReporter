@@ -1,5 +1,5 @@
-﻿using DragonSpark.Setup;
-using System.Composition;
+﻿using System.Composition;
+using DragonSpark.Application.Setup;
 
 namespace DevelopersWin.VoteReporter.Application.Startup
 {

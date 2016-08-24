@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Configuration;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Setup;
@@ -8,6 +7,7 @@ using JetBrains.Annotations;
 using System.Composition;
 using System.Reflection;
 using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 using Xunit;
 using ExecutionContext = DragonSpark.Testing.Framework.ExecutionContext;
 
@@ -48,7 +48,7 @@ namespace DragonSpark.Testing.Activation
 		}
 
 		[Export( typeof(ISetup) ), UsedImplicitly]
-		class Setup : DragonSpark.Setup.Setup
+		class Setup : Application.Setup.Setup
 		{
 			public Setup() : base( EnableMethodCaching.Default.Configured( false ) ) {}
 		}
