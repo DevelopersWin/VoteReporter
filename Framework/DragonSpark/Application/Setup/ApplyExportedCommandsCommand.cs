@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Input;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using PostSharp.Patterns.Contracts;
+using System;
+using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace DragonSpark.Application.Setup
 {

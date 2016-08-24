@@ -98,7 +98,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Runtime\CustomizationBase.cs" />
-    <Compile Include="Application\EnsureValuesAttribute.cs" />
     <Compile Include="Application\AutoDataCommandBase.cs" />
     <Compile Include="Application\AutoData.cs" />
     <Compile Include="Application\Setup\TypeProviderAttributeBase.cs" />

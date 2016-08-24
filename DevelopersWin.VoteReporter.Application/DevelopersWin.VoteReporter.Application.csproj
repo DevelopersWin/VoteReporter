@@ -59,7 +59,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Startup\Setup.xaml.cs">
+    <Compile Include="Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -110,7 +110,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Startup\Setup.xaml">
+    <Page Include="Setup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

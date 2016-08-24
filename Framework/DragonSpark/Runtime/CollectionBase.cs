@@ -1,9 +1,9 @@
+using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Extensions;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Runtime
 {
@@ -59,13 +59,13 @@ namespace DragonSpark.Runtime
 
 		bool IList.Contains( object value ) => value.AsTo( contains );
 
-		int IList.IndexOf( object value ) => value.AsTo( indexOf, () => -1 );
+		public int IndexOf( object value ) => value.AsTo( indexOf, () => -1 );
 
-		void IList.Insert( int index, object value ) => value.As<T>( x => list.Insert( index, x ) );
+		public void Insert( int index, object value ) => value.As<T>( x => list.Insert( index, x ) );
 
 		void IList.Remove( object value ) => value.As<T>( x => Source.Remove( x ) );
 
-		void IList.RemoveAt( int index ) => list.RemoveAt( index );
+		public void RemoveAt( int index ) => list.RemoveAt( index );
 
 		bool IList.IsFixedSize => list.IsFixedSize;
 
@@ -85,7 +85,7 @@ namespace DragonSpark.Runtime
 
 		public virtual bool IsReadOnly => Source.To<ICollection<T>>().IsReadOnly;
 
-		object IList.this[ int index ]
+		public object this[ int index ]
 		{
 			get { return list[index]; }
 			set { list[index] = (T)value; }

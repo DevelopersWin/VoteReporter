@@ -1,4 +1,4 @@
-﻿<setup:Setup x:Class="DevelopersWin.VoteReporter.Application.Startup.Setup"
+﻿<setup:Setup x:Class="DevelopersWin.VoteReporter.Application.Setup"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,15 +6,14 @@
 	xmlns:localEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
 	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
-			 xmlns:commands="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
-			 xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
-			 xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
-			 mc:Ignorable="d"
+	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
+	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
+	mc:Ignorable="d"
 >
-	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}" Parameter="{markup:DirectoryInfo Reports}" />
-	<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
+	<setup:RegisterInstances>
+		<markup:DirectoryInfo Path="Reports" />
 		<application:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
-	</commands:DeclaredFixedCommand>
+	</setup:RegisterInstances>
 	
 	<entity:AssignDataDirectoryCommand />
 	<entity:InstallDatabaseCommand />

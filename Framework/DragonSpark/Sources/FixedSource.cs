@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace DragonSpark.Sources
 {
 	public class FixedSource<T> : AssignableSourceBase<T>
@@ -11,9 +13,9 @@ namespace DragonSpark.Sources
 			Assign( reference );
 		}
 
-		public sealed override void Assign( T item ) => OnAssign( item );
+		public sealed override void Assign( [Optional]T item ) => OnAssign( item );
 
-		protected virtual void OnAssign( T item ) => reference = item;
+		protected virtual void OnAssign( [Optional]T item ) => reference = item;
 
 		public override T Get() => reference;
 

@@ -17,6 +17,13 @@ namespace DragonSpark.Extensions
 
 		public static void Run( this ICommand @this ) => @this.Execute( default(object) );
 
+		public static Action ToRunDelegate( this ICommand @this ) => RunDelegates.Default.Get( @this );
+		sealed class RunDelegates : Cache<ICommand, Action>
+		{
+			public static RunDelegates Default { get; } = new RunDelegates();
+			RunDelegates() : base( command => command.Run ) {}
+		}
+
 		public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );
 
 		public static TCommand Run<TCommand, TParameter>( this TCommand @this, TParameter parameter ) where TCommand : ICommand<TParameter>
@@ -31,12 +38,12 @@ namespace DragonSpark.Extensions
 
 		// public static FixedCommand<Func<T>> Fixed<T>( this ICommand<Func<T>> @this, T parameter ) => new FixedCommand<Func<T>>( @this, new FixedFactory<T>( parameter ).Create );
 		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, [Optional]T parameter ) => new FixedCommand<T>( @this, parameter );
-		
+		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, Func<T> parameter ) => new FixedCommand<T>( @this, parameter );
+
 		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => DelegateCache<T>.Default.Get( @this );
 		sealed class DelegateCache<T> : Cache<ICommand<T>, Action<T>>
 		{
 			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
-
 			DelegateCache() : base( command => command.Execute ) {}
 		}
 
@@ -44,7 +51,6 @@ namespace DragonSpark.Extensions
 		sealed class Transformers<T> : Cache<ICommand<T>, ITransformer<T>>
 		{
 			public static Transformers<T> Default { get; } = new Transformers<T>();
-
 			Transformers() : base( command => new ConfiguringTransformer<T>( command.ToDelegate() ) ) {}
 		}
 

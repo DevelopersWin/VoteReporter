@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace DragonSpark.Application
+namespace DragonSpark.Tasks
 {
 	public interface ITaskMonitor : IDisposable
 	{

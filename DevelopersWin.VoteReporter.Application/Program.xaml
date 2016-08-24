@@ -4,11 +4,6 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:ds="http://framework.dragonspark.us"
-					   xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
-					   xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
-					   mc:Ignorable="d" 
+	mc:Ignorable="d" 
 >
-	<!--Services="{ds:Factory {x:Static composition:ServiceProviderFactory.Default}}"-->
-	<application:ApplyTaskMonitorCommand />
-	<setup:ApplySetup />
 </ds:ConsoleApplication>

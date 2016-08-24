@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Tasks\FixedTaskSource.cs" />
+    <Compile Include="Tasks\MonitorTaskCommand.cs" />
+    <Compile Include="Application\Setup\RegisterInstances.cs" />
     <Compile Include="Aspects\Validation\AdapterSourceBase.cs" />
     <Compile Include="Aspects\AspectHub.cs" />
     <Compile Include="Aspects\CacheEntry.cs" />
@@ -133,12 +136,9 @@
     <Compile Include="Application\ApplicationTypes.cs" />
     <Compile Include="Application\Setup\ApplyExportedCommandsCommand.cs" />
     <Compile Include="Application\Setup\ApplySetup.cs" />
-    <Compile Include="Application\ApplyTaskMonitorCommand.cs" />
     <Compile Include="Application\Setup\AssignSystemPartsCommand.cs" />
     <Compile Include="Commands\CommandSource.cs" />
     <Compile Include="Commands\DeclaredCommandBase.cs" />
-    <Compile Include="Commands\DelegatedFixedCommand.cs" />
-    <Compile Include="Commands\DelegatedFixedCommandBase.cs" />
     <Compile Include="Application\Setup\CompositeServiceProvider.cs" />
     <Compile Include="Application\DefaultExportProvider.cs" />
     <Compile Include="Application\Setup\EnableServicesCommand.cs" />
@@ -153,7 +153,7 @@
     <Compile Include="Application\Setup\IsActive.cs" />
     <Compile Include="Application\Setup\IServiceRepository.cs" />
     <Compile Include="Application\Setup\ISetup.cs" />
-    <Compile Include="Application\ITaskMonitor.cs" />
+    <Compile Include="Tasks\ITaskMonitor.cs" />
     <Compile Include="Application\ITypeSource.cs" />
     <Compile Include="Application\Setup\RegisterInstanceCommand.cs" />
     <Compile Include="Sources\CompositeItemSource.cs" />
@@ -204,6 +204,7 @@
     <Compile Include="Sources\Parameterized\Wrapper.cs" />
     <Compile Include="Sources\SuppliedAndExportedItems.cs" />
     <Compile Include="Sources\TimedDelegatedSource.cs" />
+    <Compile Include="Tasks\TaskMonitors.cs" />
     <Compile Include="TypeSystem\Default.cs" />
     <Compile Include="TypeSystem\Generics\ActionContextBase.cs" />
     <Compile Include="Application\ApplicationAssembly.cs" />
@@ -568,7 +569,7 @@
     <Compile Include="Application\Program.cs" />
     <Compile Include="Application\RunProgramCommand.cs" />
     <Compile Include="Application\Setup\Setup.cs" />
-    <Compile Include="Application\TaskMonitor.cs" />
+    <Compile Include="Tasks\TaskMonitor.cs" />
     <Compile Include="Commands\DeclaredFixedCommand.cs" />
     <Compile Include="Sources\Delegates\RegistrationAttribute.cs" />
     <Compile Include="Application\ApplicationInformation.cs">

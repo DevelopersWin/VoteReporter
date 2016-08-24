@@ -1,14 +1,14 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Application;
+using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using System;
 using System.Composition;
 using System.Diagnostics;
 using System.Reflection;
-using DragonSpark.Application;
-using DragonSpark.Testing.Framework.Application;
-using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup
@@ -16,54 +16,8 @@ namespace DragonSpark.Windows.Testing.Setup
 	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
 	public class ProgramSetupTests
 	{
-		/*[Export]
-		public IUnityContainer Container { get; } = UnityContainerFactory.Default.Create();*/
-
-		/*[Theory, AutoData]
-		public void Temp()
-		{
-			Parallel.For( 0, 1000, i =>
-								   {
-									   var type = ConventionTypes.Default.Get( typeof(IProgram) );
-									   Assert.Equal( typeof(Program), type );
-								   } );
-		}*/
-
-		/*[Theory, AutoData]
-		public void TypeCheck( IUnityContainer container )
-		{
-			var constructor = container.Resolve<Constructor>().To<IValidatedParameterizedSource>();
-			var cancan = constructor.IsSatisfiedBy( typeof(MonitoredModule) );
-			Assert.True( cancan );
-
-			var activator = container.Resolve<IActivator>();
-			var can = activator.IsSatisfiedBy( typeof(MonitoredModule) );
-			Assert.True( can );
-
-			/*var created = activator.Create( typeof(MonitoredModule) );
-			Assert.Exists( created );#1#
-
-			/*var activator = sut.Resolve<IActivator>()
-			var specification = new DecoratedSpecification<TypeRequest>( sut.Resolve<ResolvableConstructorSpecification>(), ConstructorBase.Coercer.Default ).To<ISpecification>();
-			var valid = specification.IsSatisfiedBy( typeof(MonitoredModule) );
-			Assert.True( valid );#1#
-		}*/
-
-		/*[Theory, AutoData, IncludeParameterTypes( typeof(ModuleInitializer), typeof(AssemblyModuleCatalog), typeof(ModuleManager), typeof(ModuleMonitor), typeof(MonitoredModule), typeof(TaskMonitor), typeof(MonitoredModule.Command) )]
-		public void Extension( IModuleMonitor sut )
-		{
-			var collection = ListCache.Default.Get( sut );
-			var module = collection.FirstOrDefaultOfType<MonitoredModule>();
-			Assert.NotNull( module );
-			Assert.True( module.Initialized );
-			Assert.True( module.Loaded );
-
-			var command = collection.FirstOrDefaultOfType<MonitoredModule.Command>();
-			Assert.NotNull( command );
-		}*/
-
 		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationSource), typeof(ApplicationAssembly) )]
-		public void Create( [EnsureValues, Service]ApplicationInformation sut, [Service]AssemblyInformation temp )
+		public void Create( [Service]ApplicationInformation sut )
 		{
 			Assert.NotNull( sut.AssemblyInformation );
 			Assert.Equal( DateTimeOffset.Parse( "2/1/2016" ), sut.DeploymentDate.GetValueOrDefault() );
@@ -90,17 +44,8 @@ namespace DragonSpark.Windows.Testing.Setup
 		{
 			Assert.True( sut.Ran, "Didn't Run" );
 			Assert.Equal( GetType().GetMethod( nameof(Run) ), sut.Arguments.Method );
+			Assert.Equal( 1, Counting.Default.Get( CountingTarget.Default.Get() ) );
 		}
-
-		/*[Theory, AutoData]
-		public void SetupModuleCommand( SetupModuleCommand sut, MonitoredModule module )
-		{
-			var added = ListCache.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>();
-			Assert.Null( added );
-			sut.Execute( module );
-
-			Assert.NotNull( ListCache.Default.Get( module ).FirstOrDefaultOfType<SomeCommand>() );
-		}*/
 	}
 
 	[Shared]
@@ -116,47 +61,4 @@ namespace DragonSpark.Windows.Testing.Setup
 			Arguments = arguments;
 		}
 	}
-
-	
-
-	/*public class SomeCommand : ModuleCommand
-	{
-		public override void Execute( IMonitoredModule parameter ) => ListCache.Default.Get( parameter ).Add( this );
-	}
-
-	public class MonitoredModule : MonitoredModule<MonitoredModule.Command>
-	{
-		public MonitoredModule( IModuleMonitor moduleMonitor, Command command ) : base( moduleMonitor, command )
-		{
-			ListCache.Default.Get( moduleMonitor ).Add( this );
-		}
-
-		public bool Initialized { get; private set; }
-
-		public bool Loaded { get; private set; }
-		
-		protected override void OnInitialize()
-		{
-			Initialized = true;
-			base.OnInitialize();
-		}
-
-		protected override void OnLoad()
-		{
-			Loaded = true;
-			base.OnLoad();
-		}
-
-		public class Command : ModuleCommand
-		{
-			readonly IModuleMonitor monitor;
-
-			public Command( IModuleMonitor monitor )
-			{
-				this.monitor = monitor;
-			}
-
-			public override void Execute( IMonitoredModule parameter ) => ListCache.Default.Get( monitor ).Add( this );
-		}
-	}*/
 }

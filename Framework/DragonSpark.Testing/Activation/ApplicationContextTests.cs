@@ -35,7 +35,8 @@ namespace DragonSpark.Testing.Activation
 				Assert.Same( method, MethodContext.Default.Get() );
 				inner = Execution.Current();
 				Assert.Same( current, inner );
-				Assert.False( EnableMethodCaching.Default.Get() );
+				var condition = EnableMethodCaching.Default.Get();
+				Assert.False( condition );
 			}
 
 			var after = Execution.Current();

@@ -1,5 +1,5 @@
-﻿using System;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
+using System;
 
 namespace DragonSpark.Application.Setup
 {

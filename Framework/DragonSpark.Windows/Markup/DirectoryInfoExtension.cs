@@ -6,6 +6,8 @@ namespace DragonSpark.Windows.Markup
 	[MarkupExtensionReturnType( typeof(DirectoryInfo) )]
 	public class DirectoryInfoExtension : MarkupExtensionBase
 	{
+		public DirectoryInfoExtension() {}
+
 		public DirectoryInfoExtension( string path )
 	    {
 	        Path = path;

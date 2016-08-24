@@ -1,6 +1,6 @@
-using System.Windows.Markup;
-using DragonSpark.Extensions;
 using PostSharp.Patterns.Contracts;
+using System.Windows.Input;
+using System.Windows.Markup;
 
 namespace DragonSpark.Commands
 {
@@ -8,9 +8,9 @@ namespace DragonSpark.Commands
 	public class DeclaredFixedCommand : DeclaredCommandBase<object>
 	{
 		[Required]
-		public ICommand<object> Command { [return: Required]get; set; }
+		public ICommand Command { [return: Required]get; set; }
 
-		public override void Execute( object parameter ) => Command.Run( Parameter );
+		public override void Execute( object parameter ) => Command.Execute( Parameter );
 	}
 
 	/*[ContentProperty( nameof(Parameter) )]

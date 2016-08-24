@@ -76,11 +76,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="RegisterAsSingleton.cs" />
-    <Compile Include="Setup\SomeTypeist.cs" />
     <Compile Include="Configuration\Item.xaml.cs">
       <DependentUpon>Item.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Setup\ITyper.cs" />
+    <Compile Include="Setup\Counting.cs" />
+    <Compile Include="Setup\CountingCommand.cs" />
+    <Compile Include="Setup\CountingTaskSource.cs" />
+    <Compile Include="Setup\CountingTarget.cs" />
     <Compile Include="Setup\ProgramSetup.xaml.cs">
       <DependentUpon>ProgramSetup.xaml</DependentUpon>
     </Compile>
