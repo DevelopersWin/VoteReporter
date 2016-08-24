@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Windows.Diagnostics;
 using JetBrains.Annotations;
 using Serilog.Events;
@@ -9,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Diagnostics

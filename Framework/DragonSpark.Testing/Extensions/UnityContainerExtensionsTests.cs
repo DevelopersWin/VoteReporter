@@ -1,5 +1,5 @@
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Testing.Extensions

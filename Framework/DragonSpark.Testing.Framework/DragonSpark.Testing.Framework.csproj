@@ -44,34 +44,69 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Runtime\Defer.cs" />
+    <Compile Include="Diagnostics\MedianFactory.cs" />
+    <Compile Include="Diagnostics\ModeFactory.cs" />
+    <Compile Include="Diagnostics\ReportSource.cs" />
+    <Compile Include="Diagnostics\Run.cs" />
+    <Compile Include="Runtime\ExecutionContext.cs" />
+    <Compile Include="Runtime\Identification.cs" />
+    <Compile Include="Runtime\Identifier.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="Diagnostics\PerformanceSupport.cs" />
-    <Compile Include="Setup\ApplicationCommandsSource.cs" />
-    <Compile Include="Setup\AutoDataMoqConfiguredAttribute.cs" />
-    <Compile Include="Setup\Location\FixtureRegistry.cs" />
-    <Compile Include="Setup\MetadataCustomizationFactory.cs" />
-    <Compile Include="Setup\MinimumLevel.cs" />
-    <Compile Include="Setup\ResourceConfigurationFactory.cs" />
-    <Compile Include="Setup\CanLocateSpecification.cs" />
-    <Compile Include="Setup\GreedyMethodBuilderFactory.cs" />
-    <Compile Include="Setup\MetadataCommand.cs" />
-    <Compile Include="Setup\SetupEngineParts.cs" />
-    <Compile Include="Setup\OutputCommand.cs" />
-    <Compile Include="RegisteredAttribute.cs" />
-    <Compile Include="Setup\AssignedLogical.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Setup\AutoDataAttribute.cs" />
+    <Compile Include="MethodBaseExtensions.cs" />
+    <Compile Include="Runtime\MethodContext.cs" />
+    <Compile Include="Output.cs" />
+    <Compile Include="Application\ServiceAttribute.cs" />
+    <Compile Include="Runtime\PurgingContext.cs" />
+    <Compile Include="ServiceRegistration.cs" />
+    <Compile Include="Application\Setup\AdditionalTypesAttribute.cs" />
+    <Compile Include="Application\Application.cs" />
+    <Compile Include="Application\ApplicationCommandSource.cs" />
+    <Compile Include="Application\Setup\Configure.cs" />
+    <Compile Include="Application\ApplicationFactory.cs" />
+    <Compile Include="Application\ApplicationInitializer.cs" />
+    <Compile Include="Application\ApplicationPartsAttribute.cs" />
+    <Compile Include="Application\ApplicationPublicPartsAttribute.cs" />
+    <Compile Include="Application\Setup\AutoDataCustomization.cs" />
+    <Compile Include="Application\Setup\CommandAttributeBase.cs" />
+    <Compile Include="Application\Setup\ContainingTypeAndNestedAttribute.cs" />
+    <Compile Include="Application\Setup\FixtureContext.cs" />
+    <Compile Include="Application\Setup\FixtureFactory.cs" />
+    <Compile Include="Application\Setup\FixtureFactoryBase.cs" />
+    <Compile Include="Application\Setup\FixtureServiceProvider.cs" />
+    <Compile Include="Application\Setup\FrameworkTypesAttribute.cs" />
+    <Compile Include="Application\IApplication.cs" />
+    <Compile Include="Application\Setup\IncludeParameterTypesAttribute.cs" />
+    <Compile Include="Runtime\FixtureRegistry.cs" />
+    <Compile Include="Application\Setup\MetadataCustomizationFactory.cs" />
+    <Compile Include="Application\Setup\MethodTypes.cs" />
+    <Compile Include="Application\Setup\MinimumLevel.cs" />
+    <Compile Include="Application\Setup\OptionalParameterTransformer.cs" />
+    <Compile Include="Application\Setup\ParameterRequestRelay.cs" />
+    <Compile Include="Application\Setup\ResourceConfigurationFactory.cs" />
+    <Compile Include="Application\Setup\CanLocateSpecification.cs" />
+    <Compile Include="Application\Setup\EnginePartFactory.cs" />
+    <Compile Include="Application\Setup\MetadataCommand.cs" />
+    <Compile Include="Application\Setup\ServiceRelay.cs" />
+    <Compile Include="Application\Setup\DefaultEngineParts.cs" />
+    <Compile Include="Application\Setup\ServicesCustomization.cs" />
+    <Compile Include="FixtureExtensions.cs" />
+    <Compile Include="Application\AutoDataAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegistrationBaseAttribute.cs">
+    <Compile Include="Runtime\AssociatedRegistry.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Setup\Location\CustomizationBase.cs" />
-    <Compile Include="Parameters\EnsureValuesAttribute.cs" />
-    <Compile Include="Setup\AutoDataCommandBase.cs" />
-    <Compile Include="Setup\AutoData.cs" />
+    <Compile Include="Runtime\CustomizationBase.cs" />
+    <Compile Include="Application\EnsureValuesAttribute.cs" />
+    <Compile Include="Application\AutoDataCommandBase.cs" />
+    <Compile Include="Application\AutoData.cs" />
+    <Compile Include="Application\Setup\TypeProviderAttributeBase.cs" />
+    <Compile Include="Runtime\TaskContext.cs" />
+    <Compile Include="Runtime\TaskContextFormatter.cs" />
     <Compile Include="TestCollectionBase.cs" />
     <Compile Include="TestingMethodAspect.cs" />
+    <Compile Include="Traits.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonSpark.Windows\DragonSpark.Windows.csproj">

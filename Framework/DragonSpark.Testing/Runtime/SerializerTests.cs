@@ -1,8 +1,9 @@
 ﻿using DragonSpark.Runtime;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using System.IO;
 using System.Text;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Testing.Runtime

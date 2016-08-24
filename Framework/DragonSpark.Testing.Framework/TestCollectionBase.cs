@@ -13,32 +13,6 @@ namespace DragonSpark.Testing.Framework
 		public ApplicationOutputCommand() : base( method => new InitializeMethodCommand( AssociatedContext.Default.Get( method ).Dispose ) ) {}
 	}*/
 
-	public static class MethodBaseExtensions
-	{
-		/*public static InitializeMethodCommand AsCurrentContext( this MethodBase @this, ILoggerHistory history, LoggingLevelSwitch level ) => AsCurrentContext( @this, new RecordingLoggerFactory( history, level ) );
-
-		public static InitializeMethodCommand AsCurrentContext( this MethodBase @this ) => AsCurrentContext( @this, new RecordingLoggerFactory() );
-
-		public static InitializeMethodCommand AsCurrentContext( this MethodBase @this, RecordingLoggerFactory factory )
-		{
-			var result = new InitializeMethodCommand().AsExecuted( @this );
-			DefaultServiceProvider.Default.Assign( new ServiceProvider( factory ) );
-			return result;
-		}*/
-
-		// readonly static Func<object, ILogger> LoggerSource = DragonSpark.Diagnostics.Diagnostics.Logger.ToDelegate();
-
-		/*public static IProfiler Profile( this MethodBase method, Action<string> output ) => 
-			new ProfilerFactory( output, DragonSpark.Diagnostics.Diagnostics.History.Get( method ), LoggerSource ).Create( method );*/
-
-		/*public static IProfiler Trace( this MethodBase method, Action<string> output )
-		{
-			var profiler = method.Profile( output );
-			var result = profiler.AssociateForDispose( LoggerSource( method ).WithTracing() );
-			return result;
-		}*/
-	}
-
 	/*public class InitializeMethodCommand : AssignCommand<MethodBase>
 	{
 		readonly Action complete;
@@ -65,12 +39,6 @@ namespace DragonSpark.Testing.Framework
 		protected override void OnDispose() => complete();
 	}*/
 
-	public sealed class Output : Scope<Action<string>>
-	{
-		public static Output Default { get; } = new Output();
-		Output() {}
-	}
-
 	[Disposable]
 	public abstract class TestCollectionBase
 	{
@@ -90,14 +58,4 @@ namespace DragonSpark.Testing.Framework
 	{
 		ITestOutputHelper Output { get; }
 	}*/
-
-	public static class Traits
-	{
-		public const string Category = nameof(Category);
-
-		public static class Categories
-		{
-			public const string FileSystem = nameof(FileSystem), IoC = nameof(IoC), ServiceLocation = nameof(ServiceLocation), Performance = nameof(Performance), Memory = nameof(Memory);
-		}
-	}
 }

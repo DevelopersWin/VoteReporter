@@ -1,8 +1,8 @@
-﻿using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.TypeSystem;
+﻿using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Testing.Framework.Application;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.TypeSystem

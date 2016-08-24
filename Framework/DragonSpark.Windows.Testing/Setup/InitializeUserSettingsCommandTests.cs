@@ -6,6 +6,7 @@ using DragonSpark.Windows.Setup;
 using JetBrains.Annotations;
 using System.Configuration;
 using System.Linq;
+using DragonSpark.Testing.Framework.Application;
 using Xunit;
 using Xunit.Abstractions;
 using Resources = DragonSpark.Windows.Properties.Resources;
@@ -22,7 +23,7 @@ namespace DragonSpark.Windows.Testing.Setup
 
 		static void Clear() => ClearUserSettingCommand.Default.Execute( Settings.Default );
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void Create( InitializeUserSettingsCommand sut, ILoggerHistory history, UserSettingsPathFactory factory )
 		{
 			var path = factory.Get( ConfigurationUserLevel.PerUserRoamingAndLocal );
@@ -48,7 +49,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( before.Length + 2, history.Events.Count() );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void CreateThenRecreate( InitializeUserSettingsCommand create, InitializeUserSettingsCommand sut, ILoggerHistory history )
 		{
 			create.Execute( Settings.Default );
@@ -66,7 +67,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Contains( Resources.LoggerTemplates_Complete, upgraded );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void NoProperties( InitializeUserSettingsCommand create, InitializeUserSettingsCommand sut, ILoggerHistory history )
 		{
 			var before = history.Events.Fixed();
@@ -77,7 +78,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( before.Length + 2, items.Length );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, AutoData]
 		public void Error( InitializeUserSettingsCommand create, InitializeUserSettingsCommand sut, ILoggerHistory history )
 		{
 			var before = history.Events.Fixed();

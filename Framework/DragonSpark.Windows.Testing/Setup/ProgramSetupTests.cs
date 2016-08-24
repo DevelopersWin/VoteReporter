@@ -1,7 +1,5 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Parameters;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects.Setup;
 using DragonSpark.TypeSystem;
 using System;
@@ -9,6 +7,8 @@ using System.Composition;
 using System.Diagnostics;
 using System.Reflection;
 using DragonSpark.Application;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup

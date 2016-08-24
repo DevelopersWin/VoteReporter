@@ -1,15 +1,16 @@
-﻿using DragonSpark.Configuration;
+﻿using DragonSpark.Application;
+using DragonSpark.Application.Setup;
+using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
-using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Setup;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
+using DragonSpark.Testing.Framework.Runtime;
 using JetBrains.Annotations;
 using System.Composition;
 using System.Reflection;
-using DragonSpark.Application;
-using DragonSpark.Application.Setup;
 using Xunit;
-using ExecutionContext = DragonSpark.Testing.Framework.ExecutionContext;
+using ExecutionContext = DragonSpark.Testing.Framework.Runtime.ExecutionContext;
 
 namespace DragonSpark.Testing.Activation
 {

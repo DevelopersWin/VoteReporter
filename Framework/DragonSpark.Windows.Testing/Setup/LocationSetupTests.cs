@@ -3,8 +3,6 @@ using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Parameters;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.Testing.TestObjects;
@@ -19,6 +17,8 @@ using System.Reflection;
 using DragonSpark.Activation.Location;
 using DragonSpark.Application;
 using DragonSpark.Application.Setup;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 using Xunit.Abstractions;
 using Activator = DragonSpark.Activation.Activator;
@@ -51,7 +51,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}*/
 
 		// [Map( typeof(IActivator), typeof(Locator))]
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(Locator) )]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, AdditionalTypes( typeof(Locator) )]
 		public void CreateInstance( IActivator locator )
 		{
 			var expected = GlobalServiceProvider.GetService<IActivator>();
@@ -65,7 +65,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}
 
 		// [Map( typeof(IActivator), typeof(Locator) )]
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(Locator) )]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, AdditionalTypes( typeof(Locator) )]
 		public void CreateNamedInstance( IActivator activator, string name )
 		{
 			Assert.Same( GlobalServiceProvider.GetService<IActivator>(), activator );
@@ -90,7 +90,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( parameters, instance.Parameters );
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
 		void RegisterInstanceGeneric( [Service]IServiceRepository registry, Class instance )
 		{
 			Assert.Null( GlobalServiceProvider.GetService<IInterface>() );
@@ -102,7 +102,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Same( instance, located );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, AdditionalTypes( typeof(Class) )]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, AdditionalTypes( typeof(Class) )]
 		public void RegisterGeneric()
 		{
 			/*var registry = GlobalServiceProvider.GetService<IServiceRepository>();
@@ -224,7 +224,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Contains( classes.Single(), updated );#1#
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
 		void CreateActivator( IActivator sut, string message, int number, Class @item )
 		{
 			Assert.IsAssignableFrom<CompositeActivator>( sut );
@@ -303,7 +303,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		}*/
 
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
 		void RelayedAttribute()
 		{
 			var attribute = typeof(Relayed).GetAttribute<Attribute>();
@@ -318,13 +318,13 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Null( exception );
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(NormalPriority) )]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, IncludeParameterTypes( typeof(NormalPriority) )]
 		public void GetAllTypesWith( [Service] ImmutableArray<Type> sut ) => Assert.True( sut.Decorated<PriorityAttribute>().Contains( typeof(NormalPriority) ) );
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
 		public void Evaluate( ClassWithParameter sut ) => Assert.Equal( sut.Parameter, sut.Evaluate<object>( nameof(sut.Parameter) ) );
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
 		public void Mocked( [Frozen]Mock<IInterface> sut, IInterface item ) => Assert.Equal( sut.Object, item );
 
 		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
@@ -349,7 +349,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotSame( once, twice );
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(YetAnotherClass) )]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, IncludeParameterTypes( typeof(YetAnotherClass) )]
 		public void Factory( AllTypesOfFactory sut )
 		{
 			var items = sut.Create<IInterface>();
@@ -357,7 +357,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.NotNull( items.FirstOrDefaultOfType<YetAnotherClass>() );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, IncludeParameterTypes]
 		public void Locate( [Service]ImmutableArray<Assembly> assemblies,  [Service]ApplicationAssemblyLocator sut )
 		{
 			Assert.Same( GetType().Assembly, sut.Get( assemblies ) );
@@ -399,7 +399,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( fromContainer, sut );
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
 		public void ConventionLocator( ConventionTypes locator )
 		{
 			var type = locator.Get( typeof(Assembly) );
@@ -412,7 +412,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.True( container.IsRegistered<Assembly>() );
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly) )]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly) )]
 		public void EnsureAssemblyResolvesAsExpected( [Service]Assembly assembly )
 		{
 			Assert.NotNull( assembly );
@@ -430,7 +430,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			}
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly), typeof(AssemblyInformationSource) )]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly), typeof(AssemblyInformationSource) )]
 		public void CreateAssembly( [Service]IParameterizedSource<Assembly, AssemblyInformation> factory, IServiceProvider container, [Service]Assembly sut )
 		{
 			var fromFactory = ApplicationAssembly.Default.Get();
@@ -453,7 +453,7 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( assembly.GetName().Version, fromProvider.Version );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Setup.AutoData]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
 		void RegisterInterface( IAnotherInterface sut )
 		{
 			Assert.IsType<MultipleInterfaces>( sut );

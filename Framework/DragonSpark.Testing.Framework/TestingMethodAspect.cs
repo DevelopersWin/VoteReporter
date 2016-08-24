@@ -1,13 +1,11 @@
 using DragonSpark.Application;
 using DragonSpark.Aspects;
-using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using PostSharp.Aspects;
 using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using DragonSpark.Testing.Framework.Runtime;
 using Xunit;
 
 namespace DragonSpark.Testing.Framework
@@ -28,25 +26,6 @@ namespace DragonSpark.Testing.Framework
 			
 			var disposable = (IDisposable)ApplicationServices.Default.Get() ?? ExecutionContext.Default.Get();
 			args.ReturnValue = Defer.Run( new Action( disposable.Dispose ).Wrap<Task>(), args.ReturnValue );
-		}
-	}
-
-	public sealed class PurgingContext : InitializedDisposableAction
-	{
-		public PurgingContext() : base( PurgeLoggerMessageHistoryCommand.Default.Fixed( Output.Default.Get() ).Run ) {}
-	}
-
-	public static class Defer
-	{
-		public static Task Run( Action<Task> action, [Optional]object context )
-		{
-			var task = context as Task;
-			if ( task != null )
-			{
-				return task.ContinueWith( action );
-			}
-			action( Task.CompletedTask );
-			return null;
 		}
 	}
 }
