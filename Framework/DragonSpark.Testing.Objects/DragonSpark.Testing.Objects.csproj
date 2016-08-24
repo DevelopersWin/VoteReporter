@@ -38,13 +38,20 @@
     <Compile Include="ClassWithManyParameters.cs" />
     <Compile Include="ClassWithParameter.cs" />
     <Compile Include="ClassWithProperties.cs" />
+    <Compile Include="ClassWithProperty.cs" />
     <Compile Include="Composition\BasicServiceFactory.cs" />
     <Compile Include="Composition\BasicService.cs" />
     <Compile Include="Composition\ExportedItem.cs" />
     <Compile Include="Composition\ExportedItemFactory.cs" />
     <Compile Include="Composition\IBasicService.cs" />
-    <Compile Include="Composition\SharedBasicServiceFactory.cs" />
-    <Compile Include="Configuration\Class1.cs" />
+    <Compile Include="Composition\IParameterService.cs" />
+    <Compile Include="Composition\ISharedService.cs" />
+    <Compile Include="Composition\Parameter.cs" />
+    <Compile Include="Composition\ParameterService.cs" />
+    <Compile Include="Composition\ParameterServiceFactory.cs" />
+    <Compile Include="Composition\SharedServiceFactory.cs" />
+    <Compile Include="Composition\SharedService.cs" />
+    <Compile Include="Configuration\TestItem.cs" />
     <Compile Include="Constructor.cs" />
     <Compile Include="Convention.cs" />
     <Compile Include="ConventionMetadata.cs" />
@@ -69,10 +76,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="RegisterAsSingleton.cs" />
-    <Compile Include="Setup\Class1.cs" />
+    <Compile Include="Setup\SomeTypeist.cs" />
     <Compile Include="Configuration\Item.xaml.cs">
       <DependentUpon>Item.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Setup\ITyper.cs" />
     <Compile Include="Setup\ProgramSetup.xaml.cs">
       <DependentUpon>ProgramSetup.xaml</DependentUpon>
     </Compile>

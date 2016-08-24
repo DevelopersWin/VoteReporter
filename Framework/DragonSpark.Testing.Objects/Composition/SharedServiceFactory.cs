@@ -10,8 +10,4 @@ namespace DragonSpark.Testing.Objects.Composition
 	{
 		public override ISharedService Get() => new SharedService().WithSelf( service => Condition.Default.Get( service ).Apply() );
 	}
-
-	public interface ISharedService {}
-
-	public class SharedService : ISharedService {}
 }

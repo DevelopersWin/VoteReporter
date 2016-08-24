@@ -4,20 +4,4 @@ namespace DragonSpark.Testing.Objects.Composition
 	{
 		string HelloWorld( string message );
 	}
-
-	public interface IParameterService
-	{
-		object Parameter { get; }
-	}
-
-	class ParameterService : IParameterService
-	{
-		public ParameterService( Parameter parameter )
-		{
-			Parameter = parameter;
-			parameter.Message = "WithInstance by ParameterService";
-		}
-
-		public object Parameter { get; }
-	}
 }

@@ -2,6 +2,4 @@
 {
 	public class SomeTypeist : ITyper
 	{ }
-	public interface ITyper
-	{}
 }
