@@ -1,11 +1,6 @@
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
-using DragonSpark.Sources.Parameterized;
 using PostSharp.Patterns.Contracts;
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Markup;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -52,32 +47,4 @@ namespace DragonSpark.Windows.Markup
 		{
 		}
 	}*/
-
-	public class MemberInfoKeyFactory : ParameterizedSourceBase<PropertyReference, string>
-	{
-		public static MemberInfoKeyFactory Default { get; } = new MemberInfoKeyFactory();
-
-		public override string Get( PropertyReference parameter ) => $"{parameter.DeclaringType.FullName}::{parameter.PropertyName}";
-	}
-
-	[MarkupExtensionReturnType( typeof(string) )]
-	public abstract class ConfigurationKeyExtension : MarkupExtensionBase
-	{
-		readonly string key;
-
-		protected ConfigurationKeyExtension( string key )
-		{
-			this.key = key;
-		}
-
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => key;
-	}
-
-	
-	public class MemberInfoKeyExtension : ConfigurationKeyExtension
-	{
-		public MemberInfoKeyExtension( Type type, string member ) : this( type.GetMember( member ).First() ) {}
-
-		public MemberInfoKeyExtension( MemberInfo member ) : base( MemberInfoKeyFactory.Default.Get( PropertyReference.New( member ) ) ) {}
-	}
 }

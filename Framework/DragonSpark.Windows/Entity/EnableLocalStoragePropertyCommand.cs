@@ -7,42 +7,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Windows.Input;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class DbContextBuildingParameter
-	{
-		public DbContextBuildingParameter( DbContext context, DbModelBuilder builder )
-		{
-			Context = context;
-			Builder = builder;
-		}
-
-		public DbContext Context { get; }
-		public DbModelBuilder Builder { get; }
-	}
-
-	public class RegisterComplexTypesCommand : CommandBase<DbContextBuildingParameter>
-	{
-		public override void Execute( DbContextBuildingParameter parameter )
-		{
-			var method = parameter.Builder.GetType().GetMethod( nameof(parameter.Builder.ComplexType) );
-			parameter.Context.GetDeclaredEntityTypes().First().Assembly.GetTypes().Where( x => AttributeProviderExtensions.Has<ComplexTypeAttribute>( x ) ).Each( x =>
-			{
-				var info = method.MakeGenericMethod( x );
-				info.Invoke( parameter.Builder, null );
-			} );
-		}
-	}
-
-	public class DefaultCommands : CompositeCommand<DbContextBuildingParameter>
-	{
-		public static DefaultCommands Default { get; } = new DefaultCommands();
-
-		public DefaultCommands() : base( new ICommand[] { new EnableLocalStoragePropertyCommand(), new RegisterComplexTypesCommand() } ) {}
-	}
-
 	public class EnableLocalStoragePropertyCommand : CommandBase<DbContextBuildingParameter>
 	{
 		readonly static MethodInfo ApplyMethod = typeof(EnableLocalStoragePropertyCommand).GetMethod( nameof(Apply), BindingOptions.AllMembers );

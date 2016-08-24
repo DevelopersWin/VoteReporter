@@ -1,8 +1,6 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
 using System;
 using System.Windows.Markup;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -13,20 +11,6 @@ namespace DragonSpark.Windows.Markup
 		object GetValue();
 
 		object SetValue( object value );
-	}
-
-	public class Specification<TTarget, TProperty> : SpecificationBase<IServiceProvider>
-	{
-		public static Specification<TTarget, TProperty> Default { get; } = new Specification<TTarget, TProperty>();
-
-		public override bool IsSatisfiedBy( IServiceProvider parameter ) => 
-			parameter.Get<IProvideValueTarget>().With( target => target.TargetObject is TTarget && target.TargetProperty is TProperty )
-			;
-	}
-
-	public abstract class MarkupPropertyFactoryBase : ValidatedParameterizedSourceBase<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
-	{
-		protected MarkupPropertyFactoryBase( ISpecification<IServiceProvider> specification ) : base( specification ) {}
 	}
 
 	public abstract class MarkupPropertyFactoryBase<TTarget, TProperty> : MarkupPropertyFactoryBase

@@ -1,8 +1,6 @@
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
@@ -22,24 +20,5 @@ namespace DragonSpark.Windows.Runtime
 		}
 
 		public override Assembly Get( IEnumerable<Assembly> parameter ) => Application.ApplicationAssemblyLocator.Default.Get( parameter ) ?? defaultSource();
-	}
-
-	public sealed class DomainApplicationAssemblies : FactoryCache<AppDomain, Assembly>
-	{
-		public static DomainApplicationAssemblies Default { get; } = new DomainApplicationAssemblies();
-		DomainApplicationAssemblies() {}
-
-		protected override Assembly Create( AppDomain parameter )
-		{
-			try
-			{
-				return Assembly.Load( parameter.FriendlyName );
-			}
-			catch ( FileNotFoundException )
-			{
-				var result = Assembly.GetEntryAssembly();
-				return result;
-			}
-		}
 	}
 }

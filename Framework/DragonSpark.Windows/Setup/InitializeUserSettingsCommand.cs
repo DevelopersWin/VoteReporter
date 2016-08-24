@@ -1,9 +1,7 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
-using DragonSpark.Diagnostics.Exceptions;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
@@ -16,46 +14,6 @@ using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class UserSettingsPathFactory : ParameterizedSourceBase<ConfigurationUserLevel, FileInfo>
-	{
-		public static UserSettingsPathFactory Default { get; } = new UserSettingsPathFactory();
-		UserSettingsPathFactory() {}
-
-		public override FileInfo Get( ConfigurationUserLevel parameter ) => new FileInfo( ConfigurationManager.OpenExeConfiguration( parameter ).FilePath );
-	}
-	
-	public static class Defaults
-	{
-		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Default.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).ToFixedDelegate();
-	}
-
-	public class ClearUserSettingCommand : DelegatedFixedCommand<FileInfo>
-	{
-		public static ClearUserSettingCommand Default { get; } = new ClearUserSettingCommand();
-		ClearUserSettingCommand() : base( DeleteFileCommand.Default.Apply( DragonSpark.Diagnostics.Exceptions.Defaults<IOException>.Retry ).Self, Defaults.UserSettingsPath ) {}
-	}
-
-	[ApplyAutoValidation]
-	public sealed class DeleteFileCommand : CommandBase<FileInfo>
-	{
-		public static DeleteFileCommand Default { get; } = new DeleteFileCommand();
-		DeleteFileCommand() : base( FileSystemInfoExistsSpecification.Default ) {}
-
-		public override void Execute( FileInfo parameter ) => parameter.Delete();
-	}
-
-	public sealed class FileSystemInfoExistsSpecification : SpecificationBase<FileSystemInfo>
-	{
-		public static FileSystemInfoExistsSpecification Default { get; } = new FileSystemInfoExistsSpecification();
-		FileSystemInfoExistsSpecification() {}
-
-		public override bool IsSatisfiedBy( FileSystemInfo parameter )
-		{
-			parameter.Refresh();
-			return parameter.Exists;
-		}
-	}
-
 	[ApplyAutoValidation]
 	public class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
