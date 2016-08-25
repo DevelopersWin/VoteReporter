@@ -49,13 +49,23 @@ namespace DragonSpark.Testing.Activation
 			Assert.True( EnableMethodCaching.Default.Get() );
 		}
 
-		[Fact]
+		/*[Fact]
 		public void SanityCheck()
 		{
 			var method = MethodBase.GetCurrentMethod();
-			using ( ApplicationFactory.Default.Get( method ).Run( new AutoData( FixtureContext.Default.WithFactory( FixtureFactory<AutoDataCustomization>.Default.Get ), method ) ) ) {}
+			One( method );
+			Two( method );
+		}
+
+		static void Two( MethodBase method )
+		{
 			using ( ApplicationFactory.Default.Get( method ).Run( new AutoData( FixtureContext.Default.WithFactory( FixtureFactory<AutoDataCustomization>.Default.Get ), method ) ) ) {}
 		}
+
+		static void One( MethodBase method )
+		{
+			using ( ApplicationFactory.Default.Get( method ).Run( new AutoData( FixtureContext.Default.WithFactory( FixtureFactory<AutoDataCustomization>.Default.Get ), method ) ) ) {}
+		}*/
 
 		[Export( typeof(ISetup) ), UsedImplicitly]
 		class Setup : Application.Setup.Setup

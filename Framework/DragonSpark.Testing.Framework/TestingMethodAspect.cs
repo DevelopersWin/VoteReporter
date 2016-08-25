@@ -39,21 +39,4 @@ namespace DragonSpark.Testing.Framework
 			}
 		}
 	}
-
-	/*public sealed class TimedAttribute : Aspects.TimedAttribute
-	{
-		public TimedAttribute() : this( "Executing Test Method '{@Method}'" ) {}
-		public TimedAttribute( string template ) : base( template ) {}
-
-		public override bool CompileTimeValidate( MethodBase method )
-		{
-			return base.CompileTimeValidate( method );
-		}
-	}*/
-
-	public sealed class CurrentTestingMethod : Scope<MethodBase>
-	{
-		public static CurrentTestingMethod Default { get; } = new CurrentTestingMethod();
-		CurrentTestingMethod() {}
-	}
 }
