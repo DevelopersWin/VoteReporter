@@ -1,4 +1,5 @@
 using DragonSpark.Application.Setup;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework.Runtime;
 using System;
@@ -13,6 +14,6 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 		Configure() {}
 
 		public override IServiceProvider Get( IServiceProvider parameter ) => 
-			new CompositeServiceProvider( new SourceServiceProvider( FixtureContext.Default, MethodContext.Default ), new FixtureServiceProvider( FixtureContext.Default.Get() ), parameter );
+			new CompositeServiceProvider( new InstanceRepository<object>( new SourceCollection( FixtureContext.Default, MethodContext.Default ) ), new FixtureServiceProvider( FixtureContext.Default.Get() ), parameter );
 	}
 }

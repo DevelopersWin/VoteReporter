@@ -51,7 +51,7 @@ namespace DragonSpark.Composition
 
 		public SourceDelegateContractResolver( [OfSourceType]Type sourceDelegateType ) : this( sourceDelegateType, ResultTypeLocator ) {}
 
-		public SourceDelegateContractResolver( [OfSourceType]Type sourceDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Default.And( new GenericTypeAssignableSpecification( sourceDelegateType ) ).Project<CompositionContract, Type>( contract => contract.ContractType ) )
+		public SourceDelegateContractResolver( [OfSourceType]Type sourceDelegateType, Func<Type, Type> resultTypeLocator ) : base( TypeAssignableSpecification<Delegate>.Default.And( GenericTypeAssignableSpecification.Defaults.Get( sourceDelegateType ) ).Project<CompositionContract, Type>( contract => contract.ContractType ) )
 		{
 			this.resultTypeLocator = resultTypeLocator;
 		}

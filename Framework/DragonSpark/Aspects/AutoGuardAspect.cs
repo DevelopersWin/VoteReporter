@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
@@ -11,7 +12,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects
 {
@@ -69,15 +69,15 @@ namespace DragonSpark.Aspects
 		sealed class ImmutableArraySource : ValidatedParameterizedSourceBase<Type, Type>
 		{
 			public static ImmutableArraySource Default { get; } = new ImmutableArraySource();
-			ImmutableArraySource() : base( Specification.DefaultNested ) {}
+			ImmutableArraySource() : base( GenericTypeAssignableSpecification.Defaults.Get( typeof(ImmutableArray<>) ) ) {}
 
 			public override Type Get( Type parameter ) => typeof(AssignedAttribute);
 
-			sealed class Specification : GenericTypeAssignableSpecification
+			/*sealed class Specification : GenericTypeAssignableSpecification
 			{
 				public static ISpecification<Type> DefaultNested { get; } = new DelegatedSpecification<Type>( new DecoratedSourceCache<Type, bool>( new Specification().IsSatisfiedBy ).Get );
 				Specification() : base( typeof(ImmutableArray<>) ) {}
-			}
+			}*/
 		}
 	}
 }

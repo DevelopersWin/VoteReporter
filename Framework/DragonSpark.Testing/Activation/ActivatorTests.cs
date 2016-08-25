@@ -15,6 +15,7 @@ namespace DragonSpark.Testing.Activation
 		public void Default()
 		{
 			var activator = GlobalServiceProvider.GetService<IActivator>();
+			Assert.Same( Activator.Default.Get(), Activator.Default.Get() );
 			Assert.Same( Activator.Default.Get(), activator );
 			var instance = activator.Activate<IInterface>( typeof(Class) );
 			Assert.IsType<Class>( instance );

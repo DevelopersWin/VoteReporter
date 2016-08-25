@@ -21,7 +21,7 @@ namespace DragonSpark.Diagnostics.Logging
 				var located = ConstructingParameterLocator.Default.Get( type );
 				if ( located != null )
 				{
-					parameter.Destructure.ByTransformingWhere( new TypeAssignableSpecification( located ).ToCachedSpecification().ToSpecificationDelegate(), Formatter );
+					parameter.Destructure.ByTransformingWhere( TypeAssignableSpecification.Defaults.Get( located ).ToSpecificationDelegate(), Formatter );
 				}
 			}
 

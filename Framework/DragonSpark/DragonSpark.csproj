@@ -151,8 +151,7 @@
     <Compile Include="Application\IExportProvider.cs" />
     <Compile Include="Application\Setup\InstanceRegistrationRequest.cs" />
     <Compile Include="Application\Setup\Instances.cs" />
-    <Compile Include="Application\Setup\InstanceServiceProvider.cs" />
-    <Compile Include="Application\Setup\InstanceServiceProviderBase.cs" />
+    <Compile Include="Application\Setup\InstanceRepository.cs" />
     <Compile Include="Application\Setup\IsActive.cs" />
     <Compile Include="Application\Setup\IServiceRepository.cs" />
     <Compile Include="Application\Setup\ISetup.cs" />
@@ -168,7 +167,6 @@
     <Compile Include="Application\Setup\ServiceProviderConfigurations.cs" />
     <Compile Include="Application\Setup\ServiceProviderFactory.cs" />
     <Compile Include="Application\Setup\ServicesEnabled.cs" />
-    <Compile Include="Application\Setup\SourceServiceProvider.cs" />
     <Compile Include="Application\SystemParts.cs" />
     <Compile Include="Application\SystemPartsFactory.cs" />
     <Compile Include="Application\TypeSource.cs" />

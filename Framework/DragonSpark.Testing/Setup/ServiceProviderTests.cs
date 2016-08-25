@@ -1,11 +1,11 @@
 ﻿using DragonSpark.Activation.Location;
+using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Objects;
 using Serilog;
 using System.Linq;
-using DragonSpark.Application;
-using DragonSpark.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Testing.Setup
@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Setup
 		public void BasicTest()
 		{
 			var target = new Class();
-			var composite = new CompositeServiceProvider( new InstanceServiceProvider( target ) );
+			var composite = new CompositeServiceProvider( new InstanceRepository( target ) );
 			var result = composite.Get<Class>();
 			Assert.Same( target, result );
 		}
@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void Factory()
 		{
-			var result = new SourceServiceProvider( new ClassFactory() ).Get<Class>();
+			var result = new InstanceRepository<Class>( new SourceCollection<Class>( new ClassFactory() ) ).Get<Class>();
 			Assert.IsType<ClassFactory.ClassFromFactory>( result );
 		}
 

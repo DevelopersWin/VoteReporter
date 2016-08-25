@@ -31,7 +31,7 @@ namespace DragonSpark.Sources
 			return @this.Get();
 		}
 
-		public static IEnumerable<T> Get<T>( this IEnumerable<ISource<T>> @this ) => @this.Select( source => source.Get() );
+		public static IEnumerable<T> Get<T>( this IEnumerable<ISource> @this ) => @this.Select( source => source.Get() ).OfType<T>();
 
 		public static T ScopedWithDefault<T>( this T @this ) where T : IScopeAware => @this.ScopedWith( ExecutionContext.Default );
 

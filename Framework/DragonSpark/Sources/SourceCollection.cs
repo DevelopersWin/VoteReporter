@@ -1,16 +1,38 @@
 using DragonSpark.Runtime;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace DragonSpark.Sources
 {
-	public class SourceCollection<TStore, TInstance> : CollectionBase<TStore> where TStore : ISource<TInstance>
+	public sealed class SourceCollection : SourceCollection<object>
 	{
-		public SourceCollection() {}
-		public SourceCollection( IEnumerable<TStore> items ) : base( items ) {}
-		public SourceCollection( ICollection<TStore> source ) : base( source ) {}
+		public SourceCollection( params ISource[] items ) : base( items ) {}
+	}
 
-		public ImmutableArray<TInstance> Instances() => Query.Select( entry => entry.Get() ).ToImmutableArray();
+	public class SourceCollection<T> : CollectionBase<ISource>, ICollection<T>
+	{
+		public SourceCollection( params ISource[] items ) : base( items.AsEnumerable() ) {}
+
+		public void Add( T item ) => Add( item.Sourced() );
+
+		public bool Contains( T item ) => Values().Contains( item );
+
+		public void CopyTo( T[] array, int arrayIndex ) => Values().ToArray().CopyTo( array, arrayIndex );
+
+		public new IEnumerator<T> GetEnumerator() => Values().GetEnumerator();
+
+		IEnumerable<T> Values() => Source.Get<T>();
+
+		public bool Remove( T item )
+		{
+			foreach ( var source in Source )
+			{
+				if ( Equals( source.Get(), item ) )
+				{
+					return Source.Remove( source );
+				}
+			}
+			return false;
+		}
 	}
 }

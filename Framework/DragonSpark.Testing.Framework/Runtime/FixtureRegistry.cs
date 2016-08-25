@@ -4,7 +4,7 @@ using Ploeh.AutoFixture;
 
 namespace DragonSpark.Testing.Framework.Runtime
 {
-	sealed class FixtureRegistry : InstanceServiceProvider
+	sealed class FixtureRegistry : InstanceRepository
 	{
 		readonly IFixture fixture;
 

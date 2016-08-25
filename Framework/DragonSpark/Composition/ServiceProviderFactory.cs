@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation.Location;
 using DragonSpark.Application;
+using DragonSpark.Application.Setup;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
 using DragonSpark.Extensions;
@@ -10,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Windows.Input;
-using DragonSpark.Application.Setup;
 using Type = System.Type;
 
 namespace DragonSpark.Composition
@@ -25,7 +25,7 @@ namespace DragonSpark.Composition
 		{
 			var context = CompositionHostFactory.Default.Get();
 			var primary = new ServiceLocator( context );
-			var result = new CompositeServiceProvider( new InstanceServiceProvider( context, primary ), primary, parameter );
+			var result = new CompositeServiceProvider( new InstanceRepository( context, primary ), primary, parameter );
 			return result;
 		}
 	}
