@@ -1,10 +1,7 @@
-using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using DragonSpark.TypeSystem;
 using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources
 {
@@ -12,7 +9,7 @@ namespace DragonSpark.Sources
 	{
 		public static T Self<T>( this T @this ) => @this;
 
-		public static Func<T> For<T>( [Optional]T @this ) => @this.IsAssigned() ? ( typeof(T).GetTypeInfo().IsValueType ? new Source<T>( @this ) : @this.Sourced() ).Get : Delegates<T>.Default;
+		public static Func<T> For<T>( T @this ) => ( typeof(T).GetTypeInfo().IsValueType ? new Source<T>( @this ) : @this.Sourced() ).Get;
 
 		public static Func<T> ToFixedDelegate<T>( this ISource<T> @this ) => new Func<T>( @this.Get ).Fix();
 		public static Func<T> Fix<T>( this Func<T> @this ) => FixedDelegateBuilder<T>.Default.Get( @this );

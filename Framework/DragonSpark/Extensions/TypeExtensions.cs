@@ -12,16 +12,10 @@ namespace DragonSpark.Extensions
 {
 	public static class TypeExtensions
 	{
-		public static Type GetMemberType(this MemberInfo memberInfo)
-		{
-		  if (memberInfo is MethodInfo)
-			return ((MethodInfo) memberInfo).ReturnType;
-		  if (memberInfo is PropertyInfo)
-			return ((PropertyInfo) memberInfo).PropertyType;
-		  if (memberInfo is FieldInfo)
-			return ((FieldInfo) memberInfo).FieldType;
-		  return null;
-		}
+		public static Type GetMemberType(this MemberInfo memberInfo) => 
+			( memberInfo as MethodInfo )?.ReturnType ??
+			( memberInfo as PropertyInfo )?.PropertyType ?? 
+			( memberInfo as FieldInfo )?.FieldType;
 
 		public static IEnumerable<Assembly> Assemblies( this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct();
 

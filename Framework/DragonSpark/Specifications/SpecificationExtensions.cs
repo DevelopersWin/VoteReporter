@@ -1,7 +1,7 @@
-using System;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
 
 namespace DragonSpark.Specifications
 {
@@ -28,6 +28,9 @@ namespace DragonSpark.Specifications
 			public static Casts<T> Default { get; } = new Casts<T>();
 			Casts() : base( specification => new CastingSpecification<T>( specification ) ) {}
 		}
+
+		public static ISpecification<object> Fixed<T>( this ISpecification<T> @this, T parameter ) => new FixedDelegatedSpecification<T>( @this, parameter )/*.Cast<T>()*/;
+		public static ISpecification<object> Fixed<T>( this ISpecification<T> @this, Func<T> parameter ) => new FixedDelegatedSpecification<T>( @this, parameter )/*.Cast<T>()*/;
 
 		public static Func<object, bool> ToSpecificationDelegate( this ISpecification @this ) => Delegates.Default.Get( @this );
 		sealed class Delegates : Cache<ISpecification, Func<object, bool>>

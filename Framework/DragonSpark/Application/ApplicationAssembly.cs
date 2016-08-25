@@ -9,7 +9,7 @@ namespace DragonSpark.Application
 	public sealed class ApplicationAssembly : FixedFactory<IEnumerable<Assembly>, Assembly>
 	{
 		[Export]
-		public static ISource<Assembly> Default { get; } = new Scope<Assembly>( Factory.Global( new ApplicationAssembly().Get ) );
+		public static ISource<Assembly> Default { get; } = new ApplicationAssembly();
 		ApplicationAssembly() : base( TypeSystem.Configuration.ApplicationAssemblyLocator.Get, ApplicationAssemblies.Default.GetEnumerable ) {}
 	}
 }

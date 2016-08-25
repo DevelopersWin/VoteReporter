@@ -1,19 +1,15 @@
+using DragonSpark.TypeSystem;
 using System;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace DragonSpark.Expressions
 {
 	public abstract class CompiledDelegateFactoryBase<TParameter, TResult> //: ParameterizedSourceBase<TParameter, TResult>
 	{
-		readonly static Type Result = typeof(TResult);
-		readonly static TypeInfo ResultTypeInfo = Result.GetTypeInfo();
-		readonly static Type Void = typeof(void);
-		readonly static Type Type1 = ResultTypeInfo.GetDeclaredMethod( nameof(Invoke) ).ReturnType;
-		readonly static bool B = Type1 != Void && Type1 != Result;
-
 		readonly ParameterExpression parameterExpression;
 		readonly Func<ExpressionBodyParameter<TParameter>, Expression> bodySource;
+
+		readonly Type convertType;
 
 		protected CompiledDelegateFactoryBase( Func<ExpressionBodyParameter<TParameter>, Expression> bodySource ) : this( Parameter.Default, bodySource ) {}
 
@@ -21,12 +17,15 @@ namespace DragonSpark.Expressions
 		{
 			this.parameterExpression = parameterExpression;
 			this.bodySource = bodySource;
+
+			var type = Defaults<TResult>.Info.GetDeclaredMethod( nameof(Invoke) ).ReturnType;
+			convertType = type != Defaults.Void && type != Defaults<TResult>.Type ? type : null;
 		}
 
 		public virtual TResult Get( TParameter parameter )
 		{
 			var body = bodySource( new ExpressionBodyParameter<TParameter>( parameter, parameterExpression ) );
-			var converted = B ? Expression.Convert( body, Type1 ) : body;
+			var converted = convertType != null ? Expression.Convert( body, convertType ) : body;
 			var result = Expression.Lambda<TResult>( converted, parameterExpression ).Compile();
 			return result;
 		}

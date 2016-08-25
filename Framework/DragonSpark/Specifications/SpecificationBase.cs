@@ -1,4 +1,3 @@
-using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
 using System.Runtime.InteropServices;
@@ -10,11 +9,11 @@ namespace DragonSpark.Specifications
 		readonly Coerce<T> coercer;
 		readonly Func<T, bool> apply;
 
-		protected SpecificationBase() : this( Defaults<T>.Coercer ) {}
+		protected SpecificationBase() : this( Sources.Parameterized.Defaults<T>.Coercer ) {}
 
 		protected SpecificationBase( Coerce<T> coercer ) : this( coercer, Where<T>.Assigned ) {}
 
-		protected SpecificationBase( Func<T, bool> apply ) : this( Defaults<T>.Coercer, apply ) {}
+		protected SpecificationBase( Func<T, bool> apply ) : this( Sources.Parameterized.Defaults<T>.Coercer, apply ) {}
 
 		protected SpecificationBase( Coerce<T> coercer, Func<T, bool> apply )
 		{

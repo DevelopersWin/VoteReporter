@@ -1,5 +1,5 @@
-using System.Runtime.InteropServices;
 using DragonSpark.TypeSystem;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Specifications
 {

@@ -58,7 +58,8 @@
     <Compile Include="Runtime\MethodContext.cs" />
     <Compile Include="Output.cs" />
     <Compile Include="Application\ServiceAttribute.cs" />
-    <Compile Include="Runtime\PurgingContext.cs" />
+    <Compile Include="Runtime\MethodOperationContext.cs" />
+    <Compile Include="Diagnostics\TimedOperationFactory.cs" />
     <Compile Include="ServiceRegistration.cs" />
     <Compile Include="Application\Setup\AdditionalTypesAttribute.cs" />
     <Compile Include="Application\Application.cs" />

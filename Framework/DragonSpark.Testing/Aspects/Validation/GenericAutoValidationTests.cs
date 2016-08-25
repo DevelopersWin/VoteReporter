@@ -26,6 +26,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 		[Fact]
 		[Trait( Traits.Category, Traits.Categories.Performance )]
+		/*
+		Test                             | Average |  Median |    Mode
+		--------------------------------------------------------------
+		BasicAutoValidation              | 00.0326 | 00.0325 | 00.0328
+		BasicAutoValidationInline        | 00.0539 | 00.0537 | 00.0535
+		BasicAutoValidationApplied       | 00.0410 | 00.0408 | 00.0412
+		BasicAutoValidationAppliedInline | 00.0951 | 00.0949 | 00.0941
+		*/
 		public void Performance()
 		{
 			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();

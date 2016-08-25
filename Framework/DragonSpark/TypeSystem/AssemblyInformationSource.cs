@@ -1,19 +1,20 @@
 using DragonSpark.Application;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using System.Composition;
 using System.Diagnostics;
 using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public sealed class AssemblyInformationSource : ParameterizedSourceBase<Assembly, AssemblyInformation>
+	public sealed class AssemblyInformationSource : FactoryCache<Assembly, AssemblyInformation>
 	{
 		[Export]
-		public static IParameterizedSource<Assembly, AssemblyInformation> Default { get; } = new AssemblyInformationSource().ToCache();
+		public static IParameterizedSource<Assembly, AssemblyInformation> Default { get; } = new AssemblyInformationSource();
 		AssemblyInformationSource() {}
 
-		public override AssemblyInformation Get( Assembly parameter )
+		protected override AssemblyInformation Create( Assembly parameter )
 		{
 			var result = new AssemblyInformation
 						 {
@@ -24,10 +25,6 @@ namespace DragonSpark.TypeSystem
 							 Description = parameter.From<AssemblyDescriptionAttribute, string>( attribute => attribute.Description ),
 							 Copyright = parameter.From<AssemblyCopyrightAttribute, string>( attribute => attribute.Copyright )
 						 };
-			/*foreach ( var item in Attributes.Select( parameter.GetCustomAttribute ).WhereAssigned() )
-			{
-				item.MapInto( result );
-			}*/
 			result.Configuration = result.Configuration.NullIfEmpty() ?? parameter.From<DebuggableAttribute, string>( attribute => "DEBUG" );
 			return result;
 		}

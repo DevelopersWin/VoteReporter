@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Diagnostics;
 using PostSharp.Patterns.Model;
 using Xunit;
 using Xunit.Abstractions;
@@ -22,12 +21,12 @@ namespace DragonSpark.Testing.Aspects.Validation
 			validating = new AutoValidatingSource( factory );
 		}
 
-		[Fact]
+		/*[Fact]
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		public void Performance()
 		{
 			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();
-		}
+		}*/
 
 		[Fact]
 		public void BasicAutoValidation() => BasicAutoValidationWith( validating, factory );
