@@ -6,6 +6,12 @@ namespace DragonSpark.Expressions
 {
 	public abstract class CompiledDelegateFactoryBase<TParameter, TResult> //: ParameterizedSourceBase<TParameter, TResult>
 	{
+		readonly static Type Result = typeof(TResult);
+		readonly static TypeInfo ResultTypeInfo = Result.GetTypeInfo();
+		readonly static Type Void = typeof(void);
+		readonly static Type Type1 = ResultTypeInfo.GetDeclaredMethod( nameof(Invoke) ).ReturnType;
+		readonly static bool B = Type1 != Void && Type1 != Result;
+
 		readonly ParameterExpression parameterExpression;
 		readonly Func<ExpressionBodyParameter<TParameter>, Expression> bodySource;
 
@@ -20,8 +26,7 @@ namespace DragonSpark.Expressions
 		public virtual TResult Get( TParameter parameter )
 		{
 			var body = bodySource( new ExpressionBodyParameter<TParameter>( parameter, parameterExpression ) );
-			var type = typeof(TResult).GetTypeInfo().GetDeclaredMethod( nameof(Invoke) ).ReturnType;
-			var converted = type != typeof(void) && type != typeof(TResult) ? Expression.Convert( body, type ) : body;
+			var converted = B ? Expression.Convert( body, Type1 ) : body;
 			var result = Expression.Lambda<TResult>( converted, parameterExpression ).Compile();
 			return result;
 		}

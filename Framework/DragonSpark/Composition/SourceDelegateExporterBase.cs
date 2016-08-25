@@ -20,7 +20,7 @@ namespace DragonSpark.Composition
 		readonly static Func<Type, Type> Parameters = ParameterTypes.Default.ToDelegate();
 
 		readonly ICache<LifetimeContext, object> cache = new Cache<LifetimeContext, object>();
-		readonly IDictionary<CompositionContract, CompositeActivator> registry = new ConcurrentDictionary<CompositionContract, CompositeActivator>();
+		// readonly IDictionary<CompositionContract, CompositeActivator> registry = new ConcurrentDictionary<CompositionContract, CompositeActivator>();
 		readonly Func<ActivatorParameter, object> resultSource;
 		readonly Func<CompositionContract, CompositionContract> resolver;
 
@@ -43,7 +43,8 @@ namespace DragonSpark.Composition
 				var success = sourceType != null && descriptorAccessor.TryResolveOptionalDependency( "Source Request", contract.ChangeType( sourceType ), true, out dependency );
 				if ( success )
 				{
-					Register( descriptorAccessor, new[] { sourceType, Parameters( sourceType ) }.WhereAssigned().Select( resolved.ChangeType ).ToArray() );
+					IDictionary<CompositionContract, CompositeActivator> registry = new ConcurrentDictionary<CompositionContract, CompositeActivator>();
+					Register( registry, descriptorAccessor, new[] { sourceType, Parameters( sourceType ) }.WhereAssigned().Select( resolved.ChangeType ).ToArray() );
 					var provider = new ServiceProvider( Stack, registry.TryGet, resolved );
 					
 					var activator = new ActivatorFactory( Stack, resultSource, new ActivatorParameter( provider, sourceType ) );
@@ -53,7 +54,7 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		void Register( DependencyAccessor accessor, params CompositionContract[] contracts )
+		void Register( IDictionary<CompositionContract, CompositeActivator> registry, DependencyAccessor accessor, params CompositionContract[] contracts )
 		{
 			foreach ( var contract in contracts )
 			{

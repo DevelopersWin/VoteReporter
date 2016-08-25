@@ -62,9 +62,10 @@ namespace DragonSpark.Composition
 		readonly static Action<Type> Initializer = InitializeTypeCommand.Default.ToDelegate();
 		readonly static Func<Type, Type> Types = ConventionTypes.Default.Get;
 
-		readonly Func<Type, Type> types;
+		public static TypeInitializingExportDescriptorProvider Default { get; } = new TypeInitializingExportDescriptorProvider();
+		TypeInitializingExportDescriptorProvider() : this( Types ) {}
 
-		public TypeInitializingExportDescriptorProvider() : this( Types ) {}
+		readonly Func<Type, Type> types;
 
 		TypeInitializingExportDescriptorProvider( Func<Type, Type> types )
 		{

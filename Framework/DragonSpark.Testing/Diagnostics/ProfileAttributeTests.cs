@@ -1,7 +1,5 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Testing.Framework;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Diagnostics
@@ -11,7 +9,7 @@ namespace DragonSpark.Testing.Diagnostics
 		const string OverridingMethodTemplate = "Overriding Method Template";
 		public ProfileAttributeTests( ITestOutputHelper output ) : base( output ) {}
 
-		[Fact]
+		/*[Fact]
 		public void Verify()
 		{
 			var history = LoggingHistory.Default.Get();
@@ -20,7 +18,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var item = Assert.Single( history.Events );
 			var text = item.MessageTemplate.Text;
 			Assert.Contains( OverridingMethodTemplate, text );
-		}
+		}*/
 
 		[Timed( OverridingMethodTemplate )]
 		static void HelloWorld() {}

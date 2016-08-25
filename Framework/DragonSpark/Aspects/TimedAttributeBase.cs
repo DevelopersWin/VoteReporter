@@ -1,8 +1,6 @@
-using DragonSpark.Diagnostics.Logging;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
-using SerilogTimings.Extensions;
 
 namespace DragonSpark.Aspects
 {
@@ -20,7 +18,7 @@ namespace DragonSpark.Aspects
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			using ( Logger.Default.Get( args.Method ).TimeOperation( template, args.Method ) )
+			// using ( Logger.Default.Get( args.Method ).TimeOperation( template, args.Method ) )
 			{
 				base.OnInvoke( args );
 			}

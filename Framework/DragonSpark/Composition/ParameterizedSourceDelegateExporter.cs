@@ -1,17 +1,18 @@
 using DragonSpark.Sources;
+using DragonSpark.Sources.Delegates;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Composition.Hosting.Core;
-using DragonSpark.Sources.Delegates;
 
 namespace DragonSpark.Composition
 {
 	public sealed class ParameterizedSourceDelegateExporter : SourceDelegateExporterBase
 	{
-		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.Parameterized.ToSourceDelegate();
+		readonly static Func<CompositionContract, CompositionContract> Resolver = SourceDelegateContractResolver.Parameterized.ToSourceDelegate();
 		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.DefaultNested.Get;
 
-		public ParameterizedSourceDelegateExporter() : base( DelegateSource, Default ) {}
+		public static ParameterizedSourceDelegateExporter Default { get; } = new ParameterizedSourceDelegateExporter();
+		ParameterizedSourceDelegateExporter() : base( DelegateSource, Resolver ) {}
 
 		sealed class Factory : ParameterizedSourceBase<ActivatorParameter, object>
 		{

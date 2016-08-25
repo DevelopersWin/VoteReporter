@@ -1,11 +1,11 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.Application.Setup;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Linq;
-using DragonSpark.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition
@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = typeof(Source);
 			new AssignSystemPartsCommand( parts ).Run();
 
-			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var container = new ContainerConfiguration().WithProvider( SourceExporter.Default ).WithParts( parts ).CreateContainer();
 			var number = container.GetExport<int>();
 			Assert.Equal( 6776, number );
 		}
@@ -29,7 +29,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = typeof(Source).Append( typeof(ParameterizedSource), typeof(Result) ).ToArray();
 			new AssignSystemPartsCommand( parts ).Run();
 
-			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var container = new ContainerConfiguration().WithProvider( SourceExporter.Default ).WithParts( parts ).CreateContainer();
 			var dependency = container.GetExport<Result>();
 			Assert.Equal( 6776 + 123, dependency.Number );
 		}
@@ -40,7 +40,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = typeof(Source).Append( typeof(WithDependency) ).ToArray();
 			new AssignSystemPartsCommand( parts ).Run();
 
-			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var container = new ContainerConfiguration().WithProvider( SourceExporter.Default ).WithParts( parts ).CreateContainer();
 			var dependency = container.GetExport<WithDependency>();
 			Assert.Equal( 6776, dependency.Number );
 		}
@@ -51,7 +51,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = typeof(Source).Append( typeof(WithDependency) ).ToArray();
 			new AssignSystemPartsCommand( parts ).Run();
 
-			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var container = new ContainerConfiguration().WithProvider( SourceExporter.Default ).WithParts( parts ).CreateContainer();
 			var dependency = container.GetExport<WithDependency>();
 			Assert.Equal( 6776, dependency.Number );
 		}
@@ -62,7 +62,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = typeof(SharedCounter);
 			new AssignSystemPartsCommand( parts ).Run();
 
-			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var container = new ContainerConfiguration().WithProvider( SourceExporter.Default ).WithParts( parts ).CreateContainer();
 			Assert.Equal( 1, container.GetExport<int>() );
 			Assert.Equal( 1, container.GetExport<int>() );
 		}
@@ -73,7 +73,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = typeof(Counter);
 			new AssignSystemPartsCommand( parts ).Run();
 
-			var container = new ContainerConfiguration().WithProvider( new SourceExporter() ).WithParts( parts ).CreateContainer();
+			var container = new ContainerConfiguration().WithProvider( SourceExporter.Default ).WithParts( parts ).CreateContainer();
 			Assert.Equal( 1, container.GetExport<int>() );
 			Assert.Equal( 2, container.GetExport<int>() );
 		}

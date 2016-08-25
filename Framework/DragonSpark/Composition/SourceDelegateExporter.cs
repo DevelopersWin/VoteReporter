@@ -4,24 +4,26 @@ using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Delegates;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Composition.Hosting.Core;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Delegates;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Composition
 {
 	public class SourceDelegateExporter : SourceDelegateExporterBase
 	{
-		readonly static Func<CompositionContract, CompositionContract> Default = SourceDelegateContractResolver.Default.ToSourceDelegate();
+		readonly static Func<CompositionContract, CompositionContract> Resolver = SourceDelegateContractResolver.Default.ToSourceDelegate();
 		readonly static Func<ActivatorParameter, object> DelegateSource = Factory.DefaultNested.Get;
-		public SourceDelegateExporter() : base( DelegateSource, Default ) {}
+
+		public static SourceDelegateExporter Default { get; } = new SourceDelegateExporter();
+		SourceDelegateExporter() : base( DelegateSource, Resolver ) {}
 
 		sealed class Factory : ParameterizedSourceBase<ActivatorParameter, object>
 		{

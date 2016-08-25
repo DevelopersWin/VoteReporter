@@ -18,29 +18,20 @@ using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
 {
-	public sealed class CompositionHostFactory : ConfigurableFactoryBase<ContainerConfiguration, CompositionHost>
-	{
-		readonly static IConfigurationScope<ContainerConfiguration> DefaultConfiguration = new ConfigurationScope<ContainerConfiguration>( ContainerServicesConfigurator.Default, PartsContainerConfigurator.Default );
-
-		public static CompositionHostFactory Default { get; } = new CompositionHostFactory();
-		CompositionHostFactory() : base( () => new ContainerConfiguration(), DefaultConfiguration, parameter => parameter.CreateContainer() ) {}
-	}
-
-	public abstract class ContainerConfigurator : TransformerBase<ContainerConfiguration> {}
-
-	public class ContainerServicesConfigurator : ContainerConfigurator
+	public sealed class ContainerServicesConfigurator : ContainerConfigurator
 	{
 		public static ContainerServicesConfigurator Default { get; } = new ContainerServicesConfigurator();
 		ContainerServicesConfigurator() {}
 
-		public override ContainerConfiguration Get( ContainerConfiguration parameter ) => parameter.WithProvider( new ServicesExportDescriptorProvider() );
+		public override ContainerConfiguration Get( ContainerConfiguration parameter ) => parameter.WithProvider( ServicesExportDescriptorProvider.Default );
 	}
 
-	public class ServicesExportDescriptorProvider : ExportDescriptorProvider
+	public sealed class ServicesExportDescriptorProvider : ExportDescriptorProvider
 	{
-		readonly Func<Type, object> provider;
+		public static ServicesExportDescriptorProvider Default { get; } = new ServicesExportDescriptorProvider();
+		ServicesExportDescriptorProvider() : this( DefaultServiceProvider.Default ) {}
 
-		public ServicesExportDescriptorProvider() : this( DefaultServiceProvider.Default ) {}
+		readonly Func<Type, object> provider;
 
 		public ServicesExportDescriptorProvider( IServiceProvider provider ) : this( new ActivatedServiceSource( provider ).Get ) {}
 
@@ -159,38 +150,11 @@ namespace DragonSpark.Composition
 			var result = configuration
 				.WithParts( types, builderSource() )
 				.WithProvider( new SingletonExportDescriptorProvider( types ) )
-				.WithProvider( new SourceDelegateExporter() )
-				.WithProvider( new ParameterizedSourceDelegateExporter() )
-				.WithProvider( new SourceExporter() )
-				.WithProvider( new TypeInitializingExportDescriptorProvider() );
+				.WithProvider( SourceDelegateExporter.Default )
+				.WithProvider( ParameterizedSourceDelegateExporter.Default )
+				.WithProvider( SourceExporter.Default )
+				.WithProvider( TypeInitializingExportDescriptorProvider.Default );
 			return result;
 		}
-
-		/*class FrameworkConventionBuilder : FactoryBase<ConventionBuilder>
-		{
-			readonly Func<ConventionBuilder, object> configure;
-
-			public static FrameworkConventionBuilder Default { get; } = new FrameworkConventionBuilder();
-			FrameworkConventionBuilder()
-			{
-				configure = Configure;
-			}
-
-			public override ConventionBuilder Create() => new ConventionBuilder().WithSelf( configure );
-
-			static PartConventionBuilder Configure( ConventionBuilder builder ) => builder.ForTypesMatching( type => true ).Export().SelectConstructor( infos => infos.First(), ( info, conventionBuilder ) => conventionBuilder.AsMany( false ) );
-		}*/
-
-		/*class AttributeProvider : AttributedModelProvider
-		{
-			public static AttributeProvider Default { get; } = new AttributeProvider();
-			AttributeProvider() {}
-
-			[Freeze]
-			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, MemberInfo member ) => member.GetAttributes<Attribute>();
-
-			[Freeze]
-			public override IEnumerable<Attribute> GetCustomAttributes( Type reflectedType, ParameterInfo parameter ) => parameter.GetAttributes<Attribute>();
-		}*/
 	}
 }
