@@ -13,7 +13,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	[Trait( Traits.Category, Traits.Categories.IoC ), ContainingTypeAndNested, FrameworkTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
+	[Trait( Traits.Category, Traits.Categories.Xaml ), ContainingTypeAndNested, FrameworkTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
 	public class ProgramSetupTests
 	{
 		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationSource), typeof(ApplicationAssembly) )]

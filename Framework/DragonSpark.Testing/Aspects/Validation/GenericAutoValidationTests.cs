@@ -3,7 +3,6 @@ using DragonSpark.Aspects.Validation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
-using PostSharp.Patterns.Model;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -11,12 +10,12 @@ namespace DragonSpark.Testing.Aspects.Validation
 {
 	public class GenericAutoValidationTests : TestCollectionBase
 	{
-		[Reference]
+		//[Reference]
 		readonly ExtendedFactory factory = new ExtendedFactory();
 
-		[Reference]
+		// [Reference]
 		readonly IValidatedParameterizedSource<int, float> validating;
-		[Reference]
+		// [Reference]
 		readonly AppliedExtendedFactory applied = new AppliedExtendedFactory();
 
 		public GenericAutoValidationTests( ITestOutputHelper output ) : base( output )

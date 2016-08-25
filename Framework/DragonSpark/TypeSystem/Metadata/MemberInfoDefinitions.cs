@@ -26,24 +26,38 @@ namespace DragonSpark.TypeSystem.Metadata
 				this.typeSource = typeSource;
 			}
 
-			class PropertyInfoDefinitionLocator : NamedMemberInfoDefinitionLocatorBase<PropertyInfo>
+			public override MemberInfo Get( object parameter )
+			{
+				var definition = typeSource( parameter );
+				foreach ( var @delegate in Delegates )
+				{
+					var factory = @delegate( definition );
+					if ( factory?.IsSatisfiedBy( parameter ) ?? false )
+					{
+						return factory.Get<MemberInfo>( parameter );
+					}
+				}
+				return null;
+			}
+
+			sealed class PropertyInfoDefinitionLocator : NamedMemberInfoDefinitionLocatorBase<PropertyInfo>
 			{
 				public PropertyInfoDefinitionLocator( TypeInfo definition ) : base( definition, definition.GetDeclaredProperty, definition.DeclaredProperties ) {}
 			}
 
-			class ConstructorInfoDefinitionLocator : MemberInfoDefinitionLocatorBase<ConstructorInfo>
+			sealed class ConstructorInfoDefinitionLocator : MemberInfoDefinitionLocatorBase<ConstructorInfo>
 			{
 				public ConstructorInfoDefinitionLocator( TypeInfo definition ) : base( definition ) {}
 				protected override MemberInfo From( ConstructorInfo parameter ) => 
 					Definition.DeclaredConstructors.Introduce( parameter.GetParameterTypes(), tuple => tuple.Item1.GetParameterTypes().SequenceEqual( tuple.Item2 ) ).FirstOrDefault();
 			}
 
-			class MethodInfoDefinitionLocator : NamedMemberInfoDefinitionLocatorBase<MethodInfo>
+			sealed class MethodInfoDefinitionLocator : NamedMemberInfoDefinitionLocatorBase<MethodInfo>
 			{
 				public MethodInfoDefinitionLocator( TypeInfo definition ) : base( definition, definition.GetDeclaredMethod, definition.DeclaredMethods ) {}
 			}
 
-			class TypeInfoDefinitionLocator : MemberInfoDefinitionLocatorBase<object>
+			sealed class TypeInfoDefinitionLocator : MemberInfoDefinitionLocatorBase<object>
 			{
 				public TypeInfoDefinitionLocator( TypeInfo definition ) : base( definition ) {}
 
@@ -87,20 +101,6 @@ namespace DragonSpark.TypeSystem.Metadata
 				protected abstract MemberInfo From( T parameter );
 
 				protected TypeInfo Definition { get; }
-			}
-
-			public override MemberInfo Get( object parameter )
-			{
-				var definition = typeSource( parameter );
-				foreach ( var @delegate in Delegates )
-				{
-					var factory = @delegate( definition );
-					if ( factory?.IsSatisfiedBy( parameter ) ?? false )
-					{
-						return factory.Get<MemberInfo>( parameter );
-					}
-				}
-				return null;
 			}
 		}
 	}

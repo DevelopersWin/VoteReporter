@@ -28,7 +28,7 @@ namespace DragonSpark.TypeSystem
 		{
 			Type = type;
 			Info = info;
-			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Create ).Get;
+			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Get ).Get;
 			GenericFactoryMethods = new GenericStaticMethodFactories( Type );
 			GenericCommandMethods = new GenericStaticMethodCommands( Type );
 			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).Get;

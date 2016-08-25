@@ -1,14 +1,13 @@
-using System;
-using System.Reflection;
 using DragonSpark.Commands;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
-using PostSharp.Patterns.Threading;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	[Synchronized] // http://stackoverflow.com/questions/35976558/is-constructorinfo-getparameters-thread-safe/35976798
+	// [Synchronized] // http://stackoverflow.com/questions/35976558/is-constructorinfo-getparameters-thread-safe/35976798
 	public class InitializeTypeCommand : CommandBase<Type>
 	{
 		public static InitializeTypeCommand Default { get; } = new InitializeTypeCommand();

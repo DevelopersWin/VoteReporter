@@ -610,7 +610,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Activation\Constructor.cs" />
-    <Compile Include="TypeSystem\TypeDefinitions.cs" />
+    <Compile Include="TypeSystem\Metadata\TypeDefinitions.cs" />
     <Compile Include="TypeSystem\Metadata\TypeInfoAttributeProvider.cs" />
     <Compile Include="TypeSystem\TypesFactory.cs" />
     <Compile Include="TypeSystem\TypeSupport.cs" />

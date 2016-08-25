@@ -1,17 +1,19 @@
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Generic;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.TypeSystem.Metadata
 {
 	public abstract class AttributeProviderBase : IAttributeProvider
 	{
-		readonly ICache<Type, bool> defined;
-		readonly ICache<Type, IEnumerable<Attribute>> factory;
+		readonly ISpecification<Type> defined;
+		readonly IParameterizedSource<Type, IEnumerable<Attribute>> factory;
 
 		protected AttributeProviderBase()
 		{
-			defined = new DecoratedSourceCache<Type, bool>( new WritableSourceCache<Type, bool>( new Func<Type, bool>( Contains ) ) );
+			defined = new DelegatedSpecification<Type>( Contains ).ToCachedSpecification();
 			factory = new Cache<Type, IEnumerable<Attribute>>( GetAttributes );
 		}
 
@@ -19,6 +21,6 @@ namespace DragonSpark.TypeSystem.Metadata
 
 		public abstract IEnumerable<Attribute> GetAttributes( Type attributeType );
 
-		IEnumerable<Attribute> IAttributeProvider.GetAttributes( Type attributeType ) => defined.Get( attributeType ) ? factory.Get( attributeType ) : Items<Attribute>.Default;
+		IEnumerable<Attribute> IAttributeProvider.GetAttributes( Type attributeType ) => defined.IsSatisfiedBy( attributeType ) ? factory.Get( attributeType ) : Items<Attribute>.Default;
 	}
 }

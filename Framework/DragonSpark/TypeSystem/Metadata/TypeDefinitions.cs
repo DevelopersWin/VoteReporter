@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace DragonSpark.TypeSystem
+namespace DragonSpark.TypeSystem.Metadata
 {
 	sealed class TypeDefinitions : ParameterizedScope<TypeInfo>
 	{
@@ -25,30 +25,30 @@ namespace DragonSpark.TypeSystem
 				this.source = source;
 			}
 
-			class TypeInfoDefinitionProvider : TypeDefinitionProviderBase<TypeInfo>
+			public override TypeInfo Get( object parameter = null ) => source( base.Get( parameter ) );
+
+			abstract class TypeDefinitionProviderBase<T> : ParameterizedSourceBase<T, TypeInfo> {}
+
+			sealed class TypeInfoDefinitionProvider : TypeDefinitionProviderBase<TypeInfo>
 			{
 				public static TypeInfoDefinitionProvider DefaultNested { get; } = new TypeInfoDefinitionProvider();
 
 				public override TypeInfo Get( TypeInfo parameter ) => parameter;
 			}
 
-			class MemberInfoDefinitionProvider : TypeDefinitionProviderBase<MemberInfo>
+			sealed class MemberInfoDefinitionProvider : TypeDefinitionProviderBase<MemberInfo>
 			{
 				public static MemberInfoDefinitionProvider DefaultNested { get; } = new MemberInfoDefinitionProvider();
 
 				public override TypeInfo Get( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();
 			}
 
-			class GeneralDefinitionProvider : TypeDefinitionProviderBase<object>
+			sealed class GeneralDefinitionProvider : TypeDefinitionProviderBase<object>
 			{
 				public static GeneralDefinitionProvider DefaultNested { get; } = new GeneralDefinitionProvider();
 
 				public override TypeInfo Get( object parameter ) => parameter.GetType().GetTypeInfo();
 			}
-
-			abstract class TypeDefinitionProviderBase<T> : ParameterizedSourceBase<T, TypeInfo> {}
-
-			public override TypeInfo Get( object parameter = null ) => source( base.Get( parameter ) );
 		}
 	}
 }

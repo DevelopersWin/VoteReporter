@@ -4,9 +4,10 @@ using System.Linq;
 using System.Reflection;
 using DragonSpark.Extensions;
 
+
 namespace DragonSpark.TypeSystem
 {
-	class MethodMapper//  : FactoryBase<Type, ImmutableArray<MethodMapping>>
+	class MethodMapper // : ParameterizedSourceBase<Type, ImmutableArray<MethodMapping>>
 	{
 		readonly TypeAdapter adapter;
 
@@ -15,7 +16,7 @@ namespace DragonSpark.TypeSystem
 			this.adapter = adapter;
 		}
 
-		public ImmutableArray<MethodMapping> Create( Type parameter )
+		public ImmutableArray<MethodMapping> Get( Type parameter )
 		{
 			var generic = parameter.GetTypeInfo().IsGenericTypeDefinition ? adapter.GetImplementations( parameter ).FirstOrDefault() : null;
 			var implementation = generic ?? ( parameter.Adapt().IsAssignableFrom( adapter.Type ) ? parameter : null );

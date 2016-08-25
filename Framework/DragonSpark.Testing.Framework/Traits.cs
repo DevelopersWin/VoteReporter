@@ -6,7 +6,7 @@ namespace DragonSpark.Testing.Framework
 
 		public static class Categories
 		{
-			public const string FileSystem = nameof(FileSystem), IoC = nameof(IoC), ServiceLocation = nameof(ServiceLocation), Performance = nameof(Performance), Memory = nameof(Memory);
+			public const string FileSystem = nameof(FileSystem), IoC = nameof(IoC), ServiceLocation = nameof(ServiceLocation), Performance = nameof(Performance), Memory = nameof(Memory), Xaml = nameof(Xaml);
 		}
 	}
 }

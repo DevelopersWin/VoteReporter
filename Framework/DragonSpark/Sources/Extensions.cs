@@ -6,7 +6,6 @@ using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Windows.Input;
 
 namespace DragonSpark.Sources
@@ -30,8 +29,6 @@ namespace DragonSpark.Sources
 			@this.Assign( factory );
 			return @this.Get();
 		}
-
-		public static IEnumerable<T> Get<T>( this IEnumerable<ISource> @this ) => @this.Select( source => source.Get() ).OfType<T>();
 
 		public static T ScopedWithDefault<T>( this T @this ) where T : IScopeAware => @this.ScopedWith( ExecutionContext.Default );
 

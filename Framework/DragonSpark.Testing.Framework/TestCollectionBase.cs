@@ -1,6 +1,6 @@
+using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using JetBrains.dotMemoryUnit;
-using PostSharp.Patterns.Model;
 using System;
 using Xunit.Abstractions;
 
@@ -39,8 +39,7 @@ namespace DragonSpark.Testing.Framework
 		protected override void OnDispose() => complete();
 	}*/
 
-	[Disposable]
-	public abstract class TestCollectionBase
+	public abstract class TestCollectionBase : Disposable
 	{
 		protected TestCollectionBase( ITestOutputHelper output )
 		{
@@ -51,7 +50,7 @@ namespace DragonSpark.Testing.Framework
 
 		protected Action<string> WriteLine { get; }
 
-		protected virtual void Dispose( bool disposing ) {}
+		// protected virtual void Dispose( bool disposing ) {}
 	}
 
 	/*public interface ITestOutputAware

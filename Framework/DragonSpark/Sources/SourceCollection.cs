@@ -21,7 +21,17 @@ namespace DragonSpark.Sources
 
 		public new IEnumerator<T> GetEnumerator() => Values().GetEnumerator();
 
-		IEnumerable<T> Values() => Source.Get<T>();
+		IEnumerable<T> Values()
+		{
+			foreach ( var source in Source.ToArray() )
+			{
+				var value = source.Get();
+				if ( value is T )
+				{
+					yield return (T)value;
+				}
+			}
+		}
 
 		public bool Remove( T item )
 		{
