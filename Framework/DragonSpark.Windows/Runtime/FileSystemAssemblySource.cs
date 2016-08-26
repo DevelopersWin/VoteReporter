@@ -11,7 +11,7 @@ namespace DragonSpark.Windows.Runtime
 		public static ISource<ImmutableArray<Assembly>> Default { get; } = new FileSystemAssemblySource();
 		FileSystemAssemblySource() : this( AppDomain.CurrentDomain ) {}
 
-		public FileSystemAssemblySource( AppDomain domain ) : base( new FixedFactory<AppDomain, ImmutableArray<Assembly>>( DomainAssemblySource.Default.Get, domain ).Get ) {}
+		public FileSystemAssemblySource( AppDomain domain ) : base( DomainAssemblySource.Default.Fixed( domain ).Get ) {}
 
 		//static IEnumerable<Assembly> Create( AppDomain domain ) => DomainApplicationAssemblies.Default.Get( domain );
 			/*AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true )

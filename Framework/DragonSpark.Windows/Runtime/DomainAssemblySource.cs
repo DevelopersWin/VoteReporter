@@ -1,11 +1,11 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Windows.Runtime
 {

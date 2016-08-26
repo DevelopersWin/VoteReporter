@@ -11,6 +11,7 @@ namespace DevelopersWin.VoteReporter.Application
 	{
 		static void Main( string[] args )
 		{
+			typeof(IVoteCountLocator).GetType(); // TODO: remove.
 			using ( var program = new Program() )
 			{
 				program.Run( args );

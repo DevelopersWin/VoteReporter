@@ -2,25 +2,34 @@ using DragonSpark.Commands;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Windows.Properties;
+using PostSharp.Patterns.Contracts;
 using System.IO;
+using System.Linq;
 
 namespace DragonSpark.Windows.Entity
 {
 	public class InstallDatabaseCommand : CommandBase<object>
 	{
-		[Factory( typeof(AttachedDatabaseFileFactory) )]
-		public FileInfo Database { get; set; }
+		readonly static byte[][] Data = { Resources.Blank, Resources.Blank_log };
 
-		public override void Execute( object parameter ) => Database.Exists.IsFalse( () =>
+		[Service, Required]
+		public FileInfo Database { [return: NotNull]get; set; }
+
+		public override void Execute( object parameter )
 		{
-			var items = EntityFiles.WithLog( Database ).Tuple( new[] { Resources.Blank, Resources.Blank_log } );
-			items.Each( tuple => 
+			if ( !Database.Exists )
 			{
-				using ( var stream = File.Create( tuple.Item1.FullName ) )
+				foreach ( var item in EntityFiles.WithLog( Database ).Tuple( Data ).ToArray() )
 				{
-					stream.Write( tuple.Item2, 0, tuple.Item2.Length );
+					var fullName = item.Item1.FullName;
+					var directoryRoot = Path.GetDirectoryName( fullName );
+					Directory.CreateDirectory( directoryRoot );
+					using ( var stream = File.Create( fullName ) )
+					{
+						stream.Write( item.Item2, 0, item.Item2.Length );
+					}
 				}
-			} );
-		} );
+			}
+		}
 	}
 }
