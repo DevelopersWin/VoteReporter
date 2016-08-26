@@ -5,5 +5,4 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" 
->
-</setup:Setup>
+/>

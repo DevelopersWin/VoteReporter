@@ -1,8 +1,8 @@
+using DragonSpark.Sources;
 using System;
 using System.Collections.Immutable;
 using System.Composition.Hosting;
 using System.Linq;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Composition
 {

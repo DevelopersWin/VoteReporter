@@ -35,12 +35,14 @@
   <ItemGroup>
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ContainerConfigurator.cs" />
+    <Compile Include="Composition\ContainerConfiguratorMappings.cs" />
     <Compile Include="Composition\ContainerServicesConfigurator.cs" />
     <Compile Include="Composition\ContainsExportedSingletonSpecification.cs" />
     <Compile Include="Composition\ConventionBuilderFactory.cs" />
     <Compile Include="Composition\ConventionTransformer.cs" />
     <Compile Include="Composition\ExportedContainerConfigurator.cs" />
     <Compile Include="Composition\ExportedSingletonProperties.cs" />
+    <Compile Include="Composition\ExportMapping.cs" />
     <Compile Include="Composition\IsExportSpecification.cs" />
     <Compile Include="Composition\ServicesExportDescriptorProvider.cs" />
     <Compile Include="Composition\SingletonExport.cs" />

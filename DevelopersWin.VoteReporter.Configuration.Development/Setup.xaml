@@ -6,6 +6,4 @@
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" 
 >
-	<!--<commands:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}" />-->
-	<!--<commands:UnityType RegistrationType="{markup:GenericType entity:IDatabaseInitializer(voteReporter:VotingContext)}" MapTo="{markup:GenericType entity:DropCreateDatabaseIfModelChanges(voteReporter:VotingContext)}" />-->
 </setup:Setup>

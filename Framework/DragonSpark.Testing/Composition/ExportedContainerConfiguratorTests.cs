@@ -1,6 +1,8 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using JetBrains.Annotations;
+using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
 using Xunit;
@@ -19,13 +21,22 @@ namespace DragonSpark.Testing.Composition
 		}
 
 		[UsedImplicitly]
-		sealed class Configurator : ContainerConfigurator
+		sealed class Configurator : ContainerConfiguratorMappings
 		{
 			[Export, UsedImplicitly]
 			public static Configurator Default { get; } = new Configurator();
-			Configurator() {}
+			Configurator() : base( Mappings.Default ) {}
+		}
 
-			public override ContainerConfiguration Get( ContainerConfiguration parameter ) => parameter.WithPart<Additional>();
+		class Mappings : ItemSourceBase<ExportMapping>
+		{
+			public static Mappings Default { get; } = new Mappings();
+			Mappings() {}
+
+			protected override IEnumerable<ExportMapping> Yield()
+			{
+				yield return new ExportMapping<Additional, IAdditional>();
+			}
 		}
 
 		interface IAdditional {}
