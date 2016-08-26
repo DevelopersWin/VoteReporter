@@ -54,6 +54,7 @@
     <Compile Include="Activation\RecordingLoggerConfigurationCommandTests.cs" />
     <Compile Include="Application\DefaultExportProviderTests.cs" />
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
+    <Compile Include="Aspects\ApplyValuesFromSourceTests.cs" />
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />

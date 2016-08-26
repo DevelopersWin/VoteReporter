@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Aspects\ApplyValuesFromSource.cs" />
     <Compile Include="Composition\CanInstantiateSpecification.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ContainerConfigurator.cs" />

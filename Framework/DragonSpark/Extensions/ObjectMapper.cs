@@ -24,7 +24,7 @@ namespace DragonSpark.Extensions
 
 		public override T Get( ObjectMappingParameter<T> parameter )
 		{
-			var destination = parameter.Existing ?? activatorSource().Get( parameter.Pair.DestinationType );
+			var destination = parameter.Destination ?? activatorSource().Get( parameter.Pair.DestinationType );
 			var result = mappers.Get( parameter.Pair ).Map( parameter.Source, (T)destination );
 			return result;
 		}
@@ -36,13 +36,10 @@ namespace DragonSpark.Extensions
 
 			public override IMapper Get( TypePair parameter )
 			{
-				var expression = new MapperConfigurationExpression { CreateMissingTypeMaps = true };
-					expression
-					.IgnoreUnassignable()
-					.CreateMap( parameter.SourceType, parameter.DestinationType )
-					.IgnoreAllPropertiesWithAnInaccessibleSetter()
-					.ForAllMembers( exp => exp.Condition( ( source, destination, destinationValue, sourceValue ) => sourceValue.IsAssignedOrValue() ) )
-					;
+				var expression = new MapperConfigurationExpression();
+				expression.ForAllPropertyMaps( map => !map.DestinationPropertyType.Adapt().IsAssignableFrom( map.SourceMember.GetMemberType() ), ( map, _ ) => map.Ignored = true );
+				expression.CreateMap( parameter.SourceType, parameter.DestinationType, MemberList.Destination );
+				expression.ForAllMaps( ( map, mappingExpression ) => mappingExpression.ForAllMembers( option => option.Condition( ( source, destination, sourceValue ) => sourceValue.IsAssignedOrValue() ) ) );
 				var result = new MapperConfiguration( expression ).CreateMapper();
 				return result;
 			}
