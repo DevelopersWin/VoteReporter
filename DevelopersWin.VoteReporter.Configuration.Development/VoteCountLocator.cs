@@ -5,12 +5,6 @@ using System.Linq;
 
 namespace DevelopersWin.VoteReporter.Parts.Development
 {
-	/*public class Module : MonitoredModule<Setup>
-	{
-		public Module( IModuleMonitor moduleMonitor, Setup command ) : base( moduleMonitor, command )
-		{}
-	}*/
-
 	class VoteCountLocator : IVoteCountLocator
 	{
 		public int Locate( Vote vote )

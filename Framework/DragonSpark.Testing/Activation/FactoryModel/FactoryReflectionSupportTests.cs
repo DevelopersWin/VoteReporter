@@ -1,9 +1,10 @@
 ﻿using DragonSpark.Activation.Location;
-using DragonSpark.Application.Setup;
+using DragonSpark.Application;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Objects;
+using System.Linq;
 using Xunit;
 
 namespace DragonSpark.Testing.Activation.FactoryModel
@@ -13,12 +14,9 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		[Fact]
 		public void GetResultType()
 		{
-			var expected = typeof(FactoryOfYac);
-
-			new AssignSystemPartsCommand( expected ).Run();
-
+			var expected = typeof(FactoryOfYac).Yield().AsApplicationParts();
 			var type = SourceTypes.Default.Get().Get( new LocateTypeRequest( typeof(YetAnotherClass) ) );
-			Assert.Equal( expected, type );
+			Assert.Equal( expected.Single(), type );
 		}
 
 		[Fact]
@@ -30,7 +28,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		[Fact]
 		public void PropertyFromApplicationTypes()
 		{
-			new AssignSystemPartsCommand( typeof(FactoryOfYac) ).Run();
+			ApplicationParts.Assign( typeof(FactoryOfYac) );
 			Assert.IsType<YetAnotherClass>( ClassPropertyFromApplicationTypes );
 		}
 

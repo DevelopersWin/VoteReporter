@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation.Location;
 using DragonSpark.Application;
+using DragonSpark.Composition;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
@@ -12,8 +13,10 @@ using DragonSpark.TypeSystem;
 using Serilog;
 using Serilog.Events;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
+using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -54,6 +57,26 @@ namespace DragonSpark.Testing.Composition
 			Assert.Same( AssemblyInformationSource.Default, host.GetExport<IParameterizedSource<Assembly, AssemblyInformation>>() );
 			
 		}
+
+		[Fact]
+		public void Enumerable()
+		{
+			var parts = typeof(ExportedClass).Append( typeof(AnotherExportedClass) ).AsApplicationParts();
+			var container = new ContainerConfiguration().WithParts( parts.AsEnumerable() ).CreateContainer();
+			var exports = new ServiceLocator( container ).Get<IEnumerable<IExported>>( typeof(IEnumerable<IExported>) );
+			var exported = exports.WhereAssigned().Fixed();
+			Assert.Equal( 2, exported.Length );
+			Assert.Single( exported.OfType<AnotherExportedClass>() );
+			Assert.Single( exported.OfType<ExportedClass>() );
+		}
+
+		[Export( typeof(IExported) )]
+		class AnotherExportedClass : IExported {}
+
+		[Export( typeof(IExported) )]
+		class ExportedClass : IExported {}
+
+		interface IExported {}
 
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void BasicComposeAgain( CompositionContext host )

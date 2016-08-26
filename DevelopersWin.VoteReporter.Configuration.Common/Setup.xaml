@@ -1,14 +1,14 @@
-﻿<commands1:CompositeCommand x:Class="DevelopersWin.VoteReporter.Parts.Common.Setup"
+﻿<setup:Setup x:Class="DevelopersWin.VoteReporter.Parts.Common.Setup"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:entity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
-							xmlns:commands1="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
-							xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
-							mc:Ignorable="d" 
-	>
-	<commands1:DeclaredFixedCommand Command="{x:Static setup:RegisterInstanceCommand.Default}">
+	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
+	mc:Ignorable="d" 
+	Priority="Low"
+>
+	<setup:RegisterInstances>
 		<entity:Configuration AutomaticMigrationsEnabled="True" />
-	</commands1:DeclaredFixedCommand>
-</commands1:CompositeCommand>
+	</setup:RegisterInstances>
+</setup:Setup>

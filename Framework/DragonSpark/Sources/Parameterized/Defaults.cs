@@ -1,8 +1,8 @@
-﻿using System;
-using DragonSpark.Activation.Location;
+﻿using DragonSpark.Activation.Location;
 using DragonSpark.Composition;
 using DragonSpark.Sources.Delegates;
 using DragonSpark.Specifications;
+using System;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -12,6 +12,6 @@ namespace DragonSpark.Sources.Parameterized
 		
 		public static ISpecification<Type> ActivateSpecification { get; } = CanInstantiateSpecification.Default.Or( ContainsSingletonSpecification.Default ).ToCachedSpecification();
 
-		public static ISpecification<Type> IsExportSpecification { get; } = Composition.IsExportSpecification.Default.Project( Projections.MemberType ).Or( ContainsExportedSingletonSpecification.Default ).ToCachedSpecification();
+		public static ISpecification<Type> ContainsExportSpecification { get; } = IsExportSpecification.Default.Project( Projections.MemberType ).Or( ContainsExportedSingletonSpecification.Default ).ToCachedSpecification();
 	}
 }

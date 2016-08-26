@@ -15,14 +15,18 @@ namespace DragonSpark.Application.Setup
 	{
 		public static ISetup Current() => AmbientStack.GetCurrentItem<ISetup>();
 
-		public Setup() : this( Items<ICommand>.Default ) {}
-
-		public Setup( params ICommand[] commands ) : this( new OncePerScopeSpecification<object>(), commands ) {}
-		public Setup( ISpecification<object> specification, params ICommand[] commands ) : base( specification, commands ) {}
+		public Setup() : this( Priority.Normal ) {}
+		public Setup( Priority priority = Priority.Normal ) : this( priority, Items<ICommand>.Default ) {}
+		public Setup( params ICommand[] commands ) : this( Priority.Normal, commands ) {}
+		public Setup( Priority priority = Priority.Normal, params ICommand[] commands ) : this( new OncePerScopeSpecification<object>(), priority, commands ) {}
+		public Setup( ISpecification<object> specification, Priority priority = Priority.Normal, params ICommand[] commands ) : base( specification, commands )
+		{
+			Priority = priority;
+		}
 
 		public DeclarativeCollection<object> Items { get; } = new DeclarativeCollection<object>();
 
-		public Priority Priority { get; set; } = Priority.Normal;
+		public Priority Priority { get; set; }
 
 		public override void Execute( object parameter = null )
 		{

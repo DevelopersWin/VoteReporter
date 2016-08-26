@@ -3,9 +3,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-	xmlns:common="clr-namespace:DevelopersWin.VoteReporter.Parts.Common;assembly=DevelopersWin.VoteReporter.Parts.Common"
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" 
 >
-	<common:Setup />
 </setup:Setup>

@@ -19,7 +19,7 @@
 	<entity:InstallDatabaseCommand />
 	<entity:BackupDatabaseCommand />
 	<localEntity:InitializeDatabaseCommand>
-		<markup:Locate Type="{markup:Enumerable {x:Type entity:IInstaller}}" />
+		<markup:Service Type="{markup:Enumerable {x:Type entity:IInstaller}}" />
 	</localEntity:InitializeDatabaseCommand>
 	<application:RunProgramCommand />
 </setup:Setup>

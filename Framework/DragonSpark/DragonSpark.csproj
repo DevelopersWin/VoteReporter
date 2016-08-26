@@ -35,6 +35,17 @@
   <ItemGroup>
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ContainerConfigurator.cs" />
+    <Compile Include="Composition\ContainerServicesConfigurator.cs" />
+    <Compile Include="Composition\ContainsExportedSingletonSpecification.cs" />
+    <Compile Include="Composition\ConventionBuilderFactory.cs" />
+    <Compile Include="Composition\ConventionTransformer.cs" />
+    <Compile Include="Composition\ExportedSingletonProperties.cs" />
+    <Compile Include="Composition\IsExportSpecification.cs" />
+    <Compile Include="Composition\ServicesExportDescriptorProvider.cs" />
+    <Compile Include="Composition\SingletonExport.cs" />
+    <Compile Include="Composition\SingletonExports.cs" />
+    <Compile Include="Composition\SingletonExportsSource.cs" />
+    <Compile Include="Composition\SourceDelegateContractResolver.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactory.cs" />
     <Compile Include="Tasks\FixedTaskSource.cs" />
     <Compile Include="Tasks\MonitorTaskCommand.cs" />
@@ -139,7 +150,6 @@
     <Compile Include="Application\ApplicationTypes.cs" />
     <Compile Include="Application\Setup\ApplyExportedCommandsCommand.cs" />
     <Compile Include="Application\Setup\ApplySetup.cs" />
-    <Compile Include="Application\Setup\AssignSystemPartsCommand.cs" />
     <Compile Include="Commands\CommandSource.cs" />
     <Compile Include="Commands\DeclaredCommandBase.cs" />
     <Compile Include="Application\Setup\CompositeServiceProvider.cs" />

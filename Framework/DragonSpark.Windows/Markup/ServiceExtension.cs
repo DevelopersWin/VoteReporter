@@ -1,7 +1,6 @@
 using DragonSpark.ComponentModel;
 using PostSharp.Patterns.Contracts;
 using System;
-using System.Windows.Markup;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Markup
@@ -33,21 +32,18 @@ namespace DragonSpark.Windows.Markup
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) => store.Get();
 	}*/
 
-	[ContentProperty( nameof(Properties) )]
-	public class LocateExtension : MarkupExtensionBase
+	// [ContentProperty( nameof(Properties) )]
+	public class ServiceExtension : MarkupExtensionBase
 	{
-		public LocateExtension() {}
+		public ServiceExtension() {}
 
-		public LocateExtension( Type type, string buildName = null )
+		public ServiceExtension( Type type )
 		{
 			Type = type;
-			BuildName = buildName;
 		}
 
 		[Required]
 		public Type Type { [return: NotNull]get; set; }
-
-		public string BuildName { get; set; }
 
 		[Service, Required]
 		public IServiceProvider Locator { [return: NotNull]get; set; }

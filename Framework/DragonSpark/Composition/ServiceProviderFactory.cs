@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
+using System.Reflection;
 using System.Windows.Input;
 using Type = System.Type;
 
@@ -69,16 +70,6 @@ namespace DragonSpark.Composition
 		public override void Execute( IServiceProvider parameter ) => Exports.Default.Assign( new ExportProvider( parameter.Get<CompositionContext>() ) );
 	}
 
-	/*[Export( typeof(ISetup) )]
-	public class InitializeLocationCommand : InitializeServiceProviderCommandBase
-	{
-		// public static ISetup Default { get; } = new InitializeLocationCommand();
-		public InitializeLocationCommand() : base( ServiceCoercer<ServiceLocator>.Default.Coerce )
-		{
-			Priority = Priority.High;
-		}
-	}*/
-
 	public sealed class ExportProvider : IExportProvider
 	{
 		readonly CompositionContext context;
@@ -92,13 +83,18 @@ namespace DragonSpark.Composition
 
 	public sealed class ServiceLocator : IServiceProvider
 	{
+		readonly CompositionContext host;
+
 		public ServiceLocator( CompositionContext host )
 		{
-			Host = host;
+			this.host = host;
 		}
 
-		public CompositionContext Host { get; }
-
-		public object GetService( Type serviceType ) => Host.TryGet<object>( serviceType );
+		public object GetService( Type serviceType )
+		{
+			var enumerable = serviceType.GetTypeInfo().IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+			var result = enumerable ? host.GetExports( serviceType.Adapt().GetEnumerableType() ) : host.TryGet<object>( serviceType );
+			return result;
+		}
 	}
 }

@@ -1,29 +1,27 @@
-using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition.Hosting.Core;
-using System.Linq;
 using CompositeActivator = System.Composition.Hosting.Core.CompositeActivator;
 
 namespace DragonSpark.Composition
 {
 	public sealed class SingletonExportDescriptorProvider : ExportDescriptorProvider
 	{
-		readonly ImmutableArray<SingletonExport> singletons;
-		readonly static Func<Type, SingletonExport> Selector = SingletonExports.Default.Get;
+		public static SingletonExportDescriptorProvider Default { get; } = new SingletonExportDescriptorProvider();
+		SingletonExportDescriptorProvider() : this( SingletonExportsSource.Default.Get ) {}
 
-		public SingletonExportDescriptorProvider( params Type[] types ) : this ( types.Select( Selector ).WhereAssigned().ToImmutableArray() ) {}
+		readonly Func<ImmutableArray<SingletonExport>> singletons;
 
-		public SingletonExportDescriptorProvider( ImmutableArray<SingletonExport> singletons )
+		public SingletonExportDescriptorProvider( Func<ImmutableArray<SingletonExport>> singletons )
 		{
 			this.singletons = singletons;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
-			foreach ( var singleton in singletons )
+			foreach ( var singleton in singletons() )
 			{
 				if ( singleton.Contracts.Contains( contract ) )
 				{

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace DragonSpark.Configuration
 {
-	public abstract class ConfigurableFactoryBase<T> : ConfigurableFactoryBase<T, T>/*, IConfigurableFactory<T>*/ where T : class
+	public abstract class ConfigurableFactoryBase<T> : ConfigurableFactoryBase<T, T>
 	{
 		protected ConfigurableFactoryBase( Func<T> seed ) : this( seed, Items<ITransformer<T>>.Default ) {}
 		protected ConfigurableFactoryBase( Func<T> seed, params ITransformer<T>[] configurations ) : this( seed, new ConfigurationScope<T>( configurations ), Delegates<T>.Self ) {}
@@ -15,7 +15,7 @@ namespace DragonSpark.Configuration
 		protected ConfigurableFactoryBase( IScope<T> seed, IConfigurationScope<T> scope, Func<T, T> factory ) : base( seed, scope, factory ) {}
 	}
 
-	public abstract class ConfigurableFactoryBase<TConfiguration, TResult> : SourceBase<TResult> where TConfiguration : class
+	public abstract class ConfigurableFactoryBase<TConfiguration, TResult> : SourceBase<TResult>
 	{
 		readonly Func<TConfiguration, TResult> factory;
 		

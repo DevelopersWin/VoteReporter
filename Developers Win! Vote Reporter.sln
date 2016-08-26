@@ -27,8 +27,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Types", "Framew
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Types.Windows", "Framework\DragonSpark.Types.Windows\DragonSpark.Types.Windows.csproj", "{82E56091-DD33-4F8D-A9D9-8948F3D6F820}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{ED0845D6-3B85-4AD6-A909-EF328B4A40CC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Testing.Framework", "Framework\DragonSpark.Testing.Framework\DragonSpark.Testing.Framework.csproj", "{96F63F2B-7D11-4D0F-A932-26C29F8E48BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Testing", "Framework\DragonSpark.Testing\DragonSpark.Testing.csproj", "{6AA926EF-572C-46A3-93F5-10363748F148}"
@@ -124,7 +122,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2341CB8E-96D5-42FD-AE8F-FFC4E4803071} = {ED0845D6-3B85-4AD6-A909-EF328B4A40CC}
 		{C28B714B-07F5-4193-92DF-3BEA93D938C9} = {A39BEAEC-8A6B-4F8C-905E-C030FEDA4E5D}
 		{304A81C9-3B30-448F-9AB6-EF7355311FFB} = {A39BEAEC-8A6B-4F8C-905E-C030FEDA4E5D}
 		{1F72AB3C-9F4B-4AD8-8A3F-9CEBC1C336C2} = {A39BEAEC-8A6B-4F8C-905E-C030FEDA4E5D}

@@ -40,16 +40,15 @@ namespace DragonSpark.Testing.Setup
 		public void SystemParts()
 		{
 			var system = DefaultServiceProvider.Default.Get<SystemParts>();
-			Assert.Empty( system.Assemblies );
-			Assert.Empty( system.Types );
+			Assert.Empty( system.Assemblies.AsEnumerable() );
+			Assert.Empty( system.Types.AsEnumerable() );
 
-			var types = new[] { typeof(ClassFactory), typeof(Class) };
-			new AssignSystemPartsCommand( types ).Run();
-
+			var types = new[] { typeof(ClassFactory), typeof(Class) }.AsApplicationParts();
+			
 			var after = DefaultServiceProvider.Default.Get<SystemParts>();
-			Assert.NotEmpty( after.Assemblies );
-			Assert.NotEmpty( after.Types );
-			Assert.Equal( types, after.Types.ToArray() );
+			Assert.NotEmpty( after.Assemblies.AsEnumerable() );
+			Assert.NotEmpty( after.Types.AsEnumerable() );
+			Assert.Equal( types.AsEnumerable(), after.Types.ToArray() );
 
 		}
 

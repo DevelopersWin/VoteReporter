@@ -35,7 +35,11 @@ namespace DragonSpark.Sources.Parameterized
 			return result;
 		}
 
-		bool IsAssignable( TypeInfo type ) => type.IsGenericType && adapters.IsAssignableFrom( type.GetGenericTypeDefinition() );
+		bool IsAssignable( TypeInfo type )
+		{
+			var assignable = type.IsGenericType && adapters.IsAssignableFrom( type.GetGenericTypeDefinition() );
+			return assignable;
+		}
 
 		protected abstract Type Select( IEnumerable<Type> genericTypeArguments );
 	}

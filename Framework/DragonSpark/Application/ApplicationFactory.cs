@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Windows.Input;
-using DragonSpark.Application.Setup;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Windows.Input;
 
 namespace DragonSpark.Application
 {
@@ -30,6 +29,6 @@ namespace DragonSpark.Application
 
 		public T Create( ITypeSource types, params ICommand[] commands ) => Create( types, commands.AsEnumerable() );
 		
-		public T Create( ITypeSource types, IEnumerable<ICommand> commands ) => (T)Get( commands.StartWith( new AssignSystemPartsCommand( types ) ).Append( new DisposeDisposableCommand( Disposables.Default.Get() ) ).Distinct().Prioritize().ToImmutableArray() );
+		public T Create( ITypeSource types, IEnumerable<ICommand> commands ) => (T)Get( commands.StartWith( ApplicationParts.Default.Configured( SystemPartsFactory.Default.Get( types ) ) ).Append( new DisposeDisposableCommand( Disposables.Default.Get() ) ).Distinct().Prioritize().ToImmutableArray() );
 	}
 }

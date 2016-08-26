@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Application;
-using DragonSpark.Application.Setup;
 using DragonSpark.Extensions;
 using System;
 using System.Reflection;
@@ -13,8 +12,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Create()
 		{
-			new AssignSystemPartsCommand( GetType() ).Run();
-
+			GetType().Yield().AsApplicationParts();
 			Assert.Equal( GetType().Assembly, ApplicationAssembly.Default.Get() );
 		}
 

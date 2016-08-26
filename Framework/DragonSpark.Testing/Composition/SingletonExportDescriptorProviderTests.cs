@@ -12,8 +12,8 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void Basic()
 		{
-			var types = new[] { typeof(Singleton) };
-			var container = new ContainerConfiguration().WithParts( types ).WithProvider( new SingletonExportDescriptorProvider( types ) ).CreateContainer();
+			var types = new[] { typeof(Singleton) }.AsApplicationParts();
+			var container = new ContainerConfiguration().WithParts( types.AsEnumerable() ).WithProvider( SingletonExportDescriptorProvider.Default ).CreateContainer();
 			var export = container.GetExport<Singleton>();
 			Assert.Same( Singleton.Default, export );
 		}
@@ -21,8 +21,8 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void Implementation()
 		{
-			var types = new[] { typeof(Implemented) };
-			var container = new ContainerConfiguration().WithParts( types ).WithProvider( new SingletonExportDescriptorProvider( types ) ).CreateContainer();
+			var types = new[] { typeof(Implemented) }.AsApplicationParts();
+			var container = new ContainerConfiguration().WithParts( types.AsEnumerable() ).WithProvider( SingletonExportDescriptorProvider.Default ).CreateContainer();
 			Assert.Same( Implemented.Default, container.GetExport<ISingleton>() );
 			Assert.Same( Implemented.Default, container.GetExport<Implemented>() );
 		}
@@ -30,8 +30,8 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void Many()
 		{
-			var types = new[] { typeof(Implemented), typeof(AnotherImplemented) };
-			var container = new ContainerConfiguration().WithParts( types ).WithProvider( new SingletonExportDescriptorProvider( types ) ).CreateContainer();
+			var types = new[] { typeof(Implemented), typeof(AnotherImplemented) }.AsApplicationParts();
+			var container = new ContainerConfiguration().WithParts( types.AsEnumerable() ).WithProvider( SingletonExportDescriptorProvider.Default ).CreateContainer();
 			var exports = container.GetExports<ISingleton>().Fixed();
 			Assert.Contains( Implemented.Default, exports );
 			Assert.Contains( AnotherImplemented.Default, exports );
@@ -40,8 +40,8 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void Source()
 		{
-			var types = new[] { typeof(Sourced) };
-			var container = new ContainerConfiguration().WithParts( types ).WithProvider( new SingletonExportDescriptorProvider( types ) ).CreateContainer();
+			var types = new[] { typeof(Sourced) }.AsApplicationParts();
+			var container = new ContainerConfiguration().WithParts( types.AsEnumerable() ).WithProvider( SingletonExportDescriptorProvider.Default ).CreateContainer();
 			Assert.Same( Sourced.Default.Get(), container.GetExport<ISingleton>() );
 		}
 

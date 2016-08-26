@@ -53,6 +53,7 @@
     <Compile Include="Entity\DefaultCommands.cs" />
     <Compile Include="Entity\RegisterComplexTypesCommand.cs" />
     <Compile Include="ExecutionContext.cs" />
+    <Compile Include="InitializationCommand.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="Io\FileExtensionSpecificationBase.cs" />
     <Compile Include="Io\IsAssemblyFileSpecification.cs" />
@@ -162,7 +163,7 @@
     <Compile Include="Markup\ClrMemberMarkupProperty.cs" />
     <Compile Include="Markup\DependencyPropertyMarkupProperty.cs" />
     <Compile Include="Markup\IMarkupProperty.cs" />
-    <Compile Include="Markup\LocateExtension.cs">
+    <Compile Include="Markup\ServiceExtension.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Markup\MetadataExtension.cs" />
