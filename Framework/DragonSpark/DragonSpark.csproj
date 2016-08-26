@@ -43,7 +43,12 @@
     <Compile Include="Composition\ExportedContainerConfigurator.cs" />
     <Compile Include="Composition\ExportedSingletonProperties.cs" />
     <Compile Include="Composition\ExportMapping.cs" />
+    <Compile Include="Composition\ExportProvider.cs" />
+    <Compile Include="Composition\InitializeExportsCommand.cs" />
     <Compile Include="Composition\IsExportSpecification.cs" />
+    <Compile Include="Composition\ServiceLocator.cs" />
+    <Compile Include="Composition\ServiceProviderConfigurations.cs" />
+    <Compile Include="Composition\ServiceProviderSource.cs" />
     <Compile Include="Composition\ServicesExportDescriptorProvider.cs" />
     <Compile Include="Composition\SingletonExport.cs" />
     <Compile Include="Composition\SingletonExports.cs" />
@@ -145,9 +150,7 @@
     <Compile Include="Runtime\InitializedDisposableAction.cs" />
     <Compile Include="Application\Application.cs" />
     <Compile Include="Application\ApplicationAssemblies.cs" />
-    <Compile Include="Application\ApplicationCommands.cs" />
     <Compile Include="Application\ApplicationCommandSource.cs" />
-    <Compile Include="Application\ApplicationFactory.cs" />
     <Compile Include="Application\ApplicationParts.cs" />
     <Compile Include="Application\ApplicationServices.cs" />
     <Compile Include="Application\ApplicationTypes.cs" />

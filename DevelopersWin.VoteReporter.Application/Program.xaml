@@ -5,5 +5,4 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:ds="http://framework.dragonspark.us"
 	mc:Ignorable="d" 
->
-</ds:ConsoleApplication>
+/>

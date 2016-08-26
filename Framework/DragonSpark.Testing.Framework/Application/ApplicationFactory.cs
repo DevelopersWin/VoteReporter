@@ -1,7 +1,6 @@
-using System.Reflection;
-using DragonSpark.Application;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Testing.Framework.Application.Setup;
+using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Application
 {
@@ -10,9 +9,8 @@ namespace DragonSpark.Testing.Framework.Application
 		public static ApplicationFactory Default { get; } = new ApplicationFactory();
 		ApplicationFactory() : base( DefaultCreate, Initialize ) {}
 
-		static void Initialize( MethodBase method ) => ApplicationInitializer.Default.Get().Execute( method );
+		static IApplication DefaultCreate( MethodBase _ ) => new Application( ApplicationCommandSource.Default.Get().ToArray() );
 
-		static IApplication DefaultCreate( MethodBase _ ) => 
-			ApplicationFactory<Application>.Default.Create( MethodTypes.Default, ApplicationCommandSource.Default );
+		static void Initialize( MethodBase method ) => ApplicationInitializer.Default.Get().Execute( method );
 	}
 }

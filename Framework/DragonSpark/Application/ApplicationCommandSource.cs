@@ -1,17 +1,34 @@
-﻿using System.Collections.Generic;
-using System.Windows.Input;
-using DragonSpark.Application.Setup;
+﻿using DragonSpark.Application.Setup;
 using DragonSpark.Commands;
-using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using DragonSpark.Sources;
+using DragonSpark.TypeSystem;
+using System;
+using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace DragonSpark.Application
 {
 	public class ApplicationCommandSource : CommandSource
 	{
-		public ApplicationCommandSource( params ICommandSource[] sources ) : base( sources ) {}
-		public ApplicationCommandSource( IEnumerable<ICommand> items ) : base( items ) {}
-		public ApplicationCommandSource( params ICommand[] items ) : base( items ) {}
+		readonly IEnumerable<Type> types;
+		public ApplicationCommandSource( IEnumerable<Type> types ) : this( types, Items<ICommandSource>.Default ) {}
+		public ApplicationCommandSource( IEnumerable<Type> types, params ICommandSource[] sources ) : base( sources )
+		{
+			this.types = types;
+		}
 
-		protected override IEnumerable<ICommand> Yield() => base.Yield().Append( new ApplySetup() );
+		protected override IEnumerable<ICommand> Yield()
+		{
+			yield return ApplicationParts.Default.Configured( SystemPartsFactory.Default.Get( types ) );
+			yield return new DisposeDisposableCommand( Disposables.Default.Get() );
+
+			foreach ( var command in base.Yield() )
+			{
+				yield return command;
+			}
+
+			yield return new ApplySetup();
+		}
 	}
 }
