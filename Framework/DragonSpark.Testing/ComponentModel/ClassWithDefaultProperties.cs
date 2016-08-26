@@ -56,7 +56,7 @@ namespace DragonSpark.Testing.ComponentModel
 		[Service]
 		public Class Activated { get; set; }
 
-		[Factory( typeof(Constructor) )]
+		[Source( typeof(Constructor) )]
 		public object Factory { get; set; }
 
 		[Collection]

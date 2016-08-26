@@ -604,7 +604,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ComponentModel\CurrentTimeAttribute.cs" />
-    <Compile Include="ComponentModel\FactoryAttribute.cs" />
     <Compile Include="ComponentModel\ITypeDefinitionProvider.cs" />
     <Compile Include="ComponentModel\NewGuidAttribute.cs" />
     <Compile Include="ConditionMonitor.cs">

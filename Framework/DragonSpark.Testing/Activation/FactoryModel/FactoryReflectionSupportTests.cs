@@ -32,10 +32,10 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 			Assert.IsType<YetAnotherClass>( ClassPropertyFromApplicationTypes );
 		}
 
-		[Factory( typeof(FactoryOfYac) )]
+		[Source( typeof(FactoryOfYac) )]
 		public IInterface ClassProperty { get; set; }
 
-		[Factory]
+		[Source]
 		public YetAnotherClass ClassPropertyFromApplicationTypes { get; set; }
 	}
 

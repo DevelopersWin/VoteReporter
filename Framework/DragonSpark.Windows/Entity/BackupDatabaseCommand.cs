@@ -2,6 +2,7 @@ using DragonSpark.Commands;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Windows.Io;
+using PostSharp.Patterns.Contracts;
 using System.IO;
 using System.Linq;
 
@@ -9,30 +10,34 @@ namespace DragonSpark.Windows.Entity
 {
 	public class BackupDatabaseCommand : CommandBase<object>
 	{
-		[Factory( typeof(AttachedDatabaseFileFactory) )]
-		public FileInfo Database { get; set; }
+		[Service, NotNull]
+		public FileInfo Database { [return: NotNull]get; set; }
 
 		[Default( 6 )]
 		public int? MaximumBackups { get; set; }
 
-		public override void Execute( object parameter ) => 
-			Database.With( file =>
-						   {
-							   var files = EntityFiles.WithLog( Database ).Where( info => !info.IsLocked() ).ToArray();
-							   files.Any().IsTrue( () =>
-												   {
-													   var destination = file.Directory.CreateSubdirectory( FileSystem.GetValidPath() );
-													   files.Each( info => info.CopyTo( Path.Combine( destination.FullName, info.Name ) ) );
-												   } );
+		public override void Execute( object parameter )
+		{
+			var files = EntityFiles.WithLog( Database ).Where( info => !info.IsLocked() ).ToArray();
+			var directory = Database.Directory;
+			if ( files.Any() )
+			{
+				var destination = directory.CreateSubdirectory( FileSystem.GetValidPath() );
+				foreach ( var file in files )
+				{
+					file.CopyTo( Path.Combine( destination.FullName, file.Name ) );
+				}
+			}
 
-							   MaximumBackups.With( i =>
-														file.Directory
-															.GetDirectories()
-															.Where( x => FileSystem.IsValidPath( x.Name ) )
-															.OrderByDescending( info => info.CreationTime )
-															.Skip( i )
-															.Each( info => info.Delete( true ) )
-								   );
-						   } );
+			if ( MaximumBackups.HasValue )
+			{
+				directory
+						.GetDirectories()
+						.Where( x => FileSystem.IsValidPath( x.Name ) )
+						.OrderByDescending( info => info.CreationTime )
+						.Skip( MaximumBackups.Value )
+						.Each( info => info.Delete( true ) );
+			}
+		}
 	}
 }
