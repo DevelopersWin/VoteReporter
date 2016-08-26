@@ -23,10 +23,13 @@ namespace DragonSpark.Windows.Entity
 				{
 					var fullName = item.Item1.FullName;
 					var directoryRoot = Path.GetDirectoryName( fullName );
-					Directory.CreateDirectory( directoryRoot );
-					using ( var stream = File.Create( fullName ) )
+					if ( directoryRoot != null )
 					{
-						stream.Write( item.Item2, 0, item.Item2.Length );
+						Directory.CreateDirectory( directoryRoot );
+						using ( var stream = File.Create( fullName ) )
+						{
+							stream.Write( item.Item2, 0, item.Item2.Length );
+						}
 					}
 				}
 			}
