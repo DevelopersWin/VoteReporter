@@ -1,4 +1,4 @@
 ﻿namespace DragonSpark.Application.Setup
 {
-	public class ApplySetup : ApplyExportedCommandsCommand<ISetup> {}
+	public class ApplySetup : ApplyExportCommands<ISetup> {}
 }

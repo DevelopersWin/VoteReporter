@@ -1,11 +1,23 @@
-﻿using System.Collections.Immutable;
-using DragonSpark.Extensions;
-using DragonSpark.Sources;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using System;
+using System.Collections.Immutable;
+using System.Reflection;
 
 namespace DragonSpark.Activation.Location
 {
-	public class SingletonSpecification : SpecificationBase<SingletonRequest>
+	public class SpecifiedSingletonHostSpecification : SingletonSpecification
+	{
+		readonly Type host;
+		public SpecifiedSingletonHostSpecification( Type host, params string[] candidates ) : base( candidates )
+		{
+			this.host = host;
+		}
+
+		public override bool IsSatisfiedBy( PropertyInfo parameter ) => parameter.DeclaringType == host && base.IsSatisfiedBy( parameter );
+	}
+
+	public class SingletonSpecification : SpecificationBase<PropertyInfo>
 	{
 		public static SingletonSpecification Default { get; } = new SingletonSpecification();
 		SingletonSpecification() : this( "Instance", "Default" ) {}
@@ -19,14 +31,11 @@ namespace DragonSpark.Activation.Location
 			this.candidates = candidates;
 		}
 
-		public override bool IsSatisfiedBy( SingletonRequest parameter )
+		public override bool IsSatisfiedBy( PropertyInfo parameter )
 		{
-			var result =
-				SourceTypeAssignableSpecification.Default.IsSatisfiedBy( new SourceTypeAssignableSpecification.Parameter( parameter.RequestedType, parameter.Candidate.PropertyType ) )
+			var result = parameter.GetMethod.IsStatic && !parameter.GetMethod.ContainsGenericParameters 
 				&& 
-				parameter.Candidate.GetMethod.IsStatic && !parameter.Candidate.GetMethod.ContainsGenericParameters 
-				&& 
-				( candidates.Contains( parameter.Candidate.Name ) || parameter.Candidate.Has<SingletonAttribute>() );
+				( candidates.Contains( parameter.Name ) || parameter.Has<SingletonAttribute>() );
 			return result;
 		}
 	}

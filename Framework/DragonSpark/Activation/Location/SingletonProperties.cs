@@ -1,15 +1,21 @@
-﻿using System;
-using System.Reflection;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Activation.Location
 {
+	public static class Defaults
+	{
+		public static ISpecification<SingletonRequest> SourcedSingleton { get; } = SingletonSpecification.Default.Project<SingletonRequest, PropertyInfo>( request => request.Candidate ).And( SourceTypeAssignableSpecification.Default.Project<SingletonRequest, SourceTypeAssignableSpecification.Parameter>( destination => new SourceTypeAssignableSpecification.Parameter( destination.RequestedType, destination.Candidate.PropertyType ) ) );
+	}
+
 	public class SingletonProperties : ParameterizedSourceBase<Type, PropertyInfo>
 	{
 		public static IParameterizedSource<Type, PropertyInfo> Default { get; } = new SingletonProperties().ToCache();
-		SingletonProperties() : this( SingletonSpecification.Default ) {}
+		SingletonProperties() : this( Defaults.SourcedSingleton ) {}
 
 		readonly ISpecification<SingletonRequest> specification;
 

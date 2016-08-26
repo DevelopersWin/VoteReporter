@@ -16,7 +16,7 @@ namespace DevelopersWin.VoteReporter.Application
 			}
 		}
 
-		public Program() : base( Application.Commands.Default.Get().ToArray() )
+		public Program() : base( Application.ApplicationCommands.Default.Get().ToArray() )
 		{
 			InitializeComponent();
 		}

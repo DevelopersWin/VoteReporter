@@ -1,8 +1,8 @@
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.TypeSystem
 {

@@ -1,4 +1,5 @@
 ﻿using DragonSpark;
+using DragonSpark.Application;
 using System;
 using System.Reflection;
 using System.Resources;
@@ -32,7 +33,7 @@ using System.Runtime.InteropServices;
 [assembly: XmlnsDefinition("http://framework.dragonspark.us", "DragonSpark.Logging.Configuration")]
 */
 
-[assembly: Priority( Priority.BeforeLowest/*, typeof( IServiceLocator ), typeof( IModule ), typeof( IExecutionContextSource ), typeof( DeclarativeCollection ), typeof( DeclarativeCollection<> ), typeof( ConstructCoercer<> ), Namespaces = "DragonSpark.Aspects" */)]
+[assembly: Registration( Priority.BeforeLowest/*, typeof( IServiceLocator ), typeof( IModule ), typeof( IExecutionContextSource ), typeof( DeclarativeCollection ), typeof( DeclarativeCollection<> ), typeof( ConstructCoercer<> ), Namespaces = "DragonSpark.Aspects" */)]
 // [assembly: AddAspect( AttributeTargetAssemblies = "regex:^mscorlib", AttributeTargetTypes = "System.Collections.Collection`1", AttributeTargetMembers = "Add" )]
 
 // [assembly: ApplyDefaultValues]

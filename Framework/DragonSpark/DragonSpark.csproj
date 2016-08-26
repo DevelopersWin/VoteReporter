@@ -154,7 +154,7 @@
     <Compile Include="Application\ApplicationParts.cs" />
     <Compile Include="Application\ApplicationServices.cs" />
     <Compile Include="Application\ApplicationTypes.cs" />
-    <Compile Include="Application\Setup\ApplyExportedCommandsCommand.cs" />
+    <Compile Include="Application\Setup\ApplyExportCommands.cs" />
     <Compile Include="Application\Setup\ApplySetup.cs" />
     <Compile Include="Commands\CommandSource.cs" />
     <Compile Include="Commands\DeclaredCommandBase.cs" />
@@ -587,7 +587,7 @@
     <Compile Include="Application\Setup\Setup.cs" />
     <Compile Include="Tasks\TaskMonitor.cs" />
     <Compile Include="Commands\DeclaredFixedCommand.cs" />
-    <Compile Include="Sources\Delegates\RegistrationAttribute.cs" />
+    <Compile Include="Application\RegistrationAttribute.cs" />
     <Compile Include="Application\ApplicationInformation.cs">
       <SubType>Code</SubType>
     </Compile>

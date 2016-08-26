@@ -1,12 +1,12 @@
+using DragonSpark.Application;
+using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Application;
-using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Windows.Runtime
 {

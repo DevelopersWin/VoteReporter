@@ -50,7 +50,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands.cs" />
+    <Compile Include="ApplicationCommands.cs" />
     <Compile Include="Program.xaml.cs">
       <DependentUpon>Program.xaml</DependentUpon>
     </Compile>
@@ -85,10 +85,6 @@
     <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DevelopersWin.VoteReporter.Configuration\DevelopersWin.VoteReporter.Parts.csproj" Condition=" '$(Configuration)' == 'Release' ">
-      <Project>{304a81c9-3b30-448f-9ab6-ef7355311ffb}</Project>
-      <Name>DevelopersWin.VoteReporter.Parts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DevelopersWin.VoteReporter\DevelopersWin.VoteReporter.csproj">
       <Project>{AE7C3390-95D0-4558-B992-F7EF3FAE89DA}</Project>
       <Name>DevelopersWin.VoteReporter</Name>
@@ -118,6 +114,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y /d  "$(ProjectDir)..\Parts\$(Configuration)\*.*" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

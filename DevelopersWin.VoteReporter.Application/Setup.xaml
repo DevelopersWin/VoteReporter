@@ -14,12 +14,13 @@
 		<markup:DirectoryInfo Path="Reports" />
 		<application:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
 	</setup:RegisterInstances>
-	
+
 	<entity:AssignDataDirectoryCommand />
+	<!--<entity:AssignDataDirectoryCommand />
 	<entity:InstallDatabaseCommand />
 	<entity:BackupDatabaseCommand />
 	<localEntity:InitializeDatabaseCommand>
 		<markup:Service Type="{markup:Enumerable {x:Type entity:IInstaller}}" />
 	</localEntity:InitializeDatabaseCommand>
-	<application:RunProgramCommand />
+	<application:RunProgramCommand />-->
 </setup:Setup>

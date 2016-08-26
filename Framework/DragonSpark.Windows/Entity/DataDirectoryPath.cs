@@ -3,7 +3,7 @@ using System.Composition;
 
 namespace DragonSpark.Windows.Entity
 {
-	[Export]
+	[Export, Shared]
 	public class DataDirectoryPath : AppDomainStore<string>
 	{
 		public const string Key = "DataDirectory";

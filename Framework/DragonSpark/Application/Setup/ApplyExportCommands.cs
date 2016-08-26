@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Application.Setup
 {
-	public class ApplyExportedCommandsCommand<T> : DisposingCommand<object> where T : class, ICommand
+	public class ApplyExportCommands<T> : DisposingCommand<object> where T : class, ICommand
 	{
 		[Required, Service]
 		public IExportProvider Exports { [return: Required]get; set; }
