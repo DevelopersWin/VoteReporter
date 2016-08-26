@@ -1,8 +1,6 @@
 ﻿{
   "dependencies": {
-    "Serilog.Enrichers.Environment": "2.1.0",
-    "Serilog.Enrichers.Process": "2.0.0",
-    "Serilog.Enrichers.Thread": "2.0.0"
+    
   },
   "frameworks": {
     "net461": {}

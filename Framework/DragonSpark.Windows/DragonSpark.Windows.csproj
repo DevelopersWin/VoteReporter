@@ -98,7 +98,6 @@
     <Compile Include="Setup\ConfigurationSectionFactory.cs" />
     <Compile Include="Runtime\Data\DataBuilder.cs" />
     <Compile Include="Runtime\Data\DataSerializer.cs" />
-    <Compile Include="Entity\ActivationSource.cs" />
     <Compile Include="Entity\AssignDataDirectoryCommand.cs" />
     <Compile Include="Entity\AttachedDatabaseFileFactory.cs" />
     <Compile Include="Entity\BackupDatabaseCommand.cs" />
@@ -106,7 +105,6 @@
     <Compile Include="Entity\DbMigrationsConfiguration.cs" />
     <Compile Include="Entity\EntityFiles.cs" />
     <Compile Include="Entity\EntityInstallationStep.cs" />
-    <Compile Include="Entity\IActivationSource.cs" />
     <Compile Include="Entity\InitializeDatabaseCommand.cs" />
     <Compile Include="Entity\DbContextExtensions.cs" />
     <Compile Include="Entity\DbSetExtensions.cs" />

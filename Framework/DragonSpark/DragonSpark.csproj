@@ -33,19 +33,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Composition\CanInstantiateSpecification.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ContainerConfigurator.cs" />
     <Compile Include="Composition\ContainerConfiguratorMappings.cs" />
     <Compile Include="Composition\ContainerServicesConfigurator.cs" />
     <Compile Include="Composition\ContainsExportedSingletonSpecification.cs" />
     <Compile Include="Composition\ConventionBuilderFactory.cs" />
+    <Compile Include="Composition\ConventionCandidateNames.cs" />
+    <Compile Include="Composition\ConventionImplementedInterfaces.cs" />
+    <Compile Include="Composition\ConventionMapping.cs" />
+    <Compile Include="Composition\ConventionMappings.cs" />
     <Compile Include="Composition\ConventionTransformer.cs" />
     <Compile Include="Composition\ExportedContainerConfigurator.cs" />
     <Compile Include="Composition\ExportedSingletonProperties.cs" />
     <Compile Include="Composition\ExportMapping.cs" />
     <Compile Include="Composition\ExportProvider.cs" />
     <Compile Include="Composition\InitializeExportsCommand.cs" />
+    <Compile Include="Composition\InstantiableTypeSpecification.cs" />
+    <Compile Include="Composition\IsConventionCandidateSpecification.cs" />
     <Compile Include="Composition\IsExportSpecification.cs" />
+    <Compile Include="Composition\SelfAndNestedTypes.cs" />
     <Compile Include="Composition\ServiceLocator.cs" />
     <Compile Include="Composition\ServiceProviderConfigurations.cs" />
     <Compile Include="Composition\ServiceProviderSource.cs" />

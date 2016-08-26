@@ -2,8 +2,8 @@ using AutoMapper;
 using AutoMapper.Configuration;
 using DragonSpark.Activation;
 using DragonSpark.Sources.Parameterized;
-using System;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Extensions
@@ -41,6 +41,7 @@ namespace DragonSpark.Extensions
 					.IgnoreUnassignable()
 					.CreateMap( parameter.SourceType, parameter.DestinationType )
 					.IgnoreAllPropertiesWithAnInaccessibleSetter()
+					.ForAllMembers( exp => exp.Condition( ( source, destination, destinationValue, sourceValue ) => sourceValue.IsAssignedOrValue() ) )
 					;
 				var result = new MapperConfiguration( expression ).CreateMapper();
 				return result;

@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Extensions;
+using System.Diagnostics;
 using System.Linq;
 
 namespace DevelopersWin.VoteReporter.Application
@@ -13,10 +14,11 @@ namespace DevelopersWin.VoteReporter.Application
 			using ( var program = new Program() )
 			{
 				program.Run( args );
+				Debugger.Break();
 			}
 		}
 
-		public Program() : base( Application.ApplicationCommands.Default.Get().ToArray() )
+		public Program() : base( ApplicationCommands.Default.Get().ToArray() )
 		{
 			InitializeComponent();
 		}

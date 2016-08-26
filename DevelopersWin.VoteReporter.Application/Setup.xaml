@@ -3,7 +3,6 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-	xmlns:localEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
 	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
 	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
@@ -16,7 +15,7 @@
 	</setup:RegisterInstances>
 
 	<entity:AssignDataDirectoryCommand />
-	<!--<entity:AssignDataDirectoryCommand />
+	<!--
 	<entity:InstallDatabaseCommand />
 	<entity:BackupDatabaseCommand />
 	<localEntity:InitializeDatabaseCommand>

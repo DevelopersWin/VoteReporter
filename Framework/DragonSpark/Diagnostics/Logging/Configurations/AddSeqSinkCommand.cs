@@ -1,8 +1,9 @@
-using System;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
+using System;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Diagnostics.Logging.Configurations
 {
@@ -10,7 +11,7 @@ namespace DragonSpark.Diagnostics.Logging.Configurations
 	{
 		public AddSeqSinkCommand() : this( LogEventLevel.Verbose, 1000, null, null, null, null ) {}
 
-		public AddSeqSinkCommand( LogEventLevel restrictedToMinimumLevel, int batchPostingLimit, TimeSpan? period, string apiKey, string bufferBaseFilename, long? bufferFileSizeLimitBytes ) : base( restrictedToMinimumLevel )
+		public AddSeqSinkCommand( LogEventLevel restrictedToMinimumLevel, int batchPostingLimit, TimeSpan? period, [Optional]string apiKey, [Optional]string bufferBaseFilename, long? bufferFileSizeLimitBytes ) : base( restrictedToMinimumLevel )
 		{
 			BatchPostingLimit = batchPostingLimit;
 			Period = period;

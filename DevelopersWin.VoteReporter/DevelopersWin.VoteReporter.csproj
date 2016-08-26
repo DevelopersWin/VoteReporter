@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DocumentProvider.cs" />
-    <Compile Include="Entity\DatabaseInitializer.cs" />
     <Compile Include="Entity\InitializeDatabaseCommand.cs" />
     <Compile Include="Entity\Configuration.cs" />
     <Compile Include="Entity\Vote.cs" />

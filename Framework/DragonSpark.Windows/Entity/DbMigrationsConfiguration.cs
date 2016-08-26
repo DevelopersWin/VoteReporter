@@ -1,15 +1,9 @@
-using DragonSpark.Activation.Location;
 using System.Data.Entity;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class DbMigrationsConfiguration<TContext> : System.Data.Entity.Migrations.DbMigrationsConfiguration<TContext> where TContext : DbContext
+	public class DbMigrationsConfiguration<T> : System.Data.Entity.Migrations.DbMigrationsConfiguration<T> where T : DbContext
 	{
-		public DbMigrationsConfiguration() : this( GlobalServiceProvider.GetService<ActivationSource>() ?? ActivationSource.Default.Get() ) {}
-
-		public DbMigrationsConfiguration( IActivationSource source )
-		{
-			source.Apply( this );
-		}
+		
 	}
 }
