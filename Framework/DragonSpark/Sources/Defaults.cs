@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.Application;
+using System;
 
 namespace DragonSpark.Sources
 {
@@ -7,6 +7,6 @@ namespace DragonSpark.Sources
 	{
 		public static string TimerTemplate { get; } = "Executing Delegate {@Method}.";
 		public static string ParameterizedTimerTemplate { get; } = "Executing Delegate {@Method} with parameter {Parameter}.";
-		public static Func<IExportProvider> DefaultSource { get; } = Exports.Default.Get;
+		public static Func<IExportProvider> Exports { get; } = Application.Exports.Default.Get;
 	}
 }

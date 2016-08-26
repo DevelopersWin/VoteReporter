@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using DragonSpark.Application;
 using DragonSpark.Extensions;
+using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Sources
 {
@@ -12,7 +12,7 @@ namespace DragonSpark.Sources
 		readonly Func<IExportProvider> source;
 		readonly string name;
 
-		public ExportSource( string name = null ) : this( Defaults.DefaultSource, name ) {}
+		public ExportSource( string name = null ) : this( Defaults.Exports, name ) {}
 
 		public ExportSource( Func<IExportProvider> source, string name = null )
 		{

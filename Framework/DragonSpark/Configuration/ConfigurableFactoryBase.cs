@@ -37,7 +37,7 @@ namespace DragonSpark.Configuration
 		{
 			var seed = Seed.Get();
 			var configurations = Configurators.Get();
-			var configured = configurations.Aggregate( seed, ( curent, transformer ) => transformer.Get( curent ) );
+			var configured = configurations.Aggregate( seed, ( current, transformer ) => transformer.Get( current ) );
 			var result = factory( configured );
 			return result;
 		}

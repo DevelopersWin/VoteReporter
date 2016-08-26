@@ -39,6 +39,7 @@
     <Compile Include="Composition\ContainsExportedSingletonSpecification.cs" />
     <Compile Include="Composition\ConventionBuilderFactory.cs" />
     <Compile Include="Composition\ConventionTransformer.cs" />
+    <Compile Include="Composition\ExportedContainerConfigurator.cs" />
     <Compile Include="Composition\ExportedSingletonProperties.cs" />
     <Compile Include="Composition\IsExportSpecification.cs" />
     <Compile Include="Composition\ServicesExportDescriptorProvider.cs" />

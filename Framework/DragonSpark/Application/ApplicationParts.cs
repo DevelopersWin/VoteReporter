@@ -17,5 +17,7 @@ namespace DragonSpark.Application
 
 		public static IScope<SystemParts> Default { get; } = new ApplicationParts();
 		ApplicationParts() : base( () => SystemParts.Default ) {}
+
+		public static bool IsAssigned => !Equals( Default.Get(), SystemParts.Default );
 	}
 }

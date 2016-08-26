@@ -35,12 +35,9 @@ namespace DragonSpark.Sources
 		public override T Get()
 		{
 			var context = scope.Get();
-			// lock ( context )
-			{
-				var factory = factories.Get( context ) ?? defaultFactory.Get();
-				var result = factory( context );
-				return result;
-			}
+			var factory = factories.Get( context ) ?? defaultFactory.Get();
+			var result = factory( context );
+			return result;
 		}
 
 		public void Assign( ISource item ) => scope.Assign( item );

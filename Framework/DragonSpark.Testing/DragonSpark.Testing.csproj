@@ -52,6 +52,7 @@
     <Compile Include="Activation\FactoryModel\FactoryReflectionSupportTests.cs" />
     <Compile Include="Activation\ExecutionContextTests.cs" />
     <Compile Include="Activation\RecordingLoggerConfigurationCommandTests.cs" />
+    <Compile Include="Application\DefaultExportProviderTests.cs" />
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="Aspects\Validation\IFactory.cs" />
     <Compile Include="ComponentModel\ClassWithDefaultProperties.cs" />
     <Compile Include="Composition\ConventionTests.cs" />
+    <Compile Include="Composition\ExportedContainerConfiguratorTests.cs" />
     <Compile Include="Composition\ParameterizedSourceDelegateExporterTests.cs" />
     <Compile Include="Composition\SingletonExportDescriptorProviderTests.cs" />
     <Compile Include="Composition\SourceDelegateExporterTests.cs" />
