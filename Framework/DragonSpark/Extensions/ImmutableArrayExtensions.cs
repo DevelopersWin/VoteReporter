@@ -10,6 +10,8 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Union<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Union( second );
 
+		public static IEnumerable<T> Except<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Except( second );
+
 		public static IEnumerable<T> Concat<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Concat( second );
 
 		public static IEnumerable<T> Concat<T>( this IEnumerable<ImmutableArray<T>> sources ) => sources.Select( array => array.ToArray() ).Concat();

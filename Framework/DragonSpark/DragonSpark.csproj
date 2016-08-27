@@ -33,9 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Activation\Location\Defaults.cs" />
+    <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
     <Compile Include="Composition\CanInstantiateSpecification.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
+    <Compile Include="Composition\ConstructorSelectorConfiguration.cs" />
     <Compile Include="Composition\ContainerConfigurator.cs" />
     <Compile Include="Composition\ContainerConfiguratorMappings.cs" />
     <Compile Include="Composition\ContainerServicesConfigurator.cs" />
@@ -45,11 +48,12 @@
     <Compile Include="Composition\ConventionImplementedInterfaces.cs" />
     <Compile Include="Composition\ConventionMapping.cs" />
     <Compile Include="Composition\ConventionMappings.cs" />
-    <Compile Include="Composition\ConventionTransformer.cs" />
+    <Compile Include="Composition\ConventionConfiguration.cs" />
     <Compile Include="Composition\ExportedContainerConfigurator.cs" />
     <Compile Include="Composition\ExportedSingletonProperties.cs" />
     <Compile Include="Composition\ExportMapping.cs" />
     <Compile Include="Composition\ExportProvider.cs" />
+    <Compile Include="Composition\ExportsProfileFactory.cs" />
     <Compile Include="Composition\InitializeExportsCommand.cs" />
     <Compile Include="Composition\InstantiableTypeSpecification.cs" />
     <Compile Include="Composition\IsConventionCandidateSpecification.cs" />

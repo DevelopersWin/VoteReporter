@@ -64,6 +64,7 @@
     <Compile Include="Aspects\Validation\GenericAutoValidationTests.cs" />
     <Compile Include="Aspects\Validation\IFactory.cs" />
     <Compile Include="ComponentModel\ClassWithDefaultProperties.cs" />
+    <Compile Include="Composition\ConstructorSelectorTests.cs" />
     <Compile Include="Composition\ConventionTests.cs" />
     <Compile Include="Composition\ExportedContainerConfiguratorTests.cs" />
     <Compile Include="Composition\ParameterizedSourceDelegateExporterTests.cs" />
