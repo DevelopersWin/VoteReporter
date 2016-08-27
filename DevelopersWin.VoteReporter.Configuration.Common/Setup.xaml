@@ -6,7 +6,7 @@
 	xmlns:entity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" 
-	Priority="Low"
+	Priority="BeforeNormal"
 >
 	<setup:RegisterInstances>
 		<entity:Configuration AutomaticMigrationsEnabled="True" />

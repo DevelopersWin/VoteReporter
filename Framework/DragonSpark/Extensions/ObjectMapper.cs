@@ -37,7 +37,7 @@ namespace DragonSpark.Extensions
 			public override IMapper Get( TypePair parameter )
 			{
 				var expression = new MapperConfigurationExpression();
-				expression.ForAllPropertyMaps( map => !map.DestinationPropertyType.Adapt().IsAssignableFrom( map.SourceMember.GetMemberType() ), ( map, _ ) => map.Ignored = true );
+				expression.ForAllPropertyMaps( map => map.SourceMember == null || !map.DestinationPropertyType.Adapt().IsAssignableFrom( map.SourceMember.GetMemberType() ), ( map, _ ) => map.Ignored = true );
 				expression.CreateMap( parameter.SourceType, parameter.DestinationType, MemberList.Destination );
 				expression.ForAllMaps( ( map, mappingExpression ) => mappingExpression.ForAllMembers( option => option.Condition( ( source, destination, sourceValue ) => sourceValue.IsAssignedOrValue() ) ) );
 				var result = new MapperConfiguration( expression ).CreateMapper();

@@ -27,6 +27,7 @@ namespace DragonSpark.Windows.Entity
 			using ( var context = new TContext() )
 			{
 				MessageLogger.Information( "Initializing Database." );
+				
 				context.Database.Initialize( true );
 
 				var items = Installers.OrderBy( x => x.Version ).Where( x => x.ContextType == typeof(TContext) && context.Installations.Find( x.Id, x.Version.ToString() ) == null ).ToArray();

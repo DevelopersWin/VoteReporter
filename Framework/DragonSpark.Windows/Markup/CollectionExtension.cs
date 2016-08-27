@@ -11,7 +11,7 @@ namespace DragonSpark.Windows.Markup
 	{
 		public DeclarativeCollection Items { get; } = new DeclarativeCollection();
 
-		protected virtual IList DetermineCollection( MarkupServiceProvider serviceProvider )
+		protected virtual IList DetermineList( MarkupServiceProvider serviceProvider )
 		{
 			var target = serviceProvider.TargetObject;
 			var result = serviceProvider.Property.GetValue() as IList ?? target as IList;
@@ -20,15 +20,15 @@ namespace DragonSpark.Windows.Markup
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
-			var result = DetermineCollection( serviceProvider ).With( o =>
+			var result = DetermineList( serviceProvider );
+			if ( result != null )
 			{
-				var type = o.GetType().Adapt().GetEnumerableType();
-				Items.Where( type.IsInstanceOfType ).Each( item =>
+				var type = result.GetType().Adapt().GetEnumerableType();
+				foreach ( var source in Items.Purge().Where( type.IsInstanceOfType ) )
 				{
-					o.Add( item );
-				} );
-				Items.Clear();
-			} );
+					result.Add( source );
+				}
+			}
 			return result;
 		}
 	}

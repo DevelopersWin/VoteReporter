@@ -1,7 +1,7 @@
-﻿using System.Collections.Immutable;
-using System.Composition;
-using DragonSpark.Application;
+﻿using DragonSpark.Application;
 using DragonSpark.Extensions;
+using System.Collections.Immutable;
+using System.Composition;
 
 namespace DragonSpark.Composition
 {

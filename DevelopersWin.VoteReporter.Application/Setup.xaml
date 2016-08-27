@@ -7,6 +7,7 @@
 	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
 	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
+	xmlns:applicationEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	mc:Ignorable="d"
 >
 	<setup:RegisterInstances>
@@ -17,9 +18,8 @@
 	<entity:AssignDataDirectoryCommand />
 	<entity:InstallDatabaseCommand />
 	<entity:BackupDatabaseCommand />
-	<!--
-	<localEntity:InitializeDatabaseCommand>
+	<applicationEntity:InitializeDatabaseCommand>
 		<markup:Service Type="{markup:Enumerable {x:Type entity:IInstaller}}" />
-	</localEntity:InitializeDatabaseCommand>
-	<application:RunProgramCommand />-->
+	</applicationEntity:InitializeDatabaseCommand>
+	<!--<application:RunProgramCommand />-->
 </setup:Setup>
