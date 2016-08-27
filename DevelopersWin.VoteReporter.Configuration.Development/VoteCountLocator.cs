@@ -1,10 +1,12 @@
 ﻿using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Extensions;
 using System;
+using System.Composition;
 using System.Linq;
 
 namespace DevelopersWin.VoteReporter.Parts.Development
 {
+	[Export( typeof(IVoteCountLocator) )]
 	class VoteCountLocator : IVoteCountLocator
 	{
 		public int Locate( Vote vote )

@@ -4,9 +4,10 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:ds="http://framework.dragonspark.us"
-	xmlns:application="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
+	xmlns:core="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
+	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
 	mc:Ignorable="d" >
-	<ds:Source Instance="{x:Static application:ApplicationCommands.Default}" />
-	<!--<application:RunProgramCommand />-->
-	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Quit." />
+	<ds:Source Instance="{x:Static core:ApplicationCommands.Default}" />
+	<application:RunProgramCommand />
+	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />
 </ds:ConsoleApplication>

@@ -17,7 +17,7 @@ namespace DragonSpark.Windows.Setup
 		[DefaultValue( "Press Enter to Continue..." )]
 		public string Message { get; set; }
 
-		[DefaultValue( "Closing..." )]
+		[DefaultValue( "Closing... Have a Nice Day. :)" )]
 		public string Closing { get; set; }
 
 		public override void Execute( object parameter )
