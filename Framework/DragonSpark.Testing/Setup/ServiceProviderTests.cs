@@ -24,7 +24,7 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void Factory()
 		{
-			var result = new InstanceRepository<Class>( new SourceCollection<Class>( new ClassFactory() ) ).Get<Class>();
+			var result = new InstanceRepository( new ClassFactory() ).Get<Class>();
 			Assert.IsType<ClassFactory.ClassFromFactory>( result );
 		}
 

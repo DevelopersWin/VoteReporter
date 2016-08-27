@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
+using JetBrains.Annotations;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Reflection;
@@ -25,16 +26,19 @@ namespace DragonSpark.Testing.Composition
 			var exported = container.GetExport<Exported>();
 			Assert.Equal( 3, exported.Selected.GetParameters().Length );
 
+			Assert.Throws<CompositionFailedException>( () => container.GetExport<Protected>() );
 		}
 
 		interface IPrimary {}
 		class Primary : IPrimary
 		{
+			[UsedImplicitly]
 			public Primary( Dependency dependency, AnotherDependency anotherDependency )
 			{
 				Selected = MethodBase.GetCurrentMethod();
 			}
 
+			[UsedImplicitly]
 			public Primary( Dependency dependency, AnotherDependency anotherDependency, NotKnown notKnown )
 			{
 				Selected = MethodBase.GetCurrentMethod();
@@ -46,17 +50,27 @@ namespace DragonSpark.Testing.Composition
 		[Export]
 		class Exported
 		{
+			[UsedImplicitly]
 			public Exported( Dependency dependency, AnotherDependency anotherDependency )
 			{
 				Selected = MethodBase.GetCurrentMethod();
 			}
 
+			[UsedImplicitly]
 			public Exported( Dependency dependency, AnotherDependency anotherDependency, IAnotherDependencyAgain again )
 			{
 				Selected = MethodBase.GetCurrentMethod();
 			}
 
 			public MethodBase Selected { get; }
+		}
+
+
+		[Export]
+		class Protected
+		{
+			[UsedImplicitly]
+			protected Protected( Dependency dependency, AnotherDependency anotherDependency ) {}
 		}
 
 		interface IDependency {}
@@ -66,11 +80,9 @@ namespace DragonSpark.Testing.Composition
 		class AnotherDependency : IAnotherDependency {}
 
 		interface IAnotherDependencyAgain {}
+		[UsedImplicitly]
 		class AnotherDependencyAgain : IAnotherDependencyAgain {}
 
-		class NotKnown
-		{
-			
-		}
+		class NotKnown {}
 	}
 }

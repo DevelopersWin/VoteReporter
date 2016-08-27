@@ -1,41 +1,38 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Runtime;
+using DragonSpark.Sources;
 using DragonSpark.Specifications;
-using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DragonSpark.Application.Setup
 {
-	public class InstanceRepository : InstanceRepository<object>, IServiceRepository
+	public class InstanceRepository : RepositoryBase<object>, IServiceRepository
 	{
-		public InstanceRepository() : this( Items<object>.Default ) {}
-		public InstanceRepository( params object[] instances ) : base( instances ) {}
-	}
+		public InstanceRepository( params object[] instances ) : this( instances.AsEnumerable() ) {}
+		public InstanceRepository( IEnumerable<object> items ) : base( items ) {}
+		public InstanceRepository( ICollection<object> source ) : base( source ) {}
 
-	public class InstanceRepository<T> : RepositoryBase<T>, IServiceRepository<T>
-	{
-		public InstanceRepository( params T[] instances ) : this( instances.AsEnumerable() ) {}
-		public InstanceRepository( IEnumerable<T> items ) : base( items ) {}
-		public InstanceRepository( ICollection<T> source ) : base( source ) {}
+		public virtual object GetService( Type serviceType ) => Get( serviceType, o => o.Value() );
 
-		public virtual object GetService( Type serviceType )
+		T Get<T>( Type serviceType, Func<object, T> projection )
 		{
 			var specification = TypeAssignableSpecification.Defaults.Get( serviceType );
-			foreach ( var item in Source )
+			foreach ( var item in Query() )
 			{
-				if ( specification.IsSatisfiedBy( item.GetType() ) )
+				var parameter = ( item as IServiceAware )?.ServiceType ?? item.GetType();
+				var isSatisfiedBy = specification.IsSatisfiedBy( parameter );
+				if ( isSatisfiedBy )
 				{
-					return item;
+					return projection( item );
 				}
 			}
-			return null;
+			return default(T);
 		}
 
-		public virtual void Add( InstanceRegistrationRequest request ) => Add( request.Instance.AsValid<T>() );
+		public virtual void Add( InstanceRegistrationRequest request ) => Add( request.Instance );
 
-		public bool IsSatisfiedBy( Type parameter ) => Source.Select( arg => arg.GetType() ).Any( TypeAssignableSpecification.Defaults.Get( parameter ).ToSpecificationDelegate() );
+		public bool IsSatisfiedBy( Type parameter ) => Get( parameter, o => true );
 		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
 	}
 }

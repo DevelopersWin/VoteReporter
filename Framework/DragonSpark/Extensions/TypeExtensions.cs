@@ -15,7 +15,8 @@ namespace DragonSpark.Extensions
 		public static Type GetMemberType(this MemberInfo memberInfo) => 
 			( memberInfo as MethodInfo )?.ReturnType ??
 			( memberInfo as PropertyInfo )?.PropertyType ?? 
-			( memberInfo as FieldInfo )?.FieldType;
+			( memberInfo as FieldInfo )?.FieldType ?? 
+			(memberInfo as TypeInfo)?.AsType();
 
 		public static IEnumerable<Assembly> Assemblies( this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct();
 

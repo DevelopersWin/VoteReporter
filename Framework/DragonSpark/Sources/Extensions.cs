@@ -12,6 +12,9 @@ namespace DragonSpark.Sources
 {
 	public static class Extensions
 	{
+		public static object Value( this object @this ) => @this.Value<object>();
+		public static T Value<T>( this object @this ) => SourceCoercer<T>.Default.Coerce( @this );
+
 		public static ICommand Configured<T>( this IAssignable<T> @this, T value ) => new AssignCommand<T>( @this ).Fixed( value );
 
 		public static void Assign<TParameter, TResult>( this IParameterizedScope<TParameter, TResult> @this, Func<TParameter, TResult> instance ) => @this.Assign( instance.Self );

@@ -5,7 +5,7 @@
 		new T Get();
 	}
 
-	public interface ISource
+	public interface ISource// : ISpecification<Type>
 	{
 		object Get();
 	}

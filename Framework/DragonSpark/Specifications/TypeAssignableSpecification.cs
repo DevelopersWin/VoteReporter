@@ -5,7 +5,7 @@ using System;
 
 namespace DragonSpark.Specifications
 {
-	public sealed class TypeAssignableSpecification<T>
+	public static class TypeAssignableSpecification<T>
 	{
 		public static ISpecification<Type> Default { get; } = TypeAssignableSpecification.Defaults.Get( typeof(T) );
 	}

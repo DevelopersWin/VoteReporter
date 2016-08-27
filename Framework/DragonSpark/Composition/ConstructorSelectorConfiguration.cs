@@ -1,67 +1,61 @@
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using System;
 using System.Collections.Generic;
-using System.Composition.Convention;
 using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ConstructorSelectorConfiguration : TransformerBase<ConventionBuilder>
+	public sealed class ConstructorSelector : ParameterizedSourceBase<IEnumerable<ConstructorInfo>, ConstructorInfo>
 	{
-		public static ConstructorSelectorConfiguration Default { get; } = new ConstructorSelectorConfiguration();
-		ConstructorSelectorConfiguration() : this( ExportsProfileFactory.Default.Get ) {}
+		readonly Func<ConstructorInfo, bool> specification;
 
-		readonly Func<ExportsProfile> profileSource;
+		public static IParameterizedSource<IEnumerable<ConstructorInfo>, ConstructorInfo> Default { get; } = new ParameterizedScope<IEnumerable<ConstructorInfo>, ConstructorInfo>( Factory.Global( () => new ConstructorSelector().ToSourceDelegate() ) );
+		ConstructorSelector() : this( IsValidConstructorSpecification.Default.Get() ) {}
 
-		public ConstructorSelectorConfiguration( Func<ExportsProfile> profileSource )
+		ConstructorSelector( Func<ConstructorInfo, bool> specification )
 		{
-			this.profileSource = profileSource;
+			this.specification = specification;
 		}
 
-		public override ConventionBuilder Get( ConventionBuilder parameter )
+		public override ConstructorInfo Get( IEnumerable<ConstructorInfo> parameter ) => parameter.OrderByDescending( info => info.GetParameters().Length ).FirstOrDefault( specification );
+	}
+
+	sealed class IsValidConstructorSpecification : SpecificationBase<ConstructorInfo>
+	{
+		readonly Func<Type, bool> validate;
+
+		public static ISource<Func<ConstructorInfo, bool>> Default { get; } = new Scope<Func<ConstructorInfo, bool>>( Factory.Global( () => new IsValidConstructorSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
+		IsValidConstructorSpecification() : this( IsValidTypeSpecification.Default.Get() ) {}
+
+		public IsValidConstructorSpecification( Func<Type, bool> validate )
 		{
-			var profile = profileSource();
-
-			var all = profile.Attributed.Union( profile.Conventions.Values );
-
-			parameter.ForTypesMatching( all.Contains ).SelectConstructor( new ConstructorSelector( profile ).Get );
-
-			return parameter;
+			this.validate = validate;
 		}
 
-		sealed class ConstructorSelector : ParameterizedSourceBase<IEnumerable<ConstructorInfo>, ConstructorInfo>
+		public override bool IsSatisfiedBy( ConstructorInfo parameter )
 		{
-			readonly Func<ConstructorInfo, bool> specification;
-
-			public ConstructorSelector( ExportsProfile profile ) : this( new Specification( profile.All.Contains ).IsSatisfiedBy ) {}
-
-			ConstructorSelector( Func<ConstructorInfo, bool> specification )
-			{
-				this.specification = specification;
-			}
-
-			public override ConstructorInfo Get( IEnumerable<ConstructorInfo> parameter ) => 
-				parameter.OrderByDescending( info => info.GetParameters().Length ).FirstOrDefault( specification );
+			var types = parameter.GetParameterTypes();
+			var result = !types.Any() || types.All( validate );
+			return result;
 		}
+	}
 
-		sealed class Specification : SpecificationBase<ConstructorInfo>
+	sealed class IsValidTypeSpecification : DelegatedSpecification<Type>
+	{
+		public static ISource<Func<Type, bool>> Default { get; } = new Scope<Func<Type, bool>>( Factory.Global( () => new IsValidTypeSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
+		IsValidTypeSpecification() : base( ExportsProfileFactory.Default.Get().All.Contains ) {}
+
+		public override bool IsSatisfiedBy( Type parameter )
 		{
-			readonly Func<Type, bool> parameterSpecification;
-
-			public Specification( Func<Type, bool> parameterSpecification )
-			{
-				this.parameterSpecification = parameterSpecification;
-			}
-
-			public override bool IsSatisfiedBy( ConstructorInfo parameter )
-			{
-				var types = parameter.GetParameterTypes();
-				var result = !types.Any() || types.All( parameterSpecification );
-				return result;
-			}
+			var contains = base.IsSatisfiedBy( parameter );
+			// var canActivate = Defaults.ActivateSpecification.IsSatisfiedBy( parameter );
+			// var constructor = ConstructorSelector.Default.Get().Invoke( InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).AsEnumerable() );
+			var result = contains /*|| canActivate*/;
+			return result;
 		}
 	}
 }

@@ -11,7 +11,6 @@ namespace DragonSpark.Sources.Parameterized
 		public static ISpecification<Type> KnownSourcesSpecification { get; } = IsSourceSpecification.Default.Or( IsParameterizedSourceSpecification.Default ).ToCachedSpecification();
 		
 		public static ISpecification<Type> ActivateSpecification { get; } = CanInstantiateSpecification.Default.Or( ContainsSingletonSpecification.Default ).ToCachedSpecification();
-
-		public static ISpecification<Type> ContainsExportSpecification { get; } = IsExportSpecification.Default.Project( Projections.MemberType ).Or( ContainsExportedSingletonSpecification.Default ).ToCachedSpecification();
+	
 	}
 }

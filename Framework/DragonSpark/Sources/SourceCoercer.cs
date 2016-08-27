@@ -1,18 +1,24 @@
-using System.Runtime.InteropServices;
 using DragonSpark.Extensions;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources
 {
-	public class SourceCoercer<T> : ICoercer<T>
+	public sealed class SourceCoercer<T> : ICoercer<T>
 	{
 		public static SourceCoercer<T> Default { get; } = new SourceCoercer<T>();
 		SourceCoercer() {}
 
 		public T Coerce( [Optional]object parameter )
 		{
-			var store = parameter as ISource<T>;
-			var result = store != null ? store.Get() : parameter.As<T>();
+			var source = parameter as ISource;
+			var value = source?.Get();
+
+			var result = value is T ? (T)value : parameter.As<T>();
 			return result;
+
+			/*var store = parameter as ISource<T>;
+			var result = store != null ? store.Get() : parameter.As<T>();
+			return result;*/
 		}
 	}
 }

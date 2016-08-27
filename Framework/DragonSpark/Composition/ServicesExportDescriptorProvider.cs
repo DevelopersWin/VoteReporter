@@ -1,5 +1,6 @@
 using DragonSpark.Activation.Location;
 using DragonSpark.Application.Setup;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Generic;
@@ -30,11 +31,11 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		sealed class Factory : FixedFactory<Type, object>
+		sealed class Factory : DelegatedSource<object>
 		{
 			readonly CompositeActivator activate;
 
-			public Factory( Func<Type, object> provider, Type contract ) : base( provider, contract )
+			public Factory( Func<Type, object> provider, Type contract ) : base( provider.Fixed( contract ).ToFixedDelegate() )
 			{
 				activate = Activate;
 			}

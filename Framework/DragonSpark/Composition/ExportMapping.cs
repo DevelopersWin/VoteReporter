@@ -10,7 +10,7 @@ namespace DragonSpark.Composition
 
 	public class ExportMapping
 	{
-		public ExportMapping() {}
+		public ExportMapping( Type subject ) : this( subject, subject ) {}
 
 		public ExportMapping( Type subject, Type exportAs )
 		{
