@@ -1,6 +1,8 @@
 using DragonSpark.Activation.Location;
+using DragonSpark.Application.Setup;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 
 namespace DragonSpark.Extensions
@@ -16,12 +18,12 @@ namespace DragonSpark.Extensions
 
 		// public static Func<Type, T> Delegate<T>( this ISource<IServiceProvider> @this ) => @this.ToDelegate().Delegate<T>();
 		public static Func<Type, T> Delegate<T>( this Func<IServiceProvider> @this ) => Delegates<T>.Default.Get( @this );
-		class Delegates<T> : Cache<Func<IServiceProvider>, Func<Type, T>>
+		sealed class Delegates<T> : Cache<Func<IServiceProvider>, Func<Type, T>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
 			Delegates() : base( source => new Factory( source ).Get ) {}
 
-			class Factory : ParameterizedSourceBase<Type, T>
+			sealed class Factory : ValidatedParameterizedSourceBase<Type, T>, IServiceSpecification
 			{
 				readonly Func<IServiceProvider> source;
 				public Factory( Func<IServiceProvider> source )
@@ -30,6 +32,14 @@ namespace DragonSpark.Extensions
 				}
 
 				public override T Get( Type parameter ) => source().Get<T>( parameter );
+
+				public override bool IsSatisfiedBy( Type parameter )
+				{
+					var provider = source();
+					var inner = provider as IServiceSpecification ?? provider as ISpecification<Type>;
+					var result = inner?.IsSatisfiedBy( parameter ) ?? false;
+					return result;
+				}
 			}
 		}
 	}

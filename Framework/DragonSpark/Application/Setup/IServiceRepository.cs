@@ -4,10 +4,12 @@ using System;
 
 namespace DragonSpark.Application.Setup
 {
-	public interface IServiceRepository : IServiceProvider, IRepository<object>, ISpecification<Type>
+	public interface IServiceRepository : IServiceProvider, IRepository<object>, IServiceSpecification
 	{
 		void Add( InstanceRegistrationRequest request );
 	}
+
+	public interface IServiceSpecification : ISpecification<Type> {}
 
 	public interface IServiceAware
 	{

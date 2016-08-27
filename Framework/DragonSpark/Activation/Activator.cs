@@ -1,8 +1,9 @@
-﻿using System;
-using DragonSpark.Activation.Location;
+﻿using DragonSpark.Activation.Location;
 using DragonSpark.Composition;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
+using System;
 
 namespace DragonSpark.Activation
 {
@@ -22,7 +23,7 @@ namespace DragonSpark.Activation
 
 			public Locator() : this( Types, SingletonLocator.Default ) {}
 
-			Locator( Func<Type, Type> convention, ISingletonLocator singleton )
+			Locator( Func<Type, Type> convention, ISingletonLocator singleton ) : base( DefaultSpecification.And( ContainsSingletonSpecification.Default.Project<LocateTypeRequest, Type>( destination => destination.RequestedType ) ) )
 			{
 				this.convention = convention;
 				this.singleton = singleton;

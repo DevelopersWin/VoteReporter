@@ -1,9 +1,11 @@
-﻿using DragonSpark.Composition;
+﻿using DragonSpark.Application.Setup;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using JetBrains.Annotations;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Reflection;
+using Serilog;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition
@@ -14,9 +16,10 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void Basic()
 		{
-			var parts = this.Adapt().WithNested().AsApplicationParts();
+			var parts = this.Adapt().WithNested().Append( typeof(Protected) ).AsApplicationParts();
 			var builder = ConventionBuilderFactory.Default.Get();
-			var container = new ContainerConfiguration().WithParts( parts.AsEnumerable(), builder ).CreateContainer();
+			var container = new ContainerConfiguration().WithParts( parts.AsEnumerable(), builder ).WithProvider( ServicesExportDescriptorProvider.Default ).CreateContainer();
+			new EnableServicesCommand().Fixed( true ).Run();
 			var dependency = container.GetExport<Dependency>();
 			Assert.NotNull( dependency );
 
@@ -25,6 +28,9 @@ namespace DragonSpark.Testing.Composition
 
 			var exported = container.GetExport<Exported>();
 			Assert.Equal( 3, exported.Selected.GetParameters().Length );
+
+			var external = container.GetExport<ExternalDependencyExport>();
+			Assert.Equal( 3, external.Selected.GetParameters().Length );
 
 			Assert.Throws<CompositionFailedException>( () => container.GetExport<Protected>() );
 		}
@@ -67,6 +73,24 @@ namespace DragonSpark.Testing.Composition
 
 
 		[Export]
+		class ExternalDependencyExport
+		{
+			[UsedImplicitly]
+			public ExternalDependencyExport( Dependency dependency, AnotherDependency anotherDependency )
+			{
+				Selected = MethodBase.GetCurrentMethod();
+			}
+
+			[UsedImplicitly]
+			public ExternalDependencyExport( Dependency dependency, AnotherDependency anotherDependency, ILogger logger )
+			{
+				Selected = MethodBase.GetCurrentMethod();
+			}
+
+			public MethodBase Selected { get; }
+		}
+
+		[Export]
 		class Protected
 		{
 			[UsedImplicitly]
@@ -83,6 +107,9 @@ namespace DragonSpark.Testing.Composition
 		[UsedImplicitly]
 		class AnotherDependencyAgain : IAnotherDependencyAgain {}
 
-		class NotKnown {}
+		class NotKnown
+		{
+			NotKnown() {}
+		}
 	}
 }

@@ -1,6 +1,7 @@
 using DragonSpark.Sources.Parameterized;
-using System.Linq;
 using DragonSpark.Specifications;
+using System;
+using System.Linq;
 
 namespace DragonSpark.Activation
 {
@@ -13,7 +14,9 @@ namespace DragonSpark.Activation
 			: base( specification, activators.Cast<IParameterizedSource>().Select( activator => activator.ToSourceDelegate() ).ToArray() ) {}
 
 		object IParameterizedSource<TypeRequest, object>.Get( TypeRequest parameter ) => Get( parameter );
+		object IParameterizedSource<Type, object>.Get( Type parameter ) => Get( parameter );
 
 		bool ISpecification<TypeRequest>.IsSatisfiedBy( TypeRequest parameter ) => IsSatisfiedBy( parameter );
+		bool ISpecification<Type>.IsSatisfiedBy( Type parameter ) => IsSatisfiedBy( parameter );
 	}
 }

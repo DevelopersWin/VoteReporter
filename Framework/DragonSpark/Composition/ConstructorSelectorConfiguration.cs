@@ -1,3 +1,4 @@
+using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
@@ -44,18 +45,25 @@ namespace DragonSpark.Composition
 		}
 	}
 
-	sealed class IsValidTypeSpecification : DelegatedSpecification<Type>
+	sealed class IsValidTypeSpecification : AnySpecification<Type>
 	{
 		public static ISource<Func<Type, bool>> Default { get; } = new Scope<Func<Type, bool>>( Factory.Global( () => new IsValidTypeSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
-		IsValidTypeSpecification() : base( ExportsProfileFactory.Default.Get().All.Contains ) {}
+		IsValidTypeSpecification() : base( new DelegatedSpecification<Type>( ExportsProfileFactory.Default.Get().All.Contains ), DefaultServiceProvider.Default ) {}
 
-		public override bool IsSatisfiedBy( Type parameter )
+		/*public override bool IsSatisfiedBy( Type parameter )
 		{
 			var contains = base.IsSatisfiedBy( parameter );
+			var provided = DefaultServiceProvider.Default.IsSatisfiedBy( parameter );
 			// var canActivate = Defaults.ActivateSpecification.IsSatisfiedBy( parameter );
 			// var constructor = ConstructorSelector.Default.Get().Invoke( InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).AsEnumerable() );
-			var result = contains /*|| canActivate*/;
+			var result = contains /*|| canActivate#1#;
 			return result;
-		}
+		}*/
+
+		/*public override bool IsSatisfiedBy( Type parameter = null )
+		{
+			var isSatisfiedBy = base.IsSatisfiedBy( parameter );
+			return isSatisfiedBy;
+		}*/
 	}
 }

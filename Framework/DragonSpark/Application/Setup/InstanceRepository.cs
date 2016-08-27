@@ -21,8 +21,7 @@ namespace DragonSpark.Application.Setup
 			foreach ( var item in Query() )
 			{
 				var parameter = ( item as IServiceAware )?.ServiceType ?? item.GetType();
-				var isSatisfiedBy = specification.IsSatisfiedBy( parameter );
-				if ( isSatisfiedBy )
+				if ( specification.IsSatisfiedBy( parameter ) )
 				{
 					return projection( item );
 				}
