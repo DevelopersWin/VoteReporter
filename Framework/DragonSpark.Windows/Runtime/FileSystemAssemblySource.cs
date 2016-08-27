@@ -12,12 +12,5 @@ namespace DragonSpark.Windows.Runtime
 		FileSystemAssemblySource() : this( AppDomain.CurrentDomain ) {}
 
 		public FileSystemAssemblySource( AppDomain domain ) : base( DomainAssemblySource.Default.Fixed( domain ).Get ) {}
-
-		//static IEnumerable<Assembly> Create( AppDomain domain ) => DomainApplicationAssemblies.Default.Get( domain );
-			/*AllClasses.FromAssembliesInBasePath( includeUnityAssemblies: true )
-					  .Where( x => x.Namespace != null )
-					  .GroupBy( t => t.Assembly )
-					  .Select( g => g.Key )
-					  .ToArray();*/
 	}
 }

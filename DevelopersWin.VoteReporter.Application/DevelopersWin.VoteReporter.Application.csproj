@@ -50,7 +50,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationCommands.cs" />
     <Compile Include="Program.xaml.cs">
       <DependentUpon>Program.xaml</DependentUpon>
     </Compile>
@@ -90,7 +89,7 @@
       <Name>DevelopersWin.VoteReporter.Parts.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\DevelopersWin.VoteReporter\DevelopersWin.VoteReporter.csproj">
-      <Project>{AE7C3390-95D0-4558-B992-F7EF3FAE89DA}</Project>
+      <Project>{ae7c3390-95d0-4558-b992-f7ef3fae89da}</Project>
       <Name>DevelopersWin.VoteReporter</Name>
     </ProjectReference>
     <ProjectReference Include="..\Framework\DragonSpark.Types.Windows\DragonSpark.Types.Windows.csproj">

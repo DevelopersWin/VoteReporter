@@ -1,6 +1,6 @@
-using System.Windows.Markup;
 using DragonSpark.Sources;
 using PostSharp.Patterns.Contracts;
+using System.Windows.Markup;
 
 namespace DragonSpark.Windows.Markup
 {
@@ -14,9 +14,13 @@ namespace DragonSpark.Windows.Markup
 			Instance = instance;
 		}
 
-		[Required]
-		public ISource Instance { [return: Required]get; set; }
+		[NotNull]
+		public ISource Instance { [return: NotNull]get; set; }
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Instance.Get();
+		protected override object GetValue( MarkupServiceProvider serviceProvider )
+		{
+			var value = Instance.Get();
+			return value;
+		}
 	}
 }

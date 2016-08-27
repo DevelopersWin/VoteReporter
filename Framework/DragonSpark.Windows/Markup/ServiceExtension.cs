@@ -42,10 +42,10 @@ namespace DragonSpark.Windows.Markup
 			Type = type;
 		}
 
-		[Required]
+		[NotNull]
 		public Type Type { [return: NotNull]get; set; }
 
-		[Service, Required]
+		[Service, NotNull]
 		public IServiceProvider Locator { [return: NotNull]get; set; }
 
 		// public Collection<PropertySetter> Properties { get; } = new Collection<PropertySetter>();

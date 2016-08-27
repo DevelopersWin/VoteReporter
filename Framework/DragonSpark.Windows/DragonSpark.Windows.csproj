@@ -79,6 +79,7 @@
     <Compile Include="Runtime\AllParts.cs" />
     <Compile Include="Runtime\ApplicationDomainProxyFactory.cs" />
     <Compile Include="Runtime\ApplicationTypesBase.cs" />
+    <Compile Include="Runtime\AssemblySource.cs" />
     <Compile Include="Runtime\Data\DataStreamFactory.cs" />
     <Compile Include="Runtime\Data\DataTransformer.cs" />
     <Compile Include="Runtime\Data\DataTransformerBase.cs" />

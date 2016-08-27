@@ -1,6 +1,4 @@
 ﻿using DragonSpark.Extensions;
-using System.Diagnostics;
-using System.Linq;
 
 namespace DevelopersWin.VoteReporter.Application
 {
@@ -11,15 +9,13 @@ namespace DevelopersWin.VoteReporter.Application
 	{
 		static void Main( string[] args )
 		{
-			typeof(IVoteCountLocator).GetType(); // TODO: remove.
 			using ( var program = new Program() )
 			{
 				program.Run( args );
-				Debugger.Break();
 			}
 		}
 
-		public Program() : base( ApplicationCommands.Default.Get().ToArray() )
+		public Program()
 		{
 			InitializeComponent();
 		}

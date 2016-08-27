@@ -1,14 +1,14 @@
+using DragonSpark.Application;
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem.Generics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Application;
-using DragonSpark.TypeSystem.Generics;
 
 namespace DragonSpark.TypeSystem
 {
@@ -62,31 +62,43 @@ namespace DragonSpark.TypeSystem
 
 		public IEnumerable<Type> GetHierarchy( bool includeRoot = true )
 		{
-			var builder = ImmutableArray.CreateBuilder<Type>();
-			builder.Add( Type );
+			yield return Type;
 			var current = Info.BaseType;
 			while ( current != null )
 			{
 				if ( current != typeof(object) || includeRoot )
 				{
-					builder.Add( current );
+					yield return current;
+					// builder.Add( current );
 				}
 				current = current.GetTypeInfo().BaseType;
 			}
+			/*var builder = ImmutableArray.CreateBuilder<Type>();
+			builder.Add( Type );
+			
 			var result = builder.ToArray();
-			return result;
+			return result;*/
 		}
 
-		public Type GetEnumerableType() => InnerType( Type, types => types.Only(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
+		[Freeze]
+		public Type GetEnumerableType() => InnerType( GetHierarchy(), types => types.Only(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
 
-		public Type GetInnerType() => InnerType( Type, types => types.Only() );
+		[Freeze]
+		public Type GetInnerType() => InnerType( GetHierarchy(), types => types.Only() );
 
-		static Type InnerType( Type target, Func<Type[], Type> fromGenerics, Func<TypeInfo, bool> check = null )
+		static Type InnerType( IEnumerable<Type> hierarchy, Func<Type[], Type> fromGenerics, Func<TypeInfo, bool> check = null )
 		{
-			var info = target.GetTypeInfo();
-			var result = info.IsGenericType && info.GenericTypeArguments.Any() && ( check?.Invoke( info ) ?? true ) ? fromGenerics( info.GenericTypeArguments ) :
-				target.IsArray ? target.GetElementType() : null;
-			return result;
+			foreach ( var type in hierarchy )
+			{
+				var info = type.GetTypeInfo();
+				var result = info.IsGenericType && info.GenericTypeArguments.Any() && ( check?.Invoke( info ) ?? true ) ? fromGenerics( info.GenericTypeArguments ) :
+					type.IsArray ? type.GetElementType() : null;
+				if ( result != null )
+				{
+					return result;
+				}
+			}
+			return null;
 		}
 
 		public Type[] GetTypeArgumentsFor( Type implementationType ) => getTypeArguments( implementationType );

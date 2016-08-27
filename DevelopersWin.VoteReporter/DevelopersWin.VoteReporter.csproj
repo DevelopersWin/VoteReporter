@@ -45,6 +45,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationCommands.cs" />
     <Compile Include="DocumentProvider.cs" />
     <Compile Include="Entity\InitializeDatabaseCommand.cs" />
     <Compile Include="Entity\Configuration.cs" />

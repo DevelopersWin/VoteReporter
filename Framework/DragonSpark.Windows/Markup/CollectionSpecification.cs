@@ -1,8 +1,8 @@
+using DragonSpark.Extensions;
+using DragonSpark.Specifications;
 using System;
 using System.Collections;
 using System.Windows.Markup;
-using DragonSpark.Extensions;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Windows.Markup
 {
