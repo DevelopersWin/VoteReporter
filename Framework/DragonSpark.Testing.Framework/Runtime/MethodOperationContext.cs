@@ -12,7 +12,7 @@ namespace DragonSpark.Testing.Framework.Runtime
 
 		readonly IDisposable disposable;
 
-		public MethodOperationContext( MethodBase method ) : this( TimedOperationFactory.Default.Get( method ) ?? new Disposable() ) {}
+		public MethodOperationContext( MethodBase method ) : this( TimedOperationFactory.Default.Get( method ) ?? new DisposableAction( () => {} ) ) {}
 
 		public MethodOperationContext( IDisposable disposable ) : base( Run )
 		{

@@ -2,10 +2,12 @@ using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Windows.Entity;
+using System.Composition;
 using System.Linq;
 
 namespace DevelopersWin.VoteReporter
 {
+	[Export]
 	public class RecordingFactory : SourceBase<Recording>
 	{
 		readonly VotingContext context;

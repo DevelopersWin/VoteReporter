@@ -13,24 +13,26 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public sealed class SourceTypes : EqualityReferenceCache<LocateTypeRequest, Type>
 	{
+		readonly static string[] Suffixes = { "Source", "Factory" };
+
 		public static ISource<SourceTypes> Default { get; } = new Scope<SourceTypes>( Sources.Factory.Global( () => new SourceTypes() ) );
 		SourceTypes() : base( new Factory().Get ) {}
 		
 		sealed class Factory : ParameterizedSourceBase<LocateTypeRequest, Type>
 		{
-			readonly ImmutableArray<SourceTypeRequest> types;
+			readonly ImmutableArray<SourceTypeRequest> requests;
 
-			public Factory() : this( Requests.DefaultNested.CreateMany( ApplicationParts.Default.Get().Types.AsEnumerable() ) ) {}
+			public Factory() : this( Requests.DefaultNested.CreateMany( ApplicationTypes.Default.Get().AsEnumerable() ) ) {}
 
-			Factory( ImmutableArray<SourceTypeRequest> types )
+			Factory( ImmutableArray<SourceTypeRequest> requests )
 			{
-				this.types = types;
+				this.requests = requests;
 			}
 
 			public override Type Get( LocateTypeRequest parameter )
 			{
-				var candidates = types.Introduce( parameter, tuple => tuple.Item1.Name == tuple.Item2.Name && tuple.Item2.RequestedType.Adapt().IsAssignableFrom( tuple.Item1.ResultType ) ).ToArray();
-				var conventions = $"{parameter.RequestedType.Name}Source".Append( $"{parameter.RequestedType.Name}Factory" ).ToArray();
+				var candidates = requests.Introduce( parameter, tuple => tuple.Item1.Name == tuple.Item2.Name && tuple.Item2.RequestedType.Adapt().IsAssignableFrom( tuple.Item1.ResultType ) ).ToArray();
+				var conventions = Suffixes.Introduce( parameter.RequestedType.Name, tuple => string.Concat( tuple.Item1, tuple.Item2 ) ).ToArray();
 				var item = 
 					candidates.Introduce( conventions, info => info.Item2.Contains( info.Item1.RequestedType.Name ) ).Only()
 					??
@@ -47,7 +49,7 @@ namespace DragonSpark.Sources.Parameterized
 				readonly static Func<Type, Type> Results = ResultTypes.Default.ToSourceDelegate();
 
 				public static Requests DefaultNested { get; } = new Requests();
-				Requests() : base( Defaults.ActivateSpecification.And( Defaults.KnownSourcesSpecification, ContainsExportSpecification.Default, new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
+				Requests() : base( Defaults.ProvidesInstanceSpecification.And( Defaults.KnownSourcesSpecification, ContainsExportSpecification.Default, new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
 
 				public override SourceTypeRequest Get( Type parameter ) => 
 					new SourceTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );

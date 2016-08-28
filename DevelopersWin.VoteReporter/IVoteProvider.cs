@@ -9,7 +9,7 @@ namespace DevelopersWin.VoteReporter
 		IEnumerable<Vote> Retrieve( Recording @set );
 	}
 
-		class VoteProvider : IVoteProvider
+	public sealed class VoteProvider : IVoteProvider
 	{
 		readonly VotingContext context;
 

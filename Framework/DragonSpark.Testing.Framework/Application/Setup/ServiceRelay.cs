@@ -1,15 +1,15 @@
-using System;
-using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using Ploeh.AutoFixture.Kernel;
+using System;
+using Defaults = DragonSpark.Activation.Location.Defaults;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {
-	public class ServiceRelay : ISpecimenBuilder
+	public sealed class ServiceRelay : ISpecimenBuilder
 	{
 		public static ServiceRelay Default { get; } = new ServiceRelay();
-		ServiceRelay() : this( GlobalServiceProvider.GetService<object> ) {}
+		ServiceRelay() : this( Defaults.ServiceSource ) {}
 
 		readonly Func<Type, object> provider;
 

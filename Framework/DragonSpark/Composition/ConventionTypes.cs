@@ -14,10 +14,10 @@ namespace DragonSpark.Composition
 	[ApplyAutoValidation]
 	public sealed class ConventionTypes : ValidatedParameterizedSourceBase<Type, Type>
 	{
-		readonly static ISpecification<Type> Specification = InstantiableTypeSpecification.Default.And( CanInstantiateSpecification.Default.Inverse() );
-		readonly static Func<Type, bool> Activate = Defaults.ActivateSpecification.IsSatisfiedBy;
+		readonly static ISpecification<Type> Specification = CanActivateSpecification.Default.Inverse();
+		readonly static Func<Type, bool> Activate = Defaults.ProvidesInstanceSpecification.IsSatisfiedBy;
 
-		public static IParameterizedSource<Type, Type> Default { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Global() );
+		public static IParameterizedSource<Type, Type> Default { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Fix().Global() );
 		ConventionTypes() : this( ApplicationTypes.Default ) {}
 
 		readonly ISource<ImmutableArray<Type>> source;

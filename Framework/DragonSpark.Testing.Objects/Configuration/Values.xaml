@@ -1,4 +1,4 @@
-﻿<configuration:ValueStore x:Class="DragonSpark.Testing.Objects.Configuration.Values"
+﻿<configuration:ValueStoreBase x:Class="DragonSpark.Testing.Objects.Configuration.Values"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -14,4 +14,4 @@
 		<system:String>Some Key</system:String>
 	</configuration:Registration>
 	<configuration:Registration Key="{ds:MemberInfoKey {x:Type local:TestItem}, 'SomeTestingProperty'}" Value="This is a value from a MemberInfoKey" />
-</configuration:ValueStore>
+</configuration:ValueStoreBase>

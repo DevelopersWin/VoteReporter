@@ -3,10 +3,10 @@ using System;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ConventionMappings : ParameterizedSourceBase<Type, ConventionMapping>
+	public sealed class ConventionMappingFactory : ParameterizedSourceBase<Type, ConventionMapping>
 	{
-		public static IParameterizedSource<Type, ConventionMapping> Default { get; } = new ConventionMappings().ToCache();
-		ConventionMappings() {}
+		public static IParameterizedSource<Type, ConventionMapping> Default { get; } = new ConventionMappingFactory().ToCache();
+		ConventionMappingFactory() {}
 
 		public override ConventionMapping Get( Type parameter )
 		{

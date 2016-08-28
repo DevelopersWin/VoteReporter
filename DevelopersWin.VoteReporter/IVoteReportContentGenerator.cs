@@ -10,7 +10,7 @@ namespace DevelopersWin.VoteReporter
 		string Generate( VoteReport report );
 	}
 
-	class VoteReportContentGenerator : IVoteReportContentGenerator
+	public sealed class VoteReportContentGenerator : IVoteReportContentGenerator
 	{
 		readonly Transformer transformer;
 		readonly ISerializer serializer;
@@ -18,7 +18,7 @@ namespace DevelopersWin.VoteReporter
 
 		public VoteReportContentGenerator( DataTransformer transformer, ISerializer serializer ) : this( transformer.Get, serializer, DocumentFactory.Default ) {}
 
-		protected VoteReportContentGenerator( Transformer transformer, ISerializer serializer, DocumentFactory factory )
+		VoteReportContentGenerator( Transformer transformer, ISerializer serializer, DocumentFactory factory )
 		{
 			this.transformer = transformer;
 			this.serializer = serializer;

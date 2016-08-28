@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Configuration
 	public class ValueStoreTests
 	{
 		[Theory, AutoData]
-		public void CheckEquality( ValueStore sut, object value, string secondKey, Guid id, int number )
+		void CheckEquality( ValueStore sut, object value, string secondKey, Guid id, int number )
 		{
 			Assert.Empty( sut );
 
@@ -30,5 +30,7 @@ namespace DragonSpark.Testing.Configuration
 			var third = sut.Get( "asdfasdf" );
 			Assert.Equal( number, third );
 		}
+
+		class ValueStore : ValueStoreBase {}
 	}
 }

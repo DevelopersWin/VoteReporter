@@ -17,7 +17,7 @@
 		public void Assign( object first, bool second ) => value.Enable( first, second );
 	}*/
 
-	public class Assignment<T> : Disposable
+	public class Assignment<T> : DisposableBase
 	{
 		readonly IAssign<T> assign;
 		readonly Value<T> first;

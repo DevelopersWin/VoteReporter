@@ -39,7 +39,7 @@ namespace DragonSpark.Testing.Framework
 		protected override void OnDispose() => complete();
 	}*/
 
-	public abstract class TestCollectionBase : Disposable
+	public abstract class TestCollectionBase : DisposableBase
 	{
 		protected TestCollectionBase( ITestOutputHelper output )
 		{

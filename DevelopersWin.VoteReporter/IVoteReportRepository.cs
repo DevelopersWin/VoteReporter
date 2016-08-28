@@ -5,7 +5,7 @@ namespace DevelopersWin.VoteReporter
 		void Save( VoteReport report );
 	}
 
-	class VoteReportRepository : IVoteReportRepository
+	public sealed class VoteReportRepository : IVoteReportRepository
 	{
 		readonly IStorage storage;
 

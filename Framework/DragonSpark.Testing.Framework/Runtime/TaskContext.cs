@@ -3,7 +3,7 @@ using DragonSpark.Runtime;
 
 namespace DragonSpark.Testing.Framework.Runtime
 {
-	public sealed class TaskContext : Disposable
+	public sealed class TaskContext : DisposableBase
 	{
 		readonly Action<Identifier> complete;
 

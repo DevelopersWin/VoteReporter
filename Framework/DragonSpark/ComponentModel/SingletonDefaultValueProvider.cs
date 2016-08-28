@@ -8,7 +8,9 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class SingletonDefaultValueProvider : IDefaultValueProvider
+	public abstract class DefaultValueProviderBase : ParameterizedSourceBase<DefaultValueParameter, object>, IDefaultValueProvider {}
+
+	public sealed class SingletonDefaultValueProvider : DefaultValueProviderBase
 	{
 		readonly static Func<Type, Type> Locator = ConventionTypes.Default.Get;
 
@@ -16,16 +18,16 @@ namespace DragonSpark.ComponentModel
 		readonly Type hostType;
 		readonly IParameterizedSource<Type, object> provider;
 		
-		public SingletonDefaultValueProvider( Type hostType, string propertyName ) : this( Locator, hostType, new SingletonLocator( new SingletonDelegates( new SingletonProperties( new SpecifiedSingletonHostSpecification( hostType, propertyName.ToItem() ).Project<SingletonRequest, PropertyInfo>( request => request.Candidate ) ) ).Get ) ) {}
+		public SingletonDefaultValueProvider( Type hostType, string propertyName ) : this( hostType, Locator, new Singletons( new SingletonDelegates( new SingletonProperties( new SpecifiedSingletonHostSpecification( hostType, propertyName.ToItem() ).Project<SingletonRequest, PropertyInfo>( request => request.Candidate ) ) ).Get ) ) {}
 
-		public SingletonDefaultValueProvider( Func<Type, Type> locator, Type hostType, IParameterizedSource<Type, object> provider )
+		SingletonDefaultValueProvider( Type hostType, Func<Type, Type> locator, IParameterizedSource<Type, object> provider )
 		{
 			this.locator = locator;
 			this.hostType = hostType;
 			this.provider = provider;
 		}
 
-		public object GetValue( DefaultValueParameter parameter )
+		public override object Get( DefaultValueParameter parameter )
 		{
 			var targetType = hostType ?? parameter.Metadata.PropertyType;
 			var type = locator( targetType ) ?? targetType;

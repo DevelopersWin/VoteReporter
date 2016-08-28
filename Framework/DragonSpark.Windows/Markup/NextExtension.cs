@@ -11,6 +11,8 @@ namespace DragonSpark.Windows.Markup
 	[MarkupExtensionReturnType( typeof(int) )]
 	public class NextExtension : MarkupExtension
 	{
+		readonly static Type[] Types = { typeof(DragonSpark.Runtime.DeclarativeCollection) };
+
 		[Service, Required]
 		public IIncrementer Incrementer { [return: Required]get; set; }
 		
@@ -23,9 +25,8 @@ namespace DragonSpark.Windows.Markup
 
 		protected virtual object DetermineContext( IServiceProvider serviceProvider )
 		{
-			var xamlSchemaContext = serviceProvider.Get<IXamlSchemaContextProvider>().SchemaContext;
-			var types = new[] { typeof(DragonSpark.Runtime.DeclarativeCollection) }; // TODO: More general/generic implementation.
-			var context = serviceProvider.Get<IAmbientProvider>().GetFirstAmbientValue( types.Select( xamlSchemaContext.GetXamlType ).ToArray() );
+			var types = Types.Select( serviceProvider.Get<IXamlSchemaContextProvider>().SchemaContext.GetXamlType ).ToArray();
+			var context = serviceProvider.Get<IAmbientProvider>().GetFirstAmbientValue( types );
 			return context;
 		}
 	}

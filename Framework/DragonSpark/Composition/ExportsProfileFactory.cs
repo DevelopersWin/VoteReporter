@@ -1,25 +1,33 @@
+using DragonSpark.Activation;
 using DragonSpark.Application;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Delegates;
 using DragonSpark.Sources.Parameterized;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using DragonSpark.TypeSystem;
+using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Composition
 {
 	public sealed class ExportsProfileFactory : SourceBase<ExportsProfile>
 	{
-		readonly static Func<Type, ConventionMapping> Selector = ConventionMappings.Default.Get;
+		readonly static Func<Type, ConventionMapping> Selector = ConventionMappingFactory.Default.Get;
 
 		public static ISource<ExportsProfile> Default { get; } = new Scope<ExportsProfile>( new ExportsProfileFactory().Global() );
-		ExportsProfileFactory() : this( ApplicationTypes.Default.ToDelegate(), ExportLocator.Default.ToSourceDelegate() ) {}
+		ExportsProfileFactory() : this( ApplicationTypes.Default.ToDelegate(), DefinedExportLocator.Default.ToSourceDelegate() ) {}
 
 		readonly Func<ImmutableArray<Type>> typesSource;
-		readonly Func<Type, ExportMapping> exportSource;
+		readonly Func<Type, ExportedItemDescriptor> exportSource;
 
-		ExportsProfileFactory( Func<ImmutableArray<Type>> typesSource, Func<Type, ExportMapping> exportSource )
+		ExportsProfileFactory( Func<ImmutableArray<Type>> typesSource, Func<Type, ExportedItemDescriptor> exportSource )
 		{
 			this.typesSource = typesSource;
 			this.exportSource = exportSource;
@@ -29,33 +37,180 @@ namespace DragonSpark.Composition
 		{
 			var types = typesSource();
 			
-			var attributed = types.Select( exportSource ).WhereAssigned().ToDictionary( mapping => mapping.Subject, mapping => mapping.ExportAs );
-			var allAttributed = attributed.Keys.Concat( attributed.Values ).Distinct().ToArray();
-			var conventions =
-				types.Except( allAttributed )
-					 .Select( Selector )
-					 .WhereAssigned()
-					 .Distinct( mapping => mapping.InterfaceType )
-					 .ToDictionary( mapping => mapping.InterfaceType, mapping => mapping.ImplementationType );
+			var defined = new ExportedDescriptors( types.Select( exportSource ).WhereAssigned() );
+			var definedTypes = defined.All().ToArray();
 
-			var combined = allAttributed.Concat( conventions.Keys ).Concat( conventions.Values ).ToArray();
-			var all = combined.Concat( combined.Select( ResultTypes.Default.Get ).WhereAssigned() ).Distinct().ToImmutableHashSet();
-			var result = new ExportsProfile( all, attributed, conventions );
+			var mappings = new ConventionMappings( types.Except( definedTypes )
+														.Select( Selector )
+														.WhereAssigned()
+														.Distinct( mapping => mapping.InterfaceType )
+						   );
+				
+
+			Debug.WriteLine( "Defined:" );
+			foreach ( var pair in defined )
+			{
+				Debug.WriteLine( $"[{pair.Subject}, {pair.ExportAs}]" );
+			}
+
+			Debug.WriteLine( "Conventions:" );
+			foreach ( var pair in mappings )
+			{
+				Debug.WriteLine( $"{pair.InterfaceType.GetTypeInfo().IsPublic}, {pair.ImplementationType.GetTypeInfo().IsPublic}: [{pair.InterfaceType}, {pair.ImplementationType}]" );
+			}
+
+			var all = definedTypes.Concat( mappings.All() ).SelectMany( ExportTypeExpander.Default.Get ).Distinct().ToImmutableHashSet();
+			var selector = new ConstructorSelector( new IsValidConstructorSpecification( new IsValidTypeSpecification( all ).IsSatisfiedBy ).IsSatisfiedBy );
+
+			var implementations = mappings.Values.Fixed();
+			var constructions = defined
+				.GetClasses()
+				.Union( implementations )
+				// .Where( ContainsMultipleCandidateConstructorsSpecification.Default.IsSatisfiedBy )
+				// .ToArray()
+				.Select( selector.Get )
+				.WhereAssigned()
+				.ToDictionary( info => info.DeclaringType );
+
+			var constructed = new ConstructedExports( constructions );
+
+			var conventions = new ConventionExports( mappings.Keys, implementations.Intersect( constructions.Keys ) );
+
+			var singletons = new SingletonExports( implementations.Except( constructions.Keys ).Union( defined.GetProperties() ).Select( SingletonExportFactory.Default.Get ).WhereAssigned().ToDictionary( export => export.Location.DeclaringType ) );
+
+			var result = new ExportsProfile( constructed, conventions, singletons );
 			return result;
 		}
 	}
 
-	public struct ExportsProfile 
+	public sealed class SingletonExports : ExportSourceBase<SingletonExport>, IEnumerable<SingletonExport>
 	{
-		public ExportsProfile( ImmutableHashSet<Type> all, Dictionary<Type, Type> attributed, Dictionary<Type, Type> conventions )
+		readonly IDictionary<Type, SingletonExport> dictionary;
+		public SingletonExports( IDictionary<Type, SingletonExport> dictionary ) : base( dictionary.Keys )
 		{
-			All = all;
-			Attributed = attributed;
-			Conventions = conventions;
+			this.dictionary = dictionary;
+		}
+		public override SingletonExport Get( Type parameter ) => dictionary[ parameter ];
+		public IEnumerator<SingletonExport> GetEnumerator() => dictionary.Values.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+	}
+
+	public sealed class ConventionExports : ExportSourceBase<bool>
+	{
+		readonly ImmutableArray<Type> interfaces;
+
+		public ConventionExports( IEnumerable<Type> interfaces, IEnumerable<Type> types ) : base( types )
+		{
+			this.interfaces = interfaces.ToImmutableArray();
 		}
 
-		public ImmutableHashSet<Type> All { get; }
-		public Dictionary<Type, Type> Attributed { get; }
-		public Dictionary<Type, Type> Conventions { get; }
+		public override bool IsSatisfiedBy( Type parameter )
+		{
+			var isSatisfiedBy = base.IsSatisfiedBy( parameter );
+			return isSatisfiedBy;
+		}
+
+		public override bool Get( Type parameter )
+		{
+			var contains = interfaces.Contains( parameter );
+			return contains;
+		}
+	}
+
+	public abstract class ExportSourceBase<T> : ValidatedParameterizedSourceBase<Type, T>
+	{
+		readonly ImmutableArray<Type> types;
+
+		protected ExportSourceBase( IEnumerable<Type> types )
+		{
+			this.types = types.ToImmutableArray();
+		}
+
+		public override bool IsSatisfiedBy( Type parameter ) => types.Contains( parameter );
+	}
+
+	// public sealed class ConstructorSelector : 
+
+	public sealed class ConstructedExports : ExportSourceBase<ConstructorInfo>
+	{
+		readonly IDictionary<Type, ConstructorInfo> constructors;
+		
+		public ConstructedExports( IDictionary<Type, ConstructorInfo> constructors ) : base( constructors.Keys )
+		{
+			this.constructors = constructors;
+		}
+
+		public ConstructorInfo Get( IEnumerable<ConstructorInfo> parameter ) => Get( parameter.Select( info => info.DeclaringType ).Distinct().Single() );
+		public override ConstructorInfo Get( Type parameter ) => constructors[ parameter ];
+	}
+
+	sealed class ExportTypeExpander : ParameterizedSourceBase<Type, IEnumerable<Type>>
+	{
+		public static ExportTypeExpander Default { get; } = new ExportTypeExpander();
+		ExportTypeExpander() {}
+
+		public override IEnumerable<Type> Get( Type parameter )
+		{
+			yield return parameter;
+			var provider = Activator.Default.Provider();
+			var sourceType = SourceTypeLocator.Default.Get( parameter );
+			if ( sourceType != null )
+			{
+				yield return ResultTypes.Default.Get( sourceType );
+				yield return ParameterizedSourceDelegates.Sources.Get( provider ).Get( sourceType )?.GetType() ?? SourceDelegates.Sources.Get( provider ).Get( sourceType )?.GetType();
+			}
+		}
+	}
+
+	public sealed class ConventionMappings : DescriptorCollectionBase<ConventionMapping>
+	{
+		public ConventionMappings( IEnumerable<ConventionMapping> items ) : base( items, mapping => mapping.ImplementationType ) {}
+
+		protected override Type GetKeyForItem( ConventionMapping item ) => item.InterfaceType;
+	}
+
+	public abstract class DescriptorCollectionBase<T> : KeyedCollection<Type, T>
+	{
+		readonly Func<T, Type> valueSource;
+
+		protected DescriptorCollectionBase( IEnumerable<T> items, Func<T, Type> valueSource )
+		{
+			this.valueSource = valueSource;
+			this.AddRange( items );
+		}
+
+		public IEnumerable<Type> Keys => Dictionary?.Keys ?? Items<Type>.Default;
+
+		public IEnumerable<Type> Values => Dictionary?.Values.Select( valueSource ) ?? Items<Type>.Default;
+
+		public IEnumerable<Type> All() => Keys.Concat( Values ).Distinct();
+	}
+
+	public sealed class ExportedDescriptors : DescriptorCollectionBase<ExportedItemDescriptor>
+	{
+		public ExportedDescriptors( IEnumerable<ExportedItemDescriptor> items ) : base( items, descriptor => descriptor.ExportAs ) {}
+
+		protected override Type GetKeyForItem( ExportedItemDescriptor item ) => item.Subject;
+
+		public IEnumerable<Type> GetClasses() => Get<TypeInfo>();
+
+		public IEnumerable<Type> GetProperties() => Get<PropertyInfo>();
+
+		IEnumerable<Type> Get<T>() where T : MemberInfo => from item in Items where item.Location is T select item.Subject;
+	}
+
+	public struct ExportsProfile 
+	{
+		public ExportsProfile( ConstructedExports constructed, ConventionExports convention, SingletonExports singletons )
+		{
+			Constructed = constructed;
+			Convention = convention;
+			Singletons = singletons;
+		}
+
+		public ConstructedExports Constructed { get; }
+		public ConventionExports Convention { get; }
+		public SingletonExports Singletons { get; }
 	}
 }

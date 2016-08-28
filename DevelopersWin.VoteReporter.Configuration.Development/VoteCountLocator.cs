@@ -7,7 +7,7 @@ using System.Linq;
 namespace DevelopersWin.VoteReporter.Parts.Development
 {
 	[Export( typeof(IVoteCountLocator) )]
-	class VoteCountLocator : IVoteCountLocator
+	public class VoteCountLocator : IVoteCountLocator
 	{
 		public int Locate( Vote vote )
 		{

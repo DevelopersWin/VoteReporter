@@ -30,7 +30,8 @@ namespace DragonSpark.Application
 
 			protected override IEnumerable<T> Yield()
 			{
-				foreach ( var export in SingletonExportsSource.Default.Get() )
+				var singletonExports = SingletonExportsSource.Default.Get();
+				foreach ( var export in singletonExports )
 				{
 					if ( export.Contracts.Select( contract => contract.ContractType ).Any( specification ) )
 					{

@@ -10,7 +10,7 @@ namespace DevelopersWin.VoteReporter
 		Uri Save( object item, string fileName = null );
 	}
 
-	class Storage : IStorage
+	public sealed class Storage : IStorage
 	{
 		readonly ISerializer serializer;
 		readonly DirectoryInfo directory;

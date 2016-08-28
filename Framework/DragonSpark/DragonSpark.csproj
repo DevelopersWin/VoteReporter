@@ -36,7 +36,10 @@
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
-    <Compile Include="Composition\CanInstantiateSpecification.cs" />
+    <Compile Include="AssemblyPriorityLocator.cs" />
+    <Compile Include="AssociatedPriority.cs" />
+    <Compile Include="Composition\CanActivateSpecification.cs" />
+    <Compile Include="Composition\CompositionHostExtensions.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ConstructorSelectorConfiguration.cs" />
     <Compile Include="Composition\ContainerConfigurator.cs" />
@@ -47,7 +50,7 @@
     <Compile Include="Composition\ConventionCandidateNames.cs" />
     <Compile Include="Composition\ConventionImplementedInterfaces.cs" />
     <Compile Include="Composition\ConventionMapping.cs" />
-    <Compile Include="Composition\ConventionMappings.cs" />
+    <Compile Include="Composition\ConventionMappingFactory.cs" />
     <Compile Include="Composition\ConventionConfiguration.cs" />
     <Compile Include="Composition\Defaults.cs" />
     <Compile Include="Composition\ExportedContainerConfigurator.cs" />
@@ -56,7 +59,6 @@
     <Compile Include="Composition\ExportProvider.cs" />
     <Compile Include="Composition\ExportsProfileFactory.cs" />
     <Compile Include="Composition\InitializeExportsCommand.cs" />
-    <Compile Include="Composition\InstantiableTypeSpecification.cs" />
     <Compile Include="Composition\IsConventionCandidateSpecification.cs" />
     <Compile Include="Composition\IsExportSpecification.cs" />
     <Compile Include="Composition\SelfAndNestedTypes.cs" />
@@ -65,10 +67,18 @@
     <Compile Include="Composition\ServiceProviderSource.cs" />
     <Compile Include="Composition\ServicesExportDescriptorProvider.cs" />
     <Compile Include="Composition\SingletonExport.cs" />
-    <Compile Include="Composition\SingletonExports.cs" />
+    <Compile Include="Composition\SingletonExportFactory.cs" />
     <Compile Include="Composition\SingletonExportsSource.cs" />
     <Compile Include="Composition\SourceDelegateContractResolver.cs" />
+    <Compile Include="Composition\TypeInitializingExportDescriptorProvider.cs" />
+    <Compile Include="DefaultPriorityAware.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactory.cs" />
+    <Compile Include="PrioritizedCollection.cs" />
+    <Compile Include="PriorityAwareCollection.cs" />
+    <Compile Include="PriorityAwareLocator.cs" />
+    <Compile Include="PriorityComparer.cs" />
+    <Compile Include="PriorityExtensions.cs" />
+    <Compile Include="Specifications\DelegatedAssignedSpecificationBase.cs" />
     <Compile Include="Tasks\FixedTaskSource.cs" />
     <Compile Include="Tasks\MonitorTaskCommand.cs" />
     <Compile Include="Application\Setup\RegisterInstances.cs" />
@@ -154,7 +164,7 @@
     <Compile Include="Runtime\Delegates.cs" />
     <Compile Include="Runtime\DelegateType.cs" />
     <Compile Include="Runtime\Assignments\DictionaryAssign.cs" />
-    <Compile Include="Runtime\Disposable.cs" />
+    <Compile Include="Runtime\DisposableBase.cs" />
     <Compile Include="Runtime\Disposables.cs" />
     <Compile Include="Commands\DisposingCommand.cs" />
     <Compile Include="Commands\FirstCommand.cs" />
@@ -170,7 +180,7 @@
     <Compile Include="Application\ApplicationTypes.cs" />
     <Compile Include="Application\Setup\ApplyExportCommands.cs" />
     <Compile Include="Application\Setup\ApplySetup.cs" />
-    <Compile Include="Commands\CommandSource.cs" />
+    <Compile Include="Commands\FixedCommandSource.cs" />
     <Compile Include="Commands\DeclaredCommandBase.cs" />
     <Compile Include="Application\Setup\CompositeServiceProvider.cs" />
     <Compile Include="Application\DefaultExportProvider.cs" />
@@ -199,7 +209,7 @@
     <Compile Include="Application\Setup\ServicesEnabled.cs" />
     <Compile Include="Application\SystemParts.cs" />
     <Compile Include="Application\SystemPartsFactory.cs" />
-    <Compile Include="Application\TypeSource.cs" />
+    <Compile Include="Application\FixedTypeSource.cs" />
     <Compile Include="Sources\ExportSource.cs" />
     <Compile Include="Sources\IItemSource.cs" />
     <Compile Include="Sources\ItemSource.cs" />
@@ -361,7 +371,7 @@
     <Compile Include="Activation\ConstructorDelegateFactory.cs" />
     <Compile Include="Activation\ConstructorStore.cs" />
     <Compile Include="Activation\ConstructTypeRequest.cs" />
-    <Compile Include="Activation\Location\ContainsSingletonSpecification.cs" />
+    <Compile Include="Activation\Location\ContainsSingletonPropertySpecification.cs" />
     <Compile Include="Activation\Location\DecoratedServiceProvider.cs" />
     <Compile Include="Activation\Location\DefaultServiceProvider.cs" />
     <Compile Include="Application\Execute.cs" />
@@ -383,7 +393,7 @@
     <Compile Include="Activation\Location\SingletonAttribute.cs" />
     <Compile Include="Activation\Location\SingletonDelegateCache.cs" />
     <Compile Include="Activation\Location\SingletonDelegates.cs" />
-    <Compile Include="Activation\Location\SingletonLocator.cs" />
+    <Compile Include="Activation\Location\Singletons.cs" />
     <Compile Include="Activation\Location\SingletonProperties.cs" />
     <Compile Include="Activation\Location\SingletonRequest.cs" />
     <Compile Include="Activation\Location\SingletonSpecification.cs" />
@@ -392,7 +402,7 @@
     <Compile Include="Activation\TypeRequest.cs" />
     <Compile Include="Aspects\AutoGuardAspect.cs" />
     <Compile Include="Aspects\Validation\AutoValidationRegistry.cs" />
-    <Compile Include="Composition\Convention.cs" />
+    <Compile Include="Composition\ConventionTypes.cs" />
     <Compile Include="Diagnostics\Exceptions\SetupExceptionHandling.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\AddSinkCommand.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\EnrichFromLogContextCommand.cs" />
@@ -432,7 +442,7 @@
     <Compile Include="Configuration\EnableMethodCaching.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\MinimumLevelConfiguration.cs" />
     <Compile Include="Configuration\Registration.cs" />
-    <Compile Include="Configuration\ValueStore.cs" />
+    <Compile Include="Configuration\ValueStoreBase.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
     <Compile Include="Diagnostics\Exceptions\Extensions.cs" />
     <Compile Include="Formatter.cs" />
@@ -597,7 +607,7 @@
     <Compile Include="Application\IProgram.cs" />
     <Compile Include="Application\Program.cs" />
     <Compile Include="Application\RunProgramCommand.cs" />
-    <Compile Include="Application\Setup\Setup.cs" />
+    <Compile Include="Application\Setup\DeclarativeSetup.cs" />
     <Compile Include="Tasks\TaskMonitor.cs" />
     <Compile Include="Commands\DeclaredFixedCommand.cs" />
     <Compile Include="Application\RegistrationAttribute.cs" />

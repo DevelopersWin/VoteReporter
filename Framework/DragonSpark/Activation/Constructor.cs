@@ -55,7 +55,11 @@ namespace DragonSpark.Activation
 				this.cache = cache;
 			}
 
-			public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => parameter.RequestedType.GetTypeInfo().IsValueType || cache.Get( parameter ) != null;
+			public override bool IsSatisfiedBy( ConstructTypeRequest parameter )
+			{
+				var isSatisfiedBy = parameter.RequestedType.GetTypeInfo().IsValueType || cache.Get( parameter ) != null;
+				return isSatisfiedBy;
+			}
 		}
 	}
 

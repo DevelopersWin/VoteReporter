@@ -5,7 +5,7 @@ using System.Globalization;
 namespace DevelopersWin.VoteReporter.Parts
 {
 	[Export( typeof(IVoteCountLocator) )]
-	class VoteCountLocator : IVoteCountLocator
+	public class VoteCountLocator : IVoteCountLocator
 	{
 		readonly DocumentProvider provider;
 

@@ -4,22 +4,22 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	public abstract class ActivatorBase<TRequest> : ValidatedParameterizedSourceBase<TRequest, object>, IActivator where TRequest : TypeRequest
+	public abstract class ActivatorBase<T> : ValidatedParameterizedSourceBase<T, object>, IActivator where T : TypeRequest
 	{
-		readonly protected static ISpecification<object> DefaultSpecification = IsInstanceOfSpecification<TRequest>.Default.Or( IsInstanceOfSpecification<Type>.Default );
+		protected new static ISpecification<object> DefaultSpecification { get; } = IsInstanceOfSpecification<T>.Default.Or( IsInstanceOfSpecification<Type>.Default );
 
-		readonly Coerce<TRequest> coercer;
+		readonly Coerce<T> coercer;
 
-		protected ActivatorBase( Coerce<TRequest> coercer ) : this( coercer, DefaultSpecification ) {}
+		protected ActivatorBase( Coerce<T> coercer ) : this( coercer, DefaultSpecification ) {}
 
-		protected ActivatorBase( Coerce<TRequest> coercer, ISpecification<TRequest> specification ) : base( coercer, specification )
+		protected ActivatorBase( Coerce<T> coercer, ISpecification<T> specification ) : base( coercer, specification )
 		{
 			this.coercer = coercer;
 		}
 
-		bool ISpecification<TypeRequest>.IsSatisfiedBy( TypeRequest parameter ) => base.IsSatisfiedBy( (TRequest)parameter );
+		bool ISpecification<TypeRequest>.IsSatisfiedBy( TypeRequest parameter ) => base.IsSatisfiedBy( (T)parameter );
 
-		object IParameterizedSource<TypeRequest, object>.Get( TypeRequest parameter ) => Get( (TRequest)parameter );
+		object IParameterizedSource<TypeRequest, object>.Get( TypeRequest parameter ) => Get( (T)parameter );
 
 		object IParameterizedSource<Type, object>.Get( Type parameter ) => Get( coercer.Invoke( parameter ) );
 

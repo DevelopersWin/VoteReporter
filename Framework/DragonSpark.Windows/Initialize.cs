@@ -14,7 +14,7 @@ namespace DragonSpark.Windows
 		[ModuleInitializer( 0 )]
 		public static void Execution() => Command.Default.Run();
 
-		sealed class Command : Application.Setup.Setup
+		sealed class Command : Application.Setup.DeclarativeSetup
 		{
 			public static ICommand Default { get; } = new Command();
 			Command() : base( 

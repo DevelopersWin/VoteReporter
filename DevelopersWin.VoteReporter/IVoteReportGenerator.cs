@@ -7,7 +7,7 @@ namespace DevelopersWin.VoteReporter
 		Uri Generate();
 	}
 
-	class VoteReportGenerator : IVoteReportGenerator
+	public sealed class VoteReportGenerator : IVoteReportGenerator
 	{
 		readonly IVoteReportContentGenerator generator;
 		readonly IStorage storage;
@@ -19,7 +19,6 @@ namespace DevelopersWin.VoteReporter
 			this.storage = storage;
 			this.factory = factory;
 		}
-
 
 		public Uri Generate()
 		{

@@ -1,35 +1,32 @@
 ﻿using DragonSpark.Activation.Location;
-using DragonSpark.Composition;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
 using System;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Activation
 {
 	public sealed class Activator : CompositeActivator
 	{
 		public static ISource<IActivator> Default { get; } = new Scope<IActivator>( Factory.Global( () => new Activator() ) );
-		Activator() : base( new Locator(), Constructor.Default ) {}
+		Activator() : base( new DelegatedActivator( Singletons.Default.ToSourceDelegate(), Singletons.Specification.Project<TypeRequest, Type>( request => request.RequestedType ) ), Constructor.Default ) {}
 
 		public static T Activate<T>( Type type ) => Default.Get().Get<T>( type );
+	}
 
-		sealed class Locator : LocatorBase
+	public class DelegatedActivator : ActivatorBase<TypeRequest>
+	{
+		readonly static Coerce<LocateTypeRequest> Coercer = LocatorBase.Coercer.Default.ToDelegate();
+
+		readonly Func<Type, object> provider;
+
+		public DelegatedActivator( Func<Type, object> provider ) : this( provider, DefaultSpecification ) {}
+
+		public DelegatedActivator( Func<Type, object> provider, ISpecification<TypeRequest> specification ) : base( Coercer, specification )
 		{
-			readonly static Func<Type, Type> Types = ConventionTypes.Default.Get;
-
-			readonly Func<Type, Type> convention;
-			readonly ISingletonLocator singleton;
-
-			public Locator() : this( Types, SingletonLocator.Default ) {}
-
-			Locator( Func<Type, Type> convention, ISingletonLocator singleton ) : base( DefaultSpecification.And( ContainsSingletonSpecification.Default.Project<LocateTypeRequest, Type>( destination => destination.RequestedType ) ) )
-			{
-				this.convention = convention;
-				this.singleton = singleton;
-			}
-
-			public override object Get( LocateTypeRequest parameter ) => singleton.Get( convention( parameter.RequestedType ) ?? parameter.RequestedType );
+			this.provider = provider;
 		}
+
+		public override object Get( TypeRequest parameter ) => provider( parameter.RequestedType );
 	}
 }

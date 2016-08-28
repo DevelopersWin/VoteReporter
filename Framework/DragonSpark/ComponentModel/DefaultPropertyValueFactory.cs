@@ -19,6 +19,6 @@ namespace DragonSpark.ComponentModel
 			this.factory = factory;
 		}
 
-		public override object Get( DefaultValueParameter parameter ) => factory( parameter.Metadata ).Introduce( parameter, tuple => tuple.Item1.GetValue( tuple.Item2 ) ).FirstAssigned() ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
+		public override object Get( DefaultValueParameter parameter ) => factory( parameter.Metadata ).Introduce( parameter, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned() ?? parameter.Metadata.From<DefaultValueAttribute, object>( attribute => attribute.Value );
 	}
 }

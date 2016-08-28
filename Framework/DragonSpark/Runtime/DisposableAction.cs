@@ -2,7 +2,7 @@ using System;
 
 namespace DragonSpark.Runtime
 {
-	public class DisposableAction : Disposable
+	public class DisposableAction : DisposableBase
 	{
 		readonly Action action;
 

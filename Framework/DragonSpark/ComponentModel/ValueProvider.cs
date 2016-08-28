@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class ValueProvider<TRequest> : IDefaultValueProvider
+	public class ValueProvider<TRequest> : DefaultValueProviderBase
 	{
 		readonly Func<PropertyInfo, TRequest> convert;
 		readonly Func<TRequest, object> create;
@@ -14,11 +14,6 @@ namespace DragonSpark.ComponentModel
 			this.create = create;
 		}
 
-		public object GetValue( DefaultValueParameter parameter )
-		{
-			var request = convert( parameter.Metadata );
-			var result = create( request );
-			return result;
-		}
+		public override object Get( DefaultValueParameter parameter ) => create( convert( parameter.Metadata ) );
 	}
 }

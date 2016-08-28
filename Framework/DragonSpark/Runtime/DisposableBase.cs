@@ -2,11 +2,11 @@
 
 namespace DragonSpark.Runtime
 {
-	public class Disposable : IDisposable
+	public abstract class DisposableBase : IDisposable
 	{
 		readonly ConditionMonitor monitor = new ConditionMonitor();
 
-		~Disposable()
+		~DisposableBase()
 		{
 			Dispose( false );
 		}

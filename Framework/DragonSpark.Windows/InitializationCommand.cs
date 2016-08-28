@@ -7,7 +7,7 @@ using System.Composition;
 namespace DragonSpark.Windows
 {
 	[Export( typeof(ISetup) )]
-	public class InitializationCommand : Application.Setup.Setup
+	public class InitializationCommand : DeclarativeSetup
 	{
 		public InitializationCommand() : base( Priority.BeforeNormal,
 			DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured( TypeDefinitionProviderSource.Default.ToFixedDelegate() ),

@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class AssemblyBasedTypeSource : TypeSource
+	public class AssemblyBasedTypeSource : FixedTypeSource
 	{
 		readonly static Func<Assembly, IEnumerable<Type>> All = AssemblyTypes.All.ToDelegate();
 

@@ -18,6 +18,13 @@ namespace DragonSpark.Extensions
 		/// <exception cref="System.ArgumentNullException">An <see cref="System.ArgumentNullException"/> is thrown if <paramref name="collection"/> or <paramref name="items"/> is <see langword="null"/>.</exception>
 		public static ICollection<T> AddRange<T>( this ICollection<T> collection, IEnumerable<T> items)
 		{
+			var list = collection as List<T>;
+			if ( list != null )
+			{
+				list.AddRange( items );
+				return list;
+			}
+
 			foreach (var each in items)
 			{
 				collection.Add(each);

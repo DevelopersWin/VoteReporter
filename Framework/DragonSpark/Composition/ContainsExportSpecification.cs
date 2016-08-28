@@ -1,3 +1,4 @@
+using DragonSpark.Extensions;
 using DragonSpark.Specifications;
 using System;
 
@@ -8,6 +9,6 @@ namespace DragonSpark.Composition
 		public static ISpecification<Type> Default { get; } = new ContainsExportSpecification().ToCachedSpecification();
 		ContainsExportSpecification() {}
 
-		public override bool IsSatisfiedBy( Type parameter ) => ExportLocator.Default.Get( parameter ) != null;
+		public override bool IsSatisfiedBy( Type parameter ) => DefinedExportLocator.Default.Get( parameter ).IsAssigned();
 	}
 }

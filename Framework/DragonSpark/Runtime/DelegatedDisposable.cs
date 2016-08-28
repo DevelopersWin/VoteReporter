@@ -2,7 +2,7 @@
 
 namespace DragonSpark.Runtime
 {
-	public class DelegatedDisposable : Disposable
+	public class DelegatedDisposable : DisposableBase
 	{
 		readonly Action action;
 		public DelegatedDisposable( Action action )

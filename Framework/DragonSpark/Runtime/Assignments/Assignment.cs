@@ -1,6 +1,6 @@
 ﻿namespace DragonSpark.Runtime.Assignments
 {
-	public class Assignment<T1, T2> : Disposable
+	public class Assignment<T1, T2> : DisposableBase
 	{
 		readonly IAssign<T1, T2> assign;
 		readonly Value<T1> first;

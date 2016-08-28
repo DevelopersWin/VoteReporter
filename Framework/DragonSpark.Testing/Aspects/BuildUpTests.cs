@@ -30,13 +30,12 @@ namespace DragonSpark.Testing.Aspects
 			public void Call() => Value = SkipFirstCallProvider.Default.Item;
 		}
 
-		public class SkipFirstCallValue : DefaultValueBase
+		public sealed class SkipFirstCallValue : DefaultValueBase
 		{
-			public SkipFirstCallValue() : base( t => SkipFirstCallProvider.Default )
-			{}
+			public SkipFirstCallValue() : base( t => SkipFirstCallProvider.Default ) {}
 		}
 
-		public class SkipFirstCallProvider : IDefaultValueProvider
+		public sealed class SkipFirstCallProvider : DefaultValueProviderBase
 		{
 			public static SkipFirstCallProvider Default { get; } = new SkipFirstCallProvider();
 
@@ -44,7 +43,7 @@ namespace DragonSpark.Testing.Aspects
 
 			readonly ConditionMonitor monitor = new ConditionMonitor();
 
-			public object GetValue( DefaultValueParameter parameter ) => monitor.Apply() ? null : Item;
+			public override object Get( DefaultValueParameter parameter ) => monitor.Apply() ? null : Item;
 		}
 	}
 }

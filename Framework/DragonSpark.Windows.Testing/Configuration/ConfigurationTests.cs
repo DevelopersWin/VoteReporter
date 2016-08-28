@@ -1,4 +1,5 @@
-﻿using DragonSpark.Testing.Framework;
+﻿using DragonSpark.ComponentModel;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Testing.Objects.Properties;
 using Ploeh.AutoFixture.Xunit2;
@@ -6,7 +7,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Configuration
 {
-	[Trait( Traits.Category, Traits.Categories.Xaml ), FrameworkTypes]
+	[Trait( Traits.Category, Traits.Categories.Xaml ), FrameworkTypes, AdditionalTypes( typeof(ExpressionEvaluator) )]
 	public class ConfigurationTests
 	{
 		[Theory, DragonSpark.Testing.Framework.Application.AutoData]

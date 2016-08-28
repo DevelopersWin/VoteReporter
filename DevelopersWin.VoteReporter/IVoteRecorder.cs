@@ -8,7 +8,7 @@ namespace DevelopersWin.VoteReporter
 		Recording Record();
 	}
 
-	class VoteRecorder : IVoteRecorder
+	public sealed class VoteRecorder : IVoteRecorder
 	{
 		readonly VotingContext context;
 		readonly RecordingFactory factory;

@@ -1,8 +1,8 @@
 using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,27 +10,28 @@ using System.Reflection;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ConstructorSelector : ParameterizedSourceBase<IEnumerable<ConstructorInfo>, ConstructorInfo>
+	public sealed class ConstructorSelector : ParameterizedSourceBase<Type, ConstructorInfo>
 	{
 		readonly Func<ConstructorInfo, bool> specification;
 
-		public static IParameterizedSource<IEnumerable<ConstructorInfo>, ConstructorInfo> Default { get; } = new ParameterizedScope<IEnumerable<ConstructorInfo>, ConstructorInfo>( Factory.Global( () => new ConstructorSelector().ToSourceDelegate() ) );
-		ConstructorSelector() : this( IsValidConstructorSpecification.Default.Get() ) {}
+		/*public static IParameterizedSource<IEnumerable<ConstructorInfo>, ConstructorInfo> Default { get; } = new ParameterizedScope<IEnumerable<ConstructorInfo>, ConstructorInfo>( Factory.Global( () => new ConstructorSelector().ToSourceDelegate() ) );
+		ConstructorSelector() : this( IsValidConstructorSpecification.Default.Get() ) {}*/
 
-		ConstructorSelector( Func<ConstructorInfo, bool> specification )
+		public ConstructorSelector( Func<ConstructorInfo, bool> specification )
 		{
 			this.specification = specification;
 		}
 
-		public override ConstructorInfo Get( IEnumerable<ConstructorInfo> parameter ) => parameter.OrderByDescending( info => info.GetParameters().Length ).FirstOrDefault( specification );
+		public override ConstructorInfo Get( Type parameter ) => 
+			InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).AsEnumerable().OrderByDescending( info => info.GetParameters().Length ).FirstOrDefault( specification );
 	}
 
 	sealed class IsValidConstructorSpecification : SpecificationBase<ConstructorInfo>
 	{
 		readonly Func<Type, bool> validate;
 
-		public static ISource<Func<ConstructorInfo, bool>> Default { get; } = new Scope<Func<ConstructorInfo, bool>>( Factory.Global( () => new IsValidConstructorSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
-		IsValidConstructorSpecification() : this( IsValidTypeSpecification.Default.Get() ) {}
+		/*public static ISource<Func<ConstructorInfo, bool>> Default { get; } = new Scope<Func<ConstructorInfo, bool>>( Factory.Global( () => new IsValidConstructorSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
+		IsValidConstructorSpecification() : this( IsValidTypeSpecification.Default.Get() ) {}*/
 
 		public IsValidConstructorSpecification( Func<Type, bool> validate )
 		{
@@ -47,23 +48,13 @@ namespace DragonSpark.Composition
 
 	sealed class IsValidTypeSpecification : AnySpecification<Type>
 	{
-		public static ISource<Func<Type, bool>> Default { get; } = new Scope<Func<Type, bool>>( Factory.Global( () => new IsValidTypeSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
-		IsValidTypeSpecification() : base( new DelegatedSpecification<Type>( ExportsProfileFactory.Default.Get().All.Contains ), DefaultServiceProvider.Default ) {}
-
-		/*public override bool IsSatisfiedBy( Type parameter )
-		{
-			var contains = base.IsSatisfiedBy( parameter );
-			var provided = DefaultServiceProvider.Default.IsSatisfiedBy( parameter );
-			// var canActivate = Defaults.ActivateSpecification.IsSatisfiedBy( parameter );
-			// var constructor = ConstructorSelector.Default.Get().Invoke( InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).AsEnumerable() );
-			var result = contains /*|| canActivate#1#;
-			return result;
-		}*/
+		// public static ISource<Func<Type, bool>> Default { get; } = new Scope<Func<Type, bool>>( Factory.Global( () => new IsValidTypeSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
+		public IsValidTypeSpecification( ICollection<Type> types ) : base( new DelegatedSpecification<Type>( types.Contains ), DefaultServiceProvider.Default ) {}
 
 		/*public override bool IsSatisfiedBy( Type parameter = null )
 		{
-			var isSatisfiedBy = base.IsSatisfiedBy( parameter );
-			return isSatisfiedBy;
+			var result = base.IsSatisfiedBy( parameter );
+			return result;
 		}*/
 	}
 }

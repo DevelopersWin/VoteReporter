@@ -1,6 +1,7 @@
-﻿using DragonSpark.Sources;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -8,21 +9,21 @@ using System.Reflection;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ConventionImplementedInterfaces : FactoryCache<Type, Type>
+	public sealed class ConventionImplementedInterfaces : ValidatedParameterizedSourceBase<Type, Type>
 	{
 		public static ConventionImplementedInterfaces Default { get; } = new ConventionImplementedInterfaces();
 		ConventionImplementedInterfaces() : this( typeof(ISource), typeof(IParameterizedSource), typeof(IValidatedParameterizedSource) ) {}
 
 		readonly ImmutableArray<Type> exempt;
 
-		public ConventionImplementedInterfaces( params Type[] exempt )
+		public ConventionImplementedInterfaces( params Type[] exempt ) : base( DefaultSpecification.And( CanActivateSpecification.Default, new DelegatedSpecification<Type>( type => type.GetTypeInfo().IsPublic ) ) )
 		{
 			this.exempt = exempt.ToImmutableArray();
 		}
 
-		protected override Type Create( Type parameter )
+		public override Type Get( Type parameter )
 		{
-			foreach ( var @interface in parameter.GetTypeInfo().ImplementedInterfaces.Except( exempt.ToArray() ).ToArray() )
+			foreach ( var @interface in parameter.GetTypeInfo().ImplementedInterfaces.Except( exempt ).ToArray() )
 			{
 				var specification = IsConventionCandidateSpecification.Defaults.Get( @interface );
 				if ( specification( parameter ) )

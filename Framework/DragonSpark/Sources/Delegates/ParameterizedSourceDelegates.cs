@@ -6,7 +6,7 @@ using System;
 
 namespace DragonSpark.Sources.Delegates
 {
-	public class ParameterizedSourceDelegates : DelegatesBase
+	public sealed class ParameterizedSourceDelegates : DelegatesBase
 	{
 		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Sources { get; } = new Cache<Func<IServiceProvider>, ParameterizedSourceDelegates>( func => new ParameterizedSourceDelegates( func ) );
 		ParameterizedSourceDelegates( Func<IServiceProvider> source ) : base( source.Delegate<object>(), IsParameterizedSourceSpecification.Default, nameof(ToDelegate) ) {}

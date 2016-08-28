@@ -3,10 +3,12 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Linq;
 
 namespace DevelopersWin.VoteReporter
 {
+	[Export]
 	public class VoteReportFactory : SourceBase<VoteReport>
 	{
 		readonly VotingContext context;

@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Application.Setup
 {
-	public class ServiceProviderConfigurations : CommandSource
+	public class ServiceProviderConfigurations : FixedCommandSource
 	{
 		protected ServiceProviderConfigurations() {}
 

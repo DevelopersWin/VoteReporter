@@ -1,11 +1,10 @@
-using System.Composition;
 using System.IO;
 
 namespace DragonSpark.Runtime
 {
 	public sealed class Serializer : ISerializer
 	{
-		[Export]
+		// [Export]
 		public static ISerializer Default { get; } = new Serializer();
 		Serializer() {}
 

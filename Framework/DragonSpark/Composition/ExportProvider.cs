@@ -5,9 +5,10 @@ using System.Composition;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ExportProvider : IExportProvider
+	sealed class ExportProvider : IExportProvider
 	{
 		readonly CompositionContext context;
+
 		public ExportProvider( CompositionContext context )
 		{
 			this.context = context;

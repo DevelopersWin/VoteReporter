@@ -1,13 +1,12 @@
-using System.Composition;
+using DragonSpark.Runtime;
 using System.IO;
 using System.Xaml;
-using DragonSpark.Runtime;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
 	public sealed class Serializer : ISerializer
 	{
-		[Export]
+		// [Export]
 		public static ISerializer Default { get; } = new Serializer();
 		Serializer() {}
 

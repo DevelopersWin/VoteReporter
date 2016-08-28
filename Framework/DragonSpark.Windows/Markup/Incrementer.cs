@@ -2,7 +2,7 @@ using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Windows.Markup
 {
-	class Incrementer : IIncrementer
+	public sealed class Incrementer : IIncrementer
 	{
 		readonly DecoratedSourceCache<int> count = new DecoratedSourceCache<int>();
 

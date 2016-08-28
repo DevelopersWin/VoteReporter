@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public abstract class ApplicationTypesBase : TypeSource
+	public abstract class ApplicationTypesBase : FixedTypeSource
 	{
 		readonly Func<ImmutableArray<Assembly>> assemblySource;
 		readonly Transform<IEnumerable<Assembly>> filter;
