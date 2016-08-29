@@ -18,11 +18,11 @@ namespace DragonSpark.Composition
 		readonly static Func<Type, bool> Activate = Defaults.ProvidesInstanceSpecification.IsSatisfiedBy;
 
 		public static IParameterizedSource<Type, Type> Default { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Fix().Global() );
-		ConventionTypes() : this( ApplicationTypes.Default ) {}
+		ConventionTypes() : this( ApplicationTypes.Default.ToDelegate() ) {}
 
-		readonly ISource<ImmutableArray<Type>> source;
+		readonly Func<ImmutableArray<Type>> source;
 
-		public ConventionTypes( ISource<ImmutableArray<Type>> source ) : base( Specification )
+		public ConventionTypes( Func<ImmutableArray<Type>> source ) : base( Specification )
 		{
 			this.source = source;
 		}
@@ -39,7 +39,7 @@ namespace DragonSpark.Composition
 			var adapter = parameter.Adapt();
 			var convention = IsConventionCandidateSpecification.Defaults.Get( parameter );
 			var result =
-					source.Get()
+					source()
 					.Where( adapter.IsAssignableFrom )
 					.Where( Activate )
 					.FirstOrDefault( convention );

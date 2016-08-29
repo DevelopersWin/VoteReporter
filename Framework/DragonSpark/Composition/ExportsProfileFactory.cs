@@ -47,7 +47,7 @@ namespace DragonSpark.Composition
 						   );
 				
 
-			Debug.WriteLine( "Defined:" );
+			/*Debug.WriteLine( "Defined:" );
 			foreach ( var pair in defined )
 			{
 				Debug.WriteLine( $"[{pair.Subject}, {pair.ExportAs}]" );
@@ -57,7 +57,7 @@ namespace DragonSpark.Composition
 			foreach ( var pair in mappings )
 			{
 				Debug.WriteLine( $"{pair.InterfaceType.GetTypeInfo().IsPublic}, {pair.ImplementationType.GetTypeInfo().IsPublic}: [{pair.InterfaceType}, {pair.ImplementationType}]" );
-			}
+			}*/
 
 			var all = definedTypes.Concat( mappings.All() ).SelectMany( ExportTypeExpander.Default.Get ).Distinct().ToImmutableHashSet();
 			var selector = new ConstructorSelector( new IsValidConstructorSpecification( new IsValidTypeSpecification( all ).IsSatisfiedBy ).IsSatisfiedBy );

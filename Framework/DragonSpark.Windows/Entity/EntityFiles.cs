@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using System.Composition;
 using System.IO;
 
 namespace DragonSpark.Windows.Entity
 {
 	public static class EntityFiles
 	{
-		[Export]
 		public static DirectoryInfo DefaultDataDirectory { get; } = new DirectoryInfo( @".\App_Data" );
 
 		public static IEnumerable<FileInfo> WithLog( FileInfo databaseFile ) => new[] { databaseFile, GetLog( databaseFile ) };

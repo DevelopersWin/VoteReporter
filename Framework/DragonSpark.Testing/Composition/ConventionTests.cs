@@ -37,7 +37,7 @@ namespace DragonSpark.Testing.Composition
 			Assert.IsType<ExceptionHandler>( handler );
 		}
 
-		class ExceptionHandler : IExceptionHandler
+		public class ExceptionHandler : IExceptionHandler
 		{
 			public ExceptionHandlingResult Handle( Exception exception ) => new ExceptionHandlingResult( true, exception );
 		}
@@ -64,12 +64,12 @@ namespace DragonSpark.Testing.Composition
 			
 		}
 
-		interface IHelloWorld {}
-		class HelloWorld : IHelloWorld {}
+		public interface IHelloWorld {}
+		public class HelloWorld : IHelloWorld {}
 
 
-		interface IHelloWorldShared {}
+		public interface IHelloWorldShared {}
 		[Shared]
-		class HelloWorldShared : IHelloWorldShared {}
+		public class HelloWorldShared : IHelloWorldShared {}
 	}
 }

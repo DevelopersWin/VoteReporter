@@ -2,6 +2,8 @@
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Testing.Objects;
 using System;
 using System.Collections.Immutable;
@@ -10,8 +12,6 @@ using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Testing.Framework.Application;
-using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -56,7 +56,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData]
 		public void LocalStrict( ISingletonLocator sut )
 		{
-			Assert.IsType<Singletons>( sut );
+			Assert.IsType<SingletonLocator>( sut );
 		}
 
 		class SomeExport {}

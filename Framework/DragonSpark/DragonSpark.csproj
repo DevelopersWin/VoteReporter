@@ -38,6 +38,7 @@
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
     <Compile Include="AssemblyPriorityLocator.cs" />
     <Compile Include="AssociatedPriority.cs" />
+    <Compile Include="ComponentModel\DefaultValueProviderBase.cs" />
     <Compile Include="Composition\CanActivateSpecification.cs" />
     <Compile Include="Composition\CompositionHostExtensions.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
@@ -52,9 +53,9 @@
     <Compile Include="Composition\ConventionMapping.cs" />
     <Compile Include="Composition\ConventionMappingFactory.cs" />
     <Compile Include="Composition\ConventionConfiguration.cs" />
+    <Compile Include="Composition\ConventionTypeSelector.cs" />
     <Compile Include="Composition\Defaults.cs" />
     <Compile Include="Composition\ExportedContainerConfigurator.cs" />
-    <Compile Include="Composition\ExportedSingletonProperties.cs" />
     <Compile Include="Composition\ExportMapping.cs" />
     <Compile Include="Composition\ExportProvider.cs" />
     <Compile Include="Composition\ExportsProfileFactory.cs" />
@@ -78,6 +79,8 @@
     <Compile Include="PriorityAwareLocator.cs" />
     <Compile Include="PriorityComparer.cs" />
     <Compile Include="PriorityExtensions.cs" />
+    <Compile Include="Sources\Parameterized\SelectedParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
     <Compile Include="Specifications\DelegatedAssignedSpecificationBase.cs" />
     <Compile Include="Tasks\FixedTaskSource.cs" />
     <Compile Include="Tasks\MonitorTaskCommand.cs" />
@@ -393,7 +396,7 @@
     <Compile Include="Activation\Location\SingletonAttribute.cs" />
     <Compile Include="Activation\Location\SingletonDelegateCache.cs" />
     <Compile Include="Activation\Location\SingletonDelegates.cs" />
-    <Compile Include="Activation\Location\Singletons.cs" />
+    <Compile Include="Activation\Location\SingletonLocator.cs" />
     <Compile Include="Activation\Location\SingletonProperties.cs" />
     <Compile Include="Activation\Location\SingletonRequest.cs" />
     <Compile Include="Activation\Location\SingletonSpecification.cs" />
@@ -515,7 +518,6 @@
     <Compile Include="Sources\Scoping.cs" />
     <Compile Include="Sources\Source.cs" />
     <Compile Include="Sources\SourceBase.cs" />
-    <Compile Include="Sources\Parameterized\SourcedParameterizedSource.cs" />
     <Compile Include="Sources\StackCommand.cs" />
     <Compile Include="Runtime\IRepository.cs" />
     <Compile Include="Runtime\ISerializer.cs" />

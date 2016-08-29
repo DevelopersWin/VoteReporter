@@ -2,10 +2,10 @@
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using JetBrains.Annotations;
+using Serilog;
 using System.Composition;
 using System.Composition.Hosting;
 using System.Reflection;
-using Serilog;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition
@@ -19,7 +19,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = this.Adapt().WithNested().Append( typeof(Protected) ).AsApplicationParts();
 			var builder = ConventionBuilderFactory.Default.Get();
 			var container = new ContainerConfiguration().WithParts( parts.AsEnumerable(), builder ).WithProvider( ServicesExportDescriptorProvider.Default ).CreateContainer();
-			new EnableServicesCommand().Fixed( true ).Run();
+			new EnableServicesCommand().Run();
 			var dependency = container.GetExport<Dependency>();
 			Assert.NotNull( dependency );
 
@@ -35,17 +35,18 @@ namespace DragonSpark.Testing.Composition
 			Assert.Throws<CompositionFailedException>( () => container.GetExport<Protected>() );
 		}
 
-		interface IPrimary {}
-		class Primary : IPrimary
+		public interface IPrimary {}
+
+		public class Primary : IPrimary
 		{
 			[UsedImplicitly]
-			public Primary( Dependency dependency, AnotherDependency anotherDependency )
+			public Primary( IDependency dependency, IAnotherDependency anotherDependency )
 			{
 				Selected = MethodBase.GetCurrentMethod();
 			}
 
 			[UsedImplicitly]
-			public Primary( Dependency dependency, AnotherDependency anotherDependency, NotKnown notKnown )
+			public Primary( IAnotherDependency dependency, IAnotherDependency anotherDependency, NotKnown notKnown )
 			{
 				Selected = MethodBase.GetCurrentMethod();
 			}
@@ -97,17 +98,17 @@ namespace DragonSpark.Testing.Composition
 			protected Protected( Dependency dependency, AnotherDependency anotherDependency ) {}
 		}
 
-		interface IDependency {}
-		class Dependency : IDependency {}
+		public interface IDependency {}
+		public class Dependency : IDependency {}
 
-		interface IAnotherDependency {}
-		class AnotherDependency : IAnotherDependency {}
+		public interface IAnotherDependency {}
+		public class AnotherDependency : IAnotherDependency {}
 
 		interface IAnotherDependencyAgain {}
 		[UsedImplicitly]
-		class AnotherDependencyAgain : IAnotherDependencyAgain {}
+		public class AnotherDependencyAgain : IAnotherDependencyAgain {}
 
-		class NotKnown
+		public class NotKnown
 		{
 			NotKnown() {}
 		}

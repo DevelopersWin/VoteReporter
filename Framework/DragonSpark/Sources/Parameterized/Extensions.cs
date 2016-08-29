@@ -1,12 +1,13 @@
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
+using DragonSpark.TypeSystem.Generics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.TypeSystem.Generics;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -24,6 +25,14 @@ namespace DragonSpark.Sources.Parameterized
 				.Select( @this.Get )
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
+
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ITransformer<TParameter> selector ) => With( @this, selector.ToDelegate() );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Transform<TParameter> selector ) =>
+			new SelectedParameterizedSource<TParameter, TResult>( selector, @this.ToSourceDelegate() );
+
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) => With( @this, specification.ToSpecificationDelegate() );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Func<TParameter, bool> specification ) =>
+			new SpecificationParameterizedSource<TParameter, TResult>( specification, @this.ToSourceDelegate() );
 
 		public static T Get<T>( this IParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );
 
@@ -66,7 +75,7 @@ namespace DragonSpark.Sources.Parameterized
 			public static Delegates<T> Default { get; } = new Delegates<T>();
 			Delegates() : base( result => new Converter( result ).Get ) {}
 
-			class Converter : SourceBase<object>
+			sealed class Converter : SourceBase<object>
 			{
 				readonly Func<T> @from;
 				public Converter( Func<T> from )
@@ -103,7 +112,7 @@ namespace DragonSpark.Sources.Parameterized
 			public static ParameterizedDelegates<TFromParameter, TFromResult, TToParameter, TToResult> Default { get; } = new ParameterizedDelegates<TFromParameter, TFromResult, TToParameter, TToResult>();
 			ParameterizedDelegates() : base( result => new Converter( result ).To ) {}
 
-			class Converter 
+			sealed class Converter 
 			{
 				readonly Func<TFromParameter, TFromResult> from;
 
@@ -160,6 +169,13 @@ namespace DragonSpark.Sources.Parameterized
 		{
 			public static ParameterizedSourceDelegates<TParameter, TResult> Default { get; } = new ParameterizedSourceDelegates<TParameter, TResult>();
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
+		}
+
+		public static Transform<T> ToDelegate<T>( this ITransformer<T> @this ) => Selectors<T>.Default.Get( @this );
+		sealed class Selectors<T> : Cache<ITransformer<T>, Transform<T>>
+		{
+			public static Selectors<T> Default { get; } = new Selectors<T>();
+			Selectors() : base( item => item.Get ) {}
 		}
 
 		public static ICache<T> ToCache<T>( this IParameterizedSource<object, T> @this ) => @this.ToSourceDelegate().ToCache();

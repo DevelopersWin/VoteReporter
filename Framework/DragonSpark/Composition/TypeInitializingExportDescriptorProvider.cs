@@ -16,17 +16,18 @@ namespace DragonSpark.Composition
 		public static TypeInitializingExportDescriptorProvider Default { get; } = new TypeInitializingExportDescriptorProvider();
 		TypeInitializingExportDescriptorProvider() : this( Convention ) {}
 
-		readonly Func<Type, Type> types;
+		readonly Func<Type, Type> convention;
 
-		TypeInitializingExportDescriptorProvider( Func<Type, Type> types )
+		TypeInitializingExportDescriptorProvider( Func<Type, Type> convention )
 		{
-			this.types = types;
+			this.convention = convention;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
+			// var type = convention( contract.ContractType ) ?? contract.ContractType;
 			contract.ContractType
-					.Append( types( contract.ContractType ) )
+					.Append( convention( contract.ContractType ) )
 					.WhereAssigned()
 					.Distinct()
 					.Each( Initializer );

@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Aspects.Validation;
+using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
@@ -9,6 +10,7 @@ using System.Reflection;
 
 namespace DragonSpark.Composition
 {
+	[ApplyAutoValidation]
 	public sealed class ConventionImplementedInterfaces : ValidatedParameterizedSourceBase<Type, Type>
 	{
 		public static ConventionImplementedInterfaces Default { get; } = new ConventionImplementedInterfaces();
@@ -16,7 +18,11 @@ namespace DragonSpark.Composition
 
 		readonly ImmutableArray<Type> exempt;
 
-		public ConventionImplementedInterfaces( params Type[] exempt ) : base( DefaultSpecification.And( CanActivateSpecification.Default, new DelegatedSpecification<Type>( type => type.GetTypeInfo().IsPublic ) ) )
+		public ConventionImplementedInterfaces( params Type[] exempt ) : base( DefaultSpecification.And( CanActivateSpecification.Default, new DelegatedSpecification<Type>( type =>
+																																											 {
+																																												 var result = type.GetTypeInfo().IsPublic || type.GetTypeInfo().IsNestedPublic;
+																																												 return result;
+																																											 } ) ) )
 		{
 			this.exempt = exempt.ToImmutableArray();
 		}
