@@ -35,13 +35,15 @@
   <ItemGroup>
     <Compile Include="Activation\CanActivateSpecification.cs" />
     <Compile Include="Activation\Defaults.cs" />
-    <Compile Include="Activation\IsPublicSpecification.cs" />
+    <Compile Include="Activation\IsPublicTypeSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
     <Compile Include="AssemblyPriorityLocator.cs" />
     <Compile Include="AssociatedPriority.cs" />
     <Compile Include="ComponentModel\DefaultValueProviderBase.cs" />
+    <Compile Include="Composition\AppliedExport.cs" />
+    <Compile Include="Composition\AppliedExportLocator.cs" />
     <Compile Include="Composition\CompositionHostExtensions.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ConstructorSelectorConfiguration.cs" />
@@ -52,6 +54,7 @@
     <Compile Include="Composition\ConventionBuilderFactory.cs" />
     <Compile Include="Composition\ConventionCandidateNames.cs" />
     <Compile Include="Composition\ConventionImplementedInterfaces.cs" />
+    <Compile Include="Composition\ConventionLocator.cs" />
     <Compile Include="Composition\ConventionMapping.cs" />
     <Compile Include="Composition\ConventionMappingFactory.cs" />
     <Compile Include="Composition\ConventionConfiguration.cs" />
@@ -64,6 +67,7 @@
     <Compile Include="Composition\InitializeExportsCommand.cs" />
     <Compile Include="Composition\IsConventionCandidateSpecification.cs" />
     <Compile Include="Composition\IsExportSpecification.cs" />
+    <Compile Include="Composition\MappedConventionLocator.cs" />
     <Compile Include="Composition\SelfAndNestedTypes.cs" />
     <Compile Include="Composition\ServiceLocator.cs" />
     <Compile Include="Composition\ServiceProviderConfigurations.cs" />

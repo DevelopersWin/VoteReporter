@@ -1,10 +1,6 @@
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
-using DragonSpark.TypeSystem;
 using System;
 using System.Composition.Convention;
-using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.Composition
 {
@@ -30,13 +26,5 @@ namespace DragonSpark.Composition
 
 			return parameter;
 		}
-	}
-
-	sealed class ContainsMultipleCandidateConstructorsSpecification : SpecificationBase<Type>
-	{
-		public static ContainsMultipleCandidateConstructorsSpecification Default { get; } = new ContainsMultipleCandidateConstructorsSpecification();
-		ContainsMultipleCandidateConstructorsSpecification() {}
-
-		public override bool IsSatisfiedBy( Type parameter ) => InstanceConstructors.Default.Get( parameter.GetTypeInfo() ).Any( info => info.GetParameters().Any() );
 	}
 }

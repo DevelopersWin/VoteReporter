@@ -21,12 +21,12 @@ namespace DragonSpark.Composition
 		readonly static Func<Type, ConventionMapping> Selector = ConventionMappingFactory.Default.Get;
 
 		public static ISource<ExportsProfile> Default { get; } = new Scope<ExportsProfile>( new ExportsProfileFactory().Global() );
-		ExportsProfileFactory() : this( ApplicationTypes.Default.ToDelegate(), DefinedExportLocator.Default.ToSourceDelegate() ) {}
+		ExportsProfileFactory() : this( ApplicationTypes.Default.ToDelegate(), AppliedExportLocator.Default.ToSourceDelegate() ) {}
 
 		readonly Func<ImmutableArray<Type>> typesSource;
-		readonly Func<Type, ExportedItemDescriptor> exportSource;
+		readonly Func<Type, AppliedExport> exportSource;
 
-		ExportsProfileFactory( Func<ImmutableArray<Type>> typesSource, Func<Type, ExportedItemDescriptor> exportSource )
+		ExportsProfileFactory( Func<ImmutableArray<Type>> typesSource, Func<Type, AppliedExport> exportSource )
 		{
 			this.typesSource = typesSource;
 			this.exportSource = exportSource;
@@ -36,10 +36,10 @@ namespace DragonSpark.Composition
 		{
 			var types = typesSource();
 			
-			var defined = new ExportedDescriptors( types.Select( exportSource ).WhereAssigned() );
-			var definedTypes = defined.All().ToArray();
+			var applied = new AppliedExports( types.Select( exportSource ).WhereAssigned() );
+			var appliedTypes = applied.All().ToArray();
 
-			var mappings = new ConventionMappings( types.Except( definedTypes )
+			var mappings = new ConventionMappings( types.Except( appliedTypes )
 														.Select( Selector )
 														.WhereAssigned()
 														.Distinct( mapping => mapping.InterfaceType )
@@ -58,15 +58,13 @@ namespace DragonSpark.Composition
 				Debug.WriteLine( $"{pair.InterfaceType.GetTypeInfo().IsPublic}, {pair.ImplementationType.GetTypeInfo().IsPublic}: [{pair.InterfaceType}, {pair.ImplementationType}]" );
 			}*/
 
-			var all = definedTypes.Concat( mappings.All() ).SelectMany( ExportTypeExpander.Default.Get ).Distinct().ToImmutableHashSet();
+			var all = appliedTypes.Concat( mappings.All() ).SelectMany( ExportTypeExpander.Default.Get ).Distinct().ToImmutableHashSet();
 			var selector = new ConstructorSelector( new IsValidConstructorSpecification( new IsValidTypeSpecification( all ).IsSatisfiedBy ).IsSatisfiedBy );
 
 			var implementations = mappings.Values.Fixed();
-			var constructions = defined
+			var constructions = applied
 				.GetClasses()
 				.Union( implementations )
-				// .Where( ContainsMultipleCandidateConstructorsSpecification.Default.IsSatisfiedBy )
-				// .ToArray()
 				.Select( selector.Get )
 				.WhereAssigned()
 				.ToDictionary( info => info.DeclaringType );
@@ -75,7 +73,7 @@ namespace DragonSpark.Composition
 
 			var conventions = new ConventionExports( mappings.Keys, implementations.Intersect( constructions.Keys ) );
 
-			var singletons = new SingletonExports( implementations.Except( constructions.Keys ).Union( defined.GetProperties() ).Select( SingletonExportFactory.Default.Get ).WhereAssigned().ToDictionary( export => export.Location.DeclaringType ) );
+			var singletons = new SingletonExports( implementations.Except( constructions.Keys ).Union( applied.GetProperties() ).Select( SingletonExportFactory.Default.Get ).WhereAssigned().ToDictionary( export => export.Location.DeclaringType ) );
 
 			var result = new ExportsProfile( constructed, conventions, singletons );
 			return result;
@@ -186,11 +184,11 @@ namespace DragonSpark.Composition
 		public IEnumerable<Type> All() => Keys.Concat( Values ).Distinct();
 	}
 
-	public sealed class ExportedDescriptors : DescriptorCollectionBase<ExportedItemDescriptor>
+	public sealed class AppliedExports : DescriptorCollectionBase<AppliedExport>
 	{
-		public ExportedDescriptors( IEnumerable<ExportedItemDescriptor> items ) : base( items, descriptor => descriptor.ExportAs ) {}
+		public AppliedExports( IEnumerable<AppliedExport> items ) : base( items, descriptor => descriptor.ExportAs ) {}
 
-		protected override Type GetKeyForItem( ExportedItemDescriptor item ) => item.Subject;
+		protected override Type GetKeyForItem( AppliedExport item ) => item.Subject;
 
 		public IEnumerable<Type> GetClasses() => Get<TypeInfo>();
 

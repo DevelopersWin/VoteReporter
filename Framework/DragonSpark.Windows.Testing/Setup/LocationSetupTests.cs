@@ -24,6 +24,7 @@ using Xunit.Abstractions;
 using Activator = DragonSpark.Activation.Activator;
 using ApplicationAssemblyLocator = DragonSpark.Windows.Runtime.ApplicationAssemblyLocator;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
+using Defaults = DragonSpark.Composition.Defaults;
 using Locator = DragonSpark.Windows.Testing.TestObjects.Locator;
 using Object = DragonSpark.Testing.Objects.Object;
 
@@ -399,11 +400,13 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( fromContainer, sut );
 		}*/
 
-		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
-		public void ConventionLocator( ConventionTypes locator )
+		[Fact]
+		public void ConventionLocator()
 		{
-			var type = locator.Get( typeof(Assembly) );
+			var type = ConventionTypes.Default.Get( typeof(Assembly) );
 			Assert.Null( type );
+
+			Assert.True( new[] { typeof(Assembly), typeof(IActivator) }.All( Defaults.ConventionCandidate.IsSatisfiedBy ) );
 		}
 
 		/*[Theory, DragonSpark.Testing.Framework.Setup.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly) )]
