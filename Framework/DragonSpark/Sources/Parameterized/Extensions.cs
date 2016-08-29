@@ -27,8 +27,9 @@ namespace DragonSpark.Sources.Parameterized
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
 		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ITransformer<TParameter> selector ) => With( @this, selector.ToDelegate() );
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Transform<TParameter> selector ) =>
-			new SelectedParameterizedSource<TParameter, TResult>( selector, @this.ToSourceDelegate() );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Transform<TParameter> selector ) => With( @this.ToSourceDelegate(), selector );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Transform<TParameter> selector ) =>
+			new SelectedParameterizedSource<TParameter, TResult>( selector, @this );
 
 		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) => With( @this, specification.ToSpecificationDelegate() );
 		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Func<TParameter, bool> specification ) =>

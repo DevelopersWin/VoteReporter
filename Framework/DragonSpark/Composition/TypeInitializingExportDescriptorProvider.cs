@@ -11,7 +11,7 @@ namespace DragonSpark.Composition
 	public sealed class TypeInitializingExportDescriptorProvider : ExportDescriptorProvider
 	{
 		readonly static Action<Type> Initializer = InitializeTypeCommand.Default.ToDelegate();
-		readonly static Func<Type, Type> Convention = ConventionTypes.Default.Get;
+		readonly static Func<Type, Type> Convention = ConventionImplementations.Default.Get;
 
 		public static TypeInitializingExportDescriptorProvider Default { get; } = new TypeInitializingExportDescriptorProvider();
 		TypeInitializingExportDescriptorProvider() : this( Convention ) {}

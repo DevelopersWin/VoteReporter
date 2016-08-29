@@ -8,6 +8,6 @@
 	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
 	mc:Ignorable="d" >
 	<ds:Source Instance="{x:Static core:ApplicationCommands.Default}" />
-	<application:RunProgramCommand />
-	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />
+	<!--<application:RunProgramCommand />
+	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />-->
 </ds:ConsoleApplication>

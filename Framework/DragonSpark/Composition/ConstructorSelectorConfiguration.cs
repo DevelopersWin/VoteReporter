@@ -51,10 +51,12 @@ namespace DragonSpark.Composition
 		// public static ISource<Func<Type, bool>> Default { get; } = new Scope<Func<Type, bool>>( Factory.Global( () => new IsValidTypeSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
 		public IsValidTypeSpecification( ICollection<Type> types ) : base( new DelegatedSpecification<Type>( types.Contains ), DefaultServiceProvider.Default ) {}
 
-		/*public override bool IsSatisfiedBy( Type parameter = null )
+		public override bool IsSatisfiedBy( Type parameter = null )
 		{
+			var temp = DefaultServiceProvider.Default.IsSatisfiedBy( parameter );
+			var stop = parameter.Name.Contains( "DataTransformer" );
 			var result = base.IsSatisfiedBy( parameter );
 			return result;
-		}*/
+		}
 	}
 }

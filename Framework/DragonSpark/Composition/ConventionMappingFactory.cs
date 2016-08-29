@@ -10,7 +10,7 @@ namespace DragonSpark.Composition
 
 		public override ConventionMapping Get( Type parameter )
 		{
-			var @interface = ConventionImplementedInterfaces.Default.Get( parameter );
+			var @interface = ConventionInterfaces.Default.Get( parameter );
 			var result = @interface != null ? new ConventionMapping( @interface, parameter ) : default(ConventionMapping);
 			return result;
 		}

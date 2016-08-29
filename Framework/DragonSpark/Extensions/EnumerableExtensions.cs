@@ -200,6 +200,9 @@ namespace DragonSpark.Extensions
 			}
 		}
 
+		public static IEnumerable<TResult> SelectAssigned<TSource, TResult>( this ImmutableArray<TSource> @this, Func<TSource, TResult> select ) => @this.AsEnumerable().SelectAssigned( select );
+		public static IEnumerable<TResult> SelectAssigned<TSource, TResult>( this IEnumerable<TSource> @this, Func<TSource, TResult> select ) => @this.Select( select ).WhereAssigned();
+
 		public static T FirstOrDefaultOfType<T>( this IEnumerable enumerable ) => enumerable.OfType<T>().FirstOrDefault();
 
 		public static T PeekOrDefault<T>( this System.Collections.Generic.Stack<T> @this ) => @this.Any() ? @this.Peek() : default(T);

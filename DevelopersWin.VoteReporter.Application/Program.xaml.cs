@@ -1,4 +1,10 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation.Location;
+using DragonSpark.Composition;
+using DragonSpark.Extensions;
+using DragonSpark.Runtime;
+using DragonSpark.Windows.Runtime.Data;
+using System.Composition.Hosting;
+using System.Diagnostics;
 
 namespace DevelopersWin.VoteReporter.Application
 {
@@ -12,6 +18,12 @@ namespace DevelopersWin.VoteReporter.Application
 			using ( var program = new Program() )
 			{
 				program.Run( args );
+
+				var context = GlobalServiceProvider.GetService<CompositionHost>();
+				
+				var one = context.TryGet<DataTransformer>();
+				var two = context.TryGet<ISerializer>();
+				Debugger.Break();
 			}
 		}
 

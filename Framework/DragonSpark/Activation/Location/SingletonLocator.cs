@@ -13,9 +13,11 @@ namespace DragonSpark.Activation.Location
 		
 		[Export]
 		public static ISingletonLocator Default { get; } = new SingletonLocator();
-		SingletonLocator() : this( SingletonDelegates.Default.Get ) {}
+		SingletonLocator() : this( new Source( SingletonDelegates.Default.Get ).With( Specification ) ) {}
 
-		public SingletonLocator( Func<Type, Func<object>> inner ) : base( new Source( inner ).With( Specification ).With( ConventionTypeSelector.Default ).ToSourceDelegate().Fix() ) {}
+		public SingletonLocator( Func<Type, Func<object>> inner ) : this( new Source( inner ) ) {}
+
+		SingletonLocator( IParameterizedSource<Type, object> source ) : base( source.With( ConventionTypeSelector.Default ).ToSourceDelegate().Fix() ) {}
 
 		sealed class Source : ParameterizedSourceBase<Type, object>
 		{

@@ -1,12 +1,12 @@
-﻿using System;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
+using System;
 
 namespace DragonSpark.Composition
 {
 	public sealed class ConventionTypeSelector : DelegatedTransformer<Type>
 	{
 		public static ConventionTypeSelector Default { get; } = new ConventionTypeSelector();
-		ConventionTypeSelector() : this( ConventionTypes.Default.Get ) {}
+		ConventionTypeSelector() : this( ConventionImplementations.Default.Get ) {}
 
 		public ConventionTypeSelector( Transform<Type> source ) : base( source ) {}
 

@@ -403,7 +403,7 @@ namespace DragonSpark.Windows.Testing.Setup
 		[Fact]
 		public void ConventionLocator()
 		{
-			var type = ConventionTypes.Default.Get( typeof(Assembly) );
+			var type = ConventionImplementations.Default.Get( typeof(Assembly) );
 			Assert.Null( type );
 
 			Assert.True( new[] { typeof(Assembly), typeof(IActivator) }.All( Defaults.ConventionCandidate.IsSatisfiedBy ) );
