@@ -1,9 +1,9 @@
 using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using PostSharp.Aspects.Internals;
 using System;
 using System.Runtime.CompilerServices;
+using Defaults = DragonSpark.Activation.Defaults;
 
 namespace DragonSpark.Application
 {
@@ -12,6 +12,6 @@ namespace DragonSpark.Application
 		public static ISpecification<Type> Default { get; } = new ApplicationTypeSpecification().ToCachedSpecification();
 		ApplicationTypeSpecification() {}
 
-		public override bool IsSatisfiedBy( Type parameter ) => Defaults.ProvidesInstanceSpecification.IsSatisfiedBy( parameter ) && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Has<CompilerGeneratedAttribute>();
+		public override bool IsSatisfiedBy( Type parameter ) => Defaults.Instantiable.IsSatisfiedBy( parameter ) && !typeof(MethodBinding).Adapt().IsAssignableFrom( parameter ) && !parameter.Has<CompilerGeneratedAttribute>();
 	}
 }

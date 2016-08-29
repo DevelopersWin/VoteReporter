@@ -4,15 +4,14 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Delegates;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.TypeSystem;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Composition

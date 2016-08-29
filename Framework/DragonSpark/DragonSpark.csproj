@@ -33,13 +33,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Activation\CanActivateSpecification.cs" />
+    <Compile Include="Activation\Defaults.cs" />
+    <Compile Include="Activation\IsPublicSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
     <Compile Include="AssemblyPriorityLocator.cs" />
     <Compile Include="AssociatedPriority.cs" />
     <Compile Include="ComponentModel\DefaultValueProviderBase.cs" />
-    <Compile Include="Composition\CanActivateSpecification.cs" />
     <Compile Include="Composition\CompositionHostExtensions.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ConstructorSelectorConfiguration.cs" />

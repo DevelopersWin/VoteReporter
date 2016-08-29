@@ -1,4 +1,5 @@
-﻿using DragonSpark.Application;
+﻿using DragonSpark.Activation;
+using DragonSpark.Application;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
@@ -7,7 +8,6 @@ using DragonSpark.Specifications;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using Defaults = DragonSpark.Sources.Parameterized.Defaults;
 
 namespace DragonSpark.Composition
 {
@@ -15,7 +15,7 @@ namespace DragonSpark.Composition
 	public sealed class ConventionTypes : ValidatedParameterizedSourceBase<Type, Type>
 	{
 		readonly static ISpecification<Type> Specification = CanActivateSpecification.Default.Inverse();
-		readonly static Func<Type, bool> Activate = Defaults.ProvidesInstanceSpecification.IsSatisfiedBy;
+		// readonly static Func<Type, bool> Instantiable = Activation.Defaults.Instantiable.IsSatisfiedBy;
 
 		public static IParameterizedSource<Type, Type> Default { get; } = new ParameterizedScope<Type, Type>( new ConventionTypes().ToSourceDelegate().Fix().Global() );
 		ConventionTypes() : this( ApplicationTypes.Default.ToDelegate() ) {}
@@ -36,12 +36,12 @@ namespace DragonSpark.Composition
 
 		Type Search( Type parameter )
 		{
-			var adapter = parameter.Adapt();
+			// var adapter = parameter.Adapt();
 			var convention = IsConventionCandidateSpecification.Defaults.Get( parameter );
 			var result =
 					source()
-					.Where( adapter.IsAssignableFrom )
-					.Where( Activate )
+					/*.Where( adapter.IsAssignableFrom )
+					.Where( Instantiable )*/
 					.FirstOrDefault( convention );
 			return result;
 		}

@@ -1,4 +1,5 @@
-﻿using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Activation;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
@@ -18,11 +19,7 @@ namespace DragonSpark.Composition
 
 		readonly ImmutableArray<Type> exempt;
 
-		public ConventionImplementedInterfaces( params Type[] exempt ) : base( DefaultSpecification.And( CanActivateSpecification.Default, new DelegatedSpecification<Type>( type =>
-																																											 {
-																																												 var result = type.GetTypeInfo().IsPublic || type.GetTypeInfo().IsNestedPublic;
-																																												 return result;
-																																											 } ) ) )
+		public ConventionImplementedInterfaces( params Type[] exempt ) : base( DefaultSpecification.And( IsPublicSpecification.Default, CanActivateSpecification.Default ) )
 		{
 			this.exempt = exempt.ToImmutableArray();
 		}
