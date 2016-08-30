@@ -1,13 +1,12 @@
 ﻿using DragonSpark.Application.Setup;
 using DragonSpark.Sources.Parameterized;
 using System;
-using System.Composition;
 
 namespace DragonSpark.Composition
 {
 	public sealed class ServiceProviderFactory : TransformerBase<IServiceProvider>
 	{
-		[Export( typeof(ITransformer<IServiceProvider>) )]
+		// [Export( typeof(ITransformer<IServiceProvider>) )]
 		public static ServiceProviderFactory Default { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() {}
 
