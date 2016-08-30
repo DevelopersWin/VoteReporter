@@ -16,5 +16,7 @@ namespace DragonSpark.Specifications
 		}
 
 		protected ImmutableArray<TypeAdapter> Adapters { get; }
+
+		public override bool IsSatisfiedBy( Type parameter ) => Adapters.IsAssignableFrom( parameter );
 	}
 }

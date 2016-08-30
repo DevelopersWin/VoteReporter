@@ -1,14 +1,13 @@
-using DragonSpark.Extensions;
 using DragonSpark.Specifications;
 using System;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ContainsExportSpecification : SpecificationBase<Type>
+	public sealed class ContainsExportSpecification : DelegatedAssignedSpecificationBase<Type, AppliedExport>
 	{
 		public static ISpecification<Type> Default { get; } = new ContainsExportSpecification().ToCachedSpecification();
-		ContainsExportSpecification() {}
+		ContainsExportSpecification() : base( AppliedExportLocator.Default.Get ) {}
 
-		public override bool IsSatisfiedBy( Type parameter ) => AppliedExportLocator.Default.Get( parameter ).IsAssigned();
+		//public override bool IsSatisfiedBy( Type parameter ) => ( parameter ).IsAssigned();
 	}
 }
