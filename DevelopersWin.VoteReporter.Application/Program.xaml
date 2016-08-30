@@ -6,8 +6,14 @@
 	xmlns:ds="http://framework.dragonspark.us"
 	xmlns:core="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
 	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
+	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
 	mc:Ignorable="d" >
+	<setup:RegisterInstances>
+		<ds:DirectoryInfo Path="Reports" />
+		<application:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
+	</setup:RegisterInstances>
+
 	<ds:Source Instance="{x:Static core:ApplicationCommands.Default}" />
-	<!--<application:RunProgramCommand />
-	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />-->
+	<application:RunProgramCommand />
+	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />
 </ds:ConsoleApplication>

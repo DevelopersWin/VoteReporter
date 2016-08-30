@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using DevelopersWin.VoteReporter.Entity;
+﻿using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Composition;
 using DragonSpark.Sources;
+using System.Collections.Generic;
+using System.Composition;
+using System.Data.Entity;
 
 namespace DevelopersWin.VoteReporter.Parts.Development
 {
 	public class Mappings : ItemSourceBase<ExportMapping>
 	{
+		[Export( typeof(IEnumerable<ExportMapping>) )]
 		public static Mappings Default { get; } = new Mappings();
 		Mappings() {}
 

@@ -38,6 +38,7 @@
     <Compile Include="Activation\IsPublicTypeSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
+    <Compile Include="Composition\SingletonExportSource.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
     <Compile Include="AssemblyPriorityLocator.cs" />
     <Compile Include="AssociatedPriority.cs" />
@@ -50,7 +51,7 @@
     <Compile Include="Composition\ConstructedExports.cs" />
     <Compile Include="Composition\ConstructorSelectorConfiguration.cs" />
     <Compile Include="Composition\ContainerConfigurator.cs" />
-    <Compile Include="Composition\ContainerConfiguratorMappings.cs" />
+    <Compile Include="Composition\ExportMappingConfigurator.cs" />
     <Compile Include="Composition\ContainerServicesConfigurator.cs" />
     <Compile Include="Composition\ContainsExportSpecification.cs" />
     <Compile Include="Composition\ConventionBuilderFactory.cs" />
@@ -84,7 +85,7 @@
     <Compile Include="Composition\SingletonExport.cs" />
     <Compile Include="Composition\SingletonExportFactory.cs" />
     <Compile Include="Composition\SingletonExports.cs" />
-    <Compile Include="Composition\SingletonExportsSource.cs" />
+    <Compile Include="Application\SingletonExports.cs" />
     <Compile Include="Composition\SourceDelegateContractResolver.cs" />
     <Compile Include="Composition\TypeInitializingExportDescriptorProvider.cs" />
     <Compile Include="DefaultPriorityAware.cs" />

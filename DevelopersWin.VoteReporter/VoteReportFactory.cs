@@ -28,20 +28,20 @@ namespace DevelopersWin.VoteReporter
 			return result;
 		}
 
-		static VoteReport Convert( Recording source, VoteReport reference )
+		static VoteReport Convert( Recording source, VoteReport reference = null )
 		{
 			var result = source.MapInto<VoteReport>().With<VoteReport>( report => report.Groups.AddRange( DetermineGroups( source, reference ) ) );
 			return result;
 		}
 
-		static IEnumerable<VoteGroupView> DetermineGroups( Recording current, VoteReport previous )
+		static IEnumerable<VoteGroupView> DetermineGroups( Recording current, VoteReport previous = null )
 		{
 			var groups = current.Records.GroupBy( record => record.Vote.Group ).OrderBy( grouping => grouping.Key.Order ).Select( records => records.Key );
 			var result = groups.Select( @group => Create( current, @group, previous.With( x => x.Groups.SingleOrDefault( y => y.Id == @group.Id ) ) ) ).ToArray();
 			return result;
 		}
 
-		static VoteGroupView Create( Recording recording, VoteGroup current, VoteGroupView previous )
+		static VoteGroupView Create( Recording recording, VoteGroup current, VoteGroupView previous = null )
 		{
 			var result = current.MapInto<VoteGroupView>();
 			var count = current.Votes.Sum( vote => vote.Records.SingleOrDefault( record => record.Recording == recording ).With( record => record.Count ) );
@@ -55,7 +55,7 @@ namespace DevelopersWin.VoteReporter
 			return result;
 		}
 
-		static VoteView CreateVote( Recording recording, Vote current, VoteView previous )
+		static VoteView CreateVote( Recording recording, Vote current, VoteView previous = null )
 		{
 			var result = current.MapInto<VoteView>();
 			var count = current.Records.SingleOrDefault( record => record.Recording == recording ).With( record => record.Count );

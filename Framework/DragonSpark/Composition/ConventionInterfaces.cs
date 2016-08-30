@@ -12,7 +12,7 @@ namespace DragonSpark.Composition
 {
 	public sealed class ConventionInterfaces : TransformerBase<Type>
 	{
-		readonly static ISpecification<Type> Specification = IsPublicTypeSpecification.Default.And( CanActivateSpecification.Default );
+		readonly static ISpecification<Type> Specification = IsPublicTypeSpecification.Default.And( Activation.Defaults.Instantiable );
 		readonly static Func<ConventionMapping, bool> Valid = IsValidConventionMappingSpecification.Default.ToSpecificationDelegate();
 
 		public static IParameterizedSource<Type, Type> Default { get; } = new ConventionInterfaces().With( Specification );

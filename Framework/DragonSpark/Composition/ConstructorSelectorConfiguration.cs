@@ -14,9 +14,6 @@ namespace DragonSpark.Composition
 	{
 		readonly Func<ConstructorInfo, bool> specification;
 
-		/*public static IParameterizedSource<IEnumerable<ConstructorInfo>, ConstructorInfo> Default { get; } = new ParameterizedScope<IEnumerable<ConstructorInfo>, ConstructorInfo>( Factory.Global( () => new ConstructorSelector().ToSourceDelegate() ) );
-		ConstructorSelector() : this( IsValidConstructorSpecification.Default.Get() ) {}*/
-
 		public ConstructorSelector( Func<ConstructorInfo, bool> specification )
 		{
 			this.specification = specification;
@@ -29,9 +26,6 @@ namespace DragonSpark.Composition
 	sealed class IsValidConstructorSpecification : SpecificationBase<ConstructorInfo>
 	{
 		readonly Func<Type, bool> validate;
-
-		/*public static ISource<Func<ConstructorInfo, bool>> Default { get; } = new Scope<Func<ConstructorInfo, bool>>( Factory.Global( () => new IsValidConstructorSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
-		IsValidConstructorSpecification() : this( IsValidTypeSpecification.Default.Get() ) {}*/
 
 		public IsValidConstructorSpecification( Func<Type, bool> validate )
 		{
@@ -51,12 +45,12 @@ namespace DragonSpark.Composition
 		// public static ISource<Func<Type, bool>> Default { get; } = new Scope<Func<Type, bool>>( Factory.Global( () => new IsValidTypeSpecification().ToCachedSpecification().ToSpecificationDelegate() ) );
 		public IsValidTypeSpecification( ICollection<Type> types ) : base( new DelegatedSpecification<Type>( types.Contains ), DefaultServiceProvider.Default ) {}
 
-		public override bool IsSatisfiedBy( Type parameter = null )
+		/*public override bool IsSatisfiedBy( Type parameter = null )
 		{
 			var temp = DefaultServiceProvider.Default.IsSatisfiedBy( parameter );
-			var stop = parameter.Name.Contains( "DataTransformer" );
+			var stop = parameter.Name.Contains( "DirectoryInfo" );
 			var result = base.IsSatisfiedBy( parameter );
 			return result;
-		}
+		}*/
 	}
 }

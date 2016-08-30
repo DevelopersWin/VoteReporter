@@ -10,7 +10,7 @@ namespace DragonSpark.Composition
 	public sealed class SingletonExportDescriptorProvider : ExportDescriptorProvider
 	{
 		public static SingletonExportDescriptorProvider Default { get; } = new SingletonExportDescriptorProvider();
-		SingletonExportDescriptorProvider() : this( SingletonExportsSource.Default.Get ) {}
+		SingletonExportDescriptorProvider() : this( Application.SingletonExports.Default.Get ) {}
 
 		readonly Func<ImmutableArray<SingletonExport>> singletons;
 

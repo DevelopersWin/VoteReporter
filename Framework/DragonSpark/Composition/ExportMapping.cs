@@ -1,5 +1,11 @@
+using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using PostSharp.Patterns.Contracts;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace DragonSpark.Composition
 {
@@ -8,7 +14,7 @@ namespace DragonSpark.Composition
 		public ExportMapping() : base( typeof(TSubject), typeof(TExport) ) {}
 	}
 
-	public class ExportMapping
+	public class ExportMapping : IEnumerable<Type>
 	{
 		public ExportMapping( Type subject ) : this( subject, subject ) {}
 
@@ -21,6 +27,16 @@ namespace DragonSpark.Composition
 		public Type Subject { [return: NotNull]get; set; }
 
 		public Type ExportAs { get; set; }
+
+		public IEnumerator<Type> GetEnumerator() => Subject.Append( ExportAs ).WhereAssigned().Distinct().GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
+
+	public class ExportMappings : Scope<ImmutableArray<ExportMapping>>
+	{
+		public static ExportMappings Default { get; } = new ExportMappings();
+		ExportMappings() : base( () => ExportSource<IEnumerable<ExportMapping>>.Default.GetEnumerable().Concat().ToImmutableArray() ) {}
+	}
 }

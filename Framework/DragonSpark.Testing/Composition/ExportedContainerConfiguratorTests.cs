@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Composition;
 using System.Composition.Hosting;
+using System.Linq;
 using Xunit;
 
 namespace DragonSpark.Testing.Composition
@@ -14,22 +15,16 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void Verify()
 		{
-			GetType().Adapt().WithNested().AsApplicationParts();
-			var container = ExportedContainerConfigurator.Default.Get( new ContainerConfiguration() ).CreateContainer();
+			GetType().Adapt().WithNested().Append( typeof(ExportMappingConfigurator) ).AsApplicationParts();
+			var container = ExportSource<ContainerConfigurator>.Default.Get().Aggregate( new ContainerConfiguration(), ( current, configurator ) => configurator.Get( current ) ).CreateContainer();
 			var export = container.GetExport<IAdditional>();
 			Assert.IsType<Additional>( export );
 		}
 
 		[UsedImplicitly]
-		sealed class Configurator : ContainerConfiguratorMappings
+		sealed class Mappings : ItemSourceBase<ExportMapping>
 		{
-			[Export, UsedImplicitly]
-			public static Configurator Default { get; } = new Configurator();
-			Configurator() : base( Mappings.Default ) {}
-		}
-
-		class Mappings : ItemSourceBase<ExportMapping>
-		{
+			[Export( typeof(IEnumerable<ExportMapping>) ), UsedImplicitly]
 			public static Mappings Default { get; } = new Mappings();
 			Mappings() {}
 

@@ -39,7 +39,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContainerConfigurator.cs" />
     <Compile Include="Mappings.cs" />
     <Compile Include="VoteCountLocator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

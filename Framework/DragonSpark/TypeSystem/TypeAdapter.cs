@@ -60,7 +60,7 @@ namespace DragonSpark.TypeSystem
 		
 		public Assembly Assembly => Info.Assembly;
 
-		public IEnumerable<Type> GetHierarchy( bool includeRoot = true )
+		public IEnumerable<Type> GetHierarchy( bool includeRoot = false )
 		{
 			yield return Type;
 			var current = Info.BaseType;
@@ -140,6 +140,6 @@ namespace DragonSpark.TypeSystem
 		static IEnumerable<Type> ExpandInterfaces( Type target ) => target.Append( target.GetTypeInfo().ImplementedInterfaces.SelectMany( Expand ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();
 
 		[Freeze]
-		public Type[] GetEntireHierarchy() => Expand( Type ).Union( GetHierarchy( false ) ).Distinct().ToArray();
+		public ImmutableArray<Type> GetEntireHierarchy() => Expand( Type ).Union( GetHierarchy() ).ToImmutableArray();
 	}
 }

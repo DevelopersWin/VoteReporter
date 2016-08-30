@@ -5,16 +5,10 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
 	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
-	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
 	xmlns:applicationEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	mc:Ignorable="d"
 >
-	<setup:RegisterInstances>
-		<markup:DirectoryInfo Path="Reports" />
-		<application:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
-	</setup:RegisterInstances>
-
 	<entity:AssignDataDirectoryCommand />
 	<entity:InstallDatabaseCommand />
 	<entity:BackupDatabaseCommand />

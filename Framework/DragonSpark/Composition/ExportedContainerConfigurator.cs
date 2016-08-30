@@ -1,12 +1,6 @@
-using DragonSpark.Sources;
-using System;
-using System.Collections.Immutable;
-using System.Composition.Hosting;
-using System.Linq;
-
 namespace DragonSpark.Composition
 {
-	public sealed class ExportedContainerConfigurator : ContainerConfigurator
+	/*public sealed class ExportedContainerConfigurator : ContainerConfigurator
 	{
 		public static ExportedContainerConfigurator Default { get; } = new ExportedContainerConfigurator();
 		ExportedContainerConfigurator() : this( ExportSource<ContainerConfigurator>.Default.Get ) {}
@@ -20,5 +14,5 @@ namespace DragonSpark.Composition
 
 		public override ContainerConfiguration Get( ContainerConfiguration parameter ) => 
 			source().Aggregate( parameter, ( current, configurator ) => configurator.Get( current ) );
-	}
+	}*/
 }

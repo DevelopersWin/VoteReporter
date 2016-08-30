@@ -21,7 +21,7 @@ namespace DevelopersWin.VoteReporter
 			this.directory = directory;
 		}
 
-		public Uri Save( object item, string fileName )
+		public Uri Save( object item, string fileName = null )
 		{
 			var extension = item is string ? "txt" : "xaml";
 			var path = Path.Combine( directory.FullName, fileName ?? $"{FileSystem.GetValidPath()}.{extension}" );
