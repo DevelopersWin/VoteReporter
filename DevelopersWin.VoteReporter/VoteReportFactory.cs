@@ -23,7 +23,7 @@ namespace DevelopersWin.VoteReporter
 			var recordings = context.Recordings.OrderByDescending( recording => recording.Created );
 			var current = recordings.First();
 		    var firstOrDefault = recordings.FirstOrDefault( recording => recording.Created < current.Created );
-		    var previous = firstOrDefault.With( recording => Convert( recording, null ) );
+		    var previous = firstOrDefault.With( recording => Convert( recording ) );
 			var result = Convert( current, previous );
 			return result;
 		}
@@ -58,7 +58,7 @@ namespace DevelopersWin.VoteReporter
 		static VoteView CreateVote( Recording recording, Vote current, VoteView previous = null )
 		{
 			var result = current.MapInto<VoteView>();
-			var count = current.Records.SingleOrDefault( record => record.Recording == recording ).With( record => record.Count );
+			var count = current.Records.SingleOrDefault( record => record.Recording == recording )?.Count ?? 0;
 			result.Counts = new VoteCount { Count = count, Delta = count - previous.With( view => view.Counts.Count ) };
 			return result;
 		}

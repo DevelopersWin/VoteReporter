@@ -66,7 +66,6 @@
     <Compile Include="Composition\ConventionTypeSelector.cs" />
     <Compile Include="Composition\Defaults.cs" />
     <Compile Include="Composition\DescriptorCollectionBase.cs" />
-    <Compile Include="Composition\ExportedContainerConfigurator.cs" />
     <Compile Include="Composition\ExportMapping.cs" />
     <Compile Include="Composition\ExportProvider.cs" />
     <Compile Include="Composition\ExportSourceBase.cs" />

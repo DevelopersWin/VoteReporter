@@ -1,6 +1,5 @@
 using DragonSpark.Commands;
 using DragonSpark.Extensions;
-using DragonSpark.Windows.Runtime;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
@@ -12,11 +11,14 @@ namespace DragonSpark.Windows.Entity
 {
 	public class EnableLocalStoragePropertyCommand : CommandBase<DbContextBuildingParameter>
 	{
-		readonly static MethodInfo ApplyMethod = typeof(EnableLocalStoragePropertyCommand).GetMethod( nameof(Apply), BindingOptions.AllMembers );
+		readonly static MethodInfo ApplyMethod = typeof(EnableLocalStoragePropertyCommand).GetRuntimeMethods().Single( info => info.Name == nameof(Apply) );
+
+		public static EnableLocalStoragePropertyCommand Default { get; } = new EnableLocalStoragePropertyCommand();
+		EnableLocalStoragePropertyCommand() : this( true ) {}
 
 		readonly bool useConvention;
 
-		public EnableLocalStoragePropertyCommand( bool useConvention = true )
+		public EnableLocalStoragePropertyCommand( bool useConvention )
 		{
 			this.useConvention = useConvention;
 		}
@@ -25,14 +27,15 @@ namespace DragonSpark.Windows.Entity
 		{
 			var types = parameter.Context.GetDeclaredEntityTypes().Select( x => x.Adapt().GetHierarchy().Last() ).Distinct().SelectMany( x => x.Assembly.GetTypes().Where( y => x.Namespace == y.Namespace ) ).Distinct().ToArray();
 
-			types.SelectMany( y => y.GetProperties( BindingOptions.AllMembers ).Where( z => z.Has<LocalStorageAttribute>() || ( useConvention && FollowsConvention( z ) )  ) ).Each( x =>
+			var properties = types.SelectMany( y => y.GetRuntimeProperties().Where( z => z.Has<LocalStorageAttribute>() || useConvention && FollowsConvention( z ) ) ).Fixed();
+			foreach ( var property in properties )
 			{
-				ApplyMethod.MakeGenericMethod( x.DeclaringType, x.PropertyType ).Invoke( this, new object[] { parameter.Builder, x } );
-			} );
+				ApplyMethod.MakeGenericMethod( property.DeclaringType, property.PropertyType ).Invoke( this, new object[] { parameter.Builder, property } );
+			}
 		}
 
 		static bool FollowsConvention( PropertyInfo propertyInfo ) => 
-			propertyInfo.Name.EndsWith( "Storage" ) && propertyInfo.DeclaringType.GetProperty( propertyInfo.Name.Replace( "Storage", string.Empty ) ).With( x => AttributeProviderExtensions.Has<NotMappedAttribute>( x ) );
+			propertyInfo.Name.EndsWith( "Storage" ) && propertyInfo.DeclaringType.GetProperty( propertyInfo.Name.Replace( "Storage", string.Empty ) ).With( x => x.Has<NotMappedAttribute>() );
 
 		static void Apply<TEntity, TProperty>( DbModelBuilder builder, PropertyInfo property ) where TEntity : class
 		{

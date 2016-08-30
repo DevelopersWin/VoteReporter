@@ -170,9 +170,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Runtime\FileSystemTypes.cs" />
-    <Compile Include="Runtime\BindingOptions.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Runtime\MetadataTypeDefinitionProvider.cs" />
     <Compile Include="Runtime\TypeDefinitionProviderSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

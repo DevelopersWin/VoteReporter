@@ -2,7 +2,7 @@ using System.Data.Entity;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class DbContextBuildingParameter
+	public struct DbContextBuildingParameter
 	{
 		public DbContextBuildingParameter( DbContext context, DbModelBuilder builder )
 		{

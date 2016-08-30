@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
-using DragonSpark.Windows.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -172,7 +171,7 @@ namespace DragonSpark.Windows.Entity
 		public static void DeleteObjectEnsured( this ObjectContext target, object entity )
 		{
 			// HACK: Ensure all ends are loaded:
-			var query = from property in entity.GetType().GetProperties( BindingOptions.AllMembers )
+			var query = from property in entity.GetType().GetRuntimeProperties()
 				where typeof(IRelatedEnd).IsAssignableFrom( property.PropertyType )
 				let end = property.GetValue( entity, null ) as IRelatedEnd
 				where end != null && !end.IsLoaded

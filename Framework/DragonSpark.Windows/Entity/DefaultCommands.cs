@@ -1,12 +1,11 @@
-using System.Windows.Input;
 using DragonSpark.Commands;
+using System.Windows.Input;
 
 namespace DragonSpark.Windows.Entity
 {
-	public class DefaultCommands : CompositeCommand<DbContextBuildingParameter>
+	public sealed class DefaultCommands : CompositeCommand<DbContextBuildingParameter>
 	{
 		public static DefaultCommands Default { get; } = new DefaultCommands();
-
-		public DefaultCommands() : base( new ICommand[] { new EnableLocalStoragePropertyCommand(), new RegisterComplexTypesCommand() } ) {}
+		DefaultCommands() : base( new ICommand[] { EnableLocalStoragePropertyCommand.Default, new RegisterComplexTypesCommand() } ) {}
 	}
 }
