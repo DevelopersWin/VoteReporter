@@ -17,7 +17,7 @@ namespace DragonSpark.ComponentModel
 			var elementType = type ?? p.PropertyType.Adapt().GetEnumerableType();
 			var result = elementType.With( Transform );
 			return result;
-		}, Activator.Activate<object> );
+		}, Activator.Default.Get );
 
 		sealed class CollectionAlteration : AlterationBase<Type>
 		{

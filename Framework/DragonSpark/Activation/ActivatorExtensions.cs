@@ -22,37 +22,24 @@ namespace DragonSpark.Activation
 			protected override Func<Type, T> Create( Func<IActivator> parameter ) => parameter().Activate<T>;
 		}
 
-		public static Func<IServiceProvider> Provider( this ISource<IActivator> @this ) => @this.ToDelegate().Provider();
-		public static Func<IServiceProvider> Provider( this Func<IActivator> @this ) => Providers.Default.Get( @this );
-
-		class Providers : FactoryCache<Func<IActivator>, Func<IServiceProvider>>
+		// public static Func<IServiceProvider> Provider( this ISource<IActivator> @this ) => @this.ToDelegate().Provider();
+		public static Func<IServiceProvider> Provider( this IActivator @this ) => Providers.Default.Get( @this );
+		sealed class Providers : FactoryCache<IActivator, Func<IServiceProvider>>
 		{
 			public static Providers Default { get; } = new Providers();
 			Providers() /*: base( source => new Factory( source ).Create )*/ {}
 
-			/*class Factory : FactoryBase<IServiceProvider>
-			{
-				readonly Func<IActivator> source;
-				public Factory( Func<IActivator> source )
-				{
-					this.source = source;
-				}
-
-				
-				public override IServiceProvider Create() => new DecoratedServiceProvider( source().Create );
-			}*/
-
-			protected override Func<IServiceProvider> Create( Func<IActivator> parameter ) => new ServiceProvider( parameter ).Self;
+			protected override Func<IServiceProvider> Create( IActivator parameter ) => new ServiceProvider( parameter ).Self;
 
 			sealed class ServiceProvider : IServiceProvider
 			{
-				readonly Func<IActivator> parameter;
-				public ServiceProvider( Func<IActivator> parameter )
+				readonly IActivator parameter;
+				public ServiceProvider( IActivator parameter )
 				{
 					this.parameter = parameter;
 				}
 
-				public object GetService( Type serviceType ) => parameter().Activate<object>( serviceType );
+				public object GetService( Type serviceType ) => parameter.Activate<object>( serviceType );
 			}
 		}
 

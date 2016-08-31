@@ -1,20 +1,27 @@
-using System;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using Moq;
+using System;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Windows.Markup
 {
-	public class MockFactory : ValidatedParameterizedSourceBase<Type, object>
+	public sealed class MockFactory : ParameterizedSourceBase<Type, object>
 	{
-		public static MockFactory Default { get; } = new MockFactory();
+		public static IParameterizedSource<Type, object> Default { get; } = new MockFactory().With( Specification.DefaultNested );
+		MockFactory() : this( Activator.Default.Get<Mock> ) {}
 
-		MockFactory() : base( Specification.DefaultNested ) {}
+		readonly Func<Type, Mock> activator;
+
+		public MockFactory( Func<Type, Mock> activator )
+		{
+			this.activator = activator;
+		}
 
 		class Specification : SpecificationBase<Type>
 		{
 			public static Specification DefaultNested { get; } = new Specification();
+			Specification() {}
 
 			public override bool IsSatisfiedBy( Type parameter ) => parameter.IsInterface || !parameter.IsSealed;
 		}
@@ -22,7 +29,7 @@ namespace DragonSpark.Windows.Markup
 		public override object Get( Type parameter )
 		{
 			var type = typeof(Mock<>).MakeGenericType( parameter );
-			var result = Activator.Activate<Mock>( type ).Object;
+			var result = activator( type ).Object;
 			return result;
 		}
 	}

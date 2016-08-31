@@ -1,17 +1,16 @@
 ﻿using DragonSpark.Activation.Location;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using System;
 using DragonSpark.Specifications;
+using System;
 
 namespace DragonSpark.Activation
 {
 	public sealed class Activator : CompositeActivator
 	{
-		public static ISource<IActivator> Default { get; } = new Scope<IActivator>( Factory.GlobalCache( () => new Activator() ) );
+		public static IActivator Default { get; } = new Activator();
 		Activator() : base( new DelegatedActivator( SingletonLocator.Default.ToSourceDelegate(), SingletonLocator.Specification.Project<TypeRequest, Type>( request => request.RequestedType ) ), Constructor.Default ) {}
 
-		public static T Activate<T>( Type type ) => Default.Get().Get<T>( type );
+		// public static T Activate<T>( Type type ) => Default.Get().Get<T>( type );
 	}
 
 	public class DelegatedActivator : ActivatorBase<TypeRequest>

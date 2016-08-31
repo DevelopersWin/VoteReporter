@@ -21,14 +21,14 @@ namespace DragonSpark.Activation.Location
 
 		sealed class Source : ParameterizedSourceBase<Type, object>
 		{
-			readonly Func<Type, Func<object>> delegateSource;
+			readonly Func<Type, Func<object>> source;
 
-			public Source( Func<Type, Func<object>> delegateSource )
+			public Source( Func<Type, Func<object>> source )
 			{
-				this.delegateSource = delegateSource;
+				this.source = source;
 			}
 
-			public override object Get( Type parameter ) => delegateSource( parameter )?.Invoke();
+			public override object Get( Type parameter ) => source( parameter )?.Invoke();
 		}
 	}
 }
