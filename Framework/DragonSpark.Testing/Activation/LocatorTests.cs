@@ -7,11 +7,11 @@ namespace DragonSpark.Testing.Activation
 	public class LocatorTests
 	{
 		[Theory, AutoData]
-		void CachesAsExpected( ConstructorStore constructorStore, int number )
+		void CachesAsExpected( Constructors constructors, int number )
 		{
 			var parameter = new ConstructTypeRequest( typeof(ConstructedItem), number );
-			var first = constructorStore.Get( parameter );
-			Assert.Same( first, constructorStore.Get( parameter ) );
+			var first = constructors.Get( parameter );
+			Assert.Same( first, constructors.Get( parameter ) );
 			Assert.Equal( number, new ConstructedItem( number ).Number );
 		}
 

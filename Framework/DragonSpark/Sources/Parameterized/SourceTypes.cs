@@ -44,12 +44,13 @@ namespace DragonSpark.Sources.Parameterized
 				return result;
 			}
 
-			sealed class Requests : ValidatedParameterizedSourceBase<Type, SourceTypeRequest>
+			sealed class Requests : ParameterizedSourceBase<Type, SourceTypeRequest>
 			{
 				readonly static Func<Type, Type> Results = ResultTypes.Default.ToSourceDelegate();
+				readonly static ISpecification<Type> Specification = Activation.Defaults.Instantiable.And( Defaults.KnownSourcesSpecification, ContainsExportSpecification.Default, new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) );
 
-				public static Requests DefaultNested { get; } = new Requests();
-				Requests() : base( Activation.Defaults.Instantiable.And( Defaults.KnownSourcesSpecification, ContainsExportSpecification.Default, new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) ) ) {}
+				public static IParameterizedSource<Type, SourceTypeRequest> DefaultNested { get; } = new Requests().With( Specification );
+				Requests() {}
 
 				public override SourceTypeRequest Get( Type parameter ) => 
 					new SourceTypeRequest( parameter, parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ), Results( parameter ) );

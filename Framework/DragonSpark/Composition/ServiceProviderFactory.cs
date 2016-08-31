@@ -1,20 +1,20 @@
-﻿using DragonSpark.Application.Setup;
+﻿using DragonSpark.Activation;
+using DragonSpark.Application.Setup;
 using DragonSpark.Sources.Parameterized;
-using System;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ServiceProviderFactory : AlterationBase<IServiceProvider>
+	public sealed class ServiceProviderFactory : AlterationBase<IActivator>
 	{
 		// [Export( typeof(ITransformer<IServiceProvider>) )]
 		public static ServiceProviderFactory Default { get; } = new ServiceProviderFactory();
 		ServiceProviderFactory() {}
 
-		public override IServiceProvider Get( IServiceProvider parameter )
+		public override IActivator Get( IActivator parameter )
 		{
 			var context = CompositionHostFactory.Default.Get();
 			var primary = new ServiceLocator( context );
-			var result = new CompositeServiceProvider( new InstanceRepository( context, primary ), primary, parameter );
+			var result = new CompositeActivator( new InstanceRepository( context, primary ), primary, parameter );
 			return result;
 		}
 	}

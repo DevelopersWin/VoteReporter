@@ -1,10 +1,10 @@
-﻿using DragonSpark.Activation.Location;
+﻿using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Sources.Parameterized;
-using System;
 
 namespace DragonSpark.Composition
 {
-	public class ServiceProviderSource : SuppliedSource<IServiceProvider, IServiceProvider>
+	public class ServiceProviderSource : SuppliedSource<IActivator, IActivator>
 	{
 		public static ServiceProviderSource Default { get; } = new ServiceProviderSource();
 		ServiceProviderSource() : base( ServiceProviderFactory.Default.Get, DefaultServiceProvider.Default ) {}

@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Delegates;
 using DragonSpark.Sources.Parameterized;
-using Activator = DragonSpark.Activation.Activator;
+using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Composition
 {
@@ -16,7 +15,7 @@ namespace DragonSpark.Composition
 		public override IEnumerable<Type> Get( Type parameter )
 		{
 			yield return parameter;
-			var provider = Activator.Default.Provider();
+			var provider = SingletonLocator.Default.Sourced().ToDelegate();
 			var sourceType = SourceTypeLocator.Default.Get( parameter );
 			if ( sourceType != null )
 			{

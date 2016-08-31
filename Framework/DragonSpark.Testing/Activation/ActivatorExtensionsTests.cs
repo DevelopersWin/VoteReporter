@@ -9,8 +9,9 @@ namespace DragonSpark.Testing.Activation
 	public class ActivatorExtensionsTests
 	{
 		[Theory, AutoData]
-		public void ActivateMany( Constructor sut )
+		public void ActivateMany()
 		{
+			var sut = Constructor.Default;
 			var items = sut.ActivateMany<IInterface>( new[] { typeof(Class), typeof(AnotherClass), typeof(YetAnotherClass) } );
 			Assert.Collection( items, x => Assert.IsType<Class>( x ), x => Assert.IsType<AnotherClass>( x ), x => Assert.IsType<YetAnotherClass>( x ) );
 		} 

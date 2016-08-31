@@ -1,8 +1,8 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.ObjectModel;
-using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.ComponentModel
 {
@@ -17,7 +17,7 @@ namespace DragonSpark.ComponentModel
 			var elementType = type ?? p.PropertyType.Adapt().GetEnumerableType();
 			var result = elementType.With( Transform );
 			return result;
-		}, Activator.Default.Get );
+		}, Constructor.Default.Get );
 
 		sealed class CollectionAlteration : AlterationBase<Type>
 		{

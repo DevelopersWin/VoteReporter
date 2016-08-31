@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 	public class FactoryParameterCoercerQualifierTests
 	{
 		[Theory, AutoData]
-		public void Construct( ConstructorBase.Coercer sut )
+		public void Construct( ConstructorCoercer sut )
 		{
 			var parameter = sut.Coerce( typeof(Class) );
 			Assert.Equal( parameter.RequestedType, typeof(Class) );

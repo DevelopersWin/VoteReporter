@@ -9,7 +9,7 @@ namespace DragonSpark.Activation.Location
 {
 	public sealed class SingletonLocator : DelegatedParameterizedSource<Type, object>, ISingletonLocator
 	{
-		public static ISpecification<Type> Specification { get; } = Specifications<Type>.Assigned.And( ContainsSingletonPropertySpecification.Default );
+		readonly static ISpecification<Type> Specification = Specifications<Type>.Assigned.And( ContainsSingletonPropertySpecification.Default );
 		
 		[Export]
 		public static ISingletonLocator Default { get; } = new SingletonLocator();
@@ -30,5 +30,7 @@ namespace DragonSpark.Activation.Location
 
 			public override object Get( Type parameter ) => source( parameter )?.Invoke();
 		}
+
+		object IServiceProvider.GetService( Type serviceType ) => Get( serviceType );
 	}
 }

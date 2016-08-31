@@ -1,12 +1,13 @@
-﻿using System;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Reflection;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ServiceLocator : IServiceProvider
+	public sealed class ServiceLocator : ActivatorBase
 	{
 		readonly CompositionContext host;
 
@@ -15,10 +16,10 @@ namespace DragonSpark.Composition
 			this.host = host;
 		}
 
-		public object GetService( Type serviceType )
+		public override object Get( Type parameter )
 		{
-			var enumerable = serviceType.GetTypeInfo().IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-			var result = enumerable ? host.GetExports( serviceType.Adapt().GetEnumerableType() ) : host.TryGet<object>( serviceType );
+			var enumerable = parameter.GetTypeInfo().IsGenericType && parameter.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+			var result = enumerable ? host.GetExports( parameter.Adapt().GetEnumerableType() ) : host.TryGet<object>( parameter );
 			return result;
 		}
 	}

@@ -7,7 +7,7 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public class ParameterConstructedCompositeFactory<T> : CompositeFactory<object, T>
 	{
-		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ).ToSourceDelegate() ).Fixed() ) {}
+		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ) ).Fixed() ) {}
 
 		sealed class Factory : ParameterizedSourceBase<T>
 		{

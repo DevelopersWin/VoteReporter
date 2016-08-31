@@ -3,5 +3,5 @@ using System;
 
 namespace DragonSpark.Windows.Markup
 {
-	public interface IMarkupPropertyFactory : IValidatedParameterizedSource<IServiceProvider, IMarkupProperty> {}
+	public interface IMarkupPropertyFactory : IParameterizedSource<IServiceProvider, IMarkupProperty> {}
 }

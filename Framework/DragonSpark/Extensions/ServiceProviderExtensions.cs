@@ -8,7 +8,7 @@ namespace DragonSpark.Extensions
 {
 	public static class ServiceProviderExtensions
 	{
-		public static IServiceProvider Cached( this IServiceProvider @this ) => new DecoratedServiceProvider( new Cache<Type, object>( @this.GetService ).GetAssigned );
+		public static IServiceProvider Cached( this IServiceProvider @this ) => new DecoratedActivator( new Cache<Type, object>( @this.GetService ).GetAssigned );
 
 		public static T Get<T>( this IServiceProvider serviceProvider ) => Get<T>( serviceProvider, typeof(T) );
 

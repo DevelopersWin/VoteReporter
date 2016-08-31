@@ -1,5 +1,5 @@
+using DragonSpark.Activation.Location;
 using DragonSpark.Application.Setup;
-using DragonSpark.Aspects.Validation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using DragonSpark.Testing.Framework.Runtime;
@@ -8,19 +8,22 @@ using System;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {
-	[ApplyAutoValidation]
-	sealed class FixtureServiceProvider : ValidatedParameterizedSourceBase<Type, object>, IServiceProvider
+	// [ApplyAutoValidation]
+	sealed class FixtureServiceProvider : DecoratedActivator
 	{
-		readonly IFixture fixture;
+		public FixtureServiceProvider( IFixture fixture ) : base( new Inner( fixture ).With( new Specification( fixture ) ).ToSourceDelegate() ) {}
 
-		public FixtureServiceProvider( IFixture fixture ) : base( new Specification( fixture ) )
+		sealed class Inner : ParameterizedSourceBase<Type, object>
 		{
-			this.fixture = fixture;
+			readonly IFixture fixture;
+
+			public Inner( IFixture fixture )
+			{
+				this.fixture = fixture;
+			}
+
+			public override object Get( Type parameter ) => fixture.Create<object>( parameter );
 		}
-
-		public override object Get( Type parameter ) => fixture.Create<object>( parameter );
-
-		public object GetService( Type serviceType ) => Get( serviceType );
 
 		sealed class Specification : SpecificationBase<Type>
 		{

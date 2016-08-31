@@ -1,5 +1,6 @@
 using DragonSpark.Activation;
 using DragonSpark.Activation.Location;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Objects;
 using Xunit;
@@ -17,7 +18,7 @@ namespace DragonSpark.Testing.Activation
 			var activator = GlobalServiceProvider.GetService<IActivator>();
 			// Assert.Same( Activator.Default.Get(), Activator.Default.Get() );
 			Assert.Same( Activator.Default, activator );
-			var instance = activator.Activate<IInterface>( typeof(Class) );
+			var instance = activator.Get<IInterface>( typeof(Class) );
 			Assert.IsType<Class>( instance );
 		}
 

@@ -8,10 +8,10 @@ using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Activation
 {
-	public sealed class ConstructorStore : EqualityReferenceCache<ConstructTypeRequest, ConstructorInfo>
+	public sealed class Constructors : EqualityReferenceCache<ConstructTypeRequest, ConstructorInfo>
 	{
-		public static ConstructorStore Default { get; } = new ConstructorStore();
-		ConstructorStore() : base( Create ) {}
+		public static Constructors Default { get; } = new Constructors();
+		Constructors() : base( Create ) {}
 
 		static ConstructorInfo Create( ConstructTypeRequest parameter )
 		{
