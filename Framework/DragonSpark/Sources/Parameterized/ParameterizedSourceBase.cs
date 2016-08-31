@@ -17,7 +17,9 @@ namespace DragonSpark.Sources.Parameterized
 
 		public abstract TResult Get( TParameter parameter );
 
-		object IParameterizedSource.Get( object parameter )
+		object IParameterizedSource.Get( object parameter ) => GetGeneralized( parameter );
+
+		protected virtual object GetGeneralized( object parameter )
 		{
 			var coerced = coercer( parameter );
 			var result = coerced.IsAssignedOrValue() ? Get( coerced ) : default(TResult);

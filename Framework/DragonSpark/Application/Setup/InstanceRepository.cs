@@ -33,5 +33,8 @@ namespace DragonSpark.Application.Setup
 
 		public bool IsSatisfiedBy( Type parameter ) => Get( parameter, o => true );
 		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
+
+		public object Get( Type parameter ) => GetService( parameter );
+		public object Get( object parameter ) => parameter is Type ? Get( parameter ) : null;
 	}
 }

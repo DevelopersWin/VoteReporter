@@ -100,7 +100,8 @@
     <Compile Include="PriorityAwareLocator.cs" />
     <Compile Include="PriorityComparer.cs" />
     <Compile Include="PriorityExtensions.cs" />
-    <Compile Include="Sources\Parameterized\SelectedParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
     <Compile Include="Specifications\DelegatedAssignedSpecificationBase.cs" />
     <Compile Include="Specifications\SuppliedDelegatedSpecification.cs" />
@@ -207,7 +208,7 @@
     <Compile Include="Application\Setup\ApplySetup.cs" />
     <Compile Include="Commands\SuppliedCommandSource.cs" />
     <Compile Include="Commands\DeclaredCommandBase.cs" />
-    <Compile Include="Application\Setup\CompositeServiceProvider.cs" />
+    <Compile Include="Activation\CompositeActivator.cs" />
     <Compile Include="Application\DefaultExportProvider.cs" />
     <Compile Include="Application\Setup\EnableServicesCommand.cs" />
     <Compile Include="Application\Exports.cs" />
@@ -394,10 +395,10 @@
     <Compile Include="Expressions\CompiledDelegateFactoryBase.cs" />
     <Compile Include="Activation\ConstructingParameterLocator.cs" />
     <Compile Include="Activation\ConstructorDelegateFactory.cs" />
-    <Compile Include="Activation\ConstructorStore.cs" />
+    <Compile Include="Activation\Constructors.cs" />
     <Compile Include="Activation\ConstructTypeRequest.cs" />
     <Compile Include="Activation\Location\ContainsSingletonPropertySpecification.cs" />
-    <Compile Include="Activation\Location\DecoratedServiceProvider.cs" />
+    <Compile Include="Activation\Location\DecoratedActivator.cs" />
     <Compile Include="Activation\Location\DefaultServiceProvider.cs" />
     <Compile Include="Application\Execute.cs" />
     <Compile Include="Application\ExecutionContext.cs" />
@@ -411,7 +412,6 @@
     <Compile Include="Expressions\InvokeMethodDelegate.cs" />
     <Compile Include="Expressions\InvokeMethodExpressionFactory.cs" />
     <Compile Include="Activation\Location\ISingletonLocator.cs" />
-    <Compile Include="Activation\Location\LocatorBase.cs" />
     <Compile Include="Expressions\Parameter.cs" />
     <Compile Include="Activation\ParameterConstructor.cs" />
     <Compile Include="Projector.cs" />
@@ -549,11 +549,8 @@
     <Compile Include="Sources\AmbientStackCommand.cs" />
     <Compile Include="Sources\Parameterized\Caching\AttachedProperty.cs" />
     <Compile Include="Sources\Parameterized\Caching\ConnectedStore.cs" />
-    <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Specifications\AlwaysSpecification.cs" />
     <Compile Include="Specifications\SuppliedSpecification.cs" />
-    <Compile Include="Activation\CompositeActivator.cs" />
-    <Compile Include="Activation\ConstructorBase.cs" />
     <Compile Include="Activation\ConstructCoercer.cs" />
     <Compile Include="ICoercer.cs" />
     <Compile Include="Sources\Parameterized\IValidatedParameterizedSource.cs" />

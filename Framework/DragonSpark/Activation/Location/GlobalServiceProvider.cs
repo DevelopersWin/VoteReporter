@@ -1,6 +1,6 @@
-using System;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
+using System;
 
 namespace DragonSpark.Activation.Location
 {

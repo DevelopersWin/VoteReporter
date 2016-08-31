@@ -1,116 +1,79 @@
-using DragonSpark.Aspects.Validation;
+using DragonSpark.Expressions;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Expressions;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Activation
 {
-	[ApplyAutoValidation]
-	public class Constructor : ConstructorBase
+	public interface IConstructor : IParameterizedSource<ConstructTypeRequest, object>, IActivator {}
+
+	public sealed class Constructor : DecoratedParameterizedSource<ConstructTypeRequest, object>, IConstructor
 	{
-		public static Constructor Default { get; } = new Constructor();
-		Constructor() : this( ConstructorStore.Default.Get, ConstructorDelegateFactory<Invoke>.Default.Get ) {}
+		public static IConstructor Default { get; } = new Constructor();
+		Constructor() : base( new Source().With( ConstructorSpecification.Default ).With( ConstructorCoercer.Default ) ) {}
 
-		readonly Func<ConstructTypeRequest, ConstructorInfo> constructorSource;
-		readonly Func<ConstructorInfo, Invoke> activatorSource;
-
-		Constructor( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, Invoke> activatorSource ) : base( Specification.DefaultNested )
+		sealed class Source : ParameterizedSourceBase<ConstructTypeRequest, object>
 		{
-			this.constructorSource = constructorSource;
-			this.activatorSource = activatorSource;
-		}
+			public Source() : this( Constructors.Default.Get, ConstructorDelegateFactory<Invoke>.Default.Get ) {}
 
-		public T Create<T>( ConstructTypeRequest parameter ) => (T)Get( parameter );
+			readonly Func<ConstructTypeRequest, ConstructorInfo> constructorSource;
+			readonly Func<ConstructorInfo, Invoke> activatorSource;
 
-		public override object Get( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? SpecialValues.DefaultOrEmpty( parameter.RequestedType );
-
-		object LocateAndCreate( ConstructTypeRequest parameter )
-		{
-			var info = constructorSource( parameter );
-			var result = info != null ? activatorSource( info )?.Invoke( WithOptional( parameter.Arguments, info.GetParameters() ) ) : null;
-			return result;
-		}
-
-		static object[] WithOptional( IReadOnlyCollection<object> arguments, IEnumerable<ParameterInfo> parameters )
-		{
-			var optional = parameters.Skip( arguments.Count ).Where( info => info.IsOptional ).Select( info => info.DefaultValue );
-			var result = arguments.Concat( optional ).Fixed();
-			return result;
-		}
-
-		sealed class Specification : SpecificationBase<ConstructTypeRequest>
-		{
-			public static Specification DefaultNested { get; } = new Specification();
-			Specification() : this( ConstructorStore.Default ) {}
-
-			readonly ConstructorStore cache;
-
-			Specification( ConstructorStore cache ) : base( Coercer.Default.ToDelegate() )
+			Source( Func<ConstructTypeRequest, ConstructorInfo> constructorSource, Func<ConstructorInfo, Invoke> activatorSource )
 			{
-				this.cache = cache;
+				this.constructorSource = constructorSource;
+				this.activatorSource = activatorSource;
 			}
 
-			public override bool IsSatisfiedBy( ConstructTypeRequest parameter )
+			// public T Create<T>( ConstructTypeRequest parameter ) => (T)Get( parameter );
+
+			public override object Get( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? SpecialValues.DefaultOrEmpty( parameter.RequestedType );
+
+			object LocateAndCreate( ConstructTypeRequest parameter )
 			{
-				var isSatisfiedBy = parameter.RequestedType.GetTypeInfo().IsValueType || cache.Get( parameter ) != null;
-				return isSatisfiedBy;
+				var info = constructorSource( parameter );
+				var result = info != null ? activatorSource( info )?.Invoke( WithOptional( parameter.Arguments, info.GetParameters() ) ) : null;
+				return result;
+			}
+
+			static object[] WithOptional( IReadOnlyCollection<object> arguments, IEnumerable<ParameterInfo> parameters )
+			{
+				var optional = parameters.Skip( arguments.Count ).Where( info => info.IsOptional ).Select( info => info.DefaultValue );
+				var result = arguments.Concat( optional ).Fixed();
+				return result;
 			}
 		}
+
+		object IParameterizedSource<Type, object>.Get( Type parameter ) => GetGeneralized( parameter );
+		object IServiceProvider.GetService( Type serviceType ) => GetGeneralized( serviceType );
 	}
 
-	/*public interface IParameterExpressionStore : IStore<ParameterExpression> {}*/
-
-	/*public class ParameterFactory : FactoryBase<ImmutableArray<ParameterExpression>>
+	sealed class ConstructorSpecification : SpecificationBase<ConstructTypeRequest>
 	{
-		readonly IParameterExpressionStore[] stores;
+		public static ConstructorSpecification Default { get; } = new ConstructorSpecification();
+		ConstructorSpecification() : this( Constructors.Default ) {}
 
-		public ParameterFactory( params IParameterExpressionStore[] stores )
+		readonly Constructors cache;
+
+		ConstructorSpecification( Constructors cache ) : base( ConstructorCoercer.Default.ToDelegate() )
 		{
-			this.stores = stores;
+			this.cache = cache;
 		}
 
-		public override ImmutableArray<ParameterExpression> Create() => stores.Select( store => store.Value ).ToImmutableArray();
-	}*/
-
-	/*public class InstanceParameter : InstanceParameter<object>
-	{
-		public new static InstanceParameter Default { get; } = new InstanceParameter();
-		InstanceParameter() {}
+		public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => 
+			parameter.RequestedType.GetTypeInfo().IsValueType || cache.Get( parameter ) != null;
 	}
 
-	public class InstanceParameter<T> : ExpressionParameterStoreBase<T>
+	public sealed class ConstructorCoercer : TypeRequestCoercer<ConstructTypeRequest>
 	{
-		public static InstanceParameter<T> Default { get; } = new InstanceParameter<T>();
-		protected InstanceParameter() : base( "instance" ) {}
-	}*/
+		public static ConstructorCoercer Default { get; } = new ConstructorCoercer();
+		ConstructorCoercer() {}
 
-	/*public class ArgumentArrayParameter : ExpressionParameterStoreBase<object[]>
-	{
-		public static ArgumentArrayParameter Default { get; } = new ArgumentArrayParameter();
-		ArgumentArrayParameter() : base( "arguments" ) {}
+		protected override ConstructTypeRequest Create( Type type ) => new ConstructTypeRequest( type );
 	}
-
-	public abstract class ExpressionParameterStoreBase<T> : StoreBase<ParameterExpression>, IParameterExpressionStore
-	{
-		readonly ParameterExpression expression;
-
-		protected ExpressionParameterStoreBase( string name ) : this( Expression.Parameter( typeof(T), name ) ) {}
-
-		protected ExpressionParameterStoreBase( ParameterExpression expression )
-		{
-			this.expression = expression;
-		}
-
-		protected override ParameterExpression Get() => expression;
-	}*/
-
-	/*public static class InvokeExtensions
-	{
-		public static T Invoke<T>( this Invoke @this, params object[] arguments ) => (T)@this( arguments );
-	}*/
 }

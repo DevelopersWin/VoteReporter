@@ -60,11 +60,11 @@ namespace DragonSpark.Specifications
 			Cache() : base( specification => new DelegatedSpecification<T>( specification.ToSpecificationDelegate().Cache() ) ) {}
 		}
 
-		public static ISpecification<T> ToSpecification<T>( this Func<T, bool> @this ) => @this.Target as ISpecification<T> ?? Specifications<T>.Default.Get( @this );
-		sealed class Specifications<T> : Cache<Func<T, bool>, ISpecification<T>>
+		public static ISpecification<T> ToSpecification<T>( this object @this ) => @this as ISpecification<T> ?? Specifications<T>.Default.Get( @this );
+		sealed class Specifications<T> : Cache<object, ISpecification<T>>
 		{
 			public static Specifications<T> Default { get; } = new Specifications<T>();
-			Specifications() : base( factory => new DelegatedSpecification<T>( factory ) ) {}
+			Specifications() : base( factory => new DelegatedSpecification<T>( factory.Accepts ) ) {}
 		}
 
 		/*public static ISpecification<TParameter> ToSpecification<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => FactorySpecifications<TParameter, TResult>.Default.Get( @this );

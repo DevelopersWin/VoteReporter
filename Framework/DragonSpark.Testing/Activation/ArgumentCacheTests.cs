@@ -8,10 +8,10 @@ namespace DragonSpark.Testing.Activation
 	public class ArgumentCacheTests
 	{
 		[Theory, AutoData]
-		public void CreateDefault( Constructor sut )
+		public void CreateDefault()
 		{
 			var type = typeof(bool);
-			var result = sut.Get<object>( type );
+			var result = Constructor.Default.Get<object>( type );
 			Assert.Equal( false, result );
 		}
 	}

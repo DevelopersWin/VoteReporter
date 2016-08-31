@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Setup
 		{
 			var count = 0;
 			IValidatedParameterizedSource<Type, object> sut = null;
-			var provider = new DecoratedServiceProvider( type =>
+			var provider = new DecoratedActivator( type =>
 														 {
 															 ++count;
 															 if ( type == typeof(int) )

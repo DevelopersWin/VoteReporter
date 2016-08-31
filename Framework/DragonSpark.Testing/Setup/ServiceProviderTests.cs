@@ -1,4 +1,5 @@
-﻿using DragonSpark.Activation.Location;
+﻿using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.Application;
 using DragonSpark.Application.Setup;
 using DragonSpark.Extensions;
@@ -16,7 +17,7 @@ namespace DragonSpark.Testing.Setup
 		public void BasicTest()
 		{
 			var target = new Class();
-			var composite = new CompositeServiceProvider( new InstanceRepository( target ) );
+			var composite = new CompositeActivator( new InstanceRepository( target ) );
 			var result = composite.Get<Class>();
 			Assert.Same( target, result );
 		}

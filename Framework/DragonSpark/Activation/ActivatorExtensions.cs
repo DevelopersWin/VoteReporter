@@ -12,7 +12,7 @@ namespace DragonSpark.Activation
 {
 	public static class ActivatorExtensions
 	{
-		public static Func<Type, T> Delegate<T>( this ISource<IActivator> @this ) => @this.ToDelegate().Delegate<T>();
+		/*public static Func<Type, T> Delegate<T>( this ISource<IActivator> @this ) => @this.ToDelegate().Delegate<T>();
 		public static Func<Type, T> Delegate<T>( this Func<IActivator> @this ) => Delegates<T>.Default.Get( @this );
 		class Delegates<T> : FactoryCache<Func<IActivator>, Func<Type, T>>
 		{
@@ -20,7 +20,7 @@ namespace DragonSpark.Activation
 			Delegates() {}
 
 			protected override Func<Type, T> Create( Func<IActivator> parameter ) => parameter().Activate<T>;
-		}
+		}*/
 
 		// public static Func<IServiceProvider> Provider( this ISource<IActivator> @this ) => @this.ToDelegate().Provider();
 		public static Func<IServiceProvider> Provider( this IActivator @this ) => Providers.Default.Get( @this );
@@ -39,16 +39,10 @@ namespace DragonSpark.Activation
 					this.parameter = parameter;
 				}
 
-				public object GetService( Type serviceType ) => parameter.Activate<object>( serviceType );
+				public object GetService( Type serviceType ) => parameter.Get<object>( serviceType );
 			}
 		}
 
-		public static T Activate<T>( this IActivator @this ) => Activate<T>( @this, typeof(T) );
-
-		public static T Activate<T>( this IActivator @this, Type requestedType ) => (T)@this.Get( requestedType );
-
-		public static T Activate<T>( this IActivator @this, TypeRequest request ) => (T)@this.Get( request );
-		
 		public static T Construct<T>( this IActivator @this, params object[] parameters ) => Construct<T>( @this, typeof(T), parameters );
 
 		public static T Construct<T>( this IActivator @this, Type type, params object[] parameters ) => (T)@this.Get( new ConstructTypeRequest( type, parameters ) );

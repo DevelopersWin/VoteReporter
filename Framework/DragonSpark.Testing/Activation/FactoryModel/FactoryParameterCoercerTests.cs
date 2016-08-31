@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		}
 
 		[Theory, AutoData]
-		void ConstructParameter( ConstructorBase.Coercer sut, Type item )
+		void ConstructParameter( ConstructorCoercer sut, Type item )
 		{
 			var parameter = sut.Coerce( item );
 			Assert.NotNull( parameter );

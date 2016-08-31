@@ -14,7 +14,7 @@ namespace DragonSpark.TypeSystem.Metadata
 
 		sealed class Factory : CompositeFactory<object, TypeInfo>
 		{
-			readonly static Func<object, TypeInfo>[] Factories = new IParameterizedSource[] { TypeInfoDefinitionProvider.DefaultNested, MemberInfoDefinitionProvider.DefaultNested, GeneralDefinitionProvider.DefaultNested }.Select( parameter => new Func<object, TypeInfo>( parameter.Get<TypeInfo> ) ).Fixed();
+			readonly static IParameterizedSource<object, TypeInfo>[] Factories = new IParameterizedSource[] { TypeInfoDefinitionProvider.DefaultNested, MemberInfoDefinitionProvider.DefaultNested, GeneralDefinitionProvider.DefaultNested }./*Select( parameter => new Func<object, TypeInfo>( parameter.Get<TypeInfo> ) ).*/Select( source => source.Cast<object, TypeInfo>() ).Fixed();
 
 			public Factory() : this( ComponentModel.TypeDefinitions.Default.Get ) { }
 
