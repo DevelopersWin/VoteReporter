@@ -41,7 +41,9 @@
     <Compile Include="Composition\ActivationParameter.cs" />
     <Compile Include="Composition\ActivatorSource.cs" />
     <Compile Include="Composition\CompositeActivatorParameters.cs" />
+    <Compile Include="Composition\ConstructorSelector.cs" />
     <Compile Include="Composition\Contracts.cs" />
+    <Compile Include="Composition\IsValidConstructorSpecification.cs" />
     <Compile Include="Composition\SingletonExportSource.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
     <Compile Include="AssemblyPriorityLocator.cs" />
@@ -53,7 +55,7 @@
     <Compile Include="Composition\CompositionHostExtensions.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ConstructedExports.cs" />
-    <Compile Include="Composition\ConstructorSelectorConfiguration.cs" />
+    <Compile Include="Composition\IsValidTypeSpecification.cs" />
     <Compile Include="Composition\ContainerConfigurator.cs" />
     <Compile Include="Composition\ExportMappingConfigurator.cs" />
     <Compile Include="Composition\ContainerServicesConfigurator.cs" />

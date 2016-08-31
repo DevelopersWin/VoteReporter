@@ -7,6 +7,13 @@ namespace DragonSpark.Specifications
 {
 	public static class SpecificationExtensions
 	{
+		public static bool Accepts<T>( this object @this, T parameter )
+		{
+			var specification = @this as ISpecification<T>;
+			var result = specification?.IsSatisfiedBy( parameter ) ?? false;
+			return result;
+		}
+
 		public static ISpecification<T> Inverse<T>( this ISpecification<T> @this ) => Inversed<T>.Default.Get( @this );
 		sealed class Inversed<T> : Cache<ISpecification<T>, ISpecification<T>>
 		{

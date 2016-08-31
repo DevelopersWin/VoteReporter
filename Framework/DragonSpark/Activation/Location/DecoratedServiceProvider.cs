@@ -1,11 +1,10 @@
-using DragonSpark.Application.Setup;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
 using System;
 
 namespace DragonSpark.Activation.Location
 {
-	public class DecoratedServiceProvider : SpecificationBase<Type>, IServiceProvider, IServiceSpecification
+	public class DecoratedServiceProvider : SpecificationBase<Type>, IServiceProvider
 	{
 		readonly Func<Type, object> inner;
 
@@ -19,11 +18,6 @@ namespace DragonSpark.Activation.Location
 		}
 
 		public virtual object GetService( Type serviceType ) => inner( serviceType );
-		public override bool IsSatisfiedBy( Type parameter )
-		{
-			var specification = inner.Target as IServiceSpecification ?? inner.Target as ISpecification<Type>;
-			var result = specification?.IsSatisfiedBy( parameter ) ?? false;
-			return result;
-		}
+		public override bool IsSatisfiedBy( Type parameter ) => inner.Target.Accepts( parameter );
 	}
 }
