@@ -5,6 +5,6 @@ namespace DragonSpark.Testing.Objects.Setup
 	public class CountingTarget : Scope<object>
 	{
 		public static CountingTarget Default { get; } = new CountingTarget();
-		CountingTarget() : base( Factory.Global( () => new object() ) ) {}
+		CountingTarget() : base( Factory.GlobalCache( () => new object() ) ) {}
 	}
 }

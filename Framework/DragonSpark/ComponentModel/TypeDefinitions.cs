@@ -7,7 +7,7 @@ namespace DragonSpark.ComponentModel
 	public sealed class TypeDefinitions : ParameterizedScope<TypeInfo, TypeInfo>
 	{
 		public static IParameterizedSource<TypeInfo, TypeInfo> Default { get; } = new TypeDefinitions();
-		TypeDefinitions() : base( Factory.Global<TypeInfo, TypeInfo>( Create ) ) {}
+		TypeDefinitions() : base( Factory.GlobalCache<TypeInfo, TypeInfo>( Create ) ) {}
 
 		static TypeInfo Create( TypeInfo parameter )
 		{

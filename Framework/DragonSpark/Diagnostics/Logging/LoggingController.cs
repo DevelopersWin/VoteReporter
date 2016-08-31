@@ -7,6 +7,6 @@ namespace DragonSpark.Diagnostics.Logging
 	public sealed class LoggingController : Scope<LoggingLevelSwitch>
 	{
 		public static LoggingController Default { get; } = new LoggingController();
-		LoggingController() : base( Factory.Global( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) ) ) {}
+		LoggingController() : base( Factory.GlobalCache( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) ) ) {}
 	}
 }

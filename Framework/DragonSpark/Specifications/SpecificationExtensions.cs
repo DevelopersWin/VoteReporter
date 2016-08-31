@@ -50,7 +50,7 @@ namespace DragonSpark.Specifications
 		sealed class Cache<T> : Cache<ISpecification<T>, ISpecification<T>>
 		{
 			public static Cache<T> Default { get; } = new Cache<T>();
-			Cache() : base( specification => new DelegatedSpecification<T>( specification.ToSpecificationDelegate().Fix() ) ) {}
+			Cache() : base( specification => new DelegatedSpecification<T>( specification.ToSpecificationDelegate().Cache() ) ) {}
 		}
 
 		public static ISpecification<T> ToSpecification<T>( this Func<T, bool> @this ) => @this.Target as ISpecification<T> ?? Specifications<T>.Default.Get( @this );

@@ -11,19 +11,19 @@ namespace DragonSpark.Sources
 
 		public static Func<T> For<T>( T @this ) => ( typeof(T).GetTypeInfo().IsValueType ? new Source<T>( @this ) : @this.Sourced() ).Get;
 
-		public static Func<T> ToFixedDelegate<T>( this ISource<T> @this ) => new Func<T>( @this.Get ).Fix();
-		public static Func<T> Fix<T>( this Func<T> @this ) => FixedDelegateBuilder<T>.Default.Get( @this );
-		public static Func<TParameter, TResult> Fix<TParameter, TResult>( this Func<TParameter, TResult> @this ) => CacheFactory.Create( @this ).Get;
+		public static Func<T> ToFixedDelegate<T>( this ISource<T> @this ) => new Func<T>( @this.Get ).Cache();
+		public static Func<T> Cache<T>( this Func<T> @this ) => FixedDelegateBuilder<T>.Default.Get( @this );
+		public static Func<TParameter, TResult> Cache<TParameter, TResult>( this Func<TParameter, TResult> @this ) => CacheFactory.Create( @this ).Get;
 
-		public static Func<object, T> Global<T>( this ISource<T> @this ) => @this.ToDelegate().Global();
-		public static Func<object, T> Global<T>( this Func<T> @this ) => @this.Wrap().Fix();
-		public static Func<object, Func<TParameter, TResult>> Global<TParameter, TResult>( this Func<TParameter, TResult> @this ) => new Cache<TParameter, TResult>( @this ).Get;
+		public static Func<object, T> GlobalCache<T>( this ISource<T> @this ) => @this.ToDelegate().GlobalCache();
+		public static Func<object, T> GlobalCache<T>( this Func<T> @this ) => @this.Wrap().Cache();
+		public static Func<object, Func<TParameter, TResult>> GlobalCache<TParameter, TResult>( this Func<TParameter, TResult> @this ) => new Caches<TParameter, TResult>( @this ).Get;
 
-		sealed class Cache<TParameter, TResult> : FactoryCache<Func<TParameter, TResult>>
+		sealed class Caches<TParameter, TResult> : FactoryCache<Func<TParameter, TResult>>
 		{
 			readonly Func<TParameter, TResult> factory;
 
-			public Cache( Func<TParameter, TResult> factory )
+			public Caches( Func<TParameter, TResult> factory )
 			{
 				this.factory = factory;
 			}

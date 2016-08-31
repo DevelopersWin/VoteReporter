@@ -7,6 +7,6 @@ namespace DragonSpark.Application
 	public sealed class SingletonExports : Scope<ImmutableArray<SingletonExport>>
 	{
 		public static ISource<ImmutableArray<SingletonExport>> Default { get; } = new SingletonExports();
-		SingletonExports() : base( Factory.Global( () => ExportsProfileFactory.Default.Get().Singletons.ToImmutableArray() ) ) {}
+		SingletonExports() : base( Factory.GlobalCache( () => ExportsProfileFactory.Default.Get().Singletons.ToImmutableArray() ) ) {}
 	}
 }

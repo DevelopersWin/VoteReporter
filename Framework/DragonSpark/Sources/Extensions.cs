@@ -116,11 +116,10 @@ namespace DragonSpark.Sources
 		sealed class Scopes<T> : Cache<Func<object, T>, IScope<T>>
 		{
 			public static Scopes<T> Default { get; } = new Scopes<T>();
-			Scopes() : base( cache => new Scope<T>( cache.Fix() ) ) {}
+			Scopes() : base( cache => new Scope<T>( cache.Cache() ) ) {}
 		}
 
 		public static ISource<T> Fixed<T>( this ISource<T> @this ) => FixedSources<T>.Default.Get( @this );
-
 		sealed class FixedSources<T> : Cache<ISource<T>, ISource<T>>
 		{
 			public static FixedSources<T> Default { get; } = new FixedSources<T>();

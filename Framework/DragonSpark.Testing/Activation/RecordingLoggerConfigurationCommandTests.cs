@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Activation
 
 			const LogEventLevel assigned = LogEventLevel.Debug;
 			level.Assign( assigned );
-			controller.Assign( Factory.Global( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) ) );
+			controller.Assign( Factory.GlobalCache( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) ) );
 
 			var second = controller.Get();
 			Assert.NotSame( first, second );

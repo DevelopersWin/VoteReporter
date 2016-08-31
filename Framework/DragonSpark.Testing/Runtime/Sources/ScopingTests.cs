@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Runtime.Sources
 		class Scope : Scope<object>
 		{
 			public static Scope Default { get; } = new Scope();
-			Scope() : base( Factory.Fix( () => new object() ) ) {}
+			Scope() : base( Factory.Cache( () => new object() ) ) {}
 		}
 	}
 }

@@ -21,6 +21,6 @@ namespace DragonSpark.Diagnostics.Exceptions
 
 	public static class Defaults<T> where T : Exception
 	{
-		public static ISource<Policy> Retry { get; } = new Scope<Policy>( Exceptions.Retry.Create<T>().Global() );
+		public static ISource<Policy> Retry { get; } = new Scope<Policy>( Exceptions.Retry.Create<T>().GlobalCache() );
 	}
 }

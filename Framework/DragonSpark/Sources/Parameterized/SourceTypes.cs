@@ -15,7 +15,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		readonly static string[] Suffixes = { "Source", "Factory" };
 
-		public static ISource<SourceTypes> Default { get; } = new Scope<SourceTypes>( Sources.Factory.Global( () => new SourceTypes() ) );
+		public static ISource<SourceTypes> Default { get; } = new Scope<SourceTypes>( Sources.Factory.GlobalCache( () => new SourceTypes() ) );
 		SourceTypes() : base( new Factory().Get ) {}
 		
 		sealed class Factory : ParameterizedSourceBase<LocateTypeRequest, Type>

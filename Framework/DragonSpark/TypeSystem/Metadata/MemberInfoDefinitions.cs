@@ -13,7 +13,7 @@ namespace DragonSpark.TypeSystem.Metadata
 	sealed class MemberInfoDefinitions : ParameterizedScope<MemberInfo>
 	{
 		public static IParameterizedSource<MemberInfo> Default { get; } = new MemberInfoDefinitions();
-		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Default.Get ).ToSourceDelegate().Global() ) {}
+		MemberInfoDefinitions() : base( new Factory( TypeDefinitions.Default.Get ).ToSourceDelegate().GlobalCache() ) {}
 
 		sealed class Factory : ParameterizedSourceBase<MemberInfo>
 		{
