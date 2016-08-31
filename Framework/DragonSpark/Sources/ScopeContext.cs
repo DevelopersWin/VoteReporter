@@ -3,7 +3,7 @@ using DragonSpark.Application;
 
 namespace DragonSpark.Sources
 {
-	public class ScopeContext : FixedSource<object>
+	public class ScopeContext : SuppliedSource<object>
 	{
 		readonly Func<object> defaultScope;
 

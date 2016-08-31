@@ -4,9 +4,9 @@ namespace DragonSpark.Specifications
 	{
 		public static ISpecification<T> Assigned { get; } = AssignedSpecification<T>.Default;
 		
-		public static ISpecification<T> Always { get; } = new FixedSpecification<T>( true );
+		public static ISpecification<T> Always { get; } = new SuppliedSpecification<T>( true );
 
-		public static ISpecification<T> Never { get; } = new FixedSpecification<T>( false );
+		public static ISpecification<T> Never { get; } = new SuppliedSpecification<T>( false );
 
 		// public static ISpecification<T> IsInstanceOf { get; } = IsInstanceOfSpecification<T>.Default.Cast<T>();
 	}

@@ -44,7 +44,7 @@ namespace DragonSpark.Sources.Parameterized
 		public static ISource<TResult> Fixed<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, TParameter parameter ) => @this.ToSourceDelegate().Fixed( parameter );
 		public static ISource<TResult> Fixed<TParameter, TResult>( this Func<TParameter, TResult> @this, TParameter parameter ) => @this.Fixed( Factory.For( parameter ) );
 
-		public static ISource<TResult> Fixed<TParameter, TResult>( this Func<TParameter, TResult> @this, Func<TParameter> parameter ) => new FixedFactory<TParameter, TResult>( @this, parameter );
+		public static ISource<TResult> Fixed<TParameter, TResult>( this Func<TParameter, TResult> @this, Func<TParameter> parameter ) => new SuppliedSource<TParameter, TResult>( @this, parameter );
 
 		public static Func<object, T> Wrap<T>( this ISource<T> @this ) => @this.Wrap<object, T>();
 

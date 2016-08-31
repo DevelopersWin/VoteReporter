@@ -12,7 +12,7 @@ namespace DragonSpark.Windows.Runtime
 		public static ApplicationAssemblyLocator Default { get; } = new ApplicationAssemblyLocator();
 		ApplicationAssemblyLocator() : this( AppDomain.CurrentDomain ) {}
 
-		public ApplicationAssemblyLocator( AppDomain domain ) : this( new FixedFactory<AppDomain, Assembly>( DomainApplicationAssemblies.Default.Get, domain ).Get ) {}
+		public ApplicationAssemblyLocator( AppDomain domain ) : this( new SuppliedSource<AppDomain, Assembly>( DomainApplicationAssemblies.Default.Get, domain ).Get ) {}
 
 		public ApplicationAssemblyLocator( Func<Assembly> defaultSource )
 		{

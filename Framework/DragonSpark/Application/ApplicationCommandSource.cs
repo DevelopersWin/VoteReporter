@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Application
 {
-	public class ApplicationCommandSource : FixedCommandSource
+	public class ApplicationCommandSource : SuppliedCommandSource
 	{
 		readonly IEnumerable<Type> types;
 		public ApplicationCommandSource( IEnumerable<Type> types ) : this( types, Items<ICommandSource>.Default ) {}

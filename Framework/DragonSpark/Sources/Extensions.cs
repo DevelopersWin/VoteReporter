@@ -119,11 +119,11 @@ namespace DragonSpark.Sources
 			Scopes() : base( cache => new Scope<T>( cache.Cache() ) ) {}
 		}
 
-		public static ISource<T> Fixed<T>( this ISource<T> @this ) => FixedSources<T>.Default.Get( @this );
-		sealed class FixedSources<T> : Cache<ISource<T>, ISource<T>>
+		public static ISource<T> Fixed<T>( this ISource<T> @this ) => SuppliedSources<T>.Default.Get( @this );
+		sealed class SuppliedSources<T> : Cache<ISource<T>, ISource<T>>
 		{
-			public static FixedSources<T> Default { get; } = new FixedSources<T>();
-			FixedSources() : base( source => new FixedDeferedSource<T>( source.Get ) ) {}
+			public static SuppliedSources<T> Default { get; } = new SuppliedSources<T>();
+			SuppliedSources() : base( source => new SuppliedDeferedSource<T>( source.Get ) ) {}
 		}
 		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
 		class SourceDelegates<T> : Cache<ISource<ISource<T>>, Func<T>>

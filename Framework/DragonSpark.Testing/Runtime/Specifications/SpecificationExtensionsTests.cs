@@ -9,21 +9,21 @@ namespace DragonSpark.Testing.Runtime.Specifications
 		[Fact]
 		public void And()
 		{
-			var sut = new FixedSpecification( true ).And( new FixedSpecification( true ) );
+			var sut = new SuppliedSpecification( true ).And( new SuppliedSpecification( true ) );
 			Assert.True( sut.IsSatisfiedBy( null ) );
 		} 
 
 		[Fact]
 		public void AndNot()
 		{
-			var sut = new FixedSpecification( true ).And( new FixedSpecification( false ) );
+			var sut = new SuppliedSpecification( true ).And( new SuppliedSpecification( false ) );
 			Assert.False( sut.IsSatisfiedBy( null ) );
 		}
 
 		[Fact]
 		public void Or()
 		{
-			var sut = new FixedSpecification( true ).Or( new FixedSpecification( false ) );
+			var sut = new SuppliedSpecification( true ).Or( new SuppliedSpecification( false ) );
 			Assert.True( sut.IsSatisfiedBy( null ) );
 		}
 

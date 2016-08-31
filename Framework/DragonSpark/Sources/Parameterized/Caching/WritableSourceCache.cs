@@ -4,7 +4,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class WritableSourceCache<TInstance, TValue> : Cache<TInstance, IAssignableSource<TValue>>, ISourceCache<TInstance, TValue> where TInstance : class
 	{
-		public WritableSourceCache() : this( instance => new FixedSource<TValue>() ) {}
+		public WritableSourceCache() : this( instance => new SuppliedSource<TValue>() ) {}
 
 		public WritableSourceCache( Func<TInstance, TValue> create ) : this( new Func<TInstance, IAssignableSource<TValue>>( new Context( create ).Create ) ) {}
 
@@ -18,7 +18,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 				this.create = create;
 			}
 
-			public IAssignableSource<TValue> Create( TInstance instance ) => new FixedSource<TValue>( create( instance ) );
+			public IAssignableSource<TValue> Create( TInstance instance ) => new SuppliedSource<TValue>( create( instance ) );
 		}
 	}
 }

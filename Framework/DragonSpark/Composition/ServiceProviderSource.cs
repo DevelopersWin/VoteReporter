@@ -4,7 +4,7 @@ using System;
 
 namespace DragonSpark.Composition
 {
-	public class ServiceProviderSource : FixedFactory<IServiceProvider, IServiceProvider>
+	public class ServiceProviderSource : SuppliedSource<IServiceProvider, IServiceProvider>
 	{
 		public static ServiceProviderSource Default { get; } = new ServiceProviderSource();
 		ServiceProviderSource() : base( ServiceProviderFactory.Default.Get, DefaultServiceProvider.Default ) {}

@@ -9,7 +9,7 @@ namespace DragonSpark.Sources
 	{
 		readonly ICache<Func<object, T>> factories = new Cache<Func<object, T>>();
 		readonly IAssignableSource<object> scope;
-		readonly IAssignableSource<Func<object, T>> defaultFactory = new FixedSource<Func<object, T>>();
+		readonly IAssignableSource<Func<object, T>> defaultFactory = new SuppliedSource<Func<object, T>>();
 
 		public Scope() : this( () => default(T) ) {}
 

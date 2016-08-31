@@ -8,6 +8,6 @@ namespace DragonSpark.Windows.Setup
 {
 	public static class Defaults
 	{
-		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Default.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).ToFixedDelegate();
+		public static Func<FileInfo> UserSettingsPath { get; } = UserSettingsPathFactory.Default.Fixed( ConfigurationUserLevel.PerUserRoamingAndLocal ).ToCachedDelegate();
 	}
 }

@@ -37,8 +37,8 @@ namespace DragonSpark.Extensions
 		}
 
 		// public static FixedCommand<Func<T>> Fixed<T>( this ICommand<Func<T>> @this, T parameter ) => new FixedCommand<Func<T>>( @this, new FixedFactory<T>( parameter ).Create );
-		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, [Optional]T parameter ) => new FixedCommand<T>( @this, parameter );
-		public static FixedCommand<T> Fixed<T>( this ICommand<T> @this, Func<T> parameter ) => new FixedCommand<T>( @this, parameter );
+		public static SuppliedCommand<T> Fixed<T>( this ICommand<T> @this, [Optional]T parameter ) => new SuppliedCommand<T>( @this, parameter );
+		public static SuppliedCommand<T> Fixed<T>( this ICommand<T> @this, Func<T> parameter ) => new SuppliedCommand<T>( @this, parameter );
 
 		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => DelegateCache<T>.Default.Get( @this );
 		sealed class DelegateCache<T> : Cache<ICommand<T>, Action<T>>

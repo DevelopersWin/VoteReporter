@@ -14,7 +14,7 @@ namespace DragonSpark.Testing.Runtime.Sources
 		{
 			var count = 0;
 			var factory = new Func<int>( () => ++count );
-			var singleton = new FixedDeferedSource<int>( factory );
+			var singleton = new SuppliedDeferedSource<int>( factory );
 			Assert.Equal( 1, singleton.Get() );
 			Assert.Equal( 1, singleton.Get() );
 			Assert.Equal( 1, singleton.Get() );
@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Runtime.Sources
 			var count = 0;
 			var factory = new Func<int>( () => ++count );
 
-			var cached = FixedDelegateBuilder<int>.Default.Get( factory );
+			var cached = CachedFactoryBuilder<int>.Default.Get( factory );
 			Assert.Equal( 0, count );
 			Assert.Equal( 1, cached() );
 			Assert.Equal( 1, cached() );

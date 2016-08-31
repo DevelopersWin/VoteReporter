@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DragonSpark.Application
 {
-	public sealed class ApplicationAssembly : FixedFactory<IEnumerable<Assembly>, Assembly>
+	public sealed class ApplicationAssembly : SuppliedSource<IEnumerable<Assembly>, Assembly>
 	{
 		[Export]
 		public static ISource<Assembly> Default { get; } = new ApplicationAssembly();

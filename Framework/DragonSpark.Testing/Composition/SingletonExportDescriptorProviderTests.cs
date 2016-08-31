@@ -71,7 +71,7 @@ namespace DragonSpark.Testing.Composition
 		class Sourced  : ISingleton
 		{
 			[Export( typeof(ISingleton) )]
-			public static ISource<ISingleton> Default { get; } = new FixedSource<ISingleton>( new Sourced() );
+			public static ISource<ISingleton> Default { get; } = new SuppliedSource<ISingleton>( new Sourced() );
 			Sourced() {}
 		}
 	}

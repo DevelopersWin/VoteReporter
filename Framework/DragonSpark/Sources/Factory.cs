@@ -11,8 +11,8 @@ namespace DragonSpark.Sources
 
 		public static Func<T> For<T>( T @this ) => ( typeof(T).GetTypeInfo().IsValueType ? new Source<T>( @this ) : @this.Sourced() ).Get;
 
-		public static Func<T> ToFixedDelegate<T>( this ISource<T> @this ) => new Func<T>( @this.Get ).Cache();
-		public static Func<T> Cache<T>( this Func<T> @this ) => FixedDelegateBuilder<T>.Default.Get( @this );
+		public static Func<T> ToCachedDelegate<T>( this ISource<T> @this ) => new Func<T>( @this.Get ).Cache();
+		public static Func<T> Cache<T>( this Func<T> @this ) => CachedFactoryBuilder<T>.Default.Get( @this );
 		public static Func<TParameter, TResult> Cache<TParameter, TResult>( this Func<TParameter, TResult> @this ) => CacheFactory.Create( @this ).Get;
 
 		public static Func<object, T> GlobalCache<T>( this ISource<T> @this ) => @this.ToDelegate().GlobalCache();

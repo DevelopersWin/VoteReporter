@@ -6,13 +6,13 @@ using System.Windows.Input;
 
 namespace DragonSpark.Application.Setup
 {
-	public class ServiceProviderConfigurations : FixedCommandSource
+	public class ServiceProviderConfigurations : SuppliedCommandSource
 	{
 		protected ServiceProviderConfigurations() {}
 
 		protected override IEnumerable<ICommand> Yield()
 		{
-			yield return GlobalServiceProvider.Default.Configured( ServiceProviderFactory.Default.ToFixedDelegate() );
+			yield return GlobalServiceProvider.Default.Configured( ServiceProviderFactory.Default.ToCachedDelegate() );
 		}
 	}
 }

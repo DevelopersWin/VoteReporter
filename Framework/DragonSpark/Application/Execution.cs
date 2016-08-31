@@ -5,7 +5,7 @@ namespace DragonSpark.Application
 {
 	public static class Execution
 	{
-		public static IAssignableSource<ISource> Context { get; } = new FixedSource<ISource>( ExecutionContext.Default );
+		public static IAssignableSource<ISource> Context { get; } = new SuppliedSource<ISource>( ExecutionContext.Default );
 
 		readonly static Func<object> Get = Context.Delegate();
 

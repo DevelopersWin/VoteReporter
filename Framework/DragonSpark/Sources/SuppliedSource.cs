@@ -2,13 +2,13 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources
 {
-	public class FixedSource<T> : AssignableSourceBase<T>
+	public class SuppliedSource<T> : AssignableSourceBase<T>
 	{
 		T reference;
 
-		public FixedSource() {}
+		public SuppliedSource() {}
 
-		public FixedSource( T reference )
+		public SuppliedSource( T reference )
 		{
 			Assign( reference );
 		}

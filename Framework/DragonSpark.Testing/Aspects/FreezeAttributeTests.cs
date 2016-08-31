@@ -79,7 +79,7 @@ namespace DragonSpark.Testing.Aspects
 			protected virtual void Dispose( bool disposing ) => Count++;
 		}
 
-		public class Source : FixedTypeSource
+		public class Source : SuppliedTypeSource
 		{
 			public int Count { get; private set; }
 

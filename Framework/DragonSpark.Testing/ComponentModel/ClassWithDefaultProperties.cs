@@ -68,7 +68,7 @@ namespace DragonSpark.Testing.ComponentModel
 		[Source( typeof(Store) )]
 		public int ValuedInt { get; set; }
 
-		internal class Store : FixedSource<int>
+		internal class Store : SuppliedSource<int>
 		{
 			public Store() : base( 6776 ) {}
 		}

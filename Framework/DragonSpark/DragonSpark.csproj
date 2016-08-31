@@ -38,6 +38,10 @@
     <Compile Include="Activation\IsPublicTypeSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
+    <Compile Include="Composition\ActivationParameter.cs" />
+    <Compile Include="Composition\ActivatorSource.cs" />
+    <Compile Include="Composition\CompositeActivatorParameters.cs" />
+    <Compile Include="Composition\Contracts.cs" />
     <Compile Include="Composition\SingletonExportSource.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
     <Compile Include="AssemblyPriorityLocator.cs" />
@@ -97,7 +101,8 @@
     <Compile Include="Sources\Parameterized\SelectedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
     <Compile Include="Specifications\DelegatedAssignedSpecificationBase.cs" />
-    <Compile Include="Tasks\FixedTaskSource.cs" />
+    <Compile Include="Specifications\SuppliedDelegatedSpecification.cs" />
+    <Compile Include="Tasks\SuppliedTaskSource.cs" />
     <Compile Include="Tasks\MonitorTaskCommand.cs" />
     <Compile Include="Application\Setup\RegisterInstances.cs" />
     <Compile Include="Aspects\Validation\AdapterSourceBase.cs" />
@@ -186,7 +191,7 @@
     <Compile Include="Runtime\Disposables.cs" />
     <Compile Include="Commands\DisposingCommand.cs" />
     <Compile Include="Commands\FirstCommand.cs" />
-    <Compile Include="Commands\FixedCommand.cs" />
+    <Compile Include="Commands\SuppliedCommand.cs" />
     <Compile Include="Runtime\Assignments\IAssign.cs" />
     <Compile Include="Runtime\IComposable.cs" />
     <Compile Include="Runtime\InitializedDisposableAction.cs" />
@@ -198,7 +203,7 @@
     <Compile Include="Application\ApplicationTypes.cs" />
     <Compile Include="Application\Setup\ApplyExportCommands.cs" />
     <Compile Include="Application\Setup\ApplySetup.cs" />
-    <Compile Include="Commands\FixedCommandSource.cs" />
+    <Compile Include="Commands\SuppliedCommandSource.cs" />
     <Compile Include="Commands\DeclaredCommandBase.cs" />
     <Compile Include="Application\Setup\CompositeServiceProvider.cs" />
     <Compile Include="Application\DefaultExportProvider.cs" />
@@ -227,7 +232,7 @@
     <Compile Include="Application\Setup\ServicesEnabled.cs" />
     <Compile Include="Application\SystemParts.cs" />
     <Compile Include="Application\SystemPartsFactory.cs" />
-    <Compile Include="Application\FixedTypeSource.cs" />
+    <Compile Include="Application\SuppliedTypeSource.cs" />
     <Compile Include="Sources\ExportSource.cs" />
     <Compile Include="Sources\IItemSource.cs" />
     <Compile Include="Sources\ItemSource.cs" />
@@ -243,7 +248,7 @@
     <Compile Include="Sources\Parameterized\ConstructFromKnownTypes.cs" />
     <Compile Include="Sources\Parameterized\Defaults.cs" />
     <Compile Include="Sources\Parameterized\DelegatedValidatedSource.cs" />
-    <Compile Include="Sources\Parameterized\FixedFactory.cs" />
+    <Compile Include="Sources\Parameterized\SuppliedSource.cs" />
     <Compile Include="Sources\Parameterized\Caching\IArgumentCache.cs" />
     <Compile Include="Sources\Parameterized\IParameterAwareHandler.cs" />
     <Compile Include="Sources\Delegates\IsParameterizedSourceSpecification.cs" />
@@ -511,9 +516,9 @@
     <Compile Include="Sources\DelegatedSource.cs" />
     <Compile Include="Sources\EmptySource.cs" />
     <Compile Include="Sources\Factory.cs" />
-    <Compile Include="Sources\FixedDeferedSource.cs" />
-    <Compile Include="Sources\FixedDelegateBuilder.cs" />
-    <Compile Include="Sources\FixedSource.cs" />
+    <Compile Include="Sources\SuppliedDeferedSource.cs" />
+    <Compile Include="Sources\CachedFactoryBuilder.cs" />
+    <Compile Include="Sources\SuppliedSource.cs" />
     <Compile Include="Sources\IAssignable.cs" />
     <Compile Include="Sources\Parameterized\IAssignableParameterizedSource.cs" />
     <Compile Include="Sources\IAssignableSource.cs" />
@@ -544,7 +549,7 @@
     <Compile Include="Sources\Parameterized\Caching\ConnectedStore.cs" />
     <Compile Include="Activation\ActivatorBase.cs" />
     <Compile Include="Specifications\AlwaysSpecification.cs" />
-    <Compile Include="Specifications\FixedSpecification.cs" />
+    <Compile Include="Specifications\SuppliedSpecification.cs" />
     <Compile Include="Activation\CompositeActivator.cs" />
     <Compile Include="Activation\ConstructorBase.cs" />
     <Compile Include="Activation\ConstructCoercer.cs" />
@@ -626,7 +631,7 @@
     <Compile Include="Application\RunProgramCommand.cs" />
     <Compile Include="Application\Setup\DeclarativeSetup.cs" />
     <Compile Include="Tasks\TaskMonitor.cs" />
-    <Compile Include="Commands\DeclaredFixedCommand.cs" />
+    <Compile Include="Commands\DeclaredSuppliedCommand.cs" />
     <Compile Include="Application\RegistrationAttribute.cs" />
     <Compile Include="Application\ApplicationInformation.cs">
       <SubType>Code</SubType>
