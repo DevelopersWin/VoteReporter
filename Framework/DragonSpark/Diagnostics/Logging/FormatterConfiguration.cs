@@ -7,7 +7,7 @@ using System;
 
 namespace DragonSpark.Diagnostics.Logging
 {
-	sealed class FormatterConfiguration : TransformerBase<LoggerConfiguration>
+	sealed class FormatterConfiguration : AlterationBase<LoggerConfiguration>
 	{
 		readonly static Func<object, object> Formatter = DragonSpark.Formatter.Default.Format;
 

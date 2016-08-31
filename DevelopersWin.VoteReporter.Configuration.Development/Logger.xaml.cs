@@ -7,7 +7,7 @@ namespace DevelopersWin.VoteReporter.Parts.Development
 	/// <summary>
 	/// Interaction logic for Logger.xaml
 	/// </summary>
-	[Export( typeof(ITransformer<LoggerConfiguration>) ), Shared]
+	[Export( typeof(IAlteration<LoggerConfiguration>) ), Shared]
 	public partial class Logger
 	{
 		public Logger()

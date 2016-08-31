@@ -9,7 +9,7 @@ using DragonSpark.Commands;
 namespace DragonSpark.Diagnostics.Logging.Configurations
 {
 	[ContentProperty( nameof(Commands) )]
-	public class DeclarativeCompositeLoggerConfiguration : TransformerBase<LoggerConfiguration>
+	public class DeclarativeCompositeLoggerConfiguration : AlterationBase<LoggerConfiguration>
 	{
 		public DeclarativeCollection<CommandBase<LoggerConfiguration>> Commands { get; } = new DeclarativeCollection<CommandBase<LoggerConfiguration>>();
 

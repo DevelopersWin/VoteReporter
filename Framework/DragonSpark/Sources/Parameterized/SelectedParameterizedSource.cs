@@ -4,9 +4,9 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public sealed class SelectedParameterizedSource<TParameter, TResult> : DelegatedParameterizedSource<TParameter, TResult>
 	{
-		readonly Transform<TParameter> selector;
+		readonly Alter<TParameter> selector;
 
-		public SelectedParameterizedSource( Transform<TParameter> selector, Func<TParameter, TResult> inner ) : base( inner )
+		public SelectedParameterizedSource( Alter<TParameter> selector, Func<TParameter, TResult> inner ) : base( inner )
 		{
 			this.selector = selector;
 		}

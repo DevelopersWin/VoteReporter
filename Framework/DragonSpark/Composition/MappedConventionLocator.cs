@@ -4,7 +4,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Composition
 {
-	sealed class MappedConventionLocator : TransformerBase<Type>
+	sealed class MappedConventionLocator : AlterationBase<Type>
 	{
 		public static MappedConventionLocator Default { get; } = new MappedConventionLocator();
 		MappedConventionLocator() {}

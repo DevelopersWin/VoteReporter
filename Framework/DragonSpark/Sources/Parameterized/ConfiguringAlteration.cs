@@ -2,11 +2,11 @@
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public class ConfiguringTransformer<T> : TransformerBase<T>
+	public class ConfiguringAlteration<T> : AlterationBase<T>
 	{
 		readonly Action<T> configure;
 
-		public ConfiguringTransformer( Action<T> configure )
+		public ConfiguringAlteration( Action<T> configure )
 		{
 			this.configure = configure;
 		}

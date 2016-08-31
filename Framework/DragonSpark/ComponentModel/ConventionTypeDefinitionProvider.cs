@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.ComponentModel
 {
-	public sealed class ConventionTypeDefinitionProvider : TransformerBase<TypeInfo>, ITypeDefinitionProvider
+	public sealed class ConventionTypeDefinitionProvider : AlterationBase<TypeInfo>, ITypeDefinitionProvider
 	{
 		public static ConventionTypeDefinitionProvider Default { get; } = new ConventionTypeDefinitionProvider();
 		ConventionTypeDefinitionProvider() {}

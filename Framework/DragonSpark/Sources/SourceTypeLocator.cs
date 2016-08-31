@@ -4,7 +4,7 @@ using System;
 
 namespace DragonSpark.Sources
 {
-	public sealed class SourceTypeLocator : TransformerBase<Type>
+	public sealed class SourceTypeLocator : AlterationBase<Type>
 	{
 		readonly static Func<LocateTypeRequest, Type> Types = SourceTypes.Default.Delegate();
 

@@ -6,9 +6,9 @@ using DragonSpark.Sources.Parameterized;
 namespace DragonSpark.Configuration
 {
 	[SuppressMessage( "ReSharper", "PossibleInfiniteInheritance" )]
-	public class ConfigurationScope<T> : Scope<ImmutableArray<ITransformer<T>>>, IConfigurationScope<T>
+	public class ConfigurationScope<T> : Scope<ImmutableArray<IAlteration<T>>>, IConfigurationScope<T>
 	{
 		// public ConfigurationScope() : this( Items<ITransformer<T>>.Default ) {}
-		public ConfigurationScope( params ITransformer<T>[] configurators ) : base( new ConfigurationSource<T>( configurators ).Global() ) {}
+		public ConfigurationScope( params IAlteration<T>[] configurators ) : base( new ConfigurationSource<T>( configurators ).Global() ) {}
 	}
 }

@@ -1,22 +1,22 @@
-using System;
 using DragonSpark.Sources.Parameterized;
 using Serilog;
+using System;
 
 namespace DragonSpark.Diagnostics.Logging
 {
 	sealed class LoggerConfigurationSource : LoggerConfigurationSourceBase
 	{
 		public static LoggerConfigurationSource Default { get; } = new LoggerConfigurationSource();
-		LoggerConfigurationSource() : base( HistoryTransform.DefaultNested ) {}
+		LoggerConfigurationSource() : base( HistoryAlteration.DefaultNested ) {}
 
-		sealed class HistoryTransform : TransformerBase<LoggerConfiguration>
+		sealed class HistoryAlteration : AlterationBase<LoggerConfiguration>
 		{
-			public static HistoryTransform DefaultNested { get; } = new HistoryTransform();
-			HistoryTransform() : this( LoggingHistory.Default.Get ) {}
+			public static HistoryAlteration DefaultNested { get; } = new HistoryAlteration();
+			HistoryAlteration() : this( LoggingHistory.Default.Get ) {}
 
 			readonly Func<ILoggerHistory> history;
 
-			HistoryTransform( Func<ILoggerHistory> history )
+			HistoryAlteration( Func<ILoggerHistory> history )
 			{
 				this.history = history;
 			}

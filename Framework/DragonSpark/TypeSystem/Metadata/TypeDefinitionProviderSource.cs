@@ -13,7 +13,7 @@ namespace DragonSpark.TypeSystem.Metadata
 
 		protected TypeDefinitionProviderSource( params ITypeDefinitionProvider[] items ) : base( items.Append( ConventionTypeDefinitionProvider.Default, Self.DefaultNested ) ) {}
 
-		sealed class Self : SelfTransformer<TypeInfo>, ITypeDefinitionProvider
+		sealed class Self : SelfAlteration<TypeInfo>, ITypeDefinitionProvider
 		{
 			public static Self DefaultNested { get; } = new Self();
 			Self() {}

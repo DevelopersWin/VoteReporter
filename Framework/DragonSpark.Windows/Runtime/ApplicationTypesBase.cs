@@ -13,12 +13,12 @@ namespace DragonSpark.Windows.Runtime
 	public abstract class ApplicationTypesBase : FixedTypeSource
 	{
 		readonly Func<ImmutableArray<Assembly>> assemblySource;
-		readonly Transform<IEnumerable<Assembly>> filter;
+		readonly Alter<IEnumerable<Assembly>> filter;
 		readonly Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource;
 
 		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource ) : this( assemblySource, ApplicationAssemblyFilter.Default.Get, PublicParts.Default.Get ) {}
 
-		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource, Transform<IEnumerable<Assembly>> filter, Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource )
+		protected ApplicationTypesBase( Func<ImmutableArray<Assembly>> assemblySource, Alter<IEnumerable<Assembly>> filter, Func<IEnumerable<Assembly>, IEnumerable<Type>> partsSource )
 		{
 			this.assemblySource = assemblySource;
 			this.filter = filter;

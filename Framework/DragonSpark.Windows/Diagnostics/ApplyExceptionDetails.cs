@@ -7,9 +7,9 @@ using System.Composition;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public sealed class ApplyExceptionDetails : TransformerBase<LoggerConfiguration>
+	public sealed class ApplyExceptionDetails : AlterationBase<LoggerConfiguration>
 	{
-		[Export( typeof(ITransformer<LoggerConfiguration>) )]
+		[Export( typeof(IAlteration<LoggerConfiguration>) )]
 		public static ApplyExceptionDetails Default { get; } = new ApplyExceptionDetails();
 		ApplyExceptionDetails() {}
 

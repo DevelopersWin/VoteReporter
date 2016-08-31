@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 	{
 		readonly ImmutableArray<ISpecimenBuilderTransformation> transformers;
 
-		public static ImmutableArray<ISpecimenBuilderTransformation> DefaultTransformations { get; } = ImmutableArray.Create<ISpecimenBuilderTransformation>( OptionalParameterTransformer.Default );
+		public static ImmutableArray<ISpecimenBuilderTransformation> DefaultTransformations { get; } = ImmutableArray.Create<ISpecimenBuilderTransformation>( OptionalParameterAlteration.Default );
 
 		public static DefaultEngineParts Default { get; } = new DefaultEngineParts();
 		DefaultEngineParts() : this( DefaultTransformations ) {}

@@ -5,9 +5,9 @@ namespace DragonSpark.Diagnostics.Exceptions
 {
 	public abstract class RetryTimeBase : ParameterizedSourceBase<int, TimeSpan>
 	{
-		readonly Transform<int> time;
+		readonly Alter<int> time;
 
-		protected RetryTimeBase( Transform<int> time )
+		protected RetryTimeBase( Alter<int> time )
 		{
 			this.time = time;
 		}

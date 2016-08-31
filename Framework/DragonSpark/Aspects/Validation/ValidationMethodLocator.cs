@@ -7,7 +7,7 @@ using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {
-	public sealed class ValidationMethodLocator : TransformerBase<MethodInfo>
+	public sealed class ValidationMethodLocator : AlterationBase<MethodInfo>
 	{
 		const string MethodName = nameof(ISpecification.IsSatisfiedBy);
 

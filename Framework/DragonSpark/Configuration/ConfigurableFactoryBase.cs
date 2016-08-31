@@ -8,10 +8,10 @@ namespace DragonSpark.Configuration
 {
 	public abstract class ConfigurableFactoryBase<T> : ConfigurableFactoryBase<T, T>
 	{
-		protected ConfigurableFactoryBase( Func<T> seed ) : this( seed, Items<ITransformer<T>>.Default ) {}
-		protected ConfigurableFactoryBase( Func<T> seed, params ITransformer<T>[] configurations ) : this( seed, new ConfigurationScope<T>( configurations ), Delegates<T>.Self ) {}
+		protected ConfigurableFactoryBase( Func<T> seed ) : this( seed, Items<IAlteration<T>>.Default ) {}
+		protected ConfigurableFactoryBase( Func<T> seed, params IAlteration<T>[] configurations ) : this( seed, new ConfigurationScope<T>( configurations ), Delegates<T>.Self ) {}
 		protected ConfigurableFactoryBase( Func<T> seed, IConfigurationScope<T> scope, Func<T, T> factory ) : base( seed, scope, factory ) {}
-		protected ConfigurableFactoryBase( IScope<T> seed ) : this( seed, new ConfigurationScope<T>( Items<ITransformer<T>>.Default ), Delegates<T>.Self ) {}
+		protected ConfigurableFactoryBase( IScope<T> seed ) : this( seed, new ConfigurationScope<T>( Items<IAlteration<T>>.Default ), Delegates<T>.Self ) {}
 		protected ConfigurableFactoryBase( IScope<T> seed, IConfigurationScope<T> scope, Func<T, T> factory ) : base( seed, scope, factory ) {}
 	}
 

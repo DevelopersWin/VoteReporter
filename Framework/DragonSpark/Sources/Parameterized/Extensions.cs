@@ -26,9 +26,9 @@ namespace DragonSpark.Sources.Parameterized
 				.Cast<TResult>()
 				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
 
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ITransformer<TParameter> selector ) => With( @this, selector.ToDelegate() );
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Transform<TParameter> selector ) => With( @this.ToSourceDelegate(), selector );
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Transform<TParameter> selector ) =>
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TParameter> selector ) => With( @this, selector.ToDelegate() );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Alter<TParameter> selector ) => With( @this.ToSourceDelegate(), selector );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TParameter> selector ) =>
 			new SelectedParameterizedSource<TParameter, TResult>( selector, @this );
 
 		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) => With( @this, specification.ToSpecificationDelegate() );
@@ -172,8 +172,8 @@ namespace DragonSpark.Sources.Parameterized
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		public static Transform<T> ToDelegate<T>( this ITransformer<T> @this ) => Selectors<T>.Default.Get( @this );
-		sealed class Selectors<T> : Cache<ITransformer<T>, Transform<T>>
+		public static Alter<T> ToDelegate<T>( this IAlteration<T> @this ) => Selectors<T>.Default.Get( @this );
+		sealed class Selectors<T> : Cache<IAlteration<T>, Alter<T>>
 		{
 			public static Selectors<T> Default { get; } = new Selectors<T>();
 			Selectors() : base( item => item.Get ) {}

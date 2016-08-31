@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	public class MetadataTypeDefinitionProvider : TransformerBase<TypeInfo>, ITypeDefinitionProvider
+	public class MetadataTypeDefinitionProvider : AlterationBase<TypeInfo>, ITypeDefinitionProvider
 	{
 		public static MetadataTypeDefinitionProvider Default { get; } = new MetadataTypeDefinitionProvider();
 		MetadataTypeDefinitionProvider() {}

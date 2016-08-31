@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace DragonSpark.Composition
 {
-	sealed class ConventionImplementationLocator : TransformerBase<Type>
+	sealed class ConventionImplementationLocator : AlterationBase<Type>
 	{
 		readonly static Func<ConventionMapping, bool> Where = IsValidConventionMappingSpecification.Default.ToSpecificationDelegate();
 

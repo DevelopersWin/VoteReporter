@@ -10,7 +10,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void DefaultValue()
 		{
-			var item = Items<ITransformer<LoggerConfiguration>>.Default;
+			var item = Items<IAlteration<LoggerConfiguration>>.Default;
 			Assert.NotNull( item );
 		}
 	}

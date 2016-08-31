@@ -3,7 +3,7 @@ using System;
 
 namespace DragonSpark.Sources
 {
-	public sealed class FixedDelegateBuilder<T> : TransformerBase<Func<T>>
+	public sealed class FixedDelegateBuilder<T> : AlterationBase<Func<T>>
 	{
 		public static IParameterizedSource<Func<T>, Func<T>> Default { get; } = new FixedDelegateBuilder<T>()/*.ToCache()*/;
 		FixedDelegateBuilder() {}

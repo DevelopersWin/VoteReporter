@@ -5,8 +5,8 @@ using DragonSpark.Sources.Parameterized;
 namespace DragonSpark.Configuration
 {
 	[SuppressMessage( "ReSharper", "PossibleInfiniteInheritance" )]
-	public class ConfigurationSource<T> : SuppliedAndExportedItems<ITransformer<T>>
+	public class ConfigurationSource<T> : SuppliedAndExportedItems<IAlteration<T>>
 	{
-		public ConfigurationSource( params ITransformer<T>[] configurators ) : base( configurators ) {}
+		public ConfigurationSource( params IAlteration<T>[] configurators ) : base( configurators ) {}
 	}
 }

@@ -6,5 +6,5 @@ using DragonSpark.Sources.Parameterized;
 namespace DragonSpark.Configuration
 {
 	[SuppressMessage( "ReSharper", "PossibleInfiniteInheritance" )]
-	public interface IConfigurationScope<T> : IScope<ImmutableArray<ITransformer<T>>> {}
+	public interface IConfigurationScope<T> : IScope<ImmutableArray<IAlteration<T>>> {}
 }

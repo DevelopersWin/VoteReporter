@@ -4,7 +4,7 @@ using System;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ServiceProviderFactory : TransformerBase<IServiceProvider>
+	public sealed class ServiceProviderFactory : AlterationBase<IServiceProvider>
 	{
 		// [Export( typeof(ITransformer<IServiceProvider>) )]
 		public static ServiceProviderFactory Default { get; } = new ServiceProviderFactory();

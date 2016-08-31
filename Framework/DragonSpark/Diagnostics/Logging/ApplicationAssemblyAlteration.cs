@@ -6,10 +6,10 @@ using Serilog.Events;
 
 namespace DragonSpark.Diagnostics.Logging
 {
-	sealed class ApplicationAssemblyTransform : TransformerBase<LoggerConfiguration>
+	sealed class ApplicationAssemblyAlteration : AlterationBase<LoggerConfiguration>
 	{
-		public static ApplicationAssemblyTransform Default { get; } = new ApplicationAssemblyTransform();
-		ApplicationAssemblyTransform() {}
+		public static ApplicationAssemblyAlteration Default { get; } = new ApplicationAssemblyAlteration();
+		ApplicationAssemblyAlteration() {}
 
 		public override LoggerConfiguration Get( LoggerConfiguration parameter )
 		{

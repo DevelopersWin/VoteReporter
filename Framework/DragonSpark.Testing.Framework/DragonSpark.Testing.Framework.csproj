@@ -84,7 +84,7 @@
     <Compile Include="Application\Setup\MetadataCustomizationFactory.cs" />
     <Compile Include="Application\Setup\MethodTypes.cs" />
     <Compile Include="Application\Setup\MinimumLevel.cs" />
-    <Compile Include="Application\Setup\OptionalParameterTransformer.cs" />
+    <Compile Include="Application\Setup\OptionalParameterAlteration.cs" />
     <Compile Include="Application\Setup\ParameterRequestRelay.cs" />
     <Compile Include="Application\Setup\ResourceConfigurationFactory.cs" />
     <Compile Include="Application\Setup\CanLocateSpecification.cs" />

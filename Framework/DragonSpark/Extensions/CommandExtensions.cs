@@ -47,11 +47,11 @@ namespace DragonSpark.Extensions
 			DelegateCache() : base( command => command.Execute ) {}
 		}
 
-		public static ITransformer<T> ToTransformer<T>( this ICommand<T> @this ) => Transformers<T>.Default.Get( @this );
-		sealed class Transformers<T> : Cache<ICommand<T>, ITransformer<T>>
+		public static IAlteration<T> ToAlteration<T>( this ICommand<T> @this ) => Alterations<T>.Default.Get( @this );
+		sealed class Alterations<T> : Cache<ICommand<T>, IAlteration<T>>
 		{
-			public static Transformers<T> Default { get; } = new Transformers<T>();
-			Transformers() : base( command => new ConfiguringTransformer<T>( command.ToDelegate() ) ) {}
+			public static Alterations<T> Default { get; } = new Alterations<T>();
+			Alterations() : base( command => new ConfiguringAlteration<T>( command.ToDelegate() ) ) {}
 		}
 
 		/*public static ICommand<T> WithAutoValidation<T>( this ICommand<T> @this ) => AutoValidationCache<T>.Default.Get( @this );

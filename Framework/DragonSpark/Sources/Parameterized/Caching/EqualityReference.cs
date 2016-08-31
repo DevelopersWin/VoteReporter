@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
-	public class EqualityReference<T> : TransformerBase<T> where T : class
+	public class EqualityReference<T> : AlterationBase<T> where T : class
 	{
 		public static EqualityReference<T> Default { get; } = new EqualityReference<T>();
 		EqualityReference() {}

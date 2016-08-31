@@ -6,9 +6,9 @@ using System.Composition;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {
-	public sealed class Configure : TransformerBase<IServiceProvider>
+	public sealed class Configure : AlterationBase<IServiceProvider>
 	{
-		[Export( typeof(ITransformer<IServiceProvider>) )]
+		[Export( typeof(IAlteration<IServiceProvider>) )]
 		public static Configure Default { get; } = new Configure();
 		Configure() {}
 

@@ -4,7 +4,7 @@ using System.Composition.Convention;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ConventionConfiguration : TransformerBase<ConventionBuilder>
+	public sealed class ConventionConfiguration : AlterationBase<ConventionBuilder>
 	{
 		public static ConventionConfiguration Default { get; } = new ConventionConfiguration();
 		ConventionConfiguration() : this( ExportsProfileFactory.Default.Get ) {}

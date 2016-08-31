@@ -135,7 +135,7 @@
     <Compile Include="Diagnostics\Logging\LogEventTextFactory.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\AddSeqSinkCommand.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\AddTextWriterCommand.cs" />
-    <Compile Include="Diagnostics\Logging\ApplicationAssemblyTransform.cs" />
+    <Compile Include="Diagnostics\Logging\ApplicationAssemblyAlteration.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\DestructureByFactoryCommand.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\DestructureByTransformingCommandBase.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\DestructureCommand.cs" />
@@ -239,7 +239,7 @@
     <Compile Include="Sources\Parameterized\Caching\DecoratedSourceCache.cs" />
     <Compile Include="Sources\Parameterized\CompositeFactory.cs" />
     <Compile Include="Sources\Parameterized\ConfiguringFactory.cs" />
-    <Compile Include="Sources\Parameterized\ConfiguringTransformer.cs" />
+    <Compile Include="Sources\Parameterized\ConfiguringAlteration.cs" />
     <Compile Include="Sources\Parameterized\ConstructFromKnownTypes.cs" />
     <Compile Include="Sources\Parameterized\Defaults.cs" />
     <Compile Include="Sources\Parameterized\DelegatedValidatedSource.cs" />
@@ -253,12 +253,12 @@
     <Compile Include="Sources\Parameterized\ParameterTypes.cs" />
     <Compile Include="Sources\Parameterized\ProjectedSource.cs" />
     <Compile Include="Sources\Parameterized\ResultTypes.cs" />
-    <Compile Include="Sources\Parameterized\SelfTransformer.cs" />
+    <Compile Include="Sources\Parameterized\SelfAlteration.cs" />
     <Compile Include="Sources\Parameterized\SourceInterfaces.cs" />
     <Compile Include="Sources\Parameterized\SourceTypes.cs" />
     <Compile Include="Sources\Parameterized\TimedDelegatedSource.cs" />
-    <Compile Include="Sources\Parameterized\Transform.cs" />
-    <Compile Include="Sources\Parameterized\TransformerBase.cs" />
+    <Compile Include="Sources\Parameterized\Alter.cs" />
+    <Compile Include="Sources\Parameterized\AlterationBase.cs" />
     <Compile Include="Sources\Parameterized\TypeLocatorBase.cs" />
     <Compile Include="Sources\Parameterized\Wrapper.cs" />
     <Compile Include="Sources\SuppliedAndExportedItems.cs" />
@@ -428,7 +428,7 @@
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Sources\SourceTypeLocator.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
-    <Compile Include="Sources\Parameterized\ITransformer.cs" />
+    <Compile Include="Sources\Parameterized\IAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\ArgumentCache.cs" />
     <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Sources\Parameterized\Factory.cs" />

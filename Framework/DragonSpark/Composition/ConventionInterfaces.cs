@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace DragonSpark.Composition
 {
-	public sealed class ConventionInterfaces : TransformerBase<Type>
+	public sealed class ConventionInterfaces : AlterationBase<Type>
 	{
 		readonly static ISpecification<Type> Specification = IsPublicTypeSpecification.Default.And( Activation.Defaults.Instantiable );
 		readonly static Func<ConventionMapping, bool> Valid = IsValidConventionMappingSpecification.Default.ToSpecificationDelegate();

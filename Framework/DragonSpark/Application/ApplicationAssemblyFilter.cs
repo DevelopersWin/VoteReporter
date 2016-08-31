@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DragonSpark.Application
 {
-	public class ApplicationAssemblyFilter : TransformerBase<IEnumerable<Assembly>>
+	public class ApplicationAssemblyFilter : AlterationBase<IEnumerable<Assembly>>
 	{
 		public static ApplicationAssemblyFilter Default { get; } = new ApplicationAssemblyFilter();
 		ApplicationAssemblyFilter() : this( ApplicationAssemblySpecification.Default.IsSatisfiedBy ) {}

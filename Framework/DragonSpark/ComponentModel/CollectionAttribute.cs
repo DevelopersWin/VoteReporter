@@ -8,7 +8,7 @@ namespace DragonSpark.ComponentModel
 {
 	public sealed class CollectionAttribute : ServicesValueBase
 	{
-		readonly static Func<Type, Type> Transform = CollectionTransformer.Default.Get;
+		readonly static Func<Type, Type> Transform = CollectionAlteration.Default.Get;
 
 		public CollectionAttribute( Type elementType = null ) : base( t => Create( elementType ) ) {}
 
@@ -19,10 +19,10 @@ namespace DragonSpark.ComponentModel
 			return result;
 		}, Activator.Activate<object> );
 
-		sealed class CollectionTransformer : TransformerBase<Type>
+		sealed class CollectionAlteration : AlterationBase<Type>
 		{
-			public static CollectionTransformer Default { get; } = new CollectionTransformer();
-			CollectionTransformer() {}
+			public static CollectionAlteration Default { get; } = new CollectionAlteration();
+			CollectionAlteration() {}
 
 			public override Type Get( Type parameter ) => typeof(Collection<>).MakeGenericType( parameter );
 		}

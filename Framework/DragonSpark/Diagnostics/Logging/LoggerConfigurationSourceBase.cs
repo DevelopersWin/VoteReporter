@@ -1,27 +1,27 @@
-using System;
 using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logging.Configurations;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using Serilog;
 using Serilog.Core;
+using System;
 
 namespace DragonSpark.Diagnostics.Logging
 {
 	public abstract class LoggerConfigurationSourceBase : ConfigurationSource<LoggerConfiguration>
 	{
-		readonly static ITransformer<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Default.ToTransformer();
+		readonly static IAlteration<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Default.ToAlteration();
 
-		protected LoggerConfigurationSourceBase( params ITransformer<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Default, ControllerTransform.Default, ApplicationAssemblyTransform.Default ) ) {}
+		protected LoggerConfigurationSourceBase( params IAlteration<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Default, ControllerAlteration.Default, ApplicationAssemblyAlteration.Default ) ) {}
 
-		sealed class ControllerTransform : TransformerBase<LoggerConfiguration>
+		sealed class ControllerAlteration : AlterationBase<LoggerConfiguration>
 		{
-			public static ControllerTransform Default { get; } = new ControllerTransform();
-			ControllerTransform() : this( LoggingController.Default.Get ) {}
+			public static ControllerAlteration Default { get; } = new ControllerAlteration();
+			ControllerAlteration() : this( LoggingController.Default.Get ) {}
 
 			readonly Func<LoggingLevelSwitch> controller;
 
-			ControllerTransform( Func<LoggingLevelSwitch> controller )
+			ControllerAlteration( Func<LoggingLevelSwitch> controller )
 			{
 				this.controller = controller;
 			}
