@@ -34,8 +34,8 @@ namespace DragonSpark.Sources.Parameterized
 		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TParameter> selector ) =>
 			new AlteredParameterizedSource<TParameter, TResult>( selector, @this );
 
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) => With( @this, specification.ToSpecificationDelegate() );
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Func<TParameter, bool> specification ) =>
+		public static IValidatedParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) => With( @this, specification.ToSpecificationDelegate() );
+		public static IValidatedParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Func<TParameter, bool> specification ) =>
 			new SpecificationParameterizedSource<TParameter, TResult>( specification, @this.ToSourceDelegate() );
 
 		public static T Get<T>( this IParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );

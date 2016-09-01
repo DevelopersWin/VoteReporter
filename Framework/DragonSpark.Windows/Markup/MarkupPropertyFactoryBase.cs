@@ -1,11 +1,7 @@
-﻿using System;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
+﻿using DragonSpark.Sources.Parameterized;
+using System;
 
 namespace DragonSpark.Windows.Markup
 {
-	public abstract class MarkupPropertyFactoryBase : ValidatedParameterizedSourceBase<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory
-	{
-		protected MarkupPropertyFactoryBase( ISpecification<IServiceProvider> specification ) : base( specification ) {}
-	}
+	public abstract class MarkupPropertyFactoryBase : ParameterizedSourceBase<IServiceProvider, IMarkupProperty>, IMarkupPropertyFactory {}
 }

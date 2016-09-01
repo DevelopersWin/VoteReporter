@@ -15,8 +15,6 @@ namespace DragonSpark.Windows.Markup
 
 	public abstract class MarkupPropertyFactoryBase<TTarget, TProperty> : MarkupPropertyFactoryBase
 	{
-		protected MarkupPropertyFactoryBase() : base( Specification<TTarget, TProperty>.Default ) {}
-
 		public sealed override IMarkupProperty Get( IServiceProvider parameter )
 		{
 			var target = parameter.Get<IProvideValueTarget>();

@@ -1,8 +1,8 @@
 ﻿using DragonSpark.Activation.Location;
+using DragonSpark.Application.Setup;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
-using DragonSpark.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Testing.Setup
@@ -13,7 +13,7 @@ namespace DragonSpark.Testing.Setup
 		public void RecursionCheck()
 		{
 			var count = 0;
-			IValidatedParameterizedSource<Type, object> sut = null;
+			IParameterizedSource<Type, object> sut = null;
 			var provider = new DecoratedActivator( type =>
 														 {
 															 ++count;
@@ -38,7 +38,7 @@ namespace DragonSpark.Testing.Setup
 			Assert.Equal( 1, count );
 
 			Assert.Null( sut.Get( GetType() ) );
-			Assert.Equal( 3, count );
+			Assert.Equal( 2, count );
 		}
 	}
 }

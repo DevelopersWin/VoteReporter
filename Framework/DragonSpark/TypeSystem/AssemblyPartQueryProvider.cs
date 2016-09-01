@@ -1,12 +1,10 @@
-using System.Reflection;
-using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	[ApplyAutoValidation]
-	public sealed class AssemblyPartQueryProvider : ValidatedParameterizedSourceBase<Assembly, string>
+	public sealed class AssemblyPartQueryProvider : ParameterizedSourceBase<Assembly, string>
 	{
 		public static AssemblyPartQueryProvider Default { get; } = new AssemblyPartQueryProvider();
 		AssemblyPartQueryProvider() {}

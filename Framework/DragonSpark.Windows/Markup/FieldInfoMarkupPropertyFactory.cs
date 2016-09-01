@@ -1,12 +1,13 @@
-using DragonSpark.Aspects.Validation;
+using DragonSpark.Sources.Parameterized;
+using System;
 using System.Reflection;
 
 namespace DragonSpark.Windows.Markup
 {
-	[ApplyAutoValidation]
-	public class FieldInfoMarkupPropertyFactory : MarkupPropertyFactory<FieldInfo>
+	public sealed class FieldInfoMarkupPropertyFactory : MarkupPropertyFactory<FieldInfo>
 	{
-		public static FieldInfoMarkupPropertyFactory Default { get; } = new FieldInfoMarkupPropertyFactory();
+		public static IParameterizedSource<IServiceProvider, IMarkupProperty> Default { get; } = new FieldInfoMarkupPropertyFactory().With( Specification<object, FieldInfo>.Default );
+		FieldInfoMarkupPropertyFactory() {}
 
 		protected override IMarkupProperty Create( object targetObject, FieldInfo targetProperty ) => new ClrFieldMarkupProperty( targetObject, targetProperty );
 	}

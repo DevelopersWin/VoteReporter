@@ -27,7 +27,7 @@ namespace DragonSpark.Sources.Parameterized
 		}
 	}
 
-	public class ConfiguringFactory<TParameter, TResult> : DelegatedValidatedSource<TParameter, TResult>
+	public class ConfiguringFactory<TParameter, TResult> : DelegatedParameterizedSource<TParameter, TResult>
 	{
 		readonly Action<TParameter> initialize;
 		readonly Action<TResult> configure;

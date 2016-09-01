@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
@@ -14,15 +15,20 @@ namespace DragonSpark.Aspects.Validation
 	public class ApplyAutoValidationAttribute : TypeLevelAspect, IAspectProvider
 	{
 		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = AspectInstances.Default.ToSourceDelegate();
+		readonly static Func<Type, bool> Specification = AutoValidationTypeSpecification.Default.ToSpecificationDelegate();
 
+		readonly Func<Type, bool> specification;
 		readonly Func<Type, IEnumerable<AspectInstance>> source;
 
-		public ApplyAutoValidationAttribute() : this( DefaultSource ) {}
+		public ApplyAutoValidationAttribute() : this( Specification, DefaultSource ) {}
 
-		protected ApplyAutoValidationAttribute( Func<Type, IEnumerable<AspectInstance>> source )
+		protected ApplyAutoValidationAttribute( Func<Type, bool> specification, Func<Type, IEnumerable<AspectInstance>> source )
 		{
+			this.specification = specification;
 			this.source = source;
 		}
+
+		public override bool CompileTimeValidate( Type type ) => specification( type );
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
 		{

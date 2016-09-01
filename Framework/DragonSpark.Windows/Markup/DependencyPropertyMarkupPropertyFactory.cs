@@ -1,15 +1,14 @@
-using DragonSpark.Aspects.Validation;
+using DragonSpark.Sources.Parameterized;
+using System;
 using System.Windows;
 
 namespace DragonSpark.Windows.Markup
 {
-	[ApplyAutoValidation]
-	public class DependencyPropertyMarkupPropertyFactory : MarkupPropertyFactoryBase<DependencyObject, DependencyProperty>
+	public sealed class DependencyPropertyMarkupPropertyFactory : MarkupPropertyFactoryBase<DependencyObject, DependencyProperty>
 	{
-		public static DependencyPropertyMarkupPropertyFactory Default { get; } = new DependencyPropertyMarkupPropertyFactory();
+		public static IParameterizedSource<IServiceProvider, IMarkupProperty> Default { get; } = new DependencyPropertyMarkupPropertyFactory().With( Specification<DependencyObject, DependencyProperty>.Default );
+		DependencyPropertyMarkupPropertyFactory() {}
 
 		protected override IMarkupProperty Create( DependencyObject targetObject, DependencyProperty targetProperty ) => new DependencyPropertyMarkupProperty( targetObject, targetProperty );
-
-		//protected override Type GetPropertyType( DependencyObject target, DependencyProperty property ) => property.PropertyType;
 	}
 }

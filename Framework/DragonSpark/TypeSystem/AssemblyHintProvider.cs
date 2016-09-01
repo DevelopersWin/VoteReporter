@@ -1,12 +1,10 @@
-using System.Reflection;
-using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	[ApplyAutoValidation]
-	public sealed class AssemblyHintProvider : ValidatedParameterizedSourceBase<Assembly, string>
+	public sealed class AssemblyHintProvider : ParameterizedSourceBase<Assembly, string>
 	{
 		public static AssemblyHintProvider Default { get; } = new AssemblyHintProvider();
 		AssemblyHintProvider() {}

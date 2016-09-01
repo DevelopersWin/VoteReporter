@@ -250,7 +250,6 @@
     <Compile Include="Sources\Parameterized\ConfiguringAlteration.cs" />
     <Compile Include="Sources\Parameterized\ConstructFromKnownTypes.cs" />
     <Compile Include="Sources\Parameterized\Defaults.cs" />
-    <Compile Include="Sources\Parameterized\DelegatedValidatedSource.cs" />
     <Compile Include="Sources\Parameterized\SuppliedSource.cs" />
     <Compile Include="Sources\Parameterized\Caching\IArgumentCache.cs" />
     <Compile Include="Sources\Parameterized\IParameterAwareHandler.cs" />
@@ -547,7 +546,6 @@
     <Compile Include="Specifications\DecoratedSpecification.cs" />
     <Compile Include="Specifications\IsInstanceOfSpecification.cs" />
     <Compile Include="Sources\AmbientStackCommand.cs" />
-    <Compile Include="Sources\Parameterized\Caching\AttachedProperty.cs" />
     <Compile Include="Sources\Parameterized\Caching\ConnectedStore.cs" />
     <Compile Include="Specifications\AlwaysSpecification.cs" />
     <Compile Include="Specifications\SuppliedSpecification.cs" />

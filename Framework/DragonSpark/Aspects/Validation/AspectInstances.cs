@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using System;
@@ -7,11 +8,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {
-	public sealed class AspectInstances : ValidatedParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
+	public sealed class AspectInstances : ParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
 	{
 		public static AspectInstances Default { get; } = new AspectInstances();
 		AspectInstances() : this( Defaults.AspectProfiles ) {}
@@ -23,7 +23,7 @@ namespace DragonSpark.Aspects.Validation
 
 		public AspectInstances( ImmutableArray<IAspectProfile> profiles ) : this( profiles, ValidationMethodLocator.Default.Get, AspectInstanceFactory<AutoValidationValidationAspect>.Default.Get, AspectInstanceFactory<AutoValidationExecuteAspect>.Default.Get ) {}
 
-		public AspectInstances( ImmutableArray<IAspectProfile> profiles, Func<MethodInfo, MethodInfo> specificationSource, Func<MethodInfo, AspectInstance> validatorSource, Func<MethodInfo, AspectInstance> executionSource ) : base( new Specification( profiles.Select( profile => profile.SupportedType.Adapt() ).ToImmutableArray() ) )
+		public AspectInstances( ImmutableArray<IAspectProfile> profiles, Func<MethodInfo, MethodInfo> specificationSource, Func<MethodInfo, AspectInstance> validatorSource, Func<MethodInfo, AspectInstance> executionSource )
 		{
 			this.profiles = profiles;
 			this.specificationSource = specificationSource;
@@ -49,19 +49,22 @@ namespace DragonSpark.Aspects.Validation
 				}
 			}
 		}
+	}
 
-		sealed class Specification : SpecificationWithContextBase<Type, ImmutableArray<TypeAdapter>>
+	sealed class AutoValidationTypeSpecification : SpecificationWithContextBase<Type, ImmutableArray<TypeAdapter>>
+	{
+		public static AutoValidationTypeSpecification Default { get; } = new AutoValidationTypeSpecification();
+		AutoValidationTypeSpecification() : this( Defaults.AspectProfiles.Select( profile => profile.SupportedType.Adapt() ).ToImmutableArray() ) {}
+
+		public AutoValidationTypeSpecification( ImmutableArray<TypeAdapter> context ) : base( context ) {}
+
+		public override bool IsSatisfiedBy( Type parameter )
 		{
-			public Specification( ImmutableArray<TypeAdapter> context ) : base( context ) {}
-
-			public override bool IsSatisfiedBy( Type parameter )
+			if ( !Context.IsAssignableFrom( parameter ) )
 			{
-				if ( !Context.IsAssignableFrom( parameter ) )
-				{
-					throw new InvalidOperationException( $"{parameter} does not implement any of the types defined in {GetType()}, which are: {string.Join( ",", Context.Select( t => t.Type.FullName ) )}" );
-				}
-				return true;
+				throw new InvalidOperationException( $"{parameter} does not implement any of the types defined in {GetType()}, which are: {string.Join( ",", Context.Select( t => t.Type.FullName ) )}" );
 			}
+			return true;
 		}
 	}
 }

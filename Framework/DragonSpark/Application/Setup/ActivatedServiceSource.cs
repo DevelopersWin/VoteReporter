@@ -1,31 +1,35 @@
-using System;
-using DragonSpark.Aspects.Validation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
+using System;
 
 namespace DragonSpark.Application.Setup
 {
-	[ApplyAutoValidation]
-	public class ActivatedServiceSource : ValidatedParameterizedSourceBase<Type, object>
+	public sealed class ActivatedServiceSource : DecoratedParameterizedSource<Type, object>
 	{
-		readonly IServiceProvider provider;
-		readonly IsActive active;
+		readonly static DelegatedSpecification<object> Services = new DelegatedSpecification<object>( ServicesEnabled.Default.ToDelegate().Wrap() );
 
 		public ActivatedServiceSource( IServiceProvider provider ) : this( provider, IsActive.Default.Get( provider ) ) {}
+		ActivatedServiceSource( IServiceProvider provider, IsActive active ) : base( new Inner( provider, active ).With( Services.And( new DelegatedSpecification<Type>( active.Get ).Inverse() ) ) ) {}
 
-		ActivatedServiceSource( IServiceProvider provider, IsActive active ) : base( new DelegatedSpecification<object>( ServicesEnabled.Default.ToDelegate().Wrap() ).And( new DelegatedSpecification<Type>( active.Get ).Inverse() ) )
+		sealed class Inner : ParameterizedSourceBase<Type, object>
 		{
-			this.provider = provider;
-			this.active = active;
-		}
+			readonly IServiceProvider provider;
+			readonly IsActive active;
 
-		public override object Get( Type parameter )
-		{
-			using ( active.Assignment( parameter, true ) )
+			public Inner( IServiceProvider provider, IsActive active )
 			{
-				var service = provider.GetService( parameter );
-				return service;
+				this.provider = provider;
+				this.active = active;
+			}
+
+			public override object Get( Type parameter )
+			{
+				using ( active.Assignment( parameter, true ) )
+				{
+					var service = provider.GetService( parameter );
+					return service;
+				}
 			}
 		}
 	}

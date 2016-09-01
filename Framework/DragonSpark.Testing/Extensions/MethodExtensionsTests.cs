@@ -3,6 +3,7 @@ using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using System;
 using System.Linq;
 using System.Windows.Input;
@@ -68,11 +69,9 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( memberInfo.GetGenericTypeDefinition() , typeof(Action<>) );
 		}
 
-		class Factory : ValidatedParameterizedSourceBase<object, object>
+		class Factory : SpecificationParameterizedSource<object, object>
 		{
-			public Factory() : base( Specifications.Specifications.Assigned ) {}
-
-			public override object Get( object parameter ) => null;
+			public Factory() : base( Specifications.Specifications.Assigned.ToSpecificationDelegate(), o => null ) {}
 		}
 
 		class Command : CommandBase<object>

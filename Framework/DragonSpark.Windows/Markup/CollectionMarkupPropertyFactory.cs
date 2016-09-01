@@ -1,4 +1,3 @@
-using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using System;
@@ -7,16 +6,14 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Windows.Markup
 {
-	[ApplyAutoValidation]
-	public class CollectionMarkupPropertyFactory : MarkupPropertyFactoryBase
+	public sealed class CollectionMarkupPropertyFactory : MarkupPropertyFactoryBase
 	{
-		public static CollectionMarkupPropertyFactory Default { get; } = new CollectionMarkupPropertyFactory();
+		public static IParameterizedSource<IServiceProvider, IMarkupProperty> Default { get; } = new CollectionMarkupPropertyFactory().With( CollectionSpecification.Default );
+		CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Default.ToSourceDelegate() ) {}
 
 		readonly Func<IServiceProvider, PropertyReference> propertyFactory;
 
-		public CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Default.ToSourceDelegate() ) {}
-
-		public CollectionMarkupPropertyFactory( Func<IServiceProvider, PropertyReference> propertyFactory ) : base( CollectionSpecification.Default )
+		public CollectionMarkupPropertyFactory( Func<IServiceProvider, PropertyReference> propertyFactory )
 		{
 			this.propertyFactory = propertyFactory;
 		}

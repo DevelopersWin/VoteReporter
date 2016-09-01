@@ -10,7 +10,7 @@ namespace DragonSpark.Specifications
 		public static bool Accepts<T>( this object @this, T parameter )
 		{
 			var specification = @this as ISpecification<T>;
-			var result = specification?.IsSatisfiedBy( parameter ) ?? false;
+			var result = specification?.IsSatisfiedBy( parameter ) ?? ( @this as ISpecification )?.IsSatisfiedBy( parameter ) ?? false;
 			return result;
 		}
 

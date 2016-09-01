@@ -19,13 +19,13 @@ namespace DragonSpark.Aspects
 	[AttributeUsage( AttributeTargets.Method ), MulticastAttributeUsage( MulticastTargets.Method | MulticastTargets.InstanceConstructor, TargetMemberAttributes = MulticastAttributes.NonAbstract ), LinesOfCodeAvoided( 1 )]
 	public sealed class AutoGuardAspect : MethodLevelAspect, IAspectProvider
 	{
-		readonly static IValidatedParameterizedSource<Type, Type>[] DefaultSources = { DefaultSource.Default, ImmutableArraySource.Default };
+		readonly static IParameterizedSource<Type, Type>[] DefaultSources = { DefaultSource.Default, ImmutableArraySource.Default };
 		
-		readonly IValidatedParameterizedSource<Type, Type>[] sources;
+		readonly IParameterizedSource<Type, Type>[] sources;
 
 		public AutoGuardAspect() : this( DefaultSources ) {}
 
-		public AutoGuardAspect( params IValidatedParameterizedSource<Type, Type>[] sources )
+		public AutoGuardAspect( params IParameterizedSource<Type, Type>[] sources )
 		{
 			this.sources = sources;
 		}
@@ -40,9 +40,9 @@ namespace DragonSpark.Aspects
 				var parameterType = parameter.ParameterType;
 				foreach ( var source in sources )
 				{
-					if ( source.IsSatisfiedBy( parameterType ) )
+					var type = source.Get( parameterType );
+					if ( type != null )
 					{
-						var type = source.Get( parameterType );
 						yield return new AspectInstance( parameter, new ObjectConstruction( type ), null ) { RepresentAsStandalone = true };
 						break;
 					}
@@ -50,10 +50,10 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		sealed class DefaultSource : ValidatedParameterizedSourceBase<Type, Type>
+		sealed class DefaultSource : ParameterizedSourceBase<Type, Type>
 		{
-			public static IValidatedParameterizedSource<Type, Type> Default { get; } = new DefaultSource();
-			DefaultSource() : base( Specification.DefaultNested ) {}
+			public static IParameterizedSource<Type, Type> Default { get; } = new DefaultSource().With( Specification.DefaultNested );
+			DefaultSource() {}
 
 			public override Type Get( Type parameter ) => parameter == typeof(string) ? typeof(RequiredAttribute) : typeof(NotNullAttribute);
 
@@ -66,18 +66,12 @@ namespace DragonSpark.Aspects
 			}
 		}
 
-		sealed class ImmutableArraySource : ValidatedParameterizedSourceBase<Type, Type>
+		sealed class ImmutableArraySource : ParameterizedSourceBase<Type, Type>
 		{
-			public static ImmutableArraySource Default { get; } = new ImmutableArraySource();
-			ImmutableArraySource() : base( GenericTypeAssignableSpecification.Defaults.Get( typeof(ImmutableArray<>) ) ) {}
+			public static IParameterizedSource<Type, Type> Default { get; } = new ImmutableArraySource().With( GenericTypeAssignableSpecification.Defaults.Get( typeof(ImmutableArray<>) ) );
+			ImmutableArraySource() {}
 
 			public override Type Get( Type parameter ) => typeof(AssignedAttribute);
-
-			/*sealed class Specification : GenericTypeAssignableSpecification
-			{
-				public static ISpecification<Type> DefaultNested { get; } = new DelegatedSpecification<Type>( new DecoratedSourceCache<Type, bool>( new Specification().IsSatisfiedBy ).Get );
-				Specification() : base( typeof(ImmutableArray<>) ) {}
-			}*/
 		}
 	}
 }

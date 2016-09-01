@@ -1,15 +1,12 @@
-using System;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using System;
 
 namespace DragonSpark.Windows.Markup
 {
-	public class StringDesignerValueFactory : ValidatedParameterizedSourceBase<Type, object>
+	public class StringDesignerValueFactory : SpecificationParameterizedSource<Type, object>
 	{
 		public static StringDesignerValueFactory Default { get; } = new StringDesignerValueFactory();
-
-		public StringDesignerValueFactory() : base( TypeAssignableSpecification<string>.Default ) {}
-
-		public override object Get( Type parameter ) => parameter.AssemblyQualifiedName;
+		StringDesignerValueFactory() : base( TypeAssignableSpecification<string>.Default.ToSpecificationDelegate(), type => type.AssemblyQualifiedName ) {}
 	}
 }
