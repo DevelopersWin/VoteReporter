@@ -1,4 +1,3 @@
-using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
@@ -15,22 +14,22 @@ namespace DragonSpark.Aspects
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )
 	]
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	public sealed class TimedAttribute : MethodInterceptionAspect
+	public class TimedAttribute : MethodInterceptionAspect
 	{
-		readonly Func<MethodBase, IDisposable> source;
+		readonly Func<Func<MethodBase, IDisposable>> source;
 
-		public TimedAttribute() : this( TimedOperationFactory.Default.ToSourceDelegate() ) {}
+		public TimedAttribute() : this( "Executed Method '{@Method}'" ) {}
 
-		public TimedAttribute( string template ) : this( new TimedOperationFactory( template ).ToSourceDelegate() ) {}
+		public TimedAttribute( string template ) : this( Diagnostics.Logging.Configuration.TimedOperationFactory.Fixed( template ).ToDelegate() ) {}
 
-		TimedAttribute( Func<MethodBase, IDisposable> source )
+		protected TimedAttribute( Func<Func<MethodBase, IDisposable>> source )
 		{
 			this.source = source;
 		}
 
-		public override void OnInvoke( MethodInterceptionArgs args )
+		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			using ( source( args.Method ) )
+			using ( source()( args.Method ) )
 			{
 				base.OnInvoke( args );
 			}

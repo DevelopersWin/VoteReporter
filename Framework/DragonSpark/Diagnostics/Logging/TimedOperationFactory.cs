@@ -1,22 +1,19 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
 using SerilogTimings.Extensions;
 using System;
 using System.Reflection;
 
 namespace DragonSpark.Diagnostics.Logging
 {
-	public class TimedOperationFactory : ValidatedParameterizedSourceBase<MethodBase, IDisposable>
+	public class TimedOperationFactory : ParameterizedSourceBase<MethodBase, IDisposable>
 	{
-		public static TimedOperationFactory Default { get; } = new TimedOperationFactory();
-		TimedOperationFactory() : this( "Executed Method '{@Method}'" ) {}
+		/*public static TimedOperationFactory Default { get; } = new TimedOperationFactory();
+		TimedOperationFactory() : this( "Executed Method '{@Method}'" ) {}*/
 
 		readonly string template;
 
-		public TimedOperationFactory( string template ) : this( template, Specifications.Specifications.Assigned ) {}
-
-		public TimedOperationFactory( string template, ISpecification<MethodBase> specification ) : base( specification )
+		public TimedOperationFactory( string template )
 		{
 			this.template = template;
 		}

@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using System;
 using System.Reflection;
+using TimedOperationFactory = DragonSpark.Testing.Framework.Diagnostics.TimedOperationFactory;
 
 namespace DragonSpark.Testing.Framework.Runtime
 {

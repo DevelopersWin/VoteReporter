@@ -94,7 +94,9 @@
     <Compile Include="Composition\SourceDelegateContractResolver.cs" />
     <Compile Include="Composition\TypeInitializingExportDescriptorProvider.cs" />
     <Compile Include="DefaultPriorityAware.cs" />
+    <Compile Include="Diagnostics\Logging\Configuration.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactory.cs" />
+    <Compile Include="Diagnostics\Logging\TimedOperationFactorySource.cs" />
     <Compile Include="PrioritizedCollection.cs" />
     <Compile Include="PriorityAwareCollection.cs" />
     <Compile Include="PriorityAwareLocator.cs" />
