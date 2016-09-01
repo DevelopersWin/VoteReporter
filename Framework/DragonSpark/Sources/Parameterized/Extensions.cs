@@ -200,7 +200,8 @@ namespace DragonSpark.Sources.Parameterized
 			ParameterizedSources() : base( CacheFactory.Create ) {}
 		}
 
-		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) where TParameter : class => new EqualityReferenceCache<TParameter, TResult>( @this.Get ).ToCache();
+		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) where TParameter : class => @this.ToSourceDelegate().ToEqualityCache();
+		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this Func<TParameter, TResult> @this ) where TParameter : class => new EqualityReferenceCache<TParameter, TResult>( @this );
 		
 		public static IValidatedParameterizedSource<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => AutoValidationFactories<TParameter, TResult>.Default.Get( @this );
 		sealed class AutoValidationFactories<TParameter, TResult> : Cache<IValidatedParameterizedSource<TParameter, TResult>, IValidatedParameterizedSource<TParameter, TResult>>
