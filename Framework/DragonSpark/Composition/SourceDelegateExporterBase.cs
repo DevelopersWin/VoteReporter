@@ -116,7 +116,7 @@ namespace DragonSpark.Composition
 		{
 			public Activator( IStackSource<CompositeActivatorParameters> stack, IParameterizedSource<Type, CompositeActivator> source ) : base( new Specification( source ), new Inner( stack, source ).Get ) {}
 			
-			sealed class Specification : DelegatedAssignedSpecificationBase<Type, CompositeActivator>
+			sealed class Specification : DelegatedAssignedSpecification<Type, CompositeActivator>
 			{
 				public Specification( IParameterizedSource<Type, CompositeActivator> source ) : base( source.ToSourceDelegate() ) {}
 			}

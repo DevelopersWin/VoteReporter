@@ -21,17 +21,22 @@ namespace DragonSpark.Testing.Framework
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			if ( CurrentTestingMethod.Default.Get() == null )
+			var current = CurrentTestingMethod.Default.Get();
+			if ( current == null )
 			{
 				CurrentTestingMethod.Default.Assign( args.Method );
-
-				using ( new MethodOperationContext( args.Method ) )
+				try
 				{
-					base.OnInvoke( args );
+					using ( new MethodOperationContext( args.Method ) )
+					{
+						base.OnInvoke( args );
+					}
 				}
-			
-				var disposable = (IDisposable)ApplicationServices.Default.Get() ?? ExecutionContext.Default.Get();
-				args.ReturnValue = Defer.Run( new Action( disposable.Dispose ).Wrap<Task>(), args.ReturnValue );
+				finally
+				{
+					var disposable = (IDisposable)ApplicationServices.Default.Get() ?? ExecutionContext.Default.Get();
+					args.ReturnValue = Defer.Run( new Action( disposable.Dispose ).Wrap<Task>(), args.ReturnValue );
+				}
 			}
 			else
 			{

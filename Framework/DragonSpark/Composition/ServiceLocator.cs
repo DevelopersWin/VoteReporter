@@ -43,7 +43,7 @@ namespace DragonSpark.Composition
 			{
 				var type = SpecificationExporter.Definition.MakeGenericType( parameter );
 				object specification;
-				var result = host.TryGetExport( type, out specification ) && (bool)specification;
+				var result = !host.TryGetExport( type, out specification ) || (bool)specification;
 				return result;
 			}
 		}

@@ -1,7 +1,7 @@
 ﻿using DragonSpark.TypeSystem;
+using DragonSpark.TypeSystem.Metadata;
 using System;
 using System.Linq;
-using DragonSpark.TypeSystem.Metadata;
 
 namespace DragonSpark.Extensions
 {
@@ -18,7 +18,8 @@ namespace DragonSpark.Extensions
 		{
 			var attributeProvider = Attributes.Get( @this );
 			var attributes = attributeProvider.GetAttributes( typeof(T) );
-			return attributes as T[] ?? Items<T>.Default;
+			var result = attributes as T[] ?? Items<T>.Default;
+			return result;
 		}
 	}
 }

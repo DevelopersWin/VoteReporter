@@ -30,7 +30,7 @@ namespace DragonSpark.TypeSystem.Metadata
 
 			sealed class MemberInfoDefinitionProvider : TypeDefinitionProviderBase<MemberInfo>
 			{
-				public static IParameterizedSource<object, TypeInfo> DefaultNested { get; } = new MemberInfoDefinitionProvider().With( Specifications<MemberInfo>.Assigned ).With( Coercer<TypeInfo>.Default );
+				public static IParameterizedSource<object, TypeInfo> DefaultNested { get; } = new MemberInfoDefinitionProvider().With( Specifications<MemberInfo>.Assigned ).With( Coercer<MemberInfo>.Default );
 				MemberInfoDefinitionProvider() {}
 
 				public override TypeInfo Get( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();

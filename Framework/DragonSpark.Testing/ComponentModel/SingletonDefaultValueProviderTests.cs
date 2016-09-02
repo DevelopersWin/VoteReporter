@@ -1,4 +1,5 @@
 ﻿using DragonSpark.ComponentModel;
+using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using JetBrains.Annotations;
@@ -22,6 +23,9 @@ namespace DragonSpark.Testing.ComponentModel
 		public void VerifyConvention()
 		{
 			typeof(Convention).Yield().AsApplicationParts();
+
+			var convention = ConventionTypeSelector.Default.Get( typeof(IConvention) );
+			Assert.Equal( typeof(Convention), convention );
 
 			var sut = new ConventionComponent();
 			Assert.IsType<Convention>( sut.Subject );

@@ -12,7 +12,7 @@ namespace DragonSpark.TypeSystem.Metadata
 
 		sealed class Factory : ParameterConstructedCompositeFactory<IAttributeProvider>
 		{
-			public Factory() : this( MemberInfoDefinitions.Default.Get, ReflectionElementAttributeProvider.Default.ToSourceDelegate() ) {}
+			public Factory() : this( MemberInfoDefinitions.Default.Get, ReflectionElementAttributeProvider.Default.Get ) {}
 
 			readonly Func<object, MemberInfo> memberSource;
 			readonly Func<object, IAttributeProvider> providerSource;

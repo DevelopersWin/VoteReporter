@@ -110,7 +110,7 @@
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
-    <Compile Include="Specifications\DelegatedAssignedSpecificationBase.cs" />
+    <Compile Include="Specifications\DelegatedAssignedSpecification.cs" />
     <Compile Include="Specifications\SpecificationLocator.cs" />
     <Compile Include="Specifications\SuppliedDelegatedSpecification.cs" />
     <Compile Include="Tasks\SuppliedTaskSource.cs" />

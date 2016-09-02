@@ -20,6 +20,11 @@ namespace DragonSpark.ComponentModel
 			this.provider = provider;
 		}
 
-		public override object Get( DefaultValueParameter parameter ) => provider.Get( hostType ?? parameter.Metadata.PropertyType );
+		public override object Get( DefaultValueParameter parameter )
+		{
+			var type = hostType ?? parameter.Metadata.PropertyType;
+			var o = provider.Get( type );
+			return o;
+		}
 	}
 }
