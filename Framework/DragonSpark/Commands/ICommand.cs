@@ -1,11 +1,11 @@
-using System.Windows.Input;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using System.Windows.Input;
 
 namespace DragonSpark.Commands
 {
-	public interface ICommand<in TParameter> : ISpecification<TParameter>, ICommand
+	public interface ICommand<in TParameter> : ISpecification<TParameter>, ISpecification, ICommand
 	{
 		void Execute( TParameter parameter );
 

@@ -20,6 +20,6 @@ namespace DragonSpark.Sources.Parameterized
 		}
 
 		public bool IsSatisfiedBy( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
-		// bool ISpecification.IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
+		bool ISpecification.IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
 	}
 }

@@ -1,8 +1,12 @@
+using System.Runtime.InteropServices;
+
 namespace DragonSpark.Specifications
 {
 	public abstract class SpecificationBase<T> : ISpecification<T>
 	{
 		public abstract bool IsSatisfiedBy( T parameter );
+
+		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is T && IsSatisfiedBy( (T)parameter );
 
 		/*readonly Coerce<T> coercer;
 		readonly Func<T, bool> apply;
@@ -19,7 +23,7 @@ namespace DragonSpark.Specifications
 			this.apply = apply;
 		}
 
-		bool ISpecification.IsSatisfiedBy( [Optional]object parameter ) => Coerce( parameter );
+		
 
 		protected virtual bool Coerce( [Optional]object parameter )
 		{
