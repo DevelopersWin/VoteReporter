@@ -5,14 +5,13 @@ using System;
 
 namespace DragonSpark.Specifications
 {
-	public static class SpecificationExtensions
+	public static class Extensions
 	{
-		public static bool Accepts<T>( this object @this, T parameter )
-		{
-			var specification = @this as ISpecification<T>;
-			var result = specification?.IsSatisfiedBy( parameter ) ?? ( @this as ISpecification )?.IsSatisfiedBy( parameter ) ?? false;
-			return result;
-		}
+		public static ISpecification<TFrom> With<TFrom, TTo>( this ISpecification<TTo> @this, ICoercer<TFrom, TTo> coercer ) => With( @this.ToSpecificationDelegate(), coercer.ToDelegate() );
+		public static ISpecification<TFrom> With<TFrom, TTo>( this Func<TTo, bool> @this, Func<TFrom, TTo> coerce ) =>
+			new CoercedSpecification<TFrom, TTo>( coerce, @this );
+
+		// public static bool Accepts<T>( this object @this, T parameter ) => @this.ToSpecification<T>().IsSatisfiedBy( parameter );
 
 		public static ISpecification<T> Inverse<T>( this ISpecification<T> @this ) => Inversed<T>.Default.Get( @this );
 		sealed class Inversed<T> : Cache<ISpecification<T>, ISpecification<T>>
@@ -27,7 +26,7 @@ namespace DragonSpark.Specifications
 
 		public static ISpecification<TDestination> Project<TDestination, TOrigin>( this ISpecification<TOrigin> @this, Func<TDestination, TOrigin> projection ) => new ProjectedSpecification<TOrigin, TDestination>( @this.IsSatisfiedBy, projection );
 
-		public static ISpecification<TTo> Cast<TFrom, TTo>( this ISpecification<TFrom> @this ) where TFrom : TTo => new CastingSpecification<TFrom, TTo>( @this );
+		// public static ISpecification<TTo> Cast<TFrom, TTo>( this ISpecification<TFrom> @this ) where TFrom : TTo => new CastingSpecification<TFrom, TTo>( @this );
 
 		public static ISpecification<T> Cast<T>( this ISpecification @this ) => @this as ISpecification<T> ?? Casts<T>.Default.Get( @this );
 		sealed class Casts<T> : Cache<ISpecification, ISpecification<T>>
@@ -53,19 +52,19 @@ namespace DragonSpark.Specifications
 			Delegates() : base( specification => specification.IsSatisfiedBy ) {}
 		}
 
-		public static ISpecification<T> ToCachedSpecification<T>( this ISpecification<T> @this ) => Cache<T>.Default.Get( @this );
-		sealed class Cache<T> : Cache<ISpecification<T>, ISpecification<T>>
+		public static ISpecification<T> ToCachedSpecification<T>( this ISpecification<T> @this ) => CachedSpecifications<T>.Default.Get( @this );
+		sealed class CachedSpecifications<T> : Cache<ISpecification<T>, ISpecification<T>>
 		{
-			public static Cache<T> Default { get; } = new Cache<T>();
-			Cache() : base( specification => new DelegatedSpecification<T>( specification.ToSpecificationDelegate().Cache() ) ) {}
+			public static CachedSpecifications<T> Default { get; } = new CachedSpecifications<T>();
+			CachedSpecifications() : base( specification => new DelegatedSpecification<T>( specification.ToSpecificationDelegate().Cache() ) ) {}
 		}
 
-		public static ISpecification<T> ToSpecification<T>( this object @this ) => @this as ISpecification<T> ?? Specifications<T>.Default.Get( @this );
-		sealed class Specifications<T> : Cache<object, ISpecification<T>>
+		/*public static ISpecification<T> ToSpecification<T>( this object @this ) => Specifications<T>.Default.Get( @this );
+		sealed class Specifications<T> : Cache<ISpecification<T>>
 		{
 			public static Specifications<T> Default { get; } = new Specifications<T>();
-			Specifications() : base( factory => new DelegatedSpecification<T>( factory.Accepts ) ) {}
-		}
+			Specifications() : base( SpecificationLocator<T>.Default.Get ) {}
+		}*/
 
 		/*public static ISpecification<TParameter> ToSpecification<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => FactorySpecifications<TParameter, TResult>.Default.Get( @this );
 		sealed class FactorySpecifications<TParameter, TResult> : Cache<IValidatedParameterizedSource<TParameter, TResult>, ISpecification<TParameter>>

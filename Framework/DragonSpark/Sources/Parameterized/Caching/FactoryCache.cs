@@ -13,7 +13,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 		FactoryCache( IParameterizedScope<TInstance, TValue> configuration, ISpecification<TInstance> specification ) : base( configuration.ToCache() )
 		{
 			IParameterizedSource<TInstance, TValue> source = new DelegatedParameterizedSource<TInstance, TValue>( Create );
-			var factory = specification == DefaultSpecification ? source : source.With( specification ).WithAutoValidation();
+			var factory = specification == DefaultSpecification ? source : new AutoValidatingSource<TInstance, TValue>( specification, source );
 			configuration.Assign( new Func<TInstance, TValue>( factory.Get ).Wrap() );
 		}
 

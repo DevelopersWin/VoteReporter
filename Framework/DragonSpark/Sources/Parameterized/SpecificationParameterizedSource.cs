@@ -1,20 +1,20 @@
-using System;
 using DragonSpark.Specifications;
+using System;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public class SpecificationParameterizedSource<TParameter, TResult> : DelegatedParameterizedSource<TParameter, TResult>, IValidatedParameterizedSource<TParameter, TResult>
+	public class SpecificationParameterizedSource<TParameter, TResult> : DelegatedParameterizedSource<TParameter, TResult>, ISpecification<TParameter>
 	{
-		readonly Func<TParameter, bool> specification;
+		readonly ISpecification<TParameter> specification;
 
-		public SpecificationParameterizedSource( Func<TParameter, bool> specification, Func<TParameter, TResult> source ) : base( source )
+		public SpecificationParameterizedSource( ISpecification<TParameter> specification, Func<TParameter, TResult> source ) : base( source )
 		{
 			this.specification = specification;
 		}
 
-		public override TResult Get( TParameter parameter ) => specification( parameter ) ? base.Get( parameter ) : default(TResult);
+		public override TResult Get( TParameter parameter ) => specification.IsSatisfiedBy( parameter ) ? base.Get( parameter ) : default(TResult);
 
-		public bool IsSatisfiedBy( TParameter parameter ) => specification( parameter );
-		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is TParameter && specification( (TParameter)parameter );
+		public bool IsSatisfiedBy( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
+		// bool ISpecification.IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
 	}
 }

@@ -27,9 +27,9 @@ namespace DragonSpark.Commands
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
 		bool ICommand.CanExecute( [Optional]object parameter ) => Coerce( parameter );
-		bool ISpecification.IsSatisfiedBy( [Optional]object parameter ) => Coerce( parameter );
+		// bool ISpecification.IsSatisfiedBy( [Optional]object parameter ) => Coerce( parameter );
 		protected virtual bool Coerce( [Optional]object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
-		public virtual bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
+		public virtual bool IsSatisfiedBy( [Optional]T parameter ) => specification.IsSatisfiedBy( parameter );
 
 		void ICommand.Execute( [Optional]object parameter ) => Execute( coercer( parameter ) );
 

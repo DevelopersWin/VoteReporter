@@ -12,6 +12,6 @@ namespace DragonSpark
 			this.projection = projection;
 		}
 
-		protected override TTo PerformCoercion( [Optional]object parameter ) => parameter.AsTo( projection );
+		protected override TTo Apply( [Optional]object parameter ) => parameter.AsTo( projection );
 	}
 }

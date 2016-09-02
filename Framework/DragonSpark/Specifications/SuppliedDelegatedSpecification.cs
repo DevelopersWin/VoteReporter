@@ -1,11 +1,10 @@
 using DragonSpark.Sources;
-using DragonSpark.TypeSystem;
 using System;
 using System.Runtime.InteropServices;
 
 namespace DragonSpark.Specifications
 {
-	public class SuppliedDelegatedSpecification<T> : SpecificationBase<object>
+	public sealed class SuppliedDelegatedSpecification<T> : SpecificationBase<object>
 	{
 		readonly Func<T, bool> source;
 		readonly Func<T> parameterSource;
@@ -14,7 +13,7 @@ namespace DragonSpark.Specifications
 		public SuppliedDelegatedSpecification( ISpecification<T> specification, Func<T> parameterSource ) : this( specification.ToSpecificationDelegate(), parameterSource ) {}
 
 		public SuppliedDelegatedSpecification( Func<T, bool> source, T parameter ) : this( source, Factory.For( parameter ) ) {}
-		public SuppliedDelegatedSpecification( Func<T, bool> source, Func<T> parameterSource ) : base( Where<object>.Always )
+		public SuppliedDelegatedSpecification( Func<T, bool> source, Func<T> parameterSource )// : base( Where<object>.Always )
 		{
 			this.source = source;
 			this.parameterSource = parameterSource;

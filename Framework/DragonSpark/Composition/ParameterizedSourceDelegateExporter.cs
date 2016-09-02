@@ -1,4 +1,3 @@
-using DragonSpark.Sources;
 using DragonSpark.Sources.Delegates;
 using DragonSpark.Sources.Parameterized;
 using System;
@@ -20,7 +19,7 @@ namespace DragonSpark.Composition
 			Factory() {}
 
 			public override object Get( ActivationParameter parameter ) => 
-				ParameterizedSourceDelegates.Sources.Get( parameter.Services.Sourced().ToDelegate() ).Get( parameter.SourceType );
+				ParameterizedSourceDelegates.Sources.Get( parameter.Services ).Get( parameter.SourceType );
 		}
 	}
 }

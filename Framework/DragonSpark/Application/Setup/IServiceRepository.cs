@@ -1,11 +1,10 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Runtime;
-using DragonSpark.Specifications;
 using System;
 
 namespace DragonSpark.Application.Setup
 {
-	public interface IServiceRepository : IActivator, IRepository<object>, ISpecification<Type>
+	public interface IServiceRepository : IActivator, IRepository<object>
 	{
 		void Add( InstanceRegistrationRequest request );
 	}

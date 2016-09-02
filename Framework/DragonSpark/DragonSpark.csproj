@@ -43,6 +43,7 @@
     <Compile Include="Composition\CompositeActivatorParameters.cs" />
     <Compile Include="Composition\ConstructorSelector.cs" />
     <Compile Include="Composition\Contracts.cs" />
+    <Compile Include="Composition\ExportDescriptorProviderBase.cs" />
     <Compile Include="Composition\IsValidConstructorSpecification.cs" />
     <Compile Include="Composition\SingletonExportSource.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Composition\SingletonExports.cs" />
     <Compile Include="Application\SingletonExports.cs" />
     <Compile Include="Composition\SourceDelegateContractResolver.cs" />
+    <Compile Include="Composition\SpecificationExporter.cs" />
     <Compile Include="Composition\TypeInitializingExportDescriptorProvider.cs" />
     <Compile Include="DefaultPriorityAware.cs" />
     <Compile Include="Diagnostics\Logging\Configuration.cs" />
@@ -102,10 +104,14 @@
     <Compile Include="PriorityAwareLocator.cs" />
     <Compile Include="PriorityComparer.cs" />
     <Compile Include="PriorityExtensions.cs" />
+    <Compile Include="Sources\IQueryableContainer.cs" />
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
+    <Compile Include="Specifications\CoercedSpecification.cs" />
     <Compile Include="Specifications\DelegatedAssignedSpecificationBase.cs" />
+    <Compile Include="Specifications\SpecificationLocator.cs" />
     <Compile Include="Specifications\SuppliedDelegatedSpecification.cs" />
     <Compile Include="Tasks\SuppliedTaskSource.cs" />
     <Compile Include="Tasks\MonitorTaskCommand.cs" />
@@ -233,7 +239,7 @@
     <Compile Include="Sources\Delegates\ServiceProvidedParameterizedSourceDelegates.cs" />
     <Compile Include="Sources\Delegates\SourceDelegates.cs" />
     <Compile Include="Application\Setup\ServiceProviderConfigurations.cs" />
-    <Compile Include="Application\Setup\ServiceProviderFactory.cs" />
+    <Compile Include="Application\Setup\ActivatorFactory.cs" />
     <Compile Include="Application\Setup\ServicesEnabled.cs" />
     <Compile Include="Application\SystemParts.cs" />
     <Compile Include="Application\SystemPartsFactory.cs" />
@@ -400,7 +406,7 @@
     <Compile Include="Activation\ConstructTypeRequest.cs" />
     <Compile Include="Activation\Location\ContainsSingletonPropertySpecification.cs" />
     <Compile Include="Activation\Location\DecoratedActivator.cs" />
-    <Compile Include="Activation\Location\DefaultServiceProvider.cs" />
+    <Compile Include="Activation\Location\DefaultServices.cs" />
     <Compile Include="Application\Execute.cs" />
     <Compile Include="Application\ExecutionContext.cs" />
     <Compile Include="Expressions\ExpressionBodyParameter.cs" />
@@ -438,7 +444,6 @@
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\IAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\ArgumentCache.cs" />
-    <Compile Include="Activation\TypeRequestCoercer.cs" />
     <Compile Include="Sources\Parameterized\Factory.cs" />
     <Compile Include="Application\Execution.cs" />
     <Compile Include="Aspects\Validation\AutoValidation.cs" />
@@ -546,7 +551,6 @@
     <Compile Include="Runtime\ISerializer.cs" />
     <Compile Include="Runtime\Assignments\ParameterInvocation.cs" />
     <Compile Include="Specifications\DecoratedSpecification.cs" />
-    <Compile Include="Specifications\IsInstanceOfSpecification.cs" />
     <Compile Include="Sources\AmbientStackCommand.cs" />
     <Compile Include="Sources\Parameterized\Caching\ConnectedStore.cs" />
     <Compile Include="Specifications\AlwaysSpecification.cs" />
@@ -570,7 +574,7 @@
     <Compile Include="Specifications\EqualityContextAwareSpecification.cs" />
     <Compile Include="Specifications\ContextAwareSpecification.cs" />
     <Compile Include="Specifications\GuardedSpecificationBase.cs" />
-    <Compile Include="Specifications\SpecificationExtensions.cs" />
+    <Compile Include="Specifications\Extensions.cs" />
     <Compile Include="TypeSystem\Metadata\Attributes.cs" />
     <Compile Include="TypeSystem\Where.cs" />
     <Compile Include="TypeSystem\DefaultValues.cs" />

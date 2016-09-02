@@ -23,7 +23,7 @@ namespace DragonSpark.TypeSystem.Metadata
 				this.providerSource = providerSource;
 			}
 
-			public override IAttributeProvider Get( object parameter = null ) => base.Get( parameter ) ?? providerSource( memberSource( parameter ) );
+			public override IAttributeProvider Get( object parameter ) => base.Get( parameter ) ?? providerSource( memberSource( parameter ) );
 		}
 	}
 }

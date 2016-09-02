@@ -1,5 +1,7 @@
+using DragonSpark.Activation;
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem.Generics;
@@ -9,7 +11,7 @@ namespace DragonSpark.Sources.Delegates
 {
 	public abstract class DelegatesBase : FactoryCache<Type, Delegate>
 	{
-		protected DelegatesBase( Func<IServiceProvider> source, string name ) : this( source.Delegate<object>(), Specifications.Specifications.Assigned, name ) {}
+		protected DelegatesBase( IActivator source, string name ) : this( source.ToSourceDelegate(), Specifications.Specifications.Assigned, name ) {}
 		protected DelegatesBase( Func<Type, object> locator, ISpecification<Type> specification, string name ) : base( specification )
 		{
 			Locator = locator;

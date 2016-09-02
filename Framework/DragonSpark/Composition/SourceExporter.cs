@@ -1,4 +1,3 @@
-using DragonSpark.Sources;
 using DragonSpark.Sources.Delegates;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
@@ -19,7 +18,7 @@ namespace DragonSpark.Composition
 			public static Factory DefaultNested { get; } = new Factory();
 			Factory() {}
 
-			public override object Get( ActivationParameter parameter ) => SourceFactory.Defaults.Get( parameter.Services.Sourced().ToDelegate() ).Get( parameter.SourceType );
+			public override object Get( ActivationParameter parameter ) => SourceFactory.Defaults.Get( parameter.Services ).Get( parameter.SourceType );
 		}
 	}
 }

@@ -1,8 +1,6 @@
-using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using System;
-using System.Linq;
+using DragonSpark.Specifications;
 using System.Reflection;
 
 namespace DragonSpark.TypeSystem.Metadata
@@ -12,33 +10,28 @@ namespace DragonSpark.TypeSystem.Metadata
 		public static TypeDefinitions Default { get; } = new TypeDefinitions();
 		TypeDefinitions() : base( new Factory().ToSourceDelegate().GlobalCache() ) {}
 
-		sealed class Factory : CompositeFactory<object, TypeInfo>
+		sealed class Factory : DecoratedParameterizedSource<object, TypeInfo>
 		{
-			readonly static IParameterizedSource<object, TypeInfo>[] Factories = new IParameterizedSource[] { TypeInfoDefinitionProvider.DefaultNested, MemberInfoDefinitionProvider.DefaultNested, GeneralDefinitionProvider.DefaultNested }./*Select( parameter => new Func<object, TypeInfo>( parameter.Get<TypeInfo> ) ).*/Select( source => source.Cast<object, TypeInfo>() ).Fixed();
+			readonly static IParameterizedSource<object, TypeInfo>[]
+				Factories = { TypeInfoDefinitionProvider.DefaultNested, MemberInfoDefinitionProvider.DefaultNested, GeneralDefinitionProvider.DefaultNested };
 
 			public Factory() : this( ComponentModel.TypeDefinitions.Default.Get ) { }
-
-			readonly Func<TypeInfo, TypeInfo> source;
-		
-			Factory( Func<TypeInfo, TypeInfo> source ) : base( Factories )
-			{
-				this.source = source;
-			}
-
-			public override TypeInfo Get( object parameter = null ) => source( base.Get( parameter ) );
+			Factory( Alter<TypeInfo> alter ) : base( new CompositeFactory<object, TypeInfo>( Factories ).With( alter ) ) {}
 
 			abstract class TypeDefinitionProviderBase<T> : ParameterizedSourceBase<T, TypeInfo> {}
 
 			sealed class TypeInfoDefinitionProvider : TypeDefinitionProviderBase<TypeInfo>
 			{
-				public static TypeInfoDefinitionProvider DefaultNested { get; } = new TypeInfoDefinitionProvider();
+				public static IParameterizedSource<object, TypeInfo> DefaultNested { get; } = new TypeInfoDefinitionProvider().With( Specifications<TypeInfo>.Assigned ).With( Coercer<TypeInfo>.Default );
+				TypeInfoDefinitionProvider() {}
 
 				public override TypeInfo Get( TypeInfo parameter ) => parameter;
 			}
 
 			sealed class MemberInfoDefinitionProvider : TypeDefinitionProviderBase<MemberInfo>
 			{
-				public static MemberInfoDefinitionProvider DefaultNested { get; } = new MemberInfoDefinitionProvider();
+				public static IParameterizedSource<object, TypeInfo> DefaultNested { get; } = new MemberInfoDefinitionProvider().With( Specifications<MemberInfo>.Assigned ).With( Coercer<TypeInfo>.Default );
+				MemberInfoDefinitionProvider() {}
 
 				public override TypeInfo Get( MemberInfo parameter ) => parameter.DeclaringType.GetTypeInfo();
 			}
@@ -46,6 +39,7 @@ namespace DragonSpark.TypeSystem.Metadata
 			sealed class GeneralDefinitionProvider : TypeDefinitionProviderBase<object>
 			{
 				public static GeneralDefinitionProvider DefaultNested { get; } = new GeneralDefinitionProvider();
+				GeneralDefinitionProvider() {}
 
 				public override TypeInfo Get( object parameter ) => parameter.GetType().GetTypeInfo();
 			}

@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Diagnostics
 		{
 			var logger = context.GetExport<ILogger>();
 
-			var serviceProvider = DefaultServiceProvider.Default.Cached();
+			var serviceProvider = DefaultServices.Default.Cached();
 			Assert.Same( Logger.Default.Get( Execution.Current() ), serviceProvider.Get<ILogger>() );
 			Assert.Same( serviceProvider.Get<ILogger>(), logger );
 

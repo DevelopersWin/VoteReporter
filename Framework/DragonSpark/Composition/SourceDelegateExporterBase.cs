@@ -1,8 +1,10 @@
+using DragonSpark.Activation;
 using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ using Type = System.Type;
 
 namespace DragonSpark.Composition
 {
-	public abstract class SourceDelegateExporterBase : ExportDescriptorProvider
+	public abstract class SourceDelegateExporterBase : ExportDescriptorProviderBase
 	{
 		readonly static IStackSource<CompositeActivatorParameters> Stack = new AmbientStack<CompositeActivatorParameters>();
 		readonly static Func<LocateTypeRequest, Type> Locator = SourceTypes.Default.Delegate();
@@ -45,10 +47,9 @@ namespace DragonSpark.Composition
 				{
 					IDictionary<CompositionContract, CompositeActivator> registry = new ConcurrentDictionary<CompositionContract, CompositeActivator>();
 					Register( registry, descriptorAccessor, new[] { sourceType, Parameters( sourceType ) }.WhereAssigned().Select( resolved.ChangeType ).ToArray() );
-					var provider = new ServiceProvider( Stack, registry.TryGet, resolved );
-					
-					var activator = new ActivatorSource( Stack, resultSource, new ActivationParameter( provider, sourceType ) );
-					var factory = dependency.Target.IsShared ? new SharedFactory( activator.Create, cache, Contracts.Default.Get( dependency.Contract ) ) : new Factory( activator.Create );
+					var activator = new Activator( Stack, new Source( registry.TryGet, resolved ) );
+					var source = new ActivatorSource( Stack, resultSource, new ActivationParameter( activator, sourceType ) );
+					var factory = dependency.Target.IsShared ? new SharedFactory( source.Create, cache, Contracts.Default.Get( dependency.Contract ) ) : new Factory( source.Create );
 					yield return new ExportDescriptorPromise( dependency.Contract, GetType().Name, dependency.Target.IsShared, NoDependencies, factory.Get );
 				}
 			}
@@ -66,19 +67,16 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		class Factory : ParameterizedSourceBase<IEnumerable<CompositionDependency>, ExportDescriptor>
+		class Factory : FactoryBase
 		{
-			readonly CompositeActivator activator, create;
+			readonly CompositeActivator activator;
 
 			public Factory( CompositeActivator activator )
 			{
 				this.activator = activator;
-				create = Create;
 			}
 
-			public override ExportDescriptor Get( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( create, NoMetadata );
-
-			protected virtual object Create( LifetimeContext context, CompositionOperation operation ) => context.Registered( activator( context, operation ) );
+			protected override object Create( LifetimeContext context, CompositionOperation operation ) => context.Registered( activator( context, operation ) );
 		}
 
 		sealed class SharedFactory : Factory
@@ -100,29 +98,47 @@ namespace DragonSpark.Composition
 			}
 		}
 
-		sealed class ServiceProvider : IServiceProvider
+		sealed class Source : ParameterizedSourceBase<Type, CompositeActivator>
 		{
-			readonly IStackSource<CompositeActivatorParameters> stack;
 			readonly Func<CompositionContract, CompositeActivator> provider;
 			readonly CompositionContract source;
 
-			public ServiceProvider( IStackSource<CompositeActivatorParameters> stack, Func<CompositionContract, CompositeActivator> provider, CompositionContract source )
+			public Source( Func<CompositionContract, CompositeActivator> provider, CompositionContract source )
 			{
-				this.stack = stack;
 				this.provider = provider;
 				this.source = source;
 			}
 
-			public object GetService( Type serviceType )
+			public override CompositeActivator Get( Type parameter ) => provider( source.ChangeType( parameter ) );
+		}
+
+		sealed class Activator : ActivatorBase
+		{
+			public Activator( IStackSource<CompositeActivatorParameters> stack, IParameterizedSource<Type, CompositeActivator> source ) : base( new Specification( source ), new Inner( stack, source ).Get ) {}
+			
+			sealed class Specification : DelegatedAssignedSpecificationBase<Type, CompositeActivator>
 			{
-				var activator = provider( source.ChangeType( serviceType ) );
-				if ( activator != null )
+				public Specification( IParameterizedSource<Type, CompositeActivator> source ) : base( source.ToSourceDelegate() ) {}
+			}
+
+			sealed class Inner : ParameterizedSourceBase<Type, object>
+			{
+				readonly IStackSource<CompositeActivatorParameters> stack;
+				readonly IParameterizedSource<Type, CompositeActivator> source;
+
+				public Inner( IStackSource<CompositeActivatorParameters> stack, IParameterizedSource<Type, CompositeActivator> source  )
 				{
+					this.stack = stack;
+					this.source = source;
+				}
+
+				public override object Get( Type parameter )
+				{
+					var activator = source.Get( parameter );
 					var current = stack.GetCurrentItem();
 					var result = activator( current.Context, current.Operation );
 					return result;
 				}
-				return null;
 			}
 		}
 	}

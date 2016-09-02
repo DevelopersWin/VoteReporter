@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Aspects;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
@@ -7,25 +6,40 @@ using System.Composition;
 
 namespace DragonSpark
 {
-	public sealed class Formatter : ParameterizedSourceBase<Formatter.Parameter, string>
+	public interface IFormatter : IParameterizedSource<Formatter.Parameter, string>, IParameterizedSource<object, string> {}
+
+	public sealed class Formatter : DecoratedParameterizedSource<Formatter.Parameter, string>, IFormatter
 	{
-		readonly static Func<Parameter, string> Coerce = p => StringCoercer.Default.Coerce( p.Instance );
-		readonly static Coerce<Parameter> Coercer = ConstructCoercer<Parameter>.Default.Coerce;
-
 		[Export]
-		public static Formatter Default { get; } = new Formatter();
-		Formatter() : this( ConstructFromKnownTypes<IFormattable>.Default.Delegate() ) {}
+		public static IFormatter Default { get; } = new Formatter();
+		Formatter() : this( Inner.DefaultNested.With( ConstructCoercer<Parameter>.Default ), Inner.DefaultNested ) {}
 
-		readonly Func<object, IFormattable> factory;
-
-		Formatter( Func<object, IFormattable> factory ) : base( Coercer )
+		readonly IParameterizedSource<object, string> general;
+		
+		Formatter( IParameterizedSource<object, string> general, IParameterizedSource<Parameter, string> source ) : base( source )
 		{
-			this.factory = factory;
+			this.general = general;
 		}
 
-		public override string Get( [Assigned]Parameter parameter ) => factory( parameter.Instance )?.ToString( parameter.Format, parameter.Provider ) ?? Coerce( parameter );
+		public string Get( object item ) => general.Get( item );
 
-		public object Format( object item ) => Get( new Parameter( item ) );
+		sealed class Inner : ParameterizedSourceBase<Parameter, string>
+		{
+			readonly static Func<Parameter, string> Coerce = p => StringCoercer.Default.Coerce( p.Instance );
+
+			public static Inner DefaultNested { get; } = new Inner();
+			Inner() : this( ConstructFromKnownTypes<IFormattable>.Default.Delegate() ) {}
+
+
+			readonly Func<object, IFormattable> factory;
+
+			Inner( Func<object, IFormattable> factory )
+			{
+				this.factory = factory;
+			}
+
+			public override string Get( Parameter parameter ) => factory( parameter.Instance )?.ToString( parameter.Format, parameter.Provider ) ?? Coerce( parameter );
+		}
 
 		public struct Parameter
 		{

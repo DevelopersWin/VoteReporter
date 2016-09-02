@@ -1,7 +1,9 @@
 namespace DragonSpark
 {
-	public interface ICoercer<out TParameter>
+	public interface ICoercer<out T> : ICoercer<object, T> {}
+
+	public interface ICoercer<in TParameter, out TResult>
 	{
-		TParameter Coerce( object parameter );
+		TResult Coerce( TParameter parameter );
 	}
 }

@@ -8,7 +8,7 @@ namespace DragonSpark.Activation.Location
 	{
 		public static IScope<IServiceProvider> Default { get; } = new GlobalServiceProvider();
 
-		GlobalServiceProvider() : base( () => DefaultServiceProvider.Default ) {}
+		GlobalServiceProvider() : base( () => DefaultServices.Default ) {}
 
 		public static T GetService<T>() => GetService<T>( typeof(T) );
 

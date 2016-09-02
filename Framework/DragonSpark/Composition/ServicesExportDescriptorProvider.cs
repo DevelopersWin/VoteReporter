@@ -11,7 +11,7 @@ namespace DragonSpark.Composition
 	public sealed class ServicesExportDescriptorProvider : ExportDescriptorProvider
 	{
 		public static ServicesExportDescriptorProvider Default { get; } = new ServicesExportDescriptorProvider();
-		ServicesExportDescriptorProvider() : this( DefaultServiceProvider.Default ) {}
+		ServicesExportDescriptorProvider() : this( DefaultServices.Default ) {}
 
 		readonly Func<Type, object> provider;
 

@@ -1,3 +1,4 @@
+using DragonSpark.Activation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem.Generics;
@@ -7,12 +8,12 @@ namespace DragonSpark.Sources.Delegates
 {
 	public sealed class ServiceProvidedParameterizedSourceDelegates : DelegatesBase
 	{
-		public static IParameterizedSource<Func<IServiceProvider>, ServiceProvidedParameterizedSourceDelegates> Sources { get; } = new Cache<Func<IServiceProvider>, ServiceProvidedParameterizedSourceDelegates>( func => new ServiceProvidedParameterizedSourceDelegates( func ) );
-		ServiceProvidedParameterizedSourceDelegates( Func<IServiceProvider> source ) : this( ParameterizedSourceDelegates.Sources.Get( source ).Get, source ) {}
+		public static IParameterizedSource<IActivator, ServiceProvidedParameterizedSourceDelegates> Sources { get; } = new Cache<IActivator, ServiceProvidedParameterizedSourceDelegates>( func => new ServiceProvidedParameterizedSourceDelegates( func ) );
+		ServiceProvidedParameterizedSourceDelegates( IActivator source ) : this( source, ParameterizedSourceDelegates.Sources.Get( source ).Get ) {}
 
 		readonly Func<Type, Delegate> factorySource;
 
-		ServiceProvidedParameterizedSourceDelegates( Func<Type, Delegate> factorySource, Func<IServiceProvider> provider ) : base( provider, nameof(ToDelegate) )
+		ServiceProvidedParameterizedSourceDelegates( IActivator provider, Func<Type, Delegate> factorySource ) : base( provider, nameof(ToDelegate) )
 		{
 			this.factorySource = factorySource;
 		}

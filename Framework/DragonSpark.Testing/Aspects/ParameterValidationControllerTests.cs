@@ -207,7 +207,7 @@ namespace DragonSpark.Testing.Aspects
 				public int Number { get; }
 			}
 
-			public bool IsSatisfiedBy( object parameter ) => CanExecute( parameter );
+			// public bool IsSatisfiedBy( object parameter ) => CanExecute( parameter );
 		}
 	}
 }

@@ -8,9 +8,6 @@ namespace DragonSpark.Diagnostics.Logging
 {
 	public class TimedOperationFactory : ParameterizedSourceBase<MethodBase, IDisposable>
 	{
-		/*public static TimedOperationFactory Default { get; } = new TimedOperationFactory();
-		TimedOperationFactory() : this( "Executed Method '{@Method}'" ) {}*/
-
 		readonly string template;
 
 		public TimedOperationFactory( string template )

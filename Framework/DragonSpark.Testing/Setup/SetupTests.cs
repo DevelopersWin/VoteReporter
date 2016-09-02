@@ -19,13 +19,13 @@ namespace DragonSpark.Testing.Setup
 									 }  );
 			Assert.Equal( 0, count );
 
-			var serviceProvider = DefaultServiceProvider.Default.Cached();
+			var serviceProvider = DefaultServices.Default.Cached();
 			serviceProvider.Get<IExportProvider>();
 			Assert.Equal( 1, count );
 			serviceProvider.Get<IExportProvider>();
 			Assert.Equal( 1, count );
 
-			var provider = ServiceProviderFactory.Default.Get();
+			var provider = ActivatorFactory.Default.Get();
 			Assert.Equal( 2, count );
 
 			provider.Get<IExportProvider>();

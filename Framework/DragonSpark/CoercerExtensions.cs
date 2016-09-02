@@ -1,14 +1,22 @@
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
 
 namespace DragonSpark
 {
 	public static class CoercerExtensions
 	{
-		public static Coerce<T> ToDelegate<T>( this ICoercer<T> @this ) => DelegateCache<T>.Default.Get( @this );
-		class DelegateCache<T> : Cache<ICoercer<T>, Coerce<T>>
+		public static Func<TFrom, TTo> ToDelegate<TFrom, TTo>( this ICoercer<TFrom, TTo> @this ) => Delegates<TFrom, TTo>.Default.Get( @this );
+		class Delegates<TFrom, TTo> : Cache<ICoercer<TFrom, TTo>, Func<TFrom, TTo>>
 		{
-			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
-			DelegateCache() : base( command => command.Coerce ) {}
+			public static Delegates<TFrom, TTo> Default { get; } = new Delegates<TFrom, TTo>();
+			Delegates() : base( command => command.Coerce ) {}
+		}
+
+		public static Coerce<T> ToDelegate<T>( this ICoercer<T> @this ) => Coercers<T>.Default.Get( @this );
+		class Coercers<T> : Cache<ICoercer<T>, Coerce<T>>
+		{
+			public static Coercers<T> Default { get; } = new Coercers<T>();
+			Coercers() : base( command => command.Coerce ) {}
 		}
 	}
 }

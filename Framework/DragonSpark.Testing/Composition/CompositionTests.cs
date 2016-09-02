@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData, Types]
 		public void BasicCompose( CompositionContext host )
 		{
-			var serviceProvider = DefaultServiceProvider.Default.Cached();
+			var serviceProvider = DefaultServices.Default.Cached();
 			var sinkOne = host.GetExport<ILoggerHistory>();
 			var sinkTwo = host.GetExport<ILoggerHistory>();
 			Assert.Same( sinkOne, sinkTwo );
@@ -81,7 +81,7 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData, MinimumLevel( LogEventLevel.Debug )]
 		public void BasicComposeAgain( CompositionContext host )
 		{
-			var serviceProvider = DefaultServiceProvider.Default.Cached();
+			var serviceProvider = DefaultServices.Default.Cached();
 
 			var sinkOne = host.GetExport<ILoggerHistory>();
 			var sinkTwo = host.GetExport<ILoggerHistory>();

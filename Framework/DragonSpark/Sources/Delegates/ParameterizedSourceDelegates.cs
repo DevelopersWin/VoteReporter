@@ -1,4 +1,4 @@
-using DragonSpark.Extensions;
+using DragonSpark.Activation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem.Generics;
@@ -8,8 +8,8 @@ namespace DragonSpark.Sources.Delegates
 {
 	public sealed class ParameterizedSourceDelegates : DelegatesBase
 	{
-		public static IParameterizedSource<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>> Sources { get; } = new Cache<Func<IServiceProvider>, ParameterizedSourceDelegates>( func => new ParameterizedSourceDelegates( func ) );
-		ParameterizedSourceDelegates( Func<IServiceProvider> source ) : base( source.Delegate<object>(), IsParameterizedSourceSpecification.Default, nameof(ToDelegate) ) {}
+		public static IParameterizedSource<IActivator, IParameterizedSource<Type, Delegate>> Sources { get; } = new Cache<IActivator, ParameterizedSourceDelegates>( func => new ParameterizedSourceDelegates( func ) );
+		ParameterizedSourceDelegates( IActivator source ) : base( source.ToSourceDelegate(), IsParameterizedSourceSpecification.Default, nameof(ToDelegate) ) {}
 
 		protected override Delegate Create( Type parameter ) => 
 			Methods

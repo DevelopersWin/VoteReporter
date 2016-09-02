@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 	// [ApplyAutoValidation]
 	sealed class FixtureServiceProvider : DecoratedActivator
 	{
-		public FixtureServiceProvider( IFixture fixture ) : base( new Inner( fixture ).With( new Specification( fixture ) ).ToSourceDelegate() ) {}
+		public FixtureServiceProvider( IFixture fixture ) : base( new Specification( fixture ), new Inner( fixture ).ToSourceDelegate() ) {}
 
 		sealed class Inner : ParameterizedSourceBase<Type, object>
 		{

@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Sources.Parameterized;
+using DragonSpark.Extensions;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 

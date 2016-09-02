@@ -1,27 +1,14 @@
-using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using System;
 
 namespace DragonSpark.Activation.Location
 {
-	public class DecoratedActivator : ActivatorBase, ISpecification<Type>
+	public class DecoratedActivator : ActivatorBase
 	{
-		readonly Func<Type, object> inner;
-
-		public DecoratedActivator( Func<IServiceProvider> provider ) : this( provider.Delegate<object>() ) {}
-
-		public DecoratedActivator( IServiceProvider provider ) : this( provider.GetService ) {}
-
-		public DecoratedActivator( Func<Type, object> inner )
-		{
-			this.inner = inner;
-		}
-
-		/*public virtual object GetService( Type serviceType ) => inner( serviceType );
-		public override bool IsSatisfiedBy( Type parameter ) => inner.Target.Accepts( parameter );*/
-		public override object Get( Type parameter ) => inner( parameter );
-
-		public bool IsSatisfiedBy( Type parameter ) => inner.Target.Accepts( parameter );
-		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
+		public DecoratedActivator( Func<IActivator> provider ) : this( new DeferredSpecification<Type>( provider ),  provider.Delegate<object>() ) {}
+		public DecoratedActivator( IActivator activator ) : this( activator, activator.ToSourceDelegate() ) {}
+		public DecoratedActivator( Func<Type, bool> specification, Func<Type, object> inner ) : this( new DelegatedSpecification<Type>( specification ), inner ) {}
+		public DecoratedActivator( ISpecification<Type> specification, Func<Type, object> inner ) : base( specification, inner ) {}
 	}
 }

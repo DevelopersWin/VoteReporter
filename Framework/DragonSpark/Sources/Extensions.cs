@@ -12,6 +12,19 @@ namespace DragonSpark.Sources
 {
 	public static class Extensions
 	{
+		/*public static IEnumerable<IQueryableObject> Expand( this IQueryableObject @this )
+		{
+			yield return @this;
+			var container = @this.Instance as IQueryableContainer;
+			if ( container != null )
+			{
+				foreach ( var item in container )
+				{
+					yield return item;
+				}
+			}
+		}*/
+
 		public static object Value( this object @this ) => @this.Value<object>();
 		public static T Value<T>( this object @this ) => SourceCoercer<T>.Default.Coerce( @this );
 

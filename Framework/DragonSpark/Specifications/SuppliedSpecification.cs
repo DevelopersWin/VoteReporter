@@ -1,4 +1,3 @@
-using DragonSpark.TypeSystem;
 using System.Runtime.InteropServices;
 
 namespace DragonSpark.Specifications
@@ -12,7 +11,7 @@ namespace DragonSpark.Specifications
 	{
 		readonly bool satisfied;
 
-		public SuppliedSpecification( bool satisfied ) : base( Where<T>.Always )
+		public SuppliedSpecification( bool satisfied ) // : base( Where<T>.Always )
 		{
 			this.satisfied = satisfied;
 		}

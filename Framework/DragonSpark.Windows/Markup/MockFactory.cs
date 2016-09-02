@@ -1,3 +1,4 @@
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using Moq;

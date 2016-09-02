@@ -3,7 +3,6 @@ using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
 using System;
 using System.Linq;
 using System.Windows.Input;
@@ -71,7 +70,7 @@ namespace DragonSpark.Testing.Extensions
 
 		class Factory : SpecificationParameterizedSource<object, object>
 		{
-			public Factory() : base( Specifications.Specifications.Assigned.ToSpecificationDelegate(), o => null ) {}
+			public Factory() : base( Specifications.Specifications.Assigned, o => null ) {}
 		}
 
 		class Command : CommandBase<object>

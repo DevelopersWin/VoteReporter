@@ -32,7 +32,7 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void Logger()
 		{
-			var result = DefaultServiceProvider.Default.Get<ILogger>();
+			var result = DefaultServices.Default.Get<ILogger>();
 			Assert.NotNull( result );
 			Assert.Same( DragonSpark.Diagnostics.Logging.Logger.Default.Get( Execution.Current() ), result );
 		}
@@ -40,13 +40,13 @@ namespace DragonSpark.Testing.Setup
 		[Fact]
 		public void SystemParts()
 		{
-			var system = DefaultServiceProvider.Default.Get<SystemParts>();
+			var system = DefaultServices.Default.Get<SystemParts>();
 			Assert.Empty( system.Assemblies.AsEnumerable() );
 			Assert.Empty( system.Types.AsEnumerable() );
 
 			var types = new[] { typeof(ClassFactory), typeof(Class) }.AsApplicationParts();
 			
-			var after = DefaultServiceProvider.Default.Get<SystemParts>();
+			var after = DefaultServices.Default.Get<SystemParts>();
 			Assert.NotEmpty( after.Assemblies.AsEnumerable() );
 			Assert.NotEmpty( after.Types.AsEnumerable() );
 			Assert.Equal( types.AsEnumerable(), after.Types.ToArray() );

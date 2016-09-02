@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Specifications
 {
@@ -13,9 +12,7 @@ namespace DragonSpark.Specifications
 	{
 		readonly ImmutableArray<ISpecification<T>> specifications;
 
-		public AnySpecification( params ISpecification<T>[] specifications ) : this( Defaults<T>.Coercer, specifications ) {}
-
-		public AnySpecification( Coerce<T> coercer, params ISpecification<T>[] specifications ) : base( coercer )
+		public AnySpecification( params ISpecification<T>[] specifications )
 		{
 			this.specifications = specifications.ToImmutableArray();
 		}

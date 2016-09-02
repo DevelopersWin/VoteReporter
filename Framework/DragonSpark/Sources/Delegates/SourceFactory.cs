@@ -13,13 +13,13 @@ namespace DragonSpark.Sources.Delegates
 {
 	public sealed class SourceFactory : ParameterizedSourceBase<Type, object>
 	{
-		public static IParameterizedSource<Func<IServiceProvider>, SourceFactory> Defaults { get; } = new Cache<Func<IServiceProvider>, SourceFactory>( func => new SourceFactory( func ) );
-		public static SourceFactory Default { get; } = Defaults.Get( Activator.Default.Provider() );
+		public static IParameterizedSource<IActivator, SourceFactory> Defaults { get; } = new Cache<IActivator, SourceFactory>( func => new SourceFactory( func ) );
+		public static SourceFactory Default { get; } = Defaults.Get( Activator.Default );
 
 		readonly Func<Type, Delegate> factory;
 		readonly IGenericMethodContext<Invoke> methods;
 
-		SourceFactory( Func<IServiceProvider> provider ) : this( new Factory( provider ).Get ) {}
+		SourceFactory( IActivator provider ) : this( new Factory( provider ).Get ) {}
 
 		SourceFactory( Func<Type, Delegate> factory )
 		{
@@ -38,8 +38,8 @@ namespace DragonSpark.Sources.Delegates
 
 		sealed class Factory : CompositeFactory<Type, Delegate>
 		{
-			readonly static ImmutableArray<Func<Func<IServiceProvider>, IParameterizedSource<Type, Delegate>>> Delegates = SourceDelegates.Sources.Append( ServiceProvidedParameterizedSourceDelegates.Sources ).Select( source => source.ToSourceDelegate() ).ToImmutableArray();
-			public Factory( Func<IServiceProvider> source ) : base( Delegates.Introduce( source ).ToArray() ) {}
+			readonly static ImmutableArray<Func<IActivator, IParameterizedSource<Type, Delegate>>> Delegates = SourceDelegates.Sources.Append( ServiceProvidedParameterizedSourceDelegates.Sources ).Select( source => source.ToSourceDelegate() ).ToImmutableArray();
+			public Factory( IActivator source ) : base( Delegates.Introduce( source ).ToArray() ) {}
 		}
 	}
 }

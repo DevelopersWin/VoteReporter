@@ -6,7 +6,6 @@ using DragonSpark.TypeSystem.Generics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -18,24 +17,30 @@ namespace DragonSpark.Sources.Parameterized
 				.SelectAssigned( @this.ToSourceDelegate() )
 				.ToImmutableArray();
 
-		public static ImmutableArray<TResult> CreateMany<TResult>( this IParameterizedSource @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
+		/*public static ImmutableArray<TResult> CreateMany<TResult>( this IParameterizedSource @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
 			parameters
 				.SelectAssigned( @this.ToSourceDelegate() )
 				.Cast<TResult>()
-				.ToImmutableArray();
+				.ToImmutableArray();*/
 
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TParameter> selector ) => With( @this, selector.ToDelegate() );
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Coerce<TParameter> selector ) => With( @this.ToSourceDelegate(), selector );
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Coerce<TParameter> selector ) =>
-			new CoercedParameterizedSource<TParameter, TResult>( selector, @this );
+		public static IParameterizedSource<object, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TParameter> coercer ) => With( @this.ToSourceDelegate(), coercer.ToDelegate() );
+		public static IParameterizedSource<object, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Coerce<TParameter> coerce ) =>
+			new CoercedParameterizedSource<TParameter, TResult>( coerce, @this );
+		public static IParameterizedSource<TFrom, TResult> With<TFrom, TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TFrom, TParameter> coercer ) => With( @this.ToSourceDelegate(), coercer.ToDelegate() );
+		public static IParameterizedSource<TFrom, TResult> With<TFrom, TParameter, TResult>( this Func<TParameter, TResult> @this, Func<TFrom, TParameter> coerce ) =>
+			new CoercedParameterizedSource<TFrom, TParameter, TResult>( coerce, @this );
 
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TParameter> selector ) => With( @this, selector.ToDelegate() );
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Alter<TParameter> selector ) => With( @this.ToSourceDelegate(), selector );
-		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TParameter> selector ) =>
-			new AlteredParameterizedSource<TParameter, TResult>( selector, @this );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TParameter> alteration ) => With( @this, alteration.ToDelegate() );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Alter<TParameter> alter ) => With( @this.ToSourceDelegate(), alter );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TParameter> alter ) =>
+			new AlteredParameterizedSource<TParameter, TResult>( alter, @this );
 
-		public static IValidatedParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) => With( @this, specification.ToSpecificationDelegate() );
-		public static IValidatedParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Func<TParameter, bool> specification ) =>
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TResult> selector ) => With( @this, selector.ToDelegate() );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Alter<TResult> selector ) => With( @this.ToSourceDelegate(), selector );
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TResult> selector ) =>
+			new AlteredResultParameterizedSource<TParameter, TResult>( selector, @this );
+
+		public static IParameterizedSource<TParameter, TResult> With<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) =>
 			new SpecificationParameterizedSource<TParameter, TResult>( specification, @this.ToSourceDelegate() );
 
 		public static T Get<T>( this IParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );
@@ -62,7 +67,7 @@ namespace DragonSpark.Sources.Parameterized
 			WrappedDelegates() : base( result => new Wrapper<TParameter, TResult>( result ).Get ) {}
 		}*/
 
-		public static IParameterizedSource<TParameter, TResult> Cast<TParameter, TResult>( this IParameterizedSource @this ) => new ParameterizedSource<TParameter, TResult>( @this );
+		// public static IParameterizedSource<TParameter, TResult> Cast<TParameter, TResult>( this IParameterizedSource @this ) => new ParameterizedSource<TParameter, TResult>( @this );
 
 		public static Delegate Convert( this Func<object> @this, Type resultType ) => ConvertSupport.Methods.Make( resultType ).Invoke<Delegate>( @this );
 
