@@ -104,14 +104,13 @@
     <Compile Include="PriorityAwareLocator.cs" />
     <Compile Include="PriorityComparer.cs" />
     <Compile Include="PriorityExtensions.cs" />
-    <Compile Include="Sources\IQueryableContainer.cs" />
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
+    <Compile Include="Specifications\DeferredSpecification.cs" />
     <Compile Include="Specifications\DelegatedAssignedSpecification.cs" />
-    <Compile Include="Specifications\SpecificationLocator.cs" />
     <Compile Include="Specifications\SuppliedDelegatedSpecification.cs" />
     <Compile Include="Tasks\SuppliedTaskSource.cs" />
     <Compile Include="Tasks\MonitorTaskCommand.cs" />

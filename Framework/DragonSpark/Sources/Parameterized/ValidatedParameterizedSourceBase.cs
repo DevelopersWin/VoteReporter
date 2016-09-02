@@ -14,7 +14,7 @@ namespace DragonSpark.Sources.Parameterized
 		protected ValidatedParameterizedSourceBase( ISpecification<TParameter> specification )
 		{
 			this.specification = specification;
-			general = specification.With( Coercer<TParameter>.Default );
+			general = specification.Apply( Coercer<TParameter>.Default );
 		}
 
 		public virtual bool IsSatisfiedBy( TParameter parameter ) => specification.IsSatisfiedBy( parameter );

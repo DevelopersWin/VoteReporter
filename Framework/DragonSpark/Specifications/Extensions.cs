@@ -7,8 +7,8 @@ namespace DragonSpark.Specifications
 {
 	public static class Extensions
 	{
-		public static ISpecification<TFrom> With<TFrom, TTo>( this ISpecification<TTo> @this, ICoercer<TFrom, TTo> coercer ) => With( @this.ToSpecificationDelegate(), coercer.ToDelegate() );
-		public static ISpecification<TFrom> With<TFrom, TTo>( this Func<TTo, bool> @this, Func<TFrom, TTo> coerce ) =>
+		public static ISpecification<TFrom> Apply<TFrom, TTo>( this ISpecification<TTo> @this, ICoercer<TFrom, TTo> coercer ) => Apply( @this.ToSpecificationDelegate(), coercer.ToDelegate() );
+		public static ISpecification<TFrom> Apply<TFrom, TTo>( this Func<TTo, bool> @this, Func<TFrom, TTo> coerce ) =>
 			new CoercedSpecification<TFrom, TTo>( coerce, @this );
 
 		// public static bool Accepts<T>( this object @this, T parameter ) => @this.ToSpecification<T>().IsSatisfiedBy( parameter );

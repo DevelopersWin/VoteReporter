@@ -9,7 +9,7 @@ namespace DragonSpark.Windows.Markup
 {
 	public sealed class MockFactory : ParameterizedSourceBase<Type, object>
 	{
-		public static IParameterizedSource<Type, object> Default { get; } = new MockFactory().With( Specification.DefaultNested );
+		public static IParameterizedSource<Type, object> Default { get; } = new MockFactory().Apply( Specification.DefaultNested );
 		MockFactory() : this( Activator.Default.Get<Mock> ) {}
 
 		readonly Func<Type, Mock> activator;

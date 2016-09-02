@@ -8,7 +8,7 @@ namespace DragonSpark.Windows.Markup
 {
 	public sealed class CollectionMarkupPropertyFactory : MarkupPropertyFactoryBase
 	{
-		public static IParameterizedSource<IServiceProvider, IMarkupProperty> Default { get; } = new CollectionMarkupPropertyFactory().With( CollectionSpecification.Default );
+		public static IParameterizedSource<IServiceProvider, IMarkupProperty> Default { get; } = new CollectionMarkupPropertyFactory().Apply( CollectionSpecification.Default );
 		CollectionMarkupPropertyFactory() : this( PropertyReferenceFactory.Default.ToSourceDelegate() ) {}
 
 		readonly Func<IServiceProvider, PropertyReference> propertyFactory;

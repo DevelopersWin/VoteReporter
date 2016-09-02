@@ -15,7 +15,7 @@ namespace DragonSpark.Composition
 		readonly static ISpecification<Type> Specification = IsPublicTypeSpecification.Default.And( Activation.Defaults.Instantiable );
 		readonly static Func<ConventionMapping, bool> Valid = IsValidConventionMappingSpecification.Default.ToSpecificationDelegate();
 
-		public static IParameterizedSource<Type, Type> Default { get; } = new ConventionInterfaces().With( Specification );
+		public static IParameterizedSource<Type, Type> Default { get; } = new ConventionInterfaces().Apply( Specification );
 		ConventionInterfaces() : this( typeof(ISource), typeof(IParameterizedSource), typeof(IValidatedParameterizedSource) ) {}
 
 		readonly ImmutableArray<Type> exempt;

@@ -52,7 +52,7 @@ namespace DragonSpark.Aspects
 
 		sealed class DefaultSource : ParameterizedSourceBase<Type, Type>
 		{
-			public static IParameterizedSource<Type, Type> Default { get; } = new DefaultSource().With( Specification.DefaultNested );
+			public static IParameterizedSource<Type, Type> Default { get; } = new DefaultSource().Apply( Specification.DefaultNested );
 			DefaultSource() {}
 
 			public override Type Get( Type parameter ) => parameter == typeof(string) ? typeof(RequiredAttribute) : typeof(NotNullAttribute);
@@ -68,7 +68,7 @@ namespace DragonSpark.Aspects
 
 		sealed class ImmutableArraySource : ParameterizedSourceBase<Type, Type>
 		{
-			public static IParameterizedSource<Type, Type> Default { get; } = new ImmutableArraySource().With( GenericTypeAssignableSpecification.Defaults.Get( typeof(ImmutableArray<>) ) );
+			public static IParameterizedSource<Type, Type> Default { get; } = new ImmutableArraySource().Apply( GenericTypeAssignableSpecification.Defaults.Get( typeof(ImmutableArray<>) ) );
 			ImmutableArraySource() {}
 
 			public override Type Get( Type parameter ) => typeof(AssignedAttribute);

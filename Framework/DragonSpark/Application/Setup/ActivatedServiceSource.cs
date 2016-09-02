@@ -10,7 +10,7 @@ namespace DragonSpark.Application.Setup
 		readonly static DelegatedSpecification<object> Services = new DelegatedSpecification<object>( ServicesEnabled.Default.ToDelegate().Wrap() );
 
 		public ActivatedServiceSource( IServiceProvider provider ) : this( provider, IsActive.Default.Get( provider ) ) {}
-		ActivatedServiceSource( IServiceProvider provider, IsActive active ) : base( new Inner( provider, active ).With( Services.And( new DelegatedSpecification<Type>( active.Get ).Inverse() ) ) ) {}
+		ActivatedServiceSource( IServiceProvider provider, IsActive active ) : base( new Inner( provider, active ).Apply( Services.And( new DelegatedSpecification<Type>( active.Get ).Inverse() ) ) ) {}
 
 		sealed class Inner : ParameterizedSourceBase<Type, object>
 		{

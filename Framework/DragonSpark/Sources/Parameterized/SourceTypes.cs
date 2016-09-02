@@ -49,7 +49,7 @@ namespace DragonSpark.Sources.Parameterized
 				readonly static Func<Type, Type> Results = ResultTypes.Default.ToSourceDelegate();
 				readonly static ISpecification<Type> Specification = Activation.Defaults.Instantiable.And( Defaults.KnownSourcesSpecification, ContainsExportSpecification.Default, new DelegatedSpecification<Type>( type => Results( type ) != typeof(object) ) );
 
-				public static IParameterizedSource<Type, SourceTypeRequest> DefaultNested { get; } = new Requests().With( Specification );
+				public static IParameterizedSource<Type, SourceTypeRequest> DefaultNested { get; } = new Requests().Apply( Specification );
 				Requests() {}
 
 				public override SourceTypeRequest Get( Type parameter ) => 

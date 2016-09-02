@@ -6,10 +6,4 @@ namespace DragonSpark.Specifications
 
 		public override bool IsSatisfiedBy( T parameter ) => !base.IsSatisfiedBy( parameter );
 	}
-
-	/*public abstract class GuardedSpecificationBase<T> : SpecificationBase<T>
-	{
-		protected GuardedSpecificationBase() : this( Defaults<T>.Coercer ) {}
-		protected GuardedSpecificationBase( Coerce<T> coercer ) : base( coercer, Where<T>.Assigned ) {}
-	}*/
 }

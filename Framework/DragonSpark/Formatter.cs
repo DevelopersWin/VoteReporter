@@ -12,7 +12,7 @@ namespace DragonSpark
 	{
 		[Export]
 		public static IFormatter Default { get; } = new Formatter();
-		Formatter() : this( Inner.DefaultNested.With( ConstructCoercer<Parameter>.Default ), Inner.DefaultNested ) {}
+		Formatter() : this( Inner.DefaultNested.Apply( ConstructCoercer<Parameter>.Default ), Inner.DefaultNested ) {}
 
 		readonly IParameterizedSource<object, string> general;
 		

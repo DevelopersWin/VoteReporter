@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Commands
 {
-	public interface ICommand<in TParameter> : ISpecification<TParameter>, ISpecification, ICommand
+	public interface ICommand<in TParameter> : ISpecification<TParameter>, ICommand
 	{
 		void Execute( TParameter parameter );
 
