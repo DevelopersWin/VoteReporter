@@ -23,7 +23,8 @@ namespace DragonSpark.Testing.Composition
 			var dependency = container.GetExport<Dependency>();
 			Assert.NotNull( dependency );
 
-			var primary = Assert.IsType<Primary>( container.GetExport<IPrimary>() );
+			var export = container.GetExport<IPrimary>();
+			var primary = Assert.IsType<Primary>( export );
 			Assert.Equal( 2, primary.Selected.GetParameters().Length );
 
 			var exported = container.GetExport<Exported>();

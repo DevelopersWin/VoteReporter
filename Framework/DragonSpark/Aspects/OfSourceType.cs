@@ -1,10 +1,11 @@
-using System;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using System;
 
 namespace DragonSpark.Aspects
 {
 	public class OfSourceType : OfTypeAttribute
 	{
-		public OfSourceType() : base( typeof(IValidatedParameterizedSource), typeof(Func<>), typeof(Func<,>) ) {}
+		public OfSourceType() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(Func<>), typeof(Func<,>) ) {}
 	}
 }

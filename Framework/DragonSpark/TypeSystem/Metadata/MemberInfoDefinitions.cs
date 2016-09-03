@@ -17,7 +17,10 @@ namespace DragonSpark.TypeSystem.Metadata
 
 		sealed class Factory : ParameterizedSourceBase<MemberInfo>
 		{
-			readonly static ImmutableArray<Func<object, IValidatedParameterizedSource>> Delegates = new[] { typeof(PropertyInfoDefinitionLocator), typeof(ConstructorInfoDefinitionLocator), typeof(MethodInfoDefinitionLocator), typeof(TypeInfoDefinitionLocator) }.Select( type => ParameterConstructor<IValidatedParameterizedSource>.Make( typeof(TypeInfo), type ) ).ToImmutableArray();
+			readonly static ImmutableArray<Func<object, IMemberInfoSource>> Delegates = 
+				new[] { typeof(PropertyInfoDefinitionLocator), typeof(ConstructorInfoDefinitionLocator), typeof(MethodInfoDefinitionLocator), typeof(TypeInfoDefinitionLocator) }
+				.Select( type => ParameterConstructor<IMemberInfoSource>.Make( typeof(TypeInfo), type ) )
+				.ToImmutableArray();
 		
 			readonly Func<object, TypeInfo> typeSource;
 
@@ -31,10 +34,11 @@ namespace DragonSpark.TypeSystem.Metadata
 				var definition = typeSource( parameter );
 				foreach ( var @delegate in Delegates )
 				{
-					var factory = @delegate( definition );
-					if ( factory?.IsSatisfiedBy( parameter ) ?? false )
+					var source = @delegate( definition );
+					var result = source.Get( parameter );
+					if ( result != null )
 					{
-						return factory.Get<MemberInfo>( parameter );
+						return result;
 					}
 				}
 				return null;
@@ -89,18 +93,21 @@ namespace DragonSpark.TypeSystem.Metadata
 				}
 			}
 
-			abstract class MemberInfoDefinitionLocatorBase<T> : ValidatedParameterizedSourceBase<T, MemberInfo>
+			public interface IMemberInfoSource : IParameterizedSource<object, MemberInfo> {}
+
+			abstract class MemberInfoDefinitionLocatorBase<T> : ParameterizedSourceBase<T, MemberInfo>, IMemberInfoSource
 			{
 				protected MemberInfoDefinitionLocatorBase( TypeInfo definition )
 				{
 					Definition = definition;
 				}
 
+				protected TypeInfo Definition { get; }
+
 				public override MemberInfo Get( T parameter ) => From( parameter ) ?? parameter as MemberInfo ?? Definition;
 
 				protected abstract MemberInfo From( T parameter );
-
-				protected TypeInfo Definition { get; }
+				MemberInfo IParameterizedSource<object, MemberInfo>.Get( object parameter ) => parameter is T ? Get( (T)parameter ) : null;
 			}
 		}
 	}

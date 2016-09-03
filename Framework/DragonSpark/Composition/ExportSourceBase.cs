@@ -1,19 +1,12 @@
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Composition
 {
-	public abstract class ExportSourceBase<T> : ValidatedParameterizedSourceBase<Type, T>
+	public abstract class ExportSourceBase<T> : SpecificationParameterizedSource<Type, T>
 	{
-		readonly ImmutableArray<Type> types;
-
-		protected ExportSourceBase( IEnumerable<Type> types )
-		{
-			this.types = types.ToImmutableArray();
-		}
-
-		public override bool IsSatisfiedBy( Type parameter ) => types.Contains( parameter );
+		protected ExportSourceBase( IEnumerable<Type> types, IParameterizedSource<Type, T> source ) : base( new ContainsItemSpecification<Type>( types ), source.ToSourceDelegate() ) {}
 	}
 }

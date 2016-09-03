@@ -1,14 +1,6 @@
-using DragonSpark.Aspects;
-using DragonSpark.Aspects.Validation;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Diagnostics;
-using Xunit;
-using Xunit.Abstractions;
-
 namespace DragonSpark.Testing.Aspects.Validation
 {
-	public class GenericAutoValidationTests : TestCollectionBase
+	/*public class GenericAutoValidationTests : TestCollectionBase
 	{
 		//[Reference]
 		readonly ExtendedFactory factory = new ExtendedFactory();
@@ -32,7 +24,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		BasicAutoValidationInline        | 00.0539 | 00.0537 | 00.0535
 		BasicAutoValidationApplied       | 00.0410 | 00.0408 | 00.0412
 		BasicAutoValidationAppliedInline | 00.0951 | 00.0949 | 00.0941
-		*/
+		#1#
 		public void Performance()
 		{
 			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run();
@@ -207,5 +199,5 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return parameter is int && IsSatisfiedBy( (int)parameter );
 			}
 		}
-	}
+	}*/
 }

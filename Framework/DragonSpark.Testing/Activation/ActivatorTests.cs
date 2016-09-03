@@ -25,6 +25,8 @@ namespace DragonSpark.Testing.Activation
 			Assert.Same( Activator.Default, activator );
 			var instance = activator.Get<IInterface>( typeof(Class) );
 			Assert.IsType<Class>( instance );
+
+			Assert.NotSame( instance, activator.Get<IInterface>( typeof(Class) ) );
 		}
 
 		/*[Fact]

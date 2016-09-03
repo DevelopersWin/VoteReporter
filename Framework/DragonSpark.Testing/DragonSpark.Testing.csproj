@@ -62,7 +62,6 @@
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="Aspects\Validation\AutoValidationTests.cs" />
     <Compile Include="Aspects\Validation\GenericAutoValidationTests.cs" />
-    <Compile Include="Aspects\Validation\IFactory.cs" />
     <Compile Include="ComponentModel\ClassWithDefaultProperties.cs" />
     <Compile Include="ComponentModel\SingletonDefaultValueProviderTests.cs" />
     <Compile Include="Composition\ConstructorSelectorTests.cs" />

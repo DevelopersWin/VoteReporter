@@ -8,22 +8,19 @@ namespace DragonSpark.Aspects.Validation
 {
 	public abstract class ParameterValidationAdapterBase<T> : DecoratedSpecification<T>, IParameterValidationAdapter
 	{
-		readonly ISpecification<T> inner;
+		readonly ISpecification general;
 		readonly Func<MethodInfo, bool> method;
 
-		protected ParameterValidationAdapterBase( ISpecification<T> inner, MethodInfo method ) : this( inner, MethodEqualitySpecification.For( method ) ) {}
+		protected ParameterValidationAdapterBase( ISpecification<T> inner, MethodInfo method ) : this( inner, MethodEqualitySpecification.For( method ), inner as ISpecification ) {}
 
-		ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method ) : base( inner )
+		ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method, ISpecification general = null ) : base( inner )
 		{
-			this.inner = inner;
+			this.general = general;
 			this.method = method;
 		}
 
 		public bool IsSatisfiedBy( MethodInfo parameter ) => method( parameter );
 
-		// public override bool IsSatisfiedBy( [Optional] object parameter ) => parameter is MethodInfo ? IsSatisfiedBy( (MethodInfo)parameter ) : base.IsSatisfiedBy( parameter );
-
-		// public bool IsSatisfiedBy( [Optional]object parameter ) => ;
-		public bool IsSatisfiedBy( [Optional]object parameter ) => parameter is T ? base.IsSatisfiedBy( (T)parameter ) : inner.IsSatisfiedBy( parameter );
+		public bool IsSatisfiedBy( [Optional]object parameter ) => parameter is T ? base.IsSatisfiedBy( (T)parameter ) : general != null && general.IsSatisfiedBy( parameter );
 	}
 }

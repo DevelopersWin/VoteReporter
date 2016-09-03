@@ -1,10 +1,8 @@
-﻿using DragonSpark.Sources.Parameterized;
-
-namespace DragonSpark.Aspects.Validation
+﻿namespace DragonSpark.Aspects.Validation
 {
-	class SourceAdapterFactory : AdapterSourceBase<IValidatedParameterizedSource>
+	/*class SourceAdapterFactory : AdapterSourceBase<IValidatedParameterizedSource>
 	{
 		public static SourceAdapterFactory Default { get; } = new SourceAdapterFactory();
 		SourceAdapterFactory() : base( instance => new FactoryAdapter( instance ) ) {}
-	}
+	}*/
 }

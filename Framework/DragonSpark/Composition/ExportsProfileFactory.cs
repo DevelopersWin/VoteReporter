@@ -36,9 +36,7 @@ namespace DragonSpark.Composition
 
 			var mappings = new ConventionMappings( types.Except( appliedTypes ).SelectAssigned( Selector ).Distinct( mapping => mapping.InterfaceType ) );
 
-			// var instances = Instances.Default.Get().List().Select( o => o.GetType().Adapt().GetEntireHierarchy() ).Concat();
-
-			var all = appliedTypes.Concat( mappings.All() ).SelectMany( Expander )/*.Concat( ExportMappings.Default.GetEnumerable().Concat() )*//*.Concat( instances )*/.Distinct().ToImmutableHashSet();
+			var all = appliedTypes.Concat( mappings.All() ).SelectMany( Expander ).Distinct().ToImmutableHashSet();
 
 			/*Debug.WriteLine( "Applied:" );
 			foreach ( var pair in applied )

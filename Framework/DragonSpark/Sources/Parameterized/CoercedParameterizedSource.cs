@@ -25,7 +25,7 @@ namespace DragonSpark.Sources.Parameterized
 		}
 	}
 
-	public sealed class ParameterizedSource<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
+	/*public sealed class ParameterizedSource<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
 	{
 		readonly IParameterizedSource source;
 
@@ -35,5 +35,5 @@ namespace DragonSpark.Sources.Parameterized
 		}
 
 		public override TResult Get( TParameter parameter ) => (TResult)source.Get( parameter );
-	}
+	}*/
 }

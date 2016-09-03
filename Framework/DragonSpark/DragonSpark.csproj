@@ -107,9 +107,11 @@
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\DictionarySource.cs" />
     <Compile Include="Sources\Parameterized\SourceTypeMapping.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
+    <Compile Include="Specifications\ContainsItemSpecification.cs" />
     <Compile Include="Specifications\DeferredSpecification.cs" />
     <Compile Include="Specifications\DelegatedAssignedSpecification.cs" />
     <Compile Include="Specifications\SuppliedDelegatedSpecification.cs" />
@@ -602,7 +604,6 @@
     <Compile Include="Extensions\Mappings.cs" />
     <Compile Include="Extensions\ObjectMapper.cs" />
     <Compile Include="TypeSystem\AssemblyBasedTypeSource.cs" />
-    <Compile Include="Sources\Parameterized\ValidatedParameterizedSourceBase.cs" />
     <Compile Include="Runtime\DeclarativeCollection.cs" />
     <Compile Include="Application\ApplicationAssemblyFilter.cs">
       <SubType>Code</SubType>

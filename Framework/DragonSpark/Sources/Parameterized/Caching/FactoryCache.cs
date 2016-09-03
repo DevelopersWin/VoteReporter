@@ -1,5 +1,4 @@
 using DragonSpark.Specifications;
-using System;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
@@ -13,8 +12,8 @@ namespace DragonSpark.Sources.Parameterized.Caching
 		FactoryCache( IParameterizedScope<TInstance, TValue> configuration, ISpecification<TInstance> specification ) : base( configuration.ToCache() )
 		{
 			IParameterizedSource<TInstance, TValue> source = new DelegatedParameterizedSource<TInstance, TValue>( Create );
-			var factory = specification == DefaultSpecification ? source : new AutoValidatingSource<TInstance, TValue>( specification, source );
-			configuration.Assign( new Func<TInstance, TValue>( factory.Get ).Wrap() );
+			var factory = specification == DefaultSpecification ? source : new SpecificationParameterizedSource<TInstance, TValue>( specification, source.Get );
+			configuration.Assign( factory.ToSourceDelegate().Wrap() );
 		}
 
 		protected abstract TValue Create( TInstance parameter );

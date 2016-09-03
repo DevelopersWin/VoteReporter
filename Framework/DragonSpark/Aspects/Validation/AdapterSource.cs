@@ -2,7 +2,6 @@
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -18,6 +17,6 @@ namespace DragonSpark.Aspects.Validation
 		}
 
 		public bool IsSatisfiedBy( Type parameter ) => adapter.IsAssignableFrom( parameter );
-		bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
+		// bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
 	}
 }

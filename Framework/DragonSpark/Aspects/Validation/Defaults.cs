@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Commands;
-using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Immutable;
 using System.Reflection;
@@ -16,8 +15,8 @@ namespace DragonSpark.Aspects.Validation
 		public static ImmutableArray<IAspectProfile> AspectProfiles { get; } = 
 			new IAspectProfile[]
 			{
-				new AspectProfile( typeof(IValidatedParameterizedSource<,>), typeof(IParameterizedSource<,>), nameof(IParameterizedSource.Get) ),
-				new AspectProfile( typeof(IValidatedParameterizedSource), typeof(IParameterizedSource), nameof(IParameterizedSource.Get) ),
+				// new AspectProfile( typeof(IValidatedParameterizedSource<,>), typeof(IParameterizedSource<,>), nameof(IParameterizedSource.Get) ),
+				// new AspectProfile( typeof(IValidatedParameterizedSource), typeof(IParameterizedSource), nameof(IParameterizedSource.Get) ),
 				new AspectProfile( typeof(ICommand<>), nameof(ICommand.Execute) ),
 				new AspectProfile( typeof(ICommand), nameof(ICommand.Execute) )
 			}.ToImmutableArray();

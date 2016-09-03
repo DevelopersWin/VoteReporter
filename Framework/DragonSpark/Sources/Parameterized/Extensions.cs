@@ -43,7 +43,7 @@ namespace DragonSpark.Sources.Parameterized
 		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) =>
 			new SpecificationParameterizedSource<TParameter, TResult>( specification, @this.ToSourceDelegate() );
 
-		public static T Get<T>( this IParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );
+		// public static T Get<T>( this IParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );
 
 		public static Func<object, T> Wrap<T>( this T @this ) => @this.Wrap<object, T>();
 
@@ -168,12 +168,12 @@ namespace DragonSpark.Sources.Parameterized
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		public static Func<object, object> ToSourceDelegate( this IParameterizedSource @this ) => ParameterizedSourceDelegates.Default.Get( @this );
+		/*public static Func<object, object> ToSourceDelegate( this IParameterizedSource @this ) => ParameterizedSourceDelegates.Default.Get( @this );
 		sealed class ParameterizedSourceDelegates : Cache<IParameterizedSource, Func<object, object>>
 		{
 			public static ParameterizedSourceDelegates Default { get; } = new ParameterizedSourceDelegates();
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
-		}
+		}*/
 
 		public static Func<TParameter, TResult> ToSourceDelegate<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) => ParameterizedSourceDelegates<TParameter, TResult>.Default.Get( @this );
 		sealed class ParameterizedSourceDelegates<TParameter, TResult> : Cache<IParameterizedSource<TParameter, TResult>, Func<TParameter, TResult>>
@@ -208,7 +208,7 @@ namespace DragonSpark.Sources.Parameterized
 		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) where TParameter : class => @this.ToSourceDelegate().ToEqualityCache();
 		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this Func<TParameter, TResult> @this ) where TParameter : class => new EqualityReferenceCache<TParameter, TResult>( @this );
 		
-		public static IValidatedParameterizedSource<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => AutoValidationFactories<TParameter, TResult>.Default.Get( @this );
+		/*public static IValidatedParameterizedSource<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => AutoValidationFactories<TParameter, TResult>.Default.Get( @this );
 		sealed class AutoValidationFactories<TParameter, TResult> : Cache<IValidatedParameterizedSource<TParameter, TResult>, IValidatedParameterizedSource<TParameter, TResult>>
 		{
 			public static AutoValidationFactories<TParameter, TResult> Default { get; } = new AutoValidationFactories<TParameter, TResult>();
@@ -220,6 +220,6 @@ namespace DragonSpark.Sources.Parameterized
 		{
 			public static AutoValidationFactories Default { get; } = new AutoValidationFactories();
 			AutoValidationFactories() : base( factory => new AutoValidatingSource( factory ) ) {}
-		}
+		}*/
 	}
 }

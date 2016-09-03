@@ -1,6 +1,4 @@
 ﻿using DragonSpark.Commands;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
 using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
@@ -57,12 +55,12 @@ namespace DragonSpark.Aspects.Validation
 		public object Parameter { get; }
 	}*/
 
-	public class FactoryAdapter<TParameter, TResult> : ParameterValidationAdapterBase<TParameter>
+	/*public class FactoryAdapter<TParameter, TResult> : ParameterValidationAdapterBase<TParameter>
 	{
 		readonly static MethodInfo Method = typeof(IParameterizedSource<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(IParameterizedSource.Get) );
 		
 		public FactoryAdapter( ISpecification<TParameter> inner ) : base( inner, Method ) {}
-	}
+	}*/
 
 	public class CommandAdapter<T> : ParameterValidationAdapterBase<T>
 	{
