@@ -3,18 +3,17 @@ using DragonSpark.Commands;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Framework.Runtime;
 using PostSharp.Aspects;
-using System.Windows.Input;
 
 namespace DragonSpark.Testing.Framework
 {
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Command.Default.Run();
+		public static void Execution() => Command.Default.Execute();
 
 		sealed class Command : DeclarativeSetup
 		{
-			public static ICommand Default { get; } = new Command();
+			public static IRunCommand Default { get; } = new Command();
 			Command() : base( 
 				DragonSpark.Application.Execution.Context.Configured( ExecutionContext.Default )
 			) {}

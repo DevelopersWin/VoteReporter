@@ -8,11 +8,13 @@ using System.Windows.Markup;
 
 namespace DragonSpark.Commands
 {
-	public class CompositeCommand : CompositeCommand<object>
+	public class CompositeCommand : CompositeCommand<object>, IRunCommand
 	{
 		public CompositeCommand() : this( Items<ICommand>.Default ) {}
 
 		public CompositeCommand( params ICommand[] commands ) : base( commands ) {}
+
+		public void Execute() => Execute( Defaults.Parameter );
 	}
 
 	[ContentProperty( nameof(Commands) )]

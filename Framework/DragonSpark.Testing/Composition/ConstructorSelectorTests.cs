@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Application.Setup;
-using DragonSpark.Commands;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using JetBrains.Annotations;
@@ -13,14 +12,13 @@ namespace DragonSpark.Testing.Composition
 {
 	public class ConstructorSelectorTests
 	{
-
 		[Fact]
 		public void Basic()
 		{
 			var parts = this.Adapt().WithNested().Append( typeof(Protected) ).AsApplicationParts();
 			var builder = ConventionBuilderFactory.Default.Get();
 			var container = new ContainerConfiguration().WithParts( parts.AsEnumerable(), builder ).WithProvider( ServicesExportDescriptorProvider.Default ).CreateContainer();
-			new EnableServicesCommand().Run();
+			new EnableServicesCommand().Execute();
 			var dependency = container.GetExport<Dependency>();
 			Assert.NotNull( dependency );
 

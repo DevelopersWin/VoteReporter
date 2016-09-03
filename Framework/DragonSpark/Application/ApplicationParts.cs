@@ -1,5 +1,4 @@
-﻿using DragonSpark.Commands;
-using DragonSpark.Sources;
+﻿using DragonSpark.Sources;
 using System;
 using System.Collections.Immutable;
 
@@ -10,7 +9,7 @@ namespace DragonSpark.Application
 		public static ImmutableArray<Type> Assign( params Type[] parts )
 		{
 			var assigned = SystemPartsFactory.Default.Get( parts );
-			Default.Configured( assigned ).Run();
+			Default.Configured( assigned ).Execute();
 			var result = assigned.Types;
 			return result;
 		}

@@ -7,7 +7,7 @@ namespace DragonSpark.Commands
 {
 	public abstract class CommandBase<T> : ICommand<T>
 	{
-		public event EventHandler CanExecuteChanged = delegate { };
+		public event EventHandler CanExecuteChanged = delegate {};
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 

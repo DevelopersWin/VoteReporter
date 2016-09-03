@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Commands;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
@@ -30,7 +29,7 @@ namespace DragonSpark.Testing.Diagnostics
 		public void AssignedSource()
 		{
 			var configuration = DragonSpark.Diagnostics.Logging.Configuration.TimedOperationFactory;
-			configuration.Configured( TimedOperationFactory.Default.ToEqualityCache().ToSourceDelegate().GlobalCache() ).Run();
+			configuration.Configured( TimedOperationFactory.Default.ToEqualityCache().ToSourceDelegate().GlobalCache() ).Execute();
 
 			var history = LoggingHistory.Default.Get();
 			Assert.Empty( history.Events );

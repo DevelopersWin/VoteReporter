@@ -3,7 +3,6 @@ using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using System;
 using System.Runtime.InteropServices;
-using Defaults = DragonSpark.Sources.Defaults;
 using ICommand = System.Windows.Input.ICommand;
 
 namespace DragonSpark.Commands
@@ -34,16 +33,16 @@ namespace DragonSpark.Commands
 
 		public static ICommand<T> Cast<T>( this ICommand @this, Func<T, object> projection ) => new ProjectedCommand<T>( @this, projection );
 
-		public static void Run( this ICommand @this ) => @this.Execute( default(object) );
+		// public static void Run( this IRunCommand @this ) => @this.Execute( default(object) );
 
-		public static Action ToRunDelegate( this ICommand @this ) => RunDelegates.Default.Get( @this );
-		sealed class RunDelegates : Cache<ICommand, Action>
+		public static Action ToRunDelegate( this IRunCommand @this ) => RunDelegates.Default.Get( @this );
+		sealed class RunDelegates : Cache<IRunCommand, Action>
 		{
 			public static RunDelegates Default { get; } = new RunDelegates();
-			RunDelegates() : base( command => command.Run ) {}
+			RunDelegates() : base( command => command.Execute ) {}
 		}
 
-		public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );
+		// public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );
 
 		public static TCommand Run<TCommand, TParameter>( this TCommand @this, TParameter parameter ) where TCommand : ICommand<TParameter>
 		{
@@ -119,7 +118,7 @@ namespace DragonSpark.Commands
 		}
 
 		public static Action<T> Timed<T>( this ICommand<T> @this ) => @this.ToDelegate().Timed();
-		public static Action<T> Timed<T>( this Action<T> @this ) => Timed( @this, Defaults.ParameterizedTimerTemplate );
+		public static Action<T> Timed<T>( this Action<T> @this ) => Timed( @this, Sources.Defaults.ParameterizedTimerTemplate );
 		public static Action<T> Timed<T>( this Action<T> @this, string template ) => new TimedDelegatedCommand<T>( @this, template ).Execute;
 	}
 }

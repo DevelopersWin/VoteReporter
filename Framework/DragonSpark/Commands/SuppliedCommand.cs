@@ -1,11 +1,10 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using System;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Commands
 {
-	public class DeferredCommand<T> : DisposingCommand<object>
+	public class DeferredCommand<T> : RunCommandBase
 	{
 		readonly Func<ICommand<T>> commandSource;
 		readonly Func<T> parameterSource;
@@ -18,12 +17,12 @@ namespace DragonSpark.Commands
 			this.parameterSource = parameterSource;
 		}
 
-		public override void Execute( [Optional]object _ ) => commandSource().Execute( parameterSource() );
+		public override void Execute() => commandSource().Execute( parameterSource() );
 
 		protected override void OnDispose() => commandSource().TryDispose();
 	}
 
-	public class SuppliedCommand<T> : DisposingCommand<object>
+	public class SuppliedCommand<T> : RunCommandBase
 	{
 		readonly ICommand<T> command;
 		readonly T parameter;
@@ -34,7 +33,7 @@ namespace DragonSpark.Commands
 			this.parameter = parameter;
 		}
 
-		public override void Execute( [Optional]object _ ) => command.Execute( parameter );
+		public override void Execute() => command.Execute( parameter );
 
 		protected override void OnDispose() => command.TryDispose();
 	}
