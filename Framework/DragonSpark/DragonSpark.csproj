@@ -123,10 +123,8 @@
     <Compile Include="Aspects\CacheEntry.cs" />
     <Compile Include="Aspects\Validation\CommandAdapter.cs" />
     <Compile Include="Aspects\Validation\CommandAdapterFactory.cs" />
-    <Compile Include="Aspects\Validation\FactoryAdapter.cs" />
     <Compile Include="Aspects\Validation\GenericCommandAdapterFactory.cs" />
     <Compile Include="Aspects\Validation\GenericParameterProfileFactoryBase.cs" />
-    <Compile Include="Aspects\Validation\GenericSourceAdapterFactory.cs" />
     <Compile Include="ComponentModel\CurrentTimeValueProvider.cs" />
     <Compile Include="ComponentModel\DefaultValueParameter.cs" />
     <Compile Include="ComponentModel\ExpressionEvaluator.cs" />
@@ -250,7 +248,6 @@
     <Compile Include="Sources\IItemSource.cs" />
     <Compile Include="Sources\ItemSource.cs" />
     <Compile Include="Specifications\AdapterSpecificationBase.cs" />
-    <Compile Include="Sources\Parameterized\AutoValidatingSource.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingSourceBase.cs" />
     <Compile Include="Sources\Parameterized\CacheParameterHandler.cs" />
     <Compile Include="Sources\Parameterized\Caching\ActivatedCache.cs" />
@@ -346,7 +343,6 @@
     <Compile Include="Aspects\OfSourceType.cs" />
     <Compile Include="Aspects\OriginAttribute.cs" />
     <Compile Include="Aspects\Validation\ParameterValidationAdapterBase.cs" />
-    <Compile Include="Aspects\Validation\SourceAdapterFactory.cs" />
     <Compile Include="Aspects\Validation\AdapterLocator.cs" />
     <Compile Include="Aspects\Validation\AdapterSource.cs" />
     <Compile Include="Aspects\Validation\AspectFactory.cs" />
@@ -440,7 +436,6 @@
     <Compile Include="Diagnostics\Logging\Configurations\AddSinkCommand.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\EnrichFromLogContextCommand.cs" />
     <Compile Include="Application\Setup\ActivatedServiceSource.cs" />
-    <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\IAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\ArgumentCache.cs" />
@@ -557,7 +552,6 @@
     <Compile Include="Specifications\SuppliedSpecification.cs" />
     <Compile Include="Activation\ConstructCoercer.cs" />
     <Compile Include="ICoercer.cs" />
-    <Compile Include="Sources\Parameterized\IValidatedParameterizedSource.cs" />
     <Compile Include="Sources\Delegates\SourceFactory.cs" />
     <Compile Include="TypeSystem\AllParts.cs" />
     <Compile Include="Application\AssemblyInformation.cs" />

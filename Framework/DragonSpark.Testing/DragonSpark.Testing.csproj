@@ -60,8 +60,6 @@
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
     <Compile Include="Aspects\ParameterValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
-    <Compile Include="Aspects\Validation\AutoValidationTests.cs" />
-    <Compile Include="Aspects\Validation\GenericAutoValidationTests.cs" />
     <Compile Include="ComponentModel\ClassWithDefaultProperties.cs" />
     <Compile Include="ComponentModel\SingletonDefaultValueProviderTests.cs" />
     <Compile Include="Composition\ConstructorSelectorTests.cs" />
@@ -177,6 +175,9 @@
       <Project>{167df420-328c-4acc-abd0-42dbe268efdf}</Project>
       <Name>DragonSpark</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Aspects\Validation\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
