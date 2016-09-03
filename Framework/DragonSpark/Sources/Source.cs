@@ -14,11 +14,11 @@ namespace DragonSpark.Sources
 
 		public static ISource<T> Empty<T>() => EmptySource<T>.Default;
 
-		public static ISource<T> Sourced<T>( this T @this ) => Support<T>.Sources.Get( @this );
+		public static Source<T> Sourced<T>( this T @this ) => Support<T>.Sources.Get( @this );
 
 		static class Support<T>
 		{
-			public static ICache<T, ISource<T>> Sources { get; } = CacheFactory.Create<T, ISource<T>>( arg => new Source<T>( arg ) );
+			public static ICache<T, Source<T>> Sources { get; } = CacheFactory.Create<T, Source<T>>( arg => new Source<T>( arg ) );
 		}
 
 		/*public static IParameterizedSource<TParameter, TResult> ToFactory<TParameter, TResult>( this Func<TParameter, TResult> @this ) => ParameterizedSources<TParameter, TResult>.Default.Get( @this );
