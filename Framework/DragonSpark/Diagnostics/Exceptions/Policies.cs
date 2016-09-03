@@ -16,7 +16,7 @@ namespace DragonSpark.Diagnostics.Exceptions
 		static void Apply( Func<Policy> policy, Action action ) => Commands.Get( policy() ).Execute( action );
 
 		public static ICommand<T> Apply<T>( this ICommand<T> @this, ISource<Policy> source ) => Apply( @this, source.ToDelegate() );
-		public static ICommand<T> Apply<T>( this ICommand<T> @this, Func<Policy> source ) => new PolicyDecoratedCommand<T>( source, @this );
+		public static ICommand<T> Apply<T>( this ICommand<T> @this, Func<Policy> source ) => new DeferredPolicyCommand<T>( source, @this );
 	}
 
 	public static class Defaults<T> where T : Exception

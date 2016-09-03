@@ -334,7 +334,7 @@
     <Compile Include="Diagnostics\Logging\Configurations\ReadFromSettingsCommand.cs" />
     <Compile Include="Diagnostics\Logging\LogRetryException.cs" />
     <Compile Include="Diagnostics\Exceptions\PolicyBuilderSource.cs" />
-    <Compile Include="Diagnostics\Exceptions\PolicyDecoratedCommand.cs" />
+    <Compile Include="Diagnostics\Exceptions\DeferredPolicyCommand.cs" />
     <Compile Include="Diagnostics\Exceptions\Retry.cs" />
     <Compile Include="Diagnostics\Exceptions\RetryPolicyFactory.cs" />
     <Compile Include="Diagnostics\Exceptions\RetryPolicyParameter.cs" />

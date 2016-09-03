@@ -6,7 +6,7 @@ namespace DragonSpark.Commands
 	{
 		public FirstCommand( params ICommand[] commands ) : base( commands ) {}
 
-		public override void Execute( T parameter = default(T) )
+		public override void Execute( T parameter )
 		{
 			foreach ( var command in Commands )
 			{
