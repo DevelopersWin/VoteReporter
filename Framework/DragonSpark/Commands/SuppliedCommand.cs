@@ -1,10 +1,11 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
+using DragonSpark.Specifications;
 using System;
 
 namespace DragonSpark.Commands
 {
-	public class DeferredCommand<T> : RunCommandBase
+	/*public class DeferredCommand<T> : RunCommandBase
 	{
 		readonly Func<ICommand<T>> commandSource;
 		readonly Func<T> parameterSource;
@@ -20,20 +21,22 @@ namespace DragonSpark.Commands
 		public override void Execute() => commandSource().Execute( parameterSource() );
 
 		protected override void OnDispose() => commandSource().TryDispose();
-	}
+	}*/
 
 	public class SuppliedCommand<T> : RunCommandBase
 	{
 		readonly ICommand<T> command;
-		readonly T parameter;
+		readonly Func<T> parameter;
 
-		public SuppliedCommand( ICommand<T> command, T parameter )
+		public SuppliedCommand( ICommand<T> command, T parameter ) : this( command, Factory.For( parameter ) ) {}
+
+		public SuppliedCommand( ICommand<T> command, Func<T> parameter )
 		{
-			this.command = command;
+			this.command = new SpecificationCommand<T>( Specifications<T>.Assigned, command.ToDelegate() );
 			this.parameter = parameter;
 		}
 
-		public override void Execute() => command.Execute( parameter );
+		public override void Execute() => command.Execute( parameter() );
 
 		protected override void OnDispose() => command.TryDispose();
 	}

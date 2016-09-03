@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using System;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Specifications
 {
@@ -20,9 +19,9 @@ namespace DragonSpark.Specifications
 			this.specification = specification;
 		}
 
-		public bool IsSatisfiedBy( [Optional]TTo parameter ) => specification( parameter );
+		public bool IsSatisfiedBy( TTo parameter ) => specification( parameter );
 
-		public override bool IsSatisfiedBy( [Optional]TFrom parameter )
+		public override bool IsSatisfiedBy( TFrom parameter )
 		{
 			var to = coerce( parameter );
 			var result = to.IsAssignedOrValue() && IsSatisfiedBy( to );

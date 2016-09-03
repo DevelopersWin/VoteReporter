@@ -70,7 +70,7 @@ namespace DragonSpark.Testing.Extensions
 
 		class Factory : SpecificationParameterizedSource<object, object>
 		{
-			public Factory() : base( Specifications.Specifications.Assigned, o => null ) {}
+			public Factory() : base( DragonSpark.Specifications.Specifications.Assigned, o => null ) {}
 		}
 
 		class Command : CommandBase<object>

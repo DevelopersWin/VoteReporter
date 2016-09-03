@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Specifications
 {
@@ -11,6 +10,6 @@ namespace DragonSpark.Specifications
 			this.source = source;
 		}
 
-		public override bool IsSatisfiedBy( [Optional]T parameter ) => source( parameter ).Apply();
+		public override bool IsSatisfiedBy( T parameter ) => source( parameter ).Apply();
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -12,6 +11,6 @@ namespace DragonSpark.Sources.Parameterized
 			this.factory = factory;
 		}
 
-		public override TResult Get( [Optional]TParameter parameter ) => factory();
+		public override TResult Get( TParameter parameter ) => factory();
 	}
 }

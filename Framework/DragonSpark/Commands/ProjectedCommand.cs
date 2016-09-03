@@ -1,7 +1,6 @@
-using System;
-using System.Runtime.InteropServices;
-using System.Windows.Input;
 using DragonSpark.TypeSystem;
+using System;
+using System.Windows.Input;
 
 namespace DragonSpark.Commands
 {
@@ -18,6 +17,6 @@ namespace DragonSpark.Commands
 			this.projection = projection;
 		}
 
-		public override void Execute( [Optional]T parameter ) => command.Execute( projection( parameter ) );
+		public override void Execute( T parameter ) => command.Execute( projection( parameter ) );
 	}
 }

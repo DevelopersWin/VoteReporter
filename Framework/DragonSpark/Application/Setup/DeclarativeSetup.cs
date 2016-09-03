@@ -31,9 +31,9 @@ namespace DragonSpark.Application.Setup
 
 		public DeclarativeCollection<object> Items { get; } = new DeclarativeCollection<object>();
 
-		public override void Execute( object parameter = null ) => inner( parameter );
+		public override void Execute( object parameter ) => inner( parameter );
 
-		void Body( object parameter = null )
+		void Body( object parameter )
 		{
 			using ( new AmbientStackCommand<ISetup>().Run( this ) )
 			{

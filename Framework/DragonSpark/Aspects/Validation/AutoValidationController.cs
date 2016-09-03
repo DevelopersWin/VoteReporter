@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Runtime.InteropServices;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
+using System;
+using System.Collections.Concurrent;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -17,16 +16,16 @@ namespace DragonSpark.Aspects.Validation
 			this.validator = validator;
 		}
 
-		public bool IsSatisfiedBy( [Optional]object parameter ) => Handler?.Handles( parameter ) ?? false;
+		public bool IsSatisfiedBy( object parameter ) => Handler?.Handles( parameter ) ?? false;
 
-		bool IsMarked( [Optional]object parameter )
+		bool IsMarked( object parameter )
 		{
 			object current;
 			var result = TryGetValue( Environment.CurrentManagedThreadId, out current ) && Equals( current, parameter ) && Clear();
 			return result;
 		}
 
-		public void MarkValid( [Optional]object parameter, bool valid )
+		public void MarkValid( object parameter, bool valid )
 		{
 			if ( valid )
 			{
@@ -45,7 +44,7 @@ namespace DragonSpark.Aspects.Validation
 			return true;
 		}
 
-		public object Execute( [Optional]object parameter, Func<object> proceed )
+		public object Execute( object parameter, Func<object> proceed )
 		{
 			object handled = null;
 			if ( Handler?.Handle( parameter, out handled ) ?? false )

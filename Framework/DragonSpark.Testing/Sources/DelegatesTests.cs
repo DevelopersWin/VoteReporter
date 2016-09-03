@@ -1,11 +1,12 @@
-﻿using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using System;
+﻿using System;
 using System.Windows.Media.Animation;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using Xunit;
+
 // ReSharper disable AccessToModifiedClosure
 
-namespace DragonSpark.Testing.Runtime.Sources
+namespace DragonSpark.Testing.Sources
 {
 	public class DelegatesTests
 	{

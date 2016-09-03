@@ -1,8 +1,7 @@
-using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using DragonSpark.Diagnostics.Logging;
 using SerilogTimings.Extensions;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Commands
 {
@@ -19,7 +18,7 @@ namespace DragonSpark.Commands
 			this.template = template;
 		}
 
-		public override void Execute( [Optional]T parameter )
+		public override void Execute( T parameter )
 		{
 			using ( Logger.Default.Get( method ).TimeOperation( template, method, parameter ) )
 			{

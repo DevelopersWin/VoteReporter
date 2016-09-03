@@ -1,30 +1,31 @@
-﻿using System;
+﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using System;
 using Xunit;
 
-namespace DragonSpark.Testing.Runtime.Specifications
+namespace DragonSpark.Testing.Specifications
 {
-	public class SpecificationExtensionsTests
+	public class ExtensionsTests
 	{
 		[Fact]
 		public void And()
 		{
 			var sut = new SuppliedSpecification( true ).And( new SuppliedSpecification( true ) );
-			Assert.True( sut.IsSatisfiedBy( null ) );
+			Assert.True( sut.IsSatisfiedBy( Defaults.Parameter ) );
 		} 
 
 		[Fact]
 		public void AndNot()
 		{
 			var sut = new SuppliedSpecification( true ).And( new SuppliedSpecification( false ) );
-			Assert.False( sut.IsSatisfiedBy( null ) );
+			Assert.False( sut.IsSatisfiedBy( Defaults.Parameter ) );
 		}
 
 		[Fact]
 		public void Or()
 		{
 			var sut = new SuppliedSpecification( true ).Or( new SuppliedSpecification( false ) );
-			Assert.True( sut.IsSatisfiedBy( null ) );
+			Assert.True( sut.IsSatisfiedBy( Defaults.Parameter ) );
 		}
 
 		[Fact]

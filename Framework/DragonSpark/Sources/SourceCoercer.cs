@@ -15,10 +15,6 @@ namespace DragonSpark.Sources
 
 			var result = value is T ? (T)value : parameter.As<T>();
 			return result;
-
-			/*var store = parameter as ISource<T>;
-			var result = store != null ? store.Get() : parameter.As<T>();
-			return result;*/
 		}
 	}
 }

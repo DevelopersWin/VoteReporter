@@ -21,6 +21,6 @@ namespace DragonSpark.Application
 			inner = new SpecificationCommand<T>( specification, base.Execute ).Execute;
 		}
 
-		public sealed override void Execute( T parameter = default(T) ) => inner( parameter );
+		public sealed override void Execute( T parameter ) => inner( parameter );
 	}
 }

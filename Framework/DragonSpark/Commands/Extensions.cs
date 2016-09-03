@@ -2,7 +2,6 @@
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using System;
-using System.Runtime.InteropServices;
 using ICommand = System.Windows.Input.ICommand;
 
 namespace DragonSpark.Commands
@@ -52,8 +51,8 @@ namespace DragonSpark.Commands
 		}
 
 		// public static FixedCommand<Func<T>> Fixed<T>( this ICommand<Func<T>> @this, T parameter ) => new FixedCommand<Func<T>>( @this, new FixedFactory<T>( parameter ).Create );
-		public static SuppliedCommand<T> Fixed<T>( this ICommand<T> @this, [Optional]T parameter ) => new SuppliedCommand<T>( @this, parameter );
-		public static DeferredCommand<T> Fixed<T>( this ICommand<T> @this, Func<T> parameter ) => new DeferredCommand<T>( @this, parameter );
+		public static SuppliedCommand<T> Fixed<T>( this ICommand<T> @this, T parameter ) => new SuppliedCommand<T>( @this, parameter );
+		public static SuppliedCommand<T> Fixed<T>( this ICommand<T> @this, Func<T> parameter ) => new SuppliedCommand<T>( @this, parameter );
 
 		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => DelegateCache<T>.Default.Get( @this );
 		sealed class DelegateCache<T> : Cache<ICommand<T>, Action<T>>

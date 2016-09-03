@@ -1,6 +1,5 @@
 using DragonSpark.Extensions;
 using System;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark
 {
@@ -12,6 +11,6 @@ namespace DragonSpark
 			this.projection = projection;
 		}
 
-		protected override TTo Apply( [Optional]object parameter ) => parameter.AsTo( projection );
+		protected override TTo Apply( object parameter ) => parameter.AsTo( projection );
 	}
 }

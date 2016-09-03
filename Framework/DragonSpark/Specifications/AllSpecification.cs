@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Specifications
 {
@@ -17,7 +16,7 @@ namespace DragonSpark.Specifications
 			this.specifications = specifications.ToImmutableArray();
 		}
 
-		public override bool IsSatisfiedBy( [Optional]T parameter )
+		public override bool IsSatisfiedBy( T parameter )
 		{
 			foreach ( var specification in specifications )
 			{

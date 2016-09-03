@@ -2,7 +2,6 @@
 using DragonSpark.Specifications;
 using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -21,6 +20,6 @@ namespace DragonSpark.Aspects.Validation
 
 		public bool IsSatisfiedBy( MethodInfo parameter ) => method( parameter );
 
-		public bool IsSatisfiedBy( [Optional]object parameter ) => parameter is T ? base.IsSatisfiedBy( (T)parameter ) : general != null && general.IsSatisfiedBy( parameter );
+		public bool IsSatisfiedBy( object parameter ) => parameter is T ? base.IsSatisfiedBy( (T)parameter ) : general != null && general.IsSatisfiedBy( parameter );
 	}
 }

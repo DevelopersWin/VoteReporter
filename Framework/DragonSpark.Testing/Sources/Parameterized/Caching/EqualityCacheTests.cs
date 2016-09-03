@@ -1,4 +1,4 @@
-﻿namespace DragonSpark.Testing.Runtime.Properties
+﻿namespace DragonSpark.Testing.Sources.Parameterized.Caching
 {
 	public class EqualityCacheTests
 	{

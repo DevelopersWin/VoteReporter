@@ -76,10 +76,10 @@
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
     <Compile Include="Runtime\DelegateTests.cs" />
-    <Compile Include="Runtime\Properties\EqualityCacheTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\EqualityCacheTests.cs" />
     <Compile Include="Runtime\PurgingCollectionTests.cs" />
-    <Compile Include="Runtime\Sources\DelegatesTests.cs" />
-    <Compile Include="Runtime\Sources\ScopingTests.cs" />
+    <Compile Include="Sources\DelegatesTests.cs" />
+    <Compile Include="Sources\ScopeTests.cs" />
     <Compile Include="Setup\ActivatedServiceSourceTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
@@ -112,11 +112,11 @@
     <Compile Include="Runtime\DeclarativeCollectionTests.cs" />
     <Compile Include="Commands\CompositeCommandTests.cs" />
     <Compile Include="Runtime\SerializerTests.cs" />
-    <Compile Include="Runtime\Specifications\AllSpecificationTests.cs" />
-    <Compile Include="Runtime\Specifications\SpecificationWithContextBasetionTests.cs" />
-    <Compile Include="Runtime\Specifications\NeverSpecificationTests.cs" />
-    <Compile Include="Runtime\Specifications\SpecificationExtensionsTests.cs" />
-    <Compile Include="Runtime\Specifications\TypeAssignableSpecificationTests.cs" />
+    <Compile Include="Specifications\AllSpecificationTests.cs" />
+    <Compile Include="Specifications\SpecificationWithContextBaseTests.cs" />
+    <Compile Include="Specifications\SpecificationsTests.cs" />
+    <Compile Include="Specifications\ExtensionsTests.cs" />
+    <Compile Include="Specifications\TypeAssignableSpecificationTests.cs" />
     <Compile Include="Extensions\DictionaryExtensionsTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -178,9 +178,7 @@
       <Name>DragonSpark</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Runtime\Values\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
   <PropertyGroup>

@@ -2,9 +2,9 @@
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
-namespace DragonSpark.Testing.Runtime.Specifications
+namespace DragonSpark.Testing.Specifications
 {
-	public class SpecificationWithContextBasetionTests
+	public class SpecificationWithContextBaseTests
 	{
 		[Theory, AutoData]
 		public void Equal( [Frozen]object item, EqualityContextAwareSpecification sut )

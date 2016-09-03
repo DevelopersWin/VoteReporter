@@ -2,7 +2,7 @@
 using DragonSpark.Testing.Objects;
 using Xunit;
 
-namespace DragonSpark.Testing.Runtime.Specifications
+namespace DragonSpark.Testing.Specifications
 {
 	public class TypeAssignableSpecificationTests
 	{

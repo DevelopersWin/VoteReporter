@@ -2,9 +2,9 @@ using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Markup;
+using Defaults = DragonSpark.Sources.Parameterized.Defaults;
 
 namespace DragonSpark.Commands
 {
@@ -27,7 +27,7 @@ namespace DragonSpark.Commands
 
 		public CommandCollection Commands { get; }
 
-		public override void Execute( [Optional]T parameter )
+		public override void Execute( T parameter )
 		{
 			foreach ( var command in Commands.ToArray() )
 			{

@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Commands
 {
@@ -12,6 +11,6 @@ namespace DragonSpark.Commands
 			this.command = command;
 		}
 
-		public override void Execute( [Optional]T parameter ) => command( parameter );
+		public override void Execute( T parameter ) => command( parameter );
 	}
 }

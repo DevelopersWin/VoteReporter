@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Extensions;
 using System.Collections.Immutable;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -18,7 +17,7 @@ namespace DragonSpark.Sources.Parameterized
 				this.sources = sources;
 			}
 
-			public override TResult Get( [Optional]TParameter parameter ) => sources.Introduce( parameter, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
+			public override TResult Get( TParameter parameter ) => sources.Introduce( parameter, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 
 			// protected override object GetGeneralized( object parameter ) => sources.Introduce( parameter, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 		}

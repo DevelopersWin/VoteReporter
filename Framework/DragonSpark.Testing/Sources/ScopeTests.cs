@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Sources;
 using Xunit;
 
-namespace DragonSpark.Testing.Runtime.Sources
+namespace DragonSpark.Testing.Sources
 {
-	public class ScopingTests
+	public class ScopeTests
 	{
 		[Fact]
 		public void CachingTests()
