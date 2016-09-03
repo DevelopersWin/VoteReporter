@@ -1,5 +1,4 @@
-﻿using DragonSpark.Activation.Location;
-using DragonSpark.Application;
+﻿using DragonSpark.Application;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
@@ -15,7 +14,7 @@ namespace DragonSpark.Testing.Activation.FactoryModel
 		public void GetResultType()
 		{
 			var expected = typeof(FactoryOfYac).Yield().AsApplicationParts();
-			var type = SourceTypes.Default.Get().Get( new LocateTypeRequest( typeof(YetAnotherClass) ) );
+			var type = SourceTypes.Default.Get( typeof(YetAnotherClass) );
 			Assert.Equal( expected.Single(), type );
 		}
 

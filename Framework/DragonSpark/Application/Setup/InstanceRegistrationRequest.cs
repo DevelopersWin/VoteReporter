@@ -1,17 +1,19 @@
 ﻿using System;
-using DragonSpark.Activation.Location;
 
 namespace DragonSpark.Application.Setup
 {
-	public class InstanceRegistrationRequest : LocateTypeRequest
+	public struct InstanceRegistrationRequest
 	{
-		public InstanceRegistrationRequest( object instance, string name = null ) : this( instance.GetType(), instance, name ) {}
+		public InstanceRegistrationRequest( object instance ) : this( instance.GetType(), instance ) {}
 
-		public InstanceRegistrationRequest( Type type, object instance, string name = null ) : base( type, name )
+		public InstanceRegistrationRequest( Type type, object instance )
 		{
+			RegistrationType = type;
 			Instance = instance;
 		}
 
 		public object Instance { get; }
+
+		public Type RegistrationType { get; }
 	}
 }

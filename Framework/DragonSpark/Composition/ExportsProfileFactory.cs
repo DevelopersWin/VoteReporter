@@ -65,15 +65,15 @@ namespace DragonSpark.Composition
 				.GetClasses()
 				.Union( implementations )
 				.SelectAssigned( selector.Get )
-				.ToDictionary( info => info.DeclaringType );
+				.ToImmutableDictionary( info => info.DeclaringType );
 
 			var constructed = new ConstructedExports( constructions );
 
 			var conventions = new ConventionExports( mappings.Keys, implementations.Intersect( constructions.Keys ) );
 
-			var core = implementations.Except( constructions.Keys ).Union( applied.GetProperties() ).SelectAssigned( SingletonExports ).ToImmutableArray();
+			var core = implementations.Except( constructions.Keys ).Union( applied.GetProperties() ).SelectAssigned( SingletonExports );
 			
-			var singletons = new SingletonExports( core.ToDictionary( export => export.Location.DeclaringType ) );
+			var singletons = new SingletonExports( core.ToImmutableDictionary( export => export.Location.DeclaringType ) );
 
 			var result = new ExportsProfile( constructed, conventions, singletons );
 			return result;

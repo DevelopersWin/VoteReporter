@@ -107,6 +107,7 @@
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\SourceTypeMapping.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
     <Compile Include="Specifications\DeferredSpecification.cs" />
@@ -303,7 +304,6 @@
     <Compile Include="TypeSystem\Metadata\DerivedTypeSpecification.cs" />
     <Compile Include="TypeSystem\Metadata\Descriptor.cs" />
     <Compile Include="TypeSystem\Generics\FactoryContextBase.cs" />
-    <Compile Include="Sources\Parameterized\SourceTypeRequest.cs" />
     <Compile Include="TypeSystem\Generics\FilteredMethodContextBase.cs" />
     <Compile Include="TypeSystem\Generics\GenericInvocationFactory.cs" />
     <Compile Include="TypeSystem\Generics\GenericMethodCandidate.cs" />
@@ -439,7 +439,6 @@
     <Compile Include="Diagnostics\Logging\Configurations\EnrichFromLogContextCommand.cs" />
     <Compile Include="Application\Setup\ActivatedServiceSource.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
-    <Compile Include="Sources\SourceTypeLocator.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\IAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\ArgumentCache.cs" />
@@ -667,7 +666,6 @@
     <Compile Include="Activation\ActivatorExtensions.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Activation\Location\LocateTypeRequest.cs" />
     <Compile Include="Activation\Location\GlobalServiceProvider.cs">
       <SubType>Code</SubType>
     </Compile>

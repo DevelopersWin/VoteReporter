@@ -18,7 +18,7 @@ namespace DragonSpark.Testing.Framework.Runtime
 
 		public override void Add( InstanceRegistrationRequest request )
 		{
-			commands[nameof(RegisterInstance)].Make( request.RequestedType ).Invoke( request.Instance );
+			commands[nameof(RegisterInstance)].Make( request.RegistrationType ).Invoke( request.Instance );
 			base.Add( request );
 		}
 

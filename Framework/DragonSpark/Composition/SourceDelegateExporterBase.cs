@@ -1,7 +1,5 @@
 using DragonSpark.Activation;
-using DragonSpark.Activation.Location;
 using DragonSpark.Extensions;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
@@ -18,7 +16,7 @@ namespace DragonSpark.Composition
 	public abstract class SourceDelegateExporterBase : ExportDescriptorProviderBase
 	{
 		readonly static IStackSource<CompositeActivatorParameters> Stack = new AmbientStack<CompositeActivatorParameters>();
-		readonly static Func<LocateTypeRequest, Type> Locator = SourceTypes.Default.Delegate();
+		readonly static Func<Type, Type> Locator = SourceTypes.Default.ToSourceDelegate();
 		readonly static Func<Type, Type> Parameters = ParameterTypes.Default.ToDelegate();
 
 		readonly ICache<LifetimeContext, object> cache = new Cache<LifetimeContext, object>();
@@ -40,7 +38,7 @@ namespace DragonSpark.Composition
 			{
 				var resolved = resolver( contract );
 				var sourceType = resolved
-					.With( compositionContract => new LocateTypeRequest( compositionContract.ContractType, compositionContract.ContractName ) )
+					.With( compositionContract => compositionContract.ContractType )
 					.With( Locator );
 				var success = sourceType != null && descriptorAccessor.TryResolveOptionalDependency( "Source Request", contract.ChangeType( sourceType ), true, out dependency );
 				if ( success )
