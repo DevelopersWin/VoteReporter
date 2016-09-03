@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Commands
 {
-	public abstract class CommandBase<T> : ICommand<T>
+	public abstract class CommandBase<T> : ICommand<T>//, ISpecification
 	{
 		public event EventHandler CanExecuteChanged = delegate { };
 		readonly Coerce<T> coercer;
@@ -26,10 +26,8 @@ namespace DragonSpark.Commands
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
-		bool ICommand.CanExecute( [Optional]object parameter ) => Coerce( parameter );
-		bool ISpecification.IsSatisfiedBy( [Optional]object parameter ) => Coerce( parameter );
+		bool ICommand.CanExecute( [Optional]object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
 
-		bool Coerce( [Optional]object parameter ) => specification.IsSatisfiedBy( coercer( parameter ) );
 		public virtual bool IsSatisfiedBy( [Optional]T parameter ) => specification.IsSatisfiedBy( parameter );
 
 		void ICommand.Execute( [Optional]object parameter ) => Execute( coercer( parameter ) );

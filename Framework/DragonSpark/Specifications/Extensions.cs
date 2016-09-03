@@ -28,22 +28,22 @@ namespace DragonSpark.Specifications
 
 		// public static ISpecification<TTo> Cast<TFrom, TTo>( this ISpecification<TFrom> @this ) where TFrom : TTo => new CastingSpecification<TFrom, TTo>( @this );
 
-		public static ISpecification<T> Cast<T>( this ISpecification @this ) => @this as ISpecification<T> ?? Casts<T>.Default.Get( @this );
+		/*public static ISpecification<T> Cast<T>( this ISpecification @this ) => @this as ISpecification<T> ?? Casts<T>.Default.Get( @this );
 		sealed class Casts<T> : Cache<ISpecification, ISpecification<T>>
 		{
 			public static Casts<T> Default { get; } = new Casts<T>();
 			Casts() : base( specification => new CastingSpecification<T>( specification ) ) {}
-		}
+		}*/
 
 		public static ISpecification<object> Fixed<T>( this ISpecification<T> @this, T parameter ) => new SuppliedDelegatedSpecification<T>( @this, parameter )/*.Cast<T>()*/;
 		public static ISpecification<object> Fixed<T>( this ISpecification<T> @this, Func<T> parameter ) => new SuppliedDelegatedSpecification<T>( @this, parameter )/*.Cast<T>()*/;
 
-		public static Func<object, bool> ToSpecificationDelegate( this ISpecification @this ) => Delegates.Default.Get( @this );
+		/*public static Func<object, bool> ToSpecificationDelegate( this ISpecification @this ) => Delegates.Default.Get( @this );
 		sealed class Delegates : Cache<ISpecification, Func<object, bool>>
 		{
 			public static Delegates Default { get; } = new Delegates();
 			Delegates() : base( specification => specification.IsSatisfiedBy ) {}
-		}
+		}*/
 
 		public static Func<T, bool> ToSpecificationDelegate<T>( this ISpecification<T> @this ) => Delegates<T>.Default.Get( @this );
 		sealed class Delegates<T> : Cache<ISpecification<T>, Func<T, bool>>

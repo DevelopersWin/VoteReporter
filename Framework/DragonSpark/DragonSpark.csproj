@@ -370,7 +370,6 @@
     <Compile Include="Runtime\Serializer.cs" />
     <Compile Include="Runtime\Assignments\SourceAssignment.cs" />
     <Compile Include="Specifications\AssignedSpecification.cs" />
-    <Compile Include="Specifications\CastingSpecification.cs" />
     <Compile Include="Specifications\ConditionMonitorSpecificationBase.cs" />
     <Compile Include="Specifications\DelegatedSpecification.cs" />
     <Compile Include="Specifications\GenericTypeAssignableSpecification.cs" />

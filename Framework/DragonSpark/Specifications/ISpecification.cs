@@ -1,9 +1,9 @@
 namespace DragonSpark.Specifications
 {
-	public interface ISpecification
+	/*public interface ISpecification
 	{
 		bool IsSatisfiedBy( object parameter );
-	}
+	}*/
 
 	public interface ISpecification<in T>
 	{

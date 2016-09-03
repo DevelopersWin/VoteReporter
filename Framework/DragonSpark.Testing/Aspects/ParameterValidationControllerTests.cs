@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects.Validation;
-using DragonSpark.Commands;
 using System;
 using System.Windows.Input;
 using Xunit;
@@ -34,7 +33,7 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( valid, command.LastResult.GetValueOrDefault() );
 		}
 
-		[Fact]
+		/*[Fact]
 		public void GenericCommandWorkflow()
 		{
 			var command = new GenericCommand();
@@ -76,7 +75,7 @@ namespace DragonSpark.Testing.Aspects
 
 			command.Execute( 123 );
 			/*Assert.False( controller.IsValid( 123 ) );
-			Assert.False( controller.IsValid( 6776 ) );*/
+			Assert.False( controller.IsValid( 6776 ) );#1#
 
 			Assert.Equal( 6, command.CanExecuteCalled );
 			Assert.Equal( 4, command.CanExecuteGenericCalled );
@@ -129,8 +128,8 @@ namespace DragonSpark.Testing.Aspects
 			command.Execute( valid );
 			Assert.Equal( 3, command.CanExecuteCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
-			Assert.Equal( valid, command.LastResult.GetValueOrDefault() );*/
-		}
+			Assert.Equal( valid, command.LastResult.GetValueOrDefault() );#1#
+		}*/
 
 		[ApplyAutoValidation]
 		class Command : ICommand
@@ -156,7 +155,7 @@ namespace DragonSpark.Testing.Aspects
 			}
 		}
 
-		[ApplyAutoValidation]
+		/*[ApplyAutoValidation]
 		class GenericCommand : ICommand<GenericCommand.Parameter>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
@@ -208,6 +207,6 @@ namespace DragonSpark.Testing.Aspects
 			}
 
 			public bool IsSatisfiedBy( object parameter ) => CanExecute( parameter );
-		}
+		}*/
 	}
 }

@@ -9,7 +9,7 @@ namespace DragonSpark.Aspects.Validation
 {
 	public sealed class ValidationMethodLocator : AlterationBase<MethodInfo>
 	{
-		const string MethodName = nameof(ISpecification.IsSatisfiedBy);
+		const string MethodName = nameof(ISpecification<object>.IsSatisfiedBy);
 
 		readonly Func<MethodLocator.Parameter, MethodInfo> source;
 
@@ -23,7 +23,7 @@ namespace DragonSpark.Aspects.Validation
 
 		public override MethodInfo Get( MethodInfo parameter )
 		{
-			var candidates = typeof(ISpecification<>).MakeGenericType( parameter.GetParameterTypes().Single() ).Append( typeof(ISpecification) );
+			var candidates = typeof(ISpecification<>).MakeGenericType( parameter.GetParameterTypes().Single() ).Append( typeof(ISpecification<object>) );
 			foreach ( var candidate in candidates )
 			{
 				var result = source( new MethodLocator.Parameter( candidate, MethodName, parameter.DeclaringType ) );

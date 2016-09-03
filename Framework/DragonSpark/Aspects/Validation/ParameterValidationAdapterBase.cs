@@ -8,12 +8,12 @@ namespace DragonSpark.Aspects.Validation
 {
 	public abstract class ParameterValidationAdapterBase<T> : DecoratedSpecification<T>, IParameterValidationAdapter
 	{
-		readonly ISpecification general;
+		readonly ISpecification<object> general;
 		readonly Func<MethodInfo, bool> method;
 
-		protected ParameterValidationAdapterBase( ISpecification<T> inner, MethodInfo method ) : this( inner, MethodEqualitySpecification.For( method ), inner as ISpecification ) {}
+		protected ParameterValidationAdapterBase( ISpecification<T> inner, MethodInfo method ) : this( inner, MethodEqualitySpecification.For( method ), inner as ISpecification<object> ) {}
 
-		ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method, ISpecification general = null ) : base( inner )
+		ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method, ISpecification<object> general = null ) : base( inner )
 		{
 			this.general = general;
 			this.method = method;
