@@ -1,5 +1,4 @@
-﻿using DragonSpark.Aspects.Validation;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
@@ -14,21 +13,27 @@ using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
-	[ApplyAutoValidation]
+	// [ApplyAutoValidation]
 	public class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
 		readonly ILogger logger;
 		readonly Func<FileInfo> fileSource;
 
+		readonly Action<ApplicationSettingsBase> inner;
+
 		public InitializeUserSettingsCommand( ILogger logger ) : this( logger, Defaults.UserSettingsPath ) {}
 
-		public InitializeUserSettingsCommand( ILogger logger, Func<FileInfo> fileSource ) : base( new OnlyOnceSpecification() )
+		public InitializeUserSettingsCommand( ILogger logger, Func<FileInfo> fileSource )
 		{
 			this.logger = logger;
 			this.fileSource = fileSource;
+
+			inner = new SpecificationCommand<ApplicationSettingsBase>( new OnlyOnceSpecification(), Body ).Execute;
 		}
 
-		public override void Execute( ApplicationSettingsBase parameter )
+		public override void Execute( ApplicationSettingsBase parameter ) => inner( parameter );
+
+		void Body( ApplicationSettingsBase parameter )
 		{
 			var file = fileSource();
 			file.Refresh();

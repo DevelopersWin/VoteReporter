@@ -13,15 +13,8 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		public static ImmutableArray<TResult> CreateMany<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IEnumerable<TParameter> parameters ) =>
 			parameters
-				// .Where( @this.IsSatisfiedBy )
 				.SelectAssigned( @this.ToSourceDelegate() )
 				.ToImmutableArray();
-
-		/*public static ImmutableArray<TResult> CreateMany<TResult>( this IParameterizedSource @this, IEnumerable<object> parameters, Func<TResult, bool> where = null ) => 
-			parameters
-				.SelectAssigned( @this.ToSourceDelegate() )
-				.Cast<TResult>()
-				.ToImmutableArray();*/
 
 		public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TParameter> coercer ) => Apply( @this.ToSourceDelegate(), coercer.ToDelegate() );
 		public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Coerce<TParameter> coerce ) =>
@@ -43,8 +36,7 @@ namespace DragonSpark.Sources.Parameterized
 		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification ) =>
 			new SpecificationParameterizedSource<TParameter, TResult>( specification, @this.ToSourceDelegate() );
 
-		// public static T Get<T>( this IParameterizedSource @this, object parameter ) => (T)@this.Get( parameter );
-
+		
 		public static Func<object, T> Wrap<T>( this T @this ) => @this.Wrap<object, T>();
 
 		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) => Factory.For( @this ).Wrap<TParameter, TResult>();

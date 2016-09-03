@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using DragonSpark.Extensions;
+using DragonSpark.Commands;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Framework.Application.Setup;
 using Ploeh.AutoFixture;
 using PostSharp.Aspects;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Application
 {

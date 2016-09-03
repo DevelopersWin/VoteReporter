@@ -3,9 +3,9 @@ using System;
 using System.Windows.Input;
 using Xunit;
 
-namespace DragonSpark.Testing.Aspects
+namespace DragonSpark.Testing.Aspects.Validation
 {
-	public class ParameterValidationControllerTests
+	public class AutoValidationControllerTests
 	{
 		[Fact]
 		public void CommandWorkflow()

@@ -57,7 +57,6 @@
     <Compile Include="Setup\InitializeUserSettingsCommandTests.cs" />
     <Compile Include="Setup\LocationSetupTests.cs" />
     <Compile Include="Setup\ProgramSetupTests.cs" />
-    <Compile Include="Setup\SetupCommandTests.cs" />
     <Compile Include="Setup\StressTestingTests.cs" />
     <Compile Include="TestObjects\ClassWithBrokenConstructor.cs" />
     <Compile Include="TestObjects\ModulesConfiguration.cs" />

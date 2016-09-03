@@ -38,6 +38,7 @@
     <Compile Include="Activation\IsPublicTypeSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
+    <Compile Include="Commands\SpecificationCommand.cs" />
     <Compile Include="Composition\ActivationParameter.cs" />
     <Compile Include="Composition\ActivatorSource.cs" />
     <Compile Include="Composition\CompositeActivatorParameters.cs" />
@@ -182,7 +183,7 @@
     <Compile Include="Extensions\ImmutableArrayExtensions.cs" />
     <Compile Include="Extensions\MethodEqualitySpecification.cs" />
     <Compile Include="Extensions\TypeAdapterCache.cs" />
-    <Compile Include="Runtime\Assignments\AssignCommand.cs" />
+    <Compile Include="Runtime\Assignments\AssignDisposingCommand.cs" />
     <Compile Include="Runtime\Assignments\Assignment.cs" />
     <Compile Include="Runtime\Assignments\Assignments.cs" />
     <Compile Include="Runtime\Assignments\CacheAssign.cs" />
@@ -473,7 +474,7 @@
     <Compile Include="Formatter.cs" />
     <Compile Include="Diagnostics\Logging\LogTemplate.cs" />
     <Compile Include="Diagnostics\Exceptions\Policies.cs" />
-    <Compile Include="Extensions\CommandExtensions.cs" />
+    <Compile Include="Commands\Extensions.cs" />
     <Compile Include="Extensions\MethodExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

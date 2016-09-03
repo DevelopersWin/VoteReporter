@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Application.Setup;
+using DragonSpark.Commands;
 using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using JetBrains.Annotations;

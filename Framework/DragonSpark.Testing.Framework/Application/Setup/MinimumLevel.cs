@@ -1,5 +1,5 @@
+using DragonSpark.Commands;
 using DragonSpark.Diagnostics.Logging.Configurations;
-using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using Serilog.Events;
 

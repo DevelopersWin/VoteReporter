@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Commands;
 using Xunit;
 
-namespace DragonSpark.Windows.Testing.Setup
+namespace DragonSpark.Testing.Commands
 {
-	public class SetupCommandTests
+	public class CommandBaseTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Execute( Command sut )

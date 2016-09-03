@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Application;
 using DragonSpark.Application.Setup;
+using DragonSpark.Commands;
 using DragonSpark.Configuration;
-using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;

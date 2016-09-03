@@ -1,6 +1,5 @@
 using DragonSpark.Commands;
 using DragonSpark.ComponentModel;
-using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using System.Windows.Input;
 

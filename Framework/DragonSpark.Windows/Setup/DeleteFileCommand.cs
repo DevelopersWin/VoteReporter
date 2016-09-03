@@ -1,14 +1,13 @@
-﻿using System.IO;
-using DragonSpark.Aspects.Validation;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
+using System.IO;
 
 namespace DragonSpark.Windows.Setup
 {
-	[ApplyAutoValidation]
+	// [ApplyAutoValidation]
 	public sealed class DeleteFileCommand : CommandBase<FileInfo>
 	{
-		public static DeleteFileCommand Default { get; } = new DeleteFileCommand();
-		DeleteFileCommand() : base( FileSystemInfoExistsSpecification.Default ) {}
+		public static ICommand<FileInfo> Default { get; } = new DeleteFileCommand().Apply( FileSystemInfoExistsSpecification.Default );
+		DeleteFileCommand() {}
 
 		public override void Execute( FileInfo parameter ) => parameter.Delete();
 	}

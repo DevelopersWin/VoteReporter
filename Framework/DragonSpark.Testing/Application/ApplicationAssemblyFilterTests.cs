@@ -1,15 +1,15 @@
 ﻿using DragonSpark.Application;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.TypeSystem;
 using Moq;
 using System.Collections.Immutable;
 using System.Composition;
-using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 using AutoDataAttribute = Ploeh.AutoFixture.Xunit2.AutoDataAttribute;
 
-namespace DragonSpark.Testing.TypeSystem
+namespace DragonSpark.Testing.Application
 {
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested]
 	public class ApplicationAssemblyFilterTests

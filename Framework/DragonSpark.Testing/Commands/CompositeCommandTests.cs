@@ -2,7 +2,7 @@
 using DragonSpark.Extensions;
 using Xunit;
 
-namespace DragonSpark.Testing.Runtime
+namespace DragonSpark.Testing.Commands
 {
 	public class CompositeCommandTests
 	{

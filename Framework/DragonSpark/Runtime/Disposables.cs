@@ -1,20 +1,29 @@
-using System;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
+using System;
 
 namespace DragonSpark.Runtime
 {
-	public sealed class Disposables : RepositoryBase<IDisposable>, IDisposable
-	{
-		readonly IDisposable disposable;
+	public interface IDisposables : IRepository<IDisposable>, IDisposable {}
 
-		public static ISource<Disposables> Default { get; } = new Scope<Disposables>( Factory.GlobalCache( () => new Disposables() ) );
-		Disposables() : base( new PurgingCollection<IDisposable>() )
+	public sealed class Disposables : Scope<IDisposables>, IComposable<IDisposable>
+	{
+		public static Disposables Default { get; } = new Disposables();
+		Disposables() : base( Factory.GlobalCache( () => new Repository() ) ) {}
+
+		sealed class Repository : RepositoryBase<IDisposable>, IDisposables
 		{
-			disposable = new DelegatedDisposable( OnDispose );
+			readonly IDisposable disposable;
+
+			public Repository() : base( new PurgingCollection<IDisposable>() )
+			{
+				disposable = new DelegatedDisposable( OnDispose );
+			}
+
+			void OnDispose() => List().Each( entry => entry.Dispose() );
+			public void Dispose() => disposable.Dispose();
 		}
 
-		void OnDispose() => List().Each( entry => entry.Dispose() );
-		public void Dispose() => disposable.Dispose();
+		public void Add( IDisposable instance ) => Default.Get().Add( instance );
 	}
 }

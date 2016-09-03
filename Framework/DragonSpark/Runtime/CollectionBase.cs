@@ -36,7 +36,13 @@ namespace DragonSpark.Runtime
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-		public void Add( T item ) => Source.Add( item );
+		public void Add( T item )
+		{
+			lock ( Source )
+			{
+				Source.Add( item );
+			}
+		}
 
 		public void Insert( T item ) => list.Insert( 0, item );
 

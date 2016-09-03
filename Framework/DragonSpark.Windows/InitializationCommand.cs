@@ -11,7 +11,7 @@ namespace DragonSpark.Windows
 	{
 		public InitializationCommand() : base( Priority.BeforeNormal,
 			DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured( TypeDefinitionProviderSource.Default.ToCachedDelegate() ),
-			DragonSpark.TypeSystem.Configuration.ApplicationAssemblyLocator.Configured( ApplicationAssemblyLocator.Default.ToSourceDelegate().GlobalCache() )
+			DragonSpark.TypeSystem.Configuration.ApplicationAssemblyLocator.Configured( ApplicationAssemblyLocator.Default.ToSourceDelegate() )
 		)
 		{}
 	}

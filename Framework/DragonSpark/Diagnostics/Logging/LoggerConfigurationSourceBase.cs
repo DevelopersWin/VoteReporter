@@ -1,3 +1,4 @@
+using DragonSpark.Commands;
 using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logging.Configurations;
 using DragonSpark.Extensions;

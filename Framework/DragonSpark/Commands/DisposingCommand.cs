@@ -1,6 +1,5 @@
-using System;
 using DragonSpark.Extensions;
-using DragonSpark.Specifications;
+using System;
 
 namespace DragonSpark.Commands
 {
@@ -8,9 +7,7 @@ namespace DragonSpark.Commands
 	{
 		readonly Action onDispose;
 
-		protected DisposingCommand() : this( Specifications<T>.Assigned ) {}
-
-		protected DisposingCommand( ISpecification<T> specification ) : base( specification )
+		protected DisposingCommand()
 		{
 			onDispose = OnDispose;
 		}

@@ -1,3 +1,4 @@
+using DragonSpark.Commands;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;

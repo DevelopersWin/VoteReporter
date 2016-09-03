@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace DragonSpark.Testing.Diagnostics
+namespace DragonSpark.Testing.Diagnostics.Exceptions
 {
 	public class PoliciesTests
 	{
@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Diagnostics
 		[Fact]
 		public void AppliedCommand()
 		{
-			var policy = Retry.Create( Sources.Parameterized.Extensions.Fixed( new RetryPolicyParameterSource<CustomException>( i => TimeSpan.Zero ), 3 ) );
+			var policy = Retry.Create( DragonSpark.Sources.Parameterized.Extensions.Fixed( new RetryPolicyParameterSource<CustomException>( i => TimeSpan.Zero ), 3 ) );
 			var command = new Command();
 			var applied = command.Apply( policy );
 			var history = LoggingHistory.Default.Get();

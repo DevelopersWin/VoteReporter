@@ -5,6 +5,6 @@ namespace DragonSpark.Diagnostics
 {
 	public class DelegatedTextCommand : DelegatedCommand<string>
 	{
-		public DelegatedTextCommand( Action<string> action ) : base( action, Specifications.Specifications.Always ) {}
+		public DelegatedTextCommand( Action<string> action ) : base( action ) {}
 	}
 }

@@ -14,14 +14,13 @@ namespace DragonSpark.Sources.Parameterized
 
 		public override TResult Get( TParameter parameter )
 		{
-			var isSatisfiedBy = Validate( parameter );
-			var result = isSatisfiedBy ? base.Get( parameter ) : default(TResult);
+			var validated = Validate( parameter );
+			var result = validated ? base.Get( parameter ) : default(TResult);
 			return result;
 		}
 
 		protected virtual bool Validate( TParameter parameter ) => IsSatisfiedBy( parameter );
 
 		public bool IsSatisfiedBy( TParameter parameter ) => specification.IsSatisfiedBy( parameter );
-		// bool ISpecification.IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
 	}
 }

@@ -1,14 +1,13 @@
 ﻿using DragonSpark.Commands;
 using DragonSpark.Diagnostics.Logging;
-using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using Xunit;
 using Defaults = DragonSpark.Sources.Defaults;
 
-namespace DragonSpark.Testing.Diagnostics
+namespace DragonSpark.Testing.Sources
 {
-	public class TimedDelegateTests
+	public class TimedDelegatedSourceTests
 	{
 		[Fact]
 		public void VerifySource()

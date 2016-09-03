@@ -1,11 +1,10 @@
+using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Markup;
-using DragonSpark.Extensions;
-using DragonSpark.Specifications;
-using DragonSpark.TypeSystem;
 
 namespace DragonSpark.Commands
 {
@@ -13,16 +12,13 @@ namespace DragonSpark.Commands
 	{
 		public CompositeCommand() : this( Items<ICommand>.Default ) {}
 
-		public CompositeCommand( params ICommand[] commands ) : this( Specifications.Specifications.Always, commands ) {}
-		public CompositeCommand( ISpecification<object> specification, params ICommand[] commands ) : base( specification, commands ) {}
+		public CompositeCommand( params ICommand[] commands ) : base( commands ) {}
 	}
 
 	[ContentProperty( nameof(Commands) )]
 	public class CompositeCommand<T> : DisposingCommand<T>
 	{
-		public CompositeCommand( params ICommand[] commands ) : this( Specifications<T>.Always, commands ) {}
-
-		public CompositeCommand( ISpecification<T> specification, params ICommand[] commands ) : base( specification )
+		public CompositeCommand( params ICommand[] commands )
 		{
 			Commands = new CommandCollection( commands );
 		}

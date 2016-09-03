@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Commands;
+using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Objects;
@@ -6,17 +7,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace DragonSpark.Testing.Runtime.Values
+namespace DragonSpark.Testing.Sources.Parameterized.Caching
 {
-	public class AmbientStackPropertyTests
+	public class AmbientStackTests
 	{
 		readonly Stacks<Class> cache = new Stacks<Class>();
-
-		/*IStack<Class> GetStack() => property.Get( Execution.Current );
-
-		IEnumerable<Class> Items() => GetStack().All().ToArray();
-
-		Class GetItem() => GetStack().Peek();*/
 
 		[Fact]
 		public void ContextAsExpected()

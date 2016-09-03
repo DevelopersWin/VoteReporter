@@ -1,4 +1,4 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Commands;
 
 namespace DevelopersWin.VoteReporter.Application
 {

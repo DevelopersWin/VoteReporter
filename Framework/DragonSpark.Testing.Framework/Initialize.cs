@@ -1,5 +1,5 @@
 using DragonSpark.Application.Setup;
-using DragonSpark.Extensions;
+using DragonSpark.Commands;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Framework.Runtime;
 using PostSharp.Aspects;

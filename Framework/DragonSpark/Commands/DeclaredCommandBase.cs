@@ -5,7 +5,7 @@ namespace DragonSpark.Commands
 {
 	public abstract class DeclaredCommandBase<T> : CommandBase<object>
 	{
-		protected DeclaredCommandBase( T parameter = default(T) ) : base( Specifications.Specifications.Always )
+		protected DeclaredCommandBase( T parameter = default(T) )
 		{
 			if ( parameter.IsAssigned() )
 			{

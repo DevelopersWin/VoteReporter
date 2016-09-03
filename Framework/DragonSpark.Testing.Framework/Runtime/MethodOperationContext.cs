@@ -1,5 +1,5 @@
+using DragonSpark.Commands;
 using DragonSpark.Diagnostics.Logging;
-using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using System;
 using System.Reflection;
@@ -9,7 +9,7 @@ namespace DragonSpark.Testing.Framework.Runtime
 {
 	public sealed class MethodOperationContext : InitializedDisposableAction
 	{
-		readonly static Action Run = PurgeLoggerMessageHistoryCommand.Default.Fixed( Output.Default.Get ).Run;
+		readonly static Action Run = PurgeLoggerMessageHistoryCommand.Default.Fixed( Output.Default.Get ).ToRunDelegate();
 
 		readonly IDisposable disposable;
 
