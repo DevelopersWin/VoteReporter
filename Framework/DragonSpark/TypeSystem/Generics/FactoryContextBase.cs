@@ -7,6 +7,6 @@ namespace DragonSpark.TypeSystem.Generics
 {
 	public abstract class FactoryContextBase : DelegateCreationContextBase<Invoke>
 	{
-		protected FactoryContextBase( Func<MethodInfo, Invoke> creator, IEnumerable<MethodInfo> methods ) : base( creator, methods, info => info.ReturnType != typeof(void) ) {}
+		protected FactoryContextBase( Func<MethodInfo, Invoke> creator, IEnumerable<MethodInfo> methods ) : base( creator, methods, info => info.ReturnType != Defaults.Void ) {}
 	}
 }

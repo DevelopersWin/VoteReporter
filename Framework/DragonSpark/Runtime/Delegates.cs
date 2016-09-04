@@ -8,6 +8,8 @@ namespace DragonSpark.Runtime
 	public static class Extensions
 	{
 		public static Delegate GetReference( this Delegate @this ) => Delegates.Default.Get( @this.Target ).Get( @this.GetMethodInfo() );
+
+		public static Delegate GetDelegate( this object @this, string methodName ) => Delegates.Default.Get( @this ).Get( @this.GetType().GetMethod( methodName ) );
 	}
 
 	public sealed class Delegates : Cache<ICache<MethodInfo, Delegate>>

@@ -7,6 +7,6 @@ namespace DragonSpark.TypeSystem.Generics
 {
 	public abstract class ActionContextBase : DelegateCreationContextBase<Execute>
 	{
-		protected ActionContextBase( Func<MethodInfo, Execute> creator, IEnumerable<MethodInfo> methods ) : base( creator, methods, info => info.ReturnType == typeof(void) ) {}
+		protected ActionContextBase( Func<MethodInfo, Execute> creator, IEnumerable<MethodInfo> methods ) : base( creator, methods, info => info.ReturnType == Defaults.Void ) {}
 	}
 }
