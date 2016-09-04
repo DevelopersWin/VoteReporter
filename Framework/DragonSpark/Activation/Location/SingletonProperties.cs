@@ -22,7 +22,8 @@ namespace DragonSpark.Activation.Location
 		{
 			foreach ( var property in parameter.GetTypeInfo().DeclaredProperties.Fixed() )
 			{
-				if ( specification.IsSatisfiedBy( new SingletonRequest( parameter, property ) ) )
+				var isSatisfiedBy = specification.IsSatisfiedBy( new SingletonRequest( parameter, property ) );
+				if ( isSatisfiedBy )
 				{
 					return property;
 				}

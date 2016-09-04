@@ -95,29 +95,5 @@ namespace DragonSpark.Aspects
 
 			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = cache.GetOrSet( args.Arguments.ToArray(), args.GetReturnValue );
 		}
-
-		/*class CacheParameterConstructor<TKey, T> : FactoryBase<InstanceMethod, T> where T : class
-		{
-			//readonly static Func<InstanceMethod, IArgumentCache<TKey, object>> DefaultCacheSource = RegisteredCacheFactory<TKey, object>.Default.Create;
-
-			readonly Func<InstanceMethod, IArgumentCache<TKey, object>> cacheSource;
-			readonly Func<IArgumentCache<TKey, object>, T> factory;
-
-			public static CacheParameterConstructor<TKey, T> Default { get; } = new CacheParameterConstructor<TKey, T>();
-			CacheParameterConstructor() : this( DefaultCacheSource, ParameterConstructor<IArgumentCache<TKey, object>, T>.Default ) {}
-
-			CacheParameterConstructor( Func<InstanceMethod, IArgumentCache<TKey, object>> cacheSource, Func<IArgumentCache<TKey, object>, T> factory )
-			{
-				this.cacheSource = cacheSource;
-				this.factory = factory;
-			}
-
-			public override T Create( InstanceMethod parameter )
-			{
-				var cache = cacheSource( parameter );
-				var result = factory( cache );
-				return result;
-			}
-		}*/
 	}
 }

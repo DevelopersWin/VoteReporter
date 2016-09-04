@@ -6,6 +6,7 @@ using DragonSpark.TypeSystem.Generics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -128,31 +129,6 @@ namespace DragonSpark.Sources.Parameterized
 			}
 		}
 
-		/*public static IValidatedParameterizedSource<TParameter, TResult> Cast<TParameter, TResult>( this IValidatedParameterizedSource @this ) => @this as IValidatedParameterizedSource<TParameter, TResult> ?? Casted<TParameter, TResult>.Default.Get( @this );
-		sealed class Casted<TParameter, TResult> : Cache<IValidatedParameterizedSource, IValidatedParameterizedSource<TParameter, TResult>>
-		{
-			public static Casted<TParameter, TResult> Default { get; } = new Casted<TParameter, TResult>();
-			Casted() : base( result => new CastedFactory( result ) ) {}
-
-			class CastedFactory : ValidatedParameterizedSourceBase<TParameter, TResult>
-			{
-				readonly IValidatedParameterizedSource inner;
-				public CastedFactory( IValidatedParameterizedSource inner ) : base( inner.ToSpecification().Cast<TParameter>() )
-				{
-					this.inner = inner;
-				}
-
-				public override TResult Get( TParameter parameter ) => (TResult)inner.Get( parameter );
-			}
-		}*/
-
-		/*public static Func<object> ToDelegate( this ISource @this ) => SourceDelegates.Default.Get( @this );
-		sealed class SourceDelegates : Cache<ISource, Func<object>>
-		{
-			public static SourceDelegates Default { get; } = new SourceDelegates();
-			SourceDelegates() : base( factory => factory.Get ) {}
-		}*/
-
 		public static Func<T> ToDelegate<T>( this ISource<T> @this ) => ParameterizedSourceDelegates<T>.Default.Get( @this );
 		sealed class ParameterizedSourceDelegates<T> : Cache<ISource<T>, Func<T>>
 		{
@@ -160,19 +136,15 @@ namespace DragonSpark.Sources.Parameterized
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		/*public static Func<object, object> ToSourceDelegate( this IParameterizedSource @this ) => ParameterizedSourceDelegates.Default.Get( @this );
-		sealed class ParameterizedSourceDelegates : Cache<IParameterizedSource, Func<object, object>>
-		{
-			public static ParameterizedSourceDelegates Default { get; } = new ParameterizedSourceDelegates();
-			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
-		}*/
-
 		public static Func<TParameter, TResult> ToSourceDelegate<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) => ParameterizedSourceDelegates<TParameter, TResult>.Default.Get( @this );
 		sealed class ParameterizedSourceDelegates<TParameter, TResult> : Cache<IParameterizedSource<TParameter, TResult>, Func<TParameter, TResult>>
 		{
 			public static ParameterizedSourceDelegates<TParameter, TResult> Default { get; } = new ParameterizedSourceDelegates<TParameter, TResult>();
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
+
+		public static T Alter<T>( this ImmutableArray<IAlteration<T>> @this, T seed ) => @this.AsEnumerable().Alter( seed );
+		public static T Alter<T>( this IEnumerable<IAlteration<T>> @this, T seed ) => @this.Aggregate( seed, ( current, alteration ) => alteration.Get( current ) );
 
 		public static Alter<T> ToDelegate<T>( this IAlteration<T> @this ) => Selectors<T>.Default.Get( @this );
 		sealed class Selectors<T> : Cache<IAlteration<T>, Alter<T>>
