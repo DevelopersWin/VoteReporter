@@ -38,6 +38,7 @@
     <Compile Include="Activation\IsPublicTypeSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
+    <Compile Include="Aspects\Invocation\InvocationPolicy.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />
     <Compile Include="Commands\SpecificationCommand.cs" />
@@ -489,7 +490,7 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Sources\Parameterized\AssignableParameterizedSourceBase.cs" />
     <Compile Include="Sources\AssignableSourceBase.cs" />
-    <Compile Include="Sources\CacheContains.cs" />
+    <Compile Include="Sources\CacheContainsSpecification.cs" />
     <Compile Include="Sources\CacheValueSpecification.cs" />
     <Compile Include="Sources\Parameterized\Caching\AmbientStack.cs" />
     <Compile Include="Sources\Parameterized\Caching\Cache.cs" />

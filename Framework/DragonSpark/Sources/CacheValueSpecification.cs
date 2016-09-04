@@ -3,7 +3,7 @@ using System;
 
 namespace DragonSpark.Sources
 {
-	public class CacheValueSpecification<TInstance, TValue> : CacheContains<TInstance, TValue> where TInstance : class
+	public class CacheValueSpecification<TInstance, TValue> : CacheContainsSpecification<TInstance, TValue> where TInstance : class
 	{
 		readonly Func<TValue> value;
 
