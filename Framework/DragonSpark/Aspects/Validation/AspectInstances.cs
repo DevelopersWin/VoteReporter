@@ -54,7 +54,7 @@ namespace DragonSpark.Aspects.Validation
 	sealed class AutoValidationTypeSpecification : SpecificationWithContextBase<Type, ImmutableArray<TypeAdapter>>
 	{
 		public static AutoValidationTypeSpecification Default { get; } = new AutoValidationTypeSpecification();
-		AutoValidationTypeSpecification() : this( Defaults.AspectProfiles.Select( profile => profile.SupportedType.Adapt() ).ToImmutableArray() ) {}
+		AutoValidationTypeSpecification() : this( Defaults.AspectProfiles.Select( profile => profile.Method.DeclaringType.Adapt() ).ToImmutableArray() ) {}
 
 		public AutoValidationTypeSpecification( ImmutableArray<TypeAdapter> context ) : base( context ) {}
 

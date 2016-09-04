@@ -38,6 +38,7 @@
     <Compile Include="Activation\IsPublicTypeSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
+    <Compile Include="Aspects\Invocation\ApplyPolicyAttribute.cs" />
     <Compile Include="Aspects\Invocation\AutoValidation.cs" />
     <Compile Include="Aspects\Invocation\InvocationPolicy.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
@@ -109,6 +110,8 @@
     <Compile Include="PriorityAwareLocator.cs" />
     <Compile Include="PriorityComparer.cs" />
     <Compile Include="PriorityExtensions.cs" />
+    <Compile Include="Runtime\Extensions.cs" />
+    <Compile Include="Runtime\MethodDescriptor.cs" />
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />

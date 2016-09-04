@@ -1,27 +1,31 @@
-﻿using System;
-using System.Reflection;
+﻿using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
 {
 	class AspectProfile : ParameterizedSourceBase<Type, MethodInfo>, IAspectProfile
 	{
-		readonly Type declaringType;
-		readonly string methodName;
+		readonly static MethodDescriptor DefaultValidation = new MethodDescriptor( typeof(ISpecification<>), nameof(ISpecification<object>.IsSatisfiedBy) );
+
 		readonly Func<MethodLocator.Parameter, MethodInfo> source;
 
-		public AspectProfile( Type supportedType, string methodName ) : this( supportedType, supportedType, methodName ) {}
-		public AspectProfile( Type supportedType, Type declaringType, string methodName ) : this( supportedType, declaringType, methodName, Defaults.Locator ) {}
-		public AspectProfile( Type supportedType, Type declaringType, string methodName, Func<MethodLocator.Parameter, MethodInfo> source )
+		public AspectProfile( MethodDescriptor method ) : this( method, DefaultValidation ) {}
+
+		public AspectProfile( MethodDescriptor method, MethodDescriptor validation ) : this( method, validation, Defaults.Locator ) {}
+
+		public AspectProfile( MethodDescriptor method, MethodDescriptor validation, Func<MethodLocator.Parameter, MethodInfo> source )
 		{
-			SupportedType = supportedType;
-			this.declaringType = declaringType;
-			this.methodName = methodName;
+			Method = method;
+			Validation = validation;
 			this.source = source;
 		}
 
-		public Type SupportedType { get; }
+		public MethodDescriptor Method { get; }
+		public MethodDescriptor Validation { get; }
 
-		public override MethodInfo Get( Type parameter ) => source( new MethodLocator.Parameter( declaringType, methodName, parameter ) );
+		public override MethodInfo Get( Type parameter ) => source( new MethodLocator.Parameter( Method.DeclaringType, Method.MethodName, parameter ) );
 	}
 }

@@ -1,15 +1,7 @@
-﻿using DragonSpark.Application;
-using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.TypeSystem.Generics;
-using PostSharp.Aspects;
-using PostSharp.Aspects.Configuration;
-using PostSharp.Aspects.Serialization;
 using System;
-using System.Collections.Immutable;
-using System.Windows.Input;
-using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Invocation
 {
@@ -65,33 +57,15 @@ namespace DragonSpark.Aspects.Invocation
 		}
 	}
 
-	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Class )]
-	public class ApplyPolicyAttribute : InstanceLevelAspect
+	public class ApplyAutoValidationAttribute : ApplyPolicyAttribute
 	{
-		readonly static IGenericMethodContext<Execute> Context = typeof(ApplyPolicyAttribute).Adapt().GenericCommandMethods[nameof(Apply)];
-
-		readonly ImmutableArray<Type> policyTypes;
-		public ApplyPolicyAttribute( params Type[] policyTypes )
-		{
-			this.policyTypes = policyTypes.ToImmutableArray();
-		}
-
-		public override void RuntimeInitializeInstance()
-		{
-			foreach ( var decorator in policyTypes.SelectAssigned( Activator.Default.Get ) )
-			{
-				Context.Make( Instance.GetType() ).Invoke( decorator, Instance );
-			}
-		}
-
-		static void Apply<T>( IPolicy<T> decorator, T instance ) => decorator.Apply( instance );
+		public ApplyAutoValidationAttribute() : base( typeof(AutoValidationPolicy) ) {}
 	}
 
-	sealed class AutoValidationPolicy : PolicyBase<ICommand>
+	public sealed class AutoValidationPolicy : PolicyBase<object>
 	{
 		public static AutoValidationPolicy Default { get; } = new AutoValidationPolicy();
-		AutoValidationPolicy() : this( AutoValidationControllerFactory.Default.Get, Repositories<object, bool>.Default.Get, Repositories<object>.Default.Get ) {}
+		AutoValidationPolicy() : this( Defaults.ControllerSource, Repositories<object, bool>.Default.Get, Repositories<object>.Default.Get ) {}
 
 		readonly Func<object, IAutoValidationController> controllerSource;
 		readonly Func<Delegate, IDecoratorRepository<object, bool>> specificationSource;
@@ -104,15 +78,18 @@ namespace DragonSpark.Aspects.Invocation
 			this.executorSource = executorSource;
 		}
 
-		public override void Apply( ICommand parameter )
+		public override void Apply( object parameter )
 		{
 			var controller = controllerSource( parameter );
 
-			var specification = parameter.GetDelegate<ICommand>( nameof(ICommand.CanExecute) );
-			specificationSource( specification ).Add( new AutoValidationValidator( controller ) );
+			foreach ( var profile in Defaults.AspectProfiles.Introduce( parameter.GetType(), tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ) )
+			{
+				var specification = parameter.GetDelegate( profile.Validation );
+				specificationSource( specification ).Add( new AutoValidationValidator( controller ) );
 
-			var execute = parameter.GetDelegate<ICommand>( nameof(ICommand.Execute) );
-			executorSource( execute ).Add( new AutoValidationExecutor( controller ) );
+				var execute = parameter.GetDelegate( profile.Method );
+				executorSource( execute ).Add( new AutoValidationExecutor( controller ) );
+			}
 		}
 	}
 }

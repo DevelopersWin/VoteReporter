@@ -48,7 +48,7 @@ namespace DragonSpark.Testing.Aspects.Invocation
 			Assert.Equal( 4, applied.CanExecuteCalled );
 		}
 
-		[UsedImplicitly, ApplyPolicy( typeof(AutoValidationPolicy) )]
+		[UsedImplicitly, ApplyAutoValidation]
 		class Command : ICommand
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
