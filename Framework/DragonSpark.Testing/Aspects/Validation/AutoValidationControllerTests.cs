@@ -1,4 +1,6 @@
-﻿using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Aspects.Invocation;
+using DragonSpark.Aspects.Validation;
+using DragonSpark.Commands;
 using System;
 using System.Windows.Input;
 using Xunit;
@@ -26,14 +28,19 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( 3, command.CanExecuteCalled );
 			
 			Assert.Equal( 0, command.ExecuteCalled );
+
+			command.Execute( 123 );
+
+			Assert.Equal( 4, command.CanExecuteCalled );
+			Assert.Equal( 0, command.ExecuteCalled );
 			
 			command.Execute( valid );
-			Assert.Equal( 3, command.CanExecuteCalled );
+			Assert.Equal( 5, command.CanExecuteCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( valid, command.LastResult.GetValueOrDefault() );
 		}
 
-		/*[Fact]
+		[Fact]
 		public void GenericCommandWorkflow()
 		{
 			var command = new GenericCommand();
@@ -75,7 +82,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			command.Execute( 123 );
 			/*Assert.False( controller.IsValid( 123 ) );
-			Assert.False( controller.IsValid( 6776 ) );#1#
+			Assert.False( controller.IsValid( 6776 ) );*/
 
 			Assert.Equal( 6, command.CanExecuteCalled );
 			Assert.Equal( 4, command.CanExecuteGenericCalled );
@@ -86,7 +93,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			command.Execute( 6776 );
 
 			Assert.Equal( 6, command.CanExecuteCalled );
-			Assert.Equal( 5, command.CanExecuteGenericCalled );
+			Assert.Equal( 4, command.CanExecuteGenericCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( 1, command.ExecuteGenericCalled );
 
@@ -97,7 +104,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.False( command.IsSatisfiedBy( parameter ) );
 			
 			Assert.Equal( 6, command.CanExecuteCalled );
-			Assert.Equal( 6, command.CanExecuteGenericCalled );
+			Assert.Equal( 5, command.CanExecuteGenericCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( 1, command.ExecuteGenericCalled );
 
@@ -105,14 +112,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.True( command.IsSatisfiedBy( validGeneric ) );
 
 			Assert.Equal( 6, command.CanExecuteCalled );
-			Assert.Equal( 7, command.CanExecuteGenericCalled );
+			Assert.Equal( 6, command.CanExecuteGenericCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( 1, command.ExecuteGenericCalled );
 
 			command.Execute( validGeneric );
 
 			Assert.Equal( 6, command.CanExecuteCalled );
-			Assert.Equal( 7, command.CanExecuteGenericCalled );
+			Assert.Equal( 6, command.CanExecuteGenericCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( 2, command.ExecuteGenericCalled );
 
@@ -128,10 +135,10 @@ namespace DragonSpark.Testing.Aspects.Validation
 			command.Execute( valid );
 			Assert.Equal( 3, command.CanExecuteCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
-			Assert.Equal( valid, command.LastResult.GetValueOrDefault() );#1#
-		}*/
+			Assert.Equal( valid, command.LastResult.GetValueOrDefault() );*/
+		}
 
-		[ApplyAutoValidation]
+		[DragonSpark.Aspects.Invocation.ApplyAutoValidation]
 		class Command : ICommand
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
@@ -142,12 +149,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			public int? LastResult { get; private set; }
 
+			[ApplyDecorations]
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
 				return parameter is int && (int)parameter == 1212;
 			}
 
+			[ApplyDecorations]
 			public void Execute( object parameter )
 			{
 				ExecuteCalled++;
@@ -155,7 +164,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			}
 		}
 
-		/*[ApplyAutoValidation]
+		[DragonSpark.Aspects.Invocation.ApplyAutoValidation]
 		class GenericCommand : ICommand<GenericCommand.Parameter>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
@@ -168,12 +177,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			public Parameter LastResult { get; private set; }
 
+			[ApplyDecorations]
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
 				return parameter is int && IsSatisfiedBy( new Parameter( (int)parameter ) );
 			}
 
+			[ApplyDecorations]
 			public void Execute( object parameter )
 			{
 				ExecuteCalled++;
@@ -182,12 +193,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			// bool IValidationAware.ShouldValidate() => false;
 
+			[ApplyDecorations]
 			public bool IsSatisfiedBy( Parameter parameter )
 			{
 				CanExecuteGenericCalled++;
 				return parameter.Number == 6776;
 			}
 
+			[ApplyDecorations]
 			public void Execute( Parameter parameter )
 			{
 				ExecuteGenericCalled++;
@@ -205,8 +218,6 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 				public int Number { get; }
 			}
-
-			public bool IsSatisfiedBy( object parameter ) => CanExecute( parameter );
-		}*/
+		}
 	}
 }

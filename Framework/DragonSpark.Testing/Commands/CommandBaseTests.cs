@@ -20,13 +20,6 @@ namespace DragonSpark.Testing.Commands
 			sut.Update();
 			Assert.True( called, "Didn't call" );
 		}
-
-		/*[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
-		public void CallWithNonContext( Command<SetupCommandTests> sut )
-		{
-			var context = new object();
-			Assert.Throws<InvalidOperationException>( () => sut.To<ICommand>().Execute( context ) );
-		}*/
 	}
 
 	public class Command : Command<object> {}

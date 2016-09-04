@@ -2,6 +2,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using System;
+using System.Linq;
 
 namespace DragonSpark.Aspects.Invocation
 {
@@ -82,7 +83,8 @@ namespace DragonSpark.Aspects.Invocation
 		{
 			var controller = controllerSource( parameter );
 
-			foreach ( var profile in Defaults.AspectProfiles.Introduce( parameter.GetType(), tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ) )
+			var profiles = Defaults.AspectProfiles.Introduce( parameter.GetType(), tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ).ToArray();
+			foreach ( var profile in profiles )
 			{
 				var specification = parameter.GetDelegate( profile.Validation );
 				specificationSource( specification ).Add( new AutoValidationValidator( controller ) );

@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Commands;
+using DragonSpark.Specifications;
 using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
@@ -64,9 +65,16 @@ namespace DragonSpark.Aspects.Validation
 
 	public class CommandAdapter<T> : ParameterValidationAdapterBase<T>
 	{
+		readonly IParameterValidationAdapter general;
 		readonly static MethodInfo Method = typeof(ICommand<T>).GetTypeInfo().GetDeclaredMethod( nameof(ICommand<T>.Execute) );
 
-		public CommandAdapter( ICommand<T> inner ) : base( inner, Method ) {}
+		public CommandAdapter( ICommand<T> inner ) : this( inner, new CommandAdapter( inner ) ) {}
+		CommandAdapter( ISpecification<T> inner, IParameterValidationAdapter general ) : base( inner, Method )
+		{
+			this.general = general;
+		}
+
+		public override bool IsSatisfiedBy( object parameter ) => base.IsSatisfiedBy( parameter ) || general.IsSatisfiedBy( parameter );
 	}
 
 	/*public interface IAutoValidationController
