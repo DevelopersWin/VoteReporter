@@ -10,7 +10,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Composition
 {
-	public class ExportedContainerConfiguratorTests
+	public class ExportMappingConfiguratorTests
 	{
 		[Fact]
 		public void Verify()

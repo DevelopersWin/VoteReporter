@@ -38,6 +38,7 @@
     <Compile Include="Activation\IsPublicTypeSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
+    <Compile Include="Aspects\Invocation\AutoValidation.cs" />
     <Compile Include="Aspects\Invocation\InvocationPolicy.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />

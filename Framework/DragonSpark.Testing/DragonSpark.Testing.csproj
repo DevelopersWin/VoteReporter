@@ -58,7 +58,7 @@
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
-    <Compile Include="Aspects\Invocation\ApplyPoliciesAttributeTests.cs" />
+    <Compile Include="Aspects\Invocation\ApplyDecorationsAttributeTests.cs" />
     <Compile Include="Aspects\Validation\AutoValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="Commands\CommandBaseTests.cs" />
@@ -67,7 +67,7 @@
     <Compile Include="ComponentModel\SingletonDefaultValueProviderTests.cs" />
     <Compile Include="Composition\ConstructorSelectorTests.cs" />
     <Compile Include="Composition\ConventionTests.cs" />
-    <Compile Include="Composition\ExportedContainerConfiguratorTests.cs" />
+    <Compile Include="Composition\ExportMappingConfiguratorTests.cs" />
     <Compile Include="Composition\ParameterizedSourceDelegateExporterTests.cs" />
     <Compile Include="Composition\SingletonExportDescriptorProviderTests.cs" />
     <Compile Include="Composition\SourceDelegateExporterTests.cs" />
@@ -101,7 +101,7 @@
     <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
     <Compile Include="Diagnostics\FormatterTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggerTests.cs" />
-    <Compile Include="Diagnostics\MessageRecorderTests.cs" />
+    <Compile Include="Diagnostics\Logging\LoggerHistorySinkTests.cs" />
     <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
     <Compile Include="Extensions\AssemblyExtensionsTests.cs" />
     <Compile Include="Extensions\BooleanExtensionsTests.cs">
@@ -128,7 +128,6 @@
     <Compile Include="Extensions\ReflectionExtensionsTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Extensions\TypeAdapterCachesTests.cs" />
     <Compile Include="Extensions\WeakReferenceListExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

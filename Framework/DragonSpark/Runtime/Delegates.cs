@@ -9,7 +9,12 @@ namespace DragonSpark.Runtime
 	{
 		public static Delegate GetReference( this Delegate @this ) => Delegates.Default.Get( @this.Target ).Get( @this.GetMethodInfo() );
 
-		public static Delegate GetDelegate( this object @this, string methodName ) => Delegates.Default.Get( @this ).Get( @this.GetType().GetMethod( methodName ) );
+		public static Delegate GetDelegate<T>( this object @this, string methodName )
+		{
+			var method = @this.GetType().Adapt().GetMappedMethods<T>().Introduce( methodName, tuple => tuple.Item1.InterfaceMethod.Name == tuple.Item2 ).Only().MappedMethod;
+			var result = Delegates.Default.Get( @this ).Get( method );
+			return result;
+		}
 	}
 
 	public sealed class Delegates : Cache<ICache<MethodInfo, Delegate>>

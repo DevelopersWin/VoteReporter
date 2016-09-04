@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
-	public class AssemblyProviderTests
+	public class FileSystemTypesTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData, Trait( Traits.Category, Traits.Categories.FileSystem )]
 		public void Assemblies( FileSystemTypes sut )

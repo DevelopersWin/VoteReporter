@@ -1,14 +1,22 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using System;
-using System.Reflection;
 
 namespace DragonSpark.Composition
 {
 	sealed class MappedConventionLocator : AlterationBase<Type>
 	{
 		public static MappedConventionLocator Default { get; } = new MappedConventionLocator();
-		MappedConventionLocator() {}
+		MappedConventionLocator() : this( CanActivateSpecification.Default ) {}
+
+		readonly ISpecification<Type> specification;
+
+		MappedConventionLocator( ISpecification<Type> specification )
+		{
+			this.specification = specification;
+		}
 
 		public override Type Get( Type parameter )
 		{
@@ -17,10 +25,10 @@ namespace DragonSpark.Composition
 			return result;
 		}
 
-		static Type Get( Type parameter, string name )
+		Type Get( Type parameter, string name )
 		{
 			var type = parameter.Assembly().GetType( name );
-			var result = parameter.GetTypeInfo().IsGenericTypeDefinition == type.GetTypeInfo().IsGenericTypeDefinition ? type : null;
+			var result = type != null && specification.IsSatisfiedBy( type ) ? type : null;
 			return result;
 		}
 	}

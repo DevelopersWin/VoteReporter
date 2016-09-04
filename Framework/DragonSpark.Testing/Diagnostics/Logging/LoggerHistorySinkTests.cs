@@ -5,9 +5,9 @@ using Serilog;
 using Serilog.Events;
 using Xunit;
 
-namespace DragonSpark.Testing.Diagnostics
+namespace DragonSpark.Testing.Diagnostics.Logging
 {
-	public class MessageRecorderTests
+	public class LoggerHistorySinkTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Message( LoggerHistorySink sut, string message )

@@ -18,42 +18,15 @@ namespace DragonSpark.Aspects.Invocation
 {
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[LinesOfCodeAvoided( 10 ), AttributeUsage( AttributeTargets.Method )]
-	public sealed class DecoratedAttribute : MethodInterceptionAspect
+	public sealed class ApplyDecorationsAttribute : MethodInterceptionAspect
 	{
 		readonly IParameterizedSource<ValueTuple<object, MethodInfo>, PolicyReference?> cache;
 
-		public DecoratedAttribute() : this( new Cache() ) {}
+		public ApplyDecorationsAttribute() : this( new Cache() ) {}
 
-		public DecoratedAttribute( IParameterizedSource<ValueTuple<object, MethodInfo>, PolicyReference?> cache )
+		ApplyDecorationsAttribute( IParameterizedSource<ValueTuple<object, MethodInfo>, PolicyReference?> cache )
 		{
 			this.cache = cache;
-		}
-
-		
-		sealed class Cache : ArgumentCache<ValueTuple<object, MethodInfo>, PolicyReference?>
-		{
-			public Cache() : base( Create ) {}
-
-			static PolicyReference? Create( ValueTuple<object, MethodInfo> parameter )
-			{
-				var @delegate = Delegates.Default.Get( parameter.Item1 ).Get( parameter.Item2 );
-				var policy = Policies.Default.Get( @delegate );
-				var isSatisfiedBy = policy.IsSatisfiedBy( @delegate );
-				var result = isSatisfiedBy ? new PolicyReference?( new PolicyReference( @delegate, policy ) ) : null;
-				return result;
-			}
-		}
-
-		public struct PolicyReference
-		{
-			public PolicyReference( Delegate @delegate, IPolicy policy )
-			{
-				Delegate = @delegate;
-				Policy = policy;
-			}
-
-			public Delegate Delegate { get; }
-			public IPolicy Policy { get; }
 		}
 
 		public override void OnInvoke( MethodInterceptionArgs args )
@@ -64,30 +37,56 @@ namespace DragonSpark.Aspects.Invocation
 			{
 				var reference = item.Value;
 				var parameter = new PolicyParameter( reference.Delegate, /*args.Method,*/ args.Arguments, args.GetReturnValue, args.Arguments.GetArgument( 0 ) );
-				reference.Policy.Execute( parameter );
+				reference.DecoratorApplicator.Execute( parameter );
 			}
 			else
 			{
 				base.OnInvoke( args );
 			}
 		}
+
+		sealed class Cache : ArgumentCache<ValueTuple<object, MethodInfo>, PolicyReference?>
+		{
+			public Cache() : base( Create ) {}
+
+			static PolicyReference? Create( ValueTuple<object, MethodInfo> parameter )
+			{
+				var @delegate = Delegates.Default.Get( parameter.Item1 ).Get( parameter.Item2 );
+				var policy = Applicators.Default.Get( @delegate );
+				var isSatisfiedBy = policy.IsSatisfiedBy( @delegate );
+				var result = isSatisfiedBy ? new PolicyReference?( new PolicyReference( @delegate, policy ) ) : null;
+				return result;
+			}
+		}
+
+		struct PolicyReference
+		{
+			public PolicyReference( Delegate @delegate, IDecoratorApplicator decoratorApplicator )
+			{
+				Delegate = @delegate;
+				DecoratorApplicator = decoratorApplicator;
+			}
+
+			public Delegate Delegate { get; }
+			public IDecoratorApplicator DecoratorApplicator { get; }
+		}
 	}
 
-	public sealed class Policies : FactoryCache<Delegate, IPolicy>
+	public sealed class Applicators : FactoryCache<Delegate, IDecoratorApplicator>
 	{
-		readonly static Type Definition = typeof(Policy<,>);
+		readonly static Type Definition = typeof(DecoratorApplicator<,>);
 
-		public static Policies Default { get; } = new Policies();
-		Policies() : this( SingletonLocator.Default.Get<IPolicy> ) {}
+		public static Applicators Default { get; } = new Applicators();
+		Applicators() : this( SingletonLocator.Default.Get<IDecoratorApplicator> ) {}
 
-		readonly Func<Type, IPolicy> policySource;
+		readonly Func<Type, IDecoratorApplicator> policySource;
 
-		Policies( Func<Type, IPolicy> policySource )
+		Applicators( Func<Type, IDecoratorApplicator> policySource )
 		{
 			this.policySource = policySource;
 		}
 
-		protected override IPolicy Create( Delegate parameter )
+		protected override IDecoratorApplicator Create( Delegate parameter )
 		{
 			var methodInfo = parameter.GetMethodInfo();
 			var type = methodInfo.GetParameterTypes().Single();
@@ -97,21 +96,21 @@ namespace DragonSpark.Aspects.Invocation
 		}
 	}
 
-	public interface IPolicy : IDecorator<PolicyParameter, object>, ISpecification<Delegate> {}
+	public interface IDecoratorApplicator : IDecorator<PolicyParameter, object>, ISpecification<Delegate> {}
 
-	sealed class Policy<TParameter, TResult> : IPolicy
+	sealed class DecoratorApplicator<TParameter, TResult> : IDecoratorApplicator
 	{
 		readonly static Func<Delegate, bool> Specification = Specification<TParameter, TResult>.Default.IsSatisfiedBy;
 
 		[UsedImplicitly]
-		public static Policy<TParameter, TResult> Default { get; } = new Policy<TParameter, TResult>();
-		Policy() : this( Specification, DecoratorFactory<TParameter, TResult>.Default.Get, Repositories<TParameter, TResult>.Default.Get ) {}
+		public static DecoratorApplicator<TParameter, TResult> Default { get; } = new DecoratorApplicator<TParameter, TResult>();
+		DecoratorApplicator() : this( Specification, DecoratorFactory<TParameter, TResult>.Default.Get, Repositories<TParameter, TResult>.Default.Get ) {}
 
 		readonly Func<Delegate, bool> specification;
 		readonly Func<PolicyParameter, IDecorator<TParameter, TResult>> decoratorSource;
 		readonly Func<Delegate, IDecoratorRepository<TParameter, TResult>> repositorySource;
 
-		Policy( Func<Delegate, bool> specification, Func<PolicyParameter, IDecorator<TParameter, TResult>> decoratorSource, Func<Delegate, IDecoratorRepository<TParameter, TResult>> repositorySource )
+		DecoratorApplicator( Func<Delegate, bool> specification, Func<PolicyParameter, IDecorator<TParameter, TResult>> decoratorSource, Func<Delegate, IDecoratorRepository<TParameter, TResult>> repositorySource )
 		{
 			this.specification = specification;
 			this.decoratorSource = decoratorSource;
@@ -154,22 +153,33 @@ namespace DragonSpark.Aspects.Invocation
 	}
 
 	public interface IDecorator<in T> : IDecorator<T, object> {}
-	public interface IDecorator<in TParameter, out TResult>
-	{
-		TResult Execute( TParameter parameter );
-	}
-	public abstract class DecoratorBase<T> : DecoratorBase<T, object> {}
-	public abstract class DecoratorBase<TParameter, TResult> : AlterationBase<IDecorator<TParameter, TResult>> {}
 
-	public abstract class CommandDecoratorBase<T> : IDecorator<T, object>
+	public abstract class CommandDecoratorBase<T> : IDecorator<T>
 	{
-		public abstract void Execute( T parameter );
+		protected abstract void Execute( T parameter );
 
 		object IDecorator<T, object>.Execute( T parameter )
 		{
 			Execute( parameter );
 			return null;
 		}
+	}
+
+	public interface IDecorator<in TParameter, out TResult>
+	{
+		TResult Execute( TParameter parameter );
+	}
+
+	public abstract class DecoratorFactoryBase<T> : DecoratorFactoryBase<T, object> {}
+	public abstract class DecoratorFactoryBase<TParameter, TResult> : AlterationBase<IDecorator<TParameter, TResult>> {}
+
+	public interface IPolicy<in T>
+	{
+		void Apply( T parameter );
+	}
+	public abstract class PolicyBase<T> : IPolicy<T>
+	{
+		public abstract void Apply( T parameter );
 	}
 
 	sealed class DecoratorFactory<TParameter, TResult> : ParameterizedSourceBase<PolicyParameter, IDecorator<TParameter, TResult>>
@@ -208,23 +218,15 @@ namespace DragonSpark.Aspects.Invocation
 		protected Repositories() : base( _ => new Repository<TParameter, TResult>() ) {}
 	}
 
-	/*public static class Repositories<T>
-	{
-		public static Repositories<T, object> Default { get; } = new Repositories<T, object>();
-		
-	}*/
-
 	class Repository<TParameter, TResult> : RepositoryBase<IAlteration<IDecorator<TParameter, TResult>>>, IDecoratorRepository<TParameter, TResult> {}
 
 	public interface IDecoratorRepository<TParameter, TResult> : IRepository<IAlteration<IDecorator<TParameter, TResult>>> {}
 
 	public static class Extensions
 	{
-		public static T Apply<T>( this T @this, IDecorator<T, object> decorator ) => @this.Apply<T, object>( decorator );
-
-		public static TParameter Apply<TParameter, TResult>( this TParameter @this, IDecorator<TParameter, TResult> decorator )
+		public static T Apply<T>( this T @this, IPolicy<T> policy )
 		{
-			decorator.Execute( @this );
+			policy.Apply( @this );
 			return @this;
 		}
 	}

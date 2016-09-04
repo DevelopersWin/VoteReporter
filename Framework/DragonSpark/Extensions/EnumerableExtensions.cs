@@ -125,7 +125,7 @@ namespace DragonSpark.Extensions
 		public static TTo WithFirst<TFrom, TTo>( this IEnumerable<TFrom> @this, Func<TFrom, bool> where, Func<TFrom, TTo> with, Func<TTo> defaultFunction = null ) => @this.WhereAssigned().FirstOrDefault( @where ).With( with, defaultFunction );
 
 		public static T Only<T>( this IEnumerable<T> @this ) => Only( @this, Where<T>.Always );
-
+		public static T Only<T>( this ImmutableArray<T> @this, Func<T, bool> where ) => @this.AsEnumerable().Only( where );
 		public static T Only<T>( this IEnumerable<T> @this, Func<T, bool> where )
 		{
 			var enumerable = @this.Where( where ).ToArray();
