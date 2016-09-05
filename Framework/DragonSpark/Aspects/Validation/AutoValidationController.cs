@@ -53,13 +53,23 @@ namespace DragonSpark.Aspects.Validation
 				return handled;
 			}
 
-			var result = IsMarked( parameter ) || validator.IsSatisfiedBy( parameter ) ? proceed() : null;
+			var result = IsMarked( parameter ) || Validate( parameter ) ? proceed() : null;
 			Clear();
 			return result;
 		}
 
+		bool Validate( object parameter )
+		{
+			Enabled = false;
+			var result = validator.IsSatisfiedBy( parameter );
+			Enabled = true;
+			return result;
+		}
+
 		IParameterAwareHandler Handler { get; set; }
-		
+
+		public bool Enabled { get; set; } = true;
+
 		public void Register( IAspect aspect )
 		{
 			var methodAware = aspect as IMethodAware;

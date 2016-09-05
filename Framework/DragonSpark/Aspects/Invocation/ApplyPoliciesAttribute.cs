@@ -10,13 +10,13 @@ namespace DragonSpark.Aspects.Invocation
 {
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Class )]
-	public class ApplyPolicyAttribute : InstanceLevelAspect
+	public class ApplyPoliciesAttribute : InstanceLevelAspect
 	{
 		readonly static Func<Type, IPolicy> Create = Activator.Default.Get<IPolicy>;
 
 		readonly ImmutableArray<Type> policyTypes;
 
-		public ApplyPolicyAttribute( params Type[] policyTypes )
+		public ApplyPoliciesAttribute( params Type[] policyTypes )
 		{
 			this.policyTypes = policyTypes.ToImmutableArray();
 		}

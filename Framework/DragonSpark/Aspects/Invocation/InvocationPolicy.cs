@@ -2,7 +2,6 @@
 using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using DragonSpark.Specifications;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
@@ -19,25 +18,126 @@ namespace DragonSpark.Aspects.Invocation
 	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict )]
 	[ProvideAspectRole( StandardRoles.Validation )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
-	public sealed class SupportsPoliciesAttribute : MethodInterceptionAspect
+	public class SupportsPoliciesAttribute : MethodInterceptionAspect
 	{
-		public override void RuntimeInitialize( MethodBase method ) => Point = Points.Default.Get( (MethodInfo)method );
+		/*readonly static Func<IPolicyAspect, object, IPolicyAspect> Factory = new PolicyAspectFactory<Implementation>( ( source, o ) => new Implementation( source.Point ) ).Get;
+		public SupportsPoliciesAttribute() : base( Factory ) {}
+		SupportsPoliciesAttribute( IPolicyPoint point ) : base( point ) {}
 
-		IPolicyPoint Point { get; set; }
+		sealed class Implementation : SupportsPoliciesAttribute
+		{
+			public Implementation( IPolicyPoint point ) : base( point ) {}
+
+			public override void OnInvoke( MethodInterceptionArgs args )
+			{
+				if ( Point.Contains( args.Instance ) )
+				{
+					var invocation = new AspectInvocation( args.Instance, args.Arguments, args.GetReturnValue );
+					args.ReturnValue = Point.Invoke( invocation ) ?? args.ReturnValue;
+				}
+				else
+				{
+					base.OnInvoke( args );
+				}
+			}
+		}*/
+
+			public override void RuntimeInitialize( MethodBase method ) => Point = Points.Default.Get( (MethodInfo)method );
+
+		public IPolicyPoint Point { get; private set; }
 
 		public override void OnInvoke( MethodInterceptionArgs args )
-		{
-			if ( Point.IsSatisfiedBy( args.Instance ) )
 			{
-				var parameter = new InvokeParameter( args.Instance, args.Arguments, args.GetReturnValue, args.Arguments.GetArgument( 0 ) );
-				args.ReturnValue = Point.Invoke( parameter ) ?? args.ReturnValue;
+			
+				if ( Point.Contains( args.Instance ) )
+				{
+				var invocation = new AspectInvocation( args.Instance, args.Arguments, args.GetReturnValue );
+					args.ReturnValue = Point.Invoke( invocation ) ?? args.ReturnValue;	
+				}
+				else
+				{
+					base.OnInvoke( args );
+				}
+				
 			}
-			else
+	}
+
+	/*public static class Defaults
+	{
+		public static Func<Type, IPolicy> PolicySource { get; } = Activator.Default.Get<IPolicy>;
+	}
+
+	public interface IPolicyAspect : IAspect
+	{
+		IPolicyPoint Point { get; }
+	}
+
+	sealed class PolicyAspectFactory<T> where T : IPolicyAspect
+	{
+		readonly Func<IPolicyAspect, object, T> resultSource;
+		readonly Alter<object> apply;
+
+		public PolicyAspectFactory( Func<IPolicyAspect, object, T> resultSource ) : this( resultSource, ApplyPolicyAlteration.Default.Get ) {}
+
+		public PolicyAspectFactory( Func<IPolicyAspect, object, T> resultSource, Alter<object> apply )
+		{
+			this.resultSource = resultSource;
+			this.apply = apply;
+		}
+
+		public IPolicyAspect Get( IPolicyAspect source, object instance ) => resultSource( source, apply( instance ) );
+
+		
+	}*/
+
+	/*sealed class ApplyPolicyAlteration : AlterationBase<object>
+		{
+			public static IParameterizedSource<object> Default { get; } = new ApplyPolicyAlteration().ToCache();
+			ApplyPolicyAlteration() : this( Defaults.PolicySource ) {}
+
+			readonly Func<Type, IPolicy> policySource;
+
+			ApplyPolicyAlteration( Func<Type, IPolicy> policySource )
 			{
-				base.OnInvoke( args );
+				this.policySource = policySource;
+			}
+
+			public override object Get( object parameter )
+			{
+				var policies = parameter.GetType().GetAttributes<ApplyPoliciesAttribute>().SelectMany( attribute => attribute.PolicyTypes.ToArray() ).SelectAssigned( policySource );
+				foreach ( var policy in policies )
+				{
+					policy.Apply( parameter );
+				}
+				return parameter;
 			}
 		}
-	}
+
+	public abstract class InstanceAspectBase : MethodInterceptionAspect, IInstanceScopedAspect, IPolicyAspect
+	{
+		readonly Func<Type, bool> specification;
+		readonly Func<IPolicyAspect, object, IPolicyAspect> factory;
+
+		protected InstanceAspectBase( Func<IPolicyAspect, object, IPolicyAspect> factory ) : this( AttributeSupport<EnableInvocationPoliciesAttribute>.All.Contains, factory ) {}
+
+		protected InstanceAspectBase( Func<Type, bool> specification, Func<IPolicyAspect, object, IPolicyAspect> factory )
+		{
+			this.specification = specification;
+			this.factory = factory;
+		}
+
+		protected InstanceAspectBase( IPolicyPoint point )
+		{
+			Point = point;
+		}
+
+		public override void RuntimeInitialize( MethodBase method ) => Point = Points.Default.Get( (MethodInfo)method );
+
+		public IPolicyPoint Point { get; private set; }
+
+		public object CreateInstance( AdviceArgs adviceArgs ) => specification( adviceArgs.Instance.GetType() ) ? factory( this, adviceArgs.Instance ) : this;
+		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
+	}*/
 
 	public sealed class Points : Cache<MethodBase, IPolicyPoint>
 	{
@@ -45,42 +145,27 @@ namespace DragonSpark.Aspects.Invocation
 		Points() : base( _ => new PolicyPoint() ) {}
 	}
 
-	public interface IPolicyPoint : IInvocation<InvokeParameter>, IParameterizedSource<IInvocationChain>, ISpecification<object> {}
+	public interface IPolicyPoint : IInvocation<AspectInvocation>, ICache<IInvocationChain> {}
 	sealed class PolicyPoint : FactoryCache<IInvocationChain>, IPolicyPoint
 	{
-		public object Invoke( InvokeParameter parameter ) => Compile( parameter ).Invoke( parameter.Parameter );
+		public object Invoke( AspectInvocation parameter ) => Compile( parameter ).Invoke( parameter.Arguments[0] );
 
-		IInvocation Compile( InvokeParameter parameter )
+		IInvocation Compile( AspectInvocation parameter )
 		{
-			var result = DecoratorFactory.Default.Get( parameter );
-			foreach ( var alter in Get( parameter.Instance )/*.List().ToArray()*/ )
+			IInvocation result = parameter;
+			foreach ( var link in Get( parameter.Instance ) )
 			{
-				result = alter.Get( result );
+				result = link.Get( result );
 			}
 			return result;
 		}
 
-		protected override IInvocationChain Create( object parameter ) => new InvocationChain();
-
-		public bool IsSatisfiedBy( object parameter ) => Contains( parameter );
-
-		object IInvocation.Invoke( object parameter ) => Invoke( parameter.AsValid<InvokeParameter>() );
-	}
-
-	public struct InvokeParameter
-	{
-		public InvokeParameter( object instance, Arguments arguments, Func<object> proceed, object parameter )
+		protected override IInvocationChain Create( object parameter )
 		{
-			Instance = instance;
-			Arguments = arguments;
-			Proceed = proceed;
-			Parameter = parameter;
+			return new InvocationChain();
 		}
 
-		public object Instance { get; }
-		public Arguments Arguments { get; }
-		public Func<object> Proceed { get; }
-		public object Parameter { get; }
+		object IInvocation.Invoke( object parameter ) => Invoke( parameter.AsValid<AspectInvocation>() );
 	}
 
 	public abstract class CommandDecoratorBase<T> : InvocationBase<T, object>, IInvocation<T>
@@ -177,75 +262,30 @@ namespace DragonSpark.Aspects.Invocation
 		}
 	}
 
-	sealed class DecoratorFactory : ParameterizedSourceBase<InvokeParameter, IInvocation>
+	public sealed class AspectInvocation : IInvocation
 	{
-		public static DecoratorFactory Default { get; } = new DecoratorFactory();
-		DecoratorFactory() {}
+		readonly Func<object> proceed;
 
-		public override IInvocation Get( InvokeParameter parameter ) => new Invocation( parameter.Arguments, parameter.Proceed );
-
-		sealed class Invocation : IInvocation
+		public AspectInvocation( object instance, Arguments arguments, Func<object> proceed )
 		{
-			readonly Arguments arguments;
-			readonly Func<object> proceed;
+			Instance = instance;
+			Arguments = arguments;
+			this.proceed = proceed;
+		}
 
-			public Invocation( Arguments arguments, Func<object> proceed )
-			{
-				this.arguments = arguments;
-				this.proceed = proceed;
-			}
+		public object Instance { get; }
+		public Arguments Arguments { get; }
 
-			public object Invoke( object parameter )
-			{
-				arguments.SetArgument( 0, parameter );
-				var result = proceed();
-				return result;
-			}
+		public object Invoke( object parameter )
+		{
+			Arguments.SetArgument( 0, parameter );
+			var result = proceed();
+			return result;
 		}
 	}
-
-	/*sealed class DecoratorFactory : ParameterizedSourceBase<IStackSource<InvokeParameter>, IInvocation>
-	{
-		public static DecoratorFactory Default { get; } = new DecoratorFactory();
-		DecoratorFactory() {}
-
-		public override IInvocation Get( IStackSource<InvokeParameter> parameter ) => new Invocation( parameter );
-
-		sealed class Invocation : IInvocation
-		{
-			readonly IStackSource<InvokeParameter> stack;
-
-			public Invocation( IStackSource<InvokeParameter> stack )
-			{
-				this.stack = stack;
-			}
-
-			public object Invoke( object parameter )
-			{
-				var current = stack.GetCurrentItem();
-				current.Arguments.SetArgument( 0, parameter );
-				var result = current.Proceed();
-				return result;
-			}
-		}
-	}*/
 
 	public interface IInvocationLink : IAlteration<IInvocation> {}
 
-	public interface IInvocationChain : IRepository<IInvocationLink>/*, ISource<IInvocation>*/ {}
-	class InvocationChain : RepositoryBase<IInvocationLink>, IInvocationChain
-	{
-		/*readonly IStackSource<InvokeParameter> stack;
-		readonly ISource<IInvocation> cached;
-		public InvocationChain( IStackSource<InvokeParameter> stack )
-		{
-			this.stack = stack;
-			cached = new SuppliedDeferedSource<IInvocation>( Create );
-		}
-
-		IInvocation Create() => List().ToArray().Alter( DecoratorFactory.Default.Get( stack ) );
-
-		public IInvocation Get() => cached.Get();
-		object ISource.Get() => Get();*/
-	}
+	public interface IInvocationChain : IRepository<IInvocationLink> {}
+	class InvocationChain : RepositoryBase<IInvocationLink>, IInvocationChain {}
 }

@@ -4,7 +4,6 @@ using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using Defaults = DragonSpark.Aspects.Validation.Defaults;
 
 namespace DragonSpark.Aspects.Invocation
 {
@@ -61,7 +60,7 @@ namespace DragonSpark.Aspects.Invocation
 	}
 
 	[MulticastAttributeUsage( PersistMetaData =  true )]
-	public class ApplyAutoValidationAttribute : ApplyPolicyAttribute
+	public class ApplyAutoValidationAttribute : ApplyPoliciesAttribute
 	{
 		public ApplyAutoValidationAttribute() : base( typeof(AutoValidationPolicy) ) {}
 	}
@@ -69,7 +68,7 @@ namespace DragonSpark.Aspects.Invocation
 	public sealed class AutoValidationPolicy : PolicyBase
 	{
 		public static AutoValidationPolicy Default { get; } = new AutoValidationPolicy();
-		AutoValidationPolicy() : this( AutoValidation.DefaultProfiles, Defaults.ControllerSource ) {}
+		AutoValidationPolicy() : this( AutoValidation.DefaultProfiles, Validation.Defaults.ControllerSource ) {}
 
 		readonly ImmutableArray<IAspectProfile> profiles;
 		readonly Func<object, IAutoValidationController> controllerSource;
@@ -87,7 +86,7 @@ namespace DragonSpark.Aspects.Invocation
 			var validator = new AutoValidationValidator( controller );
 			var executor = new AutoValidationExecutor( controller );
 			
-			foreach ( var profile in profiles.Introduce( parameter.GetType(), tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) )/*.ToArray()*/ )
+			foreach ( var profile in profiles.Introduce( type, tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) )/*.ToArray()*/ )
 			{
 				yield return new InvocationMapping( profile.Validation.Find( type ), validator );
 				yield return new InvocationMapping( profile.Method.Find( type ), executor );

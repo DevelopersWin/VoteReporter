@@ -1,9 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime.Assignments;
-using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Immutable;
-using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
@@ -39,20 +36,19 @@ namespace DragonSpark.Sources.Parameterized.Caching
 			return value;
 		}
 
-		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 first, T2 second )  => new Assignment<T1, T2>( new CacheAssign<T1, T2>( @this ), Assignments.From( first ), new Value<T2>( second ) );
+		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 instance, T2 start, T2 finish = default(T2) ) => new Assignment<T1, T2>( new CacheAssign<T1, T2>( @this ), Assignments.From( instance ), new Value<T2>( start, finish ) );
 
-		public static ImmutableArray<TResult> GetMany<TParameter, TResult>( this ICache<TParameter, TResult> @this, ImmutableArray<TParameter> parameters, Func<TResult, bool> where = null ) =>
+		/*public static ImmutableArray<TResult> GetMany<TParameter, TResult>( this ICache<TParameter, TResult> @this, ImmutableArray<TParameter> parameters, Func<TResult, bool> where = null ) =>
 			parameters
 				.Select( @this.ToDelegate() )
-				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();
+				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();*/
 		
 
-		public static Func<TInstance, TValue> ToDelegate<TInstance, TValue>( this ICache<TInstance, TValue> @this ) => DelegateCache<TInstance, TValue>.Default.Get( @this );
-		class DelegateCache<TInstance, TValue> : Cache<ICache<TInstance, TValue>, Func<TInstance, TValue>>
+		public static Func<TInstance, TValue> ToDelegate<TInstance, TValue>( this ICache<TInstance, TValue> @this ) => Delegates<TInstance, TValue>.Default.Get( @this );
+		sealed class Delegates<TInstance, TValue> : Cache<ICache<TInstance, TValue>, Func<TInstance, TValue>>
 		{
-			public static DelegateCache<TInstance, TValue> Default { get; } = new DelegateCache<TInstance, TValue>();
-
-			DelegateCache() : base( command => command.Get ) {}
+			public static Delegates<TInstance, TValue> Default { get; } = new Delegates<TInstance, TValue>();
+			Delegates() : base( command => command.Get ) {}
 		}
 
 		

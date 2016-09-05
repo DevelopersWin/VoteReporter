@@ -1,12 +1,14 @@
-﻿using System.Reflection;
-using System.Windows.Input;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using System;
+using System.Reflection;
+using System.Windows.Input;
 
 namespace DragonSpark.Aspects.Validation
 {
-	public class CommandAdapter : ParameterValidationAdapterBase<object>
+	public sealed class CommandAdapter : ParameterValidationAdapterBase<object>
 	{
-		readonly static MethodInfo Method = typeof(ICommand).GetTypeInfo().GetDeclaredMethod( nameof(ICommand.Execute) );
+		readonly static Func<MethodInfo, bool> Method = MethodEqualitySpecification.For( typeof(ICommand).GetTypeInfo().GetDeclaredMethod( nameof(ICommand.Execute) ) );
 
 		public CommandAdapter( ICommand inner ) : base( new DelegatedSpecification<object>( inner.CanExecute ), Method ) {}
 	}
