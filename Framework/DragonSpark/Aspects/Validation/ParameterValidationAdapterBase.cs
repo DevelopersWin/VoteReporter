@@ -5,13 +5,13 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
 {
-	public abstract class ParameterValidationAdapterBase<T> : DecoratedSpecification<T>, IParameterValidationAdapter
+	public abstract class ParameterValidationAdapterBase<T> : DelegatedSpecification<T>, IParameterValidationAdapter
 	{
 		readonly Func<MethodInfo, bool> method;
 
 		protected ParameterValidationAdapterBase( ISpecification<T> inner, MethodInfo method ) : this( inner, MethodEqualitySpecification.For( method ) ) {}
 
-		ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method ) : base( inner )
+		ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method ) : base( inner.IsSatisfiedBy )
 		{
 			this.method = method;
 		}

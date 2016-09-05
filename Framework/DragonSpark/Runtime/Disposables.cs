@@ -20,7 +20,7 @@ namespace DragonSpark.Runtime
 				disposable = new DelegatedDisposable( OnDispose );
 			}
 
-			void OnDispose() => List().Each( entry => entry.Dispose() );
+			void OnDispose() => this.Each( entry => entry.Dispose() );
 			public void Dispose() => disposable.Dispose();
 		}
 

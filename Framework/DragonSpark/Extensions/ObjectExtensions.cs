@@ -28,8 +28,7 @@ namespace DragonSpark.Extensions
 		static bool IsAssigned<T>( [Optional]this T @this, bool value )
 		{
 			var type = @this?.GetType() ?? typeof(T);
-			var defaultOrEmpty = SpecialValues.DefaultOrEmpty( type );
-			var result = type.GetTypeInfo().IsValueType ? value || !defaultOrEmpty.Equals( @this ) : !Equals( @this, defaultOrEmpty );
+			var result = type.GetTypeInfo().IsValueType ? value || !SpecialValues.DefaultOrEmpty( type ).Equals( @this ) : !Equals( @this, default(T) );
 			return result;
 		}
 
@@ -102,30 +101,29 @@ namespace DragonSpark.Extensions
 
 		public static TResult Evaluate<TResult>( this IExpressionEvaluator @this, object container, string expression ) => (TResult)@this.Evaluate( container, expression );
 
-		public static T AsValid<T>( this object @this ) => AsValid( @this, Delegates<T>.Empty );
-
-		//public static T AsValid<T>( this T @this, Action<T> with ) => AsValid( @this, with, null );
-
-		public static T AsValid<T>( this object @this, Action<T> with, string message = null )
+		public static T AsValid<T>( this object @this, Action<T> with = null, string message = null )
 		{
 			if ( @this.Not<T>() )
 			{
 				throw new InvalidOperationException( message ?? $"'{@this.GetType().FullName}' is not of type {typeof(T).FullName}." );
 			}
-			
-			return @this.As( with );
+
+			var result = with != null ? @this.As( with ) : @this.As<T>();
+			return result;
 		}
 
 		//public static T As<T>( this object target ) => As( target, (Action<T>)null );
 
 		/*public static TResult As<TResult, TReturn>( this object target, Func<TResult, TReturn> action ) => target.As<TResult>( x => { action( x ); } );*/
 
-		public static T As<T>( [Optional]this object target, Action<T> action = null )
+		public static T As<T>( [Optional]this object target ) => target is T ? (T)target : default(T);
+
+		public static T As<T>( [Optional]this object target, Action<T> action )
 		{
 			if ( target is T )
 			{
 				var result = (T)target;
-				result.With( action );
+				action( result );
 				return result;
 			}
 			return default(T);

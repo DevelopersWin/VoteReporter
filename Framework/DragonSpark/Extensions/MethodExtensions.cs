@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -16,7 +18,9 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static MethodInfo AsDeclared( this MethodInfo @this ) => Locate( @this, @this.DeclaringType );
+		readonly static IParameterizedSource<MethodInfo, MethodInfo> Declared = new Cache<MethodInfo, MethodInfo>( info => Locate( info, info.DeclaringType ) );
+		public static MethodInfo AsDeclared( this MethodInfo @this ) => Declared.Get( @this );
+
 		public static MethodInfo LocateInDerivedType( this MethodInfo @this, Type derivedType ) => @this.DeclaringType != derivedType ? Locate( @this, derivedType ) : @this;
 
 		static MethodInfo Locate( MethodInfo @this, Type derivedType ) => derivedType.GetRuntimeMethods().Introduce( @this, tuple => MethodEqualitySpecification.For( tuple.Item1 )( tuple.Item2 ) ).SingleOrDefault();

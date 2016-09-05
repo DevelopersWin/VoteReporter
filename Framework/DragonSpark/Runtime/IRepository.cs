@@ -1,9 +1,9 @@
-using System.Collections.Immutable;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Runtime
 {
-	public interface IRepository<T> : IComposable<T>
+	public interface IRepository<T> : IItemSource<T>, IComposable<T>
 	{
-		ImmutableArray<T> List();
+	//	ImmutableArray<T> List();
 	}
 }

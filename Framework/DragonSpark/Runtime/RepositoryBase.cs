@@ -1,9 +1,9 @@
+using DragonSpark.Sources;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace DragonSpark.Runtime
 {
-	public abstract class RepositoryBase<T> : IRepository<T>
+	public abstract class RepositoryBase<T> : ItemSourceBase<T>, IRepository<T>
 	{
 		protected RepositoryBase() : this( new List<T>() ) {}
 
@@ -20,8 +20,10 @@ namespace DragonSpark.Runtime
 
 		protected virtual void OnAdd( T entry ) => Source.Add( entry );
 
-		public virtual ImmutableArray<T> List() => Query().ToImmutableArray();
+		protected override IEnumerable<T> Yield() => Source;
 
-		protected virtual IEnumerable<T> Query() => Source;
+		// public virtual ImmutableArray<T> List() => Query().ToImmutableArray();
+
+		// protected virtual IEnumerable<T> Query() => Source;
 	}
 }

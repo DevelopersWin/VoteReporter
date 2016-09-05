@@ -10,7 +10,6 @@ using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Aspects.Invocation
@@ -47,17 +46,21 @@ namespace DragonSpark.Aspects.Invocation
 	}
 
 	public interface IPolicyPoint : IInvocation<InvokeParameter>, IParameterizedSource<IInvocationChain>, ISpecification<object> {}
-	sealed class PolicyPoint : Cache<IInvocationChain>, IPolicyPoint
+	sealed class PolicyPoint : FactoryCache<IInvocationChain>, IPolicyPoint
 	{
-		public PolicyPoint() : base( _ => new InvocationChain() ) {}
+		public object Invoke( InvokeParameter parameter ) => Compile( parameter ).Invoke( parameter.Parameter );
 
-		public object Invoke( InvokeParameter parameter )
+		IInvocation Compile( InvokeParameter parameter )
 		{
-			var seed = DecoratorFactory.Default.Get( parameter );
-			var decorator = Get( parameter.Instance ).List().ToArray().Alter( seed );
-			var result = decorator.Invoke( parameter.Parameter );
+			var result = DecoratorFactory.Default.Get( parameter );
+			foreach ( var alter in Get( parameter.Instance )/*.List().ToArray()*/ )
+			{
+				result = alter.Get( result );
+			}
 			return result;
 		}
+
+		protected override IInvocationChain Create( object parameter ) => new InvocationChain();
 
 		public bool IsSatisfiedBy( object parameter ) => Contains( parameter );
 
@@ -153,7 +156,7 @@ namespace DragonSpark.Aspects.Invocation
 
 		public void Apply( object parameter )
 		{
-			foreach ( var mapping in Get( parameter ).ToArray() )
+			foreach ( var mapping in Get( parameter )/*.ToArray()*/ )
 			{
 				repository( mapping.Method ).Get( parameter ).Add( mapping.Link );
 			}
@@ -201,14 +204,48 @@ namespace DragonSpark.Aspects.Invocation
 		}
 	}
 
+	/*sealed class DecoratorFactory : ParameterizedSourceBase<IStackSource<InvokeParameter>, IInvocation>
+	{
+		public static DecoratorFactory Default { get; } = new DecoratorFactory();
+		DecoratorFactory() {}
+
+		public override IInvocation Get( IStackSource<InvokeParameter> parameter ) => new Invocation( parameter );
+
+		sealed class Invocation : IInvocation
+		{
+			readonly IStackSource<InvokeParameter> stack;
+
+			public Invocation( IStackSource<InvokeParameter> stack )
+			{
+				this.stack = stack;
+			}
+
+			public object Invoke( object parameter )
+			{
+				var current = stack.GetCurrentItem();
+				current.Arguments.SetArgument( 0, parameter );
+				var result = current.Proceed();
+				return result;
+			}
+		}
+	}*/
+
 	public interface IInvocationLink : IAlteration<IInvocation> {}
 
-	public interface IInvocationChain : IRepository<IInvocationLink>/*, IParameterizedSource<IInvocation>*/ {}
+	public interface IInvocationChain : IRepository<IInvocationLink>/*, ISource<IInvocation>*/ {}
 	class InvocationChain : RepositoryBase<IInvocationLink>, IInvocationChain
 	{
-		/*public IInvocation Get( object parameter )
+		/*readonly IStackSource<InvokeParameter> stack;
+		readonly ISource<IInvocation> cached;
+		public InvocationChain( IStackSource<InvokeParameter> stack )
 		{
-			return null;
-		}*/
+			this.stack = stack;
+			cached = new SuppliedDeferedSource<IInvocation>( Create );
+		}
+
+		IInvocation Create() => List().ToArray().Alter( DecoratorFactory.Default.Get( stack ) );
+
+		public IInvocation Get() => cached.Get();
+		object ISource.Get() => Get();*/
 	}
 }

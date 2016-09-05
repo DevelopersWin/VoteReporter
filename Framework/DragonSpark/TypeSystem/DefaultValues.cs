@@ -1,5 +1,6 @@
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem.Generics;
 using System;
@@ -13,7 +14,7 @@ namespace DragonSpark.TypeSystem
 	{
 		readonly static IGenericMethodContext<Invoke> Method = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
 
-		public static ICache<Type, object> Default { get; } = new DefaultValues();
+		public static IParameterizedSource<Type, object> Default { get; } = new DefaultValues();
 		DefaultValues() : base( Create ) {}
 
 		static object Create( Type parameter ) => parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : Empty( parameter );

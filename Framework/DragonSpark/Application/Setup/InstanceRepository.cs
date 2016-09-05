@@ -18,7 +18,7 @@ namespace DragonSpark.Application.Setup
 		T Get<T>( Type serviceType, Func<object, T> projection )
 		{
 			var specification = TypeAssignableSpecification.Defaults.Get( serviceType );
-			foreach ( var item in Query() )
+			foreach ( var item in Yield() )
 			{
 				var parameter = ( item as IServiceAware )?.ServiceType ?? item.GetType();
 				if ( specification.IsSatisfiedBy( parameter ) )

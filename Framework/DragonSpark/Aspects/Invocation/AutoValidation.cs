@@ -1,11 +1,9 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Defaults = DragonSpark.Aspects.Validation.Defaults;
 
 namespace DragonSpark.Aspects.Invocation
@@ -89,10 +87,10 @@ namespace DragonSpark.Aspects.Invocation
 			var validator = new AutoValidationValidator( controller );
 			var executor = new AutoValidationExecutor( controller );
 			
-			foreach ( var profile in profiles.Introduce( parameter.GetType(), tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ).ToArray() )
+			foreach ( var profile in profiles.Introduce( parameter.GetType(), tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) )/*.ToArray()*/ )
 			{
-				yield return new InvocationMapping( type.GetMethod( profile.Validation ).AsDeclared(), validator );
-				yield return new InvocationMapping( type.GetMethod( profile.Method ).AsDeclared(), executor );
+				yield return new InvocationMapping( profile.Validation.Find( type ), validator );
+				yield return new InvocationMapping( profile.Method.Find( type ), executor );
 			}
 		}
 	}

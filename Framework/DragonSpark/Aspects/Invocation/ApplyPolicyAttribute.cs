@@ -4,7 +4,6 @@ using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Invocation
@@ -24,7 +23,7 @@ namespace DragonSpark.Aspects.Invocation
 
 		public override void RuntimeInitializeInstance()
 		{
-			foreach ( var policy in policyTypes.SelectAssigned( Create ).ToArray() )
+			foreach ( var policy in policyTypes.SelectAssigned( Create )/*.ToArray()*/ )
 			{
 				policy.Apply( Instance );
 			}
