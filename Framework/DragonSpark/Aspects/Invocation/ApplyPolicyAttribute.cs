@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Immutable;
-using DragonSpark.Application;
-using DragonSpark.Extensions;
-using DragonSpark.TypeSystem.Generics;
+﻿using DragonSpark.Extensions;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Invocation
@@ -14,9 +13,10 @@ namespace DragonSpark.Aspects.Invocation
 	[LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Class )]
 	public class ApplyPolicyAttribute : InstanceLevelAspect
 	{
-		readonly static IGenericMethodContext<Execute> Context = typeof(ApplyPolicyAttribute).Adapt().GenericCommandMethods[nameof(Apply)];
+		readonly static Func<Type, IPolicy> Create = Activator.Default.Get<IPolicy>;
 
 		readonly ImmutableArray<Type> policyTypes;
+
 		public ApplyPolicyAttribute( params Type[] policyTypes )
 		{
 			this.policyTypes = policyTypes.ToImmutableArray();
@@ -24,12 +24,10 @@ namespace DragonSpark.Aspects.Invocation
 
 		public override void RuntimeInitializeInstance()
 		{
-			foreach ( var decorator in policyTypes.SelectAssigned( Activator.Default.Get ) )
+			foreach ( var policy in policyTypes.SelectAssigned( Create ).ToArray() )
 			{
-				Context.Make( Instance.GetType() ).Invoke( decorator, Instance );
+				policy.Apply( Instance );
 			}
 		}
-
-		static void Apply<T>( IPolicy<T> decorator, T instance ) => decorator.Apply( instance );
 	}
 }

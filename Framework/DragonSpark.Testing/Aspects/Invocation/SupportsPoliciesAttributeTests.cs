@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Aspects.Invocation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
 using JetBrains.Annotations;
 using Ploeh.AutoFixture.Xunit2;
 using System;
@@ -16,8 +15,8 @@ namespace DragonSpark.Testing.Aspects.Invocation
 		[Theory, AutoData]
 		void Verify( Subject sut, string message )
 		{
-			var reference = new Action<string>( sut.HelloWorld ).GetReference();
-			Repositories<string>.Default.Get( reference ).Add( new ModifyMessagePolicy() );
+			var reference = new Action<string>( sut.HelloWorld ).Method;
+			Points.Default.Get( reference ).Get( sut ).Add( ModifyMessagePolicy.Default );
 
 			sut.HelloWorld( message );
 
@@ -77,26 +76,25 @@ namespace DragonSpark.Testing.Aspects.Invocation
 			public ICollection<string> Messages { get; } = new Collection<string>();
 		}
 
-		sealed class ModifyMessagePolicy : DecoratorFactoryBase<string>
+		sealed class ModifyMessagePolicy : InvocationFactoryBase<string>
 		{
 			public const string Prefix = "[ModifyMessagePolicy] Hello World: ";
 
-			public override IDecorator<string, object> Get( IDecorator<string, object> parameter ) => new Context( parameter );
+			public static ModifyMessagePolicy Default { get; } = new ModifyMessagePolicy();
+			ModifyMessagePolicy() {}
+
+			protected override IInvocation<string, object> Create( IInvocation<string, object> parameter ) => new Context( parameter );
 
 			sealed class Context : CommandDecoratorBase<string>
 			{
-				readonly IDecorator<string, object> inner;
+				readonly IInvocation<string, object> inner;
 
-				public Context( IDecorator<string, object> inner )
+				public Context( IInvocation<string, object> inner )
 				{
 					this.inner = inner;
 				}
 
-				protected override void Execute( string parameter )
-				{
-					var modified = $"{Prefix}{parameter}!";
-					inner.Execute( modified );
-				}
+				public override void Execute( string parameter ) => inner.Invoke( $"{Prefix}{parameter}!" );
 			}
 		}
 	}

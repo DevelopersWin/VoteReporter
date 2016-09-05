@@ -6,16 +6,15 @@ namespace DragonSpark.Runtime
 {
 	public static class Extensions
 	{
-		public static Delegate GetReference( this Delegate @this ) => Delegates.Default.Get( @this.Target ).Get( @this.GetMethodInfo() );
+		// public static Delegate GetReference( this Delegate @this ) => Delegates.Default.Get( @this.Target ).Get( @this.GetMethodInfo() );
 
-		public static Delegate GetDelegate<T>( this object @this, string methodName ) => @this.GetDelegate( typeof(T), methodName );
+		// public static Delegate GetDelegate<T>( this object @this, string methodName ) => @this.GetDelegate( typeof(T), methodName );
 
-		public static Delegate GetDelegate( this object @this, MethodDescriptor descriptor ) => @this.GetDelegate( descriptor.DeclaringType, descriptor.MethodName );
-		public static Delegate GetDelegate( this object @this, Type interfaceType, string methodName )
+		public static MethodInfo GetMethod( this Type @this, MethodDescriptor descriptor ) => @this.GetMethod( descriptor.DeclaringType, descriptor.MethodName );
+		public static MethodInfo GetMethod( this Type @this, Type interfaceType, string methodName )
 		{
-			var methodMapping = @this.GetType().Adapt().GetMappedMethods( interfaceType ).Introduce( methodName, tuple => tuple.Item1.InterfaceMethod.Name == tuple.Item2 ).Only();
-			var method = methodMapping.MappedMethod;
-			var result = Delegates.Default.Get( @this ).Get( method );
+			var methodMapping = @this.Adapt().GetMappedMethods( interfaceType ).Introduce( methodName, tuple => tuple.Item1.InterfaceMethod.Name == tuple.Item2 ).Only();
+			var result = methodMapping.MappedMethod;
 			return result;
 		}
 	}

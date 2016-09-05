@@ -143,7 +143,7 @@ namespace DragonSpark.Sources.Parameterized
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		public static T Alter<T>( this ImmutableArray<IAlteration<T>> @this, T seed ) => @this.AsEnumerable().Alter( seed );
+		// public static U Alter<T, U>( this ImmutableArray<T> @this, U seed ) where T : IAlteration<U> => @this.AsEnumerable().Alter<U>( seed );
 		public static T Alter<T>( this IEnumerable<IAlteration<T>> @this, T seed ) => @this.Aggregate( seed, ( current, alteration ) => alteration.Get( current ) );
 
 		public static Alter<T> ToDelegate<T>( this IAlteration<T> @this ) => Selectors<T>.Default.Get( @this );

@@ -1,21 +1,17 @@
-﻿using DragonSpark.Activation.Location;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
-using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
 using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Defaults = DragonSpark.TypeSystem.Defaults;
 
 namespace DragonSpark.Aspects.Invocation
 {
@@ -26,227 +22,193 @@ namespace DragonSpark.Aspects.Invocation
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
 	public sealed class SupportsPoliciesAttribute : MethodInterceptionAspect
 	{
-		readonly IParameterizedSource<ValueTuple<object, MethodInfo>, PolicyReference?> cache;
+		public override void RuntimeInitialize( MethodBase method ) => Point = Points.Default.Get( (MethodInfo)method );
 
-		public SupportsPoliciesAttribute() : this( new Cache() ) {}
-
-		SupportsPoliciesAttribute( IParameterizedSource<ValueTuple<object, MethodInfo>, PolicyReference?> cache )
-		{
-			this.cache = cache;
-		}
+		IPolicyPoint Point { get; set; }
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var method = ( (MethodInfo)args.Method ).LocateInDerivedType( args.Instance.GetType() );
-			var tuple = ValueTuple.Create( args.Instance, method );
-			var item = cache.Get( tuple );
-			if ( item != null )
+			if ( Point.IsSatisfiedBy( args.Instance ) )
 			{
-				var reference = item.Value;
-				var parameter = new PolicyParameter( reference.Delegate, /*args.Method,*/ args.Arguments, args.GetReturnValue, args.Arguments.GetArgument( 0 ) );
-				args.ReturnValue = reference.Applicator.Execute( parameter );
+				var parameter = new InvokeParameter( args.Instance, args.Arguments, args.GetReturnValue, args.Arguments.GetArgument( 0 ) );
+				args.ReturnValue = Point.Invoke( parameter ) ?? args.ReturnValue;
 			}
 			else
 			{
 				base.OnInvoke( args );
 			}
 		}
-
-		sealed class Cache : ArgumentCache<ValueTuple<object, MethodInfo>, PolicyReference?>
-		{
-			public Cache() : base( Create ) {}
-
-			static PolicyReference? Create( ValueTuple<object, MethodInfo> parameter )
-			{
-				var @delegate = Delegates.Default.Get( parameter.Item1 ).Get( parameter.Item2 );
-				var applicator = Applicators.Default.Get( @delegate );
-				var handles = applicator.IsSatisfiedBy( @delegate );
-				var result = handles ? new PolicyReference?( new PolicyReference( @delegate, applicator ) ) : null;
-				return result;
-			}
-		}
-
-		struct PolicyReference
-		{
-			public PolicyReference( Delegate @delegate, IDecoratorApplicator applicator )
-			{
-				Delegate = @delegate;
-				Applicator = applicator;
-			}
-
-			public Delegate Delegate { get; }
-			public IDecoratorApplicator Applicator { get; }
-		}
 	}
 
-	public sealed class Applicators : FactoryCache<Delegate, IDecoratorApplicator>
+	public sealed class Points : Cache<MethodBase, IPolicyPoint>
 	{
-		readonly static Type Definition = typeof(DecoratorApplicator<,>);
+		public static Points Default { get; } = new Points();
+		Points() : base( _ => new PolicyPoint() ) {}
+	}
 
-		public static Applicators Default { get; } = new Applicators();
-		Applicators() : this( SingletonLocator.Default.Get<IDecoratorApplicator> ) {}
+	public interface IPolicyPoint : IInvocation<InvokeParameter>, IParameterizedSource<IInvocationChain>, ISpecification<object> {}
+	sealed class PolicyPoint : Cache<IInvocationChain>, IPolicyPoint
+	{
+		public PolicyPoint() : base( _ => new InvocationChain() ) {}
 
-		readonly Func<Type, IDecoratorApplicator> policySource;
-
-		Applicators( Func<Type, IDecoratorApplicator> policySource )
+		public object Invoke( InvokeParameter parameter )
 		{
-			this.policySource = policySource;
-		}
-
-		protected override IDecoratorApplicator Create( Delegate parameter )
-		{
-			var types = Types.Default.Get( parameter.GetMethodInfo() ).ToArray();
-			var host = Definition.MakeGenericType( types );
-			var result = policySource( host );
+			var seed = DecoratorFactory.Default.Get( parameter );
+			var decorator = Get( parameter.Instance ).List().ToArray().Alter( seed );
+			var result = decorator.Invoke( parameter.Parameter );
 			return result;
 		}
+
+		public bool IsSatisfiedBy( object parameter ) => Contains( parameter );
+
+		object IInvocation.Invoke( object parameter ) => Invoke( parameter.AsValid<InvokeParameter>() );
 	}
 
-	public sealed class Types : FactoryCache<MethodInfo, ImmutableArray<Type>>
+	public struct InvokeParameter
 	{
-		public static Types Default { get; } = new Types();
-		Types()  {}
-
-		protected override ImmutableArray<Type> Create( MethodInfo parameter )
+		public InvokeParameter( object instance, Arguments arguments, Func<object> proceed, object parameter )
 		{
-			var type = parameter.GetParameterTypes().Single();
-			var result = type.Append( parameter.ReturnType == Defaults.Void ? typeof(object) : parameter.ReturnType ).ToImmutableArray();
-			return result;
-		}
-	}
-
-	public interface IDecoratorApplicator : IDecorator<PolicyParameter>, ISpecification<Delegate> {}
-
-	sealed class DecoratorApplicator<TParameter, TResult> : IDecoratorApplicator
-	{
-		readonly static Func<Delegate, bool> Specification = Specification<TParameter, TResult>.Default.IsSatisfiedBy;
-
-		[UsedImplicitly]
-		public static DecoratorApplicator<TParameter, TResult> Default { get; } = new DecoratorApplicator<TParameter, TResult>();
-		DecoratorApplicator() : this( Specification, DecoratorFactory<TParameter, TResult>.Default.Get, Repositories<TParameter, TResult>.Default.Get ) {}
-
-		readonly Func<Delegate, bool> specification;
-		readonly Func<PolicyParameter, IDecorator<TParameter, TResult>> decoratorSource;
-		readonly Func<Delegate, IDecoratorRepository<TParameter, TResult>> repositorySource;
-
-		DecoratorApplicator( Func<Delegate, bool> specification, Func<PolicyParameter, IDecorator<TParameter, TResult>> decoratorSource, Func<Delegate, IDecoratorRepository<TParameter, TResult>> repositorySource )
-		{
-			this.specification = specification;
-			this.decoratorSource = decoratorSource;
-			this.repositorySource = repositorySource;
-		}
-
-		public bool IsSatisfiedBy( Delegate parameter ) => specification( parameter );
-
-		public object Execute( PolicyParameter parameter )
-		{
-			var seed = decoratorSource( parameter );
-			var decorator = repositorySource( parameter.Delegate ).List().Alter( seed );
-			var result = decorator.Execute( (TParameter)parameter.Parameter );
-			return result;
-		}
-	}
-
-	public sealed class Specification<TParameter, TResult> : CacheContainsSpecification<Delegate, IDecoratorRepository<TParameter, TResult>>
-	{
-		public static Specification<TParameter, TResult> Default { get; } = new Specification<TParameter, TResult>();
-		Specification() : base( Repositories<TParameter, TResult>.Default ) {}
-	}
-
-	public struct PolicyParameter
-	{
-		public PolicyParameter( Delegate @delegate, /*MethodBase method,*/ Arguments arguments, Func<object> proceed, object parameter )
-		{
-			Delegate = @delegate;
-			// Method = method;
+			Instance = instance;
 			Arguments = arguments;
 			Proceed = proceed;
 			Parameter = parameter;
 		}
 
-		public Delegate Delegate { get; }
-		/*public MethodBase Method { get; }*/
+		public object Instance { get; }
 		public Arguments Arguments { get; }
 		public Func<object> Proceed { get; }
 		public object Parameter { get; }
 	}
 
-	public interface IDecorator<in T> : IDecorator<T, object> {}
-
-	public abstract class CommandDecoratorBase<T> : IDecorator<T>
+	public abstract class CommandDecoratorBase<T> : InvocationBase<T, object>, IInvocation<T>
 	{
-		protected abstract void Execute( T parameter );
-
-		object IDecorator<T, object>.Execute( T parameter )
+		public sealed override object Invoke( T parameter )
 		{
 			Execute( parameter );
 			return null;
 		}
+
+		public abstract void Execute( T parameter );
 	}
 
-	public interface IDecorator<in TParameter, out TResult>
+	public abstract class InvocationBase<TParameter, TResult> : IInvocation<TParameter, TResult>
 	{
-		TResult Execute( TParameter parameter );
+		public abstract TResult Invoke( TParameter parameter );
+
+		object IInvocation.Invoke( object parameter ) => Invoke( parameter.AsValid<TParameter>() );
 	}
 
-	public abstract class DecoratorFactoryBase<T> : DecoratorFactoryBase<T, object> {}
-	public abstract class DecoratorFactoryBase<TParameter, TResult> : AlterationBase<IDecorator<TParameter, TResult>> {}
+	public interface IInvocation<in T> : IInvocation<T, object> {}
 
-	public interface IPolicy<in T>
+	public interface IInvocation<in TParameter, out TResult> : IInvocation
 	{
-		void Apply( T parameter );
-	}
-	public abstract class PolicyBase<T> : IPolicy<T>
-	{
-		public abstract void Apply( T parameter );
+		TResult Invoke( TParameter parameter );
 	}
 
-	sealed class DecoratorFactory<TParameter, TResult> : ParameterizedSourceBase<PolicyParameter, IDecorator<TParameter, TResult>>
+	public interface IInvocation
 	{
-		public static DecoratorFactory<TParameter, TResult> Default { get; } = new DecoratorFactory<TParameter, TResult>();
+		object Invoke( object parameter );
+	}
+
+	public abstract class InvocationFactoryBase<T> : InvocationFactoryBase<T, object> {}
+	public abstract class InvocationFactoryBase<TParameter, TResult> : InvocationFactoryBase
+	{
+		protected abstract IInvocation<TParameter, TResult> Create( IInvocation<TParameter, TResult> parameter );
+
+		public sealed override IInvocation Get( IInvocation parameter ) => Create( parameter as IInvocation<TParameter, TResult> ?? new Wrapper( parameter ) );
+
+		sealed class Wrapper : IInvocation<TParameter, TResult>
+		{
+			readonly IInvocation inner;
+
+			public Wrapper( IInvocation inner )
+			{
+				this.inner = inner;
+			}
+
+			public TResult Invoke( TParameter parameter ) => inner.Invoke( parameter ).As<TResult>();
+
+			public object Invoke( object parameter ) => inner.Invoke( parameter );
+		}
+	}
+
+	public abstract class InvocationFactoryBase : AlterationBase<IInvocation>, IInvocationLink {}
+
+	public interface IPolicy
+	{
+		void Apply( object parameter );
+	}
+	public abstract class PolicyBase : IPolicy
+	{
+		readonly static Func<MethodBase, IPolicyPoint> Repository = Points.Default.Get;
+
+		readonly Func<MethodBase, IPolicyPoint> repository;
+
+		protected PolicyBase() : this( Repository ) {}
+
+		protected PolicyBase( Func<MethodBase, IPolicyPoint> repository )
+		{
+			this.repository = repository;
+		}
+
+		public void Apply( object parameter )
+		{
+			foreach ( var mapping in Get( parameter ).ToArray() )
+			{
+				repository( mapping.Method ).Get( parameter ).Add( mapping.Link );
+			}
+		}
+
+		protected abstract IEnumerable<InvocationMapping> Get( object parameter );
+
+		public struct InvocationMapping
+		{
+			public InvocationMapping( MethodBase method, IInvocationLink link )
+			{
+				Method = method;
+				Link = link;
+			}
+
+			public MethodBase Method { get; }
+			public IInvocationLink Link { get; }
+		}
+	}
+
+	sealed class DecoratorFactory : ParameterizedSourceBase<InvokeParameter, IInvocation>
+	{
+		public static DecoratorFactory Default { get; } = new DecoratorFactory();
 		DecoratorFactory() {}
 
-		public override IDecorator<TParameter, TResult> Get( PolicyParameter parameter ) => new Decorator( parameter.Arguments, parameter.Proceed );
+		public override IInvocation Get( InvokeParameter parameter ) => new Invocation( parameter.Arguments, parameter.Proceed );
 
-		sealed class Decorator : IDecorator<TParameter, TResult>
+		sealed class Invocation : IInvocation
 		{
 			readonly Arguments arguments;
 			readonly Func<object> proceed;
 
-			public Decorator( Arguments arguments, Func<object> proceed )
+			public Invocation( Arguments arguments, Func<object> proceed )
 			{
 				this.arguments = arguments;
 				this.proceed = proceed;
 			}
 
-			public TResult Execute( TParameter parameter )
+			public object Invoke( object parameter )
 			{
 				arguments.SetArgument( 0, parameter );
-				var item = proceed();
-				var result = item is TResult ? (TResult)item : default(TResult);
+				var result = proceed();
 				return result;
 			}
 		}
 	}
 
-	public class Repositories<T> : Repositories<T, object> {}
+	public interface IInvocationLink : IAlteration<IInvocation> {}
 
-	public class Repositories<TParameter, TResult> : Cache<Delegate, IDecoratorRepository<TParameter, TResult>>
+	public interface IInvocationChain : IRepository<IInvocationLink>/*, IParameterizedSource<IInvocation>*/ {}
+	class InvocationChain : RepositoryBase<IInvocationLink>, IInvocationChain
 	{
-		public static Repositories<TParameter, TResult> Default { get; } = new Repositories<TParameter, TResult>();
-		protected Repositories() : base( _ => new Repository<TParameter, TResult>() ) {}
-	}
-
-	class Repository<TParameter, TResult> : RepositoryBase<IAlteration<IDecorator<TParameter, TResult>>>, IDecoratorRepository<TParameter, TResult> {}
-
-	public interface IDecoratorRepository<TParameter, TResult> : IRepository<IAlteration<IDecorator<TParameter, TResult>>> {}
-
-	public static class Extensions
-	{
-		public static T Apply<T>( this T @this, IPolicy<T> policy )
+		/*public IInvocation Get( object parameter )
 		{
-			policy.Apply( @this );
-			return @this;
-		}
+			return null;
+		}*/
 	}
 }
