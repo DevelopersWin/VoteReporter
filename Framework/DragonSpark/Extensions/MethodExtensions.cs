@@ -16,15 +16,8 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static MethodInfo LocateInDerivedType( this MethodInfo @this, Type derivedType )
-		{
-			/*if ( !@this.DeclaringType.Adapt().IsInstanceOfTypeOrDefinition( derivedType ) )
-			{
-				throw new InvalidOperationException( $"{derivedType} does not inherit from {@this.DeclaringType}" );
-			}*/
-			var result = derivedType.GetRuntimeMethods().Introduce( @this, tuple => MethodEqualitySpecification.For( tuple.Item1 )( tuple.Item2 ) ).SingleOrDefault();
-			return result;
-		}
+		public static MethodInfo LocateInDerivedType( this MethodInfo @this, Type derivedType ) => 
+			@this.DeclaringType != derivedType ? derivedType.GetRuntimeMethods().Introduce( @this, tuple => MethodEqualitySpecification.For( tuple.Item1 )( tuple.Item2 ) ).SingleOrDefault() : @this;
 
 		public static MethodInfo AccountForClosedDefinition( this MethodInfo @this, Type closedType )=> @this.ContainsGenericParameters ? @this.LocateInDerivedType( closedType ) : @this;
 	}

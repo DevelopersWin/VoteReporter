@@ -8,8 +8,11 @@ using DragonSpark.Specifications;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
+using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
+using PostSharp.Extensibility;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Defaults = DragonSpark.TypeSystem.Defaults;
@@ -18,26 +21,30 @@ namespace DragonSpark.Aspects.Invocation
 {
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[LinesOfCodeAvoided( 10 ), AttributeUsage( AttributeTargets.Method )]
-	public sealed class ApplyDecorationsAttribute : MethodInterceptionAspect
+	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict )]
+	[ProvideAspectRole( StandardRoles.Validation )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	public sealed class SupportsPoliciesAttribute : MethodInterceptionAspect
 	{
 		readonly IParameterizedSource<ValueTuple<object, MethodInfo>, PolicyReference?> cache;
 
-		public ApplyDecorationsAttribute() : this( new Cache() ) {}
+		public SupportsPoliciesAttribute() : this( new Cache() ) {}
 
-		ApplyDecorationsAttribute( IParameterizedSource<ValueTuple<object, MethodInfo>, PolicyReference?> cache )
+		SupportsPoliciesAttribute( IParameterizedSource<ValueTuple<object, MethodInfo>, PolicyReference?> cache )
 		{
 			this.cache = cache;
 		}
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var tuple = ValueTuple.Create( args.Instance, (MethodInfo)args.Method );
+			var method = ( (MethodInfo)args.Method ).LocateInDerivedType( args.Instance.GetType() );
+			var tuple = ValueTuple.Create( args.Instance, method );
 			var item = cache.Get( tuple );
 			if ( item != null )
 			{
 				var reference = item.Value;
 				var parameter = new PolicyParameter( reference.Delegate, /*args.Method,*/ args.Arguments, args.GetReturnValue, args.Arguments.GetArgument( 0 ) );
-				reference.DecoratorApplicator.Execute( parameter );
+				args.ReturnValue = reference.Applicator.Execute( parameter );
 			}
 			else
 			{
@@ -52,23 +59,23 @@ namespace DragonSpark.Aspects.Invocation
 			static PolicyReference? Create( ValueTuple<object, MethodInfo> parameter )
 			{
 				var @delegate = Delegates.Default.Get( parameter.Item1 ).Get( parameter.Item2 );
-				var policy = Applicators.Default.Get( @delegate );
-				var isSatisfiedBy = policy.IsSatisfiedBy( @delegate );
-				var result = isSatisfiedBy ? new PolicyReference?( new PolicyReference( @delegate, policy ) ) : null;
+				var applicator = Applicators.Default.Get( @delegate );
+				var handles = applicator.IsSatisfiedBy( @delegate );
+				var result = handles ? new PolicyReference?( new PolicyReference( @delegate, applicator ) ) : null;
 				return result;
 			}
 		}
 
 		struct PolicyReference
 		{
-			public PolicyReference( Delegate @delegate, IDecoratorApplicator decoratorApplicator )
+			public PolicyReference( Delegate @delegate, IDecoratorApplicator applicator )
 			{
 				Delegate = @delegate;
-				DecoratorApplicator = decoratorApplicator;
+				Applicator = applicator;
 			}
 
 			public Delegate Delegate { get; }
-			public IDecoratorApplicator DecoratorApplicator { get; }
+			public IDecoratorApplicator Applicator { get; }
 		}
 	}
 
@@ -88,15 +95,27 @@ namespace DragonSpark.Aspects.Invocation
 
 		protected override IDecoratorApplicator Create( Delegate parameter )
 		{
-			var methodInfo = parameter.GetMethodInfo();
-			var type = methodInfo.GetParameterTypes().Single();
-			var host = Definition.MakeGenericType( type, methodInfo.ReturnType == Defaults.Void ? typeof(object) : methodInfo.ReturnType );
+			var types = Types.Default.Get( parameter.GetMethodInfo() ).ToArray();
+			var host = Definition.MakeGenericType( types );
 			var result = policySource( host );
 			return result;
 		}
 	}
 
-	public interface IDecoratorApplicator : IDecorator<PolicyParameter, object>, ISpecification<Delegate> {}
+	public sealed class Types : FactoryCache<MethodInfo, ImmutableArray<Type>>
+	{
+		public static Types Default { get; } = new Types();
+		Types()  {}
+
+		protected override ImmutableArray<Type> Create( MethodInfo parameter )
+		{
+			var type = parameter.GetParameterTypes().Single();
+			var result = type.Append( parameter.ReturnType == Defaults.Void ? typeof(object) : parameter.ReturnType ).ToImmutableArray();
+			return result;
+		}
+	}
+
+	public interface IDecoratorApplicator : IDecorator<PolicyParameter>, ISpecification<Delegate> {}
 
 	sealed class DecoratorApplicator<TParameter, TResult> : IDecoratorApplicator
 	{

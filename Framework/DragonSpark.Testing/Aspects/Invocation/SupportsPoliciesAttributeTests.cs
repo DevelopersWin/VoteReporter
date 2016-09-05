@@ -11,7 +11,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Invocation
 {
-	public class ApplyDecorationsAttributeTests
+	public class SupportsPoliciesAttributeTests
 	{
 		[Theory, AutoData]
 		void Verify( Subject sut, string message )
@@ -55,14 +55,14 @@ namespace DragonSpark.Testing.Aspects.Invocation
 
 			public int CanExecuteCalled { get; private set; }
 
-			[ApplyDecorations]
+			[SupportsPolicies]
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
 				return parameter is int && (int)parameter == 6776;
 			}
 
-			[ApplyDecorations]
+			[SupportsPolicies]
 			public void Execute( object parameter ) => Parameters.Add( parameter );
 
 			public ICollection<object> Parameters { get; } = new Collection<object>();
@@ -71,7 +71,7 @@ namespace DragonSpark.Testing.Aspects.Invocation
 		[UsedImplicitly]
 		class Subject
 		{
-			[ApplyDecorations]
+			[SupportsPolicies]
 			public void HelloWorld( string message ) => Messages.Add( message );
 
 			public ICollection<string> Messages { get; } = new Collection<string>();

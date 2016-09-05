@@ -41,6 +41,8 @@
     <Compile Include="Aspects\Invocation\ApplyPolicyAttribute.cs" />
     <Compile Include="Aspects\Invocation\AutoValidation.cs" />
     <Compile Include="Aspects\Invocation\InvocationPolicy.cs" />
+    <Compile Include="Aspects\Validation\SourceAdapter.cs" />
+    <Compile Include="Aspects\Validation\GenericSourceAdapterFactory.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />
     <Compile Include="Commands\SpecificationCommand.cs" />
@@ -114,6 +116,7 @@
     <Compile Include="Runtime\MethodDescriptor.cs" />
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\DictionarySource.cs" />
     <Compile Include="Sources\Parameterized\SourceTypeMapping.cs" />

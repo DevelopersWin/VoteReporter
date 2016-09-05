@@ -1,5 +1,6 @@
 using DragonSpark.Aspects.Validation;
 using System;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -18,6 +19,6 @@ namespace DragonSpark.Sources.Parameterized
 
 		public bool IsSatisfiedBy( TParameter parameter ) => controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, specification( parameter ) );
 
-		public TResult Get( TParameter parameter ) => (TResult)controller.Execute( parameter, () => source( parameter ) );
+		public TResult Get( TParameter parameter ) => controller.Execute( parameter, () => source( parameter ) ).As<TResult>();
 	}
 }

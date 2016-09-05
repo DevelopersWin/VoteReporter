@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -48,7 +47,7 @@ namespace DragonSpark.Extensions
 		readonly static IParameterizedSource<MethodBase, ImmutableArray<Type>> ParameterTypes = CacheFactory.Create<MethodBase, ImmutableArray<Type>>( method => method.GetParameters().Select( info => info.ParameterType ).ToImmutableArray() );
 		public static ImmutableArray<Type> GetParameterTypes( this MethodBase @this ) => ParameterTypes.Get( @this );
 
-		public static MethodInfo GetMethod( this Type @this, string methodName )
+		/*public static MethodInfo GetMethod( this Type @this, string methodName )
 		{
 			foreach ( var method in @this.GetRuntimeMethods() )
 			{
@@ -58,6 +57,6 @@ namespace DragonSpark.Extensions
 				}
 			}
 			throw new InvalidOperationException( $"Method {methodName} not found." );
-		}
+		}*/
 	}
 }

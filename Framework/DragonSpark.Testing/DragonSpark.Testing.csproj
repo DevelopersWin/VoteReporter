@@ -58,9 +58,10 @@
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
-    <Compile Include="Aspects\Invocation\ApplyDecorationsAttributeTests.cs" />
+    <Compile Include="Aspects\Invocation\SupportsPoliciesAttributeTests.cs" />
     <Compile Include="Aspects\Validation\AutoValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
+    <Compile Include="Aspects\Validation\ApplyAutoValidationAttributeTests.cs" />
     <Compile Include="Commands\CommandBaseTests.cs" />
     <Compile Include="Commands\SpecificationCommandTests.cs" />
     <Compile Include="ComponentModel\ClassWithDefaultProperties.cs" />

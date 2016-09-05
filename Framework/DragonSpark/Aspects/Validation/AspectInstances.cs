@@ -14,7 +14,7 @@ namespace DragonSpark.Aspects.Validation
 	public sealed class AspectInstances : ParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
 	{
 		public static AspectInstances Default { get; } = new AspectInstances();
-		AspectInstances() : this( Defaults.AspectProfiles ) {}
+		AspectInstances() : this( AutoValidation.DefaultProfiles ) {}
 
 		readonly ImmutableArray<IAspectProfile> profiles;
 		readonly Func<MethodInfo, MethodInfo> specificationSource;
@@ -54,7 +54,7 @@ namespace DragonSpark.Aspects.Validation
 	sealed class AutoValidationTypeSpecification : SpecificationWithContextBase<Type, ImmutableArray<TypeAdapter>>
 	{
 		public static AutoValidationTypeSpecification Default { get; } = new AutoValidationTypeSpecification();
-		AutoValidationTypeSpecification() : this( Defaults.AspectProfiles.Select( profile => profile.Method.DeclaringType.Adapt() ).ToImmutableArray() ) {}
+		AutoValidationTypeSpecification() : this( AutoValidation.DefaultProfiles.Select( profile => profile.Method.DeclaringType.Adapt() ).ToImmutableArray() ) {}
 
 		public AutoValidationTypeSpecification( ImmutableArray<TypeAdapter> context ) : base( context ) {}
 

@@ -1,12 +1,18 @@
-﻿using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Application;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.TypeSystem.Generics;
+using PostSharp.Extensibility;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
+using Defaults = DragonSpark.Aspects.Validation.Defaults;
 
 namespace DragonSpark.Aspects.Invocation
 {
-	sealed class AutoValidationValidator : DecoratorFactoryBase<object, bool>
+	sealed class AutoValidationValidator<T> : DecoratorFactoryBase<T, bool>
 	{
 		readonly IAutoValidationController controller;
 
@@ -15,24 +21,24 @@ namespace DragonSpark.Aspects.Invocation
 			this.controller = controller;
 		}
 
-		public override IDecorator<object, bool> Get( IDecorator<object, bool> parameter ) => new Context( controller, parameter );
+		public override IDecorator<T, bool> Get( IDecorator<T, bool> parameter ) => new Context( controller, parameter );
 
-		sealed class Context : IDecorator<object, bool>
+		sealed class Context : IDecorator<T, bool>
 		{
 			readonly IAutoValidationController controller;
-			readonly IDecorator<object, bool> next;
+			readonly IDecorator<T, bool> next;
 
-			public Context( IAutoValidationController controller, IDecorator<object, bool> next )
+			public Context( IAutoValidationController controller, IDecorator<T, bool> next )
 			{
 				this.controller = controller;
 				this.next = next;
 			}
 
-			public bool Execute( object parameter ) => controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, next.Execute( parameter ) );
+			public bool Execute( T parameter ) => controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, next.Execute( parameter ) );
 		}
 	}
 
-	sealed class AutoValidationExecutor : DecoratorFactoryBase<object>
+	sealed class AutoValidationExecutor<TParameter, TResult> : DecoratorFactoryBase<TParameter, TResult>
 	{
 		readonly IAutoValidationController controller;
 
@@ -41,23 +47,24 @@ namespace DragonSpark.Aspects.Invocation
 			this.controller = controller;
 		}
 
-		public override IDecorator<object, object> Get( IDecorator<object, object> parameter ) => new Context( controller, parameter );
+		public override IDecorator<TParameter, TResult> Get( IDecorator<TParameter, TResult> parameter ) => new Context( controller, parameter );
 
-		sealed class Context : IDecorator<object>
+		sealed class Context : IDecorator<TParameter, TResult>
 		{
 			readonly IAutoValidationController controller;
-			readonly IDecorator<object, object> next;
+			readonly IDecorator<TParameter, TResult> next;
 
-			public Context( IAutoValidationController controller, IDecorator<object, object> next )
+			public Context( IAutoValidationController controller, IDecorator<TParameter, TResult> next )
 			{
 				this.controller = controller;
 				this.next = next;
 			}
 
-			public object Execute( object parameter ) => controller.Execute( parameter, () => next.Execute( parameter ) );
+			public TResult Execute( TParameter parameter ) => controller.Execute( parameter, () => next.Execute( parameter ) ).As<TResult>();
 		}
 	}
 
+	[MulticastAttributeUsage( PersistMetaData =  true )]
 	public class ApplyAutoValidationAttribute : ApplyPolicyAttribute
 	{
 		public ApplyAutoValidationAttribute() : base( typeof(AutoValidationPolicy) ) {}
@@ -65,33 +72,36 @@ namespace DragonSpark.Aspects.Invocation
 
 	public sealed class AutoValidationPolicy : PolicyBase<object>
 	{
+		readonly static IGenericMethodContext<Execute> Binder = typeof(AutoValidationPolicy).Adapt().GenericCommandMethods[ nameof(Bind) ];
+
 		public static AutoValidationPolicy Default { get; } = new AutoValidationPolicy();
-		AutoValidationPolicy() : this( Defaults.ControllerSource, Repositories<object, bool>.Default.Get, Repositories<object>.Default.Get ) {}
+		AutoValidationPolicy() : this( AutoValidation.DefaultProfiles, Defaults.ControllerSource ) {}
 
+		readonly ImmutableArray<IAspectProfile> profiles;
 		readonly Func<object, IAutoValidationController> controllerSource;
-		readonly Func<Delegate, IDecoratorRepository<object, bool>> specificationSource;
-		readonly Func<Delegate, IDecoratorRepository<object, object>> executorSource;
 
-		AutoValidationPolicy( Func<object, IAutoValidationController> controllerSource, Func<Delegate, IDecoratorRepository<object, bool>> specificationSource, Func<Delegate, IDecoratorRepository<object, object>> executorSource )
+		AutoValidationPolicy( ImmutableArray<IAspectProfile> profiles, Func<object, IAutoValidationController> controllerSource )
 		{
+			this.profiles = profiles;
 			this.controllerSource = controllerSource;
-			this.specificationSource = specificationSource;
-			this.executorSource = executorSource;
 		}
 
 		public override void Apply( object parameter )
 		{
 			var controller = controllerSource( parameter );
 
-			var profiles = Defaults.AspectProfiles.Introduce( parameter.GetType(), tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ).ToArray();
-			foreach ( var profile in profiles )
+			foreach ( var profile in profiles.Introduce( parameter.GetType(), tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ).ToArray() )
 			{
-				var specification = parameter.GetDelegate( profile.Validation );
-				specificationSource( specification ).Add( new AutoValidationValidator( controller ) );
-
 				var execute = parameter.GetDelegate( profile.Method );
-				executorSource( execute ).Add( new AutoValidationExecutor( controller ) );
+				Binder.Make( Types.Default.Get( execute.GetMethodInfo() ).ToArray() ).Invoke( parameter, profile, controller, execute );
 			}
+		}
+
+		static void Bind<TParameter, TResult>( object parameter, IAspectProfile profile, IAutoValidationController controller, Delegate execute ) // TODO: Bleh.
+		{
+			var specification = parameter.GetDelegate( profile.Validation );
+			Repositories<TParameter, bool>.Default.Get( specification ).Add( new AutoValidationValidator<TParameter>( controller ) );
+			Repositories<TParameter, TResult>.Default.Get( execute ).Add( new AutoValidationExecutor<TParameter, TResult>( controller ) );
 		}
 	}
 }
