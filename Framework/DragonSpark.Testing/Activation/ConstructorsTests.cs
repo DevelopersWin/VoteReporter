@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Activation
 {
-	public class LocatorTests
+	public class ConstructorsTests
 	{
 		[Theory, AutoData]
 		void CachesAsExpected( Constructors constructors, int number )

@@ -116,9 +116,11 @@
     <Compile Include="Runtime\MethodDescriptor.cs" />
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\AssignableParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\DictionarySource.cs" />
+    <Compile Include="Sources\Parameterized\IAssignableParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\SourceTypeMapping.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
@@ -533,7 +535,7 @@
     <Compile Include="Sources\CachedFactoryBuilder.cs" />
     <Compile Include="Sources\SuppliedSource.cs" />
     <Compile Include="Sources\IAssignable.cs" />
-    <Compile Include="Sources\Parameterized\IAssignableParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\IAssignableReferenceSource.cs" />
     <Compile Include="Sources\IAssignableSource.cs" />
     <Compile Include="Sources\Parameterized\IParameterizedScope.cs" />
     <Compile Include="Sources\Parameterized\IParameterizedSource.cs" />

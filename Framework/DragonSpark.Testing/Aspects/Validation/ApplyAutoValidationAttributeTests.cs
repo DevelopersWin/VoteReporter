@@ -37,7 +37,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		*/
 		public void Performance()
 		{
-			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied, BasicAutoValidationAppliedInline ).Run( 1 );
+			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied,*/ BasicAutoValidationAppliedInline ).Run( 1 );
 		}
 
 		[Fact]

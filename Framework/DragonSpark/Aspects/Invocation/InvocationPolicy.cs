@@ -10,7 +10,6 @@ using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Reflection;
 using Activator = DragonSpark.Activation.Activator;
 
@@ -167,11 +166,19 @@ namespace DragonSpark.Aspects.Invocation
 		IInvocation Compile( object instance, IInvocation parameter )
 		{
 			var result = parameter;
-			var links = Get( instance.GetType() ).Concat( Get( instance ) ).Fixed();
-			foreach ( var link in links )
+			foreach ( var link in Get( instance.GetType() ) )
 			{
 				result = link.Get( result );
 			}
+
+			if ( Contains( instance ) )
+			{
+				foreach ( var link in Get( instance ) )
+				{
+					result = link.Get( result );
+				}
+			}
+
 			return result;
 		}
 

@@ -6,9 +6,9 @@ using DragonSpark.Testing.Objects;
 using System.Linq;
 using Xunit;
 
-namespace DragonSpark.Testing.Activation.FactoryModel
+namespace DragonSpark.Testing.ComponentModel
 {
-	public class FactoryReflectionSupportTests
+	public class SourceAttributeTests
 	{
 		[Fact]
 		public void GetResultType()

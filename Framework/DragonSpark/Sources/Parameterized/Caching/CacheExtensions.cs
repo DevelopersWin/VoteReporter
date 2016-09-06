@@ -16,7 +16,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 			return result;
 		}
 
-		public static TValue SetValue<TInstance, TValue>( this IAssignableParameterizedSource<TInstance, TValue> @this, TInstance instance, TValue value )
+		public static TValue SetValue<TInstance, TValue>( this IAssignableReferenceSource<TInstance, TValue> @this, TInstance instance, TValue value )
 		{
 			@this.Set( instance, value );
 			return value;

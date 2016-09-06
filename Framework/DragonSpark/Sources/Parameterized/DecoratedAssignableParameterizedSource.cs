@@ -1,9 +1,9 @@
 namespace DragonSpark.Sources.Parameterized
 {
-	public class DecoratedAssignableParameterizedSource<TParameter, TResult> : DecoratedParameterizedSource<TParameter, TResult>, IAssignableParameterizedSource<TParameter, TResult>
+	public class DecoratedAssignableReferenceSource<TParameter, TResult> : DecoratedParameterizedSource<TParameter, TResult>, IAssignableReferenceSource<TParameter, TResult>
 	{
-		readonly IAssignableParameterizedSource<TParameter, TResult> source;
-		public DecoratedAssignableParameterizedSource( IAssignableParameterizedSource<TParameter, TResult> source ) : base( source )
+		readonly IAssignableReferenceSource<TParameter, TResult> source;
+		public DecoratedAssignableReferenceSource( IAssignableReferenceSource<TParameter, TResult> source ) : base( source )
 		{
 			this.source = source;
 		}
