@@ -3,30 +3,26 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
 using System;
-using System.Collections.Immutable;
-using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Invocation
 {
+	[AttributeUsage( AttributeTargets.Class )]
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Class )]
+	// [MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict )]
+	[LinesOfCodeAvoided( 6 )]
 	public class ApplyPoliciesAttribute : InstanceLevelAspect
 	{
-		readonly static Func<Type, IPolicy> Create = Activator.Default.Get<IPolicy>;
+		// readonly static Action<Type> Command = ApplyPoliciesCommand.Default.Execute;
 
-		readonly ImmutableArray<Type> policyTypes;
+		readonly Action<Type> command;
 
-		public ApplyPoliciesAttribute( params Type[] policyTypes )
+		public ApplyPoliciesAttribute( params Type[] policyTypes ) : this( new ApplyPoliciesCommand( policyTypes.SelectAssigned( Defaults.PolicySource ) ).Execute ) {}
+
+		public ApplyPoliciesAttribute( Action<Type> command )
 		{
-			this.policyTypes = policyTypes.ToImmutableArray();
+			this.command = command;
 		}
 
-		public override void RuntimeInitializeInstance()
-		{
-			foreach ( var policy in policyTypes.SelectAssigned( Create )/*.ToArray()*/ )
-			{
-				policy.Apply( Instance );
-			}
-		}
+		public override void RuntimeInitializeInstance() => command( Instance.GetType() );
 	}
 }

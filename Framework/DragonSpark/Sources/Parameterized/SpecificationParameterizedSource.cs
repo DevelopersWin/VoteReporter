@@ -3,10 +3,13 @@ using System;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public class SpecificationParameterizedSource<TParameter, TResult> : DelegatedParameterizedSource<TParameter, TResult>, ISpecification<TParameter>
+	public interface ISpecificationParameterizedSource<in TParameter, out TResult> : IParameterizedSource<TParameter, TResult>, ISpecification<TParameter> {}
+
+	public class SpecificationParameterizedSource<TParameter, TResult> : DelegatedParameterizedSource<TParameter, TResult>, ISpecificationParameterizedSource<TParameter, TResult>
 	{
 		readonly ISpecification<TParameter> specification;
 
+		public SpecificationParameterizedSource( ISpecification<TParameter> specification, IParameterizedSource<TParameter, TResult> source ) : this( specification, source.ToSourceDelegate() ) {}
 		public SpecificationParameterizedSource( ISpecification<TParameter> specification, Func<TParameter, TResult> source ) : base( source )
 		{
 			this.specification = specification;

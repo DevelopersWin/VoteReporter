@@ -4,6 +4,7 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
+using PostSharp.Extensibility;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -168,7 +169,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return parameter == 6776;
 			}
 
-			[SupportsPolicies]
+			[SupportsPolicies( AttributeInheritance = MulticastInheritance.Strict )]
 			public virtual float Get( int parameter )
 			{
 				CreateGenericCalled++;

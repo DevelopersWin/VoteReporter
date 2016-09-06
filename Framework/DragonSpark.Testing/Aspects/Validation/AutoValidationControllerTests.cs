@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Aspects.Invocation;
 using DragonSpark.Aspects.Validation;
-using DragonSpark.Commands;
 using System;
 using System.Windows.Input;
 using Xunit;
@@ -153,7 +152,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		}
 
 		[DragonSpark.Aspects.Invocation.ApplyAutoValidation]
-		class GenericCommand : ICommand<GenericCommand.Parameter>
+		class GenericCommand : DragonSpark.Commands.ICommand<GenericCommand.Parameter>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
 
@@ -195,7 +194,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 				LastResult = parameter;
 			}
 
-			void ICommand<Parameter>.Update() {}
+			void DragonSpark.Commands.ICommand<Parameter>.Update() {}
 
 			public class Parameter
 			{

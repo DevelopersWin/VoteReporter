@@ -5,7 +5,7 @@ using DragonSpark.Sources.Parameterized;
 using System;
 using Xunit;
 
-namespace DragonSpark.Testing.Setup
+namespace DragonSpark.Testing.Application.Setup
 {
 	public class ActivatedServiceSourceTests
 	{

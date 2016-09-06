@@ -46,7 +46,7 @@
     <Compile Include="Activation\ActivatorTests.cs" />
     <Compile Include="Activation\ApplicationContextTests.cs" />
     <Compile Include="Activation\LocatorTests.cs" />
-    <Compile Include="Activation\ArgumentCacheTests.cs" />
+    <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryReflectionSupportTests.cs" />
@@ -82,7 +82,7 @@
     <Compile Include="Runtime\PurgingCollectionTests.cs" />
     <Compile Include="Sources\DelegatesTests.cs" />
     <Compile Include="Sources\ScopeTests.cs" />
-    <Compile Include="Setup\ActivatedServiceSourceTests.cs" />
+    <Compile Include="Application\Setup\ActivatedServiceSourceTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
     <Compile Include="TaskExecutionContextTests.cs" />

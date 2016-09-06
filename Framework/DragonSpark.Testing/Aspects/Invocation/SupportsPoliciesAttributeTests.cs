@@ -85,7 +85,7 @@ namespace DragonSpark.Testing.Aspects.Invocation
 
 			protected override IInvocation<string, object> Create( IInvocation<string, object> parameter ) => new Context( parameter );
 
-			sealed class Context : CommandDecoratorBase<string>
+			sealed class Context : CommandInvocationBase<string>
 			{
 				readonly IInvocation<string, object> inner;
 
@@ -94,7 +94,7 @@ namespace DragonSpark.Testing.Aspects.Invocation
 					this.inner = inner;
 				}
 
-				public override void Execute( string parameter ) => inner.Invoke( $"{Prefix}{parameter}!" );
+				public override void Execute( object instance, string parameter ) => inner.Invoke( instance, $"{Prefix}{parameter}!" );
 			}
 		}
 	}

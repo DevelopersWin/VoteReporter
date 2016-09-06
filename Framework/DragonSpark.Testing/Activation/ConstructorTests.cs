@@ -5,7 +5,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Activation
 {
-	public class ArgumentCacheTests
+	public sealed class ConstructorTests
 	{
 		[Theory, AutoData]
 		public void CreateDefault()
