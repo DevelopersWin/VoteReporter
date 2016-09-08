@@ -37,8 +37,35 @@ namespace DragonSpark.Testing.Aspects.Validation
 		*/
 		public void Performance()
 		{
-			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline, BasicAutoValidationApplied,*/ BasicAutoValidationAppliedInline ).Run( 1 );
+			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline,*/ BasicAutoValidationApplied/*, BasicAutoValidationAspectInline*/ ).Run( 1 );
+			// new PerformanceSupport( WriteLine, Performance_Argument_Contains, Performance_Argument_Get, Performance_Weak_Contains, Performance_Weak_Get ).Run();
 		}
+
+		
+		/*
+		Test                          | Average |  Median |    Mode
+		-----------------------------------------------------------
+		Performance_Argument_Contains | 00.0046 | 00.0045 | 00.0044
+		Performance_Argument_Get      | 00.0039 | 00.0039 | 00.0039
+		Performance_Weak_Contains     | 00.0049 | 00.0048 | 00.0051
+		Performance_Weak_Get          | 00.0050 | 00.0049 | 00.0048
+		*/
+		/*readonly object key = new object();
+		readonly ICache<IInvocationChain> cache = new Cache<IInvocationChain>( o => new InvocationChain() );
+		readonly IArgumentCache<object, IInvocationChain> argument = new ArgumentCache<object, IInvocationChain>( o => new InvocationChain() );
+
+		[Fact]
+		public void Performance_Argument_Get() => argument.Get( key );
+
+		[Fact]
+		public void Performance_Argument_Contains() => argument.Contains( key );
+
+		[Fact]
+		public void Performance_Weak_Get() => cache.Get( key );
+
+		[Fact]
+		public void Performance_Weak_Contains() => cache.Contains( key );
+		*/
 
 		[Fact]
 		public void BasicAutoValidation() => BasicAutoValidationWith( validating, validating, factory );
@@ -55,7 +82,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 		public void BasicAutoValidationApplied() => BasicAutoValidationWith( applied, applied, applied );
 
 		[Fact]
-		public void BasicAutoValidationAppliedInline()
+		public void BasicAutoValidationAspectInline()
 		{
 			var sut = new AppliedExtendedFactory();
 			BasicAutoValidationWith( sut, sut, sut );

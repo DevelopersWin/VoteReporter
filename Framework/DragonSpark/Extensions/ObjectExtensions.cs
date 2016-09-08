@@ -103,12 +103,12 @@ namespace DragonSpark.Extensions
 
 		public static T AsValid<T>( this object @this, Action<T> with = null, string message = null )
 		{
-			if ( @this.Not<T>() )
+			if ( !( @this is T ) )
 			{
 				throw new InvalidOperationException( message ?? $"'{@this.GetType().FullName}' is not of type {typeof(T).FullName}." );
 			}
 
-			var result = with != null ? @this.As( with ) : @this.As<T>();
+			var result = with != null ? @this.As( with ) : (T)@this;
 			return result;
 		}
 

@@ -12,32 +12,22 @@ namespace DragonSpark.Aspects.Invocation
 		public static AutoValidationValidator Default { get; } = new AutoValidationValidator();
 		AutoValidationValidator() {}
 
-		/*readonly IAutoValidationController controller;
-
-		public AutoValidationValidator( IAutoValidationController controller )
-		{
-			this.controller = controller;
-		}*/
-
 		protected override IInvocation<object, bool> Create( IInvocation<object, bool> parameter ) => new Context( parameter );
 
 		sealed class Context : InvocationBase<object, bool>
 		{
-			readonly Func<object, IAutoValidationController> controllerSource;
 			readonly IInvocation<object, bool> next;
 
-			public Context( IInvocation<object, bool> next ) : this( Validation.Defaults.ControllerSource, next ) {}
-
-			Context( Func<object, IAutoValidationController> controllerSource, IInvocation<object, bool> next )
+			public Context( IInvocation<object, bool> next )
 			{
-				this.controllerSource = controllerSource;
 				this.next = next;
 			}
 
-			public override bool Invoke( object instance, object parameter )
+			public override bool Invoke( IInstancePolicy instance, object parameter )
 			{
-				var controller = controllerSource( instance );
-				return controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, next.Invoke( instance, parameter ) );
+				var controller = (IAutoValidationController)instance.Hub;
+				var result = controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, next.Invoke( instance, parameter ) );
+				return result;
 			}
 		}
 	}
@@ -47,29 +37,18 @@ namespace DragonSpark.Aspects.Invocation
 		public static AutoValidationExecutor Default { get; } = new AutoValidationExecutor();
 		AutoValidationExecutor() {}
 
-		/*readonly IAutoValidationController controller;
-
-		public AutoValidationExecutor( IAutoValidationController controller )
-		{
-			this.controller = controller;
-		}*/
-
 		public override IInvocation Get( IInvocation parameter ) => new Context( parameter );
 
 		sealed class Context : IInvocation
 		{
-			readonly Func<object, IAutoValidationController> controllerSource;
 			readonly IInvocation next;
 
-			public Context( IInvocation next ) : this( Validation.Defaults.ControllerSource, next ) {}
-
-			Context( Func<object, IAutoValidationController> controllerSource, IInvocation next )
+			public Context( IInvocation next )
 			{
-				this.controllerSource = controllerSource;
 				this.next = next;
 			}
 
-			public object Invoke( object instance, object parameter ) => controllerSource( instance ).Execute( parameter, () => next.Invoke( instance, parameter ) );
+			public object Invoke( IInstancePolicy instance, object parameter ) => ((IAutoValidationController)instance.Hub).Execute( parameter, () => next.Invoke( instance, parameter ) );
 		}
 	}
 
@@ -80,7 +59,9 @@ namespace DragonSpark.Aspects.Invocation
 
 		public override void RuntimeInitializeInstance()
 		{
-			Validation.Defaults.ControllerSource( Instance );
+			var instance = Instance;
+			InstancePolicies.Default.Set( instance, new InstancePolicy( (IAspectHub)Validation.Defaults.ControllerSource( instance ), instance ) );
+			
 			base.RuntimeInitializeInstance();
 		}
 	}

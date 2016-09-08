@@ -1,39 +1,36 @@
-using System;
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
+using System;
 
 namespace DragonSpark.TypeSystem.Generics
 {
 	public class GenericInvocationFactory<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult> where TParameter : class
 	{
-		readonly private Func<Type, Func<TParameter, TResult>> get;
+		readonly Func<Type, Func<TParameter, TResult>> get;
 
-		public GenericInvocationFactory( Type genericTypeDefinition, Type owningType, string methodName ) : this( new DelegateCache( owningType.Adapt().GenericFactoryMethods[ methodName ], genericTypeDefinition ).Get ) {}
+		public GenericInvocationFactory( Type genericTypeDefinition, Type owningType, string methodName ) 
+			: this( new DelegateSource( owningType.Adapt().GenericFactoryMethods[ methodName ], genericTypeDefinition ).ToSourceDelegate().Cache() ) {}
 
 		GenericInvocationFactory( Func<Type, Func<TParameter, TResult>> get )
 		{
 			this.get = get;
 		}
 
-		sealed class DelegateCache : Cache<Type, Func<TParameter, TResult>>
+		sealed class DelegateSource : ParameterizedSourceBase<Type, Func<TParameter, TResult>>
 		{
-			public DelegateCache( IGenericMethodContext<Invoke> context, Type genericType ) : base( new Factory( context, genericType ).Get ) {}
+			readonly IGenericMethodContext<Invoke> context;
+			readonly Type genericType;
 
-			sealed class Factory : ParameterizedSourceBase<Type, Func<TParameter, TResult>>
+			public DelegateSource( IGenericMethodContext<Invoke> context, Type genericType )
 			{
-				readonly IGenericMethodContext<Invoke> context;
-				readonly Type genericType;
-
-				public Factory( IGenericMethodContext<Invoke> context, Type genericType )
-				{
-					this.context = context;
-					this.genericType = genericType;
-				}
-
-				public override Func<TParameter, TResult> Get( Type parameter ) => context.Make( parameter.Adapt().GetTypeArgumentsFor( genericType ) ).Get( new[] { parameter } ).Invoke<TParameter, TResult>;
+				this.context = context;
+				this.genericType = genericType;
 			}
+
+			public override Func<TParameter, TResult> Get( Type parameter ) => 
+				context.Make( parameter.Adapt().GetTypeArgumentsFor( genericType ) ).Get( new[] { parameter } ).Invoke<TParameter, TResult>;
 		}
 
 		public override TResult Get( TParameter parameter ) => get( parameter.GetType() )( parameter );

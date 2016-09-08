@@ -94,7 +94,7 @@ namespace DragonSpark.Testing.Aspects.Invocation
 					this.inner = inner;
 				}
 
-				public override void Execute( object instance, string parameter ) => inner.Invoke( instance, $"{Prefix}{parameter}!" );
+				public override void Execute( IInstancePolicy instance, string parameter ) => inner.Invoke( instance, $"{Prefix}{parameter}!" );
 			}
 		}
 	}

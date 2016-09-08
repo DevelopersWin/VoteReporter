@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using System;
 using System.Collections.Immutable;
 
@@ -30,9 +29,9 @@ namespace DragonSpark.Aspects.Validation
 		}
 	}
 
-	sealed class AdapterSources : Cache<Type, IAdapterSource>
+	sealed class AdapterSources : ParameterizedSourceBase<Type, IAdapterSource>
 	{
-		public static AdapterSources Default { get; } = new AdapterSources();
+		public static IParameterizedSource<Type, IAdapterSource> Default { get; } = new AdapterSources().ToCache();
 		AdapterSources() : this( AutoValidation.DefaultSources ) {}
 
 		readonly ImmutableArray<IAdapterSource> sources;

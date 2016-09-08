@@ -93,7 +93,7 @@ namespace DragonSpark.TypeSystem.Metadata
 				}
 			}
 
-			public interface IMemberInfoSource : IParameterizedSource<object, MemberInfo> {}
+			interface IMemberInfoSource : IParameterizedSource<object, MemberInfo> {}
 
 			abstract class MemberInfoDefinitionLocatorBase<T> : ParameterizedSourceBase<T, MemberInfo>, IMemberInfoSource
 			{
