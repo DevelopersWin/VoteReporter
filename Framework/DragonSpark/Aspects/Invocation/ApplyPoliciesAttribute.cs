@@ -3,6 +3,8 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Aspects.Invocation
 {
@@ -14,15 +16,21 @@ namespace DragonSpark.Aspects.Invocation
 	{
 		// readonly static Action<Type> Command = ApplyPoliciesCommand.Default.Execute;
 
-		readonly Action<Type> command;
+		readonly ImmutableArray<IPolicy> policies;
 
-		public ApplyPoliciesAttribute( params Type[] policyTypes ) : this( new ApplyPoliciesCommand( policyTypes.SelectAssigned( Defaults.PolicySource ) ).Execute ) {}
+		public ApplyPoliciesAttribute( params Type[] policyTypes ) : this( policyTypes.SelectAssigned( Defaults.PolicySource ) ) {}
 
-		public ApplyPoliciesAttribute( Action<Type> command )
+		public ApplyPoliciesAttribute( IEnumerable<IPolicy> policies )
 		{
-			this.command = command;
+			this.policies = policies.ToImmutableArray();
 		}
 
-		public override void RuntimeInitializeInstance() => command( Instance.GetType() );
+		public override void RuntimeInitializeInstance()
+		{
+			foreach ( var policy in policies )
+			{
+				policy.Execute( Instance );
+			}
+		}
 	}
 }

@@ -28,16 +28,16 @@ namespace DragonSpark.Testing.Aspects.Validation
 		[Fact]
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		/*
-		Test                             | Average |  Median |    Mode
-		--------------------------------------------------------------
-		BasicAutoValidation              | 00.0326 | 00.0325 | 00.0328
-		BasicAutoValidationInline        | 00.0539 | 00.0537 | 00.0535
-		BasicAutoValidationApplied       | 00.0410 | 00.0408 | 00.0412
-		BasicAutoValidationAppliedInline | 00.0951 | 00.0949 | 00.0941
+		Test                                | Average |  Median |    Mode
+		-----------------------------------------------------------------
+		BasicAutoValidation                 | 00.0326 | 00.0325 | 00.0328
+		BasicAutoValidationWithAspect       | 00.0410 | 00.0408 | 00.0412
+		BasicAutoValidationInline           | 00.0539 | 00.0537 | 00.0535
+		BasicAutoValidationInlineWithAspect | 00.0951 | 00.0949 | 00.0941
 		*/
 		public void Performance()
 		{
-			new PerformanceSupport( WriteLine, /*BasicAutoValidation, BasicAutoValidationInline,*/ BasicAutoValidationApplied/*, BasicAutoValidationAspectInline*/ ).Run( 1 );
+			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationWithAspect, BasicAutoValidationInline, BasicAutoValidationInlineWithAspect ).Run( 1 );
 			// new PerformanceSupport( WriteLine, Performance_Argument_Contains, Performance_Argument_Get, Performance_Weak_Contains, Performance_Weak_Get ).Run();
 		}
 
@@ -79,10 +79,10 @@ namespace DragonSpark.Testing.Aspects.Validation
 		}
 
 		[Fact]
-		public void BasicAutoValidationApplied() => BasicAutoValidationWith( applied, applied, applied );
+		public void BasicAutoValidationWithAspect() => BasicAutoValidationWith( applied, applied, applied );
 
 		[Fact]
-		public void BasicAutoValidationAspectInline()
+		public void BasicAutoValidationInlineWithAspect()
 		{
 			var sut = new AppliedExtendedFactory();
 			BasicAutoValidationWith( sut, sut, sut );
@@ -189,14 +189,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 				return Get( (int)parameter );
 			}*/
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public bool IsSatisfiedBy( int parameter )
 			{
 				CanCreateGenericCalled++;
 				return parameter == 6776;
 			}
 
-			[SupportsPolicies( AttributeInheritance = MulticastInheritance.Strict )]
+			[ExtensionPoint( AttributeInheritance = MulticastInheritance.Strict )]
 			public virtual float Get( int parameter )
 			{
 				CreateGenericCalled++;

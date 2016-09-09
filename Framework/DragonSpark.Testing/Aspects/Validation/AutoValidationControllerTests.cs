@@ -136,14 +136,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			public int? LastResult { get; private set; }
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
 				return parameter is int && (int)parameter == 1212;
 			}
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public void Execute( object parameter )
 			{
 				ExecuteCalled++;
@@ -164,14 +164,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			public Parameter LastResult { get; private set; }
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
 				return parameter is int && IsSatisfiedBy( new Parameter( (int)parameter ) );
 			}
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public void Execute( object parameter )
 			{
 				ExecuteCalled++;
@@ -180,14 +180,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			// bool IValidationAware.ShouldValidate() => false;
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public bool IsSatisfiedBy( Parameter parameter )
 			{
 				CanExecuteGenericCalled++;
 				return parameter.Number == 6776;
 			}
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public void Execute( Parameter parameter )
 			{
 				ExecuteGenericCalled++;

@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects.Invocation;
-using DragonSpark.Extensions;
 using JetBrains.Annotations;
 using Ploeh.AutoFixture.Xunit2;
 using System;
@@ -15,14 +14,14 @@ namespace DragonSpark.Testing.Aspects.Invocation
 		[Theory, AutoData]
 		void Verify( Subject sut, string message )
 		{
-			var reference = new Action<string>( sut.HelloWorld ).Method;
+			/*var reference = new Action<string>( sut.HelloWorld ).Method;
 			Points.Default.Get( reference ).Get( sut ).Add( ModifyMessagePolicy.Default );
 
 			sut.HelloWorld( message );
 
 			var actual = sut.Messages.Only();
 			Assert.StartsWith( ModifyMessagePolicy.Prefix, actual );
-			Assert.Contains( message, actual );
+			Assert.Contains( message, actual );*/
 		}
 
 		[Theory, AutoData]
@@ -54,14 +53,14 @@ namespace DragonSpark.Testing.Aspects.Invocation
 
 			public int CanExecuteCalled { get; private set; }
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
 				return parameter is int && (int)parameter == 6776;
 			}
 
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public void Execute( object parameter ) => Parameters.Add( parameter );
 
 			public ICollection<object> Parameters { get; } = new Collection<object>();
@@ -70,7 +69,7 @@ namespace DragonSpark.Testing.Aspects.Invocation
 		[UsedImplicitly]
 		class Subject
 		{
-			[SupportsPolicies]
+			[ExtensionPoint]
 			public void HelloWorld( string message ) => Messages.Add( message );
 
 			public ICollection<string> Messages { get; } = new Collection<string>();
@@ -94,7 +93,7 @@ namespace DragonSpark.Testing.Aspects.Invocation
 					this.inner = inner;
 				}
 
-				public override void Execute( IInstancePolicy instance, string parameter ) => inner.Invoke( instance, $"{Prefix}{parameter}!" );
+				public override void Execute( string parameter ) => inner.Invoke( $"{Prefix}{parameter}!" );
 			}
 		}
 	}

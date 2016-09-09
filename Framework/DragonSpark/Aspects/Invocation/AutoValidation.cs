@@ -1,54 +1,66 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Invocation
 {
 	sealed class AutoValidationValidator : InvocationFactoryBase<object, bool>
 	{
-		public static AutoValidationValidator Default { get; } = new AutoValidationValidator();
-		AutoValidationValidator() {}
+		readonly IAutoValidationController controller;
+		public AutoValidationValidator( IAutoValidationController controller )
+		{
+			this.controller = controller;
+		}
 
-		protected override IInvocation<object, bool> Create( IInvocation<object, bool> parameter ) => new Context( parameter );
+		protected override IInvocation<object, bool> Create( IInvocation<object, bool> parameter ) => new Context( controller, parameter );
 
 		sealed class Context : InvocationBase<object, bool>
 		{
+			readonly IAutoValidationController controller;
 			readonly IInvocation<object, bool> next;
 
-			public Context( IInvocation<object, bool> next )
+			public Context( IAutoValidationController controller, IInvocation<object, bool> next )
 			{
+				this.controller = controller;
 				this.next = next;
 			}
 
-			public override bool Invoke( IInstancePolicy instance, object parameter )
-			{
-				var controller = (IAutoValidationController)instance.Hub;
-				var result = controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, next.Invoke( instance, parameter ) );
-				return result;
-			}
+			public override bool Invoke( object parameter ) => 
+				controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, next.Invoke( parameter ) );
 		}
 	}
 
 	sealed class AutoValidationExecutor : InvocationFactoryBase
 	{
-		public static AutoValidationExecutor Default { get; } = new AutoValidationExecutor();
-		AutoValidationExecutor() {}
+		readonly IAutoValidationController controller;
+		/*public static AutoValidationExecutor Default { get; } = new AutoValidationExecutor();
+		AutoValidationExecutor() {}*/
 
-		public override IInvocation Get( IInvocation parameter ) => new Context( parameter );
+		public AutoValidationExecutor( IAutoValidationController controller )
+		{
+			this.controller = controller;
+		}
+
+		public override IInvocation Get( IInvocation parameter ) => new Context( controller, parameter );
 
 		sealed class Context : IInvocation
 		{
+			readonly IAutoValidationController controller;
 			readonly IInvocation next;
 
-			public Context( IInvocation next )
+			public Context( IAutoValidationController controller, IInvocation next )
 			{
+				this.controller = controller;
 				this.next = next;
 			}
 
-			public object Invoke( IInstancePolicy instance, object parameter ) => ((IAutoValidationController)instance.Hub).Execute( parameter, () => next.Invoke( instance, parameter ) );
+			public object Invoke( object parameter ) => controller.Execute( parameter, () => next.Invoke( parameter ) );
 		}
 	}
 
@@ -56,34 +68,52 @@ namespace DragonSpark.Aspects.Invocation
 	public class ApplyAutoValidationAttribute : ApplyPoliciesAttribute
 	{
 		public ApplyAutoValidationAttribute() : base( typeof(AutoValidationPolicy) ) {}
-
-		public override void RuntimeInitializeInstance()
-		{
-			var instance = Instance;
-			InstancePolicies.Default.Set( instance, new InstancePolicy( (IAspectHub)Validation.Defaults.ControllerSource( instance ), instance ) );
-			
-			base.RuntimeInitializeInstance();
-		}
 	}
 
 	public sealed class AutoValidationPolicy : PolicyBase
 	{
 		public static AutoValidationPolicy Default { get; } = new AutoValidationPolicy();
-		AutoValidationPolicy() : this( AutoValidation.DefaultProfiles ) {}
+		AutoValidationPolicy() : this( PointSource.DefaultNested.Get, Validation.Defaults.ControllerSource ) {}
 
-		readonly ImmutableArray<IAspectProfile> profiles;
+		readonly Func<Type, IEnumerable<IExtensionPoint>> source;
+		readonly Func<object, IAutoValidationController> controllerSource;
 
-		AutoValidationPolicy( ImmutableArray<IAspectProfile> profiles )
+		AutoValidationPolicy( Func<Type, IEnumerable<IExtensionPoint>> source, Func<object, IAutoValidationController> controllerSource )
 		{
-			this.profiles = profiles;
+			this.source = source;
+			this.controllerSource = controllerSource;
 		}
 
-		public override IEnumerable<PolicyMapping> Get( Type parameter )
+		protected override IEnumerable<PolicyMapping> Get( object parameter )
 		{
-			foreach ( var profile in profiles.Introduce( parameter, tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ) )
+			var controller = controllerSource( parameter );
+			var links = new AutoValidationValidator( controller ).Append<IInvocationLink>( new AutoValidationExecutor( controller ) ).Repeat();
+
+			var result = source( parameter.GetType() ).Zip( links, ( point, link ) => new PolicyMapping( point, link ) );
+			return result;
+		}
+
+		sealed class PointSource : IParameterizedSource<Type, IEnumerable<IExtensionPoint>>
+		{
+			public static IParameterizedSource<Type, IEnumerable<IExtensionPoint>> DefaultNested { get; } = new PointSource().ToCache();
+			PointSource() : this( AutoValidation.DefaultProfiles, ExtensionPoints.Default.Get ) {}
+
+			readonly ImmutableArray<IAspectProfile> profiles;
+			readonly Func<MethodBase, IExtensionPoint> pointSource;
+
+			PointSource( ImmutableArray<IAspectProfile> profiles, Func<MethodBase, IExtensionPoint> pointSource )
 			{
-				yield return new PolicyMapping( profile.Validation.Find( parameter ), AutoValidationValidator.Default );
-				yield return new PolicyMapping( profile.Method.Find( parameter ), AutoValidationExecutor.Default );
+				this.profiles = profiles;
+				this.pointSource = pointSource;
+			}
+
+			public IEnumerable<IExtensionPoint> Get( Type parameter )
+			{
+				foreach ( var profile in profiles.Introduce( parameter, tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ) )
+				{
+					yield return pointSource( profile.Validation.Find( parameter ) );
+					yield return pointSource( profile.Method.Find( parameter ) );
+				}
 			}
 		}
 	}
