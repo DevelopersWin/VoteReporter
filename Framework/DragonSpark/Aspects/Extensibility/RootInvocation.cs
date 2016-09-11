@@ -13,14 +13,16 @@ namespace DragonSpark.Aspects.Extensibility
 			this.origin = origin;
 		}
 
+		protected override void OnAssign( IInvocation item )
+		{
+			Enabled = item != origin;
+			base.OnAssign( item );
+		}
+
 		public void Assign( AspectInvocation item ) => origin.Assign( item );
 
 		public object Invoke( object parameter ) => Get().Invoke( parameter );
 
-		/*// public void Add( ISpecification<object> instance ) => Specification = Specification != null ? Specification.And( instance ) : instance;
-
-		ISpecification<object> Specification { get; set; }
-
-		public bool IsSatisfiedBy( object parameter ) => Specification?.IsSatisfiedBy( parameter ) ?? true;*/
+		public bool Enabled { get; private set; }
 	}
 }
