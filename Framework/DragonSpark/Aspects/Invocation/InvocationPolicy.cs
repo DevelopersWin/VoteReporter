@@ -9,9 +9,6 @@ using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reflection;
 using Activator = DragonSpark.Activation.Activator;
 
@@ -30,11 +27,11 @@ namespace DragonSpark.Aspects.Invocation
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var compiled = Point.Compile( args.Instance );
-			if ( compiled != null )
+			var context = Point.Get( args.Instance );
+			if ( context != null )
 			{
-				compiled.Assign( new AspectInvocation( args.Arguments, args.GetReturnValue ) );
-				args.ReturnValue = compiled.Invoke( args.Arguments.GetArgument( 0 ) ) ?? args.ReturnValue;
+				context.Assign( new AspectInvocation( args.Arguments, args.GetReturnValue ) );
+				args.ReturnValue = context.Invoke( args.Arguments.GetArgument( 0 ) ) ?? args.ReturnValue;
 			}
 			else
 			{
@@ -54,42 +51,40 @@ namespace DragonSpark.Aspects.Invocation
 		ExtensionPoints() : base( _ => new ExtensionPoint() ) {}
 	}
 
-	public interface IExtensionPoint : IParameterizedSource<IComposable<IInvocationLink>>
+	public interface IExtensionPoint : IParameterizedSource<IInvocationContext>
 	{
-		CompiledInvocation Compile( object instance );
+		// CompiledInvocation Compile( object instance );
 	}
-	sealed class ExtensionPoint : IExtensionPoint
+	sealed class ExtensionPoint : Cache<IInvocationContext>, IExtensionPoint
 	{
-		readonly IParameterizedSource<Pair> pairs;
-		readonly IParameterizedSource<IInvocationChain> chains;
+		// readonly IParameterizedSource<Pair> pairs;
+		public ExtensionPoint() : base( o => new InvocationContext() ) {}
 
-		public ExtensionPoint() : this( new Cache<IInvocationChain>( o => new InvocationChain() ) ) {}
-		public ExtensionPoint( IParameterizedSource<IInvocationChain> chains ) : this( chains, new Pairs( chains ) ) {}
-
-		ExtensionPoint( IParameterizedSource<IInvocationChain> chains, IParameterizedSource<Pair> pairs )
+		public override IInvocationContext Get( object instance )
 		{
-			this.chains = chains;
-			this.pairs = pairs;
+			var context = base.Get( instance );
+			var result = context.IsSatisfiedBy( instance ) ? context : null;
+			return result;
 		}
 
-		public IComposable<IInvocationLink> Get( object parameter ) => chains.Get( parameter );
+/*		public IInvocationContext Get( object parameter ) => chains.Get( parameter );
 
 		public CompiledInvocation Compile( object instance )
 		{
 			var pair = pairs.Get( instance );
 			var result = pair.Specification?.IsSatisfiedBy( instance ) ?? true ? pair.Instance : null;
 			return result;
-		}
+		}*/
 
-		sealed class Pairs : Cache<Pair>
+		/*sealed class Pairs : Cache<Pair>
 		{
-			public Pairs( IParameterizedSource<IInvocationChain> chains ) : base( new Factory( chains ).Get ) {}
+			public Pairs( IParameterizedSource<IInvocationContext> chains ) : base( new Factory( chains ).Get ) {}
 			
 			sealed class Factory : IParameterizedSource<Pair>
 			{
-				readonly IParameterizedSource<IInvocationChain> chains;
+				readonly IParameterizedSource<IInvocationContext> chains;
 
-				public Factory( IParameterizedSource<IInvocationChain> chains )
+				public Factory( IParameterizedSource<IInvocationContext> chains )
 				{
 					this.chains = chains;
 				}
@@ -104,9 +99,9 @@ namespace DragonSpark.Aspects.Invocation
 					return result;
 				}
 			}
-		}
+		}*/
 
-		sealed class Pair
+		/*sealed class Pair
 		{
 			public Pair( CompiledInvocation instance, ISpecification<object> specification = null )
 			{
@@ -116,7 +111,7 @@ namespace DragonSpark.Aspects.Invocation
 
 			public ISpecification<object> Specification { get; }
 			public CompiledInvocation Instance { get; }
-		}
+		}*/
 	}
 
 	sealed class DelegatedInvocation<T> : IInvocation where T : IInvocation
@@ -129,30 +124,25 @@ namespace DragonSpark.Aspects.Invocation
 		public object Invoke( object parameter ) => source().Invoke( parameter );
 	}
 
-	public sealed class CompiledInvocation : ThreadLocalStore<AspectInvocation>, IInvocation
+	public interface ICompiledInvocation : IAssignable<AspectInvocation>, IInvocation {}
+
+	public sealed class CompiledInvocation : ICompiledInvocation
 	{
+		readonly IAssignable<AspectInvocation> assignable;
 		readonly IInvocation invocation;
 
-		public CompiledInvocation( IInvocationLink[] chain )
+		public CompiledInvocation( IAssignable<AspectInvocation> assignable,  IInvocation invocation )
 		{
-			invocation = Compile( chain );
+			this.assignable = assignable;
+			this.invocation = invocation;
 		}
 
 		// public bool Enabled => chain.Enabled;
 
-		IInvocation Compile( IInvocationLink[] links )
-		{
-			IInvocation result = new DelegatedInvocation<AspectInvocation>( Get );
-			foreach ( var link in links )
-			{
-				result = link.Get( result );
-			}
-			return result;
-		}
-
 		public object Invoke( object parameter ) => invocation.Invoke( parameter );
 
 		// public bool IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
+		public void Assign( AspectInvocation item ) => assignable.Assign( item );
 	}
 
 	public abstract class CommandInvocationBase<T> : InvocationBase<T, object>, IInvocation<T>
@@ -185,8 +175,8 @@ namespace DragonSpark.Aspects.Invocation
 		object Invoke( object parameter );
 	}
 
-	public abstract class InvocationFactoryBase<T> : InvocationFactoryBase<T, object> {}
-	public abstract class InvocationFactoryBase<TParameter, TResult> : InvocationFactoryBase
+	// public abstract class InvocationFactoryBase<T> : InvocationFactoryBase<T, object> {}
+	/*public abstract class InvocationFactoryBase<TParameter, TResult> : InvocationFactoryBase
 	{
 		protected abstract IInvocation<TParameter, TResult> Create( IInvocation<TParameter, TResult> parameter );
 
@@ -205,9 +195,9 @@ namespace DragonSpark.Aspects.Invocation
 
 			public object Invoke( object parameter ) => inner.Invoke( parameter );
 		}
-	}
+	}*/
 
-	public abstract class InvocationFactoryBase : AlterationBase<IInvocation>, IInvocationLink {}
+	// public abstract class InvocationFactoryBase : AlterationBase<IInvocation>, IInvocationLink {}
 
 	public interface IPolicy : ICommand<object> {}
 
@@ -241,8 +231,39 @@ namespace DragonSpark.Aspects.Invocation
 		}
 	}
 
-	public interface IInvocationLink : IAlteration<IInvocation> {}
+	// public interface IInvocationLink : IAlteration<IInvocation> {}
 
-	public interface IInvocationChain : ICollection<IInvocationLink>, IComposable<IInvocationLink> {}
-	sealed class InvocationChain : Collection<IInvocationLink>, IInvocationChain {}
+	/*public interface IInvocationContext : IComposable<IInvocation>
+	{
+		IInvocation Next();
+	}*/
+
+	public interface IInvocationContext : IAssignableSource<IInvocation>, IAssignable<AspectInvocation>, IInvocation, IComposable<ISpecification<object>>, ISpecification<object> {}
+	sealed class InvocationContext : SuppliedSource<IInvocation>, IInvocationContext
+	{
+		readonly IInitialInvocationLink initial;
+
+		public InvocationContext() : this( new InitialInvocationLink() ) {}
+
+		public InvocationContext( IInitialInvocationLink initial ) : base( initial )
+		{
+			this.initial = initial;
+		}
+
+		public void Assign( AspectInvocation item ) => initial.Assign( item );
+
+		public object Invoke( object parameter ) => Get().Invoke( parameter );
+
+		public void Add( ISpecification<object> instance ) => Specification = Specification != null ? Specification.And( instance ) : instance;
+
+		ISpecification<object> Specification { get; set; }
+
+		public bool IsSatisfiedBy( object parameter ) => Specification?.IsSatisfiedBy( parameter ) ?? true;
+	}
+
+	public interface IInitialInvocationLink : IInvocation, IAssignable<AspectInvocation> {}
+	public class InitialInvocationLink : ThreadLocalStore<AspectInvocation>, IInitialInvocationLink
+	{
+		public object Invoke( object parameter ) => Get().Invoke( parameter );
+	}
 }

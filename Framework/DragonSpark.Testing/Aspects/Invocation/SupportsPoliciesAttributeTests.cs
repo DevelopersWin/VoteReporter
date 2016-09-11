@@ -75,26 +75,27 @@ namespace DragonSpark.Testing.Aspects.Invocation
 			public ICollection<string> Messages { get; } = new Collection<string>();
 		}
 
-		sealed class ModifyMessagePolicy : InvocationFactoryBase<string>
+		/*sealed class ModifyMessagePolicy : InvocationFactoryBase<string>
 		{
-			public const string Prefix = "[ModifyMessagePolicy] Hello World: ";
-
 			public static ModifyMessagePolicy Default { get; } = new ModifyMessagePolicy();
 			ModifyMessagePolicy() {}
 
 			protected override IInvocation<string, object> Create( IInvocation<string, object> parameter ) => new Context( parameter );
 
-			sealed class Context : CommandInvocationBase<string>
+			
+		}*/
+
+		sealed class ModifyMessagePolicy : CommandInvocationBase<string>
+		{
+			public const string Prefix = "[ModifyMessagePolicy] Hello World: ";
+			readonly IInvocation<string, object> inner;
+
+			public ModifyMessagePolicy( IInvocation<string, object> inner )
 			{
-				readonly IInvocation<string, object> inner;
-
-				public Context( IInvocation<string, object> inner )
-				{
-					this.inner = inner;
-				}
-
-				public override void Execute( string parameter ) => inner.Invoke( $"{Prefix}{parameter}!" );
+				this.inner = inner;
 			}
+
+			public override void Execute( string parameter ) => inner.Invoke( $"{Prefix}{parameter}!" );
 		}
 	}
 }

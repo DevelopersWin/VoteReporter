@@ -11,69 +11,44 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Invocation
 {
-	sealed class AutoValidationValidator : InvocationFactoryBase<object, bool>, ISpecification<object>
+	sealed class AutoValidationValidator : InvocationBase<object, bool>, ISpecification<object>
 	{
 		readonly IAutoValidationController controller;
+		readonly IInvocation next;
 		readonly Active active;
 
-		public AutoValidationValidator( IAutoValidationController controller, Active active )
+		public AutoValidationValidator( IAutoValidationController controller, IInvocation next, Active active )
 		{
 			this.controller = controller;
+			this.next = next;
 			this.active = active;
 		}
 
-		protected override IInvocation<object, bool> Create( IInvocation<object, bool> parameter ) => new Context( controller, parameter );
+		public override bool Invoke( object parameter ) => 
+			controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, (bool)next.Invoke( parameter ) );
 
-		sealed class Context : InvocationBase<object, bool>
-		{
-			readonly IAutoValidationController controller;
-			readonly IInvocation<object, bool> next;
-
-			public Context( IAutoValidationController controller, IInvocation<object, bool> next )
-			{
-				this.controller = controller;
-				this.next = next;
-			}
-
-			public override bool Invoke( object parameter ) => 
-				controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, next.Invoke( parameter ) );
-		}
 		public bool IsSatisfiedBy( object parameter ) => !active.IsActive;
 	}
 
-	sealed class AutoValidationExecutor : InvocationFactoryBase
+	sealed class AutoValidationExecutor : IInvocation
 	{
 		readonly IAutoValidationController controller;
 		readonly Active active;
+		readonly IInvocation next;
 
-		public AutoValidationExecutor( IAutoValidationController controller, Active active )
+		public AutoValidationExecutor( IAutoValidationController controller, IInvocation next, Active active )
 		{
 			this.controller = controller;
 			this.active = active;
+			this.next = next;
 		}
 
-		public override IInvocation Get( IInvocation parameter ) => new Context( controller, active, parameter );
-
-		sealed class Context : IInvocation
+		public object Invoke( object parameter )
 		{
-			readonly IAutoValidationController controller;
-			readonly Active active;
-			readonly IInvocation next;
-
-			public Context( IAutoValidationController controller, Active active, IInvocation next )
-			{
-				this.controller = controller;
-				this.active = active;
-				this.next = next;
-			}
-
-			public object Invoke( object parameter )
-			{
-				active.IsActive = true;
-				var result = controller.Execute( parameter, () => next.Invoke( parameter ) );
-				active.IsActive = false;
-				return result;
-			}
+			active.IsActive = true;
+			var result = controller.Execute( parameter, () => next.Invoke( parameter ) );
+			active.IsActive = false;
+			return result;
 		}
 	}
 
@@ -140,13 +115,17 @@ namespace DragonSpark.Aspects.Invocation
 		{
 			var active = new Active();
 			var controller = controllerSource( parameter );
-			var validator = new AutoValidationValidator( controller, active );
-			var execution = new AutoValidationExecutor( controller, active );
-
+			
 			foreach ( var pair in source( parameter.GetType() ).Fixed() )
 			{
-				pair.Validation.Get( parameter ).Add( validator );
-				pair.Execution.Get( parameter ).Add( execution );
+				var context = pair.Validation.Get( parameter );
+				var validator = new AutoValidationValidator( controller, context.Get(), active );
+				context.Assign( validator );
+				context.Add( validator );
+
+				var invocationContext = pair.Execution.Get( parameter );
+				var execution = new AutoValidationExecutor( controller, invocationContext.Get(), active );
+				invocationContext.Assign( execution );
 			}
 		}
 	}
