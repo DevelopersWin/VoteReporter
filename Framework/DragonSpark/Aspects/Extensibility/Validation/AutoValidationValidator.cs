@@ -1,8 +1,6 @@
-﻿using DragonSpark.Specifications;
-
-namespace DragonSpark.Aspects.Extensibility.Validation
+﻿namespace DragonSpark.Aspects.Extensibility.Validation
 {
-	sealed class AutoValidationValidator : InvocationBase<object, bool>, ISpecification<object>
+	sealed class AutoValidationValidator : InvocationBase<object, bool>
 	{
 		readonly IAutoValidationController controller;
 		readonly IInvocation next;
@@ -16,8 +14,8 @@ namespace DragonSpark.Aspects.Extensibility.Validation
 		}
 
 		public override bool Invoke( object parameter ) => 
-			controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, (bool)next.Invoke( parameter ) );
+			active.IsActive ? (bool)next.Invoke( parameter ) : controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, (bool)next.Invoke( parameter ) );
 
-		public bool IsSatisfiedBy( object parameter ) => !active.IsActive;
+		// public bool IsSatisfiedBy( object parameter ) => !active.IsActive;
 	}
 }

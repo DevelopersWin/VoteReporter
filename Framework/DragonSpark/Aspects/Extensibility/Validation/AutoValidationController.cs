@@ -1,6 +1,6 @@
-﻿using System.Threading;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
+using System.Threading;
 
 namespace DragonSpark.Aspects.Extensibility.Validation
 {

@@ -1,14 +1,15 @@
-﻿using DragonSpark.Commands;
+﻿using DragonSpark.Aspects.Extensibility;
+using DragonSpark.Aspects.Extensibility.Validation;
+using DragonSpark.Commands;
 using System.IO;
 
 namespace DragonSpark.Windows.Setup
 {
-	// [ApplyAutoValidation]
-	public sealed class DeleteFileCommand : CommandBase<FileInfo>
+	public sealed class DeleteFileCommand : ExtensibleCommandBase<FileSystemInfo>
 	{
-		public static ICommand<FileInfo> Default { get; } = new DeleteFileCommand().Apply( FileSystemInfoExistsSpecification.Default );
+		public static DeleteFileCommand Default { get; } = new DeleteFileCommand().ExtendUsing( FileSystemInfoExistsSpecification.Default ).Extend( AutoValidationExtension.Default );
 		DeleteFileCommand() {}
 
-		public override void Execute( FileInfo parameter ) => parameter.Delete();
+		public override void Execute( FileSystemInfo parameter ) => parameter.Delete();
 	}
 }

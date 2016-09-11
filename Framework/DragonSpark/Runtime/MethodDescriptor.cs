@@ -34,7 +34,8 @@ namespace DragonSpark.Runtime
 				this.methodName = methodName;
 			}
 
-			protected override MethodInfo Create( Type parameter ) => parameter.GetMethod( declaringType, methodName ).AsDeclared();
+			protected override MethodInfo Create( Type parameter ) => 
+				parameter.GetMethod( declaringType, methodName ).AsDeclared().AccountForGenericDefinition();
 		}
 	}
 }

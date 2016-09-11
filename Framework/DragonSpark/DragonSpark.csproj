@@ -65,6 +65,8 @@
     <Compile Include="Aspects\Extensibility\IRootInvocation.cs" />
     <Compile Include="Aspects\Extensibility\OriginInvocation.cs" />
     <Compile Include="Aspects\Extensibility\RootInvocation.cs" />
+    <Compile Include="Aspects\Extensibility\Validation\ExtensionPointProfile.cs" />
+    <Compile Include="Aspects\Extensibility\Validation\ExtensionPointProfiles.cs" />
     <Compile Include="Aspects\Extensibility\WrappedInvocation.cs" />
     <Compile Include="Aspects\Extensibility\Validation\MethodLocator.cs" />
     <Compile Include="Aspects\Extensibility\Validation\SourceAdapter.cs" />

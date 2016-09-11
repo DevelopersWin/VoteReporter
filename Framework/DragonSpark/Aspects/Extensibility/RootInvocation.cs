@@ -1,5 +1,4 @@
 using DragonSpark.Sources;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Extensibility
 {
@@ -18,10 +17,10 @@ namespace DragonSpark.Aspects.Extensibility
 
 		public object Invoke( object parameter ) => Get().Invoke( parameter );
 
-		public void Add( ISpecification<object> instance ) => Specification = Specification != null ? Specification.And( instance ) : instance;
+		/*// public void Add( ISpecification<object> instance ) => Specification = Specification != null ? Specification.And( instance ) : instance;
 
 		ISpecification<object> Specification { get; set; }
 
-		public bool IsSatisfiedBy( object parameter ) => Specification?.IsSatisfiedBy( parameter ) ?? true;
+		public bool IsSatisfiedBy( object parameter ) => Specification?.IsSatisfiedBy( parameter ) ?? true;*/
 	}
 }

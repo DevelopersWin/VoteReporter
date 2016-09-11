@@ -8,7 +8,6 @@ using System;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {
-	// [ApplyAutoValidation]
 	sealed class FixtureServiceProvider : DecoratedActivator
 	{
 		public FixtureServiceProvider( IFixture fixture ) : base( new Specification( fixture ), new Inner( fixture ).ToSourceDelegate() ) {}

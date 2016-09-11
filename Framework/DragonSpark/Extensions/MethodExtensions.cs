@@ -10,7 +10,9 @@ namespace DragonSpark.Extensions
 	{
 		public static T CreateDelegate<T>( this MethodInfo @this ) => @this.CreateDelegate( typeof(T) ).To<T>();
 
-		public static MethodInfo AccountForGenericDefinition( this MethodInfo @this )
+		public static MethodInfo AccountForGenericDefinition( this MethodInfo @this ) => Account.Get( @this );
+		readonly static IParameterizedSource<MethodInfo, MethodInfo> Account = new Cache<MethodInfo, MethodInfo>( AccountForGenericDefinitionBody );
+		static MethodInfo AccountForGenericDefinitionBody( MethodInfo @this )
 		{
 			var result = @this.DeclaringType.IsConstructedGenericType ? @this.DeclaringType.GetGenericTypeDefinition().GetRuntimeMethods().SingleOrDefault( MethodEqualitySpecification.For( @this ) )
 				:

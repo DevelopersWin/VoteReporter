@@ -20,16 +20,9 @@ namespace DragonSpark.Aspects.Extensibility
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var context = Point.Get( args.Instance );
-			if ( context.IsSatisfiedBy( args.Instance ) )
-			{
-				context.Assign( new AspectInvocation( args.Arguments, args.GetReturnValue ) );
-				args.ReturnValue = context.Invoke( args.Arguments.GetArgument( 0 ) ) ?? args.ReturnValue;
-			}
-			else
-			{
-				base.OnInvoke( args );
-			}
+			var invocation = Point.Get( args.Instance );
+			invocation.Assign( new AspectInvocation( args.Arguments, args.GetReturnValue ) );
+			args.ReturnValue = invocation.Invoke( args.Arguments.GetArgument( 0 ) ) ?? args.ReturnValue;
 		}
 	}
 }

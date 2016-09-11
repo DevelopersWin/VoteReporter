@@ -1,4 +1,7 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Aspects.Extensibility.Validation;
+using DragonSpark.Extensions;
+using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
@@ -10,35 +13,25 @@ namespace DragonSpark.Aspects.Extensibility
 {
 	[AttributeUsage( AttributeTargets.Class )]
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	// [MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict )]
 	[LinesOfCodeAvoided( 6 )]
 	public class ApplyExtensionsAttribute : InstanceLevelAspect
 	{
-		// readonly static Action<Type> Command = ApplyPoliciesCommand.Default.Execute;
-
 		readonly ImmutableArray<IExtension> extensions;
 
 		public ApplyExtensionsAttribute( params Type[] extensionTypes ) : this( extensionTypes.SelectAssigned( Defaults.ExtensionSource ) ) {}
 
 		public ApplyExtensionsAttribute( IEnumerable<IExtension> policies )
 		{
-			this.extensions = policies.ToImmutableArray();
+			extensions = policies.ToImmutableArray();
 		}
 
 		public override void RuntimeInitializeInstance()
 		{
-			foreach ( var extension in extensions )
+			var provider = Instance as IExtensionProvider;
+			var provided = provider?.GetExtensions() ?? Items<IExtension>.Default;
+			foreach ( var extension in extensions.Concat( provided ).Prioritize() )
 			{
 				extension.Execute( Instance );
-			}
-
-			var provider = Instance as IExtensionProvider;
-			if ( provider != null )
-			{
-				foreach ( var extension in provider.GetExtensions() )
-				{
-					extension.Execute( Instance );
-				}
 			}
 		}
 	}
@@ -48,8 +41,40 @@ namespace DragonSpark.Aspects.Extensibility
 		IEnumerable<IExtension> GetExtensions();
 	}
 
-	class SpecificationExtension : IExtension
+	public sealed class SpecificationExtension<T> : ExtensionBase
 	{
-		public void Execute( object parameter ) {}
+		readonly Invocation invocation;
+		readonly Func<Type, IEnumerable<ExtensionPointProfile>> source;
+
+		public SpecificationExtension( ISpecification<T> specification ) : this( specification, ExtensionPointProfiles.DefaultNested.Get ) {}
+
+		public SpecificationExtension( ISpecification<T> specification, Func<Type, IEnumerable<ExtensionPointProfile>> source ) : this( new Invocation( specification ), source ) {}
+
+		SpecificationExtension( Invocation invocation, Func<Type, IEnumerable<ExtensionPointProfile>> source ) : base( Priority.BeforeHigher )
+		{
+			this.invocation = invocation;
+			this.source = source;
+		}
+
+		public override void Execute( object parameter )
+		{
+			var profiles = source( parameter.GetType() );
+			foreach ( var pair in profiles )
+			{
+				pair.Validation.Get( parameter ).Assign( invocation );
+			}
+		}
+
+		sealed class Invocation : InvocationBase<T, bool>
+		{
+			readonly ISpecification<T> specification;
+
+			public Invocation( ISpecification<T> specification )
+			{
+				this.specification = specification;
+			}
+
+			public override bool Invoke( T parameter ) => specification.IsSatisfiedBy( parameter );
+		}
 	}
 }
