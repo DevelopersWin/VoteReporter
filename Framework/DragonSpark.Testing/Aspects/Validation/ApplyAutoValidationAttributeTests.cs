@@ -30,10 +30,10 @@ namespace DragonSpark.Testing.Aspects.Validation
 		/*
 		Test                                | Average |  Median |    Mode
 		-----------------------------------------------------------------
-		BasicAutoValidation                 | 00.0326 | 00.0325 | 00.0328
-		BasicAutoValidationWithAspect       | 00.0410 | 00.0408 | 00.0412
-		BasicAutoValidationInline           | 00.0539 | 00.0537 | 00.0535
-		BasicAutoValidationInlineWithAspect | 00.0951 | 00.0949 | 00.0941
+		BasicAutoValidation                 | 00.0280 | 00.0280 | 00.0280
+		BasicAutoValidationWithAspect       | 00.0482 | 00.0482 | 00.0482
+		BasicAutoValidationInline           | 00.0415 | 00.0415 | 00.0415
+		BasicAutoValidationInlineWithAspect | 00.1476 | 00.1476 | 00.1476
 		*/
 		public void Performance()
 		{
