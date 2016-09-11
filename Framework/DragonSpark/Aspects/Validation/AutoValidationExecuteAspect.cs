@@ -1,5 +1,6 @@
-﻿using System;
+﻿using DragonSpark.Aspects.Invocation;
 using PostSharp.Aspects;
+using System;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -17,7 +18,7 @@ namespace DragonSpark.Aspects.Validation
 				this.controller = controller;
 			}
 
-			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = controller.Execute( args.Arguments[0], args.GetReturnValue );
+			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = controller.Execute( args.Arguments[0], new DelegatedInvocation<object, object>( o => args.GetReturnValue<object>() ) );
 		}
 	}
 }

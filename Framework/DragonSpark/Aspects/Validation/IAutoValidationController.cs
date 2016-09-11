@@ -1,5 +1,5 @@
-﻿using DragonSpark.Specifications;
-using System;
+﻿using DragonSpark.Aspects.Invocation;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -7,6 +7,6 @@ namespace DragonSpark.Aspects.Validation
 	{
 		void MarkValid( object parameter, bool valid );
 
-		object Execute( object parameter, Func<object> proceed );
+		object Execute( object parameter, IInvocation proceed );
 	}
 }

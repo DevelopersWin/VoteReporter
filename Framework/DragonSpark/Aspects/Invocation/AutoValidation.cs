@@ -2,7 +2,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
-using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -46,14 +45,14 @@ namespace DragonSpark.Aspects.Invocation
 		public object Invoke( object parameter )
 		{
 			active.IsActive = true;
-			var result = controller.Execute( parameter, () => next.Invoke( parameter ) );
+			var result = controller.Execute( parameter, next );
 			active.IsActive = false;
 			return result;
 		}
 	}
 
-	[MulticastAttributeUsage( PersistMetaData =  true )]
-	public class ApplyAutoValidationAttribute : ApplyPoliciesAttribute
+	// [MulticastAttributeUsage( PersistMetaData =  true )]
+	public sealed class ApplyAutoValidationAttribute : ApplyPoliciesAttribute
 	{
 		public ApplyAutoValidationAttribute() : base( typeof(AutoValidationPolicy) ) {}
 	}

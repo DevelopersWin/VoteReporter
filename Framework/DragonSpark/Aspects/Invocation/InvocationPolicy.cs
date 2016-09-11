@@ -66,83 +66,6 @@ namespace DragonSpark.Aspects.Invocation
 			var result = context.IsSatisfiedBy( instance ) ? context : null;
 			return result;
 		}
-
-/*		public IInvocationContext Get( object parameter ) => chains.Get( parameter );
-
-		public CompiledInvocation Compile( object instance )
-		{
-			var pair = pairs.Get( instance );
-			var result = pair.Specification?.IsSatisfiedBy( instance ) ?? true ? pair.Instance : null;
-			return result;
-		}*/
-
-		/*sealed class Pairs : Cache<Pair>
-		{
-			public Pairs( IParameterizedSource<IInvocationContext> chains ) : base( new Factory( chains ).Get ) {}
-			
-			sealed class Factory : IParameterizedSource<Pair>
-			{
-				readonly IParameterizedSource<IInvocationContext> chains;
-
-				public Factory( IParameterizedSource<IInvocationContext> chains )
-				{
-					this.chains = chains;
-				}
-
-				public Pair Get( object parameter )
-				{
-					var links = chains.Get( parameter ).ToArray();
-					var specifications = links.OfType<ISpecification<object>>().ToArray();
-					var length = specifications.Length;
-					var specification = length == 1 ? specifications[0] : length > 1 ? new AllSpecification<object>( specifications ) : null;
-					var result = new Pair( new CompiledInvocation( links ), specification );
-					return result;
-				}
-			}
-		}*/
-
-		/*sealed class Pair
-		{
-			public Pair( CompiledInvocation instance, ISpecification<object> specification = null )
-			{
-				Specification = specification;
-				Instance = instance;
-			}
-
-			public ISpecification<object> Specification { get; }
-			public CompiledInvocation Instance { get; }
-		}*/
-	}
-
-	sealed class DelegatedInvocation<T> : IInvocation where T : IInvocation
-	{
-		readonly Func<T> source;
-		public DelegatedInvocation( Func<T> source )
-		{
-			this.source = source;
-		}
-		public object Invoke( object parameter ) => source().Invoke( parameter );
-	}
-
-	public interface ICompiledInvocation : IAssignable<AspectInvocation>, IInvocation {}
-
-	public sealed class CompiledInvocation : ICompiledInvocation
-	{
-		readonly IAssignable<AspectInvocation> assignable;
-		readonly IInvocation invocation;
-
-		public CompiledInvocation( IAssignable<AspectInvocation> assignable,  IInvocation invocation )
-		{
-			this.assignable = assignable;
-			this.invocation = invocation;
-		}
-
-		// public bool Enabled => chain.Enabled;
-
-		public object Invoke( object parameter ) => invocation.Invoke( parameter );
-
-		// public bool IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
-		public void Assign( AspectInvocation item ) => assignable.Assign( item );
 	}
 
 	public abstract class CommandInvocationBase<T> : InvocationBase<T, object>, IInvocation<T>
@@ -170,34 +93,46 @@ namespace DragonSpark.Aspects.Invocation
 		TResult Invoke( TParameter parameter );
 	}
 
+	public static class Extensions
+	{
+		public static IInvocation<TParameter, TResult> Get<TParameter, TResult>( this IInvocationContext @this ) => @this.Get().Wrap<TParameter, TResult>();
+		public static IInvocation<TParameter, TResult> Wrap<TParameter, TResult>( this IInvocation @this ) => @this as IInvocation<TParameter, TResult> ?? Wrappers<TParameter, TResult>.Default.Get( @this );
+		sealed class Wrappers<TParameter, TResult> : Cache<IInvocation, IInvocation<TParameter, TResult>>
+		{
+			public static Wrappers<TParameter, TResult> Default { get; } = new Wrappers<TParameter, TResult>();
+			Wrappers() : base( result => new WrappedInvocation<TParameter, TResult>( result ) ) {}
+		}
+	}
+
+	class WrappedInvocation<TParameter, TResult> : IInvocation<TParameter, TResult>
+	{
+		readonly IInvocation invocation;
+
+		public WrappedInvocation( IInvocation invocation )
+		{
+			this.invocation = invocation;
+		}
+
+		TResult IInvocation<TParameter, TResult>.Invoke( TParameter parameter ) => (TResult)Invoke( parameter );
+
+		public object Invoke( object parameter ) => invocation.Invoke( parameter );
+	}
+
+	class DelegatedInvocation<TParameter, TResult> : IInvocation
+	{
+		readonly Func<TParameter, TResult> source;
+		public DelegatedInvocation( Func<TParameter, TResult> source )
+		{
+			this.source = source;
+		}
+
+		public object Invoke( object parameter ) => source( (TParameter)parameter );
+	}
+
 	public interface IInvocation
 	{
 		object Invoke( object parameter );
 	}
-
-	// public abstract class InvocationFactoryBase<T> : InvocationFactoryBase<T, object> {}
-	/*public abstract class InvocationFactoryBase<TParameter, TResult> : InvocationFactoryBase
-	{
-		protected abstract IInvocation<TParameter, TResult> Create( IInvocation<TParameter, TResult> parameter );
-
-		public sealed override IInvocation Get( IInvocation parameter ) => Create( parameter as IInvocation<TParameter, TResult> ?? new Wrapper( parameter ) );
-
-		sealed class Wrapper : IInvocation<TParameter, TResult>
-		{
-			readonly IInvocation inner;
-
-			public Wrapper( IInvocation inner )
-			{
-				this.inner = inner;
-			}
-
-			public TResult Invoke( TParameter parameter ) => (TResult)inner.Invoke( parameter );
-
-			public object Invoke( object parameter ) => inner.Invoke( parameter );
-		}
-	}*/
-
-	// public abstract class InvocationFactoryBase : AlterationBase<IInvocation>, IInvocationLink {}
 
 	public interface IPolicy : ICommand<object> {}
 
@@ -230,13 +165,6 @@ namespace DragonSpark.Aspects.Invocation
 			return result;
 		}
 	}
-
-	// public interface IInvocationLink : IAlteration<IInvocation> {}
-
-	/*public interface IInvocationContext : IComposable<IInvocation>
-	{
-		IInvocation Next();
-	}*/
 
 	public interface IInvocationContext : IAssignableSource<IInvocation>, IAssignable<AspectInvocation>, IInvocation, IComposable<ISpecification<object>>, ISpecification<object> {}
 	sealed class InvocationContext : SuppliedSource<IInvocation>, IInvocationContext

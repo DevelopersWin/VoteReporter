@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Aspects.Invocation;
+using DragonSpark.Extensions;
 using JetBrains.Annotations;
 using Ploeh.AutoFixture.Xunit2;
 using System;
@@ -9,19 +10,20 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Invocation
 {
-	public class SupportsPoliciesAttributeTests
+	public class ExtensionPointAttributeTests
 	{
 		[Theory, AutoData]
 		void Verify( Subject sut, string message )
 		{
-			/*var reference = new Action<string>( sut.HelloWorld ).Method;
-			Points.Default.Get( reference ).Get( sut ).Add( ModifyMessagePolicy.Default );
+			var reference = new Action<string>( sut.HelloWorld ).Method;
+			var context = ExtensionPoints.Default.Get( reference ).Get( sut );
+			context.Assign( new ModifyMessagePolicy( context.Get<string, object>() ) );
 
 			sut.HelloWorld( message );
 
 			var actual = sut.Messages.Only();
 			Assert.StartsWith( ModifyMessagePolicy.Prefix, actual );
-			Assert.Contains( message, actual );*/
+			Assert.Contains( message, actual );
 		}
 
 		[Theory, AutoData]
@@ -74,16 +76,6 @@ namespace DragonSpark.Testing.Aspects.Invocation
 
 			public ICollection<string> Messages { get; } = new Collection<string>();
 		}
-
-		/*sealed class ModifyMessagePolicy : InvocationFactoryBase<string>
-		{
-			public static ModifyMessagePolicy Default { get; } = new ModifyMessagePolicy();
-			ModifyMessagePolicy() {}
-
-			protected override IInvocation<string, object> Create( IInvocation<string, object> parameter ) => new Context( parameter );
-
-			
-		}*/
 
 		sealed class ModifyMessagePolicy : CommandInvocationBase<string>
 		{

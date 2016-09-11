@@ -1,14 +1,12 @@
-﻿using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Aspects.Invocation;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
-using System;
-using System.Collections.Concurrent;
+using System.Threading;
 
 namespace DragonSpark.Aspects.Validation
 {
-	sealed class AutoValidationController : ConcurrentDictionary<int, object>, IAutoValidationController, IAspectHub
+	sealed class AutoValidationController : ThreadLocal<object>, IAutoValidationController, IAspectHub
 	{
-		// readonly static object Executing = new object();
-
 		readonly IParameterValidationAdapter validator;
 		
 		public AutoValidationController( IParameterValidationAdapter validator )
@@ -18,33 +16,17 @@ namespace DragonSpark.Aspects.Validation
 
 		public bool IsSatisfiedBy( object parameter ) => Handler?.Handles( parameter ) ?? false;
 
-		bool IsMarked( object parameter )
-		{
-			object current;
-			var result = TryGetValue( Environment.CurrentManagedThreadId, out current ) && Equals( current, parameter ) && Clear();
-			return result;
-		}
+		bool IsMarked( object parameter ) => Value != null && Equals( Value, parameter ) && Clear();
 
-		public void MarkValid( object parameter, bool valid )
-		{
-			if ( valid )
-			{
-				this[Environment.CurrentManagedThreadId] = parameter;
-			}
-			else
-			{
-				Clear();
-			}
-		}
+		public void MarkValid( object parameter, bool valid ) => Value = valid ? parameter : null;
 
-		new bool Clear()
+		bool Clear()
 		{
-			object removed;
-			TryRemove( Environment.CurrentManagedThreadId, out removed );
+			Value = null;
 			return true;
 		}
 
-		public object Execute( object parameter, Func<object> proceed )
+		public object Execute( object parameter, IInvocation proceed )
 		{
 			object handled = null;
 			if ( Handler?.Handle( parameter, out handled ) ?? false )
@@ -53,14 +35,8 @@ namespace DragonSpark.Aspects.Validation
 				return handled;
 			}
 
-			var result = IsMarked( parameter ) || Validate( parameter ) ? proceed() : null;
+			var result = IsMarked( parameter ) || validator.IsSatisfiedBy( parameter ) ? proceed.Invoke( parameter ) : null;
 			Clear();
-			return result;
-		}
-
-		bool Validate( object parameter )
-		{
-			var result = validator.IsSatisfiedBy( parameter );
 			return result;
 		}
 
