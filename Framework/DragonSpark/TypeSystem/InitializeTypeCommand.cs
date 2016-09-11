@@ -9,6 +9,7 @@ using System.Reflection;
 namespace DragonSpark.TypeSystem
 {
 	// http://stackoverflow.com/questions/35976558/is-constructorinfo-getparameters-thread-safe/35976798
+	[EnableExtensions]
 	public sealed class InitializeTypeCommand : ExtensibleCommandBase<Type>
 	{
 		public static InitializeTypeCommand Default { get; } = new InitializeTypeCommand().ExtendUsing( CanActivateSpecification.Default.And( new OncePerParameterSpecification<Type>() ) );

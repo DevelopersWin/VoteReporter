@@ -145,7 +145,7 @@
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
     <Compile Include="TypeSystem\KnownTypesTests.cs" />
     <Compile Include="TypeSystem\PartsTests.cs" />
-    <Compile Include="TypeSystem\RegistrationTests.cs" />
+    <Compile Include="TypeSystem\AssemblyBasedTypeSourceTests.cs" />
     <Compile Include="TypeSystem\TypeAdapterTests.cs" />
   </ItemGroup>
   <ItemGroup>

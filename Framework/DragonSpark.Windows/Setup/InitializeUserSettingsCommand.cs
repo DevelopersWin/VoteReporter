@@ -15,6 +15,7 @@ using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
+	[EnableExtensions]
 	public class InitializeUserSettingsCommand : ExtensibleCommandBase<ApplicationSettingsBase>
 	{
 		readonly ILogger logger;

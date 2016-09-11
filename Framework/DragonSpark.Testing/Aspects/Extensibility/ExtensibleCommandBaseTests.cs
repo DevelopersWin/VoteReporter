@@ -46,6 +46,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility
 			Assert.Single( sut.Parameters );
 		}
 
+		[EnableExtensions]
 		class PocoCommand : ExtensibleCommandBase<int>
 		{
 			public override void Execute( int parameter ) => Parameters.Add( parameter );
@@ -63,13 +64,14 @@ namespace DragonSpark.Testing.Aspects.Extensibility
 			public ICollection<int> Parameters { get; } = new Collection<int>();
 		}
 
-		// [ApplyExtensions]
+		[EnableExtensions]
 		class SpecificationCommand : ExtensibleCommandBase<int>
 		{
 			public SpecificationCommand()
 			{
 				this.ExtendUsing( Specification.Default );
 			}
+
 			public override void Execute( int parameter ) {}
 
 			// public ICollection<int> Parameters { get; } = new Collection<int>();

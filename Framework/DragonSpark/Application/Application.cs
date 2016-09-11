@@ -1,4 +1,6 @@
-﻿using DragonSpark.Commands;
+﻿using DragonSpark.Aspects.Extensibility;
+using DragonSpark.Aspects.Extensibility.Validation;
+using DragonSpark.Commands;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
@@ -7,6 +9,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Application
 {
+	[EnableExtensions]
 	public abstract class Application<T> : Aspects.Extensibility.CompositeCommand<T>, IApplication<T>
 	{
 		protected Application() : this( Items<ICommand>.Default ) {}
@@ -15,7 +18,7 @@ namespace DragonSpark.Application
 
 		protected Application( ISpecification<T> specification, params ICommand[] commands ) : base( commands.Distinct().Prioritize().Fixed() )
 		{
-			this.ExtendUsing( specification );
+			this.ExtendUsing( specification ).Extend( AutoValidationExtension.Default );
 		}
 	}
 }

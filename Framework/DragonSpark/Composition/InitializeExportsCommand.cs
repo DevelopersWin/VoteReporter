@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Application;
 using DragonSpark.Aspects.Extensibility;
-using DragonSpark.Aspects.Extensibility.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using System;
@@ -8,7 +7,7 @@ using System.Composition;
 
 namespace DragonSpark.Composition
 {
-	[ApplyAutoValidation]
+	// [ApplyAutoValidation]
 	public sealed class InitializeExportsCommand : ExtensibleCommandBase<IServiceProvider>
 	{
 		public static InitializeExportsCommand Default { get; } = new InitializeExportsCommand();

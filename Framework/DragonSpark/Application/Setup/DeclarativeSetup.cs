@@ -1,4 +1,6 @@
-﻿using DragonSpark.Commands;
+﻿using DragonSpark.Aspects.Extensibility;
+using DragonSpark.Aspects.Extensibility.Validation;
+using DragonSpark.Commands;
 using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -8,7 +10,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Application.Setup
 {
-	// [ApplyAutoValidation]
+	[EnableExtensions]
 	public class DeclarativeSetup : Aspects.Extensibility.CompositeCommand, ISetup
 	{
 		public static ISetup Current() => AmbientStack.GetCurrentItem<ISetup>();
@@ -20,8 +22,7 @@ namespace DragonSpark.Application.Setup
 		public DeclarativeSetup( ISpecification<object> specification, Priority priority = Priority.Normal, params ICommand[] commands ) : base( commands )
 		{
 			Priority = priority;
-			/*inner = new SpecificationCommand<object>( specification, Body ).Execute;*/
-			this.ExtendUsing( specification );
+			this.ExtendUsing( specification ).Extend( AutoValidationExtension.Default );
 		}
 
 		public Priority Priority { get; set; }

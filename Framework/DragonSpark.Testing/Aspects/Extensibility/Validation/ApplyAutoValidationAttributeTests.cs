@@ -1,13 +1,19 @@
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Extensibility;
 using DragonSpark.Aspects.Extensibility.Validation;
+using DragonSpark.Commands;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
+using PostSharp.Aspects;
+using PostSharp.Aspects.Configuration;
+using PostSharp.Aspects.Serialization;
 using PostSharp.Extensibility;
+using System;
 using Xunit;
 using Xunit.Abstractions;
+using Defaults = DragonSpark.Sources.Parameterized.Defaults;
 
 namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 {
@@ -42,15 +48,65 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 			// new PerformanceSupport( WriteLine, Performance_Argument_Contains, Performance_Argument_Get, Performance_Weak_Contains, Performance_Weak_Get ).Run();
 		}
 
-		
-		/*
-		Test                          | Average |  Median |    Mode
-		-----------------------------------------------------------
-		Performance_Argument_Contains | 00.0046 | 00.0045 | 00.0044
-		Performance_Argument_Get      | 00.0039 | 00.0039 | 00.0039
-		Performance_Weak_Contains     | 00.0049 | 00.0048 | 00.0051
-		Performance_Weak_Get          | 00.0050 | 00.0049 | 00.0048
-		*/
+		[Fact]
+		[Trait( Traits.Category, Traits.Categories.Performance )]
+		public void RunCommandBodies()
+		{
+			new PerformanceSupport( WriteLine, RunBasicCoreCommand, RunAspectCommand, RunExtensibleCommand, RunEnabledExtensibleCommand ).Run( 1 );
+		}
+
+		static void RunBasicCoreCommand() => BasicCoreCommand.Default.Execute( Defaults.Parameter );
+		static void RunAspectCommand() => AspectCommand.Default.Execute( Defaults.Parameter );
+		static void RunExtensibleCommand() => ExtensibleCommand.Default.Execute( Defaults.Parameter );
+		static void RunEnabledExtensibleCommand() => EnabledExtensibleCommand.Default.Execute( Defaults.Parameter );
+
+		class BasicCoreCommand : CommandBase<object>
+		{
+			public static BasicCoreCommand Default { get; } = new BasicCoreCommand();
+			BasicCoreCommand() {}
+
+			public override void Execute( object parameter ) {}
+		}
+
+		class AspectCommand : CommandBase<object>
+		{
+			public static AspectCommand Default { get; } = new AspectCommand();
+			AspectCommand() {}
+
+			[Aspect]
+			public override void Execute( object parameter ) {}
+		}
+
+		[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+		[LinesOfCodeAvoided( 1 ), AttributeUsage( AttributeTargets.Method )]
+		public sealed class Aspect : MethodInterceptionAspect {}
+		class ExtensibleCommand : CommandBase<object>
+		{
+			public static ExtensibleCommand Default { get; } = new ExtensibleCommand();
+			ExtensibleCommand() {}
+
+			[ExtensionPoint]
+			public override void Execute( object parameter ) {}
+		}
+
+		[EnableExtensions]
+		class EnabledExtensibleCommand : CommandBase<object>
+		{
+			public static EnabledExtensibleCommand Default { get; } = new EnabledExtensibleCommand();
+			EnabledExtensibleCommand() {}
+
+			[ExtensionPoint]
+			public override void Execute( object parameter ) {}
+		}
+
+/*
+				Test                          | Average |  Median |    Mode
+				-----------------------------------------------------------
+				Performance_Argument_Contains | 00.0046 | 00.0045 | 00.0044
+				Performance_Argument_Get      | 00.0039 | 00.0039 | 00.0039
+				Performance_Weak_Contains     | 00.0049 | 00.0048 | 00.0051
+				Performance_Weak_Get          | 00.0050 | 00.0049 | 00.0048
+				*/
 		/*readonly object key = new object();
 		readonly ICache<IInvocationChain> cache = new Cache<IInvocationChain>( o => new InvocationChain() );
 		readonly IArgumentCache<object, IInvocationChain> argument = new ArgumentCache<object, IInvocationChain>( o => new InvocationChain() );
@@ -122,7 +178,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 			Assert.False( invalid );
 			Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );*/
-			
+
 			var cannot = specification.IsSatisfiedBy( 456 );
 			Assert.False( cannot );
 			// Assert.Equal( 1, sut.CanCreateCalled );
@@ -151,8 +207,6 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 			sut.Reset();
 		}
 
-		
-
 		interface IExtendedFactory : IParameterizedSource<int, float>, ISpecification<int>
 		{
 			// int CanCreateCalled { get; }
@@ -171,7 +225,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 			[Freeze]
 			public override float Get( int parameter ) => base.Get( parameter );
 		}
-		
+
 		[ApplyAutoValidation]
 		class AppliedExtendedFactory : IExtendedFactory
 		{

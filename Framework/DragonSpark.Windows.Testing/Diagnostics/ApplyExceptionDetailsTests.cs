@@ -1,5 +1,7 @@
 ﻿using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Windows.Diagnostics;
 using JetBrains.Annotations;
 using Serilog.Events;
@@ -8,13 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
-using DragonSpark.Testing.Framework.Application;
-using DragonSpark.Testing.Framework.Application.Setup;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.Diagnostics
 {
-	public class ExceptionDetailsTests
+	public class ApplyExceptionDetailsTests
 	{
 		[Theory, AutoData, AdditionalTypes( typeof(ApplyExceptionDetails) ), FrameworkTypes, ContainingTypeAndNested]
 		public void DetailsWorkAsExpected( int number, string message )

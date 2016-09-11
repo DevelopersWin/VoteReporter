@@ -5,6 +5,7 @@ using System.IO;
 
 namespace DragonSpark.Windows.Setup
 {
+	[EnableExtensions]
 	public sealed class DeleteFileCommand : ExtensibleCommandBase<FileSystemInfo>
 	{
 		public static DeleteFileCommand Default { get; } = new DeleteFileCommand().ExtendUsing( FileSystemInfoExistsSpecification.Default ).Extend( AutoValidationExtension.Default );

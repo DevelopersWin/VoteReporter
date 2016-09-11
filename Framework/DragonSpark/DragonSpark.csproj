@@ -40,6 +40,7 @@
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Aspects\Extensibility\Active.cs" />
     <Compile Include="Aspects\Extensibility\Commands.cs" />
+    <Compile Include="Aspects\Extensibility\SpecificationExtension.cs" />
     <Compile Include="Aspects\Extensibility\Validation\ApplyAutoValidationAttribute.cs" />
     <Compile Include="Aspects\Extensibility\ApplyExtensionsAttribute.cs" />
     <Compile Include="Aspects\Extensibility\AspectInvocation.cs" />

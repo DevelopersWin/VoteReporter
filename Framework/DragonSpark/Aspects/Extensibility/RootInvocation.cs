@@ -15,7 +15,7 @@ namespace DragonSpark.Aspects.Extensibility
 
 		protected override void OnAssign( IInvocation item )
 		{
-			Enabled = item != origin;
+			Enabled = origin != null;
 			base.OnAssign( item );
 		}
 

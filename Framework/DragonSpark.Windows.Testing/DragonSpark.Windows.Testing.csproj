@@ -39,7 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ConfigurationTests.cs" />
-    <Compile Include="Diagnostics\ExceptionDetailsTests.cs" />
+    <Compile Include="Diagnostics\ApplyExceptionDetailsTests.cs" />
     <Compile Include="Io\FileSystemTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

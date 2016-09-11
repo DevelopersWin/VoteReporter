@@ -69,7 +69,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility
 			public ICollection<object> Parameters { get; } = new Collection<object>();
 		}
 
-		[UsedImplicitly]
+		[UsedImplicitly, EnableExtensions]
 		class Subject
 		{
 			[ExtensionPoint]
