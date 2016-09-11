@@ -1,4 +1,4 @@
-﻿using DragonSpark.Aspects.Invocation;
+﻿using DragonSpark.Aspects.Extensions;
 using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation

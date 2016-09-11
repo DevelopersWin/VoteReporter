@@ -49,6 +49,7 @@
     <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
+    <Compile Include="Aspects\Extensions\ExtensibleCommandBaseTests.cs" />
     <Compile Include="ComponentModel\SourceAttributeTests.cs" />
     <Compile Include="Activation\ExecutionContextTests.cs" />
     <Compile Include="Activation\RecordingLoggerConfigurationCommandTests.cs" />
@@ -58,7 +59,7 @@
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
-    <Compile Include="Aspects\Invocation\ExtensionPointAttributeTests.cs" />
+    <Compile Include="Aspects\Extensions\ExtensionPointAttributeTests.cs" />
     <Compile Include="Aspects\Validation\AutoValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="Aspects\Validation\ApplyAutoValidationAttributeTests.cs" />

@@ -1,14 +1,14 @@
-﻿using DragonSpark.Aspects.Invocation;
-using DragonSpark.Extensions;
-using JetBrains.Annotations;
-using Ploeh.AutoFixture.Xunit2;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using DragonSpark.Aspects.Extensions;
+using DragonSpark.Extensions;
+using JetBrains.Annotations;
+using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
-namespace DragonSpark.Testing.Aspects.Invocation
+namespace DragonSpark.Testing.Aspects.Extensions
 {
 	public class ExtensionPointAttributeTests
 	{

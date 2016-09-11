@@ -1,26 +1,26 @@
-﻿using DragonSpark.Extensions;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using DragonSpark.Extensions;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 
-namespace DragonSpark.Aspects.Invocation
+namespace DragonSpark.Aspects.Extensions
 {
 	[AttributeUsage( AttributeTargets.Class )]
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	// [MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict )]
 	[LinesOfCodeAvoided( 6 )]
-	public class ApplyPoliciesAttribute : InstanceLevelAspect
+	public class ApplyExtensionsAttribute : InstanceLevelAspect
 	{
 		// readonly static Action<Type> Command = ApplyPoliciesCommand.Default.Execute;
 
-		readonly ImmutableArray<IPolicy> policies;
+		readonly ImmutableArray<IExtension> policies;
 
-		public ApplyPoliciesAttribute( params Type[] policyTypes ) : this( policyTypes.SelectAssigned( Defaults.PolicySource ) ) {}
+		public ApplyExtensionsAttribute( params Type[] policyTypes ) : this( policyTypes.SelectAssigned( Defaults.PolicySource ) ) {}
 
-		public ApplyPoliciesAttribute( IEnumerable<IPolicy> policies )
+		public ApplyExtensionsAttribute( IEnumerable<IExtension> policies )
 		{
 			this.policies = policies.ToImmutableArray();
 		}

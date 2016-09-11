@@ -1,5 +1,5 @@
 using DragonSpark.Aspects;
-using DragonSpark.Aspects.Invocation;
+using DragonSpark.Aspects.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using DragonSpark.Testing.Framework;

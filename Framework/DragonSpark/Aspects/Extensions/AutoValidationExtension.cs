@@ -1,71 +1,23 @@
-﻿using DragonSpark.Aspects.Validation;
-using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Aspects.Validation;
+using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 
-namespace DragonSpark.Aspects.Invocation
+namespace DragonSpark.Aspects.Extensions
 {
-	sealed class AutoValidationValidator : InvocationBase<object, bool>, ISpecification<object>
+	public sealed class AutoValidationExtension : ExtensionBase
 	{
-		readonly IAutoValidationController controller;
-		readonly IInvocation next;
-		readonly Active active;
-
-		public AutoValidationValidator( IAutoValidationController controller, IInvocation next, Active active )
-		{
-			this.controller = controller;
-			this.next = next;
-			this.active = active;
-		}
-
-		public override bool Invoke( object parameter ) => 
-			controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, (bool)next.Invoke( parameter ) );
-
-		public bool IsSatisfiedBy( object parameter ) => !active.IsActive;
-	}
-
-	sealed class AutoValidationExecutor : IInvocation
-	{
-		readonly IAutoValidationController controller;
-		readonly Active active;
-		readonly IInvocation next;
-
-		public AutoValidationExecutor( IAutoValidationController controller, IInvocation next, Active active )
-		{
-			this.controller = controller;
-			this.active = active;
-			this.next = next;
-		}
-
-		public object Invoke( object parameter )
-		{
-			active.IsActive = true;
-			var result = controller.Execute( parameter, next );
-			active.IsActive = false;
-			return result;
-		}
-	}
-
-	// [MulticastAttributeUsage( PersistMetaData =  true )]
-	public sealed class ApplyAutoValidationAttribute : ApplyPoliciesAttribute
-	{
-		public ApplyAutoValidationAttribute() : base( typeof(AutoValidationPolicy) ) {}
-	}
-
-	public sealed class AutoValidationPolicy : PolicyBase
-	{
-		public static AutoValidationPolicy Default { get; } = new AutoValidationPolicy();
-		AutoValidationPolicy() : this( PointSource.DefaultNested.Get, Validation.Defaults.ControllerSource ) {}
+		public static AutoValidationExtension Default { get; } = new AutoValidationExtension();
+		AutoValidationExtension() : this( PointSource.DefaultNested.Get, Validation.Defaults.ControllerSource ) {}
 
 		readonly Func<Type, IEnumerable<Pair>> source;
 		readonly Func<object, IAutoValidationController> controllerSource;
 
-		AutoValidationPolicy( Func<Type, IEnumerable<Pair>> source, Func<object, IAutoValidationController> controllerSource )
+		AutoValidationExtension( Func<Type, IEnumerable<Pair>> source, Func<object, IAutoValidationController> controllerSource )
 		{
 			this.source = source;
 			this.controllerSource = controllerSource;
@@ -127,10 +79,5 @@ namespace DragonSpark.Aspects.Invocation
 				invocationContext.Assign( execution );
 			}
 		}
-	}
-
-	public class Active
-	{
-		public bool IsActive { get; set; }
 	}
 }
