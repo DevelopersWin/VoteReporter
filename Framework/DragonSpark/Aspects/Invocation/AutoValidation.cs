@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,15 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Invocation
 {
-	sealed class AutoValidationValidator : InvocationFactoryBase<object, bool>
+	sealed class AutoValidationValidator : InvocationFactoryBase<object, bool>, ISpecification<object>
 	{
 		readonly IAutoValidationController controller;
-		public AutoValidationValidator( IAutoValidationController controller )
+		readonly Active active;
+
+		public AutoValidationValidator( IAutoValidationController controller, Active active )
 		{
 			this.controller = controller;
+			this.active = active;
 		}
 
 		protected override IInvocation<object, bool> Create( IInvocation<object, bool> parameter ) => new Context( controller, parameter );
@@ -34,33 +38,42 @@ namespace DragonSpark.Aspects.Invocation
 			public override bool Invoke( object parameter ) => 
 				controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, next.Invoke( parameter ) );
 		}
+		public bool IsSatisfiedBy( object parameter ) => !active.IsActive;
 	}
 
 	sealed class AutoValidationExecutor : InvocationFactoryBase
 	{
 		readonly IAutoValidationController controller;
-		/*public static AutoValidationExecutor Default { get; } = new AutoValidationExecutor();
-		AutoValidationExecutor() {}*/
+		readonly Active active;
 
-		public AutoValidationExecutor( IAutoValidationController controller )
+		public AutoValidationExecutor( IAutoValidationController controller, Active active )
 		{
 			this.controller = controller;
+			this.active = active;
 		}
 
-		public override IInvocation Get( IInvocation parameter ) => new Context( controller, parameter );
+		public override IInvocation Get( IInvocation parameter ) => new Context( controller, active, parameter );
 
 		sealed class Context : IInvocation
 		{
 			readonly IAutoValidationController controller;
+			readonly Active active;
 			readonly IInvocation next;
 
-			public Context( IAutoValidationController controller, IInvocation next )
+			public Context( IAutoValidationController controller, Active active, IInvocation next )
 			{
 				this.controller = controller;
+				this.active = active;
 				this.next = next;
 			}
 
-			public object Invoke( object parameter ) => controller.Execute( parameter, () => next.Invoke( parameter ) );
+			public object Invoke( object parameter )
+			{
+				active.IsActive = true;
+				var result = controller.Execute( parameter, () => next.Invoke( parameter ) );
+				active.IsActive = false;
+				return result;
+			}
 		}
 	}
 
@@ -75,27 +88,30 @@ namespace DragonSpark.Aspects.Invocation
 		public static AutoValidationPolicy Default { get; } = new AutoValidationPolicy();
 		AutoValidationPolicy() : this( PointSource.DefaultNested.Get, Validation.Defaults.ControllerSource ) {}
 
-		readonly Func<Type, IEnumerable<IExtensionPoint>> source;
+		readonly Func<Type, IEnumerable<Pair>> source;
 		readonly Func<object, IAutoValidationController> controllerSource;
 
-		AutoValidationPolicy( Func<Type, IEnumerable<IExtensionPoint>> source, Func<object, IAutoValidationController> controllerSource )
+		AutoValidationPolicy( Func<Type, IEnumerable<Pair>> source, Func<object, IAutoValidationController> controllerSource )
 		{
 			this.source = source;
 			this.controllerSource = controllerSource;
 		}
 
-		protected override IEnumerable<PolicyMapping> Get( object parameter )
+		struct Pair
 		{
-			var controller = controllerSource( parameter );
-			var links = new AutoValidationValidator( controller ).Append<IInvocationLink>( new AutoValidationExecutor( controller ) ).Repeat();
+			public Pair( IExtensionPoint validation, IExtensionPoint execution )
+			{
+				Validation = validation;
+				Execution = execution;
+			}
 
-			var result = source( parameter.GetType() ).Zip( links, ( point, link ) => new PolicyMapping( point, link ) );
-			return result;
+			public IExtensionPoint Validation { get; }
+			public IExtensionPoint Execution { get; }
 		}
 
-		sealed class PointSource : IParameterizedSource<Type, IEnumerable<IExtensionPoint>>
+		sealed class PointSource : IParameterizedSource<Type, IEnumerable<Pair>>
 		{
-			public static IParameterizedSource<Type, IEnumerable<IExtensionPoint>> DefaultNested { get; } = new PointSource().ToCache();
+			public static IParameterizedSource<Type, IEnumerable<Pair>> DefaultNested { get; } = new PointSource().ToCache();
 			PointSource() : this( AutoValidation.DefaultProfiles, ExtensionPoints.Default.Get ) {}
 
 			readonly ImmutableArray<IAspectProfile> profiles;
@@ -107,14 +123,36 @@ namespace DragonSpark.Aspects.Invocation
 				this.pointSource = pointSource;
 			}
 
-			public IEnumerable<IExtensionPoint> Get( Type parameter )
+			public IEnumerable<Pair> Get( Type parameter ) => Yield( parameter ).ToArray();
+
+			IEnumerable<Pair> Yield( Type parameter )
 			{
 				foreach ( var profile in profiles.Introduce( parameter, tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ) )
 				{
-					yield return pointSource( profile.Validation.Find( parameter ) );
-					yield return pointSource( profile.Method.Find( parameter ) );
+					var validation = pointSource( profile.Validation.Find( parameter ) );
+					var execution = pointSource( profile.Method.Find( parameter ) );
+					yield return new Pair( validation, execution );
 				}
 			}
 		}
+
+		public override void Execute( object parameter )
+		{
+			var active = new Active();
+			var controller = controllerSource( parameter );
+			var validator = new AutoValidationValidator( controller, active );
+			var execution = new AutoValidationExecutor( controller, active );
+
+			foreach ( var pair in source( parameter.GetType() ).Fixed() )
+			{
+				pair.Validation.Get( parameter ).Add( validator );
+				pair.Execution.Get( parameter ).Add( execution );
+			}
+		}
+	}
+
+	public class Active
+	{
+		public bool IsActive { get; set; }
 	}
 }

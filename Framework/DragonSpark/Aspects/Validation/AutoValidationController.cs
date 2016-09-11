@@ -60,15 +60,11 @@ namespace DragonSpark.Aspects.Validation
 
 		bool Validate( object parameter )
 		{
-			Enabled = false;
 			var result = validator.IsSatisfiedBy( parameter );
-			Enabled = true;
 			return result;
 		}
 
 		IParameterAwareHandler Handler { get; set; }
-
-		public bool Enabled { get; set; } = true;
 
 		public void Register( IAspect aspect )
 		{

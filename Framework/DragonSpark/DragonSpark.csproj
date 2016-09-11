@@ -123,6 +123,7 @@
     <Compile Include="Sources\Parameterized\IAssignableParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\SourceTypeMapping.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
+    <Compile Include="Sources\ThreadIdentitySource.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
     <Compile Include="Specifications\ContainsItemSpecification.cs" />
     <Compile Include="Specifications\DeferredSpecification.cs" />
@@ -522,7 +523,7 @@
     <Compile Include="Sources\Parameterized\Caching\Stack.cs" />
     <Compile Include="Sources\Parameterized\Caching\Stacks.cs" />
     <Compile Include="Sources\Parameterized\Caching\SourceCache.cs" />
-    <Compile Include="Sources\Parameterized\Caching\ThreadLocalStore.cs" />
+    <Compile Include="Sources\ThreadLocalStore.cs" />
     <Compile Include="Sources\Parameterized\Caching\ThreadLocalSourceCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\WritableSourceCache.cs" />
     <Compile Include="Sources\Parameterized\DecoratedAssignableParameterizedSource.cs" />

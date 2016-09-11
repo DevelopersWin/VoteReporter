@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace DragonSpark.Sources.Parameterized.Caching
+namespace DragonSpark.Sources
 {
 	public class ThreadLocalStore<T> : AssignableSourceBase<T>
 	{
