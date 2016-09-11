@@ -1,5 +1,4 @@
-﻿using DragonSpark.Aspects.Validation;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
 using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -10,7 +9,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Application.Setup
 {
-	[ApplyAutoValidation]
+	// [ApplyAutoValidation]
 	public class DeclarativeSetup : CompositeCommand, ISetup
 	{
 		public static ISetup Current() => AmbientStack.GetCurrentItem<ISetup>();

@@ -1,12 +1,12 @@
-﻿using DragonSpark.Aspects.Validation;
-using DragonSpark.Commands;
+﻿using DragonSpark.Aspects.Extensibility;
+using DragonSpark.Aspects.Extensibility.Validation;
 using Polly;
 using System;
 
 namespace DragonSpark.Diagnostics.Exceptions
 {
 	[ApplyAutoValidation]
-	public sealed class ApplyPolicyCommand : CommandBase<Action>
+	public sealed class ApplyPolicyCommand : ExtensibleCommandBase<Action>
 	{
 		readonly Policy policy;
 
