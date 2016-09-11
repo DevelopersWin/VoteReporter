@@ -36,9 +36,7 @@ namespace DragonSpark.Commands
 			return @this;
 		}
 
-		public static ICommand<T> Cast<T>( this ICommand @this ) => Cast<T>( @this, arg => arg );
-
-		public static ICommand<T> Cast<T>( this ICommand @this, Func<T, object> projection ) => new ProjectedCommand<T>( @this, projection );
+		public static ICommand<T> Adapt<T>( this ICommand @this ) => new AdapterCommand<T>( @this );
 
 		// public static void Run( this IRunCommand @this ) => @this.Execute( default(object) );
 

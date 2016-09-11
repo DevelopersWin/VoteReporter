@@ -307,7 +307,6 @@
     <Compile Include="Sources\Parameterized\Origin.cs" />
     <Compile Include="Sources\Parameterized\ParameterConstructedCompositeFactory.cs" />
     <Compile Include="Sources\Parameterized\ParameterTypes.cs" />
-    <Compile Include="Sources\Parameterized\ProjectedSource.cs" />
     <Compile Include="Sources\Parameterized\ResultTypes.cs" />
     <Compile Include="Sources\Parameterized\SelfAlteration.cs" />
     <Compile Include="Sources\Parameterized\SourceInterfaces.cs" />
@@ -398,7 +397,7 @@
     <Compile Include="Aspects\Extensibility\Validation\IAutoValidationController.cs" />
     <Compile Include="Aspects\IMethodAware.cs" />
     <Compile Include="Aspects\Extensibility\Validation\LinkedParameterAwareHandler.cs" />
-    <Compile Include="Commands\ProjectedCommand.cs" />
+    <Compile Include="Commands\AdapterCommand.cs" />
     <Compile Include="Runtime\RepositoryBase.cs" />
     <Compile Include="Runtime\Serializer.cs" />
     <Compile Include="Runtime\Assignments\SourceAssignment.cs" />
@@ -470,7 +469,6 @@
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\IAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\ArgumentCache.cs" />
-    <Compile Include="Sources\Parameterized\Factory.cs" />
     <Compile Include="Application\Execution.cs" />
     <Compile Include="Aspects\Extensibility\Validation\AutoValidation.cs" />
     <Compile Include="Aspects\FreezeAttribute.cs" />

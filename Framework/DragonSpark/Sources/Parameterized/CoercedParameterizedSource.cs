@@ -3,8 +3,9 @@ using System;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public sealed class CoercedParameterizedSource<TParameter, TResult> : CoercedParameterizedSource<object, TParameter, TResult>
+	public class CoercedParameterizedSource<TParameter, TResult> : CoercedParameterizedSource<object, TParameter, TResult>
 	{
+		public CoercedParameterizedSource( Func<TParameter, TResult> source ) : this( Defaults<TParameter>.Coercer, source ) {}
 		public CoercedParameterizedSource( Coerce<TParameter> coercer, Func<TParameter, TResult> source ) : base( new Func<object, TParameter>( coercer ), source ) {}
 	}
 
@@ -24,16 +25,4 @@ namespace DragonSpark.Sources.Parameterized
 			return result;
 		}
 	}
-
-	/*public sealed class ParameterizedSource<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
-	{
-		readonly IParameterizedSource source;
-
-		public ParameterizedSource( IParameterizedSource source ) //: base( source )
-		{
-			this.source = source;
-		}
-
-		public override TResult Get( TParameter parameter ) => (TResult)source.Get( parameter );
-	}*/
 }

@@ -7,7 +7,7 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 {
 	public abstract class CommandAttributeBase : HostingAttributeBase
 	{
-		protected CommandAttributeBase( ICommand command ) : this( command.Cast<AutoData>() ) {}
+		protected CommandAttributeBase( ICommand command ) : this( command.Adapt<AutoData>() ) {}
 		protected CommandAttributeBase( ICommand<AutoData> command ) : base( command.Wrap() ) {}
 	}
 }
