@@ -1,12 +1,11 @@
 ﻿using DragonSpark.Commands;
 using PostSharp.Extensibility;
 using System;
-using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace DragonSpark.Aspects.Extensibility
 {
-	public abstract class ExtensibleCommandBase<T> : ICommand<T>, IExtensionProvider
+	public abstract class ExtensibleCommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate {};
 
@@ -22,10 +21,5 @@ namespace DragonSpark.Aspects.Extensibility
 
 		[ExtensionPoint( AttributeInheritance =  MulticastInheritance.Strict, AttributeTargetMemberAttributes = MulticastAttributes.NonAbstract )]
 		public abstract void Execute( T parameter );
-
-		public virtual IEnumerable<IExtension> GetExtensions()
-		{
-			yield break;
-		}
 	}
 }

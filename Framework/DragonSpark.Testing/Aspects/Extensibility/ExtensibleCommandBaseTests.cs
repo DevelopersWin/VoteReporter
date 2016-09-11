@@ -63,9 +63,13 @@ namespace DragonSpark.Testing.Aspects.Extensibility
 			public ICollection<int> Parameters { get; } = new Collection<int>();
 		}
 
-		[ApplyExtensions]
+		// [ApplyExtensions]
 		class SpecificationCommand : ExtensibleCommandBase<int>
 		{
+			public SpecificationCommand()
+			{
+				this.ExtendUsing( Specification.Default );
+			}
 			public override void Execute( int parameter ) {}
 
 			// public ICollection<int> Parameters { get; } = new Collection<int>();
@@ -76,11 +80,6 @@ namespace DragonSpark.Testing.Aspects.Extensibility
 				Specification() {}
 
 				public bool IsSatisfiedBy( int parameter ) => parameter == 6776;
-			}
-
-			public override IEnumerable<IExtension> GetExtensions()
-			{
-				yield return new SpecificationExtension<int>( Specification.Default );
 			}
 		}
 	}

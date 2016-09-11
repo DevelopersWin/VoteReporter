@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Aspects.Extensibility.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
-using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
@@ -27,18 +26,11 @@ namespace DragonSpark.Aspects.Extensibility
 
 		public override void RuntimeInitializeInstance()
 		{
-			var provider = Instance as IExtensionProvider;
-			var provided = provider?.GetExtensions() ?? Items<IExtension>.Default;
-			foreach ( var extension in extensions.Concat( provided ).Prioritize() )
+			foreach ( var extension in extensions )
 			{
 				extension.Execute( Instance );
 			}
 		}
-	}
-
-	public interface IExtensionProvider
-	{
-		IEnumerable<IExtension> GetExtensions();
 	}
 
 	public sealed class SpecificationExtension<T> : ExtensionBase
@@ -50,7 +42,7 @@ namespace DragonSpark.Aspects.Extensibility
 
 		public SpecificationExtension( ISpecification<T> specification, Func<Type, IEnumerable<ExtensionPointProfile>> source ) : this( new Invocation( specification ), source ) {}
 
-		SpecificationExtension( Invocation invocation, Func<Type, IEnumerable<ExtensionPointProfile>> source ) : base( Priority.BeforeHigher )
+		SpecificationExtension( Invocation invocation, Func<Type, IEnumerable<ExtensionPointProfile>> source )
 		{
 			this.invocation = invocation;
 			this.source = source;
