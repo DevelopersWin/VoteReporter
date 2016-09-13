@@ -49,10 +49,10 @@
     <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
-    <Compile Include="Aspects\Extensibility\ExtensibleCommandBaseTests.cs" />
+    <Compile Include="Aspects\Extensibility\EnableExtensionsAttributeTests.cs" />
     <Compile Include="ComponentModel\SourceAttributeTests.cs" />
     <Compile Include="Activation\ExecutionContextTests.cs" />
-    <Compile Include="Activation\RecordingLoggerConfigurationCommandTests.cs" />
+    <Compile Include="Diagnostics\Logging\LoggingControllerTests.cs" />
     <Compile Include="Application\DefaultExportProviderTests.cs" />
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
     <Compile Include="Aspects\ApplyValuesFromSourceTests.cs" />
@@ -86,8 +86,8 @@
     <Compile Include="Application\Setup\ActivatedServiceSourceTests.cs" />
     <Compile Include="Setup\ServiceProviderTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
-    <Compile Include="TaskExecutionContextTests.cs" />
-    <Compile Include="TypeSystem\AttributesTests.cs">
+    <Compile Include="Application\ExecutionContextTests.cs" />
+    <Compile Include="TypeSystem\Metadata\AttributesTests.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Aspects\BuildUpTests.cs" />
@@ -100,8 +100,8 @@
     <Compile Include="Configuration\RegistrationTests.cs" />
     <Compile Include="Configuration\ValueStoreTests.cs" />
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
-    <Compile Include="Diagnostics\ExceptionHandlerTests.cs" />
-    <Compile Include="Diagnostics\FormatterTests.cs" />
+    <Compile Include="Diagnostics\Exceptions\ExceptionHandlerTests.cs" />
+    <Compile Include="FormatterTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggerTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggerHistorySinkTests.cs" />
     <Compile Include="Diagnostics\ProfileAttributeTests.cs" />
@@ -141,7 +141,7 @@
     <Compile Include="Setup\ApplyMigrationCommandTests.cs" />
     <Compile Include="Application\ApplicationAssemblyFilterTests.cs" />
     <Compile Include="TypeSystem\InverseCacheValueFactoryTests.cs" />
-    <Compile Include="TypeSystem\DerivedMethodSpecificationTests.cs" />
+    <Compile Include="TypeSystem\Metadata\DerivedMethodSpecificationTests.cs" />
     <Compile Include="TypeSystem\HostingAttributeTests.cs" />
     <Compile Include="TypeSystem\KnownTypesTests.cs" />
     <Compile Include="TypeSystem\PartsTests.cs" />

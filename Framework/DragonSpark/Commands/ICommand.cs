@@ -3,9 +3,9 @@ using System.Windows.Input;
 
 namespace DragonSpark.Commands
 {
-	public interface ICommand<in TParameter> : ICommand, ISpecification<TParameter>
+	public interface ICommand<in T> : ICommand, ISpecification<T>
 	{
-		void Execute( TParameter parameter );
+		void Execute( T parameter );
 
 		void Update();
 	}

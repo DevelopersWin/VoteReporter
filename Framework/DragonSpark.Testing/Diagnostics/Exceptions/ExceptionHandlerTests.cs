@@ -1,8 +1,8 @@
-﻿using DragonSpark.Diagnostics.Exceptions;
-using System;
+﻿using System;
+using DragonSpark.Diagnostics.Exceptions;
 using Xunit;
 
-namespace DragonSpark.Testing.Diagnostics
+namespace DragonSpark.Testing.Diagnostics.Exceptions
 {
 	public class ExceptionHandlerTests
 	{

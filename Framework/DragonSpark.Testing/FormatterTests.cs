@@ -1,11 +1,11 @@
-﻿using DragonSpark.Testing.Framework;
-using DragonSpark.TypeSystem;
-using System.Reflection;
+﻿using System.Reflection;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;
+using DragonSpark.TypeSystem;
 using Xunit;
 
-namespace DragonSpark.Testing.Diagnostics
+namespace DragonSpark.Testing
 {
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class FormatterTests

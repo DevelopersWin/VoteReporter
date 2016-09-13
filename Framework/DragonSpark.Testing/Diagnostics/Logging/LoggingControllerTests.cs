@@ -1,16 +1,16 @@
-﻿using DragonSpark.Diagnostics.Logging;
+﻿using System.Linq;
+using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics.Logging.Configurations;
 using DragonSpark.Sources;
 using Ploeh.AutoFixture.Xunit2;
 using Serilog.Core;
 using Serilog.Events;
-using System.Linq;
-using DragonSpark.Diagnostics.Logging.Configurations;
 using Xunit;
 using Logger = DragonSpark.Diagnostics.Logging.Logger;
 
-namespace DragonSpark.Testing.Activation
+namespace DragonSpark.Testing.Diagnostics.Logging
 {
-	public class RecordingLoggerConfigurationCommandTests
+	public class LoggingControllerTests
 	{
 		[Fact]
 		public void BasicContext()

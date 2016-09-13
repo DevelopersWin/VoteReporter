@@ -1,19 +1,19 @@
-using DragonSpark.Testing.Framework;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Runtime;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DragonSpark.Testing
+namespace DragonSpark.Testing.Application
 {
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
-	public class TaskExecutionContextTests : TestCollectionBase
+	public class ExecutionContextTests : TestCollectionBase
 	{
-		public TaskExecutionContextTests( ITestOutputHelper output ) : base( output ) {}
+		public ExecutionContextTests( ITestOutputHelper output ) : base( output ) {}
 
 		public static void Verify( MethodBase method )
 		{
@@ -88,7 +88,7 @@ namespace DragonSpark.Testing
 			return Task.Run( () =>
 							 {
 								Assert.Same( current, ExecutionContext.Default.Get() );
-								TaskExecutionContextTests.Verify( method );
+								ExecutionContextTests.Verify( method );
 								Assert.NotEqual( ExecutionContext.Default.Get().Origin, Identifier.Current() );
 								Assert.NotNull( MethodContext.Default.Get() );
 								Assert.Equal( method, MethodContext.Default.Get() );
@@ -132,7 +132,7 @@ namespace DragonSpark.Testing
 		public override IEnumerable<object[]> GetData( MethodInfo methodUnderTest )
 		{
 			var enumerable = base.GetData( methodUnderTest );
-			TaskExecutionContextTests.Verify( methodUnderTest );
+			ExecutionContextTests.Verify( methodUnderTest );
 			return enumerable;
 		}
 	}

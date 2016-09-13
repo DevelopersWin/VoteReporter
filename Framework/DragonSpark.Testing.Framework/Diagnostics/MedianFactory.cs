@@ -1,12 +1,12 @@
-﻿using System.Collections.Immutable;
+﻿using DragonSpark.Sources.Parameterized;
+using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
 	sealed class MedianFactory : ParameterizedSourceBase<ImmutableArray<long>, long>
 	{
-		public static MedianFactory DefaultNested { get; } = new MedianFactory();
+		public static MedianFactory Default { get; } = new MedianFactory();
 
 		public override long Get( ImmutableArray<long> parameter )
 		{

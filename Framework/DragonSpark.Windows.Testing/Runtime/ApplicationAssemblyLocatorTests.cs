@@ -7,7 +7,7 @@ using ApplicationAssemblyLocator = DragonSpark.Windows.Runtime.ApplicationAssemb
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
-	public class ApplicationAssemblyTests
+	public class ApplicationAssemblyLocatorTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Create()

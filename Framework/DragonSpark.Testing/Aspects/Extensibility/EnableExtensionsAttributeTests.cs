@@ -8,7 +8,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Extensibility
 {
-	public class ExtensibleCommandBaseTests
+	public class EnableExtensionsAttributeTests
 	{
 		[Fact]
 		public void Verify()

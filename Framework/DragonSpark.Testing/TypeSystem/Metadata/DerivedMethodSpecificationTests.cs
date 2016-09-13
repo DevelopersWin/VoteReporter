@@ -2,7 +2,7 @@
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
-namespace DragonSpark.Testing.TypeSystem
+namespace DragonSpark.Testing.TypeSystem.Metadata
 {
 	public class DerivedMethodSpecificationTests
 	{

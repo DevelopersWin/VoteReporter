@@ -29,7 +29,6 @@ namespace DragonSpark.Aspects.Extensibility
 					args.ReturnValue = invocation.Invoke( args.Arguments.GetArgument( 0 ) ) ?? args.ReturnValue;
 					return;
 				}
-				
 			}
 
 			base.OnInvoke( args );

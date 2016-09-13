@@ -1,7 +1,7 @@
-﻿using System;
+﻿using DragonSpark.Sources;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
@@ -22,8 +22,8 @@ namespace DragonSpark.Testing.Framework.Diagnostics
 		{
 			var data = EnumerableEx.Generate( 0, Continue, i => i + 1, Measure ).Select( span => span.Ticks ).ToArray();
 			var average = data.Average( span => span );
-			var median = MedianFactory.DefaultNested.Get( data.ToImmutableArray() );
-			var mode = ModeFactory<long>.DefaultNested.Get( data.ToImmutableArray() );
+			var median = MedianFactory.Default.Get( data.ToImmutableArray() );
+			var mode = ModeFactory<long>.Default.Get( data.ToImmutableArray() );
 			var result = new ReportSource.Result( action.Method.Name, TimeSpan.FromTicks( (long)average ), TimeSpan.FromTicks( median ), TimeSpan.FromTicks( mode ) );
 			return result;
 		}
