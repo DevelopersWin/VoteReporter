@@ -1,10 +1,10 @@
-﻿using System.Reflection;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Reflection;
+using System.Reflection;
 
-namespace DragonSpark.Aspects.Validation
+namespace DragonSpark.Aspects.Extensions.Build
 {
 	sealed class AspectInstanceConstructor<T> : ParameterizedSourceBase<MethodInfo, AspectInstance>
 	{

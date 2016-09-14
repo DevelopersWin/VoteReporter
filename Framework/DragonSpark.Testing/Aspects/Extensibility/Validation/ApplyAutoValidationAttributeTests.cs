@@ -1,30 +1,17 @@
 using DragonSpark.Aspects;
-using DragonSpark.Aspects.Extensibility;
-using DragonSpark.Aspects.Extensibility.Validation;
-using DragonSpark.Commands;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Diagnostics;
-using PostSharp.Aspects;
-using PostSharp.Aspects.Configuration;
-using PostSharp.Aspects.Serialization;
-using PostSharp.Extensibility;
-using System;
 using Xunit;
 using Xunit.Abstractions;
-using Defaults = DragonSpark.Sources.Parameterized.Defaults;
 
 namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 {
 	public class ApplyAutoValidationAttributeTests : TestCollectionBase
 	{
-		//[Reference]
 		readonly ExtendedFactory factory = new ExtendedFactory();
-
-		// [Reference]
 		readonly AutoValidatingSource<int, float> validating;
-		// [Reference]
 		readonly AppliedExtendedFactory applied = new AppliedExtendedFactory();
 
 		public ApplyAutoValidationAttributeTests( ITestOutputHelper output ) : base( output )
@@ -48,7 +35,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 			// new PerformanceSupport( WriteLine, Performance_Argument_Contains, Performance_Argument_Get, Performance_Weak_Contains, Performance_Weak_Get ).Run();
 		}
 
-		[Fact]
+		/*[Fact]
 		[Trait( Traits.Category, Traits.Categories.Performance )]
 		public void RunCommandBodies()
 		{
@@ -97,7 +84,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 
 			[ExtensionPoint]
 			public override void Execute( object parameter ) {}
-		}
+		}*/
 
 /*
 				Test                          | Average |  Median |    Mode
@@ -226,61 +213,33 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 			public override float Get( int parameter ) => base.Get( parameter );
 		}
 
-		[ApplyAutoValidation]
+		[DragonSpark.Aspects.Extensions.ApplyAutoValidation]
 		class AppliedExtendedFactory : IExtendedFactory
 		{
-			// public int CanCreateCalled { get; private set; }
-
-			// public int CreateCalled { get; private set; }
-
 			public int CanCreateGenericCalled { get; private set; }
 
 			public int CreateGenericCalled { get; private set; }
-			public void Reset() => /*CanCreateCalled =*/ /*CreateCalled =*/ CanCreateGenericCalled = CreateGenericCalled = 0;
+			public void Reset() => CanCreateGenericCalled = CreateGenericCalled = 0;
 
-			/*object IParameterizedSource<>.Get( object parameter )
-			{
-				CreateCalled++;
-				return Get( (int)parameter );
-			}*/
-
-			[ExtensionPoint]
 			public bool IsSatisfiedBy( int parameter )
 			{
 				CanCreateGenericCalled++;
 				return parameter == 6776;
 			}
 
-			[ExtensionPoint( AttributeInheritance = MulticastInheritance.Strict )]
 			public virtual float Get( int parameter )
 			{
 				CreateGenericCalled++;
 				return parameter + 123;
 			}
-
-			/*public bool IsSatisfiedBy( object parameter )
-			{
-				CanCreateCalled++;
-				return parameter is int && IsSatisfiedBy( (int)parameter );
-			}*/
 		}
 
 		class ExtendedFactory : IExtendedFactory
 		{
-			// public int CanCreateCalled { get; private set; }
-
-			// public int CreateCalled { get; private set; }
-
 			public int CanCreateGenericCalled { get; private set; }
 
 			public int CreateGenericCalled { get; private set; }
-			public void Reset() => /*CanCreateCalled =*/ /*CreateCalled =*/ CanCreateGenericCalled = CreateGenericCalled = 0;
-
-			/*public object Get( object parameter )
-			{
-				CreateCalled++;
-				return Get( (int)parameter );
-			}*/
+			public void Reset() => CanCreateGenericCalled = CreateGenericCalled = 0;
 
 			public bool IsSatisfiedBy( int parameter )
 			{
@@ -293,12 +252,6 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 				CreateGenericCalled++;
 				return parameter + 123;
 			}
-
-			/*public bool IsSatisfiedBy( object parameter )
-			{
-				CanCreateCalled++;
-				return parameter is int && IsSatisfiedBy( (int)parameter );
-			}*/
 		}
 	}
 }

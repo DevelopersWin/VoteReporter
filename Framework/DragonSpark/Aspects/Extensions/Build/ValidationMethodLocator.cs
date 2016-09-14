@@ -1,11 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using DragonSpark.Aspects.Extensibility.Validation;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using System;
+using System.Linq;
+using System.Reflection;
 
-namespace DragonSpark.Aspects.Validation
+namespace DragonSpark.Aspects.Extensions.Build
 {
 	public sealed class ValidationMethodLocator : AlterationBase<MethodInfo>
 	{
@@ -14,7 +15,7 @@ namespace DragonSpark.Aspects.Validation
 		readonly Func<MethodLocator.Parameter, MethodInfo> source;
 
 		public static ValidationMethodLocator Default { get; } = new ValidationMethodLocator();
-		ValidationMethodLocator() : this( Defaults.Locator ) {}
+		ValidationMethodLocator() : this( Extensibility.Validation.Defaults.Locator ) {}
 
 		ValidationMethodLocator( Func<MethodLocator.Parameter, MethodInfo> source )
 		{

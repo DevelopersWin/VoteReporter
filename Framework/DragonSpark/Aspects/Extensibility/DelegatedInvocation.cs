@@ -2,7 +2,7 @@ using System;
 
 namespace DragonSpark.Aspects.Extensibility
 {
-	class DelegatedInvocation<TParameter, TResult> : IInvocation
+	sealed class DelegatedInvocation<TParameter, TResult> : IInvocation
 	{
 		readonly Func<TParameter, TResult> source;
 		public DelegatedInvocation( Func<TParameter, TResult> source )

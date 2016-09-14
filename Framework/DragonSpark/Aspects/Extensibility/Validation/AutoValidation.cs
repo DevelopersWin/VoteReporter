@@ -1,9 +1,8 @@
-﻿using System.Collections.Immutable;
-using System.Windows.Input;
-using DragonSpark.Commands;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Commands;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using System.Collections.Immutable;
+using System.Windows.Input;
 
 namespace DragonSpark.Aspects.Extensibility.Validation
 {
@@ -21,10 +20,10 @@ namespace DragonSpark.Aspects.Extensibility.Validation
 		public static ImmutableArray<IAspectProfile> DefaultProfiles { get; } = 
 			new IAspectProfile[]
 			{
-				new AspectProfile( new MethodDescriptor( typeof(IParameterizedSource<,>), nameof(ISource.Get) ) ),
+				new AspectProfile( new Aspects.Extensions.MethodDefinition( typeof(IParameterizedSource<,>), nameof(ISource.Get) ) ),
 				// new AspectProfile( typeof(IValidatedParameterizedSource), typeof(IParameterizedSource), nameof(IParameterizedSource.Get) ),
-				new AspectProfile( new MethodDescriptor( typeof(ICommand<>), nameof(ICommand.Execute) ) ),
-				new AspectProfile( new MethodDescriptor( typeof(ICommand), nameof(ICommand.Execute) ), new MethodDescriptor( typeof(ICommand), nameof(ICommand.CanExecute) ) )
+				new AspectProfile( new Aspects.Extensions.MethodDefinition( typeof(ICommand<>), nameof(ICommand.Execute) ) ),
+				new AspectProfile( new Aspects.Extensions.MethodDefinition( typeof(ICommand), nameof(ICommand.Execute) ), new Aspects.Extensions.MethodDefinition( typeof(ICommand), nameof(ICommand.CanExecute) ) )
 			}.ToImmutableArray();
 	}
 }

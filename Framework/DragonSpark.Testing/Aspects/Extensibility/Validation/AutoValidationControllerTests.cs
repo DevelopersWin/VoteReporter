@@ -1,5 +1,4 @@
-﻿using DragonSpark.Aspects.Extensibility;
-using DragonSpark.Aspects.Extensibility.Validation;
+﻿using DragonSpark.Aspects.Extensibility.Validation;
 using System;
 using System.Windows.Input;
 using Xunit;
@@ -125,7 +124,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 			Assert.Same( validGeneric, command.LastResult );
 		}
 
-		[ApplyAutoValidation]
+		[DragonSpark.Aspects.Extensions.ApplyAutoValidation]
 		class Command : ICommand
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
@@ -136,14 +135,14 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 
 			public int? LastResult { get; private set; }
 
-			[ExtensionPoint]
+			// [ExtensionPoint]
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
 				return parameter is int && (int)parameter == 1212;
 			}
 
-			[ExtensionPoint]
+			// [ExtensionPoint]
 			public void Execute( object parameter )
 			{
 				ExecuteCalled++;
@@ -151,7 +150,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 			}
 		}
 
-		[ApplyAutoValidation]
+		[DragonSpark.Aspects.Extensions.ApplyAutoValidation]
 		class GenericCommand : DragonSpark.Commands.ICommand<GenericCommand.Parameter>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
@@ -164,30 +163,24 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 
 			public Parameter LastResult { get; private set; }
 
-			[ExtensionPoint]
 			public bool CanExecute( object parameter )
 			{
 				CanExecuteCalled++;
 				return parameter is int && IsSatisfiedBy( new Parameter( (int)parameter ) );
 			}
 
-			[ExtensionPoint]
 			public void Execute( object parameter )
 			{
 				ExecuteCalled++;
 				Execute( new Parameter( (int)parameter ) );
 			}
 
-			// bool IValidationAware.ShouldValidate() => false;
-
-			[ExtensionPoint]
 			public bool IsSatisfiedBy( Parameter parameter )
 			{
 				CanExecuteGenericCalled++;
 				return parameter.Number == 6776;
 			}
 
-			[ExtensionPoint]
 			public void Execute( Parameter parameter )
 			{
 				ExecuteGenericCalled++;

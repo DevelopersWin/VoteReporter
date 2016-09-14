@@ -72,6 +72,17 @@
     <Compile Include="Aspects\Extensibility\Validation\MethodLocator.cs" />
     <Compile Include="Aspects\Extensibility\Validation\SourceAdapter.cs" />
     <Compile Include="Aspects\Extensibility\Validation\GenericSourceAdapterFactory.cs" />
+    <Compile Include="Aspects\Extensions\ApplyAutoValidationAttribute.cs" />
+    <Compile Include="Aspects\Extensions\AutoValidationExecuteAspect.cs" />
+    <Compile Include="Aspects\Extensions\AutoValidationValidationAspect.cs" />
+    <Compile Include="Aspects\Extensions\Build\AspectFactory.cs" />
+    <Compile Include="Aspects\Extensions\Build\AspectInstanceConstructor.cs" />
+    <Compile Include="Aspects\Extensions\Build\AspectInstance.cs" />
+    <Compile Include="Aspects\Extensions\Build\AspectInstances.cs" />
+    <Compile Include="Aspects\Extensions\AutoValidationAspectBase.cs" />
+    <Compile Include="Aspects\Extensions\Build\Specification.cs" />
+    <Compile Include="Aspects\Extensions\Build\ValidationMethodLocator.cs" />
+    <Compile Include="Aspects\Extensions\Class1.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />
     <Compile Include="Commands\SpecificationCommand.cs" />
@@ -141,8 +152,7 @@
     <Compile Include="PriorityAwareLocator.cs" />
     <Compile Include="PriorityComparer.cs" />
     <Compile Include="PriorityExtensions.cs" />
-    <Compile Include="Runtime\Extensions.cs" />
-    <Compile Include="Runtime\MethodDescriptor.cs" />
+    <Compile Include="Aspects\Extensions\MethodDefinition.cs" />
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AssignableParameterizedSource.cs" />

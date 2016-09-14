@@ -28,10 +28,8 @@ namespace DragonSpark.Aspects.Extensibility.Validation
 		{
 			foreach ( var profile in profiles.Introduce( parameter, tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ) )
 			{
-				var methodInfo = profile.Validation.Find( parameter );
-				var validation = pointSource( methodInfo );
-				var methodBase = profile.Method.Find( parameter );
-				var execution = pointSource( methodBase );
+				var validation = pointSource( profile.Validation.Get( parameter ) );
+				var execution = pointSource( profile.Method.Get( parameter ) );
 				yield return new ExtensionPointProfile( validation, execution );
 			}
 		}
