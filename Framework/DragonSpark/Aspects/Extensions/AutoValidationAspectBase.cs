@@ -7,36 +7,12 @@ using System;
 
 namespace DragonSpark.Aspects.Extensions
 {
-	/*public interface IExtensionAware
-	{
-		object Invoke( IExtensionPoint point, Arguments arguments, Func<object> proceed );
-	}*/
+	[ProvideAspectRole( StandardRoles.Validation )]
+	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	public abstract class AutoValidationAspectBase : AspectBase {}
 
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[LinesOfCodeAvoided( 10 ), AttributeUsage( AttributeTargets.Method )]
-	[ProvideAspectRole( StandardRoles.Validation )]
-	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), 
-		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[LinesOfCodeAvoided( 4 ), AttributeUsage( AttributeTargets.Method )]
 	[MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict )]
-	public abstract class AutoValidationAspectBase : MethodInterceptionAspect {}
-
-	/*public struct AspectInvocation : IInvocation
-	{
-		readonly Func<object> proceed;
-
-		public AspectInvocation( IExtensionPoint point, Arguments arguments, Func<object> proceed )
-		{
-			Arguments = arguments;
-			this.proceed = proceed;
-		}
-
-		public Arguments Arguments { get; }
-
-		public object Invoke( object parameter )
-		{
-			Arguments.SetArgument( 0, parameter );
-			var result = proceed();
-			return result;
-		}
-	}*/
+	public abstract class AspectBase : MethodInterceptionAspect {}
 }

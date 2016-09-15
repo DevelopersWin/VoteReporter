@@ -1,12 +1,15 @@
 ﻿using DragonSpark.Aspects.Extensions.Build;
 using DragonSpark.Commands;
+using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 
@@ -17,13 +20,10 @@ namespace DragonSpark.Aspects.Extensions
 		Type DeclaringType { get; }
 	}
 
-	/*public interface IAutoValidationProfile : IProfile
+	public interface IMethodLocator : IParameterizedSource<Type, MethodInfo>
 	{
-		IMethodSource Validation { get; }
-		IMethodSource Execution { get; }
-	}*/
-
-	public interface IMethodSource : IParameterizedSource<Type, MethodInfo> {}
+		Type DeclaringType { get; }
+	}
 
 	public interface IAspectSource : IParameterizedSource<Type, AspectInstance> {}
 
@@ -32,7 +32,7 @@ namespace DragonSpark.Aspects.Extensions
 		readonly Func<Type, MethodInfo> methodSource;
 		readonly Func<MethodInfo, AspectInstance> inner;
 
-		public AspectSource( IMethodSource source ) : this( source.Get, AspectInstance<T>.Default.Get ) {}
+		public AspectSource( IMethodLocator locator ) : this( locator.Get, AspectInstance<T>.Default.Get ) {}
 
 		public AspectSource( Func<Type, MethodInfo> methodSource, Func<MethodInfo, AspectInstance> inner )
 		{
@@ -48,9 +48,9 @@ namespace DragonSpark.Aspects.Extensions
 		}
 	}
 
-	public abstract class ProfileBase : ItemSourceBase<IAspectSource>, IProfile
+	public class Profile : ItemSource<IAspectSource>, IProfile
 	{
-		protected ProfileBase( Type declaringType )
+		protected Profile( Type declaringType, params IAspectSource[] sources ) : base( sources )
 		{
 			DeclaringType = declaringType;
 		}
@@ -58,62 +58,45 @@ namespace DragonSpark.Aspects.Extensions
 		public Type DeclaringType { get; }
 	}
 
-	public abstract class AutoValidationProfileBase : ProfileBase
+	public static class Defaults
 	{
-		readonly IAspectSource validation;
-		readonly IAspectSource execution;
-
-		protected AutoValidationProfileBase( Type declaringType, IMethodSource validation, IMethodSource execution )
-			: this( declaringType, new AspectSource<AutoValidationValidationAspect>( validation ), new AspectSource<AutoValidationExecuteAspect>( execution ) ) { }
-
-		protected AutoValidationProfileBase( Type declaringType, IAspectSource validation, IAspectSource execution ) : base ( declaringType )
-		{
-			this.validation = validation;
-			this.execution = execution;
-		}
-
-		
-
-		protected override IEnumerable<IAspectSource> Yield()
-		{
-			yield return validation;
-			yield return execution;
-		}
+		public static IMethodLocator Specification { get; } = new MethodDefinition( typeof(ISpecification<>), nameof( ISpecification<object>.IsSatisfiedBy ) );
 	}
 
 	public static class AutoValidation
 	{
-		public static IMethodSource Specification { get; } = new MethodDefinition( typeof(ISpecification<>), nameof( ISpecification<object>.IsSatisfiedBy ) );
-
 		public static ImmutableArray<IProfile> DefaultProfiles { get; } = 
-			new IProfile[]
-			{
-				ParameterizedSourceAutoValidationProfile.Default,
-				GenericCommandAutoValidationProfile.Default,
-				CommandAutoValidationProfile.Default
-			}.ToImmutableArray();
+			ImmutableArray.Create<IProfile>( ParameterizedSourceAutoValidationProfile.Default, GenericCommandAutoValidationProfile.Default, CommandAutoValidationProfile.Default );
+			
+		public static ImmutableArray<TypeAdapter> Adapters { get; } = DefaultProfiles.Select( profile => profile.DeclaringType.Adapt() ).ToImmutableArray();
 	}
 
-	sealed class ParameterizedSourceAutoValidationProfile : AutoValidationProfileBase
+	public class AutoValidationProfile : Profile
+	{
+		protected AutoValidationProfile( Type declaringType, IMethodLocator validation, IMethodLocator execution )
+			: base( declaringType, new AspectSource<AutoValidationValidationAspect>( validation ), new AspectSource<AutoValidationExecuteAspect>( execution ) ) {}
+	}
+
+	sealed class ParameterizedSourceAutoValidationProfile : AutoValidationProfile
 	{
 		readonly static Type Type = typeof(IParameterizedSource<,>);
 
 		public static ParameterizedSourceAutoValidationProfile Default { get; } = new ParameterizedSourceAutoValidationProfile();
-		ParameterizedSourceAutoValidationProfile() : base( Type, AutoValidation.Specification, new MethodDefinition( Type, nameof(ISource.Get) ) ) {}
+		ParameterizedSourceAutoValidationProfile() : base( Type, Defaults.Specification, new MethodDefinition( Type, nameof(ISource.Get) ) ) {}
 	}
 
-	sealed class CommandAutoValidationProfile : AutoValidationProfileBase
+	sealed class CommandAutoValidationProfile : AutoValidationProfile
 	{
 		readonly static Type Type = typeof(ICommand);
 		public static CommandAutoValidationProfile Default { get; } = new CommandAutoValidationProfile();
 		CommandAutoValidationProfile() : base( Type, new MethodDefinition( Type, nameof(ICommand.CanExecute) ), new MethodDefinition( Type, nameof(ICommand.Execute) ) ) {}
 	}
 
-	sealed class GenericCommandAutoValidationProfile : AutoValidationProfileBase
+	sealed class GenericCommandAutoValidationProfile : AutoValidationProfile
 	{
 		readonly static Type Type = typeof(ICommand<>);
 
 		public static GenericCommandAutoValidationProfile Default { get; } = new GenericCommandAutoValidationProfile();
-		GenericCommandAutoValidationProfile() : base( Type, AutoValidation.Specification, new MethodDefinition( Type, nameof(ICommand.Execute) ) ) {}
+		GenericCommandAutoValidationProfile() : base( Type, Defaults.Specification, new MethodDefinition( Type, nameof(ICommand.Execute) ) ) {}
 	}
 }

@@ -50,6 +50,7 @@
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
     <Compile Include="Aspects\Extensibility\EnableExtensionsAttributeTests.cs" />
+    <Compile Include="Aspects\Extensions\ApplySpecificationAttributeTests.cs" />
     <Compile Include="ComponentModel\SourceAttributeTests.cs" />
     <Compile Include="Activation\ExecutionContextTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggingControllerTests.cs" />

@@ -32,84 +32,7 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 		public void Performance()
 		{
 			new PerformanceSupport( WriteLine, BasicAutoValidation, BasicAutoValidationWithAspect, BasicAutoValidationInline, BasicAutoValidationInlineWithAspect ).Run( 1 );
-			// new PerformanceSupport( WriteLine, Performance_Argument_Contains, Performance_Argument_Get, Performance_Weak_Contains, Performance_Weak_Get ).Run();
 		}
-
-		/*[Fact]
-		[Trait( Traits.Category, Traits.Categories.Performance )]
-		public void RunCommandBodies()
-		{
-			new PerformanceSupport( WriteLine, RunBasicCoreCommand, RunAspectCommand, RunExtensibleCommand, RunEnabledExtensibleCommand ).Run( 1 );
-		}
-
-		static void RunBasicCoreCommand() => BasicCoreCommand.Default.Execute( Defaults.Parameter );
-		static void RunAspectCommand() => AspectCommand.Default.Execute( Defaults.Parameter );
-		static void RunExtensibleCommand() => ExtensibleCommand.Default.Execute( Defaults.Parameter );
-		static void RunEnabledExtensibleCommand() => EnabledExtensibleCommand.Default.Execute( Defaults.Parameter );
-
-		class BasicCoreCommand : CommandBase<object>
-		{
-			public static BasicCoreCommand Default { get; } = new BasicCoreCommand();
-			BasicCoreCommand() {}
-
-			public override void Execute( object parameter ) {}
-		}
-
-		class AspectCommand : CommandBase<object>
-		{
-			public static AspectCommand Default { get; } = new AspectCommand();
-			AspectCommand() {}
-
-			[Aspect]
-			public override void Execute( object parameter ) {}
-		}
-
-		[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-		[LinesOfCodeAvoided( 1 ), AttributeUsage( AttributeTargets.Method )]
-		public sealed class Aspect : MethodInterceptionAspect {}
-		class ExtensibleCommand : CommandBase<object>
-		{
-			public static ExtensibleCommand Default { get; } = new ExtensibleCommand();
-			ExtensibleCommand() {}
-
-			[ExtensionPoint]
-			public override void Execute( object parameter ) {}
-		}
-
-		[EnableExtensions]
-		class EnabledExtensibleCommand : CommandBase<object>
-		{
-			public static EnabledExtensibleCommand Default { get; } = new EnabledExtensibleCommand();
-			EnabledExtensibleCommand() {}
-
-			[ExtensionPoint]
-			public override void Execute( object parameter ) {}
-		}*/
-
-/*
-				Test                          | Average |  Median |    Mode
-				-----------------------------------------------------------
-				Performance_Argument_Contains | 00.0046 | 00.0045 | 00.0044
-				Performance_Argument_Get      | 00.0039 | 00.0039 | 00.0039
-				Performance_Weak_Contains     | 00.0049 | 00.0048 | 00.0051
-				Performance_Weak_Get          | 00.0050 | 00.0049 | 00.0048
-				*/
-		/*readonly object key = new object();
-		readonly ICache<IInvocationChain> cache = new Cache<IInvocationChain>( o => new InvocationChain() );
-		readonly IArgumentCache<object, IInvocationChain> argument = new ArgumentCache<object, IInvocationChain>( o => new InvocationChain() );
-
-		[Fact]
-		public void Performance_Argument_Get() => argument.Get( key );
-
-		[Fact]
-		public void Performance_Argument_Contains() => argument.Contains( key );
-
-		[Fact]
-		public void Performance_Weak_Get() => cache.Get( key );
-
-		[Fact]
-		public void Performance_Weak_Contains() => cache.Contains( key );
-		*/
 
 		[Fact]
 		public void BasicAutoValidation() => BasicAutoValidationWith( validating, validating, factory );
@@ -137,20 +60,15 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 		{
 			var sut = new CachedAppliedExtendedFactory();
 			var first = sut.Get( 6776 );
-			// Assert.Equal( 0, sut.CanCreateCalled );
-			// Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, first );
 
 			var can = sut.IsSatisfiedBy( 6776 );
-			// Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 			Assert.True( can );
 
 			var second = sut.Get( 6776 );
-			// Assert.Equal( 0, sut.CanCreateCalled );
-			// Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( first, second );
@@ -158,17 +76,10 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 
 		static void BasicAutoValidationWith( IParameterizedSource<int, float> factory, ISpecification<int> specification, IExtendedFactory sut )
 		{
-			// Assert.Equal( 0, sut.CanCreateCalled );
 			Assert.Equal( 0, sut.CanCreateGenericCalled );
-
-			/*var invalid = specification.IsSatisfiedBy( "Message" );
-			Assert.False( invalid );
-			Assert.Equal( 1, sut.CanCreateCalled );
-			Assert.Equal( 0, sut.CanCreateGenericCalled );*/
 
 			var cannot = specification.IsSatisfiedBy( 456 );
 			Assert.False( cannot );
-			// Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 1, sut.CanCreateGenericCalled );
 			Assert.Equal( 0, sut.CreateGenericCalled );
 
@@ -179,16 +90,12 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 
 			var can = specification.IsSatisfiedBy( 6776 );
 			Assert.True( can );
-			// Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 3, sut.CanCreateGenericCalled );
 
-			// Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 0, sut.CreateGenericCalled );
 
 			var created = factory.Get( 6776 );
-			// Assert.Equal( 1, sut.CanCreateCalled );
 			Assert.Equal( 3, sut.CanCreateGenericCalled );
-			// Assert.Equal( 0, sut.CreateCalled );
 			Assert.Equal( 1, sut.CreateGenericCalled );
 			Assert.Equal( 6776 + 123f, created );
 			sut.Reset();
@@ -196,10 +103,6 @@ namespace DragonSpark.Testing.Aspects.Extensibility.Validation
 
 		interface IExtendedFactory : IParameterizedSource<int, float>, ISpecification<int>
 		{
-			// int CanCreateCalled { get; }
-
-			// int CreateCalled { get; }
-
 			int CanCreateGenericCalled { get; }
 
 			int CreateGenericCalled { get; }

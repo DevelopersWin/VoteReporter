@@ -1,5 +1,5 @@
-using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -11,14 +11,14 @@ namespace DragonSpark.Aspects.Extensibility.Validation
 	public sealed class ExtensionPointProfiles : IParameterizedSource<Type, IEnumerable<ExtensionPointProfile>>
 	{
 		public static IParameterizedSource<Type, IEnumerable<ExtensionPointProfile>> DefaultNested { get; } = new ExtensionPointProfiles().ToCache();
-		ExtensionPointProfiles() : this( AutoValidation.DefaultProfiles, ExtensionPoints.Default.Get ) {}
+		ExtensionPointProfiles() : this( Aspects.Extensions.AutoValidation.Adapters, ExtensionPoints.Default.Get ) {}
 
-		readonly ImmutableArray<IAspectProfile> profiles;
+		readonly ImmutableArray<TypeAdapter> adapters;
 		readonly Func<MethodBase, IExtensionPoint> pointSource;
 
-		ExtensionPointProfiles( ImmutableArray<IAspectProfile> profiles, Func<MethodBase, IExtensionPoint> pointSource )
+		ExtensionPointProfiles( ImmutableArray<TypeAdapter> adapters, Func<MethodBase, IExtensionPoint> pointSource )
 		{
-			this.profiles = profiles;
+			this.adapters = adapters;
 			this.pointSource = pointSource;
 		}
 
@@ -26,12 +26,13 @@ namespace DragonSpark.Aspects.Extensibility.Validation
 
 		IEnumerable<ExtensionPointProfile> Yield( Type parameter )
 		{
-			foreach ( var profile in profiles.Introduce( parameter, tuple => tuple.Item1.Method.DeclaringType.Adapt().IsAssignableFrom( tuple.Item2 ) ) )
+			/*foreach ( var profile in adapters.Introduce( parameter, tuple => tuple.Item1.IsAssignableFrom( tuple.Item2 ) ) )
 			{
 				var validation = pointSource( profile.Validation.Get( parameter ) );
 				var execution = pointSource( profile.Method.Get( parameter ) );
 				yield return new ExtensionPointProfile( validation, execution );
-			}
+			}*/
+			yield break;
 		}
 	}
 }

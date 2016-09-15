@@ -44,9 +44,9 @@
     <Compile Include="Aspects\Extensibility\Validation\ApplyAutoValidationAttribute.cs" />
     <Compile Include="Aspects\Extensibility\ApplyExtensionsAttribute.cs" />
     <Compile Include="Aspects\Extensibility\AspectInvocation.cs" />
+    <Compile Include="Aspects\Extensibility\Validation\AutoValidationExtension.cs" />
     <Compile Include="Aspects\Extensibility\Validation\AutoValidationValidator.cs" />
     <Compile Include="Aspects\Extensibility\Validation\AutoValidationExecutor.cs" />
-    <Compile Include="Aspects\Extensibility\Validation\AutoValidationExtension.cs" />
     <Compile Include="Aspects\Extensibility\CommandInvocationBase.cs" />
     <Compile Include="Aspects\Extensibility\Defaults.cs" />
     <Compile Include="Aspects\Extensibility\DelegatedInvocation.cs" />
@@ -73,6 +73,7 @@
     <Compile Include="Aspects\Extensibility\Validation\SourceAdapter.cs" />
     <Compile Include="Aspects\Extensibility\Validation\GenericSourceAdapterFactory.cs" />
     <Compile Include="Aspects\Extensions\ApplyAutoValidationAttribute.cs" />
+    <Compile Include="Aspects\Extensions\ApplySpecificationAttribute.cs" />
     <Compile Include="Aspects\Extensions\AutoValidationExecuteAspect.cs" />
     <Compile Include="Aspects\Extensions\AutoValidationValidationAspect.cs" />
     <Compile Include="Aspects\Extensions\Build\AspectFactory.cs" />
@@ -81,7 +82,6 @@
     <Compile Include="Aspects\Extensions\Build\AspectInstances.cs" />
     <Compile Include="Aspects\Extensions\AutoValidationAspectBase.cs" />
     <Compile Include="Aspects\Extensions\Build\Specification.cs" />
-    <Compile Include="Aspects\Extensions\Build\ValidationMethodLocator.cs" />
     <Compile Include="Aspects\Extensions\Class1.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />
@@ -397,7 +397,6 @@
     <Compile Include="Aspects\Extensibility\Validation\ParameterValidationAdapterBase.cs" />
     <Compile Include="Aspects\Extensibility\Validation\AdapterLocator.cs" />
     <Compile Include="Aspects\Extensibility\Validation\AdapterSource.cs" />
-    <Compile Include="Aspects\Extensibility\Validation\AspectProfile.cs" />
     <Compile Include="Aspects\Extensibility\Validation\AutoValidationController.cs" />
     <Compile Include="Aspects\Extensibility\Validation\AutoValidationControllerFactory.cs" />
     <Compile Include="Aspects\Extensibility\Validation\Defaults.cs" />

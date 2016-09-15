@@ -10,7 +10,9 @@ namespace DragonSpark.Aspects.Extensions.Build
 	sealed class Specification : SpecificationWithContextBase<Type, ImmutableArray<TypeAdapter>>
 	{
 		public static Specification Default { get; } = new Specification();
-		Specification() : this(  AutoValidation.DefaultProfiles.Select( profile => profile.DeclaringType.Adapt() ).ToImmutableArray() ) {}
+		Specification() : this( AutoValidation.DefaultProfiles.Select( profile => profile.DeclaringType.Adapt() ).ToImmutableArray() ) {}
+
+		public Specification( params Type[] types ) : base( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
 		public Specification( ImmutableArray<TypeAdapter> context ) : base( context ) {}
 
