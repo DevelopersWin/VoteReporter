@@ -1,9 +1,9 @@
-﻿using DragonSpark.Aspects.Extensibility.Validation;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.Diagnostics.Logging
 {

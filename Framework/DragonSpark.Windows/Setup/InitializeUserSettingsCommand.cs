@@ -1,6 +1,4 @@
-﻿using DragonSpark.Aspects.Extensibility;
-using DragonSpark.Aspects.Extensibility.Validation;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
@@ -12,11 +10,13 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using DragonSpark.Aspects.Specifications;
+using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.Windows.Setup
 {
-	[EnableExtensions]
-	public class InitializeUserSettingsCommand : ExtensibleCommandBase<ApplicationSettingsBase>
+	[ApplyAutoValidation, Specification( typeof(OnlyOnceSpecification<ApplicationSettingsBase>) )]
+	public class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
 		readonly ILogger logger;
 		readonly Func<FileInfo> fileSource;
@@ -27,8 +27,6 @@ namespace DragonSpark.Windows.Setup
 		{
 			this.logger = logger;
 			this.fileSource = fileSource;
-
-			this.ExtendUsing( new OnlyOnceSpecification<ApplicationSettingsBase>() ).Extend( AutoValidationExtension.Default );
 		}
 
 		public override void Execute( ApplicationSettingsBase parameter )

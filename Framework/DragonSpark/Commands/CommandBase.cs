@@ -1,4 +1,4 @@
-using DragonSpark.Specifications;
+using DragonSpark.Extensions;
 using System;
 using System.Windows.Input;
 
@@ -9,14 +9,11 @@ namespace DragonSpark.Commands
 		public event EventHandler CanExecuteChanged = delegate {};
 
 		readonly ICoercer<T> coercer;
-		readonly ISpecification<T> specification;
 
-		protected CommandBase() : this( Specifications<T>.Assigned ) {}
-		protected CommandBase( ISpecification<T> specification ) : this( Coercer<T>.Default, specification ) {}
-		protected CommandBase( ICoercer<T> coercer, ISpecification<T> specification )
+		protected CommandBase() : this( Coercer<T>.Default ) {}
+		protected CommandBase( ICoercer<T> coercer )
 		{
 			this.coercer = coercer;
-			this.specification = specification;
 		}
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
@@ -24,7 +21,7 @@ namespace DragonSpark.Commands
 		bool ICommand.CanExecute( object parameter ) => IsSatisfiedBy( coercer.Coerce( parameter ) );
 		void ICommand.Execute( object parameter ) => Execute( coercer.Coerce( parameter ) );
 
-		public bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
+		public virtual bool IsSatisfiedBy( T parameter ) => parameter.IsAssigned();
 		public abstract void Execute( T parameter );
 	}
 }

@@ -1,4 +1,4 @@
-using DragonSpark.Aspects.Extensibility.Validation;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Specifications;
 
 namespace DragonSpark.Sources.Parameterized

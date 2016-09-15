@@ -49,8 +49,7 @@
     <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
     <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
-    <Compile Include="Aspects\Extensibility\EnableExtensionsAttributeTests.cs" />
-    <Compile Include="Aspects\Extensions\ApplySpecificationAttributeTests.cs" />
+    <Compile Include="Aspects\Specifications\SpecificationAttributeTests.cs" />
     <Compile Include="ComponentModel\SourceAttributeTests.cs" />
     <Compile Include="Activation\ExecutionContextTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggingControllerTests.cs" />
@@ -60,10 +59,9 @@
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
     <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
-    <Compile Include="Aspects\Extensibility\ExtensionPointAttributeTests.cs" />
-    <Compile Include="Aspects\Extensibility\Validation\AutoValidationControllerTests.cs" />
+    <Compile Include="Aspects\Validation\AutoValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
-    <Compile Include="Aspects\Extensibility\Validation\ApplyAutoValidationAttributeTests.cs" />
+    <Compile Include="Aspects\Validation\ApplyAutoValidationAttributeTests.cs" />
     <Compile Include="Commands\CommandBaseTests.cs" />
     <Compile Include="Commands\SpecificationCommandTests.cs" />
     <Compile Include="ComponentModel\ClassWithDefaultProperties.cs" />
@@ -181,9 +179,7 @@
       <Name>DragonSpark</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Aspects\Validation\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
   <PropertyGroup>

@@ -1,19 +1,20 @@
-﻿using DragonSpark.Aspects.Extensibility;
-using DragonSpark.Aspects.Extensibility.Validation;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
 using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using System.Windows.Input;
+using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.Application.Setup
 {
-	[EnableExtensions]
-	public class DeclarativeSetup : Aspects.Extensibility.CompositeCommand, ISetup
+	[ApplyAutoValidation]
+	public class DeclarativeSetup : CompositeCommand, ISetup// , ISpecificationAware<object>
 	{
 		public static ISetup Current() => AmbientStack.GetCurrentItem<ISetup>();
+
+		readonly ISpecification<object> specification;
 
 		public DeclarativeSetup() : this( Priority.Normal ) {}
 		public DeclarativeSetup( Priority priority = Priority.Normal ) : this( priority, Items<ICommand>.Default ) {}
@@ -21,9 +22,11 @@ namespace DragonSpark.Application.Setup
 		public DeclarativeSetup( Priority priority = Priority.Normal, params ICommand[] commands ) : this( new OncePerScopeSpecification<object>(), priority, commands ) {}
 		public DeclarativeSetup( ISpecification<object> specification, Priority priority = Priority.Normal, params ICommand[] commands ) : base( commands )
 		{
+			this.specification = specification;
 			Priority = priority;
-			this.ExtendUsing( specification ).Extend( AutoValidationExtension.Default );
 		}
+
+		public override bool IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
 
 		public Priority Priority { get; set; }
 
@@ -36,7 +39,5 @@ namespace DragonSpark.Application.Setup
 				base.Execute( parameter );
 			}
 		}
-
-		
 	}
 }

@@ -1,7 +1,7 @@
 using DragonSpark.Extensions;
 using System;
-using DragonSpark.Aspects.Extensibility;
-using DragonSpark.Aspects.Extensibility.Validation;
+using DragonSpark.Aspects;
+using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.Sources.Parameterized
 {

@@ -1,4 +1,4 @@
-﻿using DragonSpark.Aspects.Extensibility;
+﻿using DragonSpark.Commands;
 using DragonSpark.Extensions;
 using Serilog.Events;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 
 namespace DragonSpark.Diagnostics.Logging
 {
-	public abstract class PurgeLoggerHistoryCommand<T> : ExtensibleCommandBase<Action<T>>
+	public abstract class PurgeLoggerHistoryCommand<T> : CommandBase<Action<T>>
 	{
 		readonly Func<ILoggerHistory> historySource;
 		readonly Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory;

@@ -1,5 +1,4 @@
-﻿using DragonSpark.Aspects.Extensibility;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using System;
@@ -27,14 +26,14 @@ namespace DragonSpark.Commands
 			new AlteredResultParameterizedSource<TParameter, TResult>( selector, @this );*/
 
 		// public static ICommand<T> Apply<T>( this ICommand<T> @this, ISpecification<T> specification ) => new SpecificationCommand<T>( specification, @this.ToDelegate() );
-		public static T ExtendUsing<T, TParameter>( this T @this, ISpecification<TParameter> specification ) where T : ICommand<TParameter> => 
+		/*public static T ExtendUsing<T, TParameter>( this T @this, ISpecification<TParameter> specification ) where T : ICommand<TParameter> => 
 			@this.Extend( new SpecificationExtension<TParameter>( specification ) );
 
 		public static T Extend<T>( this T @this, IExtension extension )
 		{
 			extension.Execute( @this );
 			return @this;
-		}
+		}*/
 
 		public static ICommand<T> Adapt<T>( this ICommand @this ) => new AdapterCommand<T>( @this );
 
