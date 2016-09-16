@@ -17,21 +17,8 @@ namespace DragonSpark.Extensions
 			map = Map;
 		}
 
-		public override bool IsSatisfiedBy( MethodInfo parameter )
-		{
-			return Equals( parameter, Context ) || parameter.Name == Context.Name && Map( parameter.ReturnType ) == Context.ReturnType && parameter.GetParameterTypes().Select( map ).SequenceEqual( Context.GetParameterTypes().AsEnumerable() );
-
-			/*try
-			{
-				
-			}
-			catch ( Exception )
-			{
-				var typeInfo = parameter.DeclaringType.GetTypeInfo();
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {typeInfo.GenericTypeArguments.Length} - {typeInfo.GenericTypeParameters.Length}", null, null, null ));
-				throw;
-			}*/
-		}
+		public override bool IsSatisfiedBy( MethodInfo parameter ) => 
+			Equals( parameter, Context ) || parameter.Name == Context.Name && Map( parameter.ReturnType ) == Context.ReturnType && parameter.GetParameterTypes().Select( map ).SequenceEqual( Context.GetParameterTypes().AsEnumerable() );
 
 		Type Map( Type type )
 		{
