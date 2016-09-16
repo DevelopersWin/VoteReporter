@@ -10,7 +10,7 @@ using Type = System.Type;
 namespace DragonSpark.Testing.Extensions
 {
 	[SuppressMessage( "ReSharper", "PossibleMultipleEnumeration" )]
-	public class ContinuationExceptionTests
+	public class EnumerableExtensionsTests
 	{
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Each( IEnumerable<object> sut )

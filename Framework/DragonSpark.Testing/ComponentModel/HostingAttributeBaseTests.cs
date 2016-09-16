@@ -2,9 +2,9 @@
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
 
-namespace DragonSpark.Testing.TypeSystem
+namespace DragonSpark.Testing.ComponentModel
 {
-	public class HostingAttributeTests
+	public class HostingAttributeBaseTests
 	{
 		[Theory, AutoData]
 		public void Field( object item, int number )

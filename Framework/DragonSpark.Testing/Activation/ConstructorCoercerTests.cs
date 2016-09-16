@@ -1,12 +1,20 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Testing.Objects;
 using Ploeh.AutoFixture.Xunit2;
 using System;
 using Xunit;
 
-namespace DragonSpark.Testing.Activation.FactoryModel
+namespace DragonSpark.Testing.Activation
 {
-	public class FactoryParameterCoercerTests
+	public class ConstructorCoercerTests
 	{
+		[Theory, AutoData]
+		public void Construct( ConstructorCoercer sut )
+		{
+			var parameter = sut.Coerce( typeof(Class) );
+			Assert.Equal( parameter.RequestedType, typeof(Class) );
+		} 
+
 		[Theory, AutoData]
 		void Parameter( ConstructCoercer<IntegerParameter> sut, int item )
 		{

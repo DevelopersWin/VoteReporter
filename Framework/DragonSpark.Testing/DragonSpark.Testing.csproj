@@ -47,18 +47,16 @@
     <Compile Include="Activation\ApplicationContextTests.cs" />
     <Compile Include="Activation\ConstructorsTests.cs" />
     <Compile Include="Activation\ConstructorTests.cs" />
-    <Compile Include="Activation\FactoryModel\FactoryParameterCoercerQualifierTests.cs" />
-    <Compile Include="Activation\FactoryModel\FactoryParameterCoercerTests.cs" />
+    <Compile Include="Activation\ConstructorCoercerTests.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAttributeTests.cs" />
     <Compile Include="ComponentModel\SourceAttributeTests.cs" />
-    <Compile Include="Activation\ExecutionContextTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggingControllerTests.cs" />
     <Compile Include="Application\DefaultExportProviderTests.cs" />
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
     <Compile Include="Aspects\ApplyValuesFromSourceTests.cs" />
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
-    <Compile Include="Aspects\CacheKeyFactoryTests.cs" />
+    <Compile Include="Runtime\KeyFactoryTests.cs" />
     <Compile Include="Aspects\Validation\AutoValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="Aspects\Validation\ApplyAutoValidationAttributeTests.cs" />
@@ -89,7 +87,6 @@
     <Compile Include="TypeSystem\Metadata\AttributesTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Aspects\BuildUpTests.cs" />
     <Compile Include="ComponentModel\DefaultValueProviderTests.cs" />
     <Compile Include="Composition\CompositionTests.cs" />
     <Compile Include="Composition\ConventionBuilderTests.cs" />
@@ -97,7 +94,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Configuration\RegistrationTests.cs" />
-    <Compile Include="Configuration\ValueStoreTests.cs" />
+    <Compile Include="Configuration\ValueStoreBaseTests.cs" />
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="Diagnostics\Exceptions\ExceptionHandlerTests.cs" />
     <Compile Include="FormatterTests.cs" />
@@ -122,7 +119,7 @@
     <Compile Include="Extensions\DictionaryExtensionsTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Extensions\ContinuationExceptionTests.cs">
+    <Compile Include="Extensions\EnumerableExtensionsTests.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Extensions\ObjectExtensionsTests.cs" />
@@ -139,9 +136,9 @@
     <Compile Include="Sources\Parameterized\Caching\AmbientStackTests.cs" />
     <Compile Include="Setup\ApplyMigrationCommandTests.cs" />
     <Compile Include="Application\ApplicationAssemblyFilterTests.cs" />
-    <Compile Include="TypeSystem\InverseCacheValueFactoryTests.cs" />
+    <Compile Include="TypeSystem\ItemsTests.cs" />
     <Compile Include="TypeSystem\Metadata\DerivedMethodSpecificationTests.cs" />
-    <Compile Include="TypeSystem\HostingAttributeTests.cs" />
+    <Compile Include="ComponentModel\HostingAttributeBaseTests.cs" />
     <Compile Include="TypeSystem\KnownTypesTests.cs" />
     <Compile Include="TypeSystem\PartsTests.cs" />
     <Compile Include="TypeSystem\AssemblyBasedTypeSourceTests.cs" />
