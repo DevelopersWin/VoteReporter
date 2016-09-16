@@ -1,10 +1,9 @@
-﻿using System;
+﻿using DragonSpark.Sources.Parameterized;
+using PostSharp.Aspects;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
-using PostSharp.Aspects;
 
 namespace DragonSpark.Aspects.Build
 {
@@ -19,9 +18,7 @@ namespace DragonSpark.Aspects.Build
 			this.sources = sources.ToImmutableArray();
 		}
 
-		public override IEnumerable<AspectInstance> Get( Type parameter ) => Yield( parameter ).WhereAssigned();
-
-		IEnumerable<AspectInstance> Yield( Type parameter )
+		public override IEnumerable<AspectInstance> Get( Type parameter )
 		{
 			foreach ( var source in sources )
 			{

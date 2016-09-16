@@ -18,10 +18,10 @@ namespace DragonSpark.Aspects.Validation
 		public override IParameterValidationAdapter Get( object parameter )
 		{
 			var type = parameter.GetType();
-			var adapter = profileSource( type )?.Get( parameter );
-			if ( adapter != null )
+			var result = profileSource( type )?.Get( parameter );
+			if ( result != null )
 			{
-				return adapter;
+				return result;
 			}
 
 			throw new InvalidOperationException( $"Adapter not found for {type}." );
