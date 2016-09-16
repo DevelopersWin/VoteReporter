@@ -1,4 +1,5 @@
-﻿using DragonSpark;
+﻿// ReSharper disable once FilesNotPartOfProjectWarning
+using DragonSpark;
 using DragonSpark.Application;
 using System;
 using System.Reflection;
