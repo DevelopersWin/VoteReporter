@@ -7,6 +7,6 @@ namespace DragonSpark.Aspects.Validation
 	{
 		readonly static Type Type = typeof(ICommand);
 		public static CommandAutoValidationProfile Default { get; } = new CommandAutoValidationProfile();
-		CommandAutoValidationProfile() : base( Type, new MethodDefinition( Type, nameof(ICommand.CanExecute) ), new MethodDefinition( Type, nameof(ICommand.Execute) ) ) {}
+		CommandAutoValidationProfile() : base( Type, new MethodLocator( Type, nameof(ICommand.CanExecute) ), new MethodLocator( Type, nameof(ICommand.Execute) ), CommandAdapterFactory.Default.Get ) {}
 	}
 }

@@ -1,10 +1,31 @@
-﻿using System;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
+using System;
 
 namespace DragonSpark.Aspects.Validation
 {
-	public class AutoValidationProfile : Profile
+	public interface IAutoValidationProfile 
+		: IProfile, IParameterizedSource<IParameterValidationAdapter>, ISpecification<Type> {}
+
+	public class AutoValidationProfile : Profile, IAutoValidationProfile
 	{
-		protected AutoValidationProfile( Type declaringType, IMethodLocator validation, IMethodLocator execution )
-			: base( declaringType, new AspectSource<AutoValidationValidationAspect>( validation ), new AspectSource<AutoValidationExecuteAspect>( execution ) ) {}
+		readonly TypeAdapter adapter;
+		readonly Func<object, IParameterValidationAdapter> adapterSource;
+
+		protected AutoValidationProfile( Type declaringType, IMethodLocator validation, IMethodLocator execution, Func<object, IParameterValidationAdapter> adapterSource )
+			: this( declaringType.Adapt(), validation, execution, adapterSource ) {}
+
+		AutoValidationProfile( TypeAdapter adapter, IMethodLocator validation, IMethodLocator execution, Func<object, IParameterValidationAdapter> adapterSource )
+			: base( adapter.Type, new AspectSource<AutoValidationValidationAspect>( validation ), new AspectSource<AutoValidationExecuteAspect>( execution ) )
+		{
+			this.adapter = adapter;
+			this.adapterSource = adapterSource;
+		}
+
+		public IParameterValidationAdapter Get( object parameter ) => adapterSource( parameter );
+
+		public bool IsSatisfiedBy( Type parameter ) => adapter.IsAssignableFrom( parameter );
 	}
 }

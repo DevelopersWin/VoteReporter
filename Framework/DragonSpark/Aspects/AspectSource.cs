@@ -1,7 +1,9 @@
-﻿using System;
-using System.Reflection;
-using DragonSpark.Aspects.Build;
+﻿using DragonSpark.Aspects.Build;
+using PostSharp;
 using PostSharp.Aspects;
+using PostSharp.Extensibility;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
@@ -20,9 +22,17 @@ namespace DragonSpark.Aspects
 
 		public AspectInstance Get( Type parameter )
 		{
-			var method = methodSource( parameter );
-			var result = method != null ? inner( method ) : null;
-			return result;
+			try
+			{
+				var method = methodSource( parameter );
+				var result = method != null ? inner( method ) : null;
+				return result;
+			}
+			catch ( Exception )
+			{
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {parameter} - {typeof(T)}", null, null, null ));
+				throw;
+			}
 		}
 	}
 }

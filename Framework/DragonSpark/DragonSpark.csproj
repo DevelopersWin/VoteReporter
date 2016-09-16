@@ -60,7 +60,7 @@
     <Compile Include="Aspects\Specifications\SpecificationConstructor.cs" />
     <Compile Include="Aspects\Specifications\SpecificationProfile.cs" />
     <Compile Include="Aspects\Specifications\SpecificationSource.cs" />
-    <Compile Include="Aspects\Validation\AdapterSources.cs" />
+    <Compile Include="Aspects\Validation\Profiles.cs" />
     <Compile Include="Aspects\AspectBase.cs" />
     <Compile Include="Aspects\DelegatedInvocation.cs" />
     <Compile Include="Aspects\IInvocation.cs" />
@@ -148,7 +148,7 @@
     <Compile Include="PriorityAwareLocator.cs" />
     <Compile Include="PriorityComparer.cs" />
     <Compile Include="PriorityExtensions.cs" />
-    <Compile Include="Aspects\MethodDefinition.cs" />
+    <Compile Include="Aspects\MethodLocator.cs" />
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AssignableParameterizedSource.cs" />
@@ -392,12 +392,10 @@
     <Compile Include="Aspects\OriginAttribute.cs" />
     <Compile Include="Aspects\Validation\ParameterValidationAdapterBase.cs" />
     <Compile Include="Aspects\Validation\AdapterLocator.cs" />
-    <Compile Include="Aspects\Validation\AdapterSource.cs" />
     <Compile Include="Aspects\Validation\AutoValidationController.cs" />
     <Compile Include="Aspects\Validation\AutoValidationControllerFactory.cs" />
     <Compile Include="Aspects\Validation\Defaults.cs" />
     <Compile Include="Aspects\Validation\Extensions.cs" />
-    <Compile Include="Aspects\Validation\IAdapterSource.cs" />
     <Compile Include="Aspects\IAspectHub.cs" />
     <Compile Include="Aspects\Validation\IAutoValidationController.cs" />
     <Compile Include="Aspects\IMethodAware.cs" />

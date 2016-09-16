@@ -1,6 +1,6 @@
-﻿using System;
-using DragonSpark.Sources;
+﻿using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using System;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -9,6 +9,6 @@ namespace DragonSpark.Aspects.Validation
 		readonly static Type Type = typeof(IParameterizedSource<,>);
 
 		public static ParameterizedSourceAutoValidationProfile Default { get; } = new ParameterizedSourceAutoValidationProfile();
-		ParameterizedSourceAutoValidationProfile() : base( Type, Aspects.Defaults.Specification, new MethodDefinition( Type, nameof(ISource.Get) ) ) {}
+		ParameterizedSourceAutoValidationProfile() : base( Type, Aspects.Defaults.Specification, new MethodLocator( Type, nameof(ISource.Get) ), GenericSourceAdapterFactory.Default.Get ) {}
 	}
 }

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Reflection;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	public sealed class MethodDefinition : FactoryCache<Type, MethodInfo>, IMethodLocator
+	public sealed class MethodLocator : FactoryCache<Type, MethodInfo>, IMethodLocator
 	{
 		readonly string methodName;
 
-		public MethodDefinition( Type declaringType, string methodName )
+		public MethodLocator( Type declaringType, string methodName )
 		{
 			DeclaringType = declaringType;
 			this.methodName = methodName;

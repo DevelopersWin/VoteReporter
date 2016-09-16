@@ -1,30 +1,30 @@
-﻿using System;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
+using System;
 
 namespace DragonSpark.Aspects.Validation
 {
 	sealed class AdapterLocator : ParameterizedSourceBase<IParameterValidationAdapter>
 	{
 		public static AdapterLocator Default { get; } = new AdapterLocator();
-		AdapterLocator() : this( AdapterSources.Default.Get ) {}
+		AdapterLocator() : this( Profiles.Default.Get ) {}
 
-		readonly Func<Type, IAdapterSource> factorySource;
+		readonly Func<Type, IAutoValidationProfile> profileSource;
 
-		AdapterLocator( Func<Type, IAdapterSource> factorySource )
+		AdapterLocator( Func<Type, IAutoValidationProfile> profileSource )
 		{
-			this.factorySource = factorySource;
+			this.profileSource = profileSource;
 		}
 
 		public override IParameterValidationAdapter Get( object parameter )
 		{
-			var other = parameter.GetType();
-			var adapter = factorySource( other )?.Get( parameter );
+			var type = parameter.GetType();
+			var adapter = profileSource( type )?.Get( parameter );
 			if ( adapter != null )
 			{
 				return adapter;
 			}
 
-			throw new InvalidOperationException( $"Adapter not found for {other}." );
+			throw new InvalidOperationException( $"Adapter not found for {type}." );
 		}
 	}
 }
