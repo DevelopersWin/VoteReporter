@@ -1,11 +1,11 @@
-﻿using DragonSpark.Commands;
+﻿using DragonSpark.Aspects.Validation;
+using DragonSpark.Commands;
 using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using System.Windows.Input;
-using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.Application.Setup
 {

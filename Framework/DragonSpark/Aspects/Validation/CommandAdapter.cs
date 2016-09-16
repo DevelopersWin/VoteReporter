@@ -1,9 +1,9 @@
-﻿using System;
-using System.Reflection;
-using System.Windows.Input;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using System;
+using System.Reflection;
+using System.Windows.Input;
 
 namespace DragonSpark.Aspects.Validation
 {

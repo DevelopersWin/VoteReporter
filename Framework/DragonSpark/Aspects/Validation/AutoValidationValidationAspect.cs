@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Validation
 			if ( controller != null )
 			{
 				var parameter = args.Arguments[0];
-				args.ReturnValue = controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, args.GetReturnValue<bool>() );
+				args.ReturnValue = controller.Handles( parameter ) || controller.Marked( parameter, args.GetReturnValue<bool>() );
 			}
 			else
 			{

@@ -1,6 +1,6 @@
-﻿using System.Threading;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
+using System.Threading;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -13,7 +13,7 @@ namespace DragonSpark.Aspects.Validation
 			this.validator = validator;
 		}
 
-		public bool IsSatisfiedBy( object parameter ) => Handler?.Handles( parameter ) ?? false;
+		public bool Handles( object parameter ) => Handler?.Handles( parameter ) ?? false;
 
 		bool IsMarked( object parameter ) => Value != null && Equals( Value, parameter ) && Clear();
 

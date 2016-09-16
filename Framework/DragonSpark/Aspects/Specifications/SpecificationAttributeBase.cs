@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using DragonSpark.Aspects.Build;
+﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
+using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Specifications
 {

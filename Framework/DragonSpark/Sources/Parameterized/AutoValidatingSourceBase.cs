@@ -1,7 +1,7 @@
-using DragonSpark.Extensions;
-using System;
 using DragonSpark.Aspects;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Extensions;
+using System;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -20,7 +20,7 @@ namespace DragonSpark.Sources.Parameterized
 			this.invocation = invocation;
 		}
 
-		public bool IsSatisfiedBy( TParameter parameter ) => controller.IsSatisfiedBy( parameter ) || controller.Marked( parameter, specification( parameter ) );
+		public bool IsSatisfiedBy( TParameter parameter ) => controller.Handles( parameter ) || controller.Marked( parameter, specification( parameter ) );
 
 		public TResult Get( TParameter parameter ) => controller.Execute( parameter, invocation ).As<TResult>();
 	}

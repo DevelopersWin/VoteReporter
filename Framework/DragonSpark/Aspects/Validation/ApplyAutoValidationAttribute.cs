@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Validation
 {
-	[IntroduceInterface( typeof(IAutoValidationController), OverrideAction = InterfaceOverrideAction.Ignore, AncestorOverrideAction = InterfaceOverrideAction.Ignore )]
+	[IntroduceInterface( typeof(IAutoValidationController) )]
 	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 )]
 	[
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), 
@@ -27,7 +27,7 @@ namespace DragonSpark.Aspects.Validation
 		IAutoValidationController Controller { get; set; }
 		public sealed override void RuntimeInitializeInstance() => Controller = AutoValidationControllerFactory.Default.Get( Instance );
 
-		bool ISpecification<object>.IsSatisfiedBy( object parameter ) => Controller.IsSatisfiedBy( parameter );
+		bool IAutoValidationController.Handles( object parameter ) => Controller.Handles( parameter );
 		void IAutoValidationController.MarkValid( object parameter, bool valid ) => Controller.MarkValid( parameter, valid );
 		object IAutoValidationController.Execute( object parameter, IInvocation proceed ) => Controller.Execute( parameter, proceed );
 	}
