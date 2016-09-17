@@ -1,31 +1,26 @@
-﻿using System;
+﻿using PostSharp.Aspects;
+using System;
 using System.Reflection;
-using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
-using PostSharp.Aspects;
-using PostSharp.Extensibility;
 
 namespace DragonSpark.Aspects.Build
 {
-	public sealed class AspectInstance<T> : ParameterizedSourceBase<MethodInfo, AspectInstance>
+	sealed class AspectInstance<T> : IAspectInstance where T : IAspect
 	{
-		public static AspectInstance<T> Default { get; } = new AspectInstance<T>();
-		AspectInstance() : this( AspectInstanceConstructor<T>.Default.Get ) {}
+		readonly Func<Type, MethodInfo> methodSource;
+		readonly Func<MethodInfo, AspectInstance> inner;
 
-		readonly Func<MethodInfo, AspectInstance> constructorSource;
+		public AspectInstance( IMethodLocator locator ) : this( locator.Get, AspectInstanceFactory<T>.Default.Get ) {}
 
-		public AspectInstance( Func<MethodInfo, AspectInstance> constructorSource )
+		public AspectInstance( Func<Type, MethodInfo> methodSource, Func<MethodInfo, AspectInstance> inner )
 		{
-			this.constructorSource = constructorSource;
+			this.methodSource = methodSource;
+			this.inner = inner;
 		}
 
-		public override AspectInstance Get( MethodInfo parameter )
+		public AspectInstance Get( Type parameter )
 		{
-			var method = parameter.AccountForGenericDefinition();
-			var instance = constructorSource( method );
-			var type = instance.Aspect?.GetType() ?? Type.GetType( instance.AspectConstruction.TypeName );
-			var repository = PostSharpEnvironment.CurrentProject.GetService<IAspectRepositoryService>();
-			var result = !repository.HasAspect( method, type ) ? instance : null;
+			var method = methodSource( parameter );
+			var result = method != null ? inner( method ) : null;
 			return result;
 		}
 	}

@@ -57,13 +57,11 @@ namespace DragonSpark.Testing.Aspects.Validation
 
 			var valid = command.CanExecute( 6776 );
 			Assert.True( valid );
-			// Assert.True( controller.IsValid( 6776 ) );
 			Assert.Equal( 3, command.CanExecuteCalled );
 			Assert.Equal( 2, command.CanExecuteGenericCalled );
 
 			var again = command.CanExecute( 6776 );
 			Assert.True( again );
-			// Assert.True( controller.IsValid( 6776 ) );
 			Assert.Equal( 4, command.CanExecuteCalled );
 			Assert.Equal( 3, command.CanExecuteGenericCalled );
 
@@ -71,17 +69,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.Equal( 0, command.ExecuteGenericCalled );
 
 			command.Execute( new object() );
-			// Assert.False( controller.IsValid( 6776 ) );
-
+			
 			Assert.Equal( 5, command.CanExecuteCalled );
 			Assert.Equal( 3, command.CanExecuteGenericCalled );
 			Assert.Equal( 0, command.ExecuteCalled );
 			Assert.Equal( 0, command.ExecuteGenericCalled );
 
 			command.Execute( 123 );
-			/*Assert.False( controller.IsValid( 123 ) );
-			Assert.False( controller.IsValid( 6776 ) );*/
-
+			
 			Assert.Equal( 6, command.CanExecuteCalled );
 			Assert.Equal( 4, command.CanExecuteGenericCalled );
 			Assert.Equal( 0, command.ExecuteCalled );
@@ -91,7 +86,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			command.Execute( 6776 );
 
 			Assert.Equal( 6, command.CanExecuteCalled );
-			Assert.Equal( 5, command.CanExecuteGenericCalled );
+			Assert.Equal( 4, command.CanExecuteGenericCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( 1, command.ExecuteGenericCalled );
 
@@ -102,7 +97,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.False( command.IsSatisfiedBy( parameter ) );
 			
 			Assert.Equal( 6, command.CanExecuteCalled );
-			Assert.Equal( 6, command.CanExecuteGenericCalled );
+			Assert.Equal( 5, command.CanExecuteGenericCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( 1, command.ExecuteGenericCalled );
 
@@ -110,14 +105,14 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.True( command.IsSatisfiedBy( validGeneric ) );
 
 			Assert.Equal( 6, command.CanExecuteCalled );
-			Assert.Equal( 7, command.CanExecuteGenericCalled );
+			Assert.Equal( 6, command.CanExecuteGenericCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( 1, command.ExecuteGenericCalled );
 
 			command.Execute( validGeneric );
 
 			Assert.Equal( 6, command.CanExecuteCalled );
-			Assert.Equal( 7, command.CanExecuteGenericCalled );
+			Assert.Equal( 6, command.CanExecuteGenericCalled );
 			Assert.Equal( 1, command.ExecuteCalled );
 			Assert.Equal( 2, command.ExecuteGenericCalled );
 

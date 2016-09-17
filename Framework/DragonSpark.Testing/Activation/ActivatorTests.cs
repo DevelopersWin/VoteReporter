@@ -29,13 +29,6 @@ namespace DragonSpark.Testing.Activation
 			Assert.NotSame( instance, activator.Get<IInterface>( typeof(Class) ) );
 		}
 
-		/*[Fact]
-		public void SpecificationLocator()
-		{
-			var temp = SpecificationLocator<object>.Default.Get( SingletonLocator.Default );
-			Debugger.Break();
-		}*/
-
 		[Fact]
 		public void Specifications()
 		{
@@ -45,13 +38,9 @@ namespace DragonSpark.Testing.Activation
 			Assert.Same( Singleton.Default, SingletonLocator.Default.Get( typeof(Singleton) ) );
 			Assert.True( SingletonLocator.Default.IsSatisfiedBy( typeof(Singleton) ) );
 
-			// Assert.True( Activator.Default.IsSatisfiedBy( request ) );
 			Assert.False( Activator.Default.IsSatisfiedBy( typeof(IInner) ) );
 			Assert.True( Activator.Default.IsSatisfiedBy( typeof(Class) ) );
 			Assert.False( Activator.Default.IsSatisfiedBy( typeof(Closed) ) );
-			// Assert.False( Activator.Default.IsSatisfiedBy( new object() ) );
-			
-			// Assert.True( Activator.Default.IsSatisfiedBy( typeof(Singleton) ) );
 		}
 
 		interface IInner {}

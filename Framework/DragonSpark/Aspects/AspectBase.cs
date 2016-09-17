@@ -1,14 +1,13 @@
 ﻿using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Extensibility;
 using System;
 
 namespace DragonSpark.Aspects
 {
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) ), 
-		AttributeUsage( AttributeTargets.Method ), 
-		MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict )
+		AttributeUsage( AttributeTargets.Method )/*, 
+		MulticastAttributeUsage( Inheritance = MulticastInheritance.Strict )*/
 		]
 	public abstract class AspectBase : MethodInterceptionAspect {}
 }

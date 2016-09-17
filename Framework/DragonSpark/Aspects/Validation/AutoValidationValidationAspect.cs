@@ -6,18 +6,21 @@ namespace DragonSpark.Aspects.Validation
 	{
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var active = args.Instance as IActive;
-			if ( active == null || !active.Get() )
+			var instance = args.Instance;
+			var controller = instance as IAutoValidationController;
+			if ( controller != null )
 			{
-				var controller = args.Instance as IAutoValidationController;
-				if ( controller != null )
+				var active = instance as IActive;
+				var allowed = active == null || !active.Get();
+				if ( allowed )
 				{
 					var parameter = args.Arguments[0];
 					args.ReturnValue = controller.Handles( parameter ) || controller.Marked( parameter, args.GetReturnValue<bool>() );
 					return;
 				}
 			}
-			base.OnInvoke( args );
+			
+			args.Proceed();
 		}
 	}
 }

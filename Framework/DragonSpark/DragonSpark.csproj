@@ -44,8 +44,8 @@
     <Compile Include="Aspects\Validation\CommandAutoValidationProfile.cs" />
     <Compile Include="Aspects\Defaults.cs" />
     <Compile Include="Aspects\Validation\GenericCommandAutoValidationProfile.cs" />
-    <Compile Include="Aspects\IAspectSource.cs" />
-    <Compile Include="Aspects\IMethodLocator.cs" />
+    <Compile Include="Aspects\Build\IAspectInstance.cs" />
+    <Compile Include="Aspects\Build\IMethodLocator.cs" />
     <Compile Include="Aspects\IProfile.cs" />
     <Compile Include="Aspects\Specifications\ISpecification.cs" />
     <Compile Include="Aspects\Specifications\ISpecificationAware.cs" />
@@ -73,12 +73,11 @@
     <Compile Include="Aspects\Validation\AutoValidationExecuteAspect.cs" />
     <Compile Include="Aspects\Validation\AutoValidationValidationAspect.cs" />
     <Compile Include="Aspects\Build\AspectFactory.cs" />
-    <Compile Include="Aspects\Build\AspectInstanceConstructor.cs" />
-    <Compile Include="Aspects\Build\AspectInstance.cs" />
+    <Compile Include="Aspects\Build\AspectInstanceFactory.cs" />
     <Compile Include="Aspects\Build\AspectInstances.cs" />
     <Compile Include="Aspects\Validation\AutoValidationAspectBase.cs" />
     <Compile Include="Aspects\Build\Specification.cs" />
-    <Compile Include="Aspects\AspectSource.cs" />
+    <Compile Include="Aspects\Build\AspectInstance.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />
     <Compile Include="Commands\SpecificationCommand.cs" />
@@ -148,7 +147,7 @@
     <Compile Include="PriorityAwareLocator.cs" />
     <Compile Include="PriorityComparer.cs" />
     <Compile Include="PriorityExtensions.cs" />
-    <Compile Include="Aspects\MethodLocator.cs" />
+    <Compile Include="Aspects\Build\MethodLocator.cs" />
     <Compile Include="Sources\Parameterized\AlteredParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AssignableParameterizedSource.cs" />

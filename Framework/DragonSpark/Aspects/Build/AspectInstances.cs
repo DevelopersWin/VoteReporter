@@ -9,18 +9,18 @@ namespace DragonSpark.Aspects.Build
 {
 	public sealed class AspectInstances : ParameterizedSourceBase<Type, IEnumerable<AspectInstance>>
 	{
-		readonly ImmutableArray<IAspectSource> sources;
+		readonly ImmutableArray<IAspectInstance> instances;
 
 		public AspectInstances( IEnumerable<IProfile> sources ) : this( sources.Concat() ) {}
 
-		public AspectInstances( IEnumerable<IAspectSource> sources )
+		public AspectInstances( IEnumerable<IAspectInstance> instances )
 		{
-			this.sources = sources.ToImmutableArray();
+			this.instances = instances.ToImmutableArray();
 		}
 
 		public override IEnumerable<AspectInstance> Get( Type parameter )
 		{
-			foreach ( var source in sources )
+			foreach ( var source in instances )
 			{
 				var instance = source.Get( parameter );
 				if ( instance != null )

@@ -12,7 +12,6 @@ using System.Collections.Generic;
 namespace DragonSpark.Aspects.Validation
 {
 	public interface IActive : IAssignableSource<bool> {}
-
 	class Active : ThreadLocalStore<bool>, IActive {}
 
 	[IntroduceInterface( typeof(IActive) )]
@@ -32,15 +31,14 @@ namespace DragonSpark.Aspects.Validation
 		protected ApplyAutoValidationAttribute( Func<Type, bool> specification, Func<Type, IEnumerable<AspectInstance>> source ) : base( specification, source ) {}
 
 		IAutoValidationController Controller { get; set; }
-		public sealed override void RuntimeInitializeInstance() => Controller = AutoValidationControllerFactory.Default.Get( Instance );
+		public sealed override void RuntimeInitializeInstance() => Controller = Defaults.ControllerSource( Instance );
 
 		bool IAutoValidationController.Handles( object parameter ) => Controller.Handles( parameter );
 		void IAutoValidationController.MarkValid( object parameter, bool valid ) => Controller.MarkValid( parameter, valid );
 		object IAutoValidationController.Execute( object parameter, IInvocation proceed ) => Controller.Execute( parameter, proceed );
+
 		public bool Get() => active.Get();
-
 		object ISource.Get() => Get();
-
-		public void Assign( bool item ) => active.Assign( item );
+		void IAssignable<bool>.Assign( bool item ) => active.Assign( item );
 	}
 }

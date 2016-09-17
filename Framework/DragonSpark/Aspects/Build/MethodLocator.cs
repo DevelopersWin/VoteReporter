@@ -1,15 +1,16 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 using System.Reflection;
 
-namespace DragonSpark.Aspects
+namespace DragonSpark.Aspects.Build
 {
 	public sealed class MethodLocator : FactoryCache<Type, MethodInfo>, IMethodLocator
 	{
 		readonly string methodName;
 
-		public MethodLocator( Type declaringType, string methodName )
+		public MethodLocator( Type declaringType, string methodName ) : base( TypeAssignableSpecification.Defaults.Get( declaringType ) )
 		{
 			DeclaringType = declaringType;
 			this.methodName = methodName;
@@ -20,7 +21,8 @@ namespace DragonSpark.Aspects
 		protected override MethodInfo Create( Type parameter )
 		{
 			var mapping = parameter.Adapt().GetMappedMethods( DeclaringType ).Introduce( methodName, tuple => tuple.Item1.InterfaceMethod.Name == tuple.Item2 ).Only();
-			var result = mapping.MappedMethod?.AsDeclared().AccountForGenericDefinition();
+			var result = mapping.MappedMethod?.LocateInDerivedType( parameter ).AccountForGenericDefinition();
+			// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{parameter} -> {result.DeclaringType}", null, null, null ));
 			return result;
 		}
 	}

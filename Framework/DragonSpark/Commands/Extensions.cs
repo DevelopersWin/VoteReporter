@@ -50,7 +50,7 @@ namespace DragonSpark.Commands
 
 		public static TCommand Run<TCommand, TParameter>( this TCommand @this, TParameter parameter ) where TCommand : ICommand<TParameter>
 		{
-			var result = @this.CanExecute( parameter ) ? @this : default(TCommand);
+			var result = @this.IsSatisfiedBy( parameter ) ? @this : default(TCommand);
 			result?.Execute( parameter );
 			return result;
 		}

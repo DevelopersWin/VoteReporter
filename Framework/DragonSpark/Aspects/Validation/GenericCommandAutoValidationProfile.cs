@@ -1,3 +1,4 @@
+using DragonSpark.Aspects.Build;
 using DragonSpark.Commands;
 using System;
 using System.Windows.Input;

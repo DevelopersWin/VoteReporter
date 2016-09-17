@@ -1,12 +1,12 @@
 using DragonSpark.Activation;
+using DragonSpark.Aspects.Specifications;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
 using System;
 using System.Reflection;
-using DragonSpark.Aspects.Specifications;
-using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.TypeSystem
 {
@@ -19,7 +19,7 @@ namespace DragonSpark.TypeSystem
 
 		public override void Execute( Type parameter ) => parameter.GetTypeInfo().DeclaredConstructors.Each( info => info.GetParameters() );
 
-		class Specification : AllSpecification<Type>
+		sealed class Specification : AllSpecification<Type>
 		{
 			[UsedImplicitly]
 			public static Specification DefaultNested { get; } = new Specification();

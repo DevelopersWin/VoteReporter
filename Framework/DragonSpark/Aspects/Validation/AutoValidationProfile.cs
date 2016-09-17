@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Aspects.Build;
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
@@ -6,8 +7,7 @@ using System;
 
 namespace DragonSpark.Aspects.Validation
 {
-	public interface IAutoValidationProfile 
-		: IProfile, IParameterizedSource<IParameterValidationAdapter>, ISpecification<Type> {}
+	public interface IAutoValidationProfile : IProfile, IParameterizedSource<IParameterValidationAdapter>, ISpecification<Type> {}
 
 	public class AutoValidationProfile : Profile, IAutoValidationProfile
 	{
@@ -18,14 +18,14 @@ namespace DragonSpark.Aspects.Validation
 			: this( declaringType.Adapt(), validation, execution, adapterSource ) {}
 
 		AutoValidationProfile( TypeAdapter adapter, IMethodLocator validation, IMethodLocator execution, Func<object, IParameterValidationAdapter> adapterSource )
-			: base( adapter.Type, new AspectSource<AutoValidationValidationAspect>( validation ), new AspectSource<AutoValidationExecuteAspect>( execution ) )
+			: base( adapter.Type, new AspectInstance<AutoValidationValidationAspect>( validation ), new AspectInstance<AutoValidationExecuteAspect>( execution ) )
 		{
 			this.adapter = adapter;
 			this.adapterSource = adapterSource;
 		}
 
-		public IParameterValidationAdapter Get( object parameter ) => adapterSource( parameter );
-
 		public bool IsSatisfiedBy( Type parameter ) => adapter.IsAssignableFrom( parameter );
+
+		public IParameterValidationAdapter Get( object parameter ) => adapterSource( parameter );
 	}
 }

@@ -20,8 +20,8 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		readonly static IParameterizedSource<MethodInfo, MethodInfo> Declared = new Cache<MethodInfo, MethodInfo>( info => Locate( info, info.DeclaringType ) );
-		public static MethodInfo AsDeclared( this MethodInfo @this ) => Declared.Get( @this );
+		/*readonly static IParameterizedSource<MethodInfo, MethodInfo> Declared = new Cache<MethodInfo, MethodInfo>( info => Locate( info, info.DeclaringType ) );
+		public static MethodInfo AsDeclared( this MethodInfo @this ) => Declared.Get( @this );*/
 
 		public static MethodInfo LocateInDerivedType( this MethodInfo @this, Type derivedType ) => @this.DeclaringType != derivedType ? Locate( @this, derivedType ) : @this;
 
