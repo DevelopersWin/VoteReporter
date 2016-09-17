@@ -14,8 +14,8 @@ using Xunit;
 
 namespace DragonSpark.Testing.Framework
 {
-	[ProvideAspectRole( StandardRoles.Tracing ), LinesOfCodeAvoided( 4 )]
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	[LinesOfCodeAvoided( 4 ), ProvideAspectRole( StandardRoles.Tracing ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),]
 	public sealed class TestingMethodAspect : MethodInterceptionAspect
 	{
 		public override bool CompileTimeValidate( MethodBase method ) => method.Has<FactAttribute>();

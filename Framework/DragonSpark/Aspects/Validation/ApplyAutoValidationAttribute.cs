@@ -11,11 +11,10 @@ using System.Collections.Generic;
 namespace DragonSpark.Aspects.Validation
 {
 	[IntroduceInterface( typeof(IAutoValidationController) )]
-	[ProvideAspectRole( StandardRoles.Validation ), LinesOfCodeAvoided( 4 )]
-	[
-		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), 
-		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )
-	]
+	[LinesOfCodeAvoided( 4 ), ProvideAspectRole( KnownRoles.EnhancedValidation ), 
+		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),
+		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, KnownRoles.ParameterValidation )
+		]
 	public class ApplyAutoValidationAttribute : ApplyAspectBase, IAutoValidationController
 	{
 		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = new AspectInstances( Defaults.Profiles.AsEnumerable() ).ToSourceDelegate();

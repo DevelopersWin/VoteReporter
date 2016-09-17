@@ -1,9 +1,12 @@
 ﻿using System;
+using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
+using PostSharp.Aspects.Dependencies;
 
 namespace DragonSpark.Aspects.Specifications
 {
 	[IntroduceInterface( typeof(ISpecification), OverrideAction = InterfaceOverrideAction.Ignore )]
+	[LinesOfCodeAvoided( 1 ), ProvideAspectRole( KnownRoles.ParameterValidation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
 	public sealed class SpecificationAttribute : SpecificationAttributeBase
 	{
 		readonly static Func<Type, ISpecification> Source = SpecificationSource.Default.Get;

@@ -78,7 +78,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="DevelopersWin.VoteReporter.psproj" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,11 @@
+using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 
 namespace DragonSpark.Aspects.Validation
 {
-	[ProvideAspectRole( StandardRoles.Validation )]
-	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching )]
+	[LinesOfCodeAvoided( 4 ), ProvideAspectRole( KnownRoles.EnhancedValidation ), 
+		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),
+		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, KnownRoles.ParameterValidation )
+		]
 	public abstract class AutoValidationAspectBase : AspectBase {}
 }

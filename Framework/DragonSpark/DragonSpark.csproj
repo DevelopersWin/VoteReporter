@@ -39,6 +39,7 @@
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Aspects\AdapterConstructorBase.cs" />
+    <Compile Include="Aspects\KnownRoles.cs" />
     <Compile Include="Aspects\Validation\AutoValidationProfile.cs" />
     <Compile Include="Aspects\Validation\CommandAutoValidationProfile.cs" />
     <Compile Include="Aspects\Defaults.cs" />
@@ -69,7 +70,6 @@
     <Compile Include="Aspects\Validation\SourceAdapter.cs" />
     <Compile Include="Aspects\Validation\GenericSourceAdapterFactory.cs" />
     <Compile Include="Aspects\Validation\ApplyAutoValidationAttribute.cs" />
-    <Compile Include="Aspects\Specifications\ApplySpecificationAttribute.cs" />
     <Compile Include="Aspects\Validation\AutoValidationExecuteAspect.cs" />
     <Compile Include="Aspects\Validation\AutoValidationValidationAspect.cs" />
     <Compile Include="Aspects\Build\AspectFactory.cs" />
@@ -702,9 +702,6 @@
   <ItemGroup>
     <None Include="App.Config" />
     <None Include="DragonSpark.pfx" />
-    <None Include="DragonSpark.psproj">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>

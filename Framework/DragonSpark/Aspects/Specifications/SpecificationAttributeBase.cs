@@ -8,8 +8,7 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Specifications
 {
-	[ProvideAspectRole( "Specification" ), LinesOfCodeAvoided( 1 )]
-	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
+	[ProvideAspectRole( KnownRoles.ParameterValidation ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
 	public abstract class SpecificationAttributeBase : ApplyAspectBase, ISpecification
 	{
 		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = new AspectInstances( SpecificationProfile.Default ).ToSourceDelegate();

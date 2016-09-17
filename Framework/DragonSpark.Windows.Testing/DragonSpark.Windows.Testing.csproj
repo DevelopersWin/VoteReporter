@@ -71,7 +71,6 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="DragonSpark.Windows.Testing.psproj" />
     <Content Include="Resources\Modules.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>

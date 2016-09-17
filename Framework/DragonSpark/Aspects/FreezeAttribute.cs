@@ -9,8 +9,12 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
-	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[ProvideAspectRole( StandardRoles.Caching ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading ), LinesOfCodeAvoided( 6 ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
+	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) ), AttributeUsage( AttributeTargets.Method | AttributeTargets.Property )]
+	[LinesOfCodeAvoided( 6 ), 
+		ProvideAspectRole( StandardRoles.Caching ), 
+		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ),
+		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )
+		]
 	public class FreezeAttribute : MethodInterceptionAspect, IInstanceScopedAspect
 	{
 		readonly Func<object, IAspectHub> hubSource;

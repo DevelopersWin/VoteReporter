@@ -9,9 +9,9 @@ using Serilog;
 using System.Linq;
 using Xunit;
 
-namespace DragonSpark.Testing.Setup
+namespace DragonSpark.Testing.Application.Setup
 {
-	public class ServiceProviderTests
+	public class InstanceRepositoryTests
 	{
 		[Fact]
 		public void BasicTest()

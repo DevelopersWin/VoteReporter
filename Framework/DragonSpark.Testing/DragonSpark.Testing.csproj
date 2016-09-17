@@ -81,7 +81,7 @@
     <Compile Include="Sources\DelegatesTests.cs" />
     <Compile Include="Sources\ScopeTests.cs" />
     <Compile Include="Application\Setup\ActivatedServiceSourceTests.cs" />
-    <Compile Include="Setup\ServiceProviderTests.cs" />
+    <Compile Include="Application\Setup\InstanceRepositoryTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
     <Compile Include="Application\ExecutionContextTests.cs" />
     <Compile Include="TypeSystem\Metadata\AttributesTests.cs">
@@ -155,7 +155,6 @@
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="DragonSpark.Testing.psproj" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>

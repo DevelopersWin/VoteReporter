@@ -1,24 +1,10 @@
-﻿using System;
-using PostSharp.Aspects;
+﻿using PostSharp.Aspects;
+using System;
 
 namespace DragonSpark.Aspects.Validation
 {
 	public sealed class AutoValidationExecuteAspect : AutoValidationAspectBase
 	{
-		/*readonly static Func<object, Implementation> Factory = new AspectFactory<Implementation>( controller => new Implementation( controller ) ).Get;
-
-		public AutoValidationExecuteAspect() : base( Factory ) {}
-
-		sealed class Implementation : AutoValidationExecuteAspect
-		{
-			readonly IAutoValidationController controller;
-			public Implementation( IAutoValidationController controller )
-			{
-				this.controller = controller;
-			}
-
-			public override void OnInvoke( MethodInterceptionArgs args ) => ;
-		}*/
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			var controller = args.Instance as IAutoValidationController;
