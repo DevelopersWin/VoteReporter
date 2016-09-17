@@ -21,8 +21,17 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static string TrimStartOf( this string @this, params char[] chars ) => chars.Select( c => c.ToString() ).Any( @this.StartsWith ) ? @this.Substring( 1 ) : @this;
-	}
+		public static string TrimStartOf( this string @this, params char[] chars )
+		{
+			foreach ( var c in chars )
+			{
+				if ( @this.StartsWith( c.ToString() ) )
+				{
+					return @this.Substring( 1 );
+				}
+			}
 
-	// ATTRIBUTION: http://stackoverflow.com/questions/773303/splitting-camelcase
+			return @this;
+		}
+	}
 }

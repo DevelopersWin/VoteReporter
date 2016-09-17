@@ -10,7 +10,10 @@ namespace DragonSpark.Aspects.Validation
 			var controller = args.Instance as IAutoValidationController;
 			if ( controller != null )
 			{
+				var active = controller as IActive;
+				active?.Assign( true );
 				args.ReturnValue = controller.Execute( args.Arguments[0], new Invocation( args.GetReturnValue ) ) ?? args.ReturnValue;
+				active?.Assign( false );
 			}
 			else
 			{
