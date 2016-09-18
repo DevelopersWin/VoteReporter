@@ -11,8 +11,8 @@ namespace DragonSpark.Aspects.Specifications
 	[ProvideAspectRole( KnownRoles.ParameterValidation ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
 	public abstract class SpecificationAttributeBase : ApplyAspectBase, ISpecification
 	{
-		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = new AspectInstances( SpecificationProfile.Default ).ToSourceDelegate();
 		readonly static Func<Type, bool> DefaultSpecification = new Specification( Defaults.Specification.DeclaringType ).ToSpecificationDelegate();
+		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = new AspectInstances( SpecificationProfile.Default ).ToSourceDelegate();
 
 		protected SpecificationAttributeBase() : base( DefaultSpecification, DefaultSource ) {}
 

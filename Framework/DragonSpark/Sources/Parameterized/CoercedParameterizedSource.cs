@@ -1,3 +1,4 @@
+using DragonSpark.Coercion;
 using DragonSpark.Extensions;
 using System;
 
@@ -5,8 +6,9 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public class CoercedParameterizedSource<TParameter, TResult> : CoercedParameterizedSource<object, TParameter, TResult>
 	{
-		public CoercedParameterizedSource( Func<TParameter, TResult> source ) : this( Defaults<TParameter>.Coercer, source ) {}
-		public CoercedParameterizedSource( Coerce<TParameter> coercer, Func<TParameter, TResult> source ) : base( new Func<object, TParameter>( coercer ), source ) {}
+		readonly static ICoercer<TParameter> Coercer = Coercer<TParameter>.Default;
+		public CoercedParameterizedSource( Func<TParameter, TResult> source ) : this( Coercer, source ) {}
+		public CoercedParameterizedSource( ICoercer<object, TParameter> coercer, Func<TParameter, TResult> source ) : base( coercer.Coerce, source ) {}
 	}
 
 	public class CoercedParameterizedSource<TFrom, TParameter, TResult> : DelegatedParameterizedSource<TParameter, TResult>, IParameterizedSource<TFrom, TResult>

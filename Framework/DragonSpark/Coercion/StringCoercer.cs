@@ -1,4 +1,4 @@
-namespace DragonSpark
+namespace DragonSpark.Coercion
 {
 	public sealed class StringCoercer : Coercer<string>
 	{

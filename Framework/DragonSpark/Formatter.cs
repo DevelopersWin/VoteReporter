@@ -3,6 +3,7 @@ using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Composition;
+using DragonSpark.Coercion;
 
 namespace DragonSpark
 {

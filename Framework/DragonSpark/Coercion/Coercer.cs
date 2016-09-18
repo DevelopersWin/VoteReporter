@@ -1,4 +1,4 @@
-namespace DragonSpark
+namespace DragonSpark.Coercion
 {
 	public class Coercer<T> : CoercerBase<T>
 	{

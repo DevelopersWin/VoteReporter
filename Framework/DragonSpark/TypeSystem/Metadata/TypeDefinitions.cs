@@ -2,6 +2,7 @@ using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using System.Reflection;
+using DragonSpark.Coercion;
 
 namespace DragonSpark.TypeSystem.Metadata
 {

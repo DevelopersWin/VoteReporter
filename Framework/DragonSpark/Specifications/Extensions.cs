@@ -2,6 +2,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
+using DragonSpark.Coercion;
 
 namespace DragonSpark.Specifications
 {

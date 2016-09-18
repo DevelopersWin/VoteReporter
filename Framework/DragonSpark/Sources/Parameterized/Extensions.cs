@@ -1,3 +1,4 @@
+using DragonSpark.Coercion;
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -18,8 +19,8 @@ namespace DragonSpark.Sources.Parameterized
 				.ToImmutableArray();
 
 		public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TParameter> coercer ) => Apply( @this.ToSourceDelegate(), coercer.ToDelegate() );
-		public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Coerce<TParameter> coerce ) =>
-			new CoercedParameterizedSource<TParameter, TResult>( coerce, @this );
+		/*public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Coerce<TParameter> coerce ) =>
+			new CoercedParameterizedSource<TParameter, TResult>( coerce, @this );*/
 		public static IParameterizedSource<TFrom, TResult> Apply<TFrom, TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TFrom, TParameter> coercer ) => Apply( @this.ToSourceDelegate(), coercer.ToDelegate() );
 		public static IParameterizedSource<TFrom, TResult> Apply<TFrom, TParameter, TResult>( this Func<TParameter, TResult> @this, Func<TFrom, TParameter> coerce ) =>
 			new CoercedParameterizedSource<TFrom, TParameter, TResult>( coerce, @this );

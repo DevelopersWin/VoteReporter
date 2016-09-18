@@ -11,7 +11,7 @@ using System.Reflection;
 namespace DragonSpark.TypeSystem
 {
 	// http://stackoverflow.com/questions/35976558/is-constructorinfo-getparameters-thread-safe/35976798
-	[ApplyAutoValidation, Specification( typeof(Specification) )]
+	[ApplyAutoValidation, ApplySpecification( typeof(Specification) )]
 	public sealed class InitializeTypeCommand : CommandBase<Type>
 	{
 		public static InitializeTypeCommand Default { get; } = new InitializeTypeCommand();

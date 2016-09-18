@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using DragonSpark.Coercion;
 using DragonSpark.Expressions;
 
 namespace DragonSpark.Activation

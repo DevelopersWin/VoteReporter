@@ -5,7 +5,7 @@ using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.Windows.Setup
 {
-	[ApplyAutoValidation, Specification( typeof(FileSystemInfoExistsSpecification) )]
+	[ApplyAutoValidation, ApplySpecification( typeof(FileSystemInfoExistsSpecification) )]
 	public sealed class DeleteFileCommand : CommandBase<FileSystemInfo>
 	{
 		public static DeleteFileCommand Default { get; } = new DeleteFileCommand()/*.ExtendUsing( FileSystemInfoExistsSpecification.Default ).Extend( AutoValidationExtension.Default )*/;

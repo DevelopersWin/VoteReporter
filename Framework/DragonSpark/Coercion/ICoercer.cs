@@ -1,4 +1,4 @@
-namespace DragonSpark
+namespace DragonSpark.Coercion
 {
 	public interface ICoercer<out T> : ICoercer<object, T> {}
 

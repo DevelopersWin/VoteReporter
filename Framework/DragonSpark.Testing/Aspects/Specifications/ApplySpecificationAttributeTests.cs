@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
-using DragonSpark.Aspects.Specifications;
+﻿using DragonSpark.Aspects.Specifications;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
 using Ploeh.AutoFixture.Xunit2;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Specifications
 {
-	public class SpecificationAttributeTests
+	public class ApplySpecificationAttributeTests
 	{
 		[Fact]
 		public void VerifySubject()
@@ -102,7 +102,7 @@ namespace DragonSpark.Testing.Aspects.Specifications
 			public ICollection<object> Parameters { get; } = new Collection<object>();
 		}
 
-		[ApplyAutoValidation, Specification( typeof(OnlyOnceSpecification<int>) )]
+		[ApplyAutoValidation, ApplySpecification( typeof(OnlyOnceSpecification<int>) )]
 		class PocoCommand : CommandBase<int>
 		{
 			public override void Execute( int parameter ) => Parameters.Add( parameter );
@@ -120,7 +120,7 @@ namespace DragonSpark.Testing.Aspects.Specifications
 			public ICollection<int> Parameters { get; } = new Collection<int>();
 		}
 
-		[Specification( typeof(Specification) )]
+		[ApplySpecification( typeof(Specification) )]
 		sealed class SpecificationCommand : CommandBase<int>
 		{
 			public override void Execute( int parameter ) {}
@@ -135,7 +135,7 @@ namespace DragonSpark.Testing.Aspects.Specifications
 			}*/
 		}
 
-		[Specification( typeof(Specification) )]
+		[ApplySpecification( typeof(Specification) )]
 		class Subject : ISpecification<int>
 		{
 			public bool Called { get; private set; }

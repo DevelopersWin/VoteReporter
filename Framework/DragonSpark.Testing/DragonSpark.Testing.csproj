@@ -48,7 +48,7 @@
     <Compile Include="Activation\ConstructorsTests.cs" />
     <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\ConstructorCoercerTests.cs" />
-    <Compile Include="Aspects\Specifications\SpecificationAttributeTests.cs" />
+    <Compile Include="Aspects\Specifications\ApplySpecificationAttributeTests.cs" />
     <Compile Include="ComponentModel\SourceAttributeTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggingControllerTests.cs" />
     <Compile Include="Application\DefaultExportProviderTests.cs" />

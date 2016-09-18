@@ -39,6 +39,7 @@
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Aspects\AdapterConstructorBase.cs" />
+    <Compile Include="Aspects\Coercion\ApplyCoercerAttribute.cs" />
     <Compile Include="Aspects\KnownRoles.cs" />
     <Compile Include="Aspects\Validation\AutoValidationProfile.cs" />
     <Compile Include="Aspects\Validation\CommandAutoValidationProfile.cs" />
@@ -53,7 +54,7 @@
     <Compile Include="Aspects\Profile.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAdapter.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAspect.cs" />
-    <Compile Include="Aspects\Specifications\SpecificationAttribute.cs" />
+    <Compile Include="Aspects\Specifications\ApplySpecificationAttribute.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAttributeBase.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAwareAdapter.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAwareAttribute.cs" />
@@ -412,11 +413,10 @@
     <Compile Include="Specifications\OncePerScopeSpecification.cs" />
     <Compile Include="Specifications\OnlyOnceSpecification.cs" />
     <Compile Include="Specifications\ProjectedSpecification.cs" />
-    <Compile Include="Specifications\Projections.cs" />
     <Compile Include="Specifications\SpecificationBase.cs" />
     <Compile Include="Specifications\Specifications.cs" />
     <Compile Include="Specifications\SpecificationWithContextBase.cs" />
-    <Compile Include="StringCoercer.cs" />
+    <Compile Include="Coercion\StringCoercer.cs" />
     <Compile Include="Runtime\StructuralEqualityComparer.cs" />
     <Compile Include="Commands\TimedDelegatedCommand.cs" />
     <Compile Include="Runtime\Assignments\Value.cs" />
@@ -425,10 +425,9 @@
     <Compile Include="Activation\Activator.cs" />
     <Compile Include="Expressions\ArgumentsArrayExpressionFactory.cs" />
     <Compile Include="Expressions\ArgumentsArrayParameter.cs" />
-    <Compile Include="Coerce.cs" />
-    <Compile Include="Coercer.cs" />
-    <Compile Include="CoercerBase.cs" />
-    <Compile Include="CoercerExtensions.cs" />
+    <Compile Include="Coercion\Coercer.cs" />
+    <Compile Include="Coercion\CoercerBase.cs" />
+    <Compile Include="Coercion\CoercerExtensions.cs" />
     <Compile Include="Expressions\CompiledDelegateFactoryBase.cs" />
     <Compile Include="Activation\ConstructingParameterLocator.cs" />
     <Compile Include="Activation\ConstructorDelegateFactory.cs" />
@@ -451,7 +450,6 @@
     <Compile Include="Activation\Location\ISingletonLocator.cs" />
     <Compile Include="Expressions\Parameter.cs" />
     <Compile Include="Activation\ParameterConstructor.cs" />
-    <Compile Include="Projector.cs" />
     <Compile Include="Activation\Location\SingletonAttribute.cs" />
     <Compile Include="Activation\Location\SingletonDelegateCache.cs" />
     <Compile Include="Activation\Location\SingletonDelegates.cs" />
@@ -579,7 +577,7 @@
     <Compile Include="Specifications\AlwaysSpecification.cs" />
     <Compile Include="Specifications\SuppliedSpecification.cs" />
     <Compile Include="Activation\ConstructCoercer.cs" />
-    <Compile Include="ICoercer.cs" />
+    <Compile Include="Coercion\ICoercer.cs" />
     <Compile Include="Sources\Delegates\SourceFactory.cs" />
     <Compile Include="TypeSystem\AllParts.cs" />
     <Compile Include="Application\AssemblyInformation.cs" />

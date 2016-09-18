@@ -15,7 +15,7 @@ using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.Windows.Setup
 {
-	[ApplyAutoValidation, Specification( typeof(OnlyOnceSpecification<ApplicationSettingsBase>) )]
+	[ApplyAutoValidation, ApplySpecification( typeof(OnlyOnceSpecification<ApplicationSettingsBase>) )]
 	public class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
 		readonly ILogger logger;

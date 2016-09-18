@@ -1,5 +1,6 @@
 using DragonSpark.Extensions;
 using System.Runtime.InteropServices;
+using DragonSpark.Coercion;
 
 namespace DragonSpark.Sources
 {

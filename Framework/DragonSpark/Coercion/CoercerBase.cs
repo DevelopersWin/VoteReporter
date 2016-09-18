@@ -1,6 +1,6 @@
 using DragonSpark.Extensions;
 
-namespace DragonSpark
+namespace DragonSpark.Coercion
 {
 	public abstract class CoercerBase<T> : CoercerBase<object, T>, ICoercer<T> {}
 
