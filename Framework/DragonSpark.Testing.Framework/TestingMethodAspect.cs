@@ -18,14 +18,22 @@ namespace DragonSpark.Testing.Framework
 	[LinesOfCodeAvoided( 4 ), ProvideAspectRole( StandardRoles.Tracing ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),]
 	public sealed class TestingMethodAspect : MethodInterceptionAspect
 	{
+		readonly IScope<MethodBase> methodSource;
+
+		public TestingMethodAspect() : this( CurrentTestingMethod.Default ) {}
+
+		public TestingMethodAspect( IScope<MethodBase> methodSource )
+		{
+			this.methodSource = methodSource;
+		}
+
 		public override bool CompileTimeValidate( MethodBase method ) => method.Has<FactAttribute>();
 
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var current = CurrentTestingMethod.Default.Get();
-			if ( current == null )
+			if ( methodSource.Get() == null )
 			{
-				CurrentTestingMethod.Default.Assign( args.Method );
+				methodSource.Assign( args.Method );
 				try
 				{
 					using ( new MethodOperationContext( args.Method ) )
@@ -41,7 +49,7 @@ namespace DragonSpark.Testing.Framework
 			}
 			else
 			{
-				base.OnInvoke( args );
+				args.Proceed();
 			}
 		}
 	}
