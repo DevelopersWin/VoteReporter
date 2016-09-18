@@ -1,7 +1,9 @@
 ﻿namespace DragonSpark.Aspects.Validation
 {
-	public interface IAutoValidationController // : ISpecification<object>
+	public interface IAutoValidationController
 	{
+		bool IsActive { get; }
+
 		bool Handles( object parameter );
 
 		void MarkValid( object parameter, bool valid );

@@ -6,6 +6,7 @@ namespace DragonSpark.Aspects.Validation
 {
 	sealed class AutoValidationController : ThreadLocal<object>, IAutoValidationController, IAspectHub
 	{
+		readonly static object Active = new object();
 		readonly IParameterValidationAdapter validator;
 		
 		public AutoValidationController( IParameterValidationAdapter validator )
@@ -13,16 +14,16 @@ namespace DragonSpark.Aspects.Validation
 			this.validator = validator;
 		}
 
-		public bool Handles( object parameter ) => Handler?.Handles( parameter ) ?? false;
+		public bool IsActive => Value == Active;
 
-		bool IsMarked( object parameter ) => Value != null && Equals( Value, parameter ) && Clear();
+		public bool Handles( object parameter ) => Handler?.Handles( parameter ) ?? false;
 
 		public void MarkValid( object parameter, bool valid ) => Value = valid ? parameter : null;
 
-		bool Clear()
+		object Clear( object result = null )
 		{
 			Value = null;
-			return true;
+			return result;
 		}
 
 		public object Execute( object parameter, IInvocation proceed )
@@ -30,13 +31,13 @@ namespace DragonSpark.Aspects.Validation
 			object handled = null;
 			if ( Handler?.Handle( parameter, out handled ) ?? false )
 			{
-				Clear();
-				return handled;
+				return Clear( handled );
 			}
-
-			var result = IsMarked( parameter ) || validator.IsSatisfiedBy( parameter ) ? proceed.Invoke( parameter ) : null;
-			Clear();
-			return result;
+			
+			var marked = Value != null && Equals( Value, parameter );
+			Value = Active;
+			var result = marked || validator.IsSatisfiedBy( parameter ) ? proceed.Invoke( parameter ) : null;
+			return Clear( result );
 		}
 
 		IParameterAwareHandler Handler { get; set; }
