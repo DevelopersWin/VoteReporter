@@ -80,7 +80,7 @@ namespace DragonSpark.Sources
 
 		public static Func<object> Delegate( this ISource<ISource> @this ) => @this.ToDelegate().Delegate();
 		public static Func<object> Delegate( this Func<ISource> @this ) => Delegates.Default.Get( @this );
-		class Delegates : Cache<Func<ISource>, Func<object>>
+		sealed class Delegates : Cache<Func<ISource>, Func<object>>
 		{
 			public static Delegates Default { get; } = new Delegates();
 			Delegates() : base( source => new Factory( source ).Get ) {}
@@ -95,6 +95,13 @@ namespace DragonSpark.Sources
 
 				public override object Get() => source().Get();
 			}
+		}
+
+		public static Func<T> ToDelegate<T>( this ISource<T> @this ) => ParameterizedSourceDelegates<T>.Default.Get( @this );
+		sealed class ParameterizedSourceDelegates<T> : Cache<ISource<T>, Func<T>>
+		{
+			public static ParameterizedSourceDelegates<T> Default { get; } = new ParameterizedSourceDelegates<T>();
+			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
 		public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();

@@ -12,8 +12,6 @@ namespace DragonSpark.TypeSystem
 {
 	sealed class DefaultValues : Cache<Type, object>
 	{
-		readonly static IGenericMethodContext<Invoke> Method = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
-
 		public static IParameterizedSource<Type, object> Default { get; } = new DefaultValues();
 		DefaultValues() : base( Create ) {}
 
@@ -22,8 +20,13 @@ namespace DragonSpark.TypeSystem
 		static object Empty( Type parameter )
 		{
 			var type = parameter.Adapt().GetEnumerableType();
-			var result = type != null ? Method.Make( type.ToItem() ).Invoke<Array>() : null;
+			var result = type != null ? Support.Method.Make( type.ToItem() ).Invoke<Array>() : null;
 			return result;
+		}
+
+		static class Support
+		{
+			public static IGenericMethodContext<Invoke> Method { get; } = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
 		}
 	}
 }

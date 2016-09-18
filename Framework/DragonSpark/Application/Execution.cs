@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.Sources;
+using System;
 
 namespace DragonSpark.Application
 {
@@ -7,8 +7,11 @@ namespace DragonSpark.Application
 	{
 		public static IAssignableSource<ISource> Context { get; } = new SuppliedSource<ISource>( ExecutionContext.Default );
 
-		readonly static Func<object> Get = Context.Delegate();
+		public static object Current() => Support.Get();
 
-		public static object Current() => Get();
+		static class Support
+		{
+			readonly public static Func<object> Get = Context.Delegate();
+		}
 	}
 }

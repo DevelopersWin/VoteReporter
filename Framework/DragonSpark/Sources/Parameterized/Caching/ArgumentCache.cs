@@ -8,7 +8,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class ArgumentCache<TArgument, TValue> : CacheBase<TArgument, TValue>, IArgumentCache<TArgument, TValue>
 	{
-		readonly static IEqualityComparer<TArgument> EqualityComparer = typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Default : EqualityComparer<TArgument>.Default;
+		static IEqualityComparer<TArgument> EqualityComparer { get; } = typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Default : EqualityComparer<TArgument>.Default;
 
 		readonly Func<TArgument, TValue> body;
 		readonly ConcurrentDictionary<TArgument, TValue> store = new ConcurrentDictionary<TArgument, TValue>( EqualityComparer );

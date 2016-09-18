@@ -1,9 +1,5 @@
-using DragonSpark.Commands;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
-using System;
 using System.Reflection;
 
 namespace DragonSpark.Windows
@@ -11,16 +7,11 @@ namespace DragonSpark.Windows
 	public static class Initialize
 	{
 		[ModuleInitializer( 0 )]
-		public static void Execution() => Command.Default.Execute();
-
-		sealed class Command : Application.Setup.DeclarativeSetup
+		public static void Execute()
 		{
-			public static IRunCommand Default { get; } = new Command();
-			Command() : base( 
-				Application.Execution.Context.Configured( ExecutionContext.Default ), 
-				DragonSpark.TypeSystem.Configuration.AssemblyLoader.Configured( new Func<string, Assembly>( Assembly.LoadFile ).Wrap() ),
-				DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Configured( AssemblyLocator.Default.ToSourceDelegate().Wrap() )
-				) {}
+			Application.Execution.Context.Assign( ExecutionContext.Default );
+			DragonSpark.TypeSystem.Configuration.AssemblyLoader.Assign( o => Assembly.LoadFile );
+			DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Assign( o => AssemblyLocator.Default.Get );
 		}
 	}
 }

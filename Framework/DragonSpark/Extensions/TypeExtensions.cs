@@ -44,19 +44,11 @@ namespace DragonSpark.Extensions
 			return false;
 		}
 
-		readonly static IParameterizedSource<MethodBase, ImmutableArray<Type>> ParameterTypes = CacheFactory.Create<MethodBase, ImmutableArray<Type>>( method => method.GetParameters().Select( info => info.ParameterType ).ToImmutableArray() );
-		public static ImmutableArray<Type> GetParameterTypes( this MethodBase @this ) => ParameterTypes.Get( @this );
+		public static ImmutableArray<Type> GetParameterTypes( this MethodBase @this ) => Support.ParameterTypes.Get( @this );
 
-		/*public static MethodInfo GetMethod( this Type @this, string methodName )
+		static class Support
 		{
-			foreach ( var method in @this.GetRuntimeMethods() )
-			{
-				if ( method.Name == methodName )
-				{
-					return method;
-				}
-			}
-			throw new InvalidOperationException( $"Method {methodName} not found." );
-		}*/
+			public static IParameterizedSource<MethodBase, ImmutableArray<Type>> ParameterTypes { get; } = CacheFactory.Create<MethodBase, ImmutableArray<Type>>( method => method.GetParameters().Select( info => info.ParameterType ).ToImmutableArray() );
+		}
 	}
 }

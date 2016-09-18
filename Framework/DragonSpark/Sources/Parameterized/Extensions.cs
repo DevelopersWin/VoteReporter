@@ -129,13 +129,6 @@ namespace DragonSpark.Sources.Parameterized
 			}
 		}
 
-		public static Func<T> ToDelegate<T>( this ISource<T> @this ) => ParameterizedSourceDelegates<T>.Default.Get( @this );
-		sealed class ParameterizedSourceDelegates<T> : Cache<ISource<T>, Func<T>>
-		{
-			public static ParameterizedSourceDelegates<T> Default { get; } = new ParameterizedSourceDelegates<T>();
-			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
-		}
-
 		public static Func<TParameter, TResult> ToSourceDelegate<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) => ParameterizedSourceDelegates<TParameter, TResult>.Default.Get( @this );
 		sealed class ParameterizedSourceDelegates<TParameter, TResult> : Cache<IParameterizedSource<TParameter, TResult>, Func<TParameter, TResult>>
 		{

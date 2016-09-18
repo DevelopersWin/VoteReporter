@@ -13,7 +13,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		readonly IScope<Func<TParameter, TResult>> scope;
 
-		public ParameterizedScope( Func<TParameter, TResult> source ) : this( source.Wrap() ) {}
+		public ParameterizedScope( Func<TParameter, TResult> source ) : this( new Func<object, Func<TParameter, TResult>>( new Wrapper<object, Func<TParameter, TResult>>( source.Self ).Get ) ) {}
 
 		public ParameterizedScope( Func<object, Func<TParameter, TResult>> source ) : this( new Scope<Func<TParameter, TResult>>( source ) ) {}
 

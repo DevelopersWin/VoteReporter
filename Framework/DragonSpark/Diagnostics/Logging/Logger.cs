@@ -1,4 +1,5 @@
 using DragonSpark.Configuration;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using Serilog;
 using Serilog.Core;
