@@ -2,12 +2,13 @@
 using DragonSpark.Coercion;
 using System;
 using System.Windows.Input;
+using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Coercion
 {
 	public class ApplyCoercerAttributeTests
 	{
-		/*[Fact]
+		[Fact]
 		public void Verify()
 		{
 			var sut = new Command();
@@ -20,7 +21,7 @@ namespace DragonSpark.Testing.Aspects.Coercion
 			Assert.Null( sut.LastResult );
 			sut.Execute( 6776 );
 			Assert.Equal( Coercer.ValidMatch, sut.LastResult );
-		}*/
+		}
 
 		class Coercer : CoercerBase<int, string>
 		{
