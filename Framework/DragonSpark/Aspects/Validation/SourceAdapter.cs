@@ -1,9 +1,9 @@
-﻿using System;
-using System.Reflection;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
 {

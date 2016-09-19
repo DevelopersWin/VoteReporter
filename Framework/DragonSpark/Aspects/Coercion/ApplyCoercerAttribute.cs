@@ -1,21 +1,24 @@
-﻿using DragonSpark.Aspects.Build;
-using PostSharp.Aspects;
+﻿using PostSharp.Aspects;
+using PostSharp.Aspects.Advices;
+using PostSharp.Aspects.Dependencies;
+using System;
 
 namespace DragonSpark.Aspects.Coercion
 {
-	// [IntroduceInterface( typeof(ISpecification) )]
-	/*[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
-	public class ApplyCoercerAttribute : ApplyAspectBase
+	[IntroduceInterface( typeof(ICoercer) )]
+	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
+	public class ApplyCoercerAttribute : ApplyAspectBase, ICoercer
 	{
-		readonly static Func<Type, bool> DefaultSpecification = new Specification( Defaults.Specification.DeclaringType ).ToSpecificationDelegate();
-		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = new AspectInstances(  ).ToSourceDelegate();
+		readonly static Func<Type, ICoercer> Source = CoercerSource.Default.Get;
+		readonly Type coercerType;
 
-		public ApplyCoercerAttribute() : base( specification, source ) {}
-	}*/
+		public ApplyCoercerAttribute( Type coercerType ) : base( Support.Default )
+		{
+			this.coercerType = coercerType;
+		}
 
-	public sealed class Profile : Aspects.Profile
-	{
-		public static Profile Default { get; } = new Profile();
-		Profile() : base( Defaults.Specification.DeclaringType, new AspectInstance<Aspect>( Defaults.Specification ) ) {}
+		ICoercer Coercer { get; set; }
+		public override void RuntimeInitializeInstance() => Coercer = Source( coercerType );
+		object ICoercer.Coerce( object parameter ) => Coercer.Coerce( parameter );
 	}
 }

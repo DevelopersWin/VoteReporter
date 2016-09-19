@@ -4,5 +4,5 @@ using System;
 
 namespace DragonSpark.Aspects.Build
 {
-	public interface IAspectInstance : IParameterizedSource<Type, AspectInstance> {}
+	public interface IAspectInstanceLocator : IParameterizedSource<Type, AspectInstance> {}
 }

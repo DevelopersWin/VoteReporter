@@ -1,10 +1,10 @@
-﻿using DragonSpark.Aspects.Build;
-using DragonSpark.Specifications;
+﻿using System;
+using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects
 {
 	public static class Defaults
 	{
-		public static IMethodLocator Specification { get; } = new MethodLocator( typeof(ISpecification<>), nameof( ISpecification<object>.IsSatisfiedBy ) );
+		public static Func<Type, object> ArgumentSource { get; } = Activator.Default.GetService;
 	}
 }

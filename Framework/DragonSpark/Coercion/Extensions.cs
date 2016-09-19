@@ -3,7 +3,7 @@ using System;
 
 namespace DragonSpark.Coercion
 {
-	public static class CoercerExtensions
+	public static class Extensions
 	{
 		public static Func<TFrom, TTo> ToDelegate<TFrom, TTo>( this ICoercer<TFrom, TTo> @this ) => Delegates<TFrom, TTo>.Default.Get( @this );
 		class Delegates<TFrom, TTo> : Cache<ICoercer<TFrom, TTo>, Func<TFrom, TTo>>

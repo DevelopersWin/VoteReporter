@@ -11,8 +11,6 @@ namespace DragonSpark.Aspects.Build
 	{
 		public Specification( params Type[] types ) : base( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
-		public Specification( ImmutableArray<TypeAdapter> context ) : base( context ) {}
-
 		public override bool IsSatisfiedBy( Type parameter )
 		{
 			if ( !Context.IsAssignableFrom( parameter ) )

@@ -1,12 +1,6 @@
-﻿using DragonSpark.Aspects.Build;
-using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
-using PostSharp.Aspects;
+﻿using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
-using System;
-using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -17,12 +11,7 @@ namespace DragonSpark.Aspects.Validation
 		]
 	public sealed class ApplyAutoValidationAttribute : ApplyAspectBase, IAutoValidationController
 	{
-		readonly static Func<Type, IEnumerable<AspectInstance>> DefaultSource = new AspectInstances( Defaults.Profiles.AsEnumerable() ).ToSourceDelegate();
-		readonly static Func<Type, bool> Specification = new Specification( Defaults.Adapters ).ToSpecificationDelegate();
-
-		public ApplyAutoValidationAttribute() : this( Specification, DefaultSource ) {}
-
-		ApplyAutoValidationAttribute( Func<Type, bool> specification, Func<Type, IEnumerable<AspectInstance>> source ) : base( specification, source ) {}
+		public ApplyAutoValidationAttribute() : base( Support.Default ) {}
 
 		public override void RuntimeInitializeInstance() => Controller = Defaults.ControllerSource( Instance );
 		IAutoValidationController Controller { get; set; }

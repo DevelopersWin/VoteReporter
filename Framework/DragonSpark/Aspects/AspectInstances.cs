@@ -4,9 +4,9 @@ using System;
 
 namespace DragonSpark.Aspects
 {
-	public class Profile : ItemSource<IAspectInstance>, IProfile
+	public class AspectInstances : ItemSource<IAspectInstanceLocator>, IAspectInstances
 	{
-		protected Profile( Type declaringType, params IAspectInstance[] locators ) : base( locators )
+		protected AspectInstances( Type declaringType, params IAspectInstanceLocator[] locators ) : base( locators )
 		{
 			DeclaringType = declaringType;
 		}

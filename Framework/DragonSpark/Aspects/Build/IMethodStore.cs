@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public interface IMethodLocator : IParameterizedSource<Type, MethodInfo>
+	public interface IMethodStore : IParameterizedSource<Type, MethodInfo>
 	{
 		Type DeclaringType { get; }
 	}

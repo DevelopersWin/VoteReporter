@@ -1,17 +1,18 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Immutable;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Validation
 {
 	static class Defaults
 	{
-		public static ImmutableArray<IProfile> Profiles { get; } = 
-			ImmutableArray.Create<IProfile>( ParameterizedSourceAutoValidationProfile.Default, GenericCommandAutoValidationProfile.Default, CommandAutoValidationProfile.Default );
-			
-		public static ImmutableArray<TypeAdapter> Adapters { get; } = Profiles.Select( profile => profile.DeclaringType.Adapt() ).ToImmutableArray();
+		public static IEnumerable<KeyValuePair<TypeAdapter, Func<object, IParameterValidationAdapter>>> Factories { get; } = new Dictionary<TypeAdapter, Func<object, IParameterValidationAdapter>>
+																								   {
+																									   { ParameterizedSourceDefinition.Default.DeclaringType.Adapt(), ParameterizedSourceAdapterFactory.Default.Get },
+																									   { GenericCommandDefinition.Default.DeclaringType.Adapt(), GenericCommandAdapterFactory.Default.Get },
+																									   { CommandDefinition.Default.DeclaringType.Adapt(), CommandAdapterFactory.Default.Get }
+																								   };
 
 		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Default.Get;
 	}

@@ -23,8 +23,7 @@ namespace DragonSpark.Aspects
 			ErrorMessage = errorMessage;
 		}
 
-		public Exception ValidateValue( Type value, string locationName, LocationKind locationKind ) => 
-			value != null && !types.IsAssignableFrom( value ) ? CreateArgumentException( value, locationName, locationKind ) : null;
+		public Exception ValidateValue( Type value, string locationName, LocationKind locationKind ) => value != null && !types.IsAssignableFrom( value ) ? CreateArgumentException( value, locationName, locationKind ) : null;
 
 		/*Exception CreateException( object value, string locationName, LocationKind locationKind, LocationValidationContext context )
 		{
@@ -32,13 +31,5 @@ namespace DragonSpark.Aspects
 			var result = factory( value, locationName, locationKind );
 			return result;
 		}*/
-	}
-
-	public sealed class AssignedAttribute : LocationContractAttribute, ILocationValidationAspect<object>
-	{
-		protected override string GetErrorMessage() => "The parameter '{0}' must be assigned (non-default value).";
-
-		public Exception ValidateValue( object value, string locationName, LocationKind locationKind ) => 
-			SpecialValues.DefaultOrEmpty( value.GetType() ).Equals( value ) ? CreateArgumentException( value, locationName, locationKind ) : null;
 	}
 }
