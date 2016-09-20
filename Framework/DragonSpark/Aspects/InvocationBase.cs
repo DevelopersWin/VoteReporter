@@ -6,4 +6,15 @@ namespace DragonSpark.Aspects
 
 		object IInvocation.Invoke( object parameter ) => Invoke( (TParameter)parameter );
 	}
+
+	public abstract class CommandInvocationBase<T> : InvocationBase<T, object>, IInvocation<T>
+	{
+		protected abstract void Execute( T parameter );
+
+		public sealed override object Invoke( T parameter )
+		{
+			Execute( parameter );
+			return null;
+		}
+	}
 }

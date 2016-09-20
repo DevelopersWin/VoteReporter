@@ -39,6 +39,8 @@
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Aspects\AdapterConstructorSource.cs" />
+    <Compile Include="Aspects\AdapterFactorySource.cs" />
+    <Compile Include="Aspects\AdapterLocatorBase.cs" />
     <Compile Include="Aspects\AssignedAttribute.cs" />
     <Compile Include="Aspects\Build\ISupportDefinition.cs" />
     <Compile Include="Aspects\Build\SpecificationFactory.cs" />
@@ -60,9 +62,9 @@
     <Compile Include="Aspects\IValidatedComponentDefinition.cs" />
     <Compile Include="Aspects\KnownRoles.cs" />
     <Compile Include="Aspects\ParameterizedSourceDefinition.cs" />
-    <Compile Include="Aspects\SpecificationDefinition.cs" />
+    <Compile Include="Aspects\Relay\ApplyRelayAttribute.cs" />
+    <Compile Include="Aspects\GenericSpecificationDefinition.cs" />
     <Compile Include="Aspects\ValidatedComponentDefinition.cs" />
-    <Compile Include="Aspects\Validation\AdapterFactorySourceBase.cs" />
     <Compile Include="Aspects\Validation\AspectInstanceLocatorFactory.cs" />
     <Compile Include="Aspects\Defaults.cs" />
     <Compile Include="Aspects\Build\IAspectInstanceLocator.cs" />
@@ -70,7 +72,7 @@
     <Compile Include="Aspects\Specifications\ISpecification.cs" />
     <Compile Include="Aspects\Specifications\ISpecificationAware.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAdapter.cs" />
-    <Compile Include="Aspects\Specifications\SpecificationAspect.cs" />
+    <Compile Include="Aspects\Specifications\Aspect.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationAttribute.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAttributeBase.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAwareAdapter.cs" />
@@ -93,7 +95,7 @@
     <Compile Include="Aspects\Build\AspectInstanceFactory.cs" />
     <Compile Include="Aspects\Validation\AutoValidationAspectBase.cs" />
     <Compile Include="Aspects\Build\Specification.cs" />
-    <Compile Include="Aspects\Build\AspectInstanceLocator.cs" />
+    <Compile Include="Aspects\Build\MethodBasedAspectInstanceLocator.cs" />
     <Compile Include="Aspects\Validation\Support.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />

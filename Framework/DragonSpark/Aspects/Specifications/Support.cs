@@ -2,10 +2,10 @@
 
 namespace DragonSpark.Aspects.Specifications
 {
-	public sealed class Support : SupportDefinition<SpecificationAspect>
+	public sealed class Support : SupportDefinition<Aspect>
 	{
 		public static Support Default { get; } = new Support();
-		Support() : base( SpecificationDefinition.Default ) {}
+		Support() : base( GenericSpecificationDefinition.Default ) {}
 	}
 
 

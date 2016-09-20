@@ -19,6 +19,7 @@ namespace DragonSpark.Aspects.Coercion
 
 		ICoercer Coercer { get; set; }
 		public override void RuntimeInitializeInstance() => Coercer = Source( coercerType );
+
 		object ICoercer.Coerce( object parameter ) => Coercer.Coerce( parameter );
 	}
 }

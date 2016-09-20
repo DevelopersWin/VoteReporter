@@ -11,6 +11,6 @@ namespace DragonSpark.Aspects.Coercion
 			this.coercer = coercer;
 		}
 
-		public object Coerce( object parameter ) => parameter is TFrom ? coercer.Coerce( (TFrom)parameter ) : default(TTo);
+		public object Coerce( object parameter ) => parameter is TFrom ? (object)coercer.Coerce( (TFrom)parameter ) ?? parameter : parameter;
 	}
 }

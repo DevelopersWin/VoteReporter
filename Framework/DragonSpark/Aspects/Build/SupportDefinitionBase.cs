@@ -1,7 +1,7 @@
-﻿using System;
+﻿using PostSharp.Aspects;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using PostSharp.Aspects;
 
 namespace DragonSpark.Aspects.Build
 {
@@ -18,7 +18,7 @@ namespace DragonSpark.Aspects.Build
 
 		public bool IsSatisfiedBy( Type parameter ) => specification( parameter );
 
-		public IEnumerable<AspectInstance> Get( Type parameter )
+		public virtual IEnumerable<AspectInstance> Get( Type parameter )
 		{
 			foreach ( var locator in locators )
 			{

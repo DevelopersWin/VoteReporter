@@ -1,18 +1,24 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace DragonSpark.Aspects.Validation
 {
 	static class Defaults
 	{
-		public static IEnumerable<KeyValuePair<TypeAdapter, Func<object, IParameterValidationAdapter>>> Factories { get; } = new Dictionary<TypeAdapter, Func<object, IParameterValidationAdapter>>
-																								   {
-																									   { ParameterizedSourceDefinition.Default.DeclaringType.Adapt(), ParameterizedSourceAdapterFactory.Default.Get },
-																									   { GenericCommandDefinition.Default.DeclaringType.Adapt(), GenericCommandAdapterFactory.Default.Get },
-																									   { CommandDefinition.Default.DeclaringType.Adapt(), CommandAdapterFactory.Default.Get }
-																								   };
+		public static ImmutableArray<IDefinition> Definitions { get; } = ImmutableArray.Create<IDefinition>( ParameterizedSourceDefinition.Default, GenericCommandDefinition.Default, CommandDefinition.Default );
+
+		readonly static ImmutableArray<Func<object, IParameterValidationAdapter>> AdapterSources = ImmutableArray.Create<Func<object, IParameterValidationAdapter>>(
+			ParameterizedSourceAdapterFactory.Default.Get,
+			GenericCommandAdapterFactory.Default.Get,
+			CommandAdapterFactory.Default.Get 
+		);
+
+		public static IEnumerable<ValueTuple<TypeAdapter, Func<object, IParameterValidationAdapter>>> Factories { get; } = Definitions.Select( definition => definition.DeclaringType.Adapt() ).Tuple( AdapterSources.ToArray() );
 
 		public static Func<object, IAutoValidationController> ControllerSource { get; } = AutoValidationControllerFactory.Default.Get;
 	}

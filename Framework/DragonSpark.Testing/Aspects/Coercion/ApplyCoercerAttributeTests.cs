@@ -13,12 +13,14 @@ namespace DragonSpark.Testing.Aspects.Coercion
 		{
 			var sut = new Command();
 			Assert.True( sut.CanExecute( 6776 ) );
-			Assert.False( sut.CanExecute( 123 ) );
-			Assert.False( sut.CanExecute( DateTime.Now ) );
-			sut.Execute( DateTime.Now );
-			Assert.Null( sut.LastResult );
-			sut.Execute( 123 );
-			Assert.Null( sut.LastResult );
+			var invalid = 123;
+			Assert.False( sut.CanExecute( invalid ) );
+			var now = DateTime.Now;
+			Assert.False( sut.CanExecute( now ) );
+			sut.Execute( now );
+			Assert.Equal( now, sut.LastResult );
+			sut.Execute( invalid );
+			Assert.Equal( invalid, sut.LastResult );
 			sut.Execute( 6776 );
 			Assert.Equal( Coercer.ValidMatch, sut.LastResult );
 		}

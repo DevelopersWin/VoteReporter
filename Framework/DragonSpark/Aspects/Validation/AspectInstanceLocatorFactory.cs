@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using DragonSpark.Aspects.Build;
+﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Sources.Parameterized;
+using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -11,8 +11,8 @@ namespace DragonSpark.Aspects.Validation
 
 		public IEnumerable<IAspectInstanceLocator> Get( IValidatedComponentDefinition parameter )
 		{
-			yield return new AspectInstanceLocator<AutoValidationValidationAspect>( parameter.Validation );
-			yield return new AspectInstanceLocator<AutoValidationExecuteAspect>( parameter.Execution );
+			yield return new MethodBasedAspectInstanceLocator<AutoValidationValidationAspect>( parameter.Validation );
+			yield return new MethodBasedAspectInstanceLocator<AutoValidationExecuteAspect>( parameter.Execution );
 		}
 	}
 }
