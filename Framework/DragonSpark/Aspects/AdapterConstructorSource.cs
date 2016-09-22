@@ -28,8 +28,9 @@ namespace DragonSpark.Aspects
 
 		public override Func<object, T> Get( Type parameter )
 		{
-			var instanceParameterType = parameter.Adapt().GetImplementations( parameterType ).Only();
-			var instanceImplementedType = parameterType == implementedType ? instanceParameterType : parameter.Adapt().GetImplementations( implementedType ).Only();
+			var adapter = parameter.Adapt();
+			var instanceParameterType = adapter.GetImplementations( parameterType ).Only();
+			var instanceImplementedType = parameterType == implementedType ? instanceParameterType : adapter.GetImplementations( implementedType ).Only();
 			var resultType = adapterType.MakeGenericType( instanceImplementedType.GenericTypeArguments );
 			var result = factory( instanceParameterType, resultType );
 			return result;

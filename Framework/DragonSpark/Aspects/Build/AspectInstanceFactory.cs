@@ -5,18 +5,17 @@ using PostSharp.Aspects;
 using PostSharp.Extensibility;
 using PostSharp.Reflection;
 using System;
-using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public sealed class AspectInstanceFactory<T> : SpecificationParameterizedSource<MethodInfo, AspectInstance>
+	public sealed class AspectInstanceFactory<TAspect, TTarget> : SpecificationParameterizedSource<TTarget, AspectInstance>
 	{
-		public static AspectInstanceFactory<T> Default { get; } = new AspectInstanceFactory<T>();
+		public static AspectInstanceFactory<TAspect, TTarget> Default { get; } = new AspectInstanceFactory<TAspect, TTarget>();
 		AspectInstanceFactory() : base( HasAspectSpecification.DefaultNested.Inverse(), Factory.DefaultNested.Get ) {}
 		
-		sealed class HasAspectSpecification : SpecificationBase<MethodInfo>
+		sealed class HasAspectSpecification : SpecificationBase<TTarget>
 		{
-			readonly static Type AspectType = typeof(T);
+			readonly static Type AspectType = typeof(TAspect);
 
 			public static HasAspectSpecification DefaultNested { get; } = new HasAspectSpecification();
 			HasAspectSpecification() : this( () => PostSharpEnvironment.CurrentProject.GetService<IAspectRepositoryService>() ) {}
@@ -28,13 +27,13 @@ namespace DragonSpark.Aspects.Build
 				this.repositorySource = repositorySource;
 			}
 
-			public override bool IsSatisfiedBy( MethodInfo parameter ) => repositorySource().HasAspect( parameter, AspectType );
+			public override bool IsSatisfiedBy( TTarget parameter ) => repositorySource().HasAspect( parameter, AspectType );
 		}
 
-		sealed class Factory : ParameterizedSourceBase<MethodInfo, AspectInstance>
+		sealed class Factory : ParameterizedSourceBase<TTarget, AspectInstance>
 		{
 			public static Factory DefaultNested { get; } = new Factory();
-			Factory() : this( new ObjectConstruction( typeof(T), Items<object>.Default ) ) {}
+			Factory() : this( new ObjectConstruction( typeof(TAspect), Items<object>.Default ) ) {}
 
 			readonly ObjectConstruction construction;
 
@@ -43,7 +42,7 @@ namespace DragonSpark.Aspects.Build
 				this.construction = construction;
 			}
 
-			public override AspectInstance Get( MethodInfo parameter ) => new AspectInstance( parameter, construction, null );
+			public override AspectInstance Get( TTarget parameter ) => new AspectInstance( parameter, construction, null );
 		}
 	}
 }

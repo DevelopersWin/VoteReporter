@@ -1,14 +1,14 @@
-﻿using System;
-using DragonSpark.Aspects.Build;
+﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Sources;
+using System;
 
 namespace DragonSpark.Aspects
 {
-	public class Definition : ItemSource<IMethodStore>, IDefinition
+	public class TypeDefinition : ItemSource<IMethodStore>, ITypeDefinition
 	{
 		// public Definition( Type declaringType, params string[] methods ) : this( declaringType, Create( declaringType, methods ).ToArray() ) {}
 
-		public Definition( Type declaringType, params IMethodStore[] methods ) : base( methods )
+		public TypeDefinition( Type declaringType, params IMethodStore[] methods ) : base( methods )
 		{
 			DeclaringType = declaringType;
 		}

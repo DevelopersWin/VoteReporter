@@ -6,6 +6,6 @@ namespace DragonSpark.Aspects.Specifications
 	sealed class SpecificationConstructor : AdapterConstructorSource<ISpecification>
 	{
 		public static IParameterizedSource<Type, Func<object, ISpecification>> Default { get; } = new SpecificationConstructor().ToCache();
-		SpecificationConstructor() : base( GenericSpecificationDefinition.Default.DeclaringType, typeof(SpecificationAdapter<>) ) {}
+		SpecificationConstructor() : base( GenericSpecificationTypeDefinition.Default.DeclaringType, typeof(SpecificationAdapter<>) ) {}
 	}
 }

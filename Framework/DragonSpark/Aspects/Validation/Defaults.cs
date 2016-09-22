@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Validation
 {
 	static class Defaults
 	{
-		public static ImmutableArray<IDefinition> Definitions { get; } = ImmutableArray.Create<IDefinition>( ParameterizedSourceDefinition.Default, GenericCommandDefinition.Default, CommandDefinition.Default );
+		public static ImmutableArray<ITypeDefinition> Definitions { get; } = ImmutableArray.Create<ITypeDefinition>( ParameterizedSourceTypeDefinition.Default, GenericCommandTypeDefinition.Default, CommandTypeDefinition.Default );
 
 		readonly static ImmutableArray<Func<object, IParameterValidationAdapter>> AdapterSources = ImmutableArray.Create<Func<object, IParameterValidationAdapter>>(
 			ParameterizedSourceAdapterFactory.Default.Get,

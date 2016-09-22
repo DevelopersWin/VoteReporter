@@ -2,7 +2,7 @@
 
 namespace DragonSpark.Aspects
 {
-	public interface IValidatedComponentDefinition : IDefinition
+	public interface IValidatedTypeDefinition : ITypeDefinition
 	{
 		IMethodStore Validation { get; }
 		IMethodStore Execution { get; }

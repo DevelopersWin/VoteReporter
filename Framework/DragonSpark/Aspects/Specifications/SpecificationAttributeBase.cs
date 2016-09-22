@@ -4,7 +4,7 @@ using PostSharp.Aspects.Dependencies;
 namespace DragonSpark.Aspects.Specifications
 {
 	[ProvideAspectRole( KnownRoles.ParameterValidation ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
-	public abstract class SpecificationAttributeBase : ApplyAspectBase, ISpecification
+	public abstract class SpecificationAttributeBase : ApplyInstanceAspectBase, ISpecification
 	{
 		protected SpecificationAttributeBase() : base( Support.Default ) {}
 

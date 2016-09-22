@@ -1,16 +1,16 @@
-﻿using System;
+﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Build
 {
-	sealed class SpecificationFactory : IParameterizedSource<IEnumerable<IDefinition>, Func<Type, bool>>
+	sealed class SpecificationFactory : IParameterizedSource<IEnumerable<ITypeAware>, Func<Type, bool>>
 	{
 		public static SpecificationFactory Default { get; } = new SpecificationFactory();
 		SpecificationFactory() {}
 
-		public Func<Type, bool> Get( IEnumerable<IDefinition> parameter ) => new Specification( parameter.Select( definition => definition.DeclaringType ).ToArray() ).ToSpecificationDelegate();
+		public Func<Type, bool> Get( IEnumerable<ITypeAware> parameter ) => new Specification( parameter.Select( definition => definition.DeclaringType ).Distinct().ToArray() ).ToSpecificationDelegate();
 	}
 }

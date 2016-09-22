@@ -3,9 +3,10 @@
 	public static class KnownRoles
 	{
 		public const string
+			Implementations		= "Generalized Implementations",
 			ValueConversion		= "Value Conversion",
-			ParameterValidation = "Parameter Validation",
 			InvocationWorkflow  = "Invocation Workflow",
+			ParameterValidation = "Parameter Validation",
 			EnhancedValidation  = "Enhanced Validation";
 	}
 }

@@ -9,7 +9,7 @@ namespace DragonSpark.Aspects.Validation
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, KnownRoles.ParameterValidation )
 		]
-	public sealed class ApplyAutoValidationAttribute : ApplyAspectBase, IAutoValidationController
+	public sealed class ApplyAutoValidationAttribute : ApplyInstanceAspectBase, IAutoValidationController
 	{
 		public ApplyAutoValidationAttribute() : base( Support.Default ) {}
 
