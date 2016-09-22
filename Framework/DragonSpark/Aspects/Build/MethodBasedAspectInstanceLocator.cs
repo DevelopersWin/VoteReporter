@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	sealed class MethodBasedAspectInstanceLocator<T> : IAspectInstanceLocator where T : IAspect
+	public class MethodBasedAspectInstanceLocator<T> : IAspectInstanceLocator where T : IAspect
 	{
 		readonly static Func<MethodInfo, AspectInstance> Factory = AspectInstanceFactory<T, MethodInfo>.Default.Get;
 

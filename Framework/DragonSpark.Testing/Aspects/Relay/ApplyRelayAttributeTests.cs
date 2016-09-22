@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DragonSpark.Aspects.Relay;
+using System;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Relay
@@ -14,7 +15,7 @@ namespace DragonSpark.Testing.Aspects.Relay
 			Assert.Equal( 1, sut.CanExecuteGenericCalled );
 		}
 
-		// [ApplyRelay]
+		[ApplyRelay]
 		class Command : DragonSpark.Commands.ICommand<int>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};

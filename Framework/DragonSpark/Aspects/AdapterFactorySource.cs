@@ -3,6 +3,12 @@ using System;
 
 namespace DragonSpark.Aspects
 {
+	public class AdapterFactorySource : AdapterFactorySource<object>
+	{
+		public AdapterFactorySource( Type implementedType, Type adapterType ) : base( implementedType, adapterType ) {}
+		public AdapterFactorySource( Type parameterType, Type implementedType, Type adapterType ) : base( parameterType, implementedType, adapterType ) {}
+	}
+
 	public class AdapterFactorySource<T> : ParameterizedSourceBase<T>
 	{
 		readonly Func<Type, Func<object, T>> factorySource;

@@ -30,22 +30,22 @@ namespace DragonSpark.Aspects.Relay
 		public override object CreateInstance( AdviceArgs adviceArgs ) => InstanceAspects.Default.Get( adviceArgs.Instance );
 	}
 
-	[IntroduceInterface( typeof(ICommandRelay), AncestorOverrideAction = InterfaceOverrideAction.Ignore )]
-	public sealed class CommandRelayAspect : RelayAspectBase, ICommandRelay
+	[IntroduceInterface( typeof(ICommandRelay) )]
+	public sealed class CommandRelayAspect : SpecificationRelayAspectBase, ICommandRelay
 	{
 		readonly ICommandRelay relay;
 
 		public CommandRelayAspect() {}
 
-		public CommandRelayAspect( ICommandRelay relay )
+		public CommandRelayAspect( ICommandRelay relay ) : base( relay )
 		{
 			this.relay = relay;
 		}
 
-		object IInvocation.Invoke( object parameter ) => relay.Invoke( parameter );
+		public void Execute( object parameter ) => relay.Execute( parameter );
 	}
 
-	[IntroduceInterface( typeof(IParameterizedSourceRelay), AncestorOverrideAction = InterfaceOverrideAction.Ignore )]
+	[IntroduceInterface( typeof(IParameterizedSourceRelay) )]
 	public sealed class SourceRelayAspect : RelayAspectBase, IParameterizedSourceRelay
 	{
 		readonly IParameterizedSourceRelay relay;
@@ -58,23 +58,27 @@ namespace DragonSpark.Aspects.Relay
 		}
 
 		public object Get( object parameter ) => relay.Get( parameter );
-		object IInvocation.Invoke( object parameter ) => relay.Invoke( parameter );
 	}
 	
-	[IntroduceInterface( typeof(ISpecificationRelay), AncestorOverrideAction = InterfaceOverrideAction.Ignore )]
-	public sealed class SpecificationRelayAspect : RelayAspectBase, ISpecificationRelay
+	[IntroduceInterface( typeof(ISpecificationRelay) )]
+	public sealed class SpecificationRelayAspect : SpecificationRelayAspectBase
+	{
+		public SpecificationRelayAspect() {}
+		public SpecificationRelayAspect( ISpecificationRelay relay ) : base( relay ) {}
+	}
+
+	public abstract class SpecificationRelayAspectBase : RelayAspectBase, ISpecificationRelay
 	{
 		readonly ISpecificationRelay relay;
 
-		public SpecificationRelayAspect() {}
+		protected SpecificationRelayAspectBase() {}
 
-		public SpecificationRelayAspect( ISpecificationRelay relay )
+		protected SpecificationRelayAspectBase( ISpecificationRelay relay )
 		{
 			this.relay = relay;
 		}
 
 		public bool IsSatisfiedBy( object parameter ) => relay.IsSatisfiedBy( parameter );
-		object IInvocation.Invoke( object parameter ) => relay.Invoke( parameter );
 	}
 
 	public sealed class InstanceAspects : AdapterLocatorBase<IAspect>
@@ -83,67 +87,80 @@ namespace DragonSpark.Aspects.Relay
 		InstanceAspects() : base( Descriptors.Default.Aspects ) {}	
 	}
 
-	public sealed class CommandValidationDescriptor : Descriptor<SpecificationRelayAspect, SpecificationMethodAspect>
+	/*public sealed class CommandValidationDescriptor : Descriptor<SpecificationRelayAspect, >
 	{
 		public static CommandValidationDescriptor Default { get; } = new CommandValidationDescriptor();
 		CommandValidationDescriptor() : base( CommandTypeDefinition.Default.Validation, GenericCommandTypeDefinition.Default.Validation, typeof(SpecificationRelay<>), typeof(ISpecificationRelay) ) {}
-	}
+	}*/
 	
-	public sealed class CommandDescriptor : Descriptor<CommandRelayAspect, CommandMethodAspect>
+	public sealed class CommandDescriptor : Descriptor<CommandRelayAspect>
 	{
 		public static CommandDescriptor Default { get; } = new CommandDescriptor();
-		CommandDescriptor() : base( CommandTypeDefinition.Default.Execution, GenericCommandTypeDefinition.Default.Execution, typeof(CommandRelay<>), typeof(ICommandRelay) ) {}
+		CommandDescriptor() : base( CommandTypeDefinition.Default, GenericCommandTypeDefinition.Default, typeof(CommandRelay<>), typeof(ICommandRelay),
+			new MethodBasedAspectInstanceLocator<SpecificationMethodAspect>( CommandTypeDefinition.Default.Validation ),
+			new MethodBasedAspectInstanceLocator<CommandMethodAspect>( CommandTypeDefinition.Default.Execution )
+			) {}
 	}
 
-	public sealed class SourceDescriptor : Descriptor<SourceRelayAspect, ParameterizedSourceMethodAspect>
+	public sealed class SourceDescriptor : Descriptor<SourceRelayAspect>
 	{
 		public static SourceDescriptor Default { get; } = new SourceDescriptor();
-		SourceDescriptor() : base( GeneralizedParameterizedSourceTypeDefinition.Default.Method, ParameterizedSourceTypeDefinition.Default.Method, typeof(ParameterizedSourceRelay<,>), typeof(IParameterizedSourceRelay) ) {}
+		SourceDescriptor() : base( GeneralizedParameterizedSourceTypeDefinition.Default, ParameterizedSourceTypeDefinition.Default, typeof(ParameterizedSourceRelay<,>), typeof(IParameterizedSourceRelay),
+			new MethodBasedAspectInstanceLocator<ParameterizedSourceMethodAspect>( GeneralizedParameterizedSourceTypeDefinition.Default.Method )
+			) {}
 	}
 
-	public sealed class SpecificationDescriptor : Descriptor<SpecificationRelayAspect, SpecificationMethodAspect>
+	public sealed class SpecificationDescriptor : Descriptor<SpecificationRelayAspect>
 	{
 		public static SpecificationDescriptor Default { get; } = new SpecificationDescriptor();
-		SpecificationDescriptor() : base( GeneralizedSpecificationTypeDefinition.Default.Method, GenericSpecificationTypeDefinition.Default.Method, typeof(SpecificationRelay<>), typeof(ISpecificationRelay) ) {}
+		SpecificationDescriptor() : base( GeneralizedSpecificationTypeDefinition.Default, GenericSpecificationTypeDefinition.Default, typeof(SpecificationRelay<>), typeof(ISpecificationRelay),
+			new MethodBasedAspectInstanceLocator<SpecificationMethodAspect>( GeneralizedSpecificationTypeDefinition.Default.Method )
+			) {}
 	}
 
-	public interface IDescriptor : IParameterizedSource<IAspect>, IParameterizedSource<Type, IEnumerable<AspectInstance>>
-	{
-		IMethodStore Source { get; }
-	}
+	public interface IDescriptor : ITypeAware, IParameterizedSource<IAspect>, IParameterizedSource<Type, IEnumerable<AspectInstance>> {}
 
-	public class Descriptor<TType, TMethod> : IDescriptor where TType : IAspect where TMethod : IAspect, new()
+	public class Descriptor<T> : TypeBasedAspectInstanceLocator<T>, IDescriptor where T : IAspect
 	{
-		readonly Func<object, IInvocation> invocationSource;
+		readonly Func<object, object> adapterSource;
 		readonly Func<object, IAspect> aspectSource;
-		readonly IAspectInstanceLocator typeLocator, methodLocator;
+		readonly ImmutableArray<IAspectInstanceLocator> locators;
+		
+		public Descriptor( ITypeAware source, ITypeAware destination, Type adapterType, Type introducedInterface, params IAspectInstanceLocator[] locators ) 
+			: this( source,
+					new AdapterFactorySource( destination.DeclaringType, adapterType ).Get, 
+					ParameterConstructor<object, IAspect>.Make( introducedInterface, typeof(T) ), 
+					locators.ToImmutableArray()
+				  ) {}
 
-		public Descriptor( IMethodStore source, IMethodStore destination, Type adapterType, Type introducedInterface ) 
-			: this( source, 
-					new AdapterFactorySource<IInvocation>( destination.DeclaringType, adapterType ).Get, 
-					ParameterConstructor<object, IAspect>.Make( introducedInterface, typeof(TType) ), 
-					new TypeBasedAspectInstanceLocator<TType>( source ), 
-					new MethodBasedAspectInstanceLocator<TMethod>( source ) ) {}
-
-		Descriptor( IMethodStore source, Func<object, IInvocation> invocationSource, Func<object, IAspect> aspectSource, IAspectInstanceLocator typeLocator, IAspectInstanceLocator methodLocator ) 
+		Descriptor( ITypeAware source, Func<object, object> adapterSource, Func<object, IAspect> aspectSource, ImmutableArray<IAspectInstanceLocator> locators ) : base( source )
 		{
-			Source = source;
-			this.invocationSource = invocationSource;
+			DeclaringType = source.DeclaringType;
+			this.adapterSource = adapterSource;
 			this.aspectSource = aspectSource;
-			this.typeLocator = typeLocator;
-			this.methodLocator = methodLocator;
+			this.locators = locators;
 		}
 
-		public IMethodStore Source { get; }
+		public Type DeclaringType { get; }
 
-		public IAspect Get( object source ) => aspectSource( invocationSource( source ) );
-		public IEnumerable<AspectInstance> Get( Type parameter )
+		public IAspect Get( object source ) => aspectSource( adapterSource( source ) );
+
+		IEnumerable<AspectInstance> IParameterizedSource<Type, IEnumerable<AspectInstance>>.Get( Type parameter )
 		{
-			var method = methodLocator.Get( parameter );
-			if ( method != null )
+			var methods = GetMappings( parameter ).ToArray();
+			var result = methods.Length == locators.Length ? base.Get( parameter ).Append( methods ).Fixed() : Items<AspectInstance>.Default;
+			return result;
+		}
+
+		IEnumerable<AspectInstance> GetMappings( Type parameter )
+		{
+			foreach ( var locator in locators )
 			{
-				yield return typeLocator.Get( parameter );
-				yield return method;
+				var instance = locator.Get( parameter );
+				if ( instance != null )
+				{
+					yield return instance;
+				}
 			}
 		}
 	}
@@ -151,10 +168,10 @@ namespace DragonSpark.Aspects.Relay
 	public sealed class Descriptors : ItemSource<IDescriptor>
 	{
 		public static Descriptors Default { get; } = new Descriptors();
-		Descriptors() : this( CommandValidationDescriptor.Default, CommandDescriptor.Default, SourceDescriptor.Default, SpecificationDescriptor.Default ) {}
+		Descriptors() : this( CommandDescriptor.Default, SourceDescriptor.Default, SpecificationDescriptor.Default ) {}
 
-		Descriptors( params IDescriptor[] descriptors ) : this( descriptors, descriptors.Select( definition => definition.Source.DeclaringType.Adapt() ).ToArray() ) {}
-		Descriptors( IDescriptor[] descriptors, TypeAdapter[] adapters ) 
+		Descriptors( params IDescriptor[] descriptors ) : this( descriptors.Select( definition => definition.DeclaringType.Adapt() ).ToArray(), descriptors ) {}
+		Descriptors( TypeAdapter[] adapters, IDescriptor[] descriptors ) 
 			: this( descriptors, new TypedPairs<IAspect>( adapters.Tuple( descriptors.Select( descriptor => new Func<object, IAspect>( descriptor.Get ) ).ToArray() ) ) ) {}
 
 		Descriptors( IEnumerable<IDescriptor> descriptors, ITypedPairs<IAspect> instances ) : base( descriptors )
@@ -164,19 +181,15 @@ namespace DragonSpark.Aspects.Relay
 
 		public ITypedPairs<IAspect> Aspects { get; }
 	}
-
-
+	
 	sealed class Support : DelegatedSpecification<Type>, ISupportDefinition
 	{
 		public static Support Default { get; } = new Support();
-		Support() : this( Descriptors.Default.ToArray() ) {}
-
-		public Support( params IDescriptor[] descriptors ) 
-			: this( SpecificationFactory.Default.Get( descriptors.Select( descriptor => descriptor.Source ).ToArray() ), descriptors.ToImmutableArray() ) {}
+		Support() : this( Descriptors.Default.ToImmutableArray() ) {}
 
 		readonly ImmutableArray<IDescriptor> descriptors;
 
-		Support( Func<Type, bool> specification, ImmutableArray<IDescriptor> descriptors ) : base( specification )
+		Support( ImmutableArray<IDescriptor> descriptors ) : base( SpecificationFactory.Default.Get( descriptors.ToArray() ) )
 		{
 			this.descriptors = descriptors;
 		}
@@ -185,33 +198,27 @@ namespace DragonSpark.Aspects.Relay
 		{
 			foreach ( var descriptor in descriptors )
 			{
-				foreach ( var item in descriptor.Get( parameter ) )
+				var instances = descriptor.Get( parameter ).Fixed();
+				if ( instances.Any() )
 				{
-					if ( item != null )
-					{
-						yield return item;
-					}
+					return instances;
 				}
 			}
+			return Items<AspectInstance>.Default;
 		}
 	}
 
 	[ProvideAspectRole( KnownRoles.InvocationWorkflow ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
-	public abstract class MethodAspectBase : AspectBase
+	public abstract class MethodAspectBase : AspectBase {}
+
+	public sealed class SpecificationMethodAspect : MethodAspectBase
 	{
-		readonly Func<object, IInvocation> invocationSource;
-
-		protected MethodAspectBase( Func<object, IInvocation> invocationSource )
-		{
-			this.invocationSource = invocationSource;
-		}
-
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var invocation = invocationSource( args.Instance );
+			var invocation = args.Instance as ISpecificationRelay;
 			if ( invocation != null )
 			{
-				args.ReturnValue = invocation.Invoke( args.Arguments[0] );
+				args.ReturnValue = invocation.IsSatisfiedBy( args.Arguments[0] );
 			}
 			else
 			{
@@ -220,47 +227,67 @@ namespace DragonSpark.Aspects.Relay
 		}
 	}
 
-	public sealed class SpecificationMethodAspect : MethodAspectBase
-	{
-		readonly static Func<object, IInvocation> InvocationSource = InvocationLocator<ISpecificationRelay>.Default.Get;
-		public SpecificationMethodAspect() : base( InvocationSource ) {}
-	}
-
 	public sealed class CommandMethodAspect : MethodAspectBase
 	{
-		readonly static Func<object, IInvocation> InvocationSource = InvocationLocator<ICommandRelay>.Default.Get;
-		public CommandMethodAspect() : base( InvocationSource ) {}
+		public override void OnInvoke( MethodInterceptionArgs args )
+		{
+			var invocation = args.Instance as ICommandRelay;
+			if ( invocation != null )
+			{
+				invocation.Execute( args.Arguments[0] );
+			}
+			else
+			{
+				args.Proceed();
+			}
+		}
 	}
 
 	public sealed class ParameterizedSourceMethodAspect : MethodAspectBase
 	{
-		readonly static Func<object, IInvocation> InvocationSource = InvocationLocator<IParameterizedSourceRelay>.Default.Get;
-		public ParameterizedSourceMethodAspect() : base( InvocationSource ) {}
+		public override void OnInvoke( MethodInterceptionArgs args )
+		{
+			var invocation = args.Instance as IParameterizedSourceRelay;
+			if ( invocation != null )
+			{
+				args.ReturnValue = invocation.Get( args.Arguments[0] );
+			}
+			else
+			{
+				args.Proceed();
+			}
+		}
 	}
 
-	sealed class InvocationLocator<T> : IParameterizedSource<object, T> where T : class, IInvocation
+	/*sealed class InvocationLocator<T> : IParameterizedSource<object, T> where T : class, IInvocation
 	{
 		public static InvocationLocator<T> Default { get; } = new InvocationLocator<T>();
 		InvocationLocator() {}
 
 		public T Get( object parameter ) => parameter as T;
-	}
+	}*/
 
-	public interface ICommandRelay : IInvocation {}
-	public sealed class CommandRelay<T> : CommandInvocationBase<T>, ICommandRelay
+	public interface ICommandRelay : ISpecificationRelay
+	{
+		void Execute( object parameter );
+	}
+	public sealed class CommandRelay<T> : SpecificationRelay<T>, ICommandRelay
 	{
 		readonly ICommand<T> command;
 
-		public CommandRelay( ICommand<T> command )
+		public CommandRelay( ICommand<T> command ) : base( command )
 		{
 			this.command = command;
 		}
 
-		protected override void Execute( T parameter ) => command.Execute( parameter );
+		public void Execute( object parameter ) => command.Execute( (T)parameter );
 	}
 
-	public interface ISpecificationRelay : ISpecification<object>, IInvocation {}
-	public sealed class SpecificationRelay<T> : InvocationBase<T, bool>, ISpecificationRelay
+	public interface ISpecificationRelay
+	{
+		bool IsSatisfiedBy( object parameter );
+	}
+	public class SpecificationRelay<T> : ISpecificationRelay
 	{
 		readonly ISpecification<T> specification;
 		public SpecificationRelay( ISpecification<T> specification )
@@ -268,12 +295,14 @@ namespace DragonSpark.Aspects.Relay
 			this.specification = specification;
 		}
 
-		public override bool Invoke( T parameter ) => specification.IsSatisfiedBy( parameter );
 		public bool IsSatisfiedBy( object parameter ) => parameter is T && specification.IsSatisfiedBy( (T)parameter );
 	}
 
-	public interface IParameterizedSourceRelay : IParameterizedSource<object, object>, IInvocation {}
-	public sealed class ParameterizedSourceRelay<TParameter, TResult> : InvocationBase<TParameter, TResult>, IParameterizedSourceRelay
+	public interface IParameterizedSourceRelay
+	{
+		object Get( object parameter );
+	}
+	public sealed class ParameterizedSourceRelay<TParameter, TResult> : IParameterizedSourceRelay
 	{
 		readonly IParameterizedSource<TParameter, TResult> source;
 
@@ -282,7 +311,6 @@ namespace DragonSpark.Aspects.Relay
 			this.source = source;
 		}
 
-		public override TResult Invoke( TParameter parameter ) => source.Get( parameter );
-		object IParameterizedSource<object, object>.Get( object parameter ) => source.Get( (TParameter)parameter );
+		public object Get( object parameter ) => source.Get( (TParameter)parameter );
 	}
 }
