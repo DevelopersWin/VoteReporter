@@ -31,6 +31,42 @@ namespace DragonSpark.Testing.Aspects.Implementations
 			Assert.IsAssignableFrom<IParameterizedSource<object, object>>( sut );
 		}
 
+		[Fact]
+		public void VerifyImplementedSource()
+		{
+			var sut = new AlreadyImplementedSource();
+			var parameter = new object();
+			Assert.Same( parameter, sut.Get( parameter ) );
+		}
+
+		[Fact]
+		public void VerifyImplementedSpecification()
+		{
+			var sut = new AlreadyImplementedSpecification();
+			Assert.True( sut.IsSatisfiedBy( new object() ) );
+		}
+
+		[EnsureGeneralizedImplementations]
+		class AlreadyImplementedSource : ParameterizedSourceBase<string, bool>, IParameterizedSource<object, object>
+		{
+			public override bool Get( string parameter ) => false;
+			public object Get( object parameter ) => parameter;
+		}
+
+		[EnsureGeneralizedImplementations]
+		class AlreadyImplementedSpecification : SpecificationBase<string>, ISpecification<object>
+		{
+			public override bool IsSatisfiedBy( string parameter )
+			{
+				return true;
+			}
+
+			public bool IsSatisfiedBy( object parameter )
+			{
+				return true;
+			}
+		}
+
 		[EnsureGeneralizedImplementations]
 		class Source : ParameterizedSourceBase<string, bool>
 		{
