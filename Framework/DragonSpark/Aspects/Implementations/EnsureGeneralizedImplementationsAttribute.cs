@@ -22,50 +22,19 @@ namespace DragonSpark.Aspects.Implementations
 	}
 
 	[AttributeUsage( AttributeTargets.Class ), AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	public abstract class GeneralizedAspectBase : InstanceLevelAspect
-	{
-/*
-		readonly IDescriptor descriptor;
-
-		protected GeneralizedAspectBase( IDescriptor descriptor )
-		{
-			this.descriptor = descriptor;
-		}
-*/
-
-	}
+	public abstract class GeneralizedAspectBase : InstanceLevelAspect {}
 
 	[IntroduceInterface( typeof(IParameterizedSource<object, object>) )]
 	public sealed class GeneralizedParameterizedSourceAspect : GeneralizedAspectBase, IParameterizedSource<object, object>
 	{
-		/*public GeneralizedParameterizedSourceAspect() : base( ParameterizedSourceDescriptor.Default ) {}*/
-
 		public object Get( object parameter ) => null;
 	}
 	
 	[IntroduceInterface( typeof(ISpecification<object>) )]
 	public sealed class GeneralizedSpecificationAspect : GeneralizedAspectBase, ISpecification<object>
 	{
-		/*public GeneralizedSpecificationAspect() : base( SpecificationDescriptor.Default ) {}*/
-
 		public bool IsSatisfiedBy( object parameter ) => false;
 	}
-
-	/*
-	[IntroduceInterface( typeof(ICommandRelay), AncestorOverrideAction = InterfaceOverrideAction.Ignore )]
-	public sealed class CommandRelayAspect : RelayAspectBase, ICommandRelay
-	{
-		readonly ICommandRelay relay;
-
-		public CommandRelayAspect() {}
-
-		public CommandRelayAspect( ICommandRelay relay )
-		{
-			this.relay = relay;
-		}
-
-		object IInvocation.Invoke( object parameter ) => relay.Invoke( parameter );
-	}*/
 
 	public interface IDescriptor : ITypeAware, IAspectInstanceLocator {}
 
@@ -89,33 +58,12 @@ namespace DragonSpark.Aspects.Implementations
 		}
 
 		public Type DeclaringType { get; }
-
-		/*protected override bool Validate( Type parameter )
-		{
-			var validate = base.Validate( parameter );
-			var one = TypeAssignableSpecification.Defaults.Get( typeof(ICommand) ).Inverse();
-			var two = TypeAssignableSpecification.Defaults.Get( GeneralizedSpecificationTypeDefinition.Default.DeclaringType ).Inverse();
-			var temp = new AllSpecification<Type>( one, two ).IsSatisfiedBy( parameter );
-			MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {this} {parameter}: {temp} | {validate}", null, null, null ));
-			return validate;
-		}*/
 	}
 
 	public sealed class Descriptors : ItemSource<IDescriptor>
 	{
 		public static Descriptors Default { get; } = new Descriptors();
 		Descriptors() : base( ParameterizedSourceDescriptor.Default, SpecificationDescriptor.Default ) {}
-
-		/*Descriptors( params IDescriptor[] descriptors ) : this( descriptors, descriptors.Select( definition => definition.Source.DeclaringType.Adapt() ).ToArray() ) {}
-		Descriptors( IDescriptor[] descriptors, TypeAdapter[] adapters )
-			: this( descriptors, new TypedPairs<IAspect>( adapters.Tuple( descriptors.Select( descriptor => new Func<object, IAspect>( descriptor.Get ) ).ToArray() ) ) ) {}
-
-		Descriptors( IEnumerable<Relay.IDescriptor> descriptors, ITypedPairs<IAspect> instances ) : base( descriptors )
-		{
-			Aspects = instances;
-		}
-
-		public ITypedPairs<IAspect> Aspects { get; }*/
 	}
 
 	sealed class Support : DelegatedSpecification<Type>, ISupportDefinition

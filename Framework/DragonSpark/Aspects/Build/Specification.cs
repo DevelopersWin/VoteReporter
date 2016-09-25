@@ -15,7 +15,7 @@ namespace DragonSpark.Aspects.Build
 		{
 			if ( !Context.IsAssignableFrom( parameter ) )
 			{
-				throw new InvalidOperationException( $"{parameter} does not implement any of the types defined in {GetType()}, which are: {string.Join( ",", Context.Select( t => t.Type.FullName ) )}" );
+				throw new InvalidOperationException( $"{parameter} does not implement any of the types defined in {GetType()}, which are: {string.Join( ", ", Context.Select( t => t.Type.FullName ) )}" );
 			}
 			return true;
 		}

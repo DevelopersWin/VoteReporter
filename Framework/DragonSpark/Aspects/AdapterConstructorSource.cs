@@ -2,6 +2,8 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DragonSpark.Aspects
 {
@@ -29,11 +31,20 @@ namespace DragonSpark.Aspects
 		public override Func<object, T> Get( Type parameter )
 		{
 			var adapter = parameter.Adapt();
-			var instanceParameterType = adapter.GetImplementations( parameterType ).Only();
-			var instanceImplementedType = parameterType == implementedType ? instanceParameterType : adapter.GetImplementations( implementedType ).Only();
+			var instanceParameterType = adapter.GetImplementations( parameterType ).OrderByDescending( type => type, Comparer.Default ).First();
+			var instanceImplementedType = parameterType == implementedType ? instanceParameterType : adapter.GetImplementations( implementedType ).OrderByDescending( type => type, Comparer.Default ).First();
 			var resultType = adapterType.MakeGenericType( instanceImplementedType.GenericTypeArguments );
 			var result = factory( instanceParameterType, resultType );
 			return result;
+		}
+
+		sealed class Comparer : IComparer<Type>
+		{
+			public static Comparer Default { get; } = new Comparer();
+			Comparer() {}
+
+			public int Compare( Type x, Type y ) => 
+				x.GenericTypeArguments.Count( type => type != typeof(object) ).CompareTo( y.GenericTypeArguments.Count( type => type != typeof(object) ) );
 		}
 	}
 }

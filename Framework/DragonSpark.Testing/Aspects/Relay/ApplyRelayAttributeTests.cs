@@ -1,4 +1,6 @@
 ﻿using DragonSpark.Aspects.Relay;
+using DragonSpark.Specifications;
+using PostSharp.Patterns.Model;
 using System;
 using Xunit;
 
@@ -13,10 +15,49 @@ namespace DragonSpark.Testing.Aspects.Relay
 			Assert.False( sut.CanExecute( 123 ) );
 			Assert.Equal( 0, sut.CanExecuteCalled );
 			Assert.Equal( 1, sut.CanExecuteGenericCalled );
+
+			Assert.True( sut.CanExecute( 6776 ) );
+			Assert.Equal( 0, sut.CanExecuteCalled );
+			Assert.Equal( 2, sut.CanExecuteGenericCalled );
+		}
+
+		[Fact]
+		public void VerifySpecification()
+		{
+			var sut = new Specification();
+			var generalized = sut.QueryInterface<ISpecification<object>>();
+			Assert.False( generalized.IsSatisfiedBy( 123 ) );
+			Assert.Equal( 1, sut.IsSatisfiedByCalled );
+			Assert.True( generalized.IsSatisfiedBy( 6776 ) );
+			Assert.Equal( 2, sut.IsSatisfiedByCalled );
+			Assert.Equal( 0, sut.GeneralizedIsSatisfiedByCalled );
+		}
+
+		public abstract class GeneralizedSpecificationBase<T> : SpecificationBase<T>, ISpecification<object>
+		{
+			public int GeneralizedIsSatisfiedByCalled { get; private set; }
+
+			bool ISpecification<object>.IsSatisfiedBy( object parameter )
+			{
+				GeneralizedIsSatisfiedByCalled++;
+				return false;
+			}
+		}
+
+		[/*EnsureGeneralizedImplementations,*/ ApplyRelay]
+		sealed class Specification : GeneralizedSpecificationBase<int>
+		{
+			public int IsSatisfiedByCalled { get; private set; }
+
+			public override bool IsSatisfiedBy( int parameter )
+			{
+				IsSatisfiedByCalled++;
+				return parameter == 6776;
+			}
 		}
 
 		[ApplyRelay]
-		class Command : DragonSpark.Commands.ICommand<int>
+		sealed class Command : DragonSpark.Commands.ICommand<int>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
 
