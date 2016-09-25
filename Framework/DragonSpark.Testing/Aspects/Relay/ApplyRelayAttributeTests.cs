@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Aspects.Relay;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using PostSharp.Patterns.Model;
 using System;
@@ -33,7 +34,44 @@ namespace DragonSpark.Testing.Aspects.Relay
 			Assert.Equal( 0, sut.GeneralizedIsSatisfiedByCalled );
 		}
 
-		public abstract class GeneralizedSpecificationBase<T> : SpecificationBase<T>, ISpecification<object>
+		[Fact]
+		public void VerifySource()
+		{
+			var sut = new ParameterizedSource();
+			var generalized = sut.QueryInterface<IParameterizedSource<object, object>>();
+			Assert.False( (bool)generalized.Get( "Not Valid" ) );
+			Assert.Equal( 1, sut.GetCalled );
+			Assert.True( (bool)generalized.Get( ParameterizedSource.HelloWorld ) );
+			Assert.Equal( 2, sut.GetCalled );
+			Assert.Equal( 0, sut.GeneralizedGetCalled );
+		}
+
+		abstract class GeneralizedParameterizedSourceBase<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>, IParameterizedSource<object, object>
+		{
+			public int GeneralizedGetCalled { get; private set; }
+
+			public object Get( object parameter )
+			{
+				GeneralizedGetCalled++;
+				return null;
+			}
+		}
+
+		[ApplyRelay]
+		class ParameterizedSource : GeneralizedParameterizedSourceBase<string, bool>
+		{
+			public const string HelloWorld = "Hello World!";
+
+			public int GetCalled { get; private set; }
+
+			public override bool Get( string parameter )
+			{
+				GetCalled++;
+				return parameter == HelloWorld;
+			}
+		}
+
+		abstract class GeneralizedSpecificationBase<T> : SpecificationBase<T>, ISpecification<object>
 		{
 			public int GeneralizedIsSatisfiedByCalled { get; private set; }
 
