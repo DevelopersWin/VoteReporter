@@ -8,7 +8,6 @@ using System.Collections.Generic;
 namespace DragonSpark.Aspects.Build
 {
 	// ReSharper disable once PossibleInfiniteInheritance
-	public interface ITypedPairs<T> : ITypedPairs<object, T> {}
 
 	// ReSharper disable once PossibleInfiniteInheritance
 	public interface ITypedPairs<TParameter, TResult> : IEnumerable<ValueTuple<TypeAdapter, Func<TParameter, TResult>>> {}

@@ -1,13 +1,10 @@
-﻿using DragonSpark.Aspects.Build;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using Polly;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
-using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
-using PostSharp.Aspects.Serialization;
 using System;
 using Activator = DragonSpark.Activation.Activator;
 
@@ -38,31 +35,6 @@ namespace DragonSpark.Aspects.Exceptions
 		object ISource.Get() => Get();
 	}
 
-	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[ProvideAspectRole( StandardRoles.ExceptionHandling ), LinesOfCodeAvoided( 1 ),
-	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.ParameterValidation ),
-	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.EnhancedValidation ),
-	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )
-	]
-	public abstract class AspectBase : MethodInterceptionAspect {}
-
-	[AttributeUsage( AttributeTargets.Method )]
-	public class AppliedAspect : AspectBase
-	{
-		public sealed override void OnInvoke( MethodInterceptionArgs args )
-		{
-			var source = args.Instance as IPolicySource;
-			if ( source != null )
-			{
-				source.Get().Execute( args.Proceed );
-			}
-			else
-			{
-				args.Proceed();
-			}
-		}
-	}
-
 	/*[AttributeUsage( AttributeTargets.Method | AttributeTargets.Constructor )]
 	public class ApplyExceptionPolicyAspect : AspectBase
 	{
@@ -81,12 +53,4 @@ namespace DragonSpark.Aspects.Exceptions
 
 		public sealed override void OnInvoke( MethodInterceptionArgs args ) => source.Get().Execute( args.Proceed );
 	}*/
-
-	sealed class Support : SupportDefinition<AppliedAspect>
-	{
-		public static Support Default { get; } = new Support();
-		Support() : base( GenericCommandTypeDefinition.Default, ParameterizedSourceTypeDefinition.Default, GenericSpecificationTypeDefinition.Default ) {}
-	}
-
-	public interface IPolicySource : ISource<Policy> {}
 }

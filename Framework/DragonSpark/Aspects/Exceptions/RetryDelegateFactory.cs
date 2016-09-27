@@ -1,19 +1,10 @@
-﻿using DragonSpark.Diagnostics.Exceptions;
+﻿using System;
 using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using Serilog;
-using System;
 
 namespace DragonSpark.Aspects.Exceptions
 {
-	public static class Time
-	{
-		public static Func<int, TimeSpan> None { get; } = i => TimeSpan.Zero;
-
-		public static Func<int, TimeSpan> Default { get; } = LinearRetryTime.Default.ToSourceDelegate();
-	}
-
 	class RetryDelegateFactory : SourceBase<Action<Exception, TimeSpan>>
 	{
 		public static RetryDelegateFactory Default { get; } = new RetryDelegateFactory();
