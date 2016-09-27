@@ -1,11 +1,13 @@
-﻿using DragonSpark.Commands;
-using System.IO;
+﻿using DragonSpark.Aspects.Exceptions;
 using DragonSpark.Aspects.Specifications;
 using DragonSpark.Aspects.Validation;
+using DragonSpark.Commands;
+using DragonSpark.Diagnostics.Exceptions;
+using System.IO;
 
 namespace DragonSpark.Windows.Setup
 {
-	[ApplyAutoValidation, ApplySpecification( typeof(FileSystemInfoExistsSpecification) )]
+	[ApplyAutoValidation, ApplySpecification( typeof(FileSystemInfoExistsSpecification) ), ApplyExceptionPolicy( typeof(SuppliedRetryPolicySource<IOException>) )]
 	public sealed class DeleteFileCommand : CommandBase<FileSystemInfo>
 	{
 		public static DeleteFileCommand Default { get; } = new DeleteFileCommand()/*.ExtendUsing( FileSystemInfoExistsSpecification.Default ).Extend( AutoValidationExtension.Default )*/;

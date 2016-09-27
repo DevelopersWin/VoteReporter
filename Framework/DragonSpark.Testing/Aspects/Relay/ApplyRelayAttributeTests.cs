@@ -20,6 +20,12 @@ namespace DragonSpark.Testing.Aspects.Relay
 			Assert.True( sut.CanExecute( 6776 ) );
 			Assert.Equal( 0, sut.CanExecuteCalled );
 			Assert.Equal( 2, sut.CanExecuteGenericCalled );
+
+			sut.Execute( (object)6776 );
+
+			Assert.Equal( 0, sut.ExecuteCalled );
+			Assert.Equal( 1, sut.ExecuteGenericCalled );
+			Assert.Equal( 6776, sut.LastResult );
 		}
 
 		[Fact]

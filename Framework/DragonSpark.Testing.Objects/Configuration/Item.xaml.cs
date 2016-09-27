@@ -10,7 +10,7 @@ namespace DragonSpark.Testing.Objects.Configuration
 	{
 		public Item()
 		{
-			Policies.Retry<IOException>( InitializeComponent );
+			Retry.Execute<IOException>( InitializeComponent );
 		}
 	}
 }

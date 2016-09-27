@@ -49,6 +49,7 @@
     <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\ConstructorCoercerTests.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercerAttributeTests.cs" />
+    <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyAttributeTests.cs" />
     <Compile Include="Aspects\Implementations\EnsureGeneralizedImplementationsAttributeTests.cs" />
     <Compile Include="Aspects\Relay\ApplyRelayAttributeTests.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationAttributeTests.cs" />
@@ -74,7 +75,6 @@
     <Compile Include="Composition\SingletonExportDescriptorProviderTests.cs" />
     <Compile Include="Composition\SourceDelegateExporterTests.cs" />
     <Compile Include="Composition\SourceExporterTests.cs" />
-    <Compile Include="Diagnostics\Exceptions\PoliciesTests.cs" />
     <Compile Include="Sources\TimedDelegatedSourceTests.cs" />
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
@@ -99,7 +99,6 @@
     <Compile Include="Configuration\RegistrationTests.cs" />
     <Compile Include="Configuration\ValueStoreBaseTests.cs" />
     <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
-    <Compile Include="Diagnostics\Exceptions\ExceptionHandlerTests.cs" />
     <Compile Include="FormatterTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggerTests.cs" />
     <Compile Include="Diagnostics\Logging\LoggerHistorySinkTests.cs" />
@@ -180,6 +179,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Diagnostics\Exceptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />

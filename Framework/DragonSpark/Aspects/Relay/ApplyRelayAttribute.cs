@@ -22,11 +22,6 @@ namespace DragonSpark.Aspects.Relay
 	public sealed class ApplyRelayAttribute : ApplyAspectBase
 	{
 		public ApplyRelayAttribute() : base( Support.Default ) {}
-		/*public override bool CompileTimeValidate( Type type )
-		{
-			MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"YO: {type}, {DateTime.Now.Ticks}", null, null, null ));
-			return base.CompileTimeValidate( type );
-		}*/
 	}
 
 	[AttributeUsage( AttributeTargets.Class ), AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]

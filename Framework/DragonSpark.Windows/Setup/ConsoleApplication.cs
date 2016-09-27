@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Windows.Setup
 {
-	public class ConsoleApplication : Application<string[]>
+	public class ConsoleApplication : ApplicationBase<string[]>
 	{
 		public ConsoleApplication() {}
 		public ConsoleApplication( params ICommand[] commands ) : base( commands ) {}

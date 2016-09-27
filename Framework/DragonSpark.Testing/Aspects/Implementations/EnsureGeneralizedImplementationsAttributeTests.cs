@@ -14,6 +14,7 @@ namespace DragonSpark.Testing.Aspects.Implementations
 		public void VerifyCommand()
 		{
 			var sut = new Command();
+			// ReSharper disable once SuspiciousTypeConversion.Global
 			Assert.False( sut is ISpecification<object> );
 		}
 

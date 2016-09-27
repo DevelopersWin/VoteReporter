@@ -13,7 +13,7 @@ namespace DragonSpark.Testing.Objects.Configuration
 	{
 		public Values()
 		{
-			Policies.Retry<IOException>( InitializeComponent );
+			Retry.Execute<IOException>( InitializeComponent );
 		}
 	}
 }

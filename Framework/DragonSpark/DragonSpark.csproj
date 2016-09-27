@@ -58,6 +58,7 @@
     <Compile Include="Aspects\Coercion\Support.cs" />
     <Compile Include="Aspects\CommandTypeDefinition.cs" />
     <Compile Include="Aspects\ConstructedSourceBase.cs" />
+    <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyAttribute.cs" />
     <Compile Include="Aspects\TypeDefinition.cs" />
     <Compile Include="Aspects\GenericCommandTypeDefinition.cs" />
     <Compile Include="Aspects\ITypeDefinition.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="Composition\SpecificationExporter.cs" />
     <Compile Include="Composition\TypeInitializingExportDescriptorProvider.cs" />
     <Compile Include="DefaultPriorityAware.cs" />
+    <Compile Include="Diagnostics\Exceptions\SuppliedRetryPolicySource.cs" />
     <Compile Include="Diagnostics\Logging\Configuration.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactory.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactorySource.cs" />
@@ -210,11 +212,9 @@
     <Compile Include="Configuration\Extensions.cs" />
     <Compile Include="Configuration\IConfigurationScope.cs" />
     <Compile Include="Configuration\IValueStore.cs" />
-    <Compile Include="Diagnostics\Exceptions\ApplyPolicyCommand.cs" />
     <Compile Include="Diagnostics\Exceptions\BackoffRetryTime.cs" />
-    <Compile Include="Diagnostics\Exceptions\Defaults.cs" />
+    <Compile Include="Aspects\Exceptions\Defaults.cs" />
     <Compile Include="Diagnostics\DelegatedTextCommand.cs" />
-    <Compile Include="Diagnostics\Exceptions\ExceptionHandler.cs" />
     <Compile Include="Diagnostics\IgnoredOutputCommand.cs" />
     <Compile Include="Diagnostics\Exceptions\LinearRetryTime.cs" />
     <Compile Include="Diagnostics\Logging\LogEventMessageFactory.cs" />
@@ -276,7 +276,7 @@
     <Compile Include="Runtime\Assignments\IAssign.cs" />
     <Compile Include="Runtime\IComposable.cs" />
     <Compile Include="Runtime\InitializedDisposableAction.cs" />
-    <Compile Include="Application\Application.cs" />
+    <Compile Include="Application\ApplicationBase.cs" />
     <Compile Include="Application\ApplicationAssemblies.cs" />
     <Compile Include="Application\ApplicationCommandSource.cs" />
     <Compile Include="Application\ApplicationParts.cs" />
@@ -400,11 +400,7 @@
     <Compile Include="Diagnostics\Logging\Configurations\ReadFromSettingsCommand.cs" />
     <Compile Include="Diagnostics\Logging\LogRetryException.cs" />
     <Compile Include="Diagnostics\Exceptions\PolicyBuilderSource.cs" />
-    <Compile Include="Diagnostics\Exceptions\DeferredPolicyCommand.cs" />
-    <Compile Include="Diagnostics\Exceptions\Retry.cs" />
-    <Compile Include="Diagnostics\Exceptions\RetryPolicyFactory.cs" />
-    <Compile Include="Diagnostics\Exceptions\RetryPolicyParameter.cs" />
-    <Compile Include="Diagnostics\Exceptions\RetryPolicyParameterSource.cs" />
+    <Compile Include="Diagnostics\Exceptions\RetryPolicySource.cs" />
     <Compile Include="Diagnostics\Exceptions\RetryTimeBase.cs" />
     <Compile Include="Runtime\Hash.cs" />
     <Compile Include="Aspects\Validation\IParameterValidationAdapter.cs" />
@@ -483,7 +479,6 @@
     <Compile Include="Activation\TypeRequest.cs" />
     <Compile Include="Aspects\AutoGuardAspect.cs" />
     <Compile Include="Composition\ConventionImplementations.cs" />
-    <Compile Include="Diagnostics\Exceptions\SetupExceptionHandling.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\AddSinkCommand.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\EnrichFromLogContextCommand.cs" />
     <Compile Include="Application\Setup\ActivatedServiceSource.cs" />
@@ -517,10 +512,9 @@
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\ValueStoreBase.cs" />
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
-    <Compile Include="Diagnostics\Exceptions\Extensions.cs" />
     <Compile Include="Formatter.cs" />
     <Compile Include="Diagnostics\Logging\LogTemplate.cs" />
-    <Compile Include="Diagnostics\Exceptions\Policies.cs" />
+    <Compile Include="Aspects\Exceptions\Policies.cs" />
     <Compile Include="Commands\Extensions.cs" />
     <Compile Include="Extensions\MethodExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -688,8 +682,6 @@
     <Compile Include="ConditionMonitor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Diagnostics\Exceptions\ExceptionHandlingResult.cs" />
-    <Compile Include="Diagnostics\Exceptions\IExceptionHandler.cs" />
     <Compile Include="Extensions\AssemblyExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs">
       <SubType>Code</SubType>

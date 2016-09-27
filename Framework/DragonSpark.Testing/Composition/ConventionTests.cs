@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Application;
 using DragonSpark.Composition;
-using DragonSpark.Diagnostics.Exceptions;
 using DragonSpark.Extensions;
+using JetBrains.Annotations;
 using System;
 using System.Composition;
 using System.Composition.Hosting;
@@ -29,17 +29,21 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void OrderOfSelection()
 		{
-			new[] { typeof(IExceptionHandler), typeof(DragonSpark.Diagnostics.Exceptions.ExceptionHandler), typeof(ExceptionHandler) }.AsApplicationParts();
+			new[] { typeof(ICurrentTime), typeof(CurrentTime), typeof(DragonSpark.Application.CurrentTime) }.AsApplicationParts();
 
-			Assert.Equal( typeof(ExceptionHandler), ApplicationTypes.Default.Get().First() );
+			Assert.Equal( typeof(CurrentTime), ApplicationTypes.Default.Get().First() );
 
-			var handler = CompositionHostFactory.Default.Get().GetExport<IExceptionHandler>();
-			Assert.IsType<ExceptionHandler>( handler );
+			var handler = CompositionHostFactory.Default.Get().GetExport<ICurrentTime>();
+			Assert.IsType<CurrentTime>( handler );
 		}
 
-		public class ExceptionHandler : IExceptionHandler
+		public sealed class CurrentTime : ICurrentTime
 		{
-			public ExceptionHandlingResult Handle( Exception exception ) => new ExceptionHandlingResult( true, exception );
+			[UsedImplicitly]
+			public static ICurrentTime Default { get; } = new CurrentTime();
+			CurrentTime() {}
+
+			public DateTimeOffset Now => new DateTimeOffset();
 		}
 
 		[Fact]
