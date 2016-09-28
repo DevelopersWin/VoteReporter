@@ -1,13 +1,26 @@
-﻿using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Extensibility;
 using PostSharp.Reflection;
 using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Build
 {
+	public sealed class ObjectConstructionFactory<T> : ParameterizedSourceBase<IEnumerable<object>, ObjectConstruction>
+	{
+		public static ObjectConstructionFactory<T> Default { get; } = new ObjectConstructionFactory<T>();
+		ObjectConstructionFactory() {}
+
+		public ObjectConstruction Get() => GetUsing( Items<object>.Default );
+		public ObjectConstruction GetUsing( params object[] parameter ) => Get( parameter );
+
+		public override ObjectConstruction Get( IEnumerable<object> parameter ) => new ObjectConstruction( typeof(T), parameter.Fixed() );
+	}
+
 	public sealed class AspectInstanceFactory<TAspect, TTarget> : SpecificationParameterizedSource<TTarget, AspectInstance>
 	{
 		public static AspectInstanceFactory<TAspect, TTarget> Default { get; } = new AspectInstanceFactory<TAspect, TTarget>();
@@ -33,7 +46,7 @@ namespace DragonSpark.Aspects.Build
 		sealed class Factory : ParameterizedSourceBase<TTarget, AspectInstance>
 		{
 			public static Factory DefaultNested { get; } = new Factory();
-			Factory() : this( new ObjectConstruction( typeof(TAspect), Items<object>.Default ) ) {}
+			Factory() : this( ObjectConstructionFactory<TAspect>.Default.Get() ) {}
 
 			readonly ObjectConstruction construction;
 
@@ -42,7 +55,13 @@ namespace DragonSpark.Aspects.Build
 				this.construction = construction;
 			}
 
-			public override AspectInstance Get( TTarget parameter ) => new AspectInstance( parameter, construction, null );
+			public override AspectInstance Get( TTarget parameter )
+			{
+				/*var method = parameter as MethodInfo;
+				var message = method != null ? new MethodFormatter( method ).ToString() : "n/a";
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"YO: {typeof(TAspect)} -> {message}", null, null, null ));*/
+				return new AspectInstance( parameter, construction, null );
+			}
 		}
 	}
 }

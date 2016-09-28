@@ -50,7 +50,8 @@
     <Compile Include="Activation\ConstructorCoercerTests.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercerAttributeTests.cs" />
     <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyAttributeTests.cs" />
-    <Compile Include="Aspects\Implementations\EnsureGeneralizedImplementationsAttributeTests.cs" />
+    <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsAttributeTests.cs" />
+    <Compile Include="Aspects\Profiles\ApplyAspectsAttributeTests.cs" />
     <Compile Include="Aspects\Relay\ApplyRelayAttributeTests.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationAttributeTests.cs" />
     <Compile Include="ComponentModel\SourceAttributeTests.cs" />

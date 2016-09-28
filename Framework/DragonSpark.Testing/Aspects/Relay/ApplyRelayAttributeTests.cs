@@ -119,11 +119,7 @@ namespace DragonSpark.Testing.Aspects.Relay
 				return false;
 			}
 
-			public void Execute( object parameter )
-			{
-				ExecuteCalled++;
-				// Execute( new Parameter( (int)parameter ) );
-			}
+			public void Execute( object parameter ) => ExecuteCalled++;
 
 			public bool IsSatisfiedBy( int parameter )
 			{

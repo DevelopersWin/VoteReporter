@@ -67,6 +67,7 @@
     <Compile Include="Aspects\Exceptions\IPolicySource.cs" />
     <Compile Include="Aspects\Exceptions\RetryDelegateFactory.cs" />
     <Compile Include="Aspects\Exceptions\Support.cs" />
+    <Compile Include="Aspects\Generalized.cs" />
     <Compile Include="Aspects\GeneralizedParameterizedSourceTypeDefinition.cs" />
     <Compile Include="Aspects\GeneralizedSpecificationTypeDefinition.cs" />
     <Compile Include="Aspects\Implementations\Descriptor.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Aspects\Implementations\SpecificationDescriptor.cs" />
     <Compile Include="Aspects\Implementations\Support.cs" />
     <Compile Include="Aspects\ITypeAware.cs" />
+    <Compile Include="Aspects\Profiles\ApplyAspectsAttribute.cs" />
     <Compile Include="Aspects\Relay\CommandDescriptor.cs" />
     <Compile Include="Aspects\Relay\CommandMethodAspect.cs" />
     <Compile Include="Aspects\Relay\CommandRelay.cs" />
@@ -106,7 +108,7 @@
     <Compile Include="Aspects\TypeDefinition.cs" />
     <Compile Include="Aspects\GenericCommandTypeDefinition.cs" />
     <Compile Include="Aspects\ITypeDefinition.cs" />
-    <Compile Include="Aspects\Implementations\EnsureGeneralizedImplementationsAttribute.cs" />
+    <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsAttribute.cs" />
     <Compile Include="Aspects\IValidatedTypeDefinition.cs" />
     <Compile Include="Aspects\KnownRoles.cs" />
     <Compile Include="Aspects\ParameterizedSourceTypeDefinition.cs" />

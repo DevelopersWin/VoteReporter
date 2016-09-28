@@ -8,7 +8,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Implementations
 {
-	public class EnsureGeneralizedImplementationsAttributeTests
+	public class ApplyGeneralizedImplementationsAttributeTests
 	{
 		[Fact]
 		public void VerifyCommand()
@@ -47,14 +47,14 @@ namespace DragonSpark.Testing.Aspects.Implementations
 			Assert.True( sut.IsSatisfiedBy( new object() ) );
 		}
 
-		[EnsureGeneralizedImplementations]
+		[ApplyGeneralizedImplementations]
 		class AlreadyImplementedSource : ParameterizedSourceBase<string, bool>, IParameterizedSource<object, object>
 		{
 			public override bool Get( string parameter ) => false;
 			public object Get( object parameter ) => parameter;
 		}
 
-		[EnsureGeneralizedImplementations]
+		[ApplyGeneralizedImplementations]
 		class AlreadyImplementedSpecification : SpecificationBase<string>, ISpecification<object>
 		{
 			public override bool IsSatisfiedBy( string parameter )
@@ -68,13 +68,13 @@ namespace DragonSpark.Testing.Aspects.Implementations
 			}
 		}
 
-		[EnsureGeneralizedImplementations]
+		[ApplyGeneralizedImplementations]
 		class Source : ParameterizedSourceBase<string, bool>
 		{
 			public override bool Get( string parameter ) => false;
 		}
 
-		[EnsureGeneralizedImplementations]
+		[ApplyGeneralizedImplementations]
 		class Specification : SpecificationBase<DateTime>
 		{
 			public override bool IsSatisfiedBy( DateTime parameter ) => false;
