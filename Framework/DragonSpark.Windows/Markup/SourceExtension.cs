@@ -17,10 +17,6 @@ namespace DragonSpark.Windows.Markup
 		[NotNull]
 		public ISource Instance { [return: NotNull]get; set; }
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider )
-		{
-			var value = Instance.Get();
-			return value;
-		}
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Instance.Get();
 	}
 }

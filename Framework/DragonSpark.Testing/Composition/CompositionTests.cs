@@ -55,7 +55,6 @@ namespace DragonSpark.Testing.Composition
 		public void InterfaceExport( CompositionContext host )
 		{
 			Assert.Same( AssemblyInformationSource.Default, host.GetExport<IParameterizedSource<Assembly, AssemblyInformation>>() );
-			
 		}
 
 		[Fact]

@@ -55,8 +55,9 @@ namespace DragonSpark.Composition
 			{
 				Debug.WriteLine( $"{type.FullName}" );
 			}*/
-			
-			var selector = new ConstructorSelector( new IsValidConstructorSpecification( new IsValidTypeSpecification( all ).IsSatisfiedBy ).IsSatisfiedBy );
+
+			var specification = new IsValidTypeSpecification( all );
+			var selector = new ConstructorSelector( new IsValidConstructorSpecification( specification.IsSatisfiedBy ).IsSatisfiedBy );
 
 			var implementations = mappings.Values.Fixed();
 			var constructions = applied
@@ -73,7 +74,7 @@ namespace DragonSpark.Composition
 			
 			var singletons = new SingletonExports( core.ToImmutableDictionary( export => export.Location.DeclaringType ) );
 
-			var result = new ExportsProfile( constructed, conventions, singletons );
+			var result = new ExportsProfile( constructed, conventions, singletons, specification );
 			return result;
 		}
 	}
