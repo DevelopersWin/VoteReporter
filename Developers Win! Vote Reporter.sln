@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Application", "DevelopersWin.VoteReporter.Application\DevelopersWin.VoteReporter.Application.csproj", "{5A90A124-22CF-4A87-BC4D-DACD189FE06E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C28B714B-07F5-4193-92DF-3BEA93D938C9} = {C28B714B-07F5-4193-92DF-3BEA93D938C9}
+		{304A81C9-3B30-448F-9AB6-EF7355311FFB} = {304A81C9-3B30-448F-9AB6-EF7355311FFB}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter", "DevelopersWin.VoteReporter\DevelopersWin.VoteReporter.csproj", "{AE7C3390-95D0-4558-B992-F7EF3FAE89DA}"
 EndProject

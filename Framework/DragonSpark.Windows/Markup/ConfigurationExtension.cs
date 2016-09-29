@@ -16,12 +16,12 @@ namespace DragonSpark.Windows.Markup
 		}
 
 		[Required, Service]
-		public IValueStore Registry { [return: Required] get; set; }
+		IValueStore Store { [return: Required] get; set; }
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
 			var name = key ?? MemberInfoKeyFactory.Default.Get( serviceProvider.Property.Reference );
-			var result = Registry.Get( name ) ?? FromTarget( serviceProvider );
+			var result = Store.Get( name ) ?? FromTarget( serviceProvider );
 			return result;
 		}
 
@@ -29,7 +29,7 @@ namespace DragonSpark.Windows.Markup
 		{
 			var adjusted = new PropertyReference( serviceProvider.TargetObject.GetType(), serviceProvider.Property.Reference.PropertyType, serviceProvider.Property.Reference.PropertyName );
 			var name = MemberInfoKeyFactory.Default.Get( adjusted );
-			var result = Registry.Get( name );
+			var result = Store.Get( name );
 			return result;
 		}
 	}

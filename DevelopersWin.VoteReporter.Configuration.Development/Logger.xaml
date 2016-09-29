@@ -8,13 +8,14 @@
 	xmlns:thread="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Thread"
 	xmlns:process="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Process"
 	xmlns:configurations="clr-namespace:DragonSpark.Diagnostics.Logging.Configurations;assembly=DragonSpark"
+	xmlns:ds="http://framework.dragonspark.us"
 	mc:Ignorable="d" 
 >
 	<configurations:MinimumLevelIsCommand />
 	<diagnosticsPlatform:AddConsoleSinkCommand />
 	<diagnosticsPlatform:AddTraceSinkCommand />
 
-	<configurations:AddSeqSinkCommand Endpoint="http://localhost:5341" ApiKey="FHDZFBUt1z34o0j6L1iE" />
+	<configurations:AddSeqSinkCommand Endpoint="{ds:Configuration}" ApiKey="{ds:Configuration}" />
 	
 	<configurations:EnrichCommand>
 		<process:ProcessIdEnricher />

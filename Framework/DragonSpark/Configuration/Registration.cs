@@ -11,7 +11,12 @@ namespace DragonSpark.Configuration
 	[ContentProperty( nameof(Aliases) )]
 	public class Registration : IEquatable<string>
 	{
-		public Registration() {}
+		readonly Func<string, bool> EqualsReference;
+
+		public Registration()
+		{
+			EqualsReference = Equals;
+		}
 
 		public Registration( string key, object value ) : this( key, value, Items<string>.Default ) {}
 
@@ -20,6 +25,7 @@ namespace DragonSpark.Configuration
 			Key = key;
 			Aliases = new DeclarativeCollection<string>( aliases );
 			Value = value;
+			EqualsReference = Equals;
 		}
 
 		public DeclarativeCollection<string> Aliases { get; } = new DeclarativeCollection<string>();
@@ -27,10 +33,10 @@ namespace DragonSpark.Configuration
 		[NotEmpty]
 		public string Key { [return: NotEmpty]get; set; }
 
-		[Required]
-		public object Value { [return: Required]get; set; }
+		[NotNull]
+		public object Value { [return: NotNull]get; set; }
 
-		public override bool Equals( object obj ) => obj.AsTo<string, bool>( Equals );
+		public override bool Equals( object obj ) => obj.AsTo( EqualsReference );
 
 		public virtual bool Equals( string other ) => Key.Append( Aliases ).Contains( other );
 
