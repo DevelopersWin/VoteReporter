@@ -2,12 +2,8 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Configurations;
 using PostSharp.Patterns.Contracts;
 using Serilog.Configuration;
-using Serilog.Core;
 using Serilog.Events;
-using Serilog.Formatting;
 using Serilog.Formatting.Display;
-using System.Diagnostics;
-using System.IO;
 
 namespace DragonSpark.Windows.Diagnostics
 {
@@ -25,23 +21,5 @@ namespace DragonSpark.Windows.Diagnostics
 
 		protected override void Configure( LoggerSinkConfiguration configuration ) => 
 			configuration.Sink( new TraceSink( new MessageTemplateTextFormatter( OutputTemplate, FormatProvider ) ), RestrictedToMinimumLevel );
-	}
-
-	sealed class TraceSink : ILogEventSink
-	{
-		readonly ITextFormatter textFormatter;
-
-		public TraceSink( ITextFormatter textFormatter )
-		{
-			this.textFormatter = textFormatter;
-		}
-
-		public void Emit( LogEvent logEvent )
-		{
-			var stringWriter = new StringWriter();
-			textFormatter.Format( logEvent, stringWriter );
-			var message = stringWriter.ToString().Trim();
-			Trace.WriteLine( message );
-		}
 	}
 }

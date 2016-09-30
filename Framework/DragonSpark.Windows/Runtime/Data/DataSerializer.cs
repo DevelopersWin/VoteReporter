@@ -2,7 +2,7 @@ using DragonSpark.Runtime;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
-	public class DataSerializer : DataSerializer<object>
+	public sealed class DataSerializer : DataSerializer<object>
 	{
 		public new static DataSerializer Default { get; } = new DataSerializer();
 		DataSerializer() {}

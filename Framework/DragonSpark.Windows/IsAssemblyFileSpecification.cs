@@ -1,6 +1,6 @@
-﻿namespace DragonSpark.Windows.Io
+﻿namespace DragonSpark.Windows
 {
-	public class IsAssemblyFileSpecification : FileExtensionSpecificationBase
+	public sealed class IsAssemblyFileSpecification : FileExtensionSpecificationBase
 	{
 		public static IsAssemblyFileSpecification Default { get; } = new IsAssemblyFileSpecification();
 		IsAssemblyFileSpecification() : base( FileSystem.AssemblyExtension ) {}

@@ -37,13 +37,13 @@ namespace DragonSpark.Windows.Markup
 	{
 		public ServiceExtension() {}
 
-		public ServiceExtension( Type type )
+		public ServiceExtension( Type serviceType )
 		{
-			Type = type;
+			ServiceType = serviceType;
 		}
 
 		[NotNull]
-		public Type Type { [return: NotNull]get; set; }
+		public Type ServiceType { [return: NotNull]get; set; }
 
 		[Service, NotNull]
 		public IServiceProvider Locator { [return: NotNull]get; set; }
@@ -52,7 +52,7 @@ namespace DragonSpark.Windows.Markup
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )
 		{
-			var result = Locator.GetService( Type/*, BuildName*/ );
+			var result = Locator.GetService( ServiceType/*, BuildName*/ );
 			/*result.As<ISupportInitialize>( x => x.BeginInit() );
 			result.With( x => Properties.Each( y => x.GetType().GetProperty( y.PropertyName ).With( z => y.Apply( z, x ) ) ) );
 			result.As<ISupportInitialize>( x => x.EndInit() );*/

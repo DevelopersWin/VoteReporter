@@ -10,7 +10,7 @@ namespace DragonSpark.Windows.Runtime.Data
 		public override MemoryStream Get( DataTransformParameter parameter )
 		{
 			var transform = new XslCompiledTransform();
-			transform.Load( parameter.Stylesheet );
+			transform.Load( parameter.StyleSheet );
 
 			var stream = new MemoryStream();
 			transform.Transform( parameter.Source, null, stream );

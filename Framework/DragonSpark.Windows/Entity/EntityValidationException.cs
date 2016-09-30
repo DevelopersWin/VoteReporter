@@ -1,17 +1,26 @@
 using DragonSpark.Extensions;
+using JetBrains.Annotations;
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace DragonSpark.Windows.Entity
 {
+	[Serializable]
 	public class EntityValidationException : Exception
 	{
-		public EntityValidationException( DbContext context, DbEntityValidationException innerException ) : base( DetermineMessage( context, innerException ), innerException )
-		{}
+		public EntityValidationException() {}
+
+		public EntityValidationException( string message ) : base( message ) {}
+		public EntityValidationException( string message, Exception innerException ) : base( message, innerException ) {}
+
+		public EntityValidationException( DbContext context, DbEntityValidationException innerException ) : base( DetermineMessage( context, innerException ), innerException ) {}
+
+		protected EntityValidationException( [NotNull] SerializationInfo info, StreamingContext context ) : base( info, context ) {}
 
 		static string DetermineMessage( DbContext context, DbEntityValidationException error )
 		{

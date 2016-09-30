@@ -30,7 +30,7 @@ namespace DragonSpark.Windows.Entity
 			return result;
 		}*/
 
-		public static int Save( this DbContext target, bool? validate = null, bool? autoDetectChanges = null )
+		public static int Save( this DbContext target/*, bool? validate = null, bool? autoDetectChanges = null*/ )
 		{
 			try
 			{
@@ -154,7 +154,7 @@ namespace DragonSpark.Windows.Entity
 			}
 		}*/
 
-		public class DefaultAssociationPropertyFactory : ParameterizedSourceBase<Type, string[]>
+		sealed class DefaultAssociationPropertyFactory : ParameterizedSourceBase<Type, string[]>
 		{
 			readonly IObjectContextAdapter adapter;
 
@@ -310,7 +310,7 @@ namespace DragonSpark.Windows.Entity
 			}
 		}
 		
-		public static IEnumerable<NavigationProperty> GetEntityProperties( this IObjectContextAdapter target, Type type ) => target.ObjectContext.MetadataWorkspace.GetEntityMetaData( type ).NavigationProperties;
+		public static IEnumerable<NavigationProperty> GetEntityProperties( this IObjectContextAdapter target, Type type ) => target.ObjectContext.MetadataWorkspace.GetEntityMetadata( type ).NavigationProperties;
 
 		public static Type[] GetDeclaredEntityTypes( this DbContext context ) => EnumerableExtensions.WhereAssigned( context.GetType().GetProperties().Where( x => x.PropertyType.IsGenericType && typeof( DbSet<> ).IsAssignableFrom( x.PropertyType.GetGenericTypeDefinition() ) ).Select( x => x.PropertyType.GetGenericArguments().FirstOrDefault() ) ).ToArray();
 

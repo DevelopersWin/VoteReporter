@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 using System;
 using System.Runtime.InteropServices;
 
-namespace DragonSpark.Windows.TypeSystem
+namespace DragonSpark.Windows
 {
 	public sealed class AppDomainFormatter : IFormattable
 	{

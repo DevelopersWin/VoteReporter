@@ -4,14 +4,14 @@ namespace DragonSpark.Windows.Runtime.Data
 {
 	public struct DataTransformParameter
 	{
-		public DataTransformParameter( IXPathNavigable stylesheet, IXPathNavigable source )
+		public DataTransformParameter( IXPathNavigable styleSheet, IXPathNavigable source )
 		{
-			Stylesheet = stylesheet;
+			StyleSheet = styleSheet;
 			Source = source;
 		}
 
 		public IXPathNavigable Source { get; }
 
-		public IXPathNavigable Stylesheet { get; }
+		public IXPathNavigable StyleSheet { get; }
 	}
 }

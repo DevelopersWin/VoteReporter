@@ -1,5 +1,4 @@
-﻿using DragonSpark.Windows.Io;
-using System;
+﻿using System;
 using System.Globalization;
 using Xunit;
 

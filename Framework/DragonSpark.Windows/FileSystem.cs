@@ -1,11 +1,11 @@
-﻿using DragonSpark.Application;
-using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
+using DragonSpark.Application;
+using DragonSpark.Diagnostics;
+using DragonSpark.Extensions;
 
-namespace DragonSpark.Windows.Io
+namespace DragonSpark.Windows
 {
 	public static class FileSystem
 	{

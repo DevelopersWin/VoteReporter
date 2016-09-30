@@ -464,7 +464,7 @@ namespace DragonSpark.Windows.Entity
 
 		static EdmMember GetEdmMember( this ObjectContext context, ObjectStateEntry entry, string propertyName )
 		{
-			var entityType = context.MetadataWorkspace.GetEntityMetaData( entry.Entity.GetType() );
+			var entityType = context.MetadataWorkspace.GetEntityMetadata( entry.Entity.GetType() );
 			var edmMembers = entityType.MetadataProperties.First( p => p.Name == "Members" ).Value as IEnumerable<EdmMember> ?? Items<EdmMember>.Default;
 			var edmMember = edmMembers.FirstOrDefault( item => item.Name == propertyName );
 			if ( edmMember == null )

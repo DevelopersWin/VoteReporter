@@ -1,4 +1,3 @@
-using DragonSpark.Windows.TypeSystem;
 using PostSharp.Aspects;
 using System.Reflection;
 

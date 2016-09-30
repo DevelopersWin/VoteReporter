@@ -10,10 +10,10 @@ namespace DragonSpark.Windows.Markup
 
 		readonly IServiceProvider inner;
 
-		public MarkupServiceProvider( IServiceProvider inner, object targetObject, IMarkupProperty property )
+		public MarkupServiceProvider( IServiceProvider inner, object target, IMarkupProperty property )
 		{
 			this.inner = inner;
-			TargetObject = targetObject;
+			TargetObject = target;
 			Property = property;
 		}
 

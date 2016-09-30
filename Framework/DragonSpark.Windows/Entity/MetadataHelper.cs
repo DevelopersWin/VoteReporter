@@ -11,7 +11,7 @@ namespace DragonSpark.Windows.Entity
 {
 	public static class MetadataHelper
 	{
-		static readonly Dictionary<Type, EntityType> EntityTypes = new Dictionary<Type, EntityType>();
+		readonly static Dictionary<Type, EntityType> EntityTypes = new Dictionary<Type, EntityType>();
 
 		/// <summary>
 		/// Gets the entity meta data.
@@ -19,10 +19,7 @@ namespace DragonSpark.Windows.Entity
 		/// <typeparam name="T"></typeparam>
 		/// <param name="context">The context.</param>
 		/// <returns>EntityType.</returns>
-		public static EntityType GetEntityMetaData<T>( this ObjectContext context )
-		{
-			return GetEntityMetaData( context.MetadataWorkspace, typeof(T) );
-		}
+		public static EntityType GetEntityMetadata<T>( this ObjectContext context ) => GetEntityMetadata( context.MetadataWorkspace, typeof(T) );
 
 		/// <summary>
 		/// Gets the entity meta data.
@@ -30,7 +27,7 @@ namespace DragonSpark.Windows.Entity
 		/// <param name="workspace">The workspace.</param>
 		/// <param name="entityType">Type of the entity.</param>
 		/// <returns>EntityType.</returns>
-		public static EntityType GetEntityMetaData( this MetadataWorkspace workspace, Type entityType )
+		public static EntityType GetEntityMetadata( this MetadataWorkspace workspace, Type entityType )
 		{
 			lock ( EntityTypes )
 			{
@@ -88,7 +85,7 @@ namespace DragonSpark.Windows.Entity
 		/// <returns>EntityKey.</returns>
 		public static EntityKey CreateKey<TContext, TId>( ObjectContext context, TId id ) where TContext : EntityObject where TId : struct
 		{
-			var type = GetEntityMetaData<TContext>( context );
+			var type = GetEntityMetadata<TContext>( context );
 			var list = new List<EntityKeyMember> { new EntityKeyMember( new List<EdmMember>( type.KeyMembers )[ 0 ].Name, id ) };
 			return CreateKey( context, typeof(TContext), list );
 		}
@@ -102,7 +99,7 @@ namespace DragonSpark.Windows.Entity
 		/// <returns>EntityKey.</returns>
 		public static EntityKey CreateKey<T>( ObjectContext context, params object[] values )
 		{
-			var type = GetEntityMetaData( context.MetadataWorkspace, typeof(T) );
+			var type = GetEntityMetadata( context.MetadataWorkspace, typeof(T) );
 			var list = new List<EntityKeyMember>( type.KeyMembers.Select( x => new EntityKeyMember( x.Name, values[ type.KeyMembers.IndexOf( x ) ] ) ) );
 			return CreateKey( context, typeof(T), list );
 		}
@@ -165,7 +162,7 @@ namespace DragonSpark.Windows.Entity
 		/// <returns>EntityKey.</returns>
 		public static EntityKey ExtractKey( ObjectContext context, Type type, object target )
 		{
-			var metadata = GetEntityMetaData( context.Initialized().MetadataWorkspace, type );
+			var metadata = GetEntityMetadata( context.Initialized().MetadataWorkspace, type );
 			try
 			{
 				var pairs = ExtractKeyValues( metadata, target );
@@ -184,7 +181,7 @@ namespace DragonSpark.Windows.Entity
 		/// <param name="type">The type.</param>
 		/// <param name="target">The target.</param>
 		/// <returns>List&lt;EntityKeyMember&gt;.</returns>
-		public static List<EntityKeyMember> ExtractKeyValues( EntityType type, object target )
+		public static IEnumerable<EntityKeyMember> ExtractKeyValues( EntityType type, object target )
 		{
 			var dictionary = target as IDictionary;
 			var targetType = target.GetType();
