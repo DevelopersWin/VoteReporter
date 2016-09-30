@@ -176,6 +176,7 @@
     <Compile Include="Runtime\ThreadLocalStorage.cs" />
     <Compile Include="Runtime\TaskLocalStore.cs" />
     <Compile Include="Setup\UserSettingsPathFactory.cs" />
+    <Compile Include="TypeSystem\AppDomainFormatter.cs" />
     <Compile Include="TypeSystem\AssemblyLocator.cs" />
     <Compile Include="TypeSystem\QueryableResourceLocator.cs" />
   </ItemGroup>

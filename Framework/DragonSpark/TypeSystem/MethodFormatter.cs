@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.TypeSystem
 {
-	public class MethodFormatter : IFormattable
+	public sealed class MethodFormatter : IFormattable
 	{
 		readonly MethodBase method;
 

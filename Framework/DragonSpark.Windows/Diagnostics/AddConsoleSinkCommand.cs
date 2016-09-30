@@ -1,3 +1,4 @@
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Diagnostics.Logging.Configurations;
 using PostSharp.Patterns.Contracts;
 using Serilog;
@@ -8,7 +9,7 @@ namespace DragonSpark.Windows.Diagnostics
 {
 	public class AddConsoleSinkCommand : AddSinkCommand
 	{
-		public AddConsoleSinkCommand() : this( "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}", LogEventLevel.Verbose ) {}
+		public AddConsoleSinkCommand() : this( Defaults.Template, LogEventLevel.Verbose ) {}
 
 		public AddConsoleSinkCommand( [NotEmpty]string outputTemplate, LogEventLevel restrictedToMinimumLevel ) : base( restrictedToMinimumLevel )
 		{

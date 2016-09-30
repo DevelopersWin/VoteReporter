@@ -8,6 +8,7 @@
 	xmlns:ds="http://framework.dragonspark.us"
 	xmlns:properties="clr-namespace:DevelopersWin.VoteReporter.Parts.Development.Properties"
 	mc:Ignorable="d" 
+	Priority="BeforeNormal"
 >
 	<commands:DeclaredSuppliedCommand Command="{x:Static ds:InitializeUserSettingsCommand.Default}" Parameter="{x:Static properties:Settings.Default}" />
 </setup:DeclarativeSetup>

@@ -1,9 +1,9 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Coercion;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Composition;
-using DragonSpark.Coercion;
 
 namespace DragonSpark
 {
@@ -13,7 +13,7 @@ namespace DragonSpark
 	{
 		[Export]
 		public static IFormatter Default { get; } = new Formatter();
-		Formatter() : this( Inner.DefaultNested.Apply( ConstructCoercer<Parameter>.Default ), Inner.DefaultNested ) {}
+		Formatter() : this( Inner.DefaultNested.Apply( ConstructCoercer<Parameter>.Default ).ToCache(), Inner.DefaultNested ) {}
 
 		readonly IParameterizedSource<object, string> general;
 		
@@ -23,6 +23,7 @@ namespace DragonSpark
 		}
 
 		public string Get( object item ) => general.Get( item );
+
 
 		sealed class Inner : ParameterizedSourceBase<Parameter, string>
 		{

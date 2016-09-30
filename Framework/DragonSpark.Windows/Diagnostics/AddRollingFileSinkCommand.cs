@@ -1,3 +1,4 @@
+using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Diagnostics.Logging.Configurations;
 using PostSharp.Patterns.Contracts;
 using Serilog;
@@ -8,7 +9,7 @@ namespace DragonSpark.Windows.Diagnostics
 {
 	public class AddRollingFileSinkCommand : AddSinkCommand
 	{
-		public AddRollingFileSinkCommand() : this( "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}", 1073741824, 31, LogEventLevel.Verbose ) {}
+		public AddRollingFileSinkCommand() : this( Defaults.Template, 1073741824, 31, LogEventLevel.Verbose ) {}
 
 		public AddRollingFileSinkCommand( string outputTemplate, long fileSizeLimitBytes, int retainedFileCountLimit, LogEventLevel restrictedToMinimumLevel ) : base( restrictedToMinimumLevel )
 		{
