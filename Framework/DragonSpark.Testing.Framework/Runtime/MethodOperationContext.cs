@@ -1,5 +1,5 @@
 using DragonSpark.Commands;
-using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics;
 using DragonSpark.Runtime;
 using System;
 using System.Reflection;

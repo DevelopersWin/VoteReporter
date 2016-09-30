@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation.Location;
 using DragonSpark.Application;
 using DragonSpark.Composition;
-using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;

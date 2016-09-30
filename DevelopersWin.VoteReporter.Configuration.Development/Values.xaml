@@ -6,7 +6,7 @@
 	xmlns:configuration="clr-namespace:DragonSpark.Configuration;assembly=DragonSpark"
 	xmlns:ds="http://framework.dragonspark.us"
 	xmlns:properties="clr-namespace:DevelopersWin.VoteReporter.Parts.Development.Properties"
-	xmlns:configurations="clr-namespace:DragonSpark.Diagnostics.Logging.Configurations;assembly=DragonSpark"
+	xmlns:configurations="clr-namespace:DragonSpark.Diagnostics.Configurations;assembly=DragonSpark"
 	mc:Ignorable="d" 
 	>
 	<configuration:Registration Key="{ds:MemberInfoKey {x:Type configurations:AddSeqSinkCommand}, 'Endpoint'}" Value="{ds:Eval {x:Static properties:Settings.Default}, 'ServerUri'}" />

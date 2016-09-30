@@ -34,7 +34,7 @@ namespace DragonSpark.Testing.Application.Setup
 		{
 			var result = DefaultServices.Default.Get<ILogger>();
 			Assert.NotNull( result );
-			Assert.Same( DragonSpark.Diagnostics.Logging.Logger.Default.Get( Execution.Current() ), result );
+			Assert.Same( DragonSpark.Diagnostics.Logger.Default.Get( Execution.Current() ), result );
 		}
 
 		[Fact]

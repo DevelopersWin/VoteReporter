@@ -1,9 +1,9 @@
-﻿using DragonSpark.Diagnostics.Logging;
+﻿using DragonSpark.Application;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using System;
 using System.Globalization;
 using System.IO;
-using DragonSpark.Application;
 
 namespace DragonSpark.Windows.Io
 {

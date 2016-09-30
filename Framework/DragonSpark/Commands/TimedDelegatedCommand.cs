@@ -1,4 +1,4 @@
-using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics;
 using SerilogTimings.Extensions;
 using System;
 using System.Reflection;

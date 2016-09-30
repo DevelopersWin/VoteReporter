@@ -1,4 +1,4 @@
-﻿using DragonSpark.Diagnostics.Logging;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Application;

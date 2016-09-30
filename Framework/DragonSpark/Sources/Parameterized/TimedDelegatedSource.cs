@@ -1,7 +1,7 @@
+using DragonSpark.Diagnostics;
+using SerilogTimings.Extensions;
 using System;
 using System.Reflection;
-using DragonSpark.Diagnostics.Logging;
-using SerilogTimings.Extensions;
 
 namespace DragonSpark.Sources.Parameterized
 {

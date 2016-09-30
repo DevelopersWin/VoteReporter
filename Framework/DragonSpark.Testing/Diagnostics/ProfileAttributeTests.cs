@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
@@ -28,7 +28,7 @@ namespace DragonSpark.Testing.Diagnostics
 		[Fact]
 		public void AssignedSource()
 		{
-			var configuration = DragonSpark.Diagnostics.Logging.Configuration.TimedOperationFactory;
+			var configuration = DragonSpark.Diagnostics.Configuration.TimedOperationFactory;
 			configuration.Configured( TimedOperationFactory.Default.ToEqualityCache().ToSourceDelegate().GlobalCache() ).Execute();
 
 			var history = LoggingHistory.Default.Get();

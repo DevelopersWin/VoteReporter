@@ -21,7 +21,7 @@ namespace DragonSpark.Aspects
 
 		public TimedAttribute() : this( "Executed Method '{@Method}'" ) {}
 
-		public TimedAttribute( string template ) : this( Diagnostics.Logging.Configuration.TimedOperationFactory.Fixed( template ).ToDelegate() ) {}
+		public TimedAttribute( string template ) : this( Diagnostics.Configuration.TimedOperationFactory.Fixed( template ).ToDelegate() ) {}
 
 		TimedAttribute( Func<Func<MethodBase, IDisposable>> source )
 		{

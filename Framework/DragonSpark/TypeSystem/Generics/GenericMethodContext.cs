@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Reflection;
-using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem.Metadata;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Reflection;
 
 namespace DragonSpark.TypeSystem.Generics
 {

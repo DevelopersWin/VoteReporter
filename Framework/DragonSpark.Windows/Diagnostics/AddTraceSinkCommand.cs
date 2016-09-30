@@ -1,5 +1,5 @@
-using DragonSpark.Diagnostics.Logging;
-using DragonSpark.Diagnostics.Logging.Configurations;
+using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Configurations;
 using PostSharp.Patterns.Contracts;
 using Serilog.Configuration;
 using Serilog.Core;

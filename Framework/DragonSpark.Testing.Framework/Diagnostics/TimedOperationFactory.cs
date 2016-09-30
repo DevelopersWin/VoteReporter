@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Diagnostics
 {
-	public sealed class TimedOperationFactory : DragonSpark.Diagnostics.Logging.TimedOperationFactory
+	public sealed class TimedOperationFactory : DragonSpark.Diagnostics.TimedOperationFactory
 	{
 		public const string ExecutedTestMethodMethod = "Executed Test Method '{@Method}'";
 

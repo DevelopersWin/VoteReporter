@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Aspects.Exceptions;
 using DragonSpark.Commands;
+using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Exceptions;
-using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Sources;
 using JetBrains.Annotations;
 using Polly;

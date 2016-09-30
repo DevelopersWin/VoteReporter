@@ -1,4 +1,4 @@
-﻿using DragonSpark.Diagnostics.Logging;
+﻿using DragonSpark.Diagnostics;
 using DragonSpark.Sources;
 using Serilog;
 using System;
@@ -8,7 +8,7 @@ namespace DragonSpark.Aspects.Exceptions
 	class RetryDelegateFactory : SourceBase<Action<Exception, TimeSpan>>
 	{
 		public static RetryDelegateFactory Default { get; } = new RetryDelegateFactory();
-		RetryDelegateFactory() : this( Diagnostics.Logging.Defaults.Factory, LogRetryException.Defaults.Get ) {}
+		RetryDelegateFactory() : this( Diagnostics.Defaults.Factory, LogRetryException.Defaults.Get ) {}
 
 		readonly Func<ILogger> loggerSource;
 		readonly Func<ILogger, LogExceptionCommandBase<TimeSpan>> commandSource;

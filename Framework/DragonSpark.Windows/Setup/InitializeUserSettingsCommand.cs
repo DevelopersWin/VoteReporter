@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Commands;
-using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;

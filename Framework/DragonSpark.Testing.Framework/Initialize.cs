@@ -1,4 +1,4 @@
-using DragonSpark.Diagnostics.Logging;
+using DragonSpark.Diagnostics;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework.Runtime;
 using PostSharp.Aspects;
