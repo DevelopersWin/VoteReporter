@@ -51,7 +51,7 @@ namespace DragonSpark.Activation
 			object LocateAndCreate( ConstructTypeRequest parameter )
 			{
 				var info = constructorSource( parameter );
-				var result = info != null ? activatorSource( info )?.Invoke( WithOptional( parameter.Arguments, info.GetParameters() ) ) : null;
+				var result = info != null ? activatorSource( info )?.Invoke( WithOptional( parameter.Arguments.ToArray(), info.GetParameters() ) ) : null;
 				return result;
 			}
 
