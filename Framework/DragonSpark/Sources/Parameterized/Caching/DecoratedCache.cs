@@ -21,7 +21,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		public override bool Remove( TInstance instance ) => cache.Remove( instance );
 
-		public override void Set( TInstance parameter, TValue result ) => cache.Set( parameter, result );
+		public override void Set( TInstance instance, TValue value ) => cache.Set( instance, value );
 	}
 
 	public class DecoratedCache<T> : DecoratedCache<object, T>

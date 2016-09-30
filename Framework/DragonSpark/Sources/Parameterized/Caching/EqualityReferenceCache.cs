@@ -21,7 +21,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		public override bool Remove( TInstance instance ) => base.Remove( equalitySource( instance ) );
 
-		public override void Set( TInstance parameter, TValue result ) => base.Set( equalitySource( parameter ), result );
+		public override void Set( TInstance instance, TValue value ) => base.Set( equalitySource( instance ), value );
 
 		public override TValue Get( TInstance parameter ) => base.Get( equalitySource( parameter )  );
 	}

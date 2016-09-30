@@ -1,10 +1,10 @@
-﻿using System;
-using DragonSpark.Sources.Parameterized.Caching;
+﻿using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
+using System;
 
 namespace DragonSpark.Extensions
 {
-	public class TypeAdapterCache : Cache<Type, TypeAdapter>
+	public sealed class TypeAdapterCache : Cache<Type, TypeAdapter>
 	{
 		public static TypeAdapterCache Default { get; } = new TypeAdapterCache();
 

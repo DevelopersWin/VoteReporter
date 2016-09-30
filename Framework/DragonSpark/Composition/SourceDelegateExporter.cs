@@ -5,7 +5,7 @@ using System.Composition.Hosting.Core;
 
 namespace DragonSpark.Composition
 {
-	public class SourceDelegateExporter : SourceDelegateExporterBase
+	public sealed class SourceDelegateExporter : SourceDelegateExporterBase
 	{
 		readonly static Func<CompositionContract, CompositionContract> Resolver = SourceDelegateContractResolver.Default.ToSourceDelegate();
 		readonly static Func<ActivationParameter, object> DelegateSource = Factory.DefaultNested.Get;

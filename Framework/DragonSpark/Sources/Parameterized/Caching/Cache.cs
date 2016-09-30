@@ -30,12 +30,12 @@ namespace DragonSpark.Sources.Parameterized.Caching
 			return items.TryGetValue( instance, out temp );
 		}
 
-		public override void Set( TInstance parameter, TValue result )
+		public override void Set( TInstance instance, TValue value )
 		{
 			lock ( items )
 			{
-				items.Remove( parameter );
-				items.Add( parameter, result );
+				items.Remove( instance );
+				items.Add( instance, value );
 			}
 		}
 

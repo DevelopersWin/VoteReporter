@@ -1,6 +1,7 @@
-using System;
 using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
+using System;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Activation
 {
@@ -14,17 +15,17 @@ namespace DragonSpark.Activation
 
 		public ConstructTypeRequest( Type type, params object[] arguments ) : base( type )
 		{
-			Arguments = arguments;
+			Arguments = arguments.ToImmutableArray();
 
 			unchecked
 			{
-				code = base.GetHashCode() * 397 ^ Comparer.GetHashCode( Arguments );
+				code = base.GetHashCode() * 397 ^ Comparer.GetHashCode( arguments );
 			}
 		}
 
-		public object[] Arguments { get; }
+		public ImmutableArray<object> Arguments { get; }
 
-		public bool Equals( ConstructTypeRequest other ) => base.Equals( other ) && Comparer.Equals( Arguments, other.Arguments );
+		public bool Equals( ConstructTypeRequest other ) => base.Equals( other ) && code == other.code;
 
 		public override bool Equals( object obj ) => obj is ConstructTypeRequest && Equals( (ConstructTypeRequest)obj );
 

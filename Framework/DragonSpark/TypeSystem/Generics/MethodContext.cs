@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace DragonSpark.TypeSystem.Generics
 {
-	public sealed class MethodContext<T> : ArgumentCache<Type[], T> where T : class 
+	public sealed class MethodContext<T> : ArgumentCache<ImmutableArray<Type>, T> where T : class 
 	{
 		public MethodContext( ImmutableArray<GenericMethodCandidate<T>> candidates ) : this( new Factory( candidates ).Get ) {}
-		MethodContext( Func<Type[], T> resultSelector ) : base( resultSelector ) {}
+		MethodContext( Func<ImmutableArray<Type>, T> resultSelector ) : base( resultSelector ) {}
 
-		sealed class Factory : ParameterizedSourceBase<Type[], T>
+		sealed class Factory : ParameterizedSourceBase<ImmutableArray<Type>, T>
 		{
 			readonly ImmutableArray<GenericMethodCandidate<T>> candidates;
 
@@ -21,7 +21,7 @@ namespace DragonSpark.TypeSystem.Generics
 				this.candidates = candidates;
 			}
 
-			public override T Get( Type[] parameter ) => candidates.Introduce( parameter, tuple => tuple.Item1.Specification( tuple.Item2 ), tuple => tuple.Item1.Delegate ).Single();
+			public override T Get( ImmutableArray<Type> parameter ) => candidates.Introduce( parameter.ToArray(), tuple => tuple.Item1.Specification( tuple.Item2 ), tuple => tuple.Item1.Delegate ).Single();
 		}
 	}
 }

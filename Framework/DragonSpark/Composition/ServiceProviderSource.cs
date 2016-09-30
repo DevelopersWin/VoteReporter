@@ -4,7 +4,7 @@ using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Composition
 {
-	public class ServiceProviderSource : SuppliedSource<IActivator, IActivator>
+	public sealed class ServiceProviderSource : SuppliedSource<IActivator, IActivator>
 	{
 		public static ServiceProviderSource Default { get; } = new ServiceProviderSource();
 		ServiceProviderSource() : base( ServiceProviderFactory.Default.Get, DefaultServices.Default ) {}

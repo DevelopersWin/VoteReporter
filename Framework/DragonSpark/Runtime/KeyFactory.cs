@@ -5,9 +5,8 @@ namespace DragonSpark.Runtime
 {
 	public sealed class KeyFactory //  : KeyFactory<int>
 	{
-		// public static KeyFactory Default { get; } = new KeyFactory();
-
-		// public string ToString( params object[] items ) => Create( items ).ToString();
+		public static KeyFactory Default { get; } = new KeyFactory();
+		KeyFactory() {}
 
 		public static int CreateUsing( params object[] parameter ) => Create( ImmutableArray.CreateRange( parameter ) );
 

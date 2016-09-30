@@ -16,7 +16,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		public override bool Contains( TInstance instance ) => inner.Contains( instance );
 
-		public override void Set( TInstance parameter, TValue result ) => inner.Get( parameter ).Assign( result );
+		public override void Set( TInstance instance, TValue value ) => inner.Get( instance ).Assign( value );
 
 		public override TValue Get( TInstance parameter ) => inner.Get( parameter ).Get();
 

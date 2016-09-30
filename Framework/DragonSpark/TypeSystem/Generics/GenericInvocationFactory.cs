@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using System;
+using System.Collections.Immutable;
 
 namespace DragonSpark.TypeSystem.Generics
 {
@@ -30,7 +31,7 @@ namespace DragonSpark.TypeSystem.Generics
 			}
 
 			public override Func<TParameter, TResult> Get( Type parameter ) => 
-				context.Make( parameter.Adapt().GetTypeArgumentsFor( genericType ) ).Get( new[] { parameter } ).Invoke<TParameter, TResult>;
+				context.Make( parameter.Adapt().GetTypeArgumentsFor( genericType ) ).Get( new[] { parameter }.ToImmutableArray() ).Invoke<TParameter, TResult>;
 		}
 
 		public override TResult Get( TParameter parameter ) => get( parameter.GetType() )( parameter );

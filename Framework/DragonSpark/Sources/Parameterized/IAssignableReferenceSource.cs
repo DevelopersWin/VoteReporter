@@ -1,8 +1,8 @@
 namespace DragonSpark.Sources.Parameterized
 {
 	public interface IAssignableReferenceSource<T> : IAssignableReferenceSource<object, T>, IParameterizedSource<T> {}
-	public interface IAssignableReferenceSource<in TParameter, TResult> : IParameterizedSource<TParameter, TResult>
+	public interface IAssignableReferenceSource<in TInstance, TValue> : IParameterizedSource<TInstance, TValue>
 	{
-		void Set( TParameter parameter, TResult result );
+		void Set( TInstance instance, TValue value );
 	}
 }

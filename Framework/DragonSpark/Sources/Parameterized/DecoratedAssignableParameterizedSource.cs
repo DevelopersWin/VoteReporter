@@ -8,6 +8,6 @@ namespace DragonSpark.Sources.Parameterized
 			this.source = source;
 		}
 
-		public void Set( TParameter parameter, TResult result ) => source.Set( parameter, result );
+		public void Set( TParameter instance, TResult value ) => source.Set( instance, value );
 	}
 }

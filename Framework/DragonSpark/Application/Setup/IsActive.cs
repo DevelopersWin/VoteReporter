@@ -4,7 +4,7 @@ using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Application.Setup
 {
-	public class IsActive : DecoratedSourceCache<Type, bool>
+	public sealed class IsActive : DecoratedSourceCache<Type, bool>
 	{
 		public static IParameterizedSource<IServiceProvider, IsActive> Default { get; } = new Cache<IServiceProvider, IsActive>( provider => new IsActive() );
 		IsActive() : base( new ThreadLocalSourceCache<Type, bool>() ) {}

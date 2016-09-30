@@ -1,19 +1,26 @@
-using System;
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace DragonSpark.TypeSystem
 {
-	sealed class ObjectTypeFactory : ParameterizedSourceBase<object[], Type[]>
+	sealed class ObjectTypeFactory : ParameterizedSourceBase<IEnumerable<object>, ImmutableArray<Type>>
 	{
 		public static ObjectTypeFactory Default { get; } = new ObjectTypeFactory();
+		ObjectTypeFactory() {}
 
-		public override Type[] Get( object[] parameter )
+		public override ImmutableArray<Type> Get( IEnumerable<object> parameter )
 		{
-			var result = new Type[parameter.Length];
-			for ( var i = 0; i < parameter.Length; i++ )
+			var items = parameter.Fixed();
+			var length = items.Length;
+			var types = new Type[length];
+			for ( var i = 0; i < length; i++ )
 			{
-				result[i] = parameter[i]?.GetType();
+				types[i] = items[i]?.GetType();
 			}
+			var result = types.ToImmutableArray();
 			return result;
 		}
 	}

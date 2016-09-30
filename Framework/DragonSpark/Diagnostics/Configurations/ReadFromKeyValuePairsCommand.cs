@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using PostSharp.Patterns.Contracts;
 using Serilog.Configuration;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace DragonSpark.Diagnostics.Configurations
 			Dictionary = dictionary;
 		}
 
-		[Required]
+		[Required, UsedImplicitly]
 		public IDictionary<string, string> Dictionary { [return: Required]get; set; }
 
 		protected override void Configure( LoggerSettingsConfiguration configuration ) => configuration.KeyValuePairs( Dictionary );

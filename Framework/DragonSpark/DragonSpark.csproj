@@ -161,6 +161,7 @@
     <Compile Include="Composition\ConstructorSelector.cs" />
     <Compile Include="Composition\Contracts.cs" />
     <Compile Include="Composition\ExportDescriptorProviderBase.cs" />
+    <Compile Include="Composition\ExportMappings.cs" />
     <Compile Include="Composition\IsValidConstructorSpecification.cs" />
     <Compile Include="Composition\SingletonExportSource.cs" />
     <Compile Include="Aspects\ApplyValuesFromSource.cs" />
@@ -589,7 +590,6 @@
     <Compile Include="Commands\DisposeDisposableCommand.cs" />
     <Compile Include="Application\FatalApplicationException.cs" />
     <Compile Include="Commands\ICommand.cs" />
-    <Compile Include="Sources\Parameterized\AssignableParameterizedSourceBase.cs" />
     <Compile Include="Sources\AssignableSourceBase.cs" />
     <Compile Include="Sources\CacheContainsSpecification.cs" />
     <Compile Include="Sources\CacheValueSpecification.cs" />
@@ -608,9 +608,7 @@
     <Compile Include="Sources\Parameterized\Caching\ICacheRegistry.cs" />
     <Compile Include="Sources\Parameterized\Caching\IStackSource.cs" />
     <Compile Include="Sources\Parameterized\Caching\ISourceCache.cs" />
-    <Compile Include="Sources\Parameterized\Caching\ListCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\CacheRegistry.cs" />
-    <Compile Include="Sources\Parameterized\Caching\SetCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\Stack.cs" />
     <Compile Include="Sources\Parameterized\Caching\Stacks.cs" />
     <Compile Include="Sources\Parameterized\Caching\SourceCache.cs" />
