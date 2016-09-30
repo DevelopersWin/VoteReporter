@@ -42,7 +42,7 @@ namespace DragonSpark.Activation
 		sealed class Factories : CompiledDelegateFactoryBase<ConstructorInfo, Func<TParameter, TResult>>
 		{
 			public static IParameterizedSource<ConstructorInfo, Func<TParameter, TResult>> DefaultNested { get; } = new Cache<ConstructorInfo, Func<TParameter, TResult>>( new Factories().Get );
-			Factories() : base( FormatterParameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, CreateParameters( parameter ) ) ) {}
+			Factories() : base( Parameter.Create<TParameter>(), parameter => Expression.New( parameter.Input, CreateParameters( parameter ) ) ) {}
 
 			static IEnumerable<Expression> CreateParameters( ExpressionBodyParameter<ConstructorInfo> parameter )
 			{

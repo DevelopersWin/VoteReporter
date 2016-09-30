@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Sources
 		{
 			var count = 0;
 			var factory = new Func<int>( () => ++count );
-			var singleton = new SuppliedDeferedSource<int>( factory );
+			var singleton = new SuppliedDeferredSource<int>( factory );
 			Assert.Equal( 1, singleton.Get() );
 			Assert.Equal( 1, singleton.Get() );
 			Assert.Equal( 1, singleton.Get() );

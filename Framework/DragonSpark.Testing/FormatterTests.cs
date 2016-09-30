@@ -1,8 +1,8 @@
-﻿using System.Reflection;
-using DragonSpark.Testing.Framework;
+﻿using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.TypeSystem;
+using System.Reflection;
 using Xunit;
 
 namespace DragonSpark.Testing
@@ -14,7 +14,7 @@ namespace DragonSpark.Testing
 		public void MethodFormatsAsExpected( [Service]Formatter sut )
 		{
 			var method = MethodBase.GetCurrentMethod();
-			var formatted = sut.Get( new Formatter.Parameter( method ) );
+			var formatted = sut.Get( new FormatterParameter( method ) );
 			Assert.IsType<string>( formatted );
 			Assert.Equal( new MethodFormatter( method ).ToString(), formatted );
 		}

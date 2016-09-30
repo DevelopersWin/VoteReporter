@@ -2,9 +2,9 @@
 
 namespace DragonSpark.Diagnostics.Exceptions
 {
-	public sealed class BackoffRetryTime : RetryTimeBase
+	public sealed class BackOffRetryTime : RetryTimeBase
 	{
-		public static BackoffRetryTime Default { get; } = new BackoffRetryTime();
-		BackoffRetryTime() : base( parameter => (int)Math.Pow( parameter, 2 ) ) {}
+		public static BackOffRetryTime Default { get; } = new BackOffRetryTime();
+		BackOffRetryTime() : base( parameter => (int)Math.Pow( parameter, 2 ) ) {}
 	}
 }

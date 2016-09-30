@@ -622,7 +622,7 @@
     <Compile Include="Sources\DelegatedSource.cs" />
     <Compile Include="Sources\EmptySource.cs" />
     <Compile Include="Sources\Factory.cs" />
-    <Compile Include="Sources\SuppliedDeferedSource.cs" />
+    <Compile Include="Sources\SuppliedDeferredSource.cs" />
     <Compile Include="Sources\CachedFactoryBuilder.cs" />
     <Compile Include="Sources\SuppliedSource.cs" />
     <Compile Include="Sources\IAssignable.cs" />

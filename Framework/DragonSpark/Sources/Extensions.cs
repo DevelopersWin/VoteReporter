@@ -144,7 +144,7 @@ namespace DragonSpark.Sources
 		sealed class SuppliedSources<T> : Cache<ISource<T>, ISource<T>>
 		{
 			public static SuppliedSources<T> Default { get; } = new SuppliedSources<T>();
-			SuppliedSources() : base( source => new SuppliedDeferedSource<T>( source.Get ) ) {}
+			SuppliedSources() : base( source => new SuppliedDeferredSource<T>( source.Get ) ) {}
 		}
 		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
 		class SourceDelegates<T> : Cache<ISource<ISource<T>>, Func<T>>

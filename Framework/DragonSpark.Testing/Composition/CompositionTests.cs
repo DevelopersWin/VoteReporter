@@ -112,24 +112,24 @@ namespace DragonSpark.Testing.Composition
 		public void BasicCompositionWithParameter( CompositionContext host, string text )
 		{
 			var test = host.GetExport<IParameterService>();
-			var parameter = Assert.IsType<FormatterParameter>( test.Parameter );
+			var parameter = Assert.IsType<Parameter>( test.Parameter );
 			Assert.Equal( "WithInstance by ParameterService", parameter.Message );
 		}
 
 		[Theory, AutoData, Types]
 		public void FactoryWithParameterDelegate( CompositionContext host, string message )
 		{
-			var factory = host.GetExport<Func<FormatterParameter, IParameterService>>();
+			var factory = host.GetExport<Func<Parameter, IParameterService>>();
 			Assert.NotNull( factory );
 
-			var parameter = new FormatterParameter();
+			var parameter = new Parameter();
 			var created = factory( parameter );
 				
 			Assert.Same( parameter, created.Parameter );
 			Assert.Equal( "WithInstance by ParameterService", parameter.Message );
 
 			var test = host.GetExport<IParameterService>();
-			var p = Assert.IsType<FormatterParameter>( test.Parameter );
+			var p = Assert.IsType<Parameter>( test.Parameter );
 			Assert.Equal( "WithInstance by ParameterService", p.Message );
 			Assert.NotSame( parameter, p );
 		}
