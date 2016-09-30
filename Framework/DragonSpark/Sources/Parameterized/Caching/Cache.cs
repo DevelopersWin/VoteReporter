@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
@@ -31,7 +30,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 			return items.TryGetValue( instance, out temp );
 		}
 
-		public override void Set( TInstance instance, [Optional]TValue value )
+		public override void Set( TInstance instance, TValue value )
 		{
 			lock ( items )
 			{

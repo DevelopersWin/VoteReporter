@@ -137,7 +137,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Sources\Parameterized\Caching\AmbientStackTests.cs" />
-    <Compile Include="Setup\ApplyMigrationCommandTests.cs" />
     <Compile Include="Application\ApplicationAssemblyFilterTests.cs" />
     <Compile Include="TypeSystem\ItemsTests.cs" />
     <Compile Include="TypeSystem\Metadata\DerivedMethodSpecificationTests.cs" />

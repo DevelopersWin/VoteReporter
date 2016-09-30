@@ -40,8 +40,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Logger.xaml.cs">
-      <DependentUpon>Logger.xaml</DependentUpon>
+    <Compile Include="Logging.xaml.cs">
+      <DependentUpon>Logging.xaml</DependentUpon>
     </Compile>
     <Compile Include="Mappings.cs" />
     <Compile Include="Settings.cs" />
@@ -60,7 +60,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Logger.xaml">
+    <Page Include="Logging.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,14 +1,14 @@
-﻿using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Aspects.Validation;
+using DragonSpark.Sources.Parameterized;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using DragonSpark.Aspects.Validation;
 
 namespace DragonSpark.Diagnostics.Logging
 {
 	[ApplyAutoValidation]
-	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommand<string>
+	public class PurgeLoggerMessageHistoryCommand : PurgeLoggerHistoryCommandBase<string>
 	{
 		readonly static Func<IEnumerable<LogEvent>, ImmutableArray<string>> MessageFactory = LogEventMessageFactory.Default.ToSourceDelegate();
 

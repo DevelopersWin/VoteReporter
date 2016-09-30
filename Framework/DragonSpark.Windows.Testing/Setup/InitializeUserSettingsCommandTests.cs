@@ -1,12 +1,12 @@
 ﻿using DragonSpark.Diagnostics.Logging;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Objects.Properties;
 using DragonSpark.Windows.Setup;
 using JetBrains.Annotations;
 using System.Configuration;
 using System.Linq;
-using DragonSpark.Testing.Framework.Application;
 using Xunit;
 using Xunit.Abstractions;
 using Resources = DragonSpark.Windows.Properties.Resources;
@@ -42,17 +42,12 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			path.Refresh();
 			Assert.False( path.Exists );
-			sut.Execute( Settings.Default );
-
-			path.Refresh();
-			Assert.False( path.Exists );
-			Assert.Equal( before.Length + 2, history.Events.Count() );
 		}
 
 		[Theory, AutoData]
-		public void CreateThenRecreate( InitializeUserSettingsCommand create, InitializeUserSettingsCommand sut, ILoggerHistory history )
+		public void CreateThenRecreate( InitializeUserSettingsCommand sut, ILoggerHistory history )
 		{
-			create.Execute( Settings.Default );
+			sut.Execute( Settings.Default );
 			var created = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_NotFound, created );
 			Assert.Contains( Resources.LoggerTemplates_Created, created );

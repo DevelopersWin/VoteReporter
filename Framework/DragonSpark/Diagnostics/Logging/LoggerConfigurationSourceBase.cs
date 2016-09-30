@@ -1,7 +1,6 @@
 using DragonSpark.Commands;
-using DragonSpark.Configuration;
 using DragonSpark.Diagnostics.Logging.Configurations;
-using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using Serilog;
 using Serilog.Core;
@@ -9,11 +8,12 @@ using System;
 
 namespace DragonSpark.Diagnostics.Logging
 {
-	public abstract class LoggerConfigurationSourceBase : ConfigurationSource<LoggerConfiguration>
+	class DefaultLoggerAlterations : ItemSource<IAlteration<LoggerConfiguration>>
 	{
 		readonly static IAlteration<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Default.ToAlteration();
 
-		protected LoggerConfigurationSourceBase( params IAlteration<LoggerConfiguration>[] items ) : base( items.Fixed( LogContext, FormatterConfiguration.Default, ControllerAlteration.Default, ApplicationAssemblyAlteration.Default ) ) {}
+		public static DefaultLoggerAlterations Default { get; } = new DefaultLoggerAlterations();
+		DefaultLoggerAlterations() : base( LogContext, FormatterConfiguration.Default, ControllerAlteration.Default, ApplicationAssemblyAlteration.Default ) {}
 
 		sealed class ControllerAlteration : AlterationBase<LoggerConfiguration>
 		{
@@ -30,4 +30,5 @@ namespace DragonSpark.Diagnostics.Logging
 			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.MinimumLevel.ControlledBy( controller() );
 		}
 	}
+	
 }
