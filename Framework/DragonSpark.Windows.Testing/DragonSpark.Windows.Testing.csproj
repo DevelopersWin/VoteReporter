@@ -40,7 +40,7 @@
   <ItemGroup>
     <Compile Include="Configuration\ConfigurationTests.cs" />
     <Compile Include="Diagnostics\ApplyExceptionDetailsTests.cs" />
-    <Compile Include="Io\FileSystemTests.cs" />
+    <Compile Include="FileSystemTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -98,6 +98,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Io\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />

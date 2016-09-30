@@ -9,8 +9,8 @@ namespace DragonSpark.Windows
 		public static void Execute()
 		{
 			Application.Execution.Context.Assign( ExecutionContext.Default );
-			DragonSpark.TypeSystem.Configuration.AssemblyLoader.Assign( o => Assembly.LoadFile );
-			DragonSpark.TypeSystem.Configuration.AssemblyPathLocator.Assign( o => AssemblyLocator.Default.Get );
+			TypeSystem.Configuration.AssemblyLoader.Assign( o => Assembly.LoadFile );
+			TypeSystem.Configuration.AssemblyPathLocator.Assign( o => AssemblyLocator.Default.Get );
 		}
 	}
 }

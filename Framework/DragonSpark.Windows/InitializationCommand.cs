@@ -10,8 +10,8 @@ namespace DragonSpark.Windows
 	public class InitializationCommand : DeclarativeSetup
 	{
 		public InitializationCommand() : base( Priority.Higher,
-			DragonSpark.TypeSystem.Configuration.TypeDefinitionProviders.Configured( TypeDefinitionProviderSource.Default.ToCachedDelegate() ),
-			DragonSpark.TypeSystem.Configuration.ApplicationAssemblyLocator.Configured( ApplicationAssemblyLocator.Default.ToSourceDelegate() )
+			TypeSystem.Configuration.TypeDefinitionProviders.Configured( TypeDefinitionProviderSource.Default.ToCachedDelegate() ),
+			TypeSystem.Configuration.ApplicationAssemblyLocator.Configured( ApplicationAssemblyLocator.Default.ToSourceDelegate() )
 		)
 		{}
 	}
