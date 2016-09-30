@@ -25,13 +25,5 @@ namespace DragonSpark.Commands
 				base.Execute( parameter );
 			}
 		}
-
-		/*public override TResult Get( TParameter parameter )
-		{
-			using ( Logger.Default.Get( method ).TimeOperation( template, method, parameter ) )
-			{
-				return base.Get( parameter );
-			}
-		}*/
 	}
 }

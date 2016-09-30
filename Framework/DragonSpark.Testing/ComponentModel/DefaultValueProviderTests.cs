@@ -1,33 +1,15 @@
 ﻿using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Objects;
-using System;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;
+using DragonSpark.Testing.Objects;
+using System;
 using Xunit;
 
 namespace DragonSpark.Testing.ComponentModel
 {
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes, ContainingTypeAndNested]
-	// [UnityContainerFactory.Register]
-	/*[Freeze( typeof(IServiceLocator), typeof(ServiceLocator) )]
-	[Freeze( typeof(IActivator), typeof(Activator) )]*/
 	public class DefaultValueProviderTests
 	{
-		/*[Export]
-		public IUnityContainer Container { get; } = UnityContainerFactory.Default.Get();*/
-
-		/*public class Activator : LocatorBase
-		{
-			readonly IServiceLocator locator;
-
-			public Activator( IServiceLocator locator )
-			{
-				this.locator = locator;
-			}
-			
-			public override object Get( LocateTypeRequest parameter ) => locator.GetInstance( parameter.RequestedType, parameter.Name );
-		}*/
-
 		[Theory, AutoData]
 		void Apply()
 		{

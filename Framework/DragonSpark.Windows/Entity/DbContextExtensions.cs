@@ -23,23 +23,10 @@ namespace DragonSpark.Windows.Entity
 			GetMethod = typeof(DbContextExtensions).GetMethod( nameof(DbContextExtensions.Get), new[] { typeof(DbContext), typeof(object), typeof(int) } ),
 			ApplyChangesMethod = typeof(DbContextExtensions).GetMethods().FirstOrDefault( x => x.IsGenericMethod && x.Name == nameof(ApplyChanges) );
 
-		/*public static TEntity Find<TEntity>( this DbContext @this, Expression<Func<TEntity, bool>> where, Func<IQueryable<TEntity>, IQueryable<TEntity>> with = null ) where TEntity : class
-		{
-			var entity = DbSetExtensions.Find( @this.Set<TEntity>(), @where, with );
-			var result = entity.With( x => @this.Load( x, loadAllProperties: false ) );
-			return result;
-		}*/
-
-		public static int Save( this DbContext target/*, bool? validate = null, bool? autoDetectChanges = null*/ )
+		public static int Save( this DbContext target )
 		{
 			try
 			{
-				/*if ( validate.GetValueOrDefault( target.Configuration.ValidateOnSaveEnabled ) )
-				{
-					target.ChangeTracker.DetectChanges();
-					// target.ApplyAllValues();
-				}*/
-
 				return target.SaveChanges();
 			}
 			catch ( DbEntityValidationException error )
@@ -47,31 +34,6 @@ namespace DragonSpark.Windows.Entity
 				throw new EntityValidationException( target, error );
 			}
 		}
-
-		/*public static void ApplyAllValues( this DbContext @this )
-		{
-			using ( @this.Configured( x =>
-			{
-				x.AutoDetectChangesEnabled = false;
-				x.ValidateOnSaveEnabled = false;
-			} ) )
-			{
-				var entries = @this.ChangeTracker.Entries().Where( CanApply ).ToArray();
-				// entries.Each( y => y.Entity.ApplyValues() );
-			}
-		}
-
-		static bool CanApply( DbEntityEntry entityEntry )
-		{
-			switch ( entityEntry.State )
-			{
-				case EntityState.Added:
-				case EntityState.Modified:
-				case EntityState.Unchanged:
-					return Services.IsAvailable() && entityEntry.Entity.GetType().GetProperties().Any( x => x.GetAttributes<ApplyValueAttribute>().Any() );
-			}
-			return false;
-		}*/
 
 		public static object ApplyChanges( this DbContext target, object entity )
 		{
@@ -109,50 +71,7 @@ namespace DragonSpark.Windows.Entity
 			var result = current.With( x => target.Include( x, levels ) );
 
 			return result;
-
-			/*using ( target.Configured( x => x.AutoDetectChangesEnabled = false ) )
-			{}*/
 		}
-
-		/*public static IQueryable<TItem> WithIncludes<TItem>( this DbContext target ) where TItem : class => WithIncludes( target.Set<TItem>(), target );
-
-		public static IQueryable<TItem> WithIncludes<TItem>( this IQueryable<TItem> target ) where TItem : class => WithIncludes( target, new QueryWrapper( target ) );
-
-		static IQueryable<TItem> WithIncludes<TItem>( IQueryable<TItem> target, IObjectContextAdapter adapter ) where TItem : class
-		{
-			var names = new DefaultAssociationPathsFactory( AttributeProvider.Default, adapter ).Create( typeof(TItem) );
-			var result = names.Aggregate( target, ( current, item ) => current.Include( item ) );
-			return result;
-		}*/
-
-		/*class QueryWrapper : IObjectContextAdapter
-		{
-			readonly IQueryable query;
-
-			public QueryWrapper( IQueryable query )
-			{
-				this.query = query;
-			}
-
-			public ObjectContext ObjectContext => objectContext ?? ( objectContext = DetermineContext() );
-			ObjectContext objectContext;
-
-			ObjectContext DetermineContext()
-			{
-				var internalQuery = query.GetType()
-					.GetFields( BindingFlags.NonPublic | BindingFlags.Default )
-					.Where( field => field.Name == "_internalQuery" )
-					.Select( field => field.GetValue( query ) )
-					.First();
-				var objectQuery = internalQuery.GetType()
-					.GetFields( BindingFlags.NonPublic | BindingFlags.Default )
-					.Where( field => field.Name == "_objectQuery" )
-					.Select( field => field.GetValue( internalQuery ) )
-					.Cast<ObjectQuery>()
-					.First();
-				return objectQuery.Context;
-			}
-		}*/
 
 		sealed class DefaultAssociationPropertyFactory : ParameterizedSourceBase<Type, string[]>
 		{
@@ -173,69 +92,6 @@ namespace DragonSpark.Windows.Entity
 
 			static IEnumerable<string> GetAssociationPropertyNames( IObjectContextAdapter target, Type type ) => target.GetEntityProperties( type ).Select( x => type.GetProperty( x.Name ) ).Where( x => x.PropertyType.Adapt().GetInnerType() == null ).Select( x => x.Name );
 		}
-
-		/*public class DefaultAssociationPathsFactory : Factory<Type, string[]>
-		{
-			readonly IAttributeProvider provider;
-			readonly IObjectContextAdapter adapter;
-			readonly bool includeOtherPaths;
-
-			public DefaultAssociationPathsFactory( IAttributeProvider provider, IObjectContextAdapter adapter, bool includeOtherPaths = true )
-			{
-				this.provider = provider;
-				this.adapter = adapter;
-				this.includeOtherPaths = includeOtherPaths;
-			}
-
-			protected override string[] CreateItem( Type parameter )
-			{
-				var names = GetAssociationPropertyNames( adapter, parameter );
-				var decorated = parameter.GetProperties()
-								.Where( provider.IsDecoratedWith<DefaultIncludeAttribute> )
-								.SelectMany( x => includeOtherPaths ? provider.FromMetadata<DefaultIncludeAttribute, IEnumerable<string>>( x, y => y.AlsoInclude == "*" ? new DefaultAssociationPathsFactory( provider, adapter, false ).CreateItem( x.PropertyType ) : y.AlsoInclude.ToStringArray() ).Select( z => string.Concat( x.Name, ".", z ) ).With( a => a.Any() ? a : x.Name.ToItem() ) : x.Name.ToItem() ).ToArray();
-				var result = decorated.Union( names.Where( x => !decorated.Any( y => y.StartsWith( string.Concat( x, "." ) ) ) ) ).ToArray();
-				return result;
-			}
-		}*/
-
-		/*public static TItem Entity<TItem>( this DbContext target, TItem item ) where TItem : class
-		{
-			var state = target.Entry( item ).State;
-			switch ( state )
-			{
-				case EntityState.Detached:
-					using ( target.Configured( x => x.AutoDetectChangesEnabled = false ) )
-					{
-						var get = target.Get<TItem>( item );
-						var result = get ?? Add( target, item );
-						return result;
-					}
-			}
-			return item;
-		}*/
-
-		/*static TItem Add<TItem>( DbContext target, TItem item ) where TItem : class
-		{
-			var properties = GetAssociationPropertyNames( target, typeof(TItem) );
-			properties.Each( x =>
-			{
-				var property = typeof(TItem).GetProperty( x );
-				var current = property.GetValue( item );
-				current.With( y =>
-				{
-					switch ( target.Entry( y ).State )
-					{
-						case EntityState.Detached:
-							var entity = Get( target, y, property.PropertyType );
-							property.SetValue( item, entity );
-							break;
-					}
-				} );
-			} );
-
-			var result = target.Set<TItem>().Add( item );
-			return result;
-		}*/
 
 		public static TItem Create<TItem>( this DbContext target, Action<TItem> with = null ) where TItem : class, new()
 		{
@@ -264,15 +120,6 @@ namespace DragonSpark.Windows.Entity
 
 			context.Set<T>().Remove( entity );
 		}
-
-		/*[SuppressMessage( "Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "target", Justification = "Used as a convenience to keep from adding another extension method to the object class." )]
-		public static object[] ResolveKeyValues( this DbContext target, object entity )
-		{
-			var type = entity.GetType();
-			var propertyInfos = type.GetProperties().Where( x => x.IsDecoratedWith<KeyAttribute>() ).OrderBy( x => x.FromMetadata<DisplayAttribute, int>( y => y.GetOrder().GetValueOrDefault( 0 ), () => 0 ) );
-			var result = propertyInfos.Select( x => type.GetProperty( x.Name ).GetValue( entity, null ) ).ToArray();
-			return result;
-		}*/
 
 		class KeyFactory<TEntity> : ParameterizedSourceBase<IDictionary<string, object>>
 		{
@@ -314,14 +161,6 @@ namespace DragonSpark.Windows.Entity
 
 		public static Type[] GetDeclaredEntityTypes( this DbContext context ) => EnumerableExtensions.WhereAssigned( context.GetType().GetProperties().Where( x => x.PropertyType.IsGenericType && typeof( DbSet<> ).IsAssignableFrom( x.PropertyType.GetGenericTypeDefinition() ) ).Select( x => x.PropertyType.GetGenericArguments().FirstOrDefault() ) ).ToArray();
 
-		// public static IDisposable Configured<TContext>( this TContext target, Action<DbContextConfiguration> configure ) where TContext : DbContext => new ConfigurationContext( target, configure );
-
-		/*public static TEntity Include<TEntity>( this DbContext target, TEntity entity, params Expression<Func<TEntity, object>>[] expressions ) where TEntity : class
-		{
-			var result = target.Include( entity, 1, expressions );
-			return result;
-		}*/
-
 		public static TEntity Include<TEntity>( this DbContext target, TEntity entity, int levels, params Expression<Func<TEntity, object>>[] expressions ) where TEntity : class => target.Include( entity, expressions.Select( x => x.GetMemberInfo().Name ).ToArray(), levels );
 
 		public static TEntity Include<TEntity>( this DbContext target, TEntity entity, string[] associationNames, int levels = 1 ) where TEntity : class
@@ -336,10 +175,6 @@ namespace DragonSpark.Windows.Entity
 		{
 			LoadAll( target, entity, new ArrayList(), properties, loadAllProperties.GetValueOrDefault( levels == 1 ), levels, 0 );
 			return entity;
-			/*using ( target.Configured( x => x.AutoDetectChangesEnabled = false ) )
-			{
-				
-			}*/
 		}
 
 		static void LoadAll( DbContext target, object entity, IList list, IEnumerable<string> properties, bool loadAllProperties, int? levels, int count )
@@ -363,8 +198,6 @@ namespace DragonSpark.Windows.Entity
 							LoadAll( target, item, list, null, loadAllProperties, levels, count );
 						}
 					}
-					
-					// count--;
 				}
 			}
 		}
@@ -396,51 +229,5 @@ namespace DragonSpark.Windows.Entity
 				}
 			}
 		}
-
-		/*[SuppressMessage( "Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Used to extract the expression." )]
-		public static int Total<TEntity>( this DbContext context, Expression<Func<TEntity, bool>> predicate, EntityState? state = EntityState.Added ) where TEntity : class
-		{
-			var dbSet = context.Set<TEntity>();
-			var result = dbSet.Count( predicate ) + dbSet.Local.Where( x =>	 context.Entry( x ).State == state ).Count( predicate.Compile() );
-			return result;
-		}*/
-
-		/*class ConfigurationContext : IDisposable
-		{
-			readonly List<Tuple<bool, Action<bool>>> saved;
-
-			public ConfigurationContext( DbContext context, Action<DbContextConfiguration> configure )
-			{
-				saved = new List<Tuple<bool, Action<bool>>>
-				{
-					new Tuple<bool, Action<bool>>( context.Configuration.AutoDetectChangesEnabled, x => context.Configuration.AutoDetectChangesEnabled = x ),
-					new Tuple<bool, Action<bool>>( context.Configuration.LazyLoadingEnabled, x => context.Configuration.LazyLoadingEnabled = x ),
-					new Tuple<bool, Action<bool>>( context.Configuration.ProxyCreationEnabled, x => context.Configuration.ProxyCreationEnabled = x ),
-					new Tuple<bool, Action<bool>>( context.Configuration.ValidateOnSaveEnabled, x => context.Configuration.ValidateOnSaveEnabled = x )
-				};
-				configure( context.Configuration );
-			}
-
-			public void Dispose()
-			{
-				saved.Each( x => x.Item2( x.Item1 ) );
-			}
-		}*/
-
-		/*public static ObjectStateEntry GetEntry( this DbContext @this, object entity )
-		{
-			var objectStateManager = @this.AsTo<IObjectContextAdapter, ObjectStateManager>( x => x.ObjectContext.ObjectStateManager );
-			var result = objectStateManager.GetObjectStateEntry( entity );
-			return result;
-		}*/
-
-		/*public static string[] GetModifiedProperties( this DbContext @this, object entity )
-		{
-			var stateEntry = @this.GetEntry( entity );
-			var currentValues = stateEntry.CurrentValues;
-			var originalValues = stateEntry.OriginalValues;
-			var result = stateEntry.GetModifiedProperties().Where( x => !originalValues.GetValue( originalValues.GetOrdinal( x ) ).Equals( currentValues.GetValue( currentValues.GetOrdinal( x ) ) ) ).ToArray();
-			return result;
-		}*/
 	}
 }

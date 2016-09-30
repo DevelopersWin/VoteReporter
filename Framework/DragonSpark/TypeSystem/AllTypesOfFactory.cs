@@ -20,28 +20,8 @@ namespace DragonSpark.TypeSystem
 			this.activator = activator;
 		}
 
-		public ImmutableArray<T> Create<T>() => ImmutableArray.CreateRange( Get( typeof(T) ).Cast<T>() );
+		public ImmutableArray<T> Create<T>() => Get( typeof(T) ).Cast<T>().ToImmutableArray();
 
 		public override Array Get( Type parameter ) => activator.ActivateMany<object>( parameter, types.ToArray() ).ToArray();
 	}
-
-	/*[Persistent]
-	public class AllTypesOfFactory : FactoryBase<Type, Array>
-	{
-		readonly Func<ImmutableArray<Type>> typeSource;
-		readonly IActivator activator;
-		readonly static Func<ImmutableArray<Type>> TypeSource = ApplicationTypes.Default.Get;
-
-		public AllTypesOfFactory( IActivator activator ) : this( TypeSource, activator ) {}
-
-		public AllTypesOfFactory( Func<ImmutableArray<Type>> typeSource, IActivator activator )
-		{
-			this.typeSource = typeSource;
-			this.activator = activator;
-		}
-
-		public T[] Create<T>() => Create( typeof(T) ).Cast<T>().ToArray();
-
-		public override Array Create( Type parameter ) => activator.ActivateMany<object>( parameter, typeSource().ToArray() );
-	}*/
 }

@@ -54,17 +54,6 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.IsType<Class>( located );
 		}
 
-		/*[Theory, DragonSpark.Testing.Framework.Application.AutoData]
-		void CreateActivator( IActivator sut, string message, int number, Class @item )
-		{
-			Assert.IsAssignableFrom<CompositeActivator>( sut );
-
-			var created = sut.Construct<ClassWithManyParameters>( message, number, item );
-			Assert.Equal( message, created.String );
-			Assert.Equal( number, created.Integer );
-			Assert.Equal( item, created.Class );
-		}*/
-
 		[Theory, DragonSpark.Testing.Framework.Application.AutoData]
 		void RelayedAttribute()
 		{

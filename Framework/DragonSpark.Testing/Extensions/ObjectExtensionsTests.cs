@@ -15,14 +15,6 @@ namespace DragonSpark.Testing.Extensions
 {
 	public class ObjectExtensionsTests
 	{
-		/*[Theory, AutoData]
-		void ProvidedValues( ClassWithProperties sut )
-		{
-			sut.PropertyOne = null;
-			var cloned = sut.Clone( /*Mappings.OnlyProvidedValues()#1# );
-			Assert.Null( cloned.PropertyOne );
-		}*/
-
 		[Fact]
 		public void Convert()
 		{
@@ -49,17 +41,6 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.PropertyThree, other.PropertyThree );
 			Assert.Equal( sut.PropertyFour, other.PropertyFour );
 		}
-
-		/*[Theory, AutoData]
-		void Clone( ClassWithProperties sut )
-		{
-			var cloned = sut.Clone();
-			Assert.NotSame( sut, cloned );
-			Assert.Equal( sut.PropertyOne, cloned.PropertyOne );
-			Assert.Equal( sut.PropertyTwo, cloned.PropertyTwo );
-			Assert.Equal( sut.PropertyThree, cloned.PropertyThree );
-			Assert.Equal( sut.PropertyFour, cloned.PropertyFour );
-		}*/
 
 		[Theory, AutoData]
 		public void WithNull( int number )
@@ -120,32 +101,6 @@ namespace DragonSpark.Testing.Extensions
 			Assert.True( sut.Disposed );
 		}
 
-		/*[Fact]
-		void Null()
-		{
-			Class @class = null;
-
-			var called = false;
-			@class.Null( () => called = true );
-			Assert.True( called );
-		}*/
-
-		/*[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
-		void Enumerate( List<object> sut )
-		{
-			var items = sut.GetEnumerator().Enumerate().ToList();
-			Assert.True( items.Any() && items.All( x => sut.Contains( x ) && sut.ToList().IndexOf( x ) == items.IndexOf( x ) ) );
-		}*/
-
-		/*[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
-		void GetAllPropertyValuesOf( ClassWithProperties sut )
-		{
-			var expected = new[] { sut.PropertyOne, sut.PropertyFour };
-
-			var values = sut.GetAllPropertyValuesOf<string>();
-			Assert.True( expected.Length == values.Count() && expected.All( x => values.Contains( x ) ) );
-		}*/
-
 		[Theory, AutoData]
 		void AsValid( Class sut )
 		{
@@ -175,9 +130,6 @@ namespace DragonSpark.Testing.Extensions
 			var ints = Items<int>.Default;
 			Assert.Empty( ints );
 			Assert.Same( ints, Items<int>.Default );
-
-			//Assert.Null( Default<object>.Item );
-			//Assert.Null( Default<Generic<object>>.Item );
 		}
 
 		[Theory, AutoData]

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
-	public class Cache<T> : Cache<object, T>, ICache<T>/*, IConfigurableCache<T>*/ where T : class
+	public class Cache<T> : Cache<object, T>, ICache<T> where T : class
 	{
 		public Cache() {}
 		public Cache( Func<object, T> create ) : base( create ) {}

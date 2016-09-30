@@ -21,36 +21,6 @@ namespace DragonSpark.Testing.Aspects
 			Assert.Equal( 1, sut.Cached );
 		}
 
-		/*[Fact]
-		public void Performance()
-		{
-			new PerformanceSupport( WriteLine, ToCache, Raw ).Run();
-		}
-
-		class IsSourceSpecification : DragonSpark.Activation.IsSourceSpecification
-		{
-			public new static IsSourceSpecification Default { get; } = new IsSourceSpecification();
-
-			IsSourceSpecification() : base( typeof(IFactory), typeof(IValidatedParameterizedSource) ) {}
-		}
-
-		[Fact]
-		public void Raw()
-		{
-			IsSourceSpecification.Default.IsSatisfiedBy( typeof(Factory) );
-		}
-
-		[Fact]
-		public void ToCache()
-		{
-			DragonSpark.Activation.IsSourceSpecification.Default.Get( typeof(Factory) );
-		}
-
-		class Factory : FactoryBase<string, DateTime>
-		{
-			public override DateTime Create( string parameter ) => DateTime.Now;
-		}*/
-
 		[Fact]
 		public void CheckFreeze()
 		{
@@ -124,45 +94,5 @@ namespace DragonSpark.Testing.Aspects
 				Count += i;
 			}
 		}
-
-		/*[Fact]
-		[DotMemoryUnit( SavingStrategy = SavingStrategy.OnCheckFail, Directory = @"C:\dotMemory", CollectAllocations = true, FailIfRunWithoutSupport = false )]
-		public void MemoryTest()
-		{
-			Test();
-
-			dotMemory.Check( memory =>
-							 {
-								 Assert.Equal( 0, memory.GetObjects( where => where.Type.Is<MemoryTestFactory.Result>() ).ObjectsCount );
-							 } );
-		}
-
-		static void Test()
-		{
-			var factory = new MemoryTestFactory();
-			var parameter = new MemoryTestFactory.Parameter();
-			var first = factory.Create( parameter );
-			var second = factory.Create( parameter );
-			Assert.Same( parameter, first.Parameter );
-			Assert.Same( parameter, second.Parameter );
-		}
-
-		public class MemoryTestFactory : FactoryBase<MemoryTestFactory.Parameter, MemoryTestFactory.Result>
-		{
-			public class Parameter {}
-
-			public class Result
-			{
-				public Result( Parameter parameter )
-				{
-					Parameter = parameter;
-				}
-
-				public Parameter Parameter { get; }
-			}
-
-			[Freeze]
-			public override Result Create( Parameter parameter ) => new Result( parameter );
-		}*/
 	}
 }

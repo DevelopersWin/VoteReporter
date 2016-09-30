@@ -13,6 +13,6 @@ namespace DragonSpark.Sources
 
 		public override void Execute( T parameter ) => Stack.Push( parameter );
 
-		protected override void OnDispose() => Stack.Pop()/*.TryDispose()*/;
+		protected override void OnDispose() => Stack.Pop();
 	}
 }

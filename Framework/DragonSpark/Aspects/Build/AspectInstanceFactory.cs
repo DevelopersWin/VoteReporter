@@ -55,13 +55,7 @@ namespace DragonSpark.Aspects.Build
 				this.construction = construction;
 			}
 
-			public override AspectInstance Get( TTarget parameter )
-			{
-				/*var method = parameter as MethodInfo;
-				var message = method != null ? new MethodFormatter( method ).ToString() : "n/a";
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"YO: {typeof(TAspect)} -> {message}", null, null, null ));*/
-				return new AspectInstance( parameter, construction, null );
-			}
+			public override AspectInstance Get( TTarget parameter ) => new AspectInstance( parameter, construction, null );
 		}
 	}
 }

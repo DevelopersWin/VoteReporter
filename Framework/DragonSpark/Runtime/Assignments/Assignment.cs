@@ -2,6 +2,22 @@
 
 namespace DragonSpark.Runtime.Assignments
 {
+	public sealed class Assignment<T> : DisposableBase
+	{
+		readonly IAssign<T> assign;
+		readonly Value<T> first;
+		
+		public Assignment( IAssign<T> assign, Value<T> first )
+		{
+			this.assign = assign;
+			this.first = first;
+			
+			assign.Assign( first.Start );
+		}
+
+		protected override void OnDispose( bool disposing ) => assign.Assign( first.Finish );
+	}
+
 	public class Assignment<T1, T2> : DisposableBase
 	{
 		readonly IAssign<T1, T2> assign;

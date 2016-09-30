@@ -38,33 +38,11 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		public static Assignment<T1, T2> Assignment<T1, T2>( this ICache<T1, T2> @this, T1 instance, T2 start, T2 finish = default(T2) ) => new Assignment<T1, T2>( new CacheAssign<T1, T2>( @this ), Assignments.From( instance ), new Value<T2>( start, finish ) );
 
-		/*public static ImmutableArray<TResult> GetMany<TParameter, TResult>( this ICache<TParameter, TResult> @this, ImmutableArray<TParameter> parameters, Func<TResult, bool> where = null ) =>
-			parameters
-				.Select( @this.ToDelegate() )
-				.Where( @where ?? Where<TResult>.Assigned ).ToImmutableArray();*/
-		
-
 		public static Func<TInstance, TValue> ToDelegate<TInstance, TValue>( this ICache<TInstance, TValue> @this ) => Delegates<TInstance, TValue>.Default.Get( @this );
 		sealed class Delegates<TInstance, TValue> : Cache<ICache<TInstance, TValue>, Func<TInstance, TValue>>
 		{
 			public static Delegates<TInstance, TValue> Default { get; } = new Delegates<TInstance, TValue>();
 			Delegates() : base( command => command.Get ) {}
 		}
-
-		
-
-		/*public static TDelegate Apply<TContext, TDelegate>( this ICache<TDelegate, TContext> @this, TDelegate source, TContext context ) where TDelegate : class
-		{
-			@this.Set( source, context );
-			var result = Invocation.Create( source );
-			return result;
-		}
-
-		public static TContext Context<TContext, TDelegate>( this ICache<TDelegate, TContext> @this ) where TDelegate : class
-		{
-			var instance = Invocation.GetCurrent() as TDelegate;
-			var result = instance != null ? @this.Get( instance ) : default(TContext);
-			return result;
-		}*/
 	}
 }

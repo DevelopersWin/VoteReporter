@@ -8,36 +8,7 @@ namespace DragonSpark.Commands
 {
 	public static class Extensions
 	{
-		/*public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TParameter> coercer ) => Apply( @this.ToSourceDelegate(), coercer.ToDelegate() );
-		public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Coerce<TParameter> coerce ) =>
-			new CoercedParameterizedSource<TParameter, TResult>( coerce, @this );
-		public static IParameterizedSource<TFrom, TResult> Apply<TFrom, TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TFrom, TParameter> coercer ) => Apply( @this.ToSourceDelegate(), coercer.ToDelegate() );
-		public static IParameterizedSource<TFrom, TResult> Apply<TFrom, TParameter, TResult>( this Func<TParameter, TResult> @this, Func<TFrom, TParameter> coerce ) =>
-			new CoercedParameterizedSource<TFrom, TParameter, TResult>( coerce, @this );
-
-		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TParameter> alteration ) => Apply( @this, alteration.ToDelegate() );
-		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Alter<TParameter> alter ) => Apply( @this.ToSourceDelegate(), alter );
-		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TParameter> alter ) =>
-			new AlteredParameterizedSource<TParameter, TResult>( alter, @this );
-
-		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TResult> selector ) => Apply( @this, selector.ToDelegate() );
-		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Alter<TResult> selector ) => Apply( @this.ToSourceDelegate(), selector );
-		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TResult> selector ) =>
-			new AlteredResultParameterizedSource<TParameter, TResult>( selector, @this );*/
-
-		// public static ICommand<T> Apply<T>( this ICommand<T> @this, ISpecification<T> specification ) => new SpecificationCommand<T>( specification, @this.ToDelegate() );
-		/*public static T ExtendUsing<T, TParameter>( this T @this, ISpecification<TParameter> specification ) where T : ICommand<TParameter> => 
-			@this.Extend( new SpecificationExtension<TParameter>( specification ) );
-
-		public static T Extend<T>( this T @this, IExtension extension )
-		{
-			extension.Execute( @this );
-			return @this;
-		}*/
-
 		public static ICommand<T> Adapt<T>( this ICommand @this ) => new AdapterCommand<T>( @this );
-
-		// public static void Run( this IRunCommand @this ) => @this.Execute( default(object) );
 
 		public static Action ToRunDelegate( this IRunCommand @this ) => RunDelegates.Default.Get( @this );
 		sealed class RunDelegates : Cache<IRunCommand, Action>
@@ -46,8 +17,6 @@ namespace DragonSpark.Commands
 			RunDelegates() : base( command => command.Execute ) {}
 		}
 
-		// public static void Run<T>( this ICommand<T> @this ) => @this.Execute( default(T) );
-
 		public static TCommand Run<TCommand, TParameter>( this TCommand @this, TParameter parameter ) where TCommand : ICommand<TParameter>
 		{
 			var result = @this.IsSatisfiedBy( parameter ) ? @this : default(TCommand);
@@ -55,7 +24,6 @@ namespace DragonSpark.Commands
 			return result;
 		}
 
-		// public static FixedCommand<Func<T>> Fixed<T>( this ICommand<Func<T>> @this, T parameter ) => new FixedCommand<Func<T>>( @this, new FixedFactory<T>( parameter ).Create );
 		public static SuppliedCommand<T> Fixed<T>( this ICommand<T> @this, T parameter ) => new SuppliedCommand<T>( @this, parameter );
 		public static SuppliedCommand<T> Fixed<T>( this ICommand<T> @this, Func<T> parameter ) => new SuppliedCommand<T>( @this, parameter );
 
@@ -72,22 +40,6 @@ namespace DragonSpark.Commands
 			public static Alterations<T> Default { get; } = new Alterations<T>();
 			Alterations() : base( command => new ConfiguringAlteration<T>( command.ToDelegate() ) ) {}
 		}
-
-		/*public static ICommand<T> WithAutoValidation<T>( this ICommand<T> @this ) => AutoValidationCache<T>.Default.Get( @this );
-		class AutoValidationCache<T> : Cache<ICommand<T>, ICommand<T>>
-		{
-			public static AutoValidationCache<T> Default { get; } = new AutoValidationCache<T>();
-
-			AutoValidationCache() : base( command => new AutoValidatingCommand<T>( command ) ) {}
-		}*/
-
-		/*public static Action<object> ToDelegate( this ICommand @this ) => DelegateCache.Default.Get( @this );
-		class DelegateCache : Cache<ICommand, Action<object>>
-		{
-			public static DelegateCache Default { get; } = new DelegateCache();
-
-			DelegateCache() : base( command => command.Execute ) {}
-		}*/
 
 		public static ISpecification<object> ToSpecification( this ICommand @this ) => SpecificationCache.Default.Get( @this );
 		class SpecificationCache : Cache<ICommand, ISpecification<object>>

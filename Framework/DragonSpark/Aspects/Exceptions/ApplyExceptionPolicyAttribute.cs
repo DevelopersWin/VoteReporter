@@ -34,23 +34,4 @@ namespace DragonSpark.Aspects.Exceptions
 		public Policy Get() => source.Get();
 		object ISource.Get() => Get();
 	}
-
-	/*[AttributeUsage( AttributeTargets.Method | AttributeTargets.Constructor )]
-	public class ApplyExceptionPolicyAspect : AspectBase
-	{
-		readonly static Func<Type, Policy> Source = Activator.Default.Get<Policy>;
-
-		readonly ISource<Policy> source;
-
-		public ApplyExceptionPolicyAspect( Type policyType ) : this( policyType, Source ) {}
-
-		protected ApplyExceptionPolicyAspect( Type policyType, Func<Type, Policy> source ) : this( source.Fixed( policyType ) ) {}
-
-		ApplyExceptionPolicyAspect( ISource<Policy> source )
-		{
-			this.source = source;
-		}
-
-		public sealed override void OnInvoke( MethodInterceptionArgs args ) => source.Get().Execute( args.Proceed );
-	}*/
 }

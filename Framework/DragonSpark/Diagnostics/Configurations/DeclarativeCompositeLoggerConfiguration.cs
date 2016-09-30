@@ -15,11 +15,4 @@ namespace DragonSpark.Diagnostics.Configurations
 
 		public override LoggerConfiguration Get( LoggerConfiguration parameter ) => Commands.Aggregate( parameter, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Execute ) );
 	}
-
-	/*public class DestructureMethodCommand : DestructureByFactoryCommand<MethodInfo>
-	{
-		public static DestructureMethodCommand Default { get; } = new DestructureMethodCommand();
-
-		public DestructureMethodCommand() : base( MethodFormatter.Default ) {}
-	}*/
 }

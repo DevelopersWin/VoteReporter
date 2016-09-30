@@ -13,8 +13,8 @@ namespace DragonSpark.Windows.Runtime
 	{
 		readonly AppDomain domain;
 		readonly Func<Assembly, bool> specification;
-		public AssemblySource( AppDomain domain ) : this( domain/*, DragonSpark.TypeSystem.Configuration.ApplicationAssemblyLocator.ToSourceDelegate()*/, Specification.DefaultNested.IsSatisfiedBy ) {}
-		public AssemblySource( AppDomain domain, /*Func<IEnumerable<Assembly>, Assembly> applicationAssembly,*/ Func<Assembly, bool> specification )
+		public AssemblySource( AppDomain domain ) : this( domain, Specification.DefaultNested.IsSatisfiedBy ) {}
+		public AssemblySource( AppDomain domain, Func<Assembly, bool> specification )
 		{
 			this.domain = domain;
 			this.specification = specification;
@@ -24,12 +24,13 @@ namespace DragonSpark.Windows.Runtime
 
 		sealed class Specification : SpecificationBase<Assembly>
 		{
+			const string SystemReflectionEmitInternalAssemblyBuilder = "System.Reflection.Emit.InternalAssemblyBuilder";
 			public static Specification DefaultNested { get; } = new Specification();
 			Specification() {}
 
 			public override bool IsSatisfiedBy( Assembly parameter ) => 
 				parameter.Not<AssemblyBuilder>()
-				&& parameter.GetType().FullName != "System.Reflection.Emit.InternalAssemblyBuilder"
+				&& parameter.GetType().FullName != SystemReflectionEmitInternalAssemblyBuilder
 				&& !string.IsNullOrEmpty( parameter.Location );
 		}
 	}

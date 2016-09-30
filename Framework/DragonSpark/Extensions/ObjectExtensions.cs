@@ -10,8 +10,6 @@ namespace DragonSpark.Extensions
 {
 	public static class ObjectExtensions
 	{
-		// public static TResult Clone<TResult>( this TResult @this/*, Action<IMappingExpression> configure = null*/ ) where TResult : class => @this.MapInto<TResult>( /*configure: configure*/ );
-
 		public static MemberInfo GetMemberInfo( this Expression expression )
 		{
 			var lambda = (LambdaExpression)expression;
@@ -33,16 +31,6 @@ namespace DragonSpark.Extensions
 		}
 
 		public static bool IsAssignedOrContains<T>( [Optional]this T @this ) => !Equals( @this, SpecialValues.DefaultOrEmpty<T>() );
-
-		/*public static IEnumerable<TItem> Enumerate<TItem>( this IEnumerator<TItem> target )
-		{
-			var result = new List<TItem>();
-			while ( target.MoveNext() )
-			{
-				result.Add( target.Current );
-			}
-			return result;
-		}*/
 
 		public static TResult Loop<TItem,TResult>( this TItem current, Func<TItem,TItem> resolveParent, Func<TItem, bool> condition, Func<TItem, TResult> extract = null, TResult defaultValue = default(TResult) )
 		{
@@ -112,10 +100,6 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		//public static T As<T>( this object target ) => As( target, (Action<T>)null );
-
-		/*public static TResult As<TResult, TReturn>( this object target, Func<TResult, TReturn> action ) => target.As<TResult>( x => { action( x ); } );*/
-
 		public static T As<T>( [Optional]this object target ) => target is T ? (T)target : default(T);
 
 		public static T As<T>( [Optional]this object target, Action<T> action )
@@ -131,7 +115,7 @@ namespace DragonSpark.Extensions
 
 		public static TResult AsTo<TSource, TResult>( this object target, Func<TSource,TResult> transform, Func<TResult> resolve = null )
 		{
-			var @default = resolve ?? /*DefaultValueFactory<TResult>.Default.Create*/ ( () => default(TResult) );
+			var @default = resolve ?? ( () => default(TResult) );
 			var result = target is TSource ? transform( (TSource)target ) : @default();
 			return result;
 		}

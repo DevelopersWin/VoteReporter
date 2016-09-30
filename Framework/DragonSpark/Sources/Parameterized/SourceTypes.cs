@@ -27,7 +27,7 @@ namespace DragonSpark.Sources.Parameterized
 
 		protected override Type Create( Type parameter )
 		{
-			var candidates = mappings.Introduce( parameter, tuple => /*tuple.Item1.Name == tuple.Item2.Name &&*/ tuple.Item2.Adapt().IsAssignableFrom( tuple.Item1.Value ) ).ToArray();
+			var candidates = mappings.Introduce( parameter, tuple => tuple.Item2.Adapt().IsAssignableFrom( tuple.Item1.Value ) ).ToArray();
 			var conventions = Suffixes.Introduce( parameter.Name, tuple => string.Concat( tuple.Item1, tuple.Item2 ) ).ToArray();
 			var result = Get( parameter, candidates, conventions ).FirstAssigned().Key;
 			return result;
@@ -49,7 +49,7 @@ namespace DragonSpark.Sources.Parameterized
 			Mappings() {}
 
 			public override KeyValuePair<Type, Type> Get( Type parameter ) =>
-				new KeyValuePair<Type, Type>( parameter, /*parameter.From<ExportAttribute, string>( attribute => attribute.ContractName ),*/ Results( parameter ) );
+				new KeyValuePair<Type, Type>( parameter, Results( parameter ) );
 		}
 	}
 }

@@ -10,6 +10,6 @@ namespace DragonSpark.Windows.Runtime
 		public static DomainAssemblySource Default { get; } = new DomainAssemblySource();
 		DomainAssemblySource() {}
 
-		protected override ImmutableArray<Assembly> Create( AppDomain parameter ) => new AssemblySource( parameter ).Get()/*.OrderBy( a => a.GetName().Name ).ToImmutableArray()*/;
+		protected override ImmutableArray<Assembly> Create( AppDomain parameter ) => new AssemblySource( parameter ).Get();
 	}
 }

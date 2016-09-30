@@ -193,7 +193,7 @@ namespace DragonSpark.Windows.Entity
 
 				switch ( edmMember.BuiltInTypeKind )
 				{
-					case BuiltInTypeKind.NavigationProperty: /*navigation property*/
+					case BuiltInTypeKind.NavigationProperty:
 					{
 						var navigationProperty = edmMember as NavigationProperty;
 						var sourceRelatedEnd = entry.RelationshipManager.GetRelatedEnd( navigationProperty.RelationshipType.FullName, navigationProperty.ToEndMember.Name );
@@ -202,7 +202,7 @@ namespace DragonSpark.Windows.Entity
 						return relationshipGroups.Select( relationshipGroup => relationshipGroup.Key ).Any( targetRelatedEnd => Check( targetRelatedEnd, sourceRelatedEnd ) );
 					}
 
-					case BuiltInTypeKind.EdmProperty: /*scalar field*/
+					case BuiltInTypeKind.EdmProperty:
 					{
 						ObjectStateEntry containerStateEntry;
 						return context.IsScalarPropertyModified( propertyName, entry, out containerStateEntry );

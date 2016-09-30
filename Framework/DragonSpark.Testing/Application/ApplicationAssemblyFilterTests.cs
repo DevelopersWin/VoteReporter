@@ -26,14 +26,6 @@ namespace DragonSpark.Testing.Application
 			Assert.NotEqual( assemblies, enumerable );
 		}
 
-		/*[AssemblyProvider.Register]
-		[Theory, Framework.Setup.AutoData]
-		public void DefaultProvider( ITypeSource sut )
-		{
-			Assert.NotNull( sut );
-			Assert.Same( AssemblyProvider.Default, sut );
-		}*/
-
 		[Theory, Framework.Application.AutoData]
 		public void DeclaredProvider( ITypeSource sut )
 		{

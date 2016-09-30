@@ -119,32 +119,6 @@ namespace DragonSpark.Windows.Entity
 			return result;
 		}
 
-		/*/// <summary>
-		/// Creates the key.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="context">The context.</param>
-		/// <param name="values">The values.</param>
-		/// <returns>EntityKey.</returns>
-		/// <exception cref="System.ArgumentNullException">key;A property that's part of a key was not found.</exception>
-		public static EntityKey CreateKey<T>( ObjectContext context, IOrderedDictionary values ) where T : EntityObject
-		{
-			var items = new List<EntityKeyMember>();
-			var metadata = GetEntityMetaData<T>( context );
-			foreach ( var property in ConvertProperties<EdmProperty, EdmMember>( metadata.KeyMembers ) )
-			{
-				if ( values.Contains( property.Name ) )
-				{
-					items.Add( new EntityKeyMember( property.Name, values[ property.Name ] ) );
-				}
-				else
-				{
-					throw new ArgumentNullException( "key", "A property that's part of a key was not found." );
-				}
-			}
-			return CreateKey( context, typeof(T), items );
-		}*/
-
 		/// <summary>
 		/// Extracts the key.
 		/// </summary>

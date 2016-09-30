@@ -1,7 +1,7 @@
+using Ploeh.AutoFixture;
 using System;
 using System.Collections.Immutable;
 using System.Reflection;
-using Ploeh.AutoFixture;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {
@@ -27,16 +27,4 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 			}
 		}
 	}
-
-	/*public class Application<T> : Application where T : class, ICommand
-	{
-		public Application( /*IServiceProvider serviceProvider#1# ) : base( /*serviceProvider,#1# ApplicationCommands<T>.Default.Get() ) {}
-	}
-
-	public class ApplicationCommands<T> : Configuration<IEnumerable<ICommand>> where T : class, ICommand
-	{
-		public static ApplicationCommands<T> Default { get; } = new ApplicationCommands<T>();
-
-		ApplicationCommands() : base( () => EnumerableEx.Return( new ApplyExportedCommandsCommand<T>() ).Concat( ApplicationCommands.Default.Get() ) ) {}
-	}*/
 }

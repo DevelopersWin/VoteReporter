@@ -33,19 +33,5 @@ namespace DragonSpark.Sources.Delegates
 			var result = factory.Fixed( @delegate ).ToDelegate();
 			return result;
 		}
-
-		/*sealed class Factory : SourceBase<object>
-		{
-			readonly Func<object, object> factory;
-			readonly Func<object> parameter;
-
-			public Factory( Func<object, object> factory, Func<object> parameter )
-			{
-				this.factory = factory;
-				this.parameter = parameter;
-			}
-
-			public override object Get() => factory( parameter() );
-		}*/
 	}
 }

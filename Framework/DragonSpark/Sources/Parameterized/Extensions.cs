@@ -19,8 +19,6 @@ namespace DragonSpark.Sources.Parameterized
 				.ToImmutableArray();
 
 		public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TParameter> coercer ) => Apply( @this.ToSourceDelegate(), coercer.ToDelegate() );
-		/*public static IParameterizedSource<object, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Coerce<TParameter> coerce ) =>
-			new CoercedParameterizedSource<TParameter, TResult>( coerce, @this );*/
 		public static IParameterizedSource<TFrom, TResult> Apply<TFrom, TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, ICoercer<TFrom, TParameter> coercer ) => Apply( @this.ToSourceDelegate(), coercer.ToDelegate() );
 		public static IParameterizedSource<TFrom, TResult> Apply<TFrom, TParameter, TResult>( this Func<TParameter, TResult> @this, Func<TFrom, TParameter> coerce ) =>
 			new CoercedParameterizedSource<TFrom, TParameter, TResult>( coerce, @this );
@@ -55,13 +53,6 @@ namespace DragonSpark.Sources.Parameterized
 		public static Func<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
 
 		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => new Wrapper<TParameter, TResult>( @this ).Get;
-		/*sealed class WrappedDelegates<TParameter, TResult> : Cache<Func<TResult>, Func<TParameter, TResult>>
-		{
-			public static WrappedDelegates<TParameter, TResult> Default { get; } = new WrappedDelegates<TParameter, TResult>();
-			WrappedDelegates() : base( result => new Wrapper<TParameter, TResult>( result ).Get ) {}
-		}*/
-
-		// public static IParameterizedSource<TParameter, TResult> Cast<TParameter, TResult>( this IParameterizedSource @this ) => new ParameterizedSource<TParameter, TResult>( @this );
 
 		public static Delegate Convert( this Func<object> @this, Type resultType ) => ConvertSupport.Methods.Make( resultType ).Invoke<Delegate>( @this );
 
@@ -137,7 +128,6 @@ namespace DragonSpark.Sources.Parameterized
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		// public static U Alter<T, U>( this ImmutableArray<T> @this, U seed ) where T : IAlteration<U> => @this.AsEnumerable().Alter<U>( seed );
 		public static T Alter<T>( this IEnumerable<IAlteration<T>> @this, T seed ) => @this.Aggregate( seed, ( current, alteration ) => alteration.Get( current ) );
 
 		public static Alter<T> ToDelegate<T>( this IAlteration<T> @this ) => Selectors<T>.Default.Get( @this );
@@ -165,19 +155,5 @@ namespace DragonSpark.Sources.Parameterized
 
 		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) where TParameter : class => @this.ToSourceDelegate().ToEqualityCache();
 		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this Func<TParameter, TResult> @this ) where TParameter : class => new EqualityReferenceCache<TParameter, TResult>( @this );
-		
-		/*public static IValidatedParameterizedSource<TParameter, TResult> WithAutoValidation<TParameter, TResult>( this IValidatedParameterizedSource<TParameter, TResult> @this ) => AutoValidationFactories<TParameter, TResult>.Default.Get( @this );
-		sealed class AutoValidationFactories<TParameter, TResult> : Cache<IValidatedParameterizedSource<TParameter, TResult>, IValidatedParameterizedSource<TParameter, TResult>>
-		{
-			public static AutoValidationFactories<TParameter, TResult> Default { get; } = new AutoValidationFactories<TParameter, TResult>();
-			AutoValidationFactories() : base( factory => new AutoValidatingSource<TParameter,TResult>( factory ) ) {}
-		}
-
-		public static IValidatedParameterizedSource WithAutoValidation( this IValidatedParameterizedSource @this ) => AutoValidationFactories.Default.Get( @this );
-		sealed class AutoValidationFactories : Cache<IValidatedParameterizedSource, IValidatedParameterizedSource>
-		{
-			public static AutoValidationFactories Default { get; } = new AutoValidationFactories();
-			AutoValidationFactories() : base( factory => new AutoValidatingSource( factory ) ) {}
-		}*/
 	}
 }

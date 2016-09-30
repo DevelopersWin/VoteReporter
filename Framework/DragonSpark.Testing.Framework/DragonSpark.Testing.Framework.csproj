@@ -55,7 +55,6 @@
     <Compile Include="Runtime\Identifier.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="Diagnostics\PerformanceSupport.cs" />
-    <Compile Include="MethodBaseExtensions.cs" />
     <Compile Include="Runtime\MethodContext.cs" />
     <Compile Include="Output.cs" />
     <Compile Include="Application\ServiceAttribute.cs" />

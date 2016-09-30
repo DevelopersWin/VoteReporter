@@ -14,6 +14,6 @@ namespace DragonSpark.Diagnostics.Configurations
 		[Required]
 		public IParameterizedSource<T, object> Source { [return: Required]get; set; }
 
-		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming<T>( /*Factory.IsSatisfiedBy,*/ Source.Get );
+		protected override void Configure( LoggerDestructuringConfiguration configuration ) => configuration.ByTransforming<T>( Source.Get );
 	}
 }

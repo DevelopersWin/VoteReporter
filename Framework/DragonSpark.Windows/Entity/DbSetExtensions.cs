@@ -14,25 +14,4 @@ namespace DragonSpark.Windows.Entity
 			return result;
 		}
 	}
-
-	/*[AttributeUsage( AttributeTargets.Property  )]
-	public class ApplyValueAttribute : Attribute, IPriorityAware
-	{
-		public ApplyValueAttribute( Type type )
-		{
-			Type = type;
-		}
-
-		protected internal virtual void Each( object instance, PropertyInfo info, object current )
-		{
-			var provider = Activator.Create<IApplyValue>( Type, Parameters );
-			provider.Each( instance, info, current );
-		}
-
-		protected virtual object[] Parameters => new object[0];
-
-		public Type Type { get; }
-
-		public virtual Priority Priority => Priority.Normal;
-	}*/
 }

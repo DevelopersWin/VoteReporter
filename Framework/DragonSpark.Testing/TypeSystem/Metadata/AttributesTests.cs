@@ -1,10 +1,10 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using DragonSpark.ComponentModel;
+﻿using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem.Metadata;
 using JetBrains.Annotations;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Attribute = DragonSpark.Testing.Objects.Attribute;
 
@@ -177,20 +177,5 @@ namespace DragonSpark.Testing.TypeSystem.Metadata
 
 		[UsedImplicitly]
 		class DerivedClass : BaseClass {}
-
-		/*[Fact]
-		public void SingletonTest()
-		{
-			var property = typeof(SingletonLocatorTests.Singleton).GetProperty( nameof(SingletonLocatorTests.Singleton.Default) );
-			var provider = Attributes.Get( property );
-			Assert.Exists( provider );
-		}
-
-		class Singleton : ISingleton
-		{
-			public static Singleton Default { get; } = new Singleton();
-		}
-
-		interface ISingleton {}*/
 	}
 }

@@ -38,24 +38,6 @@ namespace DragonSpark.Composition
 
 			var all = appliedTypes.Concat( mappings.All() ).SelectMany( Expander ).Distinct().ToImmutableHashSet();
 
-			/*Debug.WriteLine( "Applied:" );
-			foreach ( var pair in applied )
-			{
-				Debug.WriteLine( $"[{pair.Subject}, {pair.ExportAs}]" );
-			}
-
-			Debug.WriteLine( "Conventions:" );
-			foreach ( var pair in mappings )
-			{
-				Debug.WriteLine( $"{pair.InterfaceType.GetTypeInfo().IsPublic}, {pair.ImplementationType.GetTypeInfo().IsPublic}: [{pair.InterfaceType}, {pair.ImplementationType}]" );
-			}
-
-			Debug.WriteLine( "All:" );
-			foreach ( var type in all.OrderBy( type => type.FullName ) )
-			{
-				Debug.WriteLine( $"{type.FullName}" );
-			}*/
-
 			var specification = new IsValidTypeSpecification( all );
 			var selector = new ConstructorSelector( new IsValidConstructorSpecification( specification.IsSatisfiedBy ).IsSatisfiedBy );
 

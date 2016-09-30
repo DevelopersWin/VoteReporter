@@ -14,15 +14,5 @@ namespace DragonSpark.Testing.Framework
 			DragonSpark.Application.Execution.Context.Assign( ExecutionContext.Default );
 			Logger.Configurable.Configurators.Assign( o => new LoggerExportedConfigurations( DefaultSystemLoggerConfigurations.Default.Get().ToArray() ).Get().Wrap() );
 		}
-
-		/*sealed class Command : CompositeCommand
-		{
-			public static IRunCommand Default { get; } = new Command();
-			Command() : base( 
-				DragonSpark.Application.Execution.Context.Configured( ExecutionContext.Default )
-			) {}
-		}*/
 	}
-
-	
 }

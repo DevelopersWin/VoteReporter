@@ -41,20 +41,6 @@ namespace DragonSpark.Composition
 
 			public override bool IsSatisfiedBy( Type parameter )
 			{
-				/*var enumerable = parameter.GetTypeInfo().IsGenericType && parameter.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-				var type = enumerable ? parameter.Adapt().GetEnumerableType() : parameter;
-
-				try
-				{
-					object export;
-					var result = host.TryGetExport( type, out export )/* || (bool)specification#1#;
-					return result;
-				}
-				catch ( CompositionFailedException )
-				{
-					return enumerable;
-				}*/
-
 				var type = SpecificationExporter.Definition.MakeGenericType( parameter );
 				object specification;
 				var result = !host.TryGetExport( type, out specification ) || (bool)specification;

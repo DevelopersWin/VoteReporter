@@ -14,7 +14,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		{
 			Assert.Same( sut, FileSystemTypes.Default );
 			var assemblies = sut.Get().AsEnumerable().Assemblies();
-			var specification = ApplicationAssemblySpecification/*( typeof(ISource).Assembly.ToItem() )*/.Default;
+			var specification = ApplicationAssemblySpecification.Default;
 
 			Assert.True( assemblies.All( specification.IsSatisfiedBy ) );
 		} 

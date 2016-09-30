@@ -43,11 +43,6 @@ namespace DragonSpark.Testing.TypeSystem
 			}
 
 			public int Item { get; }
-
-			/*public static implicit operator Casted( int item )
-			{
-				return new Casted( item );
-			}*/
 		}
 
 		[Fact]

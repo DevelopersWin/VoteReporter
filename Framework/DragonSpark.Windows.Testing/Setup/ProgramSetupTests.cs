@@ -33,13 +33,6 @@ namespace DragonSpark.Windows.Testing.Setup
 			Assert.Equal( assembly.GetName().Version, sut.AssemblyInformation.Version );
 		}
 
-		/*[Theory, AutoData]
-		public void Type( IUnityContainer sut )
-		{
-			var resolve = sut.Resolve<ITyper>();
-			Assert.IsType<SomeTypeist>( resolve );
-		}*/
-
 		[Theory, AutoData]
 		public void Run( [Service]Program sut )
 		{

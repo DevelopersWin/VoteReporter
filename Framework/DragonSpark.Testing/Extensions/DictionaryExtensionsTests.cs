@@ -21,22 +21,6 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( "DefaultValue", dictionary.TryGet( "Key10", () => "DefaultValue" ) );
 		}
 
-		/*[Fact]
-		public void ExecuteOn()
-		{
-			var called = false;
-			dictionary.ExecuteOn( "Key1", s => called = true );
-			Assert.True( called );
-		}
-
-		[Fact]
-		public void ExecuteOnNot()
-		{
-			var called = false;
-			dictionary.ExecuteOn( "Key10", s => called = true );
-			Assert.False( called );
-		}*/
-
 		[Fact]
 		public void Ensure()
 		{

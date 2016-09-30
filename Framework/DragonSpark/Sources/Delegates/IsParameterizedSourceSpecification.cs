@@ -7,6 +7,6 @@ namespace DragonSpark.Sources.Delegates
 	public sealed class IsParameterizedSourceSpecification : AdapterSpecificationBase
 	{
 		public static ISpecification<Type> Default { get; } = new IsParameterizedSourceSpecification().ToCachedSpecification();
-		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>)/*, typeof(IParameterizedSource)*/ ) {}
+		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>) ) {}
 	}
 }

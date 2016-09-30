@@ -24,12 +24,5 @@ namespace DragonSpark.Aspects
 		}
 
 		public Exception ValidateValue( Type value, string locationName, LocationKind locationKind ) => value != null && !types.IsAssignableFrom( value ) ? CreateArgumentException( value, locationName, locationKind ) : null;
-
-		/*Exception CreateException( object value, string locationName, LocationKind locationKind, LocationValidationContext context )
-		{
-			var factory = context == LocationValidationContext.SuccessPostcondition ? (Func<object, string, LocationKind, Exception>)CreatePostconditionFailedException : CreateArgumentException;
-			var result = factory( value, locationName, locationKind );
-			return result;
-		}*/
 	}
 }

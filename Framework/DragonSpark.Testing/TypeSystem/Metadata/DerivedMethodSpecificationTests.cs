@@ -33,15 +33,12 @@ namespace DragonSpark.Testing.TypeSystem.Metadata
 
 		class Class : BaseClass
 		{
-			public override void Method()
-			{
-				/*base.Method();*/
-			}
+			public override void Method() {}
 
 			public override string Override
 			{
 				get { return base.Override; }
-				set { /*base.Override = value;*/ }
+				set { }
 			}
 		}
 	}

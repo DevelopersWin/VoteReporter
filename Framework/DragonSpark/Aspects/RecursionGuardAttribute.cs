@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace DragonSpark.Aspects
 {
 	[OnMethodBoundaryAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Caching )/*, AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )*/]
+	[LinesOfCodeAvoided( 3 ), ProvideAspectRole( StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Caching )]
 	public sealed class RecursionGuardAttribute : OnMethodBoundaryAspect
 	{
 		readonly int maxCallCount;
@@ -24,23 +24,6 @@ namespace DragonSpark.Aspects
 			this.maxCallCount = maxCallCount;
 			this.cache = cache;
 		}
-
-		/*class Count : ThreadAmbientStore<int>
-		{
-			public Count( MethodExecutionArgs args ) : base( Keys.For( args ).ToString() ) {}
-
-			int Update( bool up = true )
-			{
-				var amount = up ? 1 : -1;
-				var result = Value + amount;
-				Assign( result );
-				return result;
-			}
-
-			public int Increment() => Update();
-
-			public int Decrement() => Update( false );
-		}*/
 
 		public override void OnEntry( MethodExecutionArgs args )
 		{

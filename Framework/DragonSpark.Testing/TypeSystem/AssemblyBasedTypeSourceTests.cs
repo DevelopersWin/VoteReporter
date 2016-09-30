@@ -28,15 +28,5 @@ namespace DragonSpark.Testing.TypeSystem
 
 			public AssemblySource() : base( Result ) {}
 		}
-
-		/*[Fact]
-		public void IsFactory()
-		{
-			var result = SourceInterfaces.Default.Get( typeof(UnityContainerFactory) );
-			Assert.Equal( typeof(ISource<IUnityContainer>), result );
-
-			var implemented = ConventionImplementedInterfaces.Default.Get( typeof(UnityContainerFactory) );
-			Assert.Null( implemented );
-		}*/
 	}
 }

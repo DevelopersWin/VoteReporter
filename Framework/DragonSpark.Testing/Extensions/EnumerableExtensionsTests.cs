@@ -21,15 +21,6 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.Count(), count );
 		}
 
-		/*[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
-		public void NullIfEmpty( IEnumerable<object> sut )
-		{
-			Assert.NotNull( sut.NullIfEmpty() );
-
-			Assert.Null( Enumerable.Empty<object>().NullIfEmpty() );
-		}*/
-
-
 		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Prepend( IEnumerable<object> sut, object[] items )
 		{
@@ -64,14 +55,6 @@ namespace DragonSpark.Testing.Extensions
 			Assert.IsType<HighPriority>( items.First() );
 			Assert.IsType<LowPriority>( items.Last() );
 		}
-
-		/*[Fact]
-		void PrioritizePredicate()
-		{
-			var items = new object[] { new LowPriority(), new NormalPriority(), new HighPriority() }.Prioritize( x => x.GetType().GetAttribute<PriorityAttribute>() ).ToArray();
-			Assert.IsType<HighPriority>( items.First() );
-			Assert.IsType<LowPriority>( items.Last() );
-		}*/
 
 		[Fact]
 		void PrioritizeNormalObject()

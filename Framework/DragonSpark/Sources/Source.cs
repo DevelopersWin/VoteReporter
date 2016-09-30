@@ -20,13 +20,5 @@ namespace DragonSpark.Sources
 		{
 			public static ICache<T, Source<T>> Sources { get; } = CacheFactory.Create<T, Source<T>>( arg => new Source<T>( arg ) );
 		}
-
-		/*public static IParameterizedSource<TParameter, TResult> ToFactory<TParameter, TResult>( this Func<TParameter, TResult> @this ) => ParameterizedSources<TParameter, TResult>.Default.Get( @this );
-		// public static IFactory<TParameter, TResult> ToFactory<TParameter, TResult>( this TResult @this ) where TResult : class => ParameterizedSources<TResult>.Default.Get( @this ).Wrap<TParameter, TResult>();
-		class ParameterizedSources<TParameter, TResult> : Cache<Func<TParameter, TResult>, IParameterizedSource<TParameter, TResult>>
-		{
-			public static ParameterizedSources<TParameter, TResult> Default { get; } = new ParameterizedSources<TParameter, TResult>();
-			ParameterizedSources() : base( result => new DelegatedFactory<TParameter, TResult>( result ) ) {}
-		}*/
 	}
 }

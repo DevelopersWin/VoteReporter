@@ -13,19 +13,6 @@ namespace DragonSpark.Sources
 {
 	public static class Extensions
 	{
-		/*public static IEnumerable<IQueryableObject> Expand( this IQueryableObject @this )
-		{
-			yield return @this;
-			var container = @this.Instance as IQueryableContainer;
-			if ( container != null )
-			{
-				foreach ( var item in container )
-				{
-					yield return item;
-				}
-			}
-		}*/
-
 		public static object Value( this object @this ) => @this.Value<object>();
 		public static T Value<T>( this object @this ) => SourceCoercer<T>.Default.Coerce( @this );
 
@@ -146,25 +133,6 @@ namespace DragonSpark.Sources
 			public static SuppliedSources<T> Default { get; } = new SuppliedSources<T>();
 			SuppliedSources() : base( source => new SuppliedDeferredSource<T>( source.Get ) ) {}
 		}
-		/*public static Func<T> Delegate<T>( this ISource<ISource<T>> @this ) => @this.ToDelegate().Delegate();
-		class SourceDelegates<T> : Cache<ISource<ISource<T>>, Func<T>>
-		{
-			public static Delegates<T> Default { get; } = new Delegates<T>();
-			SourceDelegates() : base( source => new Factory( source ).Create ) {}
-
-			class Factory : FactoryBase<T>
-			{
-				readonly ISource<ISource<T>> source;
-				public Factory( ISource<ISource<T>> source )
-				{
-					this.source = source;
-				}
-
-				public override T Create() => source.Get().Get();
-			}
-		}*/
-
-		
 
 		public static IEnumerable<T> GetEnumerable<T>( this ISource<ImmutableArray<T>> @this ) => EnumerableSource<T>.Sources.Get( @this )();
 		sealed class EnumerableSource<T> : SourceBase<IEnumerable<T>>

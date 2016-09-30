@@ -40,6 +40,7 @@
     <Compile Include="Activation\IsPublicTypeSpecification.cs" />
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
+    <Compile Include="Activation\SingletonDelegates.cs" />
     <Compile Include="Aspects\AdapterConstructorSource.cs" />
     <Compile Include="Aspects\AdapterFactorySource.cs" />
     <Compile Include="Aspects\AdapterLocatorBase.cs" />
@@ -578,7 +579,6 @@
     <Compile Include="Diagnostics\DebugOutputCommand.cs" />
     <Compile Include="Formatter.cs" />
     <Compile Include="Diagnostics\LogTemplate.cs" />
-    <Compile Include="Aspects\Exceptions\Policies.cs" />
     <Compile Include="Commands\Extensions.cs" />
     <Compile Include="Extensions\MethodExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -649,7 +649,6 @@
     <Compile Include="Runtime\Assignments\ParameterInvocation.cs" />
     <Compile Include="Specifications\DecoratedSpecification.cs" />
     <Compile Include="Sources\AmbientStackCommand.cs" />
-    <Compile Include="Sources\Parameterized\Caching\ConnectedStore.cs" />
     <Compile Include="Specifications\AlwaysSpecification.cs" />
     <Compile Include="Specifications\SuppliedSpecification.cs" />
     <Compile Include="Activation\ConstructCoercer.cs" />
@@ -711,7 +710,6 @@
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
-    <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />

@@ -48,6 +48,7 @@
     <Compile Include="Activation\ConstructorsTests.cs" />
     <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\ConstructorCoercerTests.cs" />
+    <Compile Include="Application\TaskedTaskExecutionContextTests.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercerAttributeTests.cs" />
     <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyAttributeTests.cs" />
     <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsAttributeTests.cs" />
@@ -80,7 +81,6 @@
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
     <Compile Include="Runtime\DelegateTests.cs" />
-    <Compile Include="Sources\Parameterized\Caching\EqualityCacheTests.cs" />
     <Compile Include="Runtime\PurgingCollectionTests.cs" />
     <Compile Include="Sources\DelegatesTests.cs" />
     <Compile Include="Sources\ScopeTests.cs" />
@@ -99,7 +99,6 @@
     </Compile>
     <Compile Include="Configuration\RegistrationTests.cs" />
     <Compile Include="Configuration\ValueStoreBaseTests.cs" />
-    <Compile Include="Diagnostics\ApplicationExceptionFormatterTests.cs" />
     <Compile Include="FormatterTests.cs" />
     <Compile Include="Diagnostics\LoggerTests.cs" />
     <Compile Include="Diagnostics\LoggerHistorySinkTests.cs" />
@@ -109,7 +108,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Extensions\StringExtensionsTests.cs" />
-    <Compile Include="Extensions\UnityContainerExtensionsTests.cs" />
     <Compile Include="Properties\ResourcesTests.cs" />
     <Compile Include="Runtime\DeclarativeCollectionTests.cs" />
     <Compile Include="Commands\CompositeCommandTests.cs" />
@@ -129,7 +127,6 @@
     <Compile Include="Extensions\ReflectionExtensionsTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Extensions\WeakReferenceListExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

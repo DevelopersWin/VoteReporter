@@ -124,15 +124,6 @@ namespace DragonSpark.Testing.Aspects.Specifications
 		sealed class SpecificationCommand : CommandBase<int>
 		{
 			public override void Execute( int parameter ) {}
-
-			/*sealed class Specification : ISpecification<int>
-			{
-				[UsedImplicitly]
-				public static Specification Default { get; } = new Specification();
-				Specification() {}
-
-				public bool IsSatisfiedBy( int parameter ) => parameter == 6776;
-			}*/
 		}
 
 		[ApplySpecification( typeof(Specification) )]

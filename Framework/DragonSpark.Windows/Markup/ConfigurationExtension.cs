@@ -34,18 +34,4 @@ namespace DragonSpark.Windows.Markup
 			return result;
 		}
 	}
-
-	/*public class MemberInfoFromPropertyFactory : FirstFromParameterFactory<object, MemberInfo>
-	{
-		public class PropertyInfoFactory : Factory<object, MemberInfo>
-		{
-			public static PropertyInfoFactory Default { get; } = new PropertyInfoFactory();
-
-			protected override MemberInfo CreateItem( object parameter ) => parameter;
-		}
-
-		public MemberInfoFromPropertyFactory() : base( PropertyInfoFactory.Default )
-		{
-		}
-	}*/
 }

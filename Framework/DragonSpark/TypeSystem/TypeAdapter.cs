@@ -69,15 +69,9 @@ namespace DragonSpark.TypeSystem
 				if ( current != typeof(object) || includeRoot )
 				{
 					yield return current;
-					// builder.Add( current );
 				}
 				current = current.GetTypeInfo().BaseType;
 			}
-			/*var builder = ImmutableArray.CreateBuilder<Type>();
-			builder.Add( Type );
-			
-			var result = builder.ToArray();
-			return result;*/
 		}
 
 		[Freeze]

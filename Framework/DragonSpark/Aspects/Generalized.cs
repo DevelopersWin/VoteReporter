@@ -11,9 +11,6 @@ namespace DragonSpark.Aspects
 
 	public abstract class SourceBase<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>, IParameterizedSource<object, object>, ISpecification<object>
 	{
-		/*[Specifications.Aspect]
-		bool ISpecification<TParameter>.IsSatisfiedBy( TParameter parameter ) => false;*/
-
 		[Relay.SpecificationMethodAspect, Coercion.Aspect]
 		bool ISpecification<object>.IsSatisfiedBy( object parameter ) => false;
 

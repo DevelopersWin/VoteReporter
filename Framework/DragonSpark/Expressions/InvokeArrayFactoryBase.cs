@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace DragonSpark.Expressions
 {
-	abstract class InvokeArrayFactoryBase<T> /*: FactoryBase<ExpressionBodyParameter<T>, Expression>*/ where T : MethodBase
+	abstract class InvokeArrayFactoryBase<T> where T : MethodBase
 	{
 		public virtual Expression Create( ExpressionBodyParameter<T> parameter )
 		{
