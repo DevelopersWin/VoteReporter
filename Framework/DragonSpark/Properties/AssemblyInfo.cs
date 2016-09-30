@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible( false )]
 
-[assembly: AssemblyVersion( "2016.2.1.1" )]
-[assembly: AssemblyFileVersion( "2016.2.1.1" )]
+[assembly: AssemblyVersion( "0.1.0.0" )]
+[assembly: AssemblyFileVersion( "0.1.0.0" )]
 [assembly: InternalsVisibleTo( "DragonSpark.Testing" )]
 [assembly: Registration( Priority.BeforeLowest )]
