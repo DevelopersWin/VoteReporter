@@ -21,7 +21,6 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
-using Parameter = DragonSpark.Testing.Objects.Composition.Parameter;
 
 namespace DragonSpark.Testing.Composition
 {
@@ -113,24 +112,24 @@ namespace DragonSpark.Testing.Composition
 		public void BasicCompositionWithParameter( CompositionContext host, string text )
 		{
 			var test = host.GetExport<IParameterService>();
-			var parameter = Assert.IsType<Parameter>( test.Parameter );
+			var parameter = Assert.IsType<FormatterParameter>( test.Parameter );
 			Assert.Equal( "WithInstance by ParameterService", parameter.Message );
 		}
 
 		[Theory, AutoData, Types]
 		public void FactoryWithParameterDelegate( CompositionContext host, string message )
 		{
-			var factory = host.GetExport<Func<Parameter, IParameterService>>();
+			var factory = host.GetExport<Func<FormatterParameter, IParameterService>>();
 			Assert.NotNull( factory );
 
-			var parameter = new Parameter();
+			var parameter = new FormatterParameter();
 			var created = factory( parameter );
 				
 			Assert.Same( parameter, created.Parameter );
 			Assert.Equal( "WithInstance by ParameterService", parameter.Message );
 
 			var test = host.GetExport<IParameterService>();
-			var p = Assert.IsType<Parameter>( test.Parameter );
+			var p = Assert.IsType<FormatterParameter>( test.Parameter );
 			Assert.Equal( "WithInstance by ParameterService", p.Message );
 			Assert.NotSame( parameter, p );
 		}

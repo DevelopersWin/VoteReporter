@@ -225,6 +225,7 @@
     <Compile Include="Diagnostics\Logging\SystemLogger.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactory.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactorySource.cs" />
+    <Compile Include="FormatterParameter.cs" />
     <Compile Include="PrioritizedCollection.cs" />
     <Compile Include="PriorityAwareCollection.cs" />
     <Compile Include="PriorityAwareLocator.cs" />
@@ -235,6 +236,7 @@
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AssignableParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingFactory.cs" />
+    <Compile Include="Sources\Parameterized\Caching\StackAssignment.cs" />
     <Compile Include="Sources\Parameterized\CoercedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\DictionarySource.cs" />
     <Compile Include="Sources\Parameterized\IAssignableParameterizedSource.cs" />

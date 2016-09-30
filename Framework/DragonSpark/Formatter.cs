@@ -7,17 +7,17 @@ using System.Composition;
 
 namespace DragonSpark
 {
-	public interface IFormatter : IParameterizedSource<Formatter.Parameter, string>, IParameterizedSource<object, string> {}
+	public interface IFormatter : IParameterizedSource<FormatterParameter, string>, IParameterizedSource<object, string> {}
 
-	public sealed class Formatter : DecoratedParameterizedSource<Formatter.Parameter, string>, IFormatter
+	public sealed class Formatter : DecoratedParameterizedSource<FormatterParameter, string>, IFormatter
 	{
 		[Export]
 		public static IFormatter Default { get; } = new Formatter();
-		Formatter() : this( Inner.DefaultNested.Apply( ConstructCoercer<Parameter>.Default ).ToCache(), Inner.DefaultNested ) {}
+		Formatter() : this( Inner.DefaultNested.Apply( ConstructCoercer<FormatterParameter>.Default ).ToCache(), Inner.DefaultNested ) {}
 
 		readonly IParameterizedSource<object, string> general;
 		
-		Formatter( IParameterizedSource<object, string> general, IParameterizedSource<Parameter, string> source ) : base( source )
+		Formatter( IParameterizedSource<object, string> general, IParameterizedSource<FormatterParameter, string> source ) : base( source )
 		{
 			this.general = general;
 		}
@@ -25,9 +25,9 @@ namespace DragonSpark
 		public string Get( object parameter ) => general.Get( parameter );
 
 
-		sealed class Inner : ParameterizedSourceBase<Parameter, string>
+		sealed class Inner : ParameterizedSourceBase<FormatterParameter, string>
 		{
-			readonly static Func<Parameter, string> Coerce = p => StringCoercer.Default.Coerce( p.Instance );
+			readonly static Func<FormatterParameter, string> Coerce = p => StringCoercer.Default.Coerce( p.Instance );
 
 			public static Inner DefaultNested { get; } = new Inner();
 			Inner() : this( ConstructFromKnownTypes<IFormattable>.Default.Delegate() ) {}
@@ -40,21 +40,9 @@ namespace DragonSpark
 				this.factory = factory;
 			}
 
-			public override string Get( Parameter parameter ) => factory( parameter.Instance )?.ToString( parameter.Format, parameter.Provider ) ?? Coerce( parameter );
+			public override string Get( FormatterParameter parameter ) => factory( parameter.Instance )?.ToString( parameter.Format, parameter.Provider ) ?? Coerce( parameter );
 		}
 
-		public struct Parameter
-		{
-			public Parameter( object instance, string format = null, IFormatProvider provider = null )
-			{
-				Instance = instance;
-				Format = format;
-				Provider = provider;
-			}
-
-			public object Instance { get; }
-			public string Format { get; }
-			public IFormatProvider Provider { get; }
-		}
+		
 	}
 }
