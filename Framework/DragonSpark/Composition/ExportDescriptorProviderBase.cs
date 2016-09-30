@@ -15,7 +15,7 @@ namespace DragonSpark.Composition
 				create = Create;
 			}
 
-			public override ExportDescriptor Get( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( create, NoMetadata );
+			public override ExportDescriptor Get( IEnumerable<CompositionDependency> parameter ) => ExportDescriptor.Create( create, NoMetadata );
 
 			protected abstract object Create( LifetimeContext context, CompositionOperation operation );
 		}

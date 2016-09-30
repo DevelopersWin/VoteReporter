@@ -13,7 +13,7 @@ namespace DragonSpark.Diagnostics.Logging.Configurations
 	{
 		public DeclarativeCollection<CommandBase<LoggerConfiguration>> Commands { get; } = new DeclarativeCollection<CommandBase<LoggerConfiguration>>();
 
-		public override LoggerConfiguration Get( LoggerConfiguration configuration ) => Commands.Aggregate( configuration, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Execute ) );
+		public override LoggerConfiguration Get( LoggerConfiguration parameter ) => Commands.Aggregate( parameter, ( loggerConfiguration, command ) => loggerConfiguration.With( command.Execute ) );
 	}
 
 	/*public class DestructureMethodCommand : DestructureByFactoryCommand<MethodInfo>

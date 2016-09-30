@@ -15,7 +15,7 @@ namespace DragonSpark.Aspects
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )
 	]
 	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	public class TimedAttribute : MethodInterceptionAspect
+	public sealed class TimedAttribute : MethodInterceptionAspect
 	{
 		readonly Func<Func<MethodBase, IDisposable>> source;
 
@@ -23,12 +23,12 @@ namespace DragonSpark.Aspects
 
 		public TimedAttribute( string template ) : this( Diagnostics.Logging.Configuration.TimedOperationFactory.Fixed( template ).ToDelegate() ) {}
 
-		protected TimedAttribute( Func<Func<MethodBase, IDisposable>> source )
+		TimedAttribute( Func<Func<MethodBase, IDisposable>> source )
 		{
 			this.source = source;
 		}
 
-		public sealed override void OnInvoke( MethodInterceptionArgs args )
+		public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			using ( source()( args.Method ) )
 			{

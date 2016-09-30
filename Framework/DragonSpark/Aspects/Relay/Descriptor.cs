@@ -34,7 +34,7 @@ namespace DragonSpark.Aspects.Relay
 
 		public Type DeclaringType { get; }
 
-		public IAspect Get( object source ) => aspectSource( adapterSource( source ) );
+		public IAspect Get( object parameter ) => aspectSource( adapterSource( parameter ) );
 
 		IEnumerable<AspectInstance> IParameterizedSource<Type, IEnumerable<AspectInstance>>.Get( Type parameter )
 		{

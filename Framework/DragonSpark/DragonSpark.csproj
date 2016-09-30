@@ -23,6 +23,8 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>C:\Users\micha\OneDrive\Documents\Visual Studio 2015\Projects\Framework\DragonSpark.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -151,6 +153,7 @@
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />
     <Compile Include="Commands\SpecificationCommand.cs" />
+    <Compile Include="ComponentModel\ServicesValueProviderConverter.cs" />
     <Compile Include="Composition\ActivationParameter.cs" />
     <Compile Include="Composition\ActivatorSource.cs" />
     <Compile Include="Composition\CompositeActivatorParameters.cs" />
@@ -237,6 +240,7 @@
     <Compile Include="Sources\Parameterized\IAssignableParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\SourceTypeMapping.cs" />
     <Compile Include="Sources\Parameterized\SpecificationParameterizedSource.cs" />
+    <Compile Include="Sources\SourceTypeCandidateParameter.cs" />
     <Compile Include="Sources\ThreadIdentitySource.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
     <Compile Include="Specifications\ContainsItemSpecification.cs" />

@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Validation
 		readonly ISpecification<object> fallback;
 		readonly Func<MethodInfo, bool> method;
 
-		protected ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method ) : this( inner, Specifications<object>.Never, method ) {}
+		protected ParameterValidationAdapterBase( ISpecification<T> inner, Func<MethodInfo, bool> method ) : this( inner, Common<object>.Never, method ) {}
 
 		protected ParameterValidationAdapterBase( ISpecification<T> inner, ISpecification<object> fallback, Func<MethodInfo, bool> method )
 		{

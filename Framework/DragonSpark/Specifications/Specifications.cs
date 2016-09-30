@@ -1,4 +1,4 @@
 namespace DragonSpark.Specifications
 {
-	public class Specifications : Specifications<object> {}
+	public class Common : Common<object> {}
 }

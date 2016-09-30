@@ -4,7 +4,7 @@ using System;
 
 namespace DragonSpark.Aspects
 {
-	public class OfSourceType : OfTypeAttribute
+	public sealed class OfSourceType : OfTypeAttribute
 	{
 		public OfSourceType() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(Func<>), typeof(Func<,>) ) {}
 	}

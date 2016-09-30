@@ -8,7 +8,7 @@ namespace DragonSpark.Testing.Specifications
 		[Fact]
 		public void Never()
 		{
-			Assert.False( DragonSpark.Specifications.Specifications.Never.IsSatisfiedBy( Defaults.Parameter ) );
+			Assert.False( DragonSpark.Specifications.Common.Never.IsSatisfiedBy( Defaults.Parameter ) );
 		} 
 	}
 }

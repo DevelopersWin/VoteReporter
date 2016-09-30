@@ -22,7 +22,7 @@ namespace DragonSpark
 			this.general = general;
 		}
 
-		public string Get( object item ) => general.Get( item );
+		public string Get( object parameter ) => general.Get( parameter );
 
 
 		sealed class Inner : ParameterizedSourceBase<Parameter, string>

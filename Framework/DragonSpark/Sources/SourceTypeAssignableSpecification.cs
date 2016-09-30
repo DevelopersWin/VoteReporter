@@ -1,17 +1,17 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonSpark.Specifications;
 
 namespace DragonSpark.Sources
 {
-	public sealed class SourceTypeAssignableSpecification : SpecificationBase<SourceTypeAssignableSpecification.Parameter>
+	public sealed class SourceTypeAssignableSpecification : SpecificationBase<SourceTypeCandidateParameter>
 	{
 		public static SourceTypeAssignableSpecification Default { get; } = new SourceTypeAssignableSpecification();
 		SourceTypeAssignableSpecification() {}
 
-		public override bool IsSatisfiedBy( Parameter parameter )
+		public override bool IsSatisfiedBy( SourceTypeCandidateParameter parameter )
 		{
 			foreach ( var candidate in Candidates( parameter.Candidate ) )
 			{
@@ -31,18 +31,6 @@ namespace DragonSpark.Sources
 			{
 				yield return implementations.First().Adapt().GetInnerType();
 			}
-		}
-
-		public struct Parameter
-		{
-			public Parameter( Type targetType, Type candidate )
-			{
-				TargetType = targetType;
-				Candidate = candidate;
-			}
-
-			public Type TargetType { get; }
-			public Type Candidate { get; }
 		}
 	}
 }

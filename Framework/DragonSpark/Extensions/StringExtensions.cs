@@ -21,9 +21,9 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static string TrimStartOf( this string @this, params char[] chars )
+		public static string TrimStartOf( this string @this, params char[] characters )
 		{
-			foreach ( var c in chars )
+			foreach ( var c in characters )
 			{
 				if ( @this.StartsWith( c.ToString() ) )
 				{

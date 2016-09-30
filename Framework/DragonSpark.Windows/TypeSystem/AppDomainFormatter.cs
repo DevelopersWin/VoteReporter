@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Application;
+using JetBrains.Annotations;
 using System;
 using System.Runtime.InteropServices;
 
@@ -6,15 +7,15 @@ namespace DragonSpark.Windows.TypeSystem
 {
 	public sealed class AppDomainFormatter : IFormattable
 	{
-		readonly Func<AssemblyInformation> assemblySource;
+		readonly string title;
 
-		public AppDomainFormatter( AppDomain appDomain ) : this( DefaultAssemblyInformationSource.Default.Get ) {}
+		public AppDomainFormatter( [UsedImplicitly]AppDomain appDomain ) : this( DefaultAssemblyInformationSource.Default.Get().Title ) {}
 
-		AppDomainFormatter( Func<AssemblyInformation> assemblySource )
+		AppDomainFormatter( string title )
 		{
-			this.assemblySource = assemblySource;
+			this.title = title;
 		}
 
-		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => assemblySource().Title;
+		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => title;
 	}
 }

@@ -22,7 +22,7 @@ namespace DragonSpark.Sources.Parameterized
 			this.scope = scope;
 		}
 
-		public override TResult Get( TParameter key ) => scope.Get().Invoke( key );
+		public override TResult Get( TParameter parameter ) => scope.Get().Invoke( parameter );
 
 		public void Assign( ISource item ) => scope.Assign( item );
 

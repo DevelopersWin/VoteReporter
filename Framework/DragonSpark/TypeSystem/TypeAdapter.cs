@@ -20,22 +20,22 @@ namespace DragonSpark.TypeSystem
 		
 		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
 		readonly Func<Type, Type[]> getTypeArguments;
-		public TypeAdapter( Type type ) : this( type, type.GetTypeInfo() ) {}
+		public TypeAdapter( Type referenceType ) : this( referenceType, referenceType.GetTypeInfo() ) {}
 
 		public TypeAdapter( TypeInfo info ) : this( info.AsType(), info ) {}
 
-		public TypeAdapter( Type type, TypeInfo info )
+		public TypeAdapter( Type referenceType, TypeInfo info )
 		{
-			Type = type;
+			ReferenceType = referenceType;
 			Info = info;
 			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Get ).Get;
-			GenericFactoryMethods = new GenericStaticMethodFactories( Type );
-			GenericCommandMethods = new GenericStaticMethodCommands( Type );
+			GenericFactoryMethods = new GenericStaticMethodFactories( ReferenceType );
+			GenericCommandMethods = new GenericStaticMethodCommands( ReferenceType );
 			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).Get;
 			getTypeArguments = new GetTypeArgumentsForCache( this ).Get;
 		}
 
-		public Type Type { get; }
+		public Type ReferenceType { get; }
 
 		public TypeInfo Info { get; }
 
@@ -50,7 +50,7 @@ namespace DragonSpark.TypeSystem
 				.SingleOrDefault();
 
 		public bool IsAssignableFrom( Type other ) => isAssignableFrom( other );
-		bool IsAssignableFromBody( Type parameter ) => Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( Type ) || Info.IsAssignableFrom( parameter.GetTypeInfo() );
+		bool IsAssignableFromBody( Type parameter ) => Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( ReferenceType ) || Info.IsAssignableFrom( parameter.GetTypeInfo() );
 		class IsInstanceOfTypeOrDefinitionCache : ArgumentCache<Type, bool>
 		{
 			public IsInstanceOfTypeOrDefinitionCache( TypeAdapter owner ) : base( owner.IsAssignableFromBody ) {}
@@ -62,7 +62,7 @@ namespace DragonSpark.TypeSystem
 
 		public IEnumerable<Type> GetHierarchy( bool includeRoot = false )
 		{
-			yield return Type;
+			yield return ReferenceType;
 			var current = Info.BaseType;
 			while ( current != null )
 			{
@@ -111,7 +111,7 @@ namespace DragonSpark.TypeSystem
 		[Freeze]
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true )
 		{
-			var result = Type.Append( includeInterfaces ? Expand( Type ) : Items<Type>.Default )
+			var result = ReferenceType.Append( includeInterfaces ? Expand( ReferenceType ) : Items<Type>.Default )
 							 .Distinct()
 							 .Introduce( genericDefinition, tuple =>
 															{
@@ -135,11 +135,11 @@ namespace DragonSpark.TypeSystem
 		public bool IsGenericOf( Type genericDefinition, bool includeInterfaces ) => GetImplementations( genericDefinition, includeInterfaces ).Any();
 
 		[Freeze]
-		public Type[] GetAllInterfaces() => Expand( Type ).ToArray();
+		public Type[] GetAllInterfaces() => Expand( ReferenceType ).ToArray();
 
 		static IEnumerable<Type> ExpandInterfaces( Type target ) => target.Append( target.GetTypeInfo().ImplementedInterfaces.SelectMany( Expand ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();
 
 		[Freeze]
-		public ImmutableArray<Type> GetEntireHierarchy() => Expand( Type ).Union( GetHierarchy() ).ToImmutableArray();
+		public ImmutableArray<Type> GetEntireHierarchy() => Expand( ReferenceType ).Union( GetHierarchy() ).ToImmutableArray();
 	}
 }

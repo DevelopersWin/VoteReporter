@@ -6,17 +6,10 @@ namespace DragonSpark.TypeSystem
 {
 	public static class Items<T>
 	{
-		static Items()
-		{
-			Default = (T[])Enumerable.Empty<T>();
-			Immutable = Default.ToImmutableArray();
-			List = Default.ToImmutableList();
-		}
+		public static T[] Default { get; } = (T[])Enumerable.Empty<T>();
 
-		public static T[] Default { get; }
+		public static ImmutableArray<T> Immutable { get; } = Default.ToImmutableArray();
 
-		public static ImmutableArray<T> Immutable { get; }
-
-		public static IList<T> List { get; }
+		public static IList<T> List { get; } = Default.ToImmutableList();
 	}
 }

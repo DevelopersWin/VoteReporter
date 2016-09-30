@@ -44,7 +44,6 @@
       <DependentUpon>Logging.xaml</DependentUpon>
     </Compile>
     <Compile Include="Mappings.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="Values.xaml.cs">
       <DependentUpon>Values.xaml</DependentUpon>
     </Compile>

@@ -28,9 +28,9 @@ namespace DragonSpark.Sources.Parameterized.Caching
 			return store.TryRemove( instance, out removed );
 		}
 
-		public override void Set( TArgument instance, TValue value ) => store[instance] = value;
+		public override void Set( TArgument parameter, TValue result ) => store[parameter] = result;
 
-		public override TValue Get( TArgument key ) => store.GetOrAdd( key, body );
+		public override TValue Get( TArgument parameter ) => store.GetOrAdd( parameter, body );
 
 		public virtual TValue GetOrSet( TArgument key, Func<TValue> factory )
 		{

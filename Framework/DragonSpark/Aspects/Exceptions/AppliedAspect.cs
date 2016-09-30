@@ -1,12 +1,12 @@
-using System;
 using PostSharp.Aspects;
+using System;
 
 namespace DragonSpark.Aspects.Exceptions
 {
 	[AttributeUsage( AttributeTargets.Method )]
-	public class AppliedAspect : AspectBase
+	public sealed class AppliedAspect : AspectBase
 	{
-		public sealed override void OnInvoke( MethodInterceptionArgs args )
+		public override void OnInvoke( MethodInterceptionArgs args )
 		{
 			var source = args.Instance as IPolicySource;
 			if ( source != null )

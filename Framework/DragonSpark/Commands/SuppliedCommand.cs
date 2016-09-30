@@ -32,7 +32,7 @@ namespace DragonSpark.Commands
 
 		public SuppliedCommand( ICommand<T> command, Func<T> parameter )
 		{
-			this.command = new SpecificationCommand<T>( Specifications<T>.Assigned, command.ToDelegate() );
+			this.command = new SpecificationCommand<T>( Common<T>.Assigned, command.ToDelegate() );
 			this.parameter = parameter;
 		}
 

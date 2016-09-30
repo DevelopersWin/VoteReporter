@@ -1,5 +1,6 @@
 using DragonSpark.ComponentModel;
 using DragonSpark.Configuration;
+using JetBrains.Annotations;
 using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Windows.Markup
@@ -15,7 +16,7 @@ namespace DragonSpark.Windows.Markup
 			this.key = key;
 		}
 
-		[Required, Service]
+		[Required, Service, UsedImplicitly]
 		IValueStore Store { [return: Required] get; set; }
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider )

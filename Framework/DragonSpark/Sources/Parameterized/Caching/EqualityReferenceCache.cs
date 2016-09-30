@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources.Parameterized.Caching
 {
@@ -22,8 +21,8 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		public override bool Remove( TInstance instance ) => base.Remove( equalitySource( instance ) );
 
-		public override void Set( TInstance instance, [Optional]TValue value ) => base.Set( equalitySource( instance ), value );
+		public override void Set( TInstance parameter, TValue result ) => base.Set( equalitySource( parameter ), result );
 
-		public override TValue Get( TInstance instance ) => base.Get( equalitySource( instance )  );
+		public override TValue Get( TInstance parameter ) => base.Get( equalitySource( parameter )  );
 	}
 }

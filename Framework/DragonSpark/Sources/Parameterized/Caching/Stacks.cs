@@ -1,3 +1,4 @@
+using DragonSpark.Runtime;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 			public override IAssignableSource<IStack<T>> Get( object instance ) => new Factory( this, instance ).Get();
 
-			sealed class Factory
+			sealed class Factory : DisposableBase
 			{
 				readonly Store owner;
 				readonly object instance;
@@ -69,6 +70,8 @@ namespace DragonSpark.Sources.Parameterized.Caching
 					bool stored;
 					return empty.ContainsKey( stack ) && empty.TryGetValue( stack, out stored ) && stored;
 				}
+
+				protected override void OnDispose( bool disposing ) => store.Dispose();
 			}
 
 			void Clear( object instance ) => callback( this, instance );

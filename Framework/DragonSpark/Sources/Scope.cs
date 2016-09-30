@@ -1,10 +1,11 @@
+using DragonSpark.Aspects;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
 
 namespace DragonSpark.Sources
 {
-	public class Scope<T> : SourceBase<T>, IScope<T>
+	public class Scope<T> : SourceBase<T>, IScope<T>, IDisposable
 	{
 		readonly ICache<Func<object, T>> factories = new Cache<Func<object, T>>();
 		readonly IAssignableSource<object> scope;
@@ -40,5 +41,21 @@ namespace DragonSpark.Sources
 		}
 
 		public void Assign( ISource item ) => scope.Assign( item );
+		
+		~Scope()
+		{
+			Dispose( false );
+		}
+
+		public void Dispose()
+		{
+			Dispose( true );
+			GC.SuppressFinalize( this );
+		}
+
+		[Freeze]
+		void Dispose( bool disposing ) => OnDispose( disposing );
+
+		protected virtual void OnDispose( bool disposing ) {}
 	}
 }

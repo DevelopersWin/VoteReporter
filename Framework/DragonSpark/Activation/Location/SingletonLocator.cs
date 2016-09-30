@@ -8,7 +8,7 @@ namespace DragonSpark.Activation.Location
 {
 	public sealed class SingletonLocator : ActivatorBase, ISingletonLocator
 	{
-		readonly static ISpecification<Type> Specification = Specifications<Type>.Assigned.And( ContainsSingletonPropertySpecification.Default );
+		readonly static ISpecification<Type> Specification = Common<Type>.Assigned.And( ContainsSingletonPropertySpecification.Default );
 		
 		[Export]
 		public static ISingletonLocator Default { get; } = new SingletonLocator();

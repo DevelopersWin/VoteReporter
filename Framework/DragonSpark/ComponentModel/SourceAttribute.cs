@@ -8,7 +8,7 @@ namespace DragonSpark.ComponentModel
 	public sealed class SourceAttribute : ServicesValueBase
 	{
 		readonly static Func<Type, object> Creator = Create;
-		public SourceAttribute( [OfSourceType]Type sourceType = null ) : base( new ServicesValueProvider.Converter( info => sourceType ?? info.PropertyType ), Creator ) {}
+		public SourceAttribute( [OfSourceType]Type sourceType = null ) : base( new ServicesValueProviderConverter( info => sourceType ?? info.PropertyType ), Creator ) {}
 
 		static object Create( Type type ) => Defaults.ServiceSource( type ).Value();
 	}

@@ -10,7 +10,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 	public abstract class FactoryCache<TInstance, TValue> : DecoratedCache<TInstance, TValue>
 	{
-		readonly protected static ISpecification<TInstance> DefaultSpecification = Specifications<TInstance>.Always;
+		readonly protected static ISpecification<TInstance> DefaultSpecification = Common<TInstance>.Always;
 
 		protected FactoryCache() : this( DefaultSpecification ) {}
 		protected FactoryCache( ISpecification<TInstance> specification ) : this( new AssignableParameterizedSource<TInstance, TValue>( instance => default(TValue) ), specification ) {}

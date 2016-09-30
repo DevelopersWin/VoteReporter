@@ -18,6 +18,6 @@ namespace DragonSpark.Specifications
 			this.parameterSource = parameterSource;
 		}
 
-		public override bool IsSatisfiedBy( object _ ) => source( parameterSource() );
+		public override bool IsSatisfiedBy( object parameter ) => source( parameterSource() );
 	}
 }

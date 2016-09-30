@@ -16,7 +16,7 @@ namespace DragonSpark.Aspects.Exceptions
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.EnhancedValidation ),
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )
 		]
-	public class ApplyExceptionPolicyAttribute : ApplyInstanceAspectBase, IPolicySource
+	public sealed class ApplyExceptionPolicyAttribute : ApplyInstanceAspectBase, IPolicySource
 	{
 		readonly static Func<Type, Policy> Source = Activator.Default.Get<Policy>;
 
@@ -24,7 +24,7 @@ namespace DragonSpark.Aspects.Exceptions
 
 		public ApplyExceptionPolicyAttribute( Type policyType ) : this( policyType, Source ) {}
 
-		protected ApplyExceptionPolicyAttribute( Type policyType, Func<Type, Policy> source ) : this( source.Fixed( policyType ) ) {}
+		ApplyExceptionPolicyAttribute( Type policyType, Func<Type, Policy> source ) : this( source.Fixed( policyType ) ) {}
 
 		ApplyExceptionPolicyAttribute( ISource<Policy> source ) : base( Support.Default )
 		{

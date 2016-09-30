@@ -10,6 +10,6 @@ namespace DragonSpark.Sources.Parameterized
 		public static ICache<Type, Type> Default { get; } = new ResultTypes();
 		ResultTypes() : base( typeof(IParameterizedSource<,>), typeof(ISource<>), typeof(Func<>), typeof(Func<,>) ) {}
 
-		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
+		protected override Type From( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.Last();
 	}
 }

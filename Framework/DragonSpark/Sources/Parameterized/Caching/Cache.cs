@@ -30,19 +30,19 @@ namespace DragonSpark.Sources.Parameterized.Caching
 			return items.TryGetValue( instance, out temp );
 		}
 
-		public override void Set( TInstance instance, TValue value )
+		public override void Set( TInstance parameter, TValue result )
 		{
 			lock ( items )
 			{
-				items.Remove( instance );
-				items.Add( instance, value );
+				items.Remove( parameter );
+				items.Add( parameter, result );
 			}
 		}
 
-		public override TValue Get( TInstance instance ) => items.GetValue( instance, create );
+		public override TValue Get( TInstance parameter ) => items.GetValue( parameter, create );
 		
 		public override bool Remove( TInstance instance ) => items.Remove( instance );
 
-		public TValue GetOrSet( TInstance instance, Func<TInstance, TValue> factory ) => items.GetValue( instance, new ConditionalWeakTable<TInstance, TValue>.CreateValueCallback( factory ) );
+		public TValue GetOrSet( TInstance key, Func<TInstance, TValue> factory ) => items.GetValue( key, new ConditionalWeakTable<TInstance, TValue>.CreateValueCallback( factory ) );
 	}
 }

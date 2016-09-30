@@ -21,9 +21,9 @@ namespace DragonSpark.Composition
 			this.builderSource = builderSource;
 		}
 
-		public override ContainerConfiguration Get( ContainerConfiguration configuration )
+		public override ContainerConfiguration Get( ContainerConfiguration parameter )
 		{
-			var result = configuration
+			var result = parameter
 				.WithDefaultConventions( builderSource() )
 				.WithParts( typesSource().AsEnumerable() )
 				.WithProvider( SingletonExportDescriptorProvider.Default )

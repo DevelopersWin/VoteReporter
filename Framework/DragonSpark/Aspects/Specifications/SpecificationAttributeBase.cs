@@ -11,6 +11,6 @@ namespace DragonSpark.Aspects.Specifications
 		ISpecification Specification { get; set; }
 		public override void RuntimeInitializeInstance() => Specification = DetermineSpecification();
 		protected abstract ISpecification DetermineSpecification();
-		bool ISpecification.IsSatisfiedBy( object parameter ) => Specification.IsSatisfiedBy( parameter );
+		public bool IsSatisfiedBy( object parameter ) => Specification.IsSatisfiedBy( parameter );
 	}
 }

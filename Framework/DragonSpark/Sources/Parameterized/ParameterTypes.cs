@@ -11,6 +11,6 @@ namespace DragonSpark.Sources.Parameterized
 		public static ICache<Type, Type> Default { get; } = new ParameterTypes();
 		ParameterTypes() : base( typeof(Func<,>), typeof(IParameterizedSource<,>), typeof(ICommand<>) ) {}
 
-		protected override Type Select( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.First();
+		protected override Type From( IEnumerable<Type> genericTypeArguments ) => genericTypeArguments.First();
 	}
 }

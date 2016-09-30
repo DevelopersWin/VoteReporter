@@ -15,7 +15,7 @@ namespace DragonSpark.Aspects
 
 		public OfTypeAttribute( params Type[] types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
 
-		OfTypeAttribute( ImmutableArray<TypeAdapter> types ) : this( types, $"The specified type is not of type (or cannot be cast to) {string.Join( " or ", types.Select( type => type.Type.FullName ) )}" ) {}
+		OfTypeAttribute( ImmutableArray<TypeAdapter> types ) : this( types, $"The specified type is not of type (or cannot be cast to) {string.Join( " or ", types.Select( type => type.ReferenceType.FullName ) )}" ) {}
 
 		OfTypeAttribute( ImmutableArray<TypeAdapter> types, string errorMessage )
 		{

@@ -21,7 +21,7 @@ namespace DragonSpark.Sources.Parameterized
 		{
 			this.adapters = adapters;
 			isAssignable = IsAssignable;
-			selector = Select;
+			selector = From;
 		}
 
 		protected override Type Create( Type parameter )
@@ -37,6 +37,6 @@ namespace DragonSpark.Sources.Parameterized
 
 		bool IsAssignable( TypeInfo type ) => type.IsGenericType && adapters.IsAssignableFrom( type.GetGenericTypeDefinition() );
 
-		protected abstract Type Select( IEnumerable<Type> genericTypeArguments );
+		protected abstract Type From( IEnumerable<Type> genericTypeArguments );
 	}
 }
