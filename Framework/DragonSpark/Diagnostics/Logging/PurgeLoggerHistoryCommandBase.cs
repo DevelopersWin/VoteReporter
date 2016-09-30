@@ -7,14 +7,6 @@ using System.Collections.Immutable;
 
 namespace DragonSpark.Diagnostics.Logging
 {
-	public sealed class PurgeLoggerHistoryCommand : PurgeLoggerHistoryCommandBase<LogEvent>
-	{
-		public static PurgeLoggerHistoryCommand Default { get; } = new PurgeLoggerHistoryCommand();
-		PurgeLoggerHistoryCommand() : this( LoggingHistory.Default.Get ) {}
-
-		public PurgeLoggerHistoryCommand( Func<ILoggerHistory> historySource ) : base( historySource, events => events.ToImmutableArray() ) {}
-	}
-
 	public abstract class PurgeLoggerHistoryCommandBase<T> : CommandBase<Action<T>>
 	{
 		readonly Func<ILoggerHistory> historySource;

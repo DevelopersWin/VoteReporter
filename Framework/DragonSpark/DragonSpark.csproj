@@ -209,8 +209,17 @@
     <Compile Include="Composition\SpecificationExporter.cs" />
     <Compile Include="Composition\TypeInitializingExportDescriptorProvider.cs" />
     <Compile Include="DefaultPriorityAware.cs" />
+    <Compile Include="Diagnostics\Exceptions\Retry.cs" />
     <Compile Include="Diagnostics\Exceptions\SuppliedRetryPolicySource.cs" />
     <Compile Include="Diagnostics\Logging\Configuration.cs" />
+    <Compile Include="Diagnostics\Logging\ConfigureLoggingCommand.cs" />
+    <Compile Include="Diagnostics\Logging\Defaults.cs" />
+    <Compile Include="Diagnostics\Logging\LoggerBase.cs" />
+    <Compile Include="Diagnostics\Logging\LoggerExportedConfigurations.cs" />
+    <Compile Include="Diagnostics\Logging\LoggerOutputSource.cs" />
+    <Compile Include="Diagnostics\Logging\LoggingConfigurationSource.cs" />
+    <Compile Include="Diagnostics\Logging\PurgeLoggerHistoryCommand.cs" />
+    <Compile Include="Diagnostics\Logging\SystemLogger.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactory.cs" />
     <Compile Include="Diagnostics\Logging\TimedOperationFactorySource.cs" />
     <Compile Include="PrioritizedCollection.cs" />
@@ -292,7 +301,7 @@
     <Compile Include="Diagnostics\Logging\Logger.cs" />
     <Compile Include="Diagnostics\Logging\Configurations\LoggerConfigurationCommandBase.cs" />
     <Compile Include="Diagnostics\Logging\DefaultSystemLoggerConfigurations.cs" />
-    <Compile Include="Diagnostics\Logging\LoggerConfigurationSourceBase.cs" />
+    <Compile Include="Diagnostics\Logging\DefaultLoggerAlterations.cs" />
     <Compile Include="Diagnostics\Logging\LoggingController.cs" />
     <Compile Include="Diagnostics\Logging\LoggingHistory.cs" />
     <Compile Include="Extensions\ConventionBasedFormattingExtensions.cs" />

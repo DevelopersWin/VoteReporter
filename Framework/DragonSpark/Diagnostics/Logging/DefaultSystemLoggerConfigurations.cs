@@ -1,20 +1,11 @@
-using DragonSpark.Configuration;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using Serilog;
 using System;
-using System.Linq;
 
 namespace DragonSpark.Diagnostics.Logging
 {
-	public sealed class LoggerExportedConfigurations : ConfigurationSource<LoggerConfiguration>
-	{
-		public static LoggerExportedConfigurations Default { get; } = new LoggerExportedConfigurations();
-		LoggerExportedConfigurations() : this( DefaultLoggerAlterations.Default.Get().ToArray() ) {}
-		public LoggerExportedConfigurations( params IAlteration<LoggerConfiguration>[] configurators ) : base( configurators ) {}
-	}
-
 	public sealed class DefaultSystemLoggerConfigurations : ItemSource<IAlteration<LoggerConfiguration>>
 	{
 		public static DefaultSystemLoggerConfigurations Default { get; } = new DefaultSystemLoggerConfigurations();

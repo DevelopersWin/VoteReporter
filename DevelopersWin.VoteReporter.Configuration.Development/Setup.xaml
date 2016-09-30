@@ -4,5 +4,10 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
+	xmlns:commands="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
+	xmlns:ds="http://framework.dragonspark.us"
+	xmlns:properties="clr-namespace:DevelopersWin.VoteReporter.Parts.Development.Properties"
 	mc:Ignorable="d" 
-/>
+>
+	<commands:DeclaredSuppliedCommand Command="{x:Static ds:InitializeUserSettingsCommand.Default}" Parameter="{x:Static properties:Settings.Default}" />
+</setup:DeclarativeSetup>
