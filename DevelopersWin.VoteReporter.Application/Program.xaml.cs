@@ -6,17 +6,6 @@ namespace DevelopersWin.VoteReporter.Application
 	{
 		static void Main( string[] args )
 		{
-			/*foreach ( var command in ApplicationCommands.Default.Get() )
-			{
-				command.Execute( args );
-			}*/
-
-			/*var temp = Parts.Common.Properties.Settings.Default.ApiKey;
-			Debugger.Break();*/
-
-			// System.Windows.Forms.Application.LocalUserAppDataPath
-			// var folder = locala
-
 			using ( var program = new Program() )
 			{
 				program.Run( args );
