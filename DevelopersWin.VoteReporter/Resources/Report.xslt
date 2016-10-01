@@ -5,8 +5,7 @@
 >
 	<xsl:output method="html" indent="no" />
 
-	<xsl:template match="local:VoteReport"><xsl:variable name="Date" select="msxsl:format-date( @Created, 'dddd, MMMM d, yyyy')" /><xsl:variable name="TotalUbiquitous" select="format-number(local:VoteReport.Groups/local:VoteGroupView[1]//local:VoteCount/@Count, '###,###')" />TITLE:
-======
+	<xsl:template match="local:VoteReport"><xsl:variable name="Date" select="msxsl:format-date( @Created, 'dddd, MMMM d, yyyy')" /><xsl:variable name="TotalUbiquitous" select="format-number(local:VoteReport.Groups/local:VoteGroupView[1]//local:VoteCount/@Count, '###,###')" /><xsl:variable name="WeeklyPremiere" select="//local:VoteView[@Id = '0dbdb0e3-35d2-4e72-b1c3-ff26a70c52fe']//local:VoteCount[1]/@Delta" />TITLE:======
 Weekly Vote Report for <xsl:value-of select="$Date" />
 
 BODY:
@@ -30,6 +29,14 @@ Dark O' Thirty:
 
 Disqus Comment:
 Please show your support by liking and/or re-tweeting our kind, weekly ping to the Big Three there @ MSFT: 
+
+asdf1234
+UserVoice:
+<xsl:value-of select="$WeeklyPremiere" /> votes were cast for this idea last week, bringing the total to <xsl:value-of select="$TotalUbiquitous" /> combined votes for a ubiquitous .NET across 10 similar votes. Please feel free to like and/or retweet to show your support to the "Big Three" here:
+
+
+Thank you all who have shown and continue to show your support!
+
 </xsl:template>
 
 	<xsl:template match="local:VoteGroupView">| **<xsl:value-of select="@Title" />** | **<xsl:value-of select="format-number( number(.//local:VoteCount/@Count)-number(.//local:VoteCount/@Delta), '###,###' )" />** | <span class="new">**<xsl:value-of select=".//local:VoteCount/@Delta" />**</span> | **<xsl:value-of select="format-number( .//local:VoteCount/@Count, '###,###' )" />** |<xsl:text>&#10;</xsl:text><xsl:apply-templates select="local:VoteGroupView.Votes/local:VoteView" /></xsl:template>
