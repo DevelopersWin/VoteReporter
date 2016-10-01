@@ -162,15 +162,6 @@ namespace DragonSpark.Windows.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a user-defined setting in setting {Type}.  User file not saved..
-        /// </summary>
-        internal static string LoggerTemplates_NotSaved {
-            get {
-                return ResourceManager.GetString("LoggerTemplates_NotSaved", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The ModulePath cannot contain a null value or be empty.
         /// </summary>
         internal static string ModulePathCannotBeNullOrEmpty {

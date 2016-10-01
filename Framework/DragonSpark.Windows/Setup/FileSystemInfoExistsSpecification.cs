@@ -8,7 +8,11 @@ namespace DragonSpark.Windows.Setup
 		public static FileSystemInfoExistsSpecification Default { get; } = new FileSystemInfoExistsSpecification();
 		FileSystemInfoExistsSpecification() {}
 
-		public override bool IsSatisfiedBy( FileSystemInfo parameter ) => parameter.Refreshed().Exists;
+		public override bool IsSatisfiedBy( FileSystemInfo parameter )
+		{
+			var isSatisfiedBy = parameter.Refreshed().Exists;
+			return isSatisfiedBy;
+		}
 	}
 
 	public static class Extensions

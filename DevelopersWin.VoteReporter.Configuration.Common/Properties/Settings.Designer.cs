@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DevelopersWin.VoteReporter.Parts.Development.Properties {
+namespace DevelopersWin.VoteReporter.Parts.Common.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -23,26 +23,20 @@ namespace DevelopersWin.VoteReporter.Parts.Development.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Uri ServerUri {
             get {
                 return ((global::System.Uri)(this["ServerUri"]));
             }
-            set {
-                this["ServerUri"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ApiKey {
             get {
                 return ((string)(this["ApiKey"]));
-            }
-            set {
-                this["ApiKey"] = value;
             }
         }
     }

@@ -1,21 +1,26 @@
+using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
-using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Windows.Markup
 {
 	public abstract class MarkupExtensionBase : MarkupExtension
 	{
+		readonly static Func<IServiceProvider, IMarkupProperty> Setter = MarkupValueSetterFactory.Default.ToSourceDelegate();
+		readonly static Func<Type, object> DesignTime = DesignTimeValueProvider.Default.ToSourceDelegate();
+
 		readonly static ThreadLocal<DependencyObject> DependencyObject = new ThreadLocal<DependencyObject>( () => new DependencyObject() );
 
 		readonly Func<IServiceProvider, IMarkupProperty> factory;
 		readonly Func<Type, object> designTimeFactory;
 
-		protected MarkupExtensionBase() : this( MarkupValueSetterFactory.Default.ToSourceDelegate(), DesignTimeValueProvider.Default.ToSourceDelegate() ) {}
+		protected MarkupExtensionBase() : this( Setter, DesignTime ) {}
+
+		protected MarkupExtensionBase( Func<Type, object> designTimeFactory ) : this( Setter, designTimeFactory ) {}
 
 		protected MarkupExtensionBase( Func<IServiceProvider, IMarkupProperty> factory, Func<Type, object> designTimeFactory )
 		{

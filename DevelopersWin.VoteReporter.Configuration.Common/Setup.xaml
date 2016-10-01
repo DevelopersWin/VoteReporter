@@ -5,10 +5,15 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:entity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
+	xmlns:commands="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
+	xmlns:properties="clr-namespace:DevelopersWin.VoteReporter.Parts.Common.Properties"
+	xmlns:local="clr-namespace:DevelopersWin.VoteReporter.Parts.Common"
 	mc:Ignorable="d" 
 	Priority="AfterHigh"
 >
 	<setup:RegisterInstances>
 		<entity:Configuration AutomaticMigrationsEnabled="True" />
 	</setup:RegisterInstances>
+
+	<commands:DeclaredSuppliedCommand Command="{x:Static local:InitializeUserSettingsCommand.Default}" Parameter="{x:Static properties:Settings.Default}" />
 </setup:DeclarativeSetup>

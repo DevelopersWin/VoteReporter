@@ -9,7 +9,7 @@
 	mc:Ignorable="d"
 	Id="59ED8E8C-3078-4737-8F8B-679C736A74A2"
 	ContextType="{x:Type voteReporter:VotingContext}"
-	Version="1.0.0.6"
+	Version="1.0.0.7"
 	>
 	<entity:EntityInstallationStep>
 		<voteReporter:VoteGroup Id="BC7C5B60-6187-453A-88F4-7B58CC2B4453" Title="Ubiquitous / Cross-Platform Client .NET" Order="{markup:Next}">
@@ -34,6 +34,7 @@
 				<voteReporter:Vote Id="D21710AE-9106-44A8-8F07-9CCF8E2F2FAD" Title="Improve Asynchronous Programming Model" Location="http://visualstudio.uservoice.com/forums/121579-visual-studio/suggestions/9126493-improve-asynchronous-programming-model" Order="{markup:Next}" />
 			</markup:Collection>
 		</voteReporter:VoteGroup>
+		
 		<voteReporter:VoteGroup Id="A1734CEC-C276-461E-9E90-F3B48AF4FDE2" Title="Edge Improvements" Order="{markup:Next}">
 			<markup:Collection>
 				<voteReporter:Vote Id="31B0BE61-E84E-429F-8B0F-148A2C157623" Title="EDGE EXTENSIONS .NET COMPATIBILITY" Location="https://wpdev.uservoice.com/forums/257854-microsoft-edge-developer/suggestions/9467958-edge-extensions-net-compatibility" Order="{markup:Next}" />
@@ -44,7 +45,8 @@
 			<markup:Collection>
 				<voteReporter:Vote Id="A120452D-B60F-4408-87B0-CD1D6DCA262E" Title="Add Markup Extensions to (and Improve) WinRT Xaml System (System.Xaml Parity)" Location="https://wpdev.uservoice.com/forums/110705-dev-platform/suggestions/7232264-add-markup-extensions-to-and-improve-winrt-xaml" Order="{markup:Next}" />
 				<voteReporter:Vote Id="9306F5B0-1BA7-46DC-80DA-52278019C550" Title="Add support for 'XmlnsDefinitionAttribute'" Location="https://wpdev.uservoice.com/forums/110705-universal-windows-platform/suggestions/9523650-add-support-for-xmlnsdefinitionattribute" Order="{markup:Next}" />
-				<voteReporter:Vote Id="97163d83-d28a-4477-b23f-b830328943b0" Title="Open-source System.Xaml" Location="http://visualstudio.uservoice.com/forums/121579-visual-studio-2015/suggestions/11234259-open-source-system-xaml" Order="{markup:Next}" />
+				<!--<voteReporter:Vote Id="97163d83-d28a-4477-b23f-b830328943b0" Title="Open-source System.Xaml" Location="http://visualstudio.uservoice.com/forums/121579-visual-studio-2015/suggestions/11234259-open-source-system-xaml" Order="{markup:Next}" />-->
+				<voteReporter:Vote Id="97163d83-d28a-4477-b23f-b830328943b0" Title="Replace Xamarin.Forms Xaml syntax with latest UWP Xaml" Location="https://wpdev.uservoice.com/forums/110705-universal-windows-platform/suggestions/13279557-replace-xamarin-forms-xaml-syntax-with-latest-uwp" Order="{markup:Next}" />
 			</markup:Collection>
 		</voteReporter:VoteGroup>
 		<!--<voteReporter:VoteGroup Id="E70CCDFC-AAF0-4A92-9BE7-93A6F19A5342" Title="Other / Uncategorized" Order="{markup:Next}"></voteReporter:VoteGroup>-->

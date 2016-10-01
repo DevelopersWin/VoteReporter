@@ -13,6 +13,10 @@ namespace DragonSpark.Windows.Setup
 		public static DeleteFileCommand Default { get; } = new DeleteFileCommand();
 		DeleteFileCommand() {}
 
-		public override void Execute( FileSystemInfo parameter ) => parameter.Delete();
+		public override void Execute( FileSystemInfo parameter )
+		{
+			parameter.Delete();
+
+		}
 	}
 }

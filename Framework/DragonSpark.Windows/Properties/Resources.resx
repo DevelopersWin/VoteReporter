@@ -148,9 +148,6 @@
   <data name="LoggerTemplates_Created" xml:space="preserve">
     <value>User setting file created at {Location}</value>
   </data>
-  <data name="LoggerTemplates_NotSaved" xml:space="preserve">
-    <value>Could not find a user-defined setting in setting {Type}.  User file not saved.</value>
-  </data>
   <data name="LoggerTemplates_Initializing" xml:space="preserve">
     <value>Initializing user settings file at {Location}.</value>
   </data>

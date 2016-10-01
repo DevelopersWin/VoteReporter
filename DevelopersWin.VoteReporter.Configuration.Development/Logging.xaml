@@ -4,23 +4,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:diagnosticsPlatform="clr-namespace:DragonSpark.Windows.Diagnostics;assembly=DragonSpark.Windows"
-	xmlns:environment="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Environment"
-	xmlns:thread="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Thread"
-	xmlns:process="clr-namespace:Serilog.Enrichers;assembly=Serilog.Enrichers.Process"
-														xmlns:ds="http://framework.dragonspark.us"
-														xmlns:configurations="clr-namespace:DragonSpark.Diagnostics.Configurations;assembly=DragonSpark"
-														mc:Ignorable="d" 
+	xmlns:configurations="clr-namespace:DragonSpark.Diagnostics.Configurations;assembly=DragonSpark"
+	mc:Ignorable="d" 
 >
-	<configurations:MinimumLevelIsCommand />
-	<diagnosticsPlatform:AddConsoleSinkCommand />
 	<diagnosticsPlatform:AddTraceSinkCommand />
-
-	<configurations:AddSeqSinkCommand Endpoint="{ds:Configuration}" ApiKey="{ds:Configuration}" />
-	
-	<configurations:EnrichCommand>
-		<process:ProcessIdEnricher />
-		<thread:ThreadIdEnricher />
-		<environment:MachineNameEnricher />
-		<environment:EnvironmentUserNameEnricher />
-	</configurations:EnrichCommand>
 </configurations:DeclarativeCompositeLoggerConfiguration>

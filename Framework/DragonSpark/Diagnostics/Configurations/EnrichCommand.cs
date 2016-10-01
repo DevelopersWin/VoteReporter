@@ -11,6 +11,6 @@ namespace DragonSpark.Diagnostics.Configurations
 	{
 		public DeclarativeCollection<ILogEventEnricher> Items { get; } = new DeclarativeCollection<ILogEventEnricher>();
 		
-		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.With( EnumerableExtensions.Fixed( Items ) );
+		protected override void Configure( LoggerEnrichmentConfiguration configuration ) => configuration.With( Items.Fixed() );
 	}
 }

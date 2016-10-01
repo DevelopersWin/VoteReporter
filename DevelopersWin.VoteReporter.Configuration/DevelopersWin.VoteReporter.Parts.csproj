@@ -79,7 +79,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
+  <!--<Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />-->
   <PropertyGroup>
     <PostBuildEvent>xcopy /y /d  "$(ProjectDir)$(OutDir)$(ProjectName).*" "$(ProjectDir)..\Parts\$(Configuration)\"</PostBuildEvent>
   </PropertyGroup>

@@ -21,13 +21,13 @@ namespace DragonSpark.Windows.Testing.Setup
 			Clear();
 		}
 
-		static void Clear() => ClearUserSettingCommand.Default.Execute( Settings.Default );
+		static void Clear() => ClearUserSettingCommand.Default.Execute();
 
 		[Theory, AutoData]
-		public void Create( InitializeUserSettingsCommand sut, ILoggerHistory history, UserSettingsPathFactory factory )
+		public void Create( InitializeUserSettingsCommand sut, ILoggerHistory history, UserSettingsFile factory )
 		{
 			var path = factory.Get( ConfigurationUserLevel.PerUserRoamingAndLocal );
-			Assert.False( path.Exists );
+			Assert.False( path.Exists, path.FullName );
 			var before = history.Events.Fixed();
 			sut.Execute( Settings.Default );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
@@ -70,22 +70,26 @@ namespace DragonSpark.Windows.Testing.Setup
 			var before = history.Events.Fixed();
 			sut.Execute( new SettingsWithNoProperties() );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
-			Assert.Contains( Resources.LoggerTemplates_Initializing, items );
-			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
-			Assert.Contains( Resources.LoggerTemplates_NotSaved, items );
-			Assert.Equal( before.Length + 3, items.Length );
+			var expected = new[] { Resources.LoggerTemplates_Initializing, Resources.LoggerTemplates_NotFound, Resources.LoggerTemplates_Created };
+			foreach ( var message in expected )
+			{
+				Assert.Contains( message, items );
+			}
+			Assert.Equal( before.Length + expected.Length, items.Length );
 		}
 
 		[Theory, AutoData]
-		public void Error( InitializeUserSettingsCommand create, InitializeUserSettingsCommand sut, ILoggerHistory history )
+		public void Error( InitializeUserSettingsCommand sut, ILoggerHistory history )
 		{
 			var before = history.Events.Fixed();
 			sut.Execute( new SettingsWithException() );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
-			Assert.Contains( Resources.LoggerTemplates_Initializing, items );
-			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
-			Assert.Contains( Resources.LoggerTemplates_ErrorSaving, items );
-			Assert.Equal( before.Length + 3, items.Length );
+			var expected = new[] { Resources.LoggerTemplates_Initializing, Resources.LoggerTemplates_NotFound, Resources.LoggerTemplates_ErrorSaving };
+			foreach ( var message in expected )
+			{
+				Assert.Contains( message, items );
+			}
+			Assert.Equal( before.Length + expected.Length, items.Length );
 		}
 
 		class SettingsWithNoProperties : ApplicationSettingsBase {}

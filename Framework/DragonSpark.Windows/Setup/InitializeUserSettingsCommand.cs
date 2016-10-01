@@ -2,7 +2,6 @@
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
 using DragonSpark.Diagnostics;
-using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -11,7 +10,6 @@ using Serilog;
 using System;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
@@ -34,47 +32,29 @@ namespace DragonSpark.Windows.Setup
 		{
 			var templates = templatesSource();
 			var file = fileSource();
+			var name = file.FullName;
 
-			templates.Initializing( file.FullName );
+			templates.Initializing( name );
 
 			parameter.Upgrade();
 
+			var command = file.Refreshed().Exists ? templates.Complete : templates.NotFound;
+			command( name );
+			
 			if ( !file.Exists )
 			{
-				templates.NotFound( file.FullName );
-
-				var properties = parameter.Providers.Cast<SettingsProvider>()
-										  .Introduce( parameter, tuple => tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ).Cast<SettingsPropertyValue>() )
-										  .Concat()
-										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed();
-				var any = properties.Any();
-				if ( any )
+				try
 				{
-					foreach ( var property in properties )
-					{
-						parameter[property.Name] = property.PropertyValue;
-					}
-
-					try
-					{
-						parameter.Save();
-					}
-					catch ( ConfigurationErrorsException e )
-					{
-						templates.ErrorSaving( e, file.FullName );
-						return;
-					}
-
-					templates.Created( file.FullName );
+					var configuration = ConfigurationManager.OpenExeConfiguration( parameter.GetType().Assembly.Location );
+					configuration.SaveAs( name, ConfigurationSaveMode.Modified );
+					parameter.Save();
+					templates.Created( name );
 				}
-				else
+				catch ( ConfigurationErrorsException e )
 				{
-					templates.NotSaved( parameter.GetType() );
+					templates.ErrorSaving( e, name );
 				}
-				return;
 			}
-
-			templates.Complete( file.FullName );
 		}
 
 		sealed class TemplatesFactory : ParameterizedSourceBase<ILogger, Templates>
@@ -86,8 +66,8 @@ namespace DragonSpark.Windows.Setup
 																				 NotFoundTemplate.Defaults.Get( parameter ).Execute,
 																				 ErrorSavingTemplate.Defaults.Get( parameter ).Execute,
 																				 CreatedTemplate.Defaults.Get( parameter ).Execute,
-																				 NotSavedTemplate.Defaults.Get( parameter ).Execute,
-																				 CompleteTemplate.Defaults.Get( parameter ).Execute );
+																				 CompleteTemplate.Defaults.Get( parameter ).Execute
+																				 );
 
 			sealed class InitializingTemplate : LogCommandBase<string>
 			{
@@ -113,12 +93,6 @@ namespace DragonSpark.Windows.Setup
 				CreatedTemplate( ILogger logger ) : base( logger, Resources.LoggerTemplates_Created ) {}
 			}
 
-			sealed class NotSavedTemplate : LogCommandBase<Type>
-			{
-				public static IParameterizedSource<ILogger, NotSavedTemplate> Defaults { get; } = new Cache<ILogger, NotSavedTemplate>( logger => new NotSavedTemplate( logger ) );
-				NotSavedTemplate( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotSaved ) {}
-			}
-
 			sealed class CompleteTemplate : LogCommandBase<string>
 			{
 				public static IParameterizedSource<ILogger, CompleteTemplate> Defaults { get; } = new Cache<ILogger, CompleteTemplate>( logger => new CompleteTemplate( logger ) );
@@ -126,15 +100,14 @@ namespace DragonSpark.Windows.Setup
 			}
 		}
 
-		sealed class Templates
+		struct Templates
 		{
-			public Templates( Action<string> initializing, Action<string> notFound, Action<Exception, string> errorSaving, Action<string> created, Action<Type> notSaved, Action<string> complete )
+			public Templates( Action<string> initializing, Action<string> notFound, Action<Exception, string> errorSaving, Action<string> created, Action<string> complete )
 			{
 				Initializing = initializing;
 				NotFound = notFound;
 				ErrorSaving = errorSaving;
 				Created = created;
-				NotSaved = notSaved;
 				Complete = complete;
 			}
 
@@ -142,7 +115,6 @@ namespace DragonSpark.Windows.Setup
 			public Action<string> NotFound { get; }
 			public Action<Exception, string> ErrorSaving { get; }
 			public Action<string> Created { get; }
-			public Action<Type> NotSaved { get; }
 			public Action<string> Complete { get; }
 		}
 	}

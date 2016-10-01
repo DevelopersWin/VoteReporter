@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Markup;
 
 namespace DragonSpark.Windows.Markup
@@ -7,7 +8,7 @@ namespace DragonSpark.Windows.Markup
 	{
 		readonly string key;
 
-		protected ConfigurationKeyExtension( string key )
+		protected ConfigurationKeyExtension( string key ) : base( type => Guid.NewGuid().ToString() )
 		{
 			this.key = key;
 		}
