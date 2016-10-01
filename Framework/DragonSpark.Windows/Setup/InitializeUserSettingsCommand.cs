@@ -1,4 +1,6 @@
-﻿using DragonSpark.Commands;
+﻿using DragonSpark.Aspects.Specifications;
+using DragonSpark.Aspects.Validation;
+using DragonSpark.Commands;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
@@ -13,146 +15,135 @@ using System.Linq;
 
 namespace DragonSpark.Windows.Setup
 {
-	// [ApplyAutoValidation, ApplySpecification( typeof(OncePerScopeSpecification<ApplicationSettingsBase>) )]
+	[ApplyAutoValidation, ApplyInverseSpecification( typeof(UserSettingsExistsSpecification) )]
 	public sealed class InitializeUserSettingsCommand : CommandBase<ApplicationSettingsBase>
 	{
 		public static InitializeUserSettingsCommand Default { get; } = new InitializeUserSettingsCommand();
-		InitializeUserSettingsCommand() : this( Source.DefaultNested.Get ) {}
+		InitializeUserSettingsCommand() : this( TemplatesFactory.DefaultNested.Fixed( SystemLogger.Default.ToScope().ToDelegate() ).Get, Defaults.UserSettingsPath ) {}
 
-		readonly Func<object, ICommand<ApplicationSettingsBase>> source;
+		readonly Func<Templates> templatesSource;
+		readonly Func<FileInfo> fileSource;
 
-		InitializeUserSettingsCommand( Func<object, ICommand<ApplicationSettingsBase>> source )
+		InitializeUserSettingsCommand( Func<Templates> templatesSource, Func<FileInfo> fileSource )
 		{
-			this.source = source;
+			this.templatesSource = templatesSource;
+			this.fileSource = fileSource;
 		}
 
-		public override void Execute( ApplicationSettingsBase parameter ) => source( this ).Execute( parameter );
-
-		sealed class Source : ParameterizedSourceBase<ICommand<ApplicationSettingsBase>>
+		public override void Execute( ApplicationSettingsBase parameter )
 		{
-			public static Source DefaultNested { get; } = new Source();
-			Source() : this( SystemLogger.Default.ToScope().ToDelegate().Wrap(), Defaults.UserSettingsPath ) {}
+			var templates = templatesSource();
+			var file = fileSource();
 
-			readonly Func<object, ILogger> loggerSource;
-			readonly Func<FileInfo> fileSource;
+			templates.Initializing( file.FullName );
 
-			Source( Func<object, ILogger> loggerSource, Func<FileInfo> fileSource )
+			parameter.Upgrade();
+
+			if ( !file.Exists )
 			{
-				this.loggerSource = loggerSource;
-				this.fileSource = fileSource;
-			}
+				templates.NotFound( file.FullName );
 
-			public override ICommand<ApplicationSettingsBase> Get( object parameter ) => new Context( loggerSource( parameter ), fileSource.Refreshed() );
-		}
-
-		sealed class Context : CommandBase<ApplicationSettingsBase>
-		{
-			readonly FileInfo file;
-			readonly Action<Exception, string> errorSaving;
-			readonly Action<string> upgrading, notFound, created, complete;
-			readonly Action<Type> notSaved;
-
-			public Context( ILogger logger, FileInfo file ) : this( file,
-																	Upgrading.Defaults.Get( logger ).Execute,
-																	NotFound.Defaults.Get( logger ).Execute,
-																	ErrorSaving.Defaults.Get( logger ).Execute,
-																	Created.Defaults.Get( logger ).Execute,
-																	NotSaved.Defaults.Get( logger ).Execute,
-																	Complete.Defaults.Get( logger ).Execute
-			) {}
-
-			Context( FileInfo file, Action<string> upgrading, Action<string> notFound, Action<Exception, string> errorSaving, Action<string> created, Action<Type> notSaved, Action<string> complete )
-			{
-				this.file = file;
-				this.upgrading = upgrading;
-				this.notFound = notFound;
-				this.errorSaving = errorSaving;
-				this.created = created;
-				this.notSaved = notSaved;
-				this.complete = complete;
-			}
-
-			public override void Execute( ApplicationSettingsBase parameter )
-			{
-				var command = file.Exists ? upgrading : notFound;
-				command( file.FullName );
-
-				if ( !file.Exists )
+				var properties = parameter.Providers.Cast<SettingsProvider>()
+										  .Introduce( parameter, tuple => tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ).Cast<SettingsPropertyValue>() )
+										  .Concat()
+										  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed();
+				var any = properties.Any();
+				if ( any )
 				{
-					var properties = parameter.Providers.Cast<SettingsProvider>()
-											  .Introduce( parameter, tuple => tuple.Item1.GetPropertyValues( tuple.Item2.Context, tuple.Item2.Properties ).Cast<SettingsPropertyValue>() )
-											  .Concat()
-											  .Where( property => property.Property.Attributes[typeof(UserScopedSettingAttribute)] is UserScopedSettingAttribute ).Fixed();
-					var any = properties.Any();
-					if ( any )
+					foreach ( var property in properties )
 					{
-						foreach ( var property in properties )
-						{
-							parameter[property.Name] = property.PropertyValue;
-						}
+						parameter[property.Name] = property.PropertyValue;
+					}
 
-						try
-						{
-							parameter.Save();
-						}
-						catch ( ConfigurationErrorsException e )
-						{
-							errorSaving( e, file.FullName );
-							return;
-						}
-					}
-					if ( any )
+					try
 					{
-						created( file.FullName );
+						parameter.Save();
 					}
-					else
+					catch ( ConfigurationErrorsException e )
 					{
-						notSaved( parameter.GetType() );
+						templates.ErrorSaving( e, file.FullName );
+						return;
 					}
-					return;
+
+					templates.Created( file.FullName );
 				}
-
-				parameter.Upgrade();
-				complete( file.FullName );
+				else
+				{
+					templates.NotSaved( parameter.GetType() );
+				}
+				return;
 			}
 
-			sealed class ErrorSaving : LogExceptionCommandBase<string>
+			templates.Complete( file.FullName );
+		}
+
+		sealed class TemplatesFactory : ParameterizedSourceBase<ILogger, Templates>
+		{
+			public static TemplatesFactory DefaultNested { get; } = new TemplatesFactory();
+			TemplatesFactory() {}
+
+			public override Templates Get( ILogger parameter ) => new Templates( InitializingTemplate.Defaults.Get( parameter ).Execute,
+																				 NotFoundTemplate.Defaults.Get( parameter ).Execute,
+																				 ErrorSavingTemplate.Defaults.Get( parameter ).Execute,
+																				 CreatedTemplate.Defaults.Get( parameter ).Execute,
+																				 NotSavedTemplate.Defaults.Get( parameter ).Execute,
+																				 CompleteTemplate.Defaults.Get( parameter ).Execute );
+
+			sealed class InitializingTemplate : LogCommandBase<string>
 			{
-				public static IParameterizedSource<ILogger, ErrorSaving> Defaults { get; } = new Cache<ILogger, ErrorSaving>( logger => new ErrorSaving( logger ) );
-				ErrorSaving( ILogger logger ) : base( logger, Resources.LoggerTemplates_ErrorSaving ) {}
+				public static IParameterizedSource<ILogger, InitializingTemplate> Defaults { get; } = new Cache<ILogger, InitializingTemplate>( logger => new InitializingTemplate( logger ) );
+				InitializingTemplate( ILogger logger ) : base( logger, Resources.LoggerTemplates_Initializing ) {}
 			}
 
-			sealed class NotFound : LogCommandBase<string>
+			sealed class ErrorSavingTemplate : LogExceptionCommandBase<string>
 			{
-				public static IParameterizedSource<ILogger, NotFound> Defaults { get; } = new Cache<ILogger, NotFound>( logger => new NotFound( logger ) );
-				NotFound( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotFound ) {}
+				public static IParameterizedSource<ILogger, ErrorSavingTemplate> Defaults { get; } = new Cache<ILogger, ErrorSavingTemplate>( logger => new ErrorSavingTemplate( logger ) );
+				ErrorSavingTemplate( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_ErrorSaving ) {}
 			}
 
-			sealed class Created : LogCommandBase<string>
+			sealed class NotFoundTemplate : LogCommandBase<string>
 			{
-				public static IParameterizedSource<ILogger, Created> Defaults { get; } = new Cache<ILogger, Created>( logger => new Created( logger ) );
-				Created( ILogger logger ) : base( logger, Resources.LoggerTemplates_Created ) {}
+				public static IParameterizedSource<ILogger, NotFoundTemplate> Defaults { get; } = new Cache<ILogger, NotFoundTemplate>( logger => new NotFoundTemplate( logger ) );
+				NotFoundTemplate( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotFound ) {}
 			}
 
-			sealed class NotSaved : LogCommandBase<Type>
+			sealed class CreatedTemplate : LogCommandBase<string>
 			{
-				public static IParameterizedSource<ILogger, NotSaved> Defaults { get; } = new Cache<ILogger, NotSaved>( logger => new NotSaved( logger ) );
-				NotSaved( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotSaved ) {}
+				public static IParameterizedSource<ILogger, CreatedTemplate> Defaults { get; } = new Cache<ILogger, CreatedTemplate>( logger => new CreatedTemplate( logger ) );
+				CreatedTemplate( ILogger logger ) : base( logger, Resources.LoggerTemplates_Created ) {}
 			}
 
-			sealed class Upgrading : LogCommandBase<string>
+			sealed class NotSavedTemplate : LogCommandBase<Type>
 			{
-				public static IParameterizedSource<ILogger, Upgrading> Defaults { get; } = new Cache<ILogger, Upgrading>( logger => new Upgrading( logger ) );
-				Upgrading( ILogger logger ) : base( logger, Resources.LoggerTemplates_Upgrading ) {}
+				public static IParameterizedSource<ILogger, NotSavedTemplate> Defaults { get; } = new Cache<ILogger, NotSavedTemplate>( logger => new NotSavedTemplate( logger ) );
+				NotSavedTemplate( ILogger logger ) : base( logger.Warning, Resources.LoggerTemplates_NotSaved ) {}
 			}
 
-			sealed class Complete : LogCommandBase<string>
+			sealed class CompleteTemplate : LogCommandBase<string>
 			{
-				public static IParameterizedSource<ILogger, Complete> Defaults { get; } = new Cache<ILogger, Complete>( logger => new Complete( logger ) );
-				Complete( ILogger logger ) : base( logger, Resources.LoggerTemplates_Complete ) {}
+				public static IParameterizedSource<ILogger, CompleteTemplate> Defaults { get; } = new Cache<ILogger, CompleteTemplate>( logger => new CompleteTemplate( logger ) );
+				CompleteTemplate( ILogger logger ) : base( logger, Resources.LoggerTemplates_Complete ) {}
 			}
 		}
 
-		
+		sealed class Templates
+		{
+			public Templates( Action<string> initializing, Action<string> notFound, Action<Exception, string> errorSaving, Action<string> created, Action<Type> notSaved, Action<string> complete )
+			{
+				Initializing = initializing;
+				NotFound = notFound;
+				ErrorSaving = errorSaving;
+				Created = created;
+				NotSaved = notSaved;
+				Complete = complete;
+			}
+
+			public Action<string> Initializing { get; }
+			public Action<string> NotFound { get; }
+			public Action<Exception, string> ErrorSaving { get; }
+			public Action<string> Created { get; }
+			public Action<Type> NotSaved { get; }
+			public Action<string> Complete { get; }
+		}
 	}
 }

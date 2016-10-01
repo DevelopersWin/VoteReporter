@@ -16,7 +16,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 {
 	public class ApplyExceptionDetailsTests
 	{
-		[Theory, AutoData, AdditionalTypes( typeof(ApplyExceptionDetails) ), FrameworkTypes, ContainingTypeAndNested]
+		[Theory, AutoData, AdditionalTypes( typeof(ApplyExceptionDetails) ), FrameworkTypes, FormatterTypes, ContainingTypeAndNested]
 		public void DetailsWorkAsExpected( int number, string message )
 		{
 			var logger = Logger.Default.Get( this );

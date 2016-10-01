@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Configuration
 {
-	[Trait( Traits.Category, Traits.Categories.Xaml ), FrameworkTypes, AdditionalTypes( typeof(ExpressionEvaluator) )]
+	[Trait( Traits.Category, Traits.Categories.Xaml ), FrameworkTypes, FormatterTypes, AdditionalTypes( typeof(ExpressionEvaluator) )]
 	public class ConfigurationTests
 	{
 		[Theory, DragonSpark.Testing.Framework.Application.AutoData]

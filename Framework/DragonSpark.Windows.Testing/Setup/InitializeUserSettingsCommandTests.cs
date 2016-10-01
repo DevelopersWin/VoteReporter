@@ -33,15 +33,17 @@ namespace DragonSpark.Windows.Testing.Setup
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
 			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
 			Assert.Contains( Resources.LoggerTemplates_Created, items );
-			Assert.Equal( before.Length + 2, items.Length );
+			Assert.Equal( before.Length + 3, items.Length );
 
-			path.Refresh();
-			Assert.True( path.Exists );
+			Assert.True( path.Refreshed().Exists );
 
 			Clear();
 
-			path.Refresh();
-			Assert.False( path.Exists );
+			Assert.False( path.Refreshed().Exists );
+			sut.Execute( Settings.Default );
+			Assert.True( path.Refreshed().Exists );
+			
+			Assert.Equal( items.Length + 3, history.Events.Count() );
 		}
 
 		[Theory, AutoData]
@@ -56,10 +58,10 @@ namespace DragonSpark.Windows.Testing.Setup
 
 			sut.Execute( Settings.Default );
 
-			Assert.Equal( count + 2, history.Events.Count() );
-			var upgraded = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
-			Assert.Contains( Resources.LoggerTemplates_Upgrading, upgraded );
-			Assert.Contains( Resources.LoggerTemplates_Complete, upgraded );
+			Assert.Equal( count, history.Events.Count() );
+			/*var upgraded = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
+			Assert.Contains( Resources.LoggerTemplates_Initializing, upgraded );
+			Assert.Contains( Resources.LoggerTemplates_Complete, upgraded );*/
 		}
 
 		[Theory, AutoData]
@@ -68,9 +70,10 @@ namespace DragonSpark.Windows.Testing.Setup
 			var before = history.Events.Fixed();
 			sut.Execute( new SettingsWithNoProperties() );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
+			Assert.Contains( Resources.LoggerTemplates_Initializing, items );
 			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
 			Assert.Contains( Resources.LoggerTemplates_NotSaved, items );
-			Assert.Equal( before.Length + 2, items.Length );
+			Assert.Equal( before.Length + 3, items.Length );
 		}
 
 		[Theory, AutoData]
@@ -79,9 +82,10 @@ namespace DragonSpark.Windows.Testing.Setup
 			var before = history.Events.Fixed();
 			sut.Execute( new SettingsWithException() );
 			var items = history.Events.Select( item => item.MessageTemplate.Text ).Fixed();
+			Assert.Contains( Resources.LoggerTemplates_Initializing, items );
 			Assert.Contains( Resources.LoggerTemplates_NotFound, items );
 			Assert.Contains( Resources.LoggerTemplates_ErrorSaving, items );
-			Assert.Equal( before.Length + 2, items.Length );
+			Assert.Equal( before.Length + 3, items.Length );
 		}
 
 		class SettingsWithNoProperties : ApplicationSettingsBase {}

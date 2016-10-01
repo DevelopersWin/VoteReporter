@@ -1,8 +1,4 @@
-﻿using System;
-using System.Composition;
-using System.Linq;
-using System.Reflection;
-using DragonSpark.Activation.Location;
+﻿using DragonSpark.Activation.Location;
 using DragonSpark.Application;
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
@@ -14,11 +10,15 @@ using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.TypeSystem;
 using Serilog;
 using Serilog.Events;
+using System;
+using System.Composition;
+using System.Linq;
+using System.Reflection;
 using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), ContainingTypeAndNested, FormatterTypes]
 	public class LoggerTests
 	{
 		[Theory, AutoData, FrameworkTypes]

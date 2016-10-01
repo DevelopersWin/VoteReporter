@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.ComponentModel
 {
-	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes, ContainingTypeAndNested]
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes, FormatterTypes, ContainingTypeAndNested]
 	public class DefaultValueProviderTests
 	{
 		[Theory, AutoData]

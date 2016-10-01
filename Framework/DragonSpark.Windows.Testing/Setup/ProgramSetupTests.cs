@@ -13,7 +13,7 @@ using Xunit;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	[Trait( Traits.Category, Traits.Categories.Xaml ), ContainingTypeAndNested, FrameworkTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
+	[Trait( Traits.Category, Traits.Categories.Xaml ), ContainingTypeAndNested, FrameworkTypes, FormatterTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
 	// ReSharper disable once TestFileNameWarning
 	public class ProgramSetupTests
 	{

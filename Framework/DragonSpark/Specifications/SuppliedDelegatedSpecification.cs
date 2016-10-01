@@ -3,7 +3,7 @@ using System;
 
 namespace DragonSpark.Specifications
 {
-	public sealed class SuppliedDelegatedSpecification<T> : SpecificationBase<object>
+	public class SuppliedDelegatedSpecification<T> : SpecificationBase<object>
 	{
 		readonly Func<T, bool> source;
 		readonly Func<T> parameterSource;

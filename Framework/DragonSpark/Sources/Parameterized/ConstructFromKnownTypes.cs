@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public class ConstructFromKnownTypes<T> : ParameterConstructedCompositeFactory<object>, IParameterizedSource<object, T>
+	public sealed class ConstructFromKnownTypes<T> : ParameterConstructedCompositeFactory<object>, IParameterizedSource<object, T>
 	{
 		public static ISource<IParameterizedSource<object, T>> Default { get; } = new Scope<ConstructFromKnownTypes<T>>( Factory.GlobalCache( () => new ConstructFromKnownTypes<T>( KnownTypes.Default.Get<T>().ToArray() ) ) );
 		ConstructFromKnownTypes( params Type[] types ) : base( types ) {}

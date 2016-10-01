@@ -43,14 +43,15 @@ namespace DragonSpark.Testing.Composition
 		[Theory, AutoData, ContainingTypeAndNested]
 		public void LocalData( ImmutableArray<Type> sut, ImmutableArray<Assembly> assemblies )
 		{
-			var items = sut.Fixed();
+			var items = sut.ToArray();
 
-			var nested = GetType().Adapt().WithNested();
-			Assert.Equal( nested.Length, items.Length );
-			Assert.Equal( nested.OrderBy( type => type.FullName ), items.OrderBy( type => type.FullName ) );
+			var expected = GetType().Adapt().WithNested().Concat( FormatterTypesAttribute.Types ).Fixed();
+			Assert.Equal( expected.Length, items.Length );
+			Assert.Equal( expected.OrderBy( type => type.FullName ), items.OrderBy( type => type.FullName ) );
 
-			Assert.Single( assemblies );
-			Assert.Equal( GetType().Assembly, assemblies.Only() );
+			var actual = assemblies.ToArray().ToImmutableHashSet();
+			Assert.Equal( expected.Assemblies().ToImmutableHashSet(), actual );
+			Assert.Contains( GetType().Assembly, actual );
 		}
 
 		[Theory, AutoData]

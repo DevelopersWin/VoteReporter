@@ -108,6 +108,7 @@
     <Compile Include="Aspects\Relay\SpecificationRelayAspect.cs" />
     <Compile Include="Aspects\Relay\SpecificationRelayAspectBase.cs" />
     <Compile Include="Aspects\Relay\Support.cs" />
+    <Compile Include="Aspects\Specifications\ApplyInverseSpecificationAttribute.cs" />
     <Compile Include="Aspects\SpecificationTypeDefinitionBase.cs" />
     <Compile Include="Aspects\TypeDefinition.cs" />
     <Compile Include="Aspects\GenericCommandTypeDefinition.cs" />

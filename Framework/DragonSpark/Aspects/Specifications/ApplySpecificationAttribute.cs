@@ -4,7 +4,7 @@ using System;
 namespace DragonSpark.Aspects.Specifications
 {
 	[IntroduceInterface( typeof(ISpecification) )]
-	public sealed class ApplySpecificationAttribute : SpecificationAttributeBase
+	public class ApplySpecificationAttribute : SpecificationAttributeBase
 	{
 		readonly static Func<Type, ISpecification> Source = SpecificationSource.Default.Get;
 
@@ -12,7 +12,8 @@ namespace DragonSpark.Aspects.Specifications
 		readonly Func<Type, ISpecification> source;
 
 		public ApplySpecificationAttribute( Type specificationType ) : this( specificationType, Source ) {}
-		ApplySpecificationAttribute( Type specificationType, Func<Type, ISpecification> source )
+
+		protected ApplySpecificationAttribute( Type specificationType, Func<Type, ISpecification> source )
 		{
 			this.specificationType = specificationType;
 			this.source = source;

@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Specifications;
-using System;
 using System.IO;
 
 namespace DragonSpark.Windows.Setup
@@ -14,7 +13,7 @@ namespace DragonSpark.Windows.Setup
 
 	public static class Extensions
 	{
-		public static T Refreshed<T>( this Func<T> @this ) where T : FileSystemInfo => @this().Refreshed();
+		// public static T Refreshed<T>( this Func<T> @this ) where T : FileSystemInfo => @this().Refreshed();
 
 		public static T Refreshed<T>( this T @this ) where T : FileSystemInfo
 		{

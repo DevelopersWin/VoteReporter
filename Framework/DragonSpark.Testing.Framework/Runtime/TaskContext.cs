@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.Runtime;
+using System;
 
 namespace DragonSpark.Testing.Framework.Runtime
 {

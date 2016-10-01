@@ -151,8 +151,8 @@
   <data name="LoggerTemplates_NotSaved" xml:space="preserve">
     <value>Could not find a user-defined setting in setting {Type}.  User file not saved.</value>
   </data>
-  <data name="LoggerTemplates_Upgrading" xml:space="preserve">
-    <value>Found user settings file at {Location}.  Upgrading...</value>
+  <data name="LoggerTemplates_Initializing" xml:space="preserve">
+    <value>Initializing user settings file at {Location}.</value>
   </data>
   <data name="LoggerTemplates_Complete" xml:space="preserve">
     <value>User settings file at {Location} is up to date.</value>

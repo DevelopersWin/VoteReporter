@@ -144,6 +144,15 @@ namespace DragonSpark.Windows.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Initializing user settings file at {Location}..
+        /// </summary>
+        internal static string LoggerTemplates_Initializing {
+            get {
+                return ResourceManager.GetString("LoggerTemplates_Initializing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User setting file was not found at {Location}. Creating....
         /// </summary>
         internal static string LoggerTemplates_NotFound {
@@ -158,15 +167,6 @@ namespace DragonSpark.Windows.Properties {
         internal static string LoggerTemplates_NotSaved {
             get {
                 return ResourceManager.GetString("LoggerTemplates_NotSaved", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Found user settings file at {Location}.  Upgrading....
-        /// </summary>
-        internal static string LoggerTemplates_Upgrading {
-            get {
-                return ResourceManager.GetString("LoggerTemplates_Upgrading", resourceCulture);
             }
         }
         
