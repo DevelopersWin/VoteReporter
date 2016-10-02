@@ -83,7 +83,7 @@
     <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DevelopersWin.VoteReporter.Configuration.Common\DevelopersWin.VoteReporter.Parts.Common.csproj">
+    <ProjectReference Include="..\DevelopersWin.VoteReporter.Parts.Common\DevelopersWin.VoteReporter.Parts.Common.csproj">
       <Project>{1f72ab3c-9f4b-4ad8-8a3f-9cebc1c336c2}</Project>
       <Name>DevelopersWin.VoteReporter.Parts.Common</Name>
     </ProjectReference>

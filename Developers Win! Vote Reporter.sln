@@ -15,11 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Framework", ".Framework", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Testing", "DevelopersWin.VoteReporter.Testing\DevelopersWin.VoteReporter.Testing.csproj", "{2341CB8E-96D5-42FD-AE8F-FFC4E4803071}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Parts.Development", "DevelopersWin.VoteReporter.Configuration.Development\DevelopersWin.VoteReporter.Parts.Development.csproj", "{C28B714B-07F5-4193-92DF-3BEA93D938C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Parts.Development", "DevelopersWin.VoteReporter.Parts.Development\DevelopersWin.VoteReporter.Parts.Development.csproj", "{C28B714B-07F5-4193-92DF-3BEA93D938C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Parts", "DevelopersWin.VoteReporter.Configuration\DevelopersWin.VoteReporter.Parts.csproj", "{304A81C9-3B30-448F-9AB6-EF7355311FFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Parts", "DevelopersWin.VoteReporter.Parts\DevelopersWin.VoteReporter.Parts.csproj", "{304A81C9-3B30-448F-9AB6-EF7355311FFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Parts.Common", "DevelopersWin.VoteReporter.Configuration.Common\DevelopersWin.VoteReporter.Parts.Common.csproj", "{1F72AB3C-9F4B-4AD8-8A3F-9CEBC1C336C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelopersWin.VoteReporter.Parts.Common", "DevelopersWin.VoteReporter.Parts.Common\DevelopersWin.VoteReporter.Parts.Common.csproj", "{1F72AB3C-9F4B-4AD8-8A3F-9CEBC1C336C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Parts", "Parts", "{A39BEAEC-8A6B-4F8C-905E-C030FEDA4E5D}"
 EndProject
