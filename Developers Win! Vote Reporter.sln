@@ -44,8 +44,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Testing.Objects
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8CBA4E29-EB72-478D-B6FC-8C72876B60EC}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
 		Developers Win! Vote Reporter.pssln = Developers Win! Vote Reporter.pssln
+		LICENSE = LICENSE
 		PostSharp.targets = PostSharp.targets
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Windows.Testing", "Framework\DragonSpark.Windows.Testing\DragonSpark.Windows.Testing.csproj", "{B21E892A-BE56-4024-BD63-AA332279E7C5}"
