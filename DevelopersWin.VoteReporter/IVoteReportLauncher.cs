@@ -1,4 +1,3 @@
-using DragonSpark.Windows;
 using System;
 using System.Diagnostics;
 
@@ -9,11 +8,8 @@ namespace DevelopersWin.VoteReporter
 		void Launch( Uri location );
 	}
 
-	class VoteReportLauncher : IVoteReportLauncher
+	public sealed class VoteReportLauncher : IVoteReportLauncher
 	{
-		public void Launch( Uri location )
-		{
-			Process.Start( location.LocalPath );
-		}
+		public void Launch( Uri location ) => Process.Start( location.LocalPath );
 	}
 }

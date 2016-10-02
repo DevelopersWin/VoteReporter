@@ -1,10 +1,16 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Commands;
 
 namespace DevelopersWin.VoteReporter.Application
 {
-	public partial class Program
+	public sealed partial class Program
 	{
-		static void Main( string[] args ) => new Program().Run( args );
+		static void Main( string[] args )
+		{
+			using ( var program = new Program() )
+			{
+				program.Run( args );
+			}
+		}
 
 		public Program()
 		{

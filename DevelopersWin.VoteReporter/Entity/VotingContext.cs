@@ -1,10 +1,10 @@
-using DragonSpark.Setup.Registration;
 using DragonSpark.Windows.Entity;
+using System.Composition;
 using System.Data.Entity;
 
 namespace DevelopersWin.VoteReporter.Entity
 {
-	[Register.Mapped( typeof(DbContext) )]
+	[Export( typeof(DbContext) )]
 	public class VotingContext : EntityContext
 	{
 		public DbSet<Vote> Votes { get; set; }

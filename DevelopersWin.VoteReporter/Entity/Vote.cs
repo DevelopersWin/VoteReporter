@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace DevelopersWin.VoteReporter.Entity
 {
-    public class Vote : VoteBase
+	public class Vote : VoteBase
 	{
 		[Required]
 		public virtual VoteGroup Group { get; set; }

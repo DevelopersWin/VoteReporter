@@ -1,14 +1,19 @@
-﻿<runtime:CompositeCommand x:Class="DevelopersWin.VoteReporter.Configuration.Common.Setup"
+﻿<setup:DeclarativeSetup x:Class="DevelopersWin.VoteReporter.Parts.Common.Setup"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:entity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
-	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
-	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
+	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
+	xmlns:commands="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
+	xmlns:properties="clr-namespace:DevelopersWin.VoteReporter.Parts.Common.Properties"
+	xmlns:local="clr-namespace:DevelopersWin.VoteReporter.Parts.Common"
 	mc:Ignorable="d" 
-	>
-	<commands:UnityInstance>
+	Priority="AfterHigh"
+>
+	<setup:RegisterInstances>
 		<entity:Configuration AutomaticMigrationsEnabled="True" />
-	</commands:UnityInstance>
-</runtime:CompositeCommand>
+	</setup:RegisterInstances>
+
+	<commands:DeclaredSuppliedCommand Command="{x:Static local:InitializeUserSettingsCommand.Default}" Parameter="{x:Static properties:Settings.Default}" />
+</setup:DeclarativeSetup>

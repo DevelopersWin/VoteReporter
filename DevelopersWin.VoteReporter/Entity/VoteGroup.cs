@@ -1,6 +1,6 @@
+using DragonSpark.ComponentModel;
 using System.Collections.Generic;
 using System.Windows.Markup;
-using DragonSpark.ComponentModel;
 
 namespace DevelopersWin.VoteReporter.Entity
 {

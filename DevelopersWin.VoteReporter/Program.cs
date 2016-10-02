@@ -1,8 +1,8 @@
-using DragonSpark.Runtime;
+using DragonSpark.Application;
 
 namespace DevelopersWin.VoteReporter
 {
-	class Program : Program<object[]>
+	public sealed class Program : Program<object[]>
 	{
 		readonly IVoteRecorder recorder;
 		readonly IVoteReporter reporter;

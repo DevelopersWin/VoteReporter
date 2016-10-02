@@ -5,7 +5,7 @@ namespace DevelopersWin.VoteReporter
 		void Report();
 	}
 
-	class VoteReporter : IVoteReporter
+	public sealed class VoteReporter : IVoteReporter
 	{
 		readonly IVoteReportGenerator generator;
 		readonly IVoteReportLauncher launcher;
