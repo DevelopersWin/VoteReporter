@@ -1,122 +1,58 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Modularity;
-using DragonSpark.Runtime;
-using DragonSpark.Runtime.Values;
-using DragonSpark.Setup;
+﻿using DragonSpark.Application;
+using DragonSpark.Extensions;
 using DragonSpark.Testing.Framework;
-using DragonSpark.Testing.Framework.Parameters;
-using DragonSpark.Testing.Framework.Setup;
-using Microsoft.Practices.Unity;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
+using DragonSpark.Testing.Objects.Setup;
+using DragonSpark.TypeSystem;
+using System;
+using System.Composition;
+using System.Diagnostics;
+using System.Reflection;
 using Xunit;
-using SetupParameter = DragonSpark.Testing.Framework.Setup.SetupParameter;
 
 namespace DragonSpark.Windows.Testing.Setup
 {
-	[AssignExecution]
+	[Trait( Traits.Category, Traits.Categories.Xaml ), ContainingTypeAndNested, FrameworkTypes, FormatterTypes, AdditionalTypes( typeof(ProgramSetup), typeof(Program) )]
+	// ReSharper disable once TestFileNameWarning
 	public class ProgramSetupTests
 	{
-		[Theory, Test, SetupAutoData( typeof(ProgramSetup) )]
-		public void Extension( [Located] SetupParameter sut )
+		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationSource), typeof(ApplicationAssembly) )]
+		public void Create( [Service]ApplicationInformation sut )
 		{
-			var collection = new Items( sut ).Item;
-			var module = collection.FirstOrDefaultOfType<MonitoredModule>();
-			Assert.NotNull( module );
-			Assert.True( module.Initialized );
-			Assert.True( module.Loaded );
-
-			var command = collection.FirstOrDefaultOfType<MonitoredModule.Command>();
-			Assert.NotNull( command );
+			Assert.NotNull( sut.AssemblyInformation );
+			Assert.Equal( DateTimeOffset.Parse( "2/1/2016" ), sut.DeploymentDate.GetValueOrDefault() );
+			Assert.Equal( "http://framework.dragonspark.us/testing", sut.CompanyUri.ToString() );
+			var assembly = GetType().Assembly;
+			Assert.Equal( assembly.From<AssemblyTitleAttribute, string>( attribute => attribute.Title ), sut.AssemblyInformation.Title );
+			Assert.Equal( assembly.From<AssemblyCompanyAttribute, string>( attribute => attribute.Company ), sut.AssemblyInformation.Company );
+			Assert.Equal( assembly.From<AssemblyCopyrightAttribute, string>( attribute => attribute.Copyright ), sut.AssemblyInformation.Copyright );
+			Assert.Equal( assembly.From<DebuggableAttribute, string>( attribute => "DEBUG" ), sut.AssemblyInformation.Configuration );
+			Assert.Equal( assembly.From<AssemblyDescriptionAttribute, string>( attribute => attribute.Description ), sut.AssemblyInformation.Description );
+			Assert.Equal( assembly.From<AssemblyProductAttribute, string>( attribute => attribute.Product ), sut.AssemblyInformation.Product );
+			Assert.Equal( assembly.GetName().Version, sut.AssemblyInformation.Version );
 		}
 
-		[Theory, Test, SetupAutoData( typeof(ProgramSetup) )]
-		public void Type( IUnityContainer sut )
-		{
-			Assert.IsType<SomeTypeist>( sut.Resolve<ITyper>() );
-		}
-
-		[Theory, Test, SetupAutoData( typeof(ProgramSetup) )]
-		public void Run( [Located]Program sut )
+		[Theory, AutoData]
+		public void Run( [Service]Program sut )
 		{
 			Assert.True( sut.Ran, "Didn't Run" );
 			Assert.Equal( GetType().GetMethod( nameof(Run) ), sut.Arguments.Method );
-		}
-
-		[Theory, Test, SetupAutoData( typeof(ProgramSetup) )]
-		public void SetupModuleCommand( [Located] SetupParameter parameter, [Located] SetupModuleCommand sut, [Located] MonitoredModule module )
-		{
-			var added = new Items( module ).Item.FirstOrDefaultOfType<SomeCommand>();
-			Assert.Null( added );
-			sut.Execute( module );
-
-			Assert.NotNull( new Items( module ).Item.FirstOrDefaultOfType<SomeCommand>() );
+			Assert.Equal( 1, Counting.Default.Get( CountingTarget.Default.Get() ) );
 		}
 	}
 
-
-
-	public class Program : Program<SetupAutoDataParameter>
+	[Shared]
+	public class Program : Program<AutoData>
 	{
 		public bool Ran { get; private set; }
 
-		public SetupAutoDataParameter Arguments { get; private set; }
+		public AutoData Arguments { get; private set; }
 
-		protected override void Run( SetupAutoDataParameter arguments )
+		protected override void Run( AutoData arguments )
 		{
 			Ran = true;
 			Arguments = arguments;
-		}
-	}
-
-	public class SomeTypeist : ITyper
-	{ }
-	public interface ITyper
-	{}
-
-	public class SomeCommand : ModuleCommand
-	{
-		protected override void OnExecute( IMonitoredModule parameter )
-		{
-			new Items( parameter ).Item.Add( this );
-		}
-	}
-
-	public class MonitoredModule : MonitoredModule<MonitoredModule.Command>
-	{
-		public MonitoredModule( IModuleMonitor moduleMonitor, ISetupParameter parameter, Command command ) : base( moduleMonitor, command )
-		{
-			new Items( parameter ).Item.Add( this );
-		}
-
-		public bool Initialized { get; private set; }
-
-		public bool Loaded { get; private set; }
-		
-
-		protected override void OnInitialize()
-		{
-			Initialized = true;
-			base.OnInitialize();
-		}
-
-		protected override void OnLoad()
-		{
-			Loaded = true;
-			base.OnLoad();
-		}
-
-		public class Command : ModuleCommand
-		{
-			readonly ISetupParameter setup;
-
-			public Command( ISetupParameter setup )
-			{
-				this.setup = setup;
-			}
-
-			protected override void OnExecute( IMonitoredModule parameter )
-			{
-				new Items( setup ).Item.Add( this );
-			}
 		}
 	}
 }

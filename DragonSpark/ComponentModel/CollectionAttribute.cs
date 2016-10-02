@@ -1,25 +1,30 @@
+using DragonSpark.Activation;
 using DragonSpark.Extensions;
-using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized;
 using System;
-using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace DragonSpark.ComponentModel
 {
-	public class CollectionAttribute : ActivateAttribute
+	public sealed class CollectionAttribute : ServicesValueBase
 	{
-		public CollectionAttribute( Type elementType = null, string name = null ) : base( () => new CollectionProvider( elementType.With( type => typeof( Collection<> ).MakeGenericType( type ) ), name ) )
-		{}
-	}
+		readonly static Func<Type, Type> Transform = CollectionAlteration.Default.Get;
 
-	public class CollectionProvider : ActivatedValueProvider
-	{
-		public CollectionProvider( Type type, string name ) : base( type, name )
-		{}
+		public CollectionAttribute( Type elementType = null ) : base( t => Create( elementType ) ) {}
 
-		protected override Type DetermineType( PropertyInfo propertyInfo )
+		static ServicesValueProvider Create( Type type = null ) => new ServicesValueProvider( p =>
 		{
-			var result = typeof(Collection<>).MakeGenericType( propertyInfo.PropertyType.Adapt().GetInnerType() );
-			return result;;
+			var elementType = type ?? p.PropertyType.Adapt().GetEnumerableType();
+			var result = elementType.With( Transform );
+			return result;
+		}, Constructor.Default.Get );
+
+		sealed class CollectionAlteration : AlterationBase<Type>
+		{
+			public static CollectionAlteration Default { get; } = new CollectionAlteration();
+			CollectionAlteration() {}
+
+			public override Type Get( Type parameter ) => typeof(Collection<>).MakeGenericType( parameter );
 		}
 	}
 }

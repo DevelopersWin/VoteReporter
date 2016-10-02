@@ -1,25 +1,8 @@
-using System;
-using System.Xml;
-using System.Xml.XPath;
-
 namespace DragonSpark.Windows.Runtime.Data
 {
-	
-
-	public static class DataBuilder
+	public sealed class DocumentFactory : DocumentFactory<string>
 	{
-		public static IXPathNavigable Create( string data )
-		{
-			var result = new XmlDocument();
-			result.LoadXml( data );
-			return result;
-		}
-
-		public static IXPathNavigable Create( Uri location )
-		{
-			var result = new XmlDocument();
-			result.Load( location.ToString() );
-			return result;
-		}
+		public static DocumentFactory Default { get; } = new DocumentFactory();
+		DocumentFactory() : base( ( document, data ) => document.LoadXml( data ) ) {}
 	}
 }

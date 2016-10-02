@@ -1,24 +1,15 @@
-﻿using AutoMapper;
-using DragonSpark.Activation;
-using DragonSpark.ComponentModel;
+﻿using DragonSpark.ComponentModel;
+using DragonSpark.TypeSystem;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Activator = System.Activator;
+using System.Runtime.InteropServices;
+using Type = System.Type;
 
 namespace DragonSpark.Extensions
 {
 	public static class ObjectExtensions
 	{
-		public static TResult Clone<TResult>( this TResult @this, Action<IMappingExpression> configure = null ) where TResult : class
-		{
-			var result = @this.MapInto<TResult>( configure: configure );
-			return result;
-		}
-
 		public static MemberInfo GetMemberInfo( this Expression expression )
 		{
 			var lambda = (LambdaExpression)expression;
@@ -26,39 +17,20 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static void TryDispose( this object target )
-		{
-			target.As<IDisposable>( x => x.Dispose() );
-		}
+		public static void TryDispose( this object target ) => target.As<IDisposable>( x => x.Dispose() );
 
-		public static void Null<TItem>( this TItem target, Action action )
-		{
-			target.IsNull().IsTrue( action );
-		}
+		public static bool IsAssignedOrValue<T>( [Optional]this T @this ) => IsAssigned( @this, true );
 
-		public static bool IsNull<T>( this T @this )
+		public static bool IsAssigned<T>( [Optional]this T @this ) => IsAssigned( @this, false );
+
+		static bool IsAssigned<T>( [Optional]this T @this, bool value )
 		{
-			var result = Equals( @this, default(T) );
+			var type = @this?.GetType() ?? typeof(T);
+			var result = type.GetTypeInfo().IsValueType ? value || !SpecialValues.DefaultOrEmpty( type ).Equals( @this ) : !Equals( @this, default(T) );
 			return result;
 		}
 
-		/*public static IEnumerable<TItem> ToEnumerable<TItem>( this TItem target, IEnumerable<TItem> others = null )
-		{
-			var second = others ?? Enumerable.Empty<TItem>();
-
-			var result = new[] { target }.Union( second ).ToArray();
-			return result;
-		}*/
-
-		public static IEnumerable<TItem> Enumerate<TItem>( this IEnumerator<TItem> target )
-		{
-			var result = new List<TItem>();
-			while ( target.MoveNext() )
-			{
-				result.Add( target.Current );
-			}
-			return result;
-		}
+		public static bool IsAssignedOrContains<T>( [Optional]this T @this ) => !Equals( @this, SpecialValues.DefaultOrEmpty<T>() );
 
 		public static TResult Loop<TItem,TResult>( this TItem current, Func<TItem,TItem> resolveParent, Func<TItem, bool> condition, Func<TItem, TResult> extract = null, TResult defaultValue = default(TResult) )
 		{
@@ -71,214 +43,88 @@ namespace DragonSpark.Extensions
 				}
 				current = resolveParent( current );
 			}
-			while ( current != null );
+			while ( current.IsAssigned() );
 			return defaultValue;
 		}
 
-		public static IEnumerable<TItem> GetAllPropertyValuesOf<TItem>( this object target )
+		public static TResult With<TItem, TResult>( [Optional]this TItem target, Func<TItem, TResult> function, Func<TResult> defaultFunction = null )
 		{
-			var result = target.GetAllPropertyValuesOf( typeof(TItem) ).Cast<TItem>().ToArray();
+			var getDefault = defaultFunction ?? Support<TResult>.Default;
+			var result = target.IsAssigned() ? function( target ) : getDefault();
 			return result;
 		}
 
-		public static IEnumerable GetAllPropertyValuesOf( this object target, Type propertyType )
+		static class Support<T>
 		{
-			var result = target.GetType().GetRuntimeProperties().Where( x => !x.GetIndexParameters().Any() && propertyType.GetTypeInfo().IsAssignableFrom( x.PropertyType.GetTypeInfo() ) ).Select( x => x.GetValue( target, null ) ).ToArray();
-			return result;
+			public static Func<T> Default { get; } = SpecialValues.DefaultOrEmpty<T>;
 		}
 
-		public static TResult With<TItem, TResult>( this TItem target, Func<TItem, TResult> function, Func<TResult> defaultFunction = null )
+		public static TItem With<TItem>( [Optional]this TItem @this, Action<TItem> action = null )
 		{
-			var getDefault = defaultFunction ?? DetermineDefault<TResult>;
-			var result = target != null ? function( target ) : getDefault();
-			return result;
-		}
-
-		public static TItem With<TItem>( this TItem @this, Action<TItem> action )
-		{
-			var result = @this.With( item =>
+			if ( @this.IsAssigned() )
 			{
-				action?.Invoke( item );
-				return item;
-			} );
-			return result;
+				action?.Invoke( @this );
+				return @this;
+			}
+			return default(TItem);
 		}
 
-		public static TItem WithSelf<TItem>( this TItem @this, Func<TItem, object> action )
+		public static bool Is<T>( this object @this ) => @this is T;
+		public static bool Not<T>( this object @this ) => !@this.Is<T>();
+
+		public static TItem WithSelf<TItem>( [Optional]this TItem @this, Func<TItem, object> action )
 		{
-			@this.With( action );
+			if ( @this.IsAssigned() )
+			{
+				action( @this );
+			}
 			return @this;
 		}
 
-		public static TItem With<TItem>( this TItem? @this, Action<TItem> action ) where TItem : struct
-		{
-			var result = @this?.With( action ) ?? default(TItem);
-			return result;
-		}
+		public static T With<T>( [Optional]this T? @this, Action<T> action ) where T : struct => @this?.With( action ) ?? default(T);
 
-		public static TResult With<TItem, TResult>( this TItem? @this, Func<TItem, TResult> action ) where TItem : struct 
-		{
-			var result = @this != null ? @this.Value.With( action ) : default(TResult);
-			return result;
-		}
+		public static TResult With<TItem, TResult>( [Optional]this TItem? @this, Func<TItem, TResult> action ) where TItem : struct => @this != null ? @this.Value.With( action ) : default( TResult );
 
-		public static TResult FromMetadata<TAttribute, TResult>( this object target, Func<TAttribute,TResult> resolveValue, Func<TResult> resolveDefault = null ) where TAttribute : Attribute
-		{
-			var result = target.With( x => 
-				target.AsTo<Assembly, TResult>( assembly => assembly.FromMetadata( resolveValue, resolveDefault ), () => ( x as MemberInfo ?? x.GetType().GetTypeInfo() ).FromMetadata( resolveValue, resolveDefault ) ) 
-			);
-			return result;
-		}
+		public static TResult Evaluate<TResult>( this object container, string expression ) => Evaluate<TResult>( ExpressionEvaluator.Default, container, expression );
 
-		public static TResult FromMetadata<TAttribute, TResult>( this MemberInfo target, Func<TAttribute,TResult> resolveValue, Func<TResult> resolveDefault = null ) where TAttribute : Attribute
-		{
-			var result = target.GetCustomAttributes<TAttribute>().WithFirst( resolveValue, resolveDefault ?? DetermineDefault<TResult> );
-			return result;
-		}
+		public static TResult Evaluate<TResult>( this IExpressionEvaluator @this, object container, string expression ) => (TResult)@this.Evaluate( container, expression );
 
-		public static TResult FromMetadata<TAttribute, TResult>( this Assembly target, Func<TAttribute,TResult> resolveValue, Func<TResult> resolveDefault = null ) where TAttribute : Attribute
+		public static T AsValid<T>( this object @this, Action<T> with = null, string message = null )
 		{
-			var result = target.GetCustomAttributes<TAttribute>().WithFirst( resolveValue, resolveDefault ?? DetermineDefault<TResult> );
-			return result;
-		}
-
-		public static TItem BuildUp<TItem>( this TItem target ) where TItem : class
-		{
-			var builder = Services.Location.Locate<IObjectBuilder>() ?? ObjectBuilder.Instance;
-			builder.BuildUp( target );
-			return target;
-		}
-
-		public static object Evaluate( this object container, string expression )
-		{
-			var result = Services.Location.With<IExpressionEvaluator, object>( x => x.Evaluate( container, expression ) );
-			return result;
-		}
-
-		public static TResult Evaluate<TResult>( this object container, string expression )
-		{
-			return (TResult)container.Evaluate( expression );
-		}
-
-		public static TResult DetermineDefault<TResult>()
-		{
-			var type = typeof(TResult).GetTypeInfo();
-			if ( type.IsGenericType )
+			if ( !( @this is T ) )
 			{
-				var typeArguments = type.GenericTypeArguments.First();
-				var genericType = typeof(IEnumerable<>).MakeGenericType( typeArguments ).GetTypeInfo();
-				if ( genericType.IsAssignableFrom( type ) )
-				{
-					var result = typeArguments.With( x => Activator.CreateInstance( x.MakeArrayType(), 0 ) ).To<TResult>();
-					return result;
-				}
+				throw new InvalidOperationException( message ?? $"'{@this.GetType().FullName}' is not of type {typeof(T).FullName}." );
 			}
-			return default(TResult);
+
+			var result = with != null ? @this.As( with ) : (T)@this;
+			return result;
 		}
 
-		/*public static TResult Clone<TResult>( this TResult source )
+		public static T As<T>( [Optional]this object target ) => target is T ? (T)target : default(T);
+
+		public static T As<T>( [Optional]this object target, Action<T> action )
 		{
-			var result = (TResult)Activator.CreateInstance( source.GetType() );
-			var properties = source.GetType().GetRuntimeProperties().Where( x => x.CanRead && x.CanWrite ).NotNull();
-			properties.Each( x =>
+			if ( target is T )
 			{
-			    if ( typeof(IList).IsAssignableFrom( x.PropertyType ) )
-			    {
-			        var add = x.ReflectedType.GetMethod( "Add" );
-			        if ( add != null )
-			        {
-			            var enumerable = To<IEnumerable>( x.GetValue( source, null ) );
-			            var count = enumerable.Cast<object>().Count();
-			            for ( var i = 0; i < count; i++ )
-			            {
-			                var value = ResolveValue( source, x, new object[]{ i } );
-			                add.Invoke( enumerable, new[]{ value } );
-			            }
-			        }
-			    }
-			    else
-			    {
-			        var value = ResolveValue( source, x, null );
-			        try
-			        {
-			            x.SetValue( result, value, null );
-			        }
-			        catch ( TargetInvocationException error )
-			        {
-			            Debug.WriteLine( "Could not write property '{0}'.  Error: '{1}'.", x.Name, error.Message );
-			        }
-			    }                		
-			} );
-			return result;
-		}
-
-		static object ResolveValue( object source, PropertyInfo property, object[] parameters )
-		{
-			var current = property.GetValue( source, parameters );
-			var result = current.As<DependencyObject>().Transform( Clone, () => current );
-			return result;
-		}*/
-
-		public static TItem AsValid<TItem>( this object @this, Action<TItem> with )
-		{
-			var result = AsValid( @this, with, null );
-			return result;
-		}
-
-		public static TItem AsValid<TItem>( this object @this, Action<TItem> with, string message )
-		{
-			var result = @this.As( with );
-			result.Null( () =>
-			{
-				throw new InvalidOperationException( message ?? $"This object is not of type {typeof(TItem).FullName}." );
-			} );
-			return result;
-		}
-
-		public static TResult As<TResult>( this object target ) => As( target, (Action<TResult>)null );
-
-		/*public static TResult As<TResult, TReturn>( this object target, Func<TResult, TReturn> action ) => target.As<TResult>( x => { action( x ); } );*/
-
-		public static TResult As<TResult>( this object target, Action<TResult> action )
-		{
-			if ( target is TResult )
-			{
-				var result = (TResult)target;
-				result.With( action );
+				var result = (T)target;
+				action( result );
 				return result;
 			}
-			return default(TResult);
+			return default(T);
 		}
 
 		public static TResult AsTo<TSource, TResult>( this object target, Func<TSource,TResult> transform, Func<TResult> resolve = null )
 		{
-			var @default = resolve ?? DetermineDefault<TResult>;
+			var @default = resolve ?? ( () => default(TResult) );
 			var result = target is TSource ? transform( (TSource)target ) : @default();
 			return result;
 		}
 
+		public static TResult To<TResult>( this object target ) => (TResult)target;
 
-		public static TResult To<TResult>( this object target )
-		{
-			var result = (TResult)target;
-			return result;
-		}
+		public static T ConvertTo<T>( this object @this ) => @this.IsAssigned() ? (T)ConvertTo( @this, typeof(T) ) : default(T);
 
-		public static T ConvertTo<T>( this object @this )
-		{
-			var result = @this.With( x => (T)ConvertTo( @this, typeof(T) ) );
-			return result;
-		}
-
-		public static object ConvertTo( this object @this, Type to )
-		{
-			var info = to.GetTypeInfo();
-			if ( !info.IsAssignableFrom( @this.GetType().GetTypeInfo() ) )
-			{
-				return info.IsEnum ? Enum.Parse( to, @this.ToString() ) : ChangeType( @this, to );
-			}
-			return @this;
-		}
+		public static object ConvertTo( this object @this, Type to ) => !to.Adapt().IsInstanceOfType( @this ) ? ( to.GetTypeInfo().IsEnum ? Enum.Parse( to, @this.ToString() ) : ChangeType( @this, to ) ) : @this;
 
 		static object ChangeType( object @this, Type to )
 		{

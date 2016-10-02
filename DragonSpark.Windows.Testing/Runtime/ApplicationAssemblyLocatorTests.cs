@@ -1,25 +1,26 @@
-﻿using DragonSpark.Testing.Framework.Setup;
-using DragonSpark.Windows.Runtime;
+﻿using DragonSpark.Application;
+using DragonSpark.Extensions;
 using System;
 using System.Reflection;
 using Xunit;
+using ApplicationAssemblyLocator = DragonSpark.Windows.Runtime.ApplicationAssemblyLocator;
 
 namespace DragonSpark.Windows.Testing.Runtime
 {
 	public class ApplicationAssemblyLocatorTests
 	{
-		[Theory, MoqAutoData]
-		public void Create( ApplicationAssemblyLocator sut )
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
+		public void Create()
 		{
-			var assembly = sut.Create();
-			Assert.Equal( GetType().Assembly, assembly );
+			GetType().Yield().AsApplicationParts();
+			Assert.Equal( GetType().Assembly, ApplicationAssembly.Default.Get() );
 		}
 
-		[Theory, MoqAutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Other( Assembly[] assemblies )
 		{
-			var sut = new ApplicationAssemblyLocator( assemblies, AppDomain.CreateDomain( "NotAnAssembly" ) );
-			var assembly = sut.Create();
+			var sut = new ApplicationAssemblyLocator( AppDomain.CreateDomain( "NotAnAssembly" ) );
+			var assembly = sut.Get( assemblies );
 			Assert.Null( assembly );
 		}
 	}

@@ -1,8 +1,7 @@
-using DragonSpark.Setup.Registration;
+using System.Composition;
 
 namespace DragonSpark.Testing.Objects
 {
-	[Register]
-	public class RegisterAsSingleton
-	{}
+	[Export, Shared]
+	public class RegisterAsSingleton {}
 }

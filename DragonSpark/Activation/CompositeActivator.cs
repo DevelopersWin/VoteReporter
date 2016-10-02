@@ -1,40 +1,24 @@
+﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using System;
-using System.Linq;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Activation
 {
-	public class CompositeActivator : IActivator
+	public class CompositeActivator : CompositeFactory<Type, object>, IActivator
 	{
-		readonly IActivator[] activators;
+		readonly ISpecification<Type> specification;
 
-		public CompositeActivator( params IActivator[] activators )
+		public CompositeActivator( params IActivator[] activators ) : this( new AnySpecification<Type>( activators ), activators ) {}
+
+		public CompositeActivator( ISpecification<Type> specification, params IActivator[] activators ) : base( activators )
 		{
-			this.activators = activators;
+			this.specification = specification;
 		}
 
-		public bool CanActivate( Type type, string name = null )
-		{
-			var result = activators.Any( activator => activator.CanActivate( type, name ) );
-			return result;
-		}
+		public object GetService( Type serviceType ) => Get( serviceType );
 
-		public object Activate( Type type, string name = null )
-		{
-			var result = activators.Where( activator => activator.CanActivate( type, name ) ).Select( activator => activator.Activate( type, name ) ).NotNull().FirstOrDefault();
-			return result;
-		}
+		public bool IsSatisfiedBy( Type parameter ) => specification.IsSatisfiedBy( parameter );
 
-		public bool CanConstruct( Type type, params object[] parameters )
-		{
-			var result = activators.Any( activator => activator.CanConstruct( type, parameters ) );
-			return result;
-		}
-
-		public object Construct( Type type, params object[] parameters )
-		{
-			var result = activators.Where( activator => activator.CanConstruct( type, parameters ) ).Select( activator => activator.Construct( type, parameters ) ).NotNull().FirstOrDefault();
-			return result;
-		}
+		public bool IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
 	}
 }

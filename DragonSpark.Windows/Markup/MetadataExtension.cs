@@ -1,11 +1,13 @@
+using DragonSpark.ComponentModel;
+using DragonSpark.Extensions;
+using PostSharp.Patterns.Contracts;
 using System;
 using System.Reflection;
 using System.Xaml;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Windows.Markup
 {
-	public class MetadataExtension : MonitoredMarkupExtension
+	public class MetadataExtension : MarkupExtensionBase
 	{
 		readonly Type attributeType;
 		readonly string expression;
@@ -16,10 +18,10 @@ namespace DragonSpark.Windows.Markup
 			this.expression = expression;
 		}
 
-		protected override object GetValue( IServiceProvider serviceProvider )
-		{
-			var result = serviceProvider.Get<IRootObjectProvider>().RootObject.GetType().Assembly.GetCustomAttribute( attributeType ).Evaluate( expression );
-			return result;
-		}
+		[Service]
+		public IExpressionEvaluator Evaluator { [return: NotNull]get; set; }
+
+		protected override object GetValue( MarkupServiceProvider serviceProvider ) 
+			=> Evaluator.Evaluate( serviceProvider.Get<IRootObjectProvider>().RootObject.GetType().Assembly.GetCustomAttribute( attributeType ), expression );
 	}
 }

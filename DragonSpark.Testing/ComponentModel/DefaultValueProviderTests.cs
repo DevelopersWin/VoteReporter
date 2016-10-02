@@ -1,54 +1,20 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.ComponentModel;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Testing.Framework;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Testing.Objects;
-using Microsoft.Practices.ServiceLocation;
-using Ploeh.AutoFixture.Xunit2;
 using System;
 using Xunit;
 
 namespace DragonSpark.Testing.ComponentModel
 {
+	[Trait( Traits.Category, Traits.Categories.ServiceLocation ), FrameworkTypes, FormatterTypes, ContainingTypeAndNested]
 	public class DefaultValueProviderTests
 	{
-		public class Activator : IActivator
-		{
-			readonly IServiceLocator locator;
-
-			public Activator( IServiceLocator locator )
-			{
-				this.locator = locator;
-			}
-
-			public bool CanActivate( Type type, string name )
-			{
-				return true;
-			}
-
-			public object Activate( Type type, string name = null )
-			{
-				var result = locator.GetInstance( type, name );
-				return result;
-			}
-
-			public bool CanConstruct( Type type, params object[] parameters )
-			{
-				return true;
-			}
-
-			public object Construct( Type type, params object[] parameters )
-			{
-				var result = locator.GetInstance( type );
-				return result;
-			}
-		}
-
 		[Theory, AutoData]
-		void Apply( [Modest]ObjectBuilder sut )
+		void Apply()
 		{
 			var current = DateTime.Now;
 			var target = new ClassWithDefaultProperties();
-			sut.BuildUp( target );
 
 			Assert.Equal( 'd', target.Char );
 			Assert.Equal( 7, target.Byte );
@@ -71,16 +37,21 @@ namespace DragonSpark.Testing.ComponentModel
 
 			Assert.NotNull( target.Activated );
 
-			Assert.IsType<ClassWithParameter>( target.Factory );
+			var created = Assert.IsType<ClassWithParameter>( target.Factory );
+			Assert.NotNull( created.Parameter );
+			Assert.IsType<Constructor>( created.Parameter );
 
 			Assert.NotNull( target.Collection );
-			Assert.IsType<Collection<object>>( target.Collection );
+			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<object>>( target.Collection );
 			Assert.NotNull( target.Classes );
-			Assert.IsType<Collection<Class>>( target.Classes );
+			Assert.IsAssignableFrom<System.Collections.ObjectModel.Collection<Class>>( target.Classes );
 
 			Assert.Equal( 6776, target.ValuedInt );
 
 			Assert.NotEqual( Guid.Empty, target.Guid );
+			Assert.NotEqual( Guid.Empty, target.AnotherGuid );
+
+			Assert.NotEqual( target.Guid, target.AnotherGuid );
 
 			Assert.Equal( new Guid( "66570344-BA99-4C90-A7BE-AEC903441F97" ), target.ProvidedGuid );
 

@@ -1,42 +1,24 @@
-using DragonSpark.Setup.Registration;
-using Microsoft.Practices.Unity;
+using DragonSpark.Sources.Parameterized;
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace DragonSpark.Windows.Runtime
 {
-	[RegisterFactoryForResult]
-	public class ApplicationAssemblyLocator : TypeSystem.ApplicationAssemblyLocator
+	public sealed class ApplicationAssemblyLocator : ParameterizedSourceBase<IEnumerable<Assembly>, Assembly>
 	{
-		readonly AppDomain primary;
+		readonly Func<Assembly> defaultSource;
 
-		[InjectionConstructor]
-		public ApplicationAssemblyLocator( Assembly[] assemblies ) : this( assemblies, AppDomain.CurrentDomain )
-		{}
+		public static ApplicationAssemblyLocator Default { get; } = new ApplicationAssemblyLocator();
+		ApplicationAssemblyLocator() : this( AppDomain.CurrentDomain ) {}
 
-		public ApplicationAssemblyLocator( Assembly[] assemblies, AppDomain primary ) : base( assemblies )
+		public ApplicationAssemblyLocator( AppDomain domain ) : this( new SuppliedSource<AppDomain, Assembly>( DomainApplicationAssemblies.Default.Get, domain ).Get ) {}
+
+		public ApplicationAssemblyLocator( Func<Assembly> defaultSource )
 		{
-			this.primary = primary;
+			this.defaultSource = defaultSource;
 		}
 
-		protected override Assembly CreateItem()
-		{
-			var result = DeterminePrimaryAssembly() ?? base.CreateItem();
-			return result;
-		}
-
-		Assembly DeterminePrimaryAssembly()
-		{
-			try
-			{
-				return Assembly.Load( primary.FriendlyName );
-			}
-			catch ( FileNotFoundException )
-			{
-				var result = Assembly.GetEntryAssembly();
-				return result;
-			}
-		}
+		public override Assembly Get( IEnumerable<Assembly> parameter ) => Application.ApplicationAssemblyLocator.Default.Get( parameter ) ?? defaultSource();
 	}
 }

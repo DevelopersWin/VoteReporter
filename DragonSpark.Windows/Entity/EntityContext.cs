@@ -1,21 +1,28 @@
+using DragonSpark.Commands;
+using DragonSpark.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Windows.Entity
 {
 	public class EntityContext : DbContext, IEntityInstallationStorage
 	{
 		public event EventHandler Saved = delegate { };
-
 		public event EventHandler Saving = delegate { };
 
+		readonly ICommand<DbContextBuildingParameter> command;
+
+		protected EntityContext() : this( DefaultCommands.Default ) {}
+
+		protected EntityContext( ICommand<DbContextBuildingParameter> command )
+		{
+			this.command = command;
+		}
 
 		public IDbSet<InstallationEntry> Installations { get; set; }
 
@@ -26,7 +33,7 @@ namespace DragonSpark.Windows.Entity
 			{
 				case EntityState.Modified:
 				case EntityState.Unchanged:
-					var names = entityEntry.Entity.GetType().GetProperties().Where( x => AttributeProviderExtensions.IsDecoratedWith<RequiredAttribute>( x ) ).Select( x => x.Name ).ToArray();
+					var names = entityEntry.Entity.GetType().GetProperties().Where( x => x.Has<RequiredAttribute>() ).Select( x => x.Name ).ToArray();
 					names.Any().IsTrue( () => this.Load( entityEntry.Entity, names, 0, false ) );
 					break;
 			}
@@ -53,17 +60,9 @@ namespace DragonSpark.Windows.Entity
 
 		protected override void OnModelCreating( DbModelBuilder modelBuilder )
 		{
-			LocalStoragePropertyProcessor.Instance.Process( this, modelBuilder );
+			command.Execute( new DbContextBuildingParameter( this, modelBuilder ) );
 
 			base.OnModelCreating( modelBuilder );
-
-			var method = modelBuilder.GetType().GetMethod( "ComplexType" );
-
-			this.GetDeclaredEntityTypes().First().Assembly.GetTypes().Where( x => x.IsDecoratedWith<ComplexTypeAttribute>() ).Each( x =>
-			{
-				var info = method.MakeGenericMethod( x );
-				info.Invoke( modelBuilder, null );
-			} );
 		}
 	}
 }

@@ -1,38 +1,31 @@
+using System;
 using System.IO;
-using System.Xaml;
-using System.Xml.XPath;
-using System.Xml.Xsl;
 
 namespace DragonSpark.Windows.Runtime.Data
 {
-	public class DataTransformer : IDataTransformer
+	public sealed class DataTransformer : DataTransformer<string>
 	{
-		public static DataTransformer Instance { get; } = new DataTransformer();
+		public static DataTransformer Default { get; } = new DataTransformer();
+		DataTransformer() : base( stream => new StreamReader( stream ).ReadToEnd() ) {}
+	}
 
-		public object Transform( IXPathNavigable stylesheet, IXPathNavigable source )
+	public abstract class DataTransformer<T> : DataTransformerBase<T>
+	{
+		readonly Func<DataTransformParameter, MemoryStream> factory;
+		readonly Func<MemoryStream, T> transformer;
+
+		protected DataTransformer( Func<MemoryStream, T> transformer ) : this( DataStreamFactory.Default.Get, transformer ) {}
+
+		protected DataTransformer( Func<DataTransformParameter, MemoryStream> factory, Func<MemoryStream, T> transformer )
 		{
-			var stream = DetermineStream( stylesheet, source );
-
-			var result = XamlServices.Load( stream );
-			return result;
+			this.factory = factory;
+			this.transformer = transformer;
 		}
 
-		static MemoryStream DetermineStream( IXPathNavigable stylesheet, IXPathNavigable source )
+		public override T Get( DataTransformParameter parameter )
 		{
-			var transform = new XslCompiledTransform();
-			transform.Load( stylesheet );
-
-			var stream = new MemoryStream();
-			transform.Transform( source, null, stream );
-			stream.Seek( 0, SeekOrigin.Begin );
-			return stream;
-		}
-
-		public string ToString( IXPathNavigable stylesheet, IXPathNavigable source )
-		{
-			var stream = DetermineStream( stylesheet, source );
-
-			var result = new StreamReader( stream ).ReadToEnd();
+			var stream = factory( parameter );
+			var result = transformer( stream );
 			return result;
 		}
 	}

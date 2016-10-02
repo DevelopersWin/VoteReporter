@@ -1,17 +1,18 @@
 ﻿using DragonSpark.Extensions;
-using DragonSpark.Testing.Framework.Setup;
 using DragonSpark.Testing.Objects;
-using Ploeh.AutoFixture.Xunit2;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
+using Type = System.Type;
 
 namespace DragonSpark.Testing.Extensions
 {
+	[SuppressMessage( "ReSharper", "PossibleMultipleEnumeration" )]
 	public class EnumerableExtensionsTests
 	{
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Each( IEnumerable<object> sut )
 		{
 			var count = 0;
@@ -20,16 +21,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.Count(), count );
 		}
 
-		[Theory, MoqAutoData]
-		public void NullIfEmpty( IEnumerable<object> sut )
-		{
-			Assert.NotNull( sut.NullIfEmpty() );
-
-			Assert.Null( Enumerable.Empty<object>().NullIfEmpty() );
-		}
-
-
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void Prepend( IEnumerable<object> sut, object[] items )
 		{
 			var prepended = sut.Prepend( items );
@@ -38,7 +30,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.True( items.All( x => prepended.Contains( x ) ) );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void PrependItem( object sut, IEnumerable<object> items )
 		{
 			var prepended = sut.Prepend( items );
@@ -46,7 +38,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Same( prepended.Last(), sut );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void EachWithFunc( IEnumerable<object> sut )
 		{
 			var copy = sut.ToList();
@@ -58,15 +50,8 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		void Prioritize()
 		{
-			var items = new object[] { new LowPriority(), new NormalPriority(), new HighPriority() }.Prioritize().ToArray();
-			Assert.IsType<HighPriority>( items.First() );
-			Assert.IsType<LowPriority>( items.Last() );
-		}
-
-		[Fact]
-		void PrioritizePredicate()
-		{
-			var items = new object[] { new LowPriority(), new NormalPriority(), new HighPriority() }.Prioritize( x => x.GetType().GetAttribute<PriorityAttribute>() ).ToArray();
+			var low = new LowPriority();
+			var items = new object[] { low, new NormalPriority(), new HighPriority() }.Prioritize().ToArray();
 			Assert.IsType<HighPriority>( items.First() );
 			Assert.IsType<LowPriority>( items.Last() );
 		}
@@ -79,7 +64,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.IsType<LowPriority>( items.Last() );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void AsItem( object[] sut, object item )
 		{
 			var items = item.Append( sut );
@@ -90,7 +75,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Single( asItem, item );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void Adding( object[] sut, object item )
 		{
 			var items = sut.Append( item );
@@ -98,10 +83,10 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( sut.First(), items.First() );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		public void TupleWith( Type[] types, string[] strings )
 		{
-			var tuple = types.TupleWith( strings ).ToList();
+			var tuple = types.Tuple( strings ).ToList();
 			Assert.Equal( tuple.Count, types.Length );
 			Assert.Equal( tuple.Count, strings.Length );
 
@@ -113,7 +98,7 @@ namespace DragonSpark.Testing.Extensions
 			} );
 		}
 
-		[Theory, AutoData]
+		[Theory, Ploeh.AutoFixture.Xunit2.AutoData]
 		void FirstOrDefaultOfType( Class first, ClassWithParameter second, string third, Derived fourth )
 		{
 			var items = new object[] { first, second, third, fourth };

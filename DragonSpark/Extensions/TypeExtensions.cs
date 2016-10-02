@@ -1,40 +1,54 @@
-﻿using DragonSpark.TypeSystem;
-using System;
-using System.Collections.Concurrent;
+﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.TypeSystem;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
+using Type = System.Type;
 
 namespace DragonSpark.Extensions
 {
 	public static class TypeExtensions
 	{
-		readonly static ConcurrentDictionary<Type, TypeAdapter> Extensions = new ConcurrentDictionary<Type, TypeAdapter>();
+		public static Type GetMemberType(this MemberInfo memberInfo) => 
+			( memberInfo as MethodInfo )?.ReturnType ??
+			( memberInfo as PropertyInfo )?.PropertyType ?? 
+			( memberInfo as FieldInfo )?.FieldType ?? 
+			(memberInfo as TypeInfo)?.AsType();
 
-		public static TypeAdapter Adapt( this object @this )
+		public static IEnumerable<Assembly> Assemblies( this IEnumerable<Type> @this ) => @this.Select( x => x.Assembly() ).Distinct();
+
+		public static TypeAdapter Adapt( this Type @this ) => TypeAdapterCache.Default.Get( @this );
+
+		public static TypeAdapter Adapt( this object @this ) => @this.GetType().Adapt();
+
+		public static TypeAdapter Adapt( this TypeInfo @this ) => Adapt( @this.AsType() );
+
+		public static Assembly Assembly( this Type @this ) => Adapt( @this ).Assembly;
+
+		readonly static TypeInfo Structural = typeof(IStructuralEquatable).GetTypeInfo();
+
+		public static bool IsStructural( this Type @this ) => Structural.IsAssignableFrom( @this.GetTypeInfo() );
+		
+		public static bool IsAssignableFrom( this ImmutableArray<TypeAdapter> @this, Type type )
 		{
-			return @this.GetType().Adapt();
+			foreach ( var adapter in @this )
+			{
+				if ( adapter.IsAssignableFrom( type ) )
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
-		public static TypeAdapter Adapt( this Type @this )
-		{
-			return @this.With( item => Extensions.GetOrAdd( item, t => new TypeAdapter( t ) ) );
-		}
+		public static ImmutableArray<Type> GetParameterTypes( this MethodBase @this ) => Support.ParameterTypes.Get( @this );
 
-		public static TypeAdapter Adapt( this TypeInfo @this )
+		static class Support
 		{
-			return @this.With( item => Extensions.GetOrAdd( item.AsType(), t => new TypeAdapter( @this ) ) );
+			public static IParameterizedSource<MethodBase, ImmutableArray<Type>> ParameterTypes { get; } = CacheFactory.Create<MethodBase, ImmutableArray<Type>>( method => method.GetParameters().Select( info => info.ParameterType ).ToImmutableArray() );
 		}
-
-		public static Assembly Assembly( this Type @this )
-		{
-			return Adapt( @this ).Assembly;
-		}
-
-		/*
-		static readonly IDictionary<Type,Type[]> KnownTypeCache = new Dictionary<Type, Type[]>();
-		public static Type[] GetKnownTypes( this Type target )
-		{
-			var result = KnownTypeCache.Ensure( target, x => Services.With<IAssembliesProvider, Type[]>( y => y.GetAssemblies().SelectMany( z => z.DefinedTypes ).Where( z => z.IsSubclassOf( x ) && x.Namespace != "System.Data.Entity.DynamicProxies" ).ToArray() ) );
-			return result;
-		}*/
 	}
 }

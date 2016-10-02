@@ -1,18 +1,15 @@
-using DragonSpark.Activation.FactoryModel;
-using DragonSpark.TypeSystem;
+using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
+using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
-	public class HostedValueLocator<T> : FactoryBase<MemberInfo, T[]> where T : class
+	public sealed class HostedValueLocator<T> : ParameterizedSourceBase<ImmutableArray<T>> where T : class
 	{
-		public static HostedValueLocator<T> Instance { get; } = new HostedValueLocator<T>();
+		public static HostedValueLocator<T> Default { get; } = new HostedValueLocator<T>();
+		HostedValueLocator() {}
 
-		protected override T[] CreateItem( MemberInfo parameter )
-		{
-			var result = parameter.GetCustomAttributes<HostingAttribute>().Select( attribute => attribute.Item ).OfType<T>().ToArray();
-			return result;
-		}
+		public override ImmutableArray<T> Get( object parameter ) => parameter.GetAttributes<HostingAttributeBase>().Introduce( parameter, tuple => tuple.Item1.Get( tuple.Item2 ) ).OfType<T>().ToImmutableArray();
 	}
 }

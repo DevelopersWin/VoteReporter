@@ -1,7 +1,21 @@
-using DragonSpark.Activation.FactoryModel;
+using DragonSpark.Sources;
+using System;
+using System.Composition;
 
 namespace DragonSpark.Testing.Objects
 {
-	public class FactoryOfYAC : ActivateFactory<YetAnotherClass>
-	{}
+	[Export]
+	public class FactoryOfYac : SourceBase<YetAnotherClass>
+	{
+		readonly Func<YetAnotherClass> inner;
+
+		public FactoryOfYac() : this( () => new YetAnotherClass() ) {}
+
+		FactoryOfYac( Func<YetAnotherClass> inner )
+		{
+			this.inner = inner;
+		}
+
+		public override YetAnotherClass Get() => inner();
+	}
 }

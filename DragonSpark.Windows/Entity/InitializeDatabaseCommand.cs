@@ -1,56 +1,55 @@
-﻿using DragonSpark.ComponentModel;
-using DragonSpark.Diagnostics;
+﻿using DragonSpark.Commands;
+using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Setup;
 using PostSharp.Patterns.Contracts;
-using System.Collections.ObjectModel;
+using Serilog;
 using System.Data.Entity;
 using System.Linq;
 using System.Windows.Markup;
 
 namespace DragonSpark.Windows.Entity
 {
-	[ContentProperty( "Installers" )]
-	public abstract class InitializeDatabaseCommand<TContext> : SetupCommand where TContext : DbContext, IEntityInstallationStorage, new()
+	[ContentProperty( nameof(Installers) )]
+	public abstract class InitializeDatabaseCommand<TContext> : CommandBase<object> where TContext : DbContext, IEntityInstallationStorage, new()
 	{
-		[Activate]
-		public IDatabaseInitializer<TContext> Initializer { get; set; }
+		[Service, Required]
+		public IDatabaseInitializer<TContext> Initializer { [return: Required]get; set; }
 
-		public Collection<IInstaller> Installers { get; } = new Collection<IInstaller>();
+		public System.Collections.ObjectModel.Collection<IInstaller> Installers { get; } = new System.Collections.ObjectModel.Collection<IInstaller>();
 
-		[Activate, Required]
-		public IMessageLogger MessageLogger { [return: Required]get; set; }
+		[Service, Required]
+		public ILogger MessageLogger { [return: Required]get; set; }
 
-		protected override void OnExecute( ISetupParameter parameter )
+		public override void Execute( object parameter )
 		{
-			Initializer.With( initializer =>
+			Database.SetInitializer( Initializer );
+
+			using ( var context = new TContext() )
 			{
-				Database.SetInitializer( initializer );
+				MessageLogger.Information( "Initializing Database." );
+				
+				context.Database.Initialize( true );
 
-				using ( var instance = new TContext() )
+				var items = Installers.OrderBy( x => x.Version ).Where( x => x.ContextType == typeof(TContext) && context.Installations.Find( x.Id, x.Version.ToString() ) == null ).ToArray();
+
+				MessageLogger.Information( "Performing entity installation on {Length} installers.", items.Length );
+
+				foreach ( var x in items )
 				{
-					MessageLogger.Information( "Initializing Database.", Priority.Low );
-					instance.Database.Initialize( true );
+					MessageLogger.Information( "Installing Entity Installer with ID of '{Id}' and version '{Version}'.", x.Id, x.Version );
 
-					var items = Installers.OrderBy( x => x.Version ).Where( x => x.ContextType == typeof(TContext) && instance.Installations.Find( x.Id, x.Version.ToString() ) == null ).ToArray();
-
-					MessageLogger.Information( $"Performing entity installation on {items.Length} installers.", Priority.Low );
-
-					items.Each( x =>
+					foreach ( var y in x.Steps )
 					{
-						MessageLogger.Information( $"Installing Entity Installer with ID of '{x.Id}' and version '{x.Version}'.", Priority.Low );
-
-						x.Steps.Each( y =>
-						{
-							y.Execute( instance );
-							instance.Save();
-						} );
-						instance.Create<InstallationEntry>( y => x.MapInto( y ) );
-						instance.Save();
-					} );
-					MessageLogger.Information( "Database Initialized.", Priority.Low );
+						y.Execute( context );
+						context.Save();
+					}
+					
+					context.Create<InstallationEntry>( y => x.MapInto( y ) );
+					context.Save();
 				}
-			} );
+				
+				MessageLogger.Information( "Database Initialized." );
+			}
 		}
 	}
 }

@@ -1,209 +1,139 @@
+using DragonSpark.Application;
+using DragonSpark.Aspects;
 using DragonSpark.Extensions;
-using Microsoft.Practices.Unity.Utility;
+using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
+using DragonSpark.TypeSystem.Generics;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public class TypeAdapter
+	public sealed class TypeAdapter
 	{
-		readonly Type type;
-		readonly TypeInfo info;
+		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToSpecificationDelegate();
+		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
+		readonly Func<Type, bool> isAssignableFrom;
+		
+		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
+		readonly Func<Type, Type[]> getTypeArguments;
+		public TypeAdapter( Type referenceType ) : this( referenceType, referenceType.GetTypeInfo() ) {}
 
-		public TypeAdapter( Type type ) : this( type.GetTypeInfo() )
+		public TypeAdapter( TypeInfo info ) : this( info.AsType(), info ) {}
+
+		public TypeAdapter( Type referenceType, TypeInfo info )
 		{
-			this.type = type;
+			ReferenceType = referenceType;
+			Info = info;
+			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Get ).Get;
+			GenericFactoryMethods = new GenericStaticMethodFactories( ReferenceType );
+			GenericCommandMethods = new GenericStaticMethodCommands( ReferenceType );
+			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).Get;
+			getTypeArguments = new GetTypeArgumentsForCache( this ).Get;
 		}
 
-		public TypeAdapter( TypeInfo info )
+		public Type ReferenceType { get; }
+
+		public TypeInfo Info { get; }
+
+		public GenericStaticMethodFactories GenericFactoryMethods { get; }
+		public GenericStaticMethodCommands GenericCommandMethods { get; }
+
+		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( Specification ).ToArray();
+
+		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
+				InstanceConstructors.Default.Get( Info )
+				.Introduce( parameterTypes, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
+				.SingleOrDefault();
+
+		public bool IsAssignableFrom( Type other ) => isAssignableFrom( other );
+		bool IsAssignableFromBody( Type parameter ) => Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( ReferenceType ) || Info.IsAssignableFrom( parameter.GetTypeInfo() );
+		class IsInstanceOfTypeOrDefinitionCache : ArgumentCache<Type, bool>
 		{
-			this.info = info;
+			public IsInstanceOfTypeOrDefinitionCache( TypeAdapter owner ) : base( owner.IsAssignableFromBody ) {}
 		}
 
-		public object GetDefaultValue()
-		{
-			var result = info.IsValueType && Nullable.GetUnderlyingType( type ) == null ? Activator.CreateInstance( type ) : null;
-			return result;
-		}
+		public bool IsInstanceOfType( object instance ) => IsAssignableFrom( instance.GetType() );
+		
+		public Assembly Assembly => Info.Assembly;
 
-		/*public PropertyInfo GetProperty( string name )
+		public IEnumerable<Type> GetHierarchy( bool includeRoot = false )
 		{
-			var result = type.GetPropertiesHierarchical().FirstOrDefault( propertyInfo => propertyInfo.Name == name );
-			return result;
-		}
-
-		public FieldInfo GetField( string name )
-		{
-			var candidates = GetHierarchy( false ).SelectMany( t => new Func<string, FieldInfo>[] { t.GetTypeInfo().GetDeclaredField, t.GetRuntimeField } );
-			var result = candidates.Select( func => func( name ) ).NotNull().FirstOrDefault();
-			return result;
-		}*/
-
-		/*public ConstructorInfo[] GetConstructors()
-		{
-			var result = GetHierarchy().SelectMany( t => t.GetTypeInfo().DeclaredConstructors ).ToArray();
-			return result;
-		}*/
-
-		public ConstructorInfo FindConstructor( params object[] parameters )
-		{
-			var types = parameters.Select( o => o?.GetType() ).ToArray();
-			var result = FindConstructor( types );
-			return result;
-		}
-
-		public ConstructorInfo FindConstructor( params Type[] parameterTypes )
-		{
-			var result = info.DeclaredConstructors.SingleOrDefault( c => c.IsPublic && !c.IsStatic && Match( c.GetParameters(), parameterTypes ) );
-			return result;
-		}
-
-		static bool Match( IReadOnlyCollection<ParameterInfo> parameters, IReadOnlyCollection<Type> provided )
-		{
-			var result = 
-				provided.Count >= parameters.Count( info => !info.IsOptional ) && 
-				provided.Count <= parameters.Count && 
-				parameters.Select( ( t, i ) => provided.ElementAtOrDefault( i ).With( t.ParameterType.Adapt().IsAssignableFrom, () => i < provided.Count || t.IsOptional ) ).All( b => b );
-			return result;
-		}
-
-		public Type GuardAsAssignable<T>( string name )
-		{
-			Guard.TypeIsAssignable( typeof(T), type, name );
-			return type;
-		}
-
-		/*public bool CanInstantiate( Type instanceType )
-		{
-			var result  = info.IsAssignableFrom( instanceType.GetTypeInfo() );
-			return result;
-		}*/
-
-		public object Qualify( object instance )
-		{
-			var result = instance.With( o => info.IsAssignableFrom( o.GetType().GetTypeInfo() ) ? o : GetCaster( o.GetType() ).With( caster => caster.Invoke( null, new [] { o } ) ) );
-			return result;
-		}
-
-		public bool IsAssignableFrom( TypeInfo other )
-		{
-			var result = IsAssignableFrom( other.AsType() );
-			return result;
-		}
-
-		public bool IsAssignableFrom( Type other )
-		{
-			var result = info.IsAssignableFrom( other.GetTypeInfo() ) || GetCaster( other ) != null;
-			return result;
-		}
-
-		public bool IsInstanceOfType( object context )
-		{
-			var result = context.With( o => IsAssignableFrom( o.GetType() ) );
-			return result;
-		}
-
-		MethodInfo GetCaster( Type other )
-		{
-			return info.DeclaredMethods.SingleOrDefault( method => method.Name == "op_Implicit" && method.GetParameters().First().ParameterType.GetTypeInfo().IsAssignableFrom( other.GetTypeInfo() ) );
-		}
-
-		/*public bool IsSubclass( Type other )
-		{
-			var result = info.IsSubclassOf( other );
-			return result;
-		}*/
-
-		public Assembly Assembly => info.Assembly;
-
-		public Type[] GetHierarchy( bool includeRoot = true )
-		{
-			var result = new List<Type> { type };
-			var current = info.BaseType;
+			yield return ReferenceType;
+			var current = Info.BaseType;
 			while ( current != null )
 			{
 				if ( current != typeof(object) || includeRoot )
 				{
-					result.Add( current );
+					yield return current;
 				}
 				current = current.GetTypeInfo().BaseType;
 			}
-			return result.ToArray();
 		}
 
-		public Type GetEnumerableType()
+		[Freeze]
+		public Type GetEnumerableType() => InnerType( GetHierarchy(), types => types.Only(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
+
+		[Freeze]
+		public Type GetInnerType() => InnerType( GetHierarchy(), types => types.Only() );
+
+		static Type InnerType( IEnumerable<Type> hierarchy, Func<Type[], Type> fromGenerics, Func<TypeInfo, bool> check = null )
 		{
-			var result = InnerType( type, types => types.FirstOrDefault(), typeof(IEnumerable).GetTypeInfo().IsAssignableFrom );
+			foreach ( var type in hierarchy )
+			{
+				var info = type.GetTypeInfo();
+				var result = info.IsGenericType && info.GenericTypeArguments.Any() && ( check?.Invoke( info ) ?? true ) ? fromGenerics( info.GenericTypeArguments ) :
+					type.IsArray ? type.GetElementType() : null;
+				if ( result != null )
+				{
+					return result;
+				}
+			}
+			return null;
+		}
+
+		public Type[] GetTypeArgumentsFor( Type implementationType ) => getTypeArguments( implementationType );
+		Type[] GetTypeArgumentsForBody( Type implementationType ) => GetImplementations( implementationType ).First().GenericTypeArguments;
+		class GetTypeArgumentsForCache : ArgumentCache<Type, Type[]>
+		{
+			public GetTypeArgumentsForCache( TypeAdapter owner ) : base( owner.GetTypeArgumentsForBody ) {}
+		}
+
+		[Freeze]
+		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true )
+		{
+			var result = ReferenceType.Append( includeInterfaces ? Expand( ReferenceType ) : Items<Type>.Default )
+							 .Distinct()
+							 .Introduce( genericDefinition, tuple =>
+															{
+																var first = tuple.Item1.GetTypeInfo();
+																var second = tuple.Item2.GetTypeInfo();
+																var match = first.IsGenericType && second.IsGenericType && tuple.Item1.GetGenericTypeDefinition() == tuple.Item2.GetGenericTypeDefinition();
+																return match;
+															} )
+							 .Fixed();
 			return result;
 		}
 
-		public Type GetResultType()
-		{
-			return InnerType( type, types => types.LastOrDefault() );
-		}
-
-		public Type GetInnerType()
-		{
-			return InnerType( type, types => types.Only() );
-		}
-
-		static Type InnerType( Type target, Func<Type[], Type> fromGenerics, Func<TypeInfo, bool> check = null )
-		{
-			var info = target.GetTypeInfo();
-			var result = info.IsGenericType && info.GenericTypeArguments.Any() && check.With( func => func( info ), () => true ) ? fromGenerics( info.GenericTypeArguments ) :
-				target.IsArray ? target.GetElementType() : null;
-			return result;
-		}
-
-		public bool IsGenericOf<T>()
-		{
-			return IsGenericOf( typeof(T).GetGenericTypeDefinition() );
-		}
-
-		public bool IsGenericOf( Type genericDefinition )
-		{
-			var result = info.IsGenericType && genericDefinition.GetTypeInfo().IsGenericType && info.GetGenericTypeDefinition() == genericDefinition.GetGenericTypeDefinition();
-			return result;
-		}
-
-		public Type GetConventionCandidate( Assembly[] applicationAssemblies = null )
-		{
-			var result = 
-				DetermineImplementor().With( typeInfo => typeInfo.AsType() )
-				??
-				type.GetTypeInfo().ImplementedInterfaces.ToArray().With( interfaces => interfaces.FirstOrDefault( i => type.Name.Contains( i.Name.TrimStart( 'I' ) ) ) 
-					??
-					type.Assembly().Append( applicationAssemblies ).Distinct().With( assemblies => interfaces.FirstOrDefault( t => assemblies.Contains( t.Assembly() ) ) )
-				) ?? type;
-			return result;
-		}
+		public ImmutableArray<MethodMapping> GetMappedMethods<T>() => GetMappedMethods( typeof(T) );
+		public ImmutableArray<MethodMapping> GetMappedMethods( Type interfaceType ) => methodMapper( interfaceType );
 		
-		public TypeInfo DetermineImplementor()
-		{
-			var result = info.IsInterface ? type.Assembly().DefinedTypes.Where( IsAssignableFrom ).FirstOrDefault( i => !i.IsAbstract && i.Name.StartsWith( type.Name.TrimStart( 'I' ) ) ) : null;
-			return result;
-		}
 
-		public Type[] GetAllInterfaces()
-		{
-			var result = ExpandInterfaces( type ).ToArray();
-			return result;
-		}
+		[Freeze]
+		public bool IsGenericOf( Type genericDefinition ) => IsGenericOf( genericDefinition, true );
 
-		static IEnumerable<Type> ExpandInterfaces( Type target )
-		{
-			var ti = target.GetTypeInfo();
-			var result = target.Append( ti.ImplementedInterfaces.SelectMany( ExpandInterfaces ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();
-			return result;
-		}
+		[Freeze]
+		public bool IsGenericOf( Type genericDefinition, bool includeInterfaces ) => GetImplementations( genericDefinition, includeInterfaces ).Any();
 
-		public Type[] GetEntireHierarchy()
-		{
-			var result = ExpandInterfaces( type ).Union( GetHierarchy( false ) ).Distinct().ToArray();
-			return result;
-		}
+		[Freeze]
+		public Type[] GetAllInterfaces() => Expand( ReferenceType ).ToArray();
+
+		static IEnumerable<Type> ExpandInterfaces( Type target ) => target.Append( target.GetTypeInfo().ImplementedInterfaces.SelectMany( Expand ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();
+
+		[Freeze]
+		public ImmutableArray<Type> GetEntireHierarchy() => Expand( ReferenceType ).Union( GetHierarchy() ).ToImmutableArray();
 	}
 }
