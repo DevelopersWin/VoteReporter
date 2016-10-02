@@ -8,7 +8,7 @@ namespace DevelopersWin.VoteReporter
 		void Update( Recording set, Vote vote );
 	}
 
-	class VoteUpdater : IVoteUpdater
+	public sealed class VoteUpdater : IVoteUpdater
 	{
 		readonly IVoteCountLocator locator;
 		readonly VotingContext context;

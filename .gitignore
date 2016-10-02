@@ -1,7 +1,6 @@
 *resharper.user
 [Dd]ebug/
 [Rr]elease/
-build/
 [Bb]in/
 [Oo]bj/
 *.suo
@@ -15,7 +14,6 @@ resharper.settings.xml
 junit-report
 junit
 ProfilerMessage.java
-0
 *.g.csproj
 temp-war-deps
 /.gitversion.tmp
@@ -34,4 +32,8 @@ Packages/
 Publish.bat
 /TestResults
 -Archive/
-/.vs/config/applicationhost.config
+*.lock.json
+*.nuget.props
+*.nuget.targets
+
+.vs/

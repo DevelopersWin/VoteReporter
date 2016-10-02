@@ -1,18 +1,16 @@
 ﻿using DragonSpark;
-using DragonSpark.ComponentModel;
-using DragonSpark.Setup.Registration;
+using DragonSpark.Application;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DragonSpark.Aspects;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "DevelopersWin.VoteReporter.Configuration.Common" )]
+[assembly: AssemblyTitle( "DevelopersWin.VoteReporter.Parts.Common" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "DevelopersWin.VoteReporter.Configuration.Common" )]
+[assembly: AssemblyProduct( "DevelopersWin.VoteReporter.Parts.Common" )]
 [assembly: AssemblyCopyright( "Copyright ©  2015" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
@@ -35,8 +33,8 @@ using DragonSpark.Aspects;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "1.0.0.0" )]
-[assembly: AssemblyFileVersion( "1.0.0.0" )]
-[assembly: Registration( Priority.AboveNormal )]
+[assembly: AssemblyVersion( "0.1.0.0" )]
+[assembly: AssemblyFileVersion( "0.1.0.0" )]
+[assembly: Registration( Priority.BeforeNormal )]
 
-[assembly: ApplyDefaultValues]
+// [assembly: ApplyDefaultValues]

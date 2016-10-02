@@ -1,11 +1,11 @@
-using DragonSpark.Setup.Registration;
 using HtmlAgilityPack;
 using System;
+using System.Composition;
 using System.Net;
 
 namespace DevelopersWin.VoteReporter
 {
-	[Persistent]
+	[Shared]
 	public class DocumentProvider
 	{
 		public HtmlDocument Load( string location )

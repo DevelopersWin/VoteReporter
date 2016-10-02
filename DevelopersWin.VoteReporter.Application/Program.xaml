@@ -1,34 +1,21 @@
-﻿<setupWindows:ConsoleApplicationSetup x:Class="DevelopersWin.VoteReporter.Application.Program"
+﻿<ds:ConsoleApplication x:Class="DevelopersWin.VoteReporter.Application.Program"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-	xmlns:localEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
-	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
-	xmlns:setupWindows="clr-namespace:DragonSpark.Windows.Setup;assembly=DragonSpark.Windows"
-	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
-	xmlns:commands="clr-namespace:DragonSpark.Setup.Commands;assembly=DragonSpark"
-	xmlns:runtime="clr-namespace:DragonSpark.Runtime;assembly=DragonSpark"
-	xmlns:registration="clr-namespace:DragonSpark.Setup.Registration;assembly=DragonSpark"
-	xmlns:voteReporter="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:ds="http://framework.dragonspark.us"
-	mc:Ignorable="d"
->
-	<voteReporter:AssignServiceLocation />
-	<registration:RegisterFrameworkExceptionTypesCommand />
-	<registration:DelegatedRegisterFromMetadataCommand />
-	<commands:SetupUnityCommand>
-		<commands:UnityInstance Instance="{markup:DirectoryInfo Reports}" />
-		<runtime:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
-	</commands:SetupUnityCommand>
+	xmlns:core="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
+	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
+	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
+	xmlns:diagnostics="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
+	mc:Ignorable="d">
+	<diagnostics:DefaultConfigureLoggingCommand />
+	<setup:RegisterInstances>
+		<ds:DirectoryInfo Path="Reports" />
+		<application:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
+	</setup:RegisterInstances>
 
-	<ds:InitializeMarkupCommand />
-	<commands:InitializeModulesCommand />
-	<entity:AssignDataDirectoryCommand />
-	<entity:InstallDatabaseCommand />
-	<entity:BackupDatabaseCommand />
-	<localEntity:InitializeDatabaseCommand>
-		<markup:Locate Type="{markup:Enumerable {x:Type entity:IInstaller}}" />
-	</localEntity:InitializeDatabaseCommand>
-	<commands:RunProgramCommand />
-</setupWindows:ConsoleApplicationSetup>
+	<ds:Source Instance="{x:Static core:ApplicationCommands.Default}" />
+	<application:RunProgramCommand />
+	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />
+</ds:ConsoleApplication>
