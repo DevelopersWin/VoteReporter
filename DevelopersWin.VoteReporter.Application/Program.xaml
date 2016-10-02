@@ -16,7 +16,6 @@
 	</setup:RegisterInstances>
 
 	<ds:Source Instance="{x:Static core:ApplicationCommands.Default}" />
-	<diagnostics:DefaultPurgeLoggerHistoryCommand />
 	<application:RunProgramCommand />
 	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />
 </ds:ConsoleApplication>
