@@ -38,27 +38,49 @@
     <Reference Include="System.Xaml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppDomainFormatterTests.cs" />
     <Compile Include="Configuration\ConfigurationTests.cs" />
+    <Compile Include="Diagnostics\AddConsoleSinkCommandTests.cs" />
+    <Compile Include="Diagnostics\AddRollingFileSinkCommandTests.cs" />
+    <Compile Include="Diagnostics\AddTraceSinkCommandTests.cs" />
     <Compile Include="Diagnostics\ApplyExceptionDetailsTests.cs" />
+    <Compile Include="Diagnostics\TraceSinkTests.cs" />
     <Compile Include="FileSystemTests.cs" />
+    <Compile Include="FileSystem\DirectoryTests.cs" />
+    <Compile Include="FileSystem\FileSystemInfoFactoryTests.cs" />
+    <Compile Include="FileSystem\FileTests.cs" />
+    <Compile Include="FileSystem\LockedFileSpecificationTests.cs" />
+    <Compile Include="FileSystem\PathTests.cs" />
+    <Compile Include="FileSystem\PurgeDirectoryCommandTests.cs" />
+    <Compile Include="FileSystem\TimestampNameFactoryTests.cs" />
+    <Compile Include="FileSystem\TimestampNameSpecificationTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Runtime\ApplicationDomainProxyFactoryTests.cs" />
+    <Compile Include="Runtime\Data\DataSerializerTests.cs" />
+    <Compile Include="Runtime\Data\DataTransformerTests.cs" />
+    <Compile Include="Runtime\Data\DocumentResourceFactoryTests.cs" />
+    <Compile Include="Runtime\DomainAssembliesTests.cs" />
     <Compile Include="Runtime\FileSystemTypesTests.cs" />
     <Compile Include="Runtime\DomainAssemblySourceTests.cs" />
     <Compile Include="Runtime\TaskLocalStoreTests.cs" />
     <Compile Include="Runtime\ThreadLocalStorageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\AppDomainStoreTests.cs" />
-    <Compile Include="Runtime\ApplicationAssemblyLocatorTests.cs" />
+    <Compile Include="Runtime\DomainAssemblySpecificationTests.cs" />
     <Compile Include="Runtime\ThreadDataStoreTests.cs" />
-    <Compile Include="Setup\InitializeUserSettingsCommandTests.cs" />
-    <Compile Include="Setup\DefaultsTests.cs" />
+    <Compile Include="InputOutputTests.cs" />
+    <Compile Include="Setup\SaveUserSettingsCommandTests.cs" />
+    <Compile Include="UserConfigurationLocatorTests.cs" />
+    <Compile Include="UserSettingsFilePathTests.cs" />
+    <Compile Include="ConsoleApplicationTests.cs" />
+    <Compile Include="InitializeUserSettingsCommandTests.cs" />
+    <Compile Include="FileSystem\DefaultsTests.cs" />
+    <Compile Include="IsExecutingInManagedHostSpecificationTests.cs" />
     <Compile Include="Setup\ProgramSetupTests.cs" />
-    <Compile Include="TestObjects\ClassWithBrokenConstructor.cs" />
-    <Compile Include="TestObjects\ModulesConfiguration.cs" />
     <Compile Include="TestObjects\Relayed.cs" />
     <Compile Include="TypeSystem\PartsTests.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -70,21 +92,24 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Resources\Modules.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="project.json" />
-    <None Include="Resources\Certificate.cer" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonSpark.Testing.Framework\DragonSpark.Testing.Framework.csproj">
       <Project>{96f63f2b-7d11-4d0f-a932-26c29f8e48bf}</Project>
       <Name>DragonSpark.Testing.Framework</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DragonSpark.Testing.Objects.Declarative\DragonSpark.Testing.Objects.Declarative.csproj">
+      <Project>{7f75a2ac-6ddf-43d9-aab8-6370166a6e57}</Project>
+      <Name>DragonSpark.Testing.Objects.Declarative</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DragonSpark.Testing.Objects\DragonSpark.Testing.Objects.csproj">
       <Project>{65ccd995-c347-48b1-b017-d09e917bd252}</Project>
       <Name>DragonSpark.Testing.Objects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DragonSpark.Windows.Legacy\DragonSpark.Windows.Legacy.csproj">
+      <Project>{5e18a1ba-c6c9-4070-b8f5-c4f2a14079fd}</Project>
+      <Name>DragonSpark.Windows.Legacy</Name>
     </ProjectReference>
     <ProjectReference Include="..\DragonSpark.Windows\DragonSpark.Windows.csproj">
       <Project>{b51d28d3-bc96-41ea-885f-f7be1543d6f4}</Project>
@@ -102,7 +127,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y /d  "$(ProjectDir)..\Parts\$(Configuration)\*.*" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

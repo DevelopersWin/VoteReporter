@@ -1,36 +1,25 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Specifications;
+﻿using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Sources
 {
 	public sealed class SourceTypeAssignableSpecification : SpecificationBase<SourceTypeCandidateParameter>
 	{
 		public static SourceTypeAssignableSpecification Default { get; } = new SourceTypeAssignableSpecification();
-		SourceTypeAssignableSpecification() {}
+		SourceTypeAssignableSpecification() : this( SourceAccountedTypes.Default.Get ) {}
 
-		public override bool IsSatisfiedBy( SourceTypeCandidateParameter parameter )
+		readonly Func<Type, ImmutableArray<Type>> typesSource;
+
+		[UsedImplicitly]
+		public SourceTypeAssignableSpecification( Func<Type, ImmutableArray<Type>> typesSource )
 		{
-			foreach ( var candidate in Candidates( parameter.Candidate ) )
-			{
-				if ( candidate.Adapt().IsAssignableFrom( parameter.TargetType ) )
-				{
-					return true;
-				}
-			}
-			return false;
+			this.typesSource = typesSource;
 		}
 
-		static IEnumerable<Type> Candidates( Type type )
-		{
-			yield return type;
-			var implementations = type.Adapt().GetImplementations( typeof(ISource<>) );
-			if ( implementations.Any() )
-			{
-				yield return implementations.First().Adapt().GetInnerType();
-			}
-		}
+		public override bool IsSatisfiedBy( SourceTypeCandidateParameter parameter ) => 
+			typesSource( parameter.Candidate ).IsAssignableFrom( parameter.TargetType );
 	}
 }

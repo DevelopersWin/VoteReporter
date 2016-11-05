@@ -1,5 +1,5 @@
-using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Configurations;
+using JetBrains.Annotations;
 using PostSharp.Patterns.Contracts;
 using Serilog;
 using Serilog.Configuration;
@@ -9,14 +9,14 @@ namespace DragonSpark.Windows.Diagnostics
 {
 	public class AddConsoleSinkCommand : AddSinkCommand
 	{
-		public AddConsoleSinkCommand() : this( Defaults.Template, LogEventLevel.Verbose ) {}
+		public AddConsoleSinkCommand() : this( DragonSpark.Diagnostics.Defaults.Template, LogEventLevel.Verbose ) {}
 
 		public AddConsoleSinkCommand( [NotEmpty]string outputTemplate, LogEventLevel restrictedToMinimumLevel ) : base( restrictedToMinimumLevel )
 		{
 			OutputTemplate = outputTemplate;
 		}
 
-		[NotEmpty]
+		[NotEmpty, UsedImplicitly]
 		public string OutputTemplate { [return: NotEmpty]get; set; }
 
 		protected override void Configure( LoggerSinkConfiguration configuration )

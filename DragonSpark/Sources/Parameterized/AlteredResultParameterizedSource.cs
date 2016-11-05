@@ -6,7 +6,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		readonly Alter<TResult> selector;
 
-		public AlteredResultParameterizedSource( Alter<TResult> selector, Func<TParameter, TResult> inner ) : base( inner )
+		public AlteredResultParameterizedSource( Func<TParameter, TResult> inner, Alter<TResult> selector ) : base( inner )
 		{
 			this.selector = selector;
 		}

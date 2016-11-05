@@ -3,6 +3,7 @@ using DragonSpark.Commands;
 using DragonSpark.Diagnostics;
 using DragonSpark.Diagnostics.Exceptions;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Scopes;
 using JetBrains.Annotations;
 using Polly;
 using System;
@@ -35,7 +36,7 @@ namespace DragonSpark.Testing.Aspects.Exceptions
 		sealed class RetrySource<T> : SuppliedRetryPolicySource<T> where T : Exception
 		{
 			[UsedImplicitly]
-			public new static ISource<Policy> Default { get; } = new Scope<Policy>( new RetrySource<T>().GlobalCache() );
+			public new static ISource<Policy> Default { get; } = new RetrySource<T>().ToSingletonScope();
 			RetrySource() : base( new RetryPolicySource<T>( Time.None ), 3 ) {}
 		}
 

@@ -8,6 +8,6 @@ namespace DragonSpark.Activation.Location
 	{
 		public static SingletonDelegates Default { get; } = new SingletonDelegates();
 		SingletonDelegates() : this( SingletonProperties.Default ) {}
-		public SingletonDelegates( IParameterizedSource<Type, PropertyInfo> source ) : base( source.ToSourceDelegate(), SingletonDelegateCache.Default.Get ) {}
+		public SingletonDelegates( IParameterizedSource<Type, PropertyInfo> source ) : base( source.ToDelegate(), SingletonPropertyDelegates.Default.Get ) {}
 	}
 }

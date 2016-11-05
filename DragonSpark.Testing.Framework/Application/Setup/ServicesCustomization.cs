@@ -1,5 +1,5 @@
-using DragonSpark.Testing.Framework.Runtime;
 using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using System;
@@ -15,27 +15,24 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 		public static ServicesCustomization Default { get; } = new ServicesCustomization();
 		ServicesCustomization() {}
 
-		protected override void OnCustomize( IFixture fixture )
-		{
-			fixture.Customizations.Insert( 0, FrameworkSpecimenBuilder.DefaultNested );
-			fixture.ResidueCollectors.Add( ServiceRelay.Default );
-		}
+		protected override void OnCustomize( IFixture fixture ) => fixture.Customizations.Insert( 0, FrameworkSpecimenBuilder.Implementation );
 
 		sealed class FrameworkSpecimenBuilder : ISpecimenBuilder
 		{
-			public static FrameworkSpecimenBuilder DefaultNested { get; } = new FrameworkSpecimenBuilder();
+			public static FrameworkSpecimenBuilder Implementation { get; } = new FrameworkSpecimenBuilder();
 			FrameworkSpecimenBuilder() : this( typeof(Type[]), typeof(Assembly[]), typeof(ImmutableArray<Type>), typeof(ImmutableArray<Assembly>) ) {}
 
 			readonly Type[] types;
 
-			FrameworkSpecimenBuilder( params Type[] types )
+			[UsedImplicitly]
+			public FrameworkSpecimenBuilder( params Type[] types )
 			{
 				this.types = types;
 			}
 
 			public object Create( object request, ISpecimenContext context )
 			{
-				var type = TypeSupport.From( request );
+				var type = TypeCoercer.Default.Get( request );
 				var result = type != null && types.Contains( type ) ? Defaults.ServiceSource( type ) : new NoSpecimen();
 				return result;
 			}

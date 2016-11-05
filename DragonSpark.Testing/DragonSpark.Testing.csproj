@@ -48,22 +48,58 @@
     <Compile Include="Activation\ConstructorsTests.cs" />
     <Compile Include="Activation\ConstructorTests.cs" />
     <Compile Include="Activation\ConstructorCoercerTests.cs" />
+    <Compile Include="Activation\ConstructTypeRequestTests.cs" />
+    <Compile Include="Activation\Location\SingletonLocatorTests.cs" />
+    <Compile Include="Application\ClockTests.cs" />
+    <Compile Include="Application\Setup\DeclarativeSetupTests.cs" />
+    <Compile Include="Application\Setup\InputOutputBaseTests.cs" />
+    <Compile Include="Application\Setup\ReadKeyCommandTests.cs" />
+    <Compile Include="Application\SystemPartsTests.cs" />
     <Compile Include="Application\TaskedTaskExecutionContextTests.cs" />
+    <Compile Include="Aspects\Alteration\ApplyAlterationAttributeTests.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercerAttributeTests.cs" />
     <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyAttributeTests.cs" />
     <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsAttributeTests.cs" />
     <Compile Include="Aspects\ApplyAspectsAttributeTests.cs" />
     <Compile Include="Aspects\Relay\ApplyRelayAttributeTests.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationAttributeTests.cs" />
+    <Compile Include="Composition\SingletonExportFactoryTests.cs" />
+    <Compile Include="Runtime\Assignments\AssignScopeCommandTests.cs" />
+    <Compile Include="Runtime\DelegatedDisposableTests.cs" />
+    <Compile Include="Runtime\ExtensionsTests.cs" />
+    <Compile Include="Runtime\RepositoryBaseTests.cs" />
+    <Compile Include="Sources\Coercion\CastCoercerTests.cs" />
+    <Compile Include="Sources\Coercion\ExtensionsTests.cs" />
+    <Compile Include="Sources\Coercion\StringCoercerTests.cs" />
+    <Compile Include="Commands\ExtensionsTests.cs" />
+    <Compile Include="Commands\FirstCommandTests.cs" />
+    <Compile Include="Commands\SuppliedCommandSourceTests.cs" />
     <Compile Include="ComponentModel\SourceAttributeTests.cs" />
+    <Compile Include="ComponentModel\TypeDefinitionsTests.cs" />
+    <Compile Include="Composition\ExportMappingTests.cs" />
+    <Compile Include="Sources\CompositeItemSourceTests.cs" />
+    <Compile Include="Sources\ExtensionsTests.cs" />
+    <Compile Include="Sources\Parameterized\AlterationAdapterTests.cs" />
+    <Compile Include="Sources\Parameterized\AppliedAlterationTests.cs" />
+    <Compile Include="Sources\Parameterized\ConditionalParameterizedSourceTests.cs" />
+    <Compile Include="Sources\Parameterized\ExtensionsTests.cs" />
+    <Compile Include="Sources\Scopes\ParameterizedScopeTests.cs" />
+    <Compile Include="Diagnostics\Configurations\LoggerConfigurationTests.cs" />
+    <Compile Include="Diagnostics\LoggerAlterationsTests.cs" />
+    <Compile Include="Diagnostics\Exceptions\BackoffRetryTimeTests.cs" />
+    <Compile Include="Diagnostics\Exceptions\LinearRetryTimeTests.cs" />
+    <Compile Include="Diagnostics\LogCommandBaseTests.cs" />
+    <Compile Include="Diagnostics\LogExceptionCommandBaseTests.cs" />
     <Compile Include="Diagnostics\LoggingControllerTests.cs" />
     <Compile Include="Application\DefaultExportProviderTests.cs" />
     <Compile Include="Aspects\ApplyDefaultValuesTests.cs" />
     <Compile Include="Aspects\ApplyValuesFromSourceTests.cs" />
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
-    <Compile Include="Diagnostics\SystemLoggerTests.cs" />
-    <Compile Include="Runtime\KeyFactoryTests.cs" />
+    <Compile Include="Diagnostics\LoggerFactoryTests.cs" />
+    <Compile Include="Extensions\CollectionExtensionsTests.cs" />
+    <Compile Include="Extensions\ConventionBasedFormattingExtensionsTests.cs" />
+    <Compile Include="Extensions\ImmutableArrayExtensionsTests.cs" />
     <Compile Include="Aspects\Validation\AutoValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
     <Compile Include="Aspects\Validation\ApplyAutoValidationAttributeTests.cs" />
@@ -78,17 +114,46 @@
     <Compile Include="Composition\SingletonExportDescriptorProviderTests.cs" />
     <Compile Include="Composition\SourceDelegateExporterTests.cs" />
     <Compile Include="Composition\SourceExporterTests.cs" />
+    <Compile Include="Runtime\Assignments\AssignWithDisposeCommandTests.cs" />
+    <Compile Include="Runtime\Assignments\ValueAssignmentTests.cs" />
+    <Compile Include="Runtime\Assignments\CollectionAssignTests.cs" />
+    <Compile Include="Runtime\ValueTupleTests.cs" />
+    <Compile Include="Runtime\WeakListTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\StructuralCacheTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\CacheExtensionsTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\CachesTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\CacheTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\ConditionTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\DecoratedCacheTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\DecoratedSourceCacheTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\EqualityReferenceCacheTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\StackTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\ThreadLocalSourceCacheTests.cs" />
+    <Compile Include="Sources\Parameterized\ConfiguringFactoryTests.cs" />
+    <Compile Include="Sources\Parameterized\SelfAlterationTests.cs" />
+    <Compile Include="Sources\Scopes\ParameterizedSingletonScopeTests.cs" />
+    <Compile Include="Sources\Scopes\ScopesTests.cs" />
+    <Compile Include="Sources\SourceAccountedTypesTests.cs" />
+    <Compile Include="Sources\SuppliedSourceTests.cs" />
     <Compile Include="Sources\TimedDelegatedSourceTests.cs" />
     <Compile Include="Extensions\MethodExtensionsTests.cs" />
     <Compile Include="ImmutableArrayTests.cs" />
     <Compile Include="Runtime\DelegateTests.cs" />
     <Compile Include="Runtime\PurgingCollectionTests.cs" />
-    <Compile Include="Sources\DelegatesTests.cs" />
-    <Compile Include="Sources\ScopeTests.cs" />
+    <Compile Include="Activation\DelegatesTests.cs" />
+    <Compile Include="Sources\Scopes\SingletonScopeTests.cs" />
     <Compile Include="Application\Setup\ActivatedServiceSourceTests.cs" />
     <Compile Include="Application\Setup\InstanceRepositoryTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
     <Compile Include="Application\ExecutionContextTests.cs" />
+    <Compile Include="Specifications\AdapterAssignableSpecificationTests.cs" />
+    <Compile Include="Specifications\AdapterInstanceSpecificationTests.cs" />
+    <Compile Include="Specifications\ConfigurableSpecificationTests.cs" />
+    <Compile Include="TypeSystem\AllPartsTests.cs" />
+    <Compile Include="TypeSystem\AssemblyResourcePathSelectorTests.cs" />
+    <Compile Include="TypeSystem\AssignableEqualityComparerTests.cs" />
+    <Compile Include="TypeSystem\DefaultValuesTests.cs" />
+    <Compile Include="TypeSystem\ExtensionsTests.cs" />
     <Compile Include="TypeSystem\Metadata\AttributesTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -135,14 +200,18 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Sources\Parameterized\Caching\AmbientStackTests.cs" />
-    <Compile Include="Application\ApplicationAssemblyFilterTests.cs" />
+    <Compile Include="Application\RegisteredAssemblyFilterTests.cs" />
     <Compile Include="TypeSystem\ItemsTests.cs" />
+    <Compile Include="TypeSystem\Metadata\AttributeSupportTests.cs" />
     <Compile Include="TypeSystem\Metadata\DerivedMethodSpecificationTests.cs" />
     <Compile Include="ComponentModel\HostingAttributeBaseTests.cs" />
     <Compile Include="TypeSystem\KnownTypesTests.cs" />
+    <Compile Include="TypeSystem\Metadata\MemberInfoDefinitionsTests.cs" />
+    <Compile Include="TypeSystem\Metadata\ParameterInfoAttributeProviderTests.cs" />
     <Compile Include="TypeSystem\PartsTests.cs" />
     <Compile Include="TypeSystem\AssemblyBasedTypeSourceTests.cs" />
     <Compile Include="TypeSystem\TypeAdapterTests.cs" />
+    <Compile Include="TypeSystem\TypeCoercerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -166,6 +235,10 @@
       <Project>{65ccd995-c347-48b1-b017-d09e917bd252}</Project>
       <Name>DragonSpark.Testing.Objects</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DragonSpark.Windows.Legacy\DragonSpark.Windows.Legacy.csproj">
+      <Project>{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD}</Project>
+      <Name>DragonSpark.Windows.Legacy</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DragonSpark.Windows\DragonSpark.Windows.csproj">
       <Project>{b51d28d3-bc96-41ea-885f-f7be1543d6f4}</Project>
       <Name>DragonSpark.Windows</Name>
@@ -178,11 +251,14 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Coercion\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y /d  "$(ProjectDir)..\Parts\$(Configuration)\*.*" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

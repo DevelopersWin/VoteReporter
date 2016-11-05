@@ -2,6 +2,7 @@
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -15,7 +16,7 @@ namespace DragonSpark.Activation
 		sealed class Delegates<T> : Cache<Func<IActivator>, Func<Type, T>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( source => new Factory( source ).Apply( new DeferredSpecification<Type>( source ) ).ToSourceDelegate() ) {}
+			Delegates() : base( source => new Factory( source ).Apply( new DeferredSpecification<Type>( source ) ).ToDelegate() ) {}
 
 			sealed class Factory : ParameterizedSourceBase<Type, T>
 			{

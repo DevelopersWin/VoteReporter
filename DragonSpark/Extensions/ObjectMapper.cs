@@ -3,6 +3,7 @@ using AutoMapper.Configuration;
 using DragonSpark.Activation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.TypeSystem;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Extensions
@@ -14,7 +15,7 @@ namespace DragonSpark.Extensions
 
 		readonly IActivator activatorSource;
 
-		readonly IArgumentCache<TypePair, IMapper> mappers = new ArgumentCache<TypePair, IMapper>( Factory.DefaultNested.Get );
+		readonly IArgumentCache<TypePair, IMapper> mappers = new StructuralCache<TypePair, IMapper>( Factory.Implementation.Get );
 
 		public ObjectMapper( IActivator activatorSource )
 		{
@@ -30,7 +31,7 @@ namespace DragonSpark.Extensions
 
 		sealed class Factory : ParameterizedSourceBase<TypePair, IMapper>
 		{
-			public static IParameterizedSource<TypePair, IMapper> DefaultNested { get; } = new Factory();
+			public static IParameterizedSource<TypePair, IMapper> Implementation { get; } = new Factory();
 			Factory() {}
 
 			public override IMapper Get( TypePair parameter )
@@ -38,7 +39,7 @@ namespace DragonSpark.Extensions
 				var expression = new MapperConfigurationExpression();
 				expression.ForAllPropertyMaps( map => map.SourceMember == null || !map.DestinationPropertyType.Adapt().IsAssignableFrom( map.SourceMember.GetMemberType() ), ( map, _ ) => map.Ignored = true );
 				expression.CreateMap( parameter.SourceType, parameter.DestinationType, MemberList.Destination );
-				expression.ForAllMaps( ( map, mappingExpression ) => mappingExpression.ForAllMembers( option => option.Condition( ( source, destination, sourceValue ) => sourceValue.IsAssignedOrValue() ) ) );
+				expression.ForAllMaps( ( map, mappingExpression ) => mappingExpression.ForAllMembers( option => option.Condition( ( source, destination, sourceValue ) => sourceValue.IsAssigned() ) ) );
 				var result = new MapperConfiguration( expression ).CreateMapper();
 				return result;
 			}

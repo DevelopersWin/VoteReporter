@@ -1,24 +1,24 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
 using DragonSpark.Application;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework.Runtime;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {
-	sealed class MethodTypes : FactoryCache<ImmutableArray<Type>>, ITypeSource
+	sealed class MethodTypes : CacheWithImplementedFactoryBase<ImmutableArray<Type>>, ITypeSource
 	{
 		readonly static Func<object, ImmutableArray<Func<MethodBase, ImmutableArray<Type>>>> Locator = HostedValueLocator<Func<MethodBase, ImmutableArray<Type>>>.Default.Get;
 
 		public static MethodTypes Default { get; } = new MethodTypes();
-		MethodTypes() : this( MethodContext.Default.Get ) {}
+		MethodTypes() : this( CurrentMethod.Default.Get ) {}
 
 		readonly Func<MethodBase> methodSource;
 		readonly Func<object, ImmutableArray<Func<MethodBase, ImmutableArray<Type>>>> locator;
@@ -33,9 +33,17 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 			selector = Get;
 		}
 
-		protected override ImmutableArray<Type> Create( object parameter ) => locator( parameter ).Introduce( methodSource() ).Concat().ToImmutableArray();
+		protected override ImmutableArray<Type> Create( object parameter )
+		{
+			var methodBase = methodSource();
+			var immutableArray = locator( parameter );
+			var enumerable = immutableArray.Introduce( methodBase ).Concat();
+			var result = enumerable.ToImmutableArray();
+			return result;
+		}
 
 		public ImmutableArray<Type> Get() => this.ToImmutableArray();
+
 		object ISource.Get() => Get();
 
 		public IEnumerator<Type> GetEnumerator()

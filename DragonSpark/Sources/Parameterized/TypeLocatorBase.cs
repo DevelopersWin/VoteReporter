@@ -9,13 +9,13 @@ using System.Reflection;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public abstract class TypeLocatorBase : FactoryCache<Type, Type>
+	public abstract class TypeLocatorBase : CacheWithImplementedFactoryBase<Type, Type>
 	{
 		readonly ImmutableArray<TypeAdapter> adapters;
 		readonly Func<TypeInfo, bool> isAssignable;
 		readonly Func<Type[], Type> selector;
 
-		protected TypeLocatorBase( params Type[] types ) : this( types.Select( type => type.Adapt() ).ToImmutableArray() ) {}
+		protected TypeLocatorBase( params Type[] types ) : this( types.AsAdapters() ) {}
 
 		TypeLocatorBase( ImmutableArray<TypeAdapter> adapters )
 		{

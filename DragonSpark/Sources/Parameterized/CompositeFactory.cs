@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using DragonSpark.Extensions;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -22,16 +23,14 @@ namespace DragonSpark.Sources.Parameterized
 			{
 				foreach ( var source in sources )
 				{
-					var item = source.Get( parameter );
-					if ( !Equals( item, DefaultResult ) )
+					var candidate = source.Get( parameter );
+					if ( candidate.IsAssigned() )
 					{
-						return item;
+						return candidate;
 					}
 				}
 				return DefaultResult;
 			}
-
-			// protected override object GetGeneralized( object parameter ) => sources.Introduce( parameter, tuple => tuple.Item1.Get( tuple.Item2 ) ).FirstAssigned();
 		}
 	}
 }

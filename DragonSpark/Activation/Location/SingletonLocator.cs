@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Composition;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.Specifications;
 using System;
 using System.Composition;
@@ -8,27 +9,41 @@ namespace DragonSpark.Activation.Location
 {
 	public sealed class SingletonLocator : ActivatorBase, ISingletonLocator
 	{
-		readonly static ISpecification<Type> Specification = Common<Type>.Assigned.And( ContainsSingletonPropertySpecification.Default );
-		
 		[Export]
 		public static ISingletonLocator Default { get; } = new SingletonLocator();
-		SingletonLocator() : this( new Source( SingletonDelegates.Default.Get ).Apply( Specification ).Apply( ConventionTypeSelector.Default ).ToCache().ToSourceDelegate() ) {}
+		SingletonLocator() : this( SingletonDelegates.Default.Get ) {}
 
-		public SingletonLocator( Func<Type, Func<object>> inner ) : this( new Source( inner ) ) {}
+		public SingletonLocator( Func<Type, Func<object>> source ) : this( SourceFactory.Instance.Get( source ) ) {}
 
-		SingletonLocator( IParameterizedSource<Type, object> source ) : this( source.Apply( ConventionTypeSelector.Default ).ToCache().ToSourceDelegate() ) {}
-		SingletonLocator( Func<Type, object> source ) : base( new DelegatedAssignedSpecification<Type, object>( source ), source ) {}
+		SingletonLocator( Func<Type, object> second ) : base( new DelegatedAssignedSpecification<Type, object>( second ), second ) {}
 
-		sealed class Source : ParameterizedSourceBase<Type, object>
+		sealed class SourceFactory : ParameterizedSourceBase<Func<Type, Func<object>>, Func<Type, object>>
 		{
-			readonly Func<Type, Func<object>> source;
+			readonly static Alter<Type> Conventions = ConventionTypeSelector.Default.ToDelegate();
 
-			public Source( Func<Type, Func<object>> source )
+			public static SourceFactory Instance { get; } = new SourceFactory();
+			SourceFactory() {}
+
+			public override Func<Type, object> Get( Func<Type, Func<object>> parameter )
 			{
-				this.source = source;
+				var result = new Source( parameter ).ToSingletonScope()
+					.Apply( ContainsSingletonPropertySpecification.Default )
+					.Apply( Conventions )
+					.ToDelegate();
+				return result;
 			}
 
-			public override object Get( Type parameter ) => source( parameter )?.Invoke();
+			sealed class Source : ParameterizedSourceBase<Type, object>
+			{
+				readonly Func<Type, Func<object>> source;
+				
+				public Source( Func<Type, Func<object>> source )
+				{
+					this.source = source;
+				}
+
+				public override object Get( Type parameter ) => source( parameter )?.Invoke();
+			}
 		}
 	}
 }

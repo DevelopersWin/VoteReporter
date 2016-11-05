@@ -3,6 +3,7 @@ using DragonSpark.Application.Setup;
 using DragonSpark.Commands;
 using DragonSpark.Configuration;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Testing.Framework.Runtime;
@@ -20,31 +21,31 @@ namespace DragonSpark.Testing.Activation
 		[Fact]
 		public void Assignment()
 		{
-			var before = Execution.Current();
+			var before = Execution.Default.GetValue();
 			var current = Assert.IsType<TaskContext>( before );
 			Assert.Same( ExecutionContext.Default.Get(), current );
 			Assert.Equal( Identification.Default.Get(), current.Origin );
-			Assert.Null( MethodContext.Default.Get() );
+			Assert.Null( CurrentMethod.Default.Get() );
 			Assert.True( EnableMethodCaching.Default.Get() );
 
 			var method = MethodBase.GetCurrentMethod();
 			object inner;
-			using ( ApplicationFactory.Default.Get( method ).Run( new AutoData( FixtureContext.Default.WithFactory( FixtureFactory<AutoDataCustomization>.Default.Get ), method ) ) )
+			using ( ApplicationFactory.Default.Get( method ).Run( new AutoData( CurrentFixture.Default.WithFactory( FixtureFactory<DefaultAutoDataCustomization>.Default.Get ), method ) ) )
 			{
-				Assert.NotNull( MethodContext.Default.Get() );
-				Assert.Same( method, MethodContext.Default.Get() );
-				inner = Execution.Current();
+				Assert.NotNull( CurrentMethod.Default.Get() );
+				Assert.Same( method, CurrentMethod.Default.Get() );
+				inner = Execution.Default.GetValue();
 				Assert.Same( current, inner );
 				var condition = EnableMethodCaching.Default.Get();
 				Assert.False( condition );
 			}
 
-			var after = Execution.Current();
+			var after = Execution.Default.GetValue();
 			Assert.NotNull( after );
 			Assert.NotSame( inner, after );
 			Assert.NotSame( current, after );
 
-			Assert.Null( MethodContext.Default.Get() );
+			Assert.Null( CurrentMethod.Default.Get() );
 
 			Assert.True( EnableMethodCaching.Default.Get() );
 		}
@@ -52,7 +53,7 @@ namespace DragonSpark.Testing.Activation
 		[Export( typeof(ISetup) ), UsedImplicitly]
 		class Setup : DeclarativeSetup
 		{
-			public Setup() : base( EnableMethodCaching.Default.Configured( false ) ) {}
+			public Setup() : base( EnableMethodCaching.Default.ToCommand( false ) ) {}
 		}
 	}
 }

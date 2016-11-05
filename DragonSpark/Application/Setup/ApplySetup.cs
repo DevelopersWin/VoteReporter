@@ -1,4 +1,7 @@
-﻿namespace DragonSpark.Application.Setup
+﻿using JetBrains.Annotations;
+
+namespace DragonSpark.Application.Setup
 {
-	public class ApplySetup : ApplyExportCommands<ISetup> {}
+	[UsedImplicitly]
+	public class ApplySetup : ApplyExportsCommand<ISetup> {}
 }

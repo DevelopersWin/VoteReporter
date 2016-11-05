@@ -1,10 +1,10 @@
-﻿using System;
+﻿using DragonSpark.Sources.Parameterized.Caching;
+using System;
 using System.Reflection;
-using DragonSpark.Sources.Parameterized.Caching;
 
 namespace DragonSpark.Activation
 {
-	public class SingletonDelegates<T> : FactoryCache<Type, T>
+	public class SingletonDelegates<T> : CacheWithImplementedFactoryBase<Type, T>
 	{
 		readonly Func<Type, PropertyInfo> propertySource;
 		readonly Func<PropertyInfo, T> source;

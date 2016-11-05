@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle( "DragonSpark.Testing" )]
 [assembly: AssemblyDescription( "" )]
-// [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "DragonSpark Technologies Incorporated" )]
 [assembly: AssemblyProduct( "DragonSpark.Testing" )]
 [assembly: AssemblyCopyright( "Copyright © The DragonSpark Framework 2016" )]
@@ -20,10 +19,8 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid( "3d3176a2-8cd5-441d-bd7f-7ca0926b24a9" )]
 
-[assembly: AssemblyVersion( "0.1.0.0" )]
-[assembly: AssemblyFileVersion( "0.1.0.0" )]
+[assembly: AssemblyVersion( "0.1.2.0" )]
+[assembly: AssemblyFileVersion( "0.1.2.0" )]
 [assembly: Application]
 
-// [assembly: ApplyDefaultValues]
-// [assembly: DisposeAssociatedAspect]
 [assembly: TestingMethodAspect]

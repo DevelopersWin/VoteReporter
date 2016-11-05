@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Activation;
-using DragonSpark.Coercion;
-using DragonSpark.Sources;
+using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
+using JetBrains.Annotations;
 using System;
 using System.Composition;
 
@@ -13,29 +13,28 @@ namespace DragonSpark
 	{
 		[Export]
 		public static IFormatter Default { get; } = new Formatter();
-		Formatter() : this( Inner.DefaultNested.Apply( ConstructCoercer<FormatterParameter>.Default ).ToCache(), Inner.DefaultNested ) {}
+		Formatter() : this( DefaultImplementation.Implementation.Accept( ConstructCoercer<FormatterParameter>.Default ).ToCache(), DefaultImplementation.Implementation ) {}
 
 		readonly IParameterizedSource<object, string> general;
-		
-		Formatter( IParameterizedSource<object, string> general, IParameterizedSource<FormatterParameter, string> source ) : base( source )
+
+		[UsedImplicitly]
+		public Formatter( IParameterizedSource<object, string> general, IParameterizedSource<FormatterParameter, string> source ) : base( source )
 		{
 			this.general = general;
 		}
 
 		public string Get( object parameter ) => general.Get( parameter );
 
-
-		sealed class Inner : ParameterizedSourceBase<FormatterParameter, string>
+		sealed class DefaultImplementation : ParameterizedSourceBase<FormatterParameter, string>
 		{
-			readonly static Func<FormatterParameter, string> Coerce = p => StringCoercer.Default.Coerce( p.Instance );
+			readonly static Func<FormatterParameter, string> Coerce = p => StringCoercer.Default.Get( p.Instance );
 
-			public static Inner DefaultNested { get; } = new Inner();
-			Inner() : this( FormattableSource.Default.Get ) {}
-
+			public static DefaultImplementation Implementation { get; } = new DefaultImplementation();
+			DefaultImplementation() : this( FormattableSource.Default.Get ) {}
 
 			readonly Func<object, IFormattable> factory;
 
-			Inner( Func<object, IFormattable> factory )
+			DefaultImplementation( Func<object, IFormattable> factory )
 			{
 				this.factory = factory;
 			}
@@ -47,6 +46,6 @@ namespace DragonSpark
 	public sealed class FormattableSource : DelegatedParameterizedSource<object, IFormattable>
 	{
 		public static FormattableSource Default { get; } = new FormattableSource();
-		FormattableSource() : base( ConstructFromKnownTypes<IFormattable>.Default.Delegate().Cache() ) {}
+		FormattableSource() : base( ConstructFromKnownTypes<IFormattable>.Default.Get ) {}
 	}
 }

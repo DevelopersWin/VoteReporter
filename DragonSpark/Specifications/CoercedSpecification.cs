@@ -3,11 +3,6 @@ using System;
 
 namespace DragonSpark.Specifications
 {
-	public class CoercedSpecification<T> : CoercedSpecification<object, T>
-	{
-		public CoercedSpecification( Func<object, T> coerce, Func<T, bool> specification ) : base( coerce, specification ) {}
-	}
-
 	public class CoercedSpecification<TFrom, TTo> : SpecificationBase<TFrom>, ISpecification<TTo>
 	{
 		readonly Func<TFrom, TTo> coerce;
@@ -24,10 +19,8 @@ namespace DragonSpark.Specifications
 		public override bool IsSatisfiedBy( TFrom parameter )
 		{
 			var to = coerce( parameter );
-			var result = to.IsAssignedOrValue() && IsSatisfiedBy( to );
+			var result = to.IsAssigned() && IsSatisfiedBy( to );
 			return result;
 		}
-
-		// bool ISpecification.IsSatisfiedBy( object parameter ) => IsSatisfiedBy( coerce( parameter ) );
 	}
 }

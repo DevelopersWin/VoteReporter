@@ -1,7 +1,7 @@
 using DragonSpark.Application;
 using DragonSpark.Commands;
 using DragonSpark.Extensions;
-using DragonSpark.Sources;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.Testing.Framework.Runtime;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
@@ -43,7 +43,7 @@ namespace DragonSpark.Testing.Framework
 				}
 				finally
 				{
-					var disposable = (IDisposable)ApplicationServices.Default.Get() ?? ExecutionContext.Default.Get();
+					var disposable = (IDisposable)CurrentApplication.Default.Get() ?? ExecutionContext.Default.Get();
 					args.ReturnValue = Defer.Run( new Action( disposable.Dispose ).Wrap<Task>(), args.ReturnValue );
 				}
 			}

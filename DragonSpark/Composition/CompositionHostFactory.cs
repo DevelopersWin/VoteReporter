@@ -1,29 +1,37 @@
-using DragonSpark.Configuration;
+using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Coercion;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Scopes;
+using JetBrains.Annotations;
 using System;
 using System.Composition.Hosting;
 
 namespace DragonSpark.Composition
 {
-	public sealed class CompositionHostFactory : ConfigurableFactoryBase<ContainerConfiguration, CompositionHost>
+	public sealed class CompositionHostFactory : DelegatedSource<CompositionHost>
 	{
-		readonly IComposable<IDisposable> disposables;
-		readonly static IConfigurationScope<ContainerConfiguration> DefaultConfiguration = new ConfigurationScope<ContainerConfiguration>( ContainerServicesConfigurator.Default, PartsContainerConfigurator.Default );
+		readonly static Func<CompositionHost> Source = Configuration.Implementation.Then( configuration => configuration.CreateContainer() ).Get;
 
 		public static CompositionHostFactory Default { get; } = new CompositionHostFactory();
+		CompositionHostFactory() : this( Disposables.Default, Source ) {}
 
-		CompositionHostFactory() : this( Disposables.Default ) {}
+		readonly IComposable<IDisposable> disposables;
 
-		CompositionHostFactory( IComposable<IDisposable> disposables ) : base( () => new ContainerConfiguration(), DefaultConfiguration, parameter => parameter.CreateContainer() )
+		[UsedImplicitly]
+		public CompositionHostFactory( IComposable<IDisposable> disposables, Func<CompositionHost> source ) : base( source )
 		{
 			this.disposables = disposables;
 		}
 
-		public override CompositionHost Get()
+		public override CompositionHost Get() => disposables.Registered( base.Get() );
+
+		public sealed class Configuration : Scope<ContainerConfiguration>
 		{
-			var result = base.Get();
-			disposables.Add( result );
-			return result;
+			readonly static IAlteration<ContainerConfiguration>[] DefaultAlterations = { ContainerServicesConfigurator.Default, PartsContainerConfigurator.Default };
+			public static Configuration Implementation { get; } = new Configuration();
+			Configuration() : base( () => new AggregateSource<ContainerConfiguration>( DefaultAlterations.IncludeExports().Fixed() ).Get() ) {}
 		}
 	}
 }

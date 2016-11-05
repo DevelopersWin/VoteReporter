@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Aspects;
 using DragonSpark.Diagnostics;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.Testing.Framework;
 using Xunit;
 using Xunit.Abstractions;
@@ -28,8 +28,8 @@ namespace DragonSpark.Testing.Diagnostics
 		[Fact]
 		public void AssignedSource()
 		{
-			var configuration = DragonSpark.Diagnostics.Configuration.TimedOperationFactory;
-			configuration.Configured( TimedOperationFactory.Default.ToEqualityCache().ToSourceDelegate().GlobalCache() ).Execute();
+			var configuration = TimedOperations.Configuration.Implementation;
+			configuration.Assign( TimedOperationFactory.Default.Wrap() );
 
 			var history = LoggingHistory.Default.Get();
 			Assert.Empty( history.Events );

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />-->
   <PropertyGroup>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{96F63F2B-7D11-4D0F-A932-26C29F8E48BF}</ProjectGuid>
@@ -11,7 +12,6 @@
     <AssemblyName>DragonSpark.Testing.Framework</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <PostSharpHostConfigurationFile>App.config</PostSharpHostConfigurationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,7 +44,56 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\Setup\ClearUserSettingCommand.cs" />
+    <Compile Include="Application\Setup\InitializeUserSettingsFileAttribute.cs" />
+    <Compile Include="Application\Setup\SingletonCustomization.cs" />
+    <Compile Include="Application\Setup\SingletonMethod.cs" />
+    <Compile Include="Application\Setup\SingletonQuery.cs" />
+    <Compile Include="Application\Setup\UserSettingsFilePath.cs" />
     <Compile Include="CurrentTestingMethod.cs" />
+    <Compile Include="FileSystem\AssemblySystemFileSource.cs" />
+    <Compile Include="FileSystem\CurrentDirectoryPath.cs" />
+    <Compile Include="FileSystem\DirectoryRegistrationCoercer.cs" />
+    <Compile Include="FileSystem\DirectorySource.cs" />
+    <Compile Include="FileSystem\FileRegistrationCoercer.cs" />
+    <Compile Include="FileSystem\IDirectoryElement.cs" />
+    <Compile Include="FileSystem\IElementSource.cs" />
+    <Compile Include="FileSystem\IFileElement.cs" />
+    <Compile Include="FileSystem\IFileSystemRepository.cs" />
+    <Compile Include="FileSystem\InitializeFileSystemAttribute.cs" />
+    <Compile Include="FileSystem\RegisterDirectoriesAttribute.cs" />
+    <Compile Include="FileSystem\RegisterDirectoryCommand.cs" />
+    <Compile Include="FileSystem\RegisterFileCommand.cs" />
+    <Compile Include="Time.cs" />
+    <Compile Include="FileSystem\FileSystemRegistration.cs" />
+    <Compile Include="FileSystem\InitializePartsAssemblyCommand.cs" />
+    <Compile Include="FileSystem\AssemblyLoader.cs" />
+    <Compile Include="FileSystem\Defaults.cs" />
+    <Compile Include="FileSystem\ElementSource.cs" />
+    <Compile Include="FileSystem\Extensions.cs" />
+    <Compile Include="FileSystem\FileSystemRepository.cs" />
+    <Compile Include="FileSystem\FileSystemElementBase.cs" />
+    <Compile Include="FileSystem\IDirectorySource.cs" />
+    <Compile Include="FileSystem\IFileSystemElement.cs" />
+    <Compile Include="FileSystem\MockDirectory.cs" />
+    <Compile Include="FileSystem\DirectoryElement.cs" />
+    <Compile Include="FileSystem\MockDirectoryInfo.cs" />
+    <Compile Include="FileSystem\MockDriveInfo.cs" />
+    <Compile Include="FileSystem\MockFile.cs" />
+    <Compile Include="FileSystem\FileElement.cs" />
+    <Compile Include="FileSystem\MockFileInfo.cs" />
+    <Compile Include="FileSystem\MockFileStream.cs" />
+    <Compile Include="FileSystem\MockPath.cs" />
+    <Compile Include="FileSystem\PathTranslator.cs" />
+    <Compile Include="FileSystem\ProvisionFromSystemFileCommand.cs" />
+    <Compile Include="FileSystem\RegisterFilesAttribute.cs" />
+    <Compile Include="FileSystem\RegisterFileSystemEntryCommand.cs" />
+    <Compile Include="FileSystem\StringExtensions.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Runtime\Defer.cs" />
     <Compile Include="Diagnostics\MedianFactory.cs" />
     <Compile Include="Diagnostics\ModeFactory.cs" />
@@ -55,27 +104,26 @@
     <Compile Include="Runtime\Identifier.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="Diagnostics\PerformanceSupport.cs" />
-    <Compile Include="Runtime\MethodContext.cs" />
+    <Compile Include="Runtime\CurrentMethod.cs" />
     <Compile Include="Output.cs" />
     <Compile Include="Application\ServiceAttribute.cs" />
     <Compile Include="Runtime\MethodOperationContext.cs" />
     <Compile Include="Diagnostics\TimedOperationFactory.cs" />
-    <Compile Include="ServiceRegistration.cs" />
+    <Compile Include="ServiceRegistrationCustomization.cs" />
     <Compile Include="Application\Setup\AdditionalTypesAttribute.cs" />
     <Compile Include="Application\Application.cs" />
     <Compile Include="Application\ApplicationCommandSource.cs" />
     <Compile Include="Application\Setup\Configure.cs" />
     <Compile Include="Application\ApplicationFactory.cs" />
     <Compile Include="Application\ApplicationInitializer.cs" />
-    <Compile Include="Application\ApplicationPartsAttribute.cs" />
+    <Compile Include="Application\ApplicationAllPartsAttribute.cs" />
     <Compile Include="Application\ApplicationPublicPartsAttribute.cs" />
     <Compile Include="Application\Setup\AutoDataCustomization.cs" />
     <Compile Include="Application\Setup\CommandAttributeBase.cs" />
     <Compile Include="Application\Setup\ContainingTypeAndNestedAttribute.cs" />
-    <Compile Include="Application\Setup\FixtureContext.cs" />
+    <Compile Include="Application\Setup\CurrentFixture.cs" />
     <Compile Include="Application\Setup\FixtureFactory.cs" />
     <Compile Include="Application\Setup\FixtureFactoryBase.cs" />
-    <Compile Include="Application\Setup\FixtureServiceProvider.cs" />
     <Compile Include="Application\Setup\FrameworkTypesAttribute.cs" />
     <Compile Include="Application\IApplication.cs" />
     <Compile Include="Application\Setup\IncludeParameterTypesAttribute.cs" />
@@ -85,19 +133,17 @@
     <Compile Include="Application\Setup\MinimumLevel.cs" />
     <Compile Include="Application\Setup\OptionalParameterAlteration.cs" />
     <Compile Include="Application\Setup\ParameterRequestRelay.cs" />
-    <Compile Include="Application\Setup\ResourceConfigurationFactory.cs" />
     <Compile Include="Application\Setup\EnginePartFactory.cs" />
     <Compile Include="Application\Setup\MetadataCommand.cs" />
     <Compile Include="Application\Setup\ServiceRelay.cs" />
     <Compile Include="Application\Setup\DefaultEngineParts.cs" />
     <Compile Include="Application\Setup\ServicesCustomization.cs" />
-    <Compile Include="FixtureExtensions.cs" />
     <Compile Include="Application\AutoDataAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\AssociatedRegistry.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Runtime\CustomizationBase.cs" />
+    <Compile Include="Application\Setup\CustomizationBase.cs" />
     <Compile Include="Application\AutoDataCommandBase.cs" />
     <Compile Include="Application\AutoData.cs" />
     <Compile Include="Application\Setup\TypeProviderAttributeBase.cs" />
@@ -120,6 +166,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />

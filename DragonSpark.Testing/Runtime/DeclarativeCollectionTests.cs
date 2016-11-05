@@ -39,9 +39,19 @@ namespace DragonSpark.Testing.Runtime
 		}
 
 		[Theory, AutoData]
-		void Add( DeclarativeCollection<Class> sut )
+		void Add( DeclarativeCollection<Class> sut, DeclarativeCollection coverage )
 		{
 			Assert.Equal( -1, sut.To<IList>().Add( new object() ) );
+			Assert.NotSame( sut, coverage );
+		}
+
+		[Fact]
+		public void Coverage()
+		{
+			var item = new object();
+			IList<object> sut = new DeclarativeCollection { item };
+			sut[0] = new object();
+			Assert.NotSame( item, sut[0] );
 		}
 	}
 }

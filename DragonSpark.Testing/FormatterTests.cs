@@ -11,12 +11,19 @@ namespace DragonSpark.Testing
 	public class FormatterTests
 	{
 		[Theory, AutoData, FrameworkTypes, FormatterTypes]
-		public void MethodFormatsAsExpected( [Service]Formatter sut )
+		public void MethodFormatsAsExpected( Formatter sut )
 		{
 			var method = MethodBase.GetCurrentMethod();
 			var formatted = sut.Get( new FormatterParameter( method ) );
 			Assert.IsType<string>( formatted );
 			Assert.Equal( new MethodFormatter( method ).ToString(), formatted );
+		}
+
+		[Theory, AutoData]
+		public void StringFormat( string message )
+		{
+			var formatted = Formatter.Default.Get( message );
+			Assert.Equal( message, formatted );
 		}
 	}
 }
