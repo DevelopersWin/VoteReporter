@@ -1,10 +1,9 @@
-﻿using System.Linq;
-using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Configurations;
-using DragonSpark.Sources;
+﻿using DragonSpark.Diagnostics;
+using DragonSpark.Sources.Scopes;
 using Ploeh.AutoFixture.Xunit2;
 using Serilog.Core;
 using Serilog.Events;
+using System.Linq;
 using Xunit;
 using Logger = DragonSpark.Diagnostics.Logger;
 
@@ -25,7 +24,7 @@ namespace DragonSpark.Testing.Diagnostics
 
 			const LogEventLevel assigned = LogEventLevel.Debug;
 			level.Assign( assigned );
-			controller.Assign( Factory.GlobalCache( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) ) );
+			controller.Assign( () => new LoggingLevelSwitch( MinimumLevelConfiguration.Default.Get() ) );
 
 			var second = controller.Get();
 			Assert.NotSame( first, second );

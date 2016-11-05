@@ -1,16 +1,28 @@
+using DragonSpark.Application;
+using DragonSpark.Commands;
+using DragonSpark.Runtime.Assignments;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Scopes;
 using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Application
 {
-	public sealed class ApplicationFactory : ConfiguringFactory<MethodBase, IApplication>
+	public sealed class ApplicationFactory : ParameterizedSingletonScope<MethodBase, IApplication>
 	{
 		public static ApplicationFactory Default { get; } = new ApplicationFactory();
-		ApplicationFactory() : base( DefaultCreate, Initialize ) {}
+		ApplicationFactory() : base( DefaultImplementation.Implementation.Get ) {}
 
-		static IApplication DefaultCreate( MethodBase _ ) => new Application( ApplicationCommandSource.Default.Get().ToArray() );
+		sealed class DefaultImplementation : ConfiguringFactory<MethodBase, IApplication>
+		{
+			public static DefaultImplementation Implementation { get; } = new DefaultImplementation();
+			DefaultImplementation() : base( _ => new Application( ApplicationCommandSource.Default.ToArray() ), ApplicationInitializer.Default.Execute, Assign.Instance.Execute ) {}
 
-		static void Initialize( MethodBase method ) => ApplicationInitializer.Default.Get().Execute( method );
+			sealed class Assign : AssignScopeCommand<IApplication>
+			{
+				public static Assign Instance { get; } = new Assign();
+				Assign() : base( CurrentApplication.Default ) {}
+			}
+		}
 	}
 }

@@ -1,13 +1,19 @@
 using System;
 using System.Reflection;
-using Defaults = DragonSpark.Activation.Location.Defaults;
 
 namespace DragonSpark.ComponentModel
 {
-	public class ServicesValueProvider : ValueProvider<Type>
+	public class ServicesValueProvider : DefaultValueProviderBase
 	{
-		public ServicesValueProvider( Func<PropertyInfo, Type> convert ) : this( convert, Defaults.ServiceSource ) {}
+		readonly Func<PropertyInfo, Type> convert;
+		readonly Func<Type, object> create;
 
-		public ServicesValueProvider( Func<PropertyInfo, Type> convert, Func<Type, object> create ) : base( convert, create ) {}
+		public ServicesValueProvider( Func<PropertyInfo, Type> convert, Func<Type, object> create )
+		{
+			this.convert = convert;
+			this.create = create;
+		}
+
+		public override object Get( PropertyInfo parameter ) => create( convert( parameter ) );
 	}
 }

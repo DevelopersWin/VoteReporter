@@ -1,8 +1,8 @@
-﻿using DragonSpark.Application;
-using DragonSpark.ComponentModel;
+﻿using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Objects;
+using DragonSpark.TypeSystem;
 using System.Linq;
 using Xunit;
 
@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.ComponentModel
 		[Fact]
 		public void PropertyFromApplicationTypes()
 		{
-			ApplicationParts.Assign( typeof(FactoryOfYac) );
+			typeof(FactoryOfYac).Yield().AsApplicationParts();
 			Assert.IsType<YetAnotherClass>( ClassPropertyFromApplicationTypes );
 		}
 

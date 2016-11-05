@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
-using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Extensibility;
 using PostSharp.Reflection;
@@ -15,22 +14,19 @@ namespace DragonSpark.Aspects.Build
 		public static ObjectConstructionFactory<T> Default { get; } = new ObjectConstructionFactory<T>();
 		ObjectConstructionFactory() {}
 
-		public ObjectConstruction Get() => GetUsing( Items<object>.Default );
-		public ObjectConstruction GetUsing( params object[] parameter ) => Get( parameter );
-
 		public override ObjectConstruction Get( IEnumerable<object> parameter ) => new ObjectConstruction( typeof(T), parameter.Fixed() );
 	}
 
 	public sealed class AspectInstanceFactory<TAspect, TTarget> : SpecificationParameterizedSource<TTarget, AspectInstance>
 	{
 		public static AspectInstanceFactory<TAspect, TTarget> Default { get; } = new AspectInstanceFactory<TAspect, TTarget>();
-		AspectInstanceFactory() : base( HasAspectSpecification.DefaultNested.Inverse(), Factory.DefaultNested.Get ) {}
+		AspectInstanceFactory() : base( HasAspectSpecification.Implementation.Inverse(), Factory.Implementation.Get ) {}
 		
 		sealed class HasAspectSpecification : SpecificationBase<TTarget>
 		{
 			readonly static Type AspectType = typeof(TAspect);
 
-			public static HasAspectSpecification DefaultNested { get; } = new HasAspectSpecification();
+			public static HasAspectSpecification Implementation { get; } = new HasAspectSpecification();
 			HasAspectSpecification() : this( () => PostSharpEnvironment.CurrentProject.GetService<IAspectRepositoryService>() ) {}
 
 			readonly Func<IAspectRepositoryService> repositorySource;
@@ -45,7 +41,7 @@ namespace DragonSpark.Aspects.Build
 
 		sealed class Factory : ParameterizedSourceBase<TTarget, AspectInstance>
 		{
-			public static Factory DefaultNested { get; } = new Factory();
+			public static Factory Implementation { get; } = new Factory();
 			Factory() : this( ObjectConstructionFactory<TAspect>.Default.Get() ) {}
 
 			readonly ObjectConstruction construction;

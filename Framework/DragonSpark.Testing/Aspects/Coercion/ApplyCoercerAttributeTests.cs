@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Aspects.Coercion;
-using DragonSpark.Coercion;
+using DragonSpark.Sources.Coercion;
 using System;
 using System.Windows.Input;
 using Xunit;
@@ -29,7 +29,7 @@ namespace DragonSpark.Testing.Aspects.Coercion
 		{
 			public const string ValidMatch = "Valid Match";
 
-			protected override string Apply( int parameter )
+			protected override string Coerce( int parameter )
 			{
 				switch ( parameter )
 				{

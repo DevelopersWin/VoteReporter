@@ -5,6 +5,7 @@ using DragonSpark.Application.Setup;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Objects;
+using DragonSpark.TypeSystem;
 using Serilog;
 using System.Linq;
 using Xunit;
@@ -34,18 +35,18 @@ namespace DragonSpark.Testing.Application.Setup
 		{
 			var result = DefaultServices.Default.Get<ILogger>();
 			Assert.NotNull( result );
-			Assert.Same( DragonSpark.Diagnostics.Logger.Default.Get( Execution.Current() ), result );
+			Assert.Same( DragonSpark.Diagnostics.Logger.Default.Get( Execution.Default.GetValue() ), result );
 		}
 
 		[Fact]
 		public void SystemParts()
 		{
 			var system = DefaultServices.Default.Get<SystemParts>();
-			Assert.Empty( system.Assemblies.AsEnumerable() );
-			Assert.Empty( system.Types.AsEnumerable() );
+			Assert.True( system.Assemblies.IsDefault );
+			Assert.True( system.Types.IsDefault );
 
 			var types = new[] { typeof(ClassFactory), typeof(Class) }.AsApplicationParts();
-			
+
 			var after = DefaultServices.Default.Get<SystemParts>();
 			Assert.NotEmpty( after.Assemblies.AsEnumerable() );
 			Assert.NotEmpty( after.Types.AsEnumerable() );

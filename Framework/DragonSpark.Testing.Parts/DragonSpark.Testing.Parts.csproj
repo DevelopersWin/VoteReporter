@@ -50,7 +50,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y /d  "$(ProjectDir)$(OutDir)$(ProjectName).*" "$(ProjectDir)..\Parts\$(Configuration)\"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!--<Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />-->
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

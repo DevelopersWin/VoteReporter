@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Application;
 using DragonSpark.Composition;
-using DragonSpark.Extensions;
+using DragonSpark.Sources;
+using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using System;
 using System.Composition;
@@ -17,7 +18,6 @@ namespace DragonSpark.Testing.Composition
 		{
 			var parts = new[] { typeof(IHelloWorld), typeof(HelloWorld) }.AsApplicationParts();
 			
-
 			var container = new ContainerConfiguration().WithParts( parts.ToArray(), ConventionBuilderFactory.Default.Get() ).CreateContainer();
 			var export = container.GetExport<IHelloWorld>();
 			Assert.IsType<HelloWorld>( export );
@@ -29,21 +29,21 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void OrderOfSelection()
 		{
-			new[] { typeof(ICurrentTime), typeof(CurrentTime), typeof(DragonSpark.Application.CurrentTime) }.AsApplicationParts();
+			new[] { typeof(IClock), typeof(Clock), typeof(DragonSpark.Application.Clock) }.AsApplicationParts();
 
-			Assert.Equal( typeof(CurrentTime), ApplicationTypes.Default.Get().First() );
+			Assert.Equal( typeof(Clock), ApplicationTypes.Default.Get().First() );
 
-			var handler = CompositionHostFactory.Default.Get().GetExport<ICurrentTime>();
-			Assert.IsType<CurrentTime>( handler );
+			var handler = CompositionHostFactory.Default.Get().GetExport<IClock>();
+			Assert.IsType<Clock>( handler );
 		}
 
-		public sealed class CurrentTime : ICurrentTime
+		public sealed class Clock : SourceBase<DateTimeOffset>, IClock
 		{
 			[UsedImplicitly]
-			public static ICurrentTime Default { get; } = new CurrentTime();
-			CurrentTime() {}
+			public static IClock Default { get; } = new Clock();
+			Clock() {}
 
-			public DateTimeOffset Now => new DateTimeOffset();
+			public override DateTimeOffset Get() => new DateTimeOffset();
 		}
 
 		[Fact]

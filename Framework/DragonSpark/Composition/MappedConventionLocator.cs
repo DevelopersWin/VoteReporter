@@ -1,7 +1,6 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using System;
 
 namespace DragonSpark.Composition
@@ -9,7 +8,7 @@ namespace DragonSpark.Composition
 	sealed class MappedConventionLocator : AlterationBase<Type>
 	{
 		public static MappedConventionLocator Default { get; } = new MappedConventionLocator();
-		MappedConventionLocator() : this( CanActivateSpecification.Default ) {}
+		MappedConventionLocator() : this( Activation.Defaults.Instantiable ) {}
 
 		readonly ISpecification<Type> specification;
 

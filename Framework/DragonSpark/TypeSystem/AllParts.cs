@@ -1,8 +1,8 @@
 namespace DragonSpark.TypeSystem
 {
-	public sealed class AllParts : PartsBase
+	public sealed class AllParts : PartTypesBase
 	{
 		public static AllParts Default { get; } = new AllParts();
-		AllParts() : base( AssemblyTypes.All.Get ) {}
+		AllParts() : base( AllPartsLocator.Default.Get ) {}
 	}
 }

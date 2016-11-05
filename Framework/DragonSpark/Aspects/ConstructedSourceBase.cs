@@ -1,5 +1,7 @@
-﻿using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using System;
+using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects
 {
@@ -8,7 +10,7 @@ namespace DragonSpark.Aspects
 		readonly Func<Type, Func<object, T>> constructorSource;
 		readonly Func<Type, object> argumentSource;
 
-		protected ConstructedSourceBase( Func<Type, Func<object, T>> constructorSource ) : this( constructorSource, Defaults.ArgumentSource ) {}
+		protected ConstructedSourceBase( Func<Type, Func<object, T>> constructorSource ) : this( constructorSource, Activator.Default.GetService ) {}
 
 		protected ConstructedSourceBase( Func<Type, Func<object, T>> constructorSource, Func<Type, object> argumentSource )
 		{
@@ -19,7 +21,7 @@ namespace DragonSpark.Aspects
 		public override T Get( Type parameter )
 		{
 			var constructor = constructorSource( parameter );
-			var argument = argumentSource( parameter );
+			var argument = argumentSource( parameter ).Account( parameter );
 			var result = constructor( argument );
 			return result;
 		}

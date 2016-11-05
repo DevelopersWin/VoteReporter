@@ -1,24 +1,27 @@
 using DragonSpark.Application;
+using JetBrains.Annotations;
 using System;
+using System.Reflection;
 
 namespace DragonSpark.ComponentModel
 {
 	public sealed class CurrentTimeValueProvider : DefaultValueProviderBase
 	{
 		public static CurrentTimeValueProvider Default { get; } = new CurrentTimeValueProvider();
-		CurrentTimeValueProvider() : this( CurrentTimeConfiguration.Default.Get ) {}
+		CurrentTimeValueProvider() : this( Clock.Default.Get ) {}
 
-		readonly Func<ICurrentTime> currentTime;
+		readonly Func<DateTimeOffset> currentTime;
 
-		public CurrentTimeValueProvider( Func<ICurrentTime> currentTime )
+		[UsedImplicitly]
+		public CurrentTimeValueProvider( Func<DateTimeOffset> currentTime )
 		{
 			this.currentTime = currentTime;
 		}
 
-		public override object Get( DefaultValueParameter parameter )
+		public override object Get( PropertyInfo parameter )
 		{
-			var now = currentTime().Now;
-			var result = parameter.Metadata.PropertyType == typeof(DateTime) ? (object)now.DateTime : now;
+			var now = currentTime();
+			var result = parameter.PropertyType == typeof(DateTime) ? (object)now.DateTime : now;
 			return result;
 		}
 	}

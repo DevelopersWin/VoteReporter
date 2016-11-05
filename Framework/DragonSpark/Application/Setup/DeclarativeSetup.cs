@@ -5,12 +5,13 @@ using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using System.Windows.Input;
 
 namespace DragonSpark.Application.Setup
 {
 	[ApplyAutoValidation]
-	public class DeclarativeSetup : CompositeCommand, ISetup// , ISpecificationAware<object>
+	public class DeclarativeSetup : CompositeCommand, ISetup
 	{
 		public static ISetup Current() => AmbientStack.GetCurrentItem<ISetup>();
 
@@ -28,6 +29,7 @@ namespace DragonSpark.Application.Setup
 
 		public override bool IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
 
+		[UsedImplicitly]
 		public Priority Priority { get; set; }
 
 		public DeclarativeCollection<object> Items { get; } = new DeclarativeCollection<object>();

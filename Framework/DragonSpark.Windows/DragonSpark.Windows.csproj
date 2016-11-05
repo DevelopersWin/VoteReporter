@@ -30,7 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-	  <CodeAnalysisRuleSet>$(SolutionDir)\DragonSpark.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>$(SolutionDir)\DragonSpark.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -52,35 +52,34 @@
     <Compile Include="Diagnostics\AddRollingFileSinkCommand.cs" />
     <Compile Include="Diagnostics\AddTraceSinkCommand.cs" />
     <Compile Include="Diagnostics\TraceSink.cs" />
-    <Compile Include="Entity\DbContextBuildingParameter.cs" />
-    <Compile Include="Entity\DefaultCommands.cs" />
-    <Compile Include="Entity\RegisterComplexTypesCommand.cs" />
     <Compile Include="ExecutionContext.cs" />
+    <Compile Include="FileSystem\AllFilesSource.cs" />
+    <Compile Include="FileSystem\ByteReader.cs" />
+    <Compile Include="FileSystem\Defaults.cs" />
+    <Compile Include="FileSystem\Directory.cs" />
+    <Compile Include="FileSystem\DirectoryInfoFactory.cs" />
+    <Compile Include="FileSystem\Factory.cs" />
+    <Compile Include="FileSystem\File.cs" />
+    <Compile Include="FileSystem\FileInfoFactory.cs" />
+    <Compile Include="FileSystem\FileNameAlteration.cs" />
+    <Compile Include="FileSystem\FileSystemInfoBase.cs" />
+    <Compile Include="FileSystem\FileSystemInfoFactory.cs" />
+    <Compile Include="FileSystem\IDirectory.cs" />
+    <Compile Include="FileSystem\IDirectoryInfo.cs" />
+    <Compile Include="FileSystem\IFile.cs" />
+    <Compile Include="FileSystem\IFileInfo.cs" />
+    <Compile Include="FileSystem\IFileSystemInfoBase.cs" />
+    <Compile Include="FileSystem\IPath.cs" />
+    <Compile Include="FileSystem\LockedFileSpecification.cs" />
+    <Compile Include="FileSystem\Path.cs" />
+    <Compile Include="FileSystem\PurgeDirectoryCommand.cs" />
+    <Compile Include="FileSystem\TimestampNameSpecification.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="InitializationCommand.cs" />
     <Compile Include="Initialize.cs" />
-    <Compile Include="FileExtensionSpecificationBase.cs" />
-    <Compile Include="IsAssemblyFileSpecification.cs" />
-    <Compile Include="Markup\ClrFieldMarkupProperty.cs" />
-    <Compile Include="Markup\ClrPropertyMarkupProperty.cs" />
-    <Compile Include="Markup\CollectionSpecification.cs" />
-    <Compile Include="Markup\ConfigurationExtension.cs" />
-    <Compile Include="Markup\ConfigurationKeyExtension.cs" />
-    <Compile Include="Markup\DesignTimeValueProvider.cs" />
-    <Compile Include="Markup\EvalExtension.cs" />
-    <Compile Include="Markup\FactoryTypeExtension.cs" />
-    <Compile Include="Markup\MarkupExtensionBase.cs" />
-    <Compile Include="Markup\MarkupPropertyFactoryBase.cs" />
-    <Compile Include="Markup\MarkupValueSetterFactory.cs" />
-    <Compile Include="Markup\MemberInfoKeyExtension.cs" />
-    <Compile Include="Markup\MemberInfoKeyFactory.cs" />
-    <Compile Include="Markup\MockFactory.cs" />
-    <Compile Include="Markup\PropertyReference.cs" />
-    <Compile Include="Markup\PropertyReferenceFactory.cs" />
-    <Compile Include="Markup\SourceExtension.cs" />
-    <Compile Include="Markup\Specification.cs" />
-    <Compile Include="Markup\StringDesignerValueFactory.cs" />
-    <Compile Include="Runtime\AllParts.cs" />
+    <Compile Include="FileSystem\FileExtensionSpecificationBase.cs" />
+    <Compile Include="FileSystem\IsAssemblyFileSpecification.cs" />
+    <Compile Include="Runtime\AppDomainSource.cs" />
     <Compile Include="Runtime\ApplicationDomainProxyFactory.cs" />
     <Compile Include="Runtime\ApplicationTypesBase.cs" />
     <Compile Include="Runtime\AssemblySource.cs" />
@@ -91,101 +90,43 @@
     <Compile Include="Runtime\Data\DocumentFactory.cs" />
     <Compile Include="Runtime\Data\DocumentResourceFactory.cs" />
     <Compile Include="Runtime\Data\Serializer.cs" />
-    <Compile Include="Runtime\DomainApplicationAssemblies.cs" />
-    <Compile Include="Runtime\PartTypesBase.cs" />
-    <Compile Include="Runtime\PublicParts.cs" />
-    <Compile Include="Setup\ClearUserSettingCommand.cs" />
-    <Compile Include="Setup\Defaults.cs" />
-    <Compile Include="Setup\DeleteFileCommand.cs" />
-    <Compile Include="Setup\FileSystemInfoExistsSpecification.cs" />
-    <Compile Include="Setup\InitializeUserSettingsCommand.cs" />
-    <Compile Include="Setup\ConsoleApplication.cs" />
-    <Compile Include="Setup\ConfigurationSectionFactory.cs" />
+    <Compile Include="Runtime\Defaults.cs" />
+    <Compile Include="Runtime\DomainAssemblies.cs" />
+    <Compile Include="Defaults.cs" />
+    <Compile Include="FileSystem\DeleteFileCommand.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="FileSystemInfoExistsSpecification.cs" />
+    <Compile Include="InitializeUserSettingsCommand.cs" />
+    <Compile Include="ConsoleApplication.cs" />
     <Compile Include="Runtime\Data\DataBuilder.cs" />
     <Compile Include="Runtime\Data\DataSerializer.cs" />
-    <Compile Include="Entity\AssignDataDirectoryCommand.cs" />
-    <Compile Include="Entity\AttachedDatabaseFileFactory.cs" />
-    <Compile Include="Entity\BackupDatabaseCommand.cs" />
-    <Compile Include="Entity\DataDirectoryPath.cs" />
-    <Compile Include="Entity\DbMigrationsConfiguration.cs" />
-    <Compile Include="Entity\EntityFiles.cs" />
-    <Compile Include="Entity\EntityInstallationStep.cs" />
-    <Compile Include="Entity\InitializeDatabaseCommand.cs" />
-    <Compile Include="Entity\DbContextExtensions.cs" />
-    <Compile Include="Entity\DbSetExtensions.cs" />
-    <Compile Include="Entity\DefaultIncludeAttribute.cs" />
-    <Compile Include="Entity\EntityContext.cs" />
-    <Compile Include="Entity\EntityValidationException.cs" />
-    <Compile Include="Entity\IEntityInstallationStorage.cs" />
-    <Compile Include="Entity\IInstallationStep.cs" />
-    <Compile Include="Entity\IInstaller.cs" />
-    <Compile Include="Entity\InstallationEntry.cs" />
-    <Compile Include="Entity\InstallDatabaseCommand.cs" />
-    <Compile Include="Entity\Installer.cs" />
-    <Compile Include="Entity\LocalStorageAttribute.cs" />
-    <Compile Include="Entity\EnableLocalStoragePropertyCommand.cs" />
-    <Compile Include="Entity\MetadataHelper.cs" />
-    <Compile Include="Entity\MigrateDatabaseToLatestVersion.cs" />
-    <Compile Include="Entity\ObjectContextExtensions.cs" />
-    <Compile Include="Entity\VersionConverter.cs" />
-    <Compile Include="FileSystem.cs" />
+    <Compile Include="FileSystem\TimestampNameFactory.cs" />
     <Compile Include="Diagnostics\ApplyExceptionDetails.cs" />
-    <Compile Include="Markup\CollectionExtension.cs" />
-    <Compile Include="Markup\CollectionMarkupProperty.cs" />
-    <Compile Include="Markup\CollectionMarkupPropertyFactory.cs" />
-    <Compile Include="Markup\MarkupServiceProvider.cs" />
-    <Compile Include="Markup\DependencyPropertyMarkupPropertyFactory.cs" />
-    <Compile Include="Markup\DirectoryInfoExtension.cs" />
-    <Compile Include="Markup\EnumerableExtension.cs" />
-    <Compile Include="Markup\FieldInfoMarkupPropertyFactory.cs" />
-    <Compile Include="Markup\GenericTypeExtension.cs" />
-    <Compile Include="Markup\IIncrementer.cs" />
-    <Compile Include="Markup\IMarkupPropertyFactory.cs" />
-    <Compile Include="Markup\Incrementer.cs" />
-    <Compile Include="Markup\MarkupPropertyBase.cs" />
-    <Compile Include="Markup\MarkupPropertyFactory.cs" />
-    <Compile Include="Markup\ActivateExtension.cs" />
-    <Compile Include="Markup\NameExtension.cs" />
-    <Compile Include="Markup\NextExtension.cs" />
-    <Compile Include="Markup\PropertyInfoMarkupPropertyFactory.cs" />
-    <Compile Include="Markup\ReferenceExtension.cs" />
-    <Compile Include="Markup\StaticResourceExtension.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Runtime\AppDomainStore.cs" />
-    <Compile Include="Runtime\ApplicationAssemblyLocator.cs" />
+    <Compile Include="Runtime\DomainAssemblySpecification.cs" />
     <Compile Include="Runtime\FileSystemAssemblySource.cs" />
     <Compile Include="Runtime\DomainAssemblySource.cs" />
-    <Compile Include="Runtime\LogicalStore.cs" />
     <Compile Include="Runtime\ThreadDataStore.cs" />
-    <Compile Include="Setup\FileConfigurationFactory.cs" />
-    <Compile Include="Markup\AssemblyVersionExtension.cs" />
-    <Compile Include="Markup\ClrMemberMarkupProperty.cs" />
-    <Compile Include="Markup\DependencyPropertyMarkupProperty.cs" />
-    <Compile Include="Markup\IMarkupProperty.cs" />
-    <Compile Include="Markup\ServiceExtension.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Markup\MetadataExtension.cs" />
-    <Compile Include="Markup\PropertySetter.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Runtime\FileSystemTypes.cs" />
     <Compile Include="Runtime\MetadataTypeDefinitionProvider.cs" />
-    <Compile Include="Runtime\TypeDefinitionProviderSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\ThreadLocalStorage.cs" />
     <Compile Include="Runtime\TaskLocalStore.cs" />
-    <Compile Include="Setup\IsExecutingInManagedHostSpecification.cs" />
-    <Compile Include="Setup\ReadKeyCommand.cs" />
-    <Compile Include="Setup\UserSettingsExistsSpecification.cs" />
-    <Compile Include="Setup\UserSettingsFile.cs" />
+    <Compile Include="IsExecutingInManagedHostSpecification.cs" />
+    <Compile Include="ReadKeyCommand.cs" />
+    <Compile Include="SaveUserSettingsCommand.cs" />
+    <Compile Include="UserConfigurationLocator.cs" />
+    <Compile Include="UserSettingsExistsSpecification.cs" />
+    <Compile Include="UserSettingsFile.cs" />
     <Compile Include="AppDomainFormatter.cs" />
-    <Compile Include="AssemblyLocator.cs" />
-    <Compile Include="QueryableResourceLocator.cs" />
+    <Compile Include="FileSystem\AssemblyFilePathSelector.cs" />
+    <Compile Include="FileSystem\QueryableResourceLocator.cs" />
+    <Compile Include="UserSettingsFilePath.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -199,10 +140,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
-    <None Include="Resources\Blank.mdf" />
-    <Content Include="Resources\Blank_log.ldf">
-      <DependentUpon>Blank.mdf</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonSpark.Types.Windows\DragonSpark.Types.Windows.csproj">

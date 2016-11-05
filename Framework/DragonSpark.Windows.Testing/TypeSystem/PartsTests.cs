@@ -1,8 +1,12 @@
-﻿using DragonSpark.TypeSystem;
+﻿using DragonSpark.Application;
+using DragonSpark.Sources;
+using DragonSpark.Testing.Framework.Application;
+using DragonSpark.Testing.Framework.FileSystem;
+using DragonSpark.Testing.Objects.FileSystem;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Testing.Framework.Application;
 using Xunit;
 
 namespace DragonSpark.Windows.Testing.TypeSystem
@@ -10,19 +14,37 @@ namespace DragonSpark.Windows.Testing.TypeSystem
 	public class PartsTests
 	{
 		[Fact]
-		public void Public() => PublicAttributed( PublicParts.Default.Get( GetType().Assembly )  );
+		public void Public()
+		{
+			Assert.Empty( ApplicationAssemblies.Default.Unwrap() );
+			InitializePartsCommand.Default.Execute();
+			PublicAttributed( PublicPartsLocator.Default.Get( GetType().Assembly ) );
+		}
 
-		[Theory, AutoData, ApplicationPublicParts]
+		[Theory, AutoData, InitializePartsCommand.Public]
 		public void PublicAttributed( ImmutableArray<Type> types )
 		{
+			if ( types.IsEmpty )
+			{
+				var repository = FileSystemRepository.Default;
+				var temp = AssemblyPartLocator.Default.Get( GetType().Assembly );
+				throw new InvalidOperationException( $"WTF! {temp.Length} : {repository.AllFiles.Length} - {string.Join( ", ", repository.AllFiles )}" );
+			}
+
 			Assert.Single( types );
+
 			Assert.Equal( "DragonSpark.Testing.Parts.PublicClass", types.Single().FullName );
 		}
 
 		[Fact]
-		public void All() => AllAttributed( AllParts.Default.Get( GetType().Assembly ) );
+		public void All()
+		{
+			Assert.Empty( ApplicationAssemblies.Default.Unwrap() );
+			InitializePartsCommand.Default.Execute();
+			AllAttributed( AllPartsLocator.Default.Get( GetType().Assembly ) );
+		}
 
-		[Theory, AutoData, ApplicationParts]
+		[Theory, AutoData, InitializePartsCommand.All]
 		public void AllAttributed( ImmutableArray<Type> types )
 		{
 			Assert.Equal( 2, types.Length );

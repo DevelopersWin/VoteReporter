@@ -7,8 +7,7 @@ namespace DragonSpark.Tasks
 {
 	public class SuppliedTaskSource<T> : SuppliedTaskSource
 	{
-		public SuppliedTaskSource( ICommand<T> command, T parameter ) : base( command.Fixed( parameter ).ToRunDelegate() ) {}
-		public SuppliedTaskSource( ICommand<T> command, Func<T> parameter ) : base( command.Fixed( parameter() ).ToRunDelegate() ) {}
+		public SuppliedTaskSource( ICommand<T> command, Func<T> parameter ) : base( command.WithParameter( parameter() ).ToRunDelegate() ) {}
 	}
 
 	public class SuppliedTaskSource : SuppliedSource<Action, Task>

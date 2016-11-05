@@ -1,15 +1,15 @@
-using DragonSpark.Coercion;
 using DragonSpark.Extensions;
-using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Sources.Scopes;
 using System;
 
 namespace DragonSpark.Specifications
 {
 	public static class Extensions
 	{
-		public static ISpecification<TFrom> Apply<TFrom, TTo>( this ISpecification<TTo> @this, ICoercer<TFrom, TTo> coercer ) => Apply( @this.ToSpecificationDelegate(), coercer.ToDelegate() );
-		public static ISpecification<TFrom> Apply<TFrom, TTo>( this Func<TTo, bool> @this, Func<TFrom, TTo> coerce ) =>
+		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this ISpecification<TTo> @this, IParameterizedSource<TFrom, TTo> coercer ) => Coerce( @this.ToSpecificationDelegate(), coercer.ToDelegate() );
+		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this Func<TTo, bool> @this, Func<TFrom, TTo> coerce ) =>
 			new CoercedSpecification<TFrom, TTo>( coerce, @this );
 
 		public static ISpecification<T> Inverse<T>( this ISpecification<T> @this ) => Inversed<T>.Default.Get( @this );
@@ -39,7 +39,7 @@ namespace DragonSpark.Specifications
 		sealed class CachedSpecifications<T> : Cache<ISpecification<T>, ISpecification<T>>
 		{
 			public static CachedSpecifications<T> Default { get; } = new CachedSpecifications<T>();
-			CachedSpecifications() : base( specification => new DelegatedSpecification<T>( specification.ToSpecificationDelegate().Cache() ) ) {}
+			CachedSpecifications() : base( specification => new DelegatedSpecification<T>( specification.ToSpecificationDelegate().ToSingleton() ) ) {}
 		}
 	}
 }

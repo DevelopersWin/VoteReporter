@@ -1,7 +1,8 @@
+using DragonSpark.Extensions;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
 using System.Reflection;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {

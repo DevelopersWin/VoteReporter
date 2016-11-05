@@ -1,5 +1,5 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Coercion;
+using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
@@ -41,7 +41,7 @@ namespace DragonSpark.Testing.Aspects
 			public static Coercer Default { get; } = new Coercer();
 			Coercer() {}
 
-			protected override int Apply( string parameter ) => int.Parse( parameter );
+			protected override int Coerce( string parameter ) => int.Parse( parameter );
 		}
 
 		sealed class Specification : SpecificationBase<int>

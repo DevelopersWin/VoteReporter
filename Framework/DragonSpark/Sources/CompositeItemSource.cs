@@ -1,7 +1,7 @@
+using DragonSpark.Extensions;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Extensions;
 
 namespace DragonSpark.Sources
 {

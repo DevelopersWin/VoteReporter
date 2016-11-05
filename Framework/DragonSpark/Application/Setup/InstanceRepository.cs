@@ -1,6 +1,10 @@
-﻿using DragonSpark.Runtime;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Runtime;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,32 +13,31 @@ namespace DragonSpark.Application.Setup
 {
 	public class InstanceRepository : RepositoryBase<object>, IServiceRepository
 	{
-		public InstanceRepository( params object[] instances ) : this( instances.AsEnumerable() ) {}
-		public InstanceRepository( IEnumerable<object> items ) : base( items ) {}
-		public InstanceRepository( ICollection<object> source ) : base( source ) {}
+		readonly static Func<Type, Func<Type, bool>> Specifications = TypeAssignableSpecification.Delegates.Get;
+		readonly static Func<Type, Func<object, object>> AccountedSource = SourceAccountedAlteration.Defaults.Get;
+		readonly static Func<Type, IEnumerable<Type>> Types = SourceAccountedTypes.Default.GetEnumerable;
 
-		public virtual object GetService( Type serviceType ) => Get( serviceType, o => o.Value() );
+		readonly Func<Type, Func<Type, bool>> specifications;
+		readonly Func<Type, IEnumerable<Type>> types;
+		readonly Func<Type, Func<object, object>> accountedSource;
+		public InstanceRepository() : this( Items<object>.Default ) {}
 
-		T Get<T>( Type serviceType, Func<object, T> projection )
+		public InstanceRepository( params object[] instances ) : this( instances.AsEnumerable(), Specifications, Types, AccountedSource ) {}
+
+		[UsedImplicitly]
+		public InstanceRepository( IEnumerable<object> items, Func<Type, Func<Type, bool>> specifications, Func<Type, IEnumerable<Type>> types, Func<Type, Func<object, object>> accountedSource ) : base( items )
 		{
-			var specification = TypeAssignableSpecification.Defaults.Get( serviceType );
-			foreach ( var item in Yield() )
-			{
-				var parameter = ( item as IServiceAware )?.ServiceType ?? item.GetType();
-				if ( specification.IsSatisfiedBy( parameter ) )
-				{
-					return projection( item );
-				}
-			}
-			return default(T);
+			this.specifications = specifications;
+			this.types = types;
+			this.accountedSource = accountedSource;
 		}
+		
+		public virtual object GetService( Type serviceType ) => Yield().SelectAssigned( accountedSource( serviceType ) ).FirstOrDefault();
 
-		public virtual void Add( InstanceRegistrationRequest request ) => Add( request.Instance );
+		public virtual void Add( ServiceRegistration request ) => Add( request.Instance );
 
-		public bool IsSatisfiedBy( Type parameter ) => Get( parameter, o => true );
-		// bool ISpecification.IsSatisfiedBy( object parameter ) => parameter is Type && IsSatisfiedBy( (Type)parameter );
+		public bool IsSatisfiedBy( Type parameter ) => Yield().SelectTypes().SelectMany( types ).Any( specifications( parameter ) );
 
 		public object Get( Type parameter ) => GetService( parameter );
-		public object Get( object parameter ) => parameter is Type ? Get( parameter ) : null;
 	}
 }

@@ -60,6 +60,32 @@ namespace DragonSpark.Extensions
 			}
 		}
 
+		public static bool AnyTrue( this IEnumerable<bool> source )
+		{
+			foreach ( var b in source )
+			{
+				if ( b )
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public static bool AnyFalse( this IEnumerable<bool> source )
+		{
+			foreach ( var b in source )
+			{
+				if ( !b )
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		public static bool All( this IEnumerable<bool> source )
 		{
 			foreach ( var b in source )
@@ -137,15 +163,11 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Prepend<T>( this IEnumerable<T> @this, params T[] items ) => items.Concat( @this );
 
+		public static IEnumerable<ValueTuple<T1, T2>> Tuple<T1, T2>( this ImmutableArray<T1> target, IEnumerable<T2> other ) => target.ToArray().Tuple( other );
 		public static IEnumerable<ValueTuple<T1, T2>> Tuple<T1, T2>( this IEnumerable<T1> target, IEnumerable<T2> other ) => target.Zip( other, ValueTuple.Create ).ToArray();
 
 		public static T FirstAssigned<T>( this IEnumerable<T> @this ) => @this.WhereAssigned().FirstOrDefault();
 
-		// public static TTo FirstAssigned<TFrom, TTo>( this ImmutableArray<TFrom> @this, Func<TFrom, TTo> projection ) => @this.ToArray().FirstAssigned( projection );
-
-		public static TTo FirstAssigned<TFrom, TTo>( this IEnumerable<TFrom> @this, Func<TFrom, TTo> projection ) => @this.WhereAssigned().Select( projection ).FirstAssigned();
-
-		public static IEnumerable<T> WhereAssigned<T>( this ImmutableArray<T> target ) => target.AsEnumerable().WhereAssigned();
 		public static IEnumerable<T> WhereAssigned<T>( this IEnumerable<T> target )
 		{
 			foreach ( var item in target )
@@ -159,6 +181,9 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<TResult> SelectAssigned<TSource, TResult>( this ImmutableArray<TSource> @this, Func<TSource, TResult> select ) => @this.AsEnumerable().SelectAssigned( select );
 		public static IEnumerable<TResult> SelectAssigned<TSource, TResult>( this IEnumerable<TSource> @this, Func<TSource, TResult> select ) => @this.Select( select ).WhereAssigned();
+		public static IEnumerable<TResult> SelectAssigned<TSource, TResult>( this ImmutableArray<TSource> @this, Func<TSource, TResult?> select ) where TResult : struct => 			@this.AsEnumerable().SelectAssigned( select );
+		public static IEnumerable<TResult> SelectAssigned<TSource, TResult>( this IEnumerable<TSource> @this, Func<TSource, TResult?> select ) where TResult : struct => 
+			@this.Select( select ).Where( arg => arg.HasValue ).Select( arg => arg.Value );
 
 		public static T FirstOrDefaultOfType<T>( this IEnumerable enumerable ) => enumerable.OfType<T>().FirstOrDefault();
 
@@ -166,7 +191,7 @@ namespace DragonSpark.Extensions
 
 		static class Support<T>
 		{
-			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Default.ToSourceDelegate();
+			public static Func<T, IPriorityAware> PriorityLocator { get; } = PriorityAwareLocator<T>.Default.ToDelegate();
 		}
 	}
 }

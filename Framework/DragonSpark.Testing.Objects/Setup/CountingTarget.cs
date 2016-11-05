@@ -1,10 +1,10 @@
-﻿using DragonSpark.Sources;
+﻿using DragonSpark.Sources.Scopes;
 
 namespace DragonSpark.Testing.Objects.Setup
 {
-	public class CountingTarget : Scope<object>
+	public class CountingTarget : SingletonScope<object>
 	{
 		public static CountingTarget Default { get; } = new CountingTarget();
-		CountingTarget() : base( Factory.GlobalCache( () => new object() ) ) {}
+		CountingTarget() : base( () => new object() ) {}
 	}
 }

@@ -1,14 +1,13 @@
-using DragonSpark.Application.Setup;
 using System;
 
 namespace DragonSpark.Sources
 {
-	public abstract class SourceBase<T> : ISource<T>, IServiceAware
+	public abstract class SourceBase<T> : ISource<T>, ISourceAware
 	{
 		public abstract T Get();
 
-		object ISource.Get() => Get();
+		Type ISourceAware.SourceType => typeof(T);
 
-		Type IServiceAware.ServiceType { get; } = typeof(T);
+		object ISource.Get() => Get();
 	}
 }
