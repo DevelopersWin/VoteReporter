@@ -1,8 +1,8 @@
-using System;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using PostSharp.Patterns.Contracts;
 using PostSharp.Reflection;
+using System;
 
 namespace DragonSpark.Aspects
 {
@@ -11,6 +11,6 @@ namespace DragonSpark.Aspects
 		protected override string GetErrorMessage() => "The parameter '{0}' must be assigned (non-default value).";
 
 		public Exception ValidateValue( object value, string locationName, LocationKind locationKind ) => 
-			SpecialValues.DefaultOrEmpty( value.GetType() ).Equals( value ) ? CreateArgumentException( value, locationName, locationKind ) : null;
+			DefaultValues.Default.Get( value.GetType() ).Equals( value ) ? CreateArgumentException( value, locationName, locationKind ) : null;
 	}
 }

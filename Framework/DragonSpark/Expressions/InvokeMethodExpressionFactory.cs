@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace DragonSpark.Expressions
 {
-	class InvokeMethodExpressionFactory : InvokeArrayFactoryBase<MethodInfo>
+	sealed class InvokeMethodExpressionFactory : InvokeArrayFactoryBase<MethodInfo>
 	{
 		public static InvokeMethodExpressionFactory Default { get; } = new InvokeMethodExpressionFactory();
 		InvokeMethodExpressionFactory() {}

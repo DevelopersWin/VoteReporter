@@ -1,4 +1,4 @@
-﻿<configurations:DeclarativeCompositeLoggerConfiguration x:Class="DevelopersWin.VoteReporter.Parts.Common.Logging"
+﻿<configurations:LoggerConfiguration x:Class="DevelopersWin.VoteReporter.Parts.Common.Logging"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -22,4 +22,4 @@
 		<environment:MachineNameEnricher />
 		<environment:EnvironmentUserNameEnricher />
 	</configurations:EnrichCommand>
-</configurations:DeclarativeCompositeLoggerConfiguration>
+</configurations:LoggerConfiguration>

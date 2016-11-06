@@ -15,5 +15,5 @@
 		<entity:Configuration AutomaticMigrationsEnabled="True" />
 	</setup:RegisterInstances>
 
-	<commands:DeclaredSuppliedCommand Command="{x:Static local:InitializeUserSettingsCommand.Default}" Parameter="{x:Static properties:Settings.Default}" />
+	<commands:DeclarativeCommand Command="{x:Static local:InitializeUserSettingsCommand.Default}" Parameter="{x:Static properties:Settings.Default}" />
 </setup:DeclarativeSetup>

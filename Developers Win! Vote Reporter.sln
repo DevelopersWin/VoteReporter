@@ -61,6 +61,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Testing.Parts",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{A07FC797-D3ED-4FDF-888A-41FE104A8891}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Testing.Objects.Declarative", "Framework\DragonSpark.Testing.Objects.Declarative\DragonSpark.Testing.Objects.Declarative.csproj", "{7F75A2AC-6DDF-43D9-AAB8-6370166A6E57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonSpark.Windows.Legacy", "Framework\DragonSpark.Windows.Legacy\DragonSpark.Windows.Legacy.csproj", "{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +159,18 @@ Global
 		{5F01891D-FFB9-485B-BD5F-C072EF00DE59}.Publish|Any CPU.Build.0 = Release|Any CPU
 		{5F01891D-FFB9-485B-BD5F-C072EF00DE59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F01891D-FFB9-485B-BD5F-C072EF00DE59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F75A2AC-6DDF-43D9-AAB8-6370166A6E57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F75A2AC-6DDF-43D9-AAB8-6370166A6E57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F75A2AC-6DDF-43D9-AAB8-6370166A6E57}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{7F75A2AC-6DDF-43D9-AAB8-6370166A6E57}.Publish|Any CPU.Build.0 = Release|Any CPU
+		{7F75A2AC-6DDF-43D9-AAB8-6370166A6E57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F75A2AC-6DDF-43D9-AAB8-6370166A6E57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD}.Publish|Any CPU.Build.0 = Release|Any CPU
+		{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -174,6 +190,8 @@ Global
 		{B21E892A-BE56-4024-BD63-AA332279E7C5} = {A07FC797-D3ED-4FDF-888A-41FE104A8891}
 		{5F01891D-FFB9-485B-BD5F-C072EF00DE59} = {A07FC797-D3ED-4FDF-888A-41FE104A8891}
 		{A07FC797-D3ED-4FDF-888A-41FE104A8891} = {20BC8DE8-EFFE-42C2-A22B-A68D7C6B2CB2}
+		{7F75A2AC-6DDF-43D9-AAB8-6370166A6E57} = {A07FC797-D3ED-4FDF-888A-41FE104A8891}
+		{5E18A1BA-C6C9-4070-B8F5-C4F2A14079FD} = {20BC8DE8-EFFE-42C2-A22B-A68D7C6B2CB2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.ExceptionHandling.6.0.1304.0\lib\NET45

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Windows.Markup;
 
 [assembly: AssemblyTitle( "DragonSpark.Windows" )]
 [assembly: AssemblyDescription( "" )]
@@ -28,3 +29,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion( "0.1.2.0" )]
 [assembly: Registration( Priority.AfterLower )]
 [assembly: InternalsVisibleTo( "DragonSpark.Windows.Testing" )]
+
+
+[assembly: XmlnsPrefix( "http://framework.dragonspark.us", "ds" )]
+[assembly: XmlnsDefinition( "http://framework.dragonspark.us", "DragonSpark.Windows" )]

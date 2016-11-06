@@ -1,7 +1,9 @@
 using DragonSpark.Runtime;
+using DragonSpark.Windows.FileSystem;
 using System;
-using System.IO;
-using DragonSpark.Windows;
+using DirectoryInfo = System.IO.DirectoryInfo;
+using File = System.IO.File;
+using Path = System.IO.Path;
 
 namespace DevelopersWin.VoteReporter
 {
@@ -24,7 +26,7 @@ namespace DevelopersWin.VoteReporter
 		public Uri Save( object item, string fileName = null )
 		{
 			var extension = item is string ? "txt" : "xaml";
-			var path = Path.Combine( directory.FullName, fileName ?? $"{FileSystem.GetValidPath()}.{extension}" );
+			var path = Path.Combine( directory.FullName, fileName ?? $"{TimestampNameFactory.Default.Get()}.{extension}" );
 			var content = item as string ?? serializer.Save( item );
 			File.WriteAllText( path, content );
 

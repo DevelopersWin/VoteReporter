@@ -35,6 +35,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Windows.Forms" />
@@ -142,7 +143,6 @@
     <Compile Include="Runtime\PurgingCollectionTests.cs" />
     <Compile Include="Activation\DelegatesTests.cs" />
     <Compile Include="Sources\Scopes\SingletonScopeTests.cs" />
-    <Compile Include="Application\Setup\ActivatedServiceSourceTests.cs" />
     <Compile Include="Application\Setup\InstanceRepositoryTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
     <Compile Include="Application\ExecutionContextTests.cs" />
@@ -152,6 +152,7 @@
     <Compile Include="TypeSystem\AllPartsTests.cs" />
     <Compile Include="TypeSystem\AssemblyResourcePathSelectorTests.cs" />
     <Compile Include="TypeSystem\AssignableEqualityComparerTests.cs" />
+    <Compile Include="TypeSystem\DefaultValueAlterationTests.cs" />
     <Compile Include="TypeSystem\DefaultValuesTests.cs" />
     <Compile Include="TypeSystem\ExtensionsTests.cs" />
     <Compile Include="TypeSystem\Metadata\AttributesTests.cs">

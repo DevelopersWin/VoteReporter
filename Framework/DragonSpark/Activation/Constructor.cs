@@ -46,7 +46,7 @@ namespace DragonSpark.Activation
 				this.activatorSource = activatorSource;
 			}
 
-			public override object Get( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? SpecialValues.DefaultOrEmpty( parameter.RequestedType );
+			public override object Get( ConstructTypeRequest parameter ) => LocateAndCreate( parameter ) ?? DefaultValues.Default.Get( parameter.RequestedType );
 
 			object LocateAndCreate( ConstructTypeRequest parameter )
 			{

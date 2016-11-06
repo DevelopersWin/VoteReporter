@@ -1,20 +1,50 @@
+using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Windows.FileSystem;
+using System;
 using System.Collections.Generic;
 using Path = DragonSpark.Windows.FileSystem.Path;
 
 namespace DragonSpark.Windows.Legacy.Entity
 {
-	public static class EntityFiles
+	public sealed class DatabaseFiles : ParameterizedItemSourceBase<IFileInfo, IFileInfo>
 	{
-		public static IDirectoryInfo DefaultDataDirectory { get; } = DirectoryInfoFactory.Default.Get( @".\App_Data" );
+		readonly Func<IFileInfo, IFileInfo> logSource;
 
-		public static IEnumerable<IFileInfo> WithLog( IFileInfo databaseFile ) => new[] { databaseFile, GetLog( databaseFile ) };
+		public static DatabaseFiles Default { get; } = new DatabaseFiles();
+		DatabaseFiles() : this( DatabaseLogLocator.Default.Get ) {}
 
-		public static IFileInfo GetLog( IFileInfo database )
+		public DatabaseFiles( Func<IFileInfo, IFileInfo> logSource )
 		{
-			var path = Path.Default.Get();
-			var result = FileInfoFactory.Default.Get( path.Combine( database.DirectoryName ?? string.Empty, string.Concat( path.GetFileNameWithoutExtension( database.Name ), "_log.ldf" ) ) );
-			return result;
+			this.logSource = logSource;
 		}
+
+		protected override IEnumerable<IFileInfo> Yield( IFileInfo parameter ) => parameter.Append( logSource( parameter ) );
+	}
+
+	public sealed class DatabaseLogLocator : AlterationBase<IFileInfo>
+	{
+		public static DatabaseLogLocator Default { get; } = new DatabaseLogLocator();
+		DatabaseLogLocator() : this( Path.Default, FileInfoFactory.Default.Get ) {}
+
+		readonly IPath path;
+		readonly Func<string, IFileInfo> fileSource;
+		readonly string suffix;
+
+		public DatabaseLogLocator( IPath path, Func<string, IFileInfo> fileSource, string suffix = "_log.ldf" )
+		{
+			this.path = path;
+			this.fileSource = fileSource;
+			this.suffix = suffix;
+		}
+
+		public override IFileInfo Get( IFileInfo parameter ) => 
+			fileSource( path.Combine( parameter.DirectoryName ?? string.Empty, string.Concat( path.GetFileNameWithoutExtension( parameter.Name ), suffix ) ) );
+	}
+
+	public sealed class DataDirectory : SuppliedSource<string, IDirectoryInfo>
+	{
+		public static DataDirectory Default { get; } = new DataDirectory();
+		DataDirectory() : base( DirectoryInfoFactory.Default.Get, DataDirectoryPath.Default.Get ) {}
 	}
 }

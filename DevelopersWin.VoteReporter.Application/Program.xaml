@@ -7,9 +7,8 @@
 	xmlns:core="clr-namespace:DevelopersWin.VoteReporter;assembly=DevelopersWin.VoteReporter"
 	xmlns:application="clr-namespace:DragonSpark.Application;assembly=DragonSpark"
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
-	xmlns:diagnostics="clr-namespace:DragonSpark.Diagnostics;assembly=DragonSpark"
+	xmlns:commands="clr-namespace:DragonSpark.Commands;assembly=DragonSpark"
 	mc:Ignorable="d">
-	<diagnostics:DefaultConfigureLoggingCommand />
 	<setup:RegisterInstances>
 		<ds:DirectoryInfo Path="Reports" />
 		<application:ApplicationInformation DeploymentDate="12/1/2015" CompanyUri="http://blog.developers.win/weekly-reports" />
@@ -17,5 +16,10 @@
 
 	<ds:Source Instance="{x:Static core:ApplicationCommands.Default}" />
 	<application:RunProgramCommand />
-	<ds:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />
+	
+	<commands:DeclarativeCommand Parameter="{x:Static ds:InputOutput.Default}">
+		<commands:DeclarativeCommand.Command>
+			<setup:ReadKeyCommand Message="Report Generated.  Press Enter to Exit." />
+		</commands:DeclarativeCommand.Command>
+	</commands:DeclarativeCommand>
 </ds:ConsoleApplication>

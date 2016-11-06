@@ -14,7 +14,7 @@ using System.Reflection;
 namespace DragonSpark.Aspects
 {
 	[LocationInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[MulticastAttributeUsage( MulticastTargets.Property, PersistMetaData = false )]
+	[MulticastAttributeUsage( MulticastTargets.Property )]
 	[PSerializable, ProvideAspectRole( "Data" ), LinesOfCodeAvoided( 6 )]
 	[AttributeUsage( AttributeTargets.Assembly )]
 	[AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Threading )]

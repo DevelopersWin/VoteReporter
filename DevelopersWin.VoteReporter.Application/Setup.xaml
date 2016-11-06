@@ -3,16 +3,16 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-	xmlns:entity="clr-namespace:DragonSpark.Windows.Entity;assembly=DragonSpark.Windows"
-	xmlns:markup="clr-namespace:DragonSpark.Windows.Markup;assembly=DragonSpark.Windows"
+	xmlns:entity="clr-namespace:DragonSpark.Windows.Legacy.Entity;assembly=DragonSpark.Windows.Legacy"
 	xmlns:setup="clr-namespace:DragonSpark.Application.Setup;assembly=DragonSpark"
 	xmlns:applicationEntity="clr-namespace:DevelopersWin.VoteReporter.Entity;assembly=DevelopersWin.VoteReporter"
+	xmlns:ds="http://framework.dragonspark.us"
 	mc:Ignorable="d"
 >
 	<entity:AssignDataDirectoryCommand />
 	<entity:InstallDatabaseCommand />
 	<entity:BackupDatabaseCommand />
 	<applicationEntity:InitializeDatabaseCommand>
-		<markup:Service ServiceType="{markup:Enumerable {x:Type entity:IInstaller}}" />
+		<ds:Service ServiceType="{ds:Enumerable {x:Type entity:IInstaller}}" />
 	</applicationEntity:InitializeDatabaseCommand>
 </setup:DeclarativeSetup>

@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace DragonSpark.Expressions
 {
-	class ArgumentsArrayParameter
+	struct ArgumentsArrayParameter
 	{
 		public ArgumentsArrayParameter( MethodBase method, ParameterExpression parameter )
 		{

@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Sources.Parameterized;
 
-namespace DragonSpark.Aspects.Coercion
+namespace DragonSpark.Sources.Coercion
 {
 	sealed class CoercerAdapter<TFrom, TTo> : ICoercer
 	{

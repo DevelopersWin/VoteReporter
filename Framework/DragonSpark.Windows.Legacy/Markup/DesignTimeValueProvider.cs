@@ -7,6 +7,6 @@ namespace DragonSpark.Windows.Legacy.Markup
 	public sealed class DesignTimeValueProvider : CompositeFactory<Type, object>
 	{
 		public static DesignTimeValueProvider Default { get; } = new DesignTimeValueProvider();
-		DesignTimeValueProvider() : base( new DelegatedParameterizedSource<Type, object>( SpecialValues.DefaultOrEmpty ), MockFactory.Default, StringDesignerValueFactory.Default ) {}
+		DesignTimeValueProvider() : base( new DelegatedParameterizedSource<Type, object>( DefaultValues.Default.Get ), MockFactory.Default, StringDesignerValueFactory.Default ) {}
 	}
 }

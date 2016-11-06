@@ -1,5 +1,5 @@
 using DevelopersWin.VoteReporter.Entity;
-using DragonSpark.Windows.Entity;
+using DragonSpark.Windows.Legacy.Entity;
 
 namespace DevelopersWin.VoteReporter
 {

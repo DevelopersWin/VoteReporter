@@ -1,6 +1,8 @@
+using DragonSpark.Activation;
+using DragonSpark.Activation.Location;
 using DragonSpark.ComponentModel;
-using PostSharp.Patterns.Contracts;
-using System;
+using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using Type = System.Type;
 
 namespace DragonSpark.Windows.Legacy.Markup
@@ -14,13 +16,16 @@ namespace DragonSpark.Windows.Legacy.Markup
 			ServiceType = serviceType;
 		}
 
-		[NotNull]
-		public Type ServiceType { [return: NotNull]get; set; }
+		[PostSharp.Patterns.Contracts.NotNull]
+		public Type ServiceType { [return: PostSharp.Patterns.Contracts.NotNull]get; set; }
 
-		[Service, NotNull]
-		public IServiceProvider Locator { [return: NotNull]get; set; }
+		[Service, PostSharp.Patterns.Contracts.NotNull, UsedImplicitly]
+		public IActivator Activator { [return: PostSharp.Patterns.Contracts.NotNull] get; set; } = DefaultServices.Default;
 
-		protected override object GetValue( MarkupServiceProvider serviceProvider ) => 
-			Locator.GetService( ServiceType );
+		protected override object GetValue( MarkupServiceProvider serviceProvider )
+		{
+			var service = Activator.Get( ServiceType ) ?? DefaultValues.Default.Get( ServiceType );
+			return service;
+		}
 	}
 }

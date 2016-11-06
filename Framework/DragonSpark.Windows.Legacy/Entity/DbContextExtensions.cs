@@ -1,3 +1,4 @@
+using DragonSpark.Expressions;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
@@ -161,13 +162,6 @@ namespace DragonSpark.Windows.Legacy.Entity
 		public static IEnumerable<NavigationProperty> GetEntityProperties( this IObjectContextAdapter target, Type type ) => target.ObjectContext.MetadataWorkspace.GetEntityMetadata( type ).NavigationProperties;
 
 		public static Type[] GetDeclaredEntityTypes( this DbContext context ) => EnumerableExtensions.WhereAssigned( context.GetType().GetProperties().Where( x => x.PropertyType.IsGenericType && typeof( DbSet<> ).IsAssignableFrom( x.PropertyType.GetGenericTypeDefinition() ) ).Select( x => x.PropertyType.GetGenericArguments().FirstOrDefault() ) ).ToArray();
-
-		public static MemberInfo GetMemberInfo( this Expression expression )
-		{
-			var lambda = (LambdaExpression)expression;
-			var result = ( lambda.Body.AsTo<UnaryExpression, Expression>( unaryExpression => unaryExpression.Operand ) ?? lambda.Body ).To<MemberExpression>().Member;
-			return result;
-		}
 
 		public static TEntity Include<TEntity>( this DbContext target, TEntity entity, int levels, params Expression<Func<TEntity, object>>[] expressions ) where TEntity : class => target.Include( entity, expressions.Select( x => x.GetMemberInfo().Name ).ToArray(), levels );
 

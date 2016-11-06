@@ -1,11 +1,11 @@
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Windows.Entity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using DragonSpark.Windows.Legacy.Entity;
 
 namespace DevelopersWin.VoteReporter.Entity
 {

@@ -27,7 +27,9 @@ using System.Windows.Markup;
 
 [assembly: AssemblyVersion( "0.1.2.0" )]
 [assembly: AssemblyFileVersion( "0.1.2.0" )]
+
 [assembly: XmlnsPrefix( "http://framework.dragonspark.us", "ds" )]
 [assembly: XmlnsDefinition( "http://framework.dragonspark.us", "DragonSpark.Windows.Legacy.Markup" )]
+
 [assembly: Registration( Priority.AfterLower )]
 [assembly: InternalsVisibleTo( "DragonSpark.Windows.Testing" )]

@@ -1,7 +1,7 @@
 using DevelopersWin.VoteReporter.Entity;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
-using DragonSpark.Windows.Entity;
+using DragonSpark.Windows.Legacy.Entity;
 using System.Composition;
 using System.Linq;
 

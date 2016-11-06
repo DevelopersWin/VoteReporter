@@ -67,10 +67,11 @@
     <Compile Include="Aspects\Alteration\Support.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercerAttribute.cs" />
     <Compile Include="Aspects\Coercion\Aspect.cs" />
-    <Compile Include="Aspects\Coercion\CoercerAdapter.cs" />
+    <Compile Include="Expressions\Extensions.cs" />
+    <Compile Include="Sources\Coercion\CoercerAdapter.cs" />
     <Compile Include="Aspects\Coercion\Source.cs" />
     <Compile Include="Aspects\Coercion\Constructor.cs" />
-    <Compile Include="Aspects\Coercion\ICoercer.cs" />
+    <Compile Include="Sources\Coercion\ICoercer.cs" />
     <Compile Include="Aspects\Coercion\Support.cs" />
     <Compile Include="Aspects\CommandInvocationBase.cs" />
     <Compile Include="Aspects\CommandTypeDefinition.cs" />
@@ -191,7 +192,7 @@
     <Compile Include="Composition\AppliedExport.cs" />
     <Compile Include="Composition\AppliedExportLocator.cs" />
     <Compile Include="Composition\AppliedExports.cs" />
-    <Compile Include="Composition\CompositionHostExtensions.cs" />
+    <Compile Include="Composition\Extensions.cs" />
     <Compile Include="Composition\CompositionHostFactory.cs" />
     <Compile Include="Composition\ConstructedExports.cs" />
     <Compile Include="Composition\IsValidTypeSpecification.cs" />
@@ -246,6 +247,7 @@
     <Compile Include="Sources\Parameterized\DelegatedAlteration.cs" />
     <Compile Include="Sources\Parameterized\ICurry.cs" />
     <Compile Include="Sources\Parameterized\ISpecificationParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\ParameterizedItemSource.cs" />
     <Compile Include="Sources\Scopes\AggregateParameterizedSource.cs" />
     <Compile Include="Sources\Scopes\ScopedItems.cs" />
     <Compile Include="Sources\Scopes\ParameterizedSingletonScope.cs" />
@@ -380,7 +382,6 @@
     <Compile Include="Commands\SuppliedCommandSource.cs" />
     <Compile Include="Activation\CompositeActivator.cs" />
     <Compile Include="Application\DefaultExportProvider.cs" />
-    <Compile Include="Application\Setup\EnableServicesCommand.cs" />
     <Compile Include="Application\Exports.cs" />
     <Compile Include="Application\IApplication.cs" />
     <Compile Include="Commands\ICommandSource.cs" />
@@ -402,7 +403,6 @@
     <Compile Include="Sources\Delegates\SourceDelegates.cs" />
     <Compile Include="Application\Setup\ServiceProviderConfigurations.cs" />
     <Compile Include="Application\Setup\ActivatorFactory.cs" />
-    <Compile Include="Application\Setup\ServicesEnabled.cs" />
     <Compile Include="Application\SystemParts.cs" />
     <Compile Include="Application\SystemPartsFactory.cs" />
     <Compile Include="Application\SuppliedTypeSource.cs" />
@@ -441,7 +441,6 @@
     <Compile Include="TypeSystem\AssemblyLoader.cs" />
     <Compile Include="TypeSystem\AssemblyResourcePathSelector.cs" />
     <Compile Include="TypeSystem\AssignableEqualityComparer.cs" />
-    <Compile Include="TypeSystem\Default.cs" />
     <Compile Include="TypeSystem\Defaults.cs" />
     <Compile Include="TypeSystem\Extensions.cs" />
     <Compile Include="TypeSystem\Generics\ActionContextBase.cs" />
@@ -567,7 +566,6 @@
     <Compile Include="Composition\ConventionImplementations.cs" />
     <Compile Include="Diagnostics\Configurations\AddSinkCommand.cs" />
     <Compile Include="Diagnostics\Configurations\EnrichFromLogContextCommand.cs" />
-    <Compile Include="Application\Setup\ActivatedServiceSource.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\IAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\StructuralCache.cs" />
@@ -632,7 +630,7 @@
     <Compile Include="Sources\Parameterized\DecoratedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\DelegatedParameterizedSource.cs" />
     <Compile Include="Sources\DelegatedSource.cs" />
-    <Compile Include="Sources\SuppliedDeferredSource.cs" />
+    <Compile Include="Sources\DeferredSingletonSource.cs" />
     <Compile Include="Sources\SingletonDelegateBuilder.cs" />
     <Compile Include="Sources\SuppliedSource.cs" />
     <Compile Include="Sources\IAssignable.cs" />
@@ -697,7 +695,7 @@
     <Compile Include="TypeSystem\Metadata\PropertyInfoAttributeProvider.cs" />
     <Compile Include="TypeSystem\PublicPartsLocator.cs" />
     <Compile Include="TypeSystem\Metadata\ReflectionElementAttributeProvider.cs" />
-    <Compile Include="TypeSystem\SpecialValues.cs" />
+    <Compile Include="TypeSystem\DefaultValueAlteration.cs" />
     <Compile Include="TypeSystem\Generics\StaticActionContext.cs" />
     <Compile Include="TypeSystem\Generics\StaticFactoryContext.cs" />
     <Compile Include="TypeSystem\TypeAdapter.cs" />

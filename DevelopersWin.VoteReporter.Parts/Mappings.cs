@@ -15,7 +15,7 @@ namespace DevelopersWin.VoteReporter.Parts
 
 		protected override IEnumerable<ExportMapping> Yield()
 		{
-			yield return new ExportMapping<DragonSpark.Windows.Entity.MigrateDatabaseToLatestVersion<VotingContext, Configuration>, IDatabaseInitializer<VotingContext>>();
+			yield return new ExportMapping<DragonSpark.Windows.Legacy.Entity.MigrateDatabaseToLatestVersion<VotingContext, Configuration>, IDatabaseInitializer<VotingContext>>();
 		}
 	}
 }

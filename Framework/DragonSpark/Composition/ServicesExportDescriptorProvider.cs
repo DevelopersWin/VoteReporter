@@ -1,9 +1,7 @@
+using DragonSpark.Activation;
 using DragonSpark.Activation.Location;
-using DragonSpark.Application.Setup;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Scopes;
-using System;
+using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Composition.Hosting.Core;
 
@@ -14,36 +12,21 @@ namespace DragonSpark.Composition
 		public static ServicesExportDescriptorProvider Default { get; } = new ServicesExportDescriptorProvider();
 		ServicesExportDescriptorProvider() : this( DefaultServices.Default ) {}
 
-		readonly Func<Type, object> provider;
+		readonly IActivator activator;
 
-		public ServicesExportDescriptorProvider( IServiceProvider provider ) : this( new ActivatedServiceSource( provider ).Get ) {}
-
-		ServicesExportDescriptorProvider( Func<Type, object> provider )
+		[UsedImplicitly]
+		public ServicesExportDescriptorProvider( IActivator activator )
 		{
-			this.provider = provider;
+			this.activator = activator;
 		}
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
 			CompositionDependency dependency;
-			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) )
+			if ( !descriptorAccessor.TryResolveOptionalDependency( "Existing Request", contract, true, out dependency ) && activator.IsSatisfiedBy( contract.ContractType ) )
 			{
-				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, new Factory( provider, contract.ContractType ).Create );
+				yield return new ExportDescriptorPromise( contract, GetType().FullName, true, NoDependencies, activator.WithParameter( contract.ContractType ).ToSharedDescriptor );
 			}
-		}
-
-		sealed class Factory : DelegatedSource<object>
-		{
-			readonly CompositeActivator activate;
-
-			public Factory( Func<Type, object> provider, Type contract ) : base( provider.WithParameter( contract ).ToSingleton() )
-			{
-				activate = Activate;
-			}
-
-			object Activate( LifetimeContext context, CompositionOperation operation ) => Get();
-
-			public ExportDescriptor Create( IEnumerable<CompositionDependency> dependencies ) => ExportDescriptor.Create( activate, NoMetadata );
 		}
 	}
 }

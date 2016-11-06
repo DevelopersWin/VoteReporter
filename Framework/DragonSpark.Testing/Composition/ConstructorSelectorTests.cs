@@ -1,5 +1,4 @@
-﻿using DragonSpark.Application.Setup;
-using DragonSpark.Composition;
+﻿using DragonSpark.Composition;
 using DragonSpark.Extensions;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
@@ -19,7 +18,7 @@ namespace DragonSpark.Testing.Composition
 			var parts = this.Adapt().WithNested().Append( typeof(Protected) ).AsApplicationParts();
 			var builder = ConventionBuilderFactory.Default.Get();
 			var container = new ContainerConfiguration().WithParts( parts.AsEnumerable(), builder ).WithProvider( ServicesExportDescriptorProvider.Default ).CreateContainer();
-			new EnableServicesCommand().Execute();
+			
 			var dependency = container.GetExport<Dependency>();
 			Assert.NotNull( dependency );
 

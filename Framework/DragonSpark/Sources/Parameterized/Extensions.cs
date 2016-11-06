@@ -12,6 +12,9 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public static class Extensions
 	{
+		public static T GetWith<T>( this IParameterizedSource<Type, object> @this ) => (T)@this.Get( typeof(T) );
+		public static T GetWith<T>( this IParameterizedSource<Type, T> @this ) => @this.Get( typeof(T) );
+
 		public static ImmutableArray<TResult> CreateMany<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IEnumerable<TParameter> parameters ) =>
 			parameters
 				.SelectAssigned( @this.ToDelegate() )

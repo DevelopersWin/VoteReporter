@@ -1,4 +1,4 @@
-﻿using DragonSpark.Windows.Entity;
+﻿using DragonSpark.Windows.Legacy.Entity;
 using System.Composition;
 
 namespace DevelopersWin.VoteReporter.Parts.Common

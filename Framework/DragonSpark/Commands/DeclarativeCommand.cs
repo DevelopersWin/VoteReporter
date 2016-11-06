@@ -1,3 +1,4 @@
+using DragonSpark.Sources.Coercion;
 using PostSharp.Patterns.Contracts;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
@@ -13,6 +14,9 @@ namespace DragonSpark.Commands
 
 		[Required]
 		public ICommand Command { [return: Required]get; set; }
+
+		
+		public ICoercer Coercer { get; set; }
 
 		public override void Execute( [Optional]object parameter ) => Command.Execute( Parameter );
 	}

@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Activation
 		{
 			var count = 0;
 			var factory = new Func<int>( () => ++count );
-			var singleton = new SuppliedDeferredSource<int>( factory );
+			var singleton = new DeferredSingletonSource<int>( factory );
 			Assert.Equal( 1, singleton.Get() );
 			Assert.Equal( 1, singleton.Get() );
 			Assert.Equal( 1, singleton.Get() );

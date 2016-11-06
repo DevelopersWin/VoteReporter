@@ -10,23 +10,30 @@ using Activator = System.Activator;
 
 namespace DragonSpark.TypeSystem
 {
-	sealed class DefaultValues : Cache<Type, object>
+	public sealed class DefaultValues : Cache<Type, object>
 	{
 		public static IParameterizedSource<Type, object> Default { get; } = new DefaultValues();
-		DefaultValues() : base( Create ) {}
+		DefaultValues() : base( DefaultImplementation.Implementation.Get ) {}
 
-		static object Create( Type parameter ) => parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : Empty( parameter );
-
-		static object Empty( Type parameter )
+		sealed class DefaultImplementation : ParameterizedSourceBase<Type, object>
 		{
-			var type = parameter.Adapt().GetEnumerableType();
-			var result = type != null ? Support.Method.Make( type.ToItem() ).Invoke<Array>() : null;
-			return result;
-		}
+			public static DefaultImplementation Implementation { get; } = new DefaultImplementation();
+			DefaultImplementation() {}
 
-		static class Support
-		{
-			public static IGenericMethodContext<Invoke> Method { get; } = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
+			public override object Get( Type parameter ) => 
+				parameter.GetTypeInfo().IsValueType ? Activator.CreateInstance( parameter ) : Empty( parameter );
+
+			static object Empty( Type parameter )
+			{
+				var type = parameter.Adapt().GetEnumerableType();
+				var result = type != null ? Support.Method.Make( type.ToItem() ).Invoke<Array>() : null;
+				return result;
+			}
+
+			static class Support
+			{
+				public static IGenericMethodContext<Invoke> Method { get; } = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
+			}
 		}
 	}
 }

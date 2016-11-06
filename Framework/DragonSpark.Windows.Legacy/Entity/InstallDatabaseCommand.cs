@@ -1,9 +1,12 @@
+using DragonSpark.Aspects.Specifications;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
-using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
 using DragonSpark.Windows.FileSystem;
 using DragonSpark.Windows.Legacy.Properties;
 using JetBrains.Annotations;
+using System;
+using System.Collections.Immutable;
 using System.Linq;
 using Directory = DragonSpark.Windows.FileSystem.Directory;
 using File = DragonSpark.Windows.FileSystem.File;
@@ -11,41 +14,40 @@ using Path = DragonSpark.Windows.FileSystem.Path;
 
 namespace DragonSpark.Windows.Legacy.Entity
 {
-	public class InstallDatabaseCommand : RunCommandBase
+	[ApplyAutoValidation, ApplyInverseSpecification( typeof(FileSystemInfoExistsSpecification) )]
+	public class InstallDatabaseCommand : CommandBase<IFileInfo>
 	{
 		readonly IPath path;
 		readonly IDirectory directory;
 		readonly IFile file;
+		readonly Func<IFileInfo, ImmutableArray<IFileInfo>> fileSource;
 
 		readonly static byte[][] Data = { Resources.Blank, Resources.Blank_log };
 
-		public InstallDatabaseCommand() : this( Path.Default, Directory.Default, File.Default ) {}
+		public static InstallDatabaseCommand Default { get; } = new InstallDatabaseCommand();
+		InstallDatabaseCommand() : this( Path.Default, Directory.Default, File.Default, DatabaseFiles.Default.Get ) {}
 
-		public InstallDatabaseCommand( IPath path, IDirectory directory, IFile file )
+		[UsedImplicitly]
+		public InstallDatabaseCommand( IPath path, IDirectory directory, IFile file, Func<IFileInfo, ImmutableArray<IFileInfo>> fileSource )
 		{
 			this.path = path;
 			this.directory = directory;
 			this.file = file;
+			this.fileSource = fileSource;
 		}
 
-		[Service, PostSharp.Patterns.Contracts.NotNull, UsedImplicitly]
-		public IFileInfo Database { [return: PostSharp.Patterns.Contracts.NotNull]get; set; }
-
-		public override void Execute()
+		public override void Execute( IFileInfo parameter )
 		{
-			if ( !Database.Exists )
+			foreach ( var item in fileSource( parameter ).Tuple( Data ).ToArray() )
 			{
-				foreach ( var item in EntityFiles.WithLog( Database ).Tuple( Data ).ToArray() )
+				var fullName = item.Item1.FullName;
+				var directoryRoot = path.GetDirectoryName( fullName );
+				if ( directoryRoot != null )
 				{
-					var fullName = item.Item1.FullName;
-					var directoryRoot = path.GetDirectoryName( fullName );
-					if ( directoryRoot != null )
+					directory.CreateDirectory( directoryRoot );
+					using ( var stream = file.Create( fullName ) )
 					{
-						directory.CreateDirectory( directoryRoot );
-						using ( var stream = file.Create( fullName ) )
-						{
-							stream.Write( item.Item2, 0, item.Item2.Length );
-						}
+						stream.Write( item.Item2, 0, item.Item2.Length );
 					}
 				}
 			}

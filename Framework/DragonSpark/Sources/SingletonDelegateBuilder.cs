@@ -8,6 +8,6 @@ namespace DragonSpark.Sources
 		public static IParameterizedSource<Func<T>, Func<T>> Default { get; } = new SingletonDelegateBuilder<T>();
 		SingletonDelegateBuilder() {}
 
-		public override Func<T> Get( Func<T> parameter ) => new SuppliedDeferredSource<T>( parameter ).Get;
+		public override Func<T> Get( Func<T> parameter ) => new DeferredSingletonSource<T>( parameter ).Get;
 	}
 }

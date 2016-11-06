@@ -1,5 +1,6 @@
 ﻿using DragonSpark.ComponentModel;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
 using System.Reflection;
@@ -42,7 +43,7 @@ namespace DragonSpark.Extensions
 
 		static class Support<T>
 		{
-			public static Func<T> Default { get; } = SpecialValues.DefaultOrEmpty<T>;
+			public static Func<T> Default { get; } = DefaultValues.Default.GetWith<T>;
 		}
 
 		public static TItem With<TItem>( [Optional]this TItem @this, Action<TItem> action = null )
