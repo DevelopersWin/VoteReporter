@@ -1,7 +1,7 @@
-﻿using DragonSpark.Aspects.Build;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System;
@@ -11,11 +11,6 @@ using System.Linq;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public class RelaySupportDefinition : SupportDefinitionBase
-	{
-		public RelaySupportDefinition( Func<Type, bool> specification, params IAspectInstanceLocator[] locators ) : base( specification, locators ) {}
-	}
-
 	sealed class Relays : AspectProviderBase<Type>, Build.ISupportDefinition
 	{
 		readonly ISpecification<Type> specification;
@@ -24,7 +19,7 @@ namespace DragonSpark.Aspects.Relay
 
 		readonly ImmutableArray<IRelayAspectSource> sources;
 
-		public Relays( params IRelayAspectSource[] sources ) : this( new AnySpecification<Type>( sources.Select( source => new DecoratedSpecification<Type>( source ) ).Fixed() ), sources ) {}
+		public Relays( params IRelayAspectSource[] sources ) : this( new AnySpecification<Type>( sources.SelectTypes().Select( TypeAssignableSpecification.Defaults.Get ).Fixed() ), sources ) {}
 
 		[UsedImplicitly]
 		public Relays( ISpecification<Type> specification, params IRelayAspectSource[] sources )
@@ -63,7 +58,7 @@ namespace DragonSpark.Aspects.Relay
 		IEnumerable<AspectInstance> IParameterizedSource<Type, IEnumerable<AspectInstance>>.Get( Type parameter ) => ProvideAspects( parameter );
 	}
 
-	public interface IRelayAspectSource : ISpecification<Type>, IParameterizedSource<Type, AspectInstance> { }
+	public interface IRelayAspectSource : ISpecification<Type>, IParameterizedSource<Type, AspectInstance>, ITypeAware { }
 
 	public interface ISupportDefinition : Build.ISupportDefinition, ITypeAware, IParameterizedSource<IAspect> {}
 	/*

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using DragonSpark.Aspects.Build;
+﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
 using PostSharp.Aspects;
+using System;
+using System.Linq;
 
 namespace DragonSpark.Aspects.Implementations
 {
@@ -11,9 +11,9 @@ namespace DragonSpark.Aspects.Implementations
 	{
 		public Descriptor( Type declaringType, params Type[] implementedTypes ) : base( TypeAssignableSpecification.Defaults.Get( declaringType ).And( new AllSpecification<Type>( implementedTypes.Select( type => TypeAssignableSpecification.Defaults.Get( type ).Inverse() ).Fixed() ) ) )
 		{
-			DeclaringType = declaringType;
+			ReferencedType = declaringType;
 		}
 
-		public Type DeclaringType { get; }
+		public Type ReferencedType { get; }
 	}
 }

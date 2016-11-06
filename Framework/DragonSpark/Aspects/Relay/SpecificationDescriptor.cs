@@ -6,7 +6,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static SpecificationDescriptor Default { get; } = new SpecificationDescriptor();
 		SpecificationDescriptor() : base( 
-			GeneralizedSpecificationTypeDefinition.Default.DeclaringType, GenericSpecificationTypeDefinition.Default.DeclaringType, 
+			GeneralizedSpecificationTypeDefinition.Default.ReferencedType, GenericSpecificationTypeDefinition.Default.ReferencedType, 
 			typeof(SpecificationRelay<>), typeof(ISpecificationRelay),
 			new MethodBasedAspectInstanceLocator<Specification>( GeneralizedSpecificationTypeDefinition.Default.Method )
 		) {}

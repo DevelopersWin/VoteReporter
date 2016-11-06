@@ -6,6 +6,6 @@ namespace DragonSpark.Aspects.Relay
 	public sealed class SpecificationRelayAspect : SpecificationRelayAspectBase
 	{
 		public SpecificationRelayAspect()  : base( SpecificationDescriptor.Default ) {}
-		public SpecificationRelayAspect( ISpecificationRelay relay ) : base( SpecificationDescriptor.Default ) {}
+		public SpecificationRelayAspect( ISpecificationRelay relay ) : base( relay, SpecificationDescriptor.Default ) {}
 	}
 }

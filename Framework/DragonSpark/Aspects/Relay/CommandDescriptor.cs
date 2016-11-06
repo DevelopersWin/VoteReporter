@@ -6,7 +6,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static CommandDescriptor Default { get; } = new CommandDescriptor();
 		CommandDescriptor() : base( 
-			CommandTypeDefinition.Default.DeclaringType, GenericCommandTypeDefinition.Default.DeclaringType, 
+			CommandTypeDefinition.Default.ReferencedType, GenericCommandTypeDefinition.Default.ReferencedType, 
 			typeof(CommandRelay<>), typeof(ICommandRelay),
 			new MethodBasedAspectInstanceLocator<Specification>( CommandTypeDefinition.Default.Validation ),
 			new MethodBasedAspectInstanceLocator<Command>( CommandTypeDefinition.Default.Execution )

@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Application;
 using DragonSpark.Sources;
 using DragonSpark.Testing.Framework.Application;
-using DragonSpark.Testing.Framework.FileSystem;
 using DragonSpark.Testing.Objects.FileSystem;
 using DragonSpark.TypeSystem;
 using System;
@@ -24,15 +23,7 @@ namespace DragonSpark.Windows.Testing.TypeSystem
 		[Theory, AutoData, InitializePartsCommand.Public]
 		public void PublicAttributed( ImmutableArray<Type> types )
 		{
-			if ( types.IsEmpty )
-			{
-				var repository = FileSystemRepository.Default;
-				var temp = AssemblyPartLocator.Default.Get( GetType().Assembly );
-				throw new InvalidOperationException( $"WTF! {temp.Length} : {repository.AllFiles.Length} - {string.Join( ", ", repository.AllFiles )}" );
-			}
-
 			Assert.Single( types );
-
 			Assert.Equal( "DragonSpark.Testing.Parts.PublicClass", types.Single().FullName );
 		}
 

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {
-	[ApplyAutoValidation, ApplySpecification( typeof(ContainsSingletonPropertySpecification) ), ApplyResultAlteration( typeof(DefaultValueAlteration<IEnumerable<IMethod>>) )]
+	[ApplyAutoValidation, ApplySpecification( typeof(ContainsSingletonPropertySpecification) ), ApplyResultAlteration( typeof(DefaultItemValueAlteration<IMethod>) )]
 	public sealed class SingletonQuery : ParameterizedSourceBase<Type, IEnumerable<IMethod>>, IMethodQuery, ISpecification<Type>
 	{
 		public static SingletonQuery Default { get; } = new SingletonQuery();

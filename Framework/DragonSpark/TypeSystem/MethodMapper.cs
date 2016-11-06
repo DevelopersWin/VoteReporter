@@ -19,7 +19,7 @@ namespace DragonSpark.TypeSystem
 		public ImmutableArray<MethodMapping> Get( Type parameter )
 		{
 			var generic = parameter.GetTypeInfo().IsGenericTypeDefinition ? adapter.GetImplementations( parameter ).FirstOrDefault() : null;
-			var implementation = generic ?? ( parameter.Adapt().IsAssignableFrom( adapter.ReferenceType ) ? parameter : null );
+			var implementation = generic ?? ( parameter.Adapt().IsAssignableFrom( adapter.ReferencedType ) ? parameter : null );
 			if ( implementation != null )
 			{
 				var map = adapter.Info.GetRuntimeInterfaceMap( implementation );

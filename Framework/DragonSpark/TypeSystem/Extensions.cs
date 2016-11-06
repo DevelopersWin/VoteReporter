@@ -30,7 +30,7 @@ namespace DragonSpark.TypeSystem
 		public static TypeAdapter Adapt( this TypeInfo @this ) => Adapt( @this.AsType() );
 		public static TypeAdapter Adapt( this Type @this ) => TypeAdapterCache.Default.Get( @this );
 
-		public static IEnumerable<Type> SelectTypes( this IEnumerable<TypeAdapter> @this ) => @this.Select( adapter => adapter.ReferenceType );
+		public static IEnumerable<Type> SelectTypes( this IEnumerable<ITypeAware> @this ) => @this.Select( adapter => adapter.ReferencedType );
 		public static IEnumerable<Type> SelectTypes( this IEnumerable<object> @this ) => @this.Select( CoerceType );
 		public static ImmutableArray<Type> AsTypes( this IEnumerable<object> @this ) => @this.SelectTypes().ToImmutableArray();
 		public static ImmutableArray<TypeAdapter> AsAdapters( this IEnumerable<object> @this ) => @this.Select( type => type.Adapt() ).ToImmutableArray();

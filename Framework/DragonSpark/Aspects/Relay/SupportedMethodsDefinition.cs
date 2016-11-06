@@ -21,10 +21,10 @@ namespace DragonSpark.Aspects.Relay
 
 		SupportedMethodsDefinition( Type supportedType, Func<object, object> adapterSource, Func<object, T> aspectSource, params IAspectInstanceLocator[] locators ) : base( new Build.Specification( supportedType ).IsSatisfiedBy, locators )
 		{
-			DeclaringType = supportedType;
+			ReferencedType = supportedType;
 			this.adapterSource = adapterSource;
 			this.aspectSource = aspectSource;
-			locator = new TypeBasedAspectInstanceLocator<T>( DeclaringType );
+			locator = new TypeBasedAspectInstanceLocator<T>( ReferencedType );
 		}
 
 		public IAspect Get( object parameter ) => aspectSource( adapterSource( parameter ) );
@@ -41,7 +41,7 @@ namespace DragonSpark.Aspects.Relay
 			}
 		}*/
 
-		public Type DeclaringType { get; }
+		public Type ReferencedType { get; }
 
 		AspectInstance IParameterizedSource<Type, AspectInstance>.Get( Type parameter ) => locator.Get( parameter );
 	}

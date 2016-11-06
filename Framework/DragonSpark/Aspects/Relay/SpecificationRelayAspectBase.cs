@@ -1,15 +1,12 @@
-﻿using DragonSpark.Sources.Parameterized;
-using PostSharp.Aspects;
-
-namespace DragonSpark.Aspects.Relay
+﻿namespace DragonSpark.Aspects.Relay
 {
 	public abstract class SpecificationRelayAspectBase : ApplyRelayAspectBase, ISpecificationRelay
 	{
 		readonly ISpecificationRelay relay;
 
-		protected SpecificationRelayAspectBase( IParameterizedSource<IAspect> definition ) : base( definition ) {}
+		protected SpecificationRelayAspectBase( ISupportDefinition definition ) : base( definition ) {}
 
-		protected SpecificationRelayAspectBase( ISpecificationRelay relay, IParameterizedSource<IAspect> definition ) : base( definition )
+		protected SpecificationRelayAspectBase( ISpecificationRelay relay, ISupportDefinition definition ) : base( definition )
 		{
 			this.relay = relay;
 		}

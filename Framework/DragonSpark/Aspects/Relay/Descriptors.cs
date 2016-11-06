@@ -14,7 +14,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static Descriptors Default { get; } = new Descriptors();
 		Descriptors() : this( /*CommandDescriptor.Default,*/ SourceDescriptor.Default, SpecificationDescriptor.Default ) {}
-		Descriptors( params ISupportDefinition[] descriptors ) : this( descriptors.Select( definition => definition.DeclaringType ).AsAdapters(), descriptors ) {}
+		Descriptors( params ISupportDefinition[] descriptors ) : this( descriptors.SelectTypes().AsAdapters(), descriptors ) {}
 		Descriptors( ImmutableArray<TypeAdapter> adapters, ISupportDefinition[] descriptors ) 
 			: this( descriptors, new TypedPairs<IAspect>( adapters.Tuple( descriptors.Select( descriptor => new Func<object, IAspect>( descriptor.Get ) ).ToArray() ) ) ) {}
 

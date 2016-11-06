@@ -11,17 +11,17 @@ namespace DragonSpark.Aspects.Build
 	{
 		readonly string methodName;
 
-		public MethodStore( Type declaringType, string methodName ) : base( TypeAssignableSpecification.Defaults.Get( declaringType ) )
+		public MethodStore( Type referencedType, string methodName ) : base( TypeAssignableSpecification.Defaults.Get( referencedType ) )
 		{
-			DeclaringType = declaringType;
+			ReferencedType = referencedType;
 			this.methodName = methodName;
 		}
 
-		public Type DeclaringType { get; }
+		public Type ReferencedType { get; }
 
 		protected override MethodInfo Create( Type parameter )
 		{
-			var mapping = parameter.Adapt().GetMappedMethods( DeclaringType ).Introduce( methodName, tuple => tuple.Item1.InterfaceMethod.Name == tuple.Item2 ).Only();
+			var mapping = parameter.Adapt().GetMappedMethods( ReferencedType ).Introduce( methodName, tuple => tuple.Item1.InterfaceMethod.Name == tuple.Item2 ).Only();
 			var result = mapping.MappedMethod?.LocateInDerivedType( parameter ).AccountForGenericDefinition();
 			return result;
 		}

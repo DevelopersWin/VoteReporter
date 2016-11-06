@@ -12,26 +12,31 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public sealed class TypeAdapter
+	public interface ITypeAware
+	{
+		Type ReferencedType { get; }
+	}
+
+	public sealed class TypeAdapter : ITypeAware
 	{
 		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToSpecificationDelegate();
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
 		readonly Func<Type, bool> isAssignableFrom;
 		
 		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
-		public TypeAdapter( Type referenceType ) : this( referenceType, referenceType.GetTypeInfo() ) {}
+		public TypeAdapter( Type referencedType ) : this( referencedType, referencedType.GetTypeInfo() ) {}
 
-		public TypeAdapter( Type referenceType, TypeInfo info )
+		public TypeAdapter( Type referencedType, TypeInfo info )
 		{
-			ReferenceType = referenceType;
+			ReferencedType = referencedType;
 			Info = info;
 			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Get ).Get;
-			GenericFactoryMethods = new GenericStaticMethodFactories( ReferenceType );
-			GenericCommandMethods = new GenericStaticMethodCommands( ReferenceType );
+			GenericFactoryMethods = new GenericStaticMethodFactories( ReferencedType );
+			GenericCommandMethods = new GenericStaticMethodCommands( ReferencedType );
 			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).Get;
 		}
 
-		public Type ReferenceType { get; }
+		public Type ReferencedType { get; }
 
 		public TypeInfo Info { get; }
 
@@ -46,7 +51,7 @@ namespace DragonSpark.TypeSystem
 				.SingleOrDefault();
 
 		public bool IsAssignableFrom( Type other ) => isAssignableFrom( other );
-		bool IsAssignableFromBody( Type parameter ) => Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( ReferenceType ) || Info.IsAssignableFrom( parameter.GetTypeInfo() ) || Nullable.GetUnderlyingType( parameter ) == ReferenceType;
+		bool IsAssignableFromBody( Type parameter ) => Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( ReferencedType ) || Info.IsAssignableFrom( parameter.GetTypeInfo() ) || Nullable.GetUnderlyingType( parameter ) == ReferencedType;
 		class IsInstanceOfTypeOrDefinitionCache : StructuralCache<Type, bool>
 		{
 			public IsInstanceOfTypeOrDefinitionCache( TypeAdapter owner ) : base( owner.IsAssignableFromBody ) {}
@@ -58,7 +63,7 @@ namespace DragonSpark.TypeSystem
 
 		public IEnumerable<Type> GetHierarchy( bool includeRoot = false )
 		{
-			yield return ReferenceType;
+			yield return ReferencedType;
 			var current = Info.BaseType;
 			while ( current != null )
 			{
@@ -94,7 +99,7 @@ namespace DragonSpark.TypeSystem
 		[Freeze]
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true )
 		{
-			var result = ReferenceType.Append( includeInterfaces ? Expand( ReferenceType ) : Items<Type>.Default )
+			var result = ReferencedType.Append( includeInterfaces ? Expand( ReferencedType ) : Items<Type>.Default )
 							 .Distinct()
 							 .Introduce( genericDefinition, tuple =>
 															{
@@ -117,7 +122,7 @@ namespace DragonSpark.TypeSystem
 		public bool IsGenericOf( Type genericDefinition, bool includeInterfaces ) => GetImplementations( genericDefinition, includeInterfaces ).Any();
 
 		[Freeze]
-		public Type[] GetAllInterfaces() => Expand( ReferenceType ).ToArray();
+		public Type[] GetAllInterfaces() => Expand( ReferencedType ).ToArray();
 
 		static IEnumerable<Type> ExpandInterfaces( Type target ) => target.Append( target.GetTypeInfo().ImplementedInterfaces.SelectMany( Expand ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();
 	}

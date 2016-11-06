@@ -6,11 +6,11 @@ namespace DragonSpark.Aspects
 {
 	public class TypeDefinition : ItemSource<IMethodStore>, ITypeDefinition
 	{
-		public TypeDefinition( Type declaringType, params IMethodStore[] methods ) : base( methods )
+		public TypeDefinition( Type referencedType, params IMethodStore[] methods ) : base( methods )
 		{
-			DeclaringType = declaringType;
+			ReferencedType = referencedType;
 		}
 
-		public Type DeclaringType { get; }
+		public Type ReferencedType { get; }
 	}
 }

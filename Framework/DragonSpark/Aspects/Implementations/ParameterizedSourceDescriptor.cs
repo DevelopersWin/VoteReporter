@@ -3,6 +3,6 @@
 	public sealed class ParameterizedSourceDescriptor : Descriptor<GeneralizedParameterizedSourceAspect>
 	{
 		public static ParameterizedSourceDescriptor Default { get; } = new ParameterizedSourceDescriptor();
-		ParameterizedSourceDescriptor() : base( ParameterizedSourceTypeDefinition.Default.DeclaringType, GeneralizedParameterizedSourceTypeDefinition.Default.DeclaringType ) {}
+		ParameterizedSourceDescriptor() : base( ParameterizedSourceTypeDefinition.Default.ReferencedType, GeneralizedParameterizedSourceTypeDefinition.Default.ReferencedType ) {}
 	}
 }

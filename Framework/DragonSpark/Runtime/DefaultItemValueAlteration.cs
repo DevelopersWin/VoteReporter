@@ -1,17 +1,16 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace DragonSpark.Runtime
 {
-	/*public sealed class EnumerableResultAlteration<T> : AlterationBase<IEnumerable<T>>
+	public sealed class DefaultItemValueAlteration<T> : DelegatedAlteration<IEnumerable<T>>
 	{
-		public static EnumerableResultAlteration<T> Default { get; } = new EnumerableResultAlteration<T>();
-		EnumerableResultAlteration() {}
-
-		public override IEnumerable<T> Get( [Optional]IEnumerable<T> parameter ) => parameter ?? Items<T>.Default;
-	}*/
+		public static DefaultItemValueAlteration<T> Default { get; } = new DefaultItemValueAlteration<T>();
+		DefaultItemValueAlteration() : base( DefaultValueAlteration<IEnumerable<T>>.Default.Get ) {}
+	}
 
 	public sealed class DefaultValueAlteration<T> : AlterationBase<T> where T : class
 	{
@@ -21,7 +20,7 @@ namespace DragonSpark.Runtime
 		readonly T defaultValue;
 
 		[UsedImplicitly]
-		public DefaultValueAlteration( T defaultValue )
+		public DefaultValueAlteration( [Optional]T defaultValue )
 		{
 			this.defaultValue = defaultValue;
 		}

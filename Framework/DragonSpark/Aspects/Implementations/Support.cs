@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System;
@@ -17,7 +18,7 @@ namespace DragonSpark.Aspects.Implementations
 		readonly ImmutableArray<IDescriptor> descriptors;
 
 		[UsedImplicitly]
-		public Support( params IDescriptor[] descriptors ) : base( SpecificationFactory.Default.Get( descriptors ) )
+		public Support( params IDescriptor[] descriptors ) : base( SpecificationFactory.Default.Get( descriptors.SelectTypes() ) )
 		{
 			this.descriptors = descriptors.ToImmutableArray();
 		}

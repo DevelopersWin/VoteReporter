@@ -6,7 +6,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static SourceDescriptor Default { get; } = new SourceDescriptor();
 		SourceDescriptor() : base( 
-			GeneralizedParameterizedSourceTypeDefinition.Default.DeclaringType, ParameterizedSourceTypeDefinition.Default.DeclaringType, 
+			GeneralizedParameterizedSourceTypeDefinition.Default.ReferencedType, ParameterizedSourceTypeDefinition.Default.ReferencedType, 
 			typeof(ParameterizedSourceRelay<,>), typeof(IParameterizedSourceRelay),
 			new MethodBasedAspectInstanceLocator<ParameterizedSourceMethodAspect>( GeneralizedParameterizedSourceTypeDefinition.Default.Method )
 		) {}

@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace DragonSpark.Aspects.Build
 {
-	sealed class SpecificationFactory : IParameterizedSource<IEnumerable<ITypeAware>, Func<Type, bool>>
+	sealed class SpecificationFactory : IParameterizedSource<IEnumerable<Type>, Func<Type, bool>>
 	{
 		public static SpecificationFactory Default { get; } = new SpecificationFactory();
 		SpecificationFactory() {}
 
-		public Func<Type, bool> Get( IEnumerable<ITypeAware> parameter ) => 
-			new Specification( parameter.Select( definition => definition.DeclaringType ).Distinct().ToArray() ).ToSpecificationDelegate();
+		public Func<Type, bool> Get( IEnumerable<Type> parameter ) => 
+			new Specification( parameter.Distinct().ToArray() ).ToSpecificationDelegate();
 	}
 }

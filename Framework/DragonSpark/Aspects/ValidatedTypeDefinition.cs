@@ -5,11 +5,11 @@ namespace DragonSpark.Aspects
 {
 	public class ValidatedTypeDefinition : TypeDefinition, IValidatedTypeDefinition
 	{
-		public ValidatedTypeDefinition( Type declaringType, string execution ) : this( new MethodStore( declaringType, execution ) ) {}
-		public ValidatedTypeDefinition( IMethodStore execution ) : this( execution.DeclaringType, execution ) {}
-		public ValidatedTypeDefinition( Type declaringType, IMethodStore execution ) : this( declaringType, GenericSpecificationTypeDefinition.Default.Method, execution ) {}
-		public ValidatedTypeDefinition( Type declaringType, string validation, string execution ) : this( declaringType, new MethodStore( declaringType, validation ), new MethodStore( declaringType, execution ) ) {}
-		public ValidatedTypeDefinition( Type declaringType, IMethodStore validation, IMethodStore execution ) : base( declaringType, validation, execution )
+		public ValidatedTypeDefinition( Type referencedType, string execution ) : this( new MethodStore( referencedType, execution ) ) {}
+		public ValidatedTypeDefinition( IMethodStore execution ) : this( execution.ReferencedType, execution ) {}
+		public ValidatedTypeDefinition( Type referencedType, IMethodStore execution ) : this( referencedType, GenericSpecificationTypeDefinition.Default.Method, execution ) {}
+		public ValidatedTypeDefinition( Type referencedType, string validation, string execution ) : this( referencedType, new MethodStore( referencedType, validation ), new MethodStore( referencedType, execution ) ) {}
+		public ValidatedTypeDefinition( Type referencedType, IMethodStore validation, IMethodStore execution ) : base( referencedType, validation, execution )
 		{
 			Validation = validation;
 			Execution = execution;
