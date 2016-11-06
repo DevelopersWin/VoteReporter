@@ -1,4 +1,4 @@
-﻿namespace DragonSpark.Sources.Coercion
+﻿namespace DragonSpark.Aspects.Coercion
 {
 	public interface ICoercer
 	{

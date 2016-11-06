@@ -7,6 +7,4 @@ namespace DragonSpark.Aspects.Specifications
 		public static Support Default { get; } = new Support();
 		Support() : base( GenericSpecificationTypeDefinition.Default ) {}
 	}
-
-
 }

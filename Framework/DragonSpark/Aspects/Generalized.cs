@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 
-namespace DragonSpark.Aspects
+namespace DragonSpark.Aspects // TODO: Delete
 {
 	public abstract class GeneralizedParameterizedSourceBase<TParameter, TResult> : SourceBase<TParameter, TResult>, ISpecification<TParameter>
 	{

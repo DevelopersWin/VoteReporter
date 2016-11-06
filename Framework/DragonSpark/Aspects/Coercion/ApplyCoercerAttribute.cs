@@ -1,5 +1,4 @@
-﻿using DragonSpark.Sources.Coercion;
-using PostSharp.Aspects;
+﻿using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
 using System;

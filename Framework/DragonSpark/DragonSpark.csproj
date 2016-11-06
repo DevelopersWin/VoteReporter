@@ -68,10 +68,10 @@
     <Compile Include="Aspects\Coercion\ApplyCoercerAttribute.cs" />
     <Compile Include="Aspects\Coercion\Aspect.cs" />
     <Compile Include="Expressions\Extensions.cs" />
-    <Compile Include="Sources\Coercion\CoercerAdapter.cs" />
+    <Compile Include="Aspects\Coercion\CoercerAdapter.cs" />
     <Compile Include="Aspects\Coercion\Source.cs" />
     <Compile Include="Aspects\Coercion\Constructor.cs" />
-    <Compile Include="Sources\Coercion\ICoercer.cs" />
+    <Compile Include="Aspects\Coercion\ICoercer.cs" />
     <Compile Include="Aspects\Coercion\Support.cs" />
     <Compile Include="Aspects\CommandInvocationBase.cs" />
     <Compile Include="Aspects\CommandTypeDefinition.cs" />
@@ -695,7 +695,6 @@
     <Compile Include="TypeSystem\Metadata\PropertyInfoAttributeProvider.cs" />
     <Compile Include="TypeSystem\PublicPartsLocator.cs" />
     <Compile Include="TypeSystem\Metadata\ReflectionElementAttributeProvider.cs" />
-    <Compile Include="TypeSystem\DefaultValueAlteration.cs" />
     <Compile Include="TypeSystem\Generics\StaticActionContext.cs" />
     <Compile Include="TypeSystem\Generics\StaticFactoryContext.cs" />
     <Compile Include="TypeSystem\TypeAdapter.cs" />

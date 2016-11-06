@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using DragonSpark.Activation.Location;
 using DragonSpark.Aspects.Alteration;
 using DragonSpark.Aspects.Specifications;
@@ -8,10 +6,12 @@ using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using Ploeh.AutoFixture.Kernel;
+using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Testing.Framework.Application.Setup
 {
-	[ApplyAutoValidation, ApplySpecification( typeof(ContainsSingletonPropertySpecification) ), ApplyResultAlteration( typeof(EnumerableResultAlteration<IMethod>) )]
+	[ApplyAutoValidation, ApplySpecification( typeof(ContainsSingletonPropertySpecification) ), ApplyResultAlteration( typeof(DefaultValueAlteration<IEnumerable<IMethod>>) )]
 	public sealed class SingletonQuery : ParameterizedSourceBase<Type, IEnumerable<IMethod>>, IMethodQuery, ISpecification<Type>
 	{
 		public static SingletonQuery Default { get; } = new SingletonQuery();
@@ -24,6 +24,6 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 
 		IEnumerable<IMethod> IMethodQuery.SelectMethods( Type type ) => Get( type );
 
-		bool ISpecification<Type>.IsSatisfiedBy( Type parameter ) => false;
+		bool ISpecification<Type>.IsSatisfiedBy( Type parameter ) => false; // TODO: Undo/replace.
 	}
 }

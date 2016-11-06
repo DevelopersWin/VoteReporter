@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Extensions;
+using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Reflection;
 using System;
@@ -12,11 +13,12 @@ namespace DragonSpark.Aspects
 	{
 		readonly ImmutableArray<ObjectConstruction> constructions;
 
-		public ApplyAspectsAttribute( Type coercerType, Type specificationType ) : this( new ConstructionsSource( coercerType, specificationType ).Get() ) {}
-		public ApplyAspectsAttribute( params ObjectConstruction[] aspects ) : this( aspects.ToImmutableArray() ) {}
-		public ApplyAspectsAttribute( ImmutableArray<ObjectConstruction> constructions )
+		public ApplyAspectsAttribute( Type coercerType, Type specificationType ) : this( new ConstructionsSource( coercerType, specificationType ).Fixed() ) {}
+
+		[UsedImplicitly]
+		protected ApplyAspectsAttribute( params ObjectConstruction[] constructions )
 		{
-			this.constructions = constructions;
+			this.constructions = constructions.ToImmutableArray();
 		}
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => 
