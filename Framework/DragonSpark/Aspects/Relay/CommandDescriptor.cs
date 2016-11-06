@@ -2,12 +2,14 @@
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class CommandDescriptor : Descriptor<CommandRelayAspect>
+	public sealed class CommandDescriptor : SupportedMethodsDefinition<ApplyCommandRelay>
 	{
 		public static CommandDescriptor Default { get; } = new CommandDescriptor();
-		CommandDescriptor() : base( CommandTypeDefinition.Default, GenericCommandTypeDefinition.Default, typeof(CommandRelay<>), typeof(ICommandRelay),
-									new MethodBasedAspectInstanceLocator<SpecificationMethodAspect>( CommandTypeDefinition.Default.Validation ),
-									new MethodBasedAspectInstanceLocator<CommandMethodAspect>( CommandTypeDefinition.Default.Execution )
+		CommandDescriptor() : base( 
+			CommandTypeDefinition.Default.DeclaringType, GenericCommandTypeDefinition.Default.DeclaringType, 
+			typeof(CommandRelay<>), typeof(ICommandRelay),
+			new MethodBasedAspectInstanceLocator<Specification>( CommandTypeDefinition.Default.Validation ),
+			new MethodBasedAspectInstanceLocator<Command>( CommandTypeDefinition.Default.Execution )
 		) {}
 	}
 }

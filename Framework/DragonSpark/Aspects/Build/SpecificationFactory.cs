@@ -11,6 +11,7 @@ namespace DragonSpark.Aspects.Build
 		public static SpecificationFactory Default { get; } = new SpecificationFactory();
 		SpecificationFactory() {}
 
-		public Func<Type, bool> Get( IEnumerable<ITypeAware> parameter ) => new Specification( parameter.Select( definition => definition.DeclaringType ).Distinct().ToArray() ).ToSpecificationDelegate();
+		public Func<Type, bool> Get( IEnumerable<ITypeAware> parameter ) => 
+			new Specification( parameter.Select( definition => definition.DeclaringType ).Distinct().ToArray() ).ToSpecificationDelegate();
 	}
 }

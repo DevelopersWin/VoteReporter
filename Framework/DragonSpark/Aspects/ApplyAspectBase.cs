@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
 using DragonSpark.Aspects.Build;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
+using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Aspects
 {
@@ -21,7 +21,7 @@ namespace DragonSpark.Aspects
 			this.source = source;
 		}
 
-		public override bool CompileTimeValidate( Type type ) => specification( type );
+		public override bool CompileTimeValidate( Type type ) => false; // specification( type );
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => source( (Type)targetElement );
 	}

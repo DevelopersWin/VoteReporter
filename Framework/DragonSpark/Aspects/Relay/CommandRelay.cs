@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Commands;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.Aspects.Relay
 {
@@ -11,6 +12,6 @@ namespace DragonSpark.Aspects.Relay
 			this.command = command;
 		}
 
-		public void Execute( object parameter ) => command.Execute( (T)parameter );
+		public void Execute( object parameter ) => command.Execute( parameter.AsValid<T>() );
 	}
 }

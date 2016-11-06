@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Diagnostics
 {
-	public sealed class LoggerAlterations : ItemsScope<IAlteration<LoggerConfiguration>>
+	public sealed class LoggerAlterations : ItemScope<IAlteration<LoggerConfiguration>>
 	{
 		public static LoggerAlterations Default { get; } = new LoggerAlterations();
 		LoggerAlterations() : base( new SingletonScope<IEnumerable<IAlteration<LoggerConfiguration>>>( DefaultLoggerAlterations.Default.IncludeExports ) ) {}

@@ -13,7 +13,7 @@ namespace DragonSpark.Aspects
 {
 	sealed class ConstructionsSource : ItemSource<ObjectConstruction>
 	{
-		readonly static ObjectConstruction Relay = ObjectConstructionFactory<ApplyRelayAttribute>.Default.Get();
+		readonly static ObjectConstruction Relay = ObjectConstructionFactory<ApplyRelaysAttribute>.Default.Get();
 		readonly static ObjectConstruction Auto = ObjectConstructionFactory<ApplyAutoValidationAttribute>.Default.Get();
 		readonly static ObjectConstructionFactory<ApplyCoercerAttribute> Coercer = ObjectConstructionFactory<ApplyCoercerAttribute>.Default;
 		readonly static ObjectConstructionFactory<ApplySpecificationAttribute> Specification = ObjectConstructionFactory<ApplySpecificationAttribute>.Default;

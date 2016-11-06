@@ -1,4 +1,5 @@
-﻿using PostSharp.Aspects;
+﻿using JetBrains.Annotations;
+using PostSharp.Aspects;
 using System;
 using System.Reflection;
 
@@ -13,6 +14,7 @@ namespace DragonSpark.Aspects.Build
 
 		public MethodBasedAspectInstanceLocator( IMethodStore store ) : this( store.Get, Factory ) {}
 
+		[UsedImplicitly]
 		public MethodBasedAspectInstanceLocator( Func<Type, MethodInfo> methodSource, Func<MethodInfo, AspectInstance> inner )
 		{
 			this.methodSource = methodSource;

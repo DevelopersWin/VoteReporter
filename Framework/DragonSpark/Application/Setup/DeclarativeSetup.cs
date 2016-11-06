@@ -2,7 +2,6 @@
 using DragonSpark.Commands;
 using DragonSpark.Runtime;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
@@ -13,8 +12,6 @@ namespace DragonSpark.Application.Setup
 	[ApplyAutoValidation]
 	public class DeclarativeSetup : CompositeCommand, ISetup
 	{
-		public static ISetup Current() => AmbientStack.GetCurrentItem<ISetup>();
-
 		readonly ISpecification<object> specification;
 
 		public DeclarativeSetup() : this( Priority.Normal ) {}

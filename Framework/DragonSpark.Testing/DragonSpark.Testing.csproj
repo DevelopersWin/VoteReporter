@@ -62,7 +62,7 @@
     <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyAttributeTests.cs" />
     <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsAttributeTests.cs" />
     <Compile Include="Aspects\ApplyAspectsAttributeTests.cs" />
-    <Compile Include="Aspects\Relay\ApplyRelayAttributeTests.cs" />
+    <Compile Include="Aspects\Relay\ApplyRelaysAttributeTests.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationAttributeTests.cs" />
     <Compile Include="Composition\SingletonExportFactoryTests.cs" />
     <Compile Include="Runtime\Assignments\AssignScopeCommandTests.cs" />

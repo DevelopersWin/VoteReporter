@@ -11,7 +11,7 @@ namespace DragonSpark.Aspects // TODO: Delete
 
 	public abstract class SourceBase<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>, IParameterizedSource<object, object>, ISpecification<object>
 	{
-		[Relay.SpecificationMethodAspect, Coercion.Aspect]
+		[Relay.Specification, Coercion.Aspect]
 		bool ISpecification<object>.IsSatisfiedBy( object parameter ) => false;
 
 		[Relay.ParameterizedSourceMethodAspect, Coercion.Aspect]
@@ -20,7 +20,7 @@ namespace DragonSpark.Aspects // TODO: Delete
 
 	public abstract class GeneralizedSpecificationBase<T> : SpecificationBase<T>, ISpecification<object>
 	{
-		[Relay.SpecificationMethodAspect, Coercion.Aspect]
+		[Relay.Specification, Coercion.Aspect]
 		bool ISpecification<object>.IsSatisfiedBy( object parameter ) => false;
 	}
 }

@@ -1,5 +1,3 @@
-using DragonSpark.Sources.Coercion;
-using DragonSpark.Sources.Parameterized;
 using System;
 
 namespace DragonSpark.Commands
@@ -8,9 +6,7 @@ namespace DragonSpark.Commands
 	{
 		readonly Action<T> command;
 
-		public DelegatedCommand( Action<T> command )  : this( command, Coercer<T>.Default ) {}
-
-		public DelegatedCommand( Action<T> command, IParameterizedSource<T> coercer )  : base( coercer )
+		public DelegatedCommand( Action<T> command )
 		{
 			this.command = command;
 		}

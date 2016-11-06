@@ -16,9 +16,9 @@ namespace DragonSpark.Sources.Scopes
 		public override void Assign( Func<object, T> item ) => base.Assign( Caches.Create( item ).Get );
 	}
 
-	public class ItemsScope<T> : DecoratedItemsSource<T>
+	public class ItemScope<T> : DecoratedItemSource<T>
 	{
-		public ItemsScope( IScope<IEnumerable<T>> scope ) : base( scope )
+		public ItemScope( IScope<IEnumerable<T>> scope ) : base( scope )
 		{
 			Scope = scope;
 		}

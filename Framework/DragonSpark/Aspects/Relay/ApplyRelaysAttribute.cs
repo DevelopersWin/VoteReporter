@@ -7,8 +7,8 @@ namespace DragonSpark.Aspects.Relay
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ),
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.ValueConversion )
 		]
-	public sealed class ApplyRelayAttribute : ApplyAspectBase
+	public sealed class ApplyRelaysAttribute : ApplyAspectBase
 	{
-		public ApplyRelayAttribute() : base( Support.Default ) {}
+		public ApplyRelaysAttribute() : base( Relays.Default ) {}
 	}
 }

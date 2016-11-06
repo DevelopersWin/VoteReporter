@@ -1,4 +1,5 @@
-﻿using DragonSpark.Specifications;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Relay
 {
@@ -10,6 +11,6 @@ namespace DragonSpark.Aspects.Relay
 			this.specification = specification;
 		}
 
-		public bool IsSatisfiedBy( object parameter ) => parameter is T && specification.IsSatisfiedBy( (T)parameter );
+		public bool IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter.AsValid<T>() );
 	}
 }

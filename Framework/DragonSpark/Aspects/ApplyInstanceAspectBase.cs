@@ -21,7 +21,7 @@ namespace DragonSpark.Aspects
 			this.source = source;
 		}
 
-		public override bool CompileTimeValidate( Type type ) => specification( type );
+		public override bool CompileTimeValidate( Type type ) => false;// specification( type );
 
 		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => source( (Type)targetElement );
 	}

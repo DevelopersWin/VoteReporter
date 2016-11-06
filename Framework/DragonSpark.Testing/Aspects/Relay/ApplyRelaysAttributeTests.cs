@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Relay
 {
-	public class ApplyRelayAttributeTests
+	public class ApplyRelaysAttributeTests
 	{
 		[Fact]
 		public void Verify()
@@ -63,7 +63,7 @@ namespace DragonSpark.Testing.Aspects.Relay
 			}
 		}
 
-		[ApplyRelay]
+		[ApplyRelays]
 		class ParameterizedSource : GeneralizedParameterizedSourceBase<string, bool>
 		{
 			public const string HelloWorld = "Hello World!";
@@ -88,7 +88,7 @@ namespace DragonSpark.Testing.Aspects.Relay
 			}
 		}
 
-		[ApplyRelay]
+		[ApplyRelays]
 		sealed class Specification : GeneralizedSpecificationBase<int>
 		{
 			public int IsSatisfiedByCalled { get; private set; }
@@ -100,7 +100,7 @@ namespace DragonSpark.Testing.Aspects.Relay
 			}
 		}
 
-		[ApplyRelay]
+		[ApplyRelays]
 		sealed class Command : DragonSpark.Commands.ICommand<int>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
