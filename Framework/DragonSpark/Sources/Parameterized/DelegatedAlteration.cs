@@ -1,4 +1,6 @@
-﻿namespace DragonSpark.Sources.Parameterized
+﻿using System.Runtime.InteropServices;
+
+namespace DragonSpark.Sources.Parameterized
 {
 	public class DelegatedAlteration<T> : AlterationBase<T>
 	{
@@ -9,6 +11,6 @@
 			this.source = source;
 		}
 
-		public override T Get( T parameter ) => source( parameter );
+		public override T Get( [Optional]T parameter ) => source( parameter );
 	}
 }
