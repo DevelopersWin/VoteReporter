@@ -1,16 +1,9 @@
 ﻿namespace DragonSpark.Aspects.Relay
 {
-	public abstract class SpecificationRelayAspectBase : ApplyRelayAspectBase, ISpecificationRelay
+	public abstract class SpecificationRelayAspectBase : RelayAspectBase
 	{
-		readonly ISpecificationRelay relay;
+		protected SpecificationRelayAspectBase( IRelayMethodDefinition definition ) : base( definition ) {}
 
-		protected SpecificationRelayAspectBase( ISupportDefinition definition ) : base( definition ) {}
-
-		protected SpecificationRelayAspectBase( ISpecificationRelay relay, ISupportDefinition definition ) : base( definition )
-		{
-			this.relay = relay;
-		}
-
-		public bool IsSatisfiedBy( object parameter ) => relay.IsSatisfiedBy( parameter );
+		protected SpecificationRelayAspectBase( ISpecificationRelay relay ) : base( relay ) {}
 	}
 }

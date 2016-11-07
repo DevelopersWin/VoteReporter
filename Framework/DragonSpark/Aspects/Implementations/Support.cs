@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace DragonSpark.Aspects.Implementations
 {
-	sealed class Support : DelegatedSpecification<Type>, ISupportDefinition
+	sealed class Support : DelegatedSpecification<Type>, IDefinition
 	{
 		public static Support Default { get; } = new Support();
 		Support() : this( Descriptors.Default.ToArray() ) {}

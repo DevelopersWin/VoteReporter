@@ -1,20 +1,21 @@
 ﻿using DragonSpark.Commands;
-using System;
+using JetBrains.Annotations;
 
 namespace DragonSpark.Application.Setup
 {
 	public sealed class RegisterInstanceCommand : CommandBase<object>
 	{
 		public static RegisterInstanceCommand Default { get; } = new RegisterInstanceCommand();
-		RegisterInstanceCommand() : this( Instances.Default.Get ) {}
+		RegisterInstanceCommand() : this( Instances.Default ) {}
 
-		readonly Func<IServiceRepository> repository;
+		readonly IServiceRepository repository;
 
-		public RegisterInstanceCommand( Func<IServiceRepository> repository )
+		[UsedImplicitly]
+		public RegisterInstanceCommand( IServiceRepository repository )
 		{
 			this.repository = repository;
 		}
 
-		public override void Execute( object parameter ) => repository().Add( parameter );
+		public override void Execute( object parameter ) => repository.Add( parameter );
 	}
 }

@@ -14,7 +14,7 @@ namespace DragonSpark.Aspects.Alteration
 
 		readonly Type alterationType;
 
-		protected ApplyAlterationBase( Type alterationType, SupportDefinitionBase source ) : base( source )
+		protected ApplyAlterationBase( Type alterationType, DefinitionBase source ) : base( source )
 		{
 			this.alterationType = alterationType;
 		}

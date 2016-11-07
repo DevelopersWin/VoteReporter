@@ -1,26 +1,28 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DragonSpark.Aspects
 {
-	public class AdapterConstructorSource<T> : ParameterizedSourceBase<Type, Func<object, T>>
+	public class GenericAdapterConstructorFactory<TParameter, TResult> : ParameterizedSourceBase<Type, Func<TParameter, TResult>>
 	{
-		readonly static Func<Type, Type, Func<object, T>> Factory = ParameterConstructor<object, T>.Make;
+		readonly static Func<Type, Type, Func<TParameter, TResult>> Factory = ParameterConstructor<TParameter, TResult>.Make;
 
 		readonly Type parameterType;
 		readonly Type implementedType;
 		readonly Type adapterType;
-		readonly Func<Type, Type, Func<object, T>> factory;
+		readonly Func<Type, Type, Func<TParameter, TResult>> factory;
 
-		public AdapterConstructorSource( Type implementedType, Type adapterType ) : this( implementedType, implementedType, adapterType ) {}
+		public GenericAdapterConstructorFactory( Type implementedType, Type adapterType ) : this( implementedType, implementedType, adapterType ) {}
 
-		public AdapterConstructorSource( Type parameterType, Type implementedType, Type adapterType ) : this( parameterType, implementedType, adapterType, Factory ) {}
+		public GenericAdapterConstructorFactory( Type parameterType, Type implementedType, Type adapterType ) : this( parameterType, implementedType, adapterType, Factory ) {}
 
-		protected AdapterConstructorSource( Type parameterType, Type implementedType, Type adapterType, Func<Type, Type, Func<object, T>> factory )
+		[UsedImplicitly]
+		protected GenericAdapterConstructorFactory( Type parameterType, Type implementedType, Type adapterType, Func<Type, Type, Func<TParameter, TResult>> factory )
 		{
 			this.parameterType = parameterType;
 			this.implementedType = implementedType;
@@ -28,7 +30,7 @@ namespace DragonSpark.Aspects
 			this.factory = factory;
 		}
 
-		public override Func<object, T> Get( Type parameter )
+		public override Func<TParameter, TResult> Get( Type parameter )
 		{
 			var adapter = parameter.Adapt();
 			var instanceParameterType = adapter.GetImplementations( parameterType ).OrderByDescending( type => type, Comparer.Default ).First();

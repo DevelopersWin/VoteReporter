@@ -1,11 +1,13 @@
-﻿using DragonSpark.Sources.Parameterized;
-using PostSharp.Aspects.Advices;
+﻿using DragonSpark.Aspects.Relay;
+using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Aspects.Implementations
 {
-	[IntroduceInterface( typeof(IParameterizedSource<object, object>) )]
-	public sealed class GeneralizedParameterizedSourceAspect : GeneralizedAspectBase, IParameterizedSource<object, object>
+	public sealed class GeneralizedParameterizedSourceAspect : GeneralizedAspectBase
 	{
-		public object Get( object parameter ) => null;
+		readonly static AspectFactory<IRelay, GeneralizedParameterizedSourceAspect> Factory = 
+			new AspectFactory<IRelay, GeneralizedParameterizedSourceAspect>( typeof(IParameterizedSource<,>), typeof(ParameterizedSourceRelayAdapter<,>) );
+
+		public GeneralizedParameterizedSourceAspect() : base( Factory.Get ) {}
 	}
 }

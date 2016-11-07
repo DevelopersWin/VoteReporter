@@ -8,5 +8,5 @@ namespace DragonSpark.Aspects.Validation
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, KnownRoles.ParameterValidation )
 		]
-	public abstract class AutoValidationAspectBase : AspectBase {}
+	public abstract class AutoValidationAspectBase : MethodInterceptionAspectBase {}
 }

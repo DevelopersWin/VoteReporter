@@ -5,12 +5,12 @@ using System.Collections.Immutable;
 
 namespace DragonSpark.Aspects.Build
 {
-	public abstract class SupportDefinitionBase : ISupportDefinition
+	public abstract class DefinitionBase : IDefinition
 	{
 		readonly Func<Type, bool> specification;
 		readonly ImmutableArray<IAspectInstanceLocator> locators;
 
-		protected SupportDefinitionBase( Func<Type, bool> specification, params IAspectInstanceLocator[] locators )
+		protected DefinitionBase( Func<Type, bool> specification, params IAspectInstanceLocator[] locators )
 		{
 			this.specification = specification;
 			this.locators = locators.ToImmutableArray();

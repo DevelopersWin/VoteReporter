@@ -2,7 +2,7 @@
 
 namespace DragonSpark.Aspects.Validation
 {
-	sealed class GenericCommandAdapterFactory : AdapterFactorySource<IParameterValidationAdapter>
+	sealed class GenericCommandAdapterFactory : AdapterFactory<object, IParameterValidationAdapter>
 	{
 		public static GenericCommandAdapterFactory Default { get; } = new GenericCommandAdapterFactory();
 		GenericCommandAdapterFactory() : base( typeof(ICommand<>), typeof(CommandAdapter<>) ) {}

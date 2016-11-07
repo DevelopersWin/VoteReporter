@@ -4,7 +4,7 @@ using PostSharp.Aspects.Dependencies;
 
 namespace DragonSpark.Aspects.Alteration
 {
-	public sealed class Aspect : AspectBase
+	public sealed class Aspect : AlterationAspectBase
 	{
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
@@ -19,9 +19,9 @@ namespace DragonSpark.Aspects.Alteration
 	}
 
 	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), UsedImplicitly]
-	public abstract class AspectBase : Aspects.AspectBase { }
+	public abstract class AlterationAspectBase : MethodInterceptionAspectBase { }
 
-	public sealed class ResultAspect : AspectBase
+	public sealed class ResultAspect : AlterationAspectBase
 	{
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{

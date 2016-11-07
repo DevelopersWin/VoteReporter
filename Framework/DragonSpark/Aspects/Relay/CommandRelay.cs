@@ -1,17 +1,11 @@
-﻿using DragonSpark.Commands;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Sources.Coercion;
+using JetBrains.Annotations;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class CommandRelay<T> : SpecificationRelay<T>, ICommandRelay
+	[UsedImplicitly]
+	public sealed class CommandRelay : MethodAspectBase
 	{
-		readonly ICommand<T> command;
-
-		public CommandRelay( ICommand<T> command ) : base( command )
-		{
-			this.command = command;
-		}
-
-		public void Execute( object parameter ) => command.Execute( parameter.AsValid<T>() );
+		public CommandRelay() : base( CastCoercer<ICommandRelay>.Default.Get ) {}
 	}
 }

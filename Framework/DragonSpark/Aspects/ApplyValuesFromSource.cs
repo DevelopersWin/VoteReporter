@@ -1,6 +1,7 @@
-﻿using DragonSpark.Activation.Location;
-using DragonSpark.Application.Setup;
+﻿using DragonSpark.Application.Setup;
+using DragonSpark.Commands;
 using DragonSpark.Extensions;
+using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Configuration;
@@ -12,24 +13,39 @@ namespace DragonSpark.Aspects
 	[AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	public sealed class ApplyValuesFromSource : InstanceLevelAspect
 	{
-		readonly Func<IServiceRepository> repositorySource;
+		readonly Action<object> apply;
 
-		public ApplyValuesFromSource() : this( GlobalServiceProvider.Default.Get<IServiceRepository> ) {}
+		public ApplyValuesFromSource() : this( ApplyValuesFromSourceCommand.Default.Execute ) {}
 
-		public ApplyValuesFromSource( Func<IServiceRepository> repositorySource )
+		public ApplyValuesFromSource( Action<object> apply )
 		{
-			this.repositorySource = repositorySource;
+			this.apply = apply;
 		}
 
-		[OnInstanceConstructedAdvice]
-		public void OnInstanceConstructed()
+		[OnInstanceConstructedAdvice, UsedImplicitly]
+		public void OnInstanceConstructed() => apply( Instance );
+	}
+
+	public class ApplyValuesFromSourceCommand : CommandBase<object>
+	{
+		public static ApplyValuesFromSourceCommand Default { get; } = new ApplyValuesFromSourceCommand();
+		ApplyValuesFromSourceCommand() : this( Instances.Default ) {}
+
+		readonly IServiceRepository repository;
+
+		[UsedImplicitly]
+		public ApplyValuesFromSourceCommand( IServiceRepository repository )
 		{
-			var serviceType = Instance.GetType();
-			var repository = repositorySource();
-			if ( repository.IsSatisfiedBy( serviceType ) )
+			this.repository = repository;
+		}
+
+		public override void Execute( object parameter )
+		{
+			var type = parameter.GetType();
+			if ( repository.IsSatisfiedBy( type ) )
 			{
-				var source = repository.GetService( serviceType );
-				source.MapInto( Instance );
+				var source = repository.GetService( type );
+				source.MapInto( parameter );
 			}
 		}
 	}

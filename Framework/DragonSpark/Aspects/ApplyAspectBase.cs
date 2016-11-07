@@ -13,7 +13,7 @@ namespace DragonSpark.Aspects
 		readonly Func<Type, bool> specification;
 		readonly Func<Type, IEnumerable<AspectInstance>> source;
 
-		protected ApplyAspectBase( ISupportDefinition definition ) : this( definition.IsSatisfiedBy, definition.Get ) {}
+		protected ApplyAspectBase( IDefinition definition ) : this( definition.IsSatisfiedBy, definition.Get ) {}
 
 		protected ApplyAspectBase( Func<Type, bool> specification, Func<Type, IEnumerable<AspectInstance>> source )
 		{

@@ -4,7 +4,7 @@ using PostSharp.Aspects.Dependencies;
 namespace DragonSpark.Aspects.Coercion
 {
 	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
-	public sealed class Aspect : AspectBase
+	public sealed class Aspect : MethodInterceptionAspectBase
 	{
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{

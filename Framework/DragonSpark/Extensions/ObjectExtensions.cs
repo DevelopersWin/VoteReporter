@@ -1,5 +1,6 @@
 ﻿using DragonSpark.ComponentModel;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using System;
@@ -85,7 +86,7 @@ namespace DragonSpark.Extensions
 			return result;
 		}
 
-		public static T As<T>( [Optional]this object target ) => target is T ? (T)target : default(T);
+		public static T As<T>( [Optional]this object target ) => CastCoercer<object, T>.Default.Get( target );
 
 		public static T As<T>( [Optional]this object target, Action<T> action )
 		{

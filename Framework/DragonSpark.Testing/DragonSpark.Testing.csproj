@@ -69,7 +69,7 @@
     <Compile Include="Runtime\DelegatedDisposableTests.cs" />
     <Compile Include="Runtime\ExtensionsTests.cs" />
     <Compile Include="Runtime\RepositoryBaseTests.cs" />
-    <Compile Include="Sources\Coercion\CastCoercerTests.cs" />
+    <Compile Include="Sources\Coercion\ValidatedCastCoercerTests.cs" />
     <Compile Include="Sources\Coercion\ExtensionsTests.cs" />
     <Compile Include="Sources\Coercion\StringCoercerTests.cs" />
     <Compile Include="Commands\ExtensionsTests.cs" />
