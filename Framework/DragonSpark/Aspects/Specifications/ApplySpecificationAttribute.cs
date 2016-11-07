@@ -1,24 +1,15 @@
-﻿using PostSharp.Aspects.Advices;
+﻿using JetBrains.Annotations;
+using PostSharp.Aspects.Advices;
 using System;
 
 namespace DragonSpark.Aspects.Specifications
 {
 	[IntroduceInterface( typeof(ISpecification) )]
-	public class ApplySpecificationAttribute : SpecificationAttributeBase
+	public sealed class ApplySpecificationAttribute : SpecificationAttributeBase
 	{
-		readonly static Func<Type, ISpecification> Source = Specifications.Source.Default.Get;
+		public ApplySpecificationAttribute( Type specificationType ) : base( Factory<ApplySpecificationAttribute>.Default.Get( specificationType ) ) {}
 
-		readonly Type specificationType;
-		readonly Func<Type, ISpecification> source;
-
-		public ApplySpecificationAttribute( Type specificationType ) : this( specificationType, Source ) {}
-
-		protected ApplySpecificationAttribute( Type specificationType, Func<Type, ISpecification> source )
-		{
-			this.specificationType = specificationType;
-			this.source = source;
-		}
-
-		protected override ISpecification DetermineSpecification() => source( specificationType );
+		[UsedImplicitly]
+		public ApplySpecificationAttribute( ISpecification specification ) : base( specification ) {}
 	}
 }

@@ -1,15 +1,19 @@
+using DragonSpark.Sources.Parameterized;
 using System;
 
 namespace DragonSpark.Aspects
 {
-	sealed class DelegatedInvocation<TParameter, TResult> : IInvocation
+	public class DelegatedInvocation<TParameter, TResult> : InvocationBase<TParameter, TResult>
 	{
 		readonly Func<TParameter, TResult> source;
+
+		public DelegatedInvocation( IParameterizedSource<TParameter, TResult> source ) : this( source.ToDelegate() ) {}
+
 		public DelegatedInvocation( Func<TParameter, TResult> source )
 		{
 			this.source = source;
 		}
 
-		public object Invoke( object parameter ) => source( (TParameter)parameter );
+		public override TResult Invoke( TParameter parameter ) => source( parameter );
 	}
 }

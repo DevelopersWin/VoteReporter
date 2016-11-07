@@ -49,14 +49,14 @@
     <Compile Include="Aspects\GenericAdapterConstructorFactory.cs" />
     <Compile Include="Aspects\AdapterFactory.cs" />
     <Compile Include="Aspects\AdapterLocatorBase.cs" />
-    <Compile Include="Aspects\ApplyAspectBase.cs" />
+    <Compile Include="Aspects\TypeBasedAspectBase.cs" />
     <Compile Include="Aspects\AspectProviderBase.cs" />
     <Compile Include="Aspects\AssignedAttribute.cs" />
-    <Compile Include="Aspects\Build\IDefinition.cs" />
+    <Compile Include="Aspects\Build\IAspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\ITypedPairs.cs" />
     <Compile Include="Aspects\Build\SpecificationFactory.cs" />
-    <Compile Include="Aspects\Build\Definition.cs" />
-    <Compile Include="Aspects\Build\DefinitionBase.cs" />
+    <Compile Include="Aspects\Build\AspectBuildDefinition.cs" />
+    <Compile Include="Aspects\Build\AspectBuildDefinitionBase.cs" />
     <Compile Include="Aspects\Build\TypeBasedAspectInstanceLocator.cs" />
     <Compile Include="Aspects\Build\TypedPairs.cs" />
     <Compile Include="Aspects\Alteration\ApplyAlterationAttribute.cs" />
@@ -69,7 +69,7 @@
     <Compile Include="Aspects\Coercion\ApplyCoercerAttribute.cs" />
     <Compile Include="Aspects\Coercion\Aspect.cs" />
     <Compile Include="Aspects\Relay\IRelayAspectSource.cs" />
-    <Compile Include="Aspects\Relay\IRelayMethodDefinition.cs" />
+    <Compile Include="Aspects\Relay\IRelayMethodAspectBuildDefinition.cs" />
     <Compile Include="Expressions\Extensions.cs" />
     <Compile Include="Aspects\Coercion\CoercerAdapter.cs" />
     <Compile Include="Aspects\Coercion\Source.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="Aspects\Relay\CommandRelay.cs" />
     <Compile Include="Aspects\Relay\CommandRelayAdapter.cs" />
     <Compile Include="Aspects\Relay\ApplyCommandRelay.cs" />
-    <Compile Include="Aspects\Relay\RelayMethodDefinition.cs" />
+    <Compile Include="Aspects\Relay\RelayMethodAspectBuildDefinition.cs" />
     <Compile Include="Aspects\Relay\Descriptors.cs" />
     <Compile Include="Aspects\Relay\ICommandRelay.cs" />
     <Compile Include="Aspects\Relay\IParameterizedSourceRelay.cs" />
@@ -150,7 +150,7 @@
     <Compile Include="Aspects\DelegatedInvocation.cs" />
     <Compile Include="Aspects\IInvocation.cs" />
     <Compile Include="Aspects\InvocationBase.cs" />
-    <Compile Include="Aspects\ApplyInstanceAspectBase.cs" />
+    <Compile Include="Aspects\InstanceBasedAspectBase.cs" />
     <Compile Include="Aspects\Validation\ParameterizedSourceTypeDefinition.cs" />
     <Compile Include="Aspects\Validation\SourceAdapter.cs" />
     <Compile Include="Aspects\Validation\ParameterizedSourceAdapterFactory.cs" />

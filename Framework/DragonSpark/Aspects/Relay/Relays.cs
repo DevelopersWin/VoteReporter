@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace DragonSpark.Aspects.Relay
 {
-	sealed class Relays : AspectProviderBase<Type>, Build.IDefinition
+	sealed class Relays : AspectProviderBase<Type>, Build.IAspectBuildDefinition
 	{
 		readonly ISpecification<Type> specification;
 		public static Relays Default { get; } = new Relays();

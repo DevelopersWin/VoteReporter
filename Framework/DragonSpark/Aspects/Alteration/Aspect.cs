@@ -4,7 +4,7 @@ using PostSharp.Aspects.Dependencies;
 
 namespace DragonSpark.Aspects.Alteration
 {
-	public sealed class Aspect : AlterationAspectBase
+	/*public sealed class Aspect : AlterationAspectBase
 	{
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
@@ -12,16 +12,14 @@ namespace DragonSpark.Aspects.Alteration
 			if ( alteration != null )
 			{
 				var arguments = args.Arguments;
-				arguments.SetArgument( 0, alteration.Alter( arguments.GetArgument( 0 ) ) );
+				arguments.SetArgument( 0, alteration.Invoke( arguments.GetArgument( 0 ) ) );
 			}
 			args.Proceed();
 		}
-	}
+	}*/
 
 	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation ), UsedImplicitly]
-	public abstract class AlterationAspectBase : MethodInterceptionAspectBase { }
-
-	public sealed class ResultAspect : AlterationAspectBase
+	public sealed class ResultAspect : MethodInterceptionAspectBase
 	{
 		public override void OnInvoke( MethodInterceptionArgs args )
 		{
@@ -30,7 +28,7 @@ namespace DragonSpark.Aspects.Alteration
 			var alteration = args.Instance as IAlteration;
 			if ( alteration != null )
 			{
-				args.ReturnValue = alteration.Alter( args.ReturnValue );
+				args.ReturnValue = alteration.Invoke( args.ReturnValue );
 			}
 		}
 	}

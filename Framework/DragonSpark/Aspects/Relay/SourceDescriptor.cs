@@ -2,7 +2,7 @@
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class SourceDescriptor : RelayMethodDefinition<IParameterizedSourceRelay, ApplyParameterizedSourceRelay>
+	public sealed class SourceDescriptor : RelayMethodAspectBuildDefinition<IParameterizedSourceRelay, ApplyParameterizedSourceRelay>
 	{
 		public static SourceDescriptor Default { get; } = new SourceDescriptor();
 		SourceDescriptor() : base( 

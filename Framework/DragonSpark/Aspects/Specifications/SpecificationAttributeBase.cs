@@ -1,16 +1,19 @@
 ﻿using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
+using System;
 
 namespace DragonSpark.Aspects.Specifications
 {
 	[ProvideAspectRole( KnownRoles.ParameterValidation ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )]
-	public abstract class SpecificationAttributeBase : ApplyInstanceAspectBase, ISpecification
+	public abstract class SpecificationAttributeBase : InvocationAspectBase, ISpecification
 	{
-		protected SpecificationAttributeBase() : base( Support.Default ) {}
+		protected SpecificationAttributeBase( Func<object, IAspect> factory ) : base( factory, Support.Default ) {}
+		protected SpecificationAttributeBase( ISpecification specification ) : base( specification ) {}
 
-		ISpecification Specification { get; set; }
-		public override void RuntimeInitializeInstance() => Specification = DetermineSpecification();
-		protected abstract ISpecification DetermineSpecification();
-		public bool IsSatisfiedBy( object parameter ) => Specification.IsSatisfiedBy( parameter );
+		protected sealed class Factory<T> : TypedAspectFactory<ISpecification, T> where T :  SpecificationAttributeBase
+		{
+			public static Factory<T> Default { get; } = new Factory<T>();
+			Factory() : base( Source.Default.Get ) {}
+		}
 	}
 }

@@ -1,14 +1,18 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using PostSharp.Aspects.Advices;
+using System;
 
 namespace DragonSpark.Aspects.Specifications
 {
-	public sealed class ApplyInverseSpecificationAttribute : ApplySpecificationAttribute
+	[IntroduceInterface( typeof(ISpecification) )]
+	public sealed class ApplyInverseSpecificationAttribute : SpecificationAttributeBase
 	{
-		public ApplyInverseSpecificationAttribute( Type specificationType ) : base( specificationType ) {}
+		public ApplyInverseSpecificationAttribute( Type specificationType ) : base( Factory<ApplyInverseSpecificationAttribute>.Default.Get( specificationType ) ) {}
 
-		protected override ISpecification DetermineSpecification() => new Specification( base.DetermineSpecification() );
+		[UsedImplicitly]
+		public ApplyInverseSpecificationAttribute( ISpecification specification ) : base( new Specification( specification ) ) {}
 
-		sealed class Specification : ISpecification
+		sealed class Specification : InvocationBase<object, bool>, ISpecification
 		{
 			readonly ISpecification specification;
 
@@ -17,7 +21,7 @@ namespace DragonSpark.Aspects.Specifications
 				this.specification = specification;
 			}
 
-			public bool IsSatisfiedBy( object parameter ) => !specification.IsSatisfiedBy( parameter );
+			public override bool Invoke( object parameter ) => !(bool)specification.Invoke( parameter );
 		}
 	}
 }

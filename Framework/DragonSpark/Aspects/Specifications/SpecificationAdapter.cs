@@ -1,8 +1,9 @@
-﻿using DragonSpark.Specifications;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Specifications
 {
-	public sealed class SpecificationAdapter<T> : ISpecification
+	public sealed class SpecificationAdapter<T> : InvocationBase<object, bool>, ISpecification
 	{
 		readonly ISpecification<T> specification;
 
@@ -11,6 +12,6 @@ namespace DragonSpark.Aspects.Specifications
 			this.specification = specification;
 		}
 
-		public bool IsSatisfiedBy( object parameter ) => parameter is T && specification.IsSatisfiedBy( (T)parameter );
+		public override bool Invoke( object parameter ) => specification.IsSatisfiedBy( parameter.AsValid<T>() );
 	}
 }

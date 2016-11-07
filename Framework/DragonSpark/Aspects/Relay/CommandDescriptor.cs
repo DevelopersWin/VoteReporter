@@ -2,7 +2,7 @@
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class CommandDescriptor : RelayMethodDefinition<ICommandRelay, ApplyCommandRelay>
+	public sealed class CommandDescriptor : RelayMethodAspectBuildDefinition<ICommandRelay, ApplyCommandRelay>
 	{
 		public static CommandDescriptor Default { get; } = new CommandDescriptor();
 		CommandDescriptor() : base( 

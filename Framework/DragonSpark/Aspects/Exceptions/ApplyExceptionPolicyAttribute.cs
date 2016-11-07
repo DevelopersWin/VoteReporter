@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
+using JetBrains.Annotations;
 using Polly;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
@@ -16,22 +16,25 @@ namespace DragonSpark.Aspects.Exceptions
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.EnhancedValidation ),
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )
 		]
-	public sealed class ApplyExceptionPolicyAttribute : ApplyInstanceAspectBase, IPolicySource
+	public sealed class ApplyExceptionPolicyAttribute : InstanceBasedAspectBase, IPolicySource
 	{
-		readonly static Func<Type, Policy> Source = Activator.Default.Get<Policy>;
+		readonly Policy policy;
 
-		readonly ISource<Policy> source;
+		public ApplyExceptionPolicyAttribute( Type policyType ) :  base( Factory.Default.Get( policyType ), Support.Default ) {}
 
-		public ApplyExceptionPolicyAttribute( Type policyType ) : this( policyType, Source ) {}
-
-		ApplyExceptionPolicyAttribute( Type policyType, Func<Type, Policy> source ) : this( source.WithParameter( policyType ) ) {}
-
-		ApplyExceptionPolicyAttribute( ISource<Policy> source ) : base( Support.Default )
+		[UsedImplicitly]
+		public ApplyExceptionPolicyAttribute( Policy policy )
 		{
-			this.source = source;
+			this.policy = policy;
 		}
 
-		public Policy Get() => source.Get();
+		public Policy Get() => policy;
 		object ISource.Get() => Get();
+
+		sealed class Factory : TypedAspectFactory<Policy, ApplyExceptionPolicyAttribute>
+		{
+			public static Factory Default { get; } = new Factory();
+			Factory() : base( Activator.Default.Get<Policy> ) {}
+		}
 	}
 }

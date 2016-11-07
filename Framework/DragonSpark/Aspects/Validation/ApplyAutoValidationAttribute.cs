@@ -1,4 +1,5 @@
-﻿using PostSharp.Aspects;
+﻿using JetBrains.Annotations;
+using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
 
@@ -9,16 +10,21 @@ namespace DragonSpark.Aspects.Validation
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, KnownRoles.ParameterValidation )
 		]
-	public sealed class ApplyAutoValidationAttribute : ApplyInstanceAspectBase, IAutoValidationController
+	public sealed class ApplyAutoValidationAttribute : InstanceBasedAspectBase, IAutoValidationController
 	{
-		public ApplyAutoValidationAttribute() : base( Support.Default ) {}
+		readonly IAutoValidationController controller;
 
-		public override void RuntimeInitializeInstance() => Controller = Defaults.ControllerSource( Instance );
-		IAutoValidationController Controller { get; set; }
+		public ApplyAutoValidationAttribute() : base( o => new ApplyAutoValidationAttribute( Defaults.ControllerSource( o ) ), Support.Default ) {}
 
-		bool IAutoValidationController.IsActive => Controller.IsActive;
-		bool IAutoValidationController.Handles( object parameter ) => Controller.Handles( parameter );
-		void IAutoValidationController.MarkValid( object parameter, bool valid ) => Controller.MarkValid( parameter, valid );
-		object IAutoValidationController.Execute( object parameter, IInvocation proceed ) => Controller.Execute( parameter, proceed );
+		[UsedImplicitly]
+		public ApplyAutoValidationAttribute( IAutoValidationController controller )
+		{
+			this.controller = controller;
+		}
+
+		bool IAutoValidationController.IsActive => controller.IsActive;
+		bool IAutoValidationController.Handles( object parameter ) => controller.Handles( parameter );
+		void IAutoValidationController.MarkValid( object parameter, bool valid ) => controller.MarkValid( parameter, valid );
+		object IAutoValidationController.Execute( object parameter, IInvocation proceed ) => controller.Execute( parameter, proceed );
 	}
 }

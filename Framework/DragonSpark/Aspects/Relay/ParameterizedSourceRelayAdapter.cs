@@ -2,15 +2,8 @@
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class ParameterizedSourceRelayAdapter<TParameter, TResult> : InvocationBase<TParameter, TResult>
+	public sealed class ParameterizedSourceRelayAdapter<TParameter, TResult> : DelegatedInvocation<TParameter, TResult>, IParameterizedSourceRelay
 	{
-		readonly IParameterizedSource<TParameter, TResult> source;
-
-		public ParameterizedSourceRelayAdapter( IParameterizedSource<TParameter, TResult> source )
-		{
-			this.source = source;
-		}
-
-		public override TResult Invoke( TParameter parameter ) => source.Get( parameter );
+		public ParameterizedSourceRelayAdapter( IParameterizedSource<TParameter, TResult> source ) : base( source ) {}
 	}
 }

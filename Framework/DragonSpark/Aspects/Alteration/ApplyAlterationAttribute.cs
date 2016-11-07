@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Aspects.Build;
+using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
@@ -8,30 +9,31 @@ namespace DragonSpark.Aspects.Alteration
 {
 	[IntroduceInterface( typeof(IAlteration) )]
 	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
-	public abstract class ApplyAlterationBase : ApplyInstanceAspectBase, IAlteration
+	public abstract class ApplyAlterationBase : InvocationAspectBase, IAlteration
 	{
-		readonly static Func<Type, IAlteration> Source = Aspects.Alteration.Source.Default.Get;
+		protected ApplyAlterationBase( Func<object, IAspect> factory, IAspectBuildDefinition definition ) : base( factory, definition ) {}
+		protected ApplyAlterationBase( IAlteration alteration ) : base( alteration ) {}
 
-		readonly Type alterationType;
-
-		protected ApplyAlterationBase( Type alterationType, DefinitionBase source ) : base( source )
+		protected sealed class Factory<T> : TypedAspectFactory<IAlteration, T> where T :  ApplyAlterationBase
 		{
-			this.alterationType = alterationType;
+			public static Factory<T> Default { get; } = new Factory<T>();
+			Factory() : base( Source.Default.Get ) {}
 		}
-
-		IAlteration Alteration { get; set; }
-		public override void RuntimeInitializeInstance() => Alteration = Source( alterationType );
-
-		object IAlteration.Alter( object parameter ) => Alteration.Alter( parameter );
 	}
 
 	public sealed class ApplyAlterationAttribute : ApplyAlterationBase
 	{
-		public ApplyAlterationAttribute( Type alterationType ) : base( alterationType, Support<Aspect>.Default ) {}
+		public ApplyAlterationAttribute( Type alterationType ) : base( Factory<ApplyAlterationAttribute>.Default.Get( alterationType ), Support<Aspect>.Default ) {}
+
+		[UsedImplicitly]
+		public ApplyAlterationAttribute( IAlteration alteration ) : base( alteration ) {}
 	}
 
 	public sealed class ApplyResultAlterationAttribute : ApplyAlterationBase
 	{
-		public ApplyResultAlterationAttribute( Type alterationType ) : base( alterationType, Support<ResultAspect>.Default ) {}
+		public ApplyResultAlterationAttribute( Type alterationType ) : base( Factory<ApplyResultAlterationAttribute>.Default.Get( alterationType ), Support<ResultAspect>.Default ) {}
+
+		[UsedImplicitly]
+		public ApplyResultAlterationAttribute( IAlteration alteration ) : base( alteration ) {}
 	}
 }

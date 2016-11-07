@@ -10,15 +10,15 @@ using System.Linq;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class Descriptors : ItemSource<IRelayMethodDefinition>
+	public sealed class Descriptors : ItemSource<IRelayMethodAspectBuildDefinition>
 	{
 		public static Descriptors Default { get; } = new Descriptors();
 		Descriptors() : this( /*CommandDescriptor.Default,*/ SourceDescriptor.Default, SpecificationDescriptor.Default ) {}
-		Descriptors( params IRelayMethodDefinition[] descriptors ) : this( descriptors.SelectTypes().AsAdapters(), descriptors ) {}
-		Descriptors( ImmutableArray<TypeAdapter> adapters, IRelayMethodDefinition[] descriptors ) 
+		Descriptors( params IRelayMethodAspectBuildDefinition[] descriptors ) : this( descriptors.SelectTypes().AsAdapters(), descriptors ) {}
+		Descriptors( ImmutableArray<TypeAdapter> adapters, IRelayMethodAspectBuildDefinition[] descriptors ) 
 			: this( descriptors, new TypedPairs<IAspect>( adapters.Tuple( descriptors.Select( descriptor => new Func<object, IAspect>( descriptor.Get ) ).ToArray() ) ) ) {}
 
-		Descriptors( IEnumerable<IRelayMethodDefinition> descriptors, ITypedPairs<IAspect> instances ) : base( descriptors )
+		Descriptors( IEnumerable<IRelayMethodAspectBuildDefinition> descriptors, ITypedPairs<IAspect> instances ) : base( descriptors )
 		{
 			Aspects = instances;
 		}

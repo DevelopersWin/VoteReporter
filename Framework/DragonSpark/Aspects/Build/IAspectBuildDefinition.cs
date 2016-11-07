@@ -6,5 +6,5 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Build
 {
-	public interface IDefinition : ISpecification<Type>, IParameterizedSource<Type, IEnumerable<AspectInstance>> {}
+	public interface IAspectBuildDefinition : ISpecification<Type>, IParameterizedSource<Type, IEnumerable<AspectInstance>> {}
 }

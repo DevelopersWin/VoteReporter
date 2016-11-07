@@ -7,18 +7,18 @@ using System;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public class RelayMethodDefinition<TInterface, TAspect> : DefinitionBase, IRelayMethodDefinition, IRelayAspectSource where TAspect : IAspect
+	public class RelayMethodAspectBuildDefinition<TInterface, TAspect> : AspectBuildDefinitionBase, IRelayMethodAspectBuildDefinition, IRelayAspectSource where TAspect : IAspect
 	{
 		readonly Func<object, TAspect> aspectSource;
 		readonly TypeBasedAspectInstanceLocator<TAspect> locator;
 
-		public RelayMethodDefinition( Type supportedType, Type destinationType, Type adapterType, params IAspectInstanceLocator[] locators ) 
+		public RelayMethodAspectBuildDefinition( Type supportedType, Type destinationType, Type adapterType, params IAspectInstanceLocator[] locators ) 
 			: this( supportedType,
 					new AspectFactory<TInterface, TAspect>( destinationType, adapterType ).Get,
 					locators
 			) {}
 
-		RelayMethodDefinition( Type supportedType, Func<object, TAspect> aspectSource, params IAspectInstanceLocator[] locators ) : base( new Build.Specification( supportedType ).IsSatisfiedBy, locators )
+		RelayMethodAspectBuildDefinition( Type supportedType, Func<object, TAspect> aspectSource, params IAspectInstanceLocator[] locators ) : base( new Build.Specification( supportedType ).IsSatisfiedBy, locators )
 		{
 			ReferencedType = supportedType;
 			this.aspectSource = aspectSource;

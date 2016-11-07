@@ -4,5 +4,5 @@ using PostSharp.Aspects;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public interface IRelayMethodDefinition : Build.IDefinition, ITypeAware, IParameterizedSource<IAspect> {}
+	public interface IRelayMethodAspectBuildDefinition : Build.IAspectBuildDefinition, ITypeAware, IParameterizedSource<IAspect> {}
 }

@@ -12,7 +12,7 @@ namespace DragonSpark.Aspects.Coercion
 			if ( coercer != null )
 			{
 				var arguments = args.Arguments;
-				arguments.SetArgument( 0, coercer.Coerce( arguments.GetArgument( 0 ) ) );
+				arguments.SetArgument( 0, coercer.Invoke( arguments.GetArgument( 0 ) ) );
 			}
 			args.Proceed();
 		}

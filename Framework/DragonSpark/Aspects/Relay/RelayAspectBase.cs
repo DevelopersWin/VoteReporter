@@ -1,5 +1,4 @@
 ﻿using PostSharp.Aspects;
-using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
@@ -19,15 +18,15 @@ namespace DragonSpark.Aspects.Relay
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.ValueConversion )
 		]
 	[AttributeUsage( AttributeTargets.Class ), AspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	[IntroduceInterface( typeof(IRelay), OverrideAction = InterfaceOverrideAction.Ignore )]
+	/*[IntroduceInterface( typeof(IRelay), OverrideAction = InterfaceOverrideAction.Ignore )]*/
 	public abstract class RelayAspectBase : InstanceLevelAspect, IAspectProvider, IRelay
 	{
 		readonly IInvocation invocation;
-		readonly IRelayMethodDefinition definition;
+		readonly IRelayMethodAspectBuildDefinition aspectBuildDefinition;
 
-		protected RelayAspectBase( IRelayMethodDefinition definition )
+		protected RelayAspectBase( IRelayMethodAspectBuildDefinition aspectBuildDefinition )
 		{
-			this.definition = definition;
+			this.aspectBuildDefinition = aspectBuildDefinition;
 		}
 
 		protected RelayAspectBase( IInvocation invocation )
@@ -35,10 +34,10 @@ namespace DragonSpark.Aspects.Relay
 			this.invocation = invocation;
 		}
 
-		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => definition.Get( (Type)targetElement );
-		public override bool CompileTimeValidate( Type type ) => definition.IsSatisfiedBy( type );
+		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => aspectBuildDefinition.Get( (Type)targetElement );
+		public override bool CompileTimeValidate( Type type ) => aspectBuildDefinition.IsSatisfiedBy( type );
 
-		public override object CreateInstance( AdviceArgs adviceArgs ) => definition.Get( adviceArgs.Instance );
+		public override object CreateInstance( AdviceArgs adviceArgs ) => aspectBuildDefinition.Get( adviceArgs.Instance );
 		public object Invoke( object parameter ) => invocation.Invoke( parameter );
 	}
 }

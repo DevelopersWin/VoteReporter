@@ -45,6 +45,7 @@ namespace DragonSpark.Sources.Parameterized
 		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) => Factory.For( @this ).Wrap<TParameter, TResult>();
 		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this ISource<TResult> @this ) => new Func<TResult>( @this.Get ).Wrap<TParameter, TResult>();
 
+		public static Func<object, T> Wrap<T>( this ISource<T> @this ) => @this.ToDelegate().Wrap<object, T>();
 		public static Func<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
 
 		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => new SourceAdapter<TParameter, TResult>( @this ).Get;

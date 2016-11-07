@@ -2,7 +2,7 @@
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class SpecificationDescriptor : RelayMethodDefinition<ISpecificationRelay, ApplySpecificationRelay>
+	public sealed class SpecificationDescriptor : RelayMethodAspectBuildDefinition<ISpecificationRelay, ApplySpecificationRelay>
 	{
 		public static SpecificationDescriptor Default { get; } = new SpecificationDescriptor();
 		SpecificationDescriptor() : base( 
