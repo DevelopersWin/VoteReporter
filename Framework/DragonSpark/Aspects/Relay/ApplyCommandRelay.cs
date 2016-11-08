@@ -3,7 +3,7 @@ using PostSharp.Aspects.Advices;
 
 namespace DragonSpark.Aspects.Relay
 {
-	[IntroduceInterface( typeof(ICommandRelay), AncestorOverrideAction = InterfaceOverrideAction.Ignore )]
+	[IntroduceInterface( typeof(ICommandRelay) )]
 	public sealed class ApplyCommandRelay : SpecificationRelayAspectBase, ICommandRelay
 	{
 		readonly ICommandRelay relay;

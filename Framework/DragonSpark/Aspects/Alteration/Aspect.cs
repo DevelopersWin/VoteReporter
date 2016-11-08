@@ -28,7 +28,7 @@ namespace DragonSpark.Aspects.Alteration
 			var alteration = args.Instance as IAlteration;
 			if ( alteration != null )
 			{
-				args.ReturnValue = alteration.Invoke( args.ReturnValue );
+				args.ReturnValue = alteration.Get( args.ReturnValue );
 			}
 		}
 	}

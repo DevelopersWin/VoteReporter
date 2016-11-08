@@ -1,6 +1,6 @@
 namespace DragonSpark.Aspects
 {
-	public abstract class CommandInvocationBase<T> : InvocationBase<T, object>, IInvocation<T>
+	public abstract class CommandInvocationBase<T> : InvocationBase<T, object>
 	{
 		protected abstract void Execute( T parameter );
 

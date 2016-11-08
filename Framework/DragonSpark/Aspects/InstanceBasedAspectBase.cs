@@ -20,37 +20,38 @@ namespace DragonSpark.Aspects
 		void IInstanceScopedAspect.RuntimeInitializeInstance() {}
 	}
 
-	public interface IInvocationAspect : IInvocation {}
-
-	public abstract class InvocationAspectBase : InstanceBasedAspectBase, IInvocationAspect
+	public abstract class InvocationAspectBase : InstanceBasedAspectBase
 	{
-		readonly IInvocation invocation;
+		readonly Invoke invoke;
 
-		protected InvocationAspectBase( IInvocation invocation )
+		protected InvocationAspectBase( Invoke invoke )
 		{
-			this.invocation = invocation;
+			this.invoke = invoke;
 		}
 
 		protected InvocationAspectBase( Func<object, IAspect> factory, IAspectBuildDefinition definition ) : base( factory, definition ) {}
 
-		public object Invoke( object parameter ) => invocation.Invoke( parameter );
+		public object Get( object parameter ) => invoke( parameter );
 	}
+
+	public delegate object Invoke( object parameter );
 
 	public abstract class InvocationMethodAspectBase : MethodInterceptionAspectBase
 	{
-		readonly Func<object, IInvocation> source;
+		readonly Func<object, bool> specification;
 
-		protected InvocationMethodAspectBase( Func<object, IInvocation> source )
+		protected InvocationMethodAspectBase( Func<object, bool> specification )
 		{
-			this.source = source;
+			this.specification = specification;
 		}
 
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var invocation = source( args.Instance );
-			if ( invocation != null )
+			var instance = args.Instance;
+			if ( specification( instance ) )
 			{
-				args.ReturnValue = invocation.Invoke( args.Arguments[0] );
+				dynamic invoke = instance;
+				args.ReturnValue = invoke.Get( args.Arguments[0] );
 			}
 			else
 			{

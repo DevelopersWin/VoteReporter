@@ -82,12 +82,12 @@ namespace DragonSpark.Testing.Framework.FileSystem
 
 		public override DirectorySecurity GetAccessControl(string pathName)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override DirectorySecurity GetAccessControl(string pathName, AccessControlSections includeSections)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override string GetCurrentDirectory() => directory.Get();
@@ -230,7 +230,7 @@ namespace DragonSpark.Testing.Framework.FileSystem
 
 		public override void SetAccessControl(string pathName, DirectorySecurity directorySecurity)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override DateTime GetCreationTime(string pathName) => repository.Get( pathName ).CreationTime.DateTime;

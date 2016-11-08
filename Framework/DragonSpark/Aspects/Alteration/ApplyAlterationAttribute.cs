@@ -4,6 +4,7 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
 using System;
+using Aspect = DragonSpark.Aspects.Coercion.Aspect;
 
 namespace DragonSpark.Aspects.Alteration
 {
@@ -11,10 +12,10 @@ namespace DragonSpark.Aspects.Alteration
 	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
 	public abstract class ApplyAlterationBase : InvocationAspectBase, IAlteration
 	{
+		protected ApplyAlterationBase( IAlteration alteration ) : base( alteration.Get ) {}
 		protected ApplyAlterationBase( Func<object, IAspect> factory, IAspectBuildDefinition definition ) : base( factory, definition ) {}
-		protected ApplyAlterationBase( IAlteration alteration ) : base( alteration ) {}
 
-		protected sealed class Factory<T> : TypedAspectFactory<IAlteration, T> where T :  ApplyAlterationBase
+		protected sealed class Factory<T> : TypedParameterAspectFactory<IAlteration, T> where T :  ApplyAlterationBase
 		{
 			public static Factory<T> Default { get; } = new Factory<T>();
 			Factory() : base( Source.Default.Get ) {}

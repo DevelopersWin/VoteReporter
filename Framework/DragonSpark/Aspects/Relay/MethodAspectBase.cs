@@ -12,6 +12,6 @@ namespace DragonSpark.Aspects.Relay
 	]
 	public abstract class MethodAspectBase : InvocationMethodAspectBase
 	{
-		protected MethodAspectBase( Func<object, IInvocation> source ) : base( source ) {}
+		protected MethodAspectBase( Func<object, bool> specification ) : base( specification ) {}
 	}
 }

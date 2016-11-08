@@ -1,4 +1,7 @@
 ﻿namespace DragonSpark.Aspects.Relay
 {
-	public interface IParameterizedSourceRelay : IInvocation {}
+	public interface IParameterizedSourceRelay
+	{
+		object Get( object parameter );
+	}
 }

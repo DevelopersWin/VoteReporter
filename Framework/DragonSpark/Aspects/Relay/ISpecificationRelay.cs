@@ -1,4 +1,7 @@
 ﻿namespace DragonSpark.Aspects.Relay
 {
-	public interface ISpecificationRelay : IInvocation {}
+	public interface ISpecificationRelay
+	{
+		object Get( object parameter );
+	}
 }

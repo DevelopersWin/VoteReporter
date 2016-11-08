@@ -1,11 +1,10 @@
-﻿using DragonSpark.Sources.Coercion;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace DragonSpark.Aspects.Relay
 {
 	[UsedImplicitly]
 	public sealed class CommandRelay : MethodAspectBase
 	{
-		public CommandRelay() : base( CastCoercer<ICommandRelay>.Default.Get ) {}
+		public CommandRelay() : base( o => o is ICommandRelay ) {}
 	}
 }

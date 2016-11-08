@@ -5,9 +5,16 @@ namespace DragonSpark.Aspects.Implementations
 {
 	public sealed class GeneralizedParameterizedSourceAspect : GeneralizedAspectBase
 	{
-		readonly static AspectFactory<IRelay, GeneralizedParameterizedSourceAspect> Factory = 
-			new AspectFactory<IRelay, GeneralizedParameterizedSourceAspect>( typeof(IParameterizedSource<,>), typeof(ParameterizedSourceRelayAdapter<,>) );
+		readonly IParameterizedSourceRelay relay;
+
+		readonly static AspectFactory<IParameterizedSourceRelay, GeneralizedParameterizedSourceAspect> Factory = 
+			new AspectFactory<IParameterizedSourceRelay, GeneralizedParameterizedSourceAspect>( typeof(IParameterizedSource<,>), typeof(ParameterizedSourceRelayAdapter<,>) );
 
 		public GeneralizedParameterizedSourceAspect() : base( Factory.Get ) {}
+
+		public GeneralizedParameterizedSourceAspect( IParameterizedSourceRelay relay )
+		{
+			this.relay = relay;
+		}
 	}
 }

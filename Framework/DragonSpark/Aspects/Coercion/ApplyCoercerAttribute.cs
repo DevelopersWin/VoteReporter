@@ -1,7 +1,4 @@
-﻿using DragonSpark.Activation;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
@@ -13,11 +10,15 @@ namespace DragonSpark.Aspects.Coercion
 	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
 	public sealed class ApplyCoercerAttribute : InvocationAspectBase, ICoercer
 	{
-		public ApplyCoercerAttribute( Type coercerType ) : base( 
-			ParameterConstructor<ICoercer, ApplyCoercerAttribute>.Default.WithParameter( Source.Default.WithParameter( coercerType ).Get ).ToDelegate().Wrap(),
-			Support.Default ) {}
+		public ApplyCoercerAttribute( Type coercerType ) : base( Factory.Default.Get( coercerType ), Support.Default ) {}
 
 		[UsedImplicitly]
-		public ApplyCoercerAttribute( ICoercer invocation ) : base( invocation ) {}
+		public ApplyCoercerAttribute( ICoercer coercer ) : base( coercer.Get ) {}
+
+		sealed class Factory : TypedParameterAspectFactory<ICoercer, ApplyCoercerAttribute>
+		{
+			public static Factory Default { get; } = new Factory();
+			Factory() : base( Source.Default.Get ) {}
+		}
 	}
 }

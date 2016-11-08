@@ -1,9 +1,7 @@
-﻿using DragonSpark.Sources.Coercion;
-
-namespace DragonSpark.Aspects.Relay
+﻿namespace DragonSpark.Aspects.Relay
 {
 	public sealed class Specification : MethodAspectBase
 	{
-		public Specification() : base( CastCoercer<ISpecificationRelay>.Default.Get ) {}
+		public Specification() : base( o => o is ISpecificationRelay ) {}
 	}
 }

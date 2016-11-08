@@ -1,9 +1,7 @@
-﻿using DragonSpark.Sources.Coercion;
-
-namespace DragonSpark.Aspects.Relay
+﻿namespace DragonSpark.Aspects.Relay
 {
 	public sealed class ParameterizedSourceMethodAspect : MethodAspectBase
 	{
-		public ParameterizedSourceMethodAspect() : base( CastCoercer<IParameterizedSourceRelay>.Default.Get ) {}
+		public ParameterizedSourceMethodAspect() : base( o => o is IParameterizedSourceRelay ) {}
 	}
 }

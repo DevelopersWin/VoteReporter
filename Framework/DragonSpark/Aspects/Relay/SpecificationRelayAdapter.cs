@@ -3,7 +3,7 @@ using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public class SpecificationRelayAdapter<T> : InvocationBase<T, bool>, ISpecificationRelay
+	public sealed class SpecificationRelayAdapter<T> : InvocationBase<T, bool>, ISpecificationRelay
 	{
 		readonly ISpecification<T> specification;
 		public SpecificationRelayAdapter( ISpecification<T> specification )

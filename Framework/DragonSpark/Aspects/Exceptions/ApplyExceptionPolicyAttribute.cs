@@ -31,7 +31,7 @@ namespace DragonSpark.Aspects.Exceptions
 		public Policy Get() => policy;
 		object ISource.Get() => Get();
 
-		sealed class Factory : TypedAspectFactory<Policy, ApplyExceptionPolicyAttribute>
+		sealed class Factory : TypedParameterAspectFactory<Policy, ApplyExceptionPolicyAttribute>
 		{
 			public static Factory Default { get; } = new Factory();
 			Factory() : base( Activator.Default.Get<Policy> ) {}

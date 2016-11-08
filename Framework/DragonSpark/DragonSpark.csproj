@@ -49,6 +49,7 @@
     <Compile Include="Aspects\GenericAdapterConstructorFactory.cs" />
     <Compile Include="Aspects\AdapterFactory.cs" />
     <Compile Include="Aspects\AdapterLocatorBase.cs" />
+    <Compile Include="Aspects\InvocationAdapter.cs" />
     <Compile Include="Aspects\TypeBasedAspectBase.cs" />
     <Compile Include="Aspects\AspectProviderBase.cs" />
     <Compile Include="Aspects\AssignedAttribute.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Aspects\Coercion\Aspect.cs" />
     <Compile Include="Aspects\Relay\IRelayAspectSource.cs" />
     <Compile Include="Aspects\Relay\IRelayMethodAspectBuildDefinition.cs" />
+    <Compile Include="Aspects\TypedParameterAspectFactory.cs" />
     <Compile Include="Expressions\Extensions.cs" />
     <Compile Include="Aspects\Coercion\CoercerAdapter.cs" />
     <Compile Include="Aspects\Coercion\Source.cs" />
@@ -138,7 +140,6 @@
     <Compile Include="Aspects\Build\IAspectInstanceLocator.cs" />
     <Compile Include="Aspects\Build\IMethodStore.cs" />
     <Compile Include="Aspects\Specifications\ISpecification.cs" />
-    <Compile Include="Aspects\Specifications\ISpecificationAware.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAdapter.cs" />
     <Compile Include="Aspects\Specifications\Aspect.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationAttribute.cs" />

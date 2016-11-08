@@ -2,8 +2,8 @@
 {
 	public abstract class SpecificationRelayAspectBase : RelayAspectBase
 	{
-		protected SpecificationRelayAspectBase( IRelayMethodAspectBuildDefinition aspectBuildDefinition ) : base( aspectBuildDefinition ) {}
+		protected SpecificationRelayAspectBase( IRelayMethodAspectBuildDefinition definition ) : base( definition ) {}
 
-		protected SpecificationRelayAspectBase( ISpecificationRelay relay ) : base( relay ) {}
+		protected SpecificationRelayAspectBase( ISpecificationRelay relay ) : base( relay.Get ) {}
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using PostSharp.Aspects;
-using System;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -10,24 +9,12 @@ namespace DragonSpark.Aspects.Validation
 			var controller = args.Instance as IAutoValidationController;
 			if ( controller != null && !controller.IsActive )
 			{
-				args.ReturnValue = controller.Execute( args.Arguments[0], new Invocation( args.GetReturnValue ) ) ?? args.ReturnValue;
+				args.ReturnValue = controller.Execute( args.Arguments[0], new InvocationAdapter( args.GetReturnValue ) ) ?? args.ReturnValue;
 			}
 			else
 			{
 				args.Proceed();
 			}
-		}
-
-		sealed class Invocation : IInvocation
-		{
-			readonly Func<object> factory;
-
-			public Invocation( Func<object> factory )
-			{
-				this.factory = factory;
-			}
-
-			public object Invoke( object parameter ) => factory();
 		}
 	}
 }

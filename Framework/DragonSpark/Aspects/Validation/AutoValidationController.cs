@@ -36,7 +36,7 @@ namespace DragonSpark.Aspects.Validation
 			
 			var marked = Value != null && Equals( Value, parameter );
 			Value = Active;
-			var result = marked || validator.IsSatisfiedBy( parameter ) ? proceed.Invoke( parameter ) : null;
+			var result = marked || validator.IsSatisfiedBy( parameter ) ? proceed.Get( parameter ) : null;
 			return Clear( result );
 		}
 

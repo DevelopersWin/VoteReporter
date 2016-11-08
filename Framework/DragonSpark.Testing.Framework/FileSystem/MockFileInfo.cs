@@ -1,11 +1,11 @@
 ﻿using DragonSpark.Sources;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.Windows.FileSystem;
 using JetBrains.Annotations;
 using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Security.AccessControl;
-using DragonSpark.Sources.Scopes;
 using File = DragonSpark.Windows.FileSystem.File;
 
 namespace DragonSpark.Testing.Framework.FileSystem
@@ -132,12 +132,12 @@ namespace DragonSpark.Testing.Framework.FileSystem
 
 		public override FileSecurity GetAccessControl()
 		{
-			throw new NotImplementedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
+			throw new NotSupportedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
 		}
 
 		public override FileSecurity GetAccessControl( AccessControlSections includeSections )
 		{
-			throw new NotImplementedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
+			throw new NotSupportedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
 		}
 
 		public override void MoveTo( string destFileName )
@@ -162,17 +162,17 @@ namespace DragonSpark.Testing.Framework.FileSystem
 
 		public override FileInfoBase Replace( string destinationFileName, string destinationBackupFileName )
 		{
-			throw new NotImplementedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
+			throw new NotSupportedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
 		}
 
 		public override FileInfoBase Replace( string destinationFileName, string destinationBackupFileName, bool ignoreMetadataErrors )
 		{
-			throw new NotImplementedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
+			throw new NotSupportedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
 		}
 
 		public override void SetAccessControl( FileSecurity fileSecurity )
 		{
-			throw new NotImplementedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
+			throw new NotSupportedException( Properties.Resources.NOT_IMPLEMENTED_EXCEPTION );
 		}
 
 		public override DirectoryInfoBase Directory => repository.FromDirectoryName( DirectoryName );

@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.Windows.FileSystem;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Text;
-using DragonSpark.Sources.Scopes;
 
 namespace DragonSpark.Testing.Framework.FileSystem
 {
@@ -131,17 +131,17 @@ namespace DragonSpark.Testing.Framework.FileSystem
 
 		public override Stream Create(string pathName, int bufferSize)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override Stream Create(string pathName, int bufferSize, FileOptions options)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override Stream Create(string pathName, int bufferSize, FileOptions options, FileSecurity fileSecurity)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override StreamWriter CreateText(string pathName) => new StreamWriter(Create(pathName));
@@ -168,12 +168,12 @@ namespace DragonSpark.Testing.Framework.FileSystem
 
 		public override FileSecurity GetAccessControl(string pathName)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override FileSecurity GetAccessControl(string pathName, AccessControlSections includeSections)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		/// <summary>
@@ -432,17 +432,17 @@ namespace DragonSpark.Testing.Framework.FileSystem
 
 		public override void Replace(string sourceFileName, string destinationFileName, string destinationBackupFileName)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override void Replace(string sourceFileName, string destinationFileName, string destinationBackupFileName, bool ignoreMetadataErrors)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override void SetAccessControl(string pathName, FileSecurity fileSecurity)
 		{
-			throw new NotImplementedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
+			throw new NotSupportedException(Properties.Resources.NOT_IMPLEMENTED_EXCEPTION);
 		}
 
 		public override void SetAttributes(string pathName, FileAttributes fileAttributes)

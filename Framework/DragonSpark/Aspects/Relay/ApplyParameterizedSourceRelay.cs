@@ -7,6 +7,6 @@ namespace DragonSpark.Aspects.Relay
 		public ApplyParameterizedSourceRelay() : base( SourceDescriptor.Default ) {}
 
 		[UsedImplicitly]
-		public ApplyParameterizedSourceRelay( IInvocation relay ) : base( relay ) {}
+		public ApplyParameterizedSourceRelay( IParameterizedSourceRelay relay ) : base( relay.Get ) {}
 	}
 }

@@ -21,7 +21,7 @@ namespace DragonSpark.Aspects.Specifications
 				this.specification = specification;
 			}
 
-			public override bool Invoke( object parameter ) => !(bool)specification.Invoke( parameter );
+			public override bool Invoke( object parameter ) => !(bool)specification.Get( parameter );
 		}
 	}
 }
