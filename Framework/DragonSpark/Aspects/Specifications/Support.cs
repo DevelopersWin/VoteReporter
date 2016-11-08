@@ -4,32 +4,32 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
+using PostSharp.Aspects.Configuration;
+using PostSharp.Aspects.Serialization;
 using System;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Aspects.Specifications
 {
 	public sealed class Support : AspectBuildDefinition
 	{
 		public static Support Default { get; } = new Support();
-		Support() : base( 
-			AspectLocatorFactory<IntroducedSpecificationAspect, Aspect>.Default,
-			ParameterizedSourceTypeDefinition.Default, 
-			GenericCommandCoreTypeDefinition.Default ) {}
+		Support() : this( 
+			AspectLocatorFactory<IntroduceSpecification, Aspect>.Default,
+			GenericSpecificationTypeDefinition.Default ) {}
 
-		/*public override IEnumerable<AspectInstance> Get( Type parameter )
-		{
-			var locator = new TypeBasedAspectInstanceLocator<IntroducedSpecificationAspect>();
-
-			return base.Get( parameter );
-		}*/
+		Support( 
+			IParameterizedSource<ImmutableArray<ITypeDefinition>, ImmutableArray<IAspectInstanceLocator>> locatorSource,
+			params ITypeDefinition[] definitions
+		) : base( type => true, locatorSource.GetFixed( definitions ) ) {}
 	}
 
-	[UsedImplicitly]
-	public sealed class IntroducedSpecificationAspect : IntroducedGenericInterfaceAspect
+	[UsedImplicitly, LinesOfCodeAvoided( 1 )]
+	public sealed class IntroduceSpecification : IntroduceGenericInterfaceAspectBase
 	{
 		readonly static Func<object, object> Factory = new AdapterFactory( typeof(ISpecification), typeof(IntroducedSpecificationAdapter<>) ).Get;
 
-		public IntroducedSpecificationAspect() : base( typeof(ISpecification<>), Factory ) {}
+		public IntroduceSpecification() : base( GenericSpecificationTypeDefinition.Default.ReferencedType, Factory ) {}
 	}
 
 	public sealed class IntroducedSpecificationAdapter<T> : SpecificationBase<T>
@@ -43,15 +43,16 @@ namespace DragonSpark.Aspects.Specifications
 		public override bool IsSatisfiedBy( T parameter ) => (bool)specification.Get( parameter );
 	}
 
-	public class IntroducedGenericInterfaceAspect : CompositionAspect
+	[AttributeUsage( AttributeTargets.Class ), CompositionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	public abstract class IntroduceGenericInterfaceAspectBase : CompositionAspect
 	{
 		readonly Type interfaceType;
 		readonly ISpecification<Type> specification;
 		readonly Func<object, object> factory;
 
-		public IntroducedGenericInterfaceAspect( Type interfaceType, Func<object, object> factory ) : this( interfaceType, TypeAssignableSpecification.Defaults.Get( interfaceType ).Inverse(), factory ) {}
+		protected IntroduceGenericInterfaceAspectBase( Type interfaceType, Func<object, object> factory ) : this( interfaceType, TypeAssignableSpecification.Defaults.Get( interfaceType ).Inverse(), factory ) {}
 
-		public IntroducedGenericInterfaceAspect( Type interfaceType, ISpecification<Type> specification, Func<object, object> factory )
+		protected IntroduceGenericInterfaceAspectBase( Type interfaceType, ISpecification<Type> specification, Func<object, object> factory )
 		{
 			this.interfaceType = interfaceType;
 			this.specification = specification;
@@ -60,8 +61,10 @@ namespace DragonSpark.Aspects.Specifications
 
 		public override bool CompileTimeValidate( Type type ) => specification.IsSatisfiedBy( type );
 
-		protected override Type[] GetPublicInterfaces( Type targetType ) => 
-			interfaceType.MakeGenericType( ParameterTypes.Default.Get( targetType ) ).ToItem();
+		protected override Type[] GetPublicInterfaces( Type targetType )
+		{
+			return interfaceType.MakeGenericType( ParameterTypes.Default.Get( targetType ) ).ToItem();
+		}
 
 		public override object CreateImplementationObject( AdviceArgs args ) => factory( args.Instance );
 	}

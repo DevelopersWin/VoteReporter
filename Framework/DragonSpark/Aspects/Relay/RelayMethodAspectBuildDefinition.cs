@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Aspects.Build;
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
@@ -18,7 +19,7 @@ namespace DragonSpark.Aspects.Relay
 					locators
 			) {}
 
-		RelayMethodAspectBuildDefinition( Type supportedType, Func<object, TAspect> aspectSource, params IAspectInstanceLocator[] locators ) : base( new Build.Specification( supportedType ).IsSatisfiedBy, locators )
+		RelayMethodAspectBuildDefinition( Type supportedType, Func<object, TAspect> aspectSource, params IAspectInstanceLocator[] locators ) : base( supportedType.Yield(), locators )
 		{
 			ReferencedType = supportedType;
 			this.aspectSource = aspectSource;

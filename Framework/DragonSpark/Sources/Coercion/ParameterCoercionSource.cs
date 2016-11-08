@@ -40,6 +40,11 @@ namespace DragonSpark.Sources.Coercion
 			this.coercer = coercer;
 		}
 
-		public new TTo Get( TParameter parameter ) => coercer( base.Get( parameter ) );
+		public new TTo Get( TParameter parameter )
+		{
+			var prior = base.Get( parameter );
+			var result = prior != null ? coercer( prior ) : default(TTo);
+			return result;
+		}
 	}
 }

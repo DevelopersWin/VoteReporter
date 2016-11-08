@@ -1,11 +1,11 @@
-using System;
-using System.Reflection;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.TypeSystem.Generics
 {
-	sealed class GenericMethodEqualitySpecification : SpecificationWithContextBase<Type[], MethodBase>
+	sealed class GenericMethodEqualitySpecification : SpecificationWithContextBase<MethodBase, Type[]>
 	{
 		public static ICache<MethodBase, ISpecification<Type[]>> Default { get; } = new Cache<MethodBase, ISpecification<Type[]>>( method => new GenericMethodEqualitySpecification( method ) );
 		GenericMethodEqualitySpecification( MethodBase method ) : base( method ) {}

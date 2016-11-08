@@ -55,7 +55,6 @@
     <Compile Include="Aspects\AssignedAttribute.cs" />
     <Compile Include="Aspects\Build\IAspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\ITypedPairs.cs" />
-    <Compile Include="Aspects\Build\SpecificationFactory.cs" />
     <Compile Include="Aspects\Build\AspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\TypeBasedAspectInstanceLocator.cs" />
     <Compile Include="Aspects\Build\TypedPairs.cs" />
@@ -159,7 +158,7 @@
     <Compile Include="Aspects\Validation\AutoValidationValidationAspect.cs" />
     <Compile Include="Aspects\Build\AspectInstanceFactory.cs" />
     <Compile Include="Aspects\Validation\AutoValidationAspectBase.cs" />
-    <Compile Include="Aspects\Build\Specification.cs" />
+    <Compile Include="Aspects\Build\ValidatingSpecification.cs" />
     <Compile Include="Aspects\Build\MethodBasedAspectInstanceLocator.cs" />
     <Compile Include="Aspects\Validation\Support.cs" />
     <Compile Include="Runtime\Assignments\AssignGlobalScopeCommand.cs" />

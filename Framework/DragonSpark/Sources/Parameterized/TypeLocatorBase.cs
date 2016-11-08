@@ -11,15 +11,13 @@ namespace DragonSpark.Sources.Parameterized
 {
 	public abstract class TypeLocatorBase : CacheWithImplementedFactoryBase<Type, Type>
 	{
-		readonly ImmutableArray<TypeAdapter> adapters;
+		readonly ImmutableArray<TypeAdapter> types;
 		readonly Func<TypeInfo, bool> isAssignable;
 		readonly Func<Type[], Type> selector;
 
-		protected TypeLocatorBase( params Type[] types ) : this( types.AsAdapters() ) {}
-
-		TypeLocatorBase( ImmutableArray<TypeAdapter> adapters )
+		protected TypeLocatorBase( params Type[] types )
 		{
-			this.adapters = adapters;
+			this.types = types.AsAdapters();
 			isAssignable = IsAssignable;
 			selector = From;
 		}
@@ -35,7 +33,7 @@ namespace DragonSpark.Sources.Parameterized
 			return result;
 		}
 
-		bool IsAssignable( TypeInfo type ) => type.IsGenericType && adapters.IsAssignableFrom( type.GetGenericTypeDefinition() );
+		bool IsAssignable( TypeInfo type ) => type.IsGenericType && types.IsAssignableFrom( type.GetGenericTypeDefinition() );
 
 		protected abstract Type From( IEnumerable<Type> genericTypeArguments );
 	}

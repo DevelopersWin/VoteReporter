@@ -1,6 +1,6 @@
 namespace DragonSpark.Specifications
 {
-	public abstract class SpecificationWithContextBase<TParameter, TContext> : SpecificationBase<TParameter>
+	public abstract class SpecificationWithContextBase<TContext, TParameter> : SpecificationBase<TParameter>
 	{
 		protected SpecificationWithContextBase( TContext context )
 		{

@@ -12,7 +12,7 @@ namespace DragonSpark.Aspects.Specifications
 		protected SpecificationAttributeBase( Func<object, IAspect> factory ) : base( factory, Support.Default ) {}
 		protected SpecificationAttributeBase( ISpecification specification ) : base( specification.Get ) {}
 
-		protected sealed class Factory<T> : TypedParameterAspectFactory<ISpecification, T> where T :  SpecificationAttributeBase
+		protected sealed class Factory<T> : TypedParameterAspectFactory<ISpecification, T> where T : SpecificationAttributeBase
 		{
 			public static Factory<T> Default { get; } = new Factory<T>();
 			Factory() : base( Source.Default.Get ) {}

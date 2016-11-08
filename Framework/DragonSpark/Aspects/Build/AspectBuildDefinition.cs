@@ -2,7 +2,10 @@
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
+using PostSharp;
 using PostSharp.Aspects;
+using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -12,17 +15,16 @@ namespace DragonSpark.Aspects.Build
 {
 	public class AspectBuildDefinition : DelegatedSpecification<Type>, IAspectBuildDefinition
 	{
-		readonly static Func<IEnumerable<Type>, Func<Type, bool>> SpecificationSource = SpecificationFactory.Default.Get;
-
 		readonly ImmutableArray<IAspectInstanceLocator> locators;
 
 		public AspectBuildDefinition( 
 			IParameterizedSource<ImmutableArray<ITypeDefinition>, ImmutableArray<IAspectInstanceLocator>> locatorSource,
 			params ITypeDefinition[] definitions
-			) : this( definitions.SelectTypes(), locatorSource.GetFixed( definitions ) ) {}
+		) : this( definitions.SelectTypes(), locatorSource.GetFixed( definitions ) ) {}
 
-		public AspectBuildDefinition( IEnumerable<Type> types, params IAspectInstanceLocator[] locators ) : this( SpecificationSource( types ), locators ) {}
+		public AspectBuildDefinition( IEnumerable<Type> types, params IAspectInstanceLocator[] locators ) : this( new ValidatingSpecification( locators.SelectTypes().Distinct().ToImmutableArray(), types.Distinct().ToArray() ).ToSpecificationDelegate(), locators ) {}
 
+		[UsedImplicitly]
 		public AspectBuildDefinition( Func<Type, bool> specification, params IAspectInstanceLocator[] locators ) : base( specification )
 		{
 			this.locators = locators.ToImmutableArray();
@@ -33,6 +35,7 @@ namespace DragonSpark.Aspects.Build
 			foreach ( var locator in locators )
 			{
 				var instance = locator.Get( parameter );
+				// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"YO: {parameter} - {locator} : {instance}", null, null, null ));
 				if ( instance != null )
 				{
 					yield return instance;

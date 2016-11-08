@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	sealed class CompatibleArgumentsSpecification : SpecificationWithContextBase<Type[], CompatibleArgumentsSpecification.Parameter[]>
+	sealed class CompatibleArgumentsSpecification : SpecificationWithContextBase<CompatibleArgumentsSpecification.Parameter[], Type[]>
 	{
 		readonly int required;
 		public static ICache<MethodBase, ISpecification<Type[]>> Default { get; } = new Cache<MethodBase, ISpecification<Type[]>>( method => new CompatibleArgumentsSpecification( method ) );

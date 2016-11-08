@@ -15,5 +15,7 @@ namespace DragonSpark.Aspects.Build
 
 		protected TypeBasedAspectInstanceLocator( ISpecification<Type> specification ) : this( specification, Factory ) {}
 		protected TypeBasedAspectInstanceLocator( ISpecification<Type> specification, Func<Type, AspectInstance> factory ) : base( specification, factory ) {}
+
+		public Type ReferencedType => typeof(T);
 	}
 }

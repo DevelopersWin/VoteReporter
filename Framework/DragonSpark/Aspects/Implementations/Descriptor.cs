@@ -14,6 +14,6 @@ namespace DragonSpark.Aspects.Implementations
 			ReferencedType = declaringType;
 		}
 
-		public Type ReferencedType { get; }
+		public new Type ReferencedType { get; }
 	}
 }
