@@ -28,7 +28,7 @@ namespace DragonSpark.Aspects.Relay
 			this.sources = sources.ToImmutableArray();
 		}
 
-		protected override IEnumerable<AspectInstance> Yield( Type parameter )
+		public override IEnumerable<AspectInstance> Yield( Type parameter )
 		{
 			foreach ( var source in sources )
 			{

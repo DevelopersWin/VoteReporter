@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DragonSpark.Aspects.Validation
 {
-	public sealed class Support : AspectBuildDefinitionBase
+	public sealed class Support : AspectBuildDefinition
 	{
 		public static Support Default { get; } = new Support();
 		Support() : this( ParameterizedSourceTypeDefinition.Default, RunTypeDefinition.Default, GenericCommandTypeDefinition.Default, CommandTypeDefinition.Default ) {}

@@ -57,7 +57,6 @@
     <Compile Include="Aspects\Build\ITypedPairs.cs" />
     <Compile Include="Aspects\Build\SpecificationFactory.cs" />
     <Compile Include="Aspects\Build\AspectBuildDefinition.cs" />
-    <Compile Include="Aspects\Build\AspectBuildDefinitionBase.cs" />
     <Compile Include="Aspects\Build\TypeBasedAspectInstanceLocator.cs" />
     <Compile Include="Aspects\Build\TypedPairs.cs" />
     <Compile Include="Aspects\Alteration\ApplyAlterationAttribute.cs" />

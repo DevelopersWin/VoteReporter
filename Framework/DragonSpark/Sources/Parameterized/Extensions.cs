@@ -123,5 +123,14 @@ namespace DragonSpark.Sources.Parameterized
 		public static TResult GetEnumerable<TItem, TResult>( this Func<ImmutableArray<TItem>, TResult> @this, IEnumerable<TItem> parameter ) => @this( parameter.ToImmutableArray() );
 		public static IEnumerable<TItem> GetEnumerable<TParameter, TItem>( this IParameterizedSource<TParameter, ImmutableArray<TItem>> @this, TParameter parameter ) => @this.ToDelegate().GetEnumerable( parameter );
 		public static IEnumerable<TItem> GetEnumerable<TParameter, TItem>( this Func<TParameter, ImmutableArray<TItem>> @this, TParameter parameter ) => @this( parameter ).ToArray();
+
+		public static TItem[] GetFixed<TParameter, TItem>( this IParameterizedSource<ImmutableArray<TParameter>, ImmutableArray<TItem>> @this, params TParameter[] parameter ) => @this.ToDelegate().GetFixed( parameter );
+		public static TItem[] GetFixed<TParameter, TItem>( this Func<ImmutableArray<TParameter>, ImmutableArray<TItem>> @this, params TParameter[] parameter ) => @this( parameter.ToImmutableArray() ).ToArray();
+		public static TItem[] GetFixed<TParameter, TItem>( this IParameterizedSource<ImmutableArray<TParameter>, ImmutableArray<TItem>> @this, IEnumerable<TParameter> parameter ) => @this.ToDelegate().GetFixed( parameter );
+		public static TItem[] GetFixed<TParameter, TItem>( this Func<ImmutableArray<TParameter>, ImmutableArray<TItem>> @this, IEnumerable<TParameter> parameter ) => @this( parameter.ToImmutableArray() ).ToArray();
+		public static TItem[] GetFixed<TParameter, TItem>( this IParameterizedSource<ImmutableArray<TParameter>, ImmutableArray<TItem>> @this, ImmutableArray<TParameter> parameter ) => @this.ToDelegate().GetFixed( parameter );
+		public static TItem[] GetFixed<TParameter, TItem>( this Func<ImmutableArray<TParameter>, ImmutableArray<TItem>> @this, ImmutableArray<TParameter> parameter ) => @this( parameter ).ToArray();
+		public static TItem[] GetFixed<TParameter, TItem>( this IParameterizedSource<TParameter, ImmutableArray<TItem>> @this, TParameter parameter ) => @this.ToDelegate().GetFixed( parameter );
+		public static TItem[] GetFixed<TParameter, TItem>( this Func<TParameter, ImmutableArray<TItem>> @this, TParameter parameter ) => @this( parameter ).ToArray();
 	}
 }

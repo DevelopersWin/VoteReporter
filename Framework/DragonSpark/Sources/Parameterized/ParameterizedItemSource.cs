@@ -7,6 +7,6 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		public override ImmutableArray<TItem> Get( TParameter parameter ) => Yield( parameter ).ToImmutableArray();
 
-		protected abstract IEnumerable<TItem> Yield( TParameter parameter );
+		public abstract IEnumerable<TItem> Yield( TParameter parameter );
 	}
 }

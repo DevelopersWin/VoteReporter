@@ -7,7 +7,7 @@ using System;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public class RelayMethodAspectBuildDefinition<TInterface, TAspect> : AspectBuildDefinitionBase, IRelayMethodAspectBuildDefinition, IRelayAspectSource where TAspect : IAspect
+	public class RelayMethodAspectBuildDefinition<TInterface, TAspect> : AspectBuildDefinition, IRelayMethodAspectBuildDefinition, IRelayAspectSource where TAspect : IAspect
 	{
 		readonly Func<object, TAspect> aspectSource;
 		readonly TypeBasedAspectInstanceLocator<TAspect> locator;

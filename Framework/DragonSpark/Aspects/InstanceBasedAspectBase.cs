@@ -48,7 +48,8 @@ namespace DragonSpark.Aspects
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
 			var instance = args.Instance;
-			if ( specification( instance ) )
+			var b = specification( instance );
+			if ( b )
 			{
 				dynamic invoke = instance;
 				args.ReturnValue = invoke.Get( args.Arguments[0] );

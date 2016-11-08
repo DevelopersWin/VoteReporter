@@ -2,9 +2,13 @@
 
 namespace DragonSpark.Aspects.Coercion
 {
-	sealed class Support : AspectBuildDefinition<Aspect>
+	sealed class Support : AspectBuildDefinition
 	{
 		public static Support Default { get; } = new Support();
-		Support() : base( CommandTypeDefinition.Default, GeneralizedSpecificationTypeDefinition.Default, GeneralizedParameterizedSourceTypeDefinition.Default ) {}
+		Support() : base( 
+			MethodAspectLocatorFactory<Aspect>.Default,
+			CommandTypeDefinition.Default, 
+			GeneralizedSpecificationTypeDefinition.Default, 
+			GeneralizedParameterizedSourceTypeDefinition.Default ) {}
 	}
 }

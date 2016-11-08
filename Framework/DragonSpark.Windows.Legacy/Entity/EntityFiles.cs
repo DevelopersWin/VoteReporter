@@ -19,7 +19,7 @@ namespace DragonSpark.Windows.Legacy.Entity
 			this.logSource = logSource;
 		}
 
-		protected override IEnumerable<IFileInfo> Yield( IFileInfo parameter ) => parameter.Append( logSource( parameter ) );
+		public override IEnumerable<IFileInfo> Yield( IFileInfo parameter ) => parameter.Append( logSource( parameter ) );
 	}
 
 	public sealed class DatabaseLogLocator : AlterationBase<IFileInfo>
