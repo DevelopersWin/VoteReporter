@@ -9,4 +9,26 @@ namespace DragonSpark.Sources.Parameterized
 
 		public abstract IEnumerable<TItem> Yield( TParameter parameter );
 	}
+
+	public class SourcedItemParameterizedSource<TParameter, TItem> : ParameterizedItemSourceBase<TParameter, TItem>
+	{
+		readonly IParameterizedSource<TParameter, TItem>[] sources;
+
+		public SourcedItemParameterizedSource( params IParameterizedSource<TParameter, TItem>[] sources )
+		{
+			this.sources = sources;
+		}
+
+		public override IEnumerable<TItem> Yield( TParameter parameter )
+		{
+			foreach ( var source in sources )
+			{
+				var instance = source.Get( parameter );
+				if ( instance != null )
+				{
+					yield return instance;
+				}
+			}
+		}
+	}
 }

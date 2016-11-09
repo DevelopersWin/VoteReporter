@@ -4,9 +4,9 @@ using System;
 
 namespace DragonSpark.Aspects
 {
-	public class TypeDefinition : ItemSource<IMethodStore>, ITypeDefinition
+	public class TypeDefinition : ItemSource<IMethods>, ITypeDefinition
 	{
-		public TypeDefinition( Type referencedType, params IMethodStore[] methods ) : base( methods )
+		public TypeDefinition( Type referencedType, params IMethods[] methods ) : base( methods )
 		{
 			ReferencedType = referencedType;
 		}

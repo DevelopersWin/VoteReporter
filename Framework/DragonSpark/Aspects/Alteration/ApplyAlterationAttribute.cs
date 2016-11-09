@@ -24,7 +24,7 @@ namespace DragonSpark.Aspects.Alteration
 
 	public sealed class ApplyAlterationAttribute : ApplyAlterationBase
 	{
-		public ApplyAlterationAttribute( Type alterationType ) : base( Factory<ApplyAlterationAttribute>.Default.Get( alterationType ), Support<Aspect>.Default ) {}
+		public ApplyAlterationAttribute( Type alterationType ) : base( Factory<ApplyAlterationAttribute>.Default.Get( alterationType ), Definition<Aspect>.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyAlterationAttribute( IAlteration alteration ) : base( alteration ) {}
@@ -32,7 +32,7 @@ namespace DragonSpark.Aspects.Alteration
 
 	public sealed class ApplyResultAlterationAttribute : ApplyAlterationBase
 	{
-		public ApplyResultAlterationAttribute( Type alterationType ) : base( Factory<ApplyResultAlterationAttribute>.Default.Get( alterationType ), Support<ResultAspect>.Default ) {}
+		public ApplyResultAlterationAttribute( Type alterationType ) : base( Factory<ApplyResultAlterationAttribute>.Default.Get( alterationType ), Definition<ResultAspect>.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyResultAlterationAttribute( IAlteration alteration ) : base( alteration ) {}

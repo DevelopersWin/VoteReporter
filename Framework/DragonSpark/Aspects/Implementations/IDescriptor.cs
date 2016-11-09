@@ -1,7 +1,4 @@
-﻿using DragonSpark.Aspects.Build;
-using DragonSpark.TypeSystem;
-
-namespace DragonSpark.Aspects.Implementations
+﻿namespace DragonSpark.Aspects.Implementations
 {
-	public interface IDescriptor : ITypeAware, IAspectInstanceLocator {}
+	/*public interface IDescriptor : ITypeAware, IAspectSelector {}*/
 }

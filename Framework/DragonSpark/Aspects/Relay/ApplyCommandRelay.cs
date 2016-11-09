@@ -8,7 +8,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		readonly ICommandRelay relay;
 
-		public ApplyCommandRelay() : base( CommandDescriptor.Default ) {}
+		public ApplyCommandRelay() : base( ApplyCommandRelayDefinition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyCommandRelay( ICommandRelay relay ) : base( relay )

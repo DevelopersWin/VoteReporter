@@ -4,11 +4,11 @@ namespace DragonSpark.Aspects
 {
 	public abstract class TypeDefinitionWithPrimaryMethodBase : TypeDefinition
 	{
-		protected TypeDefinitionWithPrimaryMethodBase( IMethodStore method ) : base( method.ReferencedType, method )
+		protected TypeDefinitionWithPrimaryMethodBase( IMethods method ) : base( method.ReferencedType, method )
 		{
 			Method = method;
 		}
 
-		public IMethodStore Method { get; }
+		public IMethods Method { get; }
 	}
 }

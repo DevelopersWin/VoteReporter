@@ -7,11 +7,11 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public sealed class MethodStore : CacheWithImplementedFactoryBase<Type, MethodInfo>, IMethodStore
+	public sealed class Methods : CacheWithImplementedFactoryBase<Type, MethodInfo>, IMethods
 	{
 		readonly string methodName;
 
-		public MethodStore( Type referencedType, string methodName ) : base( TypeAssignableSpecification.Defaults.Get( referencedType ) )
+		public Methods( Type referencedType, string methodName ) : base( TypeAssignableSpecification.Defaults.Get( referencedType ) )
 		{
 			ReferencedType = referencedType;
 			this.methodName = methodName;

@@ -14,7 +14,7 @@ namespace DragonSpark.Aspects.Validation
 	{
 		readonly IAutoValidationController controller;
 
-		public ApplyAutoValidationAttribute() : base( o => new ApplyAutoValidationAttribute( Defaults.ControllerSource( o ) ), Support.Default ) {}
+		public ApplyAutoValidationAttribute() : base( o => new ApplyAutoValidationAttribute( Defaults.ControllerSource( o ) ), Definition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyAutoValidationAttribute( IAutoValidationController controller )

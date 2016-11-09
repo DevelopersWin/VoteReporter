@@ -4,5 +4,5 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects
 {
-	public interface ITypeDefinition : ITypeAware, IEnumerable<IMethodStore> {}
+	public interface ITypeDefinition : ITypeAware, IEnumerable<IMethods> {}
 }

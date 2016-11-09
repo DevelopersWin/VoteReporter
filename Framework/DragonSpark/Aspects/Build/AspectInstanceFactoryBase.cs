@@ -6,6 +6,7 @@ using PostSharp.Extensibility;
 using PostSharp.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
@@ -17,12 +18,26 @@ namespace DragonSpark.Aspects.Build
 		public override ObjectConstruction Get( IEnumerable<object> parameter ) => new ObjectConstruction( typeof(T), parameter.Fixed() );
 	}
 
-	public sealed class AspectInstanceFactory<TAspect, TTarget> : SpecificationParameterizedSource<TTarget, AspectInstance>
+	public sealed class MethodAspectFactory<T> : AspectInstanceFactoryBase<MemberInfo, T> where T : IAspect
 	{
-		public static AspectInstanceFactory<TAspect, TTarget> Default { get; } = new AspectInstanceFactory<TAspect, TTarget>();
-		AspectInstanceFactory() : base( HasAspectSpecification.Implementation.Inverse(), Factory.Implementation.Get ) {}
+		public static MethodAspectFactory<T> Default { get; } = new MethodAspectFactory<T>();
+		MethodAspectFactory() {}
+	}
+
+	public sealed class TypeAspectFactory<T> : AspectInstanceFactoryBase<TypeInfo, T> where T : IAspect
+	{
+		public static TypeAspectFactory<T> Default { get; } = new TypeAspectFactory<T>();
+		TypeAspectFactory() {}
+	}
+
+	public abstract class AspectInstanceFactoryBase<TMemberInfo, TAspect> : SpecificationParameterizedSource<TMemberInfo, AspectInstance> 
+		where TMemberInfo : MemberInfo
+		where TAspect : IAspect
+	{
+		/*public static AspectInstanceFactoryBase<TMemberInfo, TAspect> Default { get; } = new AspectInstanceFactoryBase<TMemberInfo, TAspect>();*/
+		protected AspectInstanceFactoryBase() : base( HasAspectSpecification.Implementation.Inverse(), Factory.Implementation.Get ) {}
 		
-		sealed class HasAspectSpecification : SpecificationBase<TTarget>
+		sealed class HasAspectSpecification : SpecificationBase<TMemberInfo>
 		{
 			readonly static Type AspectType = typeof(TAspect);
 
@@ -36,10 +51,10 @@ namespace DragonSpark.Aspects.Build
 				this.repositorySource = repositorySource;
 			}
 
-			public override bool IsSatisfiedBy( TTarget parameter ) => repositorySource().HasAspect( parameter, AspectType );
+			public override bool IsSatisfiedBy( TMemberInfo parameter ) => repositorySource().HasAspect( parameter, AspectType );
 		}
 
-		sealed class Factory : ParameterizedSourceBase<TTarget, AspectInstance>
+		sealed class Factory : ParameterizedSourceBase<TMemberInfo, AspectInstance>
 		{
 			public static Factory Implementation { get; } = new Factory();
 			Factory() : this( ObjectConstructionFactory<TAspect>.Default.Get() ) {}
@@ -51,7 +66,7 @@ namespace DragonSpark.Aspects.Build
 				this.construction = construction;
 			}
 
-			public override AspectInstance Get( TTarget parameter ) => new AspectInstance( parameter, construction, null );
+			public override AspectInstance Get( TMemberInfo parameter ) => new AspectInstance( parameter, construction, null );
 		}
 	}
 }

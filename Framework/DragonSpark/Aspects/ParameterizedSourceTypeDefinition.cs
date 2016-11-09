@@ -7,6 +7,6 @@ namespace DragonSpark.Aspects
 	public sealed class ParameterizedSourceTypeDefinition : TypeDefinitionWithPrimaryMethodBase
 	{
 		public static ParameterizedSourceTypeDefinition Default { get; } = new ParameterizedSourceTypeDefinition();
-		ParameterizedSourceTypeDefinition() : base( new MethodStore( typeof(IParameterizedSource<,>), nameof(ISource.Get) ) ) {}
+		ParameterizedSourceTypeDefinition() : base( new Methods( typeof(IParameterizedSource<,>), nameof(ISource.Get) ) ) {}
 	}
 }

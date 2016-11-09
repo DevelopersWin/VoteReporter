@@ -10,6 +10,6 @@ namespace DragonSpark.Aspects.Relay
 		]
 	public sealed class ApplyRelaysAttribute : TypeBasedAspectBase
 	{
-		public ApplyRelaysAttribute() : base( Relays.Default ) {}
+		public ApplyRelaysAttribute() : base( Definitions.Default ) {}
 	}
 }

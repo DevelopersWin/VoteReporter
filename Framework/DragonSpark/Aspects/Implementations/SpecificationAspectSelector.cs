@@ -1,9 +1,9 @@
 ﻿namespace DragonSpark.Aspects.Implementations
 {
-	public sealed class SpecificationDescriptor : Descriptor<GeneralizedSpecificationAspect>
+	public sealed class SpecificationAspectSelector : AspectSelector<GeneralizedSpecificationAspect>
 	{
-		public static SpecificationDescriptor Default { get; } = new SpecificationDescriptor();
-		SpecificationDescriptor() : base( 
+		public static SpecificationAspectSelector Default { get; } = new SpecificationAspectSelector();
+		SpecificationAspectSelector() : base( 
 			GenericSpecificationTypeDefinition.Default.ReferencedType, 
 			GeneralizedSpecificationTypeDefinition.Default.ReferencedType, 
 			CommandTypeDefinition.Default.ReferencedType ) {}

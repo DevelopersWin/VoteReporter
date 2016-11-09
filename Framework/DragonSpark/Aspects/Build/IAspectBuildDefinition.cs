@@ -1,10 +1,9 @@
 ﻿using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
 using PostSharp.Aspects;
-using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public interface IAspectBuildDefinition : ISpecification<Type>, IParameterizedSource<Type, IEnumerable<AspectInstance>> {}
+	public interface IAspectBuildDefinition : IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>>, IAspectProvider {}
 }

@@ -7,21 +7,20 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
 using System;
-using System.Collections.Immutable;
 
 namespace DragonSpark.Aspects.Specifications
 {
-	public sealed class Support : AspectBuildDefinition
+	public sealed class Definition : AspectBuildDefinition
 	{
-		public static Support Default { get; } = new Support();
-		Support() : this( 
-			AspectLocatorFactory<IntroduceSpecification, Aspect>.Default,
-			GenericSpecificationTypeDefinition.Default ) {}
+		public static Definition Default { get; } = new Definition();
+		Definition() : base( 
+			AspectLocatorFactory<IntroduceSpecification, Aspect>.Default.GetFixed( GenericSpecificationTypeDefinition.Default )
+		) {}
 
-		Support( 
-			IParameterizedSource<ImmutableArray<ITypeDefinition>, ImmutableArray<IAspectInstanceLocator>> locatorSource,
+		/*Support( 
+			IParameterizedSource<ImmutableArray<ITypeDefinition>, ImmutableArray<IAspectSelector>> locatorSource,
 			params ITypeDefinition[] definitions
-		) : base( type => true, locatorSource.GetFixed( definitions ) ) {}
+		) : base( type => true, locatorSource.GetFixed( definitions ) ) {}*/
 	}
 
 	[UsedImplicitly, LinesOfCodeAvoided( 1 )]
@@ -52,6 +51,7 @@ namespace DragonSpark.Aspects.Specifications
 
 		protected IntroduceGenericInterfaceAspectBase( Type interfaceType, Func<object, object> factory ) : this( interfaceType, TypeAssignableSpecification.Defaults.Get( interfaceType ).Inverse(), factory ) {}
 
+		[UsedImplicitly]
 		protected IntroduceGenericInterfaceAspectBase( Type interfaceType, ISpecification<Type> specification, Func<object, object> factory )
 		{
 			this.interfaceType = interfaceType;
@@ -61,10 +61,7 @@ namespace DragonSpark.Aspects.Specifications
 
 		public override bool CompileTimeValidate( Type type ) => specification.IsSatisfiedBy( type );
 
-		protected override Type[] GetPublicInterfaces( Type targetType )
-		{
-			return interfaceType.MakeGenericType( ParameterTypes.Default.Get( targetType ) ).ToItem();
-		}
+		protected override Type[] GetPublicInterfaces( Type targetType ) => interfaceType.MakeGenericType( ParameterTypes.Default.Get( targetType ) ).ToItem();
 
 		public override object CreateImplementationObject( AdviceArgs args ) => factory( args.Instance );
 	}

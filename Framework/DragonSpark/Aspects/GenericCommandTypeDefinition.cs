@@ -12,7 +12,7 @@ namespace DragonSpark.Aspects
 
 	public sealed class GenericCommandCoreTypeDefinition : TypeDefinitionWithPrimaryMethodBase
 	{
-		public static IMethodStore Execute { get; } = new MethodStore( typeof(ICommand<>), nameof(ICommand.Execute) );
+		public static IMethods Execute { get; } = new Methods( typeof(ICommand<>), nameof(ICommand.Execute) );
 
 		public static GenericCommandCoreTypeDefinition Default { get; } = new GenericCommandCoreTypeDefinition();
 		GenericCommandCoreTypeDefinition() : base( Execute ) {}

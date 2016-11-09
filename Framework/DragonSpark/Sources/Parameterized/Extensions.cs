@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -105,6 +106,11 @@ namespace DragonSpark.Sources.Parameterized
 		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) where TParameter : class => @this.ToDelegate().ToEqualityCache();
 		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this Func<TParameter, TResult> @this ) where TParameter : class => new EqualityReferenceCache<TParameter, TResult>( @this );
 		
+		public static T Get<T>( this IParameterizedSource<TypeInfo, T> @this, Type parameter ) => @this.ToDelegate().Get( parameter );
+		public static T Get<T>( this Func<TypeInfo, T> @this, Type parameter ) => @this( parameter.GetTypeInfo() );
+		public static T Get<T>( this IParameterizedSource<Type, T> @this, TypeInfo parameter ) => @this.ToDelegate().Get( parameter );
+		public static T Get<T>( this Func<Type, T> @this, TypeInfo parameter ) => @this( parameter.AsType() );
+
 		public static TResult Get<TItem, TResult>( this IParameterizedSource<ImmutableArray<TItem>, TResult> @this ) => @this.ToDelegate().Get();
 		public static TResult Get<TItem, TResult>( this IParameterizedSource<ImmutableArray<TItem>, TResult> @this, params TItem[] parameters ) => @this.ToDelegate().Get( parameters );
 		public static TResult Get<TItem, TResult>( this Func<ImmutableArray<TItem>, TResult> @this ) => @this.Get( Items<TItem>.Default );

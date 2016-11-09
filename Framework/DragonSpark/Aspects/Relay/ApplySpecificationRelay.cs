@@ -6,7 +6,7 @@ namespace DragonSpark.Aspects.Relay
 	[IntroduceInterface( typeof(ISpecificationRelay) )]
 	public sealed class ApplySpecificationRelay : SpecificationRelayAspectBase, ISpecificationRelay
 	{
-		public ApplySpecificationRelay()  : base( SpecificationDescriptor.Default ) {}
+		public ApplySpecificationRelay()  : base( ApplySpecificationRelayDefinition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplySpecificationRelay( ISpecificationRelay relay ) : base( relay ) {}
