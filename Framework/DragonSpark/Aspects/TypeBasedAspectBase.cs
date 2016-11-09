@@ -1,5 +1,6 @@
 using DragonSpark.Aspects.Build;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;

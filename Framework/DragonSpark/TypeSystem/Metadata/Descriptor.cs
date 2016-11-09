@@ -7,7 +7,7 @@ namespace DragonSpark.TypeSystem.Metadata
 {
 	public struct Descriptor
 	{
-		public Descriptor( MethodInfo method ) : this( method, GenericMethodEqualitySpecification.Default.Get( method ).ToSpecificationDelegate() ) {}
+		public Descriptor( MethodInfo method ) : this( method, GenericMethodEqualitySpecification.Default.Get( method ).ToDelegate() ) {}
 
 		public Descriptor( MethodInfo method, Func<Type[], bool> specification )
 		{

@@ -7,7 +7,7 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		readonly Func<TParameter, bool> specification;
 
-		public SpecificationParameterizedSource( ISpecification<TParameter> specification, Func<TParameter, TResult> source ) : this( specification.ToSpecificationDelegate(), source ) {}
+		public SpecificationParameterizedSource( ISpecification<TParameter> specification, Func<TParameter, TResult> source ) : this( specification.ToDelegate(), source ) {}
 
 		public SpecificationParameterizedSource( Func<TParameter, bool> specification, Func<TParameter, TResult> source ) : base( source )
 		{

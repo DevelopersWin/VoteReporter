@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using PostSharp.Aspects;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -8,10 +9,12 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class AspectBuildDefinition : AspectProviderBase<TypeInfo>, IAspectBuildDefinition
+	public class AspectBuildDefinition : SpecificationParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>>, IAspectBuildDefinition
 	{
-		public AspectBuildDefinition( params IAspectSelector[] sources ) : base( sources ) {}
+		public AspectBuildDefinition( params IAspectSelector[] sources ) : this( Common<TypeInfo>.Assigned, sources ) {}
+		public AspectBuildDefinition( ISpecification<TypeInfo> specification, params IAspectSelector[] sources ) : base( specification, new SourcedAspectProvider<TypeInfo>( sources ).Get ) {}
 
+		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => this.GetEnumerable( (TypeInfo)targetElement );
 
 		/*readonly ImmutableArray<IAspectSelector> locators;
 
@@ -42,7 +45,7 @@ namespace DragonSpark.Aspects.Build
 				}
 			}
 		}*/
-		
+
 	}
 
 	public sealed class AspectLocatorFactory<TType, TMethod> : ParameterizedItemSourceBase<ImmutableArray<ITypeDefinition>, IAspectSelector>

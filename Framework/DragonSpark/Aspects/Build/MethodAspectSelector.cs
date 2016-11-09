@@ -14,7 +14,7 @@ namespace DragonSpark.Aspects.Build
 
 	public abstract class AspectSelectorBase : SpecificationParameterizedSource<TypeInfo, AspectInstance>, IAspectSelector
 	{
-		protected AspectSelectorBase( Type supportedType, Func<Type, AspectInstance> factory ) : this( TypeAssignableSpecification.Defaults.Get( supportedType ).ToSpecificationDelegate(), factory ) {}
+		protected AspectSelectorBase( Type supportedType, Func<Type, AspectInstance> factory ) : this( TypeAssignableSpecification.Defaults.Get( supportedType ).ToDelegate(), factory ) {}
 		protected AspectSelectorBase( Func<Type, bool> specification, Func<Type, AspectInstance> factory ) : base( specification.Get, factory.Get ) {}
 	}
 }

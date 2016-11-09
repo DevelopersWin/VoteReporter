@@ -17,7 +17,7 @@ namespace DragonSpark.Composition
 		readonly Func<Type, bool> specification;
 
 		[UsedImplicitly]
-		public SingletonExportSource( Func<ImmutableArray<SingletonExport>> exports ) : this( TypeAssignableSpecification<T>.Default.ToSpecificationDelegate() )
+		public SingletonExportSource( Func<ImmutableArray<SingletonExport>> exports ) : this( TypeAssignableSpecification<T>.Default.ToDelegate() )
 		{
 			this.exports = exports;
 		}

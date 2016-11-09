@@ -46,18 +46,17 @@
     <Compile Include="Application\FatalApplicationException.cs" />
     <Compile Include="Application\Setup\IInputOutput.cs" />
     <Compile Include="Application\Setup\ReadKeyCommand.cs" />
+    <Compile Include="Aspects\Build\MethodAspectSelector.cs" />
     <Compile Include="Aspects\GenericAdapterConstructorFactory.cs" />
     <Compile Include="Aspects\AdapterFactory.cs" />
     <Compile Include="Aspects\AdapterLocatorBase.cs" />
     <Compile Include="Aspects\InvocationAdapter.cs" />
     <Compile Include="Aspects\TypeBasedAspectBase.cs" />
-    <Compile Include="Aspects\AspectProviderBase.cs" />
+    <Compile Include="Aspects\SourcedAspectProvider.cs" />
     <Compile Include="Aspects\AssignedAttribute.cs" />
     <Compile Include="Aspects\Build\IAspectBuildDefinition.cs" />
-    <Compile Include="Aspects\Build\ITypedPairs.cs" />
     <Compile Include="Aspects\Build\AspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\TypeAspectSelector.cs" />
-    <Compile Include="Aspects\Build\TypedPairs.cs" />
     <Compile Include="Aspects\Alteration\ApplyAlterationAttribute.cs" />
     <Compile Include="Aspects\Alteration\Aspect.cs" />
     <Compile Include="Aspects\Alteration\Adapter.cs" />
@@ -85,7 +84,7 @@
     <Compile Include="Aspects\Exceptions\AspectBase.cs" />
     <Compile Include="Aspects\Exceptions\IPolicySource.cs" />
     <Compile Include="Aspects\Exceptions\RetryDelegateFactory.cs" />
-    <Compile Include="Aspects\Exceptions\Support.cs" />
+    <Compile Include="Aspects\Exceptions\Definition.cs" />
     <Compile Include="Aspects\InterceptionArgsExtensions.cs" />
     <Compile Include="Aspects\Generalized.cs" />
     <Compile Include="Aspects\GeneralizedParameterizedSourceTypeDefinition.cs" />
@@ -158,7 +157,6 @@
     <Compile Include="Aspects\Build\AspectInstanceFactoryBase.cs" />
     <Compile Include="Aspects\Validation\AutoValidationAspectBase.cs" />
     <Compile Include="Aspects\Build\ValidatingSpecification.cs" />
-    <Compile Include="Aspects\Build\MethodAspectSelector.cs" />
     <Compile Include="Aspects\Validation\Definition.cs" />
     <Compile Include="Runtime\Assignments\AssignGlobalScopeCommand.cs" />
     <Compile Include="Runtime\Assignments\AssignScopeCommand.cs" />

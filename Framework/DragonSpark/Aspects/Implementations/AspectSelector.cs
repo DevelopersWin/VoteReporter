@@ -12,7 +12,7 @@ namespace DragonSpark.Aspects.Implementations
 		public AspectSelector( Type declaringType, params Type[] implementedTypes ) : base( 
 			TypeAssignableSpecification.Defaults.Get( declaringType )
 				.And( new AllSpecification<Type>( implementedTypes.Select( type => TypeAssignableSpecification.Defaults.Get( type ).Inverse() ).Fixed() ) )
-				.ToSpecificationDelegate()
+				.ToDelegate()
 		) {}
 	}
 }

@@ -16,7 +16,7 @@ namespace DragonSpark.Activation
 		sealed class Delegates<T> : Cache<Func<IActivator>, Func<Type, T>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( source => new Factory( source ).Apply( new DeferredSpecification<Type>( source ) ).ToDelegate() ) {}
+			Delegates() : base( source => Sources.Parameterized.Extensions.ToDelegate( new Factory( source ).Apply( new DeferredSpecification<Type>( source ) ) ) ) {}
 
 			sealed class Factory : ParameterizedSourceBase<Type, T>
 			{

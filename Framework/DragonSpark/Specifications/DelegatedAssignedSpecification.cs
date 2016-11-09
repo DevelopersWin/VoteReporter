@@ -4,7 +4,7 @@ namespace DragonSpark.Specifications
 {
 	public class DelegatedAssignedSpecification<TParameter, TResult> : SpecificationBase<TParameter>
 	{
-		readonly static Func<TResult, bool> Specification = AssignedSpecification<TResult>.Default.ToSpecificationDelegate();
+		readonly static Func<TResult, bool> Specification = AssignedSpecification<TResult>.Default.ToDelegate();
 
 		readonly Func<TParameter, TResult> source;
 		readonly Func<TResult, bool> specification;

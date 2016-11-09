@@ -9,7 +9,7 @@ namespace DragonSpark.Extensions
 {
 	sealed class MethodEqualitySpecification : SpecificationWithContextBase<MethodInfo>
 	{
-		public static Func<MethodInfo, Func<MethodInfo, bool>> For { get; } = new Cache<MethodInfo, Func<MethodInfo, bool>>( info => new MethodEqualitySpecification( info ).ToSpecificationDelegate() ).ToDelegate();
+		public static Func<MethodInfo, Func<MethodInfo, bool>> For { get; } = new Cache<MethodInfo, Func<MethodInfo, bool>>( info => new MethodEqualitySpecification( info ).ToDelegate() ).ToDelegate();
 
 		readonly Func<Type, Type> map;
 

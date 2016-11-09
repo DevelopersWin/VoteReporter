@@ -38,7 +38,7 @@ namespace DragonSpark.TypeSystem.Generics
 				try
 				{
 					var method = item.Item1.Method.MakeGenericMethod( item.Item2 );
-					var specification = CompatibleArgumentsSpecification.Default.Get( method ).ToSpecificationDelegate();
+					var specification = CompatibleArgumentsSpecification.Default.Get( method ).ToDelegate();
 					var @delegate = create( method );
 					var result = new GenericMethodCandidate<T>( @delegate, specification );
 					return result;

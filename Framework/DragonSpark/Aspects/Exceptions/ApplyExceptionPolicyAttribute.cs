@@ -20,7 +20,7 @@ namespace DragonSpark.Aspects.Exceptions
 	{
 		readonly Policy policy;
 
-		public ApplyExceptionPolicyAttribute( Type policyType ) :  base( Factory.Default.Get( policyType ), Support.Default ) {}
+		public ApplyExceptionPolicyAttribute( Type policyType ) :  base( Factory.Default.Get( policyType ), Definition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyExceptionPolicyAttribute( Policy policy )

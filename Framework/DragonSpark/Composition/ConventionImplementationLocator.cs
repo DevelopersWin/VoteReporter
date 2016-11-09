@@ -11,7 +11,7 @@ namespace DragonSpark.Composition
 {
 	sealed class ConventionImplementationLocator : AlterationBase<Type>
 	{
-		readonly static Func<ConventionMapping, bool> Where = IsValidConventionMappingSpecification.Default.ToSpecificationDelegate();
+		readonly static Func<ConventionMapping, bool> Where = IsValidConventionMappingSpecification.Default.ToDelegate();
 
 		readonly Func<ImmutableArray<Type>> source;
 		readonly Func<ConventionMapping, bool> @where;

@@ -11,7 +11,7 @@ namespace DragonSpark.TypeSystem
 {
 	public sealed class AssemblyTypesStore : CacheWithImplementedFactoryBase<Assembly, ImmutableArray<Type>>
 	{
-		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToSpecificationDelegate();
+		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToDelegate();
 
 		readonly Func<Assembly, IEnumerable<Type>> types;
 		public AssemblyTypesStore( Func<Assembly, IEnumerable<Type>> types )

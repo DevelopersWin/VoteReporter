@@ -21,7 +21,7 @@ namespace DragonSpark.Diagnostics
 				var located = ConstructingParameterLocator.Default.Get( type );
 				if ( located != null )
 				{
-					parameter.Destructure.ByTransformingWhere( TypeAssignableSpecification.Defaults.Get( located ).ToSpecificationDelegate(), Formatter );
+					parameter.Destructure.ByTransformingWhere( TypeAssignableSpecification.Defaults.Get( located ).ToDelegate(), Formatter );
 				}
 			}
 

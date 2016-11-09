@@ -3,12 +3,13 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Sources.Scopes;
 using System;
+using System.Reflection;
 
 namespace DragonSpark.Specifications
 {
 	public static class Extensions
 	{
-		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this ISpecification<TTo> @this, IParameterizedSource<TFrom, TTo> coercer ) => Coerce( @this.ToSpecificationDelegate(), coercer.ToDelegate() );
+		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this ISpecification<TTo> @this, IParameterizedSource<TFrom, TTo> coercer ) => Coerce( @this.ToDelegate(), coercer.ToDelegate() );
 		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this Func<TTo, bool> @this, Func<TFrom, TTo> coerce ) =>
 			new CoercedSpecification<TFrom, TTo>( coerce, @this );
 
@@ -28,7 +29,12 @@ namespace DragonSpark.Specifications
 		public static ISpecification<object> Fixed<T>( this ISpecification<T> @this, T parameter ) => new SuppliedDelegatedSpecification<T>( @this, parameter );
 		public static ISpecification<object> Fixed<T>( this ISpecification<T> @this, Func<T> parameter ) => new SuppliedDelegatedSpecification<T>( @this, parameter );
 
-		public static Func<T, bool> ToSpecificationDelegate<T>( this ISpecification<T> @this ) => Delegates<T>.Default.Get( @this );
+		public static bool IsSatisfiedBy( this ISpecification<TypeInfo> @this, Type parameter ) => @this.ToDelegate().Get( parameter );
+		public static bool IsSatisfiedBy( this Func<TypeInfo, bool> @this, Type parameter ) => @this( parameter.GetTypeInfo() );
+		public static bool IsSatisfiedBy( this ISpecification<Type> @this, TypeInfo parameter ) => @this.ToDelegate().Get( parameter );
+		public static bool IsSatisfiedBy( this Func<Type, bool> @this, TypeInfo parameter ) => @this( parameter.AsType() );
+
+		public static Func<T, bool> ToDelegate<T>( this ISpecification<T> @this ) => Delegates<T>.Default.Get( @this );
 		sealed class Delegates<T> : Cache<ISpecification<T>, Func<T, bool>>
 		{
 			public static Delegates<T> Default { get; } = new Delegates<T>();
@@ -39,7 +45,7 @@ namespace DragonSpark.Specifications
 		sealed class CachedSpecifications<T> : Cache<ISpecification<T>, ISpecification<T>>
 		{
 			public static CachedSpecifications<T> Default { get; } = new CachedSpecifications<T>();
-			CachedSpecifications() : base( specification => new DelegatedSpecification<T>( specification.ToSpecificationDelegate().ToSingleton() ) ) {}
+			CachedSpecifications() : base( specification => new DelegatedSpecification<T>( specification.ToDelegate().ToSingleton() ) ) {}
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace DragonSpark.TypeSystem
 
 	public sealed class TypeAdapter : ITypeAware
 	{
-		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToSpecificationDelegate();
+		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToDelegate();
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
 		readonly Func<Type, bool> isAssignableFrom;
 		
