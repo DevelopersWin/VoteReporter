@@ -7,6 +7,8 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
 using System;
+using DragonSpark.Aspects.Adapters;
+using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Specifications
 {

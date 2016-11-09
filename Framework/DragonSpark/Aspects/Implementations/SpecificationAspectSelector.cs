@@ -1,4 +1,6 @@
-﻿namespace DragonSpark.Aspects.Implementations
+﻿using DragonSpark.Aspects.Definitions;
+
+namespace DragonSpark.Aspects.Implementations
 {
 	public sealed class SpecificationAspectSelector : AspectSelector<GeneralizedSpecificationAspect>
 	{

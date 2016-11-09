@@ -1,4 +1,6 @@
-﻿namespace DragonSpark.Aspects.Specifications
+﻿using DragonSpark.Aspects.Adapters;
+
+namespace DragonSpark.Aspects.Specifications
 {
 	public sealed class Source : ConstructedSourceBase<ISpecification>
 	{

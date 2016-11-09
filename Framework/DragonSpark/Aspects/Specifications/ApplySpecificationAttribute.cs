@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
+using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects.Specifications
 {

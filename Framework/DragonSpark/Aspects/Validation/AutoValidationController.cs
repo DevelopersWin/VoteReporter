@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
 using System.Threading;
+using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects.Validation
 {

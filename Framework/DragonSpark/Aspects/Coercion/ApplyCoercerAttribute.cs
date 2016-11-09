@@ -3,6 +3,8 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
 using System;
+using DragonSpark.Aspects.Adapters;
+using DragonSpark.Aspects.Build;
 
 namespace DragonSpark.Aspects.Coercion
 {

@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using PostSharp.Aspects.Advices;
 using System;
+using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects.Specifications
 {

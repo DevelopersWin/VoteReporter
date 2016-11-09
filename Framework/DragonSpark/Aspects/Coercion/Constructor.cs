@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using System;
+using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects.Coercion
 {

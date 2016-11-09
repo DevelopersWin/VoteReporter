@@ -1,4 +1,5 @@
-﻿using PostSharp.Aspects;
+﻿using DragonSpark.Aspects.Adapters;
+using PostSharp.Aspects;
 
 namespace DragonSpark.Aspects.Validation
 {

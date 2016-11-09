@@ -1,4 +1,5 @@
-﻿using DragonSpark.Commands;
+﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Commands;
 
 namespace DragonSpark.Aspects.Validation
 {

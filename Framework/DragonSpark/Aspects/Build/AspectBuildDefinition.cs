@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Build
 {

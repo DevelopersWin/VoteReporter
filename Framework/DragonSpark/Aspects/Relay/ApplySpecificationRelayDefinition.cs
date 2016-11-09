@@ -1,8 +1,10 @@
-﻿using DragonSpark.Aspects.Build;
+﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Aspects.Build;
+using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class ApplySpecificationRelayDefinition : ApplyRelayAspectBuildDefinition<ISpecificationRelay, ApplySpecificationRelay>
+	public sealed class ApplySpecificationRelayDefinition : AspectBuildDefinition<ISpecificationRelay, ApplySpecificationRelay>
 	{
 		public static ApplySpecificationRelayDefinition Default { get; } = new ApplySpecificationRelayDefinition();
 		ApplySpecificationRelayDefinition() : base( 

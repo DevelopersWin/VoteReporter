@@ -1,4 +1,6 @@
-﻿namespace DragonSpark.Aspects.Coercion
+﻿using DragonSpark.Aspects.Adapters;
+
+namespace DragonSpark.Aspects.Coercion
 {
 	public sealed class Source : ConstructedSourceBase<ICoercer>
 	{

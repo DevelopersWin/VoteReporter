@@ -1,5 +1,7 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using System;
+using DragonSpark.Aspects.Adapters;
+using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Specifications
 {

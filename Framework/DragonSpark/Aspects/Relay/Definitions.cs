@@ -9,7 +9,7 @@ namespace DragonSpark.Aspects.Relay
 		/*readonly ISpecification<Type> specification;*/
 		public static Definitions Default { get; } = new Definitions();
 		Definitions() : this( ApplyCommandRelayDefinition.Default, ApplySourceRelayDefinition.Default, ApplySpecificationRelayDefinition.Default ) {}
-		Definitions( params IApplyRelayAspectBuildDefinition[] definitions ) : base( definitions.Concat().Fixed() ) {}
+		Definitions( params IAspectBuildDefinition[] definitions ) : base( definitions.Concat().Fixed() ) {}
 
 		/*readonly ImmutableArray<IRelayAspectSource> sources;
 

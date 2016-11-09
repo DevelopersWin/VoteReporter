@@ -1,4 +1,4 @@
-﻿using DragonSpark.Aspects.Relay;
+﻿using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects.Implementations
 {

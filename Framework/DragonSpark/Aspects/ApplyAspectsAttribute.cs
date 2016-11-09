@@ -5,6 +5,7 @@ using PostSharp.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects
 {

@@ -12,6 +12,6 @@ namespace DragonSpark.Composition
 		[UsedImplicitly]
 		public ConventionTypeSelector( Alter<Type> source ) : base( source ) {}
 
-		public override Type Get( Type parameter ) => base.Get( parameter ) ?? parameter;
+		public override Type Get( Type parameter = null ) => base.Get( parameter ) ?? parameter;
 	}
 }

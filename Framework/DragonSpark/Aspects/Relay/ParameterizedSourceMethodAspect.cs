@@ -1,4 +1,6 @@
-﻿namespace DragonSpark.Aspects.Relay
+﻿using DragonSpark.Aspects.Adapters;
+
+namespace DragonSpark.Aspects.Relay
 {
 	public sealed class ParameterizedSourceMethodAspect : MethodAspectBase
 	{

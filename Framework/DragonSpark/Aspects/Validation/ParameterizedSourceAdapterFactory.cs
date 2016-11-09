@@ -1,4 +1,5 @@
-﻿using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Validation

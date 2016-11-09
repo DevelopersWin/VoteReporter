@@ -1,4 +1,6 @@
-﻿namespace DragonSpark.Aspects.Alteration
+﻿using DragonSpark.Aspects.Adapters;
+
+namespace DragonSpark.Aspects.Alteration
 {
 	public sealed class Source : ConstructedSourceBase<IAlteration>
 	{

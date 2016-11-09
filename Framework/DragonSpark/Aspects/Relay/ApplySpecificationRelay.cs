@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using DragonSpark.Aspects.Adapters;
+using JetBrains.Annotations;
 using PostSharp.Aspects.Advices;
 
 namespace DragonSpark.Aspects.Relay

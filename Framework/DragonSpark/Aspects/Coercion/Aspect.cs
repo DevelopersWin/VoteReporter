@@ -1,4 +1,5 @@
-﻿using PostSharp.Aspects;
+﻿using DragonSpark.Aspects.Adapters;
+using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
 
 namespace DragonSpark.Aspects.Coercion

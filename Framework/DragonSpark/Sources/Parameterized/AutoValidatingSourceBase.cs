@@ -1,4 +1,4 @@
-using DragonSpark.Aspects;
+using DragonSpark.Aspects.Adapters;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Extensions;
 using System;

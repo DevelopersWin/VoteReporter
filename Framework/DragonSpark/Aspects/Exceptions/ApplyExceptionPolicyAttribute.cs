@@ -6,6 +6,7 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
 using System;
+using DragonSpark.Aspects.Build;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Exceptions

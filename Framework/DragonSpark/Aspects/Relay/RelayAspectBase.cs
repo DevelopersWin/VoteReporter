@@ -15,7 +15,7 @@ namespace DragonSpark.Aspects.Relay
 	/*[IntroduceInterface( typeof(IRelay), OverrideAction = InterfaceOverrideAction.Ignore )]*/
 	public abstract class RelayAspectBase : InvocationAspectBase
 	{
-		protected RelayAspectBase( IApplyRelayAspectBuildDefinition definition ) : base( definition.Get, definition ) {}
+		protected RelayAspectBase( IAspectBuildDefinition definition ) : base( definition.Get, definition ) {}
 		
 		protected RelayAspectBase( Invoke invoke ) : base( invoke ) {}
 	}

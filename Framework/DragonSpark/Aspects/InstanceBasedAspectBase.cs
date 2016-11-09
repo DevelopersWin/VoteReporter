@@ -1,6 +1,7 @@
 using DragonSpark.Aspects.Build;
 using PostSharp.Aspects;
 using System;
+using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects
 {

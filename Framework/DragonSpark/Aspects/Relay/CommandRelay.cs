@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using DragonSpark.Aspects.Adapters;
+using JetBrains.Annotations;
 
 namespace DragonSpark.Aspects.Relay
 {

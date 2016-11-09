@@ -6,6 +6,7 @@ using PostSharp.Aspects;
 using System;
 using System.Reflection;
 using System.Windows.Input;
+using DragonSpark.Aspects.Adapters;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Validation

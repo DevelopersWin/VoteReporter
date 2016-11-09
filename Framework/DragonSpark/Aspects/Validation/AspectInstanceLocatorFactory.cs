@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Sources.Parameterized;
 using System.Collections.Generic;
+using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Validation
 {

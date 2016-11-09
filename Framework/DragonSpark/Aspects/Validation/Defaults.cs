@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Validation
 {

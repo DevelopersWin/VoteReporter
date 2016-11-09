@@ -4,6 +4,7 @@ using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
 using System;
+using DragonSpark.Aspects.Adapters;
 using Aspect = DragonSpark.Aspects.Coercion.Aspect;
 
 namespace DragonSpark.Aspects.Alteration

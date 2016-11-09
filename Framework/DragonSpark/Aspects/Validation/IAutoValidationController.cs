@@ -1,4 +1,6 @@
-﻿namespace DragonSpark.Aspects.Validation
+﻿using DragonSpark.Aspects.Adapters;
+
+namespace DragonSpark.Aspects.Validation
 {
 	public interface IAutoValidationController
 	{

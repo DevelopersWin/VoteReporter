@@ -1,8 +1,10 @@
-﻿using DragonSpark.Aspects.Build;
+﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Aspects.Build;
+using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class ApplyCommandRelayDefinition : ApplyRelayAspectBuildDefinition<ICommandRelay, ApplyCommandRelay>
+	public sealed class ApplyCommandRelayDefinition : AspectBuildDefinition<ICommandRelay, ApplyCommandRelay>
 	{
 		public static ApplyCommandRelayDefinition Default { get; } = new ApplyCommandRelayDefinition();
 		ApplyCommandRelayDefinition() : base( 

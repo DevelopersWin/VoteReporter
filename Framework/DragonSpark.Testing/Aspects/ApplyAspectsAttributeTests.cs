@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Aspects;
+using DragonSpark.Aspects.Implementations;
 using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
