@@ -5,15 +5,15 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Validation
 {
-	sealed class AspectInstanceLocatorFactory : IParameterizedSource<IValidatedTypeDefinition, IEnumerable<IAspectSource>>
+	sealed class AspectInstanceLocatorFactory : IParameterizedSource<IValidatedTypeDefinition, IEnumerable<IAspectSelector>>
 	{
 		public static AspectInstanceLocatorFactory Default { get; } = new AspectInstanceLocatorFactory();
 		AspectInstanceLocatorFactory() {}
 
-		public IEnumerable<IAspectSource> Get( IValidatedTypeDefinition parameter )
+		public IEnumerable<IAspectSelector> Get( IValidatedTypeDefinition parameter )
 		{
-			yield return new MethodAspectSource<AutoValidationValidationAspect>( parameter.Validation );
-			yield return new MethodAspectSource<AutoValidationExecuteAspect>( parameter.Execution );
+			yield return new MethodAspectSelector<AutoValidationValidationAspect>( parameter.Validation );
+			yield return new MethodAspectSelector<AutoValidationExecuteAspect>( parameter.Execution );
 		}
 	}
 }

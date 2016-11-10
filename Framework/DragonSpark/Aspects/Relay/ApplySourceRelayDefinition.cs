@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Relay
 		ApplySourceRelayDefinition() : base( 
 			ParameterizedSourceTypeDefinition.Default.ReferencedType, 
 			typeof(ParameterizedSourceAdapter<,>),
-			new MethodAspectSource<ParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default.Method )
+			new MethodAspectSelector<ParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default.Method )
 		) {}
 	}
 }

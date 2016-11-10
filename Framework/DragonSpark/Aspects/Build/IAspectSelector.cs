@@ -4,5 +4,5 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public interface IAspectSource : ISpecificationParameterizedSource<TypeInfo, AspectInstance>/*, ITypeAware*/ {}
+	public interface IAspectSelector : ISpecificationParameterizedSource<TypeInfo, AspectInstance>/*, ITypeAware*/ {}
 }

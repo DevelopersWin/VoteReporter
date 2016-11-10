@@ -14,19 +14,19 @@ namespace DragonSpark.Aspects.Relay
 	public class AspectBuildDefinition<TInterface, TAspect> : AspectBuildDefinition, IAspectBuildDefinition where TAspect : IAspect
 	{
 		readonly Func<object, TAspect> aspectSource;
-		readonly ImmutableArray<IAspectSource> sources;
+		readonly ImmutableArray<IAspectSelector> sources;
 
-		public AspectBuildDefinition( Type destinationType, Type adapterType, params IAspectSource[] sources ) 
+		public AspectBuildDefinition( Type destinationType, Type adapterType, params IAspectSelector[] selectors ) 
 			: this( 
 				new GenericAdapterFactory<object, TInterface>( destinationType, adapterType ).To( ParameterConstructor<TInterface, TAspect>.Default ).Get,
-				sources
+				selectors
 			) {}
 
-		AspectBuildDefinition( /*Type supportedType,*/ Func<object, TAspect> aspectSource, params IAspectSource[] sources ) : base( /*supportedType.Yield(),*/ sources )
+		AspectBuildDefinition( /*Type supportedType,*/ Func<object, TAspect> aspectSource, params IAspectSelector[] selectors ) : base( /*supportedType.Yield(),*/ selectors )
 		{
 			// ReferencedType = supportedType;
 			this.aspectSource = aspectSource;
-			this.sources = sources.ToImmutableArray();
+			this.sources = selectors.ToImmutableArray();
 		}
 
 		public IAspect Get( object parameter ) => aspectSource( parameter );
@@ -34,7 +34,7 @@ namespace DragonSpark.Aspects.Relay
 		// public Type ReferencedType { get; }
 
 		// AspectInstance IParameterizedSource<Type, AspectInstance>.Get( Type parameter ) => locator.Get( parameter );
-		public IEnumerator<IAspectSource> GetEnumerator() => sources.AsEnumerable().GetEnumerator();
+		public IEnumerator<IAspectSelector> GetEnumerator() => sources.AsEnumerable().GetEnumerator();
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

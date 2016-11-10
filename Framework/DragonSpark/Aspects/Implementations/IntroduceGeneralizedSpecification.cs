@@ -8,7 +8,7 @@ namespace DragonSpark.Aspects.Implementations
 {
 	public sealed class IntroduceGeneralizedSpecification : IntroduceInterfaceAspectBase
 	{
-		public IntroduceGeneralizedSpecification() : this( typeof(DefaultParameterizedSourceImplementation) ) {}
+		public IntroduceGeneralizedSpecification() : this( typeof(DefaultSpecificationImplementation) ) {}
 
 		public IntroduceGeneralizedSpecification( Type implementationType ) : this( ParameterConstructor<object, object>.Make( typeof(ISpecificationAdapter), implementationType ) ) {}
 

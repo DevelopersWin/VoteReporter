@@ -10,8 +10,8 @@ namespace DragonSpark.Aspects.Relay
 		ApplyCommandRelayDefinition() : base( 
 			GenericCommandTypeDefinition.Default.ReferencedType, 
 			typeof(CommandAdapter<>),
-			new MethodAspectSource<SpecificationRelay>( CommandTypeDefinition.Default.Validation ),
-			new MethodAspectSource<CommandRelay>( CommandTypeDefinition.Default.Execution )
+			new MethodAspectSelector<SpecificationRelay>( CommandTypeDefinition.Default.Validation ),
+			new MethodAspectSelector<CommandRelay>( CommandTypeDefinition.Default.Execution )
 		) {}
 	}
 }

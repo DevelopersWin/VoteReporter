@@ -5,5 +5,5 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public interface IAspectBuildDefinition : Build.IAspectBuildDefinition, /*ITypeAware,*/ IParameterizedSource<IAspect>, IEnumerable<IAspectSource> {}
+	public interface IAspectBuildDefinition : Build.IAspectBuildDefinition, /*ITypeAware,*/ IParameterizedSource<IAspect>, IEnumerable<IAspectSelector> {}
 }

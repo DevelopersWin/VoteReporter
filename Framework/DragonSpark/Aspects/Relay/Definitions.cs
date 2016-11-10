@@ -11,9 +11,9 @@ namespace DragonSpark.Aspects.Relay
 		Definitions() : this( ApplyCommandRelayDefinition.Default, ApplySourceRelayDefinition.Default, ApplySpecificationRelayDefinition.Default ) {}
 		Definitions( params IAspectBuildDefinition[] definitions ) : base( 
 			definitions.Concat().Prepend( 
-				new TypeAspectSource<ApplyCommandRelay>( CommandTypeDefinition.Default.ReferencedType ),
-				new TypeAspectSource<ApplyParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default.ReferencedType ),
-				new TypeAspectSource<ApplySpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.ReferencedType )
+				new TypeAspectSelector<ApplyCommandRelay>( CommandTypeDefinition.Default.ReferencedType ),
+				new TypeAspectSelector<ApplyParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default.ReferencedType ),
+				new TypeAspectSelector<ApplySpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.ReferencedType )
 			).Fixed()
 		) {}
 	}

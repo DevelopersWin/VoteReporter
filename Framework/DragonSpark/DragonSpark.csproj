@@ -46,7 +46,7 @@
     <Compile Include="Application\FatalApplicationException.cs" />
     <Compile Include="Application\Setup\IInputOutput.cs" />
     <Compile Include="Application\Setup\ReadKeyCommand.cs" />
-    <Compile Include="Aspects\Build\MethodAspectSource.cs" />
+    <Compile Include="Aspects\Build\MethodAspectSelector.cs" />
     <Compile Include="Aspects\Adapters\GenericAdapterConstructorFactory.cs" />
     <Compile Include="Aspects\Adapters\GenericAdapterFactory.cs" />
     <Compile Include="Aspects\Adapters\AdapterLocatorBase.cs" />
@@ -56,7 +56,7 @@
     <Compile Include="Aspects\AssignedAttribute.cs" />
     <Compile Include="Aspects\Build\IAspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\AspectBuildDefinition.cs" />
-    <Compile Include="Aspects\Build\TypeAspectSource.cs" />
+    <Compile Include="Aspects\Build\TypeAspectSelector.cs" />
     <Compile Include="Aspects\Alteration\ApplyAlterationAttribute.cs" />
     <Compile Include="Aspects\Alteration\Aspect.cs" />
     <Compile Include="Aspects\Adapters\AlterationAdapter.cs" />
@@ -90,11 +90,11 @@
     <Compile Include="Aspects\Implementations\Generalized.cs" />
     <Compile Include="Aspects\Definitions\GeneralizedParameterizedSourceTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\GeneralizedSpecificationTypeDefinition.cs" />
-    <Compile Include="Aspects\Implementations\AspectSource.cs" />
+    <Compile Include="Aspects\Implementations\AspectSelector.cs" />
     <Compile Include="Aspects\Implementations\IntroduceGeneralizedParameterizedSource.cs" />
     <Compile Include="Aspects\Implementations\IntroduceGeneralizedSpecification.cs" />
-    <Compile Include="Aspects\Implementations\ParameterizedSourceAspectSource.cs" />
-    <Compile Include="Aspects\Implementations\SpecificationAspectSource.cs" />
+    <Compile Include="Aspects\Implementations\ParameterizedSelectorAspectSelector.cs" />
+    <Compile Include="Aspects\Implementations\SpecificationAspectSelector.cs" />
     <Compile Include="Aspects\Implementations\Definition.cs" />
     <Compile Include="Aspects\ApplyAspectsAttribute.cs" />
     <Compile Include="Aspects\Relay\ApplyCommandRelayDefinition.cs" />
@@ -130,7 +130,7 @@
     <Compile Include="Aspects\Definitions\TypeDefinitionWithPrimaryMethodBase.cs" />
     <Compile Include="Aspects\Definitions\ValidatedTypeDefinition.cs" />
     <Compile Include="Aspects\Validation\AspectInstanceLocatorFactory.cs" />
-    <Compile Include="Aspects\Build\IAspectSource.cs" />
+    <Compile Include="Aspects\Build\IAspectSelector.cs" />
     <Compile Include="Aspects\Build\IMethods.cs" />
     <Compile Include="Aspects\Adapters\ISpecificationAdapter.cs" />
     <Compile Include="Aspects\Adapters\SpecificationAdapter.cs" />
