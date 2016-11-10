@@ -3,11 +3,11 @@ using DragonSpark.Extensions;
 
 namespace DragonSpark.Aspects.Adapters
 {
-	public sealed class CommandRelayAdapter<T> : DelegatedInvocation<T, bool>, ICommandRelay
+	public sealed class CommandAdapter<T> : SpecificationAdapter<T>, ICommandAdapter
 	{
 		readonly ICommand<T> command;
 
-		public CommandRelayAdapter( ICommand<T> command ) : base( command.IsSatisfiedBy )
+		public CommandAdapter( ICommand<T> command ) : base( command.IsSatisfiedBy )
 		{
 			this.command = command;
 		}

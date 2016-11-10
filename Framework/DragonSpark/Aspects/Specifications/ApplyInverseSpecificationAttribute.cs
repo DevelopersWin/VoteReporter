@@ -1,28 +1,27 @@
-﻿using JetBrains.Annotations;
-using PostSharp.Aspects.Advices;
+﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Sources.Parameterized;
+using JetBrains.Annotations;
 using System;
-using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects.Specifications
 {
-	[IntroduceInterface( typeof(ISpecification) )]
-	public sealed class ApplyInverseSpecificationAttribute : SpecificationAttributeBase
+	public sealed class ApplyInverseSpecificationAttribute : SpecificationAspectBase
 	{
 		public ApplyInverseSpecificationAttribute( Type specificationType ) : base( Factory<ApplyInverseSpecificationAttribute>.Default.Get( specificationType ) ) {}
 
 		[UsedImplicitly]
-		public ApplyInverseSpecificationAttribute( ISpecification specification ) : base( new Specification( specification ) ) {}
+		public ApplyInverseSpecificationAttribute( ISpecificationAdapter specification ) : base( new SpecificationAdapter( specification ) ) {}
 
-		sealed class Specification : InvocationBase<object, bool>, ISpecification
+		sealed class SpecificationAdapter : AdapterBase<object, bool>, ISpecificationAdapter
 		{
-			readonly ISpecification specification;
+			readonly IParameterizedSource<object, bool> specification;
 
-			public Specification( ISpecification specification )
+			public SpecificationAdapter( ISpecificationAdapter specification )
 			{
 				this.specification = specification;
 			}
 
-			public override bool Invoke( object parameter ) => !(bool)specification.Get( parameter );
+			public override bool Get( object parameter ) => !specification.Get( parameter );
 		}
 	}
 }

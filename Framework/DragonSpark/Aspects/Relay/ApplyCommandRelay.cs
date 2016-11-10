@@ -1,22 +1,24 @@
 ﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Sources;
 using JetBrains.Annotations;
 using PostSharp.Aspects.Advices;
 
 namespace DragonSpark.Aspects.Relay
 {
-	[IntroduceInterface( typeof(ICommandRelay) )]
-	public sealed class ApplyCommandRelay : SpecificationRelayAspectBase, ICommandRelay
+	[IntroduceInterface( typeof(ISource<ICommandAdapter>) )]
+	public sealed class ApplyCommandRelay : SpecificationRelayAspectBase, ISource<ICommandAdapter>
 	{
-		readonly ICommandRelay relay;
+		readonly ICommandAdapter adapter;
 
 		public ApplyCommandRelay() : base( ApplyCommandRelayDefinition.Default ) {}
 
 		[UsedImplicitly]
-		public ApplyCommandRelay( ICommandRelay relay ) : base( relay )
+		public ApplyCommandRelay( ICommandAdapter adapter )
 		{
-			this.relay = relay;
+			this.adapter = adapter;
 		}
 
-		public void Execute( object parameter ) => relay.Execute( parameter );
+		public ICommandAdapter Get() => adapter;
+		object ISource.Get() => Get();
 	}
 }

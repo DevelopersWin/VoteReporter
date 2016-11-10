@@ -1,14 +1,14 @@
-﻿using JetBrains.Annotations;
+﻿using DragonSpark.Aspects.Adapters;
+using JetBrains.Annotations;
 using System;
-using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects.Specifications
 {
-	public sealed class ApplySpecificationAttribute : SpecificationAttributeBase
+	public sealed class ApplySpecificationAttribute : SpecificationAspectBase
 	{
 		public ApplySpecificationAttribute( Type specificationType ) : base( Factory<ApplySpecificationAttribute>.Default.Get( specificationType ) ) {}
 
 		[UsedImplicitly]
-		public ApplySpecificationAttribute( ISpecification specification ) : base( specification ) {}
+		public ApplySpecificationAttribute( ISpecificationAdapter specification ) : base( specification ) {}
 	}
 }

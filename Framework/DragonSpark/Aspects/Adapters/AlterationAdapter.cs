@@ -2,7 +2,7 @@
 
 namespace DragonSpark.Aspects.Adapters
 {
-	public sealed class AlterationAdapter<T> : DelegatedInvocation<T, T>, IAlteration
+	public sealed class AlterationAdapter<T> : DelegatedAdapter<T, T>, IAlterationAdapter
 	{
 		public AlterationAdapter( IAlteration<T> alteration ) : base( alteration.Get ) {}
 	}

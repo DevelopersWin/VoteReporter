@@ -10,6 +10,6 @@ namespace DragonSpark.Aspects.Validation
 
 		void MarkValid( object parameter, bool valid );
 
-		object Execute( object parameter, IInvocation proceed );
+		object Execute( object parameter, IAdapter proceed );
 	}
 }

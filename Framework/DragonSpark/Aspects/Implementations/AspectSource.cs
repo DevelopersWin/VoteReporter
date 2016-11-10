@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace DragonSpark.Aspects.Implementations
 {
-	public class AspectSelector<T> : TypeAspectSelector<T> where T : IAspect
+	public class AspectSource<T> : TypeAspectSource<T> where T : IAspect
 	{
-		public AspectSelector( Type declaringType, params Type[] implementedTypes ) : base( 
+		public AspectSource( Type declaringType, params Type[] implementedTypes ) : base( 
 			TypeAssignableSpecification.Defaults.Get( declaringType )
 				.And( new AllSpecification<Type>( implementedTypes.Select( type => TypeAssignableSpecification.Defaults.Get( type ).Inverse() ).Fixed() ) )
 				.ToDelegate()

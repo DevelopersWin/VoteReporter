@@ -1,5 +1,4 @@
 ﻿using DragonSpark.Aspects;
-using DragonSpark.Aspects.Implementations;
 using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
@@ -23,7 +22,7 @@ namespace DragonSpark.Testing.Aspects
 		}
 
 		[ApplyAspectsAttributeTests.ApplyAspects]
-		class Source : GeneralizedParameterizedSourceBase<int, int>
+		class Source : ParameterizedSourceBase<int, int>
 		{
 			public static Source Default { get; } = new Source();
 			Source() {}

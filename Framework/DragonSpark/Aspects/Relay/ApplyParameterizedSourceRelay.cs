@@ -1,13 +1,24 @@
 ﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Sources;
 using JetBrains.Annotations;
+using PostSharp.Aspects.Advices;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class ApplyParameterizedSourceRelay : RelayAspectBase
+	[IntroduceInterface( typeof(ISource<IParameterizedSourceAdapter>) )]
+	public sealed class ApplyParameterizedSourceRelay : ApplyRelayAspectBase, ISource<IParameterizedSourceAdapter>
 	{
+		readonly IParameterizedSourceAdapter adapter;
+
 		public ApplyParameterizedSourceRelay() : base( ApplySourceRelayDefinition.Default ) {}
 
 		[UsedImplicitly]
-		public ApplyParameterizedSourceRelay( IParameterizedSourceRelay relay ) : base( relay.Get ) {}
+		public ApplyParameterizedSourceRelay( IParameterizedSourceAdapter adapter )
+		{
+			this.adapter = adapter;
+		}
+
+		public IParameterizedSourceAdapter Get() => adapter;
+		object ISource.Get() => Get();
 	}
 }

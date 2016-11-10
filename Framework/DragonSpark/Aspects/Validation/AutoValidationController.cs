@@ -1,7 +1,7 @@
-﻿using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
 using System.Threading;
-using DragonSpark.Aspects.Adapters;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -27,7 +27,7 @@ namespace DragonSpark.Aspects.Validation
 			return result;
 		}
 
-		public object Execute( object parameter, IInvocation proceed )
+		public object Execute( object parameter, IAdapter proceed )
 		{
 			object handled = null;
 			if ( Handler?.Handle( parameter, out handled ) ?? false )

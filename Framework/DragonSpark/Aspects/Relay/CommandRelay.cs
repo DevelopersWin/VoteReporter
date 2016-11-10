@@ -1,11 +1,10 @@
 ﻿using DragonSpark.Aspects.Adapters;
-using JetBrains.Annotations;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Aspects.Relay
 {
-	[UsedImplicitly]
-	public sealed class CommandRelay : MethodAspectBase
+	public sealed class CommandRelay : RelayAspectBase
 	{
-		public CommandRelay() : base( o => o is ICommandRelay ) {}
+		public CommandRelay() : base( SourceCoercer<ICommandAdapter>.Default.Get ) {}
 	}
 }

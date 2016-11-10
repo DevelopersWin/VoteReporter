@@ -3,7 +3,7 @@ using DragonSpark.Commands;
 
 namespace DragonSpark.Aspects.Validation
 {
-	sealed class GenericCommandAdapterFactory : AdapterFactory<object, IParameterValidationAdapter>
+	sealed class GenericCommandAdapterFactory : GenericAdapterFactory<object, IParameterValidationAdapter>
 	{
 		public static GenericCommandAdapterFactory Default { get; } = new GenericCommandAdapterFactory();
 		GenericCommandAdapterFactory() : base( typeof(ICommand<>), typeof(CommandAdapter<>) ) {}

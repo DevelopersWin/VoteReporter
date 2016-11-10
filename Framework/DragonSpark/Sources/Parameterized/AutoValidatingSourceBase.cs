@@ -9,19 +9,19 @@ namespace DragonSpark.Sources.Parameterized
 	{
 		readonly IAutoValidationController controller;
 		readonly Func<TParameter, bool> specification;
-		readonly IInvocation invocation;
+		readonly IAdapter adapter;
 
-		protected AutoValidatingSourceBase( IAutoValidationController controller, Func<TParameter, bool> specification, Func<TParameter, TResult> source ) : this( controller, specification, new DelegatedInvocation<TParameter, TResult>( source ) ) {}
+		protected AutoValidatingSourceBase( IAutoValidationController controller, Func<TParameter, bool> specification, Func<TParameter, TResult> source ) : this( controller, specification, new DelegatedAdapter<TParameter, TResult>( source ) ) {}
 
-		AutoValidatingSourceBase( IAutoValidationController controller, Func<TParameter, bool> specification, IInvocation invocation )
+		AutoValidatingSourceBase( IAutoValidationController controller, Func<TParameter, bool> specification, IAdapter adapter )
 		{
 			this.controller = controller;
 			this.specification = specification;
-			this.invocation = invocation;
+			this.adapter = adapter;
 		}
 
 		public bool IsSatisfiedBy( TParameter parameter ) => controller.Handles( parameter ) || controller.Marked( parameter, specification( parameter ) );
 
-		public TResult Get( TParameter parameter ) => controller.Execute( parameter, invocation ).As<TResult>();
+		public TResult Get( TParameter parameter ) => controller.Execute( parameter, adapter ).As<TResult>();
 	}
 }

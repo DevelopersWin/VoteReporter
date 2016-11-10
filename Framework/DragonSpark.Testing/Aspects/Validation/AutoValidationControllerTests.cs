@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Aspects;
+using DragonSpark.Aspects.Adapters;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Sources.Parameterized;
 using Moq;
@@ -6,7 +7,6 @@ using PostSharp.Aspects;
 using System;
 using System.Reflection;
 using System.Windows.Input;
-using DragonSpark.Aspects.Adapters;
 using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Validation
@@ -53,7 +53,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			var first = Guid.NewGuid();
 			var one = new Aspect( method, first );
 			controller.Register( one );
-			Assert.Same( one, controller.Execute( first, new Mock<IInvocation>().Object ) );
+			Assert.Same( one, controller.Execute( first, new Mock<IAdapter>().Object ) );
 		}
 
 		[Fact]
@@ -74,7 +74,7 @@ namespace DragonSpark.Testing.Aspects.Validation
 			Assert.True( controller.Handles( second ) );
 			Assert.False( controller.Handles( Guid.NewGuid() ) );
 
-			var invocation = new Mock<IInvocation>().Object;
+			var invocation = new Mock<IAdapter>().Object;
 			Assert.Same( one, controller.Execute( first, invocation ) );
 			Assert.Same( two, controller.Execute( second, invocation ) );
 		}

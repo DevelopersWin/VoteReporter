@@ -4,13 +4,13 @@ using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class ApplySpecificationRelayDefinition : AspectBuildDefinition<ISpecificationRelay, ApplySpecificationRelay>
+	public sealed class ApplySpecificationRelayDefinition : AspectBuildDefinition<ISpecificationRelayAdapter, ApplySpecificationRelay>
 	{
 		public static ApplySpecificationRelayDefinition Default { get; } = new ApplySpecificationRelayDefinition();
 		ApplySpecificationRelayDefinition() : base( 
-			GeneralizedSpecificationTypeDefinition.Default.ReferencedType, GenericSpecificationTypeDefinition.Default.ReferencedType, 
-			typeof(SpecificationRelayAdapter<>),
-			new MethodAspectSelector<Specification>( GeneralizedSpecificationTypeDefinition.Default.Method )
+			GenericSpecificationTypeDefinition.Default.ReferencedType, 
+			typeof(SpecificationAdapter<>),
+			new MethodAspectSource<SpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.Method )
 		) {}
 	}
 }

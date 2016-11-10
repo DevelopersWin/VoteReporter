@@ -4,14 +4,14 @@ using DragonSpark.Aspects.Definitions;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class ApplyCommandRelayDefinition : AspectBuildDefinition<ICommandRelay, ApplyCommandRelay>
+	public sealed class ApplyCommandRelayDefinition : AspectBuildDefinition<ICommandAdapter, ApplyCommandRelay>
 	{
 		public static ApplyCommandRelayDefinition Default { get; } = new ApplyCommandRelayDefinition();
 		ApplyCommandRelayDefinition() : base( 
-			CommandTypeDefinition.Default.ReferencedType, GenericCommandTypeDefinition.Default.ReferencedType, 
-			typeof(CommandRelayAdapter<>),
-			new MethodAspectSelector<Specification>( CommandTypeDefinition.Default.Validation ),
-			new MethodAspectSelector<CommandRelay>( CommandTypeDefinition.Default.Execution )
+			GenericCommandTypeDefinition.Default.ReferencedType, 
+			typeof(CommandAdapter<>),
+			new MethodAspectSource<SpecificationRelay>( CommandTypeDefinition.Default.Validation ),
+			new MethodAspectSource<CommandRelay>( CommandTypeDefinition.Default.Execution )
 		) {}
 	}
 }

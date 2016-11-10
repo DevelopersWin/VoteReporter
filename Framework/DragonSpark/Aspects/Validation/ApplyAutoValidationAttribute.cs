@@ -26,6 +26,6 @@ namespace DragonSpark.Aspects.Validation
 		bool IAutoValidationController.IsActive => controller.IsActive;
 		bool IAutoValidationController.Handles( object parameter ) => controller.Handles( parameter );
 		void IAutoValidationController.MarkValid( object parameter, bool valid ) => controller.MarkValid( parameter, valid );
-		object IAutoValidationController.Execute( object parameter, IInvocation proceed ) => controller.Execute( parameter, proceed );
+		object IAutoValidationController.Execute( object parameter, IAdapter proceed ) => controller.Execute( parameter, proceed );
 	}
 }
