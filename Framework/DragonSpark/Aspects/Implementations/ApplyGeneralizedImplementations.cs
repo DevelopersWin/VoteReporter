@@ -5,8 +5,8 @@ using PostSharp.Aspects.Dependencies;
 namespace DragonSpark.Aspects.Implementations
 {
 	[ProvideAspectRole( KnownRoles.Implementations ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, KnownRoles.ValueConversion )]
-	public sealed class ApplyGeneralizedImplementationsAttribute : TypeBasedAspectBase
+	public sealed class ApplyGeneralizedImplementations : TypeBasedAspectBase
 	{
-		public ApplyGeneralizedImplementationsAttribute() : base( Definition.Default ) {}
+		public ApplyGeneralizedImplementations() : base( Definition.Default ) {}
 	}
 }

@@ -8,7 +8,7 @@ using System.Reflection;
 namespace DragonSpark.TypeSystem.Metadata
 {
 	[ApplyResultAlteration( typeof(ComponentModel.TypeDefinitions) )]
-	sealed class TypeDefinitions : CompositeFactory<object, TypeInfo>
+	sealed class TypeDefinitions : FirstSelector<object, TypeInfo>
 	{
 		readonly static IParameterizedSource<object, TypeInfo>[] Factories = { TypeInfoDefinitionProvider.Implementation, MemberInfoDefinitionProvider.Implementation, GeneralDefinitionProvider.Implementation };
 

@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem.Metadata
 {
-	public sealed class AttributeProviders : ParameterConstructedCompositeFactory<IAttributeProvider>
+	public sealed class AttributeProviders : FirstParameterConstructedSelector<IAttributeProvider>
 	{
 		public static IParameterizedSource<object, IAttributeProvider> Default { get; } = new AttributeProviders().ToSingletonScope();
 		AttributeProviders() : this( MemberInfoDefinitions.Default.Get, ReflectionElementAttributeProvider.Default.Get ) {}

@@ -60,7 +60,7 @@
     <Compile Include="Aspects\Alteration\ApplyAlterationAttributeTests.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercerAttributeTests.cs" />
     <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyAttributeTests.cs" />
-    <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsAttributeTests.cs" />
+    <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsTests.cs" />
     <Compile Include="Aspects\ApplyAspectsAttributeTests.cs" />
     <Compile Include="Aspects\Relay\ApplyRelaysAttributeTests.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationAttributeTests.cs" />

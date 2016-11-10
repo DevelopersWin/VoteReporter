@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Validation
 {
-	sealed class AspectInstanceLocatorFactory : IParameterizedSource<IValidatedTypeDefinition, IEnumerable<IAspectSelector>>
+	sealed class AspectSelectorFactory : ParameterizedItemSourceBase<IValidatedTypeDefinition, IAspectSelector>
 	{
-		public static AspectInstanceLocatorFactory Default { get; } = new AspectInstanceLocatorFactory();
-		AspectInstanceLocatorFactory() {}
+		public static AspectSelectorFactory Default { get; } = new AspectSelectorFactory();
+		AspectSelectorFactory() {}
 
-		public IEnumerable<IAspectSelector> Get( IValidatedTypeDefinition parameter )
+		public override IEnumerable<IAspectSelector> Yield( IValidatedTypeDefinition parameter )
 		{
 			yield return new MethodAspectSelector<AutoValidationValidationAspect>( parameter.Validation );
 			yield return new MethodAspectSelector<AutoValidationExecuteAspect>( parameter.Execution );

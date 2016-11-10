@@ -1,10 +1,10 @@
-﻿using DragonSpark.Aspects.Adapters;
+﻿using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Aspects.Validation
 {
-	sealed class AdapterLocator : AdapterLocatorBase<IParameterValidationAdapter>
+	sealed class AdapterLocator : FirstSelector<object, IParameterValidationAdapter>
 	{
 		public static AdapterLocator Default { get; } = new AdapterLocator();
-		AdapterLocator() : base( Defaults.Factories ) {}
+		AdapterLocator() : base( ParameterizedSourceAdapterFactory.Default ) {}
 	}
 }

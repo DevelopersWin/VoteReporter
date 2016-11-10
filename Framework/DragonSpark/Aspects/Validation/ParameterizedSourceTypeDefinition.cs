@@ -5,6 +5,6 @@ namespace DragonSpark.Aspects.Validation
 	sealed class ParameterizedSourceTypeDefinition : ValidatedTypeDefinition
 	{
 		public static ParameterizedSourceTypeDefinition Default { get; } = new ParameterizedSourceTypeDefinition();
-		ParameterizedSourceTypeDefinition() : base( Definitions.ParameterizedSourceTypeDefinition.Default.ReferencedType, Definitions.ParameterizedSourceTypeDefinition.Default.Method ) {}
+		ParameterizedSourceTypeDefinition() : base( Definitions.ParameterizedSourceTypeDefinition.Default.PrimaryMethod ) {}
 	}
 }

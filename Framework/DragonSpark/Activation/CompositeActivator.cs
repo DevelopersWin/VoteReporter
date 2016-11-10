@@ -5,7 +5,7 @@ using System;
 
 namespace DragonSpark.Activation
 {
-	public class CompositeActivator : CompositeFactory<Type, object>, IActivator
+	public class CompositeActivator : FirstSelector<Type, object>, IActivator
 	{
 		readonly ISpecification<Type> specification;
 

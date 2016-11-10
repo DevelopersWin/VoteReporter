@@ -4,7 +4,7 @@ using System;
 
 namespace DragonSpark.Windows.Legacy.Markup
 {
-	public sealed class DesignTimeValueProvider : CompositeFactory<Type, object>
+	public sealed class DesignTimeValueProvider : FirstSelector<Type, object>
 	{
 		public static DesignTimeValueProvider Default { get; } = new DesignTimeValueProvider();
 		DesignTimeValueProvider() : base( new DelegatedParameterizedSource<Type, object>( DefaultValues.Default.Get ), MockFactory.Default, StringDesignerValueFactory.Default ) {}

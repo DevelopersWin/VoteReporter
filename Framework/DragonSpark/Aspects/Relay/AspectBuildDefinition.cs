@@ -16,9 +16,9 @@ namespace DragonSpark.Aspects.Relay
 		readonly Func<object, TAspect> aspectSource;
 		readonly ImmutableArray<IAspectSelector> sources;
 
-		public AspectBuildDefinition( Type destinationType, Type adapterType, params IAspectSelector[] selectors ) 
+		public AspectBuildDefinition( Type supportedType, Type adapterType, params IAspectSelector[] selectors ) 
 			: this( 
-				new GenericAdapterFactory<object, TInterface>( destinationType, adapterType ).To( ParameterConstructor<TInterface, TAspect>.Default ).Get,
+				new GenericAdapterFactory<object, TInterface>( supportedType, adapterType ).To( ParameterConstructor<TInterface, TAspect>.Default ).Get,
 				selectors
 			) {}
 

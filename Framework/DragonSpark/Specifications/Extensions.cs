@@ -9,7 +9,8 @@ namespace DragonSpark.Specifications
 {
 	public static class Extensions
 	{
-		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this ISpecification<TTo> @this, IParameterizedSource<TFrom, TTo> coercer ) => Coerce( @this.ToDelegate(), coercer.ToDelegate() );
+		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this ISpecification<TTo> @this, IParameterizedSource<TFrom, TTo> coercer ) => Coerce( @this, coercer.ToDelegate() );
+		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this ISpecification<TTo> @this, Func<TFrom, TTo> coercer ) => Coerce( @this.ToDelegate(), coercer );
 		public static ISpecification<TFrom> Coerce<TFrom, TTo>( this Func<TTo, bool> @this, Func<TFrom, TTo> coerce ) =>
 			new CoercedSpecification<TFrom, TTo>( coerce, @this );
 
@@ -24,7 +25,7 @@ namespace DragonSpark.Specifications
 
 		public static ISpecification<T> And<T>( this ISpecification<T> @this, params ISpecification<T>[] others ) => new AllSpecification<T>( @this.Append( others ).Fixed() );
 
-		public static ISpecification<TDestination> Project<TDestination, TOrigin>( this ISpecification<TOrigin> @this, Func<TDestination, TOrigin> projection ) => new ProjectedSpecification<TOrigin, TDestination>( @this.IsSatisfiedBy, projection );
+		// public static ISpecification<TDestination> Project<TDestination, TOrigin>( this ISpecification<TOrigin> @this, Func<TDestination, TOrigin> projection ) => new ProjectedSpecification<TOrigin, TDestination>( @this.IsSatisfiedBy, projection );
 
 		public static ISpecification<object> Fixed<T>( this ISpecification<T> @this, T parameter ) => new SuppliedDelegatedSpecification<T>( @this, parameter );
 		public static ISpecification<object> Fixed<T>( this ISpecification<T> @this, Func<T> parameter ) => new SuppliedDelegatedSpecification<T>( @this, parameter );

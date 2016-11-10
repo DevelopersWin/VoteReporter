@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public class ParameterConstructedCompositeFactory<T> : ParameterConstructedCompositeFactory<object, T>
+	public class FirstParameterConstructedSelector<T> : FirstParameterConstructedSelector<object, T>
 	{
-		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types ) {}
+		public FirstParameterConstructedSelector( params Type[] types ) : base( types ) {}
 	}
 
-	public class ParameterConstructedCompositeFactory<TParameter, TResult> : CompositeFactory<TParameter, TResult>
+	public class FirstParameterConstructedSelector<TParameter, TResult> : FirstSelector<TParameter, TResult>
 	{
-		public ParameterConstructedCompositeFactory( params Type[] types ) : base( types.Select( type => new Factory( type ) ).Fixed() ) {}
+		public FirstParameterConstructedSelector( params Type[] types ) : base( types.Select( type => new Factory( type ) ).Fixed() ) {}
 
 		sealed class Factory : ParameterizedSourceBase<TParameter, TResult>
 		{

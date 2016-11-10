@@ -1,35 +1,26 @@
-﻿using DragonSpark.Extensions;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace DragonSpark.Sources.Parameterized
 {
-	public class CompositeFactory<TParameter, TResult> : DecoratedParameterizedSource<TParameter, TResult>
+	public class CompositeFactory<TParameter, TItem> : ParameterizedItemSourceBase<TParameter, TItem>
 	{
-		public CompositeFactory( params IParameterizedSource<TParameter, TResult>[] sources ) : this( sources.ToImmutableArray() ) {}
-		CompositeFactory( ImmutableArray<IParameterizedSource<TParameter, TResult>> sources ) : base( new Inner( sources ) ) {}
+		readonly ImmutableArray<IParameterizedSource<TParameter, TItem>> sources;
 
-		sealed class Inner : ParameterizedSourceBase<TParameter, TResult>
+		public CompositeFactory( params IParameterizedSource<TParameter, TItem>[] sources )
 		{
-			readonly static TResult DefaultResult = default(TResult);
+			this.sources = sources.ToImmutableArray();
+		}
 
-			readonly ImmutableArray<IParameterizedSource<TParameter, TResult>> sources;
-
-			public Inner( ImmutableArray<IParameterizedSource<TParameter, TResult>> sources )
+		public override IEnumerable<TItem> Yield( TParameter parameter )
+		{
+			foreach ( var source in sources )
 			{
-				this.sources = sources;
-			}
-
-			public override TResult Get( TParameter parameter )
-			{
-				foreach ( var source in sources )
+				var instance = source.Get( parameter );
+				if ( instance != null )
 				{
-					var candidate = source.Get( parameter );
-					if ( candidate.IsAssigned() )
-					{
-						return candidate;
-					}
+					yield return instance;
 				}
-				return DefaultResult;
 			}
 		}
 	}

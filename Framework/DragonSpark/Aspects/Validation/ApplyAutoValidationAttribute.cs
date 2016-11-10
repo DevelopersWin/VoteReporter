@@ -1,8 +1,11 @@
-﻿using DragonSpark.Aspects.Adapters;
+﻿using DragonSpark.Activation;
+using DragonSpark.Aspects.Adapters;
+using DragonSpark.Sources.Coercion;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
+using System;
 
 namespace DragonSpark.Aspects.Validation
 {
@@ -13,9 +16,11 @@ namespace DragonSpark.Aspects.Validation
 		]
 	public sealed class ApplyAutoValidationAttribute : InstanceBasedAspectBase, IAutoValidationController
 	{
+		readonly static Func<object, IAspect> Factory = AutoValidationControllerFactory.Default.To( ParameterConstructor<IAutoValidationController, ApplyAutoValidationAttribute>.Default ).Get;
+
 		readonly IAutoValidationController controller;
 
-		public ApplyAutoValidationAttribute() : base( o => new ApplyAutoValidationAttribute( Defaults.ControllerSource( o ) ), Definition.Default ) {}
+		public ApplyAutoValidationAttribute() : base( Factory, Definition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyAutoValidationAttribute( IAutoValidationController controller )

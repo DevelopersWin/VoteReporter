@@ -49,7 +49,6 @@
     <Compile Include="Aspects\Build\MethodAspectSelector.cs" />
     <Compile Include="Aspects\Adapters\GenericAdapterConstructorFactory.cs" />
     <Compile Include="Aspects\Adapters\GenericAdapterFactory.cs" />
-    <Compile Include="Aspects\Adapters\AdapterLocatorBase.cs" />
     <Compile Include="Aspects\Adapters\FactoryAdapter.cs" />
     <Compile Include="Aspects\Definitions\TypeBasedAspectBase.cs" />
     <Compile Include="Aspects\SourcedAspectProvider.cs" />
@@ -71,6 +70,7 @@
     <Compile Include="Aspects\IntroduceGenericInterfaceAspectBase.cs" />
     <Compile Include="Aspects\Adapters\DefaultSpecificationImplementation.cs" />
     <Compile Include="Aspects\Specifications\IntroduceSpecification.cs" />
+    <Compile Include="Aspects\Validation\AdapterLocator.cs" />
     <Compile Include="Expressions\Extensions.cs" />
     <Compile Include="Aspects\Adapters\CoercerAdapter.cs" />
     <Compile Include="Aspects\Coercion\Source.cs" />
@@ -93,7 +93,7 @@
     <Compile Include="Aspects\Implementations\AspectSelector.cs" />
     <Compile Include="Aspects\Implementations\IntroduceGeneralizedParameterizedSource.cs" />
     <Compile Include="Aspects\Implementations\IntroduceGeneralizedSpecification.cs" />
-    <Compile Include="Aspects\Implementations\ParameterizedSelectorAspectSelector.cs" />
+    <Compile Include="Aspects\Implementations\ParameterizedSourceAspectSelector.cs" />
     <Compile Include="Aspects\Implementations\SpecificationAspectSelector.cs" />
     <Compile Include="Aspects\Implementations\Definition.cs" />
     <Compile Include="Aspects\ApplyAspectsAttribute.cs" />
@@ -121,7 +121,7 @@
     <Compile Include="Aspects\Definitions\TypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\GenericCommandTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\ITypeDefinition.cs" />
-    <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsAttribute.cs" />
+    <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementations.cs" />
     <Compile Include="Aspects\Definitions\IValidatedTypeDefinition.cs" />
     <Compile Include="Aspects\KnownRoles.cs" />
     <Compile Include="Aspects\Definitions\ParameterizedSourceTypeDefinition.cs" />
@@ -129,7 +129,7 @@
     <Compile Include="Aspects\Definitions\GenericSpecificationTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\TypeDefinitionWithPrimaryMethodBase.cs" />
     <Compile Include="Aspects\Definitions\ValidatedTypeDefinition.cs" />
-    <Compile Include="Aspects\Validation\AspectInstanceLocatorFactory.cs" />
+    <Compile Include="Aspects\Validation\AspectSelectorFactory.cs" />
     <Compile Include="Aspects\Build\IAspectSelector.cs" />
     <Compile Include="Aspects\Build\IMethods.cs" />
     <Compile Include="Aspects\Adapters\ISpecificationAdapter.cs" />
@@ -236,6 +236,7 @@
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AppliedAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\AmbientContext.cs" />
+    <Compile Include="Sources\Parameterized\CompositeFactory.cs" />
     <Compile Include="Sources\Parameterized\ConditionalInstanceParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\ConditionalParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\DelegatedAlteration.cs" />
@@ -408,7 +409,7 @@
     <Compile Include="Sources\Parameterized\CacheParameterHandler.cs" />
     <Compile Include="Sources\Parameterized\Caching\ActivatedCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\DecoratedSourceCache.cs" />
-    <Compile Include="Sources\Parameterized\CompositeFactory.cs" />
+    <Compile Include="Sources\Parameterized\FirstSelector.cs" />
     <Compile Include="Sources\Parameterized\ConfiguringFactory.cs" />
     <Compile Include="Sources\Parameterized\ConfiguringAlteration.cs" />
     <Compile Include="Sources\Parameterized\ConstructFromKnownTypes.cs" />
@@ -418,7 +419,7 @@
     <Compile Include="Sources\Parameterized\IParameterAwareHandler.cs" />
     <Compile Include="Sources\Delegates\IsParameterizedSourceSpecification.cs" />
     <Compile Include="Sources\Delegates\IsSourceSpecification.cs" />
-    <Compile Include="Sources\Parameterized\ParameterConstructedCompositeFactory.cs" />
+    <Compile Include="Sources\Parameterized\FirstParameterConstructedSelector.cs" />
     <Compile Include="Sources\Parameterized\ParameterTypes.cs" />
     <Compile Include="Sources\Parameterized\ResultTypes.cs" />
     <Compile Include="Sources\Parameterized\SelfAlteration.cs" />
@@ -491,10 +492,8 @@
     <Compile Include="Aspects\Validation\IParameterValidationAdapter.cs" />
     <Compile Include="Aspects\OfSourceType.cs" />
     <Compile Include="Aspects\Validation\ParameterValidationAdapterBase.cs" />
-    <Compile Include="Aspects\Validation\AdapterLocator.cs" />
     <Compile Include="Aspects\Validation\AutoValidationController.cs" />
     <Compile Include="Aspects\Validation\AutoValidationControllerFactory.cs" />
-    <Compile Include="Aspects\Validation\Defaults.cs" />
     <Compile Include="Aspects\Validation\Extensions.cs" />
     <Compile Include="Aspects\IAspectHub.cs" />
     <Compile Include="Aspects\Validation\IAutoValidationController.cs" />

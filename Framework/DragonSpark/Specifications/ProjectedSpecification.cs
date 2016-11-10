@@ -1,8 +1,6 @@
-using System;
-
 namespace DragonSpark.Specifications
 {
-	public sealed class ProjectedSpecification<TOrigin, TDestination> : SpecificationBase<TDestination>
+	/*public sealed class ProjectedSpecification<TOrigin, TDestination> : SpecificationBase<TDestination>
 	{
 		readonly Func<TOrigin, bool> @delegate;
 		readonly Func<TDestination, TOrigin> coerce;
@@ -14,5 +12,5 @@ namespace DragonSpark.Specifications
 		}
 
 		public override bool IsSatisfiedBy( TDestination parameter ) => @delegate( coerce( parameter ) );
-	}
+	}*/
 }

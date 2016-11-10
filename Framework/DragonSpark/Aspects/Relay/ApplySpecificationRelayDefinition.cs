@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Relay
 		ApplySpecificationRelayDefinition() : base( 
 			GenericSpecificationTypeDefinition.Default.ReferencedType, 
 			typeof(SpecificationAdapter<>),
-			new MethodAspectSelector<SpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.Method )
+			new MethodAspectSelector<SpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.PrimaryMethod )
 		) {}
 	}
 }

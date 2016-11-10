@@ -9,7 +9,7 @@ namespace DragonSpark.Sources.Parameterized
 		public static ConstructFromKnownTypes<T> Default { get; } = new ConstructFromKnownTypes<T>();
 		ConstructFromKnownTypes() : base( o => new DefaultImplementation().ToSingleton() ) {}
 
-		sealed class DefaultImplementation : ParameterConstructedCompositeFactory<T>
+		sealed class DefaultImplementation : FirstParameterConstructedSelector<T>
 		{
 			public DefaultImplementation() : base( KnownTypes.Default.Get<T>().ToArray() ) {}
 		}

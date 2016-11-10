@@ -8,7 +8,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Implementations
 {
-	public class ApplyGeneralizedImplementationsAttributeTests
+	public class ApplyGeneralizedImplementationsTests
 	{
 		[Fact]
 		public void VerifyCommand()
