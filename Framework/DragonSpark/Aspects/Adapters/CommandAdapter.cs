@@ -7,7 +7,7 @@ namespace DragonSpark.Aspects.Adapters
 	{
 		readonly ICommand<T> command;
 
-		public CommandAdapter( ICommand<T> command ) : base( command.IsSatisfiedBy )
+		public CommandAdapter( ICommand<T> command ) : base( command )
 		{
 			this.command = command;
 		}

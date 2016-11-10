@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.Aspects.Adapters
 {
-	public abstract class AdapterBase<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>, IAdapter<TParameter, TResult>
+	public abstract class AdapterBase<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>, IAdapter
 	{
-		object IAdapter.Get( [Optional] object parameter ) =>
-			parameter is TParameter ? (object)Get( parameter.AsValid<TParameter>() ) ?? parameter : parameter;
+		object IParameterizedSource<object, object>.Get( [Optional] object parameter ) =>
+			parameter is TParameter ? (object)Get( parameter.To<TParameter>() ) ?? parameter : parameter;
 	}
 }
