@@ -87,7 +87,6 @@
     <Compile Include="Aspects\Exceptions\RetryDelegateFactory.cs" />
     <Compile Include="Aspects\Exceptions\Definition.cs" />
     <Compile Include="Aspects\InterceptionArgsExtensions.cs" />
-    <Compile Include="Aspects\Implementations\Generalized.cs" />
     <Compile Include="Aspects\Definitions\GeneralizedParameterizedSourceTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\GeneralizedSpecificationTypeDefinition.cs" />
     <Compile Include="Aspects\Implementations\AspectSelector.cs" />

@@ -22,18 +22,14 @@ namespace DragonSpark.Aspects.Relay
 				selectors
 			) {}
 
-		AspectBuildDefinition( /*Type supportedType,*/ Func<object, TAspect> aspectSource, params IAspectSelector[] selectors ) : base( /*supportedType.Yield(),*/ selectors )
+		AspectBuildDefinition( Func<object, TAspect> aspectSource, params IAspectSelector[] selectors ) : base( selectors )
 		{
-			// ReferencedType = supportedType;
 			this.aspectSource = aspectSource;
-			this.sources = selectors.ToImmutableArray();
+			sources = selectors.ToImmutableArray();
 		}
 
 		public IAspect Get( object parameter ) => aspectSource( parameter );
 
-		// public Type ReferencedType { get; }
-
-		// AspectInstance IParameterizedSource<Type, AspectInstance>.Get( Type parameter ) => locator.Get( parameter );
 		public IEnumerator<IAspectSelector> GetEnumerator() => sources.AsEnumerable().GetEnumerator();
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}

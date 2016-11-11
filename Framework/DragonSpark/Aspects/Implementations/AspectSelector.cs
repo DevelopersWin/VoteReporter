@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using System;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace DragonSpark.Aspects.Implementations
 		public AspectSelector( Type declaringType, params Type[] implementedTypes ) : base( 
 			TypeAssignableSpecification.Defaults.Get( declaringType )
 				.And( new AllSpecification<Type>( implementedTypes.Select( type => TypeAssignableSpecification.Defaults.Get( type ).Inverse() ).Fixed() ) )
-				.ToDelegate()
+				.Coerce( AsTypeCoercer.Default )
 		) {}
 	}
 }

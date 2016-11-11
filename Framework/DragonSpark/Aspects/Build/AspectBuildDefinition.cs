@@ -2,6 +2,7 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -12,41 +13,12 @@ namespace DragonSpark.Aspects.Build
 {
 	public class AspectBuildDefinition : SpecificationParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>>, IAspectBuildDefinition
 	{
-		public AspectBuildDefinition( params IAspectSelector[] selectors ) : this( Common<TypeInfo>.Assigned, selectors ) {}
+		public AspectBuildDefinition( params IAspectSelector[] selectors ) : this( new AnySpecification<TypeInfo>( selectors ), selectors ) {}
+
+		[UsedImplicitly]
 		public AspectBuildDefinition( ISpecification<TypeInfo> specification, params IAspectSelector[] selectors ) : base( specification, new SourcedAspectProvider<TypeInfo>( selectors ).Get ) {}
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => this.GetEnumerable( (TypeInfo)targetElement );
-
-		/*readonly ImmutableArray<IAspectSelector> locators;
-
-		public AspectBuildDefinition( 
-			IParameterizedSource<ImmutableArray<ITypeDefinition>, ImmutableArray<IAspectSelector>> locatorSource,
-			params ITypeDefinition[] definitions
-		) : this( definitions.SelectTypes(), locatorSource.GetFixed( definitions ) ) {}
-
-		// public AspectBuildDefinition( params IAspectInstanceLocator[] locators ) : this( locators.SelectTypes(), locators ) {}
-
-		public AspectBuildDefinition( IEnumerable<Type> types, params IAspectSelector[] sources ) : 
-			this( new ValidatingSpecification( sources.SelectTypes().Distinct().ToImmutableArray(), types.Distinct().ToArray() ).ToSpecificationDelegate(), sources ) {}
-
-		[UsedImplicitly]
-		public AspectBuildDefinition( Func<Type, bool> specification, params IAspectSelector[] sources ) : base( specification )
-		{
-			this.locators = sources.ToImmutableArray();
-		}
-
-		public IEnumerable<AspectInstance> Get( Type parameter )
-		{
-			foreach ( var locator in locators )
-			{
-				var instance = locator.Get( parameter );
-				if ( instance != null )
-				{
-					yield return instance;
-				}
-			}
-		}*/
-
 	}
 
 	public sealed class AspectLocatorFactory<TType, TMethod> : ParameterizedItemSourceBase<ImmutableArray<ITypeDefinition>, IAspectSelector>
