@@ -1,13 +1,12 @@
 using DragonSpark.Aspects.Build;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DragonSpark.Aspects.Definitions
 {
@@ -23,16 +22,16 @@ namespace DragonSpark.Aspects.Definitions
 			this.definition = definition;
 		}
 
-		public override bool CompileTimeValidate( Type type ) => definition.IsSatisfiedBy( type );
-		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
+		public override bool CompileTimeValidate( Type type )
 		{
-			var aspectInstances = definition.ProvideAspects( targetElement ).Fixed();
-			MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"{this}: {targetElement} = {aspectInstances.Length}", null, null, null ));
-			foreach ( var aspectInstance in aspectInstances )
+			var result = definition.IsSatisfiedBy( type );
+			if ( !result )
 			{
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"     {this}: {targetElement} = - {aspectInstance.TargetElement} -- {aspectInstance.AspectConstruction.TypeName}", null, null, null ));
+				throw new InvalidOperationException( $"Aspect '{GetType()}' was applied to {type}, but it does not implement any of the types required by the applied aspect, which are: {string.Join( ", ", definition.Select( t => t.FullName ) )}" );
 			}
-			return aspectInstances;
+			return true;
 		}
+
+		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => definition.ProvideAspects( targetElement ).Fixed();
 	}
 }
