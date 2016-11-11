@@ -40,6 +40,6 @@ namespace DragonSpark.Sources.Scopes
 			return result;
 		}
 
-		public void Assign( ISource item ) => context.Assign( item );
+		public void Assign( ISourceAware item ) => context.Assign( item );
 	}
 }

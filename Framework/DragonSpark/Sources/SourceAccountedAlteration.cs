@@ -33,8 +33,7 @@ namespace DragonSpark.Sources
 			var aware = parameter as ISourceAware;
 			if ( aware != null && assignable( aware.SourceType ) )
 			{
-				var source = parameter as ISource;
-				var candidate = source?.Get();
+				var candidate = aware.Get();
 				if ( candidate != null )
 				{
 					yield return candidate;

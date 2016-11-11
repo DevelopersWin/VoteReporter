@@ -1,12 +1,11 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Sources;
+﻿using DragonSpark.Aspects.Build;
+using DragonSpark.Extensions;
 using JetBrains.Annotations;
 using Polly;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using PostSharp.Aspects.Dependencies;
 using System;
-using DragonSpark.Aspects.Build;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Exceptions
@@ -30,7 +29,7 @@ namespace DragonSpark.Aspects.Exceptions
 		}
 
 		public Policy Get() => policy;
-		object ISource.Get() => Get();
+		// object ISource.Get() => Get();
 
 		sealed class Factory : TypedParameterAspectFactory<Policy, ApplyExceptionPolicyAttribute>
 		{

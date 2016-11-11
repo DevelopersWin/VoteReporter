@@ -53,7 +53,7 @@ namespace DragonSpark.Testing.ComponentModel
 			public string PropertyName { get; set; }
 
 			[Singleton( typeof(SingletonSource) ), UsedImplicitly]
-			public ISource Source { get; set; }
+			public ISourceAware Source { get; set; }
 		}
 
 		class SingletonSource : SourceBase<string>

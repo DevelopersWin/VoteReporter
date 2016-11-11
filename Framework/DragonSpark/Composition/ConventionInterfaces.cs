@@ -3,6 +3,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace DragonSpark.Composition
 		readonly static Func<ConventionMapping, bool> Valid = IsValidConventionMappingSpecification.Default.ToDelegate();
 
 		public static IParameterizedSource<Type, Type> Default { get; } = new ConventionInterfaces().Apply( Specification );
-		ConventionInterfaces() : this( typeof(ISource) ) {}
+		ConventionInterfaces() : this( /*typeof(ISource)*/ Items<Type>.Default ) {}
 
 		readonly ImmutableArray<Type> exempt;
 
@@ -31,6 +32,7 @@ namespace DragonSpark.Composition
 				.ImplementedInterfaces
 				.Except( exempt )
 				.Introduce( parameter, tuple => new ConventionMapping( tuple.Item1, tuple.Item2 ) )
-				.FirstOrDefault( Valid ).InterfaceType;
+				.FirstOrDefault( Valid )
+				.NullIfDefault()?.InterfaceType;
 	}
 }

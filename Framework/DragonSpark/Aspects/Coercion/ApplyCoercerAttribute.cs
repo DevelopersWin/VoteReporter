@@ -30,6 +30,6 @@ namespace DragonSpark.Aspects.Coercion
 		}
 
 		public ICoercerAdapter Get() => coercer;
-		object ISource.Get() => Get();
+		// object ISource.Get() => Get();
 	}
 }

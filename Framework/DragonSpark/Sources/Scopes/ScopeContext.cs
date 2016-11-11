@@ -10,7 +10,7 @@ namespace DragonSpark.Sources.Scopes
 
 		public ScopeContext() : this( Execution.Default ) {}
 
-		public ScopeContext( ISource<ISource> defaultScope ) : this( defaultScope.GetValue ) {}
+		public ScopeContext( ISource<ISourceAware> defaultScope ) : this( defaultScope.GetValue ) {}
 
 		[UsedImplicitly]
 		public ScopeContext( Func<object> defaultScope )

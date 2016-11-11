@@ -19,6 +19,6 @@ namespace DragonSpark.Aspects.Relay
 		}
 
 		public ICommandAdapter Get() => adapter;
-		object ISource.Get() => Get();
+		// object ISource.Get() => Get();
 	}
 }

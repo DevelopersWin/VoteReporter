@@ -1,12 +1,9 @@
 ﻿namespace DragonSpark.Sources
 {
-	public interface ISource<out T> : ISource
+	public interface ISource<out T>
 	{
-		new T Get();
+		T Get();
 	}
 
-	public interface ISource
-	{
-		object Get();
-	}
+	// public interface ISource : ISource<object> {}
 }

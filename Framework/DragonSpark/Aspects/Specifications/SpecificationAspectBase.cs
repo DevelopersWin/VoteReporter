@@ -26,6 +26,6 @@ namespace DragonSpark.Aspects.Specifications
 		}
 
 		public ISpecificationAdapter Get() => specification;
-		object ISource.Get() => Get();
+		// object ISource.Get() => Get();
 	}
 }

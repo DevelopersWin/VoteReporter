@@ -1,7 +1,6 @@
 using DragonSpark.Application;
 using DragonSpark.ComponentModel;
 using DragonSpark.Extensions;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Testing.Framework.Runtime;
 using System;
@@ -44,7 +43,7 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 
 		public ImmutableArray<Type> Get() => this.ToImmutableArray();
 
-		object ISource.Get() => Get();
+		// object ISource.Get() => Get();
 
 		public IEnumerator<Type> GetEnumerator()
 		{

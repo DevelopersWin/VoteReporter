@@ -35,7 +35,7 @@ namespace DragonSpark.Testing.Framework.FileSystem
 		public FileElement( IEnumerable<byte> contents ) : this( contents.ToImmutableArray() ) {}
 
 		public ImmutableArray<byte> Get() => source.Get();
-		object ISource.Get() => source.Get();
+		// object ISource.Get() => source.Get();
 		public void Assign( ImmutableArray<byte> item ) => source.Assign( item );
 	}
 }

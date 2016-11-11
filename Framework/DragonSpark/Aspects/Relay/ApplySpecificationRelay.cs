@@ -20,6 +20,6 @@ namespace DragonSpark.Aspects.Relay
 
 		public ISpecificationRelayAdapter Get() => relay;
 
-		object ISource.Get() => Get();
+		// object ISource.Get() => Get();
 	}
 }

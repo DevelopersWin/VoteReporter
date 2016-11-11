@@ -68,7 +68,7 @@ namespace DragonSpark.Sources.Scopes
 			return @this.Get();
 		}
 
-		public static T ScopedWith<T>( this T @this, ISource scope ) where T : IScopeAware
+		public static T ScopedWith<T>( this T @this, ISourceAware scope ) where T : IScopeAware
 		{
 			@this.Assign( scope );
 			return @this;

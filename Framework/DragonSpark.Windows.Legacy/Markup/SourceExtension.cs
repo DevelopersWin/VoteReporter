@@ -9,13 +9,13 @@ namespace DragonSpark.Windows.Legacy.Markup
 	{
 		public SourceExtension() {}
 
-		public SourceExtension( ISource instance )
+		public SourceExtension( ISourceAware instance )
 		{
 			Instance = instance;
 		}
 
 		[NotNull]
-		public ISource Instance { [return: NotNull]get; set; }
+		public ISourceAware Instance { [return: NotNull]get; set; }
 
 		protected override object GetValue( MarkupServiceProvider serviceProvider ) => Instance.Get();
 	}

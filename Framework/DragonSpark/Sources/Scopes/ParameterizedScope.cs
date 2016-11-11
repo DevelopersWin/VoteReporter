@@ -23,7 +23,7 @@ namespace DragonSpark.Sources.Scopes
 
 		public Func<TParameter, TResult> GetFactory() => scope.Get();
 
-		public void Assign( ISource item ) => scope.Assign( item );
+		public void Assign( ISourceAware item ) => scope.Assign( item );
 
 		public virtual void Assign( Func<object, Func<TParameter, TResult>> item ) => scope.Assign( item );
 		public virtual void Assign( Func<Func<TParameter, TResult>> item ) => scope.Assign( item );

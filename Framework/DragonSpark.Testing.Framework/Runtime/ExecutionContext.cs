@@ -1,12 +1,12 @@
+using DragonSpark.Sources;
 using System;
 using System.Collections.Concurrent;
-using DragonSpark.Sources;
 
 namespace DragonSpark.Testing.Framework.Runtime
 {
 	public sealed class ExecutionContext : SourceBase<TaskContext>
 	{
-		public static ISource<TaskContext> Default { get; } = new ExecutionContext( Identification.Default );
+		public static ExecutionContext Default { get; } = new ExecutionContext( Identification.Default );
 
 		readonly ConcurrentDictionary<Identifier, TaskContext> entries = new ConcurrentDictionary<Identifier, TaskContext>();
 		readonly ISource<Identifier> store;

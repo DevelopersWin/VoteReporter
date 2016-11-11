@@ -29,7 +29,7 @@ namespace DragonSpark.Aspects.Alteration
 		}
 
 		public IAlterationAdapter Get() => alteration;
-		object ISource.Get() => Get();
+		// object ISource.Get() => Get();
 	}
 
 	public sealed class ApplyAlterationAttribute : ApplyAlterationBase

@@ -11,7 +11,7 @@ namespace DragonSpark.Sources
 
 		public object Get( [Optional]object parameter )
 		{
-			var source = parameter as ISource;
+			var source = parameter as ISourceAware;
 			var result = source?.Get() ?? parameter;
 			return result;
 		}
