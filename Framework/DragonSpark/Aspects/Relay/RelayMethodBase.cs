@@ -12,8 +12,8 @@ namespace DragonSpark.Aspects.Relay
 	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.ValueConversion ),
 	 UsedImplicitly
 	]
-	public abstract class RelayAspectBase : InvocationMethodAspectBase
+	public abstract class RelayMethodBase : AdapterMethodBase
 	{
-		protected RelayAspectBase( Func<object, IAdapter> source ) : base( source ) {}
+		protected RelayMethodBase( Func<object, IAdapter> source ) : base( source ) {}
 	}
 }

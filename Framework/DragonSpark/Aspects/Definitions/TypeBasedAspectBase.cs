@@ -32,6 +32,6 @@ namespace DragonSpark.Aspects.Definitions
 			return true;
 		}
 
-		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => definition.ProvideAspects( targetElement ).Fixed();
+		public virtual IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => definition.ProvideAspects( targetElement ).Fixed();
 	}
 }

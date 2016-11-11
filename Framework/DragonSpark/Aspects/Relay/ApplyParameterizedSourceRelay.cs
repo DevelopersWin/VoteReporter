@@ -6,7 +6,7 @@ using PostSharp.Aspects.Advices;
 namespace DragonSpark.Aspects.Relay
 {
 	[IntroduceInterface( typeof(ISource<IParameterizedSourceAdapter>) )]
-	public sealed class ApplyParameterizedSourceRelay : ApplyRelayAspectBase, ISource<IParameterizedSourceAdapter>
+	public sealed class ApplyParameterizedSourceRelay : InstanceAspectBase, ISource<IParameterizedSourceAdapter>
 	{
 		readonly IParameterizedSourceAdapter adapter;
 

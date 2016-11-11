@@ -16,7 +16,7 @@ namespace DragonSpark.Aspects.Exceptions
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.EnhancedValidation ),
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )
 		]
-	public sealed class ApplyExceptionPolicyAttribute : InstanceBasedAspectBase, IPolicySource
+	public sealed class ApplyExceptionPolicyAttribute : InstanceAspectBase, IPolicySource
 	{
 		readonly Policy policy;
 

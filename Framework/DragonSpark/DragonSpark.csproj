@@ -56,7 +56,7 @@
     <Compile Include="Aspects\Build\IAspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\AspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\TypeAspectSelector.cs" />
-    <Compile Include="Aspects\Alteration\ApplyAlterationAttribute.cs" />
+    <Compile Include="Aspects\Alteration\ApplyAlteration.cs" />
     <Compile Include="Aspects\Alteration\Aspect.cs" />
     <Compile Include="Aspects\Adapters\AlterationAdapter.cs" />
     <Compile Include="Aspects\Alteration\Source.cs" />
@@ -103,10 +103,9 @@
     <Compile Include="Aspects\Adapters\ICommandAdapter.cs" />
     <Compile Include="Aspects\Adapters\IParameterizedSourceAdapter.cs" />
     <Compile Include="Aspects\Adapters\ISpecificationRelayAdapter.cs" />
-    <Compile Include="Aspects\Relay\RelayAspectBase.cs" />
+    <Compile Include="Aspects\Relay\RelayMethodBase.cs" />
     <Compile Include="Aspects\Relay\ParameterizedSourceRelay.cs" />
     <Compile Include="Aspects\Adapters\ParameterizedSourceAdapter.cs" />
-    <Compile Include="Aspects\Relay\ApplyRelayAspectBase.cs" />
     <Compile Include="Aspects\Relay\SourceRelaySelectors.cs" />
     <Compile Include="Aspects\Relay\ApplyParameterizedSourceRelay.cs" />
     <Compile Include="Aspects\Relay\SpecificationSelectors.cs" />
@@ -114,7 +113,7 @@
     <Compile Include="Aspects\Relay\ApplySpecificationRelay.cs" />
     <Compile Include="Aspects\Relay\SpecificationRelayAspectBase.cs" />
     <Compile Include="Aspects\Relay\Definitions.cs" />
-    <Compile Include="Aspects\Specifications\ApplyInverseSpecificationAttribute.cs" />
+    <Compile Include="Aspects\Specifications\ApplyInverseSpecification.cs" />
     <Compile Include="Aspects\Definitions\SpecificationTypeDefinitionBase.cs" />
     <Compile Include="Aspects\Definitions\TypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\GenericCommandTypeDefinition.cs" />
@@ -133,7 +132,7 @@
     <Compile Include="Aspects\Adapters\ISpecificationAdapter.cs" />
     <Compile Include="Aspects\Adapters\SpecificationAdapter.cs" />
     <Compile Include="Aspects\Specifications\Aspect.cs" />
-    <Compile Include="Aspects\Specifications\ApplySpecificationAttribute.cs" />
+    <Compile Include="Aspects\Specifications\ApplySpecification.cs" />
     <Compile Include="Aspects\Specifications\SpecificationAspectBase.cs" />
     <Compile Include="Aspects\Specifications\Constructor.cs" />
     <Compile Include="Aspects\Specifications\Definition.cs" />
@@ -142,7 +141,7 @@
     <Compile Include="Aspects\Adapters\DelegatedAdapter.cs" />
     <Compile Include="Aspects\Adapters\IAdapter.cs" />
     <Compile Include="Aspects\Adapters\AdapterBase.cs" />
-    <Compile Include="Aspects\InstanceBasedAspectBase.cs" />
+    <Compile Include="Aspects\InstanceAspectBase.cs" />
     <Compile Include="Aspects\Validation\ParameterizedSourceTypeDefinition.cs" />
     <Compile Include="Aspects\Validation\SourceAdapter.cs" />
     <Compile Include="Aspects\Validation\ParameterizedSourceAdapterFactory.cs" />

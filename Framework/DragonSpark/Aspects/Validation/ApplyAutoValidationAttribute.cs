@@ -4,17 +4,12 @@ using DragonSpark.Sources.Coercion;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
-using PostSharp.Aspects.Dependencies;
 using System;
 
 namespace DragonSpark.Aspects.Validation
 {
-	[IntroduceInterface( typeof(IAutoValidationController) )]
-	[LinesOfCodeAvoided( 4 ), ProvideAspectRole( KnownRoles.EnhancedValidation ), 
-		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),
-		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, KnownRoles.ParameterValidation )
-		]
-	public sealed class ApplyAutoValidationAttribute : InstanceBasedAspectBase, IAutoValidationController
+	[IntroduceInterface( typeof(IAutoValidationController) ), LinesOfCodeAvoided( 4 )]
+	public sealed class ApplyAutoValidationAttribute : InstanceAspectBase, IAutoValidationController, IAspectProvider
 	{
 		readonly static Func<object, IAspect> Factory = AutoValidationControllerFactory.Default.To( ParameterConstructor<IAutoValidationController, ApplyAutoValidationAttribute>.Default ).Get;
 

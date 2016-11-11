@@ -12,7 +12,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Specifications
 {
-	public class ApplySpecificationAttributeTests
+	public class ApplySpecificationTests
 	{
 		[Fact]
 		public void VerifySubject()

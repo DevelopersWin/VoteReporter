@@ -12,7 +12,7 @@ namespace DragonSpark.Aspects.Alteration
 {
 	[IntroduceInterface( typeof(ISource<IAlterationAdapter>) )]
 	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
-	public abstract class ApplyAlterationBase : InvocationAspectBase, ISource<IAlterationAdapter>
+	public abstract class ApplyAlterationBase : InstanceAspectBase, ISource<IAlterationAdapter>
 	{
 		readonly IAlterationAdapter alteration;
 
@@ -32,19 +32,19 @@ namespace DragonSpark.Aspects.Alteration
 		// object ISource.Get() => Get();
 	}
 
-	public sealed class ApplyAlterationAttribute : ApplyAlterationBase
+	public sealed class ApplyAlteration : ApplyAlterationBase
 	{
-		public ApplyAlterationAttribute( Type alterationType ) : base( Factory<ApplyAlterationAttribute>.Default.Get( alterationType ), Definition<Aspect>.Default ) {}
+		public ApplyAlteration( Type alterationType ) : base( Factory<ApplyAlteration>.Default.Get( alterationType ), Definition<Aspect>.Default ) {}
 
 		[UsedImplicitly]
-		public ApplyAlterationAttribute( IAlterationAdapter alteration ) : base( alteration ) {}
+		public ApplyAlteration( IAlterationAdapter alteration ) : base( alteration ) {}
 	}
 
-	public sealed class ApplyResultAlterationAttribute : ApplyAlterationBase
+	public sealed class ApplyResultAlteration : ApplyAlterationBase
 	{
-		public ApplyResultAlterationAttribute( Type alterationType ) : base( Factory<ApplyResultAlterationAttribute>.Default.Get( alterationType ), Definition<ResultAspect>.Default ) {}
+		public ApplyResultAlteration( Type alterationType ) : base( Factory<ApplyResultAlteration>.Default.Get( alterationType ), Definition<ResultAspect>.Default ) {}
 
 		[UsedImplicitly]
-		public ApplyResultAlterationAttribute( IAlterationAdapter alteration ) : base( alteration ) {}
+		public ApplyResultAlteration( IAlterationAdapter alteration ) : base( alteration ) {}
 	}
 }

@@ -2,9 +2,7 @@ using DragonSpark.Diagnostics;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
-using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
-using PostSharp.Aspects.Serialization;
 using System;
 using System.Reflection;
 
@@ -15,8 +13,7 @@ namespace DragonSpark.Aspects
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Caching ), 
 		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )
 	]
-	[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
-	public sealed class TimedAttribute : MethodInterceptionAspect
+	public sealed class TimedAttribute : MethodInterceptionAspectBase
 	{
 		readonly Func<Func<MethodBase, IDisposable>> source;
 

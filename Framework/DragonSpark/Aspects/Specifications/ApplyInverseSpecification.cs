@@ -1,17 +1,21 @@
 ﻿using DragonSpark.Aspects.Adapters;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using JetBrains.Annotations;
+using PostSharp.Aspects;
+using PostSharp.Aspects.Advices;
 using System;
 
 namespace DragonSpark.Aspects.Specifications
 {
-	public sealed class ApplyInverseSpecificationAttribute : SpecificationAspectBase
+	[IntroduceInterface( typeof(ISource<ISpecificationAdapter>) )]
+	public sealed class ApplyInverseSpecification : SpecificationAspectBase, ISource<ISpecificationAdapter>, IAspectProvider
 	{
-		public ApplyInverseSpecificationAttribute( Type specificationType ) : base( Factory<ApplyInverseSpecificationAttribute>.Default.Get( specificationType ) ) {}
+		public ApplyInverseSpecification( Type specificationType ) : base( Factory<ApplyInverseSpecification>.Default.Get( specificationType ) ) {}
 
 		[UsedImplicitly]
-		public ApplyInverseSpecificationAttribute( ISpecificationAdapter specification ) : base( new SpecificationAdapter( specification.To( CastCoercer<bool>.Default ) ) ) {}
+		public ApplyInverseSpecification( ISpecificationAdapter specification ) : base( new SpecificationAdapter( specification.To( CastCoercer<bool>.Default ) ) ) {}
 
 		sealed class SpecificationAdapter : AdapterBase<object, bool>, ISpecificationAdapter
 		{

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Alteration
 {
-	public class ApplyAlterationAttributeTests
+	public class ApplyAlterationTests
 	{
 		[Fact]
 		public void Verify()

@@ -3,7 +3,7 @@ using DragonSpark.Sources;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public sealed class SpecificationRelay : RelayAspectBase
+	public sealed class SpecificationRelay : RelayMethodBase
 	{
 		public SpecificationRelay() : base( SourceCoercer<ISpecificationRelayAdapter>.Default.Get ) {}
 	}

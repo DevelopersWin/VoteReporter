@@ -11,7 +11,7 @@ namespace DragonSpark.Aspects.Coercion
 {
 	[IntroduceInterface( typeof(ISource<ICoercerAdapter>) )]
 	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
-	public sealed class ApplyCoercerAttribute : InvocationAspectBase, ISource<ICoercerAdapter>
+	public sealed class ApplyCoercerAttribute : InstanceAspectBase, ISource<ICoercerAdapter>
 	{
 		readonly ICoercerAdapter coercer;
 

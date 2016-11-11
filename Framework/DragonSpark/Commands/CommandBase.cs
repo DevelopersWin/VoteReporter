@@ -4,14 +4,16 @@ using System.Windows.Input;
 
 namespace DragonSpark.Commands
 {
-	[ApplyCommandRelay]
 	public abstract class CommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate {};
 
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
+		[SpecificationRelay]
 		bool ICommand.CanExecute( object parameter ) => default(bool);
+
+		[CommandRelay]
 		void ICommand.Execute( object parameter ) {}
 
 		public virtual bool IsSatisfiedBy( T parameter ) => true;
