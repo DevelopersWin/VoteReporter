@@ -1,4 +1,5 @@
-﻿using PostSharp.Aspects;
+﻿using DragonSpark.Aspects.Build;
+using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
@@ -16,6 +17,6 @@ namespace DragonSpark.Aspects.Relay
 	{
 		protected ApplyRelayAspectBase() {}
 
-		protected ApplyRelayAspectBase( IAspectBuildDefinition definition ) : base( definition.Get, definition ) {}
+		protected ApplyRelayAspectBase( Func<object, IAspect> factory, IAspectBuildDefinition definition ) : base( factory, definition ) {}
 	}
 }

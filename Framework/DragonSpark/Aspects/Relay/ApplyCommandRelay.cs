@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		readonly ICommandAdapter adapter;
 
-		public ApplyCommandRelay() : base( ApplyCommandRelayDefinition.Default ) {}
+		public ApplyCommandRelay() : base( CommandRelaySelectors.Default.Get, CommandRelayDefinition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyCommandRelay( ICommandAdapter adapter )

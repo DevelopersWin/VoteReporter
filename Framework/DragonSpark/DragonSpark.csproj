@@ -51,7 +51,7 @@
     <Compile Include="Aspects\Adapters\GenericAdapterFactory.cs" />
     <Compile Include="Aspects\Adapters\FactoryAdapter.cs" />
     <Compile Include="Aspects\Definitions\TypeBasedAspectBase.cs" />
-    <Compile Include="Aspects\SourcedAspectProvider.cs" />
+    <Compile Include="Aspects\CompositeAspectProvider.cs" />
     <Compile Include="Aspects\AssignedAttribute.cs" />
     <Compile Include="Aspects\Build\IAspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\AspectBuildDefinition.cs" />
@@ -65,7 +65,6 @@
     <Compile Include="Aspects\Alteration\Definition.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercerAttribute.cs" />
     <Compile Include="Aspects\Coercion\Aspect.cs" />
-    <Compile Include="Aspects\Relay\IAspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\TypedParameterAspectFactory.cs" />
     <Compile Include="Aspects\IntroduceGenericInterfaceAspectBase.cs" />
     <Compile Include="Aspects\Adapters\DefaultSpecificationImplementation.cs" />
@@ -96,11 +95,11 @@
     <Compile Include="Aspects\Implementations\SpecificationAspectSelector.cs" />
     <Compile Include="Aspects\Implementations\Definition.cs" />
     <Compile Include="Aspects\ApplyAspectsAttribute.cs" />
-    <Compile Include="Aspects\Relay\ApplyCommandRelayDefinition.cs" />
+    <Compile Include="Aspects\Relay\CommandRelaySelectors.cs" />
     <Compile Include="Aspects\Relay\CommandRelay.cs" />
     <Compile Include="Aspects\Adapters\CommandAdapter.cs" />
     <Compile Include="Aspects\Relay\ApplyCommandRelay.cs" />
-    <Compile Include="Aspects\Relay\AspectBuildDefinition.cs" />
+    <Compile Include="Aspects\Relay\AspectSelectors.cs" />
     <Compile Include="Aspects\Adapters\ICommandAdapter.cs" />
     <Compile Include="Aspects\Adapters\IParameterizedSourceAdapter.cs" />
     <Compile Include="Aspects\Adapters\ISpecificationRelayAdapter.cs" />
@@ -108,9 +107,9 @@
     <Compile Include="Aspects\Relay\ParameterizedSourceRelay.cs" />
     <Compile Include="Aspects\Adapters\ParameterizedSourceAdapter.cs" />
     <Compile Include="Aspects\Relay\ApplyRelayAspectBase.cs" />
-    <Compile Include="Aspects\Relay\ApplySourceRelayDefinition.cs" />
+    <Compile Include="Aspects\Relay\SourceRelaySelectors.cs" />
     <Compile Include="Aspects\Relay\ApplyParameterizedSourceRelay.cs" />
-    <Compile Include="Aspects\Relay\ApplySpecificationRelayDefinition.cs" />
+    <Compile Include="Aspects\Relay\SpecificationSelectors.cs" />
     <Compile Include="Aspects\Relay\SpecificationRelay.cs" />
     <Compile Include="Aspects\Relay\ApplySpecificationRelay.cs" />
     <Compile Include="Aspects\Relay\SpecificationRelayAspectBase.cs" />
@@ -128,7 +127,7 @@
     <Compile Include="Aspects\Definitions\GenericSpecificationTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\TypeDefinitionWithPrimaryMethodBase.cs" />
     <Compile Include="Aspects\Definitions\ValidatedTypeDefinition.cs" />
-    <Compile Include="Aspects\Validation\AspectSelectorFactory.cs" />
+    <Compile Include="Aspects\Validation\AspectSelector.cs" />
     <Compile Include="Aspects\Build\IAspectSelector.cs" />
     <Compile Include="Aspects\Build\IMethods.cs" />
     <Compile Include="Aspects\Adapters\ISpecificationAdapter.cs" />

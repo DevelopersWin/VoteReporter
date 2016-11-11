@@ -13,6 +13,6 @@ namespace DragonSpark.Aspects.Implementations
 		public IntroduceGeneralizedSpecification( Type implementationType ) : this( ParameterConstructor<object, object>.Make( typeof(ISpecificationAdapter), implementationType ) ) {}
 
 		[UsedImplicitly]
-		public IntroduceGeneralizedSpecification( Func<object, object> factory ) : base( GeneralizedParameterizedSourceTypeDefinition.Default.ReferencedType, factory ) {}
+		public IntroduceGeneralizedSpecification( Func<object, object> factory ) : base( GeneralizedParameterizedSourceTypeDefinition.Default, factory ) {}
 	}
 }

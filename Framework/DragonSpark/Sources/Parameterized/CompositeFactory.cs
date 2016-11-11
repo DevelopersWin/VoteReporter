@@ -1,13 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using DragonSpark.Extensions;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized
 {
 	public class CompositeFactory<TParameter, TItem> : ParameterizedItemSourceBase<TParameter, TItem>
 	{
-		readonly ImmutableArray<IParameterizedSource<TParameter, TItem>> sources;
+		readonly ImmutableArray<Func<TParameter, TItem>> sources;
 
-		public CompositeFactory( params IParameterizedSource<TParameter, TItem>[] sources )
+		public CompositeFactory( params IParameterizedSource<TParameter, TItem>[] sources ) : this ( sources.Select( source => source.ToDelegate() ).Fixed() ) {}
+
+		public CompositeFactory( params Func<TParameter, TItem>[] sources )
 		{
 			this.sources = sources.ToImmutableArray();
 		}
@@ -16,7 +21,7 @@ namespace DragonSpark.Sources.Parameterized
 		{
 			foreach ( var source in sources )
 			{
-				var instance = source.Get( parameter );
+				var instance = source( parameter );
 				if ( instance != null )
 				{
 					yield return instance;

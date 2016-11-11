@@ -13,6 +13,6 @@ namespace DragonSpark.Aspects.Specifications
 
 		public IntroduceSpecification() : this( Factory ) {}
 		public IntroduceSpecification( Type implementationType ) : this( new GenericAdapterFactory( typeof(ISpecificationAdapter), implementationType ).Get ) {}
-		public IntroduceSpecification( Func<object, object> factory ) : base( GenericSpecificationTypeDefinition.Default.ReferencedType, Factory ) {}
+		public IntroduceSpecification( Func<object, object> factory ) : base( GenericSpecificationTypeDefinition.Default, Factory ) {}
 	}
 }

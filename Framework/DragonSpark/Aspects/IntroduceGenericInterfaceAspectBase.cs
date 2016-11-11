@@ -1,4 +1,5 @@
-﻿using DragonSpark.Extensions;
+﻿using DragonSpark.Aspects.Definitions;
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
@@ -13,7 +14,7 @@ namespace DragonSpark.Aspects
 {
 	public abstract class IntroduceGenericInterfaceAspectBase : IntroduceInterfaceAspectBase
 	{
-		protected IntroduceGenericInterfaceAspectBase( Type interfaceType, Func<object, object> factory ) : base( interfaceType, new Factory( interfaceType ).Get, factory ) {}
+		protected IntroduceGenericInterfaceAspectBase( ITypeDefinition definition, Func<object, object> factory ) : base( definition, new Factory( definition.ReferencedType ).Get, factory ) {}
 		
 		sealed class Factory : ParameterizedItemSourceBase<Type, Type>
 		{
@@ -38,8 +39,8 @@ namespace DragonSpark.Aspects
 		readonly ISpecification<Type> specification;
 		readonly Func<object, object> factory;
 
-		protected IntroduceInterfaceAspectBase( Type interfaceType, Func<object, object> factory ) : this( interfaceType, type => type.Yield().ToImmutableArray(), factory ) {}
-		protected IntroduceInterfaceAspectBase( Type interfaceType, Func<Type, ImmutableArray<Type>> interfacesSource, Func<object, object> factory ) : this( interfacesSource, TypeAssignableSpecification.Defaults.Get( interfaceType ).Inverse(), factory ) {}
+		protected IntroduceInterfaceAspectBase( ITypeDefinition definition, Func<object, object> factory ) : this( definition, type => type.Yield().ToImmutableArray(), factory ) {}
+		protected IntroduceInterfaceAspectBase( ITypeDefinition definition, Func<Type, ImmutableArray<Type>> interfacesSource, Func<object, object> factory ) : this( interfacesSource, definition.Inverse(), factory ) {}
 
 		[UsedImplicitly]
 		protected IntroduceInterfaceAspectBase( Func<Type, ImmutableArray<Type>> interfacesSource, ISpecification<Type> specification, Func<object, object> factory )

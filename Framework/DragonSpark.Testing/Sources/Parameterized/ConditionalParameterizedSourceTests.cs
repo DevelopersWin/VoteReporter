@@ -12,7 +12,7 @@ namespace DragonSpark.Testing.Sources.Parameterized
 		{
 			var trueInstance = new object();
 			var falseInstance = new object();
-			var sut = new ConditionalParameterizedSource<bool, object>( new DelegatedSpecification<bool>( b => b ), trueInstance.Shift, falseInstance.Shift );
+			var sut = new ConditionalParameterizedSource<bool, object>( new DelegatedSpecification<bool>( b => b ), trueInstance.Wrap, falseInstance.Wrap );
 			Assert.Same( trueInstance, sut.Get( true ) );
 			Assert.Same( falseInstance, sut.Get( false ) );
 		}

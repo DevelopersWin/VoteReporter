@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Aspects.Definitions;
-using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
 
 namespace DragonSpark.Aspects.Alteration
@@ -9,10 +8,14 @@ namespace DragonSpark.Aspects.Alteration
 	{
 		public static Definition<T> Default { get; } = new Definition<T>();
 		Definition() : base( 
-			MethodAspectLocatorFactory<T>.Default.GetFixed(
-				GenericCommandCoreTypeDefinition.Default, 
-				ParameterizedSourceTypeDefinition.Default
-			)
+			MethodAspectSelection<T>.Default, 
+			
+			CommandTypeDefinition.Default, 
+			GeneralizedSpecificationTypeDefinition.Default, 
+			GeneralizedParameterizedSourceTypeDefinition.Default,
+			ParameterizedSourceTypeDefinition.Default,
+			GenericCommandCoreTypeDefinition.Default,
+			GenericSpecificationTypeDefinition.Default
 		) {}
 	}
 }

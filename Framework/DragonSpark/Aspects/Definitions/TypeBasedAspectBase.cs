@@ -1,12 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using DragonSpark.Aspects.Build;
-using DragonSpark.Sources.Parameterized;
+using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
+using PostSharp.Extensibility;
+using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Definitions
 {
@@ -23,6 +24,15 @@ namespace DragonSpark.Aspects.Definitions
 		}
 
 		public override bool CompileTimeValidate( Type type ) => definition.IsSatisfiedBy( type );
-		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement ) => definition.GetEnumerable( (TypeInfo)targetElement );
+		IEnumerable<AspectInstance> IAspectProvider.ProvideAspects( object targetElement )
+		{
+			var aspectInstances = definition.ProvideAspects( targetElement ).Fixed();
+			MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"{this}: {targetElement} = {aspectInstances.Length}", null, null, null ));
+			foreach ( var aspectInstance in aspectInstances )
+			{
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.Error, "6776", $"     {this}: {targetElement} = - {aspectInstance.TargetElement} -- {aspectInstance.AspectConstruction.TypeName}", null, null, null ));
+			}
+			return aspectInstances;
+		}
 	}
 }

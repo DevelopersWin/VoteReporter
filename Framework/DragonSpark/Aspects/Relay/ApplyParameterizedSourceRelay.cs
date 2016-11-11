@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		readonly IParameterizedSourceAdapter adapter;
 
-		public ApplyParameterizedSourceRelay() : base( ApplySourceRelayDefinition.Default ) {}
+		public ApplyParameterizedSourceRelay() : base( SourceRelaySelectors.Default.Get, SourceRelayDefinition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyParameterizedSourceRelay( IParameterizedSourceAdapter adapter )

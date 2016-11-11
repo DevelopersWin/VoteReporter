@@ -1,18 +1,19 @@
 ﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Aspects.Definitions;
-using System.Linq;
+using DragonSpark.Sources.Coercion;
 
 namespace DragonSpark.Aspects.Validation
 {
 	public sealed class Definition : AspectBuildDefinition
 	{
 		public static Definition Default { get; } = new Definition();
-		Definition() : this( ParameterizedSourceTypeDefinition.Default, RunCommandTypeDefinition.Default, GenericCommandTypeDefinition.Default, CommandTypeDefinition.Default ) {}
-		Definition( params IValidatedTypeDefinition[] definitions ) : base( /*definitions.SelectTypes(),*/ definitions.SelectMany( AspectSelectorFactory.Default.Yield ).ToArray() ) {}
+		Definition() : base(
+			AspectSelection.Default.Accept( ValidatedCastCoercer<ITypeDefinition, IValidatedTypeDefinition>.Default ),
+			
+			ParameterizedSourceTypeDefinition.Default, 
+			RunCommandTypeDefinition.Default, 
+			GenericCommandTypeDefinition.Default, 
+			CommandTypeDefinition.Default 
+		) {}
 	}
-
-	/*public interface ITypeDefinition : IValidatedTypeDefinition
-	{
-		Type AdapterType { get; }
-	}*/
 }

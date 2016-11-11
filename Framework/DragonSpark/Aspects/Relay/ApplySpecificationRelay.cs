@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		readonly ISpecificationRelayAdapter relay;
 
-		public ApplySpecificationRelay()  : base( ApplySpecificationRelayDefinition.Default ) {}
+		public ApplySpecificationRelay()  : base( SpecificationSelectors.Default.Get, SpecificationRelayDefinition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplySpecificationRelay( ISpecificationRelayAdapter relay )

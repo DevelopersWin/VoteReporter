@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Validation
 {
-	sealed class AspectSelectorFactory : ParameterizedItemSourceBase<IValidatedTypeDefinition, IAspectSelector>
+	sealed class AspectSelection : ParameterizedItemSourceBase<IValidatedTypeDefinition, IAspectSelector>
 	{
-		public static AspectSelectorFactory Default { get; } = new AspectSelectorFactory();
-		AspectSelectorFactory() {}
+		public static AspectSelection Default { get; } = new AspectSelection();
+		AspectSelection() {}
 
 		public override IEnumerable<IAspectSelector> Yield( IValidatedTypeDefinition parameter )
 		{

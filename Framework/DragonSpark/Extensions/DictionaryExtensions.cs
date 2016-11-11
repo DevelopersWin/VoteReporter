@@ -7,6 +7,7 @@ namespace DragonSpark.Extensions
 {
 	public static class DictionaryExtensions
 	{
+		public static IEnumerable<TValue> Yield<TKey,TValue>( this IDictionary<TKey,TValue> target, TKey key ) => target.TryGet( key )?.Yield();
 		public static TValue TryGet<TKey,TValue>( this IDictionary<TKey,TValue> target, TKey key ) => TryGet( target, key, () => default(TValue) );
 
 		public static TValue TryGet<TKey,TValue>( this IDictionary<TKey,TValue> target, TKey key, Func<TValue> defaultValue ) => key.IsAssigned() && target.ContainsKey( key ) ? target[ key ] : defaultValue.With( x => x() );

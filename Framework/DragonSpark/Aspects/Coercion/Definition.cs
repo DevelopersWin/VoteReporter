@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Aspects.Definitions;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Aspects.Coercion
 {
@@ -8,11 +7,14 @@ namespace DragonSpark.Aspects.Coercion
 	{
 		public static Definition Default { get; } = new Definition();
 		Definition() : base( 
-			MethodAspectLocatorFactory<Aspect>.Default.GetFixed(
-				CommandTypeDefinition.Default, 
-				GeneralizedSpecificationTypeDefinition.Default, 
-				GeneralizedParameterizedSourceTypeDefinition.Default
-			)
+			MethodAspectSelection<Aspect>.Default,
+
+			CommandTypeDefinition.Default, 
+			GeneralizedSpecificationTypeDefinition.Default, 
+			GeneralizedParameterizedSourceTypeDefinition.Default,
+			ParameterizedSourceTypeDefinition.Default,
+			GenericCommandCoreTypeDefinition.Default,
+			GenericSpecificationTypeDefinition.Default
 		) {}
 	}
 }
