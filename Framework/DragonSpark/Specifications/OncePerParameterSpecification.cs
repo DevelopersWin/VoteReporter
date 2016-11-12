@@ -1,4 +1,6 @@
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using JetBrains.Annotations;
 
 namespace DragonSpark.Specifications
 {
@@ -6,6 +8,7 @@ namespace DragonSpark.Specifications
 	{
 		public OncePerParameterSpecification() : this( new Condition<T>() ) {}
 
-		public OncePerParameterSpecification( ICache<T, ConditionMonitor> cache ) : base( cache.ToDelegate() ) {}
+		[UsedImplicitly]
+		public OncePerParameterSpecification( IParameterizedSource<T, ConditionMonitor> cache ) : base( cache.ToDelegate() ) {}
 	}
 }

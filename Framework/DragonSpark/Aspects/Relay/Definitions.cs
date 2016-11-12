@@ -9,11 +9,11 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static Definitions Default { get; } = new Definitions();
 		Definitions() : base( 
-			new Dictionary<ITypeDefinition, IAspectSelector>
+			new Dictionary<ITypeDefinition, IAspectDefinition>
 			{
-				{ GenericCommandTypeDefinition.Default, new TypeAspectSelector<ApplyCommandRelay>( CommandTypeDefinition.Default.ReferencedType ) },
-				{ ParameterizedSourceTypeDefinition.Default, new TypeAspectSelector<ApplyParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default.ReferencedType ) },
-				{ GenericSpecificationTypeDefinition.Default, new TypeAspectSelector<ApplySpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.ReferencedType ) },
+				{ GenericCommandTypeDefinition.Default, new TypeAspectDefinition<ApplyCommandRelay>( CommandTypeDefinition.Default ) },
+				{ ParameterizedSourceTypeDefinition.Default, new TypeAspectDefinition<ApplyParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default ) },
+				{ GenericSpecificationTypeDefinition.Default, new TypeAspectDefinition<ApplySpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default ) },
 			}.ToImmutableDictionary() ) {}
 	}
 }

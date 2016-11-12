@@ -7,7 +7,7 @@ namespace DragonSpark.Aspects.Coercion
 	{
 		public static Definition Default { get; } = new Definition();
 		Definition() : base( 
-			MethodAspectSelection<Aspect>.Default,
+			MethodAspectSelector<Aspect>.Default,
 
 			CommandTypeDefinition.Default, 
 			GeneralizedSpecificationTypeDefinition.Default, 

@@ -9,6 +9,7 @@ using PostSharp.Aspects.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Reflection;
 
 namespace DragonSpark.Aspects
 {
@@ -36,14 +37,15 @@ namespace DragonSpark.Aspects
 	public abstract class IntroduceInterfaceAspectBase : CompositionAspect
 	{
 		readonly Func<Type, ImmutableArray<Type>> interfacesSource;
-		readonly ISpecification<Type> specification;
+		readonly ISpecification<TypeInfo> specification;
 		readonly Func<object, object> factory;
 
 		protected IntroduceInterfaceAspectBase( ITypeDefinition definition, Func<object, object> factory ) : this( definition, type => type.Yield().ToImmutableArray(), factory ) {}
-		protected IntroduceInterfaceAspectBase( ITypeDefinition definition, Func<Type, ImmutableArray<Type>> interfacesSource, Func<object, object> factory ) : this( interfacesSource, definition.Inverse(), factory ) {}
+		protected IntroduceInterfaceAspectBase( ITypeDefinition definition, Func<Type, ImmutableArray<Type>> interfacesSource, Func<object, object> factory ) 
+			: this( interfacesSource, definition.Inverse(), factory ) {}
 
 		[UsedImplicitly]
-		protected IntroduceInterfaceAspectBase( Func<Type, ImmutableArray<Type>> interfacesSource, ISpecification<Type> specification, Func<object, object> factory )
+		protected IntroduceInterfaceAspectBase( Func<Type, ImmutableArray<Type>> interfacesSource, ISpecification<TypeInfo> specification, Func<object, object> factory )
 		{
 			this.interfacesSource = interfacesSource;
 			this.specification = specification;
@@ -51,9 +53,7 @@ namespace DragonSpark.Aspects
 		}
 
 		public override bool CompileTimeValidate( Type type ) => specification.IsSatisfiedBy( type );
-
 		protected override Type[] GetPublicInterfaces( Type targetType ) => interfacesSource.GetFixed( targetType );
-
 		public override object CreateImplementationObject( AdviceArgs args ) => factory( args.Instance );
 	}
 }

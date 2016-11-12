@@ -9,7 +9,7 @@ namespace DragonSpark.Aspects.Relay
 	public sealed class SourceRelayDefinition : PairedAspectBuildDefinition
 	{
 		public static SourceRelayDefinition Default { get; } = new SourceRelayDefinition();
-		SourceRelayDefinition() : base( new Dictionary<ITypeDefinition, IEnumerable<IAspectSelector>>
+		SourceRelayDefinition() : base( new Dictionary<ITypeDefinition, IEnumerable<IAspectDefinition>>
 										{
 											{ ParameterizedSourceTypeDefinition.Default, SourceRelaySelectors.Default }
 										}.ToImmutableDictionary() ) {}
@@ -21,7 +21,7 @@ namespace DragonSpark.Aspects.Relay
 		SourceRelaySelectors() : base( 
 			ParameterizedSourceTypeDefinition.Default.ReferencedType, 
 			typeof(ParameterizedSourceAdapter<,>),
-			new MethodAspectSelector<ParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default.PrimaryMethod )
+			new MethodAspectDefinition<ParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default.PrimaryMethod )
 		) {}
 	}
 }

@@ -1,18 +1,21 @@
 ﻿using DragonSpark.Aspects.Build;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
 using System;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Definitions
 {
 	public class TypeDefinition : ItemSource<IMethods>, ITypeDefinition
 	{
-		readonly Func<Type, bool> specification;
-		public TypeDefinition( Type referencedType, params IMethods[] methods ) : this( referencedType, TypeAssignableSpecification.Delegates.Get( referencedType ), methods ) {}
+		readonly Func<TypeInfo, bool> specification;
+
+		public TypeDefinition( Type referencedType, params IMethods[] methods ) : this( referencedType, TypeAssignableSpecification.Delegates.Get( referencedType ).Get, methods ) {}
 
 		[UsedImplicitly]
-		public TypeDefinition( Type referencedType, Func<Type, bool> specification, params IMethods[] methods ) : base( methods )
+		public TypeDefinition( Type referencedType, Func<TypeInfo, bool> specification, params IMethods[] methods ) : base( methods )
 		{
 			this.specification = specification;
 			ReferencedType = referencedType;
@@ -20,6 +23,6 @@ namespace DragonSpark.Aspects.Definitions
 
 		public Type ReferencedType { get; }
 
-		public bool IsSatisfiedBy( Type parameter ) => specification( parameter );
+		public bool IsSatisfiedBy( TypeInfo parameter ) => specification( parameter );
 	}
 }

@@ -14,10 +14,10 @@ namespace DragonSpark.Aspects.Specifications
 			this.specification = specification;
 		}
 
-		protected sealed class Factory<T> : TypedParameterAspectFactory<ISpecificationAdapter, T> where T : SpecificationAspectBase
+		protected sealed class Constructors<T> : TypedAspectConstructors<ISpecificationAdapter, T> where T : SpecificationAspectBase
 		{
-			public static Factory<T> Default { get; } = new Factory<T>();
-			Factory() : base( Source.Default.Get ) {}
+			public static Constructors<T> Default { get; } = new Constructors<T>();
+			Constructors() : base( Source.Default.Get ) {}
 		}
 
 		public ISpecificationAdapter Get() => specification;

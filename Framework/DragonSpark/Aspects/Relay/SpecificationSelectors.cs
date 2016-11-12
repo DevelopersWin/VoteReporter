@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static SpecificationRelayDefinition Default { get; } = new SpecificationRelayDefinition();
 		SpecificationRelayDefinition() : base(
-			new Dictionary<ITypeDefinition, IEnumerable<IAspectSelector>>
+			new Dictionary<ITypeDefinition, IEnumerable<IAspectDefinition>>
 			{
 				{ GenericSpecificationTypeDefinition.Default, SpecificationSelectors.Default }
 			}.ToImmutableDictionary()
@@ -23,7 +23,7 @@ namespace DragonSpark.Aspects.Relay
 		SpecificationSelectors() : base( 
 			GenericSpecificationTypeDefinition.Default.ReferencedType, 
 			typeof(SpecificationAdapter<>),
-			new MethodAspectSelector<SpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.PrimaryMethod )
+			new MethodAspectDefinition<SpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.PrimaryMethod )
 		) {}
 	}
 }

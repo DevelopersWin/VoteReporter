@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Aspects.Definitions;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
@@ -16,105 +17,135 @@ namespace DragonSpark.Aspects.Build
 {
 	public class PairedAspectBuildDefinition : AspectBuildDefinition
 	{
-		public PairedAspectBuildDefinition( IDictionary<ITypeDefinition, IEnumerable<IAspectSelector>> selectors ) : base( new AspectSelection( selectors.TryGet ), selectors.Keys.Fixed() ) {}
-		public PairedAspectBuildDefinition( IDictionary<ITypeDefinition, IAspectSelector> selectors ) : base( new AspectSelection( selectors.Yield ), selectors.Keys.Fixed() ) {}
+		public PairedAspectBuildDefinition( IDictionary<ITypeDefinition, IEnumerable<IAspectDefinition>> selectors ) : base( new AspectDefinitionSelector( selectors.TryGet ), selectors.Keys.Fixed() ) {}
+		public PairedAspectBuildDefinition( IDictionary<ITypeDefinition, IAspectDefinition> selectors ) : base( new AspectDefinitionSelector( selectors.Yield ), selectors.Keys.Fixed() ) {}
 	}
 
 	public class AspectBuildDefinition : ParameterizedItemSourceBase<TypeInfo, AspectInstance>, IAspectBuildDefinition
 	{
-		readonly IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectSelector>> selector;
-		readonly IEnumerable<Type> types;
+		readonly ImmutableArray<Type> types;
 		readonly ISpecification<TypeInfo> specification;
-		readonly IParameterizedSource<TypeInfo, ITypeDefinition> definitionSource;
+		readonly IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource;
 
-		public AspectBuildDefinition( 
-			IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectSelector>> selector, 
-			params ITypeDefinition[] candidates ) 
-			: 
-			this( selector, candidates.SelectTypes(), 
-				new FirstSelector<TypeInfo, ITypeDefinition>( 
-					info => new Specification( info ).Get,
-					candidates.Select( candidate => candidate.Wrap() ).Fixed() ).ToCache() 
-				)
-		{}
+		public AspectBuildDefinition( IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, params ITypeDefinition[] candidates ) 
+			: this( selector, candidates.SelectTypes().ToImmutableArray(), candidates ) {}
 
-		public AspectBuildDefinition( 
-			IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectSelector>> selector,
-			IEnumerable<Type> types,
-			IParameterizedSource<TypeInfo, ITypeDefinition> definitionSource ) : this( selector, types, new DelegatedAssignedSpecification<TypeInfo, ITypeDefinition>( definitionSource.ToDelegate() ), definitionSource ) {}
+		AspectBuildDefinition( IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, ImmutableArray<Type> types, params ITypeDefinition[] candidates ) 
+			: this( types, new Cache( selector, types, candidates ) ) {}
+
+		public AspectBuildDefinition( ImmutableArray<Type> types, IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource ) 
+			: this( types, 
+				  new DelegatedAssignedSpecification<TypeInfo, ImmutableArray<AspectInstance>?>( instanceSource.ToDelegate() )
+				  /*.Or(  )*/, instanceSource ) {}
 
 		[UsedImplicitly]
-		public AspectBuildDefinition( 
-			IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectSelector>> selector, 
-			IEnumerable<Type> types,
-			ISpecification<TypeInfo> specification,
-			IParameterizedSource<TypeInfo, ITypeDefinition> definitionSource )
+		public AspectBuildDefinition( ImmutableArray<Type> types, ISpecification<TypeInfo> specification, IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource )
 		{
-			this.selector = selector;
 			this.types = types;
 			this.specification = specification;
-			this.definitionSource = definitionSource;
+			this.instanceSource = instanceSource;
 		}
 
 		public bool IsSatisfiedBy( TypeInfo parameter ) => specification.IsSatisfiedBy( parameter );
 
-		public override IEnumerable<AspectInstance> Yield( TypeInfo parameter )
-		{
-			var definition = definitionSource.Get( parameter );
-			var selectors = selector.GetFixed( definition );
-			var result = new CompositeFactory<TypeInfo, AspectInstance>( selectors ).GetEnumerable( parameter );
-			return result;
-		}
+		public override IEnumerable<AspectInstance> Yield( TypeInfo parameter ) => instanceSource.Get( parameter )?.ToArray();
 
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => this.GetEnumerable( (TypeInfo)targetElement );
 
-		public IEnumerator<Type> GetEnumerator() => types.GetEnumerator();
-
+		public IEnumerator<Type> GetEnumerator() => types.AsEnumerable().GetEnumerator();
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-		sealed class Specification : ParameterizedSourceBase<ITypeDefinition, bool>
+		sealed class Cache : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<AspectInstance>?>
 		{
-			readonly TypeInfo info;
-			public Specification( TypeInfo info )
+			readonly ISpecification<TypeInfo> specification;
+			readonly IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector;
+			readonly ImmutableArray<ITypeDefinition> candidates;
+
+			public Cache( IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, ImmutableArray<Type> types, params ITypeDefinition[] candidates ) : this( new AdapterAssignableSpecification( types.ToArray() ), selector, candidates ) {}
+
+			Cache( ISpecification<TypeInfo> specification, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, params ITypeDefinition[] candidates )
 			{
-				this.info = info;
+				this.specification = specification;
+				this.selector = selector;
+				this.candidates = candidates.ToImmutableArray();
 			}
 
-			public override bool Get( ITypeDefinition parameter ) => parameter.IsSatisfiedBy( info );
+			protected override ImmutableArray<AspectInstance>? Create( TypeInfo parameter )
+			{
+				foreach ( var candidate in candidates )
+				{
+					var builder = ImmutableArray.CreateBuilder<AspectInstance>();
+					var selectors = selector.GetFixed( candidate );
+					foreach ( var item in selectors )
+					{
+						if ( item.IsSatisfiedBy( parameter ) )
+						{
+							builder.Add( item.Get( parameter ) );
+						}
+					}
+
+					if ( builder.Any() )
+					{
+						return builder.ToImmutable();
+					}
+				}
+
+				var result = specification.IsSatisfiedBy( parameter ) ? Items<AspectInstance>.Immutable : (ImmutableArray<AspectInstance>?)null;
+				return result;
+			}
 		}
 	}
 
-	public sealed class AspectSelection<TType, TMethod> : ParameterizedItemSourceBase<ITypeDefinition, IAspectSelector>
+	public class IntroducedAspectSelector<TType, TMethod> : AspectSelector<TType, TMethod>
+		where TType : CompositionAspect
+		where TMethod : IAspect
+	{
+		public new static IntroducedAspectSelector<TType, TMethod> Default { get; } = new IntroducedAspectSelector<TType, TMethod>();
+		IntroducedAspectSelector() : base( definition => new IntroducedTypeAspectDefinition<TType>( definition ).Yield() ) {}
+	}
+
+	public class AspectSelector<TType, TMethod> : CompositeAspectSelector
 		where TType : IAspect 
 		where TMethod : IAspect
 	{
-		public static AspectSelection<TType, TMethod> Default { get; } = new AspectSelection<TType, TMethod>();
-		AspectSelection() {}
+		public static AspectSelector<TType, TMethod> Default { get; } = new AspectSelector<TType, TMethod>();
+		AspectSelector() : this( definition => new TypeAspectDefinition<TType>( definition ).Yield() ) {}
 
-		public override IEnumerable<IAspectSelector> Yield( ITypeDefinition parameter ) => 
-			TypeAspectSelection<TType>.Default.Yield( parameter ).Concat( MethodAspectSelection<TMethod>.Default.Yield( parameter ) );
+		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> typeSource ) : this( typeSource, MethodAspectSelector<TMethod>.Default.Yield ) {}
+
+		[UsedImplicitly]
+		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> typeSource, Func<ITypeDefinition, IEnumerable<IAspectDefinition>> methodSource ) 
+			: base( typeSource, methodSource ) {}
 	}
 
-	public sealed class TypeAspectSelection<T> : ParameterizedItemSourceBase<ITypeDefinition, IAspectSelector>
-		where T : IAspect
+	public class CompositeAspectSelector : ParameterizedItemSourceBase<ITypeDefinition, IAspectDefinition>
 	{
-		public static TypeAspectSelection<T> Default { get; } = new TypeAspectSelection<T>();
-		TypeAspectSelection() {}
+		readonly ImmutableArray<Func<ITypeDefinition, IEnumerable<IAspectDefinition>>> sources;
 
-		public override IEnumerable<IAspectSelector> Yield( ITypeDefinition parameter )
+		public CompositeAspectSelector( params Func<ITypeDefinition, IEnumerable<IAspectDefinition>>[] sources )
 		{
-			yield return new TypeAspectSelector<T>( parameter );
+			this.sources = sources.ToImmutableArray();
 		}
-			
+
+		public override IEnumerable<IAspectDefinition> Yield( ITypeDefinition parameter )
+		{
+			foreach ( var source in sources )
+			{
+				foreach ( var aspectDefinition in source( parameter ) )
+				{
+					yield return aspectDefinition;
+				}
+			}
+		}
 	}
 
-	public sealed class MethodAspectSelection<T> : ParameterizedItemSourceBase<ITypeDefinition, IAspectSelector>
+	public sealed class MethodAspectSelector<T> : ParameterizedItemSourceBase<ITypeDefinition, IAspectDefinition>
 		where T : IAspect
 	{
-		public static MethodAspectSelection<T> Default { get; } = new MethodAspectSelection<T>();
-		MethodAspectSelection() {}
+		public static MethodAspectSelector<T> Default { get; } = new MethodAspectSelector<T>();
+		MethodAspectSelector() {}
 
-		public override IEnumerable<IAspectSelector> Yield( ITypeDefinition parameter ) => 
-			parameter.Select( store => new MethodAspectSelector<T>( store ) );
+		public override IEnumerable<IAspectDefinition> Yield( ITypeDefinition parameter ) => 
+			parameter.Select( store => new MethodAspectDefinition<T>( store ) );
 	}
 }

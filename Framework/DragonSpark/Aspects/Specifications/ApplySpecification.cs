@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Specifications
 	[IntroduceInterface( typeof(ISource<ISpecificationAdapter>) )]
 	public sealed class ApplySpecification : SpecificationAspectBase, ISource<ISpecificationAdapter>, IAspectProvider
 	{
-		public ApplySpecification( Type specificationType ) : base( Factory<ApplySpecification>.Default.Get( specificationType ) ) {}
+		public ApplySpecification( Type specificationType ) : base( Constructors<ApplySpecification>.Default.Get( specificationType ) ) {}
 
 		[UsedImplicitly]
 		public ApplySpecification( ISpecificationAdapter specification ) : base( specification ) {}

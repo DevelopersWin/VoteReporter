@@ -27,7 +27,7 @@ namespace DragonSpark.Aspects.Definitions
 			var result = definition.IsSatisfiedBy( type );
 			if ( !result )
 			{
-				throw new InvalidOperationException( $"Aspect '{GetType()}' was applied to {type}, but it does not implement any of the types required by the applied aspect, which are: {string.Join( ", ", definition.Select( t => t.FullName ) )}" );
+				throw new InvalidOperationException( $"Aspect '{GetType()}' was applied to {type}, but it was not able to apply any aspects to it.  This aspects works with the following types.  Ensure that {type} implements at least one of these types: {string.Join( ", ", definition.Select( t => t.FullName ) )}" );
 			}
 			return true;
 		}

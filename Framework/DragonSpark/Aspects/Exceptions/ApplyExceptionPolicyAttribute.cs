@@ -20,7 +20,7 @@ namespace DragonSpark.Aspects.Exceptions
 	{
 		readonly Policy policy;
 
-		public ApplyExceptionPolicyAttribute( Type policyType ) :  base( Factory.Default.Get( policyType ), Definition.Default ) {}
+		public ApplyExceptionPolicyAttribute( Type policyType ) :  base( Constructors.Default.Get( policyType ), Definition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyExceptionPolicyAttribute( Policy policy )
@@ -31,10 +31,10 @@ namespace DragonSpark.Aspects.Exceptions
 		public Policy Get() => policy;
 		// object ISource.Get() => Get();
 
-		sealed class Factory : TypedParameterAspectFactory<Policy, ApplyExceptionPolicyAttribute>
+		sealed class Constructors : TypedAspectConstructors<Policy, ApplyExceptionPolicyAttribute>
 		{
-			public static Factory Default { get; } = new Factory();
-			Factory() : base( Activator.Default.Get<Policy> ) {}
+			public static Constructors Default { get; } = new Constructors();
+			Constructors() : base( Activator.Default.Get<Policy> ) {}
 		}
 	}
 }

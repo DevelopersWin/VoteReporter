@@ -12,7 +12,7 @@ namespace DragonSpark.Aspects.Specifications
 	[IntroduceInterface( typeof(ISource<ISpecificationAdapter>) )]
 	public sealed class ApplyInverseSpecification : SpecificationAspectBase, ISource<ISpecificationAdapter>, IAspectProvider
 	{
-		public ApplyInverseSpecification( Type specificationType ) : base( Factory<ApplyInverseSpecification>.Default.Get( specificationType ) ) {}
+		public ApplyInverseSpecification( Type specificationType ) : base( Constructors<ApplyInverseSpecification>.Default.Get( specificationType ) ) {}
 
 		[UsedImplicitly]
 		public ApplyInverseSpecification( ISpecificationAdapter specification ) : base( new SpecificationAdapter( specification.To( CastCoercer<bool>.Default ) ) ) {}

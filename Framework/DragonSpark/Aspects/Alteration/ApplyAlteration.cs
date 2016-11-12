@@ -22,10 +22,10 @@ namespace DragonSpark.Aspects.Alteration
 		}
 		protected ApplyAlterationBase( Func<object, IAspect> factory, IAspectBuildDefinition definition ) : base( factory, definition ) {}
 
-		protected sealed class Factory<T> : TypedParameterAspectFactory<IAlterationAdapter, T> where T :  ApplyAlterationBase
+		protected sealed class Constructors<T> : TypedAspectConstructors<IAlterationAdapter, T> where T :  ApplyAlterationBase
 		{
-			public static Factory<T> Default { get; } = new Factory<T>();
-			Factory() : base( Source.Default.Get ) {}
+			public static Constructors<T> Default { get; } = new Constructors<T>();
+			Constructors() : base( Source.Default.Get ) {}
 		}
 
 		public IAlterationAdapter Get() => alteration;
@@ -34,7 +34,7 @@ namespace DragonSpark.Aspects.Alteration
 
 	public sealed class ApplyAlteration : ApplyAlterationBase
 	{
-		public ApplyAlteration( Type alterationType ) : base( Factory<ApplyAlteration>.Default.Get( alterationType ), Definition<Aspect>.Default ) {}
+		public ApplyAlteration( Type alterationType ) : base( Constructors<ApplyAlteration>.Default.Get( alterationType ), Definition<Aspect>.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyAlteration( IAlterationAdapter alteration ) : base( alteration ) {}
@@ -42,7 +42,7 @@ namespace DragonSpark.Aspects.Alteration
 
 	public sealed class ApplyResultAlteration : ApplyAlterationBase
 	{
-		public ApplyResultAlteration( Type alterationType ) : base( Factory<ApplyResultAlteration>.Default.Get( alterationType ), Definition<ResultAspect>.Default ) {}
+		public ApplyResultAlteration( Type alterationType ) : base( Constructors<ApplyResultAlteration>.Default.Get( alterationType ), Definition<ResultAspect>.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyResultAlteration( IAlterationAdapter alteration ) : base( alteration ) {}

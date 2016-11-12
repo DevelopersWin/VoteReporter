@@ -15,7 +15,7 @@ namespace DragonSpark.Aspects.Coercion
 	{
 		readonly ICoercerAdapter coercer;
 
-		public ApplyCoercerAttribute( Type coercerType ) : base( Factory.Default.Get( coercerType ), Definition.Default ) {}
+		public ApplyCoercerAttribute( Type coercerType ) : base( Constructors.Default.Get( coercerType ), Definition.Default ) {}
 
 		[UsedImplicitly]
 		public ApplyCoercerAttribute( ICoercerAdapter coercer )
@@ -23,10 +23,10 @@ namespace DragonSpark.Aspects.Coercion
 			this.coercer = coercer;
 		}
 
-		sealed class Factory : TypedParameterAspectFactory<ICoercerAdapter, ApplyCoercerAttribute>
+		sealed class Constructors : TypedAspectConstructors<ICoercerAdapter, ApplyCoercerAttribute>
 		{
-			public static Factory Default { get; } = new Factory();
-			Factory() : base( Source.Default.Get ) {}
+			public static Constructors Default { get; } = new Constructors();
+			Constructors() : base( Source.Default.Get ) {}
 		}
 
 		public ICoercerAdapter Get() => coercer;

@@ -1,11 +1,12 @@
-﻿using DragonSpark.Sources.Parameterized.Caching;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
-using DragonSpark.TypeSystem;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace DragonSpark.Extensions
+namespace DragonSpark.TypeSystem
 {
 	sealed class MethodEqualitySpecification : SpecificationWithContextBase<MethodInfo>
 	{

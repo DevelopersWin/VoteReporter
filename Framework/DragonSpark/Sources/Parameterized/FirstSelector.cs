@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using JetBrains.Annotations;
 using System;
 using System.Linq;
 
@@ -10,10 +11,7 @@ namespace DragonSpark.Sources.Parameterized
 		readonly Func<TParameter, Func<TResult, bool>> specificationSource;
 		readonly IParameterizedItemSource<TParameter, TResult> sources;
 
-		public FirstSelector( params IParameterizedSource<TParameter, TResult>[] sources ) : this( Common<TResult>.Assigned, sources ) {}
-
-		public FirstSelector( ISpecification<TResult> specification, params IParameterizedSource<TParameter, TResult>[] sources ) 
-			: this ( specification, sources.Select( source => source.ToDelegate() ).Fixed() ) {}
+		public FirstSelector( params IParameterizedSource<TParameter, TResult>[] sources ) : this( Common<TResult>.Assigned, sources.Select( source => source.ToDelegate() ).Fixed() ) {}
 
 		public FirstSelector( params Func<TParameter, TResult>[] sources ) : this( Common<TResult>.Assigned, sources ) {}
 
@@ -23,6 +21,7 @@ namespace DragonSpark.Sources.Parameterized
 		public FirstSelector( Func<TParameter, Func<TResult, bool>> specificationSource, params Func<TParameter, TResult>[] sources )
 			: this( specificationSource, new CompositeFactory<TParameter, TResult>( sources ) ) {}
 
+		[UsedImplicitly]
 		public FirstSelector( Func<TParameter, Func<TResult, bool>> specificationSource, IParameterizedItemSource<TParameter, TResult> sources )
 		{
 			this.specificationSource = specificationSource;

@@ -2,10 +2,10 @@
 
 namespace DragonSpark.Aspects.Implementations
 {
-	public sealed class SpecificationAspectSelector : AspectSelector<IntroduceGeneralizedSpecification>
+	public sealed class SpecificationAspectDefinition : AspectDefinition<IntroduceGeneralizedSpecification>
 	{
-		public static SpecificationAspectSelector Default { get; } = new SpecificationAspectSelector();
-		SpecificationAspectSelector() : base( 
+		public static SpecificationAspectDefinition Default { get; } = new SpecificationAspectDefinition();
+		SpecificationAspectDefinition() : base( 
 			GenericSpecificationTypeDefinition.Default.ReferencedType, 
 			GeneralizedSpecificationTypeDefinition.Default.ReferencedType, 
 			CommandTypeDefinition.Default.ReferencedType ) {}

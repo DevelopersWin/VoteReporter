@@ -9,7 +9,7 @@ namespace DragonSpark.Aspects.Relay
 	public sealed class CommandRelayDefinition : PairedAspectBuildDefinition
 	{
 		public static CommandRelayDefinition Default { get; } = new CommandRelayDefinition();
-		CommandRelayDefinition() : base( new Dictionary<ITypeDefinition, IEnumerable<IAspectSelector>>
+		CommandRelayDefinition() : base( new Dictionary<ITypeDefinition, IEnumerable<IAspectDefinition>>
 												   {
 													   { GenericCommandTypeDefinition.Default, CommandRelaySelectors.Default }
 												   }.ToImmutableDictionary() ) {}
@@ -21,8 +21,8 @@ namespace DragonSpark.Aspects.Relay
 		CommandRelaySelectors() : base( 
 			GenericCommandTypeDefinition.Default.ReferencedType, 
 			typeof(CommandAdapter<>),
-			new MethodAspectSelector<SpecificationRelay>( CommandTypeDefinition.Default.Validation ),
-			new MethodAspectSelector<CommandRelay>( CommandTypeDefinition.Default.Execution )
+			new MethodAspectDefinition<SpecificationRelay>( CommandTypeDefinition.Default.Validation ),
+			new MethodAspectDefinition<CommandRelay>( CommandTypeDefinition.Default.Execution )
 		) {}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using DragonSpark.Commands;
-using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using System;
 using System.Reflection;
 using System.Windows.Input;

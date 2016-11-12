@@ -46,7 +46,7 @@
     <Compile Include="Application\FatalApplicationException.cs" />
     <Compile Include="Application\Setup\IInputOutput.cs" />
     <Compile Include="Application\Setup\ReadKeyCommand.cs" />
-    <Compile Include="Aspects\Build\MethodAspectSelector.cs" />
+    <Compile Include="Aspects\Build\MethodAspectDefinition.cs" />
     <Compile Include="Aspects\Adapters\GenericAdapterConstructorFactory.cs" />
     <Compile Include="Aspects\Adapters\GenericAdapterFactory.cs" />
     <Compile Include="Aspects\Adapters\FactoryAdapter.cs" />
@@ -55,7 +55,7 @@
     <Compile Include="Aspects\AssignedAttribute.cs" />
     <Compile Include="Aspects\Build\IAspectBuildDefinition.cs" />
     <Compile Include="Aspects\Build\AspectBuildDefinition.cs" />
-    <Compile Include="Aspects\Build\TypeAspectSelector.cs" />
+    <Compile Include="Aspects\Build\TypeAspectDefinition.cs" />
     <Compile Include="Aspects\Alteration\ApplyAlteration.cs" />
     <Compile Include="Aspects\Alteration\Aspect.cs" />
     <Compile Include="Aspects\Adapters\AlterationAdapter.cs" />
@@ -65,7 +65,7 @@
     <Compile Include="Aspects\Alteration\Definition.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercerAttribute.cs" />
     <Compile Include="Aspects\Coercion\Aspect.cs" />
-    <Compile Include="Aspects\Build\TypedParameterAspectFactory.cs" />
+    <Compile Include="Aspects\Build\TypedAspectConstructors.cs" />
     <Compile Include="Aspects\IntroduceGenericInterfaceAspectBase.cs" />
     <Compile Include="Aspects\Adapters\DefaultSpecificationImplementation.cs" />
     <Compile Include="Aspects\Specifications\IntroduceSpecification.cs" />
@@ -88,11 +88,11 @@
     <Compile Include="Aspects\InterceptionArgsExtensions.cs" />
     <Compile Include="Aspects\Definitions\GeneralizedParameterizedSourceTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\GeneralizedSpecificationTypeDefinition.cs" />
-    <Compile Include="Aspects\Implementations\AspectSelector.cs" />
+    <Compile Include="Aspects\Implementations\AspectDefinition.cs" />
     <Compile Include="Aspects\Implementations\IntroduceGeneralizedParameterizedSource.cs" />
     <Compile Include="Aspects\Implementations\IntroduceGeneralizedSpecification.cs" />
-    <Compile Include="Aspects\Implementations\ParameterizedSourceAspectSelector.cs" />
-    <Compile Include="Aspects\Implementations\SpecificationAspectSelector.cs" />
+    <Compile Include="Aspects\Implementations\ParameterizedSourceAspectDefinition.cs" />
+    <Compile Include="Aspects\Implementations\SpecificationAspectDefinition.cs" />
     <Compile Include="Aspects\Implementations\Definition.cs" />
     <Compile Include="Aspects\ApplyAspectsAttribute.cs" />
     <Compile Include="Aspects\Relay\CommandRelaySelectors.cs" />
@@ -127,7 +127,7 @@
     <Compile Include="Aspects\Definitions\TypeDefinitionWithPrimaryMethodBase.cs" />
     <Compile Include="Aspects\Definitions\ValidatedTypeDefinition.cs" />
     <Compile Include="Aspects\Validation\AspectSelector.cs" />
-    <Compile Include="Aspects\Build\IAspectSelector.cs" />
+    <Compile Include="Aspects\Build\IAspectDefinition.cs" />
     <Compile Include="Aspects\Build\IMethods.cs" />
     <Compile Include="Aspects\Adapters\ISpecificationAdapter.cs" />
     <Compile Include="Aspects\Adapters\SpecificationAdapter.cs" />
@@ -339,7 +339,7 @@
     <Compile Include="Diagnostics\LoggingHistory.cs" />
     <Compile Include="Extensions\ConventionBasedFormattingExtensions.cs" />
     <Compile Include="Extensions\ImmutableArrayExtensions.cs" />
-    <Compile Include="Extensions\MethodEqualitySpecification.cs" />
+    <Compile Include="TypeSystem\MethodEqualitySpecification.cs" />
     <Compile Include="Extensions\TypeAdapterCache.cs" />
     <Compile Include="Runtime\Assignments\AssignWithDisposeCommand.cs" />
     <Compile Include="Runtime\Assignments\ValueAssignment.cs" />

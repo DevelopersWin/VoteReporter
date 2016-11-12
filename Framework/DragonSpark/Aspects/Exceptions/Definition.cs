@@ -7,7 +7,7 @@ namespace DragonSpark.Aspects.Exceptions
 	{
 		public static Definition Default { get; } = new Definition();
 		Definition() : base(
-			MethodAspectSelection<Aspect>.Default,
+			MethodAspectSelector<Aspect>.Default,
 
 			GenericCommandTypeDefinition.Default,
 			ParameterizedSourceTypeDefinition.Default,

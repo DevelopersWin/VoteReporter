@@ -8,7 +8,7 @@ namespace DragonSpark.Aspects.Alteration
 	{
 		public static Definition<T> Default { get; } = new Definition<T>();
 		Definition() : base( 
-			MethodAspectSelection<T>.Default, 
+			MethodAspectSelector<T>.Default, 
 			
 			CommandTypeDefinition.Default, 
 			GeneralizedSpecificationTypeDefinition.Default, 

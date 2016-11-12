@@ -18,7 +18,7 @@ namespace DragonSpark.Aspects.Build
 		public override ObjectConstruction Get( IEnumerable<object> parameter ) => new ObjectConstruction( typeof(T), parameter.Fixed() );
 	}
 
-	public sealed class MethodAspectFactory<T> : AspectInstanceFactoryBase<MemberInfo, T> where T : IAspect
+	public sealed class MethodAspectFactory<T> : AspectInstanceFactoryBase<MethodInfo, T> where T : IAspect
 	{
 		public static MethodAspectFactory<T> Default { get; } = new MethodAspectFactory<T>();
 		MethodAspectFactory() {}

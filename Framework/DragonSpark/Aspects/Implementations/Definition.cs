@@ -8,10 +8,10 @@ namespace DragonSpark.Aspects.Implementations
 	sealed class Definition : PairedAspectBuildDefinition
 	{
 		public static Definition Default { get; } = new Definition();
-		Definition() : base( new Dictionary<ITypeDefinition, IAspectSelector>
+		Definition() : base( new Dictionary<ITypeDefinition, IAspectDefinition>
 							 {
-								 { GeneralizedParameterizedSourceTypeDefinition.Default, ParameterizedSourceAspectSelector.Default },
-								 { GeneralizedSpecificationTypeDefinition.Default, SpecificationAspectSelector.Default }
+								 { GeneralizedParameterizedSourceTypeDefinition.Default, ParameterizedSourceAspectDefinition.Default },
+								 { GeneralizedSpecificationTypeDefinition.Default, SpecificationAspectDefinition.Default }
 							 }.ToImmutableDictionary() ) {}
 	}
 }

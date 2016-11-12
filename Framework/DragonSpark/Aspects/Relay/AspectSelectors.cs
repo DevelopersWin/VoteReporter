@@ -9,19 +9,19 @@ using System;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public interface IAspectSelectors : IItemSource<IAspectSelector>, IParameterizedSource<object, IAspect> {}
+	public interface IAspectSelectors : IItemSource<IAspectDefinition>, IParameterizedSource<object, IAspect> {}
 
-	public class AspectSelectors<TInterface, TAspect> : ItemSource<IAspectSelector>, IAspectSelectors where TAspect : IAspect
+	public class AspectSelectors<TInterface, TAspect> : ItemSource<IAspectDefinition>, IAspectSelectors where TAspect : IAspect
 	{
 		readonly Func<object, TAspect> aspectSource;
 
-		public AspectSelectors( Type supportedType, Type adapterType, params IAspectSelector[] selectors ) 
+		public AspectSelectors( Type supportedType, Type adapterType, params IAspectDefinition[] definitions ) 
 			: this( 
 				new GenericAdapterFactory<object, TInterface>( supportedType, adapterType ).To( ParameterConstructor<TInterface, TAspect>.Default ).Get,
-				selectors
+				definitions
 			) {}
 
-		AspectSelectors( Func<object, TAspect> aspectSource, params IAspectSelector[] selectors ) : base( selectors )
+		AspectSelectors( Func<object, TAspect> aspectSource, params IAspectDefinition[] definitions ) : base( definitions )
 		{
 			this.aspectSource = aspectSource;
 		}

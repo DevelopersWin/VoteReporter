@@ -1,22 +1,17 @@
+using DragonSpark.Sources.Coercion;
+using DragonSpark.Sources.Parameterized;
+using JetBrains.Annotations;
 using System;
 
 namespace DragonSpark.Specifications
 {
-	public class DelegatedAssignedSpecification<TParameter, TResult> : SpecificationBase<TParameter>
+	public class DelegatedAssignedSpecification<TParameter, TResult> : DelegatedSpecification<TParameter>
 	{
 		readonly static Func<TResult, bool> Specification = AssignedSpecification<TResult>.Default.ToDelegate();
 
-		readonly Func<TParameter, TResult> source;
-		readonly Func<TResult, bool> specification;
-
 		public DelegatedAssignedSpecification( Func<TParameter, TResult> source ) : this( source, Specification ) {}
 
-		DelegatedAssignedSpecification( Func<TParameter, TResult> source, Func<TResult, bool> specification )
-		{
-			this.source = source;
-			this.specification = specification;
-		}
-
-		public override bool IsSatisfiedBy( TParameter parameter ) => specification( source( parameter ) );
+		[UsedImplicitly]
+		public DelegatedAssignedSpecification( Func<TParameter, TResult> source, Func<TResult, bool> specification ) : base( source.To( specification ).ToDelegate() ) {}
 	}
 }
