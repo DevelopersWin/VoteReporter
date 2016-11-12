@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Aspects.Implementations;
 using DragonSpark.Commands;
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using System;
@@ -14,8 +15,7 @@ namespace DragonSpark.Testing.Aspects.Implementations
 		public void VerifyCommand()
 		{
 			var sut = new Command();
-			// ReSharper disable once SuspiciousTypeConversion.Global
-			Assert.False( sut is ISpecification<object> );
+			Assert.Null( sut.As<ISpecification<object>>() );
 		}
 
 		[Fact]

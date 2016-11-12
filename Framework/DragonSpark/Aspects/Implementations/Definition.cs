@@ -10,8 +10,8 @@ namespace DragonSpark.Aspects.Implementations
 		public static Definition Default { get; } = new Definition();
 		Definition() : base( new Dictionary<ITypeDefinition, IAspectDefinition>
 							 {
-								 { GeneralizedParameterizedSourceTypeDefinition.Default, ParameterizedSourceAspectDefinition.Default },
-								 { GeneralizedSpecificationTypeDefinition.Default, SpecificationAspectDefinition.Default }
+								 { new IntroducedTypeDefinition( GeneralizedParameterizedSourceTypeDefinition.Default ), ParameterizedSourceAspectDefinition.Default },
+								 { new IntroducedTypeDefinition( GeneralizedSpecificationTypeDefinition.Default ), SpecificationAspectDefinition.Default }
 							 }.ToImmutableDictionary() ) {}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Aspects.Build;
+using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
@@ -8,6 +9,12 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Definitions
 {
+	public class IntroducedTypeDefinition : TypeDefinition
+	{
+		readonly static Func<TypeInfo, bool> Specification = Common<TypeInfo>.Assigned.ToDelegate();
+		public IntroducedTypeDefinition( ITypeDefinition definition ) : base( definition.ReferencedType, Specification, definition.Fixed() ) {}
+	}
+
 	public class TypeDefinition : ItemSource<IMethods>, ITypeDefinition
 	{
 		readonly Func<TypeInfo, bool> specification;

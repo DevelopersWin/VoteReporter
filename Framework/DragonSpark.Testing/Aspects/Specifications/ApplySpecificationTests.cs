@@ -85,7 +85,7 @@ namespace DragonSpark.Testing.Aspects.Specifications
 		}
 
 		[UsedImplicitly, ApplyAutoValidation]
-		class CoreCommand : ICommand
+		sealed class CoreCommand : ICommand
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
 
@@ -103,7 +103,7 @@ namespace DragonSpark.Testing.Aspects.Specifications
 		}
 
 		[ApplyAutoValidation, ApplySpecification( typeof(OnlyOnceSpecification<int>) )]
-		class PocoCommand : CommandBase<int>
+		sealed class PocoCommand : CommandBase<int>
 		{
 			public override void Execute( int parameter ) => Parameters.Add( parameter );
 
@@ -111,7 +111,7 @@ namespace DragonSpark.Testing.Aspects.Specifications
 		}
 
 		[ApplyAutoValidation]
-		class Command : CommandBase<int>
+		sealed class Command : CommandBase<int>
 		{
 			public override bool IsSatisfiedBy( int parameter ) => parameter == 6776;
 
@@ -127,7 +127,7 @@ namespace DragonSpark.Testing.Aspects.Specifications
 		}
 
 		[ApplySpecification( typeof(Specification) )]
-		class Subject : ISpecification<int>
+		sealed class Subject : ISpecification<int>
 		{
 			public bool Called { get; private set; }
 

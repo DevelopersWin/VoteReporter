@@ -5,7 +5,9 @@ using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
+using PostSharp;
 using PostSharp.Aspects;
+using PostSharp.Extensibility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -68,19 +70,23 @@ namespace DragonSpark.Aspects.Build
 			{
 				foreach ( var candidate in candidates )
 				{
-					var builder = ImmutableArray.CreateBuilder<AspectInstance>();
-					var selectors = selector.GetFixed( candidate );
-					foreach ( var item in selectors )
+					if ( candidate.IsSatisfiedBy( parameter ) )
 					{
-						if ( item.IsSatisfiedBy( parameter ) )
-						{
-							builder.Add( item.Get( parameter ) );
-						}
-					}
+						var builder = ImmutableArray.CreateBuilder<AspectInstance>();
+						var selectors = selector.GetFixed( candidate );
 
-					if ( builder.Any() )
-					{
-						return builder.ToImmutable();
+						foreach ( var item in selectors )
+						{
+							if ( item.IsSatisfiedBy( parameter ) )
+							{
+								builder.Add( item.Get( parameter ) );
+							}
+						}
+
+						if ( builder.Any() )
+						{
+							return builder.ToImmutable();
+						}
 					}
 				}
 
