@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Aspects.Definitions;
 using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
@@ -33,14 +34,14 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	[AttributeUsage( AttributeTargets.Class ), CompositionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
+	[AttributeUsage( AttributeTargets.Class ), CompositionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) ), LinesOfCodeAvoided( 5 )]
 	public abstract class IntroduceInterfaceAspectBase : CompositionAspect
 	{
 		readonly Func<Type, ImmutableArray<Type>> interfacesSource;
 		readonly ISpecification<TypeInfo> specification;
 		readonly Func<object, object> factory;
 
-		protected IntroduceInterfaceAspectBase( ITypeDefinition definition, Func<object, object> factory ) : this( definition, type => type.Yield().ToImmutableArray(), factory ) {}
+		protected IntroduceInterfaceAspectBase( ITypeDefinition definition, Func<object, object> factory ) : this( definition, definition.ReferencedType.Yield().ToImmutableArray().Wrap(), factory ) {}
 		protected IntroduceInterfaceAspectBase( ITypeDefinition definition, Func<Type, ImmutableArray<Type>> interfacesSource, Func<object, object> factory ) 
 			: this( interfacesSource, definition.Inverse(), factory ) {}
 

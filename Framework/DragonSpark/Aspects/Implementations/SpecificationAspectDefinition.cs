@@ -6,8 +6,9 @@ namespace DragonSpark.Aspects.Implementations
 	{
 		public static SpecificationAspectDefinition Default { get; } = new SpecificationAspectDefinition();
 		SpecificationAspectDefinition() : base( 
-			GenericSpecificationTypeDefinition.Default.ReferencedType, 
-			GeneralizedSpecificationTypeDefinition.Default.ReferencedType, 
-			CommandTypeDefinition.Default.ReferencedType ) {}
+			GenericSpecificationTypeDefinition.Default, 
+			
+			GeneralizedSpecificationTypeDefinition.Default, 
+			CommandTypeDefinition.Default ) {}
 	}
 }
