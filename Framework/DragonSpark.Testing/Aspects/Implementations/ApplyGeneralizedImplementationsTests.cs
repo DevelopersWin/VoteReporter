@@ -48,14 +48,14 @@ namespace DragonSpark.Testing.Aspects.Implementations
 		}
 
 		[ApplyGeneralizedImplementations]
-		class AlreadyImplementedSource : ParameterizedSourceBase<string, bool>, IParameterizedSource<object, object>
+		sealed class AlreadyImplementedSource : ParameterizedSourceBase<string, bool>, IParameterizedSource<object, object>
 		{
 			public override bool Get( string parameter ) => false;
 			public object Get( object parameter ) => parameter;
 		}
 
 		[ApplyGeneralizedImplementations]
-		class AlreadyImplementedSpecification : SpecificationBase<string>, ISpecification<object>
+		sealed class AlreadyImplementedSpecification : SpecificationBase<string>, ISpecification<object>
 		{
 			public override bool IsSatisfiedBy( string parameter )
 			{
@@ -69,18 +69,18 @@ namespace DragonSpark.Testing.Aspects.Implementations
 		}
 
 		[ApplyGeneralizedImplementations]
-		class Source : ParameterizedSourceBase<string, bool>
+		sealed class Source : ParameterizedSourceBase<string, bool>
 		{
 			public override bool Get( string parameter ) => false;
 		}
 
 		[ApplyGeneralizedImplementations]
-		class Specification : SpecificationBase<DateTime>
+		sealed class Specification : SpecificationBase<DateTime>
 		{
 			public override bool IsSatisfiedBy( DateTime parameter ) => false;
 		}
 
-		class Command : ICommand<int>
+		sealed class Command : ICommand<int>
 		{
 			bool ICommand.CanExecute( object parameter ) => false;
 
