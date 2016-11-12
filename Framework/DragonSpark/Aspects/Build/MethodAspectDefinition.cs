@@ -4,7 +4,6 @@ using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using System;
-using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
@@ -19,11 +18,5 @@ namespace DragonSpark.Aspects.Build
 				.ToDelegate(), 
 			store.Get
 		) {}
-	}
-
-	public abstract class AspectDefinitionBase : SpecificationParameterizedSource<TypeInfo, AspectInstance>, IAspectDefinition
-	{
-		//protected AspectSelectorBase( Type supportedType, Func<TypeInfo, AspectInstance> factory ) : this( TypeAssignableSpecification.Delegates.Get( supportedType ).Get, factory ) {}
-		protected AspectDefinitionBase( Func<TypeInfo, bool> specification, Func<TypeInfo, AspectInstance> factory ) : base( specification, factory ) {}
 	}
 }

@@ -15,12 +15,6 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class PairedAspectBuildDefinition : AspectBuildDefinition
-	{
-		public PairedAspectBuildDefinition( IDictionary<ITypeDefinition, IEnumerable<IAspectDefinition>> selectors ) : base( new AspectDefinitionSelector( selectors.TryGet ), selectors.Keys.Fixed() ) {}
-		public PairedAspectBuildDefinition( IDictionary<ITypeDefinition, IAspectDefinition> selectors ) : base( new AspectDefinitionSelector( selectors.Yield ), selectors.Keys.Fixed() ) {}
-	}
-
 	public class AspectBuildDefinition : ParameterizedItemSourceBase<TypeInfo, AspectInstance>, IAspectBuildDefinition
 	{
 		readonly ImmutableArray<Type> types;
@@ -94,58 +88,5 @@ namespace DragonSpark.Aspects.Build
 				return result;
 			}
 		}
-	}
-
-	public class IntroducedAspectSelector<TType, TMethod> : AspectSelector<TType, TMethod>
-		where TType : CompositionAspect
-		where TMethod : IAspect
-	{
-		public new static IntroducedAspectSelector<TType, TMethod> Default { get; } = new IntroducedAspectSelector<TType, TMethod>();
-		IntroducedAspectSelector() : base( definition => new IntroducedTypeAspectDefinition<TType>( definition ).Yield() ) {}
-	}
-
-	public class AspectSelector<TType, TMethod> : CompositeAspectSelector
-		where TType : IAspect 
-		where TMethod : IAspect
-	{
-		public static AspectSelector<TType, TMethod> Default { get; } = new AspectSelector<TType, TMethod>();
-		AspectSelector() : this( definition => new TypeAspectDefinition<TType>( definition ).Yield() ) {}
-
-		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> typeSource ) : this( typeSource, MethodAspectSelector<TMethod>.Default.Yield ) {}
-
-		[UsedImplicitly]
-		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> typeSource, Func<ITypeDefinition, IEnumerable<IAspectDefinition>> methodSource ) 
-			: base( typeSource, methodSource ) {}
-	}
-
-	public class CompositeAspectSelector : ParameterizedItemSourceBase<ITypeDefinition, IAspectDefinition>
-	{
-		readonly ImmutableArray<Func<ITypeDefinition, IEnumerable<IAspectDefinition>>> sources;
-
-		public CompositeAspectSelector( params Func<ITypeDefinition, IEnumerable<IAspectDefinition>>[] sources )
-		{
-			this.sources = sources.ToImmutableArray();
-		}
-
-		public override IEnumerable<IAspectDefinition> Yield( ITypeDefinition parameter )
-		{
-			foreach ( var source in sources )
-			{
-				foreach ( var aspectDefinition in source( parameter ) )
-				{
-					yield return aspectDefinition;
-				}
-			}
-		}
-	}
-
-	public sealed class MethodAspectSelector<T> : ParameterizedItemSourceBase<ITypeDefinition, IAspectDefinition>
-		where T : IAspect
-	{
-		public static MethodAspectSelector<T> Default { get; } = new MethodAspectSelector<T>();
-		MethodAspectSelector() {}
-
-		public override IEnumerable<IAspectDefinition> Yield( ITypeDefinition parameter ) => 
-			parameter.Select( store => new MethodAspectDefinition<T>( store ) );
 	}
 }

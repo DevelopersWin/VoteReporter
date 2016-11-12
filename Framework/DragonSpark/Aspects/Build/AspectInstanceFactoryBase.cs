@@ -1,35 +1,13 @@
-﻿using DragonSpark.Extensions;
-using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using PostSharp.Aspects;
 using PostSharp.Extensibility;
 using PostSharp.Reflection;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public sealed class ObjectConstructionFactory<T> : ParameterizedSourceBase<IEnumerable<object>, ObjectConstruction>
-	{
-		public static ObjectConstructionFactory<T> Default { get; } = new ObjectConstructionFactory<T>();
-		ObjectConstructionFactory() {}
-
-		public override ObjectConstruction Get( IEnumerable<object> parameter ) => new ObjectConstruction( typeof(T), parameter.Fixed() );
-	}
-
-	public sealed class MethodAspectFactory<T> : AspectInstanceFactoryBase<MethodInfo, T> where T : IAspect
-	{
-		public static MethodAspectFactory<T> Default { get; } = new MethodAspectFactory<T>();
-		MethodAspectFactory() {}
-	}
-
-	public sealed class TypeAspectFactory<T> : AspectInstanceFactoryBase<TypeInfo, T> where T : IAspect
-	{
-		public static TypeAspectFactory<T> Default { get; } = new TypeAspectFactory<T>();
-		TypeAspectFactory() {}
-	}
-
 	public abstract class AspectInstanceFactoryBase<TMemberInfo, TAspect> : SpecificationParameterizedSource<TMemberInfo, AspectInstance> 
 		where TMemberInfo : MemberInfo
 		where TAspect : IAspect

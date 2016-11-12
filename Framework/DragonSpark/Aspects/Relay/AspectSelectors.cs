@@ -3,14 +3,11 @@ using DragonSpark.Aspects.Adapters;
 using DragonSpark.Aspects.Build;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Coercion;
-using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
 using System;
 
 namespace DragonSpark.Aspects.Relay
 {
-	public interface IAspectSelectors : IItemSource<IAspectDefinition>, IParameterizedSource<object, IAspect> {}
-
 	public class AspectSelectors<TInterface, TAspect> : ItemSource<IAspectDefinition>, IAspectSelectors where TAspect : IAspect
 	{
 		readonly Func<object, TAspect> aspectSource;
