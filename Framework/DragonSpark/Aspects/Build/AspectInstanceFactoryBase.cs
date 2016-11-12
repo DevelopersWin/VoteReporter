@@ -1,7 +1,8 @@
 ﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
+using JetBrains.Annotations;
 using PostSharp.Aspects;
-using PostSharp.Extensibility;
 using PostSharp.Reflection;
 using System;
 using System.Reflection;
@@ -12,15 +13,17 @@ namespace DragonSpark.Aspects.Build
 		where TMemberInfo : MemberInfo
 		where TAspect : IAspect
 	{
-		/*public static AspectInstanceFactoryBase<TMemberInfo, TAspect> Default { get; } = new AspectInstanceFactoryBase<TMemberInfo, TAspect>();*/
-		protected AspectInstanceFactoryBase() : base( HasAspectSpecification.Implementation.Inverse(), Factory.Implementation.Get ) {}
+		protected AspectInstanceFactoryBase() : this( Factory.Implementation.ToCache() ) {}
+
+		[UsedImplicitly]
+		protected AspectInstanceFactoryBase( ICache<TMemberInfo, AspectInstance> source ) : base( HasAspectSpecification.Implementation.Or( new DelegatedSpecification<TMemberInfo>( source.Contains ) ).Inverse(), source.Get ) {}
 		
 		sealed class HasAspectSpecification : SpecificationBase<TMemberInfo>
 		{
 			readonly static Type AspectType = typeof(TAspect);
 
 			public static HasAspectSpecification Implementation { get; } = new HasAspectSpecification();
-			HasAspectSpecification() : this( () => PostSharpEnvironment.CurrentProject.GetService<IAspectRepositoryService>() ) {}
+			HasAspectSpecification() : this( ServiceSource<IAspectRepositoryService>.Default.Get ) {}
 
 			readonly Func<IAspectRepositoryService> repositorySource;
 

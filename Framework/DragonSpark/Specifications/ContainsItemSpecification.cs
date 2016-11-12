@@ -1,21 +1,15 @@
 using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace DragonSpark.Specifications
 {
-	public sealed class ContainsItemSpecification<T> : SpecificationBase<T>
+	public sealed class ContainsItemSpecification<T> : DelegatedSpecification<T>
 	{
-		readonly ImmutableArray<T> items;
-
-		public ContainsItemSpecification( IEnumerable<T> items ) : this( items.ToImmutableArray() ) {}
+		public ContainsItemSpecification( IEnumerable<T> items ) : base( items.Contains ) {}
 
 		[UsedImplicitly]
-		public ContainsItemSpecification( ImmutableArray<T> items )
-		{
-			this.items = items;
-		}
-
-		public override bool IsSatisfiedBy( T parameter ) => items.Contains( parameter );
+		public ContainsItemSpecification( ImmutableArray<T> items ) : base( items.Contains ) {}
 	}
 }

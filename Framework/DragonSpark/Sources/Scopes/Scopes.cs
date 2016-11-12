@@ -34,7 +34,7 @@ namespace DragonSpark.Sources.Scopes
 		}
 
 		public static Func<T> ToSingleton<T>( this ISource<T> @this ) => @this.ToDelegate().ToSingleton();
-		public static Func<T> ToSingleton<T>( this Func<T> @this ) => SingletonDelegateBuilder<T>.Default.Get( @this );
+		public static Func<T> ToSingleton<T>( this Func<T> @this ) => SingletonDelegateAlteration<T>.Default.Get( @this );
 		public static Func<TParameter, TResult> ToSingleton<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) => @this.ToDelegate().ToSingleton();
 		public static Func<TParameter, TResult> ToSingleton<TParameter, TResult>( this Func<TParameter, TResult> @this ) => Caches.Create( @this ).Get;
 

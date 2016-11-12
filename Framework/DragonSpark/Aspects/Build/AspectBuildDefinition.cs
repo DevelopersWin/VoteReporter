@@ -31,8 +31,7 @@ namespace DragonSpark.Aspects.Build
 
 		public AspectBuildDefinition( ImmutableArray<Type> types, IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource ) 
 			: this( types, 
-				  new DelegatedAssignedSpecification<TypeInfo, ImmutableArray<AspectInstance>?>( instanceSource.ToDelegate() )
-				  /*.Or(  )*/, instanceSource ) {}
+				  new DelegatedAssignedSpecification<TypeInfo, ImmutableArray<AspectInstance>?>( instanceSource.ToDelegate() ), instanceSource ) {}
 
 		[UsedImplicitly]
 		public AspectBuildDefinition( ImmutableArray<Type> types, ISpecification<TypeInfo> specification, IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource )
@@ -68,26 +67,27 @@ namespace DragonSpark.Aspects.Build
 
 			protected override ImmutableArray<AspectInstance>? Create( TypeInfo parameter )
 			{
+				var builder = ImmutableArray.CreateBuilder<AspectInstance>();
 				foreach ( var candidate in candidates )
 				{
-					if ( candidate.IsSatisfiedBy( parameter ) )
+					var selectors = selector.GetFixed( candidate );
+
+					foreach ( var item in selectors )
 					{
-						var builder = ImmutableArray.CreateBuilder<AspectInstance>();
-						var selectors = selector.GetFixed( candidate );
-
-						foreach ( var item in selectors )
+						if ( item.IsSatisfiedBy( parameter ) )
 						{
-							if ( item.IsSatisfiedBy( parameter ) )
-							{
-								builder.Add( item.Get( parameter ) );
-							}
-						}
+							var aspectInstance = item.Get( parameter );
+							MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"ADD: [{builder.Contains( aspectInstance )}] {parameter} => {candidate} - {item} - Applied {aspectInstance.AspectTypeName} on {aspectInstance.TargetElement}", null, null, null ));
 
-						if ( builder.Any() )
-						{
-							return builder.ToImmutable();
+
+							builder.Add( aspectInstance );
 						}
 					}
+				}
+
+				if ( builder.Any() )
+				{
+					return builder.ToImmutable();
 				}
 
 				var result = specification.IsSatisfiedBy( parameter ) ? Items<AspectInstance>.Immutable : (ImmutableArray<AspectInstance>?)null;

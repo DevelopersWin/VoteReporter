@@ -65,6 +65,7 @@
     <Compile Include="Aspects\Build\MethodAspectSelector.cs" />
     <Compile Include="Aspects\Build\ObjectConstructionFactory.cs" />
     <Compile Include="Aspects\Build\PairedAspectBuildDefinition.cs" />
+    <Compile Include="Aspects\Build\ServiceSource.cs" />
     <Compile Include="Aspects\Build\TypeAspectFactory.cs" />
     <Compile Include="Aspects\Definitions\GenericCommandCoreTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\RunCommandTypeDefinition.cs" />
@@ -645,8 +646,8 @@
     <Compile Include="Sources\Parameterized\DecoratedParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\DelegatedParameterizedSource.cs" />
     <Compile Include="Sources\DelegatedSource.cs" />
-    <Compile Include="Sources\DeferredSingletonSource.cs" />
-    <Compile Include="Sources\SingletonDelegateBuilder.cs" />
+    <Compile Include="Sources\DelegatedSingletonSource.cs" />
+    <Compile Include="Sources\SingletonDelegateAlteration.cs" />
     <Compile Include="Sources\SuppliedSource.cs" />
     <Compile Include="Sources\IAssignable.cs" />
     <Compile Include="Sources\Parameterized\IAssignableReferenceSource.cs" />
