@@ -6,7 +6,8 @@ namespace DragonSpark.Aspects.Adapters
 {
 	public abstract class AdapterBase<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>, IAdapter
 	{
-		object IParameterizedSource<object, object>.Get( [Optional] object parameter ) =>
-			parameter is TParameter ? (object)Get( parameter.To<TParameter>() ) ?? parameter : parameter;
+		protected TResult GetGeneral( object parameter ) => (TResult)( parameter is TParameter ? (object)Get( parameter.To<TParameter>() ) ?? parameter : parameter );
+
+		object IParameterizedSource<object, object>.Get( [Optional] object parameter ) => GetGeneral( parameter );
 	}
 }

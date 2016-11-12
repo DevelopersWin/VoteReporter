@@ -14,7 +14,7 @@ namespace DragonSpark.Aspects.Coercion
 			GeneralizedParameterizedSourceTypeDefinition.Default,
 			ParameterizedSourceTypeDefinition.Default,
 			GenericCommandCoreTypeDefinition.Default,
-			GenericSpecificationTypeDefinition.Default
+			SpecificationTypeDefinition.Default
 		) {}
 	}
 }

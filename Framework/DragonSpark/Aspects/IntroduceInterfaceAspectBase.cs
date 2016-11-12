@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Reflection;
-using DragonSpark.Aspects.Definitions;
+﻿using DragonSpark.Aspects.Definitions;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
@@ -9,6 +6,9 @@ using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
+using System;
+using System.Collections.Immutable;
+using System.Reflection;
 
 namespace DragonSpark.Aspects
 {

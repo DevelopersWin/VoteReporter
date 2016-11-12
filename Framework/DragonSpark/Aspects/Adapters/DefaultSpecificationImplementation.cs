@@ -1,12 +1,16 @@
-﻿namespace DragonSpark.Aspects.Adapters
-{
-	public sealed class DefaultSpecificationImplementation<T> : DefaultSpecificationImplementationBase<T>
-	{
-		public DefaultSpecificationImplementation( ISpecificationAdapter specification ) : base( specification ) {}
-	}
+﻿using DragonSpark.Specifications;
 
-	public sealed class DefaultSpecificationImplementation : DefaultSpecificationImplementationBase<object>
+namespace DragonSpark.Aspects.Adapters
+{
+	public sealed class DefaultSpecificationImplementation<T> : SpecificationBase<T>
 	{
-		public DefaultSpecificationImplementation( ISpecificationAdapter specification ) : base( specification ) {}
+		readonly ISpecificationAdapter specification;
+
+		public DefaultSpecificationImplementation( ISpecificationAdapter specification )
+		{
+			this.specification = specification;
+		}
+
+		public override bool IsSatisfiedBy( T parameter ) => (bool)specification.Get( parameter );
 	}
 }

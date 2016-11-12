@@ -13,7 +13,7 @@ namespace DragonSpark.Aspects.Relay
 			{
 				{ GenericCommandTypeDefinition.Default, new TypeAspectDefinition<ApplyCommandRelay>( CommandTypeDefinition.Default ) },
 				{ ParameterizedSourceTypeDefinition.Default, new TypeAspectDefinition<ApplyParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default ) },
-				{ GenericSpecificationTypeDefinition.Default, new TypeAspectDefinition<ApplySpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default ) },
+				{ SpecificationTypeDefinition.Default, new TypeAspectDefinition<ApplySpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default ) },
 			}.ToImmutableDictionary() ) {}
 	}
 }

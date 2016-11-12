@@ -47,8 +47,7 @@
     <Compile Include="Application\Setup\IInputOutput.cs" />
     <Compile Include="Application\Setup\ReadKeyCommand.cs" />
     <Compile Include="Aspects\AdapterMethodBase.cs" />
-    <Compile Include="Aspects\Adapters\DefaultParameterizedSourceImplementation.cs" />
-    <Compile Include="Aspects\Adapters\DefaultSpecificationImplementationBase.cs" />
+    <Compile Include="Aspects\Adapters\DefaultSpecificationImplementation.cs" />
     <Compile Include="Aspects\Alteration\ApplyAlterationBase.cs" />
     <Compile Include="Aspects\Alteration\ApplyResultAlteration.cs" />
     <Compile Include="Aspects\ApplyValuesFromSourceCommand.cs" />
@@ -86,8 +85,8 @@
     <Compile Include="Aspects\Coercion\Aspect.cs" />
     <Compile Include="Aspects\Build\TypedAspectConstructors.cs" />
     <Compile Include="Aspects\IAspectProvider.cs" />
+    <Compile Include="Aspects\Adapters\ImplementationCache.cs" />
     <Compile Include="Aspects\IntroduceGenericInterfaceAspectBase.cs" />
-    <Compile Include="Aspects\Adapters\DefaultSpecificationImplementation.cs" />
     <Compile Include="Aspects\IntroduceInterfaceAspectBase.cs" />
     <Compile Include="Aspects\Relay\CommandRelayDefinition.cs" />
     <Compile Include="Aspects\Relay\IAspectSelectors.cs" />
@@ -148,7 +147,7 @@
     <Compile Include="Aspects\KnownRoles.cs" />
     <Compile Include="Aspects\Definitions\ParameterizedSourceTypeDefinition.cs" />
     <Compile Include="Aspects\Relay\ApplyRelaysAttribute.cs" />
-    <Compile Include="Aspects\Definitions\GenericSpecificationTypeDefinition.cs" />
+    <Compile Include="Aspects\Definitions\SpecificationTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\TypeDefinitionWithPrimaryMethodBase.cs" />
     <Compile Include="Aspects\Definitions\ValidatedTypeDefinition.cs" />
     <Compile Include="Aspects\Validation\AspectSelection.cs" />
@@ -180,6 +179,7 @@
     <Compile Include="Runtime\Assignments\AssignGlobalScopeCommand.cs" />
     <Compile Include="Runtime\Assignments\AssignScopeCommand.cs" />
     <Compile Include="Runtime\Extensions.cs" />
+    <Compile Include="Runtime\InvokeCoercer.cs" />
     <Compile Include="Sources\Coercion\ValidatedCastCoercer.cs" />
     <Compile Include="Sources\Coercion\DelegatedCoercer.cs" />
     <Compile Include="Commands\CoercedCommand.cs" />

@@ -11,7 +11,7 @@ namespace DragonSpark.Aspects.Relay
 		SpecificationRelayDefinition() : base(
 			new Dictionary<ITypeDefinition, IEnumerable<IAspectDefinition>>
 			{
-				{ GenericSpecificationTypeDefinition.Default, SpecificationSelectors.Default }
+				{ SpecificationTypeDefinition.Default, SpecificationSelectors.Default }
 			}.ToImmutableDictionary()
 		) {}
 	}

@@ -11,7 +11,7 @@ namespace DragonSpark.Aspects.Exceptions
 
 			GenericCommandTypeDefinition.Default,
 			ParameterizedSourceTypeDefinition.Default,
-			GenericSpecificationTypeDefinition.Default
+			SpecificationTypeDefinition.Default
 		) {}
 	}
 }

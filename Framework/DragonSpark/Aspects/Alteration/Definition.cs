@@ -15,7 +15,7 @@ namespace DragonSpark.Aspects.Alteration
 			GeneralizedParameterizedSourceTypeDefinition.Default,
 			ParameterizedSourceTypeDefinition.Default,
 			GenericCommandCoreTypeDefinition.Default,
-			GenericSpecificationTypeDefinition.Default
+			SpecificationTypeDefinition.Default
 		) {}
 	}
 }

@@ -8,7 +8,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static SpecificationSelectors Default { get; } = new SpecificationSelectors();
 		SpecificationSelectors() : base( 
-			GenericSpecificationTypeDefinition.Default.ReferencedType, 
+			SpecificationTypeDefinition.Default.ReferencedType, 
 			typeof(SpecificationAdapter<>),
 			new MethodAspectDefinition<SpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default.PrimaryMethod )
 		) {}
