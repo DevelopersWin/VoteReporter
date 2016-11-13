@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Commands
 {
-	public class CommandCollection : CommandCollection<System.Windows.Input.ICommand>
+	public class CommandCollection : DeclarativeCollection<System.Windows.Input.ICommand>
 	{
 		public CommandCollection( IEnumerable<System.Windows.Input.ICommand> collection ) : base( collection ) {}
 	}
 
-	public class CommandCollection<T> : DeclarativeCollection<T> where T : System.Windows.Input.ICommand
+	public class CommandCollection<T> : DeclarativeCollection<ICommand<T>>
 	{
-		public CommandCollection() : this( Items<T>.Default ) {}
+		public CommandCollection() : this( Items<ICommand<T>>.Default ) {}
 
-		public CommandCollection( IEnumerable<T> collection ) : base( collection ) {}
+		public CommandCollection( IEnumerable<ICommand<T>> collection ) : base( collection ) {}
 	}
 }
