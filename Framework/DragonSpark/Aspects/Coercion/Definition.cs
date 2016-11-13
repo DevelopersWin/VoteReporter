@@ -3,12 +3,13 @@ using DragonSpark.Aspects.Build;
 using DragonSpark.Aspects.Definitions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System;
 using System.Collections.Immutable;
-using DragonSpark.Specifications;
+using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Coercion
 {
@@ -28,7 +29,11 @@ namespace DragonSpark.Aspects.Coercion
 	public sealed class IntroduceCoercer : IntroduceInterfaceAspectBase
 	{
 		public IntroduceCoercer( Type coercerType, Type implementationType )
-			: this( coercerType, Constructors.Default.Get( implementationType ).Get( coercerType ) ) {}
+			: this( coercerType, 
+				  Constructors.Default.Get( implementationType ).Get( coercerType ) 
+					.WithParameter( Activator.Default.WithParameter( coercerType ).Get )
+					.Wrap()
+				  ) {}
 
 		public IntroduceCoercer( Type coercerType, Func<object, object> factory ) : base( ParameterizedSourceTypeDefinition.Default.Inverse(), factory, coercerType.Adapt().GetImplementations( ParameterizedSourceTypeDefinition.Default.ReferencedType ) ) {}
 

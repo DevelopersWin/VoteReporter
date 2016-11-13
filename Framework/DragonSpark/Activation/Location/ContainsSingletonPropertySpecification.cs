@@ -9,5 +9,11 @@ namespace DragonSpark.Activation.Location
 	{
 		public static ContainsSingletonPropertySpecification Default { get; } = new ContainsSingletonPropertySpecification();
 		ContainsSingletonPropertySpecification() : base( SingletonProperties.Default.ToDelegate() ) {}
+
+		public override bool IsSatisfiedBy( Type parameter )
+		{
+			var isSatisfiedBy = base.IsSatisfiedBy( parameter );
+			return isSatisfiedBy;
+		}
 	}
 }

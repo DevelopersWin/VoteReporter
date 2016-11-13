@@ -21,7 +21,8 @@ namespace DragonSpark.Aspects.Specifications
 					.WithParameter( Activator.Default.WithParameter( specificationType ).Get )
 					.Wrap() ) {}
 
-		public IntroduceSpecification( Type specificationType, Func<object, object> factory ) : base( DragonSpark.Specifications.Extensions.Inverse( SpecificationTypeDefinition.Default ), factory, specificationType.Adapt().GetImplementations( SpecificationTypeDefinition.Default.ReferencedType ) ) {}
+		public IntroduceSpecification( Type specificationType, Func<object, object> factory ) 
+			: base( DragonSpark.Specifications.Extensions.Inverse( SpecificationTypeDefinition.Default ), factory, specificationType.Adapt().GetImplementations( SpecificationTypeDefinition.Default.ReferencedType ) ) {}
 
 		sealed class Constructors : Cache<Type, IParameterizedSource<Type, Func<object, ISpecificationAdapter>>>
 		{

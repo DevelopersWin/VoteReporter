@@ -11,7 +11,7 @@ namespace DragonSpark.Commands
 		public virtual void Update() => CanExecuteChanged( this, EventArgs.Empty );
 
 		[SpecificationRelay]
-		bool ICommand.CanExecute( object parameter ) => default(bool);
+		bool ICommand.CanExecute( object parameter ) => true;
 
 		[CommandRelay]
 		void ICommand.Execute( object parameter ) {}

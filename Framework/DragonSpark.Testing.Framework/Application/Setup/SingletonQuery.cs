@@ -21,6 +21,10 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 			yield return new SingletonMethod( parameter );
 		}
 
-		IEnumerable<IMethod> IMethodQuery.SelectMethods( Type type ) => Get( type );
+		IEnumerable<IMethod> IMethodQuery.SelectMethods( Type type )
+		{
+			var selectMethods = Get( type );
+			return selectMethods;
+		}
 	}
 }

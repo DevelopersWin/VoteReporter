@@ -1,3 +1,4 @@
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using System.Runtime.InteropServices;
@@ -20,10 +21,10 @@ namespace DragonSpark.Aspects.Adapters
 		object IParameterizedSource<object, object>.Get( [Optional] object parameter )
 		{
 			var coerced = Coerce( parameter );
-			var result = coerced != null ? (object)Get( coerced ) ?? parameter : parameter;
+			var result = (object)Get( coerced.As<TParameter>() ) ?? parameter;
 			return result;
 		}
 
-		protected TParameter Coerce( object parameter ) => coercer.Get( parameter );
+		protected TParameter Coerce( [Optional] object parameter ) => coercer.Get( parameter );
 	}
 }

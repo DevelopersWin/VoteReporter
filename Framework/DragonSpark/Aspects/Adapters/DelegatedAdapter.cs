@@ -1,5 +1,6 @@
 using DragonSpark.Sources.Parameterized;
 using System;
+using System.Runtime.InteropServices;
 
 namespace DragonSpark.Aspects.Adapters
 {
@@ -17,6 +18,6 @@ namespace DragonSpark.Aspects.Adapters
 			this.source = source;
 		}
 
-		public override TResult Get( TParameter parameter ) => source( parameter );
+		public override TResult Get( [Optional]TParameter parameter ) => source( parameter );
 	}
 }
