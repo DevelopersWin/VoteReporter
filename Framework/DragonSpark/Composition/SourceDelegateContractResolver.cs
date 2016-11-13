@@ -1,7 +1,6 @@
 using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using System;
 using System.Composition.Hosting.Core;

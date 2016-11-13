@@ -55,7 +55,6 @@
     <Compile Include="Aspects\Build\AspectSelector.cs" />
     <Compile Include="Aspects\Build\CompositeAspectSelector.cs" />
     <Compile Include="Aspects\Build\IntroducedAspectSelector.cs" />
-    <Compile Include="Aspects\Build\IntroducedTypeAspectDefinition.cs" />
     <Compile Include="Aspects\Build\MethodAspectDefinition.cs" />
     <Compile Include="Aspects\Adapters\GenericAdapterConstructorFactory.cs" />
     <Compile Include="Aspects\Adapters\GenericAdapterFactory.cs" />
@@ -86,7 +85,6 @@
     <Compile Include="Aspects\Build\TypedParameterConstructors.cs" />
     <Compile Include="Aspects\IAspectProvider.cs" />
     <Compile Include="Aspects\Adapters\ImplementationCache.cs" />
-    <Compile Include="Aspects\IntroduceGenericInterfaceAspectBase.cs" />
     <Compile Include="Aspects\IntroduceInterfaceAspectBase.cs" />
     <Compile Include="Aspects\Relay\CommandRelayDefinition.cs" />
     <Compile Include="Aspects\Relay\IAspectSelectors.cs" />
@@ -135,7 +133,6 @@
     <Compile Include="Aspects\Relay\SpecificationSelectors.cs" />
     <Compile Include="Aspects\Relay\SpecificationRelay.cs" />
     <Compile Include="Aspects\Relay\ApplySpecificationRelay.cs" />
-    <Compile Include="Aspects\Relay\SpecificationRelayAspectBase.cs" />
     <Compile Include="Aspects\Relay\Definitions.cs" />
     <Compile Include="Aspects\Specifications\ApplyInverseSpecification.cs" />
     <Compile Include="Aspects\Definitions\SpecificationTypeDefinitionBase.cs" />
@@ -531,7 +528,6 @@
     <Compile Include="Specifications\OncePerParameterSpecification.cs" />
     <Compile Include="Specifications\OncePerScopeSpecification.cs" />
     <Compile Include="Specifications\OnlyOnceSpecification.cs" />
-    <Compile Include="Specifications\ProjectedSpecification.cs" />
     <Compile Include="Specifications\SpecificationBase.cs" />
     <Compile Include="Specifications\Common.cs" />
     <Compile Include="Specifications\SpecificationWithContextBase.cs" />
