@@ -1,5 +1,4 @@
 using DragonSpark.Aspects.Adapters;
-using DragonSpark.Sources.Parameterized;
 using PostSharp.Aspects;
 using System;
 

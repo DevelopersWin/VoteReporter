@@ -3,14 +3,13 @@ using DragonSpark.Sources;
 using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using JetBrains.Annotations;
-using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using System;
 
 namespace DragonSpark.Aspects.Specifications
 {
 	[IntroduceInterface( typeof(ISource<ISpecificationAdapter>) )]
-	public sealed class ApplyInverseSpecification : SpecificationAspectBase, ISource<ISpecificationAdapter>, IAspectProvider
+	public sealed class ApplyInverseSpecification : SpecificationAspectBase, ISource<ISpecificationAdapter>
 	{
 		public ApplyInverseSpecification( Type specificationType ) : base( Constructors<ApplyInverseSpecification>.Default.Get( specificationType ), specificationType ) {}
 

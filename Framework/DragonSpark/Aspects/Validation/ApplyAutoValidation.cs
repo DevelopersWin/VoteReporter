@@ -9,7 +9,7 @@ using System;
 namespace DragonSpark.Aspects.Validation
 {
 	[IntroduceInterface( typeof(IAutoValidationController) ), LinesOfCodeAvoided( 4 )]
-	public sealed class ApplyAutoValidation : InstanceAspectBase, IAutoValidationController, IAspectProvider
+	public sealed class ApplyAutoValidation : InstanceAspectBase, IAutoValidationController
 	{
 		readonly static Func<object, IAspect> Factory = AutoValidationControllerFactory.Default.To( ParameterConstructor<IAutoValidationController, ApplyAutoValidation>.Default ).Get;
 

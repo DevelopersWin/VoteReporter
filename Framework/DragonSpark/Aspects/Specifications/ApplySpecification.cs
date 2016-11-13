@@ -2,7 +2,6 @@
 using DragonSpark.Sources;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
-using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
 using System;
 

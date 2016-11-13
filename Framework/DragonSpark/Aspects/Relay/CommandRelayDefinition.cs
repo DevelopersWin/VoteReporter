@@ -10,13 +10,13 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static CommandRelayDefinition Default { get; } = new CommandRelayDefinition();
 		CommandRelayDefinition() : base(
-			AspectSelection.Default.Accept( ValidatedCastCoercer<ITypeDefinition, IValidatedTypeDefinition>.Default ),
+			AspectSelection.Implementation.Accept( ValidatedCastCoercer<ITypeDefinition, IValidatedTypeDefinition>.Default ),
 			CommandTypeDefinition.Default
 		) {}
 
 		sealed class AspectSelection : ParameterizedItemSourceBase<IValidatedTypeDefinition, IAspects>
 		{
-			public static AspectSelection Default { get; } = new AspectSelection();
+			public static AspectSelection Implementation { get; } = new AspectSelection();
 			AspectSelection() {}
 
 			public override IEnumerable<IAspects> Yield( IValidatedTypeDefinition parameter )
