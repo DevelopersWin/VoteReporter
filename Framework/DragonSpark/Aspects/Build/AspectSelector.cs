@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using DragonSpark.Aspects.Definitions;
-using DragonSpark.Extensions;
+﻿using DragonSpark.Aspects.Definitions;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
+using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class AspectSelector<TType, TMethod> : CompositeAspectSelector
-		where TType : IAspect 
-		where TMethod : IAspect
+	public class AspectSelector<T> : CompositeAspectSelector where T : IMethodLevelAspect
 	{
-		public static AspectSelector<TType, TMethod> Default { get; } = new AspectSelector<TType, TMethod>();
-		AspectSelector() : this( definition => new TypeAspectDefinition<TType>( definition ).Yield() ) {}
-
-		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> typeSource ) : this( typeSource, MethodAspectSelector<TMethod>.Default.Yield ) {}
+		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> types ) : this( types, MethodAspectSelector<T>.Default.Yield ) {}
 
 		[UsedImplicitly]
-		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> typeSource, Func<ITypeDefinition, IEnumerable<IAspectDefinition>> methodSource ) 
-			: base( typeSource, methodSource ) {}
+		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> types, Func<ITypeDefinition, IEnumerable<IAspectDefinition>> methods ) 
+			: base( types, methods ) {}
 	}
 }

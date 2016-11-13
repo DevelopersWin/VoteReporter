@@ -14,6 +14,8 @@ namespace DragonSpark.Aspects.Build
 	{
 		public static AspectInstances<T> Default { get; } = new AspectInstances<T>();
 		AspectInstances() : base( ObjectConstructionFactory<T>.Default.Get() ) {}
+
+		/*public AspectInstances( ObjectConstruction construction ) : base( construction ) {}*/
 	}
 
 	public class AspectInstances : CacheWithImplementedFactoryBase<MemberInfo, AspectInstance>
@@ -26,12 +28,6 @@ namespace DragonSpark.Aspects.Build
 		}
 
 		protected override AspectInstance Create( MemberInfo parameter ) => new AspectInstance( parameter, construction, null );
-	}
-
-	public sealed class ContainsAspectSpecification<T> : DelegatedSpecification<MemberInfo> where T : IAspect
-	{
-		public static ContainsAspectSpecification<T> Default { get; } = new ContainsAspectSpecification<T>();
-		ContainsAspectSpecification() : base( ContainsAspectSpecification.Delegates.Get( typeof(T) ) ) {}
 	}
 
 	public sealed class ContainsAspectSpecification : SpecificationCache<Type, MemberInfo>
@@ -58,13 +54,35 @@ namespace DragonSpark.Aspects.Build
 		}
 	}
 
+	/*public sealed class ContainsAspectSpecification<T> : DelegatedSpecification<MemberInfo> where T : IAspect
+	{
+		public static ContainsAspectSpecification<T> Default { get; } = new ContainsAspectSpecification<T>();
+		ContainsAspectSpecification() : base( ContainsAspectSpecification.Delegates.Get( typeof(T) ) ) {}
+	}*/
+
+	public sealed class CanApplyAspectSpecification<T> : DelegatedSpecification<MemberInfo> where T : IAspect
+	{
+		public static CanApplyAspectSpecification<T> Default { get; } = new CanApplyAspectSpecification<T>();
+		CanApplyAspectSpecification() : this( AspectInstances<T>.Default ) {}
+
+		public CanApplyAspectSpecification( ICache<MemberInfo, AspectInstance> source ) : base( new CanApplyAspectSpecification( typeof(T), source ).IsSatisfiedBy ) {}
+	}
+
+	public sealed class CanApplyAspectSpecification : AllSpecification<MemberInfo>
+	{
+		public CanApplyAspectSpecification( [OfType( typeof(IAspect) )]Type aspectType, ICache<MemberInfo, AspectInstance> source )
+			: base( ContainsAspectSpecification.Default.Get( aspectType ).Inverse(), new DelegatedSpecification<MemberInfo>( source.Contains ).Inverse() ) {}
+	}
+
 	public abstract class AspectInstanceFactoryBase<T> : SpecificationParameterizedSource<T, AspectInstance> where T : MemberInfo
 	{
-		protected AspectInstanceFactoryBase( ObjectConstruction construction, [OfType( typeof(IAspect) )]Type aspectType )
-			: this( ContainsAspectSpecification.Default.Get( aspectType ), new AspectInstances( construction ) ) {}
+		protected AspectInstanceFactoryBase( ObjectConstruction construction, [OfType( typeof(IAspect) )]Type aspectType ) : this( new AspectInstances( construction ), aspectType ) {}
 
 		[UsedImplicitly]
-		protected AspectInstanceFactoryBase( ISpecification<MemberInfo> specification, ICache<T, AspectInstance> source ) 
-			: base( specification.Or( new DelegatedSpecification<T>( source.Contains ) ).Inverse(), source.Get ) {}
+		protected AspectInstanceFactoryBase( ICache<MemberInfo, AspectInstance> source, [OfType( typeof(IAspect) )]Type aspectType ) 
+			: this( new CanApplyAspectSpecification( aspectType, source ), source.Get ) {}
+
+		[UsedImplicitly]
+		protected AspectInstanceFactoryBase( ISpecification<T> specification, Func<T, AspectInstance> source ) : base( specification, source ) {}
 	}
 }

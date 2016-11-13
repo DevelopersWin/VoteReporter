@@ -15,7 +15,8 @@ namespace DragonSpark.Aspects.Coercion
 	{
 		readonly ICoercerAdapter coercer;
 
-		public ApplyCoercer( Type coercerType ) : base( Constructors.Default.Get( coercerType ), Definition.Default ) {}
+		public ApplyCoercer( Type coercerType ) : this( coercerType, typeof(CoercerAdapter<,>) ) {}
+		public ApplyCoercer( Type coercerType, Type implementationType ) : base( Constructors.Default.Get( coercerType ), new Definition( coercerType, implementationType ) ) {}
 
 		[UsedImplicitly]
 		public ApplyCoercer( ICoercerAdapter coercer )
@@ -23,7 +24,7 @@ namespace DragonSpark.Aspects.Coercion
 			this.coercer = coercer;
 		}
 
-		sealed class Constructors : TypedAspectConstructors<ICoercerAdapter, ApplyCoercer>
+		sealed class Constructors : TypedParameterConstructors<ICoercerAdapter, ApplyCoercer>
 		{
 			public static Constructors Default { get; } = new Constructors();
 			Constructors() : base( Source.Default.Get ) {}

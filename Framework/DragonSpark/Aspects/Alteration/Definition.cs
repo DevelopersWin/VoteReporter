@@ -4,7 +4,7 @@ using PostSharp.Aspects;
 
 namespace DragonSpark.Aspects.Alteration
 {
-	sealed class Definition<T> : AspectBuildDefinition where T : IAspect
+	sealed class Definition<T> : AspectBuildDefinition where T : IMethodLevelAspect
 	{
 		public static Definition<T> Default { get; } = new Definition<T>();
 		Definition() : base( 

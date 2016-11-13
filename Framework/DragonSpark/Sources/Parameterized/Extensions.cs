@@ -115,6 +115,8 @@ namespace DragonSpark.Sources.Parameterized
 		public static TResult Get<TItem, TResult>( this IParameterizedSource<ImmutableArray<TItem>, TResult> @this, params TItem[] parameters ) => @this.ToDelegate().Get( parameters );
 		public static TResult Get<TItem, TResult>( this Func<ImmutableArray<TItem>, TResult> @this ) => @this.Get( Items<TItem>.Default );
 		public static TResult Get<TItem, TResult>( this Func<ImmutableArray<TItem>, TResult> @this, params TItem[] parameters ) => @this( parameters.ToImmutableArray() );
+		/*public static TResult Get<TItem, TResult>( this IParameterizedSource<IEnumerable<TItem>, TResult> @this, ImmutableArray<TItem> parameter ) => @this.ToDelegate().Get( parameter );
+		public static TResult Get<TItem, TResult>( this Func<IEnumerable<TItem>, TResult> @this, ImmutableArray<TItem> parameter ) => @this.Get( parameter.ToArray() );*/
 		public static TResult Get<TItem, TResult>( this IParameterizedSource<IEnumerable<TItem>, TResult> @this ) => @this.ToDelegate().Get();
 		public static TResult Get<TItem, TResult>( this IParameterizedSource<IEnumerable<TItem>, TResult> @this, params TItem[] parameters ) => @this.ToDelegate().Get( parameters );
 		public static TResult Get<TItem, TResult>( this Func<IEnumerable<TItem>, TResult> @this ) => Get( @this, Items<TItem>.Default );

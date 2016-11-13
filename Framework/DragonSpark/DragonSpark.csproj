@@ -50,7 +50,7 @@
     <Compile Include="Aspects\Alteration\ApplyAlterationBase.cs" />
     <Compile Include="Aspects\Alteration\ApplyResultAlteration.cs" />
     <Compile Include="Aspects\ApplyValuesFromSourceCommand.cs" />
-    <Compile Include="Aspects\Build\AspectDefinitionBase.cs" />
+    <Compile Include="Aspects\Build\AspectDefinition.cs" />
     <Compile Include="Aspects\Build\AspectDefinitionSelector.cs" />
     <Compile Include="Aspects\Build\AspectSelector.cs" />
     <Compile Include="Aspects\Build\CompositeAspectSelector.cs" />
@@ -83,7 +83,7 @@
     <Compile Include="Aspects\Alteration\Definition.cs" />
     <Compile Include="Aspects\Coercion\ApplyCoercer.cs" />
     <Compile Include="Aspects\Coercion\Aspect.cs" />
-    <Compile Include="Aspects\Build\TypedAspectConstructors.cs" />
+    <Compile Include="Aspects\Build\TypedParameterConstructors.cs" />
     <Compile Include="Aspects\IAspectProvider.cs" />
     <Compile Include="Aspects\Adapters\ImplementationCache.cs" />
     <Compile Include="Aspects\IntroduceGenericInterfaceAspectBase.cs" />

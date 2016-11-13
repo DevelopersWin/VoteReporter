@@ -31,7 +31,7 @@ namespace DragonSpark.Aspects.Exceptions
 		public Policy Get() => policy;
 		// object ISource.Get() => Get();
 
-		sealed class Constructors : TypedAspectConstructors<Policy, ApplyExceptionPolicyAttribute>
+		sealed class Constructors : TypedParameterConstructors<Policy, ApplyExceptionPolicyAttribute>
 		{
 			public static Constructors Default { get; } = new Constructors();
 			Constructors() : base( Activator.Default.Get<Policy> ) {}

@@ -10,11 +10,11 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Definitions
 {
-	public class IntroducedTypeDefinition : TypeDefinition
+	/*public class IntroducedTypeDefinition : TypeDefinition
 	{
 		readonly static Func<TypeInfo, bool> Specification = Common<TypeInfo>.Assigned.ToDelegate();
 		public IntroducedTypeDefinition( ITypeDefinition definition ) : base( definition.ReferencedType, Specification, definition.Fixed() ) {}
-	}
+	}*/
 
 	public class TypeDefinition : ItemSource<IMethods>, ITypeDefinition
 	{

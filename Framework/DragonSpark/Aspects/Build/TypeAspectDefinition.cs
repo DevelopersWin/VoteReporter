@@ -1,14 +1,16 @@
-﻿using DragonSpark.Specifications;
+﻿using DragonSpark.Sources.Parameterized;
+using DragonSpark.Specifications;
 using PostSharp.Aspects;
-using System;
 using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class TypeAspectDefinition<T> : AspectDefinitionBase where T : IAspect
+	public class TypeAspectDefinition<T> : AspectDefinition where T : ITypeLevelAspect
 	{
-		readonly static Func<TypeInfo, AspectInstance> Factory = TypeAspectFactory<T>.Default.Get;
+		public TypeAspectDefinition( ISpecification<TypeInfo> specification ) 
+			: this( specification, TypeAspectFactory<T>.Default ) {}
 
-		public TypeAspectDefinition( ISpecification<TypeInfo> specification ) : base( specification.And( TypeAspectFactory<T>.Default ).ToDelegate(), Factory ) {}
+		public TypeAspectDefinition( ISpecification<TypeInfo> specification, ISpecificationParameterizedSource<TypeInfo, AspectInstance> source ) 
+			: base( specification.And( source ).ToDelegate(), source.Get ) {}
 	}
 }

@@ -17,6 +17,14 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
+	public class IntroducedAspectBuildDefinition<TType, TMethod> : AspectBuildDefinition
+		where TType : ICompositionAspect, ITypeLevelAspect
+		where TMethod : IMethodLevelAspect
+	{
+		public IntroducedAspectBuildDefinition( ImmutableArray<object> parameters, params ITypeDefinition[] candidates ) 
+			: base( new IntroducedAspectSelector<TType, TMethod>( parameters ), candidates ) {}
+	}
+
 	public class AspectBuildDefinition : ParameterizedItemSourceBase<TypeInfo, AspectInstance>, IAspectBuildDefinition
 	{
 		readonly ImmutableArray<Type> types;
@@ -75,7 +83,7 @@ namespace DragonSpark.Aspects.Build
 					foreach ( var item in selectors )
 					{
 						var isSatisfiedBy = item.IsSatisfiedBy( parameter );
-						MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"Satisfies: {parameter} => {candidate} - {item} - Valid: {isSatisfiedBy}", null, null, null ));
+						// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"Satisfies: {parameter} => {candidate} - {item} - Valid: {isSatisfiedBy}", null, null, null ));
 						if ( isSatisfiedBy )
 						{
 							var aspectInstance = item.Get( parameter );

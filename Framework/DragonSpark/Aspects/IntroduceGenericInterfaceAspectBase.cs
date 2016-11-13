@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects
 {
-	public abstract class IntroduceGenericInterfaceAspectBase : IntroduceInterfaceAspectBase
+	/*public abstract class IntroduceGenericInterfaceAspectBase : IntroduceInterfaceAspectBase
 	{
 		protected IntroduceGenericInterfaceAspectBase( ITypeDefinition definition, Type implementationType, Func<object, object> factory ) 
 			: base( definition.Inverse(), new Factory( definition.ReferencedType ).Get, factory ) {}
@@ -23,5 +23,5 @@ namespace DragonSpark.Aspects
 
 			public override IEnumerable<Type> Yield( Type parameter ) => parameter.Adapt().GetImplementations( interfaceType );
 		}
-	}
+	}*/
 }

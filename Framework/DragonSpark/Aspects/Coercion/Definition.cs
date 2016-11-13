@@ -1,42 +1,47 @@
 ﻿using DragonSpark.Aspects.Adapters;
 using DragonSpark.Aspects.Build;
 using DragonSpark.Aspects.Definitions;
-using DragonSpark.Extensions;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Aspects.Coercion
 {
-	sealed class Definition : AspectBuildDefinition
+	sealed class Definition : IntroducedAspectBuildDefinition<IntroduceCoercer, Aspect>
 	{
-		public static Definition Default { get; } = new Definition();
-		Definition() : base( 
-			IntroducedAspectSelector<IntroduceCoercer, Aspect>.Default,
+		public Definition( params object[] parameters ) : 
+			base( 
+				parameters.ToImmutableArray(),
 
-			CommandTypeDefinition.Default, 
-			GeneralizedSpecificationTypeDefinition.Default, 
-			GeneralizedParameterizedSourceTypeDefinition.Default/*,
-			ParameterizedSourceTypeDefinition.Default,
-			GenericCommandCoreTypeDefinition.Default,
-			SpecificationTypeDefinition.Default*/
-		) {}
+				CommandTypeDefinition.Default, 
+				GeneralizedSpecificationTypeDefinition.Default, 
+				GeneralizedParameterizedSourceTypeDefinition.Default 
+			) {}
 	}
 
 	[UsedImplicitly, LinesOfCodeAvoided( 1 )]
-	public sealed class IntroduceCoercer : IntroduceGenericInterfaceAspectBase
+	public sealed class IntroduceCoercer : IntroduceInterfaceAspectBase
 	{
-		readonly static Func<Type, Func<object, object>> Factory = new ImplementationCache( typeof(ICoercerAdapter) ).ToCache().ToDelegate();
+		public IntroduceCoercer( Type coercerType, Type implementationType )
+			: this( coercerType, Constructors.Default.Get( implementationType ).Get( coercerType ) ) {}
 
-		public IntroduceCoercer() : this( typeof(DefaultCoercerImplementation<,>) ) {}
-		public IntroduceCoercer( Type implementationType ) : this( implementationType, SourceCoercer<ICoercerAdapter>.Default.To( Factory( implementationType ) ).Get ) {}
-		public IntroduceCoercer( Type implementationType, Func<object, object> factory ) : base( ParameterizedSourceTypeDefinition.Default, implementationType, factory ) {}
+		public IntroduceCoercer( Type coercerType, Func<object, object> factory ) : base( ParameterizedSourceTypeDefinition.Default, factory, coercerType.Adapt().GetImplementations( ParameterizedSourceTypeDefinition.Default.ReferencedType ) ) {}
+
+		sealed class Constructors : Cache<Type, IParameterizedSource<Type, Func<object, ICoercerAdapter>>>
+		{
+			public static Constructors Default { get; } = new Constructors();
+			Constructors() : base( type => new Constructor( type ).ToCache() )
+			{
+				Set( typeof(CoercerAdapter<,>), Constructor.Default );
+			}
+		}
 	}
 
-	public sealed class DefaultCoercerImplementation<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
+	/*public sealed class DefaultCoercerImplementation<TParameter, TResult> : ParameterizedSourceBase<TParameter, TResult>
 	{
 		readonly ICoercerAdapter coercer;
 
@@ -46,5 +51,5 @@ namespace DragonSpark.Aspects.Coercion
 		}
 
 		public override TResult Get( TParameter parameter ) => coercer.Get( parameter ).As<TResult>();
-	}
+	}*/
 }

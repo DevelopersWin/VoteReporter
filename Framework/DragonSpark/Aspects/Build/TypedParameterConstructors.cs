@@ -6,11 +6,11 @@ using System;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class TypedAspectConstructors<TParameter, TResult> : CacheWithImplementedFactoryBase<Type, Func<object, TResult>> where TResult : IAspect
+	public class TypedParameterConstructors<TParameter, TResult> : CacheWithImplementedFactoryBase<Type, Func<object, TResult>> where TResult : IAspect
 	{
 		readonly Func<Type, TParameter> source;
 
-		public TypedAspectConstructors( Func<Type, TParameter> source )
+		public TypedParameterConstructors( Func<Type, TParameter> source )
 		{
 			this.source = source;
 		}

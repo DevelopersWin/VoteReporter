@@ -7,12 +7,12 @@ namespace DragonSpark.Aspects.Adapters
 	{
 		readonly Func<TParameter, TResult> source;
 
-		public DelegatedAdapter( IParameterizedSource<TParameter, TResult> source ) : this( source, Coercer ) {}
-		public DelegatedAdapter( IParameterizedSource<TParameter, TResult> source, IParameterizedSource<object, TParameter> coercer ) : this( source.ToDelegate(), coercer ) {}
+		public DelegatedAdapter( IParameterizedSource<TParameter, TResult> source ) : this( DefaultCoercer, source ) {}
+		public DelegatedAdapter( IParameterizedSource<object, TParameter> coercer, IParameterizedSource<TParameter, TResult> source ) : this( coercer, source.ToDelegate() ) {}
 
-		public DelegatedAdapter( Func<TParameter, TResult> source ) : this( source, Coercer ) {}
+		public DelegatedAdapter( Func<TParameter, TResult> source ) : this( DefaultCoercer, source ) {}
 
-		public DelegatedAdapter( Func<TParameter, TResult> source, IParameterizedSource<object, TParameter> coercer ) : base( coercer )
+		public DelegatedAdapter( IParameterizedSource<object, TParameter> coercer, Func<TParameter, TResult> source ) : base( coercer )
 		{
 			this.source = source;
 		}

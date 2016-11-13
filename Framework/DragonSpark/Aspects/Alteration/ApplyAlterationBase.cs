@@ -19,7 +19,7 @@ namespace DragonSpark.Aspects.Alteration
 		}
 		protected ApplyAlterationBase( Func<object, IAspect> factory, IAspectBuildDefinition definition ) : base( factory, definition ) {}
 
-		protected sealed class Constructors<T> : TypedAspectConstructors<IAlterationAdapter, T> where T :  ApplyAlterationBase
+		protected sealed class Constructors<T> : TypedParameterConstructors<IAlterationAdapter, T> where T :  ApplyAlterationBase
 		{
 			public static Constructors<T> Default { get; } = new Constructors<T>();
 			Constructors() : base( Source.Default.Get ) {}

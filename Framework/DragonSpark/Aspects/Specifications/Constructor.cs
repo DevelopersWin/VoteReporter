@@ -8,6 +8,8 @@ namespace DragonSpark.Aspects.Specifications
 	sealed class Constructor : GenericAdapterConstructorFactory<object, ISpecificationAdapter>
 	{
 		public static IParameterizedSource<Type, Func<object, ISpecificationAdapter>> Default { get; } = new Constructor().ToCache();
-		Constructor() : base( SpecificationTypeDefinition.Default.ReferencedType, typeof(SpecificationAdapter<>) ) {}
+		Constructor() : this( typeof(SpecificationAdapter<>) ) {}
+
+		public Constructor( Type adapterType ) : base( SpecificationTypeDefinition.Default.ReferencedType, adapterType ) {}
 	}
 }
