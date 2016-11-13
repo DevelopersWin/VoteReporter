@@ -2,6 +2,7 @@
 using DragonSpark.Diagnostics;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;
@@ -21,15 +22,14 @@ namespace DragonSpark.Windows.Testing
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
 	public class InitializeUserSettingsCommandTests : TestCollectionBase
 	{
-		public InitializeUserSettingsCommandTests( ITestOutputHelper output ) : base( output )
-		{
-			SaveUserSettingsCommand.Default.Configuration.Assign( () => p => p.Save() );
-		}
+		readonly InitializeUserSettingsCommand sut = new InitializeUserSettingsCommand( InitializeUserSettingsCommand.TemplatesFactory.Implementation.WithParameter( SystemLogger.Default.Get ).Get, Defaults.UserSettingsPath, settings => settings.Save() );
+
+		public InitializeUserSettingsCommandTests( ITestOutputHelper output ) : base( output ) {}
 
 		[Theory, AutoData, InitializeUserSettingsFile]
-		public void VerifyFileOne( [Service]IFile file, UserSettingsFilePath sut, [Service]IDirectorySource source )
+		public void VerifyFileOne( [Service]IFile file, UserSettingsFilePath settings, [Service]IDirectorySource source )
 		{
-			var path = sut.Get();
+			var path = settings.Get();
 			Assert.StartsWith( source.Get(), path );
 			Assert.True( file.Exists( path ) );
 		}
@@ -37,7 +37,6 @@ namespace DragonSpark.Windows.Testing
 		[Theory, AutoData]
 		void Create( 
 			Mock<Settings> parameter, 
-			InitializeUserSettingsCommand sut, 
 			[Service]ILoggerHistory history, 
 			UserSettingsFile factory, 
 			ClearUserSettingCommand clear,
@@ -78,7 +77,6 @@ namespace DragonSpark.Windows.Testing
 		[Theory, AutoData]
 		public void CreateThenRecreate( 
 			Mock<Settings> parameter, 
-			InitializeUserSettingsCommand sut, 
 			[Service]ILoggerHistory history, 
 			UserSettingsExistsSpecification specification )
 		{
@@ -102,7 +100,7 @@ namespace DragonSpark.Windows.Testing
 		}
 
 		[Theory, AutoData]
-		public void UpgradeWithFileCreate( Mock<Settings> parameter, InitializeUserSettingsCommand sut, [Service]ILoggerHistory history )
+		public void UpgradeWithFileCreate( Mock<Settings> parameter, [Service]ILoggerHistory history )
 		{
 			parameter.Setup( settings => settings.Upgrade() ).Callback( () => parameter.Object.Save() );
 
@@ -118,7 +116,7 @@ namespace DragonSpark.Windows.Testing
 		}
 
 		[Theory, AutoData]
-		public void Error( Mock<ApplicationSettingsBase> parameter, InitializeUserSettingsCommand sut, [Service]ILoggerHistory history, [Service]IFileSystemRepository repository )
+		public void Error( Mock<ApplicationSettingsBase> parameter, [Service]ILoggerHistory history, [Service]IFileSystemRepository repository )
 		{
 			parameter.Setup( settings => settings.Save() ).Throws( new ConfigurationErrorsException( "Some exception" ) );
 

@@ -181,7 +181,6 @@
     <Compile Include="Commands\CoercedCommand.cs" />
     <Compile Include="Commands\CompiledCommand.cs" />
     <Compile Include="Commands\FactoryCommand.cs" />
-    <Compile Include="Commands\IConfigurableCommand.cs" />
     <Compile Include="Commands\IExecute.cs" />
     <Compile Include="Commands\IRunCommand.cs" />
     <Compile Include="Commands\RunCommandBase.cs" />

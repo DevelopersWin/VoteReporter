@@ -1,6 +1,4 @@
-﻿using System;
-using System.Configuration;
-using DragonSpark.Aspects.Specifications;
+﻿using DragonSpark.Aspects.Specifications;
 using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
 using DragonSpark.Diagnostics;
@@ -10,6 +8,8 @@ using DragonSpark.Windows.FileSystem;
 using DragonSpark.Windows.Properties;
 using JetBrains.Annotations;
 using Serilog;
+using System;
+using System.Configuration;
 
 namespace DragonSpark.Windows
 {
@@ -59,7 +59,7 @@ namespace DragonSpark.Windows
 			}
 		}
 
-		sealed class TemplatesFactory : ParameterizedSourceBase<ILogger, Templates>
+		public sealed class TemplatesFactory : ParameterizedSourceBase<ILogger, Templates>
 		{
 			public static TemplatesFactory Implementation { get; } = new TemplatesFactory();
 			TemplatesFactory() {}

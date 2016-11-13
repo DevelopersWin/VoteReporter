@@ -38,23 +38,6 @@ namespace DragonSpark.Testing.Commands
 		}
 
 		[Fact]
-		public void AsConfigurable()
-		{
-			var command = new Command();
-			var configurable = command.AsConfigurable();
-			Assert.Null( Tags.Default.Get( command ) );
-			configurable.Execute( GetType().Assembly );
-			Assert.Same( GetType().Assembly, Tags.Default.Get( command ) );
-
-			Tags.Default.Remove( command );
-
-			configurable.Configuration.Assign( () => x => {} );
-			Assert.Null( Tags.Default.Get( command ) );
-			configurable.Execute( GetType().Assembly );
-			Assert.Null( Tags.Default.Get( command ) );
-		}
-
-		[Fact]
 		public void ToExecuteDelegate()
 		{
 			Assert.NotNull( Command.Current.ToExecuteDelegate() );
