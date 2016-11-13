@@ -12,8 +12,9 @@ namespace DragonSpark.Testing.Aspects.Relay
 		[Fact]
 		public void Verify()
 		{
-			var sut = new Command();
-			Assert.False( sut.CanExecute( 123 ) );
+			var sut = new RelayedCommand();
+			var canExecute = sut.CanExecute( 123 );
+			Assert.False( canExecute );
 			Assert.Equal( 0, sut.CanExecuteCalled );
 			Assert.Equal( 1, sut.CanExecuteGenericCalled );
 
@@ -102,7 +103,7 @@ namespace DragonSpark.Testing.Aspects.Relay
 		}
 
 		[ApplyRelays]
-		sealed class Command : DragonSpark.Commands.ICommand<int>
+		sealed class RelayedCommand : DragonSpark.Commands.ICommand<int>
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
 

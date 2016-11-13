@@ -42,7 +42,8 @@ namespace DragonSpark.Testing.Aspects.Specifications
 		public void VerifySpecification()
 		{
 			var sut = new SpecificationCommand();
-			Assert.False( sut.IsSatisfiedBy( 1234 ) );
+			var isSatisfiedBy = sut.IsSatisfiedBy( 1234 );
+			Assert.False( isSatisfiedBy );
 			Assert.True( sut.IsSatisfiedBy( 6776 ) );
 		}
 

@@ -15,10 +15,10 @@ namespace DragonSpark.Aspects
 
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var adapter = source.Get( args.Instance );
+			var adapter = source( args.Instance );
 			if ( adapter != null )
 			{
-				args.ReturnValue = source.Get( args.Arguments[0] );
+				args.ReturnValue = adapter.Get( args.Arguments[0] );
 			}
 			else
 			{

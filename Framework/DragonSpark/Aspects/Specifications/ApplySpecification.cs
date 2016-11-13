@@ -8,10 +8,8 @@ using System;
 
 namespace DragonSpark.Aspects.Specifications
 {
-	public interface IAsdf : ISource<ISpecificationAdapter> {}
-
-	[IntroduceInterface( typeof(IAsdf) )]
-	public sealed class ApplySpecification : SpecificationAspectBase, IAsdf, IAspectProvider
+	[IntroduceInterface( typeof(ISource<ISpecificationAdapter>) )]
+	public sealed class ApplySpecification : SpecificationAspectBase, ISource<ISpecificationAdapter>
 	{
 		public ApplySpecification( Type specificationType ) : this( specificationType, typeof(DefaultSpecificationImplementation<>) ) {}
 		public ApplySpecification( Type specificationType, Type implementationType ) : base( Constructors<ApplySpecification>.Default.Get( specificationType ), specificationType, implementationType ) {}
