@@ -35,28 +35,4 @@ namespace DragonSpark.TypeSystem
 			return result;
 		}
 	}
-
-	public sealed class ObjectTypeCoercer : CoercerBase<Type>
-	{
-		public static ObjectTypeCoercer Default { get; } = new ObjectTypeCoercer();
-		ObjectTypeCoercer() {}
-
-		protected override Type Coerce( object parameter ) => parameter.GetType();
-	}
-
-	public sealed class AsTypeCoercer : CoercerBase<TypeInfo, Type>
-	{
-		public static AsTypeCoercer Default { get; } = new AsTypeCoercer();
-		AsTypeCoercer() {}
-
-		protected override Type Coerce( TypeInfo parameter ) => parameter.AsType();
-	}
-	
-	public sealed class TypeInfoCoercer : CoercerBase<Type, TypeInfo>
-	{
-		public static TypeInfoCoercer Default { get; } = new TypeInfoCoercer();
-		TypeInfoCoercer() {}
-
-		protected override TypeInfo Coerce( Type parameter ) => parameter.GetTypeInfo();
-	}
 }

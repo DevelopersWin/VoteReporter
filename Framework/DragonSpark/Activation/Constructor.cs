@@ -12,7 +12,6 @@ using System.Reflection;
 
 namespace DragonSpark.Activation
 {
-	public interface IConstructor : IParameterizedSource<ConstructTypeRequest, object>, ISpecification<ConstructTypeRequest>, IActivator {}
 	public sealed class Constructor : ActivatorBase, IConstructor
 	{
 		public static IConstructor Default { get; } = new Constructor();
@@ -62,29 +61,5 @@ namespace DragonSpark.Activation
 				return result;
 			}
 		}
-	}
-
-	sealed class ConstructorSpecification : SpecificationBase<ConstructTypeRequest>
-	{
-		public static ConstructorSpecification Default { get; } = new ConstructorSpecification();
-		ConstructorSpecification() : this( Constructors.Default ) {}
-
-		readonly Constructors cache;
-
-		ConstructorSpecification( Constructors cache )
-		{
-			this.cache = cache;
-		}
-
-		public override bool IsSatisfiedBy( ConstructTypeRequest parameter ) => 
-			parameter.RequestedType.GetTypeInfo().IsValueType || cache.Get( parameter ) != null;
-	}
-
-	public sealed class ConstructorCoercer : CoercerBase<Type, ConstructTypeRequest>
-	{
-		public static ConstructorCoercer Default { get; } = new ConstructorCoercer();
-		ConstructorCoercer() {}
-
-		protected override ConstructTypeRequest Coerce( Type parameter ) => new ConstructTypeRequest( parameter );
 	}
 }

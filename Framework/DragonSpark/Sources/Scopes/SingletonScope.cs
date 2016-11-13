@@ -1,6 +1,5 @@
 using DragonSpark.Sources.Parameterized.Caching;
 using System;
-using System.Collections.Generic;
 
 namespace DragonSpark.Sources.Scopes
 {
@@ -14,15 +13,5 @@ namespace DragonSpark.Sources.Scopes
 		public override void Assign( Func<T> item ) => base.Assign( item.ToSingleton() );
 
 		public override void Assign( Func<object, T> item ) => base.Assign( Caches.Create( item ).Get );
-	}
-
-	public class ItemScope<T> : DecoratedItemSource<T>
-	{
-		public ItemScope( IScope<IEnumerable<T>> scope ) : base( scope )
-		{
-			Scope = scope;
-		}
-
-		public IScope<IEnumerable<T>> Scope { get; }
 	}
 }

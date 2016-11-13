@@ -20,11 +20,6 @@ namespace DragonSpark.Expressions
 			=> new PropertyAssignmentFactory( expression.GetMemberInfo().To<PropertyInfo>() ).Get( @this );
 	}
 
-	public class PropertyAssignmentFactory : PropertyAssignmentFactory<object>
-	{
-		public PropertyAssignmentFactory( PropertyInfo property ) : base( property ) {}
-	}
-
 	public class PropertyAssignmentFactory<T> : ParameterizedSourceBase<Action<T>>
 	{
 		readonly PropertyInfo property;

@@ -12,11 +12,6 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	public interface ITypeAware
-	{
-		Type ReferencedType { get; }
-	}
-
 	public sealed class TypeAdapter : ITypeAware
 	{
 		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToDelegate();

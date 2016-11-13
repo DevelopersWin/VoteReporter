@@ -5,11 +5,6 @@ using System;
 
 namespace DragonSpark.Runtime.Assignments
 {
-	public class AssignWithRestoreCommand<T> : AssignWithDisposeCommand<T>
-	{
-		public AssignWithRestoreCommand( IAssignable<T> assignable, T current ) : base( assignable, new Assignment<T>( new Assign<T>( assignable ), current ) ) {}
-	}
-
 	public class AssignWithDisposeCommand<T> : DisposingCommandBase<T>
 	{
 		readonly IAssignable<T> assignable;

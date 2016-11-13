@@ -1,7 +1,5 @@
 ﻿using DragonSpark.Aspects.Adapters;
 using DragonSpark.Aspects.Definitions;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
@@ -19,13 +17,5 @@ namespace DragonSpark.Aspects.Implementations
 
 		[UsedImplicitly]
 		public IntroduceGeneralizedParameterizedSource( Func<object, object> factory ) : base( GeneralizedParameterizedSourceTypeDefinition.Default.Inverse(), factory, GeneralizedParameterizedSourceTypeDefinition.Default.ReferencedType ) {}
-	}
-
-	sealed class DefaultGeneralizedParameterizedSource<TParameter, TResult> : DelegatedAdapter<TParameter, TResult>
-	{
-		public DefaultGeneralizedParameterizedSource( IParameterizedSource<TParameter, TResult> implementation ) 
-			: base( 
-				  SourceCoercer<ICoercerAdapter>.Default.Get( implementation )?.To( DefaultCoercer ) ?? DefaultCoercer, 
-				  new ParameterizedSourceAdapter<TParameter, TResult>( implementation ).Get ) {}
 	}
 }

@@ -16,14 +16,6 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class IntroducedAspectBuildDefinition<TType, TMethod> : AspectBuildDefinition
-		where TType : ICompositionAspect, ITypeLevelAspect
-		where TMethod : IMethodLevelAspect
-	{
-		public IntroducedAspectBuildDefinition( ImmutableArray<object> parameters, params ITypeDefinition[] candidates ) 
-			: base( new IntroducedAspectSelector<TType, TMethod>( parameters ), candidates ) {}
-	}
-
 	/*public static class Defaults
 	{
 		public static ISpecification<TypeInfo> Instantiable { get; } = Activation.Defaults.Instantiable.Coerce( AsTypeCoercer.Default );

@@ -16,12 +16,6 @@ namespace DragonSpark.Sources.Coercion
 		protected override TTo Coerce( TFrom parameter ) => parameter.AsValid<TTo>();
 	}
 
-	public sealed class CastCoercer<T> : DelegatedCoercer<object, T>
-	{
-		public static CastCoercer<T> Default { get; } = new CastCoercer<T>();
-		CastCoercer() : base( CastCoercer<object, T>.Default.Get ) {}
-	}
-
 	public sealed class CastCoercer<TFrom, TTo> : CoercerBase<TFrom, TTo>
 	{
 		public static CastCoercer<TFrom, TTo> Default { get; } = new CastCoercer<TFrom, TTo>();

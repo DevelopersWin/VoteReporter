@@ -6,7 +6,6 @@ using System.Composition.Hosting.Core;
 namespace DragonSpark.Composition
 {
 	// ReSharper disable once UnusedTypeParameter
-	public sealed class SpecificationRequest<T> {}
 
 	public sealed class SpecificationExporter : ExportDescriptorProviderBase
 	{

@@ -7,8 +7,6 @@ using System.Composition;
 
 namespace DragonSpark
 {
-	public interface IFormatter : IParameterizedSource<FormatterParameter, string>, IParameterizedSource<object, string> {}
-
 	public sealed class Formatter : DecoratedParameterizedSource<FormatterParameter, string>, IFormatter
 	{
 		[Export]
@@ -41,11 +39,5 @@ namespace DragonSpark
 
 			public override string Get( FormatterParameter parameter ) => factory( parameter.Instance )?.ToString( parameter.Format, parameter.Provider ) ?? Coerce( parameter );
 		}
-	}
-
-	public sealed class FormattableSource : DelegatedParameterizedSource<object, IFormattable>
-	{
-		public static FormattableSource Default { get; } = new FormattableSource();
-		FormattableSource() : base( ConstructFromKnownTypes<IFormattable>.Default.Get ) {}
 	}
 }
