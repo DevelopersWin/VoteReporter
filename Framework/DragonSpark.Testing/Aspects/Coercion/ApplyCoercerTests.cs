@@ -6,7 +6,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Coercion
 {
-	public class ApplyCoercerAttributeTests
+	public class ApplyCoercerTests
 	{
 		[Fact]
 		public void Verify()
@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Aspects.Coercion
 			Assert.Equal( Coercer.ValidMatch, sut.LastResult );
 		}
 
-		class Coercer : CoercerBase<int, string>
+		sealed class Coercer : CoercerBase<int, string>
 		{
 			public const string ValidMatch = "Valid Match";
 
@@ -41,7 +41,7 @@ namespace DragonSpark.Testing.Aspects.Coercion
 		}
 
 		[ApplyCoercer( typeof(Coercer) )]
-		class Command : ICommand
+		sealed class Command : ICommand
 		{
 			public event EventHandler CanExecuteChanged = delegate {};
 

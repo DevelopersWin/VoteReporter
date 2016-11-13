@@ -1,15 +1,14 @@
-﻿using System;
-using DragonSpark.Aspects.Adapters;
+﻿using DragonSpark.Aspects.Adapters;
 using DragonSpark.Aspects.Build;
 using DragonSpark.Sources;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;
-using PostSharp.Aspects.Dependencies;
+using System;
 
 namespace DragonSpark.Aspects.Alteration
 {
 	[IntroduceInterface( typeof(ISource<IAlterationAdapter>) )]
-	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
+	[LinesOfCodeAvoided( 1 )]
 	public abstract class ApplyAlterationBase : InstanceAspectBase, ISource<IAlterationAdapter>
 	{
 		readonly IAlterationAdapter alteration;

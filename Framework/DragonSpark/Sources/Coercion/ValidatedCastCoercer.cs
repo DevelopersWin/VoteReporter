@@ -1,5 +1,4 @@
 using DragonSpark.Extensions;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Sources.Coercion
 {
@@ -28,6 +27,6 @@ namespace DragonSpark.Sources.Coercion
 		public static CastCoercer<TFrom, TTo> Default { get; } = new CastCoercer<TFrom, TTo>();
 		CastCoercer() {}
 
-		protected override TTo Coerce( [Optional]TFrom parameter ) => parameter is TTo ? (TTo)(object)parameter : default(TTo);
+		protected override TTo Coerce( TFrom parameter ) => default(TTo);
 	}
 }

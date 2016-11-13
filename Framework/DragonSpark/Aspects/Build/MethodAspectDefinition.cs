@@ -11,7 +11,7 @@ namespace DragonSpark.Aspects.Build
 	{
 		public MethodAspectDefinition( IMethods store ) : this( store.ReferencedType, store.To( MethodAspectFactory<T>.Default ).ToCache().ToDelegate() ) { }
 		MethodAspectDefinition( Type referencedType, Func<Type, AspectInstance> store ) : base( 
-			TypeAssignableSpecification.Defaults.Get( referencedType )
+			TypeAssignableSpecification.Default.Get( referencedType )
 				.And( new DelegatedAssignedSpecification<Type, AspectInstance>( store ) )
 				.Coerce( AsTypeCoercer.Default )
 				.ToDelegate(), 

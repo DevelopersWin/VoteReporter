@@ -1,8 +1,6 @@
-﻿using DragonSpark.Aspects.Adapters;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
-using System;
 
 namespace DragonSpark.Aspects.Relay
 {
@@ -14,6 +12,6 @@ namespace DragonSpark.Aspects.Relay
 	]
 	public abstract class RelayMethodBase : AdapterMethodBase
 	{
-		protected RelayMethodBase( Func<object, IAdapter> source ) : base( source ) {}
+		protected RelayMethodBase( IAdapterInvocation invocation ) : base( invocation ) {}
 	}
 }

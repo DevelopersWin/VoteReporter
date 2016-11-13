@@ -1,6 +1,6 @@
 ﻿namespace DragonSpark.Aspects.Adapters
 {
-	public interface ICommandAdapter : ISpecificationAdapter
+	public interface ICommandAdapter : ISpecificationRelayAdapter
 	{
 		void Execute( object parameter );
 	}

@@ -1,4 +1,5 @@
-﻿using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Sources.Coercion;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
@@ -9,45 +10,61 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public abstract class AspectInstanceFactoryBase<TMemberInfo, TAspect> : SpecificationParameterizedSource<TMemberInfo, AspectInstance> 
-		where TMemberInfo : MemberInfo
-		where TAspect : IAspect
+	public sealed class AspectInstances<T> : AspectInstances where T : IAspect
 	{
-		protected AspectInstanceFactoryBase() : this( Factory.Implementation.ToCache() ) {}
+		public static AspectInstances<T> Default { get; } = new AspectInstances<T>();
+		AspectInstances() : base( ObjectConstructionFactory<T>.Default.Get() ) {}
+	}
 
-		[UsedImplicitly]
-		protected AspectInstanceFactoryBase( ICache<TMemberInfo, AspectInstance> source ) : base( HasAspectSpecification.Implementation.Or( new DelegatedSpecification<TMemberInfo>( source.Contains ) ).Inverse(), source.Get ) {}
-		
-		sealed class HasAspectSpecification : SpecificationBase<TMemberInfo>
+	public class AspectInstances : CacheWithImplementedFactoryBase<MemberInfo, AspectInstance>
+	{
+		readonly ObjectConstruction construction;
+
+		public AspectInstances( ObjectConstruction construction )
 		{
-			readonly static Type AspectType = typeof(TAspect);
+			this.construction = construction;
+		}
 
-			public static HasAspectSpecification Implementation { get; } = new HasAspectSpecification();
-			HasAspectSpecification() : this( ServiceSource<IAspectRepositoryService>.Default.Get ) {}
+		protected override AspectInstance Create( MemberInfo parameter ) => new AspectInstance( parameter, construction, null );
+	}
 
-			readonly Func<IAspectRepositoryService> repositorySource;
+	public sealed class ContainsAspectSpecification<T> : DelegatedSpecification<MemberInfo> where T : IAspect
+	{
+		public static ContainsAspectSpecification<T> Default { get; } = new ContainsAspectSpecification<T>();
+		ContainsAspectSpecification() : base( ContainsAspectSpecification.Delegates.Get( typeof(T) ) ) {}
+	}
 
-			HasAspectSpecification( Func<IAspectRepositoryService> repositorySource )
+	public sealed class ContainsAspectSpecification : SpecificationCache<Type, MemberInfo>
+	{
+		public static ContainsAspectSpecification Default { get; } = new ContainsAspectSpecification();
+		public static IParameterizedSource<Type, Func<MemberInfo, bool>> Delegates { get; } = Default.To( DelegateCoercer.Default ).ToCache();
+		ContainsAspectSpecification() : base( type => new DefaultImplementation( type ) ) {}
+
+		public sealed class DefaultImplementation : SpecificationBase<MemberInfo>
+		{
+			readonly IAspectRepositoryService repositorySource;
+			readonly Type aspectType;
+
+			public DefaultImplementation( [OfType( typeof(IAspect) )] Type aspectType ) : this( AspectRepositoryService.Default, aspectType ) {}
+
+			[UsedImplicitly]
+			public DefaultImplementation( IAspectRepositoryService repositorySource, [OfType( typeof(IAspect) )] Type aspectType )
 			{
 				this.repositorySource = repositorySource;
+				this.aspectType = aspectType;
 			}
 
-			public override bool IsSatisfiedBy( TMemberInfo parameter ) => repositorySource().HasAspect( parameter, AspectType );
+			public override bool IsSatisfiedBy( MemberInfo parameter ) => repositorySource.HasAspect( parameter, aspectType );
 		}
+	}
 
-		sealed class Factory : ParameterizedSourceBase<TMemberInfo, AspectInstance>
-		{
-			public static Factory Implementation { get; } = new Factory();
-			Factory() : this( ObjectConstructionFactory<TAspect>.Default.Get() ) {}
+	public abstract class AspectInstanceFactoryBase<T> : SpecificationParameterizedSource<T, AspectInstance> where T : MemberInfo
+	{
+		protected AspectInstanceFactoryBase( ObjectConstruction construction, [OfType( typeof(IAspect) )]Type aspectType )
+			: this( ContainsAspectSpecification.Default.Get( aspectType ), new AspectInstances( construction ) ) {}
 
-			readonly ObjectConstruction construction;
-
-			Factory( ObjectConstruction construction )
-			{
-				this.construction = construction;
-			}
-
-			public override AspectInstance Get( TMemberInfo parameter ) => new AspectInstance( parameter, construction, null );
-		}
+		[UsedImplicitly]
+		protected AspectInstanceFactoryBase( ISpecification<MemberInfo> specification, ICache<T, AspectInstance> source ) 
+			: base( specification.Or( new DelegatedSpecification<T>( source.Contains ) ).Inverse(), source.Get ) {}
 	}
 }

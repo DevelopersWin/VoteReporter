@@ -1,11 +1,11 @@
-﻿using System.Reflection;
-using PostSharp.Aspects;
+﻿using PostSharp.Aspects;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public sealed class TypeAspectFactory<T> : AspectInstanceFactoryBase<TypeInfo, T> where T : IAspect
+	public sealed class TypeAspectFactory<T> : AspectInstanceFactoryBase<TypeInfo> where T : IAspect
 	{
 		public static TypeAspectFactory<T> Default { get; } = new TypeAspectFactory<T>();
-		TypeAspectFactory() {}
+		TypeAspectFactory() : base( ContainsAspectSpecification<T>.Default, AspectInstances<T>.Default ) {}
 	}
 }

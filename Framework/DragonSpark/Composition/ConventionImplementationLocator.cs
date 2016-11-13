@@ -27,7 +27,7 @@ namespace DragonSpark.Composition
 
 		public override Type Get( Type parameter ) =>
 			source()
-				.Where( Activation.Defaults.Instantiable.And( TypeAssignableSpecification.Defaults.Get( parameter ) ).IsSatisfiedBy )
+				.Where( Activation.Defaults.Instantiable.And( TypeAssignableSpecification.Default.Get( parameter ) ).IsSatisfiedBy )
 				.Introduce( parameter, tuple => new ConventionMapping( tuple.Item2, tuple.Item1 ) )
 				.FirstOrDefault( @where )
 				.NullIfDefault()?

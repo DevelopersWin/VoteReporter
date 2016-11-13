@@ -74,10 +74,12 @@ namespace DragonSpark.Aspects.Build
 
 					foreach ( var item in selectors )
 					{
-						if ( item.IsSatisfiedBy( parameter ) )
+						var isSatisfiedBy = item.IsSatisfiedBy( parameter );
+						MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"Satisfies: {parameter} => {candidate} - {item} - Valid: {isSatisfiedBy}", null, null, null ));
+						if ( isSatisfiedBy )
 						{
 							var aspectInstance = item.Get( parameter );
-							MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"ADD: [{builder.Contains( aspectInstance )}] {parameter} => {candidate} - {item} - Applied {aspectInstance.AspectTypeName} on {aspectInstance.TargetElement}", null, null, null ));
+							MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"ADD: {parameter} => {candidate} - {item} - Applied {aspectInstance.AspectTypeName} on {aspectInstance.TargetElement}", null, null, null ));
 
 
 							builder.Add( aspectInstance );

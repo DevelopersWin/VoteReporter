@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Aspects.Alteration
 		}
 
 		[ApplyAlteration( typeof(Alteration) )]
-		class Command : CommandBase<Subject>
+		sealed class Command : CommandBase<Subject>
 		{
 			public static Command Default { get; } = new Command();
 			Command() {}
@@ -25,12 +25,12 @@ namespace DragonSpark.Testing.Aspects.Alteration
 			public override void Execute( Subject parameter ) {}
 		}
 		
-		class Subject
+		sealed class Subject
 		{
 			public string PropertyName { get; set; }
 		}
 
-		class Alteration : IAlteration<Subject>
+		sealed class Alteration : IAlteration<Subject>
 		{
 			public const string ParameterPropertyName = "Altered";
 

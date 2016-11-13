@@ -47,7 +47,6 @@
     <Compile Include="Application\Setup\IInputOutput.cs" />
     <Compile Include="Application\Setup\ReadKeyCommand.cs" />
     <Compile Include="Aspects\AdapterMethodBase.cs" />
-    <Compile Include="Aspects\Adapters\DefaultSpecificationImplementation.cs" />
     <Compile Include="Aspects\Alteration\ApplyAlterationBase.cs" />
     <Compile Include="Aspects\Alteration\ApplyResultAlteration.cs" />
     <Compile Include="Aspects\ApplyValuesFromSourceCommand.cs" />
@@ -82,7 +81,7 @@
     <Compile Include="Aspects\Alteration\Constructor.cs" />
     <Compile Include="Aspects\Adapters\IAlterationAdapter.cs" />
     <Compile Include="Aspects\Alteration\Definition.cs" />
-    <Compile Include="Aspects\Coercion\ApplyCoercerAttribute.cs" />
+    <Compile Include="Aspects\Coercion\ApplyCoercer.cs" />
     <Compile Include="Aspects\Coercion\Aspect.cs" />
     <Compile Include="Aspects\Build\TypedAspectConstructors.cs" />
     <Compile Include="Aspects\IAspectProvider.cs" />
@@ -147,7 +146,7 @@
     <Compile Include="Aspects\Definitions\IValidatedTypeDefinition.cs" />
     <Compile Include="Aspects\KnownRoles.cs" />
     <Compile Include="Aspects\Definitions\ParameterizedSourceTypeDefinition.cs" />
-    <Compile Include="Aspects\Relay\ApplyRelaysAttribute.cs" />
+    <Compile Include="Aspects\Relay\ApplyRelays.cs" />
     <Compile Include="Aspects\Definitions\SpecificationTypeDefinition.cs" />
     <Compile Include="Aspects\Definitions\TypeDefinitionWithPrimaryMethodBase.cs" />
     <Compile Include="Aspects\Definitions\ValidatedTypeDefinition.cs" />
@@ -170,7 +169,7 @@
     <Compile Include="Aspects\Validation\ParameterizedSourceTypeDefinition.cs" />
     <Compile Include="Aspects\Validation\SourceAdapter.cs" />
     <Compile Include="Aspects\Validation\ParameterizedSourceAdapterFactory.cs" />
-    <Compile Include="Aspects\Validation\ApplyAutoValidationAttribute.cs" />
+    <Compile Include="Aspects\Validation\ApplyAutoValidation.cs" />
     <Compile Include="Aspects\Validation\AutoValidationExecuteAspect.cs" />
     <Compile Include="Aspects\Validation\AutoValidationValidationAspect.cs" />
     <Compile Include="Aspects\Build\AspectInstanceFactoryBase.cs" />

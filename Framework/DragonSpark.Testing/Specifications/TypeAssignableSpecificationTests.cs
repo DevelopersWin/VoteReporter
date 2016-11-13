@@ -9,7 +9,7 @@ namespace DragonSpark.Testing.Specifications
 		[Fact]
 		public void Test()
 		{
-			var sut = TypeAssignableSpecification.Defaults.Get( typeof(IInterface) );
+			var sut = TypeAssignableSpecification.Default.Get( typeof(IInterface) );
 
 			Assert.True( sut.IsSatisfiedBy( typeof(Class) ) );
 			Assert.False( sut.IsSatisfiedBy( GetType() ) );

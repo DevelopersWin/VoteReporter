@@ -11,7 +11,7 @@ namespace DragonSpark.Aspects.Build
 	{
 		readonly string methodName;
 
-		public Methods( Type referencedType, string methodName ) : base( TypeAssignableSpecification.Defaults.Get( referencedType ) )
+		public Methods( Type referencedType, string methodName ) : base( TypeAssignableSpecification.Default.Get( referencedType ) )
 		{
 			ReferencedType = referencedType;
 			this.methodName = methodName;

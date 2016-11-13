@@ -9,13 +9,13 @@ using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Aspects.Validation
 {
-	public class ApplyAutoValidationAttributeTests : TestCollectionBase
+	public class ApplyAutoValidationTests : TestCollectionBase
 	{
 		readonly ExtendedFactory factory = new ExtendedFactory();
 		readonly AutoValidatingSource<int, float> validating;
 		readonly AppliedExtendedFactory applied = new AppliedExtendedFactory();
 
-		public ApplyAutoValidationAttributeTests( ITestOutputHelper output ) : base( output )
+		public ApplyAutoValidationTests( ITestOutputHelper output ) : base( output )
 		{
 			validating = new AutoValidatingSource<int, float>( factory, factory );
 		}

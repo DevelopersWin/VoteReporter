@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Relay
 {
-	public class ApplyRelaysAttributeTests
+	public class ApplyRelaysTests
 	{
 		[Fact]
 		public void Verify()
@@ -20,6 +20,7 @@ namespace DragonSpark.Testing.Aspects.Relay
 			Assert.True( sut.CanExecute( 6776 ) );
 			Assert.Equal( 0, sut.CanExecuteCalled );
 			Assert.Equal( 2, sut.CanExecuteGenericCalled );
+
 
 			sut.Execute( (object)6776 );
 

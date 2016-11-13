@@ -58,11 +58,11 @@
     <Compile Include="Application\SystemPartsTests.cs" />
     <Compile Include="Application\TaskedTaskExecutionContextTests.cs" />
     <Compile Include="Aspects\Alteration\ApplyAlterationTests.cs" />
-    <Compile Include="Aspects\Coercion\ApplyCoercerAttributeTests.cs" />
+    <Compile Include="Aspects\Coercion\ApplyCoercerTests.cs" />
     <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyAttributeTests.cs" />
     <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsTests.cs" />
     <Compile Include="Aspects\ApplyAspectsAttributeTests.cs" />
-    <Compile Include="Aspects\Relay\ApplyRelaysAttributeTests.cs" />
+    <Compile Include="Aspects\Relay\ApplyRelaysTests.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationTests.cs" />
     <Compile Include="Composition\SingletonExportFactoryTests.cs" />
     <Compile Include="Runtime\Assignments\AssignScopeCommandTests.cs" />
@@ -103,7 +103,7 @@
     <Compile Include="Extensions\ImmutableArrayExtensionsTests.cs" />
     <Compile Include="Aspects\Validation\AutoValidationControllerTests.cs" />
     <Compile Include="Aspects\OfTypeAttributeTests.cs" />
-    <Compile Include="Aspects\Validation\ApplyAutoValidationAttributeTests.cs" />
+    <Compile Include="Aspects\Validation\ApplyAutoValidationTests.cs" />
     <Compile Include="Commands\CommandBaseTests.cs" />
     <Compile Include="Commands\SpecificationCommandTests.cs" />
     <Compile Include="ComponentModel\ClassWithDefaultProperties.cs" />
