@@ -1,8 +1,5 @@
 using DragonSpark.Aspects.Adapters;
-using DragonSpark.Sources;
-using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
-using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System;
 
@@ -10,18 +7,18 @@ namespace DragonSpark.Aspects
 {
 	public abstract class AdapterMethodBase : MethodInterceptionAspectBase
 	{
-		readonly IAdapterInvocation invocation;
-		protected AdapterMethodBase( IAdapterInvocation invocation )
+		readonly Func<object, IAdapter> source;
+		protected AdapterMethodBase( Func<object, IAdapter> source )
 		{
-			this.invocation = invocation;
+			this.source = source;
 		}
 
 		public sealed override void OnInvoke( MethodInterceptionArgs args )
 		{
-			var adapter = invocation.Get( args.Instance );
+			var adapter = source.Get( args.Instance );
 			if ( adapter != null )
 			{
-				args.ReturnValue = invocation.Apply( adapter, args.Arguments[0] );
+				args.ReturnValue = source.Get( args.Arguments[0] );
 			}
 			else
 			{
@@ -30,7 +27,7 @@ namespace DragonSpark.Aspects
 		}
 	}
 
-	public class AdapterInvocation<T> : DelegatedParameterizedSource<object, T>, IAdapterInvocation where T : IAdapter
+	/*public class AdapterInvocation<T> : DelegatedParameterizedSource<object, T>, IAdapterInvocation where T : IAdapter
 	{
 		public static AdapterInvocation<T> Default { get; } = new AdapterInvocation<T>();
 		protected AdapterInvocation() : this( SourceCoercer<T>.Default.Get ) {}
@@ -47,6 +44,5 @@ namespace DragonSpark.Aspects
 
 	public interface IAdapterInvocation : IParameterizedSource<object, IAdapter>
 	{
-		object Apply( IAdapter adapter, object parameter = null );
-	}
+	}*/
 }

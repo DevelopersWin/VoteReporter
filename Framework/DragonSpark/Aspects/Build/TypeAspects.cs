@@ -5,12 +5,12 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class TypeAspectDefinition<T> : AspectDefinition where T : ITypeLevelAspect
+	public class TypeAspects<T> : Aspects where T : ITypeLevelAspect
 	{
-		public TypeAspectDefinition( ISpecification<TypeInfo> specification ) 
+		public TypeAspects( ISpecification<TypeInfo> specification ) 
 			: this( specification, TypeAspectFactory<T>.Default ) {}
 
-		public TypeAspectDefinition( ISpecification<TypeInfo> specification, ISpecificationParameterizedSource<TypeInfo, AspectInstance> source ) 
+		public TypeAspects( ISpecification<TypeInfo> specification, ISpecificationParameterizedSource<TypeInfo, AspectInstance> source ) 
 			: base( specification.And( source ).ToDelegate(), source.Get ) {}
 	}
 }

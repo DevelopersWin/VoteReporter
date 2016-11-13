@@ -6,14 +6,14 @@ using PostSharp.Aspects.Advices;
 namespace DragonSpark.Aspects.Relay
 {
 	[IntroduceInterface( typeof(ISource<ICommandAdapter>) )]
-	public sealed class ApplyCommandRelay : ApplySpecificationRelayBase, ISource<ICommandAdapter>
+	public sealed class ApplyCommandRelay : InstanceAspectBase, ISource<ICommandAdapter>
 	{
 		readonly ICommandAdapter adapter;
 
-		public ApplyCommandRelay() : base( CommandRelaySelectors.Default.Get, CommandRelayDefinition.Default ) {}
+		public ApplyCommandRelay() : base( CommandRelayAspectFactory.Default.Get, CommandRelayDefinition.Default ) {}
 
 		[UsedImplicitly]
-		public ApplyCommandRelay( ICommandAdapter adapter ) : base( adapter )
+		public ApplyCommandRelay( ICommandAdapter adapter ) //: base( adapter )
 		{
 			this.adapter = adapter;
 		}

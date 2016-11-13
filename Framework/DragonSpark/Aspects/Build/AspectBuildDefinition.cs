@@ -1,7 +1,6 @@
 ﻿using DragonSpark.Aspects.Definitions;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
@@ -25,55 +24,56 @@ namespace DragonSpark.Aspects.Build
 			: base( new IntroducedAspectSelector<TType, TMethod>( parameters ), candidates ) {}
 	}
 
-	public class AspectBuildDefinition : ParameterizedItemSourceBase<TypeInfo, AspectInstance>, IAspectBuildDefinition
+	/*public static class Defaults
+	{
+		public static ISpecification<TypeInfo> Instantiable { get; } = Activation.Defaults.Instantiable.Coerce( AsTypeCoercer.Default );
+
+		public static ISpecification<TypeInfo> Introduce { get; } = Instantiable.And( FirstInstantiable.Default );
+	}*/
+
+	public class AspectBuildDefinition : SpecificationParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?>, IAspectBuildDefinition
 	{
 		readonly ImmutableArray<Type> types;
-		readonly ISpecification<TypeInfo> specification;
-		readonly IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource;
 
-		public AspectBuildDefinition( IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, params ITypeDefinition[] candidates ) 
-			: this( selector, candidates.SelectTypes().ToImmutableArray(), candidates ) {}
+		public AspectBuildDefinition( IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates ) 
+			: this( candidates.AsTypes(), selector, candidates ) {}
 
-		AspectBuildDefinition( IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, ImmutableArray<Type> types, params ITypeDefinition[] candidates ) 
-			: this( types, new Cache( selector, types, candidates ) ) {}
+		/*public AspectBuildDefinition( ISpecification<TypeInfo> specification, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, params ITypeDefinition[] candidates ) 
+			: this( candidates.AsTypes(), specification, selector, candidates ) {}*/
 
-		public AspectBuildDefinition( ImmutableArray<Type> types, IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource ) 
-			: this( types, 
-				  new DelegatedAssignedSpecification<TypeInfo, ImmutableArray<AspectInstance>?>( instanceSource.ToDelegate() ), instanceSource ) {}
+		AspectBuildDefinition( ImmutableArray<Type> types, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates ) 
+			: this( types, new Implementation( types, selector, candidates ).ToCache() ) {}
 
 		[UsedImplicitly]
-		public AspectBuildDefinition( ImmutableArray<Type> types, ISpecification<TypeInfo> specification, IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource )
+		protected AspectBuildDefinition( ImmutableArray<Type> types, IParameterizedSource<TypeInfo, ImmutableArray<AspectInstance>?> instanceSource ) : base( new DelegatedAssignedSpecification<TypeInfo, ImmutableArray<AspectInstance>?>( instanceSource.ToDelegate() ), instanceSource.Get )
 		{
 			this.types = types;
-			this.specification = specification;
-			this.instanceSource = instanceSource;
 		}
 
-		public bool IsSatisfiedBy( TypeInfo parameter ) => specification.IsSatisfiedBy( parameter );
-
-		public override IEnumerable<AspectInstance> Yield( TypeInfo parameter ) => instanceSource.Get( parameter )?.ToArray();
-
-		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => this.GetEnumerable( (TypeInfo)targetElement );
+		public IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => Get( (TypeInfo)targetElement )?.ToArray();
 
 		public IEnumerator<Type> GetEnumerator() => types.AsEnumerable().GetEnumerator();
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-		sealed class Cache : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<AspectInstance>?>
+		sealed class Implementation : ParameterizedSourceBase<TypeInfo, ImmutableArray<AspectInstance>?>
 		{
+			readonly ImmutableArray<Type> types;
 			readonly ISpecification<TypeInfo> specification;
-			readonly IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector;
+			readonly IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector;
 			readonly ImmutableArray<ITypeDefinition> candidates;
 
-			public Cache( IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, ImmutableArray<Type> types, params ITypeDefinition[] candidates ) : this( new AdapterAssignableSpecification( types.ToArray() ), selector, candidates ) {}
+			public Implementation( ImmutableArray<Type> types, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates ) 
+				: this( types, new AdapterAssignableSpecification( types.ToArray() ), selector, candidates ) {}
 
-			Cache( ISpecification<TypeInfo> specification, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspectDefinition>> selector, params ITypeDefinition[] candidates )
+			Implementation( ImmutableArray<Type> types, ISpecification<TypeInfo> specification, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates )
 			{
+				this.types = types;
 				this.specification = specification;
 				this.selector = selector;
 				this.candidates = candidates.ToImmutableArray();
 			}
 
-			protected override ImmutableArray<AspectInstance>? Create( TypeInfo parameter )
+			public override ImmutableArray<AspectInstance>? Get( TypeInfo parameter )
 			{
 				var builder = ImmutableArray.CreateBuilder<AspectInstance>();
 				foreach ( var candidate in candidates )
@@ -83,24 +83,22 @@ namespace DragonSpark.Aspects.Build
 					foreach ( var item in selectors )
 					{
 						var isSatisfiedBy = item.IsSatisfiedBy( parameter );
-						// MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"Satisfies: {parameter} => {candidate} - {item} - Valid: {isSatisfiedBy}", null, null, null ));
+						MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"Satisfies: {parameter} => {candidate} - {item} - Valid: {isSatisfiedBy}", null, null, null ));
 						if ( isSatisfiedBy )
 						{
 							var aspectInstance = item.Get( parameter );
 							MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"ADD: {parameter} => {candidate} - {item} - Applied {aspectInstance.AspectTypeName} on {aspectInstance.TargetElement}", null, null, null ));
-
-
+							
 							builder.Add( aspectInstance );
 						}
 					}
 				}
 
-				if ( builder.Any() )
-				{
-					return builder.ToImmutable();
-				}
-
-				var result = specification.IsSatisfiedBy( parameter ) ? Items<AspectInstance>.Immutable : (ImmutableArray<AspectInstance>?)null;
+				var satisfiedBy = specification.IsSatisfiedBy( parameter );
+				var result = 
+					builder.Any() ? builder.ToImmutable() 
+						: satisfiedBy ? Items<AspectInstance>.Immutable : (ImmutableArray<AspectInstance>?)null;
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"FAILURE: {parameter} {candidates.First()} => {satisfiedBy} = {string.Join( ", ", types.Select( t => t.FullName ) )}", null, null, null ));
 				return result;
 			}
 		}

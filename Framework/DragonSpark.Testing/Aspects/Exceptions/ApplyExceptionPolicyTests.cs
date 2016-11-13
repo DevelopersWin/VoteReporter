@@ -12,7 +12,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Aspects.Exceptions
 {
-	public class ApplyExceptionPolicyAttributeTests
+	public class ApplyExceptionPolicyTests
 	{
 		[Fact]
 		public void VerifyInstance()

@@ -1,17 +1,18 @@
 ﻿using DragonSpark.Commands;
-using DragonSpark.Extensions;
+using DragonSpark.Sources;
+using DragonSpark.Sources.Coercion;
 
 namespace DragonSpark.Aspects.Adapters
 {
-	public sealed class CommandAdapter<T> : SpecificationAdapter<T>, ICommandAdapter
+	public sealed class CommandAdapter<T> : CommandAdapterBase<T>, ICommandAdapter
 	{
 		readonly ICommand<T> command;
 
-		public CommandAdapter( ICommand<T> command ) : base( command )
+		public CommandAdapter( ICommand<T> command ) : base( SourceCoercer<ICoercerAdapter>.Default.Get( command )?.To( DefaultCoercer ) ?? DefaultCoercer )
 		{
 			this.command = command;
 		}
 
-		public void Execute( object parameter ) => command.Execute( parameter.AsValid<T>() );
+		protected override void Execute( T parameter ) => command.Execute( parameter );
 	}
 }

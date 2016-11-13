@@ -5,13 +5,13 @@ using System.Collections.Immutable;
 
 namespace DragonSpark.Aspects.Implementations
 {
-	sealed class Definition : PairedAspectBuildDefinition
+	sealed class Definition : MappedAspectBuildDefinition
 	{
 		public static Definition Default { get; } = new Definition();
-		Definition() : base( new Dictionary<ITypeDefinition, IAspectDefinition>
+		Definition() : base( new Dictionary<ITypeDefinition, IAspects>
 							 {
-								 { GeneralizedParameterizedSourceTypeDefinition.Default, ParameterizedSourceAspectDefinition.Default },
-								 { GeneralizedSpecificationTypeDefinition.Default, SpecificationAspectDefinition.Default }
+								 { GeneralizedParameterizedSourceTypeDefinition.Default, ParameterizedSourceAspects.Default },
+								 { GeneralizedSpecificationTypeDefinition.Default, SpecificationAspects.Default }
 							 }.ToImmutableDictionary() ) {}
 	}
 }

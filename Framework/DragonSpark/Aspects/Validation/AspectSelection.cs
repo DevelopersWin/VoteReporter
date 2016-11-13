@@ -5,15 +5,15 @@ using System.Collections.Generic;
 
 namespace DragonSpark.Aspects.Validation
 {
-	sealed class AspectSelection : ParameterizedItemSourceBase<IValidatedTypeDefinition, IAspectDefinition>
+	sealed class AspectSelection : ParameterizedItemSourceBase<IValidatedTypeDefinition, IAspects>
 	{
 		public static AspectSelection Default { get; } = new AspectSelection();
 		AspectSelection() {}
 
-		public override IEnumerable<IAspectDefinition> Yield( IValidatedTypeDefinition parameter )
+		public override IEnumerable<IAspects> Yield( IValidatedTypeDefinition parameter )
 		{
-			yield return new MethodAspectDefinition<AutoValidationValidationAspect>( parameter.Validation );
-			yield return new MethodAspectDefinition<AutoValidationExecuteAspect>( parameter.Execution );
+			yield return new MethodAspects<AutoValidationValidationAspect>( parameter.Validation );
+			yield return new MethodAspects<AutoValidationExecuteAspect>( parameter.Execution );
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace DragonSpark.Aspects.Build
 		public IntroducedAspectSelector( ImmutableArray<object> parameters ) : base( new IntroducedAspectSource<TType>( parameters ).Yield ) {}
 	}
 
-	public sealed class IntroducedAspectSource<T> : ParameterizedItemSourceBase<ITypeDefinition, IAspectDefinition> where T : ITypeLevelAspect
+	public sealed class IntroducedAspectSource<T> : ParameterizedItemSourceBase<ITypeDefinition, IAspects> where T : ITypeLevelAspect
 	{
 		public static IntroducedAspectSource<T> Default { get; } = new IntroducedAspectSource<T>();
 		IntroducedAspectSource() : this( TypeAspectFactory<T>.Default ) {}
@@ -34,9 +34,9 @@ namespace DragonSpark.Aspects.Build
 			this.source = source;
 		}
 
-		public override IEnumerable<IAspectDefinition> Yield( ITypeDefinition parameter )
+		public override IEnumerable<IAspects> Yield( ITypeDefinition parameter )
 		{
-			yield return new TypeAspectDefinition<T>( parameter.Inverse(), source );
+			yield return new TypeAspects<T>( parameter.Inverse(), source );
 		}
 	}
 }

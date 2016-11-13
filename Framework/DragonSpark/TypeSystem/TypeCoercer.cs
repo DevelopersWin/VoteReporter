@@ -11,6 +11,12 @@ namespace DragonSpark.TypeSystem
 
 		protected override Type Coerce( object parameter )
 		{
+			var aware = parameter as ITypeAware;
+			if ( aware != null )
+			{
+				return aware.ReferencedType;
+			}
+
 			var info = parameter as ParameterInfo;
 			if ( info != null )
 			{

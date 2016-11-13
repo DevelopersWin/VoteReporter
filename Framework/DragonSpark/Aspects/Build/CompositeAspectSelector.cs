@@ -1,21 +1,21 @@
-﻿using System;
+﻿using DragonSpark.Aspects.Definitions;
+using DragonSpark.Sources.Parameterized;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using DragonSpark.Aspects.Definitions;
-using DragonSpark.Sources.Parameterized;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class CompositeAspectSelector : ParameterizedItemSourceBase<ITypeDefinition, IAspectDefinition>
+	public class CompositeAspectSelector : ParameterizedItemSourceBase<ITypeDefinition, IAspects>
 	{
-		readonly ImmutableArray<Func<ITypeDefinition, IEnumerable<IAspectDefinition>>> sources;
+		readonly ImmutableArray<Func<ITypeDefinition, IEnumerable<IAspects>>> sources;
 
-		public CompositeAspectSelector( params Func<ITypeDefinition, IEnumerable<IAspectDefinition>>[] sources )
+		public CompositeAspectSelector( params Func<ITypeDefinition, IEnumerable<IAspects>>[] sources )
 		{
 			this.sources = sources.ToImmutableArray();
 		}
 
-		public override IEnumerable<IAspectDefinition> Yield( ITypeDefinition parameter )
+		public override IEnumerable<IAspects> Yield( ITypeDefinition parameter )
 		{
 			foreach ( var source in sources )
 			{

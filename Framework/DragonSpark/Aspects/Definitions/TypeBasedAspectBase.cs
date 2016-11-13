@@ -1,12 +1,14 @@
 using DragonSpark.Aspects.Build;
-using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
+using PostSharp.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Definitions
 {
@@ -25,13 +27,23 @@ namespace DragonSpark.Aspects.Definitions
 		public override bool CompileTimeValidate( Type type )
 		{
 			var result = definition.IsSatisfiedBy( type );
-			if ( !result )
-			{
-				throw new InvalidOperationException( $"Aspect '{GetType()}' was applied to {type}, but it was not able to apply any aspects to it.  This aspects works with the following types.  Ensure that {type} implements at least one of these types: {string.Join( ", ", definition.Select( t => t.FullName ) )}" );
-			}
-			return true;
+			MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{GetType()}.CompileTimeValidate: {type} => {result.ToString()}", null, null, null ));
+			return result;
 		}
 
-		public virtual IEnumerable<AspectInstance> ProvideAspects( object targetElement ) => definition.ProvideAspects( targetElement ).Fixed();
+		public IEnumerable<AspectInstance> ProvideAspects( object targetElement )
+		{
+			var type = (TypeInfo)targetElement;
+			var result = definition.ProvideAspects( targetElement )?.ToArray();
+			if ( result == null )
+			{
+				throw new InvalidOperationException( $"Aspect '{GetType()}' was applied to {targetElement}, but it was not able to apply any aspects to it.  Ensure that {targetElement} implements at least one of these types: {string.Join( ", ", definition.Select( t => t.FullName ) )}" );
+			}
+			foreach ( var aspectInstance in result )
+			{
+				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{GetType().Name}.ProvideAspects: [{type.FullName}] Applying {aspectInstance.AspectTypeName} => {aspectInstance.TargetElement}", null, null, null ));
+			}
+			return result;
+		}
 	}
 }

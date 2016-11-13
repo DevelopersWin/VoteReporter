@@ -1,10 +1,8 @@
 ﻿using DragonSpark.Specifications;
 using JetBrains.Annotations;
-using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Extensibility;
 using System;
 using System.Collections.Immutable;
 using System.Linq;

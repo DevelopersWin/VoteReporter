@@ -8,10 +8,10 @@ namespace DragonSpark.Aspects.Build
 {
 	public class AspectSelector<T> : CompositeAspectSelector where T : IMethodLevelAspect
 	{
-		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> types ) : this( types, MethodAspectSelector<T>.Default.Yield ) {}
+		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspects>> types ) : this( types, MethodAspectSelector<T>.Default.Yield ) {}
 
 		[UsedImplicitly]
-		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspectDefinition>> types, Func<ITypeDefinition, IEnumerable<IAspectDefinition>> methods ) 
+		public AspectSelector( Func<ITypeDefinition, IEnumerable<IAspects>> types, Func<ITypeDefinition, IEnumerable<IAspects>> methods ) 
 			: base( types, methods ) {}
 	}
 }

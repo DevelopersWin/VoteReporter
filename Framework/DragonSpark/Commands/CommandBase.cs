@@ -4,6 +4,7 @@ using System.Windows.Input;
 
 namespace DragonSpark.Commands
 {
+	[ApplyCommandRelay, ApplySpecificationRelay]
 	public abstract class CommandBase<T> : ICommand<T>
 	{
 		public event EventHandler CanExecuteChanged = delegate {};

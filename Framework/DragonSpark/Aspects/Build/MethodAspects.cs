@@ -7,10 +7,12 @@ using System;
 
 namespace DragonSpark.Aspects.Build
 {
-	public class MethodAspectDefinition<T> : AspectDefinition where T : IMethodLevelAspect
+
+
+	public class MethodAspects<T> : Aspects where T : IMethodLevelAspect
 	{
-		public MethodAspectDefinition( IMethods store ) : this( store.ReferencedType, store.To( MethodAspectFactory<T>.Default ).ToCache().ToDelegate() ) { }
-		MethodAspectDefinition( Type referencedType, Func<Type, AspectInstance> store ) : base( 
+		public MethodAspects( IMethods store ) : this( store.ReferencedType, store.To( MethodAspectFactory<T>.Default ).ToCache().ToDelegate() ) { }
+		MethodAspects( Type referencedType, Func<Type, AspectInstance> store ) : base( 
 			TypeAssignableSpecification.Default.Get( referencedType )
 				.And( new DelegatedAssignedSpecification<Type, AspectInstance>( store ) )
 				.Coerce( AsTypeCoercer.Default )

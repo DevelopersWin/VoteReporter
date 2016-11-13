@@ -1,5 +1,4 @@
 using DragonSpark.Sources;
-using JetBrains.Annotations;
 using Polly;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Dependencies;
@@ -13,7 +12,6 @@ namespace DragonSpark.Aspects.Exceptions
 	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.EnhancedValidation ),
 	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )
 	]
-	[AttributeUsage( AttributeTargets.Method ), UsedImplicitly]
 	public sealed class Aspect : MethodInterceptionAspectBase
 	{
 		readonly static Func<object, Policy> Source = SourceCoercer<Policy>.Default.Get;

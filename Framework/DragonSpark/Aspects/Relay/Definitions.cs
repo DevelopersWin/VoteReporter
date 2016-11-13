@@ -5,15 +5,15 @@ using System.Collections.Immutable;
 
 namespace DragonSpark.Aspects.Relay
 {
-	sealed class Definitions : PairedAspectBuildDefinition
+	sealed class Definitions : MappedAspectBuildDefinition
 	{
 		public static Definitions Default { get; } = new Definitions();
 		Definitions() : base( 
-			new Dictionary<ITypeDefinition, IAspectDefinition>
+			new Dictionary<ITypeDefinition, IAspects>
 			{
-				{ GenericCommandTypeDefinition.Default, new TypeAspectDefinition<ApplyCommandRelay>( CommandTypeDefinition.Default ) },
-				{ ParameterizedSourceTypeDefinition.Default, new TypeAspectDefinition<ApplyParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default ) },
-				{ SpecificationTypeDefinition.Default, new TypeAspectDefinition<ApplySpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default ) },
+				{ GenericCommandTypeDefinition.Default, new TypeAspects<ApplyCommandRelay>( CommandTypeDefinition.Default ) },
+				{ ParameterizedSourceTypeDefinition.Default, new TypeAspects<ApplyParameterizedSourceRelay>( GeneralizedParameterizedSourceTypeDefinition.Default ) },
+				{ SpecificationTypeDefinition.Default, new TypeAspects<ApplySpecificationRelay>( GeneralizedSpecificationTypeDefinition.Default ) },
 			}.ToImmutableDictionary() ) {}
 	}
 }
