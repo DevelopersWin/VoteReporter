@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System;
 using System.Collections.Immutable;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Aspects.Coercion
 {
@@ -29,7 +30,7 @@ namespace DragonSpark.Aspects.Coercion
 		public IntroduceCoercer( Type coercerType, Type implementationType )
 			: this( coercerType, Constructors.Default.Get( implementationType ).Get( coercerType ) ) {}
 
-		public IntroduceCoercer( Type coercerType, Func<object, object> factory ) : base( ParameterizedSourceTypeDefinition.Default, factory, coercerType.Adapt().GetImplementations( ParameterizedSourceTypeDefinition.Default.ReferencedType ) ) {}
+		public IntroduceCoercer( Type coercerType, Func<object, object> factory ) : base( ParameterizedSourceTypeDefinition.Default.Inverse(), factory, coercerType.Adapt().GetImplementations( ParameterizedSourceTypeDefinition.Default.ReferencedType ) ) {}
 
 		sealed class Constructors : Cache<Type, IParameterizedSource<Type, Func<object, ICoercerAdapter>>>
 		{

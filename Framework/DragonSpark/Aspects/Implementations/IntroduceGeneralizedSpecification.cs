@@ -18,10 +18,10 @@ namespace DragonSpark.Aspects.Implementations
 		public IntroduceGeneralizedSpecification( Type implementationType ) : this( Factory( implementationType ) ) {}
 
 		[UsedImplicitly]
-		public IntroduceGeneralizedSpecification( Func<object, object> factory ) : base( GeneralizedSpecificationTypeDefinition.Default, factory, GeneralizedSpecificationTypeDefinition.Default.ReferencedType ) {}
+		public IntroduceGeneralizedSpecification( Func<object, object> factory ) : base( GeneralizedSpecificationTypeDefinition.Default.Inverse(), factory, GeneralizedSpecificationTypeDefinition.Default.ReferencedType ) {}
 	}
 
-	sealed class DefaultGeneralizedSpecificationImplementation<T> : DelegatedAdapter<T, bool>, ISpecification<object>
+	class DefaultGeneralizedSpecificationImplementation<T> : DelegatedAdapter<T, bool>, ISpecification<object>
 	{
 		public DefaultGeneralizedSpecificationImplementation( ISpecification<T> implementation ) 
 			: base( 
@@ -29,5 +29,6 @@ namespace DragonSpark.Aspects.Implementations
 				  new Adapters.SpecificationAdapter<T>( implementation ).Get ) {}
 
 		public bool IsSatisfiedBy( object parameter ) => Get( Coerce( parameter ) );
+		
 	}
 }
