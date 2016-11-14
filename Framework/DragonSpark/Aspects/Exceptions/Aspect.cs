@@ -6,11 +6,11 @@ using System;
 
 namespace DragonSpark.Aspects.Exceptions
 {
-	//[MethodInterceptionAspectConfiguration( SerializerType = typeof(MsilAspectSerializer) )]
 	[ProvideAspectRole( StandardRoles.ExceptionHandling ), LinesOfCodeAvoided( 1 ),
 	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.ParameterValidation ),
 	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.EnhancedValidation ),
-	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation )
+	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, StandardRoles.Validation ),
+	 AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.After, KnownRoles.ValueConversion )
 	]
 	public sealed class Aspect : MethodInterceptionAspectBase
 	{

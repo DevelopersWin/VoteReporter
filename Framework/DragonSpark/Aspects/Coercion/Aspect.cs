@@ -6,7 +6,9 @@ using System;
 
 namespace DragonSpark.Aspects.Coercion
 {
-	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )]
+	[ProvideAspectRole( KnownRoles.ValueConversion ), LinesOfCodeAvoided( 1 ), 
+		AspectRoleDependency( AspectDependencyAction.Order, AspectDependencyPosition.Before, StandardRoles.Validation )
+		]
 	public sealed class Aspect : MethodInterceptionAspectBase
 	{
 		readonly static Func<object, ICoercerAdapter> Source = SourceCoercer<ICoercerAdapter>.Default.Get;
