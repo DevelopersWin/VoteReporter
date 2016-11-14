@@ -62,6 +62,7 @@
     <Compile Include="Aspects\Exceptions\ApplyExceptionPolicyTests.cs" />
     <Compile Include="Aspects\Implementations\ApplyGeneralizedImplementationsTests.cs" />
     <Compile Include="Aspects\ApplyAspectsAttributeTests.cs" />
+    <Compile Include="Aspects\LoggingSinkTests.cs" />
     <Compile Include="Aspects\Relay\ApplyRelaysTests.cs" />
     <Compile Include="Aspects\Specifications\ApplySpecificationTests.cs" />
     <Compile Include="Composition\SingletonExportFactoryTests.cs" />

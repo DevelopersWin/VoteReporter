@@ -75,6 +75,7 @@
     <Compile Include="FileSystem\PurgeDirectoryCommand.cs" />
     <Compile Include="FileSystem\TimestampNameSpecification.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Hasher.cs" />
     <Compile Include="InitializationCommand.cs" />
     <Compile Include="Initialize.cs" />
     <Compile Include="FileSystem\FileExtensionSpecificationBase.cs" />

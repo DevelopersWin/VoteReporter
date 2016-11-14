@@ -8,7 +8,7 @@ namespace DragonSpark.Sources.Parameterized
 		readonly Func<TParameter, TResult> source;
 		readonly Func<TParameter> parameterSource;
 
-		public SuppliedSource( Func<TParameter, TResult> source, TParameter parameter ) : this( source, Factory.For( parameter ) ) {}
+		public SuppliedSource( Func<TParameter, TResult> source, TParameter parameter ) : this( source, parameter.Enclose() ) {}
 
 		public SuppliedSource( Func<TParameter, TResult> source, Func<TParameter> parameterSource )
 		{

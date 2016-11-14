@@ -9,7 +9,7 @@ namespace DragonSpark.ComponentModel
 	{
 		readonly Func<object> value;
 
-		public DefaultValueProvider( object value ) : this( Factory.For( value ) ) {}
+		public DefaultValueProvider( object value ) : this( value.Self ) {}
 
 		public DefaultValueProvider( Func<object> value )
 		{

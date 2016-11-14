@@ -1,10 +1,11 @@
 using DragonSpark.Commands;
 using DragonSpark.Runtime;
 using Serilog;
+using System.Collections.Immutable;
 
 namespace DragonSpark.Diagnostics
 {
-	public abstract class LogCommandBase : CommandBase<object[]>
+	public abstract class LogCommandBase : CommandBase<ImmutableArray<object>>
 	{
 		readonly LogTemplate action;
 		readonly string messageTemplate;
@@ -16,9 +17,7 @@ namespace DragonSpark.Diagnostics
 			this.messageTemplate = messageTemplate;
 		}
 
-		public override void Execute( object[] parameter ) => action( messageTemplate, parameter );
-
-		public void ExecuteUsing( params object[] arguments ) => Execute( arguments );
+		public override void Execute( ImmutableArray<object> parameter ) => action( messageTemplate, parameter );
 	}
 
 	public abstract class LogCommandBase<T> : CommandBase<T>

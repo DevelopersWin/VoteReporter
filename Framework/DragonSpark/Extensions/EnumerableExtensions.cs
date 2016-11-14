@@ -130,6 +130,13 @@ namespace DragonSpark.Extensions
 			Array() : base( arg => new[] { arg } ) {}
 		}
 
+/*public static ImmutableArray<TItem> Item<TItem>( this TItem target ) where TItem : class => Items<TItem>.Default.Get( target );
+		sealed class Items<T> : DecoratedSourceCache<T, ImmutableArray<T>> where T : class
+		{
+			public static Items<T> Default { get; } = new Items<T>();
+			Items() : base( ImmutableArray.Create ) {}
+		}*/
+
 		public static IEnumerable<T> Append<T>( this T @this, params T[] second ) => @this.Append( second.AsEnumerable() );
 		public static IEnumerable<T> Append<T>( this T @this, IEnumerable<T> second ) => @this.Append_( second );
 

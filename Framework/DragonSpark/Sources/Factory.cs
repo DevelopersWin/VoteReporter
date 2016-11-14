@@ -6,9 +6,10 @@ namespace DragonSpark.Sources
 {
 	public static class Factory
 	{
-		public static T Self<T>( this T @this ) => @this;
-		public static TResult Wrap<TParameter, TResult>( this TResult @this, TParameter _ ) => @this;
+		public static T Self<T>( this T @this ) where T : class => @this;
 
-		public static Func<T> For<T>( T @this ) => ( typeof(T).GetTypeInfo().IsValueType ? new Source<T>( @this ) : @this.Sourced() ).Get;
+		public static TResult Accept<TParameter, TResult>( this TResult @this, TParameter _ ) => @this;
+
+		public static Func<T> Enclose<T>( this T @this ) => ( typeof(T).GetTypeInfo().IsValueType ? new Source<T>( @this ) : @this.Sourced() ).Get;
 	}
 }

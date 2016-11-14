@@ -101,6 +101,7 @@
     <Compile Include="Aspects\Implementations\DefaultGeneralizedParameterizedSource.cs" />
     <Compile Include="Aspects\Implementations\DefaultGeneralizedSpecificationImplementation.cs" />
     <Compile Include="Aspects\IntroduceInterfaceAspectBase.cs" />
+    <Compile Include="Aspects\LoggingSink.cs" />
     <Compile Include="Aspects\Relay\CommandRelayDefinition.cs" />
     <Compile Include="Aspects\Relay\IAspectFactory.cs" />
     <Compile Include="Aspects\Relay\SourceRelayDefinition.cs" />

@@ -1,4 +1,5 @@
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.TypeSystem;
 using DragonSpark.Windows.FileSystem;
 using JetBrains.Annotations;
@@ -16,6 +17,8 @@ namespace DragonSpark.Windows
 
 			AssemblyLoader.Default.Assign( o => Assembly.LoadFile );
 			AssemblyResourcePathSelector.Default.Assign( o => new AssemblyFilePathSelector().ToEqualityCache().Get );
+
+			Aspects.Hasher.Default.Assign( Hasher.Default.Scoped );
 		}
 	}
 }

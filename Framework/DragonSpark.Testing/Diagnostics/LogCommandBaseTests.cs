@@ -1,4 +1,5 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Commands;
+using DragonSpark.Diagnostics;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using Serilog;
@@ -13,7 +14,7 @@ namespace DragonSpark.Testing.Diagnostics
 		void Log( LogCommand command )
 		{
 			command.Execute( Items<object>.Default );
-			command.ExecuteUsing( new object() );
+			command.Execute( new object() );
 		}
 
 		[Theory, Framework.Application.AutoData]

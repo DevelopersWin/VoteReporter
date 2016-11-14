@@ -41,6 +41,7 @@ namespace DragonSpark.Sources.Scopes
 		public static Func<TParameter, TResult> Invoke<TParameter, TResult>( this Func<TParameter, TResult> @this, object _ ) => @this;
 		public static T Scoped<T>( this ISource<T> @this, object _ ) => @this.ToDelegate().Scoped( _ );
 		public static T Scoped<T>( this Func<T> @this, object _ ) => @this();
+		public static Func<TParameter, TResult> Scoped<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, object _ ) => @this.ToDelegate().Scoped( _ );
 		public static Func<TParameter, TResult> Scoped<TParameter, TResult>( this Func<TParameter, TResult> @this, object _ ) => @this.ToSingleton();
 		public static IEnumerable<IAlteration<T>> Scoped<T>( this IItemSource<IAlteration<T>> @this, object _ ) => @this.GetEnumerable();
 		
@@ -48,12 +49,12 @@ namespace DragonSpark.Sources.Scopes
 		public static void Assign<T>( this IAssignable<ImmutableArray<T>> @this, params T[] parameter ) => @this.Assign( (IEnumerable<T>)parameter );
 		public static void Assign<T>( this IAssignable<ImmutableArray<T>> @this, IEnumerable<T> parameter ) => @this.Assign( parameter.ToImmutableArray() );
 		public static void Assign<TParameter, TResult>( this IParameterizedScope<TParameter, TResult> @this, Func<TParameter, TResult> instance ) => @this.Assign( instance.Self );
-		public static void Assign<T>( this IScopeAware<T> @this, T instance ) => @this.Assign( Factory.For( instance ) );
-		public static void Assign<T>( this IScopeAware<T?> @this, T instance ) where T : struct => @this.Assign( Factory.For( new T?( instance ) ) );
+		public static void Assign<T>( this IScopeAware<T> @this, T instance ) => @this.Assign( instance.Enclose() );
+		public static void Assign<T>( this IScopeAware<T?> @this, T instance ) where T : struct => @this.Assign( new T?( instance ).Enclose() );
 
-		public static void Execute<T>( this ICommand<Func<T>> @this, T instance ) => @this.Execute( Factory.For( instance ) );
+		public static void Execute<T>( this ICommand<Func<T>> @this, T instance ) => @this.Execute( instance.Enclose() );
 		
-		public static IRunCommand ToCommand<T>( this IAssignable<Func<T>> @this, T instance ) => @this.ToCommand( Factory.For( instance ) );
+		public static IRunCommand ToCommand<T>( this IAssignable<Func<T>> @this, T instance ) => @this.ToCommand( instance.Enclose() );
 		public static IRunCommand ToCommand<T>( this IAssignable<Func<T>> @this, Func<T> factory ) => new AssignCommand<Func<T>>( @this ).WithParameter( factory );
 		
 		public static T WithInstance<T>( this IScope<T> @this, T instance )

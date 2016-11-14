@@ -16,7 +16,7 @@ namespace DragonSpark.Sources.Parameterized
 		public FirstSelector( params Func<TParameter, TResult>[] sources ) : this( Common<TResult>.Assigned, sources ) {}
 
 		public FirstSelector( ISpecification<TResult> specification, params Func<TParameter, TResult>[] sources )
-			: this( specification.ToDelegate().Wrap, sources ) {}
+			: this( specification.ToDelegate().Accept, sources ) {}
 
 		public FirstSelector( Func<TParameter, Func<TResult, bool>> specificationSource, params Func<TParameter, TResult>[] sources )
 			: this( specificationSource, new CompositeFactory<TParameter, TResult>( sources ) ) {}
