@@ -4,7 +4,6 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using ICommand = System.Windows.Input.ICommand;
 
@@ -20,8 +19,8 @@ namespace DragonSpark.Commands
 		public static void Execute<T>( this ISource<Action<T>> @this, T parameter ) => @this.ToDelegate().Execute( parameter );
 		public static void Execute<T>( this Func<Action<T>> @this, T parameter ) => @this().Invoke( parameter );
 
-		public static void ExecuteItem<T>( this ICommand<ImmutableArray<T>> @this, T parameter ) where T : class => Execute( @this, parameter.ToItem() );
-		public static void Execute<T>( this ICommand<ImmutableArray<T>> @this, IEnumerable<T> parameter ) => Execute( @this, parameter.Fixed() );
+		public static void ExecuteItem<T>( this ICommand<ImmutableArray<T>> @this, T parameter ) where T : class => Execute( @this, parameter.Fix() );
+		//public static void Execute<T>( this ICommand<ImmutableArray<T>> @this, IEnumerable<T> parameter ) => Execute( @this, parameter.Fixed() );
 		public static void Execute<T>( this ICommand<ImmutableArray<T>> @this, params T[] parameter ) => @this.Execute( parameter.ToImmutableArray() );
 
 		public static IDisposable AsExecuted( this IExecution @this )

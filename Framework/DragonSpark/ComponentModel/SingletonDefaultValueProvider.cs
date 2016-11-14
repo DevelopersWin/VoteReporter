@@ -15,7 +15,7 @@ namespace DragonSpark.ComponentModel
 		readonly Func<Type, Func<object, object>> accountedSource;
 
 		public SingletonDefaultValueProvider( Type hostType = null, string propertyName = nameof(SingletonLocator.Default) ) 
-			: this( new SingletonLocator( new SingletonDelegates( new SingletonProperties( new SpecifiedSingletonHostSpecification( hostType, propertyName.ToItem() ).Coerce<SingletonRequest, PropertyInfo>( request => request.Candidate ) ) ).Get ), Sources.Defaults.AccountedSource, hostType ) {}
+			: this( new SingletonLocator( new SingletonDelegates( new SingletonProperties( new SpecifiedSingletonHostSpecification( hostType, propertyName.Fix() ).Coerce<SingletonRequest, PropertyInfo>( request => request.Candidate ) ) ).Get ), Sources.Defaults.AccountedSource, hostType ) {}
 
 		[UsedImplicitly]
 		public SingletonDefaultValueProvider( IParameterizedSource<Type, object> provider, Func<Type, Func<object, object>> accountedSource, Type hostType = null )

@@ -41,7 +41,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		[Export( typeof(IExceptionDestructurer) ), UsedImplicitly]
 		class Destructurer : ExceptionDestructurer
 		{
-			public override Type[] TargetTypes => typeof(CustomException).ToItem();
+			public override Type[] TargetTypes => typeof(CustomException).Fix();
 
 			public override void Destructure( Exception exception, IDictionary<string, object> data, Func<Exception, IDictionary<string, object>> innerDestructure )
 			{

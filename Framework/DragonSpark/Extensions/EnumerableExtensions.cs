@@ -123,11 +123,11 @@ namespace DragonSpark.Extensions
 
 		public static IEnumerable<T> Yield<T>( this T @this ) => EnumerableEx.Return( @this );
 
-		public static TItem[] ToItem<TItem>( this TItem target ) where TItem : class => Array<TItem>.Default.Get( target );
-		class Array<T> : Cache<T, T[]> where T : class
+		public static T[] Fix<T>( this T target ) where T : class => Arrays<T>.Default.Get( target );
+		sealed class Arrays<T> : Cache<T, T[]> where T : class
 		{
-			public static Array<T> Default { get; } = new Array<T>();
-			Array() : base( arg => new[] { arg } ) {}
+			public static Arrays<T> Default { get; } = new Arrays<T>();
+			Arrays() : base( arg => new[] { arg } ) {}
 		}
 
 /*public static ImmutableArray<TItem> Item<TItem>( this TItem target ) where TItem : class => Items<TItem>.Default.Get( target );

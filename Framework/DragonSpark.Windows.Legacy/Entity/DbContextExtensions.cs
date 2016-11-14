@@ -40,7 +40,7 @@ namespace DragonSpark.Windows.Legacy.Entity
 		public static object ApplyChanges( this DbContext target, object entity )
 		{
 			var type = entity.GetType();
-			var items = target.GetEntityProperties( type ).SelectMany( x => type.GetProperty( x.Name ).GetValue( entity ).With( o => o.AsTo<IEnumerable, IEnumerable<object>>( enumerable => enumerable.Cast<object>().Select( target.ApplyChanges ), o.ToItem ) ) );
+			var items = target.GetEntityProperties( type ).SelectMany( x => type.GetProperty( x.Name ).GetValue( entity ).With( o => o.AsTo<IEnumerable, IEnumerable<object>>( enumerable => enumerable.Cast<object>().Select( target.ApplyChanges ), o.Fix ) ) );
 			
 			foreach ( var o in entity.Prepend( items ).Distinct() )
 			{
@@ -193,7 +193,7 @@ namespace DragonSpark.Windows.Legacy.Entity
 				{
 					foreach ( var z in associationNames.Select( y => type.GetProperty( y ).GetValue( entity ) ).WhereAssigned() )
 					{
-						var items = z.Adapt().GetInnerType() != null ? z.AsTo<IEnumerable, object[]>( a => a.Cast<object>().ToArray() ) : z.ToItem();
+						var items = z.Adapt().GetInnerType() != null ? z.AsTo<IEnumerable, object[]>( a => a.Cast<object>().ToArray() ) : z.Fix();
 
 						foreach ( var item in items )
 						{

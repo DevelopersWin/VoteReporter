@@ -15,6 +15,6 @@ namespace DragonSpark.Diagnostics
 			this.template = template;
 		}
 
-		public override IDisposable Get( MethodBase parameter ) => Logger.Default.Get( parameter ).TimeOperation( template, parameter.ToItem() );
+		public override IDisposable Get( MethodBase parameter ) => Logger.Default.Get( parameter ).TimeOperation( template, parameter.Fix() );
 	}
 }

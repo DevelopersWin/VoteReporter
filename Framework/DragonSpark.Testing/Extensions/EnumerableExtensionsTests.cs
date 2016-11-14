@@ -112,7 +112,7 @@ namespace DragonSpark.Testing.Extensions
 			Assert.Equal( item, items.First() );
 			Assert.Equal( sut.Last(), items.Last() );
 
-			var asItem = item.ToItem();
+			var asItem = item.Fix();
 			Assert.Single( asItem, item );
 		}
 

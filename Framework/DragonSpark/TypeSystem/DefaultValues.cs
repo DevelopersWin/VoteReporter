@@ -26,7 +26,7 @@ namespace DragonSpark.TypeSystem
 			static object Empty( Type parameter )
 			{
 				var type = parameter.Adapt().GetEnumerableType();
-				var result = type != null ? Support.Method.Make( type.ToItem() ).Invoke<Array>() : null;
+				var result = type != null ? Support.Method.Make( type.Fix() ).Invoke<Array>() : null;
 				return result;
 			}
 
