@@ -10,7 +10,7 @@ namespace DragonSpark.Aspects.Relay
 	{
 		public static CommandRelayDefinition Default { get; } = new CommandRelayDefinition();
 		CommandRelayDefinition() : base(
-			AspectSelection.Implementation.Accept( ValidatedCastCoercer<ITypeDefinition, IValidatedTypeDefinition>.Default ),
+			AspectSelection.Implementation.Allow( ValidatedCastCoercer<ITypeDefinition, IValidatedTypeDefinition>.Default ),
 			CommandTypeDefinition.Default
 		) {}
 

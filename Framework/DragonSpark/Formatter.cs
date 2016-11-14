@@ -11,7 +11,7 @@ namespace DragonSpark
 	{
 		[Export]
 		public static IFormatter Default { get; } = new Formatter();
-		Formatter() : this( DefaultImplementation.Implementation.Accept( ConstructCoercer<FormatterParameter>.Default ).ToCache(), DefaultImplementation.Implementation ) {}
+		Formatter() : this( DefaultImplementation.Implementation.Allow( ConstructCoercer<FormatterParameter>.Default ).ToCache(), DefaultImplementation.Implementation ) {}
 
 		readonly IParameterizedSource<object, string> general;
 

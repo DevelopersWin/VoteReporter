@@ -1,4 +1,4 @@
-using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources;
 
 namespace DragonSpark.Specifications
 {
@@ -8,6 +8,6 @@ namespace DragonSpark.Specifications
 	{
 		public OnlyOnceSpecification() : this( new ConditionMonitor() ) {}
 
-		public OnlyOnceSpecification( ConditionMonitor monitor ) : base( monitor.Wrap<T, ConditionMonitor>() ) {} 
+		public OnlyOnceSpecification( ConditionMonitor monitor ) : base( monitor.Accept ) {} 
 	}
 }

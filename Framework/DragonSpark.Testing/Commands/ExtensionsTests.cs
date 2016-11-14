@@ -31,7 +31,7 @@ namespace DragonSpark.Testing.Commands
 		public void Apply()
 		{
 			var command = new Command();
-			var sut = DragonSpark.Commands.Extensions.Accept( command, Coercer.Default );
+			var sut = command.Allow( Coercer.Default );
 			Assert.Null( Tags.Default.Get( command ) );
 			sut.Execute( GetType() );
 			Assert.Same( GetType().Assembly, Tags.Default.Get( command ) );

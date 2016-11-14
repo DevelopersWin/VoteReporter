@@ -21,7 +21,7 @@ namespace DragonSpark.Activation
 		readonly IParameterizedSource<ConstructTypeRequest, object> source;
 
 		[UsedImplicitly]
-		public Constructor( ISpecification<ConstructTypeRequest> specification, IParameterizedSource<ConstructTypeRequest, object> source ) : base( specification.Coerce( ConstructorCoercer.Default ), source.Accept( ConstructorCoercer.Default ).Get )
+		public Constructor( ISpecification<ConstructTypeRequest> specification, IParameterizedSource<ConstructTypeRequest, object> source ) : base( specification.Coerce( ConstructorCoercer.Default ), source.Allow( ConstructorCoercer.Default ).Get )
 		{
 			this.specification = specification;
 			this.source = source;

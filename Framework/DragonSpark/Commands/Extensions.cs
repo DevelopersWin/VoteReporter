@@ -14,9 +14,6 @@ namespace DragonSpark.Commands
 	{
 		public static ICommand<T> Apply<T>( this ICommand<T> @this, ISpecification<T> specification ) => new SpecificationCommand<T>( specification, @this.ToDelegate() );
 
-		public static CoercedCommand<TFrom, TParameter> Accept<TFrom, TParameter>( this ICommand<TParameter> @this, IParameterizedSource<TFrom, TParameter> coercer ) => @this.ToDelegate().Accept( coercer );
-		public static CoercedCommand<TFrom, TParameter> Accept<TFrom, TParameter>( this Action<TParameter> @this, IParameterizedSource<TFrom, TParameter> coercer ) => new CoercedCommand<TFrom,TParameter>( coercer, @this );
-
 		public static void Execute<T>( this ISource<ICommand<T>> @this, T parameter ) => @this.ToDelegate().Execute( parameter );
 		public static void Execute<T>( this Func<ICommand<T>> @this, T parameter ) => @this().Execute( parameter );
 
@@ -104,18 +101,18 @@ namespace DragonSpark.Commands
 			SpecificationCache() : base( command => new DelegatedSpecification<T>( command.IsSatisfiedBy ) ) {}
 		}
 
-		public static Action<T> Wrap<T>( this Action @this ) => Wrappers<T>.Default.Get( @this );
+		public static Action<T> Accept<T>( this Action @this ) => Wrappers<T>.Default.Get( @this );
 		sealed class Wrappers<T> : Cache<Action, Action<T>>
 		{
 			public static Wrappers<T> Default { get; } = new Wrappers<T>();
-			Wrappers() : base( result => new Wrapper<T>( result ).Execute ) {}
+			Wrappers() : base( result => new CommandAdapter<T>( result ).Execute ) {}
 		}
 
-		sealed class Wrapper<T> : CommandBase<T>
+		sealed class CommandAdapter<T> : CommandBase<T>
 		{
 			readonly Action action;
 
-			public Wrapper( Action action )
+			public CommandAdapter( Action action )
 			{
 				this.action = action;
 			}

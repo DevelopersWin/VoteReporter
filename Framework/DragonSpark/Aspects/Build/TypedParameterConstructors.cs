@@ -1,4 +1,5 @@
 using DragonSpark.Activation;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using PostSharp.Aspects;
@@ -19,6 +20,6 @@ namespace DragonSpark.Aspects.Build
 			ParameterConstructor<TParameter, TResult>
 				.Default
 				.WithParameter( source.WithParameter( parameter ).Get )
-				.Wrap();
+				.Accept;
 	}
 }

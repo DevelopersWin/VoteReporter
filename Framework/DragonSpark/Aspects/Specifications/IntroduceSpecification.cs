@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Aspects.Adapters;
 using DragonSpark.Aspects.Definitions;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
@@ -19,7 +20,7 @@ namespace DragonSpark.Aspects.Specifications
 					.Get( implementationType )
 					.Get( specificationType )
 					.WithParameter( Activator.Default.WithParameter( specificationType ).Get )
-					.Wrap() ) {}
+					.Accept ) {}
 
 		public IntroduceSpecification( Type specificationType, Func<object, object> factory ) 
 			: base( DragonSpark.Specifications.Extensions.Inverse( SpecificationTypeDefinition.Default ), factory, specificationType.Adapt().GetImplementations( SpecificationTypeDefinition.Default.ReferencedType ) ) {}

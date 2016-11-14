@@ -38,7 +38,7 @@ namespace DragonSpark.Diagnostics
 		[UsedImplicitly]
 		public sealed class Factory : ParameterizedSourceBase<LoggerConfiguration, ILogger>
 		{
-			public static IParameterizedScope<Serilog.LoggerConfiguration, ILogger> Implementation { get; } = Sources.Coercion.Extensions.Accept( new Factory(), ValidatedCastCoercer<Serilog.LoggerConfiguration, LoggerConfiguration>.Default ).ToScope();
+			public static IParameterizedScope<Serilog.LoggerConfiguration, ILogger> Implementation { get; } = Sources.Coercion.Extensions.Allow( new Factory(), ValidatedCastCoercer<Serilog.LoggerConfiguration, LoggerConfiguration>.Default ).ToScope();
 			Factory() {}
 
 			public override ILogger Get( LoggerConfiguration parameter ) => 

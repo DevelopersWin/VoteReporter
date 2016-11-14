@@ -7,8 +7,8 @@ namespace DragonSpark.Sources.Scopes
 	public class ParameterizedSingletonScope<TParameter, TResult> : ParameterizedScope<TParameter, TResult>
 	{
 		public ParameterizedSingletonScope() : this( parameter => default(TResult) ) {}
-		public ParameterizedSingletonScope( TResult instance ) : this( instance.Wrap<TParameter, TResult>() ) {}
-		public ParameterizedSingletonScope( Func<TParameter, TResult> factory ) : base( new Func<object, Func<TParameter, TResult>>( Caches.Create( factory.ToSingleton ).Get ) ) {}
+		public ParameterizedSingletonScope( TResult instance ) : this( new Func<TParameter, TResult>( instance.Enclose().Accept ) ) {}
+		public ParameterizedSingletonScope( Func<TParameter, TResult> factory ) : base( Caches.Create( factory.ToSingleton ).ToDelegate() ) {}
 		public ParameterizedSingletonScope( Func<object, Func<TParameter, TResult>> global ) : base( global.ToSingleton() ) {}
 
 		public override void Assign( Func<Func<TParameter, TResult>> item ) => base.Assign( item.ToSingleton() );

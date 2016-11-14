@@ -8,7 +8,7 @@ namespace DragonSpark.Aspects.Validation
 	{
 		public static Definition Default { get; } = new Definition();
 		Definition() : base(
-			AspectSelection.Default.Accept( ValidatedCastCoercer<ITypeDefinition, IValidatedTypeDefinition>.Default ),
+			AspectSelection.Default.Allow( ValidatedCastCoercer<ITypeDefinition, IValidatedTypeDefinition>.Default ),
 			
 			ParameterizedSourceTypeDefinition.Default, 
 			RunCommandTypeDefinition.Default, 
