@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
-	sealed class InstanceConstructors : StructuralCache<TypeInfo, ImmutableArray<ConstructorInfo>>
+	sealed class InstanceConstructors : DecoratedSourceCache<TypeInfo, ImmutableArray<ConstructorInfo>>
 	{
 		public static InstanceConstructors Default { get; } = new InstanceConstructors();
 		InstanceConstructors() : base( info => info.DeclaredConstructors.Where( constructorInfo => constructorInfo.IsPublic && !constructorInfo.IsStatic ).ToImmutableArray() ) {}

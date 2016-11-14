@@ -1,9 +1,9 @@
-using System;
-using System.Linq;
-using System.Reflection;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace DragonSpark.Composition
 {

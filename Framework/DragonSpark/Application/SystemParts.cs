@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Extensions;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using System;
@@ -13,7 +14,7 @@ namespace DragonSpark.Application
 		[UsedImplicitly]
 		public SystemParts( IEnumerable<Assembly> assemblies ) : this( assemblies.ToImmutableArray() ) {}
 
-		SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, TypesFactory.Default.Get( assemblies ) ) {}
+		SystemParts( ImmutableArray<Assembly> assemblies ) : this( assemblies, assemblies.SelectMany( TypesFactory.Default.GetEnumerable ).ToImmutableArray() ) {}
 
 		public SystemParts( IEnumerable<Type> types ) : this( types.Fixed() ) {}
 

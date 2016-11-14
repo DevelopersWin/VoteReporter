@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -9,6 +10,9 @@ namespace DragonSpark.Extensions
 		public static IEnumerable<T> AsEnumerable<T>( this ImmutableArray<T> source ) => source.ToArray();
 
 		public static IEnumerable<T> Distinct<T>( this ImmutableArray<T> first ) => first.ToArray().Distinct();
+
+		public static IEnumerable<TResult> SelectMany<TSource, TResult>(this ImmutableArray<TSource> @this, Func<TSource, IEnumerable<TResult>> selector)
+			=> @this.ToArray().SelectMany( selector );
 
 		public static IEnumerable<T> Union<T>( this ImmutableArray<T> first, IEnumerable<T> second ) => first.ToArray().Union( second );
 

@@ -1,4 +1,5 @@
 using DragonSpark.Configuration;
+using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -9,6 +10,7 @@ using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace DragonSpark.Aspects
@@ -71,9 +73,22 @@ namespace DragonSpark.Aspects
 		abstract class InstanceFreezeBase : FreezeAttribute, IParameterAwareHandler, IMethodAware
 		{
 			readonly IParameterAwareHandler handler;
-			protected InstanceFreezeBase( IParameterAwareHandler handler, MethodInfo method )
+			readonly Func<Arguments, object> argumentSource;
+			readonly IExtendedDictionary<object, object> dictionary;
+
+			protected InstanceFreezeBase( MethodInfo method, Func<Arguments, object> argumentSource ) : this( method, argumentSource, EqualityComparer<object>.Default ) {}
+
+			protected InstanceFreezeBase( MethodInfo method, IEqualityComparer<object> comparer ) : this( method, arguments => arguments.ToArray(), comparer ) {}
+
+			InstanceFreezeBase( MethodInfo method, Func<Arguments, object> argumentSource, IEqualityComparer<object> comparer ) 
+				: this( method, argumentSource, new ExtendedDictionary<object, object>( comparer ) ) {}
+			InstanceFreezeBase( MethodInfo method, Func<Arguments, object> argumentSource, IExtendedDictionary<object, object> dictionary ) 
+				: this( new CacheParameterHandler<object, object>( new DictionaryCache<object, object>( dictionary ) ), method, argumentSource, dictionary ) {}
+			InstanceFreezeBase( IParameterAwareHandler handler, MethodInfo method, Func<Arguments, object> argumentSource, IExtendedDictionary<object, object> dictionary )
 			{
 				this.handler = handler;
+				this.argumentSource = argumentSource;
+				this.dictionary = dictionary;
 				Method = method;
 			}
 
@@ -82,34 +97,18 @@ namespace DragonSpark.Aspects
 			public bool Handle( object parameter, out object handled ) => handler.Handle( parameter, out handled );
 
 			public MethodInfo Method { get; }
+
+			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = dictionary.GetOrAdd( argumentSource( args.Arguments ), args.GetReturnValue );
 		}
 
 		sealed class SingleParameterFreeze : InstanceFreezeBase
 		{
-			readonly IArgumentCache<object, object> cache;
-
-			public SingleParameterFreeze( MethodInfo method ) : this( new StructuralCache<object, object>(), method ) {}
-
-			SingleParameterFreeze( IArgumentCache<object, object> cache, MethodInfo method ) : base( new CacheParameterHandler<object, object>( cache ), method  )
-			{
-				this.cache = cache;
-			}
-
-			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = cache.GetOrSet( args.Arguments[0], args.GetReturnValue );
+			public SingleParameterFreeze( MethodInfo method ) : base( method, arguments => arguments[0] ) {}
 		}
 
 		sealed class Freeze : InstanceFreezeBase
 		{
-			readonly IArgumentCache<object[], object> cache;
-
-			public Freeze( MethodInfo method ) : this( new StructuralCache<object[], object>(), method ) {}
-
-			Freeze( IArgumentCache<object[], object> cache, MethodInfo method ) : base( new CacheParameterHandler<object[], object>( cache ), method  )
-			{
-				this.cache = cache;
-			}
-
-			public override void OnInvoke( MethodInterceptionArgs args ) => args.ReturnValue = cache.GetOrSet( args.Arguments.ToArray(), args.GetReturnValue );
+			public Freeze( MethodInfo method ) : base( method, StructuralEqualityComparer<object>.Default ) {}
 		}
 	}
 }

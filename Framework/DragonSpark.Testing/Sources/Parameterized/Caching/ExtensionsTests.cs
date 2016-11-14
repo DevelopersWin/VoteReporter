@@ -3,7 +3,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Sources.Parameterized.Caching
 {
-	public class CacheExtensionsTests
+	public class ExtensionsTests
 	{
 		[Fact]
 		public void SetOrClear()

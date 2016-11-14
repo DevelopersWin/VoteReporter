@@ -284,6 +284,7 @@
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AppliedAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\AmbientContext.cs" />
+    <Compile Include="Sources\Parameterized\Caching\DelegatedCache.cs" />
     <Compile Include="Sources\Parameterized\CompositeFactory.cs" />
     <Compile Include="Sources\Parameterized\ConditionalInstanceParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\ConditionalParameterizedSource.cs" />
@@ -471,7 +472,6 @@
     <Compile Include="Sources\Parameterized\ConstructFromKnownTypes.cs" />
     <Compile Include="Sources\Parameterized\Defaults.cs" />
     <Compile Include="Sources\Parameterized\SuppliedSource.cs" />
-    <Compile Include="Sources\Parameterized\Caching\IArgumentCache.cs" />
     <Compile Include="Sources\Parameterized\IParameterAwareHandler.cs" />
     <Compile Include="Sources\Delegates\IsParameterizedSourceSpecification.cs" />
     <Compile Include="Sources\Delegates\IsSourceSpecification.cs" />
@@ -615,7 +615,6 @@
     <Compile Include="Diagnostics\Configurations\EnrichFromLogContextCommand.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\IAlteration.cs" />
-    <Compile Include="Sources\Parameterized\Caching\StructuralCache.cs" />
     <Compile Include="Application\Execution.cs" />
     <Compile Include="Aspects\FreezeAttribute.cs" />
     <Compile Include="Aspects\ApplyDefaultValues.cs" />
@@ -656,14 +655,13 @@
     <Compile Include="Sources\Parameterized\Caching\AmbientStack.cs" />
     <Compile Include="Sources\Parameterized\Caching\Cache.cs" />
     <Compile Include="Sources\Parameterized\Caching\CacheBase.cs" />
-    <Compile Include="Sources\Parameterized\Caching\CacheExtensions.cs" />
+    <Compile Include="Sources\Parameterized\Caching\Extensions.cs" />
     <Compile Include="Sources\Parameterized\Caching\Caches.cs" />
     <Compile Include="Sources\Parameterized\Caching\Condition.cs" />
     <Compile Include="Sources\Parameterized\Caching\DecoratedCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\EqualityReference.cs" />
     <Compile Include="Sources\Parameterized\Caching\EqualityReferenceCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\CacheWithImplementedFactoryBase.cs" />
-    <Compile Include="Sources\Parameterized\Caching\IAtomicCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\ICache.cs" />
     <Compile Include="Sources\Parameterized\Caching\ICacheRegistry.cs" />
     <Compile Include="Sources\Parameterized\Caching\IStackSource.cs" />

@@ -4,6 +4,7 @@ using DragonSpark.Activation;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Extensions
@@ -15,8 +16,9 @@ namespace DragonSpark.Extensions
 
 		readonly IActivator activatorSource;
 
-		readonly IArgumentCache<TypePair, IMapper> mappers = new StructuralCache<TypePair, IMapper>( Factory.Implementation.Get );
+		readonly ICache<TypePair, IMapper> mappers = new ExtendedDictionaryCache<TypePair, IMapper>( Factory.Implementation.Get );
 
+		[UsedImplicitly]
 		public ObjectMapper( IActivator activatorSource )
 		{
 			this.activatorSource = activatorSource;

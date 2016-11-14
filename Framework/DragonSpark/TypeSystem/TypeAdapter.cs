@@ -32,11 +32,8 @@ namespace DragonSpark.TypeSystem
 		{
 			public DefaultImplementation( Type context ) : base( context ) {}
 
-			public override bool IsSatisfiedBy( Type parameter )
-			{
-
-				return Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( Context ) || Info.IsAssignableFrom( parameter.GetTypeInfo() ) || Nullable.GetUnderlyingType( parameter ) == Context;
-			}
+			public override bool IsSatisfiedBy( Type parameter ) => 
+				Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( Context ) || Info.IsAssignableFrom( parameter.GetTypeInfo() ) || Nullable.GetUnderlyingType( parameter ) == Context;
 		}
 	}
 

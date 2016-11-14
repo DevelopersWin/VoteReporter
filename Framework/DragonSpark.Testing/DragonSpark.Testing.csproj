@@ -83,6 +83,7 @@
     <Compile Include="Sources\ExtensionsTests.cs" />
     <Compile Include="Sources\Parameterized\AlterationAdapterTests.cs" />
     <Compile Include="Sources\Parameterized\AppliedAlterationTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\DictionaryCacheTests.cs" />
     <Compile Include="Sources\Parameterized\ConditionalParameterizedSourceTests.cs" />
     <Compile Include="Sources\Parameterized\ExtensionsTests.cs" />
     <Compile Include="Sources\Scopes\ParameterizedScopeTests.cs" />
@@ -121,8 +122,7 @@
     <Compile Include="Runtime\Assignments\CollectionAssignTests.cs" />
     <Compile Include="Runtime\ValueTupleTests.cs" />
     <Compile Include="Runtime\WeakListTests.cs" />
-    <Compile Include="Sources\Parameterized\Caching\StructuralCacheTests.cs" />
-    <Compile Include="Sources\Parameterized\Caching\CacheExtensionsTests.cs" />
+    <Compile Include="Sources\Parameterized\Caching\ExtensionsTests.cs" />
     <Compile Include="Sources\Parameterized\Caching\CachesTests.cs" />
     <Compile Include="Sources\Parameterized\Caching\CacheTests.cs" />
     <Compile Include="Sources\Parameterized\Caching\ConditionTests.cs" />

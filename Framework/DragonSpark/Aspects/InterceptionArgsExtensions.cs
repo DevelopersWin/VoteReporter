@@ -4,6 +4,8 @@ namespace DragonSpark.Aspects
 {
 	public static class InterceptionArgsExtensions
 	{
+		public static object GetReturnValue( this MethodInterceptionArgs @this, object _ ) => @this.GetReturnValue();
+
 		public static object GetReturnValue( this MethodInterceptionArgs @this )
 		{
 			@this.Proceed();

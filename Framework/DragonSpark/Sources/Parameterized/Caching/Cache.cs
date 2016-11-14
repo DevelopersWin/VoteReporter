@@ -9,7 +9,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 		public Cache( Func<object, T> create ) : base( create ) {}
 	}
 
-	public class Cache<TInstance, TValue> : CacheBase<TInstance, TValue>, IAtomicCache<TInstance, TValue> where TInstance : class where TValue : class
+	public class Cache<TInstance, TValue> : CacheBase<TInstance, TValue>/*, IAtomicCache<TInstance, TValue>*/ where TInstance : class where TValue : class
 	{
 		readonly ConditionalWeakTable<TInstance, TValue>.CreateValueCallback create;
 
@@ -43,6 +43,6 @@ namespace DragonSpark.Sources.Parameterized.Caching
 		
 		public override bool Remove( TInstance instance ) => items.Remove( instance );
 
-		public TValue GetOrSet( TInstance key, Func<TInstance, TValue> factory ) => items.GetValue( key, new ConditionalWeakTable<TInstance, TValue>.CreateValueCallback( factory ) );
+		// public TValue GetOrSet( TInstance key, Func<TInstance, TValue> factory ) => items.GetValue( key, new ConditionalWeakTable<TInstance, TValue>.CreateValueCallback( factory ) );
 	}
 }
