@@ -7,6 +7,6 @@ namespace DragonSpark.Aspects.Validation
 	public sealed class ParameterizedSourceAdapterFactory : GenericAdapterFactory<object, IParameterValidationAdapter>
 	{
 		public static ParameterizedSourceAdapterFactory Default { get; } = new ParameterizedSourceAdapterFactory();
-		ParameterizedSourceAdapterFactory() : base( typeof(ISpecification<>), typeof(IParameterizedSource<,>), typeof(SourceAdapter<,>) ) {}
+		ParameterizedSourceAdapterFactory() : base( typeof(ISpecification<>), typeof(IParameterizedSource<,>), typeof(ParameterizedSourceAdapter<,>) ) {}
 	}
 }

@@ -183,7 +183,7 @@
     <Compile Include="Aspects\Adapters\AdapterBase.cs" />
     <Compile Include="Aspects\InstanceAspectBase.cs" />
     <Compile Include="Aspects\Validation\ParameterizedSourceTypeDefinition.cs" />
-    <Compile Include="Aspects\Validation\SourceAdapter.cs" />
+    <Compile Include="Aspects\Validation\ParameterizedSourceAdapter.cs" />
     <Compile Include="Aspects\Validation\ParameterizedSourceAdapterFactory.cs" />
     <Compile Include="Aspects\Validation\ApplyAutoValidation.cs" />
     <Compile Include="Aspects\Validation\AutoValidationExecuteAspect.cs" />
@@ -484,7 +484,6 @@
     <Compile Include="Sources\Parameterized\Alter.cs" />
     <Compile Include="Sources\Parameterized\AlterationBase.cs" />
     <Compile Include="Sources\Parameterized\TypeLocatorBase.cs" />
-    <Compile Include="Sources\Parameterized\SourceAdapter.cs" />
     <Compile Include="Sources\TimedDelegatedSource.cs" />
     <Compile Include="Tasks\TaskMonitorContext.cs" />
     <Compile Include="Tasks\TaskMonitors.cs" />

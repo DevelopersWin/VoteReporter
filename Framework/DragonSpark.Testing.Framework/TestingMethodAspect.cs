@@ -9,7 +9,6 @@ using PostSharp.Aspects.Dependencies;
 using PostSharp.Aspects.Serialization;
 using System;
 using System.Reflection;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace DragonSpark.Testing.Framework
@@ -44,7 +43,7 @@ namespace DragonSpark.Testing.Framework
 				finally
 				{
 					var disposable = (IDisposable)CurrentApplication.Default.Get() ?? ExecutionContext.Default.Get();
-					args.ReturnValue = Defer.Run( new Action( disposable.Dispose ).Accept<Task>(), args.ReturnValue );
+					args.ReturnValue = Defer.Run( new Action( disposable.Dispose ).Accept, args.ReturnValue );
 				}
 			}
 			else

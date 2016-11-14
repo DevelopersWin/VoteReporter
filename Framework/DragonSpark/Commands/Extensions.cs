@@ -101,25 +101,8 @@ namespace DragonSpark.Commands
 			SpecificationCache() : base( command => new DelegatedSpecification<T>( command.IsSatisfiedBy ) ) {}
 		}
 
-		public static Action<T> Accept<T>( this Action @this ) => Wrappers<T>.Default.Get( @this );
-		sealed class Wrappers<T> : Cache<Action, Action<T>>
-		{
-			public static Wrappers<T> Default { get; } = new Wrappers<T>();
-			Wrappers() : base( result => new CommandAdapter<T>( result ).Execute ) {}
-		}
-
-		sealed class CommandAdapter<T> : CommandBase<T>
-		{
-			readonly Action action;
-
-			public CommandAdapter( Action action )
-			{
-				this.action = action;
-			}
-
-			public override void Execute( T parameter ) => action();
-		}
-
+		public static void Accept<T>( this Action @this, T _ ) => @this.Invoke();
+		
 		public static Action<T> Timed<T>( this ICommand<T> @this ) => @this.ToDelegate().Timed();
 		public static Action<T> Timed<T>( this Action<T> @this ) => Timed( @this, Sources.Defaults.ParameterizedTimerTemplate );
 		public static Action<T> Timed<T>( this Action<T> @this, string template ) => new TimedDelegatedCommand<T>( @this, template ).Execute;

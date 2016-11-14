@@ -42,14 +42,6 @@ namespace DragonSpark.Sources.Parameterized
 		public static ISource<TResult> WithParameter<TParameter, TResult>( this Func<TParameter, TResult> @this, TParameter parameter ) => @this.WithParameter( parameter.Enclose() );
 		public static ISource<TResult> WithParameter<TParameter, TResult>( this Func<TParameter, TResult> @this, Func<TParameter> parameter ) => new SuppliedSource<TParameter, TResult>( @this, parameter );
 
-		// public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this TResult @this ) => @this.Enclose<TParameter, TResult>();
-		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this ISource<TResult> @this ) => new Func<TResult>( @this.Get ).Wrap<TParameter, TResult>();
-
-		/*public static Func<object, T> Wrap<T>( this ISource<T> @this ) => @this.ToDelegate().Accept;*/
-		// public static Func<object, T> Wrap<T>( this Func<T> @this ) => @this.Wrap<object, T>();
-
-		public static Func<TParameter, TResult> Wrap<TParameter, TResult>( this Func<TResult> @this ) => new SourceAdapter<TParameter, TResult>( @this ).Get;
-
 		public static Func<TToParameter, TToResult> Convert<TFromParameter, TFromResult, TToParameter, TToResult>( this Func<TFromParameter, TFromResult> @this ) => ParameterizedDelegates<TFromParameter, TFromResult, TToParameter, TToResult>.Default.Get( @this );
 		sealed class ParameterizedDelegates<TFromParameter, TFromResult, TToParameter, TToResult> : Cache<Func<TFromParameter, TFromResult>, Func<TToParameter, TToResult>>
 		{

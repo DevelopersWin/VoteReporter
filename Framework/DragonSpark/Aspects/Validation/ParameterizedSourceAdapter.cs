@@ -7,10 +7,10 @@ using System.Reflection;
 
 namespace DragonSpark.Aspects.Validation
 {
-	public sealed class SourceAdapter<TParameter, TResult> : ParameterValidationAdapterBase<TParameter>
+	public sealed class ParameterizedSourceAdapter<TParameter, TResult> : ParameterValidationAdapterBase<TParameter>
 	{
 		readonly static Func<MethodInfo, bool> Method = MethodEqualitySpecification.For( typeof(IParameterizedSource<TParameter, TResult>).GetTypeInfo().GetDeclaredMethod( nameof(ISourceAware.Get) ) );
 
-		public SourceAdapter( ISpecification<TParameter> inner ) : base( inner, Method ) {}
+		public ParameterizedSourceAdapter( ISpecification<TParameter> inner ) : base( inner, Method ) {}
 	}
 }
