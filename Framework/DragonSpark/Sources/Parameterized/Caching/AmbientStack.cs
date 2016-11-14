@@ -18,7 +18,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 	public static class AmbientStack
 	{
-		readonly static IGenericMethodContext<Invoke> Method = typeof(AmbientStack).Adapt().GenericFactoryMethods[nameof(GetCurrentItem)];
+		readonly static IGenericMethodContext<Invoke> Method = typeof(AmbientStack).GetFactory( nameof(GetCurrentItem) );
 
 		public static object GetCurrentItem( Type type ) => Method.Make( type ).Invoke<object>();
 

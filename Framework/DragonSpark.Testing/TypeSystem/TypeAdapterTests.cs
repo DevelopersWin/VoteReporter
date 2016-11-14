@@ -33,7 +33,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void Coverage_GenericMethods()
 		{
-			GetType().Adapt().GenericFactoryMethods[nameof( Generic )].Make( typeof(int) );
+			GetType().GetFactory( nameof(Generic) ).Make( typeof(int) );
 		}
 
 		public static Type Generic<T>( int number ) where T : IAspect => typeof(T);

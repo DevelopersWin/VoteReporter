@@ -14,7 +14,7 @@ namespace DragonSpark.Sources.Delegates
 		protected DelegatesBase( Func<Type, object> locator, ISpecification<Type> specification, string name ) : base( specification )
 		{
 			Locator = locator;
-			Methods = GetType().Adapt().GenericFactoryMethods[ name ];
+			Methods = GetType().GetFactory( name );
 		}
 
 		protected Func<Type, object> Locator { get; }

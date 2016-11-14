@@ -6,7 +6,7 @@ namespace DragonSpark.Sources.Parameterized
 	sealed class AutoValidatingSource<TParameter, TResult> : AutoValidatingSourceBase<TParameter, TResult>, IParameterizedSource<TParameter, TResult>, ISpecification<TParameter>
 	{
 		public AutoValidatingSource( ISpecification<TParameter> specification, IParameterizedSource<TParameter, TResult> inner ) : 
-			base( new AutoValidationController( new Aspects.Validation.ParameterizedSourceAdapter<TParameter, TResult>( specification ) ), specification.IsSatisfiedBy, inner.Get )
+			base( new AutoValidationController( new ParameterizedSourceAdapter<TParameter, TResult>( specification ) ), specification.IsSatisfiedBy, inner.Get )
 		{}
 	}
 }

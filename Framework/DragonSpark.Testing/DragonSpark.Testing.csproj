@@ -184,7 +184,7 @@
     <Compile Include="Specifications\SpecificationWithContextBaseTests.cs" />
     <Compile Include="Specifications\SpecificationsTests.cs" />
     <Compile Include="Specifications\ExtensionsTests.cs" />
-    <Compile Include="Specifications\TypeAssignableSpecificationTests.cs" />
+    <Compile Include="TypeSystem\TypeAssignableSpecificationTests.cs" />
     <Compile Include="Extensions\DictionaryExtensionsTests.cs">
       <SubType>Code</SubType>
     </Compile>

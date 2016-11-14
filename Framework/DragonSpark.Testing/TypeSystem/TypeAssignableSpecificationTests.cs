@@ -1,8 +1,8 @@
-﻿using DragonSpark.Specifications;
-using DragonSpark.Testing.Objects;
+﻿using DragonSpark.Testing.Objects;
+using DragonSpark.TypeSystem;
 using Xunit;
 
-namespace DragonSpark.Testing.Specifications
+namespace DragonSpark.Testing.TypeSystem
 {
 	public class TypeAssignableSpecificationTests
 	{

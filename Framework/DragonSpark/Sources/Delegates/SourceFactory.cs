@@ -23,7 +23,7 @@ namespace DragonSpark.Sources.Delegates
 		SourceFactory( Func<Type, Delegate> factory )
 		{
 			this.factory = factory;
-			methods = GetType().Adapt().GenericFactoryMethods[nameof(ToResult)];
+			methods = GetType().GetFactory( nameof(ToResult) );
 		}
 
 		public override object Get( Type parameter )

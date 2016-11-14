@@ -1,13 +1,14 @@
 using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace DragonSpark.Activation
 {
 	public sealed class ConstructTypeRequest : IEquatable<ConstructTypeRequest>
 	{
-		readonly static StructuralEqualityComparer<object[]> Comparer = StructuralEqualityComparer<object[]>.Default;
+		readonly static IEqualityComparer<object[]> Comparer = StructuralEqualityComparer<object[]>.Default;
 
 		readonly int code;
 

@@ -2,6 +2,8 @@ using DragonSpark.Aspects;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
+using JetBrains.Annotations;
 using System;
 using System.Composition.Hosting.Core;
 
@@ -16,6 +18,7 @@ namespace DragonSpark.Composition
 
 		public SourceDelegateContractResolver( [OfSourceType]Type sourceDelegateType ) : this( sourceDelegateType, ResultTypeLocator ) {}
 
+		[UsedImplicitly]
 		public SourceDelegateContractResolver( [OfSourceType]Type sourceDelegateType, Func<Type, Type> resultTypeLocator ) : 
 			base( TypeAssignableSpecification<Delegate>.Default.And( GenericTypeAssignableSpecification.Defaults.Get( sourceDelegateType ) ).Coerce<CompositionContract, Type>( contract => contract.ContractType ), new Inner( resultTypeLocator ).Get ) {}
 

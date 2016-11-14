@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Runtime;
 using DragonSpark.TypeSystem;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -8,7 +9,9 @@ namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class StructuralCache<TArgument, TValue> : CacheBase<TArgument, TValue>, IArgumentCache<TArgument, TValue>
 	{
-		static IEqualityComparer<TArgument> EqualityComparer { get; } = typeof(TArgument).IsStructural() ? (IEqualityComparer<TArgument>)StructuralEqualityComparer<TArgument>.Default : EqualityComparer<TArgument>.Default;
+		static IEqualityComparer<TArgument> EqualityComparer { get; } = 
+			TypeAssignableSpecification<IStructuralEquatable>.Default.IsSatisfiedBy( typeof(TArgument) )
+			? StructuralEqualityComparer<TArgument>.Default : EqualityComparer<TArgument>.Default;
 
 		readonly Func<TArgument, TValue> body;
 		readonly ConcurrentDictionary<TArgument, TValue> store = new ConcurrentDictionary<TArgument, TValue>( EqualityComparer );

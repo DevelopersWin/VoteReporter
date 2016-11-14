@@ -32,7 +32,7 @@ namespace DragonSpark.TypeSystem
 
 			static class Support
 			{
-				public static IGenericMethodContext<Invoke> Method { get; } = typeof(Enumerable).Adapt().GenericFactoryMethods[nameof(Enumerable.Empty)];
+				public static IGenericMethodContext<Invoke> Method { get; } = typeof(Enumerable).GetFactory( nameof(Enumerable.Empty) );
 			}
 		}
 	}

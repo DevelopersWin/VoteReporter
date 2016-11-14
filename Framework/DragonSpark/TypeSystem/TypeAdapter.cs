@@ -1,9 +1,13 @@
 using DragonSpark.Application;
 using DragonSpark.Aspects;
+using DragonSpark.Expressions;
 using DragonSpark.Extensions;
+using DragonSpark.Sources.Coercion;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem.Generics;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -12,11 +16,67 @@ using System.Reflection;
 
 namespace DragonSpark.TypeSystem
 {
+	public sealed class TypeAssignableSpecification<T> : DelegatedSpecification<Type>
+	{
+		public static ISpecification<Type> Default { get; } = new TypeAssignableSpecification<T>();
+		TypeAssignableSpecification() : base( TypeAssignableSpecification.Delegates.Get( typeof(T) ) ) {}
+	}
+
+	public sealed class TypeAssignableSpecification : SpecificationCache<Type>
+	{
+		public static TypeAssignableSpecification Default { get; } = new TypeAssignableSpecification();
+		public static IParameterizedSource<Type, Func<Type, bool>> Delegates { get; } = new Cache<Type, Func<Type, bool>>( Default.To( DelegateCoercer.Default ).Get );
+		TypeAssignableSpecification() : base( type => new DefaultImplementation( type ).ToCachedSpecification() ) {}
+
+		sealed class DefaultImplementation : TypeSpecificationBase
+		{
+			public DefaultImplementation( Type context ) : base( context ) {}
+
+			public override bool IsSatisfiedBy( Type parameter )
+			{
+
+				return Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( Context ) || Info.IsAssignableFrom( parameter.GetTypeInfo() ) || Nullable.GetUnderlyingType( parameter ) == Context;
+			}
+		}
+	}
+
+	public abstract class TypeSpecificationBase : SpecificationWithContextBase<Type>
+	{
+		protected TypeSpecificationBase( Type context ) : this( context, context.GetTypeInfo() ) {}
+
+		[UsedImplicitly]
+		protected TypeSpecificationBase( Type context, TypeInfo info ) : base( context )
+		{
+			Info = info;
+		}
+
+		protected TypeInfo Info { get; }
+	}
+
+	public static partial class Extensions
+	{
+		public static IGenericMethodContext<Invoke> GetFactory( this Type @this, string methodName ) => GenericFactories.Default.Get( @this )[methodName];
+		sealed class GenericFactories : DecoratedCache<Type, GenericStaticMethodFactories>
+		{
+			public static GenericFactories Default { get; } = new GenericFactories();
+			GenericFactories() {}
+		}
+
+		public static IGenericMethodContext<Execute> GetCommand( this Type @this, string methodName ) => GenericCommands.Default.Get( @this )[methodName];
+		sealed class GenericCommands : DecoratedCache<Type, GenericStaticMethodCommands>
+		{
+			public static GenericCommands Default { get; } = new GenericCommands();
+			GenericCommands() {}
+		}
+	}
+
+
+
 	public sealed class TypeAdapter : ITypeAware
 	{
 		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToDelegate();
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
-		readonly Func<Type, bool> isAssignableFrom;
+		// readonly Func<Type, bool> isAssignableFrom;
 		
 		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
 		public TypeAdapter( Type referencedType ) : this( referencedType, referencedType.GetTypeInfo() ) {}
@@ -26,17 +86,17 @@ namespace DragonSpark.TypeSystem
 			ReferencedType = referencedType;
 			Info = info;
 			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Get ).Get;
-			GenericFactoryMethods = new GenericStaticMethodFactories( ReferencedType );
-			GenericCommandMethods = new GenericStaticMethodCommands( ReferencedType );
-			isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).Get;
+			/*GenericFactoryMethods = new GenericStaticMethodFactories( ReferencedType );
+			GenericCommandMethods = new GenericStaticMethodCommands( ReferencedType );*/
+			// isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).Get;
 		}
 
 		public Type ReferencedType { get; }
 
 		public TypeInfo Info { get; }
 
-		public GenericStaticMethodFactories GenericFactoryMethods { get; }
-		public GenericStaticMethodCommands GenericCommandMethods { get; }
+		/*public GenericStaticMethodFactories GenericFactoryMethods { get; }
+		public GenericStaticMethodCommands GenericCommandMethods { get; }*/
 
 		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( Specification ).ToArray();
 
@@ -45,12 +105,8 @@ namespace DragonSpark.TypeSystem
 				.Introduce( parameterTypes, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
 				.SingleOrDefault();
 
-		public bool IsAssignableFrom( Type other ) => isAssignableFrom( other );
-		bool IsAssignableFromBody( Type parameter ) => Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( ReferencedType ) || Info.IsAssignableFrom( parameter.GetTypeInfo() ) || Nullable.GetUnderlyingType( parameter ) == ReferencedType;
-		sealed class IsInstanceOfTypeOrDefinitionCache : StructuralCache<Type, bool>
-		{
-			public IsInstanceOfTypeOrDefinitionCache( TypeAdapter owner ) : base( owner.IsAssignableFromBody ) {}
-		}
+		public bool IsAssignableFrom( Type other ) => TypeAssignableSpecification.Default.Get( ReferencedType ).IsSatisfiedBy( other );
+		
 
 		public bool IsInstanceOfType( object instance ) => IsAssignableFrom( instance.GetType() );
 		

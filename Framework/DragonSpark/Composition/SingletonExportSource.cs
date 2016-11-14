@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Sources;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ namespace DragonSpark.Composition
 {
 	sealed class SingletonExportSource<T> : ItemSourceBase<T>
 	{
+		readonly static Func<Type, bool> Delegate = TypeAssignableSpecification<T>.Default.ToDelegate();
+
 		public static SingletonExportSource<T> Default { get; } = new SingletonExportSource<T>();
 		SingletonExportSource() : this( Application.SingletonExports.Default.Get ) {}
 
@@ -17,7 +20,7 @@ namespace DragonSpark.Composition
 		readonly Func<Type, bool> specification;
 
 		[UsedImplicitly]
-		public SingletonExportSource( Func<ImmutableArray<SingletonExport>> exports ) : this( TypeAssignableSpecification<T>.Default.ToDelegate() )
+		public SingletonExportSource( Func<ImmutableArray<SingletonExport>> exports ) : this( Delegate )
 		{
 			this.exports = exports;
 		}

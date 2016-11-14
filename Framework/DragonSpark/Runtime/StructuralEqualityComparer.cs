@@ -6,7 +6,7 @@ namespace DragonSpark.Runtime
 	public class StructuralEqualityComparer<T> : IEqualityComparer<T>
 	{
 		readonly IEqualityComparer comparer;
-		public static StructuralEqualityComparer<T> Default { get; } = new StructuralEqualityComparer<T>();
+		public static IEqualityComparer<T> Default { get; } = new StructuralEqualityComparer<T>();
 		StructuralEqualityComparer() : this( StructuralComparisons.StructuralEqualityComparer ) {}
 
 		public StructuralEqualityComparer( IEqualityComparer comparer )

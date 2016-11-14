@@ -11,7 +11,7 @@ namespace DragonSpark.Testing.Extensions
 		[Theory, AutoData]
 		void GenericInvoke( Class @class )
 		{
-			var context = typeof(Static).Adapt().GenericCommandMethods[nameof(Static.Assign)].Make( typeof(Class) );
+			var context = typeof(Static).GetCommand( nameof(Static.Assign) ).Make( typeof(Class) );
 			context.Invoke( new object[] { null } );
 			
 			Assert.Null( Static.Instance );

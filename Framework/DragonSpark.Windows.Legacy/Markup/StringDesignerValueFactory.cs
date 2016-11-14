@@ -1,5 +1,5 @@
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using System;
 
 namespace DragonSpark.Windows.Legacy.Markup

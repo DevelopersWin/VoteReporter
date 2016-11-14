@@ -1,7 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
-using DragonSpark.Sources.Scopes;
 using System;
 using System.Reflection;
 
@@ -42,11 +41,11 @@ namespace DragonSpark.Specifications
 			Delegates() : base( specification => specification.IsSatisfiedBy ) {}
 		}
 
-		public static ISpecification<T> ToCachedSpecification<T>( this ISpecification<T> @this ) => CachedSpecifications<T>.Default.Get( @this );
-		sealed class CachedSpecifications<T> : Cache<ISpecification<T>, ISpecification<T>>
+		public static ISpecification<T> ToCachedSpecification<T>( this ISpecification<T> @this ) where T : class => CachedSpecifications<T>.Default.Get( @this );
+		sealed class CachedSpecifications<T> : Cache<ISpecification<T>, ISpecification<T>> where T : class
 		{
 			public static CachedSpecifications<T> Default { get; } = new CachedSpecifications<T>();
-			CachedSpecifications() : base( specification => new DelegatedSpecification<T>( specification.ToDelegate().ToSingleton() ) ) {}
+			CachedSpecifications() : base( specification => new DelegatedSpecification<T>( new DecoratedSourceCache<T, bool>( specification.ToDelegate() ).Get ) ) {}
 		}
 	}
 }
