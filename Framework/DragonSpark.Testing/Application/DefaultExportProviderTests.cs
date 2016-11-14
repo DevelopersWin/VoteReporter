@@ -12,7 +12,7 @@ namespace DragonSpark.Testing.Application
 		[Fact]
 		public void ExportsAsExpected()
 		{
-			GetType().Adapt().WithNested().AsApplicationParts();
+			GetType().WithNested().AsApplicationParts();
 			var exports = DefaultExportProvider.Default.GetExports<ITarget>();
 			var single = Assert.Single( exports.AsEnumerable() );
 			Assert.IsType<TargetWithExportedSingleton>( single );

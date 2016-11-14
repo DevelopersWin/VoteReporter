@@ -7,7 +7,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace DragonSpark.Extensions
 {
@@ -149,9 +148,9 @@ namespace DragonSpark.Extensions
 
 		public static T[] Fixed<T>( this IEnumerable<T> @this, params T[] items ) => @this.Append( items ).Fixed();
 
+		public static IEnumerable<T> Append<T>( this ImmutableArray<T> @this, params T[] items ) => @this.Concat( items );
 		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, params T[] items ) => @this.Concat( items );
-
-		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, [Optional]T element )
+		public static IEnumerable<T> Append<T>( this IEnumerable<T> @this, T element )
 		{
 			foreach ( var element1 in @this )
 				yield return element1;

@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void Verify()
 		{
-			GetType().Adapt().WithNested().Append( typeof(ExportMappingConfigurator) ).AsApplicationParts();
+			GetType().WithNested().Append( typeof(ExportMappingConfigurator) ).AsApplicationParts();
 			var container = ExportSource<ContainerConfigurator>.Default.Get().Aggregate( new ContainerConfiguration(), ( current, configurator ) => configurator.Get( current ) ).CreateContainer();
 			var export = container.GetExport<IAdditional>();
 			Assert.IsType<Additional>( export );

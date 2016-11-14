@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Composition
 		[Fact]
 		public void Basic()
 		{
-			var parts = this.Adapt().WithNested().Append( typeof(Protected) ).AsApplicationParts();
+			var parts = GetType().WithNested().Append( typeof(Protected) ).AsApplicationParts();
 			var builder = ConventionBuilderFactory.Default.Get();
 			var container = new ContainerConfiguration().WithParts( parts.AsEnumerable(), builder ).WithProvider( ServicesExportDescriptorProvider.Default ).CreateContainer();
 			

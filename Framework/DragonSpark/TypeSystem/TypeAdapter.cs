@@ -65,13 +65,26 @@ namespace DragonSpark.TypeSystem
 			public static GenericCommands Default { get; } = new GenericCommands();
 			GenericCommands() {}
 		}
+
+		public static ImmutableArray<Type> WithNested( this Type @this ) => NestedTypesFactory.Default.Get( @this );
+	}
+
+	public sealed class NestedTypesFactory : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<Type>>
+	{
+		readonly static Func<TypeInfo, bool> Specification = ApplicationTypeSpecification.Default.IsSatisfiedBy;
+
+		public static NestedTypesFactory Default { get; } = new NestedTypesFactory();
+		NestedTypesFactory() {}
+
+		protected override ImmutableArray<Type> Create( TypeInfo parameter ) =>
+			parameter.Append( parameter.DeclaredNestedTypes ).Where( Specification ).AsTypes().ToImmutableArray();
 	}
 
 
 
 	public sealed class TypeAdapter : ITypeAware
 	{
-		readonly static Func<Type, bool> Specification = ApplicationTypeSpecification.Default.ToDelegate();
+		
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
 		// readonly Func<Type, bool> isAssignableFrom;
 		
@@ -94,8 +107,6 @@ namespace DragonSpark.TypeSystem
 
 		/*public GenericStaticMethodFactories GenericFactoryMethods { get; }
 		public GenericStaticMethodCommands GenericCommandMethods { get; }*/
-
-		public Type[] WithNested() => Info.Append( Info.DeclaredNestedTypes ).AsTypes().Where( Specification ).ToArray();
 
 		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
 				InstanceConstructors.Default.Get( Info )

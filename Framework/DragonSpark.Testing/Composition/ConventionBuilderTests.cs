@@ -27,7 +27,7 @@ namespace DragonSpark.Testing.Composition
 		public void BasicConvention( ContainerConfiguration configuration, ConventionBuilder sut )
 		{
 			sut.ForTypesMatching( DragonSpark.Specifications.Common.Always.IsSatisfiedBy ).Export();
-			var types = this.Adapt().WithNested();
+			var types = GetType().WithNested().AsEnumerable();
 			var container = configuration.WithParts( types, sut ).CreateContainer();
 			var export = container.GetExport<SomeExport>();
 			Assert.NotNull( export );
@@ -46,7 +46,7 @@ namespace DragonSpark.Testing.Composition
 		{
 			var items = sut.ToArray();
 
-			var expected = GetType().Adapt().WithNested().Concat( FormatterTypesAttribute.Types ).Fixed();
+			var expected = GetType().WithNested().Concat( FormatterTypesAttribute.Types ).Fixed();
 			Assert.Equal( expected.Length, items.Length );
 			Assert.Equal( expected.OrderBy( type => type.FullName ), items.OrderBy( type => type.FullName ) );
 

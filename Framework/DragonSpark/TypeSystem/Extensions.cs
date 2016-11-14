@@ -72,7 +72,8 @@ namespace DragonSpark.TypeSystem
 
 		public static IEnumerable<TypeInfo> AsTypeInfos( this IEnumerable<Type> target ) => target.Select( info => info.GetTypeInfo() );
 
-		public static ImmutableArray<Type> AsApplicationParts( this IEnumerable<Type> target ) => ApplicationPartsFactory.Default.GetEnumerable( target ).Types;
+		public static ImmutableArray<Type> AsApplicationParts( this IEnumerable<Type> target ) => target.ToImmutableArray().AsApplicationParts();
+		public static ImmutableArray<Type> AsApplicationParts( this ImmutableArray<Type> target ) => ApplicationPartsFactory.Default.Get( target ).Types;
 
 		static class Support
 		{
