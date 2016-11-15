@@ -1,9 +1,10 @@
+using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
-using JetBrains.Annotations;
 
 namespace DragonSpark.TypeSystem
 {

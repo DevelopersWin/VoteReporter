@@ -1,7 +1,6 @@
-﻿using DragonSpark.Sources.Parameterized.Caching;
 using System;
 
-namespace DragonSpark.Sources.Parameterized
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class ParameterizedSourceCache<TConstructor, TParameter, TResult> : Cache<TConstructor, IParameterizedSource<TParameter, TResult>> where TConstructor : class
 	{

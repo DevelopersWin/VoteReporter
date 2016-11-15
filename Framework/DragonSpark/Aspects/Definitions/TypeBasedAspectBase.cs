@@ -1,10 +1,12 @@
 using DragonSpark.Aspects.Build;
+using DragonSpark.Diagnostics;
+using DragonSpark.Extensions;
 using DragonSpark.Specifications;
-using PostSharp;
+using JetBrains.Annotations;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Configuration;
 using PostSharp.Aspects.Serialization;
-using PostSharp.Extensibility;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +29,7 @@ namespace DragonSpark.Aspects.Definitions
 		public override bool CompileTimeValidate( Type type )
 		{
 			var result = definition.IsSatisfiedBy( type );
-			MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{GetType()}.CompileTimeValidate: {type} => {result.ToString()}", null, null, null ));
+			type.With<Valid>().Execute( this, result );
 			return result;
 		}
 
@@ -37,13 +39,33 @@ namespace DragonSpark.Aspects.Definitions
 			var result = definition.ProvideAspects( targetElement )?.ToArray();
 			if ( result == null )
 			{
-				throw new InvalidOperationException( $"Aspect '{GetType()}' was applied to {targetElement}, but it was not able to apply any aspects to it.  Ensure that {targetElement} implements at least one of these types: {string.Join( ", ", definition.Select( t => t.FullName ) )}" );
+				var types = definition.ToArray();
+				var exception = new InvalidOperationException( $"Aspect '{GetType()}' was applied to {targetElement}, but it was not able to apply any aspects to it.  Ensure that {targetElement} implements at least one of these types: {string.Join( ", ", types.Select( t => t.FullName ) )}" );
+				type.With<Error>().Execute( exception, this, types );
+				throw exception;
 			}
-			foreach ( var aspectInstance in result )
-			{
-				MessageSource.MessageSink.Write( new Message( MessageLocation.Unknown, SeverityType.ImportantInfo, "6776", $"{GetType().Name}.ProvideAspects: [{type.FullName}] Applying {aspectInstance.AspectTypeName} => {aspectInstance.TargetElement}", null, null, null ));
-			}
+			
+			type.With<Added>().Execute( this, result.Length, result.Select( instance => instance.AspectTypeName ).Fixed() );
+
 			return result;
+		}
+
+		[UsedImplicitly]
+		sealed class Valid : LogCommandBase<ITypeLevelAspect, bool>
+		{
+			public Valid( ILogger logger ) : base( logger.Debug, "{TypeLevelAspect} is valid: {Valid}" ) {}
+		}
+
+		[UsedImplicitly]
+		sealed class Added : LogCommandBase<ITypeLevelAspect, int, string[]>
+		{
+			public Added( ILogger logger ) : base( logger.Debug, "{Aspect} provided {Count} aspects to {SourceContext}.  These are {Aspects}" ) {}
+		}
+
+		[UsedImplicitly]
+		sealed class Error : LogExceptionCommandBase<ITypeLevelAspect, Type[]>
+		{
+			public Error( ILogger logger ) : base( logger, "No aspects were provided by {Aspect}, which expects one of the following types to be implemented by {SourceContext}: {Types}" ) {}
 		}
 	}
 }

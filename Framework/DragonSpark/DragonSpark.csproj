@@ -112,6 +112,7 @@
     <Compile Include="Commands\CommandDelegates.cs" />
     <Compile Include="Commands\IExecution.cs" />
     <Compile Include="Composition\SpecificationRequest.cs" />
+    <Compile Include="Diagnostics\Templates.cs" />
     <Compile Include="Expressions\Extensions.cs" />
     <Compile Include="Aspects\Adapters\CoercerAdapter.cs" />
     <Compile Include="Aspects\Coercion\Source.cs" />
@@ -284,7 +285,9 @@
     <Compile Include="Sources\Parameterized\AlteredResultParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\AppliedAlteration.cs" />
     <Compile Include="Sources\Parameterized\Caching\AmbientContext.cs" />
+    <Compile Include="Sources\Parameterized\Caching\CommandCache.cs" />
     <Compile Include="Sources\Parameterized\Caching\DelegatedCache.cs" />
+    <Compile Include="Sources\Parameterized\Caching\ParameterizedSourceCache.cs" />
     <Compile Include="Sources\Parameterized\CompositeFactory.cs" />
     <Compile Include="Sources\Parameterized\ConditionalInstanceParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\ConditionalParameterizedSource.cs" />
@@ -296,7 +299,6 @@
     <Compile Include="Sources\Parameterized\ISpecificationParameterizedSource.cs" />
     <Compile Include="Sources\Parameterized\ParameterizedItemCache.cs" />
     <Compile Include="Sources\Parameterized\ParameterizedItemSourceBase.cs" />
-    <Compile Include="Sources\Parameterized\ParameterizedSourceCache.cs" />
     <Compile Include="Sources\Scopes\AggregateParameterizedSource.cs" />
     <Compile Include="Sources\Scopes\ItemScope.cs" />
     <Compile Include="Sources\Scopes\ScopedItems.cs" />
@@ -343,7 +345,7 @@
     <Compile Include="Specifications\DeferredSpecification.cs" />
     <Compile Include="Specifications\DelegatedAssignedSpecification.cs" />
     <Compile Include="Specifications\SpecificationAdapter.cs" />
-    <Compile Include="Specifications\SpecificationCache.cs" />
+    <Compile Include="Sources\Parameterized\Caching\SpecificationCache.cs" />
     <Compile Include="Specifications\SpecificationDelegates.cs" />
     <Compile Include="Specifications\SuppliedDelegatedSpecification.cs" />
     <Compile Include="Tasks\SuppliedTaskSource.cs" />

@@ -1,7 +1,7 @@
-using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Specifications;
 using System;
 
-namespace DragonSpark.Specifications
+namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public class SpecificationCache<T> : SpecificationCache<T, T> where T : class
 	{
