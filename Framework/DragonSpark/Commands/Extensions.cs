@@ -72,12 +72,7 @@ namespace DragonSpark.Commands
 		public static SuppliedCommand<T> WithParameter<T>( this Action<T> @this, T parameter ) => new SuppliedCommand<T>( @this, parameter );
 		public static SuppliedCommand<T> WithParameter<T>( this Action<T> @this, Func<T> parameter ) => new SuppliedCommand<T>( @this, parameter );
 
-		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => DelegateCache<T>.Default.Get( @this );
-		sealed class DelegateCache<T> : Cache<ICommand<T>, Action<T>>
-		{
-			public static DelegateCache<T> Default { get; } = new DelegateCache<T>();
-			DelegateCache() : base( command => command.Execute ) {}
-		}
+		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => CommandDelegates<T>.Default.Get( @this );
 		
 		public static IAlteration<T> ToAlteration<T>( this ICommand<T> @this ) => Alterations<T>.Default.Get( @this );
 		sealed class Alterations<T> : Cache<ICommand<T>, IAlteration<T>>
@@ -86,18 +81,18 @@ namespace DragonSpark.Commands
 			Alterations() : base( command => new ConfiguringAlteration<T>( command.ToDelegate() ) ) {}
 		}
 
-		public static ISpecification<object> ToSpecification( this ICommand @this ) => SpecificationCache.Default.Get( @this );
-		class SpecificationCache : Cache<ICommand, ISpecification<object>>
+		public static ISpecification<object> ToSpecification( this ICommand @this ) => Specifications.Default.Get( @this );
+		sealed class Specifications : Cache<ICommand, ISpecification<object>>
 		{
-			public static SpecificationCache Default { get; } = new SpecificationCache();
-			SpecificationCache() : base( command => new DelegatedSpecification<object>( command.CanExecute ) ) {}
+			public static Specifications Default { get; } = new Specifications();
+			Specifications() : base( command => new DelegatedSpecification<object>( command.CanExecute ) ) {}
 		}
 
-		public static ISpecification<T> ToSpecification<T>( this ICommand<T> @this ) => SpecificationCache<T>.Default.Get( @this );
-		class SpecificationCache<T> : Cache<ICommand<T>, ISpecification<T>>
+		public static ISpecification<T> ToSpecification<T>( this ICommand<T> @this ) => Specifications<T>.Default.Get( @this );
+		sealed class Specifications<T> : Cache<ICommand<T>, ISpecification<T>>
 		{
-			public static SpecificationCache<T> Default { get; } = new SpecificationCache<T>();
-			SpecificationCache() : base( command => new DelegatedSpecification<T>( command.IsSatisfiedBy ) ) {}
+			public static Specifications<T> Default { get; } = new Specifications<T>();
+			Specifications() : base( command => command ) {}
 		}
 
 		public static void Accept<T>( this Action @this, T _ ) => @this.Invoke();

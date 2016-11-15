@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Sources.Scopes;
 using DragonSpark.TypeSystem;
-using System.Linq;
 
 namespace DragonSpark.Sources.Parameterized
 {
@@ -11,7 +10,7 @@ namespace DragonSpark.Sources.Parameterized
 
 		sealed class DefaultImplementation : FirstParameterConstructedSelector<T>
 		{
-			public DefaultImplementation() : base( KnownTypes.Default.Get<T>().ToArray() ) {}
+			public DefaultImplementation() : base( KnownTypes<T>.Default.Unwrap() ) {}
 		}
 	}
 }

@@ -44,7 +44,7 @@ namespace DragonSpark.Extensions
 
 		static class Support<T>
 		{
-			public static Func<T> Default { get; } = DefaultValues.Default.GetWith<T>;
+			public static Func<T> Default { get; } = DefaultValues.Default.GetUsing<T>;
 		}
 
 		public static TItem With<TItem>( [Optional]this TItem @this, Action<TItem> action = null )

@@ -109,6 +109,7 @@
     <Compile Include="Aspects\Specifications\DefaultSpecificationImplementation.cs" />
     <Compile Include="Aspects\Specifications\IntroduceSpecification.cs" />
     <Compile Include="Aspects\Validation\AdapterLocator.cs" />
+    <Compile Include="Commands\CommandDelegates.cs" />
     <Compile Include="Commands\IExecution.cs" />
     <Compile Include="Composition\SpecificationRequest.cs" />
     <Compile Include="Expressions\Extensions.cs" />
@@ -193,7 +194,7 @@
     <Compile Include="Aspects\Build\ValidatingSpecification.cs" />
     <Compile Include="Aspects\Validation\Definition.cs" />
     <Compile Include="Expressions\PropertyAssignmentFactory.cs" />
-    <Compile Include="FormattableSource.cs" />
+    <Compile Include="Formatters.cs" />
     <Compile Include="IFormatter.cs" />
     <Compile Include="Runtime\Assignments\Assign.cs" />
     <Compile Include="Runtime\Assignments\AssignGlobalScopeCommand.cs" />
@@ -586,7 +587,7 @@
     <Compile Include="Sources\Coercion\Coercer.cs" />
     <Compile Include="Sources\Coercion\CoercerBase.cs" />
     <Compile Include="Expressions\CompiledDelegateFactoryBase.cs" />
-    <Compile Include="Activation\ConstructingParameterLocator.cs" />
+    <Compile Include="Activation\ConstructingParameterTypeLocator.cs" />
     <Compile Include="Activation\ConstructorDelegateFactory.cs" />
     <Compile Include="Activation\Constructors.cs" />
     <Compile Include="Activation\ConstructTypeRequest.cs" />

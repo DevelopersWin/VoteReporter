@@ -38,17 +38,17 @@ namespace DragonSpark.Diagnostics
 		[UsedImplicitly]
 		public sealed class Factory : ParameterizedSourceBase<LoggerConfiguration, ILogger>
 		{
-			public static IParameterizedScope<Serilog.LoggerConfiguration, ILogger> Implementation { get; } = Sources.Coercion.Extensions.Allow( new Factory(), ValidatedCastCoercer<Serilog.LoggerConfiguration, LoggerConfiguration>.Default ).ToScope();
-			Factory() {}
+			readonly Func<object, bool> specification;
+			public static IParameterizedScope<Serilog.LoggerConfiguration, ILogger> Implementation { get; } = new Factory().Allow( ValidatedCastCoercer<Serilog.LoggerConfiguration, LoggerConfiguration>.Default ).ToScope();
+			Factory() : this( new DelegatedAssignedSpecification<object, IFormattable>( Formatters.Default.Get ).IsSatisfiedBy ) {}
+
+			public Factory( Func<object, bool> specification )
+			{
+				this.specification = specification;
+			}
 
 			public override ILogger Get( LoggerConfiguration parameter ) => 
-				parameter.CreateLogger().ForContext( Constants.SourceContextPropertyName, parameter.Instance, Specification.Instance.IsSatisfiedBy( parameter.Instance ) );
-
-			sealed class Specification : DelegatedAssignedSpecification<object, IFormattable>
-			{
-				public static Specification Instance { get; } = new Specification();
-				Specification() : base( FormattableSource.Default.Get ) {}
-			}
+				parameter.CreateLogger().ForContext( Constants.SourceContextPropertyName, parameter.Instance, specification( parameter.Instance ) );
 		}
 
 		[UsedImplicitly]

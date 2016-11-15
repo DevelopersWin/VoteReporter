@@ -27,9 +27,9 @@ namespace DragonSpark.Testing.Diagnostics
 		public void FormattingAsExpected( [Service]CompositionContext context, string text )
 		{
 			var execution = Assert.IsType<TaskContext>( Execution.Default.GetValue() );
-			var formattable = FormattableSource.Default.Get( execution );
+			var formattable = Formatters.Default.Get( execution );
 			Assert.NotNull( formattable );
-			Assert.Same( formattable, FormattableSource.Default.Get( execution ) );
+			Assert.Same( formattable, Formatters.Default.Get( execution ) );
 			var logger = context.GetExport<ILogger>();
 
 			var serviceProvider = DefaultServices.Default.Cached();

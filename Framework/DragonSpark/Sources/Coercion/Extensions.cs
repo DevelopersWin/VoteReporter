@@ -9,8 +9,9 @@ namespace DragonSpark.Sources.Coercion
 		public static CoercedCommand<TFrom, TParameter> Allow<TFrom, TParameter>( this ICommand<TParameter> @this, IParameterizedSource<TFrom, TParameter> coercer ) => @this.ToDelegate().Allow( coercer );
 		public static CoercedCommand<TFrom, TParameter> Allow<TFrom, TParameter>( this Action<TParameter> @this, IParameterizedSource<TFrom, TParameter> coercer ) => new CoercedCommand<TFrom,TParameter>( coercer, @this );
 
-		public static ISource<TResult> Then<TParameter, TResult>( this ISource<TParameter> @this, Func<TParameter, TResult> coerce ) => @this.ToDelegate().Then( coerce );
-		public static ISource<TResult> Then<TParameter, TResult>( this Func<TParameter> @this, Func<TParameter, TResult> coerce ) => coerce.WithParameter( @this );
+		public static ISource<TResult> Into<TParameter, TResult>( this ISource<TParameter> @this, IParameterizedSource<TParameter, TResult> coerce ) => @this.Into( coerce.ToDelegate() );
+		public static ISource<TResult> Into<TParameter, TResult>( this ISource<TParameter> @this, Func<TParameter, TResult> coerce ) => @this.ToDelegate().Into( coerce );
+		public static ISource<TResult> Into<TParameter, TResult>( this Func<TParameter> @this, Func<TParameter, TResult> coerce ) => coerce.WithParameter( @this );
 
 		public static IParameterizedSource<TFrom, TResult> Allow<TFrom, TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IParameterizedSource<TFrom, TParameter> coerce ) => @this.ToDelegate().Allow( coerce.ToDelegate() );
 		public static IParameterizedSource<TFrom, TResult> Allow<TFrom, TParameter, TResult>( this Func<TParameter, TResult> @this, IParameterizedSource<TFrom, TParameter> coerce ) => @this.Allow( coerce.ToDelegate() );

@@ -12,7 +12,7 @@ namespace DragonSpark.Composition
 {
 	public sealed class CompositionHostFactory : DelegatedSource<CompositionHost>
 	{
-		readonly static Func<CompositionHost> Source = Configuration.Implementation.Then( configuration => configuration.CreateContainer() ).Get;
+		readonly static Func<CompositionHost> Source = Configuration.Implementation.Into( configuration => configuration.CreateContainer() ).Get;
 
 		public static CompositionHostFactory Default { get; } = new CompositionHostFactory();
 		CompositionHostFactory() : this( Disposables.Default, Source ) {}
