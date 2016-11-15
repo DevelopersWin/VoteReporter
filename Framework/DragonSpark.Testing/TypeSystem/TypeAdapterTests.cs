@@ -73,8 +73,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void GetHierarchy()
 		{
-			Assert.Equal( new[]{ typeof(Derived), typeof(Class), typeof(object) }, typeof(Derived).Adapt().GetHierarchy( true ).ToArray() );
-			Assert.Equal( new[]{ typeof(Derived), typeof(Class) }, typeof(Derived).Adapt().GetHierarchy().ToArray() );
+			Assert.Equal( new[]{ typeof(Derived), typeof(Class) }, typeof(Derived).GetHierarchy().ToArray() );
 		}
 
 		[Fact]

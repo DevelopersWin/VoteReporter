@@ -66,7 +66,7 @@ namespace DragonSpark.TypeSystem
 			GenericCommands() {}
 		}
 
-		public static ImmutableArray<Type> WithNested( this Type @this ) => NestedTypesFactory.Default.Get( @this );
+		public static ImmutableArray<Type> WithNested( this Type @this ) => NestedTypes.Default.Get( @this );
 
 		public static bool IsAssignableFrom( this Type @this, Type other ) => TypeAssignableSpecification.Default.Get( @this ).IsSatisfiedBy( other );
 		
@@ -74,14 +74,15 @@ namespace DragonSpark.TypeSystem
 
 		public static Type GetInnerType( this Type @this ) => InnerTypes.Default.Get( @this );
 		public static Type GetEnumerableType( this Type @this ) => EnumerableTypes.Default.Get( @this );
+		public static ImmutableArray<Type> GetHierarchy( this Type @this ) => TypeHierarchies.Default.Get( @this );
 	}
 
-	public sealed class NestedTypesFactory : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<Type>>
+	public sealed class NestedTypes : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<Type>>
 	{
 		readonly static Func<TypeInfo, bool> Specification = ApplicationTypeSpecification.Default.IsSatisfiedBy;
 
-		public static NestedTypesFactory Default { get; } = new NestedTypesFactory();
-		NestedTypesFactory() {}
+		public static NestedTypes Default { get; } = new NestedTypes();
+		NestedTypes() {}
 
 		protected override ImmutableArray<Type> Create( TypeInfo parameter ) =>
 			parameter.Append( parameter.DeclaredNestedTypes ).Where( Specification ).AsTypes().ToImmutableArray();
@@ -121,39 +122,6 @@ namespace DragonSpark.TypeSystem
 		public static EnumerableTypes Default { get; } = new EnumerableTypes();
 		EnumerableTypes() : base( new TypeLocator( i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) ).Get ) {}
 	}
-
-	/*public sealed class TypeLocator : TypeLocatorBase*/
-
-		/*public abstract class TypeLocatorBase : CacheWithImplementedFactoryBase<Type, Type>
-	{
-		readonly ISpecification<Type> specification;
-		readonly Func<TypeInfo, bool> isAssignable;
-		readonly Func<Type[], Type> selector;
-
-		protected TypeLocatorBase( params Type[] types ) : this( new CompositeAssignableSpecification( types ) ) {}
-
-		protected TypeLocatorBase( ISpecification<Type> specification  )
-		{
-			this.specification = specification;
-			isAssignable = IsAssignable;
-			selector = From;
-		}
-
-		protected override Type Create( Type parameter )
-		{
-			var result = parameter.Append( parameter.Adapt().GetAllInterfaces() )
-								  .AsTypeInfos()
-								  .Where( isAssignable )
-								  .Select( info => info.GenericTypeArguments )
-								  .Select( selector )
-								  .FirstOrDefault();
-			return result;
-		}
-
-		bool IsAssignable( TypeInfo type ) => type.IsGenericType && specification.IsSatisfiedBy( type.GetGenericTypeDefinition() );
-
-		protected abstract Type From( IEnumerable<Type> genericTypeArguments );
-	}*/
 
 	public sealed class TypeLocator : AlterationBase<Type>
 	{
@@ -241,20 +209,6 @@ namespace DragonSpark.TypeSystem
 		public Type ReferencedType { get; }
 
 		public TypeInfo Info { get; }
-
-		public IEnumerable<Type> GetHierarchy( bool includeRoot = false )
-		{
-			yield return ReferencedType;
-			var current = Info.BaseType;
-			while ( current != null )
-			{
-				if ( current != typeof(object) || includeRoot )
-				{
-					yield return current;
-				}
-				current = current.GetTypeInfo().BaseType;
-			}
-		}
 
 		/*[Freeze]
 		public Type GetEnumerableType() => InnerType( GetHierarchy(), types => types.Only(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );

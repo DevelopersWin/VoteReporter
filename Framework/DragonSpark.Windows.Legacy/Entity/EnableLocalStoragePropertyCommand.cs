@@ -26,7 +26,7 @@ namespace DragonSpark.Windows.Legacy.Entity
 
 		public override void Execute( DbContextBuildingParameter parameter )
 		{
-			var types = parameter.Context.GetDeclaredEntityTypes().Select( x => x.Adapt().GetHierarchy().Last() ).Distinct().SelectMany( x => x.Assembly.GetTypes().Where( y => x.Namespace == y.Namespace ) ).Distinct().ToArray();
+			var types = parameter.Context.GetDeclaredEntityTypes().Select( x => x.GetHierarchy().Last() ).Distinct().SelectMany( x => x.Assembly.GetTypes().Where( y => x.Namespace == y.Namespace ) ).Distinct().ToArray();
 
 			var properties = types.SelectMany( y => y.GetRuntimeProperties().Where( z => z.Has<LocalStorageAttribute>() || useConvention && FollowsConvention( z ) ) ).Fixed();
 			foreach ( var property in properties )
