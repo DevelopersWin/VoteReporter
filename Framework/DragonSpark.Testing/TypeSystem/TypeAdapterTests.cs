@@ -1,11 +1,11 @@
-﻿using DragonSpark.Specifications;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Specifications;
 using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using PostSharp.Aspects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
@@ -22,12 +22,12 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void GetMappedMethods()
 		{
-			var mappings = typeof(List<int>).Adapt().GetMappedMethods( typeof(ICollection<int>) );
+			var mappings = typeof(List<int>).GetMappedMethods( typeof(ICollection<int>) );
 			Assert.NotEmpty( mappings );
 			Assert.Equal( typeof(ICollection<int>), mappings.First().InterfaceMethod.DeclaringType);
 			Assert.Equal( typeof(List<int>), mappings.First().MappedMethod.DeclaringType);
 
-			Assert.Empty( typeof(List<int>).Adapt().GetMappedMethods( typeof(ISpecification<int>) ) );
+			Assert.Empty( typeof(List<int>).GetMappedMethods( typeof(ISpecification<int>) ) );
 		}
 
 		[Fact]
@@ -46,14 +46,6 @@ namespace DragonSpark.Testing.TypeSystem
 			Assert.Equal( 6776, instance.Item );
 		}
 
-		[Fact]
-		public void Throws()
-		{
-			Assert.Throws<ArgumentNullException>( () => Create() );
-		}
-
-		TypeAdapter Create() => new TypeAdapter( null, null );
-
 		class Casted
 		{
 			public Casted( int item )
@@ -62,12 +54,6 @@ namespace DragonSpark.Testing.TypeSystem
 			}
 
 			public int Item { get; }
-		}
-
-		[Fact]
-		public void Adapt()
-		{
-			Assert.NotNull( typeof(object).GetTypeInfo().Adapt() );
 		}
 
 		[Fact]

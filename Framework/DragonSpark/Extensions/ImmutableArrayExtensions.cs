@@ -16,6 +16,8 @@ namespace DragonSpark.Extensions
 		public static IEnumerable<TResult> SelectMany<TSource, TResult>(this ImmutableArray<TSource> @this, Func<TSource, IEnumerable<TResult>> selector)
 			=> @this.ToArray().SelectMany( selector );
 
+		public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this ImmutableArray<TSource> source, Func<TSource, TKey> keySelector)
+			=> source.ToArray().OrderBy( keySelector );
 		public static IOrderedEnumerable<TSource> OrderByDescending<TSource, TKey>( this ImmutableArray<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer )
 			=> source.ToArray().OrderByDescending( keySelector, comparer );
 

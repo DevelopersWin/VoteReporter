@@ -6,7 +6,7 @@ namespace DragonSpark.Sources.Delegates
 {
 	public sealed class IsParameterizedSourceSpecification : CompositeAssignableSpecification
 	{
-		public static ISpecification<Type> Default { get; } = new IsParameterizedSourceSpecification().ToCachedSpecification<Type>();
+		public static ISpecification<Type> Default { get; } = new IsParameterizedSourceSpecification().ToCachedSpecification();
 		IsParameterizedSourceSpecification() : base( typeof(IParameterizedSource<,>) ) {}
 	}
 }

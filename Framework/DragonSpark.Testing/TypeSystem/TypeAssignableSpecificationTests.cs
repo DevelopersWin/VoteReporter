@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
 {
-	public class ImplementationeSpecificationTests
+	public class TypeAssignableSpecificationTests
 	{
 		[Fact]
 		public void Test()

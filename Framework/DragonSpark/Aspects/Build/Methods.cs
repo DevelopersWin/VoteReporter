@@ -20,7 +20,7 @@ namespace DragonSpark.Aspects.Build
 
 		protected override MethodInfo Create( Type parameter )
 		{
-			var mapping = parameter.Adapt().GetMappedMethods( ReferencedType ).Introduce( methodName, tuple => tuple.Item1.InterfaceMethod.Name == tuple.Item2 ).Only();
+			var mapping = parameter.GetMappedMethods( ReferencedType ).Introduce( methodName, tuple => tuple.Item1.InterfaceMethod.Name == tuple.Item2 ).Only();
 			var result = mapping.MappedMethod?.LocateInDerivedType( parameter ).AccountForGenericDefinition();
 			return result;
 		}
