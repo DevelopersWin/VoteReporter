@@ -9,20 +9,24 @@ namespace DragonSpark.TypeSystem
 {
 	class MethodMapper
 	{
-		readonly TypeAdapter adapter;
+		readonly Type type;
+		readonly TypeInfo info;
 
-		public MethodMapper( TypeAdapter adapter )
+		public MethodMapper( Type type ) : this( type, type.GetTypeInfo() ) {}
+
+		public MethodMapper( Type type, TypeInfo info )
 		{
-			this.adapter = adapter;
+			this.type = type;
+			this.info = info;
 		}
 
 		public ImmutableArray<MethodMapping> Get( Type parameter )
 		{
-			var generic = parameter.GetTypeInfo().IsGenericTypeDefinition ? adapter.GetImplementations( parameter ).FirstOrDefault() : null;
-			var implementation = generic ?? ( parameter.IsAssignableFrom( adapter.ReferencedType ) ? parameter : null );
+			var generic = parameter.GetTypeInfo().IsGenericTypeDefinition ? type.GetImplementations( parameter ).FirstOrDefault() : null;
+			var implementation = generic ?? ( parameter.IsAssignableFrom( type ) ? parameter : null );
 			if ( implementation != null )
 			{
-				var map = adapter.Info.GetRuntimeInterfaceMap( implementation );
+				var map = info.GetRuntimeInterfaceMap( implementation );
 				var result = map.InterfaceMethods.Tuple( map.TargetMethods ).Select( tuple => new MethodMapping( tuple.Item1, tuple.Item2 ) ).ToImmutableArray();
 				return result;
 			}

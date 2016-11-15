@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Activation;
+using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
@@ -32,9 +33,8 @@ namespace DragonSpark.Aspects.Adapters
 
 		public override Func<TParameter, TResult> Get( Type parameter )
 		{
-			var adapter = parameter.Adapt();
-			var instanceParameterType = adapter.GetImplementations( parameterType ).OrderByDescending( type => type, Comparer.Default ).FirstOrDefault() ?? adapter.ReferencedType;
-			var instanceImplementedType = parameterType == implementedType ? instanceParameterType : adapter.GetImplementations( implementedType ).OrderByDescending( type => type, Comparer.Default ).First();
+			var instanceParameterType = parameter.GetImplementations( parameterType ).OrderByDescending( type => type, Comparer.Default ).FirstOrDefault() ?? parameter;
+			var instanceImplementedType = parameterType == implementedType ? instanceParameterType : parameter.GetImplementations( implementedType ).OrderByDescending( type => type, Comparer.Default ).First();
 			var resultType = adapterType.MakeGenericType( instanceImplementedType.GenericTypeArguments );
 			var result = factory( instanceParameterType, resultType );
 			return result;

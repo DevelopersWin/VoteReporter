@@ -1,11 +1,10 @@
-﻿using DragonSpark.Specifications;
-using DragonSpark.Testing.Objects;
+﻿using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
 {
-	public class TypeAssignableSpecificationTests
+	public class ImplementationeSpecificationTests
 	{
 		[Fact]
 		public void Test()

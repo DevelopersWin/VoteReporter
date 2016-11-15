@@ -1,5 +1,4 @@
 using DragonSpark.Application;
-using DragonSpark.Aspects;
 using DragonSpark.Expressions;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Coercion;
@@ -33,7 +32,7 @@ namespace DragonSpark.TypeSystem
 			public DefaultImplementation( Type context ) : base( context ) {}
 
 			public override bool IsSatisfiedBy( Type parameter ) => 
-				Info.IsGenericTypeDefinition && parameter.Adapt().IsGenericOf( Context ) || Info.IsAssignableFrom( parameter.GetTypeInfo() ) || Nullable.GetUnderlyingType( parameter ) == Context;
+				Info.IsGenericTypeDefinition && parameter.ImplementsGeneric( Context ) || Info.IsAssignableFrom( parameter.GetTypeInfo() ) || Nullable.GetUnderlyingType( parameter ) == Context;
 		}
 	}
 
@@ -68,14 +67,17 @@ namespace DragonSpark.TypeSystem
 
 		public static ImmutableArray<Type> WithNested( this Type @this ) => NestedTypes.Default.Get( @this );
 
-		public static bool IsAssignableFrom( this Type @this, Type other ) => TypeAssignableSpecification.Default.Get( @this ).IsSatisfiedBy( other );
-		
+		public static bool IsAssignableFrom( this Type @this, Type other ) => @this.GetTypeInfo().IsAssignableFrom( other );
+		public static bool IsAssignableFrom( this TypeInfo @this, Type other ) => TypeAssignableSpecification.Default.Get( @this ).IsSatisfiedBy( other );
 		public static bool IsInstanceOfType( this Type @this, object instance ) => @this.IsAssignableFrom( instance.GetType() );
+		public static bool ImplementsGeneric( this Type @this, Type other ) => @this.GetTypeInfo().ImplementsGeneric( other );
+		public static bool ImplementsGeneric( this TypeInfo @this, Type other ) => GenericImplementationSpecification.Default.Get( @this ).IsSatisfiedBy( other );
 
 		public static Type GetInnerType( this Type @this ) => InnerTypes.Default.Get( @this );
 		public static Type GetEnumerableType( this Type @this ) => EnumerableTypes.Default.Get( @this );
 		public static ImmutableArray<Type> GetHierarchy( this Type @this ) => TypeHierarchies.Default.Get( @this );
-		public static ImmutableArray<Type> GetAllInterfaces( this Type @this ) => Interfaces.Default.Get( @this );
+		public static ImmutableArray<Type> GetAllInterfaces( this Type @this ) => AllInterfaces.Default.Get( @this );
+		public static ImmutableArray<Type> GetImplementations( this Type @this, Type genericInterface ) => Implementations.Default.Get( @this ).Get( genericInterface );
 	}
 
 	public sealed class NestedTypes : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<Type>>
@@ -121,7 +123,7 @@ namespace DragonSpark.TypeSystem
 	public sealed class EnumerableTypes : Cache<Type, Type>
 	{
 		public static EnumerableTypes Default { get; } = new EnumerableTypes();
-		EnumerableTypes() : base( new TypeLocator( i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) ).Get ) {}
+		EnumerableTypes() : base( new TypeLocator( i => i.ImplementsGeneric( typeof(IEnumerable<>) ) ).Get ) {}
 	}
 
 	public sealed class TypeLocator : AlterationBase<Type>
@@ -158,17 +160,17 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
-	public sealed class Interfaces : ParameterizedItemCache<Type, Type>
+	public sealed class AllInterfaces : ParameterizedItemCache<Type, Type>
 	{
-		public static Interfaces Default { get; } = new Interfaces();
-		Interfaces() : base( DefaultImplementation.Implementation ) {}
+		public static AllInterfaces Default { get; } = new AllInterfaces();
+		AllInterfaces() : base( Implementation.Instance ) {}
 
-		public sealed class DefaultImplementation : ParameterizedItemSourceBase<Type, Type>
+		public sealed class Implementation : ParameterizedItemSourceBase<Type, Type>
 		{
 			readonly Func<Type, IEnumerable<Type>> selector;
 
-			public static DefaultImplementation Implementation { get; } = new DefaultImplementation();
-			DefaultImplementation()
+			public static Implementation Instance { get; } = new Implementation();
+			Implementation()
 			{
 				selector = Yield;
 			}
@@ -178,6 +180,58 @@ namespace DragonSpark.TypeSystem
 					.Append( parameter.GetTypeInfo().ImplementedInterfaces.SelectMany( selector ) )
 					.Where( x => x.GetTypeInfo().IsInterface )
 					.Distinct();
+		}
+	}
+
+	public sealed class GenericImplementationSpecification : SpecificationCache<Type, Type>
+	{
+		public static GenericImplementationSpecification Default { get; } = new GenericImplementationSpecification();
+		GenericImplementationSpecification() : this( type => new Implementation( type ) ) {}
+
+		[UsedImplicitly]
+		public GenericImplementationSpecification( Func<Type, ISpecification<Type>> create ) : base( create ) {}
+
+		public sealed class Implementation : SpecificationWithContextBase<IParameterizedSource<Type, ImmutableArray<Type>>, Type>
+		{
+			public Implementation( Type referencedType ) : this( Implementations.Default.Get( referencedType ) ) {}
+
+			[UsedImplicitly]
+			public Implementation( IParameterizedSource<Type, ImmutableArray<Type>> context ) : base( context ) {}
+
+			public override bool IsSatisfiedBy( Type parameter ) => Context.Get( parameter ).Any();
+		}
+	}
+
+	public sealed class Implementations : ParameterizedSourceCache<Type, Type, ImmutableArray<Type>>
+	{
+		public static Implementations Default { get; } = new Implementations();
+		Implementations() : base( type => new Implementation( type ).ToCache() ) {}
+
+		public sealed class Implementation : ParameterizedItemSourceBase<Type, Type>
+		{
+			readonly ImmutableArray<Type> candidates;
+			
+			public Implementation( Type referencedType ) : this( referencedType.Append( AllInterfaces.Default.GetFixed( referencedType ) ).ToImmutableArray() ) {}
+
+			[UsedImplicitly]
+			public Implementation( ImmutableArray<Type> candidates )
+			{
+				this.candidates = candidates;
+			}
+
+			public override IEnumerable<Type> Yield( Type parameter )
+			{
+				var result = candidates
+					.Introduce( parameter,
+								tuple =>
+								{
+									var first = tuple.Item1.GetTypeInfo();
+									var second = tuple.Item2.GetTypeInfo();
+									var match = first.IsGenericType && second.IsGenericType && tuple.Item1.GetGenericTypeDefinition() == tuple.Item2.GetGenericTypeDefinition();
+									return match;
+								} );
+				return result;
+			}
 		}
 	}
 
@@ -227,33 +281,18 @@ namespace DragonSpark.TypeSystem
 		{
 			ReferencedType = referencedType;
 			Info = info;
-			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Get ).Get;
+			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( referencedType, info ).Get ).Get;
 		}
 
 		public Type ReferencedType { get; }
 
 		public TypeInfo Info { get; }
 
-		[Freeze]
-		public Type[] GetImplementations( Type genericDefinition )
-		{
-			var result = ReferencedType.Append( Interfaces.Default.GetFixed( ReferencedType ) )
-							 .Introduce( genericDefinition, tuple =>
-															{
-																var first = tuple.Item1.GetTypeInfo();
-																var second = tuple.Item2.GetTypeInfo();
-																var match = first.IsGenericType && second.IsGenericType && tuple.Item1.GetGenericTypeDefinition() == tuple.Item2.GetGenericTypeDefinition();
-																return match;
-															} )
-							 .Fixed();
-			return result;
-		}
-
 		public ImmutableArray<MethodMapping> GetMappedMethods( Type interfaceType ) => methodMapper( interfaceType );
 		
 
-		[Freeze]
-		public bool IsGenericOf( Type genericDefinition ) => GetImplementations( genericDefinition ).Any();
+		/*[Freeze]
+		public bool IsGenericOf( Type genericDefinition ) => GetImplementations( genericDefinition ).Any();*/
 
 		/*[Freeze]
 		public Type[] GetAllInterfaces() => Expand( ReferencedType ).ToArray();

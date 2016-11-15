@@ -23,8 +23,7 @@ namespace DragonSpark.Composition
 
 		public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors( CompositionContract contract, DependencyAccessor descriptorAccessor )
 		{
-			var adapter = contract.ContractType.Adapt();
-			if ( adapter.IsGenericOf( Definition ) )
+			if ( contract.ContractType.ImplementsGeneric( Definition ) )
 			{
 				var inner = contract.ContractType.GetInnerType();
 				var type = contract.ChangeType( inner );

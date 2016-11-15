@@ -16,7 +16,7 @@ namespace DragonSpark.Sources
 		static IEnumerable<Type> Candidates( Type type )
 		{
 			yield return type;
-			foreach ( var implementation in type.Adapt().GetImplementations( typeof(ISource<>) ) )
+			foreach ( var implementation in type.GetImplementations( typeof(ISource<>) ) )
 			{
 				yield return implementation.GetInnerType();
 			}

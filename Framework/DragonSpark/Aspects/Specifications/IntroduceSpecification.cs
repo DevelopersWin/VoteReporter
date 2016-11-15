@@ -7,6 +7,7 @@ using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System;
+using System.Linq;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Specifications
@@ -23,7 +24,7 @@ namespace DragonSpark.Aspects.Specifications
 					.Accept ) {}
 
 		public IntroduceSpecification( Type specificationType, Func<object, object> factory ) 
-			: base( DragonSpark.Specifications.Extensions.Inverse( SpecificationTypeDefinition.Default ), factory, specificationType.Adapt().GetImplementations( SpecificationTypeDefinition.Default.ReferencedType ) ) {}
+			: base( DragonSpark.Specifications.Extensions.Inverse( SpecificationTypeDefinition.Default ), factory, specificationType.GetImplementations( SpecificationTypeDefinition.Default.ReferencedType ).ToArray() ) {}
 
 		sealed class Constructors : Cache<Type, IParameterizedSource<Type, Func<object, ISpecificationAdapter>>>
 		{

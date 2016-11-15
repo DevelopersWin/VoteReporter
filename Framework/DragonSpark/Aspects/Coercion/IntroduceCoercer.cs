@@ -8,6 +8,7 @@ using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
 using System;
+using System.Linq;
 using Activator = DragonSpark.Activation.Activator;
 
 namespace DragonSpark.Aspects.Coercion
@@ -22,7 +23,7 @@ namespace DragonSpark.Aspects.Coercion
 								.Accept
 			) {}
 
-		public IntroduceCoercer( Type coercerType, Func<object, object> factory ) : base( ParameterizedSourceTypeDefinition.Default.Inverse(), factory, coercerType.Adapt().GetImplementations( ParameterizedSourceTypeDefinition.Default.ReferencedType ) ) {}
+		public IntroduceCoercer( Type coercerType, Func<object, object> factory ) : base( ParameterizedSourceTypeDefinition.Default.Inverse(), factory, coercerType.GetImplementations( ParameterizedSourceTypeDefinition.Default.ReferencedType ).ToArray() ) {}
 
 		sealed class Constructors : Cache<Type, IParameterizedSource<Type, Func<object, ICoercerAdapter>>>
 		{
