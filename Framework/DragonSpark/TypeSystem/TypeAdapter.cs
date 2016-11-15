@@ -25,7 +25,7 @@ namespace DragonSpark.TypeSystem
 	public sealed class TypeAssignableSpecification : SpecificationCache<Type>
 	{
 		public static TypeAssignableSpecification Default { get; } = new TypeAssignableSpecification();
-		public static IParameterizedSource<Type, Func<Type, bool>> Delegates { get; } = new Cache<Type, Func<Type, bool>>( Default.To( DelegateCoercer.Default ).Get );
+		public static IParameterizedSource<Type, Func<Type, bool>> Delegates { get; } = new Cache<Type, Func<Type, bool>>( Default.To( SpecificationDelegates<Type>.Default ).Get );
 		TypeAssignableSpecification() : base( type => new DefaultImplementation( type ).ToCachedSpecification() ) {}
 
 		sealed class DefaultImplementation : TypeSpecificationBase
@@ -80,11 +80,31 @@ namespace DragonSpark.TypeSystem
 			parameter.Append( parameter.DeclaredNestedTypes ).Where( Specification ).AsTypes().ToImmutableArray();
 	}
 
+	public sealed class ConstructorLocator : ParameterizedSourceCache<TypeInfo, ImmutableArray<Type>, ConstructorInfo>
+	{
+		public static ConstructorLocator Default { get; } = new ConstructorLocator();
+		ConstructorLocator() : base( info => new ExtendedDictionaryCache<ImmutableArray<Type>, ConstructorInfo>( new DefaultImplementation( info ).Get ) ) {}
 
+		sealed class DefaultImplementation : ParameterizedSourceBase<ImmutableArray<Type>, ConstructorInfo>
+		{
+			ImmutableArray<ConstructorInfo> candidates;
+
+			public DefaultImplementation( TypeInfo typeInfo ) : this( InstanceConstructors.Default.Get( typeInfo ) ) {}
+
+			DefaultImplementation( ImmutableArray<ConstructorInfo> candidates )
+			{
+				this.candidates = candidates;
+			}
+
+			public override ConstructorInfo Get( ImmutableArray<Type> parameter ) =>
+				candidates
+					.Introduce( parameter, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
+					.SingleOrDefault();
+		}
+	}
 
 	public sealed class TypeAdapter : ITypeAware
 	{
-		
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
 		// readonly Func<Type, bool> isAssignableFrom;
 		
@@ -96,22 +116,11 @@ namespace DragonSpark.TypeSystem
 			ReferencedType = referencedType;
 			Info = info;
 			methodMapper = new DecoratedSourceCache<Type, ImmutableArray<MethodMapping>>( new MethodMapper( this ).Get ).Get;
-			/*GenericFactoryMethods = new GenericStaticMethodFactories( ReferencedType );
-			GenericCommandMethods = new GenericStaticMethodCommands( ReferencedType );*/
-			// isAssignableFrom = new IsInstanceOfTypeOrDefinitionCache( this ).Get;
 		}
 
 		public Type ReferencedType { get; }
 
 		public TypeInfo Info { get; }
-
-		/*public GenericStaticMethodFactories GenericFactoryMethods { get; }
-		public GenericStaticMethodCommands GenericCommandMethods { get; }*/
-
-		public ConstructorInfo FindConstructor( params Type[] parameterTypes ) => 
-				InstanceConstructors.Default.Get( Info )
-				.Introduce( parameterTypes, tuple => CompatibleArgumentsSpecification.Default.Get( tuple.Item1 ).IsSatisfiedBy( tuple.Item2 ) )
-				.SingleOrDefault();
 
 		public bool IsAssignableFrom( Type other ) => TypeAssignableSpecification.Default.Get( ReferencedType ).IsSatisfiedBy( other );
 		

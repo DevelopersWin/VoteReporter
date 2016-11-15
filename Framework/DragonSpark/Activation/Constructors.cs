@@ -1,5 +1,6 @@
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.TypeSystem;
 using System;
@@ -17,9 +18,9 @@ namespace DragonSpark.Activation
 		{
 			var types = ObjectTypeFactory.Default.Get( parameter.Arguments.ToArray() ).ToArray();
 			var candidates = new [] { types, types.WhereAssigned().Fixed(), Items<Type>.Default };
-			var adapter = parameter.RequestedType.Adapt();
+			var locator = ConstructorLocator.Default.Get( parameter.RequestedType );
 			var result = candidates.Distinct( StructuralEqualityComparer<Type[]>.Default )
-								   .Introduce( adapter , tuple => tuple.Item2.FindConstructor( tuple.Item1 )  )
+								   .Introduce( locator, tuple => tuple.Item2.Get( tuple.Item1 )  )
 								   .FirstOrDefault();
 			return result;
 		}

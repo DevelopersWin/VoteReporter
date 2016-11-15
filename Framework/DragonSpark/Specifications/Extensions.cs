@@ -34,13 +34,8 @@ namespace DragonSpark.Specifications
 		public static bool IsSatisfiedBy( this ISpecification<Type> @this, TypeInfo parameter ) => @this.ToDelegate().Get( parameter );
 		public static bool IsSatisfiedBy( this Func<Type, bool> @this, TypeInfo parameter ) => @this( parameter.AsType() );
 
-		public static Func<T, bool> ToDelegate<T>( this ISpecification<T> @this ) => Delegates<T>.Default.Get( @this );
-		sealed class Delegates<T> : Cache<ISpecification<T>, Func<T, bool>>
-		{
-			public static Delegates<T> Default { get; } = new Delegates<T>();
-			Delegates() : base( specification => specification.IsSatisfiedBy ) {}
-		}
-
+		public static Func<T, bool> ToDelegate<T>( this ISpecification<T> @this ) => SpecificationDelegates<T>.Default.Get( @this );
+		
 		public static ISpecification<T> ToCachedSpecification<T>( this ISpecification<T> @this ) where T : class => CachedSpecifications<T>.Default.Get( @this );
 		sealed class CachedSpecifications<T> : Cache<ISpecification<T>, ISpecification<T>> where T : class
 		{

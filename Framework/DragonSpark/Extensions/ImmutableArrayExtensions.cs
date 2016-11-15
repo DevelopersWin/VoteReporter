@@ -9,6 +9,8 @@ namespace DragonSpark.Extensions
 	{
 		public static IEnumerable<T> AsEnumerable<T>( this ImmutableArray<T> source ) => source.ToArray();
 
+		public static int Count<T>( this ImmutableArray<T> source, Func<T, bool> predicate ) => source.ToArray().Count( predicate );
+
 		public static IEnumerable<T> Distinct<T>( this ImmutableArray<T> first ) => first.ToArray().Distinct();
 
 		public static IEnumerable<TResult> SelectMany<TSource, TResult>(this ImmutableArray<TSource> @this, Func<TSource, IEnumerable<TResult>> selector)

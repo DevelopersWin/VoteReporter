@@ -21,7 +21,7 @@ namespace DragonSpark.TypeSystem.Generics
 				this.candidates = candidates;
 			}
 
-			public override T Get( ImmutableArray<Type> parameter ) => candidates.Introduce( parameter.ToArray(), tuple => tuple.Item1.Specification( tuple.Item2 ), tuple => tuple.Item1.Delegate ).Single();
+			public override T Get( ImmutableArray<Type> parameter ) => candidates.Introduce( parameter, tuple => tuple.Item1.Specification( tuple.Item2 ), tuple => tuple.Item1.Delegate ).Single();
 		}
 	}
 }

@@ -31,7 +31,9 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 			static Func<Func<TInstance, TValue>, ICache<TInstance, TValue>> Create()
 			{
-				var definition = typeof(TValue).GetTypeInfo().IsValueType ? typeof(DecoratedSourceCache<,>) : typeof(Cache<,>);
+				var definition = 
+					typeof(TInstance).GetTypeInfo().IsValueType ? typeof(ExtendedDictionaryCache<,>) :
+					typeof(TValue).GetTypeInfo().IsValueType ? typeof(DecoratedSourceCache<,>) : typeof(Cache<,>);
 				var generic = definition.MakeGenericType( typeof(TInstance), typeof(TValue) );
 				var result = ParameterConstructor<Func<TInstance, TValue>, ICache<TInstance, TValue>>.Make( typeof(Func<TInstance, TValue>), generic );
 				return result;

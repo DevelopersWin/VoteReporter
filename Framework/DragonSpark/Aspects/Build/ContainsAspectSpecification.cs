@@ -1,17 +1,14 @@
-﻿using System;
-using System.Reflection;
-using DragonSpark.Sources.Coercion;
-using DragonSpark.Sources.Parameterized;
-using DragonSpark.Specifications;
+﻿using DragonSpark.Specifications;
 using JetBrains.Annotations;
 using PostSharp.Aspects;
+using System;
+using System.Reflection;
 
 namespace DragonSpark.Aspects.Build
 {
 	public sealed class ContainsAspectSpecification : SpecificationCache<Type, MemberInfo>
 	{
 		public static ContainsAspectSpecification Default { get; } = new ContainsAspectSpecification();
-		public static IParameterizedSource<Type, Func<MemberInfo, bool>> Delegates { get; } = Default.To( DelegateCoercer.Default ).ToCache();
 		ContainsAspectSpecification() : base( type => new DefaultImplementation( type ) ) {}
 
 		public sealed class DefaultImplementation : SpecificationBase<MemberInfo>

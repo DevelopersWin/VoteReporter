@@ -28,7 +28,7 @@ namespace DragonSpark.Activation
 
 		public static Func<TParameter, TResult> Make( Type parameterType, Type resultType )
 		{
-			var constructor = resultType.Adapt().FindConstructor( parameterType );
+			var constructor = ConstructorLocator.Default.Get( resultType ).Get( parameterType );
 			var result = constructor != null ? Make( constructor ) : ( parameter => default(TResult) );
 			return result;
 		}

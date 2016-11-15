@@ -1,6 +1,6 @@
-﻿using System;
-using DragonSpark.Aspects.Adapters;
+﻿using DragonSpark.Aspects.Adapters;
 using JetBrains.Annotations;
+using System;
 
 namespace DragonSpark.Aspects.Alteration
 {
