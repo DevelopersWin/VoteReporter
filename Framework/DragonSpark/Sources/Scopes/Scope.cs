@@ -12,7 +12,7 @@ namespace DragonSpark.Sources.Scopes
 
 		public Scope() : this( () => default(T) ) {}
 
-		public Scope( Func<T> defaultFactory ) : this( defaultFactory.Accept ) {}
+		public Scope( Func<T> defaultFactory ) : this( defaultFactory.Call ) {}
 
 		public Scope( Func<object, T> defaultFactory ) : this( new ScopeContext(), defaultFactory ) {}
 
@@ -30,7 +30,7 @@ namespace DragonSpark.Sources.Scopes
 			factories.Remove( context.Get() );
 		}
 
-		public virtual void Assign( Func<T> item ) => factories.SetOrClear( context.Get(), item.Accept );
+		public virtual void Assign( Func<T> item ) => factories.SetOrClear( context.Get(), item.Call );
 
 		public override T Get()
 		{

@@ -20,6 +20,6 @@ namespace DragonSpark.Aspects.Build
 			ParameterConstructor<TParameter, TResult>
 				.Default
 				.WithParameter( source.WithParameter( parameter ).Get )
-				.Fix;
+				.Call;
 	}
 }

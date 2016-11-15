@@ -9,7 +9,7 @@ namespace DragonSpark.Sources.Scopes
 		readonly IScope<Func<TParameter, TResult>> scope;
 
 		public ParameterizedScope() : this( parameter => default(TResult) ) {}
-		public ParameterizedScope( Func<TParameter, TResult> source ) : this( new Scope<Func<TParameter, TResult>>( source.Invoke ) ) {}
+		public ParameterizedScope( Func<TParameter, TResult> source ) : this( new Scope<Func<TParameter, TResult>>( source.Accept ) ) {}
 
 		public ParameterizedScope( Func<object, Func<TParameter, TResult>> source ) : this( new Scope<Func<TParameter, TResult>>( source ) ) {}
 

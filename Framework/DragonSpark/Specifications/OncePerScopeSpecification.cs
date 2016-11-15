@@ -9,6 +9,6 @@ namespace DragonSpark.Specifications
 		public OncePerScopeSpecification() : this( new SingletonScope<ConditionMonitor>( () => new ConditionMonitor() ) ) {}
 
 		[UsedImplicitly]
-		public OncePerScopeSpecification( ISource<ConditionMonitor> source ) : base( source.Fix ) {}
+		public OncePerScopeSpecification( ISource<ConditionMonitor> source ) : base( source.Call ) {}
 	}
 }

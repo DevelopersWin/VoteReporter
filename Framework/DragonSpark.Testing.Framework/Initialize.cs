@@ -17,7 +17,7 @@ namespace DragonSpark.Testing.Framework
 		public static void Execution()
 		{
 			DragonSpark.Application.Execution.Default.Assign( ExecutionContext.Default );
-			DragonSpark.Application.Clock.Default.Assign( Time.Default.Fix );
+			DragonSpark.Application.Clock.Default.Assign( Time.Default.Call );
 			LoggerAlterations.Default.Assign( DefaultSystemLoggerAlterations.Default.IncludeExports().Accept );
 
 			Path.Default.Assign<MockPath>();
@@ -26,7 +26,7 @@ namespace DragonSpark.Testing.Framework
 			File.Default.Assign<MockFile>();
 			FileInfoFactory.DefaultImplementation.Implementation.Assign( ParameterConstructor<string, MockFileInfo>.Default.Allot );
 
-			UserSettingsFilePath.Default.Assign( Application.Setup.UserSettingsFilePath.Default.Fix );
+			UserSettingsFilePath.Default.Assign( Application.Setup.UserSettingsFilePath.Default.Call );
 		}
 	}
 }
