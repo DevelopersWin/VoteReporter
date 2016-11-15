@@ -35,34 +35,13 @@ namespace DragonSpark.TypeSystem
 
 		public static Assembly Assembly( this Type @this ) => @this.GetTypeInfo().Assembly;
 
-		public static bool IsAssignableFrom( this ImmutableArray<Type> @this, Type type ) => @this.ToArray().IsAssignableFrom( type );
-		public static bool IsAssignableFrom( this IEnumerable<Type> @this, Type type ) => @this.AsAdapters().IsAssignableFrom( type );
-		public static bool IsAssignableFrom( this IEnumerable<TypeAdapter> @this, Type type ) => @this.ToImmutableArray().IsAssignableFrom( type );
-		public static bool IsAssignableFrom( this ImmutableArray<TypeAdapter> @this, Type type )
+		// public static bool IsAssignableFrom( this ImmutableArray<Type> @this, Type type ) => @this.ToArray().IsAssignableFrom( type );
+		// public static bool IsAssignableFrom( this IEnumerable<Type> @this, Type type ) => @this.IsAssignableFrom( type );
+		/*public static bool IsAssignableFrom( this IEnumerable<Type> @this, Type type ) => @this.ToImmutableArray().IsAssignableFrom( type );
+		public static bool IsAssignableFrom( this ImmutableArray<Type> @this, Type type )
 		{
-			foreach ( var adapter in @this )
-			{
-				if ( adapter.IsAssignableFrom( type ) )
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public static bool IsInstanceOfType( this IEnumerable<Type> @this, object instance ) => @this.AsAdapters().IsInstanceOfType( instance );
-		public static bool IsInstanceOfType( this IEnumerable<TypeAdapter> @this, object instance ) => @this.ToImmutableArray().IsInstanceOfType( instance );
-		public static bool IsInstanceOfType( this ImmutableArray<TypeAdapter> @this, object instance )
-		{
-			foreach ( var adapter in @this )
-			{
-				if ( adapter.IsInstanceOfType( instance ) )
-				{
-					return true;
-				}
-			}
-			return false;
-		}
+			
+		}*/
 
 		public static ImmutableArray<Type> GetParameterTypes( this MethodBase @this ) => Support.ParameterTypes.Get( @this );
 

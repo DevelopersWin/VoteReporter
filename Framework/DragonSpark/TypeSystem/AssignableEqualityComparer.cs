@@ -13,7 +13,7 @@ namespace DragonSpark.TypeSystem
 			this.types = types.ToImmutableArray();
 		}
 
-		public bool Equals( Type x, Type y ) => x.Adapt().IsAssignableFrom( y );
+		public bool Equals( Type x, Type y ) => x.IsAssignableFrom( y );
 
 		public int GetHashCode( Type obj )
 		{

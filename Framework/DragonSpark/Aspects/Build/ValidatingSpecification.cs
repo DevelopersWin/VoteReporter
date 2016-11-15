@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace DragonSpark.Aspects.Build
 {
-	sealed class ValidatingSpecification : AdapterAssignableSpecification
+	sealed class ValidatingSpecification : CompositeAssignableSpecification
 	{
 		readonly ImmutableArray<Type> aspectTypes;
 		readonly ImmutableArray<Type> types;

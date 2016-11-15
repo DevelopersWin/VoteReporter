@@ -50,14 +50,14 @@ namespace DragonSpark.Aspects.Build
 		sealed class Implementation : ParameterizedSourceBase<TypeInfo, ImmutableArray<AspectInstance>?>
 		{
 			readonly ImmutableArray<Type> types;
-			readonly ISpecification<TypeInfo> specification;
+			readonly ISpecification<Type> specification;
 			readonly IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector;
 			readonly ImmutableArray<ITypeDefinition> candidates;
 
 			public Implementation( ImmutableArray<Type> types, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates ) 
-				: this( types, new AdapterAssignableSpecification( types.ToArray() ), selector, candidates ) {}
+				: this( types, new CompositeAssignableSpecification( types ), selector, candidates ) {}
 
-			Implementation( ImmutableArray<Type> types, ISpecification<TypeInfo> specification, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates )
+			Implementation( ImmutableArray<Type> types, ISpecification<Type> specification, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates )
 			{
 				this.types = types;
 				this.specification = specification;

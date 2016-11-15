@@ -9,7 +9,7 @@ namespace DragonSpark.TypeSystem
 	public class KnownTypes : ParameterizedSingletonScope<Type, ImmutableArray<Type>>
 	{
 		public static KnownTypes Default { get; } = new KnownTypes();
-		KnownTypes() : base( type => ApplicationTypes.Default.Get().Where( type.Adapt().IsAssignableFrom ).ToImmutableArray() ) {}
+		KnownTypes() : base( type => ApplicationTypes.Default.Get().Where( type.IsAssignableFrom ).ToImmutableArray() ) {}
 
 		public ImmutableArray<Type> Get<T>() => Get( typeof(T) );
 	}

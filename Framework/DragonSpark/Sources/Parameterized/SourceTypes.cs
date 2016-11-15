@@ -29,7 +29,7 @@ namespace DragonSpark.Sources.Parameterized
 
 		protected override Type Create( Type parameter )
 		{
-			var candidates = mappings.Introduce( parameter, tuple => tuple.Item2.Adapt().IsAssignableFrom( tuple.Item1.Value ) ).ToArray();
+			var candidates = mappings.Introduce( parameter, tuple => tuple.Item2.IsAssignableFrom( tuple.Item1.Value ) ).ToArray();
 			var conventions = Suffixes.Introduce( parameter.Name, tuple => string.Concat( tuple.Item1, tuple.Item2 ) ).ToArray();
 			var keyValuePairs = Get( parameter, candidates, conventions ).ToArray();
 			var result = keyValuePairs.FirstAssigned()?.Key;

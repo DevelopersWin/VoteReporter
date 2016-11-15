@@ -6,18 +6,21 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DragonSpark.Specifications;
 
 namespace DragonSpark.Sources.Parameterized
 {
 	public abstract class TypeLocatorBase : CacheWithImplementedFactoryBase<Type, Type>
 	{
-		readonly ImmutableArray<TypeAdapter> types;
+		readonly ISpecification<Type> specification;
 		readonly Func<TypeInfo, bool> isAssignable;
 		readonly Func<Type[], Type> selector;
 
-		protected TypeLocatorBase( params Type[] types )
+		protected TypeLocatorBase( params Type[] types ) : this( new CompositeAssignableSpecification( types ) ) {}
+
+		protected TypeLocatorBase( ISpecification<Type> specification  )
 		{
-			this.types = types.AsAdapters();
+			this.specification = specification;
 			isAssignable = IsAssignable;
 			selector = From;
 		}
@@ -33,7 +36,7 @@ namespace DragonSpark.Sources.Parameterized
 			return result;
 		}
 
-		bool IsAssignable( TypeInfo type ) => type.IsGenericType && types.IsAssignableFrom( type.GetGenericTypeDefinition() );
+		bool IsAssignable( TypeInfo type ) => type.IsGenericType && specification.IsSatisfiedBy( type.GetGenericTypeDefinition() );
 
 		protected abstract Type From( IEnumerable<Type> genericTypeArguments );
 	}

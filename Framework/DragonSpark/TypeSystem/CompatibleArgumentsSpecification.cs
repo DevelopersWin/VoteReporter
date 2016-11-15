@@ -20,7 +20,7 @@ namespace DragonSpark.TypeSystem
 
 			readonly int required;
 
-			public DefaultImplementation( MethodBase method ) : this( method.GetParameters().Select( info => new Parameter( info.ParameterType.Adapt(), info.IsOptional ) ).ToImmutableArray() ) {}
+			public DefaultImplementation( MethodBase method ) : this( method.GetParameters().Select( info => new Parameter( info.ParameterType, info.IsOptional ) ).ToImmutableArray() ) {}
 
 			DefaultImplementation( ImmutableArray<Parameter> parameters ) : this( parameters, parameters.Count( info => !info.Optional ) ) {}
 
@@ -43,13 +43,13 @@ namespace DragonSpark.TypeSystem
 
 		public struct Parameter
 		{
-			public Parameter( TypeAdapter parameterType, bool optional )
+			public Parameter( Type parameterType, bool optional )
 			{
 				ParameterType = parameterType;
 				Optional = optional;
 			}
 
-			public TypeAdapter ParameterType { get; }
+			public Type ParameterType { get; }
 			public bool Optional { get; }
 		}
 	}

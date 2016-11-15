@@ -41,9 +41,8 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void IsInstanceOfType()
 		{
-			var adapter = new TypeAdapter( typeof(Casted) );
 			var instance = new Casted( 6776 );
-			Assert.True( adapter.IsInstanceOfType( instance ) );
+			Assert.True( typeof(Casted).IsInstanceOfType( instance ) );
 			Assert.Equal( 6776, instance.Item );
 		}
 

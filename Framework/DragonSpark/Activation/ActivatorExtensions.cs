@@ -35,6 +35,6 @@ namespace DragonSpark.Activation
 		public static T Construct<T>( this IConstructor @this, Type type, params object[] parameters ) => (T)@this.Get( new ConstructTypeRequest( type, parameters ) );
 
 		public static ImmutableArray<T> ActivateMany<T>( this IActivator @this, IEnumerable<Type> types ) => @this.ActivateMany<T>( typeof(T), types );
-		public static ImmutableArray<T> ActivateMany<T>( this IActivator @this, Type objectType, IEnumerable<Type> types ) => @this.CreateMany( types.Where( objectType.Adapt().IsAssignableFrom ) ).OfType<T>().ToImmutableArray();
+		public static ImmutableArray<T> ActivateMany<T>( this IActivator @this, Type objectType, IEnumerable<Type> types ) => @this.CreateMany( types.Where( objectType.IsAssignableFrom ) ).OfType<T>().ToImmutableArray();
 	}
 }

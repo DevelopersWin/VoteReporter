@@ -147,8 +147,8 @@
     <Compile Include="Application\Setup\InstanceRepositoryTests.cs" />
     <Compile Include="Setup\SetupTests.cs" />
     <Compile Include="Application\ExecutionContextTests.cs" />
-    <Compile Include="Specifications\AdapterAssignableSpecificationTests.cs" />
-    <Compile Include="Specifications\AdapterInstanceSpecificationTests.cs" />
+    <Compile Include="Specifications\CompositeAssignableSpecificationTests.cs" />
+    <Compile Include="Specifications\CompositeInstanceSpecificationTests.cs" />
     <Compile Include="Specifications\ConfigurableSpecificationTests.cs" />
     <Compile Include="TypeSystem\AllPartsTests.cs" />
     <Compile Include="TypeSystem\AssemblyResourcePathSelectorTests.cs" />

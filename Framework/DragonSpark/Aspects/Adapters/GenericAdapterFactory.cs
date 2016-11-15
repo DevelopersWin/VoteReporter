@@ -18,7 +18,7 @@ namespace DragonSpark.Aspects.Adapters
 
 		public GenericAdapterFactory( Type implementedType, Type adapterType ) : this( implementedType, implementedType, adapterType ) {}
 		public GenericAdapterFactory( Type parameterType, Type implementedType, Type adapterType ) : this( implementedType, new GenericAdapterConstructorFactory<TParameter, TResult>( parameterType, implementedType, adapterType ).ToDelegate() ) {}
-		GenericAdapterFactory( Type implementedType, Func<Type, Func<TParameter, TResult>> constructorSource ) : base( new AdapterInstanceSpecification( implementedType ).Coerce( CastCoercer<TParameter, object>.Default ) )
+		GenericAdapterFactory( Type implementedType, Func<Type, Func<TParameter, TResult>> constructorSource ) : base( new CompositeInstanceSpecification( implementedType ).Coerce( CastCoercer<TParameter, object>.Default ) )
 		{
 			this.constructorSource = constructorSource;
 		}

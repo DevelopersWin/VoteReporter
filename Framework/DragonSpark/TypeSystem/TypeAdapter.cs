@@ -67,6 +67,10 @@ namespace DragonSpark.TypeSystem
 		}
 
 		public static ImmutableArray<Type> WithNested( this Type @this ) => NestedTypesFactory.Default.Get( @this );
+
+		public static bool IsAssignableFrom( this Type @this, Type other ) => TypeAssignableSpecification.Default.Get( @this ).IsSatisfiedBy( other );
+		
+		public static bool IsInstanceOfType( this Type @this, object instance ) => @this.IsAssignableFrom( instance.GetType() );
 	}
 
 	public sealed class NestedTypesFactory : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<Type>>
@@ -121,13 +125,6 @@ namespace DragonSpark.TypeSystem
 		public Type ReferencedType { get; }
 
 		public TypeInfo Info { get; }
-
-		public bool IsAssignableFrom( Type other ) => TypeAssignableSpecification.Default.Get( ReferencedType ).IsSatisfiedBy( other );
-		
-
-		public bool IsInstanceOfType( object instance ) => IsAssignableFrom( instance.GetType() );
-		
-		public Assembly Assembly => Info.Assembly;
 
 		public IEnumerable<Type> GetHierarchy( bool includeRoot = false )
 		{

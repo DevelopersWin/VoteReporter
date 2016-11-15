@@ -334,7 +334,7 @@
     <Compile Include="Sources\SourceAccountedAlteration.cs" />
     <Compile Include="Sources\SourceAccountedTypes.cs" />
     <Compile Include="Sources\SourceTypeCandidateParameter.cs" />
-    <Compile Include="Specifications\AdapterInstanceSpecification.cs" />
+    <Compile Include="Specifications\CompositeInstanceSpecification.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
     <Compile Include="Specifications\ConfigurableSpecification.cs" />
     <Compile Include="Specifications\ContainsItemSpecification.cs" />
@@ -462,7 +462,7 @@
     <Compile Include="Sources\ExportSource.cs" />
     <Compile Include="Sources\IItemSource.cs" />
     <Compile Include="Sources\ItemSource.cs" />
-    <Compile Include="Specifications\AdapterAssignableSpecification.cs" />
+    <Compile Include="Specifications\CompositeAssignableSpecification.cs" />
     <Compile Include="Sources\Parameterized\AutoValidatingSourceBase.cs" />
     <Compile Include="Sources\Parameterized\CacheParameterHandler.cs" />
     <Compile Include="Sources\Parameterized\Caching\ActivatedCache.cs" />
