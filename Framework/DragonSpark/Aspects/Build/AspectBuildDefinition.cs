@@ -39,17 +39,15 @@ namespace DragonSpark.Aspects.Build
 
 		sealed class Implementation : ParameterizedSourceBase<TypeInfo, ImmutableArray<AspectInstance>?>
 		{
-			readonly ImmutableArray<Type> types;
 			readonly ISpecification<Type> specification;
 			readonly IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector;
 			readonly ImmutableArray<ITypeDefinition> candidates;
 
 			public Implementation( ImmutableArray<Type> types, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates ) 
-				: this( types, new CompositeAssignableSpecification( types ), selector, candidates ) {}
+				: this( new CompositeAssignableSpecification( types ), selector, candidates ) {}
 
-			Implementation( ImmutableArray<Type> types, ISpecification<Type> specification, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates )
+			Implementation( ISpecification<Type> specification, IParameterizedSource<ITypeDefinition, ImmutableArray<IAspects>> selector, params ITypeDefinition[] candidates )
 			{
-				this.types = types;
 				this.specification = specification;
 				this.selector = selector;
 				this.candidates = candidates.ToImmutableArray();
@@ -58,15 +56,15 @@ namespace DragonSpark.Aspects.Build
 			public override ImmutableArray<AspectInstance>? Get( TypeInfo parameter )
 			{
 				var builder = ImmutableArray.CreateBuilder<AspectInstance>();
-				var valid = Templates<Valid>.Default.Get( parameter );
-				var added = Templates<Added>.Default.Get( parameter );
+				var valid = parameter.With<Valid>();
+				var added = parameter.With<Added>();
 				foreach ( var candidate in candidates )
 				{
 					foreach ( var aspects in selector.GetFixed( candidate ) )
 					{
-						var isSatisfiedBy = aspects.IsSatisfiedBy( parameter );
-						valid.Execute( candidate, aspects, isSatisfiedBy );
-						if ( isSatisfiedBy )
+						var isValid = aspects.IsSatisfiedBy( parameter );
+						valid.Execute( candidate, aspects, isValid );
+						if ( isValid )
 						{
 							var aspectInstance = aspects.Get( parameter );
 							added.Execute( aspects, aspectInstance.AspectTypeName );
