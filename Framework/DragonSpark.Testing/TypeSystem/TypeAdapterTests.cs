@@ -79,7 +79,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void GetAllInterfaces()
 		{
-			var interfaces = typeof(Derived).Adapt().GetAllInterfaces().OrderBy( x => x.Name ).ToArray();
+			var interfaces = typeof(Derived).GetAllInterfaces().OrderBy( x => x.Name ).ToArray();
 			Assert.Equal( new[]{ typeof(IAnotherInterface), typeof(IInterface) }, interfaces );
 		}
 

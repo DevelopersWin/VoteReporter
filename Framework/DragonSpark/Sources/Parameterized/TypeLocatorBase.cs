@@ -10,6 +10,6 @@ namespace DragonSpark.Sources.Parameterized
 	public abstract class SourceTypeLocatorBase : Cache<Type, Type>
 	{
 		protected SourceTypeLocatorBase( Func<Type[], Type> locate, params Type[] types ) 
-			: base( new TypeLocator( info => info.Append( info.Adapt().GetAllInterfaces() ).ToImmutableArray(), new CompositeAssignableSpecification( types ).IsSatisfiedBy, locate ).Get ) {}
+			: base( new TypeLocator( info => info.Append( info.GetAllInterfaces() ).ToImmutableArray(), new CompositeAssignableSpecification( types ).IsSatisfiedBy, locate ).Get ) {}
 	}
 }

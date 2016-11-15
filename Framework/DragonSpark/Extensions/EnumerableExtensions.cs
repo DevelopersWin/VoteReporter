@@ -137,6 +137,7 @@ namespace DragonSpark.Extensions
 		}*/
 
 		public static IEnumerable<T> Append<T>( this T @this, params T[] second ) => @this.Append( second.AsEnumerable() );
+		public static IEnumerable<T> Append<T>( this T @this, ImmutableArray<T> second ) => @this.Append_( second.ToArray() );
 		public static IEnumerable<T> Append<T>( this T @this, IEnumerable<T> second ) => @this.Append_( second );
 
 		static IEnumerable<T> Append_<T>( this T @this, IEnumerable<T> second )

@@ -75,6 +75,7 @@ namespace DragonSpark.TypeSystem
 		public static Type GetInnerType( this Type @this ) => InnerTypes.Default.Get( @this );
 		public static Type GetEnumerableType( this Type @this ) => EnumerableTypes.Default.Get( @this );
 		public static ImmutableArray<Type> GetHierarchy( this Type @this ) => TypeHierarchies.Default.Get( @this );
+		public static ImmutableArray<Type> GetAllInterfaces( this Type @this ) => Interfaces.Default.Get( @this );
 	}
 
 	public sealed class NestedTypes : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<Type>>
@@ -157,6 +158,29 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
+	public sealed class Interfaces : ParameterizedItemCache<Type, Type>
+	{
+		public static Interfaces Default { get; } = new Interfaces();
+		Interfaces() : base( DefaultImplementation.Implementation ) {}
+
+		public sealed class DefaultImplementation : ParameterizedItemSourceBase<Type, Type>
+		{
+			readonly Func<Type, IEnumerable<Type>> selector;
+
+			public static DefaultImplementation Implementation { get; } = new DefaultImplementation();
+			DefaultImplementation()
+			{
+				selector = Yield;
+			}
+
+			public override IEnumerable<Type> Yield( Type parameter ) => 
+				parameter
+					.Append( parameter.GetTypeInfo().ImplementedInterfaces.SelectMany( selector ) )
+					.Where( x => x.GetTypeInfo().IsInterface )
+					.Distinct();
+		}
+	}
+
 	public sealed class TypeHierarchies : ParameterizedItemCache<TypeInfo, Type>
 	{
 		public static TypeHierarchies Default { get; } = new TypeHierarchies();
@@ -193,7 +217,7 @@ namespace DragonSpark.TypeSystem
 
 	public sealed class TypeAdapter : ITypeAware
 	{
-		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
+		// readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
 		// readonly Func<Type, bool> isAssignableFrom;
 		
 		readonly Func<Type, ImmutableArray<MethodMapping>> methodMapper;
@@ -210,32 +234,10 @@ namespace DragonSpark.TypeSystem
 
 		public TypeInfo Info { get; }
 
-		/*[Freeze]
-		public Type GetEnumerableType() => InnerType( GetHierarchy(), types => types.Only(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
-
 		[Freeze]
-		public Type GetInnerType() => InnerType( GetHierarchy(), types => types.Only() );
-
-		static Type InnerType( IEnumerable<Type> hierarchy, Func<Type[], Type> fromGenerics, Func<TypeInfo, bool> check = null )
+		public Type[] GetImplementations( Type genericDefinition )
 		{
-			foreach ( var type in hierarchy )
-			{
-				var info = type.GetTypeInfo();
-				var result = info.IsGenericType && info.GenericTypeArguments.Any() && ( check?.Invoke( info ) ?? true ) ? fromGenerics( info.GenericTypeArguments ) :
-					type.IsArray ? type.GetElementType() : null;
-				if ( result != null )
-				{
-					return result;
-				}
-			}
-			return null;
-		}*/
-
-		[Freeze]
-		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true )
-		{
-			var result = ReferencedType.Append( includeInterfaces ? Expand( ReferencedType ) : Items<Type>.Default )
-							 .Distinct()
+			var result = ReferencedType.Append( Interfaces.Default.GetFixed( ReferencedType ) )
 							 .Introduce( genericDefinition, tuple =>
 															{
 																var first = tuple.Item1.GetTypeInfo();
@@ -251,14 +253,11 @@ namespace DragonSpark.TypeSystem
 		
 
 		[Freeze]
-		public bool IsGenericOf( Type genericDefinition ) => IsGenericOf( genericDefinition, true );
+		public bool IsGenericOf( Type genericDefinition ) => GetImplementations( genericDefinition ).Any();
 
-		[Freeze]
-		public bool IsGenericOf( Type genericDefinition, bool includeInterfaces ) => GetImplementations( genericDefinition, includeInterfaces ).Any();
-
-		[Freeze]
+		/*[Freeze]
 		public Type[] GetAllInterfaces() => Expand( ReferencedType ).ToArray();
 
-		static IEnumerable<Type> ExpandInterfaces( Type target ) => target.Append( target.GetTypeInfo().ImplementedInterfaces.SelectMany( Expand ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();
+		static IEnumerable<Type> ExpandInterfaces( Type target ) => target.Append( target.GetTypeInfo().ImplementedInterfaces.SelectMany( Expand ) ).Where( x => x.GetTypeInfo().IsInterface ).Distinct();*/
 	}
 }
