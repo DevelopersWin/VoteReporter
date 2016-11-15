@@ -21,7 +21,7 @@ namespace DragonSpark.Aspects.Specifications
 					.Get( implementationType )
 					.Get( specificationType )
 					.WithParameter( Activator.Default.WithParameter( specificationType ).Get )
-					.Accept ) {}
+					.Fix ) {}
 
 		public IntroduceSpecification( Type specificationType, Func<object, object> factory ) 
 			: base( DragonSpark.Specifications.Extensions.Inverse( SpecificationTypeDefinition.Default ), factory, specificationType.GetImplementations( SpecificationTypeDefinition.Default.ReferencedType ).ToArray() ) {}

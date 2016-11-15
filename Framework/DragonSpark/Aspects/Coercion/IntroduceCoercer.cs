@@ -20,7 +20,7 @@ namespace DragonSpark.Aspects.Coercion
 			: this( coercerType, 
 					Constructors.Default.Get( implementationType ).Get( coercerType ) 
 								.WithParameter( Activator.Default.WithParameter( coercerType ).Get )
-								.Accept
+								.Fix
 			) {}
 
 		public IntroduceCoercer( Type coercerType, Func<object, object> factory ) : base( ParameterizedSourceTypeDefinition.Default.Inverse(), factory, coercerType.GetImplementations( ParameterizedSourceTypeDefinition.Default.ReferencedType ).ToArray() ) {}

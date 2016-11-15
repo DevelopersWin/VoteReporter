@@ -6,7 +6,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 {
 	public static class Caches
 	{
-		public static ICache<T> Create<T>( Func<T> parameter ) => Create( parameter.Fix );
+		public static ICache<T> Create<T>( Func<T> parameter ) => Create( parameter.Accept );
 
 		public static ICache<T> Create<T>( Func<object, T> parameter ) => Implementations<T>.Factory( parameter );
 
