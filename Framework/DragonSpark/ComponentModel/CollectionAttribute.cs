@@ -15,7 +15,7 @@ namespace DragonSpark.ComponentModel
 
 		static ServicesValueProvider Create( Type type = null ) => new ServicesValueProvider( p =>
 		{
-			var elementType = type ?? p.PropertyType.Adapt().GetEnumerableType();
+			var elementType = type ?? p.PropertyType.GetEnumerableType();
 			var result = elementType.With( Transform );
 			return result;
 		}, Constructor.Default.Get );

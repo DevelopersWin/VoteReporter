@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void EnumerableType()
 		{
-			var item = new TypeAdapter( typeof(List<int>) ).GetEnumerableType();
+			var item = typeof(List<int>).GetEnumerableType();
 			Assert.Equal( typeof(int), item );
 		}
 
@@ -87,9 +87,9 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void GetItemType()
 		{
-			Assert.Equal( typeof(Class), typeof(List<Class>).Adapt().GetInnerType() );
-			Assert.Equal( typeof(Class), typeof(Class[]).Adapt().GetInnerType() );
-			Assert.Null( typeof(Class).Adapt().GetInnerType() );
+			Assert.Equal( typeof(Class), typeof(List<Class>).GetInnerType() );
+			Assert.Equal( typeof(Class), typeof(Class[]).GetInnerType() );
+			Assert.Null( typeof(Class).GetInnerType() );
 		}
 	}
 }

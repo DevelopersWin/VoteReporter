@@ -26,7 +26,7 @@ namespace DragonSpark.Composition
 			var adapter = contract.ContractType.Adapt();
 			if ( adapter.IsGenericOf( Definition ) )
 			{
-				var inner = adapter.GetInnerType();
+				var inner = contract.ContractType.GetInnerType();
 				var type = contract.ChangeType( inner );
 				var exists = profileSource().IsSatisfiedBy( inner ) || Exists( descriptorAccessor, type );
 				yield return new ExportDescriptorPromise( type, GetType().Name, true, NoDependencies, new Factory( exists ).Get );

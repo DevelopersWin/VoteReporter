@@ -25,7 +25,7 @@ namespace DragonSpark.Composition
 			public override object Get( Type parameter )
 			{
 				var enumerable = parameter.GetTypeInfo().IsGenericType && parameter.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-				var result = enumerable ? host.GetExports( parameter.Adapt().GetEnumerableType() ) : host.TryGet<object>( parameter );
+				var result = enumerable ? host.GetExports( parameter.GetEnumerableType() ) : host.TryGet<object>( parameter );
 				return result;
 			}
 		}

@@ -1,4 +1,5 @@
-﻿using DragonSpark.Testing.Objects;
+﻿using DragonSpark.Specifications;
+using DragonSpark.Testing.Objects;
 using DragonSpark.TypeSystem;
 using Xunit;
 

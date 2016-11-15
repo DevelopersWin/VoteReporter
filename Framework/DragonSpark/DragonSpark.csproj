@@ -293,6 +293,7 @@
     <Compile Include="Sources\Parameterized\ICurry.cs" />
     <Compile Include="Sources\Parameterized\IParameterizedItemSource.cs" />
     <Compile Include="Sources\Parameterized\ISpecificationParameterizedSource.cs" />
+    <Compile Include="Sources\Parameterized\ParameterizedItemCache.cs" />
     <Compile Include="Sources\Parameterized\ParameterizedItemSourceBase.cs" />
     <Compile Include="Sources\Parameterized\ParameterizedSourceCache.cs" />
     <Compile Include="Sources\Scopes\AggregateParameterizedSource.cs" />

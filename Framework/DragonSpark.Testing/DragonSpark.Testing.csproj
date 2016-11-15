@@ -136,6 +136,7 @@
     <Compile Include="Sources\Scopes\ParameterizedSingletonScopeTests.cs" />
     <Compile Include="Sources\Scopes\ScopesTests.cs" />
     <Compile Include="Sources\SourceAccountedTypesTests.cs" />
+    <Compile Include="Sources\SourceTypeAssignableSpecificationTests.cs" />
     <Compile Include="Sources\SuppliedSourceTests.cs" />
     <Compile Include="Sources\TimedDelegatedSourceTests.cs" />
     <Compile Include="Extensions\MethodExtensionsTests.cs" />

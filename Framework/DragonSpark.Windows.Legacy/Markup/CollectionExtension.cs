@@ -24,7 +24,7 @@ namespace DragonSpark.Windows.Legacy.Markup
 			var result = DetermineList( serviceProvider );
 			if ( result != null )
 			{
-				var type = result.GetType().Adapt().GetEnumerableType();
+				var type = result.GetType().GetEnumerableType();
 				foreach ( var source in Items.Purge().Where( type.IsInstanceOfType ) )
 				{
 					result.Add( source );

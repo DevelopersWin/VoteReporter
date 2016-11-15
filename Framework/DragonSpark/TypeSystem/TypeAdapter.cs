@@ -71,6 +71,9 @@ namespace DragonSpark.TypeSystem
 		public static bool IsAssignableFrom( this Type @this, Type other ) => TypeAssignableSpecification.Default.Get( @this ).IsSatisfiedBy( other );
 		
 		public static bool IsInstanceOfType( this Type @this, object instance ) => @this.IsAssignableFrom( instance.GetType() );
+
+		public static Type GetInnerType( this Type @this ) => InnerTypes.Default.Get( @this );
+		public static Type GetEnumerableType( this Type @this ) => EnumerableTypes.Default.Get( @this );
 	}
 
 	public sealed class NestedTypesFactory : CacheWithImplementedFactoryBase<TypeInfo, ImmutableArray<Type>>
@@ -107,6 +110,119 @@ namespace DragonSpark.TypeSystem
 		}
 	}
 
+	public sealed class InnerTypes : Cache<Type, Type>
+	{
+		public static InnerTypes Default { get; } = new InnerTypes();
+		InnerTypes() : base( TypeLocator.Default.Get ) {}
+	}
+
+	public sealed class EnumerableTypes : Cache<Type, Type>
+	{
+		public static EnumerableTypes Default { get; } = new EnumerableTypes();
+		EnumerableTypes() : base( new TypeLocator( i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) ).Get ) {}
+	}
+
+	/*public sealed class TypeLocator : TypeLocatorBase*/
+
+		/*public abstract class TypeLocatorBase : CacheWithImplementedFactoryBase<Type, Type>
+	{
+		readonly ISpecification<Type> specification;
+		readonly Func<TypeInfo, bool> isAssignable;
+		readonly Func<Type[], Type> selector;
+
+		protected TypeLocatorBase( params Type[] types ) : this( new CompositeAssignableSpecification( types ) ) {}
+
+		protected TypeLocatorBase( ISpecification<Type> specification  )
+		{
+			this.specification = specification;
+			isAssignable = IsAssignable;
+			selector = From;
+		}
+
+		protected override Type Create( Type parameter )
+		{
+			var result = parameter.Append( parameter.Adapt().GetAllInterfaces() )
+								  .AsTypeInfos()
+								  .Where( isAssignable )
+								  .Select( info => info.GenericTypeArguments )
+								  .Select( selector )
+								  .FirstOrDefault();
+			return result;
+		}
+
+		bool IsAssignable( TypeInfo type ) => type.IsGenericType && specification.IsSatisfiedBy( type.GetGenericTypeDefinition() );
+
+		protected abstract Type From( IEnumerable<Type> genericTypeArguments );
+	}*/
+
+	public sealed class TypeLocator : AlterationBase<Type>
+	{
+		readonly Func<Type, ImmutableArray<Type>> typeSource;
+		readonly Func<TypeInfo, bool> where;
+		readonly Func<Type[], Type> selector;
+
+		public static TypeLocator Default { get; } = new TypeLocator();
+		TypeLocator() : this( Where<TypeInfo>.Always ) {}
+
+		public TypeLocator( Func<TypeInfo, bool> where ) : this( TypeHierarchies.Default.Get, where, types => types.Only() ) {}
+
+		public TypeLocator( Func<Type, ImmutableArray<Type>> typeSource, Func<TypeInfo, bool> where, Func<Type[], Type> selector )
+		{
+			this.typeSource = typeSource;
+			this.where = where;
+			this.selector = selector;
+		}
+
+		public override Type Get( Type parameter )
+		{
+			foreach ( var type in typeSource( parameter ) )
+			{
+				var info = type.GetTypeInfo();
+				var result = info.IsGenericType && info.GenericTypeArguments.Any() && where( info ) ? selector( info.GenericTypeArguments ) :
+					type.IsArray ? type.GetElementType() : null;
+				if ( result != null )
+				{
+					return result;
+				}
+			}
+			return null;
+		}
+	}
+
+	public sealed class TypeHierarchies : ParameterizedItemCache<TypeInfo, Type>
+	{
+		public static TypeHierarchies Default { get; } = new TypeHierarchies();
+		TypeHierarchies() : base( DefaultImplementation.Implementation ) {}
+
+		public sealed class DefaultImplementation : ParameterizedItemSourceBase<TypeInfo, Type>
+		{
+			public static DefaultImplementation Implementation { get; } = new DefaultImplementation();
+			DefaultImplementation() : this( typeof(object) ) {}
+
+			readonly Type rootType;
+
+			[UsedImplicitly]
+			public DefaultImplementation( Type rootType )
+			{
+				this.rootType = rootType;
+			}
+
+			public override IEnumerable<Type> Yield( TypeInfo parameter )
+			{
+				yield return parameter.AsType();
+				var current = parameter.BaseType;
+				while ( current != null )
+				{
+					if ( current != rootType )
+					{
+						yield return current;
+					}
+					current = current.GetTypeInfo().BaseType;
+				}
+			}
+		}
+	}
+
 	public sealed class TypeAdapter : ITypeAware
 	{
 		readonly static Func<Type, IEnumerable<Type>> Expand = ExpandInterfaces;
@@ -140,7 +256,7 @@ namespace DragonSpark.TypeSystem
 			}
 		}
 
-		[Freeze]
+		/*[Freeze]
 		public Type GetEnumerableType() => InnerType( GetHierarchy(), types => types.Only(), i => i.Adapt().IsGenericOf( typeof(IEnumerable<>) ) );
 
 		[Freeze]
@@ -159,7 +275,7 @@ namespace DragonSpark.TypeSystem
 				}
 			}
 			return null;
-		}
+		}*/
 
 		[Freeze]
 		public Type[] GetImplementations( Type genericDefinition, bool includeInterfaces = true )

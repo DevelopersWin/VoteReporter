@@ -92,7 +92,7 @@ namespace DragonSpark.Windows.Legacy.Entity
 				return result;
 			}
 
-			static IEnumerable<string> GetAssociationPropertyNames( IObjectContextAdapter target, Type type ) => target.GetEntityProperties( type ).Select( x => type.GetProperty( x.Name ) ).Where( x => x.PropertyType.Adapt().GetInnerType() == null ).Select( x => x.Name );
+			static IEnumerable<string> GetAssociationPropertyNames( IObjectContextAdapter target, Type type ) => target.GetEntityProperties( type ).Select( x => type.GetProperty( x.Name ) ).Where( x => x.PropertyType.GetInnerType() == null ).Select( x => x.Name );
 		}
 
 		public static TItem Create<TItem>( this DbContext target, Action<TItem> with = null ) where TItem : class, new()
@@ -114,7 +114,7 @@ namespace DragonSpark.Windows.Legacy.Entity
 				{
 					var property = type.GetProperty( x );
 					var raw = property.GetValue( entity );
-					var items = property.PropertyType.Adapt().GetInnerType() != null ? raw.To<IEnumerable>().Cast<object>().ToArray() : new[] { raw };
+					var items = property.PropertyType.GetInnerType() != null ? raw.To<IEnumerable>().Cast<object>().ToArray() : new[] { raw };
 					items.Each( y => context.Set( y.GetType() ).Remove( y ) );
 					context.Save();
 				} );
@@ -193,7 +193,7 @@ namespace DragonSpark.Windows.Legacy.Entity
 				{
 					foreach ( var z in associationNames.Select( y => type.GetProperty( y ).GetValue( entity ) ).WhereAssigned() )
 					{
-						var items = z.Adapt().GetInnerType() != null ? z.AsTo<IEnumerable, object[]>( a => a.Cast<object>().ToArray() ) : z.Fix();
+						var items = z.GetType().GetInnerType() != null ? z.AsTo<IEnumerable, object[]>( a => a.Cast<object>().ToArray() ) : z.Fix();
 
 						foreach ( var item in items )
 						{
@@ -211,7 +211,7 @@ namespace DragonSpark.Windows.Legacy.Entity
 			{
 				foreach ( var name in associationNames )
 				{
-					if ( entity.GetType().GetProperty( name ).PropertyType.Adapt().GetInnerType() != null )
+					if ( entity.GetType().GetProperty( name ).PropertyType.GetInnerType() != null )
 					{
 						var collection = entry.Collection( name );
 						var current = collection.CurrentValue.AsTo<IEnumerable, IEnumerable<object>>( x => x.Cast<object>() );

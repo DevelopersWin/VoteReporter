@@ -1,5 +1,6 @@
 ﻿using DragonSpark.Activation;
 using DragonSpark.Sources.Coercion;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.Specifications;
 using JetBrains.Annotations;
 using System;
@@ -10,7 +11,7 @@ namespace DragonSpark.Sources
 	public sealed class SourceTypeAssignableSpecification : SpecificationBase<SourceTypeCandidateParameter>
 	{
 		public static SourceTypeAssignableSpecification Default { get; } = new SourceTypeAssignableSpecification();
-		SourceTypeAssignableSpecification() : this( SourceAccountedTypes.Default.To( ParameterConstructor<ImmutableArray<Type>, CompositeAssignableSpecification>.Default ).Get ) {}
+		SourceTypeAssignableSpecification() : this( SourceAccountedTypes.Default.To( ParameterConstructor<ImmutableArray<Type>, CompositeAssignableSpecification>.Default ).ToSingleton() ) {}
 
 		readonly Func<Type, ISpecification<Type>> specificationSource;
 

@@ -12,6 +12,6 @@ namespace DragonSpark.Windows.Legacy.Markup
 		public static CollectionSpecification Default { get; } = new CollectionSpecification();
 
 		public override bool IsSatisfiedBy( IServiceProvider parameter ) => 
-			parameter.Get<IProvideValueTarget>().TargetObject.With( o => o is IList && o.Adapt().GetEnumerableType() != null );
+			parameter.Get<IProvideValueTarget>().TargetObject.With( o => o is IList && o.GetType().GetEnumerableType() != null );
 	}
 }

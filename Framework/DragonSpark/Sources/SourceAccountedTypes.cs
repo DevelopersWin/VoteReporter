@@ -18,7 +18,7 @@ namespace DragonSpark.Sources
 			yield return type;
 			foreach ( var implementation in type.Adapt().GetImplementations( typeof(ISource<>) ) )
 			{
-				yield return implementation.Adapt().GetInnerType();
+				yield return implementation.GetInnerType();
 			}
 		}
 	}

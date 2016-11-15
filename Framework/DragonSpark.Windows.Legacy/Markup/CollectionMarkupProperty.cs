@@ -27,8 +27,8 @@ namespace DragonSpark.Windows.Legacy.Markup
 				return i;
 			}, () => -1 );
 
-			var itemType = collection.GetType().Adapt().GetInnerType();
-			var items = new Stack<object>( itemType.IsInstanceOfType( value ) ? value.Fix() : value.GetType().Adapt().GetInnerType().With( itemType.IsAssignableFrom ) ? value.To<IEnumerable>().Cast<object>() : Items<object>.Default );
+			var itemType = collection.GetType().GetInnerType();
+			var items = new Stack<object>( itemType.IsInstanceOfType( value ) ? value.Fix() : value.GetType().GetInnerType().With( itemType.IsAssignableFrom ) ? value.To<IEnumerable>().Cast<object>() : Items<object>.Default );
 
 			var result = index == -1 && items.Any() ? items.Pop() : null;
 
