@@ -4,6 +4,7 @@ using DragonSpark.Runtime;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Sources.Scopes;
+using DragonSpark.Specifications;
 using JetBrains.Annotations;
 using PostSharp;
 using PostSharp.Extensibility;
@@ -17,6 +18,23 @@ using System.Text;
 
 namespace DragonSpark.Aspects
 {
+	public class InitializationCommand : SpecificationCommand<object>
+	{
+		public static InitializationCommand Default { get; } = new InitializationCommand();
+		InitializationCommand() : base( new OnlyOnceSpecification(), Implementation.Instance.Execute ) {}
+
+		sealed class Implementation : RunCommandBase
+		{
+			public static Implementation Instance { get; } = new Implementation();
+			Implementation() {}
+
+			public override void Execute()
+			{
+				// throw new InvalidOperationException( "!!!!WOOHOO???");
+			}
+		}
+	}
+
 	public class LoggingSink : DelegatedCommand<Message>, ILogEventSink
 	{
 		public static LoggingSink Default { get; } = new LoggingSink();

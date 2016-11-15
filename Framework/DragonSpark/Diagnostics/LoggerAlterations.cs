@@ -10,12 +10,12 @@ namespace DragonSpark.Diagnostics
 	public sealed class LoggerAlterations : ItemScope<IAlteration<LoggerConfiguration>>
 	{
 		public static LoggerAlterations Default { get; } = new LoggerAlterations();
-		LoggerAlterations() : base( new SingletonScope<IEnumerable<IAlteration<LoggerConfiguration>>>( DefaultLoggerAlterations.Default.IncludeExports ) ) {}
+		LoggerAlterations() : base( DefaultLoggerAlterations.Default.IncludeExports ) {}
 
 		public sealed class Configure : AssignGlobalScopeCommand<IEnumerable<IAlteration<LoggerConfiguration>>>
 		{
 			public static Configure Implementation { get; } = new Configure();
-			Configure() : base( Default.Scope ) {}
+			Configure() : base( Default ) {}
 		}
 	}
 }
