@@ -15,9 +15,7 @@ namespace DragonSpark.Windows
 			using ( var md5 = MD5.Create() )
 			{
 				return md5.ComputeHash( parameter.ToArray() ).ToImmutableArray();
-				// return new Guid( md5.ComputeHash( encoding.GetBytes( item ) ) );
 			}
-			
 		}
 	}
 }

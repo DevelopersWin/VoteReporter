@@ -18,7 +18,7 @@ using System.Text;
 
 namespace DragonSpark.Aspects
 {
-	public class InitializationCommand : SpecificationCommand<object>
+	public sealed class InitializationCommand : SpecificationCommand<object>
 	{
 		public static InitializationCommand Default { get; } = new InitializationCommand();
 		InitializationCommand() : base( new OnlyOnceSpecification(), Implementation.Instance.Execute ) {}
@@ -30,7 +30,7 @@ namespace DragonSpark.Aspects
 
 			public override void Execute()
 			{
-				// throw new InvalidOperationException( "!!!!WOOHOO???");
+				
 			}
 		}
 	}

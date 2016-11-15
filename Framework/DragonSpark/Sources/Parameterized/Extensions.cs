@@ -21,13 +21,13 @@ namespace DragonSpark.Sources.Parameterized
 				.SelectAssigned( @this.ToDelegate() )
 				.ToImmutableArray();
 
-		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TParameter> alteration ) => Apply( @this, alteration.ToDelegate() );
+		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TParameter> alteration ) => Apply( @this, alteration.ToAlterDelegate() );
 		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Alter<TParameter> alter ) => Apply( @this.ToDelegate(), alter );
 		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TParameter> alter ) =>
 			new AlteredParameterizedSource<TParameter, TResult>( alter, @this );
 
 		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Func<TResult, TResult> selector ) => Apply( @this, new Alter<TResult>( selector ) );
-		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TResult> selector ) => Apply( @this, selector.ToDelegate() );
+		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, IAlteration<TResult> selector ) => Apply( @this, selector.ToAlterDelegate() );
 		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, Alter<TResult> selector ) => Apply( @this.ToDelegate(), selector );
 		public static IParameterizedSource<TParameter, TResult> Apply<TParameter, TResult>( this Func<TParameter, TResult> @this, Alter<TResult> selector ) =>
 			new AlteredResultParameterizedSource<TParameter, TResult>( @this, selector );
@@ -68,7 +68,7 @@ namespace DragonSpark.Sources.Parameterized
 			ParameterizedSourceDelegates() : base( factory => factory.Get ) {}
 		}
 
-		public static Alter<T> ToDelegate<T>( this IAlteration<T> @this ) => Selectors<T>.Default.Get( @this );
+		public static Alter<T> ToAlterDelegate<T>( this IAlteration<T> @this ) => Selectors<T>.Default.Get( @this );
 		sealed class Selectors<T> : Cache<IAlteration<T>, Alter<T>>
 		{
 			public static Selectors<T> Default { get; } = new Selectors<T>();

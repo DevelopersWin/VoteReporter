@@ -1,9 +1,9 @@
 using DragonSpark.Application;
 using DragonSpark.Commands;
 using DragonSpark.Runtime.Assignments;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Scopes;
-using System.Linq;
 using System.Reflection;
 
 namespace DragonSpark.Testing.Framework.Application
@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Framework.Application
 		sealed class DefaultImplementation : ConfiguringFactory<MethodBase, IApplication>
 		{
 			public static DefaultImplementation Implementation { get; } = new DefaultImplementation();
-			DefaultImplementation() : base( _ => new Application( ApplicationCommandSource.Default.ToArray() ), ApplicationInitializer.Default.Execute, Assign.Instance.Execute ) {}
+			DefaultImplementation() : base( _ => new Application( ApplicationCommandSource.Default.Unwrap() ), ApplicationInitializer.Default.Execute, Assign.Instance.Execute ) {}
 
 			sealed class Assign : AssignScopeCommand<IApplication>
 			{

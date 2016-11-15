@@ -1,9 +1,7 @@
-using DragonSpark.Runtime.Assignments;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Scopes;
 using Serilog;
-using System.Collections.Generic;
 
 namespace DragonSpark.Diagnostics
 {
@@ -12,10 +10,10 @@ namespace DragonSpark.Diagnostics
 		public static LoggerAlterations Default { get; } = new LoggerAlterations();
 		LoggerAlterations() : base( DefaultLoggerAlterations.Default.IncludeExports ) {}
 
-		public sealed class Configure : AssignGlobalScopeCommand<IEnumerable<IAlteration<LoggerConfiguration>>>
+		/*public sealed class Configure : AssignGlobalScopeCommand<IEnumerable<IAlteration<LoggerConfiguration>>>
 		{
 			public static Configure Implementation { get; } = new Configure();
 			Configure() : base( Default ) {}
-		}
+		}*/
 	}
 }

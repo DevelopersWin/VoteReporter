@@ -1,7 +1,7 @@
 ﻿using DragonSpark.Sources.Parameterized;
 using Xunit;
 
-namespace DragonSpark.Testing.Specifications
+namespace DragonSpark.Testing.Commands
 {
 	public class SpecificationsTests
 	{

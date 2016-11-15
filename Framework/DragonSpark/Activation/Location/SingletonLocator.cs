@@ -19,7 +19,7 @@ namespace DragonSpark.Activation.Location
 
 		sealed class SourceFactory : ParameterizedSourceBase<Func<Type, Func<object>>, Func<Type, object>>
 		{
-			readonly static Alter<Type> Conventions = ConventionTypeSelector.Default.ToDelegate();
+			readonly static Alter<Type> Conventions = ConventionTypeSelector.Default.ToAlterDelegate();
 
 			public static SourceFactory Instance { get; } = new SourceFactory();
 			SourceFactory() {}

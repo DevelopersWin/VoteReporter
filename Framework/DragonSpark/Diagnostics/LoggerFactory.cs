@@ -38,9 +38,10 @@ namespace DragonSpark.Diagnostics
 		[UsedImplicitly]
 		public sealed class Factory : ParameterizedSourceBase<LoggerConfiguration, ILogger>
 		{
-			readonly Func<object, bool> specification;
 			public static IParameterizedScope<Serilog.LoggerConfiguration, ILogger> Implementation { get; } = new Factory().Allow( ValidatedCastCoercer<Serilog.LoggerConfiguration, LoggerConfiguration>.Default ).ToScope();
 			Factory() : this( new DelegatedAssignedSpecification<object, IFormattable>( Formatters.Default.Get ).IsSatisfiedBy ) {}
+
+			readonly Func<object, bool> specification;
 
 			public Factory( Func<object, bool> specification )
 			{
@@ -48,7 +49,9 @@ namespace DragonSpark.Diagnostics
 			}
 
 			public override ILogger Get( LoggerConfiguration parameter ) => 
-				parameter.CreateLogger().ForContext( Constants.SourceContextPropertyName, parameter.Instance, specification( parameter.Instance ) );
+				parameter
+					.CreateLogger()
+					.ForContext( Constants.SourceContextPropertyName, parameter.Instance, specification( parameter.Instance ) );
 		}
 
 		[UsedImplicitly]

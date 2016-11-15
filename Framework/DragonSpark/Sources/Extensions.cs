@@ -63,6 +63,6 @@ namespace DragonSpark.Sources
 
 		public static IEnumerable<T> IncludeExports<T>( this IEnumerable<T> @this ) => IncludeExportsAlteration<T>.Default.Get( @this );
 
-		public static IItemSource<T> ToSource<T>( this IEnumerable<T> @this ) => new ItemSource<T>( @this );
+		// public static IItemSource<T> ToSource<T>( this IEnumerable<T> @this ) => new ItemSource<T>( @this );
 	}
 }
