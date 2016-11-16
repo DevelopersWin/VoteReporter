@@ -1,28 +1,20 @@
+using DragonSpark.Diagnostics.Configurations;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
-using Serilog;
+using LoggerConfiguration = Serilog.LoggerConfiguration;
 
 namespace DragonSpark.Diagnostics
 {
 	public sealed class DefaultSystemLoggerConfigurations : ItemSource<IAlteration<LoggerConfiguration>>
 	{
 		public static DefaultSystemLoggerConfigurations Default { get; } = new DefaultSystemLoggerConfigurations();
-		DefaultSystemLoggerConfigurations() : base( HistoryAlteration.Implementation.Append( DefaultLoggerConfigurations.Default ) ) {}
+		DefaultSystemLoggerConfigurations() : base( AddHistorySink.Implementation.Append( DefaultLoggerConfigurations.Default ) ) {}
 
-		sealed class HistoryAlteration : AlterationBase<LoggerConfiguration>
+		sealed class AddHistorySink : AddSinkConfiguration
 		{
-			public static HistoryAlteration Implementation { get; } = new HistoryAlteration();
-			HistoryAlteration() : this( LoggingHistory.Default ) {}
-
-			readonly ILoggerHistory history;
-
-			HistoryAlteration( ILoggerHistory history )
-			{
-				this.history = history;
-			}
-
-			public override LoggerConfiguration Get( LoggerConfiguration parameter ) => parameter.WriteTo.Sink( history );
+			public static AddHistorySink Implementation { get; } = new AddHistorySink();
+			AddHistorySink() : base( LoggingHistory.Default ) {}
 		}
 	}
 }

@@ -1,12 +1,12 @@
 using DragonSpark.Application;
-using DragonSpark.Sources.Parameterized;
+using DragonSpark.Diagnostics.Configurations;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 
 namespace DragonSpark.Diagnostics
 {
-	sealed class ApplicationAssemblyAlteration : AlterationBase<LoggerConfiguration>
+	sealed class ApplicationAssemblyAlteration : LoggingConfigurationBase
 	{
 		public static ApplicationAssemblyAlteration Default { get; } = new ApplicationAssemblyAlteration();
 		ApplicationAssemblyAlteration() {}

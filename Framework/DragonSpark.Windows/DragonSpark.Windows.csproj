@@ -48,9 +48,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Diagnostics\AddConsoleSinkCommand.cs" />
-    <Compile Include="Diagnostics\AddRollingFileSinkCommand.cs" />
-    <Compile Include="Diagnostics\AddTraceSinkCommand.cs" />
+    <Compile Include="Diagnostics\AddConsoleSinkConfiguration.cs" />
+    <Compile Include="Diagnostics\AddRollingFileSinkConfiguration.cs" />
+    <Compile Include="Diagnostics\AddTraceSinkConfiguration.cs" />
     <Compile Include="Diagnostics\TraceSink.cs" />
     <Compile Include="ExecutionContext.cs" />
     <Compile Include="FileSystem\AllFilesSource.cs" />

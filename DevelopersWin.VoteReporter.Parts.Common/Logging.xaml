@@ -1,4 +1,4 @@
-﻿<configurations:LoggerConfiguration x:Class="DevelopersWin.VoteReporter.Parts.Common.Logging"
+﻿<configurations:LoggingConfigurations x:Class="DevelopersWin.VoteReporter.Parts.Common.Logging"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,15 +11,15 @@
 	xmlns:configurations="clr-namespace:DragonSpark.Diagnostics.Configurations;assembly=DragonSpark"
 	mc:Ignorable="d" 
 >
-	<configurations:MinimumLevelIsCommand />
-	<diagnosticsPlatform:AddConsoleSinkCommand />
+	<configurations:MinimumLevelIsConfiguration />
+	<diagnosticsPlatform:AddConsoleSinkConfiguration />
 
-	<configurations:AddSeqSinkCommand Endpoint="{ds:Configuration}" ApiKey="{ds:Configuration}" />
+	<configurations:AddSeqSinkConfiguration Endpoint="{ds:Configuration}" ApiKey="{ds:Configuration}" />
 	
-	<configurations:EnrichCommand>
+	<configurations:EnrichConfiguration>
 		<process:ProcessIdEnricher />
 		<thread:ThreadIdEnricher />
 		<environment:MachineNameEnricher />
 		<environment:EnvironmentUserNameEnricher />
-	</configurations:EnrichCommand>
-</configurations:LoggerConfiguration>
+	</configurations:EnrichConfiguration>
+</configurations:LoggingConfigurations>

@@ -1,7 +1,7 @@
 using DragonSpark.Activation;
+using DragonSpark.Diagnostics.Configurations;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using Serilog;
@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace DragonSpark.Diagnostics
 {
-	sealed class FormatterConfiguration : AlterationBase<LoggerConfiguration>
+	sealed class FormatterConfiguration : LoggingConfigurationBase
 	{
 		readonly static Func<object, object> Formatter = DragonSpark.Formatter.Default.Get;
 

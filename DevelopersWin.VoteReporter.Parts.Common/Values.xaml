@@ -9,6 +9,6 @@
 	xmlns:configurations="clr-namespace:DragonSpark.Diagnostics.Configurations;assembly=DragonSpark"
 	mc:Ignorable="d" 
 	>
-	<configuration:Registration Key="{ds:MemberInfoKey {x:Type configurations:AddSeqSinkCommand}, 'Endpoint'}" Value="{ds:Eval {x:Static properties:Settings.Default}, 'ServerUri'}" />
-	<configuration:Registration Key="{ds:MemberInfoKey {x:Type configurations:AddSeqSinkCommand}, 'ApiKey'}" Value="{ds:Eval {x:Static properties:Settings.Default}, 'ApiKey'}" />
+	<configuration:Registration Key="{ds:MemberInfoKey {x:Type configurations:AddSeqSinkConfiguration}, 'Endpoint'}" Value="{ds:Eval {x:Static properties:Settings.Default}, 'ServerUri'}" />
+	<configuration:Registration Key="{ds:MemberInfoKey {x:Type configurations:AddSeqSinkConfiguration}, 'ApiKey'}" Value="{ds:Eval {x:Static properties:Settings.Default}, 'ApiKey'}" />
 </configuration:ValueStoreBase>
