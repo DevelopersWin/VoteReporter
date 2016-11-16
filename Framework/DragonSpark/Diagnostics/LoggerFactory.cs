@@ -1,5 +1,5 @@
 using DragonSpark.Activation;
-using DragonSpark.Sources;
+using DragonSpark.Runtime;
 using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Scopes;
@@ -9,7 +9,6 @@ using Serilog;
 using Serilog.Core;
 using System;
 using System.Collections.Generic;
-using DragonSpark.Diagnostics.Configurations;
 
 namespace DragonSpark.Diagnostics
 {
@@ -24,7 +23,7 @@ namespace DragonSpark.Diagnostics
 				.ToScope() ) {}
 
 		[UsedImplicitly]
-		public LoggerFactory( IParameterizedScope<object, Serilog.LoggerConfiguration> configuration ) : base( configuration.To( Factory.Implementation ) )
+		public LoggerFactory( IParameterizedScope<object, Serilog.LoggerConfiguration> configuration ) : base( configuration.To( Factory.Implementation ).To( RegisteredDisposableAlteration<ILogger>.Default ) )
 		{
 			Configuration = configuration;
 		}

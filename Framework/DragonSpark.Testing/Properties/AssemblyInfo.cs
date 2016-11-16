@@ -3,7 +3,6 @@
 // associated with an assembly.
 
 using DragonSpark.Application;
-using DragonSpark.Testing.Framework;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -23,4 +22,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion( "0.1.2.0" )]
 [assembly: Application]
 
-[assembly: TestingMethodAspect]
+// [assembly: TestingMethodAspect]

@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Application;
+using DragonSpark.Aspects.Build;
 using DragonSpark.Aspects.Definitions;
 using DragonSpark.Commands;
 using DragonSpark.Diagnostics;
@@ -13,6 +14,7 @@ using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using PostSharp;
+using PostSharp.Aspects;
 using PostSharp.Extensibility;
 using Serilog.Core;
 using Serilog.Events;
@@ -36,8 +38,34 @@ namespace DragonSpark.Aspects
 		Configurations( LogEventLevel minimumLevel = LogEventLevel.Verbose ) : base(
 			AssignApplicationParts.Default.With( typeof(MethodFormatter), typeof(TypeFormatter), typeof(TypeDefinitionFormatter) ),
 			MinimumLevelConfiguration.Default.ToCommand( minimumLevel ),
-			Diagnostics.LoggerConfigurations.Configure.Instance.WithParameter( DefaultSystemLoggerConfigurations.Default.Concat( LoggerConfigurations.Default ).Accept )
+			Diagnostics.LoggerConfigurations.Configure.Instance.WithParameter( DefaultSystemLoggerConfigurations.Default.Concat( LoggerConfigurations.Default ).Accept ),
+			DisposeOnCompleteCommand.Default
 		) {}
+	}
+
+	public sealed class DisposeOnCompleteCommand : RunCommandBase
+	{
+		public static DisposeOnCompleteCommand Default { get; } = new DisposeOnCompleteCommand();
+		DisposeOnCompleteCommand() : this( AspectRepositoryService.Default, Disposables.Default ) {}
+
+		readonly IAspectRepositoryService service;
+		readonly IDisposable disposable;
+		readonly EventHandler onAction;
+
+		public DisposeOnCompleteCommand( IAspectRepositoryService service, IDisposable disposable )
+		{
+			this.service = service;
+			this.disposable = disposable;
+			onAction = DefaultOnAspectDiscoveryCompleted;
+		}
+
+		public override void Execute() => service.AspectDiscoveryCompleted += onAction;
+
+		void DefaultOnAspectDiscoveryCompleted( object sender, EventArgs eventArgs )
+		{
+			service.AspectDiscoveryCompleted -= onAction;
+			disposable.Dispose();
+		}
 	}
 
 	public sealed class TypeDefinitionFormatter : IFormattable
