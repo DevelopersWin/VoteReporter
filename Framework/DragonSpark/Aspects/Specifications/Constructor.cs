@@ -1,6 +1,7 @@
 ﻿using DragonSpark.Aspects.Adapters;
 using DragonSpark.Aspects.Definitions;
 using DragonSpark.Sources.Parameterized;
+using DragonSpark.Sources.Parameterized.Caching;
 using System;
 
 namespace DragonSpark.Aspects.Specifications

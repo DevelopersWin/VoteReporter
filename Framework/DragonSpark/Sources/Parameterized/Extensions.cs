@@ -78,25 +78,6 @@ namespace DragonSpark.Sources.Parameterized
 		public static T GetDefault<T>( this IParameterizedSource<object, T> @this ) => @this.ToDelegate().Invoke();
 		public static T Invoke<T>( this Func<object, T> @this ) => @this.Invoke( Execution.Default.GetValue() );
 
-		public static ICache<T> ToCache<T>( this IParameterizedSource<object, T> @this ) => @this.ToDelegate().ToCache();
-		public static ICache<T> ToCache<T>( this Func<object, T> @this ) => ParameterizedSources<T>.Default.Get( @this );
-		sealed class ParameterizedSources<T> : Cache<Func<object, T>, ICache<T>>
-		{
-			public static ParameterizedSources<T> Default { get; } = new ParameterizedSources<T>();
-			ParameterizedSources() : base( Caches.Create ) {}
-		}
-
-		public static ICache<TParameter, TResult> ToCache<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) => @this.ToDelegate().ToCache();
-		public static ICache<TParameter, TResult> ToCache<TParameter, TResult>( this Func<TParameter, TResult> @this ) => ParameterizedSources<TParameter, TResult>.Default.Get( @this );
-		sealed class ParameterizedSources<TParameter, TResult> : Cache<Func<TParameter, TResult>, ICache<TParameter, TResult>>
-		{
-			public static ParameterizedSources<TParameter, TResult> Default { get; } = new ParameterizedSources<TParameter, TResult>();
-			ParameterizedSources() : base( Caches.Create ) {}
-		}
-
-		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this ) where TParameter : class => @this.ToDelegate().ToEqualityCache();
-		public static ICache<TParameter, TResult> ToEqualityCache<TParameter, TResult>( this Func<TParameter, TResult> @this ) where TParameter : class => new EqualityReferenceCache<TParameter, TResult>( @this );
-		
 		public static T Get<T>( this IParameterizedSource<TypeInfo, T> @this, Type parameter ) => @this.ToDelegate().Get( parameter );
 		public static T Get<T>( this Func<TypeInfo, T> @this, Type parameter ) => @this( parameter.GetTypeInfo() );
 		public static T Get<T>( this IParameterizedSource<Type, T> @this, TypeInfo parameter ) => @this.ToDelegate().Get( parameter );

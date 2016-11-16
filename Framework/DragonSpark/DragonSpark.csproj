@@ -206,6 +206,7 @@
     <Compile Include="Runtime\Assignments\CollectionAssignment.cs" />
     <Compile Include="Runtime\DefaultValueAlteration.cs" />
     <Compile Include="Runtime\Extensions.cs" />
+    <Compile Include="Runtime\Hasher.cs" />
     <Compile Include="Runtime\IDisposables.cs" />
     <Compile Include="Sources\Coercion\CastCoercer.cs" />
     <Compile Include="Sources\Coercion\ResultCoercionSource.cs" />

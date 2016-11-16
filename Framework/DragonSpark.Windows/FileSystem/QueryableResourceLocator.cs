@@ -1,4 +1,5 @@
 ﻿using DragonSpark.Sources.Parameterized;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -12,16 +13,14 @@ namespace DragonSpark.Windows.FileSystem
 
 		public QueryableResourceLocator( Func<IFileSystemInfo, bool> specification ) : this( specification, DirectoryInfoFactory.Default.Get( Defaults.CurrentPath ) ) {}
 
+		[UsedImplicitly]
 		public QueryableResourceLocator( Func<IFileSystemInfo, bool> specification, IDirectoryInfo directory )
 		{
 			this.specification = specification;
 			this.directory = directory;
 		}
 
-		public override ImmutableArray<string> Get( string parameter )
-		{
-			var fileSystemInfos = directory.GetFileSystemInfos( parameter );
-			return fileSystemInfos.Where( specification ).Select( info => info.FullName ).ToImmutableArray();
-		}
+		public override ImmutableArray<string> Get( string parameter ) => 
+			directory.GetFileSystemInfos( parameter ).Where( specification ).Select( info => info.FullName ).ToImmutableArray();
 	}
 }

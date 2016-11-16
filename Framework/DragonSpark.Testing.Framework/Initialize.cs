@@ -22,9 +22,9 @@ namespace DragonSpark.Testing.Framework
 
 			Path.Default.Assign<MockPath>();
 			Directory.Default.Assign<MockDirectory>();
-			DirectoryInfoFactory.DefaultImplementation.Implementation.Assign( ParameterConstructor<string, MockDirectoryInfo>.Default.Allot );
+			DirectoryInfoFactory.DefaultImplementation.Implementation.Assign( ParameterConstructor<string, MockDirectoryInfo>.Default.Accept );
 			File.Default.Assign<MockFile>();
-			FileInfoFactory.DefaultImplementation.Implementation.Assign( ParameterConstructor<string, MockFileInfo>.Default.Allot );
+			FileInfoFactory.DefaultImplementation.Implementation.Assign( ParameterConstructor<string, MockFileInfo>.Default.Accept );
 
 			UserSettingsFilePath.Default.Assign( Application.Setup.UserSettingsFilePath.Default.Call );
 		}

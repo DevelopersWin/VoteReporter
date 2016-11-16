@@ -14,9 +14,9 @@ namespace DragonSpark.Sources
 		public static TResult Call<TParameter, TResult>( this Func<TResult> @this, TParameter _ ) => @this();
 		public static TResult Call<TParameter, TResult>( this ISource<TResult> @this, TParameter _ ) => @this.ToDelegate().Call( _ );
 
-		public static Func<TParameter, TResult> Allot<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, object _ ) => @this.ToDelegate().Allot( _ );
-		public static Func<TParameter, TResult> Allot<TParameter, TResult>( this Func<TParameter, TResult> @this, object _ ) => @this.ToSingleton();
 
+		public static Func<TParameter, TResult> ToDelegate<TParameter, TResult>( this IParameterizedSource<TParameter, TResult> @this, object _ ) => @this.ToDelegate();
+		
 		public static Func<T> Enclose<T>( this T @this ) => ( typeof(T).GetTypeInfo().IsValueType ? new Source<T>( @this ) : @this.Sourced() ).Get;
 	}
 }
