@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>	
-	<PostSharpTargetVersion>4.3.22</PostSharpTargetVersion>
+	<PostSharpTargetVersion>4.3.23</PostSharpTargetVersion>
 	<DontImportPostSharp>True</DontImportPostSharp>
 	<PostSharpProperties>NuGetPackageRoot=$(NuGetPackageRoot);PostSharpTargetVersion=$(PostSharpTargetVersion);$(PostSharpProperties)</PostSharpProperties>
 	<PostSharpHostConfigurationFile Condition="Exists( 'App.config' )">app.config</PostSharpHostConfigurationFile>

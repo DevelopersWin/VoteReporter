@@ -1,7 +1,7 @@
 ﻿{
   "dependencies": {
     "EntityFramework": "6.1.3",
-    "Moq": "4.5.23"
+    "Moq": "4.5.28"
   },
   "frameworks": {
     "net461": {}
