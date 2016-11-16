@@ -6,7 +6,7 @@ namespace DragonSpark.Sources.Parameterized
 	public sealed class ConstructFromKnownTypes<T> : ParameterizedSingletonScope<object, T>
 	{
 		public static ConstructFromKnownTypes<T> Default { get; } = new ConstructFromKnownTypes<T>();
-		ConstructFromKnownTypes() : base( o => new DefaultImplementation().ToSingleton() ) {}
+		ConstructFromKnownTypes() : base( o => new DefaultImplementation().Get ) {}
 
 		sealed class DefaultImplementation : FirstParameterConstructedSelector<T>
 		{

@@ -22,7 +22,7 @@ namespace DragonSpark.Sources.Parameterized.Caching
 
 		CacheWithImplementedFactoryBase( IParameterizedScope<TInstance, TValue> configuration, ISpecification<TInstance> specification ) : base( configuration.Apply( specification ).ToCache() )
 		{
-			configuration.Assign( new Func<TInstance, TValue>( Create ).Allot );
+			configuration.Assign( new Func<TInstance, TValue>( Create ).Accept );
 		}
 
 		protected abstract TValue Create( TInstance parameter );

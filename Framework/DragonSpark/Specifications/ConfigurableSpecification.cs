@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.Sources.Scopes;
+using System;
 
 namespace DragonSpark.Specifications
 {

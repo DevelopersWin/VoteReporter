@@ -6,7 +6,7 @@ namespace DragonSpark.Windows.FileSystem
 {
 	public sealed class FileInfoFactory : FileSystemInfoFactory<FileInfoBase, FileInfo, IFileInfo>
 	{
-		public static IParameterizedScope<string, IFileInfo> Default { get; } = new ParameterizedSingletonScope<string, IFileInfo>( o => new FileInfoFactory().ToEqualityCache().Get );
+		public static IParameterizedScope<string, IFileInfo> Default { get; } = new ParameterizedScope<string, IFileInfo>( o => new FileInfoFactory().ToEqualityCache().Get );
 		FileInfoFactory() : base( DefaultImplementation.Implementation.Get ) {}
 
 		public sealed class DefaultImplementation : ParameterizedSingletonScope<string, FileInfoBase>

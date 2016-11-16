@@ -11,12 +11,12 @@ namespace DragonSpark.Testing.Sources.Scopes
 			Assert.Same( Scope.Default.Get(), Scope.Default.Get() );
 		}
 
-		[Fact]
+		/*[Fact]
 		public void Coverage()
 		{
 			var instance = new object();
 			Assert.Same( instance, new ParameterizedSingletonScope<object, object>( instance ).Get( this ) );
-		}
+		}*/
 
 		class Scope : SingletonScope<object>
 		{

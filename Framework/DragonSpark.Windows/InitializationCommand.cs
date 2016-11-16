@@ -16,7 +16,7 @@ namespace DragonSpark.Windows
 	{
 		readonly static ImmutableArray<ITypeDefinitionProvider> Providers = TypeDefinitions.Source.Implementation.Get().Insert( 0, MetadataTypeDefinitionProvider.Default );
 		readonly static Func<Assembly, bool> Specification =
-			new DelegatedSpecification<Assembly>( ApplicationAssemblySpecification.Default.GetFactory() )
+			new DelegatedSpecification<Assembly>( ApplicationAssemblySpecification.Default.Get() )
 				.Or( DomainAssemblySpecification.Default )
 				.IsSatisfiedBy;
 

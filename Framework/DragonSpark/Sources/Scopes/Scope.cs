@@ -7,7 +7,7 @@ namespace DragonSpark.Sources.Scopes
 	public class Scope<T> : SourceBase<T>, IScope<T>
 	{
 		readonly IAssignableSource<Func<object, T>> defaultFactory = new SuppliedSource<Func<object, T>>();
-		readonly ICache<Func<object, T>> factories = new Cache<Func<object, T>>();
+		readonly ICache<Func<T>> factories = new Cache<Func<T>>();
 		readonly IAssignableSource<object> context;
 
 		public Scope() : this( () => default(T) ) {}
@@ -30,13 +30,13 @@ namespace DragonSpark.Sources.Scopes
 			factories.Remove( context.Get() );
 		}
 
-		public virtual void Assign( Func<T> item ) => factories.SetOrClear( context.Get(), item.Call );
+		public virtual void Assign( Func<T> item ) => factories.SetOrClear( context.Get(), item );
 
 		public override T Get()
 		{
 			var current = context.Get();
-			var factory = factories.Get( current ) ?? defaultFactory.Get();
-			var result = factory( current );
+			var local = factories.Get( current );
+			var result = local != null ? local.Invoke() : defaultFactory.Get().Invoke( current );
 			return result;
 		}
 
