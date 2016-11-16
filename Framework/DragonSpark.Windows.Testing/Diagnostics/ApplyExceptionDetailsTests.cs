@@ -21,7 +21,7 @@ namespace DragonSpark.Windows.Testing.Diagnostics
 		{
 			var logger = Logger.Default.Get( this );
 			logger.Information( new CustomException( number ), message );
-			var line = LoggingHistory.Default.Get().Events.Single();
+			var line = LoggingHistory.Default.Events.Single();
 			Assert.True( line.Properties.ContainsKey( "ExceptionDetail" ) );
 			var elements = line.Properties["ExceptionDetail"].To<DictionaryValue>().Elements;
 			Assert.Equal( 6, elements.Count );

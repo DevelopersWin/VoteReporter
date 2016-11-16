@@ -14,7 +14,7 @@ namespace DragonSpark.Diagnostics
 	public sealed class LoggerFactory : DecoratedParameterizedSource<object, ILogger>
 	{
 		public static LoggerFactory Default { get; } = new LoggerFactory();
-		LoggerFactory() : this ( LoggerAlterations.Default ) {}
+		LoggerFactory() : this ( LoggerConfigurations.Default ) {}
 
 		public LoggerFactory( IItemSource<IAlteration<Serilog.LoggerConfiguration>> alterations ) : this( 
 			new LoggerConfigurationCreator( alterations )

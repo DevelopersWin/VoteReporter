@@ -13,7 +13,7 @@ namespace DragonSpark.Testing.Diagnostics
 		[Fact]
 		public void Verify()
 		{
-			var history = LoggingHistory.Default.Get();
+			var history = LoggingHistory.Default;
 			var sink = new LoggerHistorySink();
 			LoggerFactory.Default.Configuration.Assign( x => new LoggerConfiguration().WriteTo.Sink( sink ) );
 			LoggerFactory.Factory.Implementation.Assign( configuration => configuration.CreateLogger() );

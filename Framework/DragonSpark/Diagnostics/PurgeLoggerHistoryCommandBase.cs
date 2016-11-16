@@ -9,18 +9,17 @@ namespace DragonSpark.Diagnostics
 {
 	public abstract class PurgeLoggerHistoryCommandBase<T> : CommandBase<Action<T>>
 	{
-		readonly Func<ILoggerHistory> historySource;
+		readonly ILoggerHistory history;
 		readonly Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory;
 
-		protected PurgeLoggerHistoryCommandBase( Func<ILoggerHistory> historySource, Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory )
+		protected PurgeLoggerHistoryCommandBase( ILoggerHistory history, Func<IEnumerable<LogEvent>, ImmutableArray<T>> factory )
 		{
-			this.historySource = historySource;
+			this.history = history;
 			this.factory = factory;
 		}
 
 		public override void Execute( Action<T> parameter )
 		{
-			var history = historySource();
 			factory( history.Events ).Each( parameter );
 			history.Clear();
 		}

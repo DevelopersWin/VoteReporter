@@ -4,11 +4,11 @@ using System;
 
 namespace DragonSpark.Diagnostics.Configurations
 {
-	public abstract class AddSinkCommand : ConfigureLoggerBase<LoggerSinkConfiguration>
+	public abstract class AddSinkCommandBase : ConfigureLoggerBase<LoggerSinkConfiguration>
 	{
-		protected AddSinkCommand() : this( LogEventLevel.Verbose ) {}
+		protected AddSinkCommandBase() : this( LogEventLevel.Verbose ) {}
 
-		protected AddSinkCommand( LogEventLevel restrictedToMinimumLevel ) : base( configuration => configuration.WriteTo )
+		protected AddSinkCommandBase( LogEventLevel restrictedToMinimumLevel ) : base( configuration => configuration.WriteTo )
 		{
 			RestrictedToMinimumLevel = restrictedToMinimumLevel;
 		}

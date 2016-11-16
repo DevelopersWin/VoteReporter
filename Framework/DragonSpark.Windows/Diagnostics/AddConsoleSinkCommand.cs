@@ -7,7 +7,7 @@ using Serilog.Events;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public class AddConsoleSinkCommand : AddSinkCommand
+	public class AddConsoleSinkCommand : AddSinkCommandBase
 	{
 		public AddConsoleSinkCommand() : this( DragonSpark.Diagnostics.Defaults.Template, LogEventLevel.Verbose ) {}
 

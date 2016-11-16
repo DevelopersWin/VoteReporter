@@ -56,7 +56,7 @@ namespace DragonSpark.Testing.Extensions
 		[Fact]
 		public void BreakingBuildTest()
 		{
-			var method = new Action<Action<string>>( new PurgeLoggerMessageHistoryCommand( new LoggerHistorySink().Self ).Execute ).Method;
+			var method = new Action<Action<string>>( new PurgeLoggerMessageHistoryCommand( new LoggerHistorySink() ).Execute ).Method;
 			var found = method.AccountForGenericDefinition();
 			Assert.NotNull( found );
 			Assert.NotSame( method, found );

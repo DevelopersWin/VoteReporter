@@ -25,7 +25,7 @@ namespace DragonSpark.Testing.Aspects.Exceptions
 		public void AppliedCommand()
 		{
 			var sut = new Command();
-			var history = LoggingHistory.Default.Get();
+			var history = LoggingHistory.Default;
 			Assert.Empty( history.Events );
 			Assert.Equal( 0, sut.Called );
 			Assert.Throws<CustomException>( () => sut.Execute( true ) );

@@ -16,7 +16,7 @@ namespace DragonSpark.Testing.Diagnostics
 		[Fact]
 		public void Verify()
 		{
-			var history = LoggingHistory.Default.Get();
+			var history = LoggingHistory.Default;
 			Assert.Empty( history.Events );
 			HelloWorld();
 			var item = Assert.Single( history.Events );
@@ -30,7 +30,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var configuration = TimedOperations.Configuration.Implementation;
 			configuration.Assign( () => TimedOperationFactory.Default.Accept );
 
-			var history = LoggingHistory.Default.Get();
+			var history = LoggingHistory.Default;
 			Assert.Empty( history.Events );
 			HelloWorldConfigured();
 			var item = Assert.Single( history.Events );

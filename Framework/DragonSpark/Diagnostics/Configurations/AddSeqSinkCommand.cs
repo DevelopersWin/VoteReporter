@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace DragonSpark.Diagnostics.Configurations
 {
-	public class AddSeqSinkCommand : AddSinkCommand
+	public class AddSeqSinkCommand : AddSinkCommandBase
 	{
 		public AddSeqSinkCommand() : this( LogEventLevel.Verbose, 1000, null, null, null, null ) {}
 

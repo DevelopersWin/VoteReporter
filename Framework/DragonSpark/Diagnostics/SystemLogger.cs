@@ -7,6 +7,6 @@ namespace DragonSpark.Diagnostics
 	public sealed class SystemLogger : SingletonScope<ILogger>
 	{
 		public static IScope<ILogger> Default { get; } = new SystemLogger();
-		SystemLogger() : base( new LoggerFactory( DefaultSystemLoggerAlterations.Default ).GetDefault ) {}
+		SystemLogger() : base( new LoggerFactory( DefaultSystemLoggerConfigurations.Default ).GetDefault ) {}
 	}
 }

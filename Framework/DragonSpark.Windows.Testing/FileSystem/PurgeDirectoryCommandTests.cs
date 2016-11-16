@@ -37,7 +37,7 @@ namespace DragonSpark.Windows.Testing.FileSystem
 			directory.Setup( info => info.GetDirectories() ).Returns( () => child.Object.Yield().ToArray() ).Verifiable();
 			directory.Setup( info => info.Exists ).Returns( () => true ).Verifiable();
 
-			var log = LoggingHistory.Default.Get();
+			var log = LoggingHistory.Default;
 			Assert.Empty( log.Events );
 			var sut = new PurgeDirectoryCommand( info => new[] { success.Object, fail.Object }.ToImmutableArray() );
 			sut.Execute( directory.Object );

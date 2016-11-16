@@ -1,6 +1,9 @@
 ﻿using DragonSpark.Commands;
+using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Configurations;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
@@ -27,9 +30,17 @@ namespace DragonSpark.Aspects
 
 			public override void Execute()
 			{
-				
+				// Diagnostics.LoggerConfigurations.Default.Assign( DefaultSystemLoggerConfigurations.Default.Append( new LoggerConfiguration() ).Accept );
 			}
 		}
+
+		/*sealed class LoggerConfigurations : ItemSourceBase<IAlteration<LoggerConfiguration>>
+		{
+			protected override IEnumerable<IAlteration<LoggerConfiguration>> Yield()
+			{
+				yield return new addsink;
+			}
+		}*/
 	}
 
 	public class LoggingSink : DelegatedCommand<Message>, ILogEventSink

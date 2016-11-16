@@ -7,7 +7,7 @@ using Serilog.Events;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public class AddRollingFileSinkCommand : AddSinkCommand
+	public class AddRollingFileSinkCommand : AddSinkCommandBase
 	{
 		public AddRollingFileSinkCommand() : this( DragonSpark.Diagnostics.Defaults.Template, 1073741824, 31, LogEventLevel.Verbose ) {}
 

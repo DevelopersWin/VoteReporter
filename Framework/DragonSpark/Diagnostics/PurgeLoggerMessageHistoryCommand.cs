@@ -13,8 +13,8 @@ namespace DragonSpark.Diagnostics
 		readonly static Func<IEnumerable<LogEvent>, ImmutableArray<string>> MessageFactory = LogEventMessageFactory.Default.ToDelegate();
 
 		public static PurgeLoggerMessageHistoryCommand Default { get; } = new PurgeLoggerMessageHistoryCommand();
-		PurgeLoggerMessageHistoryCommand() : this( LoggingHistory.Default.Get ) {}
+		PurgeLoggerMessageHistoryCommand() : this( LoggingHistory.Default ) {}
 
-		public PurgeLoggerMessageHistoryCommand( Func<ILoggerHistory> historySource ) : base( historySource, MessageFactory ) {}
+		public PurgeLoggerMessageHistoryCommand( ILoggerHistory history ) : base( history, MessageFactory ) {}
 	}
 }

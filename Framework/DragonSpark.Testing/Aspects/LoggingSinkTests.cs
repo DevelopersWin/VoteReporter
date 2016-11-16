@@ -15,7 +15,7 @@ namespace DragonSpark.Testing.Aspects
 		[Theory, Framework.Application.AutoData]
 		public void Verify( string message )
 		{
-			var history = LoggingHistory.Default.Get();
+			var history = LoggingHistory.Default;
 			var template = Templates<Template>.Default.Get( GetType() );
 			Assert.NotNull( template );
 			Assert.Empty( history.Events );

@@ -308,7 +308,7 @@
     <Compile Include="DefaultPriorityAware.cs" />
     <Compile Include="Diagnostics\Exceptions\Retry.cs" />
     <Compile Include="Diagnostics\Exceptions\SuppliedRetryPolicySource.cs" />
-    <Compile Include="Diagnostics\LoggerAlterations.cs" />
+    <Compile Include="Diagnostics\LoggerConfigurations.cs" />
     <Compile Include="Diagnostics\Defaults.cs" />
     <Compile Include="Diagnostics\LoggerFactory.cs" />
     <Compile Include="Diagnostics\PurgeLoggerHistoryCommand.cs" />
@@ -397,8 +397,8 @@
     <Compile Include="Diagnostics\LogExceptionCommandBase.cs" />
     <Compile Include="Diagnostics\Logger.cs" />
     <Compile Include="Diagnostics\Configurations\ConfigureLoggerBase.cs" />
-    <Compile Include="Diagnostics\DefaultSystemLoggerAlterations.cs" />
-    <Compile Include="Diagnostics\DefaultLoggerAlterations.cs" />
+    <Compile Include="Diagnostics\DefaultSystemLoggerConfigurations.cs" />
+    <Compile Include="Diagnostics\DefaultLoggerConfigurations.cs" />
     <Compile Include="Diagnostics\LoggingController.cs" />
     <Compile Include="Diagnostics\LoggingHistory.cs" />
     <Compile Include="Extensions\ConventionBasedFormattingExtensions.cs" />
@@ -622,7 +622,7 @@
     <Compile Include="Sources\SourceTypeAssignableSpecification.cs" />
     <Compile Include="Aspects\AutoGuardAspect.cs" />
     <Compile Include="Composition\ConventionImplementations.cs" />
-    <Compile Include="Diagnostics\Configurations\AddSinkCommand.cs" />
+    <Compile Include="Diagnostics\Configurations\AddSinkCommandBase.cs" />
     <Compile Include="Diagnostics\Configurations\EnrichFromLogContextCommand.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\IAlteration.cs" />

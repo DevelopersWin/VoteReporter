@@ -88,7 +88,7 @@
     <Compile Include="Sources\Parameterized\ExtensionsTests.cs" />
     <Compile Include="Sources\Scopes\ParameterizedScopeTests.cs" />
     <Compile Include="Diagnostics\Configurations\LoggerConfigurationTests.cs" />
-    <Compile Include="Diagnostics\LoggerAlterationsTests.cs" />
+    <Compile Include="Diagnostics\LoggerConfigurationsTests.cs" />
     <Compile Include="Diagnostics\Exceptions\BackoffRetryTimeTests.cs" />
     <Compile Include="Diagnostics\Exceptions\LinearRetryTimeTests.cs" />
     <Compile Include="Diagnostics\LogCommandBaseTests.cs" />

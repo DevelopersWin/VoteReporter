@@ -8,12 +8,12 @@ using LoggerConfiguration = Serilog.LoggerConfiguration;
 
 namespace DragonSpark.Diagnostics
 {
-	sealed class DefaultLoggerAlterations : ItemSource<IAlteration<LoggerConfiguration>>
+	sealed class DefaultLoggerConfigurations : ItemSource<IAlteration<LoggerConfiguration>>
 	{
 		readonly static IAlteration<LoggerConfiguration> LogContext = EnrichFromLogContextCommand.Default.ToAlteration();
 
-		public static DefaultLoggerAlterations Default { get; } = new DefaultLoggerAlterations();
-		DefaultLoggerAlterations() : base( LogContext, FormatterConfiguration.Default, ControllerAlteration.Implementation, ApplicationAssemblyAlteration.Default ) {}
+		public static DefaultLoggerConfigurations Default { get; } = new DefaultLoggerConfigurations();
+		DefaultLoggerConfigurations() : base( LogContext, FormatterConfiguration.Default, ControllerAlteration.Implementation, ApplicationAssemblyAlteration.Default ) {}
 
 		sealed class ControllerAlteration : AlterationBase<LoggerConfiguration>
 		{

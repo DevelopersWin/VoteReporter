@@ -3,7 +3,7 @@ using Xunit;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	public class LoggerAlterationsTests
+	public class LoggerConfigurationsTests
 	{
 		[Fact]
 		public void Coverage()

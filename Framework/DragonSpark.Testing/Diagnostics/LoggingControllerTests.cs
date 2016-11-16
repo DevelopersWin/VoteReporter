@@ -36,9 +36,9 @@ namespace DragonSpark.Testing.Diagnostics
 		[Theory, AutoData]
 		void VerifyHistory( object context, string message )
 		{
-			var history = LoggingHistory.Default.Get();
+			var history = LoggingHistory.Default;
 			Assert.Empty( history.Events );
-			Assert.Same( history, LoggingHistory.Default.Get() );
+			Assert.Same( history, LoggingHistory.Default );
 
 			var logger = Logger.Default.Get( context );
 			Assert.Empty( history.Events );

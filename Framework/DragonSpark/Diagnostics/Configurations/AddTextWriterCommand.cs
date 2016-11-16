@@ -4,7 +4,7 @@ using System.IO;
 
 namespace DragonSpark.Diagnostics.Configurations
 {
-	public class AddTextWriterCommand : AddSinkCommand
+	public class AddTextWriterCommand : AddSinkCommandBase
 	{
 		const string Template = "{Timestamp} [{Level}] {Message}{NewLine}{Exception}";
 

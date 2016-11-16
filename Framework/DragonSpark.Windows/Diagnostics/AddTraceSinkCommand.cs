@@ -6,7 +6,7 @@ using Serilog.Formatting.Display;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public sealed class AddTraceSinkCommand : AddSinkCommand
+	public sealed class AddTraceSinkCommand : AddSinkCommandBase
 	{
 		public AddTraceSinkCommand() : this( DragonSpark.Diagnostics.Defaults.Template, LogEventLevel.Verbose ) {}
 
