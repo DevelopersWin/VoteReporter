@@ -55,19 +55,19 @@ namespace DragonSpark.Aspects.Definitions
 		[UsedImplicitly]
 		sealed class Valid : LogCommandBase<ITypeLevelAspect, bool>
 		{
-			public Valid( ILogger logger ) : base( logger.Debug, "{TypeLevelAspect} is valid: {Valid}" ) {}
+			public Valid( ILogger logger ) : base( logger.Debug, "{TypeLevelAspect} can provide aspects: {Valid}" ) {}
 		}
 
 		[UsedImplicitly]
 		sealed class Added : LogCommandBase<ITypeLevelAspect, int, string[]>
 		{
-			public Added( ILogger logger ) : base( logger.Debug, "{Aspect} provided {Count} aspects to {SourceContext}.  These are {Aspects}" ) {}
+			public Added( ILogger logger ) : base( logger.Debug, "{AspectSource} provided {Count} aspects to this element: {Types}" ) {}
 		}
 
 		[UsedImplicitly]
 		sealed class Error : LogExceptionCommandBase<ITypeLevelAspect, Type[]>
 		{
-			public Error( ILogger logger ) : base( logger, "No aspects were provided by {Aspect}, which expects one of the following types to be implemented by {SourceContext}: {Types}" ) {}
+			public Error( ILogger logger ) : base( logger, "No aspects were provided by {AspectSource}, which expects one of the following types to be implemented by the source element: {Types}" ) {}
 		}
 	}
 }

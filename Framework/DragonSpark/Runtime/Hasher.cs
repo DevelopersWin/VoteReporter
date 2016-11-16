@@ -13,7 +13,7 @@ namespace DragonSpark.Runtime
 	public sealed class Hasher : ParameterizedScope<ImmutableArray<byte>, ImmutableArray<byte>>, IHasher
 	{
 		public static Hasher Default { get; } = new Hasher();
-		Hasher() : base( bytes => Hash.GetFnvHashCode( bytes ).With( hash => ImmutableArray.Create( (byte)(hash >> 24), (byte)(hash >> 16), (byte)(hash >> 8), (byte)hash ) ) ) {}
+		Hasher() : base( bytes => Encoding.UTF8.GetString( bytes.ToArray(), 0, bytes.Length ).GetHashCode().With( hash => ImmutableArray.Create( (byte)(hash >> 24), (byte)(hash >> 16), (byte)(hash >> 8), (byte)hash ) ) ) {}
 	}
 
 	public sealed class TextHasher : EqualityReferenceCache<string, string>

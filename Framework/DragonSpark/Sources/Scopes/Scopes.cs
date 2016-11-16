@@ -44,6 +44,7 @@ namespace DragonSpark.Sources.Scopes
 		public static void Assign<TParameter, TResult>( this IParameterizedScope<TParameter, TResult> @this, Func<TParameter, TResult> instance ) => @this.Assign( instance.Self );
 		public static void Assign<T>( this IScopeAware<T> @this, T instance ) => @this.Assign( instance.Enclose() );
 		public static void Assign<T>( this IScopeAware<T?> @this, T instance ) where T : struct => @this.Assign( new T?( instance ).Enclose() );
+		public static SuppliedCommand<Func<object, T?>> WithParameter<T>( this ICommand<Func<object, T?>> @this, T instance ) where T : struct => new SuppliedCommand<Func<object, T?>>( @this, new T?( instance ).Enclose().Call );
 
 		public static void Execute<T>( this ICommand<Func<T>> @this, T instance ) => @this.Execute( instance.Enclose() );
 		

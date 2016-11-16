@@ -1,9 +1,16 @@
-﻿using DragonSpark.Commands;
+﻿using DragonSpark.Application;
+using DragonSpark.Aspects.Definitions;
+using DragonSpark.Commands;
+using DragonSpark.Diagnostics;
+using DragonSpark.Diagnostics.Configurations;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
+using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using PostSharp;
 using PostSharp.Extensibility;
@@ -12,32 +19,42 @@ using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace DragonSpark.Aspects
 {
 	public sealed class InitializationCommand : SpecificationCommand<object>
 	{
 		public static InitializationCommand Default { get; } = new InitializationCommand();
-		InitializationCommand() : base( new OnlyOnceSpecification(), Implementation.Instance.Execute ) {}
+		InitializationCommand() : base( new OnlyOnceSpecification(), Configurations.Default.Execute ) {}
+	}
 
-		sealed class Implementation : RunCommandBase
+	sealed class Configurations : CompositeCommand
+	{
+		public static Configurations Default { get; } = new Configurations();
+
+		Configurations( LogEventLevel minimumLevel = LogEventLevel.Verbose ) : base(
+			AssignApplicationParts.Default.With( typeof(MethodFormatter), typeof(TypeFormatter), typeof(TypeDefinitionFormatter) ),
+			MinimumLevelConfiguration.Default.ToCommand( minimumLevel ),
+			Diagnostics.LoggerConfigurations.Configure.Instance.WithParameter( DefaultSystemLoggerConfigurations.Default.Concat( LoggerConfigurations.Default ).Accept )
+		) {}
+	}
+
+	public sealed class TypeDefinitionFormatter : IFormattable
+	{
+		readonly ITypeDefinition definition;
+		public TypeDefinitionFormatter( ITypeDefinition definition )
 		{
-			public static Implementation Instance { get; } = new Implementation();
-			Implementation() {}
-
-			public override void Execute()
-			{
-				// Diagnostics.LoggerConfigurations.Default.Assign( DefaultSystemLoggerConfigurations.Default.Append( new LoggerConfiguration() ).Accept );
-			}
+			this.definition = definition;
 		}
 
-		/*sealed class LoggerConfigurations : ItemSourceBase<IAlteration<LoggerConfiguration>>
-		{
-			protected override IEnumerable<IAlteration<LoggerConfiguration>> Yield()
-			{
-				yield return new addsink;
-			}
-		}*/
+		public string ToString( string format, IFormatProvider formatProvider ) => definition.ReferencedType.FullName;
+	}
+
+	sealed class LoggerConfigurations : ItemSource<ILoggingConfiguration>
+	{
+		public static LoggerConfigurations Default { get; } = new LoggerConfigurations();
+		LoggerConfigurations() : base( new AddSinkConfiguration( LoggingSink.Default ) ) {}
 	}
 
 	public class LoggingSink : DelegatedCommand<Message>, ILogEventSink
@@ -48,6 +65,7 @@ namespace DragonSpark.Aspects
 		readonly Func<LogEvent, Message> source;
 		readonly Action<Message> write;
 
+		[UsedImplicitly]
 		public LoggingSink( Func<LogEvent, Message> source, Action<Message> write ) : base( write )
 		{
 			this.source = source;
@@ -61,14 +79,16 @@ namespace DragonSpark.Aspects
 	public sealed class MessageFactory : ParameterizedSourceBase<LogEvent, Message>
 	{
 		public static MessageFactory Default { get; } = new MessageFactory();
-		MessageFactory() : this( LevelMappings.Default.Get, TextHasher.Default.Get ) {}
+		MessageFactory() : this( LogEventTextFactory.Default.Get, LevelMappings.Default.Get, TextHasher.Default.Get ) {}
 
+		readonly Func<LogEvent, string> textSource;
 		readonly Func<LogEventLevel, SeverityType> mappings;
 		readonly Alter<string> hasher;
 		
 		[UsedImplicitly]
-		public MessageFactory( Func<LogEventLevel, SeverityType> mappings, Alter<string> hasher )
+		public MessageFactory( Func<LogEvent, string> textSource, Func<LogEventLevel, SeverityType> mappings, Alter<string> hasher )
 		{
+			this.textSource = textSource;
 			this.mappings = mappings;
 			this.hasher = hasher;
 		}
@@ -77,7 +97,7 @@ namespace DragonSpark.Aspects
 		{
 			var source = parameter.Properties.ContainsKey( Constants.SourceContextPropertyName ) ? parameter.Properties[Constants.SourceContextPropertyName].As<ScalarValue>().With( MessageLocation.Of ) : null;
 			var messageId = hasher( parameter.MessageTemplate.Text );
-			var text = parameter.RenderMessage();
+			var text = textSource( parameter );
 			var level = mappings( parameter.Level );
 			var result = new Message( source ?? MessageLocation.Unknown, level, messageId, text, null, null, parameter.Exception );
 			return result;
@@ -90,9 +110,9 @@ namespace DragonSpark.Aspects
 		LevelMappings() : base(
 			new Dictionary<LogEventLevel, SeverityType>
 			{
-				{ LogEventLevel.Verbose, SeverityType.Verbose },
-				{ LogEventLevel.Debug, SeverityType.Debug },
-				{ LogEventLevel.Information, SeverityType.Info },
+				{ LogEventLevel.Verbose, SeverityType.Info },
+				{ LogEventLevel.Debug, SeverityType.ImportantInfo },
+				{ LogEventLevel.Information, SeverityType.ImportantInfo },
 				{ LogEventLevel.Warning, SeverityType.Warning },
 				{ LogEventLevel.Error, SeverityType.Error },
 				{ LogEventLevel.Fatal, SeverityType.Fatal },

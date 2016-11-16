@@ -9,7 +9,7 @@ namespace DragonSpark.Diagnostics
 	{
 		
 		public static LogEventTextFactory Default { get; } = new LogEventTextFactory();
-		LogEventTextFactory( string template = Defaults.Template ) : this( new MessageTemplateTextFormatter( template, null ) ) {}
+		public LogEventTextFactory( string template = Defaults.Template ) : this( new MessageTemplateTextFormatter( template, null ) ) {}
 
 		readonly MessageTemplateTextFormatter formatter;
 

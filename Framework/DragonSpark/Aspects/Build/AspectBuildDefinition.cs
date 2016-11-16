@@ -85,13 +85,13 @@ namespace DragonSpark.Aspects.Build
 			[UsedImplicitly]
 			sealed class Valid : LogCommandBase<ITypeDefinition, IAspects, bool>
 			{
-				public Valid( ILogger logger ) : base( logger.Verbose, "Candidate {TypeDefinition} with Aspects Container {Aspects} is valid: {Valid}" ) {}
+				public Valid( ILogger logger ) : base( logger.Verbose, "{@TypeDefinition} with Source {AspectSource} is valid: {Valid}" ) {}
 			}
 
 			[UsedImplicitly]
 			sealed class Added : LogCommandBase<IAspects, string>
 			{
-				public Added( ILogger logger ) : base( logger.Debug, "{Aspects} applied aspect {Aspect}" ) {}
+				public Added( ILogger logger ) : base( logger.Debug, "{AspectSource} applied aspect {Aspect}" ) {}
 			}
 		}
 	}
