@@ -1,6 +1,5 @@
-﻿using DragonSpark.Sources.Parameterized;
+﻿using DragonSpark.Diagnostics.Configurations;
 using DragonSpark.TypeSystem;
-using Serilog;
 using Xunit;
 
 namespace DragonSpark.Testing.TypeSystem
@@ -10,7 +9,7 @@ namespace DragonSpark.Testing.TypeSystem
 		[Fact]
 		public void DefaultValue()
 		{
-			var item = Items<IAlteration<LoggerConfiguration>>.Default;
+			var item = Items<ILoggingConfiguration>.Default;
 			Assert.NotNull( item );
 		}
 	}

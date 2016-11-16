@@ -8,6 +8,8 @@ using JetBrains.Annotations;
 using Serilog;
 using Serilog.Core;
 using System;
+using System.Collections.Generic;
+using DragonSpark.Diagnostics.Configurations;
 
 namespace DragonSpark.Diagnostics
 {
@@ -16,7 +18,7 @@ namespace DragonSpark.Diagnostics
 		public static LoggerFactory Default { get; } = new LoggerFactory();
 		LoggerFactory() : this ( LoggerConfigurations.Default ) {}
 
-		public LoggerFactory( IItemSource<IAlteration<Serilog.LoggerConfiguration>> alterations ) : this( 
+		public LoggerFactory( IEnumerable<IAlteration<Serilog.LoggerConfiguration>> alterations ) : this( 
 			new LoggerConfigurationCreator( alterations )
 				.Cast<Serilog.LoggerConfiguration, LoggerConfiguration>()
 				.ToScope() ) {}
@@ -32,7 +34,7 @@ namespace DragonSpark.Diagnostics
 		[UsedImplicitly]
 		sealed class LoggerConfigurationCreator : AggregateParameterizedSource<Serilog.LoggerConfiguration>
 		{
-			public LoggerConfigurationCreator( IItemSource<IAlteration<Serilog.LoggerConfiguration>> alterations ) : base( ParameterConstructor<LoggerConfiguration>.Default, alterations ) {}
+			public LoggerConfigurationCreator( IEnumerable<IAlteration<Serilog.LoggerConfiguration>> alterations ) : base( ParameterConstructor<LoggerConfiguration>.Default, alterations ) {}
 		}
 
 		[UsedImplicitly]
