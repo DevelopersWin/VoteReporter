@@ -1,9 +1,6 @@
 ﻿using DragonSpark.Commands;
-using DragonSpark.Diagnostics;
-using DragonSpark.Diagnostics.Configurations;
 using DragonSpark.Extensions;
 using DragonSpark.Runtime;
-using DragonSpark.Sources;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
