@@ -108,6 +108,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <PostSharpHostConfigurationFile Include="..\Bindings.config">
+      <Link>Bindings.config</Link>
+    </PostSharpHostConfigurationFile>
     <None Include="project.json" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>

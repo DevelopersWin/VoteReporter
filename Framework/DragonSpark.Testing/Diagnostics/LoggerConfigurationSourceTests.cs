@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Diagnostics;
 using DragonSpark.Sources.Parameterized;
-using DragonSpark.Sources.Scopes;
 using Serilog;
 using System.Collections.Immutable;
 using Xunit;
@@ -8,17 +7,17 @@ using Defaults = DragonSpark.Diagnostics.Defaults;
 
 namespace DragonSpark.Testing.Diagnostics
 {
-	public class LoggerFactoryTests
+	public class LoggerConfigurationSourceTests
 	{
 		[Fact]
 		public void Verify()
 		{
 			var history = LoggingHistory.Default;
 			var sink = new LoggerHistorySink();
-			LoggerFactory.Default.Configuration.Assign( x => new LoggerConfiguration().WriteTo.Sink( sink ) );
-			LoggerFactory.Factory.Implementation.Assign( configuration => configuration.CreateLogger() );
+			LoggerConfigurationSource.Default.Assign( () => new LoggerConfiguration().WriteTo.Sink( sink ) );
+			//LoggerFactory.Factory.Instance.Assign( configuration => configuration.CreateLogger() );
 
-			var empty = LoggerFactory.Factory.Implementation.Get( new LoggerConfiguration() );
+			var empty = CreateLogger.Instance.Get( new LoggerConfiguration() );
 			Assert.NotNull( empty );
 
 
@@ -30,7 +29,7 @@ namespace DragonSpark.Testing.Diagnostics
 			Assert.Single( events );
 
 			var logger = Logger.Default.GetDefault();
-			var source = Defaults.Source.Get();
+			var source = Defaults.Logger();
 			Assert.Same( logger, source );
 
 			Assert.Empty( history.Events );

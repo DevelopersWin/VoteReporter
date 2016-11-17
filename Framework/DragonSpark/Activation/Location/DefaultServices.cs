@@ -8,7 +8,7 @@ namespace DragonSpark.Activation.Location
 	{
 		public static DefaultServices Default { get; } = new DefaultServices();
 		DefaultServices() : base( 
-			new InstanceRepository( GlobalServiceProvider.Default, Activator.Default, Exports.Default, ApplicationParts.Default, ApplicationAssemblies.Default, ApplicationTypes.Default, LoggingHistory.Default, LoggingController.Default, Diagnostics.Defaults.Source, Instances.Default ),
+			new InstanceRepository( GlobalServiceProvider.Default, Activator.Default, Exports.Default, ApplicationParts.Default, ApplicationAssemblies.Default, ApplicationTypes.Default, LoggingHistory.Default, LoggingController.Default, DefaultLogger.Default, Instances.Default ),
 			Instances.Default,
 			Activator.Default
 		) {}

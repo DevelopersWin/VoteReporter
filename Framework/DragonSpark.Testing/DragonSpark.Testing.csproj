@@ -99,7 +99,7 @@
     <Compile Include="Aspects\ApplyValuesFromSourceTests.cs" />
     <Compile Include="Aspects\AutoGuardAspectTests.cs" />
     <Compile Include="Aspects\FreezeAttributeTests.cs" />
-    <Compile Include="Diagnostics\LoggerFactoryTests.cs" />
+    <Compile Include="Diagnostics\LoggerConfigurationSourceTests.cs" />
     <Compile Include="Extensions\CollectionExtensionsTests.cs" />
     <Compile Include="Extensions\ConventionBasedFormattingExtensionsTests.cs" />
     <Compile Include="Extensions\ImmutableArrayExtensionsTests.cs" />
@@ -224,7 +224,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config">
+    <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="project.json" />

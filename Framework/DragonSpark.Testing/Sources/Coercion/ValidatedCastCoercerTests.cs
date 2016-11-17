@@ -1,4 +1,4 @@
-﻿using DragonSpark.Diagnostics;
+﻿using DragonSpark.Sources;
 using DragonSpark.Sources.Coercion;
 using Serilog;
 using System;
@@ -11,8 +11,7 @@ namespace DragonSpark.Testing.Sources.Coercion
 		[Fact]
 		public void Verify()
 		{
-			Assert.Throws<InvalidOperationException>( () => ValidatedCastCoercer<LoggerConfiguration, LoggerFactory.LoggerConfiguration>.Default.Get( new LoggerConfiguration() ) );
-			Assert.Throws<InvalidOperationException>( () => LoggerFactory.Factory.Implementation.Get( new LoggerConfiguration() ) );
+			Assert.Throws<InvalidOperationException>( () => ValidatedCastCoercer<LoggerConfiguration, ISourceAware>.Default.Get( new LoggerConfiguration() ) );
 		}
 	}
 }

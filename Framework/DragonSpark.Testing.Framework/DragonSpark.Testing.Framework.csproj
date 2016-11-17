@@ -164,7 +164,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <PostSharpHostConfigurationFile Include="..\Bindings.config">
+      <Link>Bindings.config</Link>
+    </PostSharpHostConfigurationFile>
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>

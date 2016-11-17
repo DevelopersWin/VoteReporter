@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace DragonSpark.Diagnostics
 {
-	public sealed class MinimumLevelConfiguration : Scope<LogEventLevel>
+	public sealed class MinimumLevelConfiguration : SingletonScope<LogEventLevel>
 	{
 		public static MinimumLevelConfiguration Default { get; } = new MinimumLevelConfiguration();
 		MinimumLevelConfiguration() : base( () => LogEventLevel.Information ) {}

@@ -22,14 +22,14 @@ namespace DragonSpark.Runtime
 		public void Dispose() => Get().Dispose();
 	}
 
-	public sealed class RegisteredDisposableAlteration<T> : AlterationBase<T>
+	public sealed class RegisteredDisposable<T> : AlterationBase<T>
 	{
-		public static RegisteredDisposableAlteration<T> Default { get; } = new RegisteredDisposableAlteration<T>();
-		RegisteredDisposableAlteration() : this( Disposables.Default ) {}
+		public static RegisteredDisposable<T> Default { get; } = new RegisteredDisposable<T>();
+		RegisteredDisposable() : this( Disposables.Default ) {}
 
 		readonly IComposable<IDisposable> disposables;
 
-		public RegisteredDisposableAlteration( IComposable<IDisposable> disposables )
+		public RegisteredDisposable( IComposable<IDisposable> disposables )
 		{
 			this.disposables = disposables;
 		}

@@ -130,7 +130,9 @@
     <Compile Include="UserSettingsFilePath.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <PostSharpHostConfigurationFile Include="..\Bindings.config">
+      <Link>Bindings.config</Link>
+    </PostSharpHostConfigurationFile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

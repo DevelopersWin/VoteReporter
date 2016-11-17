@@ -1,6 +1,4 @@
-﻿using DragonSpark.Sources;
-using DragonSpark.Sources.Scopes;
-using Serilog;
+﻿using Serilog;
 using System;
 
 namespace DragonSpark.Diagnostics
@@ -9,8 +7,6 @@ namespace DragonSpark.Diagnostics
 	{
 		public const string Template = "{Timestamp:HH:mm:ss:fff} [{Level}] ({@SourceContext}) {Message}{NewLine}{Exception}";
 
-		public static ISource<ILogger> Source { get; } = Logger.Default.ToExecutionSingletonScope();
-
-		public static Func<ILogger> Factory { get; } = Source.Get;
+		public static Func<ILogger> Logger { get; } = DefaultLogger.Default.Get;
 	}
 }

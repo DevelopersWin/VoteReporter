@@ -17,6 +17,7 @@ using PostSharp;
 using PostSharp.Aspects;
 using PostSharp.Extensibility;
 using Serilog.Core;
+using Serilog.Debugging;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
@@ -34,13 +35,33 @@ namespace DragonSpark.Aspects
 	sealed class Configurations : CompositeCommand
 	{
 		public static Configurations Default { get; } = new Configurations();
-
 		Configurations( LogEventLevel minimumLevel = LogEventLevel.Verbose ) : base(
 			AssignApplicationParts.Default.With( typeof(MethodFormatter), typeof(TypeFormatter), typeof(TypeDefinitionFormatter) ),
 			MinimumLevelConfiguration.Default.ToCommand( minimumLevel ),
 			Diagnostics.LoggerConfigurations.Configure.Instance.WithParameter( DefaultSystemLoggerConfigurations.Default.Concat( LoggerConfigurations.Default ).Accept ),
-			DisposeOnCompleteCommand.Default
+			DisposeOnCompleteCommand.Default,
+			ConfigureSelfLog.Default
 		) {}
+	}
+
+	public sealed class ConfigureSelfLog : RunCommandBase
+	{
+		public static ConfigureSelfLog Default { get; } = new ConfigureSelfLog();
+		ConfigureSelfLog() {}
+
+		public override void Execute()
+		{
+			SelfLog.Enable( Emit.Instance.Execute );
+			Disposables.Default.Add( new DisposableAction( SelfLog.Disable ) );
+		}
+
+		public sealed class Emit : CommandBase<string>
+		{
+			public static Emit Instance { get; } = new Emit();
+			Emit() {}
+
+			public override void Execute( string parameter ) => LoggingSink.Default.Execute( this, SeverityType.Error, "The PostSharp SelfLog encountered a problem: {0}", parameter );
+		}
 	}
 
 	public sealed class DisposeOnCompleteCommand : RunCommandBase
@@ -76,7 +97,7 @@ namespace DragonSpark.Aspects
 			this.definition = definition;
 		}
 
-		public string ToString( string format, IFormatProvider formatProvider ) => definition.ReferencedType.FullName;
+		public string ToString( string format = null, IFormatProvider formatProvider = null ) => definition.ReferencedType.FullName;
 	}
 
 	sealed class LoggerConfigurations : ItemSource<ILoggingConfiguration>
@@ -88,7 +109,7 @@ namespace DragonSpark.Aspects
 	public class LoggingSink : DelegatedCommand<Message>, ILogEventSink
 	{
 		public static LoggingSink Default { get; } = new LoggingSink();
-		LoggingSink() : this( MessageFactory.Default.Get, MessageSource.MessageSink.Write ) {}
+		LoggingSink() : this( MessageFactory.Default.Get, Message.Write ) {}
 
 		readonly Func<LogEvent, Message> source;
 		readonly Action<Message> write;
@@ -101,6 +122,21 @@ namespace DragonSpark.Aspects
 		}
 
 		public void Emit( LogEvent logEvent ) => source( logEvent ).With( write );
+	}
+
+	public static class Extensions
+	{
+		public static void Execute( this ICommand<Message> @this, object element, string format, params object[] arguments )
+			=> @this.Execute( MessageLocation.Of( element ), format, arguments );
+
+		public static void Execute( this ICommand<Message> @this, MessageLocation messageLocation, string format, params object[] arguments )
+			=> Execute( @this, messageLocation, SeverityType.Info, format, arguments );
+
+		public static void Execute( this ICommand<Message> @this, object element, SeverityType severity, string format, params object[] arguments )
+			=> Execute( @this, MessageLocation.Of( element ), severity, format, arguments );
+
+		public static void Execute( this ICommand<Message> @this, MessageLocation messageLocation, SeverityType severity, string format, params object[] arguments ) => 
+			@this.Execute( new Message( messageLocation, severity, TextHasher.Default.Get( format ), string.Format( format, arguments ), null, null, null ) );
 	}
 
 

@@ -6,22 +6,22 @@ using System.Linq;
 
 namespace DragonSpark.Sources.Scopes
 {
-	public class AggregateParameterizedSource<T> : AggregateParameterizedSource<object, T>
+	/*public class AggregateParameterizedSource<T> : AggregateParameterizedSource<object, T>
 	{
-		public AggregateParameterizedSource( Func<object, T> seed, IEnumerable<IAlteration<T>> alterations ) : base( seed, alterations ) {}
-	}
+		public AggregateParameterizedSource( Func<object, T> seed, IEnumerable<IAlteration<T>> configurations ) : base( seed, configurations ) {}
+	}*/
 
 	public class AggregateParameterizedSource<TParameter, TResult> : DelegatedParameterizedSource<TParameter, TResult>
 	{
-		readonly IEnumerable<IAlteration<TResult>> alterations;
+		readonly IEnumerable<IAlteration<TResult>> configurations;
 
 		[UsedImplicitly]
-		public AggregateParameterizedSource( Func<TParameter, TResult> seed, IEnumerable<IAlteration<TResult>> alterations ) : base( seed )
+		public AggregateParameterizedSource( Func<TParameter, TResult> seed, IEnumerable<IAlteration<TResult>> configurations ) : base( seed )
 		{
-			this.alterations = alterations;
+			this.configurations = configurations;
 		}
 
 		public override TResult Get( TParameter parameter ) => 
-			alterations.Aggregate( base.Get( parameter ), ( current, transformer ) => transformer.Get( current ) );
+			configurations.Aggregate( base.Get( parameter ), ( current, transformer ) => transformer.Get( current ) );
 	}
 }

@@ -832,7 +832,7 @@
     <Compile Include="TypeSystem\TypeCoercer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
+    <None Include="App.config" />
     <None Include="DragonSpark.pfx" />
     <None Include="project.json" />
   </ItemGroup>
@@ -852,26 +852,11 @@
       <Name>DragonSpark.Types</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
-  <!--<ItemGroup>
-	<Folder Include="Diagnostics\Logger\Categories\" />
-  </ItemGroup>-->
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!--<Import Project="$(SolutionDir)packages\PostSharp.4.2.29\tools\PostSharp.targets" Condition="Exists('$(SolutionDir)packages\PostSharp.4.2.29\tools\PostSharp.targets')" />
-	<Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
-		<Error Condition="!Exists('$(SolutionDir)packages\PostSharp.4.2.29\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
-		<Error Condition="Exists('$(SolutionDir)packages\PostSharp.4.2.29\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
-	</Target>-->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)PostSharp.targets" Condition="Exists('$(SolutionDir)PostSharp.targets')" />
   <Target Name="BeforeBuild">
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-	   Other similar extension points exist, see Microsoft.Common.targets.
-
+  <!-- 
   <Target Name="AfterBuild">
   </Target>
   -->
