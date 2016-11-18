@@ -1,35 +1,52 @@
 ﻿using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
-using DragonSpark.Runtime;
 using DragonSpark.Sources;
 using DragonSpark.Specifications;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
+using System.Linq;
 using System.Windows.Input;
+using System.Windows.Markup;
 
 namespace DragonSpark.Application.Setup
 {
-	[ApplyAutoValidation]
-	public class DeclarativeSetup : CompositeCommand, ISetup
+	/*public class DeclarativeCompositeCommand : DeclarativeCompositeCommand<object>
 	{
-		readonly ISpecification<object> specification;
+		public DeclarativeCompositeCommand( ISpecification<object> specification, CommandCollection commands ) : base( specification, commands ) {}
+	}*/
 
-		public DeclarativeSetup() : this( Priority.Normal ) {}
-		public DeclarativeSetup( Priority priority = Priority.Normal ) : this( priority, Items<ICommand>.Default ) {}
-		public DeclarativeSetup( params ICommand[] commands ) : this( Priority.Normal, commands ) {}
-		public DeclarativeSetup( Priority priority = Priority.Normal, params ICommand[] commands ) : this( new OncePerScopeSpecification<object>(), priority, commands ) {}
-		public DeclarativeSetup( ISpecification<object> specification, Priority priority = Priority.Normal, params ICommand[] commands ) : base( commands )
+	[ContentProperty( nameof( Commands ) )]
+	public class DeclarativeCompositeCommand<T> : CompositeCommand<T>
+	{
+		readonly ISpecification<T> specification;
+
+		public DeclarativeCompositeCommand( ISpecification<T> specification, CommandCollection commands ) : base( commands.Select( command => command.Adapt<T>() ) )
 		{
 			this.specification = specification;
+			Commands = commands;
+		}
+
+		public override bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
+
+		public CommandCollection Commands { get; }
+	}
+
+	[ApplyAutoValidation]
+	public class DeclarativeSetup : DeclarativeCompositeCommand<object>, ISetup
+	{
+		public DeclarativeSetup() : this( Priority.Normal, Items<ICommand>.Default ) {}
+
+		public DeclarativeSetup( params ICommand[] commands ) : this( Priority.Normal, commands ) {}
+
+		public DeclarativeSetup( Priority priority, params ICommand[] commands ) : this( priority, new OncePerScopeSpecification<object>(), new CommandCollection( commands ) ) {}
+
+		public DeclarativeSetup( Priority priority, ISpecification<object> specification, CommandCollection commands ) : base( specification, commands )
+		{
 			Priority = priority;
 		}
 
-		public override bool IsSatisfiedBy( object parameter ) => specification.IsSatisfiedBy( parameter );
-
 		[UsedImplicitly]
 		public Priority Priority { get; set; }
-
-		public DeclarativeCollection<object> Items { get; } = new DeclarativeCollection<object>();
 
 		public override void Execute( object parameter )
 		{

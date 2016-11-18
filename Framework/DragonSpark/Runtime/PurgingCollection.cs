@@ -7,12 +7,10 @@ namespace DragonSpark.Runtime
 {
 	public sealed class PurgingCollection<T> : CollectionBase<T>
 	{
-		readonly static IEnumerable<T> Items = Items<T>.Default.AsEnumerable();
-
-		public PurgingCollection() : this( Items ) {}
+		public PurgingCollection() : this( Items<T>.Enumerable ) {}
 		public PurgingCollection( IEnumerable<T> collection ) : base( collection ) {}
 		public PurgingCollection( ICollection<T> source ) : base( source ) {}
 
-		protected override IEnumerable<T> Query => Source.Purge().ToArray();
+		protected override IEnumerable<T> Yield() => Source.Purge().ToArray();
 	}
 }

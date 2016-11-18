@@ -1,14 +1,16 @@
-﻿using DragonSpark.Runtime;
+﻿using DragonSpark.Aspects;
+using DragonSpark.Runtime;
+using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Testing.Objects;
-using System.IO;
-using System.Text;
+using Serilog.Events;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DragonSpark.Testing.Runtime
 {
-	public class SerializerTests
+	public class SerializerTests : TestCollectionBase
 	{
 		const string Property = "Property2a258824-6489-4cd5-92e9-d6dd98d76002";
 		readonly static string Expected = $@"<ClassWithProperty xmlns=""http://schemas.datacontract.org/2004/07/DragonSpark.Testing.Objects"" xmlns:i=""http://www.w3.org/2001/XMLSchema-instance""><Property>{Property}</Property></ClassWithProperty>";
@@ -26,10 +28,17 @@ namespace DragonSpark.Testing.Runtime
 		{
 			Assert.IsType<Serializer>( sut );
 
-			var stream = new MemoryStream( Encoding.UTF8.GetBytes( Expected ) );
-
-			var loaded = Assert.IsType<ClassWithProperty>( sut.Load<ClassWithProperty>( stream ) );
+			var loaded = Assert.IsType<ClassWithProperty>( sut.Load<ClassWithProperty>( Expected ) );
 			Assert.Equal( "Property2a258824-6489-4cd5-92e9-d6dd98d76002", loaded.Property );
 		}
+
+		[Fact]
+		public void Verfiy()
+		{
+			var temp = Serializer.Default.Save( new DiagnosticsConfiguration() { MinimumLevel = LogEventLevel.Information } );
+			WriteLine( temp );
+		}
+
+		public SerializerTests( ITestOutputHelper output ) : base( output ) {}
 	}
 }

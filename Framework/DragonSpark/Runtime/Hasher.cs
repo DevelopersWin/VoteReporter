@@ -13,7 +13,7 @@ namespace DragonSpark.Runtime
 	public sealed class Hasher : ParameterizedScope<ImmutableArray<byte>, ImmutableArray<byte>>, IHasher
 	{
 		public static Hasher Default { get; } = new Hasher();
-		Hasher() : base( bytes => Encoding.UTF8.GetString( bytes.ToArray(), 0, bytes.Length ).GetHashCode().With( hash => ImmutableArray.Create( (byte)(hash >> 24), (byte)(hash >> 16), (byte)(hash >> 8), (byte)hash ) ) ) {}
+		Hasher() : base( bytes => Encoding.Default.Get( bytes ).GetHashCode().With( hash => ImmutableArray.Create( (byte)(hash >> 24), (byte)(hash >> 16), (byte)(hash >> 8), (byte)hash ) ) ) {}
 	}
 
 	public sealed class TextHasher : EqualityReferenceCache<string, string>
@@ -24,7 +24,7 @@ namespace DragonSpark.Runtime
 		sealed class Implementation : AlterationBase<string>
 		{
 			public static Implementation Instance { get; } = new Implementation();
-			Implementation() : this( Hasher.Default, Encoding.UTF8 ) {}
+			Implementation() : this( Hasher.Default, Encoding.Default ) {}
 
 			readonly IHasher hasher;
 			readonly Encoding encoding;
@@ -38,7 +38,7 @@ namespace DragonSpark.Runtime
 
 			public override string Get( string parameter ) =>
 				hasher
-					.Get( encoding.GetBytes( parameter ) )
+					.Get( encoding.Get( parameter ) )
 					.Aggregate( new StringBuilder(), ( builder, current ) => builder.Append( current.ToString( "X2" ) ) )
 					.ToString();
 		}

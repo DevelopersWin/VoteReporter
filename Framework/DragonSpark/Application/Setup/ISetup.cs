@@ -1,7 +1,6 @@
-﻿using System;
-using DragonSpark.Commands;
+﻿using DragonSpark.Commands;
 
 namespace DragonSpark.Application.Setup
 {
-	public interface ISetup : ICommand<object>, IDisposable, IPriorityAware {}
+	public interface ISetup : ICommand<object>, IPriorityAware {}
 }

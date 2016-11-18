@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace DragonSpark.Sources
 {
-	public abstract class ItemSourceBase<T> : SourceBase<ImmutableArray<T>>, IItemSource<T>
+	public abstract class ItemSourceBase<T> : SourceBase<ImmutableArray<T>>, IEnumerable<T>
 	{
 		public sealed override ImmutableArray<T> Get() => Yield().ToImmutableArray();
 		

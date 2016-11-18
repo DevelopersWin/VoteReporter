@@ -1,15 +1,12 @@
 using DragonSpark.TypeSystem;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Markup;
 
 namespace DragonSpark.Runtime
 {
 	public class DeclarativeCollection : DeclarativeCollection<object>
 	{
-		readonly static IEnumerable<object> Items = Items<object>.Default.AsEnumerable();
-
-		public DeclarativeCollection() : this( Items ) {}
+		public DeclarativeCollection() : this( Items<object>.Enumerable ) {}
 		public DeclarativeCollection( IEnumerable<object> collection ) : this( new List<object>( collection ) ) {}
 		public DeclarativeCollection( ICollection<object> items ) : base( items ) {}
 	}

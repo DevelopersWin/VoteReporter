@@ -49,7 +49,7 @@ namespace DragonSpark.Diagnostics
 			public static Factory Instance { get; } = new Factory();
 			Factory() : this( LoggerConfigurationSource.Default ) {}
 
-			public Factory( ISource<LoggerConfiguration> configuration ) : base( configuration.Into( CreateLogger.Instance ).Into( RegisteredDisposable<ILogger>.Default ).Get ) {}
+			public Factory( ISource<LoggerConfiguration> configuration ) : base( configuration.Into( CreateLogger.Instance ).Into( RegisterForDispose<ILogger>.Default ).Get ) {}
 		}
 
 		[ApplyAutoValidation, ApplySpecification( typeof(OncePerScopeSpecification<ILogger>) )]

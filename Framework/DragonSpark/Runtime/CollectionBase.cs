@@ -30,9 +30,9 @@ namespace DragonSpark.Runtime
 
 		protected ICollection<T> Source { get; }
 
-		protected virtual IEnumerable<T> Query => Source;
+		protected virtual IEnumerable<T> Yield() => Source;
 
-		public IEnumerator<T> GetEnumerator() => Query.GetEnumerator();
+		public IEnumerator<T> GetEnumerator() => Yield().GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -75,7 +75,7 @@ namespace DragonSpark.Runtime
 
 		public bool Contains( T item ) => Source.Contains( item );
 
-		public virtual void CopyTo( T[] array, int arrayIndex ) => Query.ToArray().CopyTo( array, arrayIndex );
+		public virtual void CopyTo( T[] array, int arrayIndex ) => Yield().ToArray().CopyTo( array, arrayIndex );
 
 		public bool Remove( T item ) => Source.Remove( item );
 

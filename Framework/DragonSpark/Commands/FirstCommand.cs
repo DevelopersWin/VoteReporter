@@ -1,14 +1,22 @@
-using System.Windows.Input;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DragonSpark.Commands
 {
-	public class FirstCommand<T> : CompositeCommand<T>
+	public class FirstCommand<T> : CommandBase<T>
 	{
-		public FirstCommand( params ICommand[] commands ) : base( commands ) {}
+		readonly IEnumerable<ICommand<T>> commands;
+
+		public FirstCommand( params ICommand<T>[] commands ) : this( commands.AsEnumerable() ) {}
+
+		public FirstCommand( IEnumerable<ICommand<T>> commands )
+		{
+			this.commands = commands;
+		}
 
 		public override void Execute( T parameter )
 		{
-			foreach ( var command in Commands )
+			foreach ( var command in commands )
 			{
 				if ( command.CanExecute( parameter ) )
 				{

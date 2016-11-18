@@ -1,25 +1,17 @@
-using DragonSpark.Sources;
 using System.Collections.Generic;
 
 namespace DragonSpark.Runtime
 {
-	public abstract class RepositoryBase<T> : ItemSourceBase<T>, IRepository<T>
+	public abstract class RepositoryBase<T> : CollectionBase<T>, IRepository<T>
 	{
 		protected RepositoryBase() : this( new List<T>() ) {}
 
 		protected RepositoryBase( IEnumerable<T> items ) : this( new List<T>( items ) ) {}
 
-		protected RepositoryBase( ICollection<T> source )
-		{
-			Source = source;
-		}
+		protected RepositoryBase( ICollection<T> source ) : base( source ) {}
 
-		protected ICollection<T> Source { get; }
+		// protected override IEnumerable<T> Yield() => Source;
 
-		public void Add( T instance ) => OnAdd( instance );
-
-		protected virtual void OnAdd( T entry ) => Source.Add( entry );
-
-		protected override IEnumerable<T> Yield() => Source;
+		// public ImmutableArray<T> Get() => Yield().ToImmutableArray();
 	}
 }

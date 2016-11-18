@@ -1,24 +1,25 @@
-﻿using DragonSpark.Aspects.Validation;
+﻿using DragonSpark.Application.Setup;
+using DragonSpark.Aspects.Validation;
 using DragonSpark.Commands;
 using DragonSpark.Extensions;
 using DragonSpark.Specifications;
+using JetBrains.Annotations;
+using System;
 using System.Linq;
 using System.Windows.Input;
 
 namespace DragonSpark.Application
 {
 	[ApplyAutoValidation]
-	public abstract class ApplicationBase<T> : CompositeCommand<T>, IApplication<T>
+	public abstract class ApplicationBase<T> : DeclarativeCompositeCommand<T>, IApplication<T>
 	{
-		readonly ISpecification<T> specification;
-		
 		protected ApplicationBase( params ICommand[] commands ) : this( new OnlyOnceSpecification<T>(), commands ) {}
 
-		protected ApplicationBase( ISpecification<T> specification, params ICommand[] commands ) : base( commands.Distinct().Prioritize().Fixed() )
-		{
-			this.specification = specification;
-		}
+		[UsedImplicitly]
+		protected ApplicationBase( ISpecification<T> specification, params ICommand[] commands )
+			: base( specification, new CommandCollection( commands.Distinct().Prioritize().Fixed() ) ) {}
 
-		public override bool IsSatisfiedBy( T parameter ) => specification.IsSatisfiedBy( parameter );
+		public void Dispose() => 
+			Commands.Purge().OfType<IDisposable>().Reverse().Each( disposable => disposable.Dispose() );
 	}
 }

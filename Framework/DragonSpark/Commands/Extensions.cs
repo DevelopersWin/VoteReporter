@@ -4,7 +4,9 @@ using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using ICommand = System.Windows.Input.ICommand;
 
 namespace DragonSpark.Commands
@@ -43,7 +45,7 @@ namespace DragonSpark.Commands
 			ExecuteDelegates() : base( command => command.Execute ) {}
 		}
 
-		public static ICommand<T> Adapt<T>( this ICommand @this ) => new AdapterCommand<T>( @this );
+		public static ICommand<T> Adapt<T>( this ICommand @this ) => @this as ICommand<T> ?? new AdapterCommand<T>( @this );
 
 		public static ICommand<ImmutableArray<T>> AsCompiled<T>( this ICommand<T> @this ) => @this.ToDelegate().AsCompiled();
 		public static ICommand<ImmutableArray<T>> AsCompiled<T>( this Action<T> @this ) => Compiled<T>.Default.Get( @this );
@@ -66,6 +68,8 @@ namespace DragonSpark.Commands
 			result?.Execute( parameter );
 			return result;
 		}
+
+		public static SuppliedCommand<Func<object, IEnumerable<T>>> WithParameter<T>( this ICommand<Func<object, IEnumerable<T>>> @this, params IEnumerable<T>[] parameters ) => new SuppliedCommand<Func<object, IEnumerable<T>>>( @this, parameters.Concat().Accept );
 
 		public static SuppliedCommand<T> WithParameter<T>( this ICommand<T> @this, T parameter ) => new SuppliedCommand<T>( @this, parameter );
 		public static SuppliedCommand<T> WithParameter<T>( this ICommand<T> @this, Func<T> parameter ) => new SuppliedCommand<T>( @this, parameter );

@@ -1,18 +1,11 @@
 using DragonSpark.Runtime;
-using DragonSpark.TypeSystem;
 using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace DragonSpark.Commands
 {
-	public class CommandCollection : DeclarativeCollection<System.Windows.Input.ICommand>
+	public class CommandCollection : DeclarativeCollection<ICommand>
 	{
-		public CommandCollection( IEnumerable<System.Windows.Input.ICommand> collection ) : base( collection ) {}
-	}
-
-	public class CommandCollection<T> : DeclarativeCollection<ICommand<T>>
-	{
-		public CommandCollection() : this( Items<ICommand<T>>.Default ) {}
-
-		public CommandCollection( IEnumerable<ICommand<T>> collection ) : base( collection ) {}
+		public CommandCollection( IEnumerable<ICommand> collection ) : base( collection ) {}
 	}
 }

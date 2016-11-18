@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace DragonSpark.Testing.Framework.Runtime
 {
-	public sealed class ExecutionContext : SourceBase<TaskContext>
+	public sealed class ExecutionContext : SourceBase<TaskContext>, IDisposable
 	{
 		public static ExecutionContext Default { get; } = new ExecutionContext( Identification.Default );
 
@@ -29,5 +29,7 @@ namespace DragonSpark.Testing.Framework.Runtime
 			TaskContext removed;
 			entries.TryRemove( obj, out removed );
 		}
+
+		public void Dispose() => Get().Dispose();
 	}
 }

@@ -1,6 +1,6 @@
-using DragonSpark.Sources;
+using System.Collections.Generic;
 
 namespace DragonSpark.Runtime
 {
-	public interface IRepository<T> : IItemSource<T>, IComposable<T> {}
+	public interface IRepository<T> : IEnumerable<T>, IComposable<T> {}
 }

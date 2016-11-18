@@ -1,11 +1,13 @@
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Scopes;
+using PostSharp;
+using PostSharp.Extensibility;
 using System;
 
 namespace DragonSpark.Runtime
 {
-	public sealed class Disposables : SingletonScope<IDisposables>, IComposable<IDisposable>, IDisposable
+	public sealed class Disposables : SingletonScope<IDisposables>, IComposable<IDisposable>
 	{
 		public static Disposables Default { get; } = new Disposables();
 		Disposables() : base( () => new Repository() ) {}
@@ -14,22 +16,42 @@ namespace DragonSpark.Runtime
 
 		sealed class Repository : RepositoryBase<IDisposable>, IDisposables
 		{
-			public Repository() : base( new PurgingCollection<IDisposable>() ) {}
+			readonly ConditionMonitor monitor = new ConditionMonitor();
 
-			public void Dispose() => this.Each( entry => entry.Dispose() );
+			public Repository() : base( new PurgingCollection<IDisposable>(  ) ) {}
+
+			~Repository()
+			{
+				OnDispose();
+			}
+
+			public void Dispose()
+			{
+				OnDispose();
+				GC.SuppressFinalize( this );
+			}
+
+			void OnDispose()
+			{
+				throw new InvalidOperationException( "WTF!" );
+				Message.Write( MessageLocation.Of( this ), SeverityType.Warning, "6776", "DISPOSE CALLED!!!" );
+				if ( monitor.Apply() )
+				{
+					
+				this.Each( entry => entry.Dispose() );
+				}
+			}
 		}
-
-		public void Dispose() => Get().Dispose();
 	}
 
-	public sealed class RegisteredDisposable<T> : AlterationBase<T>
+	public sealed class RegisterForDispose<T> : AlterationBase<T>
 	{
-		public static RegisteredDisposable<T> Default { get; } = new RegisteredDisposable<T>();
-		RegisteredDisposable() : this( Disposables.Default ) {}
+		public static RegisterForDispose<T> Default { get; } = new RegisterForDispose<T>();
+		RegisterForDispose() : this( Disposables.Default ) {}
 
 		readonly IComposable<IDisposable> disposables;
 
-		public RegisteredDisposable( IComposable<IDisposable> disposables )
+		public RegisterForDispose( IComposable<IDisposable> disposables )
 		{
 			this.disposables = disposables;
 		}
