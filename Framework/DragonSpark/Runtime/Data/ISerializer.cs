@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace DragonSpark.Runtime
+namespace DragonSpark.Runtime.Data
 {
 	public interface ISerializer
 	{

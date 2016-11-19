@@ -1,4 +1,4 @@
-using DragonSpark.Runtime;
+using DragonSpark.Runtime.Data;
 using JetBrains.Annotations;
 
 namespace DragonSpark.Windows.Runtime.Data

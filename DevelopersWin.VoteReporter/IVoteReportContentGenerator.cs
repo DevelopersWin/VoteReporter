@@ -1,5 +1,5 @@
 using DevelopersWin.VoteReporter.Properties;
-using DragonSpark.Runtime;
+using DragonSpark.Runtime.Data;
 using DragonSpark.Windows.Runtime.Data;
 using Transformer = System.Func<DragonSpark.Windows.Runtime.Data.DataTransformParameter, string>;
 

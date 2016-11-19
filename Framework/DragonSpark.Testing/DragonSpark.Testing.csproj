@@ -38,6 +38,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
@@ -179,7 +180,7 @@
     <Compile Include="Properties\ResourcesTests.cs" />
     <Compile Include="Runtime\DeclarativeCollectionTests.cs" />
     <Compile Include="Commands\CompositeCommandTests.cs" />
-    <Compile Include="Runtime\SerializerTests.cs" />
+    <Compile Include="Runtime\Data\SerializerTests.cs" />
     <Compile Include="Specifications\AllSpecificationTests.cs" />
     <Compile Include="Specifications\SpecificationWithContextBaseTests.cs" />
     <Compile Include="Commands\SpecificationsTests.cs" />
@@ -207,7 +208,7 @@
     <Compile Include="TypeSystem\Metadata\AttributeSupportTests.cs" />
     <Compile Include="TypeSystem\Metadata\DerivedMethodSpecificationTests.cs" />
     <Compile Include="ComponentModel\HostingAttributeBaseTests.cs" />
-    <Compile Include="TypeSystem\KnownTypesTests.cs" />
+    <Compile Include="TypeSystem\KnownTypesOfTests.cs" />
     <Compile Include="TypeSystem\Metadata\MemberInfoDefinitionsTests.cs" />
     <Compile Include="TypeSystem\Metadata\ParameterInfoAttributeProviderTests.cs" />
     <Compile Include="TypeSystem\PartsTests.cs" />

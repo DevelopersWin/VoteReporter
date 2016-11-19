@@ -10,7 +10,7 @@ namespace DragonSpark.Sources.Parameterized
 
 		sealed class DefaultImplementation : FirstParameterConstructedSelector<T>
 		{
-			public DefaultImplementation() : base( KnownTypes<T>.Default.Unwrap() ) {}
+			public DefaultImplementation() : base( KnownTypesOf<T>.Default.Unwrap() ) {}
 		}
 	}
 }

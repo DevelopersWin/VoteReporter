@@ -8,10 +8,10 @@ using Xunit;
 namespace DragonSpark.Testing.TypeSystem
 {
 	[Trait( Traits.Category, Traits.Categories.ServiceLocation )]
-	public class KnownTypesTests
+	public class KnownTypesOfTests
 	{
 		[Theory, AutoData, IncludeParameterTypes( typeof(Class), typeof(ClassWithProperty), typeof(Derived) )]
-		public void Testing( KnownTypes sut )
+		public void Testing( KnownTypesOf sut )
 		{
 			var parameter = typeof(Class);
 

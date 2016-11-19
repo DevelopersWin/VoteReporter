@@ -14,6 +14,7 @@ namespace DragonSpark.TypeSystem.Metadata
 		{
 			bool Contains( Type instance );
 		}
+
 		sealed class Cache : Cache<Type, T>, IAttributeSource
 		{
 			public Cache( Func<Type, T> create ) : base( create ) {}

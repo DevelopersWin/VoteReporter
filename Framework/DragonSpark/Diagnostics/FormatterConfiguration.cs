@@ -46,7 +46,7 @@ namespace DragonSpark.Diagnostics
 		readonly static Func<Type, Func<Type, bool>> Selector = TypeAssignableSpecification.Delegates.Get;
 
 		public static FormattableSpecifications Default { get; } = new FormattableSpecifications();
-		FormattableSpecifications() : this( KnownTypes<IFormattable>.Default.Get, Locator, Selector ) {}
+		FormattableSpecifications() : this( KnownTypesOf<IFormattable>.Default.Get, Locator, Selector ) {}
 
 		readonly Func<ImmutableArray<Type>> source;
 

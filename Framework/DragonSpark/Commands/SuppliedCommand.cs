@@ -1,4 +1,3 @@
-using DragonSpark.Extensions;
 using DragonSpark.Sources;
 using System;
 
@@ -15,7 +14,7 @@ namespace DragonSpark.Commands
 
 		public SuppliedCommand( Action<T> command, T parameter ) : this( command, parameter.Enclose() ) {}
 
-		public SuppliedCommand( Action<T> command, Func<T> parameter ) : base( command.Target.AsDisposable() )
+		public SuppliedCommand( Action<T> command, Func<T> parameter )
 		{
 			this.command = command;
 			this.parameter = parameter;

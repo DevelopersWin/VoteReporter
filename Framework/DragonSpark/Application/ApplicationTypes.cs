@@ -1,13 +1,13 @@
-﻿using DragonSpark.Sources;
+﻿using DragonSpark.Extensions;
+using DragonSpark.Sources;
 using DragonSpark.TypeSystem;
 using System;
-using System.Collections.Immutable;
 
 namespace DragonSpark.Application
 {
-	public sealed class ApplicationTypes : DelegatedSource<ImmutableArray<Type>>
+	public sealed class ApplicationTypes : DelegatedItemSource<Type>
 	{
-		public static ISource<ImmutableArray<Type>> Default { get; } = new ApplicationTypes();
-		ApplicationTypes() : base( () => ApplicationParts.Default.Get()?.Types ?? Items<Type>.Immutable ) {}
+		public static IItemSource<Type> Default { get; } = new ApplicationTypes();
+		ApplicationTypes() : base( () => ApplicationParts.Default.Get()?.Types.AsEnumerable() ?? Items<Type>.Default ) {}
 	}
 }

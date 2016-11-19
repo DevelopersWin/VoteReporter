@@ -7,9 +7,9 @@ namespace DragonSpark.Sources
 {
 	public class CompositeItemSource<T> : ItemSourceBase<T>
 	{
-		readonly ImmutableArray<IItemSource<T>> sources;
+		readonly ImmutableArray<IEnumerable<T>> sources;
 
-		public CompositeItemSource( params IItemSource<T>[] sources )
+		public CompositeItemSource( params IEnumerable<T>[] sources )
 		{
 			this.sources = sources.ToImmutableArray();
 		}
