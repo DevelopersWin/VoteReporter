@@ -23,19 +23,4 @@ namespace DragonSpark.Runtime.Data
 
 		public override DataContractSerializer Get( Type parameter ) => new DataContractSerializer( parameter, knownTypes );
 	}
-
-	/*public sealed class DataContractSerializers : ParameterizedSourceBase<Type, DataContractSerializer>
-	{
-		public static IParameterizedSource<Type, DataContractSerializer> Default { get; } = new DataContractSerializers().ToCache();
-		DataContractSerializers() : this( KnownTypesOf.Default.GetEnumerable ) {}
-
-		readonly Func<Type, IEnumerable<Type>> knownTypes;
-
-		public DataContractSerializers( Func<Type, IEnumerable<Type>> knownTypes )
-		{
-			this.knownTypes = knownTypes;
-		}
-
-		public override DataContractSerializer Get( Type parameter ) => new DataContractSerializer( parameter, knownTypes( parameter ) );
-	}*/
 }

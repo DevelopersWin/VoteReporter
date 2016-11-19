@@ -37,3 +37,4 @@ Publish.bat
 *.nuget.targets
 
 .vs/
+*.secrets

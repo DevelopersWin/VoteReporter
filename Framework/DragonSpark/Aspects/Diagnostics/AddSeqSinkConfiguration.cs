@@ -12,7 +12,7 @@ namespace DragonSpark.Aspects.Diagnostics
 		public Uri Endpoint { get; set; }
 
 		[UsedImplicitly, DataMember]
-		public int BatchPostingLimit { get; set; }
+		public int BatchPostingLimit { get; set; } = 1000;
 
 		[UsedImplicitly, DataMember]
 		public TimeSpan? Period { get; set; }

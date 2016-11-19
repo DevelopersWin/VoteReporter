@@ -26,7 +26,7 @@ namespace DragonSpark.Aspects.Definitions
 			this.definition = definition;
 		}
 
-		// public override void CompileTimeInitialize( Type type, AspectInfo aspectInfo ) => InitializationCommand.Default.Execute();
+		//public override void CompileTimeInitialize( Type type, AspectInfo aspectInfo ) => InitializeDiagnosticsCommand.Default.Execute();
 
 		public override bool CompileTimeValidate( Type type )
 		{
