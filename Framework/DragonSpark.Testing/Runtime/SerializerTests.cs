@@ -1,10 +1,8 @@
-﻿using DragonSpark.Aspects;
-using DragonSpark.Runtime;
+﻿using DragonSpark.Runtime;
 using DragonSpark.Testing.Framework;
 using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Testing.Objects;
-using Serilog.Events;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -32,12 +30,12 @@ namespace DragonSpark.Testing.Runtime
 			Assert.Equal( "Property2a258824-6489-4cd5-92e9-d6dd98d76002", loaded.Property );
 		}
 
-		[Fact]
+		/*[Fact]
 		public void Verfiy()
 		{
 			var temp = Serializer.Default.Save( new DiagnosticsConfiguration() { MinimumLevel = LogEventLevel.Information } );
 			WriteLine( temp );
-		}
+		}*/
 
 		public SerializerTests( ITestOutputHelper output ) : base( output ) {}
 	}

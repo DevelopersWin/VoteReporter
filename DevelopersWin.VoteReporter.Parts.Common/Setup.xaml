@@ -12,7 +12,7 @@
 	Priority="AfterHigh"
 >
 	<setup:RegisterInstances>
-		<entity:Configuration AutomaticMigrationsEnabled="True" />
+		<entity:MigrationsConfiguration AutomaticMigrationsEnabled="True" />
 	</setup:RegisterInstances>
 
 	<commands:DeclarativeCommand Command="{x:Static local:InitializeUserSettingsCommand.Default}" Parameter="{x:Static properties:Settings.Default}" />

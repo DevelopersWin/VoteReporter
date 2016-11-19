@@ -4,6 +4,7 @@ using DragonSpark.Sources.Scopes;
 using PostSharp;
 using PostSharp.Extensibility;
 using System;
+using System.Collections.Generic;
 
 namespace DragonSpark.Runtime
 {
@@ -18,7 +19,7 @@ namespace DragonSpark.Runtime
 		{
 			readonly ConditionMonitor monitor = new ConditionMonitor();
 
-			public Repository() : base( new PurgingCollection<IDisposable>(  ) ) {}
+			public Repository() : base( new PurgingCollection<IDisposable>( new HashSet<IDisposable>() ) ) {}
 
 			~Repository()
 			{
@@ -33,12 +34,10 @@ namespace DragonSpark.Runtime
 
 			void OnDispose()
 			{
-				throw new InvalidOperationException( "WTF!" );
-				Message.Write( MessageLocation.Of( this ), SeverityType.Warning, "6776", "DISPOSE CALLED!!!" );
 				if ( monitor.Apply() )
 				{
-					
-				this.Each( entry => entry.Dispose() );
+					Message.Write( MessageLocation.Of( this ), SeverityType.Warning, "6776", "DISPOSE CALLED!!!" );
+					this.Each( entry => entry.Dispose() );
 				}
 			}
 		}

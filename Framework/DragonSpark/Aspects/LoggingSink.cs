@@ -29,7 +29,7 @@ namespace DragonSpark.Aspects
 	public sealed class InitializationCommand : SpecificationCommand<object>
 	{
 		public static InitializationCommand Default { get; } = new InitializationCommand();
-		InitializationCommand() : base( new OnlyOnceSpecification(), new CompositeCommand( ConfigurationCommands.Default ).Execute ) {}
+		InitializationCommand() : base( Common.Assigned.And( new OnlyOnceSpecification() ), new CompositeCommand( ConfigurationCommands.Default ).Execute ) {}
 
 		public override void Execute( object parameter = null )
 		{

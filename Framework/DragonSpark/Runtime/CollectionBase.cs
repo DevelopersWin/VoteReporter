@@ -24,7 +24,7 @@ namespace DragonSpark.Runtime
 
 			add = AddItem;
 			contains = Contains;
-			list = (IList)Source;
+			list = Source as IList ?? new List<T>( Source );
 			indexOf = list.IndexOf;
 		}
 

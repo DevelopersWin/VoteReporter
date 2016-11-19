@@ -48,7 +48,7 @@
     <Compile Include="ApplicationCommands.cs" />
     <Compile Include="DocumentProvider.cs" />
     <Compile Include="Entity\InitializeDatabaseCommand.cs" />
-    <Compile Include="Entity\Configuration.cs" />
+    <Compile Include="Entity\MigrationsConfiguration.cs" />
     <Compile Include="Entity\Vote.cs" />
     <Compile Include="Entity\VoteBase.cs" />
     <Compile Include="Entity\VoteGroup.cs" />
