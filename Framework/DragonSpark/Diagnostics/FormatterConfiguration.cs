@@ -2,6 +2,7 @@ using DragonSpark.Activation;
 using DragonSpark.Diagnostics.Configurations;
 using DragonSpark.Extensions;
 using DragonSpark.Sources;
+using DragonSpark.Sources.Scopes;
 using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using Serilog;
@@ -37,23 +38,48 @@ namespace DragonSpark.Diagnostics
 		}
 	}
 
+	public sealed class FormattableTypes : SingletonScope<ImmutableArray<Type>>
+	{
+		public static FormattableTypes Default { get; } = new FormattableTypes();
+		FormattableTypes() : this( Implementation.Instance.Get ) {}
+
+		[UsedImplicitly]
+		public FormattableTypes( Func<ImmutableArray<Type>> factory ) : base( factory ) {}
+
+		public sealed class Implementation : ItemSourceBase<Type>
+		{
+			public static Implementation Instance { get; } = new Implementation();
+			Implementation() : this( KnownTypesOf<IFormattable>.Default.Get, ConstructingParameterTypes.Default.Get ) {}
+
+			readonly Func<ImmutableArray<Type>> source;
+			readonly Func<Type, Type> locator;
+
+			[UsedImplicitly]
+			public Implementation( Func<ImmutableArray<Type>> source, Func<Type, Type> locator )
+			{
+				this.source = source;
+				this.locator = locator;
+			}
+
+			protected override IEnumerable<Type> Yield() => source().SelectAssigned( locator );
+		}
+	}
+
 	public sealed class FormattableSpecifications : ItemSourceBase<Func<Type, bool>>
 	{
 		public static FormattableSpecifications Default { get; } = new FormattableSpecifications();
-		FormattableSpecifications() : this( KnownTypesOf<IFormattable>.Default.Get, ConstructingParameterTypeLocator.Default.Get, TypeAssignableSpecification.Delegates.Get ) {}
+		FormattableSpecifications() : this( FormattableTypes.Default.Get, TypeAssignableSpecification.Delegates.Get ) {}
 
-		readonly Func<ImmutableArray<Type>> source;
-		readonly Func<Type, Type> locator;
+		readonly Func<ImmutableArray<Type>> types;
 		readonly Func<Type, Func<Type, bool>> selector;
 
 		[UsedImplicitly]
-		public FormattableSpecifications( Func<ImmutableArray<Type>> source, Func<Type, Type> locator, Func<Type, Func<Type, bool>> selector )
+		public FormattableSpecifications( Func<ImmutableArray<Type>> types, Func<Type, Func<Type, bool>> selector )
 		{
-			this.source = source;
-			this.locator = locator;
+			this.types = types;
 			this.selector = selector;
 		}
 
-		protected override IEnumerable<Func<Type, bool>> Yield() => source().SelectAssigned( locator ).Select( selector );
+		protected override IEnumerable<Func<Type, bool>> Yield() => types().Select( selector );
 	}
 }

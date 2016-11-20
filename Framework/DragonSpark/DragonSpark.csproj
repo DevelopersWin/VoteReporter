@@ -620,7 +620,7 @@
     <Compile Include="Sources\Coercion\Coercer.cs" />
     <Compile Include="Sources\Coercion\CoercerBase.cs" />
     <Compile Include="Expressions\CompiledDelegateFactoryBase.cs" />
-    <Compile Include="Activation\ConstructingParameterTypeLocator.cs" />
+    <Compile Include="Activation\ConstructingParameterTypes.cs" />
     <Compile Include="Activation\ConstructorDelegateFactory.cs" />
     <Compile Include="Activation\Constructors.cs" />
     <Compile Include="Activation\ConstructTypeRequest.cs" />

@@ -7,6 +7,7 @@ using DragonSpark.Sources.Coercion;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Scopes;
 using DragonSpark.Specifications;
+using DragonSpark.TypeSystem;
 using JetBrains.Annotations;
 using Serilog;
 using Serilog.Core;
@@ -22,17 +23,28 @@ namespace DragonSpark.Diagnostics
 
 		public sealed class Implementation : ParameterizedSourceBase<ILogger>
 		{
-			public Implementation() : this( LoggerFactory.Default.Get() ) {}
+			public Implementation() : this( LoggerFactory.Default.Get(), ObjectTypeCoercer.Default.Get, new CompositeAssignableSpecification( FormattableTypes.Default.Get() ).ToCachedSpecification().IsSatisfiedBy ) {}
 
 			readonly ILogger logger;
+			readonly Func<object, Type> coerce;
+			readonly Func<Type, bool> specification;
 
 			[UsedImplicitly]
-			public Implementation( ILogger logger )
+			public Implementation( ILogger logger, Func<object, Type> coerce, Func<Type, bool> specification )
 			{
 				this.logger = logger;
+				this.coerce = coerce;
+				this.specification = specification;
 			}
 
-			public override ILogger Get( object parameter ) => logger.ForContext( Constants.SourceContextPropertyName, parameter, true );
+			public override ILogger Get( object parameter )
+			{
+				var type = coerce( parameter );
+				var supported = specification( type );
+				var context = supported ? parameter : type;
+				var result = logger.ForContext( Constants.SourceContextPropertyName, context, supported );
+				return result;
+			}
 		}
 	}
 

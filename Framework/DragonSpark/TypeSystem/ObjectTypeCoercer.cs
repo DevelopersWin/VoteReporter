@@ -1,5 +1,5 @@
-using System;
 using DragonSpark.Sources.Coercion;
+using System;
 
 namespace DragonSpark.TypeSystem
 {
@@ -8,6 +8,6 @@ namespace DragonSpark.TypeSystem
 		public static ObjectTypeCoercer Default { get; } = new ObjectTypeCoercer();
 		ObjectTypeCoercer() {}
 
-		protected override Type Coerce( object parameter ) => parameter.GetType();
+		protected override Type Coerce( object parameter ) => parameter as Type ?? parameter.GetType();
 	}
 }

@@ -8,7 +8,7 @@ namespace DragonSpark.Aspects.Diagnostics
 	public sealed class DefaultKnownApplicationTypes : ItemSource<Type>
 	{
 		public static DefaultKnownApplicationTypes Default { get; } = new DefaultKnownApplicationTypes();
-		DefaultKnownApplicationTypes() : base( typeof(ProjectFormatter), typeof(TypeDefinitionFormatter), typeof(MethodFormatter), typeof(TypeFormatter), typeof(ObjectFormatter) ) {}
+		DefaultKnownApplicationTypes() : base( typeof(ProjectFormatter), typeof(TypeDefinitionFormatter), typeof(MethodFormatter), typeof(TypeFormatter) ) {}
 	}
 
 	public sealed class ProjectFormatter : IFormattable
