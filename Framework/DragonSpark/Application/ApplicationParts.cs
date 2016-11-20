@@ -19,9 +19,9 @@ namespace DragonSpark.Application
 		public static AssignApplicationParts Default { get; } = new AssignApplicationParts();
 		AssignApplicationParts() : base( ApplicationParts.Default ) {}
 
-		public IRunCommand With( params IEnumerable<Type>[] sources ) => With( sources.Concat().ToArray() );
+		public IRunCommand From( params IEnumerable<Type>[] sources ) => From( sources.Concat().ToArray() );
 
 		[UsedImplicitly]
-		public IRunCommand With( params Type[] types ) => this.WithParameter( new SystemParts( types ) );
+		public IRunCommand From( params Type[] types ) => this.WithParameter( new SystemParts( types ) );
 	}
 }

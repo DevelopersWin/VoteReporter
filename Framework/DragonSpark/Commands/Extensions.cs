@@ -1,6 +1,5 @@
 ﻿using DragonSpark.Extensions;
 using DragonSpark.Sources;
-using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
 using DragonSpark.Specifications;
 using System;
@@ -69,7 +68,8 @@ namespace DragonSpark.Commands
 			return result;
 		}
 
-		public static SuppliedCommand<Func<object, IEnumerable<T>>> WithParameter<T>( this ICommand<Func<object, IEnumerable<T>>> @this, params IEnumerable<T>[] parameters ) => new SuppliedCommand<Func<object, IEnumerable<T>>>( @this, parameters.Concat().Accept );
+		public static SuppliedCommand<Func<object, IEnumerable<T>>> WithParameter<T>( this ICommand<Func<object, IEnumerable<T>>> @this, params IEnumerable<T>[] parameters )
+			=> new SuppliedCommand<Func<object, IEnumerable<T>>>( @this, parameters.Concat().Accept );
 
 		public static SuppliedCommand<T> WithParameter<T>( this ICommand<T> @this, T parameter ) => new SuppliedCommand<T>( @this, parameter );
 		public static SuppliedCommand<T> WithParameter<T>( this ICommand<T> @this, Func<T> parameter ) => new SuppliedCommand<T>( @this, parameter );
@@ -78,12 +78,12 @@ namespace DragonSpark.Commands
 
 		public static Action<T> ToDelegate<T>( this ICommand<T> @this ) => CommandDelegates<T>.Default.Get( @this );
 		
-		public static IAlteration<T> ToAlteration<T>( this ICommand<T> @this ) => Alterations<T>.Default.Get( @this );
+		/*public static IAlteration<T> ToAlteration<T>( this ICommand<T> @this ) => Alterations<T>.Default.Get( @this );
 		sealed class Alterations<T> : Cache<ICommand<T>, IAlteration<T>>
 		{
 			public static Alterations<T> Default { get; } = new Alterations<T>();
 			Alterations() : base( command => new ConfiguringAlteration<T>( command.ToDelegate() ) ) {}
-		}
+		}*/
 
 		public static ISpecification<object> ToSpecification( this ICommand @this ) => Specifications.Default.Get( @this );
 		sealed class Specifications : Cache<ICommand, ISpecification<object>>
@@ -99,10 +99,8 @@ namespace DragonSpark.Commands
 			Specifications() : base( command => command ) {}
 		}
 
-		public static void Accept<T>( this Action @this, T _ ) => @this.Invoke();
-		
 		public static Action<T> Timed<T>( this ICommand<T> @this ) => @this.ToDelegate().Timed();
-		public static Action<T> Timed<T>( this Action<T> @this ) => Timed( @this, Sources.Defaults.ParameterizedTimerTemplate );
+		public static Action<T> Timed<T>( this Action<T> @this ) => Timed( @this, Defaults.ParameterizedTimerTemplate );
 		public static Action<T> Timed<T>( this Action<T> @this, string template ) => new TimedDelegatedCommand<T>( @this, template ).Execute;
 	}
 }

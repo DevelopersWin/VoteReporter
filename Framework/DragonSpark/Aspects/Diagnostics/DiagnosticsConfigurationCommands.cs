@@ -73,9 +73,9 @@ namespace DragonSpark.Aspects.Diagnostics
 			{
 				valid().Apply();
 
-				yield return MinimumLevelConfiguration.Default.ToCommand( configuration.MinimumLevel );
+				yield return MinimumLevelConfiguration.Default.ToGlobalCommand( configuration.MinimumLevel );
 
-				yield return AssignApplicationParts.Default.With( DefaultKnownApplicationTypes.Default, configuration.KnownApplicationTypes );
+				yield return AssignApplicationParts.Default.From( DefaultKnownApplicationTypes.Default, configuration.KnownApplicationTypes );
 
 				yield return LoggerConfigurations.Configure.Instance.WithParameter(
 					DefaultSystemLoggerConfigurations.Default,

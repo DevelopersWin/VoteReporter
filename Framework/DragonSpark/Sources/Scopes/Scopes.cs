@@ -49,7 +49,10 @@ namespace DragonSpark.Sources.Scopes
 		public static void Execute<T>( this ICommand<Func<T>> @this, T instance ) => @this.Execute( instance.Enclose() );
 		
 		public static IRunCommand ToCommand<T>( this IAssignable<Func<T>> @this, T instance ) => @this.ToCommand( instance.Enclose() );
-		public static IRunCommand ToCommand<T>( this IAssignable<Func<T>> @this, Func<T> factory ) => new AssignCommand<Func<T>>( @this ).WithParameter( factory );
+		public static IRunCommand ToCommand<T>( this IAssignable<Func<T>> @this, Func<T> factory ) => new AssignScopeCommand<T>( @this ).WithParameter( factory );
+
+		public static IRunCommand ToGlobalCommand<T>( this IAssignable<Func<object, T>> @this, T instance ) => @this.ToGlobalCommand( instance.Enclose() );
+		public static IRunCommand ToGlobalCommand<T>( this IAssignable<Func<object, T>> @this, Func<T> factory ) => new AssignGlobalScopeCommand<T>( @this ).WithParameter( factory.Call );
 		
 		public static T WithInstance<T>( this IScope<T> @this, T instance )
 		{

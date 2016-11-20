@@ -2,6 +2,7 @@ using DragonSpark.Extensions;
 using DragonSpark.Sources.Scopes;
 using System;
 using System.Collections.Generic;
+using DragonSpark.Diagnostics;
 
 namespace DragonSpark.Runtime
 {
@@ -35,6 +36,7 @@ namespace DragonSpark.Runtime
 				{
 					this.Each( entry => entry.Dispose() );
 				}
+				Logger.Default.Get( this ).Information( "Disposed!!!" );
 			}
 		}
 
