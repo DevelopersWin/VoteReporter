@@ -2,6 +2,7 @@
 using DragonSpark.Sources.Parameterized;
 using System;
 using System.Collections.Generic;
+using PostSharp.Patterns.Contracts;
 
 namespace DragonSpark.Runtime.Data
 {
@@ -10,6 +11,6 @@ namespace DragonSpark.Runtime.Data
 		public static TypeParser Default { get; } = new TypeParser();
 		TypeParser() {}
 
-		public override IEnumerable<Type> Yield( string parameter ) => parameter.ToStringArray().SelectAssigned( TypeSelector.Default.Get );
+		public override IEnumerable<Type> Yield( [NotNull]string parameter ) => parameter.ToStringArray().SelectAssigned( TypeSelector.Default.Get );
 	}
 }

@@ -241,7 +241,7 @@ namespace DragonSpark.Testing.Diagnostics.Configurations
 		{
 			var configuration = new LoggingConfigurations
 								{
-									new AddSeqSinkConfiguration { Endpoint = new Uri( "http://localhost/" ) }
+									new AddSeqSinkConfiguration { Endpoint = new Uri( "http://localhost:12345/" ) }
 								};
 			var configured = configuration.Get( new Serilog.LoggerConfiguration() );
 			string message = null;

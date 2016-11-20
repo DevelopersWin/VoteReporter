@@ -103,11 +103,13 @@
     <Compile Include="Aspects\Coercion\Aspect.cs" />
     <Compile Include="Aspects\Build\TypedParameterConstructors.cs" />
     <Compile Include="Aspects\Diagnostics\AddSeqSinkConfiguration.cs" />
-    <Compile Include="Aspects\Diagnostics\ConfigurationCommands.cs" />
+    <Compile Include="Aspects\Diagnostics\DiagnosticsConfigurationCommands.cs" />
     <Compile Include="Aspects\Diagnostics\ConfigureSelfLog.cs" />
     <Compile Include="Aspects\Diagnostics\DefaultKnownApplicationTypes.cs" />
     <Compile Include="Aspects\Diagnostics\DefaultLoggerConfigurations.cs" />
+    <Compile Include="Aspects\Diagnostics\Defaults.cs" />
     <Compile Include="Aspects\Diagnostics\DiagnosticsConfiguration.cs" />
+    <Compile Include="Aspects\Diagnostics\MonitorProjectCommand.cs" />
     <Compile Include="Aspects\Diagnostics\Extensions.cs" />
     <Compile Include="Aspects\Diagnostics\InitializeDiagnosticsCommand.cs" />
     <Compile Include="Aspects\Diagnostics\LevelMappings.cs" />
@@ -233,6 +235,7 @@
     <Compile Include="Runtime\Extensions.cs" />
     <Compile Include="Runtime\Hasher.cs" />
     <Compile Include="Runtime\IDisposables.cs" />
+    <Compile Include="Runtime\RegisterForDispose.cs" />
     <Compile Include="Sources\Coercion\CastCoercer.cs" />
     <Compile Include="Sources\Coercion\ResultCoercionSource.cs" />
     <Compile Include="Sources\Coercion\ValidatedCastCoercer.cs" />
@@ -366,6 +369,7 @@
     <Compile Include="Sources\SourceTypeCandidateParameter.cs" />
     <Compile Include="Specifications\CompositeInstanceSpecification.cs" />
     <Compile Include="Specifications\CoercedSpecification.cs" />
+    <Compile Include="Specifications\ConditionMonitorSpecification.cs" />
     <Compile Include="Specifications\ConfigurableSpecification.cs" />
     <Compile Include="Specifications\ContainsItemSpecification.cs" />
     <Compile Include="Specifications\DeferredSpecification.cs" />
@@ -433,6 +437,7 @@
     <Compile Include="TypeSystem\ConstructorLocator.cs" />
     <Compile Include="TypeSystem\EnumerableTypes.cs" />
     <Compile Include="TypeSystem\GenericImplementationSpecification.cs" />
+    <Compile Include="TypeSystem\Generics\InstanceFactoryContext.cs" />
     <Compile Include="TypeSystem\Implementations.cs" />
     <Compile Include="TypeSystem\InnerTypes.cs" />
     <Compile Include="TypeSystem\ITypeAware.cs" />
@@ -594,7 +599,7 @@
     <Compile Include="Runtime\RepositoryBase.cs" />
     <Compile Include="Runtime\Data\Serializer.cs" />
     <Compile Include="Specifications\AssignedSpecification.cs" />
-    <Compile Include="Specifications\ConditionMonitorSpecificationBase.cs" />
+    <Compile Include="Specifications\ApplyConditionMonitorSpecificationBase.cs" />
     <Compile Include="Specifications\DelegatedSpecification.cs" />
     <Compile Include="Specifications\GenericTypeAssignableSpecification.cs" />
     <Compile Include="Specifications\OncePerParameterSpecification.cs" />

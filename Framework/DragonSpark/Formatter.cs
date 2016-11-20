@@ -12,7 +12,7 @@ namespace DragonSpark
 	{
 		[Export]
 		public static IFormatter Default { get; } = new Formatter();
-		Formatter() : this( DefaultImplementation.Implementation.Allow( ConstructCoercer<FormatterParameter>.Default ).ToCache(), DefaultImplementation.Implementation ) {}
+		Formatter() : this( Implementation.Instance.Allow( ConstructCoercer<FormatterParameter>.Default ).ToCache(), Implementation.Instance ) {}
 
 		readonly IParameterizedSource<object, string> general;
 
@@ -24,16 +24,16 @@ namespace DragonSpark
 
 		public string Get( object parameter ) => general.Get( parameter );
 
-		sealed class DefaultImplementation : ParameterizedSourceBase<FormatterParameter, string>
+		sealed class Implementation : ParameterizedSourceBase<FormatterParameter, string>
 		{
 			readonly static Func<FormatterParameter, string> Coerce = p => StringCoercer.Default.Get( p.Instance );
 
-			public static DefaultImplementation Implementation { get; } = new DefaultImplementation();
-			DefaultImplementation() : this( Formatters.Default.Get ) {}
+			public static Implementation Instance { get; } = new Implementation();
+			Implementation() : this( Formatters.Default.Get ) {}
 
 			readonly Func<object, IFormattable> factory;
 
-			DefaultImplementation( Func<object, IFormattable> factory )
+			Implementation( Func<object, IFormattable> factory )
 			{
 				this.factory = factory;
 			}

@@ -15,22 +15,25 @@ using System;
 
 namespace DragonSpark.Diagnostics
 {
-	public sealed class Logger : ParameterizedSourceBase<ILogger>
+	public sealed class Logger : ParameterizedSingletonScope<object, ILogger>
 	{
-		public static IParameterizedSource<object, ILogger> Default { get; } = new ParameterizedSingletonScope<object, ILogger>( o => new Logger().Get );
-		Logger() : this( LoggerFactory.Default.Get(), new DelegatedAssignedSpecification<object, IFormattable>( Formatters.Default.Get ).IsSatisfiedBy ) {}
+		public static Logger Default { get; } = new Logger();
+		Logger() : base( o => new Implementation().Get ) {}
 
-		readonly ILogger logger;
-		readonly Func<object, bool> specification;
-
-		[UsedImplicitly]
-		public Logger( ILogger logger, Func<object, bool> specification )
+		public sealed class Implementation : ParameterizedSourceBase<ILogger>
 		{
-			this.logger = logger;
-			this.specification = specification;
-		}
+			public Implementation() : this( LoggerFactory.Default.Get() ) {}
 
-		public override ILogger Get( object parameter ) => logger.ForContext( Constants.SourceContextPropertyName, parameter, specification( parameter ) );
+			readonly ILogger logger;
+
+			[UsedImplicitly]
+			public Implementation( ILogger logger )
+			{
+				this.logger = logger;
+			}
+
+			public override ILogger Get( object parameter ) => logger.ForContext( Constants.SourceContextPropertyName, parameter, true );
+		}
 	}
 
 	public sealed class DefaultLogger : DelegatedSource<ILogger>

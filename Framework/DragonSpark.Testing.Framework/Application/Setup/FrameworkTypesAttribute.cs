@@ -12,7 +12,7 @@ namespace DragonSpark.Testing.Framework.Application.Setup
 
 	public sealed class FormatterTypesAttribute : TypeProviderAttributeBase
 	{
-		public static Type[] Types { get; } = { typeof(TypeFormatter), typeof(MethodFormatter), typeof(TaskContextFormatter) };
+		public static Type[] Types { get; } = { typeof(TypeFormatter), typeof(MethodFormatter), typeof(TaskContextFormatter), typeof(ObjectFormatter) };
 
 		public FormatterTypesAttribute() : base( Types ) {}
 	}

@@ -30,7 +30,7 @@ namespace DragonSpark.Diagnostics.Configurations
 		[PostSharp.Patterns.Contracts.NotNull]
 		public Uri Endpoint { [return: PostSharp.Patterns.Contracts.NotNull]get; set; }
 
-		protected override void Configure( LoggerSinkConfiguration configuration )
-			=> configuration.Seq( Endpoint.ToString(), RestrictedToMinimumLevel, BatchPostingLimit, Period, ApiKey, BufferBaseFileName, BufferFileSizeLimitBytes );
+		protected override void Configure( LoggerSinkConfiguration configuration ) => 
+			configuration.Seq( Endpoint.ToString(), RestrictedToMinimumLevel, BatchPostingLimit, Period, ApiKey, BufferBaseFileName, BufferFileSizeLimitBytes );
 	}
 }

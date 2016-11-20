@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace DragonSpark.Aspects.Diagnostics
 {
-	[DataContract]
+	[DataContract( Namespace = Defaults.Namespace )]
 	public sealed class AddSeqSinkConfiguration : DtoBase<DragonSpark.Diagnostics.Configurations.AddSeqSinkConfiguration>
 	{
 		[UsedImplicitly, DataMember]

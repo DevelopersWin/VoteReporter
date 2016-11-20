@@ -16,7 +16,13 @@ namespace DragonSpark.TypeSystem
 		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => $"{method.DeclaringType.Name}.{method.Name}";
 	}
 
-	public sealed class TypeFormatter : IFormattable
+	[Priority( Priority.Low )]
+	public sealed class ObjectFormatter : TypeFormatter
+	{
+		public ObjectFormatter( object target ) : base( target.GetType() ) {}
+	}
+
+	public class TypeFormatter : IFormattable
 	{
 		readonly Type type;
 
@@ -25,6 +31,6 @@ namespace DragonSpark.TypeSystem
 			this.type = type;
 		}
 
-		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => type.Name;
+		public string ToString( [Optional]string format, [Optional]IFormatProvider formatProvider ) => type.FullName;
 	}
 }

@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using System.Reflection;
 using DragonSpark.Application;
 using DragonSpark.Expressions;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DragonSpark.TypeSystem.Generics
 {

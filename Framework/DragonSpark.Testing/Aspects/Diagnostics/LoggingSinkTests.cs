@@ -6,7 +6,7 @@ using Serilog;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DragonSpark.Testing.Aspects
+namespace DragonSpark.Testing.Aspects.Diagnostics
 {
 	public class LoggingSinkTests : TestCollectionBase
 	{

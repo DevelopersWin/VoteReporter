@@ -35,7 +35,7 @@ namespace DragonSpark.Aspects
 		public IEnumerable<AspectInstance> ProvideAspects( object targetElement )
 		{
 			var methodBase = (MethodBase)targetElement;
-			foreach ( var parameter in methodBase.GetParameters().Where( info => !info.IsOptional ) )
+			foreach ( var parameter in methodBase.GetParameters().Where( info => !info.IsOptional && !info.IsDefined( typeof(LocationContractAttribute) ) ) )
 			{
 				var parameterType = parameter.ParameterType;
 				foreach ( var source in sources )

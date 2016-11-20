@@ -2,10 +2,10 @@ using System;
 
 namespace DragonSpark.Specifications
 {
-	public abstract class ConditionMonitorSpecificationBase<T> : SpecificationBase<T>
+	public abstract class ApplyConditionMonitorSpecificationBase<T> : SpecificationBase<T>
 	{
 		readonly Func<T, ConditionMonitor> source;
-		protected ConditionMonitorSpecificationBase( Func<T, ConditionMonitor> source )
+		protected ApplyConditionMonitorSpecificationBase( Func<T, ConditionMonitor> source )
 		{
 			this.source = source;
 		}

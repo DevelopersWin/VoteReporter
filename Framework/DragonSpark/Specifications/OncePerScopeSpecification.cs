@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace DragonSpark.Specifications
 {
-	public class OncePerScopeSpecification<T> : ConditionMonitorSpecificationBase<T>
+	public class OncePerScopeSpecification<T> : ApplyConditionMonitorSpecificationBase<T>
 	{
 		public OncePerScopeSpecification() : this( new SingletonScope<ConditionMonitor>( () => new ConditionMonitor() ) ) {}
 

@@ -22,7 +22,7 @@ namespace DragonSpark.Application
 		protected override IEnumerable<ICommand> Yield()
 		{
 			yield return ApplicationPartsFactory.Default.WithParameter( types.ToImmutableArray() ).ToCommand();
-			yield return new DisposingCommand( Disposables.Default.Get() );
+			yield return new DisposingCommand( Disposables.Default );
 
 			foreach ( var command in base.Yield() )
 			{

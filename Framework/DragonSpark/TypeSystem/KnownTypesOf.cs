@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using DragonSpark.Extensions;
 
 namespace DragonSpark.TypeSystem
 {
@@ -36,7 +37,7 @@ namespace DragonSpark.TypeSystem
 				this.types = types;
 			}
 
-			public override IEnumerable<Type> Yield( Type parameter ) => types.Where( parameter.IsAssignableFrom );
+			public override IEnumerable<Type> Yield( Type parameter ) => types.Where( parameter.IsAssignableFrom ).Prioritize();
 		}
 	}
 }
