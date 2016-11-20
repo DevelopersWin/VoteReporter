@@ -46,7 +46,7 @@
     <Compile Include="Activation\Location\Defaults.cs" />
     <Compile Include="Activation\Location\SpecifiedSingletonHostSpecification.cs" />
     <Compile Include="Activation\SingletonDelegates.cs" />
-    <Compile Include="Application\ApplicationAssemblyLocator.cs" />
+    <Compile Include="Application\ApplicationAssemblySelector.cs" />
     <Compile Include="Application\ApplicationPartsAssignedSpecification.cs" />
     <Compile Include="Application\ApplicationPartsFactory.cs" />
     <Compile Include="Application\FatalApplicationException.cs" />
@@ -214,6 +214,8 @@
     <Compile Include="Aspects\Build\ValidatingSpecification.cs" />
     <Compile Include="Aspects\Validation\Definition.cs" />
     <Compile Include="Expressions\PropertyAssignmentFactory.cs" />
+    <Compile Include="FormattableSpecifications.cs" />
+    <Compile Include="FormattableTypes.cs" />
     <Compile Include="Formatters.cs" />
     <Compile Include="IFormatter.cs" />
     <Compile Include="Runtime\Assignments\Assign.cs" />
@@ -404,7 +406,7 @@
     <Compile Include="Diagnostics\LogEventTextFactory.cs" />
     <Compile Include="Diagnostics\Configurations\AddSeqSinkConfiguration.cs" />
     <Compile Include="Diagnostics\Configurations\AddTextWriterConfiguration.cs" />
-    <Compile Include="Diagnostics\ApplicationAssemblyAlteration.cs" />
+    <Compile Include="Diagnostics\ApplicationAssemblyConfiguration.cs" />
     <Compile Include="Diagnostics\Configurations\DestructureByTransformConfiguration.cs" />
     <Compile Include="Diagnostics\Configurations\DestructureConfiguration.cs" />
     <Compile Include="Diagnostics\Configurations\DestructureConfigurationBase.cs" />
@@ -551,7 +553,7 @@
     <Compile Include="TypeSystem\Metadata\AttributeProviders.cs" />
     <Compile Include="TypeSystem\Metadata\AttributeSupport.cs" />
     <Compile Include="TypeSystem\CompatibleArgumentsSpecification.cs" />
-    <Compile Include="Application\DefaultAssemblyInformationSource.cs" />
+    <Compile Include="Application\CurrentApplicationInformation.cs" />
     <Compile Include="TypeSystem\Generics\DelegateCreationContextBase.cs" />
     <Compile Include="TypeSystem\Delegates.cs" />
     <Compile Include="TypeSystem\Metadata\DerivedTypeSpecification.cs" />
@@ -748,7 +750,7 @@
     <Compile Include="Sources\Delegates\SourceFactory.cs" />
     <Compile Include="TypeSystem\AllPartsLocator.cs" />
     <Compile Include="Application\AssemblyInformation.cs" />
-    <Compile Include="TypeSystem\AssemblyInformationSource.cs" />
+    <Compile Include="Application\AssemblyInformationStore.cs" />
     <Compile Include="ComponentModel\SingletonAttribute.cs" />
     <Compile Include="ComponentModel\SourceAttribute.cs" />
     <Compile Include="Diagnostics\LoggerHistorySink.cs" />

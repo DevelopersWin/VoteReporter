@@ -10,6 +10,6 @@ namespace DragonSpark.Windows.Testing
 	{
 		[Theory, AutoData, ContainingTypeAndNested]
 		public void Verify() => 
-			Assert.Equal( DefaultAssemblyInformationSource.Default.Get().Title, new AppDomainFormatter( AppDomain.CurrentDomain ).ToString() );
+			Assert.Equal( CurrentApplicationInformation.Default.Get().Title, new AppDomainFormatter( AppDomain.CurrentDomain ).ToString() );
 	}
 }

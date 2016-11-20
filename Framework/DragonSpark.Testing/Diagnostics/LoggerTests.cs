@@ -56,7 +56,7 @@ namespace DragonSpark.Testing.Diagnostics
 			var logger = Logger.Default.Get( this );
 			logger.Information( "Hello World!" );
 			var line = LoggingHistory.Default.Events.Single();
-			var source = DefaultAssemblyInformationSource.Default.Get();
+			var source = CurrentApplicationInformation.Default.Get();
 			var property = line.Properties[nameof(AssemblyInformation)].To<StructureValue>();
 			Assert.NotNull( property );
 			Assert.Equal( nameof(AssemblyInformation), property.TypeTag );

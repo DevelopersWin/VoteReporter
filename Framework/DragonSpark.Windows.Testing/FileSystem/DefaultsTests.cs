@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Composition;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using DragonSpark.Activation;
+﻿using DragonSpark.Activation;
 using DragonSpark.Activation.Location;
 using DragonSpark.Application;
 using DragonSpark.Application.Setup;
@@ -20,6 +14,12 @@ using DragonSpark.Windows.Runtime;
 using DragonSpark.Windows.Testing.TestObjects;
 using Moq;
 using Ploeh.AutoFixture.Xunit2;
+using System;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 using Activator = DragonSpark.Activation.Activator;
@@ -103,7 +103,7 @@ namespace DragonSpark.Windows.Testing.FileSystem
 			Assert.Equal( GetType().Assembly, assembly );
 		}
 
-		[Theory, DragonSpark.Testing.Framework.Application.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly), typeof(AssemblyInformationSource) )]
+		[Theory, DragonSpark.Testing.Framework.Application.AutoData, IncludeParameterTypes( typeof(ApplicationAssembly), typeof(AssemblyInformationStore) )]
 		public void CreateAssembly( [Service]IParameterizedSource<Assembly, AssemblyInformation> factory, [Service]IServiceProvider container, [Service]Assembly sut )
 		{
 			var fromFactory = ApplicationAssembly.Default.Get();

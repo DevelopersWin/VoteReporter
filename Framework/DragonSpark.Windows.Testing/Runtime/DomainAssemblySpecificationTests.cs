@@ -20,7 +20,7 @@ namespace DragonSpark.Windows.Testing.Runtime
 		public void Other( Assembly[] assemblies )
 		{
 			var sut = new DomainAssemblySpecification( typeof(object).Assembly );
-			var locator = new ApplicationAssemblyLocator( sut.IsSatisfiedBy );
+			var locator = new ApplicationAssemblySelector( sut.IsSatisfiedBy );
 			var assembly = locator.Get( assemblies );
 			Assert.Null( assembly );
 		}

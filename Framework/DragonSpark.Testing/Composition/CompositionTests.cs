@@ -50,10 +50,10 @@ namespace DragonSpark.Testing.Composition
 			Assert.True( sinkOne.Events.Count() > current );
 		}
 
-		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationSource) )]
+		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationStore) )]
 		public void InterfaceExport( [Service]CompositionContext host )
 		{
-			Assert.Same( AssemblyInformationSource.Default, host.GetExport<IParameterizedSource<Assembly, AssemblyInformation>>() );
+			Assert.Same( AssemblyInformationStore.Default, host.GetExport<IParameterizedSource<Assembly, AssemblyInformation>>() );
 		}
 
 		[Fact]

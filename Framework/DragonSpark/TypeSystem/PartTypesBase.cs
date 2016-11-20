@@ -11,7 +11,7 @@ namespace DragonSpark.TypeSystem
 {
 	public abstract class PartTypesBase : ParameterizedSourceBase<IEnumerable<Assembly>, IEnumerable<Type>>
 	{
-		readonly static Func<IEnumerable<Assembly>, Assembly> AssemblySource = ApplicationAssemblyLocator.Default.Get;
+		readonly static Func<IEnumerable<Assembly>, Assembly> AssemblySource = ApplicationAssemblySelector.Default.Get;
 
 		readonly Func<Assembly, ImmutableArray<Type>> typeSource;
 		readonly Func<IEnumerable<Assembly>, Assembly> assemblySource;

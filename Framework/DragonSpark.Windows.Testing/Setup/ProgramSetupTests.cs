@@ -5,7 +5,6 @@ using DragonSpark.Testing.Framework.Application;
 using DragonSpark.Testing.Framework.Application.Setup;
 using DragonSpark.Testing.Objects.Declarative.Setup;
 using DragonSpark.Testing.Objects.Setup;
-using DragonSpark.TypeSystem;
 using System;
 using System.Composition;
 using System.Diagnostics;
@@ -18,7 +17,7 @@ namespace DragonSpark.Windows.Testing.Setup
 	// ReSharper disable once TestFileNameWarning
 	public class ProgramSetupTests
 	{
-		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationSource), typeof(ApplicationAssembly) )]
+		[Theory, AutoData, AdditionalTypes( typeof(AssemblyInformationStore), typeof(ApplicationAssembly) )]
 		public void Create( [Service]ApplicationInformation sut )
 		{
 			Assert.NotNull( sut.AssemblyInformation );

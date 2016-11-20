@@ -6,14 +6,14 @@ using Serilog.Events;
 
 namespace DragonSpark.Diagnostics
 {
-	sealed class ApplicationAssemblyAlteration : LoggingConfigurationBase
+	public sealed class ApplicationAssemblyConfiguration : LoggingConfigurationBase
 	{
-		public static ApplicationAssemblyAlteration Default { get; } = new ApplicationAssemblyAlteration();
-		ApplicationAssemblyAlteration() {}
+		public static ApplicationAssemblyConfiguration Default { get; } = new ApplicationAssemblyConfiguration();
+		ApplicationAssemblyConfiguration() {}
 
 		public override LoggerConfiguration Get( LoggerConfiguration parameter )
 		{
-			var information = DefaultAssemblyInformationSource.Default.Get();
+			var information = CurrentApplicationInformation.Default.Get();
 			var result = information != null ? parameter.Enrich.With( new Enricher( information ) ) : parameter;
 			return result;
 		}

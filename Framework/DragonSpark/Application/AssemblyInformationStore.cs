@@ -1,4 +1,3 @@
-using DragonSpark.Application;
 using DragonSpark.Extensions;
 using DragonSpark.Sources.Parameterized;
 using DragonSpark.Sources.Parameterized.Caching;
@@ -6,13 +5,13 @@ using System.Composition;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace DragonSpark.TypeSystem
+namespace DragonSpark.Application
 {
-	public sealed class AssemblyInformationSource : CacheWithImplementedFactoryBase<Assembly, AssemblyInformation>
+	public sealed class AssemblyInformationStore : CacheWithImplementedFactoryBase<Assembly, AssemblyInformation>
 	{
 		[Export]
-		public static IParameterizedSource<Assembly, AssemblyInformation> Default { get; } = new AssemblyInformationSource();
-		AssemblyInformationSource() {}
+		public static IParameterizedSource<Assembly, AssemblyInformation> Default { get; } = new AssemblyInformationStore();
+		AssemblyInformationStore() {}
 
 		protected override AssemblyInformation Create( Assembly parameter )
 		{
