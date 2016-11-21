@@ -9,7 +9,7 @@ namespace DragonSpark.Windows
 	{
 		readonly string title;
 
-		public AppDomainFormatter( [UsedImplicitly]AppDomain appDomain ) : this( CurrentApplicationInformation.Default.Get().Title ) {}
+		public AppDomainFormatter( [UsedImplicitly]AppDomain appDomain ) : this( AssemblyInformationContext.Default.Get().Title ) {}
 
 		AppDomainFormatter( string title )
 		{

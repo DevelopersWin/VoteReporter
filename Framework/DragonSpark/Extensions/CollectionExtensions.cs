@@ -33,16 +33,6 @@ namespace DragonSpark.Extensions
 			return collection;
 		}
 
-		public static bool AddIfNotPresent<T>( this ICollection<T> @this, T item )
-		{
-			var result = !@this.Contains( item );
-			if ( result )
-			{
-				@this.Add( item );
-			}
-			return result;
-		}
-
 		public static ImmutableArray<T> Purge<T>( this ICollection<T> @this )
 		{
 			var result = @this.WhereAssigned().ToImmutableArray();

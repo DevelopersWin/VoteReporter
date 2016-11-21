@@ -553,7 +553,7 @@
     <Compile Include="TypeSystem\Metadata\AttributeProviders.cs" />
     <Compile Include="TypeSystem\Metadata\AttributeSupport.cs" />
     <Compile Include="TypeSystem\CompatibleArgumentsSpecification.cs" />
-    <Compile Include="Application\CurrentApplicationInformation.cs" />
+    <Compile Include="Application\AssemblyInformationContext.cs" />
     <Compile Include="TypeSystem\Generics\DelegateCreationContextBase.cs" />
     <Compile Include="TypeSystem\Delegates.cs" />
     <Compile Include="TypeSystem\Metadata\DerivedTypeSpecification.cs" />
