@@ -1,4 +1,5 @@
 using DragonSpark.Diagnostics.Configurations;
+using JetBrains.Annotations;
 using PostSharp.Patterns.Contracts;
 using Serilog.Configuration;
 using Serilog.Events;
@@ -6,10 +7,11 @@ using Serilog.Formatting.Display;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public sealed class AddTraceSinkConfiguration : AddSinkConfigurationBase
+	public sealed class AddTraceSinkConfiguration : AddFormattableSinkConfigurationBase
 	{
 		public AddTraceSinkConfiguration() : this( DragonSpark.Diagnostics.Defaults.Template, LogEventLevel.Verbose ) {}
 
+		[UsedImplicitly]
 		public AddTraceSinkConfiguration( string outputTemplate, LogEventLevel restrictedToMinimumLevel ) : base( restrictedToMinimumLevel )
 		{
 			OutputTemplate = outputTemplate;

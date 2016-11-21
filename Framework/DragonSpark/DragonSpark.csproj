@@ -654,7 +654,7 @@
     <Compile Include="Sources\SourceTypeAssignableSpecification.cs" />
     <Compile Include="Aspects\AutoGuardAspect.cs" />
     <Compile Include="Composition\ConventionImplementations.cs" />
-    <Compile Include="Diagnostics\Configurations\AddSinkConfigurationBase.cs" />
+    <Compile Include="Diagnostics\Configurations\AddFormattableSinkConfigurationBase.cs" />
     <Compile Include="Diagnostics\Configurations\EnrichFromLogContextConfiguration.cs" />
     <Compile Include="Sources\Parameterized\Extensions.cs" />
     <Compile Include="Sources\Parameterized\IAlteration.cs" />

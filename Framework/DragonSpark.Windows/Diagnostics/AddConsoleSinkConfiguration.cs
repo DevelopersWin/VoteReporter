@@ -7,7 +7,7 @@ using Serilog.Events;
 
 namespace DragonSpark.Windows.Diagnostics
 {
-	public class AddConsoleSinkConfiguration : AddSinkConfigurationBase
+	public class AddConsoleSinkConfiguration : AddFormattableSinkConfigurationBase
 	{
 		public AddConsoleSinkConfiguration() : this( DragonSpark.Diagnostics.Defaults.Template, LogEventLevel.Verbose ) {}
 
@@ -19,7 +19,7 @@ namespace DragonSpark.Windows.Diagnostics
 		[NotEmpty, UsedImplicitly]
 		public string OutputTemplate { [return: NotEmpty]get; set; }
 
-		protected override void Configure( LoggerSinkConfiguration configuration )
-			=> configuration.ColoredConsole( RestrictedToMinimumLevel, OutputTemplate, FormatProvider );
+		protected override void Configure( LoggerSinkConfiguration configuration ) => 
+			configuration.ColoredConsole( RestrictedToMinimumLevel, OutputTemplate, FormatProvider );
 	}
 }

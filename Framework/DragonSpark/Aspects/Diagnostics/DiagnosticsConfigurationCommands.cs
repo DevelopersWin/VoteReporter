@@ -28,6 +28,7 @@ namespace DragonSpark.Aspects.Diagnostics
 
 		readonly IAssignable<ISourceAware> assignable;
 
+		[UsedImplicitly]
 		public AssignProjectScopeCommand( IAssignable<ISourceAware> assignable )
 		{
 			this.assignable = assignable;

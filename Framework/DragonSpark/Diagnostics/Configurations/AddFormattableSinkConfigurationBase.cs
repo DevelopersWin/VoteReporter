@@ -30,8 +30,15 @@ namespace DragonSpark.Diagnostics.Configurations
 			RestrictedToMinimumLevel = restrictedToMinimumLevel;
 		}
 
-		public IFormatProvider FormatProvider { get; set; }
-
 		public LogEventLevel RestrictedToMinimumLevel { get; set; }
+	}
+
+	public abstract class AddFormattableSinkConfigurationBase : AddSinkConfigurationBase
+	{
+		protected AddFormattableSinkConfigurationBase() : this( LogEventLevel.Verbose ) {}
+
+		protected AddFormattableSinkConfigurationBase( LogEventLevel restrictedToMinimumLevel ) : base( restrictedToMinimumLevel ) {}
+
+		public IFormatProvider FormatProvider { get; set; }
 	}
 }
