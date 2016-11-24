@@ -234,6 +234,7 @@
     <Compile Include="Runtime\Data\TypeDestructurer.cs" />
     <Compile Include="Runtime\Data\TypeSelector.cs" />
     <Compile Include="Runtime\DefaultValueAlteration.cs" />
+    <Compile Include="Runtime\Encoding.cs" />
     <Compile Include="Runtime\Extensions.cs" />
     <Compile Include="Runtime\Hasher.cs" />
     <Compile Include="Runtime\IDisposables.cs" />
